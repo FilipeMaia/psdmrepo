@@ -36,127 +36,45 @@ __version__ = "$$Revision$$"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
-from optparse import OptionParser
-import logging
 import sys
 import os
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
 
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-#import PkgPackage.PkgModule
 #from PkgPackage.PkgModule import PkgClass
 
 #---------------------
 # Local definitions --
 #---------------------
+
+# local variable accessible in this module only
 _OP_X = 'Y'
-LOGGING_TRACE_LEVEL = 15
 
-class _BaseApp_$class :
-
-    #--------------------
-    #  Class variables --
-    #--------------------
-
-    #----------------
-    #  Constructor --
-    #----------------
-    def __init__ ( self, installLogger = True, usage = None, logfmt = '%(asctime)s %(levelname)-8s %(message)s' ) :
-        """Constructor.
-
-        @param installLogger  will install root logger if true
-        @param usage          usage string for OptionParser, e.g. usage: %prog [options] arg1
-        @param logfmt         logger format string
-        """
-
-        # define instance variables
-        self._installLogger = installLogger
-        self._parser = OptionParser ( usage = usage )
-        self._parser.add_option ( '-v', "--verbose", dest="verbose", action="count", default=0, help="produce more noise" )
-        self._log = None
-        self._logfmt = logfmt
-
-    #-------------------
-    #  Public methods --
-    #-------------------
-
-    #
-    #  called from main, customize the app and run it
-    #
-    def run ( self, argv = sys.argv ) :
-        """Customize and run the application
-
-        @param argv   application arguments from the command line, usually sys.argv
-        @return       return value, pass this to the shell
-        """
-
-        self._options, self._args = self._parser.parse_args(argv[1:])
-
-        appName = self.appName()
-
-        # setup logger
-        if self._installLogger :
-            logging.addLevelName ( LOGGING_TRACE_LEVEL, 'TRACE' )
-            rootlog = logging.getLogger()
-            hdlr = logging.StreamHandler( sys.stdout )
-            formatter = logging.Formatter(self._logfmt)
-            hdlr.setFormatter(formatter)
-            rootlog.addHandler(hdlr)
-            logLevels = { 0 : logging.WARNING, 1 : logging.INFO, 2 : LOGGING_TRACE_LEVEL }
-            rootlog.setLevel( logLevels.get (self._options.verbose,logging.DEBUG) )
-            self._log = logging.getLogger(appName)
-        else :
-            self._log = logging.getLogger()
-
-        return self._run()
-
-    #
-    #  Logging methods
-    #
-    def debug ( self, msg, *args, **kwargs ) :
-        return self._log.log ( logging.DEBUG, msg, *args, **kwargs )
-    def trace ( self, msg, *args, **kwargs ) :
-        return self._log.log ( LOGGING_TRACE_LEVEL, msg, *args, **kwargs )
-    def info ( self, msg, *args, **kwargs ) :
-        return self._log.log ( logging.INFO, msg, *args, **kwargs )
-    def warning ( self, msg, *args, **kwargs ) :
-        return self._log.log ( logging.WARNING, msg, *args, **kwargs )
-    def error ( self, msg, *args, **kwargs ) :
-        return self._log.log ( logging.ERROR, msg, *args, **kwargs )
-    def critical ( self, msg, *args, **kwargs ) :
-        return self._log.log ( logging.CRITICAL, msg, *args, **kwargs )
-
-
-    #
-    #  get the application name, subclasses may override
-    #
-    def appName ( self ) :
-        return os.path.basename(sys.argv[0])
-
-    #
-    #  Subclasses should override this method
-    #
-    def _run ( self ) :
-        """Run the application
-
-        @return       return value, pass this to the shell
-        """
-        raise NotImplementedError ( "_BaseApp: method _run() should be implemented in a subclass" )
+# local method name starts with undescore
+def _localMethod() :
+	pass
 
 #---------------------------------
 #  Application class definition --
 #---------------------------------
 
-class $class ( _BaseApp_$class ) :
+class $class ( LusiPyApp ) :
 
     def __init__ ( self ) :
 
-        _BaseApp_$class.__init__ ( self, installLogger = True, usage = "usage: %prog [options] input-file ..." )
+        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] input-file ..." )
 
         # add application options, see optparse module for details
-        self._parser.add_option ( '-u', "--user", default=None, help="specify user name" )
-        self._parser.add_option ( '-o', "--output-file", action="store", default=None, help="send output to file" )
+        self._parser.add_option ( '-u', "--user", 
+								  default=None, help="specify user name" )
+        self._parser.add_option ( '-o', "--output-file", action="store", 
+								  default=None, help="send output to file" )
         
 
     #
@@ -198,7 +116,6 @@ class $class ( _BaseApp_$class ) :
 #  run application when imported as a main module
 #
 if __name__ == "__main__" :
-    app = TemplateApp()
+    app = $class()
     rc = app.run()
     sys.exit(rc)
-
