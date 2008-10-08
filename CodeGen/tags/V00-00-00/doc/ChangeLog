@@ -1,0 +1,17 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package CodeGen
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-00
+2008-10-08 Andy Salnikov
+- first import if the CodeGen into CVS
+

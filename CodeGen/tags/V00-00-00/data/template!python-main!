@@ -1,0 +1,204 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $$Id$$
+#
+# Description:
+#  Script $class...
+#
+#------------------------------------------------------------------------
+
+"""Brief one-line description of the script.
+
+Following paragraphs provide detailed description of the module, its
+contents and usage. This is a template module (or module template:)
+which will be used by LUSI programmers to create new Python scripts.
+This is the "executable module" as opposed to library module. Executable
+modules are mangled (@PYTHON@ above replaced with real path to 
+interpreter plus some extra options) and copied to arch/$LUSI_ARCH/bin area.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $$Id$$ 
+
+@author $author
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$$Revision$$"
+# $$Source$$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+from optparse import OptionParser
+import logging
+import sys
+import os
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+#import PkgPackage.PkgModule
+#from PkgPackage.PkgModule import PkgClass
+
+#---------------------
+# Local definitions --
+#---------------------
+_OP_X = 'Y'
+LOGGING_TRACE_LEVEL = 15
+
+class _BaseApp_$class :
+
+    #--------------------
+    #  Class variables --
+    #--------------------
+
+    #----------------
+    #  Constructor --
+    #----------------
+    def __init__ ( self, installLogger = True, usage = None, logfmt = '%(asctime)s %(levelname)-8s %(message)s' ) :
+        """Constructor.
+
+        @param installLogger  will install root logger if true
+        @param usage          usage string for OptionParser, e.g. usage: %prog [options] arg1
+        @param logfmt         logger format string
+        """
+
+        # define instance variables
+        self._installLogger = installLogger
+        self._parser = OptionParser ( usage = usage )
+        self._parser.add_option ( '-v', "--verbose", dest="verbose", action="count", default=0, help="produce more noise" )
+        self._log = None
+        self._logfmt = logfmt
+
+    #-------------------
+    #  Public methods --
+    #-------------------
+
+    #
+    #  called from main, customize the app and run it
+    #
+    def run ( self, argv = sys.argv ) :
+        """Customize and run the application
+
+        @param argv   application arguments from the command line, usually sys.argv
+        @return       return value, pass this to the shell
+        """
+
+        self._options, self._args = self._parser.parse_args(argv[1:])
+
+        appName = self.appName()
+
+        # setup logger
+        if self._installLogger :
+            logging.addLevelName ( LOGGING_TRACE_LEVEL, 'TRACE' )
+            rootlog = logging.getLogger()
+            hdlr = logging.StreamHandler( sys.stdout )
+            formatter = logging.Formatter(self._logfmt)
+            hdlr.setFormatter(formatter)
+            rootlog.addHandler(hdlr)
+            logLevels = { 0 : logging.WARNING, 1 : logging.INFO, 2 : LOGGING_TRACE_LEVEL }
+            rootlog.setLevel( logLevels.get (self._options.verbose,logging.DEBUG) )
+            self._log = logging.getLogger(appName)
+        else :
+            self._log = logging.getLogger()
+
+        return self._run()
+
+    #
+    #  Logging methods
+    #
+    def debug ( self, msg, *args, **kwargs ) :
+        return self._log.log ( logging.DEBUG, msg, *args, **kwargs )
+    def trace ( self, msg, *args, **kwargs ) :
+        return self._log.log ( LOGGING_TRACE_LEVEL, msg, *args, **kwargs )
+    def info ( self, msg, *args, **kwargs ) :
+        return self._log.log ( logging.INFO, msg, *args, **kwargs )
+    def warning ( self, msg, *args, **kwargs ) :
+        return self._log.log ( logging.WARNING, msg, *args, **kwargs )
+    def error ( self, msg, *args, **kwargs ) :
+        return self._log.log ( logging.ERROR, msg, *args, **kwargs )
+    def critical ( self, msg, *args, **kwargs ) :
+        return self._log.log ( logging.CRITICAL, msg, *args, **kwargs )
+
+
+    #
+    #  get the application name, subclasses may override
+    #
+    def appName ( self ) :
+        return os.path.basename(sys.argv[0])
+
+    #
+    #  Subclasses should override this method
+    #
+    def _run ( self ) :
+        """Run the application
+
+        @return       return value, pass this to the shell
+        """
+        raise NotImplementedError ( "_BaseApp: method _run() should be implemented in a subclass" )
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class $class ( _BaseApp_$class ) :
+
+    def __init__ ( self ) :
+
+        _BaseApp_$class.__init__ ( self, installLogger = True, usage = "usage: %prog [options] input-file ..." )
+
+        # add application options, see optparse module for details
+        self._parser.add_option ( '-u', "--user", default=None, help="specify user name" )
+        self._parser.add_option ( '-o', "--output-file", action="store", default=None, help="send output to file" )
+        
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # check the arguments
+        if not self._args :
+            self._parser.error("one or more arguments required")
+            return 2
+
+        # open output file
+        if self._options.output_file :
+            self.debug( "Open alternative output file" )
+            out = open ( self._options.output_file, "w" )
+        else:
+            out = sys.stdout
+
+        # process all arguments
+        for arg in self._args :
+            self.process ( arg, out )
+
+
+    #
+    #  Does real processing job
+    #
+    def process ( self, arg, out ) :
+        """Processes one argument"""
+
+        self.trace( "Processing "+arg+"..." )
+
+        #.......................
+        pass
+	
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = TemplateApp()
+    rc = app.run()
+    sys.exit(rc)
+
