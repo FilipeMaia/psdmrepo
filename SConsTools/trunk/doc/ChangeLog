@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-01
+2008-10-08 Andy Salnikov
+- added ScriptInstall builder to handle substitution of @XYZ@ placeholders
+  in the scripts
+
 Tag: V00-00-00
 2008-10-08 Andy Salnikov
 - initial import of SConsTools into CVS

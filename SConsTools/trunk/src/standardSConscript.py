@@ -46,26 +46,30 @@ def standardSConscript() :
     #
     # Process src/ directory, link python sources
     #
-    pysrcs = Glob("src/*.py", source=True )
+    pysrcs = Glob("src/*.py", source=True, strings=True )
     if pysrcs :
-        trace ( "pysrcs = "+pformat([str(s) for s in pysrcs]), "SConscript", 2 )
+        trace ( "pysrcs = "+pformat(pysrcs), "SConscript", 2 )
 
         # python files area installed into python/Package
         for src in pysrcs :
-            basename = os.path.basename(src.get_abspath())
+            basename = os.path.basename(src)
             pydst = pjoin(pydir,pkg,basename)
+            ini = pjoin(pydir,pkg,"__init__.py")
+            env.Command ( ini, "", [ Touch("$TARGET") ] )
+            env.PyCompile ( ini+"c", source=ini )
             env.Symlink ( pydst, source=src )
             env.PyCompile ( pydst+"c", source=pydst )
 
     #
     # Process app/ directory
     #
-    app_files = Glob("app/*", source=True)
+    app_files = Glob("app/*", source=True, strings=True )
     if app_files :
         
-        scripts = [ f for f in app_files if not os.path.splitext(f.get_abspath())[1] ]
-        trace ( "scripts = "+pformat([str(s) for s in scripts]), "SConscript", 2 )
+        scripts = [ f for f in app_files if not os.path.splitext(f)[1] and os.path.isfile(f) ]
+        trace ( "scripts = "+pformat(scripts), "SConscript", 2 )
 
-        # Scripts are simply copied to bin/ directory
-        if scripts : env.Install ( bindir, source=scripts )
+        # Scripts are copied to bin/ directory
+        for s in scripts : 
+            env.ScriptInstall ( os.path.join(bindir,os.path.basename(s)), s )
 
