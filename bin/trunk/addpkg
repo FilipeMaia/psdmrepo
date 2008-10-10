@@ -32,7 +32,7 @@ find_tag() {
   if [ -z "$2" ] ; then
     #tag1=`statusrel "$3" "$1"`
     tag1="HEAD"
-    if [ -z "$2" ] ; then
+    if [ -z "$tag1" ] ; then
       tag1="HEAD"
       echo "Release $3 does not have package $1, will use HEAD version" 1>&2
     else
@@ -46,13 +46,13 @@ find_tag() {
 checkout() {
 
   # get the real tag
-  tag=`find_tag "$1" "$2" "$3"`
+  tag2=`find_tag "$1" "$2" "$3"`
 
   # checkout package
   if [ "$4" = "cvs" ] ; then
-    checkout_cvs "$1" "$2" || exit 2
+    checkout_cvs "$1" "$tag2" || exit 2
   else
-    checkout_svn "$1" "$2" || exit 2
+    checkout_svn "$1" "$tag2" || exit 2
   fi
 
   # link or copy SConstruct file
