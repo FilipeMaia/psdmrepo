@@ -79,6 +79,7 @@ test -n "$LUSI_ROOT" || set_env LUSI_ROOT /afs/slac.stanford.edu/g/lusi
 # determine the release to use, could be the first command line argument,
 # or the content of .lusi_release, ~/LUSI_RELEASE, or "current"
 #
+unset_env LUSI_RELEASE
 if [ -n "$1" ] ; then
   if [ "$1" = "nobase" -o -d "$LUSI_ROOT/sw/releases/$1" ] ; then
     set_env LUSI_RELEASE "$1"
