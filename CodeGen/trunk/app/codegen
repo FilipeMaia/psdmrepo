@@ -71,6 +71,7 @@ def main( argv ):
 
     templName = 'template!' + options.language + '!'
     files = os.listdir ( options.directory )
+    generated = []
     for f in files :
         if f.startswith ( templName ) :
             #print 'file:', f
@@ -88,8 +89,14 @@ def main( argv ):
                 #print "kw:", kw
                 code = templ.safe_substitute ( kw )
                 open ( genName, 'w' ).write ( code )
+                generated.append( genName )
             except Exception, e :
                 print >> sys.stderr, "Failure during code generation:", str(e)
+                
+    if generated :
+        print "Produced files:", " ".join(generated)
+    else :
+        print >> sys.stderr, "No files generated, check language name"
 
 def make_keywords ( options, args ) :
 
