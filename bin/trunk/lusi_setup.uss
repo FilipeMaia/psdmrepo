@@ -77,7 +77,7 @@ test -n "$LUSI_ROOT" || set_env LUSI_ROOT /afs/slac.stanford.edu/g/lusi
 
 #
 # determine the release to use, could be the first command line argument,
-# or the content of ~/LUSI_RELEASE, or "current"
+# or the content of .lusi_release, ~/LUSI_RELEASE, or "current"
 #
 if [ -n "$1" ] ; then
   if [ "$1" = "nobase" -o -d "$LUSI_ROOT/sw/releases/$1" ] ; then
@@ -85,16 +85,21 @@ if [ -n "$1" ] ; then
     shift
   fi
 fi
+if [ -z "$LUSI_RELEASE" -a -f .lusi_release ] ; then
+  rel=`cat .lusi_release`
+  if [ -d "$LUSI_ROOT/sw/releases/$rel" ] ; then
+  	set_env LUSI_RELEASE "$rel"
+  else
+    # if .lusi_release points to non-existing release it means new production
+    set_env LUSI_RELEASE "nobase"
+  fi
+fi
+if [ -z "$LUSI_RELEASE" -a -r ${HOME}/LUSI_RELEASE ] ; then
+  rel=`cat ${HOME}/LUSI_RELEASE`
+  test -d "$LUSI_ROOT/sw/releases/$rel" && set_env LUSI_RELEASE "$rel"
+fi
 if [ -z "$LUSI_RELEASE" ] ; then
-  if [ -r ${HOME}/LUSI_RELEASE ] ; then
-    rel=`cat ${HOME}/LUSI_RELEASE`
-    if [ -d "$LUSI_ROOT/sw/releases/$rel" ] ; then
-      set_env LUSI_RELEASE "$rel"
-    fi
-  fi
-  if [ -z "$LUSI_RELEASE" ] ; then
-    set_env LUSI_RELEASE current
-  fi
+  set_env LUSI_RELEASE current
 fi
 
 #

@@ -9,7 +9,7 @@
 usage() {
   cat << EOD
 
-Usage: $0 [options] [package-name [package-tag]]
+Usage: `basename $0` [options] [package-name [package-tag]]
 
   Available options:
     -h          this message
@@ -26,82 +26,68 @@ package's src/ directory.
 EOD
 }
 
+# usage: find_tag package tag release
 find_tag() {
 
-  pkg="$1"
-  tag="$2"
-  rel="$3"
-
-  if [ -z "$tag" ] ; then
-    #tag=`statusrel "$rel" "$pkg"`
-    tag="HEAD"
-    if [ -z "$tag" ] ; then
-      tag="HEAD"
-      echo "Release $rel does not have package $pkg, will use HEAD version" 1>&2
+  if [ -z "$2" ] ; then
+    #tag1=`statusrel "$3" "$1"`
+    tag1="HEAD"
+    if [ -z "$2" ] ; then
+      tag1="HEAD"
+      echo "Release $3 does not have package $1, will use HEAD version" 1>&2
     else
-      echo "Release $rel has tag $tag of package $pkg, will use that" 1>&2
+      echo "Release $3 has tag $tag1 of package $1, will use that" 1>&2
     fi
   fi
-  echo "$tag"
+  echo "$tag1"
 }
 
+# usage: checkout package tag release mode
 checkout() {
 
-  pkg="$1"
-  tag="$2"
-  rel="$3"
-  mode="$4"
-  
   # get the real tag
-  tag=`find_tag "$pkg" "$tag" "$rel"`
+  tag=`find_tag "$1" "$2" "$3"`
 
   # checkout package
-  if [ "$mode" = "cvs" ] ; then
-    checkout_cvs "$pkg" "$tag" || exit 2
+  if [ "$4" = "cvs" ] ; then
+    checkout_cvs "$1" "$2" || exit 2
   else
-    checkout_svn "$pkg" "$tag" || exit 2
+    checkout_svn "$1" "$2" || exit 2
   fi
 
   # link or copy SConstruct file
-  if [ "$pkg" = "SConsTools" ] ; then
-    scons="SConstruct"
-    test -h "$scons" && rm "$scons"
-    test -f "$scons" && mv "$scons" "$scons.save"
-    echo "Linking $scons to $pkg/src/$scons.main"
-    ln -s "$pkg/src/$scons.main" "$scons"
+  if [ "$1" = "SConsTools" ] ; then
+    test -h SConstruct && rm SConstruct
+    test -f SConstruct && mv SConstruct SConstruct.save
+    echo "Linking SConstruct to $1/src/SConstruct.main"
+    ln -s "$1/src/SConstruct.main" SConstruct
   fi
-
-
 }
 
+# usage: checkout_cvs package tag
 checkout_cvs() {
 
-  pkg="$1"
-  tag="$2"
-
-  if [ "$tag" = "HEAD" ] ; then
-    cvs checkout "$pkg"
+  if [ "$2" = "HEAD" ] ; then
+    cvs checkout "$1"
   else
-    cvs checkout -r "$tag" "$pkg"
+    cvs checkout -r "$2" "$1"
   fi
 
 }
 
+# usage: checkout_svn package tag
 checkout_svn() {
 
-  pkg="$1"
-  tag="$2"
-
-  repo="$SVNROOT/$pkg/trunk"
-  test "$tag" = "HEAD" || repo="$SVNROOT/$pkg/tags/$tag"
+  repo123="$SVNROOT/$1/trunk"
+  test "$2" = "HEAD" || repo123="$SVNROOT/$1/tags/$2"
 
   # for existing packages use "switch"
-  if [ -d "$pkg" ] ; then
-    svn switch "$repo" "$pkg"
+  if [ -d "$1" ] ; then
+    svn switch "$repo123" "$1"
   else
-    svn checkout "$repo" "$pkg"
+    svn checkout "$repo123" "$1"
   fi
-
+  unset repo123
 }
 
 # default values for options
