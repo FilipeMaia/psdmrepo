@@ -29,7 +29,8 @@ EOD
 # usage: find_tag package tag release
 find_tag() {
 
-  if [ -z "$2" ] ; then
+  tag1="$2"
+  if [ -z "$tag1" ] ; then
     #tag1=`statusrel "$3" "$1"`
     tag1="HEAD"
     if [ -z "$tag1" ] ; then
@@ -45,15 +46,8 @@ find_tag() {
 # usage: checkout package tag release mode
 checkout() {
 
-  # get the real tag
-  tag2=`find_tag "$1" "$2" "$3"`
-
   # checkout package
-  if [ "$4" = "cvs" ] ; then
-    checkout_cvs "$1" "$tag2" || exit 2
-  else
-    checkout_svn "$1" "$tag2" || exit 2
-  fi
+  checkout_$4 "$1" `find_tag "$1" "$2" "$3"` || exit 2
 
   # link or copy SConstruct file
   if [ "$1" = "SConsTools" ] ; then
