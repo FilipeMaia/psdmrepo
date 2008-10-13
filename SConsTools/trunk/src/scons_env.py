@@ -39,27 +39,37 @@ def buildEnv () :
     lusi_repos = env['LUSI_REPOS']
     lusi_repos = [ r for r in lusi_repos.split(':') if r ]
     # all repos including local
-    all_lusi_repos = lusi_repos + [ '#' ]
+    all_lusi_repos = [ '#' ] + lusi_repos
 
     # arch parts
     lusi_arch = env['LUSI_ARCH']
     lusi_arch_parts = lusi_arch.split('-')
     lusi_arch_base = '-'.join(lusi_arch_parts[0:3])
 
+    # LUSI_ROOT
+    lusi_root = os.environ.get( "LUSI_ROOT", "" )
+
     # build all paths    
-    bindir = pjoin("#arch/${LUSI_ARCH}/bin")
-    libdir = pjoin("#arch/${LUSI_ARCH}/lib")
-    pydir = pjoin("#arch/${LUSI_ARCH}/python")
-    incdir = pjoin("#include")
-    cpppath = [ pjoin(r,"include") for r in all_lusi_repos ]
+    archdir = pjoin("#arch/${LUSI_ARCH}")
+    archincdir = pjoin("${ARCHDIR}/geninc")
+    bindir = pjoin("${ARCHDIR}/bin")
+    libdir = pjoin("${ARCHDIR}/lib")
+    pydir = pjoin("${ARCHDIR}/python")
+    cpppath = []
+    for r in all_lusi_repos :
+        cpppath.append ( pjoin(r,"arch/${LUSI_ARCH}/geninc") )
+        cpppath.append ( pjoin(r,"include") )
     libpath = [ pjoin(r,"arch/${LUSI_ARCH}/lib") for r in all_lusi_repos ]
     
     # set other variables in environment
-    env.Replace( BINDIR = bindir,
+    env.Replace( ARCHDIR = archdir,
+                 ARCHINCDIR = archincdir,
+                 BINDIR = bindir,
                  LIBDIR = libdir,
                  PYDIR = pydir,
                  CPPPATH = cpppath,
                  LIBPATH = libpath,
+                 LUSI_ROOT = lusi_root,
                  LUSI_ARCH_PROC = lusi_arch_parts[0],
                  LUSI_ARCH_OS = lusi_arch_parts[1],
                  LUSI_ARCH_COMPILER = lusi_arch_parts[2],

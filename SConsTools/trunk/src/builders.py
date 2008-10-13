@@ -28,6 +28,8 @@ def _makeSymlink ( target, source, env ) :
     source = str(source[0].abspath)
     trace ( "Executing symlink `%s' -> `%s'" % ( target, source ), "makeSymlink", 3 )
 
+    # if target already exists then remove it
+    if os.path.islink( target ) : os.remove( target )
     os.symlink ( source, target )
 
 def _pyCompile ( target, source, env ) :

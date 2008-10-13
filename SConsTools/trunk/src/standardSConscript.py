@@ -1,7 +1,6 @@
-#!/bin/env scons
 #===============================================================================
 #
-# Main SCons script for LUSI release building
+# SConscript fuction for standard LUSI package
 #
 # $Id$
 #
@@ -52,16 +51,20 @@ def standardSConscript() :
 
         # python files area installed into python/Package
         for src in pysrcs :
+            
+            # make symlink for every .py file and compile it into .pyc
             basename = os.path.basename(src)
             pydst = pjoin(pydir,pkg,basename)
+            env.Symlink ( pydst, source=src )
+            env.PyCompile ( pydst+"c", source=pydst )
+            
+            # make __init__.py and compile it
             ini = pjoin(pydir,pkg,"__init__.py")
             env.Command ( ini, "", [ Touch("$TARGET") ] )
             env.PyCompile ( ini+"c", source=ini )
-            env.Symlink ( pydst, source=src )
-            env.PyCompile ( pydst+"c", source=pydst )
 
     #
-    # Process app/ directory
+    # Process app/ directory, install all scripts
     #
     app_files = Glob("app/*", source=True, strings=True )
     if app_files :
@@ -73,3 +76,19 @@ def standardSConscript() :
         for s in scripts : 
             env.ScriptInstall ( os.path.join(bindir,os.path.basename(s)), s )
 
+    #
+    # Process app/ directory, build all from C++ sources
+    #
+    app_files = Glob("app/*.cpp", source=True, strings=True )
+    if app_files :
+
+        trace ( "app_files = "+pformat(app_files), "SConscript", 2 )
+        
+        # for now build separate application for every C++ source file
+        for s in app_files :
+            
+            obj = env.Object( source = s )
+            bin = env.Program( source=obj )
+            env.Install ( bindir, source=bin )
+            
+            trace ( "children = " + pformat([ str(c) for c in obj[0].children()]), "SConscript", 4 )

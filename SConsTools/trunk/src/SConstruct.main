@@ -17,6 +17,10 @@ lusi_arch=os.environ.get( "LUSI_ARCH", None )
 if not lusi_arch :
     print >> sys.stderr, "Environment variable LUSI_ARCH is not defined"
     Exit(2)
+lusi_root=os.environ.get( "LUSI_ROOT", None )
+if not lusi_root :
+    print >> sys.stderr, "Environment variable LUSI_ROOT is not defined"
+    Exit(2)
 
 #
 # Before doing any other imports link the python files from
