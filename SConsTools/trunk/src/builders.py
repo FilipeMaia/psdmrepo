@@ -28,8 +28,14 @@ def _makeSymlink ( target, source, env ) :
     source = str(source[0].abspath)
     trace ( "Executing symlink `%s' -> `%s'" % ( target, source ), "makeSymlink", 3 )
 
+    # may need to make a directory for target
+    targetdir = os.path.dirname ( target )
+    if not os.path.isdir( targetdir ) : os.makedirs( targetdir )
+
     # if target already exists then remove it
     if os.path.islink( target ) : os.remove( target )
+    
+    # create symlink now
     os.symlink ( source, target )
 
 def _pyCompile ( target, source, env ) :
