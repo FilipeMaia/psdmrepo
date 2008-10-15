@@ -1,0 +1,128 @@
+#!/bin/sh
+#
+# $Id: addpkg 33 2008-10-13 23:43:03Z salnikov $
+#
+# Convenience interface for Subversion
+#
+
+
+usage() {
+  cat << EOD
+
+Usage: `basename $0` [options] command [command options]
+
+  Available options:
+    -h          this message
+    -d          debug (turn on -x shell option)
+
+  Supported commands:
+    taglist, tags - list all tags for a given or current package
+
+EOD
+}
+
+help_() { 
+  usage 
+}
+
+help_tags() {
+  cat << EOD
+
+Usage: `basename $0` tags [package]
+
+  Prints the list of tags for the given package. If package name is not 
+  given then use current package. Uses "long" SVN format for "svn ls".
+
+EOD
+}
+
+help_tag() {
+  cat << EOD
+
+Usage: `basename $0` tag [options] tag
+
+  Available options:
+    -p package    makes tag for package name, otherwise for local package
+    -r revision   makes tag for a specific revision (could be HEAD), 
+                  otherwise for working copy
+    
+EOD
+}
+
+# get SVN package name in the current directory
+localpkg() {
+  svn info 2>/dev/null | sed -n "\%^URL: $SVNROOT%s%URL: $SVNROOT/*\([^/]*\)/.*%\1%p"
+}
+
+#
+# Print the list of the tags
+#
+taglist() {
+
+  pkg=${1:-`localpkg`}
+  pkg=${pkg:?Cannot determine package name}
+  
+  svn ls -r HEAD -v "$SVNROOT/$pkg/tags"
+
+}
+
+#
+# Create new tag for a package
+#
+maketag() {
+	
+  rev=""
+  pkg=""
+  # get the options
+  while getopts r:p: c ; do
+    case $c in
+      p) pkg="$OPTARG" ;;
+      r) rev="$OPTARG" ;;
+      \?) help_tag ; exit 2 ;;
+    esac
+  done
+  shift `expr $OPTIND - 1`
+
+  tag=${1:?No tag provided}
+
+  pkg=${pkg:-`localpkg`}
+  pkg=${pkg:?Cannot determine package name}
+
+  if [ -n "$rev" ] ; then
+    svn copy -r "$rev" -m 'Tagging $pkg with $tag' \
+      "$SVNROOT/$pkg/trunk" "$SVNROOT/$pkg/tags/$tag"
+  else
+    lpkg=`localpkg`
+    lpkg=${lpkg:?Not in the package directory}
+    svn copy -m 'Tagging $pkg with $tag' "." "$SVNROOT/$pkg/tags/$tag"
+  fi
+}
+
+
+# need SVNROOT for operations
+_chk=${SVNROOT:?}
+
+# get the options
+while getopts hd c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    d) set -x ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# check arguments
+if [ $# -eq 0 ] ; then
+  echo 'No command provided'
+  usage
+  exit 2
+fi
+
+# dispatch
+case $1 in
+  help) shift ; help_$1 ;;
+  tags) shift ; taglist "$@" ;;
+  tag) shift ; maketag "$@" ;;
+  *) usage ; exit 2 ;;
+esac
