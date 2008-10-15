@@ -1,4 +1,3 @@
-#!/bin/env scons
 #===============================================================================
 #
 # Main SCons script for LUSI release building
@@ -26,6 +25,7 @@ def buildEnv () :
     vars = Variables()
     vars.Add('LUSI_ARCH', "Use to change the LUSI_ARCH value during build", os.environ['LUSI_ARCH'] )
     vars.Add('LUSI_REPOS', "Use to change the LUSI_REPOS value during build", os.environ.get('LUSI_REPOS',"") )
+    vars.Add('PKG_DEPS_FILE', "name of the package dependency file", '.pkg_tree.pkl' )
     vars.Add('TRACE', "Set to positive value to trace processing", 0)
     
     # make environment, also make it default
@@ -75,11 +75,18 @@ def buildEnv () :
                  LUSI_ARCH_COMPILER = lusi_arch_parts[2],
                  LUSI_ARCH_OPT = lusi_arch_parts[3],
                  LUSI_ARCH_BASE = lusi_arch_base,
-                 LUSI_REPOS = lusi_repos )
+                 LUSI_REPOS = lusi_repos,
+                 PKG_TREE = {},
+                 PKG_TREE_BASE = {},
+                 PKG_TREE_BINS = {} )
 
     # generate help    
     Help(vars.GenerateHelpText(env))
     
-    trace ( "Build env = "+pprint.pformat(env.Dictionary()), "<top>", 5 )
+    trace ( "Build env = "+pprint.pformat(env.Dictionary()), "buildEnv", 7 )
+    
+    #for r in lusi_repos :
+    #    trace ( "Add repository "+r, "<top>", 2 )
+    #    Repository( r )
 
     return env

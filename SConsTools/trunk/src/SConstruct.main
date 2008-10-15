@@ -12,6 +12,8 @@ import sys
 from pprint import *
 from os.path import join as pjoin
 
+cwd = os.getcwd()
+
 #   check that LUSI_ARCH is defined
 lusi_arch=os.environ.get( "LUSI_ARCH", None )
 if not lusi_arch :
@@ -42,7 +44,7 @@ if os.path.isdir("SConsTools/src") :
     
     # add missing links
     for f in pys - links :
-        os.symlink ( pjoin("../../../../SConsTools/src",f), pjoin(d,f) )
+        os.symlink ( pjoin(cwd,"SConsTools/src",f), pjoin(d,f) )
 
     init = pjoin(d,"__init__.py")
     if not os.path.isfile(init) :
@@ -50,8 +52,7 @@ if os.path.isdir("SConsTools/src") :
         f.close()
         del f
     del init
-        
-del lusi_arch
+
 
 #
 # Now can import rest of the stuff
@@ -62,6 +63,7 @@ from SConsTools.scons_env import buildEnv
 from SConsTools.compilers import setupCompilers
 from SConsTools.builders import setupBuilders
 from SConsTools.standardSConscript import standardSConscript
+from SConsTools.dependencies import *
 
 # ===================================
 #   Setup default build environment
@@ -73,7 +75,6 @@ setupCompilers( env )
 #
 # find out which packages we have locally
 #
-cwd = os.getcwd()
 packages = [ d for d in os.listdir(cwd) if os.path.isfile(pjoin( d, "SConscript" )) ]
 trace ( "Packages: " + pformat( packages ), "<top>", 1 )
 
@@ -82,6 +83,15 @@ trace ( "Packages: " + pformat( packages ), "<top>", 1 )
 #
 makePackageLinks ( "include", packages )
 makePackageLinks ( "data", packages )
+
+#
+# load package dependencies from base releases
+#
+for r in reversed(env['LUSI_REPOS']) :
+    fname = pjoin ( r, env['PKG_DEPS_FILE'] )
+    if os.path.isfile ( fname ) :
+        loadPkgDeps ( env, fname )
+
 
 #
 # include all SConscript files from all packages
@@ -95,4 +105,15 @@ for p in packages :
                 duplicate=0,
                 exports="env trace standardSConscript" )
 
+#
+# Now store the dependencies in case somebody else would want to use them later
+#
+storePkgDeps ( env, env['PKG_DEPS_FILE'] )
+
+#
+# Analyze whole dependency tree and adjust dependencies and libraries
+#
+adjustPkgDeps ( env )
+
+trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
 trace ( "BUILD_TARGETS is " + pformat( map(str, BUILD_TARGETS) ), "<top>", 1 )

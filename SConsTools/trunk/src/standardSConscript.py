@@ -15,21 +15,37 @@ from SCons.Defaults import *
 from SCons.Script import *
 
 from SConsTools.trace import *
+from SConsTools.dependencies import *
+
+def _normbinsrc ( f ):
+    if not os.path.split(f)[0] :
+        return os.path.join("app",f)
+    else :
+        return f
 
 #
 # This is the content of the standard SConscript
 #
-def standardSConscript() :
+def standardSConscript( **kw ) :
+
+    """ Understands following keywords, all optional:
+        BINS - dictionary of executables and their corresponding source files
+        LIBS - list of additional libraries that have to be linked with applications
+    """
 
     pkg = os.path.basename(os.getcwd())
     trace ( "SConscript in `"+pkg+"'", "SConscript", 1 )
-
-    env = DefaultEnvironment()
     
+    env = DefaultEnvironment()
     bindir = env['BINDIR']
     libdir = env['LIBDIR']
     pydir = env['PYDIR']
-    
+
+    # Program options
+    binkw = {}
+    if 'LIBS' in kw : binkw['LIBS'] = kw['LIBS']
+    if 'LIBDIRS' in kw : binkw['LIBDIRS'] = kw['LIBDIRS']
+
     #
     # Process src/ directory, make library from all compilable files
     #
@@ -38,9 +54,17 @@ def standardSConscript() :
         trace ( "libsrcs = "+pformat([str(s) for s in libsrcs]), "SConscript", 2 )
 
         # c++ files area compiled into library  
-        if libsrcs : 
+        if libsrcs :
+             
             lib = env.SharedLibrary ( pkg, source=libsrcs )
             env.Install ( libdir, source=lib )
+            deps = findAllDependencies( lib[0] )
+            trace ( "deps = " + pformat(deps), "SConscript", 4 )
+            
+            setPkgDeps ( env, pkg, deps )
+            setPkgLibs ( env, pkg, [ pkg ] )
+            
+            binkw.setdefault('LIBS',[]).insert ( 0, pkg )
 
     #
     # Process src/ directory, link python sources
@@ -79,16 +103,28 @@ def standardSConscript() :
     #
     # Process app/ directory, build all from C++ sources
     #
-    app_files = Glob("app/*.cpp", source=True, strings=True )
-    if app_files :
+    bins = kw.get('BINS',{})
+    if bins :
+        for k in bins.iterkeys() :
+            src = bins[k]
+            if isinstance(src,(str,unicode)) : src = src.split()
+            src = [ _normbinsrc(s) for s in src ]
+            bins[k] = src
+    else :
+        for f in Glob("app/*.cpp", source=True, strings=True ) :
+            bin = os.path.splitext(os.path.basename(f))[0]
+            bins[bin] = [ f ]
+    if bins :
 
-        trace ( "app_files = "+pformat(app_files), "SConscript", 2 )
+        trace ( "bins = "+pformat(bins), "SConscript", 2 )
         
-        # for now build separate application for every C++ source file
-        for s in app_files :
+        for bin, srcs in bins.iteritems() :
             
-            obj = env.Object( source = s )
-            bin = env.Program( source=obj )
-            env.Install ( bindir, source=bin )
+            b = env.Program( bin, source=srcs, **binkw )
+            env.Install ( bindir, source=b )
             
-            trace ( "children = " + pformat([ str(c) for c in obj[0].children()]), "SConscript", 4 )
+            deps = findAllDependencies( b[0] )
+            trace ( bin+" deps = " + pformat(deps), "SConscript", 4 )
+            
+            setBinDeps ( env, b[0], deps )
+            

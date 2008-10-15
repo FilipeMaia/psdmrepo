@@ -1,4 +1,3 @@
-#!/bin/env scons
 #===============================================================================
 #
 # Main SCons script for LUSI release building
