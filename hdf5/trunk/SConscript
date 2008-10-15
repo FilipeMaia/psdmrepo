@@ -11,7 +11,7 @@
 Import('*')
 
 import os
-
+from os.path import join as pjoin
 from SConsTools.standardExternalPackage import standardExternalPackage
 
 #
@@ -20,11 +20,26 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
+szip_ver = "2.1"
+PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/szip",szip_ver,env['LUSI_ARCH'])
+LIBDIR  = "lib"
+PKGLIBS = "sz" 
+standardExternalPackage ( 'szip', **locals() )
+
+
+mxml_ver = "2.5"
+PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/mxml",mxml_ver,env['LUSI_ARCH'])
+LIBDIR  = "lib"
+PKGLIBS = "mxml m"
+standardExternalPackage ( 'mxml', **locals() )
+
+
 hdf5_ver = "1.8.1"
-hdf5_dir = os.path.join(env['LUSI_ROOT'],"sw/external/hdf5",hdf5_ver,env['LUSI_ARCH'])
-
-
-standardExternalPackage ( 'hdf5', prefix=hdf5_dir, 
-                          inc_dir="include", lib_dir="lib", bin_dir="bin" )
-
+PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/hdf5",hdf5_ver,env['LUSI_ARCH'])
+INCDIR  = "include"
+LIBDIR  = "lib"
+BINDIR  = "bin"
+PKGLIBS = "hdf5"
+DEPS    = "szip mxml"
+standardExternalPackage ( 'hdf5', **locals() )
 
