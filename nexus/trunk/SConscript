@@ -11,6 +11,7 @@
 Import('*')
 
 import os
+from os.path import join as pjoin
 
 from SConsTools.standardExternalPackage import standardExternalPackage
 
@@ -21,11 +22,13 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 nexus_ver = "4.1.0"
-arch = env['LUSI_ARCH']
 py_ver = env['PYTHON_VERSION']
-nexus_dir = os.path.join(env['LUSI_ROOT'],"sw/external/nexus",nexus_ver,arch)
 
-
-standardExternalPackage ( 'nexus', prefix=nexus_dir, 
-                          inc_dir="include", lib_dir="lib", bin_dir="bin",
-                          py_dir="lib/python"+py_ver+"/site-packages" )
+PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/nexus",nexus_ver,env['LUSI_ARCH'])
+DEPS    = "hdf5"
+INCDIR  = "include"
+LIBDIR  = "lib"
+BINDIR  = "bin"
+PYDIR   = "lib/python"+py_ver+"/site-packages"
+PKGLIBS = "NeXus"
+standardExternalPackage ( 'nexus', **locals() )
