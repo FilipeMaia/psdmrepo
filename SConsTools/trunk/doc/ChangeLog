@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2008-10-17 Andy Salnikov
+- standardExternalPackage: adding PYDIRSEP option
+
 Tag: V00-00-04
 2008-10-15 Andy Salnikov
 - adding release dependencies module 

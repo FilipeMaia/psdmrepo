@@ -39,6 +39,8 @@ def standardExternalPackage ( package, **kw ) :
         PREFIX   - top directory of the external package
         INDIR    - include directory, absolute or relative to PREFIX 
         PYDIR    - Python src directory, absolute or relative to PREFIX
+        PYDIRSEP - if present and evaluates to True installs python code to a 
+                   separate directory arch/$LUSI_ARCH/python/<package>
         LIBDIR   - libraries directory, absolute or relative to PREFIX
         LINKLIBS - library names to link, or all libs if not present
         BINDIR   - binaries directory, absolute or relative to PREFIX
@@ -67,7 +69,17 @@ def standardExternalPackage ( package, **kw ) :
     py_dir = _absdir ( prefix, kw.get('PYDIR',None) )
     if py_dir :
         trace ( "py_dir: %s" % py_dir, "standardExternalPackage", 5 )
-        env.Symlink ( Dir(pjoin(env.subst("$PYDIR"),package)), Dir(py_dir) )
+        if kw.get('PYDIRSEP',False) :
+            # make a link to the whole dir
+            env.Symlink ( Dir(pjoin(env.subst("$PYDIR"),package)), Dir(py_dir) )
+        else :
+            # make links for every file in the directory
+            files = os.listdir(py_dir)
+            for f in files :
+                loc = pjoin(py_dir,f)
+                if not os.path.isdir(loc) :
+                    env.Symlink ( pjoin(env.subst("$PYDIR"),f), loc )
+            
     
     # link all libraries
     lib_dir = _absdir ( prefix, kw.get('LIBDIR',None) )
