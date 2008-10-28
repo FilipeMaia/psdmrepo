@@ -1,0 +1,196 @@
+# $Id: README,v 1.3 2007/02/11 03:24:25 salnikov Exp $
+
+Package: MsgLogger
+Date   : 2005-07-20, updated 2008-10-28
+Author : Andy Salnikov
+
+This package contains the message logging classes for replacement of 
+the old COUT1/BDBDEBUG1 stuff. The ideas for this stuff came mainly 
+from Python logging module and BaBar ErrLogger package. This thing 
+should not be considered as a replacement for ErrLogger, instead it is 
+useful addition to it. It is a replacement for the old COUT1/2 stuff 
+used extensively throughout the BDB code. But it's not just a 
+replacement, this stuff is much more generic and very flexible. 
+
+There are few concepts and corresponding classes in this package: 
+records, loggers, streams, handlers, and formatters.
+
+
+Records
+-------
+
+Record is another name for message. Its corresponding class is 
+MsgLogRecord, which encapsulates bunch of the information about the 
+message, like where does it come from and what it should say. Every 
+record has corresponding logging level code. Currently levels could
+be any of the following: error, warning, debug, trace, or info, in 
+the order of their priority.
+
+Clients usually do not see this class at all, only developers might 
+need something from this class.
+
+
+Loggers
+-------
+
+One of the main concepts here. There could be a number of distinct 
+loggers in any application. Each logger is distinguished by its name, 
+and all loggers are organized in hierarchical structure. Every logger
+(except top one) has one parent logger and zero or more children. One 
+logger is a root of the whole structure and it is called root logger.
+The hierarchy is build from the names of the loggers, using the dot 
+notation. For example:
+
+  logger 'DB.Temporal' has parent logger 'DB'
+  logger 'DB' has root logger as a parent
+
+Such hierarchical structure simplifies configuration of the loggers
+and their produced messages.
+
+The messages (records) are all passed to their corresponding loggers. 
+Every logger has corresponding logging level (error, warning, debug, 
+trace, info, or nolog). If the record level is higher than logger level 
+then the logger sends this message to its handlers (if any).
+
+Additionally the logger has a 'propagate' flag which is true by 
+default, but can be changed via configuration settings. If this flag 
+is set to true then the logger forwards the same message to its parent 
+logger too. This happens independently of the logger's logging level.
+
+Loggers are usually instantiated transparently to user and configured 
+at runtime via some mechanism. Client code should not in most cases do
+anything with the loggers.
+
+Handlers
+--------
+
+Handlers do actual logging work, that is they forward the message to 
+actual recipient. There could be different types of handlers, e.g. for 
+printing to standard output, or sending to syslog, or some other 
+logging service, etc. But in fact there is only one type implemented 
+currently, which sends formatted message to the std::cout/cerr. 
+
+Handlers also have corresponding logging level, and only process 
+records with the higher or equal level.
+
+Formatters
+----------
+
+Formatters are used by (some) handlers to transform messages into a
+human readable format. There is only one formatter class, but every 
+handler has independent instance of this class which could be 
+configured independently. Configuration of formatter consists of the 
+format string. There is one common format string which could be used 
+for any logging level, and there could be level-specific format 
+strings.
+
+Format string is a normal string with the control sequences, each 
+control sequence consists of a percent sign followed by the keyword 
+in parentheses. Here is the list of keywords:
+
+    logger  - name of the logger
+    level   - logging level of the message (debug/trace/info)
+    L       - one-letter level code (D/T/I)
+    message - the text of the message
+    path    - full path of the file where message originated
+    file    - base name of the file where message originated
+    line    - line number where message originated
+    time    - timestamp of the message
+    pid     - process ID
+
+Example of the format string could be (and it is also a default 
+format string):
+
+  "%(time) [%(logger)/%(level)] %(file):%(line) - %(message)"
+
+Time can be formatted differently based on a separate configuration 
+option which defines time format string. This is a strftime-format 
+string extended with additional conversion sequence '%f' which prints 
+number of milliseconds. Default time format used by formatter is
+"%m/%d %H:%M:%S.%f"
+
+Streams
+-------
+
+Messages (records) are created by the streams objects. They are the 
+normal C++ streams from iostream library, but they "print" their 
+output into the record object and pass this object to the 
+corresponding logger. It all happens when a a stream is destroyed. 
+
+Streams like are created by special macros and not normally visible 
+to clients. You can instantiate them without macros, but you have to 
+provide all nuance parameters like file name, line number. 
+
+Here is an example of typical usage for sending a message to a 
+'OPR.Temporal' logger:
+
+    MsgLog("OPR.Temporal", debug, "finished temporal merge" ) ;
+
+For messages directed to a root logger:
+
+    MsgLogRoot(info, "move along " << n << "steps" ) ;
+
+If you need to print a lot more than can fit into arguments for MsgLog
+macros, there is a way to declare a temporary stream object like this:
+
+    // or WithMsgLogRoot(debug,log) ;
+    WithMsgLog("OPR.Temporal",debug,log) {
+      log << "result of a merge:" ;
+      for ( int i = 0 ; i < 10 ; ++ i ) {
+        log << " " << i ;
+      }
+    }
+    
+The scope of the log object declared above (which is a regular ostream
+object) is to the end of the closing bracket matching the opening bracket 
+after the With... macro. Note that the code within the scope is only executing
+when the the logging level of the logger is lower than message level, that is
+if the logging level of the "OPR.Temporal" logget is "info" then the code 
+above is not executed. Do not rely on any side effect of the code in the 
+scope on surrounding scope. 
+
+Configuration
+-------------
+
+The hole system is designed to be configured at runtime without the 
+need to recompile/relink. Current configuration options are limited, 
+but in the future it would be possible to add more generic way to 
+configure the system, probably through the special configuration file
+with a specialized syntax.
+
+Right now you can configure it through 3 environment variables. First 
+and main envvar is called MSGLOGCONFIG and it allows you to change the 
+logging level of specific loggers. The syntax of this configuration
+string is simple and has the format
+
+  config       ::=  sub-config[;sub-config]*
+  sub-config   ::=  level | logger-list=level
+  logger-list  ::=  logger-name[,logger-name]*
+  level        ::=  debug[-] | trace[-] | info[-] | nolog[-]
+
+if the level in sub-config appears without any logger name, then this 
+level is applied to the root logger. For every logger name mentioned 
+in the config string, it will create logger object with the 
+corresponding logging level, and attach the default handler to it 
+(which will print formatted messages to std::cout.) If the level name 
+ends with '-' then the logger will have 'propagate' flag set to false.
+
+Here are examples of the configuration string:
+
+    setenv MSGLOGCONFIG "info;OPR.Temporal=trace-;CDB=debug-"
+
+This will set logging level for root logger to 'info', for logger
+'OPR.Temporal' to 'trace', and for 'CDB' (and children) to 'debug'.
+Note that '-' after trace and debug is needed in this case to avoid
+duplicate message of 'info' level.
+
+Second envvar with name MSGLOGFMT allows to change the default message 
+format string used by all formatters. Here is example of more compact 
+format string:
+
+    setenv MSGLOGFMT "{%(logger)}[%(L)] %(message)"
+
+And one more envvar with the name MSGLOGTIMEFMT controls the output 
+format of the time stamps, One more example:
+
+    setenv MSGLOGTIMEFMT "%D %T.%f"

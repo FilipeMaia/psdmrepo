@@ -1,0 +1,112 @@
+//--------------------------------------------------------------------------
+// File and Version Information:
+// 	$Id: MsgLogLevel.cc,v 1.1 2005/07/22 22:23:32 salnikov Exp $
+//
+// Description:
+//	Class MsgLogLevel
+//
+// Environment:
+//	Software developed for the BaBar Detector at the SLAC B-Factory.
+//
+// Author List:
+//      Andy Salnikov
+//
+// Copyright Information:
+//      Copyright (C) 2005 SLAC
+//
+//------------------------------------------------------------------------
+#include "Lusi/Lusi.h"
+
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "MsgLogger/MsgLogLevel.h"
+
+//-------------
+// C Headers --
+//-------------
+extern "C" {
+}
+
+//---------------
+// C++ Headers --
+//---------------
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+
+namespace MsgLogger {
+
+//		----------------------------------------
+// 		-- Public Function Member Definitions --
+//		----------------------------------------
+
+// get full printable name of Level level
+const char*
+MsgLogLevel::levelName () const
+{
+  switch ( _level ) {
+    case debug:
+      return "debug" ;
+    case trace:
+      return "trace" ;
+    case info:
+      return "info" ;
+    case warning:
+      return "warning" ;
+    case error:
+      return "error" ;
+    case nolog:
+    default:
+      return "no-log" ;
+  }
+}
+
+// get 3-letter printable name of Level code
+const char*
+MsgLogLevel::level3 () const
+{
+  switch ( _level ) {
+    case debug:
+      return "DBG" ;
+    case trace:
+      return "TRC" ;
+    case info:
+      return "INF" ;
+    case warning:
+      return "WRN" ;
+    case error:
+      return "ERR" ;
+    case nolog:
+    default:
+      return "???" ;
+  }
+}
+
+// get one-char Level code
+char
+MsgLogLevel::levelLetter () const
+{
+  switch ( _level ) {
+    case debug:
+      return 'D' ;
+    case trace:
+      return 'T' ;
+    case info:
+      return 'I' ;
+    case warning:
+      return 'W' ;
+    case error:
+      return 'E' ;
+    case nolog:
+    default:
+      return '?' ;
+  }
+}
+
+} // namespace MsgLogger
