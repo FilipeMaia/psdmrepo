@@ -1,0 +1,23 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package Lusi
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Brief description:
+==================
+
+This package is primarily for the global "fixes" that may be required in
+every C++ source file.
+
+Detailed description:
+=====================
+
+The main "interface" for this package is the Lusi.h header file. It is 
+supposed to be included in every C++ *source* file (that is .cpp) and
+not header file. It would provide global "fixups" in case anything is 
+needed in the future for specific platform/compiler.
