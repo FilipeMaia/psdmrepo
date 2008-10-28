@@ -128,7 +128,7 @@ newpkg() {
 	
   pkg=${1:?No package name provided}
 
-  svn copy -m "Creating package $pkg" "$SVNROOT/$pkg" \
+  svn mkdir -m "Creating package $pkg" "$SVNROOT/$pkg" \
               "$SVNROOT/$pkg/trunk" "$SVNROOT/$pkg/tags" "$SVNROOT/$pkg/branches"
 }
 
