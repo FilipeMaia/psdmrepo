@@ -16,7 +16,8 @@ Usage: `basename $0` [options] command [command options]
     -d          debug (turn on -x shell option)
 
   Supported commands:
-    taglist, tags - list all tags for a given or current package
+    tags - list all tags for a given or current package
+    tag  - make new tag for a package
 
 EOD
 }
