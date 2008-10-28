@@ -17,6 +17,9 @@ from SCons.Script import *
 from SConsTools.trace import *
 from SConsTools.dependencies import *
 
+
+_cplusplus_ext = [ 'cc', 'cpp', 'cxx', 'C', 'c' ]
+
 def _normbinsrc ( f ):
     if not os.path.split(f)[0] :
         return os.path.join("app",f)
@@ -34,7 +37,7 @@ def standardSConscript( **kw ) :
     """
 
     pkg = os.path.basename(os.getcwd())
-    trace ( "SConscript in `"+pkg+"'", "SConscript", 1 )
+    trace ( "Standard SConscript in `"+pkg+"'", "SConscript", 1 )
     
     env = DefaultEnvironment()
     bindir = env['BINDIR']
@@ -43,13 +46,16 @@ def standardSConscript( **kw ) :
 
     # Program options
     binkw = {}
-    if 'LIBS' in kw : binkw['LIBS'] = kw['LIBS']
+    if 'LIBS' in kw :
+        libs = kw['LIBS']
+        if isinstance(libs,(str,unicode)) : libs = libs.split()
+        binkw['LIBS'] = libs
     if 'LIBDIRS' in kw : binkw['LIBDIRS'] = kw['LIBDIRS']
 
     #
     # Process src/ directory, make library from all compilable files
     #
-    libsrcs = Glob("src/*.cpp", source=True )
+    libsrcs = Flatten ( [ Glob("src/*."+ext, source=True ) for ext in _cplusplus_ext ] )
     if libsrcs :        
         trace ( "libsrcs = "+pformat([str(s) for s in libsrcs]), "SConscript", 2 )
 
@@ -111,7 +117,8 @@ def standardSConscript( **kw ) :
             src = [ _normbinsrc(s) for s in src ]
             bins[k] = src
     else :
-        for f in Glob("app/*.cpp", source=True, strings=True ) :
+        cpps = Flatten ( [ Glob("app/*."+ext, source=True, strings=True ) for ext in _cplusplus_ext ] )
+        for f in cpps :
             bin = os.path.splitext(os.path.basename(f))[0]
             bins[bin] = [ f ]
     if bins :

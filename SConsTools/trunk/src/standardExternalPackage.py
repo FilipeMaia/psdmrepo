@@ -9,6 +9,7 @@
 import os
 import sys
 from os.path import join as pjoin
+from fnmatch import fnmatch
 
 from SCons.Defaults import *
 from SCons.Script import *
@@ -31,13 +32,31 @@ def _absdir ( prefix, dir ):
         dir = None
     return dir
 
+def _glob ( dir, patterns ):
+    
+    if patterns is None :
+        return os.listdir(dir)
+    
+    # patterns could be space-separated string of patterns
+    if isinstance(patterns,(str,unicode)) : 
+        patterns = patterns.split()
+    if not patterns : return []
+
+    result = []
+    for l in os.listdir(dir) :
+        for p in patterns :
+            if fnmatch ( l, p ) : result.append(l)
+            
+    return result
+
+
 #
 # Define all builders for the external package
 #
 def standardExternalPackage ( package, **kw ) :
     """ Understands following keywords (all are optional):
         PREFIX   - top directory of the external package
-        INDIR    - include directory, absolute or relative to PREFIX 
+        INCDIR   - include directory, absolute or relative to PREFIX 
         PYDIR    - Python src directory, absolute or relative to PREFIX
         PYDIRSEP - if present and evaluates to True installs python code to a 
                    separate directory arch/$LUSI_ARCH/python/<package>
@@ -50,7 +69,7 @@ def standardExternalPackage ( package, **kw ) :
     """
     
     pkg = os.path.basename(os.getcwd())
-    trace ( "SConscript in `"+pkg+"'", "SConscript", 1 )
+    trace ( "Standard SConscript for external package `"+package+"'", "SConscript", 1 )
     
     env = DefaultEnvironment()
     
@@ -85,8 +104,13 @@ def standardExternalPackage ( package, **kw ) :
     lib_dir = _absdir ( prefix, kw.get('LIBDIR',None) )
     if lib_dir :
         trace ( "lib_dir: %s" % lib_dir, "standardExternalPackage", 5 )
+        
+        # make a list of libs to link
         libraries = kw.get('LINKLIBS',None)
-        if not libraries : libraries = os.listdir(lib_dir)
+        trace ( "libraries: %s" % libraries, "standardExternalPackage", 5 )
+        libraries = _glob ( lib_dir, libraries )
+            
+        trace ( "libraries: %s" % libraries, "standardExternalPackage", 5 )
         for f in libraries :
             loc = pjoin(lib_dir,f)
             if os.path.isfile(loc) :
@@ -96,8 +120,11 @@ def standardExternalPackage ( package, **kw ) :
     bin_dir = _absdir ( prefix, kw.get('BINDIR',None) )
     if bin_dir :
         trace ( "bin_dir: %s" % bin_dir, "standardExternalPackage", 5 )
+        
+        # make list of binaries to link
         binaries = kw.get('LINKBINS',None)
-        if not binaries : binaries = os.listdir(bin_dir)
+        binaries = _glob ( bin_dir, binaries )
+        
         for f in binaries :
             loc = pjoin(bin_dir,f)
             if os.path.isfile(loc) :

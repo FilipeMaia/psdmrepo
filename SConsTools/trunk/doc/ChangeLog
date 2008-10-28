@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2008-10-28 Andy Salnikov
+- standardSConscript: added more C/C++ extensions for building libraries and
+  binaries: cc,cpp,cxx,C,c
+- standardExternalPackage: added globbing for LINKLIBS and LINKBINS
+- dependencies: 
+  - tries to guess boost package names
+  - improved topological sort, detect cycles
+
 Tag: V00-00-05
 2008-10-17 Andy Salnikov
 - standardExternalPackage: adding PYDIRSEP option

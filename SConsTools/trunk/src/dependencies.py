@@ -46,6 +46,59 @@ from trace import *
 from scons_functions import *
 
 #
+# Guess package name from the path of the (include) file
+#
+_boostPackages = {
+        'date_time' : 'boost_date_time',
+        'date_time.hpp' : 'boost_date_time',
+        'filesystem' : 'boost_filesystem', 
+        'filesystem.hpp' : 'boost_filesystem', 
+        'iostreams' : 'boost_iostreams',
+        'regex' : 'boost_regex',
+        'cregex.hpp' : 'boost_regex',
+        'regex.hpp' : 'boost_regex',
+        'regex.h' : 'boost_regex',
+        'thread' : 'boost_thread',
+        'thread.hpp' : 'boost_thread',
+        'test' : 'boost_unit_test_framework', 
+        }
+def _guessBoostPackage ( p ) :
+    return _boostPackages.get ( p, 'boost' )
+
+def _guessPackage ( path ):
+    
+    f = path.split(os.sep)
+    f.reverse() # for easier counting and reverse searching
+    
+    #
+    # First try to see if it comes from boost, in which case it
+    # will be in the form .../arch/$LUSI_ARCH/geninc/boost/.....
+    #
+    if len(f) > 4 :
+        try :
+            i = f.index('geninc')
+            if i > 1 and i+2 < len(f) and f[i-1] == 'boost' and f[i+2] == 'arch' :
+                p = _guessBoostPackage ( f[i-2] )
+                if p : 
+                    trace ( 'Child comes from boost/%s' % p, '_guessPackage', 8 )
+                    return p
+        except :
+            # probably not boost, do other tests
+            pass
+    
+    if len(f) > 4 and f[2] == 'geninc' and f[4] == 'arch' :
+        
+        # .../arch/$LUSI_ARCH/geninc/Package/file
+        trace ( 'Child comes from %s' % f[1], '_guessPackage', 8 )
+        return f[1]
+        
+    elif len(f) > 2 and f[2] == 'include' :
+        
+        # .../include/Package/file
+        trace ( 'Child comes from %s' % f[1], '_guessPackage', 8 )
+        return f[1]
+
+#
 # Returns the list of all packages that given node depends upon.
 # Only direct dependencies are evaluated. Analyzes all SCons children
 # and looks for the include files. The directory name where include 
@@ -62,9 +115,11 @@ def findAllDependencies( node ):
         if os.path.isfile(f) :
             f = f.split(os.sep)
             if len(f) > 4 and f[-3] == 'geninc' and f[-5] == 'arch' :
+                # .../arch/$LUSI_ARCH/geninc/Package/file
                 trace ( 'Child comes from %s' % f[-2], 'findAllDependencies', 8 )
                 res.add ( f[-2] )
             elif len(f) > 2 and f[-3] == 'include' :
+                # .../include/Package/file
                 trace ( 'Child comes from %s' % f[-2], 'findAllDependencies', 8 )
                 res.add ( f[-2] )
         res.update ( findAllDependencies(child) )
@@ -93,7 +148,8 @@ def setPkgDeps ( env, pkg, deps ):
     pkg_info = env['PKG_TREE'].setdefault( pkg, {} )
     if deps : 
         if isinstance(deps,(str,unicode)) : deps = deps.split()
-        pkg_info['DEPS'] = deps
+        # do not include self-dependencies
+        pkg_info['DEPS'] = [ d for d in deps if d != pkg ]
 
 #
 # Define binary dependencies
@@ -125,16 +181,28 @@ def loadPkgDeps ( env, fileName  ):
 #
 # generator method for DFS scan of dependency tree
 #
-def _genAllDeps ( pkg_tree, deps, visited ) :
+class _CycleError ( Exception ) :
+    def __init__ (self, pkg1, pkg2):
+        Exception.__init__ ( self, "Dependecy cycle detected between packages "+pkg1+" and "+pkg2 )
+
+_WHITE = 0
+_GRAY = 1
+_BLACK = 2
+def _toposort ( pkg_tree, pkg, colors ):
     
-    for d in deps :
-        if d in pkg_tree :
-            for c in _genAllDeps ( pkg_tree, pkg_tree[d].get('DEPS',[]), visited ) :
+    colors[pkg] = _GRAY
+    
+    adj = pkg_tree.get(pkg,{}).get('DEPS',[])
+    for a in adj :
+        acol = colors.get(a,_WHITE)
+        if acol == _GRAY :
+            # means cycle
+            raise _CycleError ( pkg, a )
+        elif acol == _WHITE :
+            for c in _toposort ( pkg_tree, a, colors ) :
                 yield c
-            if d not in visited :
-                visited.add ( d )
-                yield d
-            
+    yield pkg
+    colors[pkg] = _BLACK
             
 #
 # analyze complete dependency tree and adjust dependencies and libs
@@ -150,13 +218,15 @@ def adjustPkgDeps ( env ) :
     for bin, bindeps in env['PKG_TREE_BINS'].iteritems() :
  
         # build ordered list of all dependencies
-        visited = set()
-        alldeps = [ x for x in _genAllDeps(pkg_tree,bindeps,visited) ]
+        alldeps = []
+        for d in bindeps :
+            for c in _toposort( pkg_tree, d, {} ) :
+                alldeps.append ( c )
         alldeps.reverse()
         
         trace ( 'bin: %s alldeps: %s' % ( pformat(bin.env.Dictionary()), alldeps ), 'adjustPkgDeps', 4 )
 
         # now get all their libraries and add to the binary
         for d in alldeps :
-            libs = pkg_tree[d].get( 'LIBS', [] )
+            libs = pkg_tree.get(d,{}).get( 'LIBS', [] )
             bin.env['LIBS'].extend ( libs ) 
