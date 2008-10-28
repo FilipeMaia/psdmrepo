@@ -52,7 +52,7 @@ $BASEINCL
  *
  *  @see AdditionalClass
  *
- *  @version $$Id$$
+ *  @version $$Id: template!C++-template!h 4 2008-10-08 19:27:36Z salnikov $$
  *
  *  @author $author
  */

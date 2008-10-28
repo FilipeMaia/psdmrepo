@@ -22,7 +22,7 @@ part of it, please give an appropriate acknowledgement.
 
 @see RelatedModule
 
-@version $$Id$$ 
+@version $$Id: template!python-main! 8 2008-10-08 22:35:33Z salnikov $$ 
 
 @author $author
 """
@@ -30,7 +30,7 @@ part of it, please give an appropriate acknowledgement.
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$$Revision$$"
+__version__ = "$$Revision: 8 $$"
 # $$Source$$
 
 #--------------------------------

@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2008-10-28 Andy Salnikov
+- improved handling of $Id$ keyword in templates, removed keyword 
+  substitution from teplate files
+
 Tag: V00-00-02
 2008-10-08 Andy Salnikov
 - use @PYTHON@ in app/codegen script

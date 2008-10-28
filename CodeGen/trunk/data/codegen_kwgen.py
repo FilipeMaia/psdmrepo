@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------
 # File and Version Information:
-#  $$Id$$
+#  $Id: codegen_kwgen.py 4 2008-10-08 19:27:36Z salnikov$
 #
 # Description:
 #  Python script which is used by `codegen' script to provide some
