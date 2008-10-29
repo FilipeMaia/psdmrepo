@@ -1,0 +1,187 @@
+//--------------------------------------------------------------------------
+// File and Version Information:
+// 	$Id: AppCmdOptNamedValue.cc,v 1.2 2007/01/15 22:31:17 desilva Exp $
+//
+// Description:
+//	Implementation of methods for a Templated class.
+//
+// Environment:
+//	Software developed for the BaBar Detector at the SLAC B-Factory.
+//
+// Author List:
+//	Andy Salnikov		originator
+//
+// Copyright Information:
+//	Copyright (C) 2003	SLAC
+//
+//------------------------------------------------------------------------
+#include "Lusi/Lusi.h"
+
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "AppUtils/AppCmdOptNamedValue.h"
+
+//-------------
+// C Headers --
+//-------------
+extern "C" {
+}
+
+//---------------
+// C++ Headers --
+//---------------
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+#include "AppUtils/AppCmdTypeTraits.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+
+
+//		----------------------------------------
+// 		-- Public Function Member Definitions --
+//		----------------------------------------
+
+namespace AppUtils {
+
+/**
+ *  Ctor
+ */
+template <typename Type>
+AppCmdOptNamedValue<Type>::AppCmdOptNamedValue ( char shortOpt,
+						 const std::string& longOpt,
+						 const std::string& name,
+						 const std::string& descr,
+						 const Type& defValue )
+  : AppCmdOptBase()
+  , _shortOpt(shortOpt)
+  , _longOpt(longOpt)
+  , _name(name)
+  , _descr(descr)
+  , _str2value()
+  , _defValue(defValue)
+  , _value(defValue)
+  , _changed(false)
+{
+}
+
+// Destructor
+template <typename Type>
+AppCmdOptNamedValue<Type>::~AppCmdOptNamedValue( )
+{
+}
+
+/**
+ *  Returns true if option requires argument. Does not make sense for
+ *  positional arguments.
+ */
+template <typename Type>
+bool
+AppCmdOptNamedValue<Type>::hasArgument() const
+{
+  return true ;
+}
+
+/**
+ *  Get the name of the paramater
+ */
+template <typename Type>
+const std::string&
+AppCmdOptNamedValue<Type>::name() const
+{
+  return _name ;
+}
+
+/**
+ *  Get one-line description
+ */
+template <typename Type>
+const std::string&
+AppCmdOptNamedValue<Type>::description() const
+{
+  return _descr ;
+}
+
+/**
+ *  Return short option symbol for -x option
+ */
+template <typename Type>
+char
+AppCmdOptNamedValue<Type>::shortOption() const
+{
+  return _shortOpt ;
+}
+
+/**
+ *  Return long option symbol for --xxxxx option
+ */
+template <typename Type>
+const std::string&
+AppCmdOptNamedValue<Type>::longOption() const
+{
+  return _longOpt ;
+}
+
+/**
+ *  Set the value of the argument.
+ *
+ *  @return The number of consumed words. If it is negative then error has occured.
+ */
+template <typename Type>
+bool
+AppCmdOptNamedValue<Type>::setValue ( const std::string& valueStr )
+{
+  typename String2Value::const_iterator it = _str2value.find ( valueStr ) ;
+  if ( it == _str2value.end() ) return false ;
+
+  _value = it->second ;
+  _changed = true ;
+
+  return true ;
+}
+
+/**
+ *  True if the value of the option was changed from command line.
+ */
+template <typename Type>
+bool
+AppCmdOptNamedValue<Type>::valueChanged () const
+{
+  return _changed ;
+}
+
+/**
+ *  Return current value of the argument
+ */
+template <typename Type>
+const Type&
+AppCmdOptNamedValue<Type>::value() const
+{
+  return _value ;
+}
+
+/**
+ *  reset option to its default value
+ */
+template <typename Type>
+void
+AppCmdOptNamedValue<Type>::reset()
+{
+  _value = _defValue ;
+  _changed = false ;
+}
+
+/// add string-value pair
+template <typename Type>
+void
+AppCmdOptNamedValue<Type>::add ( const std::string& key, const Type& value )
+{
+  typename String2Value::value_type thePair(key, value);
+  _str2value.insert ( thePair );
+}
+
+} // namespace AppUtils
