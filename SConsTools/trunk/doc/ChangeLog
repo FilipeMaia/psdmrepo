@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2008-10-29 Andy Salnikov
+- standardSConscript: adding support for building tests in test/, 
+  plus minor refactoring
+
 Tag: V00-00-06
 2008-10-28 Andy Salnikov
 - standardSConscript: added more C/C++ extensions for building libraries and
