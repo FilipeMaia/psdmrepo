@@ -1,0 +1,20 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package AppUtils
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any LUSI project
+Import('*')
+
+#
+# For the standard LUSI packages which build libraries, applications,
+# and python modules it is usually sufficient to call
+# standardSConscript() function which defines rules for all
+# above targets. In some cases additional parameters may be needed,
+# consult SConsTools/src/standardSConscript.py file.
+#
+standardSConscript()

@@ -1,0 +1,185 @@
+//--------------------------------------------------------------------------
+// File and Version Information:
+// 	$Id: AppCmdArg.cc,v 1.3 2004/08/24 17:04:22 salnikov Exp $
+//
+// Description:
+//	Implementation of methods for a Templated class.
+//
+// Environment:
+//	Software developed for the BaBar Detector at the SLAC B-Factory.
+//
+// Author List:
+//	Andy Salnikov		originator
+//
+// Copyright Information:
+//	Copyright (C) 2003	SLAC
+//
+//------------------------------------------------------------------------
+#include "Lusi/Lusi.h"
+
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "AppUtils/AppCmdArg.h"
+
+//-------------
+// C Headers --
+//-------------
+extern "C" {
+}
+
+//---------------
+// C++ Headers --
+//---------------
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+#include "AppUtils/AppCmdTypeTraits.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+
+
+//		----------------------------------------
+// 		-- Public Function Member Definitions --
+//		----------------------------------------
+
+namespace AppUtils {
+
+/**
+ *  Make a required positional argument
+ */
+template <typename Type>
+AppCmdArg<Type>::AppCmdArg ( const std::string& name, const std::string& descr )
+  : AppCmdArgBase()
+  , _name(name)
+  , _descr(descr)
+  , _required(true)
+  , _defValue()
+  , _value()
+  , _changed(false)
+{
+}
+
+/**
+ *  Make an optional positional argument
+ */
+template <typename Type>
+AppCmdArg<Type>::AppCmdArg ( const std::string& name, const std::string& descr, const Type& val )
+  : AppCmdArgBase()
+  , _name(name)
+  , _descr(descr)
+  , _required(false)
+  , _defValue(val)
+  , _value(val)
+  , _changed(false)
+{
+}
+
+// Destructor
+template <typename Type>
+AppCmdArg<Type>::~AppCmdArg( )
+{
+}
+
+/**
+ *  Is it required?
+ */
+template <typename Type>
+bool
+AppCmdArg<Type>::isRequired() const
+{
+  return _required ;
+}
+
+/**
+ *  Get the name of the paramater
+ */
+template <typename Type>
+const std::string&
+AppCmdArg<Type>::name() const
+{
+  return _name ;
+}
+
+/**
+ *  Get one-line description
+ */
+template <typename Type>
+const std::string&
+AppCmdArg<Type>::description() const
+{
+  return _descr ;
+}
+
+/**
+ *  How many words from command line could this argument take?
+ */
+template <typename Type>
+size_t
+AppCmdArg<Type>::maxWords () const
+{
+  return 1 ;
+}
+
+/**
+ *  Set the value of the argument.
+ *
+ *  @return The number of consumed words. If it is negative then error has occured.
+ */
+template <typename Type>
+int
+AppCmdArg<Type>::setValue ( StringList::const_iterator begin,
+		            StringList::const_iterator end )
+{
+  // sequence must be non-empty
+  assert ( begin != end ) ;
+
+  std::pair<Type,bool> res = AppCmdTypeTraits<Type>::fromString ( *begin ) ;
+  if ( res.second ) {
+    _value = res.first ;
+    _changed = true ;
+    // only one string could be supplied
+    assert ( ++ begin == end ) ;
+    return 1 ;
+  } else {
+    return -1 ;
+  }
+}
+
+/**
+ *  True if the value of the option was changed from command line. Only
+ *  makes sense for "optionsl arguments", for required this will always
+ *  return true.
+ */
+template <typename Type>
+bool
+AppCmdArg<Type>::valueChanged () const
+{
+  return _changed ;
+}
+
+/**
+ *  Return current value of the argument
+ */
+template <typename Type>
+const Type&
+AppCmdArg<Type>::value() const
+{
+  return _value ;
+}
+
+/**
+ *  reset option to its default value
+ */
+template <typename Type>
+void
+AppCmdArg<Type>::reset()
+{
+  _value = _defValue ;
+  _changed = false ;
+}
+
+} // namespace AppUtils
