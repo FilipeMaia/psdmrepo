@@ -1,0 +1,46 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package SConsTools
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-07
+2008-10-29 Andy Salnikov
+- standardSConscript: adding support for building tests in test/, 
+  plus minor refactoring
+
+Tag: V00-00-06
+2008-10-28 Andy Salnikov
+- standardSConscript: added more C/C++ extensions for building libraries and
+  binaries: cc,cpp,cxx,C,c
+- standardExternalPackage: added globbing for LINKLIBS and LINKBINS
+- dependencies: 
+  - tries to guess boost package names
+  - improved topological sort, detect cycles
+
+Tag: V00-00-05
+2008-10-17 Andy Salnikov
+- standardExternalPackage: adding PYDIRSEP option
+
+Tag: V00-00-04
+2008-10-15 Andy Salnikov
+- adding release dependencies module 
+
+Tag: V00-00-01
+2008-10-08 Andy Salnikov
+- added ScriptInstall builder to handle substitution of @XYZ@ placeholders
+  in the scripts
+
+Tag: V00-00-00
+2008-10-08 Andy Salnikov
+- initial import of SConsTools into CVS
+- few python module are in the package at this time, used by SConstruct.main
+- SConstruct.main should be moved into the top release directory as a part
+  of the release preparation (or it can also be linked to SConstruct.main)
