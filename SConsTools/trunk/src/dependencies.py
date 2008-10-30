@@ -111,18 +111,13 @@ def findAllDependencies( node ):
         # take all children which are include files, i.e. they live in
         # .../arch/${LUSI_ARCH}/genarch/Package/ or include/Package/ directory
         f = str(child)
-        trace ( 'Checking child %s' % f, 'findAllDependencies', 8 )
+        #trace ( 'Checking child %s' % f, 'findAllDependencies', 8 )
         if os.path.isfile(f) :
-            f = f.split(os.sep)
-            if len(f) > 4 and f[-3] == 'geninc' and f[-5] == 'arch' :
-                # .../arch/$LUSI_ARCH/geninc/Package/file
-                trace ( 'Child comes from %s' % f[-2], 'findAllDependencies', 8 )
-                res.add ( f[-2] )
-            elif len(f) > 2 and f[-3] == 'include' :
-                # .../include/Package/file
-                trace ( 'Child comes from %s' % f[-2], 'findAllDependencies', 8 )
-                res.add ( f[-2] )
-        res.update ( findAllDependencies(child) )
+            p = _guessPackage ( f )
+            if p : 
+                res.add ( p )
+            else :
+                res.update ( findAllDependencies(child) )
         
     return res
 
@@ -224,8 +219,6 @@ def adjustPkgDeps ( env ) :
                 alldeps.append ( c )
         alldeps.reverse()
         
-        trace ( 'bin: %s alldeps: %s' % ( pformat(bin.env.Dictionary()), alldeps ), 'adjustPkgDeps', 4 )
-
         # now get all their libraries and add to the binary
         for d in alldeps :
             libs = pkg_tree.get(d,{}).get( 'LIBS', [] )

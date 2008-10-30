@@ -82,7 +82,9 @@ def standardExternalPackage ( package, **kw ) :
     inc_dir = _absdir ( prefix, kw.get('INCDIR',None) )
     if inc_dir :
         trace ( "include_dir: %s" % inc_dir, "standardExternalPackage", 5 )
-        env.Symlink ( Dir(pjoin(env.subst("$ARCHINCDIR"),package)), Dir(inc_dir) )
+        targ = env.Symlink ( Dir(pjoin(env.subst("$ARCHINCDIR"),package)), Dir(inc_dir) )
+        env['ALL_TARGETS']['LIBS'].append ( targ )
+
     
     # link python directory
     py_dir = _absdir ( prefix, kw.get('PYDIR',None) )
@@ -90,14 +92,16 @@ def standardExternalPackage ( package, **kw ) :
         trace ( "py_dir: %s" % py_dir, "standardExternalPackage", 5 )
         if kw.get('PYDIRSEP',False) :
             # make a link to the whole dir
-            env.Symlink ( Dir(pjoin(env.subst("$PYDIR"),package)), Dir(py_dir) )
+            targ = env.Symlink ( Dir(pjoin(env.subst("$PYDIR"),package)), Dir(py_dir) )
+            env['ALL_TARGETS']['LIBS'].append ( targ )
         else :
             # make links for every file in the directory
             files = os.listdir(py_dir)
             for f in files :
                 loc = pjoin(py_dir,f)
                 if not os.path.isdir(loc) :
-                    env.Symlink ( pjoin(env.subst("$PYDIR"),f), loc )
+                    targ = env.Symlink ( pjoin(env.subst("$PYDIR"),f), loc )
+                    env['ALL_TARGETS']['LIBS'].append ( targ )
             
     
     # link all libraries
@@ -114,7 +118,8 @@ def standardExternalPackage ( package, **kw ) :
         for f in libraries :
             loc = pjoin(lib_dir,f)
             if os.path.isfile(loc) :
-                env.Symlink ( pjoin(env.subst("$LIBDIR"),f), loc )
+                targ = env.Symlink ( pjoin(env.subst("$LIBDIR"),f), loc )
+                env['ALL_TARGETS']['LIBS'].append ( targ )
 
     # link all executables
     bin_dir = _absdir ( prefix, kw.get('BINDIR',None) )
@@ -128,7 +133,8 @@ def standardExternalPackage ( package, **kw ) :
         for f in binaries :
             loc = pjoin(bin_dir,f)
             if os.path.isfile(loc) :
-                env.Symlink ( pjoin(env.subst("$BINDIR"),f), loc )
+                targ = env.Symlink ( pjoin(env.subst("$BINDIR"),f), loc )
+                env['ALL_TARGETS']['BINS'].append ( targ )
 
     # add my libs to a package tree
     pkg_libs = kw.get('PKGLIBS',None)

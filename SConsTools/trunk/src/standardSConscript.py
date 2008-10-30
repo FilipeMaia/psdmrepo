@@ -48,8 +48,11 @@ def _getpkg ( kw ) :
 def standardSConscript( **kw ) :
 
     """ Understands following keywords, all optional:
+        LIBS - list of additional libraries needed by this package
         BINS - dictionary of executables and their corresponding source files
-        LIBS - list of additional libraries that have to be linked with applications
+        TESTS - dictionary of test applications and their corresponding source files
+        SCRIPTS - list of scripts in app/ directory
+        UTESTS - names of the unit tests to run, if not given then all tests are unit tests
     """
 
     pkg = _getpkg ( kw )
@@ -69,10 +72,11 @@ def standardSConscript( **kw ) :
 #
 def standardLib( **kw ) :
     
-    libsrcs = Flatten ( [ Glob("src/*."+ext, source=True ) for ext in _cplusplus_ext ] )
+    libsrcs = Flatten ( [ Glob("src/*."+ext, source=True, strings=True ) for ext in _cplusplus_ext ] )
+    libsrcs.sort()
     if libsrcs :
         
-        trace ( "libsrcs = "+pformat([str(s) for s in libsrcs]), "SConscript", 2 )
+        trace ( "libsrcs = "+str(map(str,libsrcs)), "SConscript", 2 )
 
         pkg = _getpkg( kw )
         
@@ -80,12 +84,13 @@ def standardLib( **kw ) :
         libdir = env['LIBDIR']
 
         lib = env.SharedLibrary ( pkg, source=libsrcs )
-        env.Install ( libdir, source=lib )
+        ilib = env.Install ( libdir, source=lib )
+        env['ALL_TARGETS']['LIBS'].append ( ilib )
         
         # get the list of dependencies for this package
         deps = findAllDependencies( lib[0] )
         setPkgDeps ( env, pkg, deps )
-        trace ( "deps = " + pformat(deps), "SConscript", 4 )
+        trace ( "deps = " + str(map(str,deps)), "SConscript", 4 )
 
         # get the list of libraries need for this package
         libs = [pkg] + _getkwlist ( kw, 'LIBS' )
@@ -95,7 +100,7 @@ def standardLib( **kw ) :
 # Process src/ directory, link python sources
 #
 def standardPyLib( **kw ) :
-    
+
     pysrcs = Glob("src/*.py", source=True, strings=True )
     if pysrcs :
         
@@ -104,7 +109,7 @@ def standardPyLib( **kw ) :
         env = DefaultEnvironment()
         pydir = env['PYDIR']
 
-        trace ( "pysrcs = "+pformat(pysrcs), "SConscript", 2 )
+        trace ( "pysrcs = "+str(map(str,pysrcs)), "SConscript", 2 )
 
         # python files area installed into python/Package
         for src in pysrcs :
@@ -113,43 +118,74 @@ def standardPyLib( **kw ) :
             basename = os.path.basename(src)
             pydst = pjoin(pydir,pkg,basename)
             env.Symlink ( pydst, source=src )
-            env.PyCompile ( pydst+"c", source=pydst )
+            pyc = env.PyCompile ( pydst+"c", source=pydst )
+            env['ALL_TARGETS']['LIBS'].append ( pyc )
             
             # make __init__.py and compile it
             ini = pjoin(pydir,pkg,"__init__.py")
             env.Command ( ini, "", [ Touch("$TARGET") ] )
-            env.PyCompile ( ini+"c", source=ini )
+            pyc = env.PyCompile ( ini+"c", source=ini )
+            env['ALL_TARGETS']['LIBS'].append ( pyc )
 
 #
 # Process app/ directory, install all scripts
 #
 def standardScripts( **kw ) :
     
-    app_files = Glob("app/*", source=True, strings=True )
-    if app_files :
+    
+    scripts = kw.get('SCRIPTS',None)
+    if scripts is None :
+        scripts = Glob("app/*", source=True, strings=True )
+        scripts = [ f for f in scripts if not os.path.splitext(f)[1] and os.path.isfile(f) ]
+    else :
+        scripts = [ _normbinsrc('app',s) for s in scripts ]
+            
+    if scripts :
 
         env = DefaultEnvironment()
         bindir = env['BINDIR']
 
-        scripts = [ f for f in app_files if not os.path.splitext(f)[1] and os.path.isfile(f) ]
-        trace ( "scripts = "+pformat(scripts), "SConscript", 2 )
+        trace ( "scripts = "+str(map(str,scripts)), "SConscript", 2 )
 
         # Scripts are copied to bin/ directory
         for s in scripts : 
-            env.ScriptInstall ( os.path.join(bindir,os.path.basename(s)), s )
+            script = env.ScriptInstall ( os.path.join(bindir,os.path.basename(s)), s )
+            env['ALL_TARGETS']['BINS'].append ( script )
 
 #
 # Process app/ directory, build all executables from C++ sources
 #
 def standardBins( **kw ) :
-    _standardBins ( 'app', 'BINS', True, **kw )
+    
+    env = DefaultEnvironment()
+    
+    targets = _standardBins ( 'app', 'BINS', True, **kw )
+    env['ALL_TARGETS']['BINS'].extend( targets )
 
 #
 # Process test/ directory, build all executables from C++ sources
 #
 def standardTests( **kw ) :
-    _standardBins ( 'test', 'TESTS', False, **kw )
+    
+    env = DefaultEnvironment()
+        
+    targets = _standardBins ( 'test', 'TESTS', False, **kw )
+    env['ALL_TARGETS']['TESTS'].extend( targets )
+    
+    # make a list of unit tests
+    utests = kw.get('UTESTS', None)
+    if utests is None :
+        utests = targets
+    else :
+        # filter matching targets
+        utests = [ t for t in targets if os.path.basename(str(t))[0] in utests ]
 
+    # make new unit test target
+    trace ( "utests = "+str(map(str,utests)), "SConscript", 2 )
+    for u in utests :
+        t = env.UnitTest ( str(u)+'.utest', u )
+        env['ALL_TARGETS']['TESTS'].append( t )
+        
 #
 # Build binaries, possibly install them
 #
@@ -170,9 +206,10 @@ def _standardBins( appdir, binenv, install, **kw ) :
             bins[bin] = [ f ]
             
     # make rules for the binaries
+    targets = []
     if bins :
 
-        trace ( "bins = "+pformat(bins), "SConscript", 2 )
+        trace ( "bins = "+str(map(str,bins)), "SConscript", 2 )
 
         env = DefaultEnvironment()
         bindir = env['BINDIR']
@@ -186,9 +223,15 @@ def _standardBins( appdir, binenv, install, **kw ) :
         for bin, srcs in bins.iteritems() :
             
             b = env.Program( bin, source=srcs, **binkw )
-            if install : env.Install ( bindir, source=b )
             
             deps = findAllDependencies( b[0] )
-            trace ( bin+" deps = " + pformat(deps), "SConscript", 4 )
+            trace ( bin+" deps = " + str(map(str,deps)), "SConscript", 4 )
             
             setBinDeps ( env, b[0], deps )
+
+            if install : 
+                b = env.Install ( bindir, source=b )
+                
+            targets.append( b[0] )
+            
+    return targets

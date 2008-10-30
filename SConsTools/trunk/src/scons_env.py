@@ -78,12 +78,18 @@ def buildEnv () :
                  LUSI_REPOS = lusi_repos,
                  PKG_TREE = {},
                  PKG_TREE_BASE = {},
-                 PKG_TREE_BINS = {} )
+                 PKG_TREE_BINS = {},
+                 ALL_TARGETS = {} )
+
+    # these lists will be filled by standard rules
+    env['ALL_TARGETS']['LIBS'] = []
+    env['ALL_TARGETS']['BINS'] = []
+    env['ALL_TARGETS']['TESTS'] = []
 
     # generate help    
     Help(vars.GenerateHelpText(env))
     
-    trace ( "Build env = "+pprint.pformat(env.Dictionary()), "buildEnv", 7 )
+    #trace ( "Build env = "+pprint.pformat(env.Dictionary()), "buildEnv", 7 )
     
     #for r in lusi_repos :
     #    trace ( "Add repository "+r, "<top>", 2 )

@@ -11,6 +11,20 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2008-10-29 Andy Salnikov
+- adding unit test target to the builds
+- standardSConscript: few additional keywords: TESTS, UTESTS, SCRIPTS; 
+  split standardSConscript() into bunch of functions
+- builders.py: make all builders clesses instead of functions, adding
+  strfunction() method to the classes, nicer printing of progress
+- scons_env.py: adding ALL_TARGETS variable to environment, which is a
+  dictionary of the targets for BINS, LIBS, and TEST aliases
+- standardExternalPackage: fills in ALL_TARGETS
+- standardSConscript: fills in ALL_TARGETS
+- SConstruct.main: defines target aliases 'lib', 'bin', 'test'
+- lot's of other improvements
+
 Tag: V00-00-07
 2008-10-29 Andy Salnikov
 - standardSConscript: adding support for building tests in test/, 
