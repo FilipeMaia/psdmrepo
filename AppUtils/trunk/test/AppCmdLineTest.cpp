@@ -17,18 +17,11 @@
 //------------------------------------------------------------------------
 #include "Lusi/Lusi.h"
 
-//-----------------------
-//-------------
-// C Headers --
-//-------------
-extern "C" {
-}
-
 //---------------
 // C++ Headers --
 //---------------
 #include <string>
-#include <cassert>
+#include <iostream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -41,31 +34,27 @@ extern "C" {
 #include "AppUtils/AppCmdOptIncr.h"
 #include "AppUtils/AppCmdOptToggle.h"
 #include "AppUtils/AppCmdOptNamedValue.h"
-using std::cout;
-
 
 using namespace AppUtils ;
 
 
-int main( int argc, char* argv[] )
-{
-  // Install cmd line parser, cannot fail
-  AppCmdLine cmdline ( "command" ) ;
+#define BOOST_TEST_MODULE AppCmdLineTest
+#include <boost/test/included/unit_test.hpp>
 
-  bool ok ;
+
+BOOST_AUTO_TEST_CASE( cmdline_test_simple )
+{
+  AppCmdLine cmdline("command") ;
 
   // create a bunch of arguments and add them
   AppCmdArg<std::string> argString1( "name", "specifies the name" ) ;
-  ok = cmdline.addArgument ( argString1 ) ;
-  assert ( ok ) ;
+  BOOST_CHECK( cmdline.addArgument ( argString1 ) ) ;
 
   AppCmdArg<int> argInt1( "number", "specifies the number" ) ;
-  ok = cmdline.addArgument ( argInt1 ) ;
-  assert ( ok ) ;
+  BOOST_CHECK( cmdline.addArgument ( argInt1 ) ) ;
 
   AppCmdArg<int> argInt2( "number", "specifies the number 2", 1000 ) ;
-  ok = cmdline.addArgument ( argInt2 ) ;
-  assert ( ok ) ;
+  BOOST_CHECK( cmdline.addArgument ( argInt2 ) ) ;
 
   // make a command line
   std::list<std::string> args ;
@@ -73,61 +62,50 @@ int main( int argc, char* argv[] )
   args.push_back ( "12345" ) ;
 
   // first try, stringfor optional argument is mising
-  ok = cmdline.parse ( args.begin(), args.end() ) ;
-  assert ( ok ) ;
-  assert ( argString1.value() == "MyName" ) ;
-  assert ( argInt1.value() == 12345 ) ;
-  assert ( argInt1.valueChanged() == true ) ;
-  assert ( argInt2.value() == 1000 ) ;
-  assert ( argInt2.valueChanged() == false ) ;
-
+  BOOST_CHECK ( cmdline.parse ( args.begin(), args.end() ) ) ;
+  BOOST_CHECK_EQUAL ( argString1.value(), "MyName" ) ;
+  BOOST_CHECK_EQUAL ( argInt1.value(), 12345 ) ;
+  BOOST_CHECK_EQUAL ( argInt1.valueChanged(), true ) ;
+  BOOST_CHECK_EQUAL ( argInt2.value(), 1000 ) ;
+  BOOST_CHECK_EQUAL ( argInt2.valueChanged(), false ) ;
 
   // add data for optional argument
   args.push_back ( "123" ) ;
 
-  ok = cmdline.parse ( args.begin(), args.end() ) ;
-  assert ( ok ) ;
-  assert ( argString1.value() == "MyName" ) ;
-  assert ( argInt1.value() == 12345 ) ;
-  assert ( argInt2.value() == 123 ) ;
-  assert ( argInt2.valueChanged() == true ) ;
+  BOOST_CHECK ( cmdline.parse ( args.begin(), args.end() ) ) ;
+  BOOST_CHECK_EQUAL ( argString1.value(), "MyName" ) ;
+  BOOST_CHECK_EQUAL ( argInt1.value(), 12345 ) ;
+  BOOST_CHECK_EQUAL ( argInt2.value(), 123 ) ;
+  BOOST_CHECK_EQUAL ( argInt2.valueChanged(), true ) ;
 
   // one more argument should fail
   args.push_back ( "fail" ) ;
 
-  ok = cmdline.parse ( args.begin(), args.end() ) ;
-  assert ( ! ok ) ;
+  BOOST_CHECK ( ! cmdline.parse ( args.begin(), args.end() ) ) ;
 
   // add more options
   AppCmdOptIncr optVerbose ( 'v', "verbose", "more noise", 0 ) ;
-  ok = cmdline.addOption ( optVerbose ) ;
-  assert ( ok ) ;
+  BOOST_CHECK ( cmdline.addOption ( optVerbose ) ) ;
 
   AppCmdOptToggle optToggle ( 't', "toggle", "toggle something", false ) ;
-  ok = cmdline.addOption ( optToggle ) ;
-  assert ( ok ) ;
+  BOOST_CHECK ( cmdline.addOption ( optToggle ) ) ;
 
   AppCmdOpt<int> optInt1 ( 'i', "int", "number", "some number", 123 ) ;
-  ok = cmdline.addOption ( optInt1 ) ;
-  assert ( ok ) ;
+  BOOST_CHECK ( cmdline.addOption ( optInt1 ) ) ;
 
   AppCmdOpt<int> optInt2 ( 'I', "INT", "NUMBER", "some number", 123 ) ;
-  ok = cmdline.addOption ( optInt2 ) ;
-  assert ( ok ) ;
+  BOOST_CHECK ( cmdline.addOption ( optInt2 ) ) ;
 
   AppCmdOpt<std::string> optString1 ( 's', "string", "astring", "some string", "<none>" ) ;
-  ok = cmdline.addOption ( optString1 ) ;
-  assert ( ok ) ;
+  BOOST_CHECK ( cmdline.addOption ( optString1 ) ) ;
 
   AppCmdOpt<std::string> optString2 ( 'S', "STRING", "Astring", "some string", "<none>" ) ;
-  ok = cmdline.addOption ( optString2 ) ;
-  assert ( ok ) ;
-  ok = cmdline.addOption ( optString2 ) ;
-  assert ( ! ok ) ;
+  BOOST_CHECK ( cmdline.addOption ( optString2 ) ) ;
+  // second one should fail
+  BOOST_CHECK ( ! cmdline.addOption ( optString2 ) ) ;
 
   AppCmdOpt<std::string> optString3 ( 'd', "dummy", "Astring", "some string", "<none>" ) ;
-  ok = cmdline.addOption ( optString3 ) ;
-  assert ( ok ) ;
+  BOOST_CHECK ( cmdline.addOption ( optString3 ) ) ;
 
   // new command line
   args.clear() ;
@@ -147,34 +125,37 @@ int main( int argc, char* argv[] )
   args.push_back ( "12345" ) ;
 
   // first try, stringfor optional argument is mising
-  ok = cmdline.parse ( args.begin(), args.end() ) ;
-  assert ( ok ) ;
-  assert ( optVerbose.value() == 5 ) ;
-  assert ( optToggle.value() == true ) ;
-  assert ( optInt1.value() == 654 ) ;
-  assert ( optInt2.value() == 654 ) ;
-  assert ( optString1.value() == "None" ) ;
-  assert ( optString2.value() == "NONE" ) ;
-  assert ( optString2.valueChanged() == true ) ;
-  assert ( optString3.valueChanged() == false ) ;
+  BOOST_CHECK ( cmdline.parse ( args.begin(), args.end() ) ) ;
+  BOOST_CHECK_EQUAL ( optVerbose.value(), 5 ) ;
+  BOOST_CHECK_EQUAL ( optToggle.value(), true ) ;
+  BOOST_CHECK_EQUAL ( optInt1.value(), 654 ) ;
+  BOOST_CHECK_EQUAL ( optInt2.value(), 654 ) ;
+  BOOST_CHECK_EQUAL ( optString1.value(), "None" ) ;
+  BOOST_CHECK_EQUAL ( optString2.value(), "NONE" ) ;
+  BOOST_CHECK_EQUAL ( optString2.valueChanged(), true ) ;
+  BOOST_CHECK_EQUAL ( optString3.valueChanged(), false ) ;
 
   // print usage info about command
-  cmdline.usage ( cout ) ;
+  //cmdline.usage ( std::cout ) ;
+}
 
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( cmdline_test_strlist )
+{
 
   // Install one more cmd line parser, cannot fail
   AppCmdLine cmdline1( "command1" ) ;
 
   // create a bunch of arguments and add them
   AppCmdArgList<std::string> argStringL( "names", "specifies the name(s)" ) ;
-  ok = cmdline1.addArgument ( argStringL ) ;
-  assert ( ok ) ;
+  BOOST_CHECK ( cmdline1.addArgument ( argStringL ) ) ;
 
   AppCmdOptList<std::string> optStringL( 'n', "name", "string", "specifies the name(s)" ) ;
-  ok = cmdline1.addOption ( optStringL ) ;
-  assert ( ok ) ;
+  BOOST_CHECK ( cmdline1.addOption ( optStringL ) ) ;
 
-  args.clear() ;
+  std::list<std::string> args ;
   args.push_back ( "-nname1" ) ;
   args.push_back ( "-n" ) ;
   args.push_back ( "name2" ) ;
@@ -187,89 +168,96 @@ int main( int argc, char* argv[] )
   args.push_back ( "name2" ) ;
   args.push_back ( "name3" ) ;
 
-  ok = cmdline1.parse ( args.begin(), args.end() ) ;
-  assert ( ok ) ;
+  BOOST_CHECK ( cmdline1.parse ( args.begin(), args.end() ) ) ;
 
   AppCmdOptList<std::string>::const_iterator obegin = optStringL.begin() ;
-  assert ( *obegin == "name1" ) ;
+  BOOST_CHECK_EQUAL( *obegin, "name1" ) ;
   ++ obegin ;
-  assert ( *obegin == "name2" ) ;
+  BOOST_CHECK_EQUAL( *obegin, "name2" ) ;
   ++ obegin ;
-  assert ( *obegin == "name3" ) ;
+  BOOST_CHECK_EQUAL( *obegin, "name3" ) ;
   ++ obegin ;
-  assert ( *obegin == "name4" ) ;
+  BOOST_CHECK_EQUAL( *obegin, "name4" ) ;
   ++ obegin ;
-  assert ( *obegin == "name5" ) ;
+  BOOST_CHECK_EQUAL( *obegin, "name5" ) ;
   ++ obegin ;
-  assert ( *obegin == "name6" ) ;
+  BOOST_CHECK_EQUAL( *obegin, "name6" ) ;
   ++ obegin ;
-  assert ( *obegin == "name7" ) ;
+  BOOST_CHECK_EQUAL( *obegin, "name7" ) ;
   ++ obegin ;
-  assert ( *obegin == "name8" ) ;
+  BOOST_CHECK_EQUAL( *obegin, "name8" ) ;
   ++ obegin ;
-  assert ( obegin == optStringL.end() ) ;
+  BOOST_CHECK( obegin == optStringL.end() ) ;
 
   AppCmdArgList<std::string>::const_iterator begin = argStringL.begin() ;
-  assert ( *begin == "name1" ) ;
+  BOOST_CHECK_EQUAL( *begin, "name1" ) ;
   ++ begin ;
-  assert ( *begin == "name2" ) ;
+  BOOST_CHECK_EQUAL( *begin, "name2" ) ;
   ++ begin ;
-  assert ( *begin == "name3" ) ;
+  BOOST_CHECK_EQUAL( *begin, "name3" ) ;
   ++ begin ;
-  assert ( begin == argStringL.end() ) ;
+  BOOST_CHECK( begin == argStringL.end() ) ;
 
   // print usage info about command
-  cmdline1.usage ( cout ) ;
+  //cmdline1.usage ( std::cout ) ;
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( cmdline_test_helpopt )
+{
+  // Install one more cmd line parser, cannot fail
+  AppCmdLine cmdline1( "command1" ) ;
 
   // should not be able to add -h or --help
   AppCmdOptIncr optHelp ( 'h', "help", "gimme help", 0 ) ;
-  ok = cmdline.addOption ( optHelp ) ;
-  assert ( ! ok ) ;
+  BOOST_CHECK( ! cmdline1.addOption ( optHelp ) ) ;
 
   // check how help options work
-  args.clear() ;
-  args.push_back ( "--help" ) ;
-  ok = cmdline1.parse ( args.begin(), args.end() ) ;
-  assert ( ok ) ;
-  assert ( cmdline1.helpWanted() ) ;
+  const char* args[5] = { "" } ;
 
-  args.clear() ;
-  args.push_back ( "-?" ) ;
-  ok = cmdline1.parse ( args.begin(), args.end() ) ;
-  assert ( ok ) ;
-  assert ( cmdline1.helpWanted() ) ;
+  args[1] = "--help" ;
+  BOOST_CHECK( cmdline1.parse ( 2, args ) ) ;
+  BOOST_CHECK( cmdline1.helpWanted() ) ;
 
-  args.clear() ;
-  args.push_back ( "-h" ) ;
-  ok = cmdline1.parse ( args.begin(), args.end() ) ;
-  assert ( ok ) ;
-  assert ( cmdline1.helpWanted() ) ;
+  args[1] = "-?" ;
+  BOOST_CHECK( cmdline1.parse ( 2, args ) ) ;
+  BOOST_CHECK( cmdline1.helpWanted() ) ;
 
+  args[1] = "-h" ;
+  BOOST_CHECK( cmdline1.parse ( 2, args ) ) ;
+  BOOST_CHECK( cmdline1.helpWanted() ) ;
+}
 
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( cmdline_test_intopt )
+{
   // Install one more cmd line parser, cannot fail
   AppCmdLine cmdline2( "command2" ) ;
 
   AppCmdOpt<int> optInt21 ( 'i', "int", "number", "some number", 0 ) ;
-  ok = cmdline2.addOption ( optInt21 ) ;
-  assert ( ok ) ;
+  BOOST_CHECK ( cmdline2.addOption ( optInt21 ) ) ;
 
-  args.clear() ;
-  args.push_back ( "-i1" ) ;
-  ok = cmdline2.parse ( args.begin(), args.end() ) ;
-  assert ( ok ) ;
-  assert ( optInt21.value() == 1 ) ;
+  const char* args[5] = { "" } ;
 
-  args.clear() ;
-  args.push_back ( "-i-1" ) ;
-  ok = cmdline2.parse ( args.begin(), args.end() ) ;
-  assert ( ok ) ;
-  assert ( optInt21.value() == -1 ) ;
+  args[1] = "-i1" ;
+  BOOST_CHECK ( cmdline2.parse ( 2, args ) ) ;
+  BOOST_CHECK_EQUAL ( optInt21.value(), 1 ) ;
 
-  args.clear() ;
-  args.push_back ( "-i-i" ) ;
-  ok = cmdline2.parse ( args.begin(), args.end() ) ;
-  assert ( ! ok ) ;
+  args[1] = "-i-1" ;
+  BOOST_CHECK ( cmdline2.parse ( 2, args ) ) ;
+  BOOST_CHECK_EQUAL ( optInt21.value(), -1 ) ;
 
+  args[1] = "-i-i" ;
+  BOOST_CHECK ( ! cmdline2.parse ( 2, args ) ) ;
+
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( cmdline_test_named )
+{
   // Install one more cmd line parser, cannot fail
   AppCmdLine cmdline3( "command3" ) ;
 
@@ -277,25 +265,19 @@ int main( int argc, char* argv[] )
   optInt31.add ( "zero", 0 ) ;
   optInt31.add ( "one", 1 ) ;
   optInt31.add ( "two", 2 ) ;
-  ok = cmdline3.addOption ( optInt31 ) ;
-  assert ( ok ) ;
+  BOOST_CHECK ( cmdline3.addOption ( optInt31 ) ) ;
 
+  const char* args[5] = { "" } ;
 
-  args.clear() ;
-  args.push_back ( "-ozero" ) ;
-  ok = cmdline3.parse ( args.begin(), args.end() ) ;
-  assert ( ok ) ;
-  assert ( optInt31.value() == 0 ) ;
+  args[1] = "-ozero" ;
+  BOOST_CHECK ( cmdline3.parse ( 2, args ) ) ;
+  BOOST_CHECK_EQUAL ( optInt31.value(), 0 ) ;
 
-  args.clear() ;
-  args.push_back ( "--option=one" ) ;
-  ok = cmdline3.parse ( args.begin(), args.end() ) ;
-  assert ( ok ) ;
-  assert ( optInt31.value() == 1 ) ;
+  args[1] = "--option=one" ;
+  BOOST_CHECK ( cmdline3.parse ( 2, args ) ) ;
+  BOOST_CHECK_EQUAL ( optInt31.value(), 1 ) ;
 
-  args.clear() ;
-  args.push_back ( "-othree" ) ;
-  ok = cmdline3.parse ( args.begin(), args.end() ) ;
-  assert ( ! ok ) ;
+  args[1] = "-othree" ;
+  BOOST_CHECK ( ! cmdline3.parse ( 2, args ) ) ;
 
 }

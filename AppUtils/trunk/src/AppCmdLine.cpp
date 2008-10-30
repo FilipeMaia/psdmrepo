@@ -169,6 +169,14 @@ AppCmdLine::parse ( int argc, char* argv[] )
 
   return doParse() ;
 }
+bool
+AppCmdLine::parse ( int argc, const char* argv[] )
+{
+  _argv.clear() ;
+  std::copy ( argv+1, argv+argc, std::back_inserter( _argv ) ) ;
+
+  return doParse() ;
+}
 
 /**
  *  Returns true if the "help" option was specified on the command line.

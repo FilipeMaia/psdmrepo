@@ -135,6 +135,7 @@ public:
    *  If it returns false then you should not expect anything, just exit.
    */
   bool parse ( int argc, char* argv[] ) ;
+  bool parse ( int argc, const char* argv[] ) ;
 
   /**
    *  Another form of parse, takes iterators. Dereferencing iterators should

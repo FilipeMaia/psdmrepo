@@ -11,8 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2008-10-30 Andy Salnikov
+- AppCmdLineTest.cpp changed to run with a Boost Unit Test
+
 Tag: V00-00-01
-2008-10-07 Andy Salnikov
+2008-10-29 Andy Salnikov
 - imported SysUtils from BaBar as AppUtils
 - Renamed all classes to use App prefix, everything has been put into 
   AppUtils namespace
