@@ -111,13 +111,12 @@ def findAllDependencies( node ):
         # take all children which are include files, i.e. they live in
         # .../arch/${LUSI_ARCH}/genarch/Package/ or include/Package/ directory
         f = str(child)
-        #trace ( 'Checking child %s' % f, 'findAllDependencies', 8 )
-        if os.path.isfile(f) :
-            p = _guessPackage ( f )
-            if p : 
-                res.add ( p )
-            else :
-                res.update ( findAllDependencies(child) )
+        trace ( 'Checking child %s' % f, 'findAllDependencies', 8 )
+        p = _guessPackage ( f )
+        if p : 
+            res.add ( p )
+        else :
+            res.update ( findAllDependencies(child) )
         
     return res
 

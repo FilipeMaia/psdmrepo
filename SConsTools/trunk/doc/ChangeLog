@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10
+2008-10-31 Andy Salnikov
+- dependencies.py: fix in in findAllDependencies, was skipping non-existing files
+- SConstruct.main: added dependecy of all tests on 'all' target
+
 Tag: V00-00-09
 2008-10-31 Andy Salnikov
 - symlinks in geninc/ directory are made without using scons rules, but
