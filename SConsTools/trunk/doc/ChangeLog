@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2008-10-31 Andy Salnikov
+- symlinks in geninc/ directory are made without using scons rules, but
+  directly by standardExternalPackage script itself. Resolves problem 
+  with some weird dependencies.
+
 Tag: V00-00-08
 2008-10-29 Andy Salnikov
 - adding unit test target to the builds

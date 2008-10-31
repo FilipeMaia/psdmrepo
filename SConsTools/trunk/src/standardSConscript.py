@@ -85,7 +85,7 @@ def standardLib( **kw ) :
 
         lib = env.SharedLibrary ( pkg, source=libsrcs )
         ilib = env.Install ( libdir, source=lib )
-        env['ALL_TARGETS']['LIBS'].append ( ilib )
+        env['ALL_TARGETS']['LIBS'].extend ( ilib )
         
         # get the list of dependencies for this package
         deps = findAllDependencies( lib[0] )
@@ -119,13 +119,13 @@ def standardPyLib( **kw ) :
             pydst = pjoin(pydir,pkg,basename)
             env.Symlink ( pydst, source=src )
             pyc = env.PyCompile ( pydst+"c", source=pydst )
-            env['ALL_TARGETS']['LIBS'].append ( pyc )
+            env['ALL_TARGETS']['LIBS'].extend ( pyc )
             
             # make __init__.py and compile it
             ini = pjoin(pydir,pkg,"__init__.py")
             env.Command ( ini, "", [ Touch("$TARGET") ] )
             pyc = env.PyCompile ( ini+"c", source=ini )
-            env['ALL_TARGETS']['LIBS'].append ( pyc )
+            env['ALL_TARGETS']['LIBS'].extend ( pyc )
 
 #
 # Process app/ directory, install all scripts
@@ -150,7 +150,7 @@ def standardScripts( **kw ) :
         # Scripts are copied to bin/ directory
         for s in scripts : 
             script = env.ScriptInstall ( os.path.join(bindir,os.path.basename(s)), s )
-            env['ALL_TARGETS']['BINS'].append ( script )
+            env['ALL_TARGETS']['BINS'].extend ( script )
 
 #
 # Process app/ directory, build all executables from C++ sources
@@ -184,7 +184,7 @@ def standardTests( **kw ) :
     trace ( "utests = "+str(map(str,utests)), "SConscript", 2 )
     for u in utests :
         t = env.UnitTest ( str(u)+'.utest', u )
-        env['ALL_TARGETS']['TESTS'].append( t )
+        env['ALL_TARGETS']['TESTS'].extend( t )
         
 #
 # Build binaries, possibly install them
@@ -232,6 +232,6 @@ def _standardBins( appdir, binenv, install, **kw ) :
             if install : 
                 b = env.Install ( bindir, source=b )
                 
-            targets.append( b[0] )
+            targets.extend( b )
             
     return targets

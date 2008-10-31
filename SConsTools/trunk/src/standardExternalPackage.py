@@ -22,7 +22,7 @@ from SConsTools.dependencies import *
 # symlinks to the include files, libs and binaries
 #
 
-# build absolute package name from prefix and directory
+# build package name from prefix and directory
 def _absdir ( prefix, dir ):
     if not dir : 
         return None
@@ -76,15 +76,20 @@ def standardExternalPackage ( package, **kw ) :
     prefix = kw.get('PREFIX',None)
     trace ( "prefix: %s" % prefix, "standardExternalPackage", 3 )
     
-    arch = env['LUSI_ARCH']
-    
     # link include directory
     inc_dir = _absdir ( prefix, kw.get('INCDIR',None) )
     if inc_dir :
-        trace ( "include_dir: %s" % inc_dir, "standardExternalPackage", 5 )
-        targ = env.Symlink ( Dir(pjoin(env.subst("$ARCHINCDIR"),package)), Dir(inc_dir) )
-        env['ALL_TARGETS']['LIBS'].append ( targ )
 
+        trace ( "include_dir: %s" % inc_dir, "standardExternalPackage", 5 )
+        
+        # make 'geninc' directory if not there yet
+        archinc = Dir(env.subst("$ARCHINCDIR"))
+        archinc = str(archinc)
+        if not os.path.isdir( archinc ) : os.makedirs( archinc )
+
+        target = pjoin(archinc,package)
+        if not os.path.lexists(target) : os.symlink ( inc_dir, target )
+        
     
     # link python directory
     py_dir = _absdir ( prefix, kw.get('PYDIR',None) )
@@ -93,7 +98,7 @@ def standardExternalPackage ( package, **kw ) :
         if kw.get('PYDIRSEP',False) :
             # make a link to the whole dir
             targ = env.Symlink ( Dir(pjoin(env.subst("$PYDIR"),package)), Dir(py_dir) )
-            env['ALL_TARGETS']['LIBS'].append ( targ )
+            env['ALL_TARGETS']['LIBS'].extend ( targ )
         else :
             # make links for every file in the directory
             files = os.listdir(py_dir)
@@ -101,7 +106,7 @@ def standardExternalPackage ( package, **kw ) :
                 loc = pjoin(py_dir,f)
                 if not os.path.isdir(loc) :
                     targ = env.Symlink ( pjoin(env.subst("$PYDIR"),f), loc )
-                    env['ALL_TARGETS']['LIBS'].append ( targ )
+                    env['ALL_TARGETS']['LIBS'].extend( targ )
             
     
     # link all libraries
@@ -119,7 +124,7 @@ def standardExternalPackage ( package, **kw ) :
             loc = pjoin(lib_dir,f)
             if os.path.isfile(loc) :
                 targ = env.Symlink ( pjoin(env.subst("$LIBDIR"),f), loc )
-                env['ALL_TARGETS']['LIBS'].append ( targ )
+                env['ALL_TARGETS']['LIBS'].extend ( targ )
 
     # link all executables
     bin_dir = _absdir ( prefix, kw.get('BINDIR',None) )
@@ -134,7 +139,7 @@ def standardExternalPackage ( package, **kw ) :
             loc = pjoin(bin_dir,f)
             if os.path.isfile(loc) :
                 targ = env.Symlink ( pjoin(env.subst("$BINDIR"),f), loc )
-                env['ALL_TARGETS']['BINS'].append ( targ )
+                env['ALL_TARGETS']['BINS'].extend ( targ )
 
     # add my libs to a package tree
     pkg_libs = kw.get('PKGLIBS',None)

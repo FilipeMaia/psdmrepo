@@ -122,7 +122,7 @@ libs = env.Alias ( 'lib', env['ALL_TARGETS']['LIBS'] )
 bins = env.Alias ( 'bin', env['ALL_TARGETS']['BINS'] )
 all = env.Alias ( 'all', libs+bins )
 tests = env.Alias ( 'test', env['ALL_TARGETS']['TESTS'] + all )
-env.Depends( tests, all )
+env.Requires ( tests, all )
 env.Default ( all )
 
 #trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
