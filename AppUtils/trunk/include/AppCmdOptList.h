@@ -52,7 +52,7 @@ extern "C" {
  *
  *  @see AppCmdOptListBase
  *
- *  @version $Id: AppCmdOptList.hh,v 1.5 2004/09/18 22:40:04 salnikov Exp $
+ *  @version $Id$
  *
  *  @author Andy Salnikov	(originator)
  */

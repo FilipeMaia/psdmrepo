@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2008-11-03 Andy Salnikov
+- added properties to all files here
+
 Tag: V00-00-03
 2008-11-03 Andy Salnikov
 - added test/EchoApp.cpp - simple test application for AppBase (it is 

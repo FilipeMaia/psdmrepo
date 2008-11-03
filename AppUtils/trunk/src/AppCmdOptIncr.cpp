@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: AppCmdOptIncr.cc,v 1.3 2004/08/24 17:04:23 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class AppCmdOptIncrToggle

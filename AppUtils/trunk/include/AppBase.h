@@ -52,7 +52,7 @@
  *
  *  @see AdditionalClass
  *
- *  @version $Id: template!C++!h 4 2008-10-08 19:27:36Z salnikov $
+ *  @version $Id$
  *
  *  @author Andrei Salnikov
  */

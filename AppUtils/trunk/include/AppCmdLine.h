@@ -94,7 +94,7 @@ extern "C" {
  *  @see AppCmdOptToggle
  *  @see AppCmdOptIncr
  *
- *  @version $Id: AppCmdLine.hh,v 1.3 2004/08/06 06:30:30 bartoldu Exp $
+ *  @version $Id$
  *
  *  @author Andy Salnikov	(originator)
  */

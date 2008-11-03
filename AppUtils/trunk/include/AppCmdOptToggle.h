@@ -52,7 +52,7 @@ extern "C" {
  *
  *  @see AppCmdOpt
  *
- *  @version $Id: AppCmdOptToggle.hh,v 1.3 2004/08/24 17:04:23 salnikov Exp $
+ *  @version $Id$
  *
  *  @author Andy Salnikov	(originator)
  */

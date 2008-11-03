@@ -54,7 +54,7 @@ extern "C" {
  *  @see AppCmdArg
  *  @see AppCmdArgList
  *
- *  @version $Id: AppCmdArgBase.hh,v 1.3 2004/08/24 17:04:22 salnikov Exp $
+ *  @version $Id$
  *
  *  @author Andy Salnikov	(originator)
  */

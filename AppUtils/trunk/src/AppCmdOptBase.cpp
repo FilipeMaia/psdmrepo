@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: AppCmdOptBase.cc,v 1.1 2003/02/25 20:45:11 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class AppCmdOptBase

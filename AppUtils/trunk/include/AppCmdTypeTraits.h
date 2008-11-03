@@ -55,7 +55,7 @@ extern "C" {
  *  @see AppCmdArg
  *  @see AppCmdOpt
  *
- *  @version $Id: AppCmdTypeTraits.hh,v 1.1 2003/02/25 20:45:13 salnikov Exp $
+ *  @version $Id$
  *
  *  @author Andy Salnikov	(originator)
  */

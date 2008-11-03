@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: AppCmdLineTest.cc,v 1.7 2006/02/10 17:55:30 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Test suite case for the AppCmdLine & friends.

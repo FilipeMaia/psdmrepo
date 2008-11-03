@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: AppCmdArgBase.cc,v 1.1 2003/02/25 20:45:10 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class AppCmdArgBase

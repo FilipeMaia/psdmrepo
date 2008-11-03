@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: AppCmdLine.cc,v 1.6 2004/11/25 00:55:19 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class AppCmdLine
