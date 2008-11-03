@@ -30,7 +30,7 @@ EOD
 # default values for options
 
 # get the options
-while getopts hdcf: c ; do
+while getopts hd c ; do
   case $c in
     h) usage ; exit 0 ;;
     d) set -x ;;
