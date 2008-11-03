@@ -11,11 +11,165 @@ Package author: Andrei Salnikov
 Brief description:
 ==================
 
-Add here a brief description of the package main purpose, one or two
-sentences is probably enough.
+AppUtils package contains a bunch of classes which should simplify writing
+of the command-line applications. Much of this stuff was ported from BaBar 
+(and somewhat improved).
 
 Detailed description:
 =====================
 
-More detailed info goes here. Describe main classes/applications built in
-this package. Give few examples of their use.
+There are two categories of classes in this package: AppBase (single class 
+in its own category) and AppCmd* classes. AppCmd* classes are for the 
+command-line parsing, they are virtually unchanged from BaBar, and it's
+better to consult the original BaBar description of this classes in the file 
+README.SysUtils.
+
+AppBase class is a base class for building command-line applications. It 
+solves two standard problems which appear in almost every command-line 
+application - command line parsing and logging/debugging.
+
+The real applications built from this class needs to be customized, 
+customization is performed through the inheritance and override of few 
+methods of the base class. Most of the time only the single method called 
+runApp() needs to be implemented, in addition to the setup code in the 
+subclass' constructor. Additionally the code which runs the whole application 
+needs to be added to the source file, so in general, the code will look 
+like this:
+
+#include "AppUtils/AppBase.h"
+
+class RealApp : public AppUtils::AppBase {
+public: 
+  RealApp( const std::string& appname ) 
+    : AppUtils::AppBase(appname)
+  {
+    // initialize app-specific things
+  } 
+  ~RealApp() {}
+  
+protected:
+
+  int runApp() {
+    // real application code goes in here
+  }
+
+private :
+  // data members, etc.
+
+};  
+
+// this macro generates main() which runs above application
+APPUTILS_MAIN(RealApp)
+
+The AppBase class does two things before it calls subclass' runApp() method:
+
+- command line parsing
+- message logging setup
+
+For the command line parsing it uses AppCmd* classes. The subclass can add 
+more command line options and arguments using the methods addOption() and 
+addArgument(), this should be done in the constructor of the subclass. The
+options and arguments themselves are the instances of the AppCmtOpt* and 
+AppCmdArg* classes and they should be made data members of the application
+class. See example below for the use of the command-line options/arguments.
+
+For the message logging (error reporting and debugging) the applications are 
+supposed to use facilities (macros) from MsgLogger package. The base class 
+provides two standard command-line options: "verbose" and "quiet". These are 
+incremental options and can appear multiple times on the command line. 
+Based on the number of -v and -q on the command line the base class sets the
+logging level of the message logger. By default, if no options are given, the 
+logging level is set to 'info'. Adding -v options increases level by one for 
+every -v (first 'trace', then 'debug'). Adding -q options decreases logging 
+level by one for every -q ('warning', then 'error'). Here are few examples of 
+the different combinations of the options and resulting logging level:
+
+  -v              trace
+  -q              warning
+  -q -q (or -qq)  error
+  -vvvv (= -vv)   debug
+  -v -q           info
+
+The exact formatting of the messages depends on the level of the message
+itself. One can change formatting for all levels with the environment
+variable MSGLOGFMT. See the README for MsgLogger for details. 
+
+Note also that command-line parameters control parameters of only the "root"
+message loggers, and that MSGLOGCONFIG variable can still be used for 
+configuration of "child" loggers independently of the "root" logger.
+
+Here is an example of the very simple echo-like application that uses 
+the AppUtils classes:
+
+// ==================================================
+#include <string>
+#include <iostream>
+
+#include "AppUtils/AppBase.h"
+#include "AppUtils/AppCmdOpt.h"
+#include "AppUtils/AppCmdOptIncr.h"
+#include "AppUtils/AppCmdArgList.h"
+#include "MsgLogger/MsgLogger.h"
+
+class EchoApp : public AppUtils::AppBase {
+public:
+  EchoApp( const std::string& appname ) ;
+  ~EchoApp() {}
+
+protected:
+
+  int runApp() ;
+
+private :
+  AppUtils::AppCmdOptIncr m_noEcho ;
+  AppUtils::AppCmdOpt<std::string> m_sep ;
+  AppUtils::AppCmdArgList<std::string> m_args ;
+};
+
+EchoApp::EchoApp( const std::string& appname )
+  : AppUtils::AppBase(appname)
+  , m_noEcho( 'n', "no-new-line", "disable output of new line", 0 )
+  , m_sep( 's', "separator", "string", "output word separator", " " )
+  , m_args ( "strings", "the list of strings to print", std::list<std::string>() )
+{
+  addOption( m_noEcho ) ;
+  addOption( m_sep ) ;
+  addArgument( m_args ) ;
+}
+
+int EchoApp::runApp()
+{
+  MsgLogRoot( debug, "Starting with noEcho=" << m_noEcho.value() <<
+                     " and sep=\"" << m_sep.value() << "\"" );
+
+  bool first = true ;
+  typedef AppUtils::AppCmdArgList<std::string>::const_iterator Iter ;
+  for ( Iter i = m_args.begin() ; i != m_args.end() ; ++i ) {
+    if ( first ) {
+      first = false ;
+    } else {
+      std::cout << m_sep.value() ;
+    }
+    std::cout << *i ;
+  }
+  if ( not m_noEcho.value() ) std::cout << '\n' ;
+
+  return 0 ;
+}
+
+// this macro generates main() which runs above application
+APPUTILS_MAIN(EchoApp)
+// ==================================================
+
+If you run it with -h option it will produce this help message:
+
+Usage: EchoApp [options] [strings ...]
+  Available options:
+    {-h|-?|--help    }         print help message
+    {-v|--verbose    } (incr)  verbose output, multiple allowed
+    {-q|--quiet      } (incr)  quieter output, multiple allowed
+    {-n|--no-new-line} (incr)  disable output of new line
+    {-s|--separator  } string  output word separator
+  Positional parameters:
+    strings  the list of strings to print
+

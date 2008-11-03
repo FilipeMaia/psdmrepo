@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2008-11-03 Andy Salnikov
+- added test/EchoApp.cpp - simple test application for AppBase (it is 
+  also an example in README)
+- copied README file from BaBar's SysUtils as doc/README.SysUtil
+- added detailed description of AppBase to README
+
 Tag: V00-00-02
 2008-10-30 Andy Salnikov
 - AppCmdLineTest.cpp changed to run with a Boost Unit Test

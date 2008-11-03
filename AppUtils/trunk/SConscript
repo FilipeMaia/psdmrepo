@@ -17,4 +17,4 @@ Import('*')
 # above targets. In some cases additional parameters may be needed,
 # consult SConsTools/src/standardSConscript.py file.
 #
-standardSConscript()
+standardSConscript( UTESTS=["AppCmdLineTest"] )
