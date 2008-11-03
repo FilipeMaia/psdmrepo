@@ -178,7 +178,7 @@ def standardTests( **kw ) :
         utests = targets
     else :
         # filter matching targets
-        utests = [ t for t in targets if os.path.basename(str(t))[0] in utests ]
+        utests = [ t for t in targets if os.path.basename(str(t)) in utests ]
 
     # make new unit test target
     trace ( "utests = "+str(map(str,utests)), "SConscript", 2 )
