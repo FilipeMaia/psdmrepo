@@ -93,12 +93,9 @@ protected:
 
 private:
 
-  typedef std::map< MsgLogLevel, std::string > FormatMap ;
-
   // Data members
-  std::string _fmt ;
   std::string _timefmt ;
-  FormatMap _fmtMap ;
+  std::string _fmtMap[MsgLogLevel::LAST_LEVEL+1] ;
 
   // Disable copy
   MsgFormatter( const MsgFormatter& );

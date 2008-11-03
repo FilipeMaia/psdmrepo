@@ -59,18 +59,20 @@ namespace MsgLogger {
 //		----------------------------------------
 
 // Constructor
-MsgFormatter::MsgFormatter( const std::string& fmt, const std::string& timefmt )
-  : _fmt(fmt)
-  , _timefmt(timefmt)
-  , _fmtMap()
+MsgFormatter::MsgFormatter( const std::string& afmt, const std::string& timefmt )
+  : _timefmt(timefmt)
 {
-  if ( _fmt.empty() ) {
+  std::string fmt = afmt ;
+  if ( fmt.empty() ) {
     if ( const char* env = getenv ( "MSGLOGFMT" ) ) {
-      _fmt = env ;
+      fmt = env ;
     } else {
-      _fmt = "%(time) [%(LVL)] {%(logger)} %(file):%(line) - %(message)" ;
+      fmt = "%(time) [%(LVL)] {%(logger)} %(file):%(line) - %(message)" ;
     }
   }
+
+  std::fill_n ( _fmtMap, MsgLogLevel::LAST_LEVEL+1, fmt ) ;
+
   if ( _timefmt.empty() ) {
     if ( const char* env = getenv ( "MSGLOGTIMEFMT" ) ) {
       _timefmt = env ;
@@ -89,15 +91,14 @@ MsgFormatter::~MsgFormatter()
 void
 MsgFormatter::addFormat ( MsgLogLevel level, const std::string& fmt )
 {
-  _fmtMap[level] = fmt ;
+  _fmtMap[level.code()] = fmt ;
 }
 
 // format message to the output stream
 void
 MsgFormatter::format ( const MsgLogRecord& rec, std::ostream& out )
 {
-  FormatMap::const_iterator it = _fmtMap.find( rec.level() ) ;
-  const std::string& fmt = it != _fmtMap.end() ? it->second : _fmt ;
+  const std::string& fmt = _fmtMap[rec.level().code()];
 
   // read format and fill the stream
   for ( std::string::const_iterator i = fmt.begin() ; i != fmt.end() ; ++ i ) {

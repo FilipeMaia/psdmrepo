@@ -22,15 +22,10 @@
 //-----------------------
 #include "MsgLogger/MsgLogLevel.h"
 
-//-------------
-// C Headers --
-//-------------
-extern "C" {
-}
-
 //---------------
 // C++ Headers --
 //---------------
+#include <stdexcept>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -45,6 +40,35 @@ namespace MsgLogger {
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
+
+MsgLogLevel::MsgLogLevel( int code )
+{
+  if ( code < int(debug) ) {
+    code = int(debug) ;
+  } else if ( code > int(error) ) {
+    code = int(error) ;
+  }
+  _level = Level(code) ;
+}
+
+MsgLogLevel::MsgLogLevel( const std::string& level )
+{
+  if ( level == "error" ) {
+    _level = error ;
+  } else if ( level == "warning" ) {
+    _level = warning ;
+  } else if ( level == "info" ) {
+    _level = info ;
+  } else if ( level == "trace" ) {
+    _level = trace ;
+  } else if ( level == "debug" ) {
+    _level = debug ;
+  } else if ( level == "nolog" ) {
+    _level = nolog ;
+  } else {
+    throw std::out_of_range ( "unexpected logging level name" ) ;
+  }
+}
 
 // get full printable name of Level level
 const char*

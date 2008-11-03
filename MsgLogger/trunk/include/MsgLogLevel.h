@@ -68,18 +68,22 @@ class MsgLogLevel {
 public:
 
   /**
-   *  Message Level levels.
+   *  Message Level levels. The code in the package depends on the range
+   *  which should in [0...LAST_LEVEL]
    */
   enum Level { debug,
 	       trace,
 	       info,
 	       warning,
 	       error,
-	       nolog      // There should be no messages with this level, it's only for loggers
+	       nolog,      // There should be no messages with this level, it's only for loggers
+	       LAST_LEVEL = nolog
              };
 
   // Construct root logger
   MsgLogLevel( Level code ) : _level(code) {}
+  explicit MsgLogLevel( int code ) ;
+  explicit MsgLogLevel( const std::string& name ) ;
 
   // default copy ctor is OK
   //MsgLogLevel( const MsgLogLevel& );
@@ -107,6 +111,9 @@ public:
 
   // get one-char Level code
   char levelLetter () const ;
+
+  // return level code, guaranteed between 0 and LAST_LEVEL
+  int code() const { return int(_level) ; }
 
 protected:
 

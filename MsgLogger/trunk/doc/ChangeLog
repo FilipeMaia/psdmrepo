@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2008-11-03 Andy Salnikov
+- Few optimizations and small refactoring
+
 Tag: V00-00-01
 2008-10-07 Andy Salnikov
 - Copied it from BaBar, made few serious modifications. Check README.

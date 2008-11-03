@@ -187,7 +187,11 @@ MsgLoggerImpl::getLogger( const std::string& name )
 
   // on the first call read configuration
   if ( implementations.map.empty() ) {
-    ::readConfig() ;
+    try {
+      ::readConfig() ;
+    } catch ( const std::exception& e ) {
+      std::cerr << "MsgLogger: Error while parsing MSGLOGCONFIG: " << e.what() << std::endl ;
+    }
   }
 
   // maybe we have it already?
@@ -217,21 +221,14 @@ namespace {
       return ;
     }
 
-    MsgLogger::MsgLogLevel s ( MsgLogger::MsgLogLevel::debug ) ;
-    if ( level == "error" ) {
-      s = MsgLogger::MsgLogLevel::error ;
-    } else if ( level == "warning" ) {
-        s = MsgLogger::MsgLogLevel::warning ;
-    } else if ( level == "info" ) {
-        s = MsgLogger::MsgLogLevel::info ;
-    } else if ( level == "trace" ) {
-      s = MsgLogger::MsgLogLevel::trace ;
-    } else if ( level == "nolog" ) {
-      s = MsgLogger::MsgLogLevel::nolog ;
-    }
+    MsgLogger::MsgLogLevel s ( level ) ;
 
     boost::shared_ptr<MsgLogger::MsgLoggerImpl> logger ( new MsgLogger::MsgLoggerImpl( name ) ) ;
-    logger->addHandler ( new MsgLogger::MsgHandlerStdStreams ) ;
+
+    // do not setup handler for root logger, it will be done later in initRoot,
+    // give user a chance to set different handlers
+    if ( ! name.empty() ) logger->addHandler ( new MsgLogger::MsgHandlerStdStreams ) ;
+
     logger->setLevel ( s ) ;
     logger->propagate ( propagate ) ;
     implementations.map.insert ( Name2ImplMap::value_type ( name, logger ) ) ;
