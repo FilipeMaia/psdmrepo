@@ -1,0 +1,75 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package SConsTools
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-11
+2008-11-03 Andy Salnikov
+- fix in standardSConscript.py: UTESTS list did not work
+
+Tag: V00-00-10
+2008-10-31 Andy Salnikov
+- dependencies.py: fix in in findAllDependencies, was skipping non-existing files
+- SConstruct.main: added dependecy of all tests on 'all' target
+
+Tag: V00-00-09
+2008-10-31 Andy Salnikov
+- symlinks in geninc/ directory are made without using scons rules, but
+  directly by standardExternalPackage script itself. Resolves problem 
+  with some weird dependencies.
+
+Tag: V00-00-08
+2008-10-29 Andy Salnikov
+- adding unit test target to the builds
+- standardSConscript: few additional keywords: TESTS, UTESTS, SCRIPTS; 
+  split standardSConscript() into bunch of functions
+- builders.py: make all builders clesses instead of functions, adding
+  strfunction() method to the classes, nicer printing of progress
+- scons_env.py: adding ALL_TARGETS variable to environment, which is a
+  dictionary of the targets for BINS, LIBS, and TEST aliases
+- standardExternalPackage: fills in ALL_TARGETS
+- standardSConscript: fills in ALL_TARGETS
+- SConstruct.main: defines target aliases 'lib', 'bin', 'test'
+- lot's of other improvements
+
+Tag: V00-00-07
+2008-10-29 Andy Salnikov
+- standardSConscript: adding support for building tests in test/, 
+  plus minor refactoring
+
+Tag: V00-00-06
+2008-10-28 Andy Salnikov
+- standardSConscript: added more C/C++ extensions for building libraries and
+  binaries: cc,cpp,cxx,C,c
+- standardExternalPackage: added globbing for LINKLIBS and LINKBINS
+- dependencies: 
+  - tries to guess boost package names
+  - improved topological sort, detect cycles
+
+Tag: V00-00-05
+2008-10-17 Andy Salnikov
+- standardExternalPackage: adding PYDIRSEP option
+
+Tag: V00-00-04
+2008-10-15 Andy Salnikov
+- adding release dependencies module 
+
+Tag: V00-00-01
+2008-10-08 Andy Salnikov
+- added ScriptInstall builder to handle substitution of @XYZ@ placeholders
+  in the scripts
+
+Tag: V00-00-00
+2008-10-08 Andy Salnikov
+- initial import of SConsTools into CVS
+- few python module are in the package at this time, used by SConstruct.main
+- SConstruct.main should be moved into the top release directory as a part
+  of the release preparation (or it can also be linked to SConstruct.main)
