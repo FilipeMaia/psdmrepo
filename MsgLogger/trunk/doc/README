@@ -89,8 +89,9 @@ control sequence consists of a percent sign followed by the keyword
 in parentheses. Here is the list of keywords:
 
     logger  - name of the logger
-    level   - logging level of the message (debug/trace/info)
-    L       - one-letter level code (D/T/I)
+    level   - logging level of the message (debug/trace/info/warning/error)
+    LVL     - three-letter level code (DBG/TRC/INF/WRN/ERR)
+    L       - one-letter level code (D/T/I/W/E)
     message - the text of the message
     path    - full path of the file where message originated
     file    - base name of the file where message originated
@@ -101,7 +102,7 @@ in parentheses. Here is the list of keywords:
 Example of the format string could be (and it is also a default 
 format string):
 
-  "%(time) [%(logger)/%(level)] %(file):%(line) - %(message)"
+  "%(time) [%(LVL)] {%(logger)} %(file):%(line) - %(message)"
 
 Time can be formatted differently based on a separate configuration 
 option which defines time format string. This is a strftime-format 
