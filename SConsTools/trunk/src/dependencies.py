@@ -86,13 +86,16 @@ def _guessPackage ( path ):
             # probably not boost, do other tests
             pass
     
-    if len(f) > 4 and f[2] == 'geninc' and f[4] == 'arch' :
+    try :
+        x = f.index('geninc') 
+        if f[x+2] == 'arch' :
+            # .../arch/$LUSI_ARCH/geninc/Package/file
+            trace ( 'Child comes from %s' % f[x-1], '_guessPackage', 8 )
+            return f[x-1]
+    except :
+        pass
         
-        # .../arch/$LUSI_ARCH/geninc/Package/file
-        trace ( 'Child comes from %s' % f[1], '_guessPackage', 8 )
-        return f[1]
-        
-    elif len(f) > 2 and f[2] == 'include' :
+    if len(f) > 2 and f[2] == 'include' :
         
         # .../include/Package/file
         trace ( 'Child comes from %s' % f[1], '_guessPackage', 8 )

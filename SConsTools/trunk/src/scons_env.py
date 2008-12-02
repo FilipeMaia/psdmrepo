@@ -80,6 +80,9 @@ def buildEnv () :
                  PKG_TREE_BASE = {},
                  PKG_TREE_BINS = {},
                  ALL_TARGETS = {} )
+    
+    # may want to use "relative" RPATH
+    # env.Replace( RPATH = env.Literal("'$$ORIGIN/../lib'") )
 
     # these lists will be filled by standard rules
     env['ALL_TARGETS']['LIBS'] = []
