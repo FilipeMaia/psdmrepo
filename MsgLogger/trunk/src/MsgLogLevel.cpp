@@ -53,16 +53,18 @@ MsgLogLevel::MsgLogLevel( int code )
 
 MsgLogLevel::MsgLogLevel( const std::string& level )
 {
-  if ( level == "error" ) {
-    _level = error ;
+  if ( level == "trace" ) {
+    _level = trace ;
+  } else if ( level == "debug" ) {
+    _level = debug ;
   } else if ( level == "warning" ) {
     _level = warning ;
   } else if ( level == "info" ) {
     _level = info ;
-  } else if ( level == "trace" ) {
-    _level = trace ;
-  } else if ( level == "debug" ) {
-    _level = debug ;
+  } else if ( level == "error" ) {
+    _level = error ;
+  } else if ( level == "fatal" ) {
+    _level = fatal ;
   } else if ( level == "nolog" ) {
     _level = nolog ;
   } else {
@@ -85,6 +87,8 @@ MsgLogLevel::levelName () const
       return "warning" ;
     case error:
       return "error" ;
+    case fatal:
+      return "fatal" ;
     case nolog:
     default:
       return "no-log" ;
@@ -106,6 +110,8 @@ MsgLogLevel::level3 () const
       return "WRN" ;
     case error:
       return "ERR" ;
+    case fatal:
+      return "FTL" ;
     case nolog:
     default:
       return "???" ;
@@ -127,6 +133,8 @@ MsgLogLevel::levelLetter () const
       return 'W' ;
     case error:
       return 'E' ;
+    case fatal:
+      return 'F' ;
     case nolog:
     default:
       return '?' ;

@@ -22,16 +22,11 @@
 //-----------------------
 #include "MsgLogger/MsgLogStream.h"
 
-//-------------
-// C Headers --
-//-------------
-extern "C" {
-}
-
 //---------------
 // C++ Headers --
 //---------------
 #include <iostream>
+#include <cstdlib>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -83,6 +78,9 @@ MsgLogStream::emit()
   if ( logger.logging ( _sev ) ) {
     MsgLogRecord record ( _logger, _sev, _file, _lineNum, rdbuf() ) ;
     logger.log ( record ) ;
+  }
+  if ( _sev == MsgLogLevel::fatal ) {
+    abort() ;
   }
 }
 

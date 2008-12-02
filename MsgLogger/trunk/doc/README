@@ -159,7 +159,7 @@ but in the future it would be possible to add more generic way to
 configure the system, probably through the special configuration file
 with a specialized syntax.
 
-Right now you can configure it through 3 environment variables. First 
+Right now you can configure it through few environment variables. First 
 and main envvar is called MSGLOGCONFIG and it allows you to change the 
 logging level of specific loggers. The syntax of this configuration
 string is simple and has the format
@@ -190,6 +190,10 @@ format string used by all formatters. Here is example of more compact
 format string:
 
     setenv MSGLOGFMT "{%(logger)}[%(L)] %(message)"
+
+Additionally variables MSGLOGFMT_DBG, MSGLOGFMT_TRC, MSGLOGFMT_INF, 
+MSGLOGFMT_WRN, MSGLOGFMT_ERR, and MSGLOGFMT_FTL can be set to change 
+format string for a specific logging level.
 
 And one more envvar with the name MSGLOGTIMEFMT controls the output 
 format of the time stamps, One more example:

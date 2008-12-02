@@ -83,6 +83,10 @@ public:
   // Destructor
   virtual ~MsgFormatter() ;
 
+  // set format for all formatters
+  static void addGlobalFormat ( const std::string& fmt ) ;
+  static void addGlobalFormat ( MsgLogLevel level, const std::string& fmt ) ;
+
   // add level-specific format
   virtual void addFormat ( MsgLogLevel level, const std::string& fmt ) ;
 
@@ -90,6 +94,9 @@ public:
   virtual void format ( const MsgLogRecord& rec, std::ostream& out ) ;
 
 protected:
+
+  // get a format string for a given level
+  virtual const std::string& getFormat ( MsgLogLevel level ) const ;
 
 private:
 

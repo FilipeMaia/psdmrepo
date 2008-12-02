@@ -76,6 +76,7 @@ public:
 	       info,
 	       warning,
 	       error,
+	       fatal,
 	       nolog,      // There should be no messages with this level, it's only for loggers
 	       LAST_LEVEL = nolog
              };

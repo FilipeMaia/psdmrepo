@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2008-12-02 Andy Salnikov
+- new 'fatal' level added, causes immediate termination (via abort())
+- MsgFormatter class has new static methods to modify global format strings
+  common to all handlers. global format strings are used when formatter 
+  does not provide its own strings.
+
 Tag: V00-00-03
 2008-11-03 Andy Salnikov
 - updated README file
