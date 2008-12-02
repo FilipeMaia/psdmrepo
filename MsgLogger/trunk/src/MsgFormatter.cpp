@@ -52,7 +52,14 @@ namespace {
   // get current time and format it
   void formattedTime ( std::string fmt, std::ostream& out ) ;
 
-  std::string s_fmtMap [MsgLogLevel::LAST_LEVEL+1] ;
+  // default format string
+  const std::string s_defFmt = "%(time) [%(LVL)] {%(logger)} %(file):%(line) - %(message)" ;
+
+  // these format strings are set with addGlobalFormat
+  std::string s_appFmtMap [MsgLogLevel::LAST_LEVEL+1] ;
+
+  // this format strings are set from the environment
+  std::string s_envFmtMap [MsgLogLevel::LAST_LEVEL+1] ;
 
   void initFmtMap() {
 
@@ -61,13 +68,9 @@ namespace {
       initDone = true ;
 
       // variable MSGLOGFMT defines global format string
-      std::string fmt ;
       if ( const char* env = getenv ( "MSGLOGFMT" ) ) {
-        fmt = env ;
-      } else {
-        fmt = "%(time) [%(LVL)] {%(logger)} %(file):%(line) - %(message)" ;
+        std::fill_n ( s_envFmtMap, MsgLogLevel::LAST_LEVEL+1, env ) ;
       }
-      std::fill_n ( s_fmtMap, MsgLogLevel::LAST_LEVEL+1, fmt ) ;
 
       // variables MSGLOGFMT_DBG, MSGLOGFMT_TRC, etc. define level-specific
       // format strings
@@ -76,7 +79,7 @@ namespace {
         std::string envname = "MSGLOGFMT_" ;
         envname += lvl.level3() ;
         if ( const char* env = getenv ( envname.c_str() ) ) {
-          s_fmtMap[i] = env ;
+          s_envFmtMap[i] = env ;
         }
       }
 
@@ -116,13 +119,13 @@ MsgFormatter::~MsgFormatter()
 void
 MsgFormatter::addGlobalFormat ( const std::string& fmt )
 {
-  std::fill_n ( ::s_fmtMap, MsgLogLevel::LAST_LEVEL+1, fmt ) ;
+  std::fill_n ( ::s_appFmtMap, MsgLogLevel::LAST_LEVEL+1, fmt ) ;
 }
 
 void
 MsgFormatter::addGlobalFormat ( MsgLogLevel level, const std::string& fmt )
 {
-  ::s_fmtMap[level.code()] = fmt ;
+  ::s_appFmtMap[level.code()] = fmt ;
 }
 
 // add level-specific format
@@ -230,8 +233,12 @@ MsgFormatter::getFormat ( MsgLogLevel level ) const
   int lvl = level.code() ;
   if ( not _fmtMap[lvl].empty() ) {
     return _fmtMap[lvl] ;
+  } else if ( not ::s_envFmtMap[lvl].empty() ) {
+    return ::s_envFmtMap[lvl] ;
+  } else if ( not ::s_appFmtMap[lvl].empty() ) {
+    return ::s_appFmtMap[lvl] ;
   } else {
-    return ::s_fmtMap[lvl] ;
+    return ::s_defFmt ;
   }
 }
 
