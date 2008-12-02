@@ -100,23 +100,15 @@ AppBase::run ( int argc, char** argv )
   rootlogger.setLevel ( loglvl ) ;
 
   // Do some smart formatting of the messages
-  MsgLogger::MsgFormatter* formatter = 0 ;
-  if ( const char* env = getenv ( "MSGLOGFMT" ) ) {
-    formatter = new MsgLogger::MsgFormatter( env ) ;
-  } else {
-    const char* fmt = "[%(LVL)] %(message)" ;
-    const char* errfmt = "%(time) [%(LVL)] {%(logger)} %(file):%(line) - %(message)" ;
-    const char* dbgfmt = "%(time) [%(LVL)] {%(logger)} %(file):%(line) - %(message)" ;
-    formatter = new MsgLogger::MsgFormatter( fmt ) ;
-    formatter->addFormat ( MsgLogger::MsgLogLevel::debug, dbgfmt ) ;
-    formatter->addFormat ( MsgLogger::MsgLogLevel::trace, dbgfmt ) ;
-    formatter->addFormat ( MsgLogger::MsgLogLevel::warning, errfmt ) ;
-    formatter->addFormat ( MsgLogger::MsgLogLevel::error, errfmt ) ;
-  }
-
-  MsgLogger::MsgHandler* handler = new MsgLogger::MsgHandlerStdStreams ;
-  handler->setFormatter( formatter );
-  rootlogger.addHandler ( handler ) ;
+  const char* fmt = "[%(LVL)] %(message)" ;
+  const char* errfmt = "[%(LVL)] (%(time)) %(file):%(line) - %(message)" ;
+  const char* dbgfmt = errfmt ;
+  MsgLogger::MsgFormatter::addGlobalFormat ( fmt ) ;
+  MsgLogger::MsgFormatter::addGlobalFormat ( MsgLogger::MsgLogLevel::debug, dbgfmt ) ;
+  MsgLogger::MsgFormatter::addGlobalFormat ( MsgLogger::MsgLogLevel::trace, dbgfmt ) ;
+  MsgLogger::MsgFormatter::addGlobalFormat ( MsgLogger::MsgLogLevel::warning, errfmt ) ;
+  MsgLogger::MsgFormatter::addGlobalFormat ( MsgLogger::MsgLogLevel::error, errfmt ) ;
+  MsgLogger::MsgFormatter::addGlobalFormat ( MsgLogger::MsgLogLevel::fatal, errfmt ) ;
 
   // pre-run
   int stat = preRunApp() ;
