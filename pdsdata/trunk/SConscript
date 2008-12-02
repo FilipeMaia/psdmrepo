@@ -1,0 +1,27 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package lusi-xtc
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any LUSI project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+lusi_xtc_ver = "0.0.0"
+PREFIX = pjoin(env['LUSI_ROOT'],"sw/external/lusi-xtc",lusi_xtc_ver,env['LUSI_ARCH'])
+LIBDIR = "lib"
+INCDIR = "pdsdata"
+PKGLIBS = "acqdata xtcdata"
+standardExternalPackage ( 'pdsdata', **locals() )
