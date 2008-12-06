@@ -80,7 +80,7 @@ localpkg() {
 #
 # Print the list of the tags
 #
-taglist() {
+exec_tags() {
 
   pkg=${1:-`localpkg`}
   pkg=${pkg:?Cannot determine package name}
@@ -90,41 +90,9 @@ taglist() {
 }
 
 #
-# Create new tag for a package
-#
-maketag() {
-	
-  rev=""
-  pkg=""
-  # get the options
-  while getopts r:p: c ; do
-    case $c in
-      p) pkg="$OPTARG" ;;
-      r) rev="$OPTARG" ;;
-      \?) help_tag ; exit 2 ;;
-    esac
-  done
-  shift `expr $OPTIND - 1`
-
-  tag=${1:?No tag provided}
-
-  pkg=${pkg:-`localpkg`}
-  pkg=${pkg:?Cannot determine package name}
-
-  if [ -n "$rev" ] ; then
-    svn copy -r "$rev" -m 'Tagging $pkg with $tag' \
-      "$SVNROOT/$pkg/trunk" "$SVNROOT/$pkg/tags/$tag"
-  else
-    lpkg=`localpkg`
-    lpkg=${lpkg:?Not in the package directory}
-    svn copy -m 'Tagging $pkg with $tag' "." "$SVNROOT/$pkg/tags/$tag"
-  fi
-}
-
-#
 # Create new package
 #
-newpkg() {
+exec_newpkg() {
 	
   pkg=${1:?No package name provided}
 
@@ -135,7 +103,7 @@ newpkg() {
 #
 # Create new tag for a package
 #
-maketag() {
+exec_tag() {
 	
   rev=""
   pkg=""
@@ -193,8 +161,6 @@ esac
 # dispatch
 case "$1" in
   help) shift ; help_$1 ;;
-  tags) shift ; taglist "$@" ;;
-  tag) shift ; maketag "$@" ;;
-  newpkg) shift ; newpkg "$@" ;;
+  tags|tag|newpkg) c=$1; shift ; exec_$c "$@" ;;
   *) usage ; exit 2 ;;
 esac
