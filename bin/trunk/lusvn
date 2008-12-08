@@ -19,6 +19,7 @@ Usage: `basename $0` [options] command [command options]
     tags   - list all tags for a given or current package
     tag    - make new tag for a package
     newpkg - create directory structure for new package
+    export - extracts code and adds .lusvn-tag file
 
 EOD
 }
@@ -30,7 +31,7 @@ help_() {
 help_tags() {
   cat << EOD
 
-Usage: `basename $0` tags [package]
+Usage: `basename $0` tags [<package>]
 
   Prints the list of tags for the given package. If package name is not 
   given then use current package. Uses "long" SVN format for "svn ls".
@@ -41,7 +42,7 @@ EOD
 help_tag() {
   cat << EOD
 
-Usage: `basename $0` tag [options] tag
+Usage: `basename $0` tag [options] <tag-name>
 
   Available options:
     -p package    makes tag for package name, otherwise for local package
@@ -54,7 +55,19 @@ EOD
 help_newpkg() {
   cat << EOD
 
-Usage: `basename $0` newpkg Package
+Usage: `basename $0` newpkg <package>
+
+EOD
+}
+
+help_export() {
+  cat << EOD
+
+Usage: `basename $0` export [options] <package> <tag> <path>
+
+  Will export package named <package> with the specified tag into 
+  a directory <path>. Creates .lusvn-tag file in the package directory
+  with the tag name.
 
 EOD
 }
@@ -98,6 +111,20 @@ exec_newpkg() {
 
   svn mkdir -m "Creating package $pkg" "$SVNROOT/$pkg" \
               "$SVNROOT/$pkg/trunk" "$SVNROOT/$pkg/tags" "$SVNROOT/$pkg/branches"
+}
+
+#
+# Export the package
+#
+exec_export() {
+	
+  pkg=${1:?No package name provided}
+  tag=${2:?No tag name provided}
+  path=${3:?No path provided}
+
+  svn export "$SVNROOT/$pkg/tags/$tag" "$path" &&
+     echo "$tag" > "$path/.lusvn-tag"
+
 }
 
 #
@@ -161,6 +188,6 @@ esac
 # dispatch
 case "$1" in
   help) shift ; help_$1 ;;
-  tags|tag|newpkg) c=$1; shift ; exec_$c "$@" ;;
+  tags|tag|newpkg|export) c=$1; shift ; exec_$c "$@" ;;
   *) usage ; exit 2 ;;
 esac
