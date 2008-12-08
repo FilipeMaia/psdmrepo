@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2008-12-08 Andy Salnikov
+- switch to Python2.6
+
 Tag: V00-00-12
 2008-12-02 Andy Salnikov
 - dependencies.py - modified dependency search when the include file is 
