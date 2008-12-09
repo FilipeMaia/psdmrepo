@@ -5,7 +5,7 @@
 
 # +++++++++ few adjustible parameters +++++++++
 # SCons version
-scons_ver="1.0.1"
+scons_ver="1.1.0"
 
 # The map which lists acceptable (compatible) architectures 
 # for the current processor. For example if system is detected
