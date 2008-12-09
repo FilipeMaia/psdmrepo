@@ -69,6 +69,9 @@ Usage: `basename $0` export [options] <package> <tag> <path>
   a directory <path>. Creates .lusvn-tag file in the package directory
   with the tag name.
 
+  Available options:
+    -f|--force   override the content of the directory
+    
 EOD
 }
 
@@ -118,11 +121,16 @@ exec_newpkg() {
 #
 exec_export() {
 	
+  force=""
+  if [ "$1" == "-f" -o "$1" == "--force" ] ; then
+  	force="--force"
+  	shift
+  fi
   pkg=${1:?No package name provided}
   tag=${2:?No tag name provided}
   path=${3:?No path provided}
 
-  svn export "$SVNROOT/$pkg/tags/$tag" "$path" &&
+  svn export $force "$SVNROOT/$pkg/tags/$tag" "$path" &&
      echo "$tag" > "$path/.lusvn-tag"
 
 }
