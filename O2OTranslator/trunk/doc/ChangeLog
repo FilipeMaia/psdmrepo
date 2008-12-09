@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2008-12-09 Andy Salnikov
+- use new package nexuspp for NeXus file operations
+
 Tag: V00-00-01
 2008-12-02 Andy Salnikov
 - first half-working version of the translator

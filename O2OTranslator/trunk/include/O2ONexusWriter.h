@@ -24,7 +24,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "nexus/napi.h"
+#include "nexuspp/NxppFile.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -76,7 +76,7 @@ private:
 
   // Data members
   std::string m_fileName ;
-  NXhandle m_fileId ;
+  nexuspp::NxppFile* m_file ;
   std::set<std::string> m_existingGroups ;
 
   // Copy constructor and assignment are disabled by default
