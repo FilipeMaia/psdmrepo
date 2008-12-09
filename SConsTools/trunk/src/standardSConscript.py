@@ -87,13 +87,9 @@ def standardLib( **kw ) :
         ilib = env.Install ( libdir, source=lib )
         env['ALL_TARGETS']['LIBS'].extend ( ilib )
         
-        # get the list of dependencies for this package
-        deps = findAllDependencies( lib[0] )
-        setPkgDeps ( env, pkg, deps )
-        trace ( "deps = " + str(map(str,deps)), "SConscript", 4 )
-
         # get the list of libraries need for this package
         libs = [pkg] + _getkwlist ( kw, 'LIBS' )
+        setPkgLib ( env, pkg, lib[0] )
         setPkgLibs ( env, pkg, libs )
         
 #
@@ -218,17 +214,12 @@ def _standardBins( appdir, binenv, install, **kw ) :
         binkw = {}
         binkw['LIBS'] = _getkwlist ( kw, 'LIBS' )
         #binkw['LIBS'].insert ( 0, _getpkg( kw ) )
-        binkw['LIBDIRS'] = _getkwlist ( kw, 'LIBDIRS' )
+        binkw['LIBPATH'] = _getkwlist ( kw, 'LIBPATH' )
     
         for bin, srcs in bins.iteritems() :
             
             b = env.Program( bin, source=srcs, **binkw )
-            
-            deps = findAllDependencies( b[0] )
-            trace ( bin+" deps = " + str(map(str,deps)), "SConscript", 4 )
-            
-            setBinDeps ( env, b[0], deps )
-
+            setPkgBins ( env, kw['package'], b[0] )
             if install : 
                 b = env.Install ( bindir, source=b )
                 

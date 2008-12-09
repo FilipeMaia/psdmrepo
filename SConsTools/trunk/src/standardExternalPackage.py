@@ -123,7 +123,9 @@ def standardExternalPackage ( package, **kw ) :
         for f in libraries :
             loc = pjoin(lib_dir,f)
             if os.path.isfile(loc) :
+                #targ = env.Install( "$LIBDIR", loc )
                 targ = env.Symlink ( pjoin(env.subst("$LIBDIR"),f), loc )
+                trace ( "linklib: %s -> %s" % (str(targ[0]),loc), "standardExternalPackage", 5 )
                 env['ALL_TARGETS']['LIBS'].extend ( targ )
 
     # link all executables
@@ -142,11 +144,7 @@ def standardExternalPackage ( package, **kw ) :
                 env['ALL_TARGETS']['BINS'].extend ( targ )
 
     # add my libs to a package tree
-    pkg_libs = kw.get('PKGLIBS',None)
-    if pkg_libs :
-        setPkgLibs ( env, package, pkg_libs )
+    setPkgLibs ( env, package, kw.get('PKGLIBS',[]) )
     
     # add packages that I depend on
-    deps = kw.get('DEPS',None)
-    if deps :
-        setPkgDeps ( env, package, deps )
+    setPkgDeps ( env, package, kw.get('DEPS',[]) )

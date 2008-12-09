@@ -50,16 +50,16 @@ def buildEnv () :
     lusi_root = os.environ.get( "LUSI_ROOT", "" )
 
     # build all paths    
-    archdir = pjoin("#arch/${LUSI_ARCH}")
-    archincdir = pjoin("${ARCHDIR}/geninc")
-    bindir = pjoin("${ARCHDIR}/bin")
-    libdir = pjoin("${ARCHDIR}/lib")
-    pydir = pjoin("${ARCHDIR}/python")
+    archdir = pjoin("#arch/",lusi_arch)
+    archincdir = "${ARCHDIR}/geninc"
+    bindir = "${ARCHDIR}/bin"
+    libdir = "${ARCHDIR}/lib"
+    pydir = "${ARCHDIR}/python"
     cpppath = []
     for r in all_lusi_repos :
-        cpppath.append ( pjoin(r,"arch/${LUSI_ARCH}/geninc") )
+        cpppath.append ( pjoin(r,"arch",lusi_arch,"geninc") )
         cpppath.append ( pjoin(r,"include") )
-    libpath = [ pjoin(r,"arch/${LUSI_ARCH}/lib") for r in all_lusi_repos ]
+    libpath = [ pjoin(r,"arch",lusi_arch,"lib") for r in all_lusi_repos ]
     
     # set other variables in environment
     env.Replace( ARCHDIR = archdir,
@@ -78,6 +78,8 @@ def buildEnv () :
                  LUSI_REPOS = lusi_repos,
                  PKG_TREE = {},
                  PKG_TREE_BASE = {},
+                 PKG_TREE_BINDEPS = {},
+                 PKG_TREE_LIB = {},
                  PKG_TREE_BINS = {},
                  ALL_TARGETS = {} )
     

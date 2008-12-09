@@ -19,15 +19,17 @@ dictionary with these keys:
   'LIBS' -> list of library names that this package provides
   'LIBDIRS' -> list of directories where the libraries live
   
-There are two dictionaries kept in the construction environment:
+There are few dictionaries kept in the construction environment:
 
   'PKG_TREE_BASE' - the dependency tree for base release(s)
   'PKG_TREE'- dependency tree for current (local) release
+  'PKG_TREE_LIB' -> library built by the package
+  'PKG_TREE_BINS' -> binaries built by the package
   
 PKG_TREE_BASE is read from the file(s) in the corresponding base release(s).
 PKG_TREE is built by the SConsTools and then saved in the file.
 
-One more dictionary with the environment key 'PKG_TREE_BINS' keeps 
+One more dictionary with the environment key 'PKG_TREE_BINDEPS' keeps 
 the dependencies of every executable. It is a dictionary with the key
 being the Node object of the built executable and the value as a list
 of the package names that executable needs to link to.
@@ -70,6 +72,7 @@ def _guessPackage ( path ):
     f = path.split(os.sep)
     f.reverse() # for easier counting and reverse searching
     
+    trace ( 'path: %s' % f, '_guessPackage', 9 )
     #
     # First try to see if it comes from boost, in which case it
     # will be in the form .../arch/$LUSI_ARCH/geninc/boost/.....
@@ -118,8 +121,7 @@ def findAllDependencies( node ):
         p = _guessPackage ( f )
         if p : 
             res.add ( p )
-        else :
-            res.update ( findAllDependencies(child) )
+        res.update ( findAllDependencies(child) )
         
     return res
 
@@ -128,13 +130,28 @@ def findAllDependencies( node ):
 #
 def setPkgLibs ( env, pkg, libs, libdirs = [] ):
 
-    pkg_info = env['PKG_TREE'].setdefault( pkg, {} )
     if libs :
+        pkg_info = env['PKG_TREE'].setdefault( pkg, {} )
         if isinstance(libs,(str,unicode)) : libs = libs.split()
         pkg_info['LIBS'] = libs
     if libdirs :
+        pkg_info = env['PKG_TREE'].setdefault( pkg, {} )
         if isinstance(libdirs,(str,unicode)) : libdirs = libdirs.split()
         pkg_info['LIBDIRS'] = libdirs
+
+#
+# Define package library
+#
+def setPkgLib ( env, pkg, lib ):
+
+    pkg_info = env['PKG_TREE_LIB'][pkg] = lib
+
+#
+# Define package library
+#
+def setPkgBins ( env, pkg, bin ):
+
+    pkg_info = env['PKG_TREE_BINS'].setdefault( pkg, [] ).append(bin)
 
 #
 # Define package dependencies - the list of other package names that should
@@ -142,18 +159,11 @@ def setPkgLibs ( env, pkg, libs, libdirs = [] ):
 #
 def setPkgDeps ( env, pkg, deps ):
     
-    pkg_info = env['PKG_TREE'].setdefault( pkg, {} )
     if deps : 
+        pkg_info = env['PKG_TREE'].setdefault( pkg, {} )
         if isinstance(deps,(str,unicode)) : deps = deps.split()
         # do not include self-dependencies
         pkg_info['DEPS'] = [ d for d in deps if d != pkg ]
-
-#
-# Define binary dependencies
-#
-def setBinDeps ( env, bin, deps ):
-    
-    pkg_info = env['PKG_TREE_BINS'][bin] = deps
 
 #
 # Store package dependency data in a file
@@ -207,21 +217,35 @@ def _toposort ( pkg_tree, pkg, colors ):
 def adjustPkgDeps ( env ) :
 
     trace ( 'Resolving release dependencies', 'adjustPkgDeps', 2 )
-    
+
+    # evaluate package dependencies for libraries
+    for pkg, lib in env['PKG_TREE_LIB'].iteritems() :
+        
+        deps = findAllDependencies ( lib )
+        trace ( "package "+pkg+" deps = " + str(map(str,deps)), "adjustPkgDeps", 4 )
+        setPkgDeps ( env, pkg, deps )
+            
     # complete package tree which includes base and local releases
     pkg_tree = env['PKG_TREE_BASE'].copy()
     pkg_tree.update( env['PKG_TREE'] )
 
-    for bin, bindeps in env['PKG_TREE_BINS'].iteritems() :
+    # iterate over all binaries
+    for pkg, bins in env['PKG_TREE_BINS'].iteritems() :
+        for bin in bins :
+
+            bindeps = findAllDependencies ( bin )
  
-        # build ordered list of all dependencies
-        alldeps = []
-        for d in bindeps :
-            for c in _toposort( pkg_tree, d, {} ) :
-                alldeps.append ( c )
-        alldeps.reverse()
-        
-        # now get all their libraries and add to the binary
-        for d in alldeps :
-            libs = pkg_tree.get(d,{}).get( 'LIBS', [] )
-            bin.env['LIBS'].extend ( libs ) 
+            # build ordered list of all dependencies
+            alldeps = []
+            for d in bindeps :
+                for c in _toposort( pkg_tree, d, {} ) :
+                    alldeps.append ( c )
+            alldeps.reverse()
+            
+            # now get all their libraries and add to the binary
+            trace ( str(bin)+" deps = " + str(map(str,alldeps)), "adjustPkgDeps", 4 )
+            for d in alldeps :
+                libs = pkg_tree.get(d,{}).get( 'LIBS', [] )
+                bin.env['LIBS'].extend ( libs ) 
+                bin.env['LIBPATH'] = env['LIBPATH'] 
+                trace ( str(bin)+" libs = " + str(map(str,bin.env['LIBS'])), "adjustPkgDeps", 4 )

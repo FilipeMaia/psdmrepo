@@ -99,21 +99,21 @@ for r in reversed(env['LUSI_REPOS']) :
 for p in packages :
     scons = pjoin(p,"SConscript")
     build = pjoin("#build",env['LUSI_ARCH'],p)
-    SConscript( pjoin(p,"SConscript"), 
+    env.SConscript( pjoin(p,"SConscript"), 
                 variant_dir=build,
                 src_dir='#'+p, 
                 duplicate=0,
                 exports="env trace standardSConscript" )
 
 #
-# Now store the dependencies in case somebody else would want to use them later
-#
-storePkgDeps ( env, env['PKG_DEPS_FILE'] )
-
-#
 # Analyze whole dependency tree and adjust dependencies and libraries
 #
 adjustPkgDeps ( env )
+
+#
+# Now store the dependencies in case somebody else would want to use them later
+#
+storePkgDeps ( env, env['PKG_DEPS_FILE'] )
 
 #
 # define few aliases and default targets
@@ -125,7 +125,7 @@ tests = env.Alias ( 'test', env['ALL_TARGETS']['TESTS'] )
 env.Requires ( env['ALL_TARGETS']['TESTS'], all )
 env.Default ( all )
 
-#trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
+trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
 trace ( "BUILD_TARGETS is " + pformat( map(str, BUILD_TARGETS) ), "<top>", 1 )
 trace ( "DEFAULT_TARGETS is " + pformat( map(str, DEFAULT_TARGETS) ), "<top>", 1 )
 trace ( "COMMAND_LINE_TARGETS is " + pformat( map(str, COMMAND_LINE_TARGETS) ), "<top>", 1 )
