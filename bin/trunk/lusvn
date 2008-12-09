@@ -19,7 +19,7 @@ Usage: `basename $0` [options] command [command options]
     tags   - list all tags for a given or current package
     tag    - make new tag for a package
     newpkg - create directory structure for new package
-    export - extracts code and adds .lusvn-tag file
+    export - extracts code and adds .lusi-tag file
 
 EOD
 }
@@ -66,7 +66,7 @@ help_export() {
 Usage: `basename $0` export [options] <package> <tag> <path>
 
   Will export package named <package> with the specified tag into 
-  a directory <path>. Creates .lusvn-tag file in the package directory
+  a directory <path>. Creates .lusi-tag file in the package directory
   with the tag name.
 
   Available options:
@@ -131,7 +131,7 @@ exec_export() {
   path=${3:?No path provided}
 
   svn export $force "$SVNROOT/$pkg/tags/$tag" "$path" &&
-     echo "$tag" > "$path/.lusvn-tag"
+     echo "$tag" > "$path/.lusi-tag"
 
 }
 
