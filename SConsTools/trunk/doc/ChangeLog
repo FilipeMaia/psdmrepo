@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-15
+2008-12-15 Andy Salnikov
+- dependencies.py: add workaround for unnecessary rebuilding of the 
+  binaries on the second run
+
 Tag: V00-00-14
 2008-12-09 Andy Salnikov
 - do dependency calculations only after reading all SConscript files

@@ -221,6 +221,7 @@ def adjustPkgDeps ( env ) :
     # evaluate package dependencies for libraries
     for pkg, lib in env['PKG_TREE_LIB'].iteritems() :
         
+        trace ( "checking dependencies for package "+pkg, "adjustPkgDeps", 4 )
         deps = findAllDependencies ( lib )
         trace ( "package "+pkg+" deps = " + str(map(str,deps)), "adjustPkgDeps", 4 )
         setPkgDeps ( env, pkg, deps )
@@ -233,6 +234,7 @@ def adjustPkgDeps ( env ) :
     for pkg, bins in env['PKG_TREE_BINS'].iteritems() :
         for bin in bins :
 
+            trace ( "checking dependencies for binary "+str(bin), "adjustPkgDeps", 4 )
             bindeps = findAllDependencies ( bin )
  
             # build ordered list of all dependencies
@@ -246,6 +248,16 @@ def adjustPkgDeps ( env ) :
             trace ( str(bin)+" deps = " + str(map(str,alldeps)), "adjustPkgDeps", 4 )
             for d in alldeps :
                 libs = pkg_tree.get(d,{}).get( 'LIBS', [] )
-                bin.env['LIBS'].extend ( libs ) 
-                bin.env['LIBPATH'] = env['LIBPATH'] 
-                trace ( str(bin)+" libs = " + str(map(str,bin.env['LIBS'])), "adjustPkgDeps", 4 )
+                bin.env['LIBS'].extend ( libs )
+                bin.env['LIBPATH'] = env['LIBPATH']
+            trace ( str(bin)+" libs = " + str(map(str,bin.env['LIBS'])), "adjustPkgDeps", 4 )
+            
+            #
+            # This is a hack to tell scons to rescan the binary, otherwise
+            # it can decide in some cases that it has been scanned already
+            # and won't scan it again, and the libraries that we have just
+            # added will not be in the dependency list which can result in 
+            # the unnecessary rebuilding of the binary
+            # 
+            if bin.env['LIBS'] : 
+                bin.implicit = None
