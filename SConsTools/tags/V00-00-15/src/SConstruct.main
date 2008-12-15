@@ -1,0 +1,131 @@
+#!/bin/env scons
+#===============================================================================
+#
+# Main SCons script for LUSI release building
+#
+# $Id$
+#
+#===============================================================================
+
+import os
+import sys
+from pprint import *
+from os.path import join as pjoin
+
+cwd = os.getcwd()
+
+#   check that LUSI_ARCH is defined
+lusi_arch=os.environ.get( "LUSI_ARCH", None )
+if not lusi_arch :
+    print >> sys.stderr, "Environment variable LUSI_ARCH is not defined"
+    Exit(2)
+lusi_root=os.environ.get( "LUSI_ROOT", None )
+if not lusi_root :
+    print >> sys.stderr, "Environment variable LUSI_ROOT is not defined"
+    Exit(2)
+
+#
+# Before doing any other imports link the python files from
+# SConsTools/src/*.py to arch/$LUSI_ARCH/python/SConsTools/
+#
+if os.path.isdir("SConsTools/src") :
+    
+    # list of python files in SConsTools/src
+    pys = set ( [ f for f in os.listdir("SConsTools/src") if os.path.splitext(f)[1] == ".py" ] )
+    
+    # list of links in arch/$LUSI_ARCH/python/SConsTools
+    d = pjoin("arch",lusi_arch,"python/SConsTools")
+    if not os.path.isdir(d) : os.makedirs(d) 
+    links = set ( [ f for f in os.listdir(d) if os.path.splitext(f)[1] == ".py" ] )
+    
+    # remove extra links
+    for f in links - pys :
+        os.remove( pjoin(d,f) )
+    
+    # add missing links
+    for f in pys - links :
+        os.symlink ( pjoin(cwd,"SConsTools/src",f), pjoin(d,f) )
+
+    init = pjoin(d,"__init__.py")
+    if not os.path.isfile(init) :
+        f = open( init, 'w' )
+        f.close()
+        del f
+    del init
+
+
+#
+# Now can import rest of the stuff
+#
+from SConsTools.trace import *
+from SConsTools.scons_functions import *
+from SConsTools.scons_env import buildEnv
+from SConsTools.compilers import setupCompilers
+from SConsTools.builders import setupBuilders
+from SConsTools.standardSConscript import standardSConscript
+from SConsTools.dependencies import *
+
+# ===================================
+#   Setup default build environment
+# ===================================
+env = buildEnv()
+setupBuilders( env )
+setupCompilers( env )
+
+#
+# find out which packages we have locally
+#
+packages = [ d for d in os.listdir(cwd) if os.path.isfile(pjoin( d, "SConscript" )) ]
+trace ( "Packages: " + pformat( packages ), "<top>", 1 )
+
+#
+# Check the links in include/, data/
+#
+makePackageLinks ( "include", packages )
+makePackageLinks ( "data", packages )
+
+#
+# load package dependencies from base releases
+#
+for r in reversed(env['LUSI_REPOS']) :
+    fname = pjoin ( r, env['PKG_DEPS_FILE'] )
+    if os.path.isfile ( fname ) :
+        loadPkgDeps ( env, fname )
+
+
+#
+# include all SConscript files from all packages
+#
+for p in packages :
+    scons = pjoin(p,"SConscript")
+    build = pjoin("#build",env['LUSI_ARCH'],p)
+    env.SConscript( pjoin(p,"SConscript"), 
+                variant_dir=build,
+                src_dir='#'+p, 
+                duplicate=0,
+                exports="env trace standardSConscript" )
+
+#
+# Analyze whole dependency tree and adjust dependencies and libraries
+#
+adjustPkgDeps ( env )
+
+#
+# Now store the dependencies in case somebody else would want to use them later
+#
+storePkgDeps ( env, env['PKG_DEPS_FILE'] )
+
+#
+# define few aliases and default targets
+#
+libs = env.Alias ( 'lib', env['ALL_TARGETS']['LIBS'] )
+bins = env.Alias ( 'bin', env['ALL_TARGETS']['BINS'] )
+all = env.Alias ( 'all', libs+bins )
+tests = env.Alias ( 'test', env['ALL_TARGETS']['TESTS'] )
+env.Requires ( env['ALL_TARGETS']['TESTS'], all )
+env.Default ( all )
+
+trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
+trace ( "BUILD_TARGETS is " + pformat( map(str, BUILD_TARGETS) ), "<top>", 1 )
+trace ( "DEFAULT_TARGETS is " + pformat( map(str, DEFAULT_TARGETS) ), "<top>", 1 )
+trace ( "COMMAND_LINE_TARGETS is " + pformat( map(str, COMMAND_LINE_TARGETS) ), "<top>", 1 )
