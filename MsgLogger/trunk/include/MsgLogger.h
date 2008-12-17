@@ -3,7 +3,7 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: MsgLogger.h,v 1.2 2005/07/26 18:09:15 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class MsgLogger.
@@ -67,7 +67,7 @@ extern "C" {
  *
  *  @see MsgLoggerImpl
  *
- *  @version $Id: MsgLogger.h,v 1.2 2005/07/26 18:09:15 salnikov Exp $
+ *  @version $Id$
  *
  *  @author Andy Salnikov
  */

@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: MsgFormatter.cc,v 1.2 2007/02/11 03:24:25 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class MsgFormatter

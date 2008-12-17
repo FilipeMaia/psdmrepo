@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: MsgHandlerStdStreams.cc,v 1.3 2005/10/31 19:48:17 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class MsgHandlerStdStreams

@@ -3,7 +3,7 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: MsgHandlerStdStreams.h,v 1.2 2005/07/26 18:09:14 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class MsgHandlerStdStreams.
@@ -61,7 +61,7 @@ extern "C" {
  *
  *  @see MsgHandlerStdStreamsMsgHandlerStdStreams
  *
- *  @version $Id: MsgHandlerStdStreams.h,v 1.2 2005/07/26 18:09:14 salnikov Exp $
+ *  @version $Id$
  *
  *  @author Andy Salnikov
  */

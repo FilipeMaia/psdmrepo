@@ -3,7 +3,7 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: MsgLogLevel.h,v 1.2 2005/07/26 18:09:14 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class MsgLogLevel.
@@ -57,7 +57,7 @@ extern "C" {
  *
  *  @see MsgLogLevelMsgLogLevel
  *
- *  @version $Id: MsgLogLevel.h,v 1.2 2005/07/26 18:09:14 salnikov Exp $
+ *  @version $Id$
  *
  *  @author Andy Salnikov
  */

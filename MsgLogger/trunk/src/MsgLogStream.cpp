@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: MsgLogStream.cc,v 1.1 2005/07/22 22:23:32 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class MsgLogStream

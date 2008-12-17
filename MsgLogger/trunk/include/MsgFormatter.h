@@ -3,7 +3,7 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: MsgFormatter.h,v 1.2 2005/07/26 18:09:13 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class MsgFormatter.
@@ -63,7 +63,7 @@ extern "C" {
  *
  *  @see MsgHandler
  *
- *  @version $Id: MsgFormatter.h,v 1.2 2005/07/26 18:09:13 salnikov Exp $
+ *  @version $Id$
  *
  *  @author Andy Salnikov
  */

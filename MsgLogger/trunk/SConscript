@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------
 # File and Version Information:
-#  $Id: SConscript 4 2008-10-08 19:27:36Z salnikov $
+#  $Id$
 #
 # Description:
 #  SConscript file for package MsgLogger

@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: MsgLoggerImpl.cc,v 1.2 2005/12/03 08:51:36 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class MsgLoggerImpl

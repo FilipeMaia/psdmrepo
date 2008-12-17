@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: MsgLogger.cc,v 1.1 2005/07/22 22:23:33 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class MsgLogger

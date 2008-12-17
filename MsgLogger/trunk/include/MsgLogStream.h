@@ -3,7 +3,7 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: MsgLogStream.h,v 1.3 2007/02/11 03:24:25 salnikov Exp $
+// 	$Id$
 //
 // Description:
 //	Class MsgLogStream.
@@ -95,7 +95,7 @@ extern "C" {
  *
  *  @see MsgLogger
  *
- *  @version $Id: MsgLogStream.h,v 1.3 2007/02/11 03:24:25 salnikov Exp $
+ *  @version $Id$
  *
  *  @author Andy Salnikov
  */

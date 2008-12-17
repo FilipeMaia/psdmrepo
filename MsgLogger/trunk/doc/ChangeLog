@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2008-12-17 Andy Salnikov
+- set correct svn properties on all files
+
 Tag: V00-00-06
 2008-12-17 Andy Salnikov
 - fixed small memory leak in MsgHandler, formatter was not deleted 
