@@ -16,10 +16,11 @@ Usage: `basename $0` [options] command [command options]
     -d          debug (turn on -x shell option)
 
   Supported commands:
-    tags   - list all tags for a given or current package
-    tag    - make new tag for a package
-    newpkg - create directory structure for new package
-    export - extracts code and adds .lusi-tag file
+    tags      - list all tags for a given or current package
+    tag       - make new tag for a package
+    newpkg    - create directory structure for new package
+    export    - extracts code and adds .lusi-tag file
+    mktxtprop - set svn properties for text-like files
 
 EOD
 }
@@ -72,6 +73,20 @@ Usage: `basename $0` export [options] <package> <tag> <path>
   Available options:
     -f|--force   override the content of the directory
     
+EOD
+}
+
+help_mktxtprop() {
+  cat << EOD
+
+Usage: `basename $0` [options] mktxtprop file [...]
+
+  Sets SVN properties for specified files: 
+     svn:keywords : Author Date Id Revision
+     svn:eol-style : native
+    
+  Available options:
+    -R    descend recursively
 EOD
 }
 
@@ -136,6 +151,29 @@ exec_export() {
 }
 
 #
+# Export the package
+#
+exec_mktxtprop() {
+
+  recurse=""
+  # get the options
+  while getopts R c ; do
+    case $c in
+      R) recurse="-R" ;;
+      \?) help_mktxtprop ; exit 2 ;;
+    esac
+  done
+  shift `expr $OPTIND - 1`
+
+  target=${1:?No target name provided}
+  
+  svn propdel $recurse svn:executable "$@"
+  svn propset $recurse svn:keywords "Author Date Id Revision" "$@"
+  svn propset $recurse svn:eol-style native "$@"
+
+}
+
+#
 # Create new tag for a package
 #
 exec_tag() {
@@ -196,6 +234,6 @@ esac
 # dispatch
 case "$1" in
   help) shift ; help_$1 ;;
-  tags|tag|newpkg|export) c=$1; shift ; exec_$c "$@" ;;
+  tags|tag|newpkg|export|mktxtprop) c=$1; shift ; exec_$c "$@" ;;
   *) usage ; exit 2 ;;
 esac
