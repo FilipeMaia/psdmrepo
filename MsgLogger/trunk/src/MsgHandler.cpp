@@ -57,6 +57,7 @@ MsgHandler::MsgHandler()
 // Destructor
 MsgHandler::~MsgHandler()
 {
+  delete _formatter ;
 }
 
 /// attaches the formatter, will be owned by handler
