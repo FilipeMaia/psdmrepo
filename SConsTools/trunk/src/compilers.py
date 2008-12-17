@@ -33,7 +33,7 @@ def setupCompilers ( env ) :
     if comp == 'gcc34' :
         env['CC'] = 'gcc-3.4'
         env['CXX'] = 'g++-3.4'
-        env['CCFLAGS'] = _gcc_opt.get(opt,'')
+        env['CCFLAGS'] = _gcc_opt.get(opt,'') + ' -Wall'
 
     env['PYTHON_VERSION'] = "2.6"
 

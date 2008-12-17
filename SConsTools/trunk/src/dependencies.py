@@ -2,7 +2,7 @@
 #
 # Main SCons script for LUSI release building
 #
-# $Id: builders.py 34 2008-10-13 23:58:56Z salnikov $
+# $Id$
 #
 #===============================================================================
 

@@ -125,7 +125,7 @@ tests = env.Alias ( 'test', env['ALL_TARGETS']['TESTS'] )
 env.Requires ( env['ALL_TARGETS']['TESTS'], all )
 env.Default ( all )
 
-trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
+#trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
 trace ( "BUILD_TARGETS is " + pformat( map(str, BUILD_TARGETS) ), "<top>", 1 )
 trace ( "DEFAULT_TARGETS is " + pformat( map(str, DEFAULT_TARGETS) ), "<top>", 1 )
 trace ( "COMMAND_LINE_TARGETS is " + pformat( map(str, COMMAND_LINE_TARGETS) ), "<top>", 1 )

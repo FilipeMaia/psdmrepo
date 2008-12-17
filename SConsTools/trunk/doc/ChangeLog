@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-16
+2008-12-17 Andy Salnikov
+- compilers.py: added -Wall for c++ compilation
+- fixed properties on few files 
+
 Tag: V00-00-15
 2008-12-15 Andy Salnikov
 - dependencies.py: add workaround for unnecessary rebuilding of the 

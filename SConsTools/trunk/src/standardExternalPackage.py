@@ -2,7 +2,7 @@
 #
 # SConscript fuction for standard external package
 #
-# $Id: standardSConscript.py 12 2008-10-09 00:27:34Z salnikov $
+# $Id$
 #
 #===============================================================================
 
