@@ -1,0 +1,24 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package odbcpp
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-02
+2008-12-18 Andy Salnikov
+- implemented array fetching
+  - OdbcResult::fetch() returns the number of the rows fetched
+- implemented OdbcConnection::tables()
+- added date/time types for parameters/column vars
+
+Tag: V00-00-01
+2008-12-17 Andy Salnikov
+- first import of the package into repository, minimally working version
+
