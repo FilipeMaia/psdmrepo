@@ -39,8 +39,8 @@ namespace {
   struct Disconnecter {
     void operator()( OdbcHandle<OdbcConn>* h ) {
       // do a disconnect
-      SQLRETURN status = SQLDisconnect ( *(*h) ) ;
-      OdbcStatusCheckMsg ( status, *h, "OdbcConnection: failed to disconnect from database" ) ;
+      /*SQLRETURN status = */SQLDisconnect ( *(*h) ) ;
+      //OdbcStatusCheckMsg ( status, *h, "OdbcConnection: failed to disconnect from database" ) ;
 
       // now free the handle itself
       delete h ;
@@ -85,10 +85,10 @@ OdbcConnection::connect( const std::string& connString )
                               (SQLCHAR*)connString.c_str(), connString.size(),
                               connStrRet, sizeof connStrRet, &connStrSize,
                               SQL_DRIVER_NOPROMPT ) ;
-  OdbcStatusCheckMsg ( status, *m_connH, "OdbcEnvironment::connect -- failed to connect to database, check connection string" ) ;
+  OdbcStatusCheckMsg ( status, *m_connH, "OdbcConnection::connect -- failed to connect to database, check connection string" ) ;
 
   m_connString = std::string( (char*)connStrRet, connStrSize ) ;
-  OdbcLog ( debug, "OdbcEnvironment: successfully connected to " << m_connString ) ;
+  OdbcLog ( debug, "OdbcConnection: successfully connected to " << m_connString ) ;
 }
 
 // get the satement objects
@@ -98,10 +98,29 @@ OdbcConnection::statement( const std::string& q )
   OdbcHandle<OdbcStmt> stmtH = OdbcHandle<OdbcStmt>::make( *m_connH ) ;
   OdbcHandleCheck( stmtH, *m_connH ) ;
 
-  SQLRETURN status = SQLPrepare ( *stmtH, (SQLCHAR*)q.c_str(), q.size() ) ;
+  SQLRETURN status = SQLPrepare ( *stmtH, (SQLCHAR*)q.data(), q.size() ) ;
   OdbcStatusCheck ( status, stmtH );
 
   return OdbcStatement ( stmtH ) ;
 }
+
+// get the statement objects for the list of the tables
+OdbcResultPtr
+OdbcConnection::tables( const std::string& catPattern,
+                        const std::string& schemaPattern,
+                        const std::string& tblNamePattern,
+                        const std::string& tblTypePattern )
+{
+  OdbcHandle<OdbcStmt> stmtH = OdbcHandle<OdbcStmt>::make( *m_connH ) ;
+  OdbcHandleCheck( stmtH, *m_connH ) ;
+
+  SQLRETURN status = SQLTables ( *stmtH,
+              (SQLCHAR*)catPattern.data(), catPattern.size(),
+              (SQLCHAR*)schemaPattern.data(), schemaPattern.size(),
+              (SQLCHAR*)tblNamePattern.data(), tblNamePattern.size(),
+              (SQLCHAR*)tblTypePattern.data(), tblTypePattern.size() ) ;
+  OdbcStatusCheck ( status, stmtH );
+
+  return OdbcResultPtr ( new OdbcResult ( stmtH ) ) ;}
 
 } // namespace odbcpp

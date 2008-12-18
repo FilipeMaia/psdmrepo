@@ -51,6 +51,8 @@ namespace odbcpp {
 // generic non-specialized code cannot be used
 template <typename CppType>
 class OdbcParam  {
+
+  // all these methods have to be implemented in every specialization
   SQLSMALLINT inputOutputType() const ;
   SQLSMALLINT valueType() const ;
   SQLSMALLINT parameterType() const ;
@@ -64,15 +66,31 @@ class OdbcParam  {
   void setNull () ;
 };
 
+//
+// Specialization for string class
+//
 template <>
 class OdbcParam<std::string> {
 public:
   OdbcParam () : m_value(0), m_size(SQL_NULL_DATA) {}
-  OdbcParam ( const std::string& value ) {
+  OdbcParam ( const std::string& value, unsigned int maxSize = 0 ) {
     m_size = value.size() ;
-    m_value = new SQLCHAR[m_size] ;
+    m_maxSize = maxSize ;
+    if ( m_maxSize < m_size ) m_maxSize = m_size ;
+    if ( m_maxSize < 16 ) m_maxSize = 16 ;
+    m_value = new SQLCHAR[m_maxSize] ;
     std::copy ( value.data(), value.data()+m_size, m_value ) ;
   }
+  OdbcParam ( const char* value, unsigned int maxSize = 0 ) {
+    m_size = strlen(value) ;
+    m_maxSize = maxSize ;
+    if ( m_maxSize < m_size ) m_maxSize = m_size ;
+    if ( m_maxSize < 16 ) m_maxSize = 16 ;
+    m_value = new SQLCHAR[m_maxSize] ;
+    std::copy ( value, value+m_size, m_value ) ;
+  }
+  ~OdbcParam () { delete m_value ; }
+
   SQLSMALLINT inputOutputType() const { return SQL_PARAM_INPUT ; }
   SQLSMALLINT valueType() const { return OdbcCppType<std::string>::cppTypeCode() ; }
   SQLSMALLINT parameterType() const { return OdbcCppType<std::string>::sqlTypeCode() ; }
@@ -81,16 +99,34 @@ public:
   SQLPOINTER parameterValuePtr() { return SQLPOINTER(m_value) ; }
   SQLINTEGER bufferLength() const { return m_size ; }
   SQLINTEGER* strLenOrIndPtr() { return &m_size ; }
+
+  void setData ( const std::string& value ) {
+    m_size = value.size() ;
+    if ( m_size > m_maxSize ) m_size = m_maxSize ;
+    std::copy ( value.data(), value.data()+m_size, m_value ) ;
+  }
+  void setData ( const char* value ) {
+    m_size = strlen(value) ;
+    if ( m_size > m_maxSize ) m_size = m_maxSize ;
+    std::copy ( value, value+m_size, m_value ) ;
+  }
+  void setNull () { m_size = SQL_NULL_DATA; }
+
 private:
   SQLCHAR* m_value ;
+  SQLINTEGER m_maxSize ;
   SQLINTEGER m_size ;
 };
 
+//
+// Helper base class for the value-based types
+//
 template <typename CppType>
-class OdbcParamNumeric  {
+class OdbcParamValue  {
 public:
-  OdbcParamNumeric () : m_value(0), m_size(SQL_NULL_DATA) {}
-  OdbcParamNumeric ( CppType value ) : m_value(value), m_size(sizeof value) {}
+
+  OdbcParamValue () : m_value(0), m_size(SQL_NULL_DATA) {}
+  OdbcParamValue ( CppType value ) : m_value(value), m_size(sizeof value) {}
 
   SQLSMALLINT inputOutputType() const { return SQL_PARAM_INPUT ; }
   SQLSMALLINT valueType() const { return OdbcCppType<CppType>::cppTypeCode() ; }
@@ -100,15 +136,19 @@ public:
   SQLPOINTER parameterValuePtr() { return SQLPOINTER(&m_value) ; }
   SQLINTEGER bufferLength() const { return m_size ; }
   SQLINTEGER* strLenOrIndPtr() { return &m_size ; }
+
+  void setData ( CppType val ) { m_value = val ; }
+  void setNull () { m_size = SQL_NULL_DATA; }
+
 private:
   CppType m_value ;
   SQLINTEGER m_size ;
 };
 
 #define GEN_NUM_PARAM(CPP_TYPE) \
-  template <> class OdbcParam<CPP_TYPE> : public OdbcParamNumeric<CPP_TYPE> {\
+  template <> class OdbcParam<CPP_TYPE> : public OdbcParamValue<CPP_TYPE> {\
   public:\
-    OdbcParam( CPP_TYPE value ) : OdbcParamNumeric<CPP_TYPE>( value ) {} \
+    OdbcParam( CPP_TYPE value ) : OdbcParamValue<CPP_TYPE>( value ) {} \
   } ;
 
 GEN_NUM_PARAM(short)
@@ -123,6 +163,9 @@ GEN_NUM_PARAM(signed char)
 GEN_NUM_PARAM(unsigned char)
 GEN_NUM_PARAM(SQLBIGINT)
 GEN_NUM_PARAM(SQLUBIGINT)
+GEN_NUM_PARAM(SQL_DATE_STRUCT)
+GEN_NUM_PARAM(SQL_TIME_STRUCT)
+GEN_NUM_PARAM(SQL_TIMESTAMP_STRUCT)
 
 #undef GEN_NUM_PARAM
 

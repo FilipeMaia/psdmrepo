@@ -65,6 +65,13 @@ public:
   // get access to header
   const OdbcResultHeader& header() const { return m_header ; }
 
+  // Set the number of rows returned in a single fetch operation
+  // All OdbcColumnVar should use the same size then. Note that
+  // this sets statement attribute, be careful because the same
+  // statement can be used by different results. Destructor resets
+  // this value back to 1.
+  void setRowArraySize( unsigned int rowArraySize = 1 ) ;
+
   // bind the column with a given name
   template <typename VarType>
   void bindColumn ( const std::string& name, OdbcColumnVar<VarType>& var ) {
@@ -80,22 +87,27 @@ public:
   // unbind all bound columns
   void unbindColumns() ;
 
-  // fetch the next row
-  bool fetch() ;
+  // fetch the next set of rows, return number of rows fetched
+  unsigned int fetch() ;
 
-  // fetch the row at offset, parameters are the same as for SQLFetchScroll
-  bool fetchScroll( int orientation, int offset ) ;
+  // fetch the row at offset, return number of rows fetched.
+  // Parameters are the same as for SQLFetchScroll
+  unsigned int fetchScroll( int orientation, int offset ) ;
 
   // close the cursor and discard all pending data
   void closeCursor() ;
 
 protected:
 
+  void updateRowArraySize( unsigned int nRow ) ;
+
 private:
 
   // Data members
   OdbcHandle<OdbcStmt> m_stmtH ;
   OdbcResultHeader m_header ;
+  SQLUINTEGER m_fetched ;
+  SQLUINTEGER m_rowArraySize ;
 
   // Copy constructor and assignment are disabled by default
   OdbcResult ( const OdbcResult& ) ;
@@ -118,6 +130,8 @@ OdbcResult::bindColumn ( unsigned int columnNumber, OdbcColumnVar<VarType>& var 
                              var.bufferLength(),
                              var.strLenOrIndPtr() );
   OdbcStatusCheck ( r, m_stmtH ) ;
+
+  updateRowArraySize( var.nRows() ) ;
 }
 
 } // namespace odbcpp

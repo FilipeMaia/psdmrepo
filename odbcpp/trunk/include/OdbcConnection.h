@@ -26,6 +26,7 @@
 #include "odbcpp/OdbcAttribute.h"
 #include "odbcpp/OdbcException.h"
 #include "odbcpp/OdbcHandle.h"
+#include "odbcpp/OdbcResult.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -65,8 +66,14 @@ public:
   // Format of the connection string is the same as for SQLDriverConnect
   void connect( const std::string& connString ) ;
 
-  // get the satement objects
+  // get the statement objects
   OdbcStatement statement( const std::string& q ) ;
+
+  // get the statement objects for the list of the tables
+  OdbcResultPtr tables( const std::string& catPattern,
+                        const std::string& schemaPattern,
+                        const std::string& tblNamePattern,
+                        const std::string& tblTypePattern ) ;
 
   // get connection string
   const std::string& connString() const { return m_connString ; }
