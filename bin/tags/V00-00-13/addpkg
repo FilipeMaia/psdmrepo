@@ -1,0 +1,176 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Script for convenient checkout of the packages from repository
+#
+
+
+usage() {
+  cat << EOD
+
+Usage: `basename $0` [options] [package-name [package-tag]]
+
+  Available options:
+    -h          this message
+    -d          debug (turn on -x shell option)
+    -c          checkout from CVS [default is SVN]
+    -x          export instead of checkout
+    -f {file|-} read the list of tags from file or standard input
+
+  Checks out the packages from repository, the tag can be either a real 
+tag in repository or "HEAD" for main trunk. If tag is missing then the
+tag from the base release is used, or HEAD if package is not in the release.  
+If package name is SConsTools then link SConstruct to SConstruct.main in the
+package's src/ directory.
+
+EOD
+}
+
+# usage: find_tag package tag release
+find_tag() {
+
+  tag1="$2"
+  if [ -z "$tag1" ] ; then
+    #tag1=`statusrel "$3" "$1"`
+    tag1="HEAD"
+    if [ -z "$tag1" ] ; then
+      tag1="HEAD"
+      echo "Release $3 does not have package $1, will use HEAD version" 1>&2
+    else
+      echo "Release $3 has tag $tag1 of package $1, will use that" 1>&2
+    fi
+  fi
+  echo "$tag1"
+}
+
+# usage: checkout package tag release mode
+checkout() {
+
+  # checkout package
+  checkout_$4 "$1" `find_tag "$1" "$2" "$3"` "$5" || exit 2
+
+  # link or copy SConstruct file
+  if [ "$1" = "SConsTools" ] ; then
+    test -h SConstruct && rm SConstruct
+    test -f SConstruct && mv SConstruct SConstruct.save
+    echo "Linking SConstruct to $1/src/SConstruct.main"
+    ln -s "$1/src/SConstruct.main" SConstruct
+  fi
+}
+
+# usage: checkout_cvs package tag
+checkout_cvs() {
+
+  cmd="$3"
+  if [ "$2" = "HEAD" ] ; then
+    cvs "$cmd" "$1"
+  else
+    cvs "$cmd" -r "$2" "$1"
+  fi
+
+}
+
+# usage: checkout_svn package tag
+checkout_svn() {
+
+  repo123="$SVNROOT/$1/trunk"
+  test "$2" = "HEAD" || repo123="$SVNROOT/$1/tags/$2"
+
+  # for existing packages use "switch"
+  if [ "$3" == "export" ] ; then
+  	# package should not exist yet
+  	if [ -d "$1" ] ; then
+      echo "Cannot export, package $1 already exist"
+      exit 2
+  	else
+      lusvn export "$1" "$2" "$1"
+    fi
+  else
+    if [ -d "$1" ] ; then
+      svn switch "$repo123" "$1"
+    else
+      svn checkout "$repo123" "$1"
+    fi
+  fi
+  unset repo123
+}
+
+# default values for options
+mode="svn"
+link_scons="no"
+tag_file=""
+export="checkout"
+
+# get the options
+while getopts hdcxf: c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    d) set -x ;;
+    c) mode="cvs" ;;
+    x) export="export" ;;
+    f) tag_file="$OPTARG" ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# check arguments
+if [ -z "$tag_file" ] ; then
+  if [ $# -eq 0 -o $# -gt 2 ] ; then
+    usage
+    exit 2
+  fi
+else
+  if [ $# -ne 0 ] ; then
+    usage
+    exit 2
+  fi
+fi
+
+# the file .lusi_release must be in the current directory
+if [ ! -f .lusi_release ] ; then
+  echo "Release not setup, file .lusi_release does not exist in current directory"
+  exit 2
+fi
+
+if [ "$mode" = "cvs" ] ; then
+  if [ -z "$CVSROOT" ] ; then
+    echo "CVSROOT environment variable is not defined"
+    exit 2
+  fi
+else
+  if [ -z "$SVNROOT" ] ; then
+    echo "SVNROOT environment variable is not defined"
+    exit 2
+  fi
+fi
+
+# get the base release name
+lusi_release=`cat .lusi_release | tr -d ' '`
+
+if [ "$tag_file" = '-' ] ; then
+
+  # read tags from stdin, one line at a time
+  while read pkg tag stuff ; do
+    echo addpkg "$pkg" "$tag"
+    checkout "$pkg" "$tag" "$lusi_release" "$mode" "$export"
+  done
+
+elif [ -n "$tag_file" ] ; then
+
+  # read tags from file, one line at a time
+  while read pkg tag stuff ; do
+    echo addpkg "$pkg" "$tag"
+    checkout "$pkg" "$tag" "$lusi_release" "$mode" "$export"
+  done < "$tag_file"
+
+else
+
+  # package name and optionally tag come from command line
+  pkg=`echo $1 | cut -d/ -f1`
+  tag="$2"
+  checkout "$pkg" "$tag" "$lusi_release" "$mode" "$export"
+    
+fi
+  
