@@ -32,9 +32,8 @@ find_tag() {
 
   tag1="$2"
   if [ -z "$tag1" ] ; then
-    #tag1=`statusrel "$3" "$1"`
-    tag1="HEAD"
-    if [ -z "$tag1" ] ; then
+    tag1=`relinfo -p "$1" -n -t: "$3" | cut -d: -f2`
+    if [ "x$tag1" = "x-" -o "x$tag1" = "x" ] ; then
       tag1="HEAD"
       echo "Release $3 does not have package $1, will use HEAD version" 1>&2
     else

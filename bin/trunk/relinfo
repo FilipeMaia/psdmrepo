@@ -21,6 +21,7 @@ Usage: `basename $0` [options] [release ...]
     -d          debug (turn on -x shell option)
     -n          do not print header
     -r          do not decorate tags
+    -p package  print info for specified package(s)
     -a          list all packages from all releases
     -t string   field delimiter string
 EOD
@@ -153,12 +154,13 @@ decorate="yes"
 allpkgs="no"
 
 # get the options
-while getopts hdnt:ra c ; do
+while getopts hdnt:rap: c ; do
   case $c in
     h) usage ; exit 0 ;;
     d) set -x ;;
     n) header="no" ;;
     t) delim="$OPTARG" ;;
+    p) packages="$packages $OPTARG" ;;
     r) decorate="no" ;;
     a) allpkgs="yes" ;;
     \?) usage ; exit 2 ;;
@@ -176,7 +178,7 @@ relnums=`normReleases $releases` || exit 2
 # then take the packages from test releases, otherwise make
 # the list of all packages in all releases
 #
-if [ x$allpkgs = xno ] ; then
+if [ -z "$packages" -a x$allpkgs = xno ] ; then
   for r in $relnums ; do
     if [ $r = '.' ] ; then
       packages=`listPackages .` || exit 2
