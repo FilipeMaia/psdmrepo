@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: newrel 17 2008-10-10 22:29:40Z salnikov $
+# $Id$
 #
 # Script for creation of the new software package
 #

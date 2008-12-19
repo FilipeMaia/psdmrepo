@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: addpkg 33 2008-10-13 23:43:03Z salnikov $
+# $Id$
 #
 # Convenience interface for Subversion
 #
