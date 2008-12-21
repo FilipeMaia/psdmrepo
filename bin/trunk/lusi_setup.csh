@@ -9,7 +9,9 @@
 #
 #######################################################################
 
-if ( ${?LUSI_ROOT} ) then
+if ( ${?LUSI_SETUP_BIN} ) then
+  set scrdir="${LUSI_SETUP_BIN}"
+else if ( ${?LUSI_ROOT} ) then
   set scrdir="${LUSI_ROOT}/bin"
 else
   set scrdir="/afs/slac.stanford.edu/g/lusi/bin"
@@ -20,7 +22,7 @@ set tmp_sh=/tmp/uss-$$.csh
 if ( -f $tmp_sh ) then
   /bin/rm $tmp_sh
 endif
-"$scrdir/uss.sh" -c "$uss" ${argv:q} > $tmp_sh
+"$scrdir/uss.sh" -c -- "$uss" ${argv:q} > $tmp_sh
 source $tmp_sh
 /bin/rm $tmp_sh
 unset tmp_sh

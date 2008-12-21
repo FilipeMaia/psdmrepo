@@ -73,8 +73,8 @@ checkout_cvs() {
 # usage: checkout_svn package tag
 checkout_svn() {
 
-  repo123="$SVNROOT/$1/trunk"
-  test "$2" = "HEAD" || repo123="$SVNROOT/$1/tags/$2"
+  repo123="$LUSI_SVN/$1/trunk"
+  test "$2" = "HEAD" || repo123="$LUSI_SVN/$1/tags/$2"
 
   # for existing packages use "switch"
   if [ "$3" == "export" ] ; then
@@ -139,8 +139,8 @@ if [ "$mode" = "cvs" ] ; then
     exit 2
   fi
 else
-  if [ -z "$SVNROOT" ] ; then
-    echo "SVNROOT environment variable is not defined"
+  if [ -z "$LUSI_SVN" ] ; then
+    echo "LUSI_SVN environment variable is not defined"
     exit 2
   fi
 fi

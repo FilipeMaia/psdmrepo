@@ -35,7 +35,7 @@ getPkgList() {
   
   if [ "$rel" == "REPO" ] ; then
   	# not a release, but SVN repository
-    svn -v list "$SVNROOT" | sed 's%.* \([^ ]*\)/$%\1%'
+    svn -v list "$LUSI_SVN" | sed 's%.* \([^ ]*\)/$%\1%'
   else
     # get the list of directories with SConscript file inside
     test "$rel" == "." || rel="$LUSI_ROOT/sw/releases/$rel"
@@ -56,7 +56,7 @@ getPkgTag() {
   if [ "$rel" == "REPO" ] ; then
   	
   	# get most recent tag from SVN repository
-  	svn -v list "$SVNROOT/$pkg/tags" | sort -k1,1n | tail -1 | sed 's%.* \([^ ]*\)/$%\1%'
+  	svn -v list "$LUSI_SVN/$pkg/tags" | sort -k1,1n | tail -1 | sed 's%.* \([^ ]*\)/$%\1%'
   	
   else
   

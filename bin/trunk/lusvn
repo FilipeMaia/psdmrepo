@@ -105,7 +105,7 @@ EOD
 
 # get SVN package name in the current directory
 localpkg() {
-  svn info 2>/dev/null | sed -n "\%^URL: $SVNROOT%s%URL: $SVNROOT/*\([^/]*\)/.*%\1%p"
+  svn info 2>/dev/null | sed -n "\%^URL: $LUSI_SVN%s%URL: $LUSI_SVN/*\([^/]*\)/.*%\1%p"
 }
 
 #
@@ -116,7 +116,7 @@ exec_tags() {
   pkg=${1:-`localpkg`}
   pkg=${pkg:?Cannot determine package name}
   
-  svn ls -r HEAD -v "$SVNROOT/$pkg/tags"
+  svn ls -r HEAD -v "$LUSI_SVN/$pkg/tags"
 
 }
 
@@ -127,8 +127,8 @@ exec_newpkg() {
 	
   pkg=${1:?No package name provided}
 
-  svn mkdir -m "Creating package $pkg" "$SVNROOT/$pkg" \
-              "$SVNROOT/$pkg/trunk" "$SVNROOT/$pkg/tags" "$SVNROOT/$pkg/branches"
+  svn mkdir -m "Creating package $pkg" "$LUSI_SVN/$pkg" \
+              "$LUSI_SVN/$pkg/trunk" "$LUSI_SVN/$pkg/tags" "$LUSI_SVN/$pkg/branches"
 }
 
 #
@@ -145,7 +145,7 @@ exec_export() {
   tag=${2:?No tag name provided}
   path=${3:?No path provided}
 
-  svn export $force "$SVNROOT/$pkg/tags/$tag" "$path" &&
+  svn export $force "$LUSI_SVN/$pkg/tags/$tag" "$path" &&
      echo "$tag" > "$path/.lusi-tag"
 
 }
@@ -197,17 +197,17 @@ exec_tag() {
 
   if [ -n "$rev" ] ; then
     svn copy -r "$rev" -m 'Tagging $pkg with $tag' \
-      "$SVNROOT/$pkg/trunk" "$SVNROOT/$pkg/tags/$tag"
+      "$LUSI_SVN/$pkg/trunk" "$LUSI_SVN/$pkg/tags/$tag"
   else
     lpkg=`localpkg`
     lpkg=${lpkg:?Not in the package directory}
-    svn copy -m 'Tagging $pkg with $tag' "." "$SVNROOT/$pkg/tags/$tag"
+    svn copy -m 'Tagging $pkg with $tag' "." "$LUSI_SVN/$pkg/tags/$tag"
   fi
 }
 
 
-# need SVNROOT for operations
-_chk=${SVNROOT:?}
+# need LUSI_SVN for operations
+_chk=${LUSI_SVN:?}
 
 # get the options
 while getopts hd c ; do

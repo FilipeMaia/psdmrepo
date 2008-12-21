@@ -6,13 +6,13 @@
 #
 #   from bourne-based shells:
 #       f=/tmp/uss-$$.sh
-#       uss.sh -s uss_script > $f
+#       uss.sh -s -- uss_script arguments ... > $f
 #       . $f
 #       rm $f
 #
 #   from csh-based shells:
 #       set f=/tmp/uss-$$.sh
-#       uss.sh -c uss_script > $f
+#       uss.sh -c -- uss_script arguments ... > $f
 #       . $f
 #       rm $f
 #
@@ -39,6 +39,7 @@ while getopts hcs c ; do
   esac
 done
 shift `expr $OPTIND - 1`
+OPTIND=1
 
 # check arguments
 if [ $# -eq 0 ] ; then 
