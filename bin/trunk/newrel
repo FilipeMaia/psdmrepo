@@ -70,3 +70,8 @@ if [ -r "$LUSI_ROOT/sw/releases/$release/SConstruct" ] ; then
   cp "$LUSI_ROOT/sw/releases/$release/SConstruct" "$directory"
 fi
 
+# create few empty dirs
+mkdir "$directory/arch"
+mkdir "$directory/build"
+mkdir "$directory/data"
+mkdir "$directory/include"
