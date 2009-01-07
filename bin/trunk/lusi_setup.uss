@@ -8,6 +8,7 @@
 #    -o os        - define OS name explicitely
 #    -c compiler  - define compiler explicitely
 #    -b build     - define build type explicitely
+#    -a name      - define LUSI_ARCH explicitely
 #
 
 
@@ -77,14 +78,16 @@ proc=""
 os=""
 comp=""
 build=""
+lusi_arch=""
 
 # get the options
-while getopts p:o:c:b: c ; do
+while getopts p:o:c:b:a: c ; do
   case $c in
     p) proc="$OPTARG" ;;
     o) os="$OPTARG" ;;
     c) comp="$OPTARG" ;;
     b) build="$OPTARG" ;;
+    a) lusi_arch="$OPTARG" ;;
     \?) exit 2 ;;
   esac
 done
@@ -136,7 +139,7 @@ fi
 #
 # processor architecture
 #
-if [ -z "$proc" ] ; then
+if [ -z "$lusi_arch" -a -z "$proc" ] ; then
   proc=`uname -p`
   mach=`uname -m`
   # use i686 instead of athlon
@@ -152,7 +155,7 @@ fi
 #
 # OS type
 #
-if [ -z "$os" ] ; then
+if [ -z "$lusi_arch" -a -z "$os" ] ; then
   os=`uname -s`
   if [ "$os" = "Linux" -a -r /etc/redhat-release ] ; then
     rh=`cat /etc/redhat-release | tr ' ' _`
@@ -186,7 +189,7 @@ fi
 # architectures in the release. If you need something different, 
 # then override it later via LUSI_ARCH
 #
-if [ -z "$comp" ] ; then
+if [ -z "$lusi_arch" -a -z "$comp" ] ; then
   pfx="$proc-$os"
   rel="current"
   test "$LUSI_RELEASE" = "nobase" || rel="$LUSI_RELEASE"
@@ -202,13 +205,17 @@ fi
 #
 # Choose optimization
 #
-if [ -z "$build" ] ; then
+if [ -z "$lusi_arch" -a -z "$build" ] ; then
   build=`set_intersect $options "opt,deb" | filter_first`
   test -z "$build" && build="opt"
 fi
 
 # define architecture
-set_env LUSI_ARCH "$proc-$os-$comp-$build"
+if [ -z "$lusi_arch" ] ; then
+  set_env LUSI_ARCH "$proc-$os-$comp-$build"
+else
+  set_env LUSI_ARCH "$lusi_arch"
+fi
 
 # remove all LUSI dirs from PATHs for the moment
 remove_from_path PATH "$LUSI_ROOT/bin/*"
@@ -225,9 +232,6 @@ prepend_path PATH "$LUSI_ROOT/sw/external/scons/$scons_ver/$LUSI_ARCH/bin"
 
 # add python2.6 to the PATH
 prepend_path PATH "$LUSI_ROOT/sw/external/python/2.6/$LUSI_ARCH/bin"
-
-# on some machines svn is not linked to /usr/local/bin
-append_path PATH "/afs/slac.stanford.edu/package/svn/@sys/1.4.4/bin"
 
 # add LUSI_ROOT/bin to PATH
 prepend_path PATH "$LUSI_ROOT/bin"
