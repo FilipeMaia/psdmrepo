@@ -226,6 +226,9 @@ prepend_path PATH "$LUSI_ROOT/sw/external/scons/$scons_ver/$LUSI_ARCH/bin"
 # add python2.6 to the PATH
 prepend_path PATH "$LUSI_ROOT/sw/external/python/2.6/$LUSI_ARCH/bin"
 
+# on some machines svn is not linked to /usr/local/bin
+append_path PATH "/afs/slac.stanford.edu/package/svn/@sys/1.4.4/bin"
+
 # add LUSI_ROOT/bin to PATH
 prepend_path PATH "$LUSI_ROOT/bin"
 test "$LUSI_RELEASE" = "nobase" || prepend_path PATH "$LUSI_ROOT/sw/releases/$LUSI_RELEASE/arch/$LUSI_ARCH/bin"
