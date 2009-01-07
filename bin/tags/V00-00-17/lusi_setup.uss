@@ -1,0 +1,252 @@
+#!/afs/slac.stanford.edu/g/lusi/bin/uss.sh
+#
+# $Id$
+#
+# Usage: lusi_setup [key_options] [options]
+#  key_options:
+#    -p processor - define processor type explicitely
+#    -o os        - define OS name explicitely
+#    -c compiler  - define compiler explicitely
+#    -b build     - define build type explicitely
+#
+
+
+# +++++++++ few adjustible parameters +++++++++
+# SCons version
+scons_ver="1.1.0"
+
+# The map which lists acceptable (compatible) architectures 
+# for the current processor. For example if system is detected
+# with the i686 the user may choose either i686 or i386.
+proc_map="i686:i686,i386 \
+          x86_64:x86_64,i686,i386"
+
+# --------- few adjustible parameters ---------
+
+# +++++++++ few internal functions +++++++++
+
+# messaging
+err() { echo $* 1>&2 ; exit 1 ; }
+warn() { echo $* 1>&2 ; }
+
+#
+# returns intersection of two sets, each set is a list of comma-separated words
+#
+set_intersect() {
+  res=""
+  for w1 in `echo $1 | tr , ' '` ; do
+    for w2 in `echo $2 | tr , ' '` ; do
+      if [ "$w1" = "$w2" ] ; then
+        test -n "$res" && res="$res,"
+        res="$res$w1"
+        break
+      fi
+    done
+  done
+  echo $res
+}
+
+# return first element from set
+set_first() { echo $1 | cut -d, -f1 ; }
+
+# same thing but works as filter
+filter_first() { cut -d, -f1 ; }
+
+#
+# Find key in map. Map is a string of "key:val key:val default:val" pairs.
+#
+map_find() {
+  def=""
+  for x in $1 ; do
+    map_key=`echo $x | cut -d: -f1`
+    if [ "$map_key" = "$2" ] ; then
+      map_val=`echo $x | cut -d: -f2-`
+      echo $map_val
+      return
+    fi
+    if [ "$map_key" = "default" ] ; then
+      def=`echo $x | cut -d: -f2-`
+    fi
+  done
+  echo $def
+}
+
+# --------- few internal functions ---------
+
+proc=""
+os=""
+comp=""
+build=""
+
+# get the options
+while getopts p:o:c:b: c ; do
+  case $c in
+    p) proc="$OPTARG" ;;
+    o) os="$OPTARG" ;;
+    c) comp="$OPTARG" ;;
+    b) build="$OPTARG" ;;
+    \?) exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+#
+# Command-line "options"
+#
+options=`echo "$@" | tr ' ' ','`
+
+#
+# Check necessary environment
+#
+test -n "$LUSI_ROOT" || set_env LUSI_ROOT /afs/slac.stanford.edu/g/lusi
+
+#
+#  Set repository location
+#
+set_env LUSI_SVN "file://${LUSI_ROOT}/svnrepo"
+
+#
+# determine the release to use, could be the first command line argument,
+# or the content of .lusi_release, ~/LUSI_RELEASE, or "current"
+#
+unset_env LUSI_RELEASE
+if [ -n "$1" ] ; then
+  if [ "$1" = "nobase" -o -d "$LUSI_ROOT/sw/releases/$1" ] ; then
+    set_env LUSI_RELEASE "$1"
+    shift
+  fi
+fi
+if [ -z "$LUSI_RELEASE" -a -f .lusi_release ] ; then
+  rel=`cat .lusi_release`
+  if [ -d "$LUSI_ROOT/sw/releases/$rel" ] ; then
+  	set_env LUSI_RELEASE "$rel"
+  else
+    # if .lusi_release points to non-existing release it means new production
+    set_env LUSI_RELEASE "nobase"
+  fi
+fi
+if [ -z "$LUSI_RELEASE" -a -r "${HOME}/LUSI_RELEASE" ] ; then
+  rel=`cat "${HOME}/LUSI_RELEASE"`
+  test -d "$LUSI_ROOT/sw/releases/$rel" && set_env LUSI_RELEASE "$rel"
+fi
+if [ -z "$LUSI_RELEASE" ] ; then
+  set_env LUSI_RELEASE current
+fi
+
+#
+# processor architecture
+#
+if [ -z "$proc" ] ; then
+  proc=`uname -p`
+  mach=`uname -m`
+  # use i686 instead of athlon
+  proc=`map_find "athlon:i686 unknown:$mach default:$proc" $proc`
+  proclist=`map_find "$proc_map" $proc`
+  test -n "$proclist" || err "Failed to determine processor type"
+  # let user choose processor type
+  proc=`set_intersect "$options" "$proclist" | filter_first`
+  # if user cannot choose anything then use first from the list
+  test -z "$proc" && proc=`set_first $proclist`
+fi
+
+#
+# OS type
+#
+if [ -z "$os" ] ; then
+  os=`uname -s`
+  if [ "$os" = "Linux" -a -r /etc/redhat-release ] ; then
+    rh=`cat /etc/redhat-release | tr ' ' _`
+    case $rh in
+      Scientific_Linux_*_release_4.*)
+        os=slc4
+        ;;
+      Scientific_Linux_*_release_3.*)
+        os=slc3
+        ;;
+    esac
+  fi
+  if [ "$os" = "SunOS" ] ; then
+    case `uname -r` in
+      5.8) os="sol8" ;;
+      5.9) os="sol9" ;;
+      5.10) os="sol10" ;;
+    esac
+  fi
+  if [ "$os" = "CYGWIN_NT-5.1" ] ; then
+    case `uname -r` in
+      1.5.*) os="cygwin_xp_15" ;;
+      *) os="cygwin_xp" ;;
+    esac
+  fi
+  test -n "$os" || err "Failed to determine OS type"
+fi
+
+#
+# Now we need compiler, it's determined from the list of the 
+# architectures in the release. If you need something different, 
+# then override it later via LUSI_ARCH
+#
+if [ -z "$comp" ] ; then
+  pfx="$proc-$os"
+  rel="current"
+  test "$LUSI_RELEASE" = "nobase" || rel="$LUSI_RELEASE"
+  compilers=`/bin/ls -1 "$LUSI_ROOT/sw/releases/$rel/arch" | grep "$pfx" | cut -d- -f3 | sort -u | tr ' ' ','`
+  if [ -z "$compilers" ] ; then
+    warn "OS or processor type ($os/$proc) are not supported in release \"$LUSI_RELEASE\""
+    compilers="gcc34,gcc41,CC"
+  fi
+  comp=`set_intersect $options $compilers`
+  test -z "$comp" && comp=`set_first $compilers`
+fi
+
+#
+# Choose optimization
+#
+if [ -z "$build" ] ; then
+  build=`set_intersect $options "opt,deb" | filter_first`
+  test -z "$build" && build="opt"
+fi
+
+# define architecture
+set_env LUSI_ARCH "$proc-$os-$comp-$build"
+
+# remove all LUSI dirs from PATHs for the moment
+remove_from_path PATH "$LUSI_ROOT/bin/*"
+remove_from_path PATH "$LUSI_ROOT/sw/.*"
+remove_from_path PATH "[.]/arch/[^/]*/bin/*"
+remove_from_path LD_LIBRARY_PATH "$LUSI_ROOT/sw/.*"
+remove_from_path LD_LIBRARY_PATH "[.]/arch/[^/]*/lib/*"
+remove_from_path PYTHONPATH "$LUSI_ROOT/sw/.*"
+remove_from_path PYTHONPATH "[.]/arch/[^/]*/python/*"
+unset_env LUSI_REPOS
+
+# add SCons to the PATH
+prepend_path PATH "$LUSI_ROOT/sw/external/scons/$scons_ver/$LUSI_ARCH/bin"
+
+# add python2.6 to the PATH
+prepend_path PATH "$LUSI_ROOT/sw/external/python/2.6/$LUSI_ARCH/bin"
+
+# on some machines svn is not linked to /usr/local/bin
+append_path PATH "/afs/slac.stanford.edu/package/svn/@sys/1.4.4/bin"
+
+# add LUSI_ROOT/bin to PATH
+prepend_path PATH "$LUSI_ROOT/bin"
+test "$LUSI_RELEASE" = "nobase" || prepend_path PATH "$LUSI_ROOT/sw/releases/$LUSI_RELEASE/arch/$LUSI_ARCH/bin"
+prepend_path PATH "./arch/$LUSI_ARCH/bin"
+
+# shared libs path
+test "$LUSI_RELEASE" = "nobase" || prepend_path LD_LIBRARY_PATH "$LUSI_ROOT/sw/releases/$LUSI_RELEASE/arch/$LUSI_ARCH/lib"
+prepend_path LD_LIBRARY_PATH "./arch/$LUSI_ARCH/lib"
+
+# releases dirs
+test "$LUSI_RELEASE" = "nobase" || set_env LUSI_REPOS "$LUSI_ROOT/sw/releases/$LUSI_RELEASE"
+
+# extend PYTHONPATH
+test "$LUSI_RELEASE" = "nobase" || prepend_path PYTHONPATH "$LUSI_ROOT/sw/releases/$LUSI_RELEASE/arch/$LUSI_ARCH/python"
+prepend_path PYTHONPATH "./arch/$LUSI_ARCH/python"
+
+# extend LUSI_DATA
+test "$LUSI_RELEASE" = "nobase" || set_env LUSI_DATA "$LUSI_ROOT/sw/releases/$LUSI_RELEASE/data"
+prepend_path LUSI_DATA "./data"
+
+test "$LUSI_RELEASE" = "nobase" && unset_env LUSI_RELEASE
