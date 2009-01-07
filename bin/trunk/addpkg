@@ -43,6 +43,13 @@ find_tag() {
   echo "$tag1"
 }
 
+make_link() {
+  if [ -d "$2/$1" ] ; then
+    test -d "$1" || mkdir "$1"
+    test -L "$1/$2"  || ln -s "../$2/$1" "$1/$2"
+  fi
+}
+
 # usage: checkout package tag release mode
 checkout() {
 
@@ -56,6 +63,10 @@ checkout() {
     echo "Linking SConstruct to $1/src/SConstruct.main"
     ln -s "$1/src/SConstruct.main" SConstruct
   fi
+
+  # make symlinks from data/ and include/ into package
+  make_link "include" "$1"
+  make_link "data" "$1"
 }
 
 # usage: checkout_cvs package tag
