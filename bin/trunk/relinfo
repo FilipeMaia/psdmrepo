@@ -96,7 +96,6 @@ decorate() {
   	for(i=1;i<=NF;i++) { \
   	  if( $i!="HEAD" && $i!="-" ) { if(min=="" || $i<min) min=$i; if(max=="" || $i>max) max=$i; } \
   	} ; \
-  	print $0,"min",min,"max",max >> "log";\
     for(i=1;i<=NF;i++) { \
       if( $i!="HEAD" && $i!="-" ) { if($i>min) { $i=$i"(+)" } else { if($i<max) $i=$i"(-)"; } } \
     } ; print ;\
