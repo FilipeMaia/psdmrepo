@@ -166,6 +166,9 @@ if [ -z "$lusi_arch" -a -z "$os" ] ; then
       Scientific_Linux_*_release_3.*)
         os=slc3
         ;;
+      Red_Hat_Enterprise_Linux_*_release_5.*)
+        os=rhel5
+        ;;
     esac
   fi
   if [ "$os" = "SunOS" ] ; then

@@ -157,6 +157,7 @@ exec_mktxtprop() {
 
   recurse=""
   # get the options
+  OPTIND=1
   while getopts R c ; do
     case $c in
       R) recurse="-R" ;;
@@ -181,6 +182,7 @@ exec_tag() {
   rev=""
   pkg=""
   # get the options
+  OPTIND=1
   while getopts r:p: c ; do
     case $c in
       p) pkg="$OPTARG" ;;
