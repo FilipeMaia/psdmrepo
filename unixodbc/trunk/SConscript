@@ -23,9 +23,10 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 unixodbc_ver = "2.2.12"
 
-PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/unixODBC",unixodbc_ver,env['LUSI_ARCH'])
+PREFIX  = "/usr"
 INCDIR  = "include"
+INCLUDES = "autotest.h odbcinst*.h sql.h sqlext.h sqltypes.h sqlucode.h uodbc_stats.h"
 LIBDIR  = "lib"
-BINDIR  = "bin"
 PKGLIBS = "odbc"
+LINKLIBS = "libodbc.so*"
 standardExternalPackage ( 'unixodbc', **locals() )
