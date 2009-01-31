@@ -56,7 +56,8 @@ def _glob ( dir, patterns ):
 def standardExternalPackage ( package, **kw ) :
     """ Understands following keywords (all are optional):
         PREFIX   - top directory of the external package
-        INCDIR   - include directory, absolute or relative to PREFIX 
+        INCDIR   - include directory, absolute or relative to PREFIX
+        INCLUDES - include files to copy (space-separated list of patterns)
         PYDIR    - Python src directory, absolute or relative to PREFIX
         PYDIRSEP - if present and evaluates to True installs python code to a 
                    separate directory arch/$LUSI_ARCH/python/<package>
@@ -87,9 +88,27 @@ def standardExternalPackage ( package, **kw ) :
         archinc = str(archinc)
         if not os.path.isdir( archinc ) : os.makedirs( archinc )
 
-        target = pjoin(archinc,package)
-        if not os.path.lexists(target) : os.symlink ( inc_dir, target )
-        
+        includes = kw.get('INCLUDES',None)
+        if not includes :
+            
+            # link the whole include directory
+            target = pjoin(archinc,package)
+            if not os.path.lexists(target) : os.symlink ( inc_dir, target )
+            
+        else:
+
+            # make target package directory if needed
+            targetdir = pjoin( archinc, package )
+            if not os.path.isdir( targetdir ) : os.makedirs( targetdir )
+            
+            # copy individual files
+            includes = _glob ( inc_dir, includes )
+            for inc in includes :
+                loc = pjoin( inc_dir, inc )
+                target = pjoin( targetdir, inc )
+                targ = env.Symlink( target, loc )
+                trace ( "linkinc: %s -> %s" % (str(targ[0]),loc), "standardExternalPackage", 5 )
+
     
     # link python directory
     py_dir = _absdir ( prefix, kw.get('PYDIR',None) )
@@ -106,6 +125,7 @@ def standardExternalPackage ( package, **kw ) :
                 loc = pjoin(py_dir,f)
                 if not os.path.isdir(loc) :
                     targ = env.Symlink ( pjoin(env.subst("$PYDIR"),f), loc )
+                    trace ( "linkpy: %s -> %s" % (str(targ[0]),loc), "standardExternalPackage", 5 )
                     env['ALL_TARGETS']['LIBS'].extend( targ )
             
     

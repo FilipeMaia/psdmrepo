@@ -31,11 +31,14 @@ def setupCompilers ( env ) :
     opt = env['LUSI_ARCH_OPT']
     
     if comp == 'gcc34' :
-        env['CC'] = 'gcc-3.4'
-        env['CXX'] = 'g++-3.4'
+        env['CC'] = 'gcc34'
+        env['CXX'] = 'g++34'
+        if os == 'slc4' :
+            env['CC'] = 'gcc-3.4'
+            env['CXX'] = 'g++-3.4'
         env['CCFLAGS'] = _gcc_opt.get(opt,'') + ' -Wall'
 
-    env['PYTHON_VERSION'] = "2.6"
+    env['PYTHON_VERSION'] = "2.4"
 
     # various substitutions for the scripts 
     env.SetDefault (SCRIPT_SUBS = {})
