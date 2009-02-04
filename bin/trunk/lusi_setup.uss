@@ -13,8 +13,8 @@
 
 
 # +++++++++ few adjustible parameters +++++++++
-# SCons version
-scons_ver="1.1.0"
+# SCons versions
+scons_ver="1.2.0 1.1.0"
 
 # The map which lists acceptable (compatible) architectures 
 # for the current processor. For example if system is detected
@@ -231,10 +231,12 @@ remove_from_path PYTHONPATH "[.]/arch/[^/]*/python/*"
 unset_env LUSI_REPOS
 
 # add SCons to the PATH
-prepend_path PATH "$LUSI_ROOT/sw/external/scons/$scons_ver/$LUSI_ARCH/bin"
-
-# add python2.6 to the PATH
-prepend_path PATH "$LUSI_ROOT/sw/external/python/2.6/$LUSI_ARCH/bin"
+for v in $scons_ver ; do
+  if [ -d "$LUSI_ROOT/sw/external/scons/$v/$LUSI_ARCH/bin" ] ; then
+    prepend_path PATH "$LUSI_ROOT/sw/external/scons/$v/$LUSI_ARCH/bin"
+    break
+  fi
+done
 
 # add LUSI_ROOT/bin to PATH
 prepend_path PATH "$LUSI_ROOT/bin"
