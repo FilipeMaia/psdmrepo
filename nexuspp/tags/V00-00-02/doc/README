@@ -1,0 +1,18 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package nexuspp
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Brief description:
+==================
+
+This package defines C++ wrappers for the functions in nexus API.
+
+Detailed description:
+=====================
+
