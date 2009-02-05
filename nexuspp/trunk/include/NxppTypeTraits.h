@@ -60,7 +60,7 @@ struct NxppTypeTraitsNum {
 
   // get the address of the data item
   static void* dataAddress( T* ptr ) { return static_cast<void*>(ptr); }
-  static void* dataAddress( T val ) { return static_cast<void*>(&val); }
+  static const void* dataAddress( const T& val ) { return static_cast<const void*>(&val); }
 
   // size() returns the size of the data value
   // in terms of the 'nxtype' type

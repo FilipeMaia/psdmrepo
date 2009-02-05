@@ -65,25 +65,25 @@ public:
     return NXputdata ( m_fileId, addr ) == NX_OK ;
   }
   bool putData ( T data ) {
-    void* addr = NxppTypeTraits<T>::dataAddress(data) ;
-    return NXputdata ( m_fileId, addr ) == NX_OK ;
+    const void* addr = NxppTypeTraits<T>::dataAddress(data) ;
+    return NXputdata ( m_fileId, (void*)addr ) == NX_OK ;
   }
 
   // add attribute
   template <typename U>
   bool addAttribute ( const std::string& name, const U& value ) {
-    void* addr = NxppTypeTraits<U>::dataAddress(value) ;
+    const void* addr = NxppTypeTraits<U>::dataAddress(value) ;
     int size = NxppTypeTraits<U>::size(value) ;
     int type = NxppTypeTraits<U>::nxtype ;
-    return NXputattr ( m_fileId, name.c_str(), addr, size, type ) == NX_OK ;
+    return NXputattr ( m_fileId, name.c_str(), (void*)addr, size, type ) == NX_OK ;
   }
 
   // add attribute
   template <typename U>
   bool addAttribute ( const std::string& name, int size, const U* ptr ) {
-    void* addr = NxppTypeTraits<U>::dataAddress(ptr) ;
+    const void* addr = NxppTypeTraits<U>::dataAddress(ptr) ;
     int type = NxppTypeTraits<U>::nxtype ;
-    return NXputattr ( m_fileId, name.c_str(), addr, size, type ) == NX_OK ;
+    return NXputattr ( m_fileId, name.c_str(), (void*)addr, size, type ) == NX_OK ;
   }
 
 protected:
