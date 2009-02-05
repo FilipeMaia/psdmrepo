@@ -87,7 +87,7 @@ O2ONexusWriter::eventStart ( const Pds::Sequence& seq )
   // for every event we create new group in a file, group name should include event time
   char buf[32] ;
   int s = snprintf ( buf, sizeof buf, "%08X:%08X", seq.high(), seq.low() ) ;
-  if ( s < 0 or s >= sizeof buf ) {
+  if ( s < 0 or s >= int(sizeof buf) ) {
     MsgLog( logger, fatal, "snprintf conversion failed" ) ;
   }
 

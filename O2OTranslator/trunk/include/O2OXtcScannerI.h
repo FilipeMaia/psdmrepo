@@ -73,7 +73,7 @@ private:
 
   // Copy constructor and assignment are disabled by default
   O2OXtcScannerI ( const O2OXtcScannerI& ) ;
-  O2OXtcScannerI operator = ( const O2OXtcScannerI& ) ;
+  O2OXtcScannerI& operator = ( const O2OXtcScannerI& ) ;
 
 };
 
