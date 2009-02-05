@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+#  Script which builds the release
+#
+
+usage() {
+
+  echo `basename $0` release target [options]
+  echo
+  echo "  all options are passed to lusi_setup directly"
+
+}
+
+tmp=${LUSI_ROOT:?Missing LUSI_ROOT}
+
+rel=${1:?Required parameter missing (release name)}
+shift
+target=${1:?Required parameter missing (target name)}
+shift
+
+#
+# directory for the new release
+#
+dir="/md0/releases/$rel"
+cd "$dir"
+
+#
+# setup release
+#
+LUSI_RELEASE="$rel"
+export LUSI_RELEASE
+source "$LUSI_ROOT/bin/lusi_setup.sh" "$@"
+
+#
+# run the build
+#
+scons -j 3 -i $target
