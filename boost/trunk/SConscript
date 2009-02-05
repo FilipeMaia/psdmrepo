@@ -18,7 +18,13 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 # Find out suffix for boost libs
 #
-libsfxs = { 'g++-3.4' : '-gcc34-mt' }
+libsfxs = { 
+    'g++34' : '-gcc34-mt',
+    'g++-3.4' : '-gcc34-mt',
+    'g++41' : '-gcc41-mt',
+    'g++-4.1' : '-gcc41-mt',
+    'g++' : '-gcc41-mt',
+}
 libsfx = libsfxs.get ( env['CXX'], '' )
 
 #
