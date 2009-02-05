@@ -24,6 +24,11 @@ Usage: `basename $0` [options] [release ...]
     -p package  print info for specified package(s)
     -a          list all packages from all releases
     -t string   field delimiter string
+    
+Release name can be any valid release name from \$LUSI_ROOT/sw/releases,
+"REPO" for repository information, "." for current test release, or
+"BASE" for the base release of current test release. If you do not 
+specify release name then ". BASE" will be used. 
 EOD
 }
 
