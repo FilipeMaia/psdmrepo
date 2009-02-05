@@ -230,6 +230,11 @@ remove_from_path PYTHONPATH "$LUSI_ROOT/sw/.*"
 remove_from_path PYTHONPATH "[.]/arch/[^/]*/python/*"
 unset_env LUSI_REPOS
 
+# we have a directory with extra Python modules, add it to PATH and PYTHONPATH
+prepend_path PATH "$LUSI_ROOT/sw/external/pyextra/$LUSI_ARCH/bin"
+prepend_path PYTHONPATH "$LUSI_ROOT/sw/external/pyextra/$LUSI_ARCH/lib/python2.4"
+prepend_path PYTHONPATH "$LUSI_ROOT/sw/external/pyextra/$LUSI_ARCH/lib/python2.4/site-packages"
+
 # add SCons to the PATH
 for v in $scons_ver ; do
   if [ -d "$LUSI_ROOT/sw/external/scons/$v/$LUSI_ARCH/bin" ] ; then
