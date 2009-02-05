@@ -1,0 +1,43 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package AppUtils
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-06
+2009-02-05 Andy Salnikov
+- gcc41 found a bug in AppBase.h, assignment op returned object instead
+  of reference 
+
+Tag: V00-00-05
+2008-12-02 Andy Salnikov
+- in AppBase set global formatting strings for MsgLogger instead of just 
+  for the root logger
+
+Tag: V00-00-04
+2008-11-03 Andy Salnikov
+- added properties to all files here
+
+Tag: V00-00-03
+2008-11-03 Andy Salnikov
+- added test/EchoApp.cpp - simple test application for AppBase (it is 
+  also an example in README)
+- copied README file from BaBar's SysUtils as doc/README.SysUtil
+- added detailed description of AppBase to README
+
+Tag: V00-00-02
+2008-10-30 Andy Salnikov
+- AppCmdLineTest.cpp changed to run with a Boost Unit Test
+
+Tag: V00-00-01
+2008-10-29 Andy Salnikov
+- imported SysUtils from BaBar as AppUtils
+- Renamed all classes to use App prefix, everything has been put into 
+  AppUtils namespace
