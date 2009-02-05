@@ -11,6 +11,19 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-18
+2009-02-05 Andy Salnikov
+- compilers.py: add support for gcc41
+- we'll use /usr/bin/python2.4 instead of /usr/bin/env python, latter
+  find python2.5 from TWW which we can't use
+
+Tag: V00-00-17
+2009-01-31 Andy Salnikov
+- compilers.py: adding support for RHEL5
+- standardExternalPackage.py: new keyword for standardExternalPackage -
+  INCLUDES, to link only the specified includes, and not the whole 
+  directory. Useful when the external package is installed in /usr. 
+
 Tag: V00-00-16
 2008-12-17 Andy Salnikov
 - compilers.py: added -Wall for c++ compilation

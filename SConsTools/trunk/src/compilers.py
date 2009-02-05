@@ -38,8 +38,13 @@ def setupCompilers ( env ) :
             env['CXX'] = 'g++-3.4'
         env['CCFLAGS'] = _gcc_opt.get(opt,'') + ' -Wall'
 
+    elif comp == 'gcc41' :
+        env['CC'] = 'gcc'
+        env['CXX'] = 'g++'
+        env['CCFLAGS'] = _gcc_opt.get(opt,'') + ' -Wall'
+
     env['PYTHON_VERSION'] = "2.4"
 
     # various substitutions for the scripts 
     env.SetDefault (SCRIPT_SUBS = {})
-    env['SCRIPT_SUBS']['PYTHON'] = "/bin/env python"+env['PYTHON_VERSION']
+    env['SCRIPT_SUBS']['PYTHON'] = "/usr/bin/python"+env['PYTHON_VERSION']
