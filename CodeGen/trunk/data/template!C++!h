@@ -78,7 +78,7 @@ private:
 
   // Copy constructor and assignment are disabled by default
   $class ( const $class& ) ;
-  $class operator = ( const $class& ) ;
+  $class& operator = ( const $class& ) ;
 
 //------------------
 // Static Members --

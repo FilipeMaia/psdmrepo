@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2009-02-05 Andy Salnikov
+- bug in template!C++!h: assignment op returned copy of object 
+
 Tag: V00-00-05
 2008-11-03 Andy Salnikov
 - added new template template!C++-app!cpp for applications based on AppBase
