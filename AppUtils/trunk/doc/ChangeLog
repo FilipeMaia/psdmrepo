@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2009-02-05 Andy Salnikov
+- gcc41 found a bug in AppBase.h, assignment op returned object instead
+  of reference 
+
 Tag: V00-00-05
 2008-12-02 Andy Salnikov
 - in AppBase set global formatting strings for MsgLogger instead of just 

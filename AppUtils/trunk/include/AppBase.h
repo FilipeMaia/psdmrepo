@@ -112,7 +112,7 @@ private:
 
   // Copy constructor and assignment are disabled by default
   AppBase ( const AppBase& ) ;
-  AppBase operator = ( const AppBase& ) ;
+  AppBase& operator = ( const AppBase& ) ;
 
 };
 
