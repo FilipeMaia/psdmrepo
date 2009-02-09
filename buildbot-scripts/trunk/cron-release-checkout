@@ -1,6 +1,6 @@
 #!/bin/sh
 
-reldir="/md0/releases"
+reldir="/psdm/local/releases"
 
 rel=${1:?Required parameter missing (release name)}
 tags=${2:?Required parameter missing (tags name)}

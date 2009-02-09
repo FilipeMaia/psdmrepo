@@ -1,0 +1,72 @@
+#!/bin/sh
+
+rel=${1:?Required parameter missing (release name)}
+
+srcdir="/psdm/local/releases"
+dstdir="/afs/slac.stanford.edu/g/lusi/sw/releases"
+logdir="$dstdir/logs/$rel"
+
+#
+# redirect output to logfile
+#
+if [ ! -d "$logdir" ] ; then 
+    if mkdir "$logdir" ; then
+        :
+    else
+        echo "Failed to create log directory: $logdir/$rel" 1>&2
+        exit 2
+    fi
+fi
+exec > "$logdir/copy-nightly" 2>&1
+
+echo "+++ Checking directories"
+
+#
+# Check that the source directory exists
+#
+if [ ! -d "$srcdir/$rel" ] ; then
+    echo "Release does not exist: $srcdir/$rel" 1>&2
+    exit 2
+fi
+
+#
+# Check that the destination directory does not exists
+#
+if [ -d "$dstdir/$rel" ] ; then
+    echo "Destination release already exists: $dstdir/$rel" 1>&2
+    exit 2
+fi
+
+#
+# Check that we can make a directory for destination
+#
+if mkdir "$dstdir/$rel" ; then
+    :
+else
+    echo "Failed to create release directory: $dstdir/$rel" 1>&2
+    exit 2
+fi
+
+#
+# wait for magic file to appear, max 6 hours
+#
+watch="$srcdir/$rel/.build-done"
+wait_time=360
+while [ $wait_time -ge 0 ] ; do
+    echo "+++ Waiting for release to finish building"
+    test -f "$watch" && break
+    wait_time=`expr $wait_time - 1`
+    sleep 60
+done
+if [ ! -f "$watch" ] ; then
+    echo "Failed to create release directory: $dstdir/$rel" 1>&2
+    exit 2
+fi
+
+#
+# do the copy
+#
+echo "+++ Start copying the release"
+gtar -C "$srcdir" -c -f - "$rel" | gtar -C "$dstdir" -x -v -f - "$rel"
+
+echo "+++ Done"

@@ -21,7 +21,7 @@ shift
 #
 # directory for the new release
 #
-dir="/md0/releases/$rel"
+dir="/psdm/local/releases/$rel"
 cd "$dir"
 
 #
@@ -35,3 +35,8 @@ source "$LUSI_ROOT/bin/lusi_setup.sh" "$@"
 # run the build
 #
 scons -j 3 -i $target
+
+#
+# say we are done
+#
+touch .build-done

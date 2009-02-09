@@ -3,7 +3,7 @@
 rel=${1:?Required parameter missing (release name)}
 
 # releases location
-reldir="/md0/releases"
+reldir="/psdm/local/releases"
 
 # max wait time in minutes
 wait_time=60
