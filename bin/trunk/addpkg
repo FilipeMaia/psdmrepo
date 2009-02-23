@@ -103,7 +103,6 @@ checkout_svn() {
       svn checkout "$repo123" "$1"
     fi
   fi
-  unset repo123
 }
 
 # default values for options
