@@ -47,7 +47,7 @@ echo "--- Releases to remove: $releases"
 #
 for r in $releases ; do
     echo "--- Removing release: $r"
-    #rm -rf $r
+    rm -rf $r
 done
 
 echo "+++ Finishing at" `date`

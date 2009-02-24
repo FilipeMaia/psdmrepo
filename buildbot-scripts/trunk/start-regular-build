@@ -1,0 +1,78 @@
+#!/bin/sh
+#
+#  Script which builds the release
+#
+
+# host and port where buildbot listens
+bbot=bbt-odf103:9989
+
+usage() {
+
+  echo `basename $0` release tags
+  echo
+  echo "  all options are passed to lusi_setup directly"
+
+}
+
+tmp=${LUSI_ROOT:?Missing LUSI_ROOT}
+
+rel=${1:?Required parameter missing (release name)}
+shift
+tags=${1:?Required parameter missing (tags file)}
+shift
+
+#
+# directory for the new release
+#
+rels="/psdm/local/releases"
+
+#
+# Check that releases directory is there, if not we may be on wrong host
+#
+if [ ! -d "$rels" ] ; then
+    echo "Releases directory $rels does not exist, aborting." 1>&2
+    exit 2
+fi
+
+#
+# check that release does not exist 
+#
+if [ -d "$rels/$rel" ] ; then
+    echo "Release directory $rels/$rel already there, aborting." 1>&2
+    exit 2
+fi
+
+#
+# check that tags file is there 
+#
+if [ ! -f "$tags" ] ; then
+    echo "Tags file $tags does not exist, aborting." 1>&2
+    exit 2
+fi
+
+#
+# Checkout the release
+#
+echo "Checking out release to $rels/$rel"
+log="$rels/$rel/.co-done"
+cd "$rels" && \
+newrel "$rel" "$rel" && \
+cd "$rel" && \
+cp "$tags" ./tags && \
+addpkg -x -f ./tags >"$log.out" 2>"$log.err"
+status=$?
+
+test -s "$log.err" || rm "$log.err"
+mv "$log.out" "$rels/$rel/.co-done"
+
+if [ $status -ne 0 ] ; then
+    echo "Release checkout failed, aborting." 1>&2
+    echo "Check log: $log.err" 1>&2
+    exit 2
+fi
+
+#
+# Send a signal to buildbot
+#
+echo "Sending notification to BuildBot"
+buildbot sendchange --user=$USER --master=$bbot --branch="$rel" --comments="Requesting to build release $rel" /dev/null

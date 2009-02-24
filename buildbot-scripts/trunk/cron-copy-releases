@@ -1,14 +1,32 @@
 #!/bin/sh
 
-rel=${1:?Required parameter missing (release name)}
-
 srcdir="/psdm/local/releases"
 dstdir="/afs/slac.stanford.edu/g/lusi/sw/releases"
-logdir="$dstdir/logs/$rel"
+reqdir="$srcdir/copy-requests"
+
+#
+# Check that request directory exists
+#
+if [ ! -d "$reqdir" ] ; then
+    echo "$0: cannot find request directory $reqdir"
+    exit 2
+fi
+
+#
+# See if there are any requests, take first
+#
+rel=`/bin/ls -1 "$reqdir" | sort | head -1`
+test -z "$rel" && exit 0
+
+#
+# remove request
+#
+rm "$reqdir/$rel" || exit 2
 
 #
 # redirect output to logfile
 #
+logdir="$dstdir/logs/$rel"
 if [ ! -d "$logdir" ] ; then 
     if mkdir "$logdir" ; then
         :
@@ -19,6 +37,7 @@ if [ ! -d "$logdir" ] ; then
 fi
 exec > "$logdir/copy-nightly" 2>&1
 
+echo "+++ Will copy new release $rel"
 echo "+++ Checking directories"
 
 #
@@ -43,22 +62,6 @@ fi
 if mkdir "$dstdir/$rel" ; then
     :
 else
-    echo "Failed to create release directory: $dstdir/$rel" 1>&2
-    exit 2
-fi
-
-#
-# wait for magic file to appear, max 6 hours
-#
-watch="$srcdir/$rel/.build-done"
-wait_time=360
-while [ $wait_time -ge 0 ] ; do
-    echo "+++ Waiting for release to finish building"
-    test -f "$watch" && break
-    wait_time=`expr $wait_time - 1`
-    sleep 60
-done
-if [ ! -f "$watch" ] ; then
     echo "Failed to create release directory: $dstdir/$rel" 1>&2
     exit 2
 fi

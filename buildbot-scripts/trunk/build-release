@@ -5,7 +5,7 @@
 
 usage() {
 
-  echo `basename $0` release target [options]
+  echo `basename $0` build_dir release target [options]
   echo
   echo "  all options are passed to lusi_setup directly"
 
@@ -13,6 +13,8 @@ usage() {
 
 tmp=${LUSI_ROOT:?Missing LUSI_ROOT}
 
+rels=${1:?Required parameter missing (build directory name)}
+shift
 rel=${1:?Required parameter missing (release name)}
 shift
 target=${1:?Required parameter missing (target name)}
@@ -21,7 +23,7 @@ shift
 #
 # directory for the new release
 #
-dir="/psdm/local/releases/$rel"
+dir="$rels/$rel"
 cd "$dir"
 
 #
@@ -40,3 +42,8 @@ scons -j 3 -i $target
 # say we are done
 #
 touch .build-done
+
+#
+# send request to copy job
+#
+test -d "$rels/copy-requests" && touch "$rels/copy-requests/$rel"
