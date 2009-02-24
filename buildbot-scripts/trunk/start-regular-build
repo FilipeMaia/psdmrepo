@@ -7,19 +7,20 @@
 bbot=bbt-odf103:9989
 
 usage() {
-
-  echo `basename $0` release tags
-  echo
-  echo "  all options are passed to lusi_setup directly"
-
+  echo Usage: `basename $0` '<release-name> <tags-file>' 1>&2
 }
 
 tmp=${LUSI_ROOT:?Missing LUSI_ROOT}
 
-rel=${1:?Required parameter missing (release name)}
-shift
-tags=${1:?Required parameter missing (tags file)}
-shift
+# check arguments
+if [ $# -ne 2 ] ; then
+  echo "Required parameters missing" 1>&2
+  usage
+  exit 2
+fi
+
+rel=$1
+tags=$2
 
 #
 # directory for the new release
