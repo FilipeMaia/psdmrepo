@@ -101,8 +101,7 @@ int main(int argc, char* argv[]) {
   }
 
   XtcFileIterator iter(file,0x100000);
-  Dgram* dg;
-  while (dg = iter.next()) {
+  while ( Dgram* dg = iter.next() ) {
     printf("%s transition: time 0x%x/0x%x, payloadSize 0x%x\n",TransitionId::name(dg->seq.service()),
            dg->seq.high(),dg->seq.low(),dg->xtc.sizeofPayload());
     myLevelIter iter(&(dg->xtc),0);

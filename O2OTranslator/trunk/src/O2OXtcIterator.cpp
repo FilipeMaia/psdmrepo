@@ -105,6 +105,10 @@ O2OXtcIterator::process(Xtc* xtc)
 
     }
 
+    default :
+
+      break ;
+
   }
 
   if ( m_ignore ) {
