@@ -54,16 +54,15 @@ if [ -d "$directory" ] ; then
   exit 2
 fi
 
-mkdir "$directory"
+mkdir "$directory" || exit 3
 
-# if release is linked to anoher one get its real name
-if [ -h "$LUSI_ROOT/sw/releases/$release" ] ; then
-  # it's symlink, get the real release number
-  release=`/bin/ls -dl "$LUSI_ROOT/sw/releases/$release" | awk '{print $NF;}'`
+# if release is linked to another one get its real name
+if [ -f "$LUSI_ROOT/sw/releases/$release/.lusi_release" ] ; then
+  release=`cat "$LUSI_ROOT/sw/releases/$release/.lusi_release"`
 fi
 
 # store its number
-echo "$release" > "$directory/.lusi_release"
+echo "$release" > "$directory/.lusi_release" || exit 3
 
 # copy SConstruct 
 if [ -r "$LUSI_ROOT/sw/releases/$release/SConstruct" ] ; then
@@ -71,7 +70,4 @@ if [ -r "$LUSI_ROOT/sw/releases/$release/SConstruct" ] ; then
 fi
 
 # create few empty dirs
-mkdir "$directory/arch"
-mkdir "$directory/build"
-mkdir "$directory/data"
-mkdir "$directory/include"
+mkdir "$directory/arch" "$directory/build" "$directory/data" "$directory/include"
