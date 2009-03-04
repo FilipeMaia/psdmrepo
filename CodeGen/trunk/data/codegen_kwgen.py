@@ -66,3 +66,15 @@ def codegen_python_BASEINCL ( bases ) :
 codegen_python_main_BASEDECL = codegen_python_BASEDECL
 codegen_python_main_BASEINIT = codegen_python_BASEINIT
 codegen_python_main_BASEINCL = codegen_python_BASEINCL
+
+# descriptions of the templates
+codegen_Cxx_description = "Template for regular non-templated C++ classes"
+codegen_Cxx_template_description = "Template for templated C++ classes"
+codegen_Cxx_app_description = "Template for C++ applications based on AppBase class"
+
+codegen_python_description = "Template for Python library module"
+codegen_python_main_description = "Template for Python executable script"
+
+codegen_README_description = "Template for README file"
+codegen_ChangeLog_description = "Template for ChangeLog file"
+codegen_SConscript_description = "Template for SConscript file for regular package"

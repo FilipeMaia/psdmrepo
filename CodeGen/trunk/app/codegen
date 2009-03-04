@@ -101,7 +101,7 @@ def main( argv ):
     else :
         print >> sys.stderr, "No files generated, check language name"
 
-def make_keywords ( options, args ) :
+def read_kwgen ( options ) :
 
     # first try to read the 'codegen_kwgen.py' file, ignore all errors
     fname = os.path.join ( options.directory, 'codegen_kwgen.py' )
@@ -110,9 +110,16 @@ def make_keywords ( options, args ) :
         execfile ( fname, {}, ldict )
     except Exception, e :
         print >>sys.stderr, "Failed to import file %s: %s" % ( fname, str(e) )
-        return {}
-    lang = lang_trans(options.language)
+    return ldict
 
+def make_keywords ( options, args ) :
+
+    # first try to read the 'codegen_kwgen.py' file, ignore all errors
+    ldict = read_kwgen ( options )
+    
+    # normalized language name
+    lang = lang_trans(options.language)
+    
     kw = {}
     kw['package'] = args[0]
     kw['class'] = args[1]
@@ -141,6 +148,9 @@ def lang_trans ( lang ) :
 
 def list_classes ( options ) :
 
+    # first try to read the 'codegen_kwgen.py' file, ignore all errors
+    ldict = read_kwgen ( options )
+    
     langs = set()
     files = os.listdir ( options.directory )
     for f in files :
@@ -150,8 +160,10 @@ def list_classes ( options ) :
             langs.add ( lang )
     langs = list(langs)
     langs.sort()
+    fmt = "%%-%ds - %%s" % max ( [ len(l) for l in langs ] )
     for l in langs :
-        print l
+        descr = ldict.get( 'codegen_%s_description' % lang_trans(l), "" )
+        print fmt % ( l, descr )
 
 def get_user_name () :
     try :

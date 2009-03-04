@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2009-03-04 Andy Salnikov
+- add description for each template language
+
 Tag: V00-00-06
 2009-02-05 Andy Salnikov
 - bug in template!C++!h: assignment op returned copy of object 
