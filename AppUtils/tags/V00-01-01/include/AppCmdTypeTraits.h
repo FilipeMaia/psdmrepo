@@ -1,0 +1,194 @@
+//--------------------------------------------------------------------------
+//
+// Environment:
+//      This software was developed for the BaBar collaboration.  If you
+//      use all or part of it, please give an appropriate acknowledgement.
+//
+// Copyright Information:
+//	Copyright (C) 2003	SLAC
+//
+//------------------------------------------------------------------------
+
+#ifndef APPUTILS_APPCMDTYPETRAITS_HH
+#define APPUTILS_APPCMDTYPETRAITS_HH
+
+//-------------
+// C Headers --
+//-------------
+extern "C" {
+#include <limits.h>
+#include <float.h>
+}
+
+//---------------
+// C++ Headers --
+//---------------
+
+//----------------------
+// Base Class Headers --
+//----------------------
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+#include "AppUtils/AppCmdExceptions.h"
+
+//------------------------------------
+// Collaborating Class Declarations --
+//------------------------------------
+
+//		---------------------
+// 		-- Class Interface --
+//		---------------------
+
+
+/**
+ *  Type traits for the command line options and arguments. Every type
+ *  to be used as the template parameter for classes AppCmdArg<T> or
+ *  AppCmdOpt<T> should provide specialization for the AppCmdTypeTraits<T>
+ *  struct.
+ *
+ *  This software was developed for the BaBar collaboration.  If you
+ *  use all or part of it, please give an appropriate acknowledgement.
+ *
+ *  Copyright (C) 2003		SLAC
+ *
+ *  @see AppCmdArg
+ *  @see AppCmdOpt
+ *
+ *  @version $Id$
+ *
+ *  @author Andy Salnikov	(originator)
+ */
+
+namespace AppUtils {
+
+template<class T>
+struct AppCmdTypeTraits {
+};
+
+/**
+ *  Specialization for type long int
+ */
+template<>
+struct AppCmdTypeTraits<long> {
+  static long fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+    char* end ;
+    long res = strtol ( str.c_str(), &end, 0 ) ;
+    // conversion must consume all characters, otherwise it's not successful
+    if ( *end != '\0' ) throw AppCmdTypeCvtException ( str, "long" ) ;
+    return res ;
+  }
+};
+
+/**
+ *  Specialization for type int
+ */
+template<>
+struct AppCmdTypeTraits<int> {
+  static int fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+    try {
+      long res = AppCmdTypeTraits<long>::fromString( str ) ;
+      if ( res >= INT_MIN && res <= INT_MAX ) {
+	return int(res) ;
+      }
+    } catch (AppCmdTypeCvtException& e) {
+    }
+    throw AppCmdTypeCvtException ( str, "int" ) ;
+  }
+};
+
+/**
+ *  Specialization for type unsigned long
+ */
+template<>
+struct AppCmdTypeTraits<unsigned long> {
+  static unsigned long fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+    char* end ;
+    unsigned long res = strtoul ( str.c_str(), &end, 0 ) ;
+    // conversion must consume all characters, otherwise it's not successful
+    if ( *end != '\0' ) throw AppCmdTypeCvtException ( str, "unsigned long" ) ;
+    return res ;
+  }
+};
+
+/**
+ *  Specialization for type unsigned int
+ */
+template<>
+struct AppCmdTypeTraits<unsigned int> {
+  static unsigned int fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+    try {
+      unsigned long res = AppCmdTypeTraits<unsigned long>::fromString( str ) ;
+      // check the range
+      if ( res <= UINT_MAX ) {
+	return (unsigned int)( res ) ;
+      }
+    } catch (AppCmdTypeCvtException& e) {
+    }
+    throw AppCmdTypeCvtException ( str, "unsigned int" ) ;
+  }
+};
+
+/**
+ *  Specialization for type std::string
+ */
+template<>
+struct AppCmdTypeTraits<std::string> {
+  static std::string fromString ( const std::string& str ) throw() {
+    return str ;
+  }
+};
+
+/**
+ *  Specialization for type bool
+ */
+template<>
+struct AppCmdTypeTraits<bool> {
+  static bool fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+    if ( str == "true" || str == "TRUE" || str == "1" || str == "yes" || str == "YES" ) {
+      return true ;
+    } else if ( str == "false" || str == "FALSE" || str == "0" || str == "no" || str == "NO" ) {
+      return false ;
+    } else {
+      throw AppCmdTypeCvtException ( str, "bool" ) ;
+    }
+  }
+};
+
+/**
+ *  Specialization for type double
+ */
+template<>
+struct AppCmdTypeTraits<double> {
+  static double fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+    char* end ;
+    double res = strtod ( str.c_str(), &end ) ;
+    // conversion must consume all characters, otherwise it's not successful
+    if ( *end != '\0' ) throw AppCmdTypeCvtException ( str, "double" ) ;
+    return res ;
+  }
+};
+
+/**
+ *  Specialization for type float
+ */
+template<>
+struct AppCmdTypeTraits<float> {
+  static float fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+    try {
+      double res = AppCmdTypeTraits<double>::fromString( str ) ;
+      // check the range
+      if ( res >= -FLT_MAX && res <= FLT_MAX ) {
+        return float( res ) ;
+      }
+    } catch (AppCmdTypeCvtException& e) {
+    }
+    throw AppCmdTypeCvtException ( str, "float" ) ;
+  }
+};
+
+} // namespace AppUtils
+
+
+#endif  // APPUTILS_APPCMDTYPETRAITS_HH
