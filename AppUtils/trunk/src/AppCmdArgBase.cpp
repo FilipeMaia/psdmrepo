@@ -47,7 +47,7 @@ extern "C" {
 namespace AppUtils {
 
 /// Destructor
-AppCmdArgBase::~AppCmdArgBase( )
+AppCmdArgBase::~AppCmdArgBase( ) throw()
 {
 }
 

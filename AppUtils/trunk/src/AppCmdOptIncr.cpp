@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class AppCmdOptIncrToggle
+//	Class AppCmdOptIncr
 //
 // Environment:
 //	Software developed for the BaBar Detector at the SLAC B-Factory.
@@ -64,8 +64,36 @@ AppCmdOptIncr::AppCmdOptIncr ( char shortOpt,
 {
 }
 
+AppCmdOptIncr::AppCmdOptIncr ( const std::string& longOpt,
+                               const std::string& descr,
+                               int defValue )
+  : AppCmdOptBase()
+  , _shortOpt('\0')
+  , _longOpt(longOpt)
+  , _name("(incr)")
+  , _descr(descr)
+  , _value(defValue)
+  , _defValue(defValue)
+  , _changed(false)
+{
+}
+
+AppCmdOptIncr::AppCmdOptIncr ( char shortOpt,
+                               const std::string& descr,
+                               int defValue )
+  : AppCmdOptBase()
+  , _shortOpt(shortOpt)
+  , _longOpt()
+  , _name("(incr)")
+  , _descr(descr)
+  , _value(defValue)
+  , _defValue(defValue)
+  , _changed(false)
+{
+}
+
 // Destructor
-AppCmdOptIncr::~AppCmdOptIncr( )
+AppCmdOptIncr::~AppCmdOptIncr( ) throw()
 {
 }
 
@@ -74,16 +102,16 @@ AppCmdOptIncr::~AppCmdOptIncr( )
  *  positional arguments.
  */
 bool
-AppCmdOptIncr::hasArgument() const
+AppCmdOptIncr::hasArgument() const throw()
 {
   return false ;
 }
 
 /**
- *  Get the name of the paramater
+ *  Get the name of the parameter
  */
 const std::string&
-AppCmdOptIncr::name() const
+AppCmdOptIncr::name() const throw()
 {
   return _name ;
 }
@@ -92,7 +120,7 @@ AppCmdOptIncr::name() const
  *  Get one-line description
  */
 const std::string&
-AppCmdOptIncr::description() const
+AppCmdOptIncr::description() const throw()
 {
   return _descr ;
 }
@@ -101,7 +129,7 @@ AppCmdOptIncr::description() const
  *  Return short option symbol for -x option
  */
 char
-AppCmdOptIncr::shortOption() const
+AppCmdOptIncr::shortOption() const throw()
 {
   return _shortOpt ;
 }
@@ -110,29 +138,26 @@ AppCmdOptIncr::shortOption() const
  *  Return long option symbol for --xxxxx option
  */
 const std::string&
-AppCmdOptIncr::longOption() const
+AppCmdOptIncr::longOption() const throw()
 {
   return _longOpt ;
 }
 
 /**
  *  Set the value of the argument.
- *
- *  @return The number of consumed words. If it is negative then error has occured.
  */
-bool
-AppCmdOptIncr::setValue ( const std::string& value )
+void
+AppCmdOptIncr::setValue ( const std::string& value ) throw(AppCmdException)
 {
   ++ _value ;
   _changed = true ;
-  return true ;
 }
 
 /**
  *  True if the value of the option was changed from command line.
  */
 bool
-AppCmdOptIncr::valueChanged () const
+AppCmdOptIncr::valueChanged () const throw()
 {
   return _changed ;
 }
@@ -141,7 +166,7 @@ AppCmdOptIncr::valueChanged () const
  *  Return current value of the argument
  */
 int
-AppCmdOptIncr::value() const
+AppCmdOptIncr::value() const throw()
 {
   return _value ;
 }
@@ -150,7 +175,7 @@ AppCmdOptIncr::value() const
  *  reset option to its default value
  */
 void
-AppCmdOptIncr::reset()
+AppCmdOptIncr::reset() throw()
 {
   _value = _defValue ;
   _changed = false ;

@@ -14,7 +14,8 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
-#include <iosfwd>
+#include <iostream>
+#include <stdexcept>
 
 //----------------------
 // Base Class Headers --
@@ -35,11 +36,14 @@
 //
 #define APPUTILS_MAIN(CLASS) \
   int main( int argc, char* argv[] ) \
-  {\
+  try { \
     CLASS app ( argv[0] ) ; \
     return app.run ( argc, argv ) ; \
+  } catch( std::exception& e ) { \
+    std::cerr << "Standard exception caught: " << e.what() << std::endl ; \
+  } catch( ... ) { \
+    std::cerr << "Unknown exception caught" << std::endl ; \
   }
-
 
 //		---------------------
 // 		-- Class Interface --
@@ -78,8 +82,9 @@ protected:
   /**
    *  add command line option or argument, typically called from subclass constructor
    */
-  bool addOption ( AppCmdOptBase& option ) ;
-  bool addArgument ( AppCmdArgBase& arg ) ;
+  void setOptionsFile ( AppCmdOpt<std::string>& option ) ;
+  void addOption ( AppCmdOptBase& option ) ;
+  void addArgument ( AppCmdArgBase& arg ) ;
 
   /**
    *  Method called before runApp, can be overriden in subclasses.
@@ -93,7 +98,7 @@ protected:
   virtual int runApp () = 0 ;
 
   /**
-   *  Method called after runApp, can be overriden in subclasses.
+   *  Method called after runApp, can be overridden in subclasses.
    *  Usually if you override it, call base class method too.
    */
   virtual int postRunApp () ;

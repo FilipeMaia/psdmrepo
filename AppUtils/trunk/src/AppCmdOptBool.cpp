@@ -1,9 +1,9 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+// 	$Id: AppCmdOptBool.cpp 95 2008-11-03 22:50:03Z salnikov $
 //
 // Description:
-//	Class AppCmdOptToggle
+//	Class AppCmdOptBool
 //
 // Environment:
 //	Software developed for the BaBar Detector at the SLAC B-Factory.
@@ -20,7 +20,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "AppUtils/AppCmdOptToggle.h"
+#include "AppUtils/AppCmdOptBool.h"
 
 //-------------
 // C Headers --
@@ -49,14 +49,14 @@ namespace AppUtils {
 /**
  *  Ctor
  */
-AppCmdOptToggle::AppCmdOptToggle ( char shortOpt,
-				   const std::string& longOpt,
-				   const std::string& descr,
-				   bool defValue )
+AppCmdOptBool::AppCmdOptBool ( char shortOpt,
+                               const std::string& longOpt,
+                               const std::string& descr,
+                               bool defValue )
   : AppCmdOptBase()
   , _shortOpt(shortOpt)
   , _longOpt(longOpt)
-  , _name("(toggle)")
+  , _name()
   , _descr(descr)
   , _value(defValue)
   , _defValue(defValue)
@@ -64,13 +64,13 @@ AppCmdOptToggle::AppCmdOptToggle ( char shortOpt,
 {
 }
 
-AppCmdOptToggle::AppCmdOptToggle ( const std::string& longOpt,
-                                   const std::string& descr,
-                                   bool defValue )
+AppCmdOptBool::AppCmdOptBool ( const std::string& longOpt,
+                               const std::string& descr,
+                               bool defValue )
   : AppCmdOptBase()
   , _shortOpt('\0')
   , _longOpt(longOpt)
-  , _name("(toggle)")
+  , _name()
   , _descr(descr)
   , _value(defValue)
   , _defValue(defValue)
@@ -78,13 +78,13 @@ AppCmdOptToggle::AppCmdOptToggle ( const std::string& longOpt,
 {
 }
 
-AppCmdOptToggle::AppCmdOptToggle ( char shortOpt,
-                                   const std::string& descr,
-                                   bool defValue )
+AppCmdOptBool::AppCmdOptBool ( char shortOpt,
+                               const std::string& descr,
+                               bool defValue )
   : AppCmdOptBase()
   , _shortOpt(shortOpt)
   , _longOpt()
-  , _name("(toggle)")
+  , _name()
   , _descr(descr)
   , _value(defValue)
   , _defValue(defValue)
@@ -93,7 +93,7 @@ AppCmdOptToggle::AppCmdOptToggle ( char shortOpt,
 }
 
 // Destructor
-AppCmdOptToggle::~AppCmdOptToggle( ) throw()
+AppCmdOptBool::~AppCmdOptBool( ) throw()
 {
 }
 
@@ -102,7 +102,7 @@ AppCmdOptToggle::~AppCmdOptToggle( ) throw()
  *  positional arguments.
  */
 bool
-AppCmdOptToggle::hasArgument() const throw()
+AppCmdOptBool::hasArgument() const throw()
 {
   return false ;
 }
@@ -111,7 +111,7 @@ AppCmdOptToggle::hasArgument() const throw()
  *  Get the name of the paramater
  */
 const std::string&
-AppCmdOptToggle::name() const throw()
+AppCmdOptBool::name() const throw()
 {
   return _name ;
 }
@@ -120,7 +120,7 @@ AppCmdOptToggle::name() const throw()
  *  Get one-line description
  */
 const std::string&
-AppCmdOptToggle::description() const throw()
+AppCmdOptBool::description() const throw()
 {
   return _descr ;
 }
@@ -129,7 +129,7 @@ AppCmdOptToggle::description() const throw()
  *  Return short option symbol for -x option
  */
 char
-AppCmdOptToggle::shortOption() const throw()
+AppCmdOptBool::shortOption() const throw()
 {
   return _shortOpt ;
 }
@@ -138,7 +138,7 @@ AppCmdOptToggle::shortOption() const throw()
  *  Return long option symbol for --xxxxx option
  */
 const std::string&
-AppCmdOptToggle::longOption() const throw()
+AppCmdOptBool::longOption() const throw()
 {
   return _longOpt ;
 }
@@ -149,9 +149,9 @@ AppCmdOptToggle::longOption() const throw()
  *  @return The number of consumed words. If it is negative then error has occured.
  */
 void
-AppCmdOptToggle::setValue ( const std::string& value ) throw(AppCmdException)
+AppCmdOptBool::setValue ( const std::string& value ) throw(AppCmdException)
 {
-  _value = ! _value ;
+  _value = ! _defValue ;
   _changed = true ;
 }
 
@@ -159,7 +159,7 @@ AppCmdOptToggle::setValue ( const std::string& value ) throw(AppCmdException)
  *  True if the value of the option was changed from command line.
  */
 bool
-AppCmdOptToggle::valueChanged () const throw()
+AppCmdOptBool::valueChanged () const throw()
 {
   return _changed ;
 }
@@ -168,7 +168,7 @@ AppCmdOptToggle::valueChanged () const throw()
  *  Return current value of the argument
  */
 bool
-AppCmdOptToggle::value() const throw()
+AppCmdOptBool::value() const throw()
 {
   return _value ;
 }
@@ -177,7 +177,7 @@ AppCmdOptToggle::value() const throw()
  *  reset option to its default value
  */
 void
-AppCmdOptToggle::reset() throw()
+AppCmdOptBool::reset() throw()
 {
   _value = _defValue ;
   _changed = false ;

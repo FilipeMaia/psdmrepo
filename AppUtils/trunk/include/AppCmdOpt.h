@@ -73,59 +73,71 @@ public:
               const std::string& descr,
               const Type& defValue ) ;
 
+  // option with the long name only
+  AppCmdOpt ( const std::string& longOpt,
+              const std::string& name,
+              const std::string& descr,
+              const Type& defValue ) ;
+
+  // option with the short name only
+  AppCmdOpt ( char shortOpt,
+              const std::string& name,
+              const std::string& descr,
+              const Type& defValue ) ;
+
   /// Destructor
-  virtual ~AppCmdOpt( );
+  virtual ~AppCmdOpt( ) throw() ;
 
   /**
    *  Returns true if option requires argument. Does not make sense for
    *  positional arguments.
    */
-  virtual bool hasArgument() const ;
+  virtual bool hasArgument() const throw() ;
 
   /**
    *  Get the name of the argument, only used if hasArgument() returns true
    */
-  virtual const std::string& name() const ;
+  virtual const std::string& name() const throw() ;
 
   /**
    *  Get one-line description
    */
-  virtual const std::string& description() const ;
+  virtual const std::string& description() const throw() ;
 
   /**
-   *  Return short option symbol for -x option
+   *  Return short option symbol for -x option, or '\0' if no short option
    */
-  virtual char shortOption() const ;
+  virtual char shortOption() const throw() ;
 
   /**
-   *  Return long option symbol for --xxxxx option
+   *  Return long option symbol for --xxxxx option, or empty string
    */
-  virtual const std::string& longOption() const ;
+  virtual const std::string& longOption() const throw() ;
 
   /**
    *  Set option's argument. The value string will be empty if hasArgument() is false
    */
-  virtual bool setValue( const std::string& value ) ;
+  virtual void setValue( const std::string& value ) throw(AppCmdException) ;
 
   /**
    *  True if the value of the option was changed from command line.
    */
-  virtual bool valueChanged() const ;
+  virtual bool valueChanged() const throw() ;
 
   /**
    *  Return current value of the argument
    */
-  virtual const Type& value() const ;
+  virtual const Type& value() const throw() ;
 
   /**
    *  Return default value of the argument
    */
-  const Type& defValue() const { return _defValue ; }
+  const Type& defValue() const throw() { return _defValue ; }
 
   /**
    *  Reset option to its default value
    */
-  virtual void reset() ;
+  virtual void reset() throw() ;
 
 protected:
 

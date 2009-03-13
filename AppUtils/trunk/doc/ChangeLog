@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2009-03-13 Andy Salnikov
+- adding new option class AppCmtoptBool
+- adding the ability to read options from the options file
+- introduce exceptions, many methods now throw exceptions instead of 
+  returning error codes 
+- extended README, looks like ref. manual now
+
 Tag: V00-00-06
 2009-02-05 Andy Salnikov
 - gcc41 found a bug in AppBase.h, assignment op returned object instead

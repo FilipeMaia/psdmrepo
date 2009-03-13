@@ -34,14 +34,18 @@ extern "C" {
 #include <algorithm>
 #include <functional>
 #include <iterator>
+#include <fstream>
 #include <iomanip>
+#include <set>
+#include <boost/lexical_cast.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "MsgLogger/MsgLogger.h"
 #include "AppUtils/AppCmdArgBase.h"
+#include "AppUtils/AppCmdExceptions.h"
 #include "AppUtils/AppCmdOptBase.h"
+#include "AppUtils/AppCmdOpt.h"
 using std::ios;
 using std::ostream;
 using std::setw;
@@ -69,8 +73,6 @@ namespace {
     return optname == "help" ;
   }
 
-
-  const char* logger = "AppUtils.AppCmdLine" ;
 }
 
 
@@ -87,11 +89,11 @@ AppCmdLine::AppCmdLine( const std::string& argv0 )
   : _options()
   , _positionals()
   , _argv0(argv0)
+  , _optionsFile(0)
   , _argv()
   , _helpWanted(false)
   , _iter()
   , _nWordsLeft(0)
-  , _errString()
 {
 }
 
@@ -105,23 +107,20 @@ AppCmdLine::~AppCmdLine( )
  *  only its address is remembered. The lifetime of the argument should extend
  *  to the parse() method of this class.
  */
-bool
-AppCmdLine::addArgument ( AppCmdArgBase& arg )
+void
+AppCmdLine::addArgument ( AppCmdArgBase& arg ) throw(std::exception)
 {
   // check some things first
   if ( ! _positionals.empty() ) {
 
     // cannot add required after non-required
     if ( arg.isRequired() && ! _positionals.back()->isRequired() ) {
-      MsgLog(logger, error, "AppCmdLine::addArgument - cannot add required argument after non-required.\n"
-                    << " - while adding argument '" << arg.name() << "'" ) ;
-      return false ;
+      throw AppCmdArgOrderException ( arg.name() ) ;
     }
   }
 
   _positionals.push_back ( &arg ) ;
 
-  return true ;
 }
 
 /**
@@ -129,53 +128,69 @@ AppCmdLine::addArgument ( AppCmdArgBase& arg )
  *  only its address is remembered. The lifetime of the argument should extend
  *  to the parse() method of this class.
  */
-bool
-AppCmdLine::addOption ( AppCmdOptBase& option )
+void
+AppCmdLine::addOption ( AppCmdOptBase& option ) throw(std::exception)
 {
   // check maybe some wants to redefine help options?
   if ( ::isHelpOption(option.longOption()) ) {
-    MsgLog(logger, error,  "AppCmdLine::addOption: long option '--" << option.longOption() << "' is reserved" ) ;
-    return false ;
+    throw AppCmdOptReservedException ( option.longOption() ) ;
   }
   if ( ::isHelpOption(option.shortOption()) ) {
-    MsgLog(logger, error, "AppCmdLine::addOption: short option '-" << option.shortOption() << "' is reserved" ) ;
-    return false ;
+    throw AppCmdOptReservedException ( option.shortOption() ) ;
   }
 
   // check maybe some wants to duplicate options?
  if ( findLongOpt ( option.longOption() ) ) {
-   MsgLog(logger, error, "AppCmdLine::addOption: long option '--" << option.longOption() << "' already defined" ) ;
-   return false ;
+   throw AppCmdOptDefinedException ( option.longOption() ) ;
  }
  if ( findShortOpt ( option.shortOption() ) ) {
-   MsgLog(logger, error, "AppCmdLine::addOption: short option '-" << option.shortOption() << "' already defined" ) ;
-   return false ;
+   throw AppCmdOptDefinedException ( option.shortOption() ) ;
  }
 
  // fine, remember it
   _options.push_back ( &option ) ;
-  return true ;
+}
+
+/**
+ *  Add option which will specify the name of the options file.
+ *  Only one options file is allowed per parser, attempt to add one
+ *  more will result in exception. The lifetime of the argument should
+ *  extend to the parse() method of this class.
+ */
+void
+AppCmdLine::setOptionsFile ( AppCmdOpt<std::string>& option ) throw(std::exception)
+{
+  // second attempt will fail
+  if ( _optionsFile ) {
+    throw AppCmdException ( "options file option already defined, cannot re-define" ) ;
+  }
+
+  // define a regular option
+  addOption ( option ) ;
+
+  // remember it
+  _optionsFile = &option ;
 }
 
 /**
  *  Parse function examines command line and sets the corresponding arguments.
  *  If it returns false then you should not expect anything, just exit.
  */
-bool
-AppCmdLine::parse ( int argc, char* argv[] )
+void
+AppCmdLine::parse ( int argc, char* argv[] ) throw(std::exception)
 {
   _argv.clear() ;
   std::copy ( argv+1, argv+argc, std::back_inserter( _argv ) ) ;
 
-  return doParse() ;
+  doParse() ;
 }
-bool
-AppCmdLine::parse ( int argc, const char* argv[] )
+void
+AppCmdLine::parse ( int argc, const char* argv[] ) throw(std::exception)
 {
   _argv.clear() ;
   std::copy ( argv+1, argv+argc, std::back_inserter( _argv ) ) ;
 
-  return doParse() ;
+  doParse() ;
 }
 
 /**
@@ -184,7 +199,7 @@ AppCmdLine::parse ( int argc, const char* argv[] )
  *  if the help option is given then parse() stops without checking anything else.
  */
 bool
-AppCmdLine::helpWanted() const
+AppCmdLine::helpWanted() const throw()
 {
   return _helpWanted ;
 }
@@ -213,21 +228,37 @@ AppCmdLine::usage ( ostream& out ) const
 
   if ( ! _options.empty() ) {
 
-    size_t longLen = 7 ;
+    size_t optLen = 12 ; // strlen("-h|-?|--help")
     size_t nameLen = 0 ;
     for ( OptionsList::const_iterator it = _options.begin() ; it != _options.end() ; ++ it ) {
-      size_t thisLongLen = (*it)->longOption().size() ;
+      size_t moptLen = 0 ;
+      if ( (*it)->shortOption() != '\0' ) {
+        moptLen += 2 ; // '-x'
+        if ( not (*it)->longOption().empty() ) moptLen += 1 ; // '|'
+      }
+      if ( not (*it)->longOption().empty() ) {
+        moptLen += 2 + (*it)->longOption().size() ; // '|'
+      }
       size_t thisNameLen = (*it)->name().size() ;
-      if ( longLen < thisLongLen ) longLen = thisLongLen ;
+      if ( optLen < moptLen ) optLen = moptLen ;
       if ( nameLen < thisNameLen ) nameLen = thisNameLen ;
     }
 
     out << "  Available options:\n" ;
-    out << "    {-h|-?" << setw(longLen) << "|--help" << "} "
+    out << "    {" << setw(optLen) << "-h|-?|--help" << "} "
 	<< setw(nameLen) << "" << "  print help message\n" ;
     for ( OptionsList::const_iterator it = _options.begin() ; it != _options.end() ; ++ it ) {
-      out << "    {-" << (*it)->shortOption() << "|--"
-          << setw(longLen) << (*it)->longOption().c_str() << "} "
+      std::string fopt ;
+      if ( (*it)->shortOption() != '\0' ) {
+        fopt = "-" ;
+        fopt += (*it)->shortOption() ;
+        if ( not (*it)->longOption().empty() ) fopt += '|' ;
+      }
+      if ( not (*it)->longOption().empty() ) {
+        fopt += "--" ;
+        fopt += (*it)->longOption() ;
+      }
+      out << "    {" << setw(optLen) << fopt.c_str() << "} "
 	  << setw(nameLen) << (*it)->name().c_str() << "  "
 	  << (*it)->description() << '\n' ;
     }
@@ -249,28 +280,31 @@ AppCmdLine::usage ( ostream& out ) const
 }
 
 /// real parsing happens in this method
-bool
-AppCmdLine::doParse()
+void
+AppCmdLine::doParse() throw(std::exception)
 {
-  _errString = "" ;
   _helpWanted = 0 ;
 
   // reset all options and arguments to their default values
   std::for_each ( _options.begin(), _options.end(), std::mem_fun(&AppCmdOptBase::reset) ) ;
   std::for_each ( _positionals.begin(), _positionals.end(), std::mem_fun(&AppCmdArgBase::reset) ) ;
 
-  if ( ! parseOptions() ) {
-    return false ;
-  }
+  // get options from command line
+  parseOptions() ;
   if ( _helpWanted ) {
-    return true ;
+    return ;
   }
-  return parseArgs() ;
+
+  // get options from an options file if any
+  parseOptionsFile() ;
+
+  // get remaining args
+  parseArgs() ;
 }
 
 /// parse options
-bool
-AppCmdLine::parseOptions()
+void
+AppCmdLine::parseOptions() throw(std::exception)
 {
   _iter = _argv.begin() ;
   _nWordsLeft = _argv.size() ;
@@ -297,9 +331,7 @@ AppCmdLine::parseOptions()
       // find option with this long name
       AppCmdOptBase* option = findLongOpt ( optname ) ;
       if ( ! option ) {
-        _errString = "unknown option: --" ;
-        _errString += optname ;
-	return false ;
+        throw AppCmdOptUnknownException ( optname ) ;
       }
 
       // option argument value (only for options with arguments)
@@ -316,29 +348,21 @@ AppCmdLine::parseOptions()
 	}
       }
 
-      // now give it to option
-      if ( ! option->setValue ( value ) ) {
-        _errString = "option --" ;
-        _errString += optname ;
-        _errString += " does not accept value " ;
-        _errString += value ;
-        return false ;
-      }
+      // now give it to option, this may throw
+      option->setValue ( value ) ;
 
     } else if ( word.size() > 1 && word[0] == '-' ) {
 
       // should be short option
       if ( ::isHelpOption(word[1]) ) {
 	_helpWanted = true ;
-	return true ;
+	return ;
       }
 
       // find option with this short name
       AppCmdOptBase* option = findShortOpt ( word[1] ) ;
       if ( ! option ) {
-        _errString = "unknown option: -" ;
-        _errString += word[1] ;
-	return false ;
+        throw AppCmdOptUnknownException( word[1] ) ;
       }
 
       if ( option->hasArgument() ) {
@@ -352,49 +376,32 @@ AppCmdLine::parseOptions()
 	} else {
 	  value = std::string ( word, 2 ) ;
 	}
-        if ( ! option->setValue ( value ) ) {
-          _errString = "option -" ;
-          _errString += option->shortOption() ;
-          _errString += " does not accept value " ;
-          _errString += value ;
-          return false ;
-        }
+	// this may throw
+        option->setValue ( value ) ;
 
       } else {
 
 	// option without argument, but the word may be collection of options, like -vvqs
 
-        if ( ! option->setValue ( "" ) ) {
-          _errString = "option -" ;
-          _errString += option->shortOption() ;
-          _errString += " cannot be set" ;
-          return false ;
-        }
+        // this may throw (but should not)
+        option->setValue ( "" ) ;
 	for ( size_t i = 2 ; i < word.size() ; ++ i ) {
 	  if ( ::isHelpOption(word[i]) ) {
 	    _helpWanted = true ;
-	    return true ;
+	    return ;
 	  }
 	  AppCmdOptBase* option = findShortOpt ( word[i] ) ;
 	  if ( ! option ) {
-            _errString = "unknown option: -" ;
-            _errString += word[i] ;
-	    return false ;
+	    throw AppCmdOptUnknownException ( word[i] ) ;
 	  }
 	  if ( option->hasArgument() ) {
 	    // do not allow mixture
-            _errString = "option with argument (-";
-            _errString += option->shortOption() ;
-            _errString += ") cannot be mixed with other options: " ;
-            _errString += word ;
-	    return false ;
+	    throw AppCmdException ( std::string("option with argument (-") +
+	        std::string(1,option->shortOption()) +
+                ") cannot be mixed with other options: " + word ) ;
 	  }
-          if ( ! option->setValue ( "" ) ) {
-            _errString = "option -" ;
-            _errString += option->shortOption() ;
-            _errString += " cannot be set" ;
-            return false ;
-          }
+	  // this may throw (but should not)
+          option->setValue ( "" ) ;
 	}
 
       }
@@ -413,12 +420,109 @@ AppCmdLine::parseOptions()
 
   }
 
-  return true ;
+}
+
+/// parse options file
+void
+AppCmdLine::parseOptionsFile() throw(std::exception)
+{
+  if ( not _optionsFile ) return ;
+
+  // find the name of the options file
+  std::string optFile = _optionsFile->value() ;
+  if ( optFile.empty() ) {
+    // no file name given
+    return ;
+  }
+
+  // build the list of options that were modified on the command line,
+  // we do not want to change these again
+  std::set<std::string> changedOptions ;
+  for ( OptionsList::const_iterator it = _options.begin() ; it != _options.end() ; ++ it ) {
+    if ( (*it)->valueChanged() ) {
+      changedOptions.insert ( (*it)->longOption() ) ;
+    }
+  }
+
+  // open the file
+  std::ifstream istream ( optFile.c_str() ) ;
+  if ( not istream ) {
+    // failed to open file
+    throw AppCmdException ( "failed to open options file: " + optFile ) ;
+  }
+
+  // read all the lines from the file
+  std::string line ;
+  unsigned int nlines = 0 ;
+  while ( std::getline ( istream, line ) ) {
+    nlines ++ ;
+
+    // skip comments
+    std::string::size_type fchar = line.find_first_not_of(" \t") ;
+    if ( fchar == std::string::npos ) {
+      // empty line
+      //std::cout << "line " << nlines << ": empty\n" ;
+      continue ;
+    } else if ( line[fchar] == '#' ) {
+      // comment
+      //std::cout << "line " << nlines << ": comment\n" ;
+      continue ;
+    }
+
+    // get option name
+    std::string::size_type optend = line.find_first_of( " \t=", fchar ) ;
+    std::string optname ( line, fchar, optend ) ;
+
+    // find option with this long name
+    AppCmdOptBase* option = findLongOpt ( optname ) ;
+    if ( ! option ) {
+      throw AppCmdException ( "Error parsing options file: option '" + optname + "' is unknown" ) ;
+    }
+
+    // if it was changed on command line do not change it again
+    if ( changedOptions.find(optname) != changedOptions.end() ) {
+      continue ;
+    }
+
+    //std::cout << "line " << nlines << ": option '" << optname << "'\n" ;
+
+    // get option value if any
+    std::string optval ;
+    if ( optend != std::string::npos ) {
+      std::string::size_type pos1 = line.find( '=', optend ) ;
+      //std::cout << "line " << nlines << ": pos1 = " << pos1 << "\n" ;
+      if ( pos1 != std::string::npos ) {
+        pos1 = line.find_first_not_of(" \t",pos1+1) ;
+        //std::cout << "line " << nlines << ": pos1 = " << pos1 << "\n" ;
+        if ( pos1 != std::string::npos ) {
+          std::string::size_type pos2 = line.find_last_not_of( " \t" ) ;
+          //std::cout << "line " << nlines << ": pos2 = " << pos2 << "\n" ;
+          if ( pos2 != std::string::npos ) {
+            optval = std::string ( line, pos1, pos2-pos1+1 ) ;
+          } else {
+            optval = std::string ( line, pos1 ) ;
+          }
+          //std::cout << "line " << nlines << ": value '" << optval << "'\n" ;
+        }
+      }
+
+    }
+
+    // set the option
+    option->setValue ( optval ) ;
+    //std::cout << "line " << nlines << ": '" << optname << "' = '" << optval << "'\n" ;
+
+  }
+
+  // check the status of the file, must be at EOF
+  if ( not istream.eof() ) {
+    throw AppCmdException ( "failure when reading options file, at or around line " + boost::lexical_cast<std::string>(nlines) ) ;
+  }
 }
 
 /// parse arguments
-bool
-AppCmdLine::parseArgs()
+void
+AppCmdLine::parseArgs() throw(std::exception)
 {
   int nPosLeft = _positionals.size() ;
   for ( PositionalsList::const_iterator it = _positionals.begin() ;
@@ -432,9 +536,9 @@ AppCmdLine::parseArgs()
       // no data left
       bool ok = ! (*it)->isRequired() ;
       if ( ! ok ) {
-        _errString = "missing positional required argument(s)" ;
+        throw AppCmdException ( "missing positional required argument(s)" ) ;
       }
-      return ok ;
+      return ;
     }
 
     // determine how many words we could give to next argument
@@ -443,22 +547,15 @@ AppCmdLine::parseArgs()
       // but can get more
       if ( _nWordsLeft <= nPosLeft ) {
 	// too few words left
-        _errString = "missing positional required argument(s)" ;
-	return false ;
+        throw AppCmdException ( "missing positional required argument(s)" ) ;
       }
       nWordsToGive = _nWordsLeft - nPosLeft ;
     }
 
     StringList::const_iterator w_end = _iter ;
     std::advance ( w_end, nWordsToGive ) ;
+    // this can throw
     int consumed = (*it)->setValue ( _iter, w_end ) ;
-    if ( consumed <= 0 ) {
-      // could not parse it
-      _errString = "positional argument " ;
-      _errString += (*it)->name() ;
-      _errString += " does not accept value" ;
-      return false ;
-    }
     std::advance ( _iter, consumed ) ;
     _nWordsLeft -= consumed ;
 
@@ -466,16 +563,14 @@ AppCmdLine::parseArgs()
 
   if ( _iter != _argv.end() ) {
     // not whole line is consumed
-    _errString = "command line is too long" ;
-    return false ;
+    throw AppCmdException ( "command line is too long" ) ;
   }
 
-  return true ;
 }
 
 /// find option with the long name
 AppCmdOptBase*
-AppCmdLine::findLongOpt ( const std::string& opt ) const
+AppCmdLine::findLongOpt ( const std::string& opt ) const throw()
 {
   for ( OptionsList::const_iterator it = _options.begin() ; it != _options.end() ; ++ it ) {
     if ( (*it)->longOption() == opt ) {
@@ -487,7 +582,7 @@ AppCmdLine::findLongOpt ( const std::string& opt ) const
 
 /// find option with the short name
 AppCmdOptBase*
-AppCmdLine::findShortOpt ( char opt ) const
+AppCmdLine::findShortOpt ( char opt ) const throw()
 {
   for ( OptionsList::const_iterator it = _options.begin() ; it != _options.end() ; ++ it ) {
     if ( (*it)->shortOption() == opt ) {

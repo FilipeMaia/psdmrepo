@@ -76,67 +76,77 @@ public:
                   const std::string& name,
                   const std::string& descr,
                   char separator = ',' ) ;
+  // make option with long name only
+  AppCmdOptList ( const std::string& longOpt,
+                  const std::string& name,
+                  const std::string& descr,
+                  char separator = ',' ) ;
+  // make option with short name only
+  AppCmdOptList ( char shortOpt,
+                  const std::string& name,
+                  const std::string& descr,
+                  char separator = ',' ) ;
 
   /// Destructor
-  virtual ~AppCmdOptList( );
+  virtual ~AppCmdOptList( ) throw() ;
 
   /**
    *  Returns true if option requires argument. Does not make sense for
    *  positional arguments.
    */
-  virtual bool hasArgument() const ;
+  virtual bool hasArgument() const throw() ;
 
   /**
    *  Get the name of the argument, only used if hasArgument() returns true
    */
-  virtual const std::string& name() const ;
+  virtual const std::string& name() const throw() ;
 
   /**
    *  Get one-line description
    */
-  virtual const std::string& description() const ;
+  virtual const std::string& description() const throw() ;
 
   /**
-   *  Return short option symbol for -x option
+   *  Return short option symbol for -x option, or '\0' if no short option
    */
-  virtual char shortOption() const ;
+  virtual char shortOption() const throw() ;
 
   /**
-   *  Return long option symbol for --xxxxx option
+   *  Return long option symbol for --xxxxx option, or empty string
    */
-  virtual const std::string& longOption() const ;
+  virtual const std::string& longOption() const throw() ;
 
   /**
    *  Set option's argument. The value string will be empty if hasArgument() is false
    */
-  virtual bool setValue( const std::string& value ) ;
+  virtual void setValue( const std::string& value ) throw(AppCmdException) ;
 
   /**
    *  True if the value of the option was changed from command line.
    */
-  virtual bool valueChanged() const ;
+  virtual bool valueChanged() const throw() ;
 
   /**
    *  Return iterator to the begin/end of sequence
    */
-  virtual const_iterator begin() const ;
-  virtual const_iterator end() const ;
+  virtual const_iterator begin() const throw() ;
+  virtual const_iterator end() const throw() ;
 
   /**
    *  Other usual container stuff
    */
-  size_type size() const { return _value.size() ; }
-  bool empty() const { return _value.empty() ; }
+  size_type size() const throw() { return _value.size() ; }
+  bool empty() const throw() { return _value.empty() ; }
 
   /**
    *  Clear the collected values
    */
-  virtual void clear() ;
+  virtual void clear() throw() ;
 
   /**
    *  Reset option to its default value, clear changed flag
    */
-  virtual void reset() ;
+  virtual void reset() throw() ;
 
 protected:
 

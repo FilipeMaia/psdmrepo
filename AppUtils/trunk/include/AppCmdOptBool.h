@@ -1,5 +1,5 @@
-#ifndef APPUTILS_APPCMDOPTTOGGLE_HH
-#define APPUTILS_APPCMDOPTTOGGLE_HH
+#ifndef APPUTILS_APPCMDOPTBOOL_HH
+#define APPUTILS_APPCMDOPTBOOL_HH
 
 //--------------------------------------------------------------------------
 //
@@ -52,14 +52,14 @@ extern "C" {
  *
  *  @see AppCmdOpt
  *
- *  @version $Id$
+ *  @version $Id: AppCmdOptBool.h 95 2008-11-03 22:50:03Z salnikov $
  *
  *  @author Andy Salnikov	(originator)
  */
 
 namespace AppUtils {
 
-class AppCmdOptToggle : public AppCmdOptBase {
+class AppCmdOptBool : public AppCmdOptBase {
 
 public:
 
@@ -71,21 +71,21 @@ public:
    *  @param descr     description, one-line string
    *  @param defValue  initial value of the option
    */
-  AppCmdOptToggle ( char shortOpt,
-                    const std::string& longOpt,
-                    const std::string& descr,
-                    bool defValue = false ) ;
+  AppCmdOptBool ( char shortOpt,
+                  const std::string& longOpt,
+                  const std::string& descr,
+                  bool defValue = false ) ;
   // make option with long name only
-  AppCmdOptToggle ( const std::string& longOpt,
-                    const std::string& descr,
-                    bool defValue = false ) ;
+  AppCmdOptBool ( const std::string& longOpt,
+                  const std::string& descr,
+                  bool defValue = false ) ;
   // make option with short name only
-  AppCmdOptToggle ( char shortOpt,
-                    const std::string& descr,
-                    bool defValue = false ) ;
+  AppCmdOptBool ( char shortOpt,
+                  const std::string& descr,
+                  bool defValue = false ) ;
 
   /// Destructor
-  virtual ~AppCmdOptToggle( ) throw();
+  virtual ~AppCmdOptBool( ) throw();
 
   /**
    *  Returns true if option requires argument. Does not make sense for
@@ -157,11 +157,11 @@ private:
 
   // Note: if your class needs a copy constructor or an assignment operator,
   //  make one of the following public and implement it.
-  AppCmdOptToggle( const AppCmdOptToggle& );                // Copy Constructor
-  AppCmdOptToggle& operator= ( const AppCmdOptToggle& );    // Assignment op
+  AppCmdOptBool( const AppCmdOptBool& );                // Copy Constructor
+  AppCmdOptBool& operator= ( const AppCmdOptBool& );    // Assignment op
 
 };
 
 } // namespace AppUtils
 
-#endif // APPUTILS_APPCMDOPTTOGGLE_HH
+#endif // APPUTILS_APPCMDOPTBOOL_HH

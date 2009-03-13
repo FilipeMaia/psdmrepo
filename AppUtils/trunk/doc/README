@@ -15,26 +15,437 @@ AppUtils package contains a bunch of classes which should simplify writing
 of the command-line applications. Much of this stuff was ported from BaBar 
 (and somewhat improved).
 
-Detailed description:
-=====================
-
 There are two categories of classes in this package: AppBase (single class 
 in its own category) and AppCmd* classes. AppCmd* classes are for the 
-command-line parsing, they are virtually unchanged from BaBar, and it's
-better to consult the original BaBar description of this classes in the file 
-README.SysUtils.
+command-line parsing, they are almost unchanged from BaBar.
+
+Command line parser
+===================
+
+AppCmd* classes provide advanced facilities for parsing command-line 
+options and options files. Main entity in the hierarchy is AppCmdLine
+class which is used to register all acceptable options and arguments
+and to parse the command line. Other classes represent different types 
+of options and arguments that AppCmdLine can accept.
+
+General remarks
+---------------
+
+This package assumes that the typical application accepts on a command 
+line a list of options optionally followed by literal '--' (double-dash)
+followed by positional arguments. The order of options is not defined, 
+and every option is identified by the name. Options typically have a 
+short 1-character name, or long name, or both. Options with arguments 
+can be specified on command line as:
+
+  -o <value>
+  -o<value>
+  --long-name=<value>
+  
+Options without argument can be specified similarly as:
+
+  -o
+  --long-name
+  
+Several short 1-character options can also be merger on command line 
+in one word:
+
+  -vvv  =  -v -v -v
+
+In addition to the command line application can also read options from
+a special options file using the same option names.
+
+Meaning of positional parameters depends on their position (order). Some
+positional parameters can be optional and have default values. Positional
+parameter can accept either a single word or a list of words.
+
+Class AppCmdLine
+----------------
+
+Typical usage of this class:
+
+  1. instantiate an object of this class
+  2. call addOption() zero or more times to define options
+  3. call addArgument() zero or more times to define positional 
+     (required) arguments
+  4. optionally call setOptionsFile() to define additional file with 
+     optional parameters
+  5. call parse() method to parse the command line and options file and 
+     set the value of all parameters
+
+       
+Here is the brief description of every method of AppCmdLine.
+
+Method AppCmdLine::addArgument
+------------------------------
+
+Declaration:
+
+    void addArgument ( AppCmdArgBase& arg )
+
+Adds one more positional argument. The argument object supplied is not 
+copied, only its address is remembered. The lifetime of the argument 
+should extend to the parse() method of this class. This method throws 
+an exception in case of errors (for example when required argument is
+defined after optional arguments). The order of the positional arguments
+on the command line is determined by the order in which addArgument() 
+is called.  
+
+Method AppCmdLine::addOption
+----------------------------
+
+Declaration:
+
+    void addOption ( AppCmdOptBase& option )
+
+Adds one more command option. The option object supplied is not copied,
+only its address is remembered. The lifetime of the argument should 
+extend to the parse() method of this class. This method throws 
+an exception in case of errors (for example if the option name is 
+defined twice).
+
+Method AppCmdLine::setOptionsFile
+---------------------------------
+
+Declaration:
+
+    void setOptionsFile ( AppCmdOpt<std::string>& option )
+    
+Defines an option which will specify the name of the options file.
+Only one options file is allowed per parser, attempt to add one
+more will result in exception. The lifetime of the argument should
+extend to the parse() method of this class. When the option value 
+is non empty, either as set on command line or through default value,
+then parse() function in addition to parsing all command line parameters
+will also read options file whose name is given by this option. See 
+below for the description of the options file.
+ 
+Method AppCmdLine::parse
+------------------------
+
+Declaration:
+
+    void parse ( int argc, char* argv[] ) ;
+    void parse ( int argc, const char* argv[] ) ;
+    template <typename Iter>
+      void parse ( Iter begin, Iter end ) ;
+
+Parse function examines command line and options file and sets 
+corresponding arguments and options. There are few overloaded versions
+of the method accepting different form of "command line". Will throw
+and exception in case of the parsing errors.
+
+Method AppCmdLine::helpWanted
+-----------------------------
+
+This method will return true after parse() if the help option has 
+appeared on the command line. It's user's responsibility to take 
+corresponding action in this case. Usually something like this will
+appear in your application:
+
+   // parse command line, set all options and arguments
+   try {
+     cmdline.parse ( argc, argv ) ;
+   } catch ( std::exception& exc ) {
+     cerr << "Error parsing command line: " << exc.what() << endl ;
+     exit(2) ; // exit() may not be good idea, for illustration only here
+   }
+   if ( cmdline.helpWanted() ) {
+     cmdline.usage( cout ) ;
+     exit(0) ; // exit() may not be good idea, for illustration only here
+   }
+
+Method AppCmdLine::usage
+------------------------
+
+This method produces a usage summary on the specified stream. Usually
+used in the combination with the helpWanted() as in the example above. 
+
+Class CmdArgBase
+----------------
+
+This is the abstract base class for all classes representing positional 
+arguments. It cannot be used directly but it defines methods common 
+for all inheriting classes. For users one method may be of the interest:
+
+  bool valueChanged() ;
+  
+which returns true if the value of the argument was changed on the 
+command line. This may be useful for optional arguments which provide 
+default value, and changed in this context means that the argument 
+appeared on the command line, even if its value on the command line 
+was the same as default value.    
+
+Class CmdArg<T>
+--------------- 
+
+This class represents a positional argument of a specific type. Type can 
+be one of supported in AppCmdTypeTraits. Currently supported types are: 
+std::string, int, long, unsigned int, unsigned long, bool, char, float, 
+double. Integer types are converted from string using strto(u)l with zero 
+base, this means you can specify it using decimal, octal or hex notation 
+(0 or 0x prefixes). For bool type the words "true", "TRUE", "1", "yes, and 
+"YES" all give true, the words "false", "FALSE", "0", "no", and "NO" all 
+give false, anything else is an error.
+
+The argument made with this class can be required or non-required 
+depending on which constructor you use. Constructor
+
+  AppCmdArg<T> ( string name, string description )
+
+is used to make required arguments, constructor
+
+  AppCmdArg<T> ( string name, string description, T defValue )
+
+is used to make optional arguments with a default value.
+
+To get the current value of the argument use the 
+
+  T value() const ;
+  
+member function.
+
+Class CmdArgList<T>
+-------------------
+
+This class can take more than one word from the command line and make a 
+list of values from them. It behaves more or less the same as the above 
+class, but to get the results from it you should use begin() and end() 
+member functions which return iterators for the list of values.
+
+Constructor
+
+  AppCmdArgList<T> ( string name, string description )
+
+makes a required positional argument for which there must be at least
+one argument on the command line. Constructor
+
+  AppCmdArgList<T> ( string name, string& description, list<T> defVal )
+
+makes a non-required argument with some default value.
+
+Class CmdOptBase
+----------------
+
+This is the abstract base class for all classes representing options.
+It cannot be used directly but it defines methods common for all 
+inheriting classes. For users one method may be of the interest:
+
+  bool valueChanged() ;
+  
+which returns true if the option was set/changed on the command line
+or in options file. Changed in this context means that the option 
+appeared on the command line, even if its value on the command line 
+was the same as default value.
+
+Class AppCmdOptBool
+-------------------
+
+This class represents a command line option without argument. The option 
+has boolean value which will change its value from its initial value
+when the option appears on the command line. More than one occurrence 
+of the option does not have any additional effect and is equivalent to
+just single occurrence.
+
+Current value of the option (true or false) after parse() can be 
+obtained through the value() member function.
+
+These constructors are defined for the class:
+
+  // make option with both short and long names
+  AppCmdOptToggle(char shortName, string longName, string description, bool defValue=false)
+  // make option with long name only
+  AppCmdOptToggle(string longName, string description, bool defValue=false)
+  // make option with short name only
+  AppCmdOptToggle(char shortName, string description, bool defValue=false)
+
+Class AppCmdOptToggle
+---------------------
+
+This class represents a command line option without argument. The option 
+has boolean value which will change its value for every appearance of the 
+option in the command line. Current value of the option (true or false) 
+after parse() can be obtained through the value() member function.
+
+These constructors are defined for the class:
+
+  // make option with both short and long names
+  AppCmdOptToggle(char shortName, string longName, string description, bool defValue=false)
+  // make option with long name only
+  AppCmdOptToggle(string longName, string description, bool defValue=false)
+  // make option with short name only
+  AppCmdOptToggle(char shortName, string description, bool defValue=false)
+
+Class AppCmdOptIncr
+-------------------
+
+This class represents a command line option without argument. Every 
+appearance of the option on the command line will increment the current 
+value of the option, value has an int type, and you can set its starting 
+value in constructor. Current value of the option after parse() can be 
+obtained through the value() member function.
+
+These constructors are defined for the class:
+
+  // make option with both short and long names
+  AppCmdOptIncr(char shortName, string& longName, string description, int defValue=0)
+  // option with the long name only
+  AppCmdOptIncr (string longName, string description, int defValue=0)
+  // option with the short name only
+  AppCmdOptIncr(char shortName, string description, int defValue=0)
+
+Class AptCmdOpt<T>
+------------------
+
+This class defines a command line option with argument. This is a 
+template class parameterized by the type of the argument. See the 
+description of the OptCmdArg class for information on which types can 
+be used. Current value of the option after parse() can be obtained 
+through the value() member function.
+
+These constructors are defined for the class (parameter argName provides
+a name for the argument, such as "path" or "number", used for displaying
+usage information):
+
+  // make option with both short and long names
+  AppCmdOpt<T>(char shortName, string& longName, string argName, 
+               string description, T defValue)
+  // option with the long name only
+  AppCmdOpt<T>(string longName, string argName, string description, T defValue)
+  // option with the short name only
+  AppCmdOpt<T>(char shortName, string argName, string description, T defValue)
+
+Class AptCmdOptList<T>
+----------------------
+
+This class makes a list of values from the command line options. Every 
+appearance of the option on the command line adds its argument to the 
+list of values in the option of this class. Additionally argument itself 
+is split into the words using the separator defined in the constructor, 
+default value of separator is ','. In this example:
+
+  cmd -l a -l b -l c,d,e
+  
+if the option class for -l is AptCmdOptList<std::string> then its value
+after parse() will contain 5 strings {"a","b","c","d","e"}. Set separator
+to a NUL char to avoid splitting of individual arguments.   
+
+Types supported are the same as in the previous class. Methods begin() 
+and end() return results like in the AppCmdArgList class.
+
+These constructors are defined for the class (parameter argName has the 
+same meaning as in the previous class):
+
+  // make option with both short and long names
+  AppCmdOptList<T>(char shortName, string longName, string argName,
+                  string description, char separator=',') ;
+  // make option with long name only
+  AppCmdOptList<T>(string longName, string argName,
+                  string description, char separator=',')
+  // make option with short name only
+  AppCmdOptList<T>(char shortName, string argName,
+                  string description, char separator=',')
+
+Class AptCmdOptNamedValue<T>
+----------------------------
+
+This option class provides mapping from the names appearing on the 
+command line to the values of some other type. Useful when the option
+can accept a set of predefined strings but in the application needs
+to transform them into a set of numbers for example. The mapping from
+possible set of names to values of other type is defined through the 
+method 
+
+  void add ( string name, T value )
+  
+which has to be called once for every acceptable name, like in this 
+example:
+
+  AptCmdOptNamedValue<unsigned int> colorOpt(...) ;
+  option.add ( "black", 0x000000 ) ;
+  option.add ( "red", 0xFF0000 ) ;
+  option.add ( "green", 0x00FF00 ) ;
+  option.add ( "blue", 0x0000FF ) ;
+
+Current value of the option after parse() can be obtained through 
+the value() member function.
+
+These constructors are defined for the class (parameter argName has the 
+same meaning as in the previous class):
+
+  // make option with both short and long names
+  AppCmdOptNamedValue<T>(char shortName, string longName, string argName,
+                        string description, T defValue ) ;
+  // make option with long name only
+  AppCmdOptNamedValue<T>(string longName, string argName,
+                        string description, T defValue ) ;
+  // make option with short name only
+  AppCmdOptNamedValue<T>(char shortName, string argName,
+                        string description, T defValue ) ;
+
+
+Options file
+------------
+
+In addition to providing all the options on the command line the same 
+options can be defined in the options file. this can be useful when 
+the options list becomes very long or if you want to keep predefined 
+set of options for standard situations. For option parser to read an
+option file one has to call parser's method setOptionsFile() and
+pass it an option which will be used to define the name of the 
+options file. Here are examples:
+
+  // provide options file, but do not set default name for it,
+  // user will provide file name on the command line like
+  // '-o myoptions.cfg' or '--options-file=myoptions.cfg' 
+  AppCmdLine parser( argv[0] ) ;
+  AppCmdOpt<std::string> optOptionsFile('o',"options-file","path",
+                         "name of the options file","") ;
+  parser.setOptionsFile(optOptionsFile) ;
+  
+  // provide options file, and set default name for it (appoptions.cfg),
+  // user can override file name on the command line like
+  // '-o myoptions.cfg' or '--options-file=myoptions.cfg' 
+  AppCmdLine parser( argv[0] ) ;
+  AppCmdOpt<std::string> optOptionsFile('o',"options-file","path",
+                         "name of the options file","appoptions.cfg") ;
+  parser.setOptionsFile(optOptionsFile) ;
+
+The options file consists of the series of lines, with one option per 
+line. Empty lines and lines starting with '#' (comments) are ignored. 
+Acceptable format for the option lines is:
+
+  1. option-long-name = value
+  2. option-long-name =
+  3. option-long-name
+
+Only the long names for the options can be accepted in the options file.
+The value string can contain anything, everything from the first 
+non-blank character to the last non-blank character is passed to the 
+parser as the option's value. Formats 1 and 2 can be used for options 
+with argument to set the argument to some value or empty string (or in 
+case of AptCmdOptList to add value or empty string). Formats 2 and 3
+can be used to set options without parameters.
+
+The options file is read after all command line options are parsed 
+already. The options that were set on the command line are not changed 
+from the content of the options file (command line overrides options
+file).
+
+Application class (AppBase)
+===========================
 
 AppBase class is a base class for building command-line applications. It 
 solves two standard problems which appear in almost every command-line 
 application - command line parsing and logging/debugging.
 
 The real applications built from this class needs to be customized, 
-customization is performed through the inheritance and override of few 
+customization is performed through the inheritance and overriding of few 
 methods of the base class. Most of the time only the single method called 
 runApp() needs to be implemented, in addition to the setup code in the 
-subclass' constructor. Additionally the code which runs the whole application 
-needs to be added to the source file, so in general, the code will look 
-like this:
+subclass' constructor. Additionally the code which runs the whole 
+application needs to be added to the source file, so in general, the 
+code will look like this:
 
 #include "AppUtils/AppBase.h"
 
@@ -67,11 +478,12 @@ The AppBase class does two things before it calls subclass' runApp() method:
 - message logging setup
 
 For the command line parsing it uses AppCmd* classes. The subclass can add 
-more command line options and arguments using the methods addOption() and 
-addArgument(), this should be done in the constructor of the subclass. The
-options and arguments themselves are the instances of the AppCmtOpt* and 
-AppCmdArg* classes and they should be made data members of the application
-class. See example below for the use of the command-line options/arguments.
+more command line options and arguments using the methods addOption(), 
+addArgument(), and setOptionsFile(), this should be done in the constructor 
+of the subclass. The options and arguments themselves are the instances of 
+the AppCmtOpt* and AppCmdArg* classes and they should be made data members 
+of the application class. See example below for the use of the command-line 
+options/arguments.
 
 For the message logging (error reporting and debugging) the applications are 
 supposed to use facilities (macros) from MsgLogger package. The base class 
@@ -87,7 +499,7 @@ the different combinations of the options and resulting logging level:
   -v              trace
   -q              warning
   -q -q (or -qq)  error
-  -vvvv (= -vv)   debug
+  -vv (or -v -v)  debug
   -v -q           info
 
 The exact formatting of the messages depends on the level of the message
@@ -107,7 +519,7 @@ the AppUtils classes:
 
 #include "AppUtils/AppBase.h"
 #include "AppUtils/AppCmdOpt.h"
-#include "AppUtils/AppCmdOptIncr.h"
+#include "AppUtils/AppCmdOptBool.h"
 #include "AppUtils/AppCmdArgList.h"
 #include "MsgLogger/MsgLogger.h"
 
@@ -121,14 +533,14 @@ protected:
   int runApp() ;
 
 private :
-  AppUtils::AppCmdOptIncr m_noEcho ;
+  AppUtils::AppCmdOptBool m_noEcho ;
   AppUtils::AppCmdOpt<std::string> m_sep ;
   AppUtils::AppCmdArgList<std::string> m_args ;
 };
 
 EchoApp::EchoApp( const std::string& appname )
   : AppUtils::AppBase(appname)
-  , m_noEcho( 'n', "no-new-line", "disable output of new line", 0 )
+  , m_noEcho( 'n', "disable output of new line", 0 )
   , m_sep( 's', "separator", "string", "output word separator", " " )
   , m_args ( "strings", "the list of strings to print", std::list<std::string>() )
 {

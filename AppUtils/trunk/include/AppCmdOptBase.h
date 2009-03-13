@@ -30,6 +30,7 @@ extern "C" {
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "AppUtils/AppCmdExceptions.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -75,48 +76,49 @@ class AppCmdOptBase {
 public:
 
   /// Destructor
-  virtual ~AppCmdOptBase( );
+  virtual ~AppCmdOptBase( ) throw() ;
 
   /**
    *  Returns true if option requires argument. Does not make sense for
    *  positional arguments.
    */
-  virtual bool hasArgument() const = 0 ;
+  virtual bool hasArgument() const throw() = 0 ;
 
   /**
    *  Get the name of the argument, only used if hasArgument() returns true
    */
-  virtual const std::string& name() const = 0 ;
+  virtual const std::string& name() const throw() = 0 ;
 
   /**
    *  Get one-line description
    */
-  virtual const std::string& description() const = 0 ;
+  virtual const std::string& description() const throw() = 0 ;
 
   /**
-   *  Return short option symbol for -x option
+   *  Return short option symbol for -x option, or '\0' if no short option
    */
-  virtual char shortOption() const = 0 ;
+  virtual char shortOption() const throw() = 0 ;
 
   /**
-   *  Return long option symbol for --xxxxx option
+   *  Return long option symbol for --xxxxx option, or empty string
    */
-  virtual const std::string& longOption() const = 0 ;
+  virtual const std::string& longOption() const throw() = 0 ;
 
   /**
    *  Set option's argument. The value string will be empty if hasArgument() is false
+   *  Will throw an exception in case of conversion error
    */
-  virtual bool setValue( const std::string& value ) = 0 ;
+  virtual void setValue( const std::string& value ) throw(AppCmdException) = 0 ;
 
   /**
    *  True if the value of the option was changed from command line.
    */
-  virtual bool valueChanged () const = 0 ;
+  virtual bool valueChanged () const throw() = 0 ;
 
   /**
    *  reset option to its default value
    */
-  virtual void reset() = 0 ;
+  virtual void reset() throw() = 0 ;
 
 protected:
 

@@ -53,26 +53,27 @@ extern "C" {
  *  // instanciate parser
  *  AppCmdLine cmdline( argv[0] ) ;
  *
- *  bool ok ;
- *
  *  // add some options
  *  AppCmdOptIncr optVerbose ( 'v', "verbose", "produce more noise", 0 ) ;
- *  ok = cmdline.addOption ( optVerbose ) ;
+ *  cmdline.addOption ( optVerbose ) ;
  *  AppCmdOpt<BdbTime> optTime ( 'b', "begin", "time", "start time for interval scan", BdbTime::minusInfinity ) ;
- *  ok = cmdline.addOption ( optTime ) ;
+ *  cmdline.addOption ( optTime ) ;
  *
  *  // add some positional parameters, first is required, second is optional
  *  AppCmdArg<std::string> argString( "name", "specifies the name of the game" ) ;
- *  ok = cmdline.addArgument ( argString ) ;
+ *  cmdline.addArgument ( argString ) ;
  *  AppCmdArg<int> argInt( "retries", "optional number of retries, def: 1000", 1000 ) ;
- *  ok = cmdline.addArgument ( argInt ) ;
+ *  cmdline.addArgument ( argInt ) ;
  *
  *  // parse command line, set all options and arguments
- *  ok = cmdline.parse ( argc-1, argv+1 ) ;
- *  if ( ! ok ) {
- *    cmdline.usage( std::cerr ) ;
+ *  try {
+ *    cmdline.parse ( argc-1, argv+1 ) ;
+ *  } catch ( AppCmdException& e ) {
+ *    std::cerr << "Error parsing command line: " << e.what() << "\n"
+ *              << "Use -h or --help option to obtain usage information" << std::endl ;
  *    exit(2) ;  // exit() may not be good idea, for illustration only here
- *  } else if ( cmdline.helpWanted() ) {
+ *  }
+ *  if ( cmdline.helpWanted() ) {
  *    cmdline.usage( std::cout ) ;
  *    exit(0) ;  // exit() may not be good idea, for illustration only here
  *  }
@@ -103,6 +104,7 @@ namespace AppUtils {
 
 class AppCmdArgBase ;
 class AppCmdOptBase ;
+template <typename T> class AppCmdOpt ;
 
 class AppCmdLine {
 
@@ -111,7 +113,7 @@ public:
   /**
    *  Constructor takes the name of the command, this is typically argv[0].
    */
-  AppCmdLine( const std::string& argv0 ) ;
+  explicit AppCmdLine( const std::string& argv0 ) ;
 
   /// Destructor
   virtual ~AppCmdLine( );
@@ -121,41 +123,43 @@ public:
    *  only its address is remembered. The lifetime of the argument should extend
    *  to the parse() method of this class.
    */
-  virtual bool addArgument ( AppCmdArgBase& arg ) ;
+  virtual void addArgument ( AppCmdArgBase& arg ) throw(std::exception) ;
 
   /**
    *  Add one more command option. The option object supplied is not copied,
    *  only its address is remembered. The lifetime of the argument should extend
    *  to the parse() method of this class.
    */
-  virtual bool addOption ( AppCmdOptBase& option ) ;
+  virtual void addOption ( AppCmdOptBase& option ) throw(std::exception) ;
+
+  /**
+   *  Add option which will specify the name of the options file.
+   *  Only one options file is allowed per parser, attempt to add one
+   *  more will result in exception. The lifetime of the argument should
+   *  extend to the parse() method of this class.
+   */
+  virtual void setOptionsFile ( AppCmdOpt<std::string>& option ) throw(std::exception) ;
 
   /**
    *  Parse function examines command line and sets the corresponding arguments.
    *  If it returns false then you should not expect anything, just exit.
    */
-  bool parse ( int argc, char* argv[] ) ;
-  bool parse ( int argc, const char* argv[] ) ;
+  void parse ( int argc, char* argv[] ) throw(std::exception) ;
+  void parse ( int argc, const char* argv[] ) throw(std::exception) ;
 
   /**
    *  Another form of parse, takes iterators. Dereferencing iterators should
    *  produce something convertible to std::string.
    */
   template <typename Iter>
-  bool parse ( Iter begin, Iter end ) ;
-
-  /**
-   *  Get the error string from the last parse operation. Makes sense only
-   *  if parse() returned false.
-   */
-  const std::string& getErrorString() const { return _errString ; }
+  void parse ( Iter begin, Iter end ) throw(std::exception) ;
 
   /**
    *  Returns true if the "help" option was specified on the command line.
    *  Always check its return value after calling parse() when it returns true,
    *  if the help option is given then parse() stops without checking anything else.
    */
-  bool helpWanted() const ;
+  bool helpWanted() const throw() ;
 
   /**
    *  Prints usage information to specified stream.
@@ -170,19 +174,22 @@ protected:
   typedef std::list< AppCmdOptBase* > OptionsList ;
 
   /// real parsing happens in this method
-  virtual bool doParse() ;
+  virtual void doParse() throw(std::exception) ;
 
   /// parse options
-  virtual bool parseOptions() ;
+  virtual void parseOptions() throw(std::exception) ;
+
+  /// parse options file
+  virtual void parseOptionsFile() throw(std::exception) ;
 
   /// parse arguments
-  virtual bool parseArgs() ;
+  virtual void parseArgs() throw(std::exception) ;
 
   /// find option with the long name
-  AppCmdOptBase* findLongOpt ( const std::string& opt ) const ;
+  AppCmdOptBase* findLongOpt ( const std::string& opt ) const throw() ;
 
   /// find option with the short name
-  AppCmdOptBase* findShortOpt ( char opt ) const ;
+  AppCmdOptBase* findShortOpt ( char opt ) const throw() ;
 
 private:
 
@@ -193,13 +200,13 @@ private:
   PositionalsList _positionals ;
 
   std::string _argv0 ;
+  AppCmdOpt<std::string>* _optionsFile ;
+
   StringList _argv ;
 
   bool _helpWanted ;
   StringList::const_iterator _iter ; // iterator used by doParse()
   int _nWordsLeft ;                  // number of words not yet seen
-
-  std::string _errString ;
 
   // Note: if your class needs a copy constructor or an assignment operator,
   //  make one of the following public and implement it.
@@ -212,8 +219,8 @@ private:
 
 // have to put templated stuff here
 template <typename Iter>
-bool
-AppCmdLine::parse( Iter begin, Iter end )
+void
+AppCmdLine::parse( Iter begin, Iter end ) throw(std::exception)
 {
   _argv.clear() ;
   std::copy ( begin, end, std::back_inserter( _argv ) ) ;

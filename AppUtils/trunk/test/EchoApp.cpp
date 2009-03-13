@@ -4,7 +4,7 @@
 
 #include "AppUtils/AppBase.h"
 #include "AppUtils/AppCmdOpt.h"
-#include "AppUtils/AppCmdOptIncr.h"
+#include "AppUtils/AppCmdOptBool.h"
 #include "AppUtils/AppCmdArgList.h"
 #include "MsgLogger/MsgLogger.h"
 
@@ -18,25 +18,25 @@ protected:
   int runApp() ;
 
 private :
-  AppUtils::AppCmdOptIncr m_noEcho ;
+  AppUtils::AppCmdOptBool m_newLine ;
   AppUtils::AppCmdOpt<std::string> m_sep ;
   AppUtils::AppCmdArgList<std::string> m_args ;
 };
 
 EchoApp::EchoApp( const std::string& appname )
   : AppUtils::AppBase(appname)
-  , m_noEcho( 'n', "no-new-line", "disable output of new line", 0 )
+  , m_newLine( 'n', "disable output of new line", true )
   , m_sep( 's', "separator", "string", "output word separator", " " )
   , m_args ( "strings", "the list of strings to print", std::list<std::string>() )
 {
-  addOption( m_noEcho ) ;
+  addOption( m_newLine ) ;
   addOption( m_sep ) ;
   addArgument( m_args ) ;
 }
 
 int EchoApp::runApp()
 {
-  MsgLogRoot( debug, "Starting with noEcho=" << m_noEcho.value() <<
+  MsgLogRoot( debug, "Starting with newLine=" << m_newLine.value() <<
                      " and sep=\"" << m_sep.value() << "\"" );
 
   bool first = true ;
@@ -49,7 +49,7 @@ int EchoApp::runApp()
     }
     std::cout << *i ;
   }
-  if ( not m_noEcho.value() ) std::cout << '\n' ;
+  if ( m_newLine.value() ) std::cout << '\n' ;
 
   return 0 ;
 }

@@ -69,9 +69,41 @@ AppCmdOptList<Type>::AppCmdOptList ( char shortOpt,
 {
 }
 
+template <typename Type>
+AppCmdOptList<Type>::AppCmdOptList ( const std::string& longOpt,
+                             const std::string& name,
+                             const std::string& descr,
+                             char separator )
+  : AppCmdOptBase()
+  , _shortOpt('\0')
+  , _longOpt(longOpt)
+  , _name(name)
+  , _descr(descr)
+  , _separator(separator)
+  , _value()
+  , _changed(false)
+{
+}
+
+template <typename Type>
+AppCmdOptList<Type>::AppCmdOptList ( char shortOpt,
+                             const std::string& name,
+                             const std::string& descr,
+                             char separator )
+  : AppCmdOptBase()
+  , _shortOpt(shortOpt)
+  , _longOpt()
+  , _name(name)
+  , _descr(descr)
+  , _separator(separator)
+  , _value()
+  , _changed(false)
+{
+}
+
 // Destructor
 template <typename Type>
-AppCmdOptList<Type>::~AppCmdOptList( )
+AppCmdOptList<Type>::~AppCmdOptList( ) throw()
 {
 }
 
@@ -81,7 +113,7 @@ AppCmdOptList<Type>::~AppCmdOptList( )
  */
 template <typename Type>
 bool
-AppCmdOptList<Type>::hasArgument() const
+AppCmdOptList<Type>::hasArgument() const throw()
 {
   return true ;
 }
@@ -91,7 +123,7 @@ AppCmdOptList<Type>::hasArgument() const
  */
 template <typename Type>
 const std::string&
-AppCmdOptList<Type>::name() const
+AppCmdOptList<Type>::name() const throw()
 {
   return _name ;
 }
@@ -101,7 +133,7 @@ AppCmdOptList<Type>::name() const
  */
 template <typename Type>
 const std::string&
-AppCmdOptList<Type>::description() const
+AppCmdOptList<Type>::description() const throw()
 {
   return _descr ;
 }
@@ -111,7 +143,7 @@ AppCmdOptList<Type>::description() const
  */
 template <typename Type>
 char
-AppCmdOptList<Type>::shortOption() const
+AppCmdOptList<Type>::shortOption() const throw()
 {
   return _shortOpt ;
 }
@@ -121,19 +153,17 @@ AppCmdOptList<Type>::shortOption() const
  */
 template <typename Type>
 const std::string&
-AppCmdOptList<Type>::longOption() const
+AppCmdOptList<Type>::longOption() const throw()
 {
   return _longOpt ;
 }
 
 /**
  *  Set the value of the argument.
- *
- *  @return The number of consumed words. If it is negative then error has occured.
  */
 template <typename Type>
-bool
-AppCmdOptList<Type>::setValue ( const std::string& value )
+void
+AppCmdOptList<Type>::setValue ( const std::string& value ) throw(AppCmdException)
 {
   container localCont ;
 
@@ -143,11 +173,9 @@ AppCmdOptList<Type>::setValue ( const std::string& value )
     // get next item from the string
     std::string::const_iterator pos1 = std::find ( pos, value.end(), _separator ) ;
     std::string item ( pos, pos1 ) ;
-    std::pair<Type,bool> res = AppCmdTypeTraits<Type>::fromString ( item ) ;
-    if ( ! res.second ) {
-      return false ;
-    }
-    localCont.push_back( res.first ) ;
+    // this may thrpw
+    Type res = AppCmdTypeTraits<Type>::fromString ( item ) ;
+    localCont.push_back( res ) ;
 
     // advance
     pos = pos1 ;
@@ -158,8 +186,6 @@ AppCmdOptList<Type>::setValue ( const std::string& value )
   // copy from local container to value
   std::copy ( localCont.begin(), localCont.end(), std::back_inserter(_value) ) ;
   _changed = true ;
-
-  return true ;
 }
 
 /**
@@ -167,7 +193,7 @@ AppCmdOptList<Type>::setValue ( const std::string& value )
  */
 template <typename Type>
 bool
-AppCmdOptList<Type>::valueChanged () const
+AppCmdOptList<Type>::valueChanged () const throw()
 {
   return _changed ;
 }
@@ -177,14 +203,14 @@ AppCmdOptList<Type>::valueChanged () const
  */
 template <typename Type>
 typename AppCmdOptList<Type>::const_iterator
-AppCmdOptList<Type>::begin() const
+AppCmdOptList<Type>::begin() const throw()
 {
   return _value.begin() ;
 }
 
 template <typename Type>
 typename AppCmdOptList<Type>::const_iterator
-AppCmdOptList<Type>::end() const
+AppCmdOptList<Type>::end() const throw()
 {
   return _value.end() ;
 }
@@ -194,7 +220,7 @@ AppCmdOptList<Type>::end() const
  */
 template <typename Type>
 void
-AppCmdOptList<Type>::clear()
+AppCmdOptList<Type>::clear() throw()
 {
   _value.clear() ;
 }
@@ -204,7 +230,7 @@ AppCmdOptList<Type>::clear()
  */
 template <typename Type>
 void
-AppCmdOptList<Type>::reset()
+AppCmdOptList<Type>::reset() throw()
 {
   _value.clear() ;
   _changed = false ;

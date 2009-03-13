@@ -46,7 +46,7 @@ extern "C" {
  *  Any type supported by the AppCmdTypeTraits is allowed as a template parameter.
  *
  *  This software was developed for the BaBar collaboration.  If you
- *  use all or part of it, please give an appropriate acknowledgement.
+ *  use all or part of it, please give an appropriate acknowledgment.
  *
  *  Copyright (C) 2003		SLAC
  *
@@ -84,22 +84,22 @@ public:
   AppCmdArg ( const std::string& name, const std::string& descr, const Type& val ) ;
 
   // Destructor
-  virtual ~AppCmdArg( );
+  virtual ~AppCmdArg( ) throw() ;
 
   /**
    *  Is this argument required?
    */
-  virtual bool isRequired() const ;
+  virtual bool isRequired() const throw() ;
 
   /**
    *  Get the name of the paramater
    */
-  virtual const std::string& name() const ;
+  virtual const std::string& name() const throw() ;
 
   /**
    *  Get one-line description
    */
-  virtual const std::string& description() const ;
+  virtual const std::string& description() const throw() ;
 
   /**
    *  How many words from command line could this argument take? Single-word
@@ -107,10 +107,11 @@ public:
    *  Should return some big number. Note there is no function minWords() because
    *  it would always return 1.
    */
-  virtual size_t maxWords () const ;
+  virtual size_t maxWords () const throw() ;
 
   /**
-   *  Set the value of the argument.
+   *  Set the value of the argument. Throws an exception in case of
+   *  type conversion errors.
    *
    *  @param begin  "pointer" to a starting word
    *  @param end    "pointer" behind the last word. For single-word parameters
@@ -118,32 +119,32 @@ public:
    *                number of words given will depend on the number of words in the
    *                command and the number of positional arguments.
    *
-   *  @return The number of consumed words. If it is negative then error has occured.
+   *  @return The number of consumed words. If it is negative then error has occurred.
    */
   virtual int setValue ( StringList::const_iterator begin,
-                         StringList::const_iterator end ) ;
+                         StringList::const_iterator end ) throw(AppCmdException) ;
 
   /**
    *  True if the value of the option was changed from command line. Only
    *  makes sense for "optionsl arguments", for required this will always
    *  return true.
    */
-  virtual bool valueChanged() const ;
+  virtual bool valueChanged() const throw() ;
 
   /**
    *  Return current value of the argument
    */
-  virtual const Type& value() const ;
+  virtual const Type& value() const throw() ;
 
   /**
    *  Return default value of the argument
    */
-  const Type& defValue() const { return _defValue ; }
+  const Type& defValue() const throw() { return _defValue ; }
 
   /**
    *  Reset argument to its default value
    */
-  virtual void reset() ;
+  virtual void reset() throw() ;
 
 protected:
 

@@ -5,7 +5,7 @@
 //
 // Environment:
 //      This software was developed for the BaBar collaboration.  If you
-//      use all or part of it, please give an appropriate acknowledgement.
+//      use all or part of it, please give an appropriate acknowledgment.
 //
 // Copyright Information:
 //      Copyright (C) 2003	SLAC
@@ -31,6 +31,7 @@ extern "C" {
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "AppUtils/AppCmdExceptions.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -46,7 +47,7 @@ extern "C" {
  *  arguments in the command line.
  *
  *  This software was developed for the BaBar collaboration.  If you
- *  use all or part of it, please give an appropriate acknowledgement.
+ *  use all or part of it, please give an appropriate acknowledgment.
  *
  *  Copyright (C) 2003		SLAC
  *
@@ -68,22 +69,22 @@ public:
   typedef std::list<std::string> StringList ;
 
   /// Destructor
-  virtual ~AppCmdArgBase( );
+  virtual ~AppCmdArgBase( ) throw() ;
 
   /**
    *  Is it required?
    */
-  virtual bool isRequired() const = 0 ;
+  virtual bool isRequired() const throw() = 0 ;
 
   /**
    *  Get the name of the paramater
    */
-  virtual const std::string& name() const = 0 ;
+  virtual const std::string& name() const throw() = 0 ;
 
   /**
    *  Get one-line description
    */
-  virtual const std::string& description() const = 0 ;
+  virtual const std::string& description() const throw() = 0 ;
 
   /**
    *  How many words from command line could this argument take? Single-word
@@ -91,10 +92,11 @@ public:
    *  Should return some big number. Note there is no function minWords() because
    *  it would always return 1.
    */
-  virtual size_t maxWords () const = 0 ;
+  virtual size_t maxWords () const throw() = 0 ;
 
   /**
    *  Set the value of the argument.
+   *  Will throw an exception in case of conversion error.
    *
    *  @param begin  "pointer" to a starting word
    *  @param end    "pointer" behind the last word. For single-word parameters
@@ -102,22 +104,22 @@ public:
    *                number of words given will depend on the number of words in the
    *                command and the number of positional arguments.
    *
-   *  @return The number of consumed words. If it is negative then error has occured.
+   *  @return The number of consumed words. If it is negative then error has occurred.
    */
   virtual int setValue ( StringList::const_iterator begin,
-                         StringList::const_iterator end ) = 0 ;
+                         StringList::const_iterator end ) throw(AppCmdException) = 0 ;
 
   /**
    *  True if the value of the option was changed from command line. Only
    *  makes sense for "optionsl arguments", for required this will always
    *  return true.
    */
-  virtual bool valueChanged() const = 0 ;
+  virtual bool valueChanged() const throw() = 0 ;
 
   /**
    *  Reset argument to its default value
    */
-  virtual void reset() = 0 ;
+  virtual void reset() throw() = 0 ;
 
 protected:
 

@@ -80,22 +80,22 @@ public:
   AppCmdArgList ( const std::string& name, const std::string& descr, const container& val ) ;
 
   // Destructor
-  virtual ~AppCmdArgList( );
+  virtual ~AppCmdArgList( ) throw() ;
 
   /**
    *  Is it required?
    */
-  virtual bool isRequired() const ;
+  virtual bool isRequired() const throw() ;
 
   /**
    *  Get the name of the paramater
    */
-  virtual const std::string& name() const ;
+  virtual const std::string& name() const throw() ;
 
   /**
    *  Get one-line description
    */
-  virtual const std::string& description() const ;
+  virtual const std::string& description() const throw() ;
 
   /**
    *  How many words from command line could this argument take? Single-word
@@ -103,7 +103,7 @@ public:
    *  Should return some big number. Note there is no function minWords() because
    *  it would always return 1.
    */
-  virtual size_t maxWords () const ;
+  virtual size_t maxWords () const throw() ;
 
   /**
    *  Set the value of the argument.
@@ -117,41 +117,41 @@ public:
    *  @return The number of consumed words. If it is negative then error has occured.
    */
   virtual int setValue ( StringList::const_iterator begin,
-                         StringList::const_iterator end ) ;
+                         StringList::const_iterator end ) throw(AppCmdException) ;
 
   /**
    *  True if the value of the option was changed from command line. Only
    *  makes sense for "optionsl arguments", for required this will always
    *  return true.
    */
-  virtual bool valueChanged() const ;
+  virtual bool valueChanged() const throw() ;
 
   /**
    *  Return iterator to the begin/end of sequence
    */
-  virtual const_iterator begin() const ;
-  virtual const_iterator end() const ;
+  virtual const_iterator begin() const throw() ;
+  virtual const_iterator end() const throw() ;
 
   /**
    *  Other usual container stuff
    */
-  size_type size() const { return _value.size() ; }
-  bool empty() const { return _value.empty() ; }
+  size_type size() const throw() { return _value.size() ; }
+  bool empty() const throw() { return _value.empty() ; }
 
   /**
    *  Clear the collected values
    */
-  virtual void clear() ;
+  virtual void clear() throw() ;
 
   /**
    *  Return default value of the argument
    */
-  const container& defValue() const { return _defValue ; }
+  const container& defValue() const throw() { return _defValue ; }
 
   /**
    *  Reset argument to its default value
    */
-  virtual void reset() ;
+  virtual void reset() throw() ;
 
 protected:
 

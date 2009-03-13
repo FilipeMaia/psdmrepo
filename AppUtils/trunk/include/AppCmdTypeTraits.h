@@ -31,6 +31,7 @@ extern "C" {
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "AppUtils/AppCmdExceptions.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -71,12 +72,12 @@ struct AppCmdTypeTraits {
  */
 template<>
 struct AppCmdTypeTraits<long> {
-  static std::pair<long,bool> fromString ( const std::string& str ) {
+  static long fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
     char* end ;
     long res = strtol ( str.c_str(), &end, 0 ) ;
-    // convertion must consume all characters, otherwise it's not sucessfull
-    bool success = *end == '\0' ;
-    return std::pair<long,bool> ( res, success ) ;
+    // conversion must consume all characters, otherwise it's not successful
+    if ( *end != '\0' ) throw AppCmdTypeCvtException ( str, "long" ) ;
+    return res ;
   }
 };
 
@@ -85,15 +86,15 @@ struct AppCmdTypeTraits<long> {
  */
 template<>
 struct AppCmdTypeTraits<int> {
-  static std::pair<int,bool> fromString ( const std::string& str ) {
-    std::pair<long,bool> res = AppCmdTypeTraits<long>::fromString( str ) ;
-    if ( res.second ) {
-      // check the range
-      if ( res.first >= INT_MIN && res.first <= INT_MAX ) {
-	return std::pair<int,bool>( res.first, res.second ) ;
+  static int fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+    try {
+      long res = AppCmdTypeTraits<long>::fromString( str ) ;
+      if ( res >= INT_MIN && res <= INT_MAX ) {
+	return int(res) ;
       }
+    } catch (AppCmdTypeCvtException& e) {
     }
-    return std::pair<int,bool>( res.first, false ) ;
+    throw AppCmdTypeCvtException ( str, "int" ) ;
   }
 };
 
@@ -102,12 +103,12 @@ struct AppCmdTypeTraits<int> {
  */
 template<>
 struct AppCmdTypeTraits<unsigned long> {
-  static std::pair<unsigned long,bool> fromString ( const std::string& str ) {
+  static unsigned long fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
     char* end ;
     unsigned long res = strtoul ( str.c_str(), &end, 0 ) ;
-    // convertion must consume all characters, otherwise it's not sucessfull
-    bool success = *end == '\0' ;
-    return std::pair<unsigned long,bool> ( res, success ) ;
+    // conversion must consume all characters, otherwise it's not successful
+    if ( *end != '\0' ) throw AppCmdTypeCvtException ( str, "unsigned long" ) ;
+    return res ;
   }
 };
 
@@ -116,15 +117,16 @@ struct AppCmdTypeTraits<unsigned long> {
  */
 template<>
 struct AppCmdTypeTraits<unsigned int> {
-  static std::pair<unsigned int,bool> fromString ( const std::string& str ) {
-    std::pair<unsigned long,bool> res = AppCmdTypeTraits<unsigned long>::fromString( str ) ;
-    if ( res.second ) {
+  static unsigned int fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+    try {
+      unsigned long res = AppCmdTypeTraits<unsigned long>::fromString( str ) ;
       // check the range
-      if ( res.first <= UINT_MAX ) {
-	return std::pair<unsigned int,bool>( res.first, res.second ) ;
+      if ( res <= UINT_MAX ) {
+	return (unsigned int)( res ) ;
       }
+    } catch (AppCmdTypeCvtException& e) {
     }
-    return std::pair<unsigned int,bool>( res.first, false ) ;
+    throw AppCmdTypeCvtException ( str, "unsigned int" ) ;
   }
 };
 
@@ -133,8 +135,8 @@ struct AppCmdTypeTraits<unsigned int> {
  */
 template<>
 struct AppCmdTypeTraits<std::string> {
-  static std::pair<std::string,bool> fromString ( const std::string& str ) {
-    return std::pair<std::string,bool> ( str, true ) ;
+  static std::string fromString ( const std::string& str ) throw() {
+    return str ;
   }
 };
 
@@ -143,13 +145,13 @@ struct AppCmdTypeTraits<std::string> {
  */
 template<>
 struct AppCmdTypeTraits<bool> {
-  static std::pair<bool,bool> fromString ( const std::string& str ) {
+  static bool fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
     if ( str == "true" || str == "TRUE" || str == "1" || str == "yes" || str == "YES" ) {
-      return std::pair<bool,bool>( true, true ) ;
+      return true ;
     } else if ( str == "false" || str == "FALSE" || str == "0" || str == "no" || str == "NO" ) {
-      return std::pair<bool,bool>( false, true ) ;
+      return false ;
     } else {
-      return std::pair<bool,bool>( false, false ) ;
+      throw AppCmdTypeCvtException ( str, "bool" ) ;
     }
   }
 };
@@ -159,12 +161,12 @@ struct AppCmdTypeTraits<bool> {
  */
 template<>
 struct AppCmdTypeTraits<double> {
-  static std::pair<double,bool> fromString ( const std::string& str ) {
+  static double fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
     char* end ;
     double res = strtod ( str.c_str(), &end ) ;
-    // convertion must consume all characters, otherwise it's not sucessfull
-    bool success = *end == '\0' ;
-    return std::pair<double,bool> ( res, success ) ;
+    // conversion must consume all characters, otherwise it's not successful
+    if ( *end != '\0' ) throw AppCmdTypeCvtException ( str, "double" ) ;
+    return res ;
   }
 };
 
@@ -173,15 +175,16 @@ struct AppCmdTypeTraits<double> {
  */
 template<>
 struct AppCmdTypeTraits<float> {
-  static std::pair<float,bool> fromString ( const std::string& str ) {
-    std::pair<double,bool> res = AppCmdTypeTraits<double>::fromString( str ) ;
-    if ( res.second ) {
+  static float fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+    try {
+      double res = AppCmdTypeTraits<double>::fromString( str ) ;
       // check the range
-      if ( res.first >= -FLT_MAX && res.first <= FLT_MAX ) {
-        return std::pair<float,bool>( res.first, res.second ) ;
+      if ( res >= -FLT_MAX && res <= FLT_MAX ) {
+        return float( res ) ;
       }
+    } catch (AppCmdTypeCvtException& e) {
     }
-    return std::pair<float,bool>( res.first, false ) ;
+    throw AppCmdTypeCvtException ( str, "float" ) ;
   }
 };
 

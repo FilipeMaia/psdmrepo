@@ -69,9 +69,43 @@ AppCmdOptNamedValue<Type>::AppCmdOptNamedValue ( char shortOpt,
 {
 }
 
+template <typename Type>
+AppCmdOptNamedValue<Type>::AppCmdOptNamedValue ( const std::string& longOpt,
+                                                 const std::string& name,
+                                                 const std::string& descr,
+                                                 const Type& defValue )
+  : AppCmdOptBase()
+  , _shortOpt('\0')
+  , _longOpt(longOpt)
+  , _name(name)
+  , _descr(descr)
+  , _str2value()
+  , _defValue(defValue)
+  , _value(defValue)
+  , _changed(false)
+{
+}
+
+template <typename Type>
+AppCmdOptNamedValue<Type>::AppCmdOptNamedValue ( char shortOpt,
+                                                 const std::string& name,
+                                                 const std::string& descr,
+                                                 const Type& defValue )
+  : AppCmdOptBase()
+  , _shortOpt(shortOpt)
+  , _longOpt()
+  , _name(name)
+  , _descr(descr)
+  , _str2value()
+  , _defValue(defValue)
+  , _value(defValue)
+  , _changed(false)
+{
+}
+
 // Destructor
 template <typename Type>
-AppCmdOptNamedValue<Type>::~AppCmdOptNamedValue( )
+AppCmdOptNamedValue<Type>::~AppCmdOptNamedValue( ) throw()
 {
 }
 
@@ -81,7 +115,7 @@ AppCmdOptNamedValue<Type>::~AppCmdOptNamedValue( )
  */
 template <typename Type>
 bool
-AppCmdOptNamedValue<Type>::hasArgument() const
+AppCmdOptNamedValue<Type>::hasArgument() const throw()
 {
   return true ;
 }
@@ -91,7 +125,7 @@ AppCmdOptNamedValue<Type>::hasArgument() const
  */
 template <typename Type>
 const std::string&
-AppCmdOptNamedValue<Type>::name() const
+AppCmdOptNamedValue<Type>::name() const throw()
 {
   return _name ;
 }
@@ -101,7 +135,7 @@ AppCmdOptNamedValue<Type>::name() const
  */
 template <typename Type>
 const std::string&
-AppCmdOptNamedValue<Type>::description() const
+AppCmdOptNamedValue<Type>::description() const throw()
 {
   return _descr ;
 }
@@ -111,7 +145,7 @@ AppCmdOptNamedValue<Type>::description() const
  */
 template <typename Type>
 char
-AppCmdOptNamedValue<Type>::shortOption() const
+AppCmdOptNamedValue<Type>::shortOption() const throw()
 {
   return _shortOpt ;
 }
@@ -121,7 +155,7 @@ AppCmdOptNamedValue<Type>::shortOption() const
  */
 template <typename Type>
 const std::string&
-AppCmdOptNamedValue<Type>::longOption() const
+AppCmdOptNamedValue<Type>::longOption() const throw()
 {
   return _longOpt ;
 }
@@ -132,16 +166,14 @@ AppCmdOptNamedValue<Type>::longOption() const
  *  @return The number of consumed words. If it is negative then error has occured.
  */
 template <typename Type>
-bool
-AppCmdOptNamedValue<Type>::setValue ( const std::string& valueStr )
+void
+AppCmdOptNamedValue<Type>::setValue ( const std::string& valueStr ) throw(AppCmdException)
 {
   typename String2Value::const_iterator it = _str2value.find ( valueStr ) ;
-  if ( it == _str2value.end() ) return false ;
+  if ( it == _str2value.end() ) throw AppCmdTypeCvtException ( valueStr, "<map type>" ) ;
 
   _value = it->second ;
   _changed = true ;
-
-  return true ;
 }
 
 /**
@@ -149,7 +181,7 @@ AppCmdOptNamedValue<Type>::setValue ( const std::string& valueStr )
  */
 template <typename Type>
 bool
-AppCmdOptNamedValue<Type>::valueChanged () const
+AppCmdOptNamedValue<Type>::valueChanged () const throw()
 {
   return _changed ;
 }
@@ -159,7 +191,7 @@ AppCmdOptNamedValue<Type>::valueChanged () const
  */
 template <typename Type>
 const Type&
-AppCmdOptNamedValue<Type>::value() const
+AppCmdOptNamedValue<Type>::value() const throw()
 {
   return _value ;
 }
@@ -169,7 +201,7 @@ AppCmdOptNamedValue<Type>::value() const
  */
 template <typename Type>
 void
-AppCmdOptNamedValue<Type>::reset()
+AppCmdOptNamedValue<Type>::reset() throw()
 {
   _value = _defValue ;
   _changed = false ;
@@ -178,7 +210,7 @@ AppCmdOptNamedValue<Type>::reset()
 /// add string-value pair
 template <typename Type>
 void
-AppCmdOptNamedValue<Type>::add ( const std::string& key, const Type& value )
+AppCmdOptNamedValue<Type>::add ( const std::string& key, const Type& value ) throw(std::exception)
 {
   typename String2Value::value_type thePair(key, value);
   _str2value.insert ( thePair );

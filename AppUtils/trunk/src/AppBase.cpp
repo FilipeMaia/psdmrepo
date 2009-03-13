@@ -24,6 +24,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "AppUtils/AppCmdExceptions.h"
 #include "MsgLogger/MsgLogger.h"
 #include "MsgLogger/MsgFormatter.h"
 #include "MsgLogger/MsgHandlerStdStreams.h"
@@ -82,13 +83,15 @@ int
 AppBase::run ( int argc, char** argv )
 {
   // parse command line, set all options and arguments
-  bool ok = _cmdline.parse ( argc, argv ) ;
-  if ( ! ok ) {
-    std::cerr << "Error parsing command line: " << _cmdline.getErrorString() << "\n" ;
-    _cmdline.usage( std::cerr ) ;
-    this->moreUsage ( std::cerr ) ;
+  try {
+    _cmdline.parse ( argc, argv ) ;
+  } catch ( AppCmdException& e ) {
+    std::cerr << "Error parsing command line: " << e.what() << "\n"
+              << "Use -h or --help option to obtain usage information" << std::endl ;
     return 2 ;
-  } else if ( _cmdline.helpWanted() ) {
+  }
+
+  if ( _cmdline.helpWanted() ) {
     _cmdline.usage( std::cout ) ;
     this->moreUsage ( std::cout ) ;
     return 0 ;
@@ -111,16 +114,40 @@ AppBase::run ( int argc, char** argv )
   MsgLogger::MsgFormatter::addGlobalFormat ( MsgLogger::MsgLogLevel::fatal, errfmt ) ;
 
   // pre-run
-  int stat = preRunApp() ;
-  if ( stat != 0 ) return stat ;
+  try {
+    int stat = preRunApp() ;
+    if ( stat != 0 ) return stat ;
+  } catch ( std::exception& e ) {
+    std::cerr << "Standard exception caught in preRunApp(): " << e.what() << std::endl ;
+    return 2 ;
+  } catch ( ... ) {
+    std::cerr << "Unknown exception caught in preRunApp()" << std::endl ;
+    return 2 ;
+  }
 
   // call subclass for some real stuff
-  stat = this->runApp() ;
-  if ( stat != 0 ) return stat ;
+  try {
+    int stat = this->runApp() ;
+    if ( stat != 0 ) return stat ;
+  } catch ( std::exception& e ) {
+    std::cerr << "Standard exception caught in runApp(): " << e.what() << std::endl ;
+    return 2 ;
+  } catch ( ... ) {
+    std::cerr << "Unknown exception caught in runApp()" << std::endl ;
+    return 2 ;
+  }
 
   // clean-up
-  stat = postRunApp() ;
-  if ( stat != 0 ) return stat ;
+  try {
+    int stat = postRunApp() ;
+    if ( stat != 0 ) return stat ;
+  } catch ( std::exception& e ) {
+    std::cerr << "Standard exception caught in postRunApp(): " << e.what() << std::endl ;
+    return 2 ;
+  } catch ( ... ) {
+    std::cerr << "Unknown exception caught in postRunApp()" << std::endl ;
+    return 2 ;
+  }
 
   return 0 ;
 }
@@ -128,16 +155,22 @@ AppBase::run ( int argc, char** argv )
 /**
  *  add command line option or argument, typically called from subclass constructor
  */
-bool
-AppBase::addOption ( AppCmdOptBase& option )
+void
+AppBase::setOptionsFile ( AppCmdOpt<std::string>& option )
 {
-  return _cmdline.addOption ( option ) ;
+  _cmdline.setOptionsFile ( option ) ;
 }
 
-bool
+void
+AppBase::addOption ( AppCmdOptBase& option )
+{
+  _cmdline.addOption ( option ) ;
+}
+
+void
 AppBase::addArgument ( AppCmdArgBase& arg )
 {
-  return _cmdline.addArgument ( arg ) ;
+  _cmdline.addArgument ( arg ) ;
 }
 
 /**
@@ -149,7 +182,7 @@ AppBase::moreUsage ( std::ostream& out ) const
 }
 
 /**
- *  Method called before runApp, can be overriden in subclasses.
+ *  Method called before runApp, can be overridden in subclasses.
  *  Usually if you override it, call base class method too.
  */
 int
@@ -159,7 +192,7 @@ AppBase::preRunApp ()
 }
 
 /**
- *  Method called after runApp, can be overriden in subclasses.
+ *  Method called after runApp, can be overridden in subclasses.
  *  Usually if you override it, call base class method too.
  */
 int

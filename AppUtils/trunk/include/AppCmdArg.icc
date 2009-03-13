@@ -80,7 +80,7 @@ AppCmdArg<Type>::AppCmdArg ( const std::string& name, const std::string& descr, 
 
 // Destructor
 template <typename Type>
-AppCmdArg<Type>::~AppCmdArg( )
+AppCmdArg<Type>::~AppCmdArg( ) throw()
 {
 }
 
@@ -89,7 +89,7 @@ AppCmdArg<Type>::~AppCmdArg( )
  */
 template <typename Type>
 bool
-AppCmdArg<Type>::isRequired() const
+AppCmdArg<Type>::isRequired() const throw()
 {
   return _required ;
 }
@@ -99,7 +99,7 @@ AppCmdArg<Type>::isRequired() const
  */
 template <typename Type>
 const std::string&
-AppCmdArg<Type>::name() const
+AppCmdArg<Type>::name() const throw()
 {
   return _name ;
 }
@@ -109,7 +109,7 @@ AppCmdArg<Type>::name() const
  */
 template <typename Type>
 const std::string&
-AppCmdArg<Type>::description() const
+AppCmdArg<Type>::description() const throw()
 {
   return _descr ;
 }
@@ -119,7 +119,7 @@ AppCmdArg<Type>::description() const
  */
 template <typename Type>
 size_t
-AppCmdArg<Type>::maxWords () const
+AppCmdArg<Type>::maxWords () const throw()
 {
   return 1 ;
 }
@@ -132,21 +132,16 @@ AppCmdArg<Type>::maxWords () const
 template <typename Type>
 int
 AppCmdArg<Type>::setValue ( StringList::const_iterator begin,
-		            StringList::const_iterator end )
+		            StringList::const_iterator end ) throw(AppCmdException)
 {
   // sequence must be non-empty
   assert ( begin != end ) ;
 
-  std::pair<Type,bool> res = AppCmdTypeTraits<Type>::fromString ( *begin ) ;
-  if ( res.second ) {
-    _value = res.first ;
-    _changed = true ;
-    // only one string could be supplied
-    assert ( ++ begin == end ) ;
-    return 1 ;
-  } else {
-    return -1 ;
-  }
+  _value = AppCmdTypeTraits<Type>::fromString ( *begin ) ;
+  _changed = true ;
+  // only one string could be supplied
+  assert ( ++ begin == end ) ;
+  return 1 ;
 }
 
 /**
@@ -156,7 +151,7 @@ AppCmdArg<Type>::setValue ( StringList::const_iterator begin,
  */
 template <typename Type>
 bool
-AppCmdArg<Type>::valueChanged () const
+AppCmdArg<Type>::valueChanged () const throw()
 {
   return _changed ;
 }
@@ -166,7 +161,7 @@ AppCmdArg<Type>::valueChanged () const
  */
 template <typename Type>
 const Type&
-AppCmdArg<Type>::value() const
+AppCmdArg<Type>::value() const throw()
 {
   return _value ;
 }
@@ -176,7 +171,7 @@ AppCmdArg<Type>::value() const
  */
 template <typename Type>
 void
-AppCmdArg<Type>::reset()
+AppCmdArg<Type>::reset() throw()
 {
   _value = _defValue ;
   _changed = false ;
