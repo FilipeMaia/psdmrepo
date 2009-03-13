@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: AppCmdOptBool.cpp 95 2008-11-03 22:50:03Z salnikov $
+// 	$Id$
 //
 // Description:
 //	Class AppCmdOptBool

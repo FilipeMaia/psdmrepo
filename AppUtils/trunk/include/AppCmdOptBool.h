@@ -52,7 +52,7 @@ extern "C" {
  *
  *  @see AppCmdOpt
  *
- *  @version $Id: AppCmdOptBool.h 95 2008-11-03 22:50:03Z salnikov $
+ *  @version $Id$
  *
  *  @author Andy Salnikov	(originator)
  */
