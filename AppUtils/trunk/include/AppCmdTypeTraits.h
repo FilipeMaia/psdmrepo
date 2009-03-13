@@ -15,14 +15,15 @@
 //-------------
 // C Headers --
 //-------------
-extern "C" {
 #include <limits.h>
 #include <float.h>
-}
 
 //---------------
 // C++ Headers --
 //---------------
+#include <cstdlib>
+#include <cerrno>
+#include <cmath>
 
 //----------------------
 // Base Class Headers --
@@ -73,11 +74,17 @@ struct AppCmdTypeTraits {
 template<>
 struct AppCmdTypeTraits<long> {
   static long fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+    const char* nptr = str.c_str() ;
     char* end ;
-    long res = strtol ( str.c_str(), &end, 0 ) ;
+    errno = 0 ; // not thread-safe
+    long val = std::strtol ( nptr, &end, 0 ) ;
     // conversion must consume all characters, otherwise it's not successful
-    if ( *end != '\0' ) throw AppCmdTypeCvtException ( str, "long" ) ;
-    return res ;
+    // check errno also and value for overflow/underflow
+    if (end== nptr || *end != '\0' ||
+        ((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN))) || (errno != 0 && val == 0)) {
+      throw AppCmdTypeCvtException ( str, "long" ) ;
+    }
+    return val ;
   }
 };
 
@@ -89,9 +96,7 @@ struct AppCmdTypeTraits<int> {
   static int fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
     try {
       long res = AppCmdTypeTraits<long>::fromString( str ) ;
-      if ( res >= INT_MIN && res <= INT_MAX ) {
-	return int(res) ;
-      }
+      if ( res >= INT_MIN && res <= INT_MAX ) return int(res) ;
     } catch (AppCmdTypeCvtException& e) {
     }
     throw AppCmdTypeCvtException ( str, "int" ) ;
@@ -104,11 +109,17 @@ struct AppCmdTypeTraits<int> {
 template<>
 struct AppCmdTypeTraits<unsigned long> {
   static unsigned long fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+    const char* nptr = str.c_str() ;
     char* end ;
-    unsigned long res = strtoul ( str.c_str(), &end, 0 ) ;
+    errno = 0 ;
+    unsigned long val = std::strtoul ( nptr, &end, 0 ) ;
     // conversion must consume all characters, otherwise it's not successful
-    if ( *end != '\0' ) throw AppCmdTypeCvtException ( str, "unsigned long" ) ;
-    return res ;
+    // check errno also and value for overflow/underflow
+    if (end==nptr || *end != '\0' ||
+        ((errno==ERANGE && val==ULONG_MAX) || (errno!=0 && val==0))) {
+      throw AppCmdTypeCvtException ( str, "unsigned long" ) ;
+    }
+    return val ;
   }
 };
 
@@ -121,9 +132,7 @@ struct AppCmdTypeTraits<unsigned int> {
     try {
       unsigned long res = AppCmdTypeTraits<unsigned long>::fromString( str ) ;
       // check the range
-      if ( res <= UINT_MAX ) {
-	return (unsigned int)( res ) ;
-      }
+      if ( res <= UINT_MAX ) return (unsigned int)( res ) ;
     } catch (AppCmdTypeCvtException& e) {
     }
     throw AppCmdTypeCvtException ( str, "unsigned int" ) ;
@@ -162,11 +171,17 @@ struct AppCmdTypeTraits<bool> {
 template<>
 struct AppCmdTypeTraits<double> {
   static double fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+    const char* nptr = str.c_str() ;
     char* end ;
-    double res = strtod ( str.c_str(), &end ) ;
+    errno = 0;
+    double val = std::strtod ( nptr, &end ) ;
     // conversion must consume all characters, otherwise it's not successful
-    if ( *end != '\0' ) throw AppCmdTypeCvtException ( str, "double" ) ;
-    return res ;
+    // check errno also and value for overflow/underflow
+    if (end==nptr || *end != '\0' ||
+        ((errno == ERANGE && (val == HUGE_VAL || val == -HUGE_VAL))) || (errno != 0 && val == 0)) {
+      throw AppCmdTypeCvtException ( str, "double" ) ;
+    }
+    return val ;
   }
 };
 
@@ -176,15 +191,17 @@ struct AppCmdTypeTraits<double> {
 template<>
 struct AppCmdTypeTraits<float> {
   static float fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
-    try {
-      double res = AppCmdTypeTraits<double>::fromString( str ) ;
-      // check the range
-      if ( res >= -FLT_MAX && res <= FLT_MAX ) {
-        return float( res ) ;
-      }
-    } catch (AppCmdTypeCvtException& e) {
+    const char* nptr = str.c_str() ;
+    char* end ;
+    errno = 0;
+    float val = std::strtof ( nptr, &end ) ;
+    // conversion must consume all characters, otherwise it's not successful
+    // check errno also and value for overflow/underflow
+    if (end==nptr || *end != '\0' ||
+        ((errno == ERANGE && (val == HUGE_VALF || val == -HUGE_VALF))) || (errno != 0 && val == 0)) {
+      throw AppCmdTypeCvtException ( str, "float" ) ;
     }
-    throw AppCmdTypeCvtException ( str, "float" ) ;
+    return val ;
   }
 };
 

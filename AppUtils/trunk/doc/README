@@ -346,6 +346,28 @@ same meaning as in the previous class):
   AppCmdOptList<T>(char shortName, string argName,
                   string description, char separator=',')
 
+Class AptCmdOptSize
+-------------------
+
+This class defines a command line option with argument. It accepts 
+non-negative numbers optionally followed by single-character suffix: 
+'k' or 'K' for 1024, 'M' for 1024*1024, 'G' for 1024*1024*1024. 
+The value type for this option should be unsigned integer with at 
+least 64 bits. Current value of the option after parse() can be 
+obtained through the value() member function.
+
+These constructors are defined for the class (parameter argName provides
+a name for the argument, such as "size" or "bytes", used for displaying
+usage information):
+
+  // make option with both short and long names
+  AptCmdOptSize(char shortName, string& longName, string argName, 
+                string description, uint64_t defValue)
+  // option with the long name only
+  AptCmdOptSize(string longName, string argName, string description, uint64_t defValue)
+  // option with the short name only
+  AptCmdOptSize(char shortName, string argName, string description, uint64_t defValue)
+
 Class AptCmdOptNamedValue<T>
 ----------------------------
 

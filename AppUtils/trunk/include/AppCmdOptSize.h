@@ -1,26 +1,18 @@
-#ifndef APPUTILS_APPCMDOPTBOOL_HH
-#define APPUTILS_APPCMDOPTBOOL_HH
+#ifndef APPUTILS_APPCMDOPTSIZE_H
+#define APPUTILS_APPCMDOPTSIZE_H
 
 //--------------------------------------------------------------------------
+// File and Version Information:
+// 	$Id$
 //
-// Environment:
-//      This software was developed for the BaBar collaboration.  If you
-//      use all or part of it, please give an appropriate acknowledgement.
-//
-// Copyright Information:
-//      Copyright (C) 2003	SLAC
+// Description:
+//	Class AppCmdOptSize.
 //
 //------------------------------------------------------------------------
 
-//-------------
-// C Headers --
-//-------------
-extern "C" {
-}
-
-//---------------
-// C++ Headers --
-//---------------
+//-----------------
+// C/C++ Headers --
+//-----------------
 
 //----------------------
 // Base Class Headers --
@@ -39,53 +31,46 @@ extern "C" {
 // 		-- Class Interface --
 //		---------------------
 
-
 /**
- *  This class represents a command line option without argument. The option
- *  has boolean value which will change its value for the first appearance of the
- *  option in the command line.
+ *  Option class for specifying size with a number+suffix. Acceptable
+ *  suffixes are k, K, M, G.
  *
- *  This software was developed for the BaBar collaboration.  If you
- *  use all or part of it, please give an appropriate acknowledgement.
+ *  This software was developed for the LUSI project.  If you use all or
+ *  part of it, please give an appropriate acknowledgment.
  *
- *  Copyright (C) 2003		SLAC
- *
- *  @see AppCmdOpt
+ *  @see AdditionalClass
  *
  *  @version $Id$
  *
- *  @author Andy Salnikov	(originator)
+ *  @author Andrei Salnikov
  */
 
 namespace AppUtils {
 
-class AppCmdOptBool : public AppCmdOptBase {
-
+class AppCmdOptSize : public AppCmdOptBase {
 public:
 
-  /**
-   *  Make a toggle option.
-   *
-   *  @param shortOpt  short form of the option, single character
-   *  @param longOpt   long form of the option, string without leading --
-   *  @param descr     description, one-line string
-   *  @param defValue  initial value of the option
-   */
-  AppCmdOptBool ( char shortOpt,
-                  const std::string& longOpt,
-                  const std::string& descr,
-                  bool defValue = false ) ;
-  // make option with long name only
-  AppCmdOptBool ( const std::string& longOpt,
-                  const std::string& descr,
-                  bool defValue = false ) ;
-  // make option with short name only
-  AppCmdOptBool ( char shortOpt,
-                  const std::string& descr,
-                  bool defValue = false ) ;
+  typedef unsigned long long value_type ;
 
-  /// Destructor
-  virtual ~AppCmdOptBool( ) throw();
+  // option with both short and long names
+  AppCmdOptSize ( char shortOpt,
+                  const std::string& longOpt,
+                  const std::string& name,
+                  const std::string& descr,
+                  value_type defValue ) ;
+  // option with the long name only
+  AppCmdOptSize ( const std::string& longOpt,
+                  const std::string& name,
+                  const std::string& descr,
+                  value_type defValue ) ;
+  // option with the short name only
+  AppCmdOptSize ( char shortOpt,
+                  const std::string& name,
+                  const std::string& descr,
+                  value_type defValue ) ;
+
+  // Destructor
+  virtual ~AppCmdOptSize () throw() ;
 
   /**
    *  Returns true if option requires argument. Does not make sense for
@@ -124,14 +109,14 @@ public:
   virtual bool valueChanged() const throw() ;
 
   /**
-   *  Return current value of the argument
+   *  Return current value of the option
    */
-  virtual bool value() const throw() ;
+  virtual value_type value() const throw() ;
 
   /**
    *  Return default value of the argument
    */
-  bool defValue() const throw() { return _defValue ; }
+  value_type defValue() const throw() { return _defValue ; }
 
   /**
    *  Reset option to its default value
@@ -140,28 +125,23 @@ public:
 
 protected:
 
-  // Helper functions
-
 private:
-
-  // Friends
 
   // Data members
   const char _shortOpt ;
   const std::string _longOpt ;
   const std::string _name ;
   const std::string _descr ;
-  bool _value ;
-  const bool _defValue ;
+  value_type _value ;
+  const value_type _defValue ;
   bool _changed ;
 
-  // Note: if your class needs a copy constructor or an assignment operator,
-  //  make one of the following public and implement it.
-  AppCmdOptBool( const AppCmdOptBool& );                // Copy Constructor
-  AppCmdOptBool& operator= ( const AppCmdOptBool& );    // Assignment op
+  // Copy constructor and assignment are disabled by default
+  AppCmdOptSize ( const AppCmdOptSize& ) ;
+  AppCmdOptSize& operator = ( const AppCmdOptSize& ) ;
 
 };
 
 } // namespace AppUtils
 
-#endif // APPUTILS_APPCMDOPTBOOL_HH
+#endif // APPUTILS_APPCMDOPTSIZE_H
