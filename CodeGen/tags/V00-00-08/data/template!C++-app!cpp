@@ -1,0 +1,164 @@
+//--------------------------------------------------------------------------
+// File and Version Information:
+// 	$$Id$$
+//
+// Description:
+//	Class $class...
+//
+// Author List:
+//      $author
+//
+//------------------------------------------------------------------------
+#include "Lusi/Lusi.h"
+
+//-----------------
+// C/C++ Headers --
+//-----------------
+#include <iostream>
+
+//----------------------
+// Base Class Headers --
+//----------------------
+#include "AppUtils/AppBase.h"
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+#include "AppUtils/AppCmdArg.h"
+#include "AppUtils/AppCmdOpt.h"
+#include "MsgLogger/MsgLogger.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+
+//		----------------------------------------
+// 		-- Public Function Member Definitions --
+//		----------------------------------------
+
+namespace $package {
+
+//
+//  Application class
+//
+class $class : public AppUtils::AppBase {
+public:
+
+  // Constructor
+  explicit $class ( const std::string& appName ) ;
+
+  // destructor
+  ~$class () ;
+
+protected :
+
+  /**
+   *  Method called before runApp, optional.
+   *  Usually if you override it, call base class method too.
+   */
+  //virtual int preRunApp () ;
+
+  /**
+   *  Main method which runs the whole application
+   */
+  virtual int runApp () ;
+
+  /**
+   *  Method called after runApp, optional.
+   *  Usually if you override it, call base class method too.
+   */
+  //virtual int postRunApp () ;
+
+  /**
+   *  Print some additional info after the usage information is printed,
+   *  optional.
+   */
+  //virtual void moreUsage ( std::ostream& out ) const ;
+
+private:
+
+  // more command line options and arguments
+  AppUtils::AppCmdOpt<int> m_intOpt ;
+  AppUtils::AppCmdArg<std::string> m_stringArg ;
+
+  // other data members
+  int m_val ;
+
+};
+
+//----------------
+// Constructors --
+//----------------
+$class::$class ( const std::string& appName )
+  : AppUtils::AppBase( appName )
+  , m_intOpt( 'i', "value", "number", "optional parameter, number, def: 100", 100 )
+  , m_stringArg( "name", "positional parmeter, string" )
+  , m_val( 0 )
+{
+  addOption( m_intOpt ) ;
+  addArgument( m_stringArg ) ;
+}
+
+//--------------
+// Destructor --
+//--------------
+$class::~$class ()
+{
+}
+
+/**
+ *  Method called before runApp, optional.
+ *  Usually if you override it, call base class method too.
+ */
+//int
+//$class::preRunApp ()
+//{
+//  int rc = AppBase::preRunApp();
+//  if ( rc != 0 ) return rc ;
+//
+//  // do some class-specific initialization
+//
+//  return 0 ;
+//}
+
+/**
+ *  Main method which runs the whole application
+ */
+int
+$class::runApp ()
+{
+  // All options and arguments are accessible here.
+
+  MsgLogRoot( trace, "starting with the name " << m_stringArg.value() ) ;
+
+  // return 0 on success, other values for error (like main())
+  return 0 ;
+}
+
+/**
+ *  Method called after runApp, optional.
+ *  Usually if you override it, call base class method too.
+ */
+//int
+//$class::postRunApp ()
+//{
+//  // do some class-specific clean-up
+//
+//  return AppBase::postRunApp();
+//}
+
+/**
+ *  Print some additional info after the usage information is printed,
+ *  optional.
+ */
+//void
+//$class::moreUsage ( std::ostream& out ) const
+//{
+//  out << "Application-specific usage information, optional" ;
+//}
+
+} // namespace $package
+
+
+// this defines main()
+APPUTILS_MAIN($package::$class)
