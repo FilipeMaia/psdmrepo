@@ -31,6 +31,8 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+#define ID_VERSION(ID,VERSION) ((ID)|((VERSION)<<16))
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -65,62 +67,71 @@ O2OXtcIterator::process(Xtc* xtc)
   MsgLogRoot( debug, "O2OXtcIterator::process -- new xtc: "
               << Pds::TypeId::name(type) << "/" << version ) ;
 
-  switch ( type ) {
+  int result = 1 ;
+  if ( type == Pds::TypeId::Id_Xtc ) {
 
-    case (Pds::TypeId::Id_Xtc) : {
+    // say we are at the new XTC level
+    if ( m_scanner ) m_scanner->levelStart ( xtc->src ) ;
 
-      // say we are at the new XTC level
-      if ( m_scanner ) m_scanner->levelStart ( xtc->src ) ;
+    // scan all sub-xtcs
+    O2OXtcIterator iter( xtc, m_scanner, m_ignore );
+    iter.iterate();
 
-      // scan all sub-xtcs
-      O2OXtcIterator iter( xtc, m_scanner, m_ignore );
-      iter.iterate();
+    // say we are done with this XTC level
+    if ( m_scanner ) m_scanner->levelEnd ( xtc->src ) ;
 
-      // say we are done with this XTC level
-      if ( m_scanner ) m_scanner->levelEnd ( xtc->src ) ;
+  } else if ( type == Pds::TypeId::Any ) {
 
-      return 1;
-    }
+    // NOTE: I do not know yet what this type is supposed to do, for now just ignore it
 
-    case (Pds::TypeId::Any) :
-      // NOTE: I do not know yet what this type is supposed to do, for now just ignore it
-      return 1 ;
-
-    // Below are specific types wich are known to us
-    case (Pds::TypeId::Id_Waveform) :
-      switch ( version ) {
-      case 0:
-        if ( m_scanner ) m_scanner->dataObject( *(const WaveformV1*)(xtc->payload()), xtc->src );
-        return 1 ;
-      }
-      break ;
-
-    case (Pds::TypeId::Id_AcqConfig) : {
-      switch ( version ) {
-      case 1:
-        if ( m_scanner ) m_scanner->dataObject( *(const Acqiris::ConfigV1*)(xtc->payload()), xtc->src );
-        return 1 ;
-      }
-      break ;
-
-    }
-
-    default :
-
-      break ;
-
-  }
-
-  if ( m_ignore ) {
-    MsgLogRoot( warning, "O2OXtcIterator::process -- unexpected type or version: "
-                << Pds::TypeId::name(type) << "/" << version ) ;
-    return 1;
   } else {
-    MsgLogRoot( error, "O2OXtcIterator::process -- unexpected type or version: "
-                << Pds::TypeId::name(type) << "/" << version ) ;
-    return 0;
+
+    switch ( ID_VERSION(type,version) ) {
+
+      // Below are specific types which are known to us
+      case ( ID_VERSION( Pds::TypeId::Id_Frame, 1 ) ) :
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Camera::FrameV1*)(xtc->payload()), xtc->src );
+        break ;
+
+      case ( ID_VERSION( Pds::TypeId::Id_AcqWaveform, 1 ) ) :
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Acqiris::DataDescV1*)(xtc->payload()), xtc->src );
+        break ;
+
+      case ( ID_VERSION( Pds::TypeId::Id_AcqConfig, 1 ) ) :
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Acqiris::ConfigV1*)(xtc->payload()), xtc->src );
+        break ;
+
+      case ( ID_VERSION( Pds::TypeId::Id_TwoDGaussian, 1 ) ) :
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Camera::TwoDGaussianV1*)(xtc->payload()), xtc->src );
+        break ;
+
+      case ( ID_VERSION( Pds::TypeId::Id_Opal1kConfig, 1 ) ) :
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Opal1k::ConfigV1*)(xtc->payload()), xtc->src );
+        break ;
+
+      case ( ID_VERSION( Pds::TypeId::Id_FrameFexConfig, 1 ) ) :
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Camera::FrameFexConfigV1*)(xtc->payload()), xtc->src );
+        break ;
+
+      case ( ID_VERSION( Pds::TypeId::Id_EvrConfig, 1 ) ) :
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::EvrData::ConfigV1*)(xtc->payload()), xtc->src );
+        break ;
+
+      default :
+        if ( m_ignore ) {
+          MsgLogRoot( warning, "O2OXtcIterator::process -- unexpected type or version: "
+                      << Pds::TypeId::name(type) << "/" << version ) ;
+        } else {
+          MsgLogRoot( error, "O2OXtcIterator::process -- unexpected type or version: "
+                      << Pds::TypeId::name(type) << "/" << version ) ;
+          result = 0;
+        }
+
+        break ;
+    }
   }
 
+  return result ;
 }
 
 } // namespace O2OTranslator

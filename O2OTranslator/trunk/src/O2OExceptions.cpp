@@ -42,16 +42,4 @@ O2OException::O2OException (const std::string& className, const std::string& wha
 {
 }
 
-O2OException::~O2OException () throw()
-{
-}
-
-O2OFileOpenException::~O2OFileOpenException () throw()
-{
-}
-
-O2ONexusException::~O2ONexusException () throw()
-{
-}
-
 } // namespace O2OTranslator

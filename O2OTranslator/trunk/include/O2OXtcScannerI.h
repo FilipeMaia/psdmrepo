@@ -52,7 +52,7 @@ public:
   // Destructor
   virtual ~O2OXtcScannerI () {}
 
-  // signal start/end of the event
+  // signal start/end of the event (datagram)
   virtual void eventStart ( const Pds::Sequence& seq ) = 0 ;
   virtual void eventEnd ( const Pds::Sequence& seq ) = 0 ;
 
@@ -61,8 +61,13 @@ public:
   virtual void levelEnd ( const Pds::Src& src ) = 0 ;
 
   // visit the data object
-  virtual void dataObject ( const Pds::WaveformV1& data, const Pds::Src& src ) = 0 ;
   virtual void dataObject ( const Pds::Acqiris::ConfigV1& data, const Pds::Src& src ) = 0 ;
+  virtual void dataObject ( const Pds::Acqiris::DataDescV1& data, const Pds::Src& src ) = 0 ;
+  virtual void dataObject ( const Pds::Camera::FrameFexConfigV1& data, const Pds::Src& src ) = 0 ;
+  virtual void dataObject ( const Pds::Camera::FrameV1& data, const Pds::Src& src ) = 0 ;
+  virtual void dataObject ( const Pds::Camera::TwoDGaussianV1& data, const Pds::Src& src ) = 0 ;
+  virtual void dataObject ( const Pds::EvrData::ConfigV1& data, const Pds::Src& src ) = 0 ;
+  virtual void dataObject ( const Pds::Opal1k::ConfigV1& data, const Pds::Src& src ) = 0 ;
 
 protected:
 

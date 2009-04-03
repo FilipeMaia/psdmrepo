@@ -53,8 +53,6 @@ public:
   // Constructor
   O2OException ( const std::string& className, const std::string& what ) ;
 
-  virtual ~O2OException () throw() ;
-
 };
 
 
@@ -64,16 +62,55 @@ public:
   O2OFileOpenException( const std::string& fileName )
     : O2OException( "O2OFileOpenException", "failed to open file "+fileName ) {}
 
-  virtual ~O2OFileOpenException() throw() ;
 };
 
-class O2ONexusException : public O2OException {
+class O2OXTCTransitionException : public O2OException {
 public:
 
-  O2ONexusException( const std::string& function )
-    : O2OException( "O2ONexusException", "Nexus error in call to function "+function ) {}
+  O2OXTCTransitionException( const std::string& type, const std::string& current )
+    : O2OException( "O2OXTCTransitionException", "unexpected XTC transition type: "+type+", current state: "+current ) {}
 
-  virtual ~O2ONexusException() throw() ;
+};
+
+class O2OXTCConfigException : public O2OException {
+public:
+
+  O2OXTCConfigException( const std::string& type )
+    : O2OException( "O2OXTCConfigException", "configuration object missing for type "+type ) {}
+
+};
+
+class O2OXTCLevelException : public O2OException {
+public:
+
+  O2OXTCLevelException( const std::string& type, const std::string& level )
+    : O2OException( "O2OXTCLevelException", "XTC object of type "+type+" not on Source level: "+level ) {}
+
+};
+
+/// Generic XTC exception, just give it a message
+class O2OXTCGenException : public O2OException {
+public:
+
+  O2OXTCGenException( const std::string& msg )
+    : O2OException( "O2OXTCGenException", msg ) {}
+
+};
+
+class O2OHDF5Exception : public O2OException {
+public:
+
+  O2OHDF5Exception( const std::string& what )
+    : O2OException( "O2OHDF5Exception", what ) {}
+
+};
+
+class O2OHdf5Exception : public O2OException {
+public:
+
+  O2OHdf5Exception( const std::string& function )
+    : O2OException( "O2OHdf5Exception", "HDF5 error in call to function "+function ) {}
+
 };
 
 

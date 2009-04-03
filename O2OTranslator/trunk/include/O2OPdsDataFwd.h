@@ -54,12 +54,34 @@ namespace Pds {
   class ProcInfo ;
 
   // Data objects
-  class WaveformV1 ;
 
   namespace Acqiris {
     class ConfigV1 ;
+    class DataDescV1 ;
   } // namespace Acqiris
 
+  namespace Camera {
+
+    class FrameFexConfigV1 ;
+    class FrameV1 ;
+    class TwoDGaussianV1 ;
+
+  } // namespace Camera
+
+  namespace EvrData {
+
+    class ConfigV1 ;
+
+  } // namespace EvrData
+
+  namespace Opal1k {
+
+    class ConfigV1 ;
+
+  } // namespace Opal1k
+
 } // namespace Pds
+
+
 
 #endif // O2OTRANSLATOR_O2OPDSDATAFWD_H

@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2009-04-03 Andy Salnikov
+- lots of changes:
+- new data classes appeared in pdsdata
+- starting implementation of the native HDF5 writing
+
 Tag: V00-00-04
 2009-02-25 Andy Salnikov
 - fix few harmless compilation warnings

@@ -1,19 +1,18 @@
-#ifndef O2OTRANSLATOR_O2ONEXUSWRITER_H
-#define O2OTRANSLATOR_O2ONEXUSWRITER_H
+#ifndef O2OTRANSLATOR_O2OHDF5WRITER_H
+#define O2OTRANSLATOR_O2OHDF5WRITER_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class O2ONexusWriter.
+//	Class O2OHdf5Writer.
 //
 //------------------------------------------------------------------------
 
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <string>
 #include <map>
 
 //----------------------
@@ -24,7 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "nexuspp/NxppFile.h"
+#include "hdf5pp/File.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,10 +34,10 @@
 //		---------------------
 
 /**
- *  Scanner class which sends all data to Nexus file
+ *  Scanner file that sends all data to HDF5 file
  *
  *  This software was developed for the LUSI project.  If you use all or
- *  part of it, please give an appropriate acknowledgement.
+ *  part of it, please give an appropriate acknowledgment.
  *
  *  @see AdditionalClass
  *
@@ -51,16 +50,22 @@ namespace O2OTranslator {
 
 class O2OFileNameFactory ;
 
-class O2ONexusWriter : public O2OXtcScannerI {
+class O2OHdf5Writer : public O2OXtcScannerI {
 public:
 
+  enum SplitMode { NoSplit, Family } ;
+
+  // current XTC state
   enum State { Undefined, Mapped, Configured, Running } ;
 
   // Default constructor
-  O2ONexusWriter ( const O2OFileNameFactory& nameFactory ) ;
+  O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
+                  bool overwrite=false,
+                  SplitMode split=NoSplit,
+                  hsize_t splitSize=0xFFFFFFFF ) ;
 
   // Destructor
-  virtual ~O2ONexusWriter () ;
+  virtual ~O2OHdf5Writer () ;
 
   // signal start/end of the event (datagram)
   virtual void eventStart ( const Pds::Sequence& seq ) ;
@@ -91,16 +96,12 @@ private:
 
   // Data members
   const O2OFileNameFactory& m_nameFactory ;
-  nexuspp::NxppFile* m_file ;
+  hdf5pp::File m_file ;
   State m_state ;
   AcqConfigMap m_acqConfigMap ;
-
-  // Copy constructor and assignment are disabled by default
-  O2ONexusWriter ( const O2ONexusWriter& ) ;
-  O2ONexusWriter operator = ( const O2ONexusWriter& ) ;
 
 };
 
 } // namespace O2OTranslator
 
-#endif // O2OTRANSLATOR_O2ONEXUSWRITER_H
+#endif // O2OTRANSLATOR_O2OHDF5WRITER_H
