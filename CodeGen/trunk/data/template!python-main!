@@ -22,7 +22,7 @@ part of it, please give an appropriate acknowledgement.
 
 @see RelatedModule
 
-@version $$Id: template!python-main! 8 2008-10-08 22:35:33Z salnikov $$ 
+@version $$Id$$ 
 
 @author $author
 """

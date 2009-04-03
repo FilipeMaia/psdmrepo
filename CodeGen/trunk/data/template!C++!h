@@ -34,7 +34,7 @@ $BASEINCL
 /**
  *  C++ source file code template. The first sentence is a brief summary of 
  *  what the class is for. It is followed by more detailed information
- *  about how to use the class. This doc comment must immediately preced the 
+ *  about how to use the class. This doc comment must immediately preceed the 
  *  class definition.
  *
  *  Additional paragraphs with more details may follow; separate paragraphs
@@ -48,11 +48,11 @@ $BASEINCL
  *  be commented with C++-style // (double forward slash) comments.
  *
  *  This software was developed for the LUSI project.  If you use all or 
- *  part of it, please give an appropriate acknowledgement.
+ *  part of it, please give an appropriate acknowledgment.
  *
  *  @see AdditionalClass
  *
- *  @version $$Id: template!C++!h 4 2008-10-08 19:27:36Z salnikov $$
+ *  @version $$Id$$
  *
  *  @author $author
  */

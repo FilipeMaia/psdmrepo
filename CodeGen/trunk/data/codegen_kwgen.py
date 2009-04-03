@@ -71,6 +71,7 @@ codegen_python_main_BASEINCL = codegen_python_BASEINCL
 codegen_Cxx_description = "Template for regular non-templated C++ classes"
 codegen_Cxx_template_description = "Template for templated C++ classes"
 codegen_Cxx_app_description = "Template for C++ applications based on AppBase class"
+codegen_Cxx_unit_test_description = "Template for C++ unit test module"
 
 codegen_python_description = "Template for Python library module"
 codegen_python_main_description = "Template for Python executable script"
