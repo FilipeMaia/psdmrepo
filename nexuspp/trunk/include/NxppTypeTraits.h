@@ -60,6 +60,7 @@ struct NxppTypeTraitsNum {
 
   // get the address of the data item
   static void* dataAddress( T* ptr ) { return static_cast<void*>(ptr); }
+  static const void* dataAddress( const T* ptr ) { return static_cast<const void*>(ptr); }
   static const void* dataAddress( const T& val ) { return static_cast<const void*>(&val); }
 
   // size() returns the size of the data value
@@ -97,6 +98,14 @@ struct NxppTypeTraits<int32_t> : public NxppTypeTraitsNum<int32_t,NX_INT32> {
 
 template <>
 struct NxppTypeTraits<uint32_t> : public NxppTypeTraitsNum<uint32_t,NX_UINT32> {
+};
+
+template <>
+struct NxppTypeTraits<int64_t> : public NxppTypeTraitsNum<int64_t,NX_INT64> {
+};
+
+template <>
+struct NxppTypeTraits<uint64_t> : public NxppTypeTraitsNum<uint64_t,NX_UINT64> {
 };
 
 template <>

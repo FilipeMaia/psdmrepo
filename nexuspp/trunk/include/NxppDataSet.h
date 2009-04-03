@@ -21,6 +21,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "nexuspp/NxppExceptions.h"
 #include "nexuspp/NxppTypeTraits.h"
 
 //------------------------------------
@@ -59,31 +60,33 @@ public:
     NXclosedata ( m_fileId ) ;
   }
 
+  // get info about dataset
+  void getInfo ( int* rank, int dims[], int *type=0 ) {
+    int atype ;
+    if ( NXgetinfo( m_fileId, rank, dims, type ? type : &atype ) != NX_OK ) {
+      throw NxppNexusException ( "NxppDataSet::getInfo", "NXgetinfo" ) ;
+    }
+  }
+
   // put the data
-  bool putData ( T* data ) {
-    void* addr = NxppTypeTraits<T>::dataAddress(data) ;
-    return NXputdata ( m_fileId, addr ) == NX_OK ;
-  }
-  bool putData ( T data ) {
+  void putData ( const T* data ) {
     const void* addr = NxppTypeTraits<T>::dataAddress(data) ;
-    return NXputdata ( m_fileId, (void*)addr ) == NX_OK ;
+    if ( NXputdata ( m_fileId, (void*)addr ) != NX_OK ) {
+      throw NxppNexusException ( "NxppDataSet::putData", "NXputdata" ) ;
+    }
+  }
+  void putData ( T data ) {
+    const void* addr = NxppTypeTraits<T>::dataAddress(data) ;
+    if ( NXputdata ( m_fileId, (void*)addr ) != NX_OK ) {
+      throw NxppNexusException ( "NxppDataSet::putData", "NXputdata" ) ;
+    }
   }
 
-  // add attribute
-  template <typename U>
-  bool addAttribute ( const std::string& name, const U& value ) {
-    const void* addr = NxppTypeTraits<U>::dataAddress(value) ;
-    int size = NxppTypeTraits<U>::size(value) ;
-    int type = NxppTypeTraits<U>::nxtype ;
-    return NXputattr ( m_fileId, name.c_str(), (void*)addr, size, type ) == NX_OK ;
-  }
-
-  // add attribute
-  template <typename U>
-  bool addAttribute ( const std::string& name, int size, const U* ptr ) {
-    const void* addr = NxppTypeTraits<U>::dataAddress(ptr) ;
-    int type = NxppTypeTraits<U>::nxtype ;
-    return NXputattr ( m_fileId, name.c_str(), (void*)addr, size, type ) == NX_OK ;
+  void putSlab ( const T* data, int start[], int size[] ) {
+    const void* addr = NxppTypeTraits<T>::dataAddress(data) ;
+    if ( NXputslab ( m_fileId, (void*)addr, start, size ) != NX_OK ) {
+      throw NxppNexusException ( "NxppDataSet::putSlab", "NXputslab" ) ;
+    }
   }
 
 protected:
