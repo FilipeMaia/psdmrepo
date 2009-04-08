@@ -23,6 +23,9 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "hdf5pp/CompoundType.h"
+#include "hdf5pp/EnumType.h"
+#include "hdf5pp/TypeTraits.h"
 #include "H5DataTypes/H5DataUtils.h"
 
 //-----------------------------------------------------------------------
@@ -59,20 +62,26 @@ EvrPulseConfigV1::EvrPulseConfigV1 ( const Pds::EvrData::PulseConfig pconfig )
 }
 
 hdf5pp::Type
-EvrPulseConfigV1::persType()
+EvrPulseConfigV1::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+EvrPulseConfigV1::native_type()
 {
   hdf5pp::CompoundType pulseType = hdf5pp::CompoundType::compoundType< EvrPulseConfigV1_Data >() ;
-  pulseType.insert( "pulse", offsetof(EvrPulseConfigV1_Data,pulse), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  pulseType.insert( "trigger", offsetof(EvrPulseConfigV1_Data,trigger), hdf5pp::AtomicType::atomicType<int16_t>() ) ;
-  pulseType.insert( "set", offsetof(EvrPulseConfigV1_Data,set), hdf5pp::AtomicType::atomicType<int16_t>() ) ;
-  pulseType.insert( "clear", offsetof(EvrPulseConfigV1_Data,clear), hdf5pp::AtomicType::atomicType<int16_t>() ) ;
-  pulseType.insert( "polarity", offsetof(EvrPulseConfigV1_Data,polarity), hdf5pp::AtomicType::atomicType<uint8_t>() ) ;
-  pulseType.insert( "map_set_enable", offsetof(EvrPulseConfigV1_Data,map_set_enable), hdf5pp::AtomicType::atomicType<uint8_t>() ) ;
-  pulseType.insert( "map_reset_enable", offsetof(EvrPulseConfigV1_Data,map_reset_enable), hdf5pp::AtomicType::atomicType<uint8_t>() ) ;
-  pulseType.insert( "map_trigger_enable", offsetof(EvrPulseConfigV1_Data,map_trigger_enable), hdf5pp::AtomicType::atomicType<uint8_t>() ) ;
-  pulseType.insert( "prescale", offsetof(EvrPulseConfigV1_Data,prescale), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  pulseType.insert( "delay", offsetof(EvrPulseConfigV1_Data,delay), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  pulseType.insert( "width", offsetof(EvrPulseConfigV1_Data,width), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
+  pulseType.insert_native<uint32_t>( "pulse", offsetof(EvrPulseConfigV1_Data,pulse) ) ;
+  pulseType.insert_native<int16_t>( "trigger", offsetof(EvrPulseConfigV1_Data,trigger) ) ;
+  pulseType.insert_native<int16_t>( "set", offsetof(EvrPulseConfigV1_Data,set) ) ;
+  pulseType.insert_native<int16_t>( "clear", offsetof(EvrPulseConfigV1_Data,clear) ) ;
+  pulseType.insert_native<uint8_t>( "polarity", offsetof(EvrPulseConfigV1_Data,polarity) ) ;
+  pulseType.insert_native<uint8_t>( "map_set_enable", offsetof(EvrPulseConfigV1_Data,map_set_enable) ) ;
+  pulseType.insert_native<uint8_t>( "map_reset_enable", offsetof(EvrPulseConfigV1_Data,map_reset_enable) ) ;
+  pulseType.insert_native<uint8_t>( "map_trigger_enable", offsetof(EvrPulseConfigV1_Data,map_trigger_enable) ) ;
+  pulseType.insert_native<uint32_t>( "prescale", offsetof(EvrPulseConfigV1_Data,prescale) ) ;
+  pulseType.insert_native<uint32_t>( "delay", offsetof(EvrPulseConfigV1_Data,delay) ) ;
+  pulseType.insert_native<uint32_t>( "width", offsetof(EvrPulseConfigV1_Data,width) ) ;
 
   return pulseType ;
 }
@@ -86,7 +95,13 @@ EvrOutputMapV1::EvrOutputMapV1 ( const Pds::EvrData::OutputMap mconfig )
 }
 
 hdf5pp::Type
-EvrOutputMapV1::persType()
+EvrOutputMapV1::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+EvrOutputMapV1::native_type()
 {
   hdf5pp::EnumType<int16_t> srcEnumType = hdf5pp::EnumType<int16_t>::enumType() ;
   srcEnumType.insert ( "Pulse", Pds::EvrData::OutputMap::Pulse ) ;
@@ -101,9 +116,9 @@ EvrOutputMapV1::persType()
 
   hdf5pp::CompoundType mapType = hdf5pp::CompoundType::compoundType< EvrOutputMapV1_Data >() ;
   mapType.insert( "source", offsetof(EvrOutputMapV1_Data,source), srcEnumType ) ;
-  mapType.insert( "source_id", offsetof(EvrOutputMapV1_Data,source_id), hdf5pp::AtomicType::atomicType<int16_t>() ) ;
+  mapType.insert_native<int16_t>( "source_id", offsetof(EvrOutputMapV1_Data,source_id) ) ;
   mapType.insert( "conn", offsetof(EvrOutputMapV1_Data,conn), connEnumType ) ;
-  mapType.insert( "conn_id", offsetof(EvrOutputMapV1_Data,conn_id), hdf5pp::AtomicType::atomicType<int16_t>() ) ;
+  mapType.insert_native<int16_t>( "conn_id", offsetof(EvrOutputMapV1_Data,conn_id) ) ;
 
   return mapType ;
 }
@@ -115,11 +130,17 @@ EvrConfigV1::EvrConfigV1 ( const Pds::EvrData::ConfigV1& data )
 }
 
 hdf5pp::Type
-EvrConfigV1::persType()
+EvrConfigV1::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+EvrConfigV1::native_type()
 {
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<EvrConfigV1>() ;
-  confType.insert( "npulses", offsetof(EvrConfigV1_Data,npulses), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  confType.insert( "noutputs", offsetof(EvrConfigV1_Data,noutputs), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
+  confType.insert_native<uint32_t>( "npulses", offsetof(EvrConfigV1_Data,npulses) ) ;
+  confType.insert_native<uint32_t>( "noutputs", offsetof(EvrConfigV1_Data,noutputs) ) ;
 
   return confType ;
 }

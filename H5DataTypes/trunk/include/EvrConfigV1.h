@@ -71,7 +71,8 @@ public:
   EvrPulseConfigV1 () {}
   EvrPulseConfigV1 ( const Pds::EvrData::PulseConfig pconfig ) ;
 
-  static hdf5pp::Type persType() ;
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
 
 private:
 
@@ -95,7 +96,8 @@ public:
   EvrOutputMapV1 () {}
   EvrOutputMapV1 ( const Pds::EvrData::OutputMap mconfig ) ;
 
-  static hdf5pp::Type persType() ;
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
 
 private:
 
@@ -117,7 +119,8 @@ public:
   EvrConfigV1 () {}
   EvrConfigV1 ( const Pds::EvrData::ConfigV1& data ) ;
 
-  static hdf5pp::Type persType() ;
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
 
 private:
 

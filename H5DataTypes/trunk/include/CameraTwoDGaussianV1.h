@@ -63,7 +63,8 @@ public:
   CameraTwoDGaussianV1 () {}
   CameraTwoDGaussianV1 ( const Pds::Camera::TwoDGaussianV1& config ) ;
 
-  static hdf5pp::Type persType() ;
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
 
 private:
   CameraTwoDGaussianV1_Data m_data ;

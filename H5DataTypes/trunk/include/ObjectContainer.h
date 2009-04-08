@@ -25,6 +25,7 @@
 #include "hdf5pp/DataSet.h"
 #include "hdf5pp/DataSpace.h"
 #include "hdf5pp/Group.h"
+#include "hdf5pp/TypeTraits.h"
 #include "hdf5pp/Type.h"
 
 //------------------------------------
@@ -55,11 +56,9 @@ public:
 
   ObjectContainer ( const char* name,
                     hdf5pp::Group& location,
-                    const hdf5pp::Type& type = T::persType(),
                     hsize_t chunk_size = 10240,
                     int deflate = -1 )
     : m_dataset()
-    , m_type( type )
     , m_count(0)
   {
     // make extensible data space
@@ -71,7 +70,7 @@ public:
     if ( deflate >= 0 ) plDScreate.set_deflate(deflate) ;
 
     // make a data set
-    m_dataset = location.createDataSet<T> ( name, m_type, dsp, plDScreate ) ;
+    m_dataset = location.createDataSet<T> ( name, dsp, plDScreate ) ;
   }
 
   void append ( const T& obj )
@@ -90,7 +89,7 @@ public:
     hdf5pp::DataSpace memDspc = hdf5pp::DataSpace::makeScalar() ;
 
     // store it
-    m_dataset.store ( m_type, memDspc, fileDspc, &obj ) ;
+    m_dataset.store ( memDspc, fileDspc, &obj ) ;
 
     m_count = newCount ;
   }
@@ -98,7 +97,6 @@ public:
 private:
 
   hdf5pp::DataSet<T> m_dataset ;
-  hdf5pp::Type m_type ;
   unsigned long m_count ;
 };
 

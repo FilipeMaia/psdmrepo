@@ -23,6 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "hdf5pp/CompoundType.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -41,11 +42,17 @@ XtcClockTime::XtcClockTime ( const Pds::ClockTime& time )
 }
 
 hdf5pp::Type
-XtcClockTime::persType()
+XtcClockTime::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+XtcClockTime::native_type()
 {
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<XtcClockTime>() ;
-  type.insert( "seconds", offsetof(XtcClockTime_Data,seconds), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  type.insert( "nanoseconds", offsetof(XtcClockTime_Data,nanoseconds), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
+  type.insert_native<uint32_t>( "seconds", offsetof(XtcClockTime_Data,seconds) ) ;
+  type.insert_native<uint32_t>( "nanoseconds", offsetof(XtcClockTime_Data,nanoseconds) ) ;
 
   return type ;
 }

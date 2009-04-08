@@ -22,6 +22,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "hdf5pp/Type.h"
+#include "pdsdata/camera/FrameV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -32,22 +34,8 @@
 //		---------------------
 
 /**
- *  C++ source file code template. The first sentence is a brief summary of 
- *  what the class is for. It is followed by more detailed information
- *  about how to use the class. This doc comment must immediately preceed the 
- *  class definition.
  *
- *  Additional paragraphs with more details may follow; separate paragraphs
- *  with a blank line. The last paragraph before the tags (preceded by @) 
- *  should be the identification and copyright, as below.
- *
- *  Please note that KDOC comments must start with /** (a forward slash
- *  followed by TWO asterisks). Interface members should be documented
- *  with KDOC comments, as should be protected members that may be of interest
- *  to those deriving from your class. Private implementation should
- *  be commented with C++-style // (double forward slash) comments.
- *
- *  This software was developed for the LUSI project.  If you use all or 
+ *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
  *
  *  @see AdditionalClass
@@ -59,42 +47,23 @@
 
 namespace H5DataTypes {
 
+struct CameraFrameV1_Data  {
+  double xyz ;
+};
+
 class CameraFrameV1  {
 public:
 
-  // Default constructor
-  CameraFrameV1 () ;
+  CameraFrameV1 () {}
+  CameraFrameV1 ( const Pds::Camera::FrameV1& frame ) ;
 
-  // Destructor
-  virtual ~CameraFrameV1 () ;
+  ~CameraFrameV1 () ;
 
-protected:
-
-private:
-
-  // Data members
-  
-  int m_memberVariable;  // private members start with m_
-
-  // Copy constructor and assignment are disabled by default
-  CameraFrameV1 ( const CameraFrameV1& ) ;
-  CameraFrameV1& operator = ( const CameraFrameV1& ) ;
-
-//------------------
-// Static Members --
-//------------------
-
-public:
-
-  // Selectors (const)
-
-  // Modifiers
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
 
 private:
-
-  // Data members
-  static int s_staticVariable;     // Static data member starts with s_.
-
+  CameraFrameV1_Data m_data ;
 };
 
 } // namespace H5DataTypes

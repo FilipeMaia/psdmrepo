@@ -57,7 +57,8 @@ public:
   CameraFrameCoordV1() {}
   CameraFrameCoordV1( const Pds::Camera::FrameCoord& coord ) ;
 
-  static hdf5pp::Type persType() ;
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
 
 private:
   CameraFrameCoordV1_Data m_data ;

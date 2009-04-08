@@ -24,7 +24,8 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "H5DataTypes/H5DataUtils.h"
-#include "hdf5pp/Type.h"
+#include "hdf5pp/CompoundType.h"
+#include "hdf5pp/TypeTraits.h"
 #include "hdf5pp/DataSet.h"
 #include "hdf5pp/DataSpace.h"
 
@@ -50,13 +51,19 @@ AcqirisVertV1::AcqirisVertV1 ( const Pds::Acqiris::VertV1& v )
 }
 
 hdf5pp::Type
-AcqirisVertV1::persType()
+AcqirisVertV1::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+AcqirisVertV1::native_type()
 {
   hdf5pp::CompoundType vertType = hdf5pp::CompoundType::compoundType<AcqirisVertV1>() ;
-  vertType.insert( "fullScale", offsetof(AcqirisVertV1_Data,fullScale), hdf5pp::AtomicType::atomicType<double>() ) ;
-  vertType.insert( "offset", offsetof(AcqirisVertV1_Data,offset), hdf5pp::AtomicType::atomicType<double>() ) ;
-  vertType.insert( "coupling", offsetof(AcqirisVertV1_Data,coupling), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  vertType.insert( "bandwidth", offsetof(AcqirisVertV1_Data,bandwidth), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
+  vertType.insert_native<double>( "fullScale", offsetof(AcqirisVertV1_Data,fullScale) ) ;
+  vertType.insert_native<double>( "offset", offsetof(AcqirisVertV1_Data,offset) ) ;
+  vertType.insert_native<uint32_t>( "coupling", offsetof(AcqirisVertV1_Data,coupling) ) ;
+  vertType.insert_native<uint32_t>( "bandwidth", offsetof(AcqirisVertV1_Data,bandwidth) ) ;
 
   return vertType ;
 }
@@ -70,13 +77,19 @@ AcqirisHorizV1::AcqirisHorizV1 ( const Pds::Acqiris::HorizV1& h )
 }
 
 hdf5pp::Type
-AcqirisHorizV1::persType()
+AcqirisHorizV1::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+AcqirisHorizV1::native_type()
 {
   hdf5pp::CompoundType horizType = hdf5pp::CompoundType::compoundType<AcqirisHorizV1>() ;
-  horizType.insert( "sampInterval", offsetof(AcqirisHorizV1_Data,sampInterval), hdf5pp::AtomicType::atomicType<double>() ) ;
-  horizType.insert( "delayTime", offsetof(AcqirisHorizV1_Data,delayTime), hdf5pp::AtomicType::atomicType<double>() ) ;
-  horizType.insert( "nbrSamples", offsetof(AcqirisHorizV1_Data,nbrSamples), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  horizType.insert( "nbrSegments", offsetof(AcqirisHorizV1_Data,nbrSegments), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
+  horizType.insert_native<double>( "sampInterval", offsetof(AcqirisHorizV1_Data,sampInterval) ) ;
+  horizType.insert_native<double>( "delayTime", offsetof(AcqirisHorizV1_Data,delayTime) ) ;
+  horizType.insert_native<uint32_t>( "nbrSamples", offsetof(AcqirisHorizV1_Data,nbrSamples) ) ;
+  horizType.insert_native<uint32_t>( "nbrSegments", offsetof(AcqirisHorizV1_Data,nbrSegments) ) ;
 
   return horizType ;
 }
@@ -90,13 +103,19 @@ AcqirisTrigV1::AcqirisTrigV1 ( const Pds::Acqiris::TrigV1& t )
 }
 
 hdf5pp::Type
-AcqirisTrigV1::persType()
+AcqirisTrigV1::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+AcqirisTrigV1::native_type()
 {
   hdf5pp::CompoundType trigType = hdf5pp::CompoundType::compoundType<AcqirisTrigV1>() ;
-  trigType.insert( "trigCoupling", offsetof(AcqirisTrigV1_Data,trigCoupling), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  trigType.insert( "trigInput", offsetof(AcqirisTrigV1_Data,trigInput), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  trigType.insert( "trigSlope", offsetof(AcqirisTrigV1_Data,trigSlope), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  trigType.insert( "trigLevel", offsetof(AcqirisTrigV1_Data,trigLevel), hdf5pp::AtomicType::atomicType<double>() ) ;
+  trigType.insert_native<uint32_t>( "trigCoupling", offsetof(AcqirisTrigV1_Data,trigCoupling) ) ;
+  trigType.insert_native<uint32_t>( "trigInput", offsetof(AcqirisTrigV1_Data,trigInput) ) ;
+  trigType.insert_native<uint32_t>( "trigSlope", offsetof(AcqirisTrigV1_Data,trigSlope) ) ;
+  trigType.insert_native<double>( "trigLevel", offsetof(AcqirisTrigV1_Data,trigLevel) ) ;
 
   return trigType ;
 }
@@ -110,13 +129,19 @@ AcqirisConfigV1::AcqirisConfigV1 ( const Pds::Acqiris::ConfigV1& c )
 }
 
 hdf5pp::Type
-AcqirisConfigV1::persType()
+AcqirisConfigV1::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+AcqirisConfigV1::native_type()
 {
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<AcqirisConfigV1>() ;
-  confType.insert( "nbrConvertersPerChannel", offsetof(AcqirisConfigV1_Data,nbrConvertersPerChannel), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  confType.insert( "channelMask", offsetof(AcqirisConfigV1_Data,channelMask), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  confType.insert( "nbrChannels", offsetof(AcqirisConfigV1_Data,nbrChannels), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  confType.insert( "nbrBanks", offsetof(AcqirisConfigV1_Data,nbrBanks), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
+  confType.insert_native<uint32_t>( "nbrConvertersPerChannel", offsetof(AcqirisConfigV1_Data,nbrConvertersPerChannel) ) ;
+  confType.insert_native<uint32_t>( "channelMask", offsetof(AcqirisConfigV1_Data,channelMask) ) ;
+  confType.insert_native<uint32_t>( "nbrChannels", offsetof(AcqirisConfigV1_Data,nbrChannels) ) ;
+  confType.insert_native<uint32_t>( "nbrBanks", offsetof(AcqirisConfigV1_Data,nbrBanks) ) ;
 
   return confType ;
 }

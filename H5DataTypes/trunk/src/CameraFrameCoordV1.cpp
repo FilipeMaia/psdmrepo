@@ -23,6 +23,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "hdf5pp/CompoundType.h"
+#include "hdf5pp/TypeTraits.h"
 #include "H5DataTypes/H5DataUtils.h"
 
 //-----------------------------------------------------------------------
@@ -42,12 +44,18 @@ CameraFrameCoordV1::CameraFrameCoordV1( const Pds::Camera::FrameCoord& coord )
 }
 
 hdf5pp::Type
-CameraFrameCoordV1::persType()
+CameraFrameCoordV1::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+CameraFrameCoordV1::native_type()
 {
   // make the type
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<Pds::Camera::FrameCoord>() ;
-  type.insert( "column", offsetof(CameraFrameCoordV1_Data,column), hdf5pp::AtomicType::atomicType<uint16_t>() ) ;
-  type.insert( "row", offsetof(CameraFrameCoordV1_Data,row), hdf5pp::AtomicType::atomicType<uint16_t>() ) ;
+  type.insert_native<uint16_t>( "column", offsetof(CameraFrameCoordV1_Data,column) ) ;
+  type.insert_native<uint16_t>( "row", offsetof(CameraFrameCoordV1_Data,row) ) ;
 
   return type ;
 }
@@ -55,7 +63,10 @@ CameraFrameCoordV1::persType()
 void
 storeCameraFrameCoordV1 ( hsize_t size, const Pds::Camera::FrameCoord* coord, hdf5pp::Group grp, const char* name )
 {
-  storeDataObjects ( size, coord, CameraFrameCoordV1::persType(), name, grp ) ;
+  const hsize_t np = size ;
+  CameraFrameCoordV1 coords[np] ;
+  for ( hsize_t i = 0 ; i < np ; ++ i ) coords[i] = CameraFrameCoordV1(coord[i]) ;
+  storeDataObjects ( np, coords, name, grp ) ;
 }
 
 } // namespace H5DataTypes

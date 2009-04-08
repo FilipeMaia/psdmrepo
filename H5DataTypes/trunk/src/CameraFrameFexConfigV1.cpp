@@ -23,6 +23,9 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "hdf5pp/CompoundType.h"
+#include "hdf5pp/EnumType.h"
+#include "hdf5pp/TypeTraits.h"
 #include "H5DataTypes/CameraFrameCoordV1.h"
 #include "H5DataTypes/H5DataUtils.h"
 
@@ -48,7 +51,13 @@ CameraFrameFexConfigV1::CameraFrameFexConfigV1 (const Pds::Camera::FrameFexConfi
 }
 
 hdf5pp::Type
-CameraFrameFexConfigV1::persType()
+CameraFrameFexConfigV1::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+CameraFrameFexConfigV1::native_type()
 {
   hdf5pp::EnumType<uint32_t> forwardingEnum = hdf5pp::EnumType<uint32_t>::enumType() ;
   forwardingEnum.insert ( "NoFrame", Pds::Camera::FrameFexConfigV1::NoFrame ) ;
@@ -61,16 +70,16 @@ CameraFrameFexConfigV1::persType()
   processingEnum.insert ( "GssRegionOfInterest", Pds::Camera::FrameFexConfigV1::GssRegionOfInterest ) ;
   processingEnum.insert ( "GssThreshold", Pds::Camera::FrameFexConfigV1::GssThreshold ) ;
 
-  hdf5pp::Type coordType = CameraFrameCoordV1::persType() ;
+  hdf5pp::Type coordType = hdf5pp::TypeTraits<CameraFrameCoordV1>::native_type() ;
 
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<CameraFrameFexConfigV1>() ;
   confType.insert( "forwarding", offsetof(CameraFrameFexConfigV1_Data,forwarding), forwardingEnum ) ;
-  confType.insert( "forward_prescale", offsetof(CameraFrameFexConfigV1_Data,forward_prescale), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
+  confType.insert_native<uint32_t>( "forward_prescale", offsetof(CameraFrameFexConfigV1_Data,forward_prescale) ) ;
   confType.insert( "processing", offsetof(CameraFrameFexConfigV1_Data,processing), processingEnum ) ;
   confType.insert( "roiBegin", offsetof(CameraFrameFexConfigV1_Data,roiBegin), coordType ) ;
   confType.insert( "roiEnd", offsetof(CameraFrameFexConfigV1_Data,roiEnd), coordType ) ;
-  confType.insert( "threshold", offsetof(CameraFrameFexConfigV1_Data,threshold), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
-  confType.insert( "number_of_masked_pixels", offsetof(CameraFrameFexConfigV1_Data,number_of_masked_pixels), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
+  confType.insert_native<uint32_t>( "threshold", offsetof(CameraFrameFexConfigV1_Data,threshold) ) ;
+  confType.insert_native<uint32_t>( "number_of_masked_pixels", offsetof(CameraFrameFexConfigV1_Data,number_of_masked_pixels) ) ;
 
   return confType ;
 }

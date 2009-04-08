@@ -61,7 +61,8 @@ public:
   AcqirisVertV1 () {}
   AcqirisVertV1 ( const Pds::Acqiris::VertV1& v ) ;
 
-  static hdf5pp::Type persType() ;
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
 
 private:
   AcqirisVertV1_Data m_data ;
@@ -82,7 +83,8 @@ public:
   AcqirisHorizV1 () {}
   AcqirisHorizV1 ( const Pds::Acqiris::HorizV1& v ) ;
 
-  static hdf5pp::Type persType() ;
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
 
 private:
   AcqirisHorizV1_Data m_data ;
@@ -103,7 +105,8 @@ public:
   AcqirisTrigV1 () {}
   AcqirisTrigV1 ( const Pds::Acqiris::TrigV1& v ) ;
 
-  static hdf5pp::Type persType() ;
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
 
 private:
   AcqirisTrigV1_Data m_data ;
@@ -124,7 +127,8 @@ public:
   AcqirisConfigV1 () {}
   AcqirisConfigV1 ( const Pds::Acqiris::ConfigV1& v ) ;
 
-  static hdf5pp::Type persType() ;
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
 
 private:
   AcqirisConfigV1_Data m_data ;

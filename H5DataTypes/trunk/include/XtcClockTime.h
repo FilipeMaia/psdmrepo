@@ -59,7 +59,8 @@ public:
   XtcClockTime () {}
   XtcClockTime ( const Pds::ClockTime& time ) ;
 
-  static hdf5pp::Type persType() ;
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
 
 private:
   XtcClockTime_Data m_data ;

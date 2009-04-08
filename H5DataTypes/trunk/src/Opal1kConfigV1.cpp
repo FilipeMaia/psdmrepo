@@ -25,6 +25,8 @@
 //-------------------------------
 #include "H5DataTypes/CameraFrameCoordV1.h"
 #include "H5DataTypes/H5DataUtils.h"
+#include "hdf5pp/CompoundType.h"
+#include "hdf5pp/EnumType.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -52,7 +54,13 @@ Opal1kConfigV1::Opal1kConfigV1 ( const Pds::Opal1k::ConfigV1& config )
 }
 
 hdf5pp::Type
-Opal1kConfigV1::persType()
+Opal1kConfigV1::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+Opal1kConfigV1::native_type()
 {
   hdf5pp::EnumType<uint8_t> depthEnum = hdf5pp::EnumType<uint8_t>::enumType() ;
   depthEnum.insert ( "Eight_bit", Pds::Opal1k::ConfigV1::Eight_bit ) ;
@@ -72,17 +80,17 @@ Opal1kConfigV1::persType()
   mirroringEnum.insert ( "HVFlip", Pds::Opal1k::ConfigV1::HVFlip ) ;
 
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<Opal1kConfigV1>() ;
-  confType.insert( "black_level", offsetof(Opal1kConfigV1_Data,black_level), hdf5pp::AtomicType::atomicType<uint16_t>() ) ;
-  confType.insert( "gain_percent", offsetof(Opal1kConfigV1_Data,gain_percent), hdf5pp::AtomicType::atomicType<uint16_t>() ) ;
-  confType.insert( "output_offset", offsetof(Opal1kConfigV1_Data,output_offset), hdf5pp::AtomicType::atomicType<uint16_t>() ) ;
+  confType.insert_native<uint16_t>( "black_level", offsetof(Opal1kConfigV1_Data,black_level) ) ;
+  confType.insert_native<uint16_t>( "gain_percent", offsetof(Opal1kConfigV1_Data,gain_percent) ) ;
+  confType.insert_native<uint16_t>( "output_offset", offsetof(Opal1kConfigV1_Data,output_offset) ) ;
   confType.insert( "output_resolution", offsetof(Opal1kConfigV1_Data,output_resolution), depthEnum ) ;
-  confType.insert( "output_resolution_bits", offsetof(Opal1kConfigV1_Data,output_resolution_bits), hdf5pp::AtomicType::atomicType<uint8_t>() ) ;
+  confType.insert_native<uint8_t>( "output_resolution_bits", offsetof(Opal1kConfigV1_Data,output_resolution_bits) ) ;
   confType.insert( "vertical_binning", offsetof(Opal1kConfigV1_Data,vertical_binning), binningEnum ) ;
   confType.insert( "output_mirroring", offsetof(Opal1kConfigV1_Data,output_mirroring), mirroringEnum ) ;
-  confType.insert( "vertical_remapping", offsetof(Opal1kConfigV1_Data,vertical_remapping), hdf5pp::AtomicType::atomicType<uint8_t>() ) ;
-  confType.insert( "defect_pixel_correction_enabled", offsetof(Opal1kConfigV1_Data,defect_pixel_correction_enabled), hdf5pp::AtomicType::atomicType<uint8_t>() ) ;
-  confType.insert( "output_lookup_table_enabled", offsetof(Opal1kConfigV1_Data,output_lookup_table_enabled), hdf5pp::AtomicType::atomicType<uint8_t>() ) ;
-  confType.insert( "number_of_defect_pixels", offsetof(Opal1kConfigV1_Data,number_of_defect_pixels), hdf5pp::AtomicType::atomicType<uint32_t>() ) ;
+  confType.insert_native<uint8_t>( "vertical_remapping", offsetof(Opal1kConfigV1_Data,vertical_remapping) ) ;
+  confType.insert_native<uint8_t>( "defect_pixel_correction_enabled", offsetof(Opal1kConfigV1_Data,defect_pixel_correction_enabled) ) ;
+  confType.insert_native<uint8_t>( "output_lookup_table_enabled", offsetof(Opal1kConfigV1_Data,output_lookup_table_enabled) ) ;
+  confType.insert_native<uint32_t>( "number_of_defect_pixels", offsetof(Opal1kConfigV1_Data,number_of_defect_pixels) ) ;
 
   return confType ;
 }
@@ -96,8 +104,7 @@ storeOpal1kConfigV1 ( const Pds::Opal1k::ConfigV1& config, hdf5pp::Group grp )
 
   // make array data set for LUT
   const uint32_t lutSize = Pds::Opal1k::ConfigV1::LUT_Size ;
-  hdf5pp::Type lutType = hdf5pp::AtomicType::atomicType<uint16_t>() ;
-  storeDataObjects ( lutSize, config.output_lookup_table(), lutType, "output_lookup_table", grp ) ;
+  storeDataObjects ( lutSize, config.output_lookup_table(), "output_lookup_table", grp ) ;
 
   // make array data set for defect pixels
   const uint32_t defectSize = config.number_of_defect_pixels() ;

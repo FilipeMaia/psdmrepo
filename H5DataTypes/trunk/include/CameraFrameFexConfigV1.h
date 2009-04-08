@@ -64,7 +64,8 @@ public:
   CameraFrameFexConfigV1 () {}
   CameraFrameFexConfigV1 (const Pds::Camera::FrameFexConfigV1& config) ;
 
-  static hdf5pp::Type persType() ;
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
 
 private:
   CameraFrameFexConfigV1_Data m_data ;

@@ -24,7 +24,9 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "H5DataTypes/H5DataUtils.h"
+#include "hdf5pp/CompoundType.h"
 #include "hdf5pp/PListDataSetCreate.h"
+#include "hdf5pp/TypeTraits.h"
 #include "MsgLogger/MsgLogger.h"
 
 //-----------------------------------------------------------------------
@@ -48,17 +50,23 @@ CameraTwoDGaussianV1::CameraTwoDGaussianV1 ( const Pds::Camera::TwoDGaussianV1& 
 }
 
 hdf5pp::Type
-CameraTwoDGaussianV1::persType()
+CameraTwoDGaussianV1::stored_type()
 {
-  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<CameraTwoDGaussianV1>() ;
-  confType.insert( "integral", offsetof(CameraTwoDGaussianV1_Data,integral), hdf5pp::AtomicType::atomicType<uint64_t>() ) ;
-  confType.insert( "xmean", offsetof(CameraTwoDGaussianV1_Data,xmean), hdf5pp::AtomicType::atomicType<double>() ) ;
-  confType.insert( "ymean", offsetof(CameraTwoDGaussianV1_Data,ymean), hdf5pp::AtomicType::atomicType<double>() ) ;
-  confType.insert( "major_axis_width", offsetof(CameraTwoDGaussianV1_Data,major_axis_width), hdf5pp::AtomicType::atomicType<double>() ) ;
-  confType.insert( "minor_axis_width", offsetof(CameraTwoDGaussianV1_Data,minor_axis_width), hdf5pp::AtomicType::atomicType<double>() ) ;
-  confType.insert( "major_axis_tilt", offsetof(CameraTwoDGaussianV1_Data,major_axis_tilt), hdf5pp::AtomicType::atomicType<double>() ) ;
+  return native_type() ;
+}
 
-  return confType ;
+hdf5pp::Type
+CameraTwoDGaussianV1::native_type()
+{
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<CameraTwoDGaussianV1>() ;
+  type.insert_native<uint64_t>( "integral", offsetof(CameraTwoDGaussianV1_Data,integral) ) ;
+  type.insert_native<double>( "xmean", offsetof(CameraTwoDGaussianV1_Data,xmean) ) ;
+  type.insert_native<double>( "ymean", offsetof(CameraTwoDGaussianV1_Data,ymean) ) ;
+  type.insert_native<double>( "major_axis_width", offsetof(CameraTwoDGaussianV1_Data,major_axis_width) ) ;
+  type.insert_native<double>( "minor_axis_width", offsetof(CameraTwoDGaussianV1_Data,minor_axis_width) ) ;
+  type.insert_native<double>( "major_axis_tilt", offsetof(CameraTwoDGaussianV1_Data,major_axis_tilt) ) ;
+
+  return type ;
 }
 
 } // namespace H5DataTypes

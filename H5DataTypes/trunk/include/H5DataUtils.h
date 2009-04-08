@@ -50,41 +50,31 @@ namespace H5DataTypes {
   void
   storeDataObject ( const T& data, const char* name, hdf5pp::Group grp )
   {
-    // class must define persType() method returning its data type
-    hdf5pp::Type type = T::persType() ;
-
     // make scalar data set
-    hdf5pp::DataSet<T> ds = grp.createDataSet<T> ( name, type, hdf5pp::DataSpace::makeScalar() ) ;
+    hdf5pp::DataSet<T> ds = grp.createDataSet<T> ( name, hdf5pp::DataSpace::makeScalar() ) ;
 
     // store data
-    ds.store ( type, hdf5pp::DataSpace::makeScalar(), &data ) ;
-  }
-
-  template <typename T>
-  void
-  storeDataObjects ( hsize_t size, const T* data, hdf5pp::Type type, const char* name, hdf5pp::Group grp )
-  {
-    if ( size > 0 ) {
-      // make simple data set
-      hsize_t dims[1] = { size } ;
-      hdf5pp::DataSpace dsp = hdf5pp::DataSpace::makeSimple ( 1, dims, dims ) ;
-      hdf5pp::DataSet<T> ds = grp.createDataSet<T> ( name, type, dsp ) ;
-      // store data
-      ds.store ( type, dsp, data ) ;
-    } else {
-      // for empty data set make null dataspace
-      hdf5pp::DataSpace dsp = hdf5pp::DataSpace::makeNull () ;
-      hdf5pp::DataSet<T> ds = grp.createDataSet<T> ( name, type, dsp ) ;
-      // store data
-      ds.store ( type, dsp, data ) ;
-    }
+    ds.store ( hdf5pp::DataSpace::makeScalar(), &data ) ;
   }
 
   template <typename T>
   void
   storeDataObjects ( hsize_t size, const T* data, const char* name, hdf5pp::Group grp )
   {
-    storeDataObjects ( size, data, T::persType(), name, grp );
+    if ( size > 0 ) {
+      // make simple data set
+      hsize_t dims[1] = { size } ;
+      hdf5pp::DataSpace dsp = hdf5pp::DataSpace::makeSimple ( 1, dims, dims ) ;
+      hdf5pp::DataSet<T> ds = grp.createDataSet<T> ( name, dsp ) ;
+      // store data
+      ds.store ( dsp, data ) ;
+    } else {
+      // for empty data set make null dataspace
+      hdf5pp::DataSpace dsp = hdf5pp::DataSpace::makeNull () ;
+      hdf5pp::DataSet<T> ds = grp.createDataSet<T> ( name, dsp ) ;
+      // store data
+      ds.store ( dsp, data ) ;
+    }
   }
 
 } // namespace H5DataTypes
