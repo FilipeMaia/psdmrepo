@@ -26,6 +26,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/O2OXtcScannerI.h"
 #include "pdsdata/xtc/Xtc.hh"
+#include "pdsdata/xtc/DetInfo.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -84,37 +85,39 @@ O2OXtcIterator::process(Xtc* xtc)
 
     // NOTE: I do not know yet what this type is supposed to do, for now just ignore it
 
-  } else {
+  } else if ( xtc->src.level() == Pds::Level::Source ) {
+
+    const Pds::DetInfo& detInfo = static_cast<const Pds::DetInfo&>(xtc->src);
 
     switch ( ID_VERSION(type,version) ) {
 
       // Below are specific types which are known to us
       case ( ID_VERSION( Pds::TypeId::Id_Frame, 1 ) ) :
-        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Camera::FrameV1*)(xtc->payload()), xtc->src );
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Camera::FrameV1*)(xtc->payload()), detInfo );
         break ;
 
       case ( ID_VERSION( Pds::TypeId::Id_AcqWaveform, 1 ) ) :
-        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Acqiris::DataDescV1*)(xtc->payload()), xtc->src );
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Acqiris::DataDescV1*)(xtc->payload()), detInfo );
         break ;
 
       case ( ID_VERSION( Pds::TypeId::Id_AcqConfig, 1 ) ) :
-        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Acqiris::ConfigV1*)(xtc->payload()), xtc->src );
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Acqiris::ConfigV1*)(xtc->payload()), detInfo );
         break ;
 
       case ( ID_VERSION( Pds::TypeId::Id_TwoDGaussian, 1 ) ) :
-        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Camera::TwoDGaussianV1*)(xtc->payload()), xtc->src );
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Camera::TwoDGaussianV1*)(xtc->payload()), detInfo );
         break ;
 
       case ( ID_VERSION( Pds::TypeId::Id_Opal1kConfig, 1 ) ) :
-        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Opal1k::ConfigV1*)(xtc->payload()), xtc->src );
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Opal1k::ConfigV1*)(xtc->payload()), detInfo );
         break ;
 
       case ( ID_VERSION( Pds::TypeId::Id_FrameFexConfig, 1 ) ) :
-        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Camera::FrameFexConfigV1*)(xtc->payload()), xtc->src );
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::Camera::FrameFexConfigV1*)(xtc->payload()), detInfo );
         break ;
 
       case ( ID_VERSION( Pds::TypeId::Id_EvrConfig, 1 ) ) :
-        if ( m_scanner ) m_scanner->dataObject( *(const Pds::EvrData::ConfigV1*)(xtc->payload()), xtc->src );
+        if ( m_scanner ) m_scanner->dataObject( *(const Pds::EvrData::ConfigV1*)(xtc->payload()), detInfo );
         break ;
 
       default :
@@ -129,6 +132,11 @@ O2OXtcIterator::process(Xtc* xtc)
 
         break ;
     }
+  } else {
+
+    MsgLogRoot( error, "O2OXtcIterator::process -- data object not at Source level: "
+                << Pds::TypeId::name(type) << "/" << version ) ;
+    result = 0;
   }
 
   return result ;

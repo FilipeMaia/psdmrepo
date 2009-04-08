@@ -79,17 +79,6 @@ namespace {
     return "Unexpected" ;
   }
 
-  // cast to DetInfo or throw
-  const Pds::DetInfo& detInfo( const Pds::Src& src, const char* cname ) {
-    // we have to be at Source level
-    if ( src.level() != Pds::Level::Source ) {
-      throw O2OXTCLevelException ( cname, Pds::Level::name(src.level()) ) ;
-    }
-
-    // can cast to DetInfo now
-    return static_cast<const Pds::DetInfo&>(src);
-  }
-
   // get the group name from the source
   std::string groupName( const Pds::DetInfo& info ) {
     std::ostringstream grp ;
@@ -341,15 +330,14 @@ O2ONexusWriter::levelEnd ( const Pds::Src& src )
 
 // visit the data object
 void
-O2ONexusWriter::dataObject ( const Pds::Acqiris::ConfigV1& data, const Pds::Src& src )
+O2ONexusWriter::dataObject ( const Pds::Acqiris::ConfigV1& data, const Pds::DetInfo& detInfo )
 {
   static const char cname[] = "Acqiris::ConfigV1" ;
 
-  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << Pds::Level::name(src.level()) ) ;
-
-  // get the DetInfo and group name, this can throw
-  const Pds::DetInfo& detInfo = ::detInfo( src, cname );
+  // get the group name
   const std::string& grp = ::groupName( detInfo ) ;
+
+  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << grp ) ;
 
   // Create object group
   createGroup ( m_file, grp, m_state ) ;
@@ -400,15 +388,14 @@ O2ONexusWriter::dataObject ( const Pds::Acqiris::ConfigV1& data, const Pds::Src&
 }
 
 void
-O2ONexusWriter::dataObject ( const Pds::Acqiris::DataDescV1& data, const Pds::Src& src )
+O2ONexusWriter::dataObject ( const Pds::Acqiris::DataDescV1& data, const Pds::DetInfo& detInfo )
 {
   static const char cname[] = "Acqiris::DataDescV1" ;
 
-  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << Pds::Level::name(src.level()) ) ;
-
-  // get the DetInfo and group name, this can throw
-  const Pds::DetInfo& detInfo = ::detInfo( src, cname );
+  // get the group name
   const std::string& grp = ::groupName( detInfo ) ;
+
+  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << grp ) ;
 
   // to interpret the content we need corresponding Config object
   AcqConfigMap::const_iterator cfgIt = m_acqConfigMap.find ( detInfo ) ;
@@ -487,15 +474,14 @@ O2ONexusWriter::dataObject ( const Pds::Acqiris::DataDescV1& data, const Pds::Sr
 }
 
 void
-O2ONexusWriter::dataObject ( const Pds::Camera::FrameFexConfigV1& data, const Pds::Src& src )
+O2ONexusWriter::dataObject ( const Pds::Camera::FrameFexConfigV1& data, const Pds::DetInfo& detInfo )
 {
   static const char cname[] = "Camera::FrameFexConfigV1" ;
 
-  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << Pds::Level::name(src.level()) ) ;
-
-  // get the DetInfo and group name, this can throw
-  const Pds::DetInfo& detInfo = ::detInfo( src, cname );
+  // get the group name
   const std::string& grp = ::groupName( detInfo ) ;
+
+  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << grp ) ;
 
   // Create object group
   createGroup ( m_file, grp, m_state ) ;
@@ -508,15 +494,14 @@ O2ONexusWriter::dataObject ( const Pds::Camera::FrameFexConfigV1& data, const Pd
 }
 
 void
-O2ONexusWriter::dataObject ( const Pds::Camera::FrameV1& data, const Pds::Src& src )
+O2ONexusWriter::dataObject ( const Pds::Camera::FrameV1& data, const Pds::DetInfo& detInfo )
 {
   static const char cname[] = "Camera::FrameV1" ;
 
-  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << Pds::Level::name(src.level()) ) ;
-
-  // get the DetInfo and group name, this can throw
-  const Pds::DetInfo& detInfo = ::detInfo( src, cname );
+  // get the group name
   const std::string& grp = ::groupName( detInfo ) ;
+
+  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << grp ) ;
 
   // Create object group
   createGroup ( m_file, grp, m_state ) ;
@@ -529,15 +514,14 @@ O2ONexusWriter::dataObject ( const Pds::Camera::FrameV1& data, const Pds::Src& s
 }
 
 void
-O2ONexusWriter::dataObject ( const Pds::Camera::TwoDGaussianV1& data, const Pds::Src& src )
+O2ONexusWriter::dataObject ( const Pds::Camera::TwoDGaussianV1& data, const Pds::DetInfo& detInfo )
 {
   static const char cname[] = "Camera::TwoDGaussianV1" ;
 
-  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << Pds::Level::name(src.level()) ) ;
-
-  // get the DetInfo and group name, this can throw
-  const Pds::DetInfo& detInfo = ::detInfo( src, cname );
+  // get the group name
   const std::string& grp = ::groupName( detInfo ) ;
+
+  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << grp ) ;
 
   // Create object group
   createGroup ( m_file, grp, m_state ) ;
@@ -550,15 +534,14 @@ O2ONexusWriter::dataObject ( const Pds::Camera::TwoDGaussianV1& data, const Pds:
 }
 
 void
-O2ONexusWriter::dataObject ( const Pds::EvrData::ConfigV1& data, const Pds::Src& src )
+O2ONexusWriter::dataObject ( const Pds::EvrData::ConfigV1& data, const Pds::DetInfo& detInfo )
 {
   static const char cname[] = "EvrData::ConfigV1" ;
 
-  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << Pds::Level::name(src.level()) ) ;
-
-  // get the DetInfo and group name, this can throw
-  const Pds::DetInfo& detInfo = ::detInfo( src, cname );
+  // get the group name
   const std::string& grp = ::groupName( detInfo ) ;
+
+  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << grp ) ;
 
   // Create object group
   createGroup ( m_file, grp, m_state ) ;
@@ -644,15 +627,14 @@ O2ONexusWriter::dataObject ( const Pds::EvrData::ConfigV1& data, const Pds::Src&
 }
 
 void
-O2ONexusWriter::dataObject ( const Pds::Opal1k::ConfigV1& data, const Pds::Src& src )
+O2ONexusWriter::dataObject ( const Pds::Opal1k::ConfigV1& data, const Pds::DetInfo& detInfo )
 {
   static const char cname[] = "Opal1k::ConfigV1" ;
 
-  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << Pds::Level::name(src.level()) ) ;
-
-  // get the DetInfo and group name, this can throw
-  const Pds::DetInfo& detInfo = ::detInfo( src, cname );
+  // get the group name
   const std::string& grp = ::groupName( detInfo ) ;
+
+  MsgLog( logger, debug, "O2ONexusWriter::dataObject " << cname << " " << grp ) ;
 
   // Create 'Object' group
   createGroup ( m_file, grp, m_state ) ;

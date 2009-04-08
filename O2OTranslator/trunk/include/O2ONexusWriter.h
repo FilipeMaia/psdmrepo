@@ -71,13 +71,13 @@ public:
   virtual void levelEnd ( const Pds::Src& src ) ;
 
   // visit the data object
-  virtual void dataObject ( const Pds::Acqiris::ConfigV1& data, const Pds::Src& src ) ;
-  virtual void dataObject ( const Pds::Acqiris::DataDescV1& data, const Pds::Src& src ) ;
-  virtual void dataObject ( const Pds::Camera::FrameFexConfigV1& data, const Pds::Src& src ) ;
-  virtual void dataObject ( const Pds::Camera::FrameV1& data, const Pds::Src& src ) ;
-  virtual void dataObject ( const Pds::Camera::TwoDGaussianV1& data, const Pds::Src& src ) ;
-  virtual void dataObject ( const Pds::EvrData::ConfigV1& data, const Pds::Src& src ) ;
-  virtual void dataObject ( const Pds::Opal1k::ConfigV1& data, const Pds::Src& src ) ;
+  virtual void dataObject ( const Pds::Acqiris::ConfigV1& data, const Pds::DetInfo& detInfo ) ;
+  virtual void dataObject ( const Pds::Acqiris::DataDescV1& data, const Pds::DetInfo& detInfo ) ;
+  virtual void dataObject ( const Pds::Camera::FrameFexConfigV1& data, const Pds::DetInfo& detInfo ) ;
+  virtual void dataObject ( const Pds::Camera::FrameV1& data, const Pds::DetInfo& detInfo ) ;
+  virtual void dataObject ( const Pds::Camera::TwoDGaussianV1& data, const Pds::DetInfo& detInfo ) ;
+  virtual void dataObject ( const Pds::EvrData::ConfigV1& data, const Pds::DetInfo& detInfo ) ;
+  virtual void dataObject ( const Pds::Opal1k::ConfigV1& data, const Pds::DetInfo& detInfo ) ;
 
 protected:
 
