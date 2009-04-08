@@ -27,6 +27,7 @@
 #include "hdf5pp/File.h"
 #include "hdf5pp/Group.h"
 #include "H5DataTypes/CameraTwoDGaussianV1.h"
+#include "H5DataTypes/CameraFrameV1.h"
 #include "H5DataTypes/ObjectContainer.h"
 #include "H5DataTypes/XtcClockTime.h"
 
@@ -103,16 +104,22 @@ private:
   const O2OFileNameFactory& m_nameFactory ;
   hdf5pp::File m_file ;
   State m_state ;
-  hdf5pp::Group m_mapGroup ;    // Group for current Map transition
-  hdf5pp::Group m_configGroup ;    // Group for Configure transition
+  hdf5pp::Group m_mapGroup ;      // Group for current Map transition
+  hdf5pp::Group m_configGroup ;   // Group for Configure transition
+  hdf5pp::Group m_eventGroup ;    // Group for event data
   H5DataTypes::XtcClockTime m_eventTime ;
 
   /// typedefs for various container types
   typedef H5DataTypes::ObjectContainer<H5DataTypes::XtcClockTime> XtcClockTimeCont ;
   typedef H5DataTypes::ObjectContainer<H5DataTypes::CameraTwoDGaussianV1> CameraTwoDGaussianV1Cont ;
+  typedef H5DataTypes::ObjectContainer<H5DataTypes::CameraFrameV1> CameraFrameV1Cont ;
 
   std::auto_ptr<CameraTwoDGaussianV1Cont> m_cameraTwoDGaussianV1Cont ;
   std::auto_ptr<XtcClockTimeCont> m_cameraTwoDGaussianV1TimeCont ;
+
+  std::auto_ptr<CameraFrameV1Cont> m_cameraFrameV1Cont ;
+  std::auto_ptr<XtcClockTimeCont> m_cameraFrameV1TimeCont ;
+
 };
 
 } // namespace O2OTranslator

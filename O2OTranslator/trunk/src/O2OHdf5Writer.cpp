@@ -27,6 +27,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "H5DataTypes/AcqirisConfigV1.h"
 #include "H5DataTypes/CameraFrameFexConfigV1.h"
+#include "H5DataTypes/CameraFrameV1.h"
 #include "H5DataTypes/CameraTwoDGaussianV1.h"
 #include "H5DataTypes/EvrConfigV1.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
@@ -153,9 +154,12 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_state(Undefined)
   , m_mapGroup()
   , m_configGroup()
+  , m_eventGroup()
   , m_eventTime()
   , m_cameraTwoDGaussianV1Cont()
   , m_cameraTwoDGaussianV1TimeCont()
+  , m_cameraFrameV1Cont()
+  , m_cameraFrameV1TimeCont()
 {
   std::string fileTempl = m_nameFactory.makeH5Path () ;
   MsgLog( logger, debug, "O2OHdf5Writer - open output file " << fileTempl ) ;
@@ -184,6 +188,8 @@ O2OHdf5Writer::~O2OHdf5Writer ()
 
   m_cameraTwoDGaussianV1Cont.reset() ;
   m_cameraTwoDGaussianV1TimeCont.reset() ;
+  m_cameraFrameV1Cont.reset() ;
+  m_cameraFrameV1TimeCont.reset() ;
 
   m_file.close() ;
 
@@ -243,14 +249,21 @@ O2OHdf5Writer::eventStart ( const Pds::Sequence& seq )
     // switch to running state
     m_state = Running ;
 
+    // create event group
+    m_eventGroup = createGroup ( m_mapGroup, "EventData", m_state ) ;
+
   } else if ( seq.service() == Pds::TransitionId::L1Accept ) {
 
+    // store current event time
     m_eventTime = H5DataTypes::XtcClockTime(seq.clock()) ;
 
   } else if ( seq.service() == Pds::TransitionId::EndRun ) {
 
     // switch back to configured state
     m_state = Configured ;
+
+    // close the event group
+    m_eventGroup.close() ;
 
   } else if ( seq.service() == Pds::TransitionId::Unconfigure ) {
 
@@ -262,6 +275,8 @@ O2OHdf5Writer::eventStart ( const Pds::Sequence& seq )
     // close all storers
     m_cameraTwoDGaussianV1Cont.reset() ;
     m_cameraTwoDGaussianV1TimeCont.reset() ;
+    m_cameraFrameV1Cont.reset() ;
+    m_cameraFrameV1TimeCont.reset() ;
 
     // close 'NXentry' group, go back to top level
     m_mapGroup.close() ;
@@ -353,6 +368,29 @@ O2OHdf5Writer::dataObject ( const Pds::Camera::FrameV1& data, const Pds::DetInfo
   const std::string& grpName = ::groupName( "Camera::FrameV1", detInfo ) ;
 
   MsgLog( logger, debug, "O2OHdf5Writer::dataObject " << grpName ) ;
+
+  if ( not m_cameraFrameV1Cont.get() ) {
+
+    // define two containers in a separate group
+    hdf5pp::Group contGrp = m_eventGroup.createGroup(grpName);
+    contGrp.createAttr<const char*> ( "class" ).store ( "Camera::FrameV1" ) ;
+
+    // frame data is usually large, put 10 of then in one chunk
+    hsize_t frame_chunk_size = 10 ;
+    hsize_t time_chunk_size = 10000 ;
+    int deflate = 6 ;
+
+    // make container for data objects
+    m_cameraFrameV1Cont.reset( new CameraFrameV1Cont ( "data", contGrp, frame_chunk_size, deflate ) ) ;
+
+    // make container for time
+    m_cameraFrameV1TimeCont.reset( new XtcClockTimeCont ( "time", contGrp, time_chunk_size, deflate ) ) ;
+
+  }
+
+  // store the data in the containers
+  m_cameraFrameV1Cont->append ( H5DataTypes::CameraFrameV1(data) ) ;
+  m_cameraFrameV1TimeCont->append ( m_eventTime ) ;
 }
 
 void
@@ -366,20 +404,19 @@ O2OHdf5Writer::dataObject ( const Pds::Camera::TwoDGaussianV1& data, const Pds::
   if ( not m_cameraTwoDGaussianV1Cont.get() ) {
 
     // define two containers in a separate group
-    hdf5pp::Group contGrp = m_mapGroup.createGroup(grpName);
+    hdf5pp::Group contGrp = m_eventGroup.createGroup(grpName);
     contGrp.createAttr<const char*> ( "class" ).store ( "Camera::TwoDGaussianV1" ) ;
 
-    // chunk size will be 1M/size of object
-    hsize_t chunk_size = 1024*1024 / sizeof(H5DataTypes::CameraTwoDGaussianV1) ;
+    // chunk size, compression
+    hsize_t data_chunk_size = 1000 ;
+    hsize_t time_chunk_size = 10000 ;
     int deflate = 6 ;
 
     // make container for data objects
-    hdf5pp::Type type = H5DataTypes::CameraTwoDGaussianV1::persType() ;
-    m_cameraTwoDGaussianV1Cont.reset( new CameraTwoDGaussianV1Cont ( "data", contGrp, type, chunk_size, deflate ) ) ;
+    m_cameraTwoDGaussianV1Cont.reset( new CameraTwoDGaussianV1Cont ( "data", contGrp, data_chunk_size, deflate ) ) ;
 
     // make container for time
-    hdf5pp::Type timeType = H5DataTypes::XtcClockTime::persType() ;
-    m_cameraTwoDGaussianV1TimeCont.reset( new XtcClockTimeCont ( "time", contGrp, timeType, chunk_size, deflate ) ) ;
+    m_cameraTwoDGaussianV1TimeCont.reset( new XtcClockTimeCont ( "time", contGrp, time_chunk_size, deflate ) ) ;
 
   }
 
