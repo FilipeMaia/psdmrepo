@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+// 	$Id: Type.cpp 250 2009-04-08 01:02:05Z salnikov $
 //
 // Description:
 //	Class Type...
@@ -14,11 +14,13 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "hdf5pp/Type.h"
+#include "hdf5pp/CompoundType.h"
 
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include "hdf5/hdf5.h"
+#include "hdf5pp/Exceptions.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -34,24 +36,20 @@
 
 namespace hdf5pp {
 
-//----------------
-// Constructors --
-//----------------
-Type::Type ()
-  : m_id ()
+CompoundType
+CompoundType::compoundType( size_t size )
 {
+  hid_t tid = H5Tcreate ( H5T_COMPOUND, size ) ;
+  if ( tid < 0 ) throw Hdf5CallException ( "CompoundType::compoundType", "H5Tcreate" ) ;
+  return CompoundType ( tid ) ;
 }
 
-Type::Type ( hid_t id, bool doClose )
-  : m_id ( new hid_t(id), TypePtrDeleter(doClose) )
+// add one more member
+void
+CompoundType::insert ( const char* name, size_t offset, const Type& t )
 {
-}
-
-//--------------
-// Destructor --
-//--------------
-Type::~Type ()
-{
+  herr_t stat = H5Tinsert ( id(), name, offset, t.id() ) ;
+  if ( stat < 0 ) throw Hdf5CallException ( "CompoundType::compoundType", "H5Tcreate" ) ;
 }
 
 } // namespace hdf5pp

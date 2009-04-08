@@ -108,7 +108,7 @@ template <typename T>
 Attribute<T>
 Attribute<T>::createAttr ( hid_t parent, const std::string& name, const DataSpace& dspc )
 {
-  hid_t aid = H5Acreate2 ( parent, name.c_str(), TypeTraits<T>::h5type_native(), dspc.id(), H5P_DEFAULT, H5P_DEFAULT ) ;
+  hid_t aid = H5Acreate2 ( parent, name.c_str(), TypeTraits<T>::stored_type().id(), dspc.id(), H5P_DEFAULT, H5P_DEFAULT ) ;
   if ( aid < 0 ) throw Hdf5CallException( "Attribute::createAttr", "H5Acreate2" ) ;
   return Attribute<T>( aid, dspc ) ;
 }
@@ -130,7 +130,7 @@ void
 Attribute<T>::store( const T& value )
 {
   if ( m_dspc.size() != 1 ) throw Hdf5DataSpaceSizeException ( "Attribute::store" );
-  herr_t stat = H5Awrite ( *m_id, TypeTraits<T>::h5type_native(), TypeTraits<T>::address(value) ) ;
+  herr_t stat = H5Awrite ( *m_id, TypeTraits<T>::native_type().id(), TypeTraits<T>::address(value) ) ;
   if ( stat < 0 ) throw Hdf5CallException( "Attribute::store", "H5Awrite" ) ;
 }
 
@@ -140,7 +140,7 @@ void
 Attribute<T>::store( unsigned size, const T value[] )
 {
   if ( m_dspc.size() != size ) throw Hdf5DataSpaceSizeException ( "Attribute::store" );
-  herr_t stat = H5Awrite ( *m_id, TypeTraits<T>::h5type_native(), (void*)(value) ) ;
+  herr_t stat = H5Awrite ( *m_id, TypeTraits<T>::native_type().id(), (void*)(value) ) ;
   if ( stat < 0 ) throw Hdf5CallException( "Attribute::store", "H5Awrite" ) ;
 }
 

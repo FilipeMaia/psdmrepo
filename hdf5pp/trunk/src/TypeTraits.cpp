@@ -34,7 +34,7 @@
 
 namespace hdf5pp {
 
-hid_t
+Type
 TypeTraitsHelper::string_h5type ()
 {
   static hid_t string_h5type_inst ;
@@ -45,7 +45,7 @@ TypeTraitsHelper::string_h5type ()
     H5Tset_size( string_h5type_inst, H5T_VARIABLE ) ;
     H5Tlock ( string_h5type_inst ) ;
   }
-  return string_h5type_inst ;
+  return Type::LockedType(string_h5type_inst) ;
 }
 
 } // namespace hdf5pp

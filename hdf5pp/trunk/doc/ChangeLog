@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2009-04-07 Andy Salnikov
+- split Types.h into ArrayTypes, EnumType, etc.
+- TypeTraits method now returns Type object instead of HDF5 hid
+- TypeTraits have two different methods for native type vs stored type
+- unspecialized TypeTraits have has "reasonable" implementation that
+  depends on the methods provided by the type itself
+
 Tag: V00-00-01
 2009-04-06 Andy Salnikov
 - many changes, woork in progress

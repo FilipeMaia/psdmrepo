@@ -26,6 +26,7 @@
 #include "hdf5pp/DataSpace.h"
 #include "hdf5pp/PListDataSetCreate.h"
 #include "hdf5pp/Type.h"
+#include "hdf5pp/TypeTraits.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -84,18 +85,17 @@ public:
   }
 
   // store the data
-  void store ( const Type& memType, const DataSpace& memDspc, const T* data )
+  void store ( const DataSpace& memDspc, const T* data )
   {
-    m_impl.store( memType, memDspc, DataSpace::makeAll(), static_cast<const void *>( data ) ) ;
+    m_impl.store( TypeTraits<T>::native_type(), memDspc, DataSpace::makeAll(), static_cast<const void *>( data ) ) ;
   }
 
   // store the data, give file dataspace
-  void store ( const Type& memType,
-               const DataSpace& memDspc,
+  void store ( const DataSpace& memDspc,
                const DataSpace& fileDspc,
                const T* data )
   {
-    m_impl.store( memType, memDspc, fileDspc, static_cast<const void *>( data ) ) ;
+    m_impl.store( TypeTraits<T>::native_type(), memDspc, fileDspc, static_cast<const void *>( data ) ) ;
   }
 
   // close the data set
@@ -117,17 +117,7 @@ protected:
                                 const DataSpace& dspc,
                                 const PListDataSetCreate& plistDScreate )
   {
-    return DataSet ( parent, name, AtomicType::atomicType<T>(), dspc, plistDScreate );
-  }
-
-  /// create new data set, specify the type explicitly
-  static DataSet createDataSet ( hid_t parent,
-                                 const std::string& name,
-                                 const Type& type,
-                                 const DataSpace& dspc,
-                                 const PListDataSetCreate& plistDScreate )
-  {
-    return DataSet( DataSetImpl::createDataSet ( parent, name, type, dspc, plistDScreate ) ) ;
+    return DataSet ( DataSetImpl::createDataSet ( parent, name, TypeTraits<T>::stored_type(), dspc, plistDScreate ) ) ;
   }
 
   /// open existing dataset

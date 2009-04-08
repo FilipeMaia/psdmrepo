@@ -96,15 +96,6 @@ public:
     return DataSet<T>::createDataSet ( *m_id, name, dspc, plistDScreate ) ;
   }
 
-  // create new data set, type is determined by argument
-  template <typename T>
-  DataSet<T> createDataSet ( const std::string& name,
-                             Type type,
-                             const DataSpace& dspc,
-                             const PListDataSetCreate& plistDScreate = PListDataSetCreate() ) {
-    return DataSet<T>::createDataSet ( *m_id, name, type, dspc, plistDScreate ) ;
-  }
-
   // close the group
   void close() ;
 

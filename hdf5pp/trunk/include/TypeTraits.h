@@ -22,6 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5/hdf5.h"
+#include "hdf5pp/Type.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -47,16 +48,20 @@
 namespace hdf5pp {
 
 struct TypeTraitsHelper {
-  static hid_t string_h5type() ;
+  static Type string_h5type() ;
 };
 
 template <typename T>
 struct TypeTraits  {
+  static Type stored_type() { return T::stored_type() ; }
+  static Type native_type() { return T::native_type() ; }
+  static const void* address( const T& value ) { return static_cast<const void*>(&value) ; }
 };
 
 #define TYPE_TRAITS_SIMPLE(CPP_TYPE,H5_TYPE) \
   template <> struct TypeTraits<CPP_TYPE> { \
-    static hid_t h5type_native() { return H5_TYPE ; } \
+    static Type stored_type() { return Type::LockedType(H5_TYPE); } \
+    static Type native_type() { return Type::LockedType(H5_TYPE); } \
     static const void* address( const CPP_TYPE& value ) { return static_cast<const void*>(&value) ; } \
   }
 
@@ -76,7 +81,8 @@ TYPE_TRAITS_SIMPLE(uint64_t,H5T_NATIVE_UINT64);
 template <>
 struct TypeTraits<const char*> {
   typedef const char* vtype ;
-  static hid_t h5type_native() { return TypeTraitsHelper::string_h5type() ; }
+  static Type stored_type() { return TypeTraitsHelper::string_h5type() ; }
+  static Type native_type() { return TypeTraitsHelper::string_h5type() ; }
   static const void* address( const vtype& value ) { return static_cast<const void*>(&value) ; }
 };
 

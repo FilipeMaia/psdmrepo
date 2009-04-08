@@ -1,9 +1,9 @@
-#ifndef HDF5PP_TYPE_H
-#define HDF5PP_TYPE_H
+#ifndef HDF5PP_ENUMTYPE_H
+#define HDF5PP_ENUMTYPE_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+// 	$Id: Type.h 250 2009-04-08 01:02:05Z salnikov $
 //
 // Description:
 //	Class Type.
@@ -13,7 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <boost/shared_ptr.hpp>
+#include "hdf5pp/Type.h"
 
 //----------------------
 // Base Class Headers --
@@ -23,6 +23,8 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5/hdf5.h"
+#include "hdf5pp/Exceptions.h"
+#include "hdf5pp/TypeTraits.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -40,52 +42,40 @@
  *
  *  @see AdditionalClass
  *
- *  @version $Id$
+ *  @version $Id: Type.h 250 2009-04-08 01:02:05Z salnikov $
  *
  *  @author Andrei Salnikov
  */
 
 namespace hdf5pp {
 
-class Type {
+/**
+ *  Class for the enum types, supports operations applicable to enum types only
+ */
+template <typename T>
+class EnumType : public Type {
 public:
 
-  // create locked type from type id
-  static Type LockedType( hid_t tid ) { return Type(tid,false); }
-  // create unlocked type from type id
-  static Type UnlockedType( hid_t tid ) { return Type(tid,true); }
+  // make an enum type based on some integer type
+  static EnumType enumType() {
+    hid_t tid = H5Tenum_create( TypeTraits<T>::native_type().id() ) ;
+    if ( tid < 0 ) throw Hdf5CallException ( "EnumType::enumType", "H5Tenum_create" ) ;
+    return EnumType ( tid ) ;
+  }
 
-  // Default constructor
-  Type() ;
-
-  // Destructor
-  ~Type () ;
-
-  /// return type id
-  hid_t id() const { return *m_id ; }
+  void insert ( const char* name, T value ) {
+    herr_t stat = H5Tenum_insert( id(), name, static_cast<void *>(&value) ) ;
+    if ( stat < 0 ) throw Hdf5CallException ( "EnumType::insert", "H5Tenum_insert" ) ;
+  }
 
 protected:
 
-  // constructor
-  Type ( hid_t id, bool doClose ) ;
+  EnumType ( hid_t id ) : Type( id, true ) {}
 
 private:
-
-  // deleter for  boost smart pointer
-  struct TypePtrDeleter {
-    TypePtrDeleter( bool doClose ) : m_doClose(doClose) {}
-    void operator()( hid_t* id ) {
-      if ( id and m_doClose ) H5Tclose ( *id );
-      delete id ;
-    }
-    bool m_doClose ;
-  };
-
-  // Data members
-  boost::shared_ptr<hid_t> m_id ;
 
 };
 
 } // namespace hdf5pp
 
-#endif // HDF5PP_TYPE_H
+#endif // HDF5PP_ENUMTYPE_H

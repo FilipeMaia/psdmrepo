@@ -1,9 +1,9 @@
-#ifndef HDF5PP_TYPE_H
-#define HDF5PP_TYPE_H
+#ifndef HDF5PP_ARRAYTYPE_H
+#define HDF5PP_ARRAYTYPE_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+// 	$Id: Type.h 250 2009-04-08 01:02:05Z salnikov $
 //
 // Description:
 //	Class Type.
@@ -13,7 +13,6 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <boost/shared_ptr.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -23,6 +22,8 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5/hdf5.h"
+#include "hdf5pp/Type.h"
+#include "hdf5pp/TypeTraits.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -40,52 +41,35 @@
  *
  *  @see AdditionalClass
  *
- *  @version $Id$
+ *  @version $Id: Type.h 250 2009-04-08 01:02:05Z salnikov $
  *
  *  @author Andrei Salnikov
  */
 
 namespace hdf5pp {
 
-class Type {
+/**
+ *  Class for the array types, supports operations applicable to array types only
+ */
+class ArrayType : public Type {
 public:
 
-  // create locked type from type id
-  static Type LockedType( hid_t tid ) { return Type(tid,false); }
-  // create unlocked type from type id
-  static Type UnlockedType( hid_t tid ) { return Type(tid,true); }
+  // make an array type of rank 1
+  static ArrayType arrayType( const Type& baseType, hsize_t dim ) {
+    return arrayType( baseType, 1, &dim ) ;
+  }
 
-  // Default constructor
-  Type() ;
-
-  // Destructor
-  ~Type () ;
-
-  /// return type id
-  hid_t id() const { return *m_id ; }
+  // make an array type of any rank
+  static ArrayType arrayType( const Type& baseType, unsigned rank, hsize_t dims[] ) ;
 
 protected:
 
-  // constructor
-  Type ( hid_t id, bool doClose ) ;
+  ArrayType ( hid_t id ) : Type( id, true ) {}
 
 private:
-
-  // deleter for  boost smart pointer
-  struct TypePtrDeleter {
-    TypePtrDeleter( bool doClose ) : m_doClose(doClose) {}
-    void operator()( hid_t* id ) {
-      if ( id and m_doClose ) H5Tclose ( *id );
-      delete id ;
-    }
-    bool m_doClose ;
-  };
-
-  // Data members
-  boost::shared_ptr<hid_t> m_id ;
 
 };
 
 } // namespace hdf5pp
 
-#endif // HDF5PP_TYPE_H
+#endif // HDF5PP_ARRAYTYPE_H
