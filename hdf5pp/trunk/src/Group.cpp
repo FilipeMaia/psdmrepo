@@ -54,7 +54,11 @@ Group::~Group ()
 Group
 Group::createGroup ( hid_t parent, const std::string& name )
 {
-  hid_t f_id = H5Gcreate2 ( parent, name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT ) ;
+  // allow creatyion of intermediate directories
+  hid_t lcpl_id = H5Pcreate( H5P_LINK_CREATE ) ;
+  H5Pset_create_intermediate_group( lcpl_id, 1 ) ;
+  hid_t f_id = H5Gcreate2 ( parent, name.c_str(), lcpl_id, H5P_DEFAULT, H5P_DEFAULT ) ;
+  H5Pclose( lcpl_id ) ;
   if ( f_id < 0 ) {
     throw Hdf5CallException( "File::create", "H5Gcreate2") ;
   }
@@ -70,5 +74,13 @@ Group::openGroup ( hid_t parent, const std::string& name )
   }
   return Group(f_id) ;
 }
+
+// close the group
+void
+Group::close()
+{
+  m_id.reset();
+}
+
 
 } // namespace hdf5pp

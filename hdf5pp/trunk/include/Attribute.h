@@ -108,7 +108,7 @@ template <typename T>
 Attribute<T>
 Attribute<T>::createAttr ( hid_t parent, const std::string& name, const DataSpace& dspc )
 {
-  hid_t aid = H5Acreate2 ( parent, name.c_str(), TypeTraits<T>::h5type_native(), dspc.dsId(), H5P_DEFAULT, H5P_DEFAULT ) ;
+  hid_t aid = H5Acreate2 ( parent, name.c_str(), TypeTraits<T>::h5type_native(), dspc.id(), H5P_DEFAULT, H5P_DEFAULT ) ;
   if ( aid < 0 ) throw Hdf5CallException( "Attribute::createAttr", "H5Acreate2" ) ;
   return Attribute<T>( aid, dspc ) ;
 }

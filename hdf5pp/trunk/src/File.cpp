@@ -90,5 +90,12 @@ File::open( const std::string& path,
   return File(f_id) ;
 }
 
+// close the file
+void
+File::close()
+{
+  m_id.reset();
+}
+
 
 } // namespace hdf5pp

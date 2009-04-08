@@ -25,6 +25,9 @@
 //-------------------------------
 #include "hdf5/hdf5.h"
 #include "hdf5pp/Attribute.h"
+#include "hdf5pp/DataSet.h"
+#include "hdf5pp/DataSpace.h"
+#include "hdf5pp/PListDataSetCreate.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -54,12 +57,15 @@ class File ;
 class Group  {
 public:
 
+  // Default constructor
+  Group() {}
+
   // Destructor
   ~Group () ;
 
   /// Create new group, group name treated as relative to this group
   /// (if not absolute).
-  Group newGroup ( const std::string& name ) {
+  Group createGroup ( const std::string& name ) {
     return createGroup ( *m_id, name ) ;
   }
 
@@ -80,6 +86,27 @@ public:
   Attribute<T> openAttr ( const std::string& name ) {
     return Attribute<T>::openAttr ( *m_id, name ) ;
   }
+
+  // create new data set, type is determined by the template type
+  template <typename T>
+  DataSet<T> createDataSet ( const std::string& name,
+                             const DataSpace& dspc,
+                             const PListDataSetCreate& plistDScreate = PListDataSetCreate() )
+  {
+    return DataSet<T>::createDataSet ( *m_id, name, dspc, plistDScreate ) ;
+  }
+
+  // create new data set, type is determined by argument
+  template <typename T>
+  DataSet<T> createDataSet ( const std::string& name,
+                             Type type,
+                             const DataSpace& dspc,
+                             const PListDataSetCreate& plistDScreate = PListDataSetCreate() ) {
+    return DataSet<T>::createDataSet ( *m_id, name, type, dspc, plistDScreate ) ;
+  }
+
+  // close the group
+  void close() ;
 
 protected:
 

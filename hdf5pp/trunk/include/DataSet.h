@@ -18,14 +18,14 @@
 // Base Class Headers --
 //----------------------
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Attribute.h"
+#include "hdf5pp/DataSetImpl.h"
 #include "hdf5pp/DataSpace.h"
-#include "hdf5pp/Exceptions.h"
-#include "hdf5pp/TypeTraits.h"
+#include "hdf5pp/PListDataSetCreate.h"
+#include "hdf5pp/Type.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -50,61 +50,95 @@
 
 namespace hdf5pp {
 
+class Group ;
+
 template <typename T>
-class DataSet  {
+class DataSet {
 public:
 
+  // Default constructor
+  DataSet() {}
+
   // Destructor
-  ~DataSet () ;
+  ~DataSet () {}
 
   /// create attribute for this dataset
   template <typename U>
   Attribute<U> createAttr ( const std::string& name, const DataSpace& dspc = DataSpace::makeScalar() ) {
-    return Attribute<U>::createAttr ( *m_id, name, dspc ) ;
+    return m_impl.createAttr<U> ( name, dspc ) ;
   }
 
   /// open existing attribute
   template <typename U>
   Attribute<U> openAttr ( const std::string& name ) {
-    return Attribute<U>::openAttr ( *m_id, name ) ;
+    return m_impl.openAttr<U> ( name ) ;
   }
 
+  /// Changes the sizes of a dataset’s dimensions.
+  void set_extent ( const hsize_t size[] ) {
+    m_impl.set_extent ( size ) ;
+  }
+  /// same operation for rank-1 data set
+  void set_extent ( hsize_t size ) {
+    m_impl.set_extent ( &size ) ;
+  }
+
+  // store the data
+  void store ( const Type& memType, const DataSpace& memDspc, const T* data )
+  {
+    m_impl.store( memType, memDspc, DataSpace::makeAll(), static_cast<const void *>( data ) ) ;
+  }
+
+  // store the data, give file dataspace
+  void store ( const Type& memType,
+               const DataSpace& memDspc,
+               const DataSpace& fileDspc,
+               const T* data )
+  {
+    m_impl.store( memType, memDspc, fileDspc, static_cast<const void *>( data ) ) ;
+  }
+
+  // close the data set
+  void close() { m_impl.close() ; }
+
+  /// access data space
+  DataSpace dataSpace() { return m_impl.dataSpace() ; }
 
 protected:
 
-  // Constructor
-  DataSet ( hid_t id, const DataSpace& dspc ) : m_dspc(dspc), m_id( new hid_t(id), DataSetPtrDeleter() ) {}
+  friend class Group ;
 
-  /// create new dataset
-  DataSet createDataSet ( hid_t parent, const std::string& name, const DataSpace& dspc ) {
-    hid_t ds = H5Dcreate2 ( parent, name.c_str(), TypeTraits<T>::h5type_native(), dspc.dsId(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT ) ;
-    if ( ds < 0 ) throw Hdf5CallException( "DataSet::createDataSet", "H5Dcreate2" ) ;
-    return DataSet ( ds, dspc ) ;
+  // Constructor
+  DataSet ( DataSetImpl impl ) : m_impl(impl) {}
+
+  /// create new data set for the atomic data types
+  static DataSet createDataSet ( hid_t parent,
+                                const std::string& name,
+                                const DataSpace& dspc,
+                                const PListDataSetCreate& plistDScreate )
+  {
+    return DataSet ( parent, name, AtomicType::atomicType<T>(), dspc, plistDScreate );
+  }
+
+  /// create new data set, specify the type explicitly
+  static DataSet createDataSet ( hid_t parent,
+                                 const std::string& name,
+                                 const Type& type,
+                                 const DataSpace& dspc,
+                                 const PListDataSetCreate& plistDScreate )
+  {
+    return DataSet( DataSetImpl::createDataSet ( parent, name, type, dspc, plistDScreate ) ) ;
   }
 
   /// open existing dataset
-  DataSet openDataSet ( hid_t parent, const std::string& name ) {
-    hid_t ds = H5Dopen2 ( parent, name.c_str(), H5P_DEFAULT ) ;
-    if ( ds < 0 ) throw Hdf5CallException( "DataSet::openDataSet", "H5Dopen2" ) ;
-    hid_t dspc = H5Dget_space( ds ) ;
-    if ( dspc < 0 ) throw Hdf5CallException( "DataSet::openDataSet", "H5Dget_space" ) ;
-    return DataSpace ( ds, dspc ) ;
+  static DataSet openDataSet ( hid_t parent, const std::string& name )
+  {
+    return DataSet( DataSetImpl::openDataSet ( parent, name ) ) ;
   }
-
 
 private:
 
-  // deleter for  boost smart pointer
-  struct DataSetPtrDeleter {
-    void operator()( hid_t* id ) {
-      if ( id ) H5Aclose ( *id );
-      delete id ;
-    }
-  };
-
-  // Data members
-  DataSpace m_dspc;
-  boost::shared_ptr<hid_t> m_id ;
+  DataSetImpl m_impl ;
 
 };
 

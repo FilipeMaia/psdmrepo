@@ -1,12 +1,12 @@
-#ifndef HDF5PP_PLISTFILEACCESS_H
-#define HDF5PP_PLISTFILEACCESS_H
+#ifndef HDF5PP_PLISTDATASETCREATE_H
+#define HDF5PP_PLISTDATASETCREATE_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class PListFileAccess.
+//	Class PListDataSetCreate.
 //
 //------------------------------------------------------------------------
 
@@ -17,6 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
+
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -32,7 +33,7 @@
 //		---------------------
 
 /**
- *  Property list for file access
+ *  Property list for dataset creation
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
@@ -46,20 +47,26 @@
 
 namespace hdf5pp {
 
-class PListFileAccess  {
+class PListDataSetCreate  {
 public:
 
   // Default constructor
-  PListFileAccess () ;
+  PListDataSetCreate () ;
 
   // Destructor
-  ~PListFileAccess () ;
+  ~PListDataSetCreate () ;
 
   // accessor
   hid_t plist() const { return m_impl.id() ; }
 
-  // use family driver
-  void set_family_driver ( hsize_t memb_size, const PListFileAccess& memb_fapl ) ;
+  // set chunk size
+  void set_chunk ( int rank, const hsize_t chunk_size[] ) ;
+
+  // set chunk size for rank-1
+  void set_chunk ( const hsize_t chunk_size ) ;
+
+  // set deflate compression method
+  void set_deflate ( unsigned level ) ;
 
 protected:
 
@@ -67,9 +74,8 @@ private:
 
   // Data members
   PListImpl m_impl ;
-
 };
 
 } // namespace hdf5pp
 
-#endif // HDF5PP_PLISTFILEACCESS_H
+#endif // HDF5PP_PLISTDATASETCREATE_H

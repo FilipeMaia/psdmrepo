@@ -90,6 +90,9 @@ public:
     return Group::openGroup ( *m_id, name ) ;
   }
 
+  // close the file
+  void close() ;
+
 protected:
 
   // Constructor

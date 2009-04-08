@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class PListFileAccess...
+//	Class PListDataSetCreate...
 //
 // Author List:
 //      Andrei Salnikov
@@ -14,7 +14,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "hdf5pp/PListFileAccess.h"
+#include "hdf5pp/PListDataSetCreate.h"
 
 //-----------------
 // C/C++ Headers --
@@ -38,26 +38,48 @@ namespace hdf5pp {
 //----------------
 // Constructors --
 //----------------
-PListFileAccess::PListFileAccess ()
-  : m_impl(H5P_FILE_ACCESS)
+PListDataSetCreate::PListDataSetCreate ()
+  : m_impl(H5P_DATASET_CREATE)
 {
 }
 
 //--------------
 // Destructor --
 //--------------
-PListFileAccess::~PListFileAccess ()
+PListDataSetCreate::~PListDataSetCreate ()
 {
 }
 
-// use family driver
+// set chunk size
 void
-PListFileAccess::set_family_driver ( hsize_t memb_size, const PListFileAccess& memb_fapl )
+PListDataSetCreate::set_chunk ( int rank, const hsize_t chunk_size[] )
 {
-  herr_t stat = H5Pset_fapl_family ( m_impl.id(), memb_size, memb_fapl.plist() ) ;
+  herr_t stat = H5Pset_chunk ( m_impl.id(), rank, chunk_size ) ;
   if ( stat < 0 ) {
-    throw Hdf5CallException ( "PListFileAccess::set_family_driver", "H5Pset_fapl_family" ) ;
+    throw Hdf5CallException ( "PListDataSetCreate::set_chunk", "H5Pset_chunk" ) ;
   }
 }
+
+// set chunk size for rank-1
+void
+PListDataSetCreate::set_chunk ( const hsize_t chunk_size )
+{
+  herr_t stat = H5Pset_chunk ( m_impl.id(), 1, &chunk_size ) ;
+  if ( stat < 0 ) {
+    throw Hdf5CallException ( "PListDataSetCreate::set_chunk", "H5Pset_chunk" ) ;
+  }
+}
+
+// set deflate compression method
+void
+PListDataSetCreate::set_deflate ( unsigned level )
+{
+  herr_t stat = H5Pset_deflate ( m_impl.id(), level ) ;
+  if ( stat < 0 ) {
+    throw Hdf5CallException ( "PListDataSetCreate::set_deflate", "H5Pset_deflate" ) ;
+  }
+}
+
+
 
 } // namespace hdf5pp

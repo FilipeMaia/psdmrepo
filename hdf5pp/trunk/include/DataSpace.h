@@ -53,26 +53,51 @@ public:
   /// Create new simple dataspace
   static DataSpace makeSimple ( int rank, const hsize_t * dims, const hsize_t * maxdims ) ;
 
+  /// Create new simple rank-1 dataspace
+  static DataSpace makeSimple ( hsize_t dim, hsize_t maxdim ) ;
+
+  /// Create new NULL dataspace
+  static DataSpace makeNull () ;
+
+  /// Create new H5S_ALL dataspace/selection
+  static DataSpace makeAll () ;
+
+  // constructor
+  DataSpace () {}
+
+  // constructor
+  explicit DataSpace ( hid_t dsid ) ;
+
   // Destructor
   ~DataSpace () ;
 
-  /// get number of elements in dataspace
+  /// Hyperslab selection
+  void select_hyperslab ( H5S_seloper_t op,
+                          const hsize_t *start,
+                          const hsize_t *stride,
+                          const hsize_t *count,
+                          const hsize_t *block ) ;
+
+  /// get the rank of the data space
+  unsigned rank() const ;
+
+  /// get number of elements in data space
   unsigned size() const ;
 
   /// Get data space ID
-  hid_t dsId() const { return *m_id ; }
+  hid_t id() const { return *m_id ; }
+
+  // close the data space
+  void close() ;
 
 protected:
-
-  // constructor
-  DataSpace ( hid_t dsid ) ;
 
 private:
 
   // deleter for  boost smart pointer
   struct DataSpacePtrDeleter {
     void operator()( hid_t* id ) {
-      if ( id ) H5Sclose ( *id );
+      if ( id and *id != H5S_ALL ) H5Sclose ( *id );
       delete id ;
     }
   };

@@ -52,8 +52,19 @@ namespace hdf5pp {
 class Type {
 public:
 
+  // create locked type from type id
+  static Type LockedType( hid_t tid ) { return Type(tid,false); }
+  // create unlocked type from type id
+  static Type UnlockedType( hid_t tid ) { return Type(tid,true); }
+
+  // Default constructor
+  Type() ;
+
   // Destructor
   ~Type () ;
+
+  /// return type id
+  hid_t id() const { return *m_id ; }
 
 protected:
 
@@ -81,6 +92,7 @@ private:
  *  Class for the atomic types, supports operations applicable to atomic types only
  */
 class AtomicType : public Type {
+public:
 
   // make a non-modifiable atomic type
   template <typename T>
@@ -100,6 +112,91 @@ class AtomicType : public Type {
 protected:
 
   AtomicType ( hid_t id, bool doClose ) : Type( id, doClose ) {}
+
+private:
+
+};
+
+/**
+ *  Class for the compound types, supports operations applicable to compound types only
+ */
+class CompoundType : public Type {
+public:
+
+  // make a compound type
+  template <typename T>
+  static CompoundType compoundType() { return compoundType( sizeof(T) ) ;  }
+
+  static CompoundType compoundType( size_t size ) ;
+
+  // add one more member
+  void insert ( const char* name, size_t offset, Type t ) ;
+
+protected:
+
+  CompoundType ( hid_t id ) : Type( id, true ) {}
+
+private:
+
+};
+
+/**
+ *  Class for the array types, supports operations applicable to array types only
+ */
+class ArrayType : public Type {
+public:
+
+  // make an array type of rank 1
+  template <typename T>
+  static ArrayType arrayType( hsize_t dim ) {
+    return arrayType( AtomicType::atomicType<T>(), dim ) ;
+  }
+
+  // make an array type of any rank
+  template <typename T>
+  static ArrayType arrayType( unsigned rank, hsize_t dims[] ) {
+    return arrayType( AtomicType::atomicType<T>(), rank, dims ) ;
+  }
+
+  // make an array type of rank 1
+  static ArrayType arrayType( Type baseType, hsize_t dim ) {
+    hsize_t dims[1] = { dim };
+    return arrayType( baseType, 1, dims ) ;
+  }
+
+  // make an array type of any rank
+  static ArrayType arrayType( Type baseType, unsigned rank, hsize_t dims[] ) ;
+
+protected:
+
+  ArrayType ( hid_t id ) : Type( id, true ) {}
+
+private:
+
+};
+
+/**
+ *  Class for the enum types, supports operations applicable to enum types only
+ */
+template <typename T>
+class EnumType : public Type {
+public:
+
+  // make an enum type based on some integer type
+  static EnumType enumType() {
+    hid_t tid = H5Tenum_create( AtomicType::atomicType<T>().id() ) ;
+    if ( tid < 0 ) throw Hdf5CallException ( "EnumType::enumType", "H5Tenum_create" ) ;
+    return EnumType ( tid ) ;
+  }
+
+  void insert ( const char* name, T value ) {
+    herr_t stat = H5Tenum_insert( id(), name, static_cast<void *>(&value) ) ;
+    if ( stat < 0 ) throw Hdf5CallException ( "EnumType::insert", "H5Tenum_insert" ) ;
+  }
+
+protected:
+
+  EnumType ( hid_t id ) : Type( id, true ) {}
 
 private:
 
