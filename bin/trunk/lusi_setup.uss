@@ -206,10 +206,10 @@ if [ -z "$lusi_arch" -a -z "$comp" ] ; then
 fi
 
 #
-# Choose optimization
+# Choose build type/optimization
 #
 if [ -z "$lusi_arch" -a -z "$build" ] ; then
-  build=`set_intersect $options "opt,deb" | filter_first`
+  build=`set_intersect $options "opt,deb,dbg,prof" | filter_first`
   test -z "$build" && build="opt"
 fi
 
