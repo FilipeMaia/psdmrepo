@@ -36,7 +36,7 @@ source "$LUSI_ROOT/bin/lusi_setup.sh" "$@"
 #
 # run the build
 #
-scons -j 3 -i $target
+scons -j 3 -i $target || exit 3
 
 #
 # say we are done
