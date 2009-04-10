@@ -20,7 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 lusi_xtc_ver = "0.3.0"
-PREFIX = pjoin(env['LUSI_ROOT'],"sw/external/lusi-xtc",lusi_xtc_ver,env['LUSI_ARCH'])
+PREFIX = pjoin(env['LUSI_ROOT'],"sw/external/lusi-xtc",lusi_xtc_ver)
 LIBDIR = "lib"
 INCDIR = "pdsdata"
 PKGLIBS = "acqdata camdata evrdata opal1kdata  xtcdata"
