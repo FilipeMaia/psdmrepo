@@ -21,11 +21,17 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
-nexus_ver = "4.1.0"
 py_ver = env['PYTHON_VERSION']
 
-PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/nexus",nexus_ver,env['LUSI_ARCH'])
-DEPS    = "hdf5"
+mxml_ver = "2.5"
+PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/mxml",mxml_ver)
+LIBDIR  = "lib"
+PKGLIBS = "mxml m"
+standardExternalPackage ( 'mxml', **locals() )
+
+nexus_ver = "4.1.0"
+PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/nexus",nexus_ver)
+DEPS    = "hdf5 mxml"
 INCDIR  = "include"
 LIBDIR  = "lib"
 BINDIR  = "bin"
