@@ -113,11 +113,13 @@ private:
   typedef H5DataTypes::ObjectContainer<H5DataTypes::XtcClockTime> XtcClockTimeCont ;
   typedef H5DataTypes::ObjectContainer<H5DataTypes::CameraTwoDGaussianV1> CameraTwoDGaussianV1Cont ;
   typedef H5DataTypes::ObjectContainer<H5DataTypes::CameraFrameV1> CameraFrameV1Cont ;
+  typedef H5DataTypes::ObjectContainer<const unsigned char> CameraFrameV1ImageCont ;
 
   std::auto_ptr<CameraTwoDGaussianV1Cont> m_cameraTwoDGaussianV1Cont ;
   std::auto_ptr<XtcClockTimeCont> m_cameraTwoDGaussianV1TimeCont ;
 
   std::auto_ptr<CameraFrameV1Cont> m_cameraFrameV1Cont ;
+  std::auto_ptr<CameraFrameV1ImageCont> m_cameraFrameV1ImageCont ;
   std::auto_ptr<XtcClockTimeCont> m_cameraFrameV1TimeCont ;
 
 };

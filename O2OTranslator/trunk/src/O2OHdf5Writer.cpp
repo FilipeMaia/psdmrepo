@@ -159,6 +159,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_cameraTwoDGaussianV1Cont()
   , m_cameraTwoDGaussianV1TimeCont()
   , m_cameraFrameV1Cont()
+  , m_cameraFrameV1ImageCont()
   , m_cameraFrameV1TimeCont()
 {
   std::string fileTempl = m_nameFactory.makeH5Path () ;
@@ -189,6 +190,7 @@ O2OHdf5Writer::~O2OHdf5Writer ()
   m_cameraTwoDGaussianV1Cont.reset() ;
   m_cameraTwoDGaussianV1TimeCont.reset() ;
   m_cameraFrameV1Cont.reset() ;
+  m_cameraFrameV1ImageCont.reset() ;
   m_cameraFrameV1TimeCont.reset() ;
 
   m_file.close() ;
@@ -276,6 +278,7 @@ O2OHdf5Writer::eventStart ( const Pds::Sequence& seq )
     m_cameraTwoDGaussianV1Cont.reset() ;
     m_cameraTwoDGaussianV1TimeCont.reset() ;
     m_cameraFrameV1Cont.reset() ;
+    m_cameraFrameV1ImageCont.reset() ;
     m_cameraFrameV1TimeCont.reset() ;
 
     // close 'NXentry' group, go back to top level
@@ -375,13 +378,18 @@ O2OHdf5Writer::dataObject ( const Pds::Camera::FrameV1& data, const Pds::DetInfo
     hdf5pp::Group contGrp = m_eventGroup.createGroup(grpName);
     contGrp.createAttr<const char*> ( "class" ).store ( "Camera::FrameV1" ) ;
 
-    // frame data is usually large, put 10 of then in one chunk
-    hsize_t frame_chunk_size = 10 ;
+    // frame data is usually large
+    hsize_t frame_chunk_size = 1 ;
     hsize_t time_chunk_size = 10000 ;
-    int deflate = 6 ;
+    int deflate = 1 ;
 
     // make container for data objects
     m_cameraFrameV1Cont.reset( new CameraFrameV1Cont ( "data", contGrp, frame_chunk_size, deflate ) ) ;
+
+    // get the type for the image
+    hdf5pp::Type imgType = H5DataTypes::CameraFrameV1::imageType ( data ) ;
+    m_cameraFrameV1ImageCont.reset( new CameraFrameV1ImageCont ( "image", contGrp, imgType, frame_chunk_size, deflate ) ) ;
+    m_cameraFrameV1ImageCont->dataset().createAttr<const char*> ( "CLASS" ).store("IMAGE") ;
 
     // make container for time
     m_cameraFrameV1TimeCont.reset( new XtcClockTimeCont ( "time", contGrp, time_chunk_size, deflate ) ) ;
@@ -390,6 +398,7 @@ O2OHdf5Writer::dataObject ( const Pds::Camera::FrameV1& data, const Pds::DetInfo
 
   // store the data in the containers
   m_cameraFrameV1Cont->append ( H5DataTypes::CameraFrameV1(data) ) ;
+  m_cameraFrameV1ImageCont->append ( *data.data(), H5DataTypes::CameraFrameV1::imageType ( data ) ) ;
   m_cameraFrameV1TimeCont->append ( m_eventTime ) ;
 }
 
