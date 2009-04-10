@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-19
+2009-04-10 Andy Salnikov
+- can use 'dbg' instead of 'deb'
+- for external packages added a logic to locate package directory
+  using different $LUSI_ARCH combinations or LUSI_ARCH_BASE
+
 Tag: V00-00-18
 2009-02-05 Andy Salnikov
 - compilers.py: add support for gcc41

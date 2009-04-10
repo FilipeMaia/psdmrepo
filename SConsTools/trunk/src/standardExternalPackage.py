@@ -22,6 +22,37 @@ from SConsTools.dependencies import *
 # symlinks to the include files, libs and binaries
 #
 
+#
+# Find a correct prefix directory.
+#
+def _prefix ( prefix, env ):
+    
+    # if prefix ends with LUSI_ARCH, discard it
+    head, tail = os.path.split( prefix )
+    if not tail : head, tail = os.path.split( head )        
+    if tail == env['LUSI_ARCH'] : prefix = head
+
+    # First try $LUSI_ARCH
+    pfx = pjoin( prefix, env['LUSI_ARCH'] )
+    if os.path.isdir( pfx ) : return pfx
+
+    # for 'prof' try to substitute with 'dbg'
+    if env['LUSI_ARCH_OPT'] == 'prof' :
+        pfx = pjoin( prefix, env['LUSI_ARCH_BASE']+'-dbg' )
+        if os.path.isdir( pfx ) : return pfx
+
+    # Then try $LUSI_ARCH_BASE
+    pfx = pjoin( prefix, env['LUSI_ARCH_BASE'] )
+    if os.path.isdir( pfx ) : return pfx
+
+    # otherwise try 'opt'
+    pfx = pjoin( prefix, env['LUSI_ARCH_BASE']+'-opt' )
+    if os.path.isdir( pfx ) : return pfx
+
+    # nothing works, just return what we have
+    return prefix
+
+
 # build package name from prefix and directory
 def _absdir ( prefix, dir ):
     if not dir : 
@@ -74,7 +105,7 @@ def standardExternalPackage ( package, **kw ) :
     
     env = DefaultEnvironment()
     
-    prefix = kw.get('PREFIX',None)
+    prefix = _prefix ( kw.get('PREFIX',None), env )
     trace ( "prefix: %s" % prefix, "standardExternalPackage", 3 )
     
     # link include directory

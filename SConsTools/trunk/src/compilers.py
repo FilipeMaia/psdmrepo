@@ -17,8 +17,14 @@ from SCons.Script import *
 from trace import *
 
 _gcc_opt = { 'opt' : '-O3',
-            'deb' : '-g',
+            'dbg' : '-g',
+            'deb' : '-g',     # 'deb' was an unfortunate name for 'dbg'
             'prof' : '-pg' }
+
+_ld_opt = { 'opt' : '',
+            'dbg' : '-g',
+            'deb' : '-g',     # 'deb' was an unfortunate name for 'dbg'
+            'prof' : '-pg -static' }
 
 # ===================================
 #   Setup default build environment
@@ -37,11 +43,13 @@ def setupCompilers ( env ) :
             env['CC'] = 'gcc-3.4'
             env['CXX'] = 'g++-3.4'
         env['CCFLAGS'] = _gcc_opt.get(opt,'') + ' -Wall'
+        env['LDFLAGS'] = _ld_opt.get(opt,'')
 
     elif comp == 'gcc41' :
         env['CC'] = 'gcc'
         env['CXX'] = 'g++'
         env['CCFLAGS'] = _gcc_opt.get(opt,'') + ' -Wall'
+        env['LDFLAGS'] = _ld_opt.get(opt,'')
 
     env['PYTHON_VERSION'] = "2.4"
 
