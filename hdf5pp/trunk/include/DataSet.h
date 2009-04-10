@@ -85,17 +85,20 @@ public:
   }
 
   // store the data
-  void store ( const DataSpace& memDspc, const T* data )
+  void store ( const DataSpace& memDspc,
+               const T* data,
+               const hdf5pp::Type& native_type = TypeTraits<T>::native_type() )
   {
-    m_impl.store( TypeTraits<T>::native_type(), memDspc, DataSpace::makeAll(), static_cast<const void *>( data ) ) ;
+    m_impl.store( native_type, memDspc, DataSpace::makeAll(), TypeTraits<T>::address( *data ) ) ;
   }
 
   // store the data, give file dataspace
   void store ( const DataSpace& memDspc,
                const DataSpace& fileDspc,
-               const T* data )
+               const T* data,
+               const hdf5pp::Type& native_type = TypeTraits<T>::native_type() )
   {
-    m_impl.store( TypeTraits<T>::native_type(), memDspc, fileDspc, static_cast<const void *>( data ) ) ;
+    m_impl.store( native_type, memDspc, fileDspc, TypeTraits<T>::address( *data ) ) ;
   }
 
   // close the data set
@@ -111,13 +114,23 @@ protected:
   // Constructor
   DataSet ( DataSetImpl impl ) : m_impl(impl) {}
 
-  /// create new data set for the atomic data types
+  /// create new data set, type is determined by template type
   static DataSet createDataSet ( hid_t parent,
                                 const std::string& name,
                                 const DataSpace& dspc,
                                 const PListDataSetCreate& plistDScreate )
   {
     return DataSet ( DataSetImpl::createDataSet ( parent, name, TypeTraits<T>::stored_type(), dspc, plistDScreate ) ) ;
+  }
+
+  /// create new data set, type is determined at run time
+  static DataSet createDataSet ( hid_t parent,
+                                const std::string& name,
+                                const Type& type,
+                                const DataSpace& dspc,
+                                const PListDataSetCreate& plistDScreate )
+  {
+    return DataSet ( DataSetImpl::createDataSet ( parent, name, type, dspc, plistDScreate ) ) ;
   }
 
   /// open existing dataset

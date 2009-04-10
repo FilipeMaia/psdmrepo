@@ -55,6 +55,10 @@ template <typename T>
 class Attribute  {
 public:
 
+  // factory methods
+  static Attribute createAttr ( hid_t parent, const std::string& name, const DataSpace& dspc = DataSpace::makeScalar() ) ;
+  static Attribute openAttr ( hid_t parent, const std::string& name ) ;
+
   // Destructor
   ~Attribute () {}
 
@@ -69,15 +73,8 @@ public:
 
 protected:
 
-  friend class Group ;
-  template <typename U> friend class DataSet ;
-
   // Constructor
   Attribute ( hid_t id, const DataSpace& dspc ) ;
-
-  // factory methods
-  static Attribute createAttr ( hid_t parent, const std::string& name, const DataSpace& dspc = DataSpace::makeScalar() ) ;
-  static Attribute openAttr ( hid_t parent, const std::string& name ) ;
 
 private:
 
