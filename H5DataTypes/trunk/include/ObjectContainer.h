@@ -54,7 +54,8 @@ template <typename T>
 class ObjectContainer {
 public:
 
-  ObjectContainer ( const char* name,
+  /// dataset type is determined by template type
+  ObjectContainer ( const std::string& name,
                     hdf5pp::Group& location,
                     hsize_t chunk_size = 10240,
                     int deflate = -1 )
@@ -73,7 +74,31 @@ public:
     m_dataset = location.createDataSet<T> ( name, dsp, plDScreate ) ;
   }
 
-  void append ( const T& obj )
+  /// Provide type at run time
+  ObjectContainer ( const std::string& name,
+                    hdf5pp::Group& location,
+                    const hdf5pp::Type& stored_type,
+                    hsize_t chunk_size = 10240,
+                    int deflate = -1 )
+    : m_dataset()
+    , m_count(0)
+  {
+    // make extensible data space
+    hdf5pp::DataSpace dsp = hdf5pp::DataSpace::makeSimple ( 0, H5S_UNLIMITED ) ;
+
+    // use chunking
+    hdf5pp::PListDataSetCreate plDScreate ;
+    plDScreate.set_chunk(chunk_size) ;
+    if ( deflate >= 0 ) plDScreate.set_deflate(deflate) ;
+
+    // make a data set
+    m_dataset = location.createDataSet<T> ( name, stored_type, dsp, plDScreate ) ;
+  }
+
+  /**
+   *  Append one more data element to the end of data set
+   */
+  void append ( const T& obj, const hdf5pp::Type& native_type = hdf5pp::TypeTraits<T>::native_type() )
   {
     // extend data set
     unsigned long newCount = m_count + 1 ;
@@ -89,10 +114,13 @@ public:
     hdf5pp::DataSpace memDspc = hdf5pp::DataSpace::makeScalar() ;
 
     // store it
-    m_dataset.store ( memDspc, fileDspc, &obj ) ;
+    m_dataset.store ( memDspc, fileDspc, &obj, native_type ) ;
 
     m_count = newCount ;
   }
+
+  /// get access to data set
+  hdf5pp::DataSet<T>& dataset() { return m_dataset ; }
 
 private:
 

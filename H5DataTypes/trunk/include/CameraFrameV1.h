@@ -48,7 +48,10 @@
 namespace H5DataTypes {
 
 struct CameraFrameV1_Data  {
-  double xyz ;
+  uint32_t width ;
+  uint32_t height ;
+  uint32_t depth ;
+  uint32_t offset ;
 };
 
 class CameraFrameV1  {
@@ -61,6 +64,8 @@ public:
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
+
+  static hdf5pp::Type imageType( const Pds::Camera::FrameV1& frame ) ;
 
 private:
   CameraFrameV1_Data m_data ;
