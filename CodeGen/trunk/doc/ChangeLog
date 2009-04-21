@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2009-04-20 Andy Salnikov
+- in C++ templates moved class-doc block below namespace
+
 Tag: V00-00-08
 2009-03-04 Andy Salnikov
 - added template for C++ unit test module
