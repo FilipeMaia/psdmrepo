@@ -116,20 +116,22 @@ struct EvrConfigV1_Data {
 class EvrConfigV1  {
 public:
 
+  typedef Pds::EvrData::ConfigV1 XtcType ;
+
   EvrConfigV1 () {}
-  EvrConfigV1 ( const Pds::EvrData::ConfigV1& data ) ;
+  EvrConfigV1 ( const XtcType& data ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
+
+  // store single config object at specified location
+  static void store( const XtcType& config, hdf5pp::Group location ) ;
 
 private:
 
   EvrConfigV1_Data m_data ;
 
 };
-
-// store single config object at specified location
-void storeEvrConfigV1( const Pds::EvrData::ConfigV1& config, hdf5pp::Group location ) ;
 
 } // namespace H5DataTypes
 

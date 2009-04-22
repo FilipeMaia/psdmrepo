@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2009-04-22 Andy Salnikov
+- small refactoring, store() method becomes a static member of the 
+  corresponding classes
+- finished implementation for AcqirisDataDescV1 class
+
 Tag: V00-00-02
 2009-04-10 Andy Salnikov
 - ObjectContainer: allow passing dynamic object type to all operations

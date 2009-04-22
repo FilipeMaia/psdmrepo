@@ -147,7 +147,7 @@ AcqirisConfigV1::native_type()
 }
 
 void
-storeAcqirisConfigV1 ( const Pds::Acqiris::ConfigV1& config, hdf5pp::Group grp )
+AcqirisConfigV1::store ( const Pds::Acqiris::ConfigV1& config, hdf5pp::Group grp )
 {
   // make scalar data set for main object
   AcqirisConfigV1 data ( config ) ;

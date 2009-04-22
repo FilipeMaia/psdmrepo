@@ -124,18 +124,21 @@ struct AcqirisConfigV1_Data {
 
 struct AcqirisConfigV1 {
 public:
+
+  typedef Pds::Acqiris::ConfigV1 XtcType ;
+
   AcqirisConfigV1 () {}
   AcqirisConfigV1 ( const Pds::Acqiris::ConfigV1& v ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
+  static void store ( const Pds::Acqiris::ConfigV1& config, hdf5pp::Group location ) ;
+
 private:
   AcqirisConfigV1_Data m_data ;
 };
 
-// store the object of type Pds::Acqiris::ConfigV1 at specified location
-void storeAcqirisConfigV1 ( const Pds::Acqiris::ConfigV1& config, hdf5pp::Group location ) ;
 
 } // namespace H5DataTypes
 

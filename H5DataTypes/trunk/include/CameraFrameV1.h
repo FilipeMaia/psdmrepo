@@ -57,6 +57,8 @@ struct CameraFrameV1_Data  {
 class CameraFrameV1  {
 public:
 
+  typedef Pds::Camera::FrameV1 XtcType ;
+
   CameraFrameV1 () {}
   CameraFrameV1 ( const Pds::Camera::FrameV1& frame ) ;
 

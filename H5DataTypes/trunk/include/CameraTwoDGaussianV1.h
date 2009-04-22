@@ -60,6 +60,8 @@ struct CameraTwoDGaussianV1_Data {
 class CameraTwoDGaussianV1  {
 public:
 
+  typedef Pds::Camera::TwoDGaussianV1 XtcType ;
+
   CameraTwoDGaussianV1 () {}
   CameraTwoDGaussianV1 ( const Pds::Camera::TwoDGaussianV1& config ) ;
 

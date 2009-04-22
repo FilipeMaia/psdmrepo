@@ -96,7 +96,7 @@ Opal1kConfigV1::native_type()
 }
 
 void
-storeOpal1kConfigV1 ( const Pds::Opal1k::ConfigV1& config, hdf5pp::Group grp )
+Opal1kConfigV1::store( const Pds::Opal1k::ConfigV1& config, hdf5pp::Group grp )
 {
   // make scalar data set for main object
   Opal1kConfigV1 data ( config ) ;

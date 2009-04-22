@@ -22,6 +22,9 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "hdf5pp/Group.h"
+#include "pdsdata/acqiris/ConfigV1.hh"
+#include "pdsdata/acqiris/DataDescV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -32,22 +35,8 @@
 //		---------------------
 
 /**
- *  C++ source file code template. The first sentence is a brief summary of 
- *  what the class is for. It is followed by more detailed information
- *  about how to use the class. This doc comment must immediately preceed the 
- *  class definition.
  *
- *  Additional paragraphs with more details may follow; separate paragraphs
- *  with a blank line. The last paragraph before the tags (preceded by @) 
- *  should be the identification and copyright, as below.
- *
- *  Please note that KDOC comments must start with /** (a forward slash
- *  followed by TWO asterisks). Interface members should be documented
- *  with KDOC comments, as should be protected members that may be of interest
- *  to those deriving from your class. Private implementation should
- *  be commented with C++-style // (double forward slash) comments.
- *
- *  This software was developed for the LUSI project.  If you use all or 
+ *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
  *
  *  @see AdditionalClass
@@ -59,41 +48,24 @@
 
 namespace H5DataTypes {
 
+struct AcqirisDataDescV1_Data  {
+};
+
 class AcqirisDataDescV1  {
 public:
 
-  // Default constructor
-  AcqirisDataDescV1 () ;
+  typedef Pds::Acqiris::DataDescV1 XtcType ;
 
-  // Destructor
-  virtual ~AcqirisDataDescV1 () ;
+  AcqirisDataDescV1 () ;
+  AcqirisDataDescV1 ( const XtcType& xtcData ) ;
+
+  static hdf5pp::Type timestampType( const Pds::Acqiris::ConfigV1& config ) ;
+  static hdf5pp::Type waveformType( const Pds::Acqiris::ConfigV1& config ) ;
 
 protected:
-
 private:
 
-  // Data members
-  
-  int m_memberVariable;  // private members start with m_
-
-  // Copy constructor and assignment are disabled by default
-  AcqirisDataDescV1 ( const AcqirisDataDescV1& ) ;
-  AcqirisDataDescV1& operator = ( const AcqirisDataDescV1& ) ;
-
-//------------------
-// Static Members --
-//------------------
-
-public:
-
-  // Selectors (const)
-
-  // Modifiers
-
-private:
-
-  // Data members
-  static int s_staticVariable;     // Static data member starts with s_.
+  AcqirisDataDescV1_Data m_data ;
 
 };
 

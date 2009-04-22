@@ -85,7 +85,7 @@ CameraFrameFexConfigV1::native_type()
 }
 
 void
-storeCameraFrameFexConfigV1 ( const Pds::Camera::FrameFexConfigV1& config, hdf5pp::Group grp )
+CameraFrameFexConfigV1::store( const Pds::Camera::FrameFexConfigV1& config, hdf5pp::Group grp )
 {
   // make scalar data set for main object
   CameraFrameFexConfigV1 data ( config ) ;

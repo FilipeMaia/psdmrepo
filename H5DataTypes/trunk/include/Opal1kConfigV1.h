@@ -63,17 +63,20 @@ struct Opal1kConfigV1_Data {
 
 class Opal1kConfigV1 {
 public:
+
+  typedef Pds::Opal1k::ConfigV1 XtcType ;
+
   Opal1kConfigV1() {}
   Opal1kConfigV1 ( const Pds::Opal1k::ConfigV1& config ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
+  static void store ( const Pds::Opal1k::ConfigV1& config, hdf5pp::Group location ) ;
+
 private:
   Opal1kConfigV1_Data m_data ;
 };
-
-void storeOpal1kConfigV1 ( const Pds::Opal1k::ConfigV1& config, hdf5pp::Group location ) ;
 
 } // namespace H5DataTypes
 

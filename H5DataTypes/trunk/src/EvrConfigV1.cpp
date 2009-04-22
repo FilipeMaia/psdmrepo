@@ -146,7 +146,7 @@ EvrConfigV1::native_type()
 }
 
 void
-storeEvrConfigV1( const Pds::EvrData::ConfigV1& config, hdf5pp::Group grp )
+EvrConfigV1::store( const Pds::EvrData::ConfigV1& config, hdf5pp::Group grp )
 {
   // make scalar data set for main object
   EvrConfigV1 data ( config ) ;
