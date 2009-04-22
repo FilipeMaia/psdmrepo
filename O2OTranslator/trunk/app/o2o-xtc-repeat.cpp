@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: o2o-translate.cpp 245 2009-04-03 22:12:26Z salnikov $
+// 	$Id$
 //
 // Description:
 //	Class O2O_XTC_Repeat...
