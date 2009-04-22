@@ -61,13 +61,7 @@ public:
   virtual void levelEnd ( const Pds::Src& src ) = 0 ;
 
   // visit the data object
-  virtual void dataObject ( const Pds::Acqiris::ConfigV1& data, const Pds::DetInfo& detInfo ) = 0 ;
-  virtual void dataObject ( const Pds::Acqiris::DataDescV1& data, const Pds::DetInfo& detInfo ) = 0 ;
-  virtual void dataObject ( const Pds::Camera::FrameFexConfigV1& data, const Pds::DetInfo& detInfo ) = 0 ;
-  virtual void dataObject ( const Pds::Camera::FrameV1& data, const Pds::DetInfo& detInfo ) = 0 ;
-  virtual void dataObject ( const Pds::Camera::TwoDGaussianV1& data, const Pds::DetInfo& detInfo ) = 0 ;
-  virtual void dataObject ( const Pds::EvrData::ConfigV1& data, const Pds::DetInfo& detInfo ) = 0 ;
-  virtual void dataObject ( const Pds::Opal1k::ConfigV1& data, const Pds::DetInfo& detInfo ) = 0 ;
+  virtual void dataObject ( const void* data, const Pds::TypeId& typeId, const Pds::DetInfo& detInfo ) = 0 ;
 
 protected:
 

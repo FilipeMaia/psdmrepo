@@ -15,6 +15,7 @@
 //-----------------
 #include <map>
 #include <memory>
+#include <boost/shared_ptr.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -26,10 +27,8 @@
 //-------------------------------
 #include "hdf5pp/File.h"
 #include "hdf5pp/Group.h"
-#include "H5DataTypes/CameraTwoDGaussianV1.h"
-#include "H5DataTypes/CameraFrameV1.h"
-#include "H5DataTypes/ObjectContainer.h"
 #include "H5DataTypes/XtcClockTime.h"
+#include "O2OTranslator/DataTypeCvtFactoryI.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -55,6 +54,7 @@
 namespace O2OTranslator {
 
 class O2OFileNameFactory ;
+class O2ODataTypeCvtI ;
 
 class O2OHdf5Writer : public O2OXtcScannerI {
 public:
@@ -68,7 +68,9 @@ public:
   O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
                   bool overwrite=false,
                   SplitMode split=NoSplit,
-                  hsize_t splitSize=0xFFFFFFFF ) ;
+                  hsize_t splitSize=0xFFFFFFFF,
+                  bool ignoreUnknowXtc=false,
+                  int compression = -1 ) ;
 
   // Destructor
   virtual ~O2OHdf5Writer () ;
@@ -82,45 +84,27 @@ public:
   virtual void levelEnd ( const Pds::Src& src ) ;
 
   // visit the data object
-  virtual void dataObject ( const Pds::Acqiris::ConfigV1& data, const Pds::DetInfo& detInfo ) ;
-  virtual void dataObject ( const Pds::Acqiris::DataDescV1& data, const Pds::DetInfo& detInfo ) ;
-  virtual void dataObject ( const Pds::Camera::FrameFexConfigV1& data, const Pds::DetInfo& detInfo ) ;
-  virtual void dataObject ( const Pds::Camera::FrameV1& data, const Pds::DetInfo& detInfo ) ;
-  virtual void dataObject ( const Pds::Camera::TwoDGaussianV1& data, const Pds::DetInfo& detInfo ) ;
-  virtual void dataObject ( const Pds::EvrData::ConfigV1& data, const Pds::DetInfo& detInfo ) ;
-  virtual void dataObject ( const Pds::Opal1k::ConfigV1& data, const Pds::DetInfo& detInfo ) ;
+  virtual void dataObject ( const void* data, const Pds::TypeId& typeId, const Pds::DetInfo& detInfo ) ;
 
 protected:
 
 private:
 
-  struct CmpDetInfo {
-    bool operator()( const Pds::DetInfo& lhs, const Pds::DetInfo& rhs ) const ;
-  };
-
-  typedef std::map<Pds::DetInfo,Pds::Acqiris::ConfigV1, CmpDetInfo> AcqConfigMap ;
+  typedef boost::shared_ptr<DataTypeCvtFactoryI> DataTypeCvtFactoryPtr ;
+  typedef std::multimap<uint32_t, DataTypeCvtFactoryPtr> CvtMap ;
 
   // Data members
   const O2OFileNameFactory& m_nameFactory ;
   hdf5pp::File m_file ;
   State m_state ;
   hdf5pp::Group m_mapGroup ;      // Group for current Map transition
-  hdf5pp::Group m_configGroup ;   // Group for Configure transition
-  hdf5pp::Group m_eventGroup ;    // Group for event data
   H5DataTypes::XtcClockTime m_eventTime ;
+  CvtMap m_cvtMap ;
+  bool m_ignore ;
+  int m_compression ;
 
-  /// typedefs for various container types
-  typedef H5DataTypes::ObjectContainer<H5DataTypes::XtcClockTime> XtcClockTimeCont ;
-  typedef H5DataTypes::ObjectContainer<H5DataTypes::CameraTwoDGaussianV1> CameraTwoDGaussianV1Cont ;
-  typedef H5DataTypes::ObjectContainer<H5DataTypes::CameraFrameV1> CameraFrameV1Cont ;
-  typedef H5DataTypes::ObjectContainer<const unsigned char> CameraFrameV1ImageCont ;
-
-  std::auto_ptr<CameraTwoDGaussianV1Cont> m_cameraTwoDGaussianV1Cont ;
-  std::auto_ptr<XtcClockTimeCont> m_cameraTwoDGaussianV1TimeCont ;
-
-  std::auto_ptr<CameraFrameV1Cont> m_cameraFrameV1Cont ;
-  std::auto_ptr<CameraFrameV1ImageCont> m_cameraFrameV1ImageCont ;
-  std::auto_ptr<XtcClockTimeCont> m_cameraFrameV1TimeCont ;
+  // close all containers
+  void closeContainers() ;
 
 };
 

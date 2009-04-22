@@ -1,12 +1,12 @@
-#ifndef O2OTRANSLATOR_O2OXTCITERATOR_H
-#define O2OTRANSLATOR_O2OXTCITERATOR_H
+#ifndef O2OTRANSLATOR_CONFIGDATATYPECVT_H
+#define O2OTRANSLATOR_CONFIGDATATYPECVT_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class O2OXtcIterator.
+//	Class ConfigDataTypeCvt.
 //
 //------------------------------------------------------------------------
 
@@ -17,8 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "pdsdata/xtc/XtcIterator.hh"
-#include "pdsdata/xtc/TypeId.hh"
+#include "O2OTranslator/DataTypeCvt.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -33,10 +32,9 @@
 //		---------------------
 
 /**
- *  Subclass of XtcIterator which forwards all
  *
  *  This software was developed for the LUSI project.  If you use all or
- *  part of it, please give an appropriate acknowledgement.
+ *  part of it, please give an appropriate acknowledgment.
  *
  *  @see AdditionalClass
  *
@@ -47,34 +45,40 @@
 
 namespace O2OTranslator {
 
-class O2OXtcScannerI ;
-class O2ODataTypeCvtI ;
-
-class O2OXtcIterator : public Pds::XtcIterator {
+template <typename H5Type>
+class ConfigDataTypeCvt : public DataTypeCvt<typename H5Type::XtcType> {
 public:
 
-  // Default constructor
-  O2OXtcIterator ( Xtc* xtc, O2OXtcScannerI* scanner ) ;
+  typedef typename H5Type::XtcType XtcType ;
+
+  // constructor takes a location where the data will be stored
+  ConfigDataTypeCvt ( const hdf5pp::Group& group )
+    : DataTypeCvt<typename H5Type::XtcType>(), m_group(group) {}
 
   // Destructor
-  virtual ~O2OXtcIterator () ;
+  virtual ~ConfigDataTypeCvt () {}
 
-  // process one sub-XTC, returns >0 for success, 0 for error
-  virtual int process(Xtc* xtc) ;
+  // typed conversion method
+  virtual void typedConvert ( const XtcType& data,
+                              const H5DataTypes::XtcClockTime& )
+  {
+    // store the data
+    H5Type::store ( data, m_group ) ;
+  }
 
 protected:
 
 private:
 
   // Data members
-  O2OXtcScannerI* m_scanner ;
+  hdf5pp::Group m_group ;
 
   // Copy constructor and assignment are disabled by default
-  O2OXtcIterator ( const O2OXtcIterator& ) ;
-  O2OXtcIterator operator = ( const O2OXtcIterator& ) ;
+  ConfigDataTypeCvt ( const ConfigDataTypeCvt& ) ;
+  ConfigDataTypeCvt operator = ( const ConfigDataTypeCvt& ) ;
 
 };
 
 } // namespace O2OTranslator
 
-#endif // O2OTRANSLATOR_O2OXTCITERATOR_H
+#endif // O2OTRANSLATOR_CONFIGDATATYPECVT_H

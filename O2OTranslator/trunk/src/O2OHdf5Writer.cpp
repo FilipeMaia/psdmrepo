@@ -24,20 +24,26 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "MsgLogger/MsgLogger.h"
 #include "H5DataTypes/AcqirisConfigV1.h"
 #include "H5DataTypes/CameraFrameFexConfigV1.h"
 #include "H5DataTypes/CameraFrameV1.h"
 #include "H5DataTypes/CameraTwoDGaussianV1.h"
 #include "H5DataTypes/EvrConfigV1.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
+#include "MsgLogger/MsgLogger.h"
+#include "O2OTranslator/AcqirisDataDescV1Cvt.h"
+#include "O2OTranslator/CameraFrameV1Cvt.h"
+#include "O2OTranslator/ConfigDataTypeCvt.h"
+#include "O2OTranslator/DataTypeCvtFactory.h"
+#include "O2OTranslator/EvtDataTypeCvt.h"
+#include "O2OTranslator/EvtDataTypeCvtFactory.h"
 #include "O2OTranslator/O2OExceptions.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/Level.hh"
 #include "pdsdata/xtc/Sequence.hh"
 #include "pdsdata/xtc/Src.hh"
-#include "pdsdata/acqiris/ConfigV1.hh"
+
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -64,41 +70,11 @@ namespace {
     return "*ERROR*" ;
   }
 
-  // Class name for new groups depends on the state
-  const char* className ( O2OHdf5Writer::State state ) {
-    switch ( state ) {
-      case O2OHdf5Writer::Undefined :
-        return "NXentry" ;
-      case O2OHdf5Writer::Mapped :
-        return "NXinstrument" ;
-      case O2OHdf5Writer::Configured :
-        return "CfgObject" ;
-      case O2OHdf5Writer::Running :
-        return "NXevent_data" ;
-    }
-    return "Unexpected" ;
-  }
-
-  // get the group name from the source
-  std::string groupName( const char* typeName, const Pds::DetInfo& info ) {
-    std::ostringstream grp ;
-    grp << typeName << '/' << Pds::DetInfo::name(info.detector()) << '.' << info.detId()
-        << ':' << Pds::DetInfo::name(info.device()) << '.' << info.devId() ;
-
-    return grp.str() ;
-  }
-
   // create new group in a file
   template <typename Parent>
-  hdf5pp::Group createGroup ( Parent parent, const std::string& groupName, O2OHdf5Writer::State state ) {
-    const char* gclass = className(state) ;
-    MsgLog( logger, debug, "HDF5Writer -- creating group " << groupName << "/" << gclass ) ;
+  hdf5pp::Group createGroup ( Parent parent, const std::string& groupName ) {
+    MsgLog( logger, debug, "HDF5Writer -- creating group " << groupName ) ;
     hdf5pp::Group grp = parent.createGroup( groupName ) ;
-
-    // make an attribute
-    hdf5pp::Attribute<const char*> clsAttr = grp.createAttr<const char*> ( "NX_class" ) ;
-    clsAttr.store ( gclass ) ;
-
     return grp ;
   }
 
@@ -110,36 +86,6 @@ namespace {
 
 namespace O2OTranslator {
 
-// comparator for DetInfo objects
-bool
-O2OHdf5Writer::CmpDetInfo::operator()( const Pds::DetInfo& lhs, const Pds::DetInfo& rhs ) const
-{
-  int ldet = lhs.detector();
-  int rdet = rhs.detector();
-  if ( ldet < rdet ) return true ;
-  if ( ldet > rdet ) return false ;
-
-  int ldev = lhs.device();
-  int rdev = rhs.device();
-  if ( ldev < rdev ) return true ;
-  if ( ldev > rdev ) return false ;
-
-  uint32_t ldetId = lhs.detId();
-  uint32_t rdetId = rhs.detId();
-  if ( ldetId < rdetId ) return true ;
-  if ( ldetId > rdetId ) return false ;
-
-  uint32_t ldevId = lhs.devId();
-  uint32_t rdevId = rhs.devId();
-  if ( ldevId < rdevId ) return true ;
-  if ( ldevId > rdevId ) return false ;
-
-  uint32_t lpid = lhs.processId();
-  uint32_t rpid = rhs.processId();
-  if ( lpid < rpid ) return true ;
-  return false ;
-}
-
 
 //----------------
 // Constructors --
@@ -147,20 +93,18 @@ O2OHdf5Writer::CmpDetInfo::operator()( const Pds::DetInfo& lhs, const Pds::DetIn
 O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
                                bool overwrite,
                                SplitMode split,
-                               hsize_t splitSize )
+                               hsize_t splitSize,
+                               bool ignoreUnknowXtc,
+                               int compression )
   : O2OXtcScannerI()
   , m_nameFactory( nameFactory )
   , m_file()
   , m_state(Undefined)
   , m_mapGroup()
-  , m_configGroup()
-  , m_eventGroup()
   , m_eventTime()
-  , m_cameraTwoDGaussianV1Cont()
-  , m_cameraTwoDGaussianV1TimeCont()
-  , m_cameraFrameV1Cont()
-  , m_cameraFrameV1ImageCont()
-  , m_cameraFrameV1TimeCont()
+  , m_cvtMap()
+  , m_ignore(ignoreUnknowXtc)
+  , m_compression(compression)
 {
   std::string fileTempl = m_nameFactory.makeH5Path () ;
   MsgLog( logger, debug, "O2OHdf5Writer - open output file " << fileTempl ) ;
@@ -187,11 +131,7 @@ O2OHdf5Writer::~O2OHdf5Writer ()
 {
   MsgLog( logger, debug, "O2OHdf5Writer - close output file" ) ;
 
-  m_cameraTwoDGaussianV1Cont.reset() ;
-  m_cameraTwoDGaussianV1TimeCont.reset() ;
-  m_cameraFrameV1Cont.reset() ;
-  m_cameraFrameV1ImageCont.reset() ;
-  m_cameraFrameV1TimeCont.reset() ;
+  closeContainers() ;
 
   m_file.close() ;
 
@@ -217,7 +157,7 @@ O2OHdf5Writer::eventStart ( const Pds::Sequence& seq )
     snprintf ( buf, sizeof buf, "Map:%08X", seq.clock().seconds() ) ;
 
     // create NXentry group
-    m_mapGroup = createGroup ( m_file, buf, m_state ) ;
+    m_mapGroup = createGroup ( m_file, buf ) ;
 
     // store transition time as couple of attributes to this new group
     //::storeClock ( m_file, seq.clock() ) ;
@@ -232,11 +172,42 @@ O2OHdf5Writer::eventStart ( const Pds::Sequence& seq )
       throw O2OXTCTransitionException( "Configure", ::stateName(m_state) ) ;
     }
 
-    // Create 'NXinstrument' group
-    m_configGroup = createGroup ( m_mapGroup, "Configure", m_state ) ;
+    // Create groups for data
+    hdf5pp::Group configGroup = createGroup ( m_mapGroup, "Configure" ) ;
+    hdf5pp::Group eventGroup = createGroup ( m_mapGroup, "EventData" ) ;
+
 
     // store transition time as couple of attributes to this new group
     //::storeClock ( m_file, seq.clock() ) ;
+
+    // instantiate all factories for config converters
+    DataTypeCvtFactoryPtr factory ;
+    uint32_t typeId ;
+
+    factory.reset( new DataTypeCvtFactory< ConfigDataTypeCvt<H5DataTypes::AcqirisConfigV1> > ( configGroup, "Acqiris::ConfigV1" ) ) ;
+    typeId =  Pds::TypeId(Pds::TypeId::Id_AcqConfig,1).value() ;
+    m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+
+    factory.reset( new DataTypeCvtFactory< ConfigDataTypeCvt<H5DataTypes::Opal1kConfigV1> > ( configGroup, "Opal1k::ConfigV1" ) ) ;
+    typeId =  Pds::TypeId(Pds::TypeId::Id_Opal1kConfig,1).value() ;
+    m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+
+    factory.reset( new DataTypeCvtFactory< ConfigDataTypeCvt<H5DataTypes::CameraFrameFexConfigV1> > ( configGroup, "Camera::FrameFexConfigV1" ) ) ;
+    typeId =  Pds::TypeId(Pds::TypeId::Id_FrameFexConfig,1).value() ;
+    m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+
+    factory.reset( new DataTypeCvtFactory< ConfigDataTypeCvt<H5DataTypes::EvrConfigV1> > ( configGroup, "EvrData::ConfigV1" ) ) ;
+    typeId =  Pds::TypeId(Pds::TypeId::Id_EvrConfig,1).value() ;
+    m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+
+    // very special converter for Acqiris::DataDescV1, it needs two types of data
+    hsize_t chunk_size = 128*1024 ;
+    factory.reset( new EvtDataTypeCvtFactory< AcqirisDataDescV1Cvt > (
+        eventGroup, "Acqiris::DataDescV1", chunk_size, m_compression ) ) ;
+    typeId =  Pds::TypeId(Pds::TypeId::Id_AcqConfig,1).value() ;
+    m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+    typeId =  Pds::TypeId(Pds::TypeId::Id_AcqWaveform,1).value() ;
+    m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
 
     // switch to configured state
     m_state = Configured ;
@@ -251,8 +222,23 @@ O2OHdf5Writer::eventStart ( const Pds::Sequence& seq )
     // switch to running state
     m_state = Running ;
 
-    // create event group
-    m_eventGroup = createGroup ( m_mapGroup, "EventData", m_state ) ;
+    // instantiate all factories for event converters
+    DataTypeCvtFactoryPtr factory ;
+    uint32_t typeId ;
+    hsize_t chunk_size = 128*1024 ;
+
+    // event group should have been created already
+    hdf5pp::Group eventGroup = m_mapGroup.openGroup( "EventData" ) ;
+
+    factory.reset( new EvtDataTypeCvtFactory< EvtDataTypeCvt<H5DataTypes::CameraTwoDGaussianV1> > (
+        eventGroup, "Camera::TwoDGaussianV1", chunk_size, m_compression ) ) ;
+    typeId =  Pds::TypeId(Pds::TypeId::Id_TwoDGaussian,1).value() ;
+    m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+
+    factory.reset( new EvtDataTypeCvtFactory< CameraFrameV1Cvt > (
+        eventGroup, "Camera::FrameV1", chunk_size, m_compression ) ) ;
+    typeId =  Pds::TypeId(Pds::TypeId::Id_Frame,1).value() ;
+    m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
 
   } else if ( seq.service() == Pds::TransitionId::L1Accept ) {
 
@@ -264,22 +250,12 @@ O2OHdf5Writer::eventStart ( const Pds::Sequence& seq )
     // switch back to configured state
     m_state = Configured ;
 
-    // close the event group
-    m_eventGroup.close() ;
-
   } else if ( seq.service() == Pds::TransitionId::Unconfigure ) {
 
     // switch back to mapped state
     m_state = Mapped ;
 
   } else if ( seq.service() == Pds::TransitionId::Unmap ) {
-
-    // close all storers
-    m_cameraTwoDGaussianV1Cont.reset() ;
-    m_cameraTwoDGaussianV1TimeCont.reset() ;
-    m_cameraFrameV1Cont.reset() ;
-    m_cameraFrameV1ImageCont.reset() ;
-    m_cameraFrameV1TimeCont.reset() ;
 
     // close 'NXentry' group, go back to top level
     m_mapGroup.close() ;
@@ -295,18 +271,6 @@ O2OHdf5Writer::eventStart ( const Pds::Sequence& seq )
 void
 O2OHdf5Writer::eventEnd ( const Pds::Sequence& seq )
 {
-  MsgLog( logger, debug, "O2OHdf5Writer::eventEnd " << Pds::TransitionId::name(seq.service()) ) ;
-
-  if ( seq.service() == Pds::TransitionId::Configure ) {
-
-    // check current state
-    if ( m_state != Configured ) {
-      throw O2OXTCTransitionException( "Configure", ::stateName(m_state) ) ;
-    }
-
-    // close 'Configure' group
-    m_configGroup.close() ;
-  }
 }
 
 // signal start/end of the level
@@ -324,146 +288,41 @@ O2OHdf5Writer::levelEnd ( const Pds::Src& src )
 
 // visit the data object
 void
-O2OHdf5Writer::dataObject ( const Pds::Acqiris::ConfigV1& data, const Pds::DetInfo& detInfo )
+O2OHdf5Writer::dataObject ( const void* data, const Pds::TypeId& typeId, const Pds::DetInfo& detInfo )
 {
-  // get the group name
-  const std::string& grpName = ::groupName( "Acqiris::ConfigV1", detInfo ) ;
+  // find this type in the converter factory map
+  CvtMap::iterator it = m_cvtMap.find( typeId.value() ) ;
+  if ( it != m_cvtMap.end() ) {
 
-  MsgLog( logger, debug, "O2OHdf5Writer::dataObject " << grpName ) ;
+    do {
 
-  // define separate group
-  hdf5pp::Group grp = m_configGroup.createGroup( grpName );
-  grp.createAttr<const char*> ( "class" ).store ( "Acqiris::ConfigV1" ) ;
+      DataTypeCvtFactoryPtr factory = it->second ;
+      DataTypeCvtI* converter = factory->converter( detInfo ) ;
+      converter->convert( data, typeId, detInfo, m_eventTime ) ;
 
-  // store the data
-  H5DataTypes::storeAcqirisConfigV1 ( data, grp ) ;
-}
+      ++ it ;
 
-void
-O2OHdf5Writer::dataObject ( const Pds::Acqiris::DataDescV1& data, const Pds::DetInfo& detInfo )
-{
-  // get the group name
-  const std::string& grpName = ::groupName( "Acqiris::DataDescV1", detInfo ) ;
+    } while ( it != m_cvtMap.end() and it->first == typeId.value() ) ;
 
-  MsgLog( logger, debug, "O2OHdf5Writer::dataObject " << grpName ) ;
-}
+  } else {
 
-void
-O2OHdf5Writer::dataObject ( const Pds::Camera::FrameFexConfigV1& data, const Pds::DetInfo& detInfo )
-{
-  // get the group name
-  const std::string& grpName = ::groupName( "Camera::FrameFexConfigV1", detInfo ) ;
-
-  MsgLog( logger, debug, "O2OHdf5Writer::dataObject " << grpName ) ;
-
-  // define separate group
-  hdf5pp::Group grp = m_configGroup.createGroup( grpName );
-  grp.createAttr<const char*> ( "class" ).store ( "Camera::FrameFexConfigV1" ) ;
-
-  // store the data
-  H5DataTypes::storeCameraFrameFexConfigV1 ( data, grp ) ;
-}
-
-void
-O2OHdf5Writer::dataObject ( const Pds::Camera::FrameV1& data, const Pds::DetInfo& detInfo )
-{
-  // get the group name
-  const std::string& grpName = ::groupName( "Camera::FrameV1", detInfo ) ;
-
-  MsgLog( logger, debug, "O2OHdf5Writer::dataObject " << grpName ) ;
-
-  if ( not m_cameraFrameV1Cont.get() ) {
-
-    // define two containers in a separate group
-    hdf5pp::Group contGrp = m_eventGroup.createGroup(grpName);
-    contGrp.createAttr<const char*> ( "class" ).store ( "Camera::FrameV1" ) ;
-
-    // frame data is usually large
-    hsize_t frame_chunk_size = 1 ;
-    hsize_t time_chunk_size = 10000 ;
-    int deflate = 1 ;
-
-    // make container for data objects
-    m_cameraFrameV1Cont.reset( new CameraFrameV1Cont ( "data", contGrp, frame_chunk_size, deflate ) ) ;
-
-    // get the type for the image
-    hdf5pp::Type imgType = H5DataTypes::CameraFrameV1::imageType ( data ) ;
-    m_cameraFrameV1ImageCont.reset( new CameraFrameV1ImageCont ( "image", contGrp, imgType, frame_chunk_size, deflate ) ) ;
-    m_cameraFrameV1ImageCont->dataset().createAttr<const char*> ( "CLASS" ).store("IMAGE") ;
-
-    // make container for time
-    m_cameraFrameV1TimeCont.reset( new XtcClockTimeCont ( "time", contGrp, time_chunk_size, deflate ) ) ;
+    if ( m_ignore ) {
+      MsgLogRoot( warning, "O2OXtcIterator::process -- unexpected type or version: "
+                  << Pds::TypeId::name(typeId.id()) << "/" << typeId.version() ) ;
+    } else {
+      MsgLogRoot( error, "O2OXtcIterator::process -- unexpected type or version: "
+                  << Pds::TypeId::name(typeId.id()) << "/" << typeId.version() ) ;
+    }
 
   }
 
-  // store the data in the containers
-  m_cameraFrameV1Cont->append ( H5DataTypes::CameraFrameV1(data) ) ;
-  m_cameraFrameV1ImageCont->append ( *data.data(), H5DataTypes::CameraFrameV1::imageType ( data ) ) ;
-  m_cameraFrameV1TimeCont->append ( m_eventTime ) ;
 }
 
+// close all containers
 void
-O2OHdf5Writer::dataObject ( const Pds::Camera::TwoDGaussianV1& data, const Pds::DetInfo& detInfo )
+O2OHdf5Writer::closeContainers()
 {
-  // get the group name
-  const std::string& grpName = ::groupName( "Camera::TwoDGaussianV1", detInfo ) ;
-
-  MsgLog( logger, debug, "O2OHdf5Writer::dataObject " << grpName ) ;
-
-  if ( not m_cameraTwoDGaussianV1Cont.get() ) {
-
-    // define two containers in a separate group
-    hdf5pp::Group contGrp = m_eventGroup.createGroup(grpName);
-    contGrp.createAttr<const char*> ( "class" ).store ( "Camera::TwoDGaussianV1" ) ;
-
-    // chunk size, compression
-    hsize_t data_chunk_size = 1000 ;
-    hsize_t time_chunk_size = 10000 ;
-    int deflate = 6 ;
-
-    // make container for data objects
-    m_cameraTwoDGaussianV1Cont.reset( new CameraTwoDGaussianV1Cont ( "data", contGrp, data_chunk_size, deflate ) ) ;
-
-    // make container for time
-    m_cameraTwoDGaussianV1TimeCont.reset( new XtcClockTimeCont ( "time", contGrp, time_chunk_size, deflate ) ) ;
-
-  }
-
-  // store the data in the containers
-  m_cameraTwoDGaussianV1Cont->append ( H5DataTypes::CameraTwoDGaussianV1(data) ) ;
-  m_cameraTwoDGaussianV1TimeCont->append ( m_eventTime ) ;
-}
-
-void
-O2OHdf5Writer::dataObject ( const Pds::EvrData::ConfigV1& data, const Pds::DetInfo& detInfo )
-{
-  // get the group name
-  const std::string& grpName = ::groupName( "EvrData::ConfigV1", detInfo ) ;
-
-  MsgLog( logger, debug, "O2OHdf5Writer::dataObject " << grpName ) ;
-
-  // define separate group
-  hdf5pp::Group grp = m_configGroup.createGroup( grpName );
-  grp.createAttr<const char*> ( "class" ).store ( "EvrData::ConfigV1" ) ;
-
-  // store the data
-  H5DataTypes::storeEvrConfigV1( data, grp ) ;
-}
-
-void
-O2OHdf5Writer::dataObject ( const Pds::Opal1k::ConfigV1& data, const Pds::DetInfo& detInfo )
-{
-  // get the group name
-  const std::string& grpName = ::groupName( "Opal1k::ConfigV1", detInfo ) ;
-
-  MsgLog( logger, debug, "O2OHdf5Writer::dataObject " << grpName ) ;
-
-  // define separate group
-  hdf5pp::Group grp = m_configGroup.createGroup( grpName );
-  grp.createAttr<const char*> ( "class" ).store ( "Opal1k::ConfigV1" ) ;
-
-  // store the data
-  H5DataTypes::storeOpal1kConfigV1( data, grp ) ;
+  m_cvtMap.clear() ;
 }
 
 } // namespace O2OTranslator

@@ -1,12 +1,12 @@
-#ifndef O2OTRANSLATOR_O2OXTCITERATOR_H
-#define O2OTRANSLATOR_O2OXTCITERATOR_H
+#ifndef O2OTRANSLATOR_DATATYPECVTFACTORYI_H
+#define O2OTRANSLATOR_DATATYPECVTFACTORYI_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class O2OXtcIterator.
+//	Class DataTypeCvtFactoryI.
 //
 //------------------------------------------------------------------------
 
@@ -17,12 +17,11 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "pdsdata/xtc/XtcIterator.hh"
-#include "pdsdata/xtc/TypeId.hh"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/xtc/DetInfo.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -33,10 +32,10 @@
 //		---------------------
 
 /**
- *  Subclass of XtcIterator which forwards all
+ *  Interface for a factory class for converters
  *
  *  This software was developed for the LUSI project.  If you use all or
- *  part of it, please give an appropriate acknowledgement.
+ *  part of it, please give an appropriate acknowledgment.
  *
  *  @see AdditionalClass
  *
@@ -47,34 +46,35 @@
 
 namespace O2OTranslator {
 
-class O2OXtcScannerI ;
-class O2ODataTypeCvtI ;
+class DataTypeCvtI ;
 
-class O2OXtcIterator : public Pds::XtcIterator {
+class DataTypeCvtFactoryI  {
 public:
 
-  // Default constructor
-  O2OXtcIterator ( Xtc* xtc, O2OXtcScannerI* scanner ) ;
-
   // Destructor
-  virtual ~O2OXtcIterator () ;
+  virtual ~DataTypeCvtFactoryI () ;
 
-  // process one sub-XTC, returns >0 for success, 0 for error
-  virtual int process(Xtc* xtc) ;
+  // Get the converter for given parameter set
+  virtual DataTypeCvtI* converter ( const Pds::DetInfo& detInfo ) = 0 ;
 
 protected:
 
+  // Default constructor
+  DataTypeCvtFactoryI () {}
+
+  // helper functor for comparing DetInfo objects
+  struct CmpDetInfo {
+    bool operator()( const Pds::DetInfo& lhs, const Pds::DetInfo& rhs ) const ;
+  };
+
 private:
 
-  // Data members
-  O2OXtcScannerI* m_scanner ;
-
   // Copy constructor and assignment are disabled by default
-  O2OXtcIterator ( const O2OXtcIterator& ) ;
-  O2OXtcIterator operator = ( const O2OXtcIterator& ) ;
+  DataTypeCvtFactoryI ( const DataTypeCvtFactoryI& ) ;
+  DataTypeCvtFactoryI& operator = ( const DataTypeCvtFactoryI& ) ;
 
 };
 
 } // namespace O2OTranslator
 
-#endif // O2OTRANSLATOR_O2OXTCITERATOR_H
+#endif // O2OTRANSLATOR_DATATYPECVTFACTORYI_H

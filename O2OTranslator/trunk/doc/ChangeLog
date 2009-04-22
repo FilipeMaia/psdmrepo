@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2009-04-22 Andy Salnikov
+- big refactoring, changed the way XTC iterator interacts with the scanners
+- type-dependent stuff moved to to the new converters classes
+- added new scanner type to collect run statistics, will be stored later
+  in metadata database
+- new application o2o-xtc-repeat which copies XTC datagrams, can make 
+  multiple copies of the L1Accept datagrams
+
 Tag: V00-00-08
 2009-04-10 Andy Salnikov
 - finished implentation of CameraFrameV1 translator

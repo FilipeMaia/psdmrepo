@@ -17,6 +17,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
+#include <vector>
 
 //----------------------
 // Base Class Headers --
@@ -34,9 +35,10 @@
 #include "AppUtils/AppCmdOptSize.h"
 #include "AppUtils/AppCmdOptNamedValue.h"
 #include "MsgLogger/MsgLogger.h"
+#include "O2OTranslator/MetaDataScanner.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OHdf5Writer.h"
-#include "O2OTranslator/O2ONexusWriter.h"
+//#include "O2OTranslator/O2ONexusWriter.h"
 #include "O2OTranslator/O2OXtcIterator.h"
 #include "O2OTranslator/O2OXtcScannerI.h"
 #include "pdsdata/xtc/XtcFileIterator.hh"
@@ -76,6 +78,7 @@ private:
 
   // more command line options and arguments
   AppCmdOpt<std::string>      m_optionsFile ;
+  AppCmdOpt<int>              m_compression ;
   AppCmdOptSize               m_dgramsize ;
   AppCmdOptList<std::string>  m_epicsData ;
   AppCmdOptList<std::string>  m_eventData ;
@@ -97,6 +100,7 @@ private:
 O2O_Translate::O2O_Translate ( const std::string& appName )
   : AppBase( appName )
   , m_optionsFile( 'o', "options-file", "path",     "file name with options", "" )
+  , m_compression( 'c', "compression",  "number",   "compression level, -1..9, def: -1", -1 )
   , m_dgramsize  ( 'g', "datagram-size","size",     "datagram buffer size. def: 16M", 16*1048576ULL )
   , m_epicsData  ( 'e', "epics-file",   "path",     "file name for EPICS data", '\0' )
   , m_eventData  ( 'f', "event-file",   "path",     "file name for XTC event data", '\0' )
@@ -105,12 +109,13 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_metadata   ( 'm', "metadata",     "name:value", "science metadata values", '\0' )
   , m_outputDir  ( 'd', "output-dir",   "path",     "directory to store output files, def: .", "." )
   , m_outputHdf5 ( '5', "output-hdf5",              "use HDF5 instead of NeXus for output file", false )
-  , m_outputName ( 'n', "output-name",  "template", "template string for output file names, def: .", "{seq4}.hdf5" )
+  , m_outputName ( 'n', "output-name",  "template", "template string for output file names, def: {seq4}.hdf5", "{seq4}.hdf5" )
   , m_overwrite  (      "overwrite",                "overwrite output file", false )
   , m_splitMode  ( 's', "split-mode",   "mode-name","one of none, or family; def: none", O2OHdf5Writer::NoSplit )
   , m_splitSize  ( 'z', "split-size",   "number",   "max. size of output files. def: 20G", 20*1073741824ULL )
 {
   setOptionsFile( m_optionsFile ) ;
+  addOption( m_compression ) ;
   addOption( m_dgramsize ) ;
   addOption( m_epicsData ) ;
   addOption( m_eventData ) ;
@@ -175,12 +180,19 @@ O2O_Translate::runApp ()
   nameFactory.addKeyword ( "experiment", m_experiment.value() ) ;
 
   // instantiate XTC scanner, which is also output file writer
-  O2OXtcScannerI* scanner = 0 ;
+  std::vector<O2OXtcScannerI*> scanners ;
   if ( m_outputHdf5.value() ) {
-    scanner = new O2OHdf5Writer ( nameFactory, m_overwrite.value(), m_splitMode.value(), m_splitSize.value() ) ;
+    scanners.push_back ( new O2OHdf5Writer ( nameFactory, m_overwrite.value(),
+                                  m_splitMode.value(), m_splitSize.value(),
+                                  m_ignoreMiss.value(), m_compression.value() ) ) ;
   } else {
-    scanner = new O2ONexusWriter ( nameFactory ) ;
+    MsgLogRoot(error, "only HDF5 conversion is supported now" ) ;
+    return 2 ;
+    //scanner = new O2ONexusWriter ( nameFactory ) ;
   }
+
+  // instantiate metadata scanner
+  scanners.push_back ( new MetaDataScanner() ) ;
 
   // loop over all input files
   typedef AppCmdOptList<std::string>::const_iterator StringIter ;
@@ -219,22 +231,28 @@ O2O_Translate::runApp ()
     // iterate over events in xtc file
     Pds::XtcFileIterator iter( xfile, m_dgramsize.value() ) ;
     while ( Pds::Dgram* dg = iter.next() ) {
+
       WithMsgLogRoot( trace, out ) {
+        const ClockTime& clock = dg->seq.clock() ;
         out << "Transition: "
             << std::left << std::setw(12) << Pds::TransitionId::name(dg->seq.service())
-            << "  time: " << std::hex
-            << std::showbase << std::internal << std::setfill('0')
-            << std::setw(10) << dg->seq.high() << '/'
-            << std::setw(10) << dg->seq.low()
-            << "  payloadSize: " << std::dec << dg->xtc.sizeofPayload() ;
+            << "  time: " << clock.seconds() << '.'
+            << std::setfill('0') << std::setw(9) << clock.nanoseconds()
+            << "  payloadSize: " << dg->xtc.sizeofPayload() ;
       }
 
-      if ( scanner ) scanner->eventStart ( dg->seq ) ;
+      // give this event to every scanner
+      for ( std::vector<O2OXtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
 
-      O2OXtcIterator iter( &(dg->xtc), scanner, m_ignoreMiss.value() );
-      iter.iterate();
+        O2OXtcScannerI* scanner = *i ;
 
-      if ( scanner ) scanner->eventEnd ( dg->seq ) ;
+        scanner->eventStart ( dg->seq ) ;
+
+        O2OXtcIterator iter( &(dg->xtc), scanner );
+        iter.iterate();
+
+        scanner->eventEnd ( dg->seq ) ;
+      }
     }
 
     // move to the next file
@@ -243,8 +261,10 @@ O2O_Translate::runApp ()
 
   }
 
-  // finish with the scanner
-  delete scanner ;
+  // finish with the scanners
+  for ( std::vector<O2OXtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
+    delete *i ;
+  }
 
   return 0 ;
 

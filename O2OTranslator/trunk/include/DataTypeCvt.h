@@ -1,12 +1,12 @@
-#ifndef O2OTRANSLATOR_O2OXTCITERATOR_H
-#define O2OTRANSLATOR_O2OXTCITERATOR_H
+#ifndef O2OTRANSLATOR_DATATYPECVT_H
+#define O2OTRANSLATOR_DATATYPECVT_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class O2OXtcIterator.
+//	Class DataTypeCvt.
 //
 //------------------------------------------------------------------------
 
@@ -17,8 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "pdsdata/xtc/XtcIterator.hh"
-#include "pdsdata/xtc/TypeId.hh"
+#include "O2OTranslator/DataTypeCvtI.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -33,10 +32,9 @@
 //		---------------------
 
 /**
- *  Subclass of XtcIterator which forwards all
  *
  *  This software was developed for the LUSI project.  If you use all or
- *  part of it, please give an appropriate acknowledgement.
+ *  part of it, please give an appropriate acknowledgment.
  *
  *  @see AdditionalClass
  *
@@ -47,34 +45,40 @@
 
 namespace O2OTranslator {
 
-class O2OXtcScannerI ;
-class O2ODataTypeCvtI ;
-
-class O2OXtcIterator : public Pds::XtcIterator {
+template <typename T>
+class DataTypeCvt : public DataTypeCvtI {
 public:
 
-  // Default constructor
-  O2OXtcIterator ( Xtc* xtc, O2OXtcScannerI* scanner ) ;
-
   // Destructor
-  virtual ~O2OXtcIterator () ;
+  virtual ~DataTypeCvt () {}
 
-  // process one sub-XTC, returns >0 for success, 0 for error
-  virtual int process(Xtc* xtc) ;
+  /// main method of this class
+  virtual void convert ( const void* data,
+                         const Pds::TypeId& typeId,
+                         const Pds::DetInfo& detInfo,
+                         const H5DataTypes::XtcClockTime& time )
+  {
+    const T& typedData = *static_cast<const T*>( data ) ;
+    typedConvert ( typedData, time ) ;
+  }
 
 protected:
 
+  // Default constructor
+  DataTypeCvt () : DataTypeCvtI() {}
+
 private:
 
-  // Data members
-  O2OXtcScannerI* m_scanner ;
+  // typed conversion method
+  virtual void typedConvert ( const T& data,
+                              const H5DataTypes::XtcClockTime& time ) = 0 ;
 
   // Copy constructor and assignment are disabled by default
-  O2OXtcIterator ( const O2OXtcIterator& ) ;
-  O2OXtcIterator operator = ( const O2OXtcIterator& ) ;
+  DataTypeCvt ( const DataTypeCvt& ) ;
+  DataTypeCvt operator = ( const DataTypeCvt& ) ;
 
 };
 
 } // namespace O2OTranslator
 
-#endif // O2OTRANSLATOR_O2OXTCITERATOR_H
+#endif // O2OTRANSLATOR_DATATYPECVT_H

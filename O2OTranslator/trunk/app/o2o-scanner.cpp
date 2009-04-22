@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
   while ( Dgram* dg = iter.next() ) {
     const Pds::Sequence& seq = dg->seq ;
     const Pds::ClockTime& clock = seq.clock() ;
-    printf("%s transition: type %d, time %u sec %u nsec, hi/lo 0x%x/0x%x, payloadSize 0x%x\n",
+    printf("%s transition: type %d, time %u sec %u nsec, hi/lo 0x%x/0x%x, payloadSize %d\n",
            TransitionId::name(seq.service()),
            int(seq.type()),
            clock.seconds(), clock.nanoseconds(),

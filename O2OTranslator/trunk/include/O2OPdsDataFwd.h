@@ -52,6 +52,7 @@ namespace Pds {
   class Src ;
   class DetInfo ;
   class ProcInfo ;
+  class TypeId ;
 
   // Data objects
 
