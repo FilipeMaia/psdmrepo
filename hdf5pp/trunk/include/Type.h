@@ -64,6 +64,9 @@ public:
   /// return type id
   hid_t id() const { return *m_id ; }
 
+  /// return size of the type in bytes
+  size_t size() const { return H5Tget_size( *m_id ) ; }
+
 protected:
 
   // constructor
