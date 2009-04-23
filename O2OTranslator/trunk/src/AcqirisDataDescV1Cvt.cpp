@@ -87,16 +87,16 @@ AcqirisDataDescV1Cvt::convert ( const void* data,
     m_config = new Pds::Acqiris::ConfigV1( config );
 
     // create container for timestamps
-    hdf5pp::Type tsType = H5DataTypes::AcqirisDataDescV1::timestampType ( *m_config ) ;
-    hsize_t chunk = std::max( m_chunk_size/tsType.size(), hsize_t(1) ) ;
+    m_tsType = H5DataTypes::AcqirisDataDescV1::timestampType ( *m_config ) ;
+    hsize_t chunk = std::max( m_chunk_size/m_tsType.size(), hsize_t(1) ) ;
     MsgLog( logger, debug, "chunk size for timestamps: " << chunk ) ;
-    m_timestampCont = new TimestampCont ( "timestamps", m_group, tsType, chunk, m_deflate ) ;
+    m_timestampCont = new TimestampCont ( "timestamps", m_group, m_tsType, chunk, m_deflate ) ;
 
     // create container for waveforms
-    hdf5pp::Type wfType = H5DataTypes::AcqirisDataDescV1::waveformType ( *m_config ) ;
-    chunk = std::max( m_chunk_size/wfType.size(), hsize_t(1) ) ;
+    m_wfType = H5DataTypes::AcqirisDataDescV1::waveformType ( *m_config ) ;
+    chunk = std::max( m_chunk_size/m_wfType.size(), hsize_t(1) ) ;
     MsgLog( logger, debug, "chunk size for waveforms: " << chunk ) ;
-    m_waveformCont = new WaveformCont ( "waveforms", m_group, wfType, chunk, m_deflate ) ;
+    m_waveformCont = new WaveformCont ( "waveforms", m_group, m_wfType, chunk, m_deflate ) ;
 
     // make container for time
     chunk = std::max ( m_chunk_size / sizeof(H5DataTypes::XtcClockTime), hsize_t(1) ) ;
@@ -147,8 +147,8 @@ AcqirisDataDescV1Cvt::convert ( const void* data,
 
 
     // store the data
-    m_timestampCont->append ( timestamps[0][0], H5DataTypes::AcqirisDataDescV1::timestampType ( *m_config ) ) ;
-    m_waveformCont->append ( waveforms[0][0][0], H5DataTypes::AcqirisDataDescV1::waveformType ( *m_config ) ) ;
+    m_timestampCont->append ( timestamps[0][0], m_tsType ) ;
+    m_waveformCont->append ( waveforms[0][0][0], m_wfType ) ;
     m_timeCont->append ( time ) ;
 
   }

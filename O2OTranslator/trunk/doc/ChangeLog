@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10
+2009-04-22 Andy Salnikov
+- tiny optimization, do not recreate type object in converters every time
+
 Tag: V00-00-09
 2009-04-22 Andy Salnikov
 - big refactoring, changed the way XTC iterator interacts with the scanners

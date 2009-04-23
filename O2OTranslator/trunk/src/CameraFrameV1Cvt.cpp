@@ -79,10 +79,10 @@ void CameraFrameV1Cvt::typedConvert ( const Pds::Camera::FrameV1& data,
     m_dataCont = new DataCont ( "data", m_group, chunk, m_deflate ) ;
 
     // get the type for the image
-    hdf5pp::Type imgType = H5DataTypes::CameraFrameV1::imageType ( data ) ;
-    chunk = std::max ( m_chunk_size / imgType.size(), hsize_t(1) ) ;
+    m_imgType = H5DataTypes::CameraFrameV1::imageType ( data ) ;
+    chunk = std::max ( m_chunk_size / m_imgType.size(), hsize_t(1) ) ;
     MsgLog( logger, debug, "chunk size for image: " << chunk ) ;
-    m_imageCont = new ImageCont ( "image", m_group, imgType, chunk, m_deflate ) ;
+    m_imageCont = new ImageCont ( "image", m_group, m_imgType, chunk, m_deflate ) ;
     m_imageCont->dataset().createAttr<const char*> ( "CLASS" ).store("IMAGE") ;
 
     // make container for time
@@ -94,7 +94,7 @@ void CameraFrameV1Cvt::typedConvert ( const Pds::Camera::FrameV1& data,
 
   // store the data in the containers
   m_dataCont->append ( H5DataTypes::CameraFrameV1(data) ) ;
-  m_imageCont->append ( *data.data(), H5DataTypes::CameraFrameV1::imageType ( data ) ) ;
+  m_imageCont->append ( *data.data(), m_imgType ) ;
   m_timeCont->append ( time ) ;
 }
 

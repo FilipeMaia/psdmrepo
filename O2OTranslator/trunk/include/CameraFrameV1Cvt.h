@@ -75,6 +75,7 @@ private:
   hdf5pp::Group m_group ;
   hsize_t m_chunk_size ;
   int m_deflate ;
+  hdf5pp::Type m_imgType ;
   DataCont* m_dataCont ;
   ImageCont* m_imageCont ;
   XtcClockTimeCont* m_timeCont ;

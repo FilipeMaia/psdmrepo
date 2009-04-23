@@ -79,6 +79,8 @@ private:
   hsize_t m_chunk_size ;
   int m_deflate ;
   const Pds::Acqiris::ConfigV1* m_config ;
+  hdf5pp::Type m_tsType ;
+  hdf5pp::Type m_wfType ;
   TimestampCont* m_timestampCont ;
   WaveformCont* m_waveformCont ;
   XtcClockTimeCont* m_timeCont ;
