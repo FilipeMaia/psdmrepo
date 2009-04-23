@@ -80,6 +80,15 @@ PListDataSetCreate::set_deflate ( unsigned level )
   }
 }
 
+// set n-bit compression method
+void
+PListDataSetCreate::set_nbit ()
+{
+  herr_t stat = H5Pset_nbit ( m_impl.id() ) ;
+  if ( stat < 0 ) {
+    throw Hdf5CallException ( "PListDataSetCreate::set_nbit", "H5Pset_nbit" ) ;
+  }
+}
 
 
 } // namespace hdf5pp

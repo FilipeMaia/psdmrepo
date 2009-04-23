@@ -68,6 +68,9 @@ public:
   // set deflate compression method
   void set_deflate ( unsigned level ) ;
 
+  // set n-bit compression method
+  void set_nbit () ;
+
 protected:
 
 private:

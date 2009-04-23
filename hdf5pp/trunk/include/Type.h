@@ -65,7 +65,13 @@ public:
   hid_t id() const { return *m_id ; }
 
   /// return size of the type in bytes
-  size_t size() const { return H5Tget_size( *m_id ) ; }
+  size_t size() const ;
+
+  /// make unlocked copy of the type
+  Type copy() const ;
+
+  /// set type precision
+  void set_precision( size_t precision ) ;
 
 protected:
 
