@@ -1,0 +1,62 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package O2OTranslator
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-10
+2009-04-22 Andy Salnikov
+- tiny optimization, do not recreate type object in converters every time
+
+Tag: V00-00-09
+2009-04-22 Andy Salnikov
+- big refactoring, changed the way XTC iterator interacts with the scanners
+- type-dependent stuff moved to to the new converters classes
+- added new scanner type to collect run statistics, will be stored later
+  in metadata database
+- new application o2o-xtc-repeat which copies XTC datagrams, can make 
+  multiple copies of the L1Accept datagrams
+
+Tag: V00-00-08
+2009-04-10 Andy Salnikov
+- finished implentation of CameraFrameV1 translator
+
+Tag: V00-00-07
+2009-04-07 Andy Salnikov
+- small improvements
+
+Tag: V00-00-06
+2009-04-06 Andy Salnikov
+- progress on HDF5 writer
+
+Tag: V00-00-05
+2009-04-03 Andy Salnikov
+- lots of changes:
+- new data classes appeared in pdsdata
+- starting implementation of the native HDF5 writing
+
+Tag: V00-00-04
+2009-02-25 Andy Salnikov
+- fix few harmless compilation warnings
+
+Tag: V00-00-03
+2009-02-05 Andy Salnikov
+- O2OXtcScannerI.h: gcc41 found a bug: assignment op returned object
+- O2ONexusWriter.cpp: fix signed-unsigned comparison
+
+Tag: V00-00-02
+2008-12-09 Andy Salnikov
+- use new package nexuspp for NeXus file operations
+
+Tag: V00-00-01
+2008-12-02 Andy Salnikov
+- first half-working version of the translator
+- can read the xtc files, understands limited set of data types
+- output format is not well defined yet
