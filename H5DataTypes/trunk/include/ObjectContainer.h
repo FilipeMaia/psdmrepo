@@ -58,7 +58,8 @@ public:
   ObjectContainer ( const std::string& name,
                     hdf5pp::Group& location,
                     hsize_t chunk_size = 10240,
-                    int deflate = -1 )
+                    int deflate = -1,
+                    bool nbit = false )
     : m_dataset()
     , m_count(0)
   {
@@ -69,6 +70,7 @@ public:
     hdf5pp::PListDataSetCreate plDScreate ;
     plDScreate.set_chunk(chunk_size) ;
     if ( deflate >= 0 ) plDScreate.set_deflate(deflate) ;
+    if ( nbit ) plDScreate.set_nbit() ;
 
     // make a data set
     m_dataset = location.createDataSet<T> ( name, dsp, plDScreate ) ;
@@ -79,7 +81,8 @@ public:
                     hdf5pp::Group& location,
                     const hdf5pp::Type& stored_type,
                     hsize_t chunk_size = 10240,
-                    int deflate = -1 )
+                    int deflate = -1,
+                    bool nbit = false )
     : m_dataset()
     , m_count(0)
   {
@@ -90,6 +93,7 @@ public:
     hdf5pp::PListDataSetCreate plDScreate ;
     plDScreate.set_chunk(chunk_size) ;
     if ( deflate >= 0 ) plDScreate.set_deflate(deflate) ;
+    if ( nbit ) plDScreate.set_nbit() ;
 
     // make a data set
     m_dataset = location.createDataSet<T> ( name, stored_type, dsp, plDScreate ) ;
