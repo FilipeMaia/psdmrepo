@@ -1,0 +1,42 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package hdf5pp
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-05
+2009-04-22 Andy Salnikov
+- added PListDataSetCreate::set_nbit(), Type::set_precision() and 
+  Type::copy() methods
+
+Tag: V00-00-04
+2009-04-22 Andy Salnikov
+- added Type::size() method
+
+Tag: V00-00-03
+2009-04-10 Andy Salnikov
+- allow dynamic data type specification when constructing DataSet
+
+Tag: V00-00-02
+2009-04-07 Andy Salnikov
+- split Types.h into ArrayTypes, EnumType, etc.
+- TypeTraits method now returns Type object instead of HDF5 hid
+- TypeTraits have two different methods for native type vs stored type
+- unspecialized TypeTraits have has "reasonable" implementation that
+  depends on the methods provided by the type itself
+
+Tag: V00-00-01
+2009-04-06 Andy Salnikov
+- many changes, woork in progress
+
+Tag: V00-00-00
+2009-04-03 Andy Salnikov
+- first import into repository, half-working basic something
+
