@@ -194,9 +194,9 @@ public:
                               const std::string& parameter,
                               int                value,
                               const std::string& source,
-                              bool               update) throw (ValueTypeMismatch,
-                                                                WrongParams,
-                                                                DatabaseError) ;
+                              bool               updateAllowed=false) throw (ValueTypeMismatch,
+                                                                             WrongParams,
+                                                                             DatabaseError) ;
 
     /**
       * Set a value of a run parameter (double value).
@@ -208,9 +208,9 @@ public:
                               const std::string& parameter,
                               double             value,
                               const std::string& source,
-                              bool               update) throw (ValueTypeMismatch,
-                                                                WrongParams,
-                                                                DatabaseError) ;
+                              bool               updateAllowed=false) throw (ValueTypeMismatch,
+                                                                             WrongParams,
+                                                                             DatabaseError) ;
 
     /**
       * Set a value of a run parameter (string value).
@@ -222,9 +222,9 @@ public:
                               const std::string& parameter,
                               const std::string& value,
                               const std::string& source,
-                              bool               update) throw (ValueTypeMismatch,
-                                                                WrongParams,
-                                                                DatabaseError) ;
+                              bool               updateAllowed=false) throw (ValueTypeMismatch,
+                                                                             WrongParams,
+                                                                             DatabaseError) ;
 
 private:
 
@@ -326,9 +326,9 @@ private:
                           T                  value,
                           const std::string& type,
                           const std::string& source,
-                          bool               update) throw (ValueTypeMismatch,
-                                                            WrongParams,
-                                                            DatabaseError) ;
+                          bool               updateAllowed) throw (ValueTypeMismatch,
+                                                                   WrongParams,
+                                                                   DatabaseError) ;
 
 private:
 
@@ -351,9 +351,9 @@ ConnectionImpl::setRunParamImpl (const std::string& experiment,
                                  T                  value,
                                  const std::string& type,
                                  const std::string& source,
-                                 bool               update) throw (ValueTypeMismatch,
-                                                                   WrongParams,
-                                                                   DatabaseError)
+                                 bool               updateAllowed) throw (ValueTypeMismatch,
+                                                                          WrongParams,
+                                                                          DatabaseError)
 {
     if (!m_is_started)
         throw DatabaseError ("no transaction") ;
@@ -381,7 +381,7 @@ ConnectionImpl::setRunParamImpl (const std::string& experiment,
         //
         bool updating = false ;
         if (this->runParamValueIsSet (paramDescr.id, runDescr.id)) {
-            if (update)
+            if (updateAllowed)
                 updating = true ;
             else
                 throw DatabaseError ("the value of parameter is alreay set") ;

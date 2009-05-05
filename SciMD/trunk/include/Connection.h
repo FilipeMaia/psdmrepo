@@ -46,10 +46,10 @@ namespace SciMD {
   * in the database.
   */
 struct ParamInfo {
-    std::string name ;
-    std::string experiment ;
-    std::string type ;
-    std::string descr ;
+    std::string name ;          // its (parameter's) name
+    std::string experiment ;    // its experiment name
+    std::string type ;          // its type
+    std::string descr ;         // its description (can be very long!)
 } ;
 
 /**
@@ -198,9 +198,9 @@ public:
                               const std::string& parameter,
                               int                value,
                               const std::string& source,
-                              bool               update) throw (ValueTypeMismatch,
-                                                                WrongParams,
-                                                                DatabaseError) = 0 ;
+                              bool               updateAllowed=false) throw (ValueTypeMismatch,
+                                                                             WrongParams,
+                                                                             DatabaseError) = 0 ;
 
     /**
       * Set a value of a run parameter (double value).
@@ -210,9 +210,9 @@ public:
                               const std::string& parameter,
                               double             value,
                               const std::string& source,
-                              bool               update) throw (ValueTypeMismatch,
-                                                                WrongParams,
-                                                                DatabaseError) = 0;
+                              bool               updateAllowed=false) throw (ValueTypeMismatch,
+                                                                             WrongParams,
+                                                                             DatabaseError) = 0 ;
      /**
       * Set a value of a run parameter (string value).
       */
@@ -221,9 +221,9 @@ public:
                               const std::string& parameter,
                               const std::string& value,
                               const std::string& source,
-                              bool               update) throw (ValueTypeMismatch,
-                                                                WrongParams,
-                                                                DatabaseError) = 0 ;
+                              bool               updateAllowed=false) throw (ValueTypeMismatch,
+                                                                             WrongParams,
+                                                                             DatabaseError) = 0 ;
 
 protected:
 

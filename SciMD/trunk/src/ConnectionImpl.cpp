@@ -239,9 +239,9 @@ ConnectionImpl::setRunParam (const std::string& experiment,
                              const std::string& parameter,
                              int                value,
                              const std::string& source,
-                             bool               update) throw (ValueTypeMismatch,
-                                                               WrongParams,
-                                                               DatabaseError)
+                             bool               updateAllowed) throw (ValueTypeMismatch,
+                                                                      WrongParams,
+                                                                      DatabaseError)
 {
     return this->setRunParamImpl (experiment,
                                   run,
@@ -249,7 +249,7 @@ ConnectionImpl::setRunParam (const std::string& experiment,
                                   value,
                                   "INT",
                                   source,
-                                  update) ;
+                                  updateAllowed) ;
 }
 
 void
@@ -258,9 +258,9 @@ ConnectionImpl::setRunParam (const std::string& experiment,
                              const std::string& parameter,
                              double             value,
                              const std::string& source,
-                             bool               update) throw (ValueTypeMismatch,
-                                                               WrongParams,
-                                                               DatabaseError)
+                             bool               updateAllowed) throw (ValueTypeMismatch,
+                                                                      WrongParams,
+                                                                      DatabaseError)
 {
     return this->setRunParamImpl (experiment,
                                   run,
@@ -268,7 +268,7 @@ ConnectionImpl::setRunParam (const std::string& experiment,
                                   value,
                                   "DOUBLE",
                                   source,
-                                  update) ;
+                                  updateAllowed) ;
 }
 
 void
@@ -277,9 +277,9 @@ ConnectionImpl::setRunParam (const std::string& experiment,
                              const std::string& parameter,
                              const std::string& value,
                              const std::string& source,
-                             bool               update) throw (ValueTypeMismatch,
-                                                               WrongParams,
-                                                               DatabaseError)
+                             bool               updateAllowed) throw (ValueTypeMismatch,
+                                                                      WrongParams,
+                                                                      DatabaseError)
 {
     return this->setRunParamImpl<std::string > (experiment,
                                                 run,
@@ -287,7 +287,7 @@ ConnectionImpl::setRunParam (const std::string& experiment,
                                                 value,
                                                 "TEXT",
                                                 source,
-                                                update) ;
+                                                updateAllowed) ;
 }
 
 bool
