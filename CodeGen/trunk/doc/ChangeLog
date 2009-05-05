@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10
+2009-05-05 Andy Salnikov
+- added 'date', 'time', 'datetime' keywords
+
 Tag: V00-00-09
 2009-04-20 Andy Salnikov
 - in C++ templates moved class-doc block below namespace

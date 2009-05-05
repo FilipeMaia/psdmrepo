@@ -15,6 +15,7 @@
 import sys
 import os
 import string
+import time
 from optparse import OptionParser
 
 #---------------------
@@ -125,7 +126,11 @@ def make_keywords ( options, args ) :
     kw['class'] = args[1]
     kw['PACKAGE'] = args[0].upper()
     kw['CLASS'] = args[1].upper()
-    kw['author'] = get_user_name () 
+    kw['author'] = get_user_name()
+    t = time.localtime( time.time() )
+    kw['date'] = time.strftime( "%Y-%m-%d", t )
+    kw['time'] = time.strftime( "%H:%M:%S", t )
+    kw['datetime'] = kw['date'] + ' ' + kw['time'] 
 
     for k in [ 'BASEDECL', 'BASEINCL', 'BASEINIT' ] :
         try :
