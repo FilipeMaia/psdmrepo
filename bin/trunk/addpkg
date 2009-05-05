@@ -97,7 +97,7 @@ checkout_svn() {
       lusvn export "$1" "$2" "$1"
     fi
   else
-    if [ -d "$1" ] ; then
+    if [ -d "$1/.svn" ] ; then
       svn switch "$repo123" "$1"
     else
       svn checkout "$repo123" "$1"
