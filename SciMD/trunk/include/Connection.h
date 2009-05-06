@@ -14,7 +14,6 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-
 #include <string>
 
 //----------------------
@@ -24,10 +23,11 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-
 #include "SciMD/ValueTypeMismatch.h"
 #include "SciMD/WrongParams.h"
 #include "SciMD/DatabaseError.h"
+
+#include "LusiTime/Time.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -169,12 +169,12 @@ public:
       * @see class WrongParams
       * @see class DatabaseError
       */
-     virtual void createRun (const std::string& experiment,
-                             int                run,
-                             const std::string& type,
-                             const std::string& beginTime,
-                             const std::string& endTime) throw (WrongParams,
-                                                                DatabaseError) = 0 ;
+     virtual void createRun (const std::string&    experiment,
+                             int                   run,
+                             const std::string&    type,
+                             const LusiTime::Time& beginTime,
+                             const LusiTime::Time& endTime) throw (WrongParams,
+                                                                   DatabaseError) = 0 ;
     /**
       * Set a value of a run parameter (integer value).
       *

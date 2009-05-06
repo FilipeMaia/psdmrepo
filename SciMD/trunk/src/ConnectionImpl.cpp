@@ -9,32 +9,31 @@
 //      Igor Gaponenko
 //
 //------------------------------------------------------------------------
-
 #include "Lusi/Lusi.h"
 
 //-----------------------
 // This Class's Header --
 //-----------------------
-
 #include "SciMD/ConnectionImpl.h"
 
 //-----------------
 // C/C++ Headers --
 //-----------------
-
 #include <memory>
 #include <iostream>
+
 using namespace std ;
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-
 #include "SciMD/ConnectionImpl.h"
 
 #include "odbcpp/OdbcStatement.h"
 #include "odbcpp/OdbcParam.h"
 #include "odbcpp/OdbcResult.h"
+
+#include "LusiTime/Exceptions.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -194,17 +193,26 @@ ConnectionImpl::getParamInfo (ParamInfo& info,
 }
 
 void
-ConnectionImpl::createRun (const std::string& experiment,
-                           int                run,
-                           const std::string& type,
-                           const std::string& beginTime,
-                           const std::string& endTime) throw (WrongParams,
-                                                              DatabaseError)
+ConnectionImpl::createRun (const std::string&    experiment,
+                           int                   run,
+                           const std::string&    type,
+                           const LusiTime::Time& beginTime,
+                           const LusiTime::Time& endTime) throw (WrongParams,
+                                                                 DatabaseError)
 {
     if (!m_is_started)
         throw DatabaseError ("no transaction") ;
 
+    if (!beginTime.isValid ())
+        throw WrongParams ("the begin run timstamp isn't valid") ;
+
+    if (!endTime.isValid ())
+        throw WrongParams ("the begin run timstamp isn't valid") ;
+
     try {
+        const std::string beginTimeStr = beginTime.toString () ;
+        const std::string   endTimeStr =   endTime.toString () ;
+
         ExperDescr exper_descr ;
         if (!this->findExper (exper_descr, experiment))
             throw WrongParams ("unknown experiment") ;
@@ -215,8 +223,8 @@ ConnectionImpl::createRun (const std::string& experiment,
         OdbcParam<int>         p1 (run) ;
         OdbcParam<int>         p2 (exper_descr.id) ;
         OdbcParam<std::string> p3 (type) ;
-        OdbcParam<std::string> p4 (beginTime) ;
-        OdbcParam<std::string> p5 (endTime) ;
+        OdbcParam<std::string> p4 (beginTimeStr) ;
+        OdbcParam<std::string> p5 (endTimeStr) ;
 
         stmt.bindParam (1, p1) ;
         stmt.bindParam (2, p2) ;
@@ -227,6 +235,11 @@ ConnectionImpl::createRun (const std::string& experiment,
         OdbcResultPtr result = stmt.execute() ;
 
         stmt.unbindParams() ;
+
+    } catch (const LusiTime::Exception& e) {
+        throw WrongParams (
+            std::string ("failed to translate LusiTime::Time to string because of: ")
+            + e.what()) ;
 
     } catch (const odbcpp::OdbcException& e) {
         throw DatabaseError (e.what()) ;

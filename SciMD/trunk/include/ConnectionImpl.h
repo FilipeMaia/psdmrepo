@@ -177,12 +177,12 @@ public:
       *
       * @see method Connection::createRun()
       */
-     virtual void createRun (const std::string& experiment,
-                             int                run,
-                             const std::string& type,
-                             const std::string& beginTime,
-                             const std::string& endTime) throw (WrongParams,
-                                                                DatabaseError) ;
+     virtual void createRun (const std::string&    experiment,
+                             int                   run,
+                             const std::string&    type,
+                             const LusiTime::Time& beginTime,
+                             const LusiTime::Time& endTime) throw (WrongParams,
+                                                                   DatabaseError) ;
 
     /**
       * Set a value of a run parameter (integer value).

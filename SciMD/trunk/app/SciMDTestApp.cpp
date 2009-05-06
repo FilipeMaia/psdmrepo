@@ -45,6 +45,9 @@
 
 #include "SciMD/Connection.h"
 
+#include "LusiTime/Time.h"
+#include "LusiTime/Exceptions.h"
+
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
@@ -372,14 +375,19 @@ SciMDTestApp::cmd_add_run () throw (std::exception)
     const std::string  begin_time = *(itr++) ;
     const std::string  end_time   = *(itr++) ;
 
-    m_connection->beginTransaction () ;
-    m_connection->createRun (
-        experiment,
-        run,
-        type,
-        begin_time,
-        end_time) ;
-    m_connection->commitTransaction () ;
+    try {
+        m_connection->beginTransaction () ;
+        m_connection->createRun (
+            experiment,
+            run,
+            type,
+            LusiTime::Time::parse (begin_time),
+            LusiTime::Time::parse (  end_time)) ;
+        m_connection->commitTransaction () ;
+
+    } catch (const LusiTime::Exception& e) {
+         MsgLogRoot (error, e.what()) ;
+    }
 
     return 0 ;
 }
