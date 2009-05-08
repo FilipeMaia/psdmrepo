@@ -131,8 +131,10 @@ def standardScripts( **kw ) :
     
     scripts = kw.get('SCRIPTS',None)
     if scripts is None :
+        # grab any file without extension in app/ directory
         scripts = Glob("app/*", source=True, strings=True )
-        scripts = [ f for f in scripts if not os.path.splitext(f)[1] and os.path.isfile(f) ]
+        scripts = [ ( f, str(Entry(f)) ) for f in scripts ]
+        scripts = [ s[0] for s in scripts if not os.path.splitext(s[1])[1] and os.path.isfile(s[1]) ]
     else :
         scripts = [ _normbinsrc('app',s) for s in scripts ]
             
