@@ -156,7 +156,7 @@ AppBase::run ( int argc, char** argv )
  *  add command line option or argument, typically called from subclass constructor
  */
 void
-AppBase::setOptionsFile ( AppCmdOpt<std::string>& option )
+AppBase::setOptionsFile ( AppCmdOptList<std::string>& option )
 {
   _cmdline.setOptionsFile ( option ) ;
 }

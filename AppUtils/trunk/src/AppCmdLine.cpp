@@ -45,7 +45,7 @@ extern "C" {
 #include "AppUtils/AppCmdArgBase.h"
 #include "AppUtils/AppCmdExceptions.h"
 #include "AppUtils/AppCmdOptBase.h"
-#include "AppUtils/AppCmdOpt.h"
+#include "AppUtils/AppCmdOptList.h"
 using std::ios;
 using std::ostream;
 using std::setw;
@@ -158,7 +158,7 @@ AppCmdLine::addOption ( AppCmdOptBase& option ) throw(std::exception)
  *  extend to the parse() method of this class.
  */
 void
-AppCmdLine::setOptionsFile ( AppCmdOpt<std::string>& option ) throw(std::exception)
+AppCmdLine::setOptionsFile ( AppCmdOptList<std::string>& option ) throw(std::exception)
 {
   // second attempt will fail
   if ( _optionsFile ) {
@@ -428,13 +428,6 @@ AppCmdLine::parseOptionsFile() throw(std::exception)
 {
   if ( not _optionsFile ) return ;
 
-  // find the name of the options file
-  std::string optFile = _optionsFile->value() ;
-  if ( optFile.empty() ) {
-    // no file name given
-    return ;
-  }
-
   // build the list of options that were modified on the command line,
   // we do not want to change these again
   std::set<std::string> changedOptions ;
@@ -444,79 +437,91 @@ AppCmdLine::parseOptionsFile() throw(std::exception)
     }
   }
 
-  // open the file
-  std::ifstream istream ( optFile.c_str() ) ;
-  if ( not istream ) {
-    // failed to open file
-    throw AppCmdException ( "failed to open options file: " + optFile ) ;
-  }
+  typedef AppCmdOptList<std::string>::const_iterator OFIter ;
+  for ( OFIter ofiter = _optionsFile->begin() ; ofiter != _optionsFile->end() ; ++ ofiter ) {
 
-  // read all the lines from the file
-  std::string line ;
-  unsigned int nlines = 0 ;
-  while ( std::getline ( istream, line ) ) {
-    nlines ++ ;
-
-    // skip comments
-    std::string::size_type fchar = line.find_first_not_of(" \t") ;
-    if ( fchar == std::string::npos ) {
-      // empty line
-      //std::cout << "line " << nlines << ": empty\n" ;
-      continue ;
-    } else if ( line[fchar] == '#' ) {
-      // comment
-      //std::cout << "line " << nlines << ": comment\n" ;
-      continue ;
+    // find the name of the options file
+    std::string optFile = *ofiter ;
+    if ( optFile.empty() ) {
+      // no file name given
+      return ;
     }
 
-    // get option name
-    std::string::size_type optend = line.find_first_of( " \t=", fchar ) ;
-    std::string optname ( line, fchar, optend ) ;
-
-    // find option with this long name
-    AppCmdOptBase* option = findLongOpt ( optname ) ;
-    if ( ! option ) {
-      throw AppCmdException ( "Error parsing options file: option '" + optname + "' is unknown" ) ;
+    // open the file
+    std::ifstream istream ( optFile.c_str() ) ;
+    if ( not istream ) {
+      // failed to open file
+      throw AppCmdException ( "failed to open options file: " + optFile ) ;
     }
 
-    // if it was changed on command line do not change it again
-    if ( changedOptions.find(optname) != changedOptions.end() ) {
-      continue ;
-    }
+    // read all the lines from the file
+    std::string line ;
+    unsigned int nlines = 0 ;
+    while ( std::getline ( istream, line ) ) {
+      nlines ++ ;
 
-    //std::cout << "line " << nlines << ": option '" << optname << "'\n" ;
-
-    // get option value if any
-    std::string optval ;
-    if ( optend != std::string::npos ) {
-      std::string::size_type pos1 = line.find( '=', optend ) ;
-      //std::cout << "line " << nlines << ": pos1 = " << pos1 << "\n" ;
-      if ( pos1 != std::string::npos ) {
-        pos1 = line.find_first_not_of(" \t",pos1+1) ;
-        //std::cout << "line " << nlines << ": pos1 = " << pos1 << "\n" ;
-        if ( pos1 != std::string::npos ) {
-          std::string::size_type pos2 = line.find_last_not_of( " \t" ) ;
-          //std::cout << "line " << nlines << ": pos2 = " << pos2 << "\n" ;
-          if ( pos2 != std::string::npos ) {
-            optval = std::string ( line, pos1, pos2-pos1+1 ) ;
-          } else {
-            optval = std::string ( line, pos1 ) ;
-          }
-          //std::cout << "line " << nlines << ": value '" << optval << "'\n" ;
-        }
+      // skip comments
+      std::string::size_type fchar = line.find_first_not_of(" \t") ;
+      if ( fchar == std::string::npos ) {
+        // empty line
+        //std::cout << "line " << nlines << ": empty\n" ;
+        continue ;
+      } else if ( line[fchar] == '#' ) {
+        // comment
+        //std::cout << "line " << nlines << ": comment\n" ;
+        continue ;
       }
 
+      // get option name
+      std::string::size_type optend = line.find_first_of( " \t=", fchar ) ;
+      std::string optname ( line, fchar, optend ) ;
+
+      // find option with this long name
+      AppCmdOptBase* option = findLongOpt ( optname ) ;
+      if ( ! option ) {
+        throw AppCmdException ( "Error parsing options file: option '" + optname + "' is unknown" ) ;
+      }
+
+      // if it was changed on command line do not change it again
+      if ( changedOptions.find(optname) != changedOptions.end() ) {
+        continue ;
+      }
+
+      //std::cout << "line " << nlines << ": option '" << optname << "'\n" ;
+
+      // get option value if any
+      std::string optval ;
+      if ( optend != std::string::npos ) {
+        std::string::size_type pos1 = line.find( '=', optend ) ;
+        //std::cout << "line " << nlines << ": pos1 = " << pos1 << "\n" ;
+        if ( pos1 != std::string::npos ) {
+          pos1 = line.find_first_not_of(" \t",pos1+1) ;
+          //std::cout << "line " << nlines << ": pos1 = " << pos1 << "\n" ;
+          if ( pos1 != std::string::npos ) {
+            std::string::size_type pos2 = line.find_last_not_of( " \t" ) ;
+            //std::cout << "line " << nlines << ": pos2 = " << pos2 << "\n" ;
+            if ( pos2 != std::string::npos ) {
+              optval = std::string ( line, pos1, pos2-pos1+1 ) ;
+            } else {
+              optval = std::string ( line, pos1 ) ;
+            }
+            //std::cout << "line " << nlines << ": value '" << optval << "'\n" ;
+          }
+        }
+
+      }
+
+      // set the option
+      option->setValue ( optval ) ;
+      //std::cout << "line " << nlines << ": '" << optname << "' = '" << optval << "'\n" ;
+
     }
 
-    // set the option
-    option->setValue ( optval ) ;
-    //std::cout << "line " << nlines << ": '" << optname << "' = '" << optval << "'\n" ;
+    // check the status of the file, must be at EOF
+    if ( not istream.eof() ) {
+      throw AppCmdException ( "failure when reading options file, at or around line " + boost::lexical_cast<std::string>(nlines) ) ;
+    }
 
-  }
-
-  // check the status of the file, must be at EOF
-  if ( not istream.eof() ) {
-    throw AppCmdException ( "failure when reading options file, at or around line " + boost::lexical_cast<std::string>(nlines) ) ;
   }
 }
 

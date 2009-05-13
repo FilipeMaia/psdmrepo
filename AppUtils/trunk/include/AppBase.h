@@ -82,7 +82,7 @@ protected:
   /**
    *  add command line option or argument, typically called from subclass constructor
    */
-  void setOptionsFile ( AppCmdOpt<std::string>& option ) ;
+  void setOptionsFile ( AppCmdOptList<std::string>& option ) ;
   void addOption ( AppCmdOptBase& option ) ;
   void addArgument ( AppCmdArgBase& arg ) ;
 

@@ -104,7 +104,7 @@ namespace AppUtils {
 
 class AppCmdArgBase ;
 class AppCmdOptBase ;
-template <typename T> class AppCmdOpt ;
+template <typename T> class AppCmdOptList ;
 
 class AppCmdLine {
 
@@ -133,12 +133,12 @@ public:
   virtual void addOption ( AppCmdOptBase& option ) throw(std::exception) ;
 
   /**
-   *  Add option which will specify the name of the options file.
-   *  Only one options file is allowed per parser, attempt to add one
+   *  Add option which will specify the names of the options files.
+   *  Only one such option is allowed per parser, attempt to add one
    *  more will result in exception. The lifetime of the argument should
    *  extend to the parse() method of this class.
    */
-  virtual void setOptionsFile ( AppCmdOpt<std::string>& option ) throw(std::exception) ;
+  virtual void setOptionsFile ( AppCmdOptList<std::string>& option ) throw(std::exception) ;
 
   /**
    *  Parse function examines command line and sets the corresponding arguments.
@@ -200,7 +200,7 @@ private:
   PositionalsList _positionals ;
 
   std::string _argv0 ;
-  AppCmdOpt<std::string>* _optionsFile ;
+  AppCmdOptList<std::string>* _optionsFile ;
 
   StringList _argv ;
 

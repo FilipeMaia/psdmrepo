@@ -127,6 +127,11 @@ public:
   virtual bool valueChanged() const throw() ;
 
   /**
+   *  Return current value of the argument
+   */
+  virtual const container& value() const throw() ;
+
+  /**
    *  Return iterator to the begin/end of sequence
    */
   virtual const_iterator begin() const throw() ;

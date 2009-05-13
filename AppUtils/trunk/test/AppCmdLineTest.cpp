@@ -161,7 +161,6 @@ BOOST_AUTO_TEST_CASE( cmdline_test_except )
   // make few options
   AppCmdOpt<std::string> optString1 ( '1', "string1", "astring", "some string", "<none>" ) ;
   AppCmdOpt<std::string> optString2 ( '2', "string2", "astring", "some string", "<none>" ) ;
-  AppCmdOpt<std::string> optString3 ( '3', "string3", "astring", "some string", "<none>" ) ;
 
   // first should be OK
   BOOST_CHECK_NO_THROW ( cmdline.addOption( optString1 ) ) ;
@@ -170,12 +169,15 @@ BOOST_AUTO_TEST_CASE( cmdline_test_except )
   // second should be OK
   BOOST_CHECK_NO_THROW ( cmdline.addOption( optString2 ) ) ;
 
+  AppCmdOptList<std::string> optString1l ( '1', "string1", "astring", "some string", '\0' ) ;
+  AppCmdOptList<std::string> optString3l ( '3', "string3", "astring", "some string", '\0' ) ;
+
   // setting options file with the same option will throw
-  BOOST_CHECK_THROW ( cmdline.setOptionsFile( optString2 ), AppCmdException ) ;
+  BOOST_CHECK_THROW ( cmdline.setOptionsFile( optString1l ), AppCmdException ) ;
   // this is OK
-  BOOST_CHECK_NO_THROW ( cmdline.addOption( optString3 ) ) ;
+  BOOST_CHECK_NO_THROW ( cmdline.addOption( optString3l ) ) ;
   // setting options file again will throw
-  BOOST_CHECK_THROW ( cmdline.setOptionsFile( optString3 ), AppCmdException ) ;
+  BOOST_CHECK_THROW ( cmdline.setOptionsFile( optString3l ), AppCmdException ) ;
 
   const char* args[5] = { "" } ;
 

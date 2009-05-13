@@ -164,6 +164,16 @@ AppCmdArgList<Type>::valueChanged () const throw()
 }
 
 /**
+ *  Return current value of the argument
+ */
+template <typename Type>
+const typename AppCmdArgList<Type>::container& 
+AppCmdArgList<Type>::value() const throw() 
+{
+  return _value ;
+}
+
+/**
  *  Return iterator to the begin/end of sequence
  */
 template <typename Type>
