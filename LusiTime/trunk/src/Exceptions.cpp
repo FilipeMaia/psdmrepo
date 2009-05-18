@@ -49,4 +49,9 @@ ExceptionErrno::ExceptionErrno ( const std::string& what )
 {
 }
 
+ParseException::ParseException ( const std::string& what )
+  : Exception( "date/time parse error: " + what )
+{
+}
+
 } // namespace LusiTime

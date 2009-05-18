@@ -49,7 +49,7 @@ namespace LusiTime {
 class Exception : public std::runtime_error {
 public:
 
-  // Default constructor
+  /// Constructor takes the reason for an exception
   Exception ( const std::string& what ) ;
 
 };
@@ -57,8 +57,17 @@ public:
 class ExceptionErrno : public Exception {
 public:
 
-  // Default constructor
+  /// Constructor takes the reason for an exception
   ExceptionErrno ( const std::string& what ) ;
+
+};
+
+/// Constructor takes the reason for an exception
+class ParseException : public Exception {
+public:
+
+  /// Constructor takes the reason for an exception
+  ParseException ( const std::string& what ) ;
 
 };
 

@@ -15,6 +15,7 @@
 //-----------------
 #include <time.h>
 #include <string>
+#include <iostream>
 
 //----------------------
 // Base Class Headers --
@@ -61,32 +62,30 @@ public:
     * If successful then the method will return a valid object of
     * the current class. Otherwise an exception will be thrown.
     *
-    * The parsed string is expected to have the following format:
+    * The input string is expected to have on of the the following formats:
     *
-    *   <year>-<month>-<day> <hours>:<minutes>:<seconds>
+    *   <year>-<month>-<day> <hours>:<minutes>:<seconds>[.<fractions>][<tz>]
+    *   <year>-<month>-<day> <hours>:<minutes>:<seconds>[.<fractions>][<tz>]
+    *   <year>-<month>-<day> <hours>:<minutes>[<tz>]
+    *   <year>-<month>-<day> <hours>[<tz>]
+    *   <year>-<month>-<day>     - means 00:00:00 of the day
+    *   <year>-<month>           - means 00:00:00 of the 1st day of the month
+    *   <year>                   - means 00:00:00 of the January 1st of the year
+    *   S<seconds-since-epoch>[.<fractions>]
     *
-    * For example:
+    * Date/time separators (- and :) are optional. Date and time can be 
+    * separated by any number of spaces or a single 'T' character. Timezone 
+    * offset <tz> can be either 'Z' for UTC, or {+|-}HH[[:]MM]
     *
-    *   2009-JUN-05 10:12:32
+    * Few examples of valid input:
+    *
+    *   2009-06-05
     *   2009-06-05 10:12:32
-    *
-    * Other notes on a format of the input string:
-    *
-    *   - whitespaces, tabs, newline or carriage return symbols at the begining
-    *   of the string are allowed
-    *
-    *   - whitespaces, tabs, newline or carriage return symbols at the end
-    *   of the string are also allowed
-    *
-    *   - the date and time fields must be separated by at least one whitespace
-    *   character. It's also allowed to have more then one whitespace in there.
-    *
-    *   - month can be given either as a number or as a name. The name can be
-    *   short ('JAN', 'FEB', etc.) or complete ('JANUARY', 'FEBRUARY', etc.)
-    *
-    * TODO: The 'mktime' used in the current implementation of the method
-    *       uses local timezone, therefore the code will run correctly only
-    *       on a machine configured for PDT. We need to resolve this issue.
+    *   2009-06-05T10:12:32Z
+    *   2009-06-05T10:12:32.123-08
+    *   2009-06-05T10:12-08:00
+    *   20090605T101232.123+0100
+    *   S1234567890.001
     */
   static Time parse(const std::string& inTimeStr) throw (Exception) ;
 
@@ -109,7 +108,7 @@ public:
   time_t sec() const { return m_time.tv_sec ; }
 
   /// return nanoseconds
-  time_t nsec() const { return m_time.tv_nsec ; }
+  long nsec() const { return m_time.tv_nsec ; }
 
   /// check if the time is valid
   bool isValid() const { return m_time.tv_nsec >= 0 ; }
@@ -119,24 +118,39 @@ public:
     *
     * The output string will have the following format:
     *
-    *   <year>-<month>-<day> <hours>:<minutes>:<seconds>
+    *   <year>-<month>-<day> <hours>:<minutes>:<seconds>.<nanoseconds><TZ>
     *
     * Where the month will be represented by a number. For example:
     *
-    *   2009-06-05 10:12:32
-    *
-    * Also note, that the result won't include nanoseconds. This is done
-    * to make the output format compatible with the one expected by
-    * the opposite method Time::parse().
+    *   2009-06-05 10:12:32.123456789-0800
     *
     * If the object is not valid then the method will throw an
     * exception.
-    *
-    * TODO: The 'localtime_r' used in the current implementation of the method
-    *       uses local timezone, therefore the code will run correctly only
-    *       on a machine configured for PDT. We need to resolve this issue.
     */
   std::string toString() const throw (Exception) ;
+
+  /**
+    * Translate into the string representation according to given format.
+    * Format specifiers supported:
+    *
+    * %F    = %Y-%m-%d
+    * %f    fractions of second with preceding dot, default precision is 9,
+    *       precision can be changed with %.Nf  format 
+    * %H    hour (00...24)
+    * %j    day of the year (001...366)
+    * %m    month (01...12)
+    * %M    minute (00...59)
+    * %s    seconds since epoch
+    * %S    seconds (00...60)
+    * %T    = %H:%M:%S
+    * %Y    year
+    * %z    timezone
+    * %%    literal %
+    *
+    * If the object is not valid then the method will throw an
+    * exception.
+    */
+  std::string toString( const std::string& fmt ) const throw (Exception) ;
 
 protected:
 
@@ -154,6 +168,12 @@ bool operator> ( const Time& t1, const Time& t2 ) ;
 bool operator>= ( const Time& t1, const Time& t2 ) ;
 bool operator== ( const Time& t1, const Time& t2 ) ;
 bool operator!= ( const Time& t1, const Time& t2 ) ;
+
+inline
+std::ostream&
+operator<< ( std::ostream& out, const Time& t ) {
+  return out << t.toString() ;
+}
 
 } // namespace LusiTime
 
