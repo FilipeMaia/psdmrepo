@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2008-05-19 Andy Salnikov
+- added Python implementation of the same Time class
+- added unit tests for Python class
+
 Tag: V00-00-05
 2008-05-18 Igor Gaponenko
 - refined implementation of the packaging (into 64-bit integer)

@@ -130,3 +130,13 @@ BOOST_AUTO_TEST_CASE( test_4 )
   BOOST_CHECK_EQUAL ( t0, Time ( 24*3600-100*60, 0 ) ) ;
 }
 
+BOOST_AUTO_TEST_CASE( test_5 )
+{
+  // test for local timezone
+  
+  Time t0 ;
+  BOOST_CHECK_NO_THROW ( t0 = Time::parse("20010101") ) ;
+  BOOST_CHECK_NO_THROW ( t0 = Time::parse("20010101 01:01:01.01") ) ;
+  BOOST_CHECK_THROW ( t0 = Time::parse("20010431 01:01:01.01"), ParseException ) ;
+}
+

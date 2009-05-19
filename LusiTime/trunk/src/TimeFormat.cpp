@@ -149,12 +149,11 @@ TimeFormat::parse( const std::string& timeStr ) throw (Exception)
         
       }
 
+      struct tm vtm = stm ;
       sec = timegm( &stm ) ;
       if ( time_t(-1) == sec ) throw ParseException( "timegm() failed" ) ;
 
-      // to validate the input convert it back to struct tm
-      struct tm vtm ;
-      if ( gmtime_r ( &sec, &vtm ) == 0 ) throw ParseException( "gmtime() failed" ) ;
+      // to validate the input compare the structures, if nothing was changed then input is OK
       if ( not ::cmp_tm( &stm, &vtm ) ) throw ParseException( "input time validation failed" ) ;
 
       // adjust for timezone
@@ -165,12 +164,11 @@ TimeFormat::parse( const std::string& timeStr ) throw (Exception)
       // No timezone specified, we should assume the time is in the local timezone.
       // Let it guess the daylight saving time status.
       stm.tm_isdst = -1 ;
+      struct tm vtm = stm ;
       sec = timelocal( &stm ) ;
       if ( time_t(-1) == sec ) throw ParseException( "timelocal() failed" ) ;
       
-      // to validate the input convert it back to struct tm
-      struct tm vtm ;
-      if ( gmtime_r ( &sec, &vtm ) == 0 ) throw ParseException( "gmtime() failed" ) ;
+      // to validate the input compare the structures, if nothing was changed then input is OK
       if ( not ::cmp_tm( &stm, &vtm ) ) throw ParseException( "input time validation failed" ) ;
       
     }

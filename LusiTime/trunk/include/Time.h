@@ -16,6 +16,7 @@
 #include <time.h>
 #include <string>
 #include <iostream>
+#include <stdint.h>
 
 //----------------------
 // Base Class Headers --
@@ -97,14 +98,14 @@ public:
     *
     * The overflow is reported through the exception
     */
-  static Time from64(long long unsigned inNumber) throw (Exception) ;
+  static Time from64(uint64_t inNumber) throw (Exception) ;
 
   /**
     * Pack time into a 64-bit number
     *
     * An input timestamp must be valid. Otherwise an exception will be thrown.
     */
-  static long long unsigned to64(const Time& inTime) throw (Exception) ;
+  static uint64_t to64(const Time& inTime) throw (Exception) ;
 
   // Default constructor, makes invalid time
   Time () {

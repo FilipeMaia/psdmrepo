@@ -73,7 +73,7 @@ std::string Time::toString( const std::string& fmt ) const throw (Exception)
 const long long unsigned NSEC_IN_ONE_SEC = 1*1000*1000*1000ULL ;
 const long long unsigned MAX_NSEC = (2*1024*1024*1024ULL - 1) * NSEC_IN_ONE_SEC ;
 
-Time Time::from64( long long unsigned inNumber ) throw (Exception)
+Time Time::from64( uint64_t inNumber ) throw (Exception)
 {
   if (inNumber > MAX_NSEC)
     throw Exception( "Time::from64(number): invalid number" ) ;
@@ -82,7 +82,7 @@ Time Time::from64( long long unsigned inNumber ) throw (Exception)
                inNumber % NSEC_IN_ONE_SEC ) ;
 }
 
-long long unsigned Time::to64( const Time& inTime ) throw (Exception)
+uint64_t Time::to64( const Time& inTime ) throw (Exception)
 {
   if (!inTime.isValid())
     throw Exception( "Time::to64(Time): invalid time" ) ;
