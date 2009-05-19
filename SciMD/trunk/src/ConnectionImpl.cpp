@@ -22,6 +22,8 @@
 #include <memory>
 #include <iostream>
 
+#include <strings.h>
+
 using namespace std ;
 
 //-------------------------------
@@ -46,6 +48,17 @@ using namespace odbcpp ;
 //		----------------------------------------
 
 namespace SciMD {
+
+bool
+isValidRunType(const std::string& type)
+{
+    static const char* const validTypes[] = {"DATA", "CALIB"} ;
+    static const size_t numTypes = 2 ;
+    for (size_t i = 0 ; i < numTypes ; ++i)
+        if (0 == strcasecmp(validTypes[i], type.c_str()))
+            return true ;
+    return false ;
+}
 
 //-------------
 // Operators --
@@ -209,9 +222,15 @@ ConnectionImpl::createRun (const std::string&    experiment,
     if (!endTime.isValid ())
         throw WrongParams ("the begin run timstamp isn't valid") ;
 
+    // TODO: Consider reinforcing the types at a level of the API interface
+    //       (by using 'enum' rather than here.
+    //
+    if (!SciMD::isValidRunType (type))
+        throw WrongParams ("unknown run type") ;
+
     try {
-        const std::string beginTimeStr = beginTime.toString () ;
-        const std::string   endTimeStr =   endTime.toString () ;
+        long long unsigned beginTime64 = LusiTime::Time::to64 (beginTime) ;
+        long long unsigned   endTime64 = LusiTime::Time::to64 (  endTime) ;
 
         ExperDescr exper_descr ;
         if (!this->findExper (exper_descr, experiment))
@@ -223,8 +242,8 @@ ConnectionImpl::createRun (const std::string&    experiment,
         OdbcParam<int>         p1 (run) ;
         OdbcParam<int>         p2 (exper_descr.id) ;
         OdbcParam<std::string> p3 (type) ;
-        OdbcParam<std::string> p4 (beginTimeStr) ;
-        OdbcParam<std::string> p5 (endTimeStr) ;
+        OdbcParam<long long unsigned> p4 (beginTime64) ;
+        OdbcParam<long long unsigned> p5 (endTime64) ;
 
         stmt.bindParam (1, p1) ;
         stmt.bindParam (2, p2) ;

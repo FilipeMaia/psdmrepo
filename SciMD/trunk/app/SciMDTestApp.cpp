@@ -270,8 +270,8 @@ SciMDTestApp::cmd_help ()
              << "\n"
              << "  help [command]\n"
              << "\n"
-             << "  add_run       <experiment> <run> <begn_time> <end_time>\n"
-             << "  set_run_param <experiment> <run> <param> <value>\n"
+             << "  add_run       <experiment> <run> {DATA|CALIB} <begn_time> <end_time>\n"
+             << "  set_run_param <experiment> <run> <param> <value> {INT|DOUBLE|TEXT}\n"
              << "  param_info    <experiment> <param>" << endl;
         return 0 ;
     }
@@ -318,13 +318,18 @@ SciMDTestApp::cmd_help ()
              << "    YYYY-MM-DD HH:MM::SS\n"
              << "\n"
              << "  For example:\n"
-             << "     2009-APR-27 16:23:05" << endl ;
+             << "    2009-APR-27 16:23:05\n"
+             << "\n"
+             << "  The run type can be one of the following:\n"
+             << "\n"
+             << "    'CALIB'\n"
+             << "    'DATA'" << endl ;
 
     } else if (command == "set_run_param") {
 
         cout << "SYNTAX:\n"
              << "\n"
-             << "  set_run_param <experiment> <run> <param> <value>\n"
+             << "  set_run_param <experiment> <run> <param> <value> <type>\n"
              << "\n"
              << "DESCRIPTION:\n"
              << "\n"
@@ -335,8 +340,13 @@ SciMDTestApp::cmd_help ()
              << "  during the parameter's configuration.\n"
              << "\n"
              << "  The 'source' of the parameter's value can be specified using\n"
-             << "  the '-s' option. The default value of the 'source' is: "
-             << m_source.defValue() << endl ;
+             << "  the '-s' option. The default value of the 'source' is: " << m_source.defValue() << "\n"
+             << "\n"
+             << "  The parameter type can be one of the following:\n"
+             << "\n"
+             << "    'INT'\n"
+             << "    'DOUBLE'\n"
+             << "    'TEXT'" << endl ;
 
     } else if (command == "param_info") {
 
@@ -397,7 +407,7 @@ SciMDTestApp::cmd_set_run_param () throw (std::exception)
 {
     // Parse and verify the arguments
     //
-    if (m_args.empty() || m_args.size() != 4) {
+    if (m_args.empty() || m_args.size() != 5) {
         MsgLogRoot (error, "wrong number of arguments to the command") ;
         return 2 ;
     }
@@ -406,17 +416,58 @@ SciMDTestApp::cmd_set_run_param () throw (std::exception)
     const int          run        = SciMD::str2int (*(itr++)) ;
     const std::string  param      = *(itr++) ;
     std::string        value      = *(itr++) ;
+    const  std::string type       = *(itr++) ;
 
-    m_connection->beginTransaction () ;
-    m_connection->setRunParam (
-        experiment,
-        run,
-        param,
-        value,
-        "SciMDTestApp",
-        m_update.value () > 0) ;
-    m_connection->commitTransaction () ;
+    if (type == "INT") {
 
+        int value_int ;
+        if (1 != sscanf(value.c_str(), "%d", &value_int)) {
+            MsgLogRoot (error, "parameter value is not of the claimed type") ;
+            return 2 ;
+        }
+        m_connection->beginTransaction () ;
+        m_connection->setRunParam (
+            experiment,
+            run,
+            param,
+            value_int,
+            "SciMDTestApp",
+            m_update.value () > 0) ;
+        m_connection->commitTransaction () ;
+
+    } else if (type == "DOUBLE") {
+
+        double value_double ;
+        if (1 != sscanf(value.c_str(), "%lf", &value_double)) {
+            MsgLogRoot (error, "parameter value is not of the claimed type") ;
+            return 2 ;
+        }
+        m_connection->beginTransaction () ;
+        m_connection->setRunParam (
+            experiment,
+            run,
+            param,
+            value_double,
+            "SciMDTestApp",
+            m_update.value () > 0) ;
+        m_connection->commitTransaction () ;
+
+    } else if (type == "TEXT") {
+
+        m_connection->beginTransaction () ;
+        m_connection->setRunParam (
+            experiment,
+            run,
+            param,
+            value,
+            "SciMDTestApp",
+            m_update.value () > 0) ;
+        m_connection->commitTransaction () ;
+
+    } else {
+        MsgLogRoot (error, "unsupported type of the value") ;
+        return 2 ;
+    }
     return 0 ;
 }
 
