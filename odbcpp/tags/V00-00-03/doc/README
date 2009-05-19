@@ -1,0 +1,17 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package odbcpp
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Brief description:
+==================
+
+C++ wrapper/interface for ODBC library (unixODBC).
+
+Detailed description:
+=====================
