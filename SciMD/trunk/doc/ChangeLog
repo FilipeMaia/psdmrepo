@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2009-05-19 Igor Gaponenko
+- migrated to use the new Python Class LusiTime.Time
+
 Tag: V00-00-05
 2009-05-19 Igor Gaponenko
 - changes in the schema to replace SQL's DATETIME with 64-bit integer (BIGINT)
