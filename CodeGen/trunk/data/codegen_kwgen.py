@@ -75,6 +75,7 @@ codegen_Cxx_unit_test_description = "Template for C++ unit test module"
 
 codegen_python_description = "Template for Python library module"
 codegen_python_main_description = "Template for Python executable script"
+codegen_python_unit_test_description = "Template for Python unit test script"
 
 codegen_README_description = "Template for README file"
 codegen_ChangeLog_description = "Template for ChangeLog file"
