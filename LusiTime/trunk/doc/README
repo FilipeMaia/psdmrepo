@@ -54,6 +54,11 @@ the resolution of the system clock can be lower than single nanosecond.
 Static method Time::parse(std::string) converts string in external time 
 format into time object. See section below on supported time formats.
 
+Static method Time::from64(long long unsigned) converts a 64-bit number
+into time object. The number is expected to be produced by an opposite
+static method Time::to64(Time). The packed numbers are meant to be used
+in various contexts, including databases.
+
 Methods
 -------
 

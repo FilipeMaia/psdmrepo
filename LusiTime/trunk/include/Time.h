@@ -89,6 +89,23 @@ public:
     */
   static Time parse(const std::string& inTimeStr) throw (Exception) ;
 
+  /**
+    * Unpack a 64-bit number into time
+    *
+    * A number on the input is supposed to be a previously packed value of
+    * an object of the current class.
+    *
+    * The overflow is reported through the exception
+    */
+  static Time from64(long long unsigned inNumber) throw (Exception) ;
+
+  /**
+    * Pack time into a 64-bit number
+    *
+    * An input timestamp must be valid. Otherwise an exception will be thrown.
+    */
+  static long long unsigned to64(const Time& inTime) throw (Exception) ;
+
   // Default constructor, makes invalid time
   Time () {
     m_time.tv_sec = 0xFFFFFFFF ;

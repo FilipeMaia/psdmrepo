@@ -11,17 +11,21 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2008-05-18 Igor Gaponenko
+- added packang/unpacking into/from 64-bit unsigned integer.
+
 Tag: V00-00-03
 2008-05-18 Andy Salnikov
 - Time formatting reworked, support for fractional seconds and 
   timezones
 - details are in README
 
-Tag: V00-00-01
-2008-05-05 Andy Salnikov
-- initial incomplete implementation of Time class and test cases
-
 Tag: V00-00-02
 2008-05-05 Igor Gaponenko
 - added two methods for bidirectional translation of timestamps
 to and from regulat C++ strings.
+
+Tag: V00-00-01
+2008-05-05 Andy Salnikov
+- initial incomplete implementation of Time class and test cases

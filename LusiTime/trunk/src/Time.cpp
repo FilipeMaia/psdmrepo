@@ -68,6 +68,29 @@ std::string Time::toString( const std::string& fmt ) const throw (Exception)
   return TimeFormat::format( *this, fmt ) ;
 }
 
+
+// Translate into/from 64-bit unsigned integer
+
+const long long unsigned TWO_IN_POWER_32 = 4*1024*1024*1024ULL ;
+const long NSEC_IN_ONE_SEC = 1*1000*1000*1000L ;
+
+Time Time::from64( long long unsigned inNumber ) throw (Exception)
+{
+  const time_t sec  = inNumber / TWO_IN_POWER_32 ;
+  const long   nsec = inNumber % TWO_IN_POWER_32 ;
+  if (nsec >= NSEC_IN_ONE_SEC)
+    throw Exception( "Time::from64(number): invalid number" ) ;
+  return Time( sec, nsec ) ;
+}
+
+long long unsigned Time::to64( const Time& inTime ) throw (Exception)
+{
+  if (!inTime.isValid())
+    throw Exception( "Time::to64(Time): invalid time" ) ;
+  return inTime.sec() * TWO_IN_POWER_32 + inTime.nsec() ;
+}
+
+
 /// comparisons
 bool
 operator< ( const Time& t1, const Time& t2 )
