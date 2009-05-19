@@ -40,7 +40,13 @@ if os.path.isdir("SConsTools/src") :
     
     # remove extra links
     for f in links - pys :
-        os.remove( pjoin(d,f) )
+        try :
+            os.remove( pjoin(d,f) )
+        except Exception, e :
+            print >> sys.stderr, "Failed to remove file "+pjoin(d,f)
+            print >> sys.stderr, str(e)
+            print >> sys.stderr, "Check your permissions and AFS token"
+            Exit(2)
     
     # add missing links
     for f in pys - links :

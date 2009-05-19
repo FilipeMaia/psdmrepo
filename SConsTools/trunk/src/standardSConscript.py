@@ -128,27 +128,10 @@ def standardPyLib( **kw ) :
 #
 def standardScripts( **kw ) :
     
+    env = DefaultEnvironment()
     
-    scripts = kw.get('SCRIPTS',None)
-    if scripts is None :
-        # grab any file without extension in app/ directory
-        scripts = Glob("app/*", source=True, strings=True )
-        scripts = [ ( f, str(Entry(f)) ) for f in scripts ]
-        scripts = [ s[0] for s in scripts if not os.path.splitext(s[1])[1] and os.path.isfile(s[1]) ]
-    else :
-        scripts = [ _normbinsrc('app',s) for s in scripts ]
-            
-    if scripts :
-
-        env = DefaultEnvironment()
-        bindir = env['BINDIR']
-
-        trace ( "scripts = "+str(map(str,scripts)), "SConscript", 2 )
-
-        # Scripts are copied to bin/ directory
-        for s in scripts : 
-            script = env.ScriptInstall ( os.path.join(bindir,os.path.basename(s)), s )
-            env['ALL_TARGETS']['BINS'].extend ( script )
+    targets = _standardScripts ( 'app', 'SCRIPTS', env['BINDIR'], **kw )
+    env['ALL_TARGETS']['BINS'].extend( targets )
 
 #
 # Process app/ directory, build all executables from C++ sources
@@ -166,10 +149,18 @@ def standardBins( **kw ) :
 def standardTests( **kw ) :
     
     env = DefaultEnvironment()
-        
-    targets = _standardBins ( 'test', 'TESTS', False, **kw )
-    env['ALL_TARGETS']['TESTS'].extend( targets )
+    trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
+
+    # binaries in the test/ directory
+    targets0 = _standardBins ( 'test', 'TESTS', False, **kw )
+    env['ALL_TARGETS']['TESTS'].extend( targets0 )
+
+    # also scripts in the tst/ directory
+    targets1 = _standardScripts ( 'test', 'TEST_SCRIPTS', "", **kw )
+    env['ALL_TARGETS']['TESTS'].extend( targets1 )
     
+    targets = targets0 + targets1
+
     # make a list of unit tests
     utests = kw.get('UTESTS', None)
     if utests is None :
@@ -183,7 +174,7 @@ def standardTests( **kw ) :
     for u in utests :
         t = env.UnitTest ( str(u)+'.utest', u )
         env['ALL_TARGETS']['TESTS'].extend( t )
-        
+
 #
 # Build binaries, possibly install them
 #
@@ -227,4 +218,32 @@ def _standardBins( appdir, binenv, install, **kw ) :
                 
             targets.extend( b )
             
+    return targets
+
+#
+# Process app/ directory, install all scripts
+#
+def _standardScripts( appdir, binenv, installdir, **kw ) :
+
+    scripts = kw.get(binenv,None)
+    if scripts is None :
+        # grab any file without extension in app/ directory
+        scripts = Glob(appdir+"/*", source=True, strings=True )
+        scripts = [ ( f, str(Entry(f)) ) for f in scripts ]
+        scripts = [ s[0] for s in scripts if not os.path.splitext(s[1])[1] and os.path.isfile(s[1]) ]
+    else :
+        scripts = [ _normbinsrc(appdir,s) for s in scripts ]
+
+    env = DefaultEnvironment()
+
+    trace ( "scripts = "+str(map(str,scripts)), "SConscript", 2 )
+
+    # Scripts are installed in 'installdir' directory
+    targets = []
+    for s in scripts : 
+        dst = pjoin(installdir,os.path.basename(s))
+        trace ( "install script = "+dst, "SConscript", 2 )
+        script = env.ScriptInstall ( dst, s )
+        targets.extend ( script )
+
     return targets

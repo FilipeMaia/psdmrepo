@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-21
+2009-05-19 Andy Salnikov
+- added support for test scripts to the standardSConscript.py
+
 Tag: V00-00-20
 2009-05-08 Andy Salnikov
 - standardSConscript.py: fix standardScripts() function which sometimes
