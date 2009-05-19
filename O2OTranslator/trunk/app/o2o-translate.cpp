@@ -77,18 +77,19 @@ protected :
 private:
 
   // more command line options and arguments
-  AppCmdOpt<std::string>      m_optionsFile ;
+  AppCmdOptList<std::string>  m_optionsFile ;
   AppCmdOpt<int>              m_compression ;
   AppCmdOptSize               m_dgramsize ;
   AppCmdOptList<std::string>  m_epicsData ;
   AppCmdOptList<std::string>  m_eventData ;
   AppCmdOpt<std::string>      m_experiment ;
   AppCmdOptBool               m_ignoreMiss ;
+  AppCmdOpt<std::string>      m_mdConnStr ;
   AppCmdOptList<std::string>  m_metadata ;
   AppCmdOpt<std::string>      m_outputDir ;
-  AppCmdOptBool               m_outputHdf5 ;
   AppCmdOpt<std::string>      m_outputName ;
   AppCmdOptBool               m_overwrite ;
+  AppCmdOpt<unsigned long>    m_runNumber ;
   AppCmdOptNamedValue<O2OHdf5Writer::SplitMode> m_splitMode ;
   AppCmdOptSize               m_splitSize ;
 
@@ -99,18 +100,19 @@ private:
 //----------------
 O2O_Translate::O2O_Translate ( const std::string& appName )
   : AppBase( appName )
-  , m_optionsFile( 'o', "options-file", "path",     "file name with options", "" )
+  , m_optionsFile( 'o', "options-file", "path",     "file name with options, multiple allowed", '\0' )
   , m_compression( 'c', "compression",  "number",   "compression level, -1..9, def: -1", -1 )
   , m_dgramsize  ( 'g', "datagram-size","size",     "datagram buffer size. def: 16M", 16*1048576ULL )
   , m_epicsData  ( 'e', "epics-file",   "path",     "file name for EPICS data", '\0' )
   , m_eventData  ( 'f', "event-file",   "path",     "file name for XTC event data", '\0' )
   , m_experiment ( 'x', "experiment",   "string",   "experiment name", "" )
   , m_ignoreMiss ( 'i', "ignore-miss",              "ignore missing XTC types, def: abort", false )
+  , m_mdConnStr  ( 'M', "md-conn",      "string",   "metadata ODBC connection string", "" )
   , m_metadata   ( 'm', "metadata",     "name:value", "science metadata values", '\0' )
   , m_outputDir  ( 'd', "output-dir",   "path",     "directory to store output files, def: .", "." )
-  , m_outputHdf5 ( '5', "output-hdf5",              "use HDF5 instead of NeXus for output file", false )
   , m_outputName ( 'n', "output-name",  "template", "template string for output file names, def: {seq4}.hdf5", "{seq4}.hdf5" )
   , m_overwrite  (      "overwrite",                "overwrite output file", false )
+  , m_runNumber  ( 'r', "run-number",   "number",   "run number, non-negative number; def: 0", 0 )
   , m_splitMode  ( 's', "split-mode",   "mode-name","one of none, or family; def: none", O2OHdf5Writer::NoSplit )
   , m_splitSize  ( 'z', "split-size",   "number",   "max. size of output files. def: 20G", 20*1073741824ULL )
 {
@@ -121,11 +123,12 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_eventData ) ;
   addOption( m_experiment ) ;
   addOption( m_ignoreMiss ) ;
+  addOption( m_mdConnStr ) ;
   addOption( m_metadata ) ;
   addOption( m_outputDir ) ;
-  addOption( m_outputHdf5 ) ;
   addOption( m_outputName ) ;
   addOption( m_overwrite ) ;
+  addOption( m_runNumber ) ;
   m_splitMode.add ( "none", O2OHdf5Writer::NoSplit ) ;
   m_splitMode.add ( "family", O2OHdf5Writer::Family ) ;
   addOption( m_splitMode ) ;
@@ -178,21 +181,23 @@ O2O_Translate::runApp ()
   if ( outputDir.empty() ) outputDir = "." ;
   nameFactory.addKeyword ( "output-dir", outputDir ) ;
   nameFactory.addKeyword ( "experiment", m_experiment.value() ) ;
+  char runStr[16];
+  snprintf ( runStr, sizeof runStr, "%06lu", m_runNumber.value() ) ;
+  nameFactory.addKeyword ( "run", runStr ) ;
 
   // instantiate XTC scanner, which is also output file writer
   std::vector<O2OXtcScannerI*> scanners ;
-  if ( m_outputHdf5.value() ) {
-    scanners.push_back ( new O2OHdf5Writer ( nameFactory, m_overwrite.value(),
+  scanners.push_back ( new O2OHdf5Writer ( nameFactory, m_overwrite.value(),
                                   m_splitMode.value(), m_splitSize.value(),
                                   m_ignoreMiss.value(), m_compression.value() ) ) ;
-  } else {
-    MsgLogRoot(error, "only HDF5 conversion is supported now" ) ;
-    return 2 ;
-    //scanner = new O2ONexusWriter ( nameFactory ) ;
-  }
 
   // instantiate metadata scanner
-  scanners.push_back ( new MetaDataScanner() ) ;
+  scanners.push_back ( new MetaDataScanner( m_runNumber.value(),
+                                            m_experiment.value(),
+                                            m_mdConnStr.value(), 
+                                            m_metadata.value() ) ) ;
+
+  unsigned long errCount = 0 ;
 
   // loop over all input files
   typedef AppCmdOptList<std::string>::const_iterator StringIter ;
@@ -215,6 +220,7 @@ O2O_Translate::runApp ()
     FILE* xfile = fopen( eventFile.c_str(), "rb" );
     if ( ! xfile ) {
       MsgLogRoot( error, "failed to open input XTC file: " << eventFile ) ;
+      // this is fatal error, stop here
       return 2  ;
     }
 
@@ -224,6 +230,7 @@ O2O_Translate::runApp ()
       efile = fopen( epicsFile.c_str(), "rb" );
       if ( ! efile ) {
         MsgLogRoot( error, "failed to open input EPICS file: " << epicsFile ) ;
+        // this is fatal error, stop here
         return 2  ;
       }
     }
@@ -246,12 +253,18 @@ O2O_Translate::runApp ()
 
         O2OXtcScannerI* scanner = *i ;
 
-        scanner->eventStart ( dg->seq ) ;
+        try {
+          scanner->eventStart ( dg->seq ) ;
 
-        O2OXtcIterator iter( &(dg->xtc), scanner );
-        iter.iterate();
+          O2OXtcIterator iter( &(dg->xtc), scanner );
+          iter.iterate();
 
-        scanner->eventEnd ( dg->seq ) ;
+          scanner->eventEnd ( dg->seq ) ;
+        } catch ( std::exception& e ) {
+          MsgLogRoot( error, "exception caught processing datagram: " << e.what() ) ;
+          // do not stop here, try to proceed
+          ++ errCount ;
+        }
       }
     }
 
@@ -263,7 +276,19 @@ O2O_Translate::runApp ()
 
   // finish with the scanners
   for ( std::vector<O2OXtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
-    delete *i ;
+    try {
+      delete *i ;
+    } catch ( std::exception& e ) {
+      MsgLogRoot( error, "exception caught while destroying a scanner: " << e.what() ) ;
+      ++ errCount ;
+    }
+  }
+
+  if ( errCount > 0 ) {
+    MsgLogRoot( error, "Total error count: " << errCount ) ;
+    return 4 ;
+  } else {
+    MsgLogRoot( info, "No errors during conversion" ) ;
   }
 
   return 0 ;

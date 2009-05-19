@@ -14,10 +14,13 @@
 // C/C++ Headers --
 //-----------------
 #include <stdint.h>
+#include <string>
+#include <list>
 
 //----------------------
 // Base Class Headers --
 //----------------------
+#include "LusiTime/Time.h"
 #include "O2OTranslator/O2OXtcScannerI.h"
 #include "pdsdata/xtc/ClockTime.hh"
 
@@ -48,7 +51,10 @@ class MetaDataScanner : public O2OXtcScannerI {
 public:
 
   // Default constructor
-  MetaDataScanner () ;
+  MetaDataScanner ( unsigned long runNumber,
+                    const std::string& experiment, 
+                    const std::string& odbcConnStr, 
+                    const std::list<std::string>& extraMetaData ) ;
 
   // Destructor
   virtual ~MetaDataScanner () ;
@@ -75,9 +81,13 @@ protected:
 private:
 
   // Data members
+  unsigned long m_runNumber ;
+  const std::string m_experiment ; 
+  const std::string m_odbcConnStr ;
+  const std::list<std::string>& m_extraMetaData ;
   unsigned long m_nevents ;
-  Pds::ClockTime m_runBeginTime ;
-  Pds::ClockTime m_runEndTime ;
+  LusiTime::Time m_runBeginTime ;
+  LusiTime::Time m_runEndTime ;
 
   // Copy constructor and assignment are disabled by default
   MetaDataScanner ( const MetaDataScanner& ) ;

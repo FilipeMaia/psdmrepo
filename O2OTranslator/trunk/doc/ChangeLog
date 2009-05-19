@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-11
+2009-05-19 Andy Salnikov
+- improving metadata collection and storage
+
 Tag: V00-00-10
 2009-04-22 Andy Salnikov
 - tiny optimization, do not recreate type object in converters every time
