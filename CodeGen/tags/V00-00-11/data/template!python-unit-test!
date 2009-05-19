@@ -1,0 +1,111 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $$Id$$
+#
+# Description:
+#  Script $class...
+#
+#------------------------------------------------------------------------
+
+"""Brief one-line description of the script.
+
+Following paragraphs provide detailed description of the module, its
+contents and usage. This is a template module (or module template:)
+which will be used by LUSI programmers to create new Python scripts.
+This is the "executable module" as opposed to library module. Executable
+modules are mangled (@PYTHON@ above replaced with real path to 
+interpreter plus some extra options) and copied to arch/$LUSI_ARCH/bin area.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $$Id$$ 
+
+@author $author
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$$Revision: 8 $$"
+# $$Source$$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import unittest
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+#from PkgPackage.PkgModule import PkgClass
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#-------------------------------
+#  Unit test class definition --
+#-------------------------------
+
+class $class ( unittest.TestCase ) :
+
+    def setUp(self) :
+    	""" 
+    	Method called to prepare the test fixture. This is called immediately 
+    	before calling the test method; any exception raised by this method 
+    	will be considered an error rather than a test failure.  
+    	"""
+        pass
+    
+    def tearDown(self) :
+        """
+        Method called immediately after the test method has been called and 
+        the result recorded. This is called even if the test method raised 
+        an exception, so the implementation in subclasses may need to be 
+        particularly careful about checking internal state. Any exception raised 
+        by this method will be considered an error rather than a test failure. 
+        This method will only be called if the setUp() succeeds, regardless 
+        of the outcome of the test method. 
+        """
+        pass
+
+    def test_basic_arith(self):
+    	"""
+    	The actual test code. Any method whose name starts with test is considered 
+    	a test case. Test is considered successful if it completes without raising
+    	an exception. There are many methods defined in the base class for testing
+    	particular conditions, few examples are in the code.
+    	"""
+
+    	i = 0
+    	self.assert_( i >= 0 )
+    	self.assertEqual( i, 0 )
+    	self.assertNotEqual( i, 1000 )
+    	self.assertRaises ( ZeroDivisionError, lambda : i/0 )
+    	if i**1000 > 0 : self.fail("Python arithmetic error")
+
+    def test_complex_arith(self):
+    	"""
+    	Another test case.
+    	"""
+
+    	x = 1j
+    	self.assertRaises( TypeError, x >= 0 )
+    	self.assertEqual( x, 0+1j )
+    	self.assertNotEqual( i, 1000 )
+    	self.assertRaises ( ZeroDivisionError, lambda : i/0 )
+    	if i**100 == 0 : self.fail("Python arithmetic error")
+
+#
+#  run unit tests when imported as a main module
+#
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,63 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package CodeGen
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-11
+2009-05-19 Andy Salnikov
+- new template template!python-unit-test!
+
+Tag: V00-00-10
+2009-05-05 Andy Salnikov
+- added 'date', 'time', 'datetime' keywords
+
+Tag: V00-00-09
+2009-04-20 Andy Salnikov
+- in C++ templates moved class-doc block below namespace
+
+Tag: V00-00-08
+2009-03-04 Andy Salnikov
+- added template for C++ unit test module
+
+Tag: V00-00-07
+2009-03-04 Andy Salnikov
+- add description for each template language
+
+Tag: V00-00-06
+2009-02-05 Andy Salnikov
+- bug in template!C++!h: assignment op returned copy of object 
+
+Tag: V00-00-05
+2008-11-03 Andy Salnikov
+- added new template template!C++-app!cpp for applications based on AppBase
+- added -o option to codegen to set output directory
+
+Tag: V00-00-04
+2008-10-28 Andy Salnikov
+- added 'include Lusi/Lusi.h' to .cpp templates
+
+Tag: V00-00-03
+2008-10-28 Andy Salnikov
+- improved handling of Id keyword in templates, removed keyword
+  substitution from template files
+
+Tag: V00-00-02
+2008-10-08 Andy Salnikov
+- use @PYTHON@ in app/codegen script
+
+Tag: V00-00-01
+2008-10-08 Andy Salnikov
+- changed python-main template to use LusiPyApp as base class
+
+Tag: V00-00-00
+2008-10-08 Andy Salnikov
+- first import if the CodeGen into CVS
+
