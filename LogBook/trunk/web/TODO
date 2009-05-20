@@ -1,0 +1,18 @@
+- finish READ-ONLY interfaces for free-form entries
+
+- extend the API to allow adding/updating objects (experiments, runs, etc.). For runs
+introduce two separate methods: start_run(timestamp) and stop_run(timestamp). If no
+stop_run is given (check it by NULL in the run's end_time) then the next start_run()
+would stop the last run and begin the new one.
+
+- write a very simple Web GUI for the Logbook. Pages to develop first:
+  -- a form for creating a new free-form entry
+  -- a tree for displaying related entries
+  -- a simple form for managing runs (start/stop/inspect)
+     (display the last/current run in READ color)
+  -- a table for displaying run summary parameters
+
+- write Python API for a subset of operations (start/stop run, set/update a value
+of a run parameter).
+
+
