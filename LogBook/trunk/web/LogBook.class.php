@@ -45,6 +45,7 @@ class LogBook {
         echo $sql."\n";
         $result = $this->connection->query( $sql )
             or die ("failed to create new experiment: ".mysql_error());
+        return $this->find_experiment_by_id('(SELECT LAST_INSERT_ID())');
     }
 }
 ?>
