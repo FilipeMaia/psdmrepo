@@ -1,11 +1,11 @@
 <!--
-The page for creating a new run summary parameter.
+The page for creating a new shift.
 -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Create new run parameter</title>
+        <title>Create a new shift</title>
     </head>
     <body>
         <?php
@@ -13,8 +13,8 @@ The page for creating a new run summary parameter.
         $now_str = $now->format(DateTime::ISO8601);
         $now_str[10] = ' ';  // get rid of date-time separator 'T'
         ?>
-        <h1>Create new run parameter :</h1>
-        <form action="ProcessCreateRunParam.php" method="POST" style="margin-left:2em;">
+        <h1>Add new run :</h1>
+        <form action="ProcessCreateShift.php" method="POST" style="margin-left:2em;">
             <table cellpadding="3"  border="0" >
                 <thead style="color:#0071bc;">
                     <th align="right">
@@ -28,14 +28,15 @@ The page for creating a new run summary parameter.
                     <tr>
                         <td><hr></td>
                         <td><hr></td>
-                        <td><hr></td></tr>
+                        <td><hr></td>
+                    </tr>
                     <tr>
                         <td align="right" style="width:6em;">
-                            &nbsp;<b>Parameter</b>&nbsp;</td>
+                            &nbsp;<b>Leader</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="32" type="text" name="param" value=" <enter name here>" />&nbsp;</td>
+                            &nbsp;<input align="left" size="16" type="text" name="leader" value=" <enter>" />&nbsp;</td>
                         <td>
-                            &nbsp;Max. Len. 255</td>
+                            &nbsp;UNIX account name</td>
                     </tr>
                     <tr>
                         <td align="right" style="width:6em;">
@@ -57,23 +58,19 @@ The page for creating a new run summary parameter.
                             &nbsp;</td>
                     <tr>
                         <td align="right">
-                            &nbsp;<b>Type</b>&nbsp;</td>
+                            &nbsp;<b>Begin Time</b>&nbsp;</td>
                         <td>
-                            &nbsp;<select align="center" type="text" name="type" >
-                            <option>INT</option>
-                            <option>DOUBLE</option>
-                            <option>TEXT</option>
-                            </select>&nbsp;
+                            &nbsp;<input align="left" size="32" type="text" name="begin_time" value="<?php echo ' '.$now_str; ?>" />&nbsp;</td>
                         <td>
-                            &nbsp;</td>
+                            &nbsp;YYYY-MM-DD hh:mm:ss-zzzz</td>
                     </tr>
                     <tr>
                         <td align="right">
-                            &nbsp;<b>Description</b>&nbsp;</td>
+                            &nbsp;<b>End Time</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="48" type="text" name="descr" value=" <parameter description>" />&nbsp;</td>
+                            &nbsp;<input align="left" size="32" type="text" name="end_time" value=" <unknown>" />&nbsp;</td>
                         <td>
-                            &nbsp;[optional] </td>
+                            &nbsp;YYYY-MM-DD hh:mm:ss-zzzz [optional] </td>
                     </tr>
                 </tbody>
             </table>

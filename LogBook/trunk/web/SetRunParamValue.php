@@ -5,16 +5,11 @@ The page for creating a new run summary parameter.
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Create new run parameter</title>
+        <title>Set a value of run parameter</title>
     </head>
     <body>
-        <?php
-        $now = new DateTime();
-        $now_str = $now->format(DateTime::ISO8601);
-        $now_str[10] = ' ';  // get rid of date-time separator 'T'
-        ?>
-        <h1>Create new run parameter :</h1>
-        <form action="ProcessCreateRunParam.php" method="POST" style="margin-left:2em;">
+        <h1>Set run parameter value :</h1>
+        <form action="ProcessSetRunParamValue.php" method="POST" style="margin-left:2em;">
             <table cellpadding="3"  border="0" >
                 <thead style="color:#0071bc;">
                     <th align="right">
@@ -56,27 +51,33 @@ The page for creating a new run summary parameter.
                         <td>
                             &nbsp;</td>
                     <tr>
-                        <td align="right">
-                            &nbsp;<b>Type</b>&nbsp;</td>
+                        <td align="right" style="width:6em;">
+                            &nbsp;<b>Number</b>&nbsp;</td>
                         <td>
-                            &nbsp;<select align="center" type="text" name="type" >
-                            <option>INT</option>
-                            <option>DOUBLE</option>
-                            <option>TEXT</option>
-                            </select>&nbsp;
+                            &nbsp;<input align="left" size="16" type="text" name="num" value=" <last run>" />&nbsp;</td>
+                        <td>
+                            &nbsp;1,2,3... [or leave default]</td>
+                    </tr>
+                    <tr>
+                        <td align="right" style="width:6em;">
+                            &nbsp;<b>Source</b>&nbsp;</td>
+                        <td>
+                            &nbsp;<input align="left" size="16" type="text" name="source" value=" WebAppTest" />&nbsp;</td>
                         <td>
                             &nbsp;</td>
                     </tr>
                     <tr>
                         <td align="right">
-                            &nbsp;<b>Description</b>&nbsp;</td>
+                            &nbsp;<b>Value</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="48" type="text" name="descr" value=" <parameter description>" />&nbsp;</td>
+                            &nbsp;<input align="left" size="48" type="text" name="value" value=" <enter value here>" />&nbsp;</td>
                         <td>
-                            &nbsp;[optional] </td>
+                            &nbsp;</td>
                     </tr>
                 </tbody>
             </table>
+            <br>
+            <b>Update of the value is allowed:</b>&nbsp;<input type="checkbox" name="update_allowed" value="ON" />
             <br>
             <br>
             <input type="submit" value="Submit" name="submit_button" /><br>

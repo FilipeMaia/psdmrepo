@@ -28,7 +28,8 @@ The page for creating a new run.
                     <tr>
                         <td><hr></td>
                         <td><hr></td>
-                        <td><hr></td></tr>
+                        <td><hr></td>
+                    </tr>
                     <tr>
                         <td align="right" style="width:6em;">
                             &nbsp;<b>Number</b>&nbsp;</td>

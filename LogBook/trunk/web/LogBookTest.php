@@ -10,16 +10,18 @@ require_once('LogBook.inc.php');
 class Table {
     private $cols;
     private $keys;
-    public function __construct($cols, $keys) {
+    private $class;
+    public function __construct( $cols, $keys, $class ) {
         if(count($cols) != count($keys))
             die("illegal parameters to the contsructor");
         $this->cols = $cols;
         $this->keys = $keys;
+        $this->class = $class;
     }
 
     public function begin() {
         echo <<<HERE
-<table cellpadding="3"  border="0" class="table">
+<table cellpadding="3"  border="0" class="$this->class">
     <thead style="color:#0071bc;">
 HERE;
         foreach($this->cols as $c)
@@ -66,7 +68,11 @@ HERE;
     /*
      * Display a complete table instance from the input array
      */
-    public function show($list) {
+    public function show( $list, $title=null ) {
+        if( !is_null($title))
+            echo <<<HERE
+$title
+HERE;
         $this->begin();
         foreach( $list as $e )
             $this->row($e->attr);
@@ -78,23 +84,28 @@ HERE;
  */
 $table_experiments = new Table(
     array("Id", "Name", "Begin Time", "End Time"),
-    array("id", "name", "begin_time", "end_time"));
+    array("id", "name", "begin_time", "end_time"),
+    'table_2' );
 
 $table_shifts = new Table(
     array("Experiment Id", "Begin Time", "End Time", "Shift Leader"),
-    array("exper_id",      "begin_time", "end_time", "leader"));
+    array("exper_id",      "begin_time", "end_time", "leader"),
+    'table_4' );
 
 $table_run_params = new Table(
     array("Id", "Name",  "Experiment Id", "Type", "Description"),
-    array("id", "param", "exper_id",      "type", "descr"));
+    array("id", "param", "exper_id",      "type", "descr"),
+    'table_4' );
 
 $table_runs = new Table(
     array("Id", "Number",  "Experiment Id", "Begin Time", "End Time"),
-    array("id", "num",     "exper_id",      "begin_time", "end_time"));
+    array("id", "num",     "exper_id",      "begin_time", "end_time"),
+    'table_4' );
 
 $table_param_values = new Table(
     array("Run Id", "Param Id",  "Source", "Updated", "Value"),
-    array("run_id", "param_id",  "source", "updated", "val"));
+    array("run_id", "param_id",  "source", "updated", "val"),
+    'table_6' );
 
 /* Make database connection
  */
@@ -122,8 +133,17 @@ The page for creating a new run.
     h2 {
         margin-left:2em;
     }
-    .table {
-        margin-left:3em;
+    h3 {
+        margin-left:4em;
+    }
+    .table_2 {
+        margin-left:2em;
+    }
+    .table_4 {
+        margin-left:4em;
+    }
+    .table_6 {
+        margin-left:6em;
     }
     </style>
     <body>
@@ -179,14 +199,17 @@ The page for creating a new run.
         ?>
 
         <!------------------------------>
-        <h1>Values of run parameters for an experiment : run</h1>
-        <h2>H2O : 1</h2>
+        <h1>Values of run parameters for all runs of an experiment</h1>
+        <h2>H2O</h2>
         <?php
         $experiment = $logbook->find_experiment_by_name('H2O');
         if( isset( $experiment )) {
-            $run = $experiment->find_run_by_num(1);
-            if( isset( $run ))
-                $table_param_values->show( $run->values());
+            $runs = $experiment->runs();
+            foreach( $runs as $run ) {
+                $table_param_values->show(
+                    $run->values(),
+                    '<h3>Run: '.$run->attr['num'].'</h3>' );
+            }
         }
         ?>
     </body>

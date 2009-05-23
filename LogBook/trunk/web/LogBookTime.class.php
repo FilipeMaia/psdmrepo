@@ -11,6 +11,9 @@ class LogBookTime {
     public $sec;
     public $nsec;
 
+    public static function now() {
+        return new LogBookTime( mktime());
+    }
     /*
      * Parse an input string into an object of the class.
      *
@@ -58,7 +61,7 @@ class LogBookTime {
         return new LogBookTime($gmt_time,$nsec);
     }
 
-    public function __construct($sec, $nsec) {
+    public function __construct($sec, $nsec=0) {
         if( $nsec < 0 or $nsec > 999999999)
             die( "the number of nanoseconds isn't in allowed range" );
         $this->sec = $sec;
