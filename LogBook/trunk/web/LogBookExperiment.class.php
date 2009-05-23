@@ -22,17 +22,50 @@ class LogBookExperiment {
         return $list;
     }
     public function create_shift( $leader, $begin_time, $end_time=null ) {
+
+        /* TODO: Make sure the shift interval is contained within the one
+         *       of the experiment.
+         */
+        ;
+
+        /* Get the last/current shift (if any). We want to make sure that
+         * the new one begins afterward. Also, if the current shift
+         * is open-ended then we want to get it closed where the new
+         * one begins.
+         */
+        $last_shift = $this->find_last_shift();
+        if( is_null( $last_shift->attr['end_time'])) {
+            $last_shift = $this->close_shift(
+                $last_shift->attr['begin_time'],
+                $begin_time)
+            or die( "failed to close the current shift");
+        }
         $sql = 'INSERT INTO "shift" VALUES('.$this->attr['id']
-            .",".$begin_time->to64()
-            .",".($end_time==null?'NULL':$end_time->to64())
+            .",".LogBookTime::to64from($begin_time)
+            .",".($end_time==null?'NULL':LogBookTime::to64from($end_time))
             .",'".$leader."')";
         echo $sql."\n";
         $result = $this->connection->query( $sql )
             or die ("failed to create new shift: ".mysql_error());
         return $this->find_shift_by_begin_time($begin_time);
     }
+    public function close_shift( $begin_time, $end_time ) {
+        $sql = 'UPDATE "shift" SET end_time='.LogBookTime::to64from($end_time).
+            ' WHERE exper_id='.$this->attr['id'].
+            ' AND begin_time='.LogBookTime::to64from($begin_time);
+        echo $sql."\n";
+        $result = $this->connection->query( $sql )
+            or die ("failed to close the shift: ".mysql_error());
+        return $this->find_shift_by_begin_time($begin_time);
+    }
     public function find_shift_by_begin_time( $begin_time ) {
-        return $this->find_shift_by_( "begin_time=".$begin_time) ;
+        return $this->find_shift_by_( "begin_time=".LogBookTime::to64from($begin_time)) ;
+    }
+    public function find_shift_at( $time ) {
+        return $this->find_shift_by_( 'begin_time <= '.$time.' AND '.$time.'< end_time') ;
+    }
+    public function find_last_shift() {
+        return $this->find_shift_by_( 'begin_time=(SELECT MAX(begin_time) FROM "shift")' ) ;
     }
     private function find_shift_by_( $condition=null ) {
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
@@ -105,8 +138,8 @@ class LogBookExperiment {
         $run_num = $num > 0 ? $num : $this->allocate_run($num);
         $sql = 'INSERT INTO "run" VALUES(NULL,'.$run_num
             .",".$this->attr['id']
-            .",".$begin_time->to64()
-            .",".($end_time==null?'NULL':$end_time->to64()).")";
+            .",".LogBookTime::to64from($begin_time)
+            .",".($end_time==null?'NULL':LogBookTime::to64from($end_time)).")";
         echo $sql."\n";
         $result = $this->connection->query( $sql )
             or die ("failed to create new run: ".mysql_error());

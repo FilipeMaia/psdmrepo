@@ -80,16 +80,18 @@ class LogBookTime {
      */
     public function to64() {
         return sprintf("%010d%09d", $this->sec, $this->nsec);
-        /*
-        return
-            gmp_strval(
-                gmp_add(
-                    gmp_mul(
-                        "1000000000",
-                        $this->sec ),
-                    gmp_init( $this->nsec )));
-         */
     }
+
+    /* Produce a packed timestamp from an input value regardless whether
+     * it's an object of the current class or it's already a packed
+     * representation (64-bit number).
+     */
+    public static function to64from($time) {
+        if(is_object($time)) return $time->to64();
+        return $time;
+    }
+
+
 }
 /*
 echo "here follows a simple unit test for the class.\n";
