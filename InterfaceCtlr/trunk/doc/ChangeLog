@@ -19,4 +19,15 @@ Tag: V00-01-01
 2009-05-07 Robert C. Sass
 - Replace MySQL workbench file and add generated .sql file to create database.
 
+Tag: V00-01-02
+2009-05-20 Robert C. Sass
+- Replace MySQL workbench file and add generated .sql file to create database.
+
+Tag: V00-01-03
+2009-05-25 Robert C. Sass
+- Relace MySQL workbench file and add generated CreateIDB-25-May-2009.sql file 
+to create database. Update all test sql scripts. Basic functionality of all
+store procedures tested. Can't get dynamic SQL to work in a stored procedure
+so test_get_def_id.sql is just a shell.
+
 
