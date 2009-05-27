@@ -7,13 +7,8 @@ require_once('LogBook.inc.php');
  * in the database.
  */
 
-print_r($_POST);
-
-$host     = "localhost";
-$user     = "gapon";
-$password = "";
-$database = "logbook";
-
+/* Extract input parameters
+ */
 if(isset($_POST['leader']))
     $leader = $_POST['leader'];
 else
@@ -24,28 +19,34 @@ if(isset($_POST['experiment_name']))
 else
     die( "no valid experiment name" );
 
+$begin_time = null;
 if(isset($_POST['begin_time'])) {
-    $begin_time = LogBookTime::parse($_POST['begin_time']);
+    $begin_time = LogBookTime::parse( trim( $_POST['begin_time'] ));
     if(is_null($begin_time))
         die("begin time has invalid format");
 } else
     die( "no begin time for run" );
 
 if(isset($_POST['end_time'])) {
-    $end_time = $_POST['end_time'];
-    if($end_time=='')
+    $end_time_str = trim( $_POST['end_time'] );
+    if( 0 == strcmp( $end_time_str, '' )) {
         $end_time=null;
-    else {
-        $end_time = LogBookTime::parse($_POST['end_time']);
+    } else {
+        $end_time = LogBookTime::parse($end_time_str);
         if(is_null($end_time))
             die("end time has invalid format");
     }
 } else
     die( "no end time for run" );
 
-$logbook = new LogBook( $host, $user, $password, $database );
+/* Make database connection using default connection
+ * parameters.
+ */
+$logbook = new LogBook();
+
 $experiment = $logbook->find_experiment_by_name( $experiment_name )
     or die("failed to find the experiment" );
+
 $run = $experiment->create_shift( $leader, $begin_time, $end_time )
     or die("failed to create the shift" );
 ?>

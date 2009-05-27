@@ -1,14 +1,48 @@
 <?php
 class LogBookRun {
+
+    /* Data members
+     */
     private $connection;
     private $experiment;
-    public function parent() { return $this->experiment; }
+
     public $attr;
+
+    /* Constructor
+     */
     public function __construct( $connection, $experiment, $attr ) {
         $this->connection = $connection;
         $this->experiment = $experiment;
         $this->attr = $attr;
     }
+
+    /* Accessors
+     */
+    public function parent() {
+        return $this->experiment; }
+
+    public function id() {
+        return $this->attr['id']; }
+
+    public function num() {
+        return $this->attr['num']; }
+
+    public function exper_id() {
+        return $this->attr['exper_id']; }
+
+    public function begin_time() {
+        return LogBookTime::from64( $this->attr['begin_time'] ); }
+
+    public function end_time() {
+        if( is_null( $this->attr['end_time'] )) return null;
+        return LogBookTime::from64( $this->attr['end_time'] ); }
+
+    public function in_interval( $timestamp ) {
+        return LogBookTime::in_interval(
+            $timestamp,
+            $this->attr['begin_time'],
+            $this->attr['end_time'] ); }
+
     public function values( $condition='' ) {
 
         $list = array();
@@ -51,8 +85,6 @@ class LogBookRun {
          */
         $param = $this->experiment->find_run_param_by_name( $param )
             or die( "failed to find the parameter");
-
-        print_r($param->attr);
 
         $param_id = $param->attr['id'];
         $type     = $param->attr['type'];
@@ -117,6 +149,31 @@ class LogBookRun {
             $this->connection,
             $this,
             mysql_fetch_array( $result, MYSQL_ASSOC ));
+    }
+
+    /* Close the open-ended run
+     */
+    public function close( $end_time ) {
+
+        /* Verify the value of the parameter
+         */
+        if( is_null( $end_time ))
+            die( "end time can't be null");
+        if( 0 != $this->experiment->in_interval( $end_time ))
+            die( "incorrect end time - it falls off the experiment's intervall" );
+
+        /* Make the update
+         */
+        $end_time_64 = LogBookTime::to64from( $end_time );
+        $this->connection->query(
+            'UPDATE "run" SET end_time='.$end_time_64.
+            ' WHERE exper_id='.$this->exper_id().' AND num='.$this->attr['num'] )
+            or die ("failed to close the run: ".mysql_error());
+
+        /* Update the current state of the object
+         */
+        $this->attr['end_time'] = $end_time_64;
+        return true;
     }
 }
 ?>

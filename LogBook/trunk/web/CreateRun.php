@@ -34,9 +34,9 @@ The page for creating a new run.
                         <td align="right" style="width:6em;">
                             &nbsp;<b>Number</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="16" type="text" name="num" value=" <autogenerate>" />&nbsp;</td>
+                            &nbsp;<input align="left" size="16" type="text" name="num" value="" />&nbsp;</td>
                         <td>
-                            &nbsp;1,2,3... [or leave default to autogenerate]</td>
+                            &nbsp;1,2,3... [or leave blank to autogenerate]</td>
                     </tr>
                     <tr>
                         <td align="right" style="width:6em;">
@@ -68,7 +68,7 @@ The page for creating a new run.
                         <td align="right">
                             &nbsp;<b>End Time</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="32" type="text" name="end_time" value=" <unknown>" />&nbsp;</td>
+                            &nbsp;<input align="left" size="32" type="text" name="end_time" value="" />&nbsp;</td>
                         <td>
                             &nbsp;YYYY-MM-DD hh:mm:ss-zzzz [optional] </td>
                     </tr>

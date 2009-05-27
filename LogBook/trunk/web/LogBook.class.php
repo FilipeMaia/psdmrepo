@@ -1,48 +1,57 @@
 <?php
 class LogBook {
+
+    /* Data members
+     */
     private $connection;
-    private $host;
-    private $user;
-    private $password;
-    private $database;
-    public function __construct($host, $user, $password, $database) {
+
+    /* Construct the top-level API object using the specified connection
+     * parameters. Put null to envorce default values of parameters.
+     */
+    public function __construct (
+        $host     = null,
+        $user     = null,
+        $password = null,
+        $database = null ) {
         $this->connection =
-            new LogBookConnection(
-                $host, $user, $password, $database );
+            new LogBookConnection (
+                is_null($host)     ? LOGBOOK_DEFAULT_HOST : $host,
+                is_null($user)     ? LOGBOOK_DEFAULT_USER : $user,
+                is_null($password) ? LOGBOOK_DEFAULT_PASSWORD : $password,
+                is_null($database) ? LOGBOOK_DEFAULT_DATABASE : $database);
     }
-    public function experiments($condition='') {
+    public function experiments ( $condition = '' ) {
         $list = array();
         $result = $this->connection->query( 'SELECT * FROM "experiment" '.$condition );
         $nrows = mysql_numrows( $result );
         for( $i=0; $i<$nrows; $i++ ) {
             array_push(
                 $list,
-                new LogBookExperiment(
+                new LogBookExperiment (
                     $this->connection,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
         return $list;
     }
-    public function find_experiment_by_id( $id ) {
+    public function find_experiment_by_id ( $id ) {
         return $this->find_experiment_by_( 'id='.$id) ;
     }
-    public function find_experiment_by_name( $name ) {
+    public function find_experiment_by_name ( $name ) {
         return $this->find_experiment_by_( "name='".$name."'") ;
     }
-    private function find_experiment_by_( $condition ) {
+    private function find_experiment_by_ ( $condition ) {
         $result = $this->connection->query( 'SELECT * FROM "experiment" WHERE '.$condition );
         $nrows = mysql_numrows( $result );
         if( $nrows == 1 )
             return new LogBookExperiment(
                 $this->connection,
                 mysql_fetch_array( $result, MYSQL_ASSOC ));
-        return NULL;
+        return null;
     }
-    public function create_experiment( $name, $begin_time, $end_time=null ) {
+    public function create_experiment ( $name, $begin_time, $end_time=null ) {
         $sql = "INSERT INTO experiment VALUES(NULL,'".$name
             ."',".$begin_time->to64()
             .",".($end_time==null?'NULL':$end_time->to64()).")";
-        echo $sql."\n";
         $result = $this->connection->query( $sql )
             or die ("failed to create new experiment: ".mysql_error());
         return $this->find_experiment_by_id('(SELECT LAST_INSERT_ID())');

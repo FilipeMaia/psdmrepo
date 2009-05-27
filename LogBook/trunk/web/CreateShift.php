@@ -13,7 +13,7 @@ The page for creating a new shift.
         $now_str = $now->format(DateTime::ISO8601);
         $now_str[10] = ' ';  // get rid of date-time separator 'T'
         ?>
-        <h1>Add new run :</h1>
+        <h1>Add new shift :</h1>
         <form action="ProcessCreateShift.php" method="POST" style="margin-left:2em;">
             <table cellpadding="3"  border="0" >
                 <thead style="color:#0071bc;">
@@ -34,7 +34,7 @@ The page for creating a new shift.
                         <td align="right" style="width:6em;">
                             &nbsp;<b>Leader</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="16" type="text" name="leader" value=" <enter>" />&nbsp;</td>
+                            &nbsp;<input align="left" size="16" type="text" name="leader" value="" />&nbsp;</td>
                         <td>
                             &nbsp;UNIX account name</td>
                     </tr>
@@ -68,7 +68,7 @@ The page for creating a new shift.
                         <td align="right">
                             &nbsp;<b>End Time</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="32" type="text" name="end_time" value=" <unknown>" />&nbsp;</td>
+                            &nbsp;<input align="left" size="32" type="text" name="end_time" value="" />&nbsp;</td>
                         <td>
                             &nbsp;YYYY-MM-DD hh:mm:ss-zzzz [optional] </td>
                     </tr>

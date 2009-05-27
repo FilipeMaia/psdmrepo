@@ -1,0 +1,34 @@
+/* 
+    Document   : LogBookTest.css
+    Created on : May 27, 2009, 1:20:30 PM
+    Author     : gapon
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+root { 
+    display: block;
+}
+h1 {
+    margin-left:1em;
+}
+h2 {
+    margin-left:2em;
+}
+h3 {
+    margin-left:4em;
+}
+.table_2 {
+    margin-left:2em;
+}
+.table_4 {
+    margin-left:4em;
+}
+.table_6 {
+    margin-left:6em;
+}

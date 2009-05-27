@@ -15,4 +15,32 @@ would stop the last run and begin the new one.
 - write Python API for a subset of operations (start/stop run, set/update a value
 of a run parameter).
 
+On the PHP API:
+
+- reinforce all methods dealing with 64 timestamp to use the "sanitizer"
+operation:
+
+    LogBookTime::to64from( timestamp_64_or_LogBookTime_object )
+
+- reinforce all methods dealing with timestamp to make sure that
+timestamps and intervals fall into the corresponding intervals of
+the higher context (experiment, run, etc.)
+
+- add operations for closing experiments and runs
+
+- implement operations for dealing with free-form entries. Add the corresponding
+(plain vanilla HTML + PHP) Web pages to test those operations.
+
+============== HAVE THIS STUFF READY BY MONDAY ========================
+
+In addition to that:
+
+- think about how to implement the "search_entry(parameters...)" operations
+in a way which would be not depending on using MySQL SQL directly in
+parameters of the method. Think about setting limits on parameters, for
+example.
+
+- design the "Search Form". Discuss it with Rahul.
+
+
 

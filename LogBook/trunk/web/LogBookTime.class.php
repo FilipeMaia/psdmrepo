@@ -28,13 +28,13 @@ class LogBookTime {
      * of nanoseconds (if not empty) must be in the range of 0..999999999.
      *
      * The method will return an object of the class or it will
-     * return FALSE in case of any error.
+     * return null in case of any error.
      */
     public static function parse($str) {
 
         $expr = '/(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.(\d{1,9}))?(([-+])(\d{2}):?(\d{2})?)/';
         if( !preg_match( $expr, $str, $matches2 ))
-            return FALSE;
+            return null;
 
         //print_r($matches2);
 
@@ -47,7 +47,7 @@ class LogBookTime {
 
         $local_time = strtotime( $str );
         if( !$local_time )
-            return FALSE;
+            return null;
 
         $gmt_time = ($local_time+$shift);
 
@@ -69,7 +69,8 @@ class LogBookTime {
     }
 
     public function __toString() {
-        return sprintf("%010d.%09d", $this->sec, $this->nsec );
+        //return sprintf("%010d.%09d", $this->sec, $this->nsec );
+        return gmdate("Y-m-d h:i:s", $this->sec).sprintf(".%09u", $this->nsec)."-0000";
     }
 
     /* Convert the tuple into a packed representation of a 64-bit
@@ -86,15 +87,110 @@ class LogBookTime {
      * it's an object of the current class or it's already a packed
      * representation (64-bit number).
      */
-    public static function to64from($time) {
+    public static function to64from( $time ) {
         if(is_object($time)) return $time->to64();
         return $time;
     }
 
+    /* Create an object of the current class out of a packed 64-bit
+     * numeric representation.
+     *
+     * NOTE: the "numeric" representation is actually a string.
+     */
+    public static function from64( $packed ) {
+        $sec = 0;
+        $nsec = 0;
+        $len = strlen( $packed );
+        if( $len <= 9 ) {
+            if( 1 != sscanf( $packed, "%ud", $nsec ))
+                die( "failed to translate nanoseconds" );
+        } else {
+            if( 1 != sscanf( substr( $packed, 0, $len - 9), "%ud", $sec ))
+                die( "failed to translate seconds" );
+            if( 1 != sscanf( substr( $packed, -9 ), "%ud", $nsec ))
+                die( "failed to translate nanoseconds" );
+        }
+        return new LogBookTime( $sec, $nsec );
+    }
 
+    /* Check if the input timestamp falls into the specified interval.
+     * The method will return the following values:
+     * 
+     *    < 0  - the timestamp falls before the begin time of the interval
+     *    = 0  - the timestamp is within the interval
+     *    > 0  - the timestamp is at or beyon the end time of the interval
+     * 
+     * The method will "die" (or throw an exception) if either of the timestamp
+     * is not valid, or if the end time of the interval is before its begin time.
+     * The only exception is the end time, which is allowed to be the null
+     * object for open-ended intervals. 
+     */
+    public static function in_interval( $at, $begin, $end ) {
+        if( is_null( $at ) || is_null( $begin ))
+            die( "timestamps can't be null" );
+        $at_obj    = (is_object( $at )    ? $at    : LogBookTime::from64( $at ));
+        $begin_obj = (is_object( $begin ) ? $begin : LogBookTime::from64( $begin ));
+        $end_obj = $end;
+        /*
+        print( "<br>LogBookTime::in_interval() at:    ".$at_obj );
+        print( "<br>LogBookTime::in_interval() begin: ".$begin_obj );
+        print( "<br>LogBookTime::in_interval() end:   ".$end_obj."<br>" );
+         *
+         */
+        if( !is_null( $end ) AND !is_object( $end )) $end_obj = LogBookTime::from64( $end );
+        if( $at_obj->less( $begin_obj )) return -1;
+        if( is_null( $end_obj ) OR $at_obj->less( $end_obj )) return 0;
+        return 1;
+    }
+
+    /* Compare the current object with the one given in the parameter.
+     * Return TRUE if the current object is STRICTLY less than the given one.
+     */
+    public function less( $rhs ) {
+        return ( $this->sec < $rhs->sec ) ||
+               (( $this->sec == $rhs->sec ) && ($this->nsec < $rhs->nsec));
+    }
+
+    /* Compare the current object with the one given in the parameter.
+     * Return TRUE if the current object is equal to the given one.
+     */
+    public function equal( $rhs ) {
+        return ( $this->sec == $rhs->sec ) && ($this->nsec == $rhs->nsec);
+    }
 }
 /*
 echo "here follows a simple unit test for the class.\n";
+
+$t64 = "1242812928000000000";
+$r = LogBookTime::from64($t64);
+//$r = LogBookTime::now();
+
+print("<br>input:       ".$t64);
+print("<br>result:      ".$r);
+print("<br>result.sec:  ".$r->sec);
+print("<br>result.nsec: ".$r->nsec);
+
+$t1 = new LogBookTime(1);
+$t2 = new LogBookTime(2);
+$t3 = new LogBookTime(3);
+
+print( "<br>1 in [2,3)    : ".LogBookTime::in_interval($t1, $t2, $t3)."\n" );
+print( "<br>2 in [2,3)    : ".LogBookTime::in_interval($t2, $t2, $t3)."\n" );
+print( "<br>3 in [2,3)    : ".LogBookTime::in_interval($t3, $t2, $t3)."\n" );
+print( "<br>3 in [2,null) : ".LogBookTime::in_interval($t3, $t2, null)."\n" );
+
+$t_1_2 = new LogBookTime(1,2);
+$t_1_3 = new LogBookTime(1,3);
+$t_2_2 = new LogBookTime(2,2);
+
+print( "<br>1.2 <  1.3 : ".$t_1_2->less($t_1_3)."\n" );
+print( "<br>!(1.3 <  1.2) : ".!$t_1_3->less($t_1_2)."\n" );
+print( "<br>1.2 <  2.2 : ".$t_1_2->less($t_2_2)."\n" );
+print( "<br>1.2 == 1.2 : ".$t_1_2->equal($t_1_2)."\n" );
+
+$packed = '099999999';
+print( "  Packed:     ".$packed."\n" );
+print( "  Translated: ".LogBookTime::from64( $packed )."\n" );
 
 $str = "2009-05-19 17:59:49.123-0700";
 

@@ -7,7 +7,7 @@ require_once('LogBook.inc.php');
  * parameter in the database.
  */
 
-print_r($_POST);
+//print_r($_POST);
 
 $host     = "localhost";
 $user     = "gapon";
@@ -37,6 +37,6 @@ else
 $logbook = new LogBook( $host, $user, $password, $database );
 $experiment = $logbook->find_experiment_by_name( $experiment_name )
     or die("failed to find the experiment" );
-$run = $experiment->create_run_param($param, $type, $descr)
+$param = $experiment->create_run_param($param, $type, $descr)
     or die("failed to create the run parameter" );
 ?>
