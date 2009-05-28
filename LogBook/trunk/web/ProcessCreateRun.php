@@ -6,9 +6,6 @@ require_once('LogBook.inc.php');
  * This script will process a request for creating a new run
  * in the database.
  */
-
-//print_r($_POST);
-
 if(isset($_POST['num']))
     $num = $_POST['num'];
 else
@@ -38,9 +35,13 @@ if(isset($_POST['end_time'])) {
 } else
     die( "no end time for run" );
 
+/* Proceed to the operation
+ */
 $logbook = new LogBook();
+
 $experiment = $logbook->find_experiment_by_name( $experiment_name )
     or die("failed to find the experiment" );
+
 $run = $experiment->create_run( $num, $begin_time, $end_time )
     or die("failed to create the run" );
 ?>

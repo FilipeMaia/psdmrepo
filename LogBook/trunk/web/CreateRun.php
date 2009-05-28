@@ -44,11 +44,7 @@ The page for creating a new run.
                         <td>
                             &nbsp;<select align="center" type="text" name="experiment_name" ><?php
                             require_once('LogBook.inc.php');
-                            $host     = "localhost";
-                            $user     = "gapon";
-                            $password = "";
-                            $database = "logbook";
-                            $logbook = new LogBook( $host, $user, $password, $database );
+                            $logbook = new LogBook();
                             $experiments = $logbook->experiments()
                                 or die("failed to find experiments" );
                             foreach( $experiments as $e)
@@ -56,6 +52,7 @@ The page for creating a new run.
                             ?></select>&nbsp;
                         <td>
                             &nbsp;</td>
+                    </tr>
                     <tr>
                         <td align="right">
                             &nbsp;<b>Begin Time</b>&nbsp;</td>

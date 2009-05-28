@@ -6,14 +6,6 @@ require_once('LogBook.inc.php');
  * This script will process a request for creating a new run
  * in the database.
  */
-
-print_r($_POST);
-
-$host     = "localhost";
-$user     = "gapon";
-$password = "";
-$database = "logbook";
-
 if(isset($_POST['param']))
     $param = $_POST['param'];
 else
@@ -30,7 +22,6 @@ if(isset($_POST['num'])) {
  } else {
      die( "no run number" );
  }
- print("num='".$num."'\n");
 
 if(isset($_POST['source']))
     $source = $_POST['source'];
@@ -44,8 +35,10 @@ else
 
 $update_allowed =isset($_POST['update_allowed']);
 
+/* Proceed with the operation
+ */
+$logbook = new LogBook();
 
-$logbook = new LogBook( $host, $user, $password, $database );
 $experiment = $logbook->find_experiment_by_name( $experiment_name )
     or die("failed to find the experiment" );
 
@@ -62,3 +55,23 @@ if( $num < 0) {
 $run->set_param_value( $param, $value, $source, LogBookTime::now(), $update_allowed )
     or die("failed to set a value of the run parameter" );
 ?>
+<!--
+The page for reporting the information about all summary parameters of the run.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Run parameters</title>
+    </head>
+    <link rel="stylesheet" type="text/css" href="LogBookTest.css" />
+    <body>
+        <!------------------------------>
+        <h1>Values of run parameters</h1>
+        <h2><?php echo $experiment->name(); ?></h2>
+        <h3><?php echo $run->num(); ?></h2>
+        <?php
+        LogBookTestTable::RunVal()->show( $run->values());
+        ?>
+    </body>
+</html>

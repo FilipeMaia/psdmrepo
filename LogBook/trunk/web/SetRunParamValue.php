@@ -28,7 +28,7 @@ The page for creating a new run summary parameter.
                         <td align="right" style="width:6em;">
                             &nbsp;<b>Parameter</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="32" type="text" name="param" value=" <enter name here>" />&nbsp;</td>
+                            &nbsp;<input align="left" size="32" type="text" name="param" value="" />&nbsp;</td>
                         <td>
                             &nbsp;Max. Len. 255</td>
                     </tr>
@@ -38,11 +38,7 @@ The page for creating a new run summary parameter.
                         <td>
                             &nbsp;<select align="center" type="text" name="experiment_name" ><?php
                             require_once('LogBook.inc.php');
-                            $host     = "localhost";
-                            $user     = "gapon";
-                            $password = "";
-                            $database = "logbook";
-                            $logbook = new LogBook( $host, $user, $password, $database );
+                            $logbook = new LogBook();
                             $experiments = $logbook->experiments()
                                 or die("failed to find experiments" );
                             foreach( $experiments as $e)
@@ -52,17 +48,17 @@ The page for creating a new run summary parameter.
                             &nbsp;</td>
                     <tr>
                         <td align="right" style="width:6em;">
-                            &nbsp;<b>Number</b>&nbsp;</td>
+                            &nbsp;<b>Run</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="16" type="text" name="num" value=" <last run>" />&nbsp;</td>
+                            &nbsp;<input align="left" size="16" type="text" name="num" value="" />&nbsp;</td>
                         <td>
-                            &nbsp;1,2,3... [or leave default]</td>
+                            &nbsp;1,2,3... [or leave default to increment last run]</td>
                     </tr>
                     <tr>
                         <td align="right" style="width:6em;">
                             &nbsp;<b>Source</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="16" type="text" name="source" value=" WebAppTest" />&nbsp;</td>
+                            &nbsp;<input align="left" size="16" type="text" name="source" value="WebAppTest" />&nbsp;</td>
                         <td>
                             &nbsp;</td>
                     </tr>
@@ -70,7 +66,7 @@ The page for creating a new run summary parameter.
                         <td align="right">
                             &nbsp;<b>Value</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="48" type="text" name="value" value=" <enter value here>" />&nbsp;</td>
+                            &nbsp;<input align="left" size="48" type="text" name="value" value="" />&nbsp;</td>
                         <td>
                             &nbsp;</td>
                     </tr>

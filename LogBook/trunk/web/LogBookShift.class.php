@@ -12,6 +12,7 @@ class LogBookShift {
      */
     private $connection;
     private $experiment;
+
     public $attr;
 
     /* Constructor
@@ -25,22 +26,24 @@ class LogBookShift {
     /* Accessors
      */
     public function exper_id() {
-        return $this->attr['exper_id'];
-    }
+        return $this->attr['exper_id']; }
+
     public function begin_time() {
-        return LogBookTime::from64( $this->attr['begin_time'] );
-    }
+        return LogBookTime::from64( $this->attr['begin_time'] ); }
+
     public function end_time() {
         if( is_null( $this->attr['end_time'] )) return null;
-        return LogBookTime::from64( $this->attr['end_time'] );
-    }
+        return LogBookTime::from64( $this->attr['end_time'] ); }
+
     public function leader() {
-        return $this->attr['leader'];
-    }
+        return $this->attr['leader']; }
 
     /* Close the open-ended shift
      */
     public function close( $end_time ) {
+
+        if( !is_null($this->attr['end_time']))
+            die( "the shift is already closed" );
 
         /* Verify the value of the parameter
          */

@@ -1,11 +1,12 @@
 <!--
-The page for creating a new run summary parameter.
+To change this template, choose Tools | Templates
+and open the template in the editor.
 -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Create new run parameter</title>
+        <title></title>
     </head>
     <body>
         <?php
@@ -13,8 +14,8 @@ The page for creating a new run summary parameter.
         $now_str = $now->format(DateTime::ISO8601);
         $now_str[10] = ' ';  // get rid of date-time separator 'T'
         ?>
-        <h1>Create new run parameter :</h1>
-        <form action="ProcessCreateRunParam.php" method="POST" style="margin-left:2em;">
+        <h1>Close experiment :</h1>
+        <form action="ProcessCloseExperiment.php" method="POST" style="margin-left:2em;">
             <table cellpadding="3"  border="0" >
                 <thead style="color:#0071bc;">
                     <th align="right">
@@ -28,20 +29,13 @@ The page for creating a new run summary parameter.
                     <tr>
                         <td><hr></td>
                         <td><hr></td>
-                        <td><hr></td></tr>
-                    <tr>
-                        <td align="right" style="width:6em;">
-                            &nbsp;<b>Parameter</b>&nbsp;</td>
-                        <td>
-                            &nbsp;<input align="left" size="32" type="text" name="param" value="" />&nbsp;</td>
-                        <td>
-                            &nbsp;Max. Len. 255</td>
+                        <td><hr></td>
                     </tr>
                     <tr>
                         <td align="right" style="width:6em;">
                             &nbsp;<b>Experiment</b>&nbsp;</td>
                         <td>
-                            &nbsp;<select align="center" type="text" name="experiment_name" ><?php
+                            &nbsp;<select align="center" type="text" name="name" ><?php
                             require_once('LogBook.inc.php');
                             $logbook = new LogBook();
                             $experiments = $logbook->experiments()
@@ -51,25 +45,14 @@ The page for creating a new run summary parameter.
                             ?></select>&nbsp;
                         <td>
                             &nbsp;</td>
-                    <tr>
-                        <td align="right">
-                            &nbsp;<b>Type</b>&nbsp;</td>
-                        <td>
-                            &nbsp;<select align="center" type="text" name="type" >
-                            <option>INT</option>
-                            <option>DOUBLE</option>
-                            <option>TEXT</option>
-                            </select>&nbsp;
-                        <td>
-                            &nbsp;</td>
                     </tr>
                     <tr>
                         <td align="right">
-                            &nbsp;<b>Description</b>&nbsp;</td>
+                            &nbsp;<b>End Time</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="48" type="text" name="descr" value="" />&nbsp;</td>
+                            &nbsp;<input align="left" size="32" type="text" name="end_time" value="<?php echo ' '.$now_str; ?>" />&nbsp;</td>
                         <td>
-                            &nbsp;[optional] </td>
+                            &nbsp;YYYY-MM-DD hh:mm:ss-zzzz</td>
                     </tr>
                 </tbody>
             </table>
@@ -79,4 +62,3 @@ The page for creating a new run summary parameter.
         </form>
     </body>
 </html>
-

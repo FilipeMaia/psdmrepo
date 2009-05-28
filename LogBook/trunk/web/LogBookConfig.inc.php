@@ -1,4 +1,7 @@
 <?php
+
+/* Default connection parameters for MySQL
+ */
 DEFINE( LOGBOOK_DEFAULT_HOST,     "www-lclsdev.slac.stanford.edu" );
 DEFINE( LOGBOOK_DEFAULT_USER,     "gapon" );
 DEFINE( LOGBOOK_DEFAULT_PASSWORD, "" );

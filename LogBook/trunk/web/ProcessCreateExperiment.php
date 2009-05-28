@@ -6,14 +6,6 @@ require_once('LogBook.inc.php');
  * This script will process a request for creating a new experiment
  * in the database.
  */
-
-//print_r($_POST);
-
-$host     = "localhost";
-$user     = "gapon";
-$password = "";
-$database = "logbook";
-
 if(isset($_POST['name']))
     $name = $_POST['name'];
 else
@@ -38,8 +30,28 @@ if(isset($_POST['end_time'])) {
 } else
     die( "no end time for experiment" );
 
-$logbook = new LogBook( $host, $user, $password, $database );
+/* Proceed with the operation
+ */
+$logbook = new LogBook();
+
 $experiment = $logbook->create_experiment($name, $begin_time, $end_time)
     or die("failed to create an experiment");
-print_r($experiment->attr);
 ?>
+<!--
+The page for reporting the information about all registered experiment.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Registered experiments</title>
+    </head>
+    <link rel="stylesheet" type="text/css" href="LogBookTest.css" />
+    <body>
+        <!------------------------------>
+        <h1>Registered experiments</h1>
+        <?php
+        LogBookTestTable::Experiment()->show( $logbook->experiments());
+        ?>
+    </body>
+</html>

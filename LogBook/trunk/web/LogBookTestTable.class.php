@@ -8,20 +8,26 @@ require_once('LogBook.inc.php');
  *   extracting data for table rows.
  */
 class LogBookTestTable {
+
+    /* Data members
+     */
     private $cols;
     private $keys;
-    private $class;
-    public function __construct( $cols, $keys, $class ) {
+    private $css_class;
+
+    /* Constructor
+     */
+    public function __construct( $cols, $keys, $css_class ) {
         if(count($cols) != count($keys))
             die("illegal parameters to the contsructor");
         $this->cols = $cols;
         $this->keys = $keys;
-        $this->class = $class;
+        $this->css_class = $css_class;
     }
 
     public function begin() {
         echo <<<HERE
-<table cellpadding="3"  border="0" class="$this->class">
+<table cellpadding="3"  border="0" class="$this->css_class">
     <thead style="color:#0071bc;">
 HERE;
         foreach($this->cols as $c)
@@ -81,35 +87,35 @@ HERE;
 
     /* Factory methods for predefined tables */
 
-    public static function Experiment($class='table_2') {
+    public static function Experiment($css_class='table_2') {
         return new LogBookTestTable(
             array("Id", "Name", "Begin Time", "End Time"),
             array("id", "name", "begin_time", "end_time"),
-            $class );
+            $css_class );
     }
-    public static function Shift($class='table_4') {
+    public static function Shift($css_class='table_4') {
         return new LogBookTestTable(
             array("Experiment Id", "Begin Time", "End Time", "Shift Leader"),
             array("exper_id",      "begin_time", "end_time", "leader"),
-            $class );
+            $css_class );
     }
-    public static function RunParam($class='table_4') {
+    public static function RunParam($css_class='table_4') {
         return new LogBookTestTable(
             array("Id", "Name",  "Experiment Id", "Type", "Description"),
             array("id", "param", "exper_id",      "type", "descr"),
-            $class );
+            $css_class );
     }
-    public static function Run($class='table_4') {
+    public static function Run($css_class='table_4') {
         return new LogBookTestTable(
             array("Id", "Number",  "Experiment Id", "Begin Time", "End Time"),
             array("id", "num",     "exper_id",      "begin_time", "end_time"),
-            $class );
+            $css_class );
     }
-    public static function RunVal($class='table_6') {
+    public static function RunVal($css_class='table_6') {
         return new LogBookTestTable(
             array("Run Id", "Param Id",  "Source", "Updated", "Value"),
             array("run_id", "param_id",  "source", "updated", "val"),
-            $class );
+            $css_class );
     }
 }
 ?>

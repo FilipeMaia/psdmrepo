@@ -44,11 +44,7 @@ The page for creating a new shift.
                         <td>
                             &nbsp;<select align="center" type="text" name="experiment_name" ><?php
                             require_once('LogBook.inc.php');
-                            $host     = "localhost";
-                            $user     = "gapon";
-                            $password = "";
-                            $database = "logbook";
-                            $logbook = new LogBook( $host, $user, $password, $database );
+                            $logbook = new LogBook();
                             $experiments = $logbook->experiments()
                                 or die("failed to find experiments" );
                             foreach( $experiments as $e)

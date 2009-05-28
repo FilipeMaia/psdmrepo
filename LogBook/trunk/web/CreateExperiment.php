@@ -34,7 +34,7 @@ and open the template in the editor.
                         <td align="right" style="width:6em;">
                             &nbsp;<b>Name</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="48" type="text" name="name" value=" <enter short name>" />&nbsp;</td>
+                            &nbsp;<input align="left" size="48" type="text" name="name" value="" />&nbsp;</td>
                         <td>
                             &nbsp;Max.Len. 255</td>
                     </tr>
@@ -50,7 +50,7 @@ and open the template in the editor.
                         <td align="right">
                             &nbsp;<b>End Time</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="32" type="text" name="end_time" value=" <unknown>" />&nbsp;</td>
+                            &nbsp;<input align="left" size="32" type="text" name="end_time" value="" />&nbsp;</td>
                         <td>
                             &nbsp;YYYY-MM-DD hh:mm:ss-zzzz [optional] </td>
                     </tr>

@@ -77,8 +77,9 @@ class LogBookExperiment {
          * is open-ended then we want to get it closed where the new
          * one begins.
          */
+        $last_shift = $this->find_last_shift();
         if( !is_null( $last_shift )) {
-            if( $last_shift->begin_time()->less( $begin_time ) <= 0 )
+            if( !$last_shift->begin_time()->less( $begin_time ))
                 die( "begin time of new shift falls into the previous run" );
             if( is_null( $last_shift->end_time())) {
                 $last_shift->close( $begin_time )
@@ -197,7 +198,7 @@ class LogBookExperiment {
          */
         $last_run = $this->find_last_run();
         if( !is_null( $last_run )) {
-            if( $last_run->begin_time()->less( $begin_time ) <= 0 )
+            if( !$last_run->begin_time()->less( $begin_time ))
                 die( "begin time of new run falls into the previous run" );
             if( is_null( $last_run->end_time())) {
                 $last_run->close( $begin_time )
@@ -285,6 +286,67 @@ class LogBookExperiment {
             or die ("failed to create new run parameter: ".mysql_error());
 
         return $this->find_run_param_by_id( '(SELECT LAST_INSERT_ID())' );
+    }
+
+    /* Close the open-ended experiment
+     */
+    public function close ( $end_time ) {
+
+        if( !is_null($this->attr['end_time']))
+            die( "the experiment is already closed" );
+
+        /* Verify the value of the parameter
+         */
+        if( is_null( $end_time ))
+            die( "end time can't be null");
+        if( 0 != $this->in_interval( $end_time ))
+            die( "incorrect end time - it falls off the experiment's intervall" );
+
+        /* Check the last run to be sure that it would completelly fall (unless
+         * its' open-ended) into the truncated limits of the experiment. Close
+         * the run at the sam eend tim eas well.
+         */
+        $last_run = $this->find_last_run();
+        if( !is_null( $last_run )) {
+            if( $last_run->begin_time()->greaterOrEqual( $end_time ))
+                die( "experiment end time is at or before the begin timer of the last run" );
+            if( is_null( $last_run->end_time())) {
+                $last_run->close( $end_time )
+                    or die( "failed to close the current run");
+            } else {
+                if( $end_time->less( $last_run->end_time()))
+                    die( "experiment end time is before the end of the last run" );
+            }
+        }
+
+        /* Similar action (as for the last run) must be applied to the last
+         * shift (if any).
+         */
+        $last_shift = $this->find_last_shift();
+        if( !is_null( $last_shift )) {
+            if( $last_shift->begin_time()->greaterOrEqual( $end_time ))
+                die( "experiment end time is at or before the begin timer of the last shift" );
+            if( is_null( $last_shift->end_time())) {
+                $last_shift->close( $end_time )
+                    or die( "failed to close the current shift");
+            } else {
+                if( $end_time->less( $last_shift->end_time()))
+                    die( "experiment end time is before the end of the last shift" );
+            }
+        }
+
+        /* Make the update
+         */
+        $end_time_64 = LogBookTime::to64from( $end_time );
+        $this->connection->query(
+            'UPDATE "experiment" SET end_time='.$end_time_64.
+            ' WHERE id='.$this->id())
+            or die ("failed to close the experiment: ".mysql_error());
+
+        /* Update the current state of the object
+         */
+        $this->attr['end_time'] = $end_time_64;
+        return true;
     }
 }
 ?>

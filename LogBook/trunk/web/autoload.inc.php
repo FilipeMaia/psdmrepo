@@ -41,5 +41,4 @@ function classFolder($className, $sub = "/") {
    $dir->close();
    return false;
 }
-
 ?>

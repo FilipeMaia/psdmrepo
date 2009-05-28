@@ -10,7 +10,7 @@ class LogBookRun {
 
     /* Constructor
      */
-    public function __construct( $connection, $experiment, $attr ) {
+    public function __construct ( $connection, $experiment, $attr ) {
         $this->connection = $connection;
         $this->experiment = $experiment;
         $this->attr = $attr;
@@ -18,32 +18,37 @@ class LogBookRun {
 
     /* Accessors
      */
-    public function parent() {
+    public function parent () {
         return $this->experiment; }
 
-    public function id() {
+    public function id () {
         return $this->attr['id']; }
 
-    public function num() {
+    public function num () {
         return $this->attr['num']; }
 
-    public function exper_id() {
+    public function exper_id () {
         return $this->attr['exper_id']; }
 
-    public function begin_time() {
+    public function begin_time () {
         return LogBookTime::from64( $this->attr['begin_time'] ); }
 
-    public function end_time() {
+    public function end_time () {
         if( is_null( $this->attr['end_time'] )) return null;
         return LogBookTime::from64( $this->attr['end_time'] ); }
 
-    public function in_interval( $timestamp ) {
+    public function in_interval ( $timestamp ) {
         return LogBookTime::in_interval(
             $timestamp,
             $this->attr['begin_time'],
             $this->attr['end_time'] ); }
 
-    public function values( $condition='' ) {
+    /*
+     * =============================
+     *   SUMMARY PARAMETERS VALUES
+     * =============================
+     */
+    public function values ( $condition='' ) {
 
         $list = array();
         $run_id = $this->attr['id'];
@@ -63,6 +68,7 @@ class LogBookRun {
                 ' AND p.param_id='.$param_id.
                 ' AND p.run_id=v.run_id AND p.param_id=v.param_id'.
                 $extra_condition );
+
             $nrows = mysql_numrows( $result );
             for( $i=0; $i<$nrows; $i++ ) {
                 array_push(
@@ -78,7 +84,7 @@ class LogBookRun {
 
     /* Set a value of the specified run parameter
      */
-    public function set_param_value( $param, $value, $source, $updated, $allow_update=false ) {
+    public function set_param_value ( $param, $value, $source, $updated, $allow_update=false ) {
 
         /* Find the parameter and get its identifier and its type.
          * Also prepare the value for the specified SQL type.
@@ -153,7 +159,10 @@ class LogBookRun {
 
     /* Close the open-ended run
      */
-    public function close( $end_time ) {
+    public function close ( $end_time ) {
+
+        if( !is_null($this->attr['end_time']))
+            die( "the run is already closed" );
 
         /* Verify the value of the parameter
          */

@@ -8,14 +8,18 @@
  */
 class LogBookTime {
 
+    /* Data members
+    */
     public $sec;
     public $nsec;
 
+    /* Factory method for getting the current time
+     */
     public static function now() {
-        return new LogBookTime( mktime());
-    }
-    /*
-     * Parse an input string into an object of the class.
+        return new LogBookTime( mktime()); }
+
+    /* Factory method from an input string to be parsed into an object
+     * of the class.
      *
      * Input formats:
      *
@@ -36,14 +40,10 @@ class LogBookTime {
         if( !preg_match( $expr, $str, $matches2 ))
             return null;
 
-        //print_r($matches2);
-
         $sign = $matches2[10];
         $tzone_hours = $matches2[11];
         $tzone_minutes = isset( $matches2[12] ) ? $matches2[12] : 0;
         $shift = ($sign=='-' ? +1 : -1)*(3600*$tzone_hours + 60*$tzone_minutes);
-
-        //print( "TimeZone shift to apply [seconds]: ".$shift."\n" );
 
         $local_time = strtotime( $str );
         if( !$local_time )
@@ -51,16 +51,13 @@ class LogBookTime {
 
         $gmt_time = ($local_time+$shift);
 
-        //print( "Input time             : ".$str."\n" );
-        //print( "Base time              : ".$local_time."\n" );
-        //print( "GMT  time              : ".$gmt_time."\n" );
-        //print( "Current UNIX timestamp : ".mktime()."\n" );
-
         $nsec = isset( $matches2[8] ) ? $matches2[8] : 0;
 
         return new LogBookTime($gmt_time,$nsec);
     }
 
+    /* Constructor
+     */
     public function __construct($sec, $nsec=0) {
         if( $nsec < 0 or $nsec > 999999999)
             die( "the number of nanoseconds isn't in allowed range" );
@@ -68,10 +65,11 @@ class LogBookTime {
         $this->nsec = $nsec;
     }
 
+    /* Return a human-readable ISO representation
+     * of date and time.
+     */
     public function __toString() {
-        //return sprintf("%010d.%09d", $this->sec, $this->nsec );
-        return gmdate("Y-m-d h:i:s", $this->sec).sprintf(".%09u", $this->nsec)."-0000";
-    }
+        return gmdate("Y-m-d h:i:s", $this->sec).sprintf(".%09u", $this->nsec)."-0000"; }
 
     /* Convert the tuple into a packed representation of a 64-bit
      * number. These numbers are meant to be stored in a database.
@@ -80,8 +78,7 @@ class LogBookTime {
      * nativelly supported by PHP the result is returned as a string.
      */
     public function to64() {
-        return sprintf("%010d%09d", $this->sec, $this->nsec);
-    }
+        return sprintf("%010d%09d", $this->sec, $this->nsec); }
 
     /* Produce a packed timestamp from an input value regardless whether
      * it's an object of the current class or it's already a packed
@@ -131,12 +128,7 @@ class LogBookTime {
         $at_obj    = (is_object( $at )    ? $at    : LogBookTime::from64( $at ));
         $begin_obj = (is_object( $begin ) ? $begin : LogBookTime::from64( $begin ));
         $end_obj = $end;
-        /*
-        print( "<br>LogBookTime::in_interval() at:    ".$at_obj );
-        print( "<br>LogBookTime::in_interval() begin: ".$begin_obj );
-        print( "<br>LogBookTime::in_interval() end:   ".$end_obj."<br>" );
-         *
-         */
+
         if( !is_null( $end ) AND !is_object( $end )) $end_obj = LogBookTime::from64( $end );
         if( $at_obj->less( $begin_obj )) return -1;
         if( is_null( $end_obj ) OR $at_obj->less( $end_obj )) return 0;
@@ -148,16 +140,18 @@ class LogBookTime {
      */
     public function less( $rhs ) {
         return ( $this->sec < $rhs->sec ) ||
-               (( $this->sec == $rhs->sec ) && ($this->nsec < $rhs->nsec));
-    }
+               (( $this->sec == $rhs->sec ) && ($this->nsec < $rhs->nsec)); }
+
+    public function greaterOrEqual( $rhs ) {
+        return $rhs->less( $this ); }
 
     /* Compare the current object with the one given in the parameter.
      * Return TRUE if the current object is equal to the given one.
      */
     public function equal( $rhs ) {
-        return ( $this->sec == $rhs->sec ) && ($this->nsec == $rhs->nsec);
-    }
+        return ( $this->sec == $rhs->sec ) && ($this->nsec == $rhs->nsec); }
 }
+
 /*
 echo "here follows a simple unit test for the class.\n";
 
