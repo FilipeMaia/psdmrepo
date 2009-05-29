@@ -18,7 +18,7 @@ class LogBookTestTable {
     /* Constructor
      */
     public function __construct( $cols, $keys, $css_class ) {
-        if(count($cols) != count($keys))
+        if( count( $cols ) != count( $keys ))
             die("illegal parameters to the contsructor");
         $this->cols = $cols;
         $this->keys = $keys;
@@ -30,7 +30,7 @@ class LogBookTestTable {
 <table cellpadding="3"  border="0" class="$this->css_class">
     <thead style="color:#0071bc;">
 HERE;
-        foreach($this->cols as $c)
+        foreach( $this->cols as $c )
             echo <<<HERE
         <th align="left">
             &nbsp;<b>$c</b>&nbsp;</th>
@@ -40,7 +40,7 @@ HERE;
     <tbody>
         <tr>
 HERE;
-        foreach($this->cols as $c)
+        foreach( $this->cols as $c )
             echo <<<HERE
             <td><hr></td>
 HERE;
@@ -49,11 +49,11 @@ HERE;
 HERE;
     }
 
-    public function row($attr) {
+    public function row( $attr ) {
         echo <<<HERE
         <tr>
 HERE;
-        foreach($this->keys as $k) {
+        foreach( $this->keys as $k ) {
             $v = $attr[$k];
             echo <<<HERE
             <td>&nbsp;$v&nbsp;</td>

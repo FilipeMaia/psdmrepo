@@ -20,13 +20,18 @@ if(isset($_POST['end_time'])) {
 
 /* Proceed with the operation
  */
-$logbook = new LogBook();
+try {
+    $logbook = new LogBook();
 
-$experiment = $logbook->find_experiment_by_name( $name )
-    or die("failed to find an experiment");
+    $experiment = $logbook->find_experiment_by_name( $name )
+        or die("no such experiment");
 
-$experiment->close( $end_time )
-    or die( "failed to close the experiment" );
+    $experiment->close( $end_time );
+
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+    return;
+}
 ?>
 <!--
 The page for reporting the information about the closed experiment.

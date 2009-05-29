@@ -59,8 +59,10 @@ class LogBookTime {
     /* Constructor
      */
     public function __construct($sec, $nsec=0) {
-        if( $nsec < 0 or $nsec > 999999999)
-            die( "the number of nanoseconds isn't in allowed range" );
+        if( $nsec < 0 or $nsec > 999999999 )
+            throw new LogBookException(
+                __METHOD__, "the number of nanoseconds ".$nsec." isn't in allowed range" );
+
         $this->sec = $sec;
         $this->nsec = $nsec;
     }
@@ -100,12 +102,16 @@ class LogBookTime {
         $len = strlen( $packed );
         if( $len <= 9 ) {
             if( 1 != sscanf( $packed, "%ud", $nsec ))
-                die( "failed to translate nanoseconds" );
+                throw new LogBookException(
+                    __METHOD__, "failed to translate nanoseconds" );
         } else {
             if( 1 != sscanf( substr( $packed, 0, $len - 9), "%ud", $sec ))
-                die( "failed to translate seconds" );
+                throw new LogBookException(
+                    __METHOD__, "failed to translate seconds" );
+
             if( 1 != sscanf( substr( $packed, -9 ), "%ud", $nsec ))
-                die( "failed to translate nanoseconds" );
+                throw new LogBookException(
+                    __METHOD__, "failed to translate nanoseconds" );
         }
         return new LogBookTime( $sec, $nsec );
     }
@@ -117,14 +123,17 @@ class LogBookTime {
      *    = 0  - the timestamp is within the interval
      *    > 0  - the timestamp is at or beyon the end time of the interval
      * 
-     * The method will "die" (or throw an exception) if either of the timestamp
+     * The method will throw an exception if either of the timestamp
      * is not valid, or if the end time of the interval is before its begin time.
      * The only exception is the end time, which is allowed to be the null
-     * object for open-ended intervals. 
+     * object for open-ended intervals.
      */
     public static function in_interval( $at, $begin, $end ) {
+
         if( is_null( $at ) || is_null( $begin ))
-            die( "timestamps can't be null" );
+            throw new LogBookException(
+                __METHOD__, "timestamps can't be null" );
+
         $at_obj    = (is_object( $at )    ? $at    : LogBookTime::from64( $at ));
         $begin_obj = (is_object( $begin ) ? $begin : LogBookTime::from64( $begin ));
         $end_obj = $end;

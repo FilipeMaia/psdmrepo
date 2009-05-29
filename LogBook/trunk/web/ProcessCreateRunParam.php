@@ -28,14 +28,18 @@ else
 
 /* Proceed with the operation
  */
-$logbook = new LogBook();
+try {
+    $logbook = new LogBook();
 
-$experiment = $logbook->find_experiment_by_name( $experiment_name )
-    or die("failed to find the experiment" );
+    $experiment = $logbook->find_experiment_by_name( $experiment_name )
+        or die("failed to find the experiment" );
 
-$param = $experiment->create_run_param($param, $type, $descr)
-    or die("failed to create the run parameter" );
-?>
+    $param = $experiment->create_run_param( $param, $type, $descr );
+
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+    return;
+}?>
 <!--
 The page for reporting the information about all summary run parameters
 of the experiment.

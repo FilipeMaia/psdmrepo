@@ -81,15 +81,15 @@ class LogBookFFEntry {
          */
         $list = array();
 
-        $result = $this->connection->query(
+        $result = $this->connection->query (
             'SELECT id, hdr_id FROM entry WHERE parent_entry_id='.$this->id().
             ' ORDER BY id' );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
-            array_push(
+            array_push (
                 $list,
-                new LogBookFFEntryAddr(
+                new LogBookFFEntryAddr (
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
         return $list;
@@ -99,15 +99,15 @@ class LogBookFFEntry {
 
         $list = array();
 
-        $result = $this->connection->query(
+        $result = $this->connection->query (
             'SELECT t.* FROM header h, tag t WHERE h.exper_id='.$this->exper_id().
             ' AND h.id = t.hdr_id' );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
-            array_push(
+            array_push (
                 $list,
-                new LogBookFFTag(
+                new LogBookFFTag (
                     $this->connection,
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
@@ -123,15 +123,15 @@ class LogBookFFEntry {
          */
         $list = array();
 
-        $result = $this->connection->query(
+        $result = $this->connection->query (
             'SELECT id,entry_id,description,document_type,  LENGTH(document) AS "document_size"'.
             ' FROM attachment WHERE entry_id='.$this->id());
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
-            array_push(
+            array_push (
                 $list,
-                new LogBookFFAttachment(
+                new LogBookFFAttachment (
                     $this->connection,
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));

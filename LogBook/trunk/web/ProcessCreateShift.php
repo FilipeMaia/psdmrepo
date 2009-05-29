@@ -37,14 +37,18 @@ if(isset($_POST['end_time'])) {
 
 /* Proceed with the operation
  */
-$logbook = new LogBook();
+try {
+    $logbook = new LogBook();
 
-$experiment = $logbook->find_experiment_by_name( $experiment_name )
-    or die("failed to find the experiment" );
+    $experiment = $logbook->find_experiment_by_name( $experiment_name )
+        or die("failed to find the experiment" );
 
-$shift = $experiment->create_shift( $leader, $begin_time, $end_time )
-    or die("failed to create the shift" );
-?>
+    $shift = $experiment->create_shift( $leader, $begin_time, $end_time );
+
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+    return;
+}?>
 <!--
 The page for reporting the information about all shifts of the experiment.
 -->

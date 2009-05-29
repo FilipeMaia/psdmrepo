@@ -37,13 +37,19 @@ if(isset($_POST['end_time'])) {
 
 /* Proceed to the operation
  */
-$logbook = new LogBook();
+try {
+    $logbook = new LogBook();
 
-$experiment = $logbook->find_experiment_by_name( $experiment_name )
-    or die("failed to find the experiment" );
+    $experiment = $logbook->find_experiment_by_name( $experiment_name )
+        or die("failed to find the experiment" );
 
-$run = $experiment->create_run( $num, $begin_time, $end_time )
-    or die("failed to create the run" );
+    $run = $experiment->create_run( $num, $begin_time, $end_time )
+        or die("failed to create the run" );
+
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+    return;
+}
 ?>
 <!--
 The page for reporting the information about all runs of the experiment.

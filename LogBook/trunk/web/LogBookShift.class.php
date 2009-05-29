@@ -1,10 +1,6 @@
 <?php
 /*
  * The class representing experimental shifts.
- * 
- * TODO:
- * - migrate from die() to exceptions
- * - add JSON serializer
  */
 class LogBookShift {
 
@@ -42,28 +38,31 @@ class LogBookShift {
      */
     public function close( $end_time ) {
 
-        if( !is_null($this->attr['end_time']))
-            die( "the shift is already closed" );
+        if( !is_null( $this->attr['end_time'] ))
+            throw new LogBookException(
+                __METHOD__, "the shift is already closed" );
 
         /* Verify the value of the parameter
          */
         if( is_null( $end_time ))
-            die( "end time can't be null");
+            throw new LogBookException(
+                __METHOD__, "end time can't be null" );
+
         if( 0 != $this->experiment->in_interval( $end_time ))
-            die( "incorrect end time - it falls off the experiment's intervall" );
+            throw new LogBookException(
+                __METHOD__,
+                "end time '".$end_time."' is out of experiment's interval" );
 
         /* Make the update
          */
         $end_time_64 = LogBookTime::to64from( $end_time );
-        $this->connection->query(
+        $this->connection->query (
             'UPDATE "shift" SET end_time='.$end_time_64.
-            ' WHERE exper_id='.$this->exper_id().' AND begin_time='.$this->attr['begin_time'] )
-            or die ("failed to close the shift: ".mysql_error());
+            ' WHERE exper_id='.$this->exper_id().' AND begin_time='.$this->attr['begin_time'] );
 
         /* Update the current state of the object
          */
         $this->attr['end_time'] = $end_time_64;
-        return true;
     }
 }
 ?>

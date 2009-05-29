@@ -37,23 +37,29 @@ $update_allowed =isset($_POST['update_allowed']);
 
 /* Proceed with the operation
  */
-$logbook = new LogBook();
+try {
+    $logbook = new LogBook();
 
-$experiment = $logbook->find_experiment_by_name( $experiment_name )
-    or die("failed to find the experiment" );
+    $experiment = $logbook->find_experiment_by_name( $experiment_name )
+        or die( "no such experiment" );
 
-/* Find the run if the positive number is given. If not - then look
- * for the latest run.
- */
-if( $num < 0) {
-    $run = $experiment->find_last_run()
-        or die("failed to find the last run of the experiment" );
-} else {
-    $run = $experiment->find_run_by_num( $num )
-        or die("failed to find the specified run of the experiment" );
+    /* Find the run if the positive number is given. If not - then look
+     * for the latest run.
+     */
+    if( $num < 0) {
+        $run = $experiment->find_last_run()
+            or die( "no last run in experiment" );
+    } else {
+        $run = $experiment->find_run_by_num( $num )
+            or die( "no such run of the experiment" );
+    }
+    $run->set_param_value (
+        $param, $value, $source, LogBookTime::now(), $update_allowed );
+
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+    return;
 }
-$run->set_param_value( $param, $value, $source, LogBookTime::now(), $update_allowed )
-    or die("failed to set a value of the run parameter" );
 ?>
 <!--
 The page for reporting the information about all summary parameters of the run.

@@ -13,7 +13,7 @@ The page for creating a new free-form.
         $now_str = $now->format(DateTime::ISO8601);
         $now_str[10] = ' ';  // get rid of date-time separator 'T'
         ?>
-        <h1>Add new shift :</h1>
+        <h1>Create new free-form entry :</h1>
         <form action="ProcessCreateFFEntry.php" method="POST" style="margin-left:2em;">
             <table cellpadding="3"  border="0" >
                 <thead style="color:#0071bc;">

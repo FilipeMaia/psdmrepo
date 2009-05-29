@@ -29,10 +29,14 @@ class LogBook {
      * ===============
      */
     public function experiments ( $condition = '' ) {
+
         $list = array();
-        $result = $this->connection->query( 'SELECT * FROM "experiment" '.$condition );
+
+        $result = $this->connection->query(
+            'SELECT * FROM "experiment" '.$condition );
+
         $nrows = mysql_numrows( $result );
-        for( $i=0; $i<$nrows; $i++ ) {
+        for( $i = 0; $i < $nrows; $i++ ) {
             array_push(
                 $list,
                 new LogBookExperiment (
@@ -64,13 +68,19 @@ class LogBook {
 
     public function create_experiment ( $name, $begin_time, $end_time=null ) {
 
-        $sql = "INSERT INTO experiment VALUES(NULL,'".$name
-            ."',".$begin_time->to64()
-            .",".($end_time==null?'NULL':$end_time->to64()).")";
-        $result = $this->connection->query( $sql )
-            or die ("failed to create new experiment: ".mysql_error());
+        /* Verify parameters
+         */
+        if( !is_null( $end_time ) && !$begin_time->less( $end_time ))
+            throw new LogBookException(
+                __METHOD__,
+                "begin time '".$begin_time."' isn't less than end time '".$end_time."'" );
 
-        return $this->find_experiment_by_id('(SELECT LAST_INSERT_ID())');
+        $this->connection->query (
+            "INSERT INTO experiment VALUES(NULL,'".$name
+            ."',".$begin_time->to64()
+            .",".( is_null( $end_time ) ? 'NULL' : $end_time->to64()).")" );
+
+        return $this->find_experiment_by_id( '(SELECT LAST_INSERT_ID())' );
     }
 }
 ?>

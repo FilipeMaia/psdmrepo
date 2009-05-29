@@ -2,10 +2,11 @@
 
 require_once('LogBook.inc.php');
 
-/* Make database connection using default connection
- * parameters.
+/* All operations with LogBokk API will be enclose enclosed into this
+ * exception catch block.
  */
-$logbook = new LogBook();
+try {
+    $logbook = new LogBook();
 ?>
 
 <!--
@@ -110,3 +111,9 @@ The page for reporting the contents of the LogBook database.
         ?>
     </body>
 </html>
+<?php
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+    return;
+}
+?>
