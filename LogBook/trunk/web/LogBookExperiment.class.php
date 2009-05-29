@@ -288,6 +288,87 @@ class LogBookExperiment {
         return $this->find_run_param_by_id( '(SELECT LAST_INSERT_ID())' );
     }
 
+    /* =====================
+     *   FREE-FORM ENTRIES
+     * =====================
+     */
+    public function entries () {
+
+        $list = array();
+
+        $result = $this->connection->query(
+            'SELECT h.exper_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
+            ' AND h.id = e.hdr_id AND e.parent_entry_id is NULL' );
+
+        $nrows = mysql_numrows( $result );
+        for( $i = 0; $i < $nrows; $i++ ) {
+            array_push(
+                $list,
+                new LogBookFFEntry(
+                    $this->connection,
+                    $this,
+                    mysql_fetch_array( $result, MYSQL_ASSOC )));
+        }
+        return $list;
+    }
+
+    public function find_entry_by_hdr_id ( $hdr_id ) {
+
+        $result = $this->connection->query(
+            'SELECT h.exper_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
+            ' AND h.id = e.hdr_id AND e.parent_entry_id is NULL AND hdr_id='.$hdr_id );
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 1 )
+            return new LogBookFFEntry(
+                $this->connection,
+                $this,
+                mysql_fetch_array( $result, MYSQL_ASSOC ));
+
+        return null;
+    }
+
+    public function find_entry_by_ ( $condition=null ) {
+
+        $extra_condition = $condition == null ? '' : ' AND '.$condition;
+        $result = $this->connection->query(
+            'SELECT h.exper_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
+            ' AND h.id = e.hdr_id'.$extra_condition );
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 1 )
+            return new LogBookFFEntry(
+                $this->connection,
+                $this,
+                mysql_fetch_array( $result, MYSQL_ASSOC ));
+
+        return null;
+    }
+
+    public function create_entry( $relevance_time, $author, $content_type, $content ) {
+
+        /* TODO: Make sure the relevance time falls into validity
+         * limits of the experiment.
+         */
+        $sql = "INSERT INTO header VALUES(NULL,".$this->attr['id'].
+            ",".LogBookTime::to64from( $relevance_time ).")";
+
+        $result = $this->connection->query( $sql )
+            or die ("failed to create new free-form entry header: ".mysql_error());
+
+        $sql = "INSERT INTO entry VALUES(NULL,(SELECT LAST_INSERT_ID()),NULL".
+            ",".LogBookTime::now()->to64().
+            ",'".$author.
+            "','".$content.
+            "','".$content_type."')";
+
+        $result = $this->connection->query( $sql )
+            or die ("failed to create new free-form entry  and attach it by its header: ".mysql_error());
+
+        return $this->find_entry_by_ (
+            'hdr_id = (SELECT h.id FROM header h, entry e'.
+            ' WHERE h.id = e.hdr_id AND e.id = (SELECT LAST_INSERT_ID()))' );
+    }
     /* Close the open-ended experiment
      */
     public function close ( $end_time ) {

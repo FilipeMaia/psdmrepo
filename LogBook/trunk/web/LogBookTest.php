@@ -84,5 +84,29 @@ The page for reporting the contents of the LogBook database.
             }
         }
         ?>
+
+        <!------------------------------>
+        <h1>Free-form entries of an experiment</h1>
+        <h2>FF</h2>
+        <?php
+        $experiment = $logbook->find_experiment_by_name('FF');
+        if( isset( $experiment ))
+            $entries = $experiment->entries();
+            foreach( $entries as $e ) {
+                LogBookTestTable::Entry()->show( array( $e ));
+                ?>
+                <h3>Tags</h3>
+                <?php
+                LogBookTestTable::EntryTag()->show( $e->tags());
+                ?>
+                <h3>Attachments</h3>
+                <?php
+                LogBookTestTable::EntryAttachment()->show( $e->attachments());
+                ?>
+                <h3>Addresses of direct children</h3>
+                <?php
+                LogBookTestTable::EntryAddr()->show( $e->children());
+            }
+        ?>
     </body>
 </html>

@@ -117,5 +117,29 @@ HERE;
             array("run_id", "param_id",  "source", "updated", "val"),
             $css_class );
     }
+    public static function Entry($css_class='table_4') {
+        return new LogBookTestTable(
+            array("Exper.Id", "Relevance Time", "Header Id", "Entry Id", "Insert Time", "Author", "Content Type"),
+            array("exper_id", "relevance_time", "hdr_id",    "id",       "insert_time", "author", "content_type"),
+            $css_class );
+    }
+    public static function EntryTag($css_class='table_6') {
+        return new LogBookTestTable(
+            array("Header Id", "Tag", "Value"),
+            array("hdr_id",    "tag", "value"),
+            $css_class );
+    }
+    public static function EntryAttachment($css_class='table_6') {
+        return new LogBookTestTable(
+            array("Id", "Entry Id", "Type",          "Size",          "Description"),
+            array("id", "entry_id", "document_type", "document_size", "description"),
+            $css_class );
+    }
+    public static function EntryAddr($css_class='table_6') {
+        return new LogBookTestTable(
+            array("Header Id", "Entry Id"),
+            array("hdr_id",    "id"),
+            $css_class );
+    }
 }
 ?>
