@@ -115,6 +115,22 @@ class LogBookFFEntry {
         return $list;
     }
 
+    /**
+     * Add an arbitrary collection of tags.
+     *
+     * The tags (key/value pairs) are expected to be packed
+     * into an associative array.
+     *
+     * @param array $tags
+     */
+    public function add_tags( $tags ) {
+
+        /* TODO: Parse the associative array and attach tags by the entry
+         */
+        throw new LogBookException (
+            __METHOD__, "not implemented" );
+    }
+
     public function attachments() {
 
         /* NOTE: We aren't fetching the contents of documents with
@@ -137,6 +153,21 @@ class LogBookFFEntry {
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
         return $list;
+    }
+
+    /**
+     * Attach a document by the entry.
+     *
+     * @param string $description
+     * @param string $document
+     * @param string $type
+     */
+    public function attach_document( $description, $document, $type ) {
+
+        /* TODO: Implement the method
+         */
+        throw new LogBookException (
+            __METHOD__, "not implemented" );
     }
 }
 ?>

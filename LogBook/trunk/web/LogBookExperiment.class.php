@@ -363,6 +363,9 @@ class LogBookExperiment {
         return null;
     }
 
+    public function find_last_entry () {
+        return $this->find_entry_by_( 'relevance_time=(SELECT MAX(relevance_time) FROM "entry")' ) ; }
+
     public function find_entry_by_ ( $condition=null ) {
 
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
@@ -429,7 +432,7 @@ class LogBookExperiment {
 
         /* Check the last run to be sure that it would completelly fall (unless
          * its' open-ended) into the truncated limits of the experiment. Close
-         * the run at the sam eend tim eas well.
+         * the run at the same end time as well.
          */
         $last_run = $this->find_last_run();
         if( !is_null( $last_run )) {
@@ -464,14 +467,21 @@ class LogBookExperiment {
                 if( $end_time->less( $last_shift->end_time()))
                     throw new LogBookException(
                         __METHOD__,
-                        "end time '".$end_time."' is before end time of last shit" );
+                        "end time '".$end_time."' is before end time '".
+                        $last_shift->end_time()."' of last shit" );
             }
         }
 
-        /* TODO: Similar action (as for the last run and shift) must be applied to the last
-         * free-form entry (if any).
+        /* Make sure the last free-form entry (if any) was created before
+         * the requested end time.
          */
-        ;
+        $last_entry = $this->find_last_entry();
+        if( !is_null( $last_entry ))
+            if( $last_entry->relevance_time()->greaterOrEqual( $end_time ))
+                throw new LogBookException(
+                    __METHOD__,
+                    "end time '".$end_time."' is before relevance time '".
+                    $last_entry->relevance_time()."' of last free-form entry" );
 
         /* Make the update
          */

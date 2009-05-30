@@ -52,7 +52,8 @@ class LogBookFFAttachment {
         /* TODO: Implement document loading. Do not cache documents. Load them
          * as requested.
          */
-        return null;
+        throw new LogBookException (
+            __METHOD__, "not implemented" );
     }
 }
 ?>
