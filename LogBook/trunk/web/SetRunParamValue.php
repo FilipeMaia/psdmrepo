@@ -36,14 +36,18 @@ The page for creating a new run summary parameter.
                         <td align="right" style="width:6em;">
                             &nbsp;<b>Experiment</b>&nbsp;</td>
                         <td>
-                            &nbsp;<select align="center" type="text" name="experiment_name" ><?php
+                            &nbsp;<select align="center" type="text" name="experiment_name" >
+                            <?php
                             require_once('LogBook.inc.php');
                             $logbook = new LogBook();
+                            $logbook->begin();
                             $experiments = $logbook->experiments()
                                 or die("failed to find experiments" );
                             foreach( $experiments as $e)
                                 echo '<option> '.$e->attr['name'].' </option>';
-                            ?></select>&nbsp;
+                            $logbook->commit();
+                            ?>
+                            </select>&nbsp;
                         <td>
                             &nbsp;</td>
                     <tr>

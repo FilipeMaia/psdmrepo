@@ -75,7 +75,7 @@ HERE;
      * Display a complete table instance from the input array
      */
     public function show( $list, $title=null ) {
-        if( !is_null($title))
+        if( !is_null( $title ))
             echo <<<HERE
 $title
 HERE;

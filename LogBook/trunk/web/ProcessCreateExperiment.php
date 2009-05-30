@@ -34,14 +34,10 @@ if(isset($_POST['end_time'])) {
  */
 try {
     $logbook = new LogBook();
+    $logbook->begin();
 
     $experiment = $logbook->create_experiment(
         $name, $begin_time, $end_time );
-
-} catch( LogBookException $e ) {
-    print $e->toHtml();
-    return;
-}
 ?>
 <!--
 The page for reporting the information about all registered experiment.
@@ -61,3 +57,11 @@ The page for reporting the information about all registered experiment.
         ?>
     </body>
 </html>
+<?php
+
+    $logbook->commit();
+
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+}
+?>

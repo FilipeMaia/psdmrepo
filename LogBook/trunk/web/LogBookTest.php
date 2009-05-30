@@ -7,6 +7,7 @@ require_once('LogBook.inc.php');
  */
 try {
     $logbook = new LogBook();
+    $logbook->begin();
 ?>
 
 <!--
@@ -112,6 +113,11 @@ The page for reporting the contents of the LogBook database.
     </body>
 </html>
 <?php
+
+    /* Finish the session by commiting the transaction.
+     */
+    $logbook->commit();
+
 } catch( LogBookException $e ) {
     print $e->toHtml();
     return;

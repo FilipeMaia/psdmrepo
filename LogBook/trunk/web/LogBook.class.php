@@ -24,6 +24,20 @@ class LogBook {
                 is_null($database) ? LOGBOOK_DEFAULT_DATABASE : $database);
     }
 
+    /*
+     * ==========================
+     *   TRANSACTION MANAGEMENT
+     * ==========================
+     */
+    public function begin () {
+        $this->connection->begin (); }
+
+    public function commit () {
+        $this->connection->commit (); }
+
+    public function rollback () {
+        $this->connection->rollback (); }
+
     /* ===============
      *   EXPERIMENTS
      * ===============
@@ -32,7 +46,7 @@ class LogBook {
 
         $list = array();
 
-        $result = $this->connection->query(
+        $result = $this->connection->query (
             'SELECT * FROM "experiment" '.$condition );
 
         $nrows = mysql_numrows( $result );

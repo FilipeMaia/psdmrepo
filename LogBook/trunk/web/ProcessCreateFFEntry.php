@@ -37,17 +37,13 @@ else
  */
 try {
     $logbook = new LogBook();
+    $logbook->begin();
 
     $experiment = $logbook->find_experiment_by_name( $experiment_name )
         or die("no such experiment" );
 
     $entry = $experiment->create_entry(
         $relevance_time, $author, $content_type, $content );
-
-} catch( LogBookException $e ) {
-    print $e->toHtml();
-    return;
-}
 ?>
 <!--
 The page for reporting the information about all shifts of the experiment.
@@ -68,3 +64,11 @@ The page for reporting the information about all shifts of the experiment.
         ?>
     </body>
 </html>
+<?php
+
+    $logbook->commit();
+
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+}
+?>

@@ -22,16 +22,12 @@ if(isset($_POST['end_time'])) {
  */
 try {
     $logbook = new LogBook();
+    $logbook->begin();
 
     $experiment = $logbook->find_experiment_by_name( $name )
         or die("no such experiment");
 
     $experiment->close( $end_time );
-
-} catch( LogBookException $e ) {
-    print $e->toHtml();
-    return;
-}
 ?>
 <!--
 The page for reporting the information about the closed experiment.
@@ -58,3 +54,11 @@ The page for reporting the information about the closed experiment.
         LogBookTestTable::Run()->show( $experiment->runs());
         ?>    </body>
 </html>
+<?php
+
+    $logbook->commit();
+
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+}
+?>

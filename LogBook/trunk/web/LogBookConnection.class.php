@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class LogBookConnection encapsulates operations with the database
+ */
 class LogBookConnection {
 
     /* Data members
@@ -8,14 +12,18 @@ class LogBookConnection {
     private $user;
     private $password;
     private $database;
+    private $in_transaction = false;
 
-    /* Constructor
+    /**
+     * Constructor
      *
-     * NOTE: The constructor won't make any actual connection
-     *       attempts. This will be deffered to operations
-     *       dealing with queries, transactions, etc.
+     * The constructor won't make any actual connection attempts. This will be deffered
+     * to operations dealing with queries, transactions, etc.
      *
-     * TODO: Add explicit transction management.
+     * @param string $host
+     * @param string $user
+     * @param string $password
+     * @param string $database 
      */
     public function __construct ( $host, $user, $password, $database ) {
         $this->host     = $host;
@@ -24,13 +32,59 @@ class LogBookConnection {
         $this->database = $database;
     }
 
+    /**
+     * Destructor
+     */
     public function __destruct () {
         if( isset( $this->link ))
             mysql_close( $this->link );
     }
 
-    public function query ( $sql ) {
+    /*
+     * ==========================
+     *   TRANSACTION MANAGEMENT
+     * ==========================
+     */
+    public function begin () {
         $this->connect();
+        if( $this->in_transaction ) return;
+        $this->transaction( 'BEGIN' );
+        $this->in_transaction = true;
+    }
+
+    public function commit () {
+        $this->connect();
+        if( !$this->in_transaction ) return;
+        $this->transaction( 'COMMIT' );
+        $this->in_transaction = false;
+    }
+
+    public function rollback () {
+        $this->connect();
+        if( !$this->in_transaction ) return;
+        $this->transaction( 'ROLLBACK' );
+        $this->in_transaction = false;
+    }
+
+    private function transaction ( $transition ) {
+        if( !mysql_query( $transition ))
+            throw new LogBookException(
+                __METHOD__,
+                "MySQL error: ".mysql_error().', in query: '.$transition );
+    }
+
+    /* ===========
+     *   QUERIES
+     * ===========
+     */
+    public function query ( $sql ) {
+
+        $this->connect();
+
+        if( !$this->in_transaction )
+            throw new LogBookException(
+                __METHOD__, "no active transaction" );
+
         $result = mysql_query( $sql );
         if( !$result )
             throw new LogBookException(
@@ -39,6 +93,9 @@ class LogBookConnection {
         return $result;
     }
 
+    /**
+     * Make a connection if this hasn't been done yet.
+     */
     private function connect () {
         if( !isset( $this->link )) {
             $this->link = mysql_connect( $this->host, $this->user, $this->password );
@@ -53,6 +110,12 @@ class LogBookConnection {
                     "MySQL error: ".mysql_error().", in function: mysql_select_db" );
 
             $sql = "SET SESSION SQL_MODE='ANSI'";
+            if( !mysql_query( $sql ))
+                throw new LogBookException(
+                    __METHOD__,
+                    "MySQL error: ".mysql_error().', in query: '.$sql );
+
+            $sql = "SET SESSION AUTOCOMMIT=0";
             if( !mysql_query( $sql ))
                 throw new LogBookException(
                     __METHOD__,

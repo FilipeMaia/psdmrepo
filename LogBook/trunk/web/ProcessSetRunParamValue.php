@@ -39,6 +39,7 @@ $update_allowed =isset($_POST['update_allowed']);
  */
 try {
     $logbook = new LogBook();
+    $logbook->begin();
 
     $experiment = $logbook->find_experiment_by_name( $experiment_name )
         or die( "no such experiment" );
@@ -55,11 +56,6 @@ try {
     }
     $run->set_param_value (
         $param, $value, $source, LogBookTime::now(), $update_allowed );
-
-} catch( LogBookException $e ) {
-    print $e->toHtml();
-    return;
-}
 ?>
 <!--
 The page for reporting the information about all summary parameters of the run.
@@ -75,9 +71,17 @@ The page for reporting the information about all summary parameters of the run.
         <!------------------------------>
         <h1>Values of run parameters</h1>
         <h2><?php echo $experiment->name(); ?></h2>
-        <h3><?php echo $run->num(); ?></h2>
+        <h3><?php echo $run->num(); ?></h3>
         <?php
         LogBookTestTable::RunVal()->show( $run->values());
         ?>
     </body>
 </html>
+<?php
+
+    $logbook->commit();
+
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+}
+?>

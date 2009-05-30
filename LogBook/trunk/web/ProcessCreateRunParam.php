@@ -30,16 +30,13 @@ else
  */
 try {
     $logbook = new LogBook();
+    $logbook->begin();
 
     $experiment = $logbook->find_experiment_by_name( $experiment_name )
-        or die("failed to find the experiment" );
+        or die("no such experiment" );
 
     $param = $experiment->create_run_param( $param, $type, $descr );
-
-} catch( LogBookException $e ) {
-    print $e->toHtml();
-    return;
-}?>
+?>
 <!--
 The page for reporting the information about all summary run parameters
 of the experiment.
@@ -60,3 +57,11 @@ of the experiment.
         ?>
     </body>
 </html>
+<?php
+
+    $logbook->commit();
+
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+}
+?>

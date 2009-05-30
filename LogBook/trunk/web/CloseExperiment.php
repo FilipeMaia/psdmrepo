@@ -38,10 +38,12 @@ and open the template in the editor.
                             &nbsp;<select align="center" type="text" name="name" ><?php
                             require_once('LogBook.inc.php');
                             $logbook = new LogBook();
+                            $logbook->begin();
                             $experiments = $logbook->experiments()
                                 or die("failed to find experiments" );
                             foreach( $experiments as $e)
                                 echo '<option> '.$e->attr['name'].' </option>';
+                            $logbook->commit();
                             ?></select>&nbsp;
                         <td>
                             &nbsp;</td>
