@@ -135,11 +135,5 @@ HERE;
             array("id", "entry_id", "document_type", "document_size", "description"),
             $css_class );
     }
-    public static function EntryAddr($css_class='table_6') {
-        return new LogBookTestTable(
-            array("Header Id", "Entry Id"),
-            array("hdr_id",    "id"),
-            $css_class );
-    }
 }
 ?>

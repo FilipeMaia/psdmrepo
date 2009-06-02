@@ -6,29 +6,37 @@ require_once('LogBook.inc.php');
  * This script will process a request for creating a new free-form
  * entry in the database.
  */
-if(isset($_POST['experiment_name']))
+$parent_entry_id = null;
+if( isset($_POST['parent_entry_id'])) {
+    $str = trim( $_POST['parent_entry_id'] );
+    if( $str != '' && ( 1 != sscanf( $str, "%ud", $parent_entry_id )))
+        die( "not a number at parent entry identifier" );
+} else
+    die( "no parent entry id" );
+
+if( isset($_POST['experiment_name']))
     $experiment_name = $_POST['experiment_name'];
 else
     die( "no valid experiment name" );
 
-if(isset($_POST['relevance_time'])) {
+if( isset($_POST['relevance_time'])) {
     $relevance_time = LogBookTime::parse($_POST['relevance_time']);
-    if(is_null($relevance_time))
+    if( is_null( $relevance_time ))
         die("relevance time has invalid format");
 } else
     die( "no relevance time for shift" );
 
-if(isset($_POST['author']))
+if( isset($_POST['author']))
     $author = $_POST['author'];
 else
     die( "no valid author account" );
 
-if(isset($_POST['content_type']))
+if( isset($_POST['content_type']))
     $content_type = $_POST['content_type'];
 else
     die( "no valid content type" );
 
-if(isset($_POST['content']))
+if( isset($_POST['content']))
     $content = $_POST['content'];
 else
     die( "no valid content" );
@@ -42,8 +50,15 @@ try {
     $experiment = $logbook->find_experiment_by_name( $experiment_name )
         or die("no such experiment" );
 
-    $entry = $experiment->create_entry(
-        $relevance_time, $author, $content_type, $content );
+    if( is_null($parent_entry_id))
+        $entry = $experiment->create_entry(
+            $relevance_time, $author, $content_type, $content );
+    else {
+        $parent_entry = $experiment->find_entry_by_id( $parent_entry_id )
+            or die( "no such entry" );
+        $entry = $parent_entry->create_child(
+            $author, $content_type, $content );
+    }
 ?>
 <!--
 The page for reporting the information about all shifts of the experiment.

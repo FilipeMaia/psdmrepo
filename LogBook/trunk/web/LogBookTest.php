@@ -105,9 +105,9 @@ The page for reporting the contents of the LogBook database.
                 <?php
                 LogBookTestTable::EntryAttachment()->show( $e->attachments());
                 ?>
-                <h3>Addresses of direct children</h3>
+                <h3>Direct Children</h3>
                 <?php
-                LogBookTestTable::EntryAddr()->show( $e->children());
+                LogBookTestTable::Entry( "table_6" )->show( $e->children());
             }
         ?>
     </body>

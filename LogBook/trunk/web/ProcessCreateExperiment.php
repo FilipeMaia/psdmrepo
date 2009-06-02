@@ -33,33 +33,18 @@ if(isset($_POST['end_time'])) {
 /* Proceed with the operation
  */
 try {
+
     $logbook = new LogBook();
     $logbook->begin();
 
     $experiment = $logbook->create_experiment(
         $name, $begin_time, $end_time );
-?>
-<!--
-The page for reporting the information about all registered experiment.
--->
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Registered experiments</title>
-    </head>
-    <link rel="stylesheet" type="text/css" href="LogBookTest.css" />
-    <body>
-        <!------------------------------>
-        <h1>Registered experiments</h1>
-        <?php
-        LogBookTestTable::Experiment()->show( $logbook->experiments());
-        ?>
-    </body>
-</html>
-<?php
 
     $logbook->commit();
+
+    /* Redirect to another page to see all experiments
+     */
+    header( 'Location: ListExperiments.php' ) ;
 
 } catch( LogBookException $e ) {
     print $e->toHtml();

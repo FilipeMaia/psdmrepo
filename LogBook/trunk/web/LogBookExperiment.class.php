@@ -327,6 +327,12 @@ class LogBookExperiment {
      *   FREE-FORM ENTRIES
      * =====================
      */
+
+    /**
+     * Get all known entries (headers)
+     *
+     * @return array(LogBookFFEntry)
+     */
     public function entries () {
 
         $list = array();
@@ -347,11 +353,25 @@ class LogBookExperiment {
         return $list;
     }
 
-    public function find_entry_by_hdr_id ( $hdr_id ) {
+    /**
+     * Find the specified entry
+     *
+     * @param int $id
+     * @return LogBookFFEntry
+     */
+    public function find_entry_by_id ( $id ) {
+        return $this->find_entry_by_( 'e.id='.$id ) ; }
 
-        $result = $this->connection->query(
+    /**
+     * Find the last entry (header)
+     *
+     * @return LogBookFFEntry or null
+     */
+    public function find_last_entry () {
+
+        $result = $this->connection->query (
             'SELECT h.exper_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
-            ' AND h.id = e.hdr_id AND e.parent_entry_id is NULL AND hdr_id='.$hdr_id );
+            ' AND h.id = e.hdr_id ORDER BY relevance_time DESC LIMIT 1' );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 1 )
@@ -362,9 +382,6 @@ class LogBookExperiment {
 
         return null;
     }
-
-    public function find_last_entry () {
-        return $this->find_entry_by_( 'relevance_time=(SELECT MAX(relevance_time) FROM "entry")' ) ; }
 
     public function find_entry_by_ ( $condition=null ) {
 

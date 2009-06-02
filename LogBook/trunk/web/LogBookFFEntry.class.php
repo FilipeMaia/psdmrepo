@@ -73,26 +73,37 @@ class LogBookFFEntry {
      */
     public function children() {
 
-        /* NOTE: We're getting only identifiers of child entries (not
-         * the full entries as we want to avoid avoid potential inefficiency.
-         * Also note that each identifier is packaged into an object
-         * representing a full address of the entry (header identifier
-         * and the entry identifier).
-         */
         $list = array();
 
         $result = $this->connection->query (
-            'SELECT id, hdr_id FROM entry WHERE parent_entry_id='.$this->id().
+            'SELECT h.exper_id, h.relevance_time, e.* FROM header h, entry e'.
+            ' WHERE h.id = e.hdr_id AND e.parent_entry_id='.$this->id().
             ' ORDER BY id' );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
-            array_push (
+            array_push(
                 $list,
-                new LogBookFFEntryAddr (
+                new LogBookFFEntry (
+                    $this->connection,
+                    $this->experiment,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
         return $list;
+    }
+
+    public function create_child( $author, $content_type, $content ) {
+
+        $subquery = "(SELECT h.id FROM header h, entry e WHERE h.id = e.hdr_id AND e.id=".$this->attr['id'].")";
+        $this->connection->query (
+            "INSERT INTO entry VALUES(NULL,".$subquery.",".$this->attr['id'].
+            ",".LogBookTime::now()->to64().
+            ",'".$author.
+            "','".$content.
+            "','".$content_type."')" );
+
+        return $this->experiment->find_entry_by_ (
+            'e.id = (SELECT LAST_INSERT_ID())' );
     }
 
     public function tags() {
