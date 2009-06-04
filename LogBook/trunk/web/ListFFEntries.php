@@ -1,15 +1,16 @@
 <!--
-The page for displaying all runs of an experiment.
+To change this template, choose Tools | Templates
+and open the template in the editor.
 -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Selected runs to list</title>
+        <title></title>
     </head>
     <body>
-        <h1>Select experiment :</h1>
-        <form action="ProcessListRuns.php" method="POST" style="margin-left:2em;">
+        <h1>List free-form entries of experiment :</h1>
+        <form action="ProcessListFFEntries.php" method="POST" style="margin-left:2em;">
             <table cellpadding="3"  border="0" >
                 <thead style="color:#0071bc;">
                     <th align="right">
@@ -50,4 +51,3 @@ The page for displaying all runs of an experiment.
         </form>
     </body>
 </html>
-

@@ -49,11 +49,15 @@ class LogBookFFAttachment {
 
     public function document() {
 
-        /* TODO: Implement document loading. Do not cache documents. Load them
-         * as requested.
-         */
-        throw new LogBookException (
-            __METHOD__, "not implemented" );
+        $result = $this->connection->query (
+            'SELECT document FROM attachment WHERE id='.$this->id());
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows != 1 )
+            throw new LogBookException (
+                __METHOD__, "unexpected size of result set" );
+
+        return mysql_result( $result, 0 );
     }
 }
 ?>

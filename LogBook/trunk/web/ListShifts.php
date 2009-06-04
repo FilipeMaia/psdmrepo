@@ -1,5 +1,5 @@
 <!--
-The page for displaying all runs of an experiment.
+The page for displaying all shifts of an experiment.
 -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -9,7 +9,7 @@ The page for displaying all runs of an experiment.
     </head>
     <body>
         <h1>Select experiment :</h1>
-        <form action="ProcessListRuns.php" method="POST" style="margin-left:2em;">
+        <form action="ProcessListShifts.php" method="POST" style="margin-left:2em;">
             <table cellpadding="3"  border="0" >
                 <thead style="color:#0071bc;">
                     <th align="right">

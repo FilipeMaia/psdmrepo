@@ -73,6 +73,13 @@ class LogBookTime {
     public function __toString() {
         return gmdate("Y-m-d h:i:s", $this->sec).sprintf(".%09u", $this->nsec)."-0000"; }
 
+    /* Unlike the previous method this one would return a short (no
+     * nanoseconds and time-zone) representation (ISO) of a human-readable
+     * date and time.
+     */
+    public function toStringShort() {
+        return gmdate("Y-m-d h:i:s", $this->sec); }
+
     /* Convert the tuple into a packed representation of a 64-bit
      * number. These numbers are meant to be stored in a database.
      *
@@ -160,8 +167,8 @@ class LogBookTime {
     public function equal( $rhs ) {
         return ( $this->sec == $rhs->sec ) && ($this->nsec == $rhs->nsec); }
 }
-
 /*
+
 echo "here follows a simple unit test for the class.\n";
 
 $t64 = "1242812928000000000";
@@ -202,5 +209,6 @@ $lt = LogBookTime::parse( $str) ;
 print( "  Input time:           ".$str."\n" );
 print( "  LogBookTime::parse(): ".$lt->__toString()."\n" );
 print( "  converted to 64-bit:  ".$lt->to64()."\n" );
-*/
+
 ?>
+*/

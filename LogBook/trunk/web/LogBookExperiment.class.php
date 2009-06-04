@@ -42,7 +42,14 @@ class LogBookExperiment {
      *   SHIFTS
      * ==========
      */
-    public function shifts ($condition='') {
+    public function num_shifts ( $condition='' ) {
+
+        /* TODO: This is very inefficient implementation. Replace it by
+         * a direct SQL statement for counting rows instead!.
+         */
+        return count( $this->shifts( $condition )); }
+
+    public function shifts ( $condition='' ) {
 
         $list = array();
 
@@ -141,6 +148,13 @@ class LogBookExperiment {
      *   RUNS
      * ========
      */
+    public function num_runs ( $condition='' ) {
+
+        /* TODO: This is very inefficient implementation. Replace it by
+         * a direct SQL statement for counting rows instead!.
+         */
+        return count( $this->runs( $condition )); }
+
     public function runs ( $condition='' ) {
 
         $list = array();
@@ -327,6 +341,12 @@ class LogBookExperiment {
      *   FREE-FORM ENTRIES
      * =====================
      */
+    public function num_entries ( $all = false) {
+
+        /* TODO: This is very inefficient implementation. Replace it by
+         * a direct SQL statement for counting rows instead!.
+         */
+        return count( $this->entries()); }
 
     /**
      * Get all known entries (headers)

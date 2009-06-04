@@ -66,6 +66,9 @@ class LogBook {
     public function find_experiment_by_name ( $name ) {
         return $this->find_experiment_by_( "name='".$name."'") ; }
 
+    public function find_last_experiment () {
+        return $this->find_experiment_by_( 'begin_time=(SELECT MAX(begin_time) FROM experiment)') ; }
+
     private function find_experiment_by_ ( $condition ) {
 
         $result = $this->connection->query(
@@ -95,6 +98,40 @@ class LogBook {
             .",".( is_null( $end_time ) ? 'NULL' : $end_time->to64()).")" );
 
         return $this->find_experiment_by_id( '(SELECT LAST_INSERT_ID())' );
+    }
+    /* ============================
+     *   ID-BASED DIRECT LOCATORS
+     * ============================
+     */
+    public function find_attachment_by_id( $id ) {
+
+        $result = $this->connection->query (
+            "SELECT h.exper_id, a.entry_id FROM header h, entry e, attachment a".
+            " WHERE a.id=".$id.
+            " AND h.id=e.hdr_id AND e.id=a.entry_id" );
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 1 ) {
+
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+
+            $exper_id = $attr['exper_id'];
+            $experiment = $this->find_experiment_by_id( $exper_id );
+            if( is_null( $experiment ))
+                throw new LogBookException(
+                    __METHOD__,
+                    "no experiment for id: {$exper_id} in database. Database can be corrupted." );
+
+            $entry_id = $attr['entry_id'];
+            $entry = $experiment->find_entry_by_id( $entry_id );
+            if( is_null( $entry ))
+                throw new LogBookException(
+                    __METHOD__,
+                    "no free-form entry for id: {$entry_id} in database. Database can be corrupted." );
+
+            return $entry->find_attachment_by_id( $id );
+        }
+        return null;
     }
 }
 ?>

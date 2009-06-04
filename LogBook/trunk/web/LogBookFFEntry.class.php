@@ -112,7 +112,8 @@ class LogBookFFEntry {
 
         $result = $this->connection->query (
             'SELECT t.* FROM header h, tag t WHERE h.exper_id='.$this->exper_id().
-            ' AND h.id = t.hdr_id' );
+            ' AND h.id = t.hdr_id'.
+            ' AND h.id='.$this->hdr_id());
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
@@ -164,6 +165,22 @@ class LogBookFFEntry {
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
         return $list;
+    }
+
+    public function find_attachment_by_id( $id ) {
+
+        $result = $this->connection->query (
+            'SELECT id,entry_id,description,document_type, LENGTH(document) AS "document_size"'.
+            ' FROM attachment WHERE id='.$id );
+
+        $nrows = mysql_numrows( $result );
+        if( !$nrows ) return null;
+        if( $nrows != 1 ) throw new LogBookException ( __METHOD__, "unexpected size of result set" );
+
+        return new LogBookFFAttachment (
+            $this->connection,
+            $this,
+            mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
 
     /**
