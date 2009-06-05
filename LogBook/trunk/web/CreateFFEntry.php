@@ -5,17 +5,18 @@ The page for creating a new free-form.
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Create a new shift</title>
+        <title>Create Free-form Entry</title>
     </head>
+    <link rel="stylesheet" type="text/css" href="LogBookTest.css" />
     <body>
         <?php
         $now = new DateTime();
         $now_str = $now->format(DateTime::ISO8601);
         $now_str[10] = ' ';  // get rid of date-time separator 'T'
         ?>
-        <h1>Create new free-form entry :</h1>
-        <form action="ProcessCreateFFEntry.php" method="POST" style="margin-left:2em;">
-            <table cellpadding="3"  border="0" >
+        <p id="title"><b>Create Free-Form Entry</b></p>
+        <form enctype="multipart/form-data" action="ProcessCreateFFEntry.php" method="POST" style="margin-left:2em;">
+            <table cellpadding="3" border="0" >
                 <thead style="color:#0071bc;">
                     <th align="right">
                         &nbsp;<b>Attribute</b>&nbsp;</th>
@@ -39,9 +40,9 @@ The page for creating a new free-form.
                             &nbsp;Leave blank to start new discussion</td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td><i>...or select experiment and relevance time<br>to create a new tree of entries...</i></td>
-                        <td></td>
+                        <td><hr></td>
+                        <td><hr></td>
+                        <td><hr></td>
                     </tr>
                     <tr>
                         <td align="right">
@@ -77,7 +78,7 @@ The page for creating a new free-form.
                         <td align="right">
                             &nbsp;<b>Author</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="16" type="text" name="author" value="" />&nbsp;</td>
+                            &nbsp;<input align="left" size="16" type="text" name="author" value=" <?php echo $_SERVER['WEBAUTH_USER']; ?> " />&nbsp;</td>
                         <td>
                             &nbsp;UNIX account name</td>
                     </tr>
@@ -96,6 +97,86 @@ The page for creating a new free-form.
             </table>
             <br>
             <textarea name="content" rows="12" cols="72"></textarea>
+            <br>
+            <br>
+            <table ellpadding="3" border="0" >
+                <thead style="color:#0071bc;">
+                    <th align="left">
+                        &nbsp;<b>Tag</b>&nbsp;</th>
+                    <th align="left">
+                        &nbsp;<b>Value (optional)</b>&nbsp;</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><hr></td>
+                        <td><hr></td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            &nbsp;<input align="left" size="16" type="text" name="tag_name1" value="" />&nbsp;</td>
+                        <td align="left">
+                            &nbsp;<input align="left" size="24" type="text" name="tag_value1" value="" />&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            &nbsp;<input align="left" size="16" type="text" name="tag_name2" value="" />&nbsp;</td>
+                        <td align="left">
+                            &nbsp;<input align="left" size="24" type="text" name="tag_value2" value="" />&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            &nbsp;<input align="left" size="16" type="text" name="tag_name3" value="" />&nbsp;</td>
+                        <td align="left">
+                            &nbsp;<input align="left" size="24" type="text" name="tag_value3" value="" />&nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <br>
+            <table ellpadding="3" border="0" >
+                <thead style="color:#0071bc;">
+                    <th align="left">
+                        &nbsp;<b>#</b>&nbsp;</th>
+                    <th align="left">
+                        &nbsp;<b>File to attach</b>&nbsp;</th>
+                    <th align="left">
+                        &nbsp;<b>Description (optional)</b>&nbsp;</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="width:4em;"><hr></td>
+                        <td><hr></td>
+                        <td><hr></td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            &nbsp;<b>1</b>&nbsp;</td>
+                        <td>
+                            &nbsp;<input type="hidden" name="MAX_FILE_SIZE" value="1000000">
+                            <input type="file" name="file1">&nbsp;</td>
+                        <td align="left">
+                            &nbsp;<input align="left" size="48" type="text" name="description1" value="" />&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            &nbsp;<b>2</b>&nbsp;</td>
+                        <td>
+                            &nbsp;<input type="hidden" name="MAX_FILE_SIZE" value="1000000">
+                            <input type="file" name="file2">&nbsp;</td>
+                        <td align="left">
+                            &nbsp;<input align="left" size="48" type="text" name="description2" value="" />&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            &nbsp;<b>3</b>&nbsp;</td>
+                        <td>
+                            &nbsp;<input type="hidden" name="MAX_FILE_SIZE" value="1000000">
+                            <input type="file" name="file3">&nbsp;</td>
+                        <td align="left">
+                            &nbsp;<input align="left" size="48" type="text" name="description3" value="" />&nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
             <br>
             <br>
             <input type="submit" value="Submit" name="submit_button" /><br>

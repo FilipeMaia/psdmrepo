@@ -33,7 +33,7 @@ class LogBookRunParam {
     public function type_name () {
         return $this->attr['type']; }
 
-    public function descr () {
+    public function description () {
         return $this->attr['descr']; }
 }
 ?>

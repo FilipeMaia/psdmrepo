@@ -127,20 +127,29 @@ class LogBookFFEntry {
         return $list;
     }
 
-    /**
-     * Add an arbitrary collection of tags.
-     *
-     * The tags (key/value pairs) are expected to be packed
-     * into an associative array.
-     *
-     * @param array $tags
-     */
-    public function add_tags( $tags ) {
+    public function add_tag( $tag, $value ) {
 
-        /* TODO: Parse the associative array and attach tags by the entry
-         */
-        throw new LogBookException (
-            __METHOD__, "not implemented" );
+        $this->connection->query (
+            'INSERT INTO tag VALUES('.$this->hdr_id().
+            ",'".mysql_real_escape_string( $tag ).
+            "','".mysql_real_escape_string( $value )."')" );
+
+        $result = $this->connection->query (
+            'SELECT t.* FROM header h, tag t WHERE h.exper_id='.$this->exper_id().
+            ' AND h.id = t.hdr_id'.
+            ' AND h.id='.$this->hdr_id().
+            " AND t.tag='".$tag."'" );
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows != 1 )
+            throw new LogBookException (
+                __METHOD__, "unexpected size of result set" );
+
+
+        return new LogBookFFTag (
+            $this->connection,
+            $this,
+            mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
 
     public function attachments() {
@@ -175,7 +184,9 @@ class LogBookFFEntry {
 
         $nrows = mysql_numrows( $result );
         if( !$nrows ) return null;
-        if( $nrows != 1 ) throw new LogBookException ( __METHOD__, "unexpected size of result set" );
+        if( $nrows != 1 )
+            throw new LogBookException (
+                __METHOD__, "unexpected size of result set" );
 
         return new LogBookFFAttachment (
             $this->connection,
@@ -190,12 +201,15 @@ class LogBookFFEntry {
      * @param string $document
      * @param string $type
      */
-    public function attach_document( $description, $document, $type ) {
+    public function attach_document( $document, $document_type, $description ) {
 
-        /* TODO: Implement the method
-         */
-        throw new LogBookException (
-            __METHOD__, "not implemented" );
+        $this->connection->query (
+            'INSERT INTO attachment VALUES(NULL,'.$this->id().
+            ",'".mysql_real_escape_string( $description ).
+            "','".mysql_real_escape_string( $document ).
+            "','".$document_type."')" );
+
+        return $this->find_attachment_by_id( '(SELECT LAST_INSERT_ID())' );
     }
 }
 ?>

@@ -84,6 +84,44 @@ class LogBookRun {
         return $list;
     }
 
+    /* Get a value of the specified run parameter
+     */
+    public function get_param_value ( $param ) {
+
+        /* Find the parameter and get its identifier and its type.
+         * Also prepare the value for the specified SQL type.
+         */
+        $param = $this->experiment->find_run_param_by_name( $param );
+        if( is_null( $param ))
+            throw new LogBookException(
+                __METHOD__,
+                "no such run parameter: '".$param."'" );
+
+        $param_id    = $param->attr['id'];
+        $type        = $param->attr['type'];
+        $value_table = 'run_val_'.$type;
+
+        /* Fetch the value and the bookkeeping info
+         */
+        $result = $this->connection->query (
+            'SELECT p.*,v.val FROM run_val p, '.$value_table.' v WHERE p.run_id='.$this->id().
+            ' AND p.param_id='.$param_id.
+            ' AND p.run_id=v.run_id AND p.param_id=v.param_id'.
+            $extra_condition );
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 0 ) return null;
+        if( $nrows != 1 )
+            throw new LogBookException(
+                __METHOD__,
+                "unexpected size of the result set returned by query" );
+
+        return new LogBookRunVal (
+            $this->connection,
+            $this,
+            mysql_fetch_array( $result, MYSQL_ASSOC ));
+    }
+
     /* Set a value of the specified run parameter
      */
     public function set_param_value ( $param, $value, $source, $updated, $allow_update=false ) {
@@ -153,8 +191,7 @@ class LogBookRun {
                 ' WHERE run_id='.$run_id.' AND param_id='.$param_id );
 
         } else {
-
-            $this->connection->query (
+           $this->connection->query (
                 "INSERT INTO run_val VALUES (".$run_id.",".$param_id.",'".$source."',".$updated->to64().")" );
 
             $this->connection->query (

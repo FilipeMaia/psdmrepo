@@ -34,6 +34,6 @@ class LogBookRunVal {
         return LogBookTime::from64( $this->attr['updated'] ); }
 
     public function value() {
-        return $this->attr['value']; }
+        return $this->attr['val']; }
 }
 ?>

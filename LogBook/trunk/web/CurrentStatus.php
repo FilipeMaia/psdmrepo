@@ -11,17 +11,13 @@ The page for reporting the current status of the LogBook database.
     <body>
         <style>
         #experiment_hdr {
-            margin-left:2em;
-        }
-        .hdr_table_cell_0 {
-            width:6em;
-            font-size:xx-large;
+            margin-left:4em;
         }
         #experiment {
             margin-left:4em;
         }
         .hdr_table_cell_1st {
-            width:3em;
+            width:4em;
             font-size:x-large;
         }
         .table_cell_1st {
@@ -43,6 +39,12 @@ The page for reporting the current status of the LogBook database.
             width:9em;
             background-color:silver;
         }
+        #runparams {
+            margin-left:4em;
+        }
+        #ffentries {
+            margin-left:4em;
+        }
         #ffentries_table td {
             vertical-align:top;
         }
@@ -50,6 +52,7 @@ The page for reporting the current status of the LogBook database.
             width:20em;
         }
         </style>
+        <p id="title"><b>Experiment Status</b></p>
 <?php
 require_once('LogBook.inc.php');
 
@@ -91,12 +94,11 @@ try {
         $entry = $experiment->find_last_entry();
     }
     echo <<<HERE
-<br>
 <div id="experiment_hdr">
     <table>
         <tbody>
             <tr>
-                <td valign="center" class="hdr_table_cell_0"><b>Experiment</b></td>
+                <td valign="center" class="hdr_table_cell_1st"><b>Status</b></td>
                 <td>
                     <table>
                         <tbody>
@@ -186,8 +188,92 @@ try {
             </tr>
         </tbody>
     </table>
-    <br>
-    <br>
+</div>
+<br>
+<br>
+<br>
+<div id="runparams">
+    <table>
+        <tbody>
+            <tr>
+                <td valign="center" class="hdr_table_cell_1st"><b>Params</b></td>
+                <td>
+                    <table cellpadding="3"  border="0">
+                        <thead>
+                            <th align="left" style="color:#0071bc;">
+                                &nbsp;<b>Run Parameter</b>&nbsp;
+                            </th>
+                            <th align="left" style="color:#0071bc;">
+                                &nbsp;<b>Update Time</b>&nbsp;
+                            </th>
+                            <th align="left" style="color:#0071bc;">
+                                &nbsp;<b>Source</b>&nbsp;
+                            </th>
+                            <th align="left" style="color:#0071bc;">
+                                &nbsp;<b>Value</b>&nbsp;
+                            </th>
+                            <th align="left" style="color:#0071bc;">
+                                &nbsp;<b>Description</b>&nbsp;
+                            </th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><hr></td>
+                                <td><hr></td>
+                                <td><hr></td>
+                                <td><hr></td>
+                                <td><hr></td>
+                            </tr>
+HERE;
+    if( !is_null( $experiment )) {
+        $count = 0;
+        $params = $experiment->run_params();
+        foreach( $params as $p ) {
+
+            $v = $run->get_param_value( $p->name());
+            if( !is_null( $v )) {
+                $v_updated = $v->updated()->toStringShort();
+                $v_source  = $v->source();
+                $v_value   = $v->value();
+            } else {
+                unset( $v_updated );
+                unset( $v_source  );
+                unset( $v_value   );
+            }
+            if( $count % 2 == 0 ) $style = 'style="background-color:silver;"';
+            else $style = '';
+            echo <<<HERE
+                            <tr valign="top" {$style}>
+                                <td>&nbsp;{$p->name()}&nbsp;</td>
+                                <td>&nbsp;{$v_updated}&nbsp;</td>
+                                <td>&nbsp;{$v_source}&nbsp;</td>
+                                <td>&nbsp;{$v_value}&nbsp;</td>
+                                <td>&nbsp;<i>{$p->description()}</i>&nbsp;</td>
+                            </tr>
+HERE;
+                    $count++;
+                }
+            }
+            echo <<<HERE
+                            <tr>
+                                <td><hr></td>
+                                <td><hr></td>
+                                <td><hr></td>
+                                <td><hr></td>
+                                <td><hr></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+HERE;
+echo <<<HERE
+<br>
+<br>
+<div id="ffentries">
     <table cellpadding="3"  border="0">
         <thead>
             <th align="left" style="color:#0071bc;">

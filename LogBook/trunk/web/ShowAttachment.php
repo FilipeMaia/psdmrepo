@@ -20,68 +20,9 @@ try {
 
     $attachment = $logbook->find_attachment_by_id( $id )
         or die("no such attachment" );
-?>
-<!--
-To change this template, choose Tools | Templates
-and open the template in the editor.
--->
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Show Attachment</title>
-    </head>
-    <link rel="stylesheet" type="text/css" href="LogBookTest.css" />
-    <body>
-        <style>
-        #attachment {
-            margin-left:4em;
-        }
-        .table_cell_1st {
-            color:#0071bc;
-            width:6em;
-        }
-        .table_cell_name {
-            background-color:silver;
-            width:9em;
-        }
-        .table_cell_number {
-            background-color:silver;
-            width:4em;
-        }
-        </style>
-        <h1>Attachment : </h1>
-        <div id="attachment">
-            <table>
-                <tbody>
-                    <tr>
-                        <td class="table_cell_1st">Description</td>
-                        <td class="table_cell_name"><?php echo( $attachment->description()); ?></td>
-                    </tr>
-                    <tr>
-                        <td class="table_cell_1st">Type</td>
-                        <td class="table_cell_name"><?php echo( $attachment->document_type()); ?></td>
-                    </tr>
-                    <tr>
-                        <td class="table_cell_1st">Size</td>
-                        <td class="table_cell_number"><?php echo( $attachment->document_size()); ?> Bytes</td>
-                    </tr>
 
-                </tbody>
-            </table>
-            <br>
-            <table>
-                <tbody>
-                    <tr>
-                        <td class="table_cell_1st">Document</td>
-                        <td><?php echo( $attachment->document()); ?></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </body>
-</html>
-<?php
+    header( "Content-type: {$attachment->document_type()}" );
+    echo( $attachment->document());
 
     $logbook->commit();
 
