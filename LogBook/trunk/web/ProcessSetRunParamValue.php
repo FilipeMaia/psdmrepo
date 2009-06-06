@@ -6,34 +6,39 @@ require_once('LogBook.inc.php');
  * This script will process a request for creating a new run
  * in the database.
  */
-if(isset($_POST['param']))
-    $param = $_POST['param'];
-else
+if( isset( $_POST['param'] )) {
+    $param = trim( $_POST['param'] );
+    if( $param == '' )
+        die( "parameter name can't be empty" );
+} else
     die( "no valid parameter name" );
 
-if(isset($_POST['experiment_name']))
-    $experiment_name = $_POST['experiment_name'];
-else
+if( isset( $_POST['experiment_name'] )) {
+    $experiment_name = trim( $_POST['experiment_name'] );
+    if( $experiment_name == '' )
+        die( "experiment name can't be empty" );
+} else
     die( "no valid experiment name" );
 
-if(isset($_POST['num'])) {
-    if( 1 != sscanf( $_POST['num'], "%ud", $num ))
+if( isset( $_POST['num'] )) {
+    if( 1 != sscanf( trim( $_POST['num'] ), "%ud", $num ))
         $num = -1;
- } else {
-     die( "no run number" );
- }
+ } else
+     die( "no valid run number" );
 
-if(isset($_POST['source']))
-    $source = $_POST['source'];
-else
+if( isset( $_POST['source'] )) {
+    $source = trim( $_POST['source'] );
+    if( $source == '' )
+        die( "source name can't be empty" );
+} else
     die( "no valid source" );
 
-if(isset($_POST['value']))
-    $value = $_POST['value'];
+if( isset( $_POST['value'] ))
+    $value = trim( $_POST['value'] );
 else
     die( "no parameter value" );
 
-$update_allowed =isset($_POST['update_allowed']);
+$update_allowed = isset( $_POST['update_allowed'] );
 
 /* Proceed with the operation
  */

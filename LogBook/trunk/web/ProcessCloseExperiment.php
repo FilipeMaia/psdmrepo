@@ -6,14 +6,16 @@ require_once('LogBook.inc.php');
  * This script will process a request for closing an existing experiment
  * in the database.
  */
-if(isset($_POST['name']))
-    $name = $_POST['name'];
-else
+if( isset( $_POST['name'] )) {
+    $name = trim( $_POST['name'] );
+    if( $name == '' )
+        die( "experiment name can't be empty" );
+} else
     die( "no valid experiment name" );
 
-if(isset($_POST['end_time'])) {
-    $end_time = LogBookTime::parse($_POST['end_time']);
-    if(is_null($end_time))
+if( isset( $_POST['end_time'] )) {
+    $end_time = LogBookTime::parse( trim( $_POST['end_time'] ));
+    if( is_null( $end_time ))
         die("end time has invalid format");
 } else
     die( "no end time for experiment" );

@@ -6,10 +6,10 @@ for an experiment.
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Selected runs to list</title>
+        <title>List Run Summary Parameters</title>
     </head>
     <body>
-        <h1>Select runs to list :</h1>
+        <h1>Select experiment :</h1>
         <form action="ProcessListRunParams.php" method="POST" style="margin-left:2em;">
             <table cellpadding="3"  border="0" >
                 <thead style="color:#0071bc;">

@@ -13,7 +13,7 @@ The page for closing an open-ended shift.
         $now_str = $now->format(DateTime::ISO8601);
         $now_str[10] = ' ';  // get rid of date-time separator 'T'
         ?>
-        <h1>Close run :</h1>
+        <h1>Close Shift :</h1>
         <form action="ProcessCloseShift.php" method="POST" style="margin-left:2em;">
             <table cellpadding="3"  border="0" >
                 <thead style="color:#0071bc;">

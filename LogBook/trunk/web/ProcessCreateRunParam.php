@@ -6,23 +6,29 @@ require_once('LogBook.inc.php');
  * This script will process a request for creating a new run
  * parameter in the database.
  */
-if(isset($_POST['param']))
-    $param = $_POST['param'];
-else
+if( isset( $_POST['param'] )) {
+    $param = trim( $_POST['param'] );
+    if( $param == '' )
+        die( "run parameter name can't be empty" );
+} else
     die( "no valid parameter name" );
 
-if(isset($_POST['experiment_name']))
+if( isset( $_POST['experiment_name'] )) {
     $experiment_name = $_POST['experiment_name'];
-else
+    if( $experiment_name == '' )
+        die( "experiment name can't be empty" );
+} else
     die( "no valid experiment name" );
 
-if(isset($_POST['type']))
-    $type = $_POST['type'];
-else
+if( isset( $_POST['type'] )) {
+    $type = trim( $_POST['type'] );
+    if( $type == '' )
+        die( "parameter type can't be empty" );
+} else
     die( "no valid parameter type" );
 
-if(isset($_POST['descr']))
-    $descr = $_POST['descr'];
+if( isset( $_POST['descr']))
+    $descr = trim( $_POST['descr'] );
 else
     die( "no valid parameter description" );
 

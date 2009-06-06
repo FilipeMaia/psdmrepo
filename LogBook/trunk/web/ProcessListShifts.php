@@ -6,9 +6,9 @@ require_once('LogBook.inc.php');
  * This script will process a request for listing shifts of an
  * experiment.
  */
-if(isset($_POST['experiment_name'])) {
+if( isset( $_POST['experiment_name'] )) {
     $experiment_name = trim( $_POST['experiment_name'] );
-    if( strlen( $experiment_name ) == 0 )
+    if( $experiment_name == '' )
         die( "experiment name can't be empty" );
 } else
     die( "no valid experiment name" );

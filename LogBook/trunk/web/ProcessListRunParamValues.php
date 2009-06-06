@@ -8,20 +8,21 @@ require_once('LogBook.inc.php');
  * - all runs of that experiment
  * - the specified (just one) run of the experiment
  */
-if(isset( $_POST['num'])) {
+if( isset( $_POST['num'] )) {
     if( 1 != sscanf( trim( $_POST['num'] ), "%ud", $num )) {
 
         /* No specific run given - then assume all runs
          */
         $num = null;
     }
- } else {
-     die( "no run number" );
- }
+ } else
+     die( "no valid run number" );
 
-if( isset( $_POST['experiment_name']))
+if( isset( $_POST['experiment_name'])) {
     $experiment_name = trim( $_POST['experiment_name'] );
-else
+    if( $experiment_name == '' )
+        die( "experiment name can't be empty" );
+} else
     die( "no valid experiment name" );
 
 /* Proceed to the operation

@@ -49,7 +49,7 @@ The page for reporting the current status of the LogBook database.
             vertical-align:top;
         }
         .ffentries_table_cell_contents {
-            width:20em;
+            width:16em;
         }
         </style>
         <p id="title"><b>Experiment Status</b></p>

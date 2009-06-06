@@ -99,6 +99,7 @@ class LogBook {
 
         return $this->find_experiment_by_id( '(SELECT LAST_INSERT_ID())' );
     }
+
     /* ============================
      *   ID-BASED DIRECT LOCATORS
      * ============================
@@ -133,5 +134,36 @@ class LogBook {
         }
         return null;
     }
-}
+
+    public function find_entry_by_id( $id ) {
+
+        $result = $this->connection->query (
+            "SELECT h.exper_id, e.id FROM header h, entry e".
+            " WHERE e.id=".$id.
+            " AND h.id=e.hdr_id" );
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 1 ) {
+
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+
+            $exper_id = $attr['exper_id'];
+            $experiment = $this->find_experiment_by_id( $exper_id );
+            if( is_null( $experiment ))
+                throw new LogBookException(
+                    __METHOD__,
+                    "no experiment for id: {$exper_id} in database. Database can be corrupted." );
+
+            $entry_id = $attr['id'];
+            return $experiment->find_entry_by_id( $entry_id );
+            if( is_null( $entry ))
+                throw new LogBookException(
+                    __METHOD__,
+                    "no free-form entry for id: {$entry_id} in database. Database can be corrupted." );
+
+            return $entry;
+        }
+        return null;
+    }
+ }
 ?>

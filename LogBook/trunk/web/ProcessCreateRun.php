@@ -6,30 +6,37 @@ require_once('LogBook.inc.php');
  * This script will process a request for creating a new run
  * in the database.
  */
-if(isset($_POST['num']))
-    $num = $_POST['num'];
-else
-    $num = 0;
+if( isset( $_POST['num'] )) {
+    $str = trim( $_POST['num'] );
+    if( $str != '' ) {
+        if( 1 != sscanf( $str, "%d", $num ))
+            die( "run number has invalid format" ) ;
+    } else {
+        $num = 0;
+    }
+} else
+    die( "no valid run umber" );
 
-if(isset($_POST['experiment_name']))
-    $experiment_name = $_POST['experiment_name'];
-else
+if( isset( $_POST['experiment_name'] )) {
+    $experiment_name = trim( $_POST['experiment_name'] );
+    if( $experiment_name == '' )
+        die( "experiment name can't be empty" );
+} else
     die( "no valid experiment name" );
 
-if(isset($_POST['begin_time'])) {
-    $begin_time = LogBookTime::parse($_POST['begin_time']);
-    if(is_null($begin_time))
+if( isset( $_POST['begin_time'] )) {
+    $begin_time = LogBookTime::parse( trim( $_POST['begin_time'] ));
+    if( is_null( $begin_time ))
         die("begin time has invalid format");
 } else
     die( "no begin time for run" );
 
-if(isset($_POST['end_time'])) {
-    $end_time = $_POST['end_time'];
-    if($end_time=='')
-        $end_time=null;
+if( isset( $_POST['end_time'] )) {
+    $str = trim( $_POST['end_time'] );
+    if( $str == '' ) $end_time=null;
     else {
-        $end_time = LogBookTime::parse($_POST['end_time']);
-        if(is_null($end_time))
+        $end_time = LogBookTime::parse( $str );
+        if( is_null( $end_time ))
             die("end time has invalid format");
     }
 } else
