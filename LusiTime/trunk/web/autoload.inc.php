@@ -1,6 +1,6 @@
 <?php
 // change this, if this code isn't "higher" than ALL classfiles
-define("CLASS_DIR", dirname(__FILE__));
+define("CLASS_DIR", dirname(__FILE__).'/../../');
 
 /**
  * autoload classes (no need to include them one by one)

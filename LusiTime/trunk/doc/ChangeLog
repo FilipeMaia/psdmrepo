@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2009-06-08 Igor Gaponenko
+- added autoloader for PHP classes
+- aded include file for PHP library
+
 Tag: V00-00-07
 2009-06-08 Igor Gaponenko
 - added subdirectory 'web' with PHP code implementing similar functionality
