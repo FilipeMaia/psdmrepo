@@ -1,24 +1,26 @@
 --
 -- Test change_fileset_status
 --
-SELECT id FROM experiment_def AS ed WHERE ed.name = 'First_AMOS' INTO @exper_id;
-SELECT id FROM filetype_def AS ft WHERE ft.name = 'XTC' INTO @ft_id;
+set @exper = 'ChangeFilenameStatus';
+set @runtype = 'Calibration';
+set @runnum = 123;
 set @req_bytes = 1000000;
 set @newset = 0;
-CALL new_fileset (@exper_id, @req_bytes, @newset, @newuri);
+CALL new_fileset (@exper, @runtype, @runnum, @req_bytes, @newset, @newuri);
 SELECT * FROM fileset;
 SELECT @newuri;
 set @status = 0;
-CALL add_file_to_set (@newset, @ft_id, 'file1', 50000, @status);
+set @ft = 'EPICS';
+CALL add_file_to_set (@newset, @ft, 'file1', 50000, @status);
 SELECT @status;
 set @status = 0;
-CALL add_file_to_set (@newset, @ft_id, 'file2', 50000, @status);
+set @ft = 'XTC';
+CALL add_file_to_set (@newset, @ft, 'file2', 50000, @status);
 SELECT @status;
 set @status = 0;
-CALL add_file_to_set (@newset, @ft_id, 'file3', 50000, @status);
+CALL add_file_to_set (@newset, @ft, 'file3', 50000, @status);
 SELECT @status;
 SELECT * FROM filename;
-
 SELECT id FROM fileset_status_def AS fs WHERE fs.name = 'Waiting_Translation' INTO @fsstat_id;
 set @status = 0;
 CALL change_fileset_status (@newset, @fsstat_id, @status);

@@ -2,21 +2,29 @@
 -- Test get_fileset_with_status
 -- This also assumes that change_fileset_status works
 --
-SELECT id FROM experiment_def AS ed WHERE ed.name = 'First_AMOS' INTO @exper_id;
+set @exper = 'TEST getfileset';
+set @runtype = 'Data';
+set @runnum = 432;
 set @req_bytes = 1000000;
 set @newset = 0;
-CALL new_fileset (@exper_id, @req_bytes, @newset, @newuri);
+set @getset = 0;
+-- Create several filesets to insure we get the oldest that matches
+CALL new_fileset (@exper, @runtype, @runnum, @req_bytes, @newset, @newuri);
+CALL new_fileset (@exper, @runtype, @runnum, @req_bytes, @newset, @newuri);
+CALL new_fileset (@exper, @runtype, @runnum, @req_bytes, @newset, @newuri);
 SELECT * FROM fileset;
+SELECT @newset;
 SELECT @newuri;
-SELECT id FROM fileset_Status_def AS fd WHERE fd.name = "Initial_Entry" INTO @stat_id;
-CALL get_fileset_with_status (@stat_id, @exper_id, @getset);
+SELECT id FROM fileset_status_def AS fd WHERE fd.name = "Initial_Entry" INTO @stat_id;
+SELECT @stat_id;
+CALL get_fileset_with_status (@stat_id, @getset);
 SELECT @getset;
-SELECT id FROM fileset_Status_def AS fd WHERE fd.name = "Waiting_Translation" INTO @stat_id;
-CALL get_fileset_with_status (@stat_id, @exper_id, @getset);
+SELECT id FROM fileset_status_def AS fd WHERE fd.name = "Waiting_Translation" INTO @stat_id;
+CALL get_fileset_with_status (@stat_id, @getset);
 SELECT @getset;
 CALL change_fileset_status (@newset, @stat_id, @status);
 SELECT @status;
-CALL get_fileset_with_status (@stat_id, @exper_id, @getset);
+SELECT * FROM fileset;
+CALL get_fileset_with_status (@stat_id, @getset);
 SELECT @getset;
-SELECT * from fileset;
 
