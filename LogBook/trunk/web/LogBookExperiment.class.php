@@ -23,17 +23,17 @@ class LogBookExperiment {
         return $this->attr['id']; }
 
     public function begin_time () {
-        return LogBookTime::from64( $this->attr['begin_time'] ); }
+        return LusiTime::from64( $this->attr['begin_time'] ); }
 
     public function end_time () {
         if( is_null( $this->attr['end_time'] )) return null;
-        return LogBookTime::from64( $this->attr['end_time'] ); }
+        return LusiTime::from64( $this->attr['end_time'] ); }
 
     public function name () {
         return $this->attr['name']; }
 
     public function in_interval ( $timestamp ) {
-        return LogBookTime::in_interval(
+        return LusiTime::in_interval(
             $timestamp,
             $this->attr['begin_time'],
             $this->attr['end_time'] ); }
@@ -111,15 +111,15 @@ class LogBookExperiment {
          */
         $this->connection->query (
             'INSERT INTO "shift" VALUES('.$this->attr['id']
-            .",".LogBookTime::to64from( $begin_time )
-            .",".( is_null( $end_time ) ? 'NULL' : LogBookTime::to64from( $end_time ))
+            .",".LusiTime::to64from( $begin_time )
+            .",".( is_null( $end_time ) ? 'NULL' : LusiTime::to64from( $end_time ))
             .",'".$leader."')" );
 
         return $this->find_shift_by_begin_time( $begin_time );
     }
 
     public function find_shift_by_begin_time ( $begin_time ) {
-        return $this->find_shift_by_( "begin_time=".LogBookTime::to64from($begin_time)) ; }
+        return $this->find_shift_by_( "begin_time=".LusiTime::to64from($begin_time)) ; }
 
     public function find_shift_at ( $time ) {
         return $this->find_shift_by_( 'begin_time <= '.$time.' AND '.$time.'< end_time') ; }
@@ -207,8 +207,8 @@ class LogBookExperiment {
      * Create new run
      *
      * @param int $num
-     * @param LogBookTime $begin_time
-     * @param LogBookTime $end_time
+     * @param LusiTime $begin_time
+     * @param LusiTime $end_time
      *
      * @return LogBookRun - new run object
      */
@@ -251,8 +251,8 @@ class LogBookExperiment {
         $this->connection->query(
             'INSERT INTO "run" VALUES(NULL,'.( $num > 0 ? $num : $this->allocate_run( $num ))
             .",".$this->attr['id']
-            .",".LogBookTime::to64from( $begin_time )
-            .",".( is_null( $end_time ) ? 'NULL' : LogBookTime::to64from( $end_time )).")" );
+            .",".LusiTime::to64from( $begin_time )
+            .",".( is_null( $end_time ) ? 'NULL' : LusiTime::to64from( $end_time )).")" );
 
         return $this->find_run_by_id('(SELECT LAST_INSERT_ID())');
     }
@@ -429,11 +429,11 @@ class LogBookExperiment {
 
         $this->connection->query (
             "INSERT INTO header VALUES(NULL,".$this->attr['id'].
-            ",".LogBookTime::to64from( $relevance_time ).")" );
+            ",".LusiTime::to64from( $relevance_time ).")" );
 
         $this->connection->query (
             "INSERT INTO entry VALUES(NULL,(SELECT LAST_INSERT_ID()),NULL".
-            ",".LogBookTime::now()->to64().
+            ",".LusiTime::now()->to64().
             ",'".$author.
             "','".$content.
             "','".$content_type."')" );
@@ -446,7 +446,7 @@ class LogBookExperiment {
     /**
      * Close the open-ended experiment
      *
-     * @param LogBookTime $end_time
+     * @param LusiTime $end_time
      */
     public function close ( $end_time ) {
 
@@ -522,7 +522,7 @@ class LogBookExperiment {
 
         /* Make the update
          */
-        $end_time_64 = LogBookTime::to64from( $end_time );
+        $end_time_64 = LusiTime::to64from( $end_time );
         $this->connection->query(
             'UPDATE "experiment" SET end_time='.$end_time_64.
             ' WHERE id='.$this->id());

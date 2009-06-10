@@ -25,11 +25,11 @@ class LogBookShift {
         return $this->attr['exper_id']; }
 
     public function begin_time() {
-        return LogBookTime::from64( $this->attr['begin_time'] ); }
+        return LusiTime::from64( $this->attr['begin_time'] ); }
 
     public function end_time() {
         if( is_null( $this->attr['end_time'] )) return null;
-        return LogBookTime::from64( $this->attr['end_time'] ); }
+        return LusiTime::from64( $this->attr['end_time'] ); }
 
     public function leader() {
         return $this->attr['leader']; }
@@ -55,7 +55,7 @@ class LogBookShift {
 
         /* Make the update
          */
-        $end_time_64 = LogBookTime::to64from( $end_time );
+        $end_time_64 = LusiTime::to64from( $end_time );
         $this->connection->query (
             'UPDATE "shift" SET end_time='.$end_time_64.
             ' WHERE exper_id='.$this->exper_id().' AND begin_time='.$this->attr['begin_time'] );

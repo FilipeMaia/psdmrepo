@@ -60,7 +60,7 @@ try {
             or die( "no such run of the experiment" );
     }
     $run->set_param_value (
-        $param, $value, $source, LogBookTime::now(), $update_allowed );
+        $param, $value, $source, LusiTime::now(), $update_allowed );
 ?>
 <!--
 The page for reporting the information about all summary parameters of the run.

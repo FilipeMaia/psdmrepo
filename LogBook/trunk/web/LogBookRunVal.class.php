@@ -31,7 +31,7 @@ class LogBookRunVal {
         return $this->attr['source']; }
 
     public function updated() {
-        return LogBookTime::from64( $this->attr['updated'] ); }
+        return LusiTime::from64( $this->attr['updated'] ); }
 
     public function value() {
         return $this->attr['val']; }

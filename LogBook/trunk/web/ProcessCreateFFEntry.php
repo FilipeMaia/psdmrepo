@@ -22,7 +22,7 @@ if( isset( $_POST['experiment_name'] )) {
     die( "no valid experiment name" );
 
 if( isset( $_POST['relevance_time'])) {
-    $relevance_time = LogBookTime::parse( trim( $_POST['relevance_time'] ));
+    $relevance_time = LusiTime::parse( trim( $_POST['relevance_time'] ));
     if( is_null( $relevance_time ))
         die("relevance time has invalid format");
 } else

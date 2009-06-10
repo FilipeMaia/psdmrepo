@@ -49,7 +49,7 @@ class LogBookFFEntry {
         return $this->attr['exper_id']; }
 
     public function relevance_time () {
-        return LogBookTime::from64( $this->attr['relevance_time'] ); }
+        return LusiTime::from64( $this->attr['relevance_time'] ); }
 
     public function id() {
         return $this->attr['id']; }
@@ -58,7 +58,7 @@ class LogBookFFEntry {
         return $this->attr['parent_entry_id']; }
 
     public function insert_time () {
-        return LogBookTime::from64( $this->attr['insert_time'] ); }
+        return LusiTime::from64( $this->attr['insert_time'] ); }
 
     public function author() {
         return $this->attr['author']; }
@@ -97,7 +97,7 @@ class LogBookFFEntry {
         $subquery = "(SELECT h.id FROM header h, entry e WHERE h.id = e.hdr_id AND e.id=".$this->attr['id'].")";
         $this->connection->query (
             "INSERT INTO entry VALUES(NULL,".$subquery.",".$this->attr['id'].
-            ",".LogBookTime::now()->to64().
+            ",".LusiTime::now()->to64().
             ",'".$author.
             "','".$content.
             "','".$content_type."')" );

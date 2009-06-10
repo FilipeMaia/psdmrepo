@@ -14,7 +14,7 @@ if( isset( $_POST['name'] )) {
     die( "no valid experiment name" );
 
 if( isset( $_POST['begin_time'] )) {
-    $begin_time = LogBookTime::parse( trim( $_POST['begin_time'] ));
+    $begin_time = LusiTime::parse( trim( $_POST['begin_time'] ));
     if( is_null( $begin_time ))
         die("begin time has invalid format");
 } else
@@ -25,7 +25,7 @@ if( isset( $_POST['end_time'] )) {
     if( $end_time == '' )
         $end_time=null;
     else {
-        $end_time = LogBookTime::parse( $end_time );
+        $end_time = LusiTime::parse( $end_time );
         if( is_null( $end_time ))
             die("end time has invalid format");
     }
