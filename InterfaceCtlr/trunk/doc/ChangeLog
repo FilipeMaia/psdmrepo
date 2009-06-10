@@ -30,4 +30,10 @@ to create database. Update all test sql scripts. Basic functionality of all
 store procedures tested. Can't get dynamic SQL to work in a stored procedure
 so test_get_def_id.sql is just a shell.
 
+Tag: V00-01-04
+2009-06-10 Robert C. Sass
+- Relace MySQL workbench file and add generated CreateIDB-10-Jun-2009.sql file. Changes 
+to database, stored procedures, test*.sql and OnlineSim to reflect changes from last meeting. 
+The fileset now has an experiment, run type and run number that are unverified. 
+File type becomes an enum in the filename table.
 
