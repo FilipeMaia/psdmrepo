@@ -69,7 +69,18 @@ class LogBookExperiment {
         return $list;
     }
 
-    public function create_shift ( $leader, $begin_time, $end_time=null ) {
+    public function create_shift ( $leader, $crew, $begin_time, $end_time=null ) {
+
+        /* Verify the leader's name
+         */
+        if( is_null( $leader ))
+            throw new LogBookException(
+                __METHOD__, "crew leader name is null" );
+
+        $leader = trim( $leader );
+        if( strlen( $leader ) == 0 )
+            throw new LogBookException(
+                __METHOD__, "crew leader name is empty" );
 
         /* Make sure the interval is valid
          */
@@ -91,6 +102,28 @@ class LogBookExperiment {
                 __METHOD__,
                 "end time '".$end_time."' is out of experiment's limits" );
 
+        /* Process the list of crew members, and add the leader into it
+         * if the leader isn't there yet. Also make sure the array has
+         * no duplicate names, and the names aren't empty.
+         */
+        $shift_crew = array_unique( $crew );
+        foreach( $shift_crew as $member ) {
+
+            if( is_null( $member ))
+                throw new LogBookException(
+                    __METHOD__, "crew member name is null" );
+
+            $member = trim( $member );
+            if( strlen( $member ) == 0 )
+                throw new LogBookException(
+                    __METHOD__, "crew member name is empty" );
+
+            if( $member == $leader )
+                $leader_in_crew = true;
+        }
+        if( !$leader_in_crew )
+            array_push( $shift_crew, $leader );
+
         /* Get the last/current shift (if any). We want to make sure that
          * the new one begins afterward. Also, if the current shift
          * is open-ended then we want to get it closed where the new
@@ -107,15 +140,25 @@ class LogBookExperiment {
                 $last_shift->close( $begin_time );
         }
 
-        /* Proceed with the new shift.
+        /* Proceed with the new shift and the shift crew.
          */
         $this->connection->query (
-            'INSERT INTO "shift" VALUES('.$this->attr['id']
+            'INSERT INTO shift VALUES(NULL,'.$this->attr['id']
             .",".LusiTime::to64from( $begin_time )
             .",".( is_null( $end_time ) ? 'NULL' : LusiTime::to64from( $end_time ))
             .",'".$leader."')" );
 
-        return $this->find_shift_by_begin_time( $begin_time );
+        $new_shift = $this->find_shift_by_( 'id=(SELECT LAST_INSERT_ID())' );
+        if( is_null( $new_shift ))
+            throw new LogBookException(
+                __METHOD__,
+                "internal implementation errort" );
+
+        foreach( $shift_crew as $member )
+            $this->connection->query (
+                "INSERT INTO shift_crew VALUES({$new_shift->id()},'$member')" );
+
+        return $new_shift;
     }
 
     public function find_shift_by_begin_time ( $begin_time ) {

@@ -33,10 +33,14 @@ The page for reporting the information about all shifts of the experiment.
     </head>
     <link rel="stylesheet" type="text/css" href="LogBookTest.css" />
     <body>
-        <!------------------------------>
         <h1>All shifts of experiment : <?php echo $experiment->name(); ?></h1>
         <?php
-        LogBookTestTable::Shift( "table_4")->show( $experiment->shifts());
+        $shifts = $experiment->shifts();
+        foreach( $shifts as $s ) {
+            LogBookTestTable::Shift( "table_4" )->show( array( $s ));
+            LogBookTestTable::ShiftCrew( "table_6" )->show( $s->crew());
+            echo( '<br>' );
+        }
         ?>
     </body>
 </html>

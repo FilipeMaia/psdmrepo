@@ -38,6 +38,22 @@ if( isset( $_POST['end_time'] )) {
 } else
     die( "no end time for shift" );
 
+// Read optional names of crew members submitted with the request
+//
+define( MAX_MEMBERS, 3 );   // max number of members to attach
+
+$crew = array();
+for( $i = 0; $i < MAX_MEMBERS; $i++ ) {
+
+    $key  = 'crew_member'.$i;
+    if( isset( $_POST[$key] )) {
+
+        $member = trim( $_POST[$key] );
+        if( $member != '' )
+            array_push( $crew, $member );
+    }
+}
+
 /* Proceed with the operation
  */
 try {
@@ -47,28 +63,10 @@ try {
     $experiment = $logbook->find_experiment_by_name( $experiment_name )
         or die("failed to find the experiment" );
 
-    $shift = $experiment->create_shift( $leader, $begin_time, $end_time );
-?>
-<!--
-The page for reporting the information about all shifts of the experiment.
--->
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Newely created shift</title>
-    </head>
-    <link rel="stylesheet" type="text/css" href="LogBookTest.css" />
-    <body>
-        <!------------------------------>
-        <h1>All shifts of an experiment</h1>
-        <h2><?php echo $experiment->name(); ?></h2>
-        <?php
-        LogBookTestTable::Shift()->show( $experiment->shifts());
-        ?>
-    </body>
-</html>
-<?php
+    $shift = $experiment->create_shift( $leader, $crew, $begin_time, $end_time );
+    /* Redirect to another page to see all experiments
+     */
+    header( 'Location: ListShifts.php' ) ;
 
     $logbook->commit();
 

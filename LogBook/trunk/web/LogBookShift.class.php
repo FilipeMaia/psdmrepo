@@ -21,6 +21,9 @@ class LogBookShift {
 
     /* Accessors
      */
+    public function id() {
+        return $this->attr['id']; }
+
     public function exper_id() {
         return $this->attr['exper_id']; }
 
@@ -63,6 +66,31 @@ class LogBookShift {
         /* Update the current state of the object
          */
         $this->attr['end_time'] = $end_time_64;
+    }
+
+    /**
+     * Get a complete crew (names of all members including the leader)
+     *
+     * @return array
+     */
+    public function crew() {
+
+        $list = array();
+
+        $result = $this->connection->query(
+            'SELECT member FROM shift_crew WHERE shift_id='.$this->id());
+
+        $nrows = mysql_numrows( $result );
+        for( $i = 0; $i < $nrows; $i++ ) {
+            $member =  mysql_result( $result, $i );
+            array_push( $list, $member );
+            if( $member == $this->leader())
+                $leader_in_crew = true;
+        }
+        if( !$leader_in_crew )
+            array_push( $list, $this->leader());
+
+        return $list;
     }
 }
 ?>

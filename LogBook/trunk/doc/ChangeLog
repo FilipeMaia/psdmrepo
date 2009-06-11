@@ -11,6 +11,15 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2009-06-10 Igor Gaponenko
+- extend schema and PHP implementation to allow shift crew members
+in addition to the shift leader. Implement HTML tests.
+
+Tag: V00-00-02
+2009-06-09 Igor Gaponenko
+- first implementation
+
 Tag: V00-00-01
 2009-05-19 Igor Gaponenko
 - initial version of the package

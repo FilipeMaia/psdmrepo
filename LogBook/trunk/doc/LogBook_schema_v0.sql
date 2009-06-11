@@ -239,12 +239,13 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `LOGBOOK`.`SHIFT` ;
 
 CREATE  TABLE IF NOT EXISTS `LOGBOOK`.`SHIFT` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
   `exper_id` INT NOT NULL ,
   `begin_time` BIGINT UNSIGNED NOT NULL ,
   `end_time` BIGINT UNSIGNED NULL ,
   `leader` VARCHAR(32) NOT NULL ,
   INDEX `SHIFT_FK_1` (`exper_id` ASC) ,
-  PRIMARY KEY (`exper_id`, `begin_time`) ,
+  PRIMARY KEY (`id`) ,
   CONSTRAINT `SHIFT_FK_1`
     FOREIGN KEY (`exper_id` )
     REFERENCES `LOGBOOK`.`EXPERIMENT` (`id` )
@@ -262,13 +263,31 @@ CREATE  TABLE IF NOT EXISTS `LOGBOOK`.`ATTACHMENT` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `entry_id` INT NOT NULL ,
   `description` MEDIUMTEXT NOT NULL ,
-  `document` BLOB NOT NULL ,
+  `document` LONGBLOB NOT NULL ,
   `document_type` VARCHAR(255) NOT NULL ,
   INDEX `ATTACHMENT_FK_1` (`entry_id` ASC) ,
   PRIMARY KEY (`id`) ,
   CONSTRAINT `ATTACHMENT_FK_1`
     FOREIGN KEY (`entry_id` )
     REFERENCES `LOGBOOK`.`ENTRY` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `LOGBOOK`.`SHIFT_CREW`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `LOGBOOK`.`SHIFT_CREW` ;
+
+CREATE  TABLE IF NOT EXISTS `LOGBOOK`.`SHIFT_CREW` (
+  `shift_id` INT NOT NULL ,
+  `member` VARCHAR(32) NOT NULL ,
+  PRIMARY KEY (`shift_id`, `member`) ,
+  INDEX `SHIFT_CREW_FK_1` (`shift_id` ASC) ,
+  CONSTRAINT `SHIFT_CREW_FK_1`
+    FOREIGN KEY (`shift_id` )
+    REFERENCES `LOGBOOK`.`SHIFT` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;

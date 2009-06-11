@@ -34,7 +34,7 @@ The page for creating a new shift.
                         <td align="right" style="width:6em;">
                             &nbsp;<b>Leader</b>&nbsp;</td>
                         <td>
-                            &nbsp;<input align="left" size="16" type="text" name="leader" value="" />&nbsp;</td>
+                            &nbsp;<input align="left" size="16" type="text" name="leader" value=" <?php echo $_SERVER['WEBAUTH_USER']; ?> " />&nbsp;</td>
                         <td>
                             &nbsp;UNIX account name</td>
                     </tr>
@@ -73,6 +73,30 @@ The page for creating a new shift.
                 </tbody>
             </table>
             <br>
+            <br>
+            <table ellpadding="3" border="0" >
+                <thead style="color:#0071bc;">
+                    <th align="left">
+                        &nbsp;<b>Other crew members</b>&nbsp;</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><hr></td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            &nbsp;<input align="left" size="16" type="text" name="crew_member1" value="" />&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            &nbsp;<input align="left" size="16" type="text" name="crew_member2" value="" />&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td align="left">
+                            &nbsp;<input align="left" size="16" type="text" name="crew_member3" value="" />&nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
             <br>
             <input type="submit" value="Submit" name="submit_button" /><br>
         </form>

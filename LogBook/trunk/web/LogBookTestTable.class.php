@@ -18,8 +18,18 @@ class LogBookTestTable {
     /* Constructor
      */
     public function __construct( $cols, $keys, $css_class ) {
-        if( count( $cols ) != count( $keys ))
-            die("illegal parameters to the contsructor");
+
+        /* If no keys are provided then we're constructing a table
+         * of a single collumn. And values put into the the table's
+         * rows will be single variables, not dictionaries.
+         */
+        if( is_null( $keys )) {
+            if( count( $cols ) != 1 )
+                die("illegal parameters to the contsructor");
+        } else {
+            if( count( $cols ) != count( $keys ))
+                die("illegal parameters to the contsructor");
+        }
         $this->cols = $cols;
         $this->keys = $keys;
         $this->css_class = $css_class;
@@ -53,11 +63,21 @@ HERE;
         echo <<<HERE
         <tr>
 HERE;
-        foreach( $this->keys as $k ) {
-            $v = $attr[$k];
+        /* If the table has a single collumn and no keys were specified
+         * then the input parameter is interpreted as a single value,
+         * not a dictionary.
+         */
+        if( is_null( $this->keys )) {
             echo <<<HERE
+            <td>&nbsp;$attr&nbsp;</td>
+HERE;
+        } else {
+            foreach( $this->keys as $k ) {
+                $v = $attr[$k];
+                echo <<<HERE
             <td>&nbsp;$v&nbsp;</td>
 HERE;
+            }
         }
     echo <<<HERE
         </tr>
@@ -81,7 +101,10 @@ $title
 HERE;
         $this->begin();
         foreach( $list as $e )
-            $this->row($e->attr);
+            if( is_null( $this->keys ))
+                $this->row($e); // a special case of a single collumn table w/o keys
+            else
+                $this->row($e->attr);
         $this->end();
     }
 
@@ -95,8 +118,14 @@ HERE;
     }
     public static function Shift($css_class='table_4') {
         return new LogBookTestTable(
-            array("Experiment Id", "Begin Time", "End Time", "Shift Leader"),
-            array("exper_id",      "begin_time", "end_time", "leader"),
+            array("Id", "Experiment Id", "Begin Time", "End Time", "Shift Leader"),
+            array("id", "exper_id",      "begin_time", "end_time", "leader"),
+            $css_class );
+    }
+    public static function ShiftCrew($css_class='table_6') {
+        return new LogBookTestTable(
+            array("Crew"),
+            null,   // a special case of a single collumn table w/o keys
             $css_class );
     }
     public static function RunParam($css_class='table_4') {
