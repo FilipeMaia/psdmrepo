@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-22
+2009-06-18 Andy Salnikov
+- create web/ directory at the release top level with the links 
+  to the packages web/ directories
+
 Tag: V00-00-21
 2009-05-19 Andy Salnikov
 - added support for test scripts to the standardSConscript.py

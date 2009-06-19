@@ -85,10 +85,11 @@ packages = [ d for d in os.listdir(cwd) if os.path.isfile(pjoin( d, "SConscript"
 trace ( "Packages: " + pformat( packages ), "<top>", 1 )
 
 #
-# Check the links in include/, data/
+# Check the links in include/, data/, web/
 #
 makePackageLinks ( "include", packages )
 makePackageLinks ( "data", packages )
+makePackageLinks ( "web", packages )
 
 #
 # load package dependencies from base releases
