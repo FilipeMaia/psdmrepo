@@ -70,7 +70,7 @@ public:
   virtual std::string makePath ( unsigned int seq ) const ;
 
   /// generate hdf5-family path name, with <seq> replaced with %d
-  virtual std::string makeH5Path () const ;
+  virtual std::string makeH5Path ( bool split ) const ;
 
 protected:
 

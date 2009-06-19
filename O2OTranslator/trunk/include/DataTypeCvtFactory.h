@@ -55,20 +55,14 @@ class DataTypeCvtFactory : public DataTypeCvtFactoryI {
 public:
 
   // Default constructor
-  DataTypeCvtFactory ( const hdf5pp::Group& parentGrp, const std::string& grpName )
-    : m_group(parentGrp)
+  DataTypeCvtFactory ( const std::string& grpName )
+    : m_group()
     , m_grpName(grpName)
   {
   }
 
   // Destructor
-  virtual ~DataTypeCvtFactory ()
-  {
-    // destroy converters
-    for ( CvtMap::iterator i = m_cvtMap.begin() ; i != m_cvtMap.end() ; ++ i ) {
-      delete i->second ;
-    }
-  }
+  virtual ~DataTypeCvtFactory () { destroyConverters() ; }
 
   // Get the converter for given parameter set
   virtual DataTypeCvtI* converter(const Pds::DetInfo& info)
@@ -91,7 +85,30 @@ public:
     return cvt ;
   }
 
+  // this method is called at configure transition
+  virtual void configure ( const hdf5pp::Group& cfgGroup ) { m_group = cfgGroup ; }
+
+  // this method is called at unconfigure transition
+  virtual void unconfigure () {
+    destroyConverters() ;
+    m_group = hdf5pp::Group() ;
+  }
+
+  // this method is called at begin-run transition
+  virtual void beginRun ( const hdf5pp::Group& runGroup ) { }
+
+  // this method is called at end-run transition
+  virtual void endRun () { }
+
 protected:
+
+  void destroyConverters() {
+    // destroy converters
+    for ( CvtMap::iterator i = m_cvtMap.begin() ; i != m_cvtMap.end() ; ++ i ) {
+      delete i->second ;
+    }
+    m_cvtMap.clear() ;
+  }
 
 private:
 

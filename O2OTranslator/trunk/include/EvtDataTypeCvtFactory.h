@@ -55,11 +55,10 @@ class EvtDataTypeCvtFactory : public DataTypeCvtFactoryI {
 public:
 
   // Default constructor
-  EvtDataTypeCvtFactory ( const hdf5pp::Group& parentGrp,
-                          const std::string& grpName,
+  EvtDataTypeCvtFactory ( const std::string& grpName,
                           hsize_t chunk_size = 128*1024,
                           int deflate = 1 )
-    : m_group(parentGrp)
+    : m_group()
     , m_grpName(grpName)
     , m_chunk_size(chunk_size)
     , m_deflate(deflate)
@@ -67,13 +66,7 @@ public:
   }
 
   // Destructor
-  virtual ~EvtDataTypeCvtFactory ()
-  {
-    // destroy converters
-    for ( CvtMap::iterator i = m_cvtMap.begin() ; i != m_cvtMap.end() ; ++ i ) {
-      delete i->second ;
-    }
-  }
+  virtual ~EvtDataTypeCvtFactory () { destroyConverters() ; }
 
   // Get the converter for given parameter set
   virtual DataTypeCvtI* converter(const Pds::DetInfo& info)
@@ -96,7 +89,30 @@ public:
     return cvt ;
   }
 
+  // this method is called at configure transition
+  virtual void configure ( const hdf5pp::Group& cfgGroup ) { }
+
+  // this method is called at unconfigure transition
+  virtual void unconfigure () { }
+
+  // this method is called at begin-run transition
+  virtual void beginRun ( const hdf5pp::Group& runGroup ) { m_group = runGroup ; }
+
+  // this method is called at end-run transition
+  virtual void endRun () {
+    destroyConverters() ;
+    m_group = hdf5pp::Group() ;
+  }
+
 protected:
+
+  void destroyConverters() {
+    // destroy converters
+    for ( CvtMap::iterator i = m_cvtMap.begin() ; i != m_cvtMap.end() ; ++ i ) {
+      delete i->second ;
+    }
+    m_cvtMap.clear() ;
+  }
 
 private:
 

@@ -53,8 +53,8 @@ public:
   virtual ~O2OXtcScannerI () {}
 
   // signal start/end of the event (datagram)
-  virtual void eventStart ( const Pds::Sequence& seq ) = 0 ;
-  virtual void eventEnd ( const Pds::Sequence& seq ) = 0 ;
+  virtual void eventStart ( const Pds::Dgram& dgram ) = 0 ;
+  virtual void eventEnd ( const Pds::Dgram& dgram ) = 0 ;
 
   // signal start/end of the level
   virtual void levelStart ( const Pds::Src& src ) = 0 ;

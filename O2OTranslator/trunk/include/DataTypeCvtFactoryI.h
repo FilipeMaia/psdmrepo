@@ -22,6 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "pdsdata/xtc/DetInfo.hh"
+#include "hdf5pp/Group.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -56,6 +57,18 @@ public:
 
   // Get the converter for given parameter set
   virtual DataTypeCvtI* converter ( const Pds::DetInfo& detInfo ) = 0 ;
+
+  // this method is called at configure transition
+  virtual void configure ( const hdf5pp::Group& cfgGroup ) = 0 ;
+
+  // this method is called at unconfigure transition
+  virtual void unconfigure () = 0 ;
+
+  // this method is called at begin-run transition
+  virtual void beginRun ( const hdf5pp::Group& runGroup ) = 0 ;
+
+  // this method is called at end-run transition
+  virtual void endRun () = 0 ;
 
 protected:
 

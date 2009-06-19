@@ -11,6 +11,16 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2009-06-19 Andy Salnikov
+- changed the structure of the HDF5 file, now events group is called
+  "Run" (or RUN:ABCDEF123) is located inside Configure group
+- there may be multiple Configure groups and Run groups
+- changed converters to handle configure/unconfigure and beginrun/endrun 
+  transitions and close old groups/create new groups
+- new class O2OMetaData which is a container for all metadata info
+- metadata is stored in HDF5 file too as attributes of top group
+
 Tag: V00-00-11
 2009-05-19 Andy Salnikov
 - improving metadata collection and storage

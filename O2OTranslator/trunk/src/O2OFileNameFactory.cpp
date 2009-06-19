@@ -142,8 +142,11 @@ O2OFileNameFactory::makePath ( unsigned int seq ) const
 
 /// generate hdf5-family path name, with <seq> replaced with %d
 std::string
-O2OFileNameFactory::makeH5Path () const
+O2OFileNameFactory::makeH5Path ( bool split ) const
 {
+  // in no-split mode, just return first file name
+  if ( not split ) return makePath( 1 );
+
   std::string result = m_fileNameTemplate ;
 
   std::string::size_type pos = 0 ;

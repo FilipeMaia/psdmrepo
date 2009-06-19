@@ -38,8 +38,14 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace O2OTranslator {
+
+class O2OFileNameFactory ;
+class O2ODataTypeCvtI ;
+class O2OMetaData ;
+
 /**
- *  Scanner file that sends all data to HDF5 file
+ *  Scanner class that sends all data to HDF5 file.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
@@ -51,11 +57,6 @@
  *  @author Andrei Salnikov
  */
 
-namespace O2OTranslator {
-
-class O2OFileNameFactory ;
-class O2ODataTypeCvtI ;
-
 class O2OHdf5Writer : public O2OXtcScannerI {
 public:
 
@@ -66,18 +67,19 @@ public:
 
   // Default constructor
   O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
-                  bool overwrite=false,
-                  SplitMode split=NoSplit,
-                  hsize_t splitSize=0xFFFFFFFF,
-                  bool ignoreUnknowXtc=false,
-                  int compression = -1 ) ;
+                  bool overwrite,
+                  SplitMode split,
+                  hsize_t splitSize,
+                  int compression,
+                  bool extGroups,
+                  const O2OMetaData& metadata ) ;
 
   // Destructor
   virtual ~O2OHdf5Writer () ;
 
   // signal start/end of the event (datagram)
-  virtual void eventStart ( const Pds::Sequence& seq ) ;
-  virtual void eventEnd ( const Pds::Sequence& seq ) ;
+  virtual void eventStart ( const Pds::Dgram& dgram ) ;
+  virtual void eventEnd ( const Pds::Dgram& dgram ) ;
 
   // signal start/end of the level
   virtual void levelStart ( const Pds::Src& src ) ;
@@ -87,6 +89,9 @@ public:
   virtual void dataObject ( const void* data, const Pds::TypeId& typeId, const Pds::DetInfo& detInfo ) ;
 
 protected:
+
+  // Construct a group name
+  std::string groupName( const std::string& prefix, const Pds::ClockTime& clock ) const ;
 
 private:
 
@@ -98,10 +103,13 @@ private:
   hdf5pp::File m_file ;
   State m_state ;
   hdf5pp::Group m_mapGroup ;      // Group for current Map transition
+  hdf5pp::Group m_cfgGroup ;      // Group for current Configure transition
+  hdf5pp::Group m_runGroup ;      // Group for current Run transition
   H5DataTypes::XtcClockTime m_eventTime ;
   CvtMap m_cvtMap ;
-  bool m_ignore ;
   int m_compression ;
+  bool m_extGroups ;
+  const O2OMetaData& m_metadata ;
 
   // close all containers
   void closeContainers() ;

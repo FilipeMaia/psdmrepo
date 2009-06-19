@@ -38,6 +38,7 @@
 #include "O2OTranslator/MetaDataScanner.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OHdf5Writer.h"
+#include "O2OTranslator/O2OMetaData.h"
 //#include "O2OTranslator/O2ONexusWriter.h"
 #include "O2OTranslator/O2OXtcIterator.h"
 #include "O2OTranslator/O2OXtcScannerI.h"
@@ -83,13 +84,14 @@ private:
   AppCmdOptList<std::string>  m_epicsData ;
   AppCmdOptList<std::string>  m_eventData ;
   AppCmdOpt<std::string>      m_experiment ;
-  AppCmdOptBool               m_ignoreMiss ;
+  AppCmdOptBool               m_extGroups ;
   AppCmdOpt<std::string>      m_mdConnStr ;
   AppCmdOptList<std::string>  m_metadata ;
   AppCmdOpt<std::string>      m_outputDir ;
   AppCmdOpt<std::string>      m_outputName ;
   AppCmdOptBool               m_overwrite ;
   AppCmdOpt<unsigned long>    m_runNumber ;
+  AppCmdOpt<std::string>      m_runType ;
   AppCmdOptNamedValue<O2OHdf5Writer::SplitMode> m_splitMode ;
   AppCmdOptSize               m_splitSize ;
 
@@ -106,13 +108,14 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_epicsData  ( 'e', "epics-file",   "path",     "file name for EPICS data", '\0' )
   , m_eventData  ( 'f', "event-file",   "path",     "file name for XTC event data", '\0' )
   , m_experiment ( 'x', "experiment",   "string",   "experiment name", "" )
-  , m_ignoreMiss ( 'i', "ignore-miss",              "ignore missing XTC types, def: abort", false )
+  , m_extGroups  ( 'G', "group-time",               "use extended group names with timestamps", false )
   , m_mdConnStr  ( 'M', "md-conn",      "string",   "metadata ODBC connection string", "" )
   , m_metadata   ( 'm', "metadata",     "name:value", "science metadata values", '\0' )
   , m_outputDir  ( 'd', "output-dir",   "path",     "directory to store output files, def: .", "." )
   , m_outputName ( 'n', "output-name",  "template", "template string for output file names, def: {seq4}.hdf5", "{seq4}.hdf5" )
   , m_overwrite  (      "overwrite",                "overwrite output file", false )
   , m_runNumber  ( 'r', "run-number",   "number",   "run number, non-negative number; def: 0", 0 )
+  , m_runType    ( 't', "run-type",     "string",   "run type, DATA or CALIB, def: DATA", "DATA" )
   , m_splitMode  ( 's', "split-mode",   "mode-name","one of none, or family; def: none", O2OHdf5Writer::NoSplit )
   , m_splitSize  ( 'z', "split-size",   "number",   "max. size of output files. def: 20G", 20*1073741824ULL )
 {
@@ -122,13 +125,14 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_epicsData ) ;
   addOption( m_eventData ) ;
   addOption( m_experiment ) ;
-  addOption( m_ignoreMiss ) ;
+  addOption( m_extGroups ) ;
   addOption( m_mdConnStr ) ;
   addOption( m_metadata ) ;
   addOption( m_outputDir ) ;
   addOption( m_outputName ) ;
   addOption( m_overwrite ) ;
   addOption( m_runNumber ) ;
+  addOption( m_runType ) ;
   m_splitMode.add ( "none", O2OHdf5Writer::NoSplit ) ;
   m_splitMode.add ( "family", O2OHdf5Writer::Family ) ;
   addOption( m_splitMode ) ;
@@ -185,17 +189,21 @@ O2O_Translate::runApp ()
   snprintf ( runStr, sizeof runStr, "%06lu", m_runNumber.value() ) ;
   nameFactory.addKeyword ( "run", runStr ) ;
 
+  // make metadata object
+  O2OMetaData metadata ( m_runNumber.value(),
+                         m_runType.value(),
+                         m_experiment.value(),
+                         m_metadata.value() ) ;
+
   // instantiate XTC scanner, which is also output file writer
   std::vector<O2OXtcScannerI*> scanners ;
   scanners.push_back ( new O2OHdf5Writer ( nameFactory, m_overwrite.value(),
                                   m_splitMode.value(), m_splitSize.value(),
-                                  m_ignoreMiss.value(), m_compression.value() ) ) ;
+                                  m_compression.value(), m_extGroups.value(),
+                                  metadata ) ) ;
 
   // instantiate metadata scanner
-  scanners.push_back ( new MetaDataScanner( m_runNumber.value(),
-                                            m_experiment.value(),
-                                            m_mdConnStr.value(), 
-                                            m_metadata.value() ) ) ;
+  scanners.push_back ( new MetaDataScanner( metadata, m_mdConnStr.value() ) ) ;
 
   unsigned long errCount = 0 ;
 
@@ -254,12 +262,12 @@ O2O_Translate::runApp ()
         O2OXtcScannerI* scanner = *i ;
 
         try {
-          scanner->eventStart ( dg->seq ) ;
+          scanner->eventStart ( *dg ) ;
 
           O2OXtcIterator iter( &(dg->xtc), scanner );
           iter.iterate();
 
-          scanner->eventEnd ( dg->seq ) ;
+          scanner->eventEnd ( *dg ) ;
         } catch ( std::exception& e ) {
           MsgLogRoot( error, "exception caught processing datagram: " << e.what() ) ;
           // do not stop here, try to proceed

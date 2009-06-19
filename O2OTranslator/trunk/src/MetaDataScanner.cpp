@@ -26,7 +26,8 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
-#include "pdsdata/xtc/Sequence.hh"
+#include "O2OTranslator/O2OMetaData.h"
+#include "pdsdata/xtc/Dgram.hh"
 #include "pdsdata/xtc/Src.hh"
 #include "SciMD/Connection.h"
 
@@ -49,16 +50,13 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-MetaDataScanner::MetaDataScanner (unsigned long runNumber,
-                                  const std::string& experiment, 
-                                  const std::string& odbcConnStr, 
-                                  const std::list<std::string>& extraMetaData)
+MetaDataScanner::MetaDataScanner (const O2OMetaData& metadata,
+                                  const std::string& odbcConnStr)
   : O2OXtcScannerI()
-  , m_runNumber(runNumber)
-  , m_experiment(experiment)
+  , m_metadata(metadata)
   , m_odbcConnStr(odbcConnStr)
-  , m_extraMetaData(extraMetaData)
   , m_nevents(0)
+  , m_eventSize(0)
   , m_runBeginTime()
   , m_runEndTime()
 {
@@ -73,46 +71,47 @@ MetaDataScanner::~MetaDataScanner ()
 
 // signal start/end of the event (datagram)
 void
-MetaDataScanner::eventStart ( const Pds::Sequence& seq )
+MetaDataScanner::eventStart ( const Pds::Dgram& dgram )
 {
-  if ( seq.service() == Pds::TransitionId::Map ) {
+  if ( dgram.seq.service() == Pds::TransitionId::Map ) {
 
 
-  } else if ( seq.service() == Pds::TransitionId::Configure ) {
+  } else if ( dgram.seq.service() == Pds::TransitionId::Configure ) {
 
 
-  } else if ( seq.service() == Pds::TransitionId::BeginRun ) {
+  } else if ( dgram.seq.service() == Pds::TransitionId::BeginRun ) {
 
     // reset run-specific stats
     resetRunInfo() ;
 
-    const Pds::ClockTime& t = seq.clock() ; 
+    const Pds::ClockTime& t = dgram.seq.clock() ;
     m_runBeginTime = LusiTime::Time ( t.seconds(), t.nanoseconds() ) ;
 
-  } else if ( seq.service() == Pds::TransitionId::L1Accept ) {
+  } else if ( dgram.seq.service() == Pds::TransitionId::L1Accept ) {
 
     // increment counters
     ++ m_nevents ;
+    m_eventSize += dgram.xtc.extent ;
 
-  } else if ( seq.service() == Pds::TransitionId::EndRun ) {
+  } else if ( dgram.seq.service() == Pds::TransitionId::EndRun ) {
 
-    const Pds::ClockTime& t = seq.clock() ; 
+    const Pds::ClockTime& t = dgram.seq.clock() ;
     m_runEndTime = LusiTime::Time ( t.seconds(), t.nanoseconds() ) ;
 
     // store run-specific stats
     storeRunInfo() ;
 
-  } else if ( seq.service() == Pds::TransitionId::Unconfigure ) {
+  } else if ( dgram.seq.service() == Pds::TransitionId::Unconfigure ) {
 
 
-  } else if ( seq.service() == Pds::TransitionId::Unmap ) {
+  } else if ( dgram.seq.service() == Pds::TransitionId::Unmap ) {
 
 
   }
 }
 
 void
-MetaDataScanner::eventEnd ( const Pds::Sequence& seq )
+MetaDataScanner::eventEnd ( const Pds::Dgram& dgram )
 {
 }
 
@@ -148,10 +147,11 @@ MetaDataScanner::resetRunInfo()
 void
 MetaDataScanner::storeRunInfo()
 {
-  MsgLog( logger, info, "run statistics:" 
-      << "\n\tm_runNumber: " << m_runNumber 
-      << "\n\tm_experiment: " << m_experiment
+  MsgLog( logger, info, "run statistics:"
+      << "\n\tm_runNumber: " << m_metadata.runNumber()
+      << "\n\tm_experiment: " << m_metadata.experiment()
       << "\n\tm_nevents: " << m_nevents
+      << "\n\tm_eventSize: " << ( m_nevents ? m_eventSize/m_nevents : 0 )
       << "\n\tm_runBeginTime: " << m_runBeginTime.toString("S%s%f") << "(" << m_runBeginTime << ")"
       << "\n\tm_runEndTime: " << m_runEndTime.toString("S%s%f") << "(" << m_runEndTime << ")" ) ;
 
@@ -160,15 +160,15 @@ MetaDataScanner::storeRunInfo()
     MsgLog( logger, warning, "metadata ODBC connection string is empty, no data will be stored" ) ;
     return ;
   }
-  if ( m_runNumber == 0 ) {
+  if ( m_metadata.runNumber() == 0 ) {
     MsgLog( logger, warning, "run number is zero, no data will be stored" ) ;
-    return ;    
+    return ;
   }
-  if ( m_experiment.empty() ) {
+  if ( m_metadata.experiment().empty() ) {
     MsgLog( logger, warning, "experiment name is empty, no data will be stored" ) ;
-    return ;    
+    return ;
   }
-  
+
   // create connection to the SciMD
   SciMD::Connection* conn = 0 ;
   try {
@@ -184,7 +184,7 @@ MetaDataScanner::storeRunInfo()
 
   // create info for this run
   try {
-    conn->createRun ( m_experiment, m_runNumber, "", m_runBeginTime, m_runEndTime ) ;
+    conn->createRun ( m_metadata.experiment(), m_metadata.runNumber(), m_metadata.runType(), m_runBeginTime, m_runEndTime ) ;
   } catch ( SciMD::DatabaseError& e ) {
     MsgLog( logger, error, "failed to create new run, run number may already exist" ) ;
     conn->abortTransaction() ;
@@ -194,8 +194,9 @@ MetaDataScanner::storeRunInfo()
   try {
 
     // store event count
-    conn->setRunParam ( m_experiment, m_runNumber, "events", (int)m_nevents, "translator" ) ;
-    
+    conn->setRunParam ( m_metadata.experiment(), m_metadata.runNumber(),
+                        "events", (int)m_nevents, "translator" ) ;
+
   } catch ( std::exception& e ) {
 
     // this should not happen, have to abort here
@@ -205,23 +206,34 @@ MetaDataScanner::storeRunInfo()
 
   }
 
+  try {
+
+    // store average event size
+    conn->setRunParam ( m_metadata.experiment(), m_metadata.runNumber(),
+                        "eventSize", (int)( m_nevents ? m_eventSize/m_nevents : 0 ), "translator" ) ;
+
+  } catch ( std::exception& e ) {
+
+    // this should not happen, have to abort here
+    MsgLog( logger, error, "failed to store event size: " << e.what() ) ;
+    conn->abortTransaction() ;
+    throw ;
+
+  }
+
   // store all metadata that we received from online
-  typedef std::list<std::string>::const_iterator MDIter ;  
-  for ( MDIter it = m_extraMetaData.begin() ; it != m_extraMetaData.end() ; ++ it ) {
-    const std::string& nameValue = *it ;
-    std::string::size_type c = nameValue.find(':') ;
-    std::string name = c == std::string::npos ? nameValue : std::string(nameValue,0,c) ;
-    std::string value = c == std::string::npos ? std::string() : std::string(nameValue,c+1) ;
+  typedef O2OMetaData::const_iterator MDIter ;
+  for ( MDIter it = m_metadata.extra_begin() ; it != m_metadata.extra_end() ; ++ it ) {
     try {
-      conn->setRunParam ( m_experiment, m_runNumber, name, value, "translator" ) ;
+      conn->setRunParam ( m_metadata.experiment(), m_metadata.runNumber(), it->first, it->second, "translator" ) ;
     } catch ( std::exception& e ) {
       // this is not fatal, just print error message and continue
-      MsgLog( logger, error, "failed to store metadata: " << e.what() 
-          << "\n\tkey='" << name << "', value='" << value << "'" ) ;
+      MsgLog( logger, error, "failed to store metadata: " << e.what()
+          << "\n\tkey='" << it->first << "', value='" << it->second << "'" ) ;
     }
   }
 
-  // finish with storing metadata
+  // finished storing metadata
   conn->commitTransaction() ;
   delete conn ;
   conn = 0 ;

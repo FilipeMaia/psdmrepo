@@ -38,7 +38,10 @@
 
 namespace O2OTranslator {
 
+class O2OMetaData ;
+
 /**
+ *  XTC scanner class which collect metadata and stores them in SciMD database.
  *
  *  @see AdditionalClass
  *
@@ -51,17 +54,15 @@ class MetaDataScanner : public O2OXtcScannerI {
 public:
 
   // Default constructor
-  MetaDataScanner ( unsigned long runNumber,
-                    const std::string& experiment, 
-                    const std::string& odbcConnStr, 
-                    const std::list<std::string>& extraMetaData ) ;
+  MetaDataScanner ( const O2OMetaData& metadata,
+                    const std::string& odbcConnStr ) ;
 
   // Destructor
   virtual ~MetaDataScanner () ;
 
   // signal start/end of the event (datagram)
-  virtual void eventStart ( const Pds::Sequence& seq ) ;
-  virtual void eventEnd ( const Pds::Sequence& seq ) ;
+  virtual void eventStart ( const Pds::Dgram& dgram ) ;
+  virtual void eventEnd ( const Pds::Dgram& dgram ) ;
 
   // signal start/end of the level
   virtual void levelStart ( const Pds::Src& src ) ;
@@ -81,11 +82,10 @@ protected:
 private:
 
   // Data members
-  unsigned long m_runNumber ;
-  const std::string m_experiment ; 
+  const O2OMetaData& m_metadata ;
   const std::string m_odbcConnStr ;
-  const std::list<std::string>& m_extraMetaData ;
   unsigned long m_nevents ;
+  uint64_t m_eventSize ;
   LusiTime::Time m_runBeginTime ;
   LusiTime::Time m_runEndTime ;
 
