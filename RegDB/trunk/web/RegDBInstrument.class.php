@@ -39,7 +39,7 @@ class RegDBInstrument {
      */
     public function num_params ( $condition='' ) {
 
-        $extra_condition = $condition == '' ? '' : 'AND '.$condition;
+        $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
             'SELECT COUNT(*) FROM instrument_param WHERE instr_id='.$this->id().$extra_condition );
 
@@ -55,7 +55,7 @@ class RegDBInstrument {
 
         $list = array();
 
-        $extra_condition = $condition == '' ? '' : 'AND '.$condition;
+        $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
             'SELECT param FROM instrument_param WHERE instr_id='.$this->id().$extra_condition );
 
@@ -68,12 +68,32 @@ class RegDBInstrument {
         return $list;
     }
 
+    public function params ( $condition='' ) {
+
+        $list = array();
+
+        $extra_condition = $condition == '' ? '' : ' AND '.$condition;
+        $result = $this->connection->query(
+            'SELECT * FROM instrument_param WHERE instr_id='.$this->id().$extra_condition );
+
+        $nrows = mysql_numrows( $result );
+        for( $i = 0; $i < $nrows; $i++ )
+            array_push (
+                $list,
+                new RegDBInstrumentParam (
+                    $this->connection,
+                    $this,
+                    mysql_fetch_array( $result, MYSQL_ASSOC )));
+
+        return $list;
+    }
+
     public function find_param_by_name ( $name ) {
         return $this->find_param_by_( "param='".mysql_real_escape_string( trim( $name ))."'" ); }
 
     private function find_param_by_ ( $condition ) {
 
-        $extra_condition = $condition == '' ? '' : 'AND '.$condition;
+        $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
             'SELECT * FROM instrument_param WHERE instr_id='.$this->id().$extra_condition );
 
@@ -82,6 +102,7 @@ class RegDBInstrument {
         if( $nrows == 1 )
             return new RegDBInstrumentParam (
                 $this->connection,
+                this,
                 mysql_fetch_array( $result, MYSQL_ASSOC ));
 
         throw new RegDBException(

@@ -1,0 +1,118 @@
+/* 
+    Document   : LogBookTest.css
+    Created on : May 27, 2009, 1:20:30 PM
+    Author     : gapon
+    Description:
+        Purpose of the stylesheet follows.
+*/
+/* margin and padding on body element can introduce errors in determining
+   element position and are not recommended; we turn them off as a foundation
+   for YUI CSS treatments. */
+
+body {
+    margin:0;
+    padding:0;
+}
+root { 
+    display: block;
+}
+#application_title {
+    /*width:1064px;*/
+    margin-top:0px;
+    margin-left:0px;
+    margin-right:0px;
+    margin-bottom:0px;
+    font-family: "Times", serif;
+    font-size:24px;
+    background-color:#d0d0d0;
+    border:solid 2px transparent;
+    border-left-width:0px;
+}
+#application_footer {
+    /*width:1064px;*/
+    /*border-top:solid 1px black;*/
+    border:solid 8px transparent;
+    margin-top:0px;
+    margin-left:0px;
+    margin-right:0px;
+    margin-bottom:0px;
+    /*font-family: "Times", serif;*/
+    font-size:12px;
+    background-color:#d0d0d0;
+}
+#application_title_saved {
+    width:1064px;
+    margin-top:20px;
+    margin-left:20px;
+    margin-right:20px;
+    margin-bottom:40px;
+    font-family: "Times", serif;
+    font-size:42px;
+    background-color:#d0d0d0;
+    border:solid 2px transparent;
+    border-left-width:16px;
+}
+#title {
+    margin-top:20px;
+    margin-left:20px;
+    margin-right:20px;
+    margin-bottom:40px;
+    font-family: "Times", serif;
+    font-size:24px;
+    /*background-color:#d0d0d0;*/
+    border:solid 2px transparent;
+    border-left-width:16px;
+    text-align:left;
+}
+#title_saved {
+    width:1064px;
+    margin-top:20px;
+    margin-left:20px;
+    margin-right:20px;
+    margin-bottom:40px;
+    font-family: "Times", serif;
+    font-size:42px;
+    background-color:#d0d0d0;
+    border:solid 2px transparent;
+    border-left-width:16px;
+}
+#test_container {
+    width:1024px;
+    margin-top:0px;
+    margin-left:40px;
+    margin-right:40px;
+    margin-bottom:20px;
+}
+#title1 {
+    margin-top:1em;
+    margin-left:0em;
+    font-family: "Times", serif;
+    font-size:28px;
+    text-align:left;
+}
+#test_container1 {
+    margin-left:20px;
+    margin-right:20px;
+    margin-bottom:0px;
+}
+.table_header_cell {
+    color:#0071bc;
+}
+h1 {
+    margin-left:1em;
+}
+h2 {
+    margin-left:2em;
+}
+h3 {
+    margin-left:4em;
+}
+.table_2 {
+    margin-left:2em;
+}
+.table_4 {
+    margin-left:4em;
+}
+.table_6 {
+    margin-left:6em;
+}

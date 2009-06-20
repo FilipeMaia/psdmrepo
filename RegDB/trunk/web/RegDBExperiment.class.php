@@ -65,20 +65,15 @@ class RegDBExperiment {
         return $this->attr['posix_gid']; }
 
     public function group_member_accounts () {
-        /* TODO: Iimplement to return an array of member accounts,
-         * including the leader itself. The implementation is likelly to use LDAP.
-         */
-        throw new RegDBException (
-            __METHOD__, "method isn't implemented" ); }
+        $result = array();
+        $members = $this->connection->posix_group_members( $this->POSIX_gid());
+        foreach( $members as $member )
+            array_push( $result, $member['uid'] );
+        return $result;
+    }
 
     public function group_members () {
-        /* TODO: Iimplement to return an array of objects representing
-         * members of the group, including the leader itself. The objects
-         * will provide detail information about each account. The implementation
-         * is likelly to use LDAP.
-         */
-        throw new RegDBException (
-            __METHOD__, "method isn't implemented" ); }
+        return $this->connection->posix_group_members( $this->POSIX_gid()); }
 
     public function in_interval ( $timestamp ) {
         return LusiTime::in_interval(
@@ -92,7 +87,7 @@ class RegDBExperiment {
      */
     public function num_params ( $condition='' ) {
 
-        $extra_condition = $condition == '' ? '' : 'AND '.$condition;
+        $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
             'SELECT COUNT(*) FROM experiment_param WHERE exper_id='.$this->id().$extra_condition );
 
@@ -108,7 +103,7 @@ class RegDBExperiment {
 
         $list = array();
 
-        $extra_condition = $condition == '' ? '' : 'AND '.$condition;
+        $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
             'SELECT param FROM experiment_param WHERE exper_id='.$this->id().$extra_condition );
 
@@ -121,12 +116,32 @@ class RegDBExperiment {
         return $list;
     }
 
+    public function params ( $condition='' ) {
+
+        $list = array();
+
+        $extra_condition = $condition == '' ? '' : ' AND '.$condition;
+        $result = $this->connection->query(
+            'SELECT * FROM experiment_param WHERE exper_id='.$this->id().$extra_condition );
+
+        $nrows = mysql_numrows( $result );
+        for( $i = 0; $i < $nrows; $i++ )
+            array_push (
+                $list,
+                new RegDBExperimentParam (
+                    $this->connection,
+                    $this,
+                    mysql_fetch_array( $result, MYSQL_ASSOC )));
+
+        return $list;
+    }
+
     public function find_param_by_name ( $name ) {
         return $this->find_param_by_( "param='".mysql_real_escape_string( trim( $name ))."'" ); }
 
     private function find_param_by_ ( $condition ) {
 
-        $extra_condition = $condition == '' ? '' : 'AND '.$condition;
+        $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
             'SELECT * FROM experiment_param WHERE exper_id='.$this->id().$extra_condition );
 
@@ -135,6 +150,7 @@ class RegDBExperiment {
         if( $nrows == 1 )
             return new RegDBExperimentParam (
                 $this->connection,
+                $this,
                 mysql_fetch_array( $result, MYSQL_ASSOC ));
 
         throw new RegDBException(

@@ -1,0 +1,384 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Basic Example</title>
+    <style type="text/css">
+      body {
+        margin:0;
+        padding:0; }
+    </style>
+ 
+    <link rel="stylesheet" type="text/css" href="/yui/build/fonts/fonts-min.css" />
+    <link rel="stylesheet" type="text/css" href="/yui/build/paginator/assets/skins/sam/paginator.css" />
+    <link rel="stylesheet" type="text/css" href="/yui/build/datatable/assets/skins/sam/datatable.css" />
+    <link rel="stylesheet" type="text/css" href="/yui/build/button/assets/skins/sam/button.css" />
+    <link rel="stylesheet" type="text/css" href="/yui/build/tabview/assets/skins/sam/tabview.css" />
+
+    <script type="text/javascript" src="/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="/yui/build/connection/connection-min.js"></script>
+    <script type="text/javascript" src="/yui/build/json/json-min.js"></script>
+    <script type="text/javascript" src="/yui/build/element/element-min.js"></script>
+    <script type="text/javascript" src="/yui/build/paginator/paginator-min.js"></script>
+    <script type="text/javascript" src="/yui/build/datasource/datasource-min.js"></script>
+    <script type="text/javascript" src="/yui/build/datatable/datatable-min.js"></script>
+    <script type="text/javascript" src="/yui/build/button/button-min.js"></script>
+    <script type="text/javascript" src="/yui/build/tabview/tabview-min.js"></script>
+
+    <script type="text/javascript" src="/yui/build/yahoo/yahoo-min.js"></script>
+    <script type="text/javascript" src="/yui/build/dom/dom-min.js"></script>
+
+    <!--begin custom header content for this example-->
+    <style type="text/css"> 
+
+      .yui-skin-sam .yui-dt-liner {
+        white-space:nowrap; }
+
+      #main {
+        margin-left:2em;
+        margin-right:2em; }
+
+      #tabs, #pushbutton1  {
+        margin-left:2em;
+        margin-right:2em; }
+
+      #group_table          table,
+      #instrument_table     table,
+      #experiment_table     table,
+      #run_table            table,
+      #run_param_table      table,
+      #run_val_table        table,
+      #run_val_int_table    table,
+      #run_val_double_table table,
+      #run_val_text_table   table {
+
+        margin-left:auto;
+        margin-right:auto; }
+
+      #group_table,          #group_table          .yui-dt-loading,
+      #instrument_table,     #instrument_table     .yui-dt-loading,
+      #experiment_table,     #experiment_table     .yui-dt-loading,
+      #run_table,            #run_table            .yui-dt-loading,
+      #run_param_table,      #run_param_table      .yui-dt-loading,
+      #run_val_table,        #run_val_table        .yui-dt-loading,
+      #run_val_int_table,    #run_val_int_table    .yui-dt-loading,
+      #run_val_double_table, #run_val_double_table .yui-dt-loading,
+      #run_val_text_table,   #run_val_text_table   .yui-dt-loading {
+
+        text-align:center;
+        background-color:transparent; }
+
+      /* begin tab navigation */
+
+      #tabnav {
+        position:relative;
+        /*width:800px;*/
+        margin:10px 0px 0px 0px;
+        padding:0 0 8px 0;
+        line-height:normal;
+        border-bottom:2px solid #0071bc;
+        height:24px }
+
+      #tabnav ul {
+        margin:0px;
+        padding:0px;
+        list-style:none; }
+
+      #tabnav li {
+        float:left;
+        margin:0px;
+        padding:0px; }
+
+      #tabnav a {
+        display:block;
+        color:#000;
+        padding:5px 0 0 0;
+        text-decoration:none;
+        font-size:13px;
+        text-align:center;
+        margin-left:70px; }
+
+      #tabnav li a#first {
+        margin-left:0px; }
+
+      #tabnav a:hover {
+        color:#0071bc; }
+
+      /* end tab navigation */
+
+    </style>
+    <!--end custom header content for this example-->
+
+  </head>
+ 
+  <body class="yui-skin-sam">
+
+    <table>
+      <tbody>
+        <tr>
+          <td><img src="images/PSDMLogo.gif " /></td>
+          <td valign="middle"><h1>Science Methadata Database</h1></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div id="main">
+      <div id="tabnav">
+        <ul>
+          <li><a href="https://www-lclsdev.slac.stanford.edu/tests/php/" id="first">Home</a></li>
+          <li><a href="https://www-lclsdev.slac.stanford.edu/tests/php/">Databases</a></li>
+          <li><a href="https://www-lclsdev.slac.stanford.edu/tests/php/">Tools</a></li>
+          <li><a href="https://www-lclsdev.slac.stanford.edu/tests/php/">Documentation</a></li>
+        </ul>
+      </div>
+      <div class="Intro">
+        <table>
+          <tbody>
+            <tr>
+              <td><p>The database serves as an index to experimental information stored
+                     in the LCLS/LUSI Ofline Data Manafement System. This application
+                     provides a low-level view onto the contents of the database.
+                     The tables are displayed in the corresponding tabs of the panel
+                     located below.</p></td></tr>
+            <tr>
+              <td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="tabs" class="yui-navset">
+        <ul class="yui-nav">
+          <li class="selected"><a href="#group"><em>Experimental Groups</em></a></li>
+          <li><a href="#instrument"><em>Instruments</em></a></li>
+          <li><a href="#experiment"><em>Experiments</em></a></li>
+          <li><a href="#run"><em>Runs</em></a></li>
+          <li><a href="#run_param"><em>Definitions of Run Parameters</em></a></li>
+          <li><a href="#run_val"><em>Status of Run Parameters</em></a></li>
+          <li><a href="#run_val_int"><em>Values of Run Parameters (int)</em></a></li>
+          <li><a href="#run_val_double"><em>Values of Run Parameters (double)</em></a></li>
+          <li><a href="#run_val_text"><em>Values of Run Parameters (text)</em></a></li>
+        </ul>            
+        <div class="yui-content">
+          <div id="group">
+            <p>The table stores the information about groups of experimenters.</p>
+            <div id="group_table"></div>
+            <p>Here goes the footer of the tab. We may put additional instructions
+               or command buttons in here.</p>
+          </div>
+          <div id="instrument">
+            <p>The table stores the information about instruments.</p>
+            <div id="instrument_table"></div>
+            <p>Here goes the footer of the tab. We may put additional instructions
+               or command buttons in here.</p>
+          </div>
+          <div id="experiment">
+            <p>The table stores the information about experiments.</p>
+            <div id="experiment_table"></div>
+            <p>Here goes the footer of the tab. We may put additional instructions
+               or command buttons in here.</p>
+          </div>
+          <div id="run">
+            <p>The table stores the information about experimental runs.</p>
+            <div id="run_table"></div>
+            <p>Here goes the footer of the tab. We may put additional instructions
+               or command buttons in here.</p>
+          </div>
+          <div id="run_param">
+            <p>The table stores the definitions of run parameters.</p>
+            <div id="run_param_table"></div>
+            <p>Here goes the footer of the tab. We may put additional instructions
+               or command buttons in here.</p>
+          </div>
+          <div id="run_val">
+            <p>The table stores the bookeeping information about values of run parameters.</p>
+            <div id="run_val_table"></div>
+            <p>Here goes the footer of the tab. We may put additional instructions
+               or command buttons in here.</p>
+          </div>
+          <div id="run_val_int">
+            <p>The table stores integer values of relevant run parameters.</p>
+            <div id="run_val_int_table"></div>
+            <p>Here goes the footer of the tab. We may put additional instructions
+               or command buttons in here.</p>
+          </div>
+          <div id="run_val_double">
+            <p>The table stores floating point (double precision) values of relevant run parameters.</p>
+            <div id="run_val_double_table"></div>
+            <p>Here goes the footer of the tab. We may put additional instructions
+               or command buttons in here.</p>
+          </div>
+          <div id="run_val_text">
+            <p>The table stores textual values of relevant run parameters.</p>
+            <div id="run_val_text_table"></div>
+            <p>Here goes the footer of the tab. We may put additional instructions
+               or command buttons in here.</p>
+          </div>
+        </div>
+      </div>
+      <div id="Instructions">
+        <table>
+          <tbody>
+            <tr>
+              <td><p>The contents of the tables can be refreshed from the database
+                     by pressing the button.</p></td></tr>
+            <tr>
+              <td><button type="button" id="pushbutton1" name="button1" value="Add">Reload table</button></td></tr>
+            <tr>
+              <td><br></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DYNAMIC CONTENTS GENERATION -->
+
+    <script type="text/javascript"> 
+
+    /* The customizable object for encapsulating the context and
+     * operations with tables.
+     */
+    function Table( itsTableName, itsColumnDefs ) {
+        this.name = itsTableName;
+        this.columnDefs = itsColumnDefs;
+        this.fieldsDefs = [];
+        for(i=0; i < itsColumnDefs.length; i++)
+            this.fieldsDefs.push( itsColumnDefs[i].key );
+        this.dataSource = new YAHOO.util.DataSource(
+            "assets/php/scimd_query.php?table="+itsTableName );
+        this.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+        this.dataSource.connXhrMode = "queueRequests";
+        this.dataSource.responseSchema = {
+            resultsList: "ResultSet.Result",
+            fields: this.fieldsDefs };
+        this.dataTable = new YAHOO.widget.DataTable(
+            this.name+"_table",
+            this.columnDefs,
+            this.dataSource,
+            { paginator: new YAHOO.widget.Paginator( { rowsPerPage: 10 } ),
+              initialRequest: "" } );
+
+        this.refreshTable = function() {
+            this.dataSource.sendRequest(
+                "",
+                { success: function() {
+                      this.set( "sortedBy", null);
+                      this.onDataReturnReplaceRows.apply( this, arguments );
+                  },
+                  failure: function() {
+                      this.showTableMessage(
+                          YAHOO.widget.DataTable.MSG_ERROR,
+                          YAHOO.widget.DataTable.CLASS_ERROR );
+                      this.onDataReturnAppendRows.apply( this, arguments );
+                  },
+                  scope: this.dataTable } ); };
+    }
+
+    /* The following code will be executed only when the page is loaded
+     * and DOM is initialized.
+     */
+    YAHOO.util.Event.onDOMReady( function() {
+
+        /* Create the tab panel for tables.
+         */
+        var tabView = new YAHOO.widget.TabView( 'tabs' );
+
+        /* Create and configure the tables.
+         */
+        var tables = {
+
+            group: new Table( "group",
+                [ { key: "id",         sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "name",       sortable: true, resizeable: true  },
+                  { key: "proj_id",    sortable: true, resizeable: true  },
+                  { key: "contact",    sortable: true, resizeable: true  } ] ),
+
+            instrument: new Table( "instrument",
+                [ { key: "id",         sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "name",       sortable: true, resizeable: true  },
+                  { key: "descr",      sortable: true, resizeable: true  } ] ),
+
+            experiment: new Table( "experiment",
+                [ { key: "id",         sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "name",       sortable: true, resizeable: true },
+                  { key: "descr",      sortable: true, resizeable: true },
+                  { key: "instr_id",   sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "group_id",   sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "begin_time", sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatDate,
+                                                                         sortOptions: { defaultDir: YAHOO.widget.DataTable.CLASS_DESC } },
+                  { key: "end_time",   sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatDate,
+                                                                         sortOptions: { defaultDir: YAHOO.widget.DataTable.CLASS_DESC } } ] ),
+            run: new Table( "run",
+                [ { key: "id",         sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "num",        sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "exper_id",   sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "type",       sortable: true, resizeable: true },
+                  { key: "begin_time", sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatDate,
+                                                                         sortOptions: { defaultDir: YAHOO.widget.DataTable.CLASS_DESC } },
+                  { key: "end_time",   sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatDate,
+                                                                         sortOptions: { defaultDir: YAHOO.widget.DataTable.CLASS_DESC } } ] ),
+            run_param: new Table( "run_param",
+                [ { key: "id",         sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "param",      sortable: true, resizeable: true },
+                  { key: "exper_id",   sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "type",       sortable: true, resizeable: true },
+                  { key: "descr",      sortable: true, resizeable: true } ] ),
+
+            run_val: new Table( "run_val",
+                [ { key: "run_id",     sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "param_id",   sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "source",     sortable: true, resizeable: true },
+                  { key: "updated",    sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatDate,
+                                                                         sortOptions: { defaultDir: YAHOO.widget.DataTable.CLASS_DESC } } ] ),
+            run_val_int: new Table( "run_val_int",
+                [ { key: "run_id",     sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "param_id",   sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "val",        sortable: true, resizeable: true } ] ),
+
+            run_val_double: new Table( "run_val_double",
+                [ { key: "run_id",     sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "param_id",   sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "val",        sortable: true, resizeable: true } ] ),
+
+            run_val_text: new Table( "run_val_text",
+                [ { key: "run_id",     sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "param_id",   sortable: true, resizeable: true, formatter: YAHOO.widget.DataTable.formatNumber },
+                  { key: "val",        sortable: true, resizeable: true } ] )
+        };
+
+        /* The function to refresh all registered tables.
+         */
+        function refreshAllTables() {
+            tables.group.refreshTable();
+            tables.instrument.refreshTable();
+            tables.experiment.refreshTable();
+            tables.run.refreshTable();
+            tables.run_param.refreshTable();
+            tables.run_val.refreshTable();
+            tables.run_val_int.refreshTable();
+            tables.run_val_double.refreshTable();
+            tables.run_val_text.refreshTable();
+        }
+
+        /* Register the callback with the button, so that the table will get
+         * reloaded when it's pressed. Then explicitly refresh the tables
+         * for the first time.
+         */
+        function onButtonClick( p_oEvent ) {
+            refreshAllTables();
+        }
+
+        var oPushButton1 = new YAHOO.widget.Button( "pushbutton1" );
+        oPushButton1.on(
+            "click",
+             onButtonClick );
+
+        refreshAllTables();
+    });
+
+    </script>
+
+    <hr>
+    <div id="progress"><img id="progress_bar" src="images/ajaxloader.gif" style="visibility:hidden;" /></div>
+    <button type="button" id="pushbutton_start" onclick="YAHOO.util.Dom.setStyle('progress_bar','visibility','visible');">Start</button>
+    <button type="button" id="pushbutton_stop"  onclick="YAHOO.util.Dom.setStyle('progress_bar','visibility','hidden');">Stop</button>
+  </body>
+</html>
