@@ -13,7 +13,7 @@ tmp=${LUSI_SVN:?Missing LUSI_SVN}
 
 
 getPkgList() {
-    svn -v list "$LUSI_SVN" | sed 's%.* \([^ ]*\)/$%\1%'
+    svn list "$LUSI_SVN" | sed 's%^\(.*\)/$%\1%'
 }
 
 getPkgTag() {

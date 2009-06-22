@@ -35,7 +35,7 @@ if [ ! -d "$logdir" ] ; then
         exit 2
     fi
 fi
-exec > "$logdir/copy-nightly" 2>&1
+exec > "$logdir/copy-$rel" 2>&1
 
 echo "+++ Will copy new release $rel"
 echo "+++ Checking directories"
