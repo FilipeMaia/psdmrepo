@@ -1,9 +1,13 @@
 <?php
+
+require_once( '../../RegDB/web/RegDB.inc.php' );
+
 class LogBook {
 
     /* Data members
      */
     private $connection;
+    private $regdb;
 
     /* Constructor
      *
@@ -22,6 +26,12 @@ class LogBook {
                 is_null($user)     ? LOGBOOK_DEFAULT_USER : $user,
                 is_null($password) ? LOGBOOK_DEFAULT_PASSWORD : $password,
                 is_null($database) ? LOGBOOK_DEFAULT_DATABASE : $database);
+
+        /* TODO: Think about a convenient configuration scheme allowing
+         * passing connection parameters to the Registration Database
+         * in the same fashion it's done for the LogBook connection.
+         */
+        $this->regdb = new RegDB();
     }
 
     /*
