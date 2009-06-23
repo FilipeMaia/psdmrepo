@@ -203,7 +203,7 @@ exec_tag() {
   else
     lpkg=`localpkg`
     lpkg=${lpkg:?Not in the package directory}
-    svn copy -m 'Tagging $pkg with $tag' "." "$LUSI_SVN/$pkg/tags/$tag"
+    svn copy -m "Tagging $pkg with $tag" "." "$LUSI_SVN/$pkg/tags/$tag"
   fi
 }
 
