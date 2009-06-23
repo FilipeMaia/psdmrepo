@@ -23,9 +23,11 @@ class LusiTime {
      *
      * Input formats:
      *
+     *   2009-05-19 17:59:49
      *   2009-05-19 17:59:49-07
      *   2009-05-19 17:59:49-07:00
      *   2009-05-19 17:59:49-0700
+     *   2009-05-19 12:18:49.123456789
      *   2009-05-19 12:18:49.123456789-0700
      *
      * The last example illustrates how to specify nanoseconds. The number
@@ -36,12 +38,12 @@ class LusiTime {
      */
     public static function parse($str) {
 
-        $expr = '/(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.(\d{1,9}))?(([-+])(\d{2}):?(\d{2})?)/';
+        $expr = '/(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.(\d{1,9}))?(([-+])(\d{2}):?(\d{2})?)?/';
         if( !preg_match( $expr, $str, $matches2 ))
             return null;
 
         $sign = $matches2[10];
-        $tzone_hours = $matches2[11];
+        $tzone_hours = isset( $matches2[11] ) ? $matches2[11] : 0;
         $tzone_minutes = isset( $matches2[12] ) ? $matches2[12] : 0;
         $shift = ($sign=='-' ? +1 : -1)*(3600*$tzone_hours + 60*$tzone_minutes);
 
@@ -167,48 +169,4 @@ class LusiTime {
     public function equal( $rhs ) {
         return ( $this->sec == $rhs->sec ) && ($this->nsec == $rhs->nsec); }
 }
-/*
-
-echo "here follows a simple unit test for the class.\n";
-
-$t64 = "1242812928000000000";
-$r = LusiTime::from64($t64);
-//$r = LusiTime::now();
-
-print("<br>input:       ".$t64);
-print("<br>result:      ".$r);
-print("<br>result.sec:  ".$r->sec);
-print("<br>result.nsec: ".$r->nsec);
-
-$t1 = new LusiTime(1);
-$t2 = new LusiTime(2);
-$t3 = new LusiTime(3);
-
-print( "<br>1 in [2,3)    : ".LusiTime::in_interval($t1, $t2, $t3)."\n" );
-print( "<br>2 in [2,3)    : ".LusiTime::in_interval($t2, $t2, $t3)."\n" );
-print( "<br>3 in [2,3)    : ".LusiTime::in_interval($t3, $t2, $t3)."\n" );
-print( "<br>3 in [2,null) : ".LusiTime::in_interval($t3, $t2, null)."\n" );
-
-$t_1_2 = new LusiTime(1,2);
-$t_1_3 = new LusiTime(1,3);
-$t_2_2 = new LusiTime(2,2);
-
-print( "<br>1.2 <  1.3 : ".$t_1_2->less($t_1_3)."\n" );
-print( "<br>!(1.3 <  1.2) : ".!$t_1_3->less($t_1_2)."\n" );
-print( "<br>1.2 <  2.2 : ".$t_1_2->less($t_2_2)."\n" );
-print( "<br>1.2 == 1.2 : ".$t_1_2->equal($t_1_2)."\n" );
-
-$packed = '099999999';
-print( "  Packed:     ".$packed."\n" );
-print( "  Translated: ".LusiTime::from64( $packed )."\n" );
-
-$str = "2009-05-19 17:59:49.123-0700";
-
-$lt = LusiTime::parse( $str) ;
-
-print( "  Input time:           ".$str."\n" );
-print( "  LusiTime::parse(): ".$lt->__toString()."\n" );
-print( "  converted to 64-bit:  ".$lt->to64()."\n" );
-
 ?>
-*/
