@@ -12,6 +12,9 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 2009-06-23 Andy Salnikov
+- testing svn2feed.py hook again
+
+2009-06-23 Andy Salnikov
 - testing svn2feed.py hook
 
 Tag: V00-00-00
