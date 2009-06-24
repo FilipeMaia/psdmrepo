@@ -148,8 +148,8 @@ HERE;
     }
     public static function Entry($css_class='table_4') {
         return new LogBookTestTable(
-            array("Exper.Id", "Relevance Time", "Header Id", "Entry Id", "Insert Time", "Author", "Content Type"),
-            array("exper_id", "relevance_time", "hdr_id",    "id",       "insert_time", "author", "content_type"),
+            array("Exper.Id", "Shift.Id", "Run.Id", "Relevance Time", "Header Id", "Entry Id", "Insert Time", "Author", "Content Type"),
+            array("exper_id", "shift_id", "run_id", "relevance_time", "hdr_id",    "id",       "insert_time", "author", "content_type"),
             $css_class );
     }
     public static function EntryTag($css_class='table_6') {

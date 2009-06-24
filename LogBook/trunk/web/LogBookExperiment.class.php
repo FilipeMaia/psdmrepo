@@ -378,17 +378,58 @@ HERE;
         return count( $this->entries()); }
 
     /**
-     * Get all known entries (headers)
+     * Get all known entries
      *
      * @return array(LogBookFFEntry)
      */
     public function entries () {
+        return $this->entries_by_();
+    }
+
+    /**
+     * Get a subset of entries which aren't associated with a shift or a run
+     *
+     * Note, that this operation would select entroies which aren't
+     * explicitly associated with a particular shift or a run.
+     *
+     * @return array(LogBookFFEntry)
+     */
+    public function entries_of_experiment () {
+        return $this->entries_by_( 'h.shift_id IS NULL AND h.run_id IS NULL' );
+    }
+
+    /**
+     * Get a subset of entries which are associated with the specified shift
+     *
+     * Note, that this operation would select entroies which are
+     * explicitly associated with a particular shift.
+     *
+     * @return array(LogBookFFEntry)
+     */
+    public function entries_of_shift ( $id ) {
+        return $this->entries_by_( 'h.shift_id='.$id );
+    }
+
+    /**
+     * Get a subset of entries which are associated with the specified run
+     *
+     * Note, that this operation would select entroies which are
+     * explicitly associated with a particular run.
+     *
+     * @return array(LogBookFFEntry)
+     */
+    public function entries_of_run ( $id ) {
+        return $this->entries_by_( 'h.run_id='.$id );
+    }
+
+    private function entries_by_ ( $condition=null ) {
 
         $list = array();
 
+        $extra_condition = $condition == null ? '' : ' AND '.$condition;
         $result = $this->connection->query (
-            'SELECT h.exper_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
-            ' AND h.id = e.hdr_id AND e.parent_entry_id is NULL' );
+            'SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
+            ' AND h.id = e.hdr_id AND e.parent_entry_id is NULL'.$extra_condition );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
@@ -419,7 +460,7 @@ HERE;
     public function find_last_entry () {
 
         $result = $this->connection->query (
-            'SELECT h.exper_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
+            'SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
             ' AND h.id = e.hdr_id ORDER BY relevance_time DESC LIMIT 1' );
 
         $nrows = mysql_numrows( $result );
@@ -436,7 +477,7 @@ HERE;
 
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
         $result = $this->connection->query (
-            'SELECT h.exper_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
+            'SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
             ' AND h.id = e.hdr_id'.$extra_condition );
 
         $nrows = mysql_numrows( $result );
@@ -449,16 +490,17 @@ HERE;
         return null;
     }
 
-    public function create_entry( $relevance_time, $author, $content_type, $content ) {
-
-        if( is_null( $relevance_time ))
-            throw new LogBookException(
-                __METHOD__,
-                "relevance time can't be null" );
+    public function create_entry (
+        $author, $content_type, $content,
+        $shift_id=null,
+        $run_id=null,
+        $relevance_time=null ) {
 
         $this->connection->query (
-            "INSERT INTO header VALUES(NULL,".$this->attr['id'].
-            ",".LusiTime::to64from( $relevance_time ).")" );
+            "INSERT INTO header VALUES(NULL,".$this->id().
+            ",".( is_null( $shift_id       ) ? 'NULL' : $shift_id ).
+            ",".( is_null( $run_id         ) ? 'NULL' : $run_id ).
+            ",".( is_null( $relevance_time ) ? 'NULL' : LusiTime::to64from( $relevance_time )).")" );
 
         $this->connection->query (
             "INSERT INTO entry VALUES(NULL,(SELECT LAST_INSERT_ID()),NULL".

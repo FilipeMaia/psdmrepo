@@ -92,5 +92,12 @@ class LogBookShift {
 
         return $list;
     }
-}
+
+    /* =====================
+     *   FREE-FORM ENTRIES
+     * =====================
+     */
+    public function entries () {
+        return $this->parent()->entries_of_shift( $this->id());
+    }}
 ?>

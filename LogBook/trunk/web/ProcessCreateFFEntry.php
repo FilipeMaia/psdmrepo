@@ -21,10 +21,27 @@ if( isset( $_POST['experiment_name'] )) {
 } else
     die( "no valid experiment name" );
 
+if( isset( $_POST['shift_id'] )) {
+    $str = trim( $_POST['shift_id'] );
+    if( $str != '' && ( 1 != sscanf( $str, "%ud", $shift_id )))
+        die( "not a number where shift identifier was expected" );
+} else
+    die( "no valid shift identifier" );
+
+if( isset( $_POST['runnum'] )) {
+    $str = trim( $_POST['runnum'] );
+    if( $str != '' && ( 1 != sscanf( $str, "%ud", $runnum )))
+        die( "not a number where run number was expected" );
+} else
+    die( "no valid run number" );
+
 if( isset( $_POST['relevance_time'])) {
-    $relevance_time = LusiTime::parse( trim( $_POST['relevance_time'] ));
-    if( is_null( $relevance_time ))
-        die("relevance time has invalid format");
+    $str = trim( $_POST['relevance_time'] );
+    if( $str != '' ) {
+        $relevance_time = LusiTime::parse( trim( $_POST['relevance_time'] ));
+        if( is_null( $relevance_time ))
+            die("relevance time has invalid format");
+    }
 } else
     die( "no relevance time for shift" );
 
@@ -132,8 +149,16 @@ try {
         $experiment = $logbook->find_experiment_by_name( $experiment_name )
             or die("no such experiment" );
 
+        $run_id = null;
+        if( !is_null( $runnum )) {
+            $run = $experiment->find_run_by_num( $runnum )
+                or die( "no such run" );
+            $run_id = $run->id();
+        }
+
         $entry = $experiment->create_entry(
-            $relevance_time, $author, $content_type, $content );
+            $author, $content_type, $content,
+            $shift_id, $run_id, $relevance_time );
 
     } else {
 

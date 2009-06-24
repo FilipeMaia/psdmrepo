@@ -67,10 +67,10 @@ class LogBookConnection {
     }
 
     private function transaction ( $transition ) {
-        if( !mysql_query( $transition ))
+        if( !mysql_query( $transition, $this->link ))
             throw new LogBookException(
                 __METHOD__,
-                "MySQL error: ".mysql_error().', in query: '.$transition );
+                "MySQL error: ".mysql_error( $this->link ).', in query: '.$transition );
     }
 
     /* ===========
@@ -85,41 +85,49 @@ class LogBookConnection {
             throw new LogBookException(
                 __METHOD__, "no active transaction" );
 
-        $result = mysql_query( $sql );
+        $result = mysql_query( $sql, $this->link );
         if( !$result )
             throw new LogBookException(
                 __METHOD__,
-                "MySQL error: ".mysql_error().', in query: '.$sql );
+                "MySQL error: ".mysql_error( $this->link ).', in query: '.$sql );
         return $result;
     }
+
+    /* ==========================================================
+     *   MISC. OPERATIONS REQUIREING DATABASE SERVER CONNECTION
+     * ==========================================================
+     */
+    public function escape_string( $text ) {
+        return mysql_real_escape_string( $text, $this->link );  }
 
     /**
      * Make a connection if this hasn't been done yet.
      */
     private function connect () {
         if( !isset( $this->link )) {
-            $this->link = mysql_connect( $this->host, $this->user, $this->password );
+            $new_link = true;
+            $this->link = mysql_connect( $this->host, $this->user, $this->password, $new_link );
             if( !$this->link )
                 throw new LogBookException(
                     __METHOD__,
-                    "MySQL error: ".mysql_error().", in function: mysql_connect" );
+                    "MySQL error: ".mysql_error( $this->link ).", in function: mysql_connect" );
 
-            if( !mysql_select_db( $this->database ))
+            if( !mysql_select_db( $this->database, $this->link ))
                 throw new LogBookException(
                     __METHOD__,
-                    "MySQL error: ".mysql_error().", in function: mysql_select_db" );
+                    "MySQL error: ".mysql_error( $this->link ).", in function: mysql_select_db" );
 
             $sql = "SET SESSION SQL_MODE='ANSI'";
-            if( !mysql_query( $sql ))
+            if( !mysql_query( $sql, $this->link ))
                 throw new LogBookException(
                     __METHOD__,
-                    "MySQL error: ".mysql_error().', in query: '.$sql );
+                    "MySQL error: ".mysql_error( $this->link ).', in query: '.$sql );
 
             $sql = "SET SESSION AUTOCOMMIT=0";
-            if( !mysql_query( $sql ))
+            if( !mysql_query( $sql, $this->link ))
                 throw new LogBookException(
                     __METHOD__,
-                    "MySQL error: ".mysql_error().', in query: '.$sql );
+                    "MySQL error: ".mysql_error( $this->link ).', in query: '.$sql );
         }
     }
 }

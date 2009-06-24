@@ -48,8 +48,16 @@ class LogBookFFEntry {
     public function exper_id() {
         return $this->attr['exper_id']; }
 
+    public function shift_id() {
+        return $this->attr['shift_id']; }
+
+    public function run_id() {
+        return $this->attr['run_id']; }
+
     public function relevance_time () {
-        return LusiTime::from64( $this->attr['relevance_time'] ); }
+        return is_null( $this->attr['relevance_time'] ) ?
+            null :
+            LusiTime::from64( $this->attr['relevance_time'] ); }
 
     public function id() {
         return $this->attr['id']; }
@@ -71,12 +79,28 @@ class LogBookFFEntry {
 
     /* Operations
      */
+    public function shift() {
+        $shift = $this->parent()->find_shift_by_id( $this->shift_id());
+        if( is_null( $shift ))
+            throw new LogBookException (
+                __METHOD__, "no shift for the entry. Database may be corrupted." );
+        return $shift;
+    }
+
+    public function run() {
+        $run = $this->parent()->find_run_by_id( $this->run_id());
+        if( is_null( $run ))
+            throw new LogBookException (
+                __METHOD__, "no run for the entry. Database may be corrupted." );
+        return $run;
+    }
+
     public function children() {
 
         $list = array();
 
         $result = $this->connection->query (
-            'SELECT h.exper_id, h.relevance_time, e.* FROM header h, entry e'.
+            'SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM header h, entry e'.
             ' WHERE h.id = e.hdr_id AND e.parent_entry_id='.$this->id().
             ' ORDER BY id' );
 
@@ -131,8 +155,8 @@ class LogBookFFEntry {
 
         $this->connection->query (
             'INSERT INTO tag VALUES('.$this->hdr_id().
-            ",'".mysql_real_escape_string( $tag ).
-            "','".mysql_real_escape_string( $value )."')" );
+            ",'".$this->connection->escape_string( $tag ).
+            "','".$this->connection->escape_string( $value )."')" );
 
         $result = $this->connection->query (
             'SELECT t.* FROM header h, tag t WHERE h.exper_id='.$this->exper_id().
@@ -205,8 +229,8 @@ class LogBookFFEntry {
 
         $this->connection->query (
             'INSERT INTO attachment VALUES(NULL,'.$this->id().
-            ",'".mysql_real_escape_string( $description ).
-            "','".mysql_real_escape_string( $document ).
+            ",'".$this->connection->escape_string( $description ).
+            "','".$this->connection->escape_string( $document ).
             "','".$document_type."')" );
 
         return $this->find_attachment_by_id( '(SELECT LAST_INSERT_ID())' );

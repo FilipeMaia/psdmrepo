@@ -63,11 +63,27 @@ The page for creating a new free-form.
                     </tr>
                     <tr>
                         <td align="right">
+                            &nbsp;<b>Shift Id</b>&nbsp;</td>
+                        <td>
+                            &nbsp;<input align="left" size="16" type="text" name="shift_id" value="" />&nbsp;</td>
+                        <td>
+                            &nbsp;[optional]</td>
+                    </tr>
+                    <tr>
+                        <td align="right">
+                            &nbsp;<b>Run Number</b>&nbsp;</td>
+                        <td>
+                            &nbsp;<input align="left" size="16" type="text" name="runnum" value="" />&nbsp;</td>
+                        <td>
+                            &nbsp;[optional]</td>
+                    </tr>
+                    <tr>
+                        <td align="right">
                             &nbsp;<b>Relevance Time</b>&nbsp;</td>
                         <td>
                             &nbsp;<input align="left" size="32" type="text" name="relevance_time" value="<?php echo ' '.$now_str; ?>" />&nbsp;</td>
                         <td>
-                            &nbsp;YYYY-MM-DD hh:mm:ss-zzzz</td>
+                            &nbsp;YYYY-MM-DD hh:mm:ss-zzzz [optional]</td>
                     </tr>
                     <tr>
                         <td></td>

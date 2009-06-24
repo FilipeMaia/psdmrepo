@@ -256,5 +256,13 @@ class LogBookRun {
          */
         $this->attr['end_time'] = $end_time_64;
     }
+
+    /* =====================
+     *   FREE-FORM ENTRIES
+     * =====================
+     */
+    public function entries () {
+        return $this->parent()->entries_of_run( $this->id());
+    }
 }
 ?>
