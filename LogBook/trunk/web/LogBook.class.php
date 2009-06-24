@@ -56,58 +56,30 @@ class LogBook {
 
         $list = array();
 
-        $result = $this->connection->query (
-            'SELECT * FROM "experiment" '.$condition );
-
-        $nrows = mysql_numrows( $result );
-        for( $i = 0; $i < $nrows; $i++ ) {
+        $this->regdb->begin();
+        $regdb_experiments = $this->regdb->experiments();
+        foreach( $regdb_experiments as $e )
             array_push(
                 $list,
                 new LogBookExperiment (
                     $this->connection,
-                    mysql_fetch_array( $result, MYSQL_ASSOC )));
-        }
+                    $e ));
+
         return $list;
     }
 
     public function find_experiment_by_id ( $id ) {
-        return $this->find_experiment_by_( 'id='.$id) ; }
-
-    public function find_experiment_by_name ( $name ) {
-        return $this->find_experiment_by_( "name='".$name."'") ; }
-
-    public function find_last_experiment () {
-        return $this->find_experiment_by_( 'begin_time=(SELECT MAX(begin_time) FROM experiment)') ; }
-
-    private function find_experiment_by_ ( $condition ) {
-
-        $result = $this->connection->query(
-            'SELECT * FROM "experiment" WHERE '.$condition );
-
-        $nrows = mysql_numrows( $result );
-        if( $nrows == 1 )
-            return new LogBookExperiment(
-                $this->connection,
-                mysql_fetch_array( $result, MYSQL_ASSOC ));
-
-        return null;
+        $this->regdb->begin();
+        $e = $this->regdb->find_experiment_by_id( $id ) ;
+        return is_null( $e ) ?
+            null : new LogBookExperiment ( $this->connection, $e ) ;
     }
 
-    public function create_experiment ( $name, $begin_time, $end_time=null ) {
-
-        /* Verify parameters
-         */
-        if( !is_null( $end_time ) && !$begin_time->less( $end_time ))
-            throw new LogBookException(
-                __METHOD__,
-                "begin time '".$begin_time."' isn't less than end time '".$end_time."'" );
-
-        $this->connection->query (
-            "INSERT INTO experiment VALUES(NULL,'".$name
-            ."',".$begin_time->to64()
-            .",".( is_null( $end_time ) ? 'NULL' : $end_time->to64()).")" );
-
-        return $this->find_experiment_by_id( '(SELECT LAST_INSERT_ID())' );
+    public function find_experiment_by_name ( $name ) {
+        $this->regdb->begin();
+        $e = $this->regdb->find_experiment_by_name( $name ) ;
+        return is_null( $e ) ?
+            null : new LogBookExperiment ( $this->connection, $e ) ;
     }
 
     /* ============================

@@ -9,34 +9,33 @@ class LogBookExperiment {
     /* Data members
      */
     private $connection;
+    private $regdb_experiment;
 
     public $attr;
 
     /* Constructor
      */
-    public function __construct ( $connection, $attr ) {
+    public function __construct ( $connection, $regdb_experiment ) {
         $this->connection = $connection;
-        $this->attr = $attr;
+        $this->regdb_experiment = $regdb_experiment;
+        $this->attr = array (
+            'id'         => $this->regdb_experiment->id(),
+            'name'       => $this->regdb_experiment->name(),
+            'begin_time' => $this->regdb_experiment->begin_time()->to64(),
+            'end_time'   => $this->regdb_experiment->end_time()->to64());
     }
 
     public function id () {
-        return $this->attr['id']; }
-
-    public function begin_time () {
-        return LusiTime::from64( $this->attr['begin_time'] ); }
-
-    public function end_time () {
-        if( is_null( $this->attr['end_time'] )) return null;
-        return LusiTime::from64( $this->attr['end_time'] ); }
+        return $this->regdb_experiment->id(); }
 
     public function name () {
-        return $this->attr['name']; }
+        return $this->regdb_experiment->name(); }
 
-    public function in_interval ( $timestamp ) {
-        return LusiTime::in_interval(
-            $timestamp,
-            $this->attr['begin_time'],
-            $this->attr['end_time'] ); }
+    public function begin_time () {
+        return $this->regdb_experiment->begin_time(); }
+
+    public function end_time () {
+        return $this->regdb_experiment->end_time(); }
 
     /* ==========
      *   SHIFTS
@@ -88,19 +87,6 @@ class LogBookExperiment {
             throw new LogBookException(
                 __METHOD__,
                 "begin time '".$begin_time."' isn't less than end time '".$end_time."'" );
-
-        /* Make sure the shift interval is contained within the one
-         * of the experiment.
-         */
-        if( 0 != $this->in_interval( $begin_time ))
-            throw new LogBookException(
-                __METHOD__,
-                "begin time '".$begin_time."' is out of experiment's limits" );
-
-        if( !is_null( $end_time ) && 0 != $this->in_interval( $end_time ))
-            throw new LogBookException(
-                __METHOD__,
-                "end time '".$end_time."' is out of experiment's limits" );
 
         /* Process the list of crew members, and add the leader into it
          * if the leader isn't there yet. Also make sure the array has
@@ -229,6 +215,13 @@ class LogBookExperiment {
             'id=(SELECT MAX(id) FROM "run" WHERE exper_id='.
             $this->attr['id'].')' ); }
 
+    public function find_next_run_for( $prev_run ) {
+        $sql = <<<HERE
+begin_time=(SELECT MIN(begin_time) FROM "run" WHERE exper_id={$this->id()} AND begin_time>{$prev_run->begin_time()->to64()} AND id!={$prev_run->id()})
+HERE;
+        return $this->find_run_by_( $sql );
+    }
+
     private function find_run_by_ ( $condition=null ) {
 
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
@@ -259,24 +252,17 @@ class LogBookExperiment {
 
         /* Verify parameters
          */
+        if( is_null( $begin_time ))
+            throw new LogBookException(
+                __METHOD__,
+                "begin time can't be null" );
+
         if( !is_null( $end_time ) && !$begin_time->less( $end_time ))
             throw new LogBookException(
                 __METHOD__,
                 "begin time '".$begin_time."' isn't less than end time '".$end_time."'" );
 
-        if( 0 != $this->in_interval( $begin_time ))
-            throw new LogBookException(
-                __METHOD__,
-                "begin time '".$begin_time."' is out of experiment's interval" );
-
-        if( !is_null( $end_time ) && 0 != $this->in_interval( $end_time ))
-            throw new LogBookException(
-                __METHOD__,
-                "end time '".$end_time."' is out of experiment's interval" );
-
         /* Make sure the new one begins after the previous/last run ends.
-         * If that (last) run is still open-ended then get it closed where
-         * the new will begin.
          */
         $last_run = $this->find_last_run();
         if( !is_null( $last_run )) {
@@ -284,9 +270,6 @@ class LogBookExperiment {
                 throw new LogBookException(
                     __METHOD__,
                 "begin time '".$begin_time."' falls into the previous run's interval" );
-
-            if( is_null( $last_run->end_time()))
-                $last_run->close( $begin_time );
         }
 
         /* Proceed to creating new run in the database.
@@ -303,6 +286,9 @@ class LogBookExperiment {
     /**
      * Get a number of the next available run which doesn't exist yet
      *
+     * TODO: This operation has to be replaced with a request to
+     * the Registration database's Run Numbers generator.
+     * 
      * @return int - next available run number
      */
     private function allocate_run () {
@@ -465,10 +451,10 @@ class LogBookExperiment {
 
     public function create_entry( $relevance_time, $author, $content_type, $content ) {
 
-        if( 0 != $this->in_interval( $relevance_time ))
+        if( is_null( $relevance_time ))
             throw new LogBookException(
                 __METHOD__,
-                "relevance time '".$relevance_time."' falls off experiment's interval" );
+                "relevance time can't be null" );
 
         $this->connection->query (
             "INSERT INTO header VALUES(NULL,".$this->attr['id'].
@@ -484,95 +470,6 @@ class LogBookExperiment {
         return $this->find_entry_by_ (
             'hdr_id = (SELECT h.id FROM header h, entry e'.
             ' WHERE h.id = e.hdr_id AND e.id = (SELECT LAST_INSERT_ID()))' );
-    }
-
-    /**
-     * Close the open-ended experiment
-     *
-     * @param LusiTime $end_time
-     */
-    public function close ( $end_time ) {
-
-        if( !is_null( $this->attr['end_time'] ))
-            throw new LogBookException(
-                __METHOD__,
-                "the experiment is already closed" );
-
-        /* Verify the value of the parameter
-         */
-        if( is_null( $end_time ))
-            throw new LogBookException(
-                __METHOD__,
-                "end time can't be null");
-
-        if( 0 != $this->in_interval( $end_time ))
-            throw new LogBookException(
-                __METHOD__,
-                "end time '".$end_time."' falls off experiment's interval" );
-
-        /* Check the last run to be sure that it would completelly fall (unless
-         * its' open-ended) into the truncated limits of the experiment. Close
-         * the run at the same end time as well.
-         */
-        $last_run = $this->find_last_run();
-        if( !is_null( $last_run )) {
-            if( $last_run->begin_time()->greaterOrEqual( $end_time ))
-                throw new LogBookException(
-                    __METHOD__,
-                    "end time '".$end_time."' is before begin time of last run" );
-
-            if( is_null( $last_run->end_time())) {
-                $last_run->close( $end_time );
-            } else {
-                if( $end_time->less( $last_run->end_time()))
-                    throw new LogBookException(
-                        __METHOD__,
-                        "end time '".$end_time."' is before end time of last run" );
-            }
-        }
-
-        /* Similar action (as for the last run) must be applied to the last
-         * shift (if any).
-         */
-        $last_shift = $this->find_last_shift();
-        if( !is_null( $last_shift )) {
-            if( $last_shift->begin_time()->greaterOrEqual( $end_time ))
-                throw new LogBookException(
-                    __METHOD__,
-                    "end time '".$end_time."' is before begin time of last shift" );
-
-            if( is_null( $last_shift->end_time())) {
-                $last_shift->close( $end_time );
-            } else {
-                if( $end_time->less( $last_shift->end_time()))
-                    throw new LogBookException(
-                        __METHOD__,
-                        "end time '".$end_time."' is before end time '".
-                        $last_shift->end_time()."' of last shit" );
-            }
-        }
-
-        /* Make sure the last free-form entry (if any) was created before
-         * the requested end time.
-         */
-        $last_entry = $this->find_last_entry();
-        if( !is_null( $last_entry ))
-            if( $last_entry->relevance_time()->greaterOrEqual( $end_time ))
-                throw new LogBookException(
-                    __METHOD__,
-                    "end time '".$end_time."' is before relevance time '".
-                    $last_entry->relevance_time()."' of last free-form entry" );
-
-        /* Make the update
-         */
-        $end_time_64 = LusiTime::to64from( $end_time );
-        $this->connection->query(
-            'UPDATE "experiment" SET end_time='.$end_time_64.
-            ' WHERE id='.$this->id());
-
-        /* Update the current state of the object
-         */
-        $this->attr['end_time'] = $end_time_64;
     }
 }
 ?>

@@ -37,12 +37,6 @@ class LogBookRun {
         if( is_null( $this->attr['end_time'] )) return null;
         return LusiTime::from64( $this->attr['end_time'] ); }
 
-    public function in_interval ( $timestamp ) {
-        return LusiTime::in_interval (
-            $timestamp,
-            $this->attr['begin_time'],
-            $this->attr['end_time'] ); }
-
     /*
      * =============================
      *   SUMMARY PARAMETERS VALUES
@@ -234,10 +228,22 @@ class LogBookRun {
                 __METHOD__,
                 "end time can't be null" );
 
-        if( 0 != $this->experiment->in_interval( $end_time ))
+        if( !$this->begin_time()->less( $end_time ))
             throw new LogBookException(
                 __METHOD__,
-                "end time '".$end_time."' is out of experiment's interval" );
+                "end time '".$end_time."' isn't greater than the begin time" );
+
+        /* Also make sure the end time of the run doesn't go beyond the begin
+         * time of the next run (if there is such run).
+         */
+        $next_run = $this->parent()->find_next_run_for( $this );
+        if( !is_null( $next_run )) {
+            print_r( $next_run );
+            if( !$this->begin_time()->greaterOrEqual( $end_time ))
+                throw new LogBookException(
+                    __METHOD__,
+                    "end time '".$end_time."' isn't less or equal to the begin time of the next run" );
+        }
 
         /* Make the update
          */
