@@ -68,7 +68,7 @@ The page for creating a new experiment.
                         <td align="left" width="35%">
                             <table border="0" width="100%" align="left">
                                 <td width="40%"><span class="table_header_cell"><b>End Time</b></span></td>
-                                <td width="60%"><input type="text" name="end_time" value="<?php echo $now_str; ?>>"/></td>
+                                <td width="60%"><input type="text" name="end_time" value="<?php echo $now_str; ?>"/></td>
                             </table>
                         </td>
                     </tr>

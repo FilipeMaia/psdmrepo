@@ -1,115 +1,67 @@
 <?php
-require_once('RegDB.inc.php');
 
+require_once('RegDB.inc.php');
+require_once('RegDBHtml.php');
+
+/*
+ * This script will lay out a form for creating a new experiment.
+ */
+
+/* Proceed with the operation
+ */
 try {
     $regdb = new RegDB();
     $regdb->begin();
     $instrument_names = $regdb->instrument_names();
     $posix_groups = $regdb->posix_groups();
-?>
-<!--
-The page for creating a new experiment.
--->
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Create Experiment</title>
-    </head>
-    <link rel="stylesheet" type="text/css" href="RegDBTest.css" />
-    <body>
-        <?php
-        $now = new DateTime();
-        $now_str = $now->format(DateTime::ISO8601);
-        $now_str[10] = ' ';  // get rid of date-time separator 'T'
-        ?>
-        <p id="title"><b>Create Experiment</b></p>
-        <div id="test_container">
-        <form enctype="multipart/form-data" action="ProcessCreateExperiment.php" method="POST" style="margin-left:2em;">
-            <table cellpadding="3" border="0" >
-                <tbody>
-                    <tr>
-                        <td align="left" valign="top" style="color:#0071bc;">
-                            <b>Name</b></td>
-                        <td valign="top" >
-                            <input align="left" size="24" type="text" name="experiment_name" value="" /></td></tr>
-                    <tr>
-                        <td align="left" style="color:#0071bc;">
-                            <b>Instrument</b></td>
-                        <td>
-                            <select align="center" type="text" name="instrument_name" >
-                            <?php foreach( $instrument_names as $i ) echo "<option> $i </option>"; ?>
-                            </select></td></tr>
-                    <tr>
-                        <td></td>
-                        <td><br></td>
-                        <td></td></tr>
-                    <tr>
-                        <td align="left" style="color:#0071bc;">
-                            <b>Begin Time</b></td>
-                        <td>
-                            <input align="left" size="20" type="text" name="begin_time" value="<?php echo $now_str; ?>" /></td>
-                        <td>
-                            YYYY-MM-DD hh:mm:ss-zzzz</td></tr>
-                    <tr>
-                        <td align="left" style="color:#0071bc;">
-                            <b>End Time</b></td><td>
-                            <input align="left" size="20" type="text" name="end_time" value="<?php echo $now_str; ?>" /></td>
-                        <td>
-                            YYYY-MM-DD hh:mm:ss-zzzz</td></tr>
-                    <tr>
-                        <td></td>
-                        <td><br></td>
-                        <td></td></tr>
-                    <tr>
-                        <td align="left" style="color:#0071bc;">
-                            <b>POSIX Group</b></td>
-                        <td>
-                            <select align="center" type="text" name="group" >
-                            <?php foreach( $posix_groups as $g ) echo "<option> $g </option>"; ?>
-                            </select><td></tr>
-                    <tr>
-                        <td align="left" valign="top" style="color:#0071bc;">
-                            <b>Leader</b></td>
-                        <td valign="top" >
-                            <input align="left" size="8" type="text" name="leader" value="<?php echo $_SERVER['WEBAUTH_USER']; ?>" /></td>
-                        <td style="width:20em;">
-                            UNIX account name of the leader. The account must be
-                            a member of the selected POSIX group.</td></tr>
-                </tbody>
-            </table>
-            <br>
-            <table>
-                <thead>
-                    <th style="color:#0071bc;"><b>Contact Info</b></th>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <textarea name="contact" rows="3" cols="72"></textarea></td></tr>
-                </tbody>
-            </table>
-            <br>
-            <table>
-                <thead>
-                    <th style="color:#0071bc;"><b>Experiment Description</b></th>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <textarea name="description" rows="12" cols="72"></textarea></td></tr>
-                </tbody>
-            </table>
-            <br>
-            <input type="submit" value="Submit" name="submit_button" /><br>
-        </form>
-        </div>
-    </body>
-</html>
-<?php
+
+    $now = new DateTime();
+    $now_str = $now->format(DateTime::ISO8601);
+    $now_str[10] = ' ';  // get rid of date-time separator 'T'
+    $logged_user = $_SERVER['WEBAUTH_USER'];
+
+/*
+    $experiment = $regdb->find_experiment_by_id( $id )
+        or die( "no such experiment" );
+
+    $instrument = $experiment->instrument();
+    $group      = $experiment->POSIX_gid();
+
+    $instrument_url =
+        "<a href=\"javascript:view_instrument(".$instrument->id().",'".$instrument->name()."')\">".$instrument->name().'</a>';
+
+    $group_url =
+        "<a href=\"javascript:view_group('".$group."')\">".$group.'</a>';
+*/
+    header( 'Content-type: text/html' );
+    header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
+    header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
+
+    /* Create a container with standard fields
+     */
+    $con = new RegDBHtml( 0, 0, 700, 250 );
+    echo $con
+        ->label         ( 300,   0, 'Description')
+        ->label         (   0,  25, 'Experiment: ' )
+        ->value_input   ( 100,  25, 'experiment_name' )
+        ->textarea_input( 300,  25, 'description', 500, 125 )
+        ->label         (   0,  50, 'Instrument: ' )
+        ->select_input  ( 100,  50, 'instrument_name', $instrument_names )
+        ->label         (   0, 100, 'Begin Time: ' )
+        ->value_input   ( 100, 100, 'begin_time', $now_str )
+        ->label         (   0, 125, 'End Time: '   )
+        ->value_input   ( 100, 125, 'end_time', $now_str )
+        ->label         ( 300, 175, 'Contact Info' )
+        ->label         (   0, 200, 'POSIX Group: ' )
+        ->select_input  ( 100, 200, 'group', $posix_groups )
+        ->textarea_input( 300, 200, 'contact', 500, 50 )
+        ->label         (   0, 225, 'Leader: '     )
+        ->value_input   ( 100, 225, 'leader', $logged_user )
+        ->html();
+
     $regdb->commit();
 
 } catch( RegDBException $e ) {
-    echo $e->toHtml();
+    print $e->toHtml();
 }
 ?>

@@ -81,6 +81,47 @@ class RegDBExperiment {
             $this->attr['begin_time'],
             $this->attr['end_time'] ); }
 
+    /* =============
+     *   MODIFIERS
+     * =============
+     */
+    public function set_description ( $description ) {
+        $result = $this->connection->query(
+            "UPDATE experiment SET descr='".$this->connection->escape_string( $description ).
+            "' WHERE id=".$this->id());
+        $this->attr['descr'] = $description;
+    }
+
+    public function set_contact_info ( $contact_info ) {
+        $result = $this->connection->query(
+            "UPDATE experiment SET contact_info='".$this->connection->escape_string( $contact_info ).
+            "' WHERE id=".$this->id());
+        $this->attr['contact_info'] = $contact_info;
+    }
+
+    public function set_interval( $begin_time, $end_time ) {
+
+        /* Verify parameters
+         */
+        if( !is_null( $end_time ) && !$begin_time->less( $end_time ))
+            throw new RegDBException (
+                __METHOD__,
+                "begin time '".$begin_time."' isn't less than end time '".$end_time."'" );
+
+        $begin_time_64 = $begin_time->to64();
+        $end_time_64 = $end_time->to64();
+
+        /* Proceed with the operation.
+         */
+        $this->connection->query (
+            "UPDATE experiment SET begin_time=".$begin_time_64.
+            ", end_time=".$end_time_64.
+            " WHERE id=".$this->id());
+
+        $this->attr['begin_time'] = $begin_time_64;
+        $this->attr['end_time'] = $end_time_64;
+    }
+
     /* ==============
      *   PARAMETERS
      * ==============
@@ -137,7 +178,7 @@ class RegDBExperiment {
     }
 
     public function find_param_by_name ( $name ) {
-        return $this->find_param_by_( "param='".mysql_real_escape_string( trim( $name ))."'" ); }
+        return $this->find_param_by_( "param='".$this->connection->escape_string( trim( $name ))."'" ); }
 
     private function find_param_by_ ( $condition ) {
 
@@ -175,11 +216,11 @@ class RegDBExperiment {
          */
         $this->connection->query (
             'INSERT INTO experiment_param VALUES('.$this->id().
-            ",'".mysql_real_escape_string( $trimmed_name ).
-            "','".mysql_real_escape_string( $value ).
-            ",'".mysql_real_escape_string( $description )."')" );
+            ",'".$this->connection->escape_string( $trimmed_name ).
+            "','".$this->connection->escape_string( $value ).
+            ",'".$this->connection->escape_string( $description )."')" );
 
-        $new_param = $this->find_param_by_( "param='".mysql_real_escape_string( $trimmed_name )."'" );
+        $new_param = $this->find_param_by_( "param='".$this->connection->escape_string( $trimmed_name )."'" );
         if( is_null( $new_param ))
             throw new RegDBException (
                 __METHOD__,

@@ -27,7 +27,7 @@ function PageLoader() {
  */
 function load(url,id){
   if(url==null) {
-    document.getElementById(id).innerHTML='';
+    document.getElementById(id).innerHTML='Loading...';
     return;
   }
   var ldr=PageLoader();

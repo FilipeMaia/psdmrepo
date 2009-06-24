@@ -97,7 +97,8 @@ and open the template in the editor.
                 background-color:transparent;
             }
             #experiment_params_button_container,
-            #instrument_params_button_container {
+            #instrument_params_button_container,
+            #experiment_submit_button_container {
                 margin-top:24px;
                 margin-left:0px;
                 text-align:left;
@@ -127,163 +128,400 @@ and open the template in the editor.
         <!-- Page-specific script -->
         <script type="text/javascript">
 
-            YAHOO.util.Event.onContentReady("menubar", function () {
+YAHOO.util.Event.onContentReady("menubar", function () {
 
-                var oMenuBar = new YAHOO.widget.MenuBar("menubar", {
-                                                            autosubmenudisplay: true,
-                                                            hidedelay: 750,
-                                                            lazyload: true });
-                var aSubmenuData = [
+    var oMenuBar = new YAHOO.widget.MenuBar("menubar", {
+                                                autosubmenudisplay: true,
+                                                hidedelay: 750,
+                                                lazyload: true });
+    var aSubmenuData = [
+        { },
+        {   id: "experiments",
+            itemdata: [
+                { text: "Select..", url: "javascript:list_experiments()" },
+                { text: "Create New..", url: "javascript:javascript:create_experiment()" } ] },
+        {   id: "instruments",
+            itemdata: [
+                { text: "Select..", url: "javascript:list_instruments()" },
+                { text: "Create New..", url: "javascript:load('CreateInstrument.php','workarea')" } ] },
+        { },
+        {   id: "help",
+            itemdata: [
+                { text: "Help Menu...", url: "#" },
+                { text: "About this application", url: "#" } ] } ];
 
-                    {
-                    },
+    var ua = YAHOO.env.ua,
+        oAnim;  // Animation instance
 
-                    {
-                        id: "experiments",
-                        itemdata: [
-                            { text: "Select..", url: "javascript:list_experiments()" },
-                            { text: "Create New..", url: "javascript:load('CreateExperiment.php','workarea')" }
-                        ]
-                    },
+    function onSubmenuBeforeShow(p_sType, p_sArgs) {
 
-                    {
-                        id: "instruments",
-                        itemdata: [
-                            { text: "Select..", url: "javascript:list_instruments()" },
-                            { text: "Create New..", url: "javascript:load('CreateInstrument.php','workarea')" }
-                        ]
-                    },
+        var oBody,
+            oElement,
+            oShadow,
+            oUL;
 
-                    {
-                    },
+        if (this.parent) {
 
-                    {
-                        id: "help",
-                        itemdata: [
-                            { text: "Help Menu...", url: "#" },
-                            { text: "About this application", url: "#" }
-                        ]
-                    }
-                ];
+            oElement = this.element;
 
-                var ua = YAHOO.env.ua,
-                    oAnim;  // Animation instance
+            oShadow = oElement.lastChild;
+            oShadow.style.height = "0px";
 
-                function onSubmenuBeforeShow(p_sType, p_sArgs) {
+            if (oAnim && oAnim.isAnimated()) {
+                oAnim.stop();
+                oAnim = null;
+            }
+            oBody = this.body;
 
-                    var oBody,
-                        oElement,
-                        oShadow,
-                        oUL;
+            //  Check if the menu is a submenu of a submenu.
+            if (this.parent &&
+                !(this.parent instanceof YAHOO.widget.MenuBarItem)) {
 
-                    if (this.parent) {
-
-                        oElement = this.element;
-
-                        oShadow = oElement.lastChild;
-                        oShadow.style.height = "0px";
-
-                        if (oAnim && oAnim.isAnimated()) {
-                            oAnim.stop();
-                            oAnim = null;
-                        }
-                        oBody = this.body;
-
-                        //  Check if the menu is a submenu of a submenu.
-                        if (this.parent &&
-                            !(this.parent instanceof YAHOO.widget.MenuBarItem)) {
-
-                            if (ua.gecko || ua.opera) {
-                                oBody.style.width = oBody.clientWidth + "px";
-                            }
-                            if (ua.ie == 7) {
-                                oElement.style.width = oElement.clientWidth + "px";
-                            }
-                        }
-                        oBody.style.overflow = "hidden";
-
-                        oUL = oBody.getElementsByTagName("ul")[0];
-                        oUL.style.marginTop = ("-" + oUL.offsetHeight + "px");
-                    }
+                if (ua.gecko || ua.opera) {
+                    oBody.style.width = oBody.clientWidth + "px";
                 }
-                function onTween(p_sType, p_aArgs, p_oShadow) {
-
-                    if (this.cfg.getProperty("iframe")) {
-                        this.syncIframe();
-                    }
-                    if (p_oShadow) {
-                        p_oShadow.style.height = this.element.offsetHeight + "px";
-                    }
+                if (ua.ie == 7) {
+                    oElement.style.width = oElement.clientWidth + "px";
                 }
-                function onAnimationComplete(p_sType, p_aArgs, p_oShadow) {
+            }
+            oBody.style.overflow = "hidden";
 
-                    var oBody = this.body,
-                        oUL = oBody.getElementsByTagName("ul")[0];
+            oUL = oBody.getElementsByTagName("ul")[0];
+            oUL.style.marginTop = ("-" + oUL.offsetHeight + "px");
+        }
+    }
+    function onTween(p_sType, p_aArgs, p_oShadow) {
 
-                    if (p_oShadow) {
-                        p_oShadow.style.height = this.element.offsetHeight + "px";
-                    }
-                    oUL.style.marginTop = "";
-                    oBody.style.overflow = "";
+        if (this.cfg.getProperty("iframe")) {
+            this.syncIframe();
+        }
+        if (p_oShadow) {
+            p_oShadow.style.height = this.element.offsetHeight + "px";
+        }
+    }
+    function onAnimationComplete(p_sType, p_aArgs, p_oShadow) {
 
-                    //  Check if the menu is a submenu of a submenu.
+        var oBody = this.body,
+            oUL = oBody.getElementsByTagName("ul")[0];
 
-                    if (this.parent &&
-                        !(this.parent instanceof YAHOO.widget.MenuBarItem)) {
+        if (p_oShadow) {
+            p_oShadow.style.height = this.element.offsetHeight + "px";
+        }
+        oUL.style.marginTop = "";
+        oBody.style.overflow = "";
 
-                        // Clear widths set by the "beforeshow" event handler
+        //  Check if the menu is a submenu of a submenu.
 
-                        if (ua.gecko || ua.opera) {
-                            oBody.style.width = "";
-                        }
-                        if (ua.ie == 7) {
-                            this.element.style.width = "";
-                        }
-                    }
-                }
-                function onSubmenuShow(p_sType, p_sArgs) {
+        if (this.parent &&
+            !(this.parent instanceof YAHOO.widget.MenuBarItem)) {
 
-                    var oElement,
-                        oShadow,
-                        oUL;
+            // Clear widths set by the "beforeshow" event handler
 
-                    if (this.parent) {
+            if (ua.gecko || ua.opera) {
+                oBody.style.width = "";
+            }
+            if (ua.ie == 7) {
+                this.element.style.width = "";
+            }
+        }
+    }
+    function onSubmenuShow(p_sType, p_sArgs) {
 
-                        oElement = this.element;
-                        oShadow = oElement.lastChild;
-                        oUL = this.body.getElementsByTagName("ul")[0];
+        var oElement,
+            oShadow,
+            oUL;
 
-                        oAnim = new YAHOO.util.Anim(oUL,
-                            { marginTop: { to: 0 } },
-                            .5, YAHOO.util.Easing.easeOut);
+        if (this.parent) {
 
-                        oAnim.onStart.subscribe(function () {
-                            oShadow.style.height = "100%";
-                        });
-                        oAnim.animate();
+            oElement = this.element;
+            oShadow = oElement.lastChild;
+            oUL = this.body.getElementsByTagName("ul")[0];
 
-                        if (YAHOO.env.ua.ie) {
-                            oShadow.style.height = oElement.offsetHeight + "px";
-                            oAnim.onTween.subscribe(onTween, oShadow, this);
-                        }
-                        oAnim.onComplete.subscribe(onAnimationComplete, oShadow, this);
-                    }
-                }
-                oMenuBar.subscribe("beforeRender", function () {
+            oAnim = new YAHOO.util.Anim(oUL,
+                { marginTop: { to: 0 } },
+                .5, YAHOO.util.Easing.easeOut);
 
-					var nSubmenus = aSubmenuData.length,
-						i;
-
-                    if (this.getRoot() == this) {
-						for (i = 0; i < nSubmenus; i++) {
-                        	this.getItem(i).cfg.setProperty("submenu", aSubmenuData[i]);
-						}
-                    }
-                });
-                oMenuBar.subscribe("beforeShow", onSubmenuBeforeShow);
-                oMenuBar.subscribe("show", onSubmenuShow);
-                oMenuBar.render();
+            oAnim.onStart.subscribe(function () {
+                oShadow.style.height = "100%";
             });
+            oAnim.animate();
+
+            if (YAHOO.env.ua.ie) {
+                oShadow.style.height = oElement.offsetHeight + "px";
+                oAnim.onTween.subscribe(onTween, oShadow, this);
+            }
+            oAnim.onComplete.subscribe(onAnimationComplete, oShadow, this);
+        }
+    }
+    oMenuBar.subscribe("beforeRender", function () {
+
+        var nSubmenus = aSubmenuData.length,
+            i;
+
+        if (this.getRoot() == this) {
+            for (i = 0; i < nSubmenus; i++) {
+                this.getItem(i).cfg.setProperty("submenu", aSubmenuData[i]);
+            }
+        }
+    });
+    oMenuBar.subscribe("beforeShow", onSubmenuBeforeShow);
+    oMenuBar.subscribe("show", onSubmenuShow);
+    oMenuBar.render();
+});
+
+function clear_div( id ) {
+    document.getElementById(id).innerHTML='';
+    document.getElementById('context').innerHTML='Home >';
+}
+
+/* The customizable object for encapsulating the context and
+ * operations with tables.
+ */
+function Table( itsTableName, itsColumnDefs, itsDataRequest, hasPaginator ) {
+    this.name = itsTableName;
+    this.columnDefs = itsColumnDefs;
+    this.fieldsDefs = [];
+    for(i=0; i < itsColumnDefs.length; i++)
+        this.fieldsDefs.push( itsColumnDefs[i].key );
+    this.dataSource = new YAHOO.util.DataSource( itsDataRequest );
+    this.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+    this.dataSource.connXhrMode = "queueRequests";
+    this.dataSource.responseSchema = {
+        resultsList: "ResultSet.Result",
+        fields: this.fieldsDefs };
+    this.paginator = null;
+    if( hasPaginator )
+        this.paginator = new YAHOO.widget.Paginator (
+            {   containers : [this.name+"_table_page"],
+                rowsPerPage: 10
+            }
+        );
+    this.dataTable = new YAHOO.widget.DataTable(
+        this.name+"_table",
+        this.columnDefs,
+        this.dataSource,
+        { paginator: this.paginator/*new YAHOO.widget.Paginator( { rowsPerPage: 10 } )*/,
+          initialRequest: "" } );
+
+    this.refreshTable = function() {
+        this.dataSource.sendRequest(
+            "",
+            { success: function() {
+                  this.set( "sortedBy", null);
+                  this.onDataReturnReplaceRows.apply( this, arguments );
+              },
+              failure: function() {
+                  this.showTableMessage(
+                      YAHOO.widget.DataTable.MSG_ERROR,
+                      YAHOO.widget.DataTable.CLASS_ERROR );
+                  this.onDataReturnAppendRows.apply( this, arguments );
+              },
+              scope: this.dataTable } ); };
+}
+
+function list_experiments() {
+
+    document.getElementById('workarea').innerHTML=
+        '<div id="workarea_table_container">'+
+        '  <div id="workarea_table_page"></div>'+
+        '  <div id="workarea_table"></div>'+
+        '</div>';
+    document.getElementById('context').innerHTML='<a href="javascript:clear_div(\'workarea\')">Home</a> > Select Experiment >';
+
+    var table = new Table (
+        "workarea",
+        [ { key: "instrument",  sortable: true,  resizeable: true },
+          { key: "experiment",  sortable: true,  resizeable: true },
+          { key: "begin_time",  sortable: true,  resizeable: true },
+          { key: "end_time",    sortable: true,  resizeable: true },
+          { key: "description", sortable: false, resizeable: true } ],
+        'RegDBRequestExperiments.php',
+        true
+    );
+    table.refreshTable();
+}
+
+var experimentParamsShown = false;
+
+function view_experiment( id, name ) {
+
+    document.getElementById('workarea').innerHTML=
+        '<div id="experiment_info"></div>'+
+        '<br>'+
+        '<div id="experiment_params_button_container">'+
+        '  <button type="button" id="experiment_params_button" name="button1" value="Add">Parameters &gt;</button>'+
+        '</div>'+
+        '<br>'+
+        '<div id="experiment_params">'+
+        '  <div id="experiment_params_table_page"></div>'+
+        '  <div id="experiment_params_table"></div>'+
+        '</div>';
+    document.getElementById('context').innerHTML=
+        '<a href="javascript:clear_div(\'workarea\')">Home</a> > '+
+        '<a href="javascript:list_experiments()">Select Experiment</a> > '+
+        '<i>'+name+'</i>';
+    load( 'DisplayExperiment_v1.php?id='+id, 'experiment_info' );
+
+    experimentParamsShown = false;
+    function onButtonClick( p_oEvent ) {
+        if( experimentParamsShown ) {
+            experimentParamsShown = false;
+            document.getElementById('experiment_params').innerHTML=
+                '  <div id="experiment_params_table_page"></div>'+
+                '  <div id="experiment_params_table"></div>';
+        } else {
+            experimentParamsShown = true;
+            var table = new Table (
+                "experiment_params",
+                [ { key: "name",        sortable: true,  resizeable: true },
+                  { key: "value",       sortable: false, resizeable: true },
+                  { key: "description", sortable: false, resizeable: true } ],
+                'RegDBRequestExperimentParams.php?id='+id,
+                false
+            );
+            table.refreshTable();
+        }
+    }
+    var oPushButton1 = new YAHOO.widget.Button( "experiment_params_button" );
+    oPushButton1.on(
+        "click",
+         onButtonClick );
+}
+
+function create_experiment( ) {
+
+    document.getElementById('workarea').innerHTML=
+        '<div id="experiment_info">'+
+        '  <form name="myform" action="ProcessCreateExperiment.php" method="post">'+
+        '    <div id="experiment_info_within_form"></div>'+
+        '  </form>'+
+        '</div>'+
+        '<br>'+
+        '<div id="experiment_submit_button_container">'+
+        '  <button type="submit" id="experiment_submit_button" name="button2" value="Add">Submit</button>'+
+        '</div>';
+    document.getElementById('context').innerHTML=
+        '<a href="javascript:clear_div(\'workarea\')">Home</a> > Create New Experiment > ';
+    load( 'CreateExperiment_v1.php', 'experiment_info_within_form' );
+
+    function onButtonClick( p_oEvent ) {
+        alert( document.myform.action );
+        document.myform.submit();
+        //list_experiments();
+    }
+    var oPushButton2 = new YAHOO.widget.Button( "experiment_submit_button", { type: "submit", value: "experiment_submit_button_value" } );
+    oPushButton2.on(
+        "click",
+         onButtonClick );
+}
+
+function list_instruments() {
+
+    document.getElementById('workarea').innerHTML=
+        '<div id="workarea_table_container">'+
+        '  <div id="workarea_table_page"></div>'+
+        '  <div id="workarea_table"></div>'+
+        '</div>';
+    document.getElementById('context').innerHTML='<a href="javascript:clear_div(\'workarea\')">Home</a> > Select Instrument >';
+
+    var table = new Table (
+        "workarea",
+        [ { key: "instrument",  sortable: true,  resizeable: true },
+          { key: "description", sortable: false, resizeable: true } ],
+        'RegDBRequestInstruments.php',
+        false
+    );
+    table.refreshTable();
+}
+
+var instrumentParamsShown = false;
+
+function view_instrument( id, name ) {
+
+    document.getElementById('workarea').innerHTML=
+        '<div id="instrument_info"></div>'+
+        '<br>'+
+        '<div id="instrument_params_button_container">'+
+        '  <button type="button" id="instrument_params_button" name="button1" value="Add">Parameters &gt;</button>'+
+        '</div>'+
+        '<br>'+
+        '<div id="instrument_params">'+
+        '  <div id="instrument_params_table_page"></div>'+
+        '  <div id="instrument_params_table"></div>'+
+        '</div>';
+    document.getElementById('context').innerHTML=
+        '<a href="javascript:clear_div(\'workarea\')">Home</a> > '+
+        '<a href="javascript:list_instruments()">Select Instrument</a> > '+
+        '<i>'+name+'</i>';
+    load( 'DisplayInstrument_v1.php?id='+id, 'instrument_info' );
+
+    instrumentParamsShown = false;
+    function onButtonClick( p_oEvent ) {
+        if( instrumentParamsShown ) {
+            instrumentParamsShown = false;
+            document.getElementById('instrument_params').innerHTML=
+                '  <div id="instrument_params_table_page"></div>'+
+                '  <div id="instrument_params_table"></div>';
+        } else {
+            instrumentParamsShown = true;
+            var table = new Table (
+                "instrument_params",
+                [ { key: "name",        sortable: true,  resizeable: true },
+                  { key: "value",       sortable: false, resizeable: true },
+                  { key: "description", sortable: false, resizeable: true } ],
+                'RegDBRequestInstrumentParams.php?id='+id,
+                false
+            );
+            table.refreshTable();
+        }
+    }
+    var oPushButton1 = new YAHOO.widget.Button( "instrument_params_button" );
+    oPushButton1.on(
+        "click",
+         onButtonClick );
+}
+
+function list_groups() {
+
+    document.getElementById('workarea').innerHTML=
+        '<div id="workarea_table_container">'+
+        '  <div id="workarea_table_page"></div>'+
+        '  <div id="workarea_table"></div>'+
+        '</div>';
+    document.getElementById('context').innerHTML='<a href="javascript:clear_div(\'workarea\')">Home</a> > Select POSIX Group >';
+
+    var table = new Table (
+        "workarea",
+        [ { key: "group",   sortable: true, resizeable: true },
+          { key: "members", sortable: true, resizeable: true } ],
+        'RegDBRequestGroups.php',
+        false
+    );
+    table.refreshTable();
+}
+
+function view_group( name ) {
+
+    document.getElementById('workarea').innerHTML=
+        '<div id="workarea_table_container">'+
+        '  <div id="workarea_table_page"></div>'+
+        '  <div id="workarea_table"></div>'+
+        '</div>';
+    document.getElementById('context').innerHTML=
+        '<a href="javascript:clear_div(\'workarea\')">Home</a> > '+
+        '<a href="javascript:list_groups()">Select POSIX Group</a> > '+
+        '<i>'+name+'</i>';
+
+    var table = new Table (
+        "workarea",
+        [ { key: "uid",   sortable: true, resizeable: true },
+          { key: "name",  sortable: true, resizeable: true },
+          { key: "email", sortable: true, resizeable: true } ],
+        'RegDBRequestGroupMembers.php?name='+name,
+        false
+    );
+    table.refreshTable();
+}
         </script>
 
     </head>
@@ -313,11 +551,6 @@ and open the template in the editor.
                 </ul>
             </div>
         </div>
-        <!--
-        <div id="title">
-            <p>Home</p>
-        </div>
-        -->
         <p id="context">Home > </p>
         <br>
         <div id="workarea"></div>
@@ -326,238 +559,5 @@ and open the template in the editor.
         <div id="application_footer">
             <center>2009 <a href="http://www.slac.stanford.edu">SLAC National Accelerator Laboratory</a></center>
         </div>
-
-        <!-- DYNAMIC CONTENTS GENERATION -->
-
-        <script type="text/javascript">
-
-        function clear_div( id ) {
-            document.getElementById(id).innerHTML='';
-            document.getElementById('context').innerHTML='Home >';
-        }
-
-        /* The customizable object for encapsulating the context and
-         * operations with tables.
-         */
-        function Table( itsTableName, itsColumnDefs, itsDataRequest, hasPaginator ) {
-            this.name = itsTableName;
-            this.columnDefs = itsColumnDefs;
-            this.fieldsDefs = [];
-            for(i=0; i < itsColumnDefs.length; i++)
-                this.fieldsDefs.push( itsColumnDefs[i].key );
-            this.dataSource = new YAHOO.util.DataSource( itsDataRequest );
-            this.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-            this.dataSource.connXhrMode = "queueRequests";
-            this.dataSource.responseSchema = {
-                resultsList: "ResultSet.Result",
-                fields: this.fieldsDefs };
-            this.paginator = null;
-            if( hasPaginator )
-                this.paginator = new YAHOO.widget.Paginator (
-                    {   containers : [this.name+"_table_page"],
-                        rowsPerPage: 10
-                    }
-                );
-            this.dataTable = new YAHOO.widget.DataTable(
-                this.name+"_table",
-                this.columnDefs,
-                this.dataSource,
-                { paginator: this.paginator/*new YAHOO.widget.Paginator( { rowsPerPage: 10 } )*/,
-                  initialRequest: "" } );
-
-            this.refreshTable = function() {
-                this.dataSource.sendRequest(
-                    "",
-                    { success: function() {
-                          this.set( "sortedBy", null);
-                          this.onDataReturnReplaceRows.apply( this, arguments );
-                      },
-                      failure: function() {
-                          this.showTableMessage(
-                              YAHOO.widget.DataTable.MSG_ERROR,
-                              YAHOO.widget.DataTable.CLASS_ERROR );
-                          this.onDataReturnAppendRows.apply( this, arguments );
-                      },
-                      scope: this.dataTable } ); };
-        }
-
-        function list_experiments() {
-
-            document.getElementById('workarea').innerHTML=
-                '<div id="workarea_table_container">'+
-                '  <div id="workarea_table_page"></div>'+
-                '  <div id="workarea_table"></div>'+
-                '</div>';
-            document.getElementById('context').innerHTML='<a href="javascript:clear_div(\'workarea\')">Home</a> > Select Experiment >';
-
-            var table = new Table (
-                "workarea",
-                [ { key: "instrument",  sortable: true,  resizeable: true },
-                  { key: "experiment",  sortable: true,  resizeable: true },
-                  { key: "begin_time",  sortable: true,  resizeable: true },
-                  { key: "end_time",    sortable: true,  resizeable: true },
-                  { key: "description", sortable: false, resizeable: true } ],
-                'RegDBRequestExperiments.php',
-                true
-            );
-            table.refreshTable();
-        }
-
-        var experimentParamsShown = false;
-
-        function view_experiment( id, name ) {
-
-            document.getElementById('workarea').innerHTML=
-                '<div id="experiment_info"></div>'+
-                '<br>'+
-                '<div id="experiment_params_button_container">'+
-                '  <button type="button" id="experiment_params_button" name="button1" value="Add">Parameters &gt;</button>'+
-                '</div>'+
-                '<br>'+
-                '<div id="experiment_params">'+
-                '  <div id="experiment_params_table_page"></div>'+
-                '  <div id="experiment_params_table"></div>'+
-                '</div>';
-            document.getElementById('context').innerHTML=
-                '<a href="javascript:clear_div(\'workarea\')">Home</a> > '+
-                '<a href="javascript:list_experiments()">Select Experiment</a> > '+
-                '<i>'+name+'</i>';
-            load( 'DisplayExperiment_v1.php?id='+id, 'experiment_info' );
-
-            experimentParamsShown = false;
-            function onButtonClick( p_oEvent ) {
-                if( experimentParamsShown ) {
-                    experimentParamsShown = false;
-                    document.getElementById('experiment_params').innerHTML=
-                        '  <div id="experiment_params_table_page"></div>'+
-                        '  <div id="experiment_params_table"></div>';
-                } else {
-                    experimentParamsShown = true;
-                    var table = new Table (
-                        "experiment_params",
-                        [ { key: "name",        sortable: true,  resizeable: true },
-                          { key: "value",       sortable: false, resizeable: true },
-                          { key: "description", sortable: false, resizeable: true } ],
-                        'RegDBRequestExperimentParams.php?id='+id,
-                        false
-                    );
-                    table.refreshTable();
-                }
-            }
-            var oPushButton1 = new YAHOO.widget.Button( "experiment_params_button" );
-            oPushButton1.on(
-                "click",
-                 onButtonClick );
-        }
-
-        function list_instruments() {
-
-            document.getElementById('workarea').innerHTML=
-                '<div id="workarea_table_container">'+
-                '  <div id="workarea_table_page"></div>'+
-                '  <div id="workarea_table"></div>'+
-                '</div>';
-            document.getElementById('context').innerHTML='<a href="javascript:clear_div(\'workarea\')">Home</a> > Select Instrument >';
-
-            var table = new Table (
-                "workarea",
-                [ { key: "instrument",  sortable: true,  resizeable: true },
-                  { key: "description", sortable: false, resizeable: true } ],
-                'RegDBRequestInstruments.php',
-                false
-            );
-            table.refreshTable();
-        }
-
-        var instrumentParamsShown = false;
-
-        function view_instrument( id, name ) {
-
-            document.getElementById('workarea').innerHTML=
-                '<div id="instrument_info"></div>'+
-                '<br>'+
-                '<div id="instrument_params_button_container">'+
-                '  <button type="button" id="instrument_params_button" name="button1" value="Add">Parameters &gt;</button>'+
-                '</div>'+
-                '<br>'+
-                '<div id="instrument_params">'+
-                '  <div id="instrument_params_table_page"></div>'+
-                '  <div id="instrument_params_table"></div>'+
-                '</div>';
-            document.getElementById('context').innerHTML=
-                '<a href="javascript:clear_div(\'workarea\')">Home</a> > '+
-                '<a href="javascript:list_instruments()">Select Instrument</a> > '+
-                '<i>'+name+'</i>';
-            load( 'DisplayInstrument_v1.php?id='+id, 'instrument_info' );
-
-            instrumentParamsShown = false;
-            function onButtonClick( p_oEvent ) {
-                if( instrumentParamsShown ) {
-                    instrumentParamsShown = false;
-                    document.getElementById('instrument_params').innerHTML=
-                        '  <div id="instrument_params_table_page"></div>'+
-                        '  <div id="instrument_params_table"></div>';
-                } else {
-                    instrumentParamsShown = true;
-                    var table = new Table (
-                        "instrument_params",
-                        [ { key: "name",        sortable: true,  resizeable: true },
-                          { key: "value",       sortable: false, resizeable: true },
-                          { key: "description", sortable: false, resizeable: true } ],
-                        'RegDBRequestInstrumentParams.php?id='+id,
-                        false
-                    );
-                    table.refreshTable();
-                }
-            }
-            var oPushButton1 = new YAHOO.widget.Button( "instrument_params_button" );
-            oPushButton1.on(
-                "click",
-                 onButtonClick );
-        }
-
-        function list_groups() {
-
-            document.getElementById('workarea').innerHTML=
-                '<div id="workarea_table_container">'+
-                '  <div id="workarea_table_page"></div>'+
-                '  <div id="workarea_table"></div>'+
-                '</div>';
-            document.getElementById('context').innerHTML='<a href="javascript:clear_div(\'workarea\')">Home</a> > Select POSIX Group >';
-
-            var table = new Table (
-                "workarea",
-                [ { key: "group",   sortable: true, resizeable: true },
-                  { key: "members", sortable: true, resizeable: true } ],
-                'RegDBRequestGroups.php',
-                false
-            );
-            table.refreshTable();
-        }
-
-        function view_group( name ) {
-
-            document.getElementById('workarea').innerHTML=
-                '<div id="workarea_table_container">'+
-                '  <div id="workarea_table_page"></div>'+
-                '  <div id="workarea_table"></div>'+
-                '</div>';
-            document.getElementById('context').innerHTML=
-                '<a href="javascript:clear_div(\'workarea\')">Home</a> > '+
-                '<a href="javascript:list_groups()">Select POSIX Group</a> > '+
-                '<i>'+name+'</i>';
-
-            var table = new Table (
-                "workarea",
-                [ { key: "uid",   sortable: true, resizeable: true },
-                  { key: "name",  sortable: true, resizeable: true },
-                  { key: "email", sortable: true, resizeable: true } ],
-                'RegDBRequestGroupMembers.php?name='+name,
-                false
-            );
-            table.refreshTable();
-        }
-
-        </script>
     </body>
 </html>

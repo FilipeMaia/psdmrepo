@@ -3,8 +3,10 @@
 require_once('RegDB.inc.php');
 
 function instrument2json( $instrument ) {
-    $instrument_url = "<a href=\"javascript:view_instrument(".$instrument->id().
-        ",'".$instrument->name()."')\">".$instrument->name().'</a>';
+    $instrument_url =
+        "<a href=\"javascript:view_instrument(".$instrument->id().",'".$instrument->name()."')\">".
+        $instrument->name().
+        '</a>';
     return json_encode(
         array (
             "instrument"  => $instrument_url,

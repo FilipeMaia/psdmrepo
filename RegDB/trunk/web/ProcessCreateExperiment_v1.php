@@ -62,6 +62,10 @@ if( isset( $_POST['description'] )) {
 } else
     die( "no valid experiment description" );
 
+if( isset( $_POST['actionSuccess'] )) {
+    $actionSuccess = trim( $_POST['actionSuccess'] );
+}
+
 /* Proceed with the operation
  */
 try {
@@ -73,8 +77,18 @@ try {
         LusiTime::now(), $begin_time, $end_time,
         $group, $leader, $contact );
 
-    header( 'Location: DisplayExperiment.php?id='.$experiment->id());
-
+    if( isset( $actionSuccess )) {
+        if( $actionSuccess == 'home' )
+            header( 'Location: RegDB_v1.php' );
+        else if( $actionSuccess == 'list_experiments' )
+            header( 'Location: RegDB_v1.php?action=list_experiments' );
+        else if( $actionSuccess == 'view_experiment' )
+            header( 'Location: RegDB_v1.php?action=view_experiment&id='.$experiment->id().'&name='.$experiment->name());
+        else if( $actionSuccess == 'edit_experiment' )
+            header( 'Location: RegDB_v1.php?action=edit_experiment&id='.$experiment->id().'&name='.$experiment->name());
+        else
+            ;
+    }
     $regdb->commit();
 
 } catch( RegDBException $e ) {

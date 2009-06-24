@@ -3,8 +3,10 @@
 require_once('RegDB.inc.php');
 
 function experiment2json( $experiment ) {
-    $experiment_url = "<a href=\"javascript:view_experiment(".$experiment->id().
-        ",'".$experiment->name()."')\">".$experiment->name().'</a>';
+    $experiment_url =
+        "<a href=\"javascript:view_experiment(".$experiment->id().",'".$experiment->name()."')\">".
+        $experiment->name().
+        '</a>';
     return json_encode(
         array (
             "instrument"  => $experiment->instrument()->name(),

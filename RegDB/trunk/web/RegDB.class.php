@@ -167,15 +167,15 @@ class RegDB {
          /* Proceed with the operation.
           */
         $this->connection->query (
-            "INSERT INTO experiment VALUES(NULL,'".mysql_real_escape_string( $trim_experiment_name ).
-            "','".mysql_real_escape_string( $description ).
+            "INSERT INTO experiment VALUES(NULL,'".$this->connection->escape_string( $trim_experiment_name ).
+            "','".$this->connection->escape_string( $description ).
             "',".$instrument->id().
             ",".$registration_time->to64().
             ",".$begin_time->to64().
             ",".$end_time->to64().
-            ",'".mysql_real_escape_string( $trim_leader ).
-            "','".mysql_real_escape_string( trim( $contact )).
-            "','".mysql_real_escape_string( $trim_posix_gid )."')" );
+            ",'".$this->connection->escape_string( $trim_leader ).
+            "','".$this->connection->escape_string( trim( $contact )).
+            "','".$this->connection->escape_string( $trim_posix_gid )."')" );
 
         $experiment = $this->find_experiment_by_id( '(SELECT LAST_INSERT_ID())' );
         if( !$experiment )
@@ -183,6 +183,20 @@ class RegDB {
                 __METHOD__,
                 "fatal internal error" );
         return $experiment;
+    }
+
+    public function delete_experiment_by_id ( $id ) {
+
+        $experiment = $this->find_experiment_by_id( $id );
+        if( !$experiment )
+            throw new RegDBException (
+                __METHOD__,
+                "no such experiment" );
+
+        /* Proceed with the operation.
+         */
+        $this->connection->query ( "DELETE FROM experiment_param WHERE exper_id=".$id );
+        $this->connection->query ( "DELETE FROM experiment WHERE id=".$id );
     }
 
     /* ===============
@@ -261,8 +275,8 @@ class RegDB {
          /* Proceed with the operation.
           */
         $this->connection->query (
-            "INSERT INTO instrument VALUES(NULL,'".mysql_real_escape_string( $trim_instrument_name ).
-            "','".mysql_real_escape_string( $description )."')" );
+            "INSERT INTO instrument VALUES(NULL,'".$this->connection->escape_string( $trim_instrument_name ).
+            "','".$this->connection->escape_string( $description )."')" );
 
         $instrument = $this->find_instrument_by_id( '(SELECT LAST_INSERT_ID())' );
         if( !$instrument )
@@ -270,6 +284,22 @@ class RegDB {
                 __METHOD__,
                 "fatal internal error" );
         return $instrument;
+    }
+
+    public function delete_instrument_by_id ( $id ) {
+
+        $instrument = $this->find_instrument_by_id( $id );
+        if( !$instrument )
+            throw new RegDBException (
+                __METHOD__,
+                "no such instrument" );
+
+        /* Proceed with the operation.
+         */
+        $this->connection->query ( "DELETE FROM experiment_param WHERE exper_id IN (SELECT id FROM experiment WHERE instr_id=".$id.")" );
+        $this->connection->query ( "DELETE FROM experiment WHERE instr_id=".$id );
+        $this->connection->query ( "DELETE FROM instrument_param WHERE instr_id=".$id );
+        $this->connection->query ( "DELETE FROM instrument WHERE id=".$id );
     }
 
     /* ====================

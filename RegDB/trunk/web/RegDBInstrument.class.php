@@ -33,6 +33,17 @@ class RegDBInstrument {
     public function description () {
         return $this->attr['descr']; }
 
+    /* =============
+     *   MODIFIERS
+     * =============
+     */
+    public function set_description ( $description ) {
+        $result = $this->connection->query(
+            "UPDATE instrument SET descr='".$this->connection->escape_string( $description ).
+            "' WHERE id=".$this->id());
+        $this->attr['descr'] = $description;
+    }
+
     /* ==============
      *   PARAMETERS
      * ==============
@@ -89,7 +100,7 @@ class RegDBInstrument {
     }
 
     public function find_param_by_name ( $name ) {
-        return $this->find_param_by_( "param='".mysql_real_escape_string( trim( $name ))."'" ); }
+        return $this->find_param_by_( "param='".$this->connection->escape_string( trim( $name ))."'" ); }
 
     private function find_param_by_ ( $condition ) {
 
@@ -127,11 +138,11 @@ class RegDBInstrument {
          */
         $this->connection->query (
             'INSERT INTO instrument_param VALUES('.$this->id().
-            ",'".mysql_real_escape_string( $trimmed_name ).
-            "','".mysql_real_escape_string( $value ).
-            ",'".mysql_real_escape_string( $description )."')" );
+            ",'".$this->connection->escape_string( $trimmed_name ).
+            "','".$this->connection->escape_string( $value ).
+            ",'".$this->connection->escape_string( $description )."')" );
 
-        $new_param = $this->find_param_by_( "param='".mysql_real_escape_string( $trimmed_name )."'" );
+        $new_param = $this->find_param_by_( "param='".$this->connection->escape_string( $trimmed_name )."'" );
         if( is_null( $new_param ))
             throw new RegDBException (
                 __METHOD__,
