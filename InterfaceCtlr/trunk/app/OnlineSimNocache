@@ -4,15 +4,15 @@
 #  $Id$
 #
 # Description:
-#  Script Controller.
+#  Script OnlineSim.
 #
 #------------------------------------------------------------------------
 
-"""Interface Controller for Photon Science Data Management.
+"""Simulate the Online system for the Interface Controller.
 
-This is the Interface Controller that monitors filesets created by the online system.
-It creates a translator process to translate the fileset into HDF5 and enters the 
-translated file into iRODS.
+To test the Interface Controller, use this script to add new filesets and
+associated files to the interface database. When file copies are complete
+the status of the fileset is changed to "Waiting_Translation".
 
 This software was developed for the LUSI project.  If you use all or
 part of it, please give an appropriate acknowledgement.
@@ -34,8 +34,7 @@ __version__ = "$Revision: 8 $"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
-import sys, os, pwd, socket, subprocess
-import time, resource
+import sys, os, pwd, socket
 import MySQLdb
 
 #---------------------------------
@@ -54,7 +53,7 @@ from LusiTime.Time import Time
 #---------------------
 
 # local variable accessible in this module only
-#_OP_X = 'Y'
+_OP_X = 'Y'
 
 #-------------------
 # Local functions --
@@ -66,7 +65,7 @@ def _default_user():
     return pwd.getpwuid(os.geteuid())[0]
 
 def _default_host():
-    """Return the default host on which the MySQL server is run"""
+    """Return the default host on which the MySQL is run"""
 
     return "bbt-odf101.slac.stanford.edu"
 
@@ -79,6 +78,11 @@ def _default_database():
     """Return the default database"""
 
     return "interface_db"
+
+def _exper_id_sql (experiment):
+    """Return a nested SQL query to retrieve an identifier of an experiment"""
+
+    return """(SELECT id FROM "experiment" WHERE name='%s')""" % experiment
 
 def _time2str(timestamp):
     """Turn a number 64-bit timestamp got from the database into
@@ -102,7 +106,7 @@ class DatabaseOperatonFailed(Exception):
 # Application class definition --
 #--------------------------------
 
-class Controller ( LusiPyApp ) :
+class OnlineSim ( LusiPyApp ) :
 
     # ===============================================
     # An indirection for handling the standard output
@@ -219,54 +223,71 @@ class Controller ( LusiPyApp ) :
     """,
             self.__cmd_help,
             connects2server=False);
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'init',
+            '<schema_file>',
+            """
+    The command will (re-)initialize the database using
+    a schema found in an input file. Note, that all prior
+    contents of the database will get destroyed.
+    """,
+            self.__cmd_init);
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'new_fileset',
+            '<experiment> <instrument> <run_type> <run_number>',
+            """
+    Create a new fileset.
+    """,
+             self.__cmd_new_fileset)
+
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'add_filename',
+            '<fileset_id> <filetype> <filename>',
+            """
+    Add a file to an existing fileset.
+    """,
+             self.__cmd_add_filename)
+
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'change_fileset_status',
+            '<fileset_id> <status_id>',
+            """
+    Change the status of an existing fileset and all files it contains.
+    """,
+             self.__cmd_change_fileset_status)
+
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'list_fileset_status',
+            '',
+            """
+    List all possivle fileset/filename statii.
+    """,
+             self.__cmd_list_fileset_status)
+
 
     # ============================================================
     # Run the whole thing after parsing the command argunments and
-    # installing logger. See LusiPyApp class for details.
+    # installing logger. See BbrPyApp class for details.
     # ============================================================
 
     def _run ( self ) :
- 
-        # Connect to the database
-        #
-        self.__connect()
 
-        # Init controller and get status codes we'll need
-        #
-        translate_uri= self.__init_controller()
-        xwait_id = self.__fstat_id("Waiting_Translation")
-        xproc_id = self.__fstat_id("Being_Translated")
-        xdone_id = self.__fstat_id("Translation_complete")
-
-        while True:
-           fs_id = self.__get_fileset_with_status(xwait_id)
-           if fs_id:
-              self.print_out("Found fileset id %s Waiting_Translation" % fs_id)
-              cmd = self.__build_translate_cmd(fs_id, translate_uri)
-              print "Starting translator with cmd %s" % cmd             
-              self.__change_fileset_status (fs_id, xproc_id)
-              proc = subprocess.Popen(cmd)
-              print "Return from call with retcode %s" % proc
-              done = False
-              while not done:
-                  print "Waiting for translator to complete"
-                  proc.poll()
-                  if proc.returncode == None:
-                      time.sleep(1.0)
-                  else:
-                      print "Translator complete with code %s" % proc.returncode
-                      usage = resource.getrusage(resource.RUSAGE_CHILDREN)
-                      print "translator resources: %s" % usage
-                      self.__change_fileset_status (fs_id, xdone_id)
-                      done = True
-
-           else:
-              self.print_out("No fileset Waiting_Translation found")
-              time.sleep(2.0)
-
-        # End while True
-
-        # Print the list of supported commands if none is given ----------------
+        # Print the list of supported commands of none is given ----------------
         #
         if not self._args :
             self.__cmd_help('help', self._args)
@@ -289,6 +310,7 @@ class Controller ( LusiPyApp ) :
 
         self.trace( "command: %s: arguments: %s" % (command,str(self._args[1:])))
 
+        if self.__cmd_handlers[command]['CONNECTS2SERVER']: self.__connect()
         return self.__cmd_handlers[command]['HANDLER'](command, self._args[1:])
 
     # ===========================================
@@ -329,9 +351,9 @@ DESCRIPTION:
 
     %s
 
-        This is the Interface Controller. The application has been 
-        developed in a context of the OFFLINE Data Management Project
-         for LCLS/LUSI experiments.
+        This is the Online simulator for the Interface Controller
+        Database. The application has been developed in a context of
+        the OFFLINE Data Management Project for LCLS/LUSI experiments.
 
 USAGE:
 
@@ -359,141 +381,110 @@ SUPPORTED COMMANDS:
 
         return 0
 
+    # =============================================
+    # Load the initial schema and initialize tables
+    # =============================================
 
-    # ====================================
-    # Get fileset with requested status id
-    # ====================================
+    def __cmd_init ( self, command, args ) :
+        self.print_out("Entereid cmd_init")
+        if len(args) < 1:
+            self._parser.error("Enter schema file name : %s" % command)
 
-    def __get_fileset_with_status ( self, in_statid ) :
+        filepath = args[0]
+        if not self.__simple_query(
+            'source %s' % filepath): return 1 
+        return 0
 
-        """return a fileset id with the specified status or 0 if
-        no fileset exists with that status"""
-        
-        if not self.__simple_query("""SET @_new_fileset_0 = NULL;
-            CALL get_fileset_with_status ('%s',@_new_fileset_0);""" % (in_statid)): return 0
-        fsrow = self.__select_query('SELECT @_new_fileset_0', return_dict=True)
-        if not fsrow: return 0
-        return fsrow[0]['@_new_fileset_0']
+    # ====================
+    # Add a new fileset
+    # ====================
 
-    # ========================
-    # Init Controller instance
-    # ========================
+    def __cmd_new_fileset ( self, command, args ) :
 
-    def __init_controller ( self ) :
+        if len(args) < 4:
+            self._parser.error(
+                "Enter: experiment instrument run_type run_num - %s" % command)
 
-       """Perform multiple operations to initialize this controller:
-       1) Find our translator output uri in the translator_nodes table.
-       2) Insert an entry in the interface_controller table.
-       3) Return the tuple containing the id and translate_uri from the 
-          translator_cpu table"""
+        exper      = args[0]
+        instr      = args[1]
+        runtype    = args[2]
+        runnum     = args[3]
 
-       host = socket.getfqdn(socket.gethostname())
-       print "In init_controller this host is %s" % host
-    
-       rows = self.__select_query(
-           "SELECT id, translate_uri FROM translator_node WHERE node_uri = '%s'" % host,
-           return_dict=True)
-       if not rows or len(rows) != 1:
-           raise DatabaseOperatonFailed, "Failed to find node %s in translator_node table." % host 
+        if not self.__simple_query(
+            """SET @_new_fileset_0 = NULL; 
+            CALL new_fileset_nocache ('%s','%s','%s','%s',@_new_fileset_0);""" % (
+            exper, instr, runtype, runnum )): return 1
+        setrow = self.__select_query('SELECT @_new_fileset_0', return_dict=True)
+        if not setrow: return 1
+        newset = setrow[0]['@_new_fileset_0']
+        print "newset = %s" % newset
+        return 0
 
-       translate_uri = rows[0]['translate_uri']
-       node_id = rows[0]['id']
-       proc_id= os.getpid()
-       start  = _time2str(Time.now().to64())[0:19]
-       print "time = %s" % start
 
-       if not self.__simple_query(
-           "SET SESSION SQL_MODE='ANSI'",
-           "START TRANSACTION",
-           "INSERT INTO interface_controller VALUES(NULL,%s,%s, '%s', NULL, False)" % (
-               node_id,
-               proc_id,
-               start),
-           "COMMIT"): 
-           raise DatabaseOperatonFailed, "Failed to insert new interface_controller entry"
-              
-       return translate_uri
+    # =================================
+    # Add a file to an existing fileset
+    # =================================
 
+    def __cmd_add_filename ( self, command, args ) :
+
+        if len(args) < 3:
+            self._parser.error("Enter: fileset_id  filetype filename - %s" % command)
+
+        fileset_id = args[0]
+        filetype   = args[1]
+        filename   = args[2]
+        status = None 
+        if not self.__simple_query(
+            """SET @_new_fileset_0 = NULL;
+            CALL add_file_nocache ('%s','%s', '%s', @_new_fileset_0);""" % (
+            fileset_id, filetype, filename)): return 1
+        row = self.__select_query('SELECT @_new_fileset_0', return_dict=True)
+        if not row: return 1
+        status = row[0]['@_new_fileset_0']
+        print "add_filename return = %s " % (status)
+        return 0
+
+    # =============================================
+    # List all possible statii for filesets & files
+    # =============================================
+
+    def __cmd_list_fileset_status ( self, command, args ) :
+
+        if len(args) > 0:
+            self._parser.error("No args required - %s" % command)
+
+        rows = self.__select_query('SELECT * FROM fileset_status_def', return_dict=True)
+        if not rows: return 1
+        self.print_out("""
+   Fileset Status Definitions
+ID     Name                  Description""")
+
+        for r in rows:
+            self.print_out(
+            "%-5s  %-20s  %-60s" % (r['id'], r['name'], r['description'])) 
+        return 0
 
     # ========================================================
     # Change the status of a fileset and all files it contains
     # ========================================================
 
-    def __change_fileset_status ( self, fileset_id, status_id ) :
+    def __cmd_change_fileset_status ( self, command, args ) :
 
-        """ Use the stored procedure change_fileset_status to change
-        the fileset to the requested status"""
+        if len(args) < 2:
+            self._parser.error("Enter: fileset_id  new_status - %s" % command)
 
+        fileset_id = args[0]
+        filestatus = args[1]
+        status = None
         if not self.__simple_query(
             """SET @_new_fileset_0 = NULL;
             CALL change_fileset_status ('%s','%s', @_new_fileset_0);""" % (
-            fileset_id, status_id)): 
-            raise DatabaseOperatonFailed, "Failed to change fileset status"
-            
+            fileset_id, filestatus)): return 1
         row = self.__select_query('SELECT @_new_fileset_0', return_dict=True)
-        if not row:
-            raise DatabaseOperatonFailed, "Bad status return from change_fileset_status"
-
-        return
-
-
-    # =============================================================
-    # Build a list that has the command to execute the translator
-    # =============================================================
-
-    def __build_translate_cmd ( self, fileset_id, translate_uri ) :
-
-        """Build the arg list to pass to the translator from the files in fileset
-        and the translate_uri destination for the transalator output"""
-
-        cmd_list = []
-        cmd_list.append("o2o-translate")
-
-        rows = self.__select_query(
-            "SELECT name FROM files WHERE fk_fileset_id = %s" % fileset_id,
-            return_dict=True)
-
-        if not rows:
-            raise DatabaseOperatonFailed, "No files in fileset build_translate_cmd"
-
-        for r in rows:
-            cmd_list.append("-f")
-            path.append(r['name'])            
-
-        #
-        # Destination dir for translated file
-        cmd_list.append("-d")
-        cmd_list.append(translate_uri)
-
-        # Construct translated filename from experiment, instrument, run number and type from
-        # the fileset plus the current date/time
-        cmd_list.append("-n")
-        rows = self.__select_query(
-            "SELECT experiment, instrument, run_type, run_number FROM fileset WHERE id = %s" % 
-            fileset_id,
-            return_dict=True)
-
-        if not rows:
-            raise DatabaseOperatonFailed, "Failed to select info from fileset build_translate_cmd"
-        
-        # Now construct the output file name
-        file_list = []
-        file_list.append(rows[0]['experiment'])
-        file_list.append('_')
-        file_list.append(rows[0]['instrument'])
-        file_list.append('_')
-        file_list.append(rows[0]['run_type'])
-        file_list.append('_')
-        file_list.append(str(rows[0]['run_number']))
-        file_list.append('_')
-        time = _time2str(Time.now().to64())
-        file_list.append(time[0:10])
-        file_list.append('_')
-        file_list.append(time[12:19])
-        file_list.append('.hdf5')
-        cmd_list.append(''.join(file_list))
-        
-        return cmd_list
+        if not row: return 1
+        status = row[0]['@_new_fileset_0']
+        print "change_fileset_status return = %s " % (status)
+        return 0
 
     # ====================================
     # Report current connection parameters
@@ -517,7 +508,6 @@ SUPPORTED COMMANDS:
         """Connect to the database if the connection has not been established
         yet. In case of success initialize a connection handle and
         return True. Return False otherwise."""
-
         if self.__connection is not None: return True
 
         # Make ajustments to the connection parameters if requested ------------
@@ -568,7 +558,7 @@ SUPPORTED COMMANDS:
         won't be executed.
 
         The method will return True if all query succeeded, and False otherwise."""
-      
+
         result = False
         cursor = self.__connection.cursor()
 
@@ -596,6 +586,7 @@ SUPPORTED COMMANDS:
         The method will return None if the query fails."""
 
         rows = None
+
         cursor = None
         if return_dict: cursor = self.__connection.cursor(MySQLdb.cursors.SSDictCursor)
         else:           cursor = self.__connection.cursor()
@@ -636,20 +627,37 @@ SUPPORTED COMMANDS:
         cursor.close()
         return result
 
+    # ============================================
+    # Get an internal identifier of the experiment
+    # ============================================
 
-    # ==============================================
-    # Get the internal identifier of a fileset status
-    # ==============================================
+    def _exper_id (self, experiment):
 
-    def __fstat_id (self, in_name):
+        if self.__simple_query("SET SESSION SQL_MODE='ANSI'"):
 
-        rows = self.__select_query(
-            """(SELECT id FROM fileset_status_def WHERE name='%s')""" % (in_name),
-            return_dict=True)
-        if rows:
-            return rows[0]['id']
-        else:
-            raise DatabaseOperatonFailed, "failed to obtain fileset status id for: %s" % (in_name)
+            rows = self.__select_query(
+                """(SELECT id FROM "experiment" WHERE name='%s')""" % experiment,
+                return_dict=True)
+            if rows:
+                return rows[0]['id']
+
+        raise DatabaseOperatonFailed, "failed to obtain experiment identifier for: %s" % experiment
+
+    # =====================================
+    # Get an internal identifier of the run
+    # =====================================
+
+    def _run_id (self, exper_id, run):
+
+        if self.__simple_query("SET SESSION SQL_MODE='ANSI'"):
+
+            rows = self.__select_query(
+                """(SELECT id FROM "run" WHERE exper_id=%s AND num=%s)""" % (exper_id, run),
+                return_dict=True)
+            if rows:
+                return rows[0]['id']
+
+        raise DatabaseOperatonFailed, "failed to obtain run identifier for exper_id: %s, run: %s" % (exper_id, run)
 
     # ===================================================================
     # Expect a query which counts a number of rows, and return the number
@@ -657,9 +665,13 @@ SUPPORTED COMMANDS:
 
     def _count (self, sql, colname="COUNT(*)"):
 
-        rows = self.__select_query(sql,return_dict=True)
-        for r in rows:
-            return r[colname]
+        if self.__simple_query("SET SESSION SQL_MODE='ANSI'"):
+
+            rows = self.__select_query(sql,return_dict=True)
+            for r in rows:
+                return r[colname]
+
+            raise DatabaseOperatonFailed, "inconsistent results from counting query: %s" % (sql)
 
     # =========================================
     # Read an optional description if avaialble
@@ -726,6 +738,6 @@ SUPPORTED COMMANDS:
 # ==============================================
 
 if __name__ == "__main__" :
-    app = Controller()
+    app = OnlineSim()
     rc = app.run()
     sys.exit(rc)
