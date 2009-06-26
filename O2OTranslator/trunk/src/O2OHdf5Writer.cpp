@@ -20,6 +20,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
+#include <uuid/uuid.h>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -129,29 +130,32 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   hdf5pp::File::CreateMode mode = overwrite ? hdf5pp::File::Truncate : hdf5pp::File::Exclusive ;
   m_file = hdf5pp::File::create ( fileTempl, mode, hdf5pp::PListFileCreate(), fapl ) ;
 
-  // add some metadata
-  hdf5pp::Group top = m_file.openGroup("/") ;
+  // add UUID to the file attributes
+  uuid_t uuid ;
+  uuid_generate( uuid );
+  char uuid_buf[64] ;
+  uuid_unparse ( uuid, uuid_buf ) ;
+  m_file.createAttr<const char*> ("UUID").store ( uuid_buf ) ;
 
+  // add some metadata to the top group
   LusiTime::Time ctime = LusiTime::Time::now() ;
-  top.createAttr<const char*> ("origin").store ( "translator" ) ;
-  top.createAttr<const char*> ("created").store ( ctime.toString().c_str() ) ;
+  m_file.createAttr<const char*> ("origin").store ( "translator" ) ;
+  m_file.createAttr<const char*> ("created").store ( ctime.toString().c_str() ) ;
 
-  top.createAttr<uint32_t> ("runNumber").store ( m_metadata.runNumber() ) ;
-  top.createAttr<const char*> ("runType").store ( m_metadata.runType().c_str() ) ;
-  top.createAttr<const char*> ("experiment").store ( m_metadata.experiment().c_str() ) ;
+  m_file.createAttr<uint32_t> ("runNumber").store ( m_metadata.runNumber() ) ;
+  m_file.createAttr<const char*> ("runType").store ( m_metadata.runType().c_str() ) ;
+  m_file.createAttr<const char*> ("experiment").store ( m_metadata.experiment().c_str() ) ;
 
   typedef O2OMetaData::const_iterator MDIter ;
   for ( MDIter it = m_metadata.extra_begin() ; it != m_metadata.extra_end() ; ++ it ) {
     try {
-      top.createAttr<const char*> (it->first).store ( it->second.c_str() ) ;
+      m_file.createAttr<const char*> (it->first).store ( it->second.c_str() ) ;
     } catch ( std::exception& e ) {
       // this is not fatal, just print error message and continue
       MsgLog( logger, error, "failed to store metadata: " << e.what()
           << "\n\tkey='" << it->first << "', value='" << it->second << "'" ) ;
     }
   }
-
-  top.close() ;
 
   // instantiate all factories
   DataTypeCvtFactoryPtr factory ;

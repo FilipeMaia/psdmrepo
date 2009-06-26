@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2009-06-26 Andy Salnikov
+- added UUID attribute to the HDF5 files
+
 Tag: V00-00-12
 2009-06-19 Andy Salnikov
 - changed the structure of the HDF5 file, now events group is called
