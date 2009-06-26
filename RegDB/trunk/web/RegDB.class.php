@@ -1,4 +1,5 @@
 <?php
+
 class RegDB {
 
     /* Data members
@@ -182,6 +183,16 @@ class RegDB {
             throw new RegDBException (
                 __METHOD__,
                 "fatal internal error" );
+
+        /* Create the run numbers generator
+         */
+        $this->connection->query (
+            "CREATE TABLE run_{$experiment->id()} ".
+            "(num int(11) NOT NULL auto_increment, ".
+            " request_time bigint(20) unsigned NOT NULL,".
+            " PRIMARY KEY (num)".
+            ")" );
+
         return $experiment;
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-require_once('RegDB.inc.php');
+require_once('RegDB/RegDB.inc.php');
 
 function instrument2json( $instrument ) {
     $instrument_url =

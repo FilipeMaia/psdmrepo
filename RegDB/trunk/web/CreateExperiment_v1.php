@@ -1,7 +1,6 @@
 <?php
 
-require_once('RegDB.inc.php');
-require_once('RegDBHtml.php');
+require_once('RegDB/RegDB.inc.php');
 
 /*
  * This script will lay out a form for creating a new experiment.
@@ -20,19 +19,6 @@ try {
     $now_str[10] = ' ';  // get rid of date-time separator 'T'
     $logged_user = $_SERVER['WEBAUTH_USER'];
 
-/*
-    $experiment = $regdb->find_experiment_by_id( $id )
-        or die( "no such experiment" );
-
-    $instrument = $experiment->instrument();
-    $group      = $experiment->POSIX_gid();
-
-    $instrument_url =
-        "<a href=\"javascript:view_instrument(".$instrument->id().",'".$instrument->name()."')\">".$instrument->name().'</a>';
-
-    $group_url =
-        "<a href=\"javascript:view_group('".$group."')\">".$group.'</a>';
-*/
     header( 'Content-type: text/html' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past

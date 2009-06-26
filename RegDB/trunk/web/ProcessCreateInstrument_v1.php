@@ -1,11 +1,24 @@
 <?php
 
-require_once('RegDB.inc.php');
+require_once('RegDB/RegDB.inc.php');
 
 /*
  * This script will process a request for creating a new instrument
  * in the database.
  */
+print_r( $_POST['params'] );
+$params = $_POST['params'];
+for( $i = 0; $i < $params; $i++ ) {
+    $param = array(
+        'name' => $_POST['param_name_'.$i],
+        'value' => $_POST['param_value_'.$i],
+        'description' => $_POST['param_description_'.$i] );
+    echo "<br>";
+    print_r( $param );
+}
+
+return;
+
 if( isset( $_POST['instrument_name'] )) {
     $instrument_name = trim( $_POST['instrument_name'] );
     if( $instrument_name == '' )

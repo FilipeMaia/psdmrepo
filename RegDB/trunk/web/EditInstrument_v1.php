@@ -1,7 +1,6 @@
 <?php
 
-require_once('RegDB.inc.php');
-require_once('RegDBHtml.php');
+require_once('RegDB/RegDB.inc.php');
 
 /*
  * This script will process a request for modifying parameters of an instrument.

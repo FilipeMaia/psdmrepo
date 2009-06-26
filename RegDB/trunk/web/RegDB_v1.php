@@ -12,6 +12,7 @@ and open the template in the editor.
         <link rel="stylesheet" type="text/css" href="/yui/build/reset-fonts-grids/reset-fonts-grids.css">
 
         <!-- CSS for YUI -->
+        <link rel="stylesheet" type="text/css" href="/yui/build/fonts/fonts-min.css">
         <link rel="stylesheet" type="text/css" href="/yui/build/menu/assets/skins/sam/menu.css">
         <link rel="stylesheet" type="text/css" href="/yui/build/paginator/assets/skins/sam/paginator.css" />
         <link rel="stylesheet" type="text/css" href="/yui/build/datatable/assets/skins/sam/datatable.css" />
@@ -71,30 +72,35 @@ and open the template in the editor.
                 margin-right:40px;
             }
             #experiment_info,
-            #instrument_info {
+            #instrument_info,
+            #runs_info {
                 margin-top:0px;
                 margin-left:4px;
             }
             #workarea_table_container table,
-            #params_table_container   table {
+            #params_table_container   table,
+            #runs_table_container     table {
                 /*margin-left:auto;*/
                 /*margin-right:auto;*/
             }
             #workarea_table_paginator,
             #params_table_page,
-            #instrument_params_table_page {
+            #runs_table_page {
                 margin-left:auto;
                 margin-right:auto;
             }
             #workarea_table_container,
             #workarea_table_container .yui-dt-loading,
             #params_table_container,
-            #params_table_container .yui-dt-loading {
+            #params_table_container .yui-dt-loading,
+            #runs_table_container,
+            #runs_table_container .yui-dt-loading {
                 text-align:center;
                 background-color:transparent;
             }
+            #actions_container,
             #params_actions_container,
-            #actions_container {
+            #runs_actions_container {
                 margin-top:24px;
                 margin-left:0px;
                 text-align:left;
@@ -382,6 +388,48 @@ function Table( itsTableName, itsColumnDefs, itsDataRequest, hasPaginator ) {
               scope: this.dataTable } ); };
 }
 
+function TableLocal( itsTableName, itsColumnDefs, itsDataArray, hasPaginator ) {
+    this.name = itsTableName;
+    this.columnDefs = itsColumnDefs;
+    this.fieldsDefs = [];
+    for(i=0; i < itsColumnDefs.length; i++)
+        this.fieldsDefs.push( itsColumnDefs[i].key );
+    this.dataSource = new YAHOO.util.DataSource( itsDataArray );
+    this.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
+    this.dataSource.responseSchema = {
+        resultsList: "ResultSet.Result",
+        fields:      this.fieldsDefs };
+    this.paginator = null;
+    if( hasPaginator ) {
+        this.paginator = new YAHOO.widget.Paginator (
+            {   containers : [this.name+"_table_paginator"],
+                rowsPerPage: 20
+            }
+        );
+    }
+    this.dataTable = new YAHOO.widget.DataTable(
+        this.name+"_table_body",
+        this.columnDefs,
+        this.dataSource,
+        { paginator: this.paginator/*new YAHOO.widget.Paginator( { rowsPerPage: 10 } )*/,
+          initialRequest: "" } );
+
+    var highlightEditableCell = function(oArgs) {
+        var elCell = oArgs.target;
+        if(YAHOO.util.Dom.hasClass(elCell, "yui-dt-editable")) {
+            this.highlightCell(elCell);
+        }
+    };
+    this.dataTable.subscribe("cellMouseoverEvent", highlightEditableCell);
+    this.dataTable.subscribe("cellMouseoutEvent", this.dataTable.onEventUnhighlightCell);
+    this.dataTable.subscribe("cellClickEvent", this.dataTable.onEventShowCellEditor);
+    this.dataTable.subscribe("checkboxClickEvent", function(oArgs){
+        var elCheckbox = oArgs.target;
+        var oRecord = this.getRecord( elCheckbox );
+        oRecord.setData( "selected", elCheckbox.checked );
+    });
+}
+
 function create_button( elementId, func2proceed ) {
     this.oButton = new YAHOO.widget.Button(
         elementId,
@@ -421,7 +469,7 @@ function list_experiments() {
 }
 
 function create_params_table( source, paginator ) {
-    this.paramsTableShown = false;
+    this.tableShown = false;
     this.oPushButton = new YAHOO.widget.Button( "params_button" );
     this.oPushButton.on (
         "click",
@@ -431,7 +479,7 @@ function create_params_table( source, paginator ) {
                 '  <div id="params_table_paginator"></div>'+
                 '  <div id="params_table_body"></div>';
 
-            if( !this.paramsTableShown ) {
+            if( !this.tableShown ) {
                 var table = new Table (
                     "params",
                     [ { key: "name",        sortable: true,  resizeable: true },
@@ -442,9 +490,158 @@ function create_params_table( source, paginator ) {
                 );
                 table.refreshTable();
             }
-            this.paramsTableShown = !this.paramsTableShown;
+            this.tableShown = !this.tableShown;
         }
     );
+}
+
+function create_params_table_local( storage, paginator ) {
+
+    document.getElementById('params').innerHTML=
+        '  <div id="params_table_paginator"></div>'+
+        '  <div id="params_table_body"></div>';
+
+    this.tableShown = false;
+    this.table = null;
+
+    this.oPushButton    = new YAHOO.widget.Button( "params_button" );
+    this.oPushButtonAdd = new YAHOO.widget.Button( "add_button" );
+    this.oPushButtonAdd.set( 'disabled', true );
+    this.oPushButtonRemove = new YAHOO.widget.Button( "remove_button" );
+    this.oPushButtonRemove.set( 'disabled', true );
+
+    function toggleTable() {
+        if( !this.tableShown ) {
+
+                // TODO: Watch out for memory leaks!
+                //
+                this.table = new TableLocal (
+                    "params",
+                    [
+                      { key: "selected", formatter: "checkbox" },
+                      { key: "name", sortable: true, resizeable: true,
+                        editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true}) },
+                      { key: "value", sortable: false, resizeable: true,
+                        editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true}) },
+                      { key: "description", sortable: false, resizeable: true,
+                        editor: new YAHOO.widget.TextareaCellEditor({disableBtns:true}) } 
+                    ],
+                    storage,
+                    paginator
+                );
+                this.oPushButtonAdd.set('disabled', false );
+                this.oPushButtonRemove.set('disabled', false );
+            } else {
+                var rs = this.table.dataTable.getRecordSet();
+                var rs_length = rs.getLength();
+                storage = [];
+                for( var i = 0; i < rs_length; i++ ) {
+                    var r = rs.getRecord(i);
+                    //if( !r.getData('selected'))
+                        storage.push ( {
+                            'name': r.getData('name'),
+                            'value': r.getData('value'),
+                            'description': r.getData('description')} );
+                }
+                this.table.dataTable.destroy();
+                this.oPushButtonAdd.set('disabled', true );
+                this.oPushButtonRemove.set('disabled', true );
+            }
+            this.tableShown = !this.tableShown;
+    }
+    this.oPushButton.on (
+        "click",
+        function( p_oEvent ) {
+            toggleTable();
+        }
+    );
+    function AddAndRefreshTable() {
+        this.table.dataTable.addRow (
+            {   'name': "name",
+                'value': "value",
+                'description': "description" }, 0 );
+    }
+    this.oPushButtonAdd.on (
+        "click",
+        function( p_oEvent ) {
+            AddAndRefreshTable();
+        }
+    );
+    function deleteAndRefreshTable() {
+                var rs = this.table.dataTable.getRecordSet();
+                var rs_length = rs.getLength();
+                storage = [];
+                for( var i = 0; i < rs_length; i++ ) {
+                    var r = rs.getRecord(i);
+                    if( !r.getData('selected'))
+                        storage.push ( {
+                            'name': r.getData('name'),
+                            'value': r.getData('value'),
+                            'description': r.getData('description')} );
+                }
+                this.table.dataTable.destroy();
+                this.table = new TableLocal (
+                    "params",
+                    [
+                      { key: "selected", formatter: "checkbox" },
+                      { key: "name", sortable: true, resizeable: true,
+                        editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true}) },
+                      { key: "value", sortable: false, resizeable: true,
+                        editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true}) },
+                      { key: "description", sortable: false, resizeable: true,
+                        editor: new YAHOO.widget.TextareaCellEditor({disableBtns:true}) }
+                    ],
+                    storage,
+                    paginator
+                );
+    }
+    this.oPushButtonRemove.on (
+        "click",
+        function( p_oEvent ) {
+            deleteAndRefreshTable();
+        }
+    );
+    this.getData = function() {
+        return storage;
+        var rs = this.table.dataTable.getRecordSet();
+        var rs_length = rs.getLength();
+        result = [];
+        for( var i = 0; i < rs_length; i++ ) {
+            var r = rs.getRecord(i);
+            result.push ( {
+                'name': r.getData('name'),
+                'value': r.getData('value'),
+                'description': r.getData('description')} );
+        }
+        return result;
+    };
+    return this;
+}
+
+function create_runs_table( source, paginator ) {
+    this.tableShown = false;
+    this.oPushButton = new YAHOO.widget.Button( "runs_button" );
+    this.oPushButton.on (
+        "click",
+        function( p_oEvent ) {
+            document.getElementById('runs').innerHTML=
+                '  <div id="runs_table_paginator"></div>'+
+                '  <div id="runs_table_body"></div>';
+
+            if( !this.tableShown ) {
+                var table = new Table (
+                    "runs",
+                    [ { key: "run",          sortable: true,  resizeable: true },
+                      { key: "request_time", sortable: false, resizeable: true } ],
+                    source,
+                    paginator
+                );
+                table.refreshTable();
+            }
+            this.tableShown = !this.tableShown;
+        }
+    );
+
 }
 
 function view_experiment( id, name ) {
@@ -662,7 +859,7 @@ function view_instrument( id, name ) {
         "delete_button",
         function() { delete_instrument( id, name ); } );
 }
-
+/*
 function create_instrument( ) {
 
     set_context( 'Home > Create New Instrument > ' );
@@ -690,7 +887,7 @@ function create_instrument( ) {
         "cancel_button",
         function() { list_instruments(); } );
 }
-
+*/
 function edit_instrument( id, name ) {
 
     set_context(
@@ -746,7 +943,20 @@ function create_instrument( ) {
         '  <form name="create_instrument_form" action="ProcessCreateInstrument_v1.php" method="post">'+
         '    <div id="instrument_info_within_form"></div>'+
         '    <input type="hidden" name="actionSuccess" value="edit_instrument" />'+
+        '    <input type="hidden" name="params" value="" />'+
+        '    <div id="params_container"></div>'+
         '  </form>'+
+        '</div>'+
+        '<br>'+
+        '<div id="params_actions_container">'+
+        '  <button id="params_button" >Parameters &gt;</button>'+
+        '  <button id="add_button" >Add</button>'+
+        '  <button id="remove_button" >Remove Selected</button>'+
+        '</div>'+
+        '<br>'+
+        '<div id="params">'+
+        '  <div id="params_table_paginator"></div>'+
+        '  <div id="params_table_body"></div>'+
         '</div>'+
         '<br>'+
         '<div id="actions_container">'+
@@ -756,10 +966,26 @@ function create_instrument( ) {
 
     load( 'CreateInstrument_v1.php', 'instrument_info_within_form' );
 
+    var params_array = [ { "name": "P1", "value" : "its value", "description" : "its description" } ];
+    this.params = create_params_table_local (
+        params_array,
+        false );
+
     var submit = create_button (
         "submit_button",
-        function() { document.create_instrument_form.submit(); } );
-
+        function() {
+            var params = this.params.getData();
+            document.create_instrument_form.params.value = params.length;
+            var el = document.getElementById('params_container');
+            el.innerHTML='';
+            for( var i=0; i < params.length; i++ ) {
+                el.innerHTML += '<input type="hidden" name="param_name_'+i+'" value="'+params[i]['name']+'" />';
+                el.innerHTML += '<input type="hidden" name="param_value_'+i+'" value="'+params[i]['value']+'" />';
+                el.innerHTML += '<input type="hidden" name="param_description_'+i+'" value="'+params[i]['description']+'" />';
+            }
+            document.create_instrument_form.submit();
+        }
+    );
     var cancel = create_button (
         "cancel_button",
         function() { list_instruments(); } );
@@ -860,7 +1086,7 @@ function view_group( name ) {
     table.refreshTable();
 }
 
-function run_numbers( name ) {
+function run_numbers() {
     set_context(
         'Home > Run Numbers Generator > ' );
 
@@ -874,12 +1100,51 @@ function run_numbers( name ) {
         "workarea",
         [ { key: "instrument",   sortable: true, resizeable: true },
           { key: "experiment",   sortable: true, resizeable: true },
-          { key: "last_run",     sortable: true, resizeable: true },
+          { key: "last_run_num", sortable: true, resizeable: true },
           { key: "request_time", sortable: true, resizeable: true } ],
-        'RegDBRequestRunNumbers.php?name='+name,
-        false
+        'RegDBRequestRunNumbers.php',
+        true
     );
-    table.refreshTable();}
+    table.refreshTable();
+}
+
+function generate_run_number( id, name ) {
+    view_run_numbers( id, name );
+}
+
+function view_run_numbers( id, name ) {
+
+    set_context(
+        'Home > '+
+        '<a href="javascript:run_numbers()">Run Numbers Generator</a> > '+
+        '<i>'+name );
+
+    document.getElementById('workarea').innerHTML=
+        '<div id="actions_container">'+
+        '  <button disabled="disabled" id="generate_button" title="This will generate next run number. This operation is used for testing purposes only.">Generate Next Run</button>'+
+        '</div>'+
+        '<br>'+
+        '<div id="runs_info"></div>'+
+        '<br>'+
+        '<div id="runs_actions_container">'+
+        '  <button id="runs_button">Runs &gt;</button>'+
+        '</div>'+
+        '<br>'+
+        '<div id="runs">'+
+        '  <div id="runs_table_paginator"></div>'+
+        '  <div id="runs_table_body"></div>'+
+        '</div>';
+
+    load( 'DisplayRunNumbers_v1.php?exper_id='+id, 'runs_info' );
+
+    var generate = create_button (
+        "generate_button",
+        function() { generate_run_number( id, name ); } );
+
+    var runs = create_runs_table (
+        'RegDBRequestRunNumbers.php?exper_id='+id,
+        false );
+}
 
 </script>
 

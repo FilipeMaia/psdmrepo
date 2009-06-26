@@ -29,7 +29,7 @@ The page for creating displaying all POSIX groups.
                         <td><hr></td>
                     </tr>
                     <?php
-                    require_once('RegDB.inc.php');
+                    require_once('RegDB/RegDB.inc.php');
                     try {
                         $regdb = new RegDB();
                         $regdb->begin();

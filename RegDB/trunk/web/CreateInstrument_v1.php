@@ -1,7 +1,6 @@
 <?php
 
-require_once('RegDB.inc.php');
-require_once('RegDBHtml.php');
+require_once('RegDB/RegDB.inc.php');
 
 /*
  * This script will lay out a form for creating a new instrument.

@@ -1,6 +1,6 @@
 <?php
 
-require_once('RegDB.inc.php');
+require_once('RegDB/RegDB.inc.php');
 
 function group2json( $group, $num_members ) {
     $group_url = "<a href=\"javascript:view_group('".$group."')\">".$group.'</a>';

@@ -228,5 +228,75 @@ class RegDBExperiment {
 
         return $new_param;
     }
+
+    /* ===============
+     *   RUN NUMBERS
+     * ===============
+     */
+    public function runs () {
+
+        $list = array();
+        $table = "run_".$this->id();
+
+        $result = $this->connection->query(
+            "SELECT * FROM {$table} ORDER BY num" );
+
+        $nrows = mysql_numrows( $result );
+        for( $i = 0; $i < $nrows; $i++ )
+            array_push (
+                $list,
+                new RegDBRun (
+                    $this->connection,
+                    $this,
+                    mysql_fetch_array( $result, MYSQL_ASSOC )));
+
+        return $list;
+    }
+
+    public function generate_run () {
+
+        $table = "run_".$this->id();
+        $request_time = LusiTime::now()->to64();
+
+        $this->connection->query (
+            "INSERT INTO {$table} VALUES(NULL,{$request_time})" );
+
+        $result = $this->connection->query(
+            "SELECT * FROM {$table} WHERE num=(SELECT LAST_INSERT_ID())" );
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 0 ) return null;
+        if( $nrows == 1 )
+            return new RegDBRun (
+                $this->connection,
+                $this,
+                mysql_fetch_array( $result, MYSQL_ASSOC ));
+
+        throw new RegDBException(
+            __METHOD__,
+            "unexpected size of result set returned by the query" );
+    }
+
+    public function last_run () {
+
+        $list = array();
+        $table = "run_".$this->id();
+
+        $result = $this->connection->query(
+            "SELECT * FROM {$table} WHERE num=(SELECT MAX(num) FROM {$table})" );
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 0 ) return null;
+        if( $nrows == 1 )
+            return new RegDBRun (
+                $this->connection,
+                $this,
+                mysql_fetch_array( $result, MYSQL_ASSOC ));
+
+        throw new RegDBException(
+            __METHOD__,
+            "unexpected size of result set returned by the query" );
+
+    }
 }
 ?>
