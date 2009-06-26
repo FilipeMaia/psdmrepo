@@ -30,7 +30,7 @@ The page for displaying all runs of an experiment.
                             &nbsp;<b>Experiment</b>&nbsp;</td>
                         <td>
                             &nbsp;<select align="center" type="text" name="experiment_name" ><?php
-                            require_once('LogBook.inc.php');
+                            require_once('LogBook/LogBook.inc.php');
                             $logbook = new LogBook();
                             $logbook->begin();
                             $experiments = $logbook->experiments()

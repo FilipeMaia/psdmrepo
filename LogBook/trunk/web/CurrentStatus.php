@@ -54,7 +54,7 @@ The page for reporting the current status of the LogBook database.
         </style>
         <p id="title"><b>Experiment Status</b></p>
 <?php
-require_once('LogBook.inc.php');
+require_once('LogBook/LogBook.inc.php');
 
 function decorate_end_time ( $time ) {
     if( !is_null( $time ))

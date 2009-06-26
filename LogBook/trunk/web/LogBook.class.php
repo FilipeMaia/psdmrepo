@@ -1,6 +1,6 @@
 <?php
 
-require_once( '../../RegDB/web/RegDB.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
 
 class LogBook {
 
@@ -49,6 +49,15 @@ class LogBook {
         $this->connection->rollback (); }
 
     /* ===============
+     *   INSTRUMENTS
+     * ===============
+     */
+    public function instruments () {
+        $this->regdb->begin();
+        return $this->regdb->instruments();
+    }
+
+    /* ===============
      *   EXPERIMENTS
      * ===============
      */
@@ -58,6 +67,21 @@ class LogBook {
 
         $this->regdb->begin();
         $regdb_experiments = $this->regdb->experiments();
+        foreach( $regdb_experiments as $e )
+            array_push(
+                $list,
+                new LogBookExperiment (
+                    $this->connection,
+                    $e ));
+
+        return $list;
+    }
+    public function experiments_for_instrument ( $name ) {
+
+        $list = array();
+
+        $this->regdb->begin();
+        $regdb_experiments = $this->regdb->experiments_for_instrument( $name );
         foreach( $regdb_experiments as $e )
             array_push(
                 $list,

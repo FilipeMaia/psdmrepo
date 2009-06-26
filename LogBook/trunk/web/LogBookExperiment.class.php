@@ -37,6 +37,9 @@ class LogBookExperiment {
     public function end_time () {
         return $this->regdb_experiment->end_time(); }
 
+    public function description () {
+        return $this->regdb_experiment->description(); }
+
     /* ==========
      *   SHIFTS
      * ==========

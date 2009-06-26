@@ -1,6 +1,6 @@
 <?php
 
-require_once('LogBook.inc.php');
+require_once('LogBook/LogBook.inc.php');
 
 /*
  * This script will process a request for listing all experiments of an

@@ -12,7 +12,7 @@ The page for reporting the information about all registered experiment.
         <!------------------------------>
         <h1>Registered experiments</h1>
         <?php
-        require_once('LogBook.inc.php');
+        require_once('LogBook/LogBook.inc.php');
         try {
             $logbook = new LogBook();
             $logbook->begin();

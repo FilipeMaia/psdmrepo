@@ -1,6 +1,6 @@
 <?php
 
-require_once('LogBook.inc.php');
+require_once('LogBook/LogBook.inc.php');
 
 /*
  * This script will process a request for creating a new free-form

@@ -1,5 +1,5 @@
 <?php
-require_once('LogBook.inc.php');
+require_once('LogBook/LogBook.inc.php');
 
 /* Class for constructing HTML tables of specified configurations,
  * which includes the following parameters:

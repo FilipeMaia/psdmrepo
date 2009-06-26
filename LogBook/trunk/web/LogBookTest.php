@@ -1,6 +1,6 @@
 <?php
 
-require_once('LogBook.inc.php');
+require_once('LogBook/LogBook.inc.php');
 
 /* All operations with LogBokk API will be enclose enclosed into this
  * exception catch block.
