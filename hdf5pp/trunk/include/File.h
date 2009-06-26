@@ -25,6 +25,8 @@
 //-------------------------------
 #include "hdf5/hdf5.h"
 #include "hdf5pp/Group.h"
+#include "hdf5pp/Attribute.h"
+#include "hdf5pp/DataSpace.h"
 #include "hdf5pp/PListFileAccess.h"
 #include "hdf5pp/PListFileCreate.h"
 
@@ -88,6 +90,18 @@ public:
   /// (i.e. absolute).
   Group openGroup ( const std::string& name ) {
     return Group::openGroup ( *m_id, name ) ;
+  }
+
+  /// create attribute for this file
+  template <typename T>
+  Attribute<T> createAttr ( const std::string& name, const DataSpace& dspc = DataSpace::makeScalar() ) {
+    return Attribute<T>::createAttr ( *m_id, name, dspc ) ;
+  }
+
+  /// open existing attribute
+  template <typename T>
+  Attribute<T> openAttr ( const std::string& name ) {
+    return Attribute<T>::openAttr ( *m_id, name ) ;
   }
 
   // close the file

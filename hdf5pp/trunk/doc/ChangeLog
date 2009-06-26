@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2009-06-26 Andy Salnikov
+- add createAttr/openAttr methods to File class. These are for 
+  convenience only, they are equivalent to opening top-level group in
+  the file an working with its attributes 
+
 Tag: V00-00-05
 2009-04-22 Andy Salnikov
 - added PListDataSetCreate::set_nbit(), Type::set_precision() and 
