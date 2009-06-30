@@ -1,9 +1,3 @@
-- migrate to use Registry for information about experiments one the one will
-  be available.
-
-- write Python API for a subset of operations (start/stop run, set/update a value
-of a run parameter).
-
 - think about how to implement the "search_entry(parameters...)" operations
 in a way which would be not depending on using MySQL SQL directly in
 parameters of the method. Think about setting limits on parameters, for

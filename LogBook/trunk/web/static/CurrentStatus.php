@@ -68,7 +68,10 @@ try {
     $logbook = new LogBook();
     $logbook->begin();
 
-    $experiment = $logbook->find_experiment_by_id( 1 );
+    $experiment = null;
+    $experiments = $logbook->experiments();
+    if( count( $experiments ) > 0 )
+        $experiment = $experiments[0];
     if( !is_null( $experiment )) {
 
         $e_name       = $experiment->name();
