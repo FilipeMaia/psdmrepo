@@ -1,0 +1,7 @@
+- think about how to implement the "search_entry(parameters...)" operations
+in a way which would be not depending on using MySQL SQL directly in
+parameters of the method. Think about setting limits on parameters, for
+example.
+
+- design the "Search Form". Discuss it with Rahul.
+
