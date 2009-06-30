@@ -3,8 +3,9 @@
 require_once('RegDB/RegDB.inc.php');
 
 /*
- * This script will process a request for deleting an experiment
- * from the database.
+ * This script will process a request for generating the next run number
+ * for an experiment. The run record will get permanently stored in
+ * the database.
  */
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
@@ -23,13 +24,17 @@ try {
     $regdb = new RegDB();
     $regdb->begin();
 
-    $regdb->delete_experiment_by_id ( $id );
+    $experiment = $regdb->find_experiment_by_id ( $id )
+        or die( 'no such experiment' );
+
+    $run = $experiment->generate_run()
+        or die( 'failed to generate the number' );
 
     if( isset( $actionSuccess )) {
         if( $actionSuccess == 'home' )
-            header( 'Location: RegDB.php' );
-        else if( $actionSuccess == 'list_experiments' )
-            header( 'Location: RegDB.php?action=list_experiments' );
+            header( 'Location: index.php' );
+        else if( $actionSuccess == 'view_run_numbers' )
+            header( 'Location: index.php?action=view_run_numbers&id='.$experiment->id().'&name='.$experiment->name());
         else
             ;
     }

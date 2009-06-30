@@ -3,15 +3,22 @@
 require_once('RegDB/RegDB.inc.php');
 
 /*
- * This script will process a request for editing an experiment
+ * This script will process a request for creating a new experiment
  * in the database.
  */
-if( isset( $_POST['id'] )) {
-    $id = trim( $_POST['id'] );
-    if( $id == '' )
-        die( "experiment identifier can't be empty" );
+if( isset( $_POST['experiment_name'] )) {
+    $experiment_name = trim( $_POST['experiment_name'] );
+    if( $experiment_name == '' )
+        die( "experiment name can't be empty" );
 } else
-    die( "no valid experiment identifier" );
+    die( "no valid experiment name" );
+
+if( isset( $_POST['instrument_name'] )) {
+    $instrument_name = trim( $_POST['instrument_name'] );
+    if( $instrument_name == '' )
+        die( "instrument name can't be empty" );
+} else
+    die( "no valid instrument name" );
 
 if( isset( $_POST['begin_time'])) {
     $begin_time = LusiTime::parse( trim( $_POST['begin_time'] ));
@@ -26,6 +33,20 @@ if( isset( $_POST['end_time'])) {
         die("end time has invalid format");
 } else
     die( "no end time for experiment" );
+
+if( isset( $_POST['group'] )) {
+    $group = trim( $_POST['group'] );
+    if( $group == '' )
+        die( "group name can't be empty" );
+} else
+    die( "no valid group name" );
+
+if( isset( $_POST['leader'] )) {
+    $leader = trim( $_POST['leader'] );
+    if( $leader == '' )
+        die( "leader account name can't be empty" );
+} else
+    die( "no valid leader account" );
 
 if( isset( $_POST['contact'] )) {
     $contact = trim( $_POST['contact'] );
@@ -62,34 +83,27 @@ try {
     $regdb = new RegDB();
     $regdb->begin();
 
-    $experiment = $regdb->find_experiment_by_id ( $id )
-        or die( "no such experiment" );
+    $experiment = $regdb->register_experiment (
+        $experiment_name, $instrument_name, $description,
+        LusiTime::now(), $begin_time, $end_time,
+        $group, $leader, $contact );
 
-    $experiment->set_description( $description );
-    $experiment->set_contact_info( $contact );
-    $experiment->set_interval( $begin_time, $end_time );
-
-
-    /* Replace parameters if the list is passed
-     *
-     * TODO: Perhaps we should implement a smarter algorithm here?
+    /* Add parameters if any
      */
-    if( !is_null( $params )) {
-        $experiment->remove_all_params();
-        foreach( $params as $p ) {
+    if( !is_null( $params ))
+        foreach( $params as $p )
             $param = $experiment->add_param( $p[0], $p[1], $p[2] )
                 or die( "failed to add experiment parameter: {$pa}");
-        }
-    }
+
     if( isset( $actionSuccess )) {
         if( $actionSuccess == 'home' )
-            header( 'Location: RegDB.php' );
+            header( 'Location: index.php' );
         else if( $actionSuccess == 'list_experiments' )
-            header( 'Location: RegDB.php?action=list_experiments' );
+            header( 'Location: index.php?action=list_experiments' );
         else if( $actionSuccess == 'view_experiment' )
-            header( 'Location: RegDB.php?action=view_experiment&id='.$experiment->id().'&name='.$experiment->name());
+            header( 'Location: index.php?action=view_experiment&id='.$experiment->id().'&name='.$experiment->name());
         else if( $actionSuccess == 'edit_experiment' )
-            header( 'Location: RegDB.php?action=edit_experiment&id='.$experiment->id().'&name='.$experiment->name());
+            header( 'Location: index.php?action=edit_experiment&id='.$experiment->id().'&name='.$experiment->name());
         else
             ;
     }

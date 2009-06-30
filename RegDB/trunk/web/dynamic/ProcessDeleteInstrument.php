@@ -27,9 +27,9 @@ try {
 
     if( isset( $actionSuccess )) {
         if( $actionSuccess == 'home' )
-            header( 'Location: RegDB.php' );
+            header( 'Location: index.php' );
         else if( $actionSuccess == 'list_instruments' )
-            header( 'Location: RegDB.php?action=list_instruments' );
+            header( 'Location: index.php?action=list_instruments' );
         else
             ;
     }
