@@ -140,7 +140,7 @@ class RegDBInstrument {
             'INSERT INTO instrument_param VALUES('.$this->id().
             ",'".$this->connection->escape_string( $trimmed_name ).
             "','".$this->connection->escape_string( $value ).
-            ",'".$this->connection->escape_string( $description )."')" );
+            "','".$this->connection->escape_string( $description )."')" );
 
         $new_param = $this->find_param_by_( "param='".$this->connection->escape_string( $trimmed_name )."'" );
         if( is_null( $new_param ))
@@ -149,6 +149,40 @@ class RegDBInstrument {
                 "internal implementation errort" );
 
         return $new_param;
+    }
+
+    public function remove_param ( $name ) {
+
+        /* Verify values of parameters
+         */
+        if( is_null( $name ))
+            throw new RegDBException (
+                __METHOD__, "method parameters can't be null objects" );
+
+        $trimmed_name = trim( $name );
+        if( strlen( $trimmed_name ) == 0 )
+            throw new RegDBException(
+                __METHOD__, "parameter name can't be empty" );
+
+        /* Make sure the parameter is known.
+         */
+        $param = $this->find_param_by_name ( $name );
+        if( is_null( $param ))
+            throw new RegDBException(
+                __METHOD__, "parameter doesn't exist in the database" );
+
+        /* Proceed with the operation.
+         */
+        $this->connection->query (
+            "DELETE FROM instrument_param WHERE param='{$trimmed_name}' AND instr_id={$this->id()})" );
+    }
+
+    public function remove_all_params () {
+
+        /* Proceed with the operation.
+         */
+        $this->connection->query (
+            "DELETE FROM instrument_param WHERE instr_id={$this->id()}" );
     }
 }
 ?>

@@ -62,6 +62,17 @@ if( isset( $_POST['description'] )) {
 } else
     die( "no valid experiment description" );
 
+if( isset( $_POST['params'] )) {
+    $str = stripslashes( trim( $_POST['params'] ));
+    if( $str == 'null' ) $params = null;
+    else {
+        $params = json_decode( $str );
+        if( is_null( $params ))
+            die( "failed to translate JSON object with a list of parameters" );
+    }
+} else
+    die( "no valid experiment parameters collection" );
+
 if( isset( $_POST['actionSuccess'] )) {
     $actionSuccess = trim( $_POST['actionSuccess'] );
 }
@@ -77,15 +88,22 @@ try {
         LusiTime::now(), $begin_time, $end_time,
         $group, $leader, $contact );
 
+    /* Add parameters if any
+     */
+    if( !is_null( $params ))
+        foreach( $params as $p )
+            $param = $experiment->add_param( $p[0], $p[1], $p[2] )
+                or die( "failed to add experiment parameter: {$pa}");
+
     if( isset( $actionSuccess )) {
         if( $actionSuccess == 'home' )
-            header( 'Location: RegDB_v1.php' );
+            header( 'Location: RegDB.php' );
         else if( $actionSuccess == 'list_experiments' )
-            header( 'Location: RegDB_v1.php?action=list_experiments' );
+            header( 'Location: RegDB.php?action=list_experiments' );
         else if( $actionSuccess == 'view_experiment' )
-            header( 'Location: RegDB_v1.php?action=view_experiment&id='.$experiment->id().'&name='.$experiment->name());
+            header( 'Location: RegDB.php?action=view_experiment&id='.$experiment->id().'&name='.$experiment->name());
         else if( $actionSuccess == 'edit_experiment' )
-            header( 'Location: RegDB_v1.php?action=edit_experiment&id='.$experiment->id().'&name='.$experiment->name());
+            header( 'Location: RegDB.php?action=edit_experiment&id='.$experiment->id().'&name='.$experiment->name());
         else
             ;
     }

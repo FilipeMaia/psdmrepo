@@ -9,14 +9,21 @@ require_once('RegDB/RegDB.inc.php');
 /* Proceed with the operation
  */
 try {
+
     $regdb = new RegDB();
     $regdb->begin();
-    $instrument_names = $regdb->instrument_names();
-    $posix_groups = $regdb->posix_groups();
 
+    $instrument_names = $regdb->instrument_names();
+    $posix_groups     = $regdb->posix_groups();
+
+    // Get the currnt time in the ISO format, then stripe out
+    // the date-time separator 'T' and timezone.
+    //
     $now = new DateTime();
     $now_str = $now->format(DateTime::ISO8601);
-    $now_str[10] = ' ';  // get rid of date-time separator 'T'
+    $now_str[10] = ' ';
+    $now_str = substr( $now_str, 0, 19 );
+
     $logged_user = $_SERVER['WEBAUTH_USER'];
 
     header( 'Content-type: text/html' );

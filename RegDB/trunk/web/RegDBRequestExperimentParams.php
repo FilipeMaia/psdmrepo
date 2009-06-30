@@ -16,8 +16,8 @@ function param2json( $param ) {
     return json_encode(
         array (
             "name"  => $param->name(),
-            "value" => substr( $param->value(), 0, 72 ),
-            "description" => substr( $param->description(), 0, 72 )."..."
+            "value" => $param->value(),
+            "description" => $param->description()
         )
     );
 }

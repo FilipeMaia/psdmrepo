@@ -28,10 +28,10 @@ try {
 
     $con = new RegDBHtml( 0, 0, 700, 150 );
     echo $con
-        ->label         ( 300,   0, 'Description')
+        ->label         ( 200,   0, 'Description')
         ->label         (   0,  25, 'Instrument: ' )
         ->value         ( 100,  25, $instrument->name())
-        ->textarea_input( 300,  25, 'description', 500, 125, $instrument->description())
+        ->textarea_input( 200,  25, 'description', 500, 125, $instrument->description())
         ->html();
 
     $regdb->commit();

@@ -20,6 +20,17 @@ if( isset( $_POST['description'] )) {
 } else
     die( "no valid instrument description" );
 
+if( isset( $_POST['params'] )) {
+    $str = stripslashes( trim( $_POST['params'] ));
+    if( $str == 'null' ) $params = null;
+    else {
+        $params = json_decode( $str );
+        if( is_null( $params ))
+            die( "failed to translate JSON object with a list of parameters" );
+    }
+} else
+    die( "no valid instrument parameters collection" );
+
 if( isset( $_POST['actionSuccess'] )) {
     $actionSuccess = trim( $_POST['actionSuccess'] );
 }
@@ -35,15 +46,26 @@ try {
 
     $instrument->set_description( $description );
 
+    /* Replace parameters if the list is passed
+     *
+     * TODO: Perhaps we should implement a smarter algorithm here?
+     */
+    if( !is_null( $params )) {
+        $instrument->remove_all_params();
+        foreach( $params as $p ) {
+            $param = $instrument->add_param( $p[0], $p[1], $p[2] )
+                or die( "failed to add instrument parameter: {$pa}");
+        }
+    }
     if( isset( $actionSuccess )) {
         if( $actionSuccess == 'home' )
-            header( 'Location: RegDB_v1.php' );
+            header( 'Location: RegDB.php' );
         else if( $actionSuccess == 'list_instruments' )
-            header( 'Location: RegDB_v1.php?action=list_instruments' );
+            header( 'Location: RegDB.php?action=list_instruments' );
         else if( $actionSuccess == 'view_instrument' )
-            header( 'Location: RegDB_v1.php?action=view_instrument&id='.$instrument->id().'&name='.$instrument->name());
+            header( 'Location: RegDB.php?action=view_instrument&id='.$instrument->id().'&name='.$instrument->name());
         else if( $actionSuccess == 'edit_instrument' )
-            header( 'Location: RegDB_v1.php?action=edit_instrument&id='.$instrument->id().'&name='.$instrument->name());
+            header( 'Location: RegDB.php?action=edit_instrument&id='.$instrument->id().'&name='.$instrument->name());
         else
             ;
     }

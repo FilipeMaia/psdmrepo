@@ -208,6 +208,7 @@ class RegDB {
          */
         $this->connection->query ( "DELETE FROM experiment_param WHERE exper_id=".$id );
         $this->connection->query ( "DELETE FROM experiment WHERE id=".$id );
+        $this->connection->query ( "DROP TABLE IF EXISTS run_".$id );
     }
 
     /* ===============
@@ -305,10 +306,14 @@ class RegDB {
                 __METHOD__,
                 "no such instrument" );
 
-        /* Proceed with the operation.
+        /* Find and delete the connected experiments first.
          */
-        $this->connection->query ( "DELETE FROM experiment_param WHERE exper_id IN (SELECT id FROM experiment WHERE instr_id=".$id.")" );
-        $this->connection->query ( "DELETE FROM experiment WHERE instr_id=".$id );
+        $experiments = $this->experiments_for_instrument( $instrument->name());
+        foreach( $experiments as $e )
+            $this->delete_experiment_by_id( $e->id());
+
+        /* Proceed to the instrument.
+         */
         $this->connection->query ( "DELETE FROM instrument_param WHERE instr_id=".$id );
         $this->connection->query ( "DELETE FROM instrument WHERE id=".$id );
     }

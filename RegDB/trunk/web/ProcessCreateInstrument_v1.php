@@ -6,19 +6,6 @@ require_once('RegDB/RegDB.inc.php');
  * This script will process a request for creating a new instrument
  * in the database.
  */
-print_r( $_POST['params'] );
-$params = $_POST['params'];
-for( $i = 0; $i < $params; $i++ ) {
-    $param = array(
-        'name' => $_POST['param_name_'.$i],
-        'value' => $_POST['param_value_'.$i],
-        'description' => $_POST['param_description_'.$i] );
-    echo "<br>";
-    print_r( $param );
-}
-
-return;
-
 if( isset( $_POST['instrument_name'] )) {
     $instrument_name = trim( $_POST['instrument_name'] );
     if( $instrument_name == '' )
@@ -33,6 +20,17 @@ if( isset( $_POST['description'] )) {
 } else
     die( "no valid instrument description" );
 
+if( isset( $_POST['params'] )) {
+    $str = stripslashes( trim( $_POST['params'] ));
+    if( $str == 'null' ) $params = null;
+    else {
+        $params = json_decode( $str );
+        if( is_null( $params ))
+            die( "failed to translate JSON object with a list of parameters" );
+    }
+} else
+    die( "no valid instrument parameters collection" );
+
 if( isset( $_POST['actionSuccess'] )) {
     $actionSuccess = trim( $_POST['actionSuccess'] );
 }
@@ -46,15 +44,22 @@ try {
     $instrument = $regdb->register_instrument (
         $instrument_name, $description );
 
+    /* Add parameters if any
+     */
+    if( !is_null( $params ))
+        foreach( $params as $p )
+            $param = $instrument->add_param( $p[0], $p[1], $p[2] )
+                or die( "failed to add instrument parameter: {$pa}");
+
     if( isset( $actionSuccess )) {
         if( $actionSuccess == 'home' )
-            header( 'Location: RegDB_v1.php' );
+            header( 'Location: RegDB.php' );
         else if( $actionSuccess == 'list_instruments' )
-            header( 'Location: RegDB_v1.php?action=list_instruments' );
+            header( 'Location: RegDB.php?action=list_instruments' );
         else if( $actionSuccess == 'view_instrument' )
-            header( 'Location: RegDB_v1.php?action=view_instrument&id='.$instrument->id().'&name='.$instrument->name());
+            header( 'Location: RegDB.php?action=view_instrument&id='.$instrument->id().'&name='.$instrument->name());
         else if( $actionSuccess == 'edit_instrument' )
-            header( 'Location: RegDB_v1.php?action=edit_instrument&id='.$instrument->id().'&name='.$instrument->name());
+            header( 'Location: RegDB.php?action=edit_instrument&id='.$instrument->id().'&name='.$instrument->name());
         else
             ;
     }
