@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+- re-organized the source code before starting to work on a "dynamic"
+version of the application.
+
 Tag: V00-00-04
 2009-06-10 Andy Salnikov
 - adding SConscript file
