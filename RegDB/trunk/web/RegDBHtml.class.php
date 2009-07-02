@@ -84,6 +84,32 @@ HERE;
 HERE;
         return $this;
     }
+
+    public function button( $x, $y, $id, $name, $title=null ) {
+        $title_attribute = is_null( $title ) ? '' : $title_attribute = 'title="'.$title.'"';
+        $this->html = $this->html.<<<HERE
+<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
+  <button id="{$id}" {$title_attribute}>{$name}</button>
+</div>
+HERE;
+        return $this;
+    }
+
+    public function container( $x, $y, $id ) {
+        $this->html = $this->html.<<<HERE
+<div id="{$id}" style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
+</div>
+HERE;
+        return $this;
+    }
+
+    public function line( $x, $y, $width ) {
+        $this->html = $this->html.<<<HERE
+<div style="position:absolute; left:{$x}px; top:{$y}px; width:{$width}px; border-top-style:solid; border-top-width:1px;">
+</div>
+HERE;
+        return $this;
+    }
     public function html() {
         return $this->html.'</div>
 ';

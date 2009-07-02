@@ -39,12 +39,17 @@ div.yui-b p strong {
 div.yui-b p em {
     color: #000;
 }
+#application_header {
+    background-color:#d0d0d0;
+    padding:12px;
+    margin:0px;
+}
 #application_title {
     font-family: "Times", serif;
     font-size:42px;
-    background-color:#d0d0d0;
-    border:solid 2px transparent;
-    border-left-width:16px;
+}
+#current_experiment {
+    color:#0071bc;
 }
 #menubar {
     margin: 0 0 10px 0;
@@ -777,7 +782,7 @@ function list_experiments() {
           { key: "end_time",    sortable: true,  resizeable: true },
           { key: "description", sortable: false, resizeable: true } ],
         'RequestExperiments.php',
-        true
+        false
     );
     table.refreshTable();
 }
@@ -787,14 +792,16 @@ function view_experiment( id, name ) {
     set_context(
         '<a href="javascript:list_experiments()">Select Experiment</a> > '+
         '<i>'+name+'</i>'+
-        '&nbsp;&nbsp;&nbsp;|&nbsp;<b>viewing</b>&nbsp;|' );
+//        '&nbsp;&nbsp;&nbsp;|&nbsp;<b>viewing</b>&nbsp;|' );
+        '&nbsp;&nbsp;&nbsp;(&nbsp;<b>viewing</b>&nbsp;)' );
 
     document.getElementById('workarea').innerHTML=
         '<div id="actions_container">'+
         '  <button id="edit_button" title="bring in an experiment editor to modify the experiment records">Edit</button>'+
         '  <button id="delete_button" title="destroy the experiment from the database">Delete</button>'+
         '</div>'+
-        '<div style="margin-top:25px; margin-right:0px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
+//      '<div style="margin-top:25px; margin-right:0px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
+        '<div style="margin-top:25px; width:800px;      background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
         '  <div id="experiment_info" style="height:250px;"></div>'+
         '  <br>'+
         '  <div id="params_actions_container">'+
@@ -826,7 +833,8 @@ function edit_experiment( id, name ) {
     set_context(
         '<a href="javascript:list_experiments()">Select Experiment</a> > '+
         '<i>'+name+'</i>'+
-        '&nbsp;&nbsp;&nbsp;|&nbsp;<b><span style="color:red;">editing</span></b>&nbsp;|' );
+//        '&nbsp;&nbsp;&nbsp;|&nbsp;<b><span style="color:red;">editing</span></b>&nbsp;|' );
+        '&nbsp;&nbsp;&nbsp;(&nbsp;<b><span style="color:red;">editing</span></b>&nbsp;)' );
 
     document.getElementById('workarea').innerHTML=
         '<div id="actions_container">'+
@@ -1316,15 +1324,18 @@ function view_run_numbers( id, name ) {
 
 </head>
 <body class="yui-skin-sam" id="body" onload="init()">
-    <div id="application_title">
-        <p>Experiment Registry Database</p>
-        <p style="font-size:32px;"><i>LCLS Detector Control</i></p>
+    <div id="application_header">
+        <p id="application_title">
+        <el>Experiment Registry Database</el>
+        <br>
+        <el id="current_experiment" style="font-size:32px;">LCLS Detector Control</el></p>
+        <p style="text-align:right;">Logged as: <b><?php echo $_SERVER['WEBAUTH_USER']?></b><p>
     </div>
     <div id="menubar" class="yuimenubar yuimenubarnav">
         <div class="bd">
             <ul class="first-of-type">
                 <li class="yuimenubaritem first-of-type">
-                    <a class="yuimenubaritemlabel" href="#applications" style="color:red; font-weight:bold;">Applications</a>
+                    <a class="yuimenubaritemlabel" href="#applications" style="font-weight:bold;">Applications</a>
                 </li>
                 <li class="yuimenubaritem">
                     <a class="yuimenubaritemlabel" href="index.php">Home</a>
