@@ -40,6 +40,15 @@ class LogBookExperiment {
     public function description () {
         return $this->regdb_experiment->description(); }
 
+    public function instrument () {
+        return $this->regdb_experiment->instrument(); }
+
+    public function leader_account () {
+        return $this->regdb_experiment->leader_account(); }
+
+    public function in_interval ( $time ) {
+        return $this->regdb_experiment->in_interval( $time ); }
+
     /* ==========
      *   SHIFTS
      * ==========
@@ -154,14 +163,14 @@ class LogBookExperiment {
         return $this->find_shift_by_( "begin_time=".LusiTime::to64from($begin_time)) ; }
 
     public function find_shift_at ( $time ) {
-        return $this->find_shift_by_( 'begin_time <= '.$time.' AND '.$time.'< end_time') ; }
+        return $this->find_shift_by_( 'begin_time <= '.$time.' AND (end_time IS NULL OR '.$time.'< end_time)') ; }
 
     public function find_last_shift () {
         return $this->find_shift_by_( 'begin_time=(SELECT MAX(begin_time) FROM "shift")' ) ; }
 
     private function find_shift_by_ ( $condition=null ) {
 
-        $extra_condition = $condition == null ? '' : ' AND '.$condition;
+        $extra_condition = is_null( $condition ) ? '' : ' AND '.$condition;
         $result = $this->connection->query(
             'SELECT * FROM "shift" WHERE exper_id='.
             $this->attr['id'].$extra_condition );
@@ -180,18 +189,18 @@ class LogBookExperiment {
      *   RUNS
      * ========
      */
-    public function num_runs ( $condition='' ) {
+    public function num_runs ( $condition=null ) {
 
         /* TODO: This is very inefficient implementation. Replace it by
          * a direct SQL statement for counting rows instead!.
          */
         return count( $this->runs( $condition )); }
 
-    public function runs ( $condition='' ) {
+    public function runs ( $condition=null ) {
 
         $list = array();
 
-        $extra_condition = $condition == '' ? '' : ' AND '.$condition;
+        $extra_condition = is_null( $condition )? '' : ' AND '.$condition;
         $result = $this->connection->query(
             'SELECT * FROM "run" WHERE exper_id='.$this->attr['id'].$extra_condition );
 

@@ -21,6 +21,9 @@ class LogBookShift {
 
     /* Accessors
      */
+    public function parent() {
+        return $this->experiment; }
+
     public function id() {
         return $this->attr['id']; }
 
@@ -91,6 +94,25 @@ class LogBookShift {
             array_push( $list, $this->leader());
 
         return $list;
+    }
+
+    /* =====================
+     *   FREE-FORM ENTRIES
+     * =====================
+     */
+
+    public function num_runs() {
+        $condition = 'begin_time >= '.$this->attr['begin_time'];
+        if( !is_null( $this->attr['end_time'] ))
+            $condition .= ' AND begin_time < '.$this->attr['end_time'];
+        return $this->parent()->num_runs( $condition );
+    }
+
+    public function runs() {
+        $condition = 'begin_time >= '.$this->begin_time()->to64();
+        if( !is_null( $this->end_time()))
+            $condition .= ' AND begin_time < '.$this->end_time()->to64();
+        return $this->parent()->runs( );
     }
 
     /* =====================

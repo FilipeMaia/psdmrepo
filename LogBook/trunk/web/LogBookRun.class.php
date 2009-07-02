@@ -264,5 +264,18 @@ class LogBookRun {
     public function entries () {
         return $this->parent()->entries_of_run( $this->id());
     }
+
+    /* =========
+     *   SHIFT
+     * ==========
+     */
+    public function shift () {
+        $my_shift = $this->parent()->find_shift_at( $this->attr['begin_time'] );
+        if( is_null( $my_shift ))
+            throw new LogBookException(
+                __METHOD__,
+                "run id:{$this->id()} has no overlapping shift. Database may be corrupted." );
+        return $my_shift;
+    }
 }
 ?>
