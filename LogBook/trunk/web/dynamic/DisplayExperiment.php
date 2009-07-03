@@ -49,7 +49,7 @@ try {
         ->container(   0,  85, 'shifts_table' )
         ->label    ( 410,  60, 'Last Run' )
         ->container( 410,  85, 'runs_table' )
-        ->button   ( 410,   0, 'detail_button', 'See Registration Info >' )
+        ->button   ( 410,   0, 'detail_button', '<b>Experiment Registration Info &gt;</b>' )
         ->html();
 
     $logbook->commit();

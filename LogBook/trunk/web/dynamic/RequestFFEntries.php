@@ -44,12 +44,12 @@ function entry2json( $e ) {
     $tags_url = '';
     $tags = $e->tags();
     foreach( $tags as $t )
-        $tags_url .= '<b>T</b>&nbsp;';
+        $tags_url .= '<b><em title="T1">T</em></b>&nbsp;';
 
     $attachments_url = '';
     $attachments = $e->attachments();
-    foreach( $attachments as $t )
-        $attachments_url .= '<img src="images/attachment.png" />&nbsp;';
+    foreach( $attachments as $a )
+        $attachments_url .= '<img src="images/attachment.png" title="'.$a->description().'"/>&nbsp;';
 
     return json_encode(
         array (
