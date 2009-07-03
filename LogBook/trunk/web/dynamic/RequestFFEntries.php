@@ -17,30 +17,48 @@ if( isset( $_GET['scope'] )) {
     $scope = trim( $_GET['scope'] );
     if( $scope == '' )
         die( "scope can't be empty" );
+    } else if( $scope == 'shift' ) {
+        if( isset( $_GET['shift_id'] )) {
+            $shift_id = trim( $_GET['shift_id'] );
+            if( $shift_id == '' )
+                die( "shift id can't be empty" );
+        } else
+            die( "no valid shift id" );
+    } else if( $scope == 'run' ) {
+        if( isset( $_GET['run_id'] )) {
+            $run_id = trim( $_GET['run_id'] );
+            if( $run_id == '' )
+                die( "run id can't be empty" );
+        } else
+            die( "no valid run id" );
 } else
     die( "no valid scope" );
 
-function entry2json( $run ) {
+function entry2json( $e ) {
 
-    $begin_time_url =
-        "<a href=\"javascript:select_run(".$run->id().")\">".
-        $run->begin_time()->toStringShort().
+    $posted_url =
+        "<a href=\"javascript:select_entry(".$e->id().")\">".
+        $e->insert_time()->toStringShort().
         '</a>';
-    $end_time_status =
-        is_null( $run->end_time()) ?
-        '<b><em style="color:red;">Taking Data</em></b>' :
-        $run->end_time()->toStringShort();
-    $shift_begin_time_url =
-        "<a href=\"javascript:select_shift(".$run->shift()->id().")\">".
-        $run->shift()->begin_time()->toStringShort().
-        '</a>';
+
+    $tags_url = '';
+    $tags = $e->tags();
+    foreach( $tags as $t )
+        $tags_url .= '<b>T</b>&nbsp;';
+
+    $attachments_url = '';
+    $attachments = $e->attachments();
+    foreach( $attachments as $t )
+        $attachments_url .= '<img src="images/attachment.png" />&nbsp;';
 
     return json_encode(
         array (
-            "num"  => $run->num(),
-            "begin_time" => $begin_time_url,
-            "end_time" => $end_time_status,
-            "shift_begin_time" => $shift_begin_time_url
+            "posted" => $posted_url,
+            "author" => $e->author(),
+            "relevance_time" => $e->relevance_time()->toStringShort(),
+            "message" => substr( $e->content(), 0, 72 ),
+            "tags" => $tags_url,
+            "attachments" => $attachments_url
         )
     );
 }
@@ -56,13 +74,16 @@ try {
     $experiment = $logbook->find_experiment_by_id( $id )
         or die( "no such experiment" );
 
-    if( $last_run_requested ) {
-        $runs = array( );
-        $last_run = $experiment->find_last_run();
-        if( !is_null( $last_run ))
-            array_push( $runs, $last_run );
+    if( $scope == 'all' ) {
+        $entries = $experiment->entries();
+    } else if( $scope == 'experiment' ) {
+        $entries = $experiment->entries_of_experiment();
+    } else if( $scope == 'shift' ) {
+        $entries = $experiment->entries_of_shift( $shift_id );
+    } else if( $scope == 'run' ) {
+        $entries = $experiment->entries_of_run( $run_id );
     } else {
-        $runs = $experiment->runs();
+        die ( 'unsupported scope' );
     }
 
     header( 'Content-type: application/json' );
@@ -75,12 +96,12 @@ try {
     "Result": [
 HERE;
     $first = true;
-    foreach( $runs as $r ) {
+    foreach( $entries as $e ) {
       if( $first ) {
           $first = false;
-          echo "\n".run2json( $r );
+          echo "\n".entry2json( $e );
       } else {
-          echo ",\n".run2json( $r );
+          echo ",\n".entry2json( $e );
       }
     }
     print <<< HERE

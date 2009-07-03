@@ -80,13 +80,15 @@ div.yui-b p em {
 #params_table_container   table,
 #runs_table_container     table,
 #shifts_table_container   table,
-#messages_table_container table {
+#messages_table_container table,
+#tags_table_container table {
 }
 #workarea_table_paginator,
 #params_table_page,
 #runs_table_paginator,
 #shifts_table_paginator,
-#messages_table_paginator {
+#messages_table_paginator,
+#tags_table_paginator {
     margin-left:auto;
     margin-right:auto;
 }
@@ -99,7 +101,9 @@ div.yui-b p em {
 #shifts_table_container,
 #shifts_table_container .yui-dt-loading,
 #messages_table_container,
-#messages_table_container .yui-dt-loading {
+#messages_table_container .yui-dt-loading,
+#tags_table_container,
+#tags_table_container .yui-dt-loading {
     text-align:center;
     background-color:transparent;
 }
@@ -111,6 +115,11 @@ div.yui-b p em {
     margin-top:24px;
     margin-left:0px;
     text-align:left;
+}
+.lb_label {
+    text-align:left;
+    color:#0071bc;
+    font-weight:bold;
 }
 </style>
 
@@ -403,7 +412,7 @@ function Table( itsTableName, itsColumnDefs, itsDataRequest, hasPaginator ) {
               },
               scope: this.dataTable } ); };
 }
-/*
+
 function TableLocal( itsTableName, itsColumnDefs, itsDataArray, hasPaginator ) {
     this.name = itsTableName;
     this.columnDefs = itsColumnDefs;
@@ -418,13 +427,13 @@ function TableLocal( itsTableName, itsColumnDefs, itsDataArray, hasPaginator ) {
     this.paginator = null;
     if( hasPaginator ) {
         this.paginator = new YAHOO.widget.Paginator (
-            {   containers : [this.name+"_table_paginator"],
+            {   containers : [this.name+"_paginator"],
                 rowsPerPage: 20
             }
         );
     }
     this.dataTable = new YAHOO.widget.DataTable(
-        this.name+"_table_body",
+        this.name+"_body",
         this.columnDefs,
         this.dataSource,
         { paginator: this.paginator,
@@ -447,7 +456,7 @@ function TableLocal( itsTableName, itsColumnDefs, itsDataArray, hasPaginator ) {
     });
     return this;
 }
-
+/*
 function Table1( itsTableName, itsColumnDefs, itsDataRequest, hasPaginator ) {
     this.name = itsTableName;
     this.columnDefs = itsColumnDefs;
@@ -740,44 +749,33 @@ function select_experiment( instr_id, instr_name, exper_id, exper_name ) {
     display_experiment();
 }
 
-var new_message=null;
-
 function display_experiment() {
 
     set_context ( 'Experiment Summary >' );
 
     document.getElementById('workarea').innerHTML=
-//        '<div id="actions_container">'+
-//        '  <button id="detail_button" title="'+
-//        'press the button to open a separate window with a detailed description '+
-//        'of the experiment from the Experiments Registry Database '+
-//        '">Get Registration Info</button>'+
-//        '</div>'+
         '<div style="margin-top:0px; margin-right:0px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
         '  <div id="experiment_info"></div>'+
         '  <br>'+
+        '  <br>'+
         '  <div id="messages_actions_container">'+
-        '    <button id="new_message_button">New Message &gt;</button>'+
-        '    <button id="message_extend_button">Extended &gt;</button>'+
-        '    <button id="message_submit_button">Submit</button>'+
-        '    <div id="new_message_dialog"></div>'+
+        '    <table><tbody>'+
+        '      <tr>'+
+        '        <td><button id="refresh_button">Refresh</button></td>'+
+        '        <td style="padding-left:25px;"><button id="new_message_button">New Message &gt;</button>'+
+        '            <button id="message_extend_button">Extended &gt;</button>'+
+        '            <button id="message_submit_button">Submit</button></td>'+
+        '      </tr>'+
+        '      <tr>'+
+        '        <td></td>'+
+        '        <td style="padding-left:25px;"><div id="new_message_dialog"></div></td>'+
+        '      </tr>'+
+        '    </tbody></table>'+
         '  </div>'+
-        '  <div id="messages_table" style="margin-left:25px; margin-top:25px;">'+
+        '  <div id="messages_table" style="margin-top:10px;" title="use Refresh button to refresh the table contents" >'+
         '    <div id="messages_table_paginator"></div>'+
         '    <div id="messages_table_body"></div>'+
         '  </div>'+
-//        '</div>'+
-//        '<div style="margin-top:0px; margin-right:0px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
-//        '  <div id="messages"></div>'+
-//        '    <div style="position:relative;">'+
-//        '      <div style="position:absolute; left:0px; top:0px; text-align:left; color:#0071bc; font-weight:bold;">'+
-//        '        New Message: '+
-//        '      </div>'+
-//        '      <div style="position:absolute; left:100px; top:0px; text-align:left;">'+
-//        '        <input id="message_text_id" type="text" name="message_text" style="padding:1px; width:400px;" />'+
-//        '      </div>'+
-//        '    </div>'+
-//        '  </div>'+
         '</div>';
 
     load( 'DisplayExperiment.php?id='+current_selection.experiment.id, 'experiment_info' );
@@ -817,15 +815,9 @@ function display_experiment() {
             );
         }
     );
-    new_message = create_new_message_dialog( 'experiment' );
-    /*
-    var messages = create_messages_table (
-        'DisplayMessages.php?id='+current_selection.experiment.id+'&scope=experiment',
-        false
-    );
-    */
+    var messages_dialog = create_messages_dialog( 'experiment' );
 }
-function create_new_message_dialog( scope ) {
+function create_messages_dialog( scope ) {
 
     document.getElementById('new_message_dialog').innerHTML=
         '<form name="new_message_form" action="NewFFEntry.php" method="post">'+
@@ -835,31 +827,59 @@ function create_new_message_dialog( scope ) {
         '  <div id="new_message_body" style="margin-top:10px; padding:1px;"></div>'+
         '</form>';
 
+    this.table = new Table (
+        "messages_table",
+        [ { key: "posted",      sortable: true, resizeable: false },
+          { key: "author",      sortable: true, resizeable: false },
+          { key: "message",     sortable: true, resizeable: false },
+          { key: "tags",        sortable: true, resizeable: false },
+          { key: "attachments", sortable: true, resizeable: false } ],
+        'RequestFFEntries.php?id='+current_selection.experiment.id+'&scope=experiment',
+        null
+    );
+    //this.table.refreshTable();
 
     this.dialogShown = false;
-    this.optionsShown = false;
+    this.extendedShown = false;
 
-    this.new_message_button     = new YAHOO.widget.Button( "new_message_button" );
+    this.refresh_button        = new YAHOO.widget.Button( "refresh_button" );
+    this.new_message_button    = new YAHOO.widget.Button( "new_message_button" );
     this.message_extend_button = new YAHOO.widget.Button( "message_extend_button" );
-    this.message_submit_button  = new YAHOO.widget.Button( "message_submit_button" );
+    this.message_submit_button = new YAHOO.widget.Button( "message_submit_button" );
 
     this.message_extend_button.set( 'disabled', true );
     this.message_submit_button.set( 'disabled', true );
 
+    function onRefreshClick() {
+        this.table.refreshTable();
+    }
+    this.refresh_button.on (
+        "click",
+        function( p_oEvent ) {
+            onRefreshClick();
+        }
+    );
+
     function onNewMessageClick() {
         if( !this.dialogShown ) {
-            this.dialogShown = true;
             this.message_extend_button.set( 'disabled', false );
             this.message_submit_button.set( 'disabled', false );
             document.getElementById('new_message_body').innerHTML=
-                '<input id="message_text_id" type="text" name="message_text" style="padding:1px; width:400px;" />';
+                '  <textarea id="new_message_text" type="text" name="message_text"'+
+                ' rows="1" cols="72" style="padding:1px;"'+
+                ' title="This is multi-line text area in which return will add a new line of text.'+
+                ' Use Submit button to post the message."></textarea>'+
+                '<div id="extended_message"></div>';
         } else {
-            this.dialogShown = false;
-            this.optionsShown = false;
             this.message_extend_button.set( 'disabled', true );
             this.message_submit_button.set( 'disabled', true );
             document.getElementById('new_message_body').innerHTML='';
         }
+        this.dialogShown = !this.dialogShown;
+        this.extendedShown = false;
+        var new_message_body = document.getElementById('new_message_body');
+        new_message_body.style.backgroundColor='';
+        new_message_body.style.padding='1px';
     }
     this.new_message_button.on (
         "click",
@@ -867,11 +887,98 @@ function create_new_message_dialog( scope ) {
             onNewMessageClick();
         }
     );
-    this.message_extend_button.on ( "click", function( p_oEvent ) {
-        post_info( "popupdialogs",
-            "Sorry, this feature hasn't been implemented yet! "+
-            "Come back later when a new version of the application will be available." );
-    });
+
+
+    this.tags = [];
+    this.tags_table = null;
+
+    this.oPushButtonAdd = null;
+    this.oPushButtonRemove = null;
+
+    function synchronize_data( predicate ) {
+        var rs = this.tags_table.dataTable.getRecordSet();
+        var rs_length = rs.getLength();
+        this.tags = [];
+        for( var i = 0; i < rs_length; i++ ) {
+            var r = rs.getRecord(i);
+            if( predicate( r ))
+                this.tags.push ( {
+                    'tag': r.getData('tag'),
+                    'value': r.getData('value')});
+            else {
+                this.tags_table.dataTable.deleteRow(i);
+            }
+        }
+    }
+    function AddAndRefreshTable() {
+        this.tags_table.dataTable.addRow (
+            { tag: "", value: "" }, 0 );
+    }
+    function deleteAndRefreshTable() {
+        synchronize_data( function( r ) { return !r.getData('selected'); } );
+    }
+
+    function onExtendedClick() {
+        document.getElementById('new_message_text').rows = this.extendedShown ? 1 : 12;
+        var new_message_body = document.getElementById('new_message_body');
+        if( !this.extendedShown ) {
+            document.getElementById('extended_message').innerHTML=
+                '<div style="margin-left:4px; margin-top:12px;">'+
+                '  <em class="lb_label">Author:</em>'+
+                '  <input id="author_id" type="text" name="author_text" value="<?php  echo $_SERVER['WEBAUTH_USER'] ?>" style="padding:2px; width:200px;" />'+
+                '</div>'+
+                '<div style="margin-left:4px;  margin-top:20px;">'+
+                '  <em class="lb_label">Tags</em>'+
+                '  <div style="margin-top:4px;">'+
+                '    <button id="add_tag_button">Add Tag</button>'+
+                '    <button id="remove_tag_button">Remove Selected Tags</button></td>'+
+                '  </div>'+
+                '  <div id="tags_table" style="margin-left:1px; margin-top:8px;" >'+
+                '    <div id="tags_table_paginator"></div>'+
+                '    <div id="tags_table_body"></div>'+
+                '  </div>'+
+                '</div>'+
+                '<div style="margin-top:20px;">'+
+                '</div>';
+            //new_message_body.style.backgroundColor='#f6f6f6';
+            new_message_body.style.padding='4px';
+            this.tags_table = new TableLocal (
+                "tags_table",
+                [ { key: "selected", formatter: "checkbox" },
+                  { key: "tag",   sortable: true, resizeable: false,
+                    editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})},
+                  { key: "value", sortable: true, resizeable: false,
+                    editor: new YAHOO.widget.TextareaCellEditor({disableBtns:true})} ],
+                this.tags,
+                null
+            );
+            this.oPushButtonAdd = new YAHOO.widget.Button( "add_tag_button" );
+            this.oPushButtonRemove = new YAHOO.widget.Button( "remove_tag_button" );
+
+            this.oPushButtonAdd.on (
+                "click",
+                function( p_oEvent ) { AddAndRefreshTable(); }
+            );
+            this.oPushButtonRemove.on (
+                "click",
+                function( p_oEvent ) { deleteAndRefreshTable(); }
+            );
+
+        } else {
+            document.getElementById('extended_message').innerHTML='';
+            this.tags_table = null;
+            new_message_body.style.backgroundColor='';
+            new_message_body.style.padding='1px';
+        }
+        this.extendedShown = !this.extendedShown;
+        this.tags = [];
+    }
+    this.message_extend_button.on (
+        "click",
+        function( p_oEvent ) {
+            onExtendedClick();
+        }
+    );
     this.message_submit_button .on ( "click", function( p_oEvent ) {
         post_info( "popupdialogs",
             "Sorry, this feature hasn't been implemented yet! "+
