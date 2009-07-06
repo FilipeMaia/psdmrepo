@@ -2,12 +2,13 @@
 -- Test change_filename_status
 --
 set @exper = 'ChangeFilenameStatus';
+set @inst  = 'AMOS'
 set @runtype = 'Calibration';
 set @runnum = 123;
 set @req_bytes = 1000000;
 set @newset = 0;
 set @newuri = 'temp';
-CALL new_fileset (@exper, @runtype, @runnum, @req_bytes, @newset, @newuri);
+CALL new_fileset (@exper, @inst, @runtype, @runnum, @req_bytes, @newset, @newuri);
 SELECT * FROM fileset;
 SELECT @newuri;
 SELECT @newset;

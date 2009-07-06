@@ -1,14 +1,15 @@
 -- 
 -- Test add_file_to_set
 -- 
-set @exper = 'TESTaddfiles';
+set @exper = 'Chapman2';
+set @inst  = 'AMOS';
 set @runtype = 'Data';
 set @runnum = 345;
 set @req_bytes = 1000000;
 set @newset = 0;
 set @newuri = 'temp';
 -- Create a fileset into which we add files.
-CALL new_fileset (@exper, @runtype, @runnum, @req_bytes, @newset, @newuri);
+CALL new_fileset (@exper, @inst, @runtype, @runnum, @req_bytes, @newset, @newuri);
 SELECT * FROM fileset;
 SELECT @newset;
 SELECT @newuri;
