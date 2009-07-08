@@ -37,3 +37,6 @@ to database, stored procedures, test*.sql and OnlineSim to reflect changes from 
 The fileset now has an experiment, run type and run number that are unverified. 
 File type becomes an enum in the filename table.
 
+Tag: V00-01-05
+2009-07-06 Robert C. Sass
+- Release latest dated/named version of all files. Next release will have single names and just for production.
