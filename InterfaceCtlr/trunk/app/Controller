@@ -12,7 +12,7 @@
 
 This is the Interface Controller that monitors filesets created by the online system.
 It creates a translator process to translate the fileset into HDF5 and enters the 
-translated file into iRODS.
+translated file into iRODS. rt
 
 This software was developed for the LUSI project.  If you use all or
 part of it, please give an appropriate acknowledgement.
@@ -26,9 +26,9 @@ part of it, please give an appropriate acknowledgement.
 
 
 #------------------------------
-#  Module's version from CVS --
+#  Module's version from SVN --
 #------------------------------
-__version__ = "$Revision: 8 $"
+__version__ = "$Revision: 1 $"
 # $Source$
 
 #--------------------------------
@@ -179,53 +179,25 @@ class Controller ( LusiPyApp ) :
 
         self._parser.add_option ( '-p', "--password",
 								  action="store", dest="password", default=None,
-							      help="specify user password (no password by default)" )
+							      help="specify MySQL password (no password by default)" )
 
         self._parser.add_option ( '-o', "--output",
                                   action="store", dest="output", default=None,
                                   help="send output to file instead of STDOUT" )
 
-        self._parser.add_option ( '-d', "--description",
-                                  action="store", dest="description", default=None,
-                                  help="a description given as a parameter's value" )
 
-        self._parser.add_option ( '-f', "--description-file",
-                                  action="store", dest="description_file", default=None,
-                                  help="a description stored in a file" )
-
-        self._parser.add_option ( '-l', "--long",
-                                  action="count", dest="long", default=0,
-                                  help="produce the detailed output" )
-
-        self._parser.add_option ( '-t', "--truncate-no",
-                                  action="count", dest="truncate_no", default=0,
-                                  help="do not truncate long multiline strings in output" )
-
-        self._parser.add_option ( '-u', "--update",
-                                  action="count", dest="update", default=0,
-                                  help="allow updating an existing entry" )
-
-
-        # Register command handlers for known command --------------------------
-        #
-        self.__add_handler(
-            'help',
-            '[<command> [<command> [...]]]',
-            """
-    If no specific command (or commands) will be presented
-    then general information about the tool will be printed.
-    Otherwise detailed description of each command will be
-    printed.
-    """,
-            self.__cmd_help,
-            connects2server=False);
-
-    # ============================================================
-    # Run the whole thing after parsing the command argunments and
-    # installing logger. See LusiPyApp class for details.
-    # ============================================================
+    # ==========================================
+    # Run the controller after installing logger. 
+    # See LusiPyApp class for details.
+    # ==========================================
 
     def _run ( self ) :
+
+        # Open optional output file -----------------------------------------------------
+        #
+        if self._options.output:
+            self.debug( "Open alternative output file" )
+            self.__out = open ( self._options.output, "w" )
  
         # Connect to the database
         #
@@ -233,147 +205,55 @@ class Controller ( LusiPyApp ) :
 
         # Init controller and get status codes we'll need
         #
-        translate_uri= self.__init_controller()
-        xwait_id = self.__fstat_id("Waiting_Translation")
-        xproc_id = self.__fstat_id("Being_Translated")
-        xdone_id = self.__fstat_id("Translation_complete")
+        init_info = self.__init_controller()
+        xwait_id  = self.__fstat_id("Waiting_Translation")
+        xlate_id  = self.__fstat_id("Being_Translated")
+        xdone_id  = self.__fstat_id("Translation_Complete")
+        xfail_id  = self.__fstat_id("Translation_Failed")
+        xirod_id  = self.__fstat_id("Entered_into_iRODS")
 
         while True:
-           fs_id = self.__get_fileset_with_status(xwait_id)
-           if fs_id:
-              self.print_out("Found fileset id %s Waiting_Translation" % fs_id)
-              cmd = self.__build_translate_cmd(fs_id, translate_uri)
-              print "Starting translator with cmd %s" % cmd             
-              self.__change_fileset_status (fs_id, xproc_id)
-              proc = subprocess.Popen(cmd)
-              print "Return from call with retcode %s" % proc
-              done = False
-              while not done:
-                  print "Waiting for translator to complete"
-                  proc.poll()
-                  if proc.returncode == None:
-                      time.sleep(1.0)
-                  else:
-                      print "Translator complete with code %s" % proc.returncode
-                      usage = resource.getrusage(resource.RUSAGE_CHILDREN)
-                      print "translator resources: %s" % usage
-                      self.__change_fileset_status (fs_id, xdone_id)
-                      done = True
+            try:
+                fs_id = self.__get_fileset_with_status(xwait_id)
+                if fs_id:
+                    self.trace("Found fileset id %s Waiting_Translation" % fs_id)
+                    fs_dbinfo = self.__get_fs_dbinfo(fs_id)
+                    ofname = self.__build_output_fname(fs_dbinfo)
+                    cmd = self.__build_translate_cmd(fs_id, ofname, init_info, fs_dbinfo)
+                    print "Starting translator with cmd %s" % cmd             
+                    self.__change_fileset_status (fs_id, xlate_id)
+                    proc = subprocess.Popen(cmd)
+                    translator_id = self.__insert_translator_process(init_info['controller_id'], fs_id)
+                    done = False
+                    while not done:
+                        proc.poll()
+                        if proc.returncode == None:
+                            time.sleep(1.0)
+                        else:
+                            self.__update_translator_process (translator_id, proc.returncode)
+                            if (proc.returncode != 0):
+                                self.__change_fileset_status (fs_id, xfail_id)
+                            else:                                
+                                self.__change_fileset_status (fs_id, xdone_id)
+                                cmd = self.__build_irods_cmd (fs_id, init_info['translate_uri'], ofname)
+                                print "irods insert cmd %s" % cmd
+                                returncode = subprocess.call(cmd)
+                                print "irods put complete with return code  %s" % returncode
+                                if returncode == 0:
+                                    self.__change_fileset_status (fs_id, xirod_id)
+                                    os.remove(os.path.join(init_info['translate_uri'],ofname))
+                                done = True
+                else:
+                    time.sleep(0.5)
 
-           else:
-              self.print_out("No fileset Waiting_Translation found")
-              time.sleep(2.0)
+            except KeyboardInterrupt:
+                print "Got keyboard interrupt. Exiting."
+                self.__exit_controller(init_info['controller_id'])
 
         # End while True
 
-        # Print the list of supported commands if none is given ----------------
-        #
-        if not self._args :
-            self.__cmd_help('help', self._args)
-            return 0
+        return 
 
-        # Open output file -----------------------------------------------------
-        #
-        if self._options.output:
-            self.debug( "Open alternative output file" )
-            self.__out = open ( self._options.output, "w" )
-
-        # Get the command name,  connect to the server (unless we're -----------
-        #  dealing with the command which doesn't need this) and invoke
-        # the corresponding handler.
-        #
-        command = self._args[0]
-        if command not in self.__cmd_handlers:
-            self._parser.error("unknown command: %s" % command)
-            return 2
-
-        self.trace( "command: %s: arguments: %s" % (command,str(self._args[1:])))
-
-        return self.__cmd_handlers[command]['HANDLER'](command, self._args[1:])
-
-    # ===========================================
-    # Print the information on supported commands
-    # ===========================================
-
-    def __cmd_help ( self, command, args ) :
-
-        names = args
-        if names is not None and len(names) > 0:
-            verbose = True
-        else:
-            names = self.__cmd_order
-            verbose = False
-
-        if verbose:
-
-            # Print full description of each command
-            #
-            for name in names:
-                self.print_out("""COMMAND:
-
-    %s
-
-PARAMETERS:
-
-    %s
-
-DESCRIPTION:
-%s
-""" % (name,
-         self.__cmd_handlers[name]['SYNTAX'],
-         self.__cmd_handlers[name]['DESCRIPTION']))
-
-        else:
-
-            self.print_out("""APPLICATION:
-
-    %s
-
-        This is the Interface Controller. The application has been 
-        developed in a context of the OFFLINE Data Management Project
-         for LCLS/LUSI experiments.
-
-USAGE:
-
-    command [parameters] [options]
-
-    help
-    help [command [command ...]]   (for detailed explanation)
-
-    -h | --help                    (for a full list of available options)
-
-SUPPORTED COMMANDS:
-""" %  os.path.basename(sys.argv[0]))
-
-            # Reserve enough space for the command names based on
-            # the longest name.
-            #
-            max_len = 1
-            for name in names:
-                if len(name) > max_len: max_len = len(name)
-            fmt = "    %-"+str(max_len)+"s  %s"
-            for name in names:
-                self.print_out(fmt % (name, self.__cmd_handlers[name]['SYNTAX']))
-
-            self.print_out()
-
-        return 0
-
-
-    # ====================================
-    # Get fileset with requested status id
-    # ====================================
-
-    def __get_fileset_with_status ( self, in_statid ) :
-
-        """return a fileset id with the specified status or 0 if
-        no fileset exists with that status"""
-        
-        if not self.__simple_query("""SET @_new_fileset_0 = NULL;
-            CALL get_fileset_with_status ('%s',@_new_fileset_0);""" % (in_statid)): return 0
-        fsrow = self.__select_query('SELECT @_new_fileset_0', return_dict=True)
-        if not fsrow: return 0
-        return fsrow[0]['@_new_fileset_0']
 
     # ========================
     # Init Controller instance
@@ -381,15 +261,17 @@ SUPPORTED COMMANDS:
 
     def __init_controller ( self ) :
 
-       """Perform multiple operations to initialize this controller:
-       1) Find our translator output uri in the translator_nodes table.
-       2) Insert an entry in the interface_controller table.
-       3) Return the tuple containing the id and translate_uri from the 
-          translator_cpu table"""
+       """Perform multiple operations to initialize the controller:
+       1) init for iRods access.
+       2) Find our translator output uri in the translator_nodes table.
+       3) Insert an entry in the interface_controller table.
+       4) Return the translate_uri from the translator node table and 
+          the id of the inserted interface_controller row as a dict"""
 
        host = socket.getfqdn(socket.gethostname())
        print "In init_controller this host is %s" % host
-    
+
+       proc = subprocess.call('iinit')    
        rows = self.__select_query(
            "SELECT id, translate_uri FROM translator_node WHERE node_uri = '%s'" % host,
            return_dict=True)
@@ -397,23 +279,92 @@ SUPPORTED COMMANDS:
            raise DatabaseOperatonFailed, "Failed to find node %s in translator_node table." % host 
 
        translate_uri = rows[0]['translate_uri']
-       node_id = rows[0]['id']
+       xlatenode_id = rows[0]['id']
        proc_id= os.getpid()
        start  = _time2str(Time.now().to64())[0:19]
-       print "time = %s" % start
+       print "Controller start time = %s" % start
 
        if not self.__simple_query(
            "SET SESSION SQL_MODE='ANSI'",
            "START TRANSACTION",
            "INSERT INTO interface_controller VALUES(NULL,%s,%s, '%s', NULL, False)" % (
-               node_id,
+               xlatenode_id,
                proc_id,
                start),
+           "SET @controller_id = LAST_INSERT_ID()", 
            "COMMIT"): 
-           raise DatabaseOperatonFailed, "Failed to insert new interface_controller entry"
-              
-       return translate_uri
+           raise DatabaseOperatonFailed, "Failed to insert interface_controller row"
 
+       rows = self.__select_query_1("SELECT @controller_id")
+
+       if not rows:
+           raise DatabaseOperatonFailed, "Failed to retrieve LAST_INSERT_ID of interface_controler"
+
+       controller_id = rows[0]
+              
+       return {'translate_uri':translate_uri, 'controller_id':controller_id}
+
+
+    # ====================================
+    # Get fileset with requested status id
+    # ====================================
+
+    def __get_fileset_with_status ( self, stat_id ) :
+
+        """return a fileset id with the specified status or 0 if
+        no fileset exists with that status"""
+        
+        if not self.__simple_query("""SET @new_fileset = NULL;
+            CALL get_fileset_with_status ('%s',@new_fileset);""" % (stat_id)): return 0
+        fsrow = self.__select_query_1('SELECT @new_fileset')
+        if not fsrow: return None
+        return fsrow[0]
+
+
+
+    # =======================================================
+    # Return a database dictionary of info about this fileset
+    # =======================================================
+
+    def __get_fs_dbinfo ( self, fileset_id ) :
+
+        """Return a database dictionary of information about this fileset"""
+
+        rows = self.__select_query(
+            "SELECT experiment, instrument, run_type, run_number FROM fileset WHERE id = %s" % 
+            fileset_id,return_dict=True)
+
+        if not rows:
+            raise DatabaseOperatonFailed, "Failed to select info from fileset get_fs_dbinfo"
+
+        return rows
+
+    # ====================================
+    # Build output filename for translator
+    # ====================================
+
+    def __build_output_fname ( self, fsdbinfo ) :
+
+        """Build the output filename for the translator"""
+        
+        # Now construct the output file name
+        file_list = []
+        file_list.append(fsdbinfo[0]['experiment'])
+        file_list.append('_')
+        file_list.append(fsdbinfo[0]['instrument'])
+        file_list.append('_')
+        file_list.append(fsdbinfo[0]['run_type'])
+        file_list.append('_')
+        run = "%06d" % fsdbinfo[0]['run_number']     
+        file_list.append(run)
+        file_list.append('_')
+        curtime = _time2str(Time.now().to64())
+        file_list.append(curtime[0:10])
+        file_list.append('_')
+        file_list.append(curtime[11:19])
+        file_list.append('.hdf5')
+
+        return (''.join(file_list))
 
     # ========================================================
     # Change the status of a fileset and all files it contains
@@ -425,12 +376,12 @@ SUPPORTED COMMANDS:
         the fileset to the requested status"""
 
         if not self.__simple_query(
-            """SET @_new_fileset_0 = NULL;
-            CALL change_fileset_status ('%s','%s', @_new_fileset_0);""" % (
+            """SET @fileset = NULL;
+            CALL change_fileset_status ('%s','%s', @fileset);""" % (
             fileset_id, status_id)): 
             raise DatabaseOperatonFailed, "Failed to change fileset status"
             
-        row = self.__select_query('SELECT @_new_fileset_0', return_dict=True)
+        row = self.__select_query_1('SELECT @fileset')
         if not row:
             raise DatabaseOperatonFailed, "Bad status return from change_fileset_status"
 
@@ -441,7 +392,7 @@ SUPPORTED COMMANDS:
     # Build a list that has the command to execute the translator
     # =============================================================
 
-    def __build_translate_cmd ( self, fileset_id, translate_uri ) :
+    def __build_translate_cmd ( self, fileset_id, out_fname, init_dict, fs_dbdict ) :
 
         """Build the arg list to pass to the translator from the files in fileset
         and the translate_uri destination for the transalator output"""
@@ -450,50 +401,152 @@ SUPPORTED COMMANDS:
         cmd_list.append("o2o-translate")
 
         rows = self.__select_query(
-            "SELECT name FROM files WHERE fk_fileset_id = %s" % fileset_id,
-            return_dict=True)
+            "SELECT name FROM files WHERE fk_fileset_id = %s" % fileset_id, 
+            return_dict = True)
 
         if not rows:
             raise DatabaseOperatonFailed, "No files in fileset build_translate_cmd"
 
         for r in rows:
             cmd_list.append("-f")
-            path.append(r['name'])            
+            cmd_list.append(r['name'])
 
         #
         # Destination dir for translated file
         cmd_list.append("-d")
-        cmd_list.append(translate_uri)
+        cmd_list.append(init_dict['translate_uri'])
 
-        # Construct translated filename from experiment, instrument, run number and type from
-        # the fileset plus the current date/time
+        #
+        # experiment, run number, filename
+        cmd_list.append("-x")
+        cmd_list.append(fs_dbdict[0]['experiment'])
+        cmd_list.append("-r")
+        cmd_list.append("%06d" % fs_dbdict[0]['run_number'])
         cmd_list.append("-n")
+        cmd_list.append(out_fname)
+        
+        return cmd_list
+
+
+    # =====================================
+    # Insert row for new translator process
+    # =====================================
+
+    def __insert_translator_process ( self, ctlr_id,  fs_id) :
+
+        """Add a row for this translator process. Update statistics after run is complete.
+        Return the id of the new row for later update"""
+
+        if not self.__simple_query(
+            "START TRANSACTION",
+            """INSERT INTO translator_process (id, fk_interface_controller, fk_fileset, started)
+            VALUES(NULL,%s, %s, '%s')""" % (
+            ctlr_id,
+            fs_id,
+            _time2str(Time.now().to64())[0:19]),
+            "SET @translator_id = LAST_INSERT_ID()",
+            "COMMIT"): 
+            raise DatabaseOperatonFailed, "Failed to insert translator_process row"
+
+        rows = self.__select_query_1("SELECT @translator_id")
+
+        if not rows:
+            raise DatabaseOperatonFailed, "Failed to retrieve LAST_INSERT_ID"
+
+        return rows[0]
+
+    # ======================================
+    # Update row info for translator process
+    # ======================================
+
+    def __update_translator_process ( self, translator_id, proc_code) :
+
+        """Update the row for this translator process. Update run statistics and process return
+        code. We store all of the resource usage even though some are 0 for a given OS."""
+
+        usage = resource.getrusage(resource.RUSAGE_CHILDREN)
+        if not self.__simple_query(
+           "START TRANSACTION",
+           """UPDATE translator_process SET stopped = '%s',    status_code = %s, 
+           ru_utime = %s,  ru_stime = %s,    ru_maxrss = %s,   ru_ixrss = %s,
+           ru_idrss = %s,  ru_isrss = %s,    ru_minflt = %s,   ru_majflt = %s,
+           ru_nswap = %s,  ru_inblock = %s,  ru_outblock = %s, ru_msgsnd = %s,
+           ru_msgrcv = %s, ru_nsignals = %s, ru_nvcsw = %s,    ru_nivcsw = %s
+           WHERE id = %s """ % (
+           _time2str(Time.now().to64())[0:19], 
+           proc_code,
+           usage[0],usage[1],usage[2], usage[3], usage[4], usage[5], usage[6], usage[7],
+           usage[8],usage[9],usage[10],usage[11],usage[12],usage[13],usage[14],usage[15],
+           translator_id),
+           "COMMIT"):
+           raise DatabaseOperatonFailed, "Failed to insert translator_process row"
+
+        return
+
+
+    # ============================================================
+    # Build a list that has the command to put the file into iRODS
+    # ============================================================
+
+    def __build_irods_cmd ( self, fileset_id, translate_uri, ifname ) :
+
+        """Build the arg list to pass to the translator from the files in fileset
+        and the translate_uri destination for the transalator output"""
+
+        cmd_list = []
+        cmd_list.append("iput")
+
+        ipath = []
+        ipath.append(translate_uri)
+        ipath.append("/")
+        ipath.append(ifname)
+        cmd_list.append(''.join(ipath))
+
+
+        # Construct the output path experiment, instrument, run number and type from
+        # the fileset plus the current date/time
         rows = self.__select_query(
-            "SELECT experiment, instrument, run_type, run_number FROM fileset WHERE id = %s" % 
+            "SELECT experiment, instrument, run_number FROM fileset WHERE id = %s" % 
             fileset_id,
             return_dict=True)
 
         if not rows:
-            raise DatabaseOperatonFailed, "Failed to select info from fileset build_translate_cmd"
+            raise DatabaseOperatonFailed, "Failed to select info from fileset build_irods_cmd"
         
-        # Now construct the output file name
-        file_list = []
-        file_list.append(rows[0]['experiment'])
-        file_list.append('_')
-        file_list.append(rows[0]['instrument'])
-        file_list.append('_')
-        file_list.append(rows[0]['run_type'])
-        file_list.append('_')
-        file_list.append(str(rows[0]['run_number']))
-        file_list.append('_')
-        time = _time2str(Time.now().to64())
-        file_list.append(time[0:10])
-        file_list.append('_')
-        file_list.append(time[12:19])
-        file_list.append('.hdf5')
-        cmd_list.append(''.join(file_list))
-        
-        return cmd_list
+        # Now construct the output iRODS file path
+        opath = []
+        opath.append("/lusi-zone/exp/")
+        opath.append(rows[0]['instrument'])
+        opath.append('/')
+        opath.append(rows[0]['experiment'])
+        opath.append('/')
+        opath.append("%06d" % rows[0]['run_number'])
+        opath.append("/")
+        opath.append(ifname)
+        cmd_list.append(''.join(opath))
+
+        return cmd_list     
+
+    # ===================
+    # Exit the Controller
+    # ===================
+
+    def __exit_controller ( self, controller_id ) :
+
+        """Update the stop time for the controller and exit"""
+
+        endtime = _time2str(Time.now().to64())[0:19]
+        print "Controller end time = %s" % endtime
+        if not self.__simple_query(
+           "START TRANSACTION",
+           """UPDATE interface_controller SET stopped = '%s' WHERE id = %s """ % (
+           endtime,
+           controller_id),
+           "COMMIT"):
+           raise DatabaseOperatonFailed, "Failed to insert translator_process row"
+        sys.exit()
+        return
+
 
     # ====================================
     # Report current connection parameters
@@ -643,11 +696,10 @@ SUPPORTED COMMANDS:
 
     def __fstat_id (self, in_name):
 
-        rows = self.__select_query(
-            """(SELECT id FROM fileset_status_def WHERE name='%s')""" % (in_name),
-            return_dict=True)
+        rows = self.__select_query_1(
+            """(SELECT id FROM fileset_status_def WHERE name='%s')""" % (in_name))
         if rows:
-            return rows[0]['id']
+            return rows[0]
         else:
             raise DatabaseOperatonFailed, "failed to obtain fileset status id for: %s" % (in_name)
 
@@ -661,65 +713,6 @@ SUPPORTED COMMANDS:
         for r in rows:
             return r[colname]
 
-    # =========================================
-    # Read an optional description if avaialble
-    # =========================================
-
-    def _description (self):
-
-        description = self._options.description
-        description_file = self._options.description_file
-
-        if description is not None and description_file is not None:
-            self._parser.error("do not use mutually exclusive description options")
-
-        if description is not None:
-            return MySQLdb.escape_string(description)
-
-        if description_file is not None:
-            return MySQLdb.escape_string("".join(open(description_file, "r").readlines()))
-
-        return ""
-
-
-    # ==============================================
-    # Extract only the first part of the description
-    # ==============================================
-
-    def _description_hint (self, description, maxlen=0):
-
-        """Analyze the contents of the input string and return
-        a substring which would end when the first of the following
-        conditions is met:
-
-        - the maximul length (in characters) as requested by the optional
-          parameter 'maxlen' (the default value of 0 means no limit)
-
-        - the newline character (in case of multiline string)
-
-        If none of these conditions is detected the whole input string
-        is returned. The whole input string is returned if the following
-        option is set:
-
-            --no-truncate
-        """
-
-        if self._options.truncate_no:
-            return description
-
-        begin = 0
-        end = len(description)
-        if maxlen > 0 and maxlen < end:
-            end = maxlen
-
-        idx = description.find("\n", begin, end)
-        if idx >= 0:
-            end = idx
-
-        if end < len(description):
-            return "%s  (truncated: %d of %d)" % (description[begin:end], end, len(description))
-
-        return description
 
 # ==============================================
 # Run application when imported as a main module

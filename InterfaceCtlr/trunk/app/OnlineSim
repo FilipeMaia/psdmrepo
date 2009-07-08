@@ -240,9 +240,9 @@ class OnlineSim ( LusiPyApp ) :
         #
         self.__add_handler(
             'new_fileset',
-            '<experiment> <run_type> <run_number> <size_in_bytes>',
+            '<experiment> <instrument> <run_type> <run_number>',
             """
-    Create a new fileset finding cache space for the requested file size.
+    Create a new fileset.
     """,
              self.__cmd_new_fileset)
 
@@ -251,7 +251,7 @@ class OnlineSim ( LusiPyApp ) :
         #
         self.__add_handler(
             'add_filename',
-            '<fileset_id> <filetype> <filename> <filesize>',
+            '<fileset_id> <filetype> <filename>',
             """
     Add a file to an existing fileset.
     """,
@@ -392,7 +392,7 @@ SUPPORTED COMMANDS:
 
         filepath = args[0]
         if not self.__simple_query(
-            'source %s' % (filepath)): return 1 
+            'source %s' % filepath): return 1 
         return 0
 
     # ====================
@@ -403,25 +403,21 @@ SUPPORTED COMMANDS:
 
         if len(args) < 4:
             self._parser.error(
-                "Enter: experiment run_type run_num fileset_size_in_bytes  - %s" % command)
+                "Enter: experiment instrument run_type run_num - %s" % command)
 
         exper      = args[0]
-        runtype    = args[1]
-        runnum     = args[2]
-        size_bytes = args[3]
+        instr      = args[1]
+        runtype    = args[2]
+        runnum     = args[3]
 
         if not self.__simple_query(
-            """SET @_new_fileset_0 = NULL;
-            SET @_new_fileset_1 = NULL; 
-            CALL new_fileset ('%s','%s','%s','%s',@_new_fileset_0, @_new_fileset_1);""" % (
-            exper, runtype, runnum, size_bytes )): return 1
+            """SET @_new_fileset_0 = NULL; 
+            CALL new_fileset_nocache ('%s','%s','%s','%s',@_new_fileset_0);""" % (
+            exper, instr, runtype, runnum )): return 1
         setrow = self.__select_query('SELECT @_new_fileset_0', return_dict=True)
         if not setrow: return 1
         newset = setrow[0]['@_new_fileset_0']
-        urlrow = self.__select_query ('SELECT @_new_fileset_1',return_dict=True)
-        if not urlrow: return 1
-        newurl = urlrow[0]['@_new_fileset_1']
-        print "newset = %s newurl = %s" % (newset,newurl)
+        print "newset = %s" % newset
         return 0
 
 
@@ -431,18 +427,17 @@ SUPPORTED COMMANDS:
 
     def __cmd_add_filename ( self, command, args ) :
 
-        if len(args) < 4:
-            self._parser.error("Enter: fileset_id  filetype filename filesize_in_bytes - %s" % command)
+        if len(args) < 3:
+            self._parser.error("Enter: fileset_id  filetype filename - %s" % command)
 
         fileset_id = args[0]
         filetype   = args[1]
         filename   = args[2]
-        filesize   = args[3]
         status = None 
         if not self.__simple_query(
             """SET @_new_fileset_0 = NULL;
-            CALL add_file_to_set ('%s','%s', '%s', '%s', @_new_fileset_0);""" % (
-            fileset_id, filetype, filename, filesize)): return 1
+            CALL add_file_nocache ('%s','%s', '%s', @_new_fileset_0);""" % (
+            fileset_id, filetype, filename)): return 1
         row = self.__select_query('SELECT @_new_fileset_0', return_dict=True)
         if not row: return 1
         status = row[0]['@_new_fileset_0']
