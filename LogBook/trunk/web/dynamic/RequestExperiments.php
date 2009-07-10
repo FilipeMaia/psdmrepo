@@ -13,11 +13,11 @@ function experiment2json( $experiment ) {
         '</a>';
     $status = $experiment->in_interval( LusiTime::now());
     if( $status > 0 ) {
-        $experiment_status = '<b><em style="color:gray">Completed</em></b>';
+        $experiment_status = '<b><em style="color:gray">completed</em></b>';
     } else if( $status < 0 ) {
-        $experiment_status = '<b><em style="color:green">In Preparation</em></b>';
+        $experiment_status = '<b><em style="color:green">in preparation</em></b>';
     } else {
-        $experiment_status = '<b><em style="color:red">Taking Data</em></b>';
+        $experiment_status = '<b><em style="color:red">on-going</em></b>';
     }
     return json_encode(
         array (

@@ -5,27 +5,36 @@ require_once('LogBook/LogBook.inc.php');
 /*
  * This script will process a request for displaying runs of an experiment.
  */
-if( isset( $_GET['id'] )) {
-    $id = trim( $_GET['id'] );
-    if( $id == '' )
-        die( "experiment identifier can't be empty" );
-} else
-    die( "no valid experiment identifier" );
+$exper_id = null;
+$shift_id = null;
 
+if( isset( $_GET['id'] )) {
+    $exper_id = trim( $_GET['id'] );
+    if( $exper_id == '' )
+        die( "experiment identifier can't be empty" );
+
+} else if( isset( $_GET['shift_id'] )) {
+    $shift_id = trim( $_GET['shift_id'] );
+    if( $shift_id == '' )
+        die( "shift identifier can't be empty" );
+
+} else {
+    die( "no definitive scope to search for runs" );
+}
 $last_run_requested = isset( $_GET['last'] );
 
 function run2json( $run ) {
 
     $begin_time_url =
-        "<a href=\"javascript:select_run(".$run->id().")\">".
+        "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\">".
         $run->begin_time()->toStringShort().
         '</a>';
     $end_time_status =
         is_null( $run->end_time()) ?
-        '<b><em style="color:red;">Taking Data</em></b>' :
+        '<b><em style="color:red;">on-going</em></b>' :
         $run->end_time()->toStringShort();
     $shift_begin_time_url =
-        "<a href=\"javascript:select_shift(".$run->shift()->id().")\">".
+        "<a href=\"javascript:select_shift({$run->shift()->id()})\">".
         $run->shift()->begin_time()->toStringShort().
         '</a>';
 
@@ -47,16 +56,25 @@ try {
     $logbook = new LogBook();
     $logbook->begin();
 
-    $experiment = $logbook->find_experiment_by_id( $id )
-        or die( "no such experiment" );
+    if( !is_null( $exper_id )) {
+        $experiment = $logbook->find_experiment_by_id( $exper_id )
+            or die( "no such experiment" );
 
-    if( $last_run_requested ) {
-        $runs = array( );
-        $last_run = $experiment->find_last_run();
-        if( !is_null( $last_run ))
-            array_push( $runs, $last_run );
+        if( $last_run_requested ) {
+            $runs = array( );
+            $last_run = $experiment->find_last_run();
+            if( !is_null( $last_run ))
+                array_push( $runs, $last_run );
+        } else {
+            $runs = $experiment->runs();
+        }
+
+    } else if( !is_null( $shift_id )) {
+        $shift = $logbook->find_shift_by_id( $shift_id )
+            or die( "no such shift" );
+            $runs = $shift->runs();
     } else {
-        $runs = $experiment->runs();
+        die( "internal implementation error" );
     }
 
     header( 'Content-type: application/json' );

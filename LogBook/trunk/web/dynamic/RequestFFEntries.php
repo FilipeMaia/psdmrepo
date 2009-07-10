@@ -10,29 +10,34 @@ if( isset( $_GET['id'] )) {
     $id = trim( $_GET['id'] );
     if( $id == '' )
         die( "experiment identifier can't be empty" );
-} else
+} else {
     die( "no valid experiment identifier" );
-
+}
 if( isset( $_GET['scope'] )) {
     $scope = trim( $_GET['scope'] );
-    if( $scope == '' )
+    if( $scope == '' ) {
         die( "scope can't be empty" );
     } else if( $scope == 'shift' ) {
         if( isset( $_GET['shift_id'] )) {
             $shift_id = trim( $_GET['shift_id'] );
-            if( $shift_id == '' )
+            if( $shift_id == '' ) {
                 die( "shift id can't be empty" );
-        } else
+            }
+        } else {
             die( "no valid shift id" );
+        }
     } else if( $scope == 'run' ) {
         if( isset( $_GET['run_id'] )) {
             $run_id = trim( $_GET['run_id'] );
             if( $run_id == '' )
                 die( "run id can't be empty" );
-        } else
+        } else {
             die( "no valid run id" );
-} else
+        }
+    }
+} else {
     die( "no valid scope" );
+}
 
 function entry2json( $e ) {
 
@@ -44,7 +49,7 @@ function entry2json( $e ) {
     $tags_url = '';
     $tags = $e->tags();
     foreach( $tags as $t )
-        $tags_url .= '<b><em title="T1">T</em></b>&nbsp;';
+        $tags_url .= '<b><em title="'.$t->tag().'">T</em></b>&nbsp;';
 
     $attachments_url = '';
     $attachments = $e->attachments();
@@ -56,7 +61,7 @@ function entry2json( $e ) {
             "posted" => $posted_url,
             "author" => $e->author(),
             "relevance_time" => $e->relevance_time()->toStringShort(),
-            "message" => substr( $e->content(), 0, 72 ),
+            "message" => substr( $e->content(), 0, 36 ),
             "tags" => $tags_url,
             "attachments" => $attachments_url
         )

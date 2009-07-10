@@ -3,5 +3,70 @@ in a way which would be not depending on using MySQL SQL directly in
 parameters of the method. Think about setting limits on parameters, for
 example.
 
-- design the "Search Form". Discuss it with Rahul.
+- design the "Search Form".
+
+- implement the "Browse" page as two panels. There will be a tree
+on the left side to show a hierarchy of things like instruments, experiments,
+shifts, runs:
+
+  AMOS
+    Chapman1
+      shifts
+        begin: 2009-07-17 10:22:01
+          run: 123
+          run: 124
+        begin: 2009-07-17 11:29:14
+        ..
+      runs
+        run: 123
+        run: 124
+        ...
+      all messages
+
+On the right siode there will be another panel showing messages in a selected
+context. The messages will be sorted in the "Post" order. The messages will be
+separated by th ebackground color like in YUI tables. Here is one way how
+each message will be shown:
+
+  +--------+--------+---------+---------------+-------------+
+  | Posted |  Shift | Message | Tags          | Attachments |
+  | Author |   Run  |         |               |             |
+  +--------+--------+---------+---------------+-------------+
+
+  | <time> | <time> | ...     | <tag>=<value> | <url>       |
+  | <name> | <num>  | ...     | ...           | ...         |
+
+  | <time> | <time> | ...     | <tag>=<value> | <url>       |
+  | <name> | <num>  | ...     | ...           | ...         |
+
+  | <time> | <time> | ...     | <tag>=<value> | <url>       |
+  | <name> | <num>  | ...     | ...           | ...         |
+
+  ...
+
+Repeat the table header every 10 messages.
+
+Another (perhaps - better) possibility would be to use YUI tables.
+
+
+- suggestions on the LogBook implementation made by others (LCLS Data Management
+Meeting July 9, 2009):
+
+1. ask for the user confirmation before closing the shift
+2. allow single-line input for messages must be possible with RETURN
+
+- perhaps implement a better (from the visualisation standpoint) table
+navigation buttons
+
+- finish implementing the "Run Summary" page using Run Summary Parameters from
+BABAR LogBook as an example.
+
+- think about implementing Next-Previous navigation for shifts and runs
+
+- think about the general navigation between Experiment Summary, "Shift Summary" and
+"Run Summary"
+
+
+
+
 

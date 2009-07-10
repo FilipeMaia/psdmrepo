@@ -1,7 +1,7 @@
 <!--
 The Welcome page is shown after the applications startap.
 -->
-<center style="font-family: Times, serif; font-size:18px;">
+<center style="font-size:18px;">
     <br>
     <p style="font-size:24px;"><b>Welcome to the LogBook Web Application!</b></p>
     <br>

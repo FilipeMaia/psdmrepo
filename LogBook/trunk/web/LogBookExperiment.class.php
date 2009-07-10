@@ -65,8 +65,9 @@ class LogBookExperiment {
         $list = array();
 
         $extra_condition = $condition == '' ? '' : 'AND '.$condition;
-        $result = $this->connection->query(
-            'SELECT * FROM "shift" WHERE exper_id='.$this->attr['id'].$extra_condition );
+        $result = $this->connection->query (
+            'SELECT * FROM "shift" WHERE exper_id='.$this->attr['id'].$extra_condition.
+            ' ORDER BY begin_time DESC' );
 
         $nrows = mysql_numrows( $result );
         for( $i=0; $i<$nrows; $i++ ) {
@@ -159,6 +160,9 @@ class LogBookExperiment {
         return $new_shift;
     }
 
+    public function find_shift_by_id ( $id ) {
+        return $this->find_shift_by_( "id={$id}" ) ; }
+
     public function find_shift_by_begin_time ( $begin_time ) {
         return $this->find_shift_by_( "begin_time=".LusiTime::to64from($begin_time)) ; }
 
@@ -173,7 +177,7 @@ class LogBookExperiment {
         $extra_condition = is_null( $condition ) ? '' : ' AND '.$condition;
         $result = $this->connection->query(
             'SELECT * FROM "shift" WHERE exper_id='.
-            $this->attr['id'].$extra_condition );
+            $this->attr['id'].$extra_condition.' ORDER BY begin_time DESC' );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 1 )
@@ -202,7 +206,8 @@ class LogBookExperiment {
 
         $extra_condition = is_null( $condition )? '' : ' AND '.$condition;
         $result = $this->connection->query(
-            'SELECT * FROM "run" WHERE exper_id='.$this->attr['id'].$extra_condition );
+            'SELECT * FROM "run" WHERE exper_id='.$this->attr['id'].$extra_condition.
+            ' ORDER BY begin_time DESC' );
 
         $nrows = mysql_numrows( $result );
         for( $i=0; $i<$nrows; $i++ ) {
@@ -239,7 +244,8 @@ HERE;
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
         $result = $this->connection->query(
             'SELECT * FROM "run" WHERE exper_id='.
-            $this->attr['id'].$extra_condition );
+            $this->attr['id'].$extra_condition.
+            ' ORDER BY begin_time DESC' );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 1 )
@@ -441,7 +447,8 @@ HERE;
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
         $result = $this->connection->query (
             'SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
-            ' AND h.id = e.hdr_id AND e.parent_entry_id is NULL'.$extra_condition );
+            ' AND h.id = e.hdr_id AND e.parent_entry_id is NULL'.$extra_condition.
+            ' ORDER BY e.insert_time DESC' );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {

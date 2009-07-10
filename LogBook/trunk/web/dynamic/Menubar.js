@@ -39,7 +39,7 @@ function menubar_create( element, menubar_data ) {
 
     oMenuBar = new YAHOO.widget.MenuBar (
         element,
-        {   autosubmenudisplay: true,
+        {   //autosubmenudisplay: true,
             hidedelay: 750,
             lazyload: true
         }

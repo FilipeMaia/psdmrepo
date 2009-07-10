@@ -40,6 +40,12 @@ class LogBookShift {
     public function leader() {
         return $this->attr['leader']; }
 
+    public function in_interval ( $time ) {
+        return LusiTime::in_interval (
+            $time,
+            $this->begin_time(),
+            $this->end_time() ); }
+
     /* Close the open-ended shift
      */
     public function close( $end_time ) {
@@ -57,7 +63,7 @@ class LogBookShift {
         if( !$this->begin_time()->less( $end_time ))
             throw new LogBookException(
                 __METHOD__,
-                "begin time isn't less than the requested end time '".$end_time."'" );
+                "begin time '".$this->begin_time()."' isn't less than the requested end time '".$end_time."'" );
 
         /* Make the update
          */
@@ -112,7 +118,7 @@ class LogBookShift {
         $condition = 'begin_time >= '.$this->begin_time()->to64();
         if( !is_null( $this->end_time()))
             $condition .= ' AND begin_time < '.$this->end_time()->to64();
-        return $this->parent()->runs( );
+        return $this->parent()->runs( $condition );
     }
 
     /* =====================

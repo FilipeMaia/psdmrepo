@@ -37,6 +37,12 @@ class LogBookRun {
         if( is_null( $this->attr['end_time'] )) return null;
         return LusiTime::from64( $this->attr['end_time'] ); }
 
+    public function in_interval ( $time ) {
+        return LusiTime::in_interval (
+            $time,
+            $this->begin_time(),
+            $this->end_time() ); }
+
     /*
      * =============================
      *   SUMMARY PARAMETERS VALUES

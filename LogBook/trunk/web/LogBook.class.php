@@ -143,6 +143,8 @@ class LogBook {
 
     public function find_entry_by_id( $id ) {
 
+        // Find an experiment the shift belongs to
+        //
         $result = $this->connection->query (
             "SELECT h.exper_id, e.id FROM header h, entry e".
             " WHERE e.id=".$id.
@@ -161,7 +163,7 @@ class LogBook {
                     "no experiment for id: {$exper_id} in database. Database can be corrupted." );
 
             $entry_id = $attr['id'];
-            return $experiment->find_entry_by_id( $entry_id );
+            $entry = $experiment->find_entry_by_id( $entry_id );
             if( is_null( $entry ))
                 throw new LogBookException(
                     __METHOD__,
@@ -171,5 +173,65 @@ class LogBook {
         }
         return null;
     }
- }
+
+    public function find_shift_by_id( $id ) {
+
+        // Find an experiment the shift belongs to
+        //
+        $result = $this->connection->query (
+            "SELECT exper_id FROM shift WHERE id={$id}" );
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 1 ) {
+
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+
+            $exper_id = $attr['exper_id'];
+            $experiment = $this->find_experiment_by_id( $exper_id );
+            if( is_null( $experiment ))
+                throw new LogBookException(
+                    __METHOD__,
+                    "no experiment for id: {$exper_id} in database. Database can be corrupted." );
+
+            $shift = $experiment->find_shift_by_id( $id );
+            if( is_null( $shift ))
+                throw new LogBookException(
+                    __METHOD__,
+                    "internal error while looking for shift id: {$id}. Database can be corrupted." );
+
+            return $shift;
+        }
+        return null;
+    }
+
+    public function find_run_by_id( $id ) {
+
+        // Find an experiment the run belongs to
+        //
+        $result = $this->connection->query (
+            "SELECT exper_id FROM run WHERE id={$id}" );
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 1 ) {
+
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+
+            $exper_id = $attr['exper_id'];
+            $experiment = $this->find_experiment_by_id( $exper_id );
+            if( is_null( $experiment ))
+                throw new LogBookException(
+                    __METHOD__,
+                    "no experiment for id: {$exper_id} in database. Database can be corrupted." );
+
+            $run = $experiment->find_run_by_id( $id );
+            if( is_null( $run ))
+                throw new LogBookException(
+                    __METHOD__,
+                    "internal error while looking for run id: {$id}. Database can be corrupted." );
+
+            return $run;
+        }
+        return null;
+    }
+}
 ?>
