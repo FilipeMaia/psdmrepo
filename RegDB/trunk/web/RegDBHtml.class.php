@@ -13,9 +13,10 @@ class RegDBHtml {
 
     private $html;
 
-    public function __construct( $x, $y,  $width=480, $height=320, $position='relative' ) {
+    public function __construct( $x, $y,  $width=480, $height=null, $position='relative' ) {
+        $height_str = is_null( $height ) ? 'height:auto;' : "height:{$height}px;";
         $this->html =<<<HERE
-<div style="position:{$position}; left:{$x}px; top:{$y}px; margin-left:0px; width:{$width}px; height:{$height}px;">
+<div style="position:{$position}; left:{$x}px; top:{$y}px; margin-left:0px; width:{$width}px; {$height_str}">
 HERE;
     }
 

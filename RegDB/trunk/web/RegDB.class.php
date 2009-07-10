@@ -81,7 +81,7 @@ class RegDB {
 
         $extra_condition = $condition == '' ? '' : ' WHERE '.$condition;
         $result = $this->connection->query (
-            'SELECT * FROM experiment '.$extra_condition );
+            'SELECT * FROM experiment '.$extra_condition. ' ORDER by begin_time DESC' );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
