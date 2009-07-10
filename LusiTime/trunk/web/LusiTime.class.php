@@ -46,12 +46,13 @@ class LusiTime {
         $tzone_hours = isset( $matches2[11] ) ? $matches2[11] : 0;
         $tzone_minutes = isset( $matches2[12] ) ? $matches2[12] : 0;
         $shift = ($sign=='-' ? +1 : -1)*(3600*$tzone_hours + 60*$tzone_minutes);
-
-        $local_time = strtotime( $str );
+        $local_time_str = "$matches2[1]-$matches2[2]-$matches2[3] $matches2[4]:$matches2[5]:$matches2[6]";
+        $local_time = strtotime( $local_time_str );
         if( !$local_time )
             return null;
 
-        $gmt_time = ($local_time+$shift);
+        //$gmt_time = ($local_time+$shift);
+        $gmt_time = $local_time;
 
         $nsec = isset( $matches2[8] ) ? $matches2[8] : 0;
 
@@ -73,14 +74,14 @@ class LusiTime {
      * of date and time.
      */
     public function __toString() {
-        return gmdate("Y-m-d h:i:s", $this->sec).sprintf(".%09u", $this->nsec)."-0000"; }
+        return date("Y-m-d H:i:s", $this->sec).sprintf(".%09u", $this->nsec).date("O", $this->sec); }
 
     /* Unlike the previous method this one would return a short (no
      * nanoseconds and time-zone) representation (ISO) of a human-readable
      * date and time.
      */
     public function toStringShort() {
-        return gmdate("Y-m-d h:i:s", $this->sec); }
+        return date("Y-m-d H:i:s", $this->sec); }
 
     /* Convert the tuple into a packed representation of a 64-bit
      * number. These numbers are meant to be stored in a database.

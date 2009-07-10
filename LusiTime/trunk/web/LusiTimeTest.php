@@ -14,9 +14,20 @@ echo <<<HERE
         <div style="margin-left:24px; margin-top:0px;">
 HERE;
 
-$now = LusiTime::now();
 echo <<<HERE
-<br>LusiTime::now(): {$now}
+<p style="width:32em;"><b>Get and print the current time and then translate it back
+to see if the bi-directional translation works correctly:</b></p>
+HERE;
+
+$now = LusiTime::now();
+$now_from_64 = LusiTime::from64( $now->to64());
+$now_str = $now->__toString();
+$now_parsed_from_str = LusiTime::parse( $now_str );
+echo <<<HERE
+LusiTime::now(): {$now_str}<br>
+translated into 64-bit: {$now->to64()}<br>
+from 64-bit back into string: {$now_from_64}<br>
+LusiTime::parse{{$now_str}}: {$now_parsed_from_str}<br>
 HERE;
 
 $t64 = "1242812928000000000";
