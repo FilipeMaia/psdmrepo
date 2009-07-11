@@ -48,25 +48,33 @@ Repeat the table header every 10 messages.
 
 Another (perhaps - better) possibility would be to use YUI tables.
 
-
-- suggestions on the LogBook implementation made by others (LCLS Data Management
-Meeting July 9, 2009):
-
-1. ask for the user confirmation before closing the shift
-2. allow single-line input for messages must be possible with RETURN
-
 - perhaps implement a better (from the visualisation standpoint) table
 navigation buttons
 
-- finish implementing the "Run Summary" page using Run Summary Parameters from
-BABAR LogBook as an example.
+- implement a support for Browser's history buttons (PREV/NEXT)
 
-- think about implementing Next-Previous navigation for shifts and runs
+- consider extending the schema to allow storying user name along with user's
+account name. This will be needed for the "shared accounts" security model of
+LCLS experiments.
 
-- think about the general navigation between Experiment Summary, "Shift Summary" and
-"Run Summary"
+- (IMPORTANT FEATURE?) implement "double" buffering-like behavior when navigating
+between (Prev/Next) runs and shifts. The feature must be especially usefull for
+runs because it would allow comparing values of run parameters.
 
+- (HIGH PRIORITY) implement opening a new shift. Add the corresponding option into
+the top-level menu bar. Also add a button on the experiment's Summary page.
 
+- (LOW PRIORITY?) put something into the Help menus. Expand the menu
+
+- (INTERESTING IDEA) Consider adding the 'Live Mode' to the Operator Messages
+Display (that separate window show when clicking onto a message entry). In that
+mode the display would automatically show all new messages. That would be really
+cool feature which isn't in any E-Log!!!
+
+- (INTERESTING IDEA) Also in that 'Live Mode' show how many seconds/minutes/hours/days
+ago was the last posting. That would also give an operator some sense of timing.
+BTW, the very same feature can be easily implemented in all message tables. Of course
+this only make sense if tables are updated by a timer.
 
 
 

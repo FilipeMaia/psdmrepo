@@ -55,13 +55,13 @@ and open the template in the editor.
         margin:0px;
     }
     #application_title {
+        margin-left:5px;
         font-family: "Times", serif;
         font-size:32px;
     }
-    #current_selection {
+    #application_subtitle {
         color:#0071bc;
     }
-
     #menubar {
         margin: 0 0 10px 0;
     }
@@ -91,16 +91,17 @@ and open the template in the editor.
         */
         overflow:auto;
     }
-    #experiment_info,
-    #instrument_info,
-    #runs_info,
-    #shifts_info {
-        margin-top:0px;
-        margin-left:4px;
+    #experiment_info_container,
+    #runs_table,
+    #run_parameters,
+    #messages_actions_container {
+        padding:10px;
     }
     #workarea_table_container          table,
     #params_table_container            table,
+    /*
     #runs_table_container              table,
+    */
     #shifts_table_container            table,
     #messages_table_container          table,
     #tags_table_container              table,
@@ -128,8 +129,10 @@ and open the template in the editor.
     #workarea_table_container .yui-dt-loading,
     #params_table_container,
     #params_table_container .yui-dt-loading,
+    /*
     #runs_table_container,
     #runs_table_container .yui-dt-loading,
+    */
     #shifts_table_container,
     #shifts_table_container .yui-dt-loading,
     #messages_table_container,
@@ -152,9 +155,6 @@ and open the template in the editor.
         margin-top:18px;
         margin-left:0px;
         text-align:left;
-    }
-    #messages_actions_container {
-        /*padding-top:10px;*/
     }
     .lb_label {
         text-align:left;
@@ -241,7 +241,7 @@ function set_current_selection( instr_id, instr_name, exper_id, exper_name ) {
             id: null
         }
     };
-    document.getElementById( "current_selection" ).innerHTML =
+    document.getElementById( "application_subtitle" ).innerHTML =
         instr_name+' / '+exper_name;
 
     menubar_enable( menubar_group_shifts );
@@ -593,10 +593,13 @@ function display_experiment() {
         '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
         '  <center><b>Summary</b></center>'+
         '</div>'+
-        '<div id="experiment_info" style="height:160px;">Loading...</div>'+
+        '<div id="experiment_info_container" style="height:160px;">Loading...</div>'+
+        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
+        '  <center><b>Operator and Control System Messages</b></center>'+
+        '</div>'+
         '<div id="messages_actions_container"></div>';
 
-    load( 'DisplayExperiment.php?id='+current_selection.experiment.id, 'experiment_info' );
+    load( 'DisplayExperiment.php?id='+current_selection.experiment.id, 'experiment_info_container' );
 
     YAHOO.util.Event.onContentReady (
         "detail_button",
@@ -639,9 +642,6 @@ function display_experiment() {
 function create_messages_dialog( scope ) {
 
     var html =
-        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
-        '  <center><b>Operator and Control System Messages</b></center>'+
-        '</div>'+
         '<form enctype="multipart/form-data" name="new_message_form" action="NewFFEntry.php" method="post">'+
         '  <input type="hidden" name="author_account" value="<?php  echo $_SERVER['WEBAUTH_USER'] ?>" style="padding:2px; width:200px;" />'+
         '  <input type="hidden" name="id" value="'+current_selection.experiment.id+'" />'+
@@ -1017,20 +1017,23 @@ function display_shift() {
         '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
         '  <center><b>Summary</b></center>'+
         '</div>'+
-        '<div id="experiment_info" style="height:100px;">Loading...</div>'+
+        '<div id="experiment_info_container" style="height:100px;">Loading...</div>'+
         '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
         '  <center><b>Runs</b></center>'+
         '</div>'+
         '<div id="runs_table"></div>'+
         '<br>'+
         '<br>'+
+        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
+        '  <center><b>Operator and Control System Messages</b></center>'+
+        '</div>'+
         '<div id="messages_actions_container"></div>'+
         '<form  name="close_shift_form" action="CloseShift.php" method="post">'+
         '  <input type="hidden" name="id" value="'+current_selection.shift.id+'" />'+
         '  <input type="hidden" name="actionSuccess" value="select_experiment_and_shift" />'+
         '</form>';
 
-    load( 'DisplayShift.php?id='+current_selection.shift.id, 'experiment_info' );
+    load( 'DisplayShift.php?id='+current_selection.shift.id, 'experiment_info_container' );
 
     var runs = create_runs_table (
         'RequestRuns.php?shift_id='+current_selection.shift.id,
@@ -1043,7 +1046,15 @@ function display_shift() {
             close_shift_button.on (
                 "click",
                 function( p_oEvent ) {
-                    document.forms.close_shift_form.submit();
+                    ask_yesno_confirmation (
+                        "popupdialogs",
+                        'Proceed with the operation and permanently close this shift '+
+                        'as of this time? Enter <b>Yes</b> to do so. '+
+                        'Note, this is the last chance to abort making modifications '+
+                        'in the database!',
+                        function() { document.close_shift_form.submit(); },
+                        function() { display_shift(); }
+                    );
                 }
             );
         }
@@ -1097,17 +1108,18 @@ function display_run() {
         '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
         '  <center><b>Summary</b></center>'+
         '</div>'+
-        '<div id="experiment_info" style="height:100px;">Loading...</div>'+
+        '<div id="experiment_info_container" style="height:60px;">Loading...</div>'+
         '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
         '  <center><b>Run Parameters</b></center>'+
         '</div>'+
-        '<br>'+
-        '<div id="run_parameters" style="height:100px;">Loading...</div>'+
-        '<br>'+
-        '<br>'+
+        '<div id="run_parameters" style="height:370px;">Loading...</div>'+
+        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
+        '  <center><b>Operator and Control System Messages</b></center>'+
+        '</div>'+
         '<div id="messages_actions_container"></div>';
 
-    load( 'DisplayRun.php?id='+current_selection.run.id, 'experiment_info' );
+    load( 'DisplayRun.php?id='+current_selection.run.id, 'experiment_info_container' );
+    load( 'DisplayRunParams.php?id='+current_selection.run.id, 'run_parameters' );
 
     var messages_dialog = create_messages_dialog( 'run' );
 }
@@ -1143,7 +1155,7 @@ function search_contents() {
     <div id="application_header">
       <p id="application_title" style="text-align:left;">
         <em>Electronic LogBook of Experiment: </em>
-        <em id="current_selection" style="font-size:24px;"><a href="javascript:list_experiments()">select &gt;</a></em>
+        <em id="application_subtitle" style="font-size:24px;"><a href="javascript:list_experiments()">select &gt;</a></em>
       </p>
       <p style="text-align:right;">Logged as: <b><?php echo $_SERVER['WEBAUTH_USER']?></b><p>
     </div>
