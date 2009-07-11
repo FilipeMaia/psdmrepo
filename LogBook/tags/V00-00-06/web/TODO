@@ -1,0 +1,80 @@
+- think about how to implement the "search_entry(parameters...)" operations
+in a way which would be not depending on using MySQL SQL directly in
+parameters of the method. Think about setting limits on parameters, for
+example.
+
+- design the "Search Form".
+
+- implement the "Browse" page as two panels. There will be a tree
+on the left side to show a hierarchy of things like instruments, experiments,
+shifts, runs:
+
+  AMOS
+    Chapman1
+      shifts
+        begin: 2009-07-17 10:22:01
+          run: 123
+          run: 124
+        begin: 2009-07-17 11:29:14
+        ..
+      runs
+        run: 123
+        run: 124
+        ...
+      all messages
+
+On the right siode there will be another panel showing messages in a selected
+context. The messages will be sorted in the "Post" order. The messages will be
+separated by th ebackground color like in YUI tables. Here is one way how
+each message will be shown:
+
+  +--------+--------+---------+---------------+-------------+
+  | Posted |  Shift | Message | Tags          | Attachments |
+  | Author |   Run  |         |               |             |
+  +--------+--------+---------+---------------+-------------+
+
+  | <time> | <time> | ...     | <tag>=<value> | <url>       |
+  | <name> | <num>  | ...     | ...           | ...         |
+
+  | <time> | <time> | ...     | <tag>=<value> | <url>       |
+  | <name> | <num>  | ...     | ...           | ...         |
+
+  | <time> | <time> | ...     | <tag>=<value> | <url>       |
+  | <name> | <num>  | ...     | ...           | ...         |
+
+  ...
+
+Repeat the table header every 10 messages.
+
+Another (perhaps - better) possibility would be to use YUI tables.
+
+- perhaps implement a better (from the visualisation standpoint) table
+navigation buttons
+
+- implement a support for Browser's history buttons (PREV/NEXT)
+
+- consider extending the schema to allow storying user name along with user's
+account name. This will be needed for the "shared accounts" security model of
+LCLS experiments.
+
+- (IMPORTANT FEATURE?) implement "double" buffering-like behavior when navigating
+between (Prev/Next) runs and shifts. The feature must be especially usefull for
+runs because it would allow comparing values of run parameters.
+
+- (HIGH PRIORITY) implement opening a new shift. Add the corresponding option into
+the top-level menu bar. Also add a button on the experiment's Summary page.
+
+- (LOW PRIORITY?) put something into the Help menus. Expand the menu
+
+- (INTERESTING IDEA) Consider adding the 'Live Mode' to the Operator Messages
+Display (that separate window show when clicking onto a message entry). In that
+mode the display would automatically show all new messages. That would be really
+cool feature which isn't in any E-Log!!!
+
+- (INTERESTING IDEA) Also in that 'Live Mode' show how many seconds/minutes/hours/days
+ago was the last posting. That would also give an operator some sense of timing.
+BTW, the very same feature can be easily implemented in all message tables. Of course
+this only make sense if tables are updated by a timer.
+
+
+
