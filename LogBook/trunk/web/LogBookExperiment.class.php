@@ -172,6 +172,20 @@ class LogBookExperiment {
     public function find_last_shift () {
         return $this->find_shift_by_( 'begin_time=(SELECT MAX(begin_time) FROM "shift")' ) ; }
 
+
+    public function find_prev_shift_for( $shift ) {
+        $sql = <<<HERE
+begin_time=(SELECT MAX(begin_time) FROM "shift" WHERE exper_id={$this->id()} AND begin_time<{$shift->begin_time()->to64()} AND id!={$shift->id()})
+HERE;
+        return $this->find_shift_by_( $sql );
+    }
+    public function find_next_shift_for( $shift ) {
+        $sql = <<<HERE
+begin_time=(SELECT MIN(begin_time) FROM "shift" WHERE exper_id={$this->id()} AND begin_time>{$shift->begin_time()->to64()} AND id!={$shift->id()})
+HERE;
+        return $this->find_shift_by_( $sql );
+    }
+
     private function find_shift_by_ ( $condition=null ) {
 
         $extra_condition = is_null( $condition ) ? '' : ' AND '.$condition;
@@ -232,9 +246,15 @@ class LogBookExperiment {
             'id=(SELECT MAX(id) FROM "run" WHERE exper_id='.
             $this->attr['id'].')' ); }
 
-    public function find_next_run_for( $prev_run ) {
+    public function find_prev_run_for( $run ) {
         $sql = <<<HERE
-begin_time=(SELECT MIN(begin_time) FROM "run" WHERE exper_id={$this->id()} AND begin_time>{$prev_run->begin_time()->to64()} AND id!={$prev_run->id()})
+begin_time=(SELECT MAX(begin_time) FROM "run" WHERE exper_id={$this->id()} AND begin_time<{$run->begin_time()->to64()} AND id!={$run->id()})
+HERE;
+        return $this->find_run_by_( $sql );
+    }
+    public function find_next_run_for( $run ) {
+        $sql = <<<HERE
+begin_time=(SELECT MIN(begin_time) FROM "run" WHERE exper_id={$this->id()} AND begin_time>{$run->begin_time()->to64()} AND id!={$run->id()})
 HERE;
         return $this->find_run_by_( $sql );
     }

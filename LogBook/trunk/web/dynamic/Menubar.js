@@ -166,8 +166,10 @@ function menubar_create( element, menubar_data ) {
 }
 
 function menubar_disable( idx ) {
-    oMenuBar.getItem(idx).cfg.setProperty("disabled", true );
+    if( oMenuBar != null )
+        oMenuBar.getItem(idx).cfg.setProperty("disabled", true );
 }
 function menubar_enable( idx ) {
-    oMenuBar.getItem(idx).cfg.setProperty("disabled", false );
+    if( oMenuBar != null )
+        oMenuBar.getItem(idx).cfg.setProperty("disabled", false );
 }

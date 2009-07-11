@@ -42,10 +42,15 @@ if( isset( $_GET['scope'] )) {
 function entry2json( $e ) {
 
     $posted_url =
+        $e->insert_time()->toStringShort()." <a href=\"javascript:select_entry(".$e->id().")\">".
+        '&gt;&gt;</a> ';
+//        '<img src="images/expand.gif" width="10px;" height="15px;" style="color:blue; padding-left:10px;"></a>';
+/*
+    $posted_url =
         "<a href=\"javascript:select_entry(".$e->id().")\">".
         $e->insert_time()->toStringShort().
         '</a>';
-
+*/
     $tags_url = '';
     $tags = $e->tags();
     foreach( $tags as $t )
@@ -53,9 +58,9 @@ function entry2json( $e ) {
 
     $attachments_url = '';
     $attachments = $e->attachments();
-    foreach( $attachments as $a )
+    foreach( $attachments as $a ) {
         $attachments_url .= '<img src="images/attachment.png" title="'.$a->description().'"/>&nbsp;';
-
+    }
     return json_encode(
         array (
             "posted" => $posted_url,
