@@ -1,0 +1,723 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script Controller.
+#
+#------------------------------------------------------------------------
+
+"""Interface Controller for Photon Science Data Management.
+
+This is the Interface Controller that monitors filesets created by the online system.
+It creates a translator process to translate the fileset into HDF5 and enters the 
+translated file into iRODS. rt
+
+This software was developed for the LUSI project.  If you use all or
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id: template!python-main! 8 2008-10-08 22:35:33Z salnikov $
+
+@author Robert C. Sass
+"""
+
+
+#------------------------------
+#  Module's version from SVN --
+#------------------------------
+__version__ = "$Revision: 1 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys, os, pwd, socket, subprocess
+import logging, time, resource
+import MySQLdb
+from logging.handlers import SMTPHandler
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+from LusiTime.Time import Time
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+#from PkgPackage.PkgModule import PkgClass
+
+#---------------------
+# Local definitions --
+#---------------------
+
+# local variable accessible in this module only
+#_OP_X = 'Y'
+
+#-------------------
+# Local functions --
+#-------------------
+
+def _default_user():
+    """Return the effective user name"""
+
+    return pwd.getpwuid(os.geteuid())[0]
+
+def _default_host():
+    """Return the default host on which the MySQL server is run"""
+
+    return "bbt-odf101.slac.stanford.edu"
+
+def _default_port():
+    """Return the default port on which the MySQL server would respond"""
+
+    return "3306"
+
+def _default_database():
+    """Return the default database"""
+
+    return "interface_db"
+
+def _time2str(timestamp):
+    """Turn a number 64-bit timestamp got from the database into
+    a string. Return an empty string if the input object is None"""
+
+    if timestamp is None: return ''
+    return "%s" % Time.from64(timestamp)
+
+#--------------------------
+# Specialized exceptions --
+#--------------------------
+
+class DatabaseOperatonFailed(Exception):
+    def __init__ (self, message):
+        self.__message = message
+
+    def __str__ (self):
+        logging.critical(self.__message)
+        return repr(self.__message)
+
+#--------------------------------
+# Application class definition --
+#--------------------------------
+
+class Controller ( LusiPyApp ) :
+
+    # ===============================================
+    # An indirection for handling the standard output
+    # ===============================================
+
+    __out = sys.stdout
+
+    def print_out (self, *params):
+        for p in params:
+            self.__out.write(p)
+        self.__out.write("\n")
+
+
+    # =======================================================================
+    # Database connection parameters and connection handle. They would change
+    # their default state at the first attempt to connect to the database.
+    # =======================================================================
+
+    __host       = _default_host()
+    __port       = _default_port()
+    __user       = _default_user()
+    __password   = ""
+    __database   = _default_database()
+    __connection = None
+
+    # ===========
+    # constructor
+    # ===========
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ (
+            self,
+            installLogger = True,
+            usage = "usage: %prog [<command>] [<parameters>] [<options>]" )
+
+        # Add application options, see optparse module for details -------------
+        #
+        self._parser.add_option ( '-D', "--database",
+								  action="store", dest="database", default=None,
+				      			  help="override default database name (%s)" % _default_database())
+
+        self._parser.add_option ( '-H', "--host",
+								  action="store", dest="host", default=None,
+				      			  help="override default host name (%s)" % _default_host())
+
+        self._parser.add_option ( '-P', "--port",
+								  action="store", dest="port", default=None,
+				      			  help="override default port number (%s)" % _default_port())
+
+        self._parser.add_option ( '-U', "--user",
+								  action="store", dest="user", default=None,
+								  help="override default user name (%s)" % _default_user())
+
+        self._parser.add_option ( '-p', "--password",
+								  action="store", dest="password", default=None,
+							      help="specify MySQL password (no password by default)" )
+
+        self._parser.add_option ( '-o', "--output",
+                                  action="store", dest="output", default=None,
+                                  help="send output to file instead of STDOUT" )
+
+        # 
+        # Set up critical logging handler
+        LOG_FORMAT='%(asctime)s %(levelname)s %(message)s'
+        TO_LIST=['bsassy@garlic.com']
+        FROM='rcs@slac.stanford.edu'
+        SUBJECT='Critical event'
+        SMTP_SERVER='localhost'
+        # 
+        # smtp handler, only logs on CRITICAL level messages
+        smtp_handler = logging.handlers.SMTPHandler(SMTP_SERVER, FROM, TO_LIST, SUBJECT)
+        smtp_handler.setLevel(logging.CRITICAL)
+        smtp_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+        logging.getLogger().addHandler(smtp_handler)
+        print "Finished my init"
+
+
+    # ==========================================
+    # Run the controller after installing logger. 
+    # See LusiPyApp class for details.
+    # ==========================================
+
+    def _run ( self ) :
+
+        # Open optional output file -----------------------------------------------------
+        #
+        if self._options.output:
+            self.debug( "Open alternative output file" )
+            self.__out = open ( self._options.output, "w" )
+ 
+        # Connect to the database
+        #
+        self.__connect()
+
+        # Init controller and get status codes we'll need
+        #
+        init_info = self.__init_controller()
+        xwait_id  = self.__fstat_id("Waiting_Translation")
+        xlate_id  = self.__fstat_id("Being_Translated")
+        xdone_id  = self.__fstat_id("Translation_Complete")
+        xfail_id  = self.__fstat_id("Translation_Error")
+        irgud_id  = self.__fstat_id("Entered_into_iRODS")
+        irbad_id  = self.__fstat_id("iRODS_Error")
+        xcomp_id  = self.__fstat_id("Complete")
+
+        while True:
+            try:
+                fs_id = self.__get_fileset_with_status(xwait_id)
+                if fs_id:
+                    self.trace("Found fileset id %s Waiting_Translation" % fs_id)
+                    fs_dbinfo = self.__get_fs_dbinfo(fs_id)
+                    ofname = self.__build_output_fname(fs_dbinfo)
+                    cmd = self.__build_translate_cmd(fs_id, ofname, init_info, fs_dbinfo)
+                    print "Starting translator with cmd %s" % cmd             
+                    self.__change_fileset_status (fs_id, xlate_id)
+                    proc = subprocess.Popen(cmd)
+                    translator_id = self.__insert_translator_process(init_info['controller_id'], fs_id)
+                    done = False
+                    while not done:
+                        proc.poll()
+                        if proc.returncode == None:
+                            time.sleep(1.0)
+                        else:
+                            self.__update_translator_process (translator_id, proc.returncode)
+                            if (proc.returncode != 0):
+                                self.__change_fileset_status (fs_id, xfail_id)
+                                done = True
+                            else:                                
+                                self.__change_fileset_status (fs_id, xdone_id)
+                                cmd = self.__build_irods_cmd (fs_id, init_info['translate_uri'], ofname)
+                                print "irods insert cmd %s" % cmd
+                                returncode = subprocess.call(cmd)
+                                print "irods put with return code  %s" % returncode
+                                if returncode != 0:
+                                    self.__change_fileset_status (fs_id, irbad_id)
+                                else:
+                                    self.__change_fileset_status (fs_id, irgud_id)
+                                    os.remove(os.path.join(init_info['translate_uri'],ofname))
+                                    self.__change_fileset_status (fs_id, xcomp_id)
+                                done = True
+                else:
+                    time.sleep(0.5)
+
+            except KeyboardInterrupt:
+                print "Got keyboard interrupt. Exiting."
+                self.__exit_controller(init_info['controller_id'])
+
+        # End while True
+
+        return 
+
+
+    # ========================
+    # Init Controller instance
+    # ========================
+
+    def __init_controller ( self ) :
+
+       """Perform multiple operations to initialize the controller:
+       1) Find our translator output uri in the translator_nodes table.
+       2) Insert an entry in the interface_controller table.
+       3) Return the translate_uri from the translator node table and 
+          the id of the inserted interface_controller row as a dict"""
+
+       host = socket.getfqdn(socket.gethostname())
+       print "In init_controller this host is %s" % host
+
+       rows = self.__select_query(
+           "SELECT id, translate_uri FROM translator_node WHERE node_uri = '%s'" % host,
+           return_dict=True)
+       if not rows or len(rows) != 1:
+           raise DatabaseOperatonFailed, "Failed to find node %s in translator_node table." % host 
+
+       translate_uri = rows[0]['translate_uri']
+       xlatenode_id = rows[0]['id']
+       proc_id= os.getpid()
+       start  = _time2str(Time.now().to64())[0:19]
+       print "Controller start time = %s" % start
+
+       if not self.__simple_query(
+           "SET SESSION SQL_MODE='ANSI'",
+           "START TRANSACTION",
+           "INSERT INTO interface_controller VALUES(NULL,%s,%s, '%s', NULL, False)" % (
+               xlatenode_id,
+               proc_id,
+               start),
+           "SET @controller_id = LAST_INSERT_ID()", 
+           "COMMIT"): 
+           raise DatabaseOperatonFailed, "Failed to insert interface_controller row"
+
+       rows = self.__select_query_1("SELECT @controller_id")
+
+       if not rows:
+           raise DatabaseOperatonFailed, "Failed to retrieve LAST_INSERT_ID of interface_controler"
+
+       controller_id = rows[0]
+              
+       return {'translate_uri':translate_uri, 'controller_id':controller_id}
+
+
+    # ====================================
+    # Get fileset with requested status id
+    # ====================================
+
+    def __get_fileset_with_status ( self, stat_id ) :
+
+        """return a fileset id with the specified status or 0 if
+        no fileset exists with that status"""
+        
+        if not self.__simple_query("""SET @new_fileset = NULL;
+            CALL get_fileset_with_status ('%s',@new_fileset);""" % (stat_id)): return 0
+        fsrow = self.__select_query_1('SELECT @new_fileset')
+        if not fsrow: return None
+        return fsrow[0]
+
+
+
+    # =======================================================
+    # Return a database dictionary of info about this fileset
+    # =======================================================
+
+    def __get_fs_dbinfo ( self, fileset_id ) :
+
+        """Return a database dictionary of information about this fileset"""
+
+        rows = self.__select_query(
+            "SELECT experiment, instrument, run_type, run_number FROM fileset WHERE id = %s" % 
+            fileset_id,return_dict=True)
+
+        if not rows:
+            raise DatabaseOperatonFailed, "Failed to select info from fileset get_fs_dbinfo"
+
+        return rows
+
+    # ====================================
+    # Build output filename for translator
+    # ====================================
+
+    def __build_output_fname ( self, fsdbinfo ) :
+
+        """Build the output filename for the translator"""
+        
+        # Now construct the output file name
+        file_list = []
+        file_list.append(fsdbinfo[0]['experiment'])
+        file_list.append('_')
+        file_list.append(fsdbinfo[0]['instrument'])
+        file_list.append('_')
+        file_list.append(fsdbinfo[0]['run_type'])
+        file_list.append('_')
+        run = "%06d" % fsdbinfo[0]['run_number']     
+        file_list.append(run)
+        file_list.append('_')
+        curtime = _time2str(Time.now().to64())
+        file_list.append(curtime[0:10])
+        file_list.append('_')
+        file_list.append(curtime[11:19])
+        file_list.append('.hdf5')
+
+        return (''.join(file_list))
+
+    # ========================================================
+    # Change the status of a fileset and all files it contains
+    # ========================================================
+
+    def __change_fileset_status ( self, fileset_id, status_id ) :
+
+        """ Use the stored procedure change_fileset_status to change
+        the fileset to the requested status"""
+
+        if not self.__simple_query(
+            """SET @fileset = NULL;
+            CALL change_fileset_status ('%s','%s', @fileset);""" % (
+            fileset_id, status_id)): 
+            raise DatabaseOperatonFailed, "Failed to change fileset status"
+            
+        row = self.__select_query_1('SELECT @fileset')
+        if not row:
+            raise DatabaseOperatonFailed, "Bad status return from change_fileset_status"
+
+        return
+
+
+    # =============================================================
+    # Build a list that has the command to execute the translator
+    # =============================================================
+
+    def __build_translate_cmd ( self, fileset_id, out_fname, init_dict, fs_dbdict ) :
+
+        """Build the arg list to pass to the translator from the files in fileset
+        and the translate_uri destination for the transalator output"""
+
+        cmd_list = []
+        cmd_list.append("o2o-translate")
+
+        rows = self.__select_query(
+            "SELECT name FROM files WHERE fk_fileset_id = %s" % fileset_id, 
+            return_dict = True)
+
+        if not rows:
+            raise DatabaseOperatonFailed, "No files in fileset build_translate_cmd"
+
+        for r in rows:
+            cmd_list.append("-f")
+            cmd_list.append(r['name'])
+
+        #
+        # Destination dir for translated file
+        cmd_list.append("-d")
+        cmd_list.append(init_dict['translate_uri'])
+
+        #
+        # experiment, run number, filename
+        cmd_list.append("-x")
+        cmd_list.append(fs_dbdict[0]['experiment'])
+        cmd_list.append("-n")
+        cmd_list.append(out_fname)
+        
+        return cmd_list
+
+
+    # =====================================
+    # Insert row for new translator process
+    # =====================================
+
+    def __insert_translator_process ( self, ctlr_id,  fs_id) :
+
+        """Add a row for this translator process. Update statistics after run is complete.
+        Return the id of the new row for later update"""
+
+        if not self.__simple_query(
+            "START TRANSACTION",
+            """INSERT INTO translator_process (id, fk_interface_controller, fk_fileset, started)
+            VALUES(NULL,%s, %s, '%s')""" % (
+            ctlr_id,
+            fs_id,
+            _time2str(Time.now().to64())[0:19]),
+            "SET @translator_id = LAST_INSERT_ID()",
+            "COMMIT"): 
+            raise DatabaseOperatonFailed, "Failed to insert translator_process row"
+
+        rows = self.__select_query_1("SELECT @translator_id")
+
+        if not rows:
+            raise DatabaseOperatonFailed, "Failed to retrieve LAST_INSERT_ID"
+
+        return rows[0]
+
+    # ======================================
+    # Update row info for translator process
+    # ======================================
+
+    def __update_translator_process ( self, translator_id, proc_code) :
+
+        """Update the row for this translator process. Update run statistics and process return
+        code. We store all of the resource usage even though some are 0 for a given OS."""
+
+        usage = resource.getrusage(resource.RUSAGE_CHILDREN)
+        if not self.__simple_query(
+           "START TRANSACTION",
+           """UPDATE translator_process SET stopped = '%s',    status_code = %s, 
+           ru_utime = %s,  ru_stime = %s,    ru_maxrss = %s,   ru_ixrss = %s,
+           ru_idrss = %s,  ru_isrss = %s,    ru_minflt = %s,   ru_majflt = %s,
+           ru_nswap = %s,  ru_inblock = %s,  ru_outblock = %s, ru_msgsnd = %s,
+           ru_msgrcv = %s, ru_nsignals = %s, ru_nvcsw = %s,    ru_nivcsw = %s
+           WHERE id = %s """ % (
+           _time2str(Time.now().to64())[0:19], 
+           proc_code,
+           usage[0],usage[1],usage[2], usage[3], usage[4], usage[5], usage[6], usage[7],
+           usage[8],usage[9],usage[10],usage[11],usage[12],usage[13],usage[14],usage[15],
+           translator_id),
+           "COMMIT"):
+           raise DatabaseOperatonFailed, "Failed to insert translator_process row"
+
+        return
+
+
+    # ============================================================
+    # Build a list that has the command to put the file into iRODS
+    # ============================================================
+
+    def __build_irods_cmd ( self, fileset_id, translate_uri, ifname ) :
+
+        """Build the arg list to pass to the translator from the files in fileset
+        and the translate_uri destination for the transalator output"""
+
+        cmd_list = []
+        cmd_list.append("iput")
+
+        ipath = []
+        ipath.append(translate_uri)
+        ipath.append("/")
+        ipath.append(ifname)
+        cmd_list.append(''.join(ipath))
+
+
+        # Construct the output path experiment, instrument, run number and type from
+        # the fileset plus the current date/time
+        rows = self.__select_query(
+            "SELECT experiment, instrument, run_number FROM fileset WHERE id = %s" % 
+            fileset_id,
+            return_dict=True)
+
+        if not rows:
+            raise DatabaseOperatonFailed, "Failed to select info from fileset build_irods_cmd"
+        
+        # Now construct the output iRODS file path
+        opath = []
+        opath.append("/lusi-zone/home/rcs/test/")
+        opath.append(rows[0]['instrument'])
+        opath.append('/')
+        opath.append(rows[0]['experiment'])
+        opath.append('/')
+        opath.append("%06d" % rows[0]['run_number'])
+        opath.append("/")
+        opath.append(ifname)
+        cmd_list.append(''.join(opath))
+
+        return cmd_list     
+
+    # ===================
+    # Exit the Controller
+    # ===================
+
+    def __exit_controller ( self, controller_id ) :
+
+        """Update the stop time for the controller and exit"""
+
+        endtime = _time2str(Time.now().to64())[0:19]
+        print "Controller end time = %s" % endtime
+        if not self.__simple_query(
+           "START TRANSACTION",
+           """UPDATE interface_controller SET stopped = '%s' WHERE id = %s """ % (
+           endtime,
+           controller_id),
+           "COMMIT"):
+           raise DatabaseOperatonFailed, "Failed to insert translator_process row"
+        sys.exit()
+        return
+
+
+    # ====================================
+    # Report current connection parameters
+    # ====================================
+
+    def __conn_params(self):
+        using_password = "NO"
+        if self.__password != "": using_password = "YES"
+        return "'%s'@'%s':%s (using password: %s)" % (
+            self.__user,
+            self.__host,
+            self.__port,
+            using_password)
+
+    # =====================
+    # Connect to the server
+    # ====================
+
+    def __connect(self):
+
+        """Connect to the database if the connection has not been established
+        yet. In case of success initialize a connection handle and
+        return True. Return False otherwise."""
+
+        if self.__connection is not None: return True
+
+        # Make ajustments to the connection parameters if requested ------------
+        # in the command options.
+        #
+        self.info("Default connection parameters for MySQL: %s" % self.__conn_params())
+ 
+        if self._options.host and self.__host != self._options.host:
+             self.__host = self._options.host
+
+        if self._options.port and port != self._options.port:
+            port = self._options.port
+
+        if self._options.user and self.__user != self._options.user:
+            self.__user = self._options.user
+
+        if self._options.password and self.__password != self._options.password:
+            self.__password = self._options.password
+
+        if self._options.database and self.__database != self._options.database:
+            self.__database = self._options.database
+
+        self.info("Requested connection parameters for MySQL: %s" % self.__conn_params())
+
+        # Try to connect -------------------------------------------------------
+        #
+        self.info("Connecting to MySQL: %s" % self.__conn_params())
+        try:
+            self.__connection = MySQLdb.connect(
+                host=self.__host,
+                port=int(self.__port),
+                user=self.__user,
+                passwd=self.__password,
+                db=self.__database)
+        except MySQLdb.Error, ex:
+            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+            sys.exit(1)
+
+    # ========================================================
+    # Execute a simple query which doesn't return a result set
+    # ========================================================
+
+    def __simple_query(self, *queries):
+
+        """Execute a list of simple queries which do not require any parsing
+        of results. Queries will be executed one by one till all is done or
+        till the very first failure. In the later case the rest of the list
+        won't be executed.
+
+        The method will return True if all query succeeded, and False otherwise."""
+      
+        result = False
+        cursor = self.__connection.cursor()
+
+        for query in queries:
+            self.info( "SQL: %s" % query)
+            try:
+                cursor.execute(query)
+                result = True
+            except MySQLdb.Error, ex:
+                self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+
+        cursor.close()
+        return result
+
+    # ============================================================
+    # Execute a single SELECT type query and return its result set
+    # ============================================================
+
+    def __select_query(self, query, return_dict=False):
+
+        """Execute a single SELECT type query and return a sequence of sequences
+        (or dictionaries, depending on the optional flag). If no results are found
+        then an empty sequence is retunred.
+
+        The method will return None if the query fails."""
+
+        rows = None
+        cursor = None
+        if return_dict: cursor = self.__connection.cursor(MySQLdb.cursors.SSDictCursor)
+        else:           cursor = self.__connection.cursor()
+
+        self.info( "SQL: %s" % query)
+        try:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+        except MySQLdb.Error, ex:
+            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+
+        cursor.close()
+        return rows
+
+    # ======================================================
+    # Execute a single SELECT type query on a single collumn
+    # ======================================================
+
+    def __select_query_1(self, query):
+
+        """Execute a single SELECT type query on a single column and
+        return a sequence of values found in all rows for that collumn.
+        If no results are found then an empty sequence is returned.
+
+        The method will return None if the query fails."""
+
+        result = None
+        cursor = self.__connection.cursor()
+
+        self.info( "SQL: %s" % query)
+        try:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            result = [r[0] for r in rows]
+        except MySQLdb.Error, ex:
+            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+
+        cursor.close()
+        return result
+
+
+    # ==============================================
+    # Get the internal identifier of a fileset status
+    # ==============================================
+
+    def __fstat_id (self, in_name):
+
+        rows = self.__select_query_1(
+            """(SELECT id FROM fileset_status_def WHERE name='%s')""" % (in_name))
+        if rows:
+            return rows[0]
+        else:
+            raise DatabaseOperatonFailed, "failed to obtain fileset status id for: %s" % (in_name)
+
+    # ===================================================================
+    # Expect a query which counts a number of rows, and return the number
+    # ===================================================================
+
+    def _count (self, sql, colname="COUNT(*)"):
+
+        rows = self.__select_query(sql,return_dict=True)
+        for r in rows:
+            return r[colname]
+
+
+# ==============================================
+# Run application when imported as a main module
+# ==============================================
+
+if __name__ == "__main__" :
+    app = Controller()
+    rc = app.run()
+    sys.exit(rc)

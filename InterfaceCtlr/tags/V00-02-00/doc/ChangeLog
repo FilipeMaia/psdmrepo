@@ -1,0 +1,42 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package InterfaceCtlr
+#------------------------------------------------------------------------
+
+Package author: Robert C. Sass
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-00
+2009-03-30 Robert C. Sass
+- Initial insertion of MySQL workbench file.
+
+Tag: V00-01-01
+2009-05-07 Robert C. Sass
+- Replace MySQL workbench file and add generated .sql file to create database.
+
+Tag: V00-01-02
+2009-05-20 Robert C. Sass
+- Replace MySQL workbench file and add generated .sql file to create database.
+
+Tag: V00-01-03
+2009-05-25 Robert C. Sass
+- Relace MySQL workbench file and add generated CreateIDB-25-May-2009.sql file 
+to create database. Update all test sql scripts. Basic functionality of all
+store procedures tested. Can't get dynamic SQL to work in a stored procedure
+so test_get_def_id.sql is just a shell.
+
+Tag: V00-01-04
+2009-06-10 Robert C. Sass
+- Relace MySQL workbench file and add generated CreateIDB-10-Jun-2009.sql file. Changes 
+to database, stored procedures, test*.sql and OnlineSim to reflect changes from last meeting. 
+The fileset now has an experiment, run type and run number that are unverified. 
+File type becomes an enum in the filename table.
+
+Tag: V00-01-05
+2009-07-06 Robert C. Sass
+- Release latest dated/named version of all files. Next release will have single names and just for production.
