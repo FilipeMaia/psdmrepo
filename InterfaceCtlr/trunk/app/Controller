@@ -35,8 +35,9 @@ __version__ = "$Revision: 1 $"
 #  Imports of standard modules --
 #--------------------------------
 import sys, os, pwd, socket, subprocess
-import time, resource
+import logging, time, resource
 import MySQLdb
+from logging.handlers import SMTPHandler
 
 #---------------------------------
 #  Imports of base class module --
@@ -96,6 +97,7 @@ class DatabaseOperatonFailed(Exception):
         self.__message = message
 
     def __str__ (self):
+        logging.critical(self.__message)
         return repr(self.__message)
 
 #--------------------------------
@@ -115,26 +117,6 @@ class Controller ( LusiPyApp ) :
             self.__out.write(p)
         self.__out.write("\n")
 
- 
-    # =========================================================================
-    # Command handlers are registered in the dictionary. There is a separate list
-    # to specify an order in which the command information is reported by
-    # the tool.
-    # =========================================================================
-
-    __cmd_handlers = {};
-    __cmd_order = [];
-
-    def __add_handler(self, command, syntax, description, handler, connects2server=True):
-        self.__cmd_handlers[command] = {
-        'SYNTAX':syntax,
-        'DESCRIPTION':description,
-        'HANDLER':handler,
-        'CONNECTS2SERVER':connects2server}
-        self.__cmd_order.append(command)
-
-    def __usage(self, command):
-        print "Usage: %s  %s" % (command, self.__cmd_handlers[command]['SYNTAX'])
 
     # =======================================================================
     # Database connection parameters and connection handle. They would change
@@ -185,6 +167,21 @@ class Controller ( LusiPyApp ) :
                                   action="store", dest="output", default=None,
                                   help="send output to file instead of STDOUT" )
 
+        # 
+        # Set up critical logging handler
+        LOG_FORMAT='%(asctime)s %(levelname)s %(message)s'
+        TO_LIST=['bsassy@garlic.com']
+        FROM='rcs@slac.stanford.edu'
+        SUBJECT='Critical event'
+        SMTP_SERVER='localhost'
+        # 
+        # smtp handler, only logs on CRITICAL level messages
+        smtp_handler = logging.handlers.SMTPHandler(SMTP_SERVER, FROM, TO_LIST, SUBJECT)
+        smtp_handler.setLevel(logging.CRITICAL)
+        smtp_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+        logging.getLogger().addHandler(smtp_handler)
+        print "Finished my init"
+
 
     # ==========================================
     # Run the controller after installing logger. 
@@ -209,8 +206,10 @@ class Controller ( LusiPyApp ) :
         xwait_id  = self.__fstat_id("Waiting_Translation")
         xlate_id  = self.__fstat_id("Being_Translated")
         xdone_id  = self.__fstat_id("Translation_Complete")
-        xfail_id  = self.__fstat_id("Translation_Failed")
-        xirod_id  = self.__fstat_id("Entered_into_iRODS")
+        xfail_id  = self.__fstat_id("Translation_Error")
+        irgud_id  = self.__fstat_id("Entered_into_iRODS")
+        irbad_id  = self.__fstat_id("iRODS_Error")
+        xcomp_id  = self.__fstat_id("Complete")
 
         while True:
             try:
@@ -233,15 +232,19 @@ class Controller ( LusiPyApp ) :
                             self.__update_translator_process (translator_id, proc.returncode)
                             if (proc.returncode != 0):
                                 self.__change_fileset_status (fs_id, xfail_id)
+                                done = True
                             else:                                
                                 self.__change_fileset_status (fs_id, xdone_id)
                                 cmd = self.__build_irods_cmd (fs_id, init_info['translate_uri'], ofname)
                                 print "irods insert cmd %s" % cmd
                                 returncode = subprocess.call(cmd)
-                                print "irods put complete with return code  %s" % returncode
-                                if returncode == 0:
-                                    self.__change_fileset_status (fs_id, xirod_id)
+                                print "irods put with return code  %s" % returncode
+                                if returncode != 0:
+                                    self.__change_fileset_status (fs_id, irbad_id)
+                                else:
+                                    self.__change_fileset_status (fs_id, irgud_id)
                                     os.remove(os.path.join(init_info['translate_uri'],ofname))
+                                    self.__change_fileset_status (fs_id, xcomp_id)
                                 done = True
                 else:
                     time.sleep(0.5)
@@ -262,16 +265,14 @@ class Controller ( LusiPyApp ) :
     def __init_controller ( self ) :
 
        """Perform multiple operations to initialize the controller:
-       1) init for iRods access.
-       2) Find our translator output uri in the translator_nodes table.
-       3) Insert an entry in the interface_controller table.
-       4) Return the translate_uri from the translator node table and 
+       1) Find our translator output uri in the translator_nodes table.
+       2) Insert an entry in the interface_controller table.
+       3) Return the translate_uri from the translator node table and 
           the id of the inserted interface_controller row as a dict"""
 
        host = socket.getfqdn(socket.gethostname())
        print "In init_controller this host is %s" % host
 
-       proc = subprocess.call('iinit')    
        rows = self.__select_query(
            "SELECT id, translate_uri FROM translator_node WHERE node_uri = '%s'" % host,
            return_dict=True)
@@ -420,8 +421,6 @@ class Controller ( LusiPyApp ) :
         # experiment, run number, filename
         cmd_list.append("-x")
         cmd_list.append(fs_dbdict[0]['experiment'])
-        cmd_list.append("-r")
-        cmd_list.append("%06d" % fs_dbdict[0]['run_number'])
         cmd_list.append("-n")
         cmd_list.append(out_fname)
         
@@ -515,7 +514,7 @@ class Controller ( LusiPyApp ) :
         
         # Now construct the output iRODS file path
         opath = []
-        opath.append("/lusi-zone/exp/")
+        opath.append("/lusi-zone/home/rcs/test/")
         opath.append(rows[0]['instrument'])
         opath.append('/')
         opath.append(rows[0]['experiment'])

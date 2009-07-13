@@ -4,7 +4,7 @@
 #  $Id$
 #
 # Description:
-#  Script OnlineSim.
+#  Script OnlineScript.
 #
 #------------------------------------------------------------------------
 
@@ -354,7 +354,6 @@ SUPPORTED COMMANDS:
             return 1
 
         newset = row[0]
-        print "newset = %s" % newset
 
         #
         # Find all files in the XTC directory and add them to the fileset
@@ -362,7 +361,6 @@ SUPPORTED COMMANDS:
         xtcfiles = os.listdir(xtcdir)
         for f in xtcfiles:
             filename = os.path.join(xtcdir, f)
-            print "Adding XTC filesname %s" % filename
             if not self.__simple_query(
                 """SET @_status = NULL;
                 CALL add_file_nocache ('%s','%s', '%s', @_status);""" % (
@@ -378,7 +376,6 @@ SUPPORTED COMMANDS:
             epicsfiles = os.listdir(epicsdir)
             for f in epicsfiles:
                 filename = os.path.join(xtcdir, f)
-                print "Adding EPICS filesname %s" % filename
                 if not self.__simple_query(
                     """SET @_status = NULL;
                     CALL add_file_nocache ('%s','%s', '%s', @_status);""" % (
@@ -396,7 +393,6 @@ SUPPORTED COMMANDS:
         # Set fileset status to "Waiting_Translation" and we're done
         #
         wtstat = row[0]
-        print "wtstat = %s" % wtstat
         if not self.__simple_query(
             """SET @_status = NULL;
             CALL change_fileset_status ('%s','%s', @_status);""" % (

@@ -756,14 +756,15 @@ COMMIT;
 -- Data for table `fileset_status_def`
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
-INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Initial_Entry', 'Fileset created');
-INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Being_Copied', 'Files in this fileset are being copied to offline');
-INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Waiting_Translation', 'Files in this fileset are waiting translation');
-INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Being_Translated', 'Files in this fileset are being translated');
-INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Translation_Complete', 'Files in this fileset have been translated');
-INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Translation_Failed', 'Translation of this fileset has failed');
-INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Entered_into_iRODS', 'The translated file for this fileset has been entered into the iRODS file manager');
-INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Deleted_fromCache', 'The fileset and its files have been deleted from the offline cache');
+INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Initial_Entry', 'Fileset created.');
+INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Being_Copied', 'Files in this fileset are being copied to offline.');
+INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Waiting_Translation', 'Files in this fileset are waiting to be translated.');
+INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Being_Translated', 'Files in this fileset are being translated.');
+INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Translation_Complete', 'Files in this fileset have been translated.');
+INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Translation_Error', 'Error status from translator.');
+INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Entered_into_iRODS', 'The translated file for this fileset has been entered into the iRODS file manager.');
+INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'iRODS_Error', 'Error status from iRODS.');
+INSERT INTO `fileset_status_def` (`id`, `name`, `description`) VALUES (0, 'Complete', 'All processsing completed successfully. The translated file has been deleted from the offline cache.');
 
 COMMIT;
 
