@@ -10,7 +10,7 @@ function post_message( id, title, text ) {
         '  <center><p>'+text+'</p></center>'+
         '</div>';
 
-    var handleOk = function() { this.submit(); };
+    var handleOk = function() { this.hide(); };
 
     var dialog1 =
         new YAHOO.widget.Dialog (
@@ -18,6 +18,7 @@ function post_message( id, title, text ) {
 			{   width : "480px",
                 fixedcenter : true,
 				visible : true,
+                close: true,
                 modal:true,
 				constraintoviewport : true,
 				buttons : [
@@ -51,11 +52,11 @@ function ask_yesno( id, title, text, onYes, onNo ) {
         '</div>';
 
     var handleYes = function() {
-        this.submit();
+        this.hide();
         onYes();
     };
     var handleNo = function() {
-        this.cancel();
+        this.hide();
         onNo();
     };
     var dialog1 = new YAHOO.widget.Dialog (
@@ -63,6 +64,7 @@ function ask_yesno( id, title, text, onYes, onNo ) {
         {   width : "480px",
             fixedcenter : true,
             visible : true,
+            close: true,
             modal:true,
             constraintoviewport : true,
             buttons : [

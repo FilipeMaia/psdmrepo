@@ -38,3 +38,19 @@ function load(url,id){
   ldr.open('GET', url, true);
   ldr.send(null);
 }
+
+/* The function to be called to initate loading the requested (by URL)
+ * page and if successfull - calling the specified function and passing the
+ * results into it as a parameter. The result will be presented as
+ * a JavaScript object (array).
+ */
+function load_then_call(url, onSuccess){
+  var ldr=PageLoader();
+  ldr.onreadystatechange=function() {
+    if(ldr.readyState==4) {
+      onSuccess( eval( "("+ldr.responseText+")" ));
+    }
+  }
+  ldr.open('GET', url, true);
+  ldr.send(null);
+}

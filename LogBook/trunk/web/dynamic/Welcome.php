@@ -25,11 +25,11 @@ The Welcome page is shown after the application starts.
       If you notice any problems with page rendering or the dynamic behavior
       please consider upgrading your browser's version or using more advanced browser.
       The application has been successfully tested against: Mozilla's Firefox 3,
-      Google's Chrome and Apple's Safari. Microsoft's Internet Explorer 8 works
-      just partially.</p>
+      Google's Chrome, Apple's Safari 4 and Microsoft's Internet Explorer 8 in both native
+      and compatibility modes.</p>
       <br>
-      <p><b>Browsers' navigation buttons: </b>Please, avoid using them! The future
-      version of the application will provide better integration with the browsers'
+      <p><b>Browsers' navigation buttons: </b>Please, avoid using them for now! The future
+      versions of the application will provide better integration with the browsers'
       navigation.</p>
       <br>
       <p><b>Problems monitoring: </b>In order to better assist users with any problems

@@ -1,52 +1,60 @@
+- implement 'thumbs' mode for images in the 'Browse' and 'Search' modes. Each image will
+also carry a URL to the full document. HAve a button to togle the thumbs on and off.
+Where to put the one?
+One nice possibility would be to put attachments after tags. That would allow
+seeing previews as a photo-album grid. Put an empty image 'No Preview available'
+for unsupported MIME types.
+
+  ------------------
+  |                | <name>
+  |                | type: jpg
+  |    Thumb       | Size: 123545
+  |                | [ Download ]
+  |                | [ View ]
+
+
+
 - think about how to implement the "search_entry(parameters...)" operations
 in a way which would be not depending on using MySQL SQL directly in
 parameters of the method. Think about setting limits on parameters, for
 example.
 
-- design the "Search Form".
+- design the "Search Form":
 
-- implement the "Browse" page as two panels. There will be a tree
-on the left side to show a hierarchy of things like instruments, experiments,
-shifts, runs:
+Input fields:
 
-  AMOS
-    Chapman1
-      shifts
-        begin: 2009-07-17 10:22:01
-          run: 123
-          run: 124
-        begin: 2009-07-17 11:29:14
-        ..
-      runs
-        run: 123
-        run: 124
-        ...
-      all messages
+  message text:  will be use if not empty. Possibly allow regular expressions
+  author: <get the list from the database using PHP processing to allow selection
+          from the list. On eof the options will be empty.
 
-On the right siode there will be another panel showing messages in a selected
-context. The messages will be sorted in the "Post" order. The messages will be
-separated by th ebackground color like in YUI tables. Here is one way how
-each message will be shown:
+  from:   start data. Use if not empty. Perhaps add a Calendar dialog for dates.
+          If the dialog is used then the time will be preformatted as well.
+  to:     the same as 'from'
 
-  +--------+--------+---------+---------------+-------------+
-  | Posted |  Shift | Message | Tags          | Attachments |
-  | Author |   Run  |         |               |             |
-  +--------+--------+---------+---------------+-------------+
 
-  | <time> | <time> | ...     | <tag>=<value> | <url>       |
-  | <name> | <num>  | ...     | ...           | ...         |
 
-  | <time> | <time> | ...     | <tag>=<value> | <url>       |
-  | <name> | <num>  | ...     | ...           | ...         |
+  in a context of the experiment:
+     checkbox allowing to see messages posted in a context of
+     the experiment. The default value will be 'True'. The idea
+     of the option is to reduce
+  in a context of shifts: the same as above
+  in a context of runs:   the same as above
 
-  | <time> | <time> | ...     | <tag>=<value> | <url>       |
-  | <name> | <num>  | ...     | ...           | ...         |
+  tags:   browse the database for the list of existing tags and have a button
+          "Add tag". The tags will be accumulated.
+  tag values: should be similar to the previous one except specifying
 
-  ...
+Possibly design this form using YUI tables for tags.
 
-Repeat the table header every 10 messages.
+Think about how to implementing the logical operations in the sarch filter.
+The default behavior will be AND.
 
-Another (perhaps - better) possibility would be to use YUI tables.
+Place the Search form into 'navarea' in the same mannaer it's done for 'Browse',
+so that it will be possible to modify search criteria and see results.
+Add the 'Search' button on the bottom to initiate the search.
+
+Return result in the same format which is used for browsing.
+
 
 - perhaps implement a better (from the visualisation standpoint) table
 navigation buttons
@@ -76,5 +84,8 @@ ago was the last posting. That would also give an operator some sense of timing.
 BTW, the very same feature can be easily implemented in all message tables. Of course
 this only make sense if tables are updated by a timer.
 
+- LOOK AT THE BROWSER HISTORY SUPPORT
 
-
+- (POSSIBLY) EXTEND THE SCHEMA TO KEEP THE ACCOUNT NAME AND USER NAME. IF NO USER
+NAME IS PROVIDED THEN GET IT FROM THE REGISTRY DATABASE (LDAP) AND STORE THE ONE
+ALONG WITH THE MESSAGE.

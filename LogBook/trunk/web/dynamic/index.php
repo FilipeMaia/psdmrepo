@@ -24,6 +24,9 @@ and open the template in the editor.
     <link rel="stylesheet" type="text/css" href="/yui/build/container/assets/skins/sam/container.css" />
     <link rel="stylesheet" type="text/css" href="/yui/build/treeview/assets/skins/sam/treeview.css" />
 
+    <!--bring in the folder-style CSS for the TreeView Control-->
+    <link rel="stylesheet" type="text/css" href="/yui/examples/treeview/assets/css/folders/tree.css" />
+
     <!--
     Page-specific styles
     -->
@@ -85,10 +88,6 @@ and open the template in the editor.
         overflow:auto;
     }
     #workarea {
-        /*
-        padding:15px;
-        background-color:#f0f0f0;
-        */
         overflow:auto;
     }
     #experiment_info_container,
@@ -246,6 +245,8 @@ function set_current_selection( instr_id, instr_name, exper_id, exper_name ) {
 
     menubar_enable( menubar_group_shifts );
     menubar_enable( menubar_group_runs );
+    menubar_enable( menubar_group_browse );
+    menubar_enable( menubar_group_search );
 }
 
 var dialog_element = "popupdialogs";
@@ -260,8 +261,8 @@ menubar_data.push ( {
     title: 'Applications',
     title_style: 'font-weight:bold;',
     itemdata: [
-        { text: "Experiment Registry Database", url: "javascript:leave_current_app()" },
-        { text: "Electronic Log Book", url: "javascript:leave_current_app()" } ],
+        { text: "Experiment Registry Database", url: "../../RegDB/dynamic/" },
+        { text: "Electronic Log Book", url: "../../LogBook/dynamic/" } ],
     disabled: false }
 );
 var menubar_group_home = menubar_data.length;
@@ -307,19 +308,19 @@ menubar_data.push ( {
 );
 var menubar_group_browse = menubar_data.length;
 menubar_data.push ( {
-    id:    null,
+    id:    'browse',
     href:  'javascript:browse_contents()',
     title: 'Browse',
     itemdata: null,
-    disabled: false }
+    disabled: true }
 );
 var menubar_group_search = menubar_data.length;
 menubar_data.push ( {
-    id:    null,
+    id:    'search',
     href:  'javascript:search_contents()',
     title: 'Search',
     itemdata: null,
-    disabled: false }
+    disabled: true }
 );
 var menubar_group_help = menubar_data.length;
 menubar_data.push ( {
@@ -553,10 +554,30 @@ function create_shifs_table( source, paginator ) {
     //table.refreshTable();
 }
 
+function reset_navarea() {
+    var navarea = document.getElementById('navarea');
+    navarea.style.padding = '0px';
+    navarea.style.minWidth = '0px';
+    //navarea.style.width = '0px';
+    navarea.innerHTML='';
+}
+
+function reset_workarea() {
+    var workarea = document.getElementById('workarea');
+    workarea.style.borderLeft='0px';
+    workarea.style.padding = '0px';
+    //workarea.style.minWidth = '0px';
+    //workarea.style.width = '0px';
+    workarea.innerHTML='';
+}
+
 function list_experiments() {
 
     set_context(
         'Select Experiment >' );
+
+    reset_navarea();
+    reset_workarea();
 
     document.getElementById('workarea').innerHTML=
         '<div id="workarea_table_container">'+
@@ -588,6 +609,9 @@ function select_experiment( instr_id, instr_name, exper_id, exper_name ) {
 function display_experiment() {
 
     set_context ( 'Experiment >' );
+
+    reset_navarea();
+    reset_workarea();
 
     document.getElementById('workarea').innerHTML=
         '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
@@ -943,7 +967,16 @@ function select_entry( id ) {
     create_attachments_table (
         'RequestAttachments.php?id='+id,
         false
-    );}
+    );
+}
+
+function show_atatchment( id ) {
+    var attachmentWindowRef =
+        window.open(
+            'ShowAttachment.php?id='+id,
+            'attachmentWindow',
+            'toolbar=0,location=1,menubar=0,status=0,directories=0');
+}
 
 var entry_tags_table=null;
 
@@ -978,6 +1011,9 @@ function list_shifts() {
     set_context(
         '<a href="javascript:display_experiment()">Experiment</a> > '+
         'Select Shift >' );
+
+    reset_navarea();
+    reset_workarea();
 
     document.getElementById('workarea').innerHTML=
         '<div id="workarea_table_container">'+
@@ -1052,7 +1088,7 @@ function display_shift() {
                         'as of this time? Enter <b>Yes</b> to do so. '+
                         'Note, this is the last chance to abort making modifications '+
                         'in the database!',
-                        function() { document.close_shift_form.submit(); },
+                        function() { alert("closing the shift"); return; document.close_shift_form.submit(); },
                         function() { display_shift(); }
                     );
                 }
@@ -1067,6 +1103,10 @@ function list_runs() {
     set_context(
         '<a href="javascript:display_experiment()">Experiment</a> > '+
         'Select Run >' );
+
+
+    reset_navarea();
+    reset_workarea();
 
     document.getElementById('workarea').innerHTML=
         '<div id="workarea_table_container">'+
@@ -1124,17 +1164,272 @@ function display_run() {
     var messages_dialog = create_messages_dialog( 'run' );
 }
 
+
+/* History browser.
+ *
+ * NOTE: Ideally these would need to be declared as 'const'. Unfortunatelly,
+ * ECMAScript won't support this (the code won't work on MS Explorer). Only
+ * Mozilla family of browsers will.
+ */
+var TYPE_HISTORY_P     = 110,
+    TYPE_HISTORY_D     = 120,
+    TYPE_HISTORY_D_DAY = 121,
+    TYPE_HISTORY_F     = 130,
+    TYPE_SHIFTS  = 200,
+    TYPE_SHIFT   = 201,
+    TYPE_RUNS    = 300,
+    TYPE_RUN     = 301;
+
+function event2html( re, show_full_time ) {
+    var color = "#e0e0e0"; // "#cfecec" - "Light Cyan 2""
+    var timestamp = show_full_time ? re.event_time : re.event_time.split(' ')[1];
+    var result=
+        '<div style="padding:2px;">'+
+        '  <b><em style="padding:2px; background-color:'+color+';">'+timestamp+'</em></b><hr>'+
+        '</div>'+
+        '<div style="margin:20px; margin-top:10px; margin-right:0px;">'+re.html+'</div>';
+    return result;
+}
+
+function display_history( type, data ) {
+
+    set_context (
+    '<a href="javascript:display_experiment()">Experiment</a> > '+
+    'Shift >' );
+
+    var show_full_time = true;
+    var url='RequestInfo.php?exper_id='+current_selection.experiment.id+'&type='+type;
+    if( type == TYPE_HISTORY_D_DAY ) {
+        url += '&begin='+data.begin+'&end='+data.end;
+        show_full_time = false;
+    }
+    function callback_on_load( result ) {
+        var html='';
+        var r = result.ResultSet.Result;
+        if( r.length > 0 ) {
+            for( var i = 0; i < r.length; i++ ) {
+                var re = r[i];
+                var t = event2html( re, show_full_time );
+                html += t;
+            }
+        } else {
+            html = 'No data in this context.';
+        }
+        document.getElementById('workarea').innerHTML=html;
+    }
+    //document.getElementById('workarea').innerHTML='<img src="images/ajaxloader.gif" />';
+    load_then_call( url, callback_on_load );
+}
+
+var browse_tree = null;
+
 function browse_contents() {
 
+/*
+    if( browse_tree != null ) {
+        browse_tree.show();
+        return;
+    }
+*/
     set_context (
         '<a href="javascript:display_experiment()">Experiment</a> > '+
         'Browse >' );
 
-    document.getElementById('workarea').innerHTML='';
+    reset_navarea();
+    reset_workarea();
 
-    post_info( "popupdialogs",
-        "Sorry, this feature hasn't been implemented yet! "+
-        "Come back later when a new version of the application will be available." );
+    var workarea = document.getElementById('workarea');
+    workarea.style.borderLeft="solid 1px";
+    workarea.style.padding = "10px";
+    workarea.innerHTML='No context selected yet.';
+
+    var navarea = document.getElementById('navarea');
+    //navarea.style.borderRight="solid 1px";
+    navarea.style.minWidth = "200px";
+    //navarea.style.marginRight = "10px";
+    navarea.style.padding = "10px";
+    //navarea.style.overflow = "scroll";
+    //navarea.style.backgroundColor = "d0d0d0";
+    navarea.innerHTML=
+        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
+        '  <center><b>Select Context</b></center>'+
+        '</div>'+
+        '<div id="browse_tree">Loading...</div>';
+
+    browse_tree = new YAHOO.widget.TreeView( "browse_tree" );
+
+    // Start build a tree from the current context
+    //
+    var node_i = new YAHOO.widget.TextNode(
+        {   label: current_selection.instrument.name,
+            expanded: true,
+            title: 'Coherent X-Ray Imaging Instrument' },
+        browse_tree.getRoot());
+
+    var node_e = new YAHOO.widget.TextNode(
+        {   label: current_selection.experiment.name,
+            expanded: true,
+            title: 'This is currently selected experiment' },
+        node_i );
+
+    var node_h = new YAHOO.widget.TextNode(
+        {   label: 'History',
+            expanded: true,
+            title: 'Explore the history of various events happened in the experiment.' },
+        node_e );
+
+    var node_h_p = new YAHOO.widget.TextNode(
+        {   label: 'Preparation',
+            expanded: false,
+            title: 'The preparation phase of the experiment',
+            type: TYPE_HISTORY_P },
+        node_h );
+
+    var node_h_d = new YAHOO.widget.TextNode(
+        {   label: 'Data Taking',
+            expanded: false,
+            title: 'The data taking phase of the experiment',
+            type: TYPE_HISTORY_D },
+        node_h );
+
+    var node_h_f = new YAHOO.widget.TextNode(
+        {   label: 'Follow up',
+            expanded: false,
+            title: 'After the data taking phase was over',
+            type: TYPE_HISTORY_F },
+        node_h );
+
+    var node_s = new YAHOO.widget.TextNode(
+        {   label: 'Shifts',
+            expanded: false,
+            title: 'Explore shifts of the experiment',
+            type: TYPE_SHIFTS },
+        node_e );
+
+    var node_r = new YAHOO.widget.TextNode(
+        {   label: 'Runs',
+            expanded: false,
+            title: 'Explore data taking runs',
+            type: TYPE_RUNS },
+        node_e );
+
+    // turn dynamic loading on for the last children:
+    //
+    var currentIconMode = 0;
+
+    node_h_d.setDynamicLoad( loadNodeData, currentIconMode );
+    node_s.setDynamicLoad  ( loadNodeData, currentIconMode );
+    node_r.setDynamicLoad  ( loadNodeData, currentIconMode );
+
+    // Dispatch clicks on selected nodes to the corresponding
+    // functions.
+    //
+    function onNodeSelection( node ) {
+        switch( node.data.type ) {
+            case TYPE_HISTORY_P:     display_history( TYPE_HISTORY_P,     null); break;
+            case TYPE_HISTORY_D_DAY: display_history( TYPE_HISTORY_D_DAY, node.data ); break;
+            case TYPE_HISTORY_F:     display_history( TYPE_HISTORY_F,     null); break;
+
+            case TYPE_SHIFT: select_shift( node.data.shift_id ); break;
+            case TYPE_RUN:   select_run  ( node.data.shift_id, node.data.run_id ); break;
+        }
+    }
+    browse_tree.subscribe( "labelClick", onNodeSelection );
+    browse_tree.subscribe( "enterKeyPressed", onNodeSelection );
+    browse_tree.draw();
+
+    function loadNodeData( node, fnLoadComplete ) {
+
+        //We'll create child nodes based on what we get back when we
+        //use Connection Manager to pass the text label of the
+        //expanding node to the Yahoo!
+        //Search "related suggestions" API.  Here, we're at the
+        //first part of the request -- we'll make the request to the
+        //server.  In our Connection Manager success handler, we'll build our new children
+        //and then return fnLoadComplete back to the tree.
+
+        //Get the node's label and urlencode it; this is the word/s
+        //on which we'll search for related words:
+        //
+        // alert( "node: "+node.label+", type: "+node.data.type );
+        // var nodeLabel = encodeURI( node.data.label );
+
+        //prepare URL for XHR request:
+        //
+        var sUrl = "RequestInfo.php?type="+node.data.type;
+        switch( node.data.type ) {
+            case TYPE_HISTORY_P:
+            case TYPE_HISTORY_D:
+            case TYPE_HISTORY_F:
+            case TYPE_SHIFTS:
+            case TYPE_RUNS:
+                sUrl += '&exper_id='+current_selection.experiment.id;
+                break;
+        }
+        // alert(sUrl);
+
+        //prepare our callback object
+        //
+        var callback = {
+
+            //if our XHR call is successful, we want to make use
+            //of the returned data and create child nodes.
+            //
+            success: function(oResponse) {
+                var oResults = eval( "(" + oResponse.responseText + ")" );
+                if(( oResults.ResultSet.Result ) && ( oResults.ResultSet.Result.length )) {
+
+                    // Result is an array if more than one result, string otherwise
+                    //
+                    if( YAHOO.lang.isArray( oResults.ResultSet.Result )) {
+                        for( var i = 0, j = oResults.ResultSet.Result.length; i < j; i++ ) {
+                            var tempNode = new YAHOO.widget.TextNode( oResults.ResultSet.Result[i], node, false );
+                        }
+                    } else {
+                        // there is only one result; comes as string:
+                        //
+                        var tempNode = new YAHOO.widget.TextNode( oResults.ResultSet.Result, node, false )
+                    }
+                }
+
+                //When we're done creating child nodes, we execute the node's
+                //loadComplete callback method which comes in via the argument
+                //in the response object (we could also access it at node.loadComplete,
+                //if necessary):
+                //
+                oResponse.argument.fnLoadComplete();
+            },
+
+            //if our XHR call is not successful, we want to
+            //fire the TreeView callback and let the Tree
+            //proceed with its business.
+            //
+            failure: function(oResponse) {
+                alert( "failed to get the information from server for node: "+node.label+", type: "+node.data.type );
+                oResponse.argument.fnLoadComplete();
+            },
+
+            //our handlers for the XHR response will need the same
+            //argument information we got to loadNodeData, so
+            //we'll pass those along:
+            //
+            argument: {
+                "node": node,
+                "fnLoadComplete": fnLoadComplete
+            },
+
+            //timeout -- if more than 7 seconds go by, we'll abort
+            //the transaction and assume there are no children:
+            //
+            timeout: 7000
+        };
+
+        //With our callback object ready, it's now time to
+        //make our XHR call using Connection Manager's
+        //asyncRequest method:
+        //
+        YAHOO.util.Connect.asyncRequest( 'GET', sUrl, callback );
+    }
 }
 
 function search_contents() {
@@ -1143,6 +1438,7 @@ function search_contents() {
         '<a href="javascript:display_experiment()">Experiment</a> > '+
         'Search >' );
 
+    document.getElementById('navarea').innerHTML='';
     document.getElementById('workarea').innerHTML='';
 
     post_info( "popupdialogs",

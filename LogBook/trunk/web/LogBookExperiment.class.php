@@ -49,6 +49,11 @@ class LogBookExperiment {
     public function in_interval ( $time ) {
         return $this->regdb_experiment->in_interval( $time ); }
 
+    public function days() {
+        $ival = new LusiInterval( $this->begin_time(), $this->end_time());
+        return $ival->splitIntoDays();
+    }
+
     /* ==========
      *   SHIFTS
      * ==========
@@ -430,10 +435,22 @@ HERE;
      * Note, that this operation would select entroies which aren't
      * explicitly associated with a particular shift or a run.
      *
+     * @param LusiTime $begin - the begin time of an interval the entries were posted
+     * @param LusiTime $end - the end time of an interval the entries were posted
+     *
      * @return array(LogBookFFEntry)
      */
-    public function entries_of_experiment () {
-        return $this->entries_by_( 'h.shift_id IS NULL AND h.run_id IS NULL' );
+    public function entries_of_experiment ( $begin=null, $end=null ) {
+        if( !is_null( $begin ) && !is_null( $end ) && !$begin->less( $end ))
+            throw new LogBookException(
+                __METHOD__,
+                "begin time '".$begin."' isn't less than end time '".$end."'" );
+
+        $begin_str = is_null( $begin ) ? '' : ' AND e.insert_time >='.$begin->to64();
+        $end_str   = is_null( $end )   ? '' : ' AND e.insert_time < '.$end->to64();
+        return $this->entries_by_(
+            'h.shift_id IS NULL AND h.run_id IS NULL'.$begin_str.$end_str
+        );
     }
 
     /**
