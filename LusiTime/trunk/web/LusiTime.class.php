@@ -83,6 +83,13 @@ class LusiTime {
     public function toStringShort() {
         return date("Y-m-d H:i:s", $this->sec); }
 
+    /* Unlike the previous methods this one would return just a day
+     * (yer-month-day) part of the timestamp in the human-readable
+     * format.
+     */
+    public function toStringDay() {
+        return date("Y-m-d", $this->sec); }
+
     /* Convert the tuple into a packed representation of a 64-bit
      * number. These numbers are meant to be stored in a database.
      *
