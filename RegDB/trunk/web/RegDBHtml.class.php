@@ -11,6 +11,8 @@
  */
 class RegDBHtml {
 
+    private $label_color = ''; //  'color:#0071bc;'
+
     private $html;
 
     public function __construct( $x, $y,  $width=480, $height=null, $position='relative' ) {
@@ -20,9 +22,19 @@ class RegDBHtml {
 HERE;
     }
 
-    public function label( $x, $y, $text ) {
+    public function label( $x, $y, $text, $bold=true ) {
+        $style_bold = $bold ? 'font-weight:bold;' : '';
         $this->html = $this->html.<<<HERE
-<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left; color:#0071bc; font-weight:bold;">
+<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left; {$this->label_color} {$style_bold}">
+  {$text}
+</div>
+HERE;
+        return $this;
+    }
+    public function label_1( $x, $y, $text, $width, $bold=true ) {
+        $style_bold = $bold ? 'font-weight:bold;' : '';
+        $this->html = $this->html.<<<HERE
+<div style="background-color:#e0e0e0; width:{$width}px; padding:2px; position:absolute; left:{$x}px; top:{$y}px; text-align:left; {$this->label_color} {$style_bold}">
   {$text}
 </div>
 HERE;
@@ -32,6 +44,15 @@ HERE;
     public function value( $x, $y, $text ) {
         $this->html = $this->html.<<<HERE
 <div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
+  {$text}
+</div>
+HERE;
+        return $this;
+    }
+
+    public function value_1( $x, $y, $text ) {
+        $this->html = $this->html.<<<HERE
+<div style="padding:2px; position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
   {$text}
 </div>
 HERE;
@@ -61,10 +82,20 @@ HERE;
         return $this;
     }
 
+    public function checkbox_input( $x, $y, $var, $text, $checked=false ) {
+        $checked_attr = $checked ? 'checked="checked"' : '';
+        $this->html = $this->html.<<<HERE
+<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
+  <input type="checkbox" name="{$var}" value="{$text}" {$checked_attr}/>
+</div>
+HERE;
+        return $this;
+    }
+
     public function textarea( $x, $y, $text, $width=480, $height=128 ) {
         $this->html = $this->html.<<<HERE
 <div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
-  <textarea style="width:{$width}px; height:{$height}px; padding:4px;" disabled="disabled">{$text}</textarea></td>
+  <textarea style="width:{$width}px; height:{$height}px; padding:4px;" disabled="disabled">{$text}</textarea>
 </div>
 HERE;
         return $this;
@@ -73,7 +104,27 @@ HERE;
     public function textarea_input( $x, $y, $var, $width=480, $height=128, $text='' ) {
         $this->html = $this->html.<<<HERE
 <div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
-  <textarea style="width:{$width}px; height:{$height}px; padding:4px;" name="{$var}">{$text}</textarea></td>
+  <textarea style="width:{$width}px; height:{$height}px; padding:4px;" name="{$var}">{$text}</textarea>
+</div>
+HERE;
+        return $this;
+    }
+
+    public function textbox( $x, $y, $text, $width=480, $height=128 ) {
+        $this->html = $this->html.<<<HERE
+<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
+  <texbox style="width:{$width}px; height:{$height}px; padding:0px;">{$text}</texbox>
+</div>
+HERE;
+        return $this;
+    }
+
+    public function container_1( $x, $y, $contents, $width=null, $height=null ) {
+        $width_style  = is_null( $width  ) ? '' : "width:{$width}px;";
+        $height_stlye = is_null( $height ) ? '' : "height:{$height}px;";
+        $this->html = $this->html.<<<HERE
+<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left; overflow:auto; {$width_style} {$height_stlye} padding:0px;">
+  {$contents}
 </div>
 HERE;
         return $this;

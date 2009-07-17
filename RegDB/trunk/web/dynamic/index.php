@@ -149,8 +149,9 @@ YAHOO.util.Event.onContentReady("menubar", function () {
     var aSubmenuData = [
         {   id: "applications",
             itemdata: [
-                { text: "Experiment Registry Database", url: "javascript:leave_current_app()" },
-                { text: "Electronic Log Book", url: "javascript:leave_current_app()" } ] },
+                { text: "Experiment Registry Database", url: "../../RegDB/dynamic/" },
+                { text: "Electronic Log Book", url: "../../LogBook/dynamic/" } ],
+            disabled: false },
         { },
         {   id: "experiments",
             itemdata: [
