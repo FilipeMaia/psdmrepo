@@ -18,6 +18,38 @@ class LusiTime {
     public static function now() {
         return new LusiTime( mktime()); }
 
+    /* Factory method for getting the time -1 hour from now
+     */
+    public static function minus_hour() {
+        return new LusiTime( mktime() - 3600 ); }
+
+    /* Factory method for getting the time -24 hours from now
+     */
+    public static function minus_day() {
+        return new LusiTime( mktime() - 24*3600 ); }
+
+    /* Factory method for getting the time as of today at 00:00:00
+     */
+    public static function today() {
+        return LusiTime::parse( LusiTime::now()->toStringDay().' 00:00:00' ); }
+
+    /* Factory method for getting the time as of yesterday at 00:00:00
+     */
+    public static function yesterday() {
+        return LusiTime::parse( LusiTime::minus_day()->toStringDay().' 00:00:00' ); }
+
+    /* Factory method for getting the time -1 week from now
+     */
+    public static function minus_week() {
+        return new LusiTime( mktime() - 7*24*3600 ); }
+
+    /* Factory method for getting the time -1 month from now
+     *
+     * NOTE: 1 "month" is equal to 31 day in this context
+     */
+    public static function minus_month() {
+        return new LusiTime( mktime() - 31*24*3600 ); }
+
     /* Factory method from an input string to be parsed into an object
      * of the class.
      *

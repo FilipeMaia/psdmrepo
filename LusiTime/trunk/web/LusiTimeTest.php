@@ -77,6 +77,17 @@ echo <<<HERE
 <br><b>LusiTime::parse():</b>    {$lt->__toString()}
 <br><b>converted to 64-bit:</b>  {$lt->to64()}
 <br>
+HERE;
+
+echo "<br>LusiTime::minus_month(): ".LusiTime::minus_month().
+     "<br>LusiTime::minus_week(): ".LusiTime::minus_week().
+     "<br>LusiTime::minus_day(): ".LusiTime::minus_day().
+     "<br>LusiTime::yesterday(): ".LusiTime::yesterday().
+     "<br>LusiTime::today(): ".LusiTime::today().
+     "<br>LusiTime::minus_hour(): ".LusiTime::minus_hour().
+     "<br>LusiTime::now(): ".LusiTime::now();
+
+echo <<<HERE
    </body>
 </html>
 HERE;
