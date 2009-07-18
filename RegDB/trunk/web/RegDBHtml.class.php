@@ -59,22 +59,26 @@ HERE;
         return $this;
     }
 
-    public function value_input( $x, $y, $var, $text='' ) {
+    public function value_input( $x, $y, $var, $text='', $title='' ) {
         $this->html = $this->html.<<<HERE
 <div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
-  <input id="{$var}" type="text" name="{$var}" value="{$text}" style="padding:1px;" />
+  <input id="{$var}" type="text" name="{$var}" value="{$text}" style="padding:1px;" title="{$title}" />
 </div>
 HERE;
         return $this;
     }
 
-    public function select_input( $x, $y, $var, $list ) {
+    public function select_input( $x, $y, $var, $list, $default_selected='' ) {
         $this->html = $this->html.<<<HERE
 <div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
   <select align="center" type="text" name="{$var}" style="padding:1px;">
 HERE;
-        foreach( $list as $l )
-            $this->html = $this->html."<option>{$l}</option>";
+        foreach( $list as $l ) {
+            if( $i == $default_selected )
+                $this->html = $this->html."<option id=\"{$var}_default\">{$l}</option>";
+            else
+                $this->html = $this->html."<option>{$l}</option>";
+        }
         $this->html = $this->html.<<<HERE
   </select>
 </div>
