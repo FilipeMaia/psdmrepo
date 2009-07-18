@@ -477,15 +477,85 @@ HERE;
         return $this->entries_by_( 'h.run_id='.$id );
     }
 
+
+    /**
+     * The complex search operation
+     *
+     * The method will search for free-form entries using the specified
+     * filter.
+     *
+     * @return array(LogBookFFEntry)
+     */
+    public function search (
+        $text2search='',
+        $search_experiment=false,
+        $search_shifts=false,
+        $search_runs=false,
+        $search_tags=false,
+        $search_values=false,
+        $begin=null,
+        $end=null,
+        $tag='',
+        $author='' ) {
+
+        if( !is_null( $begin ) && !is_null( $end ) && !$begin->less( $end ))
+            throw new LogBookException(
+                __METHOD__,
+                "begin time '".$begin."' isn't less than end time '".$end."'" );
+
+        // Don't search if no sensible search parameters are given
+        //
+        if( $text2search == '' &&
+            is_null( $begin ) &&
+            is_null( $end ) &&
+            $tag == '' &&
+            $author == '' ) return Array();
+
+        $text2search_str = $text2search == '' ? '' : " AND e.content LIKE '%{$text2search}%'";
+
+        $scope = '';
+        if( $search_shifts ) {
+            $scope = '((h.shift_id IS NOT NULL)';
+        }
+        if( $search_runs ) {
+            if( $scope == '' )
+                $scope = '((h.run_id IS NOT NULL)';
+            else
+                $scope .= ' OR (h.run_id IS NOT NULL)';
+        }
+        if( $search_experiment ) {
+            if( $scope == '' )
+                $scope = '((h.shift_id IS NULL AND h.run_id IS NULL)';
+            else
+                $scope .= ' OR (h.shift_id IS NULL AND h.run_id IS NULL)';
+        }
+        $scope .= ")";
+
+        $begin_str = is_null( $begin ) ? '' : ' AND e.insert_time >='.$begin->to64();
+        $end_str   = is_null( $end )   ? '' : ' AND e.insert_time < '.$end->to64();
+
+        $tag_str    = $tag    == '' ? '' : " AND t.tag='{$tag}' AND t.hdr_id = h.id";
+        $author_str = $author == '' ? '' : " AND e.author='{$author}'";
+
+        return $this->entries_by_(
+            $scope.$begin_str.$end_str.$tag_str.$author_str.$text2search_str
+        );
+    }
+
     private function entries_by_ ( $condition=null ) {
 
         $list = array();
 
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
-        $result = $this->connection->query (
-            'SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
+        $sql =
+            'SELECT DISTINCT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM header h, entry e, tag t WHERE h.exper_id='.$this->attr['id'].
             ' AND h.id = e.hdr_id AND e.parent_entry_id is NULL'.$extra_condition.
-            ' ORDER BY e.insert_time DESC' );
+            ' ORDER BY e.insert_time DESC';
+        /*
+        throw new LogBookException(
+            __METHOD__, $sql );
+        */
+        $result = $this->connection->query ( $sql );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
@@ -568,6 +638,40 @@ HERE;
         return $this->find_entry_by_ (
             'hdr_id = (SELECT h.id FROM header h, entry e'.
             ' WHERE h.id = e.hdr_id AND e.id = (SELECT LAST_INSERT_ID()))' );
+    }
+
+    /* ====================
+     *   OTHER OPERATIONS
+     * ====================
+     */
+    public function used_tags () {
+
+        $list = array();
+
+        $result = $this->connection->query (
+            'SELECT DISTINCT t.tag FROM tag t, header h WHERE h.id=t.hdr_id AND h.exper_id='.$this->id().
+            ' ORDER BY tag' );
+
+        $nrows = mysql_numrows( $result );
+        for( $i=0; $i<$nrows; $i++ )
+            array_push( $list,mysql_result( $result, $i ));
+
+        return $list;
+    }
+
+    public function used_authors () {
+
+        $list = array();
+
+        $result = $this->connection->query (
+            ' SELECT DISTINCT e.author FROM entry e, header h WHERE h.id=e.hdr_id AND h.exper_id='.$this->id().
+            ' ORDER BY author' );
+
+        $nrows = mysql_numrows( $result );
+        for( $i=0; $i<$nrows; $i++ )
+            array_push( $list,mysql_result( $result, $i ));
+
+        return $list;
     }
 }
 ?>

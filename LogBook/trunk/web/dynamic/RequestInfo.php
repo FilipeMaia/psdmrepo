@@ -65,6 +65,7 @@ function day2json( $d ) {
             "expanded" => false,
             "type" => TYPE_HISTORY_D_DAY,
             "title" => "all events happened during that day of data taking",
+            "day" => $d->begin->toStringDay(),
             "begin" => $d->begin->to64(),
             "end" => $d->end->to64()
         )
@@ -89,7 +90,7 @@ function entry2json( $entry ) {
     $extra_lines = max( count( $tags ), count( $attachments ));
     $extra_vspace = $extra_lines == 0 ? 0 :  20 + 20 * $extra_lines;
 
-    $con = new RegDBHtml( 0, 0, 750, 50 + $message_height + $extra_vspace );
+    $con = new RegDBHtml( 0, 0, 750, 60 + $message_height + $extra_vspace );
     $con->container_1 (   0,   0, "<pre style=\"padding:4px; font-size:14px; background-color:#cfecec;\">{$entry->content()}</pre>", 750, $message_height )
         ->label   ( 250,  $base,    'By:'        )->value( 300,  $base,    $entry->author())
         ->label   (  20,  $base,    'Posted:'    )->value( 100,  $base,    $entry->insert_time()->toStringShort())
@@ -98,20 +99,29 @@ function entry2json( $entry ) {
         ->label   ( 350,  $base+20, 'Shift:'     )->value( 400,  $base+20, $shift_begin_time_str );
 
     if( count( $tags ) != 0 ) {
-        $con->label_1(  20, $base+45, 'Tag', 80 )->label_1( 115, $base+45, 'Value', 100 );
+        $con->label_1(  20, $base+50, 'Tag', 80 )->label_1( 115, $base+50, 'Value', 100 );
     }
     if( count( $attachments ) != 0 ) {
-        $con->label_1( 250, $base+45, 'Attachment', 200 )->label_1( 465, $base+45, 'Size', 50 );
+        $con->label_1  ( 250, $base+50, 'Attachment', 200 )->label_1( 465, $base+50, 'Size', 50 )
+            ->container( 520, $base+50, 'viewarea' );
     }
-    $base4tags = $base+70;
+    $base4tags = $base+75;
     foreach( $tags as $tag ) {
         $con->value_1(  20, $base4tags, $tag->tag())
             ->value_1( 115, $base4tags, $tag->value());
         $base4tags = $base4tags + 20;
     }
-    $base4attch = $base+70;
+    $base4attch = $base+75;
     foreach( $attachments as $attachment ) {
-        $attachment_url = '<a href="javascript:show_atatchment('.$attachment->id().')">'.$attachment->description().'</a>';
+        $attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank">'.$attachment->description().'</a>';
+/*
+        $attachment_url = '<a href="javascript:preview_atatchment('.$attachment->id().')">'.$attachment->description().'</a>';
+        $attachment_url =
+            '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank">'.$attachment->description().'</a>'.
+            '&nbsp;'.
+            '<a href="#viewarea">View</a>';
+ *
+ */
         $con->value_1( 250, $base4attch, $attachment_url )
             ->value_1( 465, $base4attch, $attachment->document_size());
         $base4attch = $base4attch + 20;

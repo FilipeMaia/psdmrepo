@@ -1,3 +1,9 @@
+- finish implementing 'Search' where only two options are left: search in tag
+names and in tag values. Print a summary page at the begining (234 entries found).
+Consider adding a paginator. Consider image previewer.
+
+- consider redesigning the schema to associate tags with entries, not headers
+
 - implement 'thumbs' mode for images in the 'Browse' and 'Search' modes. Each image will
 also carry a URL to the full document. HAve a button to togle the thumbs on and off.
 Where to put the one?

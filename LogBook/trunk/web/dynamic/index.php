@@ -88,7 +88,9 @@ and open the template in the editor.
         overflow:auto;
     }
     #workarea {
+        /*
         overflow:auto;
+        */
     }
     #experiment_info_container,
     #runs_table,
@@ -386,7 +388,7 @@ if( isset( $_GET['action'] )) {
         echo "  alert( 'unsupported action: {$action}' );";
     }
 } else {
-    echo "  load( 'Welcome.php', 'workarea' );";
+    echo "  load( 'help/Welcome.html', 'workarea' );";
 }
 echo <<<HERE
 }
@@ -395,15 +397,6 @@ HERE;
 ?>
 
 <script type="text/javascript">
-
-function leave_current_app() {
-    post_warning (
-        dialog_element,
-        "You're about to leave the current application. "+
-        "All currently open connections will be closed, and "+
-        "all unsaved data will be lost! Click <b>Yes</b> if you sure "+
-        "you want to proceed. Click <b>Cancel</b> to abort the transition." );
-}
 
 function set_context( context ) {
     document.getElementById('context').innerHTML = context;
@@ -970,12 +963,20 @@ function select_entry( id ) {
     );
 }
 
-function show_atatchment( id ) {
+function preview_atatchment( id ) {
+
+    var viewarea = document.getElementById('viewarea');
+    //viewarea.style.width = '250px';
+    //viewarea.style.height = '250px';
+    viewarea.innerHTML='<img src="ShowAttachment.php?id='+id+'" width="250" height="250"/>';
+
+/*
     var attachmentWindowRef =
         window.open(
             'ShowAttachment.php?id='+id,
             'attachmentWindow',
             'toolbar=0,location=1,menubar=0,status=0,directories=0');
+*/
 }
 
 var entry_tags_table=null;
@@ -1193,9 +1194,23 @@ function event2html( re, show_full_time ) {
 
 function display_history( type, data ) {
 
+
+    var context='';
+    switch( type ) {
+        case TYPE_HISTORY_P:
+            context += 'Preparation >';
+            break;
+        case TYPE_HISTORY_D_DAY:
+            context += 'Data Taking > '+data.day;
+            break;
+        case TYPE_HISTORY_F:
+            context += 'Follow Up >';
+            break;
+    }
     set_context (
-    '<a href="javascript:display_experiment()">Experiment</a> > '+
-    'Shift >' );
+        '<a href="javascript:display_experiment()">Experiment</a> > '+
+        '<a href="javascript:browse_contents()">Browse</a> > '+
+        'History > '+context );
 
     var show_full_time = true;
     var url='RequestInfo.php?exper_id='+current_selection.experiment.id+'&type='+type;
@@ -1217,8 +1232,12 @@ function display_history( type, data ) {
         }
         document.getElementById('workarea').innerHTML=html;
     }
-    //document.getElementById('workarea').innerHTML='<img src="images/ajaxloader.gif" />';
-    load_then_call( url, callback_on_load );
+    function callback_on_failure( http_status ) {
+        document.getElementById('workarea').innerHTML=
+            '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
+    }
+    //document.getElementById('workarea').innerHTML='<img src="images/ajaxloader.gif" />&nbsp;loading...';
+    load_then_call( url, callback_on_load, callback_on_failure );
 }
 
 var browse_tree = null;
@@ -1244,12 +1263,8 @@ function browse_contents() {
     workarea.innerHTML='No context selected yet.';
 
     var navarea = document.getElementById('navarea');
-    //navarea.style.borderRight="solid 1px";
     navarea.style.minWidth = "200px";
-    //navarea.style.marginRight = "10px";
     navarea.style.padding = "10px";
-    //navarea.style.overflow = "scroll";
-    //navarea.style.backgroundColor = "d0d0d0";
     navarea.innerHTML=
         '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
         '  <center><b>Select Context</b></center>'+
@@ -1329,6 +1344,19 @@ function browse_contents() {
             case TYPE_HISTORY_P:     display_history( TYPE_HISTORY_P,     null); break;
             case TYPE_HISTORY_D_DAY: display_history( TYPE_HISTORY_D_DAY, node.data ); break;
             case TYPE_HISTORY_F:     display_history( TYPE_HISTORY_F,     null); break;
+
+            case TYPE_SHIFTS:
+                set_context (
+                    '<a href="javascript:display_experiment()">Experiment</a> > '+
+                    '<a href="javascript:browse_contents()">Browse</a> > '+
+                    'Shifts > ' );
+                break;
+            case TYPE_RUNS:
+                set_context (
+                    '<a href="javascript:display_experiment()">Experiment</a> > '+
+                    '<a href="javascript:browse_contents()">Browse</a> > '+
+                    'Runs > ' );
+                break;
 
             case TYPE_SHIFT: select_shift( node.data.shift_id ); break;
             case TYPE_RUN:   select_run  ( node.data.shift_id, node.data.run_id ); break;
@@ -1432,18 +1460,112 @@ function browse_contents() {
     }
 }
 
+function search_and_display( p_oEvent ) {
+
+    document.getElementById('workarea').innerHTML='<img src="images/ajaxloader.gif" />&nbsp;searching...';
+
+    function callback_on_load( result ) {
+        var html='';
+        if( result.ResultSet.Status != "success" ) {
+            html = result.ResultSet.Message;
+        } else {
+            var r = result.ResultSet.Result;
+            if( r.length > 0 ) {
+                for( var i = 0; i < r.length; i++ ) {
+                    var re = r[i];
+                    var t = event2html( re, true );
+                    html += t;
+                }
+            } else {
+                html = 'No data in this context.';
+            }
+        }
+        document.getElementById('workarea').innerHTML=html;
+    }
+    function callback_on_failure( http_status ) {
+        document.getElementById('workarea').innerHTML=
+            '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
+    }
+    var url='Search.php?id='+current_selection.experiment.id+
+        '&text2search='+encodeURIComponent(document.search_form.text2search.value)+
+        '&search_experiment='+(document.search_form.search_experiment.checked ? '1' : '0')+
+        '&search_shifts='+(document.search_form.search_shifts.checked ? '1' : '0')+
+        '&search_runs='+(document.search_form.search_runs.checked ? '1' : '0')+
+        '&search_tags='+(document.search_form.search_tags.checked ? '1' : '0')+
+        '&search_values='+(document.search_form.search_values.checked ? '1' : '0')+
+        '&begin='+encodeURIComponent(document.search_form.begin.value)+
+        '&end='+encodeURIComponent(document.search_form.end.value)+
+        '&tag='+encodeURIComponent(document.search_form.tag.value)+
+        '&author='+encodeURIComponent(document.search_form.author.value);
+
+    load_then_call( url, callback_on_load, callback_on_failure );
+}
+
 function search_contents() {
 
     set_context (
         '<a href="javascript:display_experiment()">Experiment</a> > '+
         'Search >' );
 
-    document.getElementById('navarea').innerHTML='';
-    document.getElementById('workarea').innerHTML='';
+    reset_navarea();
+    reset_workarea();
 
-    post_info( "popupdialogs",
-        "Sorry, this feature hasn't been implemented yet! "+
-        "Come back later when a new version of the application will be available." );
+    var workarea = document.getElementById('workarea');
+    workarea.style.borderLeft="solid 1px";
+    workarea.style.padding = "10px";
+    workarea.innerHTML=
+        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
+        '  <center><b>How to Use Search Engine</b></center>'+
+        '</div>'+
+        '<div id="search_instructions" style="margin:10px;"></div>';
+
+    var navarea = document.getElementById('navarea');
+    navarea.style.minWidth = "200px";
+    navarea.style.padding = "10px";
+    navarea.innerHTML=
+        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
+        '  <center><b>Filter</b></center>'+
+        '</div>'+
+        '<form name="search_form" action="javascript:search_and_display(null)">'+
+        '  <div id="search_form_params" style="margin:10px;"></div>'+
+        '</form>';
+
+    load( 'SearchFormParams.php?id='+current_selection.experiment.id, 'search_form_params' );
+    load( 'help/SearchForm.html', 'search_instructions' );
+
+    YAHOO.util.Event.onContentReady (
+        "reset_form_button",
+        function () {
+            var reset_from_button = new YAHOO.widget.Button( "reset_form_button" );
+            reset_from_button.on (
+                "click",
+                function( p_oEvent ) {
+                    document.search_form.text2search.value='';
+                    document.search_form.search_experiment.checked=true;
+                    document.search_form.search_shifts.checked=true;
+                    document.search_form.search_runs.checked=true;
+                    document.search_form.search_tags.checked=true;
+                    document.search_form.search_values.checked=true;
+                    document.search_form.begin.value='';
+                    document.search_form.end.value='';
+                    document.search_form.tag.value='';
+                    document.getElementById('tag_default').selected="selected";
+                    document.search_form.author.value='';
+                    document.getElementById('author_default').selected="selected";
+                }
+            );
+        }
+    );
+    YAHOO.util.Event.onContentReady (
+        "submit_search_button",
+        function () {
+            var submit_search_button = new YAHOO.widget.Button( "submit_search_button" );
+            submit_search_button.on (
+                "click",
+                search_and_display
+            );
+        }
+    );
 }
     </script>
   </head>

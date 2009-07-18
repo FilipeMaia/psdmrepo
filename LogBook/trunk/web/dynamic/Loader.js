@@ -44,11 +44,14 @@ function load(url,id){
  * results into it as a parameter. The result will be presented as
  * a JavaScript object (array).
  */
-function load_then_call(url, onSuccess){
+function load_then_call(url, onSuccess, onError){
   var ldr=PageLoader();
   ldr.onreadystatechange=function() {
     if(ldr.readyState==4) {
-      onSuccess( eval( "("+ldr.responseText+")" ));
+        if( ldr.status == 200)
+            onSuccess( eval( "("+ldr.responseText+")" ));
+        else
+            onError( ldr.status );
     }
   }
   ldr.open('GET', url, true);
