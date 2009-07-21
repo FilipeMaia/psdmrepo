@@ -488,20 +488,16 @@ HERE;
      */
     public function search (
         $text2search='',
-        $search_experiment=false,
-        $search_shifts=false,
-        $search_runs=false,
-        $search_tags=false,
-        $search_values=false,
+        $search_in_messages=false,
+        $search_in_tags=false,
+        $search_in_values=false,
+        $posted_at_experiment=false,
+        $posted_at_shifts=false,
+        $posted_at_runs=false,
         $begin=null,
         $end=null,
         $tag='',
         $author='' ) {
-
-        if( !is_null( $begin ) && !is_null( $end ) && !$begin->less( $end ))
-            throw new LogBookException(
-                __METHOD__,
-                "begin time '".$begin."' isn't less than end time '".$end."'" );
 
         // Don't search if no sensible search parameters are given
         //
@@ -511,34 +507,75 @@ HERE;
             $tag == '' &&
             $author == '' ) return Array();
 
-        $text2search_str = $text2search == '' ? '' : " AND e.content LIKE '%{$text2search}%'";
-
+        /* The scope determines at which group of messages to look for:
+         *   - those directly attached to the experiment
+         *   - attached to shifts
+         *   - attached to runs
+         * The scope can't empty. Otherwise we'll just return an empty array.
+         */
         $scope = '';
-        if( $search_shifts ) {
-            $scope = '((h.shift_id IS NOT NULL)';
+        if( $posted_at_experiment ) {
+            $scope = '((h.shift_id IS NULL AND h.run_id IS NULL)';
         }
-        if( $search_runs ) {
+        if( $posted_at_shifts ) {
+            if( $scope == '' )
+                $scope = '((h.shift_id IS NOT NULL)';
+            else
+                $scope .= ' OR (h.shift_id IS NOT NULL)';
+        }
+        if( $posted_at_runs ) {
             if( $scope == '' )
                 $scope = '((h.run_id IS NOT NULL)';
             else
                 $scope .= ' OR (h.run_id IS NOT NULL)';
         }
-        if( $search_experiment ) {
-            if( $scope == '' )
-                $scope = '((h.shift_id IS NULL AND h.run_id IS NULL)';
-            else
-                $scope .= ' OR (h.shift_id IS NULL AND h.run_id IS NULL)';
+        if( $scope != '' )
+            $scope .= ")";
+        else
+            return Array();
+
+        /* Decide at which part(a) of messages to look for. This is actually
+         * an optional filter.
+         */
+        $part = '';
+        if( $search_in_messages ) {
+            $part = " AND ((e.content LIKE '%{$text2search}%')";
         }
-        $scope .= ")";
+        if( $search_in_tags ) {
+            if( $part == '' )
+                $part = " AND ((t.tag LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+            else
+                $part .= " OR (t.tag LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+        }
+        if( $search_in_values ) {
+            if( $part == '' )
+                $part = " AND ((t.value LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+            else
+                $part .= " OR (t.value LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+        }
+        if( $part != '' )
+            $part .= ")";
+
+        /* Consider timing constrains as well (if present).
+         */
+        if( !is_null( $begin ) && !is_null( $end ) && !$begin->less( $end ))
+            throw new LogBookException(
+                __METHOD__,
+                "begin time '".$begin."' isn't less than end time '".$end."'" );
 
         $begin_str = is_null( $begin ) ? '' : ' AND e.insert_time >='.$begin->to64();
         $end_str   = is_null( $end )   ? '' : ' AND e.insert_time < '.$end->to64();
 
+        /* Consider tag and/or author constrains as well (if present).
+         */
         $tag_str    = $tag    == '' ? '' : " AND t.tag='{$tag}' AND t.hdr_id = h.id";
         $author_str = $author == '' ? '' : " AND e.author='{$author}'";
 
+        /* Proceed with the actual search. Expect results to be ordered by
+         * the insert (post) time.
+         */
         return $this->entries_by_(
-            $scope.$begin_str.$end_str.$tag_str.$author_str.$text2search_str
+            $scope.$part.$begin_str.$end_str.$tag_str.$author_str
         );
     }
 

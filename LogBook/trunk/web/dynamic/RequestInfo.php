@@ -91,27 +91,27 @@ function entry2json( $entry ) {
     $extra_vspace = $extra_lines == 0 ? 0 :  20 + 20 * $extra_lines;
 
     $con = new RegDBHtml( 0, 0, 750, 60 + $message_height + $extra_vspace );
-    $con->container_1 (   0,   0, "<pre style=\"padding:4px; font-size:14px; background-color:#cfecec;\">{$entry->content()}</pre>", 750, $message_height )
-        ->label   ( 250,  $base,    'By:'        )->value( 300,  $base,    $entry->author())
-        ->label   (  20,  $base,    'Posted:'    )->value( 100,  $base,    $entry->insert_time()->toStringShort())
-        ->label   (  20,  $base+20, 'Relevance:' )->value( 100,  $base+20, $relevance_time_str )
-        ->label   ( 250,  $base+20, 'Run:'       )->value( 300,  $base+20, $run_number_str )
-        ->label   ( 350,  $base+20, 'Shift:'     )->value( 400,  $base+20, $shift_begin_time_str );
+    $con->container_1 (   0,   0, "<pre style=\"padding:4px; font-size:14px; background-color:#cfecec;\">{$entry->content()}</pre>", 750, $message_height );
+        //->label   ( 250,  $base,    'By:'        )->value( 300,  $base,    $entry->author())
+        //->label   (  20,  $base,    'Posted:'    )->value( 100,  $base,    $entry->insert_time()->toStringShort())
+        //->label   (  20,  $base+20, 'Relevance:' )->value( 100,  $base+20, $relevance_time_str )
+        //->label   ( 250,  $base+20, 'Run:'       )->value( 300,  $base+20, $run_number_str )
+        //->label   ( 350,  $base+20, 'Shift:'     )->value( 400,  $base+20, $shift_begin_time_str );
 
     if( count( $tags ) != 0 ) {
-        $con->label_1(  20, $base+50, 'Tag', 80 )->label_1( 115, $base+50, 'Value', 100 );
+        $con->label_1(  0, $base+20, 'Tag', 80 )->label_1( 115, $base+20, 'Value', 100 );
     }
     if( count( $attachments ) != 0 ) {
-        $con->label_1  ( 250, $base+50, 'Attachment', 200 )->label_1( 465, $base+50, 'Size', 50 )
-            ->container( 520, $base+50, 'viewarea' );
+        $con->label_1  ( 250, $base+20, 'Attachment', 200 )->label_1( 465, $base+20, 'Size', 50 )
+            ->container( 520, $base+20, 'viewarea' );
     }
-    $base4tags = $base+75;
+    $base4tags = $base+45;
     foreach( $tags as $tag ) {
-        $con->value_1(  20, $base4tags, $tag->tag())
+        $con->value_1(   0, $base4tags, $tag->tag())
             ->value_1( 115, $base4tags, $tag->value());
         $base4tags = $base4tags + 20;
     }
-    $base4attch = $base+75;
+    $base4attch = $base+45;
     foreach( $attachments as $attachment ) {
         $attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank">'.$attachment->description().'</a>';
 /*
@@ -129,6 +129,10 @@ function entry2json( $entry ) {
     return json_encode(
         array (
             "event_time" => $entry->insert_time()->toStringShort(),
+            "relevance_time" => $relevance_time_str,
+            "run" => $run_number_str,
+            "shift" => $shift_begin_time_str,
+            "author" => $entry->author(),
             "html" => $con->html()
         )
     );

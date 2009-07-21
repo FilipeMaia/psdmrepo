@@ -1460,45 +1460,139 @@ function browse_contents() {
     }
 }
 
+function event2html_1( re ) {
+    var color = ''; //"background-color:#e0e0e0;"; // "#cfecec" - "Light Cyan 2""
+    var result=
+        '<div style="padding:2px; background-color:#cfecec;">'+
+        '  <b><em style="padding:2px; '+color+'">Posted: </em></b>'+re.event_time+
+        '  <b><em style="padding:2px; '+color+'">Relevance: </em></b>'+re.relevance_time+
+        '  <b><em style="padding:2px; '+color+'">Run: </em></b>'+re.run+
+        '  <b><em style="padding:2px; '+color+'">Shift: </em></b>'+re.shift+
+        '  <b><em style="padding:2px; '+color+'">By: </em></b>'+re.author+
+      //'  <hr>'+
+        '</div>'+
+        '<div style="margin:10px; margin-top:20px; margin-right:0px;">'+re.html+'</div>';
+    return result;
+}
+
 function search_and_display( p_oEvent ) {
 
-    document.getElementById('workarea').innerHTML='<img src="images/ajaxloader.gif" />&nbsp;searching...';
-
-    function callback_on_load( result ) {
-        var html='';
-        if( result.ResultSet.Status != "success" ) {
-            html = result.ResultSet.Message;
-        } else {
-            var r = result.ResultSet.Result;
-            if( r.length > 0 ) {
-                for( var i = 0; i < r.length; i++ ) {
-                    var re = r[i];
-                    var t = event2html( re, true );
-                    html += t;
-                }
-            } else {
-                html = 'No data in this context.';
-            }
+    // Determine how we're supposed to show the contents. Then, depending
+    // on the request, initiate different loading protocols.
+    //
+    var presentation_format=null;
+    var preview_attachments=false;
+    for( var i=0; i < document.search_form.presentation_format.length; i++ ) {
+        var r = document.search_form.presentation_format[i];
+        if( r.checked ) {
+            presentation_format = r.value;
+            if( presentation_format != 'compact' )
+                preview_attachments = document.search_form.preview_attachments.checked;
         }
-        document.getElementById('workarea').innerHTML=html;
     }
-    function callback_on_failure( http_status ) {
-        document.getElementById('workarea').innerHTML=
-            '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
-    }
-    var url='Search.php?id='+current_selection.experiment.id+
-        '&text2search='+encodeURIComponent(document.search_form.text2search.value)+
-        '&search_experiment='+(document.search_form.search_experiment.checked ? '1' : '0')+
-        '&search_shifts='+(document.search_form.search_shifts.checked ? '1' : '0')+
-        '&search_runs='+(document.search_form.search_runs.checked ? '1' : '0')+
-        '&search_tags='+(document.search_form.search_tags.checked ? '1' : '0')+
-        '&search_values='+(document.search_form.search_values.checked ? '1' : '0')+
-        '&begin='+encodeURIComponent(document.search_form.begin.value)+
-        '&end='+encodeURIComponent(document.search_form.end.value)+
-        '&tag='+encodeURIComponent(document.search_form.tag.value)+
-        '&author='+encodeURIComponent(document.search_form.author.value);
 
-    load_then_call( url, callback_on_load, callback_on_failure );
+    var show_on_page=null;
+    var limit_per_page=null;
+    for( var i=0; i < document.search_form.show_on_page.length; i++ ) {
+        var r = document.search_form.show_on_page[i];
+        if( r.checked ) {
+            show_on_page = r.value;
+            if( show_on_page != 'all' )
+                limit_per_page = document.search_form.limit_per_page.value;
+        }
+    }
+
+    if( presentation_format == 'detailed' ) {
+
+        // In the 'detailed' presentation mode show everything in plain
+        // static HTML.
+        //
+        document.getElementById('workarea').innerHTML='<img src="images/ajaxloader.gif" />&nbsp;searching...';
+
+        function callback_on_load( result ) {
+            var html='';
+            if( result.ResultSet.Status != "success" ) {
+                html = result.ResultSet.Message;
+            } else {
+                var r = result.ResultSet.Result;
+                html=
+                    '<div style="margin-bottom:30px; padding:2px; padding-left:4px; background-color:#e0e0e0;">'+
+                    '  <b>'+r.length+' message(s) found</b>'+
+                    '</div>';
+                if( r.length > 0 ) {
+                    for( var i = 0; i < r.length; i++ ) {
+                        var re = r[i];
+                        var t = event2html_1( re );
+                        html += t;
+                    }
+                }
+            }
+            document.getElementById('workarea').innerHTML=html;
+        }
+        function callback_on_failure( http_status ) {
+            document.getElementById('workarea').innerHTML=
+                '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
+        }
+        var url='Search.php?id='+current_selection.experiment.id+
+            '&format='+presentation_format+
+            '&text2search='+encodeURIComponent(document.search_form.text2search.value)+
+            '&search_in_messages='+(document.search_form.search_in_messages.checked ? '1' : '0')+
+            '&search_in_tags='+(document.search_form.search_in_tags.checked ? '1' : '0')+
+            '&search_in_values='+(document.search_form.search_in_values.checked ? '1' : '0')+
+            '&posted_at_experiment='+(document.search_form.posted_at_experiment.checked ? '1' : '0')+
+            '&posted_at_shifts='+(document.search_form.posted_at_shifts.checked ? '1' : '0')+
+            '&posted_at_runs='+(document.search_form.posted_at_runs.checked ? '1' : '0')+
+            '&begin='+encodeURIComponent(document.search_form.begin.value)+
+            '&end='+encodeURIComponent(document.search_form.end.value)+
+            '&tag='+encodeURIComponent(document.search_form.tag.value)+
+            '&author='+encodeURIComponent(document.search_form.author.value);
+
+        load_then_call( url, callback_on_load, callback_on_failure );
+
+    } else if( presentation_format == 'compact' ) {
+
+        // Build the YUI table and use its loading mechanism
+        //
+        document.getElementById('workarea').innerHTML=
+            '<div style="margin-bottom:30px; padding:2px; background-color:#e0e0e0;">'+
+            '  <b>Found the following message(s)</b>'+
+            '</div>'+
+            '<div id="messages_table" style="margin-left:10px;">'+
+            '  <div id="messages_table_paginator"></div>'+
+            '  <div id="messages_table_body"></div>'+
+          //'  <div id="messages_table_paginator" style="background-color:#e0e0e0;"></div>'+
+            '</div>';
+
+        var url='Search.php?id='+current_selection.experiment.id+
+            '&format='+presentation_format+
+            '&text2search='+encodeURIComponent(document.search_form.text2search.value)+
+            '&search_in_messages='+(document.search_form.search_in_messages.checked ? '1' : '0')+
+            '&search_in_tags='+(document.search_form.search_in_tags.checked ? '1' : '0')+
+            '&search_in_values='+(document.search_form.search_in_values.checked ? '1' : '0')+
+            '&posted_at_experiment='+(document.search_form.posted_at_experiment.checked ? '1' : '0')+
+            '&posted_at_shifts='+(document.search_form.posted_at_shifts.checked ? '1' : '0')+
+            '&posted_at_runs='+(document.search_form.posted_at_runs.checked ? '1' : '0')+
+            '&begin='+encodeURIComponent(document.search_form.begin.value)+
+            '&end='+encodeURIComponent(document.search_form.end.value)+
+            '&tag='+encodeURIComponent(document.search_form.tag.value)+
+            '&author='+encodeURIComponent(document.search_form.author.value);
+
+        this.table = new Table (
+            "messages_table",
+            [ { key: "posted",      sortable: true,  resizeable: false },
+              { key: "author",      sortable: true,  resizeable: false },
+              { key: "run",         sortable: true,  resizeable: false },
+              { key: "shift",       sortable: true,  resizeable: false },
+              { key: "message",     sortable: false, resizeable: true  },
+              { key: "tags",        sortable: false, resizeable: true  },
+              { key: "attachments", sortable: false, resizeable: true  } ],
+            url,
+            limit_per_page != null,
+            limit_per_page
+        );
+    } else {
+        alert( 'unsupported presentation format: '+presentation_format );
+    }
 }
 
 function search_contents() {
@@ -1513,6 +1607,7 @@ function search_contents() {
     var workarea = document.getElementById('workarea');
     workarea.style.borderLeft="solid 1px";
     workarea.style.padding = "10px";
+    workarea.style.minHeight="620px";
     workarea.innerHTML=
         '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
         '  <center><b>How to Use Search Engine</b></center>'+
@@ -1541,11 +1636,12 @@ function search_contents() {
                 "click",
                 function( p_oEvent ) {
                     document.search_form.text2search.value='';
-                    document.search_form.search_experiment.checked=true;
-                    document.search_form.search_shifts.checked=true;
-                    document.search_form.search_runs.checked=true;
-                    document.search_form.search_tags.checked=true;
-                    document.search_form.search_values.checked=true;
+                    document.search_form.search_in_messages.checked=true;
+                    document.search_form.search_in_tags.checked=true;
+                    document.search_form.search_in_values.checked=true;
+                    document.search_form.posted_at_experiment.checked=true;
+                    document.search_form.posted_at_shifts.checked=true;
+                    document.search_form.posted_at_runs.checked=true;
                     document.search_form.begin.value='';
                     document.search_form.end.value='';
                     document.search_form.tag.value='';
