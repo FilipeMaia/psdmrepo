@@ -15,10 +15,11 @@ class RegDBHtml {
 
     private $html;
 
-    public function __construct( $x, $y,  $width=480, $height=null, $position='relative' ) {
+    public function __construct( $x, $y,  $width=480, $height=null, $position='relative', $style=null ) {
+        $style_extra = is_null( $style ) ? '' : $style;
         $height_str = is_null( $height ) ? 'height:auto;' : "height:{$height}px;";
         $this->html =<<<HERE
-<div style="position:{$position}; left:{$x}px; top:{$y}px; margin-left:0px; width:{$width}px; {$height_str}">
+<div style="position:{$position}; left:{$x}px; top:{$y}px; margin-left:0px; width:{$width}px; {$height_str} {$style_extra}">
 HERE;
     }
 
@@ -91,6 +92,16 @@ HERE;
         $this->html = $this->html.<<<HERE
 <div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
   <input type="checkbox" name="{$var}" value="{$text}" {$checked_attr}/>
+</div>
+HERE;
+        return $this;
+    }
+
+    public function radio_input( $x, $y, $group_name, $text, $checked=false ) {
+        $checked_attr = $checked ? 'checked="checked"' : '';
+        $this->html = $this->html.<<<HERE
+<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
+  <input type="radio" name="{$group_name}" value="{$text}" {$checked_attr}>
 </div>
 HERE;
         return $this;
