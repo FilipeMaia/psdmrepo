@@ -93,20 +93,12 @@ and open the template in the editor.
         */
     }
     #experiment_info_container,
-    #runs_table,
+    /*#runs_table,*/
     #run_parameters,
     #messages_actions_container {
         padding:10px;
     }
     #workarea_table_container          table,
-    #params_table_container            table,
-    /*
-    #runs_table_container              table,
-    */
-    #shifts_table_container            table,
-    #messages_table_container          table,
-    #tags_table_container              table,
-    #files_table_container             table,
     #entry_tags_table_container        table,
     #entry_attachments_table_container table {
     }
@@ -128,20 +120,6 @@ and open the template in the editor.
     }
     #workarea_table_container,
     #workarea_table_container .yui-dt-loading,
-    #params_table_container,
-    #params_table_container .yui-dt-loading,
-    /*
-    #runs_table_container,
-    #runs_table_container .yui-dt-loading,
-    */
-    #shifts_table_container,
-    #shifts_table_container .yui-dt-loading,
-    #messages_table_container,
-    #messages_table_container .yui-dt-loading,
-    #tags_table_container,
-    #tags_table_container .yui-dt-loading,
-    #files_table_container,
-    #files_table_container .yui-dt-loading,
     #entry_tags_table_container,
     #entry_tags_table_container .yui-dt-loading,
     #entry_attachments_table_container,
@@ -509,7 +487,7 @@ function create_button( elementId, func2proceed ) {
     return this;
 }
 
-function create_runs_table( source, paginator ) {
+function create_runs_table( source, paginator, rows_per_page ) {
 
     document.getElementById('runs_table').innerHTML=
         '  <div id="runs_table_paginator"></div>'+
@@ -523,12 +501,12 @@ function create_runs_table( source, paginator ) {
           { key: "shift_begin_time", sortable: true, resizeable: false } ],
         source,
         paginator,
-        10
+        rows_per_page
     );
     //table.refreshTable();
 }
 
-function create_shifs_table( source, paginator ) {
+function create_shifts_table( source, paginator, rows_per_page ) {
 
     document.getElementById('shifts_table').innerHTML=
         '  <div id="shifts_table_paginator"></div>'+
@@ -542,7 +520,29 @@ function create_shifs_table( source, paginator ) {
           { key: "num_runs",   sortable: true, resizeable: false } ],
         source,
         paginator,
-        10
+        rows_per_page
+    );
+    //table.refreshTable();
+}
+
+function create_messages_table( source, paginator, rows_per_page ) {
+
+    document.getElementById('messages_table').innerHTML=
+        '  <div id="messages_table_paginator"></div>'+
+        '  <div id="messages_table_body"></div>';
+
+    var table = new Table (
+        "messages_table",
+        [ { key: "posted",      sortable: true,  resizeable: false },
+          { key: "author",      sortable: true,  resizeable: false },
+          { key: "run",         sortable: true,  resizeable: false },
+          { key: "shift",       sortable: true,  resizeable: false },
+          { key: "message",     sortable: false, resizeable: true  },
+          { key: "tags",        sortable: false, resizeable: true  },
+          { key: "attachments", sortable: false, resizeable: true  } ],
+        source,
+        paginator,
+        rows_per_page
     );
     //table.refreshTable();
 }
@@ -634,25 +634,6 @@ function display_experiment() {
             );
         }
     );
-
-    YAHOO.util.Event.onContentReady (
-        "runs_table",
-        function () {
-            var runs = create_runs_table (
-                'RequestRuns.php?id='+current_selection.experiment.id+'&last',
-                false
-            );
-        }
-    );
-    YAHOO.util.Event.onContentReady (
-        "shifts_table",
-        function () {
-            var shifts = create_shifs_table (
-                'RequestShifts.php?id='+current_selection.experiment.id+'&last',
-                false
-            );
-        }
-    );
     var messages_dialog = create_messages_dialog( 'experiment' );
 }
 
@@ -693,11 +674,8 @@ function create_messages_dialog( scope ) {
         '    </tr>'+
         '  </tbody></table>'+
         '</form>'+
-        '<div id="messages_table" style="margin-top:10px;">'+
-        '  <div id="messages_table_body"></div>'+
-        '  <div id="messages_table_paginator"></div>'+
-//        '  <div id="messages_table_paginator" style="background-color:#e0e0e0;"></div>'+
-        '</div>';
+        '<div id="messages_table" style="margin-top:10px;"></div>';
+
     document.getElementById('messages_actions_container').innerHTML=html;
 
     var url='RequestFFEntries.php?id='+current_selection.experiment.id+'&scope='+scope;
@@ -708,18 +686,7 @@ function create_messages_dialog( scope ) {
     } else if( scope == "run") {
          url += '&run_id='+current_selection.run.id;
     }
-
-    this.table = new Table (
-        "messages_table",
-        [ { key: "posted",      sortable: true, resizeable: false },
-          { key: "author",      sortable: true, resizeable: false },
-          { key: "message",     sortable: true, resizeable: true  },
-          { key: "tags",        sortable: true, resizeable: false },
-          { key: "attachments", sortable: true, resizeable: false } ],
-        url,
-        true,
-        10
-    );
+    create_messages_table( url, true, 10 );
 
     this.extendedShown = false;
 
@@ -1031,7 +998,7 @@ function list_shifts() {
         'RequestShifts.php?id='+current_selection.experiment.id,
         false
     );
-    table.refreshTable();
+    //table.refreshTable();
 }
 
 function select_shift( shift_id ) {
@@ -1058,7 +1025,7 @@ function display_shift() {
         '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
         '  <center><b>Runs</b></center>'+
         '</div>'+
-        '<div id="runs_table"></div>'+
+        '<div id="runs_table" style="padding:10px;"></div>'+
         '<br>'+
         '<br>'+
         '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
@@ -1089,7 +1056,7 @@ function display_shift() {
                         'as of this time? Enter <b>Yes</b> to do so. '+
                         'Note, this is the last chance to abort making modifications '+
                         'in the database!',
-                        function() { alert("closing the shift"); return; document.close_shift_form.submit(); },
+                        function() { document.close_shift_form.submit(); },
                         function() { display_shift(); }
                     );
                 }
@@ -1181,63 +1148,79 @@ var TYPE_HISTORY_P     = 110,
     TYPE_RUNS    = 300,
     TYPE_RUN     = 301;
 
-function event2html( re, show_full_time ) {
-    var color = "#e0e0e0"; // "#cfecec" - "Light Cyan 2""
-    var timestamp = show_full_time ? re.event_time : re.event_time.split(' ')[1];
-    var result=
-        '<div style="padding:2px;">'+
-        '  <b><em style="padding:2px; background-color:'+color+';">'+timestamp+'</em></b><hr>'+
-        '</div>'+
-        '<div style="margin:20px; margin-top:10px; margin-right:0px;">'+re.html+'</div>';
-    return result;
+function container_highlight( which ) {
+    which.style.backgroundColor = '#efefef';    // #cfecec';    // 'Light Cyan 2''
+}
+
+function container_unhighlight ( which, color ) {
+    which.style.backgroundColor = color;
 }
 
 function display_history( type, data ) {
 
+    var request_messages_url =
+        'Search.php?id='+current_selection.experiment.id+
+        '&format=compact'+
+        '&search_in_messages=1&search_in_tags=1&search_in_values=1'+
+        '&posted_at_experiment=1&posted_at_shifts=1&posted_at_runs=1';
+
+    var request_shifts_url =
+        'RequestShifts.php?id='+current_selection.experiment.id;
+
+    var request_runs_url =
+        'RequestRuns.php?id='+current_selection.experiment.id;
 
     var context='';
+
     switch( type ) {
         case TYPE_HISTORY_P:
+            request_messages_url += '&end=b';
+            request_shifts_url += '&end=b';
+            request_runs_url += '&end=b';
             context += 'Preparation >';
             break;
         case TYPE_HISTORY_D_DAY:
+            request_messages_url += '&begin='+encodeURIComponent(data.begin)+'&end='+encodeURIComponent(data.end);
+            request_shifts_url += '&begin='+encodeURIComponent(data.begin)+'&end='+encodeURIComponent(data.end);
+            request_runs_url += '&begin='+encodeURIComponent(data.begin)+'&end='+encodeURIComponent(data.end);
             context += 'Data Taking > '+data.day;
             break;
         case TYPE_HISTORY_F:
+            request_messages_url += '&begin=e';
+            request_shifts_url += '&begin=e';
+            request_runs_url += '&begin=e';
             context += 'Follow Up >';
             break;
+        default:
+            alert( "unsupported history element" );
+            return;
     }
     set_context (
         '<a href="javascript:display_experiment()">Experiment</a> > '+
         '<a href="javascript:browse_contents()">Browse</a> > '+
         'History > '+context );
 
-    var show_full_time = true;
-    var url='RequestInfo.php?exper_id='+current_selection.experiment.id+'&type='+type;
-    if( type == TYPE_HISTORY_D_DAY ) {
-        url += '&begin='+data.begin+'&end='+data.end;
-        show_full_time = false;
-    }
-    function callback_on_load( result ) {
-        var html='';
-        var r = result.ResultSet.Result;
-        if( r.length > 0 ) {
-            for( var i = 0; i < r.length; i++ ) {
-                var re = r[i];
-                var t = event2html( re, show_full_time );
-                html += t;
-            }
-        } else {
-            html = 'No data in this context.';
-        }
-        document.getElementById('workarea').innerHTML=html;
-    }
-    function callback_on_failure( http_status ) {
-        document.getElementById('workarea').innerHTML=
-            '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
-    }
-    //document.getElementById('workarea').innerHTML='<img src="images/ajaxloader.gif" />&nbsp;loading...';
-    load_then_call( url, callback_on_load, callback_on_failure );
+    var subheader_style = 'padding:2px; background-color:#e0e0e0;';
+
+    document.getElementById('workarea').innerHTML =
+        '<div style="margin-bottom:20px; '+subheader_style+'">'+
+        '  <b>Shifts</b>'+
+        '</div>'+
+        '<div id="shifts_table" style="margin-left:10px; margin-bottom:20px;"></div>'+
+        '<div style="margin-bottom:20px; '+subheader_style+'">'+
+        '  <b>Runs</b>'+
+        '</div>'+
+        '<div id="runs_table" style="margin-left:10px; margin-bottom:20px;"></div>'+
+        '<div style="margin-bottom:20px; '+subheader_style+'">'+
+        '  <b>Operator and Control System Messages</b>'+
+        '</div>'+
+        '<div id="messages_table" style="margin-left:10px;"></div>';
+
+    // Build  YUI tables and use their loading mechanism
+    //
+    create_shifts_table( request_shifts_url, false );
+    create_runs_table( request_runs_url, false );
+    create_messages_table( request_messages_url, false );
 }
 
 var browse_tree = null;
@@ -1463,7 +1446,7 @@ function browse_contents() {
 function event2html_1( re ) {
     var color = ''; //"background-color:#e0e0e0;"; // "#cfecec" - "Light Cyan 2""
     var result=
-        '<div style="padding:2px; background-color:#cfecec;">'+
+        '<div style="margin-top:20px; margin-left:10px; padding:2px; background-color:#cfecec;">'+
         '  <b><em style="padding:2px; '+color+'">Posted: </em></b>'+re.event_time+
         '  <b><em style="padding:2px; '+color+'">Relevance: </em></b>'+re.relevance_time+
         '  <b><em style="padding:2px; '+color+'">Run: </em></b>'+re.run+
@@ -1471,7 +1454,7 @@ function event2html_1( re ) {
         '  <b><em style="padding:2px; '+color+'">By: </em></b>'+re.author+
       //'  <hr>'+
         '</div>'+
-        '<div style="margin:10px; margin-top:20px; margin-right:0px;">'+re.html+'</div>';
+        '<div style="margin-left:20px; margin-top:20px; margin-right:0px;">'+re.html+'</div>';
     return result;
 }
 
@@ -1516,7 +1499,7 @@ function search_and_display( p_oEvent ) {
             } else {
                 var r = result.ResultSet.Result;
                 html=
-                    '<div style="margin-bottom:30px; padding:2px; padding-left:4px; background-color:#e0e0e0;">'+
+                    '<div style="margin-bottom:20px; padding:2px; padding-left:4px; background-color:#e0e0e0;">'+
                     '  <b>'+r.length+' message(s) found</b>'+
                     '</div>';
                 if( r.length > 0 ) {
@@ -1554,14 +1537,10 @@ function search_and_display( p_oEvent ) {
         // Build the YUI table and use its loading mechanism
         //
         document.getElementById('workarea').innerHTML=
-            '<div style="margin-bottom:30px; padding:2px; background-color:#e0e0e0;">'+
+            '<div style="margin-bottom:20px; padding:2px; background-color:#e0e0e0;">'+
             '  <b>Found the following message(s)</b>'+
             '</div>'+
-            '<div id="messages_table" style="margin-left:10px;">'+
-            '  <div id="messages_table_paginator"></div>'+
-            '  <div id="messages_table_body"></div>'+
-          //'  <div id="messages_table_paginator" style="background-color:#e0e0e0;"></div>'+
-            '</div>';
+            '<div id="messages_table" style="margin-left:10px;"></div>';
 
         var url='Search.php?id='+current_selection.experiment.id+
             '&format='+presentation_format+
@@ -1577,19 +1556,8 @@ function search_and_display( p_oEvent ) {
             '&tag='+encodeURIComponent(document.search_form.tag.value)+
             '&author='+encodeURIComponent(document.search_form.author.value);
 
-        this.table = new Table (
-            "messages_table",
-            [ { key: "posted",      sortable: true,  resizeable: false },
-              { key: "author",      sortable: true,  resizeable: false },
-              { key: "run",         sortable: true,  resizeable: false },
-              { key: "shift",       sortable: true,  resizeable: false },
-              { key: "message",     sortable: false, resizeable: true  },
-              { key: "tags",        sortable: false, resizeable: true  },
-              { key: "attachments", sortable: false, resizeable: true  } ],
-            url,
-            limit_per_page != null,
-            limit_per_page
-        );
+        create_messages_table( url, limit_per_page != null, limit_per_page );
+
     } else {
         alert( 'unsupported presentation format: '+presentation_format );
     }

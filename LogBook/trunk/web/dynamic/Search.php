@@ -36,89 +36,57 @@ if( !isset( $_GET['format'] )) report_error( "no valid presentation format param
 $format = trim( $_GET['format'] );
 if( $format == '' ) report_error( "presentation format parameter can't be empty" );
 
-if( !isset( $_GET['text2search'] )) report_error( "no text2search parameter" );
-$text2search = trim( $_GET['text2search'] );
+$text2search = '';
+if( isset( $_GET['text2search'] ))
+    $text2search = trim( $_GET['text2search'] );
 
 
-if( !isset( $_GET['search_in_messages'] )) report_error( "no search_in_messages parameter" );
-$search_in_messages = '0' != trim( $_GET['search_in_messages'] );
+$search_in_messages = false;
+if( isset( $_GET['search_in_messages'] ))
+    $search_in_messages = '0' != trim( $_GET['search_in_messages'] );
 
-if( !isset( $_GET['search_in_tags'] )) report_error( "no search_in_tags parameter" );
-$search_in_tags = '0' != trim( $_GET['search_in_tags'] );
+$search_in_tags = false;
+if( isset( $_GET['search_in_tags'] ))
+    $search_in_tags = '0' != trim( $_GET['search_in_tags'] );
 
-if( !isset( $_GET['search_in_values'] )) report_error( "no search_in_values parameter" );
-$search_in_values = '0' != trim( $_GET['search_in_values'] );
+$search_in_values = false;
+if( isset( $_GET['search_in_values'] ))
+    $search_in_values = '0' != trim( $_GET['search_in_values'] );
 
 if( !$search_in_messages && !$search_in_tags && !$search_in_values )
     report_error( "at least one of (<b>search_in_messages</b>, <b>search_in_tags</b>, <b>search_in_values</b>) parameters must be set" );
 
 
-if( !isset( $_GET['posted_at_experiment'] )) report_error( "no posted_at_experiment parameter" );
-$posted_at_experiment = '0' != trim( $_GET['posted_at_experiment'] );
+$posted_at_experiment = false;
+if( isset( $_GET['posted_at_experiment'] ))
+    $posted_at_experiment = '0' != trim( $_GET['posted_at_experiment'] );
 
-if( !isset( $_GET['posted_at_shifts'] )) report_error( "no posted_at_shifts parameter" );
-$posted_at_shifts = '0' != trim( $_GET['posted_at_shifts'] );
+$posted_at_shifts = false;
+if( isset( $_GET['posted_at_shifts'] ))
+    $posted_at_shifts = '0' != trim( $_GET['posted_at_shifts'] );
 
-if( !isset( $_GET['posted_at_runs'] )) report_error( "no posted_at_runs parameter" );
-$posted_at_runs = '0' != trim( $_GET['posted_at_runs'] );
+$posted_at_runs = false;
+if( isset( $_GET['posted_at_runs'] ))
+    $posted_at_runs = '0' != trim( $_GET['posted_at_runs'] );
 
 if( !$posted_at_experiment && !$posted_at_shifts && !$posted_at_runs )
     report_error( "at least one of (<b>posted_at_experiment</b>, <b>posted_at_shifts</b>, <b>posted_at_runs</b>) parameters must be set" );
 
+$begin_str = '';
+if( isset( $_GET['begin'] ))
+    $begin_str = trim( $_GET['begin'] );
 
-$begin = null;
-if( !isset( $_GET['begin'] )) report_error( "no begin parameter" );
-$begin_str = trim( $_GET['begin'] );
-if( $begin_str != '' ) {
-    // Check for shortcuts first
-    //
-    switch( $begin_str[0] ) {
-        case 'm':
-        case 'M':
-            $begin = LusiTime::minus_month();
-            break;
-        case 'w':
-        case 'W':
-            $begin = LusiTime::minus_week();
-            break;
-        case 'd':
-        case 'D':
-            $begin = LusiTime::minus_day();
-            break;
-        case 'y':
-        case 'Y':
-            $begin = LusiTime::yesterday();
-            break;
-        case 't':
-        case 'T':
-            $begin = LusiTime::today();
-            break;
-        case 'h':
-        case 'H':
-            $begin = LusiTime::minus_hour();
-            break;
-    }
-    if( is_null( $begin )) {
-        $begin = LusiTime::parse( trim( $begin_str ))
-            or report_error( "begin time has invalid format" );
-    }
-}
+$end_str = '';
+if( isset( $_GET['end'] ))
+    $end_str = trim( $_GET['end'] );
 
-$end = null;
-if( !isset( $_GET['end'] )) report_error( "no end parameter" );
-$end_str = trim( $_GET['end'] );
-if( $end_str != '' ) {
-    $end = LusiTime::parse( trim( $end_str ))
-        or report_error( "end time has invalid format" );
-}
-if( !is_null( $begin ) && !is_null( $end ) && !$begin->less( $end ))
-    report_error( "invalid interval - begin time isn't strictly less than the end one" );
+$tag = '';
+if( isset( $_GET['tag'] ))
+    $tag = trim( $_GET['tag'] );
 
-if( !isset( $_GET['tag'] )) report_error( "no tag parameter" );
-$tag = trim( $_GET['tag'] );
-
-if( !isset( $_GET['author'] )) report_error( "no author parameter" );
-$author = trim( $_GET['author'] );
+$author = '';
+if( isset( $_GET['author'] ))
+    $author = trim( $_GET['author'] );
 
 /* Package the error message into a JAON object and return the one
  * back to a caller. The script's execution will end at this point.
@@ -135,6 +103,34 @@ function report_error( $msg ) {
 }
 HERE;
     exit;
+}
+
+/* Translate timestamps which may also contain shortcuts
+ */
+function translate_time( $experiment, $str ) {
+    $str_trimmed = trim( $str );
+    if( $str_trimmed == '' ) return null;
+    switch( $str_trimmed[0] ) {
+        case 'b':
+        case 'B': return $experiment->begin_time();
+        case 'e':
+        case 'E': return $experiment->end_time();
+        case 'm':
+        case 'M': return LusiTime::minus_month();
+        case 'w':
+        case 'W': return LusiTime::minus_week();
+        case 'd':
+        case 'D': return LusiTime::minus_day();
+        case 'y':
+        case 'Y': return LusiTime::yesterday();
+        case 't':
+        case 'T': return LusiTime::today();
+        case 'h':
+        case 'H': return LusiTime::minus_hour();
+    }
+    $result = LusiTime::parse( $str_trimmed );
+    if( is_null( $result )) $result = LusiTime::from64( $str_trimmed );
+    return $result;
 }
 
 /* Translate an entry into a JASON object. Return the serialized object.
@@ -167,10 +163,14 @@ function entry2json( $entry, $format ) {
         $extra_vspace = $extra_lines == 0 ? 0 :  35 + 20 * $extra_lines;
 
         $con = new RegDBHtml( 0, 0, 800, 10 + $message_height + $extra_vspace );
-        $con->container_1 (   0,   0, "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$entry->content()}</pre>", 800, $message_height );
+
+        $highlight = true;
+        $con->container_1 (   0,   0, "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$entry->content()}</pre>", 800, $message_height, $highlight );
 
         if( $extra_lines != 0 ) {
-            $con_1 = new RegDBHtml( 0, 0, 240, $extra_vspace, 'relative', 'border: solid 2px #efefef;' );
+            $style = 'border: solid 2px #efefef;';
+            $highlight = true;
+            $con_1 = new RegDBHtml( 0, 0, 240, $extra_vspace, 'relative', $style, $highlight );
             if( count( $tags ) != 0 ) {
                 $con_1->label(  10, 5, 'Tag', 80 );
                 $base4tags = 25;
@@ -182,7 +182,7 @@ function entry2json( $entry, $format ) {
                 }
             }
             $con->container_1( 0, $base, $con_1->html());
-            $con_1 = new RegDBHtml( 0, 0, 545, $extra_vspace, 'relative', 'border: solid 2px #efefef;' );
+            $con_1 = new RegDBHtml( 0, 0, 545, $extra_vspace, 'relative', $style, $highlight );
             if( count( $attachments ) != 0 ) {
                 $con_1->label( 10, 5, 'Attachment' )->label( 215, 5, 'Size' )->label( 275, 5, 'Type' );
                 $base4attch = 25;
@@ -254,6 +254,25 @@ try {
 
     $experiment = $logbook->find_experiment_by_id( $id )
         or report_error( "no such experiment" );
+
+    // Timestamps are translated here because of possible shoftcuts which
+    // may reffer to the experiment's validity limits.
+    //
+    $begin = null;
+    if( $begin_str != '' ) {
+        $begin = translate_time( $experiment, $begin_str );
+        if( is_null( $begin ))
+            report_error( "begin time has invalid format" );
+    }
+    $end = null;
+    if( $end_str != '' ) {
+        $end = translate_time( $experiment, $end_str );
+        if( is_null( $end ))
+            report_error( "end time has invalid format" );
+    }
+    if( !is_null( $begin ) && !is_null( $end ) && !$begin->less( $end ))
+        report_error( "invalid interval - begin time isn't strictly less than the end one" );
+
 /*
     report_error(
         '<br>text2search:'.$text2search.

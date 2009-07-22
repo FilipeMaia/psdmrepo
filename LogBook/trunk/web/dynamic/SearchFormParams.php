@@ -33,10 +33,12 @@ try {
     $authors = $experiment->used_authors();
     array_unshift( $authors, '' );
 
-    $begin_time_title =
+    $time_title =
         "Valid format:\n".
         "\t".LusiTime::now()->toStringShort()."\n".
         "Also the (case neutral) shortcuts are allowed:\n".
+        "\t'b' - the begin time of the experiment\n".
+        "\t'e' - the end time of the experiment\n".
         "\t'm' - month (-31 days) ago\n".
         "\t'w' - week (-7 days) ago\n".
         "\t'd' - day (-24 hours) ago\n".
@@ -63,9 +65,9 @@ try {
         ->checkbox_input( 120, 110, 'posted_at_runs',       'Runs'      , true )->label( 140, 110, 'runs',       false )
 
         ->label       (   0, 140, 'Begin Time:' )
-        ->value_input (   0, 160, 'begin', '', $begin_time_title )
+        ->value_input (   0, 160, 'begin', '', $time_title )
         ->label       (   0, 190, 'End Time:' )
-        ->value_input (   0, 210, 'end',   '', LusiTime::now()->toStringShort() )
+        ->value_input (   0, 210, 'end',   '', $time_title )
         ->label       (   0, 240, 'Tag:' )
         ->select_input(   0, 260, 'tag', $tags, '' )
         ->label       (   0, 290, 'Posted by:' )

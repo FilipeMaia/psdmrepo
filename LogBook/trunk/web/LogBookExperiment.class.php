@@ -65,13 +65,30 @@ class LogBookExperiment {
          */
         return count( $this->shifts( $condition )); }
 
+
+
+    public function shifts_in_interval ( $begin=null, $end=null ) {
+
+        $condition = '';
+        if( !is_null( $begin )) {
+            $condition = ' begin_time >= '.$begin->to64();
+        }
+        if( !is_null( $end )) {
+            if( $condition == '' )
+                $condition = ' begin_time < '.$end->to64();
+            else
+                $condition .= ' AND begin_time < '.$end->to64();
+        }
+        return $this->shifts( $condition );
+    }
+
     public function shifts ( $condition='' ) {
 
         $list = array();
 
-        $extra_condition = $condition == '' ? '' : 'AND '.$condition;
+        $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query (
-            'SELECT * FROM "shift" WHERE exper_id='.$this->attr['id'].$extra_condition.
+            'SELECT * FROM "shift" WHERE exper_id='.$this->id().$extra_condition.
             ' ORDER BY begin_time DESC' );
 
         $nrows = mysql_numrows( $result );
@@ -212,18 +229,33 @@ HERE;
      *   RUNS
      * ========
      */
-    public function num_runs ( $condition=null ) {
+    public function num_runs ( $condition='' ) {
 
         /* TODO: This is very inefficient implementation. Replace it by
          * a direct SQL statement for counting rows instead!.
          */
         return count( $this->runs( $condition )); }
 
-    public function runs ( $condition=null ) {
+    public function runs_in_interval ( $begin=null, $end=null ) {
+
+        $condition = '';
+        if( !is_null( $begin )) {
+            $condition = ' begin_time >= '.$begin->to64();
+        }
+        if( !is_null( $end )) {
+            if( $condition == '' )
+                $condition = ' begin_time < '.$end->to64();
+            else
+                $condition .= ' AND begin_time < '.$end->to64();
+        }
+        return $this->runs( $condition );
+    }
+
+    public function runs ( $condition='' ) {
 
         $list = array();
 
-        $extra_condition = is_null( $condition )? '' : ' AND '.$condition;
+        $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
             'SELECT * FROM "run" WHERE exper_id='.$this->attr['id'].$extra_condition.
             ' ORDER BY begin_time DESC' );

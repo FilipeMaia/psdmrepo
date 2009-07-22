@@ -11,7 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-
+Tag: V00-00-08
+2009-07-21 Igor Gaponenko
+- fully implemented the search (except the paginator in the 'detailed' mode)
+- refactored the main page to get rid of duplications in its code
+- fixed bugs
 
 Tag: V00-00-07
 2009-07-18 Igor Gaponenko
