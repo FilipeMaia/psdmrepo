@@ -1,0 +1,100 @@
+- add 'Begin New Shift' operation on the 'Expperiment Summary' page
+
+- finish implementing 'Search'
+
+1. Consider 'discussion tree' option in both modes.
+2. Implement a paginator in the 'detailed' presentation modes.
+
+- consider redesigning the schema to associate tags with entries, not headers?
+
+- implement 'thumbs' mode for images in the 'Browse' and 'Search' modes. Each image will
+also carry a URL to the full document. HAve a button to togle the thumbs on and off.
+Where to put the one?
+One nice possibility would be to put attachments after tags. That would allow
+seeing previews as a photo-album grid. Put an empty image 'No Preview available'
+for unsupported MIME types.
+
+  ------------------
+  |                | <name>
+  |                | type: jpg
+  |    Thumb       | Size: 123545
+  |                | [ Download ]
+  |                | [ View ]
+
+
+
+- think about how to implement the "search_entry(parameters...)" operations
+in a way which would be not depending on using MySQL SQL directly in
+parameters of the method. Think about setting limits on parameters, for
+example.
+
+- design the "Search Form":
+
+Input fields:
+
+  message text:  will be use if not empty. Possibly allow regular expressions
+  author: <get the list from the database using PHP processing to allow selection
+          from the list. On eof the options will be empty.
+
+  from:   start data. Use if not empty. Perhaps add a Calendar dialog for dates.
+          If the dialog is used then the time will be preformatted as well.
+  to:     the same as 'from'
+
+
+
+  in a context of the experiment:
+     checkbox allowing to see messages posted in a context of
+     the experiment. The default value will be 'True'. The idea
+     of the option is to reduce
+  in a context of shifts: the same as above
+  in a context of runs:   the same as above
+
+  tags:   browse the database for the list of existing tags and have a button
+          "Add tag". The tags will be accumulated.
+  tag values: should be similar to the previous one except specifying
+
+Possibly design this form using YUI tables for tags.
+
+Think about how to implementing the logical operations in the sarch filter.
+The default behavior will be AND.
+
+Place the Search form into 'navarea' in the same mannaer it's done for 'Browse',
+so that it will be possible to modify search criteria and see results.
+Add the 'Search' button on the bottom to initiate the search.
+
+Return result in the same format which is used for browsing.
+
+
+- perhaps implement a better (from the visualisation standpoint) table
+navigation buttons
+
+- implement a support for Browser's history buttons (PREV/NEXT)
+
+- consider extending the schema to allow storying user name along with user's
+account name. This will be needed for the "shared accounts" security model of
+LCLS experiments.
+
+- (IMPORTANT FEATURE?) implement "double" buffering-like behavior when navigating
+between (Prev/Next) runs and shifts. The feature must be especially usefull for
+runs because it would allow comparing values of run parameters.
+
+- (HIGH PRIORITY) implement opening a new shift. Add the corresponding option into
+the top-level menu bar. Also add a button on the experiment's Summary page.
+
+- (LOW PRIORITY?) put something into the Help menus. Expand the menu
+
+- (INTERESTING IDEA) Consider adding the 'Live Mode' to the Operator Messages
+Display (that separate window show when clicking onto a message entry). In that
+mode the display would automatically show all new messages. That would be really
+cool feature which isn't in any E-Log!!!
+
+- (INTERESTING IDEA) Also in that 'Live Mode' show how many seconds/minutes/hours/days
+ago was the last posting. That would also give an operator some sense of timing.
+BTW, the very same feature can be easily implemented in all message tables. Of course
+this only make sense if tables are updated by a timer.
+
+- LOOK AT THE BROWSER HISTORY SUPPORT
+
+- (POSSIBLY) EXTEND THE SCHEMA TO KEEP THE ACCOUNT NAME AND USER NAME. IF NO USER
+NAME IS PROVIDED THEN GET IT FROM THE REGISTRY DATABASE (LDAP) AND STORE THE ONE
+ALONG WITH THE MESSAGE.
