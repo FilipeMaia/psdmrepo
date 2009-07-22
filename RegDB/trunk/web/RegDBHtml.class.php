@@ -15,11 +15,12 @@ class RegDBHtml {
 
     private $html;
 
-    public function __construct( $x, $y,  $width=480, $height=null, $position='relative', $style=null ) {
+    public function __construct( $x, $y,  $width=480, $height=null, $position='relative', $style=null, $highlight=false ) {
         $style_extra = is_null( $style ) ? '' : $style;
         $height_str = is_null( $height ) ? 'height:auto;' : "height:{$height}px;";
+        $highlight_str = $highlight ? 'onmouseover="javascript:container_highlight(this)" onmouseout="javascript:container_unhighlight(this,document.bgColor)"' : '';
         $this->html =<<<HERE
-<div style="position:{$position}; left:{$x}px; top:{$y}px; margin-left:0px; width:{$width}px; {$height_str} {$style_extra}">
+<div style="position:{$position}; left:{$x}px; top:{$y}px; margin-left:0px; width:{$width}px; {$height_str} {$style_extra}" {$highlight_str} >
 HERE;
     }
 
@@ -134,11 +135,12 @@ HERE;
         return $this;
     }
 
-    public function container_1( $x, $y, $contents, $width=null, $height=null ) {
+    public function container_1( $x, $y, $contents, $width=null, $height=null, $highlight=false ) {
         $width_style  = is_null( $width  ) ? '' : "width:{$width}px;";
         $height_stlye = is_null( $height ) ? '' : "height:{$height}px;";
+        $highlight_str = $highlight ? 'onmouseover="javascript:container_highlight(this)" onmouseout="javascript:container_unhighlight(this,document.bgColor)"' : '';
         $this->html = $this->html.<<<HERE
-<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left; overflow:auto; {$width_style} {$height_stlye} padding:0px;">
+<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left; overflow:auto; {$width_style} {$height_stlye} padding:0px;" {$highlight_str} >
   {$contents}
 </div>
 HERE;
