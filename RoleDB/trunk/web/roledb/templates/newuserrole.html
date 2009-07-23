@@ -1,0 +1,17 @@
+<html>
+<head>
+<title>Create new role</title>
+</head>
+<body>
+
+${h.form(h.url_for(controller='userroles', action='create'), method='post')}
+Exp_id: ${h.text('exp_id')}
+Application: ${h.text('app')}
+User: ${h.text('user')}
+Role: ${h.text('role')}
+${h.submit('submit', 'Submit')}
+${h.end_form()}
+
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+<html>
+<head>
+<title>Create new role</title>
+</head>
+<body>
+
+${h.form(h.url_for(controller='roles', action='create'), method='post')}
+Application: ${h.text('app')}
+Role: ${h.text('role')}
+Privileges (comma-separated): ${h.text('privileges')}
+${h.submit('submit', 'Submit')}
+${h.end_form()}
+
+</body>
+</html>
