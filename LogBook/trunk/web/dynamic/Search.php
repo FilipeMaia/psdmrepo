@@ -145,8 +145,8 @@ function entry2json( $entry, $format ) {
     //
     if( $format == 'detailed' ) {
 
-        $shift_begin_time_str = is_null( $entry->shift_id()) ? 'n/a' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\">".$entry->shift()->begin_time()->toStringShort().'</a>';
-        $run_number_str = 'n/a';
+        $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\">".$entry->shift()->begin_time()->toStringShort().'</a>';
+        $run_number_str = '';
         if( !is_null( $entry->run_id())) {
             $run = $entry->run();
             $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\">{$run->num()}</a>";
@@ -162,15 +162,17 @@ function entry2json( $entry, $format ) {
         $extra_lines = max( count( $tags ), count( $attachments ));
         $extra_vspace = $extra_lines == 0 ? 0 :  35 + 20 * $extra_lines;
 
-        $con = new RegDBHtml( 0, 0, 800, 10 + $message_height + $extra_vspace );
+        $con = new RegDBHtml( 0, 0, 800, $base + $extra_vspace );
 
         $highlight = true;
         $con->container_1 (   0,   0, "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$entry->content()}</pre>", 800, $message_height, $highlight );
 
+        $attachment_ids = array();
+
         if( $extra_lines != 0 ) {
-            $style = 'border: solid 2px #efefef;';
-            $highlight = true;
-            $con_1 = new RegDBHtml( 0, 0, 240, $extra_vspace, 'relative', $style, $highlight );
+            $style = 'border-top: solid 1px #ffffff;';
+            $highlight = false;
+            $con_1 = new RegDBHtml( 0, 0, 250, $extra_vspace, 'relative', $style, $highlight );
             if( count( $tags ) != 0 ) {
                 $con_1->label(  10, 5, 'Tag', 80 );
                 $base4tags = 25;
@@ -181,8 +183,9 @@ function entry2json( $entry, $format ) {
                     $base4tags = $base4tags + 20;
                 }
             }
+            $style = $style .= ' border-left: solid 1px #ffffff;';
             $con->container_1( 0, $base, $con_1->html());
-            $con_1 = new RegDBHtml( 0, 0, 545, $extra_vspace, 'relative', $style, $highlight );
+            $con_1 = new RegDBHtml( 0, 0, 550, $extra_vspace, 'relative', $style, $highlight );
             if( count( $attachments ) != 0 ) {
                 $con_1->label( 10, 5, 'Attachment' )->label( 215, 5, 'Size' )->label( 275, 5, 'Type' );
                 $base4attch = 25;
@@ -192,6 +195,23 @@ function entry2json( $entry, $format ) {
                           ->value_1( 215, $base4attch, $attachment->document_size())
                           ->value_1( 275, $base4attch, $attachment->document_type());
                     $base4attch = $base4attch + 20;
+                    $type = explode( '/', $attachment->document_type());
+                    $type2send = null;
+                    if( $type[0] == 'image' || $type[0] == 'text' ) {
+                        $type2send = $type[0];
+                    } else if( $type[0] == 'application' &&  $type[1] == 'pdf' ) {
+                        $type2send = $type[1];
+                    }
+                    if( !is_null( $type2send )) {
+                        array_push(
+                            $attachment_ids,
+                            array(
+                                "id" => $attachment->id(),
+                                "type" => $type2send,
+                                "description" => $attachment->description()
+                            )
+                        );
+                    }
                 }
             }
             $con->container_1( 250, $base, $con_1->html());
@@ -203,7 +223,10 @@ function entry2json( $entry, $format ) {
                 "run" => $run_number_str,
                 "shift" => $shift_begin_time_str,
                 "author" => $entry->author(),
-                "html" => $con->html()
+                "id" => $entry->id(),
+                "subject" => substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' ),
+                "html" => $con->html(),
+                "attachments" => $attachment_ids
             )
         );
 

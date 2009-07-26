@@ -32,7 +32,7 @@ try {
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
     $reginstration_url =
-        "<a href=\"javascript:window.open('/tests/RegDB/dynamic/index.php?".
+        "<a class=\"lb_link\" href=\"javascript:window.open('/tests/RegDB/dynamic/index.php?".
         "action=view_experiment&id={$experiment->id()}&name={$experiment->name()}')\">Experiment Registration Info &gt;</a>";
 
     $status = $experiment->in_interval( LusiTime::now());

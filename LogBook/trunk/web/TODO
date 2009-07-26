@@ -1,13 +1,22 @@
-- add 'Begin New Shift' operation on the 'Expperiment Summary' page
+- suggestions made by Amadeo:
+
+1. be more explicit in the name of commands and contexts (
+  Experiment Summary,
+  Search Messages
+  Browse Current Experiment
+  ...
+2. implement top-level submenu to select experiments through instruments
+3. implement the same options for viewing messages as in Search message view
+6. implement images/windows/screen grabber to output the grabbed contents
+straight into the database.
+
+- add 'Begin New Shift' operation on the 'Experiment Summary' page
 
 - finish implementing 'Search'
 
 1. Consider 'discussion tree' option in both modes.
 2. Implement a paginator in the 'detailed' presentation modes.
-
-- consider redesigning the schema to associate tags with entries, not headers?
-
-- implement 'thumbs' mode for images in the 'Browse' and 'Search' modes. Each image will
+3. implement 'thumbs' mode for images in the 'Browse' and 'Search' modes. Each image will
 also carry a URL to the full document. HAve a button to togle the thumbs on and off.
 Where to put the one?
 One nice possibility would be to put attachments after tags. That would allow
@@ -21,49 +30,9 @@ for unsupported MIME types.
   |                | [ Download ]
   |                | [ View ]
 
+4. add 'fit page' pagination mode for both 'compact' and 'detailed'
 
-
-- think about how to implement the "search_entry(parameters...)" operations
-in a way which would be not depending on using MySQL SQL directly in
-parameters of the method. Think about setting limits on parameters, for
-example.
-
-- design the "Search Form":
-
-Input fields:
-
-  message text:  will be use if not empty. Possibly allow regular expressions
-  author: <get the list from the database using PHP processing to allow selection
-          from the list. On eof the options will be empty.
-
-  from:   start data. Use if not empty. Perhaps add a Calendar dialog for dates.
-          If the dialog is used then the time will be preformatted as well.
-  to:     the same as 'from'
-
-
-
-  in a context of the experiment:
-     checkbox allowing to see messages posted in a context of
-     the experiment. The default value will be 'True'. The idea
-     of the option is to reduce
-  in a context of shifts: the same as above
-  in a context of runs:   the same as above
-
-  tags:   browse the database for the list of existing tags and have a button
-          "Add tag". The tags will be accumulated.
-  tag values: should be similar to the previous one except specifying
-
-Possibly design this form using YUI tables for tags.
-
-Think about how to implementing the logical operations in the sarch filter.
-The default behavior will be AND.
-
-Place the Search form into 'navarea' in the same mannaer it's done for 'Browse',
-so that it will be possible to modify search criteria and see results.
-Add the 'Search' button on the bottom to initiate the search.
-
-Return result in the same format which is used for browsing.
-
+- consider redesigning the schema to associate tags with entries, not headers?
 
 - perhaps implement a better (from the visualisation standpoint) table
 navigation buttons
@@ -98,3 +67,6 @@ this only make sense if tables are updated by a timer.
 - (POSSIBLY) EXTEND THE SCHEMA TO KEEP THE ACCOUNT NAME AND USER NAME. IF NO USER
 NAME IS PROVIDED THEN GET IT FROM THE REGISTRY DATABASE (LDAP) AND STORE THE ONE
 ALONG WITH THE MESSAGE.
+
+- Implement PDF export using either FPDF or PDFlib.
+
