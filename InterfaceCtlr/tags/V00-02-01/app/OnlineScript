@@ -1,0 +1,557 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script OnlineScript.
+#
+#------------------------------------------------------------------------
+
+"""Script used by the Online system to translate files to Offline Data Management.
+
+The translate command that makes Interface Controller database entries for the specified
+experiment info and directories is the only one presently implemented.
+
+This software was developed for the LUSI project.  If you use all or
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id: template!python-main! 8 2008-10-08 22:35:33Z salnikov $
+
+@author Robert C. Sass
+"""
+
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 1 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys, os, pwd, socket
+import MySQLdb
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+from LusiTime.Time import Time
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+#from PkgPackage.PkgModule import PkgClass
+
+#---------------------
+# Local definitions --
+#---------------------
+
+# local variable accessible in this module only
+_OP_X = 'Y'
+
+#-------------------
+# Local functions --
+#-------------------
+
+def _default_user():
+    """Return the effective user name"""
+
+    return pwd.getpwuid(os.geteuid())[0]
+
+def _default_host():
+    """Return the default host on which the MySQL is run"""
+
+    return "bbt-odf101.slac.stanford.edu"
+
+def _default_port():
+    """Return the default port on which the MySQL server would respond"""
+
+    return "3306"
+
+def _default_database():
+    """Return the default database"""
+
+    return "interface_db"
+
+def _exper_id_sql (experiment):
+    """Return a nested SQL query to retrieve an identifier of an experiment"""
+
+    return """(SELECT id FROM "experiment" WHERE name='%s')""" % experiment
+
+def _time2str(timestamp):
+    """Turn a number 64-bit timestamp got from the database into
+    a string. Return an empty string if the input object is None"""
+
+    if timestamp is None: return ''
+    return "%s" % Time.from64(timestamp)
+
+#--------------------------
+# Specialized exceptions --
+#--------------------------
+
+class DatabaseOperatonFailed(Exception):
+    def __init__ (self, message):
+        self.__message = message
+
+    def __str__ (self):
+        return repr(self.__message)
+
+#--------------------------------
+# Application class definition --
+#--------------------------------
+
+class OnlineScript ( LusiPyApp ) :
+
+    # ===============================================
+    # An indirection for handling the standard output
+    # ===============================================
+
+    __out = sys.stdout
+
+    def print_out (self, *params):
+        for p in params:
+            self.__out.write(p)
+        self.__out.write("\n")
+
+ 
+    # =========================================================================
+    # Command handlers are registered in the dictionary. There is a separate list
+    # to specify an order in which the command information is reported by
+    # the tool.
+    # =========================================================================
+
+    __cmd_handlers = {};
+    __cmd_order = [];
+
+    def __add_handler(self, command, syntax, description, handler, connects2server=True):
+        self.__cmd_handlers[command] = {
+        'SYNTAX':syntax,
+        'DESCRIPTION':description,
+        'HANDLER':handler,
+        'CONNECTS2SERVER':connects2server}
+        self.__cmd_order.append(command)
+
+    def __usage(self, command):
+        print "Usage: %s  %s" % (command, self.__cmd_handlers[command]['SYNTAX'])
+
+    # =======================================================================
+    # Database connection parameters and connection handle. They would change
+    # their default state at the first attempt to connect to the database.
+    # =======================================================================
+
+    __host       = _default_host()
+    __port       = _default_port()
+    __user       = _default_user()
+    __password   = ""
+    __database   = _default_database()
+    __connection = None
+
+    # ===========
+    # constructor
+    # ===========
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ (
+            self,
+            installLogger = True,
+            usage = "usage: %prog [<command>] [<parameters>] [<options>]" )
+
+        # Add application options, see optparse module for details -------------
+        #
+        self._parser.add_option ( '-D', "--database",
+								  action="store", dest="database", default=None,
+				      			  help="override default database name (%s)" % _default_database())
+
+        self._parser.add_option ( '-H', "--host",
+								  action="store", dest="host", default=None,
+				      			  help="override default host name (%s)" % _default_host())
+
+        self._parser.add_option ( '-P', "--port",
+								  action="store", dest="port", default=None,
+				      			  help="override default port number (%s)" % _default_port())
+
+        self._parser.add_option ( '-U', "--user",
+								  action="store", dest="user", default=None,
+								  help="override default user name (%s)" % _default_user())
+
+        self._parser.add_option ( '-p', "--password",
+								  action="store", dest="password", default=None,
+							      help="specify user password (no password by default)" )
+
+        self._parser.add_option ( '-o', "--output",
+                                  action="store", dest="output", default=None,
+                                  help="send output to file instead of STDOUT" )
+
+
+        # Register command handlers for known command --------------------------
+        #
+        self.__add_handler(
+            'help',
+            '[<command> [<command> [...]]]',
+            """
+    If no specific command (or commands) will be presented
+    then general information about the tool will be printed.
+    Otherwise detailed description of each command will be
+    printed.
+    """,
+            self.__cmd_help,
+            connects2server=False);
+
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'translate',
+            '<experiment> <instrument> <run_type> <run_number> <xtc_dir> (optional)<epics_dir>',
+            """
+    Translate a set of files to Offline Data Management.
+    """,
+             self.__cmd_translate)
+
+
+    # ============================================================
+    # Run the whole thing after parsing the command argunments and
+    # installing logger. See LusiPyApp class for details.
+    # ============================================================
+
+    def _run ( self ) :
+
+        # Print the list of supported commands of none is given ----------------
+        #
+        if not self._args :
+            self.__cmd_help('help', self._args)
+            return 0
+
+        # Open output file -----------------------------------------------------
+        #
+        if self._options.output:
+            self.debug( "Open alternative output file" )
+            self.__out = open ( self._options.output, "w" )
+
+        # Get the command name,  connect to the server (unless we're -----------
+        #  dealing with the command which doesn't need this) and invoke
+        # the corresponding handler.
+        #
+        command = self._args[0]
+        if command not in self.__cmd_handlers:
+            self._parser.error("unknown command: %s" % command)
+            return 2
+
+        self.trace( "command: %s: arguments: %s" % (command,str(self._args[1:])))
+
+        if self.__cmd_handlers[command]['CONNECTS2SERVER']: self.__connect()
+        return self.__cmd_handlers[command]['HANDLER'](command, self._args[1:])
+
+    # ===========================================
+    # Print the information on supported commands
+    # ===========================================
+
+    def __cmd_help ( self, command, args ) :
+
+        names = args
+        if names is not None and len(names) > 0:
+            verbose = True
+        else:
+            names = self.__cmd_order
+            verbose = False
+
+        if verbose:
+
+            # Print full description of each command
+            #
+            for name in names:
+                self.print_out("""COMMAND:
+
+    %s
+
+PARAMETERS:
+
+    %s
+
+DESCRIPTION:
+%s
+""" % (name,
+         self.__cmd_handlers[name]['SYNTAX'],
+         self.__cmd_handlers[name]['DESCRIPTION']))
+
+        else:
+
+            self.print_out("""APPLICATION:
+
+    %s
+
+        This is the Online script that writes to the Interface Controller
+        Database to notify the Interface Controller that Online files are
+        ready for translation. The application has been developed in the 
+        context of the OFFLINE Data Management Project for LCLS/LUSI 
+        experiments.
+
+USAGE:
+
+    command [parameters] [options]
+
+    help
+    help [command [command ...]]   (for detailed explanation)
+
+    -h | --help                    (for a full list of available options)
+
+SUPPORTED COMMANDS:
+""" %  os.path.basename(sys.argv[0]))
+
+            # Reserve enough space for the command names based on
+            # the longest name.
+            #
+            max_len = 1
+            for name in names:
+                if len(name) > max_len: max_len = len(name)
+            fmt = "    %-"+str(max_len)+"s  %s"
+            for name in names:
+                self.print_out(fmt % (name, self.__cmd_handlers[name]['SYNTAX']))
+
+            self.print_out()
+
+        return 0
+
+    # ===================
+    # Translate a fileset
+    # ===================
+
+    def __cmd_translate ( self, command, args ) :
+
+        if len(args) < 5:
+            self._parser.error(
+                "Enter: experiment instrument run_type run_num xtc_dir (optional)epics_dir- %s" % command)
+
+        exper      = args[0]
+        instr      = args[1]
+        runtype    = args[2]
+        runnum     = args[3]
+        xtcdir     = args[4]
+        epicsdir   = False
+        if not (os.path.exists(xtcdir) or os.path.isdir(xtcdir)):
+            self.print_out("XTC path doesn't exist or isn't a directory.")
+            return 1
+
+        if len(args) == 6:
+            epicsdir = args[5]
+            if not (os.path.exists(epicsdir) or os.path.isdir(epicsdir)) :
+                self.print_out("EPICS path doesn't exist or isn't a directory")
+                return 1
+           
+        if not self.__simple_query(
+            """SET @_new_fileset = NULL; 
+            CALL new_fileset_nocache ('%s','%s','%s','%s',@_new_fileset);""" % (
+            exper, instr, runtype, runnum )): return 1
+        row = self.__select_query_1('SELECT @_new_fileset')
+        if not row:
+            raise DatabaseOperatonFailed, "Bad status return from new_fileset_nocache"
+            return 1
+
+        newset = row[0]
+
+        #
+        # Find all files in the XTC directory and add them to the fileset
+        #
+        xtcfiles = os.listdir(xtcdir)
+        for f in xtcfiles:
+            filename = os.path.join(xtcdir, f)
+            if not self.__simple_query(
+                """SET @_status = NULL;
+                CALL add_file_nocache ('%s','%s', '%s', @_status);""" % (
+                newset, 'XTC', filename)): return 1
+            row = self.__select_query_1('SELECT @_status')
+            if not row: 
+                raise DatabaseOperatonFailed, "Bad status return from XTC add_file_nocache"
+
+        #
+        # Do the same for all files in the EPICS directory if it exists
+        #        
+        if epicsdir:
+            epicsfiles = os.listdir(epicsdir)
+            for f in epicsfiles:
+                filename = os.path.join(xtcdir, f)
+                if not self.__simple_query(
+                    """SET @_status = NULL;
+                    CALL add_file_nocache ('%s','%s', '%s', @_status);""" % (
+                    newset, 'EPICS', filename)): return 1
+
+                row = self.__select_query_1('SELECT @_status')
+                if not row: 
+                    raise DatabaseOperatonFailed, "Bad status return from EPICS add_file_nocache"
+
+        row = self.__select_query_1(
+            "SELECT id FROM fileset_status_def WHERE name='Waiting_Translation'")
+        if not row:
+            raise DatabaseOperatonFailed, "failed to obtain fileset status id for Waiting_Translation"
+        #
+        # Set fileset status to "Waiting_Translation" and we're done
+        #
+        wtstat = row[0]
+        if not self.__simple_query(
+            """SET @_status = NULL;
+            CALL change_fileset_status ('%s','%s', @_status);""" % (
+            newset, wtstat)):
+            raise DatabaseOperatonFailed, "Failed to change fileset status"
+            
+        row = self.__select_query_1('SELECT @_status')
+        if not row:
+            raise DatabaseOperatonFailed, "Bad status return from change_fileset_status"
+
+        return 0
+
+
+    # ====================================
+    # Report current connection parameters
+    # ====================================
+
+    def __conn_params(self):
+        using_password = "NO"
+        if self.__password != "": using_password = "YES"
+        return "'%s'@'%s':%s (using password: %s)" % (
+            self.__user,
+            self.__host,
+            self.__port,
+            using_password)
+
+    # =====================
+    # Connect to the server
+    # ====================
+
+    def __connect(self):
+
+        """Connect to the database if the connection has not been established
+        yet. In case of success initialize a connection handle and
+        return True. Return False otherwise."""
+        if self.__connection is not None: return True
+
+        # Make ajustments to the connection parameters if requested ------------
+        # in the command options.
+        #
+        self.info("Default connection parameters for MySQL: %s" % self.__conn_params())
+ 
+        if self._options.host and self.__host != self._options.host:
+             self.__host = self._options.host
+
+        if self._options.port and port != self._options.port:
+            port = self._options.port
+
+        if self._options.user and self.__user != self._options.user:
+            self.__user = self._options.user
+
+        if self._options.password and self.__password != self._options.password:
+            self.__password = self._options.password
+
+        if self._options.database and self.__database != self._options.database:
+            self.__database = self._options.database
+
+        self.info("Requested connection parameters for MySQL: %s" % self.__conn_params())
+
+        # Try to connect -------------------------------------------------------
+        #
+        self.info("Connecting to MySQL: %s" % self.__conn_params())
+        try:
+            self.__connection = MySQLdb.connect(
+                host=self.__host,
+                port=int(self.__port),
+                user=self.__user,
+                passwd=self.__password,
+                db=self.__database)
+        except MySQLdb.Error, ex:
+            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+            sys.exit(1)
+
+    # ========================================================
+    # Execute a simple query which doesn't return a result set
+    # ========================================================
+
+    def __simple_query(self, *queries):
+
+        """Execute a list of simple queries which do not require any parsing
+        of results. Queries will be executed one by one till all is done or
+        till the very first failure. In the later case the rest of the list
+        won't be executed.
+
+        The method will return True if all query succeeded, and False otherwise."""
+
+        result = False
+        cursor = self.__connection.cursor()
+
+        for query in queries:
+            self.info( "SQL: %s" % query)
+            try:
+                cursor.execute(query)
+                result = True
+            except MySQLdb.Error, ex:
+                self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+
+        cursor.close()
+        return result
+
+    # ============================================================
+    # Execute a single SELECT type query and return its result set
+    # ============================================================
+
+    def __select_query(self, query, return_dict=False):
+
+        """Execute a single SELECT type query and return a sequence of sequences
+        (or dictionaries, depending on the optional flag). If no results are found
+        then an empty sequence is retunred.
+
+        The method will return None if the query fails."""
+
+        rows = None
+
+        cursor = None
+        if return_dict: cursor = self.__connection.cursor(MySQLdb.cursors.SSDictCursor)
+        else:           cursor = self.__connection.cursor()
+
+        self.info( "SQL: %s" % query)
+        try:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+        except MySQLdb.Error, ex:
+            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+
+        cursor.close()
+        return rows
+
+    # ======================================================
+    # Execute a single SELECT type query on a single collumn
+    # ======================================================
+
+    def __select_query_1(self, query):
+
+        """Execute a single SELECT type query on a single column and
+        return a sequence of values found in all rows for that collumn.
+        If no results are found then an empty sequence is returned.
+
+        The method will return None if the query fails."""
+
+        result = None
+        cursor = self.__connection.cursor()
+
+        self.info( "SQL: %s" % query)
+        try:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            result = [r[0] for r in rows]
+        except MySQLdb.Error, ex:
+            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+
+        cursor.close()
+        return result
+
+# ==============================================
+# Run application when imported as a main module
+# ==============================================
+
+if __name__ == "__main__" :
+    app = OnlineScript()
+    rc = app.run()
+    sys.exit(rc)
