@@ -11,30 +11,14 @@ DROP TABLE IF EXISTS `translator_node` ;
 SHOW WARNINGS;
 CREATE  TABLE IF NOT EXISTS `translator_node` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `node_uri` TEXT NOT NULL COMMENT 'Initially node:network but may be more general later.' ,
-  `translate_uri` TEXT NOT NULL COMMENT 'Destination uri for translated files' ,
+  `active` BOOLEAN NOT NULL ,
+  `node_uri` TEXT NOT NULL COMMENT 'Initially node:network but may be more general later. The Controller looks in this table to find info for the node on which it is running.' ,
+  `translate_uri` TEXT NOT NULL COMMENT 'Local directory uri for translated files' ,
+  `log_uri` TEXT NOT NULL COMMENT 'Local directory uri for log files' ,
   `description` TEXT NOT NULL COMMENT 'More detailed description of the node.' ,
   PRIMARY KEY (`id`) )
 ENGINE = InnoDB
 COMMENT = 'Contains one row for each translator node.';
-
-SHOW WARNINGS;
-
--- -----------------------------------------------------
--- Table `cache`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `cache` ;
-
-SHOW WARNINGS;
-CREATE  TABLE IF NOT EXISTS `cache` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'This is the uri as seem by the offline side.' ,
-  `offline_uri` TEXT NOT NULL COMMENT 'This is the directory URI as seen by the offline side.' ,
-  `online_uri` TEXT NOT NULL COMMENT 'Directory URI as seen by the online side' ,
-  `avail_bytes` BIGINT UNSIGNED NOT NULL COMMENT 'Bytes available for use as offline->online cache.' ,
-  `alloc_bytes` BIGINT UNSIGNED NOT NULL COMMENT 'Bytes allocated by offline cache request for new_fileset.' ,
-  PRIMARY KEY (`id`) )
-ENGINE = InnoDB
-COMMENT = 'Directory URIs for cache duty.';
 
 SHOW WARNINGS;
 
@@ -48,9 +32,9 @@ CREATE  TABLE IF NOT EXISTS `interface_controller` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `fk_translator_node` INT UNSIGNED NOT NULL COMMENT 'Foreign key of translator_cpu on which the translator is running.' ,
   `process_id` INT NOT NULL COMMENT 'Process id of translator process' ,
+  `kill_ic` BOOLEAN NOT NULL COMMENT 'Force interface controller process to stop.' ,
   `started` TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'Time translator started.' ,
   `stopped` TIMESTAMP NULL COMMENT 'Time translator stopped.' ,
-  `kill` BOOLEAN NOT NULL COMMENT 'Force interface controller process to stop.' ,
   PRIMARY KEY (`id`) ,
   CONSTRAINT `translator_node_fk`
     FOREIGN KEY (`fk_translator_node` )
@@ -101,17 +85,11 @@ CREATE  TABLE IF NOT EXISTS `fileset` (
   `requested_bytes` BIGINT UNSIGNED NULL COMMENT 'Total bytes requested when fileset is created. ' ,
   `used_bytes` BIGINT UNSIGNED NULL COMMENT 'Presently used bytes.' ,
   `created` TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'Date fileset created' ,
-  `deleted` TIMESTAMP NULL COMMENT 'Date fileset deleted.' ,
   `locked` BOOLEAN NOT NULL COMMENT 'Locked when found by get_fileset_with_status. so only one requestor gets a given fileset. Unlocked whenever the fileset status is changed.' ,
   PRIMARY KEY (`id`) ,
   CONSTRAINT `fileset_status_fk`
     FOREIGN KEY (`fk_fileset_status` )
     REFERENCES `interface_db`.`fileset_status_def` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `cache_fk`
-    FOREIGN KEY (`fk_cache` )
-    REFERENCES `interface_db`.`cache` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -119,9 +97,6 @@ COMMENT = 'A fileset is the container for a set of files.';
 
 SHOW WARNINGS;
 CREATE INDEX `fileset_status_fk` ON `fileset` (`fk_fileset_status` ASC) ;
-
-SHOW WARNINGS;
-CREATE INDEX `cache_fk` ON `fileset` (`fk_cache` ASC) ;
 
 SHOW WARNINGS;
 
@@ -135,26 +110,28 @@ CREATE  TABLE IF NOT EXISTS `translator_process` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `fk_interface_controller` INT UNSIGNED NOT NULL COMMENT 'Foreign key of interface_controller process that created us' ,
   `fk_fileset` INT UNSIGNED NOT NULL COMMENT 'Foreign key of fileset that\'s being translated.' ,
-  `kill` BOOLEAN NULL COMMENT 'Force translor process to stop.' ,
+  `kill_tp` BOOLEAN NOT NULL COMMENT 'Force translor process to stop.' ,
   `started` TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'Time this process started.' ,
   `stopped` TIMESTAMP NULL COMMENT 'Time this process stopped' ,
-  `status_code` INT UNSIGNED NULL COMMENT 'Return status code from translator' ,
-  `ru_utime` FLOAT NULL COMMENT 'User mode time' ,
-  `ru_stime` FLOAT NULL COMMENT 'System mode time' ,
-  `ru_maxrss` INT UNSIGNED NULL COMMENT 'Maximum resident set size' ,
-  `ru_ixrss` INT UNSIGNED NULL COMMENT 'Shared memory size' ,
-  `ru_idrss` INT UNSIGNED NULL COMMENT 'Unshared memory size' ,
-  `ru_isrss` INT UNSIGNED NULL COMMENT 'Unshared stack size' ,
-  `ru_minflt` INT NULL COMMENT 'Page faults not requiring I/O' ,
-  `ru_majflt` INT UNSIGNED NULL COMMENT 'Page faults requiring I/O' ,
-  `ru_nswap` INT UNSIGNED NULL COMMENT 'Number of swap outs' ,
-  `ru_inblock` INT UNSIGNED NULL COMMENT 'Block input operations' ,
-  `ru_outblock` INT UNSIGNED NULL COMMENT 'Block output operations' ,
-  `ru_msgsnd` INT UNSIGNED NULL COMMENT 'Messages sent' ,
-  `ru_msgrcv` INT UNSIGNED NULL COMMENT 'Messages received' ,
-  `ru_nsignals` INT UNSIGNED NULL COMMENT 'Signals received' ,
-  `ru_nvcsw` INT UNSIGNED NULL COMMENT 'Voluntary context switches' ,
-  `ru_nivcsw` INT UNSIGNED NULL COMMENT 'Involuntary context switches' ,
+  `filesize_bytes` BIGINT UNSIGNED NULL COMMENT 'Translated file size in bytes' ,
+  `tstatus_code` INT NULL COMMENT 'Return status code from translator' ,
+  `istatus_code` INT NULL COMMENT 'Status code from iRODS put' ,
+  `tru_utime` FLOAT NULL COMMENT 'Translator user mode time' ,
+  `tru_stime` FLOAT NULL COMMENT 'Translator system mode time' ,
+  `tru_maxrss` INT UNSIGNED NULL COMMENT 'Translator maximum resident set size' ,
+  `tru_ixrss` INT UNSIGNED NULL COMMENT 'Translator shared memory size' ,
+  `tru_idrss` INT UNSIGNED NULL COMMENT 'Translator unshared memory size' ,
+  `tru_isrss` INT UNSIGNED NULL COMMENT 'Translator unshared stack size' ,
+  `tru_minflt` INT NULL COMMENT 'Translator page faults not requiring I/O' ,
+  `tru_majflt` INT UNSIGNED NULL COMMENT 'Translator page faults requiring I/O' ,
+  `tru_nswap` INT UNSIGNED NULL COMMENT 'Translator number of swap outs' ,
+  `tru_inblock` INT UNSIGNED NULL COMMENT 'Translator block input operations' ,
+  `tru_outblock` INT UNSIGNED NULL COMMENT 'Translator block output operations' ,
+  `tru_msgsnd` INT UNSIGNED NULL COMMENT 'Translator messages sent' ,
+  `tru_msgrcv` INT UNSIGNED NULL COMMENT 'Translator messages received' ,
+  `tru_nsignals` INT UNSIGNED NULL COMMENT 'Translator Signals received' ,
+  `tru_nvcsw` INT UNSIGNED NULL COMMENT 'Translator voluntary context switches' ,
+  `tru_nivcsw` INT UNSIGNED NULL COMMENT 'Translator involuntary context switches' ,
   PRIMARY KEY (`id`) ,
   CONSTRAINT `interface_controller_fk`
     FOREIGN KEY (`fk_interface_controller` )
@@ -174,41 +151,6 @@ CREATE INDEX `interface_controller_fk` ON `translator_process` (`fk_interface_co
 
 SHOW WARNINGS;
 CREATE INDEX `fileset_fk_from_translator` ON `translator_process` (`fk_fileset` ASC) ;
-
-SHOW WARNINGS;
-
--- -----------------------------------------------------
--- Table `files`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `files` ;
-
-SHOW WARNINGS;
-CREATE  TABLE IF NOT EXISTS `files` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `fk_fileset_id` INT UNSIGNED NOT NULL COMMENT 'Foreign key of the associated fileset.' ,
-  `fk_fileset_status` INT UNSIGNED NOT NULL COMMENT 'Foreign key of file status\n' ,
-  `name` TEXT NOT NULL COMMENT 'Full file name including path for nocache option. For the cache option the path is the cache directory.' ,
-  `type` ENUM('XTC','EPICS') NOT NULL ,
-  `size_bytes` BIGINT UNSIGNED NULL ,
-  PRIMARY KEY (`id`) ,
-  CONSTRAINT `fileset_id_fk`
-    FOREIGN KEY (`fk_fileset_id` )
-    REFERENCES `interface_db`.`fileset` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fileset_status_fkn`
-    FOREIGN KEY (`fk_fileset_status` )
-    REFERENCES `interface_db`.`fileset_status_def` (`id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-COMMENT = 'Filenames associated with a fileset.';
-
-SHOW WARNINGS;
-CREATE INDEX `fileset_id_fk` ON `files` (`fk_fileset_id` ASC) ;
-
-SHOW WARNINGS;
-CREATE INDEX `fileset_status_fkn` ON `files` (`fk_fileset_status` ASC) ;
 
 SHOW WARNINGS;
 
@@ -351,12 +293,12 @@ ENGINE = InnoDB;
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
--- Table `archive_translator`
+-- Table `archive_translator_process`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `archive_translator` ;
+DROP TABLE IF EXISTS `archive_translator_process` ;
 
 SHOW WARNINGS;
-CREATE  TABLE IF NOT EXISTS `archive_translator` (
+CREATE  TABLE IF NOT EXISTS `archive_translator_process` (
   `id` INT UNSIGNED NOT NULL ,
   PRIMARY KEY (`id`) )
 ENGINE = InnoDB;
@@ -377,6 +319,59 @@ CREATE  TABLE IF NOT EXISTS `config_def` (
   `description` TEXT NULL )
 ENGINE = InnoDB
 COMMENT = 'Interface DB & controller config params.';
+
+SHOW WARNINGS;
+
+-- -----------------------------------------------------
+-- Table `cache`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `cache` ;
+
+SHOW WARNINGS;
+CREATE  TABLE IF NOT EXISTS `cache` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'This is the uri as seem by the offline side.' ,
+  `offline_uri` TEXT NOT NULL COMMENT 'This is the directory URI as seen by the offline side.' ,
+  `online_uri` TEXT NOT NULL COMMENT 'Directory URI as seen by the online side' ,
+  `avail_bytes` BIGINT UNSIGNED NOT NULL COMMENT 'Bytes available for use as offline->online cache.' ,
+  `alloc_bytes` BIGINT UNSIGNED NOT NULL COMMENT 'Bytes allocated by offline cache request for new_fileset.' ,
+  PRIMARY KEY (`id`) )
+ENGINE = InnoDB
+COMMENT = 'Directory URIs for cache duty.';
+
+SHOW WARNINGS;
+
+-- -----------------------------------------------------
+-- Table `files`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `files` ;
+
+SHOW WARNINGS;
+CREATE  TABLE IF NOT EXISTS `files` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `fk_fileset_id` INT UNSIGNED NOT NULL COMMENT 'Foreign key of the associated fileset.' ,
+  `fk_fileset_status` INT UNSIGNED NOT NULL COMMENT 'Foreign key of file status\n' ,
+  `name` TEXT NOT NULL COMMENT 'Full file name including path for nocache option. For the cache option the path is the cache directory.' ,
+  `type` ENUM('XTC','EPICS') NOT NULL ,
+  `size_bytes` BIGINT UNSIGNED NULL ,
+  PRIMARY KEY (`id`) ,
+  CONSTRAINT `fileset_id_fk`
+    FOREIGN KEY (`fk_fileset_id` )
+    REFERENCES `interface_db`.`fileset` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fileset_status_fkn`
+    FOREIGN KEY (`fk_fileset_status` )
+    REFERENCES `interface_db`.`fileset_status_def` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = 'Filenames associated with a fileset.';
+
+SHOW WARNINGS;
+CREATE INDEX `fileset_id_fk` ON `files` (`fk_fileset_id` ASC) ;
+
+SHOW WARNINGS;
+CREATE INDEX `fileset_status_fkn` ON `files` (`fk_fileset_status` ASC) ;
 
 SHOW WARNINGS;
 
@@ -456,7 +451,6 @@ BEGIN
      DECLARE fs_cur CURSOR FOR SELECT id FROM fileset AS fs
          WHERE  fs.fk_fileset_status = in_status 
          AND fs.locked = FALSE
-         AND fs.deleted IS NULL
          ORDER BY fs.created ASC;
  
      DECLARE CONTINUE HANDLER FOR NOT FOUND SET fs_avail = 0;
@@ -618,7 +612,7 @@ BEGIN
          run_number = in_run_number,
          requested_bytes = in_requested_bytes,
          used_bytes = 0,
-         created   = NOW(), deleted = NULL, locked = FALSE;
+         created   = NOW(), locked = FALSE;
          
          SET out_fileset_id = LAST_INSERT_ID();
          SET out_online_uri = lcl_online_uri;
@@ -687,7 +681,7 @@ BEGIN
      run_number = in_run_number,
      requested_bytes = NULL,
      used_bytes = NULL,
-     created   = NOW(), deleted = NULL, locked = FALSE;
+     created   = NOW(), locked = FALSE;
          
      SET out_fileset_id = LAST_INSERT_ID();
      
@@ -748,7 +742,7 @@ DELIMITER ;
 -- Data for table `translator_node`
 -- -----------------------------------------------------
 SET AUTOCOMMIT=0;
-INSERT INTO `translator_node` (`id`, `node_uri`, `translate_uri`, `description`) VALUES (0, 'bbt-odf100.slac.stanford.edu', '/data/rcs/xlate', 'Development test machine');
+INSERT INTO `translator_node` (`id`, `active`, `node_uri`, `translate_uri`, `log_uri`, `description`) VALUES (0, '1', 'bbt-odf100.slac.stanford.edu', '/data1/rcs/xlate', '/data1/rcs/log', 'Development test machine');
 
 COMMIT;
 

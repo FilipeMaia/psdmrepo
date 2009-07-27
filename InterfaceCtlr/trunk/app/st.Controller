@@ -1,0 +1,73 @@
+#!/bin/bash
+#==============================================================
+#
+#  Abs:   Type I startup  
+#
+#  Name:  st.Controller
+#
+#  Rem:   This shell script calls type II startup file 
+# 
+#  Usage: st.Controller {start|stop}  
+#
+#  Auth:  27-Jul-2009, Robert C. Sass adapted from Jingchen Zhou   (jingchen)
+#  Rev:   dd-mmm-yyyy,  Whoever    (user):
+#
+#--------------------------------------------------------------
+
+# name of type II startup file, that is all I need to know!!!
+CMDPATH=/afs/slac/u/cd/rcs/workspace/IC/testIC_12/InterfaceCtlr/app/Controller
+# name of the executible started up in type II file
+# needed if you want a stop/restart option. 
+CMDEXE=
+
+# Source function library.
+. /etc/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] && exit 0
+
+if [ -x ${CMDPATH} ]; then 
+    CMD=`basename ${CMDPATH}` 
+else
+    echo "${CMDPATH} not found" 
+    exit 1
+fi
+
+RETVAL=0
+
+start() {
+    echo -n "Starting ${CMD}: "
+    ${CMDPATH} -pic_db &
+    RETVAL=$?
+    [ "$RETVAL" -eq 0 ] && success "${CMD} startup" || failure "${CMD} startup"
+}
+
+stop() {
+    echo -n "Shutting down ${CMDEXE}: "
+    killproc ${CMDEXE}
+    RETVAL=$?
+    [ "$RETVAL" -eq 0 ] && success "${CMDEXE} shutdown" || failure "${CMDEXE} shutdown"
+}
+
+# See how we were called.
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart)
+        stop
+        sleep 3
+        start        
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $RETVAL
