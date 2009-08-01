@@ -1,0 +1,164 @@
+- REFACTOR (!) the Messages Table and Dialog into a single prototype:
+
+    var ms = new  MessagesDisplay (
+      element,            // HTML 'div' element where to place the display's markup
+      url,                // optional URL to request messages. If not used then should be set to 'null'
+      scope,              // 'experiment', 'shift', 'run' - one of these current selections
+      new_message_dialog, // {true,false} - the flag requesting the dialog to be available
+      auto_refresh,       // {true,false} - the flag requesting the feature to be available
+      scope_selectors     // {true,false} - the flag requesting the feature to be available
+    );
+
+NOTES: The class will be using the following global variables and markup:
+current_selection
+"workarea"
+
+
+- VERY IMPORTANT: Screen-grabber button!!! This is very essential feature
+to begin using the LogBook.
+
+- interesting vizualization idea: when showing  alist of messages indicate 'zones'
+of shifts annd runs. Zones can be shown with different colors
+and indentation. Additional zone identifiers (begin time and leader of a shift and
+run number) can be used as well. For example:
+
+
+
+<no shift - no background color>
+| + Shift: 2009-09-17 10:12:23 - leader: gapon
+|          2009-09-17 10:22:34 - by: salnikov - the test message
+|          ..
+||  + Run: 2009-09-17 11:12:23 - number: 12
+||         ..
+|
+||  + Run: 2009-09-17 12:12:23 - number: 13
+||         ..
+|
+<no shift - no background color>
+| + Shift: 2009-09-17 10:12:23 - leader: gapon
+
+Another possibility would be to use '+ today', '+ yesterday', '+last week', 'last month'
+to group messages similar to what's done in Outlook Express
+
+- suggestions made by Amadeo:
+
+1. be more explicit in the name of commands and contexts (
+  Experiment Summary,
+  Search Messages
+  Browse Current Experiment
+  ...
+2. implement top-level submenu to select experiments through instruments
+3. implement the same options for viewing messages as in Search message view
+4. implement images/windows/screen grabber to output the grabbed contents
+straight into the database. Consider the one from BABAR.
+
+5. Be more verbose in subtitles ("Experiment Summary" instead of "Summary",
+"Runs of the shift" instead of "Runs", etc.)
+
+6. Changes in the "Operator and Control system Messages":
+6.1 Hide the "New messag" dialog under a button "New Message"
+6.2 Move that button down
+6.4 Move checkboxes (experiment/shifts/runs) down to the (COMMENT: that may
+not be a good idea). Another possibility is to introcude the "Options/Context"
+box to preselect things which are going to be shown: "Shown on page"
+6.5 By default show all messages for contexts:
+- "Experiment Summary": all contexts (experiment/shifts/runs)
+- "Shift Summary": all contexts (experiment/shifts/runs) within an interval of the shift
+- "Run Summary": all contexts (experiment/shifts/runs) within an interval of the run
+
+7. Replace background in subtitles with a background images with rounded edges
+
+8. Redesign the "Experiment Status" page by:
+- removing the link to the Experiment Registry
+- adding experiment leader name, team members, experiment description and
+contact information.
+- removing the last shift and last run information. But leave the links
+to the last run, shift and the lists of runs, and shifts.
+
+9. When starting a new shift allow selecting a leader from the POSIX group. Also allow
+adding crew members from the same group.
+
+10. think about where to position the 'New message' dialog. Should it be the modal
+dialog in the new window or an expanded window?
+
+11. Fix instrument names to follow the tree-letter achronym ('AMOS' to 'AMO', etc.).
+Also fix 'SXS' to 'SXR'?
+
+
+- 'Autorefresh' mode
+
+    // Disable this for now. It causes performance issues when utomatically
+    // downloading the attachments. We need to redesign the code to download
+    // attachments only on demand (when they're open) Also consider disabling
+    // auto-refresh if the 'Show All Attachment' mode is selected'
+    //
+
+
+- implement the 'Take Screenshot' button
+
+- more ideas on the Look And Feel design
+
+0. Finish implementing selectors/checkboxs (experiment, shifts, runs) in 'Operator
+and Control System Messages' dialog.
+
+1. Create curved background images for subtitles such as: 'Summary', 'Operator and
+Control System Messages', etc. Find agoo dcolor match. Defer this setting to CSS.
+Another (perhaps a beteer option) would be to use images for borders and the same
+background color for 'div'.
+
+2. Consider 'discussion tree' option in both modes.
+
+3. implement 'thumbs' mode for images in the 'Browse' and 'Search' modes. Each image will
+also carry a URL to the full document. HAve a button to togle the thumbs on and off.
+Where to put the one?
+One nice possibility would be to put attachments after tags. That would allow
+seeing previews as a photo-album grid. Put an empty image 'No Preview available'
+for unsupported MIME types.
+
+  ------------------
+  |                | <name>
+  |                | type: jpg
+  |    Thumb       | Size: 123545
+  |                | [ Download ]
+  |                | [ View ]
+
+4. add 'fit page' pagination mode for 'detailed'
+
+- consider redesigning the schema to associate tags with entries, not headers?
+
+- perhaps implement a better (from the visualisation standpoint) table
+navigation buttons
+
+- implement a support for Browser's history buttons (PREV/NEXT)
+
+- consider extending the schema to allow storying user name along with user's
+account name. This will be needed for the "shared accounts" security model of
+LCLS experiments.
+
+- (IMPORTANT FEATURE?) implement "double" buffering-like behavior when navigating
+between (Prev/Next) runs and shifts. The feature must be especially usefull for
+runs because it would allow comparing values of run parameters.
+
+- (HIGH PRIORITY) implement opening a new shift. Add the corresponding option into
+the top-level menu bar. Also add a button on the experiment's Summary page.
+
+- (LOW PRIORITY?) put something into the Help menus. Expand the menu
+
+- (INTERESTING IDEA) Consider adding the 'Live Mode' to the Operator Messages
+Display (that separate window show when clicking onto a message entry). In that
+mode the display would automatically show all new messages. That would be really
+cool feature which isn't in any E-Log!!!
+
+- (INTERESTING IDEA) Also in that 'Live Mode' show how many seconds/minutes/hours/days
+ago was the last posting. That would also give an operator some sense of timing.
+BTW, the very same feature can be easily implemented in all message tables. Of course
+this only make sense if tables are updated by a timer.
+
+- LOOK AT THE BROWSER HISTORY SUPPORT
+
+- (POSSIBLY) EXTEND THE SCHEMA TO KEEP THE ACCOUNT NAME AND USER NAME. IF NO USER
+NAME IS PROVIDED THEN GET IT FROM THE REGISTRY DATABASE (LDAP) AND STORE THE ONE
+ALONG WITH THE MESSAGE.
+
+- Implement PDF export using either FPDF or PDFlib.
+
