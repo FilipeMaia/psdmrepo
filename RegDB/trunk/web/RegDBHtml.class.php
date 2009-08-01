@@ -61,10 +61,12 @@ HERE;
         return $this;
     }
 
-    public function value_input( $x, $y, $var, $text='', $title='' ) {
+    public function value_input( $x, $y, $var, $text='', $title='', $size=null ) {
+        $size_str = is_null( $size ) ? '' : "size=\"{$size}\"";
+        //$width_str = is_null( $size ) ? '' : "width:{$size}px;";
         $this->html = $this->html.<<<HERE
 <div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
-  <input id="{$var}" type="text" name="{$var}" value="{$text}" style="padding:1px;" title="{$title}" />
+  <input id="{$var}" type="text" name="{$var}" value="{$text}" style="padding:1px;" title="{$title} {$width_str}" {$size_str} />
 </div>
 HERE;
         return $this;
@@ -77,9 +79,9 @@ HERE;
 HERE;
         foreach( $list as $l ) {
             if( $i == $default_selected )
-                $this->html = $this->html."<option id=\"{$var}_default\">{$l}</option>";
+                $this->html = $this->html."<option id=\"{$var}_default\" value=\"{$l}\">{$l}</option>";
             else
-                $this->html = $this->html."<option>{$l}</option>";
+                $this->html = $this->html."<option value=\"{$l}\">{$l}</option>";
         }
         $this->html = $this->html.<<<HERE
   </select>
