@@ -51,11 +51,13 @@ function entry2json( $entry, $format ) {
     //
     if( $format == 'detailed' ) {
 
-        $shift_begin_time_str = is_null( $entry->shift_id()) ? 'n/a' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\">".$entry->shift()->begin_time()->toStringShort().'</a>';
+        $shift_begin_time_str = is_null( $entry->shift_id()) ?
+            'n/a' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".
+            $entry->shift()->begin_time()->toStringShort().'</a>';
         $run_number_str = 'n/a';
         if( !is_null( $entry->run_id())) {
             $run = $entry->run();
-            $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\">{$run->num()}</a>";
+            $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
         }
 
         // Estimate a number of lines for the message text by counting
@@ -93,7 +95,7 @@ function entry2json( $entry, $format ) {
                 $con_1->label( 10, 5, 'Attachment' )->label( 215, 5, 'Size' )->label( 275, 5, 'Type' );
                 $base4attch = 25;
                 foreach( $attachments as $attachment ) {
-                    $attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank">'.$attachment->description().'</a>';
+                    $attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
                     $con_1->value_1(  10, $base4attch, $attachment_url )
                           ->value_1( 215, $base4attch, $attachment->document_size())
                           ->value_1( 275, $base4attch, $attachment->document_type());
@@ -117,11 +119,13 @@ function entry2json( $entry, $format ) {
         $posted_url =
             " <a href=\"javascript:select_entry({$entry->id()})\">".$entry->insert_time()->toStringShort().'</a> ';
 
-        $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\">".$entry->shift()->begin_time()->toStringShort().'</a>';
+        $shift_begin_time_str = is_null( $entry->shift_id()) ?
+            '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".
+            $entry->shift()->begin_time()->toStringShort().'</a>';
         $run_number_str = '';
         if( !is_null( $entry->run_id())) {
             $run = $entry->run();
-            $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\">{$run->num()}</a>";
+            $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
         }
         $tags_str = '';
         foreach( $tags as $t ) {
@@ -133,7 +137,7 @@ function entry2json( $entry, $format ) {
             $title = $a->description().', '.$a->document_size().' bytes, document type: '.$a->document_type();
             $attachment_url =
                 '<a href="ShowAttachment.php?id='.$a->id().'" target="_blank"'.
-                ' title="'.$title.'">'.substr( $a->description(), 0, 16 ).(strlen( $a->description()) > 16 ? '..' : '').'..</a>';
+                ' title="'.$title.'" class=\"lb_link\">'.substr( $a->description(), 0, 16 ).(strlen( $a->description()) > 16 ? '..' : '').'..</a>';
             if( $attachments_str == '') $attachments_str = $attachment_url;
             else                        $attachments_str .= "<br>".$attachment_url;
         }

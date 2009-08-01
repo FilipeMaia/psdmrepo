@@ -32,8 +32,8 @@ try {
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
     $reginstration_url =
-        "<a class=\"lb_link\" href=\"javascript:window.open('/tests/RegDB/dynamic/index.php?".
-        "action=view_experiment&id={$experiment->id()}&name={$experiment->name()}')\">Experiment Registration Info &gt;</a>";
+        "<a href=\"javascript:window.open('/tests/RegDB/dynamic/index.php?".
+        "action=view_experiment&id={$experiment->id()}&name={$experiment->name()}')\" class=\"lb_link\">Experiment Registration Info</a>";
 
     $status = $experiment->in_interval( LusiTime::now());
     if( $status > 0 ) {
@@ -44,25 +44,25 @@ try {
         $experiment_status = '<b><em style="color:red">Active</em></b>';
     }
 
-    $all_shifts_url = "( <a href=\"javascript:list_shifts()\">see all &gt;</a> )";
+    $all_shifts_url = "( <a href=\"javascript:list_shifts()\" class=\"lb_link\">All Shifts</a> )";
     $shift_url = 'Last Shift &gt;';
     $shift_leader = '';
     $shift_begin_time = '';
     $shift_end_time = '';
     if( !is_null( $shift )) {
-        $shift_url = "<a href=\"javascript:select_shift({$shift->id()})\">Last Shift &gt;</a>";
+        $shift_url = "<a href=\"javascript:select_shift({$shift->id()})\" class=\"lb_link\">Last Shift</a>";
         $shift_leader = $shift->leader();
         $shift_begin_time = $shift->begin_time()->toStringShort();
         $shift_end_time = is_null( $shift->end_time()) ? '<b><em style="color:red">Open</em></b>' : $shift->end_time()->toStringShort();
     }
-    $all_runs_url = "( <a href=\"javascript:list_runs()\">see all &gt;</a> )";
+    $all_runs_url = "( <a href=\"javascript:list_runs()\" class=\"lb_link\">All Runs</a> )";
     $run_url = 'Last Run &gt;';
     $run_number = '';
     $run_begin_time = '';
     $run_end_time = '';
     if( !is_null( $run )) {
         $run_number = $run->num();
-        $run_url = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\">Last Run &gt;</a>";
+        $run_url = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">Last Run</a>";
         $run_begin_time = $run->begin_time()->toStringShort();
         $run_end_time = is_null( $run->end_time()) ? '<b><em style="color:red">Open</em></b>' : $run->end_time()->toStringShort();
     }

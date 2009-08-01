@@ -40,6 +40,7 @@ and open the template in the editor.
     body {
         margin:0;
         padding:0;
+        /*background-color:#e0e0e0;*/
     }
     div.yui-b p {
         margin: 0 0 .5em 0;
@@ -51,6 +52,25 @@ and open the template in the editor.
     }
     div.yui-b p em {
         color: #000;
+    }
+    .lb_label {
+        text-align:left;
+        /*color:#0071bc;*/
+        font-weight:bold;
+    }
+    a, .lb_link {
+        text-decoration:none;
+        font-weight:bold;
+        color:#0071bc;
+        /*
+        */
+    }
+    a:hover, a.lb_link:hover {
+        color:red;
+    }
+    .lb_msg_subject {
+        color:maroon;
+        /*font-style:italic;*/
     }
     #application_header {
         background-color:#d0d0d0;
@@ -64,39 +84,36 @@ and open the template in the editor.
     }
     #application_subtitle {
         color:#0071bc;
+        font-size:24px;
     }
     #menubar {
         margin: 0 0 10px 0;
     }
     #context {
-        margin-top:5px;
-        margin-left:5px;
-        margin-right:5px;
+        margin:20px;
         margin-bottom:0px;
-        /*font-family: "Times", serif;*/
         font-size:16px;
-        /*font-weight:bold;*/
-        border:solid 4px transparent;
-        border-left-width:16px;
         text-align:left;
     }
     #nav-and-work-areas {
-        margin-left:35px;
-        margin-right:0px;
+        margin-left:20px;
     }
     #navarea {
         overflow:auto;
+        padding:20px;
+        border-right:solid 4px #f0f0f0;
+        display:none;
     }
     #workarea {
-        /*
         overflow:auto;
-        */
+        padding:20px;
+        /*background-color:#E3F6CE;*/
+        /*background-color:#f0f0f0;*/
     }
     #experiment_info_container,
-    /*#runs_table,*/
-    #run_parameters,
-    #messages_actions_container {
+    #run_parameters {
         padding:10px;
+        margin-left:10px;
     }
     #workarea_table_container          table,
     #entry_tags_table_container        table,
@@ -112,11 +129,6 @@ and open the template in the editor.
     #entry_attachments_table_paginator {
         margin-left:auto;
         margin-right:auto;
-    }
-    #messages_table_paginator {
-        /*margin-left:0px;
-        margin-right:auto;*/
-        text-align:center;
     }
     #workarea_table_container,
     #workarea_table_container .yui-dt-loading,
@@ -134,15 +146,6 @@ and open the template in the editor.
         margin-top:18px;
         margin-left:0px;
         text-align:left;
-    }
-    .lb_label {
-        text-align:left;
-        /*color:#0071bc;*/
-        font-weight:bold;
-    }
-    .lb_link {
-        text-decoration:none;
-        color:#0071bc;
     }
     </style>
 
@@ -180,6 +183,117 @@ and open the template in the editor.
     <script type="text/javascript" src="Loader.js"></script>
     <script type="text/javascript" src="JSON.js"></script>
     <script type="text/javascript" src="Utilities.js"></script>
+
+    <!--
+    PHP Generated JavaScript with initialization parameters
+    -->
+<?php
+
+echo <<<HERE
+    <script type="text/javascript">
+
+HERE;
+
+// Instruments
+//
+require_once('LogBook/LogBook.inc.php');
+try {
+    $logbook = new LogBook();
+    $logbook->begin();
+
+echo <<<HERE
+
+var instruments = [
+HERE;
+    $instruments = $logbook->instruments();
+    $first = true;
+    foreach( $instruments as $i ) {
+        if( $first ) {
+            $first = false;
+            echo <<<HERE
+
+   {name: '{$i->name()}', id: {$i->id()}}
+HERE;
+        } else {
+            echo <<<HERE
+
+  ,{name: '{$i->name()}', id: {$i->id()}}
+HERE;
+        }
+    }
+echo <<<HERE
+
+];
+
+HERE;
+    $logbook->commit();
+
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+} catch( RegDBException $e ) {
+    print $e->toHtml();
+}
+
+// Authorization context
+//
+echo <<<HERE
+
+var logged_user="{$_SERVER['WEBAUTH_USER']}";
+
+HERE;
+
+// Initial action dispatcher's generator
+//
+echo <<<HERE
+
+function init() {
+
+HERE;
+if( isset( $_GET['action'] )) {
+
+    $action = trim( $_GET['action'] );
+
+    if( $action == 'select_experiment' ) {
+        $instr_id   = $_GET['instr_id'];
+        $instr_name = $_GET['instr_name'];
+        $exper_id   = $_GET['exper_id'];
+        $exper_name = $_GET['exper_name'];
+        echo "  select_experiment({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}');";
+
+    } else if( $action == 'select_experiment_and_shift' ) {
+        $instr_id   = $_GET['instr_id'];
+        $instr_name = $_GET['instr_name'];
+        $exper_id   = $_GET['exper_id'];
+        $exper_name = $_GET['exper_name'];
+        $shift_id   = $_GET['shift_id'];
+        echo "  select_experiment_and_shift({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$shift_id});";
+
+    } else if( $action == 'select_experiment_and_run' ) {
+        $instr_id   = $_GET['instr_id'];
+        $instr_name = $_GET['instr_name'];
+        $exper_id   = $_GET['exper_id'];
+        $exper_name = $_GET['exper_name'];
+        $shift_id   = $_GET['shift_id'];
+        $run_id     = $_GET['run_id'];
+        echo "  select_experiment_and_run({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$shift_id},{$run_id});";
+
+    } else {
+        echo "  alert( 'unsupported action: {$action}' );";
+    }
+} else {
+    echo "  load( 'help/Welcome.html', 'workarea' );";
+}
+echo <<<HERE
+
+}
+
+    </script>
+
+HERE;
+?>
+
+
+
 
     <!--
     Page-specific script
@@ -259,6 +373,15 @@ menubar_data.push ( {
     itemdata: null,
     disabled: false }
 );
+var instruments_list = [];
+for( i = 0; i < instruments.length; i++ ) {
+    instruments_list.push (
+        {
+            text: instruments[i].name,
+            url:  "javascript:list_experiments('"+instruments[i].name+"')"
+        }
+    );
+}
 var menubar_group_experiments = menubar_data.length;
 menubar_data.push ( {
     id:    'experiments',
@@ -266,7 +389,11 @@ menubar_data.push ( {
     title: 'Experiments',
     title_style: null,
     itemdata: [
-        { text: "Select..", url: "javascript:list_experiments()" } ],
+        instruments_list,
+        [
+            { text: "List all", url: "javascript:list_experiments(null)" }
+        ]
+    ],
     disabled: false }
 );
 var menubar_group_shifts = menubar_data.length;
@@ -276,8 +403,9 @@ menubar_data.push ( {
     title: 'Shifts',
     title_style: null,
     itemdata: [
-        { text: "Select..", url: "javascript:list_shifts()" },
-        { text: "Last shift", url: "javascript:select_last_shift()" } ],
+        { text: "List all",     url: "javascript:list_shifts()" },
+        { text: "Display last", url: "javascript:select_last_shift()" },
+        { text: "Begin new",    url: "javascript:begin_new_shift()" } ],
     disabled: true }
 );
 var menubar_group_runs = menubar_data.length;
@@ -287,16 +415,17 @@ menubar_data.push ( {
     title: 'Runs',
     title_style: null,
     itemdata: [
-        { text: "Select..", url: "javascript:list_runs()" },
-        { text: "Last run", url: "javascript:select_last_run()" } ],
+        { text: "List all",     url: "javascript:list_runs()" },
+        { text: "Display last", url: "javascript:select_last_run()" } ],
     disabled: true }
 );
 var menubar_group_browse = menubar_data.length;
 menubar_data.push ( {
     id:    'browse',
-    href:  'javascript:browse_contents()',
+    href:  '#browse',
     title: 'Browse',
-    itemdata: null,
+    itemdata: [
+        { text: "Experiment history",    url: "javascript:browse_contents()" } ],
     disabled: true }
 );
 var menubar_group_search = menubar_data.length;
@@ -305,8 +434,8 @@ menubar_data.push ( {
     href:  '#find',
     title: 'Find',
     itemdata:  [
-        { text: "Find a text in all messages..", url: "javascript:search_contents_simple()" },
-        { text: "Advanced find..", url: "javascript:search_contents()" } ],
+        { text: "Text in all messages", url: "javascript:search_contents_simple()", disabled: true },
+        { text: "Advanced dialog",      url: "javascript:search_contents()" } ],
     disabled: true }
 );
 var menubar_group_help = menubar_data.length;
@@ -316,9 +445,9 @@ menubar_data.push ( {
     title: 'Help',
     title_style: null,
     itemdata: [
-        { text: "Help contents...", url: "#" },
-        { text: "Help with the current page...", url: "#" },
-        { text: "About the application", url: "#" } ],
+        { text: "Contents",              url: "#", disabled: true },
+        { text: "With the current page", url: "#", disabled: true },
+        { text: "About the application", url: "#", disabled: true } ],
     disabled: false }
 );
 
@@ -333,53 +462,6 @@ YAHOO.util.Event.onContentReady (
 
 </script>
 
-<?php
-
-/* Initial action dispatcher's generator
- */
-echo <<<HERE
-<script type="text/javascript">
-function init() {
-HERE;
-if( isset( $_GET['action'] )) {
-
-    $action = trim( $_GET['action'] );
-
-    if( $action == 'select_experiment' ) {
-        $instr_id   = $_GET['instr_id'];
-        $instr_name = $_GET['instr_name'];
-        $exper_id   = $_GET['exper_id'];
-        $exper_name = $_GET['exper_name'];
-        echo "  select_experiment({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}');";
-
-    } else if( $action == 'select_experiment_and_shift' ) {
-        $instr_id   = $_GET['instr_id'];
-        $instr_name = $_GET['instr_name'];
-        $exper_id   = $_GET['exper_id'];
-        $exper_name = $_GET['exper_name'];
-        $shift_id   = $_GET['shift_id'];
-        echo "  select_experiment_and_shift({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$shift_id});";
-
-    } else if( $action == 'select_experiment_and_run' ) {
-        $instr_id   = $_GET['instr_id'];
-        $instr_name = $_GET['instr_name'];
-        $exper_id   = $_GET['exper_id'];
-        $exper_name = $_GET['exper_name'];
-        $shift_id   = $_GET['shift_id'];
-        $run_id     = $_GET['run_id'];
-        echo "  select_experiment_and_run({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$shift_id},{$run_id});";
-
-    } else {
-        echo "  alert( 'unsupported action: {$action}' );";
-    }
-} else {
-    echo "  load( 'help/Welcome.html', 'workarea' );";
-}
-echo <<<HERE
-}
-</script>
-HERE;
-?>
 
 <script type="text/javascript">
 
@@ -532,46 +614,20 @@ function create_shifts_table( source, paginator, rows_per_page ) {
     //table.refreshTable();
 }
 
-function create_messages_table( source, paginator, rows_per_page ) {
-
-    document.getElementById('messages_table').innerHTML=
-        '  <div id="messages_table_paginator"></div>'+
-        '  <div id="messages_table_body"></div>';
-
-    var table = new Table (
-        "messages_table",
-        [ { key: "posted",      sortable: true,  resizeable: false },
-          { key: "author",      sortable: true,  resizeable: false },
-          { key: "run",         sortable: true,  resizeable: false },
-          { key: "shift",       sortable: true,  resizeable: false },
-          { key: "message",     sortable: false, resizeable: true  },
-          { key: "tags",        sortable: false, resizeable: true  },
-          { key: "attachments", sortable: false, resizeable: true  } ],
-        source,
-        paginator,
-        rows_per_page
-    );
-    //table.refreshTable();
-}
-
 function reset_navarea() {
     var navarea = document.getElementById('navarea');
-    navarea.style.padding = '0px';
-    navarea.style.minWidth = '0px';
-    //navarea.style.width = '0px';
-    navarea.innerHTML='';
+    navarea.style.display = 'none';
+    //navarea.innerHTML='';
 }
 
 function reset_workarea() {
     var workarea = document.getElementById('workarea');
-    workarea.style.borderLeft='0px';
-    workarea.style.padding = '0px';
-    //workarea.style.minWidth = '0px';
-    //workarea.style.width = '0px';
+    //workarea.style.borderLeft='0px';
+    //workarea.style.padding = '0px';
     workarea.innerHTML='';
 }
 
-function list_experiments() {
+function list_experiments( instr ) {
 
     set_context(
         'Select Experiment >' );
@@ -594,7 +650,7 @@ function list_experiments() {
           { key: "end_time",          sortable: true,  resizeable: false },
           { key: "registration_time", sortable: true,  resizeable: false },
           { key: "description",       sortable: false, resizeable: true } ],
-        'RequestExperiments.php',
+        'RequestExperiments.php'+( instr == null ? '' : '?instr='+instr ),
         false,
         10
     );
@@ -614,14 +670,13 @@ function display_experiment() {
     reset_workarea();
 
     document.getElementById('workarea').innerHTML=
-        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
-        '  <center><b>Summary</b></center>'+
+        '<div style="margin-bottom:20px;">'+
+        '  <img src="images/ExpSummary.png" />'+
         '</div>'+
         '<div id="experiment_info_container" style="height:160px;">Loading...</div>'+
-        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
-        '  <center><b>Operator and Control System Messages</b></center>'+
-        '</div>'+
-        '<div id="messages_actions_container"></div>';
+        '<div style="margin-top:40px; padding-right:15px;">'+
+        '  <div id="messages_actions_container"></div>'+
+        '</div>';
 
     load( 'DisplayExperiment.php?id='+current_selection.experiment.id, 'experiment_info_container' );
 
@@ -644,61 +699,102 @@ function display_experiment() {
     var messages_dialog = create_messages_dialog( 'experiment' );
 }
 
+function close_messages_dialog() {
+    document.getElementById('new_message_dialog').style.display='none';
+    new_message_button.set( 'disabled', false );
+}
+
+var current_messages_table = null;
+
 function create_messages_dialog( scope ) {
 
-    var html =
+    var html_new_message =
+        '<div id="new_message_dialog" style="padding:20px; margin-left:10px; margin-top:30px; background-color:#e0e0e0; border:solid 1px #c0c0c0; display:none;">'+
+        '<div style="float:right; position:relative; right:-18px; top:-18px;">'+
+        '  <a href="javascript:close_messages_dialog()"><img src="images/Close.png" / ></a> '+
+        '</div>'+
+        //'<center>'+
         '<form enctype="multipart/form-data" name="new_message_form" action="NewFFEntry.php" method="post">'+
-        '  <input type="hidden" name="author_account" value="<?php  echo $_SERVER['WEBAUTH_USER'] ?>" style="padding:2px; width:200px;" />'+
+        '  <input type="hidden" name="author_account" value="'+logged_user+'" style="padding:2px; width:200px;" />'+
         '  <input type="hidden" name="id" value="'+current_selection.experiment.id+'" />'+
         '  <input type="hidden" name="scope" value="'+scope+'" />';
     if( scope == "experiment") {
-         html +=
+         html_new_message +=
         '  <input type="hidden" name="actionSuccess" value="select_experiment" />';
     } else if( scope == "shift") {
-         html +=
+         html_new_message +=
         '  <input type="hidden" name="shift_id" value="'+current_selection.shift.id+'" />'+
         '  <input type="hidden" name="actionSuccess" value="select_experiment_and_shift" />';
     } else if( scope == "run") {
-         html +=
+         html_new_message +=
         '  <input type="hidden" name="run_id" value="'+current_selection.run.id+'" />'+
         '  <input type="hidden" name="actionSuccess" value="select_experiment_and_run" />';
     }
-    html +=
+    html_new_message +=
         '  <input type="hidden" name="MAX_FILE_SIZE" value="1000000">'+
-        '  <table></tbody>'+
+        //'  <div style="margin-left:10px; margin-bottom:5px;">'+
+        '  <div>'+
+        '    <em class="lb_label">New message:</em>'+
+        '  </div>'+
+        //'  <table style="width:100%; margin-left:10px;"></tbody>'+
+        '  <table><tbody>'+
         '    <tr>'+
+        //'      <td valign="top">'+
+        //'        <em class="lb_label">New message: </em>'+
+        //'      </td>'+
         '      <td valign="top">'+
-        '        <div id="new_message_body" style="margin-right:10px; background-color:#e0e0e0; padding:4px;">'+
+        '        <div id="new_message_body" style="margin-right:10px; padding:4px;">'+
         '          <input id="new_message_text" type="text" name="message_text" size="71" value="" />'+
         '        </div>'+
         '      </td>'+
         '      <td valign="top">'+
         '        <div id="new_message_dialog_container">'+
-        '          <button id="message_submit_button">Post</button>'+
         '          <button id="message_extend_button">Options &gt;</button>'+
+        '          <button id="message_submit_button">Submit</button>'+
+        '          <button id="message_cancel_button">Cancel</button>'+
         '        </div>'+
         '      </td>'+
         '    </tr>'+
         '  </tbody></table>'+
         '</form>'+
-        '<div id="messages_table" style="margin-top:10px;"></div>';
+        //'</center>'+
+        '</div>';
 
-    document.getElementById('messages_actions_container').innerHTML=html;
+    document.getElementById('messages_actions_container').innerHTML=
+        '<div id="messagesarea"></div>';
 
-    var url='RequestFFEntries.php?id='+current_selection.experiment.id+'&scope='+scope;
-    if( scope == "experiment") {
-        ;
-    } else if( scope == "shift") {
-         url += '&shift_id='+current_selection.shift.id;
-    } else if( scope == "run") {
-         url += '&run_id='+current_selection.run.id;
-    }
-    create_messages_table( url, true, 10 );
+    var scope_str = '';
+    if(      scope == "experiment" ) scope_str = '';
+    else if( scope == "shift"      ) scope_str = 'shift_id='+current_selection.shift.id;
+    else if( scope == "run"        ) scope_str = 'run_id='+current_selection.run.id;
+
+    var text2search='',
+        search_in_messages=true, search_in_tags=true, search_in_values=true,
+        posted_at_experiment=true, posted_at_shifts=true, posted_at_runs=true,
+        begin='', end='',
+        tag='',
+        author='',
+        auto_refresh=true;
+    current_messages_table = display_messages_table(
+        scope_str,
+        text2search,
+        search_in_messages, search_in_tags, search_in_values,
+        posted_at_experiment, posted_at_shifts, posted_at_runs,
+        begin, end,
+        tag,
+        author,
+        html_new_message,
+        auto_refresh );
 
     this.extendedShown = false;
 
-    this.message_submit_button = new YAHOO.widget.Button( "message_submit_button" );
     this.message_extend_button = new YAHOO.widget.Button( "message_extend_button" );
+    this.message_submit_button = new YAHOO.widget.Button( "message_submit_button" );
+    this.message_cancel_button = new YAHOO.widget.Button( "message_cancel_button" );
+    this.message_cancel_button.on (
+        "click",
+        close_messages_dialog
+    );
 
     this.tags = [];
     this.tags_table = null;
@@ -782,15 +878,17 @@ function create_messages_dialog( scope ) {
         if( !this.extendedShown ) {
             document.getElementById('new_message_body').innerHTML=
                 '<textarea id="new_message_text" type="text" name="message_text"'+
-                ' rows="12" cols="68" style="padding:1px;"'+
+                ' rows="12" cols="71" style="padding:1px;"'+
                 ' title="This is multi-line text area in which return will add a new line of text.'+
                 ' Use Submit button to post the message.">'+
                 document.getElementById('new_message_text').value+'</textarea>'+
-                '<div style="margin-left:6px; margin-top:12px;">'+
+                //'<div style="margin-left:6px; margin-top:12px;">'+
+                '<div style="margin-top:12px;">'+
                 '  <em class="lb_label">Author:</em>'+
-                '  <input id="author_id" type="text" name="author_name" value="<?php echo $_SERVER['WEBAUTH_USER'] ?>" style="padding:2px; width:200px;" />'+
+                '  <input id="author_id" type="text" name="author_name" value="'+logged_user+'" style="padding:2px; width:200px;" />'+
                 '</div>'+
-                '<div style="margin-left:6px; margin-right:6px;" align="left">'+
+                //'<div style="margin-left:6px; margin-right:6px;" align="left">'+
+                '<div style="margin-right:6px;" align="left">'+
                 '  <table style="margin-top:20px;"><tbody>'+
                 '    <tr>'+
                 '      <td align="left"><em class="lb_label">Tags</em></td>'+
@@ -1008,6 +1106,18 @@ function list_shifts() {
     //table.refreshTable();
 }
 
+function select_last_shift() {
+    load_then_call(
+        'RequestShifts.php?id='+current_selection.experiment.id+'&last',
+        function( result ) {
+            select_shift( result.ResultSet.Result[0].id );
+        },
+        function( status ) {
+            alert( status );
+        }
+    );
+}
+
 function select_shift( shift_id ) {
     current_selection.shift.id = shift_id;
     display_shift();
@@ -1025,20 +1135,17 @@ function display_shift() {
         'Shift >' );
 
     document.getElementById('workarea').innerHTML=
-        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
-        '  <center><b>Summary</b></center>'+
+        '<div style="margin-bottom:20px;">'+
+        '  <img src="images/ShiftSummary.png" />'+
         '</div>'+
         '<div id="experiment_info_container" style="height:100px;">Loading...</div>'+
-        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
-        '  <center><b>Runs</b></center>'+
+        '<div style="margin-bottom:20px;">'+
+        '  <img src="images/Runs.png" />'+
         '</div>'+
-        '<div id="runs_table" style="padding:10px;"></div>'+
+        '<div id="runs_table" style="margin-left:10px; padding:10px;"></div>'+
         '<br>'+
         '<br>'+
-        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
-        '  <center><b>Operator and Control System Messages</b></center>'+
-        '</div>'+
-        '<div id="messages_actions_container"></div>'+
+        '<div id="messages_actions_container" style="margin-top:20px;" ></div>'+
         '<form  name="close_shift_form" action="CloseShift.php" method="post">'+
         '  <input type="hidden" name="id" value="'+current_selection.shift.id+'" />'+
         '  <input type="hidden" name="actionSuccess" value="select_experiment_and_shift" />'+
@@ -1073,6 +1180,22 @@ function display_shift() {
     var messages_dialog = create_messages_dialog( 'shift' );
 }
 
+
+function begin_new_shift() {
+    ask_complex_input(
+        "popupdialogs",
+        "Begin New Shift",
+        '<form  name="begin_new_shift_form" action="CreateShift.php" method="post">'+
+        '  <b>Shift Leader: </b><input type="text" name="leader" value="'+logged_user+'" />'+
+        '  <input type="hidden" name="id" value="'+current_selection.experiment.id+'" />'+
+        '  <input type="hidden" name="actionSuccess" value="select_experiment_and_shift" />'+
+        '</form>',
+        function() {
+            document.begin_new_shift_form.submit();
+        }
+    );
+}
+
 function list_runs() {
 
     set_context(
@@ -1101,6 +1224,17 @@ function list_runs() {
     table.refreshTable();
 }
 
+function select_last_run() {
+    load_then_call(
+        'RequestRuns.php?id='+current_selection.experiment.id+'&last',
+        function( result ) {
+            select_run( result.ResultSet.Result[0].shift_id, result.ResultSet.Result[0].id );
+        },
+        function( status ) {
+            alert( status );
+        }
+    );
+}
 function select_run( shift_id, run_id ) {
     current_selection.shift.id = shift_id;
     current_selection.run.id = run_id;
@@ -1120,18 +1254,15 @@ function display_run() {
         'Run >' );
 
     document.getElementById('workarea').innerHTML=
-        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
-        '  <center><b>Summary</b></center>'+
+        '<div style="margin-bottom:20px;">'+
+        '  <img src="images/RunSummary.png" />'+
         '</div>'+
         '<div id="experiment_info_container" style="height:60px;">Loading...</div>'+
-        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
-        '  <center><b>Run Parameters</b></center>'+
+        '<div style="margin-top:40px; margin-bottom:20px;">'+
+        '  <img src="images/Parameters.png" />'+
         '</div>'+
         '<div id="run_parameters" style="height:370px;">Loading...</div>'+
-        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
-        '  <center><b>Operator and Control System Messages</b></center>'+
-        '</div>'+
-        '<div id="messages_actions_container"></div>';
+        '<div id="messages_actions_container" style="margin-top:40px;"></div>';
 
     load( 'DisplayRun.php?id='+current_selection.run.id, 'experiment_info_container' );
     load( 'DisplayRunParams.php?id='+current_selection.run.id, 'run_parameters' );
@@ -1165,12 +1296,6 @@ function container_unhighlight ( which, color ) {
 
 function display_history( type, data ) {
 
-    var request_messages_url =
-        'Search.php?id='+current_selection.experiment.id+
-        '&format=compact'+
-        '&search_in_messages=1&search_in_tags=1&search_in_values=1'+
-        '&posted_at_experiment=1&posted_at_shifts=1&posted_at_runs=1';
-
     var request_shifts_url =
         'RequestShifts.php?id='+current_selection.experiment.id;
 
@@ -1178,22 +1303,25 @@ function display_history( type, data ) {
         'RequestRuns.php?id='+current_selection.experiment.id;
 
     var context='';
+    var begin='', end='';
 
     switch( type ) {
         case TYPE_HISTORY_P:
-            request_messages_url += '&end=b';
+            end = 'b';
             request_shifts_url += '&end=b';
             request_runs_url += '&end=b';
             context += 'Preparation >';
             break;
         case TYPE_HISTORY_D_DAY:
-            request_messages_url += '&begin='+encodeURIComponent(data.begin)+'&end='+encodeURIComponent(data.end);
+            begin = data.begin;
+            end = data.end;
             request_shifts_url += '&begin='+encodeURIComponent(data.begin)+'&end='+encodeURIComponent(data.end);
             request_runs_url += '&begin='+encodeURIComponent(data.begin)+'&end='+encodeURIComponent(data.end);
             context += 'Data Taking > '+data.day;
             break;
         case TYPE_HISTORY_F:
-            request_messages_url += '&begin=e';
+            begin = 'e';
+            //request_messages_url += '&begin=e';
             request_shifts_url += '&begin=e';
             request_runs_url += '&begin=e';
             context += 'Follow Up >';
@@ -1210,24 +1338,36 @@ function display_history( type, data ) {
     var subheader_style = 'padding:2px; background-color:#e0e0e0;';
 
     document.getElementById('workarea').innerHTML =
-        '<div style="margin-bottom:20px; '+subheader_style+'">'+
-        '  <b>Shifts</b>'+
+        '<div style="margin-bottom:20px;">'+
+        '  <img src="images/Shifts.png" />'+
         '</div>'+
-        '<div id="shifts_table" style="margin-left:10px; margin-bottom:20px;"></div>'+
-        '<div style="margin-bottom:20px; '+subheader_style+'">'+
-        '  <b>Runs</b>'+
+        '<div id="shifts_table" style="margin-left:10px; padding:10px; margin-bottom:40px;"></div>'+
+        '<div style="margin-bottom:20px;">'+
+        '  <img src="images/Runs.png" />'+
         '</div>'+
-        '<div id="runs_table" style="margin-left:10px; margin-bottom:20px;"></div>'+
-        '<div style="margin-bottom:20px; '+subheader_style+'">'+
-        '  <b>Operator and Control System Messages</b>'+
-        '</div>'+
-        '<div id="messages_table" style="margin-left:10px;"></div>';
+        '<div id="runs_table" style="margin-left:10px; padding:10px; margin-bottom:40px;"></div>'+
+        '<div id="messagesarea"></div>';
 
     // Build  YUI tables and use their loading mechanism
     //
     create_shifts_table( request_shifts_url, false );
     create_runs_table( request_runs_url, false );
-    create_messages_table( request_messages_url, false );
+    var scope='',
+        text2search='',
+        search_in_messages=true, search_in_tags=true, search_in_values=true,
+        posted_at_experiment=true, posted_at_shifts=true, posted_at_runs=true,
+        tag='',
+        author='';
+    display_messages_table(
+        scope,
+        text2search,
+        search_in_messages, search_in_tags, search_in_values,
+        posted_at_experiment, posted_at_shifts, posted_at_runs,
+        begin, end,
+        tag,
+        author,
+        '',
+        false );
 }
 
 var browse_tree = null;
@@ -1242,37 +1382,39 @@ function browse_contents() {
     reset_workarea();
 
     var workarea = document.getElementById('workarea');
-    workarea.style.borderLeft="solid 1px";
-    workarea.style.padding = "10px";
-    workarea.innerHTML='No context selected yet.';
+    //workarea.style.borderLeft="solid 6px #e0e0e0";
+    //workarea.style.padding = "10px";
+    //workarea.style.minHeight="620px";
+    workarea.innerHTML='';
 
     var navarea = document.getElementById('navarea');
-    navarea.style.minWidth = "200px";
-    navarea.style.padding = "10px";
+    navarea.style.display = 'block';
+    //navarea.style.minWidth = "220px";
+    //navarea.style.padding = "10px";
     navarea.innerHTML=
-        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
-        '  <center><b>Select Context</b></center>'+
+        '<div style="margin-bottom:20px;">'+
+        '  <img src="images/History.png" />'+
         '</div>'+
-        '<div id="browse_tree">Loading...</div>';
+        '<div id="browse_tree"></div>';
 
     browse_tree = new YAHOO.widget.TreeView( "browse_tree" );
 
     // Start build a tree from the current context
     //
     var node_i = new YAHOO.widget.TextNode(
-        {   label: '<b>'+current_selection.instrument.name+'</b>',
+        {   label: '<em style="color:#0071bc;"><b>'+current_selection.instrument.name+'</b></em>',
             expanded: true,
             title: 'This is currently selected instrument' },
         browse_tree.getRoot());
 
     var node_e = new YAHOO.widget.TextNode(
-        {   label: '<b>'+current_selection.experiment.name+'</b>',
+        {   label: '<em style="color:#0071bc;"><b>'+current_selection.experiment.name+'</b></em>',
             expanded: true,
             title: 'This is currently selected experiment' },
         node_i );
 
     var node_h = new YAHOO.widget.TextNode(
-        {   label: 'History',
+        {   label: 'Timeline',
             expanded: true,
             title: 'Explore the history of various events happened in the experiment.' },
         node_e );
@@ -1514,8 +1656,21 @@ function event2html_1( re ) {
     var shift = re.shift == '' ? '' : 'shift: <em style="padding:2px;">'+re.shift+'</em>';
     var run_shift = re.run == '' && re.shift == '' ? '' : ' - '+run+' '+shift;
 
-    var show_attachments_str = show_attachments ? '' : 'display:none;';
 
+
+    var tags='';
+    for( var i=0; i < re.tags.length; i++ ) {
+        var t = re.tags[i];
+        tags +=
+            '<div style="margin-top:4px; margin-left:10px;">'+
+            '  <span style="border:solid 1px #c0c0c0; width:32px; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center;"'+
+            '     <b>TAG</b>'+'</span>'+
+            '  <span style="margin-left:4px;"><b>'+t.tag+'</b>=<i>'+t.value+'</i></span>'+
+            '</div>';
+    }
+
+    var show_attachments_str = show_attachments ? '' : 'display:none;';
+    var attachment_sign = '<img src="images/attachment.png" height="18" />';
     var attachments='';
     for( var i=0; i < re.attachments.length; i++ ) {
         var a = re.attachments[i];
@@ -1525,53 +1680,62 @@ function event2html_1( re ) {
         attachment_ids.push( { 'ahid' : ahid, 'aid' : aid } );
 
         attachments +=
-            '<div style="margin-top:10px; ">'+
-            '  <span id="'+ahid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; margin-right:12px; font-size:14px; text-align:center; cursor:pointer;"'+
+            '<div style="margin-top:0px; margin-left:10px;">'+
+            '  <span id="'+ahid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; padding-right:2px; margin-right:5px; font-size:14px; text-align:center; cursor:pointer;"'+
             '     onclick="javascript:expander_toggle('+"'"+ahid+"','"+aid+"')"+'"'+
             '     onmouseover="javascript:expander_highlight(this)" '+
             '     onmouseout="javascript:expander_unhighlight(this,document.bgColor)">'+
             '     <b>&gt;</b>'+'</span>'+
-            '  <span><b>Attached:</b> '+a.description+'</span>'+
+            '  <span><b>'+a.url+'</b></span>'+
+            '  ( <span>type:<b> '+a.type+'</b></span> '+
+            '  <span>size: <b> '+a.size+'</b></span> )'+
+            '  '+attachment_sign+
             '</div>'+
-            '<div id="'+aid+'" style="margin-left:8px; padding:17px; border-left:solid 2px #efefef; '+show_attachments_str+'">';
-        if( a.type == 'image' ) {
+            '<div id="'+aid+'" style="margin-left:18px; padding:17px; border-left:solid 2px #efefef; '+show_attachments_str+'">';
+        var type =  a.type.split('/');
+        if( type[0] == 'image' ) {
             attachments +=
-            '    <img max-width="800" src="ShowAttachment.php?id='+a.id+'" />';
-        } else if( a.type == 'text' ) {
+            '<img max-width="800" src="ShowAttachment.php?id='+a.id+'" />';
+        } else if( type[0] == 'text' ) {
             var aid4text = 'attachment_id_'+a.id+'_txt';
             attachments +=
-            '    <div id="'+aid4text+'" style="max-width:800px;"></div>';
+            '<div style="max-width:800px; min-height:40px; max-height:200px; overflow:auto;"><textbox><pre id="'+aid4text+'"></pre></textbox></div>';
             load( 'ShowAttachment.php?id='+a.id, aid4text );
-        } else if( a.type == 'pdf' ) {
+        } else if( type[0] == 'application' && type[1] == 'pdf' ) {
             attachments +=
-            '    <object data="ShowAttachment.php?id='+a.id+'" type="application/pdf" width="800" height="600"></object>';
+            '<object data="ShowAttachment.php?id='+a.id+'" type="application/pdf" width="800" height="600"></object>';
+        } else {
+            attachments +=
+            '<img src="images/NoPreview.png" />';
         }
         attachments +=
             '</div>';
     }
 
     var expand_messages_str = expand_messages ? '' : 'display:none;';
-
-    var attachments_sign = '';
+    var attachment_signs = '';
     for( var i=0; i < re.attachments.length; i++ )
-        attachments_sign += '<img src="images/attachment.png" />';
+        attachment_signs += attachment_sign;
 
     var result =
         '<div style="position:relative; left:0px; margin-top:10px; margin-left:10px; padding:2px;">'+
         '  <span id="'+hid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
-        '     onclick="javascript:expander_toggle('+"'"+hid+"','"+bid+"')"+'"'+
-        '     onmouseover="javascript:expander_highlight(this)" '+
-        '     onmouseout="javascript:expander_unhighlight(this,document.bgColor)">'+
+        '     onclick="expander_toggle('+"'"+hid+"','"+bid+"')"+'"'+
+        '     onmouseover="expander_highlight(this)" '+
+        '     onmouseout="expander_unhighlight(this,document.bgColor)">'+
         '     <b>&gt;</b>'+'</span>'+
         '  <span>'+
         '    <b><em style="padding:2px;">'+re.event_time+'</em></b>'+
         '    by: <b><em style="padding:2px;">'+re.author+'</em></b>'+
-        '    - <em style="padding:2px; color:blue;"><i>'+re.subject+'</i></em>'+run_shift+
-        '    '+attachments_sign+'</span>'+
+        '    - <em class="lb_msg_subject" style="padding:2px;">'+re.subject+'</em>'+run_shift+
+        '    </span>'+
+        attachment_signs+
         '</div>'+
         '<div id="'+bid+'" style="'+expand_messages_str+' margin-left:17px; margin-bottom:20px;">'+
         '  <div style="padding:10px; padding-left:20px; border-left:solid 1px #c0c0c0;">'+
         '    <div style="margin-top:8px; margin-right:0px; margin-bottom:20px; background-color:#efefef;">'+re.html+'</div>'+
+        tags+
+        ((re.tags.length > 0 && re.attachments.length > 0) ? '<br>' : '')+
         attachments+
         '  </div>'+
         '</div>';
@@ -1588,7 +1752,8 @@ function display_messages_page() {
     message_ids = [];
     attachment_ids = [];
 
-    document.getElementById('messages_showing_id').innerHTML=(1+first_message_idx)+' through '+last_message_idx;
+    document.getElementById('messages_showing_from_id').innerHTML=(1+first_message_idx);
+    document.getElementById('messages_showing_through_id').innerHTML=last_message_idx;
 
     prev_message_page_button.set( 'disabled', first_message_idx == 0 );
     next_message_page_button.set( 'disabled', last_message_idx >= last_search_result.length );
@@ -1630,26 +1795,83 @@ function display_messages() {
     display_messages_page();
 }
 
-function search_and_display() {
+var new_message_button=null;
 
-    var tag = document.search_form.tag.options[document.search_form.tag.selectedIndex].value;
-    var author = document.search_form.author.options[document.search_form.author.selectedIndex].value;
+var messages_refresh_timer = null;
+function scheduleNexRefreshOfMessagesTable() {
+    messages_refresh_timer = window.setTimeout( 'refreshMessagesTable()', 10000 );
+}
+function stopRefreshOfMessagesTable() {
+    if( messages_refresh_timer != null ) {
+        messages_refresh_timer.clearTimeout();
+        messages_refresh_timer = null;
+    }
+}
+function refreshMessagesTable() {
+    if( current_messages_table != null ) {
+        current_messages_table.refresh();
+        scheduleNexRefreshOfMessagesTable();
+    }
+}
 
-    var url='Search.php?id='+current_selection.experiment.id+
+function display_messages_table(
+    scope,
+    text2search,
+    search_in_messages, search_in_tags, search_in_values,
+    posted_at_experiment, posted_at_shifts, posted_at_runs,
+    begin, end,
+    tag,
+    author,
+    html_new_message,
+    auto_refresh ) {
+
+    // Disable this for now. It causes performance issues when utomatically
+    // downloading the attachments. We need to redesign the code to download
+    // attachments only on demand (when they're open) Also consider disabling
+    // auto-refresh if the 'Show All Attachment' mode is selected'
+    //
+    auto_refresh = false;
+
+    stopRefreshOfMessagesTable();
+
+    this.url='Search.php?id='+current_selection.experiment.id+
+        (scope == '' ? '' : '&'+scope)+
         '&format=detailed'+
-        '&text2search='+encodeURIComponent(document.search_form.text2search.value)+
-        '&search_in_messages='+(document.search_form.search_in_messages.checked ? '1' : '0')+
-        '&search_in_tags='+(document.search_form.search_in_tags.checked ? '1' : '0')+
-        '&search_in_values='+(document.search_form.search_in_values.checked ? '1' : '0')+
-        '&posted_at_experiment='+(document.search_form.posted_at_experiment.checked ? '1' : '0')+
-        '&posted_at_shifts='+(document.search_form.posted_at_shifts.checked ? '1' : '0')+
-        '&posted_at_runs='+(document.search_form.posted_at_runs.checked ? '1' : '0')+
-        '&begin='+encodeURIComponent(document.search_form.begin.value)+
-        '&end='+encodeURIComponent(document.search_form.end.value)+
+        '&text2search='+encodeURIComponent(text2search)+
+        '&search_in_messages='+(search_in_messages ? '1' : '0')+
+        '&search_in_tags='+(search_in_tags ? '1' : '0')+
+        '&search_in_values='+(search_in_values ? '1' : '0')+
+        '&posted_at_experiment='+(posted_at_experiment ? '1' : '0')+
+        '&posted_at_shifts='+(posted_at_shifts ? '1' : '0')+
+        '&posted_at_runs='+(posted_at_runs ? '1' : '0')+
+        '&begin='+encodeURIComponent(begin)+
+        '&end='+encodeURIComponent(end)+
         '&tag='+encodeURIComponent(tag)+
         '&author='+encodeURIComponent(author);
 
-    document.getElementById('messagesarea').innerHTML='<img src="images/ajaxloader.gif" />&nbsp;searching...';
+    var html=
+        '<div>'+
+        '  <img src="images/OCSMessages.png" />'+
+        '</div>'+
+        '<div style="margin-left:10px;">';
+    if( html_new_message != '' ) {
+        html +=
+        html_new_message+
+        '  <div style="margin-top:10px; padding-bottom:20px;">';
+    } else {
+        html +=
+        '  <div style="margin-top:10px; margin-bottom:10px; padding-bottom:10px;">';
+    }
+    html +=
+        '  <div style="text-align:right; margin-bottom:5px;">'+
+        '    <span id="messagesarea_header">&nbsp;</span>'+
+        '  </div>'+
+        '  <div id="messagesarea_body">'+
+        '    <img src="images/ajaxloader.gif" />&nbsp;searching messages...'+
+        '  </div>'+
+        '</div>';
+
+    document.getElementById('messagesarea').innerHTML=html;
 
     function callback_on_load( result ) {
         if( result.ResultSet.Status != "success" ) {
@@ -1658,37 +1880,46 @@ function search_and_display() {
             last_search_result = result.ResultSet.Result;
             expand_messages = false;
             show_attachments = false;
-            document.getElementById('messagesarea').innerHTML =
-                '<div style="margin-bottom:20px; padding:2px; padding-left:4px; background-color:#e0e0e0;">'+
-                '  <b>'+last_search_result.length+' message(s) found, showing: <em id="messages_showing_id"></em></b>'+
-                '</div>'+
-                '<div style="margin-left:10px; margin-top:20px; margin-bottom:10px; padding-bottom:10px; border-bottom:solid 2px #e0e0e0;">'+
+            document.getElementById('messagesarea_header').innerHTML =
+                '<b><em id="messages_showing_from_id"></em></b> - <b><em id="messages_showing_through_id"></em></b>'+
+                ' ( of <b>'+last_search_result.length+'</b> )';
+            var html1 =
+                '<div style="margin-left:10px; margin-bottom:10px; padding-top:10px; padding-bottom:10px; border-top:solid 2px #e0e0e0; border-bottom:solid 2px #e0e0e0;">'+
                 '  <form name="search_display_form">'+
                 '    <table><tbody>'+
                 '      <tr>'+
-                '        <td>'+
-                '          <button id="expand_button">Expand All</button>'+
-                '          <button id="collapse_button">Collapse All</button>'+
+                '        <td valign="top">'+
+                '          <button id="expand_button">Expand</button>'+
+                '          <button id="collapse_button">Collapse</button>'+
+                '            <button id="show_attachments_button">View Attach</button>'+
+                '            <button id="hide_attachments_button">Hide Attach</button>'+
+                '            <button id="new_message_button"><em style="font-weight:bold;">New Message</em></button>'+
                 '        </td>'+
-                '        <td>'+
-                '          <div style="padding-left:40px;">'+
-                '            <button id="show_attachments_button">View Attachments</button>'+
-                '            <button id="hide_attachments_button">Hide Attachments</button>'+
-                '          </div>'+
-                '        </td>'+
-                '        <td>'+
+                '        <td valign="top">'+
                 '          <div style="padding-left:40px;">'+
                 '            <select align="center" type="text" name="limit_per_page" style="padding:1px;" onchange="display_messages()">'+
+                '              <option value="all">all</option>'+
                 '              <option value="5">5</option>'+
                 '              <option value="10">10</option>'+
                 '              <option value="20">20</option>'+
                 '              <option value="50">50</option>'+
                 '              <option value="100">100</option>'+
-                '              <option value="all">no limit</option>'+
-                '            </select> messages on page'+
+                '            </select> / page'+
                 '          </div>'+
+                '          <div style="padding-left:40px;padding-top:10px;">'+
+                '            <input type="checkbox" name="posted_at_experiment" value="Experiment" checked="checked" />&nbsp;experiment'+
+                '            <input type="checkbox" name="posted_at_shifts" value="Shifts" checked="checked" />&nbsp;shifts'+
+                '            <input type="checkbox" name="posted_at_runs" value="Runs" checked="checked" />&nbsp;runs'+
+                '          </div>';
+            if( auto_refresh ) {
+                html1 +=
+                '          <div style="padding-left:40px;padding-top:10px;">'+
+                '            <input type="checkbox" name="autorefresh" value="Autorefresh" checked="checked" />&nbsp;auto refresh'+
+                '          </div>';
+            }
+            html1 +=
                 '        </td>'+
-                '        <td>'+
+                '        <td valign="top">'+
                 '          <div style="padding-left:20px;">'+
                 '            <button id="prev_message_page_button">&lt; Prev</button>'+
                 '            <button id="next_message_page_button">Next &gt;</button>'+
@@ -1699,6 +1930,7 @@ function search_and_display() {
                 '  </form>'+
                 '</div>'+
                 '<div id="messages_area"></div>';
+            document.getElementById('messagesarea_body').innerHTML = html1;
 
             var expand_button = new YAHOO.widget.Button( "expand_button" );
             expand_button.on (
@@ -1728,6 +1960,17 @@ function search_and_display() {
                     show_hide_all_attachments( false );
                 }
             );
+            // ATTENTION: this button is made global to allow re-enabling it from
+            // the dialog window when it gets closed.
+            //
+            new_message_button = new YAHOO.widget.Button( "new_message_button" );
+            new_message_button.on (
+                "click",
+                function( p_oEvent ) {
+                    document.getElementById('new_message_dialog').style.display='block';
+                    new_message_button.set( 'disabled', true );
+                }
+            );
             prev_message_page_button = new YAHOO.widget.Button( "prev_message_page_button" );
             prev_message_page_button.on (
                 "click",
@@ -1743,13 +1986,44 @@ function search_and_display() {
                 }
             );
             display_messages();
+            if( auto_refresh ) {
+                scheduleNexRefreshOfMessagesTable();
+            }
         }
     }
     function callback_on_failure( http_status ) {
         document.getElementById('messagesarea').innerHTML=
             '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
     }
-    load_then_call( url, callback_on_load, callback_on_failure );
+    load_then_call( this.url, callback_on_load, callback_on_failure );
+
+    this.refresh = function() {
+        load_then_call( url, callback_on_load, callback_on_failure );
+    }
+    return this;
+}
+
+function search_and_display() {
+
+    var scope='';
+    var tag = document.search_form.tag.options[document.search_form.tag.selectedIndex].value;
+    var author = document.search_form.author.options[document.search_form.author.selectedIndex].value;
+
+    display_messages_table(
+        scope,
+        document.search_form.text2search.value,
+        document.search_form.search_in_messages.checked,
+        document.search_form.search_in_tags.checked,
+        document.search_form.search_in_values.checked,
+        document.search_form.posted_at_experiment.checked,
+        document.search_form.posted_at_shifts.checked,
+        document.search_form.posted_at_runs.checked,
+        document.search_form.begin.value,
+        document.search_form.end.value,
+        tag,
+        author,
+        '',
+        false );
 }
 
 function search_contents() {
@@ -1762,10 +2036,9 @@ function search_contents() {
     reset_workarea();
 
     var workarea = document.getElementById('workarea');
-    //workarea.style.borderLeft="solid 1px";
-    workarea.style.borderLeft="solid 6px #e0e0e0";
-    workarea.style.padding = "10px";
-    workarea.style.minHeight="620px";
+    //workarea.style.borderLeft="solid 6px #e0e0e0";
+    //workarea.style.padding = "10px";
+    //workarea.style.minHeight="620px";
     workarea.innerHTML=
         '<div id="messagesarea">'+
         '  <div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
@@ -1775,15 +2048,16 @@ function search_contents() {
         '</div>';
 
     var navarea = document.getElementById('navarea');
-    navarea.style.minWidth = "200px";
-    navarea.style.padding = "10px";
+    //navarea.style.minWidth = "200px";
+    navarea.style.display = 'block';
+    //navarea.style.padding = "10px";
     //navarea.style.backgroundColor = "#c0c0c0";
     navarea.innerHTML=
-        '<div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
-        '  <center><b>Filter</b></center>'+
+        '<div style="margin-bottom:20px;">'+
+        '  <img src="images/Filter.png" />'+
         '</div>'+
         '<form name="search_form" action="javascript:search_and_display()">'+
-        '  <div id="search_form_params" style="margin:10px;"></div>'+
+        '  <div id="search_form_params"></div>'+
         '</form>';
 
     load( 'SearchFormParams.php?id='+current_selection.experiment.id, 'search_form_params' );
@@ -1830,7 +2104,7 @@ function search_contents() {
     <div id="application_header">
       <p id="application_title" style="text-align:left;">
         <em>Electronic LogBook of Experiment: </em>
-        <em id="application_subtitle" style="font-size:24px;"><a href="javascript:list_experiments()">select &gt;</a></em>
+        <em id="application_subtitle"><a href="javascript:list_experiments()">select &gt;</a></em>
       </p>
       <p style="text-align:right;">Logged as: <b><?php echo $_SERVER['WEBAUTH_USER']?></b><p>
     </div>

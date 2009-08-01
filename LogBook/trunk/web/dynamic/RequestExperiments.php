@@ -2,13 +2,20 @@
 
 require_once('RegDB/RegDB.inc.php');
 
+$instr = null;
+if( isset( $_GET['instr'] )) {
+    $instr = trim( $_GET['instr'] );
+    if( $instr == '' ) {
+        die( "instrument name can't be empty" );
+    }
+}
 function experiment2json( $experiment ) {
 
     $instrument = $experiment->instrument();
     $experiment_url =
         "<a href=\"javascript:select_experiment(".
         $instrument->id().",'".$instrument->name()."',".
-        $experiment->id().",'".$experiment->name()."')\">".
+        $experiment->id().",'".$experiment->name()."')\" class=\"lb_link\">".
         $experiment->name().
         '</a>';
     $status = $experiment->in_interval( LusiTime::now());
@@ -39,7 +46,8 @@ try {
     $regdb = new RegDB();
     $regdb->begin();
 
-    $experiments = $regdb->experiments();
+    if( is_null( $instr )) $experiments = $regdb->experiments();
+    else                   $experiments = $regdb->experiments_for_instrument( $instr );
 
     header( 'Content-type: application/json' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1

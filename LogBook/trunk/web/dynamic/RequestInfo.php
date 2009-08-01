@@ -113,13 +113,13 @@ function entry2json( $entry ) {
     }
     $base4attch = $base+45;
     foreach( $attachments as $attachment ) {
-        $attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank">'.$attachment->description().'</a>';
+        $attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
 /*
-        $attachment_url = '<a href="javascript:preview_atatchment('.$attachment->id().')">'.$attachment->description().'</a>';
+        $attachment_url = '<a href="javascript:preview_atatchment('.$attachment->id().')" class="lb_link">'.$attachment->description().'</a>';
         $attachment_url =
-            '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank">'.$attachment->description().'</a>'.
+            '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>'.
             '&nbsp;'.
-            '<a href="#viewarea">View</a>';
+            '<a href="#viewarea" class="lb_link">View</a>';
  *
  */
         $con->value_1( 250, $base4attch, $attachment_url )

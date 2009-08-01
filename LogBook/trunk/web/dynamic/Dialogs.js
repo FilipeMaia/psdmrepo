@@ -84,3 +84,68 @@ function ask_yesno_confirmation( id, text, onYes, onNo ) {
         onYes, onNo
     );
 }
+
+function ask_simple_input( id, title, prompt, default_value, onSubmit ) {
+
+    document.getElementById( id ).innerHTML =
+        '<div class="hd">'+title+'</div>'+
+        '<div class="bd" style="text-align:left;">'+
+        '  <b>'+prompt+':</b> <input id="ask_simple_input" type="text" value="'+default_value+'" />'+
+        '</div>';
+
+    var handleSubmit = function() {
+        this.hide();
+        onSubmit( document.getElementById("ask_simple_input").value );
+    };
+    var handleCancel = function() {
+        this.hide();
+    };
+    var dialog1 = new YAHOO.widget.Dialog (
+        id,
+        {   width : "480px",
+            fixedcenter : true,
+            visible : true,
+            close: true,
+            modal:true,
+            constraintoviewport : true,
+            buttons : [
+                { text:"Submit", handler: handleSubmit },
+                { text:"Cancel", handler: handleCancel, isDefault:true }
+            ]
+        }
+    );
+    dialog1.render();
+}
+
+function ask_complex_input( id, title, form_html, onSubmit ) {
+
+    document.getElementById( id ).innerHTML =
+        '<div class="hd">'+title+'</div>'+
+        '<div class="bd" style="text-align:left;">'+
+        form_html+
+        '</div>';
+
+    var handleSubmit = function() {
+        this.hide();
+        onSubmit();
+    };
+    var handleCancel = function() {
+        this.hide();
+    };
+    var dialog = new YAHOO.widget.Dialog (
+        id,
+        {   width : "480px",
+            fixedcenter : true,
+            visible : true,
+            close: true,
+            modal:true,
+            constraintoviewport : true,
+            buttons : [
+                { text:"Submit", handler: handleSubmit },
+                { text:"Cancel", handler: handleCancel, isDefault:true }
+            ]
+        }
+    );
+    dialog.render();
+}
+

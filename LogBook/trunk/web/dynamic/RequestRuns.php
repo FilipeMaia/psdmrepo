@@ -62,7 +62,7 @@ function translate_time( $experiment, $str ) {
 function run2json( $run ) {
 
     $begin_time_url =
-        "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\">".
+        "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">".
         $run->begin_time()->toStringShort().
         '</a>';
     $end_time_status =
@@ -70,12 +70,14 @@ function run2json( $run ) {
         '<b><em style="color:red;">on-going</em></b>' :
         $run->end_time()->toStringShort();
     $shift_begin_time_url =
-        "<a href=\"javascript:select_shift({$run->shift()->id()})\">".
+        "<a href=\"javascript:select_shift({$run->shift()->id()})\" class=\"lb_link\">".
         $run->shift()->begin_time()->toStringShort().
         '</a>';
 
     return json_encode(
         array (
+            "id"  => $run->id(),
+            "shift_id"  => $run->shift()->id(),
             "num"  => $run->num(),
             "begin_time" => $begin_time_url,
             "end_time" => $end_time_status,

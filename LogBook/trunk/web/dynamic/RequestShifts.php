@@ -53,7 +53,7 @@ function translate_time( $experiment, $str ) {
 function shift2json( $shift ) {
 
     $begin_time_url =
-        "<a href=\"javascript:select_shift(".$shift->id().")\">".
+        "<a href=\"javascript:select_shift(".$shift->id().")\" class=\"lb_link\">".
         $shift->begin_time()->toStringShort().
         '</a>';
     $end_time_status =
@@ -63,6 +63,7 @@ function shift2json( $shift ) {
 
     return json_encode(
         array (
+            "id" => $shift->id(),
             "begin_time" => $begin_time_url,
             "end_time"  => $end_time_status,
             "leader"  => $shift->leader(),

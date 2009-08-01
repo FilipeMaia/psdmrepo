@@ -519,6 +519,8 @@ HERE;
      * @return array(LogBookFFEntry)
      */
     public function search (
+        $shift_id=null,
+        $run_id=null,
         $text2search='',
         $search_in_messages=false,
         $search_in_tags=false,
@@ -531,13 +533,34 @@ HERE;
         $tag='',
         $author='' ) {
 
-        // Don't search if no sensible search parameters are given
-        //
-        if( $text2search == '' &&
-            is_null( $begin ) &&
-            is_null( $end ) &&
-            $tag == '' &&
-            $author == '' ) return Array();
+        /* Verify parameters
+         */
+        if( !is_null( $shift_id ) && !is_null( $run_id ))
+            throw new LogBookException(
+                __METHOD__,
+                "conflicting parameters: shift_id=".$shift_id." and run_id=".$run_id );
+
+        /* For explicitly specified shifts and runs force the search limits not
+         * to exceed their intervals (if the one is specified).
+         */
+        if( !is_null( $shift_id )) {
+            $shift = $this->find_shift_by_id( $shift_id );
+            if( is_null( $shift ))
+                throw new LogBookException(
+                    __METHOD__,
+                    "no shift with shift_id=".$shift_id." found" );
+            $begin = $shift->begin_time();
+            $end = $shift->end_time();
+        }
+        if( !is_null( $run_id )) {
+            $run = $this->find_run_by_id( $run_id );
+            if( is_null( $run ))
+                throw new LogBookException(
+                    __METHOD__,
+                    "no run with run_id=".$run_id." found" );
+            $begin = $run->begin_time();
+            $end = $run->end_time();
+        }
 
         /* The scope determines at which group of messages to look for:
          *   - those directly attached to the experiment

@@ -32,6 +32,21 @@ if( !isset( $_GET['id'] )) report_error( "no valid experiment id parameter" );
 $id = trim( $_GET['id'] );
 if( $id == '' ) report_error( "experiment id can't be empty" );
 
+$shift_id = null;
+if( isset( $_GET['shift_id'] )) {
+    $shift_id = trim( $_GET['shift_id'] );
+    if( $shift_id == '' ) report_error( "shift identifier parameter can't be empty" );
+}
+
+$run_id = null;
+if( isset( $_GET['run_id'] )) {
+    $run_id = trim( $_GET['run_id'] );
+    if( $run_id == '' ) report_error( "run identifier parameter can't be empty" );
+}
+
+if( !is_null( $shift_id ) && !is_null( $run_id ))
+    report_error( "conflicting parameters found in the request: <b>shift_id</b> and <b>run_id</b>" );
+
 if( !isset( $_GET['format'] )) report_error( "no valid presentation format parameter" );
 $format = trim( $_GET['format'] );
 if( $format == '' ) report_error( "presentation format parameter can't be empty" );
@@ -145,11 +160,11 @@ function entry2json( $entry, $format ) {
     //
     if( $format == 'detailed' ) {
 
-        $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\">".$entry->shift()->begin_time()->toStringShort().'</a>';
+        $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".$entry->shift()->begin_time()->toStringShort().'</a>';
         $run_number_str = '';
         if( !is_null( $entry->run_id())) {
             $run = $entry->run();
-            $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\">{$run->num()}</a>";
+            $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
         }
 
         // Estimate a number of lines for the message text by counting
@@ -157,64 +172,39 @@ function entry2json( $entry, $format ) {
         //
         $message_lines = count( explode( "\n", $entry->content()));
         $message_height = min( 200, 14 + 14*$message_lines );
-        $base = 5 + $message_height;
 
-        $extra_lines = max( count( $tags ), count( $attachments ));
-        $extra_vspace = $extra_lines == 0 ? 0 :  35 + 20 * $extra_lines;
+        $con = new RegDBHtml( 0, 0, 800, $message_height );
 
-        $con = new RegDBHtml( 0, 0, 800, $base + $extra_vspace );
-
-        $highlight = true;
+        $highlight = false;
         $con->container_1 (   0,   0, "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$entry->content()}</pre>", 800, $message_height, $highlight );
 
-        $attachment_ids = array();
+        $tag_ids = array();
+        if( count( $tags ) != 0 ) {
+            foreach( $tags as $tag ) {
+                array_push(
+                    $tag_ids,
+                    array(
+                        "tag" => $tag->tag(),
+                        "value" => $tag->value()
+                    )
+                );
+            }
+        }
 
-        if( $extra_lines != 0 ) {
-            $style = 'border-top: solid 1px #ffffff;';
-            $highlight = false;
-            $con_1 = new RegDBHtml( 0, 0, 250, $extra_vspace, 'relative', $style, $highlight );
-            if( count( $tags ) != 0 ) {
-                $con_1->label(  10, 5, 'Tag', 80 );
-                $base4tags = 25;
-                foreach( $tags as $tag ) {
-                    $value = $tag->value();
-                    $value_str = $value == '' ? '' : ' = <i>'.$value.'</i>';
-                    $con_1->value_1(  10, $base4tags, $tag->tag().$value_str);
-                    $base4tags = $base4tags + 20;
-                }
+        $attachment_ids = array();
+        if( count( $attachments ) != 0 ) {
+            foreach( $attachments as $attachment ) {
+                $attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+                array_push(
+                    $attachment_ids,
+                    array(
+                        "id" => $attachment->id(),
+                        "type" => $attachment->document_type(),
+                        "size" => $attachment->document_size(),
+                        "url" => $attachment_url
+                    )
+                );
             }
-            $style = $style .= ' border-left: solid 1px #ffffff;';
-            $con->container_1( 0, $base, $con_1->html());
-            $con_1 = new RegDBHtml( 0, 0, 550, $extra_vspace, 'relative', $style, $highlight );
-            if( count( $attachments ) != 0 ) {
-                $con_1->label( 10, 5, 'Attachment' )->label( 215, 5, 'Size' )->label( 275, 5, 'Type' );
-                $base4attch = 25;
-                foreach( $attachments as $attachment ) {
-                    $attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank">'.$attachment->description().'</a>';
-                    $con_1->value_1(  10, $base4attch, $attachment_url )
-                          ->value_1( 215, $base4attch, $attachment->document_size())
-                          ->value_1( 275, $base4attch, $attachment->document_type());
-                    $base4attch = $base4attch + 20;
-                    $type = explode( '/', $attachment->document_type());
-                    $type2send = null;
-                    if( $type[0] == 'image' || $type[0] == 'text' ) {
-                        $type2send = $type[0];
-                    } else if( $type[0] == 'application' &&  $type[1] == 'pdf' ) {
-                        $type2send = $type[1];
-                    }
-                    if( !is_null( $type2send )) {
-                        array_push(
-                            $attachment_ids,
-                            array(
-                                "id" => $attachment->id(),
-                                "type" => $type2send,
-                                "description" => $attachment->description()
-                            )
-                        );
-                    }
-                }
-            }
-            $con->container_1( 250, $base, $con_1->html());
         }
         return json_encode(
             array (
@@ -226,19 +216,22 @@ function entry2json( $entry, $format ) {
                 "id" => $entry->id(),
                 "subject" => substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' ),
                 "html" => $con->html(),
-                "attachments" => $attachment_ids
+                "attachments" => $attachment_ids,
+                "tags" => $tag_ids
             )
         );
 
     } else if( $format == 'compact' ) {
         $posted_url =
-            " <a href=\"javascript:select_entry({$entry->id()})\">".$entry->insert_time()->toStringShort().'</a> ';
+            "<a href=\"javascript:select_entry({$entry->id()})\" class=\"lb_link\">".$entry->insert_time()->toStringShort().'</a> ';
 
-        $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\">".$entry->shift()->begin_time()->toStringShort().'</a>';
+        $shift_begin_time_str = is_null( $entry->shift_id()) ?
+            '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".
+            $entry->shift()->begin_time()->toStringShort().'</a>';
         $run_number_str = '';
         if( !is_null( $entry->run_id())) {
             $run = $entry->run();
-            $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\">{$run->num()}</a>";
+            $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
         }
         $tags_str = '';
         foreach( $tags as $t ) {
@@ -250,7 +243,7 @@ function entry2json( $entry, $format ) {
             $title = $a->description().', '.$a->document_size().' bytes, document type: '.$a->document_type();
             $attachment_url =
                 '<a href="ShowAttachment.php?id='.$a->id().'" target="_blank"'.
-                ' title="'.$title.'">'.substr( $a->description(), 0, 16 ).(strlen( $a->description()) > 16 ? '..' : '').'..</a>';
+                ' title="'.$title.'" class="lb_link">'.substr( $a->description(), 0, 16 ).(strlen( $a->description()) > 16 ? '..' : '').'..</a>';
             if( $attachments_str == '') $attachments_str = $attachment_url;
             else                        $attachments_str .= "<br>".$attachment_url;
         }
@@ -296,22 +289,8 @@ try {
     if( !is_null( $begin ) && !is_null( $end ) && !$begin->less( $end ))
         report_error( "invalid interval - begin time isn't strictly less than the end one" );
 
-/*
-    report_error(
-        '<br>text2search:'.$text2search.
-        '<br>search_in_messages:'.$search_in_messages.
-        '<br>search_in_tags:'.$search_in_tags.
-        '<br>search_in_values:'.$search_in_values.
-        '<br>posted_at_experiment:'.$posted_at_experiment.
-        '<br>posted_at_shifts:'.$posted_at_shifts.
-        '<br>posted_at_runs:'.$posted_at_runs.
-        '<br>begin:'.$begin.
-        '<br>end:'.$end.
-        '<br>tag:'.$tag.
-        '<br>author:'.$author
-    );
-*/
     $entries = $experiment->search(
+        $shift_id, $run_id,
         $text2search,
         $search_in_messages,
         $search_in_tags,

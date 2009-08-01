@@ -33,13 +33,13 @@ try {
     if( is_null( $prev_run )) $prev_run_url = "&lt; Prev Run";
     else
         $prev_run_url =
-            "<a href=\"javascript:select_run({$prev_run->shift()->id()},{$prev_run->id()})\">&lt; Prev Run</a>";
+            "<a href=\"javascript:select_run({$prev_run->shift()->id()},{$prev_run->id()})\" class=\"lb_link\">&lt; Prev Run</a>";
 
     $next_run = $run->parent()->find_next_run_for( $run );
     if( is_null( $next_run )) $next_run_url = "Next Run &gt;";
     else
         $next_run_url =
-            "<a href=\"javascript:select_run({$next_run->shift()->id()},{$next_run->id()})\">Next Run &gt;</a>";
+            "<a href=\"javascript:select_run({$next_run->shift()->id()},{$next_run->id()})\" class=\"lb_link\">Next Run &gt;</a>";
 
     header( 'Content-type: text/html' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1

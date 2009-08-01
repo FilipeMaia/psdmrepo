@@ -16,12 +16,12 @@ function attachment2json( $a ) {
     /*
     $attachment_url =
         '<a href="javascript:show_attachment('.$a->id().
-        ')" title="download and see in a separate browser window">'.
+        ')" title="download and see in a separate browser window" class="lb_link">'.
         $a->description().'</a>';
      */
     $title = "download and see in a separate browser window";
     $attachment_url = <<<HERE
-<a href="ShowAttachment.php?id={$a->id()}" target="_blank" title="{$title}">{$a->description()}</a>
+<a href="ShowAttachment.php?id={$a->id()}" target="_blank" title="{$title}" class="lb_link">{$a->description()}</a>
 HERE;
     return json_encode(
         array (

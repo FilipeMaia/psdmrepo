@@ -32,12 +32,12 @@ try {
     $prev_shift = $shift->parent()->find_prev_shift_for( $shift );
     if( is_null( $prev_shift )) $prev_shift_url = "&lt; Prev Shift";
     else
-        $prev_shift_url = "<a href=\"javascript:select_shift({$prev_shift->id()})\">&lt; Prev Shift</a>";
+        $prev_shift_url = "<a href=\"javascript:select_shift({$prev_shift->id()})\" class=\"lb_link\">&lt; Prev Shift</a>";
 
     $next_shift = $shift->parent()->find_next_shift_for( $shift );
     if( is_null( $next_shift )) $next_shift_url = "Next Shift &gt;";
     else
-        $next_shift_url = "<a href=\"javascript:select_shift({$next_shift->id()})\">Next Shift &gt;</a>";
+        $next_shift_url = "<a href=\"javascript:select_shift({$next_shift->id()})\" class=\"lb_link\">Next Shift &gt;</a>";
 
     header( 'Content-type: text/html' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
@@ -50,8 +50,9 @@ try {
         ->value    ( 210,   0, $shift->leader())
         ->label    ( 125,  20, 'Begin Time:' )
         ->value    ( 210,  20, $shift->begin_time()->toStringShort())
-        ->label    ( 365,   0, $prev_shift_url, false )
-        ->label    ( 445,   0, $next_shift_url, false )
+        ->label    ( 365,   0, $prev_shift_url.'&nbsp;&nbsp;&nbsp;'.$next_shift_url, false )
+        //->label    ( 365,   0, $prev_shift_url, false )
+        //->label    ( 445,   0, $next_shift_url, false )
         ->label    ( 125,  40, 'End Time:'   );
     if( is_null( $shift->end_time())) { $con
         ->value    ( 210,  40, $shift_status )
