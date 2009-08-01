@@ -1,0 +1,83 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+        <title>RegDB PHP API Tests</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <link rel="stylesheet" type="text/css" href="RegDBTest.css" />
+    <style>
+    .category {
+        color:#0071bc;
+    }
+    .actions_menu {
+        margin-left:2em;
+        border-right-style:solid;
+        border-right-width:1px;
+        width:12em;
+    }
+    .actions {
+        margin-left:2em;
+    }
+    .instructions {
+        margin-left:2em;
+        margin-right:2em;
+    }
+    </style>
+    <body>
+    <br>
+    <div id="application_title">
+        <center><b>Experiment Registry Database</b></center>
+        <center><b><i>Test Version</i></b></center>
+    </div>
+    <br>
+    <hr style="margin-left:1em; margin-right:1em; margin-bottom:1em;">
+    <table>
+      <tbody>
+        <tr>
+          <td>
+            <div class="actions_menu">
+              <h2 class="category">Instruments</h2>
+              <div class="actions">
+                <ul>
+                  <li><a href="ListInstruments.php">View</a></li>
+                  <li><a href="CreateInstrument.php">Create</a></li>
+                  <li><a href="ModifyInstrument.php">Edit</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="actions_menu">
+              <h2 class="category">Experiments</h2>
+              <div class="actions">
+                <ul>
+                  <li><a href="ListExperiments.php">View</a></li>
+                  <li><a href="CreateExperiment.php">Create</a></li>
+                  <li><a href="ModifyExperiment.php">Edit</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="actions_menu">
+              <h2 class="category">POSIX Groups</h2>
+              <div class="actions">
+                <ul>
+                  <li><a href="ListGroups.php">View</a></li>
+                </ul>
+              </div>
+            </div>
+          </td>
+          <td valign="top">
+            <div class="instructions">
+                <p>This document presents a collection of low-level tests for the Registry Database PHP API.
+                The tests are groupped into three major categories. Each link under the categories
+                corresponds to an basic operations to be preformed via the API. Links will
+                follow to separate pages.</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>
