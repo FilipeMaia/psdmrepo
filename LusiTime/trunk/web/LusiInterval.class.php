@@ -16,6 +16,19 @@ class LusiInterval {
     public $end;
     private static $dayspermonth = array( 1 => 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
 
+    /**
+     * Corrected number of days in a month of a year. The function will take
+     * into account leap years.
+     *
+     * @param integer $month
+     * @param integer $year
+     * @return integer
+     */
+    private static function daysInThisMonth( $month, $year ) {
+        if( $month == 2 && ( 0 == ( $year - 1972 ) % 4 )) return 29;
+        return LusiInterval::$dayspermonth[$month];
+    }
+
     /* Constructor
      */
     public function __construct($begin, $end=null) {
@@ -73,25 +86,23 @@ class LusiInterval {
         $y = $ymd[0];
         $m = $ymd[1];
         $d = $ymd[2];
-        if( $d == $dayspermonth[$m] ) {
-            if( $m == 2 && ( 0 == ( $y - 1970 ) % 4 )) {
-                $d++;
+        if( $d == LusiInterval::daysInThisMonth( $m, $y )) {
+            $d = 1;
+            if( $m == 12 ) {
+                $m = 1;
+                $y++;
             } else {
-                $d = 1;
-                if( $m == 12 ) {
-                    $m = 1;
-                    $y++;
-                } else {
-                    $m++;
-                }
+                $m++;
             }
         } else {
             $d++;
         }
-        return array( $y, $m, $d );
+        $triplet = array( $y, $m, $d );
+        return $triplet;
     }
     private static function time2triplet( $time ) {
-        return explode( '-', $time->toStringDay());
+        $ymd = explode( '-', $time->toStringDay());
+        return array((int)$ymd[0], (int)$ymd[1], (int)$ymd[2]);
     }
     private static function triplet2time( $ymd ) {
         //                           h  m  s  month    day      year
@@ -101,13 +112,16 @@ class LusiInterval {
 
 /* The unit test for the class follows below. Uncomment it to use it.
  *
-$begin = LusiTime::parse( "2009-09-17 08:01:02" );
-$end = LusiTime::parse( "2009-09-22 08:03:04" );
+$begin = LusiTime::parse( "2008-02-27 19:24:00" );
+echo '<br>'.$begin;
+$end = LusiTime::parse( "2009-08-10 08:00:00" );
+echo '<br>'.$end;
 $i = new LusiInterval( $begin, $end );
 $days = $i->splitIntoDays();
 foreach( $days as $d ) {
   echo "<br>[ ".$d->begin." : ".$d->end." )";
 }
+*
 */
 ?>
 

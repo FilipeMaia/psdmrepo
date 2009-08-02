@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+ 
+Tag: V00-00-12
+2009-08-02 Igor Gaponenko
+- fixed a bug in PHP class LusiTime
 
 Tag: V00-00-11
 2009-07-18 Igor Gaponenko
