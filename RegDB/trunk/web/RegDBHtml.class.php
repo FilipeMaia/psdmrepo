@@ -137,12 +137,13 @@ HERE;
         return $this;
     }
 
-    public function container_1( $x, $y, $contents, $width=null, $height=null, $highlight=false ) {
+    public function container_1( $x, $y, $contents, $width=null, $height=null, $highlight=false, $bgcolor=null ) {
         $width_style  = is_null( $width  ) ? '' : "width:{$width}px;";
         $height_stlye = is_null( $height ) ? '' : "height:{$height}px;";
         $highlight_str = $highlight ? 'onmouseover="javascript:container_highlight(this)" onmouseout="javascript:container_unhighlight(this,document.bgColor)"' : '';
+        $bgcolor_style = is_null( $bgcolor ) ? '' : 'background-color:'.$bgcolor.';';
         $this->html = $this->html.<<<HERE
-<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left; overflow:auto; {$width_style} {$height_stlye} padding:0px;" {$highlight_str} >
+<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left; overflow:auto; {$width_style} {$height_stlye} padding:0px; {$bgcolor_style}" {$highlight_str} >
   {$contents}
 </div>
 HERE;
