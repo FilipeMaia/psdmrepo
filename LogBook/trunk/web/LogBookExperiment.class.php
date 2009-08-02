@@ -46,6 +46,12 @@ class LogBookExperiment {
     public function leader_account () {
         return $this->regdb_experiment->leader_account(); }
 
+    public function contact_info () {
+        return $this->regdb_experiment->contact_info(); }
+
+    public function POSIX_gid () {
+        return $this->regdb_experiment->POSIX_gid(); }
+
     public function in_interval ( $time ) {
         return $this->regdb_experiment->in_interval( $time ); }
 
@@ -531,7 +537,8 @@ HERE;
         $begin=null,
         $end=null,
         $tag='',
-        $author='' ) {
+        $author='',
+        $since=null) {
 
         /* Verify parameters
          */
@@ -560,6 +567,17 @@ HERE;
                     "no run with run_id=".$run_id." found" );
             $begin = $run->begin_time();
             $end = $run->end_time();
+        }
+
+        /* Ignore since if it doesn't fall into an interval of the requst.
+         */
+        if( !is_null( $since )) {
+            if( !is_null( $begin ) && $since->less( $begin )) {
+                $since = null;
+            }
+            if( !is_null( $end ) && $since->greaterOrEqual( $end )) {
+                $since = null;
+            }
         }
 
         /* The scope determines at which group of messages to look for:
@@ -619,7 +637,8 @@ HERE;
                 "begin time '".$begin."' isn't less than end time '".$end."'" );
 
         $begin_str = is_null( $begin ) ? '' : ' AND e.insert_time >='.$begin->to64();
-        $end_str   = is_null( $end )   ? '' : ' AND e.insert_time < '.$end->to64();
+        $end_str   = is_null( $end   ) ? '' : ' AND e.insert_time < '.$end->to64();
+        $since_str = is_null( $since ) ? '' : ' AND e.insert_time > '.$since->to64();
 
         /* Consider tag and/or author constrains as well (if present).
          */
@@ -630,7 +649,7 @@ HERE;
          * the insert (post) time.
          */
         return $this->entries_by_(
-            $scope.$part.$begin_str.$end_str.$tag_str.$author_str
+            $scope.$part.$begin_str.$end_str.$tag_str.$author_str.$since_str
         );
     }
 

@@ -103,6 +103,17 @@ $author = '';
 if( isset( $_GET['author'] ))
     $author = trim( $_GET['author'] );
 
+/* This is a special modifier which (if present) is used to return an updated list
+ * of messages since (strictly newer than) the specified time.
+ * 
+ * ATTENTION: This parameter will only be respected if it strictly falls into
+ * the [begin,end) interval of the request!
+ */
+$since_str = '';
+if( isset( $_GET['since'] ))
+    $since_str = trim( $_GET['since'] );
+
+
 /* Package the error message into a JAON object and return the one
  * back to a caller. The script's execution will end at this point.
  */
@@ -220,44 +231,6 @@ function entry2json( $entry, $format ) {
                 "tags" => $tag_ids
             )
         );
-
-    } else if( $format == 'compact' ) {
-        $posted_url =
-            "<a href=\"javascript:select_entry({$entry->id()})\" class=\"lb_link\">".$entry->insert_time()->toStringShort().'</a> ';
-
-        $shift_begin_time_str = is_null( $entry->shift_id()) ?
-            '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".
-            $entry->shift()->begin_time()->toStringShort().'</a>';
-        $run_number_str = '';
-        if( !is_null( $entry->run_id())) {
-            $run = $entry->run();
-            $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
-        }
-        $tags_str = '';
-        foreach( $tags as $t ) {
-            if( $tags_str == '') $tags_str = $t->tag();
-            else                 $tags_str .= "<br>".$t->tag();
-        }
-        $attachments_str = '';
-        foreach( $attachments as $a ) {
-            $title = $a->description().', '.$a->document_size().' bytes, document type: '.$a->document_type();
-            $attachment_url =
-                '<a href="ShowAttachment.php?id='.$a->id().'" target="_blank"'.
-                ' title="'.$title.'" class="lb_link">'.substr( $a->description(), 0, 16 ).(strlen( $a->description()) > 16 ? '..' : '').'..</a>';
-            if( $attachments_str == '') $attachments_str = $attachment_url;
-            else                        $attachments_str .= "<br>".$attachment_url;
-        }
-        return json_encode(
-            array (
-                "posted" => $posted_url,
-                "author" => substr( $entry->author(), 0, 10 ).(strlen( $entry->author()) > 10 ? '..' : ''),
-                "run" => $run_number_str,
-                "shift" => $shift_begin_time_str,
-                "message" => substr( $entry->content(), 0, 36 ).(strlen( $entry->content()) > 36 ? '..' : ''),
-                "tags" => $tags_str,
-                "attachments" => $attachments_str
-            )
-        );
     }
     return null;
 }
@@ -289,6 +262,13 @@ try {
     if( !is_null( $begin ) && !is_null( $end ) && !$begin->less( $end ))
         report_error( "invalid interval - begin time isn't strictly less than the end one" );
 
+    $since = null;
+    if( $since_str != '' ) {
+        $since = translate_time( $experiment, $since_str );
+        if( is_null( $since ))
+            report_error( "'since' time has invalid format" );
+    }
+
     $entries = $experiment->search(
         $shift_id, $run_id,
         $text2search,
@@ -301,7 +281,8 @@ try {
         $begin,
         $end,
         $tag,
-        $author );
+        $author,
+        $since );
 
     $status_encoded = json_encode( "success" );
     $result =<<< HERE

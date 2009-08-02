@@ -28,38 +28,40 @@ try {
     } else {
         $shift_status = '<b><em style="color:red">Open</em></b>';
     }
+    $end_time_str = is_null( $shift->end_time()) ? $shift_status : $shift->end_time()->toStringShort();
 
+    $prev_shift_url = "&lt; Prev shift";
     $prev_shift = $shift->parent()->find_prev_shift_for( $shift );
-    if( is_null( $prev_shift )) $prev_shift_url = "&lt; Prev Shift";
-    else
-        $prev_shift_url = "<a href=\"javascript:select_shift({$prev_shift->id()})\" class=\"lb_link\">&lt; Prev Shift</a>";
+    if( !is_null( $prev_shift ))
+        $prev_shift_url = "<a href=\"javascript:select_shift({$prev_shift->id()})\" class=\"lb_link\">{$prev_shift_url}</a>";
 
+    $next_shift_url = "Next shift &gt;";
     $next_shift = $shift->parent()->find_next_shift_for( $shift );
-    if( is_null( $next_shift )) $next_shift_url = "Next Shift &gt;";
-    else
-        $next_shift_url = "<a href=\"javascript:select_shift({$next_shift->id()})\" class=\"lb_link\">Next Shift &gt;</a>";
+    if( !is_null( $next_shift ))
+        $next_shift_url = "<a href=\"javascript:select_shift({$next_shift->id()})\" class=\"lb_link\">{$next_shift_url}</a>";
+
+    $begin_shift_url = "";
+    $close_shift_url = "";
+    if( $status <= 0 && $shift->parent()->in_interval( LusiTime::now()) == 0 ) {
+        $begin_shift_url = "<a href=\"javascript:begin_new_shift()\" class=\"lb_link\">Begin new shift</a>";
+        $close_shift_url = "<a href=\"javascript:close_shift({$shift->id()})\" class=\"lb_link\">Close current shift</a>";
+    }
 
     header( 'Content-type: text/html' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-    $con = new RegDBHtml( 0, 0, 550, 80 );
-    $con->label    (   0,   0, 'Status:' )
-        ->value    (  50,   0, $shift_status )
-        ->label    ( 125,   0, 'Leader:' )
-        ->value    ( 210,   0, $shift->leader())
-        ->label    ( 125,  20, 'Begin Time:' )
-        ->value    ( 210,  20, $shift->begin_time()->toStringShort())
-        ->label    ( 365,   0, $prev_shift_url.'&nbsp;&nbsp;&nbsp;'.$next_shift_url, false )
-        //->label    ( 365,   0, $prev_shift_url, false )
-        //->label    ( 445,   0, $next_shift_url, false )
-        ->label    ( 125,  40, 'End Time:'   );
-    if( is_null( $shift->end_time())) { $con
-        ->value    ( 210,  40, $shift_status )
-        ->button   ( 445,  35, 'close_shift_button', 'Close...' );
-    } else { $con
-        ->value    ( 210,  40, $shift->end_time()->toStringShort());
-    }
+    $con = new RegDBHtml( 0, 0, 675, 80 );
+    $con->label    (   0,   0, 'Status:'     )->value(  50,   0, $shift_status )
+        ->label    ( 125,   0, 'Begin Time:' )->value( 210,   0, $shift->begin_time()->toStringShort())
+        ->label    ( 355,   0, $prev_shift_url,  false )
+        ->label    ( 440,   0, $next_shift_url,  false )
+        ->label    ( 540,   0, $begin_shift_url, false )
+        ->label    ( 540,  20, $close_shift_url, false )
+        ->label    ( 125,  20, 'End Time:'   )->value( 210,  20, $end_time_str )
+        ->label    ( 125,  60, 'Leader:'     )->value( 210,  60, $shift->leader())
+        ->label    ( 125,   80, 'Shift Crew:')->value( 210,  80, 'no records' );
+
     echo $con->html();
 
     $logbook->commit();

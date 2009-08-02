@@ -673,7 +673,7 @@ function display_experiment() {
         '<div style="margin-bottom:20px;">'+
         '  <img src="images/ExpSummary.png" />'+
         '</div>'+
-        '<div id="experiment_info_container" style="height:160px;">Loading...</div>'+
+        '<div id="experiment_info_container" style="height:250px;">Loading...</div>'+
         '<div style="margin-top:40px; padding-right:15px;">'+
         '  <div id="messages_actions_container"></div>'+
         '</div>';
@@ -1138,18 +1138,14 @@ function display_shift() {
         '<div style="margin-bottom:20px;">'+
         '  <img src="images/ShiftSummary.png" />'+
         '</div>'+
-        '<div id="experiment_info_container" style="height:100px;">Loading...</div>'+
-        '<div style="margin-bottom:20px;">'+
+        '<div id="experiment_info_container" style="height:80px;">Loading...</div>'+
+        '<div style="margin-top:40px; margin-bottom:20px;">'+
         '  <img src="images/Runs.png" />'+
         '</div>'+
         '<div id="runs_table" style="margin-left:10px; padding:10px;"></div>'+
         '<br>'+
         '<br>'+
-        '<div id="messages_actions_container" style="margin-top:20px;" ></div>'+
-        '<form  name="close_shift_form" action="CloseShift.php" method="post">'+
-        '  <input type="hidden" name="id" value="'+current_selection.shift.id+'" />'+
-        '  <input type="hidden" name="actionSuccess" value="select_experiment_and_shift" />'+
-        '</form>';
+        '<div id="messages_actions_container" style="margin-top:20px;" ></div>';
 
     load( 'DisplayShift.php?id='+current_selection.shift.id, 'experiment_info_container' );
 
@@ -1157,29 +1153,24 @@ function display_shift() {
         'RequestRuns.php?shift_id='+current_selection.shift.id,
         false
     );
-    YAHOO.util.Event.onContentReady (
-        "close_shift_button",
-        function () {
-            var close_shift_button = new YAHOO.widget.Button( "close_shift_button" );
-            close_shift_button.on (
-                "click",
-                function( p_oEvent ) {
-                    ask_yesno_confirmation (
-                        "popupdialogs",
-                        'Proceed with the operation and permanently close this shift '+
-                        'as of this time? Enter <b>Yes</b> to do so. '+
-                        'Note, this is the last chance to abort making modifications '+
-                        'in the database!',
-                        function() { document.close_shift_form.submit(); },
-                        function() { display_shift(); }
-                    );
-                }
-            );
-        }
-    );
     var messages_dialog = create_messages_dialog( 'shift' );
 }
 
+function close_shift( shift_id ) {
+    ask_complex_input(
+        "popupdialogs",
+        "Close Last Shift",
+        '<form  name="close_shift_form" action="CloseShift.php" method="post">'+
+        '  <b>ATTENTION:</b> the selected shift is about to be closed. Press <b>Submit</b>'+
+        '   to proceed, or press <b>Cancel</b> to abort the operation.'+
+        '  <input type="hidden" name="id" value="'+shift_id+'" />'+
+        '  <input type="hidden" name="actionSuccess" value="select_experiment_and_shift" />'+
+        '</form>',
+        function() {
+            document.close_shift_form.submit();
+        }
+    );
+}
 
 function begin_new_shift() {
     ask_complex_input(
@@ -1593,7 +1584,10 @@ function expander_unhighlight( which, color ) {
     which.style.backgroundColor = color;
 }
 
-function expander_toggle( hid, bid ) {
+function message_expander_toggle( message_idx ) {
+    var re = last_search_result[message_idx];
+    var hid = re.hid;
+    var bid = re.bid;
     var h = document.getElementById(hid);
     var b = document.getElementById(bid);
     if( b.style.display == 'none') {
@@ -1606,15 +1600,33 @@ function expander_toggle( hid, bid ) {
     h.style.width='14px';
 }
 
-var message_ids=[];
-var expand_messages = false;
-function expand_collapse_all_messages( expand ) {
-    expand_messages = expand;
-    for( var i=0; i<message_ids.length; i++ ) {
+function attachment_expander_toggle( message_idx, attachment_idx ) {
 
-        var h = document.getElementById( message_ids[i].hid);
-        var b = document.getElementById( message_ids[i].bid);
-        if(  expand_messages ) {
+    var re = last_search_result[message_idx];
+    var attachment_descr = re.attachment_descr[attachment_idx];
+    var ahid = attachment_descr.ahid;
+    var aid = attachment_descr.aid;
+    var h = document.getElementById(ahid);
+    var a = document.getElementById(aid);
+    if( a.style.display == 'none') {
+        attachment_descr.loader.load();
+        h.innerHTML='<b>V</b>';
+        a.style.display = 'block';
+    } else {
+        h.innerHTML='<b>&gt;</b>';
+        a.style.display = 'none';
+    }
+    a.style.width='14px';
+}
+
+function expand_collapse_all_messages( expand ) {
+    for( var i = first_message_idx; i < last_message_idx; i++ ) {
+        var re = last_search_result[i];
+        var hid = re.hid;
+        var bid = re.bid;
+        var h = document.getElementById(hid);
+        var b = document.getElementById(bid);
+        if( expand ) {
             h.innerHTML='<b>V</b>';
             b.style.display = 'block';
         } else {
@@ -1625,38 +1637,81 @@ function expand_collapse_all_messages( expand ) {
     }
 }
 
-var attachment_ids=[];
-var show_attachments = false;
 function show_hide_all_attachments( show ) {
-    show_attachments = show;
-    for( var i=0; i<attachment_ids.length; i++ ) {
 
-        var h = document.getElementById( attachment_ids[i].ahid);
-        var a = document.getElementById( attachment_ids[i].aid);
-        if(  show_attachments ) {
-            h.innerHTML='<b>V</b>';
-            a.style.display = 'block';
-        } else {
-            h.innerHTML='<b>&gt;</b>';
-            a.style.display = 'none';
+    for( var message_idx = first_message_idx; message_idx < last_message_idx; message_idx++ ) {
+
+        var re = last_search_result[message_idx];
+
+        // Show attachments only for those messages whose body are presently shown
+        // (on the current page.)
+        //
+        if( document.getElementById( re.bid ).style.display != 'none' ) {
+
+            var attachment_descr = re.attachment_descr;
+            for( var i=0; i<attachment_descr.length; i++ ) {
+
+                var descr = attachment_descr[i];
+                var h = document.getElementById( descr.ahid );
+                var a = document.getElementById( descr.aid );
+                if( show ) {
+                    descr.loader.load();
+                    h.innerHTML='<b>V</b>';
+                    a.style.display = 'block';
+                } else {
+                    h.innerHTML='<b>&gt;</b>';
+                    a.style.display = 'none';
+                }
+                h.style.width='14px';
+            }
         }
-        h.style.width='14px';
     }
 }
 
-function event2html_1( re ) {
+function AttachmentLoader( a, aid ) {
+    this.type = a.type.split('/');
+    this.id = a.id;
+    this.aid = aid;
+    this.loaded = false;
+    this.load = function () {
+        if( this.loaded ) return;
+        this.loaded = true;
+        var a_elem = document.getElementById( this.aid );
+        if( this.type[0] == 'image' ) {
+            a_elem.innerHTML =
+            '<img max-width="800" src="ShowAttachment.php?id='+this.id+'" />';
+        } else if( this.type[0] == 'text' ) {
+            var aid4text = 'attachment_id_'+this.id+'_txt';
+            a_elem.innerHTML =
+            '<div style="max-width:800px; min-height:40px; max-height:200px; overflow:auto;"><textbox><pre id="'+aid4text+'"></pre></textbox></div>';
+            load( 'ShowAttachment.php?id='+this.id, aid4text );
+        } else if( this.type[0] == 'application' && this.type[1] == 'pdf' ) {
+            a_elem.innerHTML =
+            '<object data="ShowAttachment.php?id='+this.id+'" type="application/pdf" width="800" height="600"></object>';
+        } else {
+            a_elem.innerHTML =
+            '<img src="images/NoPreview.png" />';
+        }
+    }
+}
+
+function event2html( message_idx ) {
+
+    var re = last_search_result[message_idx];
+
     // Initialize and register identifiers for group operations like hiding/expanding
     // all messages.
     //
+    var mid = 'message_'+re.id;
     var hid = 'message_header_'+re.id;
     var bid = 'message_body_'+re.id;
-    message_ids.push( { 'hid' : hid, 'bid' : bid } );
+    re.mid = mid;
+    re.hid = hid;
+    re.bid = bid;
 
     var run = re.run == '' ? '' : 'run: <em style="padding:2px;">'+re.run+'</em>';
     var shift = re.shift == '' ? '' : 'shift: <em style="padding:2px;">'+re.shift+'</em>';
     var run_shift = re.run == '' && re.shift == '' ? '' : ' - '+run+' '+shift;
-
-
 
     var tags='';
     for( var i=0; i < re.tags.length; i++ ) {
@@ -1669,7 +1724,8 @@ function event2html_1( re ) {
             '</div>';
     }
 
-    var show_attachments_str = show_attachments ? '' : 'display:none;';
+    var attachment_descr = [];
+
     var attachment_sign = '<img src="images/attachment.png" height="18" />';
     var attachments='';
     for( var i=0; i < re.attachments.length; i++ ) {
@@ -1677,12 +1733,11 @@ function event2html_1( re ) {
 
         var ahid = 'attachment_header_id_'+a.id;
         var aid = 'attachment_id_'+a.id;
-        attachment_ids.push( { 'ahid' : ahid, 'aid' : aid } );
 
         attachments +=
             '<div style="margin-top:0px; margin-left:10px;">'+
             '  <span id="'+ahid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; padding-right:2px; margin-right:5px; font-size:14px; text-align:center; cursor:pointer;"'+
-            '     onclick="javascript:expander_toggle('+"'"+ahid+"','"+aid+"')"+'"'+
+            '     onclick="javascript:attachment_expander_toggle('+"'"+message_idx+"','"+i+"')"+'"'+
             '     onmouseover="javascript:expander_highlight(this)" '+
             '     onmouseout="javascript:expander_unhighlight(this,document.bgColor)">'+
             '     <b>&gt;</b>'+'</span>'+
@@ -1691,52 +1746,40 @@ function event2html_1( re ) {
             '  <span>size: <b> '+a.size+'</b></span> )'+
             '  '+attachment_sign+
             '</div>'+
-            '<div id="'+aid+'" style="margin-left:18px; padding:17px; border-left:solid 2px #efefef; '+show_attachments_str+'">';
-        var type =  a.type.split('/');
-        if( type[0] == 'image' ) {
-            attachments +=
-            '<img max-width="800" src="ShowAttachment.php?id='+a.id+'" />';
-        } else if( type[0] == 'text' ) {
-            var aid4text = 'attachment_id_'+a.id+'_txt';
-            attachments +=
-            '<div style="max-width:800px; min-height:40px; max-height:200px; overflow:auto;"><textbox><pre id="'+aid4text+'"></pre></textbox></div>';
-            load( 'ShowAttachment.php?id='+a.id, aid4text );
-        } else if( type[0] == 'application' && type[1] == 'pdf' ) {
-            attachments +=
-            '<object data="ShowAttachment.php?id='+a.id+'" type="application/pdf" width="800" height="600"></object>';
-        } else {
-            attachments +=
-            '<img src="images/NoPreview.png" />';
-        }
-        attachments +=
+            '<div id="'+aid+'" style="margin-left:18px; padding:17px; border-left:solid 2px #efefef; display:none;">'+
             '</div>';
-    }
 
-    var expand_messages_str = expand_messages ? '' : 'display:none;';
+        var descr = { 'ahid' : ahid, 'aid' : aid, 'loader' : new AttachmentLoader( a, aid )};
+        attachment_descr.push( descr );
+    }
+    re.attachment_descr = attachment_descr;
+
     var attachment_signs = '';
     for( var i=0; i < re.attachments.length; i++ )
         attachment_signs += attachment_sign;
 
     var result =
-        '<div style="position:relative; left:0px; margin-top:10px; margin-left:10px; padding:2px;">'+
-        '  <span id="'+hid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
-        '     onclick="expander_toggle('+"'"+hid+"','"+bid+"')"+'"'+
-        '     onmouseover="expander_highlight(this)" '+
-        '     onmouseout="expander_unhighlight(this,document.bgColor)">'+
-        '     <b>&gt;</b>'+'</span>'+
-        '  <span>'+
-        '    <b><em style="padding:2px;">'+re.event_time+'</em></b>'+
-        '    by: <b><em style="padding:2px;">'+re.author+'</em></b>'+
-        '    - <em class="lb_msg_subject" style="padding:2px;">'+re.subject+'</em>'+run_shift+
-        '    </span>'+
+        '<div id="'+mid+'" style="display:none;" >'+
+        '  <div style="position:relative; left:0px; margin-top:10px; margin-left:10px; padding:2px;">'+
+        '    <span id="'+hid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '      onclick="message_expander_toggle('+message_idx+')"'+
+        '      onmouseover="expander_highlight(this)" '+
+        '      onmouseout="expander_unhighlight(this,document.bgColor)">'+
+        '      <b>&gt;</b>'+'</span>'+
+        '    <span>'+
+        '      <b><em style="padding:2px;">'+re.event_time+'</em></b>'+
+        '      by: <b><em style="padding:2px;">'+re.author+'</em></b>'+
+        '      - <em class="lb_msg_subject" style="padding:2px;">'+re.subject+'</em>'+run_shift+
+        '      </span>'+
         attachment_signs+
-        '</div>'+
-        '<div id="'+bid+'" style="'+expand_messages_str+' margin-left:17px; margin-bottom:20px;">'+
-        '  <div style="padding:10px; padding-left:20px; border-left:solid 1px #c0c0c0;">'+
-        '    <div style="margin-top:8px; margin-right:0px; margin-bottom:20px; background-color:#efefef;">'+re.html+'</div>'+
+        '  </div>'+
+        '  <div id="'+bid+'" style="display:none; margin-left:17px; margin-bottom:20px;">'+
+        '    <div style="padding:10px; padding-left:20px; border-left:solid 1px #c0c0c0;">'+
+        '      <div style="margin-top:8px; margin-right:0px; margin-bottom:20px; background-color:#efefef;">'+re.html+'</div>'+
         tags+
         ((re.tags.length > 0 && re.attachments.length > 0) ? '<br>' : '')+
         attachments+
+        '    </div>'+
         '  </div>'+
         '</div>';
     return result;
@@ -1749,22 +1792,25 @@ var last_message_idx = null;
 
 function display_messages_page() {
 
-    message_ids = [];
-    attachment_ids = [];
-
-    document.getElementById('messages_showing_from_id').innerHTML=(1+first_message_idx);
-    document.getElementById('messages_showing_through_id').innerHTML=last_message_idx;
+    document.getElementById('messages_total').innerHTML = last_search_result.length;
+    document.getElementById('messages_showing_from_id').innerHTML = ( 1 + first_message_idx );
+    document.getElementById('messages_showing_through_id').innerHTML = last_message_idx;
 
     prev_message_page_button.set( 'disabled', first_message_idx == 0 );
     next_message_page_button.set( 'disabled', last_message_idx >= last_search_result.length );
 
-    var html = '';
-    for( var i = first_message_idx; i < last_message_idx; i++ ) {
+    for( var i = 0; i < last_search_result.length; i++ ) {
         var re = last_search_result[i];
-        var t = event2html_1( re );
-        html += t;
+        var m = document.getElementById(re.mid);
+
+        // Show the messages from the current page and hide the others
+        //
+        if(( first_message_idx <= i ) && ( i < last_message_idx )) {
+            m.style.display = 'block';
+        } else {
+            m.style.display = 'none';
+        }
     }
-    document.getElementById('messages_area').innerHTML = html;
 }
 
 var prev_message_page_button = null;
@@ -1799,19 +1845,23 @@ var new_message_button=null;
 
 var messages_refresh_timer = null;
 function scheduleNexRefreshOfMessagesTable() {
-    messages_refresh_timer = window.setTimeout( 'refreshMessagesTable()', 10000 );
+    messages_refresh_timer = window.setTimeout( 'refreshMessagesTable()', 5000 );
 }
 function stopRefreshOfMessagesTable() {
     if( messages_refresh_timer != null ) {
-        messages_refresh_timer.clearTimeout();
+        window.clearTimeout( messages_refresh_timer );
         messages_refresh_timer = null;
     }
 }
 function refreshMessagesTable() {
     if( current_messages_table != null ) {
         current_messages_table.refresh();
-        scheduleNexRefreshOfMessagesTable();
     }
+}
+
+function auto_refresh_togle( e ) {
+    if( e.checked ) scheduleNexRefreshOfMessagesTable();
+    else stopRefreshOfMessagesTable();
 }
 
 function display_messages_table(
@@ -1824,13 +1874,6 @@ function display_messages_table(
     author,
     html_new_message,
     auto_refresh ) {
-
-    // Disable this for now. It causes performance issues when utomatically
-    // downloading the attachments. We need to redesign the code to download
-    // attachments only on demand (when they're open) Also consider disabling
-    // auto-refresh if the 'Show All Attachment' mode is selected'
-    //
-    auto_refresh = false;
 
     stopRefreshOfMessagesTable();
 
@@ -1862,143 +1905,178 @@ function display_messages_table(
         html +=
         '  <div style="margin-top:10px; margin-bottom:10px; padding-bottom:10px;">';
     }
+    var auto_refresh_checked = auto_refresh ? 'checked="checked"' : '';
     html +=
         '  <div style="text-align:right; margin-bottom:5px;">'+
-        '    <span id="messagesarea_header">&nbsp;</span>'+
+        '    <b><em id="messages_showing_from_id">0</em></b> - <b><em id="messages_showing_through_id">0</em></b> ( of <b><em id="messages_total">0</em></b> )'+
         '  </div>'+
-        '  <div id="messagesarea_body">'+
+        '  <div style="margin-left:10px; margin-bottom:10px; padding-top:10px; padding-bottom:10px; border-top:solid 2px #e0e0e0; border-bottom:solid 2px #e0e0e0;">'+
+        '    <form name="search_display_form">'+
+        '      <table><tbody>'+
+        '        <tr>'+
+        '          <td valign="top">'+
+        '            <button id="expand_button">Expand</button>'+
+        '            <button id="collapse_button">Collapse</button>'+
+        '              <button id="show_attachments_button">View Attach</button>'+
+        '              <button id="hide_attachments_button">Hide Attach</button>'+
+        '              <button id="new_message_button"><em style="font-weight:bold;">New Message</em></button>'+
+        '          </td>'+
+        '          <td valign="top">'+
+        '            <div style="padding-left:40px;">'+
+        '              <select align="center" type="text" name="limit_per_page" style="padding:1px;" onchange="display_messages()">'+
+        '                <option value="all">all</option>'+
+        '                <option value="5">5</option>'+
+        '                <option value="10">10</option>'+
+        '                <option value="20">20</option>'+
+        '                <option value="50">50</option>'+
+        '                <option value="100">100</option>'+
+        '              </select> / page'+
+        '            </div>'+
+        //'            <div style="padding-left:40px;padding-top:10px;">'+
+        //'              <input type="checkbox" name="posted_at_experiment" value="Experiment" checked="checked" />&nbsp;experiment'+
+        //'              <input type="checkbox" name="posted_at_shifts" value="Shifts" checked="checked" />&nbsp;shifts'+
+        //'              <input type="checkbox" name="posted_at_runs" value="Runs" checked="checked" />&nbsp;runs'+
+        //'            </div>'+
+        '            <div style="padding-left:40px;padding-top:10px;">'+
+        '              <input type="checkbox" name="autorefresh" value="Autorefresh" '+auto_refresh_checked+' onchange="auto_refresh_togle(this)" />&nbsp;auto refresh'+
+        '            </div>'+
+        '          </td>'+
+        '          <td valign="top">'+
+        '            <div style="padding-left:20px;">'+
+        '              <button id="prev_message_page_button">&lt; Prev</button>'+
+        '              <button id="next_message_page_button">Next &gt;</button>'+
+        '            </div>'+
+        '          </td>'+
+        '        </tr>'+
+        '      </tbody></table></center>'+
+        '    </form>'+
+        '  </div>'+
+        '  <div id="messages_area">'+
         '    <img src="images/ajaxloader.gif" />&nbsp;searching messages...'+
         '  </div>'+
         '</div>';
 
     document.getElementById('messagesarea').innerHTML=html;
 
+    var expand_button = new YAHOO.widget.Button( "expand_button" );
+    expand_button.on (
+        "click",
+        function( p_oEvent ) {
+            expand_collapse_all_messages( true );
+        }
+    );
+    var collapse_button = new YAHOO.widget.Button( "collapse_button" );
+    collapse_button.on (
+        "click",
+        function( p_oEvent ) {
+            expand_collapse_all_messages( false );
+        }
+    );
+    var show_attachments_button = new YAHOO.widget.Button( "show_attachments_button" );
+    show_attachments_button.on (
+        "click",
+        function( p_oEvent ) {
+            show_hide_all_attachments( true );
+        }
+    );
+    var hide_attachments_button = new YAHOO.widget.Button( "hide_attachments_button" );
+    hide_attachments_button.on (
+        "click",
+        function( p_oEvent ) {
+            show_hide_all_attachments( false );
+        }
+    );
+    // ATTENTION: this button is made global to allow re-enabling it from
+    // the dialog window when it gets closed.
+    //
+    new_message_button = new YAHOO.widget.Button( "new_message_button" );
+    new_message_button.on (
+        "click",
+        function( p_oEvent ) {
+            document.getElementById('new_message_dialog').style.display='block';
+            new_message_button.set( 'disabled', true );
+        }
+    );
+    if( html_new_message == '' ) {
+        new_message_button.set( 'disabled', true );
+    }
+    prev_message_page_button = new YAHOO.widget.Button( "prev_message_page_button" );
+    prev_message_page_button.on (
+        "click",
+        function( p_oEvent ) {
+            prev_message_page();
+        }
+    );
+    next_message_page_button = new YAHOO.widget.Button( "next_message_page_button" );
+    next_message_page_button.on (
+        "click",
+        function( p_oEvent ) {
+            next_message_page();
+        }
+    );
+                
     function callback_on_load( result ) {
         if( result.ResultSet.Status != "success" ) {
-            document.getElementById('messagesarea').innerHTML = result.ResultSet.Message;
+            document.getElementById('messages_area').innerHTML = result.ResultSet.Message;
         } else {
             last_search_result = result.ResultSet.Result;
-            expand_messages = false;
-            show_attachments = false;
-            document.getElementById('messagesarea_header').innerHTML =
-                '<b><em id="messages_showing_from_id"></em></b> - <b><em id="messages_showing_through_id"></em></b>'+
-                ' ( of <b>'+last_search_result.length+'</b> )';
-            var html1 =
-                '<div style="margin-left:10px; margin-bottom:10px; padding-top:10px; padding-bottom:10px; border-top:solid 2px #e0e0e0; border-bottom:solid 2px #e0e0e0;">'+
-                '  <form name="search_display_form">'+
-                '    <table><tbody>'+
-                '      <tr>'+
-                '        <td valign="top">'+
-                '          <button id="expand_button">Expand</button>'+
-                '          <button id="collapse_button">Collapse</button>'+
-                '            <button id="show_attachments_button">View Attach</button>'+
-                '            <button id="hide_attachments_button">Hide Attach</button>'+
-                '            <button id="new_message_button"><em style="font-weight:bold;">New Message</em></button>'+
-                '        </td>'+
-                '        <td valign="top">'+
-                '          <div style="padding-left:40px;">'+
-                '            <select align="center" type="text" name="limit_per_page" style="padding:1px;" onchange="display_messages()">'+
-                '              <option value="all">all</option>'+
-                '              <option value="5">5</option>'+
-                '              <option value="10">10</option>'+
-                '              <option value="20">20</option>'+
-                '              <option value="50">50</option>'+
-                '              <option value="100">100</option>'+
-                '            </select> / page'+
-                '          </div>'+
-                '          <div style="padding-left:40px;padding-top:10px;">'+
-                '            <input type="checkbox" name="posted_at_experiment" value="Experiment" checked="checked" />&nbsp;experiment'+
-                '            <input type="checkbox" name="posted_at_shifts" value="Shifts" checked="checked" />&nbsp;shifts'+
-                '            <input type="checkbox" name="posted_at_runs" value="Runs" checked="checked" />&nbsp;runs'+
-                '          </div>';
-            if( auto_refresh ) {
-                html1 +=
-                '          <div style="padding-left:40px;padding-top:10px;">'+
-                '            <input type="checkbox" name="autorefresh" value="Autorefresh" checked="checked" />&nbsp;auto refresh'+
-                '          </div>';
-            }
-            html1 +=
-                '        </td>'+
-                '        <td valign="top">'+
-                '          <div style="padding-left:20px;">'+
-                '            <button id="prev_message_page_button">&lt; Prev</button>'+
-                '            <button id="next_message_page_button">Next &gt;</button>'+
-                '          </div>'+
-                '        </td>'+
-                '      </tr>'+
-                '    </tbody></table></center>'+
-                '  </form>'+
-                '</div>'+
-                '<div id="messages_area"></div>';
-            document.getElementById('messagesarea_body').innerHTML = html1;
-
-            var expand_button = new YAHOO.widget.Button( "expand_button" );
-            expand_button.on (
-                "click",
-                function( p_oEvent ) {
-                    expand_collapse_all_messages( true );
-                }
-            );
-            var collapse_button = new YAHOO.widget.Button( "collapse_button" );
-            collapse_button.on (
-                "click",
-                function( p_oEvent ) {
-                    expand_collapse_all_messages( false );
-                }
-            );
-            var show_attachments_button = new YAHOO.widget.Button( "show_attachments_button" );
-            show_attachments_button.on (
-                "click",
-                function( p_oEvent ) {
-                    show_hide_all_attachments( true );
-                }
-            );
-            var hide_attachments_button = new YAHOO.widget.Button( "hide_attachments_button" );
-            hide_attachments_button.on (
-                "click",
-                function( p_oEvent ) {
-                    show_hide_all_attachments( false );
-                }
-            );
-            // ATTENTION: this button is made global to allow re-enabling it from
-            // the dialog window when it gets closed.
-            //
-            new_message_button = new YAHOO.widget.Button( "new_message_button" );
-            new_message_button.on (
-                "click",
-                function( p_oEvent ) {
-                    document.getElementById('new_message_dialog').style.display='block';
-                    new_message_button.set( 'disabled', true );
-                }
-            );
-            prev_message_page_button = new YAHOO.widget.Button( "prev_message_page_button" );
-            prev_message_page_button.on (
-                "click",
-                function( p_oEvent ) {
-                    prev_message_page();
-                }
-            );
-            next_message_page_button = new YAHOO.widget.Button( "next_message_page_button" );
-            next_message_page_button.on (
-                "click",
-                function( p_oEvent ) {
-                    next_message_page();
-                }
-            );
+            var html1 = '';
+            for( var i=0; i < last_search_result.length; i++ )
+                html1 += event2html(i);
+            document.getElementById('messages_area').innerHTML = html1;
             display_messages();
-            if( auto_refresh ) {
+            if( document.search_display_form.autorefresh.checked )
                 scheduleNexRefreshOfMessagesTable();
-            }
         }
     }
     function callback_on_failure( http_status ) {
-        document.getElementById('messagesarea').innerHTML=
+        document.getElementById('messages_area').innerHTML=
             '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
     }
     load_then_call( this.url, callback_on_load, callback_on_failure );
 
+    function callback_on_refresh( result ) {
+        if( result.ResultSet.Status != "success" ) {
+            document.getElementById('messages_area').innerHTML = result.ResultSet.Message;
+        } else {
+            var this_search_result = result.ResultSet.Result;
+            if( this_search_result.length > 0 ) {
+
+                // First put new results in front of the cached array.
+                //
+                //   NOTE: unfortunatelly, we can't use JavaScript's String.unshift()
+                //         as it's not properly implemented in IE. See details in
+                //         the following article:
+                //         http://www.w3schools.com/jsref/jsref_unshift.asp
+                //
+                var old_search_result = last_search_result;
+                last_search_result = this_search_result;
+                for( var i=0; i < old_search_result.length;  i++ )
+                    last_search_result.push( old_search_result[i] );
+
+                var html1 = '';
+                for( var i=0; i < this_search_result.length; i++ ) {
+                    html1 += event2html(i);
+                }
+                var html_old = document.getElementById('messages_area').innerHTML;
+                document.getElementById('messages_area').innerHTML = html1 + html_old;
+                display_messages();
+            }
+            if( document.search_display_form.autorefresh.checked )
+                scheduleNexRefreshOfMessagesTable();
+        }
+    }
     this.refresh = function() {
-        load_then_call( url, callback_on_load, callback_on_failure );
+        if( last_search_result.length > 0 )
+            load_then_call(
+                this.url+'&since='+encodeURIComponent(last_search_result[0].event_time),
+                callback_on_refresh,
+                callback_on_failure );
+        else
+            load_then_call(
+                this.url,
+                callback_on_load,
+                callback_on_failure );
     }
     return this;
 }
@@ -2036,9 +2114,6 @@ function search_contents() {
     reset_workarea();
 
     var workarea = document.getElementById('workarea');
-    //workarea.style.borderLeft="solid 6px #e0e0e0";
-    //workarea.style.padding = "10px";
-    //workarea.style.minHeight="620px";
     workarea.innerHTML=
         '<div id="messagesarea">'+
         '  <div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
@@ -2048,10 +2123,7 @@ function search_contents() {
         '</div>';
 
     var navarea = document.getElementById('navarea');
-    //navarea.style.minWidth = "200px";
     navarea.style.display = 'block';
-    //navarea.style.padding = "10px";
-    //navarea.style.backgroundColor = "#c0c0c0";
     navarea.innerHTML=
         '<div style="margin-bottom:20px;">'+
         '  <img src="images/Filter.png" />'+
