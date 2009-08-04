@@ -45,7 +45,7 @@ class _NewUserRoleForm(formencode.Schema):
     allow_extra_fields = True
     filter_extra_fields = True
     if_key_missing = None
-    exp_id = formencode.validators.Int()
+    exp_id = formencode.validators.String()
     app = formencode.validators.String(not_empty=True)
     user = formencode.validators.String(not_empty=True)
     role = formencode.validators.String(not_empty=True)
@@ -98,10 +98,7 @@ class UserrolesController(BaseController):
             abort( 400, unicode(error) )
         
         # empty exp_id ito become NULL
-        if form_result['exp_id'] :
-            exp_id = int(form_result['exp_id'])
-        else :
-            exp_id = None        
+        exp_id = form_result['exp_id']
         app = form_result['app']
         user = form_result['user']
         role = form_result['role']
@@ -111,9 +108,10 @@ class UserrolesController(BaseController):
         # pass data to model
         id = model.addUserRole ( app, exp_id, user, role )
         if not id :
-            abort(400, "UserrolesController.create: failed to create user role %s/%s/%s", (app, user, role) )
+            abort(400, "UserrolesController.create: failed to create user role %s/%s/%s" % (app, user, role) )
 
         # return complete record for result
+        form_result['id'] = id
         return form_result
 
     @jsonify
@@ -127,6 +125,8 @@ class UserrolesController(BaseController):
         
         # pass data to model
         id = model.addUserRole ( app, exp_id, user, role )
+        if not id :
+            abort(400, "UserrolesController.create: failed to create user role %s/%s/%s" % (app, user, role) )
 
         # return complete record for result
         res = {}
@@ -134,6 +134,7 @@ class UserrolesController(BaseController):
         res['user'] = user
         res['role'] = role
         if exp_id : res['exp_id'] = exp_id
+        res['id'] = id
         return res
 
 
@@ -147,10 +148,12 @@ class UserrolesController(BaseController):
         model = RolesModel()
         if role :
             # delete one role
-            model.deleteUserRole( app, exp_id, user, role )
+            res = model.deleteUserRole( app, exp_id, user, role )
         else :
             # delete all user roles for an application
-            model.deleteUserRoles( app, exp_id, user )
+            res = model.deleteUserRoles( app, exp_id, user )
+        if not res : abort(404)
+        return [res]
 
 
     @jsonify
@@ -162,16 +165,17 @@ class UserrolesController(BaseController):
 
         # delete all user roles
         model = RolesModel()
-        model.deleteUser( user )
-
+        res = model.deleteUser( user )
+        if not res : abort(404)
+        return [res]
 
     @jsonify
     def show(self, app, user, exp_id=None ):
         """GET /userroles/{app}~{exp_id}/{user}: Show a specific item"""
 
-        if exp_id is not None : exp_id = int(exp_id)
         model = RolesModel()
         res = model.getUserRoles( app, exp_id, user )
+        if res is None : abort(404)
         return res
 
 
@@ -179,7 +183,7 @@ class UserrolesController(BaseController):
     def showPriv(self, app, user, exp_id=None ):
         """GET /userroles/{app}~{exp_id}/{user}/privileges: Show a specific item"""
 
-        if exp_id is not None : exp_id = int(exp_id)
         model = RolesModel()
         res = model.getUserPrivileges( app, exp_id, user )
+        if res is None : abort(404)
         return res

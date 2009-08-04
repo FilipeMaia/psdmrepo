@@ -112,7 +112,10 @@ class RoleDB (object):
         cursor.execute ( "DELETE FROM user WHERE role_id IN (SELECT id FROM role WHERE name=%s AND app=%s)", (role, app) )
         cursor.execute ( "DELETE FROM role WHERE name=%s AND app=%s", (role, app) )
         
+        res = cursor.rowcount
         conn.commit()
+        
+        return res
 
     def _regdbapps(self):
         """ Return the list of applications for which there is a "RegDB" role """
@@ -166,14 +169,22 @@ class RoleDB (object):
         cursor.execute ( "DELETE FROM priv" +
                          " WHERE role_id IN (SELECT id FROM role WHERE name=%s AND app=%s) AND name=%s", 
                          (role, app, privilege) )
+        res = cursor.rowcount
         conn.commit()
+
+        return res
 
     #
     # Methods for user table
     #
     
-    def addUserRole ( self, app, exp_id, user, role ):
+    def addUserRole ( self, app, expNameOrId, user, role ):
         """ Create new user record in the roles database """
+        
+        try :
+            exp_id = self._expId (expNameOrId)
+        except :
+            return None
         
         conn = self._roledb_conn.connection()
         cursor = conn.cursor ()
@@ -221,9 +232,14 @@ class RoleDB (object):
 
         return res_roles
     
-    def getUserRoles ( self, app, exp_id, user ):
+    def getUserRoles ( self, app, expNameOrId, user ):
         """ Find all the roles for a given user/application """
 
+        try :
+            exp_id = self._expId (expNameOrId)
+        except :
+            return None
+        
         # find the roles explicitly defined in the database
         conn = self._roledb_conn.connection()
         cursor = conn.cursor()
@@ -243,33 +259,37 @@ class RoleDB (object):
                 
         roles = set ( [ x[0] for x in res ] )
 
-        # now there may be also implicit roles
-        cursor.execute ( "SELECT COUNT(*) FROM role WHERE name = %s AND app = %s", (_regdb_role,app) )
-        imp_count = cursor.fetchone()[0]
+        # now there may be also implicit roles, but they only work with explicit experiment name
+        if exp_id is not None :
+            
+            cursor.execute ( "SELECT COUNT(*) FROM role WHERE name = %s AND app = %s", (_regdb_role,app) )
+            imp_count = cursor.fetchone()[0]
+            
+            if imp_count > 0 :
+                
+                # get the list of the experiments for this user from RegDB
+                regdb = self._regdb_conn.connection()
+                cursor = regdb.cursor ()
+                cursor.execute ( "SELECT COUNT(*) FROM experiment WHERE id = %s AND leader_account = %s", (exp_id,user) )
+                regdb_count = cursor.fetchone()[0]
+                
+                regdb.commit()
+    
+                if regdb_count : roles.add(_regdb_role)
         
         # done with database
         conn.commit()
-                
-        if imp_count > 0 :
-            
-            # get the list of the experiments for this user from RegDB
-            regdb = self._regdb_conn.connection()
-            cursor = regdb.cursor ()
-            if exp_id is None :
-                cursor.execute ( "SELECT COUNT(*) FROM experiment WHERE leader_account = %s", (user,) )
-            else :
-                cursor.execute ( "SELECT COUNT(*) FROM experiment WHERE id = %s AND leader_account = %s", (exp_id,user) )
-            regdb_count = cursor.fetchone()[0]
-            
-            regdb.commit()
 
-            if regdb_count : roles.insert(_regdb_role)
-        
         return list(roles)
     
 
-    def getUserPrivileges ( self, app, exp_id, user ):
+    def getUserPrivileges ( self, app, expNameOrId, user ):
         """ Find all the privileges for a given user/application """
+        
+        try :
+            exp_id = self._expId (expNameOrId)
+        except :
+            return None
         
         res = []
         
@@ -315,13 +335,18 @@ class RoleDB (object):
         
         conn.commit()
 
-        # egt rfirst column of the result set
+        # get first column of the result set
         roles = set ( [ x[0] for x in res ] )
         
         return list(roles)
     
-    def deleteUserRole( self, app, exp_id, user, role ) :
+    def deleteUserRole( self, app, expNameOrId, user, role ) :
         """ Delete one user role """
+        
+        try :
+            exp_id = self._expId (expNameOrId)
+        except :
+            return None
         
         conn = self._roledb_conn.connection()
         cursor = conn.cursor()
@@ -333,11 +358,18 @@ class RoleDB (object):
             cursor.execute ( "DELETE FROM user" +
                              " WHERE role_id IN (SELECT id FROM role WHERE name=%s AND app=%s)" +
                              " AND user = %s and exp_id = %s", (role, app, user, exp_id) )
-
+        res = cursor.rowcount
         conn.commit()
+        
+        return res
 
-    def deleteUserRoles( self, app, exp_id, user ) :
+    def deleteUserRoles( self, app, expNameOrId, user ) :
         """ Delete all roles for a user/app """
+        
+        try :
+            exp_id = self._expId (expNameOrId)
+        except :
+            return None
         
         conn = self._roledb_conn.connection()
         cursor = conn.cursor()
@@ -349,8 +381,10 @@ class RoleDB (object):
             cursor.execute ( "DELETE FROM user" +
                              " WHERE role_id IN (SELECT id FROM role WHERE app=%s)" +
                              " AND user = %s and exp_id = %s", (app, user, exp_id) )
-
+        res = cursor.rowcount
         conn.commit()
+        
+        return res
 
     def deleteUser( self, user ) :
         """ Delete all roles for a user """
@@ -359,4 +393,43 @@ class RoleDB (object):
         cursor = conn.cursor()
         cursor.execute ( "DELETE FROM user WHERE user = %s", (user,) )
 
+        res = cursor.rowcount
         conn.commit()
+
+        return res
+
+    #--------------------
+    #  Private methods --
+    #--------------------
+    
+    def _expId (self, expNameOrId):
+        
+        # None is special
+        if expNameOrId is None : return None
+        
+        try :
+            # if it is a number then it is just Id
+            expId = int(expNameOrId)
+            return expId
+        except :
+            # Not a number, expect it to be InstrName-ExpName
+            w = expNameOrId.split('-')
+                    
+            if len(w) != 2 : raise ValueError(expNameOrId)
+
+            instr = w[0]
+            exp = w[1]
+            
+            # query RegDB for corresponding experiment id
+            regdb = self._regdb_conn.connection()
+            cursor = regdb.cursor ()
+            q = "SELECT e.id FROM experiment as e, instrument as i where i.name=%s and e.name=%s and i.id=e.instr_id"
+            cursor.execute ( q, (instr,exp) )
+            res = cursor.fetchall()
+            regdb.commit()
+
+            # must be one row e
+            if len(res) != 1 : raise ValueError(expNameOrId)
+
+            return res[0][0]
+            
