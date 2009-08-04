@@ -94,10 +94,10 @@ private:
 //  Helper classes for Pds::Acqiris::TrigV1 class
 //
 struct AcqirisTrigV1_Data {
-  uint32_t trigCoupling;
-  uint32_t trigInput;
-  uint32_t trigSlope;
-  double   trigLevel;
+  uint32_t coupling;
+  uint32_t input;
+  uint32_t slope;
+  double   level;
 };
 
 struct AcqirisTrigV1 {

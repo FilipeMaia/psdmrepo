@@ -96,10 +96,10 @@ AcqirisHorizV1::native_type()
 
 AcqirisTrigV1::AcqirisTrigV1 ( const Pds::Acqiris::TrigV1& t )
 {
-  m_data.trigCoupling = t.trigCoupling() ;
-  m_data.trigInput = t.trigInput() ;
-  m_data.trigSlope = t.trigSlope() ;
-  m_data.trigLevel = t.trigLevel() ;
+  m_data.coupling = t.coupling() ;
+  m_data.input = t.input() ;
+  m_data.slope = t.slope() ;
+  m_data.level = t.level() ;
 }
 
 hdf5pp::Type
@@ -112,10 +112,10 @@ hdf5pp::Type
 AcqirisTrigV1::native_type()
 {
   hdf5pp::CompoundType trigType = hdf5pp::CompoundType::compoundType<AcqirisTrigV1>() ;
-  trigType.insert_native<uint32_t>( "trigCoupling", offsetof(AcqirisTrigV1_Data,trigCoupling) ) ;
-  trigType.insert_native<uint32_t>( "trigInput", offsetof(AcqirisTrigV1_Data,trigInput) ) ;
-  trigType.insert_native<uint32_t>( "trigSlope", offsetof(AcqirisTrigV1_Data,trigSlope) ) ;
-  trigType.insert_native<double>( "trigLevel", offsetof(AcqirisTrigV1_Data,trigLevel) ) ;
+  trigType.insert_native<uint32_t>( "coupling", offsetof(AcqirisTrigV1_Data,coupling) ) ;
+  trigType.insert_native<uint32_t>( "input", offsetof(AcqirisTrigV1_Data,input) ) ;
+  trigType.insert_native<uint32_t>( "slope", offsetof(AcqirisTrigV1_Data,slope) ) ;
+  trigType.insert_native<double>( "level", offsetof(AcqirisTrigV1_Data,level) ) ;
 
   return trigType ;
 }
