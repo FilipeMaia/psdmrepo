@@ -85,6 +85,7 @@ private:
   AppCmdOptList<std::string>  m_eventData ;
   AppCmdOpt<std::string>      m_experiment ;
   AppCmdOptBool               m_extGroups ;
+  AppCmdOpt<std::string>      m_instrument ;
   AppCmdOpt<std::string>      m_mdConnStr ;
   AppCmdOptList<std::string>  m_metadata ;
   AppCmdOpt<std::string>      m_outputDir ;
@@ -109,6 +110,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_eventData  ( 'f', "event-file",   "path",     "file name for XTC event data", '\0' )
   , m_experiment ( 'x', "experiment",   "string",   "experiment name", "" )
   , m_extGroups  ( 'G', "group-time",               "use extended group names with timestamps", false )
+  , m_instrument ( 'i', "instrument",   "string",   "instrument name", "" )
   , m_mdConnStr  ( 'M', "md-conn",      "string",   "metadata ODBC connection string", "" )
   , m_metadata   ( 'm', "metadata",     "name:value", "science metadata values", '\0' )
   , m_outputDir  ( 'd', "output-dir",   "path",     "directory to store output files, def: .", "." )
@@ -116,8 +118,8 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_overwrite  (      "overwrite",                "overwrite output file", false )
   , m_runNumber  ( 'r', "run-number",   "number",   "run number, non-negative number; def: 0", 0 )
   , m_runType    ( 't', "run-type",     "string",   "run type, DATA or CALIB, def: DATA", "DATA" )
-  , m_splitMode  ( 's', "split-mode",   "mode-name","one of none, or family; def: none", O2OHdf5Writer::NoSplit )
-  , m_splitSize  ( 'z', "split-size",   "number",   "max. size of output files. def: 20G", 20*1073741824ULL )
+  , m_splitMode  ( 's', "split-mode",   "mode-name","one of none, or family; def: family", O2OHdf5Writer::Family )
+  , m_splitSize  ( 'z', "split-size",   "size",   "max. size of output files. def: 10G", 10*1073741824ULL )
 {
   setOptionsFile( m_optionsFile ) ;
   addOption( m_compression ) ;
@@ -126,6 +128,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_eventData ) ;
   addOption( m_experiment ) ;
   addOption( m_extGroups ) ;
+  addOption( m_instrument ) ;
   addOption( m_mdConnStr ) ;
   addOption( m_metadata ) ;
   addOption( m_outputDir ) ;
@@ -185,6 +188,7 @@ O2O_Translate::runApp ()
   if ( outputDir.empty() ) outputDir = "." ;
   nameFactory.addKeyword ( "output-dir", outputDir ) ;
   nameFactory.addKeyword ( "experiment", m_experiment.value() ) ;
+  nameFactory.addKeyword ( "instrument", m_instrument.value() ) ;
   char runStr[16];
   snprintf ( runStr, sizeof runStr, "%06lu", m_runNumber.value() ) ;
   nameFactory.addKeyword ( "run", runStr ) ;
@@ -192,6 +196,7 @@ O2O_Translate::runApp ()
   // make metadata object
   O2OMetaData metadata ( m_runNumber.value(),
                          m_runType.value(),
+                         m_instrument.value(),
                          m_experiment.value(),
                          m_metadata.value() ) ;
 

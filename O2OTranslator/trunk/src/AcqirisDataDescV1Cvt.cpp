@@ -141,8 +141,8 @@ AcqirisDataDescV1Cvt::convert ( const void* data,
         timestamps[ch][seg] = dd.timestamp(seg).value();
       }
 
-      uint16_t* wf = dd.waveform(hconfig) ;
-      std::copy ( wf, wf+nSampl*nSeg, (uint16_t*)waveforms[ch] ) ;
+      int16_t* wf = dd.waveform(hconfig) ;
+      std::copy ( wf, wf+nSampl*nSeg, (int16_t*)waveforms[ch] ) ;
     }
 
 

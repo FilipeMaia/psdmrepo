@@ -39,10 +39,12 @@ namespace O2OTranslator {
 //----------------
 O2OMetaData::O2OMetaData ( unsigned long runNumber,
                            const std::string& runType,
+                           const std::string& instrument,
                            const std::string& experiment,
                            const std::list<std::string>& extraMetaData )
   : m_runNumber(runNumber)
   , m_runType(runType)
+  , m_instrument(instrument)
   , m_experiment(experiment)
   , m_extraMetaData()
 {

@@ -57,6 +57,7 @@ public:
   // Default constructor
   O2OMetaData ( unsigned long runNumber,
                 const std::string& runType,
+                const std::string& instrument,
                 const std::string& experiment,
                 const std::list<std::string>& extraMetaData ) ;
 
@@ -72,6 +73,9 @@ public:
   // get experiment name or empty string
   const std::string& experiment() const { return m_experiment ; }
 
+  // get instrument name or empty string
+  const std::string& instrument() const { return m_instrument ; }
+
   // get the iterators for extra meta data
   const_iterator extra_begin() const { return m_extraMetaData.begin() ; }
   const_iterator extra_end() const { return m_extraMetaData.end() ; }
@@ -83,6 +87,7 @@ private:
   // Data members
   unsigned long m_runNumber ;
   const std::string m_runType ;
+  const std::string m_instrument ;
   const std::string m_experiment ;
   std::map<std::string,std::string> m_extraMetaData ;
 

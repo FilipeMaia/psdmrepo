@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-14
+2009-08-04 Andy Salnikov
+- added support for new XTC type H5DataTypes::PulnixTM6740ConfigV1
+- added instrument name as an option for application
+
 Tag: V00-00-13
 2009-06-26 Andy Salnikov
 - added UUID attribute to the HDF5 files

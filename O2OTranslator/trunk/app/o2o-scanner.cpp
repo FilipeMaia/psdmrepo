@@ -22,7 +22,7 @@ public:
     printf("%s level: ",Level::name(level));
     if (level==Level::Source) {
       DetInfo& info = *(DetInfo*)(&xtc->src);
-      printf("%s%d %s%d",
+      printf("%s.%d %s.%d",
              DetInfo::name(info.detector()),info.detId(),
              DetInfo::name(info.device()),info.devId());
     } else {
@@ -80,11 +80,12 @@ int main(int argc, char* argv[]) {
   while ( Dgram* dg = iter.next() ) {
     const Pds::Sequence& seq = dg->seq ;
     const Pds::ClockTime& clock = seq.clock() ;
-    printf("%s transition: type %d, time %u sec %u nsec, hi/lo 0x%x/0x%x, payloadSize %d\n",
+    const Pds::TimeStamp& stamp = seq.stamp() ;
+    printf("%s transition: type %d, time %u sec %u nsec, ticks %u, fiducials %u, control %u, payloadSize %d\n",
            TransitionId::name(seq.service()),
            int(seq.type()),
            clock.seconds(), clock.nanoseconds(),
-           seq.high(),seq.low(),
+           stamp.ticks(),stamp.fiducials(),stamp.control(),
            dg->xtc.sizeofPayload());
     myLevelIter iter(&(dg->xtc),1);
     iter.iterate();

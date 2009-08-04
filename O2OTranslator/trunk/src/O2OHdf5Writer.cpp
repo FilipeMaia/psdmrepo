@@ -31,6 +31,7 @@
 #include "H5DataTypes/CameraTwoDGaussianV1.h"
 #include "H5DataTypes/EvrConfigV1.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
+#include "H5DataTypes/PulnixTM6740ConfigV1.h"
 #include "LusiTime/Time.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/AcqirisDataDescV1Cvt.h"
@@ -167,6 +168,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 
   factory.reset( new DataTypeCvtFactory< ConfigDataTypeCvt<H5DataTypes::Opal1kConfigV1> > ( "Opal1k::ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_Opal1kConfig,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+
+  factory.reset( new DataTypeCvtFactory< ConfigDataTypeCvt<H5DataTypes::PulnixTM6740ConfigV1> > ( "Pulnix::TM6740ConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_TM6740Config,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
 
   factory.reset( new DataTypeCvtFactory< ConfigDataTypeCvt<H5DataTypes::CameraFrameFexConfigV1> > ( "Camera::FrameFexConfigV1" ) ) ;

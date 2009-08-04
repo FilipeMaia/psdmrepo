@@ -147,9 +147,14 @@ MetaDataScanner::resetRunInfo()
 void
 MetaDataScanner::storeRunInfo()
 {
+  const std::string& instr = m_metadata.instrument() ;
+  const std::string& exper = m_metadata.experiment() ;
+  unsigned long run = m_metadata.runNumber() ;
+
   MsgLog( logger, info, "run statistics:"
-      << "\n\tm_runNumber: " << m_metadata.runNumber()
-      << "\n\tm_experiment: " << m_metadata.experiment()
+      << "\n\tm_runNumber: " << run
+      << "\n\tm_instrument: " << instr
+      << "\n\tm_experiment: " << exper
       << "\n\tm_nevents: " << m_nevents
       << "\n\tm_eventSize: " << ( m_nevents ? m_eventSize/m_nevents : 0 )
       << "\n\tm_runBeginTime: " << m_runBeginTime.toString("S%s%f") << "(" << m_runBeginTime << ")"
@@ -160,11 +165,15 @@ MetaDataScanner::storeRunInfo()
     MsgLog( logger, warning, "metadata ODBC connection string is empty, no data will be stored" ) ;
     return ;
   }
-  if ( m_metadata.runNumber() == 0 ) {
+  if ( run == 0 ) {
     MsgLog( logger, warning, "run number is zero, no data will be stored" ) ;
     return ;
   }
-  if ( m_metadata.experiment().empty() ) {
+  if ( instr.empty() ) {
+    MsgLog( logger, warning, "instrument name is empty, no data will be stored" ) ;
+    return ;
+  }
+  if ( exper.empty() ) {
     MsgLog( logger, warning, "experiment name is empty, no data will be stored" ) ;
     return ;
   }
@@ -184,24 +193,25 @@ MetaDataScanner::storeRunInfo()
 
   // create info for this run
   try {
-    conn->createRun ( m_metadata.experiment(), m_metadata.runNumber(), m_metadata.runType(), m_runBeginTime, m_runEndTime ) ;
+    conn->createRun ( exper, run, m_metadata.runType(), m_runBeginTime, m_runEndTime ) ;
   } catch ( SciMD::DatabaseError& e ) {
     MsgLog( logger, error, "failed to create new run, run number may already exist" ) ;
     conn->abortTransaction() ;
+    delete conn ;
     throw ;
   }
 
   try {
 
     // store event count
-    conn->setRunParam ( m_metadata.experiment(), m_metadata.runNumber(),
-                        "events", (int)m_nevents, "translator" ) ;
+    conn->setRunParam ( exper, run, "events", (int)m_nevents, "translator" ) ;
 
   } catch ( std::exception& e ) {
 
     // this should not happen, have to abort here
     MsgLog( logger, error, "failed to store event count: " << e.what() ) ;
     conn->abortTransaction() ;
+    delete conn ;
     throw ;
 
   }
@@ -209,7 +219,7 @@ MetaDataScanner::storeRunInfo()
   try {
 
     // store average event size
-    conn->setRunParam ( m_metadata.experiment(), m_metadata.runNumber(),
+    conn->setRunParam ( exper, run,
                         "eventSize", (int)( m_nevents ? m_eventSize/m_nevents : 0 ), "translator" ) ;
 
   } catch ( std::exception& e ) {
@@ -217,6 +227,7 @@ MetaDataScanner::storeRunInfo()
     // this should not happen, have to abort here
     MsgLog( logger, error, "failed to store event size: " << e.what() ) ;
     conn->abortTransaction() ;
+    delete conn ;
     throw ;
 
   }
@@ -225,7 +236,7 @@ MetaDataScanner::storeRunInfo()
   typedef O2OMetaData::const_iterator MDIter ;
   for ( MDIter it = m_metadata.extra_begin() ; it != m_metadata.extra_end() ; ++ it ) {
     try {
-      conn->setRunParam ( m_metadata.experiment(), m_metadata.runNumber(), it->first, it->second, "translator" ) ;
+      conn->setRunParam ( exper, run, it->first, it->second, "translator" ) ;
     } catch ( std::exception& e ) {
       // this is not fatal, just print error message and continue
       MsgLog( logger, error, "failed to store metadata: " << e.what()
