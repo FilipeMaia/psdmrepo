@@ -1,0 +1,43 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package H5DataTypes
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-05
+2009-08-04 Andy Salnikov
+- update for pdsdata-20090722:
+  - added new class PulnixTM6740ConfigV1
+  - renamed members in AcqirisTrigV1
+
+Tag: V00-00-04
+2009-04-22 Andy Salnikov
+- added option to use n-bit compression to ObjectContainer
+
+Tag: V00-00-03
+2009-04-22 Andy Salnikov
+- small refactoring, store() method becomes a static member of the 
+  corresponding classes
+- finished implementation for AcqirisDataDescV1 class
+
+Tag: V00-00-02
+2009-04-10 Andy Salnikov
+- ObjectContainer: allow passing dynamic object type to all operations
+- implemented CameraFrameV1 data
+
+Tag: V00-00-01
+2009-04-07 Andy Salnikov
+- small scale refactoring following changes in hdf5pp TypeTraits 
+
+Tag: V00-00-00
+2009-04-06 Andy Salnikov
+- first import into repository
+- just few types defined
+
