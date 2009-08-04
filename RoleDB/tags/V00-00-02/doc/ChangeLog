@@ -1,0 +1,24 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package RoleDB
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-02
+2009-08-04 Andy Salnikov
+- make the service work with experiment names in addition to 
+  experiment IDs
+- if experiment name and instrument name is given then experiment 
+  ID is extracted from RegDB
+
+Tag: V00-00-01
+2009-07-23 Andy Salnikov
+- initial commit to SVN
+
