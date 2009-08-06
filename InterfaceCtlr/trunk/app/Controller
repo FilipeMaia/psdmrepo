@@ -35,10 +35,10 @@ __version__ = "$Revision: 1 $"
 #  Imports of standard modules --
 #--------------------------------
 import sys, os, pwd, socket, subprocess
-import logging, time, resource
+import logging, time, resource, signal
 import MySQLdb
 import logging.handlers
-import atexit
+#import atexit
 
 #---------------------------------
 #  Imports of base class module --
@@ -139,7 +139,7 @@ class Controller ( LusiPyApp ) :
 
         LusiPyApp.__init__ (
             self,
-#            installLogger = True,
+            installLogger = False,
             usage = "usage: %prog [<command>] [<parameters>] [<options>]" )
 
         # Add application options, see optparse module for details -------------
@@ -179,65 +179,66 @@ class Controller ( LusiPyApp ) :
 
     def _run ( self ) :
 
-        init_info = self.__init_controller()
+        init_dict = self.__init_controller()
         exit_controller = False
         while not exit_controller:
             try:
-                fs_id = self.__get_fileset_with_status(init_info['xwait_id'])
-                if fs_id:
-                    fs_dbinfo = self.__get_fs_dbinfo(fs_id)
-                    fname = self.__build_output_fnames(fs_dbinfo)
-                    h5name = fname + '.hdf5'
-                    logname = fname + '.log'
-                    cmd = self.__build_translate_cmd(fs_id, h5name, init_info, fs_dbinfo)
-                    self.info ("Starting translator with cmd %s" % cmd)             
-                    self.__change_fileset_status (fs_id, init_info['xlate_id'])
-                    logfile = open(os.path.join(init_info['log_uri'],logname), "w")
+                fs_id = self.__get_fileset_with_status(init_dict['xwait_id'])
+                if fs_id:               #Found a new fileset to translate
+                    fs_dbdict = self.__get_fs_dbinfo(fs_id)
+                    fname_dict = self.__build_output_fnames(fs_dbdict)
+                    cmd = self.__build_translate_cmd(fs_id, fname_dict['h5name'], init_dict, fs_dbdict)
+                    self.__change_fileset_status (fs_id, init_dict['xlate_id'])
+                    logfile = open(os.path.join(init_dict['log_uri'],fname_dict['logname']), "w")
                     prev_stats = resource.getrusage(resource.RUSAGE_CHILDREN)
                     proc = subprocess.Popen(cmd, stdout = logfile, stderr = logfile)
-                    translator_id = self.__insert_translator_process(init_info['controller_id'], fs_id)
-                    done = False
-                    while not done:
+                    translator_id = self.__insert_translator_process(init_dict['controller_id'], fs_id)
+                    self.info ("Started translator with cmd %s" % cmd)             
+                    xlate_done = False
+                    while not xlate_done:
                         kill_trans = self.__test_exit_translator(translator_id)
-                        print "kill_trans = %s" % kill_trans
                         proc.poll()
                         if proc.returncode != None or kill_trans != 0:
-                            done = True
+                            xlate_done = True
                             if kill_trans:
-                                proc.terminate
-                                self.info ("Request to kill translator process id %s" % translator_id)
+                                os.kill(proc.pid,signal.SIGTERM)
+                                proc.returncode = -1
+                                self.info ("Request to kill translator_process id %s" % translator_id)
                             logfile.close()
                             self.__update_translator_process (translator_id, proc.returncode, prev_stats, 
-                                      os.path.getsize(os.path.join(init_info['translate_uri'],h5name)))
+                                      os.path.getsize(os.path.join(init_dict['translate_uri'],
+                                                      fname_dict['h5name'])))
                             if (proc.returncode != 0):
-                                self.__change_fileset_status (fs_id, init_info['xfail_id'])
+                                self.__change_fileset_status (fs_id, init_dict['xfail_id'])
                             else:                                
-                                self.__change_fileset_status (fs_id, init_info['xdone_id'])
-                                cmd = self.__build_irods_cmd (fs_id, init_info['translate_uri'], h5name)
+                                self.__change_fileset_status (fs_id, init_dict['xdone_id'])
+                                cmd = self.__build_irods_cmd (fs_id, init_dict['translate_uri'], 
+                                                              fname_dict['h5name'], fs_dbdict)
                                 self.info ("irods insert cmd %s" % cmd)
                                 returncode = subprocess.call(cmd)
+                                self.info ("iRODS complete with status %d" % returncode)
                                 self.__update_irods_status (translator_id, returncode)
                                 if returncode != 0:
-                                    self.__change_fileset_status (fs_id, init_info['irbad_id'])
+                                    self.__change_fileset_status (fs_id, init_dict['irbad_id'])
                                 else:
-                                    self.__change_fileset_status (fs_id, init_info['irgud_id'])
-                                    os.remove(os.path.join(init_info['translate_uri'], h5name))
-                                    self.__change_fileset_status (fs_id, init_info['xcomp_id'])
+                                    self.__change_fileset_status (fs_id, init_dict['irgud_id'])
+                                    os.remove(os.path.join(init_dict['translate_uri'], fname_dict['h5name']))
+                                    self.__change_fileset_status (fs_id, init_dict['xcomp_id'])
                         else:
                             time.sleep(1.0)
-                    #end while not done
-                else:
+                    #end while not xlate_done
+                else:     #Nothing to do. Sleep, check for forced controller exit and look for work
                     time.sleep(1.0)
-                    exit_controller = self.__test_exit_controller(init_info['controller_id'])
+                    exit_controller = self.__test_exit_controller(init_dict['controller_id'])
 
             except KeyboardInterrupt:
-                print "Got keyboard interrupt. Exiting."
+                self.info ("Got keyboard interrupt. Exiting.")
                 exit_controller = True
 
         # End while not exit_controller
       
-        self.info ("Request to kill controller process id %s" % init_info['controller_id'])
-        self.__exit_controller(init_info['controller_id'])
+        self.info ("Request to kill controller process id %s" % init_dict['controller_id'])
+        self.__exit_controller(init_dict['controller_id'])
         return 
 
 
@@ -305,10 +306,9 @@ class Controller ( LusiPyApp ) :
         self._log.addHandler(filehandler)
         sys.stdout = logfile
         sys.stderr = logfile
-        print "Only to logfile?"
         # 
         # Set up error logging handler
-        TO_LIST=['bsassy@garlic.com']
+        TO_LIST=['salnikov@slac.stanford.edu']
         FROM='rcs@slac.stanford.edu'
         SUBJECT='Interface Controller Database error'
         SMTP_SERVER='smtpserv.slac.stanford.edu'
@@ -338,6 +338,7 @@ class Controller ( LusiPyApp ) :
 
     def __fstat_id (self, in_name):
 
+        self.__simple_query("COMMIT")
         rows = self.__select_query_1(
             """(SELECT id FROM fileset_status_def WHERE name='%s')""" % (in_name))
         if rows:
@@ -354,6 +355,7 @@ class Controller ( LusiPyApp ) :
         """return a fileset id with the specified status or 0 if
         no fileset exists with that status"""
         
+        self.__simple_query("COMMIT")
         if not self.__simple_query("""SET @new_fileset = NULL;
             CALL get_fileset_with_status ('%s',@new_fileset);""" % (stat_id)): return 0
         fsrow = self.__select_query_1('SELECT @new_fileset')
@@ -370,6 +372,7 @@ class Controller ( LusiPyApp ) :
 
         """Return a database dictionary of information about this fileset"""
 
+        self.__simple_query("COMMIT")
         rows = self.__select_query(
             "SELECT experiment, instrument, run_type, run_number FROM fileset WHERE id = %s" % 
             fileset_id,return_dict=True)
@@ -377,7 +380,7 @@ class Controller ( LusiPyApp ) :
         if not rows:
             raise DatabaseOperatonFailed, "Failed to select info from fileset get_fs_dbinfo"
 
-        return rows
+        return (rows)
 
     # =====================
     # Build output filename
@@ -385,7 +388,7 @@ class Controller ( LusiPyApp ) :
 
     def __build_output_fnames ( self, fsdbinfo ) :
 
-        """Build the output filename sans extension"""
+        """Build the output filenames and return as a dict"""
         
         # Now construct the output file name
         file_list = []
@@ -402,8 +405,9 @@ class Controller ( LusiPyApp ) :
         file_list.append(curtime[0:10])
         file_list.append('_')
         file_list.append(curtime[11:19])
-
-        return (''.join(file_list))
+        fname = "".join(file_list)
+        return {'h5name':fname + ".hdf5",
+                'logname':fname + ".log"}
 
     # ========================================================
     # Change the status of a fileset and all files it contains
@@ -414,6 +418,7 @@ class Controller ( LusiPyApp ) :
         """ Use the stored procedure change_fileset_status to change
         the fileset to the requested status"""
 
+        self.__simple_query("COMMIT")
         if not self.__simple_query(
             """SET @fileset = NULL;
             CALL change_fileset_status ('%s','%s', @fileset);""" % (
@@ -439,6 +444,7 @@ class Controller ( LusiPyApp ) :
         cmd_list = []
         cmd_list.append("o2o-translate")
 
+        self.__simple_query("COMMIT")
         rows = self.__select_query(
             "SELECT name FROM files WHERE fk_fileset_id = %s" % fileset_id, 
             return_dict = True)
@@ -545,7 +551,7 @@ class Controller ( LusiPyApp ) :
     # Build a list that has the command to put the file into iRODS
     # ============================================================
 
-    def __build_irods_cmd ( self, fileset_id, translate_uri, ifname ) :
+    def __build_irods_cmd ( self, fileset_id, translate_uri, ifname, fs_dbdict ) :
 
         """Build the arg list to pass to the translator from the files in fileset
         and the translate_uri destination for the transalator output"""
@@ -561,23 +567,15 @@ class Controller ( LusiPyApp ) :
 
 
         # Construct the output path experiment, instrument, run number and type from
-        # the fileset plus the current date/time
-        rows = self.__select_query(
-            "SELECT experiment, instrument, run_number FROM fileset WHERE id = %s" % 
-            fileset_id,
-            return_dict=True)
-
-        if not rows:
-            raise DatabaseOperatonFailed, "Failed to select info from fileset build_irods_cmd"
-        
+        # the fileset plus the current date/time        
         # Now construct the output iRODS file path
         opath = []
         opath.append("/lusi-zone/home/rcs/test/")
-        opath.append(rows[0]['instrument'])
+        opath.append(fs_dbdict[0]['instrument'])
         opath.append('/')
-        opath.append(rows[0]['experiment'])
+        opath.append(fs_dbdict[0]['experiment'])
         opath.append('/')
-        opath.append("%06d" % rows[0]['run_number'])
+        opath.append("%06d" % fs_dbdict[0]['run_number'])
         opath.append("/")
         opath.append(ifname)
         cmd_list.append(''.join(opath))
@@ -593,8 +591,9 @@ class Controller ( LusiPyApp ) :
 
         """Check the kill field for this controller"""
 
+        self.__simple_query("COMMIT")
         rows = self.__select_query_1(
-            """SELECT kill_ic FROM interface_controller WHERE id=%s""" % controller_id)
+            "SELECT kill_ic FROM interface_controller WHERE id=%s" % controller_id)
         if rows:
             return rows[0]
         else:
@@ -610,8 +609,9 @@ class Controller ( LusiPyApp ) :
 
         """Check the kill field for this translator"""
 
+        self.__simple_query("COMMIT")
         rows = self.__select_query_1(
-            """SELECT kill_tp FROM translator_process WHERE id=%s""" % translator_id)
+            "SELECT kill_tp FROM translator_process WHERE id=%s" % translator_id)
         if rows:
             return rows[0]
         else:
@@ -627,7 +627,6 @@ class Controller ( LusiPyApp ) :
         """Update the stop time for the controller and exit"""
 
         endtime = _time2str(Time.now().to64())[0:19]
-        print "Controller end time = %s" % endtime
         if not self.__simple_query(
            "START TRANSACTION",
            """UPDATE interface_controller SET stopped = '%s' WHERE id = %s """ % (
@@ -698,6 +697,7 @@ class Controller ( LusiPyApp ) :
                 db=self.__database)
         except MySQLdb.Error, ex:
             self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+            raise DatabaseOperatonFailed, "Failed to connect to Interface Database"
             sys.exit()
 
     # ========================================================
@@ -723,6 +723,7 @@ class Controller ( LusiPyApp ) :
                 result = True
             except MySQLdb.Error, ex:
                 self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+                raise DatabaseOperatonFailed, "Database error in simple_query"
 
         cursor.close()
         return result
@@ -750,6 +751,7 @@ class Controller ( LusiPyApp ) :
             rows = cursor.fetchall()
         except MySQLdb.Error, ex:
             self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+            raise DatabaseOperatonFailed, "Database error in select_query"
 
         cursor.close()
         return rows
@@ -776,6 +778,7 @@ class Controller ( LusiPyApp ) :
             result = [r[0] for r in rows]
         except MySQLdb.Error, ex:
             self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+            raise DatabaseOperatonFailed, "Database error in select_query_1"
 
         cursor.close()
         return result
