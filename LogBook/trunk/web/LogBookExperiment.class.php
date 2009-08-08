@@ -661,7 +661,8 @@ HERE;
         $sql =
             'SELECT DISTINCT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM header h, entry e, tag t WHERE h.exper_id='.$this->attr['id'].
             ' AND h.id = e.hdr_id AND e.parent_entry_id is NULL'.$extra_condition.
-            ' ORDER BY e.insert_time DESC';
+            ' ORDER BY e.insert_time ASC';
+            //' ORDER BY e.insert_time DESC';
         /*
         throw new LogBookException(
             __METHOD__, $sql );

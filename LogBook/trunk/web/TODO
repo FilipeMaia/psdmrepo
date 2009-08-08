@@ -1,3 +1,21 @@
+___________________________________________________
+HIGH PRIORITY: implement suggestions made by Amadeo
+
+    9. When starting a new shift allow selecting a leader from the POSIX group. Also allow
+    adding crew members from the same group.
+
+___________________________________________________
+HIGH PRIORITY: fix pagination in the message viewer
+
+___________________________________________________
+MEDIUM PRIORITY: Consider extending database schema
+
+    1. storing both user account name and his name entered into the box when
+    posting messages. If no user name is provided when entering a new message then
+    use LDAP entry for the account to get its name.
+
+    2. move tags from message header to message entries
+
 ____________________________________________________________________________
 LOW PRIORITY: Refactor the Messages Table and Dialog into a single prototype
 
@@ -14,9 +32,11 @@ LOW PRIORITY: Refactor the Messages Table and Dialog into a single prototype
     current_selection
     "workarea"
 
-_______________________________________________________________________
-VERY IMPORTANT: Screen-grabber button!!! This is very essential feature
-to begin using the LogBook.
+__________________________________________________
+LOW PRIORITY: Imnprovements for the screen-grabber
+
+    - add options for posting messages for the current experiment, shift or run.
+    Right now it's for the selected experiment only. Use experiment status.
 
 ______________________________________________________________________________
 LOW PRIORITY: interesting vizualization idea: when showing a list of messages
@@ -39,23 +59,6 @@ and run number) can be used as well. For example:
 
     Another possibility would be to use '+ today', '+ yesterday', '+last week', 'last month'
     to group messages similar to what's done in Outlook Express
-
-___________________________________________________
-HIGH PRIORITY: implement suggestions made by Amadeo
-
-    3. implement the same options for viewing messages as in Search message view
-    4. implement images/windows/screen grabber to output the grabbed contents
-    straight into the database. Consider the one from BABAR.
-
-    5. Be more verbose in subtitles ("Experiment Summary" instead of "Summary",
-    "Runs of the shift" instead of "Runs", etc.)
-
-    9. When starting a new shift allow selecting a leader from the POSIX group. Also allow
-    adding crew members from the same group.
-
-    11. Fix instrument names to follow the tree-letter achronym ('AMOS' to 'AMO', etc.).
-    Also fix 'SXS' to 'SXR'?
-
 ____________________________________________________
 LOW PRIORITY: more ideas on the Look And Feel design
 
@@ -103,15 +106,6 @@ give an operator some sense of timing in the automatically updated mode as well.
 
 __________________________________________________
 LOW PRIORITY: Look at the browser history support.
-
-___________________________________________________
-MEDIUM PRIORITY: Consider extending database schema
-
-    1. storing both user account name and his name entered into the box when
-    posting messages. If no user name is provided when entering a new message then
-    use LDAP entry for the account to get its name.
-
-    2. move tags from message header to message entries
 
 _______________________________________________________________
 LOW PRIORITY: Implement PDF export using either FPDF or PDFlib.

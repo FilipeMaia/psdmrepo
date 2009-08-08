@@ -11,7 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
- 
+
+Tag: V00-00-12
+2009-08-07 Igor Gaponenko
+- implemented the screen "graber" client (an X11 Python/Tk application) 
+
 Tag: V00-00-11
 2009-08-02 Igor Gaponenko
 - refactored message display in Web application to fix bugs and get rid of memory leaks

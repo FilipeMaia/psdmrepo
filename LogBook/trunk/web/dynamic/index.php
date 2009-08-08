@@ -1835,6 +1835,8 @@ function display_messages() {
     var limit_per_page_str = document.search_display_form.limit_per_page.options[document.search_display_form.limit_per_page.selectedIndex].value;
     limit_per_page = limit_per_page_str == 'all' ? last_search_result.length : Number( limit_per_page_str );
 
+    //first_message_idx = 0;
+    //last_message_idx  = Math.min( last_search_result.length, limit_per_page );
     first_message_idx = 0;
     last_message_idx  = Math.min( last_search_result.length, limit_per_page );
 
@@ -2021,7 +2023,7 @@ function display_messages_table(
         } else {
             last_search_result = result.ResultSet.Result;
             var html1 = '';
-            for( var i=0; i < last_search_result.length; i++ )
+            for( var i=last_search_result.length-1; i >= 0 ; i-- )
                 html1 += event2html(i);
             document.getElementById('messages_area').innerHTML = html1;
             display_messages();
@@ -2041,25 +2043,13 @@ function display_messages_table(
         } else {
             var this_search_result = result.ResultSet.Result;
             if( this_search_result.length > 0 ) {
-
-                // First put new results in front of the cached array.
-                //
-                //   NOTE: unfortunatelly, we can't use JavaScript's String.unshift()
-                //         as it's not properly implemented in IE. See details in
-                //         the following article:
-                //         http://www.w3schools.com/jsref/jsref_unshift.asp
-                //
-                var old_search_result = last_search_result;
-                last_search_result = this_search_result;
-                for( var i=0; i < old_search_result.length;  i++ )
-                    last_search_result.push( old_search_result[i] );
-
                 var html1 = '';
                 for( var i=0; i < this_search_result.length; i++ ) {
-                    html1 += event2html(i);
+                    last_search_result.push(this_search_result[i])
+                    html1 += event2html( last_search_result.length-1 );
                 }
                 var html_old = document.getElementById('messages_area').innerHTML;
-                document.getElementById('messages_area').innerHTML = html1 + html_old;
+                document.getElementById('messages_area').innerHTML = html_old + html1;
                 display_messages();
             }
             if( document.search_display_form.autorefresh.checked )
@@ -2069,7 +2059,7 @@ function display_messages_table(
     this.refresh = function() {
         if( last_search_result.length > 0 )
             load_then_call(
-                this.url+'&since='+encodeURIComponent(last_search_result[0].event_time),
+                this.url+'&since='+encodeURIComponent(last_search_result[last_search_result.length-1].event_time),
                 callback_on_refresh,
                 callback_on_failure );
         else

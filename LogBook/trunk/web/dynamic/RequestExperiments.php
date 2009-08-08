@@ -30,6 +30,8 @@ function experiment2json( $experiment ) {
         array (
             "instrument"  => $experiment->instrument()->name(),
             "experiment"  => $experiment_url,
+            "name"        => $experiment->name(),
+            "id"          => $experiment->id(),
             "status"      => $experiment_status,
             "begin_time"  => $experiment->begin_time()->toStringShort(),
             "end_time"    => $experiment->end_time()->toStringShort(),
