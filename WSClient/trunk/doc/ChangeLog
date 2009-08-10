@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2009-08-10 Andy Salnikov
+- make base URI optional and provide some default base URI value
+- add support for HEAD method
+
 Tag: V00-00-01
 2009-08-04 Andy Salnikov
 - first import into repository, basic stuff is here

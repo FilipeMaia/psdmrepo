@@ -30,6 +30,7 @@ __version__ = "$Revision$"
 #  Imports of standard modules --
 #--------------------------------
 import sys
+import os
 import codecs
 import socket
 import urllib
@@ -60,10 +61,14 @@ class WSApp ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, baseURI, app, kerberos=False, pwdfile=None, user=None, password=None ) :
+    def __init__ ( self, app, base_uri=None, kerberos=False, pwdfile=None, user=None, password=None ) :
 
         # build opener
         self._opener = u2.build_opener()
+
+        # get the base URI
+        if not base_uri : base_uri = os.environ.get('WSCLIENT_BASE_URI',None)
+        if not base_uri : base_uri = 'https://www-lclsdev.slac.stanford.edu:81'
 
         # authentication location
         auloc = '/ws'
@@ -85,7 +90,7 @@ class WSApp ( object ) :
 
         # construct full application URI
         if not app.startswith('/') : app = '/'+app
-        self.uri = baseURI + auloc + app
+        self.uri = base_uri + auloc + app
             
         # add basic authentication handler if user name or password is given
         if user or password :

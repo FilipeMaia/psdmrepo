@@ -67,11 +67,13 @@ class WSClientTest ( LusiPyApp ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] method baseURL app resource [key=value ...]" )
+        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] method app resource [key=value ...]" )
 
         # add application options, see optparse module for details
+        self._parser.add_option ( '-b', "--base-uri", 
+                                  default=None, help="specify service base URI" )
         self._parser.add_option ( '-u', "--user", 
-								  default=None, help="specify user name" )
+                                  default=None, help="specify user name" )
         self._parser.add_option ( '-p', "--password", 
                                   default=None, help="password to access web service" )
         self._parser.add_option ( '-f', "--pwd-file", 
@@ -82,7 +84,7 @@ class WSClientTest ( LusiPyApp ) :
 								  default=False, help="dump request" )
         self._parser.add_option ( '-r', "--reply", action="store_true",
 								  default=False, help="dump reply headers" )
-        self._parser.add_option ( '-b', "--body", action="store_true",
+        self._parser.add_option ( '-d', "--body", action="store_true",
 								  default=False, help="dump reply body" )
         self._parser.add_option ( '-t', "--time", action="store_true",
 								  default=False, help="print time per request" )
@@ -95,25 +97,26 @@ class WSClientTest ( LusiPyApp ) :
     def _run ( self ) :
 
         # check arguments
-        if len(self._args) < 4 :
+        if len(self._args) < 3 :
             self._parser.error("at least three arguments required")
-            return 2    		
+            return 2
         
         # build parameters
         parm = None
-        if len(self._args) > 4 :
+        if len(self._args) > 3 :
             parm = {}
-            for kv in self._args[4:] :
+            for kv in self._args[3:] :
                 k,v = tuple( kv.split('=',2) )
                 parm[k] = v
         
         # make resource object
-        app = WSApp( self._args[1], self._args[2], 
+        app = WSApp( self._args[1],
+                     base_uri = self._options.base_uri,
                      kerberos=self._options.kerberos,
                      user=self._options.user,
                      password=self._options.password,
                      pwdfile=self._options.pwd_file )
-        res = WSResource( app, self._args[3] )
+        res = WSResource( app, self._args[2] )
 
         t0 = time.time()
         try :

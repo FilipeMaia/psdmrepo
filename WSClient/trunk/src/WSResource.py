@@ -40,7 +40,6 @@ import urllib2 as u2
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from WSClient.RequestWithMethod import RequestWithMethod
 import simplejson as json
 
 #----------------------------------
@@ -77,6 +76,10 @@ class WSResource ( object ) :
     def get( self, data=None ) :
         """ Talk to WS using GET. """
         return self.request ( 'GET', data ) ;
+
+    def head( self, data=None ) :
+        """ Talk to WS using HEAD. """
+        return self.request ( 'HEAD', data ) ;
 
     def post( self, data=None ) :
         """ Talk to WS using POST. """
