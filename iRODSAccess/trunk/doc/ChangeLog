@@ -15,3 +15,7 @@ Tag: V00-00-01
 2009-08-10 Andrei Salnikov
 - Initial import into repository
 
+Tag: V00-00-02
+2009-08-11 Andrei Salnikov
+- for files and runs controllers added the URI to the returned objects
+

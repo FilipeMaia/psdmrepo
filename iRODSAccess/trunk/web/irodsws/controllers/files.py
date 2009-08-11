@@ -84,4 +84,29 @@ class FilesController(BaseController):
         if res is None :
             abort(404)
         else :
+            # my URI
+            server_uri = h.server_uri()
+            
+            # add URI for each file or collection
+            for r in res :
+                if r['type'] == 'collection' :
+                    name = r['name'].lstrip('/')
+                    url = h.url_for( action='show', path=name, qualified=True )
+                    r['url'] = url
+                elif r['type'] == 'object' :
+                    name = r['collName']+'/'+r['name']
+                    name = name.lstrip('/')
+                    url = h.url_for( action='show', path=name, qualified=True )
+                    r['url'] = url
+                    
             return res
+
+
+    def environ(self):
+        result = '<html><body><h1>Environ</h1><table>'
+        keys = request.environ.keys()
+        keys.sort()
+        for key in keys :
+            result += '<tr><td>%s</td><td>%r</td></tr>'%(key, request.environ[key])
+        result += '</table></body></html>'
+        return result

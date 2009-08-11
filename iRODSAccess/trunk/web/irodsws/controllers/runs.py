@@ -69,8 +69,18 @@ class RunsController(BaseController):
         # instantiate the model 
         model = IrodsModel()
 
-        # extract the sub-directory names and convert them to numbers
-        return [ r for r in self._allRuns(model, path) ]
+        # make the list of runs
+        runs = []
+        for r in self._allRuns(model, path) :
+            run_url = h.url_for( action='show', 
+                                instrument=instrument, 
+                                experiment=experiment, 
+                                type=type,
+                                runs=str(r),
+                                qualified=True )
+            runs.append ( dict(run=r, url=run_url) )
+        
+        return runs
         
     @jsonify
     def show(self, instrument, experiment, type, runs ):
@@ -105,7 +115,17 @@ class RunsController(BaseController):
             
             # filter out collections, only report files
             if res is not None :
-                resdict[run] = [ r for r in res if r['type'] == 'object' ]
+                resdict[run] = []
+                for r in res :
+                    if r['type'] == 'object' :
+                        name = r['collName']+'/'+r['name']
+                        name = name.lstrip('/')
+                        url = h.url_for( controller='/files', 
+                                         action='show', 
+                                         path=name,
+                                         qualified=True )
+                        r['url'] = url
+                        resdict[run].append(r)
 
         return resdict
 

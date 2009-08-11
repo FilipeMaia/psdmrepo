@@ -8,6 +8,7 @@ available to Controllers. This module is available to templates as 'h'.
 from pylons import request
 from pylons import config
 from pylons.controllers.util import abort
+from routes import url_for
 
 from WSClient.WSApp import WSApp
 from WSClient.WSResource import WSResource
@@ -38,7 +39,7 @@ def checkAccess (path) :
     if len(ph) >= 3 and ph[1] == 'home' and ph[2] == user :
         return True
 
-    app = WSApp( base_uri, ws_app )
+    app = WSApp( ws_app, base_uri=base_uri )
     if len(ph) >= 4 and ph[1] == 'exp' :
         
         # check access right for specific experiment
@@ -67,3 +68,24 @@ def checkAccess (path) :
     # nothing works, just fail
     abort( 401 )
     
+    
+def server_uri() :
+    """ return the URI of the server, code adapted from PEP333 """
+    
+    environ = request.environ
+    
+    url = environ['wsgi.url_scheme']+'://'
+
+    if environ.get('HTTP_HOST'):
+        url += environ['HTTP_HOST']
+    else:
+        url += environ['SERVER_NAME']
+    
+        if environ['wsgi.url_scheme'] == 'https':
+            if environ['SERVER_PORT'] != '443':
+               url += ':' + environ['SERVER_PORT']
+        else:
+            if environ['SERVER_PORT'] != '80':
+               url += ':' + environ['SERVER_PORT']
+    
+    return url

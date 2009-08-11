@@ -39,6 +39,8 @@ def make_map():
     
 
     ###### files controller
+
+    map.connect('/environ', controller='files', action='environ', conditions=cond_get )
     
     # GET /files/...
     # list the files
