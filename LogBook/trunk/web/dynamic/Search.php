@@ -226,7 +226,8 @@ function entry2json( $entry, $format ) {
                 "author" => $entry->author(),
                 "id" => $entry->id(),
                 "subject" => substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' ),
-                "html" => $con->html(),
+                //"html" => $con->html(),
+                "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$entry->content()}</pre>",
                 "attachments" => $attachment_ids,
                 "tags" => $tag_ids
             )

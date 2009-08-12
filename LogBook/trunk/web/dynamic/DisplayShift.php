@@ -47,6 +47,10 @@ try {
         $close_shift_url = "<a href=\"javascript:close_shift({$shift->id()})\" class=\"lb_link\">Close current shift</a>";
     }
 
+    $crew = '';
+    foreach( $shift->crew() as $m )
+        $crew .= ' '.$m;
+
     header( 'Content-type: text/html' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
@@ -60,7 +64,7 @@ try {
         ->label    ( 540,  20, $close_shift_url, false )
         ->label    ( 125,  20, 'End Time:'   )->value( 210,  20, $end_time_str )
         ->label    ( 125,  60, 'Leader:'     )->value( 210,  60, $shift->leader())
-        ->label    ( 125,   80, 'Shift Crew:')->value( 210,  80, 'no records' );
+        ->label    ( 125,   80, 'Shift Crew:')->value( 210,  80, $crew );
 
     echo $con->html();
 

@@ -41,6 +41,7 @@ and open the template in the editor.
         margin:0;
         padding:0;
         /*background-color:#e0e0e0;*/
+        /*background:url('images/paperbg.gif');*/
     }
     div.yui-b p {
         margin: 0 0 .5em 0;
@@ -72,9 +73,14 @@ and open the template in the editor.
         color:maroon;
         /*font-style:italic;*/
     }
+    input.lb_sparse {
+        padding:2px;
+        color:blue;
+    }
     #application_header {
         background-color:#d0d0d0;
-        padding:12px;
+        padding:8px;
+        padding-bottom:12px;
         margin:0px;
     }
     #application_title {
@@ -115,27 +121,19 @@ and open the template in the editor.
         padding:10px;
         margin-left:10px;
     }
-    #workarea_table_container          table,
-    #entry_tags_table_container        table,
-    #entry_attachments_table_container table {
+    #workarea_table_container table {
     }
     #workarea_table_paginator,
     #params_table_page,
     #runs_table_paginator,
     #shifts_table_paginator,
     #tags_table_paginator,
-    #files_table_paginator,
-    #entry_tags_table_paginator,
-    #entry_attachments_table_paginator {
+    #files_table_paginator {
         margin-left:auto;
         margin-right:auto;
     }
     #workarea_table_container,
-    #workarea_table_container .yui-dt-loading,
-    #entry_tags_table_container,
-    #entry_tags_table_container .yui-dt-loading,
-    #entry_attachments_table_container,
-    #entry_attachments_table_container .yui-dt-loading {
+    #workarea_table_container .yui-dt-loading {
         text-align:center;
         background-color:transparent;
     }
@@ -234,11 +232,20 @@ HERE;
     print $e->toHtml();
 }
 
-// Authorization context
-//
 echo <<<HERE
 
-var logged_user="{$_SERVER['WEBAUTH_USER']}";
+/* Authentication and authorization context
+ */
+var auth_type="{$_SERVER['AUTH_TYPE']}";
+var auth_remote_user="{$_SERVER['REMOTE_USER']}";
+
+var auth_webauth_user="{$_SERVER['WEBAUTH_USER']}";
+var auth_webauth_token_creation="{$_SERVER['WEBAUTH_TOKEN_CREATION']}";
+var auth_webauth_token_expiration="{$_SERVER['WEBAUTH_TOKEN_EXPIRATION']}";
+
+function refresh_page() {
+    window.location = "{$_SERVER['REQUEST_URI']}";
+}
 
 HERE;
 
@@ -282,6 +289,7 @@ if( isset( $_GET['action'] )) {
     }
 } else {
     echo "  load( 'help/Welcome.html', 'workarea' );";
+    echo "  auth_timer_restart();";
 }
 echo <<<HERE
 
@@ -292,13 +300,45 @@ echo <<<HERE
 HERE;
 ?>
 
-
-
-
     <!--
     Page-specific script
     -->
     <script type="text/javascript">
+
+/*
+ * Session expiration timer for WebAuth authentication.
+ */
+var auth_timer = null;
+function auth_timer_restart() {
+    if( auth_type == 'WebAuth' )
+        auth_timer = window.setTimeout( 'auth_timer_event()', 1000 );
+}
+var auth_last_secs = null;
+function auth_timer_event() {
+
+    var auth_expiration_info = document.getElementById( "auth_expiration_info" );
+    var now = mktime();
+    var seconds = auth_webauth_token_expiration - now;
+    if( seconds <= 0 ) {
+        auth_expiration_info.innerHTML=
+            '<b><em style="color:red;">expired</em></b>';
+        ask_action_confirmation(
+            'popupdialogs',
+            '<span style="color:red; font-size:16px;">Session Expiration Warning</span>',
+            '<p style="text-align:left;">Your WebAuth session has expired. '+
+            'Press <b>Ok</b> or use <b>Refresh</b> button of the browser to renew your credentials.</p>',
+            refresh_page );
+        return;
+    }
+    var hours_left   = Math.floor(seconds / 3600);
+    var minutes_left = Math.floor((seconds % 3600) / 60);
+    var seconds_left = Math.floor((seconds % 3600) % 60);
+
+    auth_expiration_info.innerHTML=
+        '<b>'+hours_left+'</b> hours, <b>'+minutes_left+'</b> minutes, <b>'+seconds_left+'</b> seconds';
+
+    auth_timer_restart();
+}
 
 /*
  * The current experiment selection (if any) is represented by
@@ -715,7 +755,7 @@ function create_messages_dialog( scope ) {
         '</div>'+
         //'<center>'+
         '<form enctype="multipart/form-data" name="new_message_form" action="NewFFEntry.php" method="post">'+
-        '  <input type="hidden" name="author_account" value="'+logged_user+'" style="padding:2px; width:200px;" />'+
+        '  <input type="hidden" name="author_account" value="'+auth_remote_user+'" style="padding:2px; width:200px;" />'+
         '  <input type="hidden" name="id" value="'+current_selection.experiment.id+'" />'+
         '  <input type="hidden" name="scope" value="'+scope+'" />';
     if( scope == "experiment") {
@@ -803,7 +843,7 @@ function create_messages_dialog( scope ) {
     this.oPushButtonRemoveTag = null;
 
     function synchronize_tags_data() {
-        if( this.files_table == null ) return;
+        if( this.tags_table == null ) return;
         var rs = this.tags_table.dataTable.getRecordSet();
         var rs_length = rs.getLength();
         this.tags = [];
@@ -882,12 +922,10 @@ function create_messages_dialog( scope ) {
                 ' title="This is multi-line text area in which return will add a new line of text.'+
                 ' Use Submit button to post the message.">'+
                 document.getElementById('new_message_text').value+'</textarea>'+
-                //'<div style="margin-left:6px; margin-top:12px;">'+
                 '<div style="margin-top:12px;">'+
                 '  <em class="lb_label">Author:</em>'+
-                '  <input id="author_id" type="text" name="author_name" value="'+logged_user+'" style="padding:2px; width:200px;" />'+
+                '  <input type="text" name="author_name" value="'+auth_remote_user+'" style="padding:2px; width:200px;" />'+
                 '</div>'+
-                //'<div style="margin-left:6px; margin-right:6px;" align="left">'+
                 '<div style="margin-right:6px;" align="left">'+
                 '  <table style="margin-top:20px;"><tbody>'+
                 '    <tr>'+
@@ -1000,40 +1038,326 @@ function create_messages_dialog( scope ) {
     return this;
 }
 
-var ffentrypanel=null;
 
-function select_entry( id ) {
-    if( ffentrypanel == null) {
-        document.getElementById('ffentryheader').innerHTML=
-            '<p>Operator Message</p>';
-        document.getElementById('ffentryfooter').innerHTML=
-            '<p>if the window is closed it will be automatically open with the new message</p>';
-        ffentrypanel = new YAHOO.widget.Panel(
-            "ffentrydialog", {
-                //height:"500px",
-                height:"auto",
-                width:"auto",
-                fixedcenter:false,
-                visible:true,
-                constrainviewport:false,
-                close:true,
-                draggable:true
-            }
-        );
-        ffentrypanel.render();
+/* This is a separate dialog for posting replies to messages
+ */
+var last_rid = null;    // The last element used to display the message reply dialog
+                        // This element can be reused.
+
+function create_message_reply_dialog( rid, message_id, message_idx ) {
+
+    /* Make sure the message body is open
+     *
+     * TODO: This won't work for children. Refactor this to recognize
+     * childrens' identity.
+     */
+    message_expander( message_idx );
+
+    // Check if we can reuse the last element. We can only do ths if
+    // it was associated with the same message. Otherwise we'll recreate
+    // the whole dialog from scratch at the specified location.
+    //
+    if( last_rid != null ) {
+        if( last_rid != rid ) {
+            last_rid.style.display = 'none';
+            last_rid.innerHTML='';
+        } else {
+            if( rid.style.display == 'none') rid.style.display = 'block';
+            else                             rid.style.display = 'none';
+            return;
+        }
     }
-    ffentrypanel.show();
-    load( "DisplayFFEntry.php?id="+id, 'ffentrybody');
+    last_rid = rid;
+    rid.style.display = 'block';
 
-    create_tags_table (
-        'RequestTags.php?id='+id,
-        false
+    var scope='message';
+
+    rid.innerHTML =
+        '<form enctype="multipart/form-data" name="message_reply_form" action="NewFFEntry.php" method="post">'+
+        '  <input type="hidden" name="author_account" value="'+auth_remote_user+'" style="padding:2px; width:200px;" />'+
+        '  <input type="hidden" name="id" value="'+current_selection.experiment.id+'" />'+
+        '  <input type="hidden" name="scope" value="'+scope+'" />'+
+        '  <input type="hidden" name="message_id" value="'+message_id+'" />'+
+        '  <input type="hidden" name="actionSuccess" value="select_experiment" />'+
+        '  <input type="hidden" name="MAX_FILE_SIZE" value="1000000">'+
+        '  <div style="padding:20px;">'+
+        '    <center><b>ATTENTION: </b>The current implementation of this dialog will not'+
+        '    post replies as children of a message the dialog is invoked with. The replies'+
+        '    will show up as regular messages in the plain list. This problem will be fixed'+
+        '    in the next release of the application.'+
+        '    </center>'+
+        '  </div>'+
+        '  <div>'+
+        '    <em class="lb_label">Reply:</em>'+
+        '  </div>'+
+        '  <table><tbody>'+
+        '    <tr>'+
+        '      <td valign="top">'+
+        '        <div id="message_reply_body" style="margin-right:10px; padding:4px;">'+
+        '          <input id="message_reply_text" type="text" name="message_text" size="71" value="" />'+
+        '        </div>'+
+        '      </td>'+
+        '      <td valign="top">'+
+        '        <div id="message_reply_dialog_container">'+
+        '          <button id="message_reply_extend_button">Options &gt;</button>'+
+        '          <button id="message_reply_submit_button">Submit</button>'+
+        '          <button id="message_reply_cancel_button">Cancel</button>'+
+        '        </div>'+
+        '      </td>'+
+        '    </tr>'+
+        '  </tbody></table>'+
+        '</form>';
+
+    this.extendedShown = false;
+
+    this.message_reply_extend_button = new YAHOO.widget.Button( "message_reply_extend_button" );
+    this.message_reply_submit_button = new YAHOO.widget.Button( "message_reply_submit_button" );
+    this.message_reply_cancel_button = new YAHOO.widget.Button( "message_reply_cancel_button" );
+    //this.close_messages_dialog = function() { rid.style.display = 'none'; }
+    this.message_reply_cancel_button.on (
+        "click",
+        function() { rid.style.display = 'none'; }
+        //close_messages_dialog
     );
-    create_attachments_table (
-        'RequestAttachments.php?id='+id,
-        false
+
+    this.tags = [];
+    var tags_table = null;
+
+    this.oPushButtonAddTag = null;
+    this.oPushButtonRemoveTag = null;
+
+    function synchronize_tags_data() {
+        if( tags_table == null ) return;
+        var rs = tags_table.dataTable.getRecordSet();
+        var rs_length = rs.getLength();
+        this.tags = [];
+        for( var i = 0; i < rs_length; i++ ) {
+            var r = rs.getRecord(i);
+            if( !r.getData('delete')) {
+                this.tags.push ( {
+                    tag: r.getData('tag'),
+                    value: r.getData('value')});
+            } else {
+                tags_table.dataTable.deleteRow(i);
+            }
+        }
+        // Also refresh the markup with inputs for tags
+        //
+        var tags = ' <'+'input type="hidden" name="num_tags" value="'+this.tags.length+'" />';;
+        for( var i = 0; i < this.tags.length; i++ ) {
+            tags += ' <'+'input type="hidden" name="tag_name_'+i+'" value="'+this.tags[i].tag+'" />';
+            tags += ' <'+'input type="hidden" name="tag_value_'+i+'" value="'+this.tags[i].value+'" />';
+        }
+        document.getElementById('message_tags').innerHTML=tags;
+    }
+
+    function AddAndRefreshTagsTable() {
+        tags_table.dataTable.addRow (
+            { tag: "", value: "" }, 0 );
+    }
+
+    //this.files = [];
+    var files = [];
+    //this.files_table = null;
+    var files_table = null;
+
+    this.oPushButtonAddFile = null;
+    this.oPushButtonRemovFile = null;
+
+    function synchronize_files_data() {
+        //if( this.files_table == null ) return;
+        if( files_table == null ) return;
+        //var rs = this.files_table.dataTable.getRecordSet();
+        var rs = files_table.dataTable.getRecordSet();
+        var rs_length = rs.getLength();
+        //this.files = [];
+        files = [];
+        for( var i = 0; i < rs_length; i++ ) {
+            var r = rs.getRecord(i);
+            if( !r.getData('delete')) {
+                //this.files.push ( {
+                files.push ( {
+                    file: r.getData('file'),
+                    filename: document.getElementById(r.getData('id')).value,
+                    description: r.getData('description'),
+                    id: r.getData('id')});
+            } else {
+                //this.files_table.dataTable.deleteRow(i);
+                files_table.dataTable.deleteRow(i);
+            }
+        }
+
+        // Also refresh the markup with inputs for file descriptions
+        //
+        var descriptions ='';
+        //for( var i = 0; i < this.files.length; i++ ) {
+        for( var i = 0; i < files.length; i++ ) {
+            //var id = this.files[i].id;
+            var id = files[i].id;
+            //descriptions += ' <'+'input type="hidden" name="'+id+'" value="'+this.files[i].description+'" />';
+            descriptions += ' <'+'input type="hidden" name="'+id+'" value="'+files[i].description+'" />';
+        }
+        document.getElementById('message_reply_file_descriptions').innerHTML=descriptions;
+    }
+    var file2attach_sequence=0;
+    function AddAndRefreshFilesTable() {
+        file2attach_sequence++;
+        id = 'file2attach_'+file2attach_sequence;
+        //this.files_table.dataTable.addRow (
+        files_table.dataTable.addRow (
+            { file: '<input type="file" name="'+id+'" id="'+id+'" />', description: "", id: id }, 0 );
+    }
+
+    function onExtendedClick() {
+        var message_reply_body = document.getElementById('message_reply_body');
+        if( !this.extendedShown ) {
+            document.getElementById('message_reply_body').innerHTML=
+                '<textarea id="message_reply_text" type="text" name="message_text"'+
+                ' rows="12" cols="71" style="padding:1px;"'+
+                ' title="This is multi-line text area in which return will add a new line of text.'+
+                ' Use Submit button to post the message.">'+
+                document.getElementById('message_reply_text').value+'</textarea>'+
+                '<div style="margin-top:12px;">'+
+                '  <em class="lb_label">Author:</em>'+
+                '  <input type="text" name="author_name" value="'+auth_remote_user+'" style="padding:2px; width:200px;" />'+
+                '</div>'+
+                '<div style="margin-right:6px;" align="left">'+
+                '  <table style="margin-top:20px;"><tbody>'+
+                '    <tr>'+
+                '      <td align="left"><em class="lb_label">Tags</em></td>'+
+                '      <td><div style="width:8px;"></div></td>'+
+                '      <td align="left"><em class="lb_label">Attachments</em></td>'+
+                '    </tr>'+
+                '    <tr>'+
+                '      <td valign="top">'+
+                '        <div style="margin-top:8px; padding:8px; background-color:#f0f0f0;" >'+
+                '          <div id="message_reply_tags_table">'+
+                '            <div id="message_reply_tags_table_paginator"></div>'+
+                '            <div id="message_reply_tags_table_body"></div>'+
+                '          </div>'+
+                '          <div style="margin-top:8px;" align="right" >'+
+                '            <button id="message_reply_add_tag_button">Expand</button>'+
+                '            <button id="message_reply_remove_tag_button">Update</button>'+
+                '          </div>'+
+                '        </div>'+
+                '        <div id="message_tags"></div>'+
+                '      </td>'+
+                '      <td><div style="width:8px;"></div></td>'+
+                '      <td valign="top">'+
+                '        <div style="margin-top:8px; padding:8px; background-color:#f0f0f0;" >'+
+                '          <div id="message_reply_files_table">'+
+                '            <div id="message_reply_files_table_paginator"></div>'+
+                '            <div id="message_reply_files_table_body"></div>'+
+                '          </div>'+
+                '          <div style="margin-top:8px;" align="right" >'+
+                '            <button id="message_reply_add_file_button">Expand</button>'+
+                '            <button id="message_reply_remove_file_button">Update</button>'+
+                '          </div>'+
+                '        </div>'+
+                '        <div id="message_reply_file_descriptions"></div>'+
+                '      </td>'+
+                '    </tr>'+
+                '  </tbody></table>'+
+                '</div>';
+            message_reply_body.style.paddingBottom="10px";
+            this.oPushButtonAddTag = new YAHOO.widget.Button( "message_reply_add_tag_button" );
+            this.oPushButtonAddTag.on (
+                "click",
+                function( p_oEvent ) { AddAndRefreshTagsTable(); }
+            );
+            this.oPushButtonRemoveTag = new YAHOO.widget.Button( "message_reply_remove_tag_button" );
+            this.oPushButtonRemoveTag.on (
+                "click",
+                function( p_oEvent ) { synchronize_tags_data(); }
+            );
+            tags_table = new TableLocal (
+                "message_reply_tags_table",
+                [ { key: "delete", formatter: "checkbox" },
+                  { key: "tag",   sortable: true, resizeable: false,
+                    editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})},
+                  { key: "value", sortable: true, resizeable: false,
+                    editor: new YAHOO.widget.TextareaCellEditor({disableBtns:true})} ],
+                this.tags,
+                null
+            );
+
+            this.oPushButtonAddFile = new YAHOO.widget.Button( "message_reply_add_file_button" );
+            this.oPushButtonAddFile.on (
+                "click",
+                function( p_oEvent ) { AddAndRefreshFilesTable(); }
+            );
+            this.oPushButtonRemoveFile = new YAHOO.widget.Button( "message_reply_remove_file_button" );
+            this.oPushButtonRemoveFile.on (
+                "click",
+                function( p_oEvent ) { synchronize_files_data(); }
+            );
+            //this.files_table = new TableLocal (
+            files_table = new TableLocal (
+                "message_reply_files_table",
+                [ { key: "delete", formatter: "checkbox" },
+                  { key: "file",   sortable: true, resizeable: false },
+                  { key: "description", sortable: true, resizeable: false,
+                    editor: new YAHOO.widget.TextareaCellEditor({disableBtns:true})},
+                  { key: "id", sortable: false, hidden:true }],
+                this.tags,
+                null
+            );
+
+        } else {
+            document.getElementById('message_reply_body').innerHTML=
+                '<input id="message_reply_text" type="text" name="message_text" size="71" value="'+
+                document.getElementById('message_reply_text').value+'" />';
+            message_reply_body.style.paddingBottom="4px";
+            tags_table = null;
+        }
+        this.extendedShown = !this.extendedShown;
+        this.tags = [];
+        //this.files = [];
+        files = [];
+    }
+    this.message_reply_extend_button.on (
+        "click",
+        function( p_oEvent ) {
+            onExtendedClick();
+        }
     );
+    function SubmitRequest() {
+        synchronize_tags_data();
+        synchronize_files_data();
+        document.forms.message_reply_form.submit();
+    }
+    this.message_reply_submit_button .on (
+        "click",
+        function( p_oEvent ) {
+            SubmitRequest();
+        }
+    );
+    return html;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function preview_atatchment( id ) {
 
@@ -1049,34 +1373,6 @@ function preview_atatchment( id ) {
             'attachmentWindow',
             'toolbar=0,location=1,menubar=0,status=0,directories=0');
 */
-}
-
-var entry_tags_table=null;
-
-function create_tags_table( source, paginator ) {
-
-    entry_tags_table = new Table (
-        "entry_tags_table",
-        [ { key: "tag",   sortable: true, resizeable: false },
-          { key: "value", sortable: false, resizeable: false } ],
-        source,
-        paginator,
-        10
-    );
-}
-
-var entry_attachments_table=null;
-
-function create_attachments_table( source, paginator ) {
-
-    entry_attachments_table = new Table (
-        "entry_attachments_table",
-        [ { key: "attachment", sortable: true, resizeable: false },
-          { key: "size",       sortable: true, resizeable: false } ],
-        source,
-        paginator,
-        10
-    );
 }
 
 function list_shifts() {
@@ -1176,10 +1472,51 @@ function begin_new_shift() {
     ask_complex_input(
         "popupdialogs",
         "Begin New Shift",
+        '<p>This operation will start a new shift. '+
+        'The shift will begin instantly after submitting the form. '+
+        'The previously open shift (if any) will be atomatically closed. '+
+        'Please, provide a leader name or account and a list of (up to 10 extra) crew members.</p><br>'+
         '<form  name="begin_new_shift_form" action="CreateShift.php" method="post">'+
-        '  <b>Shift Leader: </b><input type="text" name="leader" value="'+logged_user+'" />'+
-        '  <input type="hidden" name="id" value="'+current_selection.experiment.id+'" />'+
-        '  <input type="hidden" name="actionSuccess" value="select_experiment_and_shift" />'+
+        '  <input class="lb_sparse" type="hidden" name="max_crew_size" value="10" />'+
+        '  <table><tbody>'+
+        '    <tr>'+
+        '      <td><b>Shift Leader:&nbsp;</b></td>'+
+        '      <td><input class="lb_sparse" type="text" name="leader" value="'+auth_remote_user+'" /></td>'+
+        '      <td></td>'+
+        '    </tr>'+
+        '    <tr>'+
+        '      <td><div style="height:10px;"></div></td>'+
+        '      <td></td>'+
+        '      <td></td>'+
+        '    </tr>'+
+        '    <tr>'+
+        '      <td><b>Crew Members:&nbsp;</b></td>'+
+        '      <td><input class="lb_sparse" type="text" name="member0" value="" /></td>'+
+        '      <td><input class="lb_sparse" type="text" name="member1" value="" /></td>'+
+        '    </tr>'+
+        '    <tr>'+
+        '      <td></td>'+
+        '      <td><input class="lb_sparse" type="text" name="member2" value="" /></td>'+
+        '      <td><input class="lb_sparse" type="text" name="member3" value="" /></td>'+
+        '    </tr>'+
+        '    <tr>'+
+        '      <td></td>'+
+        '      <td><input class="lb_sparse" type="text" name="member4" value="" /></td>'+
+        '      <td><input class="lb_sparse" type="text" name="member5" value="" /></td>'+
+        '    </tr>'+
+        '    <tr>'+
+        '      <td></td>'+
+        '      <td><input class="lb_sparse" type="text" name="member6" value="" /></td>'+
+        '      <td><input class="lb_sparse" type="text" name="member7" value="" /></td>'+
+        '    </tr>'+
+        '    <tr>'+
+        '      <td></td>'+
+        '      <td><input class="lb_sparse" type="text" name="member8" value="" /></td>'+
+        '      <td><input class="lb_sparse" type="text" name="member9" value="" /></td>'+
+        '    </tr>'+
+        '  </tbody></table><br>'+
+        '  <input class="lb_sparse" type="hidden" name="id" value="'+current_selection.experiment.id+'" />'+
+        '  <input class="lb_sparse" type="hidden" name="actionSuccess" value="select_experiment_and_shift" />'+
         '</form>',
         function() {
             document.begin_new_shift_form.submit();
@@ -1584,6 +1921,23 @@ function expander_unhighlight( which, color ) {
     which.style.backgroundColor = color;
 }
 
+/* TODO: Refactor this code to reduce code duplication with
+ * the next function.
+ */
+function message_expander( message_idx ) {
+    var re = last_search_result[message_idx];
+    var hid = re.hid;
+    var bid = re.bid;
+    var h = document.getElementById(hid);
+    var b = document.getElementById(bid);
+
+    h.innerHTML='<b>V</b>';
+    b.style.display = 'block';
+    show_hide_attachments( true, message_idx );
+
+    h.style.width='14px';
+}
+
 function message_expander_toggle( message_idx ) {
     var re = last_search_result[message_idx];
     var hid = re.hid;
@@ -1593,6 +1947,7 @@ function message_expander_toggle( message_idx ) {
     if( b.style.display == 'none') {
         h.innerHTML='<b>V</b>';
         b.style.display = 'block';
+        show_hide_attachments( true, message_idx );
     } else {
         h.innerHTML='<b>&gt;</b>';
         b.style.display = 'none';
@@ -1620,8 +1975,8 @@ function attachment_expander_toggle( message_idx, attachment_idx ) {
 }
 
 function expand_collapse_all_messages( expand ) {
-    for( var i = first_message_idx; i < last_message_idx; i++ ) {
-        var re = last_search_result[i];
+    for( var message_idx = last_message_idx-1; message_idx >= first_message_idx; message_idx-- ) {
+        var re = last_search_result[message_idx];
         var hid = re.hid;
         var bid = re.bid;
         var h = document.getElementById(hid);
@@ -1629,6 +1984,7 @@ function expand_collapse_all_messages( expand ) {
         if( expand ) {
             h.innerHTML='<b>V</b>';
             b.style.display = 'block';
+            show_hide_attachments( expand, message_idx );
         } else {
             h.innerHTML='<b>&gt;</b>';
             b.style.display = 'none';
@@ -1637,34 +1993,36 @@ function expand_collapse_all_messages( expand ) {
     }
 }
 
+function show_hide_attachments( show, message_idx ) {
+    var re = last_search_result[message_idx];
+
+    // Show attachments only for those messages whose body are presently shown
+    // (on the current page.)
+    //
+    if( document.getElementById( re.bid ).style.display != 'none' ) {
+
+        var attachment_descr = re.attachment_descr;
+        for( var i=0; i<attachment_descr.length; i++ ) {
+
+            var descr = attachment_descr[i];
+            var h = document.getElementById( descr.ahid );
+            var a = document.getElementById( descr.aid );
+            if( show ) {
+                descr.loader.load();
+                h.innerHTML='<b>V</b>';
+                a.style.display = 'block';
+            } else {
+                h.innerHTML='<b>&gt;</b>';
+                a.style.display = 'none';
+            }
+            h.style.width='14px';
+        }
+    }
+}
 function show_hide_all_attachments( show ) {
 
-    for( var message_idx = first_message_idx; message_idx < last_message_idx; message_idx++ ) {
-
-        var re = last_search_result[message_idx];
-
-        // Show attachments only for those messages whose body are presently shown
-        // (on the current page.)
-        //
-        if( document.getElementById( re.bid ).style.display != 'none' ) {
-
-            var attachment_descr = re.attachment_descr;
-            for( var i=0; i<attachment_descr.length; i++ ) {
-
-                var descr = attachment_descr[i];
-                var h = document.getElementById( descr.ahid );
-                var a = document.getElementById( descr.aid );
-                if( show ) {
-                    descr.loader.load();
-                    h.innerHTML='<b>V</b>';
-                    a.style.display = 'block';
-                } else {
-                    h.innerHTML='<b>&gt;</b>';
-                    a.style.display = 'none';
-                }
-                h.style.width='14px';
-            }
-        }
+    for( var message_idx = last_message_idx-1; message_idx >= first_message_idx; message_idx-- ) {
+        show_hide_attachments( show, message_idx );
     }
 }
 
@@ -1683,7 +2041,7 @@ function AttachmentLoader( a, aid ) {
         } else if( this.type[0] == 'text' ) {
             var aid4text = 'attachment_id_'+this.id+'_txt';
             a_elem.innerHTML =
-            '<div style="max-width:800px; min-height:40px; max-height:200px; overflow:auto;"><textbox><pre id="'+aid4text+'"></pre></textbox></div>';
+            '<div style="max-width:800px; min-height:40px; max-height:200px; overflow:auto; border:solid 1px;"><textbox><pre id="'+aid4text+'"></pre></textbox></div>';
             load( 'ShowAttachment.php?id='+this.id, aid4text );
         } else if( this.type[0] == 'application' && this.type[1] == 'pdf' ) {
             a_elem.innerHTML =
@@ -1705,6 +2063,7 @@ function event2html( message_idx ) {
     var mid = 'message_'+re.id;
     var hid = 'message_header_'+re.id;
     var bid = 'message_body_'+re.id;
+    var rid = 'message_reply_dialog_'+re.id;
     re.mid = mid;
     re.hid = hid;
     re.bid = bid;
@@ -1714,43 +2073,60 @@ function event2html( message_idx ) {
     var run_shift = re.run == '' && re.shift == '' ? '' : ' - '+run+' '+shift;
 
     var tags='';
-    for( var i=0; i < re.tags.length; i++ ) {
-        var t = re.tags[i];
+    if( re.tags.length > 0 ) {
         tags +=
-            '<div style="margin-top:4px; margin-left:10px;">'+
-            '  <span style="border:solid 1px #c0c0c0; width:32px; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center;"'+
-            '     <b>TAG</b>'+'</span>'+
-            '  <span style="margin-left:4px;"><b>'+t.tag+'</b>=<i>'+t.value+'</i></span>'+
-            '</div>';
+        //'<div style="padding:10px; border:solid 1px #efefef; background-color:#ffffdd;">'+
+        '<div style="padding:10px; background-color:#ddffff;">';
+        //'  <div style="position:relative; left:0px; top:-18px;">Tags</div>';
+        for( var i=0; i < re.tags.length; i++ ) {
+            var t = re.tags[i];
+            tags +=
+                '<div style="margin-top:4px; margin-left:0px;">'+
+                //'  <span style="border:solid 1px #c0c0c0; width:32px; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center;"'+
+                //'     <b>TAG</b>'+'</span>'+
+                '  <span style="margin-left:4px;"><b>'+t.tag+'</b>=<i>'+t.value+'</i></span>'+
+                '</div>';
+        }
+        tags +=
+        '</div>';
     }
-
     var attachment_descr = [];
 
     var attachment_sign = '<img src="images/attachment.png" height="18" />';
     var attachments='';
-    for( var i=0; i < re.attachments.length; i++ ) {
-        var a = re.attachments[i];
-
-        var ahid = 'attachment_header_id_'+a.id;
-        var aid = 'attachment_id_'+a.id;
-
+    if( re.attachments.length > 0 ) {
         attachments +=
-            '<div style="margin-top:0px; margin-left:10px;">'+
-            '  <span id="'+ahid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; padding-right:2px; margin-right:5px; font-size:14px; text-align:center; cursor:pointer;"'+
-            '     onclick="javascript:attachment_expander_toggle('+"'"+message_idx+"','"+i+"')"+'"'+
-            '     onmouseover="javascript:expander_highlight(this)" '+
-            '     onmouseout="javascript:expander_unhighlight(this,document.bgColor)">'+
-            '     <b>&gt;</b>'+'</span>'+
-            '  <span><b>'+a.url+'</b></span>'+
-            '  ( <span>type:<b> '+a.type+'</b></span> '+
-            '  <span>size: <b> '+a.size+'</b></span> )'+
-            '  '+attachment_sign+
-            '</div>'+
-            '<div id="'+aid+'" style="margin-left:18px; padding:17px; border-left:solid 2px #efefef; display:none;">'+
-            '</div>';
+        //'        <div style="padding:10px; border:solid 1px #efefef; background-color:#ddffff;">'+
+        '        <div style="padding:10px; background-color:#ffffdd;">';
+        //'          <div style="position:relative; left:0px; top:-18px;">Attachments</div>';
+        for( var i=0; i < re.attachments.length; i++ ) {
+            var a = re.attachments[i];
 
-        var descr = { 'ahid' : ahid, 'aid' : aid, 'loader' : new AttachmentLoader( a, aid )};
-        attachment_descr.push( descr );
+            var ahid = 'attachment_header_id_'+a.id;
+            var aid = 'attachment_id_'+a.id;
+
+            attachments +=
+                '<div style="margin-top:0px; margin-left:0px;">'+
+                '  <span id="'+ahid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; padding-right:2px; margin-right:5px; font-size:14px; text-align:center; cursor:pointer;"'+
+                '     onclick="javascript:attachment_expander_toggle('+"'"+message_idx+"','"+i+"')"+'"'+
+                '     onmouseover="javascript:expander_highlight(this)" '+
+                '     onmouseout="javascript:expander_unhighlight(this,document.bgColor)">'+
+                '     <b>&gt;</b>'+'</span>'+
+                '  <span><b>'+a.url+'</b></span>'+
+                '  ( <span>type:<b> '+a.type+'</b></span> '+
+                '  <span>size: <b> '+a.size+'</b></span> )'+
+                '  '+attachment_sign+
+                '</div>'+
+                //'<div id="'+aid+'" style="margin-left:18px; padding:17px; padding-left:30px; border-left:solid 2px #efefef; display:none;">'+
+                //'<div id="'+aid+'" style="margin-left:18px; padding:17px; padding-left:30px; display:none;">'+
+                '<div id="'+aid+'" style="margin-left:0px; padding:17px; display:none;">'+
+                '</div>';
+
+            var descr = { 'ahid' : ahid, 'aid' : aid, 'loader' : new AttachmentLoader( a, aid )};
+            attachment_descr.push( descr );
+        }
+        attachments +=
+        '</div>';
     }
     re.attachment_descr = attachment_descr;
 
@@ -1759,26 +2135,68 @@ function event2html( message_idx ) {
         attachment_signs += attachment_sign;
 
     var result =
-        '<div id="'+mid+'" style="display:none;" >'+
-        '  <div style="position:relative; left:0px; margin-top:10px; margin-left:10px; padding:2px;">'+
+        '<div id="'+mid+'" style="display:none;" style="position:relative;" >'+
+        //'  <div style="position:relative; left:0px; margin-top:10px; margin-left:10px; padding:2px;">'+
+        '  <div style="margin-top:10px; margin-left:10px; padding:2px;">'+
         '    <span id="'+hid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
         '      onclick="message_expander_toggle('+message_idx+')"'+
         '      onmouseover="expander_highlight(this)" '+
-        '      onmouseout="expander_unhighlight(this,document.bgColor)">'+
-        '      <b>&gt;</b>'+'</span>'+
+        '      onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '      title="Open/close the message body">'+
+        '      <b>&gt;</b>'+
+        '    </span>'+
+        '    <span style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '      onclick="create_message_reply_dialog('+rid+','+re.id+','+message_idx+')"'+
+        '      onmouseover="expander_highlight(this)" '+
+        '      onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '      title="Open a dialog to reply to the message">'+
+        '      <b>R</b>'+
+        '    </span>'+
         '    <span>'+
         '      <b><em style="padding:2px;">'+re.event_time+'</em></b>'+
         '      by: <b><em style="padding:2px;">'+re.author+'</em></b>'+
         '      - <em class="lb_msg_subject" style="padding:2px;">'+re.subject+'</em>'+run_shift+
-        '      </span>'+
+        '    </span>'+
         attachment_signs+
         '  </div>'+
         '  <div id="'+bid+'" style="display:none; margin-left:17px; margin-bottom:20px;">'+
-        '    <div style="padding:10px; padding-left:20px; border-left:solid 1px #c0c0c0;">'+
-        '      <div style="margin-top:8px; margin-right:0px; margin-bottom:20px; background-color:#efefef;">'+re.html+'</div>'+
+        '    <div style="padding:10px; padding-left:20px; padding-bottom:0px; border-left:solid 1px #c0c0c0;">'+
+        '      <div style="margin-top:8px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
+        '      <div id="'+rid+'" style="padding:10px; background-color:#e0e0e0; display:none;"></div>'+
         tags+
-        ((re.tags.length > 0 && re.attachments.length > 0) ? '<br>' : '')+
+        //'        <br>'+
+        //((re.tags.length > 0 && re.attachments.length > 0) ? '<br>' : '')+
         attachments+
+
+/* --------------------------------------------------------------------
+ * TODO: Temporarily disable the children. This feature will be enabled
+ * in the next release of the application.
+ * --------------------------------------------------------------------
+ *
+        '      <div style="margin-top:20px; margin-left:0px; padding:2px;">'+
+        '        <span id="'+hid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '          onclick="message_expander_toggle('+message_idx+')"'+
+        '          onmouseover="expander_highlight(this)" '+
+        '          onmouseout="expander_unhighlight(this,document.bgColor)">'+
+        '          <b>V</b>'+
+        '        </span>'+
+        '        <span>'+
+        '          <b><em style="padding:2px;">'+re.event_time+'</em></b>'+
+        '          by: <b><em style="padding:2px;">'+re.author+'</em></b>'+
+        '          - <em class="lb_msg_subject" style="padding:2px;">'+re.subject+'</em>'+run_shift+
+        '        </span>'+
+        attachment_signs+
+        '      </div>'+
+        '      <div id="'+bid+'" style="margin-left:7px; margin-bottom:20px;">'+
+        '        <div style="padding:10px; padding-left:20px; padding-bottom:40px; border-left:solid 1px #c0c0c0;">'+
+        '          <div style="margin-top:8px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
+        tags+
+        attachments+
+        '        </div>'+
+        '      </div>'+
+*
+* --------------------------------------------------------------------
+*/
         '    </div>'+
         '  </div>'+
         '</div>';
@@ -1793,11 +2211,11 @@ var last_message_idx = null;
 function display_messages_page() {
 
     document.getElementById('messages_total').innerHTML = last_search_result.length;
-    document.getElementById('messages_showing_from_id').innerHTML = ( 1 + first_message_idx );
-    document.getElementById('messages_showing_through_id').innerHTML = last_message_idx;
+    document.getElementById('messages_showing_from_id').innerHTML = last_search_result.length - last_message_idx + 1;
+    document.getElementById('messages_showing_through_id').innerHTML = last_search_result.length - first_message_idx;
 
-    prev_message_page_button.set( 'disabled', first_message_idx == 0 );
-    next_message_page_button.set( 'disabled', last_message_idx >= last_search_result.length );
+    next_message_page_button.set( 'disabled', first_message_idx == 0 );
+    prev_message_page_button.set( 'disabled', last_message_idx >= last_search_result.length );
 
     for( var i = 0; i < last_search_result.length; i++ ) {
         var re = last_search_result[i];
@@ -1813,15 +2231,15 @@ function display_messages_page() {
     }
 }
 
-var prev_message_page_button = null;
-function prev_message_page() {
+var next_message_page_button = null;
+function next_message_page() {
     last_message_idx  = first_message_idx;
     first_message_idx = Math.max( 0, first_message_idx - limit_per_page );
     display_messages_page();
 }
 
-var next_message_page_button = null;
-function next_message_page() {
+var prev_message_page_button = null;
+function prev_message_page() {
     first_message_idx = last_message_idx;
     last_message_idx  = Math.min( last_search_result.length, last_message_idx + limit_per_page );
     display_messages_page();
@@ -1837,8 +2255,8 @@ function display_messages() {
 
     //first_message_idx = 0;
     //last_message_idx  = Math.min( last_search_result.length, limit_per_page );
-    first_message_idx = 0;
-    last_message_idx  = Math.min( last_search_result.length, limit_per_page );
+    first_message_idx = Math.max( 0, last_search_result.length-limit_per_page );
+    last_message_idx  = last_search_result.length;
 
     display_messages_page();
 }
@@ -2049,7 +2467,7 @@ function display_messages_table(
                     html1 += event2html( last_search_result.length-1 );
                 }
                 var html_old = document.getElementById('messages_area').innerHTML;
-                document.getElementById('messages_area').innerHTML = html_old + html1;
+                document.getElementById('messages_area').innerHTML = html1 + html_old;
                 display_messages();
             }
             if( document.search_display_form.autorefresh.checked )
@@ -2164,11 +2582,31 @@ function search_contents() {
   </head>
   <body class="yui-skin-sam" id="body" onload="init()">
     <div id="application_header">
-      <p id="application_title" style="text-align:left;">
-        <em>Electronic LogBook of Experiment: </em>
-        <em id="application_subtitle"><a href="javascript:list_experiments()">select &gt;</a></em>
-      </p>
-      <p style="text-align:right;">Logged as: <b><?php echo $_SERVER['WEBAUTH_USER']?></b><p>
+      <div>
+        <div style="float:left;">
+          <p id="application_title" style="text-align:left;">
+            <em>Electronic LogBook of Experiment: </em>
+            <em id="application_subtitle"><a href="javascript:list_experiments()">select &gt;</a></em>
+          </p>
+        </div>
+        <div style="float:right; height:50px;">
+            <tr>
+              <td>&nbsp;</td>
+              <td></td>
+            </tr>
+          <table><tbody>
+            <tr>
+              <td>Logged as:&nbsp;</td>
+              <td><p><b><?php echo $_SERVER['REMOTE_USER']?></b></p></td>
+            </tr>
+            <tr>
+              <td>Session expires in:&nbsp;</td>
+              <td><p id="auth_expiration_info"></p></td>
+            </tr>
+          </tbody></table>
+        </div>
+        <div style="height:40px;">&nbsp;</div>
+      </div>
     </div>
     <div id="menubar" class="yuimenubar yuimenubarnav"></div>
     <p id="context"></p>
@@ -2185,34 +2623,6 @@ function search_contents() {
               <div id="navarea"></div>
             </td>
             <td valign="top">
-              <!--
-              Invisible placeholder for free-form entries viewing dialog
-              -->
-              <div id="ffentrydialog" style="height:1px;">
-                <div class="hd" id="ffentryheader"></div>
-                <div class="bd">
-                  <div id="ffentrybody"></div>
-                  <table>
-                    <tbody>
-                      <tr>
-                        <td valign="top">
-                          <div id="entry_tags_table_container" style="width:250px;">
-                            <div id="entry_tags_table_paginator"></div>
-                            <div id="entry_tags_table_body"></div>
-                          </div>
-                        </td>
-                        <td valign="top">
-                          <div id="entry_attachments_table_container">
-                            <div id="entry_attachments_table_paginator"></div>
-                            <div id="entry_attachments_table_body"></div>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div class="ft" id="ffentryfooter"></div>
-              </div>
               <!--
               Here comes the main viwing area of the application.
               -->

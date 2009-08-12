@@ -85,6 +85,35 @@ function ask_yesno_confirmation( id, text, onYes, onNo ) {
     );
 }
 
+
+function ask_action_confirmation( id, title, text, onOk ) {
+
+    document.getElementById( id ).innerHTML =
+        '<div class="hd">'+title+'</div>'+
+        '<div class="bd">'+
+        '  <center><p>'+text+'</p></center>'+
+        '</div>';
+
+    var handleOk = function() {
+        this.hide();
+        onOk();
+    };
+    var dialog = new YAHOO.widget.Dialog (
+        id,
+        {   width : "480px",
+            fixedcenter : true,
+            visible : true,
+            close: true,
+            modal:true,
+            constraintoviewport : true,
+            buttons : [
+                { text:"Ok", handler: handleOk }
+            ]
+        }
+    );
+    dialog.render();
+}
+
 function ask_simple_input( id, title, prompt, default_value, onSubmit ) {
 
     document.getElementById( id ).innerHTML =

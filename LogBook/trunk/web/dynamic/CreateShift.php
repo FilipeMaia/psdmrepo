@@ -23,6 +23,18 @@ if( isset( $_POST['actionSuccess'] )) {
     $actionSuccess = trim( $_POST['actionSuccess'] );
 }
 
+$crew = array();
+if( isset( $_POST['max_crew_size'] )) {
+    $max_crew_size = (int)trim( $_POST['max_crew_size'] );
+    for( $i=0; $i<$max_crew_size; $i++) {
+        $key = 'member'.$i;
+        if( isset( $_POST[$key] )) {
+            $member = trim( $_POST[$key] );
+            if( $member != '' ) array_push( $crew, $member );
+        }
+    }
+}
+
 try {
 
     $logbook = new LogBook();
@@ -31,7 +43,6 @@ try {
     $experiment = $logbook->find_experiment_by_id( $id )
         or die("failed to find the experiment" );
 
-    $crew = array();
     $begin_time = LusiTime::now();
     $shift = $experiment->create_shift( $leader, $crew, $begin_time );
 
