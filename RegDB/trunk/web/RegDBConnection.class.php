@@ -254,6 +254,14 @@ class RegDBConnection {
                     __METHOD__,
                     "failed to connect to LDAP server: ".$this->ldap_host );
 
+            /* IMPORTANT: This operation is required. Otherwise LDAP client may
+             * get confused and attempt guessing a wrong version of protocol before
+             * producing a usefull result. A problem is that the first failed attempt to use
+             * protocol version 2 will result in a warning message which would destorte
+             * the JSON output.
+             */
+            ldap_set_option( $this->ldap_ds, LDAP_OPT_PROTOCOL_VERSION, 3 );
+
             if( !ldap_bind( $this->ldap_ds ))
                 throw new RegDBException (
                     __METHOD__,

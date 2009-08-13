@@ -1,5 +1,8 @@
 <?php
-/* 
+
+require_once( "RegDB/RegDB.inc.php" );
+
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -8,11 +11,17 @@
 
 echo "<h3>Find Posix groups from LDAP</h3>";
 
-$ds = ldap_connect( "localhost" )
+$ds = ldap_connect( )
     or die( "failed to connect to the server" );
-
-$r = ldap_bind( $ds )
-    or die( "failed to bibd to the server" );
+ldap_set_option( $ds, LDAP_OPT_PROTOCOL_VERSION, 3 );
+/*
+$protocol_version = null;
+ldap_get_option( $ds, LDAP_OPT_PROTOCOL_VERSION, &$protocol_version );
+print( $protocol_version );
+*/
+$r = ldap_bind( $ds );
+if( is_null( $r ))
+    die( "failed to bibd to the server" );
 
 $sr = ldap_search( $ds, "ou=Group,dc=reg,o=slac", "cn=*" )
     or die( "search operation failed" );

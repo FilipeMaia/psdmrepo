@@ -1230,7 +1230,7 @@ function list_groups() {
         [ { key: "group",   sortable: true, resizeable: true },
           { key: "members", sortable: true, resizeable: true } ],
         'RequestGroups.php',
-        false
+        true
     );
     table.refreshTable();
 }
@@ -1254,7 +1254,7 @@ function view_group( name ) {
           { key: "name",  sortable: true, resizeable: true },
           { key: "email", sortable: true, resizeable: true } ],
         'RequestGroupMembers.php?name='+name,
-        false
+        true
     );
     table.refreshTable();
 }
@@ -1330,7 +1330,7 @@ function view_run_numbers( id, name ) {
         <el>Experiment Registry Database</el>
         <br>
         <el id="current_experiment" style="font-size:32px;">LCLS Detector Control</el></p>
-        <p style="text-align:right;">Logged as: <b><?php echo $_SERVER['WEBAUTH_USER']?></b><p>
+        <p style="text-align:right;">Logged as: <b><?php echo $_SERVER['REMOTE_USER']?></b><p>
     </div>
     <div id="menubar" class="yuimenubar yuimenubarnav">
         <div class="bd">
