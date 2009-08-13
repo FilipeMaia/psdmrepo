@@ -59,9 +59,12 @@ function run2json( $run ) {
 }
 
 function day2json( $d ) {
+    $label = $d->begin->toStringDay();
+    $today = LusiTime::now()->toStringDay();
+    if( $label == $today ) $label .= ' <span style="color:red; font-weight:bold;">&lt;&minus;today</span>';
     return json_encode(
         array (
-            "label" => $d->begin->toStringDay(),
+            "label" => $label,
             "expanded" => false,
             "type" => TYPE_HISTORY_D_DAY,
             "title" => "all events happened during that day of data taking",

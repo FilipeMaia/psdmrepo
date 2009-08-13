@@ -1080,12 +1080,14 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
         '  <input type="hidden" name="message_id" value="'+message_id+'" />'+
         '  <input type="hidden" name="actionSuccess" value="select_experiment" />'+
         '  <input type="hidden" name="MAX_FILE_SIZE" value="1000000">'+
-        '  <div style="padding:20px;">'+
-        '    <center><b>ATTENTION: </b>The current implementation of this dialog will not'+
-        '    post replies as children of a message the dialog is invoked with. The replies'+
-        '    will show up as regular messages in the plain list. This problem will be fixed'+
-        '    in the next release of the application.'+
-        '    </center>'+
+        '  <div style="padding:20px; padding-left:10%; padding-right:10%; text-align:left;">'+
+        '    <b>ATTENTION: </b>The current implementation of this dialog will not'+
+        '    display replies as children of a message the dialog is invoked with. The replies'+
+        '    will show up as regular messages in the message list. This problem will be fixed'+
+        '    in the next release of the application. For now, the relationship to the parent '+
+        '    message will be maintained via the automatically added tag PARENT_MESSAGE_ID.'+
+        '    Do not remove that tag please! Tags and attachments can be seen by pressing '+
+        '    the <b>Options</b> button of this dialog.'+
         '  </div>'+
         '  <div>'+
         '    <em class="lb_label">Reply:</em>'+
@@ -1120,7 +1122,7 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
         //close_messages_dialog
     );
 
-    this.tags = [];
+    this.tags = [{ tag: 'PARENT_MESSAGE_ID' , value: message_id }];
     var tags_table = null;
 
     this.oPushButtonAddTag = null;
@@ -1299,7 +1301,7 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
                   { key: "description", sortable: true, resizeable: false,
                     editor: new YAHOO.widget.TextareaCellEditor({disableBtns:true})},
                   { key: "id", sortable: false, hidden:true }],
-                this.tags,
+                files,
                 null
             );
 
@@ -2601,7 +2603,7 @@ function search_contents() {
             </tr>
             <tr>
               <td>Session expires in:&nbsp;</td>
-              <td><p id="auth_expiration_info"></p></td>
+              <td><p id="auth_expiration_info"><b>??</b> hours, <b>??</b> minutes, <b>??</b> seconds</p></td>
             </tr>
           </tbody></table>
         </div>

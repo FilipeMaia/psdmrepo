@@ -15,6 +15,12 @@ MEDIUM PRIORITY: Improve 'New Shift' dialog
     members of the POSIX group registered with an experiment. Also allow adding
     arbitrary people (as it's done now).
 
+      [ text ] or [ listbox ]
+
+    The contents of the listbox will be populated by members of a POSIX group
+    associated with the selected experiment. Th erequest will be sent dynamically
+    using AJAX.
+
 ____________________________________________________________________________
 LOW PRIORITY: Refactor the Messages Table and Dialog into a single prototype
 
@@ -34,9 +40,9 @@ LOW PRIORITY: Refactor the Messages Table and Dialog into a single prototype
 __________________________________________________
 LOW PRIORITY: Imnprovements for the screen-grabber
 
+    - allow composing a message with more than one attachment
     - add options for posting messages for the current experiment, shift or run.
     Right now it's for the selected experiment only. Use experiment status.
-    - allow composing a message with more than one attachment
     - allow specifying arbitrary tags (or the preconfigured tags for the experiment)
 
 ______________________________________________________________________________

@@ -275,7 +275,7 @@ logbook_experiments = None
 # option of the application.
 # ------------------------------------------------------------------
 
-ws_url            = 'https://www-lclsdev.slac.stanford.edu:81/ws-auth/'
+ws_url            = None       ## 'https://www-lclsdev.slac.stanford.edu:81/ws-auth/'
 ws_login_user     = 'logbook'
 ws_login_password = 'pcds'
 
@@ -522,7 +522,13 @@ OPTIONS & PARAMETERS:
   ___________________
   Required parameters
 
-    -i instrument : the name of an instrument
+    -i instrument
+
+      the name of an instrument
+
+    -w web-service-url
+
+      the base URL of the LogBook Web Service. 
 
   ___________________
   Optional parameters
@@ -535,11 +541,6 @@ OPTIONS & PARAMETERS:
       selected instrument. In the later case it will be up to
       a user of the Grabber to select a desired instrument.
 
-    -w web-service-url
-
-      the base URL of the LogBook Web Service. The default
-      value of the parameter is: %s
-
     -u web-service-user
 
       the user name to connect to the service (NOTE: this
@@ -551,7 +552,7 @@ OPTIONS & PARAMETERS:
       the password to connect to the service. Its value
       is associated with the above mentioned service account.
 
-""" % (progname,ws_url)
+""" % (progname)
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'hi:e:w:u:p;')
@@ -580,6 +581,10 @@ OPTIONS & PARAMETERS:
 
     if logbook_instrument is None:
         print "no instrument name found among command line parameters"
+        sys.exit(3)
+
+    if ws_url is None:
+        print "no web service URL found among command line parameters"
         sys.exit(3)
 
     # ----------------------------------------------------
