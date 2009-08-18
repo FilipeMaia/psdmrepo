@@ -159,12 +159,15 @@ class RegDB {
             throw new RegDBException (
                 __METHOD__,
                 "the POSIX group name can't be empty string" );
-
+/*
+ * TODO: Disable this temporarily untill a more sophisticated algorithm for
+ * browsing LDAP associations (groups/users) is implemented.
+ *
         if( !$this->is_member_of_posix_group ( $trim_posix_gid, $trim_leader ))
             throw new RegDBException (
                 __METHOD__,
                 "the proposed leader isn't a member of the POSIX group" );
-
+*/
          /* Proceed with the operation.
           */
         $this->connection->query (

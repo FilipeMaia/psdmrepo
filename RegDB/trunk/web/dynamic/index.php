@@ -28,78 +28,81 @@ Page-specific styles
 -->
 <style type="text/css">
 
-div.yui-b p {
-    margin: 0 0 .5em 0;
-    color: #999;
-}
-div.yui-b p strong {
-    font-weight: bold;
-    color: #000;
-}
-div.yui-b p em {
-    color: #000;
-}
-#application_header {
-    background-color:#d0d0d0;
-    padding:12px;
-    margin:0px;
-}
-#application_title {
-    font-family: "Times", serif;
-    font-size:42px;
-}
-#current_experiment {
-    color:#0071bc;
-}
-#menubar {
-    margin: 0 0 10px 0;
-}
-#context {
-    margin-top:20px;
-    margin-left:10px;
-    margin-right:20px;
-    margin-bottom:0px;
-    font-size:16px;
-    border:solid 4px transparent;
-    border-left-width:16px;
-    text-align:left;
-}
-#workarea {
-    margin-left:40px;
-    margin-right:40px;
-}
-#experiment_info,
-#instrument_info,
-#runs_info {
-    margin-top:0px;
-    margin-left:4px;
-}
-#workarea_table_container table,
-#params_table_container   table,
-#runs_table_container     table {
-}
-#workarea_table_paginator,
-#params_table_page,
-#runs_table_page {
-    margin-left:auto;
-    margin-right:auto;
-}
-#workarea_table_container,
-#workarea_table_container .yui-dt-loading,
-#params_table_container,
-#params_table_container .yui-dt-loading,
-#runs_table_container,
-#runs_table_container .yui-dt-loading {
-    text-align:center;
-    background-color:transparent;
-}
-#actions_container,
-#params_actions_container,
-#runs_actions_container {
-    margin-top:24px;
-    margin-left:0px;
-    text-align:left;
-}
+    div.yui-b p {
+        margin: 0 0 .5em 0;
+        color: #999;
+    }
+    div.yui-b p strong {
+        font-weight: bold;
+        color: #000;
+    }
+    div.yui-b p em {
+        color: #000;
+    }
+    #application_header {
+        background-color:#d0d0d0;
+        padding:8px;
+        padding-bottom:12px;
+        margin:0px;
+    }
+    #application_title {
+        margin-left:5px;
+        font-family: "Times", serif;
+        font-size:32px;
+    }
+    #application_subtitle {
+        color:#0071bc;
+        font-size:24px;
+    }
+    #menubar {
+        margin: 0 0 10px 0;
+    }
+    #context {
+        margin-top:20px;
+        margin-left:10px;
+        margin-right:20px;
+        margin-bottom:0px;
+        font-size:16px;
+        border:solid 4px transparent;
+        border-left-width:16px;
+        text-align:left;
+    }
+    #workarea {
+        margin-left:40px;
+        margin-right:40px;
+    }
+    #experiment_info,
+    #instrument_info,
+    #runs_info {
+        margin-top:0px;
+        margin-left:4px;
+    }
+    #workarea_table_container table,
+    #params_table_container   table,
+    #runs_table_container     table {
+    }
+    #workarea_table_paginator,
+    #params_table_page,
+    #runs_table_page {
+        margin-left:auto;
+        margin-right:auto;
+    }
+    #workarea_table_container,
+    #workarea_table_container .yui-dt-loading,
+    #params_table_container,
+    #params_table_container .yui-dt-loading,
+    #runs_table_container,
+    #runs_table_container .yui-dt-loading {
+        text-align:center;
+        background-color:transparent;
+    }
+    #actions_container,
+    #params_actions_container,
+    #runs_actions_container {
+        margin-top:24px;
+        margin-left:0px;
+        text-align:left;
+    }
 </style>
 
 <!--
@@ -130,13 +133,106 @@ Menu source file
 <!--
 Custom JavaScript
 -->
+<script type="text/javascript" src="Menubar.js"></script>
+<script type="text/javascript" src="Dialogs.js"></script>
 <script type="text/javascript" src="Loader.js"></script>
 <script type="text/javascript" src="JSON.js"></script>
+<script type="text/javascript" src="Utilities.js"></script>
 
 <!--
 Page-specific script
 -->
 <script type="text/javascript">
+
+var dialog_element = "popupdialogs";
+
+var menubar_element = "menubar";
+var menubar_data = [];
+
+var menubar_group_applications = menubar_data.length;
+menubar_data.push ( {
+    id: 'applications',
+    href: '#applications',
+    title: 'Applications',
+    title_style: 'font-weight:bold;',
+    itemdata: [
+        { text: "Experiment Registry Database", url: "../../RegDB/dynamic/" },
+        { text: "Electronic Log Book", url: "../../LogBook/dynamic/" } ],
+    disabled: false }
+);
+var menubar_group_home = menubar_data.length;
+menubar_data.push ( {
+    id: null,
+    href: 'index.php',
+    title: 'Home',
+    title_style: null,
+    itemdata: null,
+    disabled: false }
+);
+var menubar_experiments_home = menubar_data.length;
+menubar_data.push ( {
+    id: "experiments",
+    href: "#experiments",
+    title: 'Experiments',
+    title_style: 'font-weight:bold;',
+    itemdata: [
+        { text: "Select..", url: "javascript:list_experiments()" },
+        { text: "Create New..", url: "javascript:create_experiment()" } ],
+    disabled: false }
+);
+var menubar_instruments_home = menubar_data.length;
+menubar_data.push ( {
+    id: "instruments",
+    href: "#instruments",
+    title: 'Instruments',
+    title_style: 'font-weight:bold;',
+    itemdata: [
+        { text: "Select..", url: "javascript:list_instruments()" },
+        { text: "Create New..", url: "javascript:create_instrument()" } ],
+    disabled: false }
+);
+var menubar_groups_home = menubar_data.length;
+menubar_data.push ( {
+    id: null,
+    href: 'javascript:list_groups()',
+    title: 'POSIX Groups',
+    title_style: null,
+    itemdata: null,
+    disabled: false }
+);
+var menubar_runnumbers_home = menubar_data.length;
+menubar_data.push ( {
+    id: null,
+    href: 'javascript:run_numbers()',
+    title: 'Run Numbers',
+    title_style: null,
+    itemdata: null,
+    disabled: false }
+);
+var menubar_group_help = menubar_data.length;
+menubar_data.push ( {
+    id:    'help',
+    href:  '#help',
+    title: 'Help',
+    title_style: null,
+    itemdata: [
+        { text: "Contents",              url: "#", disabled: true },
+        { text: "With the current page", url: "#", disabled: true },
+        { text: "About the application", url: "#", disabled: true } ],
+    disabled: false }
+);
+
+YAHOO.util.Event.onContentReady (
+    menubar_element,
+    function () {
+        menubar_create (
+            menubar_element,
+            menubar_data );
+    }
+);
+
+
+/*
 
 YAHOO.util.Event.onContentReady("menubar", function () {
 
@@ -287,16 +383,41 @@ YAHOO.util.Event.onContentReady("menubar", function () {
     oMenuBar.subscribe("show", onSubmenuShow);
     oMenuBar.render();
 });
+*/
 
 </script>
 
 <?php
 
-/* Initial action dispatcher's generator
- */
 echo <<<HERE
-<script type="text/javascript">
+    <script type="text/javascript">
+
+HERE;
+
+
+echo <<<HERE
+
+/* Authentication and authorization context
+ */
+var auth_type="{$_SERVER['AUTH_TYPE']}";
+var auth_remote_user="{$_SERVER['REMOTE_USER']}";
+
+var auth_webauth_user="{$_SERVER['WEBAUTH_USER']}";
+var auth_webauth_token_creation="{$_SERVER['WEBAUTH_TOKEN_CREATION']}";
+var auth_webauth_token_expiration="{$_SERVER['WEBAUTH_TOKEN_EXPIRATION']}";
+
+function refresh_page() {
+    window.location = "{$_SERVER['REQUEST_URI']}";
+}
+
+HERE;
+
+// Initial action dispatcher's generator
+//
+echo <<<HERE
+
 function init() {
+
 HERE;
 if( isset( $_GET['action'] )) {
     $action = trim( $_GET['action'] );
@@ -334,99 +455,66 @@ if( isset( $_GET['action'] )) {
         echo "  alert( 'unsupported action: {$action}' );";
     }
 } else {
-    echo <<<HERE
-  //set_context( 'Home >' );
-  //set_context( '' );
-  load( 'Welcome.php', 'workarea' );
-HERE;
+    echo "  load( 'Welcome.php', 'workarea' );";
 }
 echo <<<HERE
+
+  auth_timer_restart();
+
 }
 </script>
+
 HERE;
 ?>
 
 <script type="text/javascript">
 
-function post_message( id, title, text ) {
 
-    document.getElementById( id ).innerHTML =
-        '<div class="hd">'+title+'</div>'+
-        '<div class="bd">'+
-        '  <center><p>'+text+'</p></center>'+
-        '</div>';
-
-    var handleOk = function() { this.submit(); };
-
-    var dialog1 =
-        new YAHOO.widget.Dialog (
-            id,
-			{   width : "480px",
-                fixedcenter : true,
-				visible : true,
-                modal:true,
-				constraintoviewport : true,
-				buttons : [
-                    { text:"Ok", handler: handleOk, isDefault:true }
-                ]
-			}
-        );
-    dialog1.render();
+/*
+ * Session expiration timer for WebAuth authentication.
+ */
+var auth_timer = null;
+function auth_timer_restart() {
+    if( auth_type == 'WebAuth' )
+        auth_timer = window.setTimeout( 'auth_timer_event()', 1000 );
 }
+var auth_last_secs = null;
+function auth_timer_event() {
 
-function post_warning( text ) {
-    post_message (
-        'popupdialogs',
-        '<span style="color:red; font-size:16px;">Warning</span>',
-        text );
+    var auth_expiration_info = document.getElementById( "auth_expiration_info" );
+    var now = mktime();
+    var seconds = auth_webauth_token_expiration - now;
+    if( seconds <= 0 ) {
+        auth_expiration_info.innerHTML=
+            '<b><em style="color:red;">expired</em></b>';
+        ask_action_confirmation(
+            'popupdialogs',
+            '<span style="color:red; font-size:16px;">Session Expiration Warning</span>',
+            '<p style="text-align:left;">Your WebAuth session has expired. '+
+            'Press <b>Ok</b> or use <b>Refresh</b> button of the browser to renew your credentials.</p>',
+            refresh_page );
+        return;
+    }
+    var hours_left   = Math.floor(seconds / 3600);
+    var minutes_left = Math.floor((seconds % 3600) / 60);
+    var seconds_left = Math.floor((seconds % 3600) % 60);
+
+    var hours_left_str = hours_left;
+    if( hours_left < 10 ) hours_left_str = '0'+hours_left_str;
+    var minutes_left_str = minutes_left;
+    if( minutes_left < 10 ) minutes_left_str = '0'+minutes_left_str;
+    var seconds_left_str = seconds_left;
+    if( seconds_left < 10 ) seconds_left_str = '0'+seconds_left_str;
+
+    auth_expiration_info.innerHTML=
+        '<b>'+hours_left_str+':'+minutes_left_str+'.'+seconds_left_str+'</b>';
+
+    auth_timer_restart();
 }
-
-
-function ask_yesno( title, text, onYes, onNo ) {
-
-    var id = 'popupdialogs';
-
-    document.getElementById( id ).innerHTML =
-        '<div class="hd">'+title+'</div>'+
-        '<div class="bd">'+
-        '  <center><p>'+text+'</p></center>'+
-        '</div>';
-
-    var handleYes = function() {
-        this.submit();
-        onYes();
-    };
-    var handleNo = function() {
-        this.cancel();
-        onNo();
-    };
-    var dialog1 = new YAHOO.widget.Dialog (
-        id,
-        {   width : "480px",
-            fixedcenter : true,
-            visible : true,
-            modal:true,
-            constraintoviewport : true,
-            buttons : [
-                { text:"Yes", handler: handleYes },
-                { text:"No",  handler: handleNo, isDefault:true }
-            ]
-        }
-    );
-    dialog1.render();
-}
-
-function ask_yesno_confirmation( text, onYes, onNo ) {
-    ask_yesno (
-        '<span style="color:red; font-size:16px;">Confirmation Request</span>',
-        text,
-        onYes, onNo
-    );
-}
-
 
 function leave_current_app() {
     post_warning (
+        'popupdialogs',
         "You're about to leave the current application. "+
         "All currently open connections will be closed, and "+
         "all unsaved data will be lost! Click <b>Yes</b> if you sure "+
@@ -968,6 +1056,7 @@ function delete_experiment( id, name ) {
         "save_button",
         function() {
             ask_yesno_confirmation (
+                'popupdialogs',
                 'Proceed with the operation and permanently delete this experiment '+
                 'and all relevant data from the database? Enter <b>Yes</b> to do so. '+
                 'Note, this is the last chance to abort destructive modifications '+
@@ -982,6 +1071,7 @@ function delete_experiment( id, name ) {
         function() { view_experiment( id, name ); }
     );
     post_warning (
+        'popupdialogs',
         'You are entering a dialog for deleting the selected experiment. '+
         'Please, be advised that the deletion is an irreversable operation resulting '+
         'in a permanent loss of data and potentially in a lost of referential integrity '+
@@ -1192,6 +1282,7 @@ function delete_instrument( id, name ) {
         "save_button",
         function() {
             ask_yesno_confirmation (
+                'popupdialogs',
                 'Proceed with the operation and permanently delete this instrument '+
                 'and all relevant data from the database? Enter <b>Yes</b> to do so. '+
                 'Note, this is the last chance to abort destructive modifications '+
@@ -1206,6 +1297,7 @@ function delete_instrument( id, name ) {
         function() { view_instrument( id, name ); }
     );
     post_warning (
+        'popupdialogs',
         'You are entering a dialog for deleting the selected instrument. '+
         'Please, be advised that the deletion is an irreversable operation resulting '+
         'in a permanent loss of data and potentially in a lost of referential integrity '+
@@ -1326,42 +1418,33 @@ function view_run_numbers( id, name ) {
 </head>
 <body class="yui-skin-sam" id="body" onload="init()">
     <div id="application_header">
-        <p id="application_title">
-        <el>Experiment Registry Database</el>
-        <br>
-        <el id="current_experiment" style="font-size:32px;">LCLS Detector Control</el></p>
-        <p style="text-align:right;">Logged as: <b><?php echo $_SERVER['REMOTE_USER']?></b><p>
-    </div>
-    <div id="menubar" class="yuimenubar yuimenubarnav">
-        <div class="bd">
-            <ul class="first-of-type">
-                <li class="yuimenubaritem first-of-type">
-                    <a class="yuimenubaritemlabel" href="#applications" style="font-weight:bold;">Applications</a>
-                </li>
-                <li class="yuimenubaritem">
-                    <a class="yuimenubaritemlabel" href="index.php">Home</a>
-                </li>
-                <li class="yuimenubaritem">
-                    <a class="yuimenubaritemlabel" href="#experiments">Experiments</a>
-                </li>
-                <li class="yuimenubaritem">
-                    <a class="yuimenubaritemlabel" href="#instruments">Instruments</a>
-                </li>
-                <li class="yuimenubaritem">
-                    <a class="yuimenubaritemlabel" href="javascript:list_groups()">POSIX Groups</a>
-                </li>
-                <li class="yuimenubaritem">
-                    <a class="yuimenubaritemlabel" href="javascript:run_numbers()">Run Numbers</a>
-                </li>
-                <li class="yuimenubaritem">
-                    <a class="yuimenubaritemlabel" href="#">Help</a>
-                </li>
-            </ul>
+      <div>
+        <div style="float:left;">
+          <p id="application_title" style="text-align:left;">
+            <em>Experiment Registry Database: </em>
+            <em id="application_subtitle">LCLS Detector Control</em>
+          </p>
         </div>
+        <div style="float:right; height:50px;">
+            <tr>
+              <td>&nbsp;</td>
+              <td></td>
+            </tr>
+          <table><tbody>
+            <tr>
+              <td>Logged as:&nbsp;</td>
+              <td><p><b><?php echo $_SERVER['REMOTE_USER']?></b></p></td>
+            </tr>
+            <tr>
+              <td>Session expires in:&nbsp;</td>
+              <td><p id="auth_expiration_info"><b>00:00.00</b></p></td>
+            </tr>
+          </tbody></table>
+        </div>
+        <div style="height:40px;">&nbsp;</div>
+      </div>
     </div>
-    <!--
-    <p id="context">Home > </p>
-    -->
+    <div id="menubar" class="yuimenubar yuimenubarnav"></div>
     <p id="context"></p>
     <br>
     <div id="workarea"></div>

@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2009-08-18 Igor Gaponenko
+- refactored menus in the RegDB Web app to get the same look and feel as
+for other web apps
+- temporarily relaxed the new experiment registration method due to
+a bug in the LDAP client code (PHP).
+
 Tag: V00-00-08
 2009-08-13 Igor Gaponenko
 - important correctons in PHP code dealing with LDAP
