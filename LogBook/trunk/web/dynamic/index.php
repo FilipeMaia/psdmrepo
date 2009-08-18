@@ -5,7 +5,7 @@ and open the template in the editor.
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-    <title>Experiment Registry Database</title>
+    <title>Electronic LogBook of Experiment: </title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
     <!--
@@ -289,10 +289,10 @@ if( isset( $_GET['action'] )) {
     }
 } else {
     echo "  load( 'help/Welcome.html', 'workarea' );";
-    echo "  auth_timer_restart();";
 }
 echo <<<HERE
 
+  auth_timer_restart();
 }
 
     </script>
@@ -334,8 +334,15 @@ function auth_timer_event() {
     var minutes_left = Math.floor((seconds % 3600) / 60);
     var seconds_left = Math.floor((seconds % 3600) % 60);
 
+    var hours_left_str = hours_left;
+    if( hours_left < 10 ) hours_left_str = '0'+hours_left_str;
+    var minutes_left_str = minutes_left;
+    if( minutes_left < 10 ) minutes_left_str = '0'+minutes_left_str;
+    var seconds_left_str = seconds_left;
+    if( seconds_left < 10 ) seconds_left_str = '0'+seconds_left_str;
+
     auth_expiration_info.innerHTML=
-        '<b>'+hours_left+'</b> hours, <b>'+minutes_left+'</b> minutes, <b>'+seconds_left+'</b> seconds';
+        '<b>'+hours_left_str+':'+minutes_left_str+'.'+seconds_left_str+'</b>';
 
     auth_timer_restart();
 }
@@ -379,6 +386,7 @@ function set_current_selection( instr_id, instr_name, exper_id, exper_name ) {
             id: null
         }
     };
+    document.title = 'Electronic LogBook of Experiment: '+instr_name+' / '+exper_name;
     document.getElementById( "application_subtitle" ).innerHTML =
         instr_name+' / '+exper_name;
 
@@ -2603,7 +2611,7 @@ function search_contents() {
             </tr>
             <tr>
               <td>Session expires in:&nbsp;</td>
-              <td><p id="auth_expiration_info"><b>??</b> hours, <b>??</b> minutes, <b>??</b> seconds</p></td>
+              <td><p id="auth_expiration_info"><b>00:00.00</b></p></td>
             </tr>
           </tbody></table>
         </div>

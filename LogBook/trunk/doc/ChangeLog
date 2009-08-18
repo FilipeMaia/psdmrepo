@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-14
+2009-08-18 Igor Gaponenko
+- minor bug fixes in the LogBook app
+- require the Web service URI in the LogBook "grabber" script
+
 Tag: V00-00-13
 2009-08-11 Igor Gaponenko
 - implemented posting replies to messages. Not complete implementation though.

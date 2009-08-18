@@ -389,7 +389,7 @@ class LogBookGrabberUI:
         exper_name = self.experiment.get( sel[0])
         exper_id = logbook_experiments[exper_name]['id']
 
-        url = ws_url+'LogBook/NewFFEntry.php'
+        url = ws_url+'/LogBook/NewFFEntry.php'
         data = (
             ('author_account', logbook_author),
             ('id', exper_id),
@@ -463,7 +463,7 @@ def ws_configure_auth():
 
 def ws_get_experiments (experiment=None):
 
-    url = ws_url+'LogBook/RequestExperiments.php?instr='+logbook_instrument
+    url = ws_url+'/LogBook/RequestExperiments.php?instr='+logbook_instrument
     try:
         req = urllib2.Request(url)
         response = urllib2.urlopen(req)
@@ -606,6 +606,7 @@ OPTIONS & PARAMETERS:
     # --------------------
 
     root = Tk()
+    root.title("LogBookGrabberUI")
     d = LogBookGrabberUI( root )
     root.mainloop()
 

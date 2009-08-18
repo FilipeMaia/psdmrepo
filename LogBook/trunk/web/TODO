@@ -1,3 +1,23 @@
+____
+BUGS
+Grabber
+- put a title to the grabber (root.title())
+- order group names alphabetically when selecting POSIX Group in the Experiment Registration Dialog
+- add user group search (LDAP) in the experiment registry based on user name or his account name. This is to simplify a selection of
+the group.
+- improve the PHP LDAP API at RegDB to recognize secondary groups as well.
+
+_________
+NEW IDEAS
+
+    1. begin working on implementing subthreads in the message list:
+
+    2. implement a persistent address for the individual messages (successAction or
+    actionSuccess). That would allow expanding message trees
+
+    3. implement a viewer for an individual message tree in a separate page (like
+    Experiment status, etc.).
+
 _________________________________________________
 HIGH PRIORITY: Consider extending database schema
 
