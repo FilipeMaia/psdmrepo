@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-15
+2009-08-20 Igor Gaponenko
+- minor fixes and improvements. This is the first production version deploed.
+
 Tag: V00-00-14
 2009-08-18 Igor Gaponenko
 - minor bug fixes in the LogBook app

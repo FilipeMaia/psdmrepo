@@ -408,8 +408,8 @@ menubar_data.push ( {
     title: 'Applications',
     title_style: 'font-weight:bold;',
     itemdata: [
-        { text: "Experiment Registry Database", url: "../../RegDB/dynamic/" },
-        { text: "Electronic Log Book", url: "../../LogBook/dynamic/" } ],
+        { text: "Experiment Registry Database", url: "../regdb/" },
+        { text: "Electronic Log Book", url: "../logbook/" } ],
     disabled: false }
 );
 var menubar_group_home = menubar_data.length;
@@ -844,7 +844,7 @@ function create_messages_dialog( scope ) {
         close_messages_dialog
     );
 
-    this.tags = [];
+    this.tags = [ { 'delete': false, 'tag': '', 'value' : ''}  ];
     this.tags_table = null;
 
     this.oPushButtonAddTag = null;
@@ -881,6 +881,14 @@ function create_messages_dialog( scope ) {
     }
 
     this.files = [];
+    var file2attach_sequence=1;
+    var id = 'file2attach_'+file2attach_sequence;
+    this.files.push({
+        'delete': false,
+        'file': '<input type="file" name="'+id+'" id="'+id+'" />',
+        'description': '',
+        'id': id
+    });
     this.files_table = null;
 
     this.oPushButtonAddFile = null;
@@ -913,10 +921,9 @@ function create_messages_dialog( scope ) {
         }
         document.getElementById('file_descriptions').innerHTML=descriptions;
     }
-    var file2attach_sequence=0;
     function AddAndRefreshFilesTable() {
         file2attach_sequence++;
-        id = 'file2attach_'+file2attach_sequence;
+        var id = 'file2attach_'+file2attach_sequence;
         this.files_table.dataTable.addRow (
             { file: '<input type="file" name="'+id+'" id="'+id+'" />', description: "", id: id }, 0 );
     }
@@ -949,7 +956,7 @@ function create_messages_dialog( scope ) {
                 '            <div id="tags_table_body"></div>'+
                 '          </div>'+
                 '          <div style="margin-top:8px;" align="right" >'+
-                '            <button id="add_tag_button">Expand</button>'+
+                '            <button id="add_tag_button">Add</button>'+
                 '            <button id="remove_tag_button">Update</button>'+
                 '          </div>'+
                 '        </div>'+
@@ -963,7 +970,7 @@ function create_messages_dialog( scope ) {
                 '            <div id="files_table_body"></div>'+
                 '          </div>'+
                 '          <div style="margin-top:8px;" align="right" >'+
-                '            <button id="add_file_button">Expand</button>'+
+                '            <button id="add_file_button">Add</button>'+
                 '            <button id="remove_file_button">Update</button>'+
                 '          </div>'+
                 '        </div>'+
@@ -1011,7 +1018,7 @@ function create_messages_dialog( scope ) {
                   { key: "description", sortable: true, resizeable: false,
                     editor: new YAHOO.widget.TextareaCellEditor({disableBtns:true})},
                   { key: "id", sortable: false, hidden:true }],
-                this.tags,
+                this.files,
                 null
             );
 
@@ -1023,8 +1030,6 @@ function create_messages_dialog( scope ) {
             this.tags_table = null;
         }
         this.extendedShown = !this.extendedShown;
-        this.tags = [];
-        this.files = [];
     }
     this.message_extend_button.on (
         "click",
@@ -1118,7 +1123,7 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
         '  </tbody></table>'+
         '</form>';
 
-    this.extendedShown = false;
+    var extendedShown = false;
 
     this.message_reply_extend_button = new YAHOO.widget.Button( "message_reply_extend_button" );
     this.message_reply_submit_button = new YAHOO.widget.Button( "message_reply_submit_button" );
@@ -1130,7 +1135,8 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
         //close_messages_dialog
     );
 
-    this.tags = [{ tag: 'PARENT_MESSAGE_ID' , value: message_id }];
+    this.tags = [
+        { 'delete': false, 'tag': 'PARENT_MESSAGE_ID' , 'value': message_id } ];
     var tags_table = null;
 
     this.oPushButtonAddTag = null;
@@ -1166,9 +1172,15 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
             { tag: "", value: "" }, 0 );
     }
 
-    //this.files = [];
     var files = [];
-    //this.files_table = null;
+    var file2attach_sequence=1;
+    var id = 'file2attach_'+file2attach_sequence;
+    files.push({
+        'delete': false,
+        'file': '<input type="file" name="'+id+'" id="'+id+'" />',
+        'description': '',
+        'id': id
+    });
     var files_table = null;
 
     this.oPushButtonAddFile = null;
@@ -1220,7 +1232,7 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
 
     function onExtendedClick() {
         var message_reply_body = document.getElementById('message_reply_body');
-        if( !this.extendedShown ) {
+        if( !extendedShown ) {
             document.getElementById('message_reply_body').innerHTML=
                 '<textarea id="message_reply_text" type="text" name="message_text"'+
                 ' rows="12" cols="71" style="padding:1px;"'+
@@ -1246,7 +1258,7 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
                 '            <div id="message_reply_tags_table_body"></div>'+
                 '          </div>'+
                 '          <div style="margin-top:8px;" align="right" >'+
-                '            <button id="message_reply_add_tag_button">Expand</button>'+
+                '            <button id="message_reply_add_tag_button">Add</button>'+
                 '            <button id="message_reply_remove_tag_button">Update</button>'+
                 '          </div>'+
                 '        </div>'+
@@ -1260,7 +1272,7 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
                 '            <div id="message_reply_files_table_body"></div>'+
                 '          </div>'+
                 '          <div style="margin-top:8px;" align="right" >'+
-                '            <button id="message_reply_add_file_button">Expand</button>'+
+                '            <button id="message_reply_add_file_button">Add</button>'+
                 '            <button id="message_reply_remove_file_button">Update</button>'+
                 '          </div>'+
                 '        </div>'+
@@ -1320,10 +1332,7 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
             message_reply_body.style.paddingBottom="4px";
             tags_table = null;
         }
-        this.extendedShown = !this.extendedShown;
-        this.tags = [];
-        //this.files = [];
-        files = [];
+        extendedShown = !extendedShown;
     }
     this.message_reply_extend_button.on (
         "click",
