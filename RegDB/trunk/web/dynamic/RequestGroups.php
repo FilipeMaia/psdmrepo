@@ -2,13 +2,10 @@
 
 require_once('RegDB/RegDB.inc.php');
 
-function group2json( $group, $num_members ) {
+function group2json( $group ) {
     $group_url = "<a href=\"javascript:view_group('".$group."')\">".$group.'</a>';
     return json_encode(
-        array (
-            "group"   => $group_url,
-            "members" => $num_members
-        )
+        array ( "group" => $group_url )
     );
 }
 
@@ -32,12 +29,11 @@ try {
 HERE;
     $first = true;
     foreach( $groups as $g ) {
-        $members = $regdb->posix_group_members( $g );
         if( $first ) {
             $first = false;
-            echo "\n".group2json( $g, count( $members ));
+            echo "\n".group2json( $g );
         } else {
-            echo ",\n".group2json( $g, count( $members ));
+            echo ",\n".group2json( $g );
         }
     }
     print <<< HERE

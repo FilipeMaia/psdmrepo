@@ -325,7 +325,7 @@ class RegDB {
      *   GROUPS AND USERS
      * ====================
      */
-    public function posix_groups ( ) {
+    public function posix_groups () {
         return $this->connection->posix_groups(); }
 
     public function is_known_posix_group ( $name ) {
@@ -336,6 +336,10 @@ class RegDB {
 
     public function posix_group_members ( $name ) {
         return $this->connection->posix_group_members( $name ); }
+
+    public function user_accounts () {
+        return $this->connection->user_accounts(); }
+
 }
 
 /* =======================

@@ -115,19 +115,11 @@ class RegDBConnection {
         $this->connect();
 
         $list = array();
+        $groups = $this->groups();
+        foreach( array_keys( $groups ) as $gid )
+            array_push( $list, $groups[$gid]['name'] );
 
-        $sr = ldap_search( $this->ldap_ds, "ou=Group,dc=reg,o=slac", "cn=*" );
-        if( !$sr )
-            throw new RegDBException (
-                __METHOD__,
-               "LDAP error: ".ldap_error( $this->ldap_ds ));
-
-        $info = ldap_get_entries( $this->ldap_ds, $sr );
-
-        $num_groups = $info["count"];
-        for( $i = 0; $i < $num_groups; $i++ )
-            array_push( $list, $info[$i]["cn"][0] );
-
+        sort( $list );
         return $list;
     }
 
@@ -179,7 +171,6 @@ class RegDBConnection {
             throw new RegDBException (
                 __METHOD__,
                "group name can't be empty" );
-
         $sr = ldap_search( $this->ldap_ds, "ou=Group,dc=reg,o=slac", "cn=$trim_name" );
         if( !$sr )
             throw new RegDBException (
@@ -199,6 +190,9 @@ class RegDBConnection {
                "inconsistent result set returned from LDAP server" );
 
         $result = array();
+
+        // Search members of this secondary group
+        //
         for( $i = 0; $i < $info[0]["memberuid"]["count"]; $i++ ) {
             $uid = $info[0]["memberuid"][$i];
             $full_name = "";
@@ -209,9 +203,142 @@ class RegDBConnection {
                 array(
                     "uid" => $uid,
                     "gecos" => $full_name,
-                    "email" => $uid.'@slac.stanford.edu' ));
+                    "email" => $uid.'@slac.stanford.edu' )
+            );
         }
+
+        // Now search user records to see who may claim this group as
+        // its primary group.
+        //
+        $gid = $info[0]["gidnumber"][0];
+        $primary = $this->primary_posix_group_members( $gid );
+        foreach( $primary as $p ) {
+            array_push(
+                $result,
+                array(
+                    "uid"   => $p['uid'],
+                    "gecos" => $p['gecos'],
+                    "email" => $p['email'] )
+            );
+        }
+        sort( $result );
         return $result;
+    }
+
+    public function user_accounts () {
+
+        $this->connect();
+
+        $groups = $this->groups();
+        $user2groups = $this->user2groups( $groups );
+
+        $sr = ldap_search( $this->ldap_ds, "ou=People,dc=reg,o=slac", "uid=*" );
+        if( !$sr )
+            throw new RegDBException (
+                __METHOD__,
+               "LDAP error: ".ldap_error( $this->ldap_ds ));
+
+        $list = array();
+        $info = ldap_get_entries( $this->ldap_ds, $sr );
+        $num_accounts = $info["count"];
+        for( $i = 0; $i < $num_accounts; $i++ ) {
+            $uid = $info[$i]["uid"][0];
+            $gid_primary = $info[$i]["gidnumber"][0];
+            $user_groups = array();
+            if( array_key_exists( $uid, $user2groups ))
+                $user_groups = $user2groups[$uid];
+            array_push( $user_groups, $groups[$gid_primary]['name'] );
+            array_push(
+                $list,
+                array(
+                    'uid'   => $uid,
+                    'gecos'  => $info[$i]["gecos"][0],
+                    'email' => $uid.'@slac.stanford.edu',
+                    'groups' => $user_groups
+                )
+            );
+        }
+        return $list;
+    }
+
+    public function primary_posix_group_members ( $gid ) {
+
+        $this->connect();
+
+        $groups = $this->groups();
+        $user2groups = $this->user2groups( $groups );
+
+        $sr = ldap_search( $this->ldap_ds, "ou=People,dc=reg,o=slac", "(&(uid=*)(gidnumber=".$gid."))" );
+        if( !$sr )
+            throw new RegDBException (
+                __METHOD__,
+               "LDAP error: ".ldap_error( $this->ldap_ds ));
+
+        $list = array();
+        $info = ldap_get_entries( $this->ldap_ds, $sr );
+        $num_accounts = $info["count"];
+        for( $i = 0; $i < $num_accounts; $i++ ) {
+            $uid = $info[$i]["uid"][0];
+            $gid_primary = $info[$i]["gidnumber"][0];
+            $user_groups = array();
+            if( array_key_exists( $uid, $user2groups ))
+                $user_groups = $user2groups[$uid];
+            array_push( $user_groups, $groups[$gid_primary]['name'] );
+            array_push(
+                $list,
+                array(
+                    'uid'   => $uid,
+                    'gecos'  => $info[$i]["gecos"][0],
+                    'email' => $uid.'@slac.stanford.edu',
+                    'groups' => $user_groups
+                )
+            );
+        }
+        return $list;
+    }
+
+    private function user2groups( $groups ) {
+        $list = array();
+        foreach( array_keys($groups) as $gid ) {
+            $name = $groups[$gid]['name'];
+            foreach( $groups[$gid]['members'] as $uid ) {
+                $user_groups = array_key_exists( $uid, $list ) ? $list[$uid] : array();
+                array_push( $user_groups, $name );
+                $list[$uid] = $user_groups;
+            }
+        }
+        return $list;
+    }
+    private function groups ( $gid2name=true ) {
+        $this->connect();
+
+        $sr = ldap_search( $this->ldap_ds, "ou=Group,dc=reg,o=slac", "cn=*" );
+        if( !$sr )
+            throw new RegDBException (
+                __METHOD__,
+               "LDAP error: ".ldap_error( $this->ldap_ds ));
+
+        $list = array();
+        $info = ldap_get_entries( $this->ldap_ds, $sr );
+        $num_groups = $info["count"];
+        for( $i = 0; $i < $num_groups; $i++ ) {
+            $members = array();
+            $num_members = $info[$i]["memberuid"]["count"];
+            for( $j = 0; $j < $num_members; $j++ )
+                array_push( $members, $info[$i]["memberuid"][$j] );
+
+            if( $gid2name )
+                $list[$info[$i]["gidnumber"][0]] = array(
+                    'name' => $info[$i]["cn"][0],
+                    'members' => $members
+                );
+            else
+                $list[$info[$i]["cn"][0]] = array(
+                    'gid' => $info[$i]["gidnumber"][0],
+                    'members' => $members
+                );
+        }
+        return $list;
     }
 
     /**
@@ -285,6 +412,27 @@ $conn = new RegDBConnection (
     REGDB_DEFAULT_LDAP_HOST );
 
 try {
+    $list = $conn->posix_group_members( "ec" );
+    print_r( $list );
+    $groups = $conn->groups();
+    print( "<br>Total of ".count($groups)." groups found" );
+    $gids = array_keys( $groups );
+    sort( $gids, SORT_NUMERIC );
+    foreach( $gids as $gid ) {
+        print( '<br>'.$gid." : ".$groups[$gid]['name'] );
+        print( ', members: ' );
+        foreach( $groups[$gid]['members'] as $m )
+            print( $m." " );
+    }
+    echo "<br><hr>";
+    $accounts = $conn->user_accounts();
+    sort( $accounts );
+    print( "<br>Total of ".count($accounts)." user account found" );
+    foreach( $accounts as $account ) {
+        echo "<br><hr>";
+        print_r( $account );
+    }
+
     $groups = $conn->posix_groups();
     foreach( $groups as $group ) {
         $members = $conn->posix_group_members( $group );
@@ -302,6 +450,7 @@ try {
         else
             echo "<br>Group <b>$group</b> is NOT known";
     }
+
  } catch ( RegDBException $e ) {
     print( e.toHtml());
 }

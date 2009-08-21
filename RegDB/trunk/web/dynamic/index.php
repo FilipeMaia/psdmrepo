@@ -68,8 +68,9 @@ Page-specific styles
         text-align:left;
     }
     #workarea {
+        overflow:auto;
         margin-left:40px;
-        margin-right:40px;
+        /*margin-right:40px;*/
     }
     #experiment_info,
     #instrument_info,
@@ -156,8 +157,8 @@ menubar_data.push ( {
     title: 'Applications',
     title_style: 'font-weight:bold;',
     itemdata: [
-        { text: "Experiment Registry Database", url: "../../RegDB/dynamic/" },
-        { text: "Electronic Log Book", url: "../../LogBook/dynamic/" } ],
+        { text: "Experiment Registry Database", url: "../regdb/" },
+        { text: "Electronic Log Book", url: "../logbook/" } ],
     disabled: false }
 );
 var menubar_group_home = menubar_data.length;
@@ -193,11 +194,13 @@ menubar_data.push ( {
 );
 var menubar_groups_home = menubar_data.length;
 menubar_data.push ( {
-    id: null,
-    href: 'javascript:list_groups()',
-    title: 'POSIX Groups',
-    title_style: null,
-    itemdata: null,
+    id: "ldap",
+    href: "#ldap",
+    title: 'LDAP',
+    title_style: 'font-weight:bold;',
+    itemdata: [
+        { text: "PODIX Groups..", url: "javascript:list_groups()" },
+        { text: "User accounts..", url: "javascript:list_users()" } ],
     disabled: false }
 );
 var menubar_runnumbers_home = menubar_data.length;
@@ -447,6 +450,8 @@ if( isset( $_GET['action'] )) {
         echo "  create_instrument();";
     } else if( $action == 'list_groups' ) {
         echo "  list_groups();";
+    } else if( $action == 'list_users' ) {
+        echo "  list_users();";
     } else if( $action == 'view_run_numbers' ) {
         $id   = $_GET['id'];
         $name = $_GET['name'];
@@ -1308,7 +1313,6 @@ function delete_instrument( id, name ) {
 function list_groups() {
 
     set_context(
-        //'Home > '+
         'Select POSIX Group >' );
 
     document.getElementById('workarea').innerHTML=
@@ -1319,8 +1323,7 @@ function list_groups() {
 
     var table = new Table (
         "workarea",
-        [ { key: "group",   sortable: true, resizeable: true },
-          { key: "members", sortable: true, resizeable: true } ],
+        [ { key: "group",   sortable: true, resizeable: true } ],
         'RequestGroups.php',
         true
     );
@@ -1346,6 +1349,30 @@ function view_group( name ) {
           { key: "name",  sortable: true, resizeable: true },
           { key: "email", sortable: true, resizeable: true } ],
         'RequestGroupMembers.php?name='+name,
+        true
+    );
+    table.refreshTable();
+}
+
+
+function list_users() {
+
+    set_context(
+        'Select User Account >' );
+
+    document.getElementById('workarea').innerHTML=
+        '<div id="workarea_table_container">'+
+        '  <div id="workarea_table_paginator"></div>'+
+        '  <div id="workarea_table_body"></div>'+
+        '</div>';
+
+    var table = new Table (
+        "workarea",
+        [ { key: "uid",    sortable: true,  resizeable: true },
+          { key: "name",   sortable: true,  resizeable: true },
+          { key: "email",  sortable: true,  resizeable: true },
+          { key: "groups", sortable: false, resizeable: true } ],
+        'RequestUserAccounts.php',
         true
     );
     table.refreshTable();
@@ -1447,14 +1474,24 @@ function view_run_numbers( id, name ) {
     <div id="menubar" class="yuimenubar yuimenubarnav"></div>
     <p id="context"></p>
     <br>
+    <div id="nav-and-work-areas" align="left">
+      <table>
+        <tbody>
+          <tr>
+            <td valign="top">
+              <div id="navarea"></div>
+            </td>
+            <td valign="top">
+              <div id="workarea"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="popupdialogs"></div>
+<!--
     <div id="workarea"></div>
     <div id="popupdialogs"></div>
-    <!--
-    <br>
-    <br>
-    <div id="application_footer">
-        <center>2009 <a href="http://www.slac.stanford.edu">SLAC National Accelerator Laboratory</a></center>
-    </div>
-    -->
+-->
 </body>
 </html>
