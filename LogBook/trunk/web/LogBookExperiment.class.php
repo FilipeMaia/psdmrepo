@@ -752,6 +752,11 @@ HERE;
             ' WHERE h.id = e.hdr_id AND e.id = (SELECT LAST_INSERT_ID()))' );
     }
 
+    public function delete_top_level_entry( $id ) {
+        $this->connection->query (
+            "DELETE FROM header WHERE id=(SELECT hdr_id FROM entry WHERE id={$id})" );
+    }
+
     /* ====================
      *   OTHER OPERATIONS
      * ====================

@@ -2,17 +2,40 @@ _________________________________________
 EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
 
 + run Welcome.html through the spell check (typos make people crazy!)
+
 + have at least one entry ready in the attachments dialog when posting new messages or replies.
   Then allow people to add more (replace "Expand" with something else like "Add"). Do the same for tags.
+
 + shorten the path to: https://pswww/apps/logbook. Do thit before making the server
   open to the internet and advertizing its expernal URL.
+
 + serve LogBook as all lower-case logbook. Follow the same approach for other apps and services
+
+- implement editing LogBook entries: edit the message text, renaming the atatchments, adding
+  more attachments to existing messages, and (perhaps) deleting atatchments, messages and
+  tags.
+
+  ATTENTION: This feature would require extending the database schema to keep a track
+  of the changes made to an attachment. The simplest way would be to add shadow
+  tables for hdr
+
 - Talk to Teresa on when we can get the server open.
-- provide a read-only version of the LogBook which wouldn't require any authentication. Serve these
+
+- provide a read-only version of the LogBook which wouldn't require any authentication.
+
+  ATTENTION: Make sure all PHP services are properly protected before deploying it.
+
 - set up WebAuth on the pswww
+
 - set up cron-tab on 'psdb' to make daily 'mysqldump' of all databases onto an NFS disk
+
 - revisit the server and applications security (SQL injection, error reports, etc.)
+
 - check with Len Moss on a possibility to urn 'amoopr' into an account with a password
+
+      +----------+     +---------+
+- add | << First | and | Last >> | buttons to the messages viewer
+      +----------+     +---------+
 
 ____
 BUGS

@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-16
+2009-08-22 Igor Gaponenko
+- reorganized message action controls
+- implemented message Delete and Edit dialogs
+
 Tag: V00-00-15
 2009-08-20 Igor Gaponenko
 - minor fixes and improvements. This is the first production version deploed.

@@ -243,6 +243,12 @@ var auth_webauth_user="{$_SERVER['WEBAUTH_USER']}";
 var auth_webauth_token_creation="{$_SERVER['WEBAUTH_TOKEN_CREATION']}";
 var auth_webauth_token_expiration="{$_SERVER['WEBAUTH_TOKEN_EXPIRATION']}";
 
+var auth_granted = {
+  manage_shifts     : auth_remote_user != '',
+  post_new_messages : auth_remote_user != '',
+  reply_to_messages : auth_remote_user != '',
+  see_other_apps    : auth_remote_user != '' };
+
 function refresh_page() {
     window.location = "{$_SERVER['REQUEST_URI']}";
 }
@@ -304,6 +310,16 @@ HERE;
     Page-specific script
     -->
     <script type="text/javascript">
+
+/*
+ * Browser information.
+ */
+var browser_name=navigator.appName;
+var browser_version=parseFloat(navigator.appVersion);
+
+function browser_is_MSIE() {
+    return browser_name == 'Microsoft Internet Explorer';
+}
 
 /*
  * Session expiration timer for WebAuth authentication.
@@ -408,7 +424,7 @@ menubar_data.push ( {
     title: 'Applications',
     title_style: 'font-weight:bold;',
     itemdata: [
-        { text: "Experiment Registry Database", url: "../regdb/" },
+        { text: "Experiment Registry Database", url: "../regdb/", disabled: !auth_granted.see_other_apps },
         { text: "Electronic Log Book", url: "../logbook/" } ],
     disabled: false }
 );
@@ -453,7 +469,7 @@ menubar_data.push ( {
     itemdata: [
         { text: "List all",     url: "javascript:list_shifts()" },
         { text: "Display last", url: "javascript:select_last_shift()" },
-        { text: "Begin new",    url: "javascript:begin_new_shift()" } ],
+        { text: "Begin new",    url: "javascript:begin_new_shift()", disabled: !auth_granted.manage_shifts } ],
     disabled: true }
 );
 var menubar_group_runs = menubar_data.length;
@@ -831,7 +847,7 @@ function create_messages_dialog( scope ) {
         begin, end,
         tag,
         author,
-        html_new_message,
+        auth_granted.post_new_messages ? html_new_message : '',
         auto_refresh );
 
     this.extendedShown = false;
@@ -867,12 +883,12 @@ function create_messages_dialog( scope ) {
         }
         // Also refresh the markup with inputs for tags
         //
-        var tags = ' <'+'input type="hidden" name="num_tags" value="'+this.tags.length+'" />';;
+        var tags_html = ' <'+'input type="hidden" name="num_tags" value="'+this.tags.length+'" />';;
         for( var i = 0; i < this.tags.length; i++ ) {
-            tags += ' <'+'input type="hidden" name="tag_name_'+i+'" value="'+this.tags[i].tag+'" />';
-            tags += ' <'+'input type="hidden" name="tag_value_'+i+'" value="'+this.tags[i].value+'" />';
+            tags_html += ' <'+'input type="hidden" name="tag_name_'+i+'" value="'+this.tags[i].tag+'" />';
+            tags_html += ' <'+'input type="hidden" name="tag_value_'+i+'" value="'+this.tags[i].value+'" />';
         }
-        document.getElementById('message_tags').innerHTML=tags;
+        document.getElementById('message_tags').innerHTML=tags_html;
     }
 
     function AddAndRefreshTagsTable() {
@@ -1064,7 +1080,11 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
      * TODO: This won't work for children. Refactor this to recognize
      * childrens' identity.
      */
-    message_expander( message_idx );
+    //message_expander( message_idx );
+
+    // Close the editor if any is open
+    //
+    if( last_eid != null ) last_eid.style.display = 'none';
 
     // Check if we can reuse the last element. We can only do ths if
     // it was associated with the same message. Otherwise we'll recreate
@@ -1135,8 +1155,7 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
         //close_messages_dialog
     );
 
-    this.tags = [
-        { 'delete': false, 'tag': 'PARENT_MESSAGE_ID' , 'value': message_id } ];
+    var tags = [ { 'delete': false, 'tag': 'PARENT_MESSAGE_ID' , 'value': message_id } ];
     var tags_table = null;
 
     this.oPushButtonAddTag = null;
@@ -1146,11 +1165,11 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
         if( tags_table == null ) return;
         var rs = tags_table.dataTable.getRecordSet();
         var rs_length = rs.getLength();
-        this.tags = [];
+        tags = [];
         for( var i = 0; i < rs_length; i++ ) {
             var r = rs.getRecord(i);
             if( !r.getData('delete')) {
-                this.tags.push ( {
+                tags.push ( {
                     tag: r.getData('tag'),
                     value: r.getData('value')});
             } else {
@@ -1159,12 +1178,12 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
         }
         // Also refresh the markup with inputs for tags
         //
-        var tags = ' <'+'input type="hidden" name="num_tags" value="'+this.tags.length+'" />';;
-        for( var i = 0; i < this.tags.length; i++ ) {
-            tags += ' <'+'input type="hidden" name="tag_name_'+i+'" value="'+this.tags[i].tag+'" />';
-            tags += ' <'+'input type="hidden" name="tag_value_'+i+'" value="'+this.tags[i].value+'" />';
+        var tags_html = ' <'+'input type="hidden" name="num_tags" value="'+tags.length+'" />';;
+        for( var i = 0; i < tags.length; i++ ) {
+            tags_html += ' <'+'input type="hidden" name="tag_name_'+i+'" value="'+tags[i].tag+'" />';
+            tags_html += ' <'+'input type="hidden" name="tag_value_'+i+'" value="'+tags[i].value+'" />';
         }
-        document.getElementById('message_tags').innerHTML=tags;
+        document.getElementById('message_tags').innerHTML=tags_html;
     }
 
     function AddAndRefreshTagsTable() {
@@ -1299,7 +1318,7 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
                     editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})},
                   { key: "value", sortable: true, resizeable: false,
                     editor: new YAHOO.widget.TextareaCellEditor({disableBtns:true})} ],
-                this.tags,
+                tags,
                 null
             );
 
@@ -1345,38 +1364,122 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
         synchronize_files_data();
         document.forms.message_reply_form.submit();
     }
-    this.message_reply_submit_button .on (
+    this.message_reply_submit_button.on (
         "click",
         function( p_oEvent ) {
             SubmitRequest();
         }
     );
-    return html;
 }
 
+/* This is a separate dialog for editing messages
+ */
+var last_eid = null;    // The last element used to display the message editing dialog
+                        // This element can be reused.
 
+function create_message_edit_dialog( eid, message_id, message_idx ) {
 
+    /* Make sure the message body is open
+     *
+     * TODO: This won't work for children. Refactor this to recognize
+     * childrens' identity.
+     */
+    //message_expander( message_idx );
 
+    // Close the reply dialog if any is open
+    //
+    if( last_rid != null ) last_rid.style.display = 'none';
 
+    // Check if we can reuse the last element. We can only do ths if
+    // it was associated with the same message. Otherwise we'll recreate
+    // the whole dialog from scratch at the specified location.
+    //
+    if( last_eid != null ) {
+        if( last_eid != eid ) {
+            last_eid.style.display = 'none';
+            last_eid.innerHTML='';
+        } else {
+            if( eid.style.display == 'none') eid.style.display = 'block';
+            else                             eid.style.display = 'none';
+            return;
+        }
+    }
+    last_eid = eid;
+    eid.style.display = 'block';
 
+    var re = last_search_result[message_idx];
 
+    eid.innerHTML =
+        '<form name="message_edit_form" action="UpdateFFEntry.php" method="post">'+
+        '  <input type="hidden" name="id" value="'+message_id+'" />'+
+        '  <input type="hidden" name="content_type" value="TEXT" />'+
+        '  <input type="hidden" name="actionSuccess" value="select_experiment" />'+
+        '  <div>'+
+        '    <em class="lb_label">Edited message:</em>'+
+        '  </div>'+
+        '  <table><tbody>'+
+        '    <tr>'+
+        '      <td valign="top">'+
+        '        <div id="message_edit_body" style="margin-right:10px; padding:4px;">'+
+        '          <textarea rows="12" cols="71" name="content" size="71" style="padding:1px;">'+re.content+'</textarea>'+
+        '        </div>'+
+        '      </td>'+
+        '      <td valign="top">'+
+        '        <div id="message_edit_dialog_container">'+
+        '          <button id="message_edit_submit_button">Submit</button>'+
+        '          <button id="message_edit_cancel_button">Cancel</button>'+
+        '        </div>'+
+        '      </td>'+
+        '    </tr>'+
+        '  </tbody></table>'+
+        '</form>';
 
+    var message_edit_submit_button = new YAHOO.widget.Button( "message_edit_submit_button" );
+    message_edit_submit_button.on (
+        "click",
+        function( p_oEvent ) { document.message_edit_form.submit(); }
+    );
+    var message_edit_cancel_button = new YAHOO.widget.Button( "message_edit_cancel_button" );
+    message_edit_cancel_button.on (
+        "click",
+        function() { eid.style.display = 'none'; }
+    );
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function create_message_delete_dialog( did, id ) {
+    /*
+     * TODO: Dialogs do not work consistently on different browsers if
+     * a dynamically allocated HTML element is used. Investigate the problem
+     * later!
+     *
+     * var dialog_id = browser_is_MSIE() ? "popupdialogs" : did.id;
+     */
+    var dialog_id = "popupdialogs";
+    var dialog_title = '<em style="color:red; font-weight:bold; font-size:18px;">Delete Selected Message?</em>';
+    var dialog_body =
+        '<div style="text-align:left;">'+
+        '  <form  name="delete_message_form" action="DeleteFFEntry.php" method="post">'+
+        '    <b>ATTENTION:</b> the selected message and all its children are about to be destroyed!'+
+        '    The information may be permanently lost as a result of the operation. Press <b>Yes</b>'+
+        '    to proceed, or press <b>No</b> to abort the operation.'+
+        '    <input type="hidden" name="id" value="'+id+'" />'+
+        '    <input type="hidden" name="actionSuccess" value="select_experiment" />'+
+        '  </form>'+
+        '</div>';
+    ask_yesno(
+        dialog_id,
+        dialog_title,
+        dialog_body,
+        function() { document.delete_message_form.submit(); },
+        function() {
+            /*
+             * NOTE: See 'TODO' above for an explanation why this is prohibited.
+             *
+             * did.innerHTML='';
+             */
+        }
+    );
+}
 
 function preview_atatchment( id ) {
 
@@ -1472,6 +1575,7 @@ function display_shift() {
 }
 
 function close_shift( shift_id ) {
+    if( !auth_granted.manage_shifts ) return;
     ask_complex_input(
         "popupdialogs",
         "Close Last Shift",
@@ -1488,6 +1592,7 @@ function close_shift( shift_id ) {
 }
 
 function begin_new_shift() {
+    if( !auth_granted.manage_shifts ) return;
     ask_complex_input(
         "popupdialogs",
         "Begin New Shift",
@@ -2083,6 +2188,7 @@ function event2html( message_idx ) {
     var hid = 'message_header_'+re.id;
     var bid = 'message_body_'+re.id;
     var rid = 'message_reply_dialog_'+re.id;
+    var eid = 'message_edit_dialog_'+re.id;
     re.mid = mid;
     re.hid = hid;
     re.bid = bid;
@@ -2163,14 +2269,19 @@ function event2html( message_idx ) {
         '      onmouseout="expander_unhighlight(this,document.bgColor)"'+
         '      title="Open/close the message body">'+
         '      <b>&gt;</b>'+
-        '    </span>'+
+        '    </span>';
+/*
+    if( auth_granted.reply_to_messages )
+        result +=
         '    <span style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
         '      onclick="create_message_reply_dialog('+rid+','+re.id+','+message_idx+')"'+
         '      onmouseover="expander_highlight(this)" '+
         '      onmouseout="expander_unhighlight(this,document.bgColor)"'+
         '      title="Open a dialog to reply to the message">'+
         '      <b>R</b>'+
-        '    </span>'+
+        '    </span>';
+*/
+    result +=
         '    <span>'+
         '      <b><em style="padding:2px;">'+re.event_time+'</em></b>'+
         '      by: <b><em style="padding:2px;">'+re.author+'</em></b>'+
@@ -2179,9 +2290,39 @@ function event2html( message_idx ) {
         attachment_signs+
         '  </div>'+
         '  <div id="'+bid+'" style="display:none; margin-left:17px; margin-bottom:20px;">'+
-        '    <div style="padding:10px; padding-left:20px; padding-bottom:0px; border-left:solid 1px #c0c0c0;">'+
-        '      <div style="margin-top:8px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
-        '      <div id="'+rid+'" style="padding:10px; background-color:#e0e0e0; display:none;"></div>'+
+        '    <div style="padding:10px; padding-left:20px; padding-bottom:0px; border-left:solid 1px #c0c0c0;">';
+    if( auth_granted.reply_to_messages ) {
+        var did = 'message_delete_dialog_'+re.id;
+        result +=
+        '    <div style="float:right; position:relative; top:0px;">'+
+        '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '        onclick="create_message_reply_dialog('+rid+','+re.id+','+message_idx+')"'+
+        '        onmouseover="expander_highlight(this)" '+
+        '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '        title="Open a dialog to reply to the message">'+
+        '        <b>Reply</b>'+
+        '      </span>'+
+        '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '        onclick="create_message_edit_dialog('+eid+','+re.id+','+message_idx+')"'+
+        '        onmouseover="expander_highlight(this)" '+
+        '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '        title="Open a dialog to edit the message text">'+
+        '        <b>Edit</b>'+
+        '      </span>'+
+        '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '        onclick="create_message_delete_dialog('+did+','+re.id+')"'+
+        '        onmouseover="expander_highlight(this)" '+
+        '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '        title="Delete the whole message and its children">'+
+        '        <b>Delete</b>'+
+        '      </span>'+
+        '    </div>';
+    }
+    result +=
+        '    <div style="margin-top:8px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
+        '    <div id="'+rid+'" style="border-top:solid 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
+        '    <div id="'+eid+'" style="border-top:solid 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
+        '    <div id="'+did+'" style="padding:10px; background-color:#e0e0e0; display:none;"></div>'+
         tags+
         //'        <br>'+
         //((re.tags.length > 0 && re.attachments.length > 0) ? '<br>' : '')+
@@ -2609,20 +2750,30 @@ function search_contents() {
           </p>
         </div>
         <div style="float:right; height:50px;">
+<?php
+$remote_user = $_SERVER['REMOTE_USER'];
+if( $remote_user == '' ) echo <<<HERE
+          <br>
+          <br>
+          <a href="../../apps/logbook"><p title="login here to proceed to the full version of the application">login</p></a>
+HERE;
+else echo <<<HERE
+          <table><tbody>
             <tr>
               <td>&nbsp;</td>
               <td></td>
             </tr>
-          <table><tbody>
             <tr>
-              <td>Logged as:&nbsp;</td>
-              <td><p><b><?php echo $_SERVER['REMOTE_USER']?></b></p></td>
+              <td>Welcome,&nbsp;</td>
+              <td><p><b>{$remote_user}</b></p></td>
             </tr>
             <tr>
               <td>Session expires in:&nbsp;</td>
               <td><p id="auth_expiration_info"><b>00:00.00</b></p></td>
             </tr>
           </tbody></table>
+HERE;
+?>
         </div>
         <div style="height:40px;">&nbsp;</div>
       </div>
@@ -2630,6 +2781,7 @@ function search_contents() {
     <div id="menubar" class="yuimenubar yuimenubarnav"></div>
     <p id="context"></p>
     <br>
+    <div id="popupdialogs"></div>
     <div id="nav-and-work-areas" align="left">
       <table>
         <tbody>
@@ -2651,6 +2803,5 @@ function search_contents() {
         </tbody>
       </table>
     </div>
-    <div id="popupdialogs"></div>
   </body>
 </html>

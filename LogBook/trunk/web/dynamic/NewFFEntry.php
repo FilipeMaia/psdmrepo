@@ -62,9 +62,6 @@ if( isset( $_POST['scope'] )) {
 } else {
     die( "no valid scope" );
 }
-if( isset( $_POST['actionSuccess'] )) {
-    $actionSuccess = trim( $_POST['actionSuccess'] );
-}
 
 // Read optional tags submitted with the entry
 //
@@ -170,7 +167,10 @@ try {
         $attachment = $entry->attach_document(
             $f['contents'], $f['type'], $f['description'] );
     }
+    $logbook->commit();
 
+    // Return back to the caller
+    //
     if( isset( $actionSuccess )) {
         if( $actionSuccess == 'select_experiment' ) {
             header( "Location: index.php?action={$actionSuccess}".
@@ -199,8 +199,6 @@ try {
             ;
         }
     }
-
-    $logbook->commit();
 
 } catch( RegDBException $e ) {
     print $e->toHtml();

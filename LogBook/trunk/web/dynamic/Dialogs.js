@@ -42,7 +42,7 @@ function post_info( id, text ) {
         '<span style="color:green; font-size:16px;">Info</span>',
         text );
 }
-
+var dialog_yes_no = null;
 function ask_yesno( id, title, text, onYes, onNo ) {
 
     document.getElementById( id ).innerHTML =
@@ -59,7 +59,7 @@ function ask_yesno( id, title, text, onYes, onNo ) {
         this.hide();
         onNo();
     };
-    var dialog1 = new YAHOO.widget.Dialog (
+    dialog_yes_no = new YAHOO.widget.Dialog (
         id,
         {   width : "480px",
             fixedcenter : true,
@@ -73,7 +73,7 @@ function ask_yesno( id, title, text, onYes, onNo ) {
             ]
         }
     );
-    dialog1.render();
+    dialog_yes_no.render();
 }
 
 function ask_yesno_confirmation( id, text, onYes, onNo ) {

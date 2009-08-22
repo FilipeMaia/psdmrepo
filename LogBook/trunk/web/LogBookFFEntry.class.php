@@ -235,5 +235,23 @@ class LogBookFFEntry {
 
         return $this->find_attachment_by_id( '(SELECT LAST_INSERT_ID())' );
     }
+
+    /**
+     * Update the message contents and its type.
+     *
+     * @param string $description
+     * @param string $document
+     * @param string $type
+     */
+    public function update_content( $content_type, $content ) {
+
+        $this->connection->query (
+            'UPDATE entry SET'.
+            " content_type='".$this->connection->escape_string( $content_type ).
+            "',content='".$this->connection->escape_string( $content ).
+            "' WHERE id=".$this->id());
+        $this->attr['content_type'] = $content_type;
+        $this->attr['content'] = $content;
+    }
 }
 ?>
