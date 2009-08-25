@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2009-08-25 Andy Salnikov
+- on 64 bit platform SQLBIGINT clashes with long type, will disable
+  SQLBIGINT support for now
 
 Tag: V00-00-03
 2009-05-19 Igor Gaponenko
