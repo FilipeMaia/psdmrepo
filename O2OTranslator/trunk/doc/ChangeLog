@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2009-08-26 Andy Salnikov
+- changed logic for group creation so that missing transition does not
+  crash application
+- exceptions generated in scanners stop scanning now
+
 Tag: V00-00-14
 2009-08-04 Andy Salnikov
 - added support for new XTC type H5DataTypes::PulnixTM6740ConfigV1

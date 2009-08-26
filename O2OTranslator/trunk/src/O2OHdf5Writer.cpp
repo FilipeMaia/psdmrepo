@@ -105,7 +105,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   : O2OXtcScannerI()
   , m_nameFactory( nameFactory )
   , m_file()
-  , m_state(Undefined)
+  , m_state()
   , m_mapGroup()
   , m_cfgGroup()
   , m_runGroup()
@@ -115,6 +115,9 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_extGroups(extGroups)
   , m_metadata(metadata)
 {
+  // we are in bad state, this state should never be popped
+  m_state.push(Undefined) ;
+
   std::string fileTempl = m_nameFactory.makeH5Path ( split != NoSplit ) ;
   MsgLog( logger, debug, "O2OHdf5Writer - open output file " << fileTempl ) ;
 
@@ -224,67 +227,26 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
   if ( dgram.seq.service() == Pds::TransitionId::Map ) {
 
     // check current state
-    if ( m_state != Undefined ) {
-      throw O2OXTCTransitionException( "Map", ::stateName(m_state) ) ;
-    }
+    if ( m_state.top() == Running ) this->endRun( dgram ) ;
+    if ( m_state.top() == Configured ) this->unconfigure( dgram ) ;
+    if ( m_state.top() == Mapped ) this->unmap( dgram ) ;
 
-    // create group
-    const std::string& group = groupName ( "Map", dgram.seq.clock() ) ;
-    MsgLog( logger, debug, "HDF5Writer -- creating group " << group ) ;
-    m_mapGroup = m_file.createGroup( group ) ;
-
-    // store transition time as couple of attributes to this new group
-    ::storeClock ( m_mapGroup, dgram.seq.clock(), "start" ) ;
-
-    // switch to mapped state
-    m_state = Mapped ;
+    this->map( dgram ) ;
 
   } else if ( dgram.seq.service() == Pds::TransitionId::Configure ) {
 
     // check current state
-    if ( m_state != Mapped ) {
-      throw O2OXTCTransitionException( "Configure", ::stateName(m_state) ) ;
-    }
+    if ( m_state.top() == Running ) this->endRun( dgram ) ;
+    if ( m_state.top() == Configured ) this->unconfigure( dgram ) ;
 
-    // Create group
-    const std::string& group = groupName ( "Configure", dgram.seq.clock() ) ;
-    MsgLog( logger, debug, "HDF5Writer -- creating group " << group ) ;
-    m_cfgGroup = m_mapGroup.createGroup( group ) ;
-
-    // signal the configure transition
-    for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-      it->second->configure( m_cfgGroup ) ;
-    }
-
-    // store transition time as couple of attributes to this new group
-    ::storeClock ( m_cfgGroup, dgram.seq.clock(), "start" ) ;
-
-    // switch to configured state
-    m_state = Configured ;
+    this->configure( dgram ) ;
 
   } else if ( dgram.seq.service() == Pds::TransitionId::BeginRun ) {
 
     // check current state
-    if ( m_state != Configured ) {
-      throw O2OXTCTransitionException( "BeginRun", ::stateName(m_state) ) ;
-    }
+    if ( m_state.top() == Running ) this->endRun( dgram ) ;
 
-    // Create group
-    const std::string& group = groupName ( "Run", dgram.seq.clock() ) ;
-    MsgLog( logger, debug, "HDF5Writer -- creating group " << group ) ;
-    m_runGroup = m_cfgGroup.createGroup( group ) ;
-
-    // signal the begin-run transition
-    for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-      it->second->beginRun( m_runGroup ) ;
-    }
-
-    // store transition time as couple of attributes to this new group
-    ::storeClock ( m_runGroup, dgram.seq.clock(), "start" ) ;
-
-    // switch to running state
-    m_state = Running ;
-
+    this->startRun( dgram ) ;
 
   } else if ( dgram.seq.service() == Pds::TransitionId::L1Accept ) {
 
@@ -293,53 +255,146 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
 
   } else if ( dgram.seq.service() == Pds::TransitionId::EndRun ) {
 
-    // signal the end-run transition
-    for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-      it->second->endRun() ;
-    }
-
-    // store transition time as couple of attributes to this new group
-    ::storeClock ( m_runGroup, dgram.seq.clock(), "end" ) ;
-
-    // close the group
-    m_runGroup.close() ;
-    m_runGroup = hdf5pp::Group() ;
-
-    // switch back to configured state
-    m_state = Configured ;
+    this->endRun( dgram ) ;
 
   } else if ( dgram.seq.service() == Pds::TransitionId::Unconfigure ) {
 
-    // signal the unconfigure transition
-    for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-      it->second->unconfigure() ;
-    }
-
-    // store transition time as couple of attributes to this new group
-    ::storeClock ( m_cfgGroup, dgram.seq.clock(), "end" ) ;
-
-    // close the group
-    m_cfgGroup.close() ;
-    m_cfgGroup = hdf5pp::Group() ;
-
-    // switch back to mapped state
-    m_state = Mapped ;
+    if ( m_state.top() == Running ) this->endRun( dgram ) ;
+    this->unconfigure( dgram ) ;
 
   } else if ( dgram.seq.service() == Pds::TransitionId::Unmap ) {
 
-    // store transition time as couple of attributes to this new group
-    ::storeClock ( m_mapGroup, dgram.seq.clock(), "end" ) ;
-
-    // close Map group
-    m_mapGroup.close() ;
-    m_mapGroup = hdf5pp::Group() ;
-
-    // switch back to undetermined state
-    m_state = Undefined ;
+    if ( m_state.top() == Running ) this->endRun( dgram ) ;
+    if ( m_state.top() == Configured ) this->unconfigure( dgram ) ;
+    this->unmap( dgram ) ;
 
   }
 
-  MsgLog( logger, debug, "O2OHdf5Writer -- now in the state " << ::stateName(m_state) ) ;
+  MsgLog( logger, debug, "O2OHdf5Writer -- now in the state " << ::stateName(m_state.top()) ) ;
+}
+
+
+void
+O2OHdf5Writer::map ( const Pds::Dgram& dgram )
+{
+  // create group
+  const std::string& group = groupName ( "Map", dgram.seq.clock() ) ;
+  MsgLog( logger, debug, "HDF5Writer -- creating group " << group ) ;
+  m_mapGroup = m_file.createGroup( group ) ;
+
+  // store transition time as couple of attributes to this new group
+  ::storeClock ( m_mapGroup, dgram.seq.clock(), "start" ) ;
+
+  // switch to mapped state
+  m_state.push(Mapped) ;
+}
+
+void
+O2OHdf5Writer::configure ( const Pds::Dgram& dgram )
+{
+  // Create group
+  const std::string& group = groupName ( "Configure", dgram.seq.clock() ) ;
+  MsgLog( logger, debug, "HDF5Writer -- creating group " << group ) ;
+  if ( m_state.top() == Mapped ) {
+    m_cfgGroup = m_mapGroup.createGroup( group ) ;
+  } else {
+    m_cfgGroup = m_file.createGroup( group ) ;
+  }
+
+  // signal the configure transition
+  for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+    it->second->configure( m_cfgGroup ) ;
+  }
+
+  // store transition time as couple of attributes to this new group
+  ::storeClock ( m_cfgGroup, dgram.seq.clock(), "start" ) ;
+
+  // switch to configured state
+  m_state.push(Configured) ;
+}
+
+void
+O2OHdf5Writer::startRun ( const Pds::Dgram& dgram )
+{
+  // Create group
+  const std::string& group = groupName ( "Run", dgram.seq.clock() ) ;
+  MsgLog( logger, debug, "HDF5Writer -- creating group " << group ) ;
+  if ( m_state.top() == Configured ) {
+    m_runGroup = m_cfgGroup.createGroup( group ) ;
+  } else if ( m_state.top() == Mapped ) {
+    m_runGroup = m_mapGroup.createGroup( group ) ;
+  } else {
+    m_runGroup = m_file.createGroup( group ) ;
+  }
+
+  // signal the begin-run transition
+  for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+    it->second->beginRun( m_runGroup ) ;
+  }
+
+  // store transition time as couple of attributes to this new group
+  ::storeClock ( m_runGroup, dgram.seq.clock(), "start" ) ;
+
+  // switch to running state
+  m_state.push( Running ) ;
+}
+
+void
+O2OHdf5Writer::endRun ( const Pds::Dgram& dgram )
+{
+  if ( m_state.top() != Running ) return ;
+
+  // signal the end-run transition
+  for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+    it->second->endRun() ;
+  }
+
+  // store transition time as couple of attributes to this new group
+  ::storeClock ( m_runGroup, dgram.seq.clock(), "end" ) ;
+
+  // close the group
+  m_runGroup.close() ;
+  m_runGroup = hdf5pp::Group() ;
+
+  // switch back to previous state
+  m_state.pop() ;
+}
+
+void
+O2OHdf5Writer::unconfigure ( const Pds::Dgram& dgram )
+{
+  if ( m_state.top() != Configured ) return ;
+
+  // signal the unconfigure transition
+  for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+    it->second->unconfigure() ;
+  }
+
+  // store transition time as couple of attributes to this new group
+  ::storeClock ( m_cfgGroup, dgram.seq.clock(), "end" ) ;
+
+  // close the group
+  m_cfgGroup.close() ;
+  m_cfgGroup = hdf5pp::Group() ;
+
+  // switch back to previous state
+  m_state.pop() ;
+}
+
+void
+O2OHdf5Writer::unmap ( const Pds::Dgram& dgram )
+{
+  if ( m_state.top() != Mapped ) return ;
+
+  // store transition time as couple of attributes to this new group
+  ::storeClock ( m_mapGroup, dgram.seq.clock(), "end" ) ;
+
+  // close Map group
+  m_mapGroup.close() ;
+  m_mapGroup = hdf5pp::Group() ;
+
+  // switch back to previous state
+  m_state.pop() ;
 }
 
 void

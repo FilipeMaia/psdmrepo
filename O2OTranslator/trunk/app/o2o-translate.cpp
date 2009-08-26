@@ -210,8 +210,6 @@ O2O_Translate::runApp ()
   // instantiate metadata scanner
   scanners.push_back ( new MetaDataScanner( metadata, m_mdConnStr.value() ) ) ;
 
-  unsigned long errCount = 0 ;
-
   // loop over all input files
   typedef AppCmdOptList<std::string>::const_iterator StringIter ;
   StringIter eventFileIter = m_eventData.begin() ;
@@ -275,8 +273,7 @@ O2O_Translate::runApp ()
           scanner->eventEnd ( *dg ) ;
         } catch ( std::exception& e ) {
           MsgLogRoot( error, "exception caught processing datagram: " << e.what() ) ;
-          // do not stop here, try to proceed
-          ++ errCount ;
+          return 3 ;
         }
       }
     }
@@ -290,19 +287,14 @@ O2O_Translate::runApp ()
   // finish with the scanners
   for ( std::vector<O2OXtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
     try {
-      delete *i ;
+      O2OXtcScannerI* scanner = *i ;
+      delete scanner ;
     } catch ( std::exception& e ) {
       MsgLogRoot( error, "exception caught while destroying a scanner: " << e.what() ) ;
-      ++ errCount ;
+      return 4 ;
     }
   }
-
-  if ( errCount > 0 ) {
-    MsgLogRoot( error, "Total error count: " << errCount ) ;
-    return 4 ;
-  } else {
-    MsgLogRoot( info, "No errors during conversion" ) ;
-  }
+  scanners.clear() ;
 
   return 0 ;
 

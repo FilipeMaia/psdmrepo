@@ -15,6 +15,7 @@
 //-----------------
 #include <map>
 #include <memory>
+#include <stack>
 #include <boost/shared_ptr.hpp>
 
 //----------------------
@@ -93,6 +94,13 @@ protected:
   // Construct a group name
   std::string groupName( const std::string& prefix, const Pds::ClockTime& clock ) const ;
 
+  void map ( const Pds::Dgram& dgram ) ;
+  void configure ( const Pds::Dgram& dgram ) ;
+  void startRun ( const Pds::Dgram& dgram ) ;
+  void endRun ( const Pds::Dgram& dgram ) ;
+  void unconfigure ( const Pds::Dgram& dgram ) ;
+  void unmap ( const Pds::Dgram& dgram ) ;
+
 private:
 
   typedef boost::shared_ptr<DataTypeCvtFactoryI> DataTypeCvtFactoryPtr ;
@@ -101,7 +109,7 @@ private:
   // Data members
   const O2OFileNameFactory& m_nameFactory ;
   hdf5pp::File m_file ;
-  State m_state ;
+  std::stack<State> m_state ;
   hdf5pp::Group m_mapGroup ;      // Group for current Map transition
   hdf5pp::Group m_cfgGroup ;      // Group for current Configure transition
   hdf5pp::Group m_runGroup ;      // Group for current Run transition
