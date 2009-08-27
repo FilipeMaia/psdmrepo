@@ -75,6 +75,9 @@ protected:
   // Default constructor
   DataTypeCvtFactoryI () {}
 
+  // generate the group name for the child folder
+  static std::string cvtGroupName( const std::string& grpName, const Pds::DetInfo& info ) ;
+
   // helper functor for comparing DetInfo objects
   struct CmpDetInfo {
     bool operator()( const Pds::DetInfo& lhs, const Pds::DetInfo& rhs ) const ;

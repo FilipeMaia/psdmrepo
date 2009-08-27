@@ -40,6 +40,7 @@
 #include "O2OTranslator/DataTypeCvtFactory.h"
 #include "O2OTranslator/EvtDataTypeCvt.h"
 #include "O2OTranslator/EvtDataTypeCvtFactory.h"
+#include "O2OTranslator/EvtConfigDataTypeCvtFactory.h"
 #include "O2OTranslator/O2OExceptions.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OMetaData.h"
@@ -187,7 +188,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 
   // very special converter for Acqiris::DataDescV1, it needs two types of data
   hsize_t chunk_size = 128*1024 ;
-  factory.reset( new EvtDataTypeCvtFactory< AcqirisDataDescV1Cvt > ( "Acqiris::DataDescV1", chunk_size, m_compression ) ) ;
+  factory.reset( new EvtConfigDataTypeCvtFactory< AcqirisDataDescV1Cvt > ( "Acqiris::DataDescV1", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_AcqConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_AcqWaveform,1).value() ;

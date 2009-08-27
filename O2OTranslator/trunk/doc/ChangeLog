@@ -15,6 +15,7 @@ reverse time order.
 - changed logic for group creation so that missing transition does not
   crash application
 - exceptions generated in scanners stop scanning now
+- redesign Acqiris translator factory
 
 Tag: V00-00-14
 2009-08-04 Andy Salnikov
