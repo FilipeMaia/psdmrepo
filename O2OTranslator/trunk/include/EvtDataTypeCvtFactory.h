@@ -75,10 +75,7 @@ public:
     if ( i != m_cvtMap.end() ) return i->second ;
 
     // build the name for the group where the object will live
-    std::ostringstream str ;
-    str << m_grpName << '/' << Pds::DetInfo::name(info.detector()) << '.' << info.detId()
-        << ':' << Pds::DetInfo::name(info.device()) << '.' << info.devId() ;
-    const std::string& grpName = str.str() ;
+    const std::string& grpName = cvtGroupName( m_grpName, info ) ;
 
     // define separate group
     hdf5pp::Group grp = m_group.createGroup( grpName );

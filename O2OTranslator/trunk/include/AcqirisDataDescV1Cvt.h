@@ -66,7 +66,7 @@ public:
                          const Pds::DetInfo& detInfo,
                          const H5DataTypes::XtcClockTime& time ) ;
 
-  void setGroup( hdf5pp::Group group ) { m_group = group ; }
+  void setGroup( hdf5pp::Group group ) ;
 
 protected:
 

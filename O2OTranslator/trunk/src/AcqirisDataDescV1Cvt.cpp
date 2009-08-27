@@ -86,23 +86,6 @@ AcqirisDataDescV1Cvt::convert ( const void* data,
     delete m_config ;
     m_config = new Pds::Acqiris::ConfigV1( config );
 
-    // create container for timestamps
-    m_tsType = H5DataTypes::AcqirisDataDescV1::timestampType ( *m_config ) ;
-    hsize_t chunk = std::max( m_chunk_size/m_tsType.size(), hsize_t(1) ) ;
-    MsgLog( logger, debug, "chunk size for timestamps: " << chunk ) ;
-    m_timestampCont = new TimestampCont ( "timestamps", m_group, m_tsType, chunk, m_deflate ) ;
-
-    // create container for waveforms
-    m_wfType = H5DataTypes::AcqirisDataDescV1::waveformType ( *m_config ) ;
-    chunk = std::max( m_chunk_size/m_wfType.size(), hsize_t(1) ) ;
-    MsgLog( logger, debug, "chunk size for waveforms: " << chunk ) ;
-    m_waveformCont = new WaveformCont ( "waveforms", m_group, m_wfType, chunk, m_deflate ) ;
-
-    // make container for time
-    chunk = std::max ( m_chunk_size / sizeof(H5DataTypes::XtcClockTime), hsize_t(1) ) ;
-    MsgLog( logger, debug, "chunk size for time: " << chunk ) ;
-    m_timeCont = new XtcClockTimeCont ( "time", m_group, chunk, m_deflate ) ;
-
   } else if ( typeId.id() == Pds::TypeId::Id_AcqWaveform ) {
 
     // get few constants
@@ -153,6 +136,31 @@ AcqirisDataDescV1Cvt::convert ( const void* data,
 
   }
 
+
+}
+
+
+void
+AcqirisDataDescV1Cvt::setGroup( hdf5pp::Group group )
+{
+  m_group = group ;
+
+  // create container for timestamps
+  m_tsType = H5DataTypes::AcqirisDataDescV1::timestampType ( *m_config ) ;
+  hsize_t chunk = std::max( m_chunk_size/m_tsType.size(), hsize_t(1) ) ;
+  MsgLog( logger, debug, "chunk size for timestamps: " << chunk ) ;
+  m_timestampCont = new TimestampCont ( "timestamps", m_group, m_tsType, chunk, m_deflate ) ;
+
+  // create container for waveforms
+  m_wfType = H5DataTypes::AcqirisDataDescV1::waveformType ( *m_config ) ;
+  chunk = std::max( m_chunk_size/m_wfType.size(), hsize_t(1) ) ;
+  MsgLog( logger, debug, "chunk size for waveforms: " << chunk ) ;
+  m_waveformCont = new WaveformCont ( "waveforms", m_group, m_wfType, chunk, m_deflate ) ;
+
+  // make container for time
+  chunk = std::max ( m_chunk_size / sizeof(H5DataTypes::XtcClockTime), hsize_t(1) ) ;
+  MsgLog( logger, debug, "chunk size for time: " << chunk ) ;
+  m_timeCont = new XtcClockTimeCont ( "time", m_group, chunk, m_deflate ) ;
 
 }
 
