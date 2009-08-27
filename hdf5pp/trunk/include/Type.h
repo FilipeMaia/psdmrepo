@@ -73,6 +73,9 @@ public:
   /// set type precision
   void set_precision( size_t precision ) ;
 
+  // returns true if there is a real object behind
+  bool valid() const { return m_id.get() ; }
+
 protected:
 
   // constructor

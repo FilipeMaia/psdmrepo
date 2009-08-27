@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2009-08-26 Andy Salnikov
+- added valid() method to bunch of classes
+
 Tag: V00-00-06
 2009-06-26 Andy Salnikov
 - add createAttr/openAttr methods to File class. These are for 

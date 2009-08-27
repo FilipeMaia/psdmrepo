@@ -90,6 +90,9 @@ public:
   // close the data space
   void close() ;
 
+  // returns true if there is a real object behind
+  bool valid() const { return m_id.get() ; }
+
 protected:
 
 private:

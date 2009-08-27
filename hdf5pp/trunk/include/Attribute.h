@@ -71,6 +71,9 @@ public:
   /// store attribute value (for arbitrary attributes)
   void store( unsigned size, const T value[] ) ;
 
+  // returns true if there is a real object behind
+  bool valid() const { return m_id.get() ; }
+
 protected:
 
   // Constructor

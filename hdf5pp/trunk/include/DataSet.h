@@ -107,6 +107,9 @@ public:
   /// access data space
   DataSpace dataSpace() { return m_impl.dataSpace() ; }
 
+  // returns true if there is a real object behind
+  bool valid() const { return m_impl.valid() ; }
+
 protected:
 
   friend class Group ;

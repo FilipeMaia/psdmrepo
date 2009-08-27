@@ -97,6 +97,9 @@ public:
   /// access data space
   DataSpace dataSpace() ;
 
+  // returns true if there is a real object behind
+  bool valid() const { return m_id.get() ; }
+
 protected:
 
   DataSetImpl ( hid_t id ) ;
