@@ -97,6 +97,7 @@ public:
 
   // this method is called at begin-run transition
   virtual void beginRun ( const hdf5pp::Group& runGroup ) {
+    if ( m_group.valid() ) return ;
     m_group = runGroup ;
     for ( typename CvtMap::iterator i = m_cvtMap.begin() ; i != m_cvtMap.end() ; ++ i ) {
       const std::string& grpName = cvtGroupName( m_grpName, i->first ) ;
