@@ -26,6 +26,7 @@
 //-------------------------------
 #include "pdsdata/xtc/DetInfo.hh"
 #include "hdf5pp/Group.h"
+#include "MsgLogger/MsgLogger.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -78,6 +79,7 @@ public:
     const std::string& grpName = cvtGroupName( m_grpName, info ) ;
 
     // define separate group
+    MsgLogRoot( debug, "Creating group " << grpName ) ;
     hdf5pp::Group grp = m_group.createGroup( grpName );
 
     DataTypeCvtI* cvt = new Converter ( grp, m_chunk_size, m_deflate ) ;

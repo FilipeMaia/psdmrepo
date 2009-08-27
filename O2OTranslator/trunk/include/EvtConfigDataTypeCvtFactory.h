@@ -26,6 +26,7 @@
 //-------------------------------
 #include "pdsdata/xtc/DetInfo.hh"
 #include "hdf5pp/Group.h"
+#include "MsgLogger/MsgLogger.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -78,6 +79,7 @@ public:
     hdf5pp::Group grp ;
     if ( m_group.valid() ) {
       const std::string& grpName = cvtGroupName( m_grpName, info ) ;
+      MsgLogRoot( debug, "Creating group " << grpName ) ;
       grp = m_group.createGroup( grpName );
     }
 
@@ -98,6 +100,7 @@ public:
     m_group = runGroup ;
     for ( typename CvtMap::iterator i = m_cvtMap.begin() ; i != m_cvtMap.end() ; ++ i ) {
       const std::string& grpName = cvtGroupName( m_grpName, i->first ) ;
+      MsgLogRoot( debug, "Creating group " << grpName ) ;
       hdf5pp::Group grp = m_group.createGroup( grpName );
       i->second->setGroup ( grp ) ;
     }
