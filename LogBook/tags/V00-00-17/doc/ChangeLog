@@ -1,0 +1,104 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package LogBook
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-17
+2009-08-28 Igor Gaponenko
+- implemented the read-only version of the LogBook application
+- reinforced all PHP scripts modifying the database to work within
+and authenticated context only
+- implemented a display for message subthreads
+- implemented 'Reply', 'Edit' and 'Delete' operations for messages
+(including subthreads)
+- bug fixes
+- added 'Goals' for the shifts (requested when begining a new shift
+and displayed at the 'Shift Status')
+- a number of visualization imprivements in the mesage viwere of
+the LogBook UI: 'First' and 'Last' pages, 'tags' and 'replies' signs.
+- added 'Print' button to the LogBook screen 'Grabber'
+
+Tag: V00-00-16
+2009-08-22 Igor Gaponenko
+- reorganized message action controls
+- implemented message Delete and Edit dialogs
+
+Tag: V00-00-15
+2009-08-20 Igor Gaponenko
+- minor fixes and improvements. This is the first production version deploed.
+
+Tag: V00-00-14
+2009-08-18 Igor Gaponenko
+- minor bug fixes in the LogBook app
+- require the Web service URI in the LogBook "grabber" script
+
+Tag: V00-00-13
+2009-08-11 Igor Gaponenko
+- implemented posting replies to messages. Not complete implementation though.
+- refactored the application configuration
+- fixed bugs
+- creaned markup
+
+Tag: V00-00-12
+2009-08-07 Igor Gaponenko
+- implemented the screen "graber" client (an X11 Python/Tk application) 
+
+Tag: V00-00-11
+2009-08-02 Igor Gaponenko
+- refactored message display in Web application to fix bugs and get rid of memory leaks
+- fully implemented "auto-refresh" mode in Web app
+
+Tag: V00-00-10
+2009-07-31 Igor Gaponenko
+- improved style of the Web application
+- improved functionality of 'Search'
+- added tests of the FPDF PHP library (the library itself is also included
+into the tag)
+
+Tag: V00-00-09
+2009-07-26 Igor Gaponenko
+- implemented the paginator in 'Search'
+- got rid of the 'compact' presentation in 'Search'
+- reduced form in 'Search'
+- added CSS not to display underlines in hyper links
+- added a utility function (Utilities.js) to locate HTML elements by class name
+
+Tag: V00-00-08
+2009-07-21 Igor Gaponenko
+- fully implemented the search (except the paginator in the 'detailed' mode)
+- refactored the main page to get rid of duplications in its code
+- fixed bugs
+
+Tag: V00-00-07
+2009-07-18 Igor Gaponenko
+- the first complete implementation of the LogBook Web application. Some
+minor features are still missing though.
+
+Tag: V00-00-05
+- re-organized the source code before starting to work on a "dynamic"
+version of the application.
+
+Tag: V00-00-04
+2009-06-10 Andy Salnikov
+- adding SConscript file
+
+Tag: V00-00-03
+2009-06-10 Igor Gaponenko
+- extend schema and PHP implementation to allow shift crew members
+in addition to the shift leader. Implement HTML tests.
+
+Tag: V00-00-02
+2009-06-09 Igor Gaponenko
+- first implementation
+
+Tag: V00-00-01
+2009-05-19 Igor Gaponenko
+- initial version of the package
