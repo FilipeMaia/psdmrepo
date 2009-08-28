@@ -245,7 +245,7 @@ urllib2.HTTPSHandler = newHTTPSHandler
 ######################################
 # And here follows th egrabber's logic
 
-import os, pwd, tempfile
+import os, pwd, tempfile, subprocess
 import simplejson
 import tkMessageBox
 
@@ -285,15 +285,22 @@ ws_login_password = 'pcds'
 
 class LogBookGrabberUI:
 
-    def __init__(self, parent):
+    _printer_name = None
 
-        self.grab   = Button(parent, text="Grab",   command=self.on_grab)
-        self.submit = Button(parent, text="Submit", command=self.on_submit)
-        self.cancel = Button(parent, text="Cancel", command=self.on_cancel)
+    def __init__(self, parent, printer_name=None):
 
-        self.grab.grid  (row=0, column=0,padx=5,pady=5,sticky=W)
-        self.submit.grid(row=0, column=1,padx=5,pady=5,sticky=W)
-        self.cancel.grid(row=0, column=2,padx=5,pady=5,sticky=W)
+        if printer_name is not None and printer_name != '':
+            self._printer_name = printer_name
+
+        self.grab    = Button(parent, text="Grab",   command=self.on_grab)
+        self.submit  = Button(parent, text="Submit", command=self.on_submit)
+        self.cancel  = Button(parent, text="Cancel", command=self.on_cancel)
+        self.printit = Button(parent, text="Print",  command=self.on_print)
+
+        self.grab.grid   (row=0, column=0,padx=5,pady=5,sticky=W)
+        self.submit.grid (row=0, column=1,padx=5,pady=5,sticky=W)
+        self.cancel.grid (row=0, column=2,padx=5,pady=5,sticky=W)
+        self.printit.grid(row=0, column=3,padx=5,pady=5,sticky=W)
 
         Label(parent, text="Instrument: ").grid(row=1,column=0,padx=5,pady=0,sticky=W+N)
         Label(parent, text=logbook_instrument).grid(row=1,column=1,padx=5,pady=0,sticky=W+N)
@@ -325,15 +332,18 @@ class LogBookGrabberUI:
 
         self.submit.configure(state=DISABLED)
         self.cancel.configure(state=DISABLED)
+        self.printit.configure(state=DISABLED)
         self.message.configure(state=DISABLED)
         self.descr.configure(state=DISABLED)
 
     def on_grab(self):
 
+        self.f_png = tempfile.NamedTemporaryFile(mode='r+b',suffix='.png')
         self.f_jpeg = tempfile.NamedTemporaryFile(mode='r+b',suffix='.jpeg')
         f_gif = tempfile.NamedTemporaryFile(mode='r+b',suffix='.gif')
-        print self.f_jpeg.name, f_gif.name
-        if( 0 == os.system("import -trim -border %s; convert %s %s" % (self.f_jpeg.name, self.f_jpeg.name, f_gif.name))):
+        if( 0 == os.system("import -border -trim %s; convert %s %s; convert %s %s" %
+            (self.f_png.name, self.f_png.name, self.f_jpeg.name, self.f_jpeg.name, f_gif.name))):
+
             photo = PhotoImage(file=f_gif.name)
 
             p_width = photo.width()
@@ -362,6 +372,8 @@ class LogBookGrabberUI:
             self.grab.configure(state=DISABLED)
             self.submit.configure(state=NORMAL)
             self.cancel.configure(state=NORMAL)
+            if self._printer_name is not None:
+                self.printit.configure(state=NORMAL)
             self.message.configure(state=NORMAL)
             self.descr.configure(state=NORMAL)
             image.draw()
@@ -371,6 +383,7 @@ class LogBookGrabberUI:
         self.grab.configure(state=NORMAL)
         self.submit.configure(state=DISABLED)
         self.cancel.configure(state=DISABLED)
+        self.printit.configure(state=DISABLED)
         self.message.configure(state=DISABLED)
         self.descr.configure(state=DISABLED)
         self.canvas.configure(width=0)
@@ -398,7 +411,7 @@ class LogBookGrabberUI:
             ('num_tags', '1'),
             ('tag_name_0','SCREENSHOT'),
             ('tag_value_0',''),
-            ("file1", open( self.f_jpeg.name, 'r' )),
+            ("file1", open( self.f_png.name, 'r' )),
             ("file1", self.descr.get()) )
 
         try:
@@ -418,10 +431,36 @@ class LogBookGrabberUI:
         self.grab.configure(state=NORMAL)
         self.submit.configure(state=DISABLED)
         self.cancel.configure(state=DISABLED)
+        self.printit.configure(state=DISABLED)
         self.message.configure(state=DISABLED)
         self.descr.configure(state=DISABLED)
         self.canvas.configure(width=0)
         self.canvas.configure(height=0)
+
+    def on_print(self):
+        f_ps = tempfile.NamedTemporaryFile(mode='r+b',suffix='.ps')
+        if( 0 != os.system("convert %s %s" % (self.f_jpeg.name, f_ps.name))):
+            tkMessageBox.showerror (
+                "Printing Error",
+                "JPEG to PostScript conversion failed" )
+            return
+        try:
+            # Convert into PDF first to prevent
+            sp=subprocess.Popen(
+                ['/usr/bin/lp','-d', self._printer_name, f_ps.name],
+                stderr=subprocess.PIPE)
+            sp_stderr = sp.communicate()
+        except OSError, reason:
+            tkMessageBox.showerror (
+                "Printing Error",
+                reason )
+            return
+        if sp.returncode != 0:
+            tkMessageBox.showerror (
+                "Printing Error",
+                sp_stderr )
+            return
+
 
 # ------------------------------------------------------
 # Configure an authentication context of the web service
@@ -528,7 +567,7 @@ OPTIONS & PARAMETERS:
 
     -w web-service-url
 
-      the base URL of the LogBook Web Service. 
+      the base URL of the LogBook Web Service.
 
   ___________________
   Optional parameters
@@ -552,15 +591,23 @@ OPTIONS & PARAMETERS:
       the password to connect to the service. Its value
       is associated with the above mentioned service account.
 
+
+    -q print-queue-name
+
+      the name of the print queue for images printed via the 'Print'
+      button. If none is provided a menu of all known printers will
+      be displayed.
+
 """ % (progname)
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hi:e:w:u:p;')
+        opts, args = getopt.getopt(sys.argv[1:], 'hi:e:w:u:p:q:')
     except getopt.GetoptError, errmsg:
         print "ERROR:", errmsg
         sys.exit(1)
 
     experiment = None
+    printer_name = None
     for name, value in opts:
         if name in ('-h',):
             help(sys.argv[0])
@@ -575,6 +622,8 @@ OPTIONS & PARAMETERS:
             ws_login_user = value
         elif name in ('-p',):
             ws_login_password = value
+        elif name in ('-q',):
+            printer_name = value
         else:
             print "invalid argument:", name
             sys.exit(2)
@@ -607,7 +656,7 @@ OPTIONS & PARAMETERS:
 
     root = Tk()
     root.title("LogBookGrabberUI")
-    d = LogBookGrabberUI( root )
+    d = LogBookGrabberUI( root, printer_name )
     root.mainloop()
 
     sys.exit(0)

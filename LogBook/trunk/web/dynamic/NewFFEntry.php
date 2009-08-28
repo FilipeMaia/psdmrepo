@@ -7,6 +7,8 @@ require_once('LogBook/LogBook.inc.php');
  * This script will process a request for creating new free-form entry
  * in the specified scope.
  */
+if( !LogBookAuth::isAuthenticated()) return;
+
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
     if( $id == '' ) {
@@ -57,6 +59,14 @@ if( isset( $_POST['scope'] )) {
                 die( "run id can't be empty" );
         } else {
             die( "no valid run id" );
+        }
+    } else if( $scope == 'message' ) {
+        if( isset( $_POST['message_id'] )) {
+            $message_id = trim( $_POST['message_id'] );
+            if( $message_id == '' )
+                die( "parent message id can't be empty" );
+        } else {
+            die( "no valid parent message id" );
         }
     }
 } else {
@@ -151,14 +161,26 @@ try {
 
     $content_type = "TEXT";
 
-    $entry = $experiment->create_entry(
-        $author, $content_type, $message,
-        $shift_id, $run_id, $relevance_time );
-
-    // Add tags (if any)
+    // If the request has been made in a scope of some parent entry then
+    // one the one and create the new one in its scope.
     //
-    foreach( $tags as $t ) {
-        $tag = $entry->add_tag( $t['tag'], $t['value'] );
+    // NOTE: Remember that child entries have no tags!
+
+    if( $scope == 'message' ) {
+        $parent = $experiment->find_entry_by_id( $message_id )
+            or die( "no such parent message exists" );
+        $entry = $parent->create_child(
+            $author, $content_type, $message );
+    } else {
+        $entry = $experiment->create_entry(
+            $author, $content_type, $message,
+            $shift_id, $run_id, $relevance_time );
+
+        // Add tags (if any)
+        //
+        foreach( $tags as $t ) {
+            $tag = $entry->add_tag( $t['tag'], $t['value'] );
+        }
     }
 
     // Attach files (if any)

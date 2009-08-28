@@ -102,7 +102,7 @@ class LogBookFFEntry {
         $result = $this->connection->query (
             'SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM header h, entry e'.
             ' WHERE h.id = e.hdr_id AND e.parent_entry_id='.$this->id().
-            ' ORDER BY e.insert_time DESC' );
+            ' ORDER BY e.insert_time ASC' );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {

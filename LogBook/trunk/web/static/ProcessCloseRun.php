@@ -6,6 +6,8 @@ require_once('LogBook/LogBook.inc.php');
  * This script will process a request for closing a run
  * in the database.
  */
+if( !LogBookAuth::isAuthenticated()) return;
+
 if( isset( $_POST['num'])) {
     if( 1 != sscanf( trim( $_POST['num'] ), "%ud", $num ))
         $num = null;

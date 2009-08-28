@@ -306,10 +306,10 @@ echo <<<HERE
 HERE;
 ?>
 
-    <!--
-    Page-specific script
-    -->
-    <script type="text/javascript">
+<!--
+Page-specific script
+-->
+<script type="text/javascript">
 
 /*
  * Browser information.
@@ -1073,14 +1073,7 @@ function create_messages_dialog( scope ) {
 var last_rid = null;    // The last element used to display the message reply dialog
                         // This element can be reused.
 
-function create_message_reply_dialog( rid, message_id, message_idx ) {
-
-    /* Make sure the message body is open
-     *
-     * TODO: This won't work for children. Refactor this to recognize
-     * childrens' identity.
-     */
-    //message_expander( message_idx );
+function create_message_reply_dialog( rid, message_id ) {
 
     // Close the editor if any is open
     //
@@ -1113,17 +1106,8 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
         '  <input type="hidden" name="message_id" value="'+message_id+'" />'+
         '  <input type="hidden" name="actionSuccess" value="select_experiment" />'+
         '  <input type="hidden" name="MAX_FILE_SIZE" value="1000000">'+
-        '  <div style="padding:20px; padding-left:10%; padding-right:10%; text-align:left;">'+
-        '    <b>ATTENTION: </b>The current implementation of this dialog will not'+
-        '    display replies as children of a message the dialog is invoked with. The replies'+
-        '    will show up as regular messages in the message list. This problem will be fixed'+
-        '    in the next release of the application. For now, the relationship to the parent '+
-        '    message will be maintained via the automatically added tag PARENT_MESSAGE_ID.'+
-        '    Do not remove that tag please! Tags and attachments can be seen by pressing '+
-        '    the <b>Options</b> button of this dialog.'+
-        '  </div>'+
         '  <div>'+
-        '    <em class="lb_label">Reply:</em>'+
+        '    <em class="lb_label">Reply with:</em>'+
         '  </div>'+
         '  <table><tbody>'+
         '    <tr>'+
@@ -1155,7 +1139,7 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
         //close_messages_dialog
     );
 
-    var tags = [ { 'delete': false, 'tag': 'PARENT_MESSAGE_ID' , 'value': message_id } ];
+    var tags = [ { 'delete': false, 'tag': '' , 'value': '' } ];
     var tags_table = null;
 
     this.oPushButtonAddTag = null;
@@ -1372,19 +1356,35 @@ function create_message_reply_dialog( rid, message_id, message_idx ) {
     );
 }
 
+function find_message_by_id_impl( re, id ) {
+    if( re.id == id ) return Object( re );
+    for( var i = 0; i < re.children.length; i++ ) {
+        var child = find_message_by_id_impl( Object( eval( '('+re.children[i]+')' )), id );
+        if( child != null ) return child;
+    }
+    return null;
+}
+
+function find_message_by_id( id ) {
+
+    // Pay attention to the little optimization which is based on two facts:
+    //
+    // - newest messages are stored in the very end of the cache
+    // - this lookup operation is most frequently used on newer rather than
+    //   older messages
+    //
+    for( var i = last_search_result.length-1; i >= 0; i-- ) {
+        var re = find_message_by_id_impl( Object( last_search_result[i] ), id );
+        if( re != null ) return re;
+    }
+}
+
 /* This is a separate dialog for editing messages
  */
 var last_eid = null;    // The last element used to display the message editing dialog
                         // This element can be reused.
 
-function create_message_edit_dialog( eid, message_id, message_idx ) {
-
-    /* Make sure the message body is open
-     *
-     * TODO: This won't work for children. Refactor this to recognize
-     * childrens' identity.
-     */
-    //message_expander( message_idx );
+function create_message_edit_dialog( eid, message_id ) {
 
     // Close the reply dialog if any is open
     //
@@ -1407,7 +1407,20 @@ function create_message_edit_dialog( eid, message_id, message_idx ) {
     last_eid = eid;
     eid.style.display = 'block';
 
-    var re = last_search_result[message_idx];
+   /* TODO; Replace this with a recursive search in the message tree,
+    * then get rid of the 'message_idx' in the function's signature and
+    * its client code.
+    *
+    *   var re = find_message_by_if( id );
+    *   if( re == null ) alert("internal bug");
+    */
+    //var re = last_search_result[message_idx];
+
+    var re = find_message_by_id( message_id );
+    if( re == null ) {
+        alert( 'Internal error #12: inconsistent data cache. Try reloading the application.' );
+        return;
+    }
 
     eid.innerHTML =
         '<form name="message_edit_form" action="UpdateFFEntry.php" method="post">'+
@@ -1460,8 +1473,9 @@ function create_message_delete_dialog( did, id ) {
         '<div style="text-align:left;">'+
         '  <form  name="delete_message_form" action="DeleteFFEntry.php" method="post">'+
         '    <b>ATTENTION:</b> the selected message and all its children are about to be destroyed!'+
-        '    The information may be permanently lost as a result of the operation. Press <b>Yes</b>'+
-        '    to proceed, or press <b>No</b> to abort the operation.'+
+        '    The information may be permanently lost as a result of the operation. In most cases a better'+
+        '    alternative would be to <b>Reply</b> to the message or to <b>Edit</b> its contents.'+
+        '    Press <b>Yes</b> to delete the message, or press <b>No</b> to abort the operation.'+
         '    <input type="hidden" name="id" value="'+id+'" />'+
         '    <input type="hidden" name="actionSuccess" value="select_experiment" />'+
         '  </form>'+
@@ -1556,7 +1570,7 @@ function display_shift() {
         '<div style="margin-bottom:20px;">'+
         '  <img src="images/ShiftSummary.png" />'+
         '</div>'+
-        '<div id="experiment_info_container" style="height:80px;">Loading...</div>'+
+        '<div id="experiment_info_container" style="height:200px;">Loading...</div>'+
         '<div style="margin-top:40px; margin-bottom:20px;">'+
         '  <img src="images/Runs.png" />'+
         '</div>'+
@@ -1601,7 +1615,8 @@ function begin_new_shift() {
         'The previously open shift (if any) will be atomatically closed. '+
         'Please, provide a leader name or account and a list of (up to 10 extra) crew members.</p><br>'+
         '<form  name="begin_new_shift_form" action="CreateShift.php" method="post">'+
-        '  <input class="lb_sparse" type="hidden" name="max_crew_size" value="10" />'+
+        '  <input type="hidden" name="max_crew_size" value="10" />'+
+        '  <input type="hidden" name="author" value="'+auth_remote_user+'" />'+
         '  <table><tbody>'+
         '    <tr>'+
         '      <td><b>Shift Leader:&nbsp;</b></td>'+
@@ -1637,6 +1652,16 @@ function begin_new_shift() {
         '      <td></td>'+
         '      <td><input class="lb_sparse" type="text" name="member8" value="" /></td>'+
         '      <td><input class="lb_sparse" type="text" name="member9" value="" /></td>'+
+        '    </tr>'+
+        '    <tr>'+
+        '      <td><div style="height:10px;"></div></td>'+
+        '      <td></td>'+
+        '      <td></td>'+
+        '    </tr>'+
+        '    <tr>'+
+        '      <td valign="top"><b>Shift Goals:&nbsp;</b></td>'+
+        '      <td colspan=2><textarea type="text" rows="12" cols="50" style="padding:2px;" name="goals"></textarea></td>'+
+        '      <td></td>'+
         '    </tr>'+
         '  </tbody></table><br>'+
         '  <input class="lb_sparse" type="hidden" name="id" value="'+current_selection.experiment.id+'" />'+
@@ -2041,37 +2066,30 @@ function browse_contents() {
 function expander_highlight( which ) {
     which.style.backgroundColor = '#cfecec';    // #cfecec';    // 'Light Cyan 2''
 }
+
 function expander_unhighlight( which, color ) {
     which.style.backgroundColor = color;
 }
 
-/* TODO: Refactor this code to reduce code duplication with
- * the next function.
- */
-function message_expander( message_idx ) {
-    var re = last_search_result[message_idx];
-    var hid = re.hid;
-    var bid = re.bid;
-    var h = document.getElementById(hid);
-    var b = document.getElementById(bid);
+function message_expander_toggle_impl( re ) {
 
-    h.innerHTML='<b>V</b>';
-    b.style.display = 'block';
-    show_hide_attachments( true, message_idx );
-
-    h.style.width='14px';
-}
-
-function message_expander_toggle( message_idx ) {
-    var re = last_search_result[message_idx];
-    var hid = re.hid;
-    var bid = re.bid;
+    // Handle the current object first
+    //
+    var hid = 'message_header_'+re.id;
+    var bid = 'message_body_'+re.id;
     var h = document.getElementById(hid);
     var b = document.getElementById(bid);
     if( b.style.display == 'none') {
         h.innerHTML='<b>V</b>';
         b.style.display = 'block';
-        show_hide_attachments( true, message_idx );
+        show_hide_attachments_impl( true, Object(re));
+
+        // Proceed to children (if any)
+        //
+        for( var i = 0; i < re.children.length; i++ ) {
+            var child = eval( '('+re.children[i]+')' );
+            expand_collapse_message_impl( true, Object( child ));
+        }
     } else {
         h.innerHTML='<b>&gt;</b>';
         b.style.display = 'none';
@@ -2079,75 +2097,91 @@ function message_expander_toggle( message_idx ) {
     h.style.width='14px';
 }
 
-function attachment_expander_toggle( message_idx, attachment_idx ) {
-
+function message_expander_toggle( message_idx ) {
     var re = last_search_result[message_idx];
-    var attachment_descr = re.attachment_descr[attachment_idx];
-    var ahid = attachment_descr.ahid;
-    var aid = attachment_descr.aid;
-    var h = document.getElementById(ahid);
-    var a = document.getElementById(aid);
-    if( a.style.display == 'none') {
-        attachment_descr.loader.load();
+    message_expander_toggle_impl( Object(re));
+}
+
+function expand_collapse_message_impl( expand, re ) {
+
+    // Handle the current object first
+    //
+    var hid = 'message_header_'+re.id;
+    var bid = 'message_body_'+re.id;
+    var h = document.getElementById(hid);
+    var b = document.getElementById(bid);
+    if( expand ) {
         h.innerHTML='<b>V</b>';
-        a.style.display = 'block';
+        b.style.display = 'block';
+        show_hide_attachments_impl( expand, Object(re));
     } else {
         h.innerHTML='<b>&gt;</b>';
-        a.style.display = 'none';
+        b.style.display = 'none';
     }
-    a.style.width='14px';
+    h.style.width='14px';
+
+    // Proceed to children (if any)
+    //
+    for( var i = 0; i < re.children.length; i++ ) {
+        var child = eval( '('+re.children[i]+')' );
+        expand_collapse_message_impl( expand, Object( child ));
+    }
+}
+
+function expand_collapse_all_messages_impl( expand, message_idx ) {
+    var re = last_search_result[message_idx];
+    expand_collapse_message_impl( expand, Object( re ));
 }
 
 function expand_collapse_all_messages( expand ) {
     for( var message_idx = last_message_idx-1; message_idx >= first_message_idx; message_idx-- ) {
-        var re = last_search_result[message_idx];
-        var hid = re.hid;
-        var bid = re.bid;
-        var h = document.getElementById(hid);
-        var b = document.getElementById(bid);
-        if( expand ) {
+        expand_collapse_all_messages_impl( expand, message_idx );
+    }
+}
+
+function show_hide_attachments_impl( show, re ) {
+
+    for( var i = 0; i < re.attachments.length; i++ ) {
+
+        var a = re.attachments[i];
+        var descr = attachment_descriptors[String(a.id)];
+        var h = document.getElementById( descr.ahid );
+        var a = document.getElementById( descr.aid );
+        if( show ) {
+            descr.loader.load();
             h.innerHTML='<b>V</b>';
-            b.style.display = 'block';
-            show_hide_attachments( expand, message_idx );
+            a.style.display = 'block';
         } else {
             h.innerHTML='<b>&gt;</b>';
-            b.style.display = 'none';
+            a.style.display = 'none';
         }
         h.style.width='14px';
+    }
+    // Proceed to children (if any)
+    //
+    for( var i = 0; i < re.children.length; i++ ) {
+        var child = eval( '('+re.children[i]+')' );
+        show_hide_attachments_impl( show, Object( child ));
     }
 }
 
 function show_hide_attachments( show, message_idx ) {
+
     var re = last_search_result[message_idx];
 
     // Show attachments only for those messages whose body are presently shown
     // (on the current page.)
     //
-    if( document.getElementById( re.bid ).style.display != 'none' ) {
+    var bid = 'message_body_'+re.id;
 
-        var attachment_descr = re.attachment_descr;
-        for( var i=0; i<attachment_descr.length; i++ ) {
-
-            var descr = attachment_descr[i];
-            var h = document.getElementById( descr.ahid );
-            var a = document.getElementById( descr.aid );
-            if( show ) {
-                descr.loader.load();
-                h.innerHTML='<b>V</b>';
-                a.style.display = 'block';
-            } else {
-                h.innerHTML='<b>&gt;</b>';
-                a.style.display = 'none';
-            }
-            h.style.width='14px';
-        }
+    if( document.getElementById( bid ).style.display != 'none' ) {
+        show_hide_attachments_impl( show, Object( re ));
     }
 }
-function show_hide_all_attachments( show ) {
 
-    for( var message_idx = last_message_idx-1; message_idx >= first_message_idx; message_idx-- ) {
+function show_hide_all_attachments( show ) {
+    for( var message_idx = last_message_idx-1; message_idx >= first_message_idx; message_idx-- )
         show_hide_attachments( show, message_idx );
-    }
 }
 
 function AttachmentLoader( a, aid ) {
@@ -2177,6 +2211,167 @@ function AttachmentLoader( a, aid ) {
     }
 }
 
+var attachment_descriptors=[];
+function attachment_expander_toggle( attachment_idx ) {
+
+    var attachment_descr = attachment_descriptors[String(attachment_idx)];
+    var ahid = attachment_descr.ahid;
+    var aid = attachment_descr.aid;
+    var h = document.getElementById(ahid);
+    var a = document.getElementById(aid);
+    if( a.style.display == 'none') {
+        attachment_descr.loader.load();
+        h.innerHTML='<b>V</b>';
+        a.style.display = 'block';
+    } else {
+        h.innerHTML='<b>&gt;</b>';
+        a.style.display = 'none';
+    }
+    a.style.width='14px';
+}
+
+function child_message_expander_toggle( h, b ) {
+    if( b.style.display == 'none') {
+        h.innerHTML='<b>V</b>';
+        b.style.display = 'block';
+    } else {
+        h.innerHTML='<b>&gt;</b>';
+        b.style.display = 'none';
+    }
+    h.style.width='14px';
+}
+
+function child2html( re ) {
+
+    // Initialize and register identifiers for group operations like hiding/expanding
+    // all messages.
+    //
+    var mid = 'message_'+re.id;
+    var hid = 'message_header_'+re.id;
+    var bid = 'message_body_'+re.id;
+    var rid = 'message_reply_dialog_'+re.id;
+    var eid = 'message_edit_dialog_'+re.id;
+
+    var run = re.run == '' ? '' : 'run: <em style="padding:2px;">'+re.run+'</em>';
+    var shift = re.shift == '' ? '' : 'shift: <em style="padding:2px;">'+re.shift+'</em>';
+    var run_shift = re.run == '' && re.shift == '' ? '' : ' - '+run+' '+shift;
+
+    var attachment_sign = '<img src="images/attachment.png" height="18" />';
+    var attachment_signs = '';
+    var attachments='';
+    if( re.attachments.length > 0 ) {
+        attachments +=
+        //'        <div style="padding:10px; background-color:#ffffdd;">';
+        '        <div style="padding:10px; padding-left:0px; background-color:#ffffdd;">';
+        for( var i=0; i < re.attachments.length; i++ ) {
+            attachment_signs += attachment_sign;
+            var a = re.attachments[i];
+
+            var ahid = 'attachment_header_id_'+a.id;
+            var aid = 'attachment_id_'+a.id;
+
+            attachments +=
+                '<div style="margin-top:0px; margin-left:0px;">'+
+                '  <span id="'+ahid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; padding-right:2px; margin-right:5px; font-size:14px; text-align:center; cursor:pointer;"'+
+                '     onclick="javascript:attachment_expander_toggle('+a.id+')"'+
+                '     onmouseover="javascript:expander_highlight(this)" '+
+                '     onmouseout="javascript:expander_unhighlight(this,document.bgColor)">'+
+                '     <b>&gt;</b>'+'</span>'+
+                '  <span><b>'+a.url+'</b></span>'+
+                '  ( <span>type:<b> '+a.type+'</b></span> '+
+                '  <span>size: <b> '+a.size+'</b></span> )'+
+                '  '+attachment_sign+
+                '</div>'+
+                '<div id="'+aid+'" style="margin-left:0px; padding:17px; display:none;">'+
+                '</div>';
+
+            var descr = { 'ahid' : ahid, 'aid' : aid, 'loader' : new AttachmentLoader( a, aid )};
+            attachment_descriptors[String(a.id)] = descr;
+        }
+        attachments +=
+        '</div>';
+    }
+
+    var child_sign = '';
+    if( re.children.length > 0 )
+        child_sign = '&nbsp;<sup><b>&crarr;</b></sup>';
+
+    var result =
+        '<div id="'+mid+'" style="display:block;" style="margin-top:0px;" >'+
+        '  <div style="margin-top:20px; margin-left:0px; padding:2px;">'+
+        '    <span id="'+hid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '      onclick="child_message_expander_toggle('+hid+','+bid+')"'+
+        '      onmouseover="expander_highlight(this)" '+
+        '      onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '      title="Open/close the message body">'+
+        '      <b>&gt;</b>'+
+        '    </span>';
+    result +=
+        '    <span>'+
+        '      <b><em style="padding:2px;">'+re.event_time+'</em></b>'+
+        '      by: <b><em style="padding:2px;">'+re.author+'</em></b>'+
+        '      - <em class="lb_msg_subject" style="padding:2px;">'+re.subject+'</em>'+run_shift+
+        '    </span>'+
+        attachment_signs+
+        child_sign+
+        '  </div>'+
+        //'  <div id="'+bid+'" style="display:none; margin-left:7px; margin-bottom:20px;">'+
+        '  <div id="'+bid+'" style="margin-left:7px; margin-bottom:20px;">'+
+        //'    <div style="padding:10px; padding-left:20px; padding-bottom:0px;  padding-right:0px; border-left:solid 1px #c0c0c0;">';
+        '    <div style="padding:10px; padding-left:20px; padding-bottom:0px;  padding-right:0px;">';
+    if( auth_granted.reply_to_messages ) {
+        var did = 'message_delete_dialog_'+re.id;
+        result +=
+        '    <div style="float:right; position:relative; top:-8px;">'+
+        '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '        onclick="create_message_reply_dialog('+rid+','+re.id+')"'+
+        '        onmouseover="expander_highlight(this)" '+
+        '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '        title="Open a dialog to reply to the message">'+
+        //'        <b>Reply</b>'+
+        '        Reply'+
+        '      </span>'+
+        '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '        onclick="create_message_edit_dialog('+eid+','+re.id+')"'+
+        '        onmouseover="expander_highlight(this)" '+
+        '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '        title="Open a dialog to edit the message text">'+
+        //'        <b>Edit</b>'+
+        '        Edit'+
+        '      </span>'+
+        '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '        onclick="create_message_delete_dialog('+did+','+re.id+')"'+
+        '        onmouseover="expander_highlight(this)" '+
+        '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '        title="Delete the whole message and its children">'+
+        //'        <b>Delete</b>'+
+        '        Delete'+
+        '      </span>'+
+        '    </div>';
+    }
+    result +=
+        //'    <div style="margin-top:8px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
+        '    <div style="margin-top:0px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
+        '    <div id="'+rid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
+        '    <div id="'+eid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
+        '    <div id="'+did+'" style="padding:10px; background-color:#e0e0e0; display:none;"></div>'+
+        attachments+
+        '    <div style="padding-left:20px;">';
+
+    if( re.children.length > 0 )
+        for( var i = re.children.length-1; i >= 0 ; i-- ) {
+            var child = eval( "("+re.children[i]+")" );
+            result += child2html( Object( child ));
+        }
+
+    result +=
+        '      </div>'+
+        '    </div>'+
+        '  </div>'+
+        '</div>';
+    return result;
+}
+
 function event2html( message_idx ) {
 
     var re = last_search_result[message_idx];
@@ -2189,42 +2384,37 @@ function event2html( message_idx ) {
     var bid = 'message_body_'+re.id;
     var rid = 'message_reply_dialog_'+re.id;
     var eid = 'message_edit_dialog_'+re.id;
-    re.mid = mid;
-    re.hid = hid;
-    re.bid = bid;
 
     var run = re.run == '' ? '' : 'run: <em style="padding:2px;">'+re.run+'</em>';
     var shift = re.shift == '' ? '' : 'shift: <em style="padding:2px;">'+re.shift+'</em>';
     var run_shift = re.run == '' && re.shift == '' ? '' : ' - '+run+' '+shift;
 
+    var tag_sign = '';
     var tags='';
     if( re.tags.length > 0 ) {
+        tag_sign = '&nbsp;<sup><b>T</b></sup>';
         tags +=
-        //'<div style="padding:10px; border:solid 1px #efefef; background-color:#ffffdd;">'+
-        '<div style="padding:10px; background-color:#ddffff;">';
-        //'  <div style="position:relative; left:0px; top:-18px;">Tags</div>';
+        '<div style="padding:2px; background-color:#ddffff;">';
         for( var i=0; i < re.tags.length; i++ ) {
             var t = re.tags[i];
             tags +=
                 '<div style="margin-top:4px; margin-left:0px;">'+
-                //'  <span style="border:solid 1px #c0c0c0; width:32px; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center;"'+
-                //'     <b>TAG</b>'+'</span>'+
                 '  <span style="margin-left:4px;"><b>'+t.tag+'</b>=<i>'+t.value+'</i></span>'+
                 '</div>';
         }
         tags +=
         '</div>';
     }
-    var attachment_descr = [];
 
     var attachment_sign = '<img src="images/attachment.png" height="18" />';
+    var attachment_signs = '';
     var attachments='';
     if( re.attachments.length > 0 ) {
         attachments +=
-        //'        <div style="padding:10px; border:solid 1px #efefef; background-color:#ddffff;">'+
-        '        <div style="padding:10px; background-color:#ffffdd;">';
-        //'          <div style="position:relative; left:0px; top:-18px;">Attachments</div>';
+        //'        <div style="padding:10px; background-color:#ffffdd;">';
+        '        <div style="padding:10px; padding-left:0px; background-color:#ffffdd;">';
         for( var i=0; i < re.attachments.length; i++ ) {
+            attachment_signs += attachment_sign;
             var a = re.attachments[i];
 
             var ahid = 'attachment_header_id_'+a.id;
@@ -2233,7 +2423,7 @@ function event2html( message_idx ) {
             attachments +=
                 '<div style="margin-top:0px; margin-left:0px;">'+
                 '  <span id="'+ahid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; padding-right:2px; margin-right:5px; font-size:14px; text-align:center; cursor:pointer;"'+
-                '     onclick="javascript:attachment_expander_toggle('+"'"+message_idx+"','"+i+"')"+'"'+
+                '     onclick="javascript:attachment_expander_toggle('+a.id+')"'+
                 '     onmouseover="javascript:expander_highlight(this)" '+
                 '     onmouseout="javascript:expander_unhighlight(this,document.bgColor)">'+
                 '     <b>&gt;</b>'+'</span>'+
@@ -2242,26 +2432,22 @@ function event2html( message_idx ) {
                 '  <span>size: <b> '+a.size+'</b></span> )'+
                 '  '+attachment_sign+
                 '</div>'+
-                //'<div id="'+aid+'" style="margin-left:18px; padding:17px; padding-left:30px; border-left:solid 2px #efefef; display:none;">'+
-                //'<div id="'+aid+'" style="margin-left:18px; padding:17px; padding-left:30px; display:none;">'+
                 '<div id="'+aid+'" style="margin-left:0px; padding:17px; display:none;">'+
                 '</div>';
 
             var descr = { 'ahid' : ahid, 'aid' : aid, 'loader' : new AttachmentLoader( a, aid )};
-            attachment_descr.push( descr );
+            attachment_descriptors[String(a.id)] = descr;
         }
         attachments +=
         '</div>';
     }
-    re.attachment_descr = attachment_descr;
 
-    var attachment_signs = '';
-    for( var i=0; i < re.attachments.length; i++ )
-        attachment_signs += attachment_sign;
+    var child_sign = '';
+    if( re.children.length > 0 )
+        child_sign = '&nbsp;<sup><b>&crarr;</sup></b>';
 
     var result =
         '<div id="'+mid+'" style="display:none;" style="position:relative;" >'+
-        //'  <div style="position:relative; left:0px; margin-top:10px; margin-left:10px; padding:2px;">'+
         '  <div style="margin-top:10px; margin-left:10px; padding:2px;">'+
         '    <span id="'+hid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
         '      onclick="message_expander_toggle('+message_idx+')"'+
@@ -2270,17 +2456,6 @@ function event2html( message_idx ) {
         '      title="Open/close the message body">'+
         '      <b>&gt;</b>'+
         '    </span>';
-/*
-    if( auth_granted.reply_to_messages )
-        result +=
-        '    <span style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
-        '      onclick="create_message_reply_dialog('+rid+','+re.id+','+message_idx+')"'+
-        '      onmouseover="expander_highlight(this)" '+
-        '      onmouseout="expander_unhighlight(this,document.bgColor)"'+
-        '      title="Open a dialog to reply to the message">'+
-        '      <b>R</b>'+
-        '    </span>';
-*/
     result +=
         '    <span>'+
         '      <b><em style="padding:2px;">'+re.event_time+'</em></b>'+
@@ -2288,75 +2463,58 @@ function event2html( message_idx ) {
         '      - <em class="lb_msg_subject" style="padding:2px;">'+re.subject+'</em>'+run_shift+
         '    </span>'+
         attachment_signs+
+        child_sign+
+        tag_sign+
         '  </div>'+
         '  <div id="'+bid+'" style="display:none; margin-left:17px; margin-bottom:20px;">'+
-        '    <div style="padding:10px; padding-left:20px; padding-bottom:0px; border-left:solid 1px #c0c0c0;">';
+        '    <div style="padding:10px; padding-left:20px; padding-bottom:0px;  padding-right:0px; border-left:solid 1px #c0c0c0;">';
     if( auth_granted.reply_to_messages ) {
         var did = 'message_delete_dialog_'+re.id;
         result +=
         '    <div style="float:right; position:relative; top:0px;">'+
         '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
-        '        onclick="create_message_reply_dialog('+rid+','+re.id+','+message_idx+')"'+
+        '        onclick="create_message_reply_dialog('+rid+','+re.id+')"'+
         '        onmouseover="expander_highlight(this)" '+
         '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
         '        title="Open a dialog to reply to the message">'+
-        '        <b>Reply</b>'+
+        //'        <b>Reply</b>'+
+        '        Reply'+
         '      </span>'+
         '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
-        '        onclick="create_message_edit_dialog('+eid+','+re.id+','+message_idx+')"'+
+        '        onclick="create_message_edit_dialog('+eid+','+re.id+')"'+
         '        onmouseover="expander_highlight(this)" '+
         '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
         '        title="Open a dialog to edit the message text">'+
-        '        <b>Edit</b>'+
+        //'        <b>Edit</b>'+
+        '        Edit'+
         '      </span>'+
         '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
         '        onclick="create_message_delete_dialog('+did+','+re.id+')"'+
         '        onmouseover="expander_highlight(this)" '+
         '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
         '        title="Delete the whole message and its children">'+
-        '        <b>Delete</b>'+
+        //'        <b>Delete</b>'+
+        '        Delete'+
         '      </span>'+
         '    </div>';
     }
     result +=
         '    <div style="margin-top:8px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
-        '    <div id="'+rid+'" style="border-top:solid 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
-        '    <div id="'+eid+'" style="border-top:solid 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
+        '    <div id="'+rid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
+        '    <div id="'+eid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
         '    <div id="'+did+'" style="padding:10px; background-color:#e0e0e0; display:none;"></div>'+
-        tags+
-        //'        <br>'+
-        //((re.tags.length > 0 && re.attachments.length > 0) ? '<br>' : '')+
         attachments+
+        tags+
+        '    <div style="padding-left:20px;">';
 
-/* --------------------------------------------------------------------
- * TODO: Temporarily disable the children. This feature will be enabled
- * in the next release of the application.
- * --------------------------------------------------------------------
- *
-        '      <div style="margin-top:20px; margin-left:0px; padding:2px;">'+
-        '        <span id="'+hid+'" style="border:solid 1px #c0c0c0; width:14px; height:14px; padding-left:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
-        '          onclick="message_expander_toggle('+message_idx+')"'+
-        '          onmouseover="expander_highlight(this)" '+
-        '          onmouseout="expander_unhighlight(this,document.bgColor)">'+
-        '          <b>V</b>'+
-        '        </span>'+
-        '        <span>'+
-        '          <b><em style="padding:2px;">'+re.event_time+'</em></b>'+
-        '          by: <b><em style="padding:2px;">'+re.author+'</em></b>'+
-        '          - <em class="lb_msg_subject" style="padding:2px;">'+re.subject+'</em>'+run_shift+
-        '        </span>'+
-        attachment_signs+
+    if( re.children.length > 0 )
+        for( var i = re.children.length-1; i >= 0 ; i-- ) {
+            var child = eval( "("+re.children[i]+")" );
+            result += child2html( Object( child ));
+        }
+
+    result +=
         '      </div>'+
-        '      <div id="'+bid+'" style="margin-left:7px; margin-bottom:20px;">'+
-        '        <div style="padding:10px; padding-left:20px; padding-bottom:40px; border-left:solid 1px #c0c0c0;">'+
-        '          <div style="margin-top:8px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
-        tags+
-        attachments+
-        '        </div>'+
-        '      </div>'+
-*
-* --------------------------------------------------------------------
-*/
         '    </div>'+
         '  </div>'+
         '</div>';
@@ -2374,12 +2532,15 @@ function display_messages_page() {
     document.getElementById('messages_showing_from_id').innerHTML = last_search_result.length - last_message_idx + 1;
     document.getElementById('messages_showing_through_id').innerHTML = last_search_result.length - first_message_idx;
 
+    last_message_page_button.set( 'disabled', first_message_idx == 0 );
     next_message_page_button.set( 'disabled', first_message_idx == 0 );
     prev_message_page_button.set( 'disabled', last_message_idx >= last_search_result.length );
+    first_message_page_button.set( 'disabled', last_message_idx >= last_search_result.length );
 
     for( var i = 0; i < last_search_result.length; i++ ) {
         var re = last_search_result[i];
-        var m = document.getElementById(re.mid);
+        var mid = 'message_'+re.id;
+        var m = document.getElementById(mid);
 
         // Show the messages from the current page and hide the others
         //
@@ -2389,6 +2550,14 @@ function display_messages_page() {
             m.style.display = 'none';
         }
     }
+}
+
+
+var first_message_page_button = null;
+function first_message_page() {
+    first_message_idx = Math.max( 0, last_search_result.length-limit_per_page );
+    last_message_idx  = last_search_result.length;
+    display_messages_page();
 }
 
 var next_message_page_button = null;
@@ -2405,6 +2574,19 @@ function prev_message_page() {
     display_messages_page();
 }
 
+var last_message_page_button = null;
+function last_message_page() {
+    first_message_idx = 0;
+    if( limit_per_page == last_search_result.length ) {
+        last_message_idx = last_search_result.length;
+    } else {
+        last_message_idx = last_search_result.length % limit_per_page;
+        if( last_message_idx == 0 )
+            last_message_idx = limit_per_page;
+    }
+    display_messages_page();
+}
+
 function display_messages() {
     if( last_search_result == null ) {
         alert( 'display_messages(): application logic error - no messages downloaded' );
@@ -2413,8 +2595,6 @@ function display_messages() {
     var limit_per_page_str = document.search_display_form.limit_per_page.options[document.search_display_form.limit_per_page.selectedIndex].value;
     limit_per_page = limit_per_page_str == 'all' ? last_search_result.length : Number( limit_per_page_str );
 
-    //first_message_idx = 0;
-    //last_message_idx  = Math.min( last_search_result.length, limit_per_page );
     first_message_idx = Math.max( 0, last_search_result.length-limit_per_page );
     last_message_idx  = last_search_result.length;
 
@@ -2523,8 +2703,10 @@ function display_messages_table(
         '          </td>'+
         '          <td valign="top">'+
         '            <div style="padding-left:20px;">'+
+        '              <button id="first_message_page_button">&lt;&lt; First</button>'+
         '              <button id="prev_message_page_button">&lt; Prev</button>'+
         '              <button id="next_message_page_button">Next &gt;</button>'+
+        '              <button id="last_message_page_button">Last &gt;&gt;</button>'+
         '            </div>'+
         '          </td>'+
         '        </tr>'+
@@ -2580,6 +2762,16 @@ function display_messages_table(
     if( html_new_message == '' ) {
         new_message_button.set( 'disabled', true );
     }
+
+    first_message_page_button = new YAHOO.widget.Button( "first_message_page_button" );
+    first_message_page_button.on (
+        "click",
+        function( p_oEvent ) {
+            first_message_page();
+        }
+    );
+    //first_message_page_button.set( 'disabled', true );
+
     prev_message_page_button = new YAHOO.widget.Button( "prev_message_page_button" );
     prev_message_page_button.on (
         "click",
@@ -2587,6 +2779,7 @@ function display_messages_table(
             prev_message_page();
         }
     );
+
     next_message_page_button = new YAHOO.widget.Button( "next_message_page_button" );
     next_message_page_button.on (
         "click",
@@ -2595,6 +2788,15 @@ function display_messages_table(
         }
     );
                 
+    last_message_page_button = new YAHOO.widget.Button( "last_message_page_button" );
+    last_message_page_button.on (
+        "click",
+        function( p_oEvent ) {
+            last_message_page();
+        }
+    );
+    //last_message_page_button.set( 'disabled', true );
+
     function callback_on_load( result ) {
         if( result.ResultSet.Status != "success" ) {
             document.getElementById('messages_area').innerHTML = result.ResultSet.Message;

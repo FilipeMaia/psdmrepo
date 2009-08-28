@@ -29,8 +29,17 @@ and open the template in the editor.
             width:50%;
         }
     </style>
+    <script type="text/javascript">
+    function init() {
+        var d = [];
+        d['321'] = 123;
+        alert(d['321']);
+        d['431'] = 124;
+        alert(d['2']);
+    }
+    </script>
   </head>
-  <body>
+  <body onload="init()">
       <div class="container">
         <div class="left">Left</div>
         <div class="center">Center</div>

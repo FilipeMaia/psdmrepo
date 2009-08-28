@@ -11,6 +11,21 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-17
+2009-08-28 Igor Gaponenko
+- implemented the read-only version of the LogBook application
+- reinforced all PHP scripts modifying the database to work within
+and authenticated context only
+- implemented a display for message subthreads
+- implemented 'Reply', 'Edit' and 'Delete' operations for messages
+(including subthreads)
+- bug fixes
+- added 'Goals' for the shifts (requested when begining a new shift
+and displayed at the 'Shift Status')
+- a number of visualization imprivements in the mesage viwere of
+the LogBook UI: 'First' and 'Last' pages, 'tags' and 'replies' signs.
+- added 'Print' button to the LogBook screen 'Grabber'
+
 Tag: V00-00-16
 2009-08-22 Igor Gaponenko
 - reorganized message action controls

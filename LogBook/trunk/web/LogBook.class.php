@@ -174,6 +174,21 @@ class LogBook {
         return null;
     }
 
+    public function delete_entry_by_id( $id ) {
+        $entry = $this->find_entry_by_id( $id );
+        if( is_null( $entry ))
+            throw new LogBookException(
+                __METHOD__,
+                "no entry for id: {$id} in database. Database can be corrupted." );
+
+        if( is_null( $entry->parent_entry_id()))
+            $this->connection->query (
+                "DELETE FROM header WHERE id=(SELECT hdr_id FROM entry WHERE id={$id})" );
+        else
+            $this->connection->query (
+                "DELETE FROM entry WHERE id={$id}" );
+    }
+
     public function find_shift_by_id( $id ) {
 
         // Find an experiment the shift belongs to

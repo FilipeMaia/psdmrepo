@@ -6,6 +6,8 @@ require_once('LogBook/LogBook.inc.php');
  * This script will process a request for closing a shift
  * in the database.
  */
+if( !LogBookAuth::isAuthenticated()) return;
+
 if( isset( $_POST['experiment_name'])) {
     $experiment_name = trim( $_POST['experiment_name'] );
     if( $experiment_name == '' )

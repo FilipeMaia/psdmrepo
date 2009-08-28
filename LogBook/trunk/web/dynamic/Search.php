@@ -47,10 +47,6 @@ if( isset( $_GET['run_id'] )) {
 if( !is_null( $shift_id ) && !is_null( $run_id ))
     report_error( "conflicting parameters found in the request: <b>shift_id</b> and <b>run_id</b>" );
 
-if( !isset( $_GET['format'] )) report_error( "no valid presentation format parameter" );
-$format = trim( $_GET['format'] );
-if( $format == '' ) report_error( "presentation format parameter can't be empty" );
-
 $text2search = '';
 if( isset( $_GET['text2search'] ))
     $text2search = trim( $_GET['text2search'] );
@@ -161,80 +157,116 @@ function translate_time( $experiment, $str ) {
 
 /* Translate an entry into a JASON object. Return the serialized object.
  */
-function entry2json( $entry, $format ) {
+function child2json( $entry ) {
+
+    $relevance_time_str = is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort();
+    $attachments = $entry->attachments();
+    $children = $entry->children();
+
+    $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".$entry->shift()->begin_time()->toStringShort().'</a>';
+    $run_number_str = '';
+    if( !is_null( $entry->run_id())) {
+        $run = $entry->run();
+        $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
+    }
+    $tag_ids = array();
+    $attachment_ids = array();
+    if( count( $attachments ) != 0 ) {
+        foreach( $attachments as $attachment ) {
+            $attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            array_push(
+                $attachment_ids,
+                array(
+                    "id" => $attachment->id(),
+                    "type" => $attachment->document_type(),
+                    "size" => $attachment->document_size(),
+                    "url" => $attachment_url
+                )
+            );
+        }
+    }
+    $children_ids = array();
+    foreach( $children as $child )
+        array_push( $children_ids, child2json( $child ));
+
+    return json_encode(
+        array (
+            "event_time" => $entry->insert_time()->toStringShort(),
+            "relevance_time" => $relevance_time_str,
+            "run" => $run_number_str,
+            "shift" => $shift_begin_time_str,
+            "author" => $entry->author(),
+            "id" => $entry->id(),
+            "subject" => substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' ),
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$entry->content()}</pre>",
+            "content" => $entry->content(),
+            "attachments" => $attachment_ids,
+            "tags" => $tag_ids,
+            "children" => $children_ids
+        )
+    );
+}
+
+function entry2json( $entry ) {
 
     $relevance_time_str = is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort();
     $tags = $entry->tags();
     $attachments = $entry->attachments();
+    $children = $entry->children();
 
-    // Produce different output depending on the requested format.
-    //
-    if( $format == 'detailed' ) {
-
-        $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".$entry->shift()->begin_time()->toStringShort().'</a>';
-        $run_number_str = '';
-        if( !is_null( $entry->run_id())) {
-            $run = $entry->run();
-            $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
-        }
-
-        // Estimate a number of lines for the message text by counting
-        // new lines.
-        //
-        $message_lines = count( explode( "\n", $entry->content()));
-        $message_height = min( 200, 14 + 14*$message_lines );
-
-        $con = new RegDBHtml( 0, 0, 800, $message_height );
-
-        $highlight = false;
-        $con->container_1 (   0,   0, "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$entry->content()}</pre>", 800, $message_height, $highlight );
-
-        $tag_ids = array();
-        if( count( $tags ) != 0 ) {
-            foreach( $tags as $tag ) {
-                array_push(
-                    $tag_ids,
-                    array(
-                        "tag" => $tag->tag(),
-                        "value" => $tag->value()
-                    )
-                );
-            }
-        }
-
-        $attachment_ids = array();
-        if( count( $attachments ) != 0 ) {
-            foreach( $attachments as $attachment ) {
-                $attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
-                array_push(
-                    $attachment_ids,
-                    array(
-                        "id" => $attachment->id(),
-                        "type" => $attachment->document_type(),
-                        "size" => $attachment->document_size(),
-                        "url" => $attachment_url
-                    )
-                );
-            }
-        }
-        return json_encode(
-            array (
-                "event_time" => $entry->insert_time()->toStringShort(),
-                "relevance_time" => $relevance_time_str,
-                "run" => $run_number_str,
-                "shift" => $shift_begin_time_str,
-                "author" => $entry->author(),
-                "id" => $entry->id(),
-                "subject" => substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' ),
-                //"html" => $con->html(),
-                "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$entry->content()}</pre>",
-                "content" => $entry->content(),
-                "attachments" => $attachment_ids,
-                "tags" => $tag_ids
-            )
-        );
+    $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".$entry->shift()->begin_time()->toStringShort().'</a>';
+    $run_number_str = '';
+    if( !is_null( $entry->run_id())) {
+        $run = $entry->run();
+        $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
     }
-    return null;
+    $tag_ids = array();
+    if( count( $tags ) != 0 ) {
+        foreach( $tags as $tag ) {
+            array_push(
+                $tag_ids,
+                array(
+                    "tag" => $tag->tag(),
+                    "value" => $tag->value()
+                )
+            );
+        }
+    }
+    $attachment_ids = array();
+    if( count( $attachments ) != 0 ) {
+        foreach( $attachments as $attachment ) {
+            $attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            array_push(
+                $attachment_ids,
+                array(
+                    "id" => $attachment->id(),
+                    "type" => $attachment->document_type(),
+                    "size" => $attachment->document_size(),
+                    "url" => $attachment_url
+                )
+            );
+        }
+    }
+    $children_ids = array();
+    foreach( $children as $child )
+        array_push( $children_ids, child2json( $child ));
+
+    return json_encode(
+        array (
+            "event_time" => $entry->insert_time()->toStringShort(),
+            "relevance_time" => $relevance_time_str,
+            "run" => $run_number_str,
+            "shift" => $shift_begin_time_str,
+            "author" => $entry->author(),
+            "id" => $entry->id(),
+            "subject" => substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' ),
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$entry->content()}</pre>",
+            "content" => $entry->content(),
+            "attachments" => $attachment_ids,
+            "tags" => $tag_ids,
+            "children" => $children_ids
+        )
+    );
 }
 
 /* Proceed with the operation
@@ -297,9 +329,9 @@ HERE;
     foreach( $entries as $e ) {
         if( $first ) {
             $first = false;
-            $result .= "\n".entry2json( $e, $format );
+            $result .= "\n".entry2json( $e );
         } else {
-            $result .= ",\n".entry2json( $e, $format );
+            $result .= ",\n".entry2json( $e );
         }
     }
     $result .=<<< HERE

@@ -1,5 +1,18 @@
+______
+URGENT
+
+- write C++ client for RegDb & LogBook and give it to Chris O'Grady
+
 _________________________________________
 EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
+
++ improve the PHP LDAP API at RegDB to recognize secondary groups as well.
+
++ fix the "crosstalk" of the 'Options' buttons in the 'New Message' anbd 'Reply' dialogs.
+
++ put a title to the grabber (root.title())
+
++ order group names alphabetically when selecting POSIX Group in the Experiment Registration Dialog
 
 + run Welcome.html through the spell check (typos make people crazy!)
 
@@ -11,54 +24,94 @@ EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
 
 + serve LogBook as all lower-case logbook. Follow the same approach for other apps and services
 
-- implement editing LogBook entries: edit the message text, renaming the atatchments, adding
-  more attachments to existing messages, and (perhaps) deleting atatchments, messages and
+      +----------+     +---------+
++ add | << First | and | Last >> | buttons to the messages viewer
+      +----------+     +---------+
+
++ add 'Print' button to the 'Grabber', so that the operator could create a hard-copy of the
+  grabbed picture. Add command line option '-p <printer command> | <printer>' to specify the desired
+  destination.
+
++ implement proper display of subthreads (replies to messages).
+
++ provide a read-only version of the LogBook which wouldn't require any authentication.
+  The same for RegDB.
+
+  ATTENTION: Make sure all PHP services are properly protected before deploying it.
+
++ implement _partial_ editing of LogBook entries: edit the message text.
+
+  NOTE: No backup version is the
+
++ add a sign to the end of the parent message subjects to indicate a presence of the subthreads:
+
+    |
+    +->
+
++ add a sign indicating a presence of tags - just a bold symbol 'T'
+
+      +------------+     +------------+
+- add | View Repl. | and | Hide Repl. | buttons to the messages viewer
+      +------------+     +------------+
+
+  NOTE: The viewer's bar needs to be reorganized a bit to group functions
+
+- implement full editing LogBook entries: edit the message text, renaming the atatchments,
+  adding more attachments to existing messages, and (perhaps) deleting atatchments, messages and
   tags.
 
   ATTENTION: This feature would require extending the database schema to keep a track
   of the changes made to an attachment. The simplest way would be to add shadow
   tables for hdr
 
-- Talk to Teresa on when we can get the server open.
+- Talk to Teresa on when we can get the server open. The Web & Security Committee is
+  gathering this Friday (August 28, 2009) to discuss my request. Make a PPT presentation
+  of the system architecture involving the Web server and Web services (for both ONLINE
+  and OFFLINE "worlds").
 
-- provide a read-only version of the LogBook which wouldn't require any authentication.
-
-  ATTENTION: Make sure all PHP services are properly protected before deploying it.
-
-- set up WebAuth on the pswww
+- set up WebAuth on the pswww (remote possibility only?). Perhaps, a better alternative
+  would be to set up Apache Kerberos module. This would eliminate a need to maintain
+  separate IRL for Internet and PCDS Control Network(s).
 
 - set up cron-tab on 'psdb' to make daily 'mysqldump' of all databases onto an NFS disk
 
-- revisit the server and applications security (SQL injection, error reports, etc.)
+- revisit the server and applications security (SQL injection, giving too much information in
+  error reports, etc.)
 
-- check with Len Moss on a possibility to urn 'amoopr' into an account with a password
+- check with Len Moss on a possibility to turn 'amoopr' into an account with a password
 
-      +----------+     +---------+
-- add | << First | and | Last >> | buttons to the messages viewer
-      +----------+     +---------+
+- make sure the Experiment Status, Shift Status and Run Status pages are regularily
+  refreshed too if the auto-refresh mode is on.
 
-____
-BUGS
-Grabber
-- put a title to the grabber (root.title())
-- order group names alphabetically when selecting POSIX Group in the Experiment Registration Dialog
+- fix a bug in the message 'Reply' to return to the same context from which the reply
+  is made (right now it always goes back to the 'Experiment Status')
+
 - add user group search (LDAP) in the experiment registry based on user name or his account name. This is to simplify a selection of
 the group.
-- improve the PHP LDAP API at RegDB to recognize secondary groups as well.
-- fix the "crosstalk" of the 'Options' buttons in the 'New Message' anbd 'Reply' dialogs.
+
+- implement auto-refresh fore new messages posted via 'Reply'. As a temporary solution,
+  ass an explicit mechanism to force the refresh by an operator: 'Refresh Now' button.
+
+  NOTE: The later would require to rearrange the buttons in the message viewer
+  control bar.
+
+____________________________
+CODE CLEANUP AND REFACTORING
+
+- separate JS from HTML. Put JS logic into a separate file
+- separate CSS from HTML and put it into a seprate file
+
 _________
 NEW IDEAS
 
-    1. begin working on implementing subthreads in the message list:
-
-    2. implement a persistent address for the individual messages (successAction or
+    1. implement a persistent address for the individual messages (successAction or
     actionSuccess). That would allow expanding message trees
 
-    3. implement a viewer for an individual message tree in a separate page (like
+    2. implement a viewer for an individual message tree in a separate page (like
     Experiment status, etc.).
 
-_________________________________________________
-HIGH PRIORITY: Consider extending database schema
+___________________________________________________
+MEDIUM PRIORITY: Consider extending database schema
 
     1. storing both user account name and his name entered into the box when
     posting messages. If no user name is provided when entering a new message then
@@ -66,6 +119,13 @@ HIGH PRIORITY: Consider extending database schema
 
     2. move tags from message header to message entries
 
+    3. probably add some sort of the 'Shift assignment' field for shifts to be
+    displayed at the 'Shift Status' page. An alternative to this would be to
+    use specially tagged (SHIFT_ASSIGNMENT) messages to be automatically posted
+    in a context of the shift when begining new shifts.
+
+    NOTE: A clear 'pros' of the approach would be a possibility to search
+    these assignments via the regular browsing/finding.
 
 ___________________________________________
 MEDIUM PRIORITY: Improve 'New Shift' dialog
@@ -79,6 +139,8 @@ MEDIUM PRIORITY: Improve 'New Shift' dialog
     The contents of the listbox will be populated by members of a POSIX group
     associated with the selected experiment. Th erequest will be sent dynamically
     using AJAX.
+
+    2. Add the 'Shift Assignment' text box to
 
 ____________________________________________________________________________
 LOW PRIORITY: Refactor the Messages Table and Dialog into a single prototype

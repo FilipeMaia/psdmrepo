@@ -5,6 +5,8 @@ require_once('LogBook/LogBook.inc.php');
 /*
  * This script will process a request for updating the specified free-form entry.
  */
+if( !LogBookAuth::isAuthenticated()) return;
+
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
     if( $id == '' )

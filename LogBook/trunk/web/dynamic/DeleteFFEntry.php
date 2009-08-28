@@ -5,6 +5,8 @@ require_once('LogBook/LogBook.inc.php');
 /*
  * This script will process a request for deleting the specified free-form entry.
  */
+if( !LogBookAuth::isAuthenticated()) return;
+
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
     if( $id == '' )
@@ -30,12 +32,9 @@ try {
     $entry = $logbook->find_entry_by_id( $id )
         or die( "no such free-form entry" );
 
-    if( !is_null( $entry->parent_entry_id()))
-        die( "the operation is not allowed (yet) for non-top-level entries" );
-
     $experiment = $entry->parent();
-    $experiment->delete_top_level_entry( $entry->id());
 
+    $logbook->delete_entry_by_id( $id );
     $logbook->commit();
 
     // Return back to the caller

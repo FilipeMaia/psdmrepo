@@ -5,6 +5,7 @@ require_once('LogBook/LogBook.inc.php');
 /*
  * This script will process a request for closing an on-going shift.
  */
+if( !LogBookAuth::isAuthenticated()) return;
 
 if( isset( $_POST['id'] )) {
     $shift_id = trim( $_POST['id'] );

@@ -6,6 +6,8 @@ require_once('LogBook/LogBook.inc.php');
  * This script will process a request for attaching documents to
  * an existingfree-form entry.
  */
+if( !LogBookAuth::isAuthenticated()) return;
+
 $entry_id = null;
 if( isset( $_POST['entry_id'] )) {
     $str = trim( $_POST['entry_id'] );

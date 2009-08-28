@@ -6,6 +6,8 @@ require_once('LogBook/LogBook.inc.php');
  * This script will process a request for creating a new free-form
  * entry in the database.
  */
+if( !LogBookAuth::isAuthenticated()) return;
+
 $parent_entry_id = null;
 if( isset( $_POST['parent_entry_id'] )) {
     $str = trim( $_POST['parent_entry_id'] );

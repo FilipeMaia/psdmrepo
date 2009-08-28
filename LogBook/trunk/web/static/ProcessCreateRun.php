@@ -6,6 +6,8 @@ require_once('LogBook/LogBook.inc.php');
  * This script will process a request for creating a new run
  * in the database.
  */
+if( !LogBookAuth::isAuthenticated()) return;
+
 if( isset( $_POST['num'] )) {
     $str = trim( $_POST['num'] );
     if( $str != '' ) {

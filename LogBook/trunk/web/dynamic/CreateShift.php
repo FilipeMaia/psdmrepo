@@ -5,6 +5,8 @@ require_once('LogBook/LogBook.inc.php');
 /*
  * This script will process a request for creating a new shift.
  */
+if( !LogBookAuth::isAuthenticated()) return;
+
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
     if( $id == '' )
@@ -21,6 +23,18 @@ if( isset( $_POST['leader'] )) {
 }
 if( isset( $_POST['actionSuccess'] )) {
     $actionSuccess = trim( $_POST['actionSuccess'] );
+}
+if( isset( $_POST['author'] )) {
+    $author = trim( $_POST['author'] );
+    if( $author == '' )
+        die( "shift request author can't be empty" );
+} else {
+    die( "no valid shift request author" );
+}
+if( isset( $_POST['goals'] )) {
+    $goals = trim( $_POST['goals'] );
+} else {
+    die( "no valid parameter for shift goals" );
 }
 
 $crew = array();
@@ -45,6 +59,10 @@ try {
 
     $begin_time = LusiTime::now();
     $shift = $experiment->create_shift( $leader, $crew, $begin_time );
+
+    $entry = $experiment->create_entry (
+        $author, 'TEXT', $goals, $shift_id=$shift->id());
+    $entry->add_tag( 'SHIFT_GOALS', '' );
 
     $instrument = $experiment->instrument();
 
