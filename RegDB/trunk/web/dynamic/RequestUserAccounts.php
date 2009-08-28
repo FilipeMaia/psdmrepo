@@ -5,6 +5,8 @@ require_once('RegDB/RegDB.inc.php');
 /*
  * This script will process a request for displaying user accounts.
  */
+if( !RegDBAuth::isAuthenticated()) return;
+
 function account2json( $account ) {
     $groups_str = '';
     $first = true;

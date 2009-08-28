@@ -7,6 +7,8 @@ require_once('RegDB/RegDB.inc.php');
  * for an experiment. The run record will get permanently stored in
  * the database.
  */
+if( !RegDBAuth::isAuthenticated()) return;
+
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
     if( $id == '' )

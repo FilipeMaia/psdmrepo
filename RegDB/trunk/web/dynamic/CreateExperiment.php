@@ -5,6 +5,7 @@ require_once('RegDB/RegDB.inc.php');
 /*
  * This script will lay out a form for creating a new experiment.
  */
+if( !RegDBAuth::isAuthenticated()) return;
 
 /* Proceed with the operation
  */
@@ -32,7 +33,7 @@ try {
 
     /* Create a container with standard fields
      */
-    $con = new RegDBHtml( 0, 0, 700, 250 );
+    $con = new RegDBHtml( 0, 0, 800, 250 );
     echo $con
         ->label         ( 300,   0, 'Description')
         ->label         (   0,  25, 'Experiment: ' )

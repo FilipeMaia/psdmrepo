@@ -2,6 +2,8 @@
 
 require_once('RegDB/RegDB.inc.php');
 
+if( !RegDBAuth::isAuthenticated()) return;
+
 function group2json( $group ) {
     $group_url = "<a href=\"javascript:view_group('".$group."')\">".$group.'</a>';
     return json_encode(

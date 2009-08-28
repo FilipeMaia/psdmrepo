@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-11
+2009-08-28 Igor Gaponenko
+- protect RegDB Web App and relevant Web services from unauthorized
+modifications (of the database) by unauthenticated users.
+- fix bugs
+
 Tag: V00-00-10
 2009-08-20 Igor Gaponenko
 - correctly implemented LDAP interface for PHP apps

@@ -39,6 +39,16 @@ Page-specific styles
     div.yui-b p em {
         color: #000;
     }
+    a {
+        text-decoration:none;
+        font-weight:bold;
+        color:#0071bc;
+        /*
+        */
+    }
+    a:hover {
+        color:red;
+    }
     #application_header {
         background-color:#d0d0d0;
         padding:8px;
@@ -140,263 +150,16 @@ Custom JavaScript
 <script type="text/javascript" src="JSON.js"></script>
 <script type="text/javascript" src="Utilities.js"></script>
 
+
 <!--
-Page-specific script
+PHP Generated JavaScript with initialization parameters
 -->
-<script type="text/javascript">
-
-var dialog_element = "popupdialogs";
-
-var menubar_element = "menubar";
-var menubar_data = [];
-
-var menubar_group_applications = menubar_data.length;
-menubar_data.push ( {
-    id: 'applications',
-    href: '#applications',
-    title: 'Applications',
-    title_style: 'font-weight:bold;',
-    itemdata: [
-        { text: "Experiment Registry Database", url: "../regdb/" },
-        { text: "Electronic Log Book", url: "../logbook/" } ],
-    disabled: false }
-);
-var menubar_group_home = menubar_data.length;
-menubar_data.push ( {
-    id: null,
-    href: 'index.php',
-    title: 'Home',
-    title_style: null,
-    itemdata: null,
-    disabled: false }
-);
-var menubar_experiments_home = menubar_data.length;
-menubar_data.push ( {
-    id: "experiments",
-    href: "#experiments",
-    title: 'Experiments',
-    title_style: 'font-weight:bold;',
-    itemdata: [
-        { text: "Select..", url: "javascript:list_experiments()" },
-        { text: "Create New..", url: "javascript:create_experiment()" } ],
-    disabled: false }
-);
-var menubar_instruments_home = menubar_data.length;
-menubar_data.push ( {
-    id: "instruments",
-    href: "#instruments",
-    title: 'Instruments',
-    title_style: 'font-weight:bold;',
-    itemdata: [
-        { text: "Select..", url: "javascript:list_instruments()" },
-        { text: "Create New..", url: "javascript:create_instrument()" } ],
-    disabled: false }
-);
-var menubar_groups_home = menubar_data.length;
-menubar_data.push ( {
-    id: "ldap",
-    href: "#ldap",
-    title: 'LDAP',
-    title_style: 'font-weight:bold;',
-    itemdata: [
-        { text: "PODIX Groups..", url: "javascript:list_groups()" },
-        { text: "User accounts..", url: "javascript:list_users()" } ],
-    disabled: false }
-);
-var menubar_runnumbers_home = menubar_data.length;
-menubar_data.push ( {
-    id: null,
-    href: 'javascript:run_numbers()',
-    title: 'Run Numbers',
-    title_style: null,
-    itemdata: null,
-    disabled: false }
-);
-var menubar_group_help = menubar_data.length;
-menubar_data.push ( {
-    id:    'help',
-    href:  '#help',
-    title: 'Help',
-    title_style: null,
-    itemdata: [
-        { text: "Contents",              url: "#", disabled: true },
-        { text: "With the current page", url: "#", disabled: true },
-        { text: "About the application", url: "#", disabled: true } ],
-    disabled: false }
-);
-
-YAHOO.util.Event.onContentReady (
-    menubar_element,
-    function () {
-        menubar_create (
-            menubar_element,
-            menubar_data );
-    }
-);
-
-
-/*
-
-YAHOO.util.Event.onContentReady("menubar", function () {
-
-    var oMenuBar =
-        new YAHOO.widget.MenuBar("menubar", {
-            autosubmenudisplay: true,
-            hidedelay: 750,
-            lazyload: true });
-
-    var aSubmenuData = [
-        {   id: "applications",
-            itemdata: [
-                { text: "Experiment Registry Database", url: "../../RegDB/dynamic/" },
-                { text: "Electronic Log Book", url: "../../LogBook/dynamic/" } ],
-            disabled: false },
-        { },
-        {   id: "experiments",
-            itemdata: [
-                { text: "Select..", url: "javascript:list_experiments()" },
-                { text: "Create New..", url: "javascript:create_experiment()" } ] },
-        {   id: "instruments",
-            itemdata: [
-                { text: "Select..", url: "javascript:list_instruments()" },
-                { text: "Create New..", url: "javascript:create_instrument()" } ] },
-        { },
-        { },
-        {   id: "help",
-            itemdata: [
-                { text: "Help contents...", url: "#" },
-                { text: "Help with the current page...", url: "#" },
-                { text: "About the application", url: "#" } ] } ];
-
-    var ua = YAHOO.env.ua,
-        oAnim;  // Animation instance
-
-    function onSubmenuBeforeShow(p_sType, p_sArgs) {
-
-        var oBody,
-            oElement,
-            oShadow,
-            oUL;
-
-        if (this.parent) {
-
-            oElement = this.element;
-
-            oShadow = oElement.lastChild;
-            oShadow.style.height = "0px";
-
-            if (oAnim && oAnim.isAnimated()) {
-                oAnim.stop();
-                oAnim = null;
-            }
-            oBody = this.body;
-
-            //  Check if the menu is a submenu of a submenu.
-            if (this.parent &&
-                !(this.parent instanceof YAHOO.widget.MenuBarItem)) {
-
-                if (ua.gecko || ua.opera) {
-                    oBody.style.width = oBody.clientWidth + "px";
-                }
-                if (ua.ie == 7) {
-                    oElement.style.width = oElement.clientWidth + "px";
-                }
-            }
-            oBody.style.overflow = "hidden";
-
-            oUL = oBody.getElementsByTagName("ul")[0];
-            oUL.style.marginTop = ("-" + oUL.offsetHeight + "px");
-        }
-    }
-    function onTween(p_sType, p_aArgs, p_oShadow) {
-
-        if (this.cfg.getProperty("iframe")) {
-            this.syncIframe();
-        }
-        if (p_oShadow) {
-            p_oShadow.style.height = this.element.offsetHeight + "px";
-        }
-    }
-    function onAnimationComplete(p_sType, p_aArgs, p_oShadow) {
-
-        var oBody = this.body,
-            oUL = oBody.getElementsByTagName("ul")[0];
-
-        if (p_oShadow) {
-            p_oShadow.style.height = this.element.offsetHeight + "px";
-        }
-        oUL.style.marginTop = "";
-        oBody.style.overflow = "";
-
-        //  Check if the menu is a submenu of a submenu.
-
-        if (this.parent &&
-            !(this.parent instanceof YAHOO.widget.MenuBarItem)) {
-
-            // Clear widths set by the "beforeshow" event handler
-
-            if (ua.gecko || ua.opera) {
-                oBody.style.width = "";
-            }
-            if (ua.ie == 7) {
-                this.element.style.width = "";
-            }
-        }
-    }
-    function onSubmenuShow(p_sType, p_sArgs) {
-
-        var oElement,
-            oShadow,
-            oUL;
-
-        if (this.parent) {
-
-            oElement = this.element;
-            oShadow = oElement.lastChild;
-            oUL = this.body.getElementsByTagName("ul")[0];
-
-            oAnim = new YAHOO.util.Anim(oUL,
-                { marginTop: { to: 0 } },
-                .5, YAHOO.util.Easing.easeOut);
-
-            oAnim.onStart.subscribe(function () {
-                oShadow.style.height = "100%";
-            });
-            oAnim.animate();
-
-            if (YAHOO.env.ua.ie) {
-                oShadow.style.height = oElement.offsetHeight + "px";
-                oAnim.onTween.subscribe(onTween, oShadow, this);
-            }
-            oAnim.onComplete.subscribe(onAnimationComplete, oShadow, this);
-        }
-    }
-    oMenuBar.subscribe("beforeRender", function () {
-
-        var nSubmenus = aSubmenuData.length,
-            i;
-
-        if (this.getRoot() == this) {
-            for (i = 0; i < nSubmenus; i++) {
-                this.getItem(i).cfg.setProperty("submenu", aSubmenuData[i]);
-            }
-        }
-    });
-    oMenuBar.subscribe("beforeShow", onSubmenuBeforeShow);
-    oMenuBar.subscribe("show", onSubmenuShow);
-    oMenuBar.render();
-});
-*/
-
-</script>
-
 <?php
 
 echo <<<HERE
     <script type="text/javascript">
 
 HERE;
-
 
 echo <<<HERE
 
@@ -408,6 +171,12 @@ var auth_remote_user="{$_SERVER['REMOTE_USER']}";
 var auth_webauth_user="{$_SERVER['WEBAUTH_USER']}";
 var auth_webauth_token_creation="{$_SERVER['WEBAUTH_TOKEN_CREATION']}";
 var auth_webauth_token_expiration="{$_SERVER['WEBAUTH_TOKEN_EXPIRATION']}";
+
+var auth_granted = {
+  manage_experiments : auth_remote_user != '',
+  manage_instruments : auth_remote_user != '',
+  manage_runs        : auth_remote_user != '',
+  view_ldap          : auth_remote_user != '' };
 
 function refresh_page() {
     window.location = "{$_SERVER['REQUEST_URI']}";
@@ -472,8 +241,99 @@ echo <<<HERE
 HERE;
 ?>
 
+<!--
+Page-specific script
+-->
 <script type="text/javascript">
 
+var dialog_element = "popupdialogs";
+
+var menubar_element = "menubar";
+var menubar_data = [];
+
+var menubar_group_applications = menubar_data.length;
+menubar_data.push ( {
+    id: 'applications',
+    href: '#applications',
+    title: 'Applications',
+    title_style: 'font-weight:bold;',
+    itemdata: [
+        { text: "Experiment Registry Database", url: "../regdb/" },
+        { text: "Electronic Log Book", url: "../logbook/" } ],
+    disabled: false }
+);
+var menubar_group_home = menubar_data.length;
+menubar_data.push ( {
+    id: null,
+    href: 'index.php',
+    title: 'Home',
+    title_style: null,
+    itemdata: null,
+    disabled: false }
+);
+var menubar_experiments_home = menubar_data.length;
+menubar_data.push ( {
+    id: "experiments",
+    href: "#experiments",
+    title: 'Experiments',
+    title_style: 'font-weight:bold;',
+    itemdata: [
+        { text: "Select..", url: "javascript:list_experiments()" },
+        { text: "Create New..", url: "javascript:create_experiment()", disabled: !auth_granted.manage_experiments } ],
+    disabled: false }
+);
+var menubar_instruments_home = menubar_data.length;
+menubar_data.push ( {
+    id: "instruments",
+    href: "#instruments",
+    title: 'Instruments',
+    title_style: 'font-weight:bold;',
+    itemdata: [
+        { text: "Select..", url: "javascript:list_instruments()" },
+        { text: "Create New..", url: "javascript:create_instrument()", disabled: !auth_granted.manage_instruments } ],
+    disabled: false }
+);
+var menubar_groups_home = menubar_data.length;
+menubar_data.push ( {
+    id: "ldap",
+    href: "#ldap",
+    title: 'LDAP',
+    title_style: 'font-weight:bold;',
+    itemdata: [
+        { text: "PODIX Groups..", url: "javascript:list_groups()" },
+        { text: "User accounts..", url: "javascript:list_users()" } ],
+    disabled: !auth_granted.view_ldap }
+);
+var menubar_runnumbers_home = menubar_data.length;
+menubar_data.push ( {
+    id: null,
+    href: 'javascript:run_numbers()',
+    title: 'Run Numbers',
+    title_style: null,
+    itemdata: null,
+    disabled: false }
+);
+var menubar_group_help = menubar_data.length;
+menubar_data.push ( {
+    id:    'help',
+    href:  '#help',
+    title: 'Help',
+    title_style: null,
+    itemdata: [
+        { text: "Contents",              url: "#", disabled: true },
+        { text: "With the current page", url: "#", disabled: true },
+        { text: "About the application", url: "#", disabled: true } ],
+    disabled: false }
+);
+
+YAHOO.util.Event.onContentReady (
+    menubar_element,
+    function () {
+        menubar_create (
+            menubar_element,
+            menubar_data );
+    }
+);
 
 /*
  * Session expiration timer for WebAuth authentication.
@@ -515,15 +375,6 @@ function auth_timer_event() {
         '<b>'+hours_left_str+':'+minutes_left_str+'.'+seconds_left_str+'</b>';
 
     auth_timer_restart();
-}
-
-function leave_current_app() {
-    post_warning (
-        'popupdialogs',
-        "You're about to leave the current application. "+
-        "All currently open connections will be closed, and "+
-        "all unsaved data will be lost! Click <b>Yes</b> if you sure "+
-        "you want to proceed. Click <b>Cancel</b> to abort the transition." );
 }
 
 function set_context( context ) {
@@ -660,7 +511,7 @@ function Table1( itsTableName, itsColumnDefs, itsDataRequest, hasPaginator ) {
     return this;
 }
 
-function create_button( elementId, func2proceed ) {
+function create_button( elementId, func2proceed, disabled ) {
     this.oButton = new YAHOO.widget.Button(
         elementId,
         {   type:  "submit",
@@ -672,6 +523,7 @@ function create_button( elementId, func2proceed ) {
             func2proceed();
         }
     );
+    this.oButton.set( 'disabled', disabled );
     return this;
 }
 
@@ -915,11 +767,13 @@ function view_experiment( id, name ) {
 
     var action_edit = create_button (
         "edit_button",
-        function() { edit_experiment( id, name ); } );
+        function() { edit_experiment( id, name ); },
+        !auth_granted.manage_experiments );
 
     var action_delete = create_button (
         "delete_button",
-        function() { delete_experiment( id, name ); } );
+        function() { delete_experiment( id, name ); },
+        !auth_granted.manage_experiments );
 }
 
 function edit_experiment( id, name ) {
@@ -967,7 +821,8 @@ function edit_experiment( id, name ) {
         function() {
             document.edit_experiment_form.params.value = params.toJSON();
             document.edit_experiment_form.submit();
-        }
+        },
+        !auth_granted.manage_experiments
     );
 
     var cancel = create_button (
@@ -1014,7 +869,8 @@ function create_experiment( ) {
         function() {
             document.create_experiment_form.params.value = params.toJSON();
             document.create_experiment_form.submit();
-        }
+        },
+        !auth_granted.manage_experiments
     );
     var cancel = create_button (
         "cancel_button",
@@ -1069,7 +925,8 @@ function delete_experiment( id, name ) {
                 function() { document.delete_experiment_form.submit(); },
                 function() { view_experiment( id, name ); }
             );
-        }
+        },
+        !auth_granted.manage_experiments
     );
     var cancel = create_button (
         "cancel_button",
@@ -1138,11 +995,13 @@ function view_instrument( id, name ) {
     );
     var action_edit = create_button (
         "edit_button",
-        function() { edit_instrument( id, name ); }
+        function() { edit_instrument( id, name ); },
+        !auth_granted.manage_instruments
     );
     var action_delete = create_button (
         "delete_button",
-        function() { delete_instrument( id, name ); }
+        function() { delete_instrument( id, name ); },
+        !auth_granted.manage_instruments
     );
 }
 
@@ -1190,7 +1049,8 @@ function edit_instrument( id, name ) {
         function() {
             document.edit_instrument_form.params.value = params.toJSON();
             document.edit_instrument_form.submit();
-        }
+        },
+        !auth_granted.manage_instruments
     );
     var cancel = create_button (
         "cancel_button",
@@ -1239,7 +1099,8 @@ function create_instrument( ) {
         function() {
             document.create_instrument_form.params.value = params.toJSON();
             document.create_instrument_form.submit();
-        }
+        },
+        !auth_granted.manage_instruments
     );
     var cancel = create_button (
         "cancel_button",
@@ -1295,7 +1156,8 @@ function delete_instrument( id, name ) {
                 function() { document.delete_instrument_form.submit(); },
                 function() { view_instrument( id, name ); }
             );
-        }
+        },
+        !auth_granted.manage_instruments
     );
     var cancel = create_button (
         "cancel_button",
@@ -1432,7 +1294,8 @@ function view_run_numbers( id, name ) {
 
     var generate = create_button (
         "generate_button",
-        function() { document.generate_run_form.submit(); }
+        function() { document.generate_run_form.submit(); },
+        !auth_granted.manage_runs
     );
     var runs = create_runs_table (
         'RequestRunNumbers.php?exper_id='+id,
@@ -1453,20 +1316,30 @@ function view_run_numbers( id, name ) {
           </p>
         </div>
         <div style="float:right; height:50px;">
+<?php
+$remote_user = $_SERVER['REMOTE_USER'];
+if( $remote_user == '' ) echo <<<HERE
+          <br>
+          <br>
+          <a href="../../apps/regdb"><p title="login here to proceed to the full version of the application">login</p></a>
+HERE;
+else echo <<<HERE
+          <table><tbody>
             <tr>
               <td>&nbsp;</td>
               <td></td>
             </tr>
-          <table><tbody>
             <tr>
-              <td>Logged as:&nbsp;</td>
-              <td><p><b><?php echo $_SERVER['REMOTE_USER']?></b></p></td>
+              <td>Welcome,&nbsp;</td>
+              <td><p><b>{$remote_user}</b></p></td>
             </tr>
             <tr>
               <td>Session expires in:&nbsp;</td>
               <td><p id="auth_expiration_info"><b>00:00.00</b></p></td>
             </tr>
           </tbody></table>
+HERE;
+?>
         </div>
         <div style="height:40px;">&nbsp;</div>
       </div>

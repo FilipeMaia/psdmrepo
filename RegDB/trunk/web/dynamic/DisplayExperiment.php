@@ -35,7 +35,7 @@ try {
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-    $con = new RegDBHtml( 0, 0, 700, 250 );
+    $con = new RegDBHtml( 0, 0, 800, 250 );
     echo $con
         ->label   ( 300,   0, 'Description')
         ->label   (   0,  25, 'Experiment: ' )

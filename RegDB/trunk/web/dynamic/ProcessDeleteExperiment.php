@@ -6,6 +6,8 @@ require_once('RegDB/RegDB.inc.php');
  * This script will process a request for deleting an experiment
  * from the database.
  */
+if( !RegDBAuth::isAuthenticated()) return;
+
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
     if( $id == '' )

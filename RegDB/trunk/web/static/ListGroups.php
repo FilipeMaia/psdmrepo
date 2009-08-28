@@ -30,6 +30,8 @@ The page for creating displaying all POSIX groups.
                     </tr>
                     <?php
                     require_once('RegDB/RegDB.inc.php');
+
+                    if( !RegDBAuth::isAuthenticated()) return;
                     try {
                         $regdb = new RegDB();
                         $regdb->begin();

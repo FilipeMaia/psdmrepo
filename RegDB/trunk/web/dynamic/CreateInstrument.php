@@ -5,6 +5,7 @@ require_once('RegDB/RegDB.inc.php');
 /*
  * This script will lay out a form for creating a new instrument.
  */
+if( !RegDBAuth::isAuthenticated()) return;
 
 /* Proceed with the operation
  */

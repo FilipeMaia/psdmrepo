@@ -6,6 +6,8 @@ require_once('RegDB/RegDB.inc.php');
  * This script will process a request for editing an instrument
  * in the database.
  */
+if( !RegDBAuth::isAuthenticated()) return;
+
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
     if( $id == '' )

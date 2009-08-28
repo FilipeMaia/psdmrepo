@@ -6,6 +6,8 @@ require_once('RegDB/RegDB.inc.php');
  * This script will process a request for creating a new experiment
  * in the database.
  */
+if( !RegDBAuth::isAuthenticated()) return;
+
 if( isset( $_POST['experiment_name'] )) {
     $experiment_name = trim( $_POST['experiment_name'] );
     if( $experiment_name == '' )

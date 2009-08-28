@@ -6,6 +6,8 @@ require_once('RegDB/RegDB.inc.php');
  * This script will process a request for creating a new instrument
  * in the database.
  */
+if( !RegDBAuth::isAuthenticated()) return;
+
 if( isset( $_POST['instrument_name'] )) {
     $instrument_name = trim( $_POST['instrument_name'] );
     if( $instrument_name == '' )
