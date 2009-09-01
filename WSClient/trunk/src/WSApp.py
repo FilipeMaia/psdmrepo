@@ -68,7 +68,7 @@ class WSApp ( object ) :
 
         # get the base URI
         if not base_uri : base_uri = os.environ.get('WSCLIENT_BASE_URI',None)
-        if not base_uri : base_uri = 'https://www-lclsdev.slac.stanford.edu:81'
+        if not base_uri : base_uri = 'https://pswww.slac.stanford.edu'
 
         # authentication location
         auloc = '/ws'

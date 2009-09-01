@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2009-09-01 Andy Salnikov
+- changed default base URI to point to pswww
+
 Tag: V00-00-02
 2009-08-10 Andy Salnikov
 - make base URI optional and provide some default base URI value
