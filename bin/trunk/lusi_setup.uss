@@ -106,7 +106,7 @@ test -n "$LUSI_ROOT" || set_env LUSI_ROOT /afs/slac.stanford.edu/g/lusi
 #
 #  Set repository location
 #
-set_env LUSI_SVN "file://${LUSI_ROOT}/svnrepo"
+test -n "$LUSI_SVN" || set_env LUSI_SVN "file://${LUSI_ROOT}/svnrepo"
 
 #
 # determine the release to use, could be the first command line argument,
