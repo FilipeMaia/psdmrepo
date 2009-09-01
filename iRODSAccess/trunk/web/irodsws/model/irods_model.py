@@ -71,9 +71,16 @@ class _Connection( object ) :
         app_conf = config['app_conf']
         host = app_conf.get( self._config_name+'.host', '127.0.0.1' )
         port = int( app_conf.get( self._config_name+'.port', 3306 ) )
-        user = app_conf.get( self._config_name+'.user', None )
         zone = app_conf.get( self._config_name+'.zone', "" )
+        user = app_conf.get( self._config_name+'.user', None )
         passwd = app_conf.get( self._config_name+'.password', None )
+        pwdfile = app_conf.get( self._config_name+'.pwdfile', None )
+        if pwdfile and ( not user or not passwd ) :
+            f = codecs.open(pwdfile,'r','base64')
+            u, p = tuple(f.read().split())
+            f.close()
+            if not user : user = u
+            if not passwd : passwd = p
     
         conn, errMsg = irods.rcConnect(host, port, user, zone)
         if conn :
