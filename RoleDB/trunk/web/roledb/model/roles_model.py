@@ -24,6 +24,7 @@ Copyright (C) 2006 SLAC
 from pylons import config
 import MySQLdb as db
 from MySQLdb import cursors
+import codecs
 
 #---------------------------------
 #  Imports of base class module --
@@ -60,10 +61,18 @@ class _Connection( object ):
             app_conf = config['app_conf']
             host = app_conf.get( self._config_name+'.host', '127.0.0.1' )
             port = int( app_conf.get( self._config_name+'.port', 3306 ) )
-            user = app_conf.get( self._config_name+'.user', None )
             dbname = app_conf.get( self._config_name+'.dbname', None )
+            user = app_conf.get( self._config_name+'.user', None )
+            password = app_conf.get( self._config_name+'.password', None )
+            pwdfile = app_conf.get( self._config_name+'.pwdfile', None )
+            if pwdfile and ( not user or not password ) :
+                f = codecs.open(pwdfile,'r','base64')
+                u, p = tuple(f.read().split())
+                f.close()
+                if not user : user = u
+                if not password : password = p
     
-            self._conn = db.connect( host=host, port=port, user=user, db=dbname )
+            self._conn = db.connect( host=host, port=port, user=user, db=dbname, passwd=password )
             
         return self._conn
 
