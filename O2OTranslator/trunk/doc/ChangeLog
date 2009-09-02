@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-15
+2009-09-02 Andy Salnikov
+- trying to adopt the changes in XTC structure
+
 2009-08-26 Andy Salnikov
 - changed logic for group creation so that missing transition does not
   crash application

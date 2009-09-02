@@ -64,7 +64,7 @@ public:
   enum SplitMode { NoSplit, Family } ;
 
   // current XTC state
-  enum State { Undefined, Mapped, Configured, Running } ;
+  enum State { Undefined, Mapped, Configured, Running, CalibCycle } ;
 
   // Default constructor
   O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
@@ -92,14 +92,10 @@ public:
 protected:
 
   // Construct a group name
-  std::string groupName( const std::string& prefix, const Pds::ClockTime& clock ) const ;
+  std::string groupName( State state, const Pds::ClockTime& clock ) const ;
 
-  void map ( const Pds::Dgram& dgram ) ;
-  void configure ( const Pds::Dgram& dgram ) ;
-  void startRun ( const Pds::Dgram& dgram ) ;
-  void endRun ( const Pds::Dgram& dgram ) ;
-  void unconfigure ( const Pds::Dgram& dgram ) ;
-  void unmap ( const Pds::Dgram& dgram ) ;
+  void openGroup ( const Pds::Dgram& dgram, State state ) ;
+  void closeGroup ( const Pds::Dgram& dgram, State state ) ;
 
 private:
 
@@ -110,9 +106,7 @@ private:
   const O2OFileNameFactory& m_nameFactory ;
   hdf5pp::File m_file ;
   std::stack<State> m_state ;
-  hdf5pp::Group m_mapGroup ;      // Group for current Map transition
-  hdf5pp::Group m_cfgGroup ;      // Group for current Configure transition
-  hdf5pp::Group m_runGroup ;      // Group for current Run transition
+  std::stack<hdf5pp::Group> m_groups ;
   H5DataTypes::XtcClockTime m_eventTime ;
   CvtMap m_cvtMap ;
   int m_compression ;

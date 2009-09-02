@@ -71,6 +71,8 @@ namespace {
         return "Configured" ;
       case O2OHdf5Writer::Running :
         return "Running" ;
+      case O2OHdf5Writer::CalibCycle :
+        return "CalibCycle" ;
     }
     return "*ERROR*" ;
   }
@@ -107,18 +109,13 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_nameFactory( nameFactory )
   , m_file()
   , m_state()
-  , m_mapGroup()
-  , m_cfgGroup()
-  , m_runGroup()
+  , m_groups()
   , m_eventTime()
   , m_cvtMap()
   , m_compression(compression)
   , m_extGroups(extGroups)
   , m_metadata(metadata)
 {
-  // we are in bad state, this state should never be popped
-  m_state.push(Undefined) ;
-
   std::string fileTempl = m_nameFactory.makeH5Path ( split != NoSplit ) ;
   MsgLog( logger, debug, "O2OHdf5Writer - open output file " << fileTempl ) ;
 
@@ -150,6 +147,12 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   m_file.createAttr<uint32_t> ("runNumber").store ( m_metadata.runNumber() ) ;
   m_file.createAttr<const char*> ("runType").store ( m_metadata.runType().c_str() ) ;
   m_file.createAttr<const char*> ("experiment").store ( m_metadata.experiment().c_str() ) ;
+
+  // we are in bad state, this state should never be popped
+  m_state.push(Undefined) ;
+
+  // store top group
+  m_groups.push ( m_file.openGroup("/") ) ;
 
   typedef O2OMetaData::const_iterator MDIter ;
   for ( MDIter it = m_metadata.extra_begin() ; it != m_metadata.extra_end() ; ++ it ) {
@@ -225,182 +228,183 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
           << " dgram.seq.type=" << dgram.seq.type()
           << " dgram.seq.service=" << Pds::TransitionId::name(dgram.seq.service()) ) ;
 
-  if ( dgram.seq.service() == Pds::TransitionId::Map ) {
+  switch ( dgram.seq.service()  ) {
 
-    // check current state
-    if ( m_state.top() == Running ) this->endRun( dgram ) ;
-    if ( m_state.top() == Configured ) this->unconfigure( dgram ) ;
-    if ( m_state.top() == Mapped ) this->unmap( dgram ) ;
+    case Pds::TransitionId::Map :
 
-    this->map( dgram ) ;
+      // close all states
+      this->closeGroup( dgram, CalibCycle ) ;
+      this->closeGroup( dgram, Running ) ;
+      this->closeGroup( dgram, Configured ) ;
+      this->closeGroup( dgram, Mapped ) ;
+      this->openGroup( dgram, Mapped ) ;
 
-  } else if ( dgram.seq.service() == Pds::TransitionId::Configure ) {
+      break ;
 
-    // check current state
-    if ( m_state.top() == Running ) this->endRun( dgram ) ;
-    if ( m_state.top() == Configured ) this->unconfigure( dgram ) ;
+    case Pds::TransitionId::Unmap :
 
-    this->configure( dgram ) ;
+      // close all states
+      this->closeGroup( dgram, CalibCycle ) ;
+      this->closeGroup( dgram, Running ) ;
+      this->closeGroup( dgram, Configured ) ;
+      this->closeGroup( dgram, Mapped ) ;
 
-  } else if ( dgram.seq.service() == Pds::TransitionId::BeginRun ) {
+      break ;
 
-    // check current state
-    if ( m_state.top() == Running ) this->endRun( dgram ) ;
+    case Pds::TransitionId::Configure :
 
-    this->startRun( dgram ) ;
+      // close all states up to Mapped
+      this->closeGroup( dgram, CalibCycle ) ;
+      this->closeGroup( dgram, Running ) ;
+      this->closeGroup( dgram, Configured ) ;
+      this->openGroup( dgram, Configured ) ;
 
-  } else if ( dgram.seq.service() == Pds::TransitionId::L1Accept ) {
+      // signal  transition to interested converters
+      for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+        it->second->configure( m_groups.top() ) ;
+      }
 
-    // store current event time
-    m_eventTime = H5DataTypes::XtcClockTime(dgram.seq.clock()) ;
+      break ;
 
-  } else if ( dgram.seq.service() == Pds::TransitionId::EndRun ) {
+    case Pds::TransitionId::Unconfigure :
 
-    this->endRun( dgram ) ;
+      // close all states up to Mapped
+      this->closeGroup( dgram, CalibCycle ) ;
+      this->closeGroup( dgram, Running ) ;
+      this->closeGroup( dgram, Configured ) ;
+      this->closeGroup( dgram, Mapped ) ;
 
-  } else if ( dgram.seq.service() == Pds::TransitionId::Unconfigure ) {
+      break ;
 
-    if ( m_state.top() == Running ) this->endRun( dgram ) ;
-    this->unconfigure( dgram ) ;
+    case Pds::TransitionId::BeginRun :
 
-  } else if ( dgram.seq.service() == Pds::TransitionId::Unmap ) {
+      // close all states up to Configured
+      this->closeGroup( dgram, CalibCycle ) ;
+      this->closeGroup( dgram, Running ) ;
+      this->openGroup( dgram, Running ) ;
 
-    if ( m_state.top() == Running ) this->endRun( dgram ) ;
-    if ( m_state.top() == Configured ) this->unconfigure( dgram ) ;
-    this->unmap( dgram ) ;
+      // signal  transition to interested converters
+      for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+        it->second->beginRun( m_groups.top() ) ;
+      }
 
+      break ;
+
+    case Pds::TransitionId::EndRun :
+
+      // close all states up to Configured
+      this->closeGroup( dgram, CalibCycle ) ;
+      this->closeGroup( dgram, Running ) ;
+
+      // signal  transition to interested converters
+      for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+        it->second->endRun() ;
+      }
+
+      break ;
+
+    case Pds::TransitionId::BeginCalibCycle :
+
+      // close all states up to Running
+      this->closeGroup( dgram, CalibCycle ) ;
+      this->openGroup( dgram, CalibCycle ) ;
+
+      // signal  transition to interested converters
+      for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+        it->second->configure( m_groups.top() ) ;
+        it->second->endRun() ;
+        it->second->beginRun( m_groups.top() ) ;
+      }
+
+      break ;
+
+    case Pds::TransitionId::EndCalibCycle :
+
+      for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+        it->second->endRun() ;
+      }
+
+      // close all states up to Running
+      this->closeGroup( dgram, CalibCycle ) ;
+
+      if ( m_state.top() == Running ) {
+        for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+          it->second->beginRun( m_groups.top() ) ;
+        }
+      }
+
+      break ;
+
+    case Pds::TransitionId::L1Accept :
+
+      // store current event time
+      m_eventTime = H5DataTypes::XtcClockTime(dgram.seq.clock()) ;
+
+      break ;
+
+    case Pds::TransitionId::Enable :
+    case Pds::TransitionId::Disable :
+    case Pds::TransitionId::Unknown :
+    case Pds::TransitionId::Reset :
+    case Pds::TransitionId::NumberOf :
+
+      break ;
   }
 
   MsgLog( logger, debug, "O2OHdf5Writer -- now in the state " << ::stateName(m_state.top()) ) ;
 }
 
-
-void
-O2OHdf5Writer::map ( const Pds::Dgram& dgram )
-{
-  // create group
-  const std::string& group = groupName ( "Map", dgram.seq.clock() ) ;
-  MsgLog( logger, debug, "HDF5Writer -- creating group " << group ) ;
-  m_mapGroup = m_file.createGroup( group ) ;
-
-  // store transition time as couple of attributes to this new group
-  ::storeClock ( m_mapGroup, dgram.seq.clock(), "start" ) ;
-
-  // switch to mapped state
-  m_state.push(Mapped) ;
-}
-
-void
-O2OHdf5Writer::configure ( const Pds::Dgram& dgram )
-{
-  // Create group
-  const std::string& group = groupName ( "Configure", dgram.seq.clock() ) ;
-  MsgLog( logger, debug, "HDF5Writer -- creating group " << group ) ;
-  if ( m_state.top() == Mapped ) {
-    m_cfgGroup = m_mapGroup.createGroup( group ) ;
-  } else {
-    m_cfgGroup = m_file.createGroup( group ) ;
-  }
-
-  // signal the configure transition
-  for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-    it->second->configure( m_cfgGroup ) ;
-  }
-
-  // store transition time as couple of attributes to this new group
-  ::storeClock ( m_cfgGroup, dgram.seq.clock(), "start" ) ;
-
-  // switch to configured state
-  m_state.push(Configured) ;
-}
-
-void
-O2OHdf5Writer::startRun ( const Pds::Dgram& dgram )
-{
-  // Create group
-  const std::string& group = groupName ( "Run", dgram.seq.clock() ) ;
-  MsgLog( logger, debug, "HDF5Writer -- creating group " << group ) ;
-  if ( m_state.top() == Configured ) {
-    m_runGroup = m_cfgGroup.createGroup( group ) ;
-  } else if ( m_state.top() == Mapped ) {
-    m_runGroup = m_mapGroup.createGroup( group ) ;
-  } else {
-    m_runGroup = m_file.createGroup( group ) ;
-  }
-
-  // signal the begin-run transition
-  for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-    it->second->beginRun( m_runGroup ) ;
-  }
-
-  // store transition time as couple of attributes to this new group
-  ::storeClock ( m_runGroup, dgram.seq.clock(), "start" ) ;
-
-  // switch to running state
-  m_state.push( Running ) ;
-}
-
-void
-O2OHdf5Writer::endRun ( const Pds::Dgram& dgram )
-{
-  if ( m_state.top() != Running ) return ;
-
-  // signal the end-run transition
-  for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-    it->second->endRun() ;
-  }
-
-  // store transition time as couple of attributes to this new group
-  ::storeClock ( m_runGroup, dgram.seq.clock(), "end" ) ;
-
-  // close the group
-  m_runGroup.close() ;
-  m_runGroup = hdf5pp::Group() ;
-
-  // switch back to previous state
-  m_state.pop() ;
-}
-
-void
-O2OHdf5Writer::unconfigure ( const Pds::Dgram& dgram )
-{
-  if ( m_state.top() != Configured ) return ;
-
-  // signal the unconfigure transition
-  for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-    it->second->unconfigure() ;
-  }
-
-  // store transition time as couple of attributes to this new group
-  ::storeClock ( m_cfgGroup, dgram.seq.clock(), "end" ) ;
-
-  // close the group
-  m_cfgGroup.close() ;
-  m_cfgGroup = hdf5pp::Group() ;
-
-  // switch back to previous state
-  m_state.pop() ;
-}
-
-void
-O2OHdf5Writer::unmap ( const Pds::Dgram& dgram )
-{
-  if ( m_state.top() != Mapped ) return ;
-
-  // store transition time as couple of attributes to this new group
-  ::storeClock ( m_mapGroup, dgram.seq.clock(), "end" ) ;
-
-  // close Map group
-  m_mapGroup.close() ;
-  m_mapGroup = hdf5pp::Group() ;
-
-  // switch back to previous state
-  m_state.pop() ;
-}
-
 void
 O2OHdf5Writer::eventEnd ( const Pds::Dgram& dgram )
 {
+  switch ( dgram.seq.service()  ) {
+
+    case Pds::TransitionId::Configure :
+    case Pds::TransitionId::BeginCalibCycle :
+
+      // configuration object converters are not needed anymore
+      for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+        it->second->unconfigure() ;
+      }
+      break ;
+
+    default :
+
+      break ;
+  }
+}
+
+
+void
+O2OHdf5Writer::openGroup ( const Pds::Dgram& dgram, State state )
+{
+  // create group
+  const std::string& name = groupName ( state, dgram.seq.clock() ) ;
+  MsgLog( logger, debug, "HDF5Writer -- creating group " << name ) ;
+  hdf5pp::Group group = m_groups.top().createGroup( name ) ;
+
+  // store transition time as couple of attributes to this new group
+  ::storeClock ( group, dgram.seq.clock(), "start" ) ;
+
+  // switch to mapped state
+  m_state.push(Mapped) ;
+  m_groups.push( group ) ;
+}
+
+void
+O2OHdf5Writer::closeGroup ( const Pds::Dgram& dgram, State state )
+{
+  if ( m_state.top() != state ) return ;
+
+  // store transition time as couple of attributes to this new group
+  ::storeClock ( m_groups.top(), dgram.seq.clock(), "end" ) ;
+
+  // close the group
+  m_groups.top().close() ;
+
+  // switch back to previous state
+  m_state.pop() ;
+  m_groups.pop() ;
 }
 
 // signal start/end of the level
@@ -445,15 +449,35 @@ O2OHdf5Writer::dataObject ( const void* data, const Pds::TypeId& typeId, const P
 
 // Construct a group name
 std::string
-O2OHdf5Writer::groupName( const std::string& prefix, const Pds::ClockTime& clock ) const
+O2OHdf5Writer::groupName( State state, const Pds::ClockTime& clock ) const
 {
+  const char* prefix = "Undefined" ;
+  switch ( state ) {
+    case O2OHdf5Writer::Mapped :
+      prefix = "Map" ;
+      break ;
+    case O2OHdf5Writer::Configured :
+      prefix = "Configure" ;
+      break ;
+    case O2OHdf5Writer::Running :
+      prefix = "Run" ;
+      break ;
+    case O2OHdf5Writer::CalibCycle :
+      prefix = "CalibCycle" ;
+      break ;
+    case O2OHdf5Writer::Undefined :
+    default :
+      prefix = "Undefined" ;
+      break ;
+  }
+
   if ( m_extGroups ) {
     // dump seconds as a hex string, it will be group name
-    char buf[16] ;
-    snprintf ( buf, sizeof buf, ":%08X", clock.seconds() ) ;
-    return prefix+buf;
+    char buf[32] ;
+    snprintf ( buf, sizeof buf, "%s:%08X", prefix, clock.seconds() ) ;
+    return buf;
   } else {
-    return prefix ;
+    return prefix;
   }
 }
 
