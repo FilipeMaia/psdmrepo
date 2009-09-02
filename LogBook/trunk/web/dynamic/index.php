@@ -182,25 +182,25 @@ and open the template in the editor.
     <script type="text/javascript" src="JSON.js"></script>
     <script type="text/javascript" src="Utilities.js"></script>
 
-    <!--
-    PHP Generated JavaScript with initialization parameters
-    -->
+<!--
+PHP Generated JavaScript with initialization parameters
+-->
+<script type="text/javascript">
+
 <?php
 
-echo <<<HERE
-    <script type="text/javascript">
-
-HERE;
-
-// Instruments
-//
 require_once('LogBook/LogBook.inc.php');
+
 try {
+    $auth_svc = LogBookAuth::instance();
+
     $logbook = new LogBook();
     $logbook->begin();
 
-echo <<<HERE
+    echo <<<HERE
 
+/* Known instruments
+ */
 var instruments = [
 HERE;
     $instruments = $logbook->instruments();
@@ -219,35 +219,75 @@ HERE;
 HERE;
         }
     }
-echo <<<HERE
+    echo <<<HERE
 
 ];
 
+/* Known experiments
+ */
+var experiments = [
 HERE;
-    $logbook->commit();
+    $experiments = $logbook->experiments();
+    $first = true;
+    foreach( $experiments as $i ) {
+        if( $first ) {
+            $first = false;
+            echo <<<HERE
 
-} catch( LogBookException $e ) {
-    print $e->toHtml();
-} catch( RegDBException $e ) {
-    print $e->toHtml();
-}
+   {name: '{$i->name()}', id: {$i->id()}}
+HERE;
+        } else {
+            echo <<<HERE
 
-echo <<<HERE
+  ,{name: '{$i->name()}', id: {$i->id()}}
+HERE;
+        }
+    }
+    echo <<<HERE
+
+];
+
 
 /* Authentication and authorization context
  */
-var auth_type="{$_SERVER['AUTH_TYPE']}";
-var auth_remote_user="{$_SERVER['REMOTE_USER']}";
+var auth_is_authenticated="{$auth_svc->isAuthenticated()}";
+var auth_type="{$auth_svc->authType()}";
+var auth_remote_user="{$auth_svc->authName()}";
 
-var auth_webauth_user="{$_SERVER['WEBAUTH_USER']}";
 var auth_webauth_token_creation="{$_SERVER['WEBAUTH_TOKEN_CREATION']}";
 var auth_webauth_token_expiration="{$_SERVER['WEBAUTH_TOKEN_EXPIRATION']}";
 
 var auth_granted = {
-  manage_shifts     : auth_remote_user != '',
-  post_new_messages : auth_remote_user != '',
-  reply_to_messages : auth_remote_user != '',
-  see_other_apps    : auth_remote_user != '' };
+HERE;
+    $experiments = $logbook->experiments();
+    $first = true;
+    foreach( $experiments as $e ) {
+        if( $first ) $first = false;
+        else echo ',';
+        $canRead            = $auth_svc->canRead($e->id()) ? 'true' : 'false';
+        $canPostNewMessages = $auth_svc->canPostNewMessages($e->id()) ? 'true' : 'false';
+        $canEditMessages    = $auth_svc->canEditMessages($e->id()) ? 'true' : 'false';
+        $canDeleteMessages  = $auth_svc->canDeleteMessages($e->id()) ? 'true' : 'false';
+        $canManageShifts    = $auth_svc->canManageShifts($e->id()) ? 'true' : 'false';
+        echo <<<HERE
+
+   {$e->id()} :
+     { 'canRead'            : {$canRead},
+       'canPostNewMessages' : {$canPostNewMessages},
+       'canEditMessages'    : {$canEditMessages},
+       'canDeleteMessages'  : {$canDeleteMessages},
+       'canManageShifts'    : {$canManageShifts}
+     }
+   
+HERE;
+    }
+    echo <<<HERE
+
+};
+
+function isAuthorizedFor( priv ) {
+    return auth_granted[current_selection.experiment.id][priv];
+}
 
 function refresh_page() {
     window.location = "{$_SERVER['REQUEST_URI']}";
@@ -257,54 +297,58 @@ HERE;
 
 // Initial action dispatcher's generator
 //
-echo <<<HERE
+    echo <<<HERE
 
 function init() {
 
 HERE;
-if( isset( $_GET['action'] )) {
+    if( isset( $_GET['action'] )) {
 
-    $action = trim( $_GET['action'] );
+        $action = trim( $_GET['action'] );
 
-    if( $action == 'select_experiment' ) {
-        $instr_id   = $_GET['instr_id'];
-        $instr_name = $_GET['instr_name'];
-        $exper_id   = $_GET['exper_id'];
-        $exper_name = $_GET['exper_name'];
-        echo "  select_experiment({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}');";
+        if( $action == 'select_experiment' ) {
+            $instr_id   = $_GET['instr_id'];
+            $instr_name = $_GET['instr_name'];
+            $exper_id   = $_GET['exper_id'];
+            $exper_name = $_GET['exper_name'];
+            echo "  select_experiment({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}');";
 
-    } else if( $action == 'select_experiment_and_shift' ) {
-        $instr_id   = $_GET['instr_id'];
-        $instr_name = $_GET['instr_name'];
-        $exper_id   = $_GET['exper_id'];
-        $exper_name = $_GET['exper_name'];
-        $shift_id   = $_GET['shift_id'];
-        echo "  select_experiment_and_shift({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$shift_id});";
+        } else if( $action == 'select_experiment_and_shift' ) {
+            $instr_id   = $_GET['instr_id'];
+            $instr_name = $_GET['instr_name'];
+            $exper_id   = $_GET['exper_id'];
+            $exper_name = $_GET['exper_name'];
+            $shift_id   = $_GET['shift_id'];
+            echo "  select_experiment_and_shift({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$shift_id});";
 
-    } else if( $action == 'select_experiment_and_run' ) {
-        $instr_id   = $_GET['instr_id'];
-        $instr_name = $_GET['instr_name'];
-        $exper_id   = $_GET['exper_id'];
-        $exper_name = $_GET['exper_name'];
-        $shift_id   = $_GET['shift_id'];
-        $run_id     = $_GET['run_id'];
-        echo "  select_experiment_and_run({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$shift_id},{$run_id});";
+        } else if( $action == 'select_experiment_and_run' ) {
+            $instr_id   = $_GET['instr_id'];
+            $instr_name = $_GET['instr_name'];
+            $exper_id   = $_GET['exper_id'];
+            $exper_name = $_GET['exper_name'];
+            $shift_id   = $_GET['shift_id'];
+            $run_id     = $_GET['run_id'];
+            echo "  select_experiment_and_run({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$shift_id},{$run_id});";
 
+        } else {
+            echo "  alert( 'unsupported action: {$action}' );";
+        }
     } else {
-        echo "  alert( 'unsupported action: {$action}' );";
+        echo "  load( 'help/Welcome.html', 'workarea' );";
     }
-} else {
-    echo "  load( 'help/Welcome.html', 'workarea' );";
-}
-echo <<<HERE
+    echo <<<HERE
 
   auth_timer_restart();
 }
 
-    </script>
-
 HERE;
+
 ?>
+
+</script>
+<!--
+This is the end of the PHP generated JavaScript code
+-->
 
 <!--
 Page-specific script
@@ -326,7 +370,7 @@ function browser_is_MSIE() {
  */
 var auth_timer = null;
 function auth_timer_restart() {
-    if( auth_type == 'WebAuth' )
+    if( auth_is_authenticated && ( auth_type == 'WebAuth' ))
         auth_timer = window.setTimeout( 'auth_timer_event()', 1000 );
 }
 var auth_last_secs = null;
@@ -424,7 +468,7 @@ menubar_data.push ( {
     title: 'Applications',
     title_style: 'font-weight:bold;',
     itemdata: [
-        { text: "Experiment Registry Database", url: "../regdb/", disabled: !auth_granted.see_other_apps },
+        { text: "Experiment Registry Database", url: "../regdb/" },
         { text: "Electronic Log Book", url: "../logbook/" } ],
     disabled: false }
 );
@@ -469,7 +513,7 @@ menubar_data.push ( {
     itemdata: [
         { text: "List all",     url: "javascript:list_shifts()" },
         { text: "Display last", url: "javascript:select_last_shift()" },
-        { text: "Begin new",    url: "javascript:begin_new_shift()", disabled: !auth_granted.manage_shifts } ],
+        { text: "Begin new",    url: "javascript:begin_new_shift()" } ],
     disabled: true }
 );
 var menubar_group_runs = menubar_data.length;
@@ -773,10 +817,10 @@ var current_messages_table = null;
 function create_messages_dialog( scope ) {
 
     var html_new_message =
-        '<div id="new_message_dialog" style="padding:20px; margin-left:10px; margin-top:30px; background-color:#e0e0e0; border:solid 1px #c0c0c0; display:none;">'+
-        '<div style="float:right; position:relative; right:-18px; top:-18px;">'+
-        '  <a href="javascript:close_messages_dialog()"><img src="images/Close.png" / ></a> '+
-        '</div>'+
+        '<div id="new_message_dialog" style="padding:10px; margin-left:10px; margin-top:30px; background-color:#e0e0e0; border:solid 1px #c0c0c0; display:none;">'+
+        //'<div style="float:right; position:relative; right:-8px; top:-8px;">'+
+        //'  <a href="javascript:close_messages_dialog()"><img src="images/Close.png" / ></a> '+
+        //'</div>'+
         //'<center>'+
         '<form enctype="multipart/form-data" name="new_message_form" action="NewFFEntry.php" method="post">'+
         '  <input type="hidden" name="author_account" value="'+auth_remote_user+'" style="padding:2px; width:200px;" />'+
@@ -807,8 +851,8 @@ function create_messages_dialog( scope ) {
         //'        <em class="lb_label">New message: </em>'+
         //'      </td>'+
         '      <td valign="top">'+
-        '        <div id="new_message_body" style="margin-right:10px; padding:4px;">'+
-        '          <input id="new_message_text" type="text" name="message_text" size="71" value="" />'+
+        '        <div id="new_message_body" style="margin-right:0px; padding:4px;">'+
+        '          <input id="new_message_text" type="text" name="message_text" size="128" value="" />'+
         '        </div>'+
         '      </td>'+
         '      <td valign="top">'+
@@ -847,7 +891,7 @@ function create_messages_dialog( scope ) {
         begin, end,
         tag,
         author,
-        auth_granted.post_new_messages ? html_new_message : '',
+        isAuthorizedFor( 'canPostNewMessages' ) ? html_new_message : '',
         auto_refresh );
 
     this.extendedShown = false;
@@ -949,7 +993,7 @@ function create_messages_dialog( scope ) {
         if( !this.extendedShown ) {
             document.getElementById('new_message_body').innerHTML=
                 '<textarea id="new_message_text" type="text" name="message_text"'+
-                ' rows="12" cols="71" style="padding:1px;"'+
+                ' rows="12" cols="128" style="padding:1px;"'+
                 ' title="This is multi-line text area in which return will add a new line of text.'+
                 ' Use Submit button to post the message.">'+
                 document.getElementById('new_message_text').value+'</textarea>'+
@@ -1040,7 +1084,7 @@ function create_messages_dialog( scope ) {
 
         } else {
             document.getElementById('new_message_body').innerHTML=
-                '<input id="new_message_text" type="text" name="message_text" size="71" value="'+
+                '<input id="new_message_text" type="text" name="message_text" size="128" value="'+
                 document.getElementById('new_message_text').value+'" />';
             new_message_body.style.paddingBottom="4px";
             this.tags_table = null;
@@ -1113,7 +1157,7 @@ function create_message_reply_dialog( rid, message_id ) {
         '    <tr>'+
         '      <td valign="top">'+
         '        <div id="message_reply_body" style="margin-right:10px; padding:4px;">'+
-        '          <input id="message_reply_text" type="text" name="message_text" size="71" value="" />'+
+        '          <input id="message_reply_text" type="text" name="message_text" size="128" value="" />'+
         '        </div>'+
         '      </td>'+
         '      <td valign="top">'+
@@ -1238,7 +1282,7 @@ function create_message_reply_dialog( rid, message_id ) {
         if( !extendedShown ) {
             document.getElementById('message_reply_body').innerHTML=
                 '<textarea id="message_reply_text" type="text" name="message_text"'+
-                ' rows="12" cols="71" style="padding:1px;"'+
+                ' rows="12" cols="128" style="padding:1px;"'+
                 ' title="This is multi-line text area in which return will add a new line of text.'+
                 ' Use Submit button to post the message.">'+
                 document.getElementById('message_reply_text').value+'</textarea>'+
@@ -1330,7 +1374,7 @@ function create_message_reply_dialog( rid, message_id ) {
 
         } else {
             document.getElementById('message_reply_body').innerHTML=
-                '<input id="message_reply_text" type="text" name="message_text" size="71" value="'+
+                '<input id="message_reply_text" type="text" name="message_text" size="128" value="'+
                 document.getElementById('message_reply_text').value+'" />';
             message_reply_body.style.paddingBottom="4px";
             tags_table = null;
@@ -1434,7 +1478,7 @@ function create_message_edit_dialog( eid, message_id ) {
         '    <tr>'+
         '      <td valign="top">'+
         '        <div id="message_edit_body" style="margin-right:10px; padding:4px;">'+
-        '          <textarea rows="12" cols="71" name="content" size="71" style="padding:1px;">'+re.content+'</textarea>'+
+        '          <textarea rows="12" cols="128" name="content" size="128" style="padding:1px;">'+re.content+'</textarea>'+
         '        </div>'+
         '      </td>'+
         '      <td valign="top">'+
@@ -1472,9 +1516,11 @@ function create_message_delete_dialog( did, id ) {
     var dialog_body =
         '<div style="text-align:left;">'+
         '  <form  name="delete_message_form" action="DeleteFFEntry.php" method="post">'+
-        '    <b>ATTENTION:</b> the selected message and all its children are about to be destroyed!'+
+        '    <b>PLEASE, READ THIS:</b> the selected message and all its children are about to be destroyed!'+
         '    The information may be permanently lost as a result of the operation. In most cases a better'+
         '    alternative would be to <b>Reply</b> to the message or to <b>Edit</b> its contents.'+
+        '    Also note that your identity will be recorded.'+
+        '    <br><br>'+
         '    Press <b>Yes</b> to delete the message, or press <b>No</b> to abort the operation.'+
         '    <input type="hidden" name="id" value="'+id+'" />'+
         '    <input type="hidden" name="actionSuccess" value="select_experiment" />'+
@@ -1589,7 +1635,10 @@ function display_shift() {
 }
 
 function close_shift( shift_id ) {
-    if( !auth_granted.manage_shifts ) return;
+    if( !isAuthorizedFor( 'canManageShifts' )) {
+        post_auth_error( "popupdialogs" );
+        return;
+    }
     ask_complex_input(
         "popupdialogs",
         "Close Last Shift",
@@ -1606,7 +1655,10 @@ function close_shift( shift_id ) {
 }
 
 function begin_new_shift() {
-    if( !auth_granted.manage_shifts ) return;
+    if( !isAuthorizedFor( 'canManageShifts' )) {
+        post_auth_error( "popupdialogs" );
+        return;
+    }
     ask_complex_input(
         "popupdialogs",
         "Begin New Shift",
@@ -2204,6 +2256,9 @@ function AttachmentLoader( a, aid ) {
         } else if( this.type[0] == 'application' && this.type[1] == 'pdf' ) {
             a_elem.innerHTML =
             '<object data="ShowAttachment.php?id='+this.id+'" type="application/pdf" width="800" height="600"></object>';
+        } else if( this.type[0] == 'application' && this.type[1] == 'rtf' ) {
+            a_elem.innerHTML =
+            '<object data="ShowAttachment.php?id='+this.id+'" type="application/rtf" width="800" height="600"></object>';
         } else {
             a_elem.innerHTML =
             '<img src="images/NoPreview.png" />';
@@ -2251,6 +2306,7 @@ function child2html( re ) {
     var bid = 'message_body_'+re.id;
     var rid = 'message_reply_dialog_'+re.id;
     var eid = 'message_edit_dialog_'+re.id;
+    var did = 'message_delete_dialog_'+re.id;
 
     var run = re.run == '' ? '' : 'run: <em style="padding:2px;">'+re.run+'</em>';
     var shift = re.shift == '' ? '' : 'shift: <em style="padding:2px;">'+re.shift+'</em>';
@@ -2305,8 +2361,7 @@ function child2html( re ) {
         '      onmouseout="expander_unhighlight(this,document.bgColor)"'+
         '      title="Open/close the message body">'+
         '      <b>&gt;</b>'+
-        '    </span>';
-    result +=
+        '    </span>'+
         '    <span>'+
         '      <b><em style="padding:2px;">'+re.event_time+'</em></b>'+
         '      by: <b><em style="padding:2px;">'+re.author+'</em></b>'+
@@ -2315,48 +2370,47 @@ function child2html( re ) {
         attachment_signs+
         child_sign+
         '  </div>'+
-        //'  <div id="'+bid+'" style="display:none; margin-left:7px; margin-bottom:20px;">'+
         '  <div id="'+bid+'" style="margin-left:7px; margin-bottom:20px;">'+
-        //'    <div style="padding:10px; padding-left:20px; padding-bottom:0px;  padding-right:0px; border-left:solid 1px #c0c0c0;">';
-        '    <div style="padding:10px; padding-left:20px; padding-bottom:0px;  padding-right:0px;">';
-    if( auth_granted.reply_to_messages ) {
-        var did = 'message_delete_dialog_'+re.id;
+        '    <div style="padding:10px; padding-left:20px; padding-bottom:0px;  padding-right:0px;">'+
+        '      <div style="float:right; position:relative; top:-16px;">';
+    if( isAuthorizedFor( 'canPostNewMessages' )) {
         result +=
-        '    <div style="float:right; position:relative; top:-8px;">'+
-        '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
-        '        onclick="create_message_reply_dialog('+rid+','+re.id+')"'+
-        '        onmouseover="expander_highlight(this)" '+
-        '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
-        '        title="Open a dialog to reply to the message">'+
-        //'        <b>Reply</b>'+
-        '        Reply'+
-        '      </span>'+
-        '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
-        '        onclick="create_message_edit_dialog('+eid+','+re.id+')"'+
-        '        onmouseover="expander_highlight(this)" '+
-        '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
-        '        title="Open a dialog to edit the message text">'+
-        //'        <b>Edit</b>'+
-        '        Edit'+
-        '      </span>'+
-        '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
-        '        onclick="create_message_delete_dialog('+did+','+re.id+')"'+
-        '        onmouseover="expander_highlight(this)" '+
-        '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
-        '        title="Delete the whole message and its children">'+
-        //'        <b>Delete</b>'+
-        '        Delete'+
-        '      </span>'+
-        '    </div>';
+        '        <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '          onclick="create_message_reply_dialog('+rid+','+re.id+')"'+
+        '          onmouseover="expander_highlight(this)" '+
+        '          onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '          title="Open a dialog to reply to the message">'+
+        '          Reply'+
+        '        </span>';
+    }
+    if( isAuthorizedFor( 'canEditMessages' )) {
+        result +=
+        '        <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '          onclick="create_message_edit_dialog('+eid+','+re.id+')"'+
+        '          onmouseover="expander_highlight(this)" '+
+        '          onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '          title="Open a dialog to edit the message text">'+
+        '          Edit'+
+        '        </span>';
+    }
+    if( isAuthorizedFor( 'canDeleteMessages' )) {
+        result +=
+        '        <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '          onclick="create_message_delete_dialog('+did+','+re.id+')"'+
+        '          onmouseover="expander_highlight(this)" '+
+        '          onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '          title="Delete the whole message and its children">'+
+        '          Delete'+
+        '        </span>';
     }
     result +=
-        //'    <div style="margin-top:8px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
-        '    <div style="margin-top:0px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
-        '    <div id="'+rid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
-        '    <div id="'+eid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
-        '    <div id="'+did+'" style="padding:10px; background-color:#e0e0e0; display:none;"></div>'+
+        '      </div>'+
+        '      <div style="margin-top:0px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
+        '      <div id="'+rid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
+        '      <div id="'+eid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
+        '      <div id="'+did+'" style="padding:10px; background-color:#e0e0e0; display:none;"></div>'+
         attachments+
-        '    <div style="padding-left:20px;">';
+        '      <div style="padding-left:20px;">';
 
     if( re.children.length > 0 )
         for( var i = re.children.length-1; i >= 0 ; i-- ) {
@@ -2384,6 +2438,7 @@ function event2html( message_idx ) {
     var bid = 'message_body_'+re.id;
     var rid = 'message_reply_dialog_'+re.id;
     var eid = 'message_edit_dialog_'+re.id;
+    var did = 'message_delete_dialog_'+re.id;
 
     var run = re.run == '' ? '' : 'run: <em style="padding:2px;">'+re.run+'</em>';
     var shift = re.shift == '' ? '' : 'shift: <em style="padding:2px;">'+re.shift+'</em>';
@@ -2455,8 +2510,7 @@ function event2html( message_idx ) {
         '      onmouseout="expander_unhighlight(this,document.bgColor)"'+
         '      title="Open/close the message body">'+
         '      <b>&gt;</b>'+
-        '    </span>';
-    result +=
+        '    </span>'+
         '    <span>'+
         '      <b><em style="padding:2px;">'+re.event_time+'</em></b>'+
         '      by: <b><em style="padding:2px;">'+re.author+'</em></b>'+
@@ -2467,38 +2521,40 @@ function event2html( message_idx ) {
         tag_sign+
         '  </div>'+
         '  <div id="'+bid+'" style="display:none; margin-left:17px; margin-bottom:20px;">'+
-        '    <div style="padding:10px; padding-left:20px; padding-bottom:0px;  padding-right:0px; border-left:solid 1px #c0c0c0;">';
-    if( auth_granted.reply_to_messages ) {
-        var did = 'message_delete_dialog_'+re.id;
+        '    <div style="padding:10px; padding-left:20px; padding-bottom:0px;  padding-right:0px; border-left:solid 1px #c0c0c0;">'+
+        '    <div style="float:right; position:relative; top:-8px;">';
+    if( isAuthorizedFor( 'canPostNewMessages' )) {
         result +=
-        '    <div style="float:right; position:relative; top:0px;">'+
         '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
         '        onclick="create_message_reply_dialog('+rid+','+re.id+')"'+
         '        onmouseover="expander_highlight(this)" '+
         '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
         '        title="Open a dialog to reply to the message">'+
-        //'        <b>Reply</b>'+
         '        Reply'+
-        '      </span>'+
+        '      </span>';
+    }
+    if( isAuthorizedFor( 'canEditMessages' )) {
+        result +=
         '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
         '        onclick="create_message_edit_dialog('+eid+','+re.id+')"'+
         '        onmouseover="expander_highlight(this)" '+
         '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
         '        title="Open a dialog to edit the message text">'+
-        //'        <b>Edit</b>'+
         '        Edit'+
-        '      </span>'+
+        '      </span>';
+    }
+    if( isAuthorizedFor( 'canDeleteMessages' )) {
+        result +=
         '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
         '        onclick="create_message_delete_dialog('+did+','+re.id+')"'+
         '        onmouseover="expander_highlight(this)" '+
         '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
         '        title="Delete the whole message and its children">'+
-        //'        <b>Delete</b>'+
         '        Delete'+
-        '      </span>'+
-        '    </div>';
+        '      </span>';
     }
     result +=
+        '    </div>'+
         '    <div style="margin-top:8px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
         '    <div id="'+rid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
         '    <div id="'+eid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
@@ -2953,13 +3009,14 @@ function search_contents() {
         </div>
         <div style="float:right; height:50px;">
 <?php
-$remote_user = $_SERVER['REMOTE_USER'];
-if( $remote_user == '' ) echo <<<HERE
+if( $auth_svc->authName() == '' )
+    echo <<<HERE
           <br>
           <br>
           <a href="../../apps/logbook"><p title="login here to proceed to the full version of the application">login</p></a>
 HERE;
-else echo <<<HERE
+else
+    echo <<<HERE
           <table><tbody>
             <tr>
               <td>&nbsp;</td>
@@ -2967,7 +3024,7 @@ else echo <<<HERE
             </tr>
             <tr>
               <td>Welcome,&nbsp;</td>
-              <td><p><b>{$remote_user}</b></p></td>
+              <td><p><b>{$auth_svc->authName()}</b></p></td>
             </tr>
             <tr>
               <td>Session expires in:&nbsp;</td>
@@ -3007,3 +3064,14 @@ HERE;
     </div>
   </body>
 </html>
+
+<?php
+
+    $logbook->commit();
+
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+} catch( RegDBException $e ) {
+    print $e->toHtml();
+}
+?>

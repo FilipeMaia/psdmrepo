@@ -5,8 +5,6 @@ require_once('LogBook/LogBook.inc.php');
 /*
  * This script will process a request for deleting the specified free-form entry.
  */
-if( !LogBookAuth::isAuthenticated()) return;
-
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
     if( $id == '' )
@@ -33,9 +31,24 @@ try {
         or die( "no such free-form entry" );
 
     $experiment = $entry->parent();
+    $instrument = $experiment->instrument();
 
+    // Check for the authorization
+    //
+    if( !LogBookAuth::instance()->canDeleteMessages( $experiment->id())) {
+        print( LogBookAuth::reporErrorHtml(
+            'You are not authorized to delete messages of the experiment',
+            'index.php?action=select_experiment'.
+                '&instr_id='.$instrument->id().
+                '&instr_name='.$instrument->name().
+                '&exper_id='.$experiment->id().
+                '&exper_name='.$experiment->name()));
+        exit;
+    }
+
+    // Proceed to the operation
+    //
     $logbook->delete_entry_by_id( $id );
-    $logbook->commit();
 
     // Return back to the caller
     //
@@ -67,6 +80,7 @@ try {
             ;
         }
     }
+    $logbook->commit();
 
 } catch( RegDBException $e ) {
     print $e->toHtml();

@@ -24,6 +24,16 @@ try {
 
     $instrument = $experiment->instrument();
 
+    // Check for the authorization
+    //
+    if( !LogBookAuth::instance()->canRead( $experiment->id())) {
+        print( LogBookAuth::reporErrorHtml(
+            'You are not authorized to access any information about the experiment' ));
+        exit;
+    }
+
+    // Proceed to the operation
+    //
     $shift = $experiment->find_last_shift();
     $run = $experiment->find_last_run();
 

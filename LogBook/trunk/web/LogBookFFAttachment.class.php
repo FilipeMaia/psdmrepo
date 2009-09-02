@@ -23,7 +23,7 @@ class LogBookFFAttachment {
      */
     public function __construct ( $connection, $entry, $attr ) {
         $this->connection = $connection;
-        $this->exntry = $entry;
+        $this->entry = $entry;
         $this->attr = $attr;
     }
 

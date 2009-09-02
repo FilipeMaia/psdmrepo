@@ -36,6 +36,13 @@ function post_warning( id, text ) {
         text );
 }
 
+function post_auth_error( id ) {
+    post_message (
+        id,
+        '<span style="color:red; font-size:16px;">Authorization Error</span>',
+        '<p>Sorry, you are not authorized to peform this operation in a context of the selected experiment!</p>' );
+}
+
 function post_info( id, text ) {
     post_message (
         id,

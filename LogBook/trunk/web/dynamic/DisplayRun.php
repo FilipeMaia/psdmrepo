@@ -21,6 +21,19 @@ try {
     $run = $logbook->find_run_by_id( $id )
         or die( "no such run" );
 
+    $experiment = $run->parent();
+    $instrument = $experiment->instrument();
+
+    // Check for the authorization
+    //
+    if( !LogBookAuth::instance()->canRead( $experiment->id())) {
+        print( LogBookAuth::reporErrorHtml(
+            'You are not authorized to access any information about the experiment' ));
+        exit;
+    }
+
+    // Proceed to the operation
+    //
     $status = $run->in_interval( LusiTime::now());
     if( $status > 0 ) {
         $run_status = '<b><em style="color:gray">Ended</em></b>';

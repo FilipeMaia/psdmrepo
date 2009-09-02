@@ -9,6 +9,9 @@ require_once('LogBook/LogBook.inc.php');
 if( !isset( $_GET['type'] )) die( "no valid information type in the request" );
 $type = trim( $_GET['type'] );
 
+if( !isset( $_GET['exper_id'] )) die( "no valid experiment identifier in the request" );
+$exper_id = trim( $_GET['exper_id'] );
+
 define( TYPE_HISTORY_P,     110 );  // preparation phase
 define( TYPE_HISTORY_D,     120 );  // data taking phase
 define( TYPE_HISTORY_D_DAY, 121 );  // a day in data taking phase
@@ -19,19 +22,6 @@ define( TYPE_SHIFT,   201 );
 
 define( TYPE_RUNS,    300 );
 define( TYPE_RUN,     301 );
-
-switch( $type ) {
-    case TYPE_HISTORY_P:
-    case TYPE_HISTORY_D:
-    case TYPE_HISTORY_D_DAY:
-    case TYPE_HISTORY_F:
-    case TYPE_SHIFTS:
-    case TYPE_RUNS: {
-        if( !isset( $_GET['exper_id'] )) die( "no valid experiment identifier in the request" );
-        $exper_id = trim( $_GET['exper_id'] );
-        break;
-    }
-}
 
 function shift2json( $shift ) {
     return json_encode(
@@ -149,13 +139,21 @@ try {
     $logbook = new LogBook();
     $logbook->begin();
 
-    // Get the experiment for those request types which
+    $experiment = $logbook->find_experiment_by_id( $exper_id )
+        or die( "no such experiment" );
+
+    $instrument = $experiment->instrument();
+
+    // Check for the authorization
     //
-    if( isset( $exper_id )) {
-        $experiment = $logbook->find_experiment_by_id( $exper_id )
-            or die( "no such experiment" );
+    if( !LogBookAuth::instance()->canRead( $experiment->id())) {
+        print( LogBookAuth::reporErrorHtml(
+            'You are not authorized to access any information about the experiment' ));
+        exit;
     }
 
+    // Proceed to the operation
+    //
     header( "Content-type: application/json" );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past

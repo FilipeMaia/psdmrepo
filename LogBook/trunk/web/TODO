@@ -1,7 +1,69 @@
 ______
 URGENT
 
-- write C++ client for RegDb & LogBook and give it to Chris O'Grady
+- write C++ client for RegDB & LogBook and give it to Chris O'Grady
+- continue discussing the security model for web apps. One idea suggested by Amedeo
+  was to implement the group-based security for LogBook:
+
+  1. an experiment is associated with a group; the group leader automatically
+  gets all admnistrative privileges for LogBook; the group members get read-write
+  privileges.
+
+  2. certain groups (like, lab-superusers) can be registered as administrators,
+  or as just observers (top-level admins).
+
+  3. this should also work for netgroups (they don't seem to be retranslated into
+  LDAP server of PCDS. These groups exist in NIS only.). so, the queston is how to
+  access these groups from PHP?\
+
+  4. individual users can also be registered here for various privilege levels.
+
+  Having said that, a proposal is to encode all of these into Andy's RolesDB
+  as 'users';
+
+    'uid:gapon'
+    'gid:posix:xr'
+    'gid:netgroup:u-whatever'
+
+  Then it will be up to the AuthDB PHP API to take a user account and use extra
+  sources of information (LDAP, and perhaps NIS?) to see if:
+
+  a. a given user is individually registered in RoleDB, or
+  b. he's associated with one or another POSIX group, and RoleDB has a record for
+     that group, or
+  c. ditto for the netgroups
+
+- test hpss client developed by Andy H. and installed on psdm. See his last message
+  with the following subject "hpsscp" posted on August 31, 2009.
+
+- discuss MySQL replication with Arash Alavi to see what would be the most reliable
+  protocol for switching servers in case of a failure.
+
+- develop a direct PHP API for the RoleDB. The corresponding package is AuthDB.
+
+  class AuthDB {
+    public static function hasRole( 'user', 'experiment_id', 'app', 'role' );
+    public static function hasPrivilege( 'user', 'experiment_id', 'app', 'privilege' );
+    ..
+    // a full set of editing methods to register users, roles, etc.
+  }
+
+  Then, in a context of LogBook develop a wrapper class which would simplify
+  things for LogBook:
+
+    class LogBookAuth {
+      public static function isAuthenticated();
+      public static function authName();
+      public static function canRead( 'experiment_id' );
+      public static function canPostNewMessages( 'experiment_id' );
+      public static function canEditMessages( 'experiment_id' );
+      public static function canDeleteMessages( 'experiment_id' );
+      public static function canManageShifts( 'experiment_id' );
+    }
+
+  NOTE: if a user isn't authenticated then all the abobe shown methods should
+  return false.
+
 
 _________________________________________
 EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
@@ -43,6 +105,11 @@ EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
 
   NOTE: No backup version is the
 
++ Talk to Teresa on when we can get the server open. The Web & Security Committee is
+  gathering this Friday (August 28, 2009) to discuss my request. Make a PPT presentation
+  of the system architecture involving the Web server and Web services (for both ONLINE
+  and OFFLINE "worlds").
+
 + add a sign to the end of the parent message subjects to indicate a presence of the subthreads:
 
     |
@@ -50,28 +117,27 @@ EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
 
 + add a sign indicating a presence of tags - just a bold symbol 'T'
 
++ implement message text wrapping at 128 (using PHP wordwrap() function).
+
       +------------+     +------------+
 - add | View Repl. | and | Hide Repl. | buttons to the messages viewer
       +------------+     +------------+
 
   NOTE: The viewer's bar needs to be reorganized a bit to group functions
 
-- implement full editing LogBook entries: edit the message text, renaming the atatchments,
-  adding more attachments to existing messages, and (perhaps) deleting atatchments, messages and
-  tags.
+- implement full editing LogBook entries: not just the message text, but also - renaming
+  atatchments, adding more attachments to existing messages, and (perhaps) deleting atatchments,
+  messages and tags.
 
   ATTENTION: This feature would require extending the database schema to keep a track
   of the changes made to an attachment. The simplest way would be to add shadow
-  tables for hdr
-
-- Talk to Teresa on when we can get the server open. The Web & Security Committee is
-  gathering this Friday (August 28, 2009) to discuss my request. Make a PPT presentation
-  of the system architecture involving the Web server and Web services (for both ONLINE
-  and OFFLINE "worlds").
+  tables for: header, entry, tag and attachment.
 
 - set up WebAuth on the pswww (remote possibility only?). Perhaps, a better alternative
   would be to set up Apache Kerberos module. This would eliminate a need to maintain
   separate IRL for Internet and PCDS Control Network(s).
+
+  NOTE: That may not be needed at all because 
 
 - set up cron-tab on 'psdb' to make daily 'mysqldump' of all databases onto an NFS disk
 
@@ -89,12 +155,18 @@ EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
 - add user group search (LDAP) in the experiment registry based on user name or his account name. This is to simplify a selection of
 the group.
 
-- implement auto-refresh fore new messages posted via 'Reply'. As a temporary solution,
+- implement auto-refresh for new messages posted via 'Reply'. As a temporary solution,
   ass an explicit mechanism to force the refresh by an operator: 'Refresh Now' button.
 
   NOTE: The later would require to rearrange the buttons in the message viewer
   control bar.
 
+- investigate increasing the 1 MB limit for attached documents. It may make a sense
+  to put a little warning at the 'New Message' dialog to display the current limit.
+  (Unfortunately, we can't determine the image size from JS.). Print a clear complain
+  at the server side if the image size exceeds the limit.
+
+- increase the windows size for new/edited messages
 ____________________________
 CODE CLEANUP AND REFACTORING
 

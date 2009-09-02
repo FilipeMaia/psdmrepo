@@ -23,6 +23,16 @@ try {
     $experiment = $entry->parent();
     $instrument = $experiment->instrument();
 
+    // Check for the authorization
+    //
+    if( !LogBookAuth::instance()->canRead( $experiment->id())) {
+        print( LogBookAuth::reporErrorHtml(
+            'You are not authorized to access any information about the experiment' ));
+        exit;
+    }
+
+    // Proceed to the operation
+    //
     $relevance_time_str   = is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort();
     $shift_begin_time_str = is_null( $entry->shift_id())       ? 'n/a' : $entry->shift()->begin_time()->toStringShort();
     $run_number_str       = is_null( $entry->run_id())         ? 'n/a' : $entry->run()->num();

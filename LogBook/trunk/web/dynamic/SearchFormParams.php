@@ -24,6 +24,24 @@ try {
     $experiment = $logbook->find_experiment_by_id( $id )
         or die( "no such experiment" );
 
+    $instrument = $experiment->instrument();
+
+    // Check for the authorization
+    //
+    if( !LogBookAuth::instance()->canRead( $experiment->id())) {
+        print( LogBookAuth::reporErrorHtml(
+            'You are not authorized to access any information about the experiment',
+            'index.php?action=select_experiment'.
+                '&instr_id='.$instrument->id().
+                '&instr_name='.$instrument->name().
+                '&exper_id='.$experiment->id().
+                '&exper_name='.$experiment->name()));
+        exit;
+    }
+
+    // Proceed to the operation
+    //
+
     /* Get names of all tags and authors which have ever been used in free-form
      * entries of the experiment (including its shifts and runs).
      */

@@ -2,6 +2,7 @@
 
 require_once('LogBook/LogBook.inc.php');
 
+
 /*
  * This script will perform the search for free-form entries in a scope
  * of an experiment using values of specified parameter. The result is returned
@@ -189,6 +190,7 @@ function child2json( $entry ) {
     foreach( $children as $child )
         array_push( $children_ids, child2json( $child ));
 
+    $content = wordwrap( $entry->content(), 128 );
     return json_encode(
         array (
             "event_time" => $entry->insert_time()->toStringShort(),
@@ -198,7 +200,7 @@ function child2json( $entry ) {
             "author" => $entry->author(),
             "id" => $entry->id(),
             "subject" => substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' ),
-            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$entry->content()}</pre>",
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$content}</pre>",
             "content" => $entry->content(),
             "attachments" => $attachment_ids,
             "tags" => $tag_ids,
@@ -251,6 +253,7 @@ function entry2json( $entry ) {
     foreach( $children as $child )
         array_push( $children_ids, child2json( $child ));
 
+    $content = wordwrap( $entry->content(), 128 );
     return json_encode(
         array (
             "event_time" => $entry->insert_time()->toStringShort(),
@@ -260,7 +263,7 @@ function entry2json( $entry ) {
             "author" => $entry->author(),
             "id" => $entry->id(),
             "subject" => substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' ),
-            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$entry->content()}</pre>",
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$content}</pre>",
             "content" => $entry->content(),
             "attachments" => $attachment_ids,
             "tags" => $tag_ids,
@@ -277,6 +280,12 @@ try {
 
     $experiment = $logbook->find_experiment_by_id( $id )
         or report_error( "no such experiment" );
+
+    // Check for the authorization
+    //
+    if( !LogBookAuth::instance()->canRead( $experiment->id())) {
+        report_error( 'not authorized to read messages for the experiment' );
+    }
 
     // Timestamps are translated here because of possible shoftcuts which
     // may reffer to the experiment's validity limits.

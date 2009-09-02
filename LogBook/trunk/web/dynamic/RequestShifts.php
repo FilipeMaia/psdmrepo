@@ -83,6 +83,19 @@ try {
     $experiment = $logbook->find_experiment_by_id( $id )
         or die( "no such experiment" );
 
+    $instrument = $experiment->instrument();
+
+    // Check for the authorization
+    //
+    if( !LogBookAuth::instance()->canRead( $experiment->id())) {
+        print( LogBookAuth::reporErrorHtml(
+            'You are not authorized to access any information about the experiment' ));
+        exit;
+    }
+
+    // Proceed to the operation
+    //
+
     // Timestamps are translated here because of possible shoftcuts which
     // may reffer to the experiment's validity limits.
     //

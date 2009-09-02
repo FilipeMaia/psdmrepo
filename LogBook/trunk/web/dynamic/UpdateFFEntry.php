@@ -5,8 +5,6 @@ require_once('LogBook/LogBook.inc.php');
 /*
  * This script will process a request for updating the specified free-form entry.
  */
-if( !LogBookAuth::isAuthenticated()) return;
-
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
     if( $id == '' )
@@ -44,10 +42,25 @@ try {
     $entry = $logbook->find_entry_by_id( $id )
         or die( "no such free-form entry" );
 
-    $entry->update_content( $content_type, $content );
     $experiment = $entry->parent();
+    $instrument = $experiment->instrument();
 
-    $logbook->commit();
+    // Check for the authorization
+    //
+    if( !LogBookAuth::instance()->canEditMessages( $experiment->id())) {
+        print( LogBookAuth::reporErrorHtml(
+            'You are not authorized to edit messages of the experiment',
+            'index.php?action=select_experiment'.
+                '&instr_id='.$instrument->id().
+                '&instr_name='.$instrument->name().
+                '&exper_id='.$experiment->id().
+                '&exper_name='.$experiment->name()));
+        exit;
+    }
+
+    // Proceed to the operation
+    //
+    $entry->update_content( $content_type, $content );
 
     // Return back to the caller
     //
@@ -79,6 +92,7 @@ try {
             ;
         }
     }
+    $logbook->commit();
 
 } catch( RegDBException $e ) {
     print $e->toHtml();

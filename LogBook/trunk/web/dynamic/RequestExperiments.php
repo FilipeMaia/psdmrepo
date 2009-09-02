@@ -48,9 +48,19 @@ try {
     $regdb = new RegDB();
     $regdb->begin();
 
-    if( is_null( $instr )) $experiments = $regdb->experiments();
-    else                   $experiments = $regdb->experiments_for_instrument( $instr );
+    if( is_null( $instr )) $all_experiments = $regdb->experiments();
+    else                   $all_experiments = $regdb->experiments_for_instrument( $instr );
 
+    // Leave only those experiments the logged user is authorizated to see
+    //
+    $experiments = array();
+    foreach( $all_experiments as $e ) {
+        if( LogBookAuth::instance()->canRead( $e->id()))
+            array_push( $experiments, $e );
+    }
+
+    // Proceed to the operation
+    //
     header( 'Content-type: application/json' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past

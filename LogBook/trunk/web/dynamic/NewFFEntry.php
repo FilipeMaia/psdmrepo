@@ -7,8 +7,6 @@ require_once('LogBook/LogBook.inc.php');
  * This script will process a request for creating new free-form entry
  * in the specified scope.
  */
-if( !LogBookAuth::isAuthenticated()) return;
-
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
     if( $id == '' ) {
@@ -159,6 +157,23 @@ try {
     $experiment = $logbook->find_experiment_by_id( $id )
         or die( "no such experiment" );
 
+    $instrument = $experiment->instrument();
+
+    // Check for the authorization
+    //
+    if( !LogBookAuth::instance()->canPostNewMessages( $experiment->id())) {
+        print( LogBookAuth::reporErrorHtml(
+            'You are not authorized to post messages for the experiment',
+            'index.php?action=select_experiment'.
+                '&instr_id='.$instrument->id().
+                '&instr_name='.$instrument->name().
+                '&exper_id='.$experiment->id().
+                '&exper_name='.$experiment->name()));
+        exit;
+    }
+
+    // Proceed to the operation
+    //
     $content_type = "TEXT";
 
     // If the request has been made in a scope of some parent entry then
@@ -189,7 +204,6 @@ try {
         $attachment = $entry->attach_document(
             $f['contents'], $f['type'], $f['description'] );
     }
-    $logbook->commit();
 
     // Return back to the caller
     //
@@ -221,6 +235,7 @@ try {
             ;
         }
     }
+    $logbook->commit();
 
 } catch( RegDBException $e ) {
     print $e->toHtml();

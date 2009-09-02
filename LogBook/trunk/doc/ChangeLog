@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+Tag: V00-01-00
+2009-09-02 Igor Gaponenko
+- added the fine-grain authorization protection layer into the web
+application (both UI and PHP backend)
+- fixed bugs.
+
 Tag: V00-00-17
 2009-08-28 Igor Gaponenko
 - implemented the read-only version of the LogBook application

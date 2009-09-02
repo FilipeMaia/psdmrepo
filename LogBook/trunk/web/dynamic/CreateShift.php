@@ -5,8 +5,6 @@ require_once('LogBook/LogBook.inc.php');
 /*
  * This script will process a request for creating a new shift.
  */
-if( !LogBookAuth::isAuthenticated()) return;
-
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
     if( $id == '' )
@@ -57,14 +55,29 @@ try {
     $experiment = $logbook->find_experiment_by_id( $id )
         or die("failed to find the experiment" );
 
+    $instrument = $experiment->instrument();
+
+    // Check for the authorization
+    //
+    if( !LogBookAuth::instance()->canManageShifts( $experiment->id())) {
+        print( LogBookAuth::reporErrorHtml(
+            'You are not authorized to manage shifts of the experiment',
+            'index.php?action=select_experiment'.
+                '&instr_id='.$instrument->id().
+                '&instr_name='.$instrument->name().
+                '&exper_id='.$experiment->id().
+                '&exper_name='.$experiment->name()));
+        exit;
+    }
+
+    // Proceed to the operation
+    //
     $begin_time = LusiTime::now();
     $shift = $experiment->create_shift( $leader, $crew, $begin_time );
 
     $entry = $experiment->create_entry (
         $author, 'TEXT', $goals, $shift_id=$shift->id());
     $entry->add_tag( 'SHIFT_GOALS', '' );
-
-    $instrument = $experiment->instrument();
 
     if( isset( $actionSuccess )) {
         if( $actionSuccess == 'select_experiment_and_shift' )
@@ -77,7 +90,6 @@ try {
         else
             ;
     }
-
     $logbook->commit();
 
 } catch( RegDBException $e ) {
