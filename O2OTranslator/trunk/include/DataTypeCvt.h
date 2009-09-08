@@ -59,7 +59,7 @@ public:
                          const H5DataTypes::XtcClockTime& time )
   {
     const T& typedData = *static_cast<const T*>( data ) ;
-    typedConvert ( typedData, time ) ;
+    typedConvert ( typedData, typeId, detInfo, time ) ;
   }
 
 protected:
@@ -71,6 +71,8 @@ private:
 
   // typed conversion method
   virtual void typedConvert ( const T& data,
+                              const Pds::TypeId& typeId,
+                              const Pds::DetInfo& detInfo,
                               const H5DataTypes::XtcClockTime& time ) = 0 ;
 
   // Copy constructor and assignment are disabled by default

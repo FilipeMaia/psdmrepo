@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <stack>
 
 //----------------------
 // Base Class Headers --
@@ -52,18 +53,45 @@ public:
   typedef typename H5Type::XtcType XtcType ;
 
   // constructor takes a location where the data will be stored
-  ConfigDataTypeCvt ( const hdf5pp::Group& group )
-    : DataTypeCvt<typename H5Type::XtcType>(), m_group(group) {}
+  ConfigDataTypeCvt ( const std::string& typeGroupName )
+    : DataTypeCvt<typename H5Type::XtcType>()
+    , m_typeGroupName(typeGroupName)
+    , m_groups()
+  {}
 
   // Destructor
   virtual ~ConfigDataTypeCvt () {}
 
   // typed conversion method
   virtual void typedConvert ( const XtcType& data,
-                              const H5DataTypes::XtcClockTime& )
+                              const Pds::TypeId& typeId,
+                              const Pds::DetInfo& detInfo,
+                              const H5DataTypes::XtcClockTime& time )
   {
+    // this should not happen
+    if ( m_groups.empty() ) return ;
+
+    // get the name of the group for this object
+    const std::string& grpName = this->cvtGroupName( m_typeGroupName, detInfo ) ;
+
+    // create separate group
+    hdf5pp::Group grp = m_groups.top().createGroup( grpName );
+
     // store the data
-    H5Type::store ( data, m_group ) ;
+    H5Type::store ( data, grp ) ;
+  }
+
+  /// method called when the driver makes a new group in the file
+  virtual void openGroup( hdf5pp::Group group ) {
+    m_groups.push ( group ) ;
+  }
+
+  /// method called when the driver closes a group in the file
+  virtual void closeGroup( hdf5pp::Group group ) {
+    if ( m_groups.empty() ) return ;
+    while ( m_groups.top() != group ) m_groups.pop() ;
+    if ( m_groups.empty() ) return ;
+    m_groups.pop() ;
   }
 
 protected:
@@ -71,7 +99,8 @@ protected:
 private:
 
   // Data members
-  hdf5pp::Group m_group ;
+  std::string m_typeGroupName ;
+  std::stack<hdf5pp::Group> m_groups ;
 
   // Copy constructor and assignment are disabled by default
   ConfigDataTypeCvt ( const ConfigDataTypeCvt& ) ;

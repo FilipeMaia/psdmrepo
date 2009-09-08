@@ -19,6 +19,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -41,4 +42,13 @@ DataTypeCvtI::~DataTypeCvtI ()
 {
 }
 
+// generate the group name for the child folder
+std::string
+DataTypeCvtI::cvtGroupName( const std::string& grpName, const Pds::DetInfo& info )
+{
+  std::ostringstream str ;
+  str << grpName << '/' << Pds::DetInfo::name(info.detector()) << '.' << info.detId()
+      << ':' << Pds::DetInfo::name(info.device()) << '.' << info.devId() ;
+  return str.str() ;
+}
 } // namespace O2OTranslator

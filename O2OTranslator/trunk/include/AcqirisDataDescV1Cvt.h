@@ -13,18 +13,21 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <map>
 
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "O2OTranslator/DataTypeCvtI.h"
+#include "O2OTranslator/EvtDataTypeCvt.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "pdsdata/acqiris/ConfigV1.hh"
 #include "pdsdata/acqiris/DataDescV1.hh"
-#include "H5DataTypes/ObjectContainer.h"
+#include "O2OTranslator/CvtDataContainer.h"
+#include "O2OTranslator/CvtDataContFactoryDef.h"
+#include "O2OTranslator/CvtDataContFactoryAcqirisV1.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -49,40 +52,56 @@ namespace O2OTranslator {
  *  @author Andrei Salnikov
  */
 
-class AcqirisDataDescV1Cvt : public DataTypeCvtI {
+class AcqirisDataDescV1Cvt : public EvtDataTypeCvt<Pds::Acqiris::DataDescV1> {
 public:
 
+  typedef Pds::Acqiris::DataDescV1 XtcType ;
+  typedef Pds::Acqiris::ConfigV1 ConfigXtcType ;
+
   // Default constructor
-  AcqirisDataDescV1Cvt ( hdf5pp::Group group,
+  AcqirisDataDescV1Cvt ( const std::string& typeGroupName,
                          hsize_t chunk_size,
                          int deflate ) ;
 
   // Destructor
   virtual ~AcqirisDataDescV1Cvt () ;
 
-  /// main method of this class
+  /// override base class method because we expect multiple types
   virtual void convert ( const void* data,
                          const Pds::TypeId& typeId,
                          const Pds::DetInfo& detInfo,
                          const H5DataTypes::XtcClockTime& time ) ;
 
-  void setGroup( hdf5pp::Group group ) ;
-
 protected:
+
+  // typed conversion method
+  virtual void typedConvertSubgroup ( hdf5pp::Group group,
+                                      const XtcType& data,
+                                      const Pds::TypeId& typeId,
+                                      const Pds::DetInfo& detInfo,
+                                      const H5DataTypes::XtcClockTime& time ) ;
+
+  /// method called when the driver closes a group in the file
+  virtual void closeSubgroup( hdf5pp::Group group ) ;
+
 
 private:
 
-  typedef H5DataTypes::ObjectContainer<uint64_t> TimestampCont ;
-  typedef H5DataTypes::ObjectContainer<uint16_t> WaveformCont ;
-  typedef H5DataTypes::ObjectContainer<H5DataTypes::XtcClockTime> XtcClockTimeCont ;
+  typedef CvtDataContainer<CvtDataContFactoryAcqirisV1<uint64_t> > TimestampCont ;
+  typedef CvtDataContainer<CvtDataContFactoryAcqirisV1<uint16_t> > WaveformCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
+
+  // comparison operator for DetInfo objects
+  struct _DetInfoCmp {
+    bool operator()( const Pds::DetInfo& lhs, const Pds::DetInfo& rhs ) const ;
+  };
+
+  typedef std::map<Pds::DetInfo,Pds::Acqiris::ConfigV1,_DetInfoCmp> ConfigMap ;
 
   // Data members
-  hdf5pp::Group m_group ;
   hsize_t m_chunk_size ;
   int m_deflate ;
-  const Pds::Acqiris::ConfigV1* m_config ;
-  hdf5pp::Type m_tsType ;
-  hdf5pp::Type m_wfType ;
+  ConfigMap m_config ;
   TimestampCont* m_timestampCont ;
   WaveformCont* m_waveformCont ;
   XtcClockTimeCont* m_timeCont ;

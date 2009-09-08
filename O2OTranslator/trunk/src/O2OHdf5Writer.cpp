@@ -37,10 +37,7 @@
 #include "O2OTranslator/AcqirisDataDescV1Cvt.h"
 #include "O2OTranslator/CameraFrameV1Cvt.h"
 #include "O2OTranslator/ConfigDataTypeCvt.h"
-#include "O2OTranslator/DataTypeCvtFactory.h"
-#include "O2OTranslator/EvtDataTypeCvt.h"
-#include "O2OTranslator/EvtDataTypeCvtFactory.h"
-#include "O2OTranslator/EvtConfigDataTypeCvtFactory.h"
+#include "O2OTranslator/EvtDataTypeCvtDef.h"
 #include "O2OTranslator/O2OExceptions.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OMetaData.h"
@@ -166,46 +163,48 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   }
 
   // instantiate all factories
-  DataTypeCvtFactoryPtr factory ;
+  DataTypeCvtPtr converter ;
   uint32_t typeId ;
 
-  factory.reset( new DataTypeCvtFactory< ConfigDataTypeCvt<H5DataTypes::AcqirisConfigV1> > ( "Acqiris::ConfigV1" ) ) ;
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::AcqirisConfigV1> ( "Acqiris::ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_AcqConfig,1).value() ;
-  m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
-  factory.reset( new DataTypeCvtFactory< ConfigDataTypeCvt<H5DataTypes::Opal1kConfigV1> > ( "Opal1k::ConfigV1" ) ) ;
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::Opal1kConfigV1> ( "Opal1k::ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_Opal1kConfig,1).value() ;
-  m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
-  factory.reset( new DataTypeCvtFactory< ConfigDataTypeCvt<H5DataTypes::PulnixTM6740ConfigV1> > ( "Pulnix::TM6740ConfigV1" ) ) ;
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::PulnixTM6740ConfigV1> ( "Pulnix::TM6740ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_TM6740Config,1).value() ;
-  m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
-  factory.reset( new DataTypeCvtFactory< ConfigDataTypeCvt<H5DataTypes::CameraFrameFexConfigV1> > ( "Camera::FrameFexConfigV1" ) ) ;
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::CameraFrameFexConfigV1> ( "Camera::FrameFexConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_FrameFexConfig,1).value() ;
-  m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
-  factory.reset( new DataTypeCvtFactory< ConfigDataTypeCvt<H5DataTypes::EvrConfigV1> > ( "EvrData::ConfigV1" ) ) ;
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::EvrConfigV1> ( "EvrData::ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_EvrConfig,1).value() ;
-  m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
-  // very special converter for Acqiris::DataDescV1, it needs two types of data
   hsize_t chunk_size = 128*1024 ;
-  factory.reset( new EvtConfigDataTypeCvtFactory< AcqirisDataDescV1Cvt > ( "Acqiris::DataDescV1", chunk_size, m_compression ) ) ;
-  typeId =  Pds::TypeId(Pds::TypeId::Id_AcqConfig,1).value() ;
-  m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
-  typeId =  Pds::TypeId(Pds::TypeId::Id_AcqWaveform,1).value() ;
-  m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
 
   // instantiate all factories for event converters
-  factory.reset( new EvtDataTypeCvtFactory< EvtDataTypeCvt<H5DataTypes::CameraTwoDGaussianV1> > (
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::CameraTwoDGaussianV1> (
       "Camera::TwoDGaussianV1", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_TwoDGaussian,1).value() ;
-  m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
-  factory.reset( new EvtDataTypeCvtFactory< CameraFrameV1Cvt > ( "Camera::FrameV1", chunk_size, m_compression ) ) ;
+  // special converter for CameraFrame type
+  converter.reset( new CameraFrameV1Cvt ( "Camera::FrameV1", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_Frame,1).value() ;
-  m_cvtMap.insert( CvtMap::value_type( typeId, factory ) ) ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // very special converter for Acqiris::DataDescV1, it needs two types of data
+  converter.reset( new AcqirisDataDescV1Cvt ( "Acqiris::DataDescV1", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_AcqConfig,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_AcqWaveform,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
 }
 
@@ -259,11 +258,6 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
       this->closeGroup( dgram, Configured ) ;
       this->openGroup( dgram, Configured ) ;
 
-      // signal  transition to interested converters
-      for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-        it->second->configure( m_groups.top() ) ;
-      }
-
       break ;
 
     case Pds::TransitionId::Unconfigure :
@@ -283,11 +277,6 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
       this->closeGroup( dgram, Running ) ;
       this->openGroup( dgram, Running ) ;
 
-      // signal  transition to interested converters
-      for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-        it->second->beginRun( m_groups.top() ) ;
-      }
-
       break ;
 
     case Pds::TransitionId::EndRun :
@@ -295,11 +284,6 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
       // close all states up to Configured
       this->closeGroup( dgram, CalibCycle ) ;
       this->closeGroup( dgram, Running ) ;
-
-      // signal  transition to interested converters
-      for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-        it->second->endRun() ;
-      }
 
       break ;
 
@@ -309,29 +293,12 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
       this->closeGroup( dgram, CalibCycle ) ;
       this->openGroup( dgram, CalibCycle ) ;
 
-      // signal  transition to interested converters
-      for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-        it->second->configure( m_groups.top() ) ;
-        it->second->endRun() ;
-        it->second->beginRun( m_groups.top() ) ;
-      }
-
       break ;
 
     case Pds::TransitionId::EndCalibCycle :
 
-      for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-        it->second->endRun() ;
-      }
-
       // close all states up to Running
       this->closeGroup( dgram, CalibCycle ) ;
-
-      if ( m_state.top() == Running ) {
-        for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-          it->second->beginRun( m_groups.top() ) ;
-        }
-      }
 
       break ;
 
@@ -357,21 +324,6 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
 void
 O2OHdf5Writer::eventEnd ( const Pds::Dgram& dgram )
 {
-  switch ( dgram.seq.service()  ) {
-
-    case Pds::TransitionId::Configure :
-    case Pds::TransitionId::BeginCalibCycle :
-
-      // configuration object converters are not needed anymore
-      for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
-        it->second->unconfigure() ;
-      }
-      break ;
-
-    default :
-
-      break ;
-  }
 }
 
 
@@ -387,8 +339,13 @@ O2OHdf5Writer::openGroup ( const Pds::Dgram& dgram, State state )
   ::storeClock ( group, dgram.seq.clock(), "start" ) ;
 
   // switch to mapped state
-  m_state.push(Mapped) ;
+  m_state.push(state) ;
   m_groups.push( group ) ;
+
+  // notify all converters
+  for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+    it->second->openGroup( group ) ;
+  }
 }
 
 void
@@ -398,6 +355,11 @@ O2OHdf5Writer::closeGroup ( const Pds::Dgram& dgram, State state )
 
   // store transition time as couple of attributes to this new group
   ::storeClock ( m_groups.top(), dgram.seq.clock(), "end" ) ;
+
+  // notify all converters
+  for ( CvtMap::iterator it = m_cvtMap.begin() ; it != m_cvtMap.end() ; ++ it ) {
+    it->second->closeGroup( m_groups.top() ) ;
+  }
 
   // close the group
   m_groups.top().close() ;
@@ -424,14 +386,13 @@ O2OHdf5Writer::levelEnd ( const Pds::Src& src )
 void
 O2OHdf5Writer::dataObject ( const void* data, const Pds::TypeId& typeId, const Pds::DetInfo& detInfo )
 {
-  // find this type in the converter factory map
+  // find this type in the converter map
   CvtMap::iterator it = m_cvtMap.find( typeId.value() ) ;
   if ( it != m_cvtMap.end() ) {
 
     do {
 
-      DataTypeCvtFactoryPtr factory = it->second ;
-      DataTypeCvtI* converter = factory->converter( detInfo ) ;
+      DataTypeCvtPtr converter = it->second ;
       converter->convert( data, typeId, detInfo, m_eventTime ) ;
 
       ++ it ;

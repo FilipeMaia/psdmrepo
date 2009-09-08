@@ -14,6 +14,8 @@
 // C/C++ Headers --
 //-----------------
 #include <algorithm>
+#include <map>
+#include <stack>
 
 //----------------------
 // Base Class Headers --
@@ -23,7 +25,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "H5DataTypes/ObjectContainer.h"
+#include "hdf5pp/Group.h"
+#include "O2OTranslator/CvtGroupMap.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -48,57 +51,89 @@ namespace O2OTranslator {
  *  @author Andrei Salnikov
  */
 
-template <typename H5Type>
-class EvtDataTypeCvt : public DataTypeCvt<typename H5Type::XtcType> {
+template <typename XtcType>
+class EvtDataTypeCvt : public DataTypeCvt<XtcType> {
 public:
 
-  typedef typename H5Type::XtcType XtcType ;
-
   // constructor takes a location where the data will be stored
-  EvtDataTypeCvt ( hdf5pp::Group group,
-                   hsize_t chunk_size,
-                   int deflate )
-    : DataTypeCvt<typename H5Type::XtcType>()
-    , m_dataCont(0)
-    , m_timeCont(0)
+  EvtDataTypeCvt ( const std::string& typeGroupName )
+    : DataTypeCvt<XtcType>()
+    , m_typeGroupName(typeGroupName)
   {
-    // make container for data objects
-    hsize_t chunk = std::max ( chunk_size / sizeof (H5Type), hsize_t(1) ) ;
-    MsgLog( "EvtDataTypeCvt", debug, "chunk size for data: " << chunk ) ;
-    m_dataCont = new DataCont ( "data", group, chunk, deflate ) ;
-
-    // make container for time
-    chunk = std::max ( chunk_size / sizeof(H5DataTypes::XtcClockTime), hsize_t(1) ) ;
-    MsgLog( "EvtDataTypeCvt", debug, "chunk size for time: " << chunk ) ;
-    m_timeCont = new XtcClockTimeCont ( "time", group, chunk, deflate ) ;
   }
 
   // Destructor
   virtual ~EvtDataTypeCvt ()
   {
-    delete m_dataCont ;
-    delete m_timeCont ;
   }
 
   // typed conversion method
   virtual void typedConvert ( const XtcType& data,
+                              const Pds::TypeId& typeId,
+                              const Pds::DetInfo& detInfo,
                               const H5DataTypes::XtcClockTime& time )
   {
-    // store the data in the containers
-    m_dataCont->append ( H5Type(data) ) ;
-    m_timeCont->append ( time ) ;
+    hdf5pp::Group group = m_groups.top() ;
+    hdf5pp::Group subgroup = m_group2group.find ( group, detInfo ) ;
+    if ( not subgroup.valid() ) {
+
+      // get the name of the group for this object
+      const std::string& grpName = this->cvtGroupName( m_typeGroupName, detInfo ) ;
+
+      // create separate group
+      subgroup = group.createGroup( grpName );
+
+      m_group2group.insert ( group, detInfo, subgroup ) ;
+    }
+
+    // call overloaded method and pass all data
+    this->typedConvertSubgroup ( subgroup, data, typeId, detInfo, time ) ;
+  }
+
+  /// method called when the driver makes a new group in the file
+  virtual void openGroup( hdf5pp::Group group ) {
+    m_groups.push ( group ) ;
+  }
+
+  /// method called when the driver closes a group in the file
+  virtual void closeGroup( hdf5pp::Group group )
+  {
+    // tell my subobjects that we are closing all subgroups
+    const CvtGroupMap::GroupList& subgroups = m_group2group.groups( group ) ;
+    for ( CvtGroupMap::GroupList::const_iterator it = subgroups.begin() ; it != subgroups.end() ; ++ it ) {
+      this->closeSubgroup( *it );
+    }
+
+    // remove it from the map
+    m_group2group.erase( group ) ;
+
+    // remove it from the stack
+    if ( m_groups.empty() ) return ;
+    while ( m_groups.top() != group ) m_groups.pop() ;
+    if ( m_groups.empty() ) return ;
+    m_groups.pop() ;
   }
 
 protected:
 
+  // typed conversion method
+  virtual void typedConvertSubgroup ( hdf5pp::Group group,
+                              const XtcType& data,
+                              const Pds::TypeId& typeId,
+                              const Pds::DetInfo& detInfo,
+                              const H5DataTypes::XtcClockTime& time ) = 0 ;
+
+  /// method called when the driver closes a group in the file
+  virtual void closeSubgroup( hdf5pp::Group group ) = 0 ;
+
 private:
 
-  typedef H5DataTypes::ObjectContainer<H5DataTypes::XtcClockTime> XtcClockTimeCont ;
-  typedef H5DataTypes::ObjectContainer<H5Type> DataCont ;
+  typedef std::map<hdf5pp::Group,hdf5pp::Group> Group2Group ;
 
   // Data members
-  DataCont* m_dataCont ;
-  XtcClockTimeCont* m_timeCont ;
+  std::string m_typeGroupName ;
+  std::stack<hdf5pp::Group> m_groups ;
+  CvtGroupMap m_group2group ;
 
   // Copy constructor and assignment are disabled by default
   EvtDataTypeCvt ( const EvtDataTypeCvt& ) ;

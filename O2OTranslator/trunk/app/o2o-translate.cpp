@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <cstdio>
 #include <vector>
+#include <boost/thread/thread.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -35,11 +36,12 @@
 #include "AppUtils/AppCmdOptSize.h"
 #include "AppUtils/AppCmdOptNamedValue.h"
 #include "MsgLogger/MsgLogger.h"
+#include "O2OTranslator/DgramQueue.h"
+#include "O2OTranslator/DgramReader.h"
 #include "O2OTranslator/MetaDataScanner.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OHdf5Writer.h"
 #include "O2OTranslator/O2OMetaData.h"
-//#include "O2OTranslator/O2ONexusWriter.h"
 #include "O2OTranslator/O2OXtcIterator.h"
 #include "O2OTranslator/O2OXtcScannerI.h"
 #include "pdsdata/xtc/XtcFileIterator.hh"
@@ -81,6 +83,7 @@ private:
   AppCmdOptList<std::string>  m_optionsFile ;
   AppCmdOpt<int>              m_compression ;
   AppCmdOptSize               m_dgramsize ;
+  AppCmdOpt<unsigned int>     m_dgramQSize ;
   AppCmdOptList<std::string>  m_epicsData ;
   AppCmdOptList<std::string>  m_eventData ;
   AppCmdOpt<std::string>      m_experiment ;
@@ -106,6 +109,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_optionsFile( 'o', "options-file", "path",     "file name with options, multiple allowed", '\0' )
   , m_compression( 'c', "compression",  "number",   "compression level, -1..9, def: -1", -1 )
   , m_dgramsize  ( 'g', "datagram-size","size",     "datagram buffer size. def: 16M", 16*1048576ULL )
+  , m_dgramQSize ( 'Q', "datagram-queue","number",     "datagram queue size. def: 32", 32 )
   , m_epicsData  ( 'e', "epics-file",   "path",     "file name for EPICS data", '\0' )
   , m_eventData  ( 'f', "event-file",   "path",     "file name for XTC event data", '\0' )
   , m_experiment ( 'x', "experiment",   "string",   "experiment name", "" )
@@ -124,6 +128,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   setOptionsFile( m_optionsFile ) ;
   addOption( m_compression ) ;
   addOption( m_dgramsize ) ;
+  addOption( m_dgramQSize ) ;
   addOption( m_epicsData ) ;
   addOption( m_eventData ) ;
   addOption( m_experiment ) ;
@@ -210,78 +215,44 @@ O2O_Translate::runApp ()
   // instantiate metadata scanner
   scanners.push_back ( new MetaDataScanner( metadata, m_mdConnStr.value() ) ) ;
 
-  // loop over all input files
-  typedef AppCmdOptList<std::string>::const_iterator StringIter ;
-  StringIter eventFileIter = m_eventData.begin() ;
-  StringIter epicsFileIter = m_epicsData.begin() ;
-  while ( eventFileIter != m_eventData.end() ) {
+  // make datagram queue
+  DgramQueue dgqueue( m_dgramQSize.value() ) ;
 
-    // get the file names
-    const std::string& eventFile = *eventFileIter ;
-    std::string epicsFile ;
-    if ( epicsFileIter != m_epicsData.end() ) epicsFile = *epicsFileIter ;
+  // start datagram reading thread
+  boost::thread readerThread( DgramReader ( m_eventData.value(), dgqueue, m_dgramsize.value() ) ) ;
 
-    WithMsgLogRoot( info, log ) {
-      log << "processing files:\n";
-      log << "    " << eventFile ;
-      if ( not epicsFile.empty() ) log << "\n    " << epicsFile ;
+
+  // get all datagrams
+  while ( Pds::Dgram* dg = dgqueue.pop() ) {
+
+    WithMsgLogRoot( trace, out ) {
+      const ClockTime& clock = dg->seq.clock() ;
+      out << "Transition: "
+          << std::left << std::setw(12) << Pds::TransitionId::name(dg->seq.service())
+          << "  time: " << clock.seconds() << '.'
+          << std::setfill('0') << std::setw(9) << clock.nanoseconds()
+          << "  payloadSize: " << dg->xtc.sizeofPayload() ;
     }
 
-    // open input xtc file
-    FILE* xfile = fopen( eventFile.c_str(), "rb" );
-    if ( ! xfile ) {
-      MsgLogRoot( error, "failed to open input XTC file: " << eventFile ) ;
-      // this is fatal error, stop here
-      return 2  ;
-    }
+    // give this event to every scanner
+    for ( std::vector<O2OXtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
 
-    // open input EPICS file
-    FILE* efile = 0 ;
-    if ( not epicsFile.empty() ) {
-      efile = fopen( epicsFile.c_str(), "rb" );
-      if ( ! efile ) {
-        MsgLogRoot( error, "failed to open input EPICS file: " << epicsFile ) ;
-        // this is fatal error, stop here
-        return 2  ;
+      O2OXtcScannerI* scanner = *i ;
+
+      try {
+        scanner->eventStart ( *dg ) ;
+
+        O2OXtcIterator iter( &(dg->xtc), scanner );
+        iter.iterate();
+
+        scanner->eventEnd ( *dg ) ;
+      } catch ( std::exception& e ) {
+        MsgLogRoot( error, "exception caught processing datagram: " << e.what() ) ;
+        return 3 ;
       }
     }
 
-    // iterate over events in xtc file
-    Pds::XtcFileIterator iter( xfile, m_dgramsize.value() ) ;
-    while ( Pds::Dgram* dg = iter.next() ) {
-
-      WithMsgLogRoot( trace, out ) {
-        const ClockTime& clock = dg->seq.clock() ;
-        out << "Transition: "
-            << std::left << std::setw(12) << Pds::TransitionId::name(dg->seq.service())
-            << "  time: " << clock.seconds() << '.'
-            << std::setfill('0') << std::setw(9) << clock.nanoseconds()
-            << "  payloadSize: " << dg->xtc.sizeofPayload() ;
-      }
-
-      // give this event to every scanner
-      for ( std::vector<O2OXtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
-
-        O2OXtcScannerI* scanner = *i ;
-
-        try {
-          scanner->eventStart ( *dg ) ;
-
-          O2OXtcIterator iter( &(dg->xtc), scanner );
-          iter.iterate();
-
-          scanner->eventEnd ( *dg ) ;
-        } catch ( std::exception& e ) {
-          MsgLogRoot( error, "exception caught processing datagram: " << e.what() ) ;
-          return 3 ;
-        }
-      }
-    }
-
-    // move to the next file
-    ++ eventFileIter ;
-    if ( epicsFileIter != m_epicsData.end() ) ++ epicsFileIter ;
-
+    delete [] (char*)dg ;
   }
 
   // finish with the scanners

@@ -43,17 +43,26 @@ namespace {
 
 namespace O2OTranslator {
 
+// comparison operator for DetInfo objects
+bool
+AcqirisDataDescV1Cvt::_DetInfoCmp::operator()( const Pds::DetInfo& lhs, const Pds::DetInfo& rhs ) const
+{
+  if ( lhs.log() < rhs.log() ) return true ;
+  if ( lhs.log() > rhs.log() ) return false ;
+  if ( lhs.phy() < rhs.phy() ) return true ;
+  return false ;
+}
+
 //----------------
 // Constructors --
 //----------------
-AcqirisDataDescV1Cvt::AcqirisDataDescV1Cvt ( hdf5pp::Group group,
+AcqirisDataDescV1Cvt::AcqirisDataDescV1Cvt ( const std::string& typeGroupName,
                                              hsize_t chunk_size,
                                              int deflate )
-  : DataTypeCvtI()
-  , m_group(group)
+  : EvtDataTypeCvt<Pds::Acqiris::DataDescV1>(typeGroupName)
   , m_chunk_size(chunk_size)
   , m_deflate(deflate)
-  , m_config(0)
+  , m_config()
   , m_timestampCont(0)
   , m_waveformCont(0)
   , m_timeCont(0)
@@ -65,13 +74,12 @@ AcqirisDataDescV1Cvt::AcqirisDataDescV1Cvt ( hdf5pp::Group group,
 //--------------
 AcqirisDataDescV1Cvt::~AcqirisDataDescV1Cvt ()
 {
-  delete m_config ;
   delete m_timestampCont ;
   delete m_waveformCont ;
   delete m_timeCont ;
 }
 
-/// main method of this class
+/// override base class method because we expect multiple types
 void
 AcqirisDataDescV1Cvt::convert ( const void* data,
                                 const Pds::TypeId& typeId,
@@ -80,88 +88,113 @@ AcqirisDataDescV1Cvt::convert ( const void* data,
 {
   if ( typeId.id() == Pds::TypeId::Id_AcqConfig ) {
 
-    const Pds::Acqiris::ConfigV1& config = *static_cast<const Pds::Acqiris::ConfigV1*>( data ) ;
+    const ConfigXtcType& config = *static_cast<const ConfigXtcType*>( data ) ;
 
     // got configuration object, make the copy
-    delete m_config ;
-    m_config = new Pds::Acqiris::ConfigV1( config );
+    m_config.insert( ConfigMap::value_type( detInfo, config ) ) ;
 
   } else if ( typeId.id() == Pds::TypeId::Id_AcqWaveform ) {
 
-    // get few constants
-    const Pds::Acqiris::HorizV1& hconfig = m_config->horiz() ;
-    const uint32_t nChan = m_config->nbrChannels() ;
-    const uint32_t nSeg = hconfig.nbrSegments() ;
-    const uint32_t nSampl = hconfig.nbrSamples() ;
+    // follow regular path
+    const XtcType& typedData = *static_cast<const XtcType*>( data ) ;
+    typedConvert ( typedData, typeId, detInfo, time ) ;
 
-    // allocate data
-    uint64_t timestamps[nChan][nSeg] ;
-    uint16_t waveforms[nChan][nSeg][nSampl] ;
+  }
 
-    // scan the data and fill arrays
-    // FIXME: few methods that we need from DataDescV1 declared as non-const
-    const Pds::Acqiris::DataDescV1& ddescr = *static_cast<const Pds::Acqiris::DataDescV1*>( data ) ;
-    Pds::Acqiris::DataDescV1& dd = const_cast<Pds::Acqiris::DataDescV1&>( ddescr ) ;
-    for ( uint32_t ch = 0 ; ch < nChan ; ++ ch, dd = *dd.nextChannel(hconfig) ) {
+}
 
-      // first verify that the shape of the data returned corresponds to the config
-      if ( dd.nbrSamplesInSeg() != nSampl ) {
-        std::ostringstream msg ;
-        msg << "O2ONexusWriter::dataObject(Acqiris::DataDescV1) -"
-            << " number of samples in data object (" << dd.nbrSamplesInSeg()
-            << ") different from config object (" << nSampl << ")" ;
-        throw O2OXTCGenException ( msg.str() ) ;
-      }
-      if ( dd.nbrSegments() != nSeg ) {
-        std::ostringstream msg ;
-        msg << "O2ONexusWriter::dataObject(Acqiris::DataDescV1) -"
-            << " number of segments in data object (" << dd.nbrSegments()
-            << ") different from config object (" << nSeg << ")" ;
-        throw O2OXTCGenException ( msg.str() ) ;
-      }
+// typed conversion method
+void
+AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
+                                             const XtcType& data,
+                                             const Pds::TypeId& typeId,
+                                             const Pds::DetInfo& detInfo,
+                                             const H5DataTypes::XtcClockTime& time )
+{
+  // find corresponding configuration object
+  ConfigMap::const_iterator cit = m_config.find( detInfo ) ;
+  if ( cit == m_config.end() ) {
+    MsgLog ( logger, error, "AcqirisDataDescV1Cvt - no configuration object was defined" );
+  }
+  const ConfigXtcType& config = cit->second ;
 
-      for ( uint32_t seg = 0 ; seg < nSeg ; ++ seg ) {
-        timestamps[ch][seg] = dd.timestamp(seg).value();
-      }
+  // create all containers if running first time
+  if ( not m_waveformCont ) {
 
-      int16_t* wf = dd.waveform(hconfig) ;
-      std::copy ( wf, wf+nSampl*nSeg, (int16_t*)waveforms[ch] ) ;
-    }
+    // create container for timestamps
+    CvtDataContFactoryAcqirisV1<uint64_t> tsContFactory( "timestamps", m_chunk_size, m_deflate, 'T' ) ;
+    m_timestampCont = new TimestampCont ( tsContFactory ) ;
 
+    // create container for waveforms
+    CvtDataContFactoryAcqirisV1<uint16_t> wfContFactory( "waveforms", m_chunk_size, m_deflate, 'W' ) ;
+    m_waveformCont = new WaveformCont ( wfContFactory ) ;
 
-    // store the data
-    m_timestampCont->append ( timestamps[0][0], m_tsType ) ;
-    m_waveformCont->append ( waveforms[0][0][0], m_wfType ) ;
-    m_timeCont->append ( time ) ;
+    // make container for time
+    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate ) ;
+    m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
   }
 
 
+  // get few constants
+  const Pds::Acqiris::HorizV1& hconfig = config.horiz() ;
+  const uint32_t nChan = config.nbrChannels() ;
+  const uint32_t nSeg = hconfig.nbrSegments() ;
+  const uint32_t nSampl = hconfig.nbrSamples() ;
+
+  // allocate data
+  uint64_t timestamps[nChan][nSeg] ;
+  uint16_t waveforms[nChan][nSeg][nSampl] ;
+
+  // scan the data and fill arrays
+  // FIXME: few methods that we need from DataDescV1 declared as non-const
+  Pds::Acqiris::DataDescV1& dd = const_cast<Pds::Acqiris::DataDescV1&>( data ) ;
+  for ( uint32_t ch = 0 ; ch < nChan ; ++ ch, dd = *dd.nextChannel(hconfig) ) {
+
+    // first verify that the shape of the data returned corresponds to the config
+    if ( dd.nbrSamplesInSeg() != nSampl ) {
+      std::ostringstream msg ;
+      msg << "O2ONexusWriter::dataObject(Acqiris::DataDescV1) -"
+          << " number of samples in data object (" << dd.nbrSamplesInSeg()
+          << ") different from config object (" << nSampl << ")" ;
+      throw O2OXTCGenException ( msg.str() ) ;
+    }
+    if ( dd.nbrSegments() != nSeg ) {
+      std::ostringstream msg ;
+      msg << "O2ONexusWriter::dataObject(Acqiris::DataDescV1) -"
+          << " number of segments in data object (" << dd.nbrSegments()
+          << ") different from config object (" << nSeg << ")" ;
+      throw O2OXTCGenException ( msg.str() ) ;
+    }
+
+    for ( uint32_t seg = 0 ; seg < nSeg ; ++ seg ) {
+      timestamps[ch][seg] = dd.timestamp(seg).value();
+    }
+
+    int16_t* wf = dd.waveform(hconfig) ;
+    std::copy ( wf, wf+nSampl*nSeg, (int16_t*)waveforms[ch] ) ;
+  }
+
+
+  // store the data
+  hdf5pp::Type type = H5DataTypes::AcqirisDataDescV1::timestampType ( config ) ;
+  m_timestampCont->container(group,config)->append ( timestamps[0][0], type ) ;
+  type = H5DataTypes::AcqirisDataDescV1::waveformType ( config ) ;
+  m_waveformCont->container(group,config)->append ( waveforms[0][0][0], type ) ;
+  m_timeCont->container(group)->append ( time ) ;
+
+
 }
 
-
+/// method called when the driver closes a group in the file
 void
-AcqirisDataDescV1Cvt::setGroup( hdf5pp::Group group )
+AcqirisDataDescV1Cvt::closeSubgroup( hdf5pp::Group group )
 {
-  m_group = group ;
-
-  // create container for timestamps
-  m_tsType = H5DataTypes::AcqirisDataDescV1::timestampType ( *m_config ) ;
-  hsize_t chunk = std::max( m_chunk_size/m_tsType.size(), hsize_t(1) ) ;
-  MsgLog( logger, debug, "chunk size for timestamps: " << chunk ) ;
-  m_timestampCont = new TimestampCont ( "timestamps", m_group, m_tsType, chunk, m_deflate ) ;
-
-  // create container for waveforms
-  m_wfType = H5DataTypes::AcqirisDataDescV1::waveformType ( *m_config ) ;
-  chunk = std::max( m_chunk_size/m_wfType.size(), hsize_t(1) ) ;
-  MsgLog( logger, debug, "chunk size for waveforms: " << chunk ) ;
-  m_waveformCont = new WaveformCont ( "waveforms", m_group, m_wfType, chunk, m_deflate ) ;
-
-  // make container for time
-  chunk = std::max ( m_chunk_size / sizeof(H5DataTypes::XtcClockTime), hsize_t(1) ) ;
-  MsgLog( logger, debug, "chunk size for time: " << chunk ) ;
-  m_timeCont = new XtcClockTimeCont ( "time", m_group, chunk, m_deflate ) ;
-
+  if ( m_timestampCont ) m_timestampCont->closeGroup( group ) ;
+  if ( m_waveformCont ) m_waveformCont->closeGroup( group ) ;
+  if ( m_timeCont ) m_timeCont->closeGroup( group ) ;
 }
+
+
 
 } // namespace O2OTranslator

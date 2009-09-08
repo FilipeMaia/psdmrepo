@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "O2OTranslator/DataTypeCvt.h"
+#include "O2OTranslator/EvtDataTypeCvt.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -27,7 +27,9 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "H5DataTypes/ObjectContainer.h"
+#include "O2OTranslator/CvtDataContainer.h"
+#include "O2OTranslator/CvtDataContFactoryDef.h"
+#include "O2OTranslator/CvtDataContFactoryFrameV1.h"
 
 //		---------------------
 // 		-- Class Interface --
@@ -48,31 +50,38 @@ namespace O2OTranslator {
  *  @author Andrei Salnikov
  */
 
-class CameraFrameV1Cvt : public DataTypeCvt<Pds::Camera::FrameV1> {
+class CameraFrameV1Cvt : public EvtDataTypeCvt<Pds::Camera::FrameV1> {
 public:
 
+  typedef Pds::Camera::FrameV1 XtcType ;
+
   // constructor takes a location where the data will be stored
-  CameraFrameV1Cvt ( hdf5pp::Group group,
+  CameraFrameV1Cvt ( const std::string& typeGroupName,
                      hsize_t chunk_size,
                      int deflate ) ;
 
   // Destructor
   virtual ~CameraFrameV1Cvt () ;
 
-  // typed conversion method
-  virtual void typedConvert ( const Pds::Camera::FrameV1& data,
-                              const H5DataTypes::XtcClockTime& time ) ;
-
 protected:
+
+  // typed conversion method
+  virtual void typedConvertSubgroup ( hdf5pp::Group group,
+                                      const XtcType& data,
+                                      const Pds::TypeId& typeId,
+                                      const Pds::DetInfo& detInfo,
+                                      const H5DataTypes::XtcClockTime& time ) ;
+
+  /// method called when the driver closes a group in the file
+  virtual void closeSubgroup( hdf5pp::Group group ) ;
 
 private:
 
-  typedef H5DataTypes::ObjectContainer<H5DataTypes::XtcClockTime> XtcClockTimeCont ;
-  typedef H5DataTypes::ObjectContainer<H5DataTypes::CameraFrameV1> DataCont ;
-  typedef H5DataTypes::ObjectContainer<const unsigned char> ImageCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
+  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::CameraFrameV1> > DataCont ;
+  typedef CvtDataContainer<CvtDataContFactoryFrameV1<const unsigned char> > ImageCont ;
 
   // Data members
-  hdf5pp::Group m_group ;
   hsize_t m_chunk_size ;
   int m_deflate ;
   hdf5pp::Type m_imgType ;

@@ -24,6 +24,7 @@
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/TypeId.hh"
 #include "H5DataTypes/XtcClockTime.h"
+#include "hdf5pp/Group.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -60,10 +61,19 @@ public:
                          const Pds::DetInfo& detInfo,
                          const H5DataTypes::XtcClockTime& time ) = 0 ;
 
+  /// method called when the driver makes a new group in the file
+  virtual void openGroup( hdf5pp::Group group ) = 0 ;
+
+  /// method called when the driver closes a group in the file
+  virtual void closeGroup( hdf5pp::Group group ) = 0 ;
+
 protected:
 
   // Default constructor
   DataTypeCvtI () {}
+
+  // generate the group name for the child folder
+  static std::string cvtGroupName( const std::string& grpName, const Pds::DetInfo& info ) ;
 
 private:
 

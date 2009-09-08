@@ -29,7 +29,7 @@
 #include "hdf5pp/File.h"
 #include "hdf5pp/Group.h"
 #include "H5DataTypes/XtcClockTime.h"
-#include "O2OTranslator/DataTypeCvtFactoryI.h"
+#include "O2OTranslator/DataTypeCvtI.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -99,8 +99,8 @@ protected:
 
 private:
 
-  typedef boost::shared_ptr<DataTypeCvtFactoryI> DataTypeCvtFactoryPtr ;
-  typedef std::multimap<uint32_t, DataTypeCvtFactoryPtr> CvtMap ;
+  typedef boost::shared_ptr<DataTypeCvtI> DataTypeCvtPtr ;
+  typedef std::multimap<uint32_t, DataTypeCvtPtr> CvtMap ;
 
   // Data members
   const O2OFileNameFactory& m_nameFactory ;
