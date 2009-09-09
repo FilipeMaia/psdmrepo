@@ -82,5 +82,31 @@ Group::close()
   m_id.reset();
 }
 
+// groups can be used as keys for associative containers, need compare operators
+bool
+Group::operator<( const Group& other ) const
+{
+  // if this group is None then it is less that other group that is not None
+  if ( not m_id.get() ) return other.m_id.get() ;
+
+  // this group is not None, but other is None - false
+  if ( not other.m_id.get() ) return false ;
+
+  // compare IDs
+  return *m_id < *(other.m_id) ;
+}
+
+bool
+Group::operator==( const Group& other ) const
+{
+  // if this group is None then it is less that other group that is not None
+  if ( not m_id.get() ) return not other.m_id.get() ;
+
+  // this group is not None, but other is None - false
+  if ( not other.m_id.get() ) return false ;
+
+  // compare IDs
+  return *m_id == *(other.m_id) ;
+}
 
 } // namespace hdf5pp

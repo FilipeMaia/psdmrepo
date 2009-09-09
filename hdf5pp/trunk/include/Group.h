@@ -112,6 +112,11 @@ public:
   // returns true if there is a real object behind
   bool valid() const { return m_id.get() ; }
 
+  // groups can be used as keys for associative containers, need compare operators
+  bool operator<( const Group& other ) const ;
+  bool operator==( const Group& other ) const ;
+  bool operator!=( const Group& other ) const { return ! this->operator==(other) ; }
+
 protected:
 
   // allow this guy to call my factory methods

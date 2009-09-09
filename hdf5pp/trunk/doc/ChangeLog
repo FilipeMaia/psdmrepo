@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2009-09-08 Andy Salnikov
+- added comparison operators to Group class
+
 Tag: V00-00-07
 2009-08-26 Andy Salnikov
 - added valid() method to bunch of classes
