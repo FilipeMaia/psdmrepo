@@ -839,7 +839,7 @@ function create_messages_dialog( scope ) {
         '  <input type="hidden" name="actionSuccess" value="select_experiment_and_run" />';
     }
     html_new_message +=
-        '  <input type="hidden" name="MAX_FILE_SIZE" value="1000000">'+
+        '  <input type="hidden" name="MAX_FILE_SIZE" value="10000000">'+
         //'  <div style="margin-left:10px; margin-bottom:5px;">'+
         '  <div>'+
         '    <em class="lb_label">New message:</em>'+
@@ -1149,7 +1149,7 @@ function create_message_reply_dialog( rid, message_id ) {
         '  <input type="hidden" name="scope" value="'+scope+'" />'+
         '  <input type="hidden" name="message_id" value="'+message_id+'" />'+
         '  <input type="hidden" name="actionSuccess" value="select_experiment" />'+
-        '  <input type="hidden" name="MAX_FILE_SIZE" value="1000000">'+
+        '  <input type="hidden" name="MAX_FILE_SIZE" value="10000000">'+
         '  <div>'+
         '    <em class="lb_label">Reply with:</em>'+
         '  </div>'+

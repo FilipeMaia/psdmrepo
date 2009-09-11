@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 
+Tag: V00-01-01
+2009-09-11 Igor Gaponenko
+- added the first version of the C++ API
+- increased a limit of the downloaded attachments from 1 MB to 10 MB.
+
 Tag: V00-01-00
 2009-09-02 Igor Gaponenko
 - added the fine-grain authorization protection layer into the web

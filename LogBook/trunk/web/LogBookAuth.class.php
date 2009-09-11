@@ -1,4 +1,7 @@
 <?php
+
+require_once( 'AuthDB/AuthDB.inc.php' );
+
 /* 
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -11,11 +14,19 @@
  */
 class LogBookAuth {
 
+    /* Data members
+     */
+    private $authdb;
+
     private static $instance = null;
 
     public static function instance() {
         if( is_null( LogBookAuth::$instance )) LogBookAuth::$instance = new LogBookAuth();
         return LogBookAuth::$instance;
+    }
+
+    public function __construct () {
+        $this->authdb = new AuthDB();
     }
 
     public function authName() {
@@ -31,23 +42,30 @@ class LogBookAuth {
     }
 
     public function canRead( $exper_id ) {
-        return LogBookAuth::instance()->authName() != '';
+        return $this->can( $exper_id, 'read' );
     }
 
     public function canPostNewMessages( $exper_id ) {
-        return LogBookAuth::instance()->authName() != '';
+        return $this->can( $exper_id, 'post' );
     }
 
     public function canEditMessages( $exper_id ) {
-        return LogBookAuth::instance()->authName() != '';
+        return $this->can( $exper_id, 'edit' );
     }
 
     public function canDeleteMessages( $exper_id ) {
-        return LogBookAuth::instance()->authName() != '';
+        return $this->can( $exper_id, 'delete' );
     }
 
     public function canManageShifts( $exper_id ) {
-        return LogBookAuth::instance()->authName() != '';
+        return $this->can( $exper_id, 'manage_shifts' );
+    }
+
+    private function can( $exper_id, $priv ) {
+        if( !$this->isAuthenticated()) return false;
+        $this->authdb->begin();
+        return $this->authdb->hasPrivilege(
+            LogBookAuth::instance()->authName(), $exper_id, 'LogBook', $priv );
     }
 
     public static function reporErrorHtml( $message, $link=null ) {

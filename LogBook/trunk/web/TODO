@@ -2,6 +2,7 @@ ______
 URGENT
 
 - write C++ client for RegDB & LogBook and give it to Chris O'Grady
+
 - continue discussing the security model for web apps. One idea suggested by Amedeo
   was to implement the group-based security for LogBook:
 
@@ -21,7 +22,7 @@ URGENT
   Having said that, a proposal is to encode all of these into Andy's RolesDB
   as 'users';
 
-    'uid:gapon'
+    'gapon'
     'gid:posix:xr'
     'gid:netgroup:u-whatever'
 
@@ -39,7 +40,7 @@ URGENT
 - discuss MySQL replication with Arash Alavi to see what would be the most reliable
   protocol for switching servers in case of a failure.
 
-- develop a direct PHP API for the RoleDB. The corresponding package is AuthDB.
++ develop a direct PHP API for the RoleDB. The corresponding package is AuthDB.
 
   class AuthDB {
     public static function hasRole( 'user', 'experiment_id', 'app', 'role' );
@@ -61,9 +62,13 @@ URGENT
       public static function canManageShifts( 'experiment_id' );
     }
 
-  NOTE: if a user isn't authenticated then all the abobe shown methods should
+  NOTE: if a user isn't authenticated then all the above shown methods should
   return false.
 
+- develop the AuthDb GUI
+
+- extend the LDAP PHP client implementation to support Netgroups as well
+  (use the following command as an example: %ldapsearch -x cn-u-srv )
 
 _________________________________________
 EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
@@ -133,18 +138,10 @@ EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
   of the changes made to an attachment. The simplest way would be to add shadow
   tables for: header, entry, tag and attachment.
 
-- set up WebAuth on the pswww (remote possibility only?). Perhaps, a better alternative
-  would be to set up Apache Kerberos module. This would eliminate a need to maintain
-  separate IRL for Internet and PCDS Control Network(s).
-
-  NOTE: That may not be needed at all because 
-
 - set up cron-tab on 'psdb' to make daily 'mysqldump' of all databases onto an NFS disk
 
 - revisit the server and applications security (SQL injection, giving too much information in
   error reports, etc.)
-
-- check with Len Moss on a possibility to turn 'amoopr' into an account with a password
 
 - make sure the Experiment Status, Shift Status and Run Status pages are regularily
   refreshed too if the auto-refresh mode is on.
@@ -152,8 +149,8 @@ EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
 - fix a bug in the message 'Reply' to return to the same context from which the reply
   is made (right now it always goes back to the 'Experiment Status')
 
-- add user group search (LDAP) in the experiment registry based on user name or his account name. This is to simplify a selection of
-the group.
+- add user group search (LDAP) in the experiment registry based on user name or
+  his account name. This is to simplify a selection of the group.
 
 - implement auto-refresh for new messages posted via 'Reply'. As a temporary solution,
   ass an explicit mechanism to force the refresh by an operator: 'Refresh Now' button.
@@ -166,7 +163,43 @@ the group.
   (Unfortunately, we can't determine the image size from JS.). Print a clear complain
   at the server side if the image size exceeds the limit.
 
-- increase the windows size for new/edited messages
+  NOTE: Consider doing this in some clean way to avoid duplicating number.
+  For example, set a value of soem JS variable when generating the PHP
+  script. What should we do for the "Grabber"?
+
++ increase the windows size for new/edited messages
+
+- implement persistent links to messages. This would also require adding
+  a standalone viewer of LogBook messages. The viewer should have
+  a navigation link back to the LogBook of the corresponding experiment,
+  next and previous messages (if any), etc.
+
+- implement fixed-size priview for attached images to avoid downloading
+  huge documents. This shold make LogBook more agile. The most trivial way
+  to implement this would be by generating the images "on the fly".
+  Most optimal way is to extend the schema for these fixed-size images
+  and store the images in the extended column the first time the request
+  is made. Then serve other clients from these column.
+
+  NOTE #1: watch out for race conditions when two clients will be attempting
+  to generate the same image! A solution would be to catch the exception,
+  ignore it, and try reading the image. The second solution would be to
+  use SQL 'UPDATE'. The best solution would be to generate the image
+  when uploading the atachment. In the later case a management tool would
+  be needed to geneate images for existing messages.
+
+  NOTE #2: add a header to images to indicate that this is just a preview:
+
+              +-----------------+
+              | 800x800 preview |
+   +----------+-----------------+---------+
+   |               <image>                |
+
+
+  NOTE #3: Leave other types of documents intact. At the moment this would
+  only include PDF.
+
+
 ____________________________
 CODE CLEANUP AND REFACTORING
 
@@ -180,8 +213,13 @@ NEW IDEAS
     actionSuccess). That would allow expanding message trees
 
     2. implement a viewer for an individual message tree in a separate page (like
-    Experiment status, etc.).
+    Experiment status, etc.). This will be used with persistent URLs to the messages.
 
+    3. implement the 'subscribe' mode for LogBook messages (events, to be correct), so
+    that subscribed users were notified by recieving URLs pointing to new messages.
+    Use LDAP to get e-mail addresses and ask a user for a confirmation. Extend
+    the schema to store the subscriptions.
+ 
 ___________________________________________________
 MEDIUM PRIORITY: Consider extending database schema
 

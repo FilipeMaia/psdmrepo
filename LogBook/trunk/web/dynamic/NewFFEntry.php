@@ -102,8 +102,7 @@ if( isset( $_POST['num_tags'] )) {
 
 // Read the names of optional files submitted for uploading
 //
-define( MAX_SIZE,  1024*1024 );  // max size for each uploaded file (Bytes)
-define( MAX_FILES, 3 );          // max number of files to attach
+define( MAX_SIZE, 10000000 );   // max size for each uploaded file (Bytes)
 
 $files = array();
 $file_keys = array_keys( $_FILES );
