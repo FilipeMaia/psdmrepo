@@ -16,6 +16,9 @@ Tag: V00-01-01
 2009-09-11 Igor Gaponenko
 - added the first version of the C++ API
 - increased a limit of the downloaded attachments from 1 MB to 10 MB.
+- extended the schema by adding the 'type' column to the 'run' table
+in the same way it's done in SciMD database (see the patch file:
+doc/LogBook_schema_v1_patched.sql)
 
 Tag: V00-01-00
 2009-09-02 Igor Gaponenko

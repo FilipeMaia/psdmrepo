@@ -25,6 +25,9 @@
 #include <strings.h>
 #include <stdlib.h>
 
+#include <iostream>
+using namespace std ;
+
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
@@ -123,7 +126,6 @@ ConnectionImpl::ConnectionImpl (MYSQL* mysql, const ConnectionParams& conn_param
 ConnectionImpl::~ConnectionImpl () throw ()
 {
     mysql_close( m_mysql ) ;
-    delete m_mysql ;
     m_mysql = 0 ;
 }
 
@@ -190,9 +192,47 @@ ConnectionImpl::getParamInfo (ParamInfo&         info,
 
 int
 ConnectionImpl::allocateRunNumber (const std::string& instrument,
-                                   const std::string& experiment) throw (DatabaseError)
+                                   const std::string& experiment) throw (WrongParams,
+                                                                         DatabaseError)
 {
-    throw DatabaseError ("ConnectionImpl::allocateRunNumber(): not implemented") ;
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    try {
+
+        ExperDescr exper_descr ;
+        if (!this->findExper (exper_descr, instrument, experiment))
+            throw WrongParams ("unknown experiment") ;
+
+        // The current timestamp will be recorded as a time when the run umber
+        // was requested/allocated.
+        //
+        const LusiTime::Time now = LusiTime::Time::now () ;
+
+        // Now proceed with the new run allocation
+        //
+        std::ostringstream sql;
+        sql << "INSERT INTO " << m_conn_params.regdb << ".run_" << exper_descr.id
+            << " VALUES(NULL," << LusiTime::Time::to64 (now) << ")";
+
+        this->simpleQuery (sql.str());
+
+        // Get back its number
+        //
+        QueryProcessor query (m_mysql) ;
+        query.execute ("SELECT LAST_INSERT_ID() AS 'num'") ;
+        if (!query.next_row())
+            throw DatabaseError ("inconsistent result from the database") ;
+
+        int num = 0 ;
+        query.get (num, "num") ;
+        return num ;
+
+    } catch (const LusiTime::Exception& e) {
+        throw WrongParams (
+            std::string ("failed to translate LusiTime::Time to string because of: ")
+            + e.what()) ;
+    }
 }
 
 void
@@ -210,9 +250,6 @@ ConnectionImpl::createRun (const std::string&    instrument,
     if (!beginTime.isValid ())
         throw WrongParams ("the begin run timstamp isn't valid") ;
 
-    if (!endTime.isValid ())
-        throw WrongParams ("the begin run timstamp isn't valid") ;
-
     // TODO: Consider reinforcing the types at a level of the API interface
     //       (by using 'enum' rather than here.
     //
@@ -220,20 +257,96 @@ ConnectionImpl::createRun (const std::string&    instrument,
         throw WrongParams ("unknown run type") ;
 
     try {
-        long long unsigned beginTime64 = LusiTime::Time::to64 (beginTime) ;
-        long long unsigned   endTime64 = LusiTime::Time::to64 (  endTime) ;
 
         ExperDescr exper_descr ;
         if (!this->findExper (exper_descr, instrument, experiment))
             throw WrongParams ("unknown experiment") ;
 
+        // Find out the previous run (if any) and make sure it gets closed
+        // if it's still being open.
+        //
+        RunDescr run_descr ;
+        if (this->findLastRun (run_descr, exper_descr.id)) {
+            this->endRun (instrument, experiment, run_descr.num, beginTime) ;
+        }
+
+        // Now proceed with the new run creation
+        //
         std::ostringstream sql;
         sql << "INSERT INTO " << m_conn_params.logbook << ".run VALUES(NULL,"
             << run << ","
             << exper_descr.id << ",'"
             << type << "',"
-            << beginTime64 << ","
-            << endTime64 << ")";
+            << LusiTime::Time::to64 (beginTime) << ",";
+
+        if (endTime.isValid ())
+            sql << LusiTime::Time::to64 (endTime) << ")";
+        else
+            sql << "NULL)";
+
+        this->simpleQuery (sql.str());
+
+    } catch (const LusiTime::Exception& e) {
+        throw WrongParams (
+            std::string ("failed to translate LusiTime::Time to string because of: ")
+            + e.what()) ;
+    }
+}
+
+void
+ConnectionImpl::beginRun (const std::string&    instrument,
+                          const std::string&    experiment,
+                          int                   run,
+                          const std::string&    type,
+                          const LusiTime::Time& beginTime) throw (WrongParams,
+                                                                  DatabaseError)
+{
+    this->createRun (instrument,
+                     experiment,
+                     run,
+                     type,
+                     beginTime,
+                     LusiTime::Time()) ;
+}
+
+void
+ConnectionImpl::endRun (const std::string&    instrument,
+                        const std::string&    experiment,
+                        int                   run,
+                        const LusiTime::Time& endTime) throw (WrongParams,
+                                                              DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    if (!endTime.isValid ())
+        throw WrongParams ("the begin run timstamp isn't valid") ;
+
+    try {
+
+        ExperDescr exper_descr ;
+        if (!this->findExper (exper_descr, instrument, experiment))
+            throw WrongParams ("unknown experiment") ;
+
+        // Find the run in the database and make sure it's still open, and its begin time
+        // is strictly less than the specified end time.
+        //
+        RunDescr run_descr ;
+        if (!this->findRun (run_descr, exper_descr.id, run))
+            throw WrongParams ("no such run in the database") ;
+
+
+        if (run_descr.end_time.isValid())
+            throw WrongParams ("the specified run is already closed") ;
+
+        if (run_descr.begin_time >= endTime)
+            throw WrongParams ("the specified end time isn't newer than the begin time of the run") ;
+
+        // Now proceed with the new run creation
+        //
+        std::ostringstream sql;
+        sql << "UPDATE " << m_conn_params.logbook << ".run SET end_time=" << LusiTime::Time::to64 (endTime)
+            << " WHERE id=" << run_descr.id ;
 
         this->simpleQuery (sql.str());
 
@@ -332,13 +445,13 @@ ConnectionImpl::findExper (ExperDescr&        descr,
     //
     if (!query.next_row()) return false ;
 
-    query.get (descr.instr_id,    "nstr_id") ;
+    query.get (descr.instr_id,    "instr_id") ;
     query.get (descr.instr_name,  "instr_name") ;
     query.get (descr.instr_descr, "instr_descr") ;
 
-    query.get (descr.id,    "instr_id") ;
-    query.get (descr.name,  "instr_name") ;
-    query.get (descr.descr, "instr_descr") ;
+    query.get (descr.id,    "id") ;
+    query.get (descr.name,  "name") ;
+    query.get (descr.descr, "descr") ;
 
     query.get (descr.registration_time, "registration_time") ;
     query.get (descr.begin_time,        "begin_time") ;
@@ -417,6 +530,39 @@ ConnectionImpl::findRun (RunDescr& descr,
 }
 
 bool
+ConnectionImpl::findLastRun (RunDescr& descr,
+                             int       exper_id) throw (WrongParams,
+                                                        DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    // Formulate and execute the query
+    //
+    std::ostringstream sql;
+    sql << "SELECT * FROM " << m_conn_params.logbook << ".run "
+        << " WHERE exper_id=" << exper_id
+        << " AND begin_time=(SELECT MAX(begin_time) FROM " << m_conn_params.logbook << ".run "
+        << " WHERE exper_id=" << exper_id << ")";
+
+    QueryProcessor query (m_mysql) ;
+    query.execute (sql.str()) ;
+
+    // Extract results
+    //
+    if (!query.next_row()) return false ;
+
+    query.get (descr.id,         "id") ;
+    query.get (descr.num,        "num") ;
+    query.get (descr.exper_id,   "exper_id") ;
+    query.get (descr.type,       "type") ;
+    query.get (descr.begin_time, "begin_time") ;
+    query.get (descr.end_time,   "end_time", true) ;
+
+    return true ;
+}
+
+bool
 ConnectionImpl::runParamValueIsSet (int param_id,
                                     int run_id) throw (WrongParams,
                                                        DatabaseError)
@@ -443,7 +589,7 @@ void
 ConnectionImpl::simpleQuery (const std::string& query) throw (DatabaseError)
 {
     if (mysql_real_query (m_mysql, query.c_str(), query.size()))
-        throw DatabaseError( std::string( "error in mysql_real_query(): " ) + mysql_error(m_mysql));
+        throw DatabaseError( std::string( "error in mysql_real_query('"+query+"'): " ) + mysql_error(m_mysql));
 }
 
 } // namespace LogBook

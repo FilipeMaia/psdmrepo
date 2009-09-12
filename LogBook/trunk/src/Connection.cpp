@@ -24,6 +24,9 @@
 
 #include <mysql/mysql.h>
 
+#include <iostream>
+using namespace std ;
+
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
@@ -69,7 +72,7 @@ Connection::open (const char* host,
     // Prepare the connection object
     //
     MYSQL* mysql = 0;
-    if( !mysql_init( mysql ))
+    if( !(mysql = mysql_init( mysql )))
         throw DatabaseError( "error in mysql_init(): insufficient memory to allocate an object" );
 
     // Set trhose attributes which should be initialized before setting up

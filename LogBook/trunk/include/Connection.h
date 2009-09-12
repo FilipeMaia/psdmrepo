@@ -170,7 +170,8 @@ public:
     /** Allocate next run number
       */
      virtual int allocateRunNumber (const std::string& instrument,
-                                    const std::string& experiment) throw (DatabaseError) = 0 ;
+                                    const std::string& experiment) throw (WrongParams,
+                                                                          DatabaseError) = 0 ;
 
     /**
       * Create a placeholder for a new run.
@@ -178,8 +179,10 @@ public:
       * The method would create a new run entry in the database. The run
       * will be assigned the specified number and it will have the range.
       *
-      * NOTE: The method should be used when the end time of the run is
-      * already known.
+      * NOTE #1: The method will end the previously open (if any) run.
+      *
+      * NOTE #2: The method should be used when the end time of the run is
+      *          not known.
       *
       * EXCEPTIONS:
       *
@@ -204,8 +207,10 @@ public:
       * it's closed either explicitly (by calling the endRun() method) or
       * implicitly (by calling either createRun() or beginRun() method).
       *
-      * NOTE: The method should be used when the end time of the run is
-      * not known.
+      * NOTE #1: The method will end the previously open (if any) run.
+      *
+      * NOTE #2: The method should be used when the end time of the run is
+      *          not known.
       *
       * EXCEPTIONS:
       *
@@ -238,8 +243,8 @@ public:
      virtual void endRun (const std::string&    instrument,
                           const std::string&    experiment,
                           int                   run,
-                          const LusiTime::Time& beginTime) throw (WrongParams,
-                                                                  DatabaseError) = 0 ;
+                          const LusiTime::Time& endTime) throw (WrongParams,
+                                                                DatabaseError) = 0 ;
 
      /**
       * Set a value of a run parameter (integer value).

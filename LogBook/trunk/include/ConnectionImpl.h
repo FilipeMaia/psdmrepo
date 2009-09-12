@@ -103,12 +103,12 @@ std::ostream& operator<< (std::ostream& s, const ParamDescr& d) ;
   * in the database.
   */
 struct RunDescr {
-    int         id ;
-    int         num ;
-    int         exper_id ;
-    std::string type ;
-    std::string begin_time ;
-    std::string end_time ;
+    int            id ;
+    int            num ;
+    int            exper_id ;
+    std::string    type ;
+    LusiTime::Time begin_time ;
+    LusiTime::Time end_time ;
 } ;
 
 std::ostream& operator<< (std::ostream& s, const RunDescr& d) ;
@@ -202,7 +202,8 @@ public:
       * @see method Connection::allocateRunNumber()
       */
      virtual int allocateRunNumber (const std::string& instrument,
-                                    const std::string& experiment) throw (DatabaseError) ;
+                                    const std::string& experiment) throw (WrongParams,
+                                                                          DatabaseError) ;
 
     /**
       * Create a placeholder for a new run.
@@ -237,8 +238,8 @@ public:
      virtual void endRun (const std::string&    instrument,
                           const std::string&    experiment,
                           int                   run,
-                          const LusiTime::Time& beginTime) throw (WrongParams,
-                                                                  DatabaseError) ;
+                          const LusiTime::Time& endTime) throw (WrongParams,
+                                                                DatabaseError) ;
 
     /**
       * Set a value of a run parameter (integer value).
@@ -347,6 +348,16 @@ private:
                   int       exper_id,
                   int       num) throw (WrongParams,
                                         DatabaseError) ;
+
+    /**
+      * Find last run description in the database.
+      *
+      * The method will return 'true' and it will set up values
+      * of the supplied data structure if the parameter is found.
+      */
+    bool findLastRun (RunDescr& descr,
+                      int       exper_id) throw (WrongParams,
+                                                 DatabaseError) ;
 
     /**
       * Find run description in the database.

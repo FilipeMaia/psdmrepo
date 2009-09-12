@@ -66,12 +66,12 @@ QueryProcessor::~QueryProcessor () throw ()
 void
 QueryProcessor::execute (const std::string& sql) throw (DatabaseError)
 {
-    m_last_sql = sql ;
-
     this->reset () ;
 
-    if (!mysql_real_query (m_mysql, sql.c_str(), sql.length()))
-        throw DatabaseError( std::string( "error in mysql_real_query(): " ) + mysql_error(m_mysql)) ;
+    m_last_sql = sql ;
+
+    if (mysql_real_query (m_mysql, sql.c_str(), sql.length()))
+        throw DatabaseError( std::string( "error in mysql_real_query('"+m_last_sql+"'): " ) + mysql_error(m_mysql)) ;
 
     m_res = mysql_store_result (m_mysql);
     if (!m_res)
@@ -200,7 +200,7 @@ QueryProcessor::cell (const std::string& col_name) throw (WrongParams)
 
     std::map<std::string, unsigned int >::const_iterator itr = m_columns.find (col_name) ;
     if (itr == m_columns.end())
-        throw WrongParams ("no such field in the result set") ;
+        throw WrongParams ("no such field as '"+col_name+"' in the result set of query '"+m_last_sql+"'") ;
 
     const unsigned int col_idx = itr->second ;
     return QueryProcessor::Cell (

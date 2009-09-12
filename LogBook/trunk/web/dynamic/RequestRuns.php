@@ -132,11 +132,10 @@ try {
         $shift = $logbook->find_shift_by_id( $shift_id )
             or die( "no such shift" );
             $runs = $shift->runs();
+        $experiment = $shift->parent();
     } else {
         die( "internal implementation error" );
     }
-
-    $experiment = $shift->parent();
     $instrument = $experiment->instrument();
 
     // Check for the authorization
