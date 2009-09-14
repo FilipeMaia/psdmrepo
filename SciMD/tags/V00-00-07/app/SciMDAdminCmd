@@ -1,0 +1,1724 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script SciMDCmd...
+#
+#------------------------------------------------------------------------
+
+"""Brief one-line description of the script.
+
+Following paragraphs provide detailed description of the module, its
+contents and usage. This is a template module (or module template:)
+which will be used by LUSI programmers to create new Python scripts.
+This is the "executable module" as opposed to library module. Executable
+modules are mangled (@PYTHON@ above replaced with real path to
+interpreter plus some extra options) and copied to arch/$LUSI_ARCH/bin area.
+
+This software was developed for the LUSI project.  If you use all or
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id: template!python-main! 8 2008-10-08 22:35:33Z salnikov $
+
+@author Igor Gaponenko
+"""
+
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 8 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys, os, pwd, socket
+import MySQLdb
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+from LusiTime.Time import Time
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+#from PkgPackage.PkgModule import PkgClass
+
+#---------------------
+# Local definitions --
+#---------------------
+
+# local variable accessible in this module only
+_OP_X = 'Y'
+
+#-------------------
+# Local functions --
+#-------------------
+
+def _default_user():
+    """Return the effective user name"""
+
+    return pwd.getpwuid(os.geteuid())[0]
+
+def _default_host():
+    """Return the default host on which the MySQL is run"""
+
+    return socket.getfqdn(socket.gethostname())
+
+def _default_port():
+    """Return the default port on which the MySQL server would respond"""
+
+    return "3306"
+
+def _default_database():
+    """Return the default database"""
+
+    return "SciMD"
+
+def _exper_id_sql (experiment):
+    """Return a nested SQL query to retrieve an identifier of an experiment"""
+
+    return """(SELECT id FROM "experiment" WHERE name='%s')""" % experiment
+
+def _time2str(timestamp):
+    """Trun a number 64-bit timestamp got from the database into
+    a string. Return an empty string if the input object is None"""
+
+    if timestamp is None: return ''
+    return "%s" % Time.from64(timestamp)
+
+#--------------------------
+# Specialized exceptions --
+#--------------------------
+
+class DatabaseOperatonFailed(Exception):
+    def __init__ (self, message):
+        self.__message = message
+
+    def __str__ (self):
+        return repr(self.__message)
+
+#--------------------------------
+# Application class definition --
+#--------------------------------
+
+class SciMDCmd ( LusiPyApp ) :
+
+    # ===============================================
+    # An indirection for handling the standard output
+    # ===============================================
+
+    __out = sys.stdout
+
+    def print_out (self, *params):
+        for p in params:
+            self.__out.write(p)
+        self.__out.write("\n")
+
+    # =========================================================================
+    # Command handlers are register in the dictionary. There is a separate list
+    # to specify an order in which the command information is reported by
+    # the tool.
+    # =========================================================================
+
+    __cmd_handlers = {};
+    __cmd_order = [];
+
+    def __add_handler(self, command, syntax, description, handler, connects2server=True):
+        self.__cmd_handlers[command] = {
+        'SYNTAX':syntax,
+        'DESCRIPTION':description,
+        'HANDLER':handler,
+        'CONNECTS2SERVER':connects2server}
+        self.__cmd_order.append(command)
+
+    def __usage(self, command):
+        print "Usage: %s  %s" % (command, self.__cmd_handlers[command]['SYNTAX'])
+
+    # =======================================================================
+    # Database connection parameters and connection handle. They would change
+    # their default state at the first attempt to connect to the database.
+    # =======================================================================
+
+    __host       = _default_host()
+    __port       = _default_port()
+    __user       = _default_user()
+    __password   = ""
+    __database   = _default_database()
+    __connection = None
+
+    # ===========
+    # constructor
+    # ===========
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ (
+            self,
+            installLogger = True,
+            usage = "usage: %prog [<command>] [<parameters>] [<options>]" )
+
+        # Add application options, see optparse module for details -------------
+        #
+        self._parser.add_option ( '-D', "--database",
+								  action="store", dest="database", default=None,
+				      			  help="override default database name (%s)" % _default_database())
+
+        self._parser.add_option ( '-H', "--host",
+								  action="store", dest="host", default=None,
+				      			  help="override default host name (%s)" % _default_host())
+
+        self._parser.add_option ( '-P', "--port",
+								  action="store", dest="port", default=None,
+				      			  help="override default port number (%s)" % _default_port())
+
+        self._parser.add_option ( '-U', "--user",
+								  action="store", dest="user", default=None,
+								  help="override default user name (%s)" % _default_user())
+
+        self._parser.add_option ( '-p', "--password",
+								  action="store", dest="password", default=None,
+							      help="specify user password (no password by default)" )
+
+        self._parser.add_option ( '-o', "--output",
+                                  action="store", dest="output", default=None,
+                                  help="send output to file instead of STDOUT" )
+
+        self._parser.add_option ( '-d', "--description",
+                                  action="store", dest="description", default=None,
+                                  help="a description given as a parameter's value" )
+
+        self._parser.add_option ( '-f', "--description-file",
+                                  action="store", dest="description_file", default=None,
+                                  help="a description stored in a file" )
+
+        self._parser.add_option ( '-l', "--long",
+                                  action="count", dest="long", default=0,
+                                  help="produce the detailed output" )
+
+        self._parser.add_option ( '-t', "--truncate-no",
+                                  action="count", dest="truncate_no", default=0,
+                                  help="do not truncate long multiline strings in output" )
+
+        self._parser.add_option ( '-u', "--update",
+                                  action="count", dest="update", default=0,
+                                  help="allow updating an existing entry" )
+
+
+        # Register command handlers for known command --------------------------
+        #
+        self.__add_handler(
+            'help',
+            '[<command> [<command> [...]]]',
+            """
+    If no specific command (or commands) will be presented
+    then general information about the tool will be printed.
+    Otherwise detailed description of each command will be
+    printed.
+    """,
+            self.__cmd_help,
+            connects2server=False);
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'init',
+            '<schema_file>',
+            """
+    The command will (re-)initialize the database using
+    a schema found in an input file. Note, that all prior
+    contents of the database will get destroyed.
+    """,
+            self.__cmd_init);
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'experiments',
+            '[<experiment>]',
+            """
+    Display all known experiments or just one experiment (if its
+    name is requested in the optional parameter to the command).
+
+    The following option will trigger the detailed report on
+    the parameters of selected entries:
+
+        --long
+
+    Note, that by default the long multiline description strings
+    will get truncated in the output. Use the truncation off by
+    passing the following option to the command:
+
+        --truncate-no
+    """,
+             self.__cmd_experiments)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'add_experiment',
+            '<experiment> <group> <instrument>',
+            """
+    Register a new experiment and associate it with an experimental
+    group and a particular LUSI instrument to be used.
+
+    The command also expects optional arguments. The first group of
+    arguments allows attaching some description to the experiment.
+    The description can be given either in the long or in the long
+    form (the options are mutually exclusive):
+
+        --description=<short description>
+        --description-file=<file>
+
+    The next group of arguments deals with an interval in time
+    the experiment will last:
+
+        --begin_time=<time>
+        --end_time=<time>
+        --allow_overlap
+
+    If no begin time is given then the current wall-clock time will
+    used instead. If no end time is given then the interval will be
+    left open-ended and it will have to be explicitly closed using
+    a separate command. The contents of the database will be analysed
+    to see if no overlap in time exists with other experiments, and
+    if it does exist then the command will fail and names of those
+    other experiments will be reported. This constrain can be turned
+    off by using '--allow_overlap'.
+    """,
+            self.__cmd_add_experiment)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'experiment_config',
+            '<experiment> <operation> [<parameters>]',
+            """
+    Browse or modify (add, remove, set) various records associated with
+    an existing experiment, including:
+
+        - values of its global configuration parameters
+        - definitions of core parameters of runs
+        - definitions of user-defined parameters of runs
+
+    The relevant actions are presented to the command through its
+    <operation> parameter. Here follow a detailed description of
+    all supported operations and their syntax.
+
+    _________________________________________
+    CONFIGURATION PARAMETERS OF AN EXPERIMENT
+
+        list_confs  [<config_param_name> [<config_param_name> [..]]
+
+            If no names of parameters are presented then list all
+            names and possibly (if the below explained "long"
+            option is given) their descriptions and partial values
+            (just their begining). Otherwise print detailed information
+            on each requested parameter.
+
+            The following option will trigger the detailed report on
+            the parameters of selected entries:
+
+                --long
+
+            Note, that by default the long multiline description strings
+            will get truncated in the output. Use the truncation off by
+            passing the following option to the command:
+
+                --truncate-no
+
+        print_conf  <config_param_name>
+
+            Print a value of the specified parameter.
+
+        add_conf  <name> <value>
+
+            This subcommand will add a new configuration parameter
+            to an experiment.
+
+            The configuration may get an optional description by
+            using one of the following mutually exclusive options:
+
+                --description=<short description>
+                --description_file=<file>
+
+        remove_conf  <name>
+
+            This subcommand will remove an existing configuration
+            parameter from an experiment. Note, that all information
+            previously associated with the parameter will be completelly
+            lost from the database.
+
+    __________________________________
+    DEFINITIONS OF CORE RUN PARAMETERS
+
+        list_run_params
+
+            List known definitions for core parameters of runs.
+
+            The following option will trigger the detailed report on
+            the parameters of selected entries:
+
+                --long
+
+            If the option isn't specified only names of parameters will
+            be reported.
+
+            Note, that by default the long multiline description strings
+            will get truncated in the output. Use the truncation off by
+            passing the following option to the command:
+
+                --truncate-no
+
+        add_run_param  <name> <type>
+
+            This subcommand will add a new core parameter to be associated
+            with any runs of an experiment. The operation needs to be performed
+            just once per parameter and per experiment. Then different values
+            of the parameter will be set for each run of the experiment.
+            Note, that a particular run (including those taken before adding
+            the parameter) may not have any values of that parameter. The type
+            of the parameter can be anything from the following list:
+
+                INT
+                DOUBLE
+                TEXT
+
+            The parameter may get an optional description by using one of
+            the following mutually exclusive options:
+
+                --description=<short description>
+                --description_file=<file>
+
+        remove_run_param  <name>
+
+            This subcommand will remove an existing core run parameter from
+            an experiment. Note, that all information previously associated
+            with the parameter will be completelly lost from the database.
+
+    __________________________________
+    DEFINITIONS OF USER RUN PARAMETERS
+
+        list_user_run_params
+
+        add_user_run_param  <name> <type>
+
+        remove_user_run_param  <name>
+
+            These subcommand are similar to the previously discussed
+            operations for the core run parameters. The only difference
+            is that user-level subcommands allow an experimental group
+            to maintain its own collection of parameters w/o interfering
+            with the production system.
+        """,
+             self.__cmd_experiment_config)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'groups',
+            '[<group>]',
+            """
+    Display all known groups or just one group (if its name
+    is requested in the optional parameter to the command).
+
+    The following option will trigger the detailed report on
+    the parameters of selected entries:
+
+        --long
+
+    Note, that by default the long multiline description strings
+    will get truncated in the output. Use the truncation off by
+    passing the following option to the command:
+
+        --truncate-no
+    """,
+             self.__cmd_groups)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'add_group',
+            '<gropu> <project_id> <contact_info>',
+            """
+    The command will create a new group.
+    """,
+            self.__cmd_add_group)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'instruments',
+            '[<instrument>]',
+            """
+    Display all known instruments or just one instrument (if its
+    name is requested in the optional parameter to the command).
+
+    The following option will trigger the detailed report on
+    the parameters of selected entries:
+
+        --long
+
+    Note, that by default the long multiline description strings
+    will get truncated in the output. Use the truncation off by
+    passing the following option to the command:
+
+        --truncate-no
+    """,
+             self.__cmd_instruments)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'add_instrument',
+            '<instrument>',
+            """
+    The command will create a new instrument.
+
+    It's possible to attach some description to the new instrument using
+    one of the folowing mutually exclusive options:
+
+        --description=<short description>
+        --description-file=<file>
+    """,
+            self.__cmd_add_instrument)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'runs',
+            '<experiment> [<run>]',
+            """
+    The command will print an information about runs. If no specific run
+    is requested all runs will be reported.
+    """,
+            self.__cmd_runs)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'add_run',
+            '<experiment> <run> <type> <begin_time> <end_time>',
+            """
+    The command will create a database record for the specified run.
+    At a time this application was being written the following run
+    types were supported (this list may be extended later):
+
+        DATA    - for regular data runs
+        CALIB   - for calibration runs
+
+    The begin and end run timestamps should have the following
+    format and be included into single or double quotes:
+
+        "2009-03-13 15:37:23"
+
+    Also note the following:
+
+    - each experiment has its own set of runs. The run numbers
+      have a scope within their experiment.
+
+    - runs numbers should increase as they're added to the database.
+      Adding runs back in time isn't allowed.
+
+    - run intervals should not overlap; an interval of a consequtive
+      run should follow the previous one (gaps allowed); an interval
+      should fit into an interval of the corresponding experiment.
+
+    - the timestamps are interpreted in the local timezone
+    """,
+            self.__cmd_add_run)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'run_params',
+            '<experiment> <run> <operation> [<parameters>]',
+            """
+    Browse or modify parameters of the specified run. The command
+    deals with both core and user defined (if any) parameters.
+
+    The following operations are supported:
+
+        list  [<param_name> [<param_name> [..]]
+
+            If no names of parameters are presented then list all
+            names and possibly (if the below explained "long"
+            option is given) their descriptions and partial values
+            (just their begining). Otherwise print detailed information
+            on each requested parameter.
+
+            The following option will trigger the detailed report on
+            the parameters of selected entries:
+
+                --long
+
+            Note, that by default the long multiline description strings
+            will get truncated in the output. Use the truncation off by
+            passing the following option to the command:
+
+                --truncate-no
+
+        value  <param_name>
+
+            Print a value of the specified parameter.
+
+        set_value  <name> <value> <source>
+
+            This subcommand will set a value of the previously defined
+            core parameter for the given run. The last parameter describes
+            a source from which the parameters was obtained. The following
+            sources were anticipated at a time when the database was being
+            designed:
+
+                XTC       - from data files
+                EPICS     - from Experiment Control stream
+                LOGBOOK   - from Experiment Loogbook records
+
+            Although the parameter may have take an arbitrary text, it would
+            make a sense to have a certain well defined naming convention for
+            the sources.
+
+            The following option should be used to allow updating an existing
+            value of the parameter:
+
+                --update
+
+            Also note the following:
+
+            - the run must have already been known in the database
+
+            - the previous (if set) value of the parameter for the run
+              will be overwritten by the command
+
+            - the input value must have an appropriate type as it was
+              requested when creating the parameter.
+
+        set_user_value  <name> <value>
+
+            The operation is similar to the previously discussed
+            operation for the core run parameters. The only difference
+            is that it applies to a set of user parameters of runs.
+        """,
+             self.__cmd_run_params)
+
+    # ============================================================
+    # Run the whole thing after parsing the command argunments and
+    # installing logger. See BbrPyApp class for details.
+    # ============================================================
+
+    def _run ( self ) :
+
+        # Print the list of supported commands of none is given ----------------
+        #
+        if not self._args :
+            self.__cmd_help('help', self._args)
+            return 0
+
+        # Open output file -----------------------------------------------------
+        #
+        if self._options.output:
+            self.debug( "Open alternative output file" )
+            self.__out = open ( self._options.output, "w" )
+
+        # Get the command name,  connect to the server (unless we're -----------
+        #  dealing with the command which doesn't need this) and invoke
+        # the corresponding handler.
+        #
+        command = self._args[0]
+        if command not in self.__cmd_handlers:
+            self._parser.error("unknown command: %s" % command)
+            return 2
+
+        self.trace( "command: %s: arguments: %s" % (command,str(self._args[1:])))
+
+        if self.__cmd_handlers[command]['CONNECTS2SERVER']: self.__connect()
+        return self.__cmd_handlers[command]['HANDLER'](command, self._args[1:])
+
+    # ===========================================
+    # Print the information on supported commands
+    # ===========================================
+
+    def __cmd_help ( self, command, args ) :
+
+        names = args
+        if names is not None and len(names) > 0:
+            verbose = True
+        else:
+            names = self.__cmd_order
+            verbose = False
+
+        if verbose:
+
+            # Print full description of each command
+            #
+            for name in names:
+                self.print_out("""COMMAND:
+
+    %s
+
+PARAMETERS:
+
+    %s
+
+DESCRIPTION:
+%s
+""" % (name,
+         self.__cmd_handlers[name]['SYNTAX'],
+         self.__cmd_handlers[name]['DESCRIPTION']))
+
+        else:
+
+            self.print_out("""APPLICATION:
+
+    %s
+
+        This is the management and report utility for Science Metadata
+        Database. The application has been developed in a context of
+        the OFFLINE Data Management Project for LCLS/LUSI experiments.
+
+USAGE:
+
+    command [parameters] [options]
+
+    help
+    help [command [command ...]]   (for detailed explanation)
+
+    -h | --help                    (for a full list of available options)
+
+SUPPORTED COMMANDS:
+""" %  os.path.basename(sys.argv[0]))
+
+            # Reserve enough space for the command names based on
+            # the longest name.
+            #
+            max_len = 1
+            for name in names:
+                if len(name) > max_len: max_len = len(name)
+            fmt = "    %-"+str(max_len)+"s  %s"
+            for name in names:
+                self.print_out(fmt % (name, self.__cmd_handlers[name]['SYNTAX']))
+
+            self.print_out()
+
+        return 0
+
+    # =============================================
+    # Load the initial schema and initialize tables
+    # =============================================
+
+    def __cmd_init ( self, command, args ) :
+        return 0
+
+    # ================================
+    # Print a list of known experiment
+    # ================================
+
+    def __cmd_experiments ( self, command, args ) :
+
+        # Restrict the query to specific groups only if requested --------------
+        #
+        limits = ""
+        if len(args):
+            limits = """ AND "e"."name"='%s'""" % args[0]
+
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT e.*, g.name "group_name", i.name "instr_name"'+
+            ' FROM "experiment" AS "e", "group" AS "g" , "instrument" AS "i"'+
+            ' WHERE "e"."group_id"="g"."id" AND "e"."instr_id"="i"."id"'+limits,
+            return_dict=True)
+        if not rows: return 1
+
+        for r in rows:
+##            for k in r.keys():
+##                self.print_out(k, ":", r[k])
+            if self._options.long:
+                self.print_out("""
+  %s
+
+    DESCRIPTION : %s
+    GROUP       : %s
+    INSTRUMENT  : %s
+    BEGIN TIME  : %s
+    END TIME    : %s""" % (
+        r['name'],
+        self._description_hint(r['descr']),
+        r['group_name'],
+        r['instr_name'],
+        _time2str(r['begin_time']),
+        _time2str(r['end_time'])))
+
+            else:
+                self.print_out(r['name'])
+
+        return 0
+
+    # ====================
+    # Add a new experiment
+    # ====================
+
+    def __cmd_add_experiment ( self, command, args ) :
+
+        if len(args) != 3:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+        # First create an entry for the experiment in core tables --------------
+        #
+        (experiment, group, instrument) = args
+
+        instr_id = """(SELECT id FROM "instrument" WHERE name='%s')""" % instrument
+        group_id = """(SELECT id FROM "group" WHERE name='%s')""" % group
+        begin_time = Time.now().to64()
+        end_time = "NULL"
+
+        if not self.__simple_query(
+            "SET SESSION SQL_MODE='ANSI'",
+            "START TRANSACTION",
+            """INSERT INTO "experiment" VALUES(NULL,'%s','%s',%s, %s, %s, %s)""" % (
+                experiment,
+                self._description(),
+                instr_id,
+                group_id,
+                begin_time,
+                end_time)): return 1
+
+        # Get an identifier of the experiment and create user tables -----------
+        # for expended parameters of the experiment. Note, that
+        # we're going to use existing template tables as a model
+        # for new tables.
+        #
+        exper_id = self._exper_id( experiment )
+
+        statements = []
+
+        rows = self.__select_query(
+            """ SELECT t.table_name from "information_schema"."tables" "t" """+
+            """ WHERE "t"."table_schema"='SciMD'"""+
+            """ AND "t"."table_name" LIKE 'EXPER_X_%'""",
+            return_dict=True)
+        if not rows: return 1
+        for row in rows:
+            table_rows = self.__select_query(
+                """SHOW CREATE TABLE "%s" """ % row['table_name'],
+                return_dict=True)
+            if not table_rows or len(table_rows) != 1: return 1
+            template_sql = table_rows[0]['Create Table'].lower()
+            sql = template_sql.replace("exper_x_", "exper_%s_" % exper_id)
+            statements.append(sql)
+
+        statements.append("COMMIT")
+        if not self.__simple_query( *statements ): return 1
+
+        return 0
+
+    # ================================================
+    # Manage configuration parameters of an experiment
+    # ================================================
+
+    def __cmd_experiment_config ( self, command, args ) :
+
+        if len(args) < 2:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+        experiment = args[0]
+
+        # Get the operation name, analyze its parameters and switch ------------
+        # to its processor.
+        #
+        operation = args[1]
+        nextParam = 2
+        numParams = len(args) - 2
+
+        if operation == 'list_confs':
+            return self.__list_exper_confs (experiment, args[nextParam:])
+
+        elif operation == 'print_conf':
+            if numParams != 1:
+                self._parser.error("insufficient number of parameters for operation: %s" % operation)
+            (name,) = args[nextParam:]
+            return self.__print_exper_conf (experiment, name)
+
+        elif operation == 'add_conf':
+            if numParams != 2:
+                self._parser.error("insufficient number of parameters for operation: %s" % operation)
+            (name,value) = args[nextParam:]
+            return self.__add_exper_conf (experiment, name, value)
+
+        elif operation == 'remove_conf':
+            if numParams != 1:
+                self._parser.error("insufficient number of parameters for operation: %s" % operation)
+            (name,) = args[nextParam:]
+            return self.__remove_exper_conf (experiment, name)
+
+        elif operation == 'list_run_params':
+            if numParams != 0:
+                self._parser.error("insufficient number of parameters for operation: %s" % operation)
+            return self.__list_run_param_defs (experiment)
+
+        elif operation == 'add_run_param':
+            if numParams != 2:
+                self._parser.error("insufficient number of parameters for operation: %s" % operation)
+            (name,type) = args[nextParam:]
+            return self.__add_run_param_def (experiment, name, type)
+
+        elif operation == 'remove_run_param':
+            if numParams != 1:
+                self._parser.error("insufficient number of parameters for operation: %s" % operation)
+            (name,) = args[nextParam:]
+            return self.__remove_run_param_def (experiment, name)
+
+        elif operation == 'list_user_run_params':
+            if numParams != 0:
+                self._parser.error("insufficient number of parameters for operation: %s" % operation)
+            return self.__list_user_run_param_defs (experiment)
+
+        elif operation == 'add_user_run_param':
+            if numParams != 2:
+                self._parser.error("insufficient number of parameters for operation: %s" % operation)
+            (name,type) = args[nextParam:]
+            return self.__add_user_run_param_def (experiment, name, type)
+
+        elif operation == 'remove_user_run_param':
+            if numParams != 1:
+                self._parser.error("insufficient number of parameters for operation: %s" % operation)
+            (name,) = args[nextParam:]
+            return self.__remove_user_run_param_def (experiment, name)
+
+        else:
+            self._parser.error("unknown subcommand: %s for command: %s" % (operation, command))
+
+        return 0
+
+    def __list_exper_confs (self, experiment, args):
+
+        # Restrict the query to specific parameters only if requested ----------
+        #
+        limits = ""
+        if len(args):
+            limits = """ AND "c"."param" IN (%s)""" % (", ".join(["'%s'" % n for n in args[0]]),)
+
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT c.param, c.descr, SUBSTR(c.val, 1, 72) "val"'+
+            ' FROM "experiment_conf" AS "c"'+
+            """ WHERE "c"."exper_id"=%s""" % (_exper_id_sql( experiment),) +limits,
+            return_dict=True)
+        if not rows: return 1
+
+        for r in rows:
+##            for k in r.keys():
+##                self.print_out(k, ":", r[k])
+            if self._options.long:
+                self.print_out("""
+  %s
+
+    DESCRIPTION : %s
+    VALUE       : %s""" % (
+        r['param'],
+        self._description_hint(r['descr']),
+        r['val']))
+
+            else:
+                self.print_out(r['param'])
+
+        return 0
+
+    def __print_exper_conf (self, experiment, name):
+
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT c.val "val"'+
+            ' FROM "experiment_conf" AS "c"'+
+            """ WHERE "c"."exper_id"=%s AND "c"."param"='%s'""" % (
+            _exper_id_sql( experiment ),name),
+            return_dict=True)
+        if not rows: return 1
+
+        self.print_out(rows[0]['val'])
+
+        return 0
+
+    def __add_exper_conf (self, experiment, name, value):
+
+        if not self.__simple_query(
+            "SET SESSION SQL_MODE='ANSI'",
+            "START TRANSACTION",
+            """INSERT INTO "experiment_conf" VALUES(%s,'%s','%s','%s')""" % (
+                _exper_id_sql( experiment ),
+                name,
+                value,
+                self._description()),
+            "COMMIT"): return 1
+
+        return 0
+
+    def __remove_exper_conf (self, experiment, name):
+        if not self.__simple_query(
+            "SET SESSION SQL_MODE='ANSI'",
+            "START TRANSACTION",
+            """DELETE FROM "experiment_conf" WHERE "exper_id"=%s AND "param"='%s'""" % (
+                _exper_id_sql( experiment ),
+                name),
+            "COMMIT"): return 1
+
+        return 0
+
+    def __list_run_param_defs (self, experiment):
+
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT rp.*'+
+            ' FROM "run_param" AS "rp"'+
+            """ WHERE "rp"."exper_id"=%s""" % (_exper_id_sql( experiment),),
+            return_dict=True)
+        if not rows: return 1
+
+        for r in rows:
+##            for k in r.keys():
+##                self.print_out(k, ":", r[k])
+            if self._options.long:
+                self.print_out("""
+  %s
+
+    TYPE        : %s
+    DESCRIPTION : %s""" % (
+        r['param'],
+        r['type'],
+        self._description_hint(r['descr'])))
+
+            else:
+                self.print_out(r['param'])
+
+        return 0
+
+    def __add_run_param_def (self, experiment, name, type):
+
+        if type not in ('INT', 'DOUBLE', 'TEXT'):
+            self._parser.error("unsupported parameter type: %s" % type)
+
+        if not self.__simple_query(
+            "SET SESSION SQL_MODE='ANSI'",
+            "START TRANSACTION",
+            """INSERT INTO "run_param" VALUES(NULL,'%s',%s,'%s','%s')""" % (
+                name,
+                _exper_id_sql( experiment ),
+                type,
+                self._description()),
+            "COMMIT"): return 1
+
+        return 0
+
+    def __remove_run_param_def (self, experiment, name):
+        pass
+
+    def __list_user_run_param_defs (self, experiment):
+
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT rp.*'+
+            ' FROM "exper_%s_run_param" AS "rp"' % (self._exper_id( experiment),),
+            return_dict=True)
+        if not rows: return 1
+
+        for r in rows:
+            for k in r.keys():
+                self.print_out(k, ":", r[k])
+            if self._options.long:
+                self.print_out("""
+  %s
+
+    DESCRIPTION : %s
+    VALUE       : %s""" % (
+        r['param'],
+        r['type'],
+        self._description_hint(r['descr'])))
+
+            else:
+                self.print_out(r['param'])
+
+        return 0
+
+    def __add_user_run_param_def (self, experiment, name, type):
+        if type not in ('INT', 'DOUBLE', 'TEXT'):
+            self._parser.error("unsupported parameter type: %s" % type)
+
+        if not self.__simple_query(
+            "SET SESSION SQL_MODE='ANSI'",
+            "START TRANSACTION",
+            """INSERT INTO "exper_%s_run_param" VALUES(NULL,'%s','%s','%s')""" % (
+                self._exper_id( experiment),
+                name,
+                type,
+                self._description()),
+            "COMMIT"): return 1
+
+        return 0
+
+    def __remove_user_run_param_def (self, experiment, name):
+        pass
+
+    # ============================
+    # Print a list of known groups
+    # ============================
+
+    def __cmd_groups ( self, command, args ) :
+
+        limits = ""
+        if len(args) == 0:
+            pass
+        elif len(args) == 1:
+            limits = """ WHERE "g"."name"='%s'""" % args[0]
+        else:
+            self._parser.error("to many parameters for command: %s" % command)
+
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT * FROM "group" AS "g"'+limits,
+            return_dict=True)
+        if not rows: return 1
+
+        for r in rows:
+##            for k in r.keys():
+##                self.print_out(k, ":", r[k])
+            if self._options.long:
+                experiments = self.__select_query_1(
+                    'SELECT "e"."name" FROM "experiment" AS "e"'+
+                    """ WHERE "e"."group_id"=%d""" % r['id'])
+                if experiments is None: return 1
+                self.print_out("""
+  %s
+
+    PROJECT ID  : %s
+    CONTACT     : %s
+    EXPERIMENTS :
+        %s""" % (
+        r['name'],
+        r['proj_id'],
+        r['contact'],
+        "\n        ".join(experiments)))
+
+            else:
+                self.print_out(r['name'])
+
+        return 0
+
+    # ===============
+    # Add a new group
+    # ===============
+
+    def __cmd_add_group ( self, command, args ) :
+
+        if len(args) != 3:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+        (name, project_id, contact_info) = args
+
+        if not self.__simple_query(
+            "SET SESSION SQL_MODE='ANSI'",
+            "START TRANSACTION",
+            """INSERT INTO "group" VALUES(NULL,'%s','%s','%s')""" % (
+                name,project_id,contact_info),
+            "COMMIT"): return 1
+
+        return 0
+
+    # =================================
+    # Print a list of known instruments
+    # =================================
+
+    def __cmd_instruments ( self, command, args ) :
+
+        limits = ""
+        if len(args) == 0:
+            pass
+        elif len(args) == 1:
+            limits = """ WHERE "i"."name"='%s'""" % args[0]
+        else:
+            self._parser.error("to many parameters for command: %s" % command)
+
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT * FROM "instrument" AS "i"'+limits,
+            return_dict=True)
+        if not rows: return 1
+
+        for r in rows:
+##            for k in r.keys():
+##                self.print_out(k, ":", r[k])
+            if self._options.long:
+                experiments = self.__select_query_1(
+                    'SELECT "e"."name" FROM "experiment" AS "e"'+
+                    """ WHERE "e"."instr_id"=%d""" % r['id'])
+                if experiments is None: return 1
+                self.print_out("""
+  %s
+
+    DESCRIPTION : %s
+    EXPERIMENTS :
+        %s""" % (
+        r['name'],
+        self._description_hint(r['descr']),
+        "\n        ".join(experiments)))
+
+            else:
+                self.print_out(r['name'])
+
+        return 0
+
+    # ====================
+    # Add a new instrument
+    # ====================
+
+    def __cmd_add_instrument ( self, command, args ) :
+
+        if len(args) != 1:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+        (name,) = args
+
+        if not self.__simple_query(
+            "SET SESSION SQL_MODE='ANSI'",
+            "START TRANSACTION",
+            """INSERT INTO "instrument" VALUES(NULL,'%s','%s')""" % (
+                name,
+                self._description()),
+            "COMMIT"): return 1
+
+        return 0
+
+    # ==========================
+    # Print a list of known runs
+    # ==========================
+
+    def __cmd_runs ( self, command, args ):
+
+        if len(args) < 1:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+        experiment = args[0]
+
+        limits = ""
+        if len(args) == 1:
+            pass
+        elif len(args) == 2:
+            limits = """ WHERE "r"."num"=%s""" % args[1]
+        else:
+            self._parser.error("to many parameters for command: %s" % command)
+
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT * FROM "run" AS "r"'+
+            """ WHERE "r"."exper_id"=%s""" % (_exper_id_sql( experiment ),)+limits+
+            ' ORDER by "r"."num"',
+            return_dict=True)
+        if not rows: return 1
+
+        for r in rows:
+##            for k in r.keys():
+##                self.print_out(k, ":", r[k])
+            self.print_out("  %10d  %-5s  %-19s  %-19s" % (
+                r['num'],
+                r['type'],
+                _time2str(r['begin_time']),
+                _time2str(r['end_time'])))
+
+        return 0
+
+    # =============================
+    # Create an entry for a new run
+    # =============================
+
+    def __cmd_add_run ( self, command, args ):
+
+        if len(args) != 5:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+        (experiment, run, type, begin_time, end_time) = args
+
+        # Parse and reconvert timestamps into packed format
+        try:
+            begin_time = Time.parse(begin_time).to64()
+            end_time   = Time.parse(end_time).to64()
+        except Exception, ex:
+            self._parser.error("failed to parse begin/end run timestamps due to: %s" % ex)
+            return 1
+
+        if not self.__simple_query(
+            "SET SESSION SQL_MODE='ANSI'",
+            "START TRANSACTION",
+            """INSERT INTO "run" VALUES(NULL,%s,%s,'%s',%s,%s)""" % (
+                run,_exper_id_sql( experiment ),type,begin_time,end_time),
+            "COMMIT"): return 1
+
+        return 0
+
+    # =============================
+    # Report on parameters of a run
+    # =============================
+
+    def __cmd_run_params ( self, command, args ) :
+
+        if len(args) < 3:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+
+        # Get the operation name, analyze its parameters and switch ------------
+        # to its processor.
+        #
+        experiment = args[0]
+        run        = args[1]
+        operation  = args[2]
+
+        nextParam = 3
+        numParams = len(args) - 3
+
+        if operation == 'list':
+            return self.__list_run_params (experiment, run, args[nextParam:])
+
+        elif operation == 'value':
+            if numParams != 1:
+                self._parser.error("insufficient number of parameters for operation: %s" % operation)
+            (name,) = args[nextParam:]
+            return self.__print_run_param_value (experiment, run, name)
+
+        elif operation == 'set_value':
+            if numParams != 3:
+                self._parser.error("insufficient number of parameters for operation: %s" % operation)
+            (name,value,source) = args[nextParam:]
+            return self.__set_run_param_value (experiment, run, name, value, source)
+
+        elif operation == 'set_user_value':
+            if numParams != 2:
+                self._parser.error("insufficient number of parameters for operation: %s" % operation)
+            (name,value) = args[nextParam:]
+            return self.__set_user_run_param_value (experiment, run, name, value)
+
+        else:
+            self._parser.error("unknown subcommand: %s for command: %s" % (operation, command))
+
+        return 0
+
+    def __list_run_params (self, experiment, run, args):
+
+        # Restrict the query to specific parameters only if requested ----------
+        #
+        limits = ""
+        if len(args):
+            limits = """ AND "p"."param" IN (%s)""" % (", ".join(["'%s'" % n for n in args[0]]),)
+
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT *'+
+            ' FROM "run_param" AS "p"'+
+            """ WHERE "p"."exper_id"=%s""" % (_exper_id_sql( experiment),) +limits,
+            return_dict=True)
+        if not rows: return 1
+
+        for rp in rows:
+
+            #  The value is to be fetched from another table whose name
+            # is determined by a type of the parameter.
+            #
+            run_val_table = ""
+            if   rp['type'] == "TEXT"  : run_val_table = "run_val_text"
+            elif rp['type'] == "INT"   : run_val_table = "run_val_int"
+            elif rp['type'] == "DOUBLE": run_val_table = "run_val_double"
+            else:
+                return 1
+
+            sql = "".join([
+               'SELECT rv.source "source", rv.updated "updated", v.val "val"',
+               """ FROM "run_val" AS "rv", "%s" AS "v", "run" AS "r" """ % (run_val_table,),
+               """ WHERE "r"."exper_id"=%s AND "r"."num"=%s""" % (_exper_id_sql( experiment),run),
+               """ AND "r"."id"="rv"."run_id" AND "r"."id"="v"."run_id" AND "rv"."param_id"=%s AND "v"."param_id"=%s""" % (rp['id'],rp['id'])])
+
+            value = ""
+            source = ""
+            updated = ""
+
+            v_rows = self.__select_query(sql,return_dict=True)
+            #if not v_rows: return 1
+            for r in v_rows:
+                value   = r['val']
+                updated = r['updated']
+                source  = r['source']
+                break
+
+            if self._options.long:
+                self.print_out("""
+  %s
+
+    DESCRIPTION : %s
+    TYPE        : %s
+    VALUE       : %s
+    UPDATED     : %s
+    FROM SOURCE : %s""" % (
+        rp['param'],
+        rp['descr'],
+        rp['type'],
+        value,
+        _time2str(updated),
+        source))
+
+            else:
+                self.print_out("%s: %s" % (rp['param'], value))
+
+        return 0
+
+    def __print_run_params_value (self, experiment, run, name):
+
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT c.val "val"'+
+            ' FROM "experiment_conf" AS "c"'+
+            """ WHERE "c"."exper_id"=%s AND "c"."param"='%s'""" % (
+            _exper_id_sql( experiment ),name),
+            return_dict=True)
+        if not rows: return 1
+
+        self.print_out(rows[0]['val'])
+
+        return 0
+
+    def __set_run_param_value (self, experiment, run, name, value, source):
+
+        # Get a type of the parameter (we need the one to put-------------------
+        # parameter's value into the right table).
+        #
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT *'+
+            ' FROM "run_param" AS "p"'+
+            """ WHERE "p"."exper_id"=%s AND "p"."param"='%s'""" % (_exper_id_sql( experiment),name),
+            return_dict=True)
+        if not rows: return 1
+
+        p_id   = rows[0]['id']
+        p_type = rows[0]['type']
+
+        run_val_table = ""
+        p_val = value
+        if   p_type == "TEXT"  :
+            run_val_table = "run_val_text"
+            p_val = "'%s'" % value
+        elif p_type == "INT"   : run_val_table = "run_val_int"
+        elif p_type == "DOUBLE": run_val_table = "run_val_double"
+        else:
+            return 1
+
+        # We also need identifiers of the experiment and the run----------------
+        #
+        exper_id = self._exper_id(experiment)
+        run_id   = self._run_id(exper_id, run)
+
+        # Using the current timestamp as a value update time--------------------
+        #
+        update_time = Time.now().to64()
+
+        # Make sure the value hasn't been set yet, unless the "update"----------
+        # option is requested. Note that mode. We're going to use it later.
+        #
+        updating = False
+        if self._count (
+            'SELECT COUNT(*) FROM "run_val" AS "rv"'+
+            """ WHERE "rv"."run_id"=%s AND "rv"."param_id"=%s""" % (run_id,p_id)) > 0:
+            if not self._options.update:
+                self.error("the value of: %s is already set for run: %s, and no 'update' option requested" % (name, run))
+                return 1
+            updating = True
+
+        # Proceed with the insertio/modification
+        #
+        if updating:
+            if not self.__simple_query(
+                "SET SESSION SQL_MODE='ANSI'",
+                "START TRANSACTION",
+                """UPDATE "run_val" SET source='%s', updated=%s WHERE run_id=%s AND param_id=%s""" % (source,update_time,run_id,p_id),
+                """UPDATE "%s" SET val=%s WHERE run_id=%s AND param_id=%s""" % (run_val_table,p_val,run_id,p_id),
+                "COMMIT"): return 1
+        else:
+            if not self.__simple_query(
+                "SET SESSION SQL_MODE='ANSI'",
+                "START TRANSACTION",
+                """INSERT INTO "run_val" VALUES(%s,%s,'%s',%s)""" % (run_id,p_id,source,update_time),
+                """INSERT INTO "%s" VALUES(%s,%s,%s)""" % (run_val_table,run_id,p_id,p_val),
+                "COMMIT"): return 1
+
+        return 0
+
+    def __set_user_run_param_value (self, run, experiment, name, value):
+
+        # Get an identifier of the experiment (we need the one to put-----------
+        # parameter's value into the right table associated with
+        # that experiment).
+        #
+        pass
+
+        # Get a type of the parameter (we need the one to put-------------------
+        # parameter's value into the right table).
+        #
+        return 0
+
+    # ====================================
+    # Report current connection parameters
+    # ====================================
+
+    def __conn_params(self):
+        using_password = "NO"
+        if self.__password != "": using_password = "YES"
+        return "'%s'@'%s':%s (using password: %s)" % (
+            self.__user,
+            self.__host,
+            self.__port,
+            using_password)
+
+    # =====================
+    # Connect to the server
+    # ====================
+
+    def __connect(self):
+
+        """Connect to the database if the connection has not been established
+        yet. In case of success initialize a connection handle and
+        return True. Return False otherwise."""
+
+        if self.__connection is not None: return True
+
+        # Make ajustments to the connection parameters if requested ------------
+        # in the command options.
+        #
+        self.info("Default connection parameters for MySQL: %s" % self.__conn_params())
+
+        if self._options.host and self.__host != self._options.host:
+            self.__host = self._options.host
+
+        if self._options.port and port != self._options.port:
+            port = self._options.port
+
+        if self._options.user and self.__user != self._options.user:
+            self.__user = self._options.user
+
+        if self._options.password and self.__password != self._options.password:
+            self.__password = self._options.password
+
+        if self._options.database and self.__database != self._options.database:
+            self.__database = self._options.database
+
+        self.info("Requested connection parameters for MySQL: %s" % self.__conn_params())
+
+        # Try to connect -------------------------------------------------------
+        #
+        self.info("Connecting to MySQL: %s" % self.__conn_params())
+        try:
+            self.__connection = MySQLdb.connect(
+                host=self.__host,
+                port=int(self.__port),
+                user=self.__user,
+                passwd=self.__password,
+                db=self.__database)
+        except MySQLdb.Error, ex:
+            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+            sys.exit(1)
+
+    # ========================================================
+    # Execute a simple query which doesn't return a result set
+    # ========================================================
+
+    def __simple_query(self, *queries):
+
+        """Execute a list of simple queries which do not require any parsing
+        of results. Queries will be executed one by one till all is done or
+        till the very first failure. In the later case the rest of the list
+        won't be executed.
+
+        The method will return True if all query succeeded, and False otherwise."""
+
+        result = False
+        cursor = self.__connection.cursor()
+
+        for query in queries:
+            self.info( "SQL: %s" % query)
+            try:
+                cursor.execute(query)
+                result = True
+            except MySQLdb.Error, ex:
+                self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+
+        cursor.close()
+        return result
+
+    # ============================================================
+    # Execute a single SELECT type query and return its result set
+    # ============================================================
+
+    def __select_query(self, query, return_dict=False):
+
+        """Execute a single SELECT type query and return a sequence of sequences
+        (or dictionaries, depending on the optional flag). If no results are found
+        then an empty sequence is retunred.
+
+        The method will return None if the query fails."""
+
+        rows = None
+
+        cursor = None
+        if return_dict: cursor = self.__connection.cursor(MySQLdb.cursors.SSDictCursor)
+        else:           cursor = self.__connection.cursor()
+
+        self.info( "SQL: %s" % query)
+        try:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+        except MySQLdb.Error, ex:
+            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+
+        cursor.close()
+        return rows
+
+    # ======================================================
+    # Execute a single SELECT type query on a single collumn
+    # ======================================================
+
+    def __select_query_1(self, query):
+
+        """Execute a single SELECT type query on a single column and
+        return a sequence of values found in all rows for that collumn.
+        If no results are found then an empty sequence is returned.
+
+        The method will return None if the query fails."""
+
+        result = None
+        cursor = self.__connection.cursor()
+
+        self.info( "SQL: %s" % query)
+        try:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            result = [r[0] for r in rows]
+        except MySQLdb.Error, ex:
+            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+
+        cursor.close()
+        return result
+
+    # ============================================
+    # Get an internal identifier of the experiment
+    # ============================================
+
+    def _exper_id (self, experiment):
+
+        if self.__simple_query("SET SESSION SQL_MODE='ANSI'"):
+
+            rows = self.__select_query(
+                """(SELECT id FROM "experiment" WHERE name='%s')""" % experiment,
+                return_dict=True)
+            if rows:
+                return rows[0]['id']
+
+        raise DatabaseOperatonFailed, "failed to obtain experiment identifier for: %s" % experiment
+
+    # =====================================
+    # Get an internal identifier of the run
+    # =====================================
+
+    def _run_id (self, exper_id, run):
+
+        if self.__simple_query("SET SESSION SQL_MODE='ANSI'"):
+
+            rows = self.__select_query(
+                """(SELECT id FROM "run" WHERE exper_id=%s AND num=%s)""" % (exper_id, run),
+                return_dict=True)
+            if rows:
+                return rows[0]['id']
+
+        raise DatabaseOperatonFailed, "failed to obtain run identifier for exper_id: %s, run: %s" % (exper_id, run)
+
+    # ===================================================================
+    # Expect a query which counts a number of rows, and return the number
+    # ===================================================================
+
+    def _count (self, sql, colname="COUNT(*)"):
+
+        if self.__simple_query("SET SESSION SQL_MODE='ANSI'"):
+
+            rows = self.__select_query(sql,return_dict=True)
+            for r in rows:
+                return r[colname]
+
+            raise DatabaseOperatonFailed, "inconsistent results from counting query: %s" % (sql)
+
+    # =========================================
+    # Read an optional description if avaialble
+    # =========================================
+
+    def _description (self):
+
+        description = self._options.description
+        description_file = self._options.description_file
+
+        if description is not None and description_file is not None:
+            self._parser.error("do not use mutually exclusive description options")
+
+        if description is not None:
+            return MySQLdb.escape_string(description)
+
+        if description_file is not None:
+            return MySQLdb.escape_string("".join(open(description_file, "r").readlines()))
+
+        return ""
+
+
+    # ==============================================
+    # Extract only the first part of the description
+    # ==============================================
+
+    def _description_hint (self, description, maxlen=0):
+
+        """Analyze the contents of the input string and return
+        a substring which would end when the first of the following
+        conditions is met:
+
+        - the maximul length (in characters) as requested by the optional
+          parameter 'maxlen' (the default value of 0 means no limit)
+
+        - the newline character (in case of multiline string)
+
+        If none of these conditions is detected the whole input string
+        is returned. The whole input string is returned if the following
+        option is set:
+
+            --no-truncate
+        """
+
+        if self._options.truncate_no:
+            return description
+
+        begin = 0
+        end = len(description)
+        if maxlen > 0 and maxlen < end:
+            end = maxlen
+
+        idx = description.find("\n", begin, end)
+        if idx >= 0:
+            end = idx
+
+        if end < len(description):
+            return "%s  (truncated: %d of %d)" % (description[begin:end], end, len(description))
+
+        return description
+
+# ==============================================
+# Run application when imported as a main module
+# ==============================================
+
+if __name__ == "__main__" :
+    app = SciMDCmd()
+    rc = app.run()
+    sys.exit(rc)
