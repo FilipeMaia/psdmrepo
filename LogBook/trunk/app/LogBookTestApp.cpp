@@ -19,6 +19,7 @@
 #include <list>
 #include <string>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <iterator>
 #include <algorithm>
@@ -152,12 +153,20 @@ private:
     // Implement the commands
 
     int cmd_help () ;
-    int cmd_allocate_run () throw (std::exception) ;
-    int cmd_add_run () throw (std::exception) ;
-    int cmd_begin_run () throw (std::exception) ;
-    int cmd_end_run () throw (std::exception) ;
-    int cmd_set_run_param () throw (std::exception) ;
-    int cmd_param_info () throw (std::exception) ;
+
+    int cmd_experiments       () throw (std::exception) ;
+
+    int cmd_allocate_run      () throw (std::exception) ;
+    int cmd_add_run           () throw (std::exception) ;
+    int cmd_begin_run         () throw (std::exception) ;
+    int cmd_end_run           () throw (std::exception) ;
+
+    int cmd_create_run_param  () throw (std::exception) ;
+    int cmd_param_info        () throw (std::exception) ;
+    int cmd_run_parameters    () throw (std::exception) ;
+
+    int cmd_set_run_param     () throw (std::exception) ;
+    int cmd_display_run_param () throw (std::exception) ;
 
 private:
 
@@ -257,12 +266,16 @@ LogBookTestApp::runApp ()
 
         // Proceed to commands which require the database
         //
-        if      (command == "allocate_run")  return cmd_allocate_run ();
-        else if (command == "add_run")       return cmd_add_run ();
-        else if (command == "begin_run")     return cmd_begin_run ();
-        else if (command == "end_run")       return cmd_end_run ();
-        else if (command == "set_run_param") return cmd_set_run_param ();
-        else if (command == "param_info")    return cmd_param_info ();
+        if      (command == "experiments")       return cmd_experiments();
+        else if (command == "allocate_run")      return cmd_allocate_run ();
+        else if (command == "add_run")           return cmd_add_run ();
+        else if (command == "begin_run")         return cmd_begin_run ();
+        else if (command == "end_run")           return cmd_end_run ();
+        else if (command == "create_run_param")  return cmd_create_run_param ();
+        else if (command == "param_info")        return cmd_param_info ();
+        else if (command == "run_parameters")    return cmd_run_parameters ();
+        else if (command == "set_run_param")     return cmd_set_run_param ();
+        else if (command == "display_run_param") return cmd_display_run_param ();
         else {
             MsgLogRoot( error, "unknown command") ;
             return 2 ;
@@ -285,119 +298,120 @@ LogBookTestApp::runApp ()
 int
 LogBookTestApp::cmd_help ()
 {
-    if (m_args.empty()) {
-        cout << "Usage: -h | help | <command>" << endl;
-        return 0 ;
-    }
-    if (m_args.size() != 1) {
+    cout << "SYNTAX:\n"
+         << "\n"
+         << "  experiments   [<instrument>]\n"
+         << "\n"
+         << "  allocate_run  <instrument> <experiment>\n"
+         << "\n"
+         << "  add_run       <instrument> <experiment> <run> {DATA|CALIB} <begn_time> <end_time>\n"
+         << "  begin_run     <instrument> <experiment> <run> {DATA|CALIB} <begn_time>\n"
+         << "  end_run       <instrument> <experiment> <run>                          <end_time>\n"
+         << "\n"
+         << "  create_run_param  <instrument> <experiment> <param> {INT|DOUBLE|TEXT} <description>\n"
+         << "  param_info        <instrument> <experiment> <param>\n"
+         << "  run_parameters    <instrument> <experiment>\n"
+         << "\n"
+         << "  set_run_param     <instrument> <experiment> <run> <param> <value> {INT|DOUBLE|TEXT}\n"
+         << "  display_run_param <instrument> <experiment> <run> <param>\n"
+         << "\n"
+         << "NOTES ON PARAMETERS:\n"
+         << "\n"
+         << "  - the instrument and experiment ate given by their names.\n"
+         << "  - the run number must be a positive number.\n"
+         << "  - values of the timestamps are expected to have the following syntax:\n"
+         << "\n"
+         << "      YYYY-MM-DD HH:MM::SS\n"
+         << "\n"
+         << "    For example:\n"
+         << "\n"
+         << "      2009-APR-27 16:23:05\n"
+         << "\n"
+         << "  - the run type can be one of the following:\n"
+         << "\n"
+         << "    'CALIB'\n"
+         << "    'DATA'\n"
+         << "\n"
+         << "  - the run parameter type can be one of the following:\n"
+         << "\n"
+         << "      'INT'\n"
+         << "      'DOUBLE'\n"
+         << "      'TEXT'\n"
+         << "\n"
+         << "    Note, that values of run parameters must be of the same type used\n"
+         << "    when creating (definig) the parameter.\n"
+         << "\n"
+         << "  - the 'source' of the parameter's value can be specified using\n"
+         << "    the '-s' option. The default value of the 'source' is: " << m_source.defValue() << "\n"
+         << "\n"
+         << "COMMANDS:\n"
+         << "\n"
+         << "  add_run\n"
+         << "\n"
+         << "    - add a new run to the database for the experiment. Close a previous run\n"
+         << "      if the one is still open.\n"
+         << "\n"
+         << "  begin_run\n"
+         << "\n"
+         << "    - begin the new run. The run will remain in the open-ended state and it shall\n"
+         << "      be closed either explicitly or implicitly by starting another run.\n"
+         << "\n"
+         << "  create_run_param\n"
+         << "\n"
+         << "    - create (define) a new run parameter for an experiment. Values of the parameter\n"
+         << "      are set for each run independently by calling the 'set_run_param' command.\n"
+         << "\n"
+         << "  param_info\n"
+         << "\n"
+         << "    - check if the specified parameter exists, and if so print its\n"
+         << "      description. Note, that the command won't display values of\n"
+         << "      the parameters for runs. Use the 'display_run_param' command to\n"
+         << "      display its value for a run if set.\n"
+         << "\n"
+         << "  run_parameters\n"
+         << "\n"
+         << "    - locate and display definitions of all prun parameters of an experiment.\n"
+         << "      Note, that the command won't display values of\n"
+         << "      the parameters for runs. Use the 'display_run_param' command to\n"
+         << "      display its value for a run if set.\n"
+         << "\n"
+         << "  set_run_param\n"
+         << "\n"
+         << "    - set/update a value of the requested parameter. The parameter\n"
+         << "      has to be already configured in the database for the experiment.\n"
+         << "      Use the -u option to allow updates.\n"
+         << "\n"
+         << "  display_run_param\n"
+         << "\n"
+         << "    - display a value (if any) of a run parameter set for a run.\n"
+         << endl ;
+
+    return 0 ;
+}
+
+int
+LogBookTestApp::cmd_experiments () throw (std::exception)
+{
+    // Parse and verify the arguments
+    //
+    if (m_args.size() > 1 ) {
         MsgLogRoot (error, "wrong number of arguments to the command") ;
         return 2 ;
     }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    std::string instrument = "" ;
+    if (itr != m_args.end()) instrument = *(itr++) ;
 
-    const std::string command = *(m_args.begin());
-    if (command == "help") {
+    m_connection->beginTransaction () ;
+    std::vector<LogBook::ExperDescr > experiments ;
+    m_connection->getExperiments (
+        experiments,
+        instrument) ;
+    for (size_t i = 0 ; i < experiments.size(); i++)
+        cout << "\n"
+             << experiments[i];
+    m_connection->commitTransaction () ;
 
-        cout << "SYNTAX:\n"
-             << "\n"
-             << "  help [command]\n"
-             << "\n"
-             << "SUPPORTED COMMANDS & ARGUMENTS:\n"
-             << "\n"
-             << "  allocate_run  <instrument> <experiment>\n"
-             << "\n"
-             << "  add_run       <instrument> <experiment> <run> {DATA|CALIB} <begn_time> <end_time>\n"
-             << "  begin_run     <instrument> <experiment> <run> {DATA|CALIB} <begn_time>\n"
-             << "  end_run       <instrument> <experiment> <run>                          <end_time>\n"
-             << "\n"
-             << "  set_run_param <instrument> <experiment> <run> <param> <value> {INT|DOUBLE|TEXT}\n"
-             << "  param_info    <instrument> <experiment> <param>\n"
-             << "\n"
-             << "PARAMETERS:\n"
-             << "\n"
-             << "  - the instrument and experiment ate given by their names.\n"
-             << "  - the run number must be a positive number.\n"
-             << "  - values of the timestamps are expected to have the following syntax:\n"
-             << "\n"
-             << "      YYYY-MM-DD HH:MM::SS\n"
-             << "\n"
-             << "    For example:\n"
-             << "\n"
-             << "      2009-APR-27 16:23:05\n"
-             << "\n"
-             << "  - the run type can be one of the following:\n"
-             << "\n"
-             << "    'CALIB'\n"
-             << "    'DATA'\n"
-             << "\n"
-             << "  - the run parameter type can be one of the following:\n"
-             << "\n"
-             << "      'INT'\n"
-             << "      'DOUBLE'\n"
-             << "      'TEXT'\n"
-             << "\n"
-             << "    Note, that values of run parameters must be of the same type used\n"
-             << "    during the parameter's configuration.\n"
-             << "\n"
-             << "  - the 'source' of the parameter's value can be specified using\n"
-             << "    the '-s' option. The default value of the 'source' is: " << m_source.defValue() << "\n"
-             << endl ;
-
-    } else if (command == "add_run") {
-
-        cout << "SYNTAX:\n"
-             << "\n"
-             << "  add_run <instrument> <experiment> <run> <type> <begn_time> <end_time>\n"
-             << "\n"
-             << "DESCRIPTION:\n"
-             << "\n"
-             << "  Add a new run to the database for the experiment. Close a previous run\n"
-             << "  if the one is still open."
-             << endl ;
-
-    } else if (command == "begin_run") {
-
-        cout << "SYNTAX:\n"
-             << "\n"
-             << "  begin_run <instrument> <experiment> <run> <type> <begn_time>\n"
-             << "\n"
-             << "DESCRIPTION:\n"
-             << "\n"
-             << "  Begin the new run. The run will remain in the open-ended state and it shall\n"
-             << "  be closed either explicitly or implicitly by starting another run."
-             << endl ;
-
-    } else if (command == "set_run_param") {
-
-        cout << "SYNTAX:\n"
-             << "\n"
-             << "  set_run_param <instrument> <experiment> <run> <param> <value> <type>\n"
-             << "\n"
-             << "DESCRIPTION:\n"
-             << "\n"
-             << "  Set/update a value of the requested parameter. The parameter\n"
-             << "  has to be already configured in the database for the experiment.\n"
-             << "  Use the -u option to allow updates."
-             << endl ;
-
-    } else if (command == "param_info") {
-
-        cout << "SYNTAX:\n"
-             << "\n"
-             << "  param_info <instrument> <experiment> <param>\n"
-             << "\n"
-             << "DESCRIPTION:\n"
-             << "\n"
-             << "  Check if the specified parameter exists, and if so print its\n"
-             << "  description.\n"
-             << "\n"
-             << "  Note, that the command won't display values of the parameter\n"
-             << "  for runs."
-             << endl ;
-
-    } else {
-        MsgLogRoot (error, "unknown command name requested") ;
-        return 2 ;
-    }
     return 0 ;
 }
 
@@ -527,6 +541,124 @@ LogBookTestApp::cmd_end_run () throw (std::exception)
 }
 
 int
+LogBookTestApp::cmd_create_run_param () throw (std::exception)
+{
+    // Parse and verify the arguments
+    //
+    if (m_args.empty() || m_args.size() != 5) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument = *(itr++) ;
+    const std::string  experiment = *(itr++) ;
+    const std::string  param      = *(itr++) ;
+    const std::string  type       = *(itr++) ;
+    const std::string  descr      = *(itr++) ;
+
+    // Check if such parameter already exists. Complain if it does.
+    //
+    int status = 0 ;
+
+    m_connection->beginTransaction () ;
+
+    LogBook::ParamInfo p ;
+    if (m_connection->getParamInfo (
+        p,
+        instrument,
+        experiment,
+        param)) {
+            cout << "Sorry, the parameter already exists in the database." << endl ;
+            status = 1 ;
+    } else {
+        m_connection->createRunParam (
+            instrument,
+            experiment,
+            param,
+            type,
+            descr) ;
+    }
+    m_connection->commitTransaction () ;
+
+    return status ;
+}
+
+int
+LogBookTestApp::cmd_param_info () throw (std::exception)
+{
+    // Parse and verify the arguments
+    //
+    if (m_args.empty() || m_args.size() != 3) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument = *(itr++) ;
+    const std::string  experiment = *(itr++) ;
+    const std::string  param      = *(itr++) ;
+
+    m_connection->beginTransaction () ;
+
+    LogBook::ParamInfo p ;
+    if (m_connection->getParamInfo (
+        p,
+        instrument,
+        experiment,
+        param))
+        cout << p << endl ;
+    else
+        cout << "Sorry, no such parameter." << endl ;
+
+    m_connection->commitTransaction () ;
+
+    return 0 ;
+}
+
+int
+LogBookTestApp::cmd_run_parameters () throw (std::exception)
+{
+    // Parse and verify the arguments
+    //
+    if (m_args.empty() || m_args.size() != 2) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument = *(itr++) ;
+    const std::string  experiment = *(itr++) ;
+
+    // Get the parameters
+    //
+    std::vector<LogBook::ParamInfo > params ;
+
+    m_connection->beginTransaction () ;
+    m_connection->getParamsInfo (
+        params,
+        instrument,
+        experiment) ;
+    m_connection->commitTransaction () ;
+
+    // Calculate "pretty print" parameters and print results
+    //
+    size_t name_len  = strlen ("Name") ;
+    size_t type_len  = strlen ("Type") ;
+    size_t descr_len = strlen ("Description") ;
+    for (size_t i = 0 ; i < params.size (); i++) {
+        if (params[i].name.size  () > name_len)  name_len = params[i].name.size () ;
+        if (params[i].type.size  () > type_len)  type_len = params[i].type.size () ;
+        if (params[i].descr.size () > descr_len) descr_len = params[i].descr.size () ;
+    }
+    if (descr_len > 80) descr_len = 80 ;
+    cout << "\n" << std::left
+         << "  " << std::setw (name_len) << "Name" << " | " << std::setw (type_len) << "Type" << " | Description\n"
+         << " " << std::string (name_len+2, '-') << "+" << std::string (type_len+2, '-') << "+" << std::string (descr_len+2, '-') << "\n";
+    for (size_t i = 0 ; i < params.size (); i++)
+        cout << "  " << std::setw (name_len) << params[i].name << " | " << std::setw (type_len) << params[i].type << " | " << std::setw (descr_len) << params[i].descr << "\n" ;
+    cout << endl ;
+
+    return 0 ;
+}
+int
 LogBookTestApp::cmd_set_run_param () throw (std::exception)
 {
     // Parse and verify the arguments
@@ -599,38 +731,93 @@ LogBookTestApp::cmd_set_run_param () throw (std::exception)
     return 0 ;
 }
 
+
 int
-LogBookTestApp::cmd_param_info () throw (std::exception)
+LogBookTestApp::cmd_display_run_param () throw (std::exception)
 {
     // Parse and verify the arguments
     //
-    if (m_args.empty() || m_args.size() != 3) {
+    if (m_args.empty() || m_args.size() != 4) {
         MsgLogRoot (error, "wrong number of arguments to the command") ;
         return 2 ;
     }
     AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
     const std::string  instrument = *(itr++) ;
     const std::string  experiment = *(itr++) ;
+    const int          run        = LogBook::str2int (*(itr++)) ;
     const std::string  param      = *(itr++) ;
 
-    LogBook::ParamInfo p ;
 
+    // Find the parameter to be sure it exists and also to learn its type.
+    //
     m_connection->beginTransaction () ;
-    const bool exists = m_connection->getParamInfo (
-        p,
-        instrument,
-        experiment,
-        param) ;
+
+    LogBook::ParamInfo p ;
+    if (!m_connection->getParamInfo ( p,
+                                      instrument,
+                                      experiment,
+                                      param)) {
+        cout << "Sorry, no such parameter in the database." << endl ;
+        m_connection->commitTransaction () ;
+        return 1 ;
+    }
+
+    // Get a value (if set) of the parameter for the run.
+    //
+    std::string    source ;
+    LusiTime::Time updated ;
+
+    if (p.type == "INT") {
+
+        int value ;
+        m_connection->getRunParam (
+            instrument,
+            experiment,
+            run,
+            param,
+            value,
+            source,
+            updated) ;
+
+        cout << "VALUE:   " << value << "\n";
+
+    } else if (p.type == "DOUBLE") {
+
+        double value ;
+        m_connection->getRunParam (
+            instrument,
+            experiment,
+            run,
+            param,
+            value,
+            source,
+            updated) ;
+
+        cout << "VALUE:   " << value << "\n";
+
+    } else if (p.type == "TEXT") {
+
+        std::string value ;
+        m_connection->getRunParam (
+            instrument,
+            experiment,
+            run,
+            param,
+            value,
+            source,
+            updated) ;
+
+        cout << "VALUE:   " << value << "\n";
+
+    } else {
+        cout << "Sorry, no support for the parameter type: " << p.type << endl ;
+        m_connection->commitTransaction () ;
+        return 1 ;
+    }
     m_connection->commitTransaction () ;
 
-    if (exists)
-        cout << "       name: " << p.name << "\n"
-             << " instrument: " << p.instrument << "\n"
-             << " experiment: " << p.experiment << "\n"
-             << "       type: " << p.type << "\n"
-             << "description: " << p.descr << endl ;
-    else
-        cout << "Sorry, no such parameter!" << endl ;
+    cout << "SOURCE:  " << source << "\n";
+    cout << "UPDATED: " << updated << "\n";
 
     return 0 ;
 }

@@ -13,7 +13,7 @@ reverse time order.
 
 
 Tag: V00-01-01
-2009-09-11 Igor Gaponenko
+2009-09-13 Igor Gaponenko
 - added the first version of the C++ API
 - increased a limit of the downloaded attachments from 1 MB to 10 MB.
 - extended the schema by adding the 'type' column to the 'run' table

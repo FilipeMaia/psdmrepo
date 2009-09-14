@@ -44,41 +44,11 @@
 
 namespace LogBook {
 
-/**
-  * Experiment descriptor.
-  *
-  * Data members of the class represent properties of the experiment
-  * in the database.
-  */
-struct ExperDescr {
+//---------------------------------------------------
+// Collaborating Class Headers (fr this namespace) --
+//---------------------------------------------------
 
-    // Instrument identity
-    //
-    int         instr_id ;
-    std::string instr_name ;
-    std::string instr_descr ;
-
-    // Experiment identity
-    //
-    int         id ;
-    std::string name ;
-    std::string descr ;
-
-    // Experimenttime frame
-    //
-    LusiTime::Time registration_time ;
-    LusiTime::Time begin_time ;
-    LusiTime::Time end_time ;
-
-    // Experiment owner
-    //
-    std::string leader_account ;
-    std::string contact_info ;
-    std::string posix_gid ;
-} ;
-
-std::ostream& operator<< (std::ostream& s, const ExperDescr& d) ;
-
+class QueryProcessor ;
 
 /**
   * Parameter descriptor.
@@ -186,6 +156,15 @@ public:
     virtual bool transactionIsStarted () const;
 
     /**
+      * Find experiment descriptors in the given scope.
+      *
+      * @see method Connection::getExperiments()
+      */
+    virtual void getExperiments (std::vector<ExperDescr >& experiments,
+                                 const std::string&        instrument="") throw (WrongParams,
+                                                                                 DatabaseError) ;
+
+    /**
       * Find an information on a parameter.
       *
       * @see method Connection::getParamInfo()
@@ -195,6 +174,60 @@ public:
                                 const std::string& experiment,
                                 const std::string& parameter) throw (WrongParams,
                                                                      DatabaseError) ;
+    /**
+      * Find an information on all parameters of an experiment.
+      *
+      * @see method Connection::getParamsInfo()
+      */
+     virtual void getParamsInfo (std::vector<ParamInfo >& info,
+                                 const std::string&       instrument,
+                                 const std::string&       experiment) throw (WrongParams,
+                                                                             DatabaseError) ;
+
+     /**
+      * Get a value of a run parameter (integer value).
+      *
+      * @see method Connection::getRunParam()
+      */
+    virtual void getRunParam (const std::string& instrument,
+                              const std::string& experiment,
+                              int                run,
+                              const std::string& parameter,
+                              int                &value,
+                              std::string&       source,
+                              LusiTime::Time&    updated) throw (ValueTypeMismatch,
+                                                                 WrongParams,
+                                                                 DatabaseError) ;
+
+    /**
+      * Get a value of a run parameter (double value).
+      *
+      * @see method Connection::getRunParam()
+      */
+    virtual void getRunParam (const std::string& instrument,
+                              const std::string& experiment,
+                              int                run,
+                              const std::string& parameter,
+                              double&            value,
+                              std::string&       source,
+                              LusiTime::Time&    updated) throw (ValueTypeMismatch,
+                                                                 WrongParams,
+                                                                 DatabaseError) ;
+
+     /**
+      * Get a value of a run parameter (string value).
+      *
+      * @see method Connection::getRunParam()
+      */
+    virtual void getRunParam (const std::string& instrument,
+                              const std::string& experiment,
+                              int                run,
+                              const std::string& parameter,
+                              std::string&       value,
+                              std::string&       source,
+                              LusiTime::Time&    updated) throw (ValueTypeMismatch,
+                                                                 WrongParams,
+                                                                 DatabaseError) ;
 
     /**
       * Allocate next run number
@@ -240,6 +273,18 @@ public:
                           int                   run,
                           const LusiTime::Time& endTime) throw (WrongParams,
                                                                 DatabaseError) ;
+
+    /**
+      * Create new run parameter.
+      *
+      * @see method Connection::createRunParam()
+      */
+    virtual void createRunParam (const std::string& instrument,
+                                 const std::string& experiment,
+                                 const std::string& parameter,
+                                 const std::string& type,
+                                 const std::string& description) throw (WrongParams,
+                                                                        DatabaseError) ;
 
     /**
       * Set a value of a run parameter (integer value).
@@ -387,7 +432,27 @@ private:
                                                 DatabaseError) ;
 
     /**
-      * The actual implementation of the operation for all types of parameter
+      * An actual "backend" implementation of the "getRunParam" methods.
+      *
+      * EXCEPTIONS:
+      *
+      *   "ValueTypeMismatch" : parameter's actual type won't match the proposed one
+      *   "WrongParams"       : parameter value isn't set, no such run, experiment, etc.
+      *   "DatabaseError"     : database errors, etc.
+      *
+      * The function is used by the class's methods.
+      */
+    void getRunParamImpl (QueryProcessor&    query,
+                          const std::string& instrument,
+                          const std::string& experiment,
+                          int                run,
+                          const std::string& parameter,
+                          const std::string& proposed_type) throw (ValueTypeMismatch,
+                                                                   WrongParams,
+                                                                   DatabaseError) ;
+
+    /**
+      * The actual implementation of` the operation for all types of parameter
       * values.
       *
       * The function is used by the class's methods.
@@ -408,6 +473,11 @@ private:
       * Execure a simple query which won't produce any result set.
       */
     void simpleQuery (const std::string& query) throw (DatabaseError) ;
+
+    /**
+      * A fron-end to mysql_real_escape_string()
+      */
+    std::string escape_string (const std::string& str) const throw () ;
 
 private:
 
@@ -469,17 +539,18 @@ ConnectionImpl::setRunParamImpl (const std::string& instrument,
 
     // Proceed with the operation and insert/update an entry into two tables.
     //
+    const LusiTime::Time now (LusiTime::Time::now ()) ;
     if (updating) {
 
         std::ostringstream sql_1;
         sql_1 << "UPDATE " << m_conn_params.logbook << ".run_val"
-              << " SET source='" << source << "', updated=NOW() WHERE run_id=" << runDescr.id
+            << " SET source='" << this->escape_string (source) << "', updated=" << LusiTime::Time::to64 (now) << " WHERE run_id=" << runDescr.id
               << " AND param_id=" << paramDescr.id ;
         this->simpleQuery (sql_1.str()) ;
 
         std::ostringstream sql_2;
         sql_2 << "UPDATE " << m_conn_params.logbook << ".run_val_" << type
-              << " SET val='" << value << "' WHERE run_id=" << runDescr.id
+              << " SET val=" << value << " WHERE run_id=" << runDescr.id
               << " AND param_id=" << paramDescr.id;
         this->simpleQuery (sql_2.str()) ;
 
@@ -487,12 +558,12 @@ ConnectionImpl::setRunParamImpl (const std::string& instrument,
 
         std::ostringstream sql_1;
         sql_1 << "INSERT INTO " << m_conn_params.logbook << ".run_val"
-              << " VALUES(" << runDescr.id << "," << paramDescr.id << ",'" << source << "', NOW())" ;
+              << " VALUES(" << runDescr.id << "," << paramDescr.id << ",'" << this->escape_string (source) << "', " << LusiTime::Time::to64 (now) << ")" ;
         this->simpleQuery (sql_1.str()) ;
 
         std::ostringstream sql_2;
         sql_2 << "INSERT INTO " << m_conn_params.logbook << ".run_val_" << type
-              << " VALUES(" << runDescr.id << "," << paramDescr.id << ",'" << value << "')" ;
+              << " VALUES(" << runDescr.id << "," << paramDescr.id << "," << value << ")" ;
         this->simpleQuery (sql_2.str()) ;
     }
 }

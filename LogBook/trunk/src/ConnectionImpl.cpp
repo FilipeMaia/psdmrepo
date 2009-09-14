@@ -25,6 +25,7 @@
 #include <strings.h>
 #include <stdlib.h>
 
+#include <memory>
 #include <iostream>
 using namespace std ;
 
@@ -57,29 +58,20 @@ isValidRunType(const std::string& type)
     return false ;
 }
 
+bool
+isValidRunParamType(const std::string& type)
+{
+    static const char* const validTypes[] = {"INT", "DOUBLE", "TEXT"} ;
+    static const size_t numTypes = 3 ;
+    for (size_t i = 0 ; i < numTypes ; ++i)
+        if (0 == strcasecmp(validTypes[i], type.c_str()))
+            return true ;
+    return false ;
+}
+
 //-------------
 // Operators --
 //-------------
-
-std::ostream&
-operator<< (std::ostream& s, const ExperDescr& d)
-{
-    s << "LogBook::ExperDescr {\n"
-      << "         instr_id: " << d.instr_id << "\n"
-      << "       instr_name: " << d.instr_name << "\n"
-      << "      instr_descr: " << d.instr_descr << "\n"
-      << "               id: " << d.id << "\n"
-      << "             name: " << d.name << "\n"
-      << "            descr: " << d.descr << "\n"
-      << "registration_time: " << d.registration_time << "\n"
-      << "       begin_time: " << d.begin_time << "\n"
-      << "         end_time: " << d.end_time << "\n"
-      << "   leader_account: " << d.leader_account << "\n"
-      << "     contact_info: " << d.contact_info << "\n"
-      << "        posix_gid: " << d.posix_gid << "\n"
-      << "}\n" ;
-    return s ;
-}
 
 std::ostream&
 operator<< (std::ostream& s, const ParamDescr& d)
@@ -163,6 +155,54 @@ ConnectionImpl::transactionIsStarted () const
     return m_is_started ;
 }
 
+void
+ConnectionImpl::getExperiments (std::vector<ExperDescr >& experiments,
+                                const std::string&        instrument) throw (WrongParams,
+                                                                             DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    // Formulate and execute the query
+    //
+    std::ostringstream sql;
+    sql << "SELECT i.name AS 'instr_name',i.descr AS 'instr_descr',e.* FROM "
+        << m_conn_params.regdb << ".instrument i, "
+        << m_conn_params.regdb << ".experiment e WHERE e.instr_id=i.id" ;
+    if (instrument != "")
+        sql << " AND i.name='" << instrument << "'";
+
+    QueryProcessor query (m_mysql) ;
+    query.execute (sql.str()) ;
+
+    // Extract results
+    //
+    experiments.clear () ;
+
+    while (query.next_row()) {
+
+        ExperDescr descr ;
+
+        query.get (descr.instr_id,    "instr_id") ;
+        query.get (descr.instr_name,  "instr_name") ;
+        query.get (descr.instr_descr, "instr_descr") ;
+
+        query.get (descr.id,    "id") ;
+        query.get (descr.name,  "name") ;
+        query.get (descr.descr, "descr") ;
+
+        query.get (descr.registration_time, "registration_time") ;
+        query.get (descr.begin_time,        "begin_time") ;
+        query.get (descr.end_time,          "end_time") ;
+
+        query.get (descr.leader_account, "leader_account") ;
+        query.get (descr.contact_info,   "contact_info") ;
+        query.get (descr.posix_gid,      "posix_gid") ;
+
+        experiments.push_back (descr) ;
+    }
+}
+
 bool
 ConnectionImpl::getParamInfo (ParamInfo&         info,
                               const std::string& instrument,
@@ -188,6 +228,48 @@ ConnectionImpl::getParamInfo (ParamInfo&         info,
     info.descr      = param_descr.descr ;
 
     return true ;
+}
+
+
+void
+ConnectionImpl::getParamsInfo (std::vector<ParamInfo >& info,
+                               const std::string&       instrument,
+                               const std::string&       experiment) throw (WrongParams,
+                                                                          DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, instrument, experiment))
+        throw WrongParams ("unknown experiment") ;
+
+    // Formulate and execute the query
+    //
+    std::ostringstream sql;
+    sql << "SELECT * FROM " << m_conn_params.logbook << ".run_param "
+        << " WHERE exper_id=" << exper_descr.id ;
+
+    QueryProcessor query (m_mysql) ;
+    query.execute (sql.str()) ;
+
+    // Extract results
+    //
+    info.reserve (query.num_rows ()) ;
+
+    while (query.next_row()) {
+
+        ParamInfo param ;
+
+        param.instrument = instrument ;
+        param.experiment = experiment ;
+
+        query.get (param.name,     "param") ;
+        query.get (param.type,     "type") ;
+        query.get (param.descr,    "descr", true) ;
+
+        info.push_back (param) ;
+    }
 }
 
 int
@@ -267,7 +349,9 @@ ConnectionImpl::createRun (const std::string&    instrument,
         //
         RunDescr run_descr ;
         if (this->findLastRun (run_descr, exper_descr.id)) {
-            this->endRun (instrument, experiment, run_descr.num, beginTime) ;
+            if (!run_descr.end_time.isValid()) {
+                this->endRun (instrument, experiment, run_descr.num, beginTime) ;
+            }
         }
 
         // Now proceed with the new run creation
@@ -337,7 +421,7 @@ ConnectionImpl::endRun (const std::string&    instrument,
 
 
         if (run_descr.end_time.isValid())
-            throw WrongParams ("the specified run is already closed") ;
+            throw WrongParams ("the run is already ended") ;
 
         if (run_descr.begin_time >= endTime)
             throw WrongParams ("the specified end time isn't newer than the begin time of the run") ;
@@ -355,6 +439,36 @@ ConnectionImpl::endRun (const std::string&    instrument,
             std::string ("failed to translate LusiTime::Time to string because of: ")
             + e.what()) ;
     }
+}
+
+void
+ConnectionImpl::createRunParam (const std::string& instrument,
+                                const std::string& experiment,
+                                const std::string& parameter,
+                                const std::string& type,
+                                const std::string& description) throw (WrongParams,
+                                                                        DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    if (!isValidRunParamType (type))
+        throw WrongParams ("unsupported run parameter type") ;
+
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, instrument, experiment))
+        throw WrongParams ("unknown experiment") ;
+
+    // Now proceed with the new run parameter creation
+    //
+    std::ostringstream sql;
+    sql << "INSERT INTO " << m_conn_params.logbook << ".run_param VALUES(NULL,'"
+        << this->escape_string (parameter) << "',"
+        << exper_descr.id << ",'"
+        << type << "','"
+        << this->escape_string (description) << "')";
+
+    this->simpleQuery (sql.str());
 }
 
 void
@@ -414,10 +528,82 @@ ConnectionImpl::setRunParam (const std::string& instrument,
                                                 experiment,
                                                 run,
                                                 parameter,
-                                                value,
+                                                "'"+this->escape_string (value)+"'",
                                                 "TEXT",
                                                 source,
                                                 updateAllowed) ;
+}
+
+void
+ConnectionImpl::getRunParam (const std::string& instrument,
+                             const std::string& experiment,
+                             int                run,
+                             const std::string& parameter,
+                             int&               value,
+                             std::string&       source,
+                             LusiTime::Time&    updated) throw (ValueTypeMismatch,
+                                                                WrongParams,
+                                                                DatabaseError)
+{
+    QueryProcessor query (m_mysql) ;
+    this->getRunParamImpl (query,
+                           instrument,
+                           experiment,
+                           run,
+                           parameter,
+                           "INT") ;
+
+    query.get (value,   "val") ;
+    query.get (source,  "source") ;
+    query.get (updated, "updated") ;
+}
+
+void
+ConnectionImpl::getRunParam (const std::string& instrument,
+                             const std::string& experiment,
+                             int                run,
+                             const std::string& parameter,
+                             double&            value,
+                             std::string&       source,
+                             LusiTime::Time&    updated) throw (ValueTypeMismatch,
+                                                                WrongParams,
+                                                                DatabaseError)
+{
+    QueryProcessor query (m_mysql) ;
+    this->getRunParamImpl (query,
+                           instrument,
+                           experiment,
+                           run,
+                           parameter,
+                           "DOUBLE") ;
+
+    query.get (value,   "val") ;
+    query.get (source,  "source") ;
+    query.get (updated, "updated") ;
+}
+
+void
+ConnectionImpl::getRunParam (const std::string& instrument,
+                             const std::string& experiment,
+                             int                run,
+                             const std::string& parameter,
+                             std::string&       value,
+                             std::string&       source,
+                             LusiTime::Time&    updated) throw (ValueTypeMismatch,
+                                                                WrongParams,
+                                                                DatabaseError)
+{
+    QueryProcessor query (m_mysql) ;
+    this->getRunParamImpl (query,
+                           instrument,
+                           experiment,
+                           run,
+                           parameter,
+                           "TEXT") ;
+
+    query.get (value,   "val") ;
+    query.get (source,  "source") ;
+    query.get (updated, "updated") ;
 }
 
 bool
@@ -586,10 +772,74 @@ ConnectionImpl::runParamValueIsSet (int param_id,
 }
 
 void
+ConnectionImpl::getRunParamImpl (QueryProcessor&    query,
+                                 const std::string& instrument,
+                                 const std::string& experiment,
+                                 int                run,
+                                 const std::string& parameter,
+                                 const std::string& proposed_type) throw (ValueTypeMismatch,
+                                                                          WrongParams,
+                                                                          DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    if (!isValidRunParamType (proposed_type))
+        throw WrongParams ("unsupported run parameter type: "+proposed_type) ;
+
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, instrument, experiment))
+        throw WrongParams ("unknown experiment") ;
+
+    ParamDescr param_descr ;
+    if (!findRunParam (param_descr,
+                       exper_descr.id,
+                       parameter))
+        throw WrongParams ("no such parameter exists" );
+
+    if (proposed_type != param_descr.type)
+        throw ValueTypeMismatch ("actual arameter type is: "+param_descr.type+", not: "+proposed_type) ;
+
+    RunDescr run_descr ;
+    if (!findRun (run_descr,
+                  exper_descr.id,
+                  run))
+        throw WrongParams ("unknown run") ;
+
+    // Formulate and execute the query
+    //
+    std::ostringstream sql;
+    sql << "SELECT v.source, v.updated, vv.val FROM "
+        << m_conn_params.logbook << ".run_val v, "
+        << m_conn_params.logbook << ".run_val_" << proposed_type << " vv"
+        << " WHERE v.param_id=" << param_descr.id << " AND vv.param_id=" << param_descr.id
+        << " AND   v.run_id="   << run_descr.id   << " AND vv.run_id="   << run_descr.id;
+
+    query.execute (sql.str()) ;
+    if (!query.next_row())
+        throw WrongParams ("the value of the parameter isn't set yet for this run") ;
+}
+
+void
 ConnectionImpl::simpleQuery (const std::string& query) throw (DatabaseError)
 {
     if (mysql_real_query (m_mysql, query.c_str(), query.size()))
         throw DatabaseError( std::string( "error in mysql_real_query('"+query+"'): " ) + mysql_error(m_mysql));
+}
+
+std::string
+ConnectionImpl::escape_string (const std::string& in_str) const throw ()
+{
+    const size_t in_str_len = in_str.length () ;
+    std::auto_ptr<char > out_str (new char [2*in_str_len + 1]) ;
+    const size_t out_str_len =
+        mysql_real_escape_string (
+            m_mysql,
+            out_str.get(),
+            in_str.c_str(),
+            in_str_len) ;
+
+    return std::string (out_str.get(), out_str_len) ;
 }
 
 } // namespace LogBook

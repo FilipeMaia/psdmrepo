@@ -13,7 +13,9 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+
 #include <string>
+#include <vector>
 
 //----------------------
 // Base Class Headers --
@@ -51,18 +53,55 @@ struct ConnectionParams {
 } ;
 
 /**
+  * Experiment descriptor.
+  *
+  * Data members of the class represent properties of the experiment
+  * in the database.
+  */
+struct ExperDescr {
+
+    // Instrument identity
+    //
+    int         instr_id ;
+    std::string instr_name ;
+    std::string instr_descr ;
+
+    // Experiment identity
+    //
+    int         id ;
+    std::string name ;
+    std::string descr ;
+
+    // Experimenttime frame
+    //
+    LusiTime::Time registration_time ;
+    LusiTime::Time begin_time ;
+    LusiTime::Time end_time ;
+
+    // Experiment owner
+    //
+    std::string leader_account ;
+    std::string contact_info ;
+    std::string posix_gid ;
+} ;
+
+std::ostream& operator<< (std::ostream& s, const ExperDescr& d) ;
+
+/**
   * Parameter information structure.
   *
   * Data members of the class represent properties of the parameter
   * in the database.
   */
 struct ParamInfo {
-    std::string name ;          // its (parameter's) name
     std::string instrument ;    // its instrument name
     std::string experiment ;    // its experiment name
+    std::string name ;          // its (parameter's) name
     std::string type ;          // its type
     std::string descr ;         // its description (can be very long!)
 } ;
+
+std::ostream& operator<< (std::ostream& s, const ParamInfo& p) ;
 
 /**
   * The top-level class of the "LogBook Database" API.
@@ -142,6 +181,17 @@ public:
     // ------------------------------------------------------------------
 
     /**
+      * Find experiment descriptors in the given scope.
+      *
+      * If the "instrument" parameter is given some non-default value
+      * then experiments for the specified instrument will be searched for.
+      * Otherwise all experiments will be returned.
+      */
+    virtual void getExperiments (std::vector<ExperDescr >& experiments,
+                                 const std::string&        instrument="") throw (WrongParams,
+                                                                                 DatabaseError) = 0 ;
+
+    /**
       * Find an information on a parameter.
       *
       * The method would check if the parameter is known in the database
@@ -161,7 +211,76 @@ public:
                                 const std::string& instrument,
                                 const std::string& experiment,
                                 const std::string& parameter) throw (WrongParams,
-                                                                     DatabaseError) = 0 ;
+                                                                      DatabaseError) = 0 ;
+    /**
+      * Find an information on all parameters of an experiment.
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"   : to report wrong parameters (non-existing instrument, experiment, etc.)
+      *   "DatabaseError" : to report database related problems
+      *
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+     virtual void getParamsInfo (std::vector<ParamInfo >& info,
+                                 const std::string&       instrument,
+                                 const std::string&       experiment) throw (WrongParams,
+                                                                            DatabaseError) = 0 ;
+
+     /**
+      * Get a value of a run parameter (integer value).
+      *
+      * The method would get a value of the parameter in a scope of its
+      * experiment and run. The run is given by its number. A type of
+      * of the parameter should match the type defined in the experiment's
+      * configuration.
+      *
+      * EXCEPTIONS:
+      *
+      *   "ValueTypeMismatch"  : to report a wrong type of a parameter's value
+      *   "WrongParams"        : to report wrong parameters (non-existing experiment, etc.)
+      *   "DatabaseError"      : to report database related problems
+      *
+      * @see class ValueTypeMismatch
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+    virtual void getRunParam (const std::string& instrument,
+                              const std::string& experiment,
+                              int                run,
+                              const std::string& parameter,
+                              int&               value,
+                              std::string&       source,
+                              LusiTime::Time&    updated) throw (ValueTypeMismatch,
+                                                                 WrongParams,
+                                                                 DatabaseError) = 0 ;
+
+    /**
+      * Get a value of a run parameter (double value).
+      */
+    virtual void getRunParam (const std::string& instrument,
+                              const std::string& experiment,
+                              int                run,
+                              const std::string& parameter,
+                              double&            value,
+                              std::string&       source,
+                              LusiTime::Time&    updated) throw (ValueTypeMismatch,
+                                                                 WrongParams,
+                                                                 DatabaseError) = 0 ;
+
+     /**
+      * Get a value of a run parameter (string value).
+      */
+    virtual void getRunParam (const std::string& instrument,
+                              const std::string& experiment,
+                              int                run,
+                              const std::string& parameter,
+                              std::string&       value,
+                              std::string&       source,
+                              LusiTime::Time&    updated) throw (ValueTypeMismatch,
+                                                                 WrongParams,
+                                                                 DatabaseError) = 0 ;
 
     // --------------------------------------------------------------------
     // ------------- Database contents modification methods ---------------
@@ -246,6 +365,37 @@ public:
                           const LusiTime::Time& endTime) throw (WrongParams,
                                                                 DatabaseError) = 0 ;
 
+    /**
+      * Create new run parameter.
+      *
+      * The method would define a new parameter for runs of an experiments.
+      * Values of the parameters will have to be set separatedly for each run
+      * by calling the corresponding "setRunParam()" metghod defined below.
+      *
+      * PARAMETERS:
+      *
+      *   parameter   - is a unique name of the parameter in a scope of an experiment
+      *   type        - is a type of the parameter. Allowed values are: 'INT', 'DOUBLE'
+      *                 or 'TEXT'.
+      *   description - an arbitrary description of the parameter.
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"        : to report wrong parameters (non-existing experiment, etc.)
+      *   "DatabaseError"      : to report database related problems
+      *
+      * @see class ValueTypeMismatch
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+    virtual void createRunParam (const std::string& instrument,
+                                 const std::string& experiment,
+                                 const std::string& parameter,
+                                 const std::string& type,
+                                 const std::string& description) throw (WrongParams,
+                                                                        DatabaseError) = 0 ;
+
+ 
      /**
       * Set a value of a run parameter (integer value).
       *
