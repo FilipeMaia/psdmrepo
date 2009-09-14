@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2009-09-14 Andy Salnikov
+- SciMD API has changed to use instrument name, migrating this package
+  to use this new API
+
 Tag: V00-01-00
 2009-09-08 Andy Salnikov
 - redesigned convertors classes to work correctly with more liberal

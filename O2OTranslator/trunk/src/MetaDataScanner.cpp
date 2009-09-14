@@ -193,7 +193,7 @@ MetaDataScanner::storeRunInfo()
 
   // create info for this run
   try {
-    conn->createRun ( exper, run, m_metadata.runType(), m_runBeginTime, m_runEndTime ) ;
+    conn->createRun ( instr, exper, run, m_metadata.runType(), m_runBeginTime, m_runEndTime ) ;
   } catch ( SciMD::DatabaseError& e ) {
     MsgLog( logger, error, "failed to create new run, run number may already exist" ) ;
     conn->abortTransaction() ;
@@ -204,7 +204,7 @@ MetaDataScanner::storeRunInfo()
   try {
 
     // store event count
-    conn->setRunParam ( exper, run, "events", (int)m_nevents, "translator" ) ;
+    conn->setRunParam ( instr, exper, run, "events", (int)m_nevents, "translator" ) ;
 
   } catch ( std::exception& e ) {
 
@@ -219,7 +219,7 @@ MetaDataScanner::storeRunInfo()
   try {
 
     // store average event size
-    conn->setRunParam ( exper, run,
+    conn->setRunParam ( instr, exper, run,
                         "eventSize", (int)( m_nevents ? m_eventSize/m_nevents : 0 ), "translator" ) ;
 
   } catch ( std::exception& e ) {
@@ -236,7 +236,7 @@ MetaDataScanner::storeRunInfo()
   typedef O2OMetaData::const_iterator MDIter ;
   for ( MDIter it = m_metadata.extra_begin() ; it != m_metadata.extra_end() ; ++ it ) {
     try {
-      conn->setRunParam ( exper, run, it->first, it->second, "translator" ) ;
+      conn->setRunParam ( instr, exper, run, it->first, it->second, "translator" ) ;
     } catch ( std::exception& e ) {
       // this is not fatal, just print error message and continue
       MsgLog( logger, error, "failed to store metadata: " << e.what()
