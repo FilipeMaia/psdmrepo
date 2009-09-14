@@ -46,8 +46,9 @@ namespace SciMD {
   * in the database.
   */
 struct ParamInfo {
-    std::string name ;          // its (parameter's) name
+    std::string instrument ;    // its instrument name
     std::string experiment ;    // its experiment name
+    std::string name ;          // its (parameter's) name
     std::string type ;          // its type
     std::string descr ;         // its description (can be very long!)
 } ;
@@ -146,6 +147,7 @@ public:
       * @see class DatabaseError
       */
      virtual bool getParamInfo (ParamInfo& info,
+                                const std::string& instrument,
                                 const std::string& experiment,
                                 const std::string& parameter) throw (WrongParams,
                                                                      DatabaseError) = 0 ;
@@ -169,7 +171,8 @@ public:
       * @see class WrongParams
       * @see class DatabaseError
       */
-     virtual void createRun (const std::string&    experiment,
+     virtual void createRun (const std::string&    instrument,
+                             const std::string&    experiment,
                              int                   run,
                              const std::string&    type,
                              const LusiTime::Time& beginTime,
@@ -193,7 +196,8 @@ public:
       * @see class WrongParams
       * @see class DatabaseError
       */
-    virtual void setRunParam (const std::string& experiment,
+    virtual void setRunParam (const std::string& instrument,
+                              const std::string& experiment,
                               int                run,
                               const std::string& parameter,
                               int                value,
@@ -205,7 +209,8 @@ public:
     /**
       * Set a value of a run parameter (double value).
       */
-    virtual void setRunParam (const std::string& experiment,
+    virtual void setRunParam (const std::string& instrument,
+                              const std::string& experiment,
                               int                run,
                               const std::string& parameter,
                               double             value,
@@ -216,7 +221,8 @@ public:
      /**
       * Set a value of a run parameter (string value).
       */
-    virtual void setRunParam (const std::string& experiment,
+    virtual void setRunParam (const std::string& instrument,
+                              const std::string& experiment,
                               int                run,
                               const std::string& parameter,
                               const std::string& value,

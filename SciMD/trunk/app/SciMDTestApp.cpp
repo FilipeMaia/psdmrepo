@@ -270,9 +270,9 @@ SciMDTestApp::cmd_help ()
              << "\n"
              << "  help [command]\n"
              << "\n"
-             << "  add_run       <experiment> <run> {DATA|CALIB} <begn_time> <end_time>\n"
-             << "  set_run_param <experiment> <run> <param> <value> {INT|DOUBLE|TEXT}\n"
-             << "  param_info    <experiment> <param>" << endl;
+             << "  add_run       <instrument> <experiment> <run> {DATA|CALIB} <begn_time> <end_time>\n"
+             << "  set_run_param <instrument> <experiment> <run> <param> <value> {INT|DOUBLE|TEXT}\n"
+             << "  param_info    <instrument> <experiment> <param>" << endl;
         return 0 ;
     }
     if (m_args.size() != 1) {
@@ -298,7 +298,7 @@ SciMDTestApp::cmd_help ()
 
         cout << "SYNTAX:\n"
              << "\n"
-             << "  add_run <experiment> <run> <type> <begn_time> <end_time>\n"
+             << "  add_run <instrument> <experiment> <run> <type> <begn_time> <end_time>\n"
              << "\n"
              << "DESCRIPTION:\n"
              << "\n"
@@ -329,7 +329,7 @@ SciMDTestApp::cmd_help ()
 
         cout << "SYNTAX:\n"
              << "\n"
-             << "  set_run_param <experiment> <run> <param> <value> <type>\n"
+             << "  set_run_param <instrument> <experiment> <run> <param> <value> <type>\n"
              << "\n"
              << "DESCRIPTION:\n"
              << "\n"
@@ -352,7 +352,7 @@ SciMDTestApp::cmd_help ()
 
         cout << "SYNTAX:\n"
              << "\n"
-             << "  param_info <experiment> <param>\n"
+             << "  param_info <instrument> <experiment> <param>\n"
              << "\n"
              << "DESCRIPTION:\n"
              << "\n"
@@ -374,11 +374,12 @@ SciMDTestApp::cmd_add_run () throw (std::exception)
 {
     // Parse and verify the arguments
     //
-    if (m_args.empty() || m_args.size() != 5) {
+    if (m_args.empty() || m_args.size() != 6) {
         MsgLogRoot (error, "wrong number of arguments to the command") ;
         return 2 ;
     }
     AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument = *(itr++) ;
     const std::string  experiment = *(itr++) ;
     const unsigned int run        = SciMD::str2int (*(itr++)) ;
     const std::string  type       = *(itr++) ;
@@ -388,6 +389,7 @@ SciMDTestApp::cmd_add_run () throw (std::exception)
     try {
         m_connection->beginTransaction () ;
         m_connection->createRun (
+            instrument,
             experiment,
             run,
             type,
@@ -407,11 +409,12 @@ SciMDTestApp::cmd_set_run_param () throw (std::exception)
 {
     // Parse and verify the arguments
     //
-    if (m_args.empty() || m_args.size() != 5) {
+    if (m_args.empty() || m_args.size() != 6) {
         MsgLogRoot (error, "wrong number of arguments to the command") ;
         return 2 ;
     }
     AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument = *(itr++) ;
     const std::string  experiment = *(itr++) ;
     const int          run        = SciMD::str2int (*(itr++)) ;
     const std::string  param      = *(itr++) ;
@@ -427,6 +430,7 @@ SciMDTestApp::cmd_set_run_param () throw (std::exception)
         }
         m_connection->beginTransaction () ;
         m_connection->setRunParam (
+            instrument,
             experiment,
             run,
             param,
@@ -444,6 +448,7 @@ SciMDTestApp::cmd_set_run_param () throw (std::exception)
         }
         m_connection->beginTransaction () ;
         m_connection->setRunParam (
+            instrument,
             experiment,
             run,
             param,
@@ -456,6 +461,7 @@ SciMDTestApp::cmd_set_run_param () throw (std::exception)
 
         m_connection->beginTransaction () ;
         m_connection->setRunParam (
+            instrument,
             experiment,
             run,
             param,
@@ -476,11 +482,12 @@ SciMDTestApp::cmd_param_info () throw (std::exception)
 {
     // Parse and verify the arguments
     //
-    if (m_args.empty() || m_args.size() != 2) {
+    if (m_args.empty() || m_args.size() != 3) {
         MsgLogRoot (error, "wrong number of arguments to the command") ;
         return 2 ;
     }
     AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument = *(itr++) ;
     const std::string  experiment = *(itr++) ;
     const std::string  param      = *(itr++) ;
 
@@ -489,6 +496,7 @@ SciMDTestApp::cmd_param_info () throw (std::exception)
     m_connection->beginTransaction () ;
     const bool exists = m_connection->getParamInfo (
         p,
+        instrument,
         experiment,
         param) ;
     m_connection->commitTransaction () ;

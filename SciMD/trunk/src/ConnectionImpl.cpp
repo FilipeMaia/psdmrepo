@@ -178,6 +178,7 @@ ConnectionImpl::transactionIsStarted () const
 
 bool
 ConnectionImpl::getParamInfo (ParamInfo& info,
+                              const std::string& instrument,
                               const std::string& experiment,
                               const std::string& parameter) throw (WrongParams,
                                                                    DatabaseError)
@@ -187,15 +188,16 @@ ConnectionImpl::getParamInfo (ParamInfo& info,
 
     try {
         ExperDescr exper_descr ;
-        if (!this->findExper (exper_descr, experiment))
+        if (!this->findExper (exper_descr, instrument, experiment))
             throw WrongParams ("unknown experiment") ;
 
         ParamDescr param_descr ;
         if (!this->findRunParam (param_descr, exper_descr.id, parameter))
             return false ;
 
-        info.name       = parameter ;
+        info.experiment = instrument ;
         info.experiment = experiment ;
+        info.name       = parameter ;
         info.type       = param_descr.type ;
         info.descr      = param_descr.descr ;
 
@@ -206,7 +208,8 @@ ConnectionImpl::getParamInfo (ParamInfo& info,
 }
 
 void
-ConnectionImpl::createRun (const std::string&    experiment,
+ConnectionImpl::createRun (const std::string&    instrument,
+                           const std::string&    experiment,
                            int                   run,
                            const std::string&    type,
                            const LusiTime::Time& beginTime,
@@ -233,7 +236,7 @@ ConnectionImpl::createRun (const std::string&    experiment,
         long long unsigned   endTime64 = LusiTime::Time::to64 (  endTime) ;
 
         ExperDescr exper_descr ;
-        if (!this->findExper (exper_descr, experiment))
+        if (!this->findExper (exper_descr, instrument, experiment))
             throw WrongParams ("unknown experiment") ;
 
         OdbcStatement stmt = m_odbc_conn.statement (
@@ -266,7 +269,8 @@ ConnectionImpl::createRun (const std::string&    experiment,
 }
 
 void
-ConnectionImpl::setRunParam (const std::string& experiment,
+ConnectionImpl::setRunParam (const std::string& instrument,
+                             const std::string& experiment,
                              int                run,
                              const std::string& parameter,
                              int                value,
@@ -275,7 +279,8 @@ ConnectionImpl::setRunParam (const std::string& experiment,
                                                                       WrongParams,
                                                                       DatabaseError)
 {
-    return this->setRunParamImpl (experiment,
+    return this->setRunParamImpl (instrument,
+                                  experiment,
                                   run,
                                   parameter,
                                   value,
@@ -285,7 +290,8 @@ ConnectionImpl::setRunParam (const std::string& experiment,
 }
 
 void
-ConnectionImpl::setRunParam (const std::string& experiment,
+ConnectionImpl::setRunParam (const std::string& instrument,
+                             const std::string& experiment,
                              int                run,
                              const std::string& parameter,
                              double             value,
@@ -294,7 +300,8 @@ ConnectionImpl::setRunParam (const std::string& experiment,
                                                                       WrongParams,
                                                                       DatabaseError)
 {
-    return this->setRunParamImpl (experiment,
+    return this->setRunParamImpl (instrument,
+                                  experiment,
                                   run,
                                   parameter,
                                   value,
@@ -304,7 +311,8 @@ ConnectionImpl::setRunParam (const std::string& experiment,
 }
 
 void
-ConnectionImpl::setRunParam (const std::string& experiment,
+ConnectionImpl::setRunParam (const std::string& instrument,
+                             const std::string& experiment,
                              int                run,
                              const std::string& parameter,
                              const std::string& value,
@@ -313,7 +321,8 @@ ConnectionImpl::setRunParam (const std::string& experiment,
                                                                       WrongParams,
                                                                       DatabaseError)
 {
-    return this->setRunParamImpl<std::string > (experiment,
+    return this->setRunParamImpl<std::string > (instrument,
+                                                experiment,
                                                 run,
                                                 parameter,
                                                 value,
@@ -324,7 +333,8 @@ ConnectionImpl::setRunParam (const std::string& experiment,
 
 bool
 ConnectionImpl::findExper (ExperDescr&        descr,
-                           const std::string& name) throw (WrongParams,
+                           const std::string& instrument,
+                           const std::string& experiment) throw (WrongParams,
                                                            DatabaseError)
 {
     if (!m_is_started)
@@ -334,11 +344,13 @@ ConnectionImpl::findExper (ExperDescr&        descr,
 
         // Formulate and make the query
         //
-        OdbcStatement stmt = m_odbc_conn.statement ("SELECT * FROM experiment WHERE name = ?") ;
+        OdbcStatement stmt = m_odbc_conn.statement ("SELECT e.* FROM instrument i, experiment e WHERE i.name=? AND e.name=? AND i.id=e.instr_id") ;
 
-        OdbcParam<std::string> p_name (name) ;
+        OdbcParam<std::string> p_instrument (instrument) ;
+        OdbcParam<std::string> p_experiment (experiment) ;
 
-        stmt.bindParam ( 1, p_name) ;
+        stmt.bindParam (1, p_instrument) ;
+        stmt.bindParam (2, p_experiment) ;
 
         OdbcResultPtr result = stmt.execute() ;
 

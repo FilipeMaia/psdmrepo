@@ -168,6 +168,7 @@ public:
       * @see method Connection::getParamInfo()
       */
      virtual bool getParamInfo (ParamInfo& info,
+                                const std::string& instrument,
                                 const std::string& experiment,
                                 const std::string& parameter) throw (WrongParams,
                                                                      DatabaseError) ;
@@ -177,7 +178,8 @@ public:
       *
       * @see method Connection::createRun()
       */
-     virtual void createRun (const std::string&    experiment,
+     virtual void createRun (const std::string&    instrument,
+                             const std::string&    experiment,
                              int                   run,
                              const std::string&    type,
                              const LusiTime::Time& beginTime,
@@ -189,7 +191,8 @@ public:
       *
       * @see method Connection::setRunParam()
       */
-    virtual void setRunParam (const std::string& experiment,
+    virtual void setRunParam (const std::string& instrument,
+                              const std::string& experiment,
                               int                run,
                               const std::string& parameter,
                               int                value,
@@ -203,7 +206,8 @@ public:
       *
       * @see method Connection::setRunParam()
       */
-    virtual void setRunParam (const std::string& experiment,
+    virtual void setRunParam (const std::string& instrument,
+                              const std::string& experiment,
                               int                run,
                               const std::string& parameter,
                               double             value,
@@ -217,7 +221,8 @@ public:
       *
       * @see method Connection::setRunParam()
       */
-    virtual void setRunParam (const std::string& experiment,
+    virtual void setRunParam (const std::string& instrument,
+                              const std::string& experiment,
                               int                run,
                               const std::string& parameter,
                               const std::string& value,
@@ -246,8 +251,9 @@ private:
       * of the supplied data structure if the parameter is found.
       */
     bool findExper(ExperDescr&        descr,
-                   const std::string& name) throw (WrongParams,
-                                                   DatabaseError) ;
+                   const std::string& instrument,
+                   const std::string& experiment) throw (WrongParams,
+                                                         DatabaseError) ;
 
     /**
       * Find run parameter description in the database.
@@ -266,13 +272,14 @@ private:
       * of the supplied data structure if the parameter is found.
       */
     bool findRunParam (ParamDescr&        descr,
+                       const std::string& instrument,
                        const std::string& experiment,
                        const std::string& parameter) throw (WrongParams,
                                                             DatabaseError)
     {
         ExperDescr exper_descr ;
-        if (!this->findExper (exper_descr, experiment))
-            throw WrongParams ("unknown experiment: " + experiment) ;
+        if (!this->findExper (exper_descr, instrument, experiment))
+            throw WrongParams ("unknown instrument/experiment: " + instrument + "/" + experiment) ;
         return this->findRunParam (descr, exper_descr.id, parameter) ;
     }
 
@@ -294,13 +301,14 @@ private:
       * of the supplied data structure if the parameter is found.
       */
     bool findRun (RunDescr&          descr,
+                  const std::string& instrument,
                   const std::string& experiment,
                   int                num) throw (WrongParams,
                                                  DatabaseError)
     {
         ExperDescr exper_descr ;
-        if (!this->findExper (exper_descr, experiment))
-            throw WrongParams ("unknown experiment: " + experiment) ;
+        if (!this->findExper (exper_descr, instrument, experiment))
+            throw WrongParams ("unknown instrument/experiment: " + instrument + "/" + experiment) ;
         return this->findRun (descr, exper_descr.id, num) ;
     }
 
@@ -320,7 +328,8 @@ private:
       * The function is used by the class's methods.
       */
     template <class T >
-    void setRunParamImpl (const std::string& experiment,
+    void setRunParamImpl (const std::string& instrument,
+                          const std::string& experiment,
                           int                run,
                           const std::string& parameter,
                           T                  value,
@@ -345,7 +354,8 @@ private:
 
 template <class T >
 void
-ConnectionImpl::setRunParamImpl (const std::string& experiment,
+ConnectionImpl::setRunParamImpl (const std::string& instrument,
+                                 const std::string& experiment,
                                  int                run,
                                  const std::string& parameter,
                                  T                  value,
@@ -365,11 +375,11 @@ ConnectionImpl::setRunParamImpl (const std::string& experiment,
         // that the value is of the correct type.
         //
         RunDescr runDescr ;
-        if (!findRun (runDescr, experiment, run))
+        if (!findRun (runDescr, instrument, experiment, run))
             throw WrongParams ("unknown run") ;
 
         ParamDescr paramDescr ;
-        if (!findRunParam (paramDescr, experiment, parameter))
+        if (!findRunParam (paramDescr, instrument, experiment, parameter))
             throw WrongParams ("unknown parameter") ;
 
         if (paramDescr.type != type)

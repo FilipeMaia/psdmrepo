@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2009-09-13 Igor Gaponenko
+- added missing instrument parameter to the relevant methods of the C++ API
+
 Tag: V00-00-06
 2009-05-19 Igor Gaponenko
 - migrated to use the new Python Class LusiTime.Time
