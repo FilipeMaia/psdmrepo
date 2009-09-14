@@ -1,0 +1,350 @@
+______
+URGENT
+
+- write C++ client for RegDB & LogBook and give it to Chris O'Grady
+
+- continue discussing the security model for web apps. One idea suggested by Amedeo
+  was to implement the group-based security for LogBook:
+
+  1. an experiment is associated with a group; the group leader automatically
+  gets all admnistrative privileges for LogBook; the group members get read-write
+  privileges.
+
+  2. certain groups (like, lab-superusers) can be registered as administrators,
+  or as just observers (top-level admins).
+
+  3. this should also work for netgroups (they don't seem to be retranslated into
+  LDAP server of PCDS. These groups exist in NIS only.). so, the queston is how to
+  access these groups from PHP?\
+
+  4. individual users can also be registered here for various privilege levels.
+
+  Having said that, a proposal is to encode all of these into Andy's RolesDB
+  as 'users';
+
+    'gapon'
+    'gid:posix:xr'
+    'gid:netgroup:u-whatever'
+
+  Then it will be up to the AuthDB PHP API to take a user account and use extra
+  sources of information (LDAP, and perhaps NIS?) to see if:
+
+  a. a given user is individually registered in RoleDB, or
+  b. he's associated with one or another POSIX group, and RoleDB has a record for
+     that group, or
+  c. ditto for the netgroups
+
+- test hpss client developed by Andy H. and installed on psdm. See his last message
+  with the following subject "hpsscp" posted on August 31, 2009.
+
+- discuss MySQL replication with Arash Alavi to see what would be the most reliable
+  protocol for switching servers in case of a failure.
+
++ develop a direct PHP API for the RoleDB. The corresponding package is AuthDB.
+
+  class AuthDB {
+    public static function hasRole( 'user', 'experiment_id', 'app', 'role' );
+    public static function hasPrivilege( 'user', 'experiment_id', 'app', 'privilege' );
+    ..
+    // a full set of editing methods to register users, roles, etc.
+  }
+
+  Then, in a context of LogBook develop a wrapper class which would simplify
+  things for LogBook:
+
+    class LogBookAuth {
+      public static function isAuthenticated();
+      public static function authName();
+      public static function canRead( 'experiment_id' );
+      public static function canPostNewMessages( 'experiment_id' );
+      public static function canEditMessages( 'experiment_id' );
+      public static function canDeleteMessages( 'experiment_id' );
+      public static function canManageShifts( 'experiment_id' );
+    }
+
+  NOTE: if a user isn't authenticated then all the above shown methods should
+  return false.
+
+- develop the AuthDb GUI
+
+- extend the LDAP PHP client implementation to support Netgroups as well
+  (use the following command as an example: %ldapsearch -x cn-u-srv )
+
+_________________________________________
+EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
+
++ improve the PHP LDAP API at RegDB to recognize secondary groups as well.
+
++ fix the "crosstalk" of the 'Options' buttons in the 'New Message' anbd 'Reply' dialogs.
+
++ put a title to the grabber (root.title())
+
++ order group names alphabetically when selecting POSIX Group in the Experiment Registration Dialog
+
++ run Welcome.html through the spell check (typos make people crazy!)
+
++ have at least one entry ready in the attachments dialog when posting new messages or replies.
+  Then allow people to add more (replace "Expand" with something else like "Add"). Do the same for tags.
+
++ shorten the path to: https://pswww/apps/logbook. Do thit before making the server
+  open to the internet and advertizing its expernal URL.
+
++ serve LogBook as all lower-case logbook. Follow the same approach for other apps and services
+
+      +----------+     +---------+
++ add | << First | and | Last >> | buttons to the messages viewer
+      +----------+     +---------+
+
++ add 'Print' button to the 'Grabber', so that the operator could create a hard-copy of the
+  grabbed picture. Add command line option '-p <printer command> | <printer>' to specify the desired
+  destination.
+
++ implement proper display of subthreads (replies to messages).
+
++ provide a read-only version of the LogBook which wouldn't require any authentication.
+  The same for RegDB.
+
+  ATTENTION: Make sure all PHP services are properly protected before deploying it.
+
++ implement _partial_ editing of LogBook entries: edit the message text.
+
+  NOTE: No backup version is the
+
++ Talk to Teresa on when we can get the server open. The Web & Security Committee is
+  gathering this Friday (August 28, 2009) to discuss my request. Make a PPT presentation
+  of the system architecture involving the Web server and Web services (for both ONLINE
+  and OFFLINE "worlds").
+
++ add a sign to the end of the parent message subjects to indicate a presence of the subthreads:
+
+    |
+    +->
+
++ add a sign indicating a presence of tags - just a bold symbol 'T'
+
++ implement message text wrapping at 128 (using PHP wordwrap() function).
+
+      +------------+     +------------+
+- add | View Repl. | and | Hide Repl. | buttons to the messages viewer
+      +------------+     +------------+
+
+  NOTE: The viewer's bar needs to be reorganized a bit to group functions
+
+- implement full editing LogBook entries: not just the message text, but also - renaming
+  atatchments, adding more attachments to existing messages, and (perhaps) deleting atatchments,
+  messages and tags.
+
+  ATTENTION: This feature would require extending the database schema to keep a track
+  of the changes made to an attachment. The simplest way would be to add shadow
+  tables for: header, entry, tag and attachment.
+
+- set up cron-tab on 'psdb' to make daily 'mysqldump' of all databases onto an NFS disk
+
+- revisit the server and applications security (SQL injection, giving too much information in
+  error reports, etc.)
+
+- make sure the Experiment Status, Shift Status and Run Status pages are regularily
+  refreshed too if the auto-refresh mode is on.
+
+- fix a bug in the message 'Reply' to return to the same context from which the reply
+  is made (right now it always goes back to the 'Experiment Status')
+
+- add user group search (LDAP) in the experiment registry based on user name or
+  his account name. This is to simplify a selection of the group.
+
+- implement auto-refresh for new messages posted via 'Reply'. As a temporary solution,
+  ass an explicit mechanism to force the refresh by an operator: 'Refresh Now' button.
+
+  NOTE: The later would require to rearrange the buttons in the message viewer
+  control bar.
+
+- investigate increasing the 1 MB limit for attached documents. It may make a sense
+  to put a little warning at the 'New Message' dialog to display the current limit.
+  (Unfortunately, we can't determine the image size from JS.). Print a clear complain
+  at the server side if the image size exceeds the limit.
+
+  NOTE: Consider doing this in some clean way to avoid duplicating number.
+  For example, set a value of soem JS variable when generating the PHP
+  script. What should we do for the "Grabber"?
+
++ increase the windows size for new/edited messages
+
+- implement persistent links to messages. This would also require adding
+  a standalone viewer of LogBook messages. The viewer should have
+  a navigation link back to the LogBook of the corresponding experiment,
+  next and previous messages (if any), etc.
+
+- implement fixed-size priview for attached images to avoid downloading
+  huge documents. This shold make LogBook more agile. The most trivial way
+  to implement this would be by generating the images "on the fly".
+  Most optimal way is to extend the schema for these fixed-size images
+  and store the images in the extended column the first time the request
+  is made. Then serve other clients from these column.
+
+  NOTE #1: watch out for race conditions when two clients will be attempting
+  to generate the same image! A solution would be to catch the exception,
+  ignore it, and try reading the image. The second solution would be to
+  use SQL 'UPDATE'. The best solution would be to generate the image
+  when uploading the atachment. In the later case a management tool would
+  be needed to geneate images for existing messages.
+
+  NOTE #2: add a header to images to indicate that this is just a preview:
+
+              +-----------------+
+              | 800x800 preview |
+   +----------+-----------------+---------+
+   |               <image>                |
+
+
+  NOTE #3: Leave other types of documents intact. At the moment this would
+  only include PDF.
+
+
+____________________________
+CODE CLEANUP AND REFACTORING
+
+- separate JS from HTML. Put JS logic into a separate file
+- separate CSS from HTML and put it into a seprate file
+
+_________
+NEW IDEAS
+
+    1. implement a persistent address for the individual messages (successAction or
+    actionSuccess). That would allow expanding message trees
+
+    2. implement a viewer for an individual message tree in a separate page (like
+    Experiment status, etc.). This will be used with persistent URLs to the messages.
+
+    3. implement the 'subscribe' mode for LogBook messages (events, to be correct), so
+    that subscribed users were notified by recieving URLs pointing to new messages.
+    Use LDAP to get e-mail addresses and ask a user for a confirmation. Extend
+    the schema to store the subscriptions.
+ 
+___________________________________________________
+MEDIUM PRIORITY: Consider extending database schema
+
+    1. storing both user account name and his name entered into the box when
+    posting messages. If no user name is provided when entering a new message then
+    use LDAP entry for the account to get its name.
+
+    2. move tags from message header to message entries
+
+    3. probably add some sort of the 'Shift assignment' field for shifts to be
+    displayed at the 'Shift Status' page. An alternative to this would be to
+    use specially tagged (SHIFT_ASSIGNMENT) messages to be automatically posted
+    in a context of the shift when begining new shifts.
+
+    NOTE: A clear 'pros' of the approach would be a possibility to search
+    these assignments via the regular browsing/finding.
+
+___________________________________________
+MEDIUM PRIORITY: Improve 'New Shift' dialog
+
+    1. in order to simplify crew formation allow using checkboxes to select
+    members of the POSIX group registered with an experiment. Also allow adding
+    arbitrary people (as it's done now).
+
+      [ text ] or [ listbox ]
+
+    The contents of the listbox will be populated by members of a POSIX group
+    associated with the selected experiment. Th erequest will be sent dynamically
+    using AJAX.
+
+    2. Add the 'Shift Assignment' text box to
+
+____________________________________________________________________________
+LOW PRIORITY: Refactor the Messages Table and Dialog into a single prototype
+
+    var ms = new  MessagesDisplay (
+      element,            // HTML 'div' element where to place the display's markup
+      url,                // optional URL to request messages. If not used then should be set to 'null'
+      scope,              // 'experiment', 'shift', 'run' - one of these current selections
+      new_message_dialog, // {true,false} - the flag requesting the dialog to be available
+      auto_refresh,       // {true,false} - the flag requesting the feature to be available
+      scope_selectors     // {true,false} - the flag requesting the feature to be available
+    );
+
+    NOTES: The class will be using the following global variables and markup:
+    current_selection
+    "workarea"
+
+__________________________________________________
+LOW PRIORITY: Imnprovements for the screen-grabber
+
+    - allow composing a message with more than one attachment
+    - add options for posting messages for the current experiment, shift or run.
+    Right now it's for the selected experiment only. Use experiment status.
+    - allow specifying arbitrary tags (or the preconfigured tags for the experiment)
+
+______________________________________________________________________________
+LOW PRIORITY: interesting vizualization idea: when showing a list of messages
+indicate 'zones' of shifts annd runs. Zones can be shown with different colors
+and indentation. Additional zone identifiers (begin time and leader of a shift
+and run number) can be used as well. For example:
+
+    <no shift - no background color>
+    | + Shift: 2009-09-17 10:12:23 - leader: gapon
+    |          2009-09-17 10:22:34 - by: salnikov - the test message
+    |          ..
+    ||  + Run: 2009-09-17 11:12:23 - number: 12
+    ||         ..
+    |
+    ||  + Run: 2009-09-17 12:12:23 - number: 13
+    ||         ..
+    |
+    <no shift - no background color>
+    | + Shift: 2009-09-17 10:12:23 - leader: gapon
+
+    Another possibility would be to use '+ today', '+ yesterday', '+last week', 'last month'
+    to group messages similar to what's done in Outlook Express
+____________________________________________________
+LOW PRIORITY: more ideas on the Look And Feel design
+
+    - Finish implementing selectors/checkboxs (experiment, shifts, runs) in 'Operator
+    and Control System Messages' dialog.
+
+    - Create curved background images for subtitles such as: 'Summary', 'Operator and
+    Control System Messages', etc. Find agoo dcolor match. Defer this setting to CSS.
+    Another (perhaps a beteer option) would be to use images for borders and the same
+    background color for 'div'.
+
+    - Consider 'discussion tree' option in both modes.
+
+    - implement 'thumbs' mode for images in the 'Browse' and 'Search' modes. Each image will
+    also carry a URL to the full document. HAve a button to togle the thumbs on and off.
+    Where to put the one?
+    One nice possibility would be to put attachments after tags. That would allow
+    seeing previews as a photo-album grid. Put an empty image 'No Preview available'
+    for unsupported MIME types.
+
+      ------------------
+      |                | <name>
+      |                | type: jpg
+      |    Thumb       | Size: 123545
+      |                | [ Download ]
+      |                | [ View ]
+
+    - add 'fit page' pagination mode for 'detailed'
+
+    - implement a support for Browser's history buttons (PREV/NEXT)
+
+________________________________________________________________________________
+LOW PRIORITY: implement "double" buffering-like behavior when navigating
+between (Prev/Next) runs and shifts. The feature must be especially usefull for
+runs because it would allow comparing values of run parameters.
+__________________________________________________________________________
+LOW PRIORITY: put something into the Help menus. Consider placing question
+mark icons (suported by hyperlinks) throughout document pages.
+
+________________________________________________________________________________
+INTERESTING IDEA: In the 'Operator and Control System Messages' introduce an
+option for viewing messages timestamps in the "back in time" mode. For example,
+to show how many seconds/minutes/hours/days ago was the last posting. That would
+give an operator some sense of timing in the automatically updated mode as well.
+
+__________________________________________________
+LOW PRIORITY: Look at the browser history support.
+
+_______________________________________________________________
+LOW PRIORITY: Implement PDF export using either FPDF or PDFlib.
+
