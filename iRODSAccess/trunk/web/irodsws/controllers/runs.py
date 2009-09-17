@@ -45,7 +45,7 @@ from irodsws.model.irods_model import IrodsModel
 # Local non-exported definitions --
 #----------------------------------
 
-_zone = config['app_conf'].get( 'irods.zone', 'lusi-zone' )
+_run_data_path = config['app_conf'].get( 'irods.run_data_path', '/psdm-zone/exp' )
 
 #------------------------
 # Exported definitions --
@@ -61,7 +61,7 @@ class RunsController(BaseController):
         """ GET /runs/{instrument}/{experiment}/{type} """
 
         # location of the experiment directory
-        path = '/'.join([ '', _zone, 'exp', instrument, experiment, type ])
+        path = '/'.join([ _run_data_path, instrument, experiment, type ])
 
         # see if user can have an access
         h.checkAccess(path)
@@ -88,7 +88,7 @@ class RunsController(BaseController):
         # url('resource', id=ID)
 
         # location of the experiment directory
-        path = '/'.join([ '', _zone, 'exp', instrument, experiment, type ])
+        path = '/'.join([ _run_data_path, instrument, experiment, type ])
 
         # see if user can have an access
         h.checkAccess(path)
@@ -99,7 +99,7 @@ class RunsController(BaseController):
         # make the list of all runs
         allRuns = set([ r for r in self._allRuns(model, path) ])
         
-        resdict = {}
+        reslist = []
         for run in self._runList( runs ) :
             # for every run get the list of all files in that run's directory
             
@@ -110,12 +110,12 @@ class RunsController(BaseController):
             if run not in allRuns : continue
             
             # get file list recursively
-            runpath = "%s/%06d" % ( path, run ) 
+            runpath = "%s/%06d" % ( path, run )
             res = model.files( runpath, recursive = True )
             
             # filter out collections, only report files
+            files = []
             if res is not None :
-                resdict[run] = []
                 for r in res :
                     if r['type'] == 'object' :
                         name = r['collName']+'/'+r['name']
@@ -125,9 +125,11 @@ class RunsController(BaseController):
                                          path=name,
                                          qualified=True )
                         r['url'] = url
-                        resdict[run].append(r)
+                        files.append(r)
+                        
+            reslist.append( dict(run=run, files=files) )
 
-        return resdict
+        return reslist
 
     def _runList( self, runs ) :
         """ Generator which produces the run number list from the 

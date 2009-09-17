@@ -37,6 +37,7 @@ __version__ = "$Revision$"
 #  Imports of standard modules --
 #--------------------------------
 import sys
+import codecs
 
 #---------------------------------
 #  Imports of base class module --

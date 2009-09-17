@@ -56,7 +56,7 @@ class ResourcesController(BaseController):
         
         model = IrodsModel()
         res = model.resources()
-        res = [ {'id':x} for x in res ] 
+        res = [ dict( id=x, url=h.url_for( action='show', id=x, qualified=True ) ) for x in res ]
         return res
 
     @jsonify

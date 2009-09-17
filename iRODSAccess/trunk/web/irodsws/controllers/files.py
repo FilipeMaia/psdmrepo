@@ -84,8 +84,6 @@ class FilesController(BaseController):
         if res is None :
             abort(404)
         else :
-            # my URI
-            server_uri = h.server_uri()
             
             # add URI for each file or collection
             for r in res :
