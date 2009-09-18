@@ -18,7 +18,7 @@ part of it, please give an appropriate acknowledgement.
 
 @see RelatedModule
 
-@version $Id: template!python-main! 8 2008-10-08 22:35:33Z salnikov $
+@version $Id$
 
 @author Robert C. Sass
 """
@@ -27,7 +27,7 @@ part of it, please give an appropriate acknowledgement.
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 1 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -66,7 +66,7 @@ def _default_user():
 def _default_host():
     """Return the default host on which the MySQL is run"""
 
-    return "bbt-odf101.slac.stanford.edu"
+    return "psdb.slac.stanford.edu"
 
 def _default_port():
     """Return the default port on which the MySQL server would respond"""
@@ -208,7 +208,7 @@ class OnlineScript ( LusiPyApp ) :
         #
         self.__add_handler(
             'translate',
-            '<experiment> <instrument> <run_type> <run_number> <xtc_dir> (optional)<epics_dir>',
+            '<instrument> <experiment> <run_type> <run_number> <xtc_files>',
             """
     Translate a set of files to Offline Data Management.
     """,
@@ -326,17 +326,13 @@ SUPPORTED COMMANDS:
 
         if len(args) < 5:
             self._parser.error(
-                "Enter: experiment instrument run_type run_num xtc_dir (optional)epics_dir- %s" % command)
+                "Enter: instrument experiment run_type run_num xtc_files - %s" % command)
 
-        exper      = args[0]
-        instr      = args[1]
+        instr      = args[0]
+        exper      = args[1]
         runtype    = args[2]
         runnum     = args[3]
-        xtcdir     = args[4]
-        epicsdir   = False
-        if not (os.path.exists(xtcdir) or os.path.isdir(xtcdir)):
-            self.print_out("XTC path doesn't exist or isn't a directory.")
-            return 1
+        xtcfiles   = args[4:]
 
         if len(args) == 6:
             epicsdir = args[5]
@@ -358,9 +354,7 @@ SUPPORTED COMMANDS:
         #
         # Find all files in the XTC directory and add them to the fileset
         #
-        xtcfiles = os.listdir(xtcdir)
-        for f in xtcfiles:
-            filename = os.path.join(xtcdir, f)
+        for filename in xtcfiles:
             if not self.__simple_query(
                 """SET @_status = NULL;
                 CALL add_file_nocache ('%s','%s', '%s', @_status);""" % (
@@ -368,22 +362,6 @@ SUPPORTED COMMANDS:
             row = self.__select_query_1('SELECT @_status')
             if not row: 
                 raise DatabaseOperatonFailed, "Bad status return from XTC add_file_nocache"
-
-        #
-        # Do the same for all files in the EPICS directory if it exists
-        #        
-        if epicsdir:
-            epicsfiles = os.listdir(epicsdir)
-            for f in epicsfiles:
-                filename = os.path.join(xtcdir, f)
-                if not self.__simple_query(
-                    """SET @_status = NULL;
-                    CALL add_file_nocache ('%s','%s', '%s', @_status);""" % (
-                    newset, 'EPICS', filename)): return 1
-
-                row = self.__select_query_1('SELECT @_status')
-                if not row: 
-                    raise DatabaseOperatonFailed, "Bad status return from EPICS add_file_nocache"
 
         row = self.__select_query_1(
             "SELECT id FROM fileset_status_def WHERE name='Waiting_Translation'")
