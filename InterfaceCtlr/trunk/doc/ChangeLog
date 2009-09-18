@@ -11,6 +11,18 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2009-09-18 Andy Salnikov
+- Small scale refactoring, Controller is split into three separate
+  classes: 
+  - src/InterfaceDb.py responsible for all database staff
+  - src/FileMgrIrods.py which does all iRODS interaction
+  - app/Controller - pure driver functions
+- some parameters are coming from database now (config_def table), many
+  parameters controlling iRODS interaction are already defined
+- added support for storing XTC files in iRODS
+- mysql user name and password can be read from a file now 
+
 Tag: V00-01-00
 2009-03-30 Robert C. Sass
 - Initial insertion of MySQL workbench file.
