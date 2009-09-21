@@ -1,0 +1,441 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Interface Controller.
+#
+#------------------------------------------------------------------------
+
+"""Interface Controller for Photon Science Data Management.
+
+This is the Interface Controller that monitors filesets created by the online system.
+It creates a translator process to translate the fileset into HDF5 and enters the 
+translated file into iRODS. rt
+
+This software was developed for the LUSI project.  If you use all or
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$
+
+@author Robert C. Sass
+"""
+
+
+#------------------------------
+#  Module's version from SVN --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import codecs
+import pwd
+import socket
+import subprocess
+import logging
+import logging.handlers
+import time
+import resource
+import signal
+from pprint import *
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+from LusiTime.Time import Time
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from InterfaceCtlr.FileMgrIrods import FileMgrIrods
+from InterfaceCtlr.InterfaceDb import InterfaceDb
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#-------------------
+# Local functions --
+#-------------------
+
+def _sig2int(signum, frame):
+    # convert signals to SIGINT
+    raise KeyboardInterrupt()
+    
+
+#--------------------------
+# Specialized exceptions --
+#--------------------------
+
+#--------------------------------
+# Application class definition --
+#--------------------------------
+
+class Controller ( LusiPyApp ) :
+
+    # =======================================================================
+    # Database connection parameters and connection handle. They would change
+    # their default state at the first attempt to connect to the database.
+    # =======================================================================
+
+    __host       = "psdb.slac.stanford.edu"
+    __port       = 3306
+    __user       = pwd.getpwuid(os.geteuid())[0]
+    __password   = ""
+    __database   = "interface_db"
+
+    # ===========
+    # constructor
+    # ===========
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ (
+            self,
+            installLogger = True,
+            usage = "usage: %prog [<command>] [<parameters>] [<options>]" )
+
+        # Add application options, see optparse module for details -------------
+        #
+        self._parser.add_option ( '-D', "--database",
+								  action="store", dest="database", default=self.__database,
+				      			  help="override default database name (%s)" % self.__database)
+
+        self._parser.add_option ( '-H', "--host",
+								  action="store", dest="host", default=self.__host,
+				      			  help="override default host name (%s)" % self.__host)
+
+        self._parser.add_option ( '-P', "--port",
+								  action="store", dest="port", default=self.__port, type="int",
+				      			  help="override default port number (%s)" % self.__port)
+
+        self._parser.add_option ( '-U', "--user",
+								  action="store", dest="user", default=None,
+								  help="override default user name (%s)" % self.__user)
+
+        self._parser.add_option ( '-p', "--password",
+                                  action="store", dest="password", default=None,
+                                  help="specify MySQL password (no password by default)" )
+
+        self._parser.add_option ( '-f', "--pwd-file",
+                                  action="store", dest="pwd_file", default=None,
+                                  help="specify file with user name and password" )
+
+        self._parser.add_option ( '-c', "--config",
+                                  action="append", dest="config", default=[],
+                                  help="specify configuration section in the database" )
+
+        # other instance variables
+        self._db = None
+        self._controller_id = None
+        self._translate_uri = None
+        self._log_uri = None
+        self._config = {}
+        self._fileMgr = None
+        self._fs_stat = {}
+
+    # ==========================================
+    # Run the controller after installing logger. 
+    # See LusiPyApp class for details.
+    # ==========================================
+
+    def _run ( self ) :
+
+        # setup signal handling
+        signal.signal ( signal.SIGTERM, _sig2int )
+        signal.signal ( signal.SIGABRT, _sig2int )
+        signal.signal ( signal.SIGQUIT, _sig2int )
+
+        # if this throws then we are done
+        self.__init_controller()
+        
+        # start infinite loop
+        while not self._db.test_exit_controller(self._controller_id) :
+            try:
+                fs = self._db.get_fileset(self._fs_stat['xwait_id'])
+                if fs:               
+                    # Found a new fileset to translate
+                    self.trace( 'found new fileset %s', pformat(fs) )
+                    self.__process_fileset ( fs )
+                else:     
+                    # Nothing to do, sleep, look for work again
+                    time.sleep(10.0)
+
+            except KeyboardInterrupt:
+                self.info ("Received interrupt signal, exiting.")
+                break
+
+            except Exception, ex :
+                
+                # all other exceptions are trapped
+                self.error( "Exception caught in main loop: "+str(ex) )
+
+                # wait until dust settles
+                time.sleep(10.0)
+
+        # End while not exit_controller
+        
+        self.info ("Request to kill controller #%d" % self._controller_id)
+        self._db.exit_controller(self._controller_id)
+        return 
+
+
+    # ========================
+    # Init Controller instance
+    # ========================
+
+    def __init_controller ( self ) :
+
+        """Perform multiple operations to initialize the controller:
+        1) Connect to the database.
+        2) Find our translator output uri in the translator_nodes table.
+        3) Insert an entry in the interface_controller table.
+        4) read config data from database and store in self._config
+
+        """
+
+        # create database instance
+        user = self._options.user
+        password = self._options.password
+        if not user and not password and self._options.pwd_file :
+            # read user name and password from file
+            f = codecs.open(self._options.pwd_file,'r','base64')
+            u, p = tuple(f.read().split())
+            f.close()
+            if not user : user = u
+            if not password : password = p
+        self._db = InterfaceDb( self._options.host, self._options.port, 
+                                self._options.database, user, password )
+
+        # define new controller instance
+        host = socket.getfqdn(socket.gethostname())
+        ctrl = self._db.new_controller( host )
+        self._translate_uri = ctrl['translate_uri']
+        self._log_uri = ctrl['log_uri']
+        self._controller_id = ctrl['id']
+
+        # get configuration from database
+        for section in self._options.config :
+            config = self._db.get_config(section)
+            self.trace ( 'config[%s] = %s', section, pformat(config) )
+            self._config.update ( config )
+
+        # setup file manager
+        if self._config.get('filemanager-irods-command',None) :
+            self._fileMgr = FileMgrIrods( self._config['filemanager-irods-command'], self._config, self._log )
+
+        # populate fileset status dict
+        fstat_id = self._db.fstat_id()
+        self._fs_stat = dict ( 
+                xwait_id = fstat_id["Waiting_Translation"],
+                xlate_id = fstat_id["Being_Translated"],
+                xdone_id = fstat_id["Translation_Complete"],
+                xfail_id = fstat_id["Translation_Error"],
+                irgud_id = fstat_id["Entered_into_iRODS"],
+                irbad_id = fstat_id["iRODS_Error"],
+                xcomp_id = fstat_id["Complete"] )
+
+        self.info ("Successful init_controller on host %s started %s" % (host,Time.now()) )
+
+
+
+    # ======================
+    # Process single fileset
+    # ======================
+    def __process_fileset (self, fs):
+
+        fs_id = fs['id']
+
+        # tell everybody we are taking care of this fileset
+        self._db.change_fileset_status (fs_id, self._fs_stat['xlate_id'])
+        
+        # store XTC files in file manager
+        fm_xtc_dir = self._config.get('filemanager-xtc-dir',None)
+        if self._fileMgr and fm_xtc_dir :
+            for xtc in fs['xtc_files'] :
+                basename = xtc.split('/')[-1]
+                dst_path = ( fm_xtc_dir % fs ) + '/' + basename
+                self._fileMgr.storeFile( xtc, dst_path )
+
+        # build all directory and file names
+        fname_dict = self.__build_output_fnames(fs)
+
+        # output directory must be empty or non-existent
+        self.__make_hdf5_dir( fname_dict['h5dirname'] )
+
+        # build command line for running translator
+        cmd = self.__build_translate_cmd(fs_id, fname_dict, fs)
+
+        # open log file for translator
+        logname = os.path.join(self._log_uri,fname_dict['logname'])
+        logfile = open(logname, "w")
+
+        prev_stats = resource.getrusage(resource.RUSAGE_CHILDREN)
+
+        # start translator
+        proc = subprocess.Popen(cmd, stdout = logfile, stderr = logfile)
+        translator_id = self._db.new_translator(self._controller_id, fs_id)
+        self.info ("Started translator #%d (PID=%d) with cmd %s", translator_id, proc.pid, ' '.join(cmd) )
+        self.info ("output directory %s", fname_dict['h5dirname'] )
+        self.info ("Log file is in %s", logname )
+        
+        # loop and wait until translation done             
+        xlate_done = False
+        while not xlate_done:
+
+            # check kill flag
+            kill_trans = self._db.test_exit_translator(translator_id)
+            proc.poll()
+            if proc.returncode != None or kill_trans != 0:
+                xlate_done = True
+                if kill_trans:
+                    # kill it if asked
+                    self.info ("Request to kill translator_process #%d (PID=%d)", translator_id, proc.pid)
+                    os.kill(proc.pid,signal.SIGTERM)
+                    proc.returncode = -1
+                logfile.close()
+
+                self.info ("translator #%d finished (PID=%d) retcode=%s", translator_id, proc.pid, proc.returncode)
+
+                # get the size of resulting files
+                output_size = self.__dir_size( fname_dict['h5dirname'] )
+                self.info ("translator #%d produced %d bytes of data", translator_id, output_size)
+
+                # store statistics
+                self._db.update_translator(translator_id, proc.returncode, prev_stats, output_size )
+
+                if proc.returncode != 0 :
+                    self.warning ("translator #%d failed", translator_id )
+                    self._db.change_fileset_status (fs_id, self._fs_stat['xfail_id'])
+                else:
+                    self._db.change_fileset_status (fs_id, self._fs_stat['xdone_id'])
+                    
+                    # store result in file manager
+                    fm_hdf_dir = self._config.get('filemanager-hdf5-dir',None)
+                    if self._fileMgr and fm_hdf_dir :
+                        dst_dir = fm_hdf_dir % fs
+                        returncode = self._fileMgr.storeDir( fname_dict['h5dirname'], dst_dir )
+                    
+                        self._db.update_irods_status (translator_id, returncode)
+                        if returncode != 0:
+                            self._db.change_fileset_status (fs_id, self._fs_stat['irbad_id'])
+                        else:
+                            self._db.change_fileset_status (fs_id, self._fs_stat['irgud_id'])
+                            #os.remove(os.path.join(self._translate_uri, fname_dict['h5name']))
+                            self._db.change_fileset_status (fs_id, self._fs_stat['xcomp_id'])
+                            
+            else:
+                time.sleep(5.0)
+        #end while not xlate_done
+         
+
+
+
+    # =====================
+    # Build output filename
+    # =====================
+
+    def __build_output_fnames ( self, fsdbinfo ) :
+
+        """Build the output filenames and return as a dict"""
+
+        # current time string as '20090915T120145'
+        curtime = Time.now().toString("%Y%m%dT%H%M%S")
+
+        # re-format directory URI
+        dir_name = self._translate_uri % fsdbinfo
+        
+        # Now construct the output file name
+        fname = "%(instrument)s-%(experiment)s-%(run_number)06d" % fsdbinfo
+
+        return dict ( h5name = fname + '-{seq4}.hdf5',
+                      h5dirname = dir_name,
+                      logname = fname + '-' + curtime + '.log' )
+
+    # ===========================================================
+    # Build a list that has the command to execute the translator
+    # ===========================================================
+
+    def __build_translate_cmd ( self, fileset_id, fname_dict, fs ) :
+
+        """Build the arg list to pass to the translator from the files in fileset
+        and the translate_uri destination for the transalator output"""
+
+        cmd_list = []
+        cmd_list.append("o2o-translate")
+
+        for xtc in fs['xtc_files']:
+            cmd_list.append("-f")
+            cmd_list.append(xtc)
+
+        #
+        # Destination dir for translated file
+        cmd_list.append("-d")
+        cmd_list.append(fname_dict['h5dirname'])
+
+        #
+        # experiment, run number, filename
+        cmd_list.append("-i")
+        cmd_list.append(fs['instrument'])
+        cmd_list.append("-x")
+        cmd_list.append(fs['experiment'])
+        cmd_list.append("-n")
+        cmd_list.append(fname_dict['h5name'])
+        
+        return cmd_list
+
+
+    # ============================================
+    # Calculate the size of all files in directory
+    # ============================================
+
+    def __dir_size( self, dirname ) :
+
+        # generator for all file paths under given directory
+        def _all_files( dirname ) :
+            for root, dirs, files in os.walk( dirname ) :
+                for f in files :
+                    yield os.path.join( root, f )
+
+        return sum( [ os.stat(f).st_size for f in _all_files( dirname ) ] )
+
+
+    # ===============================
+    # make directory for output files
+    # ===============================
+
+    def __make_hdf5_dir(self, dirname) :
+
+        # output directory must be empty or non-existent
+        if os.path.exists(dirname) :
+            if not os.path.isdir(dirname) :
+                msg = 'output directory exist but is not a directory: '+dirname
+                self.warning ( msg )
+                raise IOError( msg )
+            elif os.listdir(dirname) :
+                msg = 'output directory exist but is not empty: '+dirname
+                self.warning ( msg )
+                raise IOError( msg )
+        else :
+            # create output directory
+            self.trace ( 'create directory for output files: '+dirname )
+            os.makedirs(dirname)
+
+
+# ==============================================
+# Run application when imported as a main module
+# ==============================================
+
+if __name__ == "__main__" :
+    app = Controller()
+    rc = app.run()
+    sys.exit(rc)
