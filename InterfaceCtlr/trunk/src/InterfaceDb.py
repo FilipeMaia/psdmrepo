@@ -117,7 +117,7 @@ class InterfaceDb ( object ) :
             try :
                 self._conn = db.connect( host=self._host, port=self._port, db=self._database,
                                          user=self._user, passwd=self._passwd )
-            except db.Exception, ex :
+            except db.Error, ex :
                 self._log.error( 'database connection failed: '+str(ex) )
                 # wait max 15 seconds
                 if time.time() - t0 > 15 :

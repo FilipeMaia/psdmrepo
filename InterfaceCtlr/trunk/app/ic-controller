@@ -119,7 +119,7 @@ class Controller ( LusiPyApp ) :
 				      			  help="override default port number (%s)" % self.__port)
 
         self._parser.add_option ( '-U', "--user",
-								  action="store", dest="user", default=self.__user,
+								  action="store", dest="user", default=None,
 								  help="override default user name (%s)" % self.__user)
 
         self._parser.add_option ( '-p', "--password",

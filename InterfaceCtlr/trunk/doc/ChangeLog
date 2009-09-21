@@ -11,6 +11,10 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-02
+2009-09-20 Andy Salnikov
+- couple of small fixes
+
 Tag: V00-03-01
 2009-09-18 Andy Salnikov
 - renamed applications:
