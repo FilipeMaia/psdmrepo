@@ -71,7 +71,7 @@ def _default_host():
 def _default_port():
     """Return the default port on which the MySQL server would respond"""
 
-    return "3306"
+    return 3306
 
 def _default_database():
     """Return the default database"""
@@ -139,17 +139,6 @@ class OnlineScript ( LusiPyApp ) :
     def __usage(self, command):
         print "Usage: %s  %s" % (command, self.__cmd_handlers[command]['SYNTAX'])
 
-    # =======================================================================
-    # Database connection parameters and connection handle. They would change
-    # their default state at the first attempt to connect to the database.
-    # =======================================================================
-
-    __host       = _default_host()
-    __port       = _default_port()
-    __user       = _default_user()
-    __password   = ""
-    __database   = _default_database()
-    __connection = None
 
     # ===========
     # constructor
@@ -165,28 +154,34 @@ class OnlineScript ( LusiPyApp ) :
         # Add application options, see optparse module for details -------------
         #
         self._parser.add_option ( '-D', "--database",
-								  action="store", dest="database", default=None,
+								  action="store", dest="database", default=_default_database(),
 				      			  help="override default database name (%s)" % _default_database())
 
         self._parser.add_option ( '-H', "--host",
-								  action="store", dest="host", default=None,
+								  action="store", dest="host", default=_default_host(),
 				      			  help="override default host name (%s)" % _default_host())
 
         self._parser.add_option ( '-P', "--port",
-								  action="store", dest="port", default=None,
+								  action="store", dest="port", default=_default_port(), type='int', 
 				      			  help="override default port number (%s)" % _default_port())
 
         self._parser.add_option ( '-U', "--user",
-								  action="store", dest="user", default=None,
+								  action="store", dest="user", default=_default_user(),
 								  help="override default user name (%s)" % _default_user())
 
         self._parser.add_option ( '-p', "--password",
 								  action="store", dest="password", default=None,
 							      help="specify user password (no password by default)" )
 
+        self._parser.add_option ( '-f', "--pwd-file",
+                                  action="store", dest="pwd_file", default=None,
+                                  help="specify file with user name and password" )
+
         self._parser.add_option ( '-o', "--output",
                                   action="store", dest="output", default=None,
                                   help="send output to file instead of STDOUT" )
+
+        self.__connection = None
 
 
         # Register command handlers for known command --------------------------
@@ -339,63 +334,43 @@ SUPPORTED COMMANDS:
             if not (os.path.exists(epicsdir) or os.path.isdir(epicsdir)) :
                 self.print_out("EPICS path doesn't exist or isn't a directory")
                 return 1
-           
-        if not self.__simple_query(
-            """SET @_new_fileset = NULL; 
-            CALL new_fileset_nocache ('%s','%s','%s','%s',@_new_fileset);""" % (
-            exper, instr, runtype, runnum )): return 1
-        row = self.__select_query_1('SELECT @_new_fileset')
-        if not row:
-            raise DatabaseOperatonFailed, "Bad status return from new_fileset_nocache"
-            return 1
 
+        self.__simple_query( "START TRANSACTION" )
+           
+        row = self.__select_query_1("SELECT id FROM fileset_status_def WHERE name = 'Initial_Entry'")
+        if not row :
+            raise DatabaseOperatonFailed( "No rows found in fileset_status_def with Initial_Entry" )
+        stat = row[0]
+           
+        if not self.__simple_query( 
+            """INSERT INTO fileset 
+            (fk_fileset_status,experiment,instrument,run_type,run_number,created,locked)
+            VALUES (%s,%s,%s,%s,%s,NOW(),1)""", ( stat, exper, instr, runtype, runnum ) ) :
+             return 1
+        row = self.__select_query_1('SELECT LAST_INSERT_ID()')
         newset = row[0]
 
-        #
-        # Find all files in the XTC directory and add them to the fileset
-        #
+        # add all XTC files to the fileset
         for filename in xtcfiles:
             if not self.__simple_query(
-                """SET @_status = NULL;
-                CALL add_file_nocache ('%s','%s', '%s', @_status);""" % (
-                newset, 'XTC', filename)): return 1
-            row = self.__select_query_1('SELECT @_status')
-            if not row: 
-                raise DatabaseOperatonFailed, "Bad status return from XTC add_file_nocache"
+                """INSERT INTO files (fk_fileset_id,name,type) VALUES (%s,%s,%s)""",
+                (newset, filename, 'XTC')) :
+                return 1
 
-        row = self.__select_query_1(
-            "SELECT id FROM fileset_status_def WHERE name='Waiting_Translation'")
-        if not row:
-            raise DatabaseOperatonFailed, "failed to obtain fileset status id for Waiting_Translation"
-        #
-        # Set fileset status to "Waiting_Translation" and we're done
-        #
+        row = self.__select_query_1("SELECT id FROM fileset_status_def WHERE name = 'Waiting_Translation'")
+        if not row :
+            raise DatabaseOperatonFailed( "No rows found in fileset_status_def with Waiting_Translation" )
         wtstat = row[0]
+
+        # Set fileset status to "Waiting_Translation" and we're done
         if not self.__simple_query(
-            """SET @_status = NULL;
-            CALL change_fileset_status ('%s','%s', @_status);""" % (
-            newset, wtstat)):
+            """UPDATE fileset SET fk_fileset_status=%s, locked=0 WHERE fileset.id = %s""", (wtstat, newset) ):
             raise DatabaseOperatonFailed, "Failed to change fileset status"
             
-        row = self.__select_query_1('SELECT @_status')
-        if not row:
-            raise DatabaseOperatonFailed, "Bad status return from change_fileset_status"
+        self.__simple_query( "COMMIT" )
 
         return 0
 
-
-    # ====================================
-    # Report current connection parameters
-    # ====================================
-
-    def __conn_params(self):
-        using_password = "NO"
-        if self.__password != "": using_password = "YES"
-        return "'%s'@'%s':%s (using password: %s)" % (
-            self.__user,
-            self.__host,
-            self.__port,
-            using_password)
 
     # =====================
     # Connect to the server
@@ -408,47 +383,35 @@ SUPPORTED COMMANDS:
         return True. Return False otherwise."""
         if self.__connection is not None: return True
 
-        # Make ajustments to the connection parameters if requested ------------
-        # in the command options.
-        #
-        self.info("Default connection parameters for MySQL: %s" % self.__conn_params())
- 
-        if self._options.host and self.__host != self._options.host:
-             self.__host = self._options.host
-
-        if self._options.port and port != self._options.port:
-            port = self._options.port
-
-        if self._options.user and self.__user != self._options.user:
-            self.__user = self._options.user
-
-        if self._options.password and self.__password != self._options.password:
-            self.__password = self._options.password
-
-        if self._options.database and self.__database != self._options.database:
-            self.__database = self._options.database
-
-        self.info("Requested connection parameters for MySQL: %s" % self.__conn_params())
+        user = self._options.user
+        password = self._options.password
+        if not user and not password and self._options.pwd_file :
+            # read user name and password from file
+            f = codecs.open(self._options.pwd_file,'r','base64')
+            u, p = tuple(f.read().split())
+            f.close()
+            if not user : user = u
+            if not password : password = p
 
         # Try to connect -------------------------------------------------------
         #
-        self.info("Connecting to MySQL: %s" % self.__conn_params())
+        self.info("Connecting to MySQL: %s@%s:%d", user, self._options.host, self._options.port)
         try:
             self.__connection = MySQLdb.connect(
-                host=self.__host,
-                port=int(self.__port),
-                user=self.__user,
-                passwd=self.__password,
-                db=self.__database)
+                host=self._options.host,
+                port=self._options.port,
+                user=user,
+                passwd=password,
+                db=self._options.database)
         except MySQLdb.Error, ex:
-            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+            self.error("MySQL error %d: %s", ex[0], ex[1] )
             sys.exit(1)
 
     # ========================================================
     # Execute a simple query which doesn't return a result set
     # ========================================================
 
-    def __simple_query(self, *queries):
+    def __simple_query(self, query, data=None):
 
         """Execute a list of simple queries which do not require any parsing
         of results. Queries will be executed one by one till all is done or
@@ -460,13 +423,13 @@ SUPPORTED COMMANDS:
         result = False
         cursor = self.__connection.cursor()
 
-        for query in queries:
-            self.info( "SQL: %s" % query)
-            try:
-                cursor.execute(query)
-                result = True
-            except MySQLdb.Error, ex:
-                self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+        self.info( "SQL: %s" % query)
+        try:
+            cursor.execute(query,data)
+            result = True
+        except MySQLdb.Error, ex:
+            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+            result = False
 
         cursor.close()
         return result
@@ -475,7 +438,7 @@ SUPPORTED COMMANDS:
     # Execute a single SELECT type query and return its result set
     # ============================================================
 
-    def __select_query(self, query, return_dict=False):
+    def __select_query(self, query, data=None, return_dict=False):
 
         """Execute a single SELECT type query and return a sequence of sequences
         (or dictionaries, depending on the optional flag). If no results are found
@@ -491,7 +454,7 @@ SUPPORTED COMMANDS:
 
         self.info( "SQL: %s" % query)
         try:
-            cursor.execute(query)
+            cursor.execute(query,data)
             rows = cursor.fetchall()
         except MySQLdb.Error, ex:
             self.error("MySQL error %d: %s" % (ex[0],ex[1]))
@@ -503,7 +466,7 @@ SUPPORTED COMMANDS:
     # Execute a single SELECT type query on a single collumn
     # ======================================================
 
-    def __select_query_1(self, query):
+    def __select_query_1(self, query, data=None):
 
         """Execute a single SELECT type query on a single column and
         return a sequence of values found in all rows for that collumn.
@@ -516,7 +479,7 @@ SUPPORTED COMMANDS:
 
         self.info( "SQL: %s" % query)
         try:
-            cursor.execute(query)
+            cursor.execute(query,data)
             rows = cursor.fetchall()
             result = [r[0] for r in rows]
         except MySQLdb.Error, ex:

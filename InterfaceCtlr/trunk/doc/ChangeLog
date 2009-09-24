@@ -11,6 +11,19 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-03
+2009-09-24 Andy Salnikov
+- controller can run multiple translators now, maximum number is
+  controlled by the command line option, default is 1
+- every translator runs in a separate thread, all translator logic
+  has been moved to TranslatorThread class
+- files table has been changed, there is now new field 'archive_dir'
+  which contains the file manager directory where the file was 
+  archived (or NULL)
+- fk_fileset_status field was dropped from files table
+- we also store produced HDF5 files in the files table to see if the 
+  file was correctly archived
+
 Tag: V00-03-02
 2009-09-20 Andy Salnikov
 - couple of small fixes

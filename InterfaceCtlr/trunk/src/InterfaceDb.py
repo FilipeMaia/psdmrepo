@@ -35,6 +35,7 @@ import MySQLdb as db
 import logging
 import time
 import resource
+import threading
 
 #---------------------------------
 #  Imports of base class module --
@@ -52,6 +53,14 @@ from LusiTime.Time import Time
 class _DatabaseOperatonFailed(Exception):
     def __init__ (self, message):
         Exception.__init__( self, message )
+
+class _RAIILock(object):
+    def __init__(self,lock):
+        self._lock = lock
+        self._lock.acquire()
+        
+    def __del__(self):
+        self._lock.release()
 
 #------------------------
 # Exported definitions --
@@ -88,6 +97,11 @@ class InterfaceDb ( object ) :
         self._conn = None
 
         self._log = logging.getLogger('iface_db')
+
+        self.__lock = threading.Lock()
+
+    def getlock(self) :
+        return _RAIILock(self.__lock)
     
     # ===========================================================
     # Return database connection, attempt to reconnect if dropped
@@ -157,6 +171,9 @@ class InterfaceDb ( object ) :
             - translate_uri
             - log_uri
         """
+
+        # critical sections begins
+        lock = self.getlock()
         
         cursor = self.cursor()
         
@@ -195,6 +212,9 @@ class InterfaceDb ( object ) :
 
     def get_config(self, section):
         
+        # critical sections begins
+        lock = self.getlock()
+        
         cursor = self.cursor()
         
         q = "SELECT param, value, type FROM config_def WHERE section=%s"
@@ -212,42 +232,30 @@ class InterfaceDb ( object ) :
 
         return config
 
-    # ==============================================
-    # Get the internal identifier of a fileset status
-    # ==============================================
-
-    def fstat_id(self):
-
-        cursor = self.cursor()
-        
-        cursor.execute( "SELECT name, id FROM fileset_status_def" )
-        rows = cursor.fetchall()
-        cursor.execute( "COMMIT" )
-        if rows:
-            return dict( rows )
-        else:
-            raise _DatabaseOperatonFailed( "failed to obtain fileset status ids" )
-
     # ====================================
     # Get fileset with requested status id
     # ====================================
 
-    def get_fileset ( self, stat_id ) :
+    def get_fileset ( self, *status ) :
 
-        """return a fileset id with the specified status or 0 if
+        """return a fileset id with the specified status or None if
         no fileset exists with that status"""
         
         fs = None
+
+        # critical sections begins
+        lock = self.getlock()
 
         cursor = self.cursor(dict=True)
         
         cursor.execute("START TRANSACTION")
         
         # find a matching fileset and lock it for update
-        cursor.execute("""SELECT id, experiment, instrument, run_type, run_number 
-                    FROM fileset AS fs
-                    WHERE  fs.fk_fileset_status = %s AND fs.locked = FALSE
-                    ORDER BY fs.created ASC LIMIT 1 FOR UPDATE""", (stat_id,) )
+        fmt = ','.join(['%s']*len(status))
+        cursor.execute("""SELECT fs.id AS id, experiment, instrument, run_type, run_number, stat.name as status
+                    FROM fileset AS fs, fileset_status_def AS stat
+                    WHERE stat.name IN (""" + fmt + """) AND fs.fk_fileset_status = stat.id AND fs.locked = FALSE
+                    ORDER BY fs.created ASC LIMIT 1 FOR UPDATE""", tuple(status) )
         rows = cursor.fetchall()
         
         if rows :
@@ -265,13 +273,44 @@ class InterfaceDb ( object ) :
                 cursor = self.cursor()
                 rows = cursor.execute("SELECT name FROM files WHERE fk_fileset_id = %s", (fs['id'],) )
                 rows = cursor.fetchall()
-                if not rows:
-                    raise _DatabaseOperatonFailed("No files in fileset #%d" % fs['id'])
                 fs['xtc_files'] = [ r[0] for r in rows ]
 
         cursor.execute("COMMIT")
         return fs
 
+    # ======================
+    # Add files to a fileset
+    # ======================
+    
+    def add_files (self, fs_id, type, files):
+    
+        # critical sections begins
+        lock = self.getlock()
+        
+        cursor = self.cursor()
+        
+        q = """INSERT INTO files (fk_fileset_id,name,type) VALUES (%s,%s,%s)"""
+        cursor.executemany ( q, [(fs_id,name,type) for name in files] )
+        
+        cursor.execute("COMMIT")
+
+
+    # ================================
+    # Note where the file was archived
+    # ================================
+    
+    def archive_file (self, fs_id, name, archive_dir) :
+        
+        # critical sections begins
+        lock = self.getlock()
+        
+        cursor = self.cursor()
+        
+        q = """UPDATE files SET archive_dir = %s WHERE fk_fileset_id = %s AND name = %s"""
+        cursor.execute ( q, (archive_dir, fs_id, name) )
+
+        cursor.execute("COMMIT")
+        
     # ===================================
     # Test if this Controller should exit
     # ===================================
@@ -279,6 +318,9 @@ class InterfaceDb ( object ) :
     def test_exit_controller ( self, controller_id ) :
         """Check the kill field for this controller"""
 
+        # critical sections begins
+        lock = self.getlock()
+        
         cursor = self.cursor()
         
         cursor.execute( "SELECT kill_ic FROM interface_controller WHERE id=%s", (controller_id,) )
@@ -289,12 +331,16 @@ class InterfaceDb ( object ) :
         else:
             raise _DatabaseOperatonFailed("Failed to obtain kill field for controller id: %d" % controller_id)
 
+
     # ===================================
     # Test if this Translator should exit
     # ===================================
 
     def test_exit_translator ( self, translator_id ) :
         """Check the kill field for this translator"""
+
+        # critical sections begins
+        lock = self.getlock()
 
         cursor = self.cursor()
         
@@ -312,27 +358,31 @@ class InterfaceDb ( object ) :
     # Change the status of a fileset and all files it contains
     # ========================================================
 
-    def change_fileset_status ( self, fileset_id, status_id ) :
+    def change_fileset_status ( self, fileset_id, status ) :
 
         """ change the fileset to the requested status"""
+
+        # critical sections begins
+        lock = self.getlock()
 
         cursor = self.cursor()
         
         cursor.execute("START TRANSACTION")
-        cursor.execute("""UPDATE fileset SET fk_fileset_status = %s, locked = FALSE 
-            WHERE fileset.id = %s""", (status_id, fileset_id) )
-        cursor.execute("""UPDATE files SET fk_fileset_status = %s 
-            WHERE files.fk_fileset_id = %s""", (status_id, fileset_id) )
+        cursor.execute("""UPDATE fileset SET fk_fileset_status = (SELECT id FROM fileset_status_def WHERE name=%s), locked = FALSE 
+            WHERE fileset.id = %s""", (status, fileset_id) )
         cursor.execute("COMMIT")
 
     # =====================================
     # Insert row for new translator process
     # =====================================
 
-    def new_translator ( self, ctlr_id,  fs_id) :
+    def new_translator ( self, ctlr_id,  fs_id ) :
 
         """Add a row for this translator process. Update statistics after run is complete.
         Return the id of the new row for later update"""
+
+        # critical sections begins
+        lock = self.getlock()
 
         cursor = self.cursor()
 
@@ -363,6 +413,9 @@ class InterfaceDb ( object ) :
         usage = resource.getrusage(resource.RUSAGE_CHILDREN)
         diff = tuple([ usage[x]-perf_prev[x] for x in range(0,16) ])
         
+        # critical sections begins
+        lock = self.getlock()
+
         cursor = self.cursor()
         
         cursor.execute("START TRANSACTION")
@@ -384,6 +437,9 @@ class InterfaceDb ( object ) :
     def update_irods_status ( self, translator_id, status_code) :
         """Update the irods status in the row for this translator process."""
 
+        # critical sections begins
+        lock = self.getlock()
+        
         cursor = self.cursor()
         
         cursor.execute("START TRANSACTION")
@@ -399,6 +455,9 @@ class InterfaceDb ( object ) :
     def exit_controller ( self, controller_id ) :
         """Update the stop time for the controller and exit"""
 
+        # critical sections begins
+        lock = self.getlock()
+        
         cursor = self.cursor()
 
         endtime = Time.now().toString("%F %T")
