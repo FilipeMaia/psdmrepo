@@ -21,8 +21,6 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
-#unixodbc_ver = "2.2.12"
-
 PREFIX  = "/usr"
 INCDIR  = "include/mysql"
 INCLUDES = " ".join((
@@ -51,6 +49,7 @@ INCLUDES = " ".join((
   "typelib.h",
   "xmalloc.h" ))
 LIBDIR  = "lib/mysql"
+if env['LUSI_ARCH_PROC'] == 'x86_64' : LIBDIR  = "lib64/mysql"
 PKGLIBS = "mysqlclient"
 LINKLIBS = "libmysqlclient.so*"
 standardExternalPackage ( 'mysql', **locals() )
