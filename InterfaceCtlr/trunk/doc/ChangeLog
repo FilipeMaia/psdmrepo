@@ -11,6 +11,10 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-04
+2009-09-25 Andy Salnikov
+- updated st.Controller script
+
 Tag: V00-03-03
 2009-09-24 Andy Salnikov
 - controller can run multiple translators now, maximum number is
