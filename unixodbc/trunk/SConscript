@@ -27,6 +27,7 @@ PREFIX  = "/usr"
 INCDIR  = "include"
 INCLUDES = "autotest.h odbcinst*.h sql.h sqlext.h sqltypes.h sqlucode.h uodbc_stats.h"
 LIBDIR  = "lib"
+if env['LUSI_ARCH_PROC'] == 'x86_64' : LIBDIR  = "lib64"
 PKGLIBS = "odbc"
 LINKLIBS = "libodbc.so*"
 standardExternalPackage ( 'unixodbc', **locals() )
