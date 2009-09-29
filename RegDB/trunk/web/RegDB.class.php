@@ -75,6 +75,22 @@ class RegDB {
         return $this->find_experiments_by_ ( 'instr_id='.$instrument->id() );
     }
 
+    public function find_experiment ( $instrument_name, $experiment_name ) {
+
+        $instrument = $this->find_instrument_by_name( $instrument_name );
+        if( !$instrument )
+            throw new RegDBException (
+                __METHOD__,
+                "no such instrument in the database" );
+
+        $experiments = $this->find_experiments_by_ ( 'instr_id='.$instrument->id()." AND name='{$experiment_name}'" );
+        if( count( $experiments ) == 0 ) return null;
+        if( count( $experiments ) == 1 ) return $experiments[0];
+        throw new RegDBException (
+            __METHOD__,
+            "inconsistent results returned fromthe database. The database may be corrupted." );
+    }
+
     private function find_experiments_by_ ( $condition='' ) {
 
         $list = array();
@@ -337,8 +353,8 @@ class RegDB {
     public function posix_group_members ( $name ) {
         return $this->connection->posix_group_members( $name ); }
 
-    public function user_accounts () {
-        return $this->connection->user_accounts(); }
+    public function user_accounts ( $user='*' ) {
+        return $this->connection->user_accounts( $user ); }
 
 }
 

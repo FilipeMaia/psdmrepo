@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2009-09-28 Igor Gaponenko
+- extended PHP API to allow searching LDAP users
+
 Tag: V00-00-11
 2009-08-28 Igor Gaponenko
 - protect RegDB Web App and relevant Web services from unauthorized

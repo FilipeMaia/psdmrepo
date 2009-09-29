@@ -225,14 +225,19 @@ class RegDBConnection {
         return $result;
     }
 
-    public function user_accounts () {
+    public function user_accounts ( $name='*' ) {
 
         $this->connect();
 
         $groups = $this->groups();
         $user2groups = $this->user2groups( $groups );
 
-        $sr = ldap_search( $this->ldap_ds, "ou=People,dc=reg,o=slac", "uid=*" );
+        $trim_name = trim( $name );
+        if( $trim_name == '' )
+            throw new RegDBException (
+                __METHOD__,
+               "group name can't be empty" );
+        $sr = ldap_search( $this->ldap_ds, "ou=People,dc=reg,o=slac", "uid=$trim_name" );
         if( !$sr )
             throw new RegDBException (
                 __METHOD__,
@@ -412,6 +417,8 @@ $conn = new RegDBConnection (
     REGDB_DEFAULT_LDAP_HOST );
 
 try {
+    $list = $conn->user_accounts( "gapon" );
+    print_r( $list );
     $list = $conn->posix_group_members( "ec" );
     print_r( $list );
     $groups = $conn->groups();
