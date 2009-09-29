@@ -25,6 +25,7 @@
 #include <mysql/mysql.h>
 
 #include <iostream>
+#include <fstream>
 using namespace std ;
 
 //-------------------------------
@@ -42,6 +43,93 @@ using namespace std ;
 //		----------------------------------------
 
 namespace LogBook {
+
+//-------------
+// Functions --
+//-------------
+
+/**
+  * Parse the next line of a configuration file.
+  *
+  * The lines are expected to have the following format:
+  *
+  *   <key>=[<value>]
+  *
+  * The function will also check that the specified key is the one found
+  * in the line.
+  *
+  * @return 'true' and set a value of the parameter, or 'false' otherwise
+  */
+bool
+parse_next_line (std::string& value, const char* key, std::ifstream& str)
+{
+    std::string line;
+    if( str >> line ) {
+        const size_t separator_pos = line.find( '=' );
+        if( separator_pos != std::string::npos ) {
+            const std::string key = line.substr( 0, separator_pos );
+            if( key == line.substr( 0, separator_pos )) {
+                value = line.substr( separator_pos + 1 );
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+/**
+  * Return a pointinr onto a C-style string or null pointer if the input string is empty
+  */
+inline
+const char*
+string_or_null (const std::string& str)
+{
+    if( str.empty()) return 0 ;
+    return str.c_str();
+}
+
+/**
+  * Establish database connection for the specified parameters
+  */
+MYSQL*
+connect2server (const std::string& host,
+                const std::string& user,
+                const std::string& password,
+                const std::string& db) throw (DatabaseError)
+{
+    // Prepare the connection object
+    //
+    MYSQL* mysql = 0;
+    if( !(mysql = mysql_init( mysql )))
+        throw DatabaseError( "error in mysql_init(): insufficient memory to allocate an object" );
+
+    // Set trhose attributes which should be initialized before setting up
+    // a connection.
+    //
+    ;
+
+    // Connect now
+    //
+    if( !mysql_real_connect(
+        mysql,
+        string_or_null( host ),
+        string_or_null( user ),
+        string_or_null( password ),
+        string_or_null( db ),
+        0,  // connect to the default TCP port
+        0,  // no defaulkt UNIX socket
+        0   // no default client flag
+        ))
+        throw DatabaseError( std::string( "error in mysql_real_connect(): " ) + mysql_error(mysql));
+
+    // Set connection attributes
+    //
+    if( mysql_query( mysql, "SET SESSION SQL_MODE='ANSI'" ) ||
+        mysql_query( mysql, "SET SESSION AUTOCOMMIT=0" ))
+        throw DatabaseError( std::string( "error in mysql_query(): " ) + mysql_error(mysql));
+
+    return mysql;
+}
 
 //-------------
 // Operators --
@@ -85,73 +173,86 @@ operator<< (std::ostream& s, const ParamInfo& p)
     return s ;
 }
 
-//---------------------------------
-// Static members initialization --
-//---------------------------------
-
-Connection*
-Connection::s_conn = 0 ;
-
 //------------------
 // Static methods --
 //------------------
 
 Connection*
-Connection::open (const char* host,
-                  const char* user,
-                  const char* password,
-                  const char* logbook,
-                  const char* regdb) throw (DatabaseError)
+Connection::open ( const std::string& config) throw (WrongParams,
+                                                     DatabaseError)
 {
-    // Disconnect from the previously connected database (if any)
+    if( config.empty())
+        throw WrongParams( "error in Connection::open(): found 0 pointer instead of configuration file" );
+
+    // Read configuration parameters and decript the passwords.
     //
-    if ( s_conn != 0 ) {
-        delete s_conn ;
-        s_conn = 0 ;
-    }
+    ifstream config_file( config.c_str());
+    if( !config_file.good())
+        throw WrongParams( "error in Connection::open(): failed to open the configuration file" );
 
+    std::string logbook_host;
+    std::string logbook_user;
+    std::string logbook_password;
+    std::string logbook_db;
 
-    // Prepare the connection object
+    std::string regdb_host;
+    std::string regdb_user;
+    std::string regdb_password;
+    std::string regdb_db;
+
+    std::string ifacedb_host;
+    std::string ifacedb_user;
+    std::string ifacedb_password;
+    std::string ifacedb_db;
+
+    if( !( parse_next_line( logbook_host,     "logbook_host",     config_file ) &&
+           parse_next_line( logbook_user,     "logbook_user",     config_file ) &&
+           parse_next_line( logbook_password, "logbook_password", config_file ) &&
+           parse_next_line( logbook_db,       "logbook_db",       config_file ) &&
+
+           parse_next_line( regdb_host,       "regdb_host",       config_file ) &&
+           parse_next_line( regdb_user,       "regdb_user",       config_file ) &&
+           parse_next_line( regdb_password,   "regdb_password",   config_file ) &&
+           parse_next_line( regdb_db,         "regdb_db",         config_file ) &&
+
+           parse_next_line( ifacedb_host,     "ifacedb_host",     config_file ) &&
+           parse_next_line( ifacedb_user,     "ifacedb_user",     config_file ) &&
+           parse_next_line( ifacedb_password, "ifacedb_password", config_file ) &&
+           parse_next_line( ifacedb_db,       "ifacedb_db",       config_file )))
+
+         throw WrongParams( "error in Connection::open(): failed to parse the configuration file" );
+
+    // Open and configure connections, and create the API object.
     //
-    MYSQL* mysql = 0;
-    if( !(mysql = mysql_init( mysql )))
-        throw DatabaseError( "error in mysql_init(): insufficient memory to allocate an object" );
+    return new ConnectionImpl (
+        connect2server ( logbook_host, logbook_user, logbook_password, logbook_db ),
+        connect2server (   regdb_host,   regdb_user,   regdb_password,   regdb_db ),
+        connect2server ( ifacedb_host, ifacedb_user, ifacedb_password, ifacedb_db )) ;
+}
 
-    // Set trhose attributes which should be initialized before setting up
-    // a connection.
+Connection*
+Connection::open ( const std::string& logbook_host,
+                   const std::string& logbook_user,
+                   const std::string& logbook_password,
+                   const std::string& logbook_db,
+
+                   const std::string& regdb_host,
+                   const std::string& regdb_user,
+                   const std::string& regdb_password,
+                   const std::string& regdb_db,
+
+                   const std::string& ifacedb_host,
+                   const std::string& ifacedb_user,
+                   const std::string& ifacedb_password,
+                   const std::string& ifacedb_db ) throw (WrongParams,
+                                                          DatabaseError)
+{
+    // Open and configure connections, and create the API object.
     //
-    ;
-
-    // Connect now
-    //
-    if( !mysql_real_connect(
-        mysql, host, user, password,
-        0,  // no default database
-        0,  // connect to the default TCP port
-        0,  // no defaulkt UNIX socket
-        0   // no default client flag
-        ))
-        throw DatabaseError( std::string( "error in mysql_real_connect(): " ) + mysql_error(mysql));
-
-    // Set connection attributes
-    //
-    if( mysql_query( mysql, "SET SESSION SQL_MODE='ANSI'" ) ||
-        mysql_query( mysql, "SET SESSION AUTOCOMMIT=0" ))
-        throw DatabaseError( std::string( "error in mysql_query(): " ) + mysql_error(mysql));
-
-    // Finally, initialize the connector
-    //
-    ConnectionParams conn_params;
-    {
-        conn_params.host = ( host == 0 ? "" : host );
-        conn_params.user = ( user == 0 ? "" : user );
-        conn_params.using_password = !password;
-        conn_params.logbook = logbook;
-        conn_params.regdb = regdb;
-    }
-    s_conn = new ConnectionImpl ( mysql, conn_params ) ;
-
-    return s_conn ;
+    return new ConnectionImpl (
+        connect2server ( logbook_host, logbook_user, logbook_password, logbook_db ),
+        connect2server (   regdb_host,   regdb_user,   regdb_password,   regdb_db ),
+        connect2server ( ifacedb_host, ifacedb_user, ifacedb_password, ifacedb_db )) ;
 }
 
 //----------------

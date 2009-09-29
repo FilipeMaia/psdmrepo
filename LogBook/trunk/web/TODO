@@ -1,7 +1,7 @@
 ______
 URGENT
 
-- write C++ client for RegDB & LogBook and give it to Chris O'Grady
++ write C++ client for RegDB & LogBook and give it to Chris O'Grady
 
 - continue discussing the security model for web apps. One idea suggested by Amedeo
   was to implement the group-based security for LogBook:
@@ -36,6 +36,8 @@ URGENT
 
 - test hpss client developed by Andy H. and installed on psdm. See his last message
   with the following subject "hpsscp" posted on August 31, 2009.
+
++ set up cron-tab on 'psdb' to make daily 'mysqldump' of all databases onto an NFS disk
 
 - discuss MySQL replication with Arash Alavi to see what would be the most reliable
   protocol for switching servers in case of a failure.
@@ -137,8 +139,6 @@ EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
   ATTENTION: This feature would require extending the database schema to keep a track
   of the changes made to an attachment. The simplest way would be to add shadow
   tables for: header, entry, tag and attachment.
-
-- set up cron-tab on 'psdb' to make daily 'mysqldump' of all databases onto an NFS disk
 
 - revisit the server and applications security (SQL injection, giving too much information in
   error reports, etc.)

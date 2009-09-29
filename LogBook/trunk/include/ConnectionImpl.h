@@ -105,10 +105,12 @@ public:
     /**
       * Normal constructor.
       *
-      * Take over the MySQL connection structure. Use it to make queries
-      * and dispose it when destroying this object.
+      * Take over the MySQL connection structures. Use them to make queries
+      * and dispose them when destroying this object.
       */
-    ConnectionImpl (MYSQL* mysql, const ConnectionParams& conn_params ) ;
+    ConnectionImpl (MYSQL* logbook_mysql,
+                    MYSQL*   regdb_mysql,
+                    MYSQL* ifacedb_mysql) ;
 
     /**
       * Destructor.
@@ -116,16 +118,6 @@ public:
       * @see method Connection::~Connection()
       */
     virtual ~ConnectionImpl () throw () ;
-
-    /**
-      * Get connection parameters.
-      *
-      * @see method Connection::connParams()
-      */
-    virtual ConnectionParams connParams () const 
-    {
-        return m_conn_params ;
-    }
 
     /**
       * Begin the transaction.
@@ -246,7 +238,7 @@ public:
      virtual void createRun (const std::string&    instrument,
                              const std::string&    experiment,
                              int                   run,
-                             const std::string&    type,
+                             const std::string&    run_type,
                              const LusiTime::Time& beginTime,
                              const LusiTime::Time& endTime) throw (WrongParams,
                                                                    DatabaseError) ;
@@ -259,7 +251,7 @@ public:
      virtual void beginRun (const std::string&    instrument,
                             const std::string&    experiment,
                             int                   run,
-                            const std::string&    type,
+                            const std::string&    run_type,
                             const LusiTime::Time& beginTime) throw (WrongParams,
                                                                     DatabaseError) ;
 
@@ -274,6 +266,27 @@ public:
                           const LusiTime::Time& endTime) throw (WrongParams,
                                                                 DatabaseError) ;
 
+     /**
+      * Tell OFFLINE to save files for a run (OFFLINE will search for files).
+      *
+      * @see method Connection::saveFiles()
+      */
+     virtual void saveFiles (const std::string& instrument,
+                             const std::string& experiment,
+                             int                run,
+                             const std::string& run_type) throw (WrongParams,
+                                                                 DatabaseError) ;
+     /**
+      * Tell OFFLINE to save files for a run (expect an explicit list of files).
+      */
+     virtual void saveFiles (const std::string& instrument,
+                             const std::string& experiment,
+                             int                run,
+                             const std::string& run_type,
+                             const std::vector<std::string >& files,
+                             const std::vector<std::string >& file_types) throw (WrongParams,
+                                                                                 DatabaseError) ;
+
     /**
       * Create new run parameter.
       *
@@ -282,7 +295,7 @@ public:
     virtual void createRunParam (const std::string& instrument,
                                  const std::string& experiment,
                                  const std::string& parameter,
-                                 const std::string& type,
+                                 const std::string& parameter_type,
                                  const std::string& description) throw (WrongParams,
                                                                         DatabaseError) ;
 
@@ -447,9 +460,9 @@ private:
                           const std::string& experiment,
                           int                run,
                           const std::string& parameter,
-                          const std::string& proposed_type) throw (ValueTypeMismatch,
-                                                                   WrongParams,
-                                                                   DatabaseError) ;
+                          const std::string& parameter_type) throw (ValueTypeMismatch,
+                                                                    WrongParams,
+                                                                    DatabaseError) ;
 
     /**
       * The actual implementation of` the operation for all types of parameter
@@ -463,7 +476,7 @@ private:
                           int                run,
                           const std::string& parameter,
                           T                  value,
-                          const std::string& type,
+                          const std::string& parameter_type,
                           const std::string& source,
                           bool               updateAllowed) throw (ValueTypeMismatch,
                                                                    WrongParams,
@@ -472,12 +485,12 @@ private:
     /**
       * Execure a simple query which won't produce any result set.
       */
-    void simpleQuery (const std::string& query) throw (DatabaseError) ;
+    void simpleQuery (MYSQL* mysql, const std::string& query) throw (DatabaseError) ;
 
     /**
       * A fron-end to mysql_real_escape_string()
       */
-    std::string escape_string (const std::string& str) const throw () ;
+    std::string escape_string (MYSQL* mysql, const std::string& str) const throw () ;
 
 private:
 
@@ -485,9 +498,9 @@ private:
 
     bool m_is_started ;     // there is an active transaction
 
-    MYSQL* m_mysql ;
-
-    ConnectionParams m_conn_params ;
+    MYSQL* m_logbook_mysql ;
+    MYSQL* m_regdb_mysql ;
+    MYSQL* m_ifacedb_mysql ;
 };
 
 //------------------
@@ -501,7 +514,7 @@ ConnectionImpl::setRunParamImpl (const std::string& instrument,
                                  int                run,
                                  const std::string& parameter,
                                  T                  value,
-                                 const std::string& type,
+                                 const std::string& parameter_type,
                                  const std::string& source,
                                  bool               updateAllowed) throw (ValueTypeMismatch,
                                                                           WrongParams,
@@ -522,8 +535,8 @@ ConnectionImpl::setRunParamImpl (const std::string& instrument,
     if (!findRunParam (paramDescr, instrument, experiment, parameter))
         throw WrongParams ("unknown parameter") ;
 
-    if (paramDescr.type != type)
-        throw ValueTypeMismatch ("unexpected parameter type") ;
+    if (paramDescr.type != parameter_type)
+        throw ValueTypeMismatch ("unexpected parameter type: "+parameter_type) ;
 
     // Check if the parameter's value already exists in the database.
     // If so, and if the update is allowed - then do rthe update
@@ -543,28 +556,30 @@ ConnectionImpl::setRunParamImpl (const std::string& instrument,
     if (updating) {
 
         std::ostringstream sql_1;
-        sql_1 << "UPDATE " << m_conn_params.logbook << ".run_val"
-            << " SET source='" << this->escape_string (source) << "', updated=" << LusiTime::Time::to64 (now) << " WHERE run_id=" << runDescr.id
+        sql_1 << "UPDATE run_val"
+              << " SET source='" << this->escape_string (m_logbook_mysql, source)
+              << "', updated=" << LusiTime::Time::to64 (now) << " WHERE run_id=" << runDescr.id
               << " AND param_id=" << paramDescr.id ;
-        this->simpleQuery (sql_1.str()) ;
+        this->simpleQuery (m_logbook_mysql, sql_1.str()) ;
 
         std::ostringstream sql_2;
-        sql_2 << "UPDATE " << m_conn_params.logbook << ".run_val_" << type
+        sql_2 << "UPDATE run_val_" << parameter_type
               << " SET val=" << value << " WHERE run_id=" << runDescr.id
               << " AND param_id=" << paramDescr.id;
-        this->simpleQuery (sql_2.str()) ;
+        this->simpleQuery (m_logbook_mysql, sql_2.str()) ;
 
     } else {
 
         std::ostringstream sql_1;
-        sql_1 << "INSERT INTO " << m_conn_params.logbook << ".run_val"
-              << " VALUES(" << runDescr.id << "," << paramDescr.id << ",'" << this->escape_string (source) << "', " << LusiTime::Time::to64 (now) << ")" ;
-        this->simpleQuery (sql_1.str()) ;
+        sql_1 << "INSERT INTO run_val"
+              << " VALUES(" << runDescr.id << "," << paramDescr.id << ",'"
+              << this->escape_string (m_logbook_mysql, source) << "', " << LusiTime::Time::to64 (now) << ")" ;
+        this->simpleQuery (m_logbook_mysql, sql_1.str()) ;
 
         std::ostringstream sql_2;
-        sql_2 << "INSERT INTO " << m_conn_params.logbook << ".run_val_" << type
+        sql_2 << "INSERT INTO run_val_" << parameter_type
               << " VALUES(" << runDescr.id << "," << paramDescr.id << "," << value << ")" ;
-        this->simpleQuery (sql_2.str()) ;
+        this->simpleQuery (m_logbook_mysql, sql_2.str()) ;
     }
 }
 

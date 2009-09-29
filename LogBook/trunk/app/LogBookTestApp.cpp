@@ -26,6 +26,7 @@
 #include <exception>
 
 #include <stdio.h>
+#include <strings.h>
 
 //----------------------
 // Base Class Headers --
@@ -168,6 +169,9 @@ private:
     int cmd_set_run_param     () throw (std::exception) ;
     int cmd_display_run_param () throw (std::exception) ;
 
+    int cmd_save_files        () throw (std::exception) ;
+    int cmd_save_files_m      () throw (std::exception) ;
+
 private:
 
     // Command line options and arguments
@@ -176,6 +180,7 @@ private:
     AppUtils::AppCmdArgList<std::string > m_args ;
 
     AppUtils::AppCmdOpt<std::string >  m_source ;
+    AppUtils::AppCmdOpt<std::string >  m_config_file ;
     AppUtils::AppCmdOpt<std::string >  m_host ;
     AppUtils::AppCmdOpt<std::string >  m_user ;
     AppUtils::AppCmdOpt<std::string >  m_password ;
@@ -203,6 +208,11 @@ LogBookTestApp::LogBookTestApp (const std::string& appName) :
               "string",
               "a source of the modification",
               "TEST"),
+    m_config_file ('c',
+                   "config-file",
+                   "string",
+                   "Configuration file with MySQL connection parameters",
+                   ""),
     m_host ('H',
             "host",
             "string",
@@ -227,6 +237,7 @@ LogBookTestApp::LogBookTestApp (const std::string& appName) :
     addArgument (m_command) ;
     addArgument (m_args) ;
     addOption   (m_source) ;
+    addOption   (m_config_file) ;
     addOption   (m_host) ;
     addOption   (m_user) ;
     addOption   (m_password) ;
@@ -255,10 +266,26 @@ LogBookTestApp::runApp ()
 
         // Connect to the database
         //
-        m_connection = LogBook::Connection::open (
-            m_host.value().c_str(),
-            m_user.value().c_str(),
-            m_password.value().c_str()) ;
+        if( !m_config_file.value().empty())
+            m_connection = LogBook::Connection::open ( m_config_file.value()) ;
+        else
+            m_connection = LogBook::Connection::open (
+
+                m_host.value().c_str(),
+                m_user.value().c_str(),
+                m_password.value().c_str(),
+                "LogBook",
+
+                m_host.value().c_str(),
+                m_user.value().c_str(),
+                m_password.value().c_str(),
+                "RegDB",
+
+                m_host.value().c_str(),
+                m_user.value().c_str(),
+                m_password.value().c_str(),
+                "interface_db"
+            ) ;
         if (!m_connection) {
             MsgLogRoot( error, "failed to connect to the server" ) ;
             return 2 ;
@@ -276,6 +303,8 @@ LogBookTestApp::runApp ()
         else if (command == "run_parameters")    return cmd_run_parameters ();
         else if (command == "set_run_param")     return cmd_set_run_param ();
         else if (command == "display_run_param") return cmd_display_run_param ();
+        else if (command == "save_files")        return cmd_save_files ();
+        else if (command == "save_files_m")      return cmd_save_files_m ();
         else {
             MsgLogRoot( error, "unknown command") ;
             return 2 ;
@@ -314,6 +343,9 @@ LogBookTestApp::cmd_help ()
          << "\n"
          << "  set_run_param     <instrument> <experiment> <run> <param> <value> {INT|DOUBLE|TEXT}\n"
          << "  display_run_param <instrument> <experiment> <run> <param>\n"
+         << "\n"
+         << "  save_files       <instrument> <experiment> <run> {DATA|CALIB}\n"
+         << "  save_files_m     <instrument> <experiment> <run> {DATA|CALIB} [ <file1> {XTC|EPICS} ] [ <file>2 {XTC|EPICS} ] ...\n"
          << "\n"
          << "NOTES ON PARAMETERS:\n"
          << "\n"
@@ -384,6 +416,18 @@ LogBookTestApp::cmd_help ()
          << "  display_run_param\n"
          << "\n"
          << "    - display a value (if any) of a run parameter set for a run.\n"
+         << "\n"
+         << "  save_files\n"
+         << "\n"
+         << "    - tell OFFLINE to further process (translate from the XTC into HDF5\n"
+         << "      representation, archive, etc.) data files of a run.\n"
+         << "\n"
+         << "  save_files_m\n"
+         << "\n"
+         << "    - tell OFFLINE to further process (translate from the XTC into HDF5\n"
+         << "      representation, archive, etc.) data files of a run. Unlike the previous\n"
+         << "      command this one will also register the specified files in the data set\n"
+         << "      associated with the run.\n"
          << endl ;
 
     return 0 ;
@@ -675,7 +719,7 @@ LogBookTestApp::cmd_set_run_param () throw (std::exception)
     std::string        value      = *(itr++) ;
     const  std::string type       = *(itr++) ;
 
-    if (type == "INT") {
+    if (!strcasecmp ("INT", type.c_str())) {
 
         int value_int ;
         if (1 != sscanf(value.c_str(), "%d", &value_int)) {
@@ -693,7 +737,7 @@ LogBookTestApp::cmd_set_run_param () throw (std::exception)
             m_update.value () > 0) ;
         m_connection->commitTransaction () ;
 
-    } else if (type == "DOUBLE") {
+    } else if (!strcasecmp ("DOUBLE", type.c_str())) {
 
         double value_double ;
         if (1 != sscanf(value.c_str(), "%lf", &value_double)) {
@@ -711,7 +755,7 @@ LogBookTestApp::cmd_set_run_param () throw (std::exception)
             m_update.value () > 0) ;
         m_connection->commitTransaction () ;
 
-    } else if (type == "TEXT") {
+    } else if (!strcasecmp ("TEXT", type.c_str())) {
 
         m_connection->beginTransaction () ;
         m_connection->setRunParam (
@@ -818,6 +862,69 @@ LogBookTestApp::cmd_display_run_param () throw (std::exception)
 
     cout << "SOURCE:  " << source << "\n";
     cout << "UPDATED: " << updated << "\n";
+
+    return 0 ;
+}
+
+int
+LogBookTestApp::cmd_save_files () throw (std::exception)
+{
+    // Parse and verify the arguments
+    //
+    if (m_args.empty() || m_args.size() != 4) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument = *(itr++) ;
+    const std::string  experiment = *(itr++) ;
+    const unsigned int run        = LogBook::str2int (*(itr++)) ;
+    const std::string  run_type   = *(itr++) ;
+
+    m_connection->beginTransaction () ;
+    m_connection->saveFiles (
+        instrument,
+        experiment,
+        run,
+        run_type) ;
+    m_connection->commitTransaction () ;
+
+    return 0 ;
+}
+
+int
+LogBookTestApp::cmd_save_files_m () throw (std::exception)
+{
+    // Parse and verify the arguments
+    //
+    if (m_args.empty() || m_args.size() < 4 || m_args.size() % 2) {
+        MsgLogRoot (error, "insufficient number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument = *(itr++) ;
+    const std::string  experiment = *(itr++) ;
+    const unsigned int run        = LogBook::str2int (*(itr++)) ;
+    const std::string  run_type   = *(itr++) ;
+    const size_t       num_files  = (m_args.size() - 4) / 2 ;
+    std::vector<std::string > files      (num_files) ;
+    std::vector<std::string > file_types (num_files) ;
+    for (size_t i = 0; i < num_files; i++) {
+        const std::string file = *(itr++) ;
+        const std::string type = *(itr++) ;
+        files      [i] = file ;
+        file_types [i] = type ;
+    }
+
+    m_connection->beginTransaction () ;
+    m_connection->saveFiles (
+        instrument,
+        experiment,
+        run,
+        run_type,
+        files,
+        file_types) ;
+    m_connection->commitTransaction () ;
 
     return 0 ;
 }

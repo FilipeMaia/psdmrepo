@@ -42,17 +42,6 @@
 namespace LogBook {
 
 /**
-  * Connection parameters information structure.
-  */
-struct ConnectionParams {
-    std::string host ;          // database host name
-    std::string user ;          // database user account name
-    bool        using_password ;// a flag indicating of a pasword iss required to connect
-    std::string logbook ;       // database name for LogBook
-    std::string regdb ;         // database name for RegDB
-} ;
-
-/**
   * Experiment descriptor.
   *
   * Data members of the class represent properties of the experiment
@@ -133,13 +122,6 @@ public:
       * "endTransaction()" methods declared below.
       */
     virtual ~Connection () throw () ;
-
-    // Selectors (const)
-
-    /**
-      * Get connection parameters.
-      */
-    virtual ConnectionParams connParams () const = 0 ;
 
     // ------------------------------------------------------------
     // ------------- Transaction management methods ---------------
@@ -287,6 +269,11 @@ public:
     // --------------------------------------------------------------------
 
     /** Allocate next run number
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"   : to report wrong parameters (non-existing experiment, etc.)
+      *   "DatabaseError" : to report database related problems
       */
      virtual int allocateRunNumber (const std::string& instrument,
                                     const std::string& experiment) throw (WrongParams,
@@ -314,7 +301,7 @@ public:
      virtual void createRun (const std::string&    instrument,
                              const std::string&    experiment,
                              int                   run,
-                             const std::string&    type,
+                             const std::string&    run_type,
                              const LusiTime::Time& beginTime,
                              const LusiTime::Time& endTime) throw (WrongParams,
                                                                    DatabaseError) = 0 ;
@@ -342,14 +329,14 @@ public:
      virtual void beginRun (const std::string&    instrument,
                             const std::string&    experiment,
                             int                   run,
-                            const std::string&    type,
+                            const std::string&    run_type,
                             const LusiTime::Time& beginTime) throw (WrongParams,
                                                                     DatabaseError) = 0 ;
 
      /**
       * End a previously started run.
       *
-      * The method would close an open-enede run in the database.
+      * The method would close an open-ended run in the database.
       *
       * EXCEPTIONS:
       *
@@ -364,6 +351,56 @@ public:
                           int                   run,
                           const LusiTime::Time& endTime) throw (WrongParams,
                                                                 DatabaseError) = 0 ;
+
+     /**
+      * Tell OFFLINE to save files for a run (OFFLINE will search for files).
+      *
+      * The method would create a data set in the Interface Controller Database
+      * for further processing, archival, etc.
+      *
+      * NOTE:
+      *
+      *   This method should be moved elsewhere in a separate API.
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"   : to report wrong parameters (non-existing experiment, etc.)
+      *   "DatabaseError" : to report database related problems
+      *
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+     virtual void saveFiles (const std::string& instrument,
+                             const std::string& experiment,
+                             int                run,
+                             const std::string& run_type) throw (WrongParams,
+                                                                 DatabaseError) = 0 ;
+
+     /**
+      * Tell OFFLINE to save files for a run (expect an explicit list of files).
+      *
+      * The method would create a data set in the Interface Controller Database
+      * for further processing, archival, etc.
+      *
+      * NOTE:
+      *
+      *   This method should be moved elsewhere in a separate API.
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"   : to report wrong parameters (non-existing experiment, etc.)
+      *   "DatabaseError" : to report database related problems
+      *
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+     virtual void saveFiles (const std::string& instrument,
+                             const std::string& experiment,
+                             int                run,
+                             const std::string& run_type,
+                             const std::vector<std::string >& files,
+                             const std::vector<std::string >& file_types) throw (WrongParams,
+                                                                                 DatabaseError) = 0 ;
 
     /**
       * Create new run parameter.
@@ -391,7 +428,7 @@ public:
     virtual void createRunParam (const std::string& instrument,
                                  const std::string& experiment,
                                  const std::string& parameter,
-                                 const std::string& type,
+                                 const std::string& parameter_type,
                                  const std::string& description) throw (WrongParams,
                                                                         DatabaseError) = 0 ;
 
@@ -472,33 +509,51 @@ private:
 public:
 
     /**
-      * Establish the connection.
+      * Read the parameters file and establish database connection(s)
       *
-      * The connection will be open using the specified  connection parameters.
+      * The connection will be open using the specified connection parameters.
       * In case of a success, a valid pointer is returned. The object's ownership
       * is also retured by the method. So, don't forget to delete the object!
       *
       * EXCEPTIONS:
       *
+      *   "WrongParams"   : to report missing, unreadable or inappropriate parameters file
       *   "DatabaseError" : to report database related problems
       *
+      * @see class WrongParams
       * @see class DatabaseError
       */
-    static Connection* open ( const char* host     = 0,         // default: localhost
-                              const char* user     = 0,         // default: UNIX user account
-                              const char* password = 0,         // default: no password
-                              const char* logbook  = "LogBook",
-                              const char* regdb    = "RegDB" ) throw (DatabaseError) ;
+    static Connection* open ( const std::string& config ) throw (WrongParams,
+                                                                 DatabaseError) ;
 
-    // Selectors (const)
-
-    // Modifiers
-
-private:
-
-    // Data members
-
-    static Connection* s_conn ; // cached connection (if any)
+    /**
+      * Establish database connection(s) using specified parameters
+      *
+      * The connection will be open using the specified connection parameters.
+      * In case of a success, a valid pointer is returned. The object's ownership
+      * is also retured by the method. So, don't forget to delete the object!
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"   : to report missing, unreadable or inappropriate parameters file
+      *   "DatabaseError" : to report database related problems
+      *
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+    static Connection* open ( const std::string& logbook_host,
+                              const std::string& logbook_user,
+                              const std::string& logbook_password,
+                              const std::string& logbook_db,
+                              const std::string& regdb_host,
+                              const std::string& regdb_user,
+                              const std::string& regdb_password,
+                              const std::string& regdb_db,
+                              const std::string& ifacedb_host,
+                              const std::string& ifacedb_user,
+                              const std::string& ifacedb_password,
+                              const std::string& ifacedb_db ) throw (WrongParams,
+                                                                     DatabaseError) ;
 } ;
 
 } // namespace LogBook
