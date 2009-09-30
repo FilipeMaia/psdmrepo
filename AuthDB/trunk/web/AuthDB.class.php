@@ -9,6 +9,71 @@ require_once( 'RegDB/RegDB.inc.php' );
  */
 class AuthDB {
 
+    // ---------------------------------------------------
+    // --- SIMPLIFIED INTERFACE AND ITS IMPLEMENTATION ---
+    // ---------------------------------------------------
+
+    private static $instance = null;
+
+    /**
+     * Singleton to simplify certain operations.
+     *
+     * @return unknown_type
+     */
+    public static function instance() {
+        if( is_null( AuthDB::$instance )) AuthDB::$instance = new AuthDB();
+        return AuthDB::$instance;
+    }
+
+    public function authName() {
+        return $_SERVER['REMOTE_USER'];
+    }
+
+    public function authType() {
+        return $_SERVER['AUTH_TYPE'];
+    }
+
+    public function isAuthenticated() {
+        return AuthDB::instance()->authName() != '';
+    }
+
+    public function canRead() {
+    	// Anyone who's been authenticated can read the contents of
+    	// this database.
+    	//
+        return $this->isAuthenticated();
+    }
+
+    public function canEdit() {
+        if( !$this->isAuthenticated()) return false;
+        $this->begin();
+        return $this->hasRole(
+            $this->authName(), null, 'RoleDB', 'Admin' );
+    }
+
+    public static function reporErrorHtml( $message, $link=null ) {
+        $suggested_back_link =
+            is_null($link) ?
+            'the <b>BACK</b> button of your browser' :
+            '<a href="'.$link.'">here</a>';
+        return <<<HERE
+<center>
+  <br>
+  <br>
+  <div style="background-color:#f0f0f0; border:solid 2px red; max-width:640px;">
+    <h1 style="color:red;">Authorization Error</h1>
+    <div style="height:2px; background-color:red;"></div>
+    <p>{$message}</p>
+    <p>Click {$suggested_back_link} to return to the previous context</p>
+  </div>
+</center>
+HERE;
+    }
+
+    // -----------------------------------------
+    // --- CORE CLASS AND ITS IMPLEMENTATION ---
+    // -----------------------------------------
+    
     /* Data members
      */
     private $connection;
@@ -26,7 +91,7 @@ class AuthDB {
         $database = null ) {
 
         $this->connection =
-            new LogBookConnection (
+            new AuthDBConnection (
                 is_null($host)     ? AUTHDB_DEFAULT_HOST : $host,
                 is_null($user)     ? AUTHDB_DEFAULT_USER : $user,
                 is_null($password) ? AUTHDB_DEFAULT_PASSWORD : $password,
@@ -153,7 +218,7 @@ class AuthDB {
             "SELECT * FROM user u, role r".
             " WHERE r.name='{$role}' AND r.app='{$app}'".
             " AND u.user='{$user}' AND u.role_id=r.id".
-            " AND u.exp_id={$exper_id}";
+            ( is_null($exper_id) ? "" : " AND u.exp_id={$exper_id}" );
         $result = $this->connection->query ( $sql );
 
         $nrows = mysql_numrows( $result );
@@ -197,8 +262,8 @@ class AuthDB {
             "SELECT * FROM user u, role r, priv p".
             " WHERE p.name='{$priv}' AND p.role_id=r.id AND r.app='{$app}'".
             " AND u.user='{$user}' AND u.role_id=r.id".
-            " AND u.exp_id={$exper_id}";
-        $result = $this->connection->query ( $sql );
+            (is_null($exper_id) ? "" : " AND u.exp_id={$exper_id}");
+         $result = $this->connection->query ( $sql );
 
         $nrows = mysql_numrows( $result );
         return $nrows >= 1;

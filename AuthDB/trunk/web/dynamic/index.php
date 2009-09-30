@@ -173,28 +173,31 @@ Custom JavaScript
 <!--
 PHP Generated JavaScript with initialization parameters
 -->
+<script type="text/javascript">
+
 <?php
 
-echo <<<HERE
-    <script type="text/javascript">
+require_once('AuthDB/AuthDB.inc.php');
 
-HERE;
+try {
+    $auth_svc = AuthDB::instance();
 
-echo <<<HERE
+    $can_read = $auth_svc->canRead() ? 'true' : 'false';
+    $can_edit = $auth_svc->canEdit() ? 'true' : 'false';
+    
+    echo <<<HERE
 
 /* Authentication and authorization context
  */
-var auth_type="{$_SERVER['AUTH_TYPE']}";
-var auth_remote_user="{$_SERVER['REMOTE_USER']}";
-
-var auth_webauth_user="{$_SERVER['WEBAUTH_USER']}";
+var auth_type="{$auth_svc->authType()}";
+var auth_remote_user="{$auth_svc->authName()}";
+ 
 var auth_webauth_token_creation="{$_SERVER['WEBAUTH_TOKEN_CREATION']}";
 var auth_webauth_token_expiration="{$_SERVER['WEBAUTH_TOKEN_EXPIRATION']}";
 
 var auth_granted = {
-  manage_roles : auth_remote_user != '',
-  manage_users : auth_remote_user != '',
-  view_ldap    : auth_remote_user != '' };
+  read : {$can_read},
+  edit : {$can_edit} };
 
 function refresh_page() {
     window.location = "{$_SERVER['REQUEST_URI']}";
@@ -274,7 +277,7 @@ menubar_data.push ( {
     title_style: 'font-weight:bold;',
     itemdata: [
         { text: "Select..", url: "javascript:list_roles()" },
-        { text: "Create New..", url: "javascript:create_role()", disabled: !auth_granted.manage_roles } ],
+        { text: "Create New..", url: "javascript:create_role()", disabled: !auth_granted.edit } ],
     disabled: false }
 );
 var menubar_users_home = menubar_data.length;
@@ -285,7 +288,7 @@ menubar_data.push ( {
     title_style: 'font-weight:bold;',
     itemdata: [
         { text: "Select..", url: "javascript:list_role_players()" },
-        { text: "Add New..", url: "javascript:add_role_player()", disabled: !auth_granted.manage_users } ],
+        { text: "Add New..", url: "javascript:add_role_player()", disabled: !auth_granted.edit } ],
     disabled: false }
 );
 var menubar_groups_home = menubar_data.length;
@@ -297,7 +300,7 @@ menubar_data.push ( {
     itemdata: [
         { text: "POSIX Groups..", url: "javascript:list_groups()" },
         { text: "User accounts..", url: "javascript:list_accounts()" } ],
-    disabled: !auth_granted.view_ldap }
+    disabled: !auth_granted.read }
 );
 var menubar_group_help = menubar_data.length;
 menubar_data.push ( {
@@ -513,33 +516,6 @@ function create_button( elementId, func2proceed, disabled ) {
     return this;
 }
 
-function create_params_table( source, paginator ) {
-    this.tableShown = false;
-    this.oPushButton = new YAHOO.widget.Button( "params_button" );
-    this.oPushButton.on (
-        "click",
-        function( p_oEvent ) {
-
-            document.getElementById('params').innerHTML=
-                '  <div id="params_table_paginator"></div>'+
-                '  <div id="params_table_body"></div>';
-
-            if( !this.tableShown ) {
-                var table = new Table (
-                    "params",
-                    [ { key: "name",        sortable: true,  resizeable: true },
-                      { key: "value",       sortable: false, resizeable: true },
-                      { key: "description", sortable: false, resizeable: true } ],
-                    source,
-                    paginator
-                );
-                //table.refreshTable();
-            }
-            this.tableShown = !this.tableShown;
-        }
-    );
-}
-
 function create_privileges_table_editable( source, paginator ) {
 
     document.getElementById('privileges').innerHTML=
@@ -658,8 +634,8 @@ var ROLES_APPS   = 1,   // applications
 
 var roles_tree = null;
 
-var default_application_msg = '&lt;select application&gt;';
-var default_role_msg        = '&lt;select role&gt;';
+var default_application_msg = '&lt;application&gt;';
+var default_role_msg        = '&lt;role&gt;';
 
 var selected_application = default_application_msg;
 var selected_role_name   = default_role_msg;
@@ -709,10 +685,10 @@ function list_roles() {
         '  <table><thead>'+
         '    <tr>'+
         '      <td>'+
-        '        <table style="width:400px;"><thead>'+
+        '        <table style="width:500px;"><thead>'+
         '          <tr>'+
         '            <td>'+
-        '              <div id="selected_application" style="margin-left:10px; min-width:75px; margin-right:10px; font-weight:bold;">'+default_application_msg+'</div></td>'+
+        '              <div id="selected_application" style="margin-left:10px; width:125px; margin-right:10px; font-weight:bold;">'+default_application_msg+'</div></td>'+
         '            <td>'+
         '              <button id="delete_application_button" >Delete Appl</button>'+
         '            </td>'+
@@ -722,10 +698,11 @@ function list_roles() {
         '          </tr>'+
         '          <tr>'+
         '            <td>'+
-        '              <div id="selected_role" style="margin-left:10px; min-width:75px; margin-right:10px; font-weight:bold;">'+default_role_msg+'</div></td>'+
+        '              <div id="selected_role" style="margin-left:10px; width:125px; margin-right:10px; font-weight:bold;">'+default_role_msg+'</div></td>'+
         '            <td>'+
         '              <button id="delete_role_button" >Delete Role</button>'+
-        '              <button id="edit_role_button" >Edit</button>'+
+        '              <button id="edit_role_button" >Edit Role</button>'+
+        '              <button id="add_player_button" >Add Player</button>'+
         '            </td>'+
         '          </tr>'+
         '        </thead></table>'+
@@ -755,7 +732,7 @@ function list_roles() {
     DeleteRoleButton.set( 'disabled', true );
     DeleteRoleButton.on (
         "click",
-        function( p_oEvent ) { delete_role( selected_role_id ); }
+        function( p_oEvent ) { delete_role( selected_application, selected_role_name, selected_role_id ); }
     );
     var EditRoleButton = new YAHOO.widget.Button( "edit_role_button" );
     EditRoleButton.set( 'disabled', true );
@@ -763,7 +740,12 @@ function list_roles() {
         "click",
         function( p_oEvent ) { alert("not implemented yet"); }
     );
-
+	var AddPlayerButton = new YAHOO.widget.Button( "add_player_button" );
+	AddPlayerButton.set( 'disabled', true );
+	AddPlayerButton.on (
+        "click",
+        function( p_oEvent ) { add_role_player(); }
+    );
     var navarea = document.getElementById('navarea');
     navarea.style.display = 'block';
     navarea.innerHTML=
@@ -799,6 +781,7 @@ function list_roles() {
         var delete_application_disabled = true;
         var delete_role_disabled        = true;
         var edit_role_disabled          = true;
+        var add_player_disabled         = true;
         if( node.data.type == ROLES_APPS) {
             selected_application = default_application_msg;
             selected_role_name   = default_role_msg;
@@ -812,6 +795,7 @@ function list_roles() {
             delete_application_disabled = false;
             delete_role_disabled        = false;
             edit_role_disabled          = false;
+            add_player_disabled         = false;
             selected_application = node.data.application;
             selected_role_name   = node.data.name;
             selected_role_id     = node.data.role_id;
@@ -822,6 +806,7 @@ function list_roles() {
         DeleteApplicationButton.set( 'disabled', delete_application_disabled );
         DeleteRoleButton.set( 'disabled', delete_role_disabled );
         EditRoleButton.set( 'disabled', edit_role_disabled );
+        AddPlayerButton.set( 'disabled', add_player_disabled );
     }
 
     function loadNodeData( node, fnLoadComplete ) {
@@ -922,6 +907,10 @@ function list_roles() {
 
 function delete_application( application_name ) {
 
+	if( application_name == 'RoleDB' ) {
+		alert( 'You can not delete application "'+application_name+'" using this interface!' );
+		return;
+	}
     var dialog_id = "popupdialogs";
     var dialog_title = '<em style="color:red; font-weight:bold; font-size:18px;">Delete Selected Application?</em>';
     var dialog_body =
@@ -945,7 +934,12 @@ function delete_application( application_name ) {
     );
 }
 
-function delete_role( role_id ) {
+function delete_role( application_name, role_name, role_id ) {
+
+	if(( application_name == 'RoleDB' ) && ( role_name == 'Admin' )) {
+		alert( 'You can not delete role "'+role_name+'" of application '+application_name+'" using this interface!' );
+		return;
+	}
 
     var dialog_id = "popupdialogs";
     var dialog_title = '<em style="color:red; font-weight:bold; font-size:18px;">Delete Selected Role?</em>';
@@ -1052,7 +1046,7 @@ function create_role( ) {
             document.create_role_form.privileges.value = privileges.toJSON();
             document.create_role_form.submit();
         },
-        !auth_granted.manage_roles
+        !auth_granted.edit
     );
     var cancel = create_button (
         "cancel_button",
@@ -1060,7 +1054,7 @@ function create_role( ) {
 }
 
 
-/* Role playerss browser.
+/* Role players browser.
  */
 var PLAYERS_INSTR = 1,  // instruments
     PLAYERS_EXPER = 2,  // experiments
@@ -1086,7 +1080,7 @@ function list_role_players() {
         '  The tree shown on the left of the page allows to select an experiment'+
         '  and privileges for applications which are registed in the database.'+
         '  By clicking on a role one can see a table with a list of <b>Role Players</b> associated with'+
-        '  that role accross all known instruments/experiments. Th etable will be created in a separate section below.'+
+        '  that role accross all known instruments/experiments. The table will be created in a separate section below.'+
         '  A role player can be either a single user or a group of users.'+
         '  </p>'+
         '</div>'+
@@ -1291,7 +1285,7 @@ function add_role_player( ) {
             }
             document.create_player_form.submit();
         },
-        !auth_granted.manage_users
+        !auth_granted.edit
     );
     var cancel = create_button (
         "cancel_button",
@@ -1299,13 +1293,9 @@ function add_role_player( ) {
     );
 }
 
-
-
-
-
-
 function list_groups() {
-
+	list_groups_grid('vertical');
+/*
     set_context(
         'Select POSIX Group >' );
 
@@ -1325,6 +1315,18 @@ function list_groups() {
         true
     );
     table.refreshTable();
+*/
+}
+
+function list_groups_grid( orientation ) {
+
+    set_context(
+        'Select POSIX Group >' );
+
+    reset_navarea();
+    reset_workarea();
+
+    load('../regdb/RequestGroups.php?grid='+orientation, 'workarea');
 }
 
 function view_group( name ) {
@@ -1445,3 +1447,10 @@ HERE;
 -->
 </body>
 </html>
+
+<?php
+
+} catch( AuthDBException $e ) {
+    print $e->toHtml();
+}
+?>

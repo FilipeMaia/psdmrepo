@@ -128,12 +128,20 @@ HERE;
     } else if( $type == PLAYERS ) {
         $roles = $authdb->roles( $exper_id );
         foreach( $roles as $r ) {
-          if( $first ) {
-              $first = false;
-              echo "\n".role2json( $r );
-          } else {
-              echo ",\n".role2json( $r );
-          }
+        	// Skip roles which are known not to be associated with particular experiments
+        	//
+        	// TODO: This is a request from Andy Salnikov.
+        	//
+        	if( $r->application() == 'RoleDB' ) {
+        		;
+        	} else {
+          		if( $first ) {
+            	  	$first = false;
+        	      	echo "\n".role2json( $r );
+    	      	} else {
+	              	echo ",\n".role2json( $r );
+    	      	}
+          	}
         }
     }
     print <<< HERE

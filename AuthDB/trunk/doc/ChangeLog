@@ -11,6 +11,15 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+Tag: V00-00-02
+2009-09-30 Igor Gaponenko
+- IDE migration from NetBeans to Eclipse
+- not showing RoleDB role players in a scope of a particular experiment
+- extended API of the AuthDB interface for the AuthDB Web app
+- improved view of POSIX groups  at the AuthDB Web app
+- other improvements at the AuthDB Web app
+
 Tag: V00-00-01
 2009-09-28 Igor Gaponenko
 - the first implementation of the Authorization Database Web application
