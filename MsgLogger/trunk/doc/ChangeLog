@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2009-09-29 Andy Salnikov
+- MsgLogStream.h: changed the name of the temporary stream in macros to
+  avoid name collision with other variables
+- added an option to enable thread safety in MsgHandlerStdStreams.cpp, 
+  see README
+
 Tag: V00-00-07
 2008-12-17 Andy Salnikov
 - set correct svn properties on all files

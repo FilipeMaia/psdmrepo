@@ -199,3 +199,13 @@ And one more envvar with the name MSGLOGTIMEFMT controls the output
 format of the time stamps, One more example:
 
     setenv MSGLOGTIMEFMT "%D %T.%f"
+    
+    
+Thread safety
+-------------
+
+The output to standard streams is not thread safe by default. It is 
+possible to enable thread safety if the application utilizes more
+than one thread by setting environment variable:
+
+    setenv MSGLOGTHREADSAFE

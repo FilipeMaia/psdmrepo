@@ -58,8 +58,8 @@ extern "C" {
 #endif
 #define MsgLog(logger,sev,msg) \
   if ( MsgLogger::MsgLogger(logger).logging(MsgLogger::MsgLogLevel(MsgLogger::MsgLogLevel::sev)) ) { \
-    MsgLogger::MsgLogStream stream(logger, MsgLogger::MsgLogLevel(MsgLogger::MsgLogLevel::sev), __FILE__, __LINE__) ;\
-    stream.ostream_hack() << msg ; \
+    MsgLogger::MsgLogStream _msg_log_stream_123(logger, MsgLogger::MsgLogLevel(MsgLogger::MsgLogLevel::sev), __FILE__, __LINE__) ;\
+    _msg_log_stream_123.ostream_hack() << msg ; \
   }
 
 #ifdef MsgLogRoot
@@ -67,8 +67,8 @@ extern "C" {
 #endif
 #define MsgLogRoot(sev,msg) \
   if ( MsgLogger::MsgLogger().logging(MsgLogger::MsgLogLevel(MsgLogger::MsgLogLevel::sev)) ) { \
-    MsgLogger::MsgLogStream stream(MsgLogger::MsgLogLevel(MsgLogger::MsgLogLevel::sev), __FILE__, __LINE__) ;\
-    stream.ostream_hack() << msg ; \
+    MsgLogger::MsgLogStream _msg_log_stream_123(MsgLogger::MsgLogLevel(MsgLogger::MsgLogLevel::sev), __FILE__, __LINE__) ;\
+    _msg_log_stream_123.ostream_hack() << msg ; \
   }
 
 #ifdef WithMsgLog

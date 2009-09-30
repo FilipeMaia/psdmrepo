@@ -31,6 +31,7 @@ extern "C" {
 //---------------
 #include <iostream>
 #include <string>
+#include <boost/thread/mutex.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -86,6 +87,8 @@ public:
 protected:
 
 private:
+
+  mutable boost::mutex m_mutex ;
 
   // Disable copy
   MsgHandlerStdStreams( const MsgHandlerStdStreams& );

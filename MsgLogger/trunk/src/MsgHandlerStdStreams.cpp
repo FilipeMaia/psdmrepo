@@ -53,6 +53,7 @@ namespace MsgLogger {
 // Constructor
 MsgHandlerStdStreams::MsgHandlerStdStreams()
   : MsgHandler()
+  , m_mutex()
 {
 }
 
@@ -69,6 +70,9 @@ MsgHandlerStdStreams::log ( const MsgLogRecord& record ) const
     return false ;
   }
 
+  static bool threadSafe = getenv("MSGLOGTHREADSAFE") ;
+  if (threadSafe) m_mutex.lock() ;
+
   if ( record.level() <= MsgLogLevel::info ) {
     formatter().format ( record, std::cout ) ;
     std::cout << std::endl ;
@@ -76,6 +80,9 @@ MsgHandlerStdStreams::log ( const MsgLogRecord& record ) const
     formatter().format ( record, std::cerr ) ;
     std::cerr << std::endl ;
   }
+
+  if (threadSafe) m_mutex.unlock() ;
+
   return true ;
 }
 
