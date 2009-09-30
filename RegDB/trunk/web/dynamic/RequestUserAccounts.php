@@ -5,7 +5,11 @@ require_once('RegDB/RegDB.inc.php');
 /*
  * This script will process a request for displaying user accounts.
  */
-if( !RegDBAuth::isAuthenticated()) return;
+if( !RegDBAuth::instance()->canRead()) {
+    print( RegDBAuth::reporErrorHtml(
+        'You are not authorized to read the users info'));
+    exit;
+}
 
 function account2json( $account ) {
     $groups_str = '';

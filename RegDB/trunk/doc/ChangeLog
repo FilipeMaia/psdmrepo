@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+Tag: V00-00-13
+2009-09-30 Igor Gaponenko
+- IDE migration from NetBeans to Eclipse
+- added AuthDB protection for RegDB Web app
+- improved view for POSIX groups
+
 Tag: V00-00-12
 2009-09-28 Igor Gaponenko
 - extended PHP API to allow searching LDAP users

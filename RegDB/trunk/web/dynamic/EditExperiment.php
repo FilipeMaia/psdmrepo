@@ -5,7 +5,11 @@ require_once('RegDB/RegDB.inc.php');
 /*
  * This script will process a request for modifying parameters of an experiment.
  */
-if( !RegDBAuth::isAuthenticated()) return;
+if( !RegDBAuth::instance()->canEdit()) {
+    print( RegDBAuth::reporErrorHtml(
+        'You are not authorized to manage the contents of the Experiment Registry Database'));
+    exit;
+}
 
 if( isset( $_GET['id'] )) {
     $id = trim( $_GET['id'] );

@@ -154,29 +154,32 @@ Custom JavaScript
 <!--
 PHP Generated JavaScript with initialization parameters
 -->
+<script type="text/javascript">
+
 <?php
 
-echo <<<HERE
-    <script type="text/javascript">
+require_once('RegDB/RegDB.inc.php');
 
-HERE;
 
-echo <<<HERE
+try {
+    $auth_svc = RegDBAuth::instance();
+
+    $can_read = $auth_svc->canRead() ? 'true' : 'false';
+    $can_edit = $auth_svc->canEdit() ? 'true' : 'false';
+    
+    echo <<<HERE
 
 /* Authentication and authorization context
  */
-var auth_type="{$_SERVER['AUTH_TYPE']}";
-var auth_remote_user="{$_SERVER['REMOTE_USER']}";
+var auth_type="{$auth_svc->authType()}";
+var auth_remote_user="{$auth_svc->authName()}";
 
-var auth_webauth_user="{$_SERVER['WEBAUTH_USER']}";
 var auth_webauth_token_creation="{$_SERVER['WEBAUTH_TOKEN_CREATION']}";
 var auth_webauth_token_expiration="{$_SERVER['WEBAUTH_TOKEN_EXPIRATION']}";
 
 var auth_granted = {
-  manage_experiments : auth_remote_user != '',
-  manage_instruments : auth_remote_user != '',
-  manage_runs        : auth_remote_user != '',
-  view_ldap          : auth_remote_user != '' };
+  read : {$can_read},
+  edit : {$can_edit} };
 
 function refresh_page() {
     window.location = "{$_SERVER['REQUEST_URI']}";
@@ -236,10 +239,11 @@ echo <<<HERE
   auth_timer_restart();
 
 }
-</script>
 
 HERE;
 ?>
+
+</script>
 
 <!--
 Page-specific script
@@ -279,7 +283,7 @@ menubar_data.push ( {
     title_style: 'font-weight:bold;',
     itemdata: [
         { text: "Select..", url: "javascript:list_experiments()" },
-        { text: "Create New..", url: "javascript:create_experiment()", disabled: !auth_granted.manage_experiments } ],
+        { text: "Create New..", url: "javascript:create_experiment()", disabled: !auth_granted.edit } ],
     disabled: false }
 );
 var menubar_instruments_home = menubar_data.length;
@@ -290,7 +294,7 @@ menubar_data.push ( {
     title_style: 'font-weight:bold;',
     itemdata: [
         { text: "Select..", url: "javascript:list_instruments()" },
-        { text: "Create New..", url: "javascript:create_instrument()", disabled: !auth_granted.manage_instruments } ],
+        { text: "Create New..", url: "javascript:create_instrument()", disabled: !auth_granted.edit } ],
     disabled: false }
 );
 var menubar_groups_home = menubar_data.length;
@@ -302,7 +306,7 @@ menubar_data.push ( {
     itemdata: [
         { text: "PODIX Groups..", url: "javascript:list_groups()" },
         { text: "User accounts..", url: "javascript:list_users()" } ],
-    disabled: !auth_granted.view_ldap }
+    disabled: !auth_granted.read }
 );
 var menubar_runnumbers_home = menubar_data.length;
 menubar_data.push ( {
@@ -768,12 +772,12 @@ function view_experiment( id, name ) {
     var action_edit = create_button (
         "edit_button",
         function() { edit_experiment( id, name ); },
-        !auth_granted.manage_experiments );
+        !auth_granted.edit );
 
     var action_delete = create_button (
         "delete_button",
         function() { delete_experiment( id, name ); },
-        !auth_granted.manage_experiments );
+        !auth_granted.edit );
 }
 
 function edit_experiment( id, name ) {
@@ -822,7 +826,7 @@ function edit_experiment( id, name ) {
             document.edit_experiment_form.params.value = params.toJSON();
             document.edit_experiment_form.submit();
         },
-        !auth_granted.manage_experiments
+        !auth_granted.edit
     );
 
     var cancel = create_button (
@@ -870,7 +874,7 @@ function create_experiment( ) {
             document.create_experiment_form.params.value = params.toJSON();
             document.create_experiment_form.submit();
         },
-        !auth_granted.manage_experiments
+        !auth_granted.edit
     );
     var cancel = create_button (
         "cancel_button",
@@ -926,7 +930,7 @@ function delete_experiment( id, name ) {
                 function() { view_experiment( id, name ); }
             );
         },
-        !auth_granted.manage_experiments
+        !auth_granted.edit
     );
     var cancel = create_button (
         "cancel_button",
@@ -996,12 +1000,12 @@ function view_instrument( id, name ) {
     var action_edit = create_button (
         "edit_button",
         function() { edit_instrument( id, name ); },
-        !auth_granted.manage_instruments
+        !auth_granted.edit
     );
     var action_delete = create_button (
         "delete_button",
         function() { delete_instrument( id, name ); },
-        !auth_granted.manage_instruments
+        !auth_granted.edit
     );
 }
 
@@ -1050,7 +1054,7 @@ function edit_instrument( id, name ) {
             document.edit_instrument_form.params.value = params.toJSON();
             document.edit_instrument_form.submit();
         },
-        !auth_granted.manage_instruments
+        !auth_granted.edit
     );
     var cancel = create_button (
         "cancel_button",
@@ -1100,7 +1104,7 @@ function create_instrument( ) {
             document.create_instrument_form.params.value = params.toJSON();
             document.create_instrument_form.submit();
         },
-        !auth_granted.manage_instruments
+        !auth_granted.edit
     );
     var cancel = create_button (
         "cancel_button",
@@ -1157,7 +1161,7 @@ function delete_instrument( id, name ) {
                 function() { view_instrument( id, name ); }
             );
         },
-        !auth_granted.manage_instruments
+        !auth_granted.edit
     );
     var cancel = create_button (
         "cancel_button",
@@ -1174,6 +1178,8 @@ function delete_instrument( id, name ) {
 
 function list_groups() {
 
+	list_groups_grid('vertical');
+/*
     set_context(
         'Select POSIX Group >' );
 
@@ -1190,6 +1196,15 @@ function list_groups() {
         true
     );
     table.refreshTable();
+*/
+}
+
+function list_groups_grid( orientation ) {
+
+    set_context(
+        'Select POSIX Group >' );
+
+    load('../regdb/RequestGroups.php?grid='+orientation, 'workarea');
 }
 
 function view_group( name ) {
@@ -1295,7 +1310,7 @@ function view_run_numbers( id, name ) {
     var generate = create_button (
         "generate_button",
         function() { document.generate_run_form.submit(); },
-        !auth_granted.manage_runs
+        !auth_granted.edit
     );
     var runs = create_runs_table (
         'RequestRunNumbers.php?exper_id='+id,
@@ -1368,3 +1383,12 @@ HERE;
 -->
 </body>
 </html>
+
+<?php
+
+} catch( AuthDBException $e ) {
+    print $e->toHtml();
+} catch( RegDBException $e ) {
+    print $e->toHtml();
+}
+?>

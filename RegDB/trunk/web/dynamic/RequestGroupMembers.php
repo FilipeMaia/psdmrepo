@@ -5,7 +5,12 @@ require_once('RegDB/RegDB.inc.php');
 /*
  * This script will process a request for displaying members of a POSIX group.
  */
-if( !RegDBAuth::isAuthenticated()) return;
+
+if( !RegDBAuth::instance()->canRead()) {
+    print( RegDBAuth::reporErrorHtml(
+        'You are not authorized to read the group members info'));
+    exit;
+}
 
 if( isset( $_GET['name'] )) {
     $name = trim( $_GET['name'] );

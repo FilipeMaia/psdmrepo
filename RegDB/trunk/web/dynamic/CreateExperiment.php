@@ -5,7 +5,12 @@ require_once('RegDB/RegDB.inc.php');
 /*
  * This script will lay out a form for creating a new experiment.
  */
-if( !RegDBAuth::isAuthenticated()) return;
+
+if( !RegDBAuth::instance()->canEdit()) {
+    print( RegDBAuth::reporErrorHtml(
+        'You are not authorized to manage the contents of the Experiment Registry Database'));
+    exit;
+}
 
 /* Proceed with the operation
  */

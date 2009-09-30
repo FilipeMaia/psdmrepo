@@ -7,7 +7,11 @@ require_once('RegDB/RegDB.inc.php');
  * for an experiment. The run record will get permanently stored in
  * the database.
  */
-if( !RegDBAuth::isAuthenticated()) return;
+if( !RegDBAuth::instance()->canEdit()) {
+    print( RegDBAuth::reporErrorHtml(
+        'You are not authorized to manage the contents of the Experiment Registry Database'));
+    exit;
+}
 
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
