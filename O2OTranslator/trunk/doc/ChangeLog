@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2009-09-29 Andy Salnikov
+- implement merging of the XTC files from several streams/chunks, the
+  scheme relies on a particular naming convention defined in 
+  O2OXtcFileName class
+
 Tag: V00-01-01
 2009-09-14 Andy Salnikov
 - SciMD API has changed to use instrument name, migrating this package

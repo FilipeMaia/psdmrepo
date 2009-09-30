@@ -1,12 +1,12 @@
-#ifndef O2OTRANSLATOR_DGRAMREADER_H
-#define O2OTRANSLATOR_DGRAMREADER_H
+#ifndef O2OTRANSLATOR_O2OXTCFILENAME_H
+#define O2OTRANSLATOR_O2OXTCFILENAME_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class DgramReader.
+//	Class O2OXtcFileName.
 //
 //------------------------------------------------------------------------
 
@@ -14,16 +14,15 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
-#include <list>
 
 //----------------------
 // Base Class Headers --
 //----------------------
 
+
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "O2OTranslator/O2OXtcFileName.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,10 +34,8 @@
 
 namespace O2OTranslator {
 
-class DgramQueue ;
-
 /**
- *  Thread which reads datagrams from the list of XTC files
+ *  Representation of the XTC file name.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
@@ -50,31 +47,54 @@ class DgramQueue ;
  *  @author Andrei Salnikov
  */
 
-class DgramReader  {
+class O2OXtcFileName  {
 public:
 
-  typedef std::list<O2OXtcFileName> FileList ;
-
   // Default constructor
-  DgramReader (const FileList& files, DgramQueue& queue, size_t maxDgSize ) ;
+  O2OXtcFileName() ;
+  O2OXtcFileName( const std::string& path ) ;
 
   // Destructor
-  ~DgramReader () ;
+  ~O2OXtcFileName () {}
 
-  // this is the "run" method used by the Boost.thread
-  void operator() () ;
+  // get full name
+  const std::string& path() const { return m_path ; }
+
+  // get base name
+  std::string basename() const ;
+
+  // get experiment number
+  unsigned expNum() const { return m_expNum ; }
+
+  // get run number
+  unsigned run() const { return m_run ; }
+
+  // get stream number
+  unsigned stream() const { return m_stream ; }
+
+  // get chunk number
+  unsigned chunk() const { return m_chunk ; }
+
+  // compare two names
+  bool operator<( const O2OXtcFileName& other ) const ;
 
 protected:
+
+  // helper methods
+  void _exception() const ;
+  unsigned _cvt ( const char* ptr ) const ;
 
 private:
 
   // Data members
-  FileList m_files ;
-  DgramQueue& m_queue ;
-  size_t m_maxDgSize ;
+  std::string m_path ;
+  unsigned m_expNum ;
+  unsigned m_run ;
+  unsigned m_stream ;
+  unsigned m_chunk ;
 
 };
 
 } // namespace O2OTranslator
 
-#endif // O2OTRANSLATOR_DGRAMREADER_H
+#endif // O2OTRANSLATOR_O2OXTCFILENAME_H

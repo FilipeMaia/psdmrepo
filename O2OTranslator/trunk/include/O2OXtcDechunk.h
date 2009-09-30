@@ -1,12 +1,12 @@
-#ifndef O2OTRANSLATOR_DGRAMREADER_H
-#define O2OTRANSLATOR_DGRAMREADER_H
+#ifndef O2OTRANSLATOR_O2OXTCDECHUNK_H
+#define O2OTRANSLATOR_O2OXTCDECHUNK_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class DgramReader.
+//	Class O2OXtcDechunk.
 //
 //------------------------------------------------------------------------
 
@@ -15,6 +15,7 @@
 //-----------------
 #include <string>
 #include <list>
+#include <stdio.h>
 
 //----------------------
 // Base Class Headers --
@@ -23,6 +24,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/xtc/Dgram.hh"
+#include "pdsdata/xtc/XtcFileIterator.hh"
 #include "O2OTranslator/O2OXtcFileName.h"
 
 //------------------------------------
@@ -35,10 +38,8 @@
 
 namespace O2OTranslator {
 
-class DgramQueue ;
-
 /**
- *  Thread which reads datagrams from the list of XTC files
+ *  Class which merges the chunks from a single XTC stream
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
@@ -50,31 +51,40 @@ class DgramQueue ;
  *  @author Andrei Salnikov
  */
 
-class DgramReader  {
+class O2OXtcDechunk  {
 public:
 
-  typedef std::list<O2OXtcFileName> FileList ;
-
-  // Default constructor
-  DgramReader (const FileList& files, DgramQueue& queue, size_t maxDgSize ) ;
+  // Constructor accepts the list of files, the files will be sorted
+  // based on the chunk number extracted from files name.
+  O2OXtcDechunk ( const std::list<O2OXtcFileName>& files, size_t maxDgSize ) ;
 
   // Destructor
-  ~DgramReader () ;
+  ~O2OXtcDechunk () ;
 
-  // this is the "run" method used by the Boost.thread
-  void operator() () ;
+  // read next datagram, return zero pointer after last file has been read,
+  // throws exception for errors.
+  Pds::Dgram* next() ;
+
+  // get current file name
+  O2OXtcFileName chunkName() const ;
 
 protected:
 
 private:
 
   // Data members
-  FileList m_files ;
-  DgramQueue& m_queue ;
+  std::list<O2OXtcFileName> m_files ;
   size_t m_maxDgSize ;
+  std::list<O2OXtcFileName>::const_iterator m_iter ;
+  FILE* m_file ;
+  Pds::XtcFileIterator* m_dgiter ;
+
+  // Copy constructor and assignment are disabled by default
+  O2OXtcDechunk ( const O2OXtcDechunk& ) ;
+  O2OXtcDechunk& operator = ( const O2OXtcDechunk& ) ;
 
 };
 
 } // namespace O2OTranslator
 
-#endif // O2OTRANSLATOR_DGRAMREADER_H
+#endif // O2OTRANSLATOR_O2OXTCDECHUNK_H

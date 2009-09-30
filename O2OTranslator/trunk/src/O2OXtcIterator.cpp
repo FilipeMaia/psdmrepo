@@ -89,9 +89,10 @@ O2OXtcIterator::process(Xtc* xtc)
 
   } else {
 
-    MsgLogRoot( error, "O2OXtcIterator::process -- data object not at Source level: "
+    MsgLogRoot( warning, "O2OXtcIterator::process -- data object at "
+                << Pds::Level::name(xtc->src.level()) << " level: "
                 << Pds::TypeId::name(type) << "/" << version ) ;
-    result = 0;
+
   }
 
   return result ;

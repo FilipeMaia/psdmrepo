@@ -26,9 +26,8 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/DgramQueue.h"
-#include "O2OTranslator/O2OExceptions.h"
+#include "O2OTranslator/O2OXtcMerger.h"
 #include "pdsdata/xtc/Dgram.hh"
-#include "pdsdata/xtc/XtcFileIterator.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -43,7 +42,7 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-DgramReader::DgramReader ( const StringList& files, DgramQueue& queue, size_t maxDgSize )
+DgramReader::DgramReader ( const FileList& files, DgramQueue& queue, size_t maxDgSize )
   : m_files( files )
   , m_queue( queue )
   , m_maxDgSize( maxDgSize )
@@ -61,36 +60,11 @@ DgramReader::~DgramReader ()
 void
 DgramReader::operator() ()
 {
-  typedef StringList::const_iterator StringIter ;
-  for ( StringIter eventFileIter = m_files.begin() ; eventFileIter != m_files.end() ; ++ eventFileIter ) {
+  O2OTranslator::O2OXtcMerger iter(m_files,m_maxDgSize);
+  while ( Pds::Dgram* dg = iter.next() ) {
 
-    // get the file names
-    const std::string& eventFile = *eventFileIter ;
-
-    MsgLogRoot( info, "processing file: " << eventFile ) ;
-
-    // open input xtc file
-    FILE* xfile = fopen( eventFile.c_str(), "rb" );
-    if ( ! xfile ) {
-      MsgLogRoot( error, "failed to open input XTC file: " << eventFile ) ;
-      // this is fatal error, stop here
-      throw O2OFileOpenException(eventFile) ;
-    }
-
-    // iterate over events in xtc file
-    Pds::XtcFileIterator iter( xfile, m_maxDgSize ) ;
-    while ( Pds::Dgram* dg = iter.next() ) {
-
-      // make a copy
-      char* dgbuf = (char*)dg ;
-      size_t dgsize = sizeof(Pds::Dgram) + dg->xtc.sizeofPayload();
-      char* buf = new char[dgsize] ;
-      std::copy( dgbuf, dgbuf+dgsize, buf ) ;
-
-      // move it to the queue
-      m_queue.push ( (Pds::Dgram*)buf ) ;
-
-    }
+    // move it to the queue
+    m_queue.push ( dg ) ;
 
   }
 

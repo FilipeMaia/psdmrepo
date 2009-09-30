@@ -6,11 +6,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <list>
 
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/ProcInfo.hh"
 #include "pdsdata/xtc/XtcIterator.hh"
 #include "pdsdata/xtc/XtcFileIterator.hh"
+#include "O2OTranslator/O2OXtcFileName.h"
+#include "O2OTranslator/O2OXtcMerger.h"
+#include "MsgLogger/MsgLogger.h"
 
 class myLevelIter : public XtcIterator {
 public:
@@ -44,39 +48,42 @@ private:
 };
 
 void usage(char* progname) {
-  fprintf(stderr,"Usage: %s -f <filename> [-h]\n", progname);
+  fprintf(stderr,"Usage: %s [-h] <filename> ...\n", progname);
 }
 
 int main(int argc, char* argv[]) {
   int c;
-  char* xtcname=0;
   int parseErr = 0;
+  int verbose = 0 ;
 
-  while ((c = getopt(argc, argv, "hf:")) != -1) {
+  while ((c = getopt(argc, argv, "hv")) != -1) {
     switch (c) {
     case 'h':
       usage(argv[0]);
       exit(0);
-    case 'f':
-      xtcname = optarg;
-      break;
+    case 'v':
+      ++ verbose ;
+      break ;
     default:
       parseErr++;
     }
   }
 
-  if (!xtcname) {
+  MsgLogger::MsgLogLevel loglvl ( 3 - verbose ) ;
+  MsgLogger::MsgLogger rootlogger ;
+  rootlogger.setLevel ( loglvl ) ;
+
+  std::list<O2OTranslator::O2OXtcFileName> files ;
+  for ( int i = optind ; i < argc ; ++ i ) {
+    files.push_back( O2OTranslator::O2OXtcFileName(argv[i]) ) ;
+  }
+
+  if (files.empty()) {
     usage(argv[0]);
     exit(2);
   }
 
-  FILE* file = fopen(xtcname,"r");
-  if (!file) {
-    perror("Unable to open file %s\n");
-    exit(2);
-  }
-
-  XtcFileIterator iter(file,0x1000000);
+  O2OTranslator::O2OXtcMerger iter(files,0x100000);
   while ( Dgram* dg = iter.next() ) {
     const Pds::Sequence& seq = dg->seq ;
     const Pds::ClockTime& clock = seq.clock() ;
@@ -89,8 +96,9 @@ int main(int argc, char* argv[]) {
            dg->xtc.sizeofPayload());
     myLevelIter iter(&(dg->xtc),1);
     iter.iterate();
+
+    delete [] (char*)dg ;
   }
 
-  fclose(file);
   return 0;
 }

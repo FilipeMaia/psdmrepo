@@ -42,6 +42,7 @@
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OHdf5Writer.h"
 #include "O2OTranslator/O2OMetaData.h"
+#include "O2OTranslator/O2OXtcFileName.h"
 #include "O2OTranslator/O2OXtcIterator.h"
 #include "O2OTranslator/O2OXtcScannerI.h"
 #include "pdsdata/xtc/XtcFileIterator.hh"
@@ -219,7 +220,11 @@ O2O_Translate::runApp ()
   DgramQueue dgqueue( m_dgramQSize.value() ) ;
 
   // start datagram reading thread
-  boost::thread readerThread( DgramReader ( m_eventData.value(), dgqueue, m_dgramsize.value() ) ) ;
+  std::list<O2OXtcFileName> files ;
+  for ( AppCmdOptList<std::string>::const_iterator it = m_eventData.begin() ; it != m_eventData.end() ; ++ it ) {
+    files.push_back ( O2OXtcFileName(*it) ) ;
+  }
+  boost::thread readerThread( DgramReader ( files, dgqueue, m_dgramsize.value() ) ) ;
 
 
   // get all datagrams

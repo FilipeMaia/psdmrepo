@@ -55,6 +55,14 @@ public:
 
 };
 
+// thrown for incorrect arguments provided
+class O2OArgumentException : public O2OException {
+public:
+
+  O2OArgumentException( const std::string& msg )
+    : O2OException( "O2OArgumentException", msg ) {}
+
+};
 
 class O2OFileOpenException : public O2OException {
 public:
@@ -88,20 +96,20 @@ public:
 
 };
 
+class O2OXTCSyncException : public O2OException {
+public:
+
+  O2OXTCSyncException()
+    : O2OException( "O2OXTCSyncException", "XTC streams are desynchronized" ) {}
+
+};
+
 /// Generic XTC exception, just give it a message
 class O2OXTCGenException : public O2OException {
 public:
 
   O2OXTCGenException( const std::string& msg )
     : O2OException( "O2OXTCGenException", msg ) {}
-
-};
-
-class O2OHDF5Exception : public O2OException {
-public:
-
-  O2OHDF5Exception( const std::string& what )
-    : O2OException( "O2OHDF5Exception", what ) {}
 
 };
 
