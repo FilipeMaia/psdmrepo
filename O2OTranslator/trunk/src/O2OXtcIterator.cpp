@@ -82,7 +82,9 @@ O2OXtcIterator::process(Xtc* xtc)
 
     // NOTE: I do not know yet what this type is supposed to do, for now just ignore it
 
-  } else if ( xtc->src.level() == Pds::Level::Source ) {
+  } else if ( xtc->src.level() == Pds::Level::Source
+      or xtc->src.level() == Pds::Level::Reporter
+      or xtc->src.level() == Pds::Level::Control ) {
 
     const Pds::DetInfo& detInfo = static_cast<const Pds::DetInfo&>(xtc->src);
     m_scanner->dataObject( xtc->payload(), xtc->contains, detInfo ) ;

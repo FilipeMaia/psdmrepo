@@ -26,9 +26,12 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "H5DataTypes/AcqirisConfigV1.h"
+#include "H5DataTypes/BldDataEBeam.h"
+#include "H5DataTypes/BldDataFEEGasDetEnergy.h"
 #include "H5DataTypes/CameraFrameFexConfigV1.h"
 #include "H5DataTypes/CameraFrameV1.h"
 #include "H5DataTypes/CameraTwoDGaussianV1.h"
+#include "H5DataTypes/ControlDataConfigV1.h"
 #include "H5DataTypes/EvrConfigV1.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
@@ -186,12 +189,28 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_EvrConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+//  converter.reset( new ConfigDataTypeCvt<H5DataTypes::ControlDataConfigV1> ( "ControlData::ConfigV1" ) ) ;
+//  typeId =  Pds::TypeId(Pds::TypeId::Id_ControlConfig,1).value() ;
+//  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   hsize_t chunk_size = 128*1024 ;
 
   // instantiate all factories for event converters
   converter.reset( new EvtDataTypeCvtDef<H5DataTypes::CameraTwoDGaussianV1> (
       "Camera::TwoDGaussianV1", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_TwoDGaussian,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // version for this type is 0
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataFEEGasDetEnergy> (
+      "Bld::BldDataFEEGasDetEnergy", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_FEEGasDetEnergy,0).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // version for this type is 0
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataEBeam> (
+      "Bld::BldDataEBeam", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EBeam,0).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // special converter for CameraFrame type

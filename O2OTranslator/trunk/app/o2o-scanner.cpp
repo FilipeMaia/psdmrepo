@@ -24,7 +24,7 @@ public:
     unsigned i=_depth; while (i--) printf("  ");
     Level::Type level = xtc->src.level();
     printf("%s level: ",Level::name(level));
-    if (level==Level::Source) {
+    if (level==Level::Source or level==Pds::Level::Reporter ) {
       DetInfo& info = *(DetInfo*)(&xtc->src);
       printf("%s.%d %s.%d",
              DetInfo::name(info.detector()),info.detId(),
