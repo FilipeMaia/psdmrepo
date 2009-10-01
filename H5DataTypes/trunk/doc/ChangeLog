@@ -12,6 +12,10 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-05
+2009-09-30 Andy Salnikov
+- few more types, need pdsdata-20090930
+
+Tag: V00-00-05
 2009-08-04 Andy Salnikov
 - update for pdsdata-20090722:
   - added new class PulnixTM6740ConfigV1

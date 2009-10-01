@@ -69,7 +69,7 @@ class EvrPulseConfigV1 {
 public:
 
   EvrPulseConfigV1 () {}
-  EvrPulseConfigV1 ( const Pds::EvrData::PulseConfig pconfig ) ;
+  EvrPulseConfigV1 ( const Pds::EvrData::PulseConfig& pconfig ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
@@ -94,7 +94,7 @@ class EvrOutputMapV1 {
 public:
 
   EvrOutputMapV1 () {}
-  EvrOutputMapV1 ( const Pds::EvrData::OutputMap mconfig ) ;
+  EvrOutputMapV1 ( const Pds::EvrData::OutputMap& mconfig ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;

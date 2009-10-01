@@ -46,7 +46,7 @@ namespace H5DataTypes {
 //----------------
 // Constructors --
 //----------------
-EvrPulseConfigV1::EvrPulseConfigV1 ( const Pds::EvrData::PulseConfig pconfig )
+EvrPulseConfigV1::EvrPulseConfigV1 ( const Pds::EvrData::PulseConfig& pconfig )
 {
   m_data.pulse = pconfig.pulse() ;
   m_data.trigger = pconfig.trigger() ;
@@ -86,7 +86,7 @@ EvrPulseConfigV1::native_type()
   return pulseType ;
 }
 
-EvrOutputMapV1::EvrOutputMapV1 ( const Pds::EvrData::OutputMap mconfig )
+EvrOutputMapV1::EvrOutputMapV1 ( const Pds::EvrData::OutputMap& mconfig )
 {
   m_data.source = mconfig.source() ;
   m_data.source_id = mconfig.source_id() ;
