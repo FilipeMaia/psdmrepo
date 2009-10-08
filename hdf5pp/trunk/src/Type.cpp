@@ -77,6 +77,15 @@ Type::copy() const
   return UnlockedType( tid ) ;
 }
 
+/// set type size
+void
+Type::set_size( size_t size )
+{
+  if ( H5Tset_size( *m_id, size ) ) {
+    throw Hdf5CallException( "Type::set_size", "H5Tset_size" ) ;
+  }
+}
+
 /// set type precision
 void
 Type::set_precision( size_t precision )

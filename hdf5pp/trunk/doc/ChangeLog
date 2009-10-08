@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2009-10-08 Andy Salnikov
+- Group: new method hasChild()
+- Type: new factory method Copy(), new method set_size()
+- ArrayType: new template factory method arrayType()
+
 Tag: V00-00-08
 2009-09-08 Andy Salnikov
 - added comparison operators to Group class

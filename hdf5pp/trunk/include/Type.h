@@ -54,6 +54,8 @@ public:
   static Type LockedType( hid_t tid ) { return Type(tid,false); }
   // create unlocked type from type id
   static Type UnlockedType( hid_t tid ) { return Type(tid,true); }
+  // create unlocked type as a copy of type id
+  static Type Copy( hid_t tid ) { return Type(H5Tcopy(tid),true); }
 
   // Default constructor
   Type() ;
@@ -69,6 +71,9 @@ public:
 
   /// make unlocked copy of the type
   Type copy() const ;
+
+  /// set type size
+  void set_size( size_t size ) ;
 
   /// set type precision
   void set_precision( size_t precision ) ;

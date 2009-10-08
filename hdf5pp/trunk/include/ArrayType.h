@@ -59,6 +59,12 @@ public:
     return arrayType( baseType, 1, &dim ) ;
   }
 
+  // make an array type of rank 1
+  template <typename T>
+  static ArrayType arrayType( hsize_t dim ) {
+    return arrayType( TypeTraits<T>::native_type(), 1, &dim ) ;
+  }
+
   // make an array type of any rank
   static ArrayType arrayType( const Type& baseType, unsigned rank, hsize_t dims[] ) ;
 

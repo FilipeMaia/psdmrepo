@@ -75,6 +75,9 @@ public:
     return openGroup ( *m_id, name ) ;
   }
 
+  /// Determines if the group has a child (link) with the given nae
+  bool hasChild ( const std::string& name ) const ;
+
   /// create attribute for this group
   template <typename T>
   Attribute<T> createAttr ( const std::string& name, const DataSpace& dspc = DataSpace::makeScalar() ) {

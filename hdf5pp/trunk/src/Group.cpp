@@ -54,13 +54,13 @@ Group::~Group ()
 Group
 Group::createGroup ( hid_t parent, const std::string& name )
 {
-  // allow creatyion of intermediate directories
+  // allow creation of intermediate directories
   hid_t lcpl_id = H5Pcreate( H5P_LINK_CREATE ) ;
   H5Pset_create_intermediate_group( lcpl_id, 1 ) ;
   hid_t f_id = H5Gcreate2 ( parent, name.c_str(), lcpl_id, H5P_DEFAULT, H5P_DEFAULT ) ;
   H5Pclose( lcpl_id ) ;
   if ( f_id < 0 ) {
-    throw Hdf5CallException( "File::create", "H5Gcreate2") ;
+    throw Hdf5CallException( "Group::createGroup", "H5Gcreate2") ;
   }
   return Group(f_id) ;
 }
@@ -70,9 +70,20 @@ Group::openGroup ( hid_t parent, const std::string& name )
 {
   hid_t f_id = H5Gopen2 ( parent, name.c_str(), H5P_DEFAULT ) ;
   if ( f_id < 0 ) {
-    throw Hdf5CallException( "File::create", "H5Gopen2") ;
+    throw Hdf5CallException( "Group::openGroup", "H5Gopen2") ;
   }
   return Group(f_id) ;
+}
+
+bool
+Group::hasChild ( const std::string& name ) const
+{
+  // check that the group exists
+  hid_t lapl_id = H5Pcreate( H5P_LINK_ACCESS ) ;
+  htri_t stat = H5Lexists ( *m_id, name.c_str(), lapl_id ) ;
+  H5Pclose( lapl_id ) ;
+
+  return stat>0 ;
 }
 
 // close the group
