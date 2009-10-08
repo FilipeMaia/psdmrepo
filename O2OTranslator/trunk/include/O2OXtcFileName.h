@@ -81,7 +81,7 @@ public:
 protected:
 
   // helper methods
-  unsigned _cvt ( const char* ptr ) const ;
+  unsigned _cvt ( const char* ptr, bool& stat ) const ;
 
 private:
 

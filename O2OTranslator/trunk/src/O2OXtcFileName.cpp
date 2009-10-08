@@ -69,40 +69,41 @@ O2OXtcFileName::O2OXtcFileName ( const std::string& path )
 
   // find underscore before chunk part
   n = name.rfind('_') ;
-  if ( n == std::string::npos || (name.size()-n) < 4 || name[n+1] != 'c' || name[n+2] != 'h' ) {
-    return ;
-  }
-  m_chunk = _cvt ( name.c_str()+n+3 ) ;
+  if ( n == std::string::npos || (name.size()-n) < 3 || name[n+1] != 'c' ) return ;
+  bool stat ;
+  unsigned chunk = _cvt ( name.c_str()+n+2, stat ) ;
+  if ( not stat ) return ;
 
   // remove chunk part
   name.erase(n) ;
 
   // find underscore before stream part
   n = name.rfind('_') ;
-  if ( n == std::string::npos || (name.size()-n) < 3 || name[n+1] != 's' ) {
-    return ;
-  }
-  m_stream = _cvt ( name.c_str()+n+2 ) ;
+  if ( n == std::string::npos || (name.size()-n) < 3 || name[n+1] != 's' )  return ;
+  unsigned stream = _cvt ( name.c_str()+n+2, stat ) ;
+  if ( not stat ) return ;
 
   // remove stream part
   name.erase(n) ;
 
   // find underscore before run part
   n = name.rfind('_') ;
-  if ( n == std::string::npos || (name.size()-n) < 3 || name[n+1] != 'r' ) {
-    return ;
-  }
-  m_run = _cvt ( name.c_str()+n+2 ) ;
+  if ( n == std::string::npos || (name.size()-n) < 3 || name[n+1] != 'r' ) return ;
+  unsigned run = _cvt ( name.c_str()+n+2, stat ) ;
+  if ( not stat ) return ;
 
   // remove run part
   name.erase(n) ;
 
   // remaining must be experiment part
-  if ( name.size() < 2 || name[0] != 'e' ) {
-    return ;
-  }
-  m_expNum = _cvt ( name.c_str()+1 ) ;
+  if ( name.size() < 2 || name[0] != 'e' ) return ;
+  unsigned expNum = _cvt ( name.c_str()+1, stat ) ;
+  if ( not stat ) return ;
 
+  m_expNum = expNum ;
+  m_run = run ;
+  m_stream = stream ;
+  m_chunk = chunk ;
 }
 
 
@@ -138,10 +139,11 @@ O2OXtcFileName::operator<( const O2OXtcFileName& other ) const
 }
 
 unsigned
-O2OXtcFileName::_cvt ( const char* ptr ) const
+O2OXtcFileName::_cvt ( const char* ptr, bool& stat ) const
 {
   char *eptr = 0 ;
   unsigned val = strtoul ( ptr, &eptr, 10 ) ;
+  stat = ( *eptr == 0 ) ;
   return val ;
 }
 

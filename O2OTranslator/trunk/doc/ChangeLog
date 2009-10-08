@@ -11,6 +11,18 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-01
+2009-10-08 Andy Salnikov
+- change in the format of file names
+
+Tag: V00-03-00
+2009-10-08 Andy Salnikov
+- added converters for epics types
+- refactor some pieces to support data objects at Control level
+
+Tag: V00-02-02
+2009-10-08 Andy Salnikov
+
 Tag: V00-02-02
 2009-09-30 Andy Salnikov
 - couple more converter types
