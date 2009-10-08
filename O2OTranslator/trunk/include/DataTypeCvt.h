@@ -55,11 +55,11 @@ public:
   /// main method of this class
   virtual void convert ( const void* data,
                          const Pds::TypeId& typeId,
-                         const Pds::DetInfo& detInfo,
+                         const O2OXtcSrc& src,
                          const H5DataTypes::XtcClockTime& time )
   {
     const T& typedData = *static_cast<const T*>( data ) ;
-    typedConvert ( typedData, typeId, detInfo, time ) ;
+    typedConvert ( typedData, typeId, src, time ) ;
   }
 
 protected:
@@ -72,7 +72,7 @@ private:
   // typed conversion method
   virtual void typedConvert ( const T& data,
                               const Pds::TypeId& typeId,
-                              const Pds::DetInfo& detInfo,
+                              const O2OXtcSrc& src,
                               const H5DataTypes::XtcClockTime& time ) = 0 ;
 
   // Copy constructor and assignment are disabled by default

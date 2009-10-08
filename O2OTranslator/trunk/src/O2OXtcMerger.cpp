@@ -58,9 +58,10 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files, size_t maxDgSize )
+O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files, size_t maxDgSize, MergeMode mode )
   : m_streams()
   , m_dgrams()
+  , m_mode(mode)
 {
   // check that we have at least one input stream
   if ( files.empty() ) {
@@ -71,8 +72,13 @@ O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files, size_t maxD
   StreamMap streamMap ;
 
   // separate files from different streams
+  unsigned stream = 0 ;
   for ( std::list<O2OXtcFileName>::const_iterator it = files.begin() ; it != files.end() ; ++ it ) {
-    unsigned stream = it->stream() ;
+    if ( mode == FileName ) {
+      stream = it->stream() ;
+    } else if ( mode == NoChunking ) {
+      stream ++ ;
+    }
     streamMap[stream].push_back( *it );
     MsgLog( logger, trace, "O2OXtcMerger -- file: " << it->path() << " stream: " << stream ) ;
   }
@@ -92,7 +98,8 @@ O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files, size_t maxD
     }
 
     // create new stream
-    O2OXtcDechunk* stream = new O2OXtcDechunk( streamFiles, maxDgSize ) ;
+    bool sort = ( mode == FileName ) ;
+    O2OXtcDechunk* stream = new O2OXtcDechunk( streamFiles, maxDgSize, sort ) ;
     m_streams.push_back( stream ) ;
     m_dgrams.push_back( stream->next() ) ;
   }

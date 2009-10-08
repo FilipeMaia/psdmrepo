@@ -87,7 +87,7 @@ public:
   virtual void levelEnd ( const Pds::Src& src ) ;
 
   // visit the data object
-  virtual void dataObject ( const void* data, const Pds::TypeId& typeId, const Pds::DetInfo& detInfo ) ;
+  virtual void dataObject ( const void* data, const Pds::TypeId& typeId, const O2OXtcSrc& src ) ;
 
 protected:
 

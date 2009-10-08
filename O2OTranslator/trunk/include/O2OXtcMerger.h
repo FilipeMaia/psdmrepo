@@ -54,8 +54,14 @@ namespace O2OTranslator {
 class O2OXtcMerger  {
 public:
 
+  /// Several merge modes supported:
+  ///   OneStream - all files come from one stream, chunked
+  ///   FilePerStream - single file per stream, no chunking
+  ///   FileName - streams and chunks are determined from file names
+  enum MergeMode { OneStream, NoChunking, FileName } ;
+
   // Default constructor
-  O2OXtcMerger ( const std::list<O2OXtcFileName>& files, size_t maxDgSize ) ;
+  O2OXtcMerger ( const std::list<O2OXtcFileName>& files, size_t maxDgSize, MergeMode mode ) ;
 
   // Destructor
   ~O2OXtcMerger () ;
@@ -71,6 +77,7 @@ private:
   // Data members
   std::vector<O2OXtcDechunk*> m_streams ;
   std::vector<Pds::Dgram*> m_dgrams ;
+  MergeMode m_mode ;
 
   // Copy constructor and assignment are disabled by default
   O2OXtcMerger ( const O2OXtcMerger& ) ;

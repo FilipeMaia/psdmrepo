@@ -56,7 +56,7 @@ public:
 
   // Constructor accepts the list of files, the files will be sorted
   // based on the chunk number extracted from files name.
-  O2OXtcDechunk ( const std::list<O2OXtcFileName>& files, size_t maxDgSize ) ;
+  O2OXtcDechunk ( const std::list<O2OXtcFileName>& files, size_t maxDgSize, bool sort ) ;
 
   // Destructor
   ~O2OXtcDechunk () ;

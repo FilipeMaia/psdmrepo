@@ -70,24 +70,24 @@ public:
   // typed conversion method
   virtual void typedConvert ( const XtcType& data,
                               const Pds::TypeId& typeId,
-                              const Pds::DetInfo& detInfo,
+                              const O2OXtcSrc& src,
                               const H5DataTypes::XtcClockTime& time )
   {
     hdf5pp::Group group = m_groups.top() ;
-    hdf5pp::Group subgroup = m_group2group.find ( group, detInfo ) ;
+    hdf5pp::Group subgroup = m_group2group.find ( group, src.top() ) ;
     if ( not subgroup.valid() ) {
 
       // get the name of the group for this object
-      const std::string& grpName = this->cvtGroupName( m_typeGroupName, detInfo ) ;
+      const std::string& grpName = m_typeGroupName + "/" + src.name() ;
 
       // create separate group
       subgroup = group.createGroup( grpName );
 
-      m_group2group.insert ( group, detInfo, subgroup ) ;
+      m_group2group.insert ( group, src.top(), subgroup ) ;
     }
 
     // call overloaded method and pass all data
-    this->typedConvertSubgroup ( subgroup, data, typeId, detInfo, time ) ;
+    this->typedConvertSubgroup ( subgroup, data, typeId, src, time ) ;
   }
 
   /// method called when the driver makes a new group in the file
@@ -120,7 +120,7 @@ protected:
   virtual void typedConvertSubgroup ( hdf5pp::Group group,
                               const XtcType& data,
                               const Pds::TypeId& typeId,
-                              const Pds::DetInfo& detInfo,
+                              const O2OXtcSrc& src,
                               const H5DataTypes::XtcClockTime& time ) = 0 ;
 
   /// method called when the driver closes a group in the file

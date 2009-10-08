@@ -19,12 +19,12 @@
 class myLevelIter : public XtcIterator {
 public:
   enum {Stop, Continue};
-  myLevelIter(Xtc* xtc, unsigned depth) : XtcIterator(xtc), _depth(depth) {}
+  myLevelIter(Xtc* xtc) : XtcIterator(xtc), _depth(1) {}
   int process(Xtc* xtc) {
-    unsigned i=_depth; while (i--) printf("  ");
+    for ( unsigned i=0 ; i < _depth ; ++ i ) printf("  ");
     Level::Type level = xtc->src.level();
     printf("%s level: ",Level::name(level));
-    if (level==Level::Source or level==Pds::Level::Reporter ) {
+    if (level==Level::Source or level==Pds::Level::Reporter or level==Pds::Level::Control) {
       DetInfo& info = *(DetInfo*)(&xtc->src);
       printf("%s.%d %s.%d",
              DetInfo::name(info.detector()),info.detId(),
@@ -35,8 +35,9 @@ public:
     }
     if (xtc->contains.id() == TypeId::Id_Xtc ) {
       printf("\n");
-      myLevelIter iter(xtc,_depth+1);
-      iter.iterate();
+      ++_depth;
+      this->iterate( xtc );
+      --_depth;
     } else {
       printf(" id=%d name=%s version=%d\n", xtc->contains.id(),
           Pds::TypeId::name(xtc->contains.id()), xtc->contains.version() );
@@ -83,7 +84,7 @@ int main(int argc, char* argv[]) {
     exit(2);
   }
 
-  O2OTranslator::O2OXtcMerger iter(files,0x100000);
+  O2OTranslator::O2OXtcMerger iter(files,0x100000,O2OTranslator::O2OXtcMerger::OneStream);
   while ( Dgram* dg = iter.next() ) {
     const Pds::Sequence& seq = dg->seq ;
     const Pds::ClockTime& clock = seq.clock() ;
@@ -94,7 +95,7 @@ int main(int argc, char* argv[]) {
            clock.seconds(), clock.nanoseconds(),
            stamp.ticks(),stamp.fiducials(),stamp.control(),
            dg->xtc.sizeofPayload());
-    myLevelIter iter(&(dg->xtc),1);
+    myLevelIter iter(&(dg->xtc));
     iter.iterate();
 
     delete [] (char*)dg ;

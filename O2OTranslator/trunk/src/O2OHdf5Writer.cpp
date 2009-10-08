@@ -32,6 +32,7 @@
 #include "H5DataTypes/CameraFrameV1.h"
 #include "H5DataTypes/CameraTwoDGaussianV1.h"
 #include "H5DataTypes/ControlDataConfigV1.h"
+#include "H5DataTypes/EpicsPvHeader.h"
 #include "H5DataTypes/EvrConfigV1.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
@@ -41,6 +42,7 @@
 #include "O2OTranslator/CameraFrameV1Cvt.h"
 #include "O2OTranslator/ConfigDataTypeCvt.h"
 #include "O2OTranslator/EvtDataTypeCvtDef.h"
+#include "O2OTranslator/EpicsDataTypeCvt.h"
 #include "O2OTranslator/O2OExceptions.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OMetaData.h"
@@ -189,9 +191,9 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_EvrConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
-//  converter.reset( new ConfigDataTypeCvt<H5DataTypes::ControlDataConfigV1> ( "ControlData::ConfigV1" ) ) ;
-//  typeId =  Pds::TypeId(Pds::TypeId::Id_ControlConfig,1).value() ;
-//  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::ControlDataConfigV1> ( "ControlData::ConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_ControlConfig,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   hsize_t chunk_size = 128*1024 ;
 
@@ -225,6 +227,16 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_AcqWaveform,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  // temporary/diagnostics  Epics converter (headers only)
+//  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::EpicsPvHeader> (
+//      "Epics::EpicsPvHeader", chunk_size, m_compression ) ) ;
+//  typeId =  Pds::TypeId(Pds::TypeId::Id_Epics,1).value() ;
+//  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // Epics converter
+  converter.reset( new EpicsDataTypeCvt( "Epics::EpicsPv", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_Epics,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 }
 
 //--------------
@@ -403,7 +415,7 @@ O2OHdf5Writer::levelEnd ( const Pds::Src& src )
 
 // visit the data object
 void
-O2OHdf5Writer::dataObject ( const void* data, const Pds::TypeId& typeId, const Pds::DetInfo& detInfo )
+O2OHdf5Writer::dataObject ( const void* data, const Pds::TypeId& typeId, const O2OXtcSrc& src )
 {
   // find this type in the converter map
   CvtMap::iterator it = m_cvtMap.find( typeId.value() ) ;
@@ -412,7 +424,7 @@ O2OHdf5Writer::dataObject ( const void* data, const Pds::TypeId& typeId, const P
     do {
 
       DataTypeCvtPtr converter = it->second ;
-      converter->convert( data, typeId, detInfo, m_eventTime ) ;
+      converter->convert( data, typeId, src, m_eventTime ) ;
 
       ++ it ;
 

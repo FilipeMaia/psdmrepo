@@ -1,18 +1,20 @@
-#ifndef O2OTRANSLATOR_CAMERAFRAMEV1CVT_H
-#define O2OTRANSLATOR_CAMERAFRAMEV1CVT_H
+#ifndef O2OTRANSLATOR_EPICSDATATYPECVT_H
+#define O2OTRANSLATOR_EPICSDATATYPECVT_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CameraFrameV1Cvt.
+//	Class EpicsDataTypeCvt.
 //
 //------------------------------------------------------------------------
 
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <string>
+#include <map>
 
 //----------------------
 // Base Class Headers --
@@ -22,14 +24,15 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "H5DataTypes/CameraFrameV1.h"
+#include "pdsdata/epics/EpicsPvData.hh"
+#include "hdf5pp/Group.h"
+#include "O2OTranslator/CvtDataContFactoryEpics.h"
+#include "O2OTranslator/CvtDataContainer.h"
+#include "O2OTranslator/CvtDataContFactoryDef.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "O2OTranslator/CvtDataContainer.h"
-#include "O2OTranslator/CvtDataContFactoryDef.h"
-#include "O2OTranslator/CvtDataContFactoryFrameV1.h"
 
 //		---------------------
 // 		-- Class Interface --
@@ -38,7 +41,7 @@
 namespace O2OTranslator {
 
 /**
- *  Special converter class for Pds::Camera::FrameV1
+ *  Converter type for EPICS XTC data
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
@@ -50,18 +53,18 @@ namespace O2OTranslator {
  *  @author Andrei Salnikov
  */
 
-class CameraFrameV1Cvt : public EvtDataTypeCvt<Pds::Camera::FrameV1> {
+class EpicsDataTypeCvt : public EvtDataTypeCvt<Pds::EpicsPvHeader> {
 public:
 
-  typedef Pds::Camera::FrameV1 XtcType ;
+  typedef Pds::EpicsPvHeader XtcType ;
 
-  // constructor takes a location where the data will be stored
-  CameraFrameV1Cvt ( const std::string& typeGroupName,
+  // Default constructor
+  EpicsDataTypeCvt ( const std::string& topGroupName,
                      hsize_t chunk_size,
                      int deflate ) ;
 
   // Destructor
-  virtual ~CameraFrameV1Cvt () ;
+  virtual ~EpicsDataTypeCvt () ;
 
 protected:
 
@@ -75,26 +78,44 @@ protected:
   /// method called when the driver closes a group in the file
   virtual void closeSubgroup( hdf5pp::Group group ) ;
 
+  // generate the name for the subgroup
+  std::string _subname ( const XtcType& data ) ;
+
 private:
 
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
-  typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::CameraFrameV1> > DataCont ;
-  typedef CvtDataContainer<CvtDataContFactoryFrameV1<const unsigned char> > ImageCont ;
+  typedef CvtDataContainer<CvtDataContFactoryEpics> DataCont ;
+
+  struct _pvdata {
+    _pvdata() : timeCont(0), dataCont(0) {}
+    _pvdata(XtcClockTimeCont* tc, DataCont* dc) : timeCont(tc), dataCont(dc) {}
+    XtcClockTimeCont* timeCont ;
+    DataCont* dataCont ;
+  };
+
+  typedef std::map<int16_t,hdf5pp::Group> PV2Group ;
+  typedef std::map<int16_t,hdf5pp::Type> PV2Type ;
+  typedef std::map<hdf5pp::Group,PV2Group> Subgroups ;
+  typedef std::map<hdf5pp::Group,PV2Type> Types ;
+  typedef std::map<int16_t,_pvdata> PVDataMap ;
+  typedef std::map<int16_t,std::string> PVNameMap ;
+  typedef std::map<std::string,int16_t> PVName2Id ;
 
   // Data members
   hsize_t m_chunk_size ;
   int m_deflate ;
-  hdf5pp::Type m_imgType ;
-  DataCont* m_dataCont ;
-  ImageCont* m_imageCont ;
-  XtcClockTimeCont* m_timeCont ;
+  Subgroups m_subgroups ;
+  Types m_types ;
+  PVDataMap m_pvdatamap ;
+  PVNameMap m_pvnames ;
+  PVName2Id m_name2id ;
 
   // Copy constructor and assignment are disabled by default
-  CameraFrameV1Cvt ( const CameraFrameV1Cvt& ) ;
-  CameraFrameV1Cvt& operator = ( const CameraFrameV1Cvt& ) ;
+  EpicsDataTypeCvt ( const EpicsDataTypeCvt& ) ;
+  EpicsDataTypeCvt& operator = ( const EpicsDataTypeCvt& ) ;
 
 };
 
 } // namespace O2OTranslator
 
-#endif // O2OTRANSLATOR_CAMERAFRAMEV1CVT_H
+#endif // O2OTRANSLATOR_EPICSDATATYPECVT_H

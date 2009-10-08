@@ -42,10 +42,11 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-DgramReader::DgramReader ( const FileList& files, DgramQueue& queue, size_t maxDgSize )
+DgramReader::DgramReader ( const FileList& files, DgramQueue& queue, size_t maxDgSize, O2OXtcMerger::MergeMode mode )
   : m_files( files )
   , m_queue( queue )
   , m_maxDgSize( maxDgSize )
+  , m_mode( mode )
 {
 }
 
@@ -60,7 +61,7 @@ DgramReader::~DgramReader ()
 void
 DgramReader::operator() ()
 {
-  O2OTranslator::O2OXtcMerger iter(m_files,m_maxDgSize);
+  O2OXtcMerger iter(m_files, m_maxDgSize, m_mode);
   while ( Pds::Dgram* dg = iter.next() ) {
 
     // move it to the queue

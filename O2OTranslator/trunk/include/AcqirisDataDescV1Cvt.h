@@ -69,7 +69,7 @@ public:
   /// override base class method because we expect multiple types
   virtual void convert ( const void* data,
                          const Pds::TypeId& typeId,
-                         const Pds::DetInfo& detInfo,
+                         const O2OXtcSrc& src,
                          const H5DataTypes::XtcClockTime& time ) ;
 
 protected:
@@ -78,7 +78,7 @@ protected:
   virtual void typedConvertSubgroup ( hdf5pp::Group group,
                                       const XtcType& data,
                                       const Pds::TypeId& typeId,
-                                      const Pds::DetInfo& detInfo,
+                                      const O2OXtcSrc& src,
                                       const H5DataTypes::XtcClockTime& time ) ;
 
   /// method called when the driver closes a group in the file
@@ -91,12 +91,12 @@ private:
   typedef CvtDataContainer<CvtDataContFactoryAcqirisV1<uint16_t> > WaveformCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
 
-  // comparison operator for DetInfo objects
-  struct _DetInfoCmp {
-    bool operator()( const Pds::DetInfo& lhs, const Pds::DetInfo& rhs ) const ;
+  // comparison operator for Src objects
+  struct _SrcCmp {
+    bool operator()( const Pds::Src& lhs, const Pds::Src& rhs ) const ;
   };
 
-  typedef std::map<Pds::DetInfo,Pds::Acqiris::ConfigV1,_DetInfoCmp> ConfigMap ;
+  typedef std::map<Pds::Src,Pds::Acqiris::ConfigV1,_SrcCmp> ConfigMap ;
 
   // Data members
   hsize_t m_chunk_size ;

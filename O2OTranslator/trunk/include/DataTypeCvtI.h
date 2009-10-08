@@ -29,6 +29,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+#include "O2OTranslator/O2OXtcSrc.h"
 
 //		---------------------
 // 		-- Class Interface --
@@ -58,7 +59,7 @@ public:
   /// main method of this class
   virtual void convert ( const void* data,
                          const Pds::TypeId& typeId,
-                         const Pds::DetInfo& detInfo,
+                         const O2OXtcSrc& src,
                          const H5DataTypes::XtcClockTime& time ) = 0 ;
 
   /// method called when the driver makes a new group in the file
@@ -71,9 +72,6 @@ protected:
 
   // Default constructor
   DataTypeCvtI () {}
-
-  // generate the group name for the child folder
-  static std::string cvtGroupName( const std::string& grpName, const Pds::DetInfo& info ) ;
 
 private:
 

@@ -70,7 +70,7 @@ O2OXtcFileName::O2OXtcFileName ( const std::string& path )
   // find underscore before chunk part
   n = name.rfind('_') ;
   if ( n == std::string::npos || (name.size()-n) < 4 || name[n+1] != 'c' || name[n+2] != 'h' ) {
-    _exception() ;
+    return ;
   }
   m_chunk = _cvt ( name.c_str()+n+3 ) ;
 
@@ -80,7 +80,7 @@ O2OXtcFileName::O2OXtcFileName ( const std::string& path )
   // find underscore before stream part
   n = name.rfind('_') ;
   if ( n == std::string::npos || (name.size()-n) < 3 || name[n+1] != 's' ) {
-    _exception() ;
+    return ;
   }
   m_stream = _cvt ( name.c_str()+n+2 ) ;
 
@@ -90,7 +90,7 @@ O2OXtcFileName::O2OXtcFileName ( const std::string& path )
   // find underscore before run part
   n = name.rfind('_') ;
   if ( n == std::string::npos || (name.size()-n) < 3 || name[n+1] != 'r' ) {
-    _exception() ;
+    return ;
   }
   m_run = _cvt ( name.c_str()+n+2 ) ;
 
@@ -99,7 +99,7 @@ O2OXtcFileName::O2OXtcFileName ( const std::string& path )
 
   // remaining must be experiment part
   if ( name.size() < 2 || name[0] != 'e' ) {
-    _exception() ;
+    return ;
   }
   m_expNum = _cvt ( name.c_str()+1 ) ;
 
@@ -137,21 +137,11 @@ O2OXtcFileName::operator<( const O2OXtcFileName& other ) const
 
 }
 
-void
-O2OXtcFileName::_exception() const
-{
-  throw O2OTranslator::O2OArgumentException( "O2OXtcFileName: unsupported file name: "+m_path ) ;
-}
-
 unsigned
 O2OXtcFileName::_cvt ( const char* ptr ) const
 {
   char *eptr = 0 ;
   unsigned val = strtoul ( ptr, &eptr, 10 ) ;
-  if ( *eptr ) {
-    // conversion failed
-    _exception() ;
-  }
   return val ;
 }
 

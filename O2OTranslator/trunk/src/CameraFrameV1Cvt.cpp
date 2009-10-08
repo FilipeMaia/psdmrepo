@@ -70,7 +70,7 @@ void
 CameraFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                         const XtcType& data,
                                         const Pds::TypeId& typeId,
-                                        const Pds::DetInfo& detInfo,
+                                        const O2OXtcSrc& src,
                                         const H5DataTypes::XtcClockTime& time )
 {
   if ( not m_dataCont ) {

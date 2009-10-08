@@ -65,14 +65,14 @@ public:
   // typed conversion method
   virtual void typedConvert ( const XtcType& data,
                               const Pds::TypeId& typeId,
-                              const Pds::DetInfo& detInfo,
+                              const O2OXtcSrc& src,
                               const H5DataTypes::XtcClockTime& time )
   {
     // this should not happen
     if ( m_groups.empty() ) return ;
 
     // get the name of the group for this object
-    const std::string& grpName = this->cvtGroupName( m_typeGroupName, detInfo ) ;
+    const std::string& grpName = m_typeGroupName + "/" + src.name() ;
 
     // create separate group
     hdf5pp::Group grp = m_groups.top().createGroup( grpName );

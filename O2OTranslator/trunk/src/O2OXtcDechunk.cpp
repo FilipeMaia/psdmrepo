@@ -45,7 +45,7 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-O2OXtcDechunk::O2OXtcDechunk ( const std::list<O2OXtcFileName>& files, size_t maxDgSize )
+O2OXtcDechunk::O2OXtcDechunk ( const std::list<O2OXtcFileName>& files, size_t maxDgSize, bool sort )
   : m_files(files)
   , m_maxDgSize(maxDgSize)
   , m_iter()
@@ -53,10 +53,9 @@ O2OXtcDechunk::O2OXtcDechunk ( const std::list<O2OXtcFileName>& files, size_t ma
   , m_dgiter(0)
 {
   // sort the list according to the chunk number
-  m_files.sort();
+  if ( sort ) m_files.sort();
 
   m_iter = m_files.begin();
-
 }
 
 //--------------

@@ -18,7 +18,6 @@
 // Base Class Headers --
 //----------------------
 #include "pdsdata/xtc/XtcIterator.hh"
-#include "pdsdata/xtc/TypeId.hh"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -27,6 +26,8 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+#include "O2OTranslator/O2OXtcSrc.h"
+#include "pdsdata/xtc/TypeId.hh"
 
 //		---------------------
 // 		-- Class Interface --
@@ -68,6 +69,7 @@ private:
 
   // Data members
   O2OXtcScannerI* m_scanner ;
+  O2OXtcSrc m_src ;
 
   // Copy constructor and assignment are disabled by default
   O2OXtcIterator ( const O2OXtcIterator& ) ;

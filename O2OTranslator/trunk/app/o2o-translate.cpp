@@ -44,6 +44,7 @@
 #include "O2OTranslator/O2OMetaData.h"
 #include "O2OTranslator/O2OXtcFileName.h"
 #include "O2OTranslator/O2OXtcIterator.h"
+#include "O2OTranslator/O2OXtcMerger.h"
 #include "O2OTranslator/O2OXtcScannerI.h"
 #include "pdsdata/xtc/XtcFileIterator.hh"
 
@@ -91,6 +92,7 @@ private:
   AppCmdOptBool               m_extGroups ;
   AppCmdOpt<std::string>      m_instrument ;
   AppCmdOpt<std::string>      m_mdConnStr ;
+  AppCmdOptNamedValue<O2OXtcMerger::MergeMode> m_mergeMode ;
   AppCmdOptList<std::string>  m_metadata ;
   AppCmdOpt<std::string>      m_outputDir ;
   AppCmdOpt<std::string>      m_outputName ;
@@ -117,6 +119,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_extGroups  ( 'G', "group-time",               "use extended group names with timestamps", false )
   , m_instrument ( 'i', "instrument",   "string",   "instrument name", "" )
   , m_mdConnStr  ( 'M', "md-conn",      "string",   "metadata ODBC connection string", "" )
+  , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", O2OXtcMerger::FileName )
   , m_metadata   ( 'm', "metadata",     "name:value", "science metadata values", '\0' )
   , m_outputDir  ( 'd', "output-dir",   "path",     "directory to store output files, def: .", "." )
   , m_outputName ( 'n', "output-name",  "template", "template string for output file names, def: {seq4}.hdf5", "{seq4}.hdf5" )
@@ -136,6 +139,10 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_extGroups ) ;
   addOption( m_instrument ) ;
   addOption( m_mdConnStr ) ;
+  addOption( m_mergeMode ) ;
+  m_mergeMode.add ( "one-stream", O2OXtcMerger::OneStream ) ;
+  m_mergeMode.add ( "no-chunking", O2OXtcMerger::NoChunking ) ;
+  m_mergeMode.add ( "file-name", O2OXtcMerger::FileName ) ;
   addOption( m_metadata ) ;
   addOption( m_outputDir ) ;
   addOption( m_outputName ) ;
@@ -224,7 +231,7 @@ O2O_Translate::runApp ()
   for ( AppCmdOptList<std::string>::const_iterator it = m_eventData.begin() ; it != m_eventData.end() ; ++ it ) {
     files.push_back ( O2OXtcFileName(*it) ) ;
   }
-  boost::thread readerThread( DgramReader ( files, dgqueue, m_dgramsize.value() ) ) ;
+  boost::thread readerThread( DgramReader ( files, dgqueue, m_dgramsize.value(), m_mergeMode.value() ) ) ;
 
 
   // get all datagrams

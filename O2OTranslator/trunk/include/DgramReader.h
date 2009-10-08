@@ -24,6 +24,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "O2OTranslator/O2OXtcFileName.h"
+#include "O2OTranslator/O2OXtcMerger.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -56,7 +57,7 @@ public:
   typedef std::list<O2OXtcFileName> FileList ;
 
   // Default constructor
-  DgramReader (const FileList& files, DgramQueue& queue, size_t maxDgSize ) ;
+  DgramReader (const FileList& files, DgramQueue& queue, size_t maxDgSize, O2OXtcMerger::MergeMode mode ) ;
 
   // Destructor
   ~DgramReader () ;
@@ -72,6 +73,7 @@ private:
   FileList m_files ;
   DgramQueue& m_queue ;
   size_t m_maxDgSize ;
+  O2OXtcMerger::MergeMode m_mode ;
 
 };
 

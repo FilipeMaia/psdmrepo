@@ -1,28 +1,28 @@
-#ifndef O2OTRANSLATOR_O2OXTCFILENAME_H
-#define O2OTRANSLATOR_O2OXTCFILENAME_H
+#ifndef O2OTRANSLATOR_O2OXTCSRC_H
+#define O2OTRANSLATOR_O2OXTCSRC_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class O2OXtcFileName.
+//	Class O2OXtcSrc.
 //
 //------------------------------------------------------------------------
 
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <string>
+#include <vector>
 
 //----------------------
 // Base Class Headers --
 //----------------------
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/xtc/Src.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,7 +35,7 @@
 namespace O2OTranslator {
 
 /**
- *  Representation of the XTC file name.
+ *  Representation of the nested XTC source info.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
@@ -47,53 +47,40 @@ namespace O2OTranslator {
  *  @author Andrei Salnikov
  */
 
-class O2OXtcFileName  {
+class O2OXtcSrc  {
 public:
 
   // Default constructor
-  O2OXtcFileName() ;
-  O2OXtcFileName( const std::string& path ) ;
+  O2OXtcSrc () { m_src.reserve(5) ; }
 
   // Destructor
-  ~O2OXtcFileName () {}
+  ~O2OXtcSrc () {}
 
-  // get full name
-  const std::string& path() const { return m_path ; }
+  // add one level
+  void push ( const Pds::Src& src ) { m_src.push_back( src ); }
 
-  // get base name
-  std::string basename() const ;
+  // remove top level
+  void pop () { m_src.pop_back(); }
 
-  // get experiment number
-  unsigned expNum() const { return m_expNum ; }
+  // get topmost level
+  const Pds::Src& top () const { return m_src.back() ; }
 
-  // get run number
-  unsigned run() const { return m_run ; }
-
-  // get stream number
-  unsigned stream() const { return m_stream ; }
-
-  // get chunk number
-  unsigned chunk() const { return m_chunk ; }
-
-  // compare two names
-  bool operator<( const O2OXtcFileName& other ) const ;
+  // get the name of the source
+  std::string name() const ;
 
 protected:
-
-  // helper methods
-  unsigned _cvt ( const char* ptr ) const ;
 
 private:
 
   // Data members
-  std::string m_path ;
-  unsigned m_expNum ;
-  unsigned m_run ;
-  unsigned m_stream ;
-  unsigned m_chunk ;
+  std::vector<Pds::Src> m_src ;
+
+  // Copy constructor and assignment are disabled by default
+  O2OXtcSrc ( const O2OXtcSrc& ) ;
+  O2OXtcSrc& operator = ( const O2OXtcSrc& ) ;
 
 };
 
 } // namespace O2OTranslator
 
-#endif // O2OTRANSLATOR_O2OXTCFILENAME_H
+#endif // O2OTRANSLATOR_O2OXTCSRC_H

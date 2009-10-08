@@ -43,9 +43,9 @@ namespace {
 
 namespace O2OTranslator {
 
-// comparison operator for DetInfo objects
+// comparison operator for Src objects
 bool
-AcqirisDataDescV1Cvt::_DetInfoCmp::operator()( const Pds::DetInfo& lhs, const Pds::DetInfo& rhs ) const
+AcqirisDataDescV1Cvt::_SrcCmp::operator()( const Pds::Src& lhs, const Pds::Src& rhs ) const
 {
   if ( lhs.log() < rhs.log() ) return true ;
   if ( lhs.log() > rhs.log() ) return false ;
@@ -83,7 +83,7 @@ AcqirisDataDescV1Cvt::~AcqirisDataDescV1Cvt ()
 void
 AcqirisDataDescV1Cvt::convert ( const void* data,
                                 const Pds::TypeId& typeId,
-                                const Pds::DetInfo& detInfo,
+                                const O2OXtcSrc& src,
                                 const H5DataTypes::XtcClockTime& time )
 {
   if ( typeId.id() == Pds::TypeId::Id_AcqConfig ) {
@@ -91,13 +91,13 @@ AcqirisDataDescV1Cvt::convert ( const void* data,
     const ConfigXtcType& config = *static_cast<const ConfigXtcType*>( data ) ;
 
     // got configuration object, make the copy
-    m_config.insert( ConfigMap::value_type( detInfo, config ) ) ;
+    m_config.insert( ConfigMap::value_type( src.top(), config ) ) ;
 
   } else if ( typeId.id() == Pds::TypeId::Id_AcqWaveform ) {
 
     // follow regular path
     const XtcType& typedData = *static_cast<const XtcType*>( data ) ;
-    typedConvert ( typedData, typeId, detInfo, time ) ;
+    typedConvert ( typedData, typeId, src, time ) ;
 
   }
 
@@ -108,11 +108,11 @@ void
 AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                              const XtcType& data,
                                              const Pds::TypeId& typeId,
-                                             const Pds::DetInfo& detInfo,
+                                             const O2OXtcSrc& src,
                                              const H5DataTypes::XtcClockTime& time )
 {
   // find corresponding configuration object
-  ConfigMap::const_iterator cit = m_config.find( detInfo ) ;
+  ConfigMap::const_iterator cit = m_config.find( src.top() ) ;
   if ( cit == m_config.end() ) {
     MsgLog ( logger, error, "AcqirisDataDescV1Cvt - no configuration object was defined" );
   }
@@ -148,30 +148,30 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
 
   // scan the data and fill arrays
   // FIXME: few methods that we need from DataDescV1 declared as non-const
-  Pds::Acqiris::DataDescV1& dd = const_cast<Pds::Acqiris::DataDescV1&>( data ) ;
-  for ( uint32_t ch = 0 ; ch < nChan ; ++ ch, dd = *dd.nextChannel(hconfig) ) {
+  Pds::Acqiris::DataDescV1* dd = const_cast<Pds::Acqiris::DataDescV1*>( &data ) ;
+  for ( uint32_t ch = 0 ; ch < nChan ; ++ ch, dd = dd->nextChannel(hconfig) ) {
 
     // first verify that the shape of the data returned corresponds to the config
-    if ( dd.nbrSamplesInSeg() != nSampl ) {
+    if ( dd->nbrSamplesInSeg() != nSampl ) {
       std::ostringstream msg ;
       msg << "O2ONexusWriter::dataObject(Acqiris::DataDescV1) -"
-          << " number of samples in data object (" << dd.nbrSamplesInSeg()
+          << " number of samples in data object (" << dd->nbrSamplesInSeg()
           << ") different from config object (" << nSampl << ")" ;
       throw O2OXTCGenException ( msg.str() ) ;
     }
-    if ( dd.nbrSegments() != nSeg ) {
+    if ( dd->nbrSegments() != nSeg ) {
       std::ostringstream msg ;
       msg << "O2ONexusWriter::dataObject(Acqiris::DataDescV1) -"
-          << " number of segments in data object (" << dd.nbrSegments()
+          << " number of segments in data object (" << dd->nbrSegments()
           << ") different from config object (" << nSeg << ")" ;
       throw O2OXTCGenException ( msg.str() ) ;
     }
 
     for ( uint32_t seg = 0 ; seg < nSeg ; ++ seg ) {
-      timestamps[ch][seg] = dd.timestamp(seg).value();
+      timestamps[ch][seg] = dd->timestamp(seg).value();
     }
 
-    int16_t* wf = dd.waveform(hconfig) ;
+    int16_t* wf = dd->waveform(hconfig) ;
     std::copy ( wf, wf+nSampl*nSeg, (int16_t*)waveforms[ch] ) ;
   }
 

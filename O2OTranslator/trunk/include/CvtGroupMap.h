@@ -24,7 +24,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/xtc/DetInfo.hh"
+#include "pdsdata/xtc/Src.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -37,7 +37,7 @@
 namespace O2OTranslator {
 
 /**
- *  Class which provides mapping from a DetInfo obejct to a corresponding
+ *  Class which provides mapping from a Src object to a corresponding
  *  detector group in HDF5 file.
  *
  *  This software was developed for the LUSI project.  If you use all or
@@ -61,12 +61,12 @@ public:
   // Destructor
   ~CvtGroupMap () ;
 
-  /// find a group for a given top group and DetInfo, return invalid
+  /// find a group for a given top group and Src, return invalid
   /// object if not found
-  hdf5pp::Group find( hdf5pp::Group top, Pds::DetInfo info ) const ;
+  hdf5pp::Group find( hdf5pp::Group top, const Pds::Src& src ) const ;
 
   /// insert new mapping
-  void insert ( hdf5pp::Group top, Pds::DetInfo info, hdf5pp::Group group ) ;
+  void insert ( hdf5pp::Group top, const Pds::Src& src, hdf5pp::Group group ) ;
 
   /// remove all mappings for given top group
   void erase ( hdf5pp::Group top ) ;
@@ -78,13 +78,13 @@ protected:
 
 private:
 
-  // comparison operator for DetInfo objects
-  struct _DetInfoCmp {
-    bool operator()( const Pds::DetInfo& lhs, const Pds::DetInfo& rhs ) const ;
+  // comparison operator for Src objects
+  struct _SrcCmp {
+    bool operator()( const Pds::Src& lhs, const Pds::Src& rhs ) const ;
   };
 
-  typedef std::map<Pds::DetInfo,hdf5pp::Group,_DetInfoCmp> Det2Group ;
-  typedef std::map<hdf5pp::Group,Det2Group> Group2Group ;
+  typedef std::map<Pds::Src,hdf5pp::Group,_SrcCmp> Src2Group ;
+  typedef std::map<hdf5pp::Group,Src2Group> Group2Group ;
 
   // Data members
   Group2Group m_group2group ;

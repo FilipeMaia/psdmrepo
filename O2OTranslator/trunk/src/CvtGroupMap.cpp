@@ -34,9 +34,9 @@
 
 namespace O2OTranslator {
 
-// comparison operator for DetInfo objects
+// comparison operator for Src objects
 bool
-CvtGroupMap::_DetInfoCmp::operator()( const Pds::DetInfo& lhs, const Pds::DetInfo& rhs ) const
+CvtGroupMap::_SrcCmp::operator()( const Pds::Src& lhs, const Pds::Src& rhs ) const
 {
   if ( lhs.log() < rhs.log() ) return true ;
   if ( lhs.log() > rhs.log() ) return false ;
@@ -60,15 +60,15 @@ CvtGroupMap::~CvtGroupMap ()
 {
 }
 
-/// find a group for a given top group and DetInfo, return invalid
+/// find a group for a given top group and Src, return invalid
 /// object if not found
 hdf5pp::Group
-CvtGroupMap::find( hdf5pp::Group top, Pds::DetInfo info ) const
+CvtGroupMap::find( hdf5pp::Group top, const Pds::Src& src ) const
 {
   Group2Group::const_iterator git = m_group2group.find( top ) ;
   if ( git == m_group2group.end() ) return hdf5pp::Group() ;
 
-  Det2Group::const_iterator dit = git->second.find( info ) ;
+  Src2Group::const_iterator dit = git->second.find( src ) ;
   if ( dit == git->second.end() ) return hdf5pp::Group() ;
 
   return dit->second ;
@@ -76,9 +76,9 @@ CvtGroupMap::find( hdf5pp::Group top, Pds::DetInfo info ) const
 
 /// insert new mapping
 void
-CvtGroupMap::insert ( hdf5pp::Group top, Pds::DetInfo info, hdf5pp::Group group )
+CvtGroupMap::insert ( hdf5pp::Group top, const Pds::Src& src, hdf5pp::Group group )
 {
-  m_group2group[top].insert ( Det2Group::value_type(info,group) ) ;
+  m_group2group[top].insert ( Src2Group::value_type(src,group) ) ;
 }
 
 /// remove all mappings for given top group
@@ -97,7 +97,7 @@ CvtGroupMap::groups( hdf5pp::Group top ) const
   Group2Group::const_iterator git = m_group2group.find( top ) ;
   if ( git == m_group2group.end() ) return result ;
 
-  for ( Det2Group::const_iterator it = git->second.begin() ; it != git->second.end() ; ++ it ) {
+  for ( Src2Group::const_iterator it = git->second.begin() ; it != git->second.end() ; ++ it ) {
     result.push_back( it->second ) ;
   }
 
