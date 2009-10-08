@@ -31,6 +31,30 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+namespace {
+
+  hdf5pp::Type _strType( size_t size )
+  {
+    hdf5pp::Type strType = hdf5pp::Type::Copy(H5T_C_S1);
+    strType.set_size( size ) ;
+    return strType ;
+  }
+
+
+  hdf5pp::Type _pvCtrlNameType()
+  {
+    static hdf5pp::Type strType = _strType( Pds::ControlData::PVControl::NameSize );
+    return strType ;
+  }
+
+  hdf5pp::Type _pvMonNameType()
+  {
+    static hdf5pp::Type strType = _strType( Pds::ControlData::PVMonitor::NameSize );
+    return strType ;
+  }
+
+}
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -57,7 +81,7 @@ hdf5pp::Type
 ControlDataPVControlV1::native_type()
 {
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< ControlDataPVControlV1_Data >() ;
-  type.insert_native<const char*>( "name", offsetof(ControlDataPVControlV1_Data,name) ) ;
+  type.insert( "name", offsetof(ControlDataPVControlV1_Data,name), _pvCtrlNameType() ) ;
   type.insert_native<int32_t>( "index", offsetof(ControlDataPVControlV1_Data,index) ) ;
   type.insert_native<double>( "value", offsetof(ControlDataPVControlV1_Data,value) ) ;
 
@@ -82,7 +106,7 @@ hdf5pp::Type
 ControlDataPVMonitorV1::native_type()
 {
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< ControlDataPVMonitorV1_Data >() ;
-  type.insert_native<const char*>( "name", offsetof(ControlDataPVMonitorV1_Data,name) ) ;
+  type.insert( "name", offsetof(ControlDataPVMonitorV1_Data,name), _pvMonNameType() ) ;
   type.insert_native<int32_t>( "index", offsetof(ControlDataPVMonitorV1_Data,index) ) ;
   type.insert_native<double>( "loValue", offsetof(ControlDataPVMonitorV1_Data,loValue) ) ;
   type.insert_native<double>( "hiValue", offsetof(ControlDataPVMonitorV1_Data,hiValue) ) ;
