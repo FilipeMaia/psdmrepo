@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2009-10-09 Andy Salnikov
+- more fixes needed for 64-bit platform, C int type is not supported 
+  by ODBC directly, need to remap it it to long type
+
 Tag: V00-00-04
 2009-08-25 Andy Salnikov
 - on 64 bit platform SQLBIGINT clashes with long type, will disable

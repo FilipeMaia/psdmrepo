@@ -97,7 +97,7 @@ OdbcStatement::bindParam ( unsigned i, OdbcParam<T>& param )
 {
   SQLRETURN r = SQLBindParameter(
        *m_stmtH,
-       i,
+       SQLUSMALLINT(i),
        param.inputOutputType(),
        param.valueType(),
        param.parameterType(),

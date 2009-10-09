@@ -56,11 +56,11 @@ class OdbcParam  {
   SQLSMALLINT inputOutputType() const ;
   SQLSMALLINT valueType() const ;
   SQLSMALLINT parameterType() const ;
-  SQLUINTEGER columnSize() const ;
+  SQLULEN columnSize() const ;
   SQLSMALLINT decimalDigits() const ;
   SQLPOINTER parameterValuePtr() ;
-  SQLINTEGER bufferLength() const ;
-  SQLINTEGER* strLenOrIndPtr() ;
+  SQLLEN bufferLength() const ;
+  SQLLEN* strLenOrIndPtr() ;
 
   void setData ( CppType ) ;
   void setNull () ;
@@ -94,11 +94,11 @@ public:
   SQLSMALLINT inputOutputType() const { return SQL_PARAM_INPUT ; }
   SQLSMALLINT valueType() const { return OdbcCppType<std::string>::cppTypeCode() ; }
   SQLSMALLINT parameterType() const { return OdbcCppType<std::string>::sqlTypeCode() ; }
-  SQLUINTEGER columnSize() const { return m_size ; }
+  SQLULEN columnSize() const { return m_size ; }
   SQLSMALLINT decimalDigits() const { return 0 ; }
   SQLPOINTER parameterValuePtr() { return SQLPOINTER(m_value) ; }
-  SQLINTEGER bufferLength() const { return m_size ; }
-  SQLINTEGER* strLenOrIndPtr() { return &m_size ; }
+  SQLLEN bufferLength() const { return m_size ; }
+  SQLLEN* strLenOrIndPtr() { return &m_size ; }
 
   void setData ( const std::string& value ) {
     m_size = value.size() ;
@@ -114,8 +114,8 @@ public:
 
 private:
   SQLCHAR* m_value ;
-  SQLINTEGER m_maxSize ;
-  SQLINTEGER m_size ;
+  SQLLEN m_maxSize ;
+  SQLLEN m_size ;
 };
 
 //
@@ -125,24 +125,26 @@ template <typename CppType>
 class OdbcParamValue  {
 public:
 
+  typedef typename OdbcCppType<CppType>::stored_type stored_type ;
+
   OdbcParamValue () : m_value(0), m_size(SQL_NULL_DATA) {}
   OdbcParamValue ( CppType value ) : m_value(value), m_size(sizeof value) {}
 
   SQLSMALLINT inputOutputType() const { return SQL_PARAM_INPUT ; }
   SQLSMALLINT valueType() const { return OdbcCppType<CppType>::cppTypeCode() ; }
   SQLSMALLINT parameterType() const { return OdbcCppType<CppType>::sqlTypeCode() ; }
-  SQLUINTEGER columnSize() const { return 0 ; }
+  SQLULEN columnSize() const { return 0 ; }
   SQLSMALLINT decimalDigits() const { return 0 ; }
   SQLPOINTER parameterValuePtr() { return SQLPOINTER(&m_value) ; }
-  SQLINTEGER bufferLength() const { return m_size ; }
-  SQLINTEGER* strLenOrIndPtr() { return &m_size ; }
+  SQLLEN bufferLength() const { return m_size ; }
+  SQLLEN* strLenOrIndPtr() { return &m_size ; }
 
   void setData ( CppType val ) { m_value = val ; }
   void setNull () { m_size = SQL_NULL_DATA; }
 
 private:
-  CppType m_value ;
-  SQLINTEGER m_size ;
+  stored_type m_value ;
+  SQLLEN m_size ;
 };
 
 #define GEN_NUM_PARAM(CPP_TYPE) \

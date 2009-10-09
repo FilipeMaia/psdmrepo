@@ -49,12 +49,20 @@ namespace odbcpp {
 
 template <typename CppType>
 struct OdbcCppType  {
+  typedef void stored_type ;
   static SQLSMALLINT cppTypeCode() ;
   static SQLSMALLINT sqlTypeCode() ;
 };
 
 #define GEN_ODBC_CPP_TYPE(CPP_TYPE,CPP_TYPE_CODE,SQL_TYPE_CODE) \
   template <> struct OdbcCppType<CPP_TYPE> { \
+    typedef CPP_TYPE stored_type ; \
+    static SQLSMALLINT cppTypeCode() { return CPP_TYPE_CODE ; } \
+    static SQLSMALLINT sqlTypeCode() { return SQL_TYPE_CODE ; } \
+  };
+#define GEN_ODBC_CPP_TYPE2(CPP_TYPE,STORED_TYPE,CPP_TYPE_CODE,SQL_TYPE_CODE) \
+  template <> struct OdbcCppType<CPP_TYPE> { \
+    typedef STORED_TYPE stored_type ; \
     static SQLSMALLINT cppTypeCode() { return CPP_TYPE_CODE ; } \
     static SQLSMALLINT sqlTypeCode() { return SQL_TYPE_CODE ; } \
   };
@@ -62,8 +70,8 @@ struct OdbcCppType  {
 GEN_ODBC_CPP_TYPE(std::string,  SQL_C_CHAR,     SQL_VARCHAR  )
 GEN_ODBC_CPP_TYPE(SQLSMALLINT,  SQL_C_SSHORT,   SQL_SMALLINT )
 GEN_ODBC_CPP_TYPE(SQLUSMALLINT, SQL_C_USHORT,   SQL_SMALLINT)
-GEN_ODBC_CPP_TYPE(int,          SQL_C_SLONG,    SQL_INTEGER )
-GEN_ODBC_CPP_TYPE(unsigned int, SQL_C_ULONG,    SQL_INTEGER)
+GEN_ODBC_CPP_TYPE2(int,         long,           SQL_C_SLONG,    SQL_INTEGER )
+GEN_ODBC_CPP_TYPE2(unsigned int, unsigned long, SQL_C_ULONG,    SQL_INTEGER)
 GEN_ODBC_CPP_TYPE(long,         SQL_C_SLONG,    SQL_INTEGER )
 GEN_ODBC_CPP_TYPE(unsigned long,SQL_C_ULONG,    SQL_INTEGER)
 GEN_ODBC_CPP_TYPE(long long,    SQL_C_SBIGINT,  SQL_BIGINT)

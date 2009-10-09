@@ -127,19 +127,22 @@ private:
 template <typename NumType>
 class OdbcColumnVarValue : public OdbcColumnVarBase {
 public:
+
+  typedef typename OdbcCppType<NumType>::stored_type stored_type ;
+
   OdbcColumnVarValue( unsigned int nRows )
     : OdbcColumnVarBase(nRows)
-    , m_value(new NumType[nRows])
+    , m_value(new stored_type[nRows])
   {}
   ~OdbcColumnVarValue() { delete [] m_value ; }
 
   SQLSMALLINT targetType() const { return OdbcCppType<NumType>::cppTypeCode() ; }
   SQLPOINTER targetValuePtr() { return m_value ; }
-  SQLINTEGER bufferLength() const { return sizeof(NumType) ; }
-  NumType value(unsigned int idx=0) const { return m_value[idx] ; }
+  SQLINTEGER bufferLength() const { return sizeof(stored_type) ; }
+  NumType value(unsigned int idx=0) const { return NumType(m_value[idx]) ; }
 
 private:
-  NumType* m_value ;
+  stored_type* m_value ;
 
   // copy or assignment is not allowed
   OdbcColumnVarValue ( const OdbcColumnVarValue& ) ;
