@@ -292,8 +292,8 @@ class Controller ( LusiPyApp ) :
                 if k.startswith('list:') :
                     self._config.setdefault(k, []).extend(v)
                 else :
-                    self._config[k] = value
-
+                    self._config[k] = v
+                    
         self._config["_log_uri"] = ctrl['log_uri']
         self._config["_translate_uri"] = ctrl['translate_uri']
         self._config["_controller_id"] = ctrl['id']
