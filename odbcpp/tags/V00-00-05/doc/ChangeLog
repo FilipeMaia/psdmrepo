@@ -1,0 +1,39 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package odbcpp
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-05
+2009-10-09 Andy Salnikov
+- more fixes needed for 64-bit platform, C int type is not supported 
+  by ODBC directly, need to remap it it to long type
+
+Tag: V00-00-04
+2009-08-25 Andy Salnikov
+- on 64 bit platform SQLBIGINT clashes with long type, will disable
+  SQLBIGINT support for now
+
+Tag: V00-00-03
+2009-05-19 Igor Gaponenko
+- support for 64-bit integer collumns (C++ types: 'long long'
+  and 'long long unsigned')
+
+Tag: V00-00-02
+2008-12-18 Andy Salnikov
+- implemented array fetching
+  - OdbcResult::fetch() returns the number of the rows fetched
+- implemented OdbcConnection::tables()
+- added date/time types for parameters/column vars
+
+Tag: V00-00-01
+2008-12-17 Andy Salnikov
+- first import of the package into repository, minimally working version
+
