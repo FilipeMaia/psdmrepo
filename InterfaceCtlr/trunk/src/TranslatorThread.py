@@ -237,10 +237,9 @@ class TranslatorThread ( threading.Thread ) :
         cmd_list.append("--output-name")
         cmd_list.append(fname_dict['h5name'])
         
-        odbc_opt = self._config.get('md-odbc-options-file',None)
-        if odbc_opt :
+        for f in self._config.get('list:o2o-options-file',[]) :
             cmd_list.append("--options-file")
-            cmd_list.append(odbc_opt)
+            cmd_list.append(f)
 
         return cmd_list
 

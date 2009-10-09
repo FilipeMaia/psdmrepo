@@ -287,7 +287,12 @@ class Controller ( LusiPyApp ) :
         for section in self._options.config :
             config = self._db.get_config(section)
             self.trace ( 'config[%s] = %s', section, pformat(config) )
-            self._config.update ( config )
+            # merge configurations
+            for k,v in config.iteritems() :
+                if k.startswith('list:') :
+                    self._config.setdefault(k, []).extend(v)
+                else :
+                    self._config[k] = value
 
         self._config["_log_uri"] = ctrl['log_uri']
         self._config["_translate_uri"] = ctrl['translate_uri']

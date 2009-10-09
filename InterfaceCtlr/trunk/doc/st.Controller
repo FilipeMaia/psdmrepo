@@ -25,7 +25,7 @@ start() {
     if [ -n "${pid}" -a -d /proc/${pid} ] ; then
         failure "already running, pid=$pid"
     else
-        runuser -s /bin/bash psdatmgr -c "${CMDPATH} -p ${pidfile}" && success || failure
+        runuser -g ps-data -s /bin/bash psdatmgr -c "${CMDPATH} -p ${pidfile}" && success || failure
     fi
     RETVAL=$?
 }

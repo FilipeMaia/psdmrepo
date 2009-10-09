@@ -228,7 +228,12 @@ class InterfaceDb ( object ) :
 
         config = {}
         for row in res :
-            config[row[0]] = parsers.get(row[2], lambda x: x)(row[1])
+            param = row[0]
+            value = parsers.get(row[2], lambda x: x)(row[1])
+            if param.startswith('list:') :
+                config.setdefault(param,[]).append(value)
+            else :
+                config[param] = value
 
         return config
 
