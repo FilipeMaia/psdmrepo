@@ -90,6 +90,7 @@ class TranslatorThread ( threading.Thread ) :
         self._log = logger
 
         # setup file manager
+        self._file_mgr = None
         if self._config.get('filemanager-irods-command',None) :
             self._file_mgr = FileMgrIrods( self._config['filemanager-irods-command'], self._config, self._log )
 
@@ -217,23 +218,30 @@ class TranslatorThread ( threading.Thread ) :
         cmd_list.append("o2o-translate")
 
         for xtc in fs['xtc_files']:
-            cmd_list.append("-f")
+            cmd_list.append("--event-file")
             cmd_list.append(xtc)
 
         #
         # Destination dir for translated file
-        cmd_list.append("-d")
+        cmd_list.append("--output-dir")
         cmd_list.append(fname_dict['h5dirname'])
 
         #
         # experiment, run number, filename
-        cmd_list.append("-i")
+        cmd_list.append("--instrument")
         cmd_list.append(fs['instrument'])
-        cmd_list.append("-x")
+        cmd_list.append("--experiment")
         cmd_list.append(fs['experiment'])
-        cmd_list.append("-n")
+        cmd_list.append("--run-number")
+        cmd_list.append(str(fs['run_number']))
+        cmd_list.append("--output-name")
         cmd_list.append(fname_dict['h5name'])
         
+        odbc_opt = self._config.get('md-odbc-options-file',None)
+        if odbc_opt :
+            cmd_list.append("--options-file")
+            cmd_list.append(odbc_opt)
+
         return cmd_list
 
 
@@ -277,7 +285,7 @@ class TranslatorThread ( threading.Thread ) :
     # Store HDF5 files in both dataset and file manager
     # =================================================
 
-    def __store_hdf5 (self, fs_id, dirname):
+    def __store_hdf5 (self, fs, dirname):
 
         # generator for all file paths under given directory
         def _all_files( root, subdir = "" ) :

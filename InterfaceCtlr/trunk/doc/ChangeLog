@@ -11,6 +11,12 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-06
+2009-10-09 Andy Salnikov
+- small fixes
+- added support for md-odbc-options-file configuration
+- select from files should only look for XTC files
+
 Tag: V00-03-05
 2009-10-08 Andy Salnikov
 - commented out everything in test/CreateFilesets

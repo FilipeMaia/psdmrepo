@@ -138,7 +138,7 @@ class InterfaceDb ( object ) :
                     self._log.warning( 'retry limit exceeded, abort' )
                     raise
                 else :
-                    os.sleep(3)
+                    time.sleep(3)
             
             if self._conn :
                 
@@ -271,7 +271,7 @@ class InterfaceDb ( object ) :
             if fs :
                 # get the list of files in fileset
                 cursor = self.cursor()
-                rows = cursor.execute("SELECT name FROM files WHERE fk_fileset_id = %s", (fs['id'],) )
+                rows = cursor.execute("SELECT name FROM files WHERE fk_fileset_id = %s and type='XTC'", (fs['id'],) )
                 rows = cursor.fetchall()
                 fs['xtc_files'] = [ r[0] for r in rows ]
 
