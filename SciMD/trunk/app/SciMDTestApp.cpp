@@ -271,7 +271,7 @@ SciMDTestApp::cmd_help ()
              << "  help [command]\n"
              << "\n"
              << "  add_run       <instrument> <experiment> <run> {DATA|CALIB} <begn_time> <end_time>\n"
-             << "  set_run_param <instrument> <experiment> <run> <param> <value> {INT|DOUBLE|TEXT}\n"
+             << "  set_run_param <instrument> <experiment> <run> <param> <value> {INT|INT64|DOUBLE|TEXT}\n"
              << "  param_info    <instrument> <experiment> <param>" << endl;
         return 0 ;
     }
@@ -345,6 +345,8 @@ SciMDTestApp::cmd_help ()
              << "  The parameter type can be one of the following:\n"
              << "\n"
              << "    'INT'\n"
+             << "    'INT64'\n"
+             << "    'DOUBLE'\n"
              << "    'DOUBLE'\n"
              << "    'TEXT'" << endl ;
 
@@ -425,6 +427,24 @@ SciMDTestApp::cmd_set_run_param () throw (std::exception)
 
         int value_int ;
         if (1 != sscanf(value.c_str(), "%d", &value_int)) {
+            MsgLogRoot (error, "parameter value is not of the claimed type") ;
+            return 2 ;
+        }
+        m_connection->beginTransaction () ;
+        m_connection->setRunParam (
+            instrument,
+            experiment,
+            run,
+            param,
+            value_int,
+            "SciMDTestApp",
+            m_update.value () > 0) ;
+        m_connection->commitTransaction () ;
+
+    } else if (type == "INT64") {
+
+        int64_t value_int ;
+        if (1 != sscanf(value.c_str(), "%lld", &value_int)) {
             MsgLogRoot (error, "parameter value is not of the claimed type") ;
             return 2 ;
         }

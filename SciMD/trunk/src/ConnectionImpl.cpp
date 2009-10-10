@@ -294,6 +294,27 @@ ConnectionImpl::setRunParam (const std::string& instrument,
                              const std::string& experiment,
                              int                run,
                              const std::string& parameter,
+                             int64_t            value,
+                             const std::string& source,
+                             bool               updateAllowed) throw (ValueTypeMismatch,
+                                                                      WrongParams,
+                                                                      DatabaseError)
+{
+    return this->setRunParamImpl (instrument,
+                                  experiment,
+                                  run,
+                                  parameter,
+                                  value,
+                                  "INT64",
+                                  source,
+                                  updateAllowed) ;
+}
+
+void
+ConnectionImpl::setRunParam (const std::string& instrument,
+                             const std::string& experiment,
+                             int                run,
+                             const std::string& parameter,
                              double             value,
                              const std::string& source,
                              bool               updateAllowed) throw (ValueTypeMismatch,

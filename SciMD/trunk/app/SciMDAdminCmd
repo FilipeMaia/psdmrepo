@@ -82,10 +82,10 @@ def _default_database():
 
     return "SciMD"
 
-def _exper_id_sql (experiment):
-    """Return a nested SQL query to retrieve an identifier of an experiment"""
+def _exper_id_sql (instrument, experiment ):
+    """Return a nested SQL query to retrieve an identifier of an instrument/experiment"""
 
-    return """(SELECT id FROM "experiment" WHERE name='%s')""" % experiment
+    return """(SELECT e.id FROM instrument i,experiment e WHERE i.id=e.instr_id AND i.name='%s' AND e.name='%s')""" % (instrument, experiment)
 
 def _time2str(timestamp):
     """Trun a number 64-bit timestamp got from the database into
@@ -242,10 +242,9 @@ class SciMDCmd ( LusiPyApp ) :
         #
         self.__add_handler(
             'experiments',
-            '[<experiment>]',
+            '',
             """
-    Display all known experiments or just one experiment (if its
-    name is requested in the optional parameter to the command).
+    Display all known experiments.
 
     The following option will trigger the detailed report on
     the parameters of selected entries:
@@ -299,7 +298,7 @@ class SciMDCmd ( LusiPyApp ) :
         #
         self.__add_handler(
             'experiment_config',
-            '<experiment> <operation> [<parameters>]',
+            '<instrument> <experiment> <operation> [<parameters>]',
             """
     Browse or modify (add, remove, set) various records associated with
     an existing experiment, including:
@@ -388,6 +387,7 @@ class SciMDCmd ( LusiPyApp ) :
             of the parameter can be anything from the following list:
 
                 INT
+                INT64
                 DOUBLE
                 TEXT
 
@@ -456,10 +456,9 @@ class SciMDCmd ( LusiPyApp ) :
         #
         self.__add_handler(
             'instruments',
-            '[<instrument>]',
+            '',
             """
-    Display all known instruments or just one instrument (if its
-    name is requested in the optional parameter to the command).
+    Display all known instruments.
 
     The following option will trigger the detailed report on
     the parameters of selected entries:
@@ -494,7 +493,7 @@ class SciMDCmd ( LusiPyApp ) :
         #
         self.__add_handler(
             'runs',
-            '<experiment> [<run>]',
+            '<instrument> <experiment> [<run>]',
             """
     The command will print an information about runs. If no specific run
     is requested all runs will be reported.
@@ -505,7 +504,7 @@ class SciMDCmd ( LusiPyApp ) :
         #
         self.__add_handler(
             'add_run',
-            '<experiment> <run> <type> <begin_time> <end_time>',
+            '<instrument> <experiment> <run> <type> <begin_time> <end_time>',
             """
     The command will create a database record for the specified run.
     At a time this application was being written the following run
@@ -539,7 +538,7 @@ class SciMDCmd ( LusiPyApp ) :
         #
         self.__add_handler(
             'run_params',
-            '<experiment> <run> <operation> [<parameters>]',
+            '<instrument> <experiment> <run> <operation> [<parameters>]',
             """
     Browse or modify parameters of the specified run. The command
     deals with both core and user defined (if any) parameters.
@@ -722,17 +721,12 @@ SUPPORTED COMMANDS:
 
     def __cmd_experiments ( self, command, args ) :
 
-        # Restrict the query to specific groups only if requested --------------
-        #
-        limits = ""
-        if len(args):
-            limits = """ AND "e"."name"='%s'""" % args[0]
-
         if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
         rows = self.__select_query(
             'SELECT e.*, g.name "group_name", i.name "instr_name"'+
             ' FROM "experiment" AS "e", "group" AS "g" , "instrument" AS "i"'+
-            ' WHERE "e"."group_id"="g"."id" AND "e"."instr_id"="i"."id"'+limits,
+            ' WHERE "e"."group_id"="g"."id" AND "e"."instr_id"="i"."id"'+
+            ' ORDER BY i.name, e.name',
             return_dict=True)
         if not rows: return 1
 
@@ -756,7 +750,7 @@ SUPPORTED COMMANDS:
         _time2str(r['end_time'])))
 
             else:
-                self.print_out(r['name'])
+                self.print_out(r['instr_name'] + ' / ' + r['name'])
 
         return 0
 
@@ -794,7 +788,7 @@ SUPPORTED COMMANDS:
         # we're going to use existing template tables as a model
         # for new tables.
         #
-        exper_id = self._exper_id( experiment )
+        exper_id = self._exper_id( instrument, experiment )
 
         statements = []
 
@@ -824,79 +818,80 @@ SUPPORTED COMMANDS:
 
     def __cmd_experiment_config ( self, command, args ) :
 
-        if len(args) < 2:
+        if len(args) < 3:
             self._parser.error("insuffcient number of parameters for command: %s" % command)
 
-        experiment = args[0]
+        instrument = args[0]
+        experiment = args[1]
 
         # Get the operation name, analyze its parameters and switch ------------
         # to its processor.
         #
-        operation = args[1]
-        nextParam = 2
-        numParams = len(args) - 2
+        operation = args[2]
+        nextParam = 3
+        numParams = len(args) - 3
 
         if operation == 'list_confs':
-            return self.__list_exper_confs (experiment, args[nextParam:])
+            return self.__list_exper_confs (instrument, experiment, args[nextParam:])
 
         elif operation == 'print_conf':
             if numParams != 1:
                 self._parser.error("insufficient number of parameters for operation: %s" % operation)
             (name,) = args[nextParam:]
-            return self.__print_exper_conf (experiment, name)
+            return self.__print_exper_conf (instrument, experiment, name)
 
         elif operation == 'add_conf':
             if numParams != 2:
                 self._parser.error("insufficient number of parameters for operation: %s" % operation)
             (name,value) = args[nextParam:]
-            return self.__add_exper_conf (experiment, name, value)
+            return self.__add_exper_conf (instrument, experiment, name, value)
 
         elif operation == 'remove_conf':
             if numParams != 1:
                 self._parser.error("insufficient number of parameters for operation: %s" % operation)
             (name,) = args[nextParam:]
-            return self.__remove_exper_conf (experiment, name)
+            return self.__remove_exper_conf (instrument, experiment, name)
 
         elif operation == 'list_run_params':
             if numParams != 0:
                 self._parser.error("insufficient number of parameters for operation: %s" % operation)
-            return self.__list_run_param_defs (experiment)
+            return self.__list_run_param_defs (instrument, experiment)
 
         elif operation == 'add_run_param':
             if numParams != 2:
                 self._parser.error("insufficient number of parameters for operation: %s" % operation)
             (name,type) = args[nextParam:]
-            return self.__add_run_param_def (experiment, name, type)
+            return self.__add_run_param_def (instrument, experiment, name, type)
 
         elif operation == 'remove_run_param':
             if numParams != 1:
                 self._parser.error("insufficient number of parameters for operation: %s" % operation)
             (name,) = args[nextParam:]
-            return self.__remove_run_param_def (experiment, name)
+            return self.__remove_run_param_def (instrument, experiment, name)
 
         elif operation == 'list_user_run_params':
             if numParams != 0:
                 self._parser.error("insufficient number of parameters for operation: %s" % operation)
-            return self.__list_user_run_param_defs (experiment)
+            return self.__list_user_run_param_defs (instrument, experiment)
 
         elif operation == 'add_user_run_param':
             if numParams != 2:
                 self._parser.error("insufficient number of parameters for operation: %s" % operation)
             (name,type) = args[nextParam:]
-            return self.__add_user_run_param_def (experiment, name, type)
+            return self.__add_user_run_param_def (instrument, experiment, name, type)
 
         elif operation == 'remove_user_run_param':
             if numParams != 1:
                 self._parser.error("insufficient number of parameters for operation: %s" % operation)
             (name,) = args[nextParam:]
-            return self.__remove_user_run_param_def (experiment, name)
+            return self.__remove_user_run_param_def (instrument, experiment, name)
 
         else:
             self._parser.error("unknown subcommand: %s for command: %s" % (operation, command))
 
         return 0
 
-    def __list_exper_confs (self, experiment, args):
+    def __list_exper_confs (self, instrument, experiment, args):
 
         # Restrict the query to specific parameters only if requested ----------
         #
@@ -908,7 +903,7 @@ SUPPORTED COMMANDS:
         rows = self.__select_query(
             'SELECT c.param, c.descr, SUBSTR(c.val, 1, 72) "val"'+
             ' FROM "experiment_conf" AS "c"'+
-            """ WHERE "c"."exper_id"=%s""" % (_exper_id_sql( experiment),) +limits,
+            """ WHERE "c"."exper_id"=%s""" % (_exper_id_sql( instrument, experiment ),) +limits,
             return_dict=True)
         if not rows: return 1
 
@@ -930,14 +925,14 @@ SUPPORTED COMMANDS:
 
         return 0
 
-    def __print_exper_conf (self, experiment, name):
+    def __print_exper_conf (self, instrument, experiment, name):
 
         if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
         rows = self.__select_query(
             'SELECT c.val "val"'+
             ' FROM "experiment_conf" AS "c"'+
             """ WHERE "c"."exper_id"=%s AND "c"."param"='%s'""" % (
-            _exper_id_sql( experiment ),name),
+            _exper_id_sql( instrument, experiment ),name),
             return_dict=True)
         if not rows: return 1
 
@@ -945,13 +940,13 @@ SUPPORTED COMMANDS:
 
         return 0
 
-    def __add_exper_conf (self, experiment, name, value):
+    def __add_exper_conf (self, instrument, experiment, name, value):
 
         if not self.__simple_query(
             "SET SESSION SQL_MODE='ANSI'",
             "START TRANSACTION",
             """INSERT INTO "experiment_conf" VALUES(%s,'%s','%s','%s')""" % (
-                _exper_id_sql( experiment ),
+                _exper_id_sql( instrument, experiment ),
                 name,
                 value,
                 self._description()),
@@ -959,24 +954,24 @@ SUPPORTED COMMANDS:
 
         return 0
 
-    def __remove_exper_conf (self, experiment, name):
+    def __remove_exper_conf (self, instrument, experiment, name):
         if not self.__simple_query(
             "SET SESSION SQL_MODE='ANSI'",
             "START TRANSACTION",
             """DELETE FROM "experiment_conf" WHERE "exper_id"=%s AND "param"='%s'""" % (
-                _exper_id_sql( experiment ),
+                _exper_id_sql( instrument, experiment ),
                 name),
             "COMMIT"): return 1
 
         return 0
 
-    def __list_run_param_defs (self, experiment):
+    def __list_run_param_defs (self, instrument, experiment):
 
         if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
         rows = self.__select_query(
             'SELECT rp.*'+
             ' FROM "run_param" AS "rp"'+
-            """ WHERE "rp"."exper_id"=%s""" % (_exper_id_sql( experiment),),
+            """ WHERE "rp"."exper_id"=%s""" % (_exper_id_sql( instrument, experiment ),),
             return_dict=True)
         if not rows: return 1
 
@@ -998,9 +993,9 @@ SUPPORTED COMMANDS:
 
         return 0
 
-    def __add_run_param_def (self, experiment, name, type):
+    def __add_run_param_def (self, instrument, experiment, name, type):
 
-        if type not in ('INT', 'DOUBLE', 'TEXT'):
+        if type not in ('INT', 'INT64', 'DOUBLE', 'TEXT'):
             self._parser.error("unsupported parameter type: %s" % type)
 
         if not self.__simple_query(
@@ -1008,22 +1003,22 @@ SUPPORTED COMMANDS:
             "START TRANSACTION",
             """INSERT INTO "run_param" VALUES(NULL,'%s',%s,'%s','%s')""" % (
                 name,
-                _exper_id_sql( experiment ),
+                _exper_id_sql( instrument, experiment ),
                 type,
                 self._description()),
             "COMMIT"): return 1
 
         return 0
 
-    def __remove_run_param_def (self, experiment, name):
+    def __remove_run_param_def (self, instrument, experiment, name):
         pass
 
-    def __list_user_run_param_defs (self, experiment):
+    def __list_user_run_param_defs (self, instrument, experiment):
 
         if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
         rows = self.__select_query(
             'SELECT rp.*'+
-            ' FROM "exper_%s_run_param" AS "rp"' % (self._exper_id( experiment),),
+            ' FROM "exper_%s_run_param" AS "rp"' % (self._exper_id( instrument, experiment ),),
             return_dict=True)
         if not rows: return 1
 
@@ -1045,7 +1040,7 @@ SUPPORTED COMMANDS:
 
         return 0
 
-    def __add_user_run_param_def (self, experiment, name, type):
+    def __add_user_run_param_def (self, instrument, experiment, name, type):
         if type not in ('INT', 'DOUBLE', 'TEXT'):
             self._parser.error("unsupported parameter type: %s" % type)
 
@@ -1053,7 +1048,7 @@ SUPPORTED COMMANDS:
             "SET SESSION SQL_MODE='ANSI'",
             "START TRANSACTION",
             """INSERT INTO "exper_%s_run_param" VALUES(NULL,'%s','%s','%s')""" % (
-                self._exper_id( experiment),
+                self._exper_id( instrument, experiment ),
                 name,
                 type,
                 self._description()),
@@ -1061,7 +1056,7 @@ SUPPORTED COMMANDS:
 
         return 0
 
-    def __remove_user_run_param_def (self, experiment, name):
+    def __remove_user_run_param_def (self, instrument, experiment, name):
         pass
 
     # ============================
@@ -1135,17 +1130,12 @@ SUPPORTED COMMANDS:
 
     def __cmd_instruments ( self, command, args ) :
 
-        limits = ""
-        if len(args) == 0:
-            pass
-        elif len(args) == 1:
-            limits = """ WHERE "i"."name"='%s'""" % args[0]
-        else:
+        if len(args) != 0:
             self._parser.error("to many parameters for command: %s" % command)
 
         if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
         rows = self.__select_query(
-            'SELECT * FROM "instrument" AS "i"'+limits,
+            'SELECT * FROM "instrument" AS "i"',
             return_dict=True)
         if not rows: return 1
 
@@ -1199,23 +1189,16 @@ SUPPORTED COMMANDS:
 
     def __cmd_runs ( self, command, args ):
 
-        if len(args) < 1:
-            self._parser.error("insuffcient number of parameters for command: %s" % command)
+        if len(args) != 2:
+            self._parser.error("insufficient number of parameters for command: %s" % command)
 
-        experiment = args[0]
-
-        limits = ""
-        if len(args) == 1:
-            pass
-        elif len(args) == 2:
-            limits = """ WHERE "r"."num"=%s""" % args[1]
-        else:
-            self._parser.error("to many parameters for command: %s" % command)
+        instrument = args[0]
+        experiment = args[1]
 
         if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
         rows = self.__select_query(
             'SELECT * FROM "run" AS "r"'+
-            """ WHERE "r"."exper_id"=%s""" % (_exper_id_sql( experiment ),)+limits+
+            """ WHERE "r"."exper_id"=%s""" % (_exper_id_sql( instrument, experiment ),)+
             ' ORDER by "r"."num"',
             return_dict=True)
         if not rows: return 1
@@ -1237,10 +1220,10 @@ SUPPORTED COMMANDS:
 
     def __cmd_add_run ( self, command, args ):
 
-        if len(args) != 5:
+        if len(args) != 6:
             self._parser.error("insuffcient number of parameters for command: %s" % command)
 
-        (experiment, run, type, begin_time, end_time) = args
+        (instrument, experiment, run, type, begin_time, end_time) = args
 
         # Parse and reconvert timestamps into packed format
         try:
@@ -1254,7 +1237,7 @@ SUPPORTED COMMANDS:
             "SET SESSION SQL_MODE='ANSI'",
             "START TRANSACTION",
             """INSERT INTO "run" VALUES(NULL,%s,%s,'%s',%s,%s)""" % (
-                run,_exper_id_sql( experiment ),type,begin_time,end_time),
+                run,_exper_id_sql( instrument, experiment ),type,begin_time,end_time),
             "COMMIT"): return 1
 
         return 0
@@ -1265,47 +1248,48 @@ SUPPORTED COMMANDS:
 
     def __cmd_run_params ( self, command, args ) :
 
-        if len(args) < 3:
+        if len(args) < 4:
             self._parser.error("insuffcient number of parameters for command: %s" % command)
 
 
         # Get the operation name, analyze its parameters and switch ------------
         # to its processor.
         #
-        experiment = args[0]
-        run        = args[1]
-        operation  = args[2]
+        instrument = args[0]
+        experiment = args[1]
+        run        = args[2]
+        operation  = args[3]
 
-        nextParam = 3
-        numParams = len(args) - 3
+        nextParam = 4
+        numParams = len(args) - 4
 
         if operation == 'list':
-            return self.__list_run_params (experiment, run, args[nextParam:])
+            return self.__list_run_params (instrument, experiment, run, args[nextParam:])
 
         elif operation == 'value':
             if numParams != 1:
                 self._parser.error("insufficient number of parameters for operation: %s" % operation)
             (name,) = args[nextParam:]
-            return self.__print_run_param_value (experiment, run, name)
+            return self.__print_run_param_value (instrument, experiment, run, name)
 
         elif operation == 'set_value':
             if numParams != 3:
                 self._parser.error("insufficient number of parameters for operation: %s" % operation)
             (name,value,source) = args[nextParam:]
-            return self.__set_run_param_value (experiment, run, name, value, source)
+            return self.__set_run_param_value (instrument, experiment, run, name, value, source)
 
         elif operation == 'set_user_value':
             if numParams != 2:
                 self._parser.error("insufficient number of parameters for operation: %s" % operation)
             (name,value) = args[nextParam:]
-            return self.__set_user_run_param_value (experiment, run, name, value)
+            return self.__set_user_run_param_value (instrument, experiment, run, name, value)
 
         else:
             self._parser.error("unknown subcommand: %s for command: %s" % (operation, command))
 
         return 0
 
-    def __list_run_params (self, experiment, run, args):
+    def __list_run_params (self, instrument, experiment, run, args):
 
         # Restrict the query to specific parameters only if requested ----------
         #
@@ -1317,7 +1301,7 @@ SUPPORTED COMMANDS:
         rows = self.__select_query(
             'SELECT *'+
             ' FROM "run_param" AS "p"'+
-            """ WHERE "p"."exper_id"=%s""" % (_exper_id_sql( experiment),) +limits,
+            """ WHERE "p"."exper_id"=%s""" % (_exper_id_sql( instrument, experiment ),) +limits,
             return_dict=True)
         if not rows: return 1
 
@@ -1329,6 +1313,7 @@ SUPPORTED COMMANDS:
             run_val_table = ""
             if   rp['type'] == "TEXT"  : run_val_table = "run_val_text"
             elif rp['type'] == "INT"   : run_val_table = "run_val_int"
+            elif rp['type'] == "INT64" : run_val_table = "run_val_int64"
             elif rp['type'] == "DOUBLE": run_val_table = "run_val_double"
             else:
                 return 1
@@ -1336,9 +1321,10 @@ SUPPORTED COMMANDS:
             sql = "".join([
                'SELECT rv.source "source", rv.updated "updated", v.val "val"',
                """ FROM "run_val" AS "rv", "%s" AS "v", "run" AS "r" """ % (run_val_table,),
-               """ WHERE "r"."exper_id"=%s AND "r"."num"=%s""" % (_exper_id_sql( experiment),run),
+               """ WHERE "r"."exper_id"=%s AND "r"."num"=%s""" % (_exper_id_sql( instrument, experiment ),run),
                """ AND "r"."id"="rv"."run_id" AND "r"."id"="v"."run_id" AND "rv"."param_id"=%s AND "v"."param_id"=%s""" % (rp['id'],rp['id'])])
 
+            print sql;
             value = ""
             source = ""
             updated = ""
@@ -1372,14 +1358,14 @@ SUPPORTED COMMANDS:
 
         return 0
 
-    def __print_run_params_value (self, experiment, run, name):
+    def __print_run_params_value (self, instrument, experiment, run, name):
 
         if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
         rows = self.__select_query(
             'SELECT c.val "val"'+
             ' FROM "experiment_conf" AS "c"'+
             """ WHERE "c"."exper_id"=%s AND "c"."param"='%s'""" % (
-            _exper_id_sql( experiment ),name),
+            _exper_id_sql( instrument, experiment ),name),
             return_dict=True)
         if not rows: return 1
 
@@ -1387,7 +1373,7 @@ SUPPORTED COMMANDS:
 
         return 0
 
-    def __set_run_param_value (self, experiment, run, name, value, source):
+    def __set_run_param_value (self, instrument, experiment, run, name, value, source):
 
         # Get a type of the parameter (we need the one to put-------------------
         # parameter's value into the right table).
@@ -1396,7 +1382,7 @@ SUPPORTED COMMANDS:
         rows = self.__select_query(
             'SELECT *'+
             ' FROM "run_param" AS "p"'+
-            """ WHERE "p"."exper_id"=%s AND "p"."param"='%s'""" % (_exper_id_sql( experiment),name),
+            """ WHERE "p"."exper_id"=%s AND "p"."param"='%s'""" % (_exper_id_sql( instrument, experiment ),name),
             return_dict=True)
         if not rows: return 1
 
@@ -1409,14 +1395,15 @@ SUPPORTED COMMANDS:
             run_val_table = "run_val_text"
             p_val = "'%s'" % value
         elif p_type == "INT"   : run_val_table = "run_val_int"
+        elif p_type == "INT64" : run_val_table = "run_val_int64"
         elif p_type == "DOUBLE": run_val_table = "run_val_double"
         else:
             return 1
 
         # We also need identifiers of the experiment and the run----------------
         #
-        exper_id = self._exper_id(experiment)
-        run_id   = self._run_id(exper_id, run)
+        exper_id = self._exper_id( instrument, experiment )
+        run_id   = self._run_id( exper_id, run )
 
         # Using the current timestamp as a value update time--------------------
         #
@@ -1612,17 +1599,17 @@ SUPPORTED COMMANDS:
     # Get an internal identifier of the experiment
     # ============================================
 
-    def _exper_id (self, experiment):
+    def _exper_id (self, instrument, experiment):
 
         if self.__simple_query("SET SESSION SQL_MODE='ANSI'"):
 
             rows = self.__select_query(
-                """(SELECT id FROM "experiment" WHERE name='%s')""" % experiment,
+                """(SELECT e.id FROM instrument i, experiment e WHERE i.name='%s' AND e.name='%s' AND i.id=e.instr_id)""" % (instrument, experiment),
                 return_dict=True)
             if rows:
                 return rows[0]['id']
 
-        raise DatabaseOperatonFailed, "failed to obtain experiment identifier for: %s" % experiment
+        raise DatabaseOperatonFailed, "failed to obtain experiment identifier for: %s / %s" % (instrument, experiment)
 
     # =====================================
     # Get an internal identifier of the run

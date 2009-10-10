@@ -16,6 +16,8 @@
 //-----------------
 #include <string>
 
+#include <stdint.h>
+
 //----------------------
 // Base Class Headers --
 //----------------------
@@ -201,6 +203,19 @@ public:
                               int                run,
                               const std::string& parameter,
                               int                value,
+                              const std::string& source,
+                              bool               updateAllowed=false) throw (ValueTypeMismatch,
+                                                                             WrongParams,
+                                                                             DatabaseError) = 0 ;
+
+    /**
+      * Set a value of a run parameter (64-bit integer value).
+      */
+    virtual void setRunParam (const std::string& instrument,
+                              const std::string& experiment,
+                              int                run,
+                              const std::string& parameter,
+                              int64_t            value,
                               const std::string& source,
                               bool               updateAllowed=false) throw (ValueTypeMismatch,
                                                                              WrongParams,
