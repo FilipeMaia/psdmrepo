@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2009-10-12 Igor Gaponenko
+- fixed a bug in the C++ API
+
 Tag: V00-00-08
 2009-10-10 Igor Gaponenko
 - added 64-bit integer parameter type to schema

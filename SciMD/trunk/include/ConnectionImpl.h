@@ -413,19 +413,23 @@ ConnectionImpl::setRunParamImpl (const std::string& instrument,
 
         // Proceed with the operation and insert/update an entry into two tables.
         //
-        odbcpp::OdbcParam<int >        p_run_id   (runDescr.id) ;
-        odbcpp::OdbcParam<int >        p_param_id (paramDescr.id) ;
-        odbcpp::OdbcParam<std::string> p_source   (source) ;
-        odbcpp::OdbcParam<T>           p_value    (value) ;
+        long long unsigned setOrUpdateTime64 = LusiTime::Time::to64 (LusiTime::Time::now()) ;
+
+        odbcpp::OdbcParam<int >               p_run_id   (runDescr.id) ;
+        odbcpp::OdbcParam<int >               p_param_id (paramDescr.id) ;
+        odbcpp::OdbcParam<std::string>        p_source   (source) ;
+        odbcpp::OdbcParam<T>                  p_value    (value) ;
+        odbcpp::OdbcParam<long long unsigned> p_updated  (setOrUpdateTime64) ;
 
         if (updating) {
             {
                 odbcpp::OdbcStatement stmt = m_odbc_conn.statement (
-                    "UPDATE run_val SET source=?, updated=NOW() WHERE run_id=? AND param_id=?");
+                    "UPDATE run_val SET source=?, updated=? WHERE run_id=? AND param_id=?");
 
                 stmt.bindParam (1, p_source) ;
-                stmt.bindParam (2, p_run_id) ;
-                stmt.bindParam (3, p_param_id) ;
+                stmt.bindParam (2, p_updated) ;
+                stmt.bindParam (3, p_run_id) ;
+                stmt.bindParam (4, p_param_id) ;
 
                 odbcpp::OdbcResultPtr result = stmt.execute() ;
                 stmt.unbindParams() ;
@@ -444,11 +448,12 @@ ConnectionImpl::setRunParamImpl (const std::string& instrument,
         } else {
             {
                 odbcpp::OdbcStatement stmt = m_odbc_conn.statement (
-                    "INSERT INTO run_val VALUES(?,?,?,NOW())");
+                    "INSERT INTO run_val VALUES(?,?,?,?)");
 
                 stmt.bindParam (1, p_run_id) ;
                 stmt.bindParam (2, p_param_id) ;
                 stmt.bindParam (3, p_source) ;
+                stmt.bindParam (4, p_updated) ;
 
                 odbcpp::OdbcResultPtr result = stmt.execute() ;
                 stmt.unbindParams() ;
