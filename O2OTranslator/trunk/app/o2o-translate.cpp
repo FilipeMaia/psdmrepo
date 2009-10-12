@@ -234,6 +234,7 @@ O2O_Translate::runApp ()
   boost::thread readerThread( DgramReader ( files, dgqueue, m_dgramsize.value(), m_mergeMode.value() ) ) ;
 
 
+
   // get all datagrams
   while ( Pds::Dgram* dg = dgqueue.pop() ) {
 
@@ -244,6 +245,16 @@ O2O_Translate::runApp ()
           << "  time: " << clock.seconds() << '.'
           << std::setfill('0') << std::setw(9) << clock.nanoseconds()
           << "  payloadSize: " << dg->xtc.sizeofPayload() ;
+    }
+
+    // sanity check
+    if ( dg->xtc.sizeofPayload() < 0 ) {
+      WithMsgLogRoot( error, out ) {
+        out << "Negative payload size in XTC: Transition: "
+            << Pds::TransitionId::name(dg->seq.service())
+            << " payloadSize: " << dg->xtc.sizeofPayload() ;
+      }
+      return 3 ;
     }
 
     // give this event to every scanner
@@ -264,6 +275,7 @@ O2O_Translate::runApp ()
       }
     }
 
+    // all datagrams must be explicitely deleted
     delete [] (char*)dg ;
   }
 

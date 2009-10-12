@@ -24,6 +24,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+#include "O2OTranslator/O2OExceptions.h"
 #include "O2OTranslator/O2OXtcScannerI.h"
 #include "pdsdata/xtc/Xtc.hh"
 #include "pdsdata/xtc/DetInfo.hh"
@@ -59,9 +60,16 @@ O2OXtcIterator::~O2OXtcIterator ()
 int
 O2OXtcIterator::process(Xtc* xtc)
 {
-
   Pds::TypeId::Type type = xtc->contains.id() ;
   uint32_t version = xtc->contains.version() ;
+
+  // sanity check
+  if ( xtc->sizeofPayload() < 0 ) {
+    MsgLogRoot( error, "Negative payload size in XTC: " << xtc->sizeofPayload()
+        << " level: " << Pds::Level::name(xtc->src.level())
+        << " type: " << Pds::TypeId::name(type) << "/" << version) ;
+    throw O2OXTCGenException("negative payload size") ;
+  }
 
   m_src.push( xtc->src ) ;
 

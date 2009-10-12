@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-02
+2009-10-08 Andy Salnikov
+- add protection for XTC with negative payload size
+
 Tag: V00-03-01
 2009-10-08 Andy Salnikov
 - change in the format of file names
