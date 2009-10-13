@@ -171,7 +171,7 @@ class Controller ( LusiPyApp ) :
                 if len(translators) >= self._options.threads :
                     
                     # wait until one more thread finishes
-                    sleep(10)
+                    time.sleep(10)
 
                 else :
                     

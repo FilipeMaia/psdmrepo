@@ -11,6 +11,10 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-09
+2009-10-13 Andy Salnikov
+- sleep -> time.sleep
+
 Tag: V00-03-08
 2009-10-09 Andy Salnikov
 - small bug fix
