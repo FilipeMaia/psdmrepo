@@ -236,10 +236,15 @@ class TranslatorThread ( threading.Thread ) :
         cmd_list.append(str(fs['run_number']))
         cmd_list.append("--output-name")
         cmd_list.append(fname_dict['h5name'])
-        
+
+        # add options files
         for f in self._config.get('list:o2o-options-file',[]) :
             cmd_list.append("--options-file")
             cmd_list.append(f)
+
+        # any extra options
+        for opt in self._config.get('list:o2o-extra-options',[]) :
+            cmd_list.extend( opt.split() )
 
         return cmd_list
 
