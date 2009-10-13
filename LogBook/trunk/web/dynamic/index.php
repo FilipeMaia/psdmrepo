@@ -468,6 +468,7 @@ menubar_data.push ( {
     title: 'Applications',
     title_style: 'font-weight:bold;',
     itemdata: [
+        { text: "Authorization Database Manager", url: "../authdb/" },
         { text: "Experiment Registry Database", url: "../regdb/" },
         { text: "Electronic Log Book", url: "../logbook/" } ],
     disabled: false }
@@ -568,10 +569,21 @@ YAHOO.util.Event.onContentReady (
     }
 );
 
-</script>
-
-
-<script type="text/javascript">
+function logout() {
+    ask_yesno(
+        'popupdialogs',
+        '<span style="color:red; font-size:16px;">Session Logout Warning</span>',
+        '<p style="text-align:left;">You are about to logout from the current WebAuth session. '+
+        'Press <b>Yes</b> to proceed with the logout. Press <b>No</b> to stay in the session.</p>',
+        function() {
+            document.cookie = 'webauth_wpt_krb5=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
+            document.cookie = 'webauth_at=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
+            refresh_page();
+        },
+        function() {}
+    );
+    return;
+}
 
 function set_context( context ) {
     document.getElementById('context').innerHTML = context;
@@ -3009,18 +3021,19 @@ function search_contents() {
         </div>
         <div style="float:right; height:50px;">
 <?php
-if( $auth_svc->authName() == '' )
+if( $auth_svc->authName() == '' ) {
     echo <<<HERE
           <br>
           <br>
           <a href="../../apps/logbook"><p title="login here to proceed to the full version of the application">login</p></a>
 HERE;
-else
-    echo <<<HERE
+} else {
+	$logout = $auth_svc->authType() == 'WebAuth' ? '[<a href="javascript:logout()" title="close the current WebAuth session">logout</a>]' : '&nbsp;';
+	echo <<<HERE
           <table><tbody>
             <tr>
-              <td>&nbsp;</td>
               <td></td>
+              <td>{$logout}</td>
             </tr>
             <tr>
               <td>Welcome,&nbsp;</td>
@@ -3032,6 +3045,7 @@ else
             </tr>
           </tbody></table>
 HERE;
+}
 ?>
         </div>
         <div style="height:40px;">&nbsp;</div>

@@ -1,76 +1,32 @@
-______
-URGENT
+____________________________________________________________________________________
+URGENT: work out a solution for a request to use LogBook for various LCLC facilities
 
-+ write C++ client for RegDB & LogBook and give it to Chris O'Grady
+  PROBLEM: LCLS also has a number of areas where people would like to use
+  LogBook. Th eproblem is that those activities aren't "experiments", and they
+  also aren't neccesarily related to any 'instruments'. On the other hand we'd
+  like to benefit from using RegDB and AuthDB for those activities.
 
-- continue discussing the security model for web apps. One idea suggested by Amedeo
-  was to implement the group-based security for LogBook:
+  PROPOSED SOLUTION:
 
-  1. an experiment is associated with a group; the group leader automatically
-  gets all admnistrative privileges for LogBook; the group members get read-write
-  privileges.
+  - keep using the same database schema ('instruments' and 'experiments') because
+  a lot of code and services depend on its stability.
 
-  2. certain groups (like, lab-superusers) can be registered as administrators,
-  or as just observers (top-level admins).
+  - at the level of  LogBook App visually separate 'instruments' from 'locations',
+  and 'experiments' from 'facilities'.
 
-  3. this should also work for netgroups (they don't seem to be retranslated into
-  LDAP server of PCDS. These groups exist in NIS only.). so, the queston is how to
-  access these groups from PHP?\
+  - use the parameters of instruments in RegDB to tell application that
+  a particular 'instrument' is actually a 'location'. The would allow treating
+  the connected 'experiments' as 'facilities'.
 
-  4. individual users can also be registered here for various privilege levels.
+  - use parameters of 'experiments' ('facilities') to control certain features of
+  applications. In a context of this topic that would allow to run off 'runs'
+  (and probably 'shifts') for non-experiment activities such as 'facilities'.
 
-  Having said that, a proposal is to encode all of these into Andy's RolesDB
-  as 'users';
+  IDEA:
 
-    'gapon'
-    'gid:posix:xr'
-    'gid:netgroup:u-whatever'
-
-  Then it will be up to the AuthDB PHP API to take a user account and use extra
-  sources of information (LDAP, and perhaps NIS?) to see if:
-
-  a. a given user is individually registered in RoleDB, or
-  b. he's associated with one or another POSIX group, and RoleDB has a record for
-     that group, or
-  c. ditto for the netgroups
-
-- test hpss client developed by Andy H. and installed on psdm. See his last message
-  with the following subject "hpsscp" posted on August 31, 2009.
-
-+ set up cron-tab on 'psdb' to make daily 'mysqldump' of all databases onto an NFS disk
-
-- discuss MySQL replication with Arash Alavi to see what would be the most reliable
-  protocol for switching servers in case of a failure.
-
-+ develop a direct PHP API for the RoleDB. The corresponding package is AuthDB.
-
-  class AuthDB {
-    public static function hasRole( 'user', 'experiment_id', 'app', 'role' );
-    public static function hasPrivilege( 'user', 'experiment_id', 'app', 'privilege' );
-    ..
-    // a full set of editing methods to register users, roles, etc.
-  }
-
-  Then, in a context of LogBook develop a wrapper class which would simplify
-  things for LogBook:
-
-    class LogBookAuth {
-      public static function isAuthenticated();
-      public static function authName();
-      public static function canRead( 'experiment_id' );
-      public static function canPostNewMessages( 'experiment_id' );
-      public static function canEditMessages( 'experiment_id' );
-      public static function canDeleteMessages( 'experiment_id' );
-      public static function canManageShifts( 'experiment_id' );
-    }
-
-  NOTE: if a user isn't authenticated then all the above shown methods should
-  return false.
-
-- develop the AuthDb GUI
-
-- extend the LDAP PHP client implementation to support Netgroups as well
-  (use the following command as an example: %ldapsearch -x cn-u-srv )
+  - consider a persistent translation table which will play a role similar
+  to 'localisation'. This can be either a separate table in RegDB, with
+  foreign keys from instrument/experiment tables pointing to it.
 
 _________________________________________
 EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
@@ -220,6 +176,51 @@ NEW IDEAS
     Use LDAP to get e-mail addresses and ask a user for a confirmation. Extend
     the schema to store the subscriptions.
  
+_________________________________
+MEDIUM PRIORITY: unfinished tasks
+
++ continue discussing the security model for web apps. One idea suggested by Amedeo
+  was to implement the group-based security for LogBook:
+
+  -1. an experiment is associated with a group; the group leader automatically
+  gets all admnistrative privileges for LogBook; the group members get read-write
+  privileges.
+  [ NOTE: This doesn't happen automatically right now. We have to register
+    leaders explicitly. ]
+
+  2. certain groups (like, lab-superusers) can be registered as administrators,
+  or as just observers (top-level admins).
+
+  -3. this should also work for netgroups (they don't seem to be retranslated into
+  LDAP server of PCDS. These groups exist in NIS only.). so, the queston is how to
+  access these groups from PHP?
+
+  [ NOTE: No support for netgroups in LDAP yet. ]
+
+  4. individual users can also be registered here for various privilege levels.
+
+  Having said that, a proposal is to encode all of these into Andy's RolesDB
+  as 'users';
+
+    'gapon'
+    'gid:xr'
+    'gid:netgroup:u-whatever'
+
+  Then it will be up to the AuthDB PHP API to take a user account and use extra
+  sources of information (LDAP, and perhaps NIS?) to see if:
+
+  a. a given user is individually registered in RoleDB, or
+  b. he's associated with one or another POSIX group, and RoleDB has a record for
+     that group, or
+  c. ditto for the netgroups
+
+
+- discuss MySQL replication with Arash Alavi to see what would be the most reliable
+  protocol for switching servers in case of a failure.
+
+- extend the LDAP PHP client implementation to support Netgroups as well
+  (use the following command as an example: %ldapsearch -x cn-u-srv )
+
 ___________________________________________________
 MEDIUM PRIORITY: Consider extending database schema
 
@@ -249,8 +250,6 @@ MEDIUM PRIORITY: Improve 'New Shift' dialog
     The contents of the listbox will be populated by members of a POSIX group
     associated with the selected experiment. Th erequest will be sent dynamically
     using AJAX.
-
-    2. Add the 'Shift Assignment' text box to
 
 ____________________________________________________________________________
 LOW PRIORITY: Refactor the Messages Table and Dialog into a single prototype
