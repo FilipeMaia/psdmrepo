@@ -32,7 +32,7 @@
 
 namespace {
 
-
+  const char sep = '-' ;
 
 }
 
@@ -68,7 +68,7 @@ O2OXtcFileName::O2OXtcFileName ( const std::string& path )
   // file name expected to be eNNN_rNNN_sNNN_chNNN.xtc
 
   // find underscore before chunk part
-  n = name.rfind('_') ;
+  n = name.rfind(sep) ;
   if ( n == std::string::npos || (name.size()-n) < 3 || name[n+1] != 'c' ) return ;
   bool stat ;
   unsigned chunk = _cvt ( name.c_str()+n+2, stat ) ;
@@ -78,7 +78,7 @@ O2OXtcFileName::O2OXtcFileName ( const std::string& path )
   name.erase(n) ;
 
   // find underscore before stream part
-  n = name.rfind('_') ;
+  n = name.rfind(sep) ;
   if ( n == std::string::npos || (name.size()-n) < 3 || name[n+1] != 's' )  return ;
   unsigned stream = _cvt ( name.c_str()+n+2, stat ) ;
   if ( not stat ) return ;
@@ -87,7 +87,7 @@ O2OXtcFileName::O2OXtcFileName ( const std::string& path )
   name.erase(n) ;
 
   // find underscore before run part
-  n = name.rfind('_') ;
+  n = name.rfind(sep) ;
   if ( n == std::string::npos || (name.size()-n) < 3 || name[n+1] != 'r' ) return ;
   unsigned run = _cvt ( name.c_str()+n+2, stat ) ;
   if ( not stat ) return ;
@@ -142,9 +142,9 @@ unsigned
 O2OXtcFileName::_cvt ( const char* ptr, bool& stat ) const
 {
   char *eptr = 0 ;
-  unsigned val = strtoul ( ptr, &eptr, 10 ) ;
-  stat = ( *eptr == 0 ) ;
-  return val ;
+  int val = strtol ( ptr, &eptr, 10 ) ;
+  stat = ( *eptr == 0 ) and val >= 0 ;
+  return unsigned(val) ;
 }
 
 } // namespace O2OTranslator

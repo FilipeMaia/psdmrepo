@@ -166,10 +166,10 @@ O2OXtcMerger::next()
     for ( unsigned i = 0 ; i < ns ; ++ i ) {
       if ( m_dgrams[i] and m_dgrams[i]->seq.service() != dg->seq.service() ) {
         MsgLog( logger, error, "next -- streams desynchronized, stream[" << stream
-            << "] = " << m_streams[stream]->chunkName().basename() << "stream[" << i
+            << "] = " << m_streams[stream]->chunkName().basename() << " stream[" << i
             << "] = " << m_streams[i]->chunkName().basename() ) ;
         MsgLog( logger, error, "next -- streams desynchronized, stream[" << stream
-            << "].service = " << Pds::TransitionId::name(dg->seq.service()) << "stream[" << i
+            << "].service = " << Pds::TransitionId::name(dg->seq.service()) << " stream[" << i
             << "].service = " << Pds::TransitionId::name(m_dgrams[i]->seq.service()) ) ;
         throw O2OXTCSyncException() ;
       }
