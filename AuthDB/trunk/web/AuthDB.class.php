@@ -258,11 +258,15 @@ HERE;
 
     private function hasPrivilegeImpl( $user, $exper_id, $app, $priv ) {
 
+    	// NOTE: Regardless of whether a valid experiment identifier is given
+    	//       the requested privilege holder is also checked among those
+    	//       role playes who're not associated with any particular experiment.
+    	//
         $sql =
             "SELECT * FROM user u, role r, priv p".
             " WHERE p.name='{$priv}' AND p.role_id=r.id AND r.app='{$app}'".
             " AND u.user='{$user}' AND u.role_id=r.id".
-            (is_null($exper_id) ? "" : " AND u.exp_id={$exper_id}");
+            (is_null($exper_id) ? "" : " AND ((u.exp_id={$exper_id}) OR (u.exp_id IS NULL))");
          $result = $this->connection->query ( $sql );
 
         $nrows = mysql_numrows( $result );

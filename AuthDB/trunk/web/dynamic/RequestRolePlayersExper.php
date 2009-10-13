@@ -66,7 +66,11 @@ function role2json( $role ) {
     } else {
         $group_url = '<a href="javascript:view_group('."'".$group_url."'".')">'.$group_url.'</a>';
         $user_url  = '';
-        $comment = 'all members of the group';
+        $comment = 'all members of the group;';
+    }
+    if( is_null( $role->exper_id())) {
+    	if( $comment != '' ) $comment .= '<br>';
+    	$comment .= 'also accross all experiments;';
     }
 
     return json_encode(
@@ -132,7 +136,7 @@ HERE;
         	//
         	// TODO: This is a request from Andy Salnikov.
         	//
-        	if( $r->application() == 'RoleDB' ) {
+        	if(( $r->application() == 'RoleDB' ) || ( $r->application() == 'RegDB' )) {
         		;
         	} else {
           		if( $first ) {
