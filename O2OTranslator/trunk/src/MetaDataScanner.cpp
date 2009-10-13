@@ -232,6 +232,21 @@ MetaDataScanner::storeRunInfo()
 
   }
 
+  try {
+
+    // store average event size
+    conn->setRunParam ( instr, exper, run, "dgramSize", (int64_t)m_eventSize, "translator" ) ;
+
+  } catch ( std::exception& e ) {
+
+    // this should not happen, have to abort here
+    MsgLog( logger, error, "failed to store datagrams size: " << e.what() ) ;
+    conn->abortTransaction() ;
+    delete conn ;
+    throw ;
+
+  }
+
   // store all metadata that we received from online
   typedef O2OMetaData::const_iterator MDIter ;
   for ( MDIter it = m_metadata.extra_begin() ; it != m_metadata.extra_end() ; ++ it ) {
