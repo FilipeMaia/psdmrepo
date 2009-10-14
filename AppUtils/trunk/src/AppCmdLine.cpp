@@ -279,6 +279,27 @@ AppCmdLine::usage ( ostream& out ) const
   out.setf ( ios::right, ios::adjustfield ) ;
 }
 
+/**
+ * Get the complete command line
+ */
+std::string
+AppCmdLine::cmdline() const
+{
+  std::string cmdl = _argv0 ;
+  for ( StringList::const_iterator i = _argv.begin() ; i != _argv.end() ; ++ i ) {
+    const std::string& arg = *i ;
+    if ( arg.find_first_of(" \t\n\"") != std::string::npos ) {
+      cmdl += " '" ;
+      cmdl += arg ;
+      cmdl += "'" ;
+    } else {
+      cmdl += " " ;
+      cmdl += arg ;
+    }
+  }
+  return cmdl ;
+}
+
 /// real parsing happens in this method
 void
 AppCmdLine::doParse() throw(std::exception)

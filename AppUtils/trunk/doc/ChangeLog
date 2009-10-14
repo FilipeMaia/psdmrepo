@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-04
+2009-05-13 Andy Salnikov
+- added AppCmdLine::cmdline() method to return complete command line
+
 Tag: V00-01-03
 2009-05-13 Andy Salnikov
 - AppCmdOptList now has value() method wich returns the reference to whole collection

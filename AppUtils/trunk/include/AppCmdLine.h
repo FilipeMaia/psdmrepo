@@ -166,6 +166,11 @@ public:
    */
   virtual void usage ( std::ostream& out ) const ;
 
+  /**
+   * Get the complete command line
+   */
+  std::string cmdline() const ;
+
 protected:
 
   // types

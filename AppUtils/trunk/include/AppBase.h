@@ -108,6 +108,11 @@ protected:
    */
   virtual void moreUsage ( std::ostream& out ) const ;
 
+  /**
+   * Get the complete command line
+   */
+  std::string cmdline() const { return _cmdline.cmdline() ; }
+
 private:
 
   // Data members
