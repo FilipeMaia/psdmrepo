@@ -88,6 +88,7 @@ private:
   uint64_t m_eventSize ;
   LusiTime::Time m_runBeginTime ;
   LusiTime::Time m_runEndTime ;
+  bool m_stored ;
 
   // Copy constructor and assignment are disabled by default
   MetaDataScanner ( const MetaDataScanner& ) ;

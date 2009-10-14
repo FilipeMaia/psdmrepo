@@ -19,6 +19,8 @@
 #include <cstdio>
 #include <vector>
 #include <boost/thread/thread.hpp>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 //----------------------
 // Base Class Headers --
@@ -35,6 +37,7 @@
 #include "AppUtils/AppCmdOptList.h"
 #include "AppUtils/AppCmdOptSize.h"
 #include "AppUtils/AppCmdOptNamedValue.h"
+#include "LusiTime/Time.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/DgramQueue.h"
 #include "O2OTranslator/DgramReader.h"
@@ -179,6 +182,10 @@ O2O_Translate::runApp ()
     return 2 ;
   }
 
+  LusiTime::Time start_time = LusiTime::Time::now() ;
+  MsgLogRoot( info, "Starting translator process " << start_time ) ;
+  MsgLogRoot( info, "Command line: " <<  this->cmdline() ) ;
+
   WithMsgLogRoot( info, log ) {
     typedef AppCmdOptList<std::string>::const_iterator Iter ;
     log << "input files:";
@@ -290,6 +297,20 @@ O2O_Translate::runApp ()
     }
   }
   scanners.clear() ;
+
+  LusiTime::Time end_time = LusiTime::Time::now() ;
+  MsgLogRoot( info, "Translator process finished " << end_time ) ;
+
+  // dump some resource info
+  double delta_time = (end_time.sec()-start_time.sec()) + (end_time.nsec()-start_time.nsec()) / 1e9 ;
+  WithMsgLogRoot( info, out ) {
+    struct rusage u ;
+    getrusage(RUSAGE_SELF, &u);
+    out << "Resource usage summary:"
+        << "\n    real time: " << delta_time
+        << "\n    user time: " << (u.ru_utime.tv_sec + u.ru_utime.tv_usec/1e6)
+        << "\n    sys time : " << (u.ru_stime.tv_sec + u.ru_stime.tv_usec/1e6) ;
+  }
 
   return 0 ;
 

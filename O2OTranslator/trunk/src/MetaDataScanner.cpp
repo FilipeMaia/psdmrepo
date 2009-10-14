@@ -59,6 +59,7 @@ MetaDataScanner::MetaDataScanner (const O2OMetaData& metadata,
   , m_eventSize(0)
   , m_runBeginTime()
   , m_runEndTime()
+  , m_stored(false)
 {
 }
 
@@ -67,6 +68,26 @@ MetaDataScanner::MetaDataScanner (const O2OMetaData& metadata,
 //--------------
 MetaDataScanner::~MetaDataScanner ()
 {
+  if ( not m_stored ) {
+
+    // in case the EndRun transition is not seen just dump
+    // the collected info to the log file
+
+    const std::string& instr = m_metadata.instrument() ;
+    const std::string& exper = m_metadata.experiment() ;
+    unsigned long run = m_metadata.runNumber() ;
+
+    MsgLog( logger, info, "run statistics:"
+        << "\n\tm_runNumber: " << run
+        << "\n\tm_instrument: " << instr
+        << "\n\tm_experiment: " << exper
+        << "\n\tm_nevents: " << m_nevents
+        << "\n\tm_eventSize: " << ( m_nevents ? m_eventSize/m_nevents : 0 )
+        << "\n\tm_runBeginTime: " << m_runBeginTime.toString("S%s%f") << "(" << m_runBeginTime << ")"
+        << "\n\tm_runEndTime: " << m_runEndTime.toString("S%s%f") << "(" << m_runEndTime << ")" ) ;
+
+  }
+
 }
 
 // signal start/end of the event (datagram)
@@ -100,6 +121,7 @@ MetaDataScanner::eventStart ( const Pds::Dgram& dgram )
 
     // store run-specific stats
     storeRunInfo() ;
+    m_stored = true ;
 
   } else if ( dgram.seq.service() == Pds::TransitionId::Unconfigure ) {
 
