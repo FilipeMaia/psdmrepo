@@ -5,7 +5,7 @@ and open the template in the editor.
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-    <title>Electronic LogBook of Experiment: </title>
+    <title>Electronic LogBook: </title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
     <!--
@@ -197,25 +197,26 @@ try {
     $logbook = new LogBook();
     $logbook->begin();
 
+    $instruments = $logbook->instruments();
+    $experiments = $logbook->experiments();
+
     echo <<<HERE
 
-/* Known instruments
- */
 var instruments = [
 HERE;
-    $instruments = $logbook->instruments();
     $first = true;
     foreach( $instruments as $i ) {
+    	$is_location_str = $i->is_location() ? 'true' : 'false';
         if( $first ) {
             $first = false;
             echo <<<HERE
 
-   {name: '{$i->name()}', id: {$i->id()}}
+   {name: '{$i->name()}', id: {$i->id()}, is_location: {$is_location_str}}
 HERE;
         } else {
             echo <<<HERE
 
-  ,{name: '{$i->name()}', id: {$i->id()}}
+  ,{name: '{$i->name()}', id: {$i->id()}, is_location: {$is_location_str}}
 HERE;
         }
     }
@@ -223,30 +224,27 @@ HERE;
 
 ];
 
-/* Known experiments
- */
 var experiments = [
 HERE;
-    $experiments = $logbook->experiments();
     $first = true;
-    foreach( $experiments as $i ) {
-        if( $first ) {
+    foreach( $experiments as $e ) {
+    	$is_facility_str = $e->is_facility() ? 'true' : 'false';
+    	if( $first ) {
             $first = false;
             echo <<<HERE
 
-   {name: '{$i->name()}', id: {$i->id()}}
+   {name: '{$e->name()}', id: {$e->id()}, is_facility: {$is_facility_str}}
 HERE;
         } else {
             echo <<<HERE
 
-  ,{name: '{$i->name()}', id: {$i->id()}}
+  ,{name: '{$e->name()}', id: {$e->id()}, is_facility: {$is_facility_str}}
 HERE;
         }
     }
     echo <<<HERE
 
 ];
-
 
 /* Authentication and authorization context
  */
@@ -446,14 +444,31 @@ function set_current_selection( instr_id, instr_name, exper_id, exper_name ) {
             id: null
         }
     };
-    document.title = 'Electronic LogBook of Experiment: '+instr_name+' / '+exper_name;
+    document.title = 'Electronic LogBook: '+instr_name+' / '+exper_name;
     document.getElementById( "application_subtitle" ).innerHTML =
         instr_name+' / '+exper_name;
 
     menubar_enable( menubar_group_shifts );
-    menubar_enable( menubar_group_runs );
+    if( is_facility( exper_id ))
+        menubar_disable( menubar_group_runs );
+    else
+        menubar_enable( menubar_group_runs );
     menubar_enable( menubar_group_browse );
     menubar_enable( menubar_group_search );
+}
+
+/* Check if the specified id corresponds to a facility or an experiment.
+ * Return 'true' if it's a facility.
+ * Alert if the specified id doesn't correspond to anything.
+ */
+function is_facility( id ) {
+	for( i = 0; i < experiments.length; i++ )
+		if( experiments[i].id == id ) return experiments[i].is_facility;
+    alert("no experiment/facility for id: "+id);
+}
+function experiment_or_facility( id ) {
+    if( is_facility( id )) return 'Facility';
+    return 'Experiment';
 }
 
 var dialog_element = "popupdialogs";
@@ -482,15 +497,39 @@ menubar_data.push ( {
     itemdata: null,
     disabled: false }
 );
+var locations_list   = [];
 var instruments_list = [];
 for( i = 0; i < instruments.length; i++ ) {
-    instruments_list.push (
-        {
-            text: instruments[i].name,
-            url:  "javascript:list_experiments('"+instruments[i].name+"')"
-        }
-    );
+	if( instruments[i].is_location ) {
+		locations_list.push (
+            {
+                text: instruments[i].name,
+                url:  "javascript:list_experiments('"+instruments[i].name+"', true)"
+            }
+        );
+	} else {
+        instruments_list.push (
+            {
+                text: instruments[i].name,
+                url:  "javascript:list_experiments('"+instruments[i].name+"', false)"
+            }
+        );
+	}
 }
+var menubar_group_facilities = menubar_data.length;
+menubar_data.push ( {
+    id:    'facilities',
+    href:  '#facilities',
+    title: 'Facilities',
+    title_style: null,
+    itemdata: [
+        locations_list,
+        [
+            { text: "List all", url: "javascript:list_experiments(null, true)" }
+        ]
+    ],
+    disabled: false }
+);
 var menubar_group_experiments = menubar_data.length;
 menubar_data.push ( {
     id:    'experiments',
@@ -500,7 +539,7 @@ menubar_data.push ( {
     itemdata: [
         instruments_list,
         [
-            { text: "List all", url: "javascript:list_experiments(null)" }
+            { text: "List all", url: "javascript:list_experiments(null, false)" }
         ]
     ],
     disabled: false }
@@ -534,7 +573,7 @@ menubar_data.push ( {
     href:  '#browse',
     title: 'Browse',
     itemdata: [
-        { text: "Experiment history",    url: "javascript:browse_contents()" } ],
+        { text: "History...",    url: "javascript:browse_contents()" } ],
     disabled: true }
 );
 var menubar_group_search = menubar_data.length;
@@ -747,10 +786,18 @@ function reset_workarea() {
     workarea.innerHTML='';
 }
 
-function list_experiments( instr ) {
+// Display a list of experiments (or facilities) in a given scope.
+//
+// If null is passed as 'instr' then all known instanceswill be displayed.
+// Otherwise only those instances registered within 'instr' will beshown.
+//
+// The last parameter 'is_location' indicates whether 'instr' is an instrument
+// or a location name.
+//
+function list_experiments( instr, is_location ) {
 
     set_context(
-        'Select Experiment >' );
+        ( is_location ? 'Select Facility >' : 'Select Experiment >' ));
 
     reset_navarea();
     reset_workarea();
@@ -761,20 +808,39 @@ function list_experiments( instr ) {
         '  <div id="workarea_table_body"></div>'+
         '</div>';
 
-    var table = new Table (
-        "workarea_table",
-        [ { key: "instrument",        sortable: true,  resizeable: false },
-          { key: "experiment",        sortable: true,  resizeable: false },
-          { key: "status",            sortable: true,  resizeable: false },
-          { key: "begin_time",        sortable: true,  resizeable: false },
-          { key: "end_time",          sortable: true,  resizeable: false },
-          { key: "registration_time", sortable: true,  resizeable: false },
-          { key: "description",       sortable: false, resizeable: true } ],
-        'RequestExperiments.php'+( instr == null ? '' : '?instr='+instr ),
-        false,
-        10
-    );
-    table.refreshTable();
+    var params = ( instr == null ? '' : '?instr='+instr );
+    if( is_location ) {
+        if( params == '' ) params = '?is_location=';
+        else               params = params + '&is_location=';
+    }
+    var url = 'RequestExperiments.php'+params;
+    var table = null;
+    if( is_location )
+        table = new Table (
+            "workarea_table",
+            [ { key: "location",          sortable: true,  resizeable: false },
+              { key: "facility",          sortable: true,  resizeable: false },
+              { key: "registration_time", sortable: true,  resizeable: false },
+              { key: "description",       sortable: false, resizeable: true } ],
+            url,
+            false,
+            10
+        );
+    else
+        table = new Table (
+            "workarea_table",
+            [ { key: "instrument",        sortable: true,  resizeable: false },
+              { key: "experiment",        sortable: true,  resizeable: false },
+              { key: "status",            sortable: true,  resizeable: false },
+              { key: "begin_time",        sortable: true,  resizeable: false },
+              { key: "end_time",          sortable: true,  resizeable: false },
+              { key: "registration_time", sortable: true,  resizeable: false },
+              { key: "description",       sortable: false, resizeable: true } ],
+            url,
+            false,
+            10
+        );
+    //table.refreshTable();
 }
 
 function select_experiment( instr_id, instr_name, exper_id, exper_name ) {
@@ -784,38 +850,24 @@ function select_experiment( instr_id, instr_name, exper_id, exper_name ) {
 
 function display_experiment() {
 
-    set_context ( 'Experiment >' );
+    var exper_id = current_selection.experiment.id;
+
+    set_context ( experiment_or_facility( exper_id )+' >' );
 
     reset_navarea();
     reset_workarea();
 
     document.getElementById('workarea').innerHTML=
         '<div style="margin-bottom:20px;">'+
-        '  <img src="images/ExpSummary.png" />'+
+        '  <img src="images/'+( is_facility( exper_id ) ? 'Fac' : 'Exp' )+'Summary.png" />'+
         '</div>'+
         '<div id="experiment_info_container" style="height:250px;">Loading...</div>'+
         '<div style="margin-top:40px; padding-right:15px;">'+
         '  <div id="messages_actions_container"></div>'+
         '</div>';
 
-    load( 'DisplayExperiment.php?id='+current_selection.experiment.id, 'experiment_info_container' );
+    load( 'Display'+( is_facility( exper_id ) ? 'Facility' : 'Experiment' )+'.php?id='+exper_id, 'experiment_info_container' );
 
-    YAHOO.util.Event.onContentReady (
-        "detail_button",
-        function () {
-            var action_edit = create_button (
-                "detail_button",
-                function() {
-                    window.open (
-                        '/tests/RegDB/dynamic/index.php?action=view_experiment&id='+
-                        current_selection.experiment.id+
-                        '&name='+current_selection.experiment.name,
-                        'mywindow'/*,'width=1280,height=1024'*/
-                    );
-                }
-            );
-        }
-    );
     var messages_dialog = create_messages_dialog( 'experiment' );
 }
 
@@ -1572,7 +1624,7 @@ function preview_atatchment( id ) {
 function list_shifts() {
 
     set_context(
-        '<a href="javascript:display_experiment()">Experiment</a> > '+
+        '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
         'Select Shift >' );
 
     reset_navarea();
@@ -1621,7 +1673,7 @@ function select_experiment_and_shift( instr_id, instr_name, exper_id, exper_name
 function display_shift() {
 
     set_context (
-        '<a href="javascript:display_experiment()">Experiment</a> > '+
+        '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
         'Shift >' );
 
     document.getElementById('workarea').innerHTML=
@@ -1740,9 +1792,8 @@ function begin_new_shift() {
 function list_runs() {
 
     set_context(
-        '<a href="javascript:display_experiment()">Experiment</a> > '+
+        '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
         'Select Run >' );
-
 
     reset_navarea();
     reset_workarea();
@@ -1790,7 +1841,7 @@ function select_experiment_and_run( instr_id, instr_name, exper_id, exper_name, 
 function display_run() {
 
     set_context (
-        '<a href="javascript:display_experiment()">Experiment</a> > '+
+        '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
         '<a href="javascript:display_shift()">Shift</a> > '+
         'Run >' );
 
@@ -1872,7 +1923,7 @@ function display_history( type, data ) {
             return;
     }
     set_context (
-        '<a href="javascript:display_experiment()">Experiment</a> > '+
+        '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
         '<a href="javascript:browse_contents()">Browse</a> > '+
         'History > '+context );
 
@@ -1916,7 +1967,7 @@ var browse_tree = null;
 function browse_contents() {
 
     set_context (
-        '<a href="javascript:display_experiment()">Experiment</a> > '+
+        '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
         'Browse By Categories >' );
 
     reset_navarea();
@@ -2014,13 +2065,13 @@ function browse_contents() {
 
             case TYPE_SHIFTS:
                 set_context (
-                    '<a href="javascript:display_experiment()">Experiment</a> > '+
+                    '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
                     '<a href="javascript:browse_contents()">Browse</a> > '+
                     'Shifts > ' );
                 break;
             case TYPE_RUNS:
                 set_context (
-                    '<a href="javascript:display_experiment()">Experiment</a> > '+
+                    '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
                     '<a href="javascript:browse_contents()">Browse</a> > '+
                     'Runs > ' );
                 break;
@@ -2945,7 +2996,7 @@ function search_and_display() {
 function search_contents() {
 
     set_context (
-        '<a href="javascript:display_experiment()">Experiment</a> > '+
+        '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
         'Find Messages >' );
 
     reset_navarea();
@@ -3015,8 +3066,11 @@ function search_contents() {
       <div>
         <div style="float:left;">
           <p id="application_title" style="text-align:left;">
-            <em>Electronic LogBook of Experiment: </em>
+            <em>Electronic LogBook: </em>
+            <em id="application_subtitle"></em>
+            <!--
             <em id="application_subtitle"><a href="javascript:list_experiments()">select &gt;</a></em>
+            -->
           </p>
         </div>
         <div style="float:right; height:50px;">

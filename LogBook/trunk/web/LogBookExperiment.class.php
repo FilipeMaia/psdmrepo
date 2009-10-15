@@ -55,6 +55,9 @@ class LogBookExperiment {
     public function in_interval ( $time ) {
         return $this->regdb_experiment->in_interval( $time ); }
 
+  	public function is_facility () {
+  		return $this->regdb_experiment->is_facility(); }
+
     public function days() {
         $ival = new LusiInterval( $this->begin_time(), $this->end_time());
         return $ival->splitIntoDays();

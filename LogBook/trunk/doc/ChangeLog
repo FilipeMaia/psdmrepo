@@ -11,7 +11,9 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-
+Tag: V00-01-05
+2009-10-15 Igor Gaponenko
+- added an initial support for 'location' and 'facilities'
 
 Tag: V00-01-04
 2009-10-12 Igor Gaponenko

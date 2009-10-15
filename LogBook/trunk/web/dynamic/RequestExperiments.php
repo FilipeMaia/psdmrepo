@@ -9,6 +9,8 @@ if( isset( $_GET['instr'] )) {
         die( "instrument name can't be empty" );
     }
 }
+$is_location = isset( $_GET['is_location'] );
+
 function experiment2json( $experiment ) {
 
     $instrument = $experiment->instrument();
@@ -26,8 +28,17 @@ function experiment2json( $experiment ) {
     } else {
         $experiment_status = '<b><em style="color:red">on-going</em></b>';
     }
-    return json_encode(
-        array (
+    if( $experiment->is_facility())
+        $obj = array (
+            "location"           => $experiment->instrument()->name(),
+            "facility"           => $experiment_url,
+            "name"               => $experiment->name(),
+            "id"                 => $experiment->id(),
+            "registration_time"  => $experiment->registration_time()->toStringShort(),
+            "description"        => substr( $experiment->description(), 0, 72 )."..."
+        );
+    else
+        $obj = array (
             "instrument"  => $experiment->instrument()->name(),
             "experiment"  => $experiment_url,
             "name"        => $experiment->name(),
@@ -37,8 +48,8 @@ function experiment2json( $experiment ) {
             "end_time"    => $experiment->end_time()->toStringShort(),
             "registration_time"   => $experiment->registration_time()->toStringShort(),
             "description" => substr( $experiment->description(), 0, 72 )."..."
-        )
-    );
+        );
+    return json_encode( $obj );
 }
 
 /*
@@ -55,8 +66,10 @@ try {
     //
     $experiments = array();
     foreach( $all_experiments as $e ) {
-        if( LogBookAuth::instance()->canRead( $e->id()))
+        if( LogBookAuth::instance()->canRead( $e->id())) {
+            if( $is_location xor $e->is_facility()) continue;
             array_push( $experiments, $e );
+        }
     }
 
     // Proceed to the operation
@@ -72,12 +85,12 @@ try {
 HERE;
     $first = true;
     foreach( $experiments as $e ) {
-      if( $first ) {
-          $first = false;
-          echo "\n".experiment2json( $e );
-      } else {
-          echo ",\n".experiment2json( $e );
-      }
+        if( $first ) {
+            $first = false;
+            echo "\n".experiment2json( $e );
+        } else {
+            echo ",\n".experiment2json( $e );
+        }
     }
     print <<< HERE
  ] } }
