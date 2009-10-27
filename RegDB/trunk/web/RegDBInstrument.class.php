@@ -33,13 +33,18 @@ class RegDBInstrument {
     public function description () {
         return $this->attr['descr']; }
 
+    public function is_location () {
+        $is_location_param = $this->find_param_by_name ('isLocation');
+    	return !is_null( $is_location_param ) && ( $is_location_param->value() != '0' );
+    }
+
     /* =============
      *   MODIFIERS
      * =============
      */
     public function set_description ( $description ) {
         $result = $this->connection->query(
-            "UPDATE instrument SET descr='".$this->connection->escape_string( $description ).
+            "UPDATE {$this->connection->database}.instrument SET descr='".$this->connection->escape_string( $description ).
             "' WHERE id=".$this->id());
         $this->attr['descr'] = $description;
     }
@@ -52,7 +57,7 @@ class RegDBInstrument {
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
-            'SELECT COUNT(*) FROM instrument_param WHERE instr_id='.$this->id().$extra_condition );
+            "SELECT COUNT(*) FROM {$this->connection->database}.instrument_param WHERE instr_id=".$this->id().$extra_condition );
 
         if( $nrows == 1 )
             return mysql_result( $result, 0 );
@@ -68,7 +73,7 @@ class RegDBInstrument {
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
-            'SELECT param FROM instrument_param WHERE instr_id='.$this->id().$extra_condition );
+            "SELECT param FROM {$this->connection->database}.instrument_param WHERE instr_id=".$this->id().$extra_condition );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
@@ -85,7 +90,7 @@ class RegDBInstrument {
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
-            'SELECT * FROM instrument_param WHERE instr_id='.$this->id().$extra_condition );
+            "SELECT * FROM {$this->connection->database}.instrument_param WHERE instr_id=".$this->id().$extra_condition );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
@@ -106,7 +111,7 @@ class RegDBInstrument {
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
-            'SELECT * FROM instrument_param WHERE instr_id='.$this->id().$extra_condition );
+            "SELECT * FROM {$this->connection->database}.instrument_param WHERE instr_id=".$this->id().$extra_condition );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 0 ) return null;
@@ -137,7 +142,7 @@ class RegDBInstrument {
         /* Proceed with the operation.
          */
         $this->connection->query (
-            'INSERT INTO instrument_param VALUES('.$this->id().
+            "INSERT INTO {$this->connection->database}.instrument_param VALUES(".$this->id().
             ",'".$this->connection->escape_string( $trimmed_name ).
             "','".$this->connection->escape_string( $value ).
             "','".$this->connection->escape_string( $description )."')" );
@@ -174,7 +179,7 @@ class RegDBInstrument {
         /* Proceed with the operation.
          */
         $this->connection->query (
-            "DELETE FROM instrument_param WHERE param='{$trimmed_name}' AND instr_id={$this->id()})" );
+            "DELETE FROM {$this->connection->database}.instrument_param WHERE param='{$trimmed_name}' AND instr_id={$this->id()})" );
     }
 
     public function remove_all_params () {
@@ -182,7 +187,7 @@ class RegDBInstrument {
         /* Proceed with the operation.
          */
         $this->connection->query (
-            "DELETE FROM instrument_param WHERE instr_id={$this->id()}" );
+            "DELETE FROM {$this->connection->database}.instrument_param WHERE instr_id={$this->id()}" );
     }
 }
 ?>

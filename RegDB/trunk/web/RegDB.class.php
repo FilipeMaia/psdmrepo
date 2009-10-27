@@ -50,7 +50,7 @@ class RegDB {
         $list = array();
 
         $result = $this->connection->query (
-            'SELECT name FROM experiment ' );
+            "SELECT name FROM {$this->connection->database}.experiment ORDER BY name" );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
@@ -97,7 +97,7 @@ class RegDB {
 
         $extra_condition = $condition == '' ? '' : ' WHERE '.$condition;
         $result = $this->connection->query (
-            'SELECT * FROM experiment '.$extra_condition. ' ORDER by begin_time DESC' );
+            "SELECT * FROM {$this->connection->database}.experiment ".$extra_condition. ' ORDER by begin_time DESC' );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
@@ -123,7 +123,7 @@ class RegDB {
     private function find_experiment_by_ ( $condition ) {
 
         $result = $this->connection->query(
-            'SELECT * FROM "experiment" WHERE '.$condition );
+            "SELECT * FROM {$this->connection->database}.experiment WHERE ".$condition );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 1 )
@@ -187,7 +187,7 @@ class RegDB {
          /* Proceed with the operation.
           */
         $this->connection->query (
-            "INSERT INTO experiment VALUES(NULL,'".$this->connection->escape_string( $trim_experiment_name ).
+            "INSERT INTO {$this->connection->database}.experiment VALUES(NULL,'".$this->connection->escape_string( $trim_experiment_name ).
             "','".$this->connection->escape_string( $description ).
             "',".$instrument->id().
             ",".$registration_time->to64().
@@ -206,7 +206,7 @@ class RegDB {
         /* Create the run numbers generator
          */
         $this->connection->query (
-            "CREATE TABLE run_{$experiment->id()} ".
+            "CREATE TABLE {$this->connection->database}.run_{$experiment->id()} ".
             "(num int(11) NOT NULL auto_increment, ".
             " request_time bigint(20) unsigned NOT NULL,".
             " PRIMARY KEY (num)".
@@ -225,9 +225,9 @@ class RegDB {
 
         /* Proceed with the operation.
          */
-        $this->connection->query ( "DELETE FROM experiment_param WHERE exper_id=".$id );
-        $this->connection->query ( "DELETE FROM experiment WHERE id=".$id );
-        $this->connection->query ( "DROP TABLE IF EXISTS run_".$id );
+        $this->connection->query ( "DELETE FROM {$this->connection->database}.experiment_param WHERE exper_id=".$id );
+        $this->connection->query ( "DELETE FROM {$this->connection->database}.experiment WHERE id=".$id );
+        $this->connection->query ( "DROP TABLE IF EXISTS {$this->connection->database}.run_".$id );
     }
 
     /* ===============
@@ -239,7 +239,7 @@ class RegDB {
         $list = array();
 
         $result = $this->connection->query (
-            'SELECT name FROM instrument ' );
+            "SELECT name FROM {$this->connection->database}.instrument " );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
@@ -255,7 +255,7 @@ class RegDB {
         $list = array();
 
         $result = $this->connection->query (
-            'SELECT * FROM instrument '.$condition );
+            "SELECT * FROM {$this->connection->database}.instrument ".$condition );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
@@ -278,7 +278,7 @@ class RegDB {
     private function find_instrument_by_ ( $condition ) {
 
         $result = $this->connection->query(
-            'SELECT * FROM instrument WHERE '.$condition );
+            "SELECT * FROM {$this->connection->database}.instrument WHERE ".$condition );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 0 ) return null;
@@ -306,7 +306,7 @@ class RegDB {
          /* Proceed with the operation.
           */
         $this->connection->query (
-            "INSERT INTO instrument VALUES(NULL,'".$this->connection->escape_string( $trim_instrument_name ).
+            "INSERT INTO {$this->connection->database}.instrument VALUES(NULL,'".$this->connection->escape_string( $trim_instrument_name ).
             "','".$this->connection->escape_string( $description )."')" );
 
         $instrument = $this->find_instrument_by_id( '(SELECT LAST_INSERT_ID())' );
@@ -333,8 +333,8 @@ class RegDB {
 
         /* Proceed to the instrument.
          */
-        $this->connection->query ( "DELETE FROM instrument_param WHERE instr_id=".$id );
-        $this->connection->query ( "DELETE FROM instrument WHERE id=".$id );
+        $this->connection->query ( "DELETE FROM {$this->connection->database}.instrument_param WHERE instr_id=".$id );
+        $this->connection->query ( "DELETE FROM {$this->connection->database}.instrument WHERE id=".$id );
     }
 
     /* ====================

@@ -10,7 +10,7 @@ class RegDBConnection {
     private $host;
     private $user;
     private $password;
-    private $database;
+    public  $database;
     private $ldap_host;
 
     /* Current state of the object
@@ -42,7 +42,10 @@ class RegDBConnection {
      * Destructor
      */
     public function __destruct () {
-        if( isset( $this->link    )) mysql_close( $this->link );
+    	// Do not close this connection from here because it might be shared
+    	// with other instances of the class (also from other APIs).
+    	//
+    	// if( isset( $this->link    )) mysql_close( $this->link );
         if( isset( $this->ldap_ds )) ldap_close( $this->ldap_ds );
     }
 
@@ -352,10 +355,15 @@ class RegDBConnection {
     private function connect () {
         if( !isset( $this->link )) {
 
-            /* Connect to MySQL server
+            /* Connect to MySQL server and register the shutdown function
+             * to clean up after self by doing 'ROLLBACK'. This would allow
+             * to use so called 'persistent' MySQL connections.
+             * 
+             * NOTE: using the 'persistent' connection. This connection won't be
+             * closed by 'mysql_close()'.
              */
-            $new_link = true;
-            $this->link = mysql_connect( $this->host, $this->user, $this->password, $new_link );
+            $new_link = false; // true;
+            $this->link = mysql_pconnect( $this->host, $this->user, $this->password, $new_link );
             if( !$this->link )
                 throw new RegDBException (
                     __METHOD__,
@@ -377,6 +385,8 @@ class RegDBConnection {
                 throw new RegDBException (
                     __METHOD__,
                     "MySQL error: ".mysql_error( $this->link ).', in query: '.$sql );
+
+            register_shutdown_function( array( $this, "rollback" ));
 
             /* Connect to LDAP server
              */

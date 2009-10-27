@@ -81,20 +81,24 @@ class RegDBExperiment {
             $this->attr['begin_time'],
             $this->attr['end_time'] ); }
 
+   	public function is_facility () {
+        return $this->instrument()->is_location();
+   	}
+
     /* =============
      *   MODIFIERS
      * =============
      */
     public function set_description ( $description ) {
         $result = $this->connection->query(
-            "UPDATE experiment SET descr='".$this->connection->escape_string( $description ).
+            "UPDATE {$this->connection->database}.experiment SET descr='".$this->connection->escape_string( $description ).
             "' WHERE id=".$this->id());
         $this->attr['descr'] = $description;
     }
 
     public function set_contact_info ( $contact_info ) {
         $result = $this->connection->query(
-            "UPDATE experiment SET contact_info='".$this->connection->escape_string( $contact_info ).
+            "UPDATE {$this->connection->database}.experiment SET contact_info='".$this->connection->escape_string( $contact_info ).
             "' WHERE id=".$this->id());
         $this->attr['contact_info'] = $contact_info;
     }
@@ -114,7 +118,7 @@ class RegDBExperiment {
         /* Proceed with the operation.
          */
         $this->connection->query (
-            "UPDATE experiment SET begin_time=".$begin_time_64.
+            "UPDATE {$this->connection->database}.experiment SET begin_time=".$begin_time_64.
             ", end_time=".$end_time_64.
             " WHERE id=".$this->id());
 
@@ -130,7 +134,7 @@ class RegDBExperiment {
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
-            'SELECT COUNT(*) FROM experiment_param WHERE exper_id='.$this->id().$extra_condition );
+            "SELECT COUNT(*) FROM {$this->connection->database}.experiment_param WHERE exper_id=".$this->id().$extra_condition );
 
         if( $nrows == 1 )
             return mysql_result( $result, 0 );
@@ -146,7 +150,7 @@ class RegDBExperiment {
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
-            'SELECT param FROM experiment_param WHERE exper_id='.$this->id().$extra_condition );
+            "SELECT param FROM {$this->connection->database}.experiment_param WHERE exper_id=".$this->id().$extra_condition );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
@@ -163,7 +167,7 @@ class RegDBExperiment {
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
-            'SELECT * FROM experiment_param WHERE exper_id='.$this->id().$extra_condition );
+            "SELECT * FROM {$this->connection->database}.experiment_param WHERE exper_id=".$this->id().$extra_condition );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
@@ -184,7 +188,7 @@ class RegDBExperiment {
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
-            'SELECT * FROM experiment_param WHERE exper_id='.$this->id().$extra_condition );
+            "SELECT * FROM {$this->connection->database}.experiment_param WHERE exper_id=".$this->id().$extra_condition );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 0 ) return null;
@@ -215,7 +219,7 @@ class RegDBExperiment {
         /* Proceed with the operation.
          */
         $this->connection->query (
-            'INSERT INTO experiment_param VALUES('.$this->id().
+            "INSERT INTO {$this->connection->database}.experiment_param VALUES(".$this->id().
             ",'".$this->connection->escape_string( $trimmed_name ).
             "','".$this->connection->escape_string( $value ).
             "','".$this->connection->escape_string( $description )."')" );
@@ -252,7 +256,7 @@ class RegDBExperiment {
         /* Proceed with the operation.
          */
         $this->connection->query (
-            "DELETE FROM experiment_param WHERE param='{$trimmed_name}' AND exper_id={$this->id()})" );
+            "DELETE FROM {$this->connection->database}.experiment_param WHERE param='{$trimmed_name}' AND exper_id={$this->id()})" );
     }
 
     public function remove_all_params () {
@@ -260,7 +264,7 @@ class RegDBExperiment {
         /* Proceed with the operation.
          */
         $this->connection->query (
-            "DELETE FROM experiment_param WHERE exper_id={$this->id()}" );
+            "DELETE FROM {$this->connection->database}.experiment_param WHERE exper_id={$this->id()}" );
     }
 
     /* ===============
@@ -270,7 +274,7 @@ class RegDBExperiment {
     public function runs () {
 
         $list = array();
-        $table = "run_".$this->id();
+        $table = "{$this->connection->database}.run_".$this->id();
 
         $result = $this->connection->query(
             "SELECT * FROM {$table} ORDER BY num" );
@@ -289,7 +293,7 @@ class RegDBExperiment {
 
     public function generate_run () {
 
-        $table = "run_".$this->id();
+        $table = "{$this->connection->database}.run_".$this->id();
         $request_time = LusiTime::now()->to64();
 
         $this->connection->query (
@@ -314,7 +318,7 @@ class RegDBExperiment {
     public function last_run () {
 
         $list = array();
-        $table = "run_".$this->id();
+        $table = "{$this->connection->database}.run_".$this->id();
 
         $result = $this->connection->query(
             "SELECT * FROM {$table} WHERE num=(SELECT MAX(num) FROM {$table})" );
