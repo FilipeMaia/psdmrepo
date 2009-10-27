@@ -50,7 +50,7 @@ class LogBookFFAttachment {
     public function document() {
 
         $result = $this->connection->query (
-            'SELECT document FROM attachment WHERE id='.$this->id());
+            "SELECT document FROM {$this->connection->database}.attachment WHERE id=".$this->id());
 
         $nrows = mysql_numrows( $result );
         if( $nrows != 1 )

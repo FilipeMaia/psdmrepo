@@ -69,7 +69,7 @@ class LogBookShift {
          */
         $end_time_64 = LusiTime::to64from( $end_time );
         $this->connection->query (
-            'UPDATE "shift" SET end_time='.$end_time_64.
+            "UPDATE {$this->connection->database}.shift SET end_time=".$end_time_64.
             ' WHERE exper_id='.$this->exper_id().' AND begin_time='.$this->attr['begin_time'] );
 
         /* Update the current state of the object
@@ -87,7 +87,7 @@ class LogBookShift {
         $list = array();
 
         $result = $this->connection->query(
-            'SELECT member FROM shift_crew WHERE shift_id='.$this->id());
+            "SELECT member FROM {$this->connection->database}.shift_crew WHERE shift_id=".$this->id());
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {

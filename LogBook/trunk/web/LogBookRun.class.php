@@ -66,7 +66,7 @@ class LogBookRun {
 
             $extra_condition = $condition == '' ? '' : ' AND '.$condition;
             $result = $this->connection->query (
-                'SELECT p.*,v.val FROM run_val AS p, run_val_'.$type.' AS v WHERE p.run_id='.$run_id.
+                "SELECT p.*,v.val FROM {$this->connection->database}.run_val p, {$this->connection->database}.run_val_".$type.' v WHERE p.run_id='.$run_id.
                 ' AND p.param_id='.$param_id.
                 ' AND p.run_id=v.run_id AND p.param_id=v.param_id'.
                 $extra_condition );
@@ -104,7 +104,7 @@ class LogBookRun {
         /* Fetch the value and the bookkeeping info
          */
         $result = $this->connection->query (
-            'SELECT p.*,v.val FROM run_val p, '.$value_table.' v WHERE p.run_id='.$this->id().
+            "SELECT p.*,v.val FROM {$this->connection->database}.run_val p, ".$value_table.' v WHERE p.run_id='.$this->id().
             ' AND p.param_id='.$param_id.
             ' AND p.run_id=v.run_id AND p.param_id=v.param_id'.
             $extra_condition );
@@ -157,7 +157,7 @@ class LogBookRun {
             /* Treat it as the string */
             $value4sql = "'".$value."'";
         }
-        $value_table = 'run_val_'.$type;
+        $value_table = "{$this->connection->database}.run_val_".$type;
 
         /* Check if its value is already set, and if so - if we're allowed
          * to update it.
@@ -165,7 +165,7 @@ class LogBookRun {
         $run_id = $this->attr['id'];
 
         $result = $this->connection->query (
-            'SELECT COUNT(*) "count" FROM run_val AS p WHERE p.run_id='.$run_id.
+            "SELECT COUNT(*) AS \"count\" FROM {$this->connection->database}.run_val p WHERE p.run_id=".$run_id.
             ' AND p.param_id='.$param_id );
 
         $nrows = mysql_numrows( $result );
@@ -183,7 +183,7 @@ class LogBookRun {
                     "the value of parameter: '".$param."' was set before and it's not allowed to be updated" );
 
             $this->connection->query (
-                "UPDATE run_val SET source='".$source."', updated=".$updated->to64().
+                "UPDATE {$this->connection->database}.run_val SET source='".$source."', updated=".$updated->to64().
                 ' WHERE run_id='.$run_id.' AND param_id='.$param_id );
 
             $this->connection->query(
@@ -191,8 +191,8 @@ class LogBookRun {
                 ' WHERE run_id='.$run_id.' AND param_id='.$param_id );
 
         } else {
-           $this->connection->query (
-                "INSERT INTO run_val VALUES (".$run_id.",".$param_id.",'".$source."',".$updated->to64().")" );
+            $this->connection->query (
+                "INSERT INTO {$this->connection->database}.run_val VALUES (".$run_id.",".$param_id.",'".$source."',".$updated->to64().")" );
 
             $this->connection->query (
                 "INSERT INTO ".$value_table." VALUES (".$run_id.",".$param_id.",".$value4sql.")" );
@@ -201,7 +201,7 @@ class LogBookRun {
         /* Fetch the value and the bookkeeping info
          */
         $result = $this->connection->query (
-            'SELECT p.*,v.val FROM run_val AS p, '.$value_table.' AS v WHERE p.run_id='.$run_id.
+            "SELECT p.*,v.val FROM {$this->connection->database}.run_val p, ".$value_table.' v WHERE p.run_id='.$run_id.
             ' AND p.param_id='.$param_id.
             ' AND p.run_id=v.run_id AND p.param_id=v.param_id'.
             $extra_condition );
@@ -255,7 +255,7 @@ class LogBookRun {
          */
         $end_time_64 = LusiTime::to64from( $end_time );
         $this->connection->query (
-            'UPDATE "run" SET end_time='.$end_time_64.
+            "UPDATE {$this->connection->database}.run SET end_time=".$end_time_64.
             ' WHERE exper_id='.$this->exper_id().' AND num='.$this->attr['num'] );
 
         /* Update the current state of the object

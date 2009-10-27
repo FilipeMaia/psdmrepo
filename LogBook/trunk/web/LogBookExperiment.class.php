@@ -97,7 +97,7 @@ class LogBookExperiment {
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query (
-            'SELECT * FROM "shift" WHERE exper_id='.$this->id().$extra_condition.
+            "SELECT * FROM {$this->connection->database}.shift WHERE exper_id=".$this->id().$extra_condition.
             ' ORDER BY begin_time DESC' );
 
         $nrows = mysql_numrows( $result );
@@ -173,7 +173,7 @@ class LogBookExperiment {
         /* Proceed with the new shift and the shift crew.
          */
         $this->connection->query (
-            'INSERT INTO shift VALUES(NULL,'.$this->attr['id']
+            "INSERT INTO {$this->connection->database}.shift VALUES(NULL,".$this->attr['id']
             .",".LusiTime::to64from( $begin_time )
             .",".( is_null( $end_time ) ? 'NULL' : LusiTime::to64from( $end_time ))
             .",'".$leader."')" );
@@ -186,7 +186,7 @@ class LogBookExperiment {
 
         foreach( $shift_crew as $member )
             $this->connection->query (
-                "INSERT INTO shift_crew VALUES({$new_shift->id()},'$member')" );
+                "INSERT INTO {$this->connection->database}.shift_crew VALUES({$new_shift->id()},'$member')" );
 
         return $new_shift;
     }
@@ -201,18 +201,18 @@ class LogBookExperiment {
         return $this->find_shift_by_( 'begin_time <= '.$time.' AND (end_time IS NULL OR '.$time.'< end_time)') ; }
 
     public function find_last_shift () {
-        return $this->find_shift_by_( 'begin_time=(SELECT MAX(begin_time) FROM "shift")' ) ; }
+        return $this->find_shift_by_( "begin_time=(SELECT MAX(begin_time) FROM {$this->connection->database}.shift)" ) ; }
 
 
     public function find_prev_shift_for( $shift ) {
         $sql = <<<HERE
-begin_time=(SELECT MAX(begin_time) FROM "shift" WHERE exper_id={$this->id()} AND begin_time<{$shift->begin_time()->to64()} AND id!={$shift->id()})
+begin_time=(SELECT MAX(begin_time) FROM {$this->connection->database}.shift WHERE exper_id={$this->id()} AND begin_time<{$shift->begin_time()->to64()} AND id!={$shift->id()})
 HERE;
         return $this->find_shift_by_( $sql );
     }
     public function find_next_shift_for( $shift ) {
         $sql = <<<HERE
-begin_time=(SELECT MIN(begin_time) FROM "shift" WHERE exper_id={$this->id()} AND begin_time>{$shift->begin_time()->to64()} AND id!={$shift->id()})
+begin_time=(SELECT MIN(begin_time) FROM {$this->connection->database}.shift WHERE exper_id={$this->id()} AND begin_time>{$shift->begin_time()->to64()} AND id!={$shift->id()})
 HERE;
         return $this->find_shift_by_( $sql );
     }
@@ -221,7 +221,7 @@ HERE;
 
         $extra_condition = is_null( $condition ) ? '' : ' AND '.$condition;
         $result = $this->connection->query(
-            'SELECT * FROM "shift" WHERE exper_id='.
+            "SELECT * FROM {$this->connection->database}.shift WHERE exper_id=".
             $this->attr['id'].$extra_condition.' ORDER BY begin_time DESC' );
 
         $nrows = mysql_numrows( $result );
@@ -266,7 +266,7 @@ HERE;
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
-            'SELECT * FROM "run" WHERE exper_id='.$this->attr['id'].$extra_condition.
+            "SELECT * FROM {$this->connection->database}.run WHERE exper_id=".$this->attr['id'].$extra_condition.
             ' ORDER BY begin_time DESC' );
 
         $nrows = mysql_numrows( $result );
@@ -289,18 +289,18 @@ HERE;
 
     public function find_last_run () {
         return $this->find_run_by_(
-            'id=(SELECT MAX(id) FROM "run" WHERE exper_id='.
+            "id=(SELECT MAX(id) FROM {$this->connection->database}.run WHERE exper_id=".
             $this->attr['id'].')' ); }
 
     public function find_prev_run_for( $run ) {
         $sql = <<<HERE
-begin_time=(SELECT MAX(begin_time) FROM "run" WHERE exper_id={$this->id()} AND begin_time<{$run->begin_time()->to64()} AND id!={$run->id()})
+begin_time=(SELECT MAX(begin_time) FROM {$this->connection->database}.run WHERE exper_id={$this->id()} AND begin_time<{$run->begin_time()->to64()} AND id!={$run->id()})
 HERE;
         return $this->find_run_by_( $sql );
     }
     public function find_next_run_for( $run ) {
         $sql = <<<HERE
-begin_time=(SELECT MIN(begin_time) FROM "run" WHERE exper_id={$this->id()} AND begin_time>{$run->begin_time()->to64()} AND id!={$run->id()})
+begin_time=(SELECT MIN(begin_time) FROM {$this->connection->database}.run WHERE exper_id={$this->id()} AND begin_time>{$run->begin_time()->to64()} AND id!={$run->id()})
 HERE;
         return $this->find_run_by_( $sql );
     }
@@ -309,7 +309,7 @@ HERE;
 
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
         $result = $this->connection->query(
-            'SELECT * FROM "run" WHERE exper_id='.
+            "SELECT * FROM {$this->connection->database}.run WHERE exper_id=".
             $this->attr['id'].$extra_condition.
             ' ORDER BY begin_time DESC' );
 
@@ -359,7 +359,7 @@ HERE;
         /* Proceed to creating new run in the database.
          */
         $this->connection->query(
-            'INSERT INTO "run" VALUES(NULL,'.( $num > 0 ? $num : $this->allocate_run( $num ))
+            "INSERT INTO {$this->connection->database}.run VALUES(NULL,".( $num > 0 ? $num : $this->allocate_run( $num ))
             .",".$this->attr['id']
             .",".LusiTime::to64from( $begin_time )
             .",".( is_null( $end_time ) ? 'NULL' : LusiTime::to64from( $end_time )).")" );
@@ -378,7 +378,7 @@ HERE;
     private function allocate_run () {
 
         $result = $this->connection->query(
-            'SELECT MAX(num) "num" FROM "run" WHERE exper_id='.
+            "SELECT MAX(num) AS \"num\" FROM {$this->connection->database}.run WHERE exper_id=".
             $this->attr['id'] );
 
         $nrows = mysql_numrows( $result );
@@ -402,7 +402,7 @@ HERE;
 
         $extra_condition = $condition == '' ? '' : 'AND '.$condition;
         $result = $this->connection->query (
-            'SELECT * FROM "run_param" WHERE exper_id='.$this->attr['id'].$extra_condition );
+            "SELECT * FROM {$this->connection->database}.run_param WHERE exper_id=".$this->attr['id'].$extra_condition );
 
         $nrows = mysql_numrows( $result );
         for( $i=0; $i<$nrows; $i++ ) {
@@ -426,7 +426,7 @@ HERE;
 
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
         $result = $this->connection->query (
-            'SELECT * FROM "run_param" WHERE exper_id='.
+            "SELECT * FROM {$this->connection->database}.run_param WHERE exper_id=".
             $this->attr['id'].$extra_condition );
 
         $nrows = mysql_numrows( $result );
@@ -442,7 +442,7 @@ HERE;
     public function create_run_param ( $param, $type, $descr ) {
 
         $this->connection->query (
-            "INSERT INTO run_param VALUES(NULL,'".$param.
+            "INSERT INTO {$this->connection->database}.run_param VALUES(NULL,'".$param.
             "',".$this->attr['id'].
             ",'".$type.
             "','".$descr."')" );
@@ -662,7 +662,7 @@ HERE;
 
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
         $sql =
-            'SELECT DISTINCT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM header h, entry e, tag t WHERE h.exper_id='.$this->attr['id'].
+            "SELECT DISTINCT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM {$this->connection->database}.header h, {$this->connection->database}.entry e, {$this->connection->database}.tag t WHERE h.exper_id=".$this->attr['id'].
             ' AND h.id = e.hdr_id AND e.parent_entry_id is NULL'.$extra_condition.
             ' ORDER BY e.insert_time ASC';
             //' ORDER BY e.insert_time DESC';
@@ -701,7 +701,7 @@ HERE;
     public function find_last_entry () {
 
         $result = $this->connection->query (
-            'SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
+            "SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM {$this->connection->database}.header h, {$this->connection->database}.entry e WHERE h.exper_id=".$this->attr['id'].
             ' AND h.id = e.hdr_id ORDER BY relevance_time DESC LIMIT 1' );
 
         $nrows = mysql_numrows( $result );
@@ -718,7 +718,7 @@ HERE;
 
         $extra_condition = $condition == null ? '' : ' AND '.$condition;
         $result = $this->connection->query (
-            'SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM header h, entry e WHERE h.exper_id='.$this->attr['id'].
+            "SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM {$this->connection->database}.header h, {$this->connection->database}.entry e WHERE h.exper_id=".$this->attr['id'].
             ' AND h.id = e.hdr_id'.$extra_condition );
 
         $nrows = mysql_numrows( $result );
@@ -738,20 +738,20 @@ HERE;
         $relevance_time=null ) {
 
         $this->connection->query (
-            "INSERT INTO header VALUES(NULL,".$this->id().
+            "INSERT INTO {$this->connection->database}.header VALUES(NULL,".$this->id().
             ",".( is_null( $shift_id       ) ? 'NULL' : $shift_id ).
             ",".( is_null( $run_id         ) ? 'NULL' : $run_id ).
             ",".( is_null( $relevance_time ) ? 'NULL' : LusiTime::to64from( $relevance_time )).")" );
 
         $this->connection->query (
-            "INSERT INTO entry VALUES(NULL,(SELECT LAST_INSERT_ID()),NULL".
+            "INSERT INTO {$this->connection->database}.entry VALUES(NULL,(SELECT LAST_INSERT_ID()),NULL".
             ",".LusiTime::now()->to64().
             ",'".$author.
             "','".$content.
             "','".$content_type."')" );
 
         return $this->find_entry_by_ (
-            'hdr_id = (SELECT h.id FROM header h, entry e'.
+            "hdr_id = (SELECT h.id FROM {$this->connection->database}.header h, {$this->connection->database}.entry e".
             ' WHERE h.id = e.hdr_id AND e.id = (SELECT LAST_INSERT_ID()))' );
     }
 
@@ -764,7 +764,7 @@ HERE;
         $list = array();
 
         $result = $this->connection->query (
-            'SELECT DISTINCT t.tag FROM tag t, header h WHERE h.id=t.hdr_id AND h.exper_id='.$this->id().
+            "SELECT DISTINCT t.tag FROM {$this->connection->database}.tag t, {$this->connection->database}.header h WHERE h.id=t.hdr_id AND h.exper_id=".$this->id().
             ' ORDER BY tag' );
 
         $nrows = mysql_numrows( $result );
@@ -779,7 +779,7 @@ HERE;
         $list = array();
 
         $result = $this->connection->query (
-            ' SELECT DISTINCT e.author FROM entry e, header h WHERE h.id=e.hdr_id AND h.exper_id='.$this->id().
+            "SELECT DISTINCT e.author FROM {$this->connection->database}.entry e, {$this->connection->database}.header h WHERE h.id=e.hdr_id AND h.exper_id=".$this->id().
             ' ORDER BY author' );
 
         $nrows = mysql_numrows( $result );

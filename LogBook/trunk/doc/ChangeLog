@@ -11,6 +11,16 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-06
+2009-10-27 Igor Gaponenko
+- reimplemented the PHP connection class to use persistent MySQL connections
+- added a support for locations & facilities (as alternatives for instruments
+and experiments)
+- implemented the first version of the message viewer for indiovidual messages
+(no support for the Prev/Next messages yet)
+- implemented 'persistent' links for individual messages. That would allow users
+to embed direct links to the LogBook messages from other documents
+
 Tag: V00-01-05
 2009-10-15 Igor Gaponenko
 - added an initial support for 'location' and 'facilities'

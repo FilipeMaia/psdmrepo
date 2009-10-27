@@ -1,35 +1,52 @@
-____________________________________________________________________________________
-URGENT: work out a solution for a request to use LogBook for various LCLC facilities
+____________________________________________
+NEW IDEA: FINDING ALL READERS OF THE LOGBOOK
 
-  PROBLEM: LCLS also has a number of areas where people would like to use
-  LogBook. Th eproblem is that those activities aren't "experiments", and they
-  also aren't neccesarily related to any 'instruments'. On the other hand we'd
-  like to benefit from using RegDB and AuthDB for those activities.
+mysql -u root -p roles
 
-  PROPOSED SOLUTION:
+mysql> SELECT user.user,user.exp_id,role.* FROM user,role WHERE user.role_id IN (SELECT role.id FROM role, priv WHERE role.id=priv.role_id AND role.app='LogBook' AND priv.name='read') AND ((user.exp_id IS NULL) OR (user.exp_id=4)) AND user.role_id=role.id ORDER BY role.app,role.name;
++---------------+--------+----+--------+---------+
+| user          | exp_id | id | name   | app     |
++---------------+--------+----+--------+---------+
+| gid:ps-amo    |   NULL |  5 | Editor | LogBook |
+| perazzo       |   NULL |  5 | Editor | LogBook |
+| amoopr        |      4 |  3 | Reader | LogBook |
+| gid:ps-mgt    |   NULL |  3 | Reader | LogBook |
+| amo01809      |      4 |  3 | Reader | LogBook |
+| gid:lab-admin |   NULL |  4 | Writer | LogBook |
++---------------+--------+----+--------+---------+
+6 rows in set (0.00 sec)
 
-  - keep using the same database schema ('instruments' and 'experiments') because
-  a lot of code and services depend on its stability.
+mysql>
 
-  - at the level of  LogBook App visually separate 'instruments' from 'locations',
-  and 'experiments' from 'facilities'.
+____________________
+KNOWN PROBLEMS, BUGS
 
-  - use the parameters of instruments in RegDB to tell application that
-  a particular 'instrument' is actually a 'location'. The would allow treating
-  the connected 'experiments' as 'facilities'.
+- fix the DisplayShift.php not to show 'Close Current Shift' and
+  'Begin New Shift' links for non-authorized users.
 
-  - use parameters of 'experiments' ('facilities') to control certain features of
-  applications. In a context of this topic that would allow to run off 'runs'
-  (and probably 'shifts') for non-experiment activities such as 'facilities'.
+- the same issue in the index.php file. Disable 'Create Shift' button
+  in the top-level menu bar ('Shifts')
 
-  IDEA:
+___________________________
+URGENT PROBLEMS FOR LOGBOOK
 
-  - consider a persistent translation table which will play a role similar
-  to 'localisation'. This can be either a separate table in RegDB, with
-  foreign keys from instrument/experiment tables pointing to it.
+- put a table with all available run parameters into the Run Summary page
+
+      +----------+     +---------+
+- add | << Prev  | and | Next >> | buttons to the messages viewer
+      +----------+     +---------+
 
 _________________________________________
 EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
+
+- study a possibility to convert PostScript to JPEG/PNG "on the fly".
+  UPDATE: This can be done by ImageMagic's 'convert' command or PHP module:
+  http://pecl.php.net/package/imagick
+
+
+- in order to better assist with usability problems the application may record users'
+  activities and get them stored in the database. The gathered information will be
+  used to analyze a sequence of actions and users' input made before a problem occured.
 
 + improve the PHP LDAP API at RegDB to recognize secondary groups as well.
 
@@ -125,10 +142,9 @@ EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
 
 + increase the windows size for new/edited messages
 
-- implement persistent links to messages. This would also require adding
-  a standalone viewer of LogBook messages. The viewer should have
-  a navigation link back to the LogBook of the corresponding experiment,
-  next and previous messages (if any), etc.
++ implement persistent links to messages.
+
+  COMMENT: The Next/Previous navigation buttons are yet to be implemented.
 
 - implement fixed-size priview for attached images to avoid downloading
   huge documents. This shold make LogBook more agile. The most trivial way
@@ -346,4 +362,43 @@ LOW PRIORITY: Look at the browser history support.
 
 _______________________________________________________________
 LOW PRIORITY: Implement PDF export using either FPDF or PDFlib.
+
+
+
+
+
+
+____________________________________________________________________________________
+URGENT: work out a solution for a request to use LogBook for various LCLC facilities
+
+  STATUS UPDATE: As of October 21st, 2009 this has been implemented, tested
+  and deployed.
+
+
+  PROBLEM: LCLS also has a number of areas where people would like to use
+  LogBook. Th eproblem is that those activities aren't "experiments", and they
+  also aren't neccesarily related to any 'instruments'. On the other hand we'd
+  like to benefit from using RegDB and AuthDB for those activities.
+
+  PROPOSED SOLUTION:
+
+  - keep using the same database schema ('instruments' and 'experiments') because
+  a lot of code and services depend on its stability.
+
+  - at the level of  LogBook App visually separate 'instruments' from 'locations',
+  and 'experiments' from 'facilities'.
+
+  - use the parameters of instruments in RegDB to tell application that
+  a particular 'instrument' is actually a 'location'. The would allow treating
+  the connected 'experiments' as 'facilities'.
+
+  - use parameters of 'experiments' ('facilities') to control certain features of
+  applications. In a context of this topic that would allow to run off 'runs'
+  (and probably 'shifts') for non-experiment activities such as 'facilities'.
+
+  IDEA:
+
+  - consider a persistent translation table which will play a role similar
+  to 'localisation'. This can be either a separate table in RegDB, with
+  foreign keys from instrument/experiment tables pointing to it.
 

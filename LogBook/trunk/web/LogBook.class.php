@@ -113,7 +113,7 @@ class LogBook {
     public function find_attachment_by_id( $id ) {
 
         $result = $this->connection->query (
-            "SELECT h.exper_id, a.entry_id FROM header h, entry e, attachment a".
+            "SELECT h.exper_id, a.entry_id FROM {$this->connection->database}.header h, {$this->connection->database}.entry e, {$this->connection->database}.attachment a".
             " WHERE a.id=".$id.
             " AND h.id=e.hdr_id AND e.id=a.entry_id" );
 
@@ -146,7 +146,7 @@ class LogBook {
         // Find an experiment the shift belongs to
         //
         $result = $this->connection->query (
-            "SELECT h.exper_id, e.id FROM header h, entry e".
+            "SELECT h.exper_id, e.id FROM {$this->connection->database}.header h, {$this->connection->database}.entry e".
             " WHERE e.id=".$id.
             " AND h.id=e.hdr_id" );
 
@@ -183,10 +183,10 @@ class LogBook {
 
         if( is_null( $entry->parent_entry_id()))
             $this->connection->query (
-                "DELETE FROM header WHERE id=(SELECT hdr_id FROM entry WHERE id={$id})" );
+                "DELETE FROM {$this->connection->database}.header WHERE id=(SELECT hdr_id FROM {$this->connection->database}.entry WHERE id={$id})" );
         else
             $this->connection->query (
-                "DELETE FROM entry WHERE id={$id}" );
+                "DELETE FROM {$this->connection->database}.entry WHERE id={$id}" );
     }
 
     public function find_shift_by_id( $id ) {
@@ -194,7 +194,7 @@ class LogBook {
         // Find an experiment the shift belongs to
         //
         $result = $this->connection->query (
-            "SELECT exper_id FROM shift WHERE id={$id}" );
+            "SELECT exper_id FROM {$this->connection->database}.shift WHERE id={$id}" );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 1 ) {
@@ -224,7 +224,7 @@ class LogBook {
         // Find an experiment the run belongs to
         //
         $result = $this->connection->query (
-            "SELECT exper_id FROM run WHERE id={$id}" );
+            "SELECT exper_id FROM {$this->connection->database}.run WHERE id={$id}" );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 1 ) {

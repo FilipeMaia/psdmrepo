@@ -328,6 +328,20 @@ HERE;
             $run_id     = $_GET['run_id'];
             echo "  select_experiment_and_run({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$shift_id},{$run_id});";
 
+        } else if( $action == 'select_message' ) {
+            $id    = $_GET['id'];
+            $entry = $logbook->find_entry_by_id( $id );
+            if( is_null( $entry )) {
+                echo "  alert( 'no message found for id: {$id}' );";
+            } else {
+                $experiment = $entry->parent();
+                $instrument = $experiment->instrument();
+                $instr_id   = $instrument->id();
+                $instr_name = $instrument->name();
+                $exper_id   = $experiment->id();
+                $exper_name = $experiment->name();
+            	echo "  select_experiment_and_message({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$id});";
+            }
         } else {
             echo "  alert( 'unsupported action: {$action}' );";
         }
@@ -1175,6 +1189,40 @@ function create_messages_dialog( scope ) {
     return this;
 }
 
+/* This is a separate dialog for displaying persistent links for messages
+ */
+ var last_lid = null;    // The last element used to display the message link dialog
+                         // This element can be reused.
+
+function create_message_link_dialog( lid, message_id ) {
+
+    var idx = window.location.href.indexOf( '?' );
+    var link = ( idx < 0 ? window.location.href : window.location.href.substr( 0, idx ))+'?action=select_message&id='+message_id;
+
+    // Check if we can reuse the last element. We can only do ths if
+    // it was associated with the same message. Otherwise we'll recreate
+    // the whole dialog from scratch at the specified location.
+    //
+    if( last_lid != null ) {
+        if( last_lid != lid ) {
+            last_lid.style.display = 'none';
+            last_lid.innerHTML='';
+        } else {
+            if( lid.style.display == 'none') lid.style.display = 'block';
+            else                             lid.style.display = 'none';
+            return;
+        }
+    }
+    last_lid = lid;
+    lid.style.display = 'block';
+
+    lid.innerHTML =
+        '<div>'+
+        '  <em class="lb_label">URL: </em><a href="'+link+
+        '" target="_blank" class="lb_link" title="Click to open in a separate window/tab, or cut and paste to incorporate into another document as a link.">'+
+        link+'</a>'+
+        '</div>';
+}
 
 /* This is a separate dialog for posting replies to messages
  */
@@ -1675,26 +1723,33 @@ function display_shift() {
     set_context (
         '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
         'Shift >' );
-
-    document.getElementById('workarea').innerHTML=
+    var html =
         '<div style="margin-bottom:20px;">'+
         '  <img src="images/ShiftSummary.png" />'+
         '</div>'+
-        '<div id="experiment_info_container" style="height:200px;">Loading...</div>'+
+        '<div id="experiment_info_container" style="height:200px;">Loading...</div>';
+    if( !is_facility( current_selection.experiment.id )) {
+        html +=
         '<div style="margin-top:40px; margin-bottom:20px;">'+
         '  <img src="images/Runs.png" />'+
         '</div>'+
-        '<div id="runs_table" style="margin-left:10px; padding:10px;"></div>'+
+        '<div id="runs_table" style="margin-left:10px; padding:10px;"></div>';
+    }
+    html +=
         '<br>'+
         '<br>'+
         '<div id="messages_actions_container" style="margin-top:20px;" ></div>';
 
+    document.getElementById('workarea').innerHTML = html;
+
     load( 'DisplayShift.php?id='+current_selection.shift.id, 'experiment_info_container' );
 
-    var runs = create_runs_table (
-        'RequestRuns.php?shift_id='+current_selection.shift.id,
-        false
-    );
+    if( !is_facility( current_selection.experiment.id )) {
+        var runs = create_runs_table (
+            'RequestRuns.php?shift_id='+current_selection.shift.id,
+            false
+        );
+    }
     var messages_dialog = create_messages_dialog( 'shift' );
 }
 
@@ -1862,6 +1917,58 @@ function display_run() {
     var messages_dialog = create_messages_dialog( 'run' );
 }
 
+function select_experiment_and_message( instr_id, instr_name, exper_id, exper_name, id ) {
+    set_current_selection( instr_id, instr_name, exper_id, exper_name );
+    display_message( id );
+}
+
+function display_message( id ) {
+    set_context(
+        '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
+        'Message Viewer > ID='+id );
+
+    stopRefreshOfMessagesTable();
+
+    reset_navarea();
+    reset_workarea();
+
+    this.url='SearchOne.php?id='+id;
+
+	var html=
+	    '<div id="messages_area" style="min-width:800px;">'+
+	    '  <img src="images/ajaxloader.gif" />&nbsp;searching messages...'+
+	    '</div>';
+
+	document.getElementById('workarea').innerHTML=html;
+
+	function callback_on_load( result ) {
+	    if( result.ResultSet.Status != "success" ) {
+	        document.getElementById('messages_area').innerHTML = result.ResultSet.Message;
+	    } else {
+	        last_search_result = result.ResultSet.Result;
+
+	        // Put the list of all message headers onto the current page
+	        // and expand them all.
+	        //
+	        var html1 = '';
+	        for( var i=last_search_result.length-1; i >= 0 ; i-- )
+	            html1 += event2html(i);
+	        document.getElementById('messages_area').innerHTML = html1;
+	        for( var i = 0; i < last_search_result.length; i++ ) {
+	            var re = last_search_result[i];
+	            var mid = 'message_'+re.id;
+	            var m = document.getElementById(mid);
+                m.style.display = 'block';
+                message_expander_toggle( i );
+	        }
+	    }
+	}
+	function callback_on_failure( http_status ) {
+	    document.getElementById('messages_area').innerHTML=
+	        '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
+	}
+	load_then_call( this.url, callback_on_load, callback_on_failure );
+}
 
 /* History browser.
  *
@@ -1909,7 +2016,7 @@ function display_history( type, data ) {
             end = data.end;
             request_shifts_url += '&begin='+encodeURIComponent(data.begin)+'&end='+encodeURIComponent(data.end);
             request_runs_url += '&begin='+encodeURIComponent(data.begin)+'&end='+encodeURIComponent(data.end);
-            context += 'Data Taking > '+data.day;
+            context += ( is_facility( current_selection.experiment.id ) ? ' Day by Day > ' : 'Data Taking > ' )+data.day;
             break;
         case TYPE_HISTORY_F:
             begin = 'e';
@@ -1929,21 +2036,29 @@ function display_history( type, data ) {
 
     var subheader_style = 'padding:2px; background-color:#e0e0e0;';
 
-    document.getElementById('workarea').innerHTML =
+    var html =
         '<div style="margin-bottom:20px;">'+
         '  <img src="images/Shifts.png" />'+
         '</div>'+
-        '<div id="shifts_table" style="margin-left:10px; padding:10px; margin-bottom:40px;"></div>'+
+        '<div id="shifts_table" style="margin-left:10px; padding:10px; margin-bottom:40px;"></div>';
+    if( !is_facility( current_selection.experiment.id )) {
+        html +=
         '<div style="margin-bottom:20px;">'+
         '  <img src="images/Runs.png" />'+
         '</div>'+
-        '<div id="runs_table" style="margin-left:10px; padding:10px; margin-bottom:40px;"></div>'+
+        '<div id="runs_table" style="margin-left:10px; padding:10px; margin-bottom:40px;"></div>';
+    }
+    html +=
         '<div id="messagesarea"></div>';
+
+    document.getElementById('workarea').innerHTML = html;
 
     // Build  YUI tables and use their loading mechanism
     //
     create_shifts_table( request_shifts_url, false );
-    create_runs_table( request_runs_url, false );
+    if( !is_facility( current_selection.experiment.id )) {
+        create_runs_table( request_runs_url, false );
+    }
     var scope='',
         text2search='',
         search_in_messages=true, search_in_tags=true, search_in_values=true,
@@ -1996,63 +2111,85 @@ function browse_contents() {
     var node_i = new YAHOO.widget.TextNode(
         {   label: '<em style="color:#0071bc;"><b>'+current_selection.instrument.name+'</b></em>',
             expanded: true,
-            title: 'This is currently selected instrument' },
+            title: 'This is currently selected instrument/location' },
         browse_tree.getRoot());
 
     var node_e = new YAHOO.widget.TextNode(
         {   label: '<em style="color:#0071bc;"><b>'+current_selection.experiment.name+'</b></em>',
             expanded: true,
-            title: 'This is currently selected experiment' },
+            title: 'This is currently selected experiment/facility' },
         node_i );
 
     var node_h = new YAHOO.widget.TextNode(
         {   label: 'Timeline',
             expanded: true,
-            title: 'Explore the history of various events happened in the experiment.' },
+            title: 'Explore the history of various events happened in the experiment/facility.' },
         node_e );
 
-    var node_h_p = new YAHOO.widget.TextNode(
-        {   label: 'Preparation',
-            expanded: false,
-            title: 'The preparation phase of the experiment',
-            type: TYPE_HISTORY_P },
-        node_h );
+    if( is_facility( current_selection.experiment.id )) {
 
-    var node_h_d = new YAHOO.widget.TextNode(
-        {   label: 'Data Taking',
-            expanded: false,
-            title: 'The data taking phase of the experiment',
-            type: TYPE_HISTORY_D },
-        node_h );
+        var node_h_d = new YAHOO.widget.TextNode(
+      	    {   label: 'Day by day',
+        	    expanded: false,
+        	    title: 'The day-bay-day history of the facility',
+                type: TYPE_HISTORY_D },
+            node_h );
 
-    var node_h_f = new YAHOO.widget.TextNode(
-        {   label: 'Follow up',
-            expanded: false,
-            title: 'After the data taking phase was over',
-            type: TYPE_HISTORY_F },
-        node_h );
+        var node_s = new YAHOO.widget.TextNode(
+            {   label: 'Shifts',
+                expanded: false,
+                title: 'Explore shifts of the facility',
+                type: TYPE_SHIFTS },
+            node_e );
 
-    var node_s = new YAHOO.widget.TextNode(
-        {   label: 'Shifts',
-            expanded: false,
-            title: 'Explore shifts of the experiment',
-            type: TYPE_SHIFTS },
-        node_e );
+        var currentIconMode = 0;
 
-    var node_r = new YAHOO.widget.TextNode(
-        {   label: 'Runs',
-            expanded: false,
-            title: 'Explore data taking runs',
-            type: TYPE_RUNS },
-        node_e );
+        node_h_d.setDynamicLoad( loadNodeData, currentIconMode );
+        node_s.setDynamicLoad  ( loadNodeData, currentIconMode );
 
-    // turn dynamic loading on for the last children:
-    //
-    var currentIconMode = 0;
+    } else {
 
-    node_h_d.setDynamicLoad( loadNodeData, currentIconMode );
-    node_s.setDynamicLoad  ( loadNodeData, currentIconMode );
-    node_r.setDynamicLoad  ( loadNodeData, currentIconMode );
+        var node_h_p = new YAHOO.widget.TextNode(
+                {   label: 'Preparation',
+                    expanded: false,
+                    title: 'The preparation phase of the experiment',
+                    type: TYPE_HISTORY_P },
+                node_h );
+
+            var node_h_d = new YAHOO.widget.TextNode(
+          	    {   label: 'Data Taking',
+            	    expanded: false,
+            	    title: 'The data taking phase of the experiment',
+                    type: TYPE_HISTORY_D },
+                node_h );
+
+            var node_h_f = new YAHOO.widget.TextNode(
+                {   label: 'Follow up',
+                    expanded: false,
+                    title: 'After the data taking phase was over',
+                    type: TYPE_HISTORY_F },
+                node_h );
+
+            var node_s = new YAHOO.widget.TextNode(
+                {   label: 'Shifts',
+                    expanded: false,
+                    title: 'Explore shifts of the experiment',
+                    type: TYPE_SHIFTS },
+                node_e );
+
+            var node_r = new YAHOO.widget.TextNode(
+                {   label: 'Runs',
+                    expanded: false,
+                    title: 'Explore data taking runs',
+                    type: TYPE_RUNS },
+                node_e );
+
+            var currentIconMode = 0;
+
+            node_h_d.setDynamicLoad( loadNodeData, currentIconMode );
+            node_s.setDynamicLoad  ( loadNodeData, currentIconMode );
+            node_r.setDynamicLoad  ( loadNodeData, currentIconMode );
+    }
 
     // Dispatch clicks on selected nodes to the corresponding
     // functions.
@@ -2367,6 +2504,7 @@ function child2html( re ) {
     var mid = 'message_'+re.id;
     var hid = 'message_header_'+re.id;
     var bid = 'message_body_'+re.id;
+    var lid = 'message_link_dialog_'+re.id;
     var rid = 'message_reply_dialog_'+re.id;
     var eid = 'message_edit_dialog_'+re.id;
     var did = 'message_delete_dialog_'+re.id;
@@ -2436,6 +2574,14 @@ function child2html( re ) {
         '  <div id="'+bid+'" style="margin-left:7px; margin-bottom:20px;">'+
         '    <div style="padding:10px; padding-left:20px; padding-bottom:0px;  padding-right:0px;">'+
         '      <div style="float:right; position:relative; top:-16px;">';
+    result +=
+        '        <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '          onclick="create_message_link_dialog('+lid+','+re.id+')"'+
+        '          onmouseover="expander_highlight(this)" '+
+        '          onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '          title="Show a persistent URL for this message. The link can be embedded into other documents.">'+
+        '          Link'+
+        '        </span>';
     if( isAuthorizedFor( 'canPostNewMessages' )) {
         result +=
         '        <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
@@ -2469,6 +2615,7 @@ function child2html( re ) {
     result +=
         '      </div>'+
         '      <div style="margin-top:0px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
+        '      <div id="'+lid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
         '      <div id="'+rid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
         '      <div id="'+eid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
         '      <div id="'+did+'" style="padding:10px; background-color:#e0e0e0; display:none;"></div>'+
@@ -2499,6 +2646,7 @@ function event2html( message_idx ) {
     var mid = 'message_'+re.id;
     var hid = 'message_header_'+re.id;
     var bid = 'message_body_'+re.id;
+    var lid = 'message_link_dialog_'+re.id;
     var rid = 'message_reply_dialog_'+re.id;
     var eid = 'message_edit_dialog_'+re.id;
     var did = 'message_delete_dialog_'+re.id;
@@ -2586,6 +2734,14 @@ function event2html( message_idx ) {
         '  <div id="'+bid+'" style="display:none; margin-left:17px; margin-bottom:20px;">'+
         '    <div style="padding:10px; padding-left:20px; padding-bottom:0px;  padding-right:0px; border-left:solid 1px #c0c0c0;">'+
         '    <div style="float:right; position:relative; top:-8px;">';
+    result +=
+        '        <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
+        '          onclick="create_message_link_dialog('+lid+','+re.id+')"'+
+        '          onmouseover="expander_highlight(this)" '+
+        '          onmouseout="expander_unhighlight(this,document.bgColor)"'+
+        '          title="Show a persistent URL for this message. The link can be embedded into other documents.">'+
+        '          Link'+
+        '        </span>';
     if( isAuthorizedFor( 'canPostNewMessages' )) {
         result +=
         '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
@@ -2619,6 +2775,7 @@ function event2html( message_idx ) {
     result +=
         '    </div>'+
         '    <div style="margin-top:8px; margin-right:0px; margin-bottom:0px; background-color:#efefef;">'+re.html+'</div>'+
+        '    <div id="'+lid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
         '    <div id="'+rid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
         '    <div id="'+eid+'" style="border-top:dashed 1px #000000; padding:10px; background-color:#e0e0e0; display:none;"></div>'+
         '    <div id="'+did+'" style="padding:10px; background-color:#e0e0e0; display:none;"></div>'+
