@@ -123,7 +123,7 @@ HERE;
 
         $list = array();
 
-        $sql = "SELECT user.user,user.exp_id,role.* FROM user,role WHERE ((user.exp_id IS NULL) OR (user.exp_id={$exper_id})) AND user.role_id=role.id ORDER BY role.app,role.name";
+        $sql = "SELECT user.user,user.exp_id,role.* FROM {$this->connection->database}.user, {$this->connection->database}.role WHERE ((user.exp_id IS NULL) OR (user.exp_id={$exper_id})) AND user.role_id=role.id ORDER BY role.app,role.name";
         $result = $this->connection->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
@@ -141,7 +141,7 @@ HERE;
 
         $list = array();
 
-        $sql = "SELECT user.user,user.exp_id,role.* FROM user,role WHERE role.id={$role_id} AND user.role_id=role.id ORDER BY user.exp_id, role.app";
+        $sql = "SELECT user.user,user.exp_id,role.* FROM {$this->connection->database}.user, {$this->connection->database}.role WHERE role.id={$role_id} AND user.role_id=role.id ORDER BY user.exp_id, role.app";
         $result = $this->connection->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
@@ -159,7 +159,7 @@ HERE;
 
         $list = array();
 
-        $sql = "SELECT * FROM role WHERE app='{$application}' ORDER BY name";
+        $sql = "SELECT * FROM {$this->connection->database}.role WHERE app='{$application}' ORDER BY name";
         $result = $this->connection->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
@@ -170,7 +170,7 @@ HERE;
 
     public function find_role( $application, $role ) {
 
-        $sql = "SELECT * FROM role WHERE app='{$application}' AND name='{$role}'";
+        $sql = "SELECT * FROM {$this->connection->database}.role WHERE app='{$application}' AND name='{$role}'";
         $result = $this->connection->query ( $sql );
         $nrows = mysql_numrows( $result );
         if( $nrows == 0 ) return null;
@@ -185,7 +185,7 @@ HERE;
 
         $list = array();
 
-        $sql = "SELECT DISTINCT app FROM role ORDER BY app";
+        $sql = "SELECT DISTINCT app FROM {$this->connection->database}.role ORDER BY app";
         $result = $this->connection->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
@@ -200,7 +200,7 @@ HERE;
 
         $list = array();
 
-        $sql = "SELECT name FROM priv WHERE role_id={$role_id} ORDER BY name";
+        $sql = "SELECT name FROM {$this->connection->database}.priv WHERE role_id={$role_id} ORDER BY name";
         $result = $this->connection->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
@@ -215,7 +215,7 @@ HERE;
         //return true ;
 
         $sql =
-            "SELECT * FROM user u, role r".
+            "SELECT * FROM {$this->connection->database}.user u, {$this->connection->database}.role r".
             " WHERE r.name='{$role}' AND r.app='{$app}'".
             " AND u.user='{$user}' AND u.role_id=r.id".
             ( is_null($exper_id) ? "" : " AND u.exp_id={$exper_id}" );
@@ -263,7 +263,7 @@ HERE;
     	//       role playes who're not associated with any particular experiment.
     	//
         $sql =
-            "SELECT * FROM user u, role r, priv p".
+            "SELECT * FROM {$this->connection->database}.user u, {$this->connection->database}.role r, {$this->connection->database}.priv p".
             " WHERE p.name='{$priv}' AND p.role_id=r.id AND r.app='{$app}'".
             " AND u.user='{$user}' AND u.role_id=r.id".
             (is_null($exper_id) ? "" : " AND ((u.exp_id={$exper_id}) OR (u.exp_id IS NULL))");
@@ -279,7 +279,7 @@ HERE;
      * ======================
      */
     public function createRole( $application, $role, $privileges ) {
-        $this->connection->query ( "INSERT INTO role VALUES(NULL,'{$role}','{$application}')" );
+        $this->connection->query ( "INSERT INTO {$this->connection->database}.role VALUES(NULL,'{$role}','{$application}')" );
         $result = $this->connection->query ( "SELECT LAST_INSERT_ID() AS 'role_id'" );
         $nrows = mysql_numrows( $result );
         if( $nrows != 1 )
@@ -289,25 +289,25 @@ HERE;
         $row = mysql_fetch_array( $result, MYSQL_ASSOC );
         $role_id = $row['role_id'];
         foreach( $privileges as $p) {
-            $this->connection->query( "INSERT INTO priv VALUES(NULL,'{$p}',{$role_id})" );
+            $this->connection->query( "INSERT INTO {$this->connection->database}.priv VALUES(NULL,'{$p}',{$role_id})" );
         }
     }
 
     public function deleteRole( $id ) {
-        $this->connection->query ( "DELETE FROM priv WHERE role_id={$id}" );
-        $this->connection->query ( "DELETE FROM user WHERE role_id={$id}" );
-        $this->connection->query ( "DELETE FROM role WHERE id={$id}" );
+        $this->connection->query ( "DELETE FROM {$this->connection->database}.priv WHERE role_id={$id}" );
+        $this->connection->query ( "DELETE FROM {$this->connection->database}.user WHERE role_id={$id}" );
+        $this->connection->query ( "DELETE FROM {$this->connection->database}.role WHERE id={$id}" );
     }
 
     public function deleteApplication( $name ) {
-        $this->connection->query ( "DELETE FROM priv WHERE role_id=(SELECT id FROM role WHERE app='{$name}')" );
-        $this->connection->query ( "DELETE FROM user WHERE role_id=(SELECT id FROM role WHERE app='{$name}')" );
-        $this->connection->query ( "DELETE FROM role WHERE app='{$name}'" );
+        $this->connection->query ( "DELETE FROM {$this->connection->database}.priv WHERE role_id=(SELECT id FROM role WHERE app='{$name}')" );
+        $this->connection->query ( "DELETE FROM {$this->connection->database}.user WHERE role_id=(SELECT id FROM role WHERE app='{$name}')" );
+        $this->connection->query ( "DELETE FROM {$this->connection->database}.role WHERE app='{$name}'" );
     }
 
     public function createRolePlayer( $application, $role, $exper_id, $player ) {
         $exper_id_attr = is_null( $exper_id ) ? 'NULL' : $exper_id;
-        $this->connection->query ( "INSERT INTO user VALUES(NULL,{$exper_id_attr},'{$player}',(SELECT id FROM role WHERE name='{$role}' AND app='{$application}'))" );
+        $this->connection->query ( "INSERT INTO {$this->connection->database}.user VALUES(NULL,{$exper_id_attr},'{$player}',(SELECT id FROM {$this->connection->database}.role WHERE name='{$role}' AND app='{$application}'))" );
     }
 }
 
