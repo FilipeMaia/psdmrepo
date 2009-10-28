@@ -120,7 +120,7 @@ class TranslatorThread ( threading.Thread ) :
         fname_dict = self.__build_output_fnames(fs)
 
         # output directory must be empty or non-existent
-        self.__make_hdf5_dir( fname_dict['h5dirname'] )
+        self.__make_hdf5_dir( fname_dict['tmpdirname'] )
 
         # build command line for running translator
         cmd = self.__build_translate_cmd(fs_id, fname_dict, fs)
@@ -135,7 +135,7 @@ class TranslatorThread ( threading.Thread ) :
         proc = subprocess.Popen(cmd, stdout = logfile, stderr = logfile)
         translator_id = self._db.new_translator(self._controller_id, fs_id)
         self.info ("[%s] Started translator #%d (PID=%d) with cmd %s", self._name, translator_id, proc.pid, ' '.join(cmd) )
-        self.info ("[%s] output directory %s", self._name, fname_dict['h5dirname'] )
+        self.info ("[%s] output directory %s", self._name, fname_dict['tmpdirname'] )
         self.info ("[%s] Log file is in %s", self._name, logname )
         
         # loop and wait until translation done             
@@ -157,7 +157,7 @@ class TranslatorThread ( threading.Thread ) :
                 self.info ("[%s] translator #%d finished (PID=%d) retcode=%s", self._name, translator_id, proc.pid, proc.returncode)
 
                 # get the size of resulting files
-                output_size = self.__dir_size( fname_dict['h5dirname'] )
+                output_size = self.__dir_size( fname_dict['tmpdirname'] )
                 self.info ("[%s] translator #%d produced %d bytes of data", self._name, translator_id, output_size)
 
                 # store statistics
@@ -170,7 +170,7 @@ class TranslatorThread ( threading.Thread ) :
                     self._db.change_fileset_status (fs_id, 'Translation_Complete')
                     
                     # store result in file manager
-                    returncode = self.__store_hdf5 ( fs, fname_dict['h5dirname'] )
+                    returncode = self.__store_hdf5 ( fs, fname_dict['tmpdirname'], fname_dict['h5dirname'] )
                     self._db.update_irods_status (translator_id, returncode)
                     if returncode != 0:
                         self._db.change_fileset_status (fs_id, 'Archive_Error')
@@ -197,13 +197,22 @@ class TranslatorThread ( threading.Thread ) :
 
         # re-format directory URI
         dir_name = self._translate_uri % fsdbinfo
+
+        # temporary directory name
+        tmpdirname = "%04d-%s" % ( fsdbinfo['run_number'], curtime )
+        tmpdirname = os.path.join(dir_name,tmpdirname)
         
         # Now construct the output file name
-        fname = "%(instrument)s-%(experiment)s-%(run_number)06d" % fsdbinfo
+        h5name = self._config.get('hdf5-file-name',None)
+        if not h5name : h5name = "%(experiment)s-r%(run_number)04d-c{seq2}.h5"
+        h5name = h5name % fsdbinfo
 
-        return dict ( h5name = fname + '-{seq4}.hdf5',
+        logname = "o2o-translate-%(experiment)s-r%(run_number)04d" % fsdbinfo
+
+        return dict ( h5name = h5name,
                       h5dirname = dir_name,
-                      logname = fname + '-' + curtime + '.log' )
+                      tmpdirname = tmpdirname,
+                      logname = logname + '-' + curtime + '.log' )
 
     # ===========================================================
     # Build a list that has the command to execute the translator
@@ -212,7 +221,7 @@ class TranslatorThread ( threading.Thread ) :
     def __build_translate_cmd ( self, fileset_id, fname_dict, fs ) :
 
         """Build the arg list to pass to the translator from the files in fileset
-        and the translate_uri destination for the transalator output"""
+        and the translate_uri destination for the translator output"""
 
         cmd_list = []
         cmd_list.append("o2o-translate")
@@ -224,7 +233,7 @@ class TranslatorThread ( threading.Thread ) :
         #
         # Destination dir for translated file
         cmd_list.append("--output-dir")
-        cmd_list.append(fname_dict['h5dirname'])
+        cmd_list.append(fname_dict['tmpdirname'])
 
         #
         # experiment, run number, filename
@@ -289,9 +298,10 @@ class TranslatorThread ( threading.Thread ) :
     # Store HDF5 files in both dataset and file manager
     # =================================================
 
-    def __store_hdf5 (self, fs, dirname):
+    def __store_hdf5 (self, fs, tmpdirname, dirname):
 
-        # generator for all file paths under given directory
+        # generator for all file paths under given directory, 
+        # returns list of tuples (subdir,filename)
         def _all_files( root, subdir = "" ) :
             for e in os.listdir( os.path.join(root,subdir) ) :
                 path = os.path.join(root,subdir,e)
@@ -302,8 +312,35 @@ class TranslatorThread ( threading.Thread ) :
                     yield ( subdir, e )
 
         # build a list of files to store
-        files = [ x for x in _all_files( dirname ) ]
+        files = [ x for x in _all_files( tmpdirname ) ]
+
+        # check that final destination does not have these files
+        for f in files :
+            dst = os.path.join( dirname, f[0], f[1] )
+            if os.path.exists(dst) :
+                self.error("store_hdf5: destination files already exists: %s",dst)
+                return 2
             
+        # move all files to final destination
+        for f in files :
+            src = os.path.join( tmpdirname, f[0], f[1] )
+            dst = os.path.join( dirname, f[0], f[1] )
+            try:
+                self.debug("moving file %s ->%s", src,dst)
+                os.rename(src,dst)
+            except Exception, e :
+                self.error("store_hdf5: failed to move file: %s -> %s", src, dst)
+                self.error("store_hdf5: exception raised: %s", str(e) )
+                return 2
+        
+        # remove temporary directory
+        try :
+            self.debug("removing temp dir %s", tmpdirname)
+            os.rmdir( tmpdirname )
+        except Exception, e :
+            # non-fatal, means it may have some subdirectories
+            self.error("store_hdf5: failed to remove directory %s: %s", tmpdirname, str(e) )
+
         # add all files to fileset
         self._db.add_files( fs['id'], 'HDF5', [os.path.join(dirname,f[0],f[1]) for f in files ] )
 

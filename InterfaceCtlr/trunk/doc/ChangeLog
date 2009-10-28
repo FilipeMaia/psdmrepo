@@ -11,6 +11,13 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-11
+2009-10-28 Andy Salnikov
+- many changes:
+  - HDF files are created in a temporary directory and then 
+    moved to the destination directory
+  - can override output file name in configuration
+
 Tag: V00-03-10
 2009-10-13 Andy Salnikov
 - add config option 'list:o2o-extra-options' to add arbitrary options
