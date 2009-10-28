@@ -89,6 +89,9 @@ namespace {
     } else if ( dbr_type_is_TIME(pv.iDbrType) ) {
       typedef Pds::EpicsPvTime<iDbrType> Struct ;
       return sizeof(Struct) + (n-1)*sizeof(typename Struct::TDbrOrg) ;
+    } else {
+      // suppress warning
+      return 0 ;
     }
   }
 

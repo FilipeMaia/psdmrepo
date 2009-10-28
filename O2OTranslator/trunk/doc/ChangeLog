@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-06
+2009-10-28 Andy Salnikov
+- added couple of new data types
+
 Tag: V00-03-05
 2009-10-14 Andy Salnikov
 - added timestamp printing at start/finish

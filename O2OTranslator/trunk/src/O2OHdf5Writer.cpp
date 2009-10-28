@@ -28,12 +28,14 @@
 #include "H5DataTypes/AcqirisConfigV1.h"
 #include "H5DataTypes/BldDataEBeam.h"
 #include "H5DataTypes/BldDataFEEGasDetEnergy.h"
+#include "H5DataTypes/BldDataPhaseCavity.h"
 #include "H5DataTypes/CameraFrameFexConfigV1.h"
 #include "H5DataTypes/CameraFrameV1.h"
 #include "H5DataTypes/CameraTwoDGaussianV1.h"
 #include "H5DataTypes/ControlDataConfigV1.h"
 #include "H5DataTypes/EpicsPvHeader.h"
 #include "H5DataTypes/EvrConfigV1.h"
+#include "H5DataTypes/EvrConfigV2.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
 #include "LusiTime/Time.h"
@@ -191,6 +193,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_EvrConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::EvrConfigV2> ( "EvrData::ConfigV2" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EvrConfig,2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::ControlDataConfigV1> ( "ControlData::ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_ControlConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
@@ -213,6 +219,12 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataEBeam> (
       "Bld::BldDataEBeam", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_EBeam,0).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // version for this type is 0
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataPhaseCavity> (
+      "Bld::BldDataPhaseCavity", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_PhaseCavity,0).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // special converter for CameraFrame type
