@@ -165,7 +165,7 @@ class RegDBConnection {
         return false;
     }
 
-    public function posix_group_members ( $name ) {
+    public function posix_group_members ( $name, $and_as_primary_group=true ) {
 
         $this->connect();
 
@@ -174,7 +174,7 @@ class RegDBConnection {
             throw new RegDBException (
                 __METHOD__,
                "group name can't be empty" );
-        $sr = ldap_search( $this->ldap_ds, "ou=Group,dc=reg,o=slac", "cn=$trim_name" );
+        $sr = ldap_search( $this->ldap_ds, "ou=Group,dc=reg,o=slac", "cn={$trim_name}" );
         if( !$sr )
             throw new RegDBException (
                 __METHOD__,
@@ -210,19 +210,21 @@ class RegDBConnection {
             );
         }
 
-        // Now search user records to see who may claim this group as
+        // (OPTIONALY) Now search user records to see who may claim this group as
         // its primary group.
         //
-        $gid = $info[0]["gidnumber"][0];
-        $primary = $this->primary_posix_group_members( $gid );
-        foreach( $primary as $p ) {
-            array_push(
-                $result,
-                array(
-                    "uid"   => $p['uid'],
-                    "gecos" => $p['gecos'],
-                    "email" => $p['email'] )
-            );
+        if( $and_as_primary_group ) {
+            $gid = $info[0]["gidnumber"][0];
+            $primary = $this->primary_posix_group_members( $gid );
+            foreach( $primary as $p ) {
+                array_push(
+                    $result,
+                    array(
+                        "uid"   => $p['uid'],
+                        "gecos" => $p['gecos'],
+                        "email" => $p['email'] )
+                );
+            }
         }
         sort( $result );
         return $result;
@@ -239,7 +241,7 @@ class RegDBConnection {
         if( $trim_name == '' )
             throw new RegDBException (
                 __METHOD__,
-               "group name can't be empty" );
+               "user name can't be empty" );
         $sr = ldap_search( $this->ldap_ds, "ou=People,dc=reg,o=slac", "uid=$trim_name" );
         if( !$sr )
             throw new RegDBException (
@@ -267,6 +269,57 @@ class RegDBConnection {
             );
         }
         return $list;
+    }
+
+    public function find_user_account ( $name ) {
+
+        $this->connect();
+
+        $trim_name = trim( $name );
+        if( $trim_name == '' )
+            throw new RegDBException (
+                __METHOD__,
+               "user name can't be empty" );
+        $sr = ldap_search( $this->ldap_ds, "ou=People,dc=reg,o=slac", "uid={$trim_name}" );
+        if( !$sr )
+            throw new RegDBException (
+                __METHOD__,
+               "LDAP error: ".ldap_error( $this->ldap_ds ));
+
+        $info = ldap_get_entries( $this->ldap_ds, $sr );
+        $num_accounts = $info["count"];
+        if( $num_accounts == 0 ) return null;
+        if( $num_accounts != 1 )
+            throw new RegDBException (
+                __METHOD__,
+               "LDAP error: ".ldap_error( $this->ldap_ds ));
+        $uid = $info[0]["uid"][0];
+        return array (
+            'uid'   => $uid,
+            'gecos'  => $info[0]["gecos"][0],
+            'email' => $uid.'@slac.stanford.edu',
+            'gid' => $this->gid2name( $info[0]["gidnumber"][0] ));
+    }
+
+    public function gid2name( $gid ) {
+    	$this->connect();
+    	$trim_gid = trim( $gid );
+        if( $trim_gid == '' )
+            throw new RegDBException (
+                __METHOD__,
+               "GID can't be empty" );
+        $sr = ldap_search( $this->ldap_ds, "ou=Group,dc=reg,o=slac", "(&(gidNumber={$trim_gid})(objectClass=posixGroup))" );
+        if( !$sr )
+            throw new RegDBException (
+                __METHOD__,
+               "LDAP error: ".ldap_error( $this->ldap_ds ));
+        $info = ldap_get_entries( $this->ldap_ds, $sr );
+        $num_accounts = $info["count"];
+        if( $num_accounts != 1 )
+            throw new RegDBException (
+                __METHOD__,
+               "Inconsistent result reported by LDAP server" );
+        return $info[0]["cn"][0];
     }
 
     public function primary_posix_group_members ( $gid ) {
@@ -427,6 +480,13 @@ $conn = new RegDBConnection (
     REGDB_DEFAULT_LDAP_HOST );
 
 try {
+	
+    $user = $conn->find_user_account( "gapon" );
+    print_r( $user );
+
+	$group = $conn->gid2name( 1013 );
+	print "1013 : ".$group;
+
     $list = $conn->user_accounts( "gapon" );
     print_r( $list );
     $list = $conn->posix_group_members( "ec" );
@@ -469,7 +529,8 @@ try {
     }
 
  } catch ( RegDBException $e ) {
-    print( e.toHtml());
+    print( $e->toHtml());
 }
+*
 */
 ?>

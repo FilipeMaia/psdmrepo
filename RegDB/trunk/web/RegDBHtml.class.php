@@ -24,10 +24,11 @@ class RegDBHtml {
 HERE;
     }
 
-    public function label( $x, $y, $text, $bold=true ) {
+    public function label( $x, $y, $text, $bold=true, $color=null ) {
         $style_bold = $bold ? 'font-weight:bold;' : '';
+        $style_color = is_null( $color ) ? '' : "color:{$color};";
         $this->html = $this->html.<<<HERE
-<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left; {$this->label_color} {$style_bold}">
+<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left; {$this->label_color} {$style_bold} {$style_color}">
   {$text}
 </div>
 HERE;
@@ -43,9 +44,10 @@ HERE;
         return $this;
     }
 
-    public function value( $x, $y, $text ) {
-        $this->html = $this->html.<<<HERE
-<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
+    public function value( $x, $y, $text, $color=null ) {
+        $style_color = is_null( $color ) ? '' : "color:{$color};";
+    	$this->html = $this->html.<<<HERE
+<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left; {$style_color}">
   {$text}
 </div>
 HERE;

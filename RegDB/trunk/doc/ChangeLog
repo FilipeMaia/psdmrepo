@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-16
+2009-10-28 Igor Gaponenko
+- added fine grain methods for searching records in LDAP. These operations
+were needed for a more efficient implementation of some authorization
+operations.
+
 Tag: V00-00-15
 2009-10-27 Igor Gaponenko
 - reimplemented the PHP connection class to use persistent MySQL connections

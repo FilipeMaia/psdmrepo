@@ -350,11 +350,14 @@ class RegDB {
     public function is_member_of_posix_group ( $group, $uid ) {
         return $this->connection->is_member_of_posix_group( $group, $uid ); }
 
-    public function posix_group_members ( $name ) {
-        return $this->connection->posix_group_members( $name ); }
+    public function posix_group_members ( $name, $and_as_primary_group=true ) {
+        return $this->connection->posix_group_members( $name, $and_as_primary_group ); }
 
     public function user_accounts ( $user='*' ) {
         return $this->connection->user_accounts( $user ); }
+
+    public function find_user_account ( $user ) {
+        return $this->connection->find_user_account( $user ); }
 
 }
 
