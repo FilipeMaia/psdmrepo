@@ -30,7 +30,11 @@ KNOWN PROBLEMS, BUGS
 ___________________________
 URGENT PROBLEMS FOR LOGBOOK
 
-- put a table with all available run parameters into the Run Summary page
++ put a table with all available run parameters into the Run Summary page
+
+  NOTE: It's been done for the common parameters of all experiments only.
+  And it still needs to be done for experiment-specific parameters (any params
+  which do not belong to the above category).
 
       +----------+     +---------+
 - add | << Prev  | and | Next >> | buttons to the messages viewer
@@ -42,7 +46,6 @@ EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
 - study a possibility to convert PostScript to JPEG/PNG "on the fly".
   UPDATE: This can be done by ImageMagic's 'convert' command or PHP module:
   http://pecl.php.net/package/imagick
-
 
 - in order to better assist with usability problems the application may record users'
   activities and get them stored in the database. The gathered information will be

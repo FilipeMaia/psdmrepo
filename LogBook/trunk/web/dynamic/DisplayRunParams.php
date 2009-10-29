@@ -12,6 +12,137 @@ if( isset( $_GET['id'] )) {
 } else
     die( "no valid run identifier" );
 
+define( BEAMS_TITLE,   "&nbsp;E l e c t r o n &nbsp;&nbsp; a n d &nbsp;&nbsp; P h o t o n &nbsp;&nbsp; b e a m s");
+define( FEE_TITLE,     "&nbsp;F E E" );
+define( HFP_TITLE,     "&nbsp;H F P" );
+define( ETOF_TITLE,    "&nbsp;e T O F" );
+define( ITOF_TITLE,    "&nbsp;i T O F" );
+define( HFP_GAS_TITLE, "&nbsp;H F P &nbsp;&nbsp; G a s" );
+define( DIA_TITLE,     "&nbsp;D I A " );
+define( MBES_TITLE,    "&nbsp;M B E S" );
+
+define( BEAMS,   0 );
+define( FEE,     BEAMS   +  9 );
+define( HFP,     FEE     +  8 );
+define( ETOF,    HFP     +  2 );
+define( ITOF,    ETOF    + 30 );
+define( HFP_GAS, ITOF    +  6 );
+define( DIA,     HFP_GAS +  5 );
+define( MBES,    DIA     +  1 );
+define( END_,    MBES    +  4 );
+
+$pardefs = array(
+    //
+    // Electron beam and Photon beam data
+    //
+    array( 'name' => 'BEND:DMP1:400:BDES',   'descr' => 'electron beam energy' ),
+    array( 'name' => 'BPMS:DMP1:199:TMIT1H', 'descr' => 'Particle N_electrons' ),
+    array( 'name' => 'BEAM:LCLS:ELEC:Q',     'descr' => 'Charge' ),
+    array( 'name' => 'SIOC:SYS0:ML00:AO195', 'descr' => 'Peak current after second bunch compressor' ),
+    array( 'name' => 'SIOC:SYS0:ML00:AO820', 'descr' => 'Pulse length' ),
+    array( 'name' => 'SIOC:SYS0:ML00:AO569', 'descr' => 'ebeam energy loss converted to photon mJ' ),
+    array( 'name' => 'SIOC:SYS0:ML00:AO580', 'descr' => 'Calculated number of photons' ),
+    array( 'name' => 'SIOC:SYS0:ML00:AO541', 'descr' => 'Photon beam energy' ),
+    array( 'name' => 'SIOC:SYS0:ML00:AO192', 'descr' => 'Wavelength' ),
+    //
+    // FEE data
+    //
+    array( 'name' => 'VGPR:FEE1:311:PSETPOINT_DES', 'descr' => 'Gas attenuator setpoint' ),
+    array( 'name' => 'VGCP:FEE1:311:P',             'descr' => 'Gas attenuator actual pressure' ),
+    array( 'name' => 'GATT:FEE1:310:R_ACT',         'descr' => 'Gas attenuator calculated transmission' ),
+    array( 'name' => 'SATT:FEE1:321:STATE',         'descr' => 'Solid attenuator 1' ),
+    array( 'name' => 'SATT:FEE1:322:STATE',         'descr' => 'Solid attenuator 2' ),
+    array( 'name' => 'SATT:FEE1:323:STATE',         'descr' => 'Solid attenuator 3' ),
+    array( 'name' => 'SATT:FEE1:324:STATE',         'descr' => 'Solid attenuator 4' ),
+    array( 'name' => 'SATT:FEE1:320:TACT',          'descr' => 'Total attenuator length' ),
+    //
+    // HFP data
+    //
+    array( 'name' => 'AMO:HFP:GCC:01:PMON', 'descr' => 'pressure' ),
+    array( 'name' => 'AMO:HFP:MMS:table.Z', 'descr' => 'z-position' ),
+    //
+    // etof settings
+    //
+    //   etof 1
+    //
+    array( 'name' => 'AMO:R14:IOC:10:ao0:out1',                'descr' => '1' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS0:CH0:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS0:CH1:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS0:CH2:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS0:CH3:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS7:CH0:VoltageMeasure', 'descr' => '' ),
+    //
+    //   etof 2
+    //
+    array( 'name' => 'AMO:R14:IOC:10:ao0:out2',                'descr' => '2' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS1:CH0:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS1:CH1:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS1:CH2:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS1:CH3:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS7:CH1:VoltageMeasure', 'descr' => '' ),
+    //
+    //   etof 3
+    //
+    array( 'name' => 'AMO:R14:IOC:10:ao0:out3',                'descr' => '3' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS2:CH0:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS2:CH1:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS2:CH2:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS2:CH3:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS7:CH2:VoltageMeasure', 'descr' => '' ),
+    //
+    //   etof 4
+    //
+    array( 'name' => 'AMO:R14:IOC:10:ao0:out4',                'descr' => '4' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS3:CH0:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS3:CH1:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS3:CH2:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS3:CH3:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS7:CH3:VoltageMeasure', 'descr' => '' ),
+    //
+    //   etof 5
+    //
+    array( 'name' => 'AMO:R14:IOC:10:ao0:out5',                'descr' => '5' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS4:CH0:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS4:CH1:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS4:CH2:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS4:CH3:VoltageMeasure', 'descr' => '' ),
+    array( 'name' => 'AMO:R14:IOC:10:VHS8:CH0:VoltageMeasure', 'descr' => '' ),
+    //
+    // itof settings
+    //
+    array( 'name' => 'AMO:R14:IOC:21:VHS2:CH0:VoltageMeasure', 'descr' => 'repeller' ),
+    array( 'name' => 'AMO:R14:IOC:21:VHS0:CH0:VoltageMeasure', 'descr' => 'extractor' ),
+    array( 'name' => 'AMO:R14:IOC:21:VHS0:CH1:VoltageMeasure', 'descr' => 'acceleration' ),
+    array( 'name' => 'AMO:R14:IOC:21:VHS0:CH2:VoltageMeasure', 'descr' => 'MCP in' ),
+    array( 'name' => 'AMO:R14:IOC:21:VHS2:CH2:VoltageMeasure', 'descr' => 'MCP out' ),
+    array( 'name' => 'AMO:R14:IOC:21:VHS2:CH1:VoltageMeasure', 'descr' => 'Anode' ),
+    //
+    // HFP Gas data
+    //
+    array( 'name' => 'AMO:HFP:GCC:03:PMON',                    'descr' => 'pressure' ),
+    array( 'name' => 'AMO:R14:IOC:21:VHS7:CH0:VoltageMeasure', 'descr' => 'piezo voltage' ),
+    array( 'name' => 'AMO:R14:EVR:21:CTRL.DG2D',               'descr' => 'piezo timing delay' ),
+    array( 'name' => 'AMO:R14:EVR:21:CTRL.DG2W',               'descr' => 'piezo timing width' ),
+    array( 'name' => 'AMO:HFP:MMS:71.RBV',                     'descr' => 'x-position (rel. distance)' ),
+    //
+    // DIA data
+    //
+    array( 'name' => 'AMO:DIA:GCC:01:PMON', 'descr' => 'pressure' ),
+    //
+    // mbes settings
+    //
+    //   coils
+    //
+    array( 'name' => 'AMO:DIA:SHC:11:I', 'descr' => 'coil 1' ),
+    array( 'name' => 'AMO:DIA:SHC:12:I', 'descr' => 'coil 2' ),
+    //
+    array( 'name' => 'AMO:R15:IOC:40:VHS0:CH0:VoltageSet', 'descr' => '' ),
+    array( 'name' => 'AMO:R15:IOC:40:VHS0:CH1:VoltageSet', 'descr' => '' )
+ );
+
+$par2descr = array();
+foreach( $pardefs as $p ) $par2descr[$p['name']] = $p['descr'];
+
 /* Proceed with the operation
  */
 try {
@@ -32,85 +163,104 @@ try {
         exit;
     }
 
+    // Get values for existing run parameters
+    //
+    $return_dict = true;
+    $values = $run->values( '', $return_dict );
+
     // Proceed to the operation
     //
     header( 'Content-type: text/html' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-    // Grid-like markup
-    //
-    define(C0,  0);
-    define(C1,150);
-    define(C2,250);
-    define(C3,350);
-    define(C4,450);
-    define(C5,550);
-    define(C6,650);
+    $value_color = 'maroon';
+    $label_color = '#b0b0b0';
+    $con = new RegDBHtml( 0, 0, 1000, 1470 );
+    $row = 0;
 
-    define(R0,  0);
-    define(R1, 20);
-    define(R2, 50);
-    define(R3, 70);
-    define(R4,100);
-    define(R5,120);
-    define(R6,140);
-    define(R7,170);
-    define(R8,200);
-    define(R9,220);
-    define(RA,240);
-    define(RB,260);
-    define(RC,280);
-    define(RD,310);
-    define(RE,340);
+    $con->label_1(0, $row, BEAMS_TITLE, 780 );
+    $row += 30;
+    for( $i = BEAMS; $i < FEE; $i++ ) {
+    	$key = $pardefs[$i]['name'];
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
+            ->value(300, $row, $val, $value_color )
+            ->label(500, $row, $key, true, $label_color );
+        $row += 20;
+    }
+    $row += 15;
 
-    $con = new RegDBHtml( 0, 0, 800, 360 );
-    $con->label(C0,R0,'Type'    )->value(C0,R1,'Colliding Beams')
-        ->label(C1,R0,'Solenoid')->value(C1,R1,'4597')
-        ->label(C2,R0,'#L1Acc'  )->value(C2,R1,'5184775')
-        ->label(C3,R0,'#Evts'   )->value(C3,R1,'1243007')
-        ->label(C4,R0,'QA'      )->value(C4,R1,'')
+    $con->label_1(0, $row, FEE_TITLE, 780 );
+    $row += 30;
+    for( $i = FEE; $i < HFP; $i++ ) {
+    	$key = $pardefs[$i]['name'];
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
+            ->value(300, $row, $val, $value_color )
+            ->label(500, $row, $key, true, $label_color );
+    	$row += 20;
+    }
+    $row += 15;
 
-        ->label(C0,R2,'Config' )
-        ->label(C1,R2,'TrigMask:'   )->value(C2,R2,'33ffffff')
-        ->label(C3,R2,'CrateMask:'  )->value(C4,R2,'4fff77ff')
-        ->label(C5,R2,'ConfigKey:'  )->value(C6,R2,'206d')
-        ->label(C1,R3,'OprMode:'    )->value(C2,R3,'YES')
-        ->label(C4,R3,'ConfigAlias:')->value(C5,R3,'PHYSICS_TEST')
+    $con->label_1(0, $row, HFP_TITLE, 780 );
+    $row += 30;
+    for( $i = HFP; $i < ETOF; $i++ ) {
+    	$key = $pardefs[$i]['name'];
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
+            ->value(300, $row, $val, $value_color )
+            ->label(500, $row, $key, true, $label_color );
+    	$row += 20;
+    }
+    $row += 15;
 
-        ->label(C0,R4,'Beam Energy<br>and<br>Current')
-        ->label(C1,R4,'LER:'        )->value(C2,R4,'3.1127')
-        ->label(C3,R4,'HER:'        )->value(C4,R4,'8.0517')
-        ->label(C5,R4,'CM:'         )->value(C6,R4,'10.0125')
-        ->label(C1,R5,'LER:'        )->value(C2,R5,'1980 mA')
-        ->label(C3,R5,'HER:'        )->value(C4,R5,'1440 mA')
-        ->label(C1,R6,'LER Pattern:')->value(C2,R6,'by2_t34_3gap')
-        ->label(C4,R6,'HER Pattern:')->value(C5,R6,'by2_t34_3gap')
+    $con->label_1(0, $row, ETOF_TITLE, 780 );
+    $row += 30;
+    for( $i = ETOF; $i < ITOF; $i++ ) {
+    	$key = $pardefs[$i]['name'];
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
+            ->value(300, $row, $val, $value_color )
+            ->label(500, $row, $key, true, $label_color );
+    	$row += 20;
+    }
+    $row += 15;
 
-        ->label(C0,R7,'PEP (x.99)')
-        ->label(C1,R7,'InitLum:'  )->value(C2,R7,'6650.0 (6583.5)')
-        ->label(C4,R7,'Lumin:'    )->value(C5,R7,'11286.0 (11173.1) nb<SUP>-1</SUP>')
+    $con->label_1(0, $row, HFP_GAS_TITLE, 780 );
+    $row += 30;
+    for( $i = HFP_GAS; $i < DIA; $i++ ) {
+    	$key = $pardefs[$i]['name'];
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
+            ->value(300, $row, $val, $value_color )
+            ->label(500, $row, $key, true, $label_color );
+    	$row += 20;
+    }
+    $row += 15;
 
-        ->label(C0,R8,'L3 Vars')
-        ->label(C1,R8,'Deliv Lum:')->value(C2,   R8,'11280.5 nb<SUP>-1</SUP>')
-        ->label(C4,R8,'Rec Lum:'  )->value(C5,   R8,'11104.0 nb<SUP>-1</SUP>')
-        ->label(C1,R9,'Time:'     )->value(C2,   R9,'enabled = 1668.1 s')
-                                   ->value(C3+30,R9,'paused = 2.9 s')
-                                   ->value(C4+50,R9,'elapsed = 1671 s')
-                                   ->value(C5+70,R9,'dead = 1.56 %')
-        ->label(C1,RA,'# CycTrig:' )->value(C2,   RA,'1642')
-        ->label(C4,RA,'# LumTrig:' )->value(C5,   RA,'100919')
-        ->label(C1,RB,'# HadATrig:')->value(C2,   RB,'79785 (A/L = 0.791 &plusmn; 0.004)')
-        ->label(C4,RB,'# HadBTrig:')->value(C5,   RB,'42822 (B/L = 0.424 &plusmn; 0.002)')
-        ->label(C1,RC,'Trigger Rates:')->label(C2,RC,'&lt;L1&gt;')->value(C2+35,RC,'= 3108.2 Hz')
-                                       ->label(C4,RC,'&lt;L3&gt;')->value(C4+35,RC,'= 745.2 Hz')
+    $con->label_1(0, $row, DIA_TITLE, 780 );
+    $row += 30;
+    for( $i = DIA; $i < MBES; $i++ ) {
+    	$key = $pardefs[$i]['name'];
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
+            ->value(300, $row, $val, $value_color )
+            ->label(500, $row, $key, true, $label_color );
+    	$row += 20;
+    }
+    $row += 15;
 
-        ->label(C0,RD,'On?')
-        ->label(C1,RD,'Deliv Lum:')->value(C2,RD,'Svt,Dch,Drc,Emc,Ifr,Emt,Glt,L3,Dcz')
-
-        ->label(C0,RE,'Why Ended?' )->value(C1,RE,'BEAMLOSS')
-        ->label(C2,RE,'Total Events:'  )->value(C3,RE,'16484358')
-        ->label(C4,RE,'Luminosity:')->value(C5,RE,'124688 x .99 = 123441.12');
+    $con->label_1(0, $row, MBES_TITLE, 780 );
+    $row += 30;
+    for( $i = MBES; $i < END_; $i++ ) {
+    	$key = $pardefs[$i]['name'];
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
+            ->value(300, $row, $val, $value_color )
+            ->label(500, $row, $key, true, $label_color );
+    	$row += 20;
+    }
 
     echo $con->html();
 

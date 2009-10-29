@@ -48,12 +48,12 @@ class LogBookRun {
      *   SUMMARY PARAMETERS VALUES
      * =============================
      */
-    public function values ( $condition='' ) {
+    public function values ( $condition='', $return_dict=false ) {
 
         $list = array();
         $run_id = $this->attr['id'];
 
-        /* Det descriptions of run parameters for the experiment. We need to know
+        /* Get descriptions of run parameters for the experiment. We need to know
          * type names of the parameters to scedule a request to the corresponding
          * tables.
          */
@@ -73,12 +73,23 @@ class LogBookRun {
 
             $nrows = mysql_numrows( $result );
             for( $i = 0; $i < $nrows; $i++ ) {
-                array_push(
-                    $list,
-                    new LogBookRunVal (
-                        $this->connection,
-                        $this,
-                        mysql_fetch_array( $result, MYSQL_ASSOC )));
+            	if( $return_dict )
+            	    $list[$param] =
+                        new LogBookRunVal (
+                            $this->connection,
+                            $this,
+                            $param,
+                            $type,
+                            mysql_fetch_array( $result, MYSQL_ASSOC ));
+            	else
+                    array_push(
+                        $list,
+                        new LogBookRunVal (
+                            $this->connection,
+                            $this,
+                            $param,
+                            $type,
+                            mysql_fetch_array( $result, MYSQL_ASSOC )));
             }
         }
         return $list;

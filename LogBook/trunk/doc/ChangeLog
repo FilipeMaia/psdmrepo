@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-07
+2009-10-28 Igor Gaponenko
+- the first real implementation of the Run Summary page to display parameter values
+from the database.
+
 Tag: V00-01-06
 2009-10-27 Igor Gaponenko
 - reimplemented the PHP connection class to use persistent MySQL connections

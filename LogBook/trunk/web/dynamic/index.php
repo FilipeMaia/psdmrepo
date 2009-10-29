@@ -1908,7 +1908,7 @@ function display_run() {
         '<div style="margin-top:40px; margin-bottom:20px;">'+
         '  <img src="images/Parameters.png" />'+
         '</div>'+
-        '<div id="run_parameters" style="height:370px;">Loading...</div>'+
+        '<div id="run_parameters" style="height:1470px;">Loading...</div>'+
         '<div id="messages_actions_container" style="margin-top:40px;"></div>';
 
     load( 'DisplayRun.php?id='+current_selection.run.id, 'experiment_info_container' );
