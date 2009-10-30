@@ -94,7 +94,7 @@ O2OXtcIterator::process(Xtc* xtc)
       or xtc->src.level() == Pds::Level::Reporter
       or xtc->src.level() == Pds::Level::Control ) {
 
-    m_scanner->dataObject( xtc->payload(), xtc->contains, m_src ) ;
+    m_scanner->dataObject( xtc->payload(), xtc->sizeofPayload(), xtc->contains, m_src ) ;
 
   } else {
 

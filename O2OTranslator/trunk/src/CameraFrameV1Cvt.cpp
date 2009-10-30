@@ -24,6 +24,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+#include "O2OTranslator/O2OExceptions.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -69,10 +70,15 @@ CameraFrameV1Cvt::~CameraFrameV1Cvt ()
 void
 CameraFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                         const XtcType& data,
+                                        size_t size,
                                         const Pds::TypeId& typeId,
                                         const O2OXtcSrc& src,
                                         const H5DataTypes::XtcClockTime& time )
 {
+  if ( sizeof data + data.data_size() != size ) {
+    throw O2OXTCSizeException ( "Camera::FrameV1", sizeof data + data.data_size(), size ) ;
+  }
+  
   if ( not m_dataCont ) {
 
     // make container for data objects

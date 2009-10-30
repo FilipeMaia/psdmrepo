@@ -62,7 +62,10 @@ public:
   virtual void levelEnd ( const Pds::Src& src ) = 0 ;
 
   // visit the data object
-  virtual void dataObject ( const void* data, const Pds::TypeId& typeId, const O2OXtcSrc& src ) = 0 ;
+  virtual void dataObject ( const void* data, 
+                            size_t size, 
+                            const Pds::TypeId& typeId, 
+                            const O2OXtcSrc& src ) = 0 ;
 
 protected:
 

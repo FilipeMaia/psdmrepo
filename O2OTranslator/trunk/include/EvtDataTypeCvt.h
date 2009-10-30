@@ -69,6 +69,7 @@ public:
 
   // typed conversion method
   virtual void typedConvert ( const XtcType& data,
+                              size_t size,
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src,
                               const H5DataTypes::XtcClockTime& time )
@@ -87,7 +88,7 @@ public:
     }
 
     // call overloaded method and pass all data
-    this->typedConvertSubgroup ( subgroup, data, typeId, src, time ) ;
+    this->typedConvertSubgroup ( subgroup, data, size, typeId, src, time ) ;
   }
 
   /// method called when the driver makes a new group in the file
@@ -114,14 +115,17 @@ public:
     m_groups.pop() ;
   }
 
+  const std::string& typeGroupName() const { return m_typeGroupName ; }
+  
 protected:
 
   // typed conversion method
   virtual void typedConvertSubgroup ( hdf5pp::Group group,
-                              const XtcType& data,
-                              const Pds::TypeId& typeId,
-                              const O2OXtcSrc& src,
-                              const H5DataTypes::XtcClockTime& time ) = 0 ;
+                                      const XtcType& data,
+                                      size_t size,
+                                      const Pds::TypeId& typeId,
+                                      const O2OXtcSrc& src,
+                                      const H5DataTypes::XtcClockTime& time ) = 0 ;
 
   /// method called when the driver closes a group in the file
   virtual void closeSubgroup( hdf5pp::Group group ) = 0 ;

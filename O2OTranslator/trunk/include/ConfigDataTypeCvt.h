@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <stack>
+#include <cassert>
 
 //----------------------
 // Base Class Headers --
@@ -23,6 +24,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "O2OTranslator/O2OExceptions.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -64,13 +66,19 @@ public:
 
   // typed conversion method
   virtual void typedConvert ( const XtcType& data,
+                              size_t size,
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src,
                               const H5DataTypes::XtcClockTime& time )
   {
     // this should not happen
-    if ( m_groups.empty() ) return ;
+    assert ( not m_groups.empty() ) ;
 
+    // check data size
+    if ( H5Type::xtcSize(data) != size ) {
+      throw O2OXTCSizeException ( m_typeGroupName, H5Type::xtcSize(data), size ) ;
+    }
+    
     // get the name of the group for this object
     const std::string& grpName = m_typeGroupName + "/" + src.name() ;
 

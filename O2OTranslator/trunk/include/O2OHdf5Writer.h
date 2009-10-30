@@ -87,12 +87,13 @@ public:
   virtual void levelEnd ( const Pds::Src& src ) ;
 
   // visit the data object
-  virtual void dataObject ( const void* data, const Pds::TypeId& typeId, const O2OXtcSrc& src ) ;
+  virtual void dataObject ( const void* data, size_t size, 
+      const Pds::TypeId& typeId, const O2OXtcSrc& src ) ;
 
 protected:
 
   // Construct a group name
-  std::string groupName( State state, const Pds::ClockTime& clock ) const ;
+  std::string groupName( State state, unsigned counter ) const ;
 
   void openGroup ( const Pds::Dgram& dgram, State state ) ;
   void closeGroup ( const Pds::Dgram& dgram, State state ) ;
@@ -101,6 +102,7 @@ private:
 
   typedef boost::shared_ptr<DataTypeCvtI> DataTypeCvtPtr ;
   typedef std::multimap<uint32_t, DataTypeCvtPtr> CvtMap ;
+  typedef std::map<State,unsigned> StateCounters ;
 
   // Data members
   const O2OFileNameFactory& m_nameFactory ;
@@ -112,6 +114,7 @@ private:
   int m_compression ;
   bool m_extGroups ;
   const O2OMetaData& m_metadata ;
+  StateCounters m_stateCounters ;
 
   // close all containers
   void closeContainers() ;

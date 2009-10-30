@@ -24,6 +24,7 @@
 //-------------------------------
 #include "O2OTranslator/CvtDataContainer.h"
 #include "O2OTranslator/CvtDataContFactoryDef.h"
+#include "O2OTranslator/O2OExceptions.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -51,6 +52,7 @@ template <typename H5Type>
 class EvtDataTypeCvtDef : public EvtDataTypeCvt<typename H5Type::XtcType> {
 public:
 
+  typedef EvtDataTypeCvt<typename H5Type::XtcType> Super ;
   typedef typename H5Type::XtcType XtcType ;
 
   // Default constructor
@@ -80,11 +82,17 @@ protected:
 
   // typed conversion method
   virtual void typedConvertSubgroup ( hdf5pp::Group group,
-                              const XtcType& data,
-                              const Pds::TypeId& typeId,
-                              const O2OXtcSrc& src,
-                              const H5DataTypes::XtcClockTime& time )
+                                      const XtcType& data,
+                                      size_t size,
+                                      const Pds::TypeId& typeId,
+                                      const O2OXtcSrc& src,
+                                      const H5DataTypes::XtcClockTime& time )
   {
+    // check data size
+    if ( H5Type::xtcSize(data) != size ) {
+      throw O2OXTCSizeException ( Super::typeGroupName(), H5Type::xtcSize(data), size ) ;
+    }
+    
     m_dataCont->container( group )->append ( H5Type(data) ) ;
     m_timeCont->container( group )->append ( time ) ;
   }

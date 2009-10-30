@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-00
+2009-10-28 Andy Salnikov
+- adding verification of the XTC size in files, XTC size is 
+  now passed around to the converters methods
+- few methods changed their signature to accept XTC size
+
 Tag: V00-03-06
 2009-10-28 Andy Salnikov
 - added couple of new data types

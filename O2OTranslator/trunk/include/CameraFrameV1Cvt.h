@@ -68,6 +68,7 @@ protected:
   // typed conversion method
   virtual void typedConvertSubgroup ( hdf5pp::Group group,
                                       const XtcType& data,
+                                      size_t size,
                                       const Pds::TypeId& typeId,
                                       const O2OXtcSrc& src,
                                       const H5DataTypes::XtcClockTime& time ) ;

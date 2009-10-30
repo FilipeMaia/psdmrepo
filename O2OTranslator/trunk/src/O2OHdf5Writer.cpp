@@ -119,6 +119,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_compression(compression)
   , m_extGroups(extGroups)
   , m_metadata(metadata)
+  , m_stateCounters()
 {
   std::string fileTempl = m_nameFactory.makeH5Path ( split != NoSplit ) ;
   MsgLog( logger, debug, "O2OHdf5Writer - open output file " << fileTempl ) ;
@@ -372,9 +373,27 @@ O2OHdf5Writer::eventEnd ( const Pds::Dgram& dgram )
 
 void
 O2OHdf5Writer::openGroup ( const Pds::Dgram& dgram, State state )
-{
+{ 
+  // get the counter for this state
+  unsigned counter = m_stateCounters[state] ;
+  ++ m_stateCounters[state] ;
+  
+  // reset counter for sub-states, note there are no breaks
+  switch( state ) {
+  case Undefined:
+    m_stateCounters[Mapped] = 0;
+  case Mapped:
+    m_stateCounters[Configured] = 0;
+  case Configured:
+    m_stateCounters[Running] = 0;
+  case Running:
+    m_stateCounters[CalibCycle] = 0;
+  case CalibCycle:
+    break;
+  }
+
   // create group
-  const std::string& name = groupName ( state, dgram.seq.clock() ) ;
+  const std::string& name = groupName ( state, counter ) ;
   MsgLog( logger, debug, "HDF5Writer -- creating group " << name ) ;
   hdf5pp::Group group = m_groups.top().createGroup( name ) ;
 
@@ -427,7 +446,8 @@ O2OHdf5Writer::levelEnd ( const Pds::Src& src )
 
 // visit the data object
 void
-O2OHdf5Writer::dataObject ( const void* data, const Pds::TypeId& typeId, const O2OXtcSrc& src )
+O2OHdf5Writer::dataObject ( const void* data, size_t size, 
+    const Pds::TypeId& typeId, const O2OXtcSrc& src )
 {
   // find this type in the converter map
   CvtMap::iterator it = m_cvtMap.find( typeId.value() ) ;
@@ -436,7 +456,7 @@ O2OHdf5Writer::dataObject ( const void* data, const Pds::TypeId& typeId, const O
     do {
 
       DataTypeCvtPtr converter = it->second ;
-      converter->convert( data, typeId, src, m_eventTime ) ;
+      converter->convert( data, size, typeId, src, m_eventTime ) ;
 
       ++ it ;
 
@@ -453,7 +473,7 @@ O2OHdf5Writer::dataObject ( const void* data, const Pds::TypeId& typeId, const O
 
 // Construct a group name
 std::string
-O2OHdf5Writer::groupName( State state, const Pds::ClockTime& clock ) const
+O2OHdf5Writer::groupName( State state, unsigned counter ) const
 {
   const char* prefix = "Undefined" ;
   switch ( state ) {
@@ -478,7 +498,7 @@ O2OHdf5Writer::groupName( State state, const Pds::ClockTime& clock ) const
   if ( m_extGroups ) {
     // dump seconds as a hex string, it will be group name
     char buf[32] ;
-    snprintf ( buf, sizeof buf, "%s:%08X", prefix, clock.seconds() ) ;
+    snprintf ( buf, sizeof buf, "%s:%04d", prefix, counter ) ;
     return buf;
   } else {
     return prefix;

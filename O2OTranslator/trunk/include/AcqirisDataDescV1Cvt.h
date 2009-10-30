@@ -68,6 +68,7 @@ public:
 
   /// override base class method because we expect multiple types
   virtual void convert ( const void* data,
+                         size_t size,
                          const Pds::TypeId& typeId,
                          const O2OXtcSrc& src,
                          const H5DataTypes::XtcClockTime& time ) ;
@@ -77,6 +78,7 @@ protected:
   // typed conversion method
   virtual void typedConvertSubgroup ( hdf5pp::Group group,
                                       const XtcType& data,
+                                      size_t size,
                                       const Pds::TypeId& typeId,
                                       const O2OXtcSrc& src,
                                       const H5DataTypes::XtcClockTime& time ) ;

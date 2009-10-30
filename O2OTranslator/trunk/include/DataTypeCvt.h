@@ -53,13 +53,14 @@ public:
   virtual ~DataTypeCvt () {}
 
   /// main method of this class
-  virtual void convert ( const void* data,
+  virtual void convert ( const void* data, 
+                         size_t size,
                          const Pds::TypeId& typeId,
                          const O2OXtcSrc& src,
                          const H5DataTypes::XtcClockTime& time )
   {
     const T& typedData = *static_cast<const T*>( data ) ;
-    typedConvert ( typedData, typeId, src, time ) ;
+    typedConvert ( typedData, size, typeId, src, time ) ;
   }
 
 protected:
@@ -71,6 +72,7 @@ private:
 
   // typed conversion method
   virtual void typedConvert ( const T& data,
+                              size_t size,
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src,
                               const H5DataTypes::XtcClockTime& time ) = 0 ;

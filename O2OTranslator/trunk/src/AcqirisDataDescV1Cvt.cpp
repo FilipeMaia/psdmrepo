@@ -82,6 +82,7 @@ AcqirisDataDescV1Cvt::~AcqirisDataDescV1Cvt ()
 /// override base class method because we expect multiple types
 void
 AcqirisDataDescV1Cvt::convert ( const void* data,
+                                size_t size,
                                 const Pds::TypeId& typeId,
                                 const O2OXtcSrc& src,
                                 const H5DataTypes::XtcClockTime& time )
@@ -90,6 +91,11 @@ AcqirisDataDescV1Cvt::convert ( const void* data,
 
     const ConfigXtcType& config = *static_cast<const ConfigXtcType*>( data ) ;
 
+    // check data size
+    if ( sizeof(ConfigXtcType) != size ) {
+      throw O2OXTCSizeException ( "Acqiris::ConfigV1", sizeof(ConfigXtcType), size ) ;
+    }
+    
     // got configuration object, make the copy
     m_config.insert( ConfigMap::value_type( src.top(), config ) ) ;
 
@@ -97,7 +103,8 @@ AcqirisDataDescV1Cvt::convert ( const void* data,
 
     // follow regular path
     const XtcType& typedData = *static_cast<const XtcType*>( data ) ;
-    typedConvert ( typedData, typeId, src, time ) ;
+
+    typedConvert ( typedData, size, typeId, src, time ) ;
 
   }
 
@@ -107,10 +114,12 @@ AcqirisDataDescV1Cvt::convert ( const void* data,
 void
 AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                              const XtcType& data,
+                                             size_t size,
                                              const Pds::TypeId& typeId,
                                              const O2OXtcSrc& src,
                                              const H5DataTypes::XtcClockTime& time )
 {
+      
   // find corresponding configuration object
   ConfigMap::const_iterator cit = m_config.find( src.top() ) ;
   if ( cit == m_config.end() ) {
@@ -141,6 +150,11 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   const uint32_t nChan = config.nbrChannels() ;
   const uint32_t nSeg = hconfig.nbrSegments() ;
   const uint32_t nSampl = hconfig.nbrSamples() ;
+
+  // check total size
+  if ( data.totalSize(hconfig) * nChan != size ) {
+    throw O2OXTCSizeException ( "AcqirisDataDescV1", data.totalSize(hconfig) * nChan, size ) ;
+  }
 
   // allocate data
   uint64_t timestamps[nChan][nSeg] ;
