@@ -165,12 +165,16 @@ O2OXtcMerger::next()
     // make sure that all streams have the same type of datagram
     for ( unsigned i = 0 ; i < ns ; ++ i ) {
       if ( m_dgrams[i] and m_dgrams[i]->seq.service() != dg->seq.service() ) {
-        MsgLog( logger, error, "next -- streams desynchronized, stream[" << stream
-            << "] = " << m_streams[stream]->chunkName().basename() << " stream[" << i
-            << "] = " << m_streams[i]->chunkName().basename() ) ;
-        MsgLog( logger, error, "next -- streams desynchronized, stream[" << stream
-            << "].service = " << Pds::TransitionId::name(dg->seq.service()) << " stream[" << i
-            << "].service = " << Pds::TransitionId::name(m_dgrams[i]->seq.service()) ) ;
+        MsgLog( logger, error, "next -- streams desynchronized:"
+            << "\n    stream[" << stream << "] = " 
+            << m_streams[stream]->chunkName().basename() 
+            << " service = " << Pds::TransitionId::name(dg->seq.service())
+            << " time = " << dg->seq.clock().seconds() << " sec " << dg->seq.clock().nanoseconds() << " nsec"
+            << "\n    stream[" << i << "] = " 
+            << m_streams[i]->chunkName().basename() 
+            << "service = " << Pds::TransitionId::name(m_dgrams[i]->seq.service())
+            << " time = " << m_dgrams[i]->seq.clock().seconds() << " sec " << m_dgrams[i]->seq.clock().nanoseconds() << " nsec"
+            ) ;
         throw O2OXTCSyncException() ;
       }
     }

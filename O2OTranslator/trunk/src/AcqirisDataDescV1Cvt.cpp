@@ -168,16 +168,14 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     // first verify that the shape of the data returned corresponds to the config
     if ( dd->nbrSamplesInSeg() != nSampl ) {
       std::ostringstream msg ;
-      msg << "O2ONexusWriter::dataObject(Acqiris::DataDescV1) -"
-          << " number of samples in data object (" << dd->nbrSamplesInSeg()
-          << ") different from config object (" << nSampl << ")" ;
+      msg << "Acqiris::DataDescV1 - number of samples in data object (" 
+          << dd->nbrSamplesInSeg() << ") different from config object (" << nSampl << ")" ;
       throw O2OXTCGenException ( msg.str() ) ;
     }
     if ( dd->nbrSegments() != nSeg ) {
       std::ostringstream msg ;
-      msg << "O2ONexusWriter::dataObject(Acqiris::DataDescV1) -"
-          << " number of segments in data object (" << dd->nbrSegments()
-          << ") different from config object (" << nSeg << ")" ;
+      msg << "Acqiris::DataDescV1 - number of segments in data object (" 
+          << dd->nbrSegments() << ") different from config object (" << nSeg << ")" ;
       throw O2OXTCGenException ( msg.str() ) ;
     }
 

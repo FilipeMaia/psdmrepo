@@ -62,12 +62,13 @@ O2OXtcIterator::process(Xtc* xtc)
 {
   Pds::TypeId::Type type = xtc->contains.id() ;
   uint32_t version = xtc->contains.version() ;
+  Pds::Level::Type level = xtc->src.level() ;
 
   // sanity check
   if ( xtc->sizeofPayload() < 0 ) {
     MsgLogRoot( error, "Negative payload size in XTC: " << xtc->sizeofPayload()
-        << " level: " << Pds::Level::name(xtc->src.level())
-        << " type: " << Pds::TypeId::name(type) << "/" << version) ;
+        << " level: " << int(level) << '#' << Pds::Level::name(level)
+        << " type: " << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version) ;
     throw O2OXTCGenException("negative payload size") ;
   }
 
@@ -77,7 +78,7 @@ O2OXtcIterator::process(Xtc* xtc)
   if ( m_scanner ) m_scanner->levelStart ( xtc->src ) ;
 
   MsgLogRoot( debug, "O2OXtcIterator::process -- new xtc: "
-              << Pds::TypeId::name(type) << "/" << version
+              << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version
               << " payload = " << xtc->sizeofPayload() ) ;
 
   int result = 1 ;
@@ -98,9 +99,9 @@ O2OXtcIterator::process(Xtc* xtc)
 
   } else {
 
-    MsgLogRoot( warning, "O2OXtcIterator::process -- data object at "
-                << Pds::Level::name(xtc->src.level()) << " level: "
-                << Pds::TypeId::name(type) << "/" << version ) ;
+    MsgLogRoot( warning, "O2OXtcIterator::process -- data object at level "
+                << int(level) << '#' << Pds::Level::name(level) << ": "
+                << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version ) ;
 
   }
 
