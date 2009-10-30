@@ -72,6 +72,8 @@ public:
 
   static void store ( const Pds::Pulnix::TM6740ConfigV1& config, hdf5pp::Group location ) ;
 
+  static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
+
 private:
   PulnixTM6740ConfigV1_Data m_data ;
 };

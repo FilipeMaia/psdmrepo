@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10
+2009-10-30 Andy Salnikov
+- adding new static method xtcSize() to a bunch of classes,
+  they are used to verify size of the XTC in files
+
 Tag: V00-00-09
 2009-10-28 Andy Salnikov
 - adding couple of new data classes

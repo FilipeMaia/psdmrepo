@@ -135,6 +135,8 @@ public:
 
   static void store ( const Pds::Acqiris::ConfigV1& config, hdf5pp::Group location ) ;
 
+  static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
+
 private:
   AcqirisConfigV1_Data m_data ;
 };

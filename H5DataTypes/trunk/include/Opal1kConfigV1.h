@@ -74,6 +74,8 @@ public:
 
   static void store ( const Pds::Opal1k::ConfigV1& config, hdf5pp::Group location ) ;
 
+  static size_t xtcSize( const XtcType& xtc ) { return xtc.size() ; }
+
 private:
   Opal1kConfigV1_Data m_data ;
 };

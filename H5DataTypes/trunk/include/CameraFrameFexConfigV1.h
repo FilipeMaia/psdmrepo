@@ -71,6 +71,8 @@ public:
 
   static void store ( const Pds::Camera::FrameFexConfigV1& config, hdf5pp::Group location ) ;
 
+  static size_t xtcSize( const XtcType& xtc ) { return xtc.size() ; }
+
 private:
   CameraFrameFexConfigV1_Data m_data ;
 };

@@ -53,6 +53,8 @@ public:
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
+  
+  static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
 
 private:
   BldDataPhaseCavity_Data m_data ;
