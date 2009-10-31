@@ -1,0 +1,194 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script ic-status...
+#
+#------------------------------------------------------------------------
+
+"""Script to display status information for the controller.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import MySQLdb
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+#from PkgPackage.PkgModule import PkgClass
+
+#---------------------
+# Local definitions --
+#---------------------
+def _default_host():
+    return "psdb.slac.stanford.edu"
+
+def _default_database():
+    return "interface_db"
+
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class ICStatus ( LusiPyApp ) :
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
+
+        self._parser.add_option ( '-d', "--database",
+                                  action="store", dest="database", default=_default_database(),
+                                    help="override default database name (%s)" % _default_database())
+
+        self._parser.add_option ( '-H', "--host",
+                                  action="store", dest="host", default=_default_host(),
+                                    help="override default host name (%s)" % _default_host())
+
+        self._parser.add_option ( '-P', "--port",
+                                  action="store", dest="port", default=None, type='int', 
+                                    help="override default port number" )
+
+        self._parser.add_option ( '-u', "--user",
+                                  action="store", dest="user", default=None,
+                                  help="override default user name" )
+
+        self._parser.add_option ( '-p', "--password",
+                                  action="store", dest="password", default=None,
+                                  help="specify user password (no password by default)" )
+
+        self._parser.add_option ( '-f', "--pwd-file",
+                                  action="store", dest="pwd_file", default=None,
+                                  help="specify file with user name and password" )
+
+        self._parser.add_option ( '-e', "--experiment",
+                                  action="store", dest="experiment", default=None,
+                                    help="limit display to particular instrument:experiment" )
+
+        self._parser.add_option ( '-Q', "--queue",
+                                  action="store_true", dest="queue", default=False,
+                                    help="only show queued datasets" )
+
+        self._parser.add_option ( '-D', "--done",
+                                  action="store_true", dest="done", default=False,
+                                    help="only show processed datasets" )
+
+        self._parser.add_option ( '-F', "--failed",
+                                  action="store_true", dest="failed", default=False,
+                                    help="only show failed datasets" )
+
+        self._parser.add_option ( '-S', "--success",
+                                  action="store_true", dest="success", default=False,
+                                    help="only show successfully processed datasets" )
+
+        
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # check the arguments
+        if self._args :
+            self._parser.error("unexpected arguments")
+            return 2
+
+        # get credentials
+        user = self._options.user
+        password = self._options.password
+        if not user and not password and self._options.pwd_file :
+            # read user name and password from file
+            f = codecs.open(self._options.pwd_file,'r','base64')
+            u, p = tuple(f.read().split())
+            f.close()
+            if not user : user = u
+            if not password : password = p
+    
+        # Connect to database
+        cparm = dict ( host=self._options.host, db=self._options.database )
+        if self._options.port : cparm['port'] = self._options.port
+        if user : cparm['user'] = user
+        if password : cparm['passwd'] = password
+        try:
+            conn = MySQLdb.connect( **cparm )
+        except MySQLdb.Error, ex:
+            self.error("MySQL error %d: %s", ex[0], ex[1] )
+            return 1
+
+
+        # build query
+        q = """SELECT fs.id, fs.instrument, fs.experiment, fs.run_number, 
+                      stat.name as status, fs.run_type, fs.created
+            FROM fileset fs, fileset_status_def stat 
+            WHERE stat.id=fs.fk_fileset_status 
+        """
+        vars = ()
+        if self._options.experiment :
+            w = self._options.experiment.split(':',1)
+            if len(w) == 1 :
+                q += " AND fs.experiment=%s "
+                vars += (w[0],)
+            else :
+                q += " AND fs.instrument=%s AND fs.experiment=%s "
+                vars += (w[0],w[1])
+        if self._options.queue :
+            q += " AND stat.name IN (%s,%s,%s) "
+            vars += ('Initial_Entry','Being_Copied','Waiting_Translation')
+        if self._options.done :
+            q += " AND stat.name IN (%s,%s) "
+            vars += ('Archive_Error','Complete')
+        if self._options.failed :
+            q += " AND stat.name IN (%s,%s) "
+            vars += ('Translation_Error','Archive_Error')
+        if self._options.success :
+            q += " AND stat.name=%s "
+            vars += ('Complete',)
+        q += " ORDER BY fs.instrument, fs.experiment, fs.run_number, fs.created"
+
+        # execute query
+        self.trace( "query: %s" % q)
+        self.trace( "query vars: %s" % (vars,) )
+        cursor = conn.cursor()
+        cursor.execute( q, vars )
+
+        # dump it
+        rows = cursor.fetchmany()
+        while rows :
+	        for r in rows :
+	            print "%-8s %-10s %4d %-20s %8s %-16s" % tuple( r[1:] )
+        	rows = cursor.fetchmany()
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = ICStatus()
+    rc = app.run()
+    sys.exit(rc)
