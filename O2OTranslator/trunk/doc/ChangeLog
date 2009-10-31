@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-03
+2009-10-31 Andy Salnikov
+- catch-rethrow exceptions in the datagram reading thread
+
 Tag: V00-04-02
 2009-10-31 Andy Salnikov
 - adding one space to diagnostic output in O2OXtcMerger

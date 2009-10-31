@@ -61,17 +61,27 @@ DgramReader::~DgramReader ()
 void
 DgramReader::operator() ()
 {
-  O2OXtcMerger iter(m_files, m_maxDgSize, m_mode);
-  while ( Pds::Dgram* dg = iter.next() ) {
-
-    // move it to the queue
-    m_queue.push ( dg ) ;
-
+  try {
+    
+    O2OXtcMerger iter(m_files, m_maxDgSize, m_mode);
+    while ( Pds::Dgram* dg = iter.next() ) {
+  
+      // move it to the queue
+      m_queue.push ( dg ) ;
+  
+    }
+  
+    // tell all we are done
+    m_queue.push ( (Pds::Dgram*)0 ) ;
+    
+  } catch ( std::exception& e ) {
+    
+    MsgLogRoot( error, "exception caught while reading datagram: " << e.what() ) ;
+    
+    // TODO: there is no way yet to stop gracefully, will just abort
+    throw;
+    
   }
-
-  // tell all we are done
-  m_queue.push ( (Pds::Dgram*)0 ) ;
-
 }
 
 
