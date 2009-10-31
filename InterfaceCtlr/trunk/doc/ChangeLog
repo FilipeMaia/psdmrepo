@@ -20,6 +20,8 @@ Tag: V00-03-12
 - FileMgrIrods: replaced subprocess.call with os.spawn, subprocess
   module has bug(s) in Python2.4 which make it loosing the track
   of the running processes
+- add ic-status script which displays processing status for 
+  filesets
 
 Tag: V00-03-11
 2009-10-28 Andy Salnikov
