@@ -366,8 +366,20 @@ SHOW WARNINGS;
 CREATE INDEX `fileset_id_fk` ON `files` (`fk_fileset_id` ASC) ;
 
 
+-- -----------------------------------------------------
+-- Table `active_exp`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `active_exp` ;
 
-
+SHOW WARNINGS;
+CREATE  TABLE IF NOT EXISTS `active_exp` (
+  `instrument` TINYTEXT NOT NULL ,
+  `experiment` TINYTEXT NOT NULL ,
+  `since` TIMESTAMP NOT NULL ,
+  PRIMARY KEY (`instrument`(255),`experiment`(255)) 
+  )
+ENGINE = InnoDB
+COMMENT = 'List of experiments which can be processed.';
 
 -- -----------------------------------------------------
 -- Data for table `translator_node`

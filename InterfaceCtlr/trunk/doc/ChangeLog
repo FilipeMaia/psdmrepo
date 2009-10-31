@@ -11,6 +11,16 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-12
+2009-10-31 Andy Salnikov
+- support for configuration updates: re-read configuration 
+  from database on every iteration (10 seconds)
+- added table to the database active_exp which contains active
+  experiments, experiments not in this table are not processed
+- FileMgrIrods: replaced subprocess.call with os.spawn, subprocess
+  module has bug(s) in Python2.4 which make it loosing the track
+  of the running processes
+
 Tag: V00-03-11
 2009-10-28 Andy Salnikov
 - many changes:

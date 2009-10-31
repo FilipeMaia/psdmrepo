@@ -257,9 +257,10 @@ class InterfaceDb ( object ) :
         
         # find a matching fileset and lock it for update
         fmt = ','.join(['%s']*len(status))
-        cursor.execute("""SELECT fs.id AS id, experiment, instrument, run_type, run_number, stat.name as status
-                    FROM fileset AS fs, fileset_status_def AS stat
+        cursor.execute("""SELECT fs.id AS id, fs.experiment, fs.instrument, run_type, run_number, stat.name as status
+                    FROM fileset AS fs, fileset_status_def AS stat, active_exp AS act
                     WHERE stat.name IN (""" + fmt + """) AND fs.fk_fileset_status = stat.id AND fs.locked = FALSE
+                    AND fs.instrument = act.instrument AND fs.experiment = act.experiment
                     ORDER BY fs.created ASC LIMIT 1 FOR UPDATE""", tuple(status) )
         rows = cursor.fetchall()
         
@@ -470,6 +471,27 @@ class InterfaceDb ( object ) :
         cursor.execute("""UPDATE interface_controller SET stopped = %s WHERE id = %s """, 
                             ( endtime, controller_id ) )
         cursor.execute("COMMIT")
+
+    # =================================
+    # Check if the experiment is active
+    # =================================
+
+    def is_exp_active ( self, instr, exp ) :
+        """Returns true when experiment is active"""
+
+        # critical sections begins
+        lock = self.getlock()
+        
+        cursor = self.cursor()
+
+        cursor.execute("START TRANSACTION")
+        cursor.execute("SELECT 1 FROM active_exp WHERE instrument = %s AND experiment = %s", 
+                            ( instr, exp ) )
+        rows = cursor.fetchall()
+        cursor.execute("COMMIT")
+
+        # non-empty means we found something
+        return bool(rows)
 
 
 

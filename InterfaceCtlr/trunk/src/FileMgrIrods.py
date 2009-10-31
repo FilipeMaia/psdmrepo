@@ -30,7 +30,6 @@ __version__ = "$Revision$"
 #  Imports of standard modules --
 #--------------------------------
 import sys
-import subprocess
 import os
 
 #---------------------------------
@@ -83,7 +82,7 @@ class FileMgrIrods ( object ) :
         coll = dst_path[:dst_path.rfind('/')]
         cmd = [ 'imkdir', '-p', coll ]
         self._log.info ( "FileMgrIrods.storeFile: creating collection %s", coll )
-        returncode = subprocess.call(cmd)
+        returncode = os.spawnvp(os.P_WAIT,cmd[0],cmd)
         if returncode : self._log.warning("imkdir completed with status %d", returncode)
         # this call may fail, but it fails also if directory exists, so just try next thing
         
@@ -92,7 +91,7 @@ class FileMgrIrods ( object ) :
         else :
             cmd = [ 'ireg', src_path, dst_path ]
         
-        returncode = subprocess.call(cmd)
+        returncode = os.spawnvp(os.P_WAIT,cmd[0],cmd)
         if returncode : self._log.warning("%s completed with status %d", self._cmd, returncode)
         return returncode
         
@@ -102,7 +101,7 @@ class FileMgrIrods ( object ) :
         # create collection if needed
 #        self._log.info ( "FileMgrIrods.storeFile: creating collection %s", dst_coll )
 #        cmd = [ 'imkdir', '-p', dst_coll ]
-#        returncode = subprocess.call(cmd)
+#        returncode = os.spawnvp(os.P_WAIT,cmd[0],cmd)
         # this call may fail, but it fails also if directory exists, so just try next thing
         
         self._log.info ( "FileMgrIrods.storeDir: %s -> %s", src_dir, dst_coll )
@@ -110,7 +109,7 @@ class FileMgrIrods ( object ) :
             cmd = [ 'iput', src_dir, dst_coll ]
         else :
             cmd = [ 'ireg', '-C', src_dir, dst_coll ]
-        returncode = subprocess.call(cmd)
+        returncode = os.spawnvp(os.P_WAIT,cmd[0],cmd)
         if returncode : self._log.warning("%s completed with status %d", self._cmd, returncode)
         return returncode
         

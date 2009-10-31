@@ -140,6 +140,8 @@ class Controller ( LusiPyApp ) :
         self._db = None
         self._controller_id = None
         self._config = {}
+        self._perm_config = {}
+        self._config_counter = 0
 
     # ==========================================
     # Run the controller after installing logger. 
@@ -163,6 +165,10 @@ class Controller ( LusiPyApp ) :
         
         # start infinite loop
         while not self._db.test_exit_controller(self._controller_id) :
+            
+            # re-read configurations
+            self._read_config()
+            
             try:
                 
                 # get rid of the finished threads
@@ -203,7 +209,7 @@ class Controller ( LusiPyApp ) :
                     # now try to see if there is a fileset with files
                     fs = self._db.get_fileset('Waiting_Translation')
                     if fs:
-                        # must have some files assotiated
+                        # must have some files associated
                         if not fs['xtc_files'] :
                             self.error ( 'expecting non-empty fileset: %s', pformat(fs) )
                             self._db.change_fileset_status (fs_id, 'Empty_Fileset')
@@ -283,23 +289,41 @@ class Controller ( LusiPyApp ) :
         ctrl = self._db.new_controller( host )
         self._controller_id = ctrl['id']
 
+        self._perm_config["_log_uri"] = ctrl['log_uri']
+        self._perm_config["_translate_uri"] = ctrl['translate_uri']
+        self._perm_config["_controller_id"] = ctrl['id']
+
+        self.info ("Successful init_controller on host %s started %s", host,Time.now() )
+
+
+    # =========================================
+    # read complete configuration from database
+    # =========================================
+
+    def _read_config (self):
+
+        # throw away all we got
+        self._config = {}
+
         # get configuration from database
         for section in self._options.config :
+            
+            # read section from database
             config = self._db.get_config(section)
-            self.trace ( 'config[%s] = %s', section, pformat(config) )
+            if self._config_counter == 0 : 
+                self.trace ( 'config[%s] = %s', section, pformat(config) )
+                
             # merge configurations
             for k,v in config.iteritems() :
                 if k.startswith('list:') :
                     self._config.setdefault(k, []).extend(v)
                 else :
                     self._config[k] = v
-                    
-        self._config["_log_uri"] = ctrl['log_uri']
-        self._config["_translate_uri"] = ctrl['translate_uri']
-        self._config["_controller_id"] = ctrl['id']
+        
+        # add permanent configuration
+        self._config.update( self._perm_config )
 
-        self.info ("Successful init_controller on host %s started %s", host,Time.now() )
-
+        self._config_counter += 1
 
     # =========================================================
     # Find the files in filesystem corresponding to the fileset
