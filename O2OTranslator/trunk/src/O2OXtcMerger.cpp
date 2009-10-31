@@ -172,7 +172,7 @@ O2OXtcMerger::next()
             << " time = " << dg->seq.clock().seconds() << " sec " << dg->seq.clock().nanoseconds() << " nsec"
             << "\n    stream[" << i << "] = " 
             << m_streams[i]->chunkName().basename() 
-            << "service = " << Pds::TransitionId::name(m_dgrams[i]->seq.service())
+            << " service = " << Pds::TransitionId::name(m_dgrams[i]->seq.service())
             << " time = " << m_dgrams[i]->seq.clock().seconds() << " sec " << m_dgrams[i]->seq.clock().nanoseconds() << " nsec"
             ) ;
         throw O2OXTCSyncException() ;
