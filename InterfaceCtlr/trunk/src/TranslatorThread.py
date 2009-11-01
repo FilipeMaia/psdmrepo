@@ -125,16 +125,14 @@ class TranslatorThread ( threading.Thread ) :
         # build command line for running translator
         cmd = self.__build_translate_cmd(fs_id, fname_dict, fs)
 
-        # open log file for translator
-        logname = os.path.join(self._log_uri,fname_dict['logname'])
-        logfile = open(logname, "w")
-
         prev_stats = resource.getrusage(resource.RUSAGE_CHILDREN)
 
         # start translator
-        proc = subprocess.Popen(cmd, stdout = logfile, stderr = logfile)
+        logname = os.path.join(self._log_uri,fname_dict['logname'])
+        pid = self._start ( cmd, logname )
         translator_id = self._db.new_translator(self._controller_id, fs_id)
-        self.info ("[%s] Started translator #%d (PID=%d) with cmd %s", self._name, translator_id, proc.pid, ' '.join(cmd) )
+        
+        self.info ("[%s] Started translator #%d (PID=%d) with cmd %s", self._name, translator_id, pid, ' '.join(cmd) )
         self.info ("[%s] output directory %s", self._name, fname_dict['tmpdirname'] )
         self.info ("[%s] Log file is in %s", self._name, logname )
         
@@ -143,27 +141,28 @@ class TranslatorThread ( threading.Thread ) :
         while not xlate_done:
 
             # check kill flag
-            kill_trans = self._db.test_exit_translator(translator_id)
-            proc.poll()
-            if proc.returncode != None or kill_trans != 0:
+            if self._db.test_exit_translator(translator_id):
+                # kill it if asked
+                self.info ("[%s] Request to kill translator_process #%d (PID=%d)", self._name, translator_id, proc.pid)
+                os.kill(pid,signal.SIGTERM)
+                # it may need some time to stop
+                time.sleep( 3 )
+                
+            wpid, wstat = os.waitpid( pid, os.WNOHANG )
+            if wpid != 0:
+                
                 xlate_done = True
-                if kill_trans:
-                    # kill it if asked
-                    self.info ("[%s] Request to kill translator_process #%d (PID=%d)", self._name, translator_id, proc.pid)
-                    os.kill(proc.pid,signal.SIGTERM)
-                    proc.returncode = -1
-                logfile.close()
 
-                self.info ("[%s] translator #%d finished (PID=%d) retcode=%s", self._name, translator_id, proc.pid, proc.returncode)
+                self.info ("[%s] translator #%d finished (PID=%d) retcode=%s", self._name, translator_id, wpid, wstat)
 
                 # get the size of resulting files
                 output_size = self.__dir_size( fname_dict['tmpdirname'] )
                 self.info ("[%s] translator #%d produced %d bytes of data", self._name, translator_id, output_size)
 
                 # store statistics
-                self._db.update_translator(translator_id, proc.returncode, prev_stats, output_size )
+                self._db.update_translator(translator_id, wstat, prev_stats, output_size )
 
-                if proc.returncode != 0 :
+                if wstat != 0 :
                     self.warning ("[%s] translator #%d failed", self._name, translator_id )
                     self._db.change_fileset_status (fs_id, 'Translation_Error')
                 else:
@@ -361,7 +360,32 @@ class TranslatorThread ( threading.Thread ) :
 
         return result
                 
+    # =====================================
+    # Start the translator, redirect output
+    # =====================================
+    def _start ( self, cmd, logname ) :
+        
+        pid = os.fork()
+        if pid == 0 :
+            
+            # child
+            
+            # redirect output
+            fd = os.open( logname, os.O_WRONLY|os.O_CREAT|os.O_TRUNC, 0666 )
+            os.dup2 ( fd, 1 )
+            os.dup2 ( fd, 2 )
+            
+            # execute subprocess, should throw in case of errors
+            os.execvp(cmd[0], cmd)
+            
+        else :
 
+            #parent
+            
+            return pid
+            
+            
+            
     #                                                                                                                                                 
     #  Logging methods                                                                                                                                
     #                                                                                                                                                 

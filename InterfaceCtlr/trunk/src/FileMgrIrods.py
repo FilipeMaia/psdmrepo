@@ -31,6 +31,7 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import os
+import popen2
 
 #---------------------------------
 #  Imports of base class module --
@@ -113,6 +114,21 @@ class FileMgrIrods ( object ) :
         if returncode : self._log.warning("%s completed with status %d", self._cmd, returncode)
         return returncode
         
+    def listdir(self, coll):
+        """ List files in the collection """
+        
+        cmd = ['ils', coll]
+        child = popen2.Popen3(cmd)
+        child.tochild.close()
+        list = child.fromchild.read()
+        
+        stat = child.wait()
+        if stat :
+            # error happened
+            self._log.error( "FileMgrIrods.listdir: error returned from ils: %s", str(stat) )
+            return None
+
+        return list.split()
 
 #
 #  In case someone decides to run this module

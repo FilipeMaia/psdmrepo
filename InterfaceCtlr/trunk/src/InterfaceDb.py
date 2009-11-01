@@ -31,11 +31,10 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import os
-import MySQLdb as db
 import logging
-import time
 import resource
 import threading
+from pprint import *
 
 #---------------------------------
 #  Imports of base class module --
@@ -78,25 +77,15 @@ class InterfaceDb ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, host, port, database, user, passwd ) :
+    def __init__ ( self, conn, log ) :
         """Constructor.
 
-        Explanation of what it does. So it does that and that, and also 
-        that, but only if x is equal to that and y is not None.
-
-        @param x   first parameter
-        @param y   second parameter
+        @param conn      database connection object
         """
 
-        self._host = host
-        self._port = port
-        self._database = database
-        self._user = user
-        self._passwd = passwd
-        
-        self._conn = None
+        self._conn = conn
 
-        self._log = logging.getLogger('iface_db')
+        self._log = log
 
         self.__lock = threading.Lock()
 
@@ -107,56 +96,12 @@ class InterfaceDb ( object ) :
     # Return database connection, attempt to reconnect if dropped
     # ===========================================================
 
-    def connection(self):
-        """ Method that returns connection to a database """
-        
-        if self._conn :
-            try :
-                self._conn.ping()
-            except db.OperationalError, message:
-                # we lost database connection
-                self._conn = None
-        
-        if not self._conn :
-            using_password = "NO"
-            if self._passwd : using_password = "YES"
-            connstr = "'%s'@'%s':%s (using password: %s)" % (
-                self._user,self._host, self._port, using_password)
-            self._log.info( 'connecting to database: '+connstr )
-        
-        t0 = time.time()
-        while self._conn is None :
-    
-            # retry several times
-            try :
-                self._conn = db.connect( host=self._host, port=self._port, db=self._database,
-                                         user=self._user, passwd=self._passwd )
-            except db.Error, ex :
-                self._log.error( 'database connection failed: '+str(ex) )
-                # wait max 15 seconds
-                if time.time() - t0 > 15 :
-                    self._log.warning( 'retry limit exceeded, abort' )
-                    raise
-                else :
-                    time.sleep(3)
-            
-            if self._conn :
-                
-                # initialize session
-                cursor = self._conn.cursor()
-                cursor.execute("SET SESSION SQL_MODE='ANSI'")
-            
-            
-        return self._conn
 
     #
     # Make a cursor object
     #
     def cursor (self, dict=False):
-        if dict: 
-            return self.connection().cursor(db.cursors.SSDictCursor)
-        else:
-            return self.connection().cursor()
+        return self._conn.cursor(dict)
 
 
     # ==============================================
@@ -236,6 +181,32 @@ class InterfaceDb ( object ) :
                 config[param] = value
 
         return config
+
+    # =========================================
+    # read complete configuration from database
+    # =========================================
+
+    def read_config (self, sections, verbose=False):
+
+        # throw away all we got
+        fullconfig = {}
+
+        # get configuration from database
+        for section in sections :
+            
+            # read section from database
+            config = self.get_config(section)
+            if verbose :
+                self._log.trace ( 'config[%s] = %s', section, pformat(config) )
+                
+            # merge configurations
+            for k,v in config.iteritems() :
+                if k.startswith('list:') :
+                    fullconfig.setdefault(k, []).extend(v)
+                else :
+                    fullconfig[k] = v
+        
+        return fullconfig
 
     # ====================================
     # Get fileset with requested status id

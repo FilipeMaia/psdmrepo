@@ -11,6 +11,15 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-13
+2009-11-01 Andy Salnikov
+- factored-out database connection class DbConnection used by 
+  several other classes now
+- new script ic-store-files which browses data directories and 
+  stores files which are not in iRODS yet, to be run as a cron 
+  job at regular intervals
+- removed all references to subprocess module
+
 Tag: V00-03-12
 2009-10-31 Andy Salnikov
 - support for configuration updates: re-read configuration 

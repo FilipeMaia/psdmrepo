@@ -33,8 +33,7 @@ __version__ = "$Revision$"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
-import sys, os, pwd, socket
-import MySQLdb
+import sys, os, socket
 
 #---------------------------------
 #  Imports of base class module --
@@ -45,33 +44,20 @@ from LusiTime.Time import Time
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-#from PkgPackage.PkgModule import PkgClass
+from InterfaceCtlr.DbConnection import DbConnection
 
 #---------------------
 # Local definitions --
 #---------------------
 
-# local variable accessible in this module only
-_OP_X = 'Y'
-
 #-------------------
 # Local functions --
 #-------------------
-
-def _default_user():
-    """Return the effective user name"""
-
-    return pwd.getpwuid(os.geteuid())[0]
 
 def _default_host():
     """Return the default host on which the MySQL is run"""
 
     return "psdb.slac.stanford.edu"
-
-def _default_port():
-    """Return the default port on which the MySQL server would respond"""
-
-    return 3306
 
 def _default_database():
     """Return the default database"""
@@ -162,12 +148,12 @@ class OnlineScript ( LusiPyApp ) :
 				      			  help="override default host name (%s)" % _default_host())
 
         self._parser.add_option ( '-P', "--port",
-								  action="store", dest="port", default=_default_port(), type='int', 
-				      			  help="override default port number (%s)" % _default_port())
+								  action="store", dest="port", default=None, type='int', 
+				      			  help="override default port number" )
 
         self._parser.add_option ( '-U', "--user",
-								  action="store", dest="user", default=_default_user(),
-								  help="override default user name (%s)" % _default_user())
+								  action="store", dest="user", default=None,
+								  help="override default user name" )
 
         self._parser.add_option ( '-p', "--password",
 								  action="store", dest="password", default=None,
@@ -383,26 +369,12 @@ SUPPORTED COMMANDS:
         return True. Return False otherwise."""
         if self.__connection is not None: return True
 
-        user = self._options.user
-        password = self._options.password
-        if not user and not password and self._options.pwd_file :
-            # read user name and password from file
-            f = codecs.open(self._options.pwd_file,'r','base64')
-            u, p = tuple(f.read().split())
-            f.close()
-            if not user : user = u
-            if not password : password = p
-
-        # Try to connect -------------------------------------------------------
-        #
-        self.info("Connecting to MySQL: %s@%s:%d", user, self._options.host, self._options.port)
+        # create database instance
         try:
-            self.__connection = MySQLdb.connect(
-                host=self._options.host,
-                port=self._options.port,
-                user=user,
-                passwd=password,
-                db=self._options.database)
+            self.__connection = DbConnection( self._options.host, self._options.port, 
+                                self._options.database, self._options.user,
+                                self._options.password, self._options.pwd_file,
+                                timeout=0 )
         except MySQLdb.Error, ex:
             self.error("MySQL error %d: %s", ex[0], ex[1] )
             sys.exit(1)
@@ -448,9 +420,7 @@ SUPPORTED COMMANDS:
 
         rows = None
 
-        cursor = None
-        if return_dict: cursor = self.__connection.cursor(MySQLdb.cursors.SSDictCursor)
-        else:           cursor = self.__connection.cursor()
+        cursor = self.__connection.cursor(return_dict)
 
         self.info( "SQL: %s" % query)
         try:

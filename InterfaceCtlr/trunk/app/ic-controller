@@ -36,7 +36,6 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import os
-import codecs
 import pwd
 import signal
 import socket
@@ -55,6 +54,7 @@ from LusiPython.LusiPyApp import LusiPyApp
 #-----------------------------
 from InterfaceCtlr.TranslatorThread import TranslatorThread
 from InterfaceCtlr.InterfaceDb import InterfaceDb
+from InterfaceCtlr.DbConnection import DbConnection
 from LusiTime.Time import Time
 
 #---------------------
@@ -86,9 +86,6 @@ class Controller ( LusiPyApp ) :
     # =======================================================================
 
     __host       = "psdb.slac.stanford.edu"
-    __port       = 3306
-    __user       = pwd.getpwuid(os.geteuid())[0]
-    __password   = ""
     __database   = "interface_db"
 
     # ===========
@@ -113,12 +110,12 @@ class Controller ( LusiPyApp ) :
 				      			  help="override default host name (%s)" % self.__host)
 
         self._parser.add_option ( '-P', "--port",
-								  action="store", dest="port", default=self.__port, type="int",
-				      			  help="override default port number (%s)" % self.__port)
+								  action="store", dest="port", default=None, type="int",
+				      			  help="override default port number" )
 
         self._parser.add_option ( '-U', "--user",
 								  action="store", dest="user", default=None,
-								  help="override default user name (%s)" % self.__user)
+								  help="override default user name" )
 
         self._parser.add_option ( '-p', "--password",
                                   action="store", dest="password", default=None,
@@ -271,17 +268,10 @@ class Controller ( LusiPyApp ) :
         """
 
         # create database instance
-        user = self._options.user
-        password = self._options.password
-        if not user and not password and self._options.pwd_file :
-            # read user name and password from file
-            f = codecs.open(self._options.pwd_file,'r','base64')
-            u, p = tuple(f.read().split())
-            f.close()
-            if not user : user = u
-            if not password : password = p
-        self._db = InterfaceDb( self._options.host, self._options.port, 
-                            self._options.database, user, password )
+        conn = DbConnection( self._options.host, self._options.port, 
+                            self._options.database, self._options.user,
+                            self._options.password, self._options.pwd_file )
+        self._db = InterfaceDb( conn, self ) 
 
 
         # define new controller instance
@@ -302,23 +292,8 @@ class Controller ( LusiPyApp ) :
 
     def _read_config (self):
 
-        # throw away all we got
-        self._config = {}
-
-        # get configuration from database
-        for section in self._options.config :
-            
-            # read section from database
-            config = self._db.get_config(section)
-            if self._config_counter == 0 : 
-                self.trace ( 'config[%s] = %s', section, pformat(config) )
-                
-            # merge configurations
-            for k,v in config.iteritems() :
-                if k.startswith('list:') :
-                    self._config.setdefault(k, []).extend(v)
-                else :
-                    self._config[k] = v
+        # read from database
+        self._config = self._db.read_config( self._options.config, self._config_counter == 0 )
         
         # add permanent configuration
         self._config.update( self._perm_config )

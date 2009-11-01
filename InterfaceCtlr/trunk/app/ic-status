@@ -31,7 +31,6 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import os
-import MySQLdb
 
 #---------------------------------
 #  Imports of base class module --
@@ -41,7 +40,7 @@ from LusiPython.LusiPyApp import LusiPyApp
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-#from PkgPackage.PkgModule import PkgClass
+from InterfaceCtlr.DbConnection import DbConnection
 
 #---------------------
 # Local definitions --
@@ -120,28 +119,11 @@ class ICStatus ( LusiPyApp ) :
             self._parser.error("unexpected arguments")
             return 2
 
-        # get credentials
-        user = self._options.user
-        password = self._options.password
-        if not user and not password and self._options.pwd_file :
-            # read user name and password from file
-            f = codecs.open(self._options.pwd_file,'r','base64')
-            u, p = tuple(f.read().split())
-            f.close()
-            if not user : user = u
-            if not password : password = p
-    
-        # Connect to database
-        cparm = dict ( host=self._options.host, db=self._options.database )
-        if self._options.port : cparm['port'] = self._options.port
-        if user : cparm['user'] = user
-        if password : cparm['passwd'] = password
-        try:
-            conn = MySQLdb.connect( **cparm )
-        except MySQLdb.Error, ex:
-            self.error("MySQL error %d: %s", ex[0], ex[1] )
-            return 1
-
+        # create database instance
+        conn = DbConnection( self._options.host, self._options.port, 
+                            self._options.database, self._options.user,
+                            self._options.password, self._options.pwd_file,
+                            timeout=0 )
 
         # build query
         q = """SELECT fs.id, fs.instrument, fs.experiment, fs.run_number, 
