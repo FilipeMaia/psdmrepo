@@ -11,6 +11,10 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-14
+2009-11-04 Andy Salnikov
+- added --last option to ic-status script
+
 Tag: V00-03-13
 2009-11-01 Andy Salnikov
 - factored-out database connection class DbConnection used by 

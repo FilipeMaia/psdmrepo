@@ -106,6 +106,9 @@ class ICStatus ( LusiPyApp ) :
                                   action="store_true", dest="success", default=False,
                                     help="only show successfully processed datasets" )
 
+        self._parser.add_option ( '-l', "--last",
+                                  action="store_true", dest="last", default=False,
+                                    help="only show last processing" )
         
 
     #
@@ -126,20 +129,44 @@ class ICStatus ( LusiPyApp ) :
                             timeout=0 )
 
         # build query
-        q = """SELECT fs.id, fs.instrument, fs.experiment, fs.run_number, 
-                      stat.name as status, fs.run_type, fs.created
-            FROM fileset fs, fileset_status_def stat 
-            WHERE stat.id=fs.fk_fileset_status 
-        """
         vars = ()
-        if self._options.experiment :
-            w = self._options.experiment.split(':',1)
-            if len(w) == 1 :
-                q += " AND fs.experiment=%s "
-                vars += (w[0],)
-            else :
-                q += " AND fs.instrument=%s AND fs.experiment=%s "
-                vars += (w[0],w[1])
+        if self._options.last :
+            subq = "SELECT instrument, experiment, run_number, max(created) AS last FROM fileset"
+            if self._options.experiment :
+                w = self._options.experiment.split(':',1)
+                if len(w) == 1 :
+                    subq += " WHERE experiment=%s"
+                    vars += (w[0],)
+                else :
+                    subq += " WHERE instrument=%s AND experiment=%s"
+                    vars += (w[0],w[1])
+            subq += " GROUP BY run_number, instrument, experiment"
+ 
+            q = """SELECT fs.id, fs.instrument, fs.experiment, fs.run_number, 
+                          stat.name as status, fs.run_type, fs.created
+                FROM fileset fs, fileset_status_def stat, (""" +subq+ """) flast
+                WHERE fs.instrument=flast.instrument AND fs.experiment=flast.experiment 
+                AND fs.run_number=flast.run_number AND fs.created=flast.last
+                AND stat.id=fs.fk_fileset_status  
+            """
+            
+        else :
+            
+            q = """SELECT fs.id, fs.instrument, fs.experiment, fs.run_number, 
+                          stat.name as status, fs.run_type, fs.created
+                FROM fileset fs, fileset_status_def stat
+                WHERE stat.id=fs.fk_fileset_status 
+            """
+        
+            if self._options.experiment :
+                w = self._options.experiment.split(':',1)
+                if len(w) == 1 :
+                    q += " AND fs.experiment=%s "
+                    vars += (w[0],)
+                else :
+                    q += " AND fs.instrument=%s AND fs.experiment=%s "
+                    vars += (w[0],w[1])
+                
         if self._options.queue :
             q += " AND stat.name IN (%s,%s,%s) "
             vars += ('Initial_Entry','Being_Copied','Waiting_Translation')
@@ -152,7 +179,10 @@ class ICStatus ( LusiPyApp ) :
         if self._options.success :
             q += " AND stat.name=%s "
             vars += ('Complete',)
+
         q += " ORDER BY fs.instrument, fs.experiment, fs.run_number, fs.created"
+
+        
 
         # execute query
         self.trace( "query: %s" % q)

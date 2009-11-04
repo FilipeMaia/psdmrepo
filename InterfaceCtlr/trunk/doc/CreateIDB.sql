@@ -84,7 +84,7 @@ CREATE  TABLE IF NOT EXISTS `fileset` (
   `run_number` INT UNSIGNED NOT NULL COMMENT 'Unverified run number from online.' ,
   `requested_bytes` BIGINT UNSIGNED NULL COMMENT 'Total bytes requested when fileset is created. ' ,
   `used_bytes` BIGINT UNSIGNED NULL COMMENT 'Presently used bytes.' ,
-  `created` TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'Date fileset created' ,
+  `created` TIMESTAMP NOT NULL COMMENT 'Date fileset created' ,
   `locked` BOOLEAN NOT NULL COMMENT 'Locked when found by get_fileset_with_status. so only one requestor gets a given fileset. Unlocked whenever the fileset status is changed.' ,
   PRIMARY KEY (`id`) ,
   CONSTRAINT `fileset_status_fk`
@@ -97,6 +97,12 @@ COMMENT = 'A fileset is the container for a set of files.';
 
 SHOW WARNINGS;
 CREATE INDEX `fileset_status_fk` ON `fileset` (`fk_fileset_status` ASC) ;
+CREATE INDEX `fileset_run_number_idx` ON `fileset` (`run_number`) ;
+CREATE INDEX `fileset_experiment_idx` ON `fileset` (`experiment`(255)) ;
+CREATE INDEX `fileset_instrument_idx` ON `fileset` (`instrument`(255)) ;
+CREATE INDEX `fileset_created_idx` ON `fileset` (`created`) ;
+CREATE INDEX `fileset_inst_exp_run_idx` ON `fileset` (`instrument`(255),`experiment`(255),`run_number`) ;
+CREATE INDEX `fileset_inst_exp_run_time_idx` ON `fileset` (`instrument`(255),`experiment`(255),`run_number`,`created`) ;
 
 SHOW WARNINGS;
 
