@@ -1,0 +1,203 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script ic-store-files...
+#
+#------------------------------------------------------------------------
+
+"""Script that stores all files from offline storage to File Manager.
+
+This script should be run at regular intervals.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import fnmatch
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from InterfaceCtlr.InterfaceDb import InterfaceDb
+from InterfaceCtlr.DbConnection import DbConnection
+from InterfaceCtlr.FileMgrIrods import FileMgrIrods
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class ICStoreFiles ( LusiPyApp ) :
+
+    __host       = "psdb.slac.stanford.edu"
+    __database   = "interface_db"
+    __regdb      = "regdb"
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
+
+        self._parser.add_option ( '-d', "--database",
+                                  action="store", dest="database", default=self.__database,
+                                    help="Interface Controller database name (%s)" % self.__database)
+
+        self._parser.add_option ( '-r', "--regdb",
+                                  action="store", dest="regdb", default=self.__regdb,
+                                    help="RegDB database name (%s)" % self.__regdb)
+
+        self._parser.add_option ( '-H', "--host",
+                                  action="store", dest="host", default=self.__host,
+                                    help="override default host name (%s)" % self.__host)
+
+        self._parser.add_option ( '-P', "--port",
+                                  action="store", dest="port", default=None, type="int",
+                                    help="override default port number")
+
+        self._parser.add_option ( '-u', "--user",
+                                  action="store", dest="user", default=None,
+                                  help="override default user name")
+
+        self._parser.add_option ( '-p', "--password",
+                                  action="store", dest="password", default=None,
+                                  help="specify MySQL password" )
+
+        self._parser.add_option ( '-f', "--pwd-file",
+                                  action="store", dest="pwd_file", default=None,
+                                  help="specify file with user name and password" )
+        
+        self._parser.add_option ( '-c', "--config",
+                                  action="append", dest="config", default=[],
+                                  help="specify configuration section in the database" )
+
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # check the arguments
+        if self._args :
+            self._parser.error("unexpected arguments")
+            return 2
+	
+        # setup databases
+        conn = DbConnection( self._options.host, self._options.port, 
+                            self._options.database, self._options.user,
+                            self._options.password, self._options.pwd_file )
+        db = InterfaceDb( conn, self ) 
+        
+        regdb_conn = DbConnection( self._options.host, self._options.port, 
+                            self._options.regdb, self._options.user,
+                            self._options.password, self._options.pwd_file )
+        
+        # get the options from database
+        config = db.read_config( self._options.config, True )
+
+        # instantiate fiel manager
+        if not config.get('filemanager-irods-command',None) :
+            self.error("filemanager-irods-command is not defined, use -c option to define" )
+            return 2            
+        file_mgr = FileMgrIrods( config['filemanager-irods-command'], config, self._log )
+
+        # get the list of experiments from regdb
+        q = "select i.name, e.name from instrument i, experiment e where i.id = e.instr_id"
+        cursor = regdb_conn.cursor()
+        cursor.execute( q )
+        experiments = [ tuple(row) for row in cursor.fetchall() ]
+
+        # check all experiments
+        for instr, exp in experiments :
+            
+            self.info( "Processing experiment %s:%s", instr, exp )
+            
+            parm = dict ( instrument=instr, experiment=exp )
+            
+            # XTC files first
+            if 'experiment-xtc-dir' in config and 'filemanager-xtc-dir' in config :
+                src_dir = config['experiment-xtc-dir'] % parm
+                pattern = config.get('xtc-name-pattern','%(experiment)s-*.xtc') % parm
+                dst_coll = config['filemanager-xtc-dir'] % parm
+                
+                self.process_dir (src_dir, pattern, dst_coll, file_mgr)
+
+            # HDF files
+            if 'experiment-hdf5-dir' in config and 'filemanager-hdf5-dir' in config :
+                src_dir = config['experiment-hdf5-dir'] % parm
+                pattern = config.get('hdf5-name-pattern','%(experiment)s-*.h5') % parm
+                dst_coll = config['filemanager-hdf5-dir'] % parm
+                
+                self.process_dir (src_dir, pattern, dst_coll, file_mgr)
+
+
+    def process_dir (self, src_dir, pattern, dst_coll, file_mgr):
+
+        dst_filelist = None
+        
+        if os.path.isdir(src_dir) :
+            
+            self.debug( "Processing %s/%s -> %s", src_dir, pattern, dst_coll )
+        
+            for filename in os.listdir( src_dir ) :
+                
+                fpath = os.path.join(src_dir,filename)
+                self.debug( "checking path %s", fpath )
+                
+                # skip directories
+                if os.path.isdir(fpath) : 
+                    self.debug( "- path is a directory" )
+                    continue
+                
+                if fnmatch.fnmatch(filename,pattern) :
+
+                    # first time around get the list of files already in iRODS
+                    if dst_filelist is None :
+                        dst_filelist = file_mgr.listdir( dst_coll )
+                        if dst_filelist is None : dst_filelist = []
+                        dst_filelist = set(dst_filelist)
+                        self.debug("Files in iRODS already: %s",dst_filelist)
+
+                    if filename not in dst_filelist :                        
+                        # store the file
+                        self.debug( "+ file is not in file manager" )
+                        dst_path = dst_coll + '/' + filename
+                        file_mgr.storeFile ( fpath, dst_path )
+                    else :
+                        self.debug( "- file is in file manager already" )
+
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = ICStoreFiles()
+    rc = app.run()
+    sys.exit(rc)
