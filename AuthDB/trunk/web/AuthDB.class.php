@@ -428,45 +428,58 @@ try {
  * Unit tests
  *
 require_once( 'AuthDB/AuthDB.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
 
 function toYesNo( $boolean_val ) { return '<b>'.( $boolean_val ? 'Yes' : 'No').'</b>'; }
 
+function resolve_exper_id( $instrument_name, $experiment_name ) {
+    $regdb = new RegDB();
+	$regdb->begin();
+    $experiment = $regdb->find_experiment( $instrument_name, $experiment_name )
+        or die( "no such experiment" );
+    $exper_id = $experiment->id();
+    $regdb->commit();
+    return $exper_id;
+}
 try {
     $authdb = new AuthDB();
     $authdb->begin();
 
-    $user = 'gapon';
+    $exper_id = resolve_exper_id( 'AMO', 'amo02709');
+    $user = 'dimauro' ; //'gapon';
 
-    print( "<h1>privileges of user '{$user}' for 'LogBook' of experiment '53'</h1>" );
-    print( "<br>'read: : ".toYesNo( $authdb->hasPrivilege( $user, 53, 'LogBook', 'read' )));
-    print( "<br>'post: : ".toYesNo( $authdb->hasPrivilege( $user, 53, 'LogBook', 'post' )));
-    print( "<br>'edit: : ".toYesNo( $authdb->hasPrivilege( $user, 53, 'LogBook', 'edit' )));
-    print( "<br>'delete: : ".toYesNo( $authdb->hasPrivilege( $user, 53, 'LogBook', 'delete' )));
-    print( "<br>'manage_shifts: : ".toYesNo( $authdb->hasPrivilege( $user, 53, 'LogBook', 'manage_shifts' )));
+    print( "<h1>privileges of user '{$user}' for 'LogBook' of experiment {$exper_id}</h1>" );
+    print( "<br>'read: : ".toYesNo( $authdb->hasPrivilege( $user, $exper_id, 'LogBook', 'read' )));
+    print( "<br>'post: : ".toYesNo( $authdb->hasPrivilege( $user, $exper_id, 'LogBook', 'post' )));
+    print( "<br>'edit: : ".toYesNo( $authdb->hasPrivilege( $user, $exper_id, 'LogBook', 'edit' )));
+    print( "<br>'delete: : ".toYesNo( $authdb->hasPrivilege( $user, $exper_id, 'LogBook', 'delete' )));
+    print( "<br>'manage_shifts: : ".toYesNo( $authdb->hasPrivilege( $user, $exper_id, 'LogBook', 'manage_shifts' )));
 
-    print( "<br>hoHasPrivilege( 53, 'LogBook', 'read' ): " );
-    $users = $authdb->whoHasPrivilege( 53, 'LogBook', 'read' );
+    print( "<br>hoHasPrivilege( {$exper_id}, 'LogBook', 'read' ): " );
+    $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'read' );
     print_r( $users );
 
-    print( "<br>hoHasPrivilege( 53, 'LogBook', 'post' ): " );
-    $users = $authdb->whoHasPrivilege( 53, 'LogBook', 'post' );
+    print( "<br>hoHasPrivilege( {$exper_id}, 'LogBook', 'post' ): " );
+    $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'post' );
     print_r( $users );
 
-    print( "<br>hoHasPrivilege( 53, 'LogBook', 'manage_shifts' ): " );
-    $users = $authdb->whoHasPrivilege( 53, 'LogBook', 'manage_shifts' );
-    print_r( $users );
-    
-    print( "<br>hoHasPrivilege( 53, 'LogBook', 'edit' ): " );
-    $users = $authdb->whoHasPrivilege( 53, 'LogBook', 'edit' );
+    print( "<br>hoHasPrivilege( {$exper_id}, 'LogBook', 'manage_shifts' ): " );
+    $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'manage_shifts' );
     print_r( $users );
     
-    print( "<br>hoHasPrivilege( 53, 'LogBook', 'delete' ): " );
-    $users = $authdb->whoHasPrivilege( 53, 'LogBook', 'delete' );
+    print( "<br>hoHasPrivilege( {$exper_id}, 'LogBook', 'edit' ): " );
+    $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'edit' );
+    print_r( $users );
+    
+    print( "<br>hoHasPrivilege( {$exper_id}, 'LogBook', 'delete' ): " );
+    $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'delete' );
     print_r( $users );
 
     $authdb->commit();
 
 } catch( AuthDBException $e ) {
+    print( $e->toHtml());
+} catch( RegDBException $e ) {
     print( $e->toHtml());
 }
 

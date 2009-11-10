@@ -11,7 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-
+Tag: V00-00-07
+2009-11-09 Igor Gaponenko
+- enhanced unit test for the PHP API
+- added two version of the welcome/login pages for WebKDC
 
 Tag: V00-00-06
 2009-10-28 Igor Gaponenko
