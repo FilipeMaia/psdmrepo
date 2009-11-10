@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-08
+2009-11-09 Igor Gaponenko
+- implemented e-mail notifications for subscribed users
+- extended the MySQL schema (the WrokBench hasn't been updated yet!)
+
 Tag: V00-01-07
 2009-10-28 Igor Gaponenko
 - the first real implementation of the Run Summary page to display parameter values

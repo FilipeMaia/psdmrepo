@@ -788,5 +788,162 @@ HERE;
 
         return $list;
     }
+
+    /* =========================================
+     *   SUBSCRPTIONS TO RECEIVE NOTIFICATIONS
+     * =========================================
+     */
+    public function subscribe( $subscriber, $address, $time, $host ) {
+
+    	$time64 = LusiTime::to64from( $time );
+    	$this->connection->query (
+            "INSERT INTO {$this->connection->database}.subscriber VALUES(NULL,{$this->id()},'{$subscriber}','{$address}',{$time64},'{$host}')" );
+
+    	$s = $this->find_subscriber_by_( "s.id=(SELECT LAST_INSERT_ID())");
+    	if( is_null( $s ))
+            throw new LogBookException(
+                __METHOD__,
+                "internal error" );
+
+        $url     = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps/logbook/';
+        $logbook = $this->instrument()->name().'/'.$this->name();
+
+        $body =<<<HERE
+URL:     {$url}
+LogBook: {$logbook}
+
+** ATTENTION **
+The message was sent by the automated notification system because this e-mail
+has been just registered to recieve updates on new entries posted in the Electornic LogBook
+of the experiment. The registration was made by user '{$s->subscriber()}'
+on {$s->subscribed_time()->toStringShort()} from {$s->subscribed_host()}. To unsubscribe
+from this service, please follow the above shown URL, select the specified experiment and
+proceed to the 'Subscribe' at the top top-level menu of the LogBook application. In case
+if you won't be able to log onto the LogBook get in touch with the experiment management
+personnel.
+HERE;
+                
+        $this->do_notify( $s->address(), $logbook, "*** SUBSCRIBED ***", $body );
+    }
+
+    public function unsubscribe( $id ) {
+
+    	$s = $this->find_subscriber_by_( "s.id={$id}");
+    	if( is_null( $s ))
+            throw new LogBookException(
+                __METHOD__,
+                "no subscriber for id={$id} error" );
+
+    	$this->connection->query (
+            "DELETE FROM {$this->connection->database}.subscriber WHERE id={$id}" );
+
+        $url     = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps/logbook/';
+        $logbook = $this->instrument()->name().'/'.$this->name();
+
+        $body =<<<HERE
+URL:     {$url}
+LogBook: {$logbook}
+
+** ATTENTION **
+The message was sent by the automated notification system because this e-mail 
+has been removed from a list recipients who receive updates on new entries posted 
+in the Electornic LogBook of the experiment. The prior registration was made by 
+user '{$s->subscriber()}' on {$s->subscribed_time()->toStringShort()} from {$s->subscribed_host()}. 
+To subscribe to this service again, please follow the above
+shown URL, then select the specified experiment and proceed to the 'Subscribe' at 
+the top top-level menu of the LogBook application. In case if you won't be able 
+to log onto the LogBook get in touch with the experiment management personnel.
+HERE;
+                
+        $this->do_notify( $s->address(), $logbook, "*** UNSUBSCRIBED ***", $body );
+    }
+
+    public function find_subscriber_by_( $condition ) {
+        $result = $this->connection->query (
+            "SELECT * FROM {$this->connection->database}.subscriber s WHERE s.exper_id={$this->id()} AND {$condition}" );
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 0 ) return null;
+        if( $nrows == 1 )
+            return new LogBookSubscription (
+                $this->connection,
+                $this,
+                mysql_fetch_array( $result, MYSQL_ASSOC ));
+
+        throw new LogBookException(
+            __METHOD__,
+            "inconsistent results returned by the query" );
+    }
+
+    public function subscriptions( $subscribed_by=null ) {
+
+    	$list = array();
+
+        // Find all subscribers. If none then just quit.
+        //
+        // TODO: Select authorized subscribers only.
+        //
+        $extra = is_null( $subscribed_by ) ? "" : "AND s.subscriber='{$subscribed_by}'";
+        $result = $this->connection->query (
+            "SELECT * FROM {$this->connection->database}.subscriber s WHERE s.exper_id={$this->id()} {$extra} ORDER BY s.subscriber" );
+
+        $nrows = mysql_numrows( $result );
+        for( $i=0; $i<$nrows; $i++ )
+            array_push(
+                $list,
+                new LogBookSubscription (
+                    $this->connection,
+                    $this,
+                    mysql_fetch_array( $result, MYSQL_ASSOC )));
+        return $list;
+    }
+
+    public function notify_subscribers( $entry ) {
+
+        $subscriptions = $this->subscriptions();
+        if( count( $subscriptions ) <= 0 ) return;
+
+        $url     = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps/logbook/index.php?action=select_message&id='.$entry->id();
+        $author  = $entry->author();
+        $time    = $entry->insert_time()->toStringShort();
+        $logbook = $this->instrument()->name().'/'.$this->name(); 
+        $subject = strtr( substr( $entry->content(), 0, 72 ), array( "'" => '"', "\n" => " " ));
+
+        // Notify each subscriber.
+        //
+        foreach( $subscriptions as $s ) {
+           
+            $body =<<<HERE
+Message: {$url}
+Author:  {$author}
+Time:    {$time}
+LogBook: {$logbook}
+
+** ATTENTION **
+The message was sent by the automated notification system because this e-mail
+was registered to recieve updates on new entries posted in the Electornic LogBook
+of the experiment. The registration was made by user '{$s->subscriber()}'
+on {$s->subscribed_time()->toStringShort()} from {$s->subscribed_host()}. To unsubscribe
+from this service, please follow the above shown URL and select 'Subscribe' at
+the top top-level menu of the LogBook application. In case if you won't be able
+to log onto the LogBook get in touch with the experiment management personnel.
+HERE;
+            $this->do_notify( $s->address(), $logbook, $subject, $body );
+        }
+    }
+
+    private function do_notify( $address, $logbook, $subject, $body ) {
+        $tmpfname = tempnam("/tmp", "logbook");
+        $handle = fopen( $tmpfname, "w" );
+        fwrite( $handle, $body );
+        fclose( $handle );
+
+        shell_exec( "cat {$tmpfname} | mail -s '[ {$logbook} ]  {$subject}' {$address} -- -F 'LCLS E-Log'" );
+
+        // Delete the file only after piping its contents to the mailer command.
+        // Otherwise its contents will be lost before we use it.
+        //
+        unlink( $tmpfname );
+    }
 }
 ?>

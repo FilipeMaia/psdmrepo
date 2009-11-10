@@ -37,9 +37,26 @@ URGENT PROBLEMS FOR LOGBOOK
   which do not belong to the above category).
 
       +----------+     +---------+
-- add | << Prev  | and | Next >> | buttons to the messages viewer
+- add | << Prev  | and | Next >> | buttons to the messages viewer. This should show up for the top-level messages only.
       +----------+     +---------+
 
+      +----------------+
+- add | Parent Message | for the replies.
+      +----------------+
+
+- add a possibility to change the default soft order for messages in a list. The feature
+  requested by John Bozek.
+
+- add a possibility to limit 'Last 10 messages | Today | 1 day | 1 week | All history' of messages.
+
+  IMPORTANT: This selector would only work if the normal (newest on top) order of messages is used.
+  Otherwise disable the 
+
+- implement 'Subscribe' functionality (schema changes may be required to register non-SLAC e-mail
+  addresses by users who're looged into shared accounts, or to register multiple e-mail addresses).
+  Allow users to manage their subscriptions (unsubscribe/subscribe/change e-mail address/choose
+  between TEXT|HTML format of e-mail messages). Each message received by a user would have a link
+  at its bottom leading directly to unsubscribe operation.
 _________________________________________
 EARLY FEEDBACK FROM AMEDEO (Aug 19, 2009)
 

@@ -22,12 +22,12 @@ define( DIA_TITLE,     "&nbsp;D I A " );
 define( MBES_TITLE,    "&nbsp;M B E S" );
 
 define( BEAMS,   0 );
-define( FEE,     BEAMS   +  9 );
+define( FEE,     BEAMS   + 10 );
 define( HFP,     FEE     +  8 );
 define( ETOF,    HFP     +  2 );
 define( ITOF,    ETOF    + 30 );
 define( HFP_GAS, ITOF    +  6 );
-define( DIA,     HFP_GAS +  5 );
+define( DIA,     HFP_GAS +  6 );
 define( MBES,    DIA     +  1 );
 define( END_,    MBES    +  4 );
 
@@ -37,6 +37,7 @@ $pardefs = array(
     //
     array( 'name' => 'BEND:DMP1:400:BDES',   'descr' => 'electron beam energy' ),
     array( 'name' => 'BPMS:DMP1:199:TMIT1H', 'descr' => 'Particle N_electrons' ),
+    array( 'name' => 'SIOC:SYS0:ML00:AO289', 'descr' => 'E.Vernier' ),
     array( 'name' => 'BEAM:LCLS:ELEC:Q',     'descr' => 'Charge' ),
     array( 'name' => 'SIOC:SYS0:ML00:AO195', 'descr' => 'Peak current after second bunch compressor' ),
     array( 'name' => 'SIOC:SYS0:ML00:AO820', 'descr' => 'Pulse length' ),
@@ -123,7 +124,8 @@ $pardefs = array(
     array( 'name' => 'AMO:R14:IOC:21:VHS7:CH0:VoltageMeasure', 'descr' => 'piezo voltage' ),
     array( 'name' => 'AMO:R14:EVR:21:CTRL.DG2D',               'descr' => 'piezo timing delay' ),
     array( 'name' => 'AMO:R14:EVR:21:CTRL.DG2W',               'descr' => 'piezo timing width' ),
-    array( 'name' => 'AMO:HFP:MMS:71.RBV',                     'descr' => 'x-position (rel. distance)' ),
+    array( 'name' => 'AMO:HFP:MMS:72.RBV',                     'descr' => 'gasjet x-position (rel. distance)' ),
+    array( 'name' => 'AMO:HFP:MMS:71.RBV',                     'descr' => 'gasjet y-position (rel. distance)' ),
     //
     // DIA data
     //
@@ -176,14 +178,14 @@ try {
 
     $value_color = 'maroon';
     $label_color = '#b0b0b0';
-    $con = new RegDBHtml( 0, 0, 1000, 1470 );
+    $con = new RegDBHtml( 0, 0, 1000, 1500 );
     $row = 0;
 
     $con->label_1(0, $row, BEAMS_TITLE, 780 );
     $row += 30;
     for( $i = BEAMS; $i < FEE; $i++ ) {
     	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
         $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
             ->value(300, $row, $val, $value_color )
             ->label(500, $row, $key, true, $label_color );
@@ -195,7 +197,7 @@ try {
     $row += 30;
     for( $i = FEE; $i < HFP; $i++ ) {
     	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
         $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
             ->value(300, $row, $val, $value_color )
             ->label(500, $row, $key, true, $label_color );
@@ -207,7 +209,7 @@ try {
     $row += 30;
     for( $i = HFP; $i < ETOF; $i++ ) {
     	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
         $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
             ->value(300, $row, $val, $value_color )
             ->label(500, $row, $key, true, $label_color );
@@ -219,7 +221,7 @@ try {
     $row += 30;
     for( $i = ETOF; $i < ITOF; $i++ ) {
     	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
         $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
             ->value(300, $row, $val, $value_color )
             ->label(500, $row, $key, true, $label_color );
@@ -231,7 +233,7 @@ try {
     $row += 30;
     for( $i = HFP_GAS; $i < DIA; $i++ ) {
     	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
         $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
             ->value(300, $row, $val, $value_color )
             ->label(500, $row, $key, true, $label_color );
@@ -243,7 +245,7 @@ try {
     $row += 30;
     for( $i = DIA; $i < MBES; $i++ ) {
     	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
         $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
             ->value(300, $row, $val, $value_color )
             ->label(500, $row, $key, true, $label_color );
@@ -255,7 +257,7 @@ try {
     $row += 30;
     for( $i = MBES; $i < END_; $i++ ) {
     	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no value &gt;';
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
         $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
             ->value(300, $row, $val, $value_color )
             ->label(500, $row, $key, true, $label_color );

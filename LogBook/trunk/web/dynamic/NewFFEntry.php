@@ -204,6 +204,11 @@ try {
             $f['contents'], $f['type'], $f['description'] );
     }
 
+    // Notify those (if any) who're interested and who're authorized to receive
+    // updates from the experiment's logbook.
+    //
+    $experiment->notify_subscribers( $entry );
+
     // Return back to the caller
     //
     if( isset( $actionSuccess )) {

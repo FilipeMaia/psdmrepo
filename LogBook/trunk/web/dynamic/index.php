@@ -77,6 +77,14 @@ and open the template in the editor.
         padding:2px;
         color:blue;
     }
+    div.help_area {
+        width:800px;
+    }
+    p.help {
+        font-family: Times, serif;
+        font-size:18px;
+        padding-bottom:1em;
+    }
     #application_header {
         background-color:#d0d0d0;
         padding:8px;
@@ -469,6 +477,7 @@ function set_current_selection( instr_id, instr_name, exper_id, exper_name ) {
         menubar_enable( menubar_group_runs );
     menubar_enable( menubar_group_browse );
     menubar_enable( menubar_group_search );
+    menubar_enable( menubar_group_subscribe );
 }
 
 /* Check if the specified id corresponds to a facility or an experiment.
@@ -600,6 +609,15 @@ menubar_data.push ( {
         { text: "Advanced dialog",      url: "javascript:search_contents()" } ],
     disabled: true }
 );
+var menubar_group_subscribe = menubar_data.length;
+menubar_data.push ( {
+    id:    'subscribe',
+    href:  '#subscribe',
+    title: 'Subscribe',
+    itemdata:  [
+        { text: "Automatic notifications by e-mail", url: "javascript:subscribe()" } ],
+    disabled: true }
+);
 var menubar_group_help = menubar_data.length;
 menubar_data.push ( {
     id:    'help',
@@ -681,7 +699,23 @@ function Table( itsTableName, itsColumnDefs, itsDataRequest, hasPaginator, rowsP
                       YAHOO.widget.DataTable.CLASS_ERROR );
                   this.onDataReturnAppendRows.apply( this, arguments );
               },
-              scope: this.dataTable } ); };
+              scope: this.dataTable } );
+    };
+    this.highlightEditableCell = function(oArgs) {
+        var elCell = oArgs.target;
+        if(YAHOO.util.Dom.hasClass(elCell, "yui-dt-editable")) {
+            this.highlightCell(elCell);
+        }
+    };
+    this.dataTable.subscribe("cellMouseoverEvent", this.highlightEditableCell);
+    this.dataTable.subscribe("cellMouseoutEvent", this.dataTable.onEventUnhighlightCell);
+    this.dataTable.subscribe("cellClickEvent", this.dataTable.onEventShowCellEditor);
+    this.dataTable.subscribe("checkboxClickEvent", function(oArgs){
+        var elCheckbox = oArgs.target;
+        var oRecord = this.getRecord( elCheckbox );
+        oRecord.setData( "delete", elCheckbox.checked );
+    });
+    return this;
 }
 
 function TableLocal( itsTableName, itsColumnDefs, itsDataArray, hasPaginator ) {
@@ -1908,7 +1942,7 @@ function display_run() {
         '<div style="margin-top:40px; margin-bottom:20px;">'+
         '  <img src="images/Parameters.png" />'+
         '</div>'+
-        '<div id="run_parameters" style="height:1470px;">Loading...</div>'+
+        '<div id="run_parameters" style="height:1500px;">Loading...</div>'+
         '<div id="messages_actions_container" style="margin-top:40px;"></div>';
 
     load( 'DisplayRun.php?id='+current_selection.run.id, 'experiment_info_container' );
@@ -3216,6 +3250,158 @@ function search_contents() {
         }
     );
 }
+
+function subscribe() {
+    set_context (
+            '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
+            'Manage Subscriptions >' );
+
+    reset_navarea();
+    reset_workarea();
+
+    document.getElementById('workarea').innerHTML=
+        '<div class="help_area">'+
+        '  <p class="help">The mechanism of subscriptions allows registered users to recieve instant e-mail notifications'+
+        '  on any new messages posted in a context of the experiment.</p>'+
+        '  <p class="help"><b>Who can subscribe:</b> The subscriptions can be made by any user who has read'+
+        '  privileges in the experiment. Logged LogBook users can register as many e-mail addresses of any'+
+        '  recipients as they want.</p>'+
+        '  <p class="help"><b>Message delivery:</b> The notification service will make its best effort'+
+        '  to deliver (send) notifications on all relevant updates to recipients who were registered at'+
+        '  a time the updates were posted. However the service can <b>NOT</b> guarantee that the notifications'+
+        '  will be actiually delivered to addressees. It is up to the users to ensure that specified e-mail'+
+        '  addresses are correct. Also keep in mind that some anti-spam filters may block these messages.</p>'+
+        '  <p class="help"><b>Register/unregister:</b> Make required modifications and press the <b>Save</b> button'+
+        '  Upon a successful registration a greeting message will be sent to each new recipient.'+
+        '  A similar message will be sent to an addressee after their e-mail address will be unregistered.</p>'+
+        '</div>'+
+        '<br />'+
+        '<div style="margin-left:20px;">'+
+        '  <button id="subscribers_save_button">Save</button>'+
+        '  <button id="subscribers_cancel_button" style="margin-lefty:10px;">Cancel</button>'+
+        '  <div style="margin-top:10px; padding:20px; background-color:#e0e0e0;">'+
+        '    <div>'+
+        '      <div id="subscribers_table">'+
+        '        <div id="subscribers_table_paginator"></div>'+
+        '        <div id="subscribers_table_body"></div>'+
+        '      </div>'+
+        '      <div style="margin-top:8px;" align="left" >'+
+        '        <button id="subscribers_add_button">Add Entry</button>'+
+        '        <button id="subscribers_update_button">Delete Selected</button>'+
+        '      </div>'+
+        '    </div>'+
+        '  </div>'+
+        '</div>'+
+        '<form name="manage_subscriptions_form" action="UpdateSubscriptions.php" method="post">'+
+        '  <input type="hidden" name="exper_id" value="'+current_selection.experiment.id+'" />'+
+        '  <input type="hidden" name="actionSuccess" value="select_experiment" />'+
+        '  <input type="hidden" name="subscriptions" value="" />'+
+        '</form>';
+
+    var subscribers = null;
+
+    var url = 'RequestSubscriptions.php?exper_id='+current_selection.experiment.id+'&subscribed_by='+auth_remote_user;
+ 
+    function create_table() {
+        if( subscribers == null )
+        	return new Table (
+                "subscribers_table",
+                [ { key: "delete", formatter: "checkbox" },
+                  { key: "address",   sortable: true, resizeable: true,
+                    editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})},
+                  { key: "subscriber", sortable: true, resizeable: true },
+                  { key: "subscribed_time", sortable: true, resizeable: true },
+                  { key: "subscribed_host", sortable: true, resizeable: true } ],
+                url,
+                false,
+                10
+            );
+        else
+        	return new TableLocal (
+                "subscribers_table",
+                [ { key: "delete", formatter: "checkbox" },
+                  { key: "address",   sortable: true, resizeable: true,
+                    editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})},
+                  { key: "subscriber", sortable: true, resizeable: true },
+                  { key: "subscribed_time", sortable: true, resizeable: true },
+                  { key: "subscribed_host", sortable: true, resizeable: true } ],
+                subscribers,
+                false
+            );
+    }
+    var subscribers_table = create_table();
+
+    function AddAndRefreshSubscribersTable() {
+        subscribers_table.dataTable.addRow (
+            { "address": auth_remote_user+'@slac.stanford.edu',
+              "subscriber" : auth_remote_user,
+              "subscribed_time" : '',
+              "subscribed_host" : '' },
+            0 );
+    }
+    function synchronize_subscribers() {
+        var rs = subscribers_table.dataTable.getRecordSet();
+        var rs_length = rs.getLength();
+        subscribers = [];
+        for( var i = 0; i < rs_length; i++ ) {
+            var r = rs.getRecord(i);
+            if( !r.getData('delete'))
+            	subscribers.push ( {
+                    "address": r.getData("address"),
+                    "subscriber" : r.getData("subscriber"),
+                    "subscribed_time" : r.getData("subscribed_time"),
+                    "subscribed_host" : r.getData("subscribed_host")} );
+        }
+    }
+    function toJSON() {
+        var result = [];
+        synchronize_subscribers();
+        if( subscribers != null) {
+            for( var i = 0; i < subscribers.length; i++ ) {
+                var r = subscribers[i];
+                result.push ( r["address"] );
+            }
+        } else {
+            // Pass this special string to indicate that we don't have any
+            // information on subscribers.
+            //
+            return 'null';
+        }
+        return JSON.stringify( result );
+    };
+
+    var subscribers_save_button = new YAHOO.widget.Button( "subscribers_save_button" );
+    subscribers_save_button.on(
+        "click",
+        function( p_oEvent ) {
+            document.manage_subscriptions_form.subscriptions.value = toJSON();
+            document.manage_subscriptions_form.submit();
+        }
+    );
+
+    var subscribers_cancel_button = new YAHOO.widget.Button( "subscribers_cancel_button" );
+    subscribers_cancel_button.on(
+        "click",
+        function( p_oEvent ) { display_experiment(); }
+    );
+
+    var subscribers_add_button = new YAHOO.widget.Button( "subscribers_add_button" );
+    subscribers_add_button.on (
+        "click",
+        function( p_oEvent ) { AddAndRefreshSubscribersTable(); }
+    );
+
+    var subscribers_update_button = new YAHOO.widget.Button( "subscribers_update_button" );
+    subscribers_update_button.on (
+        "click",
+        function( p_oEvent ) {
+            synchronize_subscribers();
+            subscribers_table.dataTable.destroy();
+            subscribers_table = create_table();
+        }
+    );
+}
+
     </script>
   </head>
   <body class="yui-skin-sam" id="body" onload="init()">
