@@ -85,13 +85,13 @@ def _parse_conn_string( conn_string ) :
         # map key to db.connect keys
         try :
             ckey, fun = kwords[key]
-        except IndexError:
+        except KeyError:
             raise ValueError ( "invalid key in connection string (%s): %s" % ( key, conn_string ) )
 
         # conver the value
         try :
             val = fun(val)
-        except IndexError:
+        except :
             raise ValueError ( "invalid value in connection string (%s=%s): %s" % ( key, val, conn_string ) )
             
         params[ckey] = val
@@ -126,22 +126,28 @@ class DbConnection ( object ) :
         One of the conn_string or conn_string_file must be given
         """
 
+        # check keyword arguments
+        for kw in kwargs :
+            if kw not in ['conn_string', 'host', 'db', 'port', 'user', 'passwd', 'timeout'] :
+                raise KeyError( 'DbConnection: unexpected keyword argument: '+kw )
+
         self._log = logging.getLogger('db_conn')
 
         self._conn_parm = {}
         self._timeout = 15
         
-        conn_string = None
         if 'conn_string' in kwargs :
+            
             # connection string given as kw-parameter
             conn_string = kwargs['conn_string']
-        if not conn_string and 'conn_string_file' in kwargs :
-            # read connection string from file
-            conn_string = file(kwargs['conn_string_file']).read()
+            
+            if conn_string.startswith('file:') :
+                # read connection string from file
+                conn_string = file(conn_string[5:]).read()
         
-        # parse connection string if it was given
-        if conn_string :
-            self._conn_parm = _parse_conn_string( conn_string or "" )
+            # parse connection string if it was given
+            if conn_string :
+                self._conn_parm = _parse_conn_string( conn_string )
 
         # check all other kw parameters, they override connection string
         for kw in ['host', 'db', 'port', 'user', 'passwd', 'timeout'] :

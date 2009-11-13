@@ -224,7 +224,13 @@ The syntax for connection string is:
 Server=myServerAddress;Port=1234;Database=myDataBase;\
 Uid=myUsername;Pwd=myPassword;Connection Timeout=5;
 
-Any part is optional, if missing the default MySQL value will be used.
+or 
+
+file:/path/to/file/containing/connection_string
+
+Any part of connection string is optional, if missing the default MySQL 
+value will be used.
+
 Default timeout value can also be specified as an optional argument to 
 constructor. Here are few examples for instantiating the objects of 
 this class:
@@ -234,22 +240,18 @@ this class:
     dbconn = DbConnection( conn_string=cstr )
     
     # connecting with connection string in a file
-    path="/reg/g/psdm/psdatmgr/.icdb_conn_str"
-    dbconn = DbConnection( conn_string_file=path )
+    cstr="file:/reg/g/psdm/psdatmgr/.icdb_conn_str"
+    dbconn = DbConnection( conn_string=cstr )
 
     # modifying connection timeout
     dbconn = DbConnection( conn_string=cstr, timeout=0 )
 
-    # combined, if conn_string is non-empty then it will be used,
-    # otherwise conn_string_file will be used
-    dbconn = DbConnection( conn_string=cstr, conn_string_file=path )
-
     # connect using all individual parameters
     dbconn = DbConnection( host='...', db='...', user='...', passwd='...' )
 
-    # connect using connection string plus individual parameters which
+    # combine connection string plus individual parameters which
     # can override parts of connection string
-    dbconn = DbConnection( conn_str=cstr, port=1234 )
+    dbconn = DbConnection( conn_string=cstr, port=1234, passwd='...' )
 
 Instantiating the object does not immediately create connection to 
 the database. To create a connection one needs to use connection()
