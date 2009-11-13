@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-01
+2009-11-13 Andy Salnikov
+- add DbConnection class
+
 Tag: V00-00-00
 2008-10-08 Andy Salnikov
 - first import of the package into LUSI CVS
