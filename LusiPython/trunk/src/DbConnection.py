@@ -145,7 +145,7 @@ class DbConnection ( object ) :
 
         # check all other kw parameters, they override connection string
         for kw in ['host', 'db', 'port', 'user', 'passwd', 'timeout'] :
-            if kw in kwargs :
+            if kw in kwargs and kwargs[kw] is not None:
                 self._conn_parm[kw] = kwargs[kw]
 
         # check if timeout was set in a connection string or as a kw parameter

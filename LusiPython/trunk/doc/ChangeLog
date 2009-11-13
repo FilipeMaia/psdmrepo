@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2009-11-13 Andy Salnikov
+- small change in DbConnection, allow kw arguments with None value,
+  simply ignore them 
+
 Tag: V00-00-01
 2009-11-13 Andy Salnikov
 - add DbConnection class
