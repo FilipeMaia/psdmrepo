@@ -52,9 +52,6 @@ from LusiTime.Time import Time
 # Local definitions --
 #---------------------
 
-# local variable accessible in this module only
-_OP_X = 'Y'
-
 #-------------------
 # Local functions --
 #-------------------
@@ -97,10 +94,7 @@ def _time2str(timestamp):
 
 class DatabaseOperatonFailed(Exception):
     def __init__ (self, message):
-        self.__message = message
-
-    def __str__ (self):
-        return repr(self.__message)
+        Exception.__init__( self, message )
 
 #--------------------------------
 # Application class definition --
@@ -308,7 +302,7 @@ class OnlineSim ( LusiPyApp ) :
             self._parser.error("unknown command: %s" % command)
             return 2
 
-        self.trace( "command: %s: arguments: %s" % (command,str(self._args[1:])))
+        self.trace( "command: %s: arguments: %s" % (command, str(self._args[1:])))
 
         if self.__cmd_handlers[command]['CONNECTS2SERVER']: self.__connect()
         return self.__cmd_handlers[command]['HANDLER'](command, self._args[1:])
@@ -516,10 +510,10 @@ ID     Name                  Description""")
         self.info("Default connection parameters for MySQL: %s" % self.__conn_params())
  
         if self._options.host and self.__host != self._options.host:
-             self.__host = self._options.host
+            self.__host = self._options.host
 
-        if self._options.port and port != self._options.port:
-            port = self._options.port
+        if self._options.port and self.__port != self._options.port:
+            self.__port = self._options.port
 
         if self._options.user and self.__user != self._options.user:
             self.__user = self._options.user
@@ -543,7 +537,7 @@ ID     Name                  Description""")
                 passwd=self.__password,
                 db=self.__database)
         except MySQLdb.Error, ex:
-            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+            self.error("MySQL error %d: %s" % (ex[0], ex[1]))
             sys.exit(1)
 
     # ========================================================
@@ -568,7 +562,7 @@ ID     Name                  Description""")
                 cursor.execute(query)
                 result = True
             except MySQLdb.Error, ex:
-                self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+                self.error("MySQL error %d: %s" % (ex[0], ex[1]))
 
         cursor.close()
         return result
@@ -596,7 +590,7 @@ ID     Name                  Description""")
             cursor.execute(query)
             rows = cursor.fetchall()
         except MySQLdb.Error, ex:
-            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+            self.error("MySQL error %d: %s" % (ex[0], ex[1]))
 
         cursor.close()
         return rows
@@ -622,7 +616,7 @@ ID     Name                  Description""")
             rows = cursor.fetchall()
             result = [r[0] for r in rows]
         except MySQLdb.Error, ex:
-            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+            self.error("MySQL error %d: %s" % (ex[0], ex[1]))
 
         cursor.close()
         return result
@@ -667,7 +661,7 @@ ID     Name                  Description""")
 
         if self.__simple_query("SET SESSION SQL_MODE='ANSI'"):
 
-            rows = self.__select_query(sql,return_dict=True)
+            rows = self.__select_query(sql, return_dict=True)
             for r in rows:
                 return r[colname]
 

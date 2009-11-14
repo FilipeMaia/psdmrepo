@@ -82,7 +82,7 @@ class FileMgrIrods ( object ) :
         # create collection if needed
         coll = dst_path[:dst_path.rfind('/')]
         cmd = [ 'imkdir', '-p', coll ]
-        self._log.info ( "FileMgrIrods.storeFile: creating collection %s", coll )
+        self._log.debug ( "FileMgrIrods.storeFile: creating collection %s", coll )
         returncode = os.spawnvp(os.P_WAIT,cmd[0],cmd)
         if returncode : self._log.warning("imkdir completed with status %d", returncode)
         # this call may fail, but it fails also if directory exists, so just try next thing

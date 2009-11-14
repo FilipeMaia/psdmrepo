@@ -40,6 +40,7 @@ import pwd
 import subprocess
 import time
 import resource
+import signal
 
 #---------------------------------
 #  Imports of base class module --
@@ -143,7 +144,7 @@ class TranslatorThread ( threading.Thread ) :
             # check kill flag
             if self._db.test_exit_translator(translator_id):
                 # kill it if asked
-                self.info ("[%s] Request to kill translator_process #%d (PID=%d)", self._name, translator_id, proc.pid)
+                self.info ("[%s] Request to kill translator_process #%d (PID=%d)", self._name, translator_id, pid)
                 os.kill(pid,signal.SIGTERM)
                 # it may need some time to stop
                 time.sleep( 3 )

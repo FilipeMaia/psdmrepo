@@ -11,6 +11,19 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-00
+2009-11-13 Andy Salnikov
+- significant refactoring
+  - removed DbConnection class, moved to LusiPython package
+  - database connection parameters can be specified via the connection
+    string or file name containing connection string
+  - InterfaceDb class now uses decorators for locking and transaction
+    control in the methods
+  - new method new_fileset() in InterfaceDb, replaces the code in 
+    ic-command, to be used by online module too
+- new module online_iface, now contains single function new_fileset()
+  to be used by online script to register new filesets
+
 Tag: V00-03-14
 2009-11-04 Andy Salnikov
 - added --last option to ic-status script

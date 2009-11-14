@@ -40,17 +40,13 @@ from LusiPython.LusiPyApp import LusiPyApp
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from InterfaceCtlr.DbConnection import DbConnection
+from LusiPython.DbConnection import DbConnection
 
 #---------------------
 # Local definitions --
 #---------------------
-def _default_host():
-    return "psdb.slac.stanford.edu"
 
-def _default_database():
-    return "interface_db"
-
+_conn_str = "Server=psdb.slac.stanford.edu;Database=interface_db;"
 
 #---------------------------------
 #  Application class definition --
@@ -62,17 +58,9 @@ class ICStatus ( LusiPyApp ) :
 
         LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
 
-        self._parser.add_option ( '-d', "--database",
-                                  action="store", dest="database", default=_default_database(),
-                                    help="override default database name (%s)" % _default_database())
-
-        self._parser.add_option ( '-H', "--host",
-                                  action="store", dest="host", default=_default_host(),
-                                    help="override default host name (%s)" % _default_host())
-
-        self._parser.add_option ( '-P', "--port",
-                                  action="store", dest="port", default=None, type='int', 
-                                    help="override default port number" )
+        self._parser.add_option ( '-d', "--conn-string",
+                                  action="store", dest="conn_string", default=_conn_str,
+                                  help="database connection string", metavar="CONN_STRING" )
 
         self._parser.add_option ( '-u', "--user",
                                   action="store", dest="user", default=None,
@@ -82,13 +70,9 @@ class ICStatus ( LusiPyApp ) :
                                   action="store", dest="password", default=None,
                                   help="specify user password (no password by default)" )
 
-        self._parser.add_option ( '-f', "--pwd-file",
-                                  action="store", dest="pwd_file", default=None,
-                                  help="specify file with user name and password" )
-
         self._parser.add_option ( '-e', "--experiment",
                                   action="store", dest="experiment", default=None,
-                                    help="limit display to particular instrument:experiment" )
+                                  help="limit display to particular instrument:experiment" )
 
         self._parser.add_option ( '-Q', "--queue",
                                   action="store_true", dest="queue", default=False,
@@ -123,23 +107,23 @@ class ICStatus ( LusiPyApp ) :
             return 2
 
         # create database instance
-        conn = DbConnection( self._options.host, self._options.port, 
-                            self._options.database, self._options.user,
-                            self._options.password, self._options.pwd_file,
-                            timeout=0 )
+        conn = DbConnection( conn_string=self._options.conn_string, 
+                             user=self._options.user,
+                             passwd=self._options.password,
+                             timeout = 0 )
 
         # build query
         vars = ()
         if self._options.last :
             subq = "SELECT instrument, experiment, run_number, max(created) AS last FROM fileset"
             if self._options.experiment :
-                w = self._options.experiment.split(':',1)
-                if len(w) == 1 :
+                words = self._options.experiment.split(':', 1)
+                if len(words) == 1 :
                     subq += " WHERE experiment=%s"
-                    vars += (w[0],)
+                    vars += (words[0],)
                 else :
                     subq += " WHERE instrument=%s AND experiment=%s"
-                    vars += (w[0],w[1])
+                    vars += (words[0], words[1])
             subq += " GROUP BY run_number, instrument, experiment"
  
             q = """SELECT fs.id, fs.instrument, fs.experiment, fs.run_number, 
@@ -159,17 +143,17 @@ class ICStatus ( LusiPyApp ) :
             """
         
             if self._options.experiment :
-                w = self._options.experiment.split(':',1)
-                if len(w) == 1 :
+                words = self._options.experiment.split(':', 1)
+                if len(words) == 1 :
                     q += " AND fs.experiment=%s "
-                    vars += (w[0],)
+                    vars += (words[0],)
                 else :
                     q += " AND fs.instrument=%s AND fs.experiment=%s "
-                    vars += (w[0],w[1])
+                    vars += (words[0], words[1])
                 
         if self._options.queue :
             q += " AND stat.name IN (%s,%s,%s) "
-            vars += ('Initial_Entry','Being_Copied','Waiting_Translation')
+            vars += ('Initial_Entry', 'Being_Copied', 'Waiting_Translation')
         if self._options.done :
             q += " AND stat.name IN (%s,%s) "
             vars += ('Archive_Error','Complete')
@@ -182,7 +166,6 @@ class ICStatus ( LusiPyApp ) :
 
         q += " ORDER BY fs.instrument, fs.experiment, fs.run_number, fs.created"
 
-        
 
         # execute query
         self.trace( "query: %s" % q)
@@ -193,9 +176,9 @@ class ICStatus ( LusiPyApp ) :
         # dump it
         rows = cursor.fetchmany()
         while rows :
-	        for r in rows :
-	            print "%-8s %-10s %4d %-20s %8s %-16s" % tuple( r[1:] )
-        	rows = cursor.fetchmany()
+            for row in rows :
+                print "%-8s %-10s %4d %-20s %8s %-16s" % tuple( row[1:] )
+            rows = cursor.fetchmany()
 
 #
 #  run application when imported as a main module

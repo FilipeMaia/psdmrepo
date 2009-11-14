@@ -36,13 +36,12 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import os
-import pwd
 import signal
 import socket
 import time
 import fnmatch
 import traceback
-from pprint import *
+from pprint import pformat
 
 #---------------------------------
 #  Imports of base class module --
@@ -54,16 +53,14 @@ from LusiPython.LusiPyApp import LusiPyApp
 #-----------------------------
 from InterfaceCtlr.TranslatorThread import TranslatorThread
 from InterfaceCtlr.InterfaceDb import InterfaceDb
-from InterfaceCtlr.DbConnection import DbConnection
+from LusiPython.DbConnection import DbConnection
 from LusiTime.Time import Time
 
 #---------------------
 # Local definitions --
 #---------------------
 
-#-------------------
-# Local functions --
-#-------------------
+_CONN_STR = "Server=psdb.slac.stanford.edu;Database=interface_db;"
 
 def _sig2int(signum, frame):
     # convert signals to SIGINT
@@ -80,13 +77,6 @@ def _sig2int(signum, frame):
 
 class Controller ( LusiPyApp ) :
 
-    # =======================================================================
-    # Database connection parameters and connection handle. They would change
-    # their default state at the first attempt to connect to the database.
-    # =======================================================================
-
-    __host       = "psdb.slac.stanford.edu"
-    __database   = "interface_db"
 
     # ===========
     # constructor
@@ -101,37 +91,25 @@ class Controller ( LusiPyApp ) :
 
         # Add application options, see optparse module for details -------------
         #
-        self._parser.add_option ( '-D', "--database",
-								  action="store", dest="database", default=self.__database,
-				      			  help="override default database name (%s)" % self.__database)
+        self._parser.add_option ( '-d', "--conn-string",
+                                  action="store", dest="conn_string", default=_CONN_STR,
+                                  help="database connection string", metavar="CONN_STRING" )
 
-        self._parser.add_option ( '-H', "--host",
-								  action="store", dest="host", default=self.__host,
-				      			  help="override default host name (%s)" % self.__host)
-
-        self._parser.add_option ( '-P', "--port",
-								  action="store", dest="port", default=None, type="int",
-				      			  help="override default port number" )
-
-        self._parser.add_option ( '-U', "--user",
-								  action="store", dest="user", default=None,
-								  help="override default user name" )
+        self._parser.add_option ( '-u', "--user",
+                                  action="store", dest="user", default=None,
+                                  help="override default user name" )
 
         self._parser.add_option ( '-p', "--password",
                                   action="store", dest="password", default=None,
-                                  help="specify MySQL password (no password by default)" )
-
-        self._parser.add_option ( '-f', "--pwd-file",
-                                  action="store", dest="pwd_file", default=None,
-                                  help="specify file with user name and password" )
+                                  help="specify user password (no password by default)" )
 
         self._parser.add_option ( '-c', "--config",
                                   action="append", dest="config", default=[],
-                                  help="specify configuration section in the database" )
+                                  help="specify configuration section in the database", metavar="STRING" )
 
         self._parser.add_option ( '-n', "--threads",
                                   action="store", dest="threads", default=1, type='int',
-                                  help="number of translators to run simultaneously" )
+                                  help="number of translators to run simultaneously", metavar="NUMBER" )
 
         # other instance variables
         self._db = None
@@ -188,6 +166,7 @@ class Controller ( LusiPyApp ) :
                     # check if there is a fileset with Initial_Entry and find files for it
                     fs = self._db.get_fileset('Initial_Entry')
                     if fs:
+                        fs_id = fs['id']
                         # check the files
                         if fs['xtc_files'] :
                             self.error ( 'expecting empty fileset: %s', pformat(fs) )
@@ -206,6 +185,7 @@ class Controller ( LusiPyApp ) :
                     # now try to see if there is a fileset with files
                     fs = self._db.get_fileset('Waiting_Translation')
                     if fs:
+                        fs_id = fs['id']
                         # must have some files associated
                         if not fs['xtc_files'] :
                             self.error ( 'expecting non-empty fileset: %s', pformat(fs) )
@@ -268,11 +248,10 @@ class Controller ( LusiPyApp ) :
         """
 
         # create database instance
-        conn = DbConnection( self._options.host, self._options.port, 
-                            self._options.database, self._options.user,
-                            self._options.password, self._options.pwd_file )
+        conn = DbConnection( conn_string=self._options.conn_string, 
+                             user=self._options.user,
+                             passwd=self._options.password )
         self._db = InterfaceDb( conn, self ) 
-
 
         # define new controller instance
         host = socket.getfqdn(socket.gethostname())
@@ -283,7 +262,7 @@ class Controller ( LusiPyApp ) :
         self._perm_config["_translate_uri"] = ctrl['translate_uri']
         self._perm_config["_controller_id"] = ctrl['id']
 
-        self.info ("Successful init_controller on host %s started %s", host,Time.now() )
+        self.info ("Successful init_controller on host %s started %s", host, Time.now() )
 
 
     # =========================================
@@ -308,15 +287,15 @@ class Controller ( LusiPyApp ) :
         
         xtc_root = self._config.get( 'xtc-location-root', None )
         if not xtc_root :
-             self.error( 'configuration parameter xtc-location-root not defined, check -c options and config_def table' )
-             return []
+            self.error( 'configuration parameter xtc-location-root not defined, check -c options and config_def table' )
+            return []
         xtc_name_pattern = self._config.get( 'xtc-name-pattern', None )
         if not xtc_name_pattern :
-             self.error( 'configuration parameter xtc-name-pattern not defined, check -c options and config_def table' )
-             return []
+            self.error( 'configuration parameter xtc-name-pattern not defined, check -c options and config_def table' )
+            return []
 
         # get the list of subdirectories
-        files = [ os.path.join(xtc_root,f) for f in os.lisdir( xtc_root ) ]
+        files = [ os.path.join(xtc_root, f) for f in os.listdir( xtc_root ) ]
         subdirs = [ f for f in files if os.path.isdir(f) ]
 
         # find all files matching a pattern
