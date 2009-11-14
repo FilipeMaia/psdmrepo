@@ -78,6 +78,7 @@ private:
   std::list<O2OXtcFileName>::const_iterator m_iter ;
   FILE* m_file ;
   Pds::XtcFileIterator* m_dgiter ;
+  uint64_t m_count ;
 
   // Copy constructor and assignment are disabled by default
   O2OXtcDechunk ( const O2OXtcDechunk& ) ;

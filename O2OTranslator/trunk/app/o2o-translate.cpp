@@ -49,6 +49,7 @@
 #include "O2OTranslator/O2OXtcIterator.h"
 #include "O2OTranslator/O2OXtcMerger.h"
 #include "O2OTranslator/O2OXtcScannerI.h"
+#include "O2OTranslator/O2OXtcValidator.h"
 #include "pdsdata/xtc/XtcFileIterator.hh"
 
 //-----------------------------------------------------------------------
@@ -240,48 +241,54 @@ O2O_Translate::runApp ()
   }
   boost::thread readerThread( DgramReader ( files, dgqueue, m_dgramsize.value(), m_mergeMode.value() ) ) ;
 
-
+  uint64_t count = 0 ;
 
   // get all datagrams
   while ( Pds::Dgram* dg = dgqueue.pop() ) {
 
+    ++ count ;
+    
     WithMsgLogRoot( trace, out ) {
       const ClockTime& clock = dg->seq.clock() ;
-      out << "Transition: "
+      out << "Transition: #" << count << " " 
           << std::left << std::setw(12) << Pds::TransitionId::name(dg->seq.service())
           << "  time: " << clock.seconds() << '.'
           << std::setfill('0') << std::setw(9) << clock.nanoseconds()
           << "  payloadSize: " << dg->xtc.sizeofPayload() ;
     }
 
-    // sanity check
-    if ( dg->xtc.sizeofPayload() < 0 ) {
+    // validate the XTC structure 
+    O2OXtcValidator validator ;
+    if ( validator.process( &(dg->xtc) ) == 0 ) {
+      
       WithMsgLogRoot( error, out ) {
-        out << "Negative payload size in XTC: Transition: "
+        out << "Validation failed: Transition: #" << count << " "
             << Pds::TransitionId::name(dg->seq.service())
-            << " payloadSize: " << dg->xtc.sizeofPayload() ;
+            << ", skipping datagram";
       }
-      return 3 ;
-    }
+      
+    } else {
 
-    // give this event to every scanner
-    for ( std::vector<O2OXtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
-
-      O2OXtcScannerI* scanner = *i ;
-
-      try {
-        scanner->eventStart ( *dg ) ;
-
-        O2OXtcIterator iter( &(dg->xtc), scanner );
-        iter.iterate();
-
-        scanner->eventEnd ( *dg ) ;
-      } catch ( std::exception& e ) {
-        MsgLogRoot( error, "exception caught processing datagram: " << e.what() ) ;
-        return 3 ;
+      // give this event to every scanner
+      for ( std::vector<O2OXtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
+  
+        O2OXtcScannerI* scanner = *i ;
+  
+        try {
+          scanner->eventStart ( *dg ) ;
+  
+          O2OXtcIterator iter( &(dg->xtc), scanner );
+          iter.iterate();
+  
+          scanner->eventEnd ( *dg ) ;
+        } catch ( std::exception& e ) {
+          MsgLogRoot( error, "exception caught processing datagram: " << e.what() ) ;
+          return 3 ;
+        }
       }
-    }
 
+    }
+  
     // all datagrams must be explicitely deleted
     delete [] (char*)dg ;
   }

@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-04
+2009-11-13 Andy Salnikov
+- add some protection for damaged datagrams, right now all damaged
+  datagrams are discarded in O2OXtcDechunk class
+- also added datagram validation option via new class O2OXtcValidator
+
 Tag: V00-04-03
 2009-10-31 Andy Salnikov
 - catch-rethrow exceptions in the datagram reading thread

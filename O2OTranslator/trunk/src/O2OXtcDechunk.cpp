@@ -25,6 +25,7 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/O2OExceptions.h"
+#include "pdsdata/xtc/Xtc.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -51,6 +52,7 @@ O2OXtcDechunk::O2OXtcDechunk ( const std::list<O2OXtcFileName>& files, size_t ma
   , m_iter()
   , m_file(0)
   , m_dgiter(0)
+  , m_count(0)
 {
   // sort the list according to the chunk number
   if ( sort ) m_files.sort();
@@ -88,11 +90,13 @@ O2OXtcDechunk::next()
         throw O2OFileOpenException(m_iter->path()) ;
       }
       m_dgiter = new Pds::XtcFileIterator ( m_file, m_maxDgSize ) ;
+      m_count = 0 ;
     }
 
     // try to read next event from it
     dgram = m_dgiter->next() ;
-
+    ++ m_count ;
+    
     // if failed to read go to next file
     if ( not dgram ) {
       delete m_dgiter ;
@@ -101,6 +105,19 @@ O2OXtcDechunk::next()
       m_file = 0 ;
 
       ++ m_iter ;
+    } else {
+      
+      // get rid of damaged datagrams
+      const Pds::Xtc& xtc = dgram->xtc ;
+      if ( xtc.damage.value() ) {
+        MsgLog( logger, warning, "XTC damage: " << std::hex << xtc.damage.value() << std::dec
+            << " level: " << int(xtc.src.level()) << '#' << Pds::Level::name(xtc.src.level())
+            << " type: " << int(xtc.contains.id()) << '#' << Pds::TypeId::name(xtc.contains.id()) 
+            << "/V" << xtc.contains.version() 
+            << "\n    Skipping damaged event -- file: " << m_iter->path() << " event: " << m_count ) ;
+        dgram = 0 ;
+      }
+      
     }
 
   }

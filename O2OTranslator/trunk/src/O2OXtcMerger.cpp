@@ -20,6 +20,7 @@
 // C/C++ Headers --
 //-----------------
 #include <map>
+#include <iomanip>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -114,9 +115,6 @@ O2OXtcMerger::~O2OXtcMerger ()
   for ( std::vector<O2OXtcDechunk*>::const_iterator it = m_streams.begin() ; it != m_streams.end() ; ++ it ) {
     delete *it ;
   }
-  for ( std::vector<Pds::Dgram*>::const_iterator it = m_dgrams.begin() ; it != m_dgrams.end() ; ++ it ) {
-    delete *it ;
-  }
 }
 
 // read next datagram, return zero pointer after last file has been read,
@@ -170,11 +168,14 @@ O2OXtcMerger::next()
             << m_streams[stream]->chunkName().basename() 
             << " service = " << Pds::TransitionId::name(dg->seq.service())
             << " time = " << dg->seq.clock().seconds() << " sec " << dg->seq.clock().nanoseconds() << " nsec"
+            << " damage = " << std::hex << dg->xtc.damage.value() << std::dec
             << "\n    stream[" << i << "] = " 
             << m_streams[i]->chunkName().basename() 
             << " service = " << Pds::TransitionId::name(m_dgrams[i]->seq.service())
             << " time = " << m_dgrams[i]->seq.clock().seconds() << " sec " << m_dgrams[i]->seq.clock().nanoseconds() << " nsec"
+            << " damage = " << std::hex << m_dgrams[i]->xtc.damage.value() << std::dec
             ) ;
+        delete [] (char*)dg ;
         throw O2OXTCSyncException() ;
       }
     }

@@ -24,6 +24,7 @@ public:
     for ( unsigned i=0 ; i < _depth ; ++ i ) printf("  ");
     Level::Type level = xtc->src.level();
     printf("%s level: ",Level::name(level));
+    printf("damage %x ", xtc->damage.value() );
     if (level==Level::Source or level==Pds::Level::Reporter or level==Pds::Level::Control) {
       DetInfo& info = *(DetInfo*)(&xtc->src);
       printf("%s.%d %s.%d",
@@ -89,8 +90,9 @@ int main(int argc, char* argv[]) {
     const Pds::Sequence& seq = dg->seq ;
     const Pds::ClockTime& clock = seq.clock() ;
     const Pds::TimeStamp& stamp = seq.stamp() ;
-    printf("%s transition: type %d, time %u sec %u nsec, ticks %u, fiducials %u, control %u, payloadSize %d\n",
+    printf("%s transition: damage %x, type %d, time %u sec %u nsec, ticks %u, fiducials %u, control %u, payloadSize %d\n",
            TransitionId::name(seq.service()),
+           dg->xtc.damage.value(),
            int(seq.type()),
            clock.seconds(), clock.nanoseconds(),
            stamp.ticks(),stamp.fiducials(),stamp.control(),
