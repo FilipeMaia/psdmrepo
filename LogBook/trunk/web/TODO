@@ -27,6 +27,11 @@ KNOWN PROBLEMS, BUGS
 - the same issue in the index.php file. Disable 'Create Shift' button
   in the top-level menu bar ('Shifts')
 
++ fixed a a bug in the LogBookExperiment::find_last_shift() method which wasn't usinng
+  an experiment identifier to narrow down the begin time.
+
++ fixed a bug in the file descriptions list of the GUI apps when replying to a message.
+
 ___________________________
 URGENT PROBLEMS FOR LOGBOOK
 
@@ -52,7 +57,7 @@ URGENT PROBLEMS FOR LOGBOOK
   IMPORTANT: This selector would only work if the normal (newest on top) order of messages is used.
   Otherwise disable the 
 
-- implement 'Subscribe' functionality (schema changes may be required to register non-SLAC e-mail
++ implement 'Subscribe' functionality (schema changes may be required to register non-SLAC e-mail
   addresses by users who're looged into shared accounts, or to register multiple e-mail addresses).
   Allow users to manage their subscriptions (unsubscribe/subscribe/change e-mail address/choose
   between TEXT|HTML format of e-mail messages). Each message received by a user would have a link

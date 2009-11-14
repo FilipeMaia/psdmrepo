@@ -11,6 +11,16 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-09
+2009-11-13 Igor Gaponenko
+- fixed a a bug in the LogBookExperiment::find_last_shift() method which wasn't usinng
+an experiment identifier to narrow down the begin time.
+- fixed a bug in the file descriptions list of the GUI apps when replying to a message
+(a s a result it was one less attachment posted)
+- move divs for message tags and file descriptions close to the definition of the forms
+in both New MEssage and message Reply dialogs to deal with the out-of-box PHP 5.1.6 issue.
+- cleaned up the code of the GUI app
+
 Tag: V00-01-08
 2009-11-09 Igor Gaponenko
 - implemented e-mail notifications for subscribed users

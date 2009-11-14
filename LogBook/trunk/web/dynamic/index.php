@@ -4,191 +4,214 @@ and open the template in the editor.
 -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-  <head>
-    <title>Electronic LogBook: </title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<head>
+<title>Electronic LogBook:</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-    <!--
+<!--
     Standard reset, fonts and grids
     -->
-    <link rel="stylesheet" type="text/css" href="/yui/build/reset-fonts-grids/reset-fonts-grids.css">
+<link rel="stylesheet" type="text/css" href="/yui/build/reset-fonts-grids/reset-fonts-grids.css">
 
-    <!--
+<!--
     CSS for YUI
     -->
-    <link rel="stylesheet" type="text/css" href="/yui/build/fonts/fonts-min.css">
-    <link rel="stylesheet" type="text/css" href="/yui/build/menu/assets/skins/sam/menu.css">
-    <link rel="stylesheet" type="text/css" href="/yui/build/paginator/assets/skins/sam/paginator.css" />
-    <link rel="stylesheet" type="text/css" href="/yui/build/datatable/assets/skins/sam/datatable.css" />
-    <link rel="stylesheet" type="text/css" href="/yui/build/button/assets/skins/sam/button.css" />
-    <link rel="stylesheet" type="text/css" href="/yui/build/container/assets/skins/sam/container.css" />
-    <link rel="stylesheet" type="text/css" href="/yui/build/treeview/assets/skins/sam/treeview.css" />
+<link rel="stylesheet" type="text/css" href="/yui/build/fonts/fonts-min.css">
+<link rel="stylesheet" type="text/css" href="/yui/build/menu/assets/skins/sam/menu.css">
+<link rel="stylesheet" type="text/css" href="/yui/build/paginator/assets/skins/sam/paginator.css" />
+<link rel="stylesheet" type="text/css" href="/yui/build/datatable/assets/skins/sam/datatable.css" />
+<link rel="stylesheet" type="text/css" href="/yui/build/button/assets/skins/sam/button.css" />
+<link rel="stylesheet" type="text/css" href="/yui/build/container/assets/skins/sam/container.css" />
+<link rel="stylesheet" type="text/css" href="/yui/build/treeview/assets/skins/sam/treeview.css" />
 
-    <!--bring in the folder-style CSS for the TreeView Control
-    <link rel="stylesheet" type="text/css" href="/yui/examples/treeview/assets/css/folders/tree.css" />
-    -->
-    <!--
-    Page-specific styles
-    -->
-    <style type="text/css">
+<!--bring in the folder-style CSS for the TreeView Control
+<link rel="stylesheet" type="text/css" href="/yui/examples/treeview/assets/css/folders/tree.css" />
+-->
+<!--
+Page-specific styles
+-->
+<style type="text/css">
 
-    /*margin and padding on body element
-      can introduce errors in determining
-      element position and are not recommended;
-      we turn them off as a foundation for YUI
-      CSS treatments. */
+    /* margin and padding on body element can introduce errors in determining
+       element position and are not recommended;
+       we turn them off as a foundation for YUI CSS treatments.
+     */
     body {
-        margin:0;
-        padding:0;
-        /*background-color:#e0e0e0;*/
-        /*background:url('images/paperbg.gif');*/
+        margin: 0;
+        padding: 0;
+        /*
+         background-color:#e0e0e0;
+         background:url('images/paperbg.gif');
+         */
     }
+
     div.yui-b p {
         margin: 0 0 .5em 0;
         color: #999;
     }
+
     div.yui-b p strong {
         font-weight: bold;
         color: #000;
     }
+    
     div.yui-b p em {
         color: #000;
     }
+    
     .lb_label {
-        text-align:left;
+        text-align: left;
         /*color:#0071bc;*/
-        font-weight:bold;
+        font-weight: bold;
     }
-    a, .lb_link {
-        text-decoration:none;
-        font-weight:bold;
-        color:#0071bc;
-        /*
-        */
+    
+    a,.lb_link {
+        text-decoration: none;
+        font-weight: bold;
+        color: #0071bc;
     }
-    a:hover, a.lb_link:hover {
-        color:red;
+    
+    a:hover,a.lb_link:hover {
+        color: red;
     }
+    
     .lb_msg_subject {
-        color:maroon;
+        color: maroon;
         /*font-style:italic;*/
     }
+    
     input.lb_sparse {
-        padding:2px;
-        color:blue;
+        padding: 2px;
+        color: blue;
     }
+    
     div.help_area {
-        width:800px;
+        width: 800px;
     }
+    
     p.help {
         font-family: Times, serif;
-        font-size:18px;
-        padding-bottom:1em;
+        font-size: 18px;
+        padding-bottom: 1em;
     }
+    
     #application_header {
-        background-color:#d0d0d0;
-        padding:8px;
-        padding-bottom:12px;
-        margin:0px;
+        background-color: #d0d0d0;
+        padding: 8px;
+        padding-bottom: 12px;
+        margin: 0px;
     }
+    
     #application_title {
-        margin-left:5px;
+        margin-left: 5px;
         font-family: "Times", serif;
-        font-size:32px;
+        font-size: 32px;
     }
+    
     #application_subtitle {
-        color:#0071bc;
-        font-size:24px;
+        color: #0071bc;
+        font-size: 24px;
     }
+    
     #menubar {
         margin: 0 0 10px 0;
     }
+    
     #context {
-        margin:20px;
-        margin-bottom:0px;
-        font-size:16px;
-        text-align:left;
+        margin: 20px;
+        margin-bottom: 0px;
+        font-size: 16px;
+        text-align: left;
     }
+    
     #nav-and-work-areas {
-        margin-left:20px;
+        margin-left: 20px;
     }
+    
     #navarea {
-        overflow:auto;
-        padding:20px;
-        border-right:solid 4px #f0f0f0;
-        display:none;
+        overflow: auto;
+        padding: 20px;
+        border-right: solid 4px #f0f0f0;
+        display: none;
     }
+    
     #workarea {
-        overflow:auto;
-        padding:20px;
-        /*background-color:#E3F6CE;*/
-        /*background-color:#f0f0f0;*/
+        overflow: auto;
+        padding: 20px;
+        /*background-color:#E3F6CE;*/ /*background-color:#f0f0f0;*/
     }
-    #experiment_info_container,
-    #run_parameters {
-        padding:10px;
-        margin-left:10px;
+    
+    #experiment_info_container,#run_parameters {
+        padding: 10px;
+        margin-left: 10px;
     }
+    
     #workarea_table_container table {
+        
     }
+    
     #workarea_table_paginator,
     #params_table_page,
     #runs_table_paginator,
     #shifts_table_paginator,
     #tags_table_paginator,
-    #files_table_paginator {
-        margin-left:auto;
-        margin-right:auto;
+    #files_table_paginator
+    {
+        margin-left: auto;
+        margin-right: auto;
     }
+    
     #workarea_table_container,
     #workarea_table_container .yui-dt-loading {
-        text-align:center;
-        background-color:transparent;
+        text-align: center;
+        background-color: transparent;
     }
+    
     #actions_container,
     #params_actions_container,
     #runs_actions_container,
-    #shifts_actions_container {
-        margin-top:18px;
-        margin-left:0px;
-        text-align:left;
+    #shifts_actions_container
+        {
+        margin-top: 18px;
+        margin-left: 0px;
+        text-align: left;
     }
-    </style>
+</style>
 
-    <!--
-    Dependency source files
-    -->
-    <script type="text/javascript" src="/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-    <script type="text/javascript" src="/yui/build/animation/animation.js"></script>
-    <script type="text/javascript" src="/yui/build/container/container_core.js"></script>
+<!--
+Dependency source files
+-->
+<script type="text/javascript" src="/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="/yui/build/animation/animation.js"></script>
+<script type="text/javascript" src="/yui/build/container/container_core.js"></script>
 
-    <script type="text/javascript" src="/yui/build/dragdrop/dragdrop-min.js"></script>
-    <script type="text/javascript" src="/yui/build/container/container-min.js"></script>
+<script type="text/javascript" src="/yui/build/dragdrop/dragdrop-min.js"></script>
+<script type="text/javascript" src="/yui/build/container/container-min.js"></script>
 
-    <!--
-    Menu source file
-    -->
-    <script type="text/javascript" src="/yui/build/menu/menu.js"></script>
-    <script type="text/javascript" src="/yui/build/connection/connection-min.js"></script>
-    <script type="text/javascript" src="/yui/build/json/json-min.js"></script>
-    <script type="text/javascript" src="/yui/build/element/element-min.js"></script>
-    <script type="text/javascript" src="/yui/build/paginator/paginator-min.js"></script>
-    <script type="text/javascript" src="/yui/build/datasource/datasource-min.js"></script>
-    <script type="text/javascript" src="/yui/build/datatable/datatable-min.js"></script>
-    <script type="text/javascript" src="/yui/build/button/button-min.js"></script>
+<!--
+Menu source file
+-->
+<script type="text/javascript" src="/yui/build/menu/menu.js"></script>
+<script type="text/javascript" src="/yui/build/connection/connection-min.js"></script>
+<script type="text/javascript" src="/yui/build/json/json-min.js"></script>
+<script type="text/javascript" src="/yui/build/element/element-min.js"></script>
+<script type="text/javascript" src="/yui/build/paginator/paginator-min.js"></script>
+<script type="text/javascript" src="/yui/build/datasource/datasource-min.js"></script>
+<script type="text/javascript" src="/yui/build/datatable/datatable-min.js"></script>
+<script type="text/javascript" src="/yui/build/button/button-min.js"></script>
 
-    <script type="text/javascript" src="/yui/build/yahoo/yahoo-min.js"></script>
-    <script type="text/javascript" src="/yui/build/dom/dom-min.js"></script>
-    <script type="text/javascript" src="/yui/build/treeview/treeview-min.js"></script>
+<script type="text/javascript" src="/yui/build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="/yui/build/dom/dom-min.js"></script>
+<script type="text/javascript" src="/yui/build/treeview/treeview-min.js"></script>
 
-    <!--
-    Custom JavaScript
-    -->
-    <script type="text/javascript" src="Menubar.js"></script>
-    <script type="text/javascript" src="Dialogs.js"></script>
-    <script type="text/javascript" src="Loader.js"></script>
-    <script type="text/javascript" src="JSON.js"></script>
-    <script type="text/javascript" src="Utilities.js"></script>
+<!--
+Custom JavaScript
+-->
+<script type="text/javascript" src="Menubar.js"></script>
+<script type="text/javascript" src="Dialogs.js"></script>
+<script type="text/javascript" src="Loader.js"></script>
+<script type="text/javascript" src="JSON.js"></script>
+<script type="text/javascript" src="Utilities.js"></script>
 
 <!--
 PHP Generated JavaScript with initialization parameters
@@ -214,7 +237,7 @@ var instruments = [
 HERE;
     $first = true;
     foreach( $instruments as $i ) {
-    	$is_location_str = $i->is_location() ? 'true' : 'false';
+        $is_location_str = $i->is_location() ? 'true' : 'false';
         if( $first ) {
             $first = false;
             echo <<<HERE
@@ -236,8 +259,8 @@ var experiments = [
 HERE;
     $first = true;
     foreach( $experiments as $e ) {
-    	$is_facility_str = $e->is_facility() ? 'true' : 'false';
-    	if( $first ) {
+        $is_facility_str = $e->is_facility() ? 'true' : 'false';
+        if( $first ) {
             $first = false;
             echo <<<HERE
 
@@ -348,7 +371,7 @@ HERE;
                 $instr_name = $instrument->name();
                 $exper_id   = $experiment->id();
                 $exper_name = $experiment->name();
-            	echo "  select_experiment_and_message({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$id});";
+                echo "  select_experiment_and_message({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$id});";
             }
         } else {
             echo "  alert( 'unsupported action: {$action}' );";
@@ -485,8 +508,8 @@ function set_current_selection( instr_id, instr_name, exper_id, exper_name ) {
  * Alert if the specified id doesn't correspond to anything.
  */
 function is_facility( id ) {
-	for( i = 0; i < experiments.length; i++ )
-		if( experiments[i].id == id ) return experiments[i].is_facility;
+    for( i = 0; i < experiments.length; i++ )
+        if( experiments[i].id == id ) return experiments[i].is_facility;
     alert("no experiment/facility for id: "+id);
 }
 function experiment_or_facility( id ) {
@@ -523,21 +546,21 @@ menubar_data.push ( {
 var locations_list   = [];
 var instruments_list = [];
 for( i = 0; i < instruments.length; i++ ) {
-	if( instruments[i].is_location ) {
-		locations_list.push (
+    if( instruments[i].is_location ) {
+        locations_list.push (
             {
                 text: instruments[i].name,
                 url:  "javascript:list_experiments('"+instruments[i].name+"', true)"
             }
         );
-	} else {
+    } else {
         instruments_list.push (
             {
                 text: instruments[i].name,
                 url:  "javascript:list_experiments('"+instruments[i].name+"', false)"
             }
         );
-	}
+    }
 }
 var menubar_group_facilities = menubar_data.length;
 menubar_data.push ( {
@@ -930,14 +953,12 @@ function create_messages_dialog( scope ) {
 
     var html_new_message =
         '<div id="new_message_dialog" style="padding:10px; margin-left:10px; margin-top:30px; background-color:#e0e0e0; border:solid 1px #c0c0c0; display:none;">'+
-        //'<div style="float:right; position:relative; right:-8px; top:-8px;">'+
-        //'  <a href="javascript:close_messages_dialog()"><img src="images/Close.png" / ></a> '+
-        //'</div>'+
-        //'<center>'+
         '<form enctype="multipart/form-data" name="new_message_form" action="NewFFEntry.php" method="post">'+
         '  <input type="hidden" name="author_account" value="'+auth_remote_user+'" style="padding:2px; width:200px;" />'+
         '  <input type="hidden" name="id" value="'+current_selection.experiment.id+'" />'+
-        '  <input type="hidden" name="scope" value="'+scope+'" />';
+        '  <input type="hidden" name="scope" value="'+scope+'" />'+
+        '  <div id="file_descriptions"></div>'+
+        '  <div id="message_tags"></div>';
     if( scope == "experiment") {
          html_new_message +=
         '  <input type="hidden" name="actionSuccess" value="select_experiment" />';
@@ -952,16 +973,11 @@ function create_messages_dialog( scope ) {
     }
     html_new_message +=
         '  <input type="hidden" name="MAX_FILE_SIZE" value="10000000">'+
-        //'  <div style="margin-left:10px; margin-bottom:5px;">'+
         '  <div>'+
         '    <em class="lb_label">New message:</em>'+
         '  </div>'+
-        //'  <table style="width:100%; margin-left:10px;"></tbody>'+
         '  <table><tbody>'+
         '    <tr>'+
-        //'      <td valign="top">'+
-        //'        <em class="lb_label">New message: </em>'+
-        //'      </td>'+
         '      <td valign="top">'+
         '        <div id="new_message_body" style="margin-right:0px; padding:4px;">'+
         '          <input id="new_message_text" type="text" name="message_text" size="128" value="" />'+
@@ -977,7 +993,6 @@ function create_messages_dialog( scope ) {
         '    </tr>'+
         '  </tbody></table>'+
         '</form>'+
-        //'</center>'+
         '</div>';
 
     document.getElementById('messages_actions_container').innerHTML=
@@ -1132,7 +1147,6 @@ function create_messages_dialog( scope ) {
                 '            <button id="remove_tag_button">Update</button>'+
                 '          </div>'+
                 '        </div>'+
-                '        <div id="message_tags"></div>'+
                 '      </td>'+
                 '      <td><div style="width:8px;"></div></td>'+
                 '      <td valign="top">'+
@@ -1146,7 +1160,6 @@ function create_messages_dialog( scope ) {
                 '            <button id="remove_file_button">Update</button>'+
                 '          </div>'+
                 '        </div>'+
-                '        <div id="file_descriptions"></div>'+
                 '      </td>'+
                 '    </tr>'+
                 '  </tbody></table>'+
@@ -1200,6 +1213,7 @@ function create_messages_dialog( scope ) {
                 document.getElementById('new_message_text').value+'" />';
             new_message_body.style.paddingBottom="4px";
             this.tags_table = null;
+            this.files_table = null;
         }
         this.extendedShown = !this.extendedShown;
     }
@@ -1296,6 +1310,8 @@ function create_message_reply_dialog( rid, message_id ) {
         '  <input type="hidden" name="message_id" value="'+message_id+'" />'+
         '  <input type="hidden" name="actionSuccess" value="select_experiment" />'+
         '  <input type="hidden" name="MAX_FILE_SIZE" value="10000000">'+
+        '  <div id="message_reply_file_descriptions"></div>'+
+        '  <div id="message_tags"></div>'+
         '  <div>'+
         '    <em class="lb_label">Reply with:</em>'+
         '  </div>'+
@@ -1322,11 +1338,9 @@ function create_message_reply_dialog( rid, message_id ) {
     this.message_reply_extend_button = new YAHOO.widget.Button( "message_reply_extend_button" );
     this.message_reply_submit_button = new YAHOO.widget.Button( "message_reply_submit_button" );
     this.message_reply_cancel_button = new YAHOO.widget.Button( "message_reply_cancel_button" );
-    //this.close_messages_dialog = function() { rid.style.display = 'none'; }
     this.message_reply_cancel_button.on (
         "click",
         function() { rid.style.display = 'none'; }
-        //close_messages_dialog
     );
 
     var tags = [ { 'delete': false, 'tag': '' , 'value': '' } ];
@@ -1380,24 +1394,19 @@ function create_message_reply_dialog( rid, message_id ) {
     this.oPushButtonRemovFile = null;
 
     function synchronize_files_data() {
-        //if( this.files_table == null ) return;
         if( files_table == null ) return;
-        //var rs = this.files_table.dataTable.getRecordSet();
         var rs = files_table.dataTable.getRecordSet();
         var rs_length = rs.getLength();
-        //this.files = [];
         files = [];
         for( var i = 0; i < rs_length; i++ ) {
             var r = rs.getRecord(i);
             if( !r.getData('delete')) {
-                //this.files.push ( {
                 files.push ( {
                     file: r.getData('file'),
                     filename: document.getElementById(r.getData('id')).value,
                     description: r.getData('description'),
                     id: r.getData('id')});
             } else {
-                //this.files_table.dataTable.deleteRow(i);
                 files_table.dataTable.deleteRow(i);
             }
         }
@@ -1405,20 +1414,16 @@ function create_message_reply_dialog( rid, message_id ) {
         // Also refresh the markup with inputs for file descriptions
         //
         var descriptions ='';
-        //for( var i = 0; i < this.files.length; i++ ) {
         for( var i = 0; i < files.length; i++ ) {
-            //var id = this.files[i].id;
             var id = files[i].id;
-            //descriptions += ' <'+'input type="hidden" name="'+id+'" value="'+this.files[i].description+'" />';
             descriptions += ' <'+'input type="hidden" name="'+id+'" value="'+files[i].description+'" />';
         }
         document.getElementById('message_reply_file_descriptions').innerHTML=descriptions;
     }
-    var file2attach_sequence=0;
+    var file2attach_sequence=1;
     function AddAndRefreshFilesTable() {
         file2attach_sequence++;
         id = 'file2attach_'+file2attach_sequence;
-        //this.files_table.dataTable.addRow (
         files_table.dataTable.addRow (
             { file: '<input type="file" name="'+id+'" id="'+id+'" />', description: "", id: id }, 0 );
     }
@@ -1455,7 +1460,6 @@ function create_message_reply_dialog( rid, message_id ) {
                 '            <button id="message_reply_remove_tag_button">Update</button>'+
                 '          </div>'+
                 '        </div>'+
-                '        <div id="message_tags"></div>'+
                 '      </td>'+
                 '      <td><div style="width:8px;"></div></td>'+
                 '      <td valign="top">'+
@@ -1469,7 +1473,6 @@ function create_message_reply_dialog( rid, message_id ) {
                 '            <button id="message_reply_remove_file_button">Update</button>'+
                 '          </div>'+
                 '        </div>'+
-                '        <div id="message_reply_file_descriptions"></div>'+
                 '      </td>'+
                 '    </tr>'+
                 '  </tbody></table>'+
@@ -1506,7 +1509,6 @@ function create_message_reply_dialog( rid, message_id ) {
                 "click",
                 function( p_oEvent ) { synchronize_files_data(); }
             );
-            //this.files_table = new TableLocal (
             files_table = new TableLocal (
                 "message_reply_files_table",
                 [ { key: "delete", formatter: "checkbox" },
@@ -1690,17 +1692,7 @@ function create_message_delete_dialog( did, id ) {
 function preview_atatchment( id ) {
 
     var viewarea = document.getElementById('viewarea');
-    //viewarea.style.width = '250px';
-    //viewarea.style.height = '250px';
     viewarea.innerHTML='<img src="ShowAttachment.php?id='+id+'" width="250" height="250"/>';
-
-/*
-    var attachmentWindowRef =
-        window.open(
-            'ShowAttachment.php?id='+id,
-            'attachmentWindow',
-            'toolbar=0,location=1,menubar=0,status=0,directories=0');
-*/
 }
 
 function list_shifts() {
@@ -1968,40 +1960,40 @@ function display_message( id ) {
 
     this.url='SearchOne.php?id='+id;
 
-	var html=
-	    '<div id="messages_area" style="min-width:800px;">'+
-	    '  <img src="images/ajaxloader.gif" />&nbsp;searching messages...'+
-	    '</div>';
+    var html=
+        '<div id="messages_area" style="min-width:800px;">'+
+        '  <img src="images/ajaxloader.gif" />&nbsp;searching messages...'+
+        '</div>';
 
-	document.getElementById('workarea').innerHTML=html;
+    document.getElementById('workarea').innerHTML=html;
 
-	function callback_on_load( result ) {
-	    if( result.ResultSet.Status != "success" ) {
-	        document.getElementById('messages_area').innerHTML = result.ResultSet.Message;
-	    } else {
-	        last_search_result = result.ResultSet.Result;
+    function callback_on_load( result ) {
+        if( result.ResultSet.Status != "success" ) {
+            document.getElementById('messages_area').innerHTML = result.ResultSet.Message;
+        } else {
+            last_search_result = result.ResultSet.Result;
 
-	        // Put the list of all message headers onto the current page
-	        // and expand them all.
-	        //
-	        var html1 = '';
-	        for( var i=last_search_result.length-1; i >= 0 ; i-- )
-	            html1 += event2html(i);
-	        document.getElementById('messages_area').innerHTML = html1;
-	        for( var i = 0; i < last_search_result.length; i++ ) {
-	            var re = last_search_result[i];
-	            var mid = 'message_'+re.id;
-	            var m = document.getElementById(mid);
+            // Put the list of all message headers onto the current page
+            // and expand them all.
+            //
+            var html1 = '';
+            for( var i=last_search_result.length-1; i >= 0 ; i-- )
+                html1 += event2html(i);
+            document.getElementById('messages_area').innerHTML = html1;
+            for( var i = 0; i < last_search_result.length; i++ ) {
+                var re = last_search_result[i];
+                var mid = 'message_'+re.id;
+                var m = document.getElementById(mid);
                 m.style.display = 'block';
                 message_expander_toggle( i );
-	        }
-	    }
-	}
-	function callback_on_failure( http_status ) {
-	    document.getElementById('messages_area').innerHTML=
-	        '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
-	}
-	load_then_call( this.url, callback_on_load, callback_on_failure );
+            }
+        }
+    }
+    function callback_on_failure( http_status ) {
+        document.getElementById('messages_area').innerHTML=
+            '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
+    }
+    load_then_call( this.url, callback_on_load, callback_on_failure );
 }
 
 /* History browser.
@@ -2163,9 +2155,9 @@ function browse_contents() {
     if( is_facility( current_selection.experiment.id )) {
 
         var node_h_d = new YAHOO.widget.TextNode(
-      	    {   label: 'Day by day',
-        	    expanded: false,
-        	    title: 'The day-bay-day history of the facility',
+              {   label: 'Day by day',
+                expanded: false,
+                title: 'The day-bay-day history of the facility',
                 type: TYPE_HISTORY_D },
             node_h );
 
@@ -2191,9 +2183,9 @@ function browse_contents() {
                 node_h );
 
             var node_h_d = new YAHOO.widget.TextNode(
-          	    {   label: 'Data Taking',
-            	    expanded: false,
-            	    title: 'The data taking phase of the experiment',
+                  {   label: 'Data Taking',
+                    expanded: false,
+                    title: 'The data taking phase of the experiment',
                     type: TYPE_HISTORY_D },
                 node_h );
 
@@ -3304,7 +3296,7 @@ function subscribe() {
  
     function create_table() {
         if( subscribers == null )
-        	return new Table (
+            return new Table (
                 "subscribers_table",
                 [ { key: "delete", formatter: "checkbox" },
                   { key: "address",   sortable: true, resizeable: true,
@@ -3317,7 +3309,7 @@ function subscribe() {
                 10
             );
         else
-        	return new TableLocal (
+            return new TableLocal (
                 "subscribers_table",
                 [ { key: "delete", formatter: "checkbox" },
                   { key: "address",   sortable: true, resizeable: true,
@@ -3346,7 +3338,7 @@ function subscribe() {
         for( var i = 0; i < rs_length; i++ ) {
             var r = rs.getRecord(i);
             if( !r.getData('delete'))
-            	subscribers.push ( {
+                subscribers.push ( {
                     "address": r.getData("address"),
                     "subscriber" : r.getData("subscriber"),
                     "subscribed_time" : r.getData("subscribed_time"),
@@ -3403,21 +3395,17 @@ function subscribe() {
 }
 
     </script>
-  </head>
-  <body class="yui-skin-sam" id="body" onload="init()">
-    <div id="application_header">
-      <div>
-        <div style="float:left;">
-          <p id="application_title" style="text-align:left;">
-            <em>Electronic LogBook: </em>
-            <em id="application_subtitle"></em>
-            <!--
+</head>
+<body class="yui-skin-sam" id="body" onload="init()">
+<div id="application_header">
+<div>
+<div style="float: left;">
+<p id="application_title" style="text-align: left;"><em>Electronic
+LogBook: </em> <em id="application_subtitle"></em> <!--
             <em id="application_subtitle"><a href="javascript:list_experiments()">select &gt;</a></em>
-            -->
-          </p>
-        </div>
-        <div style="float:right; height:50px;">
-<?php
+            --></p>
+</div>
+<div style="float: right; height: 50px;"><?php
 if( $auth_svc->authName() == '' ) {
     echo <<<HERE
           <br>
@@ -3425,8 +3413,8 @@ if( $auth_svc->authName() == '' ) {
           <a href="../../apps/logbook"><p title="login here to proceed to the full version of the application">login</p></a>
 HERE;
 } else {
-	$logout = $auth_svc->authType() == 'WebAuth' ? '[<a href="javascript:logout()" title="close the current WebAuth session">logout</a>]' : '&nbsp;';
-	echo <<<HERE
+    $logout = $auth_svc->authType() == 'WebAuth' ? '[<a href="javascript:logout()" title="close the current WebAuth session">logout</a>]' : '&nbsp;';
+    echo <<<HERE
           <table><tbody>
             <tr>
               <td></td>
@@ -3443,42 +3431,39 @@ HERE;
           </tbody></table>
 HERE;
 }
-?>
-        </div>
-        <div style="height:40px;">&nbsp;</div>
-      </div>
-    </div>
-    <div id="menubar" class="yuimenubar yuimenubarnav"></div>
-    <p id="context"></p>
-    <br>
-    <div id="popupdialogs"></div>
-    <div id="nav-and-work-areas" align="left">
-      <table>
-        <tbody>
-          <tr>
-            <td valign="top">
-              <!--
+?></div>
+<div style="height: 40px;">&nbsp;</div>
+</div>
+</div>
+<div id="menubar" class="yuimenubar yuimenubarnav"></div>
+<p id="context"></p>
+<br>
+<div id="popupdialogs"></div>
+<div id="nav-and-work-areas" align="left">
+<table>
+    <tbody>
+        <tr>
+            <td valign="top"><!--
               Optional navigation tools (menus, trees, etc.) can be placed
               below.
               -->
-              <div id="navarea"></div>
+            <div id="navarea"></div>
             </td>
-            <td valign="top">
-              <!--
+            <td valign="top"><!--
               Here comes the main viwing area of the application.
               -->
-              <div id="workarea"></div>
+            <div id="workarea"></div>
             </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </body>
+        </tr>
+    </tbody>
+</table>
+</div>
+</body>
 </html>
 
 <?php
 
-    $logbook->commit();
+$logbook->commit();
 
 } catch( LogBookException $e ) {
     print $e->toHtml();

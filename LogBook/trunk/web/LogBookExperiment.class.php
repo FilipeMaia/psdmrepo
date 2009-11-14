@@ -201,7 +201,7 @@ class LogBookExperiment {
         return $this->find_shift_by_( 'begin_time <= '.$time.' AND (end_time IS NULL OR '.$time.'< end_time)') ; }
 
     public function find_last_shift () {
-        return $this->find_shift_by_( "begin_time=(SELECT MAX(begin_time) FROM {$this->connection->database}.shift)" ) ; }
+        return $this->find_shift_by_( "begin_time=(SELECT MAX(begin_time) FROM {$this->connection->database}.shift WHERE exper_id={$this->id()})" ) ; }
 
 
     public function find_prev_shift_for( $shift ) {
