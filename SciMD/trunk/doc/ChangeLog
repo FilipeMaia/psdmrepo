@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10
+2009-11-16 Igor Gaponenko
+- added the interactive command 'remove_runs' (see Python admin tools)
+
 Tag: V00-00-09
 2009-10-12 Igor Gaponenko
 - fixed a bug in the C++ API

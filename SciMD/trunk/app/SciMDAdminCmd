@@ -537,6 +537,28 @@ class SciMDCmd ( LusiPyApp ) :
         # ----------------------------------------------------------------------
         #
         self.__add_handler(
+            'remove_runs',
+            '<instrument> <experiment> { <run> | [<first_run>]:[<last_run>] | ALL }',
+            """
+    The command will remove specified run (or runs) from a database.
+    There are three ways to specify which run(s) to remnove:
+
+        <run>                   - to delete a single run
+        <first_run>:            - to delete a range of runs starting (including) from the specified one
+                   :<last_run>  - to delete a range of runs ending (including) the specified one
+        <first_run>:<last_run>  - to delete a range of runs with both ends included
+        ALL                     - to delete all known runs of an experiment
+
+    Also note the following:
+
+    - values of run parameters (if any) which were set for specified run(s)
+      will also be deleted from the database.
+    """,
+            self.__cmd_remove_runs)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
             'run_params',
             '<instrument> <experiment> <run> <operation> [<parameters>]',
             """
@@ -1242,6 +1264,62 @@ SUPPORTED COMMANDS:
 
         return 0
 
+    # =============
+    # Remove run(s)
+    # =============
+
+    def __cmd_remove_runs ( self, command, args ):
+
+        if len(args) != 3:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+        (instrument, experiment, range_of_runs) = args
+
+        # Translate the range of runs into an SQL condition
+        range_condition = ''  # default: all runs
+        try:
+            if range_of_runs == 'ALL': pass
+            else:
+                idx = range_of_runs.find(':')
+                if idx == -1:
+                    range_condition = " AND num=%d" % int( range_of_runs )
+
+                else:
+                    (first_run,last_run) = (None,None)
+
+                    if idx > 0:                     first_run = int( range_of_runs[0:idx] )
+                    if idx +1 < len(range_of_runs): last_run  = int( range_of_runs[idx+1:] )
+                    if first_run is None and last_run is None:
+                        self._parser.error("empty range of runs isn't allowed")
+
+                    if first_run is not None and last_run is not None:
+                        if first_run >= last_run:
+                            self._parser.error("incorrect range of runs: the first run number must be strictly less")
+
+                    if first_run is not None: range_condition += " AND num >= %d" % first_run
+                    if last_run  is not None: range_condition += " AND num <= %d" % last_run
+
+        except ValueError, ex:
+            self._parser.error("not an integer value where a run number expected")
+            return 1
+
+        statements = [
+            "SET SESSION SQL_MODE='ANSI'",
+            "START TRANSACTION"
+        ]
+        for table in ('run_val', 'run_val_text', 'run_val_int', 'run_val_int64','run_val_double'):
+            statements.append(
+                """DELETE FROM "%s" WHERE run_id IN (SELECT run_id FROM "run" WHERE exper_id=%s %s)""" % (
+                    table,_exper_id_sql( instrument, experiment ),range_condition ))
+        statements.append(
+            """DELETE FROM "run" WHERE exper_id=%s %s""" % (
+                _exper_id_sql( instrument, experiment ),range_condition))
+        statements.append("COMMIT")
+
+        if not self.__simple_query( *statements ): return 1
+
+        return 0
+
     # =============================
     # Report on parameters of a run
     # =============================
@@ -1324,7 +1402,6 @@ SUPPORTED COMMANDS:
                """ WHERE "r"."exper_id"=%s AND "r"."num"=%s""" % (_exper_id_sql( instrument, experiment ),run),
                """ AND "r"."id"="rv"."run_id" AND "r"."id"="v"."run_id" AND "rv"."param_id"=%s AND "v"."param_id"=%s""" % (rp['id'],rp['id'])])
 
-            print sql;
             value = ""
             source = ""
             updated = ""
