@@ -37,9 +37,7 @@ URGENT PROBLEMS FOR LOGBOOK
 
 + put a table with all available run parameters into the Run Summary page
 
-  NOTE: It's been done for the common parameters of all experiments only.
-  And it still needs to be done for experiment-specific parameters (any params
-  which do not belong to the above category).
++ display experiment-specific parameters as well
 
       +----------+     +---------+
 - add | << Prev  | and | Next >> | buttons to the messages viewer. This should show up for the top-level messages only.
@@ -51,6 +49,10 @@ URGENT PROBLEMS FOR LOGBOOK
 
 - add a possibility to change the default soft order for messages in a list. The feature
   requested by John Bozek.
+
+- add a possibility to display message in an order they're posted, not by threads
+
+- add a possibility to unfold new messages if requested
 
 - add a possibility to limit 'Last 10 messages | Today | 1 day | 1 week | All history' of messages.
 

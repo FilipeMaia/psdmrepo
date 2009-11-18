@@ -20,6 +20,7 @@ define( ITOF_TITLE,    "&nbsp;i T O F" );
 define( HFP_GAS_TITLE, "&nbsp;H F P &nbsp;&nbsp; G a s" );
 define( DIA_TITLE,     "&nbsp;D I A " );
 define( MBES_TITLE,    "&nbsp;M B E S" );
+define( EXTRA_TITLE,    "&nbsp;E x p e r i m e n t &nbsp;&nbsp; S p e c i f i c" );
 
 define( BEAMS,   0 );
 define( FEE,     BEAMS   + 10 );
@@ -27,9 +28,10 @@ define( HFP,     FEE     +  8 );
 define( ETOF,    HFP     +  2 );
 define( ITOF,    ETOF    + 30 );
 define( HFP_GAS, ITOF    +  6 );
-define( DIA,     HFP_GAS +  6 );
+define( DIA,     HFP_GAS +  7 );
 define( MBES,    DIA     +  1 );
-define( END_,    MBES    +  4 );
+define( EXTRA,   MBES    +  4 );
+define( END_,    EXTRA   +  0 );
 
 $pardefs = array(
     //
@@ -126,6 +128,7 @@ $pardefs = array(
     array( 'name' => 'AMO:R14:EVR:21:CTRL.DG2W',               'descr' => 'piezo timing width' ),
     array( 'name' => 'AMO:HFP:MMS:72.RBV',                     'descr' => 'gasjet x-position (rel. distance)' ),
     array( 'name' => 'AMO:HFP:MMS:71.RBV',                     'descr' => 'gasjet y-position (rel. distance)' ),
+    array( 'name' => 'AMO:HFP:MMS:73.RBV',                     'descr' => 'Gas Jet motor Z axis (mm)' ),
     //
     // DIA data
     //
@@ -144,6 +147,10 @@ $pardefs = array(
 
 $par2descr = array();
 foreach( $pardefs as $p ) $par2descr[$p['name']] = $p['descr'];
+
+// Add extra parameters
+//
+$par2descr['AMO:DIA:GMP:06:PMON'] = 'Pressure (Torr)';
 
 /* Proceed with the operation
  */
@@ -178,7 +185,8 @@ try {
 
     $value_color = 'maroon';
     $label_color = '#b0b0b0';
-    $con = new RegDBHtml( 0, 0, 1000, 1500 );
+    $num_rows = count( $values ) * 20 + 9 * ( 30 + 15 );
+    $con = new RegDBHtml( 0, 0, 780, $num_rows );
     $row = 0;
 
     $con->label_1(0, $row, BEAMS_TITLE, 780 );
@@ -229,6 +237,18 @@ try {
     }
     $row += 15;
 
+    $con->label_1(0, $row, ITOF_TITLE, 780 );
+    $row += 30;
+    for( $i = ITOF; $i < HFP_GAS; $i++ ) {
+    	$key = $pardefs[$i]['name'];
+    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
+        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
+            ->value(300, $row, $val, $value_color )
+            ->label(500, $row, $key, true, $label_color );
+    	$row += 20;
+    }
+    $row += 15;
+    
     $con->label_1(0, $row, HFP_GAS_TITLE, 780 );
     $row += 30;
     for( $i = HFP_GAS; $i < DIA; $i++ ) {
@@ -255,7 +275,7 @@ try {
 
     $con->label_1(0, $row, MBES_TITLE, 780 );
     $row += 30;
-    for( $i = MBES; $i < END_; $i++ ) {
+    for( $i = MBES; $i < EXTRA; $i++ ) {
     	$key = $pardefs[$i]['name'];
     	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
         $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
@@ -263,7 +283,29 @@ try {
             ->label(500, $row, $key, true, $label_color );
     	$row += 20;
     }
+    $row += 15;
 
+    $con->label_1(0, $row, EXTRA_TITLE, 780 );
+    $row += 30;
+    $pardefs_keys = array();
+    foreach( $pardefs as $p ) $pardefs_keys[$p['name']] = $p;
+    foreach( $values as $p ) {
+        $key = $p->name();
+        $val = $p->value();
+        $descr = array_key_exists( $key, $par2descr ) ? $par2descr[$key] : $key;
+        if( array_key_exists( $key, $pardefs_keys )) continue;
+        $con->value( 10, $row, '<i>'.$descr.'</i>' )
+            ->value(300, $row, $val, $value_color )
+            ->label(500, $row, $key, true, $label_color );
+    	$row += 20;
+    }
+    $row += 15;
+    /*
+         $con->value( 10, $row, '<i>'.count($pardefs).'</i>' )
+            ->value(300, $row, count($values), $value_color )
+            ->label(500, $row, $num_rows, true, $label_color )
+            ->label(700, $row, $row, true, $label_color );
+    */      
     echo $con->html();
 
     $logbook->commit();

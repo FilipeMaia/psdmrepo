@@ -11,6 +11,15 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-10
+2009-11-18 Igor Gaponenko
+- optimized query in Search.php and Web GUI to display last 25 messages in the experiment
+Summary page.
+- implemented experiment-specific Run parameters.
+- minor changes and bug fixes in the in the list of common run parameters
+- changes in the New Message & Reply to Message forms generators to make things
+compatible with the RHEL5 standard PHP 5.1.6.
+
 Tag: V00-01-09
 2009-11-13 Igor Gaponenko
 - fixed a a bug in the LogBookExperiment::find_last_shift() method which wasn't usinng

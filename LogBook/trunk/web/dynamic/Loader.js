@@ -39,6 +39,26 @@ function load(url,id){
   ldr.send(null);
 }
 
+/* This is an extended version of the regular 'load()' function.
+ * This one would also call a user defined action when the loading is done.
+ * This may be needed to trigger additional actiions.
+ */
+function load_and_call(url,id, onSuccess){
+  if(url==null) {
+    document.getElementById(id).innerHTML='Loading...';
+    return;
+  }
+  var ldr=PageLoader();
+  ldr.onreadystatechange=function() {
+    if(ldr.readyState==4) {
+      document.getElementById(id).innerHTML=ldr.responseText;
+      onSuccess();
+    }
+  }
+  ldr.open('GET', url, true);
+  ldr.send(null);
+}
+
 /* The function to be called to initate loading the requested (by URL)
  * page and if successfull - calling the specified function and passing the
  * results into it as a parameter. The result will be presented as

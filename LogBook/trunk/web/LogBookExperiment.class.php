@@ -541,7 +541,8 @@ HERE;
         $end=null,
         $tag='',
         $author='',
-        $since=null) {
+        $since=null,
+        $limit=null) {
 
         /* Verify parameters
          */
@@ -590,44 +591,56 @@ HERE;
          * The scope can't empty. Otherwise we'll just return an empty array.
          */
         $scope = '';
-        if( $posted_at_experiment ) {
-            $scope = '((h.shift_id IS NULL AND h.run_id IS NULL)';
-        }
-        if( $posted_at_shifts ) {
-            if( $scope == '' )
-                $scope = '((h.shift_id IS NOT NULL)';
+        if( $posted_at_experiment && $posted_at_shifts && $posted_at_runs ) {
+
+            /* no fancy subselectors are needed for messages posted in all
+             * scopes.
+             */
+
+            ;
+
+        } else {
+            if( $posted_at_experiment ) {
+                $scope = '((h.shift_id IS NULL AND h.run_id IS NULL)';
+            }
+            if( $posted_at_shifts ) {
+                if( $scope == '' )
+                    $scope = '((h.shift_id IS NOT NULL)';
+                else
+                    $scope .= ' OR (h.shift_id IS NOT NULL)';
+            }
+            if( $posted_at_runs ) {
+                if( $scope == '' )
+                    $scope = '((h.run_id IS NOT NULL)';
+                else
+                    $scope .= ' OR (h.run_id IS NOT NULL)';
+            }
+            if( $scope != '' )
+                $scope .= ")";
             else
-                $scope .= ' OR (h.shift_id IS NOT NULL)';
+                return Array();
         }
-        if( $posted_at_runs ) {
-            if( $scope == '' )
-                $scope = '((h.run_id IS NOT NULL)';
-            else
-                $scope .= ' OR (h.run_id IS NOT NULL)';
-        }
-        if( $scope != '' )
-            $scope .= ")";
-        else
-            return Array();
 
         /* Decide at which part(a) of messages to look for. This is actually
          * an optional filter.
          */
         $part = '';
-        if( $search_in_messages ) {
-            $part = " AND ((e.content LIKE '%{$text2search}%')";
-        }
-        if( $search_in_tags ) {
-            if( $part == '' )
-                $part = " AND ((t.tag LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
-            else
-                $part .= " OR (t.tag LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
-        }
-        if( $search_in_values ) {
-            if( $part == '' )
-                $part = " AND ((t.value LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
-            else
-                $part .= " OR (t.value LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+        if( $text2search != '' ) {
+            if( $search_in_messages ) {
+                $part = " ((e.content LIKE '%{$text2search}%')";
+            }
+            if( $search_in_tags ) {
+                if( $part == '' )
+                    $part = " ((t.tag LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+                else
+                    $part .= " OR (t.tag LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+            }
+            if( $search_in_values ) {
+                if( $part == '' )
+                    $part = " ((t.value LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+                else
+                    $part .= " OR (t.value LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+            }
         }
         if( $part != '' )
             $part .= ")";
@@ -639,33 +652,66 @@ HERE;
                 __METHOD__,
                 "begin time '".$begin."' isn't less than end time '".$end."'" );
 
-        $begin_str = is_null( $begin ) ? '' : ' AND e.insert_time >='.$begin->to64();
-        $end_str   = is_null( $end   ) ? '' : ' AND e.insert_time < '.$end->to64();
-        $since_str = is_null( $since ) ? '' : ' AND e.insert_time > '.$since->to64();
+        $begin_str = is_null( $begin ) ? '' : ' e.insert_time >='.$begin->to64();
+        $end_str   = is_null( $end   ) ? '' : ' e.insert_time < '.$end->to64();
+        $since_str = is_null( $since ) ? '' : ' e.insert_time > '.$since->to64();
 
         /* Consider tag and/or author constrains as well (if present).
          */
-        $tag_str    = $tag    == '' ? '' : " AND t.tag='{$tag}' AND t.hdr_id = h.id";
-        $author_str = $author == '' ? '' : " AND e.author='{$author}'";
+        $tag_str    = $tag    == '' ? '' : " t.tag='{$tag}' AND t.hdr_id = h.id";
+        $author_str = $author == '' ? '' : " e.author='{$author}'";
 
-        /* Proceed with the actual search. Expect results to be ordered by
-         * the insert (post) time.
+        /* The flag which would instruct the query processor to use the tags table.
          */
+        $use_tags = (( $text2search != '' ) && $search_in_tags ) || ( $tag != '' );
+
+        /* Build the extra condition and proceed with the actual search. Expect results
+         * to be ordered by the insert (post) time.
+         */
+        function expand_condition( $condition, $extra ) {
+            if( $extra != '' ) {
+                if( $condition != '' ) $condition .= ' AND ';
+                $condition .= $extra;
+            }
+            return $condition;
+        }
+        $condition = '';
+        $condition = expand_condition( $condition, $scope );
+        $condition = expand_condition( $condition, $part );
+        $condition = expand_condition( $condition, $begin_str );
+        $condition = expand_condition( $condition, $end_str );
+        $condition = expand_condition( $condition, $since_str );
+        $condition = expand_condition( $condition, $tag_str );
+        $condition = expand_condition( $condition, $author_str );
+        
         return $this->entries_by_(
-            $scope.$part.$begin_str.$end_str.$tag_str.$author_str.$since_str
+            $condition,
+            $limit,
+            $use_tags
         );
     }
 
-    private function entries_by_ ( $condition=null ) {
+    private function entries_by_ ( $condition=null, $limit=null, $use_tags=true ) {
 
         $list = array();
 
-        $extra_condition = $condition == null ? '' : ' AND '.$condition;
+        $extra_condition = ( is_null( $condition ) || ( $condition == '' )) ? '' : ' AND '.$condition;
+
+        /* Apply the limit if specified
+         *
+         * IMPORTANT: Note an order of elements returned by the query. Elements will start
+         * from the newest entry. We need it to make sure the limit woud work. In the end
+         * (before returning from the method) the array will be reversed.
+         */
+        $limit_str = is_null( $limit ) ? '' : ' LIMIT '.$limit;
+
+        $tables = $this->connection->database.'.header h, '.
+                  $this->connection->database.'.entry e'.
+                  ($use_tags ? ','.$this->connection->database.'.tag t ' : ' ');
         $sql =
-            "SELECT DISTINCT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM {$this->connection->database}.header h, {$this->connection->database}.entry e, {$this->connection->database}.tag t WHERE h.exper_id=".$this->attr['id'].
+            'SELECT DISTINCT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM '.$tables.' WHERE h.exper_id='.$this->attr['id'].
             ' AND h.id = e.hdr_id AND e.parent_entry_id is NULL'.$extra_condition.
-            ' ORDER BY e.insert_time ASC';
-            //' ORDER BY e.insert_time DESC';
+            ' ORDER BY e.insert_time DESC'.$limit_str;
         /*
         throw new LogBookException(
             __METHOD__, $sql );
@@ -681,7 +727,11 @@ HERE;
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
-        return $list;
+        /* IMPORTANT: This is needed because the quesry returned elements
+         * in the wrong order (DESC instead of ASC). We had to do it to apply
+         * an optinal 'LIMIT';
+         */ 
+        return array_reverse( $list );
     }
 
     /**

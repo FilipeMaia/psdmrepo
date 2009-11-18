@@ -107,8 +107,18 @@ if( isset( $_GET['author'] ))
  * the [begin,end) interval of the request!
  */
 $since_str = '';
-if( isset( $_GET['since'] ))
+if( isset( $_GET['since'] )) {
     $since_str = trim( $_GET['since'] );
+}
+
+/* This is a special modifier which (if present) is used to return a shortened list
+ * of messages.
+ */
+$limit = null;  // no limit
+if( isset( $_GET['limit'] )) {
+    $limit = trim( $_GET['limit'] );
+    if( $limit == 'all' ) $limit = null;
+}
 
 
 /* Package the error message into a JAON object and return the one
@@ -326,7 +336,8 @@ try {
         $end,
         $tag,
         $author,
-        $since );
+        $since,
+        $limit );
 
     $status_encoded = json_encode( "success" );
     $result =<<< HERE

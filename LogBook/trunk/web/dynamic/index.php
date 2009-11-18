@@ -141,7 +141,8 @@ Page-specific styles
         /*background-color:#E3F6CE;*/ /*background-color:#f0f0f0;*/
     }
     
-    #experiment_info_container,#run_parameters {
+    #experiment_info_container,
+    #run_parameters {
         padding: 10px;
         margin-left: 10px;
     }
@@ -998,10 +999,11 @@ function create_messages_dialog( scope ) {
     document.getElementById('messages_actions_container').innerHTML=
         '<div id="messagesarea"></div>';
 
+    var limit_per_view = null;
     var scope_str = '';
-    if(      scope == "experiment" ) scope_str = '';
-    else if( scope == "shift"      ) scope_str = 'shift_id='+current_selection.shift.id;
-    else if( scope == "run"        ) scope_str = 'run_id='+current_selection.run.id;
+    if(      scope == "experiment" ) { scope_str = ''; limit_per_view = '25'; }
+    else if( scope == "shift"      ) { scope_str = 'shift_id='+current_selection.shift.id; }
+    else if( scope == "run"        ) { scope_str = 'run_id='+current_selection.run.id; }
 
     var text2search='',
         search_in_messages=true, search_in_tags=true, search_in_values=true,
@@ -1019,7 +1021,8 @@ function create_messages_dialog( scope ) {
         tag,
         author,
         isAuthorizedFor( 'canPostNewMessages' ) ? html_new_message : '',
-        auto_refresh );
+        auto_refresh,
+        limit_per_view );
 
     this.extendedShown = false;
 
@@ -1931,11 +1934,12 @@ function display_run() {
         '  <img src="images/RunSummary.png" />'+
         '</div>'+
         '<div id="experiment_info_container" style="height:60px;">Loading...</div>'+
-        '<div style="margin-top:40px; margin-bottom:20px;">'+
+        '<div style="margin-top:40px; margin-bottom:40px;">'+
         '  <img src="images/Parameters.png" />'+
         '</div>'+
-        '<div id="run_parameters" style="height:1500px;">Loading...</div>'+
-        '<div id="messages_actions_container" style="margin-top:40px;"></div>';
+        //'<div id="run_parameters" style="height:1500px;">Loading...</div>'+
+        '<div id="run_parameters" style="width:800px; height:440px; overflow:auto; border:solid 2px #e0e0e0; margin-left:20px; padding:10px;">Loading...</div>'+
+        '<div id="messages_actions_container" style="margin-top:50px;"></div>';
 
     load( 'DisplayRun.php?id='+current_selection.run.id, 'experiment_info_container' );
     load( 'DisplayRunParams.php?id='+current_selection.run.id, 'run_parameters' );
@@ -2100,7 +2104,8 @@ function display_history( type, data ) {
         tag,
         author,
         '',
-        false );
+        false, /* auto_refresh */
+        null   /* limit_per_view */ );
 }
 
 var browse_tree = null;
@@ -2926,18 +2931,76 @@ function auto_refresh_togle( e ) {
     else stopRefreshOfMessagesTable();
 }
 
+var last_display_scope,
+    last_display_text2search,
+    last_display_search_in_messages,
+    last_display_search_in_tags,
+    last_display_search_in_values,
+    last_display_posted_at_experiment,
+    last_display_posted_at_shifts,
+    last_display_posted_at_runs,
+    last_display_begin,
+    last_display_end,
+    last_display_tag,
+    last_display_author,
+    last_display_html_new_message,
+    last_display_auto_refresh,
+    last_limit_per_view;
+
+function re_display_messages_table() {
+	last_limit_per_view = document.search_display_form.limit_per_view.options[document.search_display_form.limit_per_view.selectedIndex].value;
+    display_messages_table(
+        last_display_scope,
+        last_display_text2search,
+        last_display_search_in_messages,
+        last_display_search_in_tags,
+        last_display_search_in_values,
+        last_display_posted_at_experiment,
+        last_display_posted_at_shifts,
+        last_display_posted_at_runs,
+        last_display_begin,
+        last_display_end,
+        last_display_tag,
+        last_display_author,
+        last_display_html_new_message,
+        last_display_auto_refresh,
+        last_limit_per_view );
+}
+
 function display_messages_table(
     scope,
     text2search,
-    search_in_messages, search_in_tags, search_in_values,
-    posted_at_experiment, posted_at_shifts, posted_at_runs,
-    begin, end,
+    search_in_messages,
+    search_in_tags,
+    search_in_values,
+    posted_at_experiment,
+    posted_at_shifts,
+    posted_at_runs,
+    begin,
+    end,
     tag,
     author,
     html_new_message,
-    auto_refresh ) {
+    auto_refresh,
+    limit_per_view ) {
 
     stopRefreshOfMessagesTable();
+
+    last_display_scope = scope;
+    last_display_text2search = text2search;
+    last_display_search_in_messages = search_in_messages;
+    last_display_search_in_tags = search_in_tags;
+    last_display_search_in_values = search_in_values;
+    last_display_posted_at_experiment = posted_at_experiment;
+    last_display_posted_at_shifts = posted_at_shifts;
+    last_display_posted_at_runs = posted_at_runs,
+    last_display_begin = begin;
+    last_display_end = end;
+    last_display_tag = tag;
+    last_display_author = author;
+    last_display_html_new_message = html_new_message;
+    last_display_auto_refresh = auto_refresh;
+    last_limit_per_view = limit_per_view;
 
     this.url='Search.php?id='+current_selection.experiment.id+
         (scope == '' ? '' : '&'+scope)+
@@ -2952,7 +3015,8 @@ function display_messages_table(
         '&begin='+encodeURIComponent(begin)+
         '&end='+encodeURIComponent(end)+
         '&tag='+encodeURIComponent(tag)+
-        '&author='+encodeURIComponent(author);
+        '&author='+encodeURIComponent(author)+
+        (limit_per_view == null ? '' : '&limit='+limit_per_view);
 
     var html=
         '<div>'+
@@ -2969,8 +3033,17 @@ function display_messages_table(
     }
     var auto_refresh_checked = auto_refresh ? 'checked="checked"' : '';
     html +=
+        '  <form name="search_display_form">'+
         '  <div style="text-align:right; margin-bottom:5px;">'+
-        '    <b><em id="messages_showing_from_id">0</em></b> - <b><em id="messages_showing_through_id">0</em></b> ( of <b><em id="messages_total">0</em></b> )'+
+        '    <b><em id="messages_showing_from_id">0</em></b> - <b><em id="messages_showing_through_id">0</em></b> of <b><em id="messages_total">0</em></b> ';
+    if( limit_per_view != null )
+    html +=
+        '       <select align="center" type="text" name="limit_per_view" style="padding:1px;" onchange="re_display_messages_table()">'+
+        '         <option value="all"'+(limit_per_view=='all'?' selected="selected"':'')+'>all known threads</option>'+
+        '         <option value="25"' +(limit_per_view=='25' ?' selected="selected"':'')+'>latest threads only</option>'+
+        '       </select>'+
+        '       '+(limit_per_view=='all'?'':' <b style="color:red;">!!!</b>');
+    html +=
         '  </div>'+
         '  <div style="margin-left:10px; margin-bottom:10px; padding-top:10px; padding-bottom:10px; border-top:solid 2px #e0e0e0; border-bottom:solid 2px #e0e0e0;">'+
         '    <form name="search_display_form">'+
@@ -2994,11 +3067,6 @@ function display_messages_table(
         '                <option value="100">100</option>'+
         '              </select> / page'+
         '            </div>'+
-        //'            <div style="padding-left:40px;padding-top:10px;">'+
-        //'              <input type="checkbox" name="posted_at_experiment" value="Experiment" checked="checked" />&nbsp;experiment'+
-        //'              <input type="checkbox" name="posted_at_shifts" value="Shifts" checked="checked" />&nbsp;shifts'+
-        //'              <input type="checkbox" name="posted_at_runs" value="Runs" checked="checked" />&nbsp;runs'+
-        //'            </div>'+
         '            <div style="padding-left:40px;padding-top:10px;">'+
         '              <input type="checkbox" name="autorefresh" value="Autorefresh" '+auto_refresh_checked+' onchange="auto_refresh_togle(this)" />&nbsp;auto refresh'+
         '            </div>'+
@@ -3013,8 +3081,8 @@ function display_messages_table(
         '          </td>'+
         '        </tr>'+
         '      </tbody></table></center>'+
-        '    </form>'+
         '  </div>'+
+        '  </form>'+
         '  <div id="messages_area">'+
         '    <img src="images/ajaxloader.gif" />&nbsp;searching messages...'+
         '  </div>'+
