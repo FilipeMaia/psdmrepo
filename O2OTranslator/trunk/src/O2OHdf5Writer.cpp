@@ -26,6 +26,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "H5DataTypes/AcqirisConfigV1.h"
+#include "H5DataTypes/BldDataEBeamV0.h"
 #include "H5DataTypes/BldDataEBeam.h"
 #include "H5DataTypes/BldDataFEEGasDetEnergy.h"
 #include "H5DataTypes/BldDataPhaseCavity.h"
@@ -217,9 +218,15 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // version for this type is 0
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataEBeamV0> (
+      "Bld::BldDataEBeamV0", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EBeam,0).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // version for this type is 1
   converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataEBeam> (
       "Bld::BldDataEBeam", chunk_size, m_compression ) ) ;
-  typeId =  Pds::TypeId(Pds::TypeId::Id_EBeam,0).value() ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EBeam,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // version for this type is 0
@@ -373,11 +380,11 @@ O2OHdf5Writer::eventEnd ( const Pds::Dgram& dgram )
 
 void
 O2OHdf5Writer::openGroup ( const Pds::Dgram& dgram, State state )
-{ 
+{
   // get the counter for this state
   unsigned counter = m_stateCounters[state] ;
   ++ m_stateCounters[state] ;
-  
+
   // reset counter for sub-states, note there are no breaks
   switch( state ) {
   case Undefined:
@@ -446,7 +453,7 @@ O2OHdf5Writer::levelEnd ( const Pds::Src& src )
 
 // visit the data object
 void
-O2OHdf5Writer::dataObject ( const void* data, size_t size, 
+O2OHdf5Writer::dataObject ( const void* data, size_t size,
     const Pds::TypeId& typeId, const O2OXtcSrc& src )
 {
   // find this type in the converter map

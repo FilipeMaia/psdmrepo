@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-05
+2009-11-20 Andy Salnikov
+- add one more converter (new version of BldDataEBeam)
+
 Tag: V00-04-04
 2009-11-13 Andy Salnikov
 - add some protection for damaged datagrams, right now all damaged
