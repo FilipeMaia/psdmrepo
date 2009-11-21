@@ -11,6 +11,10 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-01
+2009-11-20 Andy Salnikov
+- ic-command: add command to remove fileset
+
 Tag: V00-04-00
 2009-11-13 Andy Salnikov
 - significant refactoring

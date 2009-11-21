@@ -4,14 +4,11 @@
 #  $Id$
 #
 # Description:
-#  Script OnlineScript.
+#  Script ICCommand.
 #
 #------------------------------------------------------------------------
 
-"""Script used by the Online system to translate files to Offline Data Management.
-
-The translate command that makes Interface Controller database entries for the specified
-experiment info and directories is the only one presently implemented.
+"""Script for interacting with the Interface Controller database.
 
 This software was developed for the LUSI project.  If you use all or
 part of it, please give an appropriate acknowledgement.
@@ -51,66 +48,13 @@ from InterfaceCtlr.InterfaceDb import InterfaceDb
 # Local definitions --
 #---------------------
 
-#-------------------
-# Local functions --
-#-------------------
-
 _conn_str = "Server=psdb.slac.stanford.edu;Database=interface_db;"
-
-def _exper_id_sql (experiment):
-    """Return a nested SQL query to retrieve an identifier of an experiment"""
-
-    return """(SELECT id FROM "experiment" WHERE name='%s')""" % experiment
-
-#--------------------------
-# Specialized exceptions --
-#--------------------------
-
-class DatabaseOperatonFailed(Exception):
-    def __init__ (self, message):
-        self.__message = message
-
-    def __str__ (self):
-        return repr(self.__message)
 
 #--------------------------------
 # Application class definition --
 #--------------------------------
 
-class OnlineScript ( LusiPyApp ) :
-
-    # ===============================================
-    # An indirection for handling the standard output
-    # ===============================================
-
-    __out = sys.stdout
-
-    def print_out (self, *params):
-        for p in params:
-            self.__out.write(p)
-        self.__out.write("\n")
-
- 
-    # =========================================================================
-    # Command handlers are registered in the dictionary. There is a separate list
-    # to specify an order in which the command information is reported by
-    # the tool.
-    # =========================================================================
-
-    __cmd_handlers = {}
-    __cmd_order = []
-
-    def __add_handler(self, command, syntax, description, handler, connects2server=True):
-        self.__cmd_handlers[command] = {
-        'SYNTAX':syntax,
-        'DESCRIPTION':description,
-        'HANDLER':handler,
-        'CONNECTS2SERVER':connects2server}
-        self.__cmd_order.append(command)
-
-    def __usage(self, command):
-        print "Usage: %s  %s" % (command, self.__cmd_handlers[command]['SYNTAX'])
-
+class ICCommand ( LusiPyApp ) :
 
     # ===========
     # constructor
@@ -137,13 +81,11 @@ class OnlineScript ( LusiPyApp ) :
                                   action="store", dest="password", default=None,
                                   help="specify user password (no password by default)" )
 
-        self._parser.add_option ( '-o', "--output",
-                                  action="store", dest="output", default=None,
-                                  help="send output to file instead of STDOUT", metavar="PATH" )
+        self.__conn = None
+        self.__icdb = None
 
-        self.__connection = None
-        self.__idb = None
-
+        self.__cmd_handlers = {}
+        self.__cmd_order = []
 
         # Register command handlers for known command --------------------------
         #
@@ -156,20 +98,36 @@ class OnlineScript ( LusiPyApp ) :
     Otherwise detailed description of each command will be
     printed.
     """,
-            self.__cmd_help,
-            connects2server=False)
+            self.cmd_help)
 
-        #
-        # ----------------------------------------------------------------------
-        #
+            # ----------------------------------------------------------------------
         self.__add_handler(
             'translate',
             '<instrument> <experiment> <run_type> <run_number> <xtc_files>',
-            """
-    Translate a set of files to Offline Data Management.
-    """,
-             self.__cmd_translate)
+            "Translate a set of files to Offline Data Management",
+             self.cmd_translate )
 
+        # ----------------------------------------------------------------------
+        self.__add_handler(
+            'remove',
+            '<instrument> <experiment> [<run_number>]',
+            "Remove fileset(s) from the database",
+             self.cmd_remove )
+
+
+    # =========================================================================
+    # Command handlers are registered in the dictionary. There is a separate list
+    # to specify an order in which the command information is reported by
+    # the tool.
+    # =========================================================================
+    
+    def __add_handler(self, command, syntax, description, handler):
+        self.__cmd_handlers[command] = {
+            'SYNTAX':syntax,
+            'DESCRIPTION':description,
+            'HANDLER':handler
+        }
+        self.__cmd_order.append(command)
 
     # ============================================================
     # Run the whole thing after parsing the command argunments and
@@ -181,14 +139,8 @@ class OnlineScript ( LusiPyApp ) :
         # Print the list of supported commands of none is given ----------------
         #
         if not self._args :
-            self.__cmd_help('help', self._args)
+            self.cmd_help('help', self._args)
             return 0
-
-        # Open output file -----------------------------------------------------
-        #
-        if self._options.output:
-            self.debug( "Open alternative output file" )
-            self.__out = open ( self._options.output, "w" )
 
         # Get the command name,  connect to the server (unless we're -----------
         #  dealing with the command which doesn't need this) and invoke
@@ -201,14 +153,13 @@ class OnlineScript ( LusiPyApp ) :
 
         self.trace( "command: %s: arguments: %s" % (command, str(self._args[1:])))
 
-        if self.__cmd_handlers[command]['CONNECTS2SERVER']: self.__connect()
         return self.__cmd_handlers[command]['HANDLER'](command, self._args[1:])
 
     # ===========================================
     # Print the information on supported commands
     # ===========================================
 
-    def __cmd_help ( self, command, args ) :
+    def cmd_help ( self, command, args ) :
 
         names = args
         if names is not None and len(names) > 0:
@@ -222,7 +173,7 @@ class OnlineScript ( LusiPyApp ) :
             # Print full description of each command
             #
             for name in names:
-                self.print_out("""COMMAND:
+                print """COMMAND:
 
     %s
 
@@ -234,11 +185,11 @@ DESCRIPTION:
 %s
 """ % (name,
          self.__cmd_handlers[name]['SYNTAX'],
-         self.__cmd_handlers[name]['DESCRIPTION']))
+         self.__cmd_handlers[name]['DESCRIPTION'] )
 
         else:
 
-            self.print_out("""APPLICATION:
+            print """APPLICATION:
 
     %s
 
@@ -250,7 +201,7 @@ DESCRIPTION:
 
 USAGE:
 
-    command [parameters] [options]
+    command [options] [parameters]
 
     help
     help [command [command ...]]   (for detailed explanation)
@@ -258,19 +209,15 @@ USAGE:
     -h | --help                    (for a full list of available options)
 
 SUPPORTED COMMANDS:
-""" %  os.path.basename(sys.argv[0]))
+""" %  os.path.basename(sys.argv[0])
 
             # Reserve enough space for the command names based on
             # the longest name.
-            #
-            max_len = 1
+            max_len = max([len(n) for n in names])
             for name in names:
-                if len(name) > max_len: max_len = len(name)
-            fmt = "    %-"+str(max_len)+"s  %s"
-            for name in names:
-                self.print_out(fmt % (name, self.__cmd_handlers[name]['SYNTAX']))
+                print "    %-*s  %s" % (max_len, name, self.__cmd_handlers[name]['SYNTAX'])
 
-            self.print_out()
+            print
 
         return 0
 
@@ -278,7 +225,7 @@ SUPPORTED COMMANDS:
     # Translate a fileset
     # ===================
 
-    def __cmd_translate ( self, command, args ) :
+    def cmd_translate ( self, command, args ) :
 
         if len(args) < 5:
             self._parser.error(
@@ -290,31 +237,54 @@ SUPPORTED COMMANDS:
         runnum     = args[3]
         xtcfiles   = args[4:]
 
-        self.__idb.new_fileset ( instr, exper, runnum, runtype, xtcfiles, duplicate=True )
+        self.icdb().new_fileset ( instr, exper, runnum, runtype, xtcfiles, duplicate=True )
+        
+        return 0
+
+    # ===================
+    # Translate a fileset
+    # ===================
+
+    def cmd_remove ( self, command, args ) :
+
+        if len(args) not in [2,3]:
+            self._parser.error(
+                "Enter: instrument experiment [run_num] - %s" % command)
+
+        instr = args[0]
+        exper = args[1]
+        runnum = None
+        if len(args) > 2 : runnum = args[2]
+
+        self.icdb().remove_fileset ( instr, exper, runnum )
         
         return 0
 
 
-    # =====================
-    # Connect to the server
-    # ====================
+    # =================
+    # Server connection
+    # =================
 
-    def __connect(self):
+    def connection(self):
 
         """Connect to the database if the connection has not been established
         yet. In case of success initialize a connection handle and
         return True. Return False otherwise."""
-        if self.__connection is not None: return True
+        
+        if self.__conn : return self.__conn
 
-        # create database instance
-        try:
-            self.__connection = DbConnection( conn_string=self._options.conn_string, 
-                                             user=self._options.user,
-                                             passwd=self._options.password )
-            self.__idb = InterfaceDb(self.__connection)
-        except Exception, ex:
-            self.error("MySQL error %d: %s", ex[0], ex[1] )
-            sys.exit(1)
+        self.__conn = DbConnection( conn_string=self._options.conn_string, 
+                                    user=self._options.user,
+                                    passwd=self._options.password,
+                                    timeout=0 )
+        return self.__conn
+                                    
+    def icdb(self) :
+    
+        if self.__icdb : return self.__icdb
+        
+        self.__icdb = InterfaceDb( self.connection() )
+        return self.__icdb
 
 
 # ==============================================
@@ -322,6 +292,6 @@ SUPPORTED COMMANDS:
 # ==============================================
 
 if __name__ == "__main__" :
-    app = OnlineScript()
+    app = ICCommand()
     rc = app.run()
     sys.exit(rc)

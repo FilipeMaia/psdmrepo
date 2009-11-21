@@ -486,6 +486,37 @@ class InterfaceDb ( object ) :
         cursor.execute( "UPDATE fileset SET fk_fileset_status=%s, locked=0 WHERE fileset.id = %s", (wtstat, newset) )
 
 
+    # ==============
+    # Remove fileset
+    # ==============
+
+    @_synchronized
+    @_transaction
+    def remove_fileset (self, instr, exper, runnum=None, cursor=None ) :
+        """ Register new fileset.         
+            @param instr        instrument name
+            @param exper        experiment name
+            @param runum        run number, if None remove all run numbers
+        """
+        
+        qvars = ( instr, exper )
+        sel = "instrument=%s AND experiment=%s"
+        if runnum is not None :
+            qvars += ( runnum, )
+            sel += " AND run_number=%s"
+        
+        # delete all translator processes for those filesets
+        q = "DELETE FROM translator_process WHERE fk_fileset IN (SELECT id FROM fileset WHERE %s)" % sel
+        cursor.execute ( q, qvars )
+    
+        # delete all files for those filesets
+        q = "DELETE FROM files WHERE fk_fileset_id IN (SELECT id FROM fileset WHERE %s)" % sel
+        cursor.execute ( q, qvars )
+
+        # delete filesets
+        q = "DELETE FROM fileset WHERE %s" % sel
+        cursor.execute ( q, qvars )
+
         
 #
 #  In case someone decides to run this module
