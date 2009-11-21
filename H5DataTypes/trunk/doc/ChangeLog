@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-11
+2009-11-20 Andy Salnikov
+- new types added corresponding to pdsdata V01-06-00
+
 Tag: V00-00-10
 2009-10-30 Andy Salnikov
 - adding new static method xtcSize() to a bunch of classes,

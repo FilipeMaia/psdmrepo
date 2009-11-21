@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_BLDDATAEBEAM_H
-#define H5DATATYPES_BLDDATAEBEAM_H
+#ifndef H5DATATYPES_BLDDATAEBEAMV0_H
+#define H5DATATYPES_BLDDATAEBEAMV0_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class BldDataEBeam.
+//	Class BldDataEBeamV0.
 //
 //------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@
 
 namespace H5DataTypes {
 
-struct BldDataEBeam_Data  {
+struct BldDataEBeamV0_Data  {
   uint32_t    uDamageMask;
   double      fEbeamCharge;    /* in nC */
   double      fEbeamL3Energy;  /* in MeV */
@@ -42,18 +42,17 @@ struct BldDataEBeam_Data  {
   double      fEbeamLTUPosY;   /* in mm */
   double      fEbeamLTUAngX;   /* in mrad */
   double      fEbeamLTUAngY;   /* in mrad */
-  double      fEbeamPkCurrBC2; /* in Amps */
 };
 
-class BldDataEBeam  {
+class BldDataEBeamV0  {
 public:
 
-  typedef Pds::BldDataEBeam XtcType ;
+  typedef Pds::BldDataEBeamV0 XtcType ;
 
-  BldDataEBeam () {}
-  BldDataEBeam ( const XtcType& xtc ) ;
+  BldDataEBeamV0 () {}
+  BldDataEBeamV0 ( const XtcType& xtc ) ;
 
-  ~BldDataEBeam () ;
+  ~BldDataEBeamV0 () ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
@@ -61,9 +60,9 @@ public:
   static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
 
 private:
-  BldDataEBeam_Data m_data ;
+  BldDataEBeamV0_Data m_data ;
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_BLDDATAEBEAM_H
+#endif // H5DATATYPES_BLDDATAEBEAMV0_H

@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class BldDataEBeam...
+//	Class BldDataEBeamV0...
 //
 // Author List:
 //      Andrei Salnikov
@@ -14,7 +14,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "H5DataTypes/BldDataEBeam.h"
+#include "H5DataTypes/BldDataEBeamV0.h"
 
 //-----------------
 // C/C++ Headers --
@@ -35,7 +35,7 @@
 
 namespace H5DataTypes {
 
-BldDataEBeam::BldDataEBeam ( const XtcType& xtc )
+BldDataEBeamV0::BldDataEBeamV0 ( const XtcType& xtc )
 {
   m_data.uDamageMask = xtc.uDamageMask ;
   m_data.fEbeamCharge = xtc.fEbeamCharge ;
@@ -44,31 +44,29 @@ BldDataEBeam::BldDataEBeam ( const XtcType& xtc )
   m_data.fEbeamLTUPosY = xtc.fEbeamLTUPosY ;
   m_data.fEbeamLTUAngX = xtc.fEbeamLTUAngX ;
   m_data.fEbeamLTUAngY = xtc.fEbeamLTUAngY ;
-  m_data.fEbeamPkCurrBC2 = xtc.fEbeamPkCurrBC2 ;
 }
 
-BldDataEBeam::~BldDataEBeam ()
+BldDataEBeamV0::~BldDataEBeamV0 ()
 {
 }
 
 hdf5pp::Type
-BldDataEBeam::stored_type()
+BldDataEBeamV0::stored_type()
 {
   return native_type() ;
 }
 
 hdf5pp::Type
-BldDataEBeam::native_type()
+BldDataEBeamV0::native_type()
 {
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<BldDataEBeam_Data>() ;
-  type.insert_native<uint32_t>( "uDamageMask", offsetof(BldDataEBeam_Data,uDamageMask) ) ;
-  type.insert_native<double>( "fEbeamCharge", offsetof(BldDataEBeam_Data,fEbeamCharge) ) ;
-  type.insert_native<double>( "fEbeamL3Energy", offsetof(BldDataEBeam_Data,fEbeamL3Energy) ) ;
-  type.insert_native<double>( "fEbeamLTUPosX", offsetof(BldDataEBeam_Data,fEbeamLTUPosX) ) ;
-  type.insert_native<double>( "fEbeamLTUPosY", offsetof(BldDataEBeam_Data,fEbeamLTUPosY) ) ;
-  type.insert_native<double>( "fEbeamLTUAngX", offsetof(BldDataEBeam_Data,fEbeamLTUAngX) ) ;
-  type.insert_native<double>( "fEbeamLTUAngY", offsetof(BldDataEBeam_Data,fEbeamLTUAngY) ) ;
-  type.insert_native<double>( "fEbeamPkCurrBC2", offsetof(BldDataEBeam_Data,fEbeamPkCurrBC2) ) ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<BldDataEBeamV0_Data>() ;
+  type.insert_native<uint32_t>( "uDamageMask", offsetof(BldDataEBeamV0_Data,uDamageMask) ) ;
+  type.insert_native<double>( "fEbeamCharge", offsetof(BldDataEBeamV0_Data,fEbeamCharge) ) ;
+  type.insert_native<double>( "fEbeamL3Energy", offsetof(BldDataEBeamV0_Data,fEbeamL3Energy) ) ;
+  type.insert_native<double>( "fEbeamLTUPosX", offsetof(BldDataEBeamV0_Data,fEbeamLTUPosX) ) ;
+  type.insert_native<double>( "fEbeamLTUPosY", offsetof(BldDataEBeamV0_Data,fEbeamLTUPosY) ) ;
+  type.insert_native<double>( "fEbeamLTUAngX", offsetof(BldDataEBeamV0_Data,fEbeamLTUAngX) ) ;
+  type.insert_native<double>( "fEbeamLTUAngY", offsetof(BldDataEBeamV0_Data,fEbeamLTUAngY) ) ;
 
   return type ;
 }
