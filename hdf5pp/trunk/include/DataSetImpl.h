@@ -82,7 +82,7 @@ public:
     return Attribute<U>::openAttr ( *m_id, name ) ;
   }
 
-  /// Changes the sizes of a dataset’s dimensions.
+  /// Changes the sizes of a dataset's dimensions.
   void set_extent ( const hsize_t size[] ) ;
 
   // store the data

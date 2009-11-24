@@ -96,10 +96,10 @@ public:
                              const DataSpace& dspc,
                              const PListDataSetCreate& plistDScreate = PListDataSetCreate() )
   {
-    return DataSet<T>::createDataSet ( *m_id, name, dspc, plistDScreate ) ;
+    return DataSet<T>::createDataSet ( *m_id, name, TypeTraits<T>::stored_type(), dspc, plistDScreate ) ;
   }
 
-  // create new data set, type is determined by the template type
+  // create new data set, type is determined by explicit parameter
   template <typename T>
   DataSet<T> createDataSet ( const std::string& name,
                              const Type& type,

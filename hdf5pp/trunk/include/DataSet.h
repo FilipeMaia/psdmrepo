@@ -75,7 +75,7 @@ public:
     return m_impl.openAttr<U> ( name ) ;
   }
 
-  /// Changes the sizes of a dataset’s dimensions.
+  /// Changes the sizes of a dataset's dimensions.
   void set_extent ( const hsize_t size[] ) {
     m_impl.set_extent ( size ) ;
   }
@@ -116,15 +116,6 @@ protected:
 
   // Constructor
   DataSet ( DataSetImpl impl ) : m_impl(impl) {}
-
-  /// create new data set, type is determined by template type
-  static DataSet createDataSet ( hid_t parent,
-                                const std::string& name,
-                                const DataSpace& dspc,
-                                const PListDataSetCreate& plistDScreate )
-  {
-    return DataSet ( DataSetImpl::createDataSet ( parent, name, TypeTraits<T>::stored_type(), dspc, plistDScreate ) ) ;
-  }
 
   /// create new data set, type is determined at run time
   static DataSet createDataSet ( hid_t parent,
