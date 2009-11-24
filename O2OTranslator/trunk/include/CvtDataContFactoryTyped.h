@@ -57,23 +57,22 @@ public:
   typedef H5DataTypes::ObjectContainer<H5Type> container_type ;
 
   // Default constructor
-  CvtDataContFactoryTyped ( const std::string& name, hdf5pp::Type type, hsize_t chunkSize, int deflate )
+  CvtDataContFactoryTyped ( const std::string& name, hsize_t chunkSize, int deflate )
     : m_name(name)
-    , m_type(type)
-    , m_chunkSize()
+    , m_chunkSize(chunkSize)
     , m_deflate(deflate)
   {
-    m_chunkSize = std::max( chunkSize/type.size(), hsize_t(1) ) ;
   }
 
   // Destructor
   ~CvtDataContFactoryTyped () {}
 
   // main method
-  container_type* container( hdf5pp::Group group ) const
+  container_type* container( hdf5pp::Group group, hdf5pp::Type type ) const
   {
-    MsgLog( "CvtDataContFactoryTyped", debug, "create container " << m_name << " with chunk size " << m_chunkSize ) ;
-    return new container_type ( m_name, group, m_type, m_chunkSize, m_deflate ) ;
+    hsize_t chunkSize = std::max( m_chunkSize/type.size(), hsize_t(1) ) ;
+    MsgLog( "CvtDataContFactoryTyped", debug, "create container " << m_name << " with chunk size " << chunkSize ) ;
+    return new container_type ( m_name, group, type, chunkSize, m_deflate ) ;
   }
 
 protected:

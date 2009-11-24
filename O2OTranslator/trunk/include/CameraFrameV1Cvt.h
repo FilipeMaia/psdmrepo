@@ -29,7 +29,7 @@
 //------------------------------------
 #include "O2OTranslator/CvtDataContainer.h"
 #include "O2OTranslator/CvtDataContFactoryDef.h"
-#include "O2OTranslator/CvtDataContFactoryFrameV1.h"
+#include "O2OTranslator/CvtDataContFactoryTyped.h"
 
 //		---------------------
 // 		-- Class Interface --
@@ -80,7 +80,7 @@ private:
 
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::CameraFrameV1> > DataCont ;
-  typedef CvtDataContainer<CvtDataContFactoryFrameV1<const unsigned char> > ImageCont ;
+  typedef CvtDataContainer<CvtDataContFactoryTyped<const unsigned char> > ImageCont ;
 
   // Data members
   hsize_t m_chunk_size ;

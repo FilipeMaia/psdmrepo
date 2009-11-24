@@ -11,6 +11,22 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-00
+2009-11-20 Andy Salnikov
+- small refactoring:
+  - removed CvtDataContFactoryImage class (not used, will need more
+    generic way to assign attributes to datasets)
+  - removed CvtDataContFactoryAcqirisV1 class (CvtDataContFactoryTyped
+    is used instead)
+  - removed CvtDataContFactoryFrameV1 class (CvtDataContFactoryTyped
+    is used instead)
+  - CvtDataContFactoryTyped now uses type that is passed as extra 
+    parameter to container() method
+- new converter class PnCCDFrameV1Cvt for Pds::PNCCD::FrameV1, this is
+  a special converter that needs both Config object and Event object
+- two new types supported by O2OHdf5Writer: Pds::PNCCD::ConfigV1 and
+  Pds::PNCCD::FrameV1 (not tested yet)
+  
 Tag: V00-04-05
 2009-11-20 Andy Salnikov
 - add one more converter (new version of BldDataEBeam)

@@ -27,7 +27,7 @@
 #include "pdsdata/acqiris/DataDescV1.hh"
 #include "O2OTranslator/CvtDataContainer.h"
 #include "O2OTranslator/CvtDataContFactoryDef.h"
-#include "O2OTranslator/CvtDataContFactoryAcqirisV1.h"
+#include "O2OTranslator/CvtDataContFactoryTyped.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -89,8 +89,8 @@ protected:
 
 private:
 
-  typedef CvtDataContainer<CvtDataContFactoryAcqirisV1<uint64_t> > TimestampCont ;
-  typedef CvtDataContainer<CvtDataContFactoryAcqirisV1<uint16_t> > WaveformCont ;
+  typedef CvtDataContainer<CvtDataContFactoryTyped<uint64_t> > TimestampCont ;
+  typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > WaveformCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
 
   // comparison operator for Src objects

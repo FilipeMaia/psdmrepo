@@ -78,7 +78,7 @@ CameraFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( sizeof data + data.data_size() != size ) {
     throw O2OXTCSizeException ( "Camera::FrameV1", sizeof data + data.data_size(), size ) ;
   }
-  
+
   if ( not m_dataCont ) {
 
     // make container for data objects
@@ -86,7 +86,7 @@ CameraFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     m_dataCont = new DataCont ( dataContFactory ) ;
 
     // get the type for the image
-    CvtDataContFactoryFrameV1<const unsigned char> imgContFactory( "image", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryTyped<const unsigned char> imgContFactory( "image", m_chunk_size, m_deflate ) ;
     m_imageCont = new ImageCont ( imgContFactory ) ;
 
     // make container for time
@@ -98,7 +98,7 @@ CameraFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   // store the data in the containers
   m_dataCont->container(group)->append ( H5DataTypes::CameraFrameV1(data) ) ;
   hdf5pp::Type imgType = H5DataTypes::CameraFrameV1::imageType ( data ) ;
-  m_imageCont->container(group,data)->append ( *data.data(), imgType ) ;
+  m_imageCont->container(group,imgType)->append ( *data.data(), imgType ) ;
   m_timeCont->container(group)->append ( time ) ;
 }
 

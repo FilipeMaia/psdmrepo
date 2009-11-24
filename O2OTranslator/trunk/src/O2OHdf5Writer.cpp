@@ -38,6 +38,7 @@
 #include "H5DataTypes/EvrConfigV1.h"
 #include "H5DataTypes/EvrConfigV2.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
+#include "H5DataTypes/PnCCDConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
 #include "LusiTime/Time.h"
 #include "MsgLogger/MsgLogger.h"
@@ -49,11 +50,11 @@
 #include "O2OTranslator/O2OExceptions.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OMetaData.h"
+#include "O2OTranslator/PnCCDFrameV1Cvt.h"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/Dgram.hh"
 #include "pdsdata/xtc/Level.hh"
 #include "pdsdata/xtc/Src.hh"
-
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -203,6 +204,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_ControlConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::PnCCDConfigV1> ( "PNCCD::ConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_pnCCDconfig,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   hsize_t chunk_size = 128*1024 ;
 
   // instantiate all factories for event converters
@@ -245,6 +250,13 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_AcqConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_AcqWaveform,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // very special converter for PNCCD::FrameV1, it needs two types of data
+  converter.reset( new PnCCDFrameV1Cvt ( "PNCCD::FrameV1", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_pnCCDconfig,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_pnCCDframe,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // temporary/diagnostics  Epics converter (headers only)

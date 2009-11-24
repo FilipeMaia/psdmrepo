@@ -95,7 +95,7 @@ AcqirisDataDescV1Cvt::convert ( const void* data,
     if ( sizeof(ConfigXtcType) != size ) {
       throw O2OXTCSizeException ( "Acqiris::ConfigV1", sizeof(ConfigXtcType), size ) ;
     }
-    
+
     // got configuration object, make the copy
     m_config.insert( ConfigMap::value_type( src.top(), config ) ) ;
 
@@ -119,11 +119,12 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                              const O2OXtcSrc& src,
                                              const H5DataTypes::XtcClockTime& time )
 {
-      
+
   // find corresponding configuration object
   ConfigMap::const_iterator cit = m_config.find( src.top() ) ;
   if ( cit == m_config.end() ) {
     MsgLog ( logger, error, "AcqirisDataDescV1Cvt - no configuration object was defined" );
+    return ;
   }
   const ConfigXtcType& config = cit->second ;
 
@@ -131,11 +132,11 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( not m_waveformCont ) {
 
     // create container for timestamps
-    CvtDataContFactoryAcqirisV1<uint64_t> tsContFactory( "timestamps", m_chunk_size, m_deflate, 'T' ) ;
+    CvtDataContFactoryTyped<uint64_t> tsContFactory( "timestamps", m_chunk_size, m_deflate ) ;
     m_timestampCont = new TimestampCont ( tsContFactory ) ;
 
     // create container for waveforms
-    CvtDataContFactoryAcqirisV1<uint16_t> wfContFactory( "waveforms", m_chunk_size, m_deflate, 'W' ) ;
+    CvtDataContFactoryTyped<uint16_t> wfContFactory( "waveforms", m_chunk_size, m_deflate ) ;
     m_waveformCont = new WaveformCont ( wfContFactory ) ;
 
     // make container for time
@@ -168,13 +169,13 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     // first verify that the shape of the data returned corresponds to the config
     if ( dd->nbrSamplesInSeg() != nSampl ) {
       std::ostringstream msg ;
-      msg << "Acqiris::DataDescV1 - number of samples in data object (" 
+      msg << "Acqiris::DataDescV1 - number of samples in data object ("
           << dd->nbrSamplesInSeg() << ") different from config object (" << nSampl << ")" ;
       throw O2OXTCGenException ( msg.str() ) ;
     }
     if ( dd->nbrSegments() != nSeg ) {
       std::ostringstream msg ;
-      msg << "Acqiris::DataDescV1 - number of segments in data object (" 
+      msg << "Acqiris::DataDescV1 - number of segments in data object ("
           << dd->nbrSegments() << ") different from config object (" << nSeg << ")" ;
       throw O2OXTCGenException ( msg.str() ) ;
     }
@@ -190,9 +191,9 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
 
   // store the data
   hdf5pp::Type type = H5DataTypes::AcqirisDataDescV1::timestampType ( config ) ;
-  m_timestampCont->container(group,config)->append ( timestamps[0][0], type ) ;
+  m_timestampCont->container(group,type)->append ( timestamps[0][0], type ) ;
   type = H5DataTypes::AcqirisDataDescV1::waveformType ( config ) ;
-  m_waveformCont->container(group,config)->append ( waveforms[0][0][0], type ) ;
+  m_waveformCont->container(group,type)->append ( waveforms[0][0][0], type ) ;
   m_timeCont->container(group)->append ( time ) ;
 
 
