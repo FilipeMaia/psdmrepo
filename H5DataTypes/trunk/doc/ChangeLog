@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2009-11-24 Andy Salnikov
+- removed ObjectContainer constructor with implicit type
+- new classes PnCCDConfigV1 and PnCCDFrameV1
+
 Tag: V00-00-11
 2009-11-20 Andy Salnikov
 - new types added corresponding to pdsdata V01-06-00

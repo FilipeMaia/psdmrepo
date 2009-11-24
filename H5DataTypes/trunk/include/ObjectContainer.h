@@ -54,28 +54,6 @@ template <typename T>
 class ObjectContainer {
 public:
 
-  /// dataset type is determined by template type
-  ObjectContainer ( const std::string& name,
-                    hdf5pp::Group& location,
-                    hsize_t chunk_size = 10240,
-                    int deflate = -1,
-                    bool nbit = false )
-    : m_dataset()
-    , m_count(0)
-  {
-    // make extensible data space
-    hdf5pp::DataSpace dsp = hdf5pp::DataSpace::makeSimple ( 0, H5S_UNLIMITED ) ;
-
-    // use chunking
-    hdf5pp::PListDataSetCreate plDScreate ;
-    plDScreate.set_chunk(chunk_size) ;
-    if ( deflate >= 0 ) plDScreate.set_deflate(deflate) ;
-    if ( nbit ) plDScreate.set_nbit() ;
-
-    // make a data set
-    m_dataset = location.createDataSet<T> ( name, dsp, plDScreate ) ;
-  }
-
   /// Provide type at run time
   ObjectContainer ( const std::string& name,
                     hdf5pp::Group& location,
