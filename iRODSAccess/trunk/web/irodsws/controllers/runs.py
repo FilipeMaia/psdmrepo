@@ -45,7 +45,15 @@ from irodsws.model.irods_model import IrodsModel
 # Local non-exported definitions --
 #----------------------------------
 
-_run_data_path = config['app_conf'].get( 'irods.run_data_path', '/psdm-zone/exp' )
+_run_data_path = config['app_conf'].get( 'irods.run_data_path', '/psdm-zone/psdm' )
+
+# extract run number from irods object
+def _run_number ( obj ):
+    if obj['type'] == 'object' :
+        r = obj['name'].split('-')
+        if len(r) > 2 and r[1][0] == 'r'  and r[1][1:].isdigit() :
+            return int(r[1][1:],10)
+    return None
 
 #------------------------
 # Exported definitions --
@@ -71,7 +79,7 @@ class RunsController(BaseController):
 
         # make the list of runs
         runs = []
-        for r in self._allRuns(model, path) :
+        for r in set(self._allRuns(model, path)) :
             run_url = h.url_for( action='show', 
                                 instrument=instrument, 
                                 experiment=experiment, 
@@ -96,38 +104,36 @@ class RunsController(BaseController):
         # instantiate the model 
         model = IrodsModel()
 
-        # make the list of all runs
-        allRuns = set([ r for r in self._allRuns(model, path) ])
-        
-        reslist = []
-        for run in self._runList( runs ) :
-            # for every run get the list of all files in that run's directory
-            
-            if not isinstance(run,types.IntType) : 
-                abort(404,"bad run number specified: "+str(run) )
+        # make the list of runs
+        allRuns = set([ r for r in self._runList( runs ) ])
 
+        # get list of files
+        files = model.files( path )
+        if files is None : abort(404)
+        
+        res = {}
+        for file in files :
+            
+            # for file get its run number
+            run = _run_number ( file )
+            
             # quick check first
             if run not in allRuns : continue
-            
-            # get file list recursively
-            runpath = "%s/%06d" % ( path, run )
-            res = model.files( runpath, recursive = True )
-            
-            # filter out collections, only report files
-            files = []
-            if res is not None :
-                for r in res :
-                    if r['type'] == 'object' :
-                        name = r['collName']+'/'+r['name']
-                        name = name.lstrip('/')
-                        url = h.url_for( controller='/files', 
-                                         action='show', 
-                                         path=name,
-                                         qualified=True )
-                        r['url'] = url
-                        files.append(r)
-                        
-            reslist.append( dict(run=run, files=files) )
+
+            # add some additional info to the object
+            name = file['collName']+'/'+file['name']
+            name = name.lstrip('/')
+            url = h.url_for( controller='/files', 
+                             action='show', 
+                             path=name,
+                             qualified=True )
+            file['url'] = url
+
+            # append to the list of file for this run
+            res.setdefault(run,[]).append(file)
+
+        # convert to the list of dictionaries
+        reslist = [ dict(run=k, files=v) for k,v in res.iteritems() ]
 
         return reslist
 
@@ -157,11 +163,8 @@ class RunsController(BaseController):
         res = model.files( path )
         if res is None : abort(404)
 
-        # extract the sub-directory names and convert them to numbers
+        # get file names, extract -rNNNN- part, convert it to run number
         for r in res :
-            if r['type'] == 'collection' :
-                r = r['name'].split('/')[-1]
-                if r.isdigit() : 
-                    yield int(r)
-
-    
+            run = _run_number ( r )
+            if run is not None :
+                yield run

@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2009-11-25 Andy Salnikov
+- updated web service's runs controller to reflect new structure of 
+  irods directories
+
 Tag: V00-00-04
 2009-09-15 Andy Salnikov
 - irods_model.py: forgot to import codes module
