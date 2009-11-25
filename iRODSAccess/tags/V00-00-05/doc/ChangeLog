@@ -1,0 +1,40 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package iRODSAccess
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-05
+2009-11-25 Andy Salnikov
+- updated web service's runs controller to reflect new structure of 
+  irods directories
+
+Tag: V00-00-04
+2009-09-15 Andy Salnikov
+- irods_model.py: forgot to import codes module
+- resources.py: add URL to each object returned from /resources
+- runs.py: instead of irods.zone define new configuration parameter
+  called irods.run_data_path which is a prefix for area where 
+  experimental run data is stored
+- runs.py: run information is returned as a list of objects instead of 
+  single object, new object contains fields run and files.
+
+Tag: V00-00-03
+2009-09-01 Andy Salnikov
+- added support for reading user name/password from external file
+
+Tag: V00-00-01
+2009-08-10 Andrei Salnikov
+- Initial import into repository
+
+Tag: V00-00-02
+2009-08-11 Andrei Salnikov
+- for files and runs controllers added the URI to the returned objects
+
