@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2009-11-25 Andy Salnikov
+- protection added in files controller
+
 Tag: V00-00-05
 2009-11-25 Andy Salnikov
 - updated web service's runs controller to reflect new structure of 

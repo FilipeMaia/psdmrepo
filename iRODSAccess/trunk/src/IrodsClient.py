@@ -224,7 +224,7 @@ class IrodsClient ( object ) :
             if dataCreate : entry.setCreateTime( dataCreate[i] )
             if dataPath : entry.setPhyPath( dataPath[i] )
             if dataId : entry.setDataId( dataId[i] )
-            if dataMode : entry.setDataMode( int(dataMode[i]) )
+            if dataMode and dataMode[i] : entry.setDataMode( int(dataMode[i]) )
             if dataName : entry.setDataName( dataName[i] )
             if replNum : entry.setReplNum( int(replNum[i]) )
             if dataSize : entry.setDataSize( int(dataSize[i]) )
