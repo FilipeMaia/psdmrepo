@@ -11,8 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-01
+2009-11-24 Andy Salnikov
+- forgot to add PnCCDFrameV1Cvt to svn
+
 Tag: V00-05-00
-2009-11-20 Andy Salnikov
+2009-11-24 Andy Salnikov
 - small refactoring:
   - removed CvtDataContFactoryImage class (not used, will need more
     generic way to assign attributes to datasets)
