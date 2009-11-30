@@ -239,7 +239,7 @@ O2O_Translate::runApp ()
   for ( AppCmdOptList<std::string>::const_iterator it = m_eventData.begin() ; it != m_eventData.end() ; ++ it ) {
     files.push_back ( O2OXtcFileName(*it) ) ;
   }
-  boost::thread readerThread( DgramReader ( files, dgqueue, m_dgramsize.value(), m_mergeMode.value() ) ) ;
+  boost::thread readerThread( DgramReader ( files, dgqueue, m_dgramsize.value(), m_mergeMode.value(), true ) ) ;
 
   uint64_t count = 0 ;
 
@@ -247,39 +247,39 @@ O2O_Translate::runApp ()
   while ( Pds::Dgram* dg = dgqueue.pop() ) {
 
     ++ count ;
-    
+
     WithMsgLogRoot( trace, out ) {
       const ClockTime& clock = dg->seq.clock() ;
-      out << "Transition: #" << count << " " 
+      out << "Transition: #" << count << " "
           << std::left << std::setw(12) << Pds::TransitionId::name(dg->seq.service())
           << "  time: " << clock.seconds() << '.'
           << std::setfill('0') << std::setw(9) << clock.nanoseconds()
           << "  payloadSize: " << dg->xtc.sizeofPayload() ;
     }
 
-    // validate the XTC structure 
+    // validate the XTC structure
     O2OXtcValidator validator ;
     if ( validator.process( &(dg->xtc) ) == 0 ) {
-      
+
       WithMsgLogRoot( error, out ) {
         out << "Validation failed: Transition: #" << count << " "
             << Pds::TransitionId::name(dg->seq.service())
             << ", skipping datagram";
       }
-      
+
     } else {
 
       // give this event to every scanner
       for ( std::vector<O2OXtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
-  
+
         O2OXtcScannerI* scanner = *i ;
-  
+
         try {
           scanner->eventStart ( *dg ) ;
-  
+
           O2OXtcIterator iter( &(dg->xtc), scanner );
           iter.iterate();
-  
+
           scanner->eventEnd ( *dg ) ;
         } catch ( std::exception& e ) {
           MsgLogRoot( error, "exception caught processing datagram: " << e.what() ) ;
@@ -288,7 +288,7 @@ O2O_Translate::runApp ()
       }
 
     }
-  
+
     // all datagrams must be explicitely deleted
     delete [] (char*)dg ;
   }

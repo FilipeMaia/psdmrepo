@@ -56,7 +56,7 @@ public:
 
   // Constructor accepts the list of files, the files will be sorted
   // based on the chunk number extracted from files name.
-  O2OXtcDechunk ( const std::list<O2OXtcFileName>& files, size_t maxDgSize, bool sort ) ;
+  O2OXtcDechunk ( const std::list<O2OXtcFileName>& files, size_t maxDgSize, bool skipDamaged ) ;
 
   // Destructor
   ~O2OXtcDechunk () ;
@@ -75,6 +75,7 @@ private:
   // Data members
   std::list<O2OXtcFileName> m_files ;
   size_t m_maxDgSize ;
+  bool m_skipDamaged ;
   std::list<O2OXtcFileName>::const_iterator m_iter ;
   FILE* m_file ;
   Pds::XtcFileIterator* m_dgiter ;

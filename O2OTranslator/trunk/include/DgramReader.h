@@ -57,7 +57,11 @@ public:
   typedef std::list<O2OXtcFileName> FileList ;
 
   // Default constructor
-  DgramReader (const FileList& files, DgramQueue& queue, size_t maxDgSize, O2OXtcMerger::MergeMode mode ) ;
+  DgramReader ( const FileList& files,
+                DgramQueue& queue,
+                size_t maxDgSize,
+                O2OXtcMerger::MergeMode mode,
+                bool skipDamaged ) ;
 
   // Destructor
   ~DgramReader () ;
@@ -74,6 +78,7 @@ private:
   DgramQueue& m_queue ;
   size_t m_maxDgSize ;
   O2OXtcMerger::MergeMode m_mode ;
+  bool m_skipDamaged ;
 
 };
 

@@ -8,14 +8,29 @@
 #include <unistd.h>
 #include <list>
 
+//----------------------
+// Base Class Headers --
+//----------------------
+#include "AppUtils/AppBase.h"
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+#include "AppUtils/AppCmdArgList.h"
+#include "AppUtils/AppCmdOptBool.h"
+#include "MsgLogger/MsgLogger.h"
+#include "O2OTranslator/O2OXtcFileName.h"
+#include "O2OTranslator/O2OXtcMerger.h"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/ProcInfo.hh"
 #include "pdsdata/xtc/XtcIterator.hh"
 #include "pdsdata/xtc/XtcFileIterator.hh"
-#include "O2OTranslator/O2OXtcFileName.h"
-#include "O2OTranslator/O2OXtcMerger.h"
-#include "MsgLogger/MsgLogger.h"
 
+
+
+//
+//  XTC iterator class which dumps XTC-level info
+//
 class myLevelIter : public XtcIterator {
 public:
   enum {Stop, Continue};
@@ -24,6 +39,7 @@ public:
     for ( unsigned i=0 ; i < _depth ; ++ i ) printf("  ");
     Level::Type level = xtc->src.level();
     printf("%s level: ",Level::name(level));
+    printf("payloadSize %d ", xtc->sizeofPayload() );
     printf("damage %x ", xtc->damage.value() );
     if (level==Level::Source or level==Pds::Level::Reporter or level==Pds::Level::Control) {
       DetInfo& info = *(DetInfo*)(&xtc->src);
@@ -49,43 +65,74 @@ private:
   unsigned _depth;
 };
 
-void usage(char* progname) {
-  fprintf(stderr,"Usage: %s [-h] <filename> ...\n", progname);
+
+namespace O2OTranslator {
+
+using namespace AppUtils ;
+
+//
+//  Application class
+//
+class O2O_Scanner : public AppBase {
+public:
+
+  // Constructor
+  explicit O2O_Scanner ( const std::string& appName ) ;
+
+  // destructor
+  ~O2O_Scanner () ;
+
+protected :
+
+  /**
+   *  Main method which runs the whole application
+   */
+  virtual int runApp () ;
+
+private:
+
+  // more command line options and arguments
+  AppCmdOptBool               m_skipDamaged ;
+  AppCmdArgList<std::string>  m_inputFiles ;
+
+};
+
+//----------------
+// Constructors --
+//----------------
+O2O_Scanner::O2O_Scanner ( const std::string& appName )
+  : AppBase( appName )
+  , m_skipDamaged( 'd', "skip-damaged",             "skip damaged datagrams", false )
+, m_inputFiles ( "input-xtc", "the list of the input XTC files" )
+{
+  addOption( m_skipDamaged ) ;
+  addArgument( m_inputFiles ) ;
 }
 
-int main(int argc, char* argv[]) {
-  int c;
-  int parseErr = 0;
-  int verbose = 0 ;
+//--------------
+// Destructor --
+//--------------
+O2O_Scanner::~O2O_Scanner ()
+{
+}
 
-  while ((c = getopt(argc, argv, "hv")) != -1) {
-    switch (c) {
-    case 'h':
-      usage(argv[0]);
-      exit(0);
-    case 'v':
-      ++ verbose ;
-      break ;
-    default:
-      parseErr++;
-    }
-  }
-
-  MsgLogger::MsgLogLevel loglvl ( 3 - verbose ) ;
-  MsgLogger::MsgLogger rootlogger ;
-  rootlogger.setLevel ( loglvl ) ;
-
-  std::list<O2OTranslator::O2OXtcFileName> files ;
-  for ( int i = optind ; i < argc ; ++ i ) {
-    files.push_back( O2OTranslator::O2OXtcFileName(argv[i]) ) ;
+/**
+ *  Main method which runs the whole application
+ */
+int
+O2O_Scanner::runApp ()
+{
+  std::list<O2OXtcFileName> files ;
+  for (AppCmdArgList<std::string>::const_iterator i = m_inputFiles.begin(); i!=m_inputFiles.end(); ++i) {
+    files.push_back( O2OXtcFileName(*i) ) ;
   }
 
   if (files.empty()) {
-    usage(argv[0]);
-    exit(2);
+    MsgLogRoot(error, "no input data files specified" ) ;
+    return 2 ;
   }
 
-  O2OTranslator::O2OXtcMerger iter(files,0x100000,O2OTranslator::O2OXtcMerger::OneStream);
+  O2OTranslator::O2OXtcMerger iter(files, 0x1000000, O2OTranslator::O2OXtcMerger::OneStream, m_skipDamaged.value());
   while ( Dgram* dg = iter.next() ) {
     const Pds::Sequence& seq = dg->seq ;
     const Pds::ClockTime& clock = seq.clock() ;
@@ -105,3 +152,9 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
+
+} // namespace O2OTranslator
+
+
+// this defines main()
+APPUTILS_MAIN(O2OTranslator::O2O_Scanner)

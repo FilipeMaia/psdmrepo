@@ -59,7 +59,8 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files, size_t maxDgSize, MergeMode mode )
+O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files,
+                             size_t maxDgSize, MergeMode mode, bool skipDamaged )
   : m_streams()
   , m_dgrams()
   , m_mode(mode)
@@ -89,7 +90,7 @@ O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files, size_t maxD
   m_dgrams.reserve( streamMap.size() ) ;
   for ( StreamMap::const_iterator it = streamMap.begin() ; it != streamMap.end() ; ++ it ) {
 
-    const std::list<O2OXtcFileName>& streamFiles = it->second ;
+    std::list<O2OXtcFileName> streamFiles = it->second ;
 
     WithMsgLog( logger, info, out ) {
       out << "O2OXtcMerger -- stream: " << it->first ;
@@ -98,9 +99,12 @@ O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files, size_t maxD
       }
     }
 
+    if ( mode == FileName ) {
+      // order according to chunk number
+      streamFiles.sort() ;
+    }
     // create new stream
-    bool sort = ( mode == FileName ) ;
-    O2OXtcDechunk* stream = new O2OXtcDechunk( streamFiles, maxDgSize, sort ) ;
+    O2OXtcDechunk* stream = new O2OXtcDechunk( streamFiles, maxDgSize, skipDamaged ) ;
     m_streams.push_back( stream ) ;
     m_dgrams.push_back( stream->next() ) ;
   }
@@ -164,13 +168,13 @@ O2OXtcMerger::next()
     for ( unsigned i = 0 ; i < ns ; ++ i ) {
       if ( m_dgrams[i] and m_dgrams[i]->seq.service() != dg->seq.service() ) {
         MsgLog( logger, error, "next -- streams desynchronized:"
-            << "\n    stream[" << stream << "] = " 
-            << m_streams[stream]->chunkName().basename() 
+            << "\n    stream[" << stream << "] = "
+            << m_streams[stream]->chunkName().basename()
             << " service = " << Pds::TransitionId::name(dg->seq.service())
             << " time = " << dg->seq.clock().seconds() << " sec " << dg->seq.clock().nanoseconds() << " nsec"
             << " damage = " << std::hex << dg->xtc.damage.value() << std::dec
-            << "\n    stream[" << i << "] = " 
-            << m_streams[i]->chunkName().basename() 
+            << "\n    stream[" << i << "] = "
+            << m_streams[i]->chunkName().basename()
             << " service = " << Pds::TransitionId::name(m_dgrams[i]->seq.service())
             << " time = " << m_dgrams[i]->seq.clock().seconds() << " sec " << m_dgrams[i]->seq.clock().nanoseconds() << " nsec"
             << " damage = " << std::hex << m_dgrams[i]->xtc.damage.value() << std::dec

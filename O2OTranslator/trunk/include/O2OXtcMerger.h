@@ -61,7 +61,7 @@ public:
   enum MergeMode { OneStream, NoChunking, FileName } ;
 
   // Default constructor
-  O2OXtcMerger ( const std::list<O2OXtcFileName>& files, size_t maxDgSize, MergeMode mode ) ;
+  O2OXtcMerger ( const std::list<O2OXtcFileName>& files, size_t maxDgSize, MergeMode mode, bool skipDamaged ) ;
 
   // Destructor
   ~O2OXtcMerger () ;

@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-02
+2009-11-30 Andy Salnikov
+- enable damaged events in o2o-scanner, O2OXtcDechunk is now passed
+  a boolean flag that enables/disables damaged filter
+- o2o-scanner is now a standard AppUtil application, easier to add options
+- increased datagram buffer size in o2o-scanner
+
 Tag: V00-05-01
 2009-11-24 Andy Salnikov
 - forgot to add PnCCDFrameV1Cvt to svn
