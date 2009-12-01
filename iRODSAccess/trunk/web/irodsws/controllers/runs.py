@@ -50,8 +50,9 @@ _run_data_path = config['app_conf'].get( 'irods.run_data_path', '/psdm-zone/psdm
 # extract run number from irods object
 def _run_number ( obj ):
     if obj['type'] == 'object' :
-        r = obj['name'].split('-')
-        if len(r) > 2 and r[1][0] == 'r'  and r[1][1:].isdigit() :
+        r = obj['name'].split('.')[0]
+        r = r.split('-')
+        if len(r) >= 2 and r[1][0] == 'r'  and r[1][1:].isdigit() :
             return int(r[1][1:],10)
     return None
 
@@ -131,6 +132,8 @@ class RunsController(BaseController):
 
             # append to the list of file for this run
             res.setdefault(run,[]).append(file)
+
+        if not res : abort(404)
 
         # convert to the list of dictionaries
         reslist = [ dict(run=k, files=v) for k,v in res.iteritems() ]

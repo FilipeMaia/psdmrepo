@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2009-11-30 Andy Salnikov
+- run numbers from hdf5 files did not work
+
 Tag: V00-00-06
 2009-11-25 Andy Salnikov
 - protection added in files controller
