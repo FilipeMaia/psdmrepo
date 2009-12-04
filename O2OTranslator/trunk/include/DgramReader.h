@@ -61,7 +61,8 @@ public:
                 DgramQueue& queue,
                 size_t maxDgSize,
                 O2OXtcMerger::MergeMode mode,
-                bool skipDamaged ) ;
+                bool skipDamaged,
+                int l1OffsetSec = 0 ) ;
 
   // Destructor
   ~DgramReader () ;
@@ -79,6 +80,7 @@ private:
   size_t m_maxDgSize ;
   O2OXtcMerger::MergeMode m_mode ;
   bool m_skipDamaged ;
+  int m_l1OffsetSec ;
 
 };
 

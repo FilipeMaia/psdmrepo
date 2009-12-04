@@ -95,6 +95,7 @@ private:
   AppCmdOpt<std::string>      m_experiment ;
   AppCmdOptBool               m_extGroups ;
   AppCmdOpt<std::string>      m_instrument ;
+  AppCmdOpt<int>              m_l1offset ;
   AppCmdOpt<std::string>      m_mdConnStr ;
   AppCmdOptNamedValue<O2OXtcMerger::MergeMode> m_mergeMode ;
   AppCmdOptList<std::string>  m_metadata ;
@@ -122,6 +123,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_experiment ( 'x', "experiment",   "string",   "experiment name", "" )
   , m_extGroups  ( 'G', "group-time",               "use extended group names with timestamps", false )
   , m_instrument ( 'i', "instrument",   "string",   "instrument name", "" )
+  , m_l1offset   (      "l1-offset",    "number",   "L1Accept time offset seconds, def: 0", 0 )
   , m_mdConnStr  ( 'M', "md-conn",      "string",   "metadata ODBC connection string", "" )
   , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", O2OXtcMerger::FileName )
   , m_metadata   ( 'm', "metadata",     "name:value", "science metadata values", '\0' )
@@ -142,6 +144,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_experiment ) ;
   addOption( m_extGroups ) ;
   addOption( m_instrument ) ;
+  addOption( m_l1offset ) ;
   addOption( m_mdConnStr ) ;
   addOption( m_mergeMode ) ;
   m_mergeMode.add ( "one-stream", O2OXtcMerger::OneStream ) ;
@@ -239,7 +242,8 @@ O2O_Translate::runApp ()
   for ( AppCmdOptList<std::string>::const_iterator it = m_eventData.begin() ; it != m_eventData.end() ; ++ it ) {
     files.push_back ( O2OXtcFileName(*it) ) ;
   }
-  boost::thread readerThread( DgramReader ( files, dgqueue, m_dgramsize.value(), m_mergeMode.value(), true ) ) ;
+  boost::thread readerThread( DgramReader ( files, dgqueue, m_dgramsize.value(),
+                                            m_mergeMode.value(), true, m_l1offset.value() ) ) ;
 
   uint64_t count = 0 ;
 

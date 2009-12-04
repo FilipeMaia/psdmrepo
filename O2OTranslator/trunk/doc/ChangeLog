@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-03
+2009-12-04 Andy Salnikov
+- add option --l1-offset to translator to correct the timestamps for 
+  amo00409 runs 39-146
+
 Tag: V00-05-02
 2009-11-30 Andy Salnikov
 - enable damaged events in o2o-scanner, O2OXtcDechunk is now passed

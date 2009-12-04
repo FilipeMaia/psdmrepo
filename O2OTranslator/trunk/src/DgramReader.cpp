@@ -46,12 +46,14 @@ DgramReader::DgramReader ( const FileList& files,
                            DgramQueue& queue,
                            size_t maxDgSize,
                            O2OXtcMerger::MergeMode mode,
-                           bool skipDamaged )
+                           bool skipDamaged,
+                           int l1OffsetSec )
   : m_files( files )
   , m_queue( queue )
   , m_maxDgSize( maxDgSize )
   , m_mode( mode )
   , m_skipDamaged( skipDamaged )
+  , m_l1OffsetSec(l1OffsetSec)
 {
 }
 
@@ -68,7 +70,7 @@ DgramReader::operator() ()
 {
   try {
 
-    O2OXtcMerger iter(m_files, m_maxDgSize, m_mode, m_skipDamaged);
+    O2OXtcMerger iter(m_files, m_maxDgSize, m_mode, m_skipDamaged, m_l1OffsetSec);
     while ( Pds::Dgram* dg = iter.next() ) {
 
       // move it to the queue

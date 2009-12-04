@@ -18,6 +18,7 @@
 //-------------------------------
 #include "AppUtils/AppCmdArgList.h"
 #include "AppUtils/AppCmdOptBool.h"
+#include "AppUtils/AppCmdOptNamedValue.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/O2OXtcFileName.h"
 #include "O2OTranslator/O2OXtcMerger.h"
@@ -93,6 +94,7 @@ private:
 
   // more command line options and arguments
   AppCmdOptBool               m_skipDamaged ;
+  AppCmdOptNamedValue<O2OXtcMerger::MergeMode> m_mergeMode ;
   AppCmdArgList<std::string>  m_inputFiles ;
 
 };
@@ -103,9 +105,14 @@ private:
 O2O_Scanner::O2O_Scanner ( const std::string& appName )
   : AppBase( appName )
   , m_skipDamaged( 'd', "skip-damaged",             "skip damaged datagrams", false )
-, m_inputFiles ( "input-xtc", "the list of the input XTC files" )
+  , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", O2OXtcMerger::FileName )
+  , m_inputFiles ( "input-xtc", "the list of the input XTC files" )
 {
   addOption( m_skipDamaged ) ;
+  addOption( m_mergeMode ) ;
+  m_mergeMode.add ( "one-stream", O2OXtcMerger::OneStream ) ;
+  m_mergeMode.add ( "no-chunking", O2OXtcMerger::NoChunking ) ;
+  m_mergeMode.add ( "file-name", O2OXtcMerger::FileName ) ;
   addArgument( m_inputFiles ) ;
 }
 
@@ -132,7 +139,7 @@ O2O_Scanner::runApp ()
     return 2 ;
   }
 
-  O2OTranslator::O2OXtcMerger iter(files, 0x1000000, O2OTranslator::O2OXtcMerger::OneStream, m_skipDamaged.value());
+  O2OTranslator::O2OXtcMerger iter(files, 0x1000000, m_mergeMode.value(), m_skipDamaged.value());
   while ( Dgram* dg = iter.next() ) {
     const Pds::Sequence& seq = dg->seq ;
     const Pds::ClockTime& clock = seq.clock() ;

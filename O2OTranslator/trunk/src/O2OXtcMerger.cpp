@@ -60,10 +60,14 @@ namespace O2OTranslator {
 // Constructors --
 //----------------
 O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files,
-                             size_t maxDgSize, MergeMode mode, bool skipDamaged )
+                             size_t maxDgSize,
+                             MergeMode mode,
+                             bool skipDamaged,
+                             int l1OffsetSec )
   : m_streams()
   , m_dgrams()
   , m_mode(mode)
+  , m_l1OffsetSec(l1OffsetSec)
 {
   // check that we have at least one input stream
   if ( files.empty() ) {
@@ -132,7 +136,7 @@ O2OXtcMerger::next()
   int stream = -1 ;
   for ( unsigned i = 0 ; i < ns ; ++ i ) {
     if ( m_dgrams[i] ) {
-      if ( stream < 0 or m_dgrams[stream]->seq.clock() > m_dgrams[i]->seq.clock() ) {
+      if ( stream < 0 or dgramTime(*m_dgrams[stream]) > dgramTime(*m_dgrams[i]) ) {
         stream = i ;
       }
     }
