@@ -140,10 +140,10 @@ AppCmdLine::addOption ( AppCmdOptBase& option ) throw(std::exception)
   }
 
   // check maybe some wants to duplicate options?
- if ( findLongOpt ( option.longOption() ) ) {
+ if ( not option.longOption().empty() and findLongOpt ( option.longOption() ) ) {
    throw AppCmdOptDefinedException ( option.longOption() ) ;
  }
- if ( findShortOpt ( option.shortOption() ) ) {
+ if ( option.shortOption() != '\0' && findShortOpt ( option.shortOption() ) ) {
    throw AppCmdOptDefinedException ( option.shortOption() ) ;
  }
 
