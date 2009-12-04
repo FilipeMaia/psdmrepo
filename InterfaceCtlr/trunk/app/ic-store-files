@@ -126,7 +126,7 @@ class ICStoreFiles ( LusiPyApp ) :
             
             self.info( "Processing experiment %s:%s", instr, exp )
             
-            parm = dict ( instrument=instr, experiment=exp )
+            parm = dict ( instrument=instr, instrument_lower=instr.lower(), experiment=exp )
             
             # XTC files first
             if 'experiment-xtc-dir' in config and 'filemanager-xtc-dir' in config :

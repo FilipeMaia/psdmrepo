@@ -196,6 +196,9 @@ class Controller ( LusiPyApp ) :
                         
                         # Found a new fileset to translate
                         self.trace( 'found new fileset %s', pformat(fs) )
+                        
+                        # adjust few things
+                        fs['instrument_lower'] = fs['instrument'].lower()
 
                         counter += 1
                         name = "Tran=%04d" % counter
