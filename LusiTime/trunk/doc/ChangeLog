@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-14
+2009-12-10 Andy Salnikov
+- TimeFormat::format() now returns string <InvalidTime> instead of
+  throwing exception if time is not valid
+
 Tag: V00-00-13
 2009-09-30 Igor Gaponenko
 - IDE migration from NetBeans to Eclipse
