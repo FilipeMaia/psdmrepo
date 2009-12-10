@@ -55,7 +55,8 @@ public:
 
   // Default constructor
   MetaDataScanner ( const O2OMetaData& metadata,
-                    const std::string& odbcConnStr ) ;
+                    const std::string& odbcConnStr,
+                    const std::string& regdbConnStr ) ;
 
   // Destructor
   virtual ~MetaDataScanner () ;
@@ -69,7 +70,7 @@ public:
   virtual void levelEnd ( const Pds::Src& src ) ;
 
   // visit the data object
-  virtual void dataObject ( const void* data, size_t size, 
+  virtual void dataObject ( const void* data, size_t size,
        const Pds::TypeId& typeId, const O2OXtcSrc& src ) ;
 
 protected:
@@ -85,6 +86,7 @@ private:
   // Data members
   const O2OMetaData& m_metadata ;
   const std::string m_odbcConnStr ;
+  const std::string m_regdbConnStr ;
   unsigned long m_nevents ;
   uint64_t m_eventSize ;
   LusiTime::Time m_runBeginTime ;

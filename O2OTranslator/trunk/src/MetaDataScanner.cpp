@@ -51,10 +51,12 @@ namespace O2OTranslator {
 // Constructors --
 //----------------
 MetaDataScanner::MetaDataScanner (const O2OMetaData& metadata,
-                                  const std::string& odbcConnStr)
+                                  const std::string& odbcConnStr,
+                                  const std::string& regdbConnStr)
   : O2OXtcScannerI()
   , m_metadata(metadata)
   , m_odbcConnStr(odbcConnStr)
+  , m_regdbConnStr(regdbConnStr)
   , m_nevents(0)
   , m_eventSize(0)
   , m_runBeginTime()
@@ -152,7 +154,7 @@ MetaDataScanner::levelEnd ( const Pds::Src& src )
 
 // visit the data object
 void
-MetaDataScanner::dataObject ( const void* data, size_t size, 
+MetaDataScanner::dataObject ( const void* data, size_t size,
     const Pds::TypeId& typeId, const O2OXtcSrc& src )
 {
 
@@ -205,7 +207,7 @@ MetaDataScanner::storeRunInfo()
   SciMD::Connection* conn = 0 ;
   try {
     MsgLog( logger, trace, "ODBC connection string: '" << m_odbcConnStr << "'" ) ;
-    conn = SciMD::Connection::open( m_odbcConnStr ) ;
+    conn = SciMD::Connection::open( m_odbcConnStr, m_regdbConnStr ) ;
   } catch ( SciMD::DatabaseError& e ) {
     MsgLog( logger, error, "failed to open SciMD connection, metadata will not be stored" ) ;
     throw ;

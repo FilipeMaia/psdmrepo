@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-00
+2009-12-10 Andy Salnikov
+- New interface to scimd needs additional connection string for RegDB
+
 Tag: V00-05-03
 2009-12-04 Andy Salnikov
 - add option --l1-offset to translator to correct the timestamps for 

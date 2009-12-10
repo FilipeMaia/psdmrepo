@@ -102,6 +102,7 @@ private:
   AppCmdOpt<std::string>      m_outputDir ;
   AppCmdOpt<std::string>      m_outputName ;
   AppCmdOptBool               m_overwrite ;
+  AppCmdOpt<std::string>      m_regConnStr ;
   AppCmdOpt<unsigned long>    m_runNumber ;
   AppCmdOpt<std::string>      m_runType ;
   AppCmdOptNamedValue<O2OHdf5Writer::SplitMode> m_splitMode ;
@@ -130,6 +131,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_outputDir  ( 'd', "output-dir",   "path",     "directory to store output files, def: .", "." )
   , m_outputName ( 'n', "output-name",  "template", "template string for output file names, def: {seq4}.hdf5", "{seq4}.hdf5" )
   , m_overwrite  (      "overwrite",                "overwrite output file", false )
+  , m_regConnStr ( 'R', "regdb-conn",   "string",   "RegDB ODBC connection string", "" )
   , m_runNumber  ( 'r', "run-number",   "number",   "run number, non-negative number; def: 0", 0 )
   , m_runType    ( 't', "run-type",     "string",   "run type, DATA or CALIB, def: DATA", "DATA" )
   , m_splitMode  ( 's', "split-mode",   "mode-name","one of none, or family; def: family", O2OHdf5Writer::Family )
@@ -232,7 +234,7 @@ O2O_Translate::runApp ()
                                   metadata ) ) ;
 
   // instantiate metadata scanner
-  scanners.push_back ( new MetaDataScanner( metadata, m_mdConnStr.value() ) ) ;
+  scanners.push_back ( new MetaDataScanner( metadata, m_mdConnStr.value(), m_regConnStr.value() ) ) ;
 
   // make datagram queue
   DgramQueue dgqueue( m_dgramQSize.value() ) ;
