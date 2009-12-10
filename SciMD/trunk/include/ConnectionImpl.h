@@ -52,7 +52,7 @@ struct ExperDescr {
     int         id ;
     std::string name ;
     int         instr_id ;
-    int         group_id ;
+    std::string instr_name ;
     std::string begin_time ;
     std::string end_time ;
     std::string descr ;
@@ -116,9 +116,11 @@ public:
     /**
       * Normal constructor.
       *
-      * Expects ODBC connector as the only parameter.
+      * Expects two ODBC connectors as input parameters - one for SciMD and
+      * the other one for RegDB.
       */
-    explicit ConnectionImpl (const odbcpp::OdbcConnection& odbc_conn) ;
+    explicit ConnectionImpl (const odbcpp::OdbcConnection& odbc_conn_scimd,
+                             const odbcpp::OdbcConnection& odbc_conn_regdb) ;
 
     /**
       * Destructor.
@@ -128,11 +130,16 @@ public:
     virtual ~ConnectionImpl () throw () ;
 
     /**
-      * Get ODBC connection string for the database.
+      * Get ODBC connection string for the SciMD database.
       *
-      * @see method Connection::connString()
+      * @see method Connection::connStringSciMD()
       */
-    virtual std::string connString () const ;
+    virtual std::string connStringSciMD () const ;
+
+    /**
+      * Get ODBC connection string for the regDB database.
+      */
+    virtual std::string connStringRegDB () const ;
 
     /**
       * Begin the transaction.
@@ -172,6 +179,17 @@ public:
                                 const std::string& experiment,
                                 const std::string& parameter) throw (WrongParams,
                                                                      DatabaseError) ;
+    /**
+      * Define a new run parameter for an experiment.
+      *
+      * @see method Connection::defineParam()
+      */
+     virtual void defineParam (const std::string& instrument,
+                               const std::string& experiment,
+                               const std::string& parameter,
+                               const std::string& type,
+                               const std::string& description) throw (WrongParams,
+                                                                      DatabaseError) ;
 
     /**
       * Create a placeholder for a new run.
@@ -359,7 +377,8 @@ private:
 
     bool m_is_started ;     // there is an active transaction
 
-    odbcpp::OdbcConnection m_odbc_conn ;    // ODBC connector
+    odbcpp::OdbcConnection m_odbc_conn_scimd ;  // ODBC connector (SciMD)
+    odbcpp::OdbcConnection m_odbc_conn_regdb ;  // ODBC connector (RegDB)
 };
 
 //------------------
@@ -423,7 +442,7 @@ ConnectionImpl::setRunParamImpl (const std::string& instrument,
 
         if (updating) {
             {
-                odbcpp::OdbcStatement stmt = m_odbc_conn.statement (
+                odbcpp::OdbcStatement stmt = m_odbc_conn_scimd.statement (
                     "UPDATE run_val SET source=?, updated=? WHERE run_id=? AND param_id=?");
 
                 stmt.bindParam (1, p_source) ;
@@ -435,7 +454,7 @@ ConnectionImpl::setRunParamImpl (const std::string& instrument,
                 stmt.unbindParams() ;
             }
             {
-                odbcpp::OdbcStatement stmt = m_odbc_conn.statement (
+                odbcpp::OdbcStatement stmt = m_odbc_conn_scimd.statement (
                     "UPDATE run_val_" + type + " SET val=? WHERE run_id=? AND param_id=?");
 
                 stmt.bindParam (1, p_value) ;
@@ -447,7 +466,7 @@ ConnectionImpl::setRunParamImpl (const std::string& instrument,
             }
         } else {
             {
-                odbcpp::OdbcStatement stmt = m_odbc_conn.statement (
+                odbcpp::OdbcStatement stmt = m_odbc_conn_scimd.statement (
                     "INSERT INTO run_val VALUES(?,?,?,?)");
 
                 stmt.bindParam (1, p_run_id) ;
@@ -459,7 +478,7 @@ ConnectionImpl::setRunParamImpl (const std::string& instrument,
                 stmt.unbindParams() ;
             }
             {
-                odbcpp::OdbcStatement stmt = m_odbc_conn.statement (
+                odbcpp::OdbcStatement stmt = m_odbc_conn_scimd.statement (
                     "INSERT INTO run_val_" + type + " VALUES(?,?,?)");
 
                 stmt.bindParam (1, p_run_id) ;

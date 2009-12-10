@@ -89,9 +89,14 @@ public:
     // Selectors (const)
 
     /**
-      * Get ODBC connection string for the database.
+      * Get ODBC connection string for the SciMD database.
       */
-    virtual std::string connString () const = 0 ;
+    virtual std::string connStringSciMD () const = 0 ;
+
+    /**
+      * Get ODBC connection string for the regDB database.
+      */
+    virtual std::string connStringRegDB () const = 0 ;
 
     // ------------------------------------------------------------
     // ------------- Transaction management methods ---------------
@@ -157,6 +162,27 @@ public:
     // --------------------------------------------------------------------
     // ------------- Database contents modification methods ---------------
     // --------------------------------------------------------------------
+
+    /**
+      * Define a new run parameter for an experiment.
+      *
+      * The method would create a definition for a new run parameter of an experiment
+      * in the database.
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"   : to report wrong parameters (non-existing experiment, etc.)
+      *   "DatabaseError" : to report database related problems
+      *
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+     virtual void defineParam (const std::string& instrument,
+                               const std::string& experiment,
+                               const std::string& parameter,
+                               const std::string& type,
+                               const std::string& description) throw (WrongParams,
+                                                                      DatabaseError) = 0 ;
 
     /**
       * Create a placeholder for a new run.
@@ -271,7 +297,15 @@ public:
     /**
       * Establish the connection.
       *
-      * The connection will be open using the specified ODBC connection string.
+      * The connection will be open using the specified ODBC connection strings.
+      * Two connections will be established here:
+      *
+      *   SciMD - Science Metadata Database
+      *
+      *   RegDB - Experiments Registry Database (an information about instruments
+      *           and experiments). This database will be used in read-only mode
+      *           only.
+      *
       * In case of a success, a valid pointer is returned. The object's ownership
       * is also retured by the method.
       *
@@ -281,7 +315,8 @@ public:
       *
       * @see class DatabaseError
       */
-    static Connection* open (const std::string& odbc_conn_str) throw (DatabaseError) ;
+    static Connection* open (const std::string& odbc_conn_scimd_str,
+                             const std::string& odbc_conn_regdb_str) throw (DatabaseError) ;
 
     // Selectors (const)
 

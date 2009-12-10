@@ -11,6 +11,20 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2009-12-09 Igor Gaponenko
+- redesigned the schema to delegate all instrument/experiment specific
+requests to a separate database (Experiments registry Database). Use
+only a numeric 'exper_id' to identify an experiment. ATTENTION: the new
+schema is not compatible with the old one.
+- added 'CASCADE' for both 'UPDATE' and "DELETE' in all foreign keys 
+- modified the source code accordingly
+- modified and simplified the administrative tool (Python)
+- extended the C++ API with a method allowing to define run parameters;
+added a test for the new method into the C++ test application; modified
+the constructor of C++ API class SciMD::Connection to accept separate
+ODBC connections for SciMD and RegDB databases.
+
 Tag: V00-00-10
 2009-11-16 Igor Gaponenko
 - added the interactive command 'remove_runs' (see Python admin tools)

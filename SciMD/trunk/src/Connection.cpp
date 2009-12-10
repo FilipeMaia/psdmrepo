@@ -56,7 +56,8 @@ Connection::s_conn = 0 ;
 //------------------
 
 Connection*
-Connection::open (const std::string& odbc_conn_str) throw (DatabaseError)
+Connection::open (const std::string& odbc_conn_scimd_str,
+                  const std::string& odbc_conn_regdb_str) throw (DatabaseError)
 {
     // Disconnect from the previously connected database (if any)
     //
@@ -66,31 +67,37 @@ Connection::open (const std::string& odbc_conn_str) throw (DatabaseError)
     }
 
     try {
-        // Connect to the database and configure the connector before
+
+        // Connect to the databases and configure the connector before
         // returning it to a caller.
 
-        // Setup environment
+        // Setup environments
         //
-        OdbcEnvironment env ;
+        OdbcEnvironment env_scimd ;
+        OdbcEnvironment env_regdb ;
 
-        // Create an ODBC connection
+        // Create ODBC connections
         //
-        OdbcConnection conn = env.connection () ;
+        OdbcConnection conn_scimd = env_scimd.connection () ;
+        OdbcConnection conn_regdb = env_regdb.connection () ;
 
         // Set trhose attributes which should be initialized before setting up
         // a connection.
         //
-        conn.setAttr (ODBC_ATTR_PACKET_SIZE(1*1024*1024)) ;
+        conn_scimd.setAttr (ODBC_ATTR_PACKET_SIZE(1*1024*1024)) ;
+        conn_regdb.setAttr (ODBC_ATTR_PACKET_SIZE(1*1024*1024)) ;
 
         // Connect now
         //
-        conn.connect (odbc_conn_str) ;
+        conn_scimd.connect (odbc_conn_scimd_str) ;
+        conn_regdb.connect (odbc_conn_regdb_str) ;
 
         // Set connection attributes
         //
-        conn.setAttr (ODBC_AUTOCOMMIT_ON) ;
+        conn_scimd.setAttr (ODBC_AUTOCOMMIT_ON) ;
+        conn_regdb.setAttr (ODBC_AUTOCOMMIT_ON) ;
 
-        s_conn = new ConnectionImpl (conn) ;
+        s_conn = new ConnectionImpl (conn_scimd, conn_regdb) ;
 
     } catch (const odbcpp::OdbcException& e) {
         throw DatabaseError (e.what()) ;

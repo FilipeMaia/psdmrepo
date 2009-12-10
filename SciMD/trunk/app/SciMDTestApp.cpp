@@ -151,13 +151,11 @@ private:
 
     // Implement the commands
 
-    int cmd_help () ;
-
-    int cmd_add_run () throw (std::exception) ;
-
+    int cmd_help          () ;
+    int cmd_define_param  () throw (std::exception) ;
+    int cmd_param_info    () throw (std::exception) ;
+    int cmd_add_run       () throw (std::exception) ;
     int cmd_set_run_param () throw (std::exception) ;
-
-    int cmd_param_info () throw (std::exception) ;
 
 private:
 
@@ -167,7 +165,8 @@ private:
     AppUtils::AppCmdArgList<std::string > m_args ;
 
     AppUtils::AppCmdOpt<std::string >  m_source ;
-    AppUtils::AppCmdOpt<std::string >  m_odbc_conn ;
+    AppUtils::AppCmdOpt<std::string >  m_odbc_conn_scimd ;
+    AppUtils::AppCmdOpt<std::string >  m_odbc_conn_regdb ;
     AppUtils::AppCmdOptIncr            m_update ;
 
     // Database connection
@@ -192,11 +191,16 @@ SciMDTestApp::SciMDTestApp (const std::string& appName) :
               "string",
               "a source of the modification",
               "TEST"),
-    m_odbc_conn ('c',
-                 "odbc-conn",
-                 "string",
-                 "ODBC connection string",
-                 "DSN=SCIMD"),
+    m_odbc_conn_scimd ('c',
+                       "odbc-conn-scimd",
+                       "string",
+                       "ODBC connection string for SciMD",
+                       "DSN=SCIMD"),
+    m_odbc_conn_regdb ('r',
+                       "odbc-conn-regdb",
+                       "string",
+                       "ODBC connection string for RegDB",
+                       "DSN=REGDB"),
     m_update ('u',
               "update",
               "update is allowed",
@@ -206,7 +210,8 @@ SciMDTestApp::SciMDTestApp (const std::string& appName) :
     addArgument (m_command) ;
     addArgument (m_args) ;
     addOption   (m_source) ;
-    addOption   (m_odbc_conn) ;
+    addOption   (m_odbc_conn_scimd) ;
+    addOption   (m_odbc_conn_regdb) ;
     addOption   (m_update) ;
 }
 
@@ -232,17 +237,19 @@ SciMDTestApp::runApp ()
 
         // Connect to the database
         //
-        m_connection = SciMD::Connection::open (m_odbc_conn.value()) ;
+        m_connection = SciMD::Connection::open (m_odbc_conn_scimd.value(), m_odbc_conn_regdb.value()) ;
         if (!m_connection) {
-            MsgLogRoot( error, "failed to connect to: " << m_odbc_conn.value()) ;
+            MsgLogRoot( error, "failed to connect to SciMD: " << m_odbc_conn_scimd.value()
+                << " or RegDB: " << m_odbc_conn_regdb.value()) ;
             return 2 ;
         }
 
         // Proceed to commands which require the database
         //
-        if      (command == "add_run")       return cmd_add_run ();
-        else if (command == "set_run_param") return cmd_set_run_param ();
+        if      (command == "define_param")  return cmd_define_param ();
         else if (command == "param_info")    return cmd_param_info ();
+        else if (command == "add_run")       return cmd_add_run ();
+        else if (command == "set_run_param") return cmd_set_run_param ();
         else {
             MsgLogRoot( error, "unknown command") ;
             return 2 ;
@@ -270,9 +277,12 @@ SciMDTestApp::cmd_help ()
              << "\n"
              << "  help [command]\n"
              << "\n"
+             << "  define_param  <instrument> <experiment> <param> {INT|INT64|DOUBLE|TEXT} <description>\n"
+             << "  param_info    <instrument> <experiment> <param>\n"
+             << "\n"
              << "  add_run       <instrument> <experiment> <run> {DATA|CALIB} <begn_time> <end_time>\n"
-             << "  set_run_param <instrument> <experiment> <run> <param> <value> {INT|INT64|DOUBLE|TEXT}\n"
-             << "  param_info    <instrument> <experiment> <param>" << endl;
+             << "  set_run_param <instrument> <experiment> <run> <param> <value> {INT|INT64|DOUBLE|TEXT}"
+             << endl;
         return 0 ;
     }
     if (m_args.size() != 1) {
@@ -293,6 +303,44 @@ SciMDTestApp::cmd_help ()
              << "  name is given then a general syntax of each command will\n"
              << "  be reported. Otherwise a full description of the command\n"
              << "  in question will be printed." << endl ;
+
+    } else if (command == "define_param") {
+
+        cout << "SYNTAX:\n"
+             << "\n"
+             << "  define_param <instrument> <experiment> <param> {INT|INT64|DOUBLE|TEXT} <description>\n"
+             << "\n"
+             << "DESCRIPTION:\n"
+             << "\n"
+             << "  Define a new run parameter for an experiment. Note, that parameters must\n"
+             << "  be defined for each experiment before setting their values for runs.\n"
+             << "  Also remember that different experiments have separate collections\n"
+             << "  of parameters.\n"
+             << "\n"
+             << "  The parameter type can be one of the following:\n"
+             << "\n"
+             << "    'INT'\n"
+             << "    'INT64'\n"
+             << "    'DOUBLE'\n"
+             << "    'DOUBLE'\n"
+             << "    'TEXT'\n"
+             << "\n"
+             << "  The parameter description can be anything."
+             << endl ;
+
+    } else if (command == "param_info") {
+
+        cout << "SYNTAX:\n"
+             << "\n"
+             << "  param_info <instrument> <experiment> <param>\n"
+             << "\n"
+             << "DESCRIPTION:\n"
+             << "\n"
+             << "  Check if the specified parameter exists, and if so print its\n"
+             << "  description.\n"
+             << "\n"
+             << "  Note, that the command won't display values of the parameter\n"
+             << "  for runs." << endl ;
 
     } else if (command == "add_run") {
 
@@ -350,24 +398,72 @@ SciMDTestApp::cmd_help ()
              << "    'DOUBLE'\n"
              << "    'TEXT'" << endl ;
 
-    } else if (command == "param_info") {
-
-        cout << "SYNTAX:\n"
-             << "\n"
-             << "  param_info <instrument> <experiment> <param>\n"
-             << "\n"
-             << "DESCRIPTION:\n"
-             << "\n"
-             << "  Check if the specified parameter exists, and if so print its\n"
-             << "  description.\n"
-             << "\n"
-             << "  Note, that the command won't display values of the parameter\n"
-             << "  for runs." << endl ;
-
     } else {
         MsgLogRoot (error, "unknown command name requested") ;
         return 2 ;
     }
+    return 0 ;
+}
+
+int
+SciMDTestApp::cmd_define_param () throw (std::exception)
+{
+    // Parse and verify the arguments
+    //
+    if (m_args.empty() || m_args.size() != 5) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string instrument  = *(itr++) ;
+    const std::string experiment  = *(itr++) ;
+    const std::string param       = *(itr++) ;
+    const std::string type        = *(itr++) ;
+    const std::string description = *(itr++) ;
+
+    m_connection->beginTransaction () ;
+    m_connection->defineParam (
+        instrument,
+        experiment,
+        param,
+        type,
+        description) ;
+    m_connection->commitTransaction () ;
+    return 0 ;
+}
+
+int
+SciMDTestApp::cmd_param_info () throw (std::exception)
+{
+    // Parse and verify the arguments
+    //
+    if (m_args.empty() || m_args.size() != 3) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument = *(itr++) ;
+    const std::string  experiment = *(itr++) ;
+    const std::string  param      = *(itr++) ;
+
+    SciMD::ParamInfo p ;
+
+    m_connection->beginTransaction () ;
+    const bool exists = m_connection->getParamInfo (
+        p,
+        instrument,
+        experiment,
+        param) ;
+    m_connection->commitTransaction () ;
+
+    if (exists)
+        cout << "       name: " << p.name << "\n"
+             << " experiment: " << p.experiment << "\n"
+             << "       type: " << p.type << "\n"
+             << "description: " << p.descr << endl ;
+    else
+        cout << "Sorry, no such parameter!" << endl ;
+
     return 0 ;
 }
 
@@ -494,41 +590,6 @@ SciMDTestApp::cmd_set_run_param () throw (std::exception)
         MsgLogRoot (error, "unsupported type of the value") ;
         return 2 ;
     }
-    return 0 ;
-}
-
-int
-SciMDTestApp::cmd_param_info () throw (std::exception)
-{
-    // Parse and verify the arguments
-    //
-    if (m_args.empty() || m_args.size() != 3) {
-        MsgLogRoot (error, "wrong number of arguments to the command") ;
-        return 2 ;
-    }
-    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
-    const std::string  instrument = *(itr++) ;
-    const std::string  experiment = *(itr++) ;
-    const std::string  param      = *(itr++) ;
-
-    SciMD::ParamInfo p ;
-
-    m_connection->beginTransaction () ;
-    const bool exists = m_connection->getParamInfo (
-        p,
-        instrument,
-        experiment,
-        param) ;
-    m_connection->commitTransaction () ;
-
-    if (exists)
-        cout << "       name: " << p.name << "\n"
-             << " experiment: " << p.experiment << "\n"
-             << "       type: " << p.type << "\n"
-             << "description: " << p.descr << endl ;
-    else
-        cout << "Sorry, no such parameter!" << endl ;
-
     return 0 ;
 }
 

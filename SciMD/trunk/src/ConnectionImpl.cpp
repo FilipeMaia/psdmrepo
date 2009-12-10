@@ -60,6 +60,17 @@ isValidRunType(const std::string& type)
     return false ;
 }
 
+bool
+isValidParamType(const std::string& type)
+{
+    static const char* const validTypes[] = {"INT", "INT64", "DOUBLE", "TEXT" } ;
+    static const size_t numTypes = 4 ;
+    for (size_t i = 0 ; i < numTypes ; ++i)
+        if (0 == strcasecmp(validTypes[i], type.c_str()))
+            return true ;
+    return false ;
+}
+
 //-------------
 // Operators --
 //-------------
@@ -71,7 +82,6 @@ operator<< (std::ostream& s, const ExperDescr& d)
       << "          id: " << d.id << "\n"
       << "        name: " << d.name << "\n"
       << "    instr_id: " << d.instr_id << "\n"
-      << "    group_id: " << d.group_id << "\n"
       << "  begin_time: " << d.begin_time << "\n"
       << "    end_time: " << d.end_time << "\n"
       << "       descr: " << d.descr << "\n"
@@ -110,10 +120,12 @@ operator<< (std::ostream& s, const RunDescr& d)
 // Constructors --
 //----------------
 
-ConnectionImpl::ConnectionImpl (const odbcpp::OdbcConnection& odbc_conn) :
+ConnectionImpl::ConnectionImpl (const odbcpp::OdbcConnection& odbc_conn_scimd,
+                                const odbcpp::OdbcConnection& odbc_conn_regdb) :
     Connection () ,
     m_is_started (false) ,
-    m_odbc_conn (odbc_conn)
+    m_odbc_conn_scimd (odbc_conn_scimd),
+    m_odbc_conn_regdb (odbc_conn_regdb)
 {}
 
 //--------------
@@ -128,9 +140,15 @@ ConnectionImpl::~ConnectionImpl () throw ()
 //-----------
 
 std::string
-ConnectionImpl::connString () const
+ConnectionImpl::connStringSciMD () const
 {
-    return m_odbc_conn.connString () ;
+    return m_odbc_conn_scimd.connString () ;
+}
+
+std::string
+ConnectionImpl::connStringRegDB () const
+{
+    return m_odbc_conn_regdb.connString () ;
 }
 
 void
@@ -139,7 +157,8 @@ ConnectionImpl::beginTransaction () throw (DatabaseError)
     if (m_is_started) return ;
 
     try {
-        m_odbc_conn.statement ("BEGIN").execute() ;
+        m_odbc_conn_scimd.statement ("BEGIN").execute() ;
+        m_odbc_conn_regdb.statement ("BEGIN").execute() ;
     } catch (const odbcpp::OdbcException& e) {
         throw DatabaseError (e.what()) ;
     }
@@ -151,7 +170,8 @@ ConnectionImpl::commitTransaction () throw (DatabaseError)
 {
     if (!m_is_started) return ;
     try {
-        m_odbc_conn.statement ("COMMIT").execute() ;
+        m_odbc_conn_scimd.statement ("COMMIT").execute() ;
+        m_odbc_conn_regdb.statement ("COMMIT").execute() ;
     } catch (const odbcpp::OdbcException& e) {
         throw DatabaseError (e.what()) ;
     }
@@ -163,7 +183,8 @@ ConnectionImpl::abortTransaction () throw (DatabaseError)
 {
     if (!m_is_started) return ;
     try {
-        m_odbc_conn.statement ("ROLLBACK").execute();
+        m_odbc_conn_scimd.statement ("ROLLBACK").execute();
+        m_odbc_conn_regdb.statement ("ROLLBACK").execute();
     } catch (const odbcpp::OdbcException& e) {
         throw DatabaseError (e.what()) ;
     }
@@ -208,6 +229,51 @@ ConnectionImpl::getParamInfo (ParamInfo& info,
 }
 
 void
+ConnectionImpl::defineParam (const std::string& instrument,
+                             const std::string& experiment,
+                             const std::string& parameter,
+                             const std::string& type,
+                             const std::string& description) throw (WrongParams,
+                                                                    DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    // TODO: Consider reinforcing the types at a level of the API interface
+    //       (by using 'enum' rather than here.
+    //
+    if (!SciMD::isValidParamType (type))
+        throw WrongParams ("unknown type of the parameter") ;
+
+    try {
+
+        ExperDescr exper_descr ;
+        if (!this->findExper (exper_descr, instrument, experiment))
+            throw WrongParams ("unknown experiment") ;
+
+        OdbcStatement stmt = m_odbc_conn_scimd.statement (
+            "INSERT INTO run_param VALUES(NULL,?,?,?,?)");
+
+        OdbcParam<std::string> p1 (parameter) ;
+        OdbcParam<int>         p2 (exper_descr.id) ;
+        OdbcParam<std::string> p3 (type) ;
+        OdbcParam<std::string> p4 (description) ;
+
+        stmt.bindParam (1, p1) ;
+        stmt.bindParam (2, p2) ;
+        stmt.bindParam (3, p3) ;
+        stmt.bindParam (4, p4) ;
+
+        OdbcResultPtr result = stmt.execute() ;
+
+        stmt.unbindParams() ;
+
+    } catch (const odbcpp::OdbcException& e) {
+        throw DatabaseError (e.what()) ;
+    }
+}
+
+void
 ConnectionImpl::createRun (const std::string&    instrument,
                            const std::string&    experiment,
                            int                   run,
@@ -239,7 +305,7 @@ ConnectionImpl::createRun (const std::string&    instrument,
         if (!this->findExper (exper_descr, instrument, experiment))
             throw WrongParams ("unknown experiment") ;
 
-        OdbcStatement stmt = m_odbc_conn.statement (
+        OdbcStatement stmt = m_odbc_conn_scimd.statement (
             "INSERT INTO run VALUES(NULL,?,?,?,?,?)");
 
         OdbcParam<int>         p1 (run) ;
@@ -365,7 +431,7 @@ ConnectionImpl::findExper (ExperDescr&        descr,
 
         // Formulate and make the query
         //
-        OdbcStatement stmt = m_odbc_conn.statement ("SELECT e.* FROM instrument i, experiment e WHERE i.name=? AND e.name=? AND i.id=e.instr_id") ;
+        OdbcStatement stmt = m_odbc_conn_regdb.statement ("SELECT e.*,i.name as instr_name FROM instrument i, experiment e WHERE i.name=? AND e.name=? AND i.id=e.instr_id") ;
 
         OdbcParam<std::string> p_instrument (instrument) ;
         OdbcParam<std::string> p_experiment (experiment) ;
@@ -384,7 +450,7 @@ ConnectionImpl::findExper (ExperDescr&        descr,
         OdbcColumnVar<int >         col_id  ;
         OdbcColumnVar<std::string > col_name  (255) ;
         OdbcColumnVar<int >         col_instr_id ;
-        OdbcColumnVar<int >         col_group_id ;
+        OdbcColumnVar<std::string > col_instr_name (255) ;
         OdbcColumnVar<std::string > col_begin_time (255) ;
         OdbcColumnVar<std::string > col_end_time   (255) ;
         OdbcColumnVar<std::string > col_descr      (255) ;
@@ -392,7 +458,7 @@ ConnectionImpl::findExper (ExperDescr&        descr,
         result->bindColumn ("id",         col_id) ;
         result->bindColumn ("name",       col_name) ;
         result->bindColumn ("instr_id",   col_instr_id) ;
-        result->bindColumn ("group_id",   col_group_id) ;
+        result->bindColumn ("instr_name", col_instr_name) ;
         result->bindColumn ("begin_time", col_begin_time) ;
         result->bindColumn ("end_time",   col_end_time) ;
         result->bindColumn ("descr",      col_descr) ;
@@ -407,7 +473,7 @@ ConnectionImpl::findExper (ExperDescr&        descr,
         descr.id         = col_id.value         (row) ;
         descr.name       = col_name.value       (row) ;
         descr.instr_id   = col_instr_id.value   (row) ;
-        descr.group_id   = col_group_id.value   (row) ;
+        descr.instr_name = col_instr_name.value (row) ;
         descr.begin_time = col_begin_time.value (row) ;
         if (!col_end_time.isNull()) descr.end_time = col_end_time.value (row) ;
         if (!col_descr.isNull())    descr.descr    = col_descr.value    (row) ;
@@ -430,7 +496,7 @@ ConnectionImpl::findRunParam (ParamDescr&        descr,
 
         // Formulate and make the query
         //
-        OdbcStatement stmt = m_odbc_conn.statement ("SELECT * FROM run_param WHERE exper_id = ? AND param = ?") ;
+        OdbcStatement stmt = m_odbc_conn_scimd.statement ("SELECT * FROM run_param WHERE exper_id = ? AND param = ?") ;
 
         OdbcParam<int>         p1 (exper_id) ;
         OdbcParam<std::string> p2 (name) ;
@@ -490,7 +556,7 @@ ConnectionImpl::findRun (RunDescr& descr,
 
         // Formulate and make the query
         //
-        OdbcStatement stmt = m_odbc_conn.statement ("SELECT * FROM run WHERE exper_id = ? AND num = ?") ;
+        OdbcStatement stmt = m_odbc_conn_scimd.statement ("SELECT * FROM run WHERE exper_id = ? AND num = ?") ;
 
         OdbcParam<int > p1 (exper_id) ;
         OdbcParam<int > p2 (num) ;
@@ -552,7 +618,7 @@ ConnectionImpl::runParamValueIsSet (int param_id,
 
         // Formulate and make the query
         //
-        OdbcStatement stmt = m_odbc_conn.statement ("SELECT * FROM run_val WHERE param_id = ? AND run_id = ?") ;
+        OdbcStatement stmt = m_odbc_conn_scimd.statement ("SELECT * FROM run_val WHERE param_id = ? AND run_id = ?") ;
 
         OdbcParam<int > p1 (param_id) ;
         OdbcParam<int > p2 (run_id) ;
