@@ -431,6 +431,45 @@ class InterfaceDb ( object ) :
         # non-empty means we found something
         return bool(rows)
 
+    # =======================
+    # List active experiments
+    # =======================
+
+    @_synchronized
+    @_transaction
+    def active_experiments ( self, cursor ) :
+        """Returns list of tuples (instr,exp) for all active experiments"""
+
+        cursor.execute("SELECT instrument, experiment FROM active_exp ORDER BY instrument, experiment")
+        rows = cursor.fetchall()
+
+        # non-empty means we found something
+        return rows
+
+    # ===================
+    # Activate experiment
+    # ===================
+
+    @_synchronized
+    @_transaction
+    def activate_experiment ( self, instr, exp, cursor ) :
+        """Make experiments active"""
+
+        cursor.execute("INSERT INTO active_exp (instrument, experiment) VALUES (%s,%s)",
+                       (instr, exp) )
+
+    # =====================
+    # Deactivate experiment
+    # =====================
+
+    @_synchronized
+    @_transaction
+    def deactivate_experiment ( self, instr, exp, cursor ) :
+        """Remove experiments from active list"""
+
+        cursor.execute("DELETE FROM active_exp WHERE instrument=%s AND experiment=%s",
+                       (instr, exp) )
+
 
     # ==================
     # Create new fileset

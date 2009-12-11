@@ -11,6 +11,10 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-03
+2009-12-10 Andy Salnikov
+- new ic-commands to manage active experiments
+
 Tag: V00-04-02
 2009-12-04 Andy Salnikov
 - add support for instrument_lower configuration parameter

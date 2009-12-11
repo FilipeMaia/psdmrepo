@@ -100,19 +100,35 @@ class ICCommand ( LusiPyApp ) :
     """,
             self.cmd_help)
 
-            # ----------------------------------------------------------------------
         self.__add_handler(
             'translate',
             '<instrument> <experiment> <run_type> <run_number> <xtc_files>',
             "Translate a set of files to Offline Data Management",
              self.cmd_translate )
 
-        # ----------------------------------------------------------------------
         self.__add_handler(
             'remove',
             '<instrument> <experiment> [<run_number>]',
             "Remove fileset(s) from the database",
              self.cmd_remove )
+
+        self.__add_handler(
+            'active',
+            '',
+            "Display active experiments",
+             self.cmd_active )
+
+        self.__add_handler(
+            'activate',
+            '<instrument> <experiment> ',
+            "Activate experiment",
+             self.cmd_activate )
+
+        self.__add_handler(
+            'deactivate',
+            '<instrument> <experiment> ',
+            "Deactivate experiment",
+             self.cmd_deactivate )
 
 
     # =========================================================================
@@ -241,9 +257,9 @@ SUPPORTED COMMANDS:
         
         return 0
 
-    # ===================
-    # Translate a fileset
-    # ===================
+    # ===============
+    # Remove filesets
+    # ===============
 
     def cmd_remove ( self, command, args ) :
 
@@ -257,6 +273,46 @@ SUPPORTED COMMANDS:
         if len(args) > 2 : runnum = args[2]
 
         self.icdb().remove_fileset ( instr, exper, runnum )
+        
+        return 0
+
+    # =======================
+    # Show active experiments
+    # =======================
+
+    def cmd_active ( self, command, args ) :
+
+        if args:
+            self._parser.error("No arguments expected - %s" % command)
+
+        for instr, exp in self.icdb().active_experiments() :
+            print "%-6s %s" %(instr, exp)
+        
+        return 0
+
+    # ===================
+    # Activate experiment
+    # ===================
+
+    def cmd_activate ( self, command, args ) :
+
+        if len(args) != 2:
+            self._parser.error("Enter: instrument experiment - %s" % command)
+
+        self.icdb().activate_experiment(*args)
+        
+        return 0
+
+    # =====================
+    # Deactivate experiment
+    # =====================
+
+    def cmd_deactivate ( self, command, args ) :
+
+        if len(args) != 2:
+            self._parser.error("Enter: instrument experiment - %s" % command)
+
+        self.icdb().deactivate_experiment(*args)
         
         return 0
 
