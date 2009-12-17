@@ -64,11 +64,12 @@ EvrConfigV2::native_type()
   rateEnumType.insert ( "r5Hz", Pds::EvrData::ConfigV2::r5Hz ) ;
   rateEnumType.insert ( "r1Hz", Pds::EvrData::ConfigV2::r1Hz ) ;
   rateEnumType.insert ( "r0_5Hz", Pds::EvrData::ConfigV2::r0_5Hz ) ;
+  rateEnumType.insert ( "Single", Pds::EvrData::ConfigV2::Single ) ;
 
   hdf5pp::EnumType<int16_t> beamEnumType = hdf5pp::EnumType<int16_t>::enumType() ;
   beamEnumType.insert ( "Off", Pds::EvrData::ConfigV2::Off ) ;
   beamEnumType.insert ( "On", Pds::EvrData::ConfigV2::On ) ;
-  
+
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<EvrConfigV2>() ;
   confType.insert( "beam", offsetof(EvrConfigV2_Data,beam), beamEnumType ) ;
   confType.insert( "rate", offsetof(EvrConfigV2_Data,rate), rateEnumType ) ;
