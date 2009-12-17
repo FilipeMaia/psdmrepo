@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
+#include <cerrno>
 #include <boost/lexical_cast.hpp>
 
 //----------------------
@@ -56,6 +57,15 @@ public:
 
 };
 
+class O2OErrnoException : public O2OException {
+public:
+
+    O2OErrnoException(const std::string& className, const std::string& what)
+    : O2OException( className, what + ": " + strerror(errno) ) {}
+
+};
+
+
 // thrown for incorrect arguments provided
 class O2OArgumentException : public O2OException {
 public:
@@ -65,11 +75,29 @@ public:
 
 };
 
-class O2OFileOpenException : public O2OException {
+class O2OFileOpenException : public O2OErrnoException {
 public:
 
   O2OFileOpenException( const std::string& fileName )
-    : O2OException( "O2OFileOpenException", "failed to open file "+fileName ) {}
+    : O2OErrnoException( "O2OFileOpenException", "failed to open file "+fileName ) {}
+
+};
+
+class O2OXTCReadException : public O2OErrnoException {
+public:
+
+  O2OXTCReadException(const std::string& fileName)
+    : O2OErrnoException( "O2OXTCReadException", "failed to read XTC file "+fileName ) {}
+
+};
+
+class O2OXTCSizeLimitException : public O2OException {
+public:
+
+    O2OXTCSizeLimitException(const std::string& fileName, size_t dgSize, size_t maxSize)
+    : O2OException( "O2OXTCSizeLimitException", "datagram too large reading XTC file "+fileName+
+            ": datagram size="+boost::lexical_cast<std::string>(dgSize) +
+            ", max size="+boost::lexical_cast<std::string>(maxSize) ) {}
 
 };
 

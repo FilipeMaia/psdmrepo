@@ -1,12 +1,12 @@
-#ifndef O2OTRANSLATOR_O2OXTCDECHUNK_H
-#define O2OTRANSLATOR_O2OXTCDECHUNK_H
+#ifndef O2OTRANSLATOR_O2OXTCDGITERATOR_H
+#define O2OTRANSLATOR_O2OXTCDGITERATOR_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class O2OXtcDechunk.
+//	Class O2OXtcDgIterator.
 //
 //------------------------------------------------------------------------
 
@@ -14,22 +14,21 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
-#include <list>
-#include <stdio.h>
+#include <cstdio>
 
 //----------------------
 // Base Class Headers --
 //----------------------
 
+
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/xtc/Dgram.hh"
-#include "O2OTranslator/O2OXtcFileName.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+#include "pdsdata/xtc/Dgram.hh"
 
 //		---------------------
 // 		-- Class Interface --
@@ -37,10 +36,9 @@
 
 namespace O2OTranslator {
 
-class O2OXtcDgIterator ;
-
 /**
- *  Class which merges the chunks from a single XTC stream
+ *  Datagram iterator - reads datagrams from file, replacement for
+ *  XtcFileIterator.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
@@ -52,41 +50,34 @@ class O2OXtcDgIterator ;
  *  @author Andrei Salnikov
  */
 
-class O2OXtcDechunk  {
+class O2OXtcDgIterator  {
 public:
 
-  // Constructor accepts the list of files, the files will be sorted
-  // based on the chunk number extracted from files name.
-  O2OXtcDechunk ( const std::list<O2OXtcFileName>& files, size_t maxDgSize, bool skipDamaged ) ;
+  // Default constructor
+  O2OXtcDgIterator (const std::string& path, size_t maxDgramSize) ;
 
   // Destructor
-  ~O2OXtcDechunk () ;
+  ~O2OXtcDgIterator () ;
 
-  // read next datagram, return zero pointer after last file has been read,
-  // throws exception for errors.
+  // Returns next datagram, zero or EOF, throws exceptions for errors
   Pds::Dgram* next() ;
-
-  // get current file name
-  O2OXtcFileName chunkName() const ;
 
 protected:
 
 private:
 
   // Data members
-  std::list<O2OXtcFileName> m_files ;
-  size_t m_maxDgSize ;
-  bool m_skipDamaged ;
-  std::list<O2OXtcFileName>::const_iterator m_iter ;
-  O2OXtcDgIterator* m_dgiter ;
-  uint64_t m_count ;
+  std::string m_path;
+  FILE* m_file;
+  size_t m_maxDgramSize ;
+  char* m_buf ;
 
   // Copy constructor and assignment are disabled by default
-  O2OXtcDechunk ( const O2OXtcDechunk& ) ;
-  O2OXtcDechunk& operator = ( const O2OXtcDechunk& ) ;
+  O2OXtcDgIterator ( const O2OXtcDgIterator& ) ;
+  O2OXtcDgIterator& operator = ( const O2OXtcDgIterator& ) ;
 
 };
 
 } // namespace O2OTranslator
 
-#endif // O2OTRANSLATOR_O2OXTCDECHUNK_H
+#endif // O2OTRANSLATOR_O2OXTCDGITERATOR_H

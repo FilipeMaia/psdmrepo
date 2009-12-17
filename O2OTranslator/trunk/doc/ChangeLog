@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-01
+2009-12-17 Andy Salnikov
+- add new class O2OXtcDgIterator which is a repalcement for 
+  XtcfileIterator with correct error handling
+
 Tag: V00-06-00
 2009-12-10 Andy Salnikov
 - New interface to scimd needs additional connection string for RegDB

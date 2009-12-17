@@ -156,6 +156,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_outputDir ) ;
   addOption( m_outputName ) ;
   addOption( m_overwrite ) ;
+  addOption( m_regConnStr ) ;
   addOption( m_runNumber ) ;
   addOption( m_runType ) ;
   m_splitMode.add ( "none", O2OHdf5Writer::NoSplit ) ;
