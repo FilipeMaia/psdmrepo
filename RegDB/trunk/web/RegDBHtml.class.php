@@ -177,9 +177,9 @@ HERE;
         return $this;
     }
 
-    public function line( $x, $y, $width ) {
+    public function line( $x, $y, $width, $style="solid", $height="1px", $color="#000000" ) {
         $this->html = $this->html.<<<HERE
-<div style="position:absolute; left:{$x}px; top:{$y}px; width:{$width}px; border-top-style:solid; border-top-width:1px;">
+<div style="position:absolute; left:{$x}px; top:{$y}px; width:{$width}px; border-top-style:{$style}; border-top-width:{$height}; border-color:{$color};">
 </div>
 HERE;
         return $this;

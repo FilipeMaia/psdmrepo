@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-18
+2010-01-04 Igor Gaponenko
+- changes in the PHP HTML generator
+
 Tag: V00-00-17
 2009-11-14 Igor Gaponenko
 - added Python module RegDb and a simplified Python interface to the database
