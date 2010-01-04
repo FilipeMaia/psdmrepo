@@ -300,12 +300,7 @@ try {
     	$row += 20;
     }
     $row += 15;
-    /*
-         $con->value( 10, $row, '<i>'.count($pardefs).'</i>' )
-            ->value(300, $row, count($values), $value_color )
-            ->label(500, $row, $num_rows, true, $label_color )
-            ->label(700, $row, $row, true, $label_color );
-    */      
+    
     echo $con->html();
 
     $logbook->commit();

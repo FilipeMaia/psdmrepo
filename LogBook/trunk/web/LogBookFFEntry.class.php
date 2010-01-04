@@ -123,7 +123,7 @@ class LogBookFFEntry {
             "INSERT INTO {$this->connection->database}.entry VALUES(NULL,".$subquery.",".$this->attr['id'].
             ",".LusiTime::now()->to64().
             ",'".$author.
-            "','".$content.
+            "','".$this->connection->escape_string( $content ).
             "','".$content_type."')" );
 
         return $this->experiment->find_entry_by_ (

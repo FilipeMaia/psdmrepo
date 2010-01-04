@@ -343,6 +343,20 @@ HERE;
             $exper_name = $_GET['exper_name'];
             echo "  select_experiment({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}');";
 
+        } else if( $action == 'select_experiment_by_id' ) {
+            $id = $_GET['id'];
+            $experiment = $logbook->find_experiment_by_id( $id );
+            if( is_null( $experiment )) {
+                echo "  alert( 'no experiment found for id: {$id}' );";
+            } else {
+                $instrument = $experiment->instrument();
+                $instr_id   = $instrument->id();
+                $instr_name = $instrument->name();
+                $exper_id   = $experiment->id();
+                $exper_name = $experiment->name();
+            }
+            echo "  select_experiment({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}');";
+
         } else if( $action == 'select_experiment_and_shift' ) {
             $instr_id   = $_GET['instr_id'];
             $instr_name = $_GET['instr_name'];
@@ -359,6 +373,43 @@ HERE;
             $shift_id   = $_GET['shift_id'];
             $run_id     = $_GET['run_id'];
             echo "  select_experiment_and_run({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$shift_id},{$run_id});";
+
+        } else if( $action == 'select_run' ) {
+            $instr_name = $_GET['instr_name'];
+            $exper_name = $_GET['exper_name'];
+            $experiment = $logbook->find_experiment( $instr_name, $exper_name );
+            if( is_null( $experiment )) {
+                echo "  alert( 'no experiment found for instrument: {$instr_name} and experiment: {$exper_name}' );";
+            } else {
+                $run_num = $_GET['num'];
+                $run = $experiment->find_run_by_num( $run_num );
+                if( is_null( $run )) {
+                    echo "  alert( 'no run found for number: {$run_num}' );";
+                } else {
+                    $instrument = $experiment->instrument();
+                    $instr_id   = $instrument->id();
+                    $exper_id   = $experiment->id();
+                    $shift_id   = $run->shift()->id();
+                    $run_id     = $run->id();
+                    echo "  select_experiment_and_run({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$shift_id},{$run_id});";
+                }
+            }
+
+        } else if( $action == 'select_run_by_id' ) {
+            $run_id  = $_GET['id'];
+            $run = $logbook->find_run_by_id( $run_id );
+            if( is_null( $run )) {
+                echo "  alert( 'no run found for id: {$run_id}' );";
+            } else {
+                $experiment = $run->parent();
+                $instrument = $experiment->instrument();
+                $instr_id   = $instrument->id();
+                $instr_name = $instrument->name();
+                $exper_id   = $experiment->id();
+                $exper_name = $experiment->name();
+                $shift_id   = $run->shift()->id();
+                echo "  select_experiment_and_run({$instr_id},'{$instr_name}',{$exper_id},'{$exper_name}',{$shift_id},{$run_id});";
+            }
 
         } else if( $action == 'select_message' ) {
             $id    = $_GET['id'];

@@ -797,7 +797,7 @@ HERE;
             "INSERT INTO {$this->connection->database}.entry VALUES(NULL,(SELECT LAST_INSERT_ID()),NULL".
             ",".LusiTime::now()->to64().
             ",'".$author.
-            "','".$content.
+            "','".$this->connection->escape_string( $content ).
             "','".$content_type."')" );
 
         return $this->find_entry_by_ (

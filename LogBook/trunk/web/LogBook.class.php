@@ -99,6 +99,13 @@ class LogBook {
             null : new LogBookExperiment ( $this->connection, $e ) ;
     }
 
+    public function find_experiment ( $instrument_name, $experiment_name ) {
+        $this->regdb->begin();
+        $e = $this->regdb->find_experiment( $instrument_name, $experiment_name ) ;
+        return is_null( $e ) ?
+            null : new LogBookExperiment ( $this->connection, $e ) ;
+    }
+
     public function find_experiment_by_name ( $name ) {
         $this->regdb->begin();
         $e = $this->regdb->find_experiment_by_name( $name ) ;
