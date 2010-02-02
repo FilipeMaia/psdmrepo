@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-02
+2010-02-02 Andy Salnikov
+- O2OXtcDgIterator: bug fix, in the case when payload size is zero
+  it produces an error because fread returns 0 for zero-sized object
+
 Tag: V00-06-01
 2009-12-17 Andy Salnikov
 - add new class O2OXtcDgIterator which is a repalcement for 
