@@ -1,0 +1,129 @@
+
+
+        How to install Python pdsdata library
+        
+
+This package uses standard Python distutils method for building and 
+installation which is relatively easy to use for most configurations.
+
+Requirements:
+-------------
+
+C++ pdsdata library installed somewhere, both headers and libraries 
+need to be present.
+
+Future: NumPy library
+
+C++ library location:
+---------------------
+
+Define the location of installed C++ library using either setup.cfg
+or command line options to setup.py The options are:
+
+pdsdata_dir
+pdsdata_incdir - default is empty string
+pdsdata_libdir - default is "lib"
+pdsdata_libs
+
+pdsdata_dir is the location of the top-level directory with C++ pdsdata
+installation. pdsdata_incdir is a subdirectory (relative to pdsdata_dir)
+where include files are installed. pdsdata_libdir is a subdirectory 
+where pdsdata static or shared libraries are installed. pdsdata_libs
+is the list of C++ libraries to be linked.  
+
+Usually only the value of pdsdata_dir needs to be changed, values for
+other options are predefined in a way that correspond to the pdsdata
+installation at SLAC which has following structure:
+
+TOPDIR/
+   |
+   +- lib/*.so
+   |
+   +- pdsdata/
+        |
+        +- xtc/*.hh
+        |
+        +- acqiris/*.hh
+
+In this case the value of pdsdata_dir will be TOPDIR. If you have a 
+different structure of directories change the values accordingly, one
+caveat for pdsdata_incdir is that include files are always included
+as "pdsdata/xtc/File.hh" (exactly as in the C++ library) so the 
+directory pdsdata has always to be in the path to include files, but 
+it should not be included in pdsdata_incdir.
+
+If you specify options on command line then replace underscore with
+dash, like this:
+
+  python setup.py build --pdsdata-dir=TOPDIR
+  
+
+Selecting Python version:
+-------------------------
+
+Many locations have multiple versions of Python installed (2.4, 2.5, 
+2.6 and even 3.0). For now this python library has been tested with
+version 2.4 only which is the default for RHEL5 platform. If you want 
+to build library for non-standard Python version then select different
+Python interpreter when punning the setup script:
+
+    /path/to/my/python/python2.6 setup.py ...
+
+
+Building the package:
+---------------------
+
+To build the whole thing just run setup.py with "build" command, e.g.:
+
+    python2.4 setup.py build
+    
+
+Testing the library
+-------------------
+
+There is a unit test script in the test/ directory which you may want 
+to run. Before you can run it you need to add new module to the 
+PYTHONPATH:
+
+  export PYTHONPATH=./build/lib.linux-x86_64-2.4
+  
+and then run the test with the same interpreter that was used for 
+running setup.py:
+
+    python2.4 test/pypdsdata-unit-test
+
+The test also need a test data file with the name opal1k.xtc that is 
+usually distributed with C++ pfdsdata library. If the script fails 
+the tests becase the file was not found it will print message like
+
+AssertionError: XtcIterator test failed: data file cannot be open
+
+If you have this file somewhere in a different place then give the 
+complete path name of that file as an argument to the script:
+
+  python2.4 test/pypdsdata-unit-test /path/to/opal1k.xtc
+
+If you do not have that file around then expect few tests to fail.
+
+Installation:
+-------------
+
+To install the modul;e library and all other files just run the same
+setup.py script and give it command install:
+
+    python2.4 setup.py install
+    
+If you want to install the package in place which is different from 
+interpreter standard location (which is usually in /usr/lib/python)
+use the command options --prefix, --exec-prefix or any other --install
+options. For complete list of options say:
+
+    python2.4 setup.py install --help
+    
+Example of installation in non-standard location:
+
+    python2.4 setup.py install --prefix=/opt/sw/pypdsdata
+
+(You'll then have to extend your PYTHONPATH with 
+/opt/sw/pypdsdata/lib/python2.4/site-packages)
+
