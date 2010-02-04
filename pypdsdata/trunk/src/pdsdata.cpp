@@ -37,6 +37,13 @@
 #include "XtcFileIterator.h"
 #include "XtcIterator.h"
 
+#include "types/camera/FrameCoord.h"
+#include "types/camera/FrameFexConfigV1.h"
+#include "types/camera/FrameV1.h"
+
+#define PDSDATA_IMPORT_ARRAY
+#import "pdsdata_numpy.h"
+
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
@@ -77,5 +84,13 @@ PyMODINIT_FUNC initpdsdata()
   ::registerType( this_module, "Xtc", pypdsdata::Xtc::typeObject() );
   ::registerType( this_module, "XtcFileIterator", pypdsdata::XtcFileIterator::typeObject() );
   ::registerType( this_module, "XtcIterator", pypdsdata::XtcIterator::typeObject() );
+
+  // initialize data types, but do not register them
+  PyType_Ready( pypdsdata::Camera::FrameCoord::typeObject() );
+  PyType_Ready( pypdsdata::Camera::FrameFexConfigV1::typeObject() );
+  PyType_Ready( pypdsdata::Camera::FrameV1::typeObject() );
+
+  // import NumPy
+  import_array();
 
 }

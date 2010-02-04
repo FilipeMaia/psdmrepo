@@ -38,21 +38,21 @@ namespace {
   void Sequence_dealloc( PyObject* self );
 
   // type-specific methods
-  PyObject* Sequence_type( PyObject* self );
-  PyObject* Sequence_service( PyObject* self );
-  PyObject* Sequence_isExtended( PyObject* self );
-  PyObject* Sequence_isEvent( PyObject* self );
-  PyObject* Sequence_clock( PyObject* self );
-  PyObject* Sequence_stamp( PyObject* self );
+  PyObject* Sequence_type( PyObject* self, PyObject* );
+  PyObject* Sequence_service( PyObject* self, PyObject* );
+  PyObject* Sequence_isExtended( PyObject* self, PyObject* );
+  PyObject* Sequence_isEvent( PyObject* self, PyObject* );
+  PyObject* Sequence_clock( PyObject* self, PyObject* );
+  PyObject* Sequence_stamp( PyObject* self, PyObject* );
 
   PyMethodDef Sequence_Methods[] = {
-    { "type", (PyCFunction) Sequence_type, METH_NOARGS,
+    { "type",       Sequence_type,          METH_NOARGS,
         "Returns the type of this sequence, one of Event, Occurrence, or Marker" },
-    { "service", (PyCFunction) Sequence_service, METH_NOARGS, "Returns the TransitionId type" },
-    { "isExtended", (PyCFunction) Sequence_isExtended, METH_NOARGS, "Returns True for extended sequence" },
-    { "isEvent", (PyCFunction) Sequence_isEvent, METH_NOARGS, "Returns True for event sequence" },
-    { "clock", (PyCFunction) Sequence_clock, METH_NOARGS, "Returns clock value for sequence" },
-    { "stamp", (PyCFunction) Sequence_stamp, METH_NOARGS, "Returns timestamp value for sequence" },
+    { "service",    Sequence_service,       METH_NOARGS, "Returns the TransitionId type" },
+    { "isExtended",   Sequence_isExtended,  METH_NOARGS, "Returns True for extended sequence" },
+    { "isEvent",      Sequence_isEvent,     METH_NOARGS, "Returns True for event sequence" },
+    { "clock",        Sequence_clock,       METH_NOARGS, "Returns clock value for sequence" },
+    { "stamp",        Sequence_stamp,       METH_NOARGS, "Returns timestamp value for sequence" },
     {0, 0, 0, 0}
    };
 
@@ -179,42 +179,42 @@ Sequence_dealloc( PyObject* self )
 }
 
 PyObject*
-Sequence_type( PyObject* self )
+Sequence_type( PyObject* self, PyObject* )
 {
   pypdsdata::Sequence* py_this = (pypdsdata::Sequence*) self;
   return PyInt_FromLong( py_this->m_seq.type() );
 }
 
 PyObject*
-Sequence_service( PyObject* self )
+Sequence_service( PyObject* self, PyObject* )
 {
   pypdsdata::Sequence* py_this = (pypdsdata::Sequence*) self;
   return pypdsdata::TransitionId::TransitionId_FromInt( py_this->m_seq.service() );
 }
 
 PyObject*
-Sequence_isExtended( PyObject* self )
+Sequence_isExtended( PyObject* self, PyObject* )
 {
   pypdsdata::Sequence* py_this = (pypdsdata::Sequence*) self;
   return PyBool_FromLong( py_this->m_seq.isExtended() );
 }
 
 PyObject*
-Sequence_isEvent( PyObject* self )
+Sequence_isEvent( PyObject* self, PyObject* )
 {
   pypdsdata::Sequence* py_this = (pypdsdata::Sequence*) self;
   return PyBool_FromLong( py_this->m_seq.isEvent() );
 }
 
 PyObject*
-Sequence_clock( PyObject* self )
+Sequence_clock( PyObject* self, PyObject* )
 {
   pypdsdata::Sequence* py_this = (pypdsdata::Sequence*) self;
   return pypdsdata::ClockTime::ClockTime_FromPds( py_this->m_seq.clock() );
 }
 
 PyObject*
-Sequence_stamp( PyObject* self )
+Sequence_stamp( PyObject* self, PyObject* )
 {
   pypdsdata::Sequence* py_this = (pypdsdata::Sequence*) self;
   return pypdsdata::TimeStamp::TimeStamp_FromPds( py_this->m_seq.stamp() );

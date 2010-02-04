@@ -39,12 +39,12 @@ namespace {
   PyObject* ClockTime_repr( PyObject *self );
 
   // type-specific methods
-  PyObject* ClockTime_seconds( PyObject* self );
-  PyObject* ClockTime_nanoseconds( PyObject* self );
+  PyObject* ClockTime_seconds( PyObject* self, PyObject* );
+  PyObject* ClockTime_nanoseconds( PyObject* self, PyObject* );
 
   PyMethodDef ClockTime_Methods[] = {
-    { "seconds", (PyCFunction) ClockTime_seconds, METH_NOARGS, "Returns the number of seconds" },
-    { "nanoseconds", (PyCFunction) ClockTime_nanoseconds, METH_NOARGS, "Returns the number of nanoseconds" },
+    { "seconds",     ClockTime_seconds,     METH_NOARGS, "Returns the number of seconds" },
+    { "nanoseconds", ClockTime_nanoseconds, METH_NOARGS, "Returns the number of nanoseconds" },
     {0, 0, 0, 0}
    };
 
@@ -209,14 +209,14 @@ ClockTime_repr( PyObject *self )
 }
 
 PyObject*
-ClockTime_seconds( PyObject* self )
+ClockTime_seconds( PyObject* self, PyObject* )
 {
   pypdsdata::ClockTime* py_this = (pypdsdata::ClockTime*) self;
   return PyInt_FromLong( py_this->m_clock.seconds() );
 }
 
 PyObject*
-ClockTime_nanoseconds( PyObject* self )
+ClockTime_nanoseconds( PyObject* self, PyObject* )
 {
   pypdsdata::ClockTime* py_this = (pypdsdata::ClockTime*) self;
   return PyInt_FromLong( py_this->m_clock.nanoseconds() );

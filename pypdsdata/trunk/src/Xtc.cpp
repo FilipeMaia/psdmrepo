@@ -22,8 +22,12 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "BldInfo.h"
 #include "Damage.h"
+#include "DataObjectFactory.h"
+#include "DetInfo.h"
 #include "Exception.h"
+#include "ProcInfo.h"
 #include "TypeId.h"
 #include "XtcIterator.h"
 
@@ -39,20 +43,26 @@ namespace {
   PyObject* Xtc_iter( PyObject* self );
 
   // type-specific methods
-  PyObject* Xtc_damage( PyObject* self );
-  PyObject* Xtc_contains( PyObject* self );
-  PyObject* Xtc_extent( PyObject* self );
-  PyObject* Xtc_sizeofPayload( PyObject* self );
-  PyObject* Xtc_payload( PyObject* self );
+  PyObject* Xtc_damage( PyObject* self, void* );
+  PyObject* Xtc_contains( PyObject* self, void* );
+  PyObject* Xtc_src( PyObject* self, void* );
+  PyObject* Xtc_extent( PyObject* self, void* );
+  PyObject* Xtc_sizeofPayload( PyObject* self, PyObject* );
+  PyObject* Xtc_payload( PyObject* self, PyObject* );
 
   PyMethodDef Xtc_Methods[] = {
-    { "damage", (PyCFunction) Xtc_damage, METH_NOARGS, "Returns the damage field." },
-    { "contains", (PyCFunction) Xtc_contains, METH_NOARGS, "Returns the TypeId of the contained object(s)." },
-    { "extent", (PyCFunction) Xtc_extent, METH_NOARGS, "Returns the extent size of the Xtc." },
-    { "sizeofPayload", (PyCFunction) Xtc_sizeofPayload, METH_NOARGS, "Returns the size of payload." },
-    { "payload", (PyCFunction) Xtc_payload, METH_NOARGS, "Returns data object. If `contains' is Any returns None. If `contains' is Id_Xtc returns XtcIterator" },
+    { "sizeofPayload",  Xtc_sizeofPayload,  METH_NOARGS, "Returns the size of payload." },
+    { "payload",        Xtc_payload,        METH_NOARGS, "Returns data object. If `contains' is Any returns None. If `contains' is Id_Xtc returns XtcIterator" },
     {0, 0, 0, 0}
    };
+
+  PyGetSetDef Xtc_GetSet[] = {
+    {"damage",   Xtc_damage,   0, "damage bitmask", 0},
+    {"src",      Xtc_src,      0, "data source object, one of BldInfo, DetInfo, or ProcInfo", 0},
+    {"contains", Xtc_contains, 0, "TypeId of the contained object(s)", 0},
+    {"extent",   Xtc_extent,   0, "extent size of the XTC", 0},
+    {0, 0, 0, 0, 0}
+  };
 
   char Xtc_doc[] = "Python class wrapping C++ Pds::Xtc class.";
 
@@ -88,7 +98,7 @@ namespace {
     0,                       /*tp_iternext*/
     Xtc_Methods,             /*tp_methods*/
     0,                       /*tp_members*/
-    0,                       /*tp_getset*/
+    Xtc_GetSet,              /*tp_getset*/
     0,                       /*tp_base*/
     0,                       /*tp_dict*/
     0,                       /*tp_descr_get*/
@@ -216,7 +226,7 @@ Xtc_iter( PyObject* self )
 }
 
 PyObject*
-Xtc_damage( PyObject* self )
+Xtc_damage( PyObject* self, void* )
 {
   pypdsdata::Xtc* py_this = (pypdsdata::Xtc*) self;
   if( ! py_this->m_xtc ){
@@ -228,7 +238,7 @@ Xtc_damage( PyObject* self )
 }
 
 PyObject*
-Xtc_contains( PyObject* self )
+Xtc_contains( PyObject* self, void* )
 {
   pypdsdata::Xtc* py_this = (pypdsdata::Xtc*) self;
   if( ! py_this->m_xtc ){
@@ -240,7 +250,29 @@ Xtc_contains( PyObject* self )
 }
 
 PyObject*
-Xtc_extent( PyObject* self )
+Xtc_src( PyObject* self, void* )
+{
+  pypdsdata::Xtc* py_this = (pypdsdata::Xtc*) self;
+  if( ! py_this->m_xtc ){
+    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
+    return 0;
+  }
+
+  const Pds::Src& src = py_this->m_xtc->src;
+  if ( src.level() == Level::Reporter ) {
+    const Pds::BldInfo& info = static_cast<const Pds::BldInfo&>(src);
+    return pypdsdata::BldInfo::BldInfo_FromPds(info);
+  } else if ( src.level() == Level::Source ) {
+    const Pds::DetInfo& info = static_cast<const Pds::DetInfo&>(src);
+    return pypdsdata::DetInfo::DetInfo_FromPds(info);
+  } else {
+    const Pds::ProcInfo& info = static_cast<const Pds::ProcInfo&>(src);
+    return pypdsdata::ProcInfo::ProcInfo_FromPds(info);
+  }
+}
+
+PyObject*
+Xtc_extent( PyObject* self, void* )
 {
   pypdsdata::Xtc* py_this = (pypdsdata::Xtc*) self;
   if( ! py_this->m_xtc ){
@@ -252,7 +284,7 @@ Xtc_extent( PyObject* self )
 }
 
 PyObject*
-Xtc_sizeofPayload( PyObject* self )
+Xtc_sizeofPayload( PyObject* self, PyObject* )
 {
   pypdsdata::Xtc* py_this = (pypdsdata::Xtc*) self;
   if( ! py_this->m_xtc ){
@@ -264,7 +296,7 @@ Xtc_sizeofPayload( PyObject* self )
 }
 
 PyObject*
-Xtc_payload( PyObject* self )
+Xtc_payload( PyObject* self, PyObject* )
 {
   pypdsdata::Xtc* py_this = (pypdsdata::Xtc*) self;
   if( ! py_this->m_xtc ){
@@ -275,8 +307,7 @@ Xtc_payload( PyObject* self )
   if ( py_this->m_xtc->contains.id() == Pds::TypeId::Id_Xtc ) {
     return Xtc_iter( self );
   } else {
-    PyErr_SetString(PyExc_TypeError, "Error: payload() does not work yet on non-XTC container");
-    return 0;
+    return pypdsdata::DataObjectFactory::makeObject(*py_this->m_xtc, self);
   }
 }
 

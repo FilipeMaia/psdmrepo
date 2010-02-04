@@ -1,5 +1,4 @@
 
-
         How to install Python pdsdata library
         
 
@@ -10,9 +9,15 @@ Requirements:
 -------------
 
 C++ pdsdata library installed somewhere, both headers and libraries 
-need to be present.
+need to be present. Current release was built with pdsdata V01-08-00,
+later versions may also work, but additional data types added after 
+that version will not be available.
 
-Future: NumPy library
+NumPy v1.3 library installed with the headers. If it has not been 
+installed on your system yet then download it from http://numpy.scipy.org/ 
+and install or use your system package manager to install pre-build 
+version.
+
 
 C++ library location:
 ---------------------
@@ -58,6 +63,17 @@ dash, like this:
   python setup.py build --pdsdata-dir=TOPDIR
   
 
+NumPy location:
+---------------
+
+This package needs NumPy header files for compilation. If NumPy is
+installed in the standard location then the setup script can guess
+the location of the header files. If you observe errors from script 
+related to the numpy/arrayobject.h header file then you need to 
+help it by providing the command-line option --numpy-incdir (or
+numpy_incdir in setup.cfg file) specifying the location of the 
+directory where numpy/arrayobject.h can be found.
+
 Selecting Python version:
 -------------------------
 
@@ -65,7 +81,7 @@ Many locations have multiple versions of Python installed (2.4, 2.5,
 2.6 and even 3.0). For now this python library has been tested with
 version 2.4 only which is the default for RHEL5 platform. If you want 
 to build library for non-standard Python version then select different
-Python interpreter when punning the setup script:
+Python interpreter when running the setup script:
 
     /path/to/my/python/python2.6 setup.py ...
 
@@ -93,8 +109,8 @@ running setup.py:
     python2.4 test/pypdsdata-unit-test
 
 The test also need a test data file with the name opal1k.xtc that is 
-usually distributed with C++ pfdsdata library. If the script fails 
-the tests becase the file was not found it will print message like
+usually distributed with C++ pdsdata library. If the script fails 
+the tests because the file was not found it will print message like
 
 AssertionError: XtcIterator test failed: data file cannot be open
 
@@ -108,7 +124,7 @@ If you do not have that file around then expect few tests to fail.
 Installation:
 -------------
 
-To install the modul;e library and all other files just run the same
+To install the module library and all other files just run the same
 setup.py script and give it command install:
 
     python2.4 setup.py install
@@ -126,4 +142,3 @@ Example of installation in non-standard location:
 
 (You'll then have to extend your PYTHONPATH with 
 /opt/sw/pypdsdata/lib/python2.4/site-packages)
-

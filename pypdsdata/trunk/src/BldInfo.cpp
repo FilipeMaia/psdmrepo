@@ -40,18 +40,18 @@ namespace {
   PyObject* BldInfo_repr( PyObject *self );
 
   // type-specific methods
-  PyObject* BldInfo_level( PyObject* self );
-  PyObject* BldInfo_log( PyObject* self );
-  PyObject* BldInfo_phy( PyObject* self );
-  PyObject* BldInfo_processId( PyObject* self );
-  PyObject* BldInfo_type( PyObject* self );
+  PyObject* BldInfo_level( PyObject* self, PyObject* args );
+  PyObject* BldInfo_log( PyObject* self, PyObject* args );
+  PyObject* BldInfo_phy( PyObject* self, PyObject* args );
+  PyObject* BldInfo_processId( PyObject* self, PyObject* args );
+  PyObject* BldInfo_type( PyObject* self, PyObject* args );
 
   PyMethodDef BldInfo_Methods[] = {
-    { "level", (PyCFunction) BldInfo_level, METH_NOARGS, "Returns source level object (Level class)" },
-    { "log", (PyCFunction) BldInfo_log, METH_NOARGS, "Returns logical address of data source" },
-    { "phy", (PyCFunction) BldInfo_phy, METH_NOARGS, "Returns physical address of data source" },
-    { "processId", (PyCFunction) BldInfo_processId, METH_NOARGS, "Returns process ID" },
-    { "type", (PyCFunction) BldInfo_type, METH_NOARGS, "Returns BldInfo type" },
+    { "level",     BldInfo_level,     METH_NOARGS, "Returns source level object (Level class)" },
+    { "log",       BldInfo_log,       METH_NOARGS, "Returns logical address of data source" },
+    { "phy",       BldInfo_phy,       METH_NOARGS, "Returns physical address of data source" },
+    { "processId", BldInfo_processId, METH_NOARGS, "Returns process ID" },
+    { "type",      BldInfo_type,      METH_NOARGS, "Returns BldInfo type" },
     {0, 0, 0, 0}
    };
 
@@ -233,35 +233,35 @@ BldInfo_repr( PyObject *self )
 }
 
 PyObject*
-BldInfo_level( PyObject* self )
+BldInfo_level( PyObject* self, PyObject* )
 {
   pypdsdata::BldInfo* py_this = (pypdsdata::BldInfo*) self;
   return pypdsdata::Level::Level_FromInt( py_this->m_src.level() );
 }
 
 PyObject*
-BldInfo_log( PyObject* self )
+BldInfo_log( PyObject* self, PyObject* )
 {
   pypdsdata::BldInfo* py_this = (pypdsdata::BldInfo*) self;
   return PyInt_FromLong( py_this->m_src.log() );
 }
 
 PyObject*
-BldInfo_phy( PyObject* self )
+BldInfo_phy( PyObject* self, PyObject* )
 {
   pypdsdata::BldInfo* py_this = (pypdsdata::BldInfo*) self;
   return PyInt_FromLong( py_this->m_src.phy() );
 }
 
 PyObject*
-BldInfo_processId( PyObject* self )
+BldInfo_processId( PyObject* self, PyObject* )
 {
   pypdsdata::BldInfo* py_this = (pypdsdata::BldInfo*) self;
   return PyInt_FromLong( py_this->m_src.processId() );
 }
 
 PyObject*
-BldInfo_type( PyObject* self )
+BldInfo_type( PyObject* self, PyObject* )
 {
   pypdsdata::BldInfo* py_this = (pypdsdata::BldInfo*) self;
   return PyInt_FromLong( py_this->m_src.type() );

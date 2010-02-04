@@ -40,18 +40,18 @@ namespace {
   PyObject* ProcInfo_repr( PyObject *self );
 
   // type-specific methods
-  PyObject* ProcInfo_level( PyObject* self );
-  PyObject* ProcInfo_log( PyObject* self );
-  PyObject* ProcInfo_phy( PyObject* self );
-  PyObject* ProcInfo_processId( PyObject* self );
-  PyObject* ProcInfo_ipAddr( PyObject* self );
+  PyObject* ProcInfo_level( PyObject* self, PyObject* );
+  PyObject* ProcInfo_log( PyObject* self, PyObject* );
+  PyObject* ProcInfo_phy( PyObject* self, PyObject* );
+  PyObject* ProcInfo_processId( PyObject* self, PyObject* );
+  PyObject* ProcInfo_ipAddr( PyObject* self, PyObject* );
 
   PyMethodDef ProcInfo_Methods[] = {
-    { "level", (PyCFunction) ProcInfo_level, METH_NOARGS, "Returns source level object (Level class)" },
-    { "log", (PyCFunction) ProcInfo_log, METH_NOARGS, "Returns logical address of data source" },
-    { "phy", (PyCFunction) ProcInfo_phy, METH_NOARGS, "Returns physical address of data source" },
-    { "processId", (PyCFunction) ProcInfo_processId, METH_NOARGS, "Returns process ID" },
-    { "ipAddr", (PyCFunction) ProcInfo_ipAddr, METH_NOARGS, "Returns host IP address" },
+    { "level",      ProcInfo_level,     METH_NOARGS, "Returns source level object (Level class)" },
+    { "log",        ProcInfo_log,       METH_NOARGS, "Returns logical address of data source" },
+    { "phy",        ProcInfo_phy,       METH_NOARGS, "Returns physical address of data source" },
+    { "processId",  ProcInfo_processId, METH_NOARGS, "Returns process ID" },
+    { "ipAddr",     ProcInfo_ipAddr,    METH_NOARGS, "Returns host IP address" },
     {0, 0, 0, 0}
    };
 
@@ -74,7 +74,7 @@ namespace {
     ProcInfo_compare,        /*tp_compare*/
     ProcInfo_repr,           /*tp_repr*/
     0,                       /*tp_as_number*/
-    0,                       /*tp_as_ProcInfo*/
+    0,                       /*tp_as_sequence*/
     0,                       /*tp_as_mapping*/
     ProcInfo_hash,           /*tp_hash*/
     0,                       /*tp_call*/
@@ -219,35 +219,35 @@ ProcInfo_repr( PyObject *self )
 }
 
 PyObject*
-ProcInfo_level( PyObject* self )
+ProcInfo_level( PyObject* self, PyObject* )
 {
   pypdsdata::ProcInfo* py_this = (pypdsdata::ProcInfo*) self;
   return pypdsdata::Level::Level_FromInt( py_this->m_src.level() );
 }
 
 PyObject*
-ProcInfo_log( PyObject* self )
+ProcInfo_log( PyObject* self, PyObject* )
 {
   pypdsdata::ProcInfo* py_this = (pypdsdata::ProcInfo*) self;
   return PyInt_FromLong( py_this->m_src.log() );
 }
 
 PyObject*
-ProcInfo_phy( PyObject* self )
+ProcInfo_phy( PyObject* self, PyObject* )
 {
   pypdsdata::ProcInfo* py_this = (pypdsdata::ProcInfo*) self;
   return PyInt_FromLong( py_this->m_src.phy() );
 }
 
 PyObject*
-ProcInfo_processId( PyObject* self )
+ProcInfo_processId( PyObject* self, PyObject* )
 {
   pypdsdata::ProcInfo* py_this = (pypdsdata::ProcInfo*) self;
   return PyInt_FromLong( py_this->m_src.processId() );
 }
 
 PyObject*
-ProcInfo_ipAddr( PyObject* self )
+ProcInfo_ipAddr( PyObject* self, PyObject* )
 {
   pypdsdata::ProcInfo* py_this = (pypdsdata::ProcInfo*) self;
   return PyInt_FromLong( py_this->m_src.ipAddr() );

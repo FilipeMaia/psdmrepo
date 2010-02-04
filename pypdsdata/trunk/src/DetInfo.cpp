@@ -40,24 +40,24 @@ namespace {
   PyObject* DetInfo_repr( PyObject *self );
 
   // type-specific methods
-  PyObject* DetInfo_level( PyObject* self );
-  PyObject* DetInfo_log( PyObject* self );
-  PyObject* DetInfo_phy( PyObject* self );
-  PyObject* DetInfo_processId( PyObject* self );
-  PyObject* DetInfo_detector( PyObject* self );
-  PyObject* DetInfo_device( PyObject* self );
-  PyObject* DetInfo_detId( PyObject* self );
-  PyObject* DetInfo_devId( PyObject* self );
+  PyObject* DetInfo_level( PyObject* self, PyObject* );
+  PyObject* DetInfo_log( PyObject* self, PyObject* );
+  PyObject* DetInfo_phy( PyObject* self, PyObject* );
+  PyObject* DetInfo_processId( PyObject* self, PyObject* );
+  PyObject* DetInfo_detector( PyObject* self, PyObject* );
+  PyObject* DetInfo_device( PyObject* self, PyObject* );
+  PyObject* DetInfo_detId( PyObject* self, PyObject* );
+  PyObject* DetInfo_devId( PyObject* self, PyObject* );
 
   PyMethodDef DetInfo_Methods[] = {
-    { "level", (PyCFunction) DetInfo_level, METH_NOARGS, "Returns source level object (Level class)" },
-    { "log", (PyCFunction) DetInfo_log, METH_NOARGS, "Returns logical address of data source" },
-    { "phy", (PyCFunction) DetInfo_phy, METH_NOARGS, "Returns physical address of data source" },
-    { "processId", (PyCFunction) DetInfo_processId, METH_NOARGS, "Returns process ID" },
-    { "detector", (PyCFunction) DetInfo_detector, METH_NOARGS, "Returns detector type" },
-    { "device", (PyCFunction) DetInfo_device, METH_NOARGS, "Returns device type" },
-    { "detId", (PyCFunction) DetInfo_detId, METH_NOARGS, "Returns detector ID" },
-    { "devId", (PyCFunction) DetInfo_devId, METH_NOARGS, "Returns device ID" },
+    { "level",     DetInfo_level,     METH_NOARGS, "Returns source level object (Level class)" },
+    { "log",       DetInfo_log,       METH_NOARGS, "Returns logical address of data source" },
+    { "phy",       DetInfo_phy,       METH_NOARGS, "Returns physical address of data source" },
+    { "processId", DetInfo_processId, METH_NOARGS, "Returns process ID" },
+    { "detector",  DetInfo_detector,  METH_NOARGS, "Returns detector type" },
+    { "device",    DetInfo_device,    METH_NOARGS, "Returns device type" },
+    { "detId",     DetInfo_detId,     METH_NOARGS, "Returns detector ID" },
+    { "devId",     DetInfo_devId,     METH_NOARGS, "Returns device ID" },
     {0, 0, 0, 0}
    };
 
@@ -264,56 +264,56 @@ DetInfo_repr( PyObject *self )
 }
 
 PyObject*
-DetInfo_level( PyObject* self )
+DetInfo_level( PyObject* self, PyObject* )
 {
   pypdsdata::DetInfo* py_this = (pypdsdata::DetInfo*) self;
   return pypdsdata::Level::Level_FromInt( py_this->m_src.level() );
 }
 
 PyObject*
-DetInfo_log( PyObject* self )
+DetInfo_log( PyObject* self, PyObject* )
 {
   pypdsdata::DetInfo* py_this = (pypdsdata::DetInfo*) self;
   return PyInt_FromLong( py_this->m_src.log() );
 }
 
 PyObject*
-DetInfo_phy( PyObject* self )
+DetInfo_phy( PyObject* self, PyObject* )
 {
   pypdsdata::DetInfo* py_this = (pypdsdata::DetInfo*) self;
   return PyInt_FromLong( py_this->m_src.phy() );
 }
 
 PyObject*
-DetInfo_processId( PyObject* self )
+DetInfo_processId( PyObject* self, PyObject* )
 {
   pypdsdata::DetInfo* py_this = (pypdsdata::DetInfo*) self;
   return PyInt_FromLong( py_this->m_src.processId() );
 }
 
 PyObject*
-DetInfo_detector( PyObject* self )
+DetInfo_detector( PyObject* self, PyObject* )
 {
   pypdsdata::DetInfo* py_this = (pypdsdata::DetInfo*) self;
   return PyInt_FromLong( py_this->m_src.detector() );
 }
 
 PyObject*
-DetInfo_device( PyObject* self )
+DetInfo_device( PyObject* self, PyObject* )
 {
   pypdsdata::DetInfo* py_this = (pypdsdata::DetInfo*) self;
   return PyInt_FromLong( py_this->m_src.device() );
 }
 
 PyObject*
-DetInfo_detId( PyObject* self )
+DetInfo_detId( PyObject* self, PyObject* )
 {
   pypdsdata::DetInfo* py_this = (pypdsdata::DetInfo*) self;
   return PyInt_FromLong( py_this->m_src.detId() );
 }
 
 PyObject*
-DetInfo_devId( PyObject* self )
+DetInfo_devId( PyObject* self, PyObject* )
 {
   pypdsdata::DetInfo* py_this = (pypdsdata::DetInfo*) self;
   return PyInt_FromLong( py_this->m_src.devId() );

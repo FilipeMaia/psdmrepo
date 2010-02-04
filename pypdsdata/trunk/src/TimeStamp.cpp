@@ -39,16 +39,16 @@ namespace {
   PyObject* TimeStamp_repr( PyObject *self );
 
   // type-specific methods
-  PyObject* TimeStamp_ticks( PyObject* self );
-  PyObject* TimeStamp_fiducials( PyObject* self );
-  PyObject* TimeStamp_control( PyObject* self );
-  PyObject* TimeStamp_vector( PyObject* self );
+  PyObject* TimeStamp_ticks( PyObject* self, PyObject* );
+  PyObject* TimeStamp_fiducials( PyObject* self, PyObject* );
+  PyObject* TimeStamp_control( PyObject* self, PyObject* );
+  PyObject* TimeStamp_vector( PyObject* self, PyObject* );
 
   PyMethodDef TimeStamp_Methods[] = {
-    { "ticks", (PyCFunction) TimeStamp_ticks, METH_NOARGS, "Returns the ticks value" },
-    { "fiducials", (PyCFunction) TimeStamp_fiducials, METH_NOARGS, "Returns the fiducials value" },
-    { "control", (PyCFunction) TimeStamp_control, METH_NOARGS, "Returns the control value" },
-    { "vector", (PyCFunction) TimeStamp_ticks, METH_NOARGS, "Returns the vector value" },
+    { "ticks",    TimeStamp_ticks,    METH_NOARGS, "Returns the ticks value" },
+    { "fiducials", TimeStamp_fiducials, METH_NOARGS, "Returns the fiducials value" },
+    { "control",  TimeStamp_control,  METH_NOARGS, "Returns the control value" },
+    { "vector",   TimeStamp_ticks,    METH_NOARGS, "Returns the vector value" },
     {0, 0, 0, 0}
    };
 
@@ -218,28 +218,28 @@ TimeStamp_repr( PyObject *self )
 }
 
 PyObject*
-TimeStamp_ticks( PyObject* self )
+TimeStamp_ticks( PyObject* self, PyObject* )
 {
   pypdsdata::TimeStamp* py_this = (pypdsdata::TimeStamp*) self;
   return PyInt_FromLong( py_this->m_ts.ticks() );
 }
 
 PyObject*
-TimeStamp_fiducials( PyObject* self )
+TimeStamp_fiducials( PyObject* self, PyObject* )
 {
   pypdsdata::TimeStamp* py_this = (pypdsdata::TimeStamp*) self;
   return PyInt_FromLong( py_this->m_ts.fiducials() );
 }
 
 PyObject*
-TimeStamp_control( PyObject* self )
+TimeStamp_control( PyObject* self, PyObject* )
 {
   pypdsdata::TimeStamp* py_this = (pypdsdata::TimeStamp*) self;
   return PyInt_FromLong( py_this->m_ts.control() );
 }
 
 PyObject*
-TimeStamp_vector( PyObject* self )
+TimeStamp_vector( PyObject* self, PyObject* )
 {
   pypdsdata::TimeStamp* py_this = (pypdsdata::TimeStamp*) self;
   return PyInt_FromLong( py_this->m_ts.vector() );

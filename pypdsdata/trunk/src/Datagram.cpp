@@ -38,16 +38,20 @@ namespace {
   void Datagram_dealloc( PyObject* self );
 
   // type-specific methods
-  PyObject* Datagram_env( PyObject* self );
-  PyObject* Datagram_seq( PyObject* self );
-  PyObject* Datagram_xtc( PyObject* self );
+  PyObject* Datagram_env( PyObject* self, void* );
+  PyObject* Datagram_seq( PyObject* self, void* );
+  PyObject* Datagram_xtc( PyObject* self, void* );
 
   PyMethodDef Datagram_Methods[] = {
-    { "env", (PyCFunction) Datagram_env, METH_NOARGS, "Returns the env field as a number." },
-    { "seq", (PyCFunction) Datagram_seq, METH_NOARGS, "Returns the seq field as an object." },
-    { "xtc", (PyCFunction) Datagram_xtc, METH_NOARGS, "Returns top-level Xtc object." },
     {0, 0, 0, 0}
    };
+
+  PyGetSetDef Datagram_GetSet[] = {
+    { "env", Datagram_env, 0, "Returns the env field as a number.", 0 },
+    { "seq", Datagram_seq, 0, "Returns the seq field as an object.", 0 },
+    { "xtc", Datagram_xtc, 0, "Returns top-level Xtc object.", 0 },
+    {0, 0, 0, 0, 0}
+  };
 
   char Datagram_doc[] = "Python class wrapping C++ Pds::Dgram class.\n\n"
       "Instances of his class are created by other objects, there is no\n"
@@ -85,7 +89,7 @@ namespace {
     0,                       /*tp_iternext*/
     Datagram_Methods,        /*tp_methods*/
     0,                       /*tp_members*/
-    0,                       /*tp_getset*/
+    Datagram_GetSet,         /*tp_getset*/
     0,                       /*tp_base*/
     0,                       /*tp_dict*/
     0,                       /*tp_descr_get*/
@@ -179,7 +183,7 @@ Datagram_dealloc( PyObject* self )
 }
 
 PyObject*
-Datagram_env( PyObject* self )
+Datagram_env( PyObject* self, void* )
 {
   pypdsdata::Datagram* py_this = (pypdsdata::Datagram*) self;
   if( ! py_this->m_object ){
@@ -191,7 +195,7 @@ Datagram_env( PyObject* self )
 }
 
 PyObject*
-Datagram_seq( PyObject* self )
+Datagram_seq( PyObject* self, void* )
 {
   pypdsdata::Datagram* py_this = (pypdsdata::Datagram*) self;
   if( ! py_this->m_object ){
@@ -203,7 +207,7 @@ Datagram_seq( PyObject* self )
 }
 
 PyObject*
-Datagram_xtc( PyObject* self )
+Datagram_xtc( PyObject* self, void* )
 {
   pypdsdata::Datagram* py_this = (pypdsdata::Datagram*) self;
   if( ! py_this->m_object ){

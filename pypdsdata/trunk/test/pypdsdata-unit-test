@@ -617,32 +617,32 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual( count, 12 )
 
         f.seek(0)
-        self.assertEqual( [dg.env() for dg in iter], envs )
+        self.assertEqual( [dg.env for dg in iter], envs )
         
         f.seek(0)
-        self.assertEqual( [dg.seq().type() for dg in iter], [Sequence.Event]*12 )
+        self.assertEqual( [dg.seq.type() for dg in iter], [Sequence.Event]*12 )
 
         f.seek(0)
-        self.assertEqual( [dg.seq().clock() for dg in iter], clocks )
+        self.assertEqual( [dg.seq.clock() for dg in iter], clocks )
 
         f.seek(0)
-        self.assertEqual( [dg.seq().stamp() for dg in iter], stamps )
+        self.assertEqual( [dg.seq.stamp() for dg in iter], stamps )
 
         f.seek(0)
-        self.assertEqual( [dg.xtc().sizeofPayload() for dg in iter], payloads )
+        self.assertEqual( [dg.xtc.sizeofPayload() for dg in iter], payloads )
 
         f.seek(0)
-        self.assertEqual( [dg.xtc().extent() for dg in iter], extents )
+        self.assertEqual( [dg.xtc.extent for dg in iter], extents )
 
         f.seek(0)
-        self.assertEqual( [dg.xtc().damage() for dg in iter], [0]*12 )
+        self.assertEqual( [dg.xtc.damage for dg in iter], [0]*12 )
                 
 
     def test_XtcIterator(self):
         """ Test for XtcIterator class """
 
         def visit ( xtc, op ):
-            if xtc.contains().id() == TypeId.Id_Xtc :
+            if xtc.contains.id() == TypeId.Id_Xtc :
                 return [ visit(x,op) for x in xtc ]
             else :
                 return op(xtc)
@@ -652,18 +652,18 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         except :
             self.fail("XtcIterator test failed: data file cannot be open")
         dgiter = XtcFileIterator(f)
-        xtcs = [ dg.xtc() for dg in dgiter ]        
+        xtcs = [ dg.xtc for dg in dgiter ]        
 
-        tree = visit(xtcs[0], lambda x: x.contains())
+        tree = visit(xtcs[0], lambda x: x.contains)
         self.assertEqual( tree, [[], [], [[], [], [], []]] )
 
-        tree = visit(xtcs[4], lambda x: x.contains())
+        tree = visit(xtcs[4], lambda x: x.contains)
         self.assertEqual( tree, [[[], [TypeId(TypeId.Id_Frame,1)], [TypeId(TypeId.Id_Frame,1)], [TypeId(TypeId.Id_Frame,1)]]] )
         
         tree = visit(xtcs[4], lambda x: x.sizeofPayload())
         self.assertEqual( tree, [[[], [2097168], [2097168], [2097168]]] )
         
-        tree = visit(xtcs[4], lambda x: x.damage())
+        tree = visit(xtcs[4], lambda x: x.damage)
         self.assertEqual( tree, [[[], [0], [0], [0]]] )
 
 

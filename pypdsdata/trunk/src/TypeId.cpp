@@ -40,14 +40,14 @@ namespace {
   int TypeId_compare( PyObject *self, PyObject *other);
 
   // type-specific methods
-  PyObject* TypeId_value( PyObject* self );
-  PyObject* TypeId_id( PyObject* self );
-  PyObject* TypeId_version( PyObject* self );
+  PyObject* TypeId_value( PyObject* self, PyObject* );
+  PyObject* TypeId_id( PyObject* self, PyObject* );
+  PyObject* TypeId_version( PyObject* self, PyObject* );
 
   PyMethodDef TypeId_Methods[] = {
-    { "value", (PyCFunction) TypeId_value, METH_NOARGS, "Returns the whole type ID number including version" },
-    { "id", (PyCFunction) TypeId_id, METH_NOARGS, "Returns the type ID number without version" },
-    { "version", (PyCFunction) TypeId_version, METH_NOARGS, "Returns the type ID version number" },
+    { "value",    TypeId_value,   METH_NOARGS, "Returns the whole type ID number including version" },
+    { "id",       TypeId_id,      METH_NOARGS, "Returns the type ID number without version" },
+    { "version",  TypeId_version, METH_NOARGS, "Returns the type ID version number" },
     {0, 0, 0, 0}
    };
 
@@ -244,21 +244,21 @@ TypeId_repr( PyObject* self )
 }
 
 PyObject*
-TypeId_value( PyObject* self )
+TypeId_value( PyObject* self, PyObject* )
 {
   pypdsdata::TypeId* py_this = (pypdsdata::TypeId*) self;
   return PyInt_FromLong( py_this->m_typeId.value() );
 }
 
 PyObject*
-TypeId_id( PyObject* self )
+TypeId_id( PyObject* self, PyObject* )
 {
   pypdsdata::TypeId* py_this = (pypdsdata::TypeId*) self;
   return PyInt_FromLong( py_this->m_typeId.id() );
 }
 
 PyObject*
-TypeId_version( PyObject* self )
+TypeId_version( PyObject* self, PyObject* )
 {
   pypdsdata::TypeId* py_this = (pypdsdata::TypeId*) self;
   return PyInt_FromLong( py_this->m_typeId.version() );
