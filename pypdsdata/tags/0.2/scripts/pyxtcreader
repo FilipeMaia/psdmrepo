@@ -1,0 +1,91 @@
+#!python
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script pyxtcreader...
+#
+#------------------------------------------------------------------------
+
+"""Scanner for XTC files, reads everything and dumps the content of XTCs.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+from optparse import OptionParser
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from pdsdata import *
+
+#---------------------
+# Local definitions --
+#---------------------
+
+def _scan( xtc, offset=1 ) :
+    
+    pfx = "  "*offset
+    level = xtc.src.level()
+    print "%s%s level: payloadSize=%d damage=%d src=%s" % \
+            ( pfx, level, xtc.sizeofPayload(), xtc.damage, xtc.src ),
+    
+    if xtc.contains.id() == TypeId.Id_Xtc :
+        print
+        for x in xtc :
+            _scan( x, offset+1 )
+    else :
+        print "contains=%s" % xtc.contains
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+def main( argv ) :
+
+    parser = OptionParser(usage="%prog [options] xtc-file")
+
+    (options, args) = parser.parse_args()
+    
+    if len(args) != 1 :
+        parser.error("file name requred")
+
+    # read datagrams one by one
+    for dg in XtcFileIterator(file(args[0])) :
+
+        seq = dg.seq
+        clock = seq.clock()
+        stamp = seq.stamp()
+        xtc = dg.xtc
+
+        # print datagram info
+        print "%s transition: type=%d, time=%u sec %u nsec, ticks=%u, fiducials=%u, control=%u, payloadSize=%d" \
+            % ( seq.service(), seq.type(), clock.seconds(), clock.nanoseconds(),
+                stamp.ticks(),stamp.fiducials(),stamp.control(), xtc.sizeofPayload() )
+
+        # recursively dump Xtc info
+        _scan ( xtc )
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    sys.exit( main(sys.argv) )
