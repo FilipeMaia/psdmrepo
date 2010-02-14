@@ -1,0 +1,31 @@
+
+
+2010-02-14 - version 0.3
+========================
+- major refactoring:
+  - split the whole thing into a number of modules, pdsdata becomes a 
+    package, module names follow the directory names in pdsdata C++ package
+    so that Xtc class is now in pdsdata.xtc.Xtc
+  - most of the classes now inherit from either PdsDataType or 
+    PdsDataTypeEmbedded
+  - Datagram class renamed to Dgram
+- bunch of new data types added
+
+2010-02-04 - version 0.2
+========================
+- added NumPy header location search to setup script
+- started implementation of data classes
+  - common base class to be used for them is in src/types/PdsDataType
+  - src/types/TypeLib hase few useful macros and functions to simplify
+    writing of wrappers for member functions
+- src/types/camera has implementation of the data types from 
+  corresponding pdsdata package
+- new script scripts/pyxtcscanner whcih does the same as o2o-scanner
+- few methods in Xtc and Datagram classes became attributes (following
+  their C++ counterparts as closely as possible).
+
+2010-02-03 - version 0.1
+========================
+- first import into repository
+- just a bunch of XTC-related classes, no specific data types defined yet
+
