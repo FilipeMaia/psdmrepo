@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "Python.h"
+#include "types/PdsDataTypeEmbedded.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -45,18 +45,13 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-struct TypeId {
+class TypeId : public PdsDataTypeEmbedded<TypeId,Pds::TypeId> {
+public:
 
-  /// Returns the Python type
-  static PyTypeObject* typeObject();
+  typedef PdsDataTypeEmbedded<TypeId,Pds::TypeId> BaseType;
 
-  /// Builds TypeId from corresponding Pds type
-  static PyObject* TypeId_FromPds(Pds::TypeId type);
-
-  // standard Python stuff
-  PyObject_HEAD
-
-  Pds::TypeId m_typeId;
+  /// Initialize Python type and register it in a module
+  static void initType( PyObject* module );
 
 };
 

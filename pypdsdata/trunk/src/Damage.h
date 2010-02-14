@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "Python.h"
+#include "types/PdsDataTypeEmbedded.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -45,13 +45,13 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-struct Damage : PyIntObject {
+class Damage : public PdsDataTypeEmbedded<Damage,Pds::Damage> {
+public:
 
-  /// Returns the Python type
-  static PyTypeObject* typeObject();
+  typedef PdsDataTypeEmbedded<Damage,Pds::Damage> BaseType;
 
-  // makes new TransitionId object from a number
-  static PyObject* Damage_FromInt(int value);
+  /// Initialize Python type and register it in a module
+  static void initType( PyObject* module );
 
 };
 

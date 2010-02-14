@@ -1,5 +1,5 @@
-#ifndef PYPDSDATA_FRAMECOORD_H
-#define PYPDSDATA_FRAMECOORD_H
+#ifndef PYPDSDATA_CAMERA_FRAMECOORD_H
+#define PYPDSDATA_CAMERA_FRAMECOORD_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "Python.h"
+#include "types/PdsDataTypeEmbedded.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -46,22 +46,17 @@ namespace Camera {
  *  @author Andrei Salnikov
  */
 
-struct FrameCoord {
+class FrameCoord : public PdsDataTypeEmbedded<FrameCoord,Pds::Camera::FrameCoord> {
+public:
 
-  /// Returns the Python type
-  static PyTypeObject* typeObject();
+  typedef PdsDataTypeEmbedded<FrameCoord,Pds::Camera::FrameCoord> BaseType;
 
-  // makes new FrameCoord object from Pds type
-  static PyObject* FrameCoord_FromPds(const Pds::Camera::FrameCoord& coord);
-
-  // standard Python stuff
-  PyObject_HEAD
-
-  Pds::Camera::FrameCoord m_coord;
+  /// Initialize Python type and register it in a module
+  static void initType( PyObject* module );
 
 };
 
 } // namespace Camera
 } // namespace pypdsdata
 
-#endif // PYPDSDATA_FRAMECOORD_H
+#endif // PYPDSDATA_CAMERA_FRAMECOORD_H

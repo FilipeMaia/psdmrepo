@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "Python.h"
+#include "types/PdsDataTypeEmbedded.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -46,18 +46,13 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-struct ClockTime {
+class ClockTime : public PdsDataTypeEmbedded<ClockTime,Pds::ClockTime> {
+public:
 
-  /// Returns the Python type
-  static PyTypeObject* typeObject();
+  typedef PdsDataTypeEmbedded<ClockTime,Pds::ClockTime> BaseType;
 
-  // makes new ClockTime object from Pds type
-  static PyObject* ClockTime_FromPds(const Pds::ClockTime& clock);
-
-  // standard Python stuff
-  PyObject_HEAD
-
-  Pds::ClockTime m_clock;
+  /// Initialize Python type and register it in a module
+  static void initType( PyObject* module );
 
 };
 

@@ -1,12 +1,12 @@
-#ifndef PYPDSDATA_DATAGRAM_H
-#define PYPDSDATA_DATAGRAM_H
+#ifndef PYPDSDATA_ACQIRIS_TRIGV1_H
+#define PYPDSDATA_ACQIRIS_TRIGV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class Datagram.
+//	Class Acqiris_TrigV1.
 //
 //------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "Python.h"
+#include "types/PdsDataType.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -26,13 +26,14 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/xtc/Dgram.hh"
+#include "pdsdata/acqiris/ConfigV1.hh"
 
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//    ---------------------
+//    -- Class Interface --
+//    ---------------------
 
 namespace pypdsdata {
+namespace Acqiris {
 
 /**
  *  This software was developed for the LUSI project.  If you use all or
@@ -45,28 +46,17 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-struct Datagram  {
+class TrigV1 : public PdsDataType<TrigV1,Pds::Acqiris::TrigV1> {
+public:
 
-  // type of the destructor function
-  typedef void (*destructor)(Pds::Dgram*);
+  typedef PdsDataType<TrigV1,Pds::Acqiris::TrigV1> BaseType;
 
-  /// Returns the Python type
-  static PyTypeObject* typeObject();
-
-  /// Builds Datagram from corresponding Pds type, parent is the owner
-  /// of the corresponding buffer space, if parent is 0 then datagram
-  /// will be deleted on destruction.
-  static PyObject* Datagram_FromPds( Pds::Dgram* object, PyObject* parent, destructor dtor );
-
-  // standard Python stuff
-  PyObject_HEAD
-
-  Pds::Dgram* m_object;
-  PyObject* m_parent;
-  destructor m_dtor;
+  /// Initialize Python type and register it in a module
+  static void initType( PyObject* module );
 
 };
 
+} // namespace Acqiris
 } // namespace pypdsdata
 
-#endif // PYPDSDATA_DATAGRAM_H
+#endif // PYPDSDATA_ACQIRIS_TRIGV1_H

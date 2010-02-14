@@ -1,5 +1,5 @@
-#ifndef PYPDSDATA_FRAMEV1_H
-#define PYPDSDATA_FRAMEV1_H
+#ifndef PYPDSDATA_CAMERA_FRAMEV1_H
+#define PYPDSDATA_CAMERA_FRAMEV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
@@ -49,12 +49,14 @@ namespace Camera {
 class FrameV1 : public PdsDataType<FrameV1,Pds::Camera::FrameV1> {
 public:
 
-  /// Returns the Python type
-  static PyTypeObject* typeObject();
+  typedef PdsDataType<FrameV1,Pds::Camera::FrameV1> BaseType;
+
+  /// Initialize Python type and register it in a module
+  static void initType( PyObject* module );
 
 };
 
 } // namespace Camera
 } // namespace pypdsdata
 
-#endif // PYPDSDATA_FRAMEV1_H
+#endif // PYPDSDATA_CAMERA_FRAMEV1_H

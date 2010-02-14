@@ -50,8 +50,11 @@ namespace pypdsdata {
 namespace TypeLib {
 
 /// free-standing functions for conversion from C++ types to Python types
+inline PyObject* toPython(bool v) { return PyBool_FromLong( v ); }
 inline PyObject* toPython(int v) { return PyInt_FromLong( v ); }
 inline PyObject* toPython(unsigned int v) { return PyInt_FromLong( v ); }
+inline PyObject* toPython(long int v) { return PyInt_FromLong( v ); }
+inline PyObject* toPython(unsigned long int v) { return PyLong_FromUnsignedLong( v ); }
 inline PyObject* toPython(float v) { return PyFloat_FromDouble( v ); }
 inline PyObject* toPython(double v) { return PyFloat_FromDouble( v ); }
 
@@ -91,6 +94,58 @@ struct TypeCvt<double> {
     return pypdsdata::TypeLib::toPython( py_this->m_obj->FUN0() ); \
   }
 
+#define FUN0_WRAPPER_EMBEDDED(PYTYPE,FUN0) \
+  PyObject* FUN0( PyObject* self, PyObject* ) { \
+    PYTYPE* py_this = (PYTYPE*) self; \
+    return pypdsdata::TypeLib::toPython( py_this->m_obj.FUN0() ); \
+  }
+
+#define ENUM_FUN0_WRAPPER(PYTYPE,FUN0,ENUM) \
+  PyObject* FUN0( PyObject* self, PyObject* ) { \
+    PYTYPE* py_this = (PYTYPE*) self; \
+    if( ! py_this->m_obj ){ \
+      PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object"); \
+      return 0; \
+    } \
+    return ENUM.Enum_FromLong( py_this->m_obj->FUN0() ); \
+  }
+
+#define ENUM_FUN0_WRAPPER_EMBEDDED(PYTYPE,FUN0,ENUM) \
+  PyObject* FUN0( PyObject* self, PyObject* ) { \
+    PYTYPE* py_this = (PYTYPE*) self; \
+    return ENUM.Enum_FromLong( py_this->m_obj.FUN0() ); \
+  }
+
+#define MEMBER_WRAPPER(PYTYPE,MEMBER) \
+  PyObject* MEMBER( PyObject* self, void* ) { \
+    PYTYPE* py_this = (PYTYPE*) self; \
+    if( ! py_this->m_obj ){ \
+      PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object"); \
+      return 0; \
+    } \
+    return pypdsdata::TypeLib::toPython( py_this->m_obj->MEMBER ); \
+  }
+
+#define MEMBER_WRAPPER_EMBEDDED(PYTYPE,MEMBER) \
+  PyObject* MEMBER( PyObject* self, void* ) { \
+    PYTYPE* py_this = (PYTYPE*) self; \
+    return pypdsdata::TypeLib::toPython( py_this->m_obj.MEMBER ); \
+  }
+
+
+struct EnumEntry {
+  const char* name ;
+  int value;
+};
+
+inline void DefineEnums( PyObject* dict, const EnumEntry* enums )
+{
+  for ( ; enums->name ; ++ enums ) {
+    PyObject* val = PyInt_FromLong(enums->value);
+    PyDict_SetItemString( dict, enums->name, val );
+    Py_DECREF( val );
+  }
+}
 
 
 } // namespace TypeLib

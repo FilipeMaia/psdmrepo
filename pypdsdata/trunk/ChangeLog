@@ -1,5 +1,16 @@
 
 
+2010-02-14 - version 0.3
+========================
+- major refactoring:
+  - split the whole thing into a number of modules, pdsdata becomes a 
+    package, module names follow the directory names in pdsdata C++ package
+    so that Xtc class is now in pdsdata.xtc.Xtc
+  - most of the classes now inherit from either PdsDataType or 
+    PdsDataTypeEmbedded
+  - Datagram class renamed to Dgram
+- bunch of new data types added
+
 2010-02-04 - version 0.2
 ========================
 - added NumPy header location search to setup script

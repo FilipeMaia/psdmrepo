@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <string>
 
 //----------------------
 // Base Class Headers --
@@ -48,14 +49,18 @@ template <typename ConcreteType, typename PdsType>
 struct PdsDataType {
 
   // type of the destructor function
-  typedef void (*destructor)(const PdsType*);
+  typedef void (*destructor)(PdsType*);
+
+  /// Returns the Python type
+  static PyTypeObject* typeObject();
 
   /// Builds Python object from corresponding Pds type, parent is the owner
   /// of the corresponding buffer space, usually XTC object. If destructor
   /// function is provided it will be called to delete the Pds object.
-  static PyObject* PyObject_FromPds( const PdsType* obj, PyObject* parent, destructor dtor=0 );
+  static PyObject* PyObject_FromPds( PdsType* obj, PyObject* parent, destructor dtor=0 );
 
-  static const PdsType* pdsObject(PyObject* self) {
+  // returns pointer to an PdsType object
+  static PdsType* pdsObject(PyObject* self) {
     PdsDataType* py_this = (PdsDataType*) self;
     if( ! py_this->m_obj ){
       PyErr_SetString(PyExc_TypeError, "Error: No Valid C++ Object");
@@ -63,18 +68,27 @@ struct PdsDataType {
     return py_this->m_obj;
   }
 
+  // returns true if object is an instance of this type or subtype
+  static bool Object_TypeCheck( PyObject* obj ) {
+    PyTypeObject* type = typeObject();
+    return PyObject_TypeCheck( obj, type );
+  }
+
   // --------------------------------------------------
 
   // standard Python stuff
   PyObject_HEAD
 
-  const PdsType* m_obj;
+  PdsType* m_obj;
   PyObject* m_parent;
   destructor m_dtor;
 
 protected:
 
-  static PyTypeObject* PdsDataType_typeObject();
+  /// Initialize Python type and register it in a module
+  static void initType( const char* name, PyObject* module );
+
+  // standard Python deallocation function
   static void PdsDataType_dealloc( PyObject* self );
 
 };
@@ -83,7 +97,7 @@ protected:
 /// Returns the Python type opbject
 template <typename ConcreteType, typename PdsType>
 PyTypeObject*
-PdsDataType<ConcreteType, PdsType>::PdsDataType_typeObject()
+PdsDataType<ConcreteType, PdsType>::typeObject()
 {
   static PyTypeObject type = {
     PyObject_HEAD_INIT(0)
@@ -163,9 +177,9 @@ PdsDataType<ConcreteType, PdsType>::PdsDataType_dealloc( PyObject* self )
 /// function is provided it will be called to delete the Pds object.
 template <typename ConcreteType, typename PdsType>
 PyObject*
-PdsDataType<ConcreteType, PdsType>::PyObject_FromPds( const PdsType* obj, PyObject* parent, destructor dtor )
+PdsDataType<ConcreteType, PdsType>::PyObject_FromPds( PdsType* obj, PyObject* parent, destructor dtor )
 {
-  ConcreteType* ob = PyObject_New(ConcreteType,ConcreteType::typeObject());
+  ConcreteType* ob = PyObject_New(ConcreteType,typeObject());
   if ( not ob ) {
     PyErr_SetString( PyExc_RuntimeError, "Failed to create PdsDataType object." );
     return 0;
@@ -179,6 +193,32 @@ PdsDataType<ConcreteType, PdsType>::PyObject_FromPds( const PdsType* obj, PyObje
   return (PyObject*)ob;
 }
 
+/// Initialize Python type and register it in a module
+template <typename ConcreteType, typename PdsType>
+void
+PdsDataType<ConcreteType, PdsType>::initType( const char* name, PyObject* module )
+{
+  static std::string typeName;
+
+  // perfix type name with module name
+  const char* modname = PyModule_GetName(module);
+  if ( modname ) {
+    typeName = modname;
+    typeName += '.';
+  }
+  typeName += name;
+
+  // set the name
+  PyTypeObject* type = typeObject();
+  type->tp_name = (char*)typeName.c_str();
+
+  // initialize type
+  if ( PyType_Ready( type ) < 0 ) return;
+
+  // register it in a module
+  Py_INCREF( type );
+  PyModule_AddObject( module, (char*)name, (PyObject*) type );
+}
 
 } // namespace pypdsdata
 

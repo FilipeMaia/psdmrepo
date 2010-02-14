@@ -55,6 +55,11 @@ def _scan( xtc, offset=1 ) :
             _scan( x, offset+1 )
     else :
         print "contains=%s" % xtc.contains
+        try:
+            data = xtc.payload()
+            print "%sPayload: %s" % ( pfx, data )
+        except:
+            pass
 
 #---------------------------------
 #  Application class definition --

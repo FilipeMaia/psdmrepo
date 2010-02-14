@@ -23,7 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "Datagram.h"
+#include "Dgram.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -46,7 +46,7 @@ namespace {
   char XtcFileIterator_doc[] = "Python class wrapping C++ Pds::XtcFileIterator class.\n\n"
       "Constructor of the class has one argument which is a Python file object. The\n"
       "instances of this class act as regular Python iterators which return objects\n"
-      "of type Datagram.";
+      "of type Dgram.";
 
   PyTypeObject XtcFileIterator_Type = {
     PyObject_HEAD_INIT(0)
@@ -100,7 +100,7 @@ namespace {
   };
 
 
-  // Destructor function for datagrams
+  // Destructor function for Dgrams
   void dgramDtor(Pds::Dgram* dgram) {
     delete[] (char*)(dgram);
   }
@@ -188,7 +188,6 @@ PyObject* XtcFileIterator_next( PyObject* self )
     }
   }
 
-
   // get the data size and allocate whole buffer
   size_t payloadSize = header.xtc.sizeofPayload();
   size_t dgramSize = sizeof(header) + payloadSize;
@@ -200,7 +199,7 @@ PyObject* XtcFileIterator_next( PyObject* self )
     return 0;
   }
 
-  // copy part already here
+  // copy header into new buffer
   std::copy( (char*)&header, ((char*)&header)+sizeof(header), buf );
 
   // read rest of the data
@@ -208,7 +207,7 @@ PyObject* XtcFileIterator_next( PyObject* self )
     if ( fread( buf+sizeof(header), payloadSize, 1, file ) != 1 ) {
       PyObject* fnameObj = PyFile_Name( py_this->m_file );
       if ( feof(file) ) {
-        PyErr_Format( PyExc_EOFError, "EOF while reading datagram payload in file %s", PyString_AsString(fnameObj) ) ;
+        PyErr_Format( PyExc_EOFError, "EOF while reading Dgram payload in file %s", PyString_AsString(fnameObj) ) ;
       } else {
         PyErr_SetFromErrnoWithFilename( PyExc_IOError, PyString_AsString(fnameObj) );
       }
@@ -218,7 +217,7 @@ PyObject* XtcFileIterator_next( PyObject* self )
     }
   }
 
-  return pypdsdata::Datagram::Datagram_FromPds( (Pds::Dgram*)buf, 0, ::dgramDtor );
+  return pypdsdata::Dgram::PyObject_FromPds( (Pds::Dgram*)buf, 0, ::dgramDtor );
 }
 
 }

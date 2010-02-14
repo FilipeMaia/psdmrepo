@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "Python.h"
+#include "types/PdsDataTypeEmbedded.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -45,18 +45,13 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-struct ProcInfo {
+class ProcInfo : public PdsDataTypeEmbedded<ProcInfo,Pds::ProcInfo> {
+public:
 
-  /// Returns the Python type
-  static PyTypeObject* typeObject();
+  typedef PdsDataTypeEmbedded<ProcInfo,Pds::ProcInfo> BaseType;
 
-  // makes new ProcInfo object from Pds type
-  static PyObject* ProcInfo_FromPds(const Pds::ProcInfo& src);
-
-  // standard Python stuff
-  PyObject_HEAD
-
-  Pds::ProcInfo m_src;
+  /// Initialize Python type and register it in a module
+  static void initType( PyObject* module );
 
 };
 

@@ -64,22 +64,16 @@ namespace {
 //              -- Public Function Member Definitions --
 //              ----------------------------------------
 
-
-PyTypeObject*
-pypdsdata::Camera::FrameV1::typeObject()
+void
+pypdsdata::Camera::FrameV1::initType( PyObject* module )
 {
-  static PyTypeObject* type = 0;
-  if ( not type ) {
-    type = PdsDataType_typeObject() ;
+  PyTypeObject* type = BaseType::typeObject() ;
+  type->tp_doc = ::typedoc;
+  type->tp_methods = ::methods;
+  type->tp_str = FrameV1_str;
+  type->tp_repr = FrameV1_repr;
 
-    type->tp_name = "pdsdata.Camera.FrameV1";
-    type->tp_doc = ::typedoc;
-    type->tp_methods = ::methods;
-    type->tp_str = FrameV1_str;
-    type->tp_repr = FrameV1_repr;
-  }
-
-  return type;
+  BaseType::initType( "FrameV1", module );
 }
 
 namespace {

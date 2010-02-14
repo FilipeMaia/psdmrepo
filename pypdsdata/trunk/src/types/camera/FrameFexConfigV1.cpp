@@ -63,20 +63,14 @@ namespace {
 //              -- Public Function Member Definitions --
 //              ----------------------------------------
 
-
-PyTypeObject*
-pypdsdata::Camera::FrameFexConfigV1::typeObject()
+void
+pypdsdata::Camera::FrameFexConfigV1::initType( PyObject* module )
 {
-  static PyTypeObject* type = 0;
-  if ( not type ) {
-    type = PdsDataType_typeObject() ;
+  PyTypeObject* type = BaseType::typeObject() ;
+  type->tp_doc = ::typedoc;
+  type->tp_methods = ::methods;
 
-    type->tp_name = "pdsdata.Camera.FrameFexConfigV1";
-    type->tp_doc = ::typedoc;
-    type->tp_methods = ::methods;
-  }
-
-  return type;
+  BaseType::initType( "FrameFexConfigV1", module );
 }
 
 namespace {
@@ -87,7 +81,7 @@ roiBegin( PyObject* self, PyObject* args)
   const Pds::Camera::FrameFexConfigV1* obj = pypdsdata::Camera::FrameFexConfigV1::pdsObject( self );
   if ( not obj ) return 0;
 
-  return pypdsdata::Camera::FrameCoord::FrameCoord_FromPds ( obj->roiBegin() );
+  return pypdsdata::Camera::FrameCoord::PyObject_FromPds ( obj->roiBegin() );
 }
 
 PyObject*
@@ -96,7 +90,7 @@ roiEnd( PyObject* self, PyObject* args)
   const Pds::Camera::FrameFexConfigV1* obj = pypdsdata::Camera::FrameFexConfigV1::pdsObject( self );
   if ( not obj ) return 0;
 
-  return pypdsdata::Camera::FrameCoord::FrameCoord_FromPds ( obj->roiEnd() );
+  return pypdsdata::Camera::FrameCoord::PyObject_FromPds ( obj->roiEnd() );
 }
 
 PyObject*
@@ -111,7 +105,7 @@ masked_pixel_coordinates( PyObject* self, PyObject* args)
   // copy coordinates to the list
   const Pds::Camera::FrameCoord* coords = &(obj->masked_pixel_coordinates());
   for ( unsigned i = 0; i < size; ++ i ) {
-    PyObject* obj = pypdsdata::Camera::FrameCoord::FrameCoord_FromPds(coords[i]) ;
+    PyObject* obj = pypdsdata::Camera::FrameCoord::PyObject_FromPds(coords[i]) ;
     PyList_SET_ITEM( list, i, obj );
   }
 

@@ -40,6 +40,7 @@ import unittest
 # Imports for other modules --
 #-----------------------------
 from pdsdata import *
+from pdsdata.xtc import *
 
 #---------------------
 # Local definitions --
@@ -220,44 +221,44 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         """ Test for TypeId class """
         
         # check enums
-        self.assertEqual ( TypeId.Any, 0 )
-        self.assertEqual ( TypeId.Id_Xtc, 1 )
-        self.assertEqual ( TypeId.Id_Frame, 2 )
-        self.assertEqual ( TypeId.Id_AcqWaveform, 3 )
-        self.assertEqual ( TypeId.Id_AcqConfig, 4 )
-        self.assertEqual ( TypeId.Id_TwoDGaussian, 5 )
-        self.assertEqual ( TypeId.Id_Opal1kConfig, 6 )
-        self.assertEqual ( TypeId.Id_FrameFexConfig, 7 )
-        self.assertEqual ( TypeId.Id_EvrConfig, 8 )
-        self.assertEqual ( TypeId.Id_TM6740Config, 9 )
-        self.assertEqual ( TypeId.Id_ControlConfig, 10 )
-        self.assertEqual ( TypeId.Id_pnCCDframe, 11 )
-        self.assertEqual ( TypeId.Id_pnCCDconfig, 12 )
-        self.assertEqual ( TypeId.Id_Epics, 13 )
-        self.assertEqual ( TypeId.Id_FEEGasDetEnergy, 14 )
-        self.assertEqual ( TypeId.Id_EBeam, 15 )
-        self.assertEqual ( TypeId.Id_PhaseCavity, 16 )
-        self.assertEqual ( TypeId.NumberOf, 17 )
+        self.assertEqual ( TypeId.Type.Any, 0 )
+        self.assertEqual ( TypeId.Type.Id_Xtc, 1 )
+        self.assertEqual ( TypeId.Type.Id_Frame, 2 )
+        self.assertEqual ( TypeId.Type.Id_AcqWaveform, 3 )
+        self.assertEqual ( TypeId.Type.Id_AcqConfig, 4 )
+        self.assertEqual ( TypeId.Type.Id_TwoDGaussian, 5 )
+        self.assertEqual ( TypeId.Type.Id_Opal1kConfig, 6 )
+        self.assertEqual ( TypeId.Type.Id_FrameFexConfig, 7 )
+        self.assertEqual ( TypeId.Type.Id_EvrConfig, 8 )
+        self.assertEqual ( TypeId.Type.Id_TM6740Config, 9 )
+        self.assertEqual ( TypeId.Type.Id_ControlConfig, 10 )
+        self.assertEqual ( TypeId.Type.Id_pnCCDframe, 11 )
+        self.assertEqual ( TypeId.Type.Id_pnCCDconfig, 12 )
+        self.assertEqual ( TypeId.Type.Id_Epics, 13 )
+        self.assertEqual ( TypeId.Type.Id_FEEGasDetEnergy, 14 )
+        self.assertEqual ( TypeId.Type.Id_EBeam, 15 )
+        self.assertEqual ( TypeId.Type.Id_PhaseCavity, 16 )
+        self.assertEqual ( TypeId.Type.NumberOf, 17 )
 
         # instantiation
         TypeId ()
-        TypeId ( TypeId.Any, 0 )
-        TypeId ( TypeId.Any, 1 )
-        TypeId ( TypeId.Any, 100 )
-        TypeId ( TypeId.Id_Epics, 0 )
+        TypeId ( TypeId.Type.Any, 0 )
+        TypeId ( TypeId.Type.Any, 1 )
+        TypeId ( TypeId.Type.Any, 100 )
+        TypeId ( TypeId.Type.Id_Epics, 0 )
 
         # out of range, type error
-        self.assertRaises( TypeError, lambda : TypeId( TypeId.NumberOf ) )
+        self.assertRaises( TypeError, lambda : TypeId( TypeId.Type.NumberOf ) )
         self.assertRaises( TypeError, lambda : TypeId( 1j ) )
         self.assertRaises( TypeError, lambda : TypeId( TypeId() ) )
 
         # compare
-        for i in range(TypeId.NumberOf) :
+        for i in range(TypeId.Type.NumberOf) :
             self.assertEqual ( TypeId(i), TypeId(i,0) )
             self.assertEqual ( TypeId(i,1), TypeId(i,1) )
             self.assert_ ( TypeId(i,1) > TypeId(i,0) )
             self.assert_ ( TypeId(i,0) < TypeId(i,1) )
-        for i in range(1,TypeId.NumberOf) :
+        for i in range(1,TypeId.Type.NumberOf) :
             self.assert_ ( TypeId(i) > TypeId() )
             self.assert_ ( TypeId(i) > TypeId(i-1) )
             self.assert_ ( TypeId(i-1) < TypeId(i) )
@@ -271,8 +272,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         
         # names
         self.assertEqual ( str(TypeId()), "Any" )
-        self.assertEqual ( str(TypeId(TypeId.Id_Xtc)), "Xtc" )
-        self.assertEqual ( str(TypeId(TypeId.Id_Xtc,1)), "Xtc_V1" )
+        self.assertEqual ( str(TypeId(TypeId.Type.Id_Xtc)), "Xtc" )
+        self.assertEqual ( str(TypeId(TypeId.Type.Id_Xtc,1)), "Xtc_V1" )
         
         
     def test_TimeStamp(self):
@@ -325,26 +326,26 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         """ Test for DetInfo class """
         
         # check enums
-        self.assertEqual ( DetInfo.NoDetector, 0 )
-        self.assertEqual ( DetInfo.AmoIms, 1 )
-        self.assertEqual ( DetInfo.AmoGasdet, 2 )
-        self.assertEqual ( DetInfo.AmoETof, 3 )
-        self.assertEqual ( DetInfo.AmoITof, 4 )
-        self.assertEqual ( DetInfo.AmoMbes, 5 )
-        self.assertEqual ( DetInfo.AmoVmi, 6 )
-        self.assertEqual ( DetInfo.AmoBps, 7 )
-        self.assertEqual ( DetInfo.Camp, 8 )
-        self.assertEqual ( DetInfo.EpicsArch, 9 )
-        self.assertEqual ( DetInfo.BldEb, 10 )
-        self.assertEqual ( DetInfo.NumDetector, 11 )
+        self.assertEqual ( DetInfo.Detector.NoDetector, 0 )
+        self.assertEqual ( DetInfo.Detector.AmoIms, 1 )
+        self.assertEqual ( DetInfo.Detector.AmoGasdet, 2 )
+        self.assertEqual ( DetInfo.Detector.AmoETof, 3 )
+        self.assertEqual ( DetInfo.Detector.AmoITof, 4 )
+        self.assertEqual ( DetInfo.Detector.AmoMbes, 5 )
+        self.assertEqual ( DetInfo.Detector.AmoVmi, 6 )
+        self.assertEqual ( DetInfo.Detector.AmoBps, 7 )
+        self.assertEqual ( DetInfo.Detector.Camp, 8 )
+        self.assertEqual ( DetInfo.Detector.EpicsArch, 9 )
+        self.assertEqual ( DetInfo.Detector.BldEb, 10 )
+        self.assertEqual ( DetInfo.Detector.NumDetector, 11 )
         
-        self.assertEqual ( DetInfo.NoDevice, 0 )
-        self.assertEqual ( DetInfo.Evr, 1 )
-        self.assertEqual ( DetInfo.Acqiris, 2 )
-        self.assertEqual ( DetInfo.Opal1000, 3 )
-        self.assertEqual ( DetInfo.TM6740, 4 )
-        self.assertEqual ( DetInfo.pnCCD, 5 )
-        self.assertEqual ( DetInfo.NumDevice, 6 )
+        self.assertEqual ( DetInfo.Device.NoDevice, 0 )
+        self.assertEqual ( DetInfo.Device.Evr, 1 )
+        self.assertEqual ( DetInfo.Device.Acqiris, 2 )
+        self.assertEqual ( DetInfo.Device.Opal1000, 3 )
+        self.assertEqual ( DetInfo.Device.TM6740, 4 )
+        self.assertEqual ( DetInfo.Device.pnCCD, 5 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 6 )
 
         
         o1 = DetInfo(0,0,0,0,0)
@@ -390,8 +391,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertRaises( TypeError, lambda : DetInfo(1,1,1) )
         self.assertRaises( TypeError, lambda : DetInfo(1,1,1,1) )
         self.assertRaises( TypeError, lambda : DetInfo(1,1,1,1,1,1) )
-        self.assertRaises( TypeError, lambda : DetInfo(1,DetInfo.NumDetector,1,1,1) )
-        self.assertRaises( TypeError, lambda : DetInfo(1,1,1,DetInfo.NumDevice,1) )
+        self.assertRaises( TypeError, lambda : DetInfo(1,DetInfo.Detector.NumDetector,1,1,1) )
+        self.assertRaises( TypeError, lambda : DetInfo(1,1,1,DetInfo.Device.NumDevice,1) )
 
         # can use for keys
         d = {}
@@ -448,10 +449,10 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         """ Test for BldInfo class """
         
         # check enums
-        self.assertEqual ( BldInfo.EBeam, 0 )
-        self.assertEqual ( BldInfo.PhaseCavity, 1 )
-        self.assertEqual ( BldInfo.FEEGasDetEnergy, 2 )
-        self.assertEqual ( BldInfo.NumberOf, 3 )
+        self.assertEqual ( BldInfo.Type.EBeam, 0 )
+        self.assertEqual ( BldInfo.Type.PhaseCavity, 1 )
+        self.assertEqual ( BldInfo.Type.FEEGasDetEnergy, 2 )
+        self.assertEqual ( BldInfo.Type.NumberOf, 3 )
 
         o1 = BldInfo(0,0)
         
@@ -483,7 +484,7 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         # out of range, parameters
         self.assertRaises( TypeError, lambda : BldInfo(1) )
         self.assertRaises( TypeError, lambda : BldInfo(1,1,1) )
-        self.assertRaises( TypeError, lambda : BldInfo(1,BldInfo.NumberOf) )
+        self.assertRaises( TypeError, lambda : BldInfo(1,BldInfo.Type.NumberOf) )
 
         # can use for keys
         d = {}
@@ -496,50 +497,46 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         """ Test for Damage class """
         
         # check enums
-        self.assertEqual ( Damage.DroppedContribution, 1 )
-        self.assertEqual ( Damage.OutOfOrder, 12 )
-        self.assertEqual ( Damage.OutOfSynch, 13 )
-        self.assertEqual ( Damage.UserDefined, 14 )
-        self.assertEqual ( Damage.IncompleteContribution, 15 )
-        self.assertEqual ( Damage.ContainsIncomplete, 16 )
+        self.assertEqual ( Damage.Value.DroppedContribution, 1 )
+        self.assertEqual ( Damage.Value.OutOfOrder, 12 )
+        self.assertEqual ( Damage.Value.OutOfSynch, 13 )
+        self.assertEqual ( Damage.Value.UserDefined, 14 )
+        self.assertEqual ( Damage.Value.IncompleteContribution, 15 )
+        self.assertEqual ( Damage.Value.ContainsIncomplete, 16 )
 
-        self.assertEqual ( Damage.DroppedContribution_mask, 1 << 1 )
-        self.assertEqual ( Damage.OutOfOrder_mask, 1 << 12 )
-        self.assertEqual ( Damage.OutOfSynch_mask, 1 << 13 )
-        self.assertEqual ( Damage.UserDefined_mask, 1 << 14 )
-        self.assertEqual ( Damage.IncompleteContribution_mask, 1 << 15 )
-        self.assertEqual ( Damage.ContainsIncomplete_mask, 1 << 16 )
+        self.assertEqual ( Damage.Mask.DroppedContribution, 1 << 1 )
+        self.assertEqual ( Damage.Mask.OutOfOrder, 1 << 12 )
+        self.assertEqual ( Damage.Mask.OutOfSynch, 1 << 13 )
+        self.assertEqual ( Damage.Mask.UserDefined, 1 << 14 )
+        self.assertEqual ( Damage.Mask.IncompleteContribution, 1 << 15 )
+        self.assertEqual ( Damage.Mask.ContainsIncomplete, 1 << 16 )
 
         o1 = Damage(0)
         
         # check that we can call methods
         o1.hasDamage(0)
 
-        self.assertEqual( o1, 0 )
-        self.failIf ( o1.hasDamage(Damage.DroppedContribution) )
-        self.failIf ( o1.hasDamage(Damage.OutOfOrder) )
-        self.failIf ( o1.hasDamage(Damage.OutOfSynch) )
-        self.failIf ( o1.hasDamage(Damage.UserDefined) )
-        self.failIf ( o1.hasDamage(Damage.IncompleteContribution) )
-        self.failIf ( o1.hasDamage(Damage.ContainsIncomplete) )
+        self.assertEqual( o1.value(), 0 )
+        self.failIf ( o1.hasDamage(Damage.Value.DroppedContribution) )
+        self.failIf ( o1.hasDamage(Damage.Value.OutOfOrder) )
+        self.failIf ( o1.hasDamage(Damage.Value.OutOfSynch) )
+        self.failIf ( o1.hasDamage(Damage.Value.UserDefined) )
+        self.failIf ( o1.hasDamage(Damage.Value.IncompleteContribution) )
+        self.failIf ( o1.hasDamage(Damage.Value.ContainsIncomplete) )
 
-        o2 = Damage( Damage.OutOfOrder_mask | Damage.IncompleteContribution_mask )
-        self.failUnless( o2 != 0 )
-        self.failUnless( o2 == Damage.OutOfOrder_mask | Damage.IncompleteContribution_mask )
+        o2 = Damage( Damage.Mask.OutOfOrder | Damage.Mask.IncompleteContribution )
+        self.failUnless( o2.value() != 0 )
+        self.failUnless( o2.value() == Damage.Mask.OutOfOrder | Damage.Mask.IncompleteContribution )
 
-        self.failIf ( o2.hasDamage(Damage.DroppedContribution) )
-        self.failUnless ( o2.hasDamage(Damage.OutOfOrder) )
-        self.failIf ( o2.hasDamage(Damage.OutOfSynch) )
-        self.failIf ( o2.hasDamage(Damage.UserDefined) )
-        self.failUnless ( o2.hasDamage(Damage.IncompleteContribution) )
-        self.failIf ( o2.hasDamage(Damage.ContainsIncomplete) )
+        self.failIf ( o2.hasDamage(Damage.Value.DroppedContribution) )
+        self.failUnless ( o2.hasDamage(Damage.Value.OutOfOrder) )
+        self.failIf ( o2.hasDamage(Damage.Value.OutOfSynch) )
+        self.failIf ( o2.hasDamage(Damage.Value.UserDefined) )
+        self.failUnless ( o2.hasDamage(Damage.Value.IncompleteContribution) )
+        self.failIf ( o2.hasDamage(Damage.Value.ContainsIncomplete) )
 
 
         # compare
-        self.assert_ ( o2 > o1 ) 
-        self.assert_ ( o2 >= o1 ) 
-        self.assert_ ( o1 < o2 ) 
-        self.assert_ ( o1 <= o2 ) 
         self.assert_ ( o2 != o1 ) 
         self.assert_ ( o2 == o2 ) 
         self.assertEqual ( o1, o1 ) 
@@ -559,9 +556,9 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         """ Test for Sequence class """
         
         # check enums
-        self.assertEqual ( Sequence.Event, 0 )
-        self.assertEqual ( Sequence.Occurrence, 1 )
-        self.assertEqual ( Sequence.Marker, 2 )
+        self.assertEqual ( Sequence.Type.Event, 0 )
+        self.assertEqual ( Sequence.Type.Occurrence, 1 )
+        self.assertEqual ( Sequence.Type.Marker, 2 )
         o1 = Sequence()
         
         # check that we can call methods
@@ -572,7 +569,7 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         o1.clock()
         o1.stamp()
         
-        self.assertEqual( o1.type(), Sequence.Event )
+        self.assertEqual( o1.type(), Sequence.Type.Event )
         self.assertEqual( o1.service(), TransitionId.Unknown )
         self.assertEqual( o1.isExtended(), False )
         self.assertEqual( o1.isEvent(), False )
@@ -620,7 +617,7 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual( [dg.env for dg in iter], envs )
         
         f.seek(0)
-        self.assertEqual( [dg.seq.type() for dg in iter], [Sequence.Event]*12 )
+        self.assertEqual( [dg.seq.type() for dg in iter], [Sequence.Type.Event]*12 )
 
         f.seek(0)
         self.assertEqual( [dg.seq.clock() for dg in iter], clocks )
@@ -635,14 +632,14 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual( [dg.xtc.extent for dg in iter], extents )
 
         f.seek(0)
-        self.assertEqual( [dg.xtc.damage for dg in iter], [0]*12 )
+        self.assertEqual( [dg.xtc.damage.value() for dg in iter], [0]*12 )
                 
 
     def test_XtcIterator(self):
         """ Test for XtcIterator class """
 
         def visit ( xtc, op ):
-            if xtc.contains.id() == TypeId.Id_Xtc :
+            if xtc.contains.id() == TypeId.Type.Id_Xtc :
                 return [ visit(x,op) for x in xtc ]
             else :
                 return op(xtc)
@@ -658,12 +655,12 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual( tree, [[], [], [[], [], [], []]] )
 
         tree = visit(xtcs[4], lambda x: x.contains)
-        self.assertEqual( tree, [[[], [TypeId(TypeId.Id_Frame,1)], [TypeId(TypeId.Id_Frame,1)], [TypeId(TypeId.Id_Frame,1)]]] )
+        self.assertEqual( tree, [[[], [TypeId(TypeId.Type.Id_Frame,1)], [TypeId(TypeId.Type.Id_Frame,1)], [TypeId(TypeId.Type.Id_Frame,1)]]] )
         
         tree = visit(xtcs[4], lambda x: x.sizeofPayload())
         self.assertEqual( tree, [[[], [2097168], [2097168], [2097168]]] )
         
-        tree = visit(xtcs[4], lambda x: x.damage)
+        tree = visit(xtcs[4], lambda x: x.damage.value() )
         self.assertEqual( tree, [[[], [0], [0], [0]]] )
 
 

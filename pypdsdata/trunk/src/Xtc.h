@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "Python.h"
+#include "types/PdsDataType.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -45,31 +45,19 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-struct Xtc {
+class Xtc : public PdsDataType<Xtc,Pds::Xtc> {
+public:
 
-  // type of the destructor function
-  typedef void (*destructor)(Pds::Xtc*);
+  typedef PdsDataType<Xtc,Pds::Xtc> BaseType;
 
-  /// Returns the Python type
-  static PyTypeObject* typeObject();
-
-  /// Builds Xtc from corresponding Pds type, parent is the owner
-  /// of the corresponding buffer space, if parent is 0 then Xtc
-  /// will be deleted on destruction.
-  static PyObject* Xtc_FromPds( Pds::Xtc* xtc, PyObject* parent, destructor dtor );
+  /// Initialize Python type and register it in a module
+  static void initType( PyObject* module );
 
   // Check object type
   static bool Xtc_Check( PyObject* obj );
 
   // REturns a pointer to Pds object
   static Pds::Xtc* Xtc_AsPds( PyObject* obj );
-
-  // standard Python stuff
-  PyObject_HEAD
-
-  Pds::Xtc* m_xtc;
-  PyObject* m_parent;
-  destructor m_dtor;
 
 };
 
