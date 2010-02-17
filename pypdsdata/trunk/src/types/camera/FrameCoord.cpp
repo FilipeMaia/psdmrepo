@@ -19,6 +19,7 @@
 // C/C++ Headers --
 //-----------------
 #include <new>
+#include <structmember.h>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -36,19 +37,15 @@ namespace {
   PyObject* FrameCoord_str( PyObject *self );
   PyObject* FrameCoord_repr( PyObject *self );
 
-  // type-specific methods
-  MEMBER_WRAPPER_EMBEDDED(pypdsdata::Camera::FrameCoord, column)
-  MEMBER_WRAPPER_EMBEDDED(pypdsdata::Camera::FrameCoord, row)
-
-  PyMethodDef methods[] = {
-    {0, 0, 0, 0}
-   };
-
-  PyGetSetDef getset[] = {
-    {"x",      column, 0, "column index", 0},
-    {"column", column, 0, "column index", 0},
-    {"y",      row,    0, "row index",    0},
-    {"row",    row,    0, "row index",    0},
+  PyMemberDef members[] = {
+    {"x",      T_USHORT, offsetof(pypdsdata::Camera::FrameCoord,m_obj.column),
+       0, "column index" },
+    {"column", T_USHORT, offsetof(pypdsdata::Camera::FrameCoord,m_obj.column),
+       0, "column index" },
+    {"y",      T_USHORT, offsetof(pypdsdata::Camera::FrameCoord,m_obj.row),
+      0, "row index" },
+    {"row",    T_USHORT, offsetof(pypdsdata::Camera::FrameCoord,m_obj.row),
+      0, "row index" },
     {0, 0, 0, 0, 0}
   };
 
@@ -68,8 +65,7 @@ pypdsdata::Camera::FrameCoord::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
-  type->tp_methods = ::methods;
-  type->tp_getset = ::getset;
+  type->tp_members = ::members;
   type->tp_hash = FrameCoord_hash;
   type->tp_compare = FrameCoord_compare;
   type->tp_str = FrameCoord_str;

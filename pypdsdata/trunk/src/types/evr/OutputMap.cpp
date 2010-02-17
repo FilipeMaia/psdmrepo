@@ -64,10 +64,6 @@ namespace {
     {0, 0, 0, 0}
    };
 
-  PyGetSetDef getset[] = {
-    {0, 0, 0, 0, 0}
-  };
-
   char typedoc[] = "Python class wrapping C++ Pds::EvrData::OutputMap class.";
 
 }
@@ -82,7 +78,6 @@ pypdsdata::EvrData::OutputMap::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_getset = ::getset;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();

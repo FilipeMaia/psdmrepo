@@ -131,7 +131,15 @@ ProcInfo_compare( PyObject* self, PyObject* other )
 PyObject*
 ProcInfo_str( PyObject *self )
 {
-  return ::ProcInfo_repr( self );
+  pypdsdata::ProcInfo* py_this = (pypdsdata::ProcInfo*) self;
+  char buf[64];
+  unsigned ip = py_this->m_obj.ipAddr() ;
+
+  snprintf( buf, sizeof buf, "ProcInfo(%s, %d, %d.%d.%d.%d)",
+      Pds::Level::name(py_this->m_obj.level()),
+      py_this->m_obj.processId(),
+      ((ip>>24)&0xff), ((ip>>16)&0xff), ((ip>>8)&0xff), (ip&0xff) );
+  return PyString_FromString( buf );
 }
 
 PyObject*

@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class BldDataFEEGasDetEnergy...
+//	Class ControlData_PVMonitor...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "BldDataFEEGasDetEnergy.h"
+#include "PVMonitor.h"
 
 //-----------------
 // C/C++ Headers --
@@ -32,20 +32,22 @@
 namespace {
 
   // methods
-  MEMBER_WRAPPER(pypdsdata::BldDataFEEGasDetEnergy, f_11_ENRC)
-  MEMBER_WRAPPER(pypdsdata::BldDataFEEGasDetEnergy, f_12_ENRC)
-  MEMBER_WRAPPER(pypdsdata::BldDataFEEGasDetEnergy, f_21_ENRC)
-  MEMBER_WRAPPER(pypdsdata::BldDataFEEGasDetEnergy, f_22_ENRC)
+  FUN0_WRAPPER(pypdsdata::ControlData::PVMonitor, name)
+  FUN0_WRAPPER(pypdsdata::ControlData::PVMonitor, array)
+  FUN0_WRAPPER(pypdsdata::ControlData::PVMonitor, index)
+  FUN0_WRAPPER(pypdsdata::ControlData::PVMonitor, loValue)
+  FUN0_WRAPPER(pypdsdata::ControlData::PVMonitor, hiValue)
 
-  PyGetSetDef getset[] = {
-    {"f_11_ENRC",   f_11_ENRC,   0, "PV name: GDET:FEE1:11:ENRC", 0},
-    {"f_12_ENRC",   f_12_ENRC,   0, "PV name: GDET:FEE1:12:ENRC", 0},
-    {"f_21_ENRC",   f_11_ENRC,   0, "PV name: GDET:FEE1:21:ENRC", 0},
-    {"f_22_ENRC",   f_11_ENRC,   0, "PV name: GDET:FEE1:22:ENRC", 0},
-    {0, 0, 0, 0, 0}
-  };
+  PyMethodDef methods[] = {
+    {"name",       name,       METH_NOARGS,  "Returns name of the monitoring channel" },
+    {"array",      array,      METH_NOARGS,  "Returns true for array" },
+    {"index",      index,      METH_NOARGS,  "Returns index in the array" },
+    {"loValue",    loValue,    METH_NOARGS,  "Returns low value" },
+    {"hiValue",    hiValue,    METH_NOARGS,  "Returns high value" },
+    {0, 0, 0, 0}
+   };
 
-  char typedoc[] = "Python class wrapping C++ Pds::BldDataFEEGasDetEnergy class.";
+  char typedoc[] = "Python class wrapping C++ Pds::ControlData::PVMonitor class.";
 }
 
 //              ----------------------------------------
@@ -53,11 +55,11 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::BldDataFEEGasDetEnergy::initType( PyObject* module )
+pypdsdata::ControlData::PVMonitor::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
-  type->tp_getset = ::getset;
+  type->tp_methods = ::methods;
 
-  BaseType::initType( "BldDataFEEGasDetEnergy", module );
+  BaseType::initType( "PVMonitor", module );
 }

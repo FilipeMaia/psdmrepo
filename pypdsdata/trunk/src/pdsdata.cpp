@@ -54,6 +54,12 @@
 #include "types/camera/FrameV1.h"
 #include "types/camera/TwoDGaussianV1.h"
 
+#include "types/control/ConfigV1.h"
+#include "types/control/PVControl.h"
+#include "types/control/PVMonitor.h"
+
+#include "types/epics/EpicsModule.h"
+
 #include "types/evr/ConfigV1.h"
 #include "types/evr/ConfigV2.h"
 #include "types/evr/OutputMap.h"
@@ -63,6 +69,8 @@
 
 #include "types/pnCCD/ConfigV1.h"
 #include "types/pnCCD/FrameV1.h"
+
+#include "types/pulnix/TM6740ConfigV1.h"
 
 #define PDSDATA_IMPORT_ARRAY
 #import "pdsdata_numpy.h"
@@ -94,7 +102,7 @@ PyMODINIT_FUNC initpdsdata()
   // Initialize the module
   PyObject* this_module = Py_InitModule3( "pdsdata", 0, "The Python module for XTC" );
 
-  PyObject* module = Py_InitModule3( "pdsdata.xtc", 0, "The Python module for pdsdata/acqiris" );
+  PyObject* module = Py_InitModule3( "pdsdata.xtc", 0, "The Python module for pdsdata/xtc" );
   pypdsdata::BldInfo::initType( module );
   pypdsdata::ClockTime::initType( module );
   pypdsdata::Damage::initType( module );
@@ -139,6 +147,18 @@ PyMODINIT_FUNC initpdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "camera", module );
 
+  module = Py_InitModule3( "pdsdata.control", 0, "The Python module for pdsdata/control" );
+  pypdsdata::ControlData::ConfigV1::initType( module );
+  pypdsdata::ControlData::PVControl::initType( module );
+  pypdsdata::ControlData::PVMonitor::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "control", module );
+
+  // very special epics module
+  module = pypdsdata::EpicsModule::getModule();
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "epics", module );
+
   module = Py_InitModule3( "pdsdata.evr", 0, "The Python module for pdsdata/evr" );
   pypdsdata::EvrData::ConfigV1::initType( module );
   pypdsdata::EvrData::ConfigV2::initType( module );
@@ -157,6 +177,11 @@ PyMODINIT_FUNC initpdsdata()
   pypdsdata::PNCCD::FrameV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "pnccd", module );
+
+  module = Py_InitModule3( "pdsdata.pulnix", 0, "The Python module for pdsdata/pulnix" );
+  pypdsdata::Pulnix::TM6740ConfigV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "pulnix", module );
 
   // import NumPy
   import_array();

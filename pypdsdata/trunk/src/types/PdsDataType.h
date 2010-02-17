@@ -59,6 +59,11 @@ struct PdsDataType {
   /// function is provided it will be called to delete the Pds object.
   static PyObject* PyObject_FromPds( PdsType* obj, PyObject* parent, destructor dtor=0 );
 
+  /// helper method to avoid casting on client side,
+  static PyObject* PyObject_FromPds( void* obj, PyObject* parent, destructor dtor=0 ) {
+    return PyObject_FromPds( static_cast<PdsType*>(obj), parent, dtor );
+  }
+
   // returns pointer to an PdsType object
   static PdsType* pdsObject(PyObject* self) {
     PdsDataType* py_this = (PdsDataType*) self;

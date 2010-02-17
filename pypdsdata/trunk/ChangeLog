@@ -1,4 +1,8 @@
 
+2010-02-16 - version 0.4
+========================
+- few remaining modules added - control, epics, pulnix
+- all existing data types to date now have Python classes   
 
 2010-02-14 - version 0.3
 ========================

@@ -181,7 +181,9 @@ PyObject*
 DetInfo_str( PyObject *self )
 {
   pypdsdata::DetInfo* py_this = (pypdsdata::DetInfo*) self;
-  return PyString_FromString( Pds::DetInfo::name(py_this->m_obj) );
+  char buf[48];
+  snprintf( buf, sizeof buf, "DetInfo(%s)", Pds::DetInfo::name(py_this->m_obj) );
+  return PyString_FromString( buf );
 }
 
 PyObject*

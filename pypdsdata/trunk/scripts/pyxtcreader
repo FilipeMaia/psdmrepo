@@ -37,6 +37,7 @@ from optparse import OptionParser
 # Imports for other modules --
 #-----------------------------
 from pdsdata import *
+from pdsdata.xtc import *
 
 #---------------------
 # Local definitions --
@@ -47,9 +48,9 @@ def _scan( xtc, offset=1 ) :
     pfx = "  "*offset
     level = xtc.src.level()
     print "%s%s level: payloadSize=%d damage=%d src=%s" % \
-            ( pfx, level, xtc.sizeofPayload(), xtc.damage, xtc.src ),
+            ( pfx, level, xtc.sizeofPayload(), xtc.damage.value(), xtc.src ),
     
-    if xtc.contains.id() == TypeId.Id_Xtc :
+    if xtc.contains.id() == TypeId.Type.Id_Xtc :
         print
         for x in xtc :
             _scan( x, offset+1 )
