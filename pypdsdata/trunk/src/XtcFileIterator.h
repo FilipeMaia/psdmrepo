@@ -50,6 +50,9 @@ struct XtcFileIterator {
   /// Returns the Python type
   static PyTypeObject* typeObject();
 
+  /// factory function
+  static PyObject* XtcFileIterator_FromFile( PyObject* file );
+
   // standard Python stuff
   PyObject_HEAD
 

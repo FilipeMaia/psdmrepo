@@ -118,6 +118,23 @@ XtcFileIterator::typeObject()
   return &::XtcFileIterator_Type;
 }
 
+
+/// factory function
+PyObject*
+XtcFileIterator::XtcFileIterator_FromFile( PyObject* file )
+{
+  XtcFileIterator* ob = PyObject_New(XtcFileIterator,typeObject());
+  if ( not ob ) {
+    PyErr_SetString( PyExc_RuntimeError, "Failed to create XtcFileIterator object." );
+    return 0;
+  }
+
+  Py_XINCREF(file);
+  ob->m_file = file;
+
+  return (PyObject*)ob;
+}
+
 } // namespace pypdsdata
 
 

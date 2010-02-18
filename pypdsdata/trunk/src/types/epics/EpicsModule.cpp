@@ -31,6 +31,20 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+namespace {
+
+  PyObject* Epics_dbr_type_is_TIME( PyObject*, PyObject* args );
+  PyObject* Epics_dbr_type_is_CTRL( PyObject*, PyObject* args );
+
+  PyMethodDef methods[] = {
+    {"dbr_type_is_TIME", Epics_dbr_type_is_TIME,  METH_VARARGS,  "Returns true for DBR_TIME type IDs." },
+    {"dbr_type_is_CTRL", Epics_dbr_type_is_CTRL,  METH_VARARGS,  "Returns true for DBR_CTRL type IDs." },
+    {0, 0, 0, 0}
+   };
+
+}
+
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -45,7 +59,7 @@ EpicsModule::getModule()
   if ( s_module ) return s_module;
 
   // create the module
-  PyObject* module = Py_InitModule3( "pdsdata.epics", 0, "The Python module for pdsdata/epics" );
+  PyObject* module = Py_InitModule3( "pdsdata.epics", methods, "The Python module for pdsdata/epics" );
 
   // define constants
   PyModule_AddIntConstant( module, "DBR_STRING", DBR_STRING );
@@ -90,6 +104,30 @@ EpicsModule::getModule()
   pypdsdata::EpicsPvTime::initType( module );
   pypdsdata::Epics::epicsTimeStamp::initType( module );
 
+  // make the list of severity strings
+  PyObject* strList = PyList_New(ALARM_NSEV);
+  for ( int i = 0 ; i < ALARM_NSEV ; ++ i ) {
+    PyList_SET_ITEM( strList, i, PyString_FromString( Pds::Epics::epicsAlarmSeverityStrings[i] ) );
+  }
+  Py_INCREF( strList );
+  PyModule_AddObject( module, "epicsAlarmSeverityStrings", strList );
+
+  // make the list of conditions strings
+  strList = PyList_New(ALARM_NSTATUS);
+  for ( int i = 0 ; i < ALARM_NSTATUS ; ++ i ) {
+    PyList_SET_ITEM( strList, i, PyString_FromString( Pds::Epics::epicsAlarmConditionStrings[i] ) );
+  }
+  Py_INCREF( strList );
+  PyModule_AddObject( module, "epicsAlarmConditionStrings", strList );
+
+  // make the list of conditions strings
+  const int ndbr = sizeof Pds::Epics::dbr_text / sizeof Pds::Epics::dbr_text[0] ;
+  strList = PyList_New( ndbr );
+  for ( int i = 0 ; i <  ndbr ; ++ i ) {
+    PyList_SET_ITEM( strList, i, PyString_FromString( Pds::Epics::dbr_text[i] ) );
+  }
+  Py_INCREF( strList );
+  PyModule_AddObject( module, "dbr_text", strList );
 
   // store it
   s_module = module ;
@@ -112,3 +150,26 @@ EpicsModule::PyObject_FromPds( Pds::EpicsPvHeader* pvHeader, PyObject* parent )
 }
 
 } // namespace pypdsdata
+
+
+namespace {
+
+PyObject*
+Epics_dbr_type_is_TIME( PyObject*, PyObject* args )
+{
+  int id = 0;
+  if ( not PyArg_ParseTuple( args, "I:epics.dbr_type_is_TIME", &id ) ) return 0;
+
+  return PyBool_FromLong( dbr_type_is_TIME(id) );
+}
+
+PyObject*
+Epics_dbr_type_is_CTRL( PyObject*, PyObject* args )
+{
+  int id = 0;
+  if ( not PyArg_ParseTuple( args, "I:epics.dbr_type_is_CTRL", &id ) ) return 0;
+
+  return PyBool_FromLong( dbr_type_is_CTRL(id) );
+}
+
+}
