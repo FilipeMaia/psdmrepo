@@ -27,6 +27,7 @@
 #include "Damage.h"
 #include "Dgram.h"
 #include "DetInfo.h"
+#include "Exception.h"
 #include "Level.h"
 #include "ProcInfo.h"
 #include "Sequence.h"
@@ -97,12 +98,18 @@ namespace {
 
 // Module entry point
 extern "C"
-PyMODINIT_FUNC initpdsdata()
+PyMODINIT_FUNC init_pdsdata()
 {
   // Initialize the module
-  PyObject* this_module = Py_InitModule3( "pdsdata", 0, "The Python module for XTC" );
+  PyObject* this_module = Py_InitModule3( "_pdsdata", 0, "The Python module for XTC" );
 
-  PyObject* module = Py_InitModule3( "pdsdata.xtc", 0, "The Python module for pdsdata/xtc" );
+  PyObject* excType = pypdsdata::exceptionType();
+  Py_INCREF( excType );
+  PyModule_AddObject( this_module, "Error", excType );
+
+  PyObject* module = 0;
+
+  module = Py_InitModule3( "pdsdata.xtc", 0, "The Python module for pdsdata/acqiris" );
   pypdsdata::BldInfo::initType( module );
   pypdsdata::ClockTime::initType( module );
   pypdsdata::Damage::initType( module );

@@ -57,6 +57,7 @@ struct XtcFileIterator {
   PyObject_HEAD
 
   PyObject* m_file;
+  size_t m_count ;
 
 };
 

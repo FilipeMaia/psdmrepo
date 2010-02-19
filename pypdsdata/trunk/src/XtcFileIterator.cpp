@@ -131,6 +131,7 @@ XtcFileIterator::XtcFileIterator_FromFile( PyObject* file )
 
   Py_XINCREF(file);
   ob->m_file = file;
+  ob->m_count = 0;
 
   return (PyObject*)ob;
 }
@@ -158,8 +159,10 @@ XtcFileIterator_init(PyObject* self, PyObject* args, PyObject* kwds)
     return -1;
   }
 
+  Py_CLEAR(py_this->m_file);
   Py_INCREF(fileObj);
   py_this->m_file = fileObj;
+  py_this->m_count = 0;
 
   return 0;
 }

@@ -1,4 +1,13 @@
 
+2010-02-19 - version 0.5
+========================
+- changed module organization:
+  - C extension module is now called _pdsdata
+  - pdsdata package introduced which incorporates _pdsdata and 
+    pure Python modules
+- new pure module 'io' with few file-reading primitives, chunk iterator 
+  and stream merging iterator
+
 2010-02-17 - version 0.4.1
 ==========================
 - added bunch of constants and couple of methods to epics module 

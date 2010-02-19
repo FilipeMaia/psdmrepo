@@ -664,6 +664,36 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual( tree, [[[], [0], [0], [0]]] )
 
 
+    def test_XtcFileName(self):
+        """ Test for XtcFileName class """
+
+        f1 = "/reg/d/psdm/amo/amo00409/xtc/e11-r0001-s00-c00.xtc"
+        o1 = io.XtcFileName(f1)
+        self.assertEqual( o1, f1 )
+        self.assertEqual( o1.expNum(), 11 )
+        self.assertEqual( o1.run(), 1 )
+        self.assertEqual( o1.stream(), 0 )
+        self.assertEqual( o1.chunk(), 0 )
+
+        f2 = "/reg/d/psdm/amo/amo00409/xtc/e55-r9991-s01-c01.xtc"
+        o2 = io.XtcFileName(f2)
+        self.assertEqual( o2, f2 )
+        self.assertEqual( o2.expNum(), 55 )
+        self.assertEqual( o2.run(), 9991 )
+        self.assertEqual( o2.stream(), 1 )
+        self.assertEqual( o2.chunk(), 1 )
+
+        f2 = "/reg/d/psdm/amo/amo00409/xtc/datafile.xtc"
+        o2 = io.XtcFileName(f2)
+        self.assertEqual( o2, f2 )
+        self.assertEqual( o2.expNum(), None )
+        self.assertEqual( o2.run(), None )
+        self.assertEqual( o2.stream(), None )
+        self.assertEqual( o2.chunk(), None )
+
+
+
+
 #
 #  run unit tests when imported as a main module
 #

@@ -31,6 +31,7 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import os
+import logging
 from optparse import OptionParser
 
 #-----------------------------
@@ -68,15 +69,17 @@ def _scan( xtc, offset=1 ) :
 
 def main( argv ) :
 
-    parser = OptionParser(usage="%prog [options] xtc-file")
+    parser = OptionParser(usage="%prog [options] xtc-files ...")
 
     (options, args) = parser.parse_args()
     
-    if len(args) != 1 :
-        parser.error("file name requred")
+    if not args :
+        parser.error("at least one file name required")
+
+    #logging.basicConfig(level=logging.DEBUG)
 
     # read datagrams one by one
-    for dg in XtcFileIterator(file(args[0])) :
+    for dg in io.XtcMergeIterator( args ) :
 
         seq = dg.seq
         clock = seq.clock()

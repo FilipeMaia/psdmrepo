@@ -36,7 +36,7 @@ namespace pypdsdata {
 PyObject*
 exceptionType()
 {
-  static PyObject* type = PyErr_NewException( "pdsdata.Exception", 0, 0 );
+  static PyObject* type = PyErr_NewException( "_pdsdata.Error", 0, 0 );
   return type;
 }
 

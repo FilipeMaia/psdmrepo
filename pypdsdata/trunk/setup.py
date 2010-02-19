@@ -1,7 +1,7 @@
 #
 # $Id$
 #
-# Copyright (c) 2010-2008 SLAC National Accelerator Laboratory
+# Copyright (c) 2010 SLAC National Accelerator Laboratory
 # 
 
 from distutils.core import setup, Extension
@@ -31,7 +31,7 @@ options = dict(
 sources = glob.glob( os.path.join(SRC_DIR,"*.cpp") ) + \
     glob.glob( os.path.join(SRC_DIR,"types","*","*.cpp") )
 
-module = Extension('pdsdata',
+module = Extension('_pdsdata',
                    sources = sources,
                    include_dirs = ['src']
                    )
@@ -104,6 +104,7 @@ class PdsdataBuilder( build ):
       
 
 options['ext_modules'] = [module]
+options['packages'] = ['pdsdata']
 options['scripts'] = [ 'scripts/pyxtcreader' ]
 options['cmdclass'] = dict( build = PdsdataBuilder )
 
