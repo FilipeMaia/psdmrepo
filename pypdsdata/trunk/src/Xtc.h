@@ -58,7 +58,6 @@ public:
 
   // REturns a pointer to Pds object
   static Pds::Xtc* Xtc_AsPds( PyObject* obj );
-
 };
 
 } // namespace pypdsdata

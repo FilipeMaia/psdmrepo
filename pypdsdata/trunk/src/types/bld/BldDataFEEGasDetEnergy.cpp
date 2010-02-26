@@ -40,8 +40,8 @@ namespace {
   PyGetSetDef getset[] = {
     {"f_11_ENRC",   f_11_ENRC,   0, "PV name: GDET:FEE1:11:ENRC", 0},
     {"f_12_ENRC",   f_12_ENRC,   0, "PV name: GDET:FEE1:12:ENRC", 0},
-    {"f_21_ENRC",   f_11_ENRC,   0, "PV name: GDET:FEE1:21:ENRC", 0},
-    {"f_22_ENRC",   f_11_ENRC,   0, "PV name: GDET:FEE1:22:ENRC", 0},
+    {"f_21_ENRC",   f_21_ENRC,   0, "PV name: GDET:FEE1:21:ENRC", 0},
+    {"f_22_ENRC",   f_22_ENRC,   0, "PV name: GDET:FEE1:22:ENRC", 0},
     {0, 0, 0, 0, 0}
   };
 

@@ -46,7 +46,7 @@ namespace pypdsdata {
  */
 
 template <typename ConcreteType, typename PdsType>
-struct PdsDataType {
+struct PdsDataType : PyObject {
 
   // type of the destructor function
   typedef void (*destructor)(PdsType*);
@@ -57,10 +57,10 @@ struct PdsDataType {
   /// Builds Python object from corresponding Pds type, parent is the owner
   /// of the corresponding buffer space, usually XTC object. If destructor
   /// function is provided it will be called to delete the Pds object.
-  static PyObject* PyObject_FromPds( PdsType* obj, PyObject* parent, destructor dtor=0 );
+  static ConcreteType* PyObject_FromPds( PdsType* obj, PyObject* parent, destructor dtor=0 );
 
   /// helper method to avoid casting on client side,
-  static PyObject* PyObject_FromPds( void* obj, PyObject* parent, destructor dtor=0 ) {
+  static ConcreteType* PyObject_FromPds( void* obj, PyObject* parent, destructor dtor=0 ) {
     return PyObject_FromPds( static_cast<PdsType*>(obj), parent, dtor );
   }
 
@@ -80,9 +80,6 @@ struct PdsDataType {
   }
 
   // --------------------------------------------------
-
-  // standard Python stuff
-  PyObject_HEAD
 
   PdsType* m_obj;
   PyObject* m_parent;
@@ -181,7 +178,7 @@ PdsDataType<ConcreteType, PdsType>::PdsDataType_dealloc( PyObject* self )
 /// of the corresponding buffer space, usually XTC object. If destructor
 /// function is provided it will be called to delete the Pds object.
 template <typename ConcreteType, typename PdsType>
-PyObject*
+ConcreteType*
 PdsDataType<ConcreteType, PdsType>::PyObject_FromPds( PdsType* obj, PyObject* parent, destructor dtor )
 {
   ConcreteType* ob = PyObject_New(ConcreteType,typeObject());
@@ -195,7 +192,7 @@ PdsDataType<ConcreteType, PdsType>::PyObject_FromPds( PdsType* obj, PyObject* pa
   Py_XINCREF(ob->m_parent);
   ob->m_dtor = dtor;
 
-  return (PyObject*)ob;
+  return ob;
 }
 
 /// Initialize Python type and register it in a module

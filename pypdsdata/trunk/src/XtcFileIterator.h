@@ -45,16 +45,13 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-struct XtcFileIterator {
+struct XtcFileIterator : PyObject {
 
   /// Returns the Python type
   static PyTypeObject* typeObject();
 
   /// factory function
-  static PyObject* XtcFileIterator_FromFile( PyObject* file );
-
-  // standard Python stuff
-  PyObject_HEAD
+  static XtcFileIterator* XtcFileIterator_FromFile( PyObject* file );
 
   PyObject* m_file;
   size_t m_count ;

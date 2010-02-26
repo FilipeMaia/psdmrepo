@@ -50,7 +50,7 @@ namespace {
   PyTypeObject XtcIterator_Type = {
     PyObject_HEAD_INIT(0)
     0,                       /*ob_size*/
-    "pdsdata.XtcIterator",   /*tp_name*/
+    "pdsdata.xtc.XtcIterator",   /*tp_name*/
     sizeof(pypdsdata::XtcIterator), /*tp_basicsize*/
     0,                       /*tp_itemsize*/
     /* methods */
@@ -113,7 +113,7 @@ XtcIterator::typeObject()
   return &::XtcIterator_Type;
 }
 
-PyObject*
+XtcIterator*
 XtcIterator::XtcIterator_FromXtc( Pds::Xtc* xtc, PyObject* parent )
 {
   // check XTC first
@@ -132,14 +132,22 @@ XtcIterator::XtcIterator_FromXtc( Pds::Xtc* xtc, PyObject* parent )
   py_this->m_parentXtc = xtc;
   Py_INCREF(parent);
   py_this->m_parent = parent;
-  py_this->m_remaining = xtc->sizeofPayload();
+
+  // for some type of damage it's dangerous to look inside
+  // this code follows what is found in pdsdata/xtc/XtcIterator.cc
+  if ( xtc->damage.value() & ( 1 << Damage::IncompleteContribution) ) {
+    py_this->m_remaining = 0;
+  } else {
+    py_this->m_remaining = xtc->sizeofPayload();
+  }
+
   if ( py_this->m_remaining ) {
     py_this->m_next = (Pds::Xtc*)(xtc->payload());
   } else {
     py_this->m_next = 0;
   }
 
-  return (PyObject*)py_this;
+  return py_this;
 }
 
 } // namespace pypdsdata
@@ -180,9 +188,18 @@ XtcIterator_init(PyObject* self, PyObject* args, PyObject* kwds)
 
   // build an object
   py_this->m_parentXtc = xtc;
+  Py_CLEAR(py_this->m_parent);
   Py_INCREF(xtcObj);
   py_this->m_parent = xtcObj;
-  py_this->m_remaining = py_this->m_parentXtc->sizeofPayload();
+
+  // for some type of damage it's dangerous to look inside
+  // this code follows what is found in pdsdata/xtc/XtcIterator.cc
+  if ( xtc->damage.value() & (1 << Damage::IncompleteContribution) ) {
+    py_this->m_remaining = 0;
+  } else {
+    py_this->m_remaining = xtc->sizeofPayload();
+  }
+
   if ( py_this->m_remaining ) {
     py_this->m_next = (Pds::Xtc*)(py_this->m_parentXtc->payload());
   } else {

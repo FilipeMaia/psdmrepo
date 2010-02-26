@@ -54,9 +54,9 @@ namespace {
     {"nbrSamplesInSeg",  nbrSamplesInSeg,   METH_NOARGS,  "Returns integer number" },
     {"nbrSegments",      nbrSegments,       METH_NOARGS,  "Returns integer number" },
     {"indexFirstPoint",  indexFirstPoint,   METH_NOARGS,  "Returns integer number" },
-    {"timestamp",        timestamp,         METH_NOARGS,  "Returns TimestampV1 object for a given segment" },
-    {"waveform",         waveform,          METH_NOARGS,  "Returns waveform array given a HorizV1 object" },
-    {"nextChannel",      nextChannel,       METH_NOARGS,  "Returns DataDescV1 for next channel (arg is HorizV1 object)" },
+    {"timestamp",        timestamp,         METH_VARARGS, "Returns TimestampV1 object for a given segment" },
+    {"waveform",         waveform,          METH_VARARGS, "Returns waveform array given a HorizV1 object" },
+    {"nextChannel",      nextChannel,       METH_VARARGS, "Returns DataDescV1 for next channel (arg is HorizV1 object)" },
     {0, 0, 0, 0}
    };
 
@@ -117,7 +117,7 @@ waveform( PyObject* self, PyObject* args )
   const Pds::Acqiris::HorizV1* hconfig = pypdsdata::Acqiris::HorizV1::pdsObject( hconfigObj );
 
   // get data size
-  unsigned size = Pds::Acqiris::DataDescV1::waveformSize( *hconfig );
+  unsigned size = hconfig->nbrSamples();
 
   // NumPy type number
   int typenum = NPY_SHORT;
@@ -129,11 +129,15 @@ waveform( PyObject* self, PyObject* args )
   npy_intp dims[1] = { size };
 
   // make array
+  int16_t* data = obj->waveform(*hconfig);
+  data += obj->indexFirstPoint();
   PyObject* array = PyArray_New(&PyArray_Type, 1, dims, typenum, 0,
-                                (void*)obj->waveform(*hconfig), 0, flags, 0);
+                                (void*)data, 0, flags, 0);
 
   // array does not own its data, set self as owner
-  ((PyArrayObject*)array)->base = self ;
+  Py_INCREF(self);
+  PyArrayObject* oarray = (PyArrayObject*)array;
+  oarray->base = self ;
 
   return array;
 }

@@ -4,5 +4,9 @@
 # Copyright (c) 2010 SLAC National Accelerator Laboratory
 # 
 
-from _pdsdata import *
-import io
+# import stuff from extension module
+from _pdsdata import Error
+
+__all__ = ['Error', 'xtc', 'bld', 'camera', 'control', 
+           'epics', 'evr', 'opal1k', 'pnccd', 'pulnix',
+           'acqiris', 'io', 'event', 'histo']

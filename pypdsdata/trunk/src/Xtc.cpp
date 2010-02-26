@@ -104,7 +104,6 @@ Xtc::Xtc_AsPds( PyObject* obj )
   }
 }
 
-
 } // namespace pypdsdata
 
 

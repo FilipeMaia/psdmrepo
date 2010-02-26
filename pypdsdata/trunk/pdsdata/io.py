@@ -235,11 +235,8 @@ class XtcMergeIterator(XtcStreamMerger) :
         _log.debug("XtcMergeIterator: files=%s", xfiles)
         
         # check they all from the same experiment and run
-        exp = set()
-        runs = set()
-        for file in xfiles :
-            exp.add( file.expNum() ) 
-            runs.add( file.run() )
+        exp = set([file.expNum() for file in xfiles])
+        runs = set([file.run() for file in xfiles])
         if len(exp)>1 or len(runs)>1 :
             raise Error("file names from different runs or experiments")
 

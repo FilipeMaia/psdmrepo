@@ -109,7 +109,7 @@ PyMODINIT_FUNC init_pdsdata()
 
   PyObject* module = 0;
 
-  module = Py_InitModule3( "pdsdata.xtc", 0, "The Python module for pdsdata/acqiris" );
+  module = Py_InitModule3( "_pdsdata.xtc", 0, "The Python module for pdsdata/acqiris" );
   pypdsdata::BldInfo::initType( module );
   pypdsdata::ClockTime::initType( module );
   pypdsdata::Damage::initType( module );
@@ -128,7 +128,7 @@ PyMODINIT_FUNC init_pdsdata()
   PyModule_AddObject( this_module, "xtc", module );
 
   // initialize data types, each in its own module
-  module = Py_InitModule3( "pdsdata.acqiris", 0, "The Python module for pdsdata/acqiris" );
+  module = Py_InitModule3( "_pdsdata.acqiris", 0, "The Python module for pdsdata/acqiris" );
   pypdsdata::Acqiris::ConfigV1::initType( module );
   pypdsdata::Acqiris::DataDescV1::initType( module );
   pypdsdata::Acqiris::HorizV1::initType( module );
@@ -138,7 +138,7 @@ PyMODINIT_FUNC init_pdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "acqiris", module );
 
-  module = Py_InitModule3( "pdsdata.bld", 0, "The Python module for pdsdata/bld" );
+  module = Py_InitModule3( "_pdsdata.bld", 0, "The Python module for pdsdata/bld" );
   pypdsdata::BldDataEBeam::initType( module );
   pypdsdata::BldDataEBeamV0::initType( module );
   pypdsdata::BldDataFEEGasDetEnergy::initType( module );
@@ -146,7 +146,7 @@ PyMODINIT_FUNC init_pdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "bld", module );
 
-  module = Py_InitModule3( "pdsdata.camera", 0, "The Python module for pdsdata/camera" );
+  module = Py_InitModule3( "_pdsdata.camera", 0, "The Python module for pdsdata/camera" );
   pypdsdata::Camera::FrameCoord::initType( module );
   pypdsdata::Camera::FrameFexConfigV1::initType( module );
   pypdsdata::Camera::FrameV1::initType( module );
@@ -154,7 +154,7 @@ PyMODINIT_FUNC init_pdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "camera", module );
 
-  module = Py_InitModule3( "pdsdata.control", 0, "The Python module for pdsdata/control" );
+  module = Py_InitModule3( "_pdsdata.control", 0, "The Python module for pdsdata/control" );
   pypdsdata::ControlData::ConfigV1::initType( module );
   pypdsdata::ControlData::PVControl::initType( module );
   pypdsdata::ControlData::PVMonitor::initType( module );
@@ -166,7 +166,7 @@ PyMODINIT_FUNC init_pdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "epics", module );
 
-  module = Py_InitModule3( "pdsdata.evr", 0, "The Python module for pdsdata/evr" );
+  module = Py_InitModule3( "_pdsdata.evr", 0, "The Python module for pdsdata/evr" );
   pypdsdata::EvrData::ConfigV1::initType( module );
   pypdsdata::EvrData::ConfigV2::initType( module );
   pypdsdata::EvrData::OutputMap::initType( module );
@@ -174,18 +174,18 @@ PyMODINIT_FUNC init_pdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "evr", module );
 
-  module = Py_InitModule3( "pdsdata.opal1k", 0, "The Python module for pdsdata/opal1k" );
+  module = Py_InitModule3( "_pdsdata.opal1k", 0, "The Python module for pdsdata/opal1k" );
   pypdsdata::Opal1k::ConfigV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "opal1k", module );
 
-  module = Py_InitModule3( "pdsdata.pnccd", 0, "The Python module for pdsdata/pnCCD" );
+  module = Py_InitModule3( "_pdsdata.pnccd", 0, "The Python module for pdsdata/pnCCD" );
   pypdsdata::PNCCD::ConfigV1::initType( module );
   pypdsdata::PNCCD::FrameV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "pnccd", module );
 
-  module = Py_InitModule3( "pdsdata.pulnix", 0, "The Python module for pdsdata/pulnix" );
+  module = Py_InitModule3( "_pdsdata.pulnix", 0, "The Python module for pdsdata/pulnix" );
   pypdsdata::Pulnix::TM6740ConfigV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "pulnix", module );

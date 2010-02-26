@@ -51,7 +51,7 @@ namespace {
   PyTypeObject XtcFileIterator_Type = {
     PyObject_HEAD_INIT(0)
     0,                       /*ob_size*/
-    "pdsdata.XtcFileIterator", /*tp_name*/
+    "pdsdata.xtc.XtcFileIterator", /*tp_name*/
     sizeof(pypdsdata::XtcFileIterator), /*tp_basicsize*/
     0,                       /*tp_itemsize*/
     /* methods */
@@ -120,7 +120,7 @@ XtcFileIterator::typeObject()
 
 
 /// factory function
-PyObject*
+XtcFileIterator*
 XtcFileIterator::XtcFileIterator_FromFile( PyObject* file )
 {
   XtcFileIterator* ob = PyObject_New(XtcFileIterator,typeObject());
@@ -133,7 +133,7 @@ XtcFileIterator::XtcFileIterator_FromFile( PyObject* file )
   ob->m_file = file;
   ob->m_count = 0;
 
-  return (PyObject*)ob;
+  return ob;
 }
 
 } // namespace pypdsdata

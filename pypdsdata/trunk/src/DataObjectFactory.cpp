@@ -22,6 +22,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "Xtc.h"
+
 #include "types/acqiris/ConfigV1.h"
 #include "types/acqiris/DataDescV1.h"
 
@@ -52,6 +54,27 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+namespace {
+
+  // "destructor" for cloned xtc
+  void buf_dealloc(Pds::Xtc* xtc) {
+    delete [] (char*)xtc;
+  }
+
+  // make a separate copy of the xtc object not sharing same buffer
+  pypdsdata::Xtc* cloneXtc( const Pds::Xtc& xtc )
+  {
+    size_t size = xtc.extent ;
+    char* newbuf = new char[size];
+    const char* oldbuf = (const char*)&xtc;
+    std::copy( oldbuf, oldbuf+size, newbuf);
+
+    return pypdsdata::Xtc::PyObject_FromPds( (Pds::Xtc*)newbuf, 0, ::buf_dealloc );
+  }
+
+
+}
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -65,6 +88,7 @@ PyObject*
 DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 {
   PyObject* obj = 0;
+  Xtc* clone = 0;
   switch ( xtc.contains.id() ) {
 
   case Pds::TypeId::Any :
@@ -141,7 +165,9 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     break ;
 
   case Pds::TypeId::Id_Epics :
-    obj = EpicsModule::PyObject_FromPds(xtc.payload(), parent);
+    clone = ::cloneXtc( xtc );
+    obj = EpicsModule::PyObject_FromPds(clone->m_obj->payload(), clone);
+    Py_CLEAR(clone);
     break ;
 
   case Pds::TypeId::Id_FEEGasDetEnergy :

@@ -1,4 +1,16 @@
 
+2010-02-26 - version 0.6
+========================
+- few bugs fixed in data classes, needed to INCREF self before setting
+  base object in numpy arrays
+- epics xtcs are now cloned to avoid pinning of the whole datagram in memory
+- package organization reworked, now C code is in its own package _pdsdata
+  and pdsdata is pure Python package which imports stuff from _pdsdata.
+  Every _pdsdata submodule is mirrored in pdsdata package to allow
+  different kinds of imports and extend/override the classes from _pdsdata
+- started implementation of pyana
+- pnCCD/FrameV1.cpp returns 512x512 array instead of 1-dim buffer
+
 2010-02-19 - version 0.5
 ========================
 - changed module organization:

@@ -153,6 +153,7 @@ output_lookup_table( PyObject* self, PyObject* )
                                 (void*)obj->output_lookup_table(), 0, flags, 0);
 
   // array does not own its data, set self as owner
+  Py_INCREF(self);
   ((PyArrayObject*)array)->base = self ;
 
   return array;

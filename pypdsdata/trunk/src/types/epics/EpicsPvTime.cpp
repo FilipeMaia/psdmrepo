@@ -150,6 +150,7 @@ EpicsPvTime_stamp( PyObject* self, void* )
 }
 
 template <int iDbrType>
+inline
 PyObject*
 getValue( Pds::EpicsPvHeader* header, int index = 0 )
 {

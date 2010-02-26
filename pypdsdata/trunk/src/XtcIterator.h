@@ -45,17 +45,15 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-struct XtcIterator {
+struct XtcIterator : PyObject {
 
   /// Returns the Python type
   static PyTypeObject* typeObject();
 
   /// Builds iterator from Xtc.
-  static PyObject* XtcIterator_FromXtc( Pds::Xtc* xtc, PyObject* parent );
+  static XtcIterator* XtcIterator_FromXtc( Pds::Xtc* xtc, PyObject* parent );
 
-  // standard Python stuff
-  PyObject_HEAD
-
+  // data members
   PyObject* m_parent;
   Pds::Xtc* m_parentXtc;
   Pds::Xtc* m_next;

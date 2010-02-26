@@ -47,13 +47,13 @@ namespace pypdsdata {
  */
 
 template <typename ConcreteType, typename PdsType>
-struct PdsDataTypeEmbedded {
+struct PdsDataTypeEmbedded : PyObject {
 
   /// Returns the Python type
   static PyTypeObject* typeObject();
 
   /// Builds Python object from corresponding Pds type.
-  static PyObject* PyObject_FromPds( const PdsType& obj );
+  static ConcreteType* PyObject_FromPds( const PdsType& obj );
 
   // Returns reference to embedded object
   static PdsType& pdsObject(PyObject* self) {
@@ -68,9 +68,6 @@ struct PdsDataTypeEmbedded {
   }
 
   // --------------------------------------------------
-
-  // standard Python stuff
-  PyObject_HEAD
 
   PdsType m_obj;
 
@@ -158,7 +155,7 @@ PdsDataTypeEmbedded<ConcreteType, PdsType>::PdsDataTypeEmbedded_dealloc( PyObjec
 
 /// Builds Python object from corresponding Pds type.
 template <typename ConcreteType, typename PdsType>
-PyObject*
+ConcreteType*
 PdsDataTypeEmbedded<ConcreteType, PdsType>::PyObject_FromPds( const PdsType& obj )
 {
   ConcreteType* ob = PyObject_New(ConcreteType,typeObject());
@@ -170,7 +167,7 @@ PdsDataTypeEmbedded<ConcreteType, PdsType>::PyObject_FromPds( const PdsType& obj
   // copy-construct the object
   new(&ob->m_obj) PdsType(obj);
 
-  return (PyObject*)ob;
+  return ob;
 }
 
 /// Initialize Python type and register it in a module

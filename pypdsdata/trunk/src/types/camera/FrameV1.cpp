@@ -140,6 +140,7 @@ FrameV1_data( PyObject* self, PyObject* args)
                                 (void*)obj->data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
+  Py_INCREF(self);
   ((PyArrayObject*)array)->base = self ;
 
   return array;
