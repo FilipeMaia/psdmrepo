@@ -79,7 +79,7 @@ horiz( PyObject* self, PyObject* )
   const Pds::Acqiris::ConfigV1* obj = pypdsdata::Acqiris::ConfigV1::pdsObject( self );
   if ( not obj ) return 0;
 
-  return pypdsdata::Acqiris::HorizV1::PyObject_FromPds( (Pds::Acqiris::HorizV1*)&obj->horiz(), self );
+  return pypdsdata::Acqiris::HorizV1::PyObject_FromPds( (Pds::Acqiris::HorizV1*)&obj->horiz(), self, sizeof(Pds::Acqiris::HorizV1) );
 }
 
 PyObject*
@@ -88,7 +88,7 @@ trig( PyObject* self, PyObject* )
   const Pds::Acqiris::ConfigV1* obj = pypdsdata::Acqiris::ConfigV1::pdsObject( self );
   if ( not obj ) return 0;
 
-  return pypdsdata::Acqiris::TrigV1::PyObject_FromPds( (Pds::Acqiris::TrigV1*)&obj->trig(), self );
+  return pypdsdata::Acqiris::TrigV1::PyObject_FromPds( (Pds::Acqiris::TrigV1*)&obj->trig(), self, sizeof(Pds::Acqiris::TrigV1) );
 }
 
 
@@ -101,7 +101,7 @@ vert( PyObject* self, PyObject* args )
   unsigned channel;
   if ( not PyArg_ParseTuple( args, "I:Acqiris.ConfigV1.vert", &channel ) ) return 0;
 
-  return pypdsdata::Acqiris::VertV1::PyObject_FromPds( (Pds::Acqiris::VertV1*)&obj->vert(channel), self );
+  return pypdsdata::Acqiris::VertV1::PyObject_FromPds( (Pds::Acqiris::VertV1*)&obj->vert(channel), self, sizeof(Pds::Acqiris::VertV1) );
 }
 
 

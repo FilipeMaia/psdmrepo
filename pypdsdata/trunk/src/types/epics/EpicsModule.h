@@ -27,6 +27,7 @@
 // Collaborating Class Declarations --
 //------------------------------------
 #include "pdsdata/epics/EpicsPvData.hh"
+#include "pdsdata/xtc/Xtc.hh"
 
 //		---------------------
 // 		-- Class Interface --
@@ -53,11 +54,11 @@ public:
   static PyObject* getModule() ;
 
   // make Python object from Pds type
-  static PyObject* PyObject_FromPds( Pds::EpicsPvHeader* pvHeader, PyObject* parent );
+  static PyObject* PyObject_FromPds( Pds::EpicsPvHeader* pvHeader, PyObject* parent, size_t size );
 
   // helper method to avoid casting on client side
-  static PyObject* PyObject_FromPds( void* pvHeader, PyObject* parent ) {
-    return PyObject_FromPds( static_cast<Pds::EpicsPvHeader*>(pvHeader), parent );
+  static PyObject* PyObject_FromXtc( const Pds::Xtc& xtc, PyObject* parent ) {
+    return PyObject_FromPds( static_cast<Pds::EpicsPvHeader*>((void*)xtc.payload()), parent, xtc.sizeofPayload() );
   }
 
 protected:

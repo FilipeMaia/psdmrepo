@@ -16,10 +16,12 @@ _log = logging.getLogger("pdsdata.io")
 def _genXtcChunkIterator( files, bufsize=-1 ):
     """ helper generator object """
     for fname in files :
-        dgiter = xtc.XtcFileIterator( open(fname, 'rb', bufsize) )
+        file = open(fname, 'rb', bufsize)
+        fpos = file.tell()
         count = 0
-        for dg in dgiter :
-            yield ( dg, fname, count )
+        for dg in xtc.XtcFileIterator( file ) :
+            yield ( dg, fname, count, fpos )
+            fpos = file.tell()
             count += 1
 
 class XtcChunkIterator (object) :
@@ -34,6 +36,7 @@ class XtcChunkIterator (object) :
         self.m_gen = _genXtcChunkIterator( files, bufsize )
 
         self.m_fname = None
+        self.m_fpos = 0
         self.m_dgindex = 0
 
     def __iter__ (self) :
@@ -43,10 +46,7 @@ class XtcChunkIterator (object) :
     def next(self):
         """ advance to next datagram possibly switching to next file """
         
-        self.m_fname = None
-        self.m_dgindex = 0
-        
-        dg, self.m_fname, self.m_dgindex = self.m_gen.next()
+        dg, self.m_fname, self.m_dgindex, self.m_fpos = self.m_gen.next()
         return dg
 
     def fileName(self):
@@ -57,8 +57,12 @@ class XtcChunkIterator (object) :
         """ get the name of the currently read file """
         return os.path.basename(self.m_fname)
         
+    def fpos(self):
+        """ get the position in the file with last read datagram """
+        return self.m_fpos
+        
     def dgIndex(self):
-        """ get the index of the last read histogram in a file """
+        """ get the index of the last read datagram in a file """
         return self.m_dgindex
         
 
@@ -84,6 +88,8 @@ class XtcStreamMerger(object) :
             except StopIteration :
                 dg = None
             self.m_dgs.append( dg )
+            
+        self.m_lastIndex = None
 
     def _dgramTime(self, dg):
         """ corrects datagram time for L1Accept transitions """
@@ -100,6 +106,8 @@ class XtcStreamMerger(object) :
     def next(self):
         """ return next diagram in the time order """
 
+        self.m_lastIndex = None
+
         # find stream/datagram with minimal time
         ns = len(self.m_dgs)
         stream = -1
@@ -111,6 +119,8 @@ class XtcStreamMerger(object) :
         if stream < 0 :
             # means no more non-empty streams left, stop iteration
             raise StopIteration
+
+        self.m_lastIndex = stream
 
         nextdg = self.m_dgs[stream]
 
@@ -254,3 +264,9 @@ class XtcMergeIterator(XtcStreamMerger) :
 
         # call base class ctor and give it all this
         XtcStreamMerger.__init__( self, streamIters, l1OffsetSec )
+
+    def fileName(self):
+        return self.m_streams[self.m_lastIndex].fileName()
+
+    def fpos(self):
+        return self.m_streams[self.m_lastIndex].fpos()

@@ -32,10 +32,6 @@
 
 namespace {
 
-  // standard Python stuff
-  PyObject* EpicsPvCtrl_str( PyObject *self );
-  PyObject* EpicsPvCtrl_repr( PyObject *self );
-
   template <int DBR_TYPE>
   struct LimitUnitGetter {
 
@@ -69,6 +65,11 @@ namespace {
 
   };
 
+  // standard Python stuff
+  PyObject* EpicsPvCtrl_new( PyTypeObject *subtype, PyObject *args, PyObject *kwds );
+  PyObject* EpicsPvCtrl_str( PyObject *self );
+  PyObject* EpicsPvCtrl_repr( PyObject *self );
+
   // methods
   MEMBER_WRAPPER(pypdsdata::EpicsPvCtrl, iPvId)
   MEMBER_WRAPPER(pypdsdata::EpicsPvCtrl, iDbrType)
@@ -82,6 +83,7 @@ namespace {
   PyObject* EpicsPvCtrl_strs( PyObject* self, void* );
   PyObject* EpicsPvCtrl_value( PyObject* self, void* );
   PyObject* EpicsPvCtrl_values( PyObject* self, void* );
+  PyObject* EpicsPvCtrl_getnewargs( PyObject* self, PyObject* );
 
   PyGetSetDef getset[] = {
     {"iPvId",        iPvId,                0, "Pv Id", 0},
@@ -107,6 +109,11 @@ namespace {
     {0, 0, 0, 0, 0}
   };
 
+  PyMethodDef methods[] = {
+    { "__getnewargs__",    EpicsPvCtrl_getnewargs, METH_NOARGS, "Pickle support" },
+    {0, 0, 0, 0}
+   };
+
   char typedoc[] = "Python class wrapping C++ Pds::EpicsPvCtrl class.";
 }
 
@@ -119,6 +126,7 @@ pypdsdata::EpicsPvCtrl::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
+  type->tp_methods = ::methods;
   type->tp_getset = ::getset;
   type->tp_str = EpicsPvCtrl_str ;
   type->tp_repr = EpicsPvCtrl_repr ;
@@ -130,9 +138,31 @@ pypdsdata::EpicsPvCtrl::initType( PyObject* module )
 namespace {
 
 PyObject*
+EpicsPvCtrl_new( PyTypeObject *subtype, PyObject *args, PyObject *kwds )
+{
+  // parse arguments must be a buffer object
+  const char* buf;
+  int bufsize;
+  if ( not PyArg_ParseTuple( args, "s#:pypdsdata::Dgram", &buf, &bufsize ) ) return 0;
+
+  // allocate memory
+  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>( subtype->tp_alloc(subtype, 1) );
+  if ( not py_this ) return 0;
+
+  // initialization from buffer objects
+  py_this->m_obj = (Pds::EpicsPvCtrlHeader*)buf;
+  PyObject* parent = PyTuple_GetItem(args, 0);
+  Py_INCREF(parent);
+  py_this->m_parent = parent;
+  py_this->m_dtor = 0;
+
+  return py_this;
+}
+
+PyObject*
 EpicsPvCtrl_str( PyObject *self )
 {
-  pypdsdata::EpicsPvCtrl* py_this = (pypdsdata::EpicsPvCtrl*) self;
+  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
 
   char buf[64];
   snprintf( buf, sizeof buf, "EpicsPv(%d, %s)",
@@ -170,7 +200,7 @@ EpicsPvCtrl_status( PyObject* self, void* )
 PyObject*
 EpicsPvCtrl_severity( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvCtrl* py_this = (pypdsdata::EpicsPvCtrl*) self;
+  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
   if( ! py_this->m_obj ){
     PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
     return 0;
@@ -186,7 +216,7 @@ EpicsPvCtrl_severity( PyObject* self, void* )
 PyObject*
 EpicsPvCtrl_precision( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvCtrl* py_this = (pypdsdata::EpicsPvCtrl*) self;
+  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
   if( ! py_this->m_obj ){
     PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
     return 0;
@@ -213,7 +243,7 @@ EpicsPvCtrl_precision( PyObject* self, void* )
 PyObject*
 EpicsPvCtrl_units_limits( PyObject* self, void* closure )
 {
-  pypdsdata::EpicsPvCtrl* py_this = (pypdsdata::EpicsPvCtrl*) self;
+  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
   if( ! py_this->m_obj ){
     PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
     return 0;
@@ -254,7 +284,7 @@ EpicsPvCtrl_units_limits( PyObject* self, void* closure )
 PyObject*
 EpicsPvCtrl_no_str( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvCtrl* py_this = (pypdsdata::EpicsPvCtrl*) self;
+  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
   if( ! py_this->m_obj ){
     PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
     return 0;
@@ -271,7 +301,7 @@ EpicsPvCtrl_no_str( PyObject* self, void* )
 PyObject*
 EpicsPvCtrl_strs( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvCtrl* py_this = (pypdsdata::EpicsPvCtrl*) self;
+  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
   if( ! py_this->m_obj ){
     PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
     return 0;
@@ -362,7 +392,7 @@ EpicsPvCtrl_value( PyObject* self, void* )
 PyObject*
 EpicsPvCtrl_values( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvCtrl* py_this = (pypdsdata::EpicsPvCtrl*) self;
+  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
   if( ! py_this->m_obj ){
     PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
     return 0;
@@ -423,6 +453,25 @@ EpicsPvCtrl_values( PyObject* self, void* )
     PyErr_SetString(PyExc_TypeError, "Unexpected PV type");
   }
   return list;
+}
+
+PyObject*
+EpicsPvCtrl_getnewargs( PyObject* self, PyObject* )
+{
+  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
+  if( ! py_this->m_obj ){
+    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
+    return 0;
+  }
+
+  size_t size = py_this->m_size;
+  const char* data = (const char*)py_this->m_obj;
+  PyObject* pydata = PyString_FromStringAndSize(data, size);
+
+  PyObject* args = PyTuple_New(1);
+  PyTuple_SET_ITEM(args, 0, pydata);
+
+  return args;
 }
 
 }

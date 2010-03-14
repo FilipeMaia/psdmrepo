@@ -137,12 +137,12 @@ EpicsModule::getModule()
 
 // make Python object from Pds type
 PyObject*
-EpicsModule::PyObject_FromPds( Pds::EpicsPvHeader* pvHeader, PyObject* parent )
+EpicsModule::PyObject_FromPds( Pds::EpicsPvHeader* pvHeader, PyObject* parent, size_t size )
 {
   if ( dbr_type_is_TIME(pvHeader->iDbrType) ) {
-    return EpicsPvTime::PyObject_FromPds( pvHeader, parent );
+    return EpicsPvTime::PyObject_FromPds( pvHeader, parent, size );
   } else if ( dbr_type_is_CTRL(pvHeader->iDbrType) ) {
-    return EpicsPvCtrl::PyObject_FromPds( static_cast<Pds::EpicsPvCtrlHeader*>(pvHeader), parent );
+    return EpicsPvCtrl::PyObject_FromPds( static_cast<Pds::EpicsPvCtrlHeader*>(pvHeader), parent, size);
   } else {
     PyErr_SetString(PyExc_TypeError, "Unknown EPICS PV type");
     return 0;

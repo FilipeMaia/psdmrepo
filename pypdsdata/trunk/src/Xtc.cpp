@@ -38,7 +38,18 @@
 
 namespace {
 
-  // standard Python stuff
+  // Xtc class supports buffer interface
+  int Xtc_readbufferproc(PyObject* self, int segment, void** ptrptr);
+  int Xtc_segcountproc(PyObject* self, int* lenp);
+
+  PyBufferProcs bufferprocs = {
+    Xtc_readbufferproc, // bf_getreadbuffer
+    0,                  // bf_getwritebuffer
+    Xtc_segcountproc,   // bf_getsegcount
+    0                   // bf_getcharbuffer
+  } ;
+
+// standard Python stuff
   PyObject* Xtc_iter( PyObject* self );
 
   // type-specific methods
@@ -82,6 +93,7 @@ Xtc::initType( PyObject* module )
   type->tp_methods = ::methods;
   type->tp_getset = ::getset;
   type->tp_iter = Xtc_iter;
+  type->tp_as_buffer = &::bufferprocs;
 
   BaseType::initType( "Xtc", module );
 }
@@ -108,6 +120,34 @@ Xtc::Xtc_AsPds( PyObject* obj )
 
 
 namespace {
+
+int
+Dgram_readbufferproc(PyObject* self, int segment, void** ptrptr)
+{
+  pypdsdata::Xtc* py_this = static_cast<pypdsdata::Xtc*>(self);
+  if( ! py_this->m_obj ){
+    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
+    return 0;
+  }
+
+  *ptrptr = py_this->m_obj;
+  return 0;
+}
+
+int
+Dgram_segcountproc(PyObject* self, int* lenp)
+{
+  pypdsdata::Xtc* py_this = static_cast<pypdsdata::Xtc*>(self);
+  if( ! py_this->m_obj ){
+    if ( lenp ) *lenp = 0;
+    return 0;
+  }
+
+  if ( lenp ) {
+    *lenp = py_this->m_size;
+  }
+  return 1;
+}
 
 PyObject*
 Xtc_iter( PyObject* self )

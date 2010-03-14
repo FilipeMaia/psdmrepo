@@ -69,7 +69,7 @@ namespace {
     const char* oldbuf = (const char*)&xtc;
     std::copy( oldbuf, oldbuf+size, newbuf);
 
-    return pypdsdata::Xtc::PyObject_FromPds( (Pds::Xtc*)newbuf, 0, ::buf_dealloc );
+    return pypdsdata::Xtc::PyObject_FromPds( (Pds::Xtc*)newbuf, 0, size, ::buf_dealloc );
   }
 
 
@@ -98,94 +98,94 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_Frame :
     if ( xtc.contains.version() == 1 ) {
-      obj = Camera::FrameV1::PyObject_FromPds(xtc.payload(), parent);
+      obj = Camera::FrameV1::PyObject_FromXtc(xtc, parent);
     }
     break ;
 
   case Pds::TypeId::Id_AcqWaveform :
     if ( xtc.contains.version() == 1 ) {
-      obj = Acqiris::DataDescV1::PyObject_FromPds(xtc.payload(), parent);
+      obj = Acqiris::DataDescV1::PyObject_FromXtc(xtc, parent);
     }
     break ;
 
   case Pds::TypeId::Id_AcqConfig :
     if ( xtc.contains.version() == 1 ) {
-      obj = Acqiris::ConfigV1::PyObject_FromPds(xtc.payload(), parent);
+      obj = Acqiris::ConfigV1::PyObject_FromXtc(xtc, parent);
     }
     break ;
 
   case Pds::TypeId::Id_TwoDGaussian :
     if ( xtc.contains.version() == 1 ) {
-      obj = Camera::TwoDGaussianV1::PyObject_FromPds(xtc.payload(), parent);
+      obj = Camera::TwoDGaussianV1::PyObject_FromXtc(xtc, parent);
     }
     break;
 
   case Pds::TypeId::Id_Opal1kConfig :
     if ( xtc.contains.version() == 1 ) {
-      obj = Opal1k::ConfigV1::PyObject_FromPds(xtc.payload(), parent);
+      obj = Opal1k::ConfigV1::PyObject_FromXtc(xtc, parent);
     }
     break ;
 
   case Pds::TypeId::Id_FrameFexConfig :
     if ( xtc.contains.version() == 1 ) {
-      obj = Camera::FrameFexConfigV1::PyObject_FromPds(xtc.payload(), parent);
+      obj = Camera::FrameFexConfigV1::PyObject_FromXtc(xtc, parent);
     }
     break ;
 
   case Pds::TypeId::Id_EvrConfig :
     if ( xtc.contains.version() == 1 ) {
-      obj = EvrData::ConfigV1::PyObject_FromPds(xtc.payload(), parent);
+      obj = EvrData::ConfigV1::PyObject_FromXtc(xtc, parent);
     } else if ( xtc.contains.version() == 2 ) {
-      obj = EvrData::ConfigV2::PyObject_FromPds(xtc.payload(), parent);
+      obj = EvrData::ConfigV2::PyObject_FromXtc(xtc, parent);
     }
     break ;
 
   case Pds::TypeId::Id_TM6740Config :
     if ( xtc.contains.version() == 1 ) {
-      obj = Pulnix::TM6740ConfigV1::PyObject_FromPds(xtc.payload(), parent);
+      obj = Pulnix::TM6740ConfigV1::PyObject_FromXtc(xtc, parent);
     }
     break ;
 
   case Pds::TypeId::Id_ControlConfig :
     if ( xtc.contains.version() == 1 ) {
-      obj = ControlData::ConfigV1::PyObject_FromPds(xtc.payload(), parent);
+      obj = ControlData::ConfigV1::PyObject_FromXtc(xtc, parent);
     }
     break ;
 
   case Pds::TypeId::Id_pnCCDframe :
     if ( xtc.contains.version() == 1 ) {
-      obj = PNCCD::FrameV1::PyObject_FromPds(xtc.payload(), parent);
+      obj = PNCCD::FrameV1::PyObject_FromXtc(xtc, parent);
     }
     break ;
 
   case Pds::TypeId::Id_pnCCDconfig :
     if ( xtc.contains.version() == 1 ) {
-      obj = PNCCD::ConfigV1::PyObject_FromPds(xtc.payload(), parent);
+      obj = PNCCD::ConfigV1::PyObject_FromXtc(xtc, parent);
     }
     break ;
 
   case Pds::TypeId::Id_Epics :
     clone = ::cloneXtc( xtc );
-    obj = EpicsModule::PyObject_FromPds(clone->m_obj->payload(), clone);
+    obj = EpicsModule::PyObject_FromXtc(*clone->m_obj, clone);
     Py_CLEAR(clone);
     break ;
 
   case Pds::TypeId::Id_FEEGasDetEnergy :
     // NOTE: does not seem to care about versions
-    obj = BldDataFEEGasDetEnergy::PyObject_FromPds(xtc.payload(), parent);
+    obj = BldDataFEEGasDetEnergy::PyObject_FromXtc(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_EBeam :
     if ( xtc.contains.version() == 0 ) {
-      obj = BldDataEBeamV0::PyObject_FromPds(xtc.payload(), parent);
+      obj = BldDataEBeamV0::PyObject_FromXtc(xtc, parent);
     } else {
-      obj = BldDataEBeam::PyObject_FromPds(xtc.payload(), parent);
+      obj = BldDataEBeam::PyObject_FromXtc(xtc, parent);
     }
     break ;
 
   case Pds::TypeId::Id_PhaseCavity :
     // NOTE: does not seem to care about versions
-    obj = BldDataPhaseCavity::PyObject_FromPds(xtc.payload(), parent);
+    obj = BldDataPhaseCavity::PyObject_FromXtc(xtc, parent);
     break ;
 
   case Pds::TypeId::NumberOf :

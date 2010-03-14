@@ -93,7 +93,7 @@ timestamp( PyObject* self, PyObject* args )
   unsigned seg;
   if ( not PyArg_ParseTuple( args, "I:Acqiris.DataDescV1.timestamp", &seg ) ) return 0;
 
-  return pypdsdata::Acqiris::TimestampV1::PyObject_FromPds( &obj->timestamp(seg), self );
+  return pypdsdata::Acqiris::TimestampV1::PyObject_FromPds( &obj->timestamp(seg), self, sizeof(Pds::Acqiris::TimestampV1) );
 }
 
 
@@ -166,7 +166,8 @@ nextChannel( PyObject* self, PyObject* args )
 
   // make Python object
   pypdsdata::Acqiris::DataDescV1* py_this = (pypdsdata::Acqiris::DataDescV1*) self;
-  return pypdsdata::Acqiris::DataDescV1::PyObject_FromPds( next, py_this->m_parent, py_this->m_dtor );
+  size_t size = Pds::Acqiris::DataDescV1::totalSize( *hconfig );
+  return pypdsdata::Acqiris::DataDescV1::PyObject_FromPds( next, py_this->m_parent, size, py_this->m_dtor );
 }
 
 

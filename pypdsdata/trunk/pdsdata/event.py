@@ -78,6 +78,8 @@ class Event(object):
     def env(self) :
         return self.m_dg.env
 
+    def getTime(self) :
+         return self.m_dg.seq.clock()
 
     def findXtc(self, **kw):
         """ Returns the list of Xtc objects matching the criteria.
@@ -177,12 +179,28 @@ class Event(object):
         
         return pnccd.FrameV1( frames, cfg )
 
+    def getOpal1kConfig(self, address):
+        """Returns opal1k.ConfigV1 object"""
+        addrdict = _addr(address)
+        return self.findFirst( typeId=xtc.TypeId.Type.Id_Opal1kConfig, **addrdict )
 
     def getFeeGasDet(self):
+        """Returns list of 4 floating numbers"""
         obj = self.findFirst( typeId=xtc.TypeId.Type.Id_FEEGasDetEnergy )
         if obj :
             return [obj.f_11_ENRC, obj.f_12_ENRC, obj.f_21_ENRC, obj.f_22_ENRC]
-        
+
+    def getPhaseCavity(self):
+        """Returns bld.BldDataPhaseCavity object"""
+        return self.findFirst( typeId=xtc.TypeId.Type.Id_PhaseCavity )
+
+    def getEBeam(self):
+        """Returns bld.BldDataEBeam or bld.BldDataEBeamV0 object whichever is present"""
+        return self.findFirst( typeId=xtc.TypeId.Type.Id_EBeam )
+
+    #
+    # Private methods not to be used by clients directly
+    #
 
     @staticmethod
     def _filter(xtcObj, typeId=None, version=None, level=None,
@@ -300,7 +318,11 @@ class Env(object):
         # store config objects 
         if evt.seq().service() == xtc.TransitionId.Configure :
             
-            for typeId in [xtc.TypeId.Type.Id_AcqConfig, xtc.TypeId.Type.Id_pnCCDconfig] :
+            types = [xtc.TypeId.Type.Id_AcqConfig, 
+                     xtc.TypeId.Type.Id_pnCCDconfig,
+                     xtc.TypeId.Type.Id_Opal1kConfig]
+            
+            for typeId in types :
                 for x in evt.findXtc( typeId=typeId ) :
                     self._storeConfig(typeId, x.src, x.payload())
                     
@@ -311,6 +333,10 @@ class Env(object):
     def getPnCCDConfig(self, **kw):
         _log.debug("Env.getPnCCDConfig: %s", kw)
         return self._getConfig(xtc.TypeId.Type.Id_pnCCDconfig, **kw)
+
+    def getOpal1kConfig(self, **kw):
+        _log.debug("Env.getOpal1kConfig: %s", kw)
+        return self._getConfig(xtc.TypeId.Type.Id_Opal1kConfig, **kw)
 
     def _storeConfig(self, typeId, detInfo, cfgObj ):
         _log.debug("Env._storeConfig: typeId=%s detinfo=%s", typeId, detInfo)

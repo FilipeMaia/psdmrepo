@@ -128,7 +128,7 @@ pypdsdata::EnumType::Enum_FromLong( long value )
 {
   Int2Enum::const_iterator it = m_int2enum.find( value );
   if ( it == m_int2enum.end() ) {
-    PyErr_SetString( PyExc_RuntimeError, "Unknown enum value." );
+    PyErr_Format( PyExc_RuntimeError, "Unknown enum value (%ld)", value );
     return 0;
   }
 
@@ -149,7 +149,7 @@ pypdsdata::EnumType::Enum_FromString( const char* name )
   PyObject* val = PyDict_GetItemString( m_type.tp_dict, name );
 
   if ( not val ) {
-    PyErr_SetString( PyExc_TypeError, "Name is not known." );
+    PyErr_Format( PyExc_TypeError, "Unknown enum name (%s)", name );
     return 0;
   }
 
@@ -190,7 +190,6 @@ Enum_init(PyObject* self, PyObject* args, PyObject* kwds)
 
     } else {
 
-      PyErr_SetString(PyExc_RuntimeError, "Error: unknown enum value");
       return -1;
 
     }
@@ -208,7 +207,6 @@ Enum_init(PyObject* self, PyObject* args, PyObject* kwds)
 
     } else {
 
-      PyErr_SetString(PyExc_RuntimeError, "Error: unknown enum name");
       return -1;
 
     }

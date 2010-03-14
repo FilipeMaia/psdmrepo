@@ -251,7 +251,7 @@ XtcIterator_next( PyObject* self )
     py_this->m_next = 0;
   }
 
-  return pypdsdata::Xtc::PyObject_FromPds( next, py_this->m_parent, 0 );
+  return pypdsdata::Xtc::PyObject_FromPds( next, py_this->m_parent, next->extent );
 }
 
 }

@@ -98,7 +98,7 @@ def main( argv ) :
                          file_list = None, 
                          num_events = 0,
                          job_name = None,
-                         module = "myana" )
+                         module = [] )
     
     parser.add_option( '-v', "--verbose", action="count", help="increase verbosity" )
     parser.add_option( '-l', "--file-list", metavar="FILE",
@@ -107,8 +107,8 @@ def main( argv ) :
                        help="maximum number of events to process" )
     parser.add_option( '-j', "--job-name", metavar="STRING", 
                        help="job name, default is deduced from file name(s)" )
-    parser.add_option( '-m', "--module", metavar="NAME", 
-                       help="user module name, default is myana" )
+    parser.add_option( '-m', "--module", metavar="NAME", action="append",
+                       help="user module name, multiple modules allowed, default is myana" )
 
     (options, args) = parser.parse_args()
     
@@ -154,8 +154,10 @@ def main( argv ) :
     hmgr = HistoMgr( file=jobname+".root" )
 
     # import user module
-    userana = _my_import( options.module )
-    if not userana : return 1
+    modules = options.module
+    if not modules : modules = ['myana']
+    userObjects = map( _my_import, modules )
+    if None in userObjects : return 2
 
     jobbegun = False
     runbegun = False
@@ -193,14 +195,15 @@ def main( argv ) :
                 # pass it all to user
                 if svc == xtc.TransitionId.Configure :
                     if not jobbegun:
-                        userana.beginjob( evt, env )
+                        for userana in userObjects : userana.beginjob( evt, env )
                         jobbegun = True
                     else :
-                        if runbegun : userana.endrun()
-                        userana.beginrun( evt, env )
+                        if runbegun : 
+                            for userana in userObjects : userana.endrun()
+                        for userana in userObjects : userana.beginrun( evt, env )
                         runbegun = True
                 elif svc == xtc.TransitionId.L1Accept :
-                    userana.event( evt, env )
+                    for userana in userObjects : userana.event( evt, env )
     
             if svc == xtc.TransitionId.L1Accept :
                 nevent += 1
@@ -214,8 +217,9 @@ def main( argv ) :
             break
 
     # finish
-    if runbegun : userana.endrun( env )
-    userana.endjob( env )
+    if runbegun : 
+        for userana in userObjects : userana.endrun( env )
+    for userana in userObjects : userana.endjob( env )
     
     # close histo files
     hmgr.close()

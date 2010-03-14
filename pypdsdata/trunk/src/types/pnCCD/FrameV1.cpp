@@ -98,7 +98,7 @@ next( PyObject* self, PyObject* args )
 
   // make Python object
   pypdsdata::PNCCD::FrameV1* py_this = (pypdsdata::PNCCD::FrameV1*) self;
-  return pypdsdata::PNCCD::FrameV1::PyObject_FromPds( next, py_this->m_parent, py_this->m_dtor );
+  return pypdsdata::PNCCD::FrameV1::PyObject_FromPds( next, py_this->m_parent, config->payloadSizePerLink(), py_this->m_dtor );
 }
 
 PyObject*

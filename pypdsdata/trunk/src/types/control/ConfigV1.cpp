@@ -96,7 +96,8 @@ pvControl( PyObject* self, PyObject* args )
   unsigned index ;
   if ( not PyArg_ParseTuple( args, "I:ConfigV1_pvControl", &index ) ) return 0;
 
-  return pypdsdata::ControlData::PVControl::PyObject_FromPds( (Pds::ControlData::PVControl*)(&obj->pvControl(index)), self );
+  return pypdsdata::ControlData::PVControl::PyObject_FromPds( (Pds::ControlData::PVControl*)(&obj->pvControl(index)),
+      self, sizeof(Pds::ControlData::PVControl) );
 }
 
 PyObject*
@@ -109,7 +110,8 @@ pvMonitor( PyObject* self, PyObject* args )
   unsigned index ;
   if ( not PyArg_ParseTuple( args, "I:ConfigV1_pvMonitor", &index ) ) return 0;
 
-  return pypdsdata::ControlData::PVMonitor::PyObject_FromPds( (Pds::ControlData::PVMonitor*)(&obj->pvMonitor(index)), self );
+  return pypdsdata::ControlData::PVMonitor::PyObject_FromPds( (Pds::ControlData::PVMonitor*)(&obj->pvMonitor(index)),
+      self, sizeof(Pds::ControlData::PVMonitor) );
 }
 
 }

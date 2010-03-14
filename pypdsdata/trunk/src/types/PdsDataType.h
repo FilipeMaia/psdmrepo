@@ -23,6 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/xtc/Xtc.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -57,11 +58,13 @@ struct PdsDataType : PyObject {
   /// Builds Python object from corresponding Pds type, parent is the owner
   /// of the corresponding buffer space, usually XTC object. If destructor
   /// function is provided it will be called to delete the Pds object.
-  static ConcreteType* PyObject_FromPds( PdsType* obj, PyObject* parent, destructor dtor=0 );
+  static ConcreteType* PyObject_FromPds( PdsType* obj, PyObject* parent, size_t size, destructor dtor=0 );
 
-  /// helper method to avoid casting on client side,
-  static ConcreteType* PyObject_FromPds( void* obj, PyObject* parent, destructor dtor=0 ) {
-    return PyObject_FromPds( static_cast<PdsType*>(obj), parent, dtor );
+  /// Builds Python object from the content of Xtc, parent is the owner
+  /// of the corresponding buffer space, usually XTC object. If destructor
+  /// function is provided it will be called to delete the Pds object.
+  static ConcreteType* PyObject_FromXtc( const Pds::Xtc& xtc, PyObject* parent, destructor dtor=0 ) {
+    return PyObject_FromPds( static_cast<PdsType*>((void*)xtc.payload()), parent, xtc.sizeofPayload(), dtor );
   }
 
   // returns pointer to an PdsType object
@@ -83,6 +86,7 @@ struct PdsDataType : PyObject {
 
   PdsType* m_obj;
   PyObject* m_parent;
+  size_t m_size;
   destructor m_dtor;
 
 protected:
@@ -179,7 +183,7 @@ PdsDataType<ConcreteType, PdsType>::PdsDataType_dealloc( PyObject* self )
 /// function is provided it will be called to delete the Pds object.
 template <typename ConcreteType, typename PdsType>
 ConcreteType*
-PdsDataType<ConcreteType, PdsType>::PyObject_FromPds( PdsType* obj, PyObject* parent, destructor dtor )
+PdsDataType<ConcreteType, PdsType>::PyObject_FromPds( PdsType* obj, PyObject* parent, size_t size, destructor dtor )
 {
   ConcreteType* ob = PyObject_New(ConcreteType,typeObject());
   if ( not ob ) {
@@ -190,6 +194,7 @@ PdsDataType<ConcreteType, PdsType>::PyObject_FromPds( PdsType* obj, PyObject* pa
   ob->m_obj = obj;
   ob->m_parent = parent ;
   Py_XINCREF(ob->m_parent);
+  ob->m_size = size;
   ob->m_dtor = dtor;
 
   return ob;

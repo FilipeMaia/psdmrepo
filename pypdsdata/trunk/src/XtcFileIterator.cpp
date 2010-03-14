@@ -237,7 +237,7 @@ PyObject* XtcFileIterator_next( PyObject* self )
     }
   }
 
-  return pypdsdata::Dgram::PyObject_FromPds( (Pds::Dgram*)buf, 0, ::dgramDtor );
+  return pypdsdata::Dgram::PyObject_FromPds( (Pds::Dgram*)buf, 0, dgramSize, ::dgramDtor );
 }
 
 }

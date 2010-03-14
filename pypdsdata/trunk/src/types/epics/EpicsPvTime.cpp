@@ -33,6 +33,7 @@
 namespace {
 
   // standard Python stuff
+  PyObject* EpicsPvTime_new( PyTypeObject *subtype, PyObject *args, PyObject *kwds );
   PyObject* EpicsPvTime_str( PyObject *self );
   PyObject* EpicsPvTime_repr( PyObject *self );
 
@@ -45,6 +46,7 @@ namespace {
   PyObject* EpicsPvTime_stamp( PyObject* self, void* );
   PyObject* EpicsPvTime_value( PyObject* self, void* );
   PyObject* EpicsPvTime_values( PyObject* self, void* );
+  PyObject* EpicsPvTime_getnewargs( PyObject* self, PyObject* );
 
   PyGetSetDef getset[] = {
     {"iPvId",        iPvId,                0, "Pv Id", 0},
@@ -58,6 +60,11 @@ namespace {
     {0, 0, 0, 0, 0}
   };
 
+  PyMethodDef methods[] = {
+    { "__getnewargs__",    EpicsPvTime_getnewargs, METH_NOARGS, "Pickle support" },
+    {0, 0, 0, 0}
+   };
+
   char typedoc[] = "Python class wrapping C++ Pds::EpicsPvTime class.";
 }
 
@@ -70,6 +77,7 @@ pypdsdata::EpicsPvTime::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
+  type->tp_methods = ::methods;
   type->tp_getset = ::getset;
   type->tp_str = EpicsPvTime_str ;
   type->tp_repr = EpicsPvTime_repr ;
@@ -81,9 +89,31 @@ pypdsdata::EpicsPvTime::initType( PyObject* module )
 namespace {
 
 PyObject*
+EpicsPvTime_new( PyTypeObject *subtype, PyObject *args, PyObject *kwds )
+{
+  // parse arguments must be a buffer object
+  const char* buf;
+  int bufsize;
+  if ( not PyArg_ParseTuple( args, "s#:pypdsdata::Dgram", &buf, &bufsize ) ) return 0;
+
+  // allocate memory
+  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>( subtype->tp_alloc(subtype, 1) );
+  if ( not py_this ) return 0;
+
+  // initialization from buffer objects
+  py_this->m_obj = (Pds::EpicsPvHeader*)buf;
+  PyObject* parent = PyTuple_GetItem(args, 0);
+  Py_INCREF(parent);
+  py_this->m_parent = parent;
+  py_this->m_dtor = 0;
+
+  return py_this;
+}
+
+PyObject*
 EpicsPvTime_str( PyObject *self )
 {
-  pypdsdata::EpicsPvTime* py_this = (pypdsdata::EpicsPvTime*) self;
+  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
 
   char buf[48];
   snprintf( buf, sizeof buf, "EpicsPv(%d)", py_this->m_obj->iPvId );
@@ -93,7 +123,7 @@ EpicsPvTime_str( PyObject *self )
 PyObject*
 EpicsPvTime_repr( PyObject *self )
 {
-  pypdsdata::EpicsPvTime* py_this = (pypdsdata::EpicsPvTime*) self;
+  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
 
   char buf[48];
   snprintf( buf, sizeof buf, "<EpicsPv(%d, %s)>",
@@ -104,7 +134,7 @@ EpicsPvTime_repr( PyObject *self )
 PyObject*
 EpicsPvTime_status( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvTime* py_this = (pypdsdata::EpicsPvTime*) self;
+  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
   if( ! py_this->m_obj ){
     PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
     return 0;
@@ -120,7 +150,7 @@ EpicsPvTime_status( PyObject* self, void* )
 PyObject*
 EpicsPvTime_severity( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvTime* py_this = (pypdsdata::EpicsPvTime*) self;
+  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
   if( ! py_this->m_obj ){
     PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
     return 0;
@@ -136,7 +166,7 @@ EpicsPvTime_severity( PyObject* self, void* )
 PyObject*
 EpicsPvTime_stamp( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvTime* py_this = (pypdsdata::EpicsPvTime*) self;
+  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
   if( ! py_this->m_obj ){
     PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
     return 0;
@@ -162,7 +192,7 @@ getValue( Pds::EpicsPvHeader* header, int index = 0 )
 PyObject*
 EpicsPvTime_value( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvTime* py_this = (pypdsdata::EpicsPvTime*) self;
+  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
   if( ! py_this->m_obj ){
     PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
     return 0;
@@ -213,7 +243,7 @@ EpicsPvTime_value( PyObject* self, void* )
 PyObject*
 EpicsPvTime_values( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvTime* py_this = (pypdsdata::EpicsPvTime*) self;
+  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
   if( ! py_this->m_obj ){
     PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
     return 0;
@@ -274,6 +304,25 @@ EpicsPvTime_values( PyObject* self, void* )
     PyErr_SetString(PyExc_TypeError, "Unexpected PV type");
   }
   return list;
+}
+
+PyObject*
+EpicsPvTime_getnewargs( PyObject* self, PyObject* )
+{
+  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
+  if( ! py_this->m_obj ){
+    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
+    return 0;
+  }
+
+  size_t size = py_this->m_size;
+  const char* data = (const char*)py_this->m_obj;
+  PyObject* pydata = PyString_FromStringAndSize(data, size);
+
+  PyObject* args = PyTuple_New(1);
+  PyTuple_SET_ITEM(args, 0, pydata);
+
+  return args;
 }
 
 }
