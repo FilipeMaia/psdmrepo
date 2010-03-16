@@ -1,4 +1,13 @@
 
+2010-03-16 - version 0.8
+========================
+- moved pyana stuff to a separate package
+
+2010-03-14 - version 0.7
+========================
+- preparing to add multiprocessing support
+- implmented pickling of Dgram and Epics classes
+
 2010-02-26 - version 0.6
 ========================
 - few bugs fixed in data classes, needed to INCREF self before setting
