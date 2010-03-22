@@ -357,7 +357,8 @@ HERE;
     	$role_r = $this->connection->database.".role r";
     	$priv_p = $this->connection->database.".priv p";
 
-    	$sql = "SELECT DISTINCT u.user FROM {$user_u},{$role_r} WHERE u.role_id IN (SELECT r.id FROM {$role_r},{$priv_p} WHERE r.id=p.role_id AND r.app='{$app}' AND p.name='{$priv}') AND ((u.exp_id IS NULL) OR (u.exp_id={$exper_id})) AND u.role_id=r.id ORDER BY u.user";
+        $exper_id_attr = is_null( $exper_id ) ? 'NULL' : $exper_id;
+    	$sql = "SELECT DISTINCT u.user FROM {$user_u},{$role_r} WHERE u.role_id IN (SELECT r.id FROM {$role_r},{$priv_p} WHERE r.id=p.role_id AND r.app='{$app}' AND p.name='{$priv}') AND ((u.exp_id IS NULL) OR (u.exp_id={$exper_id_attr})) AND u.role_id=r.id ORDER BY u.user";
         $result = $this->connection->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
