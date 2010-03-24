@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-14
+2010-03-24 Andy Salnikov
+- bug fix in AcqirisDataDescV1, waveform type must be signed
+
 Tag: V00-00-13
 2009-12-17 Andy Salnikov
 - update for pdsdata V01-08-00, evr::ConfigV2 has an additional enum value

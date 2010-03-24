@@ -63,7 +63,7 @@ AcqirisDataDescV1::waveformType( const Pds::Acqiris::ConfigV1& config )
 {
   const Pds::Acqiris::HorizV1& hconfig = config.horiz() ;
 
-  hdf5pp::Type baseType = hdf5pp::TypeTraits<uint16_t>::native_type() ;
+  hdf5pp::Type baseType = hdf5pp::TypeTraits<int16_t>::native_type() ;
 
   hsize_t dims[] = { config.nbrChannels(), hconfig.nbrSegments(), hconfig.nbrSamples() } ;
   return hdf5pp::ArrayType::arrayType ( baseType, 3, dims );
