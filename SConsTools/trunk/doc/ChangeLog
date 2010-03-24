@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-23
+2010-03-24 Andy Salnikov
+- adding library list when building shared libraries
+
 Tag: V00-00-22
 2009-06-18 Andy Salnikov
 - create web/ directory at the release top level with the links 

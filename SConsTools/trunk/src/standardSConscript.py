@@ -83,7 +83,7 @@ def standardLib( **kw ) :
         env = DefaultEnvironment()
         libdir = env['LIBDIR']
 
-        lib = env.SharedLibrary ( pkg, source=libsrcs )
+        lib = env.SharedLibrary ( pkg, source=libsrcs, LIBS=[] )
         ilib = env.Install ( libdir, source=lib )
         env['ALL_TARGETS']['LIBS'].extend ( ilib )
         

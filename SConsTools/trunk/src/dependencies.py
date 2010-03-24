@@ -218,18 +218,26 @@ def adjustPkgDeps ( env ) :
 
     trace ( 'Resolving release dependencies', 'adjustPkgDeps', 2 )
 
+    # complete package tree which includes base and local releases
+    pkg_tree = env['PKG_TREE_BASE'].copy()
+    pkg_tree.update( env['PKG_TREE'] )
+
     # evaluate package dependencies for libraries
     for pkg, lib in env['PKG_TREE_LIB'].iteritems() :
         
         trace ( "checking dependencies for package "+pkg, "adjustPkgDeps", 4 )
         deps = findAllDependencies ( lib )
+        # self-dependencies are not needed here
+        deps.discard(pkg)
         trace ( "package "+pkg+" deps = " + str(map(str,deps)), "adjustPkgDeps", 4 )
         setPkgDeps ( env, pkg, deps )
+        
+        # add all libraries from the packages
+        for d in deps :
+            libs = pkg_tree.get(d,{}).get( 'LIBS', [] )
+            lib.env['LIBS'].extend ( libs )
+        trace ( str(lib)+" libs = " + str(map(str,lib.env['LIBS'])), "adjustPkgDeps", 4 )
             
-    # complete package tree which includes base and local releases
-    pkg_tree = env['PKG_TREE_BASE'].copy()
-    pkg_tree.update( env['PKG_TREE'] )
-
     # iterate over all binaries
     for pkg, bins in env['PKG_TREE_BINS'].iteritems() :
         for bin in bins :
