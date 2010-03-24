@@ -90,7 +90,7 @@ protected:
 private:
 
   typedef CvtDataContainer<CvtDataContFactoryTyped<uint64_t> > TimestampCont ;
-  typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > WaveformCont ;
+  typedef CvtDataContainer<CvtDataContFactoryTyped<int16_t> > WaveformCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
 
   // comparison operator for Src objects

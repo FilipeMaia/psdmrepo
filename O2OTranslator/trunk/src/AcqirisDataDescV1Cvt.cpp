@@ -136,7 +136,7 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     m_timestampCont = new TimestampCont ( tsContFactory ) ;
 
     // create container for waveforms
-    CvtDataContFactoryTyped<uint16_t> wfContFactory( "waveforms", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryTyped<int16_t> wfContFactory( "waveforms", m_chunk_size, m_deflate ) ;
     m_waveformCont = new WaveformCont ( wfContFactory ) ;
 
     // make container for time
@@ -159,7 +159,7 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
 
   // allocate data
   uint64_t timestamps[nChan][nSeg] ;
-  uint16_t waveforms[nChan][nSeg][nSampl] ;
+  int16_t waveforms[nChan][nSeg][nSampl] ;
 
   // scan the data and fill arrays
   // FIXME: few methods that we need from DataDescV1 declared as non-const
@@ -185,7 +185,7 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     }
 
     int16_t* wf = dd->waveform(hconfig) ;
-    std::copy ( wf, wf+nSampl*nSeg, (int16_t*)waveforms[ch] ) ;
+    std::copy ( wf, wf+nSampl*nSeg, waveforms[ch][0] ) ;
   }
 
 

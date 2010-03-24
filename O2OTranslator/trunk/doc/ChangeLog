@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-03
+2010-02-24 Andy Salnikov
+- bug fix in AcqirisDataDescV1Cvt, waveform type should have been 
+  signed
+
 Tag: V00-06-02
 2010-02-02 Andy Salnikov
 - O2OXtcDgIterator: bug fix, in the case when payload size is zero
