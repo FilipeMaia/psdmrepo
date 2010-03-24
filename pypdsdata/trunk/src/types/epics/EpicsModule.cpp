@@ -35,10 +35,12 @@ namespace {
 
   PyObject* Epics_dbr_type_is_TIME( PyObject*, PyObject* args );
   PyObject* Epics_dbr_type_is_CTRL( PyObject*, PyObject* args );
+  PyObject* Epics_from_buffer( PyObject*, PyObject* args );
 
   PyMethodDef methods[] = {
     {"dbr_type_is_TIME", Epics_dbr_type_is_TIME,  METH_VARARGS,  "Returns true for DBR_TIME type IDs." },
     {"dbr_type_is_CTRL", Epics_dbr_type_is_CTRL,  METH_VARARGS,  "Returns true for DBR_CTRL type IDs." },
+    {"from_buffer", Epics_from_buffer,  METH_VARARGS,  "Build EPICS object from memory buffer." },
     {0, 0, 0, 0}
    };
 
@@ -170,6 +172,28 @@ Epics_dbr_type_is_CTRL( PyObject*, PyObject* args )
   if ( not PyArg_ParseTuple( args, "I:epics.dbr_type_is_CTRL", &id ) ) return 0;
 
   return PyBool_FromLong( dbr_type_is_CTRL(id) );
+}
+
+PyObject*
+Epics_from_buffer( PyObject*, PyObject* args )
+{
+  // parse arguments must be a buffer object
+  PyObject* parent = PyTuple_GetItem(args, 0);
+  const char* buf;
+  int bufsize;
+  if ( not PyArg_ParseTuple( args, "s#:pypdsdata::Dgram", &buf, &bufsize ) ) return 0;
+
+  // buffer must contain valid memory representation of Epics data
+  Pds::EpicsPvHeader* pvHeader = (Pds::EpicsPvHeader*)buf;
+
+  if ( dbr_type_is_TIME(pvHeader->iDbrType) ) {
+    return pypdsdata::EpicsPvTime::PyObject_FromPds( pvHeader, parent, bufsize );
+  } else if ( dbr_type_is_CTRL(pvHeader->iDbrType) ) {
+    return pypdsdata::EpicsPvCtrl::PyObject_FromPds( static_cast<Pds::EpicsPvCtrlHeader*>(pvHeader), parent, bufsize );
+  } else {
+    PyErr_SetString(PyExc_TypeError, "Unknown EPICS PV type");
+    return 0;
+  }
 }
 
 }

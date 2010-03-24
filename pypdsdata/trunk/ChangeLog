@@ -1,4 +1,11 @@
 
+2010-03-24 - version 0.9
+========================
+- moved pdsdata/event.py to pyana
+- make all data classes inheriting from PdsDataType usable as read-only 
+  buffers
+- epics module has new method from_buffer()
+
 2010-03-16 - version 0.8
 ========================
 - moved pyana stuff to a separate package

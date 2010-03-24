@@ -33,17 +33,6 @@
 
 namespace {
 
-  // Dgram class supports buffer interface
-  int Dgram_readbufferproc(PyObject* self, int segment, void** ptrptr);
-  int Dgram_segcountproc(PyObject* self, int* lenp);
-
-  PyBufferProcs bufferprocs = {
-    Dgram_readbufferproc, // bf_getreadbuffer
-    0,                    // bf_getwritebuffer
-    Dgram_segcountproc,   // bf_getsegcount
-    0                     // bf_getcharbuffer
-  } ;
-
   // standard Python stuff
   PyObject* Dgram_new( PyTypeObject *subtype, PyObject *args, PyObject *kwds );
 
@@ -83,7 +72,6 @@ pypdsdata::Dgram::initType( PyObject* module )
   type->tp_getset = ::getset;
   type->tp_new = ::Dgram_new;
   type->tp_methods = ::methods;
-  type->tp_as_buffer = &::bufferprocs;
 
   BaseType::initType( "Dgram", module );
 }
@@ -166,34 +154,6 @@ Dgram_getnewargs( PyObject* self, PyObject* )
   PyTuple_SET_ITEM(args, 0, pydata);
 
   return args;
-}
-
-int
-Dgram_readbufferproc(PyObject* self, int segment, void** ptrptr)
-{
-  pypdsdata::Dgram* py_this = static_cast<pypdsdata::Dgram*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
-
-  *ptrptr = py_this->m_obj;
-  return 0;
-}
-
-int
-Dgram_segcountproc(PyObject* self, int* lenp)
-{
-  pypdsdata::Dgram* py_this = static_cast<pypdsdata::Dgram*>(self);
-  if( ! py_this->m_obj ){
-    if ( lenp ) *lenp = 0;
-    return 0;
-  }
-
-  if ( lenp ) {
-    *lenp = py_this->m_size;
-  }
-  return 1;
 }
 
 }

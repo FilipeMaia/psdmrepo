@@ -89,7 +89,9 @@ class XtcStreamMerger(object) :
                 dg = None
             self.m_dgs.append( dg )
             
-        self.m_lastIndex = None
+        self.m_fname = None
+        self.m_fpos = 0
+
 
     def _dgramTime(self, dg):
         """ corrects datagram time for L1Accept transitions """
@@ -106,8 +108,6 @@ class XtcStreamMerger(object) :
     def next(self):
         """ return next diagram in the time order """
 
-        self.m_lastIndex = None
-
         # find stream/datagram with minimal time
         ns = len(self.m_dgs)
         stream = -1
@@ -120,9 +120,13 @@ class XtcStreamMerger(object) :
             # means no more non-empty streams left, stop iteration
             raise StopIteration
 
-        self.m_lastIndex = stream
-
         nextdg = self.m_dgs[stream]
+        try :
+            self.m_fname = self.m_streams[stream].fileName()
+            self.m_fpos = self.m_streams[stream].fpos()
+        except :
+            pass
+
 
         # check the type of the datagram, for L1Accept give it to the caller,
         # all other datagram types must appear in all streams, return only one copy
@@ -168,6 +172,12 @@ class XtcStreamMerger(object) :
                     self.m_dgs[i] = None
             
         return nextdg
+
+    def fileName(self):
+        return self.m_fname
+
+    def fpos(self):
+        return self.m_fpos
 
 #
 # Class which can be used to extract run/stream/chunk from file name
@@ -229,7 +239,6 @@ class XtcFileName(str) :
     def chunk(self):
         return self.m_chunk
 
-
 #
 # iterator which merges multiple streams into one
 #
@@ -264,9 +273,3 @@ class XtcMergeIterator(XtcStreamMerger) :
 
         # call base class ctor and give it all this
         XtcStreamMerger.__init__( self, streamIters, l1OffsetSec )
-
-    def fileName(self):
-        return self.m_streams[self.m_lastIndex].fileName()
-
-    def fpos(self):
-        return self.m_streams[self.m_lastIndex].fpos()

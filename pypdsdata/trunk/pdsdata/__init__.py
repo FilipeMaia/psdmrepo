@@ -9,4 +9,4 @@ from _pdsdata import Error
 
 __all__ = ['Error', 'xtc', 'bld', 'camera', 'control', 
            'epics', 'evr', 'opal1k', 'pnccd', 'pulnix',
-           'acqiris', 'io', 'event', 'histo']
+           'acqiris', 'io']

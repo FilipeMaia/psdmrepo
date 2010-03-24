@@ -28,6 +28,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+#include "Exception.h"
 
 //    ---------------------
 //    -- Class Interface --
@@ -97,6 +98,10 @@ protected:
   // standard Python deallocation function
   static void PdsDataType_dealloc( PyObject* self );
 
+  // class supports buffer interface
+  static int readbufferproc(PyObject* self, int segment, void** ptrptr);
+  static int segcountproc(PyObject* self, int* lenp);
+
 };
 
 
@@ -105,6 +110,13 @@ template <typename ConcreteType, typename PdsType>
 PyTypeObject*
 PdsDataType<ConcreteType, PdsType>::typeObject()
 {
+  static PyBufferProcs bufferprocs = {
+    readbufferproc, // bf_getreadbuffer
+    0,              // bf_getwritebuffer
+    segcountproc,   // bf_getsegcount
+    0               // bf_getcharbuffer
+  } ;
+
   static PyTypeObject type = {
     PyObject_HEAD_INIT(0)
     0,                       /*ob_size*/
@@ -126,7 +138,7 @@ PdsDataType<ConcreteType, PdsType>::typeObject()
     0,                       /*tp_str*/
     PyObject_GenericGetAttr, /*tp_getattro*/
     PyObject_GenericSetAttr, /*tp_setattro*/
-    0,                       /*tp_as_buffer*/
+    &bufferprocs,            /*tp_as_buffer*/
     Py_TPFLAGS_DEFAULT,      /*tp_flags*/
     0,                       /*tp_doc*/
     0,                       /*tp_traverse*/
@@ -225,6 +237,36 @@ PdsDataType<ConcreteType, PdsType>::initType( const char* name, PyObject* module
   // register it in a module
   Py_INCREF( type );
   PyModule_AddObject( module, (char*)name, (PyObject*) type );
+}
+
+template <typename ConcreteType, typename PdsType>
+int
+PdsDataType<ConcreteType, PdsType>::readbufferproc(PyObject* self, int segment, void** ptrptr)
+{
+  ConcreteType* py_this = static_cast<ConcreteType*>(self);
+  if( ! py_this->m_obj ){
+    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
+    return 0;
+  }
+
+  *ptrptr = py_this->m_obj;
+  return py_this->m_size;
+}
+
+template <typename ConcreteType, typename PdsType>
+int
+PdsDataType<ConcreteType, PdsType>::segcountproc(PyObject* self, int* lenp)
+{
+  ConcreteType* py_this = static_cast<ConcreteType*>(self);
+  if( ! py_this->m_obj ){
+    if ( lenp ) *lenp = 0;
+    return 0;
+  }
+
+  if ( lenp ) {
+    *lenp = py_this->m_size;
+  }
+  return 1;
 }
 
 } // namespace pypdsdata

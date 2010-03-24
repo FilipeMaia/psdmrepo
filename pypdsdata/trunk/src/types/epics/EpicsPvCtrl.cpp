@@ -66,7 +66,6 @@ namespace {
   };
 
   // standard Python stuff
-  PyObject* EpicsPvCtrl_new( PyTypeObject *subtype, PyObject *args, PyObject *kwds );
   PyObject* EpicsPvCtrl_str( PyObject *self );
   PyObject* EpicsPvCtrl_repr( PyObject *self );
 
@@ -136,28 +135,6 @@ pypdsdata::EpicsPvCtrl::initType( PyObject* module )
 
 
 namespace {
-
-PyObject*
-EpicsPvCtrl_new( PyTypeObject *subtype, PyObject *args, PyObject *kwds )
-{
-  // parse arguments must be a buffer object
-  const char* buf;
-  int bufsize;
-  if ( not PyArg_ParseTuple( args, "s#:pypdsdata::Dgram", &buf, &bufsize ) ) return 0;
-
-  // allocate memory
-  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>( subtype->tp_alloc(subtype, 1) );
-  if ( not py_this ) return 0;
-
-  // initialization from buffer objects
-  py_this->m_obj = (Pds::EpicsPvCtrlHeader*)buf;
-  PyObject* parent = PyTuple_GetItem(args, 0);
-  Py_INCREF(parent);
-  py_this->m_parent = parent;
-  py_this->m_dtor = 0;
-
-  return py_this;
-}
 
 PyObject*
 EpicsPvCtrl_str( PyObject *self )
