@@ -226,10 +226,6 @@ class TranslatorThread ( threading.Thread ) :
         cmd_list = []
         cmd_list.append("o2o-translate")
 
-        for xtc in fs['xtc_files']:
-            cmd_list.append("--event-file")
-            cmd_list.append(xtc)
-
         #
         # Destination dir for translated file
         cmd_list.append("--output-dir")
@@ -254,6 +250,9 @@ class TranslatorThread ( threading.Thread ) :
         # any extra options
         for opt in self._config.get('list:o2o-extra-options',[]) :
             cmd_list.extend( opt.split() )
+
+        for xtc in fs['xtc_files']:
+            cmd_list.append(xtc)
 
         return cmd_list
 
