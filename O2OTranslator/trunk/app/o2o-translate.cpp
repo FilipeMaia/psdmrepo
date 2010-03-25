@@ -30,7 +30,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "AppUtils/AppCmdArg.h"
+#include "AppUtils/AppCmdArgList.h"
 #include "AppUtils/AppCmdOpt.h"
 #include "AppUtils/AppCmdOptBool.h"
 #include "AppUtils/AppCmdOptIncr.h"
@@ -90,8 +90,6 @@ private:
   AppCmdOpt<int>              m_compression ;
   AppCmdOptSize               m_dgramsize ;
   AppCmdOpt<unsigned int>     m_dgramQSize ;
-  AppCmdOptList<std::string>  m_epicsData ;
-  AppCmdOptList<std::string>  m_eventData ;
   AppCmdOpt<std::string>      m_experiment ;
   AppCmdOptBool               m_extGroups ;
   AppCmdOpt<std::string>      m_instrument ;
@@ -107,7 +105,7 @@ private:
   AppCmdOpt<std::string>      m_runType ;
   AppCmdOptNamedValue<O2OHdf5Writer::SplitMode> m_splitMode ;
   AppCmdOptSize               m_splitSize ;
-
+  AppCmdArgList<std::string>  m_eventData ;
 };
 
 //----------------
@@ -119,8 +117,6 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_compression( 'c', "compression",  "number",   "compression level, -1..9, def: -1", -1 )
   , m_dgramsize  ( 'g', "datagram-size","size",     "datagram buffer size. def: 16M", 16*1048576ULL )
   , m_dgramQSize ( 'Q', "datagram-queue","number",     "datagram queue size. def: 32", 32 )
-  , m_epicsData  ( 'e', "epics-file",   "path",     "file name for EPICS data", '\0' )
-  , m_eventData  ( 'f', "event-file",   "path",     "file name for XTC event data", '\0' )
   , m_experiment ( 'x', "experiment",   "string",   "experiment name", "" )
   , m_extGroups  ( 'G', "group-time",               "use extended group names with timestamps", false )
   , m_instrument ( 'i', "instrument",   "string",   "instrument name", "" )
@@ -136,13 +132,12 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_runType    ( 't', "run-type",     "string",   "run type, DATA or CALIB, def: DATA", "DATA" )
   , m_splitMode  ( 's', "split-mode",   "mode-name","one of none, or family; def: family", O2OHdf5Writer::Family )
   , m_splitSize  ( 'z', "split-size",   "size",   "max. size of output files. def: 10G", 10*1073741824ULL )
+  , m_eventData  ( "event-file",   "file name(s) with XTC event data" )
 {
   setOptionsFile( m_optionsFile ) ;
   addOption( m_compression ) ;
   addOption( m_dgramsize ) ;
   addOption( m_dgramQSize ) ;
-  addOption( m_epicsData ) ;
-  addOption( m_eventData ) ;
   addOption( m_experiment ) ;
   addOption( m_extGroups ) ;
   addOption( m_instrument ) ;
@@ -163,6 +158,7 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   m_splitMode.add ( "family", O2OHdf5Writer::Family ) ;
   addOption( m_splitMode ) ;
   addOption( m_splitSize ) ;
+  addArgument( m_eventData ) ;
 }
 
 //--------------
@@ -178,17 +174,6 @@ O2O_Translate::~O2O_Translate ()
 int
 O2O_Translate::runApp ()
 {
-  // verify input parameters, must ave at least one even data file and
-  // if epics list is non-empty then its size must be equal to events
-  if ( m_eventData.empty() ) {
-    MsgLogRoot(error, "no event data files specified" ) ;
-    return 2 ;
-  }
-  if ( not m_epicsData.empty() and m_eventData.size() != m_epicsData.size() ) {
-    MsgLogRoot(error, "number of event/epics files is different" ) ;
-    return 2 ;
-  }
-
   LusiTime::Time start_time = LusiTime::Time::now() ;
   MsgLogRoot( info, "Starting translator process " << start_time ) ;
   MsgLogRoot( info, "Command line: " <<  this->cmdline() ) ;
@@ -198,13 +183,6 @@ O2O_Translate::runApp ()
     log << "input files:";
     for ( Iter it = m_eventData.begin() ; it != m_eventData.end() ; ++ it ) {
       log << "\n    " << *it ;
-    }
-  }
-  WithMsgLogRoot( info, log ) {
-    typedef AppCmdOptList<std::string>::const_iterator Iter ;
-    log << "epics files:";
-    for ( Iter it = m_epicsData.begin() ; it != m_epicsData.end() ; ++ it ) {
-      log << "\n    " << *it  ;
     }
   }
   MsgLogRoot( info, "output dir: " << m_outputDir.value() ) ;

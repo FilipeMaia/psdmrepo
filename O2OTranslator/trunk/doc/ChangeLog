@@ -11,8 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-04
+2010-03-24 Andy Salnikov
+- change in the options for o2o-translator:
+  -e option disappears
+  -f option disappears, files are now specified as positional arguments
+
 Tag: V00-06-03
-2010-02-24 Andy Salnikov
+2010-03-24 Andy Salnikov
 - bug fix in AcqirisDataDescV1Cvt, waveform type should have been 
   signed
 
