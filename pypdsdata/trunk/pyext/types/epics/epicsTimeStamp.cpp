@@ -19,12 +19,12 @@
 // C/C++ Headers --
 //-----------------
 #include <new>
-#include <structmember.h>
+#include "python/structmember.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "types/TypeLib.h"
+#include "../TypeLib.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

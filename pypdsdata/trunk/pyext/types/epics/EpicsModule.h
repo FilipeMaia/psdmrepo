@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "Python.h"
+#include "python/Python.h"
 
 //-------------------------------
 // Collaborating Class Headers --

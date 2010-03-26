@@ -22,11 +22,11 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "ClockTime.h"
-#include "Exception.h"
+#include "../../ClockTime.h"
+#include "../../Exception.h"
 #include "PVControl.h"
 #include "PVMonitor.h"
-#include "types/TypeLib.h"
+#include "../TypeLib.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

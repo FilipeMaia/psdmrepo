@@ -22,11 +22,11 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "EnumType.h"
-#include "Exception.h"
+#include "../../EnumType.h"
+#include "../../Exception.h"
 #include "OutputMap.h"
 #include "PulseConfig.h"
-#include "types/TypeLib.h"
+#include "../TypeLib.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

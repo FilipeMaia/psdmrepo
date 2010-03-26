@@ -18,7 +18,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "Python.h"
+#include "python/Python.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -28,7 +28,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "Exception.h"
+#include "../Exception.h"
 
 //    ---------------------
 //    -- Class Interface --

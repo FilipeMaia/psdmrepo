@@ -22,11 +22,11 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "EnumType.h"
-#include "Exception.h"
-#include "types/TypeLib.h"
-#include "types/camera/FrameCoord.h"
-#include "pdsdata_numpy.h"
+#include "../../EnumType.h"
+#include "../../Exception.h"
+#include "../TypeLib.h"
+#include "../camera/FrameCoord.h"
+#include "../../pdsdata_numpy.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

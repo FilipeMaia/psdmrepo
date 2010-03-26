@@ -22,8 +22,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "Exception.h"
-#include "types/TypeLib.h"
+#include "../../Exception.h"
+#include "../TypeLib.h"
 #include "HorizV1.h"
 #include "TrigV1.h"
 #include "VertV1.h"

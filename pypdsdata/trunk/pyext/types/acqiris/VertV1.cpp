@@ -22,9 +22,9 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "EnumType.h"
-#include "Exception.h"
-#include "types/TypeLib.h"
+#include "../../EnumType.h"
+#include "../../Exception.h"
+#include "../TypeLib.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

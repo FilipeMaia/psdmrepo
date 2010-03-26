@@ -132,7 +132,7 @@ PyObject*
 Damage_repr( PyObject* self )
 {
   pypdsdata::Damage* py_this = (pypdsdata::Damage*) self;
-  return PyString_FromFormat("<Damage(%ld)>", py_this->m_obj.value());
+  return PyString_FromFormat("<Damage(%d)>", int(py_this->m_obj.value()) );
 }
 
 PyObject*

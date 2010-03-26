@@ -22,9 +22,9 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "Exception.h"
-#include "types/TypeLib.h"
-#include "types/camera/FrameCoord.h"
+#include "../../Exception.h"
+#include "../TypeLib.h"
+#include "../camera/FrameCoord.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

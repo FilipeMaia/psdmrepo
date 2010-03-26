@@ -13,7 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <Python.h>
+#include <python/Python.h>
 
 //----------------------
 // Base Class Headers --

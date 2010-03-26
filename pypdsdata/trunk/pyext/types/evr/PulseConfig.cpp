@@ -23,7 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "types/TypeLib.h"
+#include "../TypeLib.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

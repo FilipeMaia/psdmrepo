@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "types/PdsDataType.h"
+#include "../PdsDataType.h"
 
 //-------------------------------
 // Collaborating Class Headers --

@@ -22,11 +22,11 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "Exception.h"
-#include "types/TypeLib.h"
+#include "../../Exception.h"
+#include "../TypeLib.h"
 #include "HorizV1.h"
 #include "TimestampV1.h"
-#include "pdsdata_numpy.h"
+#include "../../pdsdata_numpy.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

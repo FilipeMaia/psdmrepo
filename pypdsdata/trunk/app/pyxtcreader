@@ -1,4 +1,4 @@
-#!python
+#!@PYTHON@
 #--------------------------------------------------------------------------
 # File and Version Information:
 #  $Id$
@@ -37,8 +37,8 @@ from optparse import OptionParser
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from pdsdata import *
-from pdsdata.xtc import *
+from pypdsdata import io
+from pypdsdata.xtc import *
 
 #---------------------
 # Local definitions --
