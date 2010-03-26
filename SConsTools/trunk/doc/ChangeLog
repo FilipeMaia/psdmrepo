@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-24
+2010-03-26 Andy Salnikov
+- add support for building Python extension modules, everything that 
+  appears in pyext/ directory will be built as Python extension
+
 Tag: V00-00-23
 2010-03-24 Andy Salnikov
 - adding library list when building shared libraries

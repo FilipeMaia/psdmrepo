@@ -23,7 +23,7 @@ There are few dictionaries kept in the construction environment:
 
   'PKG_TREE_BASE' - the dependency tree for base release(s)
   'PKG_TREE'- dependency tree for current (local) release
-  'PKG_TREE_LIB' -> library built by the package
+  'PKG_TREE_LIB' -> libraries built by the package
   'PKG_TREE_BINS' -> binaries built by the package
   
 PKG_TREE_BASE is read from the file(s) in the corresponding base release(s).
@@ -128,23 +128,23 @@ def findAllDependencies( node ):
 #
 # Define package libraries - everything that has to be linked to application
 #
-def setPkgLibs ( env, pkg, libs, libdirs = [] ):
+def addPkgLibs ( env, pkg, libs, libdirs = [] ):
 
     if libs :
         pkg_info = env['PKG_TREE'].setdefault( pkg, {} )
         if isinstance(libs,(str,unicode)) : libs = libs.split()
-        pkg_info['LIBS'] = libs
+        pkg_info.setdefault('LIBS', []).extend(libs)
     if libdirs :
         pkg_info = env['PKG_TREE'].setdefault( pkg, {} )
         if isinstance(libdirs,(str,unicode)) : libdirs = libdirs.split()
-        pkg_info['LIBDIRS'] = libdirs
+        pkg_info.setdefault('LIBDIRS', []).extend(libdirs)
 
 #
 # Define package library
 #
-def setPkgLib ( env, pkg, lib ):
+def addPkgLib ( env, pkg, lib ):
 
-    pkg_info = env['PKG_TREE_LIB'][pkg] = lib
+    pkg_info = env['PKG_TREE_LIB'].setdefault(pkg, []).append(lib)
 
 #
 # Define package library
@@ -223,20 +223,21 @@ def adjustPkgDeps ( env ) :
     pkg_tree.update( env['PKG_TREE'] )
 
     # evaluate package dependencies for libraries
-    for pkg, lib in env['PKG_TREE_LIB'].iteritems() :
-        
-        trace ( "checking dependencies for package "+pkg, "adjustPkgDeps", 4 )
-        deps = findAllDependencies ( lib )
-        # self-dependencies are not needed here
-        deps.discard(pkg)
-        trace ( "package "+pkg+" deps = " + str(map(str,deps)), "adjustPkgDeps", 4 )
-        setPkgDeps ( env, pkg, deps )
-        
-        # add all libraries from the packages
-        for d in deps :
-            libs = pkg_tree.get(d,{}).get( 'LIBS', [] )
-            lib.env['LIBS'].extend ( libs )
-        trace ( str(lib)+" libs = " + str(map(str,lib.env['LIBS'])), "adjustPkgDeps", 4 )
+    for pkg, libs in env['PKG_TREE_LIB'].iteritems() :
+        for lib in libs:
+            
+            trace ( "checking dependencies for package "+pkg, "adjustPkgDeps", 4 )
+            deps = findAllDependencies ( lib )
+            # self-dependencies are not needed here
+            deps.discard(pkg)
+            trace ( "package "+pkg+" deps = " + str(map(str,deps)), "adjustPkgDeps", 4 )
+            setPkgDeps ( env, pkg, deps )
+            
+            # add all libraries from the packages
+            for d in deps :
+                libs = pkg_tree.get(d,{}).get( 'LIBS', [] )
+                lib.env['LIBS'].extend ( libs )
+            trace ( str(lib)+" libs = " + str(map(str,lib.env['LIBS'])), "adjustPkgDeps", 4 )
             
     # iterate over all binaries
     for pkg, bins in env['PKG_TREE_BINS'].iteritems() :

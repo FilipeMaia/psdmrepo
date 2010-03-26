@@ -52,7 +52,8 @@ def setupCompilers ( env ) :
         env['LDFLAGS'] = _ld_opt.get(opt,'')
 
     env['PYTHON_VERSION'] = "2.4"
+    env['PYTHON'] = "/usr/bin/python"+env['PYTHON_VERSION']
 
     # various substitutions for the scripts 
     env.SetDefault (SCRIPT_SUBS = {})
-    env['SCRIPT_SUBS']['PYTHON'] = "/usr/bin/python"+env['PYTHON_VERSION']
+    env['SCRIPT_SUBS']['PYTHON'] = env['PYTHON']

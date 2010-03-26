@@ -16,6 +16,7 @@ from SCons.Script import *
 
 from SConsTools.trace import *
 from SConsTools.dependencies import *
+from SConsTools.scons_functions import *
 
 
 _cplusplus_ext = [ 'cc', 'cpp', 'cxx', 'C', 'c' ]
@@ -53,6 +54,7 @@ def standardSConscript( **kw ) :
         TESTS - dictionary of test applications and their corresponding source files
         SCRIPTS - list of scripts in app/ directory
         UTESTS - names of the unit tests to run, if not given then all tests are unit tests
+        PYEXTMOD - name of the Python extension module, package name used by default
     """
 
     pkg = _getpkg ( kw )
@@ -63,6 +65,7 @@ def standardSConscript( **kw ) :
     
     standardLib( **ukw )
     standardPyLib( **ukw )
+    standardPyExt( **ukw )
     standardScripts( **ukw )
     standardBins ( **ukw )
     standardTests ( **ukw )
@@ -89,8 +92,8 @@ def standardLib( **kw ) :
         
         # get the list of libraries need for this package
         libs = [pkg] + _getkwlist ( kw, 'LIBS' )
-        setPkgLib ( env, pkg, lib[0] )
-        setPkgLibs ( env, pkg, libs )
+        addPkgLib ( env, pkg, lib[0] )
+        addPkgLibs ( env, pkg, libs )
         
 #
 # Process src/ directory, link python sources
@@ -108,20 +111,47 @@ def standardPyLib( **kw ) :
         trace ( "pysrcs = "+str(map(str,pysrcs)), "SConscript", 2 )
 
         # python files area installed into python/Package
+        doinit = True
         for src in pysrcs :
             
             # make symlink for every .py file and compile it into .pyc
             basename = os.path.basename(src)
+            if basename == "__init__.py" : doinit = False
             pydst = pjoin(pydir,pkg,basename)
             env.Symlink ( pydst, source=src )
             pyc = env.PyCompile ( pydst+"c", source=pydst )
             env['ALL_TARGETS']['LIBS'].extend ( pyc )
-            
+
+        if doinit :
             # make __init__.py and compile it
             ini = pjoin(pydir,pkg,"__init__.py")
             env.Command ( ini, "", [ Touch("$TARGET") ] )
             pyc = env.PyCompile ( ini+"c", source=ini )
             env['ALL_TARGETS']['LIBS'].extend ( pyc )
+
+#
+# Process pyext/ directory, build python extension module
+#
+def standardPyExt( **kw ) :
+
+    env = DefaultEnvironment()
+    pkg = _getpkg( kw )
+    extsrcs = Flatten ( [ MyGlob("pyext/*."+ext, source=True, strings=True, recursive=True) for ext in _cplusplus_ext ] )
+    if extsrcs :
+        
+        trace ( "pyextsrc = "+str(map(str,extsrcs)), "SConscript", 2 )
+        
+        pydir = env['PYDIR']
+
+        extmodname = kw.get('PYEXTMOD', pkg)
+
+        extmod = env.LoadableModule ( extmodname, source=extsrcs, LIBS=[], SHLIBPREFIX='' )
+        iextmod = env.Install ( pydir, source=extmod )
+        env['ALL_TARGETS']['LIBS'].extend ( iextmod )
+        
+        # get the list of libraries need for this package
+        addPkgLib ( env, pkg, extmod[0] )
+        addPkgLibs ( env, pkg, [extmodname] )
 
 #
 # Process app/ directory, install all scripts

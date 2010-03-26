@@ -12,6 +12,9 @@ from os.path import join as pjoin
 
 from trace import *
 
+from SCons.Defaults import *
+from SCons.Script import *
+
 # ==========================
 #     Local functions
 # ==========================
@@ -65,3 +68,22 @@ def makePackageLinks ( dirname, packagelist ) :
             except :
                 fail ( "Failed to create symlink `%s'" % ( dst, ) )
 
+
+def MyGlob(pattern, ondisk=True, source=True, strings=False, recursive=False):
+    """ Recursive glob function """
+    
+    dirname = os.path.dirname(pattern)
+    pattern = os.path.basename(pattern)
+    
+    trace ( "dirname=%s pattern=%s" % (dirname, pattern), "MyGlob", 7 )
+    names = Glob(os.path.join(dirname, pattern), ondisk, source, strings)
+
+    if recursive :
+        
+        for entry in Glob(os.path.join(dirname, '*'), source=True, strings=False):
+            
+            #trace ( "entry=`%s' %s class=%s" % (entry.get_abspath(), repr(entry), entry.__class__), "MyGlob", 7 )
+            if entry.__class__ is SCons.Node.FS.Dir :
+                names += MyGlob(os.path.join(str(entry), pattern), ondisk, source, strings, recursive)
+                
+    return names
