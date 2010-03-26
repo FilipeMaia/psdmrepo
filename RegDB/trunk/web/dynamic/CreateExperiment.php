@@ -25,17 +25,15 @@ try {
     // Get the currnt time in the ISO format, then stripe out
     // the date-time separator 'T' and timezone.
     //
-    $now = new DateTime();
-    $now_str = $now->format(DateTime::ISO8601);
-    $now_str[10] = ' ';
-    $now_str = substr( $now_str, 0, 19 );
+    $now = LusiTime::now();
+    $now_str = $now->toStringShort();
 
     $logged_user = $_SERVER['WEBAUTH_USER'];
 
     header( 'Content-type: text/html' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
-
+    
     /* Create a container with standard fields
      */
     $con = new RegDBHtml( 0, 0, 800, 250 );

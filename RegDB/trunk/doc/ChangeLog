@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-19
+2010-03-26 Igor Gaponenko
+- a bug fix in the CreateExperiment service
+
 Tag: V00-00-18
 2010-01-04 Igor Gaponenko
 - changes in the PHP HTML generator
