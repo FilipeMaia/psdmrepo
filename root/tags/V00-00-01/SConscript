@@ -1,0 +1,28 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package root
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any LUSI project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+root_ver = "5.24.00"
+PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/root",root_ver)
+
+PYDIR = "lib"
+LINKPY = "*.py libPyROOT.so*"
+
+standardExternalPackage ( 'root', **locals() )
