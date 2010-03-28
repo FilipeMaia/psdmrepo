@@ -90,6 +90,7 @@ def standardExternalPackage ( package, **kw ) :
         INCDIR   - include directory, absolute or relative to PREFIX
         INCLUDES - include files to copy (space-separated list of patterns)
         PYDIR    - Python src directory, absolute or relative to PREFIX
+        LINKPY   - Python files to link (patterns), or all files if not present
         PYDIRSEP - if present and evaluates to True installs python code to a 
                    separate directory arch/$LUSI_ARCH/python/<package>
         LIBDIR   - libraries directory, absolute or relative to PREFIX
@@ -151,13 +152,16 @@ def standardExternalPackage ( package, **kw ) :
             env['ALL_TARGETS']['LIBS'].extend ( targ )
         else :
             # make links for every file in the directory
-            files = os.listdir(py_dir)
+            files = kw.get('LINKPY',None)
+            files = _glob ( py_dir, files )
             for f in files :
                 loc = pjoin(py_dir,f)
                 if not os.path.isdir(loc) :
                     targ = env.Symlink ( pjoin(env.subst("$PYDIR"),f), loc )
-                    trace ( "linkpy: %s -> %s" % (str(targ[0]),loc), "standardExternalPackage", 5 )
-                    env['ALL_TARGETS']['LIBS'].extend( targ )
+                else :
+                    targ = env.Symlink ( Dir(pjoin(env.subst("$PYDIR"),f)), Dir(loc) )
+                trace ( "linkpy: %s -> %s" % (str(targ[0]),loc), "standardExternalPackage", 5 )
+                env['ALL_TARGETS']['LIBS'].extend( targ )
             
     
     # link all libraries

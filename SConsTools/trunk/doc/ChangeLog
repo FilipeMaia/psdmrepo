@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-28
+2010-03-27 Andy Salnikov
+- in standardExternalPackage: allow symlinking of the directories
+  when doing Python modules
+- also allow explicit specification of which files to link via LINKPY
+  argument to standardExternalPackage
+
 Tag: V00-00-24
 2010-03-26 Andy Salnikov
 - add support for building Python extension modules, everything that 
