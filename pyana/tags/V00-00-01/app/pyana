@@ -1,0 +1,375 @@
+#!/usr/bin/python2.4
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script pyxtcreader...
+#
+#------------------------------------------------------------------------
+
+"""Analysis job.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import logging
+from optparse import OptionParser
+import multiprocessing as mp
+from resource import *
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from pypdsdata import xtc, io, epics
+from pyana import event
+from pyana.histo import HistoMgr
+from pyana.input import dgramGen, threadedDgramGen
+from pyana.userana import mod_import
+
+#---------------------
+# Local definitions --
+#---------------------
+
+def _rusage(msg, ru1, ru2):
+    
+    print "%s: %.1f user %.1f sys" % ( msg, ru2.ru_utime-ru1.ru_utime, ru2.ru_stime-ru1.ru_stime )
+
+
+def _sendEpicsList(pipe, epicsList):
+    
+    for epics in epicsList :
+        if epics :
+            # send as buffer
+            pipe.send_bytes(epics)
+        else :
+            # send special string 
+            pipe.send_bytes('')
+    # EOD
+    pipe.send_bytes('$')
+
+# generator for Epics objects read from pipe
+def _getEpics(pipe):
+
+    while True :
+        buf = pipe.recv_bytes()
+        if buf == '$' : break
+        if buf == '' :
+            yield None
+        else :
+            yield epics.from_buffer(buf)
+
+def _proc(jobname, id, pipe, userObjects, dg_ref):
+    """ method which is running in child process when we do multi-processing """
+
+    ru1 = getrusage(RUSAGE_SELF)
+    
+    # create own environment, make unique job name
+    jobname = "%s-job-%s" % (jobname, id)
+    env = event.Env(jobname)
+
+    logging.info("proc-%s: starting job %s", id, jobname)
+
+    # instantiate histo manager
+    hmgr = HistoMgr( file=jobname+".root" )
+    
+    files = {}
+    
+    jobbegun = False
+    runbegun = False
+    nevent = 0
+
+    # event loop
+    while True:
+
+        fname = None
+        fpos = 0
+        dg = None
+
+        try :
+            
+            # read epics list from pipe
+            epics_data = [ e for e in _getEpics(pipe) ]
+            if epics_data == [None] :
+                # means server sent EOD
+                break
+            
+            # read next object from pipe, this would be a datagram sent as a string or 
+            # a file name plus file position
+            if dg_ref :
+                
+                fname = pipe.recv()
+                fpos = pipe.recv()
+                logging.debug("proc-%s: fname=%s fpos=%d", id, fname, fpos )
+                
+            else :
+                
+                data = pipe.recv_bytes()
+                logging.debug("proc-%s: received %s bytes", id, len(data) )
+                if not data : break
+                dg = xtc.Dgram(data)
+            
+        except EOFError, ex:
+            
+            logging.error("proc-%s: server closed connection unexpectedly", id )
+            break
+
+        # read datagram from file
+        if dg is None and fname :
+
+            file = files.get(fname, None)
+            if not file :
+                file = open(fname, 'rb')
+                files[fname] = file
+
+            file.seek(fpos)
+            dgiter = xtc.XtcFileIterator(file)
+            dg = dgiter.next()
+                
+
+        svc = dg.seq.service()
+
+        evt = event.Event(dg)
+        
+        # update configuration objects
+        env.updateConfig(evt)
+
+        # update epics data
+        if svc == xtc.TransitionId.Configure :
+            env.updateEpics(evt)
+        env.m_epics.m_id2epics = epics_data
+
+        # process all data
+        if svc == xtc.TransitionId.Configure :
+            if not jobbegun:
+                for userana in userObjects : userana.beginjob( evt, env )
+                jobbegun = True
+            else :
+                if runbegun : 
+                    for userana in userObjects : userana.endrun()
+                for userana in userObjects : userana.beginrun( evt, env )
+                runbegun = True
+        elif svc == xtc.TransitionId.L1Accept :
+            if not jobbegun :
+                logging.error("proc-%s: event seen before configuration", id)
+                break
+            for userana in userObjects : userana.event( evt, env )
+            nevent += 1
+
+    if runbegun : 
+        for userana in userObjects : userana.endrun( env )
+    if jobbegun:
+        for userana in userObjects : userana.endjob( env )
+
+    # close histo files
+    hmgr.close()
+
+    logging.info("proc-%s: processed %d events", id, nevent)
+
+    pipe.close()
+
+    ru2 = getrusage(RUSAGE_SELF)
+    _rusage( "proc-%s time" % id, ru1, ru2 )
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+def main( argv ) :
+
+    ru1 = getrusage(RUSAGE_SELF), getrusage(RUSAGE_CHILDREN)
+
+    parser = OptionParser(usage="%prog [options] [xtc-files ...]")
+    parser.set_defaults( verbose = 0, 
+                         file_list = None, 
+                         num_events = 0,
+                         job_name = None,
+                         module = [],
+                         num_cpu = 1,
+                         dg_ref = False )
+    
+    parser.add_option( '-v', "--verbose", action="count", help="increase verbosity" )
+    parser.add_option( '-l', "--file-list", metavar="FILE",
+                       help="file with a list of file names in it" )
+    parser.add_option( '-n', "--num-events", metavar="NUMBER", type="int",
+                       help="maximum number of events to process" )
+    parser.add_option( '-j', "--job-name", metavar="STRING", 
+                       help="job name, default is deduced from file name(s)" )
+    parser.add_option( '-m', "--module", metavar="NAME", action="append",
+                       help="user module name, multiple modules allowed, default is myana" )
+    parser.add_option( '-p', "--num-cpu", metavar="NUMBER", type="int",
+                       help="number grater than 1 enables multi-processing" )
+    parser.add_option( '-r', "--dg-ref", action="store_true",
+                       help="number grater than 1 enables multi-processing" )
+
+    (options, args) = parser.parse_args()
+    
+    # set logging level
+    log_levels = { 0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG }
+    level = log_levels.get ( options.verbose, logging.DEBUG )
+    logging.basicConfig( level=level )
+
+    # get file names
+    if not args and not options.file_list :
+        parser.error("at least one file name or a file list required")
+    if args and options.file_list :
+        parser.error("file list cannot be used with the file names")
+    if options.file_list :
+        # read file names from file
+        names = file(options.file_list).readlines()
+        names = [ n.strip() for n in names ]
+        names = [ n for n in names if n ]
+    else :
+        names = args
+
+    # get job name
+    if options.job_name :
+        jobname = options.job_name
+    else :
+        if options.file_list :
+            jobname = os.path.basename(options.file_list)
+            jobname = os.path.splitext(jobname)[0]
+        else :
+            jobname = os.path.basename(names[0])
+            jobname = os.path.splitext(jobname)[0]
+
+    # create environment
+    env = event.Env(jobname)
+
+    # instantiate histo manager
+    hmgr = HistoMgr( file=jobname+".root" )
+
+    # import user module
+    modules = options.module
+    if not modules : modules = ['myana']
+    userObjects = map( mod_import, modules )
+    if None in userObjects : return 2
+
+    # start worker process if requested
+    pipes = []
+    procs = []
+    for proc in range(max(options.num_cpu-1,0)) :
+        parent_conn, child_conn = mp.Pipe()
+        pipes.append(parent_conn)
+        procs.append(mp.Process(target=_proc, args=(jobname, proc, child_conn, userObjects, options.dg_ref)))
+    for p in procs : p.start()
+
+    jobbegun = False
+    runbegun = False
+    nevent = 0
+    ndamage = 0
+    damagemask = 0
+    next = 0
+
+    # read datagrams one by one
+    for dgtup in dgramGen( names ) :
+
+        dg, fileName, fpos = dgtup
+
+        damage = dg.xtc.damage.value()
+        svc = dg.seq.service()
+
+        if damage :
+            ndamage += 1
+            damagemask |= damage
+
+        if not damage or svc == xtc.TransitionId.Configure:
+            
+            evt = event.Event(dg)
+            
+            # update environment
+            env.update ( evt )
+
+            if procs:
+                
+                # pass all the data to children
+                if svc == xtc.TransitionId.Configure :
+                    # each configure transitions goes to each child
+                    for p in pipes :
+                        _sendEpicsList(p, env.m_epics.m_id2epics)
+                        #p.send({})
+                        if options.dg_ref :
+                            p.send(fileName)
+                            p.send(fpos)
+                        else :
+                            p.send_bytes(dg)
+                elif svc == xtc.TransitionId.L1Accept :
+                    # event data goes to next child
+                    p = pipes[next]
+                    next = (next+1) % len(pipes)
+                    _sendEpicsList(p, env.m_epics.m_id2epics)
+                    #p.send({})
+                    if options.dg_ref :
+                        p.send(fileName)
+                        p.send(fpos)
+                    else :
+                        p.send_bytes(dg)
+
+            else :
+                
+                # process all data
+                if svc == xtc.TransitionId.Configure :
+                    if not jobbegun:
+                        for userana in userObjects : userana.beginjob( evt, env )
+                        jobbegun = True
+                    else :
+                        if runbegun : 
+                            for userana in userObjects : userana.endrun()
+                        for userana in userObjects : userana.beginrun( evt, env )
+                        runbegun = True
+                elif svc == xtc.TransitionId.L1Accept :
+                    for userana in userObjects : userana.event( evt, env )
+
+        if svc == xtc.TransitionId.L1Accept :
+            nevent += 1
+
+        #print "Processed %d events, %d damaged, with damage mask %#x" % (nevent, ndamage, damagemask)
+        
+        if options.num_events and nevent >= options.num_events :
+            logging.info("event limit reached (%d), terminating", nevent)
+            break
+
+    # send EOD to all processes
+    for p in pipes : _sendEpicsList(p, [None])
+    # wait for all processes
+    for p in procs : p.join()
+
+    # finish
+    if runbegun :
+        for userana in userObjects : userana.endrun( env )
+    if jobbegun :
+        for userana in userObjects : userana.endjob( env )
+
+    # close histo files
+    hmgr.close()
+
+    logging.info("Processed %d events, %d damaged, with damage mask %#x", nevent, ndamage, damagemask)
+
+    ru2 = getrusage(RUSAGE_SELF), getrusage(RUSAGE_CHILDREN)
+    _rusage( "self  time", ru1[0], ru2[0] )
+    _rusage( "child time", ru1[1], ru2[1] )
+    
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    sys.path.insert(0, ".")
+    sys.exit( main(sys.argv) )
