@@ -27,7 +27,7 @@ PKGLIBS = "sz"
 standardExternalPackage ( 'szip', **locals() )
 
 
-hdf5_ver = "1.8.1"
+hdf5_ver = "1.8.4p1"
 PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/hdf5",hdf5_ver)
 INCDIR  = "include"
 LIBDIR  = "lib"
