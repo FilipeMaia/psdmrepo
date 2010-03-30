@@ -55,7 +55,7 @@ def _prefix ( prefix, env ):
 
 # build package name from prefix and directory
 def _absdir ( prefix, dir ):
-    if not dir : 
+    if dir is None: 
         return None
     if prefix and not os.path.isabs( dir ) :
         dir = pjoin( prefix, dir )
@@ -106,12 +106,12 @@ def standardExternalPackage ( package, **kw ) :
     
     env = DefaultEnvironment()
     
-    prefix = _prefix ( kw.get('PREFIX',None), env )
+    prefix = _prefix ( kw.get('PREFIX'), env )
     trace ( "prefix: %s" % prefix, "standardExternalPackage", 3 )
     
     # link include directory
-    inc_dir = _absdir ( prefix, kw.get('INCDIR',None) )
-    if inc_dir :
+    inc_dir = _absdir ( prefix, kw.get('INCDIR') )
+    if inc_dir is not None :
 
         trace ( "include_dir: %s" % inc_dir, "standardExternalPackage", 5 )
         
@@ -120,7 +120,7 @@ def standardExternalPackage ( package, **kw ) :
         archinc = str(archinc)
         if not os.path.isdir( archinc ) : os.makedirs( archinc )
 
-        includes = kw.get('INCLUDES',None)
+        includes = kw.get('INCLUDES')
         if not includes :
             
             # link the whole include directory
@@ -143,8 +143,8 @@ def standardExternalPackage ( package, **kw ) :
 
     
     # link python directory
-    py_dir = _absdir ( prefix, kw.get('PYDIR',None) )
-    if py_dir :
+    py_dir = _absdir ( prefix, kw.get('PYDIR') )
+    if py_dir is not None :
         trace ( "py_dir: %s" % py_dir, "standardExternalPackage", 5 )
         if kw.get('PYDIRSEP',False) :
             # make a link to the whole dir
@@ -152,7 +152,7 @@ def standardExternalPackage ( package, **kw ) :
             env['ALL_TARGETS']['LIBS'].extend ( targ )
         else :
             # make links for every file in the directory
-            files = kw.get('LINKPY',None)
+            files = kw.get('LINKPY')
             files = _glob ( py_dir, files )
             for f in files :
                 loc = pjoin(py_dir,f)
@@ -165,12 +165,12 @@ def standardExternalPackage ( package, **kw ) :
             
     
     # link all libraries
-    lib_dir = _absdir ( prefix, kw.get('LIBDIR',None) )
-    if lib_dir :
+    lib_dir = _absdir ( prefix, kw.get('LIBDIR') )
+    if lib_dir is not None :
         trace ( "lib_dir: %s" % lib_dir, "standardExternalPackage", 5 )
         
         # make a list of libs to link
-        libraries = kw.get('LINKLIBS',None)
+        libraries = kw.get('LINKLIBS')
         trace ( "libraries: %s" % libraries, "standardExternalPackage", 5 )
         libraries = _glob ( lib_dir, libraries )
             
@@ -184,12 +184,12 @@ def standardExternalPackage ( package, **kw ) :
                 env['ALL_TARGETS']['LIBS'].extend ( targ )
 
     # link all executables
-    bin_dir = _absdir ( prefix, kw.get('BINDIR',None) )
-    if bin_dir :
+    bin_dir = _absdir ( prefix, kw.get('BINDIR') )
+    if bin_dir is not None :
         trace ( "bin_dir: %s" % bin_dir, "standardExternalPackage", 5 )
         
         # make list of binaries to link
-        binaries = kw.get('LINKBINS',None)
+        binaries = kw.get('LINKBINS')
         binaries = _glob ( bin_dir, binaries )
         
         for f in binaries :

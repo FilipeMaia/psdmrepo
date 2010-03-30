@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-29
+2010-03-30 Andy Salnikov
+- standardExternalPackage: update to allow BINDIR, LIBDIR, etc to
+  be empty (but not None)
+
 Tag: V00-00-28
 2010-03-27 Andy Salnikov
 - in standardExternalPackage: allow symlinking of the directories
