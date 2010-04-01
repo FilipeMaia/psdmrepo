@@ -22,6 +22,15 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 root_ver = "5.24.00"
 PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/root",root_ver)
 
+INCDIR = "include/root"
+
+LIBDIR = "lib"
+LINKLIBS = "lib*.so*"
+PKGLIBS = "Core Cint RIO Net Hist Graf Graf3d Gpad Tree Rint Postscript Matrix Physics MathCore Thread m dl"
+
+BINDIR = "bin"
+LINKBINS = "root root.exe rootcint"
+
 PYDIR = "lib"
 LINKPY = "*.py libPyROOT.so*"
 
