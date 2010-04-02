@@ -40,9 +40,6 @@ import numpy
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from pyana.histo import HistoMgr
-
-from ROOT import TCanvas
 
 #----------------------------------
 # Local non-exported definitions --
@@ -56,15 +53,7 @@ from ROOT import TCanvas
 #  Class definition --
 #---------------------
 class myana1 ( object ) :
-    """Brief description of a class.
-
-    Full description of this class. The whole purpose of this class is 
-    to serve as an example for LUSI users. It shows the structure of
-    the code inside the class. Class can have class (static) variables, 
-    which can be private or public. It is good idea to define constructor 
-    for your class (in Python there is only one constructor). Put your 
-    public methods after constructor, and private methods after public.
-    """
+    """Example analysis job that reads waveform and does something useless"""
 
     #--------------------
     #  Class variables --
@@ -73,9 +62,13 @@ class myana1 ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self ) :
+    def __init__ ( self, nenergy, e1, e2 ) :
         """Constructor."""
         
+        self.nenergy = int(nenergy)
+        self.e1 = float(e1)
+        self.e2 = float(e2)
+        logging.info( "nenergy=%d e1=%f e2=%f", self.nenergy, self.e1, self.e2 )
         self.shotCountITof = 0
         self.sum2 = None
 
@@ -87,24 +80,6 @@ class myana1 ( object ) :
         """This method is called once at the beginning of the job"""
 
         logging.info( "myana.beginjob() called" )
-
-        # get ITof parameters from myana.inp
-        inpfile = open("myana.inp")
-        self.nenergy = int(inpfile.readline())
-        self.e1 = float(inpfile.readline())
-        self.e2 = float(inpfile.readline())
-        print "%d %f %f" % (self.nenergy, self.e1, self.e2)
-        del inpfile
-
-        
-#        self.canvas = TCanvas('canvas', 'ITofavg histograms', 1000, 800)
-#        self.canvas.Divide( 5, (len(self.itofHistos)+4)/5 )
-#        c = 1
-#        for h in self.itofHistos :
-#            self.canvas.cd(c)
-#            h.Draw()
-#            c += 1
-        
 
     def beginrun( self, evt, env ) :
         """This method is called at the beginning of the run"""

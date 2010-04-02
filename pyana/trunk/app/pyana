@@ -39,11 +39,14 @@ from resource import *
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from pypdsdata import xtc, io, epics
+from pypdsdata import xtc
 from pyana import event
 from pyana.histo import HistoMgr
 from pyana.input import dgramGen, threadedDgramGen
-from pyana.userana import mod_import
+from pyana.userana import mod_import, evt_dispatch
+from pyana.mp_proto import *
+from pyana.config import config
+from pyana.merger import merger
 
 #---------------------
 # Local definitions --
@@ -54,137 +57,67 @@ def _rusage(msg, ru1, ru2):
     print "%s: %.1f user %.1f sys" % ( msg, ru2.ru_utime-ru1.ru_utime, ru2.ru_stime-ru1.ru_stime )
 
 
-def _sendEpicsList(pipe, epicsList):
-    
-    for epics in epicsList :
-        if epics :
-            # send as buffer
-            pipe.send_bytes(epics)
-        else :
-            # send special string 
-            pipe.send_bytes('')
-    # EOD
-    pipe.send_bytes('$')
-
-# generator for Epics objects read from pipe
-def _getEpics(pipe):
-
-    while True :
-        buf = pipe.recv_bytes()
-        if buf == '$' : break
-        if buf == '' :
-            yield None
-        else :
-            yield epics.from_buffer(buf)
-
 def _proc(jobname, id, pipe, userObjects, dg_ref):
     """ method which is running in child process when we do multi-processing """
 
     ru1 = getrusage(RUSAGE_SELF)
     
+    # instantiate histo manager (memory-based)
+    hmgr = HistoMgr()
+    
     # create own environment, make unique job name
-    jobname = "%s-job-%s" % (jobname, id)
-    env = event.Env(jobname)
+    env = event.Env(jobname, hmgr, subproc=True)
 
     logging.info("proc-%s: starting job %s", id, jobname)
 
-    # instantiate histo manager
-    hmgr = HistoMgr( file=jobname+".root" )
-    
-    files = {}
-    
-    jobbegun = False
-    runbegun = False
+    dispatch = evt_dispatch(userObjects)
+    proto = mp_proto(pipe, dg_ref, 'prot-%d' % id)
     nevent = 0
 
     # event loop
-    while True:
+    for req in proto.getRequest():
 
-        fname = None
-        fpos = 0
-        dg = None
+        # request is a tuple with first element being opcode
+        if req[0] == OP_EVENT :
 
-        try :
+            epics_data = req[1]
+            dg = req[2]
+
+            evt = event.Event(dg)
             
-            # read epics list from pipe
-            epics_data = [ e for e in _getEpics(pipe) ]
-            if epics_data == [None] :
-                # means server sent EOD
-                break
+            # update configuration objects
+            env.updateConfig(evt)
+    
+            # update epics data
+            env.m_epics.m_id2epics = epics_data
+    
+            # process all data
+            dispatch.dispatch(evt, env)
+    
+            if evt.seq().service() == xtc.TransitionId.L1Accept : nevent += 1
+
+        elif req[0] == OP_FINISH :
             
-            # read next object from pipe, this would be a datagram sent as a string or 
-            # a file name plus file position
-            if dg_ref :
-                
-                fname = pipe.recv()
-                fpos = pipe.recv()
-                logging.debug("proc-%s: fname=%s fpos=%d", id, fname, fpos )
-                
-            else :
-                
-                data = pipe.recv_bytes()
-                logging.debug("proc-%s: received %s bytes", id, len(data) )
-                if not data : break
-                dg = xtc.Dgram(data)
+            logging.info("proc-%s: received FIN", id)
+            dispatch.finish(env)
             
-        except EOFError, ex:
+        elif req[0] == OP_RESULT :
             
-            logging.error("proc-%s: server closed connection unexpectedly", id )
+            logging.info("proc-%s: result requested, tag=%s", id, req[1])
+            proto.sendData( env.result() )
+
+        elif req[0] == OP_END :
+            
+            logging.info("proc-%s: received END", id)
+            # stop here
             break
-
-        # read datagram from file
-        if dg is None and fname :
-
-            file = files.get(fname, None)
-            if not file :
-                file = open(fname, 'rb')
-                files[fname] = file
-
-            file.seek(fpos)
-            dgiter = xtc.XtcFileIterator(file)
-            dg = dgiter.next()
-                
-
-        svc = dg.seq.service()
-
-        evt = event.Event(dg)
-        
-        # update configuration objects
-        env.updateConfig(evt)
-
-        # update epics data
-        if svc == xtc.TransitionId.Configure :
-            env.updateEpics(evt)
-        env.m_epics.m_id2epics = epics_data
-
-        # process all data
-        if svc == xtc.TransitionId.Configure :
-            if not jobbegun:
-                for userana in userObjects : userana.beginjob( evt, env )
-                jobbegun = True
-            else :
-                if runbegun : 
-                    for userana in userObjects : userana.endrun()
-                for userana in userObjects : userana.beginrun( evt, env )
-                runbegun = True
-        elif svc == xtc.TransitionId.L1Accept :
-            if not jobbegun :
-                logging.error("proc-%s: event seen before configuration", id)
-                break
-            for userana in userObjects : userana.event( evt, env )
-            nevent += 1
-
-    if runbegun : 
-        for userana in userObjects : userana.endrun( env )
-    if jobbegun:
-        for userana in userObjects : userana.endjob( env )
-
+            
     # close histo files
     hmgr.close()
 
     logging.info("proc-%s: processed %d events", id, nevent)
 
-    pipe.close()
+    proto.close()
 
     ru2 = getrusage(RUSAGE_SELF)
     _rusage( "proc-%s time" % id, ru1, ru2 )
@@ -199,6 +132,7 @@ def main( argv ) :
 
     parser = OptionParser(usage="%prog [options] [xtc-files ...]")
     parser.set_defaults( verbose = 0, 
+                         config = None,
                          file_list = None, 
                          num_events = 0,
                          job_name = None,
@@ -207,6 +141,8 @@ def main( argv ) :
                          dg_ref = False )
     
     parser.add_option( '-v', "--verbose", action="count", help="increase verbosity" )
+    parser.add_option( '-c', "--config", metavar="FILE",
+                       help="configuration file" )
     parser.add_option( '-l', "--file-list", metavar="FILE",
                        help="file with a list of file names in it" )
     parser.add_option( '-n', "--num-events", metavar="NUMBER", type="int",
@@ -218,7 +154,7 @@ def main( argv ) :
     parser.add_option( '-p', "--num-cpu", metavar="NUMBER", type="int",
                        help="number grater than 1 enables multi-processing" )
     parser.add_option( '-r', "--dg-ref", action="store_true",
-                       help="number grater than 1 enables multi-processing" )
+                       help="pass datagrams by-reference to children processes" )
 
     (options, args) = parser.parse_args()
     
@@ -226,6 +162,13 @@ def main( argv ) :
     log_levels = { 0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG }
     level = log_levels.get ( options.verbose, logging.DEBUG )
     logging.basicConfig( level=level )
+
+    # read config file
+    try :
+        jobConfig = config(options.config)
+    except Exception, exc:
+        logging.error("config error: %s", exc)
+        return 2
 
     # get file names
     if not args and not options.file_list :
@@ -251,29 +194,42 @@ def main( argv ) :
             jobname = os.path.basename(names[0])
             jobname = os.path.splitext(jobname)[0]
 
-    # create environment
-    env = event.Env(jobname)
-
-    # instantiate histo manager
-    hmgr = HistoMgr( file=jobname+".root" )
-
-    # import user module
+    # get all names of user modules
     modules = options.module
-    if not modules : modules = ['myana']
-    userObjects = map( mod_import, modules )
-    if None in userObjects : return 2
+    if not modules :
+        try:
+            modules = jobConfig.getJobConfig("modules")
+            if modules : modules = modules.split()
+        except Exception, e :
+            logging.error("config error: %s", exc)
+            return 2
+    if not modules :
+        logging.error("no user modules defined")
+        return 2
+    
+    # import all user modules, mod_import does not throw but returns None instead
+    modConfig = map(jobConfig.getModuleConfig, modules)
+    userObjects = map(mod_import, modules, modConfig)
+    if None in userObjects :
+        # not all modules imported 
+        return 2
 
     # start worker process if requested
     pipes = []
     procs = []
     for proc in range(max(options.num_cpu-1,0)) :
         parent_conn, child_conn = mp.Pipe()
-        pipes.append(parent_conn)
+        pipes.append(mp_proto(parent_conn, options.dg_ref, 'prot-main'))
         procs.append(mp.Process(target=_proc, args=(jobname, proc, child_conn, userObjects, options.dg_ref)))
     for p in procs : p.start()
 
-    jobbegun = False
-    runbegun = False
+    # instantiate histo manager
+    hmgr = HistoMgr( file=jobname+".root" )
+
+    # create environment
+    env = event.Env(jobname, hmgr)
+
+    dispatch = evt_dispatch(userObjects)
     nevent = 0
     ndamage = 0
     damagemask = 0
@@ -303,41 +259,18 @@ def main( argv ) :
                 # pass all the data to children
                 if svc == xtc.TransitionId.Configure :
                     # each configure transitions goes to each child
-                    for p in pipes :
-                        _sendEpicsList(p, env.m_epics.m_id2epics)
-                        #p.send({})
-                        if options.dg_ref :
-                            p.send(fileName)
-                            p.send(fpos)
-                        else :
-                            p.send_bytes(dg)
+                    for p in pipes : p.sendEventData(dgtup, env)
                 elif svc == xtc.TransitionId.L1Accept :
                     # event data goes to next child
                     p = pipes[next]
                     next = (next+1) % len(pipes)
-                    _sendEpicsList(p, env.m_epics.m_id2epics)
-                    #p.send({})
-                    if options.dg_ref :
-                        p.send(fileName)
-                        p.send(fpos)
-                    else :
-                        p.send_bytes(dg)
+                    p.sendEventData(dgtup, env)
 
             else :
                 
                 # process all data
-                if svc == xtc.TransitionId.Configure :
-                    if not jobbegun:
-                        for userana in userObjects : userana.beginjob( evt, env )
-                        jobbegun = True
-                    else :
-                        if runbegun : 
-                            for userana in userObjects : userana.endrun()
-                        for userana in userObjects : userana.beginrun( evt, env )
-                        runbegun = True
-                elif svc == xtc.TransitionId.L1Accept :
-                    for userana in userObjects : userana.event( evt, env )
-
+                dispatch.dispatch(evt, env)
+                
         if svc == xtc.TransitionId.L1Accept :
             nevent += 1
 
@@ -347,18 +280,28 @@ def main( argv ) :
             logging.info("event limit reached (%d), terminating", nevent)
             break
 
-    # send EOD to all processes
-    for p in pipes : _sendEpicsList(p, [None])
+    # finish
+    dispatch.finish(env)
+
+    # send FIN to all processes
+    for p in pipes : 
+        p.sendCode(OP_FINISH)
+
+    # get results from all processes
+    merge = merger() 
+    for p in pipes : 
+        merge.merge(p.getResult())
+    merge.finish(env)    
+
+    # send END to all processes
+    for p in pipes :
+        p.sendCode(OP_END)
+
     # wait for all processes
+    for p in pipes : p.close()
     for p in procs : p.join()
 
-    # finish
-    if runbegun :
-        for userana in userObjects : userana.endrun( env )
-    if jobbegun :
-        for userana in userObjects : userana.endjob( env )
-
-    # close histo files
+    # close histo file
     hmgr.close()
 
     logging.info("Processed %d events, %d damaged, with damage mask %#x", nevent, ndamage, damagemask)

@@ -31,7 +31,6 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import logging
-import numpy
 
 #---------------------------------
 #  Imports of base class module --
@@ -41,8 +40,6 @@ import numpy
 # Imports for other modules --
 #-----------------------------
 from pdsdata import *
-from pdsdata.histo import HistoMgr
-
 
 #----------------------------------
 # Local non-exported definitions --
@@ -56,15 +53,7 @@ from pdsdata.histo import HistoMgr
 #  Class definition --
 #---------------------
 class myana_pnccd ( object ) :
-    """Brief description of a class.
-
-    Full description of this class. The whole purpose of this class is 
-    to serve as an example for LUSI users. It shows the structure of
-    the code inside the class. Class can have class (static) variables, 
-    which can be private or public. It is good idea to define constructor 
-    for your class (in Python there is only one constructor). Put your 
-    public methods after constructor, and private methods after public.
-    """
+    """Example analysis module which dumps pnCCD info."""
 
     #--------------------
     #  Class variables --

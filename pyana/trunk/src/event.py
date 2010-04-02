@@ -6,6 +6,8 @@
 
 import logging
 import numpy
+import os
+import tempfile
 
 from pypdsdata import xtc
 from pypdsdata import epics
@@ -298,17 +300,37 @@ class EpicsStore(object):
 #
 class Env(object):
     
-    def __init__ (self, jobName="pyana" ):
+    def __init__ (self, jobName="pyana", hmgr=None, subproc=False ):
         
         self.m_jobName = jobName
+        self.m_hmgr = hmgr
+        self.m_subproc = subproc
         
         self.m_epics = EpicsStore()
 
         # store for configuration objects
         self.m_config = {}
 
+        # in subprocess mode store the names of the files
+        self.m_files = {}
+
     def jobName(self):
         return self.m_jobName
+    
+    def hmgr(self):
+        "Returns histogram manager object"
+        return self.m_hmgr
+
+    def mkfile(self, filename, mode='w', bufsize=-1):
+
+        if not self.m_subproc :
+            # in regular job just open the file
+            return open(filename, mode, bufsize)
+        else :
+            # in child open temporary file and record its name
+            fd, tmpname = tempfile.mkstemp()
+            self.m_files[filename] = tmpname
+            return os.fdopen(fd, mode, bufsize)
 
     def epicsStore(self):
         return self.m_epics
@@ -349,6 +371,20 @@ class Env(object):
         _log.debug("Env.getOpal1kConfig: %s", kw)
         return self._getConfig(xtc.TypeId.Type.Id_Opal1kConfig, **kw)
 
+    def result(self):
+        """returns complete result of processing from a subprocess"""
+        if self.m_subproc:
+
+            # send abck all histogram and all file names
+            histos = []
+            if self.m_hmgr : histos = self.m_hmgr.histos()
+            
+            return dict ( files = self.m_files,
+                          histos = histos )
+
+    # ==================
+    #  internal methods
+    # ==================
     def _storeConfig(self, typeId, detInfo, cfgObj ):
         _log.debug("Env._storeConfig: typeId=%s detinfo=%s", typeId, detInfo)
         self.m_config.setdefault(typeId, {})[detInfo] = cfgObj        

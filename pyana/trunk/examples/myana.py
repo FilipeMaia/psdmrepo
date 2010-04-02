@@ -40,8 +40,6 @@ import numpy
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from pyana.histo import HistoMgr
-
 from ROOT import TCanvas
 
 #----------------------------------
@@ -56,15 +54,8 @@ from ROOT import TCanvas
 #  Class definition --
 #---------------------
 class myana ( object ) :
-    """Brief description of a class.
-
-    Full description of this class. The whole purpose of this class is 
-    to serve as an example for LUSI users. It shows the structure of
-    the code inside the class. Class can have class (static) variables, 
-    which can be private or public. It is good idea to define constructor 
-    for your class (in Python there is only one constructor). Put your 
-    public methods after constructor, and private methods after public.
-    """
+    """Example analysis class which reads waveform data and fill a 
+    profile histogram with the waveforms """
 
     #--------------------
     #  Class variables --
@@ -73,10 +64,18 @@ class myana ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self ) :
-        """Constructor."""
+    def __init__ ( self, nenergy, e1, e2 ) :
+        """Constructor. The parameters to the constructor are passed
+        from pyana.cfg file. If parameters do not have default values
+        here then the must be defined in pyana.cfg. All parameters are
+        passed as strings, convert to correct type before use."""
         
         self.shotCountITof = 0
+
+        self.nenergy = int(nenergy)
+        self.e1 = float(e1)
+        self.e2 = float(e2)
+        logging.info( "nenergy=%d e1=%f e2=%f", self.nenergy, self.e1, self.e2 )
 
     #-------------------
     #  Public methods --
@@ -87,20 +86,12 @@ class myana ( object ) :
 
         logging.info( "myana.beginjob() called" )
 
-        # get ITof parameters from myana.inp
-        inpfile = open("myana.inp")
-        self.nenergy = int(inpfile.readline())
-        self.e1 = float(inpfile.readline())
-        self.e2 = float(inpfile.readline())
-        print "%d %f %f" % (self.nenergy, self.e1, self.e2)
-        del inpfile
-        
         # open output files
         paramFileName = env.jobName()+".param"
-        self.paramFile = open(paramFileName, 'w')
+        self.paramFile = env.mkfile(paramFileName)
         
         shotsFileName = paramFileName + '.data'
-        self.shotsFile = open(shotsFileName, 'w')
+        self.shotsFile = env.mkfile(shotsFileName)
         print >> self.shotsFile, shotsFileName
 
         # get Acqiris configuration
@@ -111,7 +102,7 @@ class myana ( object ) :
         if not self.etofConfig :  raise Exception("AmoETof configuration missing")
         
         # book histograms
-        hmgr = HistoMgr()
+        hmgr = env.hmgr()
 
         self.itofHistos = []
         for i in range(self.nenergy) :
@@ -121,7 +112,7 @@ class myana ( object ) :
             hconfig = self.itofConfig.horiz()
             halfbinsize = hconfig.sampInterval()/2.0
             
-            prof = hmgr.profile( name, name, hconfig.nbrSamples(),
+            prof = hmgr.prof( name, name, hconfig.nbrSamples(),
                                  0.0-halfbinsize, hconfig.sampInterval()*hconfig.nbrSamples()-halfbinsize)
             prof.SetYTitle("Volts")
             prof.SetXTitle("Seconds")
@@ -133,12 +124,11 @@ class myana ( object ) :
             name = "ETOF Channel %d" % i
 
             hconfig = self.etofConfig.horiz()
-            prof = hmgr.profile( name, name, hconfig.nbrSamples(),
+            prof = hmgr.prof( name, name, hconfig.nbrSamples(),
                                  0.0, hconfig.sampInterval()*hconfig.nbrSamples() )
             prof.SetYTitle("Volts")
             prof.SetXTitle("Seconds")
             self.etofHistos.append( prof )
-
         
 #        self.canvas = TCanvas('canvas', 'ITofavg histograms', 1000, 800)
 #        self.canvas.Divide( 5, (len(self.itofHistos)+4)/5 )

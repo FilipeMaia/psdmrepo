@@ -6,17 +6,19 @@
 
 import logging
 
+from pypdsdata import xtc
+
 _log = logging.getLogger("pyana.userana")
 
 
-def mod_import(name):
+def mod_import(name, config):
     """ Helper function to import and instantiate user analysis class """
 
     # import module
     try :
         mod = __import__(name)
     except ImportError, e :
-        _log.exception("Cannot import module %s: %s", name, str(e) )
+        _log.error("Cannot import module %s: %s", name, str(e) )
         return None
 
     # locate sub-module
@@ -33,7 +35,7 @@ def mod_import(name):
     
     # instantiate it
     try:
-        userana = userClass()
+        userana = userClass(**config)
     except Exception, e :
         _log.exception("Failure while instantiating class %s: %s", classname, str(e) )
         return None
@@ -53,4 +55,35 @@ def mod_import(name):
     return userana
 
 
+
+class evt_dispatch(object) :
+    
+    def __init__ (self, userObjects) :
+        self.userObjects = userObjects
+        self.jobbegun = False
+        self.runbegun = False
+        
+    def dispatch (self, evt, env):
+    
+        svc = evt.seq().service()
+        
+        # process all data
+        if svc == xtc.TransitionId.Configure :
+            if not self.jobbegun:
+                for userana in self.userObjects : userana.beginjob( evt, env )
+                self.jobbegun = True
+            else :
+                if self.runbegun : 
+                    for userana in self.userObjects : userana.endrun()
+                for userana in self.userObjects : userana.beginrun( evt, env )
+                self.runbegun = True
+        elif svc == xtc.TransitionId.L1Accept :
+            for userana in self.userObjects : userana.event( evt, env )
+
+    def finish(self, env):
+        # finish
+        if self.runbegun :
+            for userana in self.userObjects : userana.endrun( env )
+        if self.jobbegun :
+            for userana in self.userObjects : userana.endjob( env )
         
