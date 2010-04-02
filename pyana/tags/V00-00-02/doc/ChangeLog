@@ -1,0 +1,23 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package pyana
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-02
+2010-04-02 - Andy Salnikov
+- adding support for merging results from subprocesses 
+- options can now be specified in config file, the same config file
+  can contain options for user modules, see examples/myana.cfg
+
+Tag: V00-00-01
+2010-03-28 - Andy Salnikov
+- first import into repository
+- first half-working version of pyana
