@@ -1,0 +1,47 @@
+#------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package $package
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any LUSI project
+Import('*')
+
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving few keyword arguments. Here is a complete list of arguments:
+#
+#    PREFIX   - top directory of the external package
+#    INCDIR   - include directory, absolute or relative to PREFIX
+#    INCLUDES - include files to copy (space-separated list of patterns)
+#    PYDIR    - Python src directory, absolute or relative to PREFIX
+#    LINKPY   - Python files to link (patterns), or all files if not present
+#    PYDIRSEP - if present and evaluates to True installs python code to a 
+#               separate directory arch/$LUSI_ARCH/python/<package>
+#    LIBDIR   - libraries directory, absolute or relative to PREFIX
+#    LINKLIBS - library names to link, or all libs if not present
+#    BINDIR   - binaries directory, absolute or relative to PREFIX
+#    LINKBINS - binary names to link, or all libs if not present
+#    PKGLIBS  - names of libraries that have to be linked for this package
+#    DEPS     - names of other packages that we depend upon
+
+
+# here is an example setting up a fictional package
+
+pkg = "$package"
+pkg_ver = "0.0.1b"
+
+PREFIX  = os.path.join(env['LUSI_ROOT'], "sw/external", pkg, pkg_ver)
+INCDIR = "include"
+BINDIR = "bin"
+LIBDIR = "lib"
+LINKLIBS = "lib$package.so* lib$package-opt.so*"
+PKGLIBS = "$package m rt"
+
+standardExternalPackage ( pkg, **locals() )

@@ -1,0 +1,43 @@
+//--------------------------------------------------------------------------
+// File and Version Information:
+// 	$Id$
+//
+// Description:
+//	Test suite case for the $class.
+//
+//------------------------------------------------------------------------
+#include "Lusi/Lusi.h"
+
+//---------------
+// C++ Headers --
+//---------------
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+
+using namespace $package ;
+
+#define BOOST_TEST_MODULE $class
+#include <boost/test/included/unit_test.hpp>
+
+/**
+ * Simple test suite for module $class.
+ * See http://www.boost.org/doc/libs/1_36_0/libs/test/doc/html/index.html
+ */
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_1 )
+{
+  BOOST_CHECK_NO_THROW( expr ) ;
+  BOOST_CHECK_EQUAL ( expr1, expr2 ) ;
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_2 )
+{
+  BOOST_CHECK_NO_THROW( expr ) ;
+  BOOST_CHECK_EQUAL ( expr1, expr2 ) ;
+}
