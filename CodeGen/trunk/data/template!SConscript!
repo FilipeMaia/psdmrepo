@@ -12,9 +12,18 @@ Import('*')
 
 #
 # For the standard LUSI packages which build libraries, applications,
-# and python modules it is usually sufficient to call
+# and Python modules it is usually sufficient to call
 # standardSConscript() function which defines rules for all
-# above targets. In some cases additional parameters may be needed,
-# consult SConsTools/src/standardSConscript.py file.
+# above targets. Many standard packages do not need any special options, 
+# but those which need can modify standardSConscript() behavior using
+# a number of arguments, here is a complete list:
+#
+# LIBS - list of additional libraries needed by this package
+# BINS - dictionary of executables and their corresponding source files
+# TESTS - dictionary of test applications and their corresponding source files
+# SCRIPTS - list of scripts in app/ directory
+# UTESTS - names of the unit tests to run, if not given then all tests are unit tests
+# PYEXTMOD - name of the Python extension module, package name used by default
+#
 #
 standardSConscript()

@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2010-04-05 Andy Salnikov
+- added templates for pyana-module, SConscript-external
+
 Tag: V00-00-11
 2009-05-19 Andy Salnikov
 - new template template!python-unit-test!
