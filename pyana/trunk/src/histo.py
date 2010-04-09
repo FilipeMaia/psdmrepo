@@ -26,11 +26,17 @@ class HistoMgrRoot(object):
     def h1f(self, *args, **kw):
         return ROOT.TH1F(*args, **kw)
 
+    def h1i(self, *args, **kw):
+        return ROOT.TH1I(*args, **kw)
+
     def h2d(self, *args, **kw):
         return ROOT.TH2D(*args, **kw)
 
     def h2f(self, *args, **kw):
         return ROOT.TH2F(*args, **kw)
+
+    def h2i(self, *args, **kw):
+        return ROOT.TH2I(*args, **kw)
 
     def prof(self, *args, **kw):
         return ROOT.TProfile(*args, **kw)

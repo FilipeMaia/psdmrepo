@@ -21,10 +21,12 @@ _log = logging.getLogger("pyana.event")
 
 def _addr( address ):
     """Parse address string and returns dictionary with keys 
-    (detector, detId, device, devId), some or all values can be None"""
+    (detector, detId, device, devId), some or all values can be None.
+    If address type is DetInfo then returns dictionary with single key
+    address."""
     
     if type(address) == xtc.DetInfo :
-        return dict(detInfo=address)
+        return dict(address=address)
     
     det = None
     detId = None
@@ -119,8 +121,7 @@ class Event(object):
     def getAcqConfig(self, address):
         """ returns AcqConfig for specific address"""
         
-        addrdict = _addr(address)
-        return self.findFirst( typeId=xtc.TypeId.Type.Id_AcqConfig, **addrdict )
+        return self.findFirst( typeId=xtc.TypeId.Type.Id_AcqConfig, address=address )
 
     def getAcqValue(self, address, channel, env):
         """ returns Acquiris data for specific detector and channel, 
@@ -131,9 +132,7 @@ class Event(object):
 
         _log.debug("Event.getAcqValue: address=%s channel=%s", address, channel)
 
-        addrdict = _addr(address)
-
-        xtcObj = self.findFirstXtc( typeId=xtc.TypeId.Type.Id_AcqWaveform, **addrdict )
+        xtcObj = self.findFirstXtc( typeId=xtc.TypeId.Type.Id_AcqWaveform, address=address )
         if not xtcObj : return None
         obj = xtcObj.payload()
 
@@ -160,9 +159,7 @@ class Event(object):
         
         _log.debug("Event.getPnCcdValue: address=%s", address)
 
-        addrdict = _addr(address)
-
-        xtcObj = self.findFirstXtc( typeId=xtc.TypeId.Type.Id_pnCCDframe, **addrdict )
+        xtcObj = self.findFirstXtc( typeId=xtc.TypeId.Type.Id_pnCCDframe, address=address )
         if not xtcObj : return None
         frame = xtcObj.payload()
 
@@ -183,8 +180,7 @@ class Event(object):
 
     def getOpal1kConfig(self, address):
         """Returns opal1k.ConfigV1 object"""
-        addrdict = _addr(address)
-        return self.findFirst( typeId=xtc.TypeId.Type.Id_Opal1kConfig, **addrdict )
+        return self.findFirst( typeId=xtc.TypeId.Type.Id_Opal1kConfig, address=address )
 
     def getFeeGasDet(self):
         """Returns list of 4 floating numbers"""
@@ -205,8 +201,8 @@ class Event(object):
     #
 
     @staticmethod
-    def _filter(xtcObj, typeId=None, version=None, level=None,
-                detector=None, detId=None, device=None, devId=None, detInfo=None):
+    def _filter(xtcObj, typeId=None, version=None, level=None, address=None, 
+                detector=None, detId=None, device=None, devId=None):
         """ generator which produces Xtc objects matching specified criteria.
         
             typeId   - one of xtc.TypeId.Type.Something values
@@ -216,7 +212,22 @@ class Event(object):
             detId    - detector ID number
             device   - one of xtc.DetInfo.Device.Something values
             devId    - device ID number
+            address  - xtc.DetInfo object or address string
+            
+            address cannot be used together with any of  detector/detId/device/devId
         """
+
+        if address is not None and (detector is not None or 
+                detId is not None or device is not None or devId is not None ) :
+            raise ValueError("Event._filter: address cannot be specified with other arguments")
+
+        if address is not None :
+            addrdict = _addr(address)
+            address = addrdict.get('address')
+            detector = addrdict.get('detector')
+            detId = addrdict.get('detId')
+            device = addrdict.get('device')
+            devId = addrdict.get('devId')
 
         for x in Event._xtcGenerator( xtcObj ) :
 
@@ -235,12 +246,13 @@ class Event(object):
                 if src.level() != level : continue
 
             # check DetInfo
-            if detInfo is not None :
+            if address is not None :
                 
                 if not isinstance(src, xtc.DetInfo) : continue
                 if src != detInfo : continue
 
             else :
+                
                 # check detector
                 if detector is not None :
                     if not isinstance(src, xtc.DetInfo) : continue
@@ -375,7 +387,7 @@ class Env(object):
         """returns complete result of processing from a subprocess"""
         if self.m_subproc:
 
-            # send abck all histogram and all file names
+            # send back all histogram and all file names
             histos = []
             if self.m_hmgr : histos = self.m_hmgr.histos()
             
@@ -389,11 +401,11 @@ class Env(object):
         _log.debug("Env._storeConfig: typeId=%s detinfo=%s", typeId, detInfo)
         self.m_config.setdefault(typeId, {})[detInfo] = cfgObj        
         
-    def _getConfig(self, typeId=None, detector=None, detId=None, device=None, devId=None, detInfo=None):
+    def _getConfig(self, typeId=None, detector=None, detId=None, device=None, devId=None, address=None):
         
         configMap = self.m_config.get(typeId, {})
-        if detInfo :
-            return configMap.get(detInfo, None)
+        if address :
+            return configMap.get(address, None)
         else:
             for k, v in configMap.iteritems() :
                 if detector is not None and k.detector() != detector : continue
@@ -401,4 +413,3 @@ class Env(object):
                 if device is not None and k.device() != device : continue
                 if devId is not None and k.devId() != devId : continue
                 return v
-        

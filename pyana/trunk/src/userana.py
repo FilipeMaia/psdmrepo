@@ -14,15 +14,17 @@ _log = logging.getLogger("pyana.userana")
 def mod_import(name, config):
     """ Helper function to import and instantiate user analysis class """
 
+    modname = name.split(':')[0]
+    
     # import module
     try :
-        mod = __import__(name)
+        mod = __import__(modname)
     except ImportError, e :
-        _log.error("Cannot import module %s: %s", name, str(e) )
+        _log.error("Cannot import module %s: %s", modname, str(e) )
         return None
 
     # locate sub-module
-    components = name.split('.')
+    components = modname.split('.')
     for comp in components[1:]:
         mod = getattr(mod, comp)
     
@@ -30,7 +32,7 @@ def mod_import(name, config):
     classname = components[-1]
     userClass = getattr(mod, classname, None)
     if not userClass :
-        _log.error("User module %s does not define class %s", name, classname )
+        _log.error("User module %s does not define class %s", modname, classname )
         return None
     
     # instantiate it

@@ -121,6 +121,12 @@ class merger ( object ) :
                 
                 # copy data in chunks of 1MB
                 shutil.copyfileobj(tmpfile, file, 1024*1024)
+                
+                # delete the temporary file, but do not stop if it fails
+                try :
+                    os.remove(tmpname)
+                except StandardError, exc:
+                    _log.error('failed to remove file after merge: %s (%s)', tmpname, exc)
 
             except Exception, exc:
                 

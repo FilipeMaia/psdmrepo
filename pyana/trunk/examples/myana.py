@@ -64,7 +64,7 @@ class myana ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, nenergy, e1, e2 ) :
+    def __init__ ( self, name, nenergy, e1, e2 ) :
         """Constructor. The parameters to the constructor are passed
         from pyana.cfg file. If parameters do not have default values
         here then the must be defined in pyana.cfg. All parameters are
@@ -72,10 +72,11 @@ class myana ( object ) :
         
         self.shotCountITof = 0
 
+        self.name = name
         self.nenergy = int(nenergy)
         self.e1 = float(e1)
         self.e2 = float(e2)
-        logging.info( "nenergy=%d e1=%f e2=%f", self.nenergy, self.e1, self.e2 )
+        logging.info( "name=%s nenergy=%d e1=%f e2=%f", self.name, self.nenergy, self.e1, self.e2 )
 
     #-------------------
     #  Public methods --
@@ -107,7 +108,7 @@ class myana ( object ) :
         self.itofHistos = []
         for i in range(self.nenergy) :
             
-            name = "ITofavg%d" % i
+            name = "%s-ITofavg%d" % (self.name, i)
 
             hconfig = self.itofConfig.horiz()
             halfbinsize = hconfig.sampInterval()/2.0
@@ -121,7 +122,7 @@ class myana ( object ) :
         self.etofHistos = []
         for i in range(self.etofConfig.nbrChannels()) :
             
-            name = "ETOF Channel %d" % i
+            name = "%s - ETOF Channel %d" % (self.name, i)
 
             hconfig = self.etofConfig.horiz()
             prof = hmgr.prof( name, name, hconfig.nbrSamples(),
@@ -145,7 +146,7 @@ class myana ( object ) :
         logging.info( "myana.beginrun() called" )
 
     def event( self, evt, env ) :
-        """This methiod is called for every L1Accept transition"""
+        """This method is called for every L1Accept transition"""
 
         # store energy in a file
         shotEnergy = evt.getFeeGasDet()
