@@ -53,7 +53,7 @@ namespace {
   PyTypeObject TransitionId_Type = {
     PyObject_HEAD_INIT(0)
     0,                       /*ob_size*/
-    "pdsdata.xtc.TransitionId",  /*tp_name*/
+    "_pdsdata.xtc.TransitionId",  /*tp_name*/
     sizeof(pypdsdata::TransitionId), /*tp_basicsize*/
     0,                       /*tp_itemsize*/
     /* methods */

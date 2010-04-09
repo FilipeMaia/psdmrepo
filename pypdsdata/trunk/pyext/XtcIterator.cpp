@@ -50,7 +50,7 @@ namespace {
   PyTypeObject XtcIterator_Type = {
     PyObject_HEAD_INIT(0)
     0,                       /*ob_size*/
-    "pdsdata.xtc.XtcIterator",   /*tp_name*/
+    "_pdsdata.xtc.XtcIterator",   /*tp_name*/
     sizeof(pypdsdata::XtcIterator), /*tp_basicsize*/
     0,                       /*tp_itemsize*/
     /* methods */

@@ -55,8 +55,8 @@ namespace {
   pypdsdata::EnumType beamcodeEnum ( "BeamCode", beamcodeEnumValues );
 
   // type-specific methods
-  FUN0_WRAPPER(pypdsdata::EvrData::ConfigV2, beam)
-  FUN0_WRAPPER(pypdsdata::EvrData::ConfigV2, rate)
+  ENUM_FUN0_WRAPPER(pypdsdata::EvrData::ConfigV2, beam, beamcodeEnum)
+  ENUM_FUN0_WRAPPER(pypdsdata::EvrData::ConfigV2, rate, ratecodeEnum)
   FUN0_WRAPPER(pypdsdata::EvrData::ConfigV2, opcode)
   FUN0_WRAPPER(pypdsdata::EvrData::ConfigV2, npulses)
   FUN0_WRAPPER(pypdsdata::EvrData::ConfigV2, noutputs)

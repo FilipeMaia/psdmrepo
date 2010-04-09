@@ -70,10 +70,6 @@ namespace {
    };
 
   char typedoc[] = "Python class wrapping C++ Pds::Damage class.\n\n"
-      "This class inherits from a int type, the instances of this class\n"
-      "are regular numbers with some additional niceties: repr() and str()\n"
-      "functions witll print string representaion of the enum values.\n"
-      "Class defines several attributes which correspond to the C++ enum values.\n\n"
       "Class constructor takes zero or one integer numbers, constructor with zero\n"
       "arguments will create no-damage object.";
 

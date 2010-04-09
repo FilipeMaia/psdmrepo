@@ -92,7 +92,7 @@ namespace {
     {"status",       EpicsPvCtrl_status,   0, "Status value", 0},
     {"severity",     EpicsPvCtrl_severity, 0, "Severity value", 0},
     {"precision",    EpicsPvCtrl_precision, 0, "Precision Digits, for non-floating types is None", 0},
-    {"units",        EpicsPvCtrl_units_limits,    0, "String, None for ENUM and STRING PF types", (void*)"u"},
+    {"units",        EpicsPvCtrl_units_limits,    0, "String, None for ENUM and STRING PV types", (void*)"u"},
     {"upper_disp_limit",  EpicsPvCtrl_units_limits,  0, "Set to None for ENUM and STRING PV types", (void*)"D"},
     {"lower_disp_limit",  EpicsPvCtrl_units_limits,  0, "Set to None for ENUM and STRING PV types", (void*)"d"},
     {"upper_alarm_limit",  EpicsPvCtrl_units_limits,  0, "Set to None for ENUM and STRING PV types", (void*)"A"},

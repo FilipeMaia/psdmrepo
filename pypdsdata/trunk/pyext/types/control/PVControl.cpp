@@ -41,7 +41,7 @@ namespace {
     {"name",       name,       METH_NOARGS,  "Returns name of the monitoring channel" },
     {"array",      array,      METH_NOARGS,  "Returns true for array" },
     {"index",      index,      METH_NOARGS,  "Returns index in the array" },
-    {"vValue",     value,      METH_NOARGS,  "Returns value" },
+    {"value",      value,      METH_NOARGS,  "Returns value" },
     {0, 0, 0, 0}
    };
 

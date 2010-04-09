@@ -51,10 +51,10 @@ namespace {
     {"duration",      duration,       METH_NOARGS,  "Returns ClockTime value." },
     {"events",        events,         METH_NOARGS,  "Returns number of events." },
     {"npvControls",   npvControls,    METH_NOARGS,  "Returns number of PVControls." },
-    {"npvMonitors",   npvMonitors,    METH_NOARGS,  "Returns number of npvMonitors." },
+    {"npvMonitors",   npvMonitors,    METH_NOARGS,  "Returns number of PVMonitors." },
     {"size",          size,           METH_NOARGS,  "Returns total data size." },
     {"pvControl",     pvControl,      METH_VARARGS, "Returns PVControl for a given index." },
-    {"pvMonitor",     pvMonitor,      METH_VARARGS, "Returns pvMonitor for a given index." },
+    {"pvMonitor",     pvMonitor,      METH_VARARGS, "Returns PVMonitor for a given index." },
     {0, 0, 0, 0}
    };
 

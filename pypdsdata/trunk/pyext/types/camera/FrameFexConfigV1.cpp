@@ -22,6 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "../../EnumType.h"
 #include "../../Exception.h"
 #include "../TypeLib.h"
 #include "FrameCoord.h"
@@ -32,10 +33,28 @@
 
 namespace {
 
+  pypdsdata::EnumType::Enum fwdEnumValues[] = {
+      { "NoFrame", Pds::Camera::FrameFexConfigV1::NoFrame },
+      { "FullFrame", Pds::Camera::FrameFexConfigV1::FullFrame },
+      { "RegionOfInterest", Pds::Camera::FrameFexConfigV1::RegionOfInterest },
+      { 0, 0 }
+  };
+  pypdsdata::EnumType fwdEnum ( "Forwarding", fwdEnumValues );
+
+  pypdsdata::EnumType::Enum procEnumValues[] = {
+      { "NoProcessing", Pds::Camera::FrameFexConfigV1::NoProcessing },
+      { "GssFullFrame", Pds::Camera::FrameFexConfigV1::GssFullFrame },
+      { "GssRegionOfInterest", Pds::Camera::FrameFexConfigV1::GssRegionOfInterest },
+      { "GssThreshold", Pds::Camera::FrameFexConfigV1::GssThreshold },
+      { 0, 0 }
+  };
+  pypdsdata::EnumType procEnum ( "Processing", procEnumValues );
+
+
   // methods
-  FUN0_WRAPPER(pypdsdata::Camera::FrameFexConfigV1, forwarding)
+  ENUM_FUN0_WRAPPER(pypdsdata::Camera::FrameFexConfigV1, forwarding, fwdEnum)
   FUN0_WRAPPER(pypdsdata::Camera::FrameFexConfigV1, forward_prescale)
-  FUN0_WRAPPER(pypdsdata::Camera::FrameFexConfigV1, processing)
+  ENUM_FUN0_WRAPPER(pypdsdata::Camera::FrameFexConfigV1, processing, procEnum)
   FUN0_WRAPPER(pypdsdata::Camera::FrameFexConfigV1, threshold)
   FUN0_WRAPPER(pypdsdata::Camera::FrameFexConfigV1, number_of_masked_pixels)
   FUN0_WRAPPER(pypdsdata::Camera::FrameFexConfigV1, size)
@@ -69,6 +88,12 @@ pypdsdata::Camera::FrameFexConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+
+  // define class attributes for enums
+  PyObject* tp_dict = PyDict_New();
+  PyDict_SetItemString( tp_dict, "Forwarding", fwdEnum.type() );
+  PyDict_SetItemString( tp_dict, "Processing", procEnum.type() );
+  type->tp_dict = tp_dict;
 
   BaseType::initType( "FrameFexConfigV1", module );
 }

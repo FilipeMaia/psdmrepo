@@ -1,4 +1,10 @@
 
+2010-04-09 - V00-00-02
+======================
+- fix few typos here and there
+- FrameFexConfigV1 - forgot to declare enums
+- evr/ConfigV2 - returned integer instead of enum
+
 2010-03-26 - V00-00-01
 ======================
 - adopting whole thing to SConsTools building

@@ -52,8 +52,8 @@ namespace {
   PyTypeObject Level_Type = {
     PyObject_HEAD_INIT(0)
     0,                       /*ob_size*/
-    "pdsdata.xtc.Level",         /*tp_name*/
-    sizeof(pypdsdata::Level),    /*tp_basicsize*/
+    "_pdsdata.xtc.Level",    /*tp_name*/
+    sizeof(pypdsdata::Level),/*tp_basicsize*/
     0,                       /*tp_itemsize*/
     /* methods */
     Level_dealloc,           /*tp_dealloc*/
