@@ -32,7 +32,6 @@ __version__ = "$Revision$"
 import sys
 import os
 import logging
-from optparse import OptionParser
 import multiprocessing as mp
 from resource import *
 
@@ -130,79 +129,27 @@ def main( argv ) :
 
     ru1 = getrusage(RUSAGE_SELF), getrusage(RUSAGE_CHILDREN)
 
-    parser = OptionParser(usage="%prog [options] [xtc-files ...]")
-    parser.set_defaults( verbose = 0, 
-                         config = None,
-                         file_list = None, 
-                         num_events = 0,
-                         job_name = None,
-                         module = [],
-                         num_cpu = 1,
-                         dg_ref = False )
-    
-    parser.add_option( '-v', "--verbose", action="count", help="increase verbosity" )
-    parser.add_option( '-c', "--config", metavar="FILE",
-                       help="configuration file" )
-    parser.add_option( '-l', "--file-list", metavar="FILE",
-                       help="file with a list of file names in it" )
-    parser.add_option( '-n', "--num-events", metavar="NUMBER", type="int",
-                       help="maximum number of events to process" )
-    parser.add_option( '-j', "--job-name", metavar="STRING", 
-                       help="job name, default is deduced from file name(s)" )
-    parser.add_option( '-m', "--module", metavar="NAME", action="append",
-                       help="user module name, multiple modules allowed, default is myana" )
-    parser.add_option( '-p', "--num-cpu", metavar="NUMBER", type="int",
-                       help="number grater than 1 enables multi-processing" )
-    parser.add_option( '-r', "--dg-ref", action="store_true",
-                       help="pass datagrams by-reference to children processes" )
-
-    (options, args) = parser.parse_args()
-    
-    # set logging level
-    log_levels = { 0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG }
-    level = log_levels.get ( options.verbose, logging.DEBUG )
-    logging.basicConfig( level=level )
-
-    # read config file
-    try :
-        jobConfig = config(options.config)
-    except Exception, exc:
-        logging.error("config error: %s", exc)
-        return 2
+    # get all options from command line and config file
+    jobConfig = config( argv[1:] )
 
     # get file names
-    if not args and not options.file_list :
-        parser.error("at least one file name or a file list required")
-    if args and options.file_list :
-        parser.error("file list cannot be used with the file names")
-    if options.file_list :
-        # read file names from file
-        names = file(options.file_list).readlines()
-        names = [ n.strip() for n in names ]
-        names = [ n for n in names if n ]
-    else :
-        names = args
+    names = jobConfig.files()
 
     # get job name
-    if options.job_name :
-        jobname = options.job_name
-    else :
-        if options.file_list :
-            jobname = os.path.basename(options.file_list)
+    jobname = jobConfig.getJobConfig("job-name")
+    if not jobname :
+        # if it was not specified then build it from the input file names
+        file_list = jobConfig.getJobConfig("file-list")
+        if file_list :
+            jobname = os.path.basename(file_list)
             jobname = os.path.splitext(jobname)[0]
         else :
             jobname = os.path.basename(names[0])
             jobname = os.path.splitext(jobname)[0]
 
     # get all names of user modules
-    modules = options.module
-    if not modules :
-        try:
-            modules = jobConfig.getJobConfig("modules")
-            if modules : modules = modules.split()
-        except Exception, e :
-            logging.error("config error: %s", exc)
-            return 2
+    modules = jobConfig.getJobConfig('modules')
+    if isinstance(modules, (str,unicode)): modules = modules.split()
     if not modules :
         logging.error("no user modules defined")
         return 2
@@ -215,12 +162,14 @@ def main( argv ) :
         return 2
 
     # start worker process if requested
+    num_cpu = jobConfig.getJobConfig('num-cpu', 1)
+    dg_ref = jobConfig.getJobConfig('dg-ref', False)
     pipes = []
     procs = []
-    for proc in range(max(options.num_cpu-1,0)) :
+    for proc in range(max(num_cpu-1,0)) :
         parent_conn, child_conn = mp.Pipe()
-        pipes.append(mp_proto(parent_conn, options.dg_ref, 'prot-main'))
-        procs.append(mp.Process(target=_proc, args=(jobname, proc, child_conn, userObjects, options.dg_ref)))
+        pipes.append(mp_proto(parent_conn, dg_ref, 'prot-main'))
+        procs.append(mp.Process(target=_proc, args=(jobname, proc, child_conn, userObjects, dg_ref)))
     for p in procs : p.start()
 
     # instantiate histo manager
@@ -230,6 +179,7 @@ def main( argv ) :
     env = event.Env(jobname, hmgr)
 
     dispatch = evt_dispatch(userObjects)
+    num_events = jobConfig.getJobConfig('num-events')
     nevent = 0
     ndamage = 0
     damagemask = 0
@@ -276,7 +226,7 @@ def main( argv ) :
 
         #print "Processed %d events, %d damaged, with damage mask %#x" % (nevent, ndamage, damagemask)
         
-        if options.num_events and nevent >= options.num_events :
+        if num_events is not None and nevent >= num_events :
             logging.info("event limit reached (%d), terminating", nevent)
             break
 

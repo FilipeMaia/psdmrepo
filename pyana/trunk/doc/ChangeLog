@@ -11,6 +11,20 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2010-04-12 - Andy Salnikov
+- src/event.py: changed keyword params from detInfo to address
+- src/config.py: all configuration stuff including command line options
+  was moved here. Small refactoring oof pyana main().
+
+Tag: V00-00-03
+2010-04-09 - Andy Salnikov
+- src/histo.py: added h1i() and h2i() methods
+- src/merger.py: delete temporary files after merging them
+- src/event.py: more uniform handling of address strings
+- src/userana.py: allow multiple instances of the same analysis class
+- examples/myana.py: updated to support many instances
+
 Tag: V00-00-02
 2010-04-02 - Andy Salnikov
 - adding support for merging results from subprocesses 

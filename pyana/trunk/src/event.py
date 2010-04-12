@@ -137,7 +137,7 @@ class Event(object):
         obj = xtcObj.payload()
 
         # get config object
-        cfg = env.getAcqConfig(detInfo=xtcObj.src)
+        cfg = env.getAcqConfig(address=xtcObj.src)
         if not cfg : 
             raise Error("cannot find Acqiris config for address %s" % xtcObj.src )
 
@@ -164,7 +164,7 @@ class Event(object):
         frame = xtcObj.payload()
 
         # get config object
-        cfg = env.getPnCCDConfig(detInfo=xtcObj.src)
+        cfg = env.getPnCCDConfig(address=xtcObj.src)
         if not cfg : 
             raise Error("cannot find PnCCD config for address %s" % xtcObj.src )
 
@@ -249,7 +249,7 @@ class Event(object):
             if address is not None :
                 
                 if not isinstance(src, xtc.DetInfo) : continue
-                if src != detInfo : continue
+                if src != address : continue
 
             else :
                 
