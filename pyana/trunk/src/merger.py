@@ -30,6 +30,7 @@ __version__ = "$Revision$"
 #  Imports of standard modules --
 #--------------------------------
 import sys
+import os
 import logging
 import shutil
 import numpy as np
@@ -75,7 +76,7 @@ class merger ( object ) :
 
     def merge( self, result ) :
 
-        _log.info('merging data: %s', result)
+        _log.debug('merging data: %s', result)
         if not result: return
         
         files = result.get("files",{})

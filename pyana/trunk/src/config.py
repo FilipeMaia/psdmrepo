@@ -75,10 +75,8 @@ _cmdoptions = [
     make_option( '-l', "--file-list", metavar="FILE", help="file with a list of file names in it" ),
     make_option( '-n', "--num-events", metavar="NUMBER", type="int", help="maximum number of events to process" ),
     make_option( '-j', "--job-name", metavar="STRING", help="job name, default is deduced from file name(s)" ),
-    make_option( '-m', "--module", metavar="NAME", action="append", 
-                 help="user module name, multiple modules allowed, default is myana" ),
-    make_option( '-p', "--num-cpu", metavar="NUMBER", type="int", 
-                 help="number grater than 1 enables multi-processing" ),
+    make_option( '-m', "--module", metavar="NAME", action="append", help="user module name, multiple modules allowed" ),
+    make_option( '-p', "--num-cpu", metavar="NUMBER", type="int", help="number grater than 1 enables multi-processing" ),
     make_option( '-r', "--dg-ref", action="store_true",help="pass datagrams by-reference to children processes" ),
 ]
 
@@ -105,7 +103,7 @@ class config ( object ) :
         self._options, self._args = self._parser.parse_args(args)
         
         # set logging level
-        log_levels = { 0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG }
+        log_levels = { None: logging.WARNING, 0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG }
         level = log_levels.get ( self._options.verbose, logging.DEBUG )
         logging.getLogger().setLevel(level)
 

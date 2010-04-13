@@ -312,7 +312,9 @@ class EpicsStore(object):
 #
 class Env(object):
     
-    def __init__ (self, jobName="pyana", hmgr=None, subproc=False ):
+    def __init__ (self, jobName="pyana", hmgr=None, subproc=-1 ):
+        """If subproc is negative it means main process, non-negative
+        would mean subprocess"""
         
         self.m_jobName = jobName
         self.m_hmgr = hmgr
@@ -329,13 +331,22 @@ class Env(object):
     def jobName(self):
         return self.m_jobName
     
+    def subprocess(self):
+        return self.m_subproc
+    
+    def jobNameSub(self):
+        if self.m_subproc < 0 :
+            return self.m_jobName
+        else :
+            return "%s-%d" % (self.m_jobName, self.m_subproc)
+    
     def hmgr(self):
         "Returns histogram manager object"
         return self.m_hmgr
 
     def mkfile(self, filename, mode='w', bufsize=-1):
 
-        if not self.m_subproc :
+        if self.m_subproc < 0 :
             # in regular job just open the file
             return open(filename, mode, bufsize)
         else :
@@ -385,7 +396,7 @@ class Env(object):
 
     def result(self):
         """returns complete result of processing from a subprocess"""
-        if self.m_subproc:
+        if self.m_subproc >= 0 :
 
             # send back all histogram and all file names
             histos = []

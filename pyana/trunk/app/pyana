@@ -65,7 +65,7 @@ def _proc(jobname, id, pipe, userObjects, dg_ref):
     hmgr = HistoMgr()
     
     # create own environment, make unique job name
-    env = event.Env(jobname, hmgr, subproc=True)
+    env = event.Env(jobname, hmgr, subproc=id)
 
     logging.info("proc-%s: starting job %s", id, jobname)
 
@@ -163,7 +163,9 @@ def main( argv ) :
 
     # start worker process if requested
     num_cpu = jobConfig.getJobConfig('num-cpu', 1)
+    logging.info("num-cpu: %s", num_cpu)
     dg_ref = jobConfig.getJobConfig('dg-ref', False)
+    logging.info("dg-ref: %s", dg_ref)
     pipes = []
     procs = []
     for proc in range(max(num_cpu-1,0)) :

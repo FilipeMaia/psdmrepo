@@ -32,6 +32,7 @@ __version__ = "$Revision$"
 import sys
 import logging
 import numpy
+from scipy import integrate
 
 #---------------------------------
 #  Imports of base class module --
@@ -106,6 +107,7 @@ class myana ( object ) :
         hmgr = env.hmgr()
 
         self.itofHistos = []
+        self.itofHistosIntegral = []
         for i in range(self.nenergy) :
             
             name = "%s-ITofavg%d" % (self.name, i)
@@ -118,6 +120,11 @@ class myana ( object ) :
             prof.SetYTitle("Volts")
             prof.SetXTitle("Seconds")
             self.itofHistos.append( prof )
+
+            name = "%s-ITofavgInteg%d" % (self.name, i)
+            ihist = hmgr.h1i (name, name, 100, 2e-8, 6e-8 )
+
+            self.itofHistosIntegral.append ( ihist )
 
         self.etofHistos = []
         for i in range(self.etofConfig.nbrChannels()) :
@@ -166,6 +173,10 @@ class myana ( object ) :
         wf = ddesc.waveform()
         ts = ddesc.timestamps()
         self.itofHistos[bin].FillN( len(ts), ts, wf, numpy.ones_like(ts) )
+
+        # integrate it
+        integ = integrate.trapz (wf, ts)
+        self.itofHistosIntegral[bin].Fill(integ)
 
 #        c = 1
 #        for h in self.itofHistos :

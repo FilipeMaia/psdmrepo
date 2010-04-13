@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2010-04-13 - Andy Salnikov
+- subprocess ID is know available in environment, can be used to construct
+  unique names
+- updated example myana.py to use simple scipy algorithm 
+
 Tag: V00-00-04
 2010-04-12 - Andy Salnikov
 - src/event.py: changed keyword params from detInfo to address
