@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2010-04-14 - Andy Salnikov
+- moved examples to a new package pyana_examples/
+- bug fix in src/config, readfp(0 instead of read()
+
 Tag: V00-00-05
 2010-04-13 - Andy Salnikov
 - subprocess ID is know available in environment, can be used to construct

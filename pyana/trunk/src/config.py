@@ -117,7 +117,7 @@ class config ( object ) :
         if configFile :
             _log.info("reading config file %s", configFile)
             self._config = ConfigParser.ConfigParser()
-            self._config.read(file(configFile))
+            self._config.readfp(file(configFile))
         else :
             _log.info("reading config file pyana.cfg")
             self._config = ConfigParser.ConfigParser()
@@ -125,8 +125,10 @@ class config ( object ) :
 
         # verify that config file options have valid names
         for section in self._config.sections() :
+            _log.debug("config section=%s", section)
             if section == 'pyana' or section.startswith('pyana.') :
                 for option in self._config.options(section):
+                    _log.debug("config section=%s option=%s", section, option)
                     if option not in _options :
                         raise ValueError("unknown option name '%s' in section [%s]" % (option, section) )
 
@@ -171,7 +173,7 @@ class config ( object ) :
         # then from config file
         for section in self._sections:
             try:
-                #_log.debug("getJobConfig section=%s option=%s", section, option)
+                _log.debug("getJobConfig section=%s option=%s", section, option)
                 strval = self._config.get(section, option)
                 # convert it to correct type
                 return opt[1](strval)
@@ -179,7 +181,7 @@ class config ( object ) :
                 pass
             except ConfigParser.NoOptionError:
                 pass
-            #_log.debug("getJobConfig option not found")
+            _log.debug("getJobConfig option not found")
     
         # otherwise default
         return default
