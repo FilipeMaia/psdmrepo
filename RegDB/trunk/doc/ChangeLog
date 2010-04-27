@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-20
+2010-04-26 Igor Gaponenko
+- a bug fix in CreateInstrument class
+- added a new test (see web/tests/ directory) to report parameters
+of the PHP installation
+
 Tag: V00-00-19
 2010-03-26 Igor Gaponenko
 - a bug fix in the CreateExperiment service

@@ -118,7 +118,7 @@ class RegDBInstrument {
         if( $nrows == 1 )
             return new RegDBInstrumentParam (
                 $this->connection,
-                this,
+                $this,
                 mysql_fetch_array( $result, MYSQL_ASSOC ));
 
         throw new RegDBException(
