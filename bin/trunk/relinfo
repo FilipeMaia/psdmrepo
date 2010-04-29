@@ -145,7 +145,7 @@ normReleases() {
     elif [ "$r" == "REPO" ] ; then
       echo $r
   	else
-      test -d "$LUSI_ROOT/sw/releases/$r" -o -d "$SIT_RELEASES/$r" || { echo "release $r does not exist" 1>&2 ; exit 2 ; }
+      test -d "$LUSI_ROOT/sw/releases/$r" -o -d "$SIT_RELDIR/$r" || { echo "release $r does not exist" 1>&2 ; exit 2 ; }
       echo $r
     fi
   done
