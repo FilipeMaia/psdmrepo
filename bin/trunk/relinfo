@@ -25,7 +25,7 @@ Usage: `basename $0` [options] [release ...]
     -a          list all packages from all releases
     -t string   field delimiter string
     
-Release name can be any valid release name from \$LUSI_ROOT/sw/releases,
+Release name can be any valid release name from \$SIT_RELDIR,
 "REPO" for repository information, "." for current test release, or
 "BASE" for the base release of current test release. If you do not 
 specify release name then ". BASE" will be used. 
@@ -40,10 +40,16 @@ getPkgList() {
   
   if [ "$rel" == "REPO" ] ; then
   	# not a release, but SVN repository
-    svn -v list "$LUSI_SVN" | sed 's%.* \([^ ]*\)/$%\1%'
+    # TODO: remove once migration is finished
+  	repo="$LUSI_SVN"
+  	test -n "$SIT_SVN" && repo="$SIT_SVN"
+    svn -v list "$repo" | sed 's%.* \([^ ]*\)/$%\1%'
   else
     # get the list of directories with SConscript file inside
-    test "$rel" == "." || rel="$LUSI_ROOT/sw/releases/$rel"
+    if [ "$rel" != "." ] ; then
+      test -n "$LUSI_ROOT" && rel="$LUSI_ROOT/sw/releases/$rel"
+      test -n "$SIT_RELDIR" && rel="$SIT_RELDIR/$rel"
+    fi
     for f in $rel/* ; do
       test -d "$f" -a -f "$f/SConscript" && basename $f
     done
@@ -61,16 +67,24 @@ getPkgTag() {
   if [ "$rel" == "REPO" ] ; then
   	
   	# get most recent tag from SVN repository
-  	svn -v list "$LUSI_SVN/$pkg/tags" | sort -k1,1n | tail -1 | sed 's%.* \([^ ]*\)/$%\1%'
+    repo="$LUSI_SVN"
+    test -n "$SIT_SVN" && repo="$SIT_SVN"
+  	svn -v list "$repo/$pkg/tags" | sort -k1,1n | tail -1 | sed 's%.* \([^ ]*\)/$%\1%'
   	
   else
   
-    test "$rel" == "." || rel="$LUSI_ROOT/sw/releases/$rel"
+    if [ "$rel" != "." ] ; then
+      test -n "$LUSI_ROOT" && rel="$LUSI_ROOT/sw/releases/$rel"
+      test -n "$SIT_RELDIR" && rel="$SIT_RELDIR/$rel"
+    fi
     pkg="$rel/$pkg"
   
     if [ -f "$pkg/.lusi-tag" ] ; then
-      # .lusitag means exported package
+      # .lusi-tag means exported package
       cat "$pkg/.lusi-tag"
+    elif [ -f "$pkg/.sit-tag" ] ; then
+      # .sit-tag means exported package
+      cat "$pkg/.sit-tag"
     elif [ -d "$pkg/.svn" ] ; then
       # use svn info to get the location of the package in SVN repository
       # main trunk means HEAD, otherwize assume it's in tag or branch directory
@@ -117,15 +131,21 @@ normReleases() {
 
   for r in "$@" ; do 
   	if [ $r = "BASE" ] ; then
-      test -f .lusi_release || { echo ".lusi_release is absent, cannot use BASE" 1>&2 ; exit 2 ; }
-      cat .lusi_release
+      if [ -f .lusi_release ] ; then
+      	cat .lusi_release
+  	  elif [ -f .sit_release ] ; then
+  	    cat .sit_release
+  	  else 
+        echo ".sit_release [or .lusi_release] is absent, cannot use BASE" 1>&2
+        exit 2
+  	  fi
     elif [ "$r" == "." ] ; then
-      test -f .lusi_release || { echo ".lusi_release is absent, cannot use ." 1>&2 ; exit 2 ; }
+      test -f .lusi_release -o -f .sit_release || { echo ".sit_release [or .lusi_release] is absent, cannot use ." 1>&2 ; exit 2 ; }
       echo $r
     elif [ "$r" == "REPO" ] ; then
       echo $r
   	else
-      test -d "$LUSI_ROOT/sw/releases/$r" || { echo "release $r does not exist" 1>&2 ; exit 2 ; }
+      test -d "$LUSI_ROOT/sw/releases/$r" -o -d "$SIT_RELEASES/$r" || { echo "release $r does not exist" 1>&2 ; exit 2 ; }
       echo $r
     fi
   done
@@ -139,7 +159,11 @@ normReleases() {
 relHeader() {
   for r in "$@" ; do 
     if [ $r = "BASE" ] ; then
-      echo "BASE(`cat .lusi_release`)"
+      if [ -r .lusi_release ] ; then
+      	echo "BASE(`cat .lusi_release`)"
+      elif [ -r .sit_release ] ; then
+      	echo "BASE(`cat .sit_release`)"
+      fi
     elif [ "$r" == "." ] ; then
       echo "TEST"
     else

@@ -84,8 +84,8 @@ checkout_cvs() {
 # usage: checkout_svn package tag
 checkout_svn() {
 
-  repo123="$LUSI_SVN/$1/trunk"
-  test "$2" = "HEAD" || repo123="$LUSI_SVN/$1/tags/$2"
+  repo123="$svnroot/$1/trunk"
+  test "$2" = "HEAD" || repo123="$svnroot/$1/tags/$2"
 
   # for existing packages use "switch"
   if [ "$3" == "export" ] ; then
@@ -137,33 +137,29 @@ else
   fi
 fi
 
-# the file .lusi_release must be in the current directory
-if [ ! -f .lusi_release ] ; then
-  echo "Release not setup, file .lusi_release does not exist in current directory"
+# the file .sit_release must be in the current directory
+if [ -f .sit_release ] ; then
+  base_release=`cat .sit_release | tr -d ' '`
+elif [ -f .lusi_release ] ; then
+  base_release=`cat .lusi_release | tr -d ' '`
+else
+  echo "Release not setup, file .lusi_release or .sit_release does not exist in current directory"
   exit 2
 fi
 
-if [ "$mode" = "cvs" ] ; then
-  if [ -z "$CVSROOT" ] ; then
-    echo "CVSROOT environment variable is not defined"
-    exit 2
-  fi
-else
-  if [ -z "$LUSI_SVN" ] ; then
-    echo "LUSI_SVN environment variable is not defined"
-    exit 2
-  fi
+svnroot="$LUSI_SVN"
+test -z "$svnroot" && svnroot="$SIT_SVN"
+if [ -z "$svnroot" ] ; then
+  echo "SIT_SVN or LUSI_SVN environment variable is not defined"
+  exit 2
 fi
-
-# get the base release name
-lusi_release=`cat .lusi_release | tr -d ' '`
 
 if [ "$tag_file" = '-' ] ; then
 
   # read tags from stdin, one line at a time
   while read pkg tag stuff ; do
     echo addpkg "$pkg" "$tag"
-    checkout "$pkg" "$tag" "$lusi_release" "$mode" "$export"
+    checkout "$pkg" "$tag" "$base_release" "$mode" "$export"
   done
 
 elif [ -n "$tag_file" ] ; then
@@ -171,7 +167,7 @@ elif [ -n "$tag_file" ] ; then
   # read tags from file, one line at a time
   while read pkg tag stuff ; do
     echo addpkg "$pkg" "$tag"
-    checkout "$pkg" "$tag" "$lusi_release" "$mode" "$export"
+    checkout "$pkg" "$tag" "$base_release" "$mode" "$export"
   done < "$tag_file"
 
 else
@@ -179,7 +175,7 @@ else
   # package name and optionally tag come from command line
   pkg=`echo $1 | cut -d/ -f1`
   tag="$2"
-  checkout "$pkg" "$tag" "$lusi_release" "$mode" "$export"
+  checkout "$pkg" "$tag" "$base_release" "$mode" "$export"
     
 fi
   
