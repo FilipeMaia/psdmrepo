@@ -9,7 +9,7 @@
 #
 #######################################################################
 
-scrdir="${LUSI_SETUP_DIR:-${LUSI_ROOT:-/afs/slac.stanford.edu/g/lusi}/bin}"
+scrdir="${LUSI_SETUP_DIR:-${LUSI_ROOT:-/reg/g/psdm}/bin}"
 uss="$scrdir/lusi_setup.uss"
 tmp_sh=/tmp/uss-$$.sh
 

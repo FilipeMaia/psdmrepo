@@ -1,4 +1,4 @@
-#!/afs/slac.stanford.edu/g/lusi/bin/uss.sh
+#!/reg/g/psdm/bin/uss.sh
 #
 # $Id$
 #
@@ -101,7 +101,7 @@ options=`echo "$@" | tr ' ' ','`
 #
 # Check necessary environment
 #
-test -n "$LUSI_ROOT" || set_env LUSI_ROOT /afs/slac.stanford.edu/g/lusi
+test -n "$LUSI_ROOT" || set_env LUSI_ROOT /reg/g/psdm
 
 #
 #  Set repository location

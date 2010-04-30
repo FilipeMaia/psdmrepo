@@ -14,7 +14,7 @@ if ( ${?LUSI_SETUP_BIN} ) then
 else if ( ${?LUSI_ROOT} ) then
   set scrdir="${LUSI_ROOT}/bin"
 else
-  set scrdir="/afs/slac.stanford.edu/g/lusi/bin"
+  set scrdir="/reg/g/psdm/bin"
 endif
 set uss="$scrdir/lusi_setup.uss"
 set tmp_sh=/tmp/uss-$$.csh
