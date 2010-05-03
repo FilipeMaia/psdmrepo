@@ -1,0 +1,90 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script ws-passwd...
+#
+#------------------------------------------------------------------------
+
+"""Application that writes file with encoded user name and password 
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import codecs
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+class WSPasswd ( LusiPyApp ) :
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog user passwd file" )
+
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # check the arguments
+        if len(self._args) != 3 :
+            self._parser.error("three arguments required")
+            return 2
+        
+        # delete the file if it exists, otherwise umask has no effect
+        try :
+            os.unlink(self._args[2])
+        except OSError, e :
+            # if it does not exists then errno=2 
+            if e.errno != 2 : raise
+        
+        # set umask so that nobody else could read this file
+        os.umask ( 0177 )
+
+        f = codecs.open( self._args[2], 'w', 'base64' )
+        f.write( self._args[0]+' '+self._args[1] )
+        f.close()
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = WSPasswd()
+    rc = app.run()
+    sys.exit(rc)
