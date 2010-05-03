@@ -39,8 +39,8 @@ import unittest
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from pdsdata import *
-from pdsdata.xtc import *
+from pypdsdata import *
+from pypdsdata.xtc import *
 
 #---------------------
 # Local definitions --
