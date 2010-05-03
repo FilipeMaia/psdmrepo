@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 
-# SConscript file for any LUSI project
+# SConscript file for any SIT project
 Import('*')
 
 from os.path import join as pjoin
@@ -21,10 +21,10 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 pkg = "tables"
 pkg_ver = "2.1.2"
-PREFIX  = pjoin(env['LUSI_ROOT'], "sw/external", pkg, pkg_ver)
+PREFIX  = pjoin(env['SIT_ROOT'], "sw/external", pkg, pkg_ver)
 
 PYDIR = "lib"
-if env['LUSI_ARCH_PROC'] == 'x86_64' : PYDIR = "lib64"
+if env['SIT_ARCH_PROC'] == 'x86_64' : PYDIR = "lib64"
 PYDIR += "/python"+env['PYTHON_VERSION']+"/site-packages"
 
 BINDIR = "bin"
