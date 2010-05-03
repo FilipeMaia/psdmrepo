@@ -94,7 +94,7 @@ checkout_svn() {
       echo "Cannot export, package $1 already exist"
       exit 2
   	else
-      lusvn export "$1" "$2" "$1"
+      $svncmd export "$1" "$2" "$1"
     fi
   else
     if [ -d "$1/.svn" ] ; then
@@ -153,6 +153,9 @@ if [ -z "$svnroot" ] ; then
   echo "SIT_SVN or LUSI_SVN environment variable is not defined"
   exit 2
 fi
+
+svncmd=lusvn
+test -z "$LUSI_SVN" && svncmd=psvn
 
 if [ "$tag_file" = '-' ] ; then
 
