@@ -1,0 +1,40 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: template!SConscript! 8 2008-10-08 22:35:33Z salnikov $
+#
+# Description:
+#  SConscript file for package nexus
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+import os
+from os.path import join as pjoin
+
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+py_ver = env['PYTHON_VERSION']
+
+mxml_ver = "2.5"
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/mxml",mxml_ver)
+LIBDIR  = "lib"
+PKGLIBS = "mxml m"
+standardExternalPackage ( 'mxml', **locals() )
+
+nexus_ver = "4.1.0"
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/nexus",nexus_ver)
+DEPS    = "hdf5 mxml"
+INCDIR  = "include"
+LIBDIR  = "lib"
+BINDIR  = "bin"
+PYDIR   = "lib/python"+py_ver+"/site-packages"
+PKGLIBS = "NeXus"
+standardExternalPackage ( 'nexus', **locals() )
