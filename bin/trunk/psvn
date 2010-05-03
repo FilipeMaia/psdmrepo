@@ -149,7 +149,7 @@ exec_export() {
   tag=${2:?No tag name provided}
   path=${3:?No path provided}
 
-  svn export $force "$PDSM_SVN/$pkg/tags/$tag" "$path" &&
+  svn export $force "$SIT_SVN/$pkg/tags/$tag" "$path" &&
      echo "$tag" > "$path/.psdm-tag"
 
 }
