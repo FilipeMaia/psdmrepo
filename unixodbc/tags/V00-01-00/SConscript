@@ -1,0 +1,33 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package unixodbc
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+import os
+from os.path import join as pjoin
+
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+unixodbc_ver = "2.2.12"
+
+PREFIX  = "/usr"
+INCDIR  = "include"
+INCLUDES = "autotest.h odbcinst*.h sql.h sqlext.h sqltypes.h sqlucode.h uodbc_stats.h"
+LIBDIR  = "lib"
+if env['SIT_ARCH_PROC'] == 'x86_64' : LIBDIR  = "lib64"
+PKGLIBS = "odbc"
+LINKLIBS = "libodbc.so*"
+standardExternalPackage ( 'unixodbc', **locals() )
