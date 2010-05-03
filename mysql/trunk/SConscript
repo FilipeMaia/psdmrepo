@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 
-# SConscript file for any LUSI project
+# SConscript file for any SIT project
 Import('*')
 
 import os
@@ -49,7 +49,7 @@ INCLUDES = " ".join((
   "typelib.h",
   "xmalloc.h" ))
 LIBDIR  = "lib/mysql"
-if env['LUSI_ARCH_PROC'] == 'x86_64' : LIBDIR  = "lib64/mysql"
+if env['SIT_ARCH_PROC'] == 'x86_64' : LIBDIR  = "lib64/mysql"
 PKGLIBS = "mysqlclient"
 LINKLIBS = "libmysqlclient.so*"
 standardExternalPackage ( 'mysql', **locals() )
