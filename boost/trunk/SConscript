@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 
-# SConscript file for any LUSI project
+# SConscript file for any SIT project
 Import('*')
 
 import os
@@ -35,7 +35,7 @@ libsfx = libsfxs.get ( env['CXX'], '' )
 
 boost_ver = "1.36.0"
 
-PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/boost",boost_ver,env['LUSI_ARCH'])
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/boost",boost_ver,env['SIT_ARCH'])
 INCDIR  = "include/boost-1_36/boost"
 
 # Mother of all other boost packages, this will only link 
