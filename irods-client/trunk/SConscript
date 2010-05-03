@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 
-# SConscript file for any LUSI project
+# SConscript file for any SIT project
 Import('*')
 
 import os
@@ -22,6 +22,6 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 irods_ver = "2.3"
-PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/irods-client",irods_ver)
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/irods-client",irods_ver)
 BINDIR  = "bin"
 standardExternalPackage ( 'irods-client', **locals() )
