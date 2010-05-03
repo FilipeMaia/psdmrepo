@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 
-# SConscript file for any LUSI project
+# SConscript file for any SIT project
 Import('*')
 
 from os.path import join as pjoin
@@ -20,7 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 gppy_ver = "1.8"
-PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/gnuplot-py",gppy_ver)
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/gnuplot-py",gppy_ver)
 
 python_ver = env['PYTHON_VERSION']
 PYDIR = "lib/python"+python_ver+"/site-packages/Gnuplot"
