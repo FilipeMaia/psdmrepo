@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 
-# SConscript file for any LUSI project
+# SConscript file for any SIT project
 Import('*')
 
 from os.path import join as pjoin
@@ -21,7 +21,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 # it also needs ATLAS numeric stuff (shared libs only)
 atlas_ver = "3.8.3"
-PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/atlas",atlas_ver)
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/atlas",atlas_ver)
 LIBDIR = 'lib'
 LINKLIBS = "*.so"
 standardExternalPackage ( 'atlas', **locals() )
@@ -32,10 +32,10 @@ del LINKLIBS
 
 scipy_ver = "0.7.1"
 python_ver = env['PYTHON_VERSION']
-PREFIX  = pjoin(env['LUSI_ROOT'], "sw/external/scipy", scipy_ver)
+PREFIX  = pjoin(env['SIT_ROOT'], "sw/external/scipy", scipy_ver)
 
 PYDIR = "lib"
-if env['LUSI_ARCH_PROC'] == 'x86_64' : PYDIR = "lib64"
+if env['SIT_ARCH_PROC'] == 'x86_64' : PYDIR = "lib64"
 PYDIR += "/python"+python_ver+"/site-packages/scipy"
 PYDIRSEP = True
 
