@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 
-# SConscript file for any LUSI project
+# SConscript file for any SIT project
 Import('*')
 
 from SConsTools.standardExternalPackage import standardExternalPackage
@@ -22,7 +22,7 @@ python_ver = env['PYTHON_VERSION']
 PREFIX  = "/usr"
 INCDIR = "include/python"+python_ver
 LIBDIR  = "lib"
-if env['LUSI_ARCH_PROC'] == 'x86_64' : LIBDIR  = "lib64"
+if env['SIT_ARCH_PROC'] == 'x86_64' : LIBDIR  = "lib64"
 PKGLIBS = "python"+python_ver
 LINKLIBS = "libpython"+python_ver+".so*"
 
