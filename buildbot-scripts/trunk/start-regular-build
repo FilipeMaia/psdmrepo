@@ -10,7 +10,7 @@ usage() {
   echo Usage: `basename $0` '<release-name> <tags-file>' 1>&2
 }
 
-tmp=${LUSI_ROOT:?Missing LUSI_ROOT}
+tmp=${SIT_ROOT:?Missing SIT_ROOT}
 
 # check arguments
 if [ $# -ne 2 ] ; then
@@ -25,7 +25,7 @@ tags=$2
 #
 # directory for the new release
 #
-rels="$LUSI_ROOT/sw/releases"
+rels="$SIT_ROOT/sw/releases"
 
 #
 # Check that releases directory is there, if not we may be on wrong host

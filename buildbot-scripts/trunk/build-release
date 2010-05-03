@@ -7,11 +7,11 @@ usage() {
 
   echo `basename $0` build_dir release target [options]
   echo
-  echo "  all options are passed to lusi_setup directly"
+  echo "  all options are passed to sit_setup directly"
 
 }
 
-tmp=${LUSI_ROOT:?Missing LUSI_ROOT}
+tmp=${SIT_ROOT:?Missing SIT_ROOT}
 
 rels=${1:?Required parameter missing (build directory name)}
 shift
@@ -29,9 +29,9 @@ cd "$dir"
 #
 # setup release
 #
-LUSI_RELEASE="$rel"
-export LUSI_RELEASE
-source "$LUSI_ROOT/bin/lusi_setup.sh" "$@"
+SIT_RELEASE="$rel"
+export SIT_RELEASE
+source "$SIT_ROOT/bin/sit_setup.sh" "$@"
 
 #
 # run the build

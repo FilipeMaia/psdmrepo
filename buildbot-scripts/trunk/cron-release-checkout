@@ -6,10 +6,10 @@ rel=${1:?Required parameter missing (release name)}
 tags=${2:?Required parameter missing (tags name)}
 
 #
-# Standard LUSI setup
+# Standard SIT setup
 #
-. /afs/slac.stanford.edu/g/lusi/bin/lusi_setup.sh
-tmp=${LUSI_ROOT:?Missing LUSI_ROOT}
+. /reg/g/psdm/bin/sit_setup.sh
+tmp=${SIT_ROOT:?Missing SIT_ROOT}
 
 checkout() {
 
@@ -27,7 +27,7 @@ checkout() {
     #
     # get the list of the tags
     #
-    cp "$LUSI_ROOT/sw/releases/buildbot/tags/$tags" ./tags || return 3
+    cp "$SIT_ROOT/sw/releases/buildbot/tags/$tags" ./tags || return 3
 
     #
     # checkout all packages from the tag list
