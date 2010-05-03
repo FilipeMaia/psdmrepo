@@ -1,16 +1,17 @@
 #!/bin/sh
 
-reldir="/psdm/local/releases"
+reldir="/reg/g/psdm/sw/releases"
 
 rel=${1:?Required parameter missing (release name)}
 
 #
 # Standard LUSI setup
 #
-. /afs/slac.stanford.edu/g/lusi/bin/lusi_setup.sh
+. /reg/g/psdm/bin/lusi_setup.sh
 tmp=${LUSI_ROOT:?Missing LUSI_ROOT}
 tmp=${LUSI_SVN:?Missing LUSI_SVN}
 
+export LUSI_SVN=file://localhost/afs/slac.stanford.edu/g/lusi/svnrepo
 
 getPkgList() {
     svn list "$LUSI_SVN" | sed 's%^\(.*\)/$%\1%'
@@ -22,7 +23,7 @@ getPkgTag() {
 
     # get most recent tag from SVN repository
     svn -v list "$LUSI_SVN/$pkg/tags" | sort -k1,1n | tail -1 | sed 's%.* \([^ ]*\)/$%\1%'
-
+    
 }
 
 getTags() {
@@ -40,6 +41,7 @@ getTags() {
     done
 
 }
+
 
 checkout() {
 

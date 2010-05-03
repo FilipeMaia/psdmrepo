@@ -4,7 +4,7 @@
 #
 
 # host and port where buildbot listens
-bbot=bbt-odf103:9989
+bbot=psdev:9989
 
 usage() {
   echo Usage: `basename $0` '<release-name> <tags-file>' 1>&2
@@ -25,7 +25,7 @@ tags=$2
 #
 # directory for the new release
 #
-rels="/psdm/local/releases"
+rels="$LUSI_ROOT/sw/releases"
 
 #
 # Check that releases directory is there, if not we may be on wrong host
@@ -50,6 +50,11 @@ if [ ! -f "$tags" ] ; then
     echo "Tags file $tags does not exist, aborting." 1>&2
     exit 2
 fi
+
+#
+# Make absolute name for tags file
+#
+tags=$(cd $(dirname $tags); pwd)/$(basename $tags)
 
 #
 # Checkout the release
