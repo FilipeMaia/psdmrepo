@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 
-# SConscript file for any LUSI project
+# SConscript file for any SIT project
 Import('*')
 
 import os
@@ -24,13 +24,13 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 py_ver = env['PYTHON_VERSION']
 
 mxml_ver = "2.5"
-PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/mxml",mxml_ver)
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/mxml",mxml_ver)
 LIBDIR  = "lib"
 PKGLIBS = "mxml m"
 standardExternalPackage ( 'mxml', **locals() )
 
 nexus_ver = "4.1.0"
-PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/nexus",nexus_ver)
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/nexus",nexus_ver)
 DEPS    = "hdf5 mxml"
 INCDIR  = "include"
 LIBDIR  = "lib"
