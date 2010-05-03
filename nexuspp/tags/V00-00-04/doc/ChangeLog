@@ -1,0 +1,27 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package nexuspp
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-03
+2009-04-03 Andy Salnikov
+- use exceptions instead of error codes in many places
+- new file NxppExceptions.h contains all exception classes 
+- NxppTypeTraits.h: add support for int64_t,  uint64_t
+
+Tag: V00-00-02
+2009-02-05 Andy Salnikov
+- NxppTypeTraits::dataAddress(T) method should have been declared 
+  dataAddress(const T&)
+
+Tag: V00-00-01
+2008-12-08 Andy Salnikov
+- first import into SVN
