@@ -1,0 +1,29 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package Gnuplot
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+gppy_ver = "1.8"
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/gnuplot-py",gppy_ver)
+
+python_ver = env['PYTHON_VERSION']
+PYDIR = "lib/python"+python_ver+"/site-packages/Gnuplot"
+PYDIRSEP = True
+
+standardExternalPackage ( 'Gnuplot', **locals() )
