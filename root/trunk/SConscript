@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 
-# SConscript file for any LUSI project
+# SConscript file for any SIT project
 Import('*')
 
 from os.path import join as pjoin
@@ -20,7 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 root_ver = "5.24.00"
-PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/root",root_ver)
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/root",root_ver)
 
 INCDIR = "include/root"
 
