@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# Main SCons script for LUSI release building
+# Main SCons script for SIT release building
 #
 # $Id$
 #
@@ -31,10 +31,10 @@ _ld_opt = { 'opt' : '',
 # ===================================
 def setupCompilers ( env ) :
     
-    proc = env['LUSI_ARCH_PROC']
-    os = env['LUSI_ARCH_OS']
-    comp = env['LUSI_ARCH_COMPILER']
-    opt = env['LUSI_ARCH_OPT']
+    proc = env['SIT_ARCH_PROC']
+    os = env['SIT_ARCH_OS']
+    comp = env['SIT_ARCH_COMPILER']
+    opt = env['SIT_ARCH_OPT']
     
     if comp == 'gcc34' :
         env['CC'] = 'gcc34'

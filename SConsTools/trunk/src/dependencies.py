@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# Main SCons script for LUSI release building
+# Main SCons script for SIT release building
 #
 # $Id$
 #
@@ -8,7 +8,7 @@
 
 """
 This module is for managing the dependencies between the packages
-in the LUSI releases.
+in the SIT releases.
 
 It keeps the the dependency graph in the construction environment.
 The main structure is represented as a dictionary with one entry 
@@ -75,7 +75,7 @@ def _guessPackage ( path ):
     trace ( 'path: %s' % f, '_guessPackage', 9 )
     #
     # First try to see if it comes from boost, in which case it
-    # will be in the form .../arch/$LUSI_ARCH/geninc/boost/.....
+    # will be in the form .../arch/$SIT_ARCH/geninc/boost/.....
     #
     if len(f) > 4 :
         try :
@@ -92,7 +92,7 @@ def _guessPackage ( path ):
     try :
         x = f.index('geninc') 
         if f[x+2] == 'arch' :
-            # .../arch/$LUSI_ARCH/geninc/Package/file
+            # .../arch/$SIT_ARCH/geninc/Package/file
             trace ( 'Child comes from %s' % f[x-1], '_guessPackage', 8 )
             return f[x-1]
     except :
@@ -115,7 +115,7 @@ def findAllDependencies( node ):
     res = set()
     for child in node.children() :
         # take all children which are include files, i.e. they live in
-        # .../arch/${LUSI_ARCH}/genarch/Package/ or include/Package/ directory
+        # .../arch/${SIT_ARCH}/genarch/Package/ or include/Package/ directory
         f = str(child)
         trace ( 'Checking child %s' % f, 'findAllDependencies', 8 )
         p = _guessPackage ( f )

@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# SConscript fuction for standard LUSI package
+# SConscript fuction for standard SIT package
 #
 # $Id$
 #

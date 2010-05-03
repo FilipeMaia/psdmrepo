@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# Main SCons script for LUSI release building
+# Main SCons script for SIT release building
 #
 # $Id$
 #

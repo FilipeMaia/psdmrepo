@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# Main SCons script for LUSI release building
+# Main SCons script for SIT release building
 #
 # $Id$
 #
@@ -23,8 +23,8 @@ def buildEnv () :
     
     
     vars = Variables()
-    vars.Add('LUSI_ARCH', "Use to change the LUSI_ARCH value during build", os.environ['LUSI_ARCH'] )
-    vars.Add('LUSI_REPOS', "Use to change the LUSI_REPOS value during build", os.environ.get('LUSI_REPOS',"") )
+    vars.Add('SIT_ARCH', "Use to change the SIT_ARCH value during build", os.environ['SIT_ARCH'] )
+    vars.Add('SIT_REPOS', "Use to change the SIT_REPOS value during build", os.environ.get('SIT_REPOS',"") )
     vars.Add('PKG_DEPS_FILE', "name of the package dependency file", '.pkg_tree.pkl' )
     vars.Add('TRACE', "Set to positive value to trace processing", 0)
     
@@ -36,30 +36,30 @@ def buildEnv () :
     setTraceLevel ( tracev )
 
     # get repository list from it
-    lusi_repos = env['LUSI_REPOS']
-    lusi_repos = [ r for r in lusi_repos.split(':') if r ]
+    sit_repos = env['SIT_REPOS']
+    sit_repos = [ r for r in sit_repos.split(':') if r ]
     # all repos including local
-    all_lusi_repos = [ '#' ] + lusi_repos
+    all_sit_repos = [ '#' ] + sit_repos
 
     # arch parts
-    lusi_arch = env['LUSI_ARCH']
-    lusi_arch_parts = lusi_arch.split('-')
-    lusi_arch_base = '-'.join(lusi_arch_parts[0:3])
+    sit_arch = env['SIT_ARCH']
+    sit_arch_parts = sit_arch.split('-')
+    sit_arch_base = '-'.join(sit_arch_parts[0:3])
 
-    # LUSI_ROOT
-    lusi_root = os.environ.get( "LUSI_ROOT", "" )
+    # SIT_ROOT
+    sit_root = os.environ.get( "SIT_ROOT", "" )
 
     # build all paths    
-    archdir = pjoin("#arch/",lusi_arch)
+    archdir = pjoin("#arch/",sit_arch)
     archincdir = "${ARCHDIR}/geninc"
     bindir = "${ARCHDIR}/bin"
     libdir = "${ARCHDIR}/lib"
     pydir = "${ARCHDIR}/python"
     cpppath = []
-    for r in all_lusi_repos :
-        cpppath.append ( pjoin(r,"arch",lusi_arch,"geninc") )
+    for r in all_sit_repos :
+        cpppath.append ( pjoin(r,"arch",sit_arch,"geninc") )
         cpppath.append ( pjoin(r,"include") )
-    libpath = [ pjoin(r,"arch",lusi_arch,"lib") for r in all_lusi_repos ]
+    libpath = [ pjoin(r,"arch",sit_arch,"lib") for r in all_sit_repos ]
     
     # set other variables in environment
     env.Replace( ARCHDIR = archdir,
@@ -69,13 +69,13 @@ def buildEnv () :
                  PYDIR = pydir,
                  CPPPATH = cpppath,
                  LIBPATH = libpath,
-                 LUSI_ROOT = lusi_root,
-                 LUSI_ARCH_PROC = lusi_arch_parts[0],
-                 LUSI_ARCH_OS = lusi_arch_parts[1],
-                 LUSI_ARCH_COMPILER = lusi_arch_parts[2],
-                 LUSI_ARCH_OPT = lusi_arch_parts[3],
-                 LUSI_ARCH_BASE = lusi_arch_base,
-                 LUSI_REPOS = lusi_repos,
+                 SIT_ROOT = sit_root,
+                 SIT_ARCH_PROC = sit_arch_parts[0],
+                 SIT_ARCH_OS = sit_arch_parts[1],
+                 SIT_ARCH_COMPILER = sit_arch_parts[2],
+                 SIT_ARCH_OPT = sit_arch_parts[3],
+                 SIT_ARCH_BASE = sit_arch_base,
+                 SIT_REPOS = sit_repos,
                  PKG_TREE = {},
                  PKG_TREE_BASE = {},
                  PKG_TREE_BINDEPS = {},
@@ -96,7 +96,7 @@ def buildEnv () :
     
     #trace ( "Build env = "+pprint.pformat(env.Dictionary()), "buildEnv", 7 )
     
-    #for r in lusi_repos :
+    #for r in sit_repos :
     #    trace ( "Add repository "+r, "<top>", 2 )
     #    Repository( r )
 

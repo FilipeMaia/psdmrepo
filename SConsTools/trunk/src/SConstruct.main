@@ -1,7 +1,7 @@
 #!/bin/env scons
 #===============================================================================
 #
-# Main SCons script for LUSI release building
+# Main SCons script for SIT release building
 #
 # $Id$
 #
@@ -14,27 +14,27 @@ from os.path import join as pjoin
 
 cwd = os.getcwd()
 
-#   check that LUSI_ARCH is defined
-lusi_arch=os.environ.get( "LUSI_ARCH", None )
-if not lusi_arch :
-    print >> sys.stderr, "Environment variable LUSI_ARCH is not defined"
+#   check that SIT_ARCH is defined
+sit_arch=os.environ.get( "SIT_ARCH", None )
+if not sit_arch :
+    print >> sys.stderr, "Environment variable SIT_ARCH is not defined"
     Exit(2)
-lusi_root=os.environ.get( "LUSI_ROOT", None )
-if not lusi_root :
-    print >> sys.stderr, "Environment variable LUSI_ROOT is not defined"
+sit_root=os.environ.get( "SIT_ROOT", None )
+if not sit_root :
+    print >> sys.stderr, "Environment variable SIT_ROOT is not defined"
     Exit(2)
 
 #
 # Before doing any other imports link the python files from
-# SConsTools/src/*.py to arch/$LUSI_ARCH/python/SConsTools/
+# SConsTools/src/*.py to arch/$SIT_ARCH/python/SConsTools/
 #
 if os.path.isdir("SConsTools/src") :
     
     # list of python files in SConsTools/src
     pys = set ( [ f for f in os.listdir("SConsTools/src") if os.path.splitext(f)[1] == ".py" ] )
     
-    # list of links in arch/$LUSI_ARCH/python/SConsTools
-    d = pjoin("arch",lusi_arch,"python/SConsTools")
+    # list of links in arch/$SIT_ARCH/python/SConsTools
+    d = pjoin("arch",sit_arch,"python/SConsTools")
     if not os.path.isdir(d) : os.makedirs(d) 
     links = set ( [ f for f in os.listdir(d) if os.path.splitext(f)[1] == ".py" ] )
     
@@ -94,7 +94,7 @@ makePackageLinks ( "web", packages )
 #
 # load package dependencies from base releases
 #
-for r in reversed(env['LUSI_REPOS']) :
+for r in reversed(env['SIT_REPOS']) :
     fname = pjoin ( r, env['PKG_DEPS_FILE'] )
     if os.path.isfile ( fname ) :
         loadPkgDeps ( env, fname )
@@ -105,7 +105,7 @@ for r in reversed(env['LUSI_REPOS']) :
 #
 for p in packages :
     scons = pjoin(p,"SConscript")
-    build = pjoin("#build",env['LUSI_ARCH'],p)
+    build = pjoin("#build",env['SIT_ARCH'],p)
     env.SConscript( pjoin(p,"SConscript"), 
                 variant_dir=build,
                 src_dir='#'+p, 

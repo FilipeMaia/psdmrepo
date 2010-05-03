@@ -1,6 +1,6 @@
 #===============================================================================
 #
-# SConscript fuction for standard external package
+# SConscript function for standard external package
 #
 # $Id$
 #
@@ -27,26 +27,26 @@ from SConsTools.dependencies import *
 #
 def _prefix ( prefix, env ):
     
-    # if prefix ends with LUSI_ARCH, discard it
+    # if prefix ends with SIT_ARCH, discard it
     head, tail = os.path.split( prefix )
     if not tail : head, tail = os.path.split( head )        
-    if tail == env['LUSI_ARCH'] : prefix = head
+    if tail == env['SIT_ARCH'] : prefix = head
 
-    # First try $LUSI_ARCH
-    pfx = pjoin( prefix, env['LUSI_ARCH'] )
+    # First try $SIT_ARCH
+    pfx = pjoin( prefix, env['SIT_ARCH'] )
     if os.path.isdir( pfx ) : return pfx
 
     # for 'prof' try to substitute with 'dbg'
-    if env['LUSI_ARCH_OPT'] == 'prof' :
-        pfx = pjoin( prefix, env['LUSI_ARCH_BASE']+'-dbg' )
+    if env['SIT_ARCH_OPT'] == 'prof' :
+        pfx = pjoin( prefix, env['SIT_ARCH_BASE']+'-dbg' )
         if os.path.isdir( pfx ) : return pfx
 
-    # Then try $LUSI_ARCH_BASE
-    pfx = pjoin( prefix, env['LUSI_ARCH_BASE'] )
+    # Then try $SIT_ARCH_BASE
+    pfx = pjoin( prefix, env['SIT_ARCH_BASE'] )
     if os.path.isdir( pfx ) : return pfx
 
     # otherwise try 'opt'
-    pfx = pjoin( prefix, env['LUSI_ARCH_BASE']+'-opt' )
+    pfx = pjoin( prefix, env['SIT_ARCH_BASE']+'-opt' )
     if os.path.isdir( pfx ) : return pfx
 
     # nothing works, just return what we have
@@ -92,7 +92,7 @@ def standardExternalPackage ( package, **kw ) :
         PYDIR    - Python src directory, absolute or relative to PREFIX
         LINKPY   - Python files to link (patterns), or all files if not present
         PYDIRSEP - if present and evaluates to True installs python code to a 
-                   separate directory arch/$LUSI_ARCH/python/<package>
+                   separate directory arch/$SIT_ARCH/python/<package>
         LIBDIR   - libraries directory, absolute or relative to PREFIX
         LINKLIBS - library names to link, or all libs if not present
         BINDIR   - binaries directory, absolute or relative to PREFIX
