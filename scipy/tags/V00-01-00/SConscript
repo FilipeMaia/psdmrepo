@@ -1,0 +1,42 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: SConscript 806 2010-03-26 17:32:36Z salnikov $
+#
+# Description:
+#  SConscript file for package scipy
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+# it also needs ATLAS numeric stuff (shared libs only)
+atlas_ver = "3.8.3"
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/atlas",atlas_ver)
+LIBDIR = 'lib'
+LINKLIBS = "*.so"
+standardExternalPackage ( 'atlas', **locals() )
+
+
+del LIBDIR
+del LINKLIBS
+
+scipy_ver = "0.7.1"
+python_ver = env['PYTHON_VERSION']
+PREFIX  = pjoin(env['SIT_ROOT'], "sw/external/scipy", scipy_ver)
+
+PYDIR = "lib"
+if env['SIT_ARCH_PROC'] == 'x86_64' : PYDIR = "lib64"
+PYDIR += "/python"+python_ver+"/site-packages/scipy"
+PYDIRSEP = True
+
+standardExternalPackage ( 'scipy', **locals() )
