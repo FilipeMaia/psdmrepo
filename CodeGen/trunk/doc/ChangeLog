@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2010-05-03 Andy Salnikov
+- switching to SIT environment
+
 Tag: V00-00-12
 2010-04-05 Andy Salnikov
 - added templates for pyana-module, SConscript-external

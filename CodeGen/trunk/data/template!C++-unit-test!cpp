@@ -6,7 +6,7 @@
 //	Test suite case for the $class.
 //
 //------------------------------------------------------------------------
-#include "Lusi/Lusi.h"
+#include "SITConfig/SITConfig.h"
 
 //---------------
 // C++ Headers --

@@ -30,9 +30,9 @@ _kwgen = 'codegen_kwgen.py'
 def main( argv ):
 
     # find default location of the _kwgen file
-    datapath = os.getenv("LUSI_DATA")
+    datapath = os.getenv("SIT_DATA")
     if not datapath :
-        print >> sys.stderr, "Environment variable LUSI_DATA is not defined, exiting"
+        print >> sys.stderr, "Environment variable SIT_DATA is not defined, exiting"
         return 2
     dir = None
     for d in datapath.split(':') :

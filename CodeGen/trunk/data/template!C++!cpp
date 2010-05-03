@@ -9,7 +9,7 @@
 //      $author
 //
 //------------------------------------------------------------------------
-#include "Lusi/Lusi.h"
+#include "SITConfig/SITConfig.h"
 
 //-----------------------
 // This Class's Header --

@@ -16,7 +16,7 @@ This is the "library module" as opposed to executable module. Library
 modules provide class definitions or function definitions, but these
 scripts cannot be run by themselves.
 
-This software was developed for the LUSI project.  If you use all or 
+This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
 
 @see RelatedModule
@@ -89,7 +89,7 @@ class $class $BASEDECL :
     """Brief description of a class.
 
     Full description of this class. The whole purpose of this class is 
-    to serve as an example for LUSI users. It shows the structure of
+    to serve as an example for SIT users. It shows the structure of
     the code inside the class. Class can have class (static) variables, 
     which can be private or public. It is good idea to define constructor 
     for your class (in Python there is only one constructor). Put your 

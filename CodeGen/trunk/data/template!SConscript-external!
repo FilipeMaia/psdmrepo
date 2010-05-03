@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 
-# SConscript file for any LUSI project
+# SConscript file for any SIT project
 Import('*')
 
 from SConsTools.standardExternalPackage import standardExternalPackage
@@ -23,7 +23,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #    PYDIR    - Python src directory, absolute or relative to PREFIX
 #    LINKPY   - Python files to link (patterns), or all files if not present
 #    PYDIRSEP - if present and evaluates to True installs python code to a 
-#               separate directory arch/$LUSI_ARCH/python/<package>
+#               separate directory arch/$SIT_ARCH/python/<package>
 #    LIBDIR   - libraries directory, absolute or relative to PREFIX
 #    LINKLIBS - library names to link, or all libs if not present
 #    BINDIR   - binaries directory, absolute or relative to PREFIX
@@ -37,7 +37,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 pkg = "$package"
 pkg_ver = "0.0.1b"
 
-PREFIX  = os.path.join(env['LUSI_ROOT'], "sw/external", pkg, pkg_ver)
+PREFIX  = os.path.join(env['SIT_ROOT'], "sw/external", pkg, pkg_ver)
 INCDIR = "include"
 BINDIR = "bin"
 LIBDIR = "lib"

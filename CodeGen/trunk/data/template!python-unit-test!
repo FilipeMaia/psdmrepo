@@ -12,12 +12,12 @@
 
 Following paragraphs provide detailed description of the module, its
 contents and usage. This is a template module (or module template:)
-which will be used by LUSI programmers to create new Python scripts.
+which will be used by LCLS programmers to create new Python scripts.
 This is the "executable module" as opposed to library module. Executable
 modules are mangled (@PYTHON@ above replaced with real path to 
-interpreter plus some extra options) and copied to arch/$LUSI_ARCH/bin area.
+interpreter plus some extra options) and copied to arch/$SIT_ARCH/bin area.
 
-This software was developed for the LUSI project.  If you use all or 
+This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgement.
 
 @see RelatedModule
