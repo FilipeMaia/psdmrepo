@@ -22,6 +22,7 @@ Usage: `basename $0` [options] [release ...]
     -n          do not print header
     -r          do not decorate tags
     -p package  print info for specified package(s)
+    -f file     read list of packages from a file
     -a          list all packages from all releases
     -t string   field delimiter string
     
@@ -182,13 +183,14 @@ decorate="yes"
 allpkgs="no"
 
 # get the options
-while getopts hdnt:rap: c ; do
+while getopts hdnt:rap:f: c ; do
   case $c in
     h) usage ; exit 0 ;;
     d) set -x ;;
     n) header="no" ;;
     t) delim="$OPTARG" ;;
     p) packages="$packages $OPTARG" ;;
+    f) packages="$packages $(cat $OPTARG)" ;;
     r) decorate="no" ;;
     a) allpkgs="yes" ;;
     \?) usage ; exit 2 ;;
