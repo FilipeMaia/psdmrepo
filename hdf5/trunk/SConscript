@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 
-# SConscript file for any LUSI project
+# SConscript file for any SIT project
 Import('*')
 
 import os
@@ -21,14 +21,14 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 szip_ver = "2.1"
-PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/szip",szip_ver)
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/szip",szip_ver)
 LIBDIR  = "lib"
 PKGLIBS = "sz" 
 standardExternalPackage ( 'szip', **locals() )
 
 
 hdf5_ver = "1.8.4p1"
-PREFIX  = pjoin(env['LUSI_ROOT'],"sw/external/hdf5",hdf5_ver)
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/hdf5",hdf5_ver)
 INCDIR  = "include"
 LIBDIR  = "lib"
 BINDIR  = "bin"
