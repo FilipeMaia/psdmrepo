@@ -1,0 +1,51 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <script language="javascript">
+        function expander_highlight( which ) {
+            which.style.backgroundColor = '#efefef';    // #cfecec';    // 'Light Cyan 2''
+        }
+        function expander_unhighlight( which, color ) {
+            which.style.backgroundColor = color;
+        }
+        function expander_toggle( hid, bid ) {
+            var h = document.getElementById(hid);
+            var b = document.getElementById(bid);
+            if( h.innerHTML == '+' ) {
+                h.innerHTML='-';
+                b.style.display = 'block';
+            } else {
+                h.innerHTML='+';
+                b.style.display = 'none';
+            }
+        }
+    </script>
+    <div style="position:relative;">
+
+      <div style="width:14px; height:14px; border:solid 1px #c0c0c0;"
+           onclick="javascript:expander_toggle('message_header_1','message_body_1')"
+           onmouseover="javascript:expander_highlight(this)"
+           onmouseout="javascript:expander_unhighlight(this,document.bgColor)">
+        <center><span id="message_header_1" style="font-size:13px;">+</span></center>
+      </div>
+      <div id="message_body_1" style="display:none; position:absolute; left:0px; top:20px;">Here comes the 1-rst message body</div>
+    </div>
+    <div style="position:relative;">
+      <div style="width:14px; height:14px; border:solid 1px #c0c0c0;"
+           onclick="javascript:expander_toggle('message_header_2','message_body_2')"
+           onmouseover="javascript:expander_highlight(this)"
+           onmouseout="javascript:expander_unhighlight(this,document.bgColor)">
+        <center><span id="message_header_2" style="font-size:13px;">+</span></center>
+      </div>
+      <div id="message_body_2" style="display:none; position:absolute; left:20px; top:0px;">Here comes the 2-d message body</div>
+    </div>
+  </body>
+</html>
