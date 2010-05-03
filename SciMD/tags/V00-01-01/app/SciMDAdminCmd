@@ -1,0 +1,1038 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script SciMDCmd...
+#
+#------------------------------------------------------------------------
+
+"""Brief one-line description of the script.
+
+Following paragraphs provide detailed description of the module, its
+contents and usage. This is a template module (or module template:)
+which will be used by LUSI programmers to create new Python scripts.
+This is the "executable module" as opposed to library module. Executable
+modules are mangled (@PYTHON@ above replaced with real path to
+interpreter plus some extra options) and copied to arch/$LUSI_ARCH/bin area.
+
+This software was developed for the LUSI project.  If you use all or
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id: template!python-main! 8 2008-10-08 22:35:33Z salnikov $
+
+@author Igor Gaponenko
+"""
+
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 8 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys, os
+import MySQLdb
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+from LusiPython.DbConnection import DbConnection
+from LusiTime.Time import Time
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+#from PkgPackage.PkgModule import PkgClass
+
+#---------------------
+# Local definitions --
+#---------------------
+
+# local variable accessible in this module only
+_OP_X = 'Y'
+
+#-------------------
+# Local functions --
+#-------------------
+
+def default_scimd_conn_str():
+    return "Database=SCIMD;"
+
+def default_regdb_conn_str():
+    return "Database=REGDB;"
+
+def _time2str(timestamp):
+    """Trun a number 64-bit timestamp got from the database into
+    a string. Return an empty string if the input object is None"""
+
+    if timestamp is None: return ''
+    return "%s" % Time.from64(timestamp)
+
+#--------------------------
+# Specialized exceptions --
+#--------------------------
+
+class DatabaseOperatonFailed(Exception):
+    def __init__ (self, message):
+        self.__message = message
+
+    def __str__ (self):
+        return repr(self.__message)
+
+#--------------------------------
+# Application class definition --
+#--------------------------------
+
+class SciMDCmd ( LusiPyApp ) :
+
+    # ===============================================
+    # An indirection for handling the standard output
+    # ===============================================
+
+    __out = sys.stdout
+
+    def print_out (self, *params):
+        for p in params:
+            self.__out.write(p)
+        self.__out.write("\n")
+
+    # =========================================================================
+    # Command handlers are register in the dictionary. There is a separate list
+    # to specify an order in which the command information is reported by
+    # the tool.
+    # =========================================================================
+
+    __cmd_handlers = {};
+    __cmd_order = [];
+
+    def __add_handler(self, command, syntax, description, handler, connects2server=True):
+        self.__cmd_handlers[command] = {
+        'SYNTAX':syntax,
+        'DESCRIPTION':description,
+        'HANDLER':handler,
+        'CONNECTS2SERVER':connects2server}
+        self.__cmd_order.append(command)
+
+    def __usage(self, command):
+        print "Usage: %s  %s" % (command, self.__cmd_handlers[command]['SYNTAX'])
+
+    # =======================================================================
+    # Database connection parameters and connection handle. They would change
+    # their default state at the first attempt to connect to the database.
+    # =======================================================================
+
+    __connection_scimd = None
+    __connection_regdb = None
+
+    # ===========
+    # constructor
+    # ===========
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ (
+            self,
+            installLogger = True,
+            usage = "usage: %prog [<command>] [<parameters>] [<options>]" )
+
+        # Add application options, see optparse module for details -------------
+        #
+        self._parser.add_option ( '-s', "--scimd-conn-str",
+								  action="store", dest="scimd_conn_str", default=default_scimd_conn_str(),
+				      			  help="connection string for SciMD" )
+
+        self._parser.add_option ( '-r', "--regdb-conn-str",
+								  action="store", dest="regdb_conn_str", default=default_regdb_conn_str(),
+				      			  help="connection string for RegDB" )
+
+        self._parser.add_option ( '-o', "--output",
+                                  action="store", dest="output", default=None,
+                                  help="send output to file instead of STDOUT" )
+
+        self._parser.add_option ( '-d', "--description",
+                                  action="store", dest="description", default=None,
+                                  help="a description given as a parameter's value" )
+
+        self._parser.add_option ( '-f', "--description-file",
+                                  action="store", dest="description_file", default=None,
+                                  help="a description stored in a file" )
+
+        self._parser.add_option ( '-l', "--long",
+                                  action="count", dest="long", default=0,
+                                  help="produce the detailed output" )
+
+        self._parser.add_option ( '-t', "--truncate-no",
+                                  action="count", dest="truncate_no", default=0,
+                                  help="do not truncate long multiline strings in output" )
+
+        self._parser.add_option ( '-u', "--update",
+                                  action="count", dest="update", default=0,
+                                  help="allow updating an existing entry" )
+
+
+        # Register command handlers for known command --------------------------
+        #
+        self.__add_handler(
+            'help',
+            '[<command> [<command> [...]]]',
+            """
+    If no specific command (or commands) will be presented
+    then general information about the tool will be printed.
+    Otherwise detailed description of each command will be
+    printed.
+    """,
+            self.__cmd_help,
+            connects2server=False);
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'run_params',
+            '<instrument> <experiment>',
+            """
+    List definitions of run parameters for an experiment.
+
+    The following option will trigger the detailed report on
+    the parameters of selected entries:
+
+        --long
+
+    If the option isn't specified only names of parameters will
+    be reported.
+
+    Note, that by default the long multiline description strings
+    will get truncated in the output. Use the truncation off by
+    passing the following option to the command:
+
+        --truncate-no
+    """,
+            self.__cmd_run_param_defs);
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'define_run_param',
+            '<instrument> <experiment> <name> <type>',
+            """
+    Define a new parameter to be associated with any runs of
+    an experiment. The operation needs to be performed just once
+    per parameter and per experiment. Then different values
+    of the parameter will be set for each run of the experiment.
+    Note, that a particular run (including those taken before adding
+    the parameter) may not have any values of that parameter. The type
+    of the parameter can be anything from the following list:
+
+        INT
+        INT64
+        DOUBLE
+        TEXT
+
+    The parameter may get an optional description by using one of
+    the following mutually exclusive options:
+
+        --description=<short description>
+        --description_file=<file>
+    """,
+            self.__cmd_define_run_param);
+        #
+        # ----------------------------------------------------------------------
+        #
+
+        self.__add_handler(
+            'remove_run_param',
+            '<instrument> <experiment> <name>',
+            """
+    Remove an existing run parameter from an experiment.
+    Note, that all information previously associated with
+    the parameter will be completelly lost from the database.
+        """,
+             self.__cmd_remove_run_param)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'runs',
+            '<instrument> <experiment> [<run>]',
+            """
+    The command will print an information about runs. If no specific run
+    is requested all runs will be reported.
+    """,
+            self.__cmd_runs)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'add_run',
+            '<instrument> <experiment> <run> <type> <begin_time> <end_time>',
+            """
+    The command will create a database record for the specified run.
+    At a time this application was being written the following run
+    types were supported (this list may be extended later):
+
+        DATA    - for regular data runs
+        CALIB   - for calibration runs
+
+    The begin and end run timestamps should have the following
+    format and be included into single or double quotes:
+
+        "2009-03-13 15:37:23"
+
+    Also note the following:
+
+    - each experiment has its own set of runs. The run numbers
+      have a scope within their experiment.
+
+    - runs numbers should increase as they're added to the database.
+      Adding runs back in time isn't allowed.
+
+    - run intervals should not overlap; an interval of a consequtive
+      run should follow the previous one (gaps allowed); an interval
+      should fit into an interval of the corresponding experiment.
+
+    - the timestamps are interpreted in the local timezone
+    """,
+            self.__cmd_add_run)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'remove_runs',
+            '<instrument> <experiment> { <run> | [<first_run>]:[<last_run>] | ALL }',
+            """
+    The command will remove specified run (or runs) from a database.
+    There are three ways to specify which run(s) to remnove:
+
+        <run>                   - to delete a single run
+        <first_run>:            - to delete a range of runs starting (including) from the specified one
+                   :<last_run>  - to delete a range of runs ending (including) the specified one
+        <first_run>:<last_run>  - to delete a range of runs with both ends included
+        ALL                     - to delete all known runs of an experiment
+
+    Also note the following:
+
+    - values of run parameters (if any) which were set for specified run(s)
+      will also be deleted from the database.
+    """,
+            self.__cmd_remove_runs)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'list',
+            '<instrument> <experiment> <run> [<param_name> [<param_name> [..]]',
+            """
+    If no names of parameters are presented then list all
+    names and possibly (if the below explained "long"
+    option is given) their descriptions and partial values
+    (just their begining). Otherwise print detailed information
+    on each requested parameter.
+
+    The following option will trigger the detailed report on
+    the parameters of selected entries:
+
+        --long
+
+    Note, that by default the long multiline description strings
+    will get truncated in the output. Use the truncation off by
+    passing the following option to the command:
+
+        --truncate-no
+    """,
+            self.__cmd_list)
+        #
+        # ----------------------------------------------------------------------
+        #
+        self.__add_handler(
+            'set',
+            '<instrument> <experiment> <run> <param_name> <value> <source>',
+            """
+    Set a value of the previously defined parameter for the given run.
+    The last parameter describes a source from which the parameters was
+    obtained. The following sources were anticipated at a time when
+    the database was being designed:
+
+        XTC       - from data files
+        EPICS     - from Experiment Control stream
+        LOGBOOK   - from Experiment Loogbook records
+
+    Although the parameter may have take an arbitrary text, it would
+    make a sense to have a certain well defined naming convention for
+    the sources.
+
+    The following option should be used to allow updating an existing
+    value of the parameter:
+
+        --update
+
+    Also note the following:
+
+    - the run must have already been known in the database
+
+    - the previous (if set) value of the parameter for the run
+      will be overwritten by the command
+
+    - the input value must have an appropriate type as it was
+      requested when creating the parameter.
+    """,
+            self.__cmd_set)
+
+    # ============================================================
+    # Run the whole thing after parsing the command argunments and
+    # installing logger. See BbrPyApp class for details.
+    # ============================================================
+
+    def _run ( self ) :
+
+        # Print the list of supported commands of none is given ----------------
+        #
+        if not self._args :
+            self.__cmd_help('help', self._args)
+            return 0
+
+        # Open output file -----------------------------------------------------
+        #
+        if self._options.output:
+            self.debug( "Open alternative output file" )
+            self.__out = open ( self._options.output, "w" )
+
+        # Get the command name,  connect to the server (unless we're -----------
+        #  dealing with the command which doesn't need this) and invoke
+        # the corresponding handler.
+        #
+        command = self._args[0]
+        if command not in self.__cmd_handlers:
+            self._parser.error("unknown command: %s" % command)
+            return 2
+
+        self.trace( "command: %s: arguments: %s" % (command,str(self._args[1:])))
+
+        if self.__cmd_handlers[command]['CONNECTS2SERVER']: self.__connect()
+        return self.__cmd_handlers[command]['HANDLER'](command, self._args[1:])
+
+    # ===========================================
+    # Print the information on supported commands
+    # ===========================================
+
+    def __cmd_help ( self, command, args ) :
+
+        names = args
+        if names is not None and len(names) > 0:
+            verbose = True
+        else:
+            names = self.__cmd_order
+            verbose = False
+
+        if verbose:
+
+            # Print full description of each command
+            #
+            for name in names:
+                self.print_out("""COMMAND:
+
+    %s
+
+PARAMETERS:
+
+    %s
+
+DESCRIPTION:
+%s
+""" % (name,
+         self.__cmd_handlers[name]['SYNTAX'],
+         self.__cmd_handlers[name]['DESCRIPTION']))
+
+        else:
+
+            self.print_out("""APPLICATION:
+
+    %s
+
+        This is the management and report utility for Science Metadata
+        Database. The application has been developed in a context of
+        the OFFLINE Data Management Project for LCLS/LUSI experiments.
+
+USAGE:
+
+    command [parameters] [options]
+
+    help
+    help [command [command ...]]   (for detailed explanation)
+
+    -h | --help                    (for a full list of available options)
+
+SUPPORTED COMMANDS:
+""" %  os.path.basename(sys.argv[0]))
+
+            # Reserve enough space for the command names based on
+            # the longest name.
+            #
+            max_len = 1
+            for name in names:
+                if len(name) > max_len: max_len = len(name)
+            fmt = "    %-"+str(max_len)+"s  %s"
+            for name in names:
+                self.print_out(fmt % (name, self.__cmd_handlers[name]['SYNTAX']))
+
+            self.print_out()
+
+        return 0
+
+    # ================================================
+    # Manage configuration parameters of an experiment
+    # ================================================
+
+    def __cmd_run_param_defs (self, command, args):
+
+        if len(args) != 2:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+        instrument = args[0]
+        experiment = args[1]
+
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT rp.*'+
+            ' FROM "run_param" AS "rp"'+
+            """ WHERE "rp"."exper_id"=%s""" % (self._exper_id( instrument, experiment ),),
+            return_dict=True)
+        if not rows: return 1
+
+        for r in rows:
+            if self._options.long:
+                self.print_out("""
+  %s
+
+    TYPE        : %s
+    DESCRIPTION : %s""" % (
+        r['param'],
+        r['type'],
+        self._description_hint(r['descr'])))
+
+            else:
+                self.print_out(r['param'])
+
+        return 0
+
+    def __cmd_define_run_param (self, command, args):
+
+        if len(args) != 4:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+        instrument = args[0]
+        experiment = args[1]
+        name       = args[2]
+        type       = args[3]
+
+        if type not in ('INT', 'INT64', 'DOUBLE', 'TEXT'):
+            self._parser.error("unsupported parameter type: %s" % type)
+
+        if not self.__simple_query(
+            "SET SESSION SQL_MODE='ANSI'",
+            "START TRANSACTION",
+            """INSERT INTO "run_param" VALUES(NULL,'%s',%s,'%s','%s')""" % (
+                name,
+                self._exper_id( instrument, experiment ),
+                type,
+                self._description()),
+            "COMMIT"): return 1
+
+        return 0
+
+    def __cmd_remove_run_param (self, command, args):
+
+        if len(args) != 3:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+        instrument = args[0]
+        experiment = args[1]
+        name       = args[2]
+
+        self._parser.error("the command isn't implemented: %s" % command)
+
+        return 1
+
+    # ==========================
+    # Print a list of known runs
+    # ==========================
+
+    def __cmd_runs ( self, command, args ):
+
+        if len(args) != 2:
+            self._parser.error("insufficient number of parameters for command: %s" % command)
+
+        instrument = args[0]
+        experiment = args[1]
+
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT * FROM "run" AS "r"'+
+            """ WHERE "r"."exper_id"=%s""" % (self._exper_id( instrument, experiment ),)+
+            ' ORDER by "r"."num"',
+            return_dict=True)
+        if not rows: return 1
+
+        for r in rows:
+##            for k in r.keys():
+##                self.print_out(k, ":", r[k])
+            self.print_out("  %10d  %-5s  %-19s  %-19s" % (
+                r['num'],
+                r['type'],
+                _time2str(r['begin_time']),
+                _time2str(r['end_time'])))
+
+        return 0
+
+    # =============================
+    # Create an entry for a new run
+    # =============================
+
+    def __cmd_add_run ( self, command, args ):
+
+        if len(args) != 6:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+        (instrument, experiment, run, type, begin_time, end_time) = args
+
+        # Parse and reconvert timestamps into packed format
+        try:
+            begin_time = Time.parse(begin_time).to64()
+            end_time   = Time.parse(end_time).to64()
+        except Exception, ex:
+            self._parser.error("failed to parse begin/end run timestamps due to: %s" % ex)
+            return 1
+
+        if not self.__simple_query(
+            "SET SESSION SQL_MODE='ANSI'",
+            "START TRANSACTION",
+            """INSERT INTO "run" VALUES(NULL,%s,%s,'%s',%s,%s)""" % (
+                run,self._exper_id( instrument, experiment ),type,begin_time,end_time),
+            "COMMIT"): return 1
+
+        return 0
+
+    # =============
+    # Remove run(s)
+    # =============
+
+    def __cmd_remove_runs ( self, command, args ):
+
+        if len(args) != 3:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+        (instrument, experiment, range_of_runs) = args
+
+        # Translate the range of runs into an SQL condition
+        range_condition = ''  # default: all runs
+        try:
+            if range_of_runs == 'ALL': pass
+            else:
+                idx = range_of_runs.find(':')
+                if idx == -1:
+                    range_condition = " AND num=%d" % int( range_of_runs )
+
+                else:
+                    (first_run,last_run) = (None,None)
+
+                    if idx > 0:                     first_run = int( range_of_runs[0:idx] )
+                    if idx +1 < len(range_of_runs): last_run  = int( range_of_runs[idx+1:] )
+                    if first_run is None and last_run is None:
+                        self._parser.error("empty range of runs isn't allowed")
+
+                    if first_run is not None and last_run is not None:
+                        if first_run >= last_run:
+                            self._parser.error("incorrect range of runs: the first run number must be strictly less")
+
+                    if first_run is not None: range_condition += " AND num >= %d" % first_run
+                    if last_run  is not None: range_condition += " AND num <= %d" % last_run
+
+        except ValueError, ex:
+            self._parser.error("not an integer value where a run number expected")
+            return 1
+
+        statements = [
+            "SET SESSION SQL_MODE='ANSI'",
+            "START TRANSACTION"
+        ]
+        for table in ('run_val', 'run_val_text', 'run_val_int', 'run_val_int64','run_val_double'):
+            statements.append(
+                """DELETE FROM "%s" WHERE run_id IN (SELECT run_id FROM "run" WHERE exper_id=%s %s)""" % (
+                    table,self._exper_id( instrument, experiment ),range_condition ))
+        statements.append(
+            """DELETE FROM "run" WHERE exper_id=%s %s""" % (
+                self._exper_id( instrument, experiment ),range_condition))
+        statements.append("COMMIT")
+
+        if not self.__simple_query( *statements ): return 1
+
+        return 0
+
+    # ==============================================================
+    # Operations with values of run parameters for an experiment/run
+    # ==============================================================
+
+    def __cmd_list (self, command, args):
+
+        if len(args) < 3:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+
+        # Get the operation name, analyze its parameters and switch ------------
+        # to its processor.
+        #
+        instrument = args[0]
+        experiment = args[1]
+        run        = args[2]
+
+        params = args[3:]
+
+        # Restrict the query to specific parameters only if requested ----------
+        #
+        limits = ""
+        if len(params):
+            limits = """ AND "p"."param" IN (%s)""" % (", ".join(["'%s'" % p for p in params]),)
+
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT *'+
+            ' FROM "run_param" AS "p"'+
+            """ WHERE "p"."exper_id"=%s""" % (self._exper_id( instrument, experiment ),) +limits,
+            return_dict=True)
+        if not rows: return 1
+
+        for rp in rows:
+
+            #  The value is to be fetched from another table whose name
+            # is determined by a type of the parameter.
+            #
+            run_val_table = ""
+            if   rp['type'] == "TEXT"  : run_val_table = "run_val_text"
+            elif rp['type'] == "INT"   : run_val_table = "run_val_int"
+            elif rp['type'] == "INT64" : run_val_table = "run_val_int64"
+            elif rp['type'] == "DOUBLE": run_val_table = "run_val_double"
+            else:
+                return 1
+
+            sql = "".join([
+               'SELECT rv.source "source", rv.updated "updated", v.val "val"',
+               """ FROM "run_val" AS "rv", "%s" AS "v", "run" AS "r" """ % (run_val_table,),
+               """ WHERE "r"."exper_id"=%s AND "r"."num"=%s""" % (self._exper_id( instrument, experiment ),run),
+               """ AND "r"."id"="rv"."run_id" AND "r"."id"="v"."run_id" AND "rv"."param_id"=%s AND "v"."param_id"=%s""" % (rp['id'],rp['id'])])
+
+            value = ""
+            source = ""
+            updated = ""
+
+            v_rows = self.__select_query(sql,return_dict=True)
+            #if not v_rows: return 1
+            for r in v_rows:
+                value   = r['val']
+                updated = r['updated']
+                source  = r['source']
+                break
+
+            if self._options.long:
+                self.print_out("""
+  %s
+
+    DESCRIPTION : %s
+    TYPE        : %s
+    VALUE       : %s
+    UPDATED     : %s
+    FROM SOURCE : %s""" % (
+        rp['param'],
+        rp['descr'],
+        rp['type'],
+        value,
+        _time2str(updated),
+        source))
+
+            else:
+                self.print_out("%s: %s" % (rp['param'], value))
+
+        return 0
+
+    def __cmd_set (self, command, args):
+
+        if len(args) != 6:
+            self._parser.error("insuffcient number of parameters for command: %s" % command)
+
+        instrument = args[0]
+        experiment = args[1]
+        run        = args[2]
+        name       = args[3]
+        value      = args[4]
+        source     = args[5]
+
+        # Get a type of the parameter (we need the one to put-------------------
+        # parameter's value into the right table).
+        #
+        if not self.__simple_query("SET SESSION SQL_MODE='ANSI'"): return 1
+        rows = self.__select_query(
+            'SELECT *'+
+            ' FROM "run_param" AS "p"'+
+            """ WHERE "p"."exper_id"=%s AND "p"."param"='%s'""" % (self._exper_id( instrument, experiment ),name),
+            return_dict=True)
+        if not rows: return 1
+
+        p_id   = rows[0]['id']
+        p_type = rows[0]['type']
+
+        run_val_table = ""
+        p_val = value
+        if   p_type == "TEXT"  :
+            run_val_table = "run_val_text"
+            p_val = "'%s'" % value
+        elif p_type == "INT"   : run_val_table = "run_val_int"
+        elif p_type == "INT64" : run_val_table = "run_val_int64"
+        elif p_type == "DOUBLE": run_val_table = "run_val_double"
+        else:
+            return 1
+
+        # We also need identifiers of the experiment and the run----------------
+        #
+        exper_id = self._exper_id( instrument, experiment )
+        run_id   = self._run_id( exper_id, run )
+
+        # Using the current timestamp as a value update time--------------------
+        #
+        update_time = Time.now().to64()
+
+        # Make sure the value hasn't been set yet, unless the "update"----------
+        # option is requested. Note that mode. We're going to use it later.
+        #
+        updating = False
+        if self._count (
+            'SELECT COUNT(*) FROM "run_val" AS "rv"'+
+            """ WHERE "rv"."run_id"=%s AND "rv"."param_id"=%s""" % (run_id,p_id)) > 0:
+            if not self._options.update:
+                self.error("the value of: %s is already set for run: %s, and no 'update' option requested" % (name, run))
+                return 1
+            updating = True
+
+        # Proceed with the insertio/modification
+        #
+        if updating:
+            if not self.__simple_query(
+                "SET SESSION SQL_MODE='ANSI'",
+                "START TRANSACTION",
+                """UPDATE "run_val" SET source='%s', updated=%s WHERE run_id=%s AND param_id=%s""" % (source,update_time,run_id,p_id),
+                """UPDATE "%s" SET val=%s WHERE run_id=%s AND param_id=%s""" % (run_val_table,p_val,run_id,p_id),
+                "COMMIT"): return 1
+        else:
+            if not self.__simple_query(
+                "SET SESSION SQL_MODE='ANSI'",
+                "START TRANSACTION",
+                """INSERT INTO "run_val" VALUES(%s,%s,'%s',%s)""" % (run_id,p_id,source,update_time),
+                """INSERT INTO "%s" VALUES(%s,%s,%s)""" % (run_val_table,run_id,p_id,p_val),
+                "COMMIT"): return 1
+
+        return 0
+
+    # =====================
+    # Connect to the server
+    # ====================
+
+    def __connect(self):
+
+        """Connect to both databases if the connections have not been established
+        yet. In case of success initialize a connection handle and
+        return True. Return False otherwise."""
+
+        if (self.__connection_scimd is not None) and (self.__connection_regdb is not None):
+            return True
+
+        self.info("SciMD connection params: %s\n" % self._options.scimd_conn_str)
+        self.info("RegDB connection params: %s\n" % self._options.regdb_conn_str)
+
+        try:
+            scimd_conn = DbConnection(conn_string=self._options.scimd_conn_str)
+            self.__connection_scimd = scimd_conn.connection()
+
+            regdb_conn = DbConnection(conn_string=self._options.regdb_conn_str)
+            self.__connection_regdb = regdb_conn.connection()
+
+        except MySQLdb.Error, ex:
+            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+            sys.exit(1)
+
+    # ========================================================
+    # Execute a simple query which doesn't return a result set
+    # ========================================================
+
+    def __simple_query(self, *queries):
+
+        """Execute a list of simple queries which do not require any parsing
+        of results. Queries will be executed one by one till all is done or
+        till the very first failure. In the later case the rest of the list
+        won't be executed.
+
+        The method will return True if all query succeeded, and False otherwise."""
+
+        result = False
+        cursor = self.__connection_scimd.cursor()
+
+        for query in queries:
+            self.info( "SQL: %s" % query)
+            try:
+                cursor.execute(query)
+                result = True
+            except MySQLdb.Error, ex:
+                self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+
+        cursor.close()
+        return result
+
+    # ============================================================
+    # Execute a single SELECT type query and return its result set
+    # ============================================================
+
+    def __select_query(self, query, return_dict=False, scimd_conn=True):
+
+        """Execute a single SELECT type query and return a sequence of sequences
+        (or dictionaries, depending on the optional flag). If no results are found
+        then an empty sequence is retunred.
+
+        The method will return None if the query fails."""
+
+        if scimd_conn: conn = self.__connection_scimd
+        else:          conn = self.__connection_regdb
+
+        rows = None
+
+        cursor = None
+        if return_dict: cursor = conn.cursor(MySQLdb.cursors.SSDictCursor)
+        else:           cursor = conn.cursor()
+
+        self.info( "SQL: %s" % query)
+        try:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+        except MySQLdb.Error, ex:
+            self.error("MySQL error %d: %s" % (ex[0],ex[1]))
+
+        cursor.close()
+        return rows
+
+    # ============================================
+    # Get an internal identifier of the experiment
+    # ============================================
+
+    def _exper_id (self, instrument, experiment):
+
+        if self.__simple_query("SET SESSION SQL_MODE='ANSI'"):
+
+            rows = self.__select_query(
+                """(SELECT e.id FROM instrument i, experiment e WHERE i.name='%s' AND e.name='%s' AND i.id=e.instr_id)""" % (instrument, experiment),
+                return_dict=True,
+                scimd_conn=False)
+            if rows:
+                return rows[0]['id']
+
+        raise DatabaseOperatonFailed, "failed to obtain experiment identifier for: %s / %s" % (instrument, experiment)
+
+    # =====================================
+    # Get an internal identifier of the run
+    # =====================================
+
+    def _run_id (self, exper_id, run):
+
+        if self.__simple_query("SET SESSION SQL_MODE='ANSI'"):
+
+            rows = self.__select_query(
+                """(SELECT id FROM "run" WHERE exper_id=%s AND num=%s)""" % (exper_id, run),
+                return_dict=True)
+            if rows:
+                return rows[0]['id']
+
+        raise DatabaseOperatonFailed, "failed to obtain run identifier for exper_id: %s, run: %s" % (exper_id, run)
+
+    # ===================================================================
+    # Expect a query which counts a number of rows, and return the number
+    # ===================================================================
+
+    def _count (self, sql, colname="COUNT(*)"):
+
+        if self.__simple_query("SET SESSION SQL_MODE='ANSI'"):
+
+            rows = self.__select_query(sql,return_dict=True)
+            for r in rows:
+                return r[colname]
+
+            raise DatabaseOperatonFailed, "inconsistent results from counting query: %s" % (sql)
+
+    # =========================================
+    # Read an optional description if avaialble
+    # =========================================
+
+    def _description (self):
+
+        description = self._options.description
+        description_file = self._options.description_file
+
+        if description is not None and description_file is not None:
+            self._parser.error("do not use mutually exclusive description options")
+
+        if description is not None:
+            return MySQLdb.escape_string(description)
+
+        if description_file is not None:
+            return MySQLdb.escape_string("".join(open(description_file, "r").readlines()))
+
+        return ""
+
+
+    # ==============================================
+    # Extract only the first part of the description
+    # ==============================================
+
+    def _description_hint (self, description, maxlen=0):
+
+        """Analyze the contents of the input string and return
+        a substring which would end when the first of the following
+        conditions is met:
+
+        - the maximul length (in characters) as requested by the optional
+          parameter 'maxlen' (the default value of 0 means no limit)
+
+        - the newline character (in case of multiline string)
+
+        If none of these conditions is detected the whole input string
+        is returned. The whole input string is returned if the following
+        option is set:
+
+            --no-truncate
+        """
+
+        if self._options.truncate_no:
+            return description
+
+        begin = 0
+        end = len(description)
+        if maxlen > 0 and maxlen < end:
+            end = maxlen
+
+        idx = description.find("\n", begin, end)
+        if idx >= 0:
+            end = idx
+
+        if end < len(description):
+            return "%s  (truncated: %d of %d)" % (description[begin:end], end, len(description))
+
+        return description
+
+# ==============================================
+# Run application when imported as a main module
+# ==============================================
+
+if __name__ == "__main__" :
+    app = SciMDCmd()
+    rc = app.run()
+    sys.exit(rc)
