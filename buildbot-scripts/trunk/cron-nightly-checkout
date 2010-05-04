@@ -11,6 +11,9 @@ rel=${1:?Required parameter missing (release name)}
 tmp=${SIT_ROOT:?Missing SIT_ROOT}
 tmp=${SIT_SVN:?Missing SIT_SVN}
 
+# override SVN repo
+export SIT_SVN=file://localhost/afs/slac.stanford.edu/g/lusi/svnrepo
+
 getPkgList() {
     svn list "$SIT_SVN" | sed 's%^\(.*\)/$%\1%'
 }
