@@ -19,7 +19,7 @@ psvn-specific subcommands:
    tags      - list all tags for a given or current package
    tag       - make new tag for a package
    newpkg    - create directory structure for new package
-   export    - extracts code and adds .psdm-tag file
+   export    - extracts code and adds .sit-tag file
    mktxtprop - set svn properties for text-like files
 
 EOD
@@ -71,7 +71,7 @@ help_export() {
 Usage: `basename $0` export [options] <package> <tag> <path>
 
   Will export package named <package> with the specified tag into 
-  a directory <path>. Creates .psdm-tag file in the package directory
+  a directory <path>. Creates .sit-tag file in the package directory
   with the tag name.
 
   Available options:
@@ -150,7 +150,7 @@ exec_export() {
   path=${3:?No path provided}
 
   svn export $force "$SIT_SVN/$pkg/tags/$tag" "$path" &&
-     echo "$tag" > "$path/.psdm-tag"
+     echo "$tag" > "$path/.sit-tag"
 
 }
 

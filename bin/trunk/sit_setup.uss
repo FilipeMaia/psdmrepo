@@ -245,7 +245,7 @@ remove_from_path LD_LIBRARY_PATH "$SIT_ROOT/sw/.*"
 remove_from_path LD_LIBRARY_PATH "[.]/arch/[^/]*/lib/*"
 remove_from_path PYTHONPATH "$SIT_ROOT/sw/.*"
 remove_from_path PYTHONPATH "[.]/arch/[^/]*/python/*"
-unset_env PDSM_REPOS
+unset_env SIT_REPOS
 
 # we have a directory with extra Python modules, add it to PATH and PYTHONPATH
 prepend_path PATH "$SIT_ROOT/sw/external/pyextra/$SIT_ARCH/bin"
