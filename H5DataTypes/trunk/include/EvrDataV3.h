@@ -37,7 +37,8 @@
 namespace H5DataTypes {
 
 struct EvrDataV3_Data {
-  uint32_t numFifoEvents;
+  size_t numFifoEvents;
+  const Pds::EvrData::DataV3::FIFOEvent* fifoEvents;
 };
 
 class EvrDataV3  {
@@ -46,14 +47,14 @@ public:
   typedef Pds::EvrData::DataV3 XtcType ;
   typedef Pds::EvrData::ConfigV3 ConfigXtcType ;
 
-  // Default constructor
-  EvrDataV3 () {}
+  EvrDataV3 () ;
   EvrDataV3 ( const XtcType& data ) ;
+
+      // destructor
+  void destroy();
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
-
-  static hdf5pp::Type stored_fifoevent_type( const ConfigXtcType& config ) ;
 
 protected:
 

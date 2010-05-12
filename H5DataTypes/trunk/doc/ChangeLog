@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-17
+2010-05-12 Andy Salnikov
+- changed EvrDataV3 class to use variable length data array
+
+Tag: V00-00-16
+2010-05-12 Andy Salnikov
+- adding more classes for pdsdata V02-00-01
+
 Tag: V00-00-14
 2010-03-24 Andy Salnikov
 - bug fix in AcqirisDataDescV1, waveform type must be signed
