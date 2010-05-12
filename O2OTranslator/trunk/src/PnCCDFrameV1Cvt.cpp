@@ -19,12 +19,15 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include "O2OTranslator/O2OExceptions.h"
-#include "MsgLogger/MsgLogger.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "MsgLogger/MsgLogger.h"
+#include "O2OTranslator/ConfigObjectStore.h"
+#include "O2OTranslator/O2OExceptions.h"
+#include "pdsdata/pnCCD/ConfigV1.hh"
+#include "pdsdata/pnCCD/ConfigV2.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -40,26 +43,17 @@ namespace {
 
 namespace O2OTranslator {
 
-// comparison operator for Src objects
-bool
-PnCCDFrameV1Cvt::_SrcCmp::operator()( const Pds::Src& lhs, const Pds::Src& rhs ) const
-{
-  if ( lhs.log() < rhs.log() ) return true ;
-  if ( lhs.log() > rhs.log() ) return false ;
-  if ( lhs.phy() < rhs.phy() ) return true ;
-  return false ;
-}
-
 //----------------
 // Constructors --
 //----------------
 PnCCDFrameV1Cvt::PnCCDFrameV1Cvt ( const std::string& typeGroupName,
+                                   const ConfigObjectStore& configStore,
                                    hsize_t chunk_size,
                                    int deflate )
   : EvtDataTypeCvt<Pds::PNCCD::FrameV1>(typeGroupName)
+  , m_configStore(configStore)
   , m_chunk_size(chunk_size)
   , m_deflate(deflate)
-  , m_config()
   , m_frameCont(0)
   , m_frameDataCont(0)
   , m_timeCont(0)
@@ -76,37 +70,6 @@ PnCCDFrameV1Cvt::~PnCCDFrameV1Cvt ()
   delete m_timeCont ;
 }
 
-/// override base class method because we expect multiple types
-void
-PnCCDFrameV1Cvt::convert ( const void* data,
-                           size_t size,
-                           const Pds::TypeId& typeId,
-                           const O2OXtcSrc& src,
-                           const H5DataTypes::XtcClockTime& time )
-{
-  if ( typeId.id() == Pds::TypeId::Id_pnCCDconfig ) {
-
-    const ConfigXtcType& config = *static_cast<const ConfigXtcType*>( data ) ;
-
-    // check data size
-    if ( sizeof(ConfigXtcType) != size ) {
-      throw O2OXTCSizeException ( "PNCCD::ConfigV1", sizeof(ConfigXtcType), size ) ;
-    }
-
-    // got configuration object, make the copy
-    m_config.insert( ConfigMap::value_type( src.top(), config ) ) ;
-
-  } else if ( typeId.id() == Pds::TypeId::Id_pnCCDframe ) {
-
-    // follow regular path
-    const XtcType& typedData = *static_cast<const XtcType*>( data ) ;
-
-    typedConvert ( typedData, size, typeId, src, time ) ;
-
-  }
-
-}
-
 // typed conversion method
 void
 PnCCDFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
@@ -117,12 +80,29 @@ PnCCDFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                         const H5DataTypes::XtcClockTime& time )
 {
   // find corresponding configuration object
-  ConfigMap::const_iterator cit = m_config.find( src.top() ) ;
-  if ( cit == m_config.end() ) {
-    MsgLog ( logger, error, "PnCCDFrameV1Cvt - no configuration object was defined" );
-    return ;
+  const Pds::DetInfo& info = static_cast<const Pds::DetInfo&>(src.top());
+  Pds::PNCCD::ConfigV1 config;
+  Pds::TypeId cfgTypeId(Pds::TypeId::Id_pnCCDconfig, 1);
+  const Pds::PNCCD::ConfigV1* config1 = m_configStore.find<Pds::PNCCD::ConfigV1>(cfgTypeId, src.top());
+  MsgLog( logger, debug, "PnCCDFrameV1Cvt: looking for config object "
+      << Pds::DetInfo::name(info)
+      << " name=" <<  Pds::TypeId::name(cfgTypeId.id())
+      << " version=" <<  cfgTypeId.version() ) ;
+  if ( config1 ) {
+    config = Pds::PNCCD::ConfigV1(*config1);
+  } else {
+    Pds::TypeId cfgTypeId(Pds::TypeId::Id_pnCCDconfig, 2);
+    const Pds::PNCCD::ConfigV2* config2 = m_configStore.find<Pds::PNCCD::ConfigV2>(cfgTypeId, src.top());
+    MsgLog( logger, debug, "PnCCDFrameV1Cvt: looking for config object "
+        << Pds::DetInfo::name(info)
+        << " name=" <<  Pds::TypeId::name(cfgTypeId.id())
+        << " version=" <<  cfgTypeId.version() ) ;
+    if (not config2) {
+      MsgLog ( logger, error, "PnCCDFrameV1Cvt - no configuration object was defined" );
+      return ;
+    }
+    config = Pds::PNCCD::ConfigV1(config2->numLinks(), config2->payloadSizePerLink());
   }
-  const ConfigXtcType& config = cit->second ;
 
   // create all containers if running first time
   if ( not m_frameCont ) {

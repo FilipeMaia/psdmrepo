@@ -34,23 +34,33 @@
 #include "H5DataTypes/CameraFrameV1.h"
 #include "H5DataTypes/CameraTwoDGaussianV1.h"
 #include "H5DataTypes/ControlDataConfigV1.h"
+#include "H5DataTypes/EncoderConfigV1.h"
+#include "H5DataTypes/EncoderDataV1.h"
 #include "H5DataTypes/EpicsPvHeader.h"
 #include "H5DataTypes/EvrConfigV1.h"
 #include "H5DataTypes/EvrConfigV2.h"
+#include "H5DataTypes/EvrConfigV3.h"
+#include "H5DataTypes/FccdConfigV1.h"
+#include "H5DataTypes/IpimbConfigV1.h"
+#include "H5DataTypes/IpimbDataV1.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
 #include "H5DataTypes/PnCCDConfigV1.h"
+#include "H5DataTypes/PnCCDConfigV2.h"
+#include "H5DataTypes/PrincetonConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
 #include "LusiTime/Time.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/AcqirisDataDescV1Cvt.h"
 #include "O2OTranslator/CameraFrameV1Cvt.h"
 #include "O2OTranslator/ConfigDataTypeCvt.h"
+#include "O2OTranslator/EvrDataV3Cvt.h"
 #include "O2OTranslator/EvtDataTypeCvtDef.h"
 #include "O2OTranslator/EpicsDataTypeCvt.h"
 #include "O2OTranslator/O2OExceptions.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OMetaData.h"
 #include "O2OTranslator/PnCCDFrameV1Cvt.h"
+#include "O2OTranslator/PrincetonFrameV1Cvt.h"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/Dgram.hh"
 #include "pdsdata/xtc/Level.hh"
@@ -122,6 +132,8 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_extGroups(extGroups)
   , m_metadata(metadata)
   , m_stateCounters()
+  , m_transition(Pds::TransitionId::Unknown)
+  , m_configStore()
 {
   std::string fileTempl = m_nameFactory.makeH5Path ( split != NoSplit ) ;
   MsgLog( logger, debug, "O2OHdf5Writer - open output file " << fileTempl ) ;
@@ -200,12 +212,36 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_EvrConfig,2).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::EvrConfigV3> ( "EvrData::ConfigV3" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EvrConfig,3).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::ControlDataConfigV1> ( "ControlData::ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_ControlConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::PnCCDConfigV1> ( "PNCCD::ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_pnCCDconfig,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::PnCCDConfigV2> ( "PNCCD::ConfigV2" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_pnCCDconfig,2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::PrincetonConfigV1> ( "Princeton::ConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_PrincetonConfig,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::FccdConfigV1> ( "FCCD::FccdConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_FccdConfig,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::IpimbConfigV1> ( "Ipimb::ConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_IpimbConfig,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::EncoderConfigV1> ( "Encoder::ConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EncoderConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   hsize_t chunk_size = 128*1024 ;
@@ -240,23 +276,41 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_PhaseCavity,0).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  // version for this type is 1
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::EncoderDataV1> (
+      "Encoder::DataV1", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EncoderData,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // version for this type is 1
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::IpimbDataV1> (
+      "Ipimb::DataV1", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_IpimbData,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   // special converter for CameraFrame type
   converter.reset( new CameraFrameV1Cvt ( "Camera::FrameV1", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_Frame,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // very special converter for Acqiris::DataDescV1, it needs two types of data
-  converter.reset( new AcqirisDataDescV1Cvt ( "Acqiris::DataDescV1", chunk_size, m_compression ) ) ;
-  typeId =  Pds::TypeId(Pds::TypeId::Id_AcqConfig,1).value() ;
-  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+  converter.reset( new AcqirisDataDescV1Cvt ( "Acqiris::DataDescV1", m_configStore, chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_AcqWaveform,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
-  // very special converter for PNCCD::FrameV1, it needs two types of data
-  converter.reset( new PnCCDFrameV1Cvt ( "PNCCD::FrameV1", chunk_size, m_compression ) ) ;
-  typeId =  Pds::TypeId(Pds::TypeId::Id_pnCCDconfig,1).value() ;
+  // very special converter for EvrData::DataV3, it needs two types of data
+  converter.reset( new EvrDataV3Cvt ( "EvrData::DataV3", m_configStore, chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EvrData,3).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // very special converter for PNCCD::FrameV1, it needs two types of data
+  converter.reset( new PnCCDFrameV1Cvt ( "PNCCD::FrameV1", m_configStore, chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_pnCCDframe,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // very special converter for Princeton::FrameV1, it needs two types of data
+  converter.reset( new PrincetonFrameV1Cvt ( "Princeton::FrameV1", m_configStore, chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_PrincetonFrame,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // temporary/diagnostics  Epics converter (headers only)
@@ -290,7 +344,8 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
           << " dgram.seq.type=" << dgram.seq.type()
           << " dgram.seq.service=" << Pds::TransitionId::name(dgram.seq.service()) ) ;
 
-  switch ( dgram.seq.service()  ) {
+  m_transition = dgram.seq.service();
+  switch ( m_transition ) {
 
     case Pds::TransitionId::Map :
 
@@ -468,6 +523,17 @@ void
 O2OHdf5Writer::dataObject ( const void* data, size_t size,
     const Pds::TypeId& typeId, const O2OXtcSrc& src )
 {
+  // for Configure and BeginCalibCycle transitions store config objects at Source level
+  if ( ( m_transition == Pds::TransitionId::Configure
+      or m_transition == Pds::TransitionId::BeginCalibCycle )  ) {
+    const Pds::DetInfo& info = static_cast<const Pds::DetInfo&>(src.top());
+    MsgLog( logger, debug, "O2OHdf5Writer: store config object "
+        << Pds::DetInfo::name(info)
+        << " name=" <<  Pds::TypeId::name(typeId.id())
+        << " version=" <<  typeId.version() ) ;
+    m_configStore.store(typeId, src.top(), data, size);
+  }
+
   // find this type in the converter map
   CvtMap::iterator it = m_cvtMap.find( typeId.value() ) ;
   if ( it != m_cvtMap.end() ) {

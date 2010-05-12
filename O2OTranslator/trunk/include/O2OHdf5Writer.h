@@ -29,7 +29,9 @@
 #include "hdf5pp/File.h"
 #include "hdf5pp/Group.h"
 #include "H5DataTypes/XtcClockTime.h"
+#include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/DataTypeCvtI.h"
+#include "pdsdata/xtc//TransitionId.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -87,7 +89,7 @@ public:
   virtual void levelEnd ( const Pds::Src& src ) ;
 
   // visit the data object
-  virtual void dataObject ( const void* data, size_t size, 
+  virtual void dataObject ( const void* data, size_t size,
       const Pds::TypeId& typeId, const O2OXtcSrc& src ) ;
 
 protected:
@@ -115,6 +117,8 @@ private:
   bool m_extGroups ;
   const O2OMetaData& m_metadata ;
   StateCounters m_stateCounters ;
+  Pds::TransitionId::Value m_transition;
+  ConfigObjectStore m_configStore;
 
   // close all containers
   void closeContainers() ;

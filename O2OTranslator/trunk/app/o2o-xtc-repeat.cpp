@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <cstdio>
 #include <vector>
+#include <fcntl.h>
 
 //----------------------
 // Base Class Headers --
@@ -151,7 +152,7 @@ O2O_XTC_Repeat::runApp ()
     MsgLogRoot( info, "processing file: " << eventFile << '\n' ) ;
 
     // open input xtc file
-    FILE* xfile = fopen( eventFile.c_str(), "rb" );
+    int xfile = open( eventFile.c_str(), O_RDONLY );
     if ( ! xfile ) {
       MsgLogRoot( error, "failed to open input XTC file: " << eventFile ) ;
       return 2  ;
@@ -197,6 +198,8 @@ O2O_XTC_Repeat::runApp ()
 
 
     }
+
+    close(xfile);
 
   }
 

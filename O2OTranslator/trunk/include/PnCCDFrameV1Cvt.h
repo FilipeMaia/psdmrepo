@@ -13,7 +13,6 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <map>
 
 //----------------------
 // Base Class Headers --
@@ -24,8 +23,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "H5DataTypes/PnCCDFrameV1.h"
-#include "pdsdata/pnCCD/ConfigV1.hh"
-#include "pdsdata/pnCCD/FrameV1.hh"
 #include "O2OTranslator/CvtDataContainer.h"
 #include "O2OTranslator/CvtDataContFactoryDef.h"
 #include "O2OTranslator/CvtDataContFactoryTyped.h"
@@ -39,6 +36,8 @@
 //		---------------------
 
 namespace O2OTranslator {
+
+class ConfigObjectStore;
 
 /**
  *  Special converter class for Pds::PNCCD::FrameV1 XTC class
@@ -57,22 +56,15 @@ class PnCCDFrameV1Cvt : public EvtDataTypeCvt<Pds::PNCCD::FrameV1> {
 public:
 
   typedef Pds::PNCCD::FrameV1 XtcType ;
-  typedef Pds::PNCCD::ConfigV1 ConfigXtcType ;
 
   // constructor
   PnCCDFrameV1Cvt ( const std::string& typeGroupName,
+                    const ConfigObjectStore& configStore,
                     hsize_t chunk_size,
                     int deflate ) ;
 
   // Destructor
   virtual ~PnCCDFrameV1Cvt () ;
-
-  /// override base class method because we expect multiple types
-  virtual void convert ( const void* data,
-                         size_t size,
-                         const Pds::TypeId& typeId,
-                         const O2OXtcSrc& src,
-                         const H5DataTypes::XtcClockTime& time ) ;
 
 protected:
 
@@ -93,17 +85,10 @@ private:
   typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > FrameDataCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
 
-  // comparison operator for Src objects
-  struct _SrcCmp {
-    bool operator()( const Pds::Src& lhs, const Pds::Src& rhs ) const ;
-  };
-
-  typedef std::map<Pds::Src,ConfigXtcType,_SrcCmp> ConfigMap ;
-
   // Data members
+  const ConfigObjectStore& m_configStore;
   hsize_t m_chunk_size ;
   int m_deflate ;
-  ConfigMap m_config ;
   FrameCont* m_frameCont ;
   FrameDataCont* m_frameDataCont ;
   XtcClockTimeCont* m_timeCont ;

@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-00
+2010-05-12 Andy Salnikov
+- small-scale refactoring, extracted the code that handles configuration
+  object store into separate class, now event data converters use one 
+  instance of this store to find their configurations
+- adopt to pdsdata V02-00-01, few new types added
+- o2o-translator: default file extension is now h5, default split mode
+  is none
+
 Tag: V00-06-04
 2010-03-24 Andy Salnikov
 - change in the options for o2o-translator:
