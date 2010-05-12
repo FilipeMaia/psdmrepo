@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_PNCCDCONFIGV1_H
-#define H5DATATYPES_PNCCDCONFIGV1_H
+#ifndef H5DATATYPES_FCCDCONFIGV1_H
+#define H5DATATYPES_FCCDCONFIGV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class PnCCDConfigV1.
+//	Class FccdConfigV1.
 //
 //------------------------------------------------------------------------
 
@@ -18,11 +18,12 @@
 // Base Class Headers --
 //----------------------
 
+
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/pnCCD/ConfigV1.hh"
+#include "pdsdata/fccd/FccdConfigV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,36 +36,38 @@
 namespace H5DataTypes {
 
 //
-// Helper type for Pds::PNCCD::ConfigV1
+// Helper type for Pds::Ipimb::ConfigV1
 //
-struct PnCCDConfigV1_Data {
-  uint32_t numLinks;
-  uint32_t payloadSizePerLink;
+struct FccdConfigV1_Data  {
+  uint32_t width;
+  uint32_t height;
+  uint32_t trimmedWidth;
+  uint32_t trimmedHeight;
+  uint16_t outputMode;
 };
 
-class PnCCDConfigV1 {
+class FccdConfigV1  {
 public:
 
-  typedef Pds::PNCCD::ConfigV1 XtcType ;
+  typedef Pds::FCCD::FccdConfigV1 XtcType ;
 
-  PnCCDConfigV1() {}
-  PnCCDConfigV1 ( const XtcType& config ) ;
+  FccdConfigV1 () {}
+  FccdConfigV1 ( const XtcType& data ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  static void store ( const XtcType& config, hdf5pp::Group location ) ;
+  // store single config object at specified location
+  static void store( const XtcType& config, hdf5pp::Group location ) ;
 
-  static size_t xtcSize( const XtcType& xtc ) { return sizeof(XtcType) ; }
-
-protected:
+  static size_t xtcSize( const XtcType& xtc ) { return sizeof(xtc) ; }
 
 private:
 
-  PnCCDConfigV1_Data m_data ;
+  FccdConfigV1_Data m_data ;
 
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_PNCCDCONFIGV1_H
+#endif // H5DATATYPES_FCCDCONFIGV1_H

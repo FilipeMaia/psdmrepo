@@ -27,6 +27,8 @@
 //------------------------------------
 #include "hdf5pp/Type.h"
 #include "pdsdata/evr/PulseConfig.hh"
+#include "pdsdata/evr/PulseConfigV3.hh"
+#include "pdsdata/evr/EventCodeV3.hh"
 #include "pdsdata/evr/OutputMap.hh"
 
 //		---------------------
@@ -81,6 +83,32 @@ private:
 };
 
 //
+// Helper type for Pds::EvrData::PulseConfigV3
+//
+struct EvrPulseConfigV3_Data {
+  uint16_t  pulseId;
+  uint16_t  polarity;
+  uint32_t  prescale;
+  uint32_t  delay;
+  uint32_t  width;
+} ;
+
+class EvrPulseConfigV3 {
+public:
+
+  EvrPulseConfigV3 () {}
+  EvrPulseConfigV3 ( const Pds::EvrData::PulseConfigV3& pconfig ) ;
+
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
+
+private:
+
+  EvrPulseConfigV3_Data m_data ;
+
+};
+
+//
 // Helper type for Pds::EvrData::OutputMap
 //
 struct EvrOutputMap_Data {
@@ -105,6 +133,32 @@ private:
 
 };
 
+//
+// Helper type for Pds::EvrData::EventCodeV3
+//
+struct EvrEventCodeV3_Data {
+  uint16_t  code;
+  uint8_t   isReadout;
+  uint8_t   isTerminator;
+  uint32_t  maskTrigger;
+  uint32_t  maskSet;
+  uint32_t  maskClear;
+};
+
+class EvrEventCodeV3 {
+public:
+
+  EvrEventCodeV3 () {}
+  EvrEventCodeV3 ( const Pds::EvrData::EventCodeV3& evtcode ) ;
+
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
+
+private:
+
+  EvrEventCodeV3_Data m_data ;
+
+};
 
 } // namespace H5DataTypes
 

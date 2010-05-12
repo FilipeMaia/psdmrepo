@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_PNCCDCONFIGV1_H
-#define H5DATATYPES_PNCCDCONFIGV1_H
+#ifndef H5DATATYPES_IPIMBDATAV1_H
+#define H5DATATYPES_IPIMBDATAV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class PnCCDConfigV1.
+//	Class IpimbDataV1.
 //
 //------------------------------------------------------------------------
 
@@ -18,15 +18,16 @@
 // Base Class Headers --
 //----------------------
 
+
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "hdf5pp/Group.h"
-#include "pdsdata/pnCCD/ConfigV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+#include "hdf5pp/Group.h"
+#include "pdsdata/ipimb/DataV1.hh"
 
 //		---------------------
 // 		-- Class Interface --
@@ -35,36 +36,39 @@
 namespace H5DataTypes {
 
 //
-// Helper type for Pds::PNCCD::ConfigV1
+// Helper type for Pds::Ipimb::DataV1
 //
-struct PnCCDConfigV1_Data {
-  uint32_t numLinks;
-  uint32_t payloadSizePerLink;
+struct IpimbDataV1_Data  {
+  uint64_t triggerCounter;
+  uint16_t config0;
+  uint16_t config1;
+  uint16_t config2;
+  uint16_t channel0;
+  uint16_t channel1;
+  uint16_t channel2;
+  uint16_t channel3;
+  uint16_t checksum;
 };
 
-class PnCCDConfigV1 {
+class IpimbDataV1  {
 public:
 
-  typedef Pds::PNCCD::ConfigV1 XtcType ;
+  typedef Pds::Ipimb::DataV1 XtcType ;
 
-  PnCCDConfigV1() {}
-  PnCCDConfigV1 ( const XtcType& config ) ;
+  IpimbDataV1 () {}
+  IpimbDataV1 ( const XtcType& data ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  static void store ( const XtcType& config, hdf5pp::Group location ) ;
-
-  static size_t xtcSize( const XtcType& xtc ) { return sizeof(XtcType) ; }
-
-protected:
+  static size_t xtcSize( const XtcType& xtc ) { return sizeof(xtc) ; }
 
 private:
 
-  PnCCDConfigV1_Data m_data ;
+  IpimbDataV1_Data m_data ;
 
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_PNCCDCONFIGV1_H
+#endif // H5DATATYPES_IPIMBDATAV1_H

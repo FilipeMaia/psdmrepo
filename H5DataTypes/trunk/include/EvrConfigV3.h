@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_PNCCDCONFIGV1_H
-#define H5DATATYPES_PNCCDCONFIGV1_H
+#ifndef H5DATATYPES_EVRCONFIGV3_H
+#define H5DATATYPES_EVRCONFIGV3_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class PnCCDConfigV1.
+//	Class EvrConfigV3.
 //
 //------------------------------------------------------------------------
 
@@ -18,11 +18,12 @@
 // Base Class Headers --
 //----------------------
 
+
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/pnCCD/ConfigV1.hh"
+#include "pdsdata/evr/ConfigV3.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,36 +36,36 @@
 namespace H5DataTypes {
 
 //
-// Helper type for Pds::PNCCD::ConfigV1
+// Helper type for Pds::EvrData::ConfigV3
 //
-struct PnCCDConfigV1_Data {
-  uint32_t numLinks;
-  uint32_t payloadSizePerLink;
+struct EvrConfigV3_Data {
+  uint32_t neventcodes;
+  uint32_t npulses;
+  uint32_t noutputs;
 };
 
-class PnCCDConfigV1 {
+class EvrConfigV3  {
 public:
 
-  typedef Pds::PNCCD::ConfigV1 XtcType ;
+  typedef Pds::EvrData::ConfigV3 XtcType ;
 
-  PnCCDConfigV1() {}
-  PnCCDConfigV1 ( const XtcType& config ) ;
+  EvrConfigV3 () {}
+  EvrConfigV3 ( const XtcType& data ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  static void store ( const XtcType& config, hdf5pp::Group location ) ;
+  // store single config object at specified location
+  static void store( const XtcType& config, hdf5pp::Group location ) ;
 
-  static size_t xtcSize( const XtcType& xtc ) { return sizeof(XtcType) ; }
-
-protected:
+  static size_t xtcSize( const XtcType& xtc ) { return xtc.size() ; }
 
 private:
 
-  PnCCDConfigV1_Data m_data ;
+  EvrConfigV3_Data m_data ;
 
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_PNCCDCONFIGV1_H
+#endif // H5DATATYPES_EVRCONFIGV3_H
