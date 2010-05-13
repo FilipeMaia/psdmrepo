@@ -39,7 +39,7 @@ import logging
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from pdsdata import *
+from pypdsdata import *
 
 #----------------------------------
 # Local non-exported definitions --
@@ -72,9 +72,7 @@ class myana_pnccd ( object ) :
     #-------------------
 
     def beginjob( self, evt, env ) :
-        self.configs = {}
-        for x in evt.findXtc(typeId=xtc.TypeId.Type.Id_pnCCDconfig) :
-            self.configs[x.src] = x.payload()
+        pass
 
     def beginrun( self, evt, env ) :
         pass
@@ -83,7 +81,7 @@ class myana_pnccd ( object ) :
         
         for x in evt.findXtc(typeId=xtc.TypeId.Type.Id_pnCCDframe) :
             
-            cfg = self.configs[x.src]
+            cfg = env.getPnCCDConfig(x.src)
             print "event %d: detInfo=%s numLinks=%d payloadSizePerLink=%d" % \
                     ( self.count, x.src, cfg.numLinks(), cfg.payloadSizePerLink() )
             

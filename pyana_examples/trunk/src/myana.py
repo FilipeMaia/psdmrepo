@@ -97,10 +97,10 @@ class myana ( object ) :
         print >> self.shotsFile, shotsFileName
 
         # get Acqiris configuration
-        self.itofConfig = evt.getAcqConfig( "AmoITof" )
+        self.itofConfig = env.getAcqConfig( "AmoITof" )
         if not self.itofConfig :  raise Exception("AmoITof configuration missing")
         
-        self.etofConfig = evt.getAcqConfig( "AmoETof" )
+        self.etofConfig = env.getAcqConfig( "AmoETof" )
         if not self.etofConfig :  raise Exception("AmoETof configuration missing")
         
         # book histograms

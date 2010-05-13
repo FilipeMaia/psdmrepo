@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2010-05-13 Andrei Salnikov
+- updated examples to get config objects from env instead of evt
+
 Tag: V00-00-02
 2010-04-14 Andrei Salnikov
 - forgot to add SConscript and doc/ directory
