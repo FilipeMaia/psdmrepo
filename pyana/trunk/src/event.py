@@ -14,6 +14,7 @@ from pypdsdata import epics
 from pypdsdata import Error
 from pypdsdata import acqiris
 from pypdsdata import pnccd
+from pypdsdata import princeton
 
 _log = logging.getLogger("pyana.event")
 
@@ -117,15 +118,13 @@ class Event(object):
         except StopIteration:
             return None
 
-
-    def getAcqConfig(self, address):
-        """ returns AcqConfig for specific address"""
-        
-        return self.findFirst( typeId=xtc.TypeId.Type.Id_AcqConfig, address=address )
+    def get(self, typeId, address=None):
+        """Generic get method"""
+        return self.findFirst( typeId=typeId, address=address )
 
     def getAcqValue(self, address, channel, env):
         """ returns Acquiris data for specific detector and channel, 
-        detector is one of xtc.DetInfo.Detector.Value constants. 
+        address is the DetInfo object or address string. 
         This methods requires environment object to get access to 
         Acqiris configuration object. Returned object is an iterator
         which returns tuples - timestamp and voltage value"""
@@ -154,6 +153,34 @@ class Event(object):
         
         return acqiris.DataDescV1( obj, hcfg, vcfg )
     
+    def getEBeam(self):
+        """Returns bld.BldDataEBeam or bld.BldDataEBeamV0 object whichever is present"""
+        return self.findFirst( typeId=xtc.TypeId.Type.Id_EBeam )
+
+    def getEvrData(self, address):
+        """Returns EvrData for specific address"""
+        return self.findFirst( typeId=xtc.TypeId.Type.Id_EvrData, address=address )
+
+    def getFeeGasDet(self):
+        """Returns list of 4 floating numbers"""
+        obj = self.findFirst( typeId=xtc.TypeId.Type.Id_FEEGasDetEnergy )
+        if obj :
+            return [obj.f_11_ENRC, obj.f_12_ENRC, obj.f_21_ENRC, obj.f_22_ENRC]
+
+    def getFrameValue(self, address):
+        """Returns Frame data for specific address"""
+        return self.findFirst( typeId=xtc.TypeId.Type.Id_Frame, address=address )
+
+    def getIpimbValue(self, address):
+        """Returns Ipimb data for specific address"""
+        return self.findFirst( typeId=xtc.TypeId.Type.Id_IpimbData, address=address )
+
+    getOpal1kValue = getFrameValue
+
+    def getPhaseCavity(self):
+        """Returns bld.BldDataPhaseCavity object"""
+        return self.findFirst( typeId=xtc.TypeId.Type.Id_PhaseCavity )
+
     def getPnCcdValue(self, address, env):
         """ returns PnCCDFrameV1 for specific address"""
         
@@ -178,23 +205,23 @@ class Event(object):
         
         return pnccd.FrameV1( frames, cfg )
 
-    def getOpal1kConfig(self, address):
-        """Returns opal1k.ConfigV1 object"""
-        return self.findFirst( typeId=xtc.TypeId.Type.Id_Opal1kConfig, address=address )
+    def getPrincetonValue(self, address, env):
+        """ returns Acquiris data for specific detector and channel, 
+        address is the DetInfo object or address string."""
 
-    def getFeeGasDet(self):
-        """Returns list of 4 floating numbers"""
-        obj = self.findFirst( typeId=xtc.TypeId.Type.Id_FEEGasDetEnergy )
-        if obj :
-            return [obj.f_11_ENRC, obj.f_12_ENRC, obj.f_21_ENRC, obj.f_22_ENRC]
+        _log.debug("Event.getPrincetonValue: address=%s", address)
 
-    def getPhaseCavity(self):
-        """Returns bld.BldDataPhaseCavity object"""
-        return self.findFirst( typeId=xtc.TypeId.Type.Id_PhaseCavity )
+        xtcObj = self.findFirstXtc( typeId=xtc.TypeId.Type.Id_PrincetonFrame, address=address )
+        if not xtcObj : return None
+        obj = xtcObj.payload()
 
-    def getEBeam(self):
-        """Returns bld.BldDataEBeam or bld.BldDataEBeamV0 object whichever is present"""
-        return self.findFirst( typeId=xtc.TypeId.Type.Id_EBeam )
+        # get config object
+        cfg = env.getPrincetonConfig(address=xtcObj.src)
+        if not cfg : 
+            raise Error("cannot find Princeton config for address %s" % xtcObj.src )
+
+        return princeton.FrameV1( obj, cfg )
+    
 
     #
     # Private methods not to be used by clients directly
@@ -376,23 +403,33 @@ class Env(object):
             
             types = [xtc.TypeId.Type.Id_AcqConfig, 
                      xtc.TypeId.Type.Id_pnCCDconfig,
-                     xtc.TypeId.Type.Id_Opal1kConfig]
+                     xtc.TypeId.Type.Id_Opal1kConfig,
+                     xtc.TypeId.Type.Id_PrincetonConfig]
             
             for typeId in types :
                 for x in evt.findXtc( typeId=typeId ) :
                     self._storeConfig(typeId, x.src, x.payload())
                     
-    def getAcqConfig(self, **kw):
-        _log.debug("Env.getAcqConfig: %s", kw)
-        return self._getConfig(xtc.TypeId.Type.Id_AcqConfig, **kw)
+    def getConfig(self, typeId, address=None):
+        """Generic getConfig method"""
+        _log.debug("Env.getConfig: %s %s", typeId, address)
+        return self._getConfig(typeId=typeId, address=address)
 
-    def getPnCCDConfig(self, **kw):
-        _log.debug("Env.getPnCCDConfig: %s", kw)
-        return self._getConfig(xtc.TypeId.Type.Id_pnCCDconfig, **kw)
+    def getAcqConfig(self, address=None):
+        _log.debug("Env.getAcqConfig: %s", address)
+        return self._getConfig(typeId=xtc.TypeId.Type.Id_AcqConfig, address=address)
 
-    def getOpal1kConfig(self, **kw):
-        _log.debug("Env.getOpal1kConfig: %s", kw)
-        return self._getConfig(xtc.TypeId.Type.Id_Opal1kConfig, **kw)
+    def getOpal1kConfig(self, address=None):
+        _log.debug("Env.getOpal1kConfig: %s", address)
+        return self._getConfig(typeId=xtc.TypeId.Type.Id_Opal1kConfig, address=address)
+
+    def getPnCCDConfig(self, address=None):
+        _log.debug("Env.getPnCCDConfig: %s", address)
+        return self._getConfig(typeId=xtc.TypeId.Type.Id_pnCCDconfig, address=address)
+
+    def getPrincetonConfig(self, address=None):
+        _log.debug("Env.getPrincetonConfig: %s", address)
+        return self._getConfig(typeId=xtc.TypeId.Type.Id_PrincetonConfig, address=address)
 
     def result(self):
         """returns complete result of processing from a subprocess"""
@@ -414,6 +451,14 @@ class Env(object):
         
     def _getConfig(self, typeId=None, detector=None, detId=None, device=None, devId=None, address=None):
         
+        if address is not None :
+            addrdict = _addr(address)
+            address = addrdict.get('address')
+            detector = addrdict.get('detector')
+            detId = addrdict.get('detId')
+            device = addrdict.get('device')
+            devId = addrdict.get('devId')
+
         configMap = self.m_config.get(typeId, {})
         if address :
             return configMap.get(address, None)

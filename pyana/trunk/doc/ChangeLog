@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2010-05-13 - Andy Salnikov
+- updated event.Evt and event.Env for new types
+- removed getConfig* methods from Event interface, use Env
+
 Tag: V00-00-06
 2010-04-14 - Andy Salnikov
 - moved examples to a new package pyana_examples/
