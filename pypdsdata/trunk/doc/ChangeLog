@@ -1,4 +1,9 @@
 
+2010-05-13 - V00-00-07
+======================
+- forgot couple of new classes in evr package
+- some evr classes had incorrect args count in methods
+
 2010-05-12 - V00-00-06
 ======================
 - removed include SITConfig, not needed for this package

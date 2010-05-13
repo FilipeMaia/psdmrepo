@@ -59,8 +59,8 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Camera::FrameFexConfigV1, number_of_masked_pixels)
   FUN0_WRAPPER(pypdsdata::Camera::FrameFexConfigV1, size)
   PyObject* roiBegin( PyObject* self, PyObject* );
-  PyObject* roiEnd( PyObject* self, PyObject* args );
-  PyObject* masked_pixel_coordinates( PyObject* self, PyObject* args );
+  PyObject* roiEnd( PyObject* self, PyObject* );
+  PyObject* masked_pixel_coordinates( PyObject* self, PyObject* );
 
   PyMethodDef methods[] = {
     {"forwarding",       forwarding,       METH_NOARGS,  "Returns forwarding policy for frame data." },
@@ -101,7 +101,7 @@ pypdsdata::Camera::FrameFexConfigV1::initType( PyObject* module )
 namespace {
 
 PyObject*
-roiBegin( PyObject* self, PyObject* args)
+roiBegin( PyObject* self, PyObject*)
 {
   const Pds::Camera::FrameFexConfigV1* obj = pypdsdata::Camera::FrameFexConfigV1::pdsObject( self );
   if ( not obj ) return 0;
@@ -110,7 +110,7 @@ roiBegin( PyObject* self, PyObject* args)
 }
 
 PyObject*
-roiEnd( PyObject* self, PyObject* args)
+roiEnd( PyObject* self, PyObject*)
 {
   const Pds::Camera::FrameFexConfigV1* obj = pypdsdata::Camera::FrameFexConfigV1::pdsObject( self );
   if ( not obj ) return 0;
@@ -119,7 +119,7 @@ roiEnd( PyObject* self, PyObject* args)
 }
 
 PyObject*
-masked_pixel_coordinates( PyObject* self, PyObject* args)
+masked_pixel_coordinates( PyObject* self, PyObject*)
 {
   const Pds::Camera::FrameFexConfigV1* obj = pypdsdata::Camera::FrameFexConfigV1::pdsObject( self );
   if ( not obj ) return 0;

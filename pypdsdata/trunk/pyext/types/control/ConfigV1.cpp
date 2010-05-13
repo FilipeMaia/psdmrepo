@@ -42,7 +42,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::ControlData::ConfigV1, npvMonitors)
   FUN0_WRAPPER(pypdsdata::ControlData::ConfigV1, size)
   PyObject* duration( PyObject* self, PyObject* );
-  PyObject* pvControl( PyObject* self, PyObject* );
+  PyObject* pvControl( PyObject* self, PyObject* args );
   PyObject* pvMonitor( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {

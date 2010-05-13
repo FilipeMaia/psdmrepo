@@ -44,11 +44,11 @@ namespace {
 
   PyMethodDef methods[] = {
     { "neventcodes",neventcodes, METH_NOARGS, "event codes appended to this structure" },
-    { "eventcode",  eventcode,   METH_NOARGS, "event codes appended to this structure" },
+    { "eventcode",  eventcode,   METH_VARARGS, "event codes appended to this structure" },
     { "npulses",    npulses,     METH_NOARGS, "pulse configurations appended to this structure" },
-    { "pulse",      pulse,       METH_NOARGS, "pulse configurations appended to this structure" },
+    { "pulse",      pulse,       METH_VARARGS, "pulse configurations appended to this structure" },
     { "noutputs",   noutputs,    METH_NOARGS, "output configurations appended to this structure" },
-    { "output_map", output_map,  METH_NOARGS, "output configurations appended to this structure" },
+    { "output_map", output_map,  METH_VARARGS, "output configurations appended to this structure" },
     { "size",       size,        METH_NOARGS, "size including appended PulseConfig's and OutputMap's" },
     {0, 0, 0, 0}
    };
