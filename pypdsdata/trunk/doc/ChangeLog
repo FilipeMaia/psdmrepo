@@ -1,4 +1,8 @@
 
+2010-05-12 - V00-00-06
+======================
+- removed include SITConfig, not needed for this package
+
 2010-05-12 - V00-00-05
 ======================
 - adding new types from pdsdata V02-00-01
