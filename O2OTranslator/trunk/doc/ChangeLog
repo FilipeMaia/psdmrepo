@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-01
+2010-05-12 Andy Salnikov
+- replaced Lusi/Lusi.h with SITConfig/SITConfig.h
+
 Tag: V00-07-00
 2010-05-12 Andy Salnikov
 - small-scale refactoring, extracted the code that handles configuration

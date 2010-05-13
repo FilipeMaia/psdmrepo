@@ -9,7 +9,7 @@
 //      Andrei Salnikov
 //
 //------------------------------------------------------------------------
-#include "Lusi/Lusi.h"
+#include "SITConfig/SITConfig.h"
 
 //-----------------
 // C/C++ Headers --
