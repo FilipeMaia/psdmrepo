@@ -127,10 +127,26 @@ struct TypeCvt<double> {
     return pypdsdata::TypeLib::toPython( py_this->m_obj->MEMBER ); \
   }
 
+#define ENUM_MEMBER_WRAPPER(PYTYPE,MEMBER,ENUM) \
+  PyObject* MEMBER( PyObject* self, void* ) { \
+    PYTYPE* py_this = (PYTYPE*) self; \
+    if( ! py_this->m_obj ){ \
+      PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object"); \
+      return 0; \
+    } \
+    return ENUM.Enum_FromLong( py_this->m_obj->MEMBER ); \
+  }
+
 #define MEMBER_WRAPPER_EMBEDDED(PYTYPE,MEMBER) \
   PyObject* MEMBER( PyObject* self, void* ) { \
     PYTYPE* py_this = (PYTYPE*) self; \
     return pypdsdata::TypeLib::toPython( py_this->m_obj.MEMBER ); \
+  }
+
+#define ENUM_MEMBER_WRAPPER_EMBEDDED(PYTYPE,MEMBER,ENUM) \
+  PyObject* MEMBER( PyObject* self, void* ) { \
+    PYTYPE* py_this = (PYTYPE*) self; \
+    return ENUM.Enum_FromLong( py_this->m_obj.MEMBER ); \
   }
 
 

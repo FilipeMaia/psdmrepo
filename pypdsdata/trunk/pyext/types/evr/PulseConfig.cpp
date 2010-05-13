@@ -62,10 +62,7 @@ namespace {
     {0, 0, 0, 0, 0}
   };
 
-  char typedoc[] = "Python class wrapping C++ Pds::EvrData::PulseConfig class.\n\n"
-      "Constructor takes two positional arguments, same values as the\n"
-      "C++ constructor. Class implements usual comparison operators\n"
-      "and hash function so that objects can be used as dictionary keys.";
+  char typedoc[] = "Python class wrapping C++ Pds::EvrData::PulseConfig class.";
 
 }
 

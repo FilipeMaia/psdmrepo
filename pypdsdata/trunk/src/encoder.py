@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module bld...
+#  Module encoder...
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for _pdsdata.bld.
+"""Wrapper module for _pdsdata.encoder.
 
 This software was developed for the LUSI project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -46,4 +46,4 @@ __version__ = "$Revision$"
 # Exported definitions --
 #------------------------
 
-from _pdsdata.bld import *
+from _pdsdata.encoder import *

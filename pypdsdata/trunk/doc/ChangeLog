@@ -1,4 +1,9 @@
 
+2010-05-12 - V00-00-05
+======================
+- adding new types from pdsdata V02-00-01
+- fixing return code from unittest
+
 2010-05-03 - V00-00-04
 ======================
 - fixed imports in unit test

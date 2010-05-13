@@ -238,7 +238,16 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_FEEGasDetEnergy, 14 )
         self.assertEqual ( TypeId.Type.Id_EBeam, 15 )
         self.assertEqual ( TypeId.Type.Id_PhaseCavity, 16 )
-        self.assertEqual ( TypeId.Type.NumberOf, 17 )
+        self.assertEqual ( TypeId.Type.Id_PrincetonFrame, 17 )
+        self.assertEqual ( TypeId.Type.Id_PrincetonConfig, 18 )
+        self.assertEqual ( TypeId.Type.Id_EvrData, 19 )
+        self.assertEqual ( TypeId.Type.Id_FrameFccdConfig, 20 )
+        self.assertEqual ( TypeId.Type.Id_FccdConfig, 21 )
+        self.assertEqual ( TypeId.Type.Id_IpimbData, 22 )
+        self.assertEqual ( TypeId.Type.Id_IpimbConfig, 23 )
+        self.assertEqual ( TypeId.Type.Id_EncoderData, 24 )
+        self.assertEqual ( TypeId.Type.Id_EncoderConfig, 25 )
+        self.assertEqual ( TypeId.Type.NumberOf, 26 )
 
         # instantiation
         TypeId ()
@@ -337,7 +346,9 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Detector.Camp, 8 )
         self.assertEqual ( DetInfo.Detector.EpicsArch, 9 )
         self.assertEqual ( DetInfo.Detector.BldEb, 10 )
-        self.assertEqual ( DetInfo.Detector.NumDetector, 11 )
+        self.assertEqual ( DetInfo.Detector.SxrBeamline, 11 )
+        self.assertEqual ( DetInfo.Detector.SxrEndstation, 12 )
+        self.assertEqual ( DetInfo.Detector.NumDetector, 13 )
         
         self.assertEqual ( DetInfo.Device.NoDevice, 0 )
         self.assertEqual ( DetInfo.Device.Evr, 1 )
@@ -345,7 +356,11 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.Opal1000, 3 )
         self.assertEqual ( DetInfo.Device.TM6740, 4 )
         self.assertEqual ( DetInfo.Device.pnCCD, 5 )
-        self.assertEqual ( DetInfo.Device.NumDevice, 6 )
+        self.assertEqual ( DetInfo.Device.Princeton, 6 )
+        self.assertEqual ( DetInfo.Device.Fccd, 7 )
+        self.assertEqual ( DetInfo.Device.Ipimb, 8 )
+        self.assertEqual ( DetInfo.Device.Encoder, 9 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 10 )
 
         
         o1 = DetInfo(0,0,0,0,0)
@@ -703,6 +718,4 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 : 
         _data = sys.argv[1]
     
-    suite = unittest.TestLoader().loadTestsFromTestCase(pypdsdata_unit_test)
-    unittest.TextTestRunner(verbosity=2).run(suite)
-    
+    unittest.main(argv=[sys.argv[0], '-v'])

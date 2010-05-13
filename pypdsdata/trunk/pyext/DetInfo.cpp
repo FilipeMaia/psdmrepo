@@ -45,6 +45,8 @@ namespace {
       { "Camp",        Pds::DetInfo::Camp },
       { "EpicsArch",   Pds::DetInfo::EpicsArch },
       { "BldEb",       Pds::DetInfo::BldEb },
+      { "SxrBeamline", Pds::DetInfo::SxrBeamline },
+      { "SxrEndstation", Pds::DetInfo::SxrEndstation },
       { "NumDetector", Pds::DetInfo::NumDetector },
       { 0, 0 }
   };
@@ -57,6 +59,10 @@ namespace {
       { "Opal1000",  Pds::DetInfo::Opal1000 },
       { "TM6740",    Pds::DetInfo::TM6740 },
       { "pnCCD",     Pds::DetInfo::pnCCD },
+      { "Princeton", Pds::DetInfo::Princeton },
+      { "Fccd",      Pds::DetInfo::Fccd },
+      { "Ipimb",     Pds::DetInfo::Ipimb },
+      { "Encoder",   Pds::DetInfo::Encoder },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };

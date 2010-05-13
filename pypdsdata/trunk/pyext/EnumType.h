@@ -59,7 +59,7 @@ public:
   // Destructor
   ~EnumType () ;
 
-  // Returns _borrowed_ reference to Pyhton type object
+  // Returns _borrowed_ reference to Python type object
   PyObject* type() { return (PyObject*)&m_type; }
 
   // Make instance of this type, returns new reference

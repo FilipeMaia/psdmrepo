@@ -29,12 +29,10 @@ __version__ = "$Revision$"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
-import sys
 
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-import _pdsdata
 
 #-----------------------------
 # Imports for other modules --
@@ -49,7 +47,7 @@ import numpy as np
 # Exported definitions --
 #------------------------
 
-from _pdsdata.pnccd import ConfigV1
+from _pdsdata.pnccd import *
 
 # extend FrameV1
 class FrameV1(object) :

@@ -23,6 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "ConfigV1.h"
+#include "ConfigV2.h"
 #include "../../Exception.h"
 #include "../TypeLib.h"
 #include "../camera/FrameCoord.h"
@@ -84,21 +85,26 @@ next( PyObject* self, PyObject* args )
   PyObject* configObj ;
   if ( not PyArg_ParseTuple( args, "O:PNCCD.FrameV1.next", &configObj ) ) return 0;
 
-  // check type
-  if ( not pypdsdata::PNCCD::ConfigV1::Object_TypeCheck( configObj ) ) {
-    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a PNCCD.ConfigV1 object");
-    return 0;
+  // get Pds::PNCCD::ConfigV1 from argument which could also be of Config2 type
+  Pds::PNCCD::ConfigV1 config;
+  if ( pypdsdata::PNCCD::ConfigV1::Object_TypeCheck( configObj ) ) {
+    config = *pypdsdata::PNCCD::ConfigV1::pdsObject( configObj );
+  } else {
+    if ( pypdsdata::PNCCD::ConfigV2::Object_TypeCheck( configObj ) ) {
+      Pds::PNCCD::ConfigV2* config2 = pypdsdata::PNCCD::ConfigV2::pdsObject( configObj );
+      config = Pds::PNCCD::ConfigV1(config2->numLinks(), config2->payloadSizePerLink());
+    } else {
+      PyErr_SetString(PyExc_TypeError, "Error: parameter is not a PNCCD.ConfigV1 object");
+      return 0;
+    }
   }
 
-  // convert to Pds config object
-  const Pds::PNCCD::ConfigV1* config = pypdsdata::PNCCD::ConfigV1::pdsObject( configObj );
-
   // get next frame
-  Pds::PNCCD::FrameV1* next = (Pds::PNCCD::FrameV1*)obj->next( *config );
+  Pds::PNCCD::FrameV1* next = (Pds::PNCCD::FrameV1*)obj->next( config );
 
   // make Python object
   pypdsdata::PNCCD::FrameV1* py_this = (pypdsdata::PNCCD::FrameV1*) self;
-  return pypdsdata::PNCCD::FrameV1::PyObject_FromPds( next, py_this->m_parent, config->payloadSizePerLink(), py_this->m_dtor );
+  return pypdsdata::PNCCD::FrameV1::PyObject_FromPds( next, py_this->m_parent, config.payloadSizePerLink(), py_this->m_dtor );
 }
 
 PyObject*
@@ -111,17 +117,22 @@ data( PyObject* self, PyObject* args )
   PyObject* configObj ;
   if ( not PyArg_ParseTuple( args, "O:PNCCD.FrameV1.data", &configObj ) ) return 0;
 
-  // check type
-  if ( not pypdsdata::PNCCD::ConfigV1::Object_TypeCheck( configObj ) ) {
-    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a PNCCD.ConfigV1 object");
-    return 0;
+  // get Pds::PNCCD::ConfigV1 from argument which could also be of Config2 type
+  Pds::PNCCD::ConfigV1 config;
+  if ( pypdsdata::PNCCD::ConfigV1::Object_TypeCheck( configObj ) ) {
+    config = *pypdsdata::PNCCD::ConfigV1::pdsObject( configObj );
+  } else {
+    if ( pypdsdata::PNCCD::ConfigV2::Object_TypeCheck( configObj ) ) {
+      Pds::PNCCD::ConfigV2* config2 = pypdsdata::PNCCD::ConfigV2::pdsObject( configObj );
+      config = Pds::PNCCD::ConfigV1(config2->numLinks(), config2->payloadSizePerLink());
+    } else {
+      PyErr_SetString(PyExc_TypeError, "Error: parameter is not a PNCCD.ConfigV1 object");
+      return 0;
+    }
   }
 
-  // convert to Pds config object
-  const Pds::PNCCD::ConfigV1* config = pypdsdata::PNCCD::ConfigV1::pdsObject( configObj );
-
   // get data size
-  unsigned size = obj->sizeofData( *config );
+  unsigned size = obj->sizeofData( config );
 
   // asume that single frame is 512x512 image
   if ( size != 512*512 ) {
@@ -159,16 +170,21 @@ sizeofData( PyObject* self, PyObject* args )
   PyObject* configObj ;
   if ( not PyArg_ParseTuple( args, "O:PNCCD.FrameV1.sizeofData", &configObj ) ) return 0;
 
-  // check type
-  if ( not pypdsdata::PNCCD::ConfigV1::Object_TypeCheck( configObj ) ) {
-    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a PNCCD.ConfigV1 object");
-    return 0;
+  // get Pds::PNCCD::ConfigV1 from argument which could also be of Config2 type
+  Pds::PNCCD::ConfigV1 config;
+  if ( pypdsdata::PNCCD::ConfigV1::Object_TypeCheck( configObj ) ) {
+    config = *pypdsdata::PNCCD::ConfigV1::pdsObject( configObj );
+  } else {
+    if ( pypdsdata::PNCCD::ConfigV2::Object_TypeCheck( configObj ) ) {
+      Pds::PNCCD::ConfigV2* config2 = pypdsdata::PNCCD::ConfigV2::pdsObject( configObj );
+      config = Pds::PNCCD::ConfigV1(config2->numLinks(), config2->payloadSizePerLink());
+    } else {
+      PyErr_SetString(PyExc_TypeError, "Error: parameter is not a PNCCD.ConfigV1 object");
+      return 0;
+    }
   }
 
-  // convert to Pds config object
-  const Pds::PNCCD::ConfigV1* config = pypdsdata::PNCCD::ConfigV1::pdsObject( configObj );
-
-  return PyInt_FromLong( obj->sizeofData( *config ) );
+  return PyInt_FromLong( obj->sizeofData( config ) );
 }
 
 }

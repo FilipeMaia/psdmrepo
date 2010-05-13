@@ -59,17 +59,32 @@
 #include "types/control/PVControl.h"
 #include "types/control/PVMonitor.h"
 
+#include "types/encoder/ConfigV1.h"
+#include "types/encoder/DataV1.h"
+
 #include "types/epics/EpicsModule.h"
 
 #include "types/evr/ConfigV1.h"
 #include "types/evr/ConfigV2.h"
+#include "types/evr/ConfigV3.h"
+#include "types/evr/EventCodeV3.h"
 #include "types/evr/OutputMap.h"
 #include "types/evr/PulseConfig.h"
+#include "types/evr/PulseConfigV3.h"
+
+#include "types/fccd/FccdConfigV1.h"
+
+#include "types/ipimb/ConfigV1.h"
+#include "types/ipimb/DataV1.h"
 
 #include "types/opal1k/ConfigV1.h"
 
 #include "types/pnCCD/ConfigV1.h"
+#include "types/pnCCD/ConfigV2.h"
 #include "types/pnCCD/FrameV1.h"
+
+#include "types/princeton/ConfigV1.h"
+#include "types/princeton/FrameV1.h"
 
 #include "types/pulnix/TM6740ConfigV1.h"
 
@@ -161,6 +176,12 @@ PyMODINIT_FUNC init_pdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "control", module );
 
+  module = Py_InitModule3( "_pdsdata.encoder", 0, "The Python module for pdsdata/encoder" );
+  pypdsdata::Encoder::ConfigV1::initType( module );
+  pypdsdata::Encoder::DataV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "encoder", module );
+
   // very special epics module
   module = pypdsdata::EpicsModule::getModule();
   Py_INCREF( module );
@@ -169,10 +190,24 @@ PyMODINIT_FUNC init_pdsdata()
   module = Py_InitModule3( "_pdsdata.evr", 0, "The Python module for pdsdata/evr" );
   pypdsdata::EvrData::ConfigV1::initType( module );
   pypdsdata::EvrData::ConfigV2::initType( module );
+  pypdsdata::EvrData::ConfigV3::initType( module );
+  pypdsdata::EvrData::EventCodeV3::initType( module );
   pypdsdata::EvrData::OutputMap::initType( module );
   pypdsdata::EvrData::PulseConfig::initType( module );
+  pypdsdata::EvrData::PulseConfigV3::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "evr", module );
+
+  module = Py_InitModule3( "_pdsdata.fccd", 0, "The Python module for pdsdata/fccd" );
+  pypdsdata::FCCD::FccdConfigV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "fccd", module );
+
+  module = Py_InitModule3( "_pdsdata.ipimb", 0, "The Python module for pdsdata/ipimb" );
+  pypdsdata::Ipimb::ConfigV1::initType( module );
+  pypdsdata::Ipimb::DataV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "ipimb", module );
 
   module = Py_InitModule3( "_pdsdata.opal1k", 0, "The Python module for pdsdata/opal1k" );
   pypdsdata::Opal1k::ConfigV1::initType( module );
@@ -181,9 +216,16 @@ PyMODINIT_FUNC init_pdsdata()
 
   module = Py_InitModule3( "_pdsdata.pnccd", 0, "The Python module for pdsdata/pnCCD" );
   pypdsdata::PNCCD::ConfigV1::initType( module );
+  pypdsdata::PNCCD::ConfigV2::initType( module );
   pypdsdata::PNCCD::FrameV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "pnccd", module );
+
+  module = Py_InitModule3( "_pdsdata.princeton", 0, "The Python module for pdsdata/princeton" );
+  pypdsdata::Princeton::ConfigV1::initType( module );
+  pypdsdata::Princeton::FrameV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "princeton", module );
 
   module = Py_InitModule3( "_pdsdata.pulnix", 0, "The Python module for pdsdata/pulnix" );
   pypdsdata::Pulnix::TM6740ConfigV1::initType( module );

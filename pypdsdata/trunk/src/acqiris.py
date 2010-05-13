@@ -28,12 +28,10 @@ __version__ = "$Revision$"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
-import sys
 
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-import _pdsdata
 
 #-----------------------------
 # Imports for other modules --
@@ -49,12 +47,7 @@ import numpy
 #------------------------
 
 # many classes are unchanged
-ConfigV1 = _pdsdata.acqiris.ConfigV1
-HorizV1 = _pdsdata.acqiris.HorizV1
-TimestampV1 = _pdsdata.acqiris.TimestampV1
-TrigV1 = _pdsdata.acqiris.TrigV1
-VertV1 = _pdsdata.acqiris.VertV1
-
+from _pdsdata.acqiris import *
 
 # extend DataDescV1
 class DataDescV1(object) :
