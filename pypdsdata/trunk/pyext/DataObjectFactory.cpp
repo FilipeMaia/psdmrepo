@@ -38,15 +38,28 @@
 
 #include "types/control/ConfigV1.h"
 
+#include "types/encoder/ConfigV1.h"
+#include "types/encoder/DataV1.h"
+
 #include "types/epics/EpicsModule.h"
 
 #include "types/evr/ConfigV1.h"
 #include "types/evr/ConfigV2.h"
+#include "types/evr/ConfigV3.h"
+#include "types/evr/DataV3.h"
+
+#include "types/fccd/FccdConfigV1.h"
+
+#include "types/ipimb/ConfigV1.h"
+#include "types/ipimb/DataV1.h"
 
 #include "types/opal1k/ConfigV1.h"
 
 #include "types/pnCCD/ConfigV1.h"
 #include "types/pnCCD/FrameV1.h"
+
+#include "types/princeton/ConfigV1.h"
+#include "types/princeton/FrameV1.h"
 
 #include "types/pulnix/TM6740ConfigV1.h"
 
@@ -72,6 +85,14 @@ namespace {
     return pypdsdata::Xtc::PyObject_FromPds( (Pds::Xtc*)newbuf, 0, size, ::buf_dealloc );
   }
 
+  template <typename T, int Version>
+  inline 
+  PyObject* xtc2obj(const Pds::Xtc& xtc, PyObject* parent) {
+    if( Version < 0 or xtc.contains.version() == unsigned(Version) ) {
+      return T::PyObject_FromXtc(xtc, parent); 
+    }
+    return 0;
+  }
 
 }
 
@@ -97,71 +118,49 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     break;
 
   case Pds::TypeId::Id_Frame :
-    if ( xtc.contains.version() == 1 ) {
-      obj = Camera::FrameV1::PyObject_FromXtc(xtc, parent);
-    }
+    if ( not obj ) obj = xtc2obj<Camera::FrameV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_AcqWaveform :
-    if ( xtc.contains.version() == 1 ) {
-      obj = Acqiris::DataDescV1::PyObject_FromXtc(xtc, parent);
-    }
+    if ( not obj ) obj = xtc2obj<Acqiris::DataDescV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_AcqConfig :
-    if ( xtc.contains.version() == 1 ) {
-      obj = Acqiris::ConfigV1::PyObject_FromXtc(xtc, parent);
-    }
+    if ( not obj ) obj = xtc2obj<Acqiris::ConfigV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_TwoDGaussian :
-    if ( xtc.contains.version() == 1 ) {
-      obj = Camera::TwoDGaussianV1::PyObject_FromXtc(xtc, parent);
-    }
+    if ( not obj ) obj = xtc2obj<Camera::TwoDGaussianV1, 1>(xtc, parent);
     break;
 
   case Pds::TypeId::Id_Opal1kConfig :
-    if ( xtc.contains.version() == 1 ) {
-      obj = Opal1k::ConfigV1::PyObject_FromXtc(xtc, parent);
-    }
+    if ( not obj ) obj = xtc2obj<Opal1k::ConfigV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_FrameFexConfig :
-    if ( xtc.contains.version() == 1 ) {
-      obj = Camera::FrameFexConfigV1::PyObject_FromXtc(xtc, parent);
-    }
+    if ( not obj ) obj = xtc2obj<Camera::FrameFexConfigV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_EvrConfig :
-    if ( xtc.contains.version() == 1 ) {
-      obj = EvrData::ConfigV1::PyObject_FromXtc(xtc, parent);
-    } else if ( xtc.contains.version() == 2 ) {
-      obj = EvrData::ConfigV2::PyObject_FromXtc(xtc, parent);
-    }
+    if ( not obj ) obj = xtc2obj<EvrData::ConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<EvrData::ConfigV2, 2>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<EvrData::ConfigV3, 3>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_TM6740Config :
-    if ( xtc.contains.version() == 1 ) {
-      obj = Pulnix::TM6740ConfigV1::PyObject_FromXtc(xtc, parent);
-    }
+    if ( not obj ) obj = xtc2obj<Pulnix::TM6740ConfigV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_ControlConfig :
-    if ( xtc.contains.version() == 1 ) {
-      obj = ControlData::ConfigV1::PyObject_FromXtc(xtc, parent);
-    }
+    if ( not obj ) obj = xtc2obj<ControlData::ConfigV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_pnCCDframe :
-    if ( xtc.contains.version() == 1 ) {
-      obj = PNCCD::FrameV1::PyObject_FromXtc(xtc, parent);
-    }
+    if ( not obj ) obj = xtc2obj<PNCCD::FrameV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_pnCCDconfig :
-    if ( xtc.contains.version() == 1 ) {
-      obj = PNCCD::ConfigV1::PyObject_FromXtc(xtc, parent);
-    }
+    if ( not obj ) obj = xtc2obj<PNCCD::ConfigV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_Epics :
@@ -172,20 +171,49 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_FEEGasDetEnergy :
     // NOTE: does not seem to care about versions
-    obj = BldDataFEEGasDetEnergy::PyObject_FromXtc(xtc, parent);
+    if ( not obj ) obj = xtc2obj<BldDataFEEGasDetEnergy, -1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_EBeam :
-    if ( xtc.contains.version() == 0 ) {
-      obj = BldDataEBeamV0::PyObject_FromXtc(xtc, parent);
-    } else {
-      obj = BldDataEBeam::PyObject_FromXtc(xtc, parent);
-    }
+    if ( not obj ) obj = xtc2obj<BldDataEBeamV0, 0>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<BldDataEBeam, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_PhaseCavity :
     // NOTE: does not seem to care about versions
-    obj = BldDataPhaseCavity::PyObject_FromXtc(xtc, parent);
+    if ( not obj ) obj = xtc2obj<BldDataPhaseCavity, -1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_PrincetonFrame :
+    if ( not obj ) obj = xtc2obj<Princeton::FrameV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_PrincetonConfig :
+    if ( not obj ) obj = xtc2obj<Princeton::ConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_EvrData :
+    if ( not obj ) obj = xtc2obj<EvrData::DataV3, 3>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_FccdConfig :
+    if ( not obj ) obj = xtc2obj<FCCD::FccdConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_IpimbData :
+    if ( not obj ) obj = xtc2obj<Ipimb::DataV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_IpimbConfig :
+    if ( not obj ) obj = xtc2obj<Ipimb::ConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_EncoderData :
+    if ( not obj ) obj = xtc2obj<Encoder::DataV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_EncoderConfig :
+    if ( not obj ) obj = xtc2obj<Encoder::ConfigV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::NumberOf :
