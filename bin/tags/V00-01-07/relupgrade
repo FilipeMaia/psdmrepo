@@ -1,0 +1,78 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Upgrade test release to a different base release number
+#
+#
+
+#
+# various functions definition
+#
+
+usage() {
+
+  cat << EOD
+
+Usage: `basename $0` [options] [release ...]
+
+  Available options:
+    -h          this message
+    -d          debug (turn on -x shell option)
+    
+Upgrade test release to a different base release number.
+Release name can be any valid release name from \$SIT_RELDIR.
+EOD
+}
+
+
+
+# get the options
+while getopts hd c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    d) set -x ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# new release name
+release="$1"
+if [ -z "$release" ] ; then
+  usage
+  exit 2
+fi
+
+# check that we are in the release dir
+if [ ! -f .sit_release -a ! .lusi_release ] ; then
+  echo ".sit_release or .lusi_release are not present in current directory"
+  exit 2
+fi
+
+# check that release exists
+if [ ! -d $SIT_RELDIR/$release ] ; then
+  echo "release name does not exist in $SIT_RELDIR"
+  exit 2
+fi
+
+# update release names
+echo "$release" > .sit_release
+test -f .lusi_release && echo "$release" > .lusi_release
+
+# if we don't have SConsTools checked out then copy SConstruct from new release
+test -d SConsTools || cp $SIT_RELDIR/$release/SConstruct ./
+
+# few things left to do, ask user to do it manually
+cat <<EOD
+
+  Current test release has been successfully upgraded to a new base
+release. There are just few things that need to be done to complete 
+the upgrade:
+1. run sit_setup as usual to update you environment
+2. run scons -c to clean all built libraries and binaries
+3. if you checked out any package from repository verify that 
+  the version you have locally is compatible with new release
+  or use addpkg command to update local version
+
+EOD
