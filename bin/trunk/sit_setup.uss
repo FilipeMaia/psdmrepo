@@ -113,12 +113,7 @@ test -n "$SIT_ROOT" || set_env SIT_ROOT "$def_sit_root"
 test -n "$SIT_RELDIR" || set_env SIT_RELDIR "$SIT_ROOT/sw/releases"
 
 # Subversion root directory
-if [ "$SIT_ENV" = "default" ] ; then
-    test -n "$SIT_SVN" || set_env SIT_SVN "svn+ssh://yakut/afs/slac.stanford.edu/g/lusi/svnrepo"
-else
-    # may setup alternative repo for users
-    unset_env SIT_SVN
-fi
+test -n "$SIT_SVN" || set_env SIT_SVN "svn+ssh://yakut/afs/slac.stanford.edu/g/lusi/svnrepo"
 
 #
 # determine the release to use, could be the first command line argument,
