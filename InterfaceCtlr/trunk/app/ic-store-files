@@ -134,7 +134,10 @@ class ICStoreFiles ( LusiPyApp ) :
                 pattern = config.get('xtc-name-pattern','%(experiment)s-*.xtc') % parm
                 dst_coll = config['filemanager-xtc-dir'] % parm
                 
-                self.process_dir (src_dir, pattern, dst_coll, file_mgr)
+                try:
+                    self.process_dir (src_dir, pattern, dst_coll, file_mgr)
+                except StandardError, exc:
+                    self.error( "Processing failed: %s", exc )
 
             # HDF files
             if 'experiment-hdf5-dir' in config and 'filemanager-hdf5-dir' in config :
@@ -142,7 +145,10 @@ class ICStoreFiles ( LusiPyApp ) :
                 pattern = config.get('hdf5-name-pattern','%(experiment)s-*.h5') % parm
                 dst_coll = config['filemanager-hdf5-dir'] % parm
                 
-                self.process_dir (src_dir, pattern, dst_coll, file_mgr)
+                try:
+                    self.process_dir (src_dir, pattern, dst_coll, file_mgr)
+                except StandardError, exc:
+                    self.error( "Processing failed: %s", exc )
 
 
     def process_dir (self, src_dir, pattern, dst_coll, file_mgr):
