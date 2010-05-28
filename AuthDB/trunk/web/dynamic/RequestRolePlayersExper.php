@@ -10,9 +10,9 @@ require_once('RegDB/RegDB.inc.php');
 if( !isset( $_GET['type'] )) die( "no valid information type in the request" );
 $type = trim( $_GET['type'] );
 
-define( PLAYERS_INSTR, 1 ); // instruments
-define( PLAYERS_EXPER, 2 ); // experiments
-define( PLAYERS,       3 ); // roles themselves
+define( 'PLAYERS_INSTR', 1 ); // instruments
+define( 'PLAYERS_EXPER', 2 ); // experiments
+define( 'PLAYERS',       3 ); // roles themselves
 
 $instr_id = null;
 $exper_id = null;

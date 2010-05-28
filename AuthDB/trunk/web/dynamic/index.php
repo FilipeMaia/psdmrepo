@@ -257,7 +257,8 @@ menubar_data.push ( {
     itemdata: [
         { text: "Authorization Database Manager", url: "../authdb/" },
         { text: "Experiment Registry Database", url: "../regdb/" },
-        { text: "Electronic Log Book", url: "../logbook/" } ],
+        { text: "Electronic Log Book", url: "../logbook/" },
+        { text: "File Explorer", url: "../explorer/" } ],
     disabled: false }
 );
 var menubar_group_home = menubar_data.length;
@@ -405,16 +406,19 @@ function Table( itsTableName, itsColumnDefs, itsDataRequest, hasPaginator ) {
                 rowsPerPage: 20
             }
         );
-    this.dataTable = new YAHOO.widget.DataTable(
-        this.name+"_table_body",
-        this.columnDefs,
-        this.dataSource,
-        { paginator: this.paginator/*new YAHOO.widget.Paginator( { rowsPerPage: 10 } )*/,
-          initialRequest: "" } );
-
-    this.refreshTable = function() {
+    this.createTable = function( itsInitialRequest ) {
+        return new YAHOO.widget.DataTable(
+            this.name+"_table_body",
+            this.columnDefs,
+            this.dataSource,
+            { paginator: this.paginator/*new YAHOO.widget.Paginator( { rowsPerPage: 10 } )*/,
+              initialRequest: itsInitialRequest } );
+    };
+    this.dataTable = this.createTable( "" );
+    this.refreshTable = function( itsInitialRequest ) {
+        /*
         this.dataSource.sendRequest(
-            "",
+            "?string2search=Gapon",
             { success: function() {
                   this.set( "sortedBy", null);
                   this.onDataReturnReplaceRows.apply( this, arguments );
@@ -425,7 +429,11 @@ function Table( itsTableName, itsColumnDefs, itsDataRequest, hasPaginator ) {
                       YAHOO.widget.DataTable.CLASS_ERROR );
                   this.onDataReturnAppendRows.apply( this, arguments );
               },
-              scope: this.dataTable } ); };
+              scope: this.dataTable } );
+        */
+        this.dataTable.destroy();
+        this.dataTable = this.createTable( itsInitialRequest );
+    };
 }
 
 function TableLocal( itsTableName, itsColumnDefs, itsDataArray, hasPaginator ) {
@@ -1372,6 +1380,40 @@ function view_group( name ) {
     table.refreshTable();
 }
 
+
+/*
+ * The variables to maintain the state of the accounts filter. The filter
+ * will be reused accross multiple invocatins of the 'list_accounts()' page.
+ *
+ * TODO: Reimplement this as an object.
+ */
+var accounts_string2search = '';
+var accounts_scope = 'uid_and_name';
+
+function accounts_filter() {
+	return 'string2search=' + accounts_string2search + '&scope=' + accounts_scope;
+}
+
+/*
+ * The bukder for acconts table. The builder will use the above specified
+ * filter.
+ *
+ * TODO: Reimplement this as an object.
+ */
+var accounts_table = null;
+
+function create_accounts_table() {
+    accounts_table = new Table (
+        "workarea",
+        [ { key: "uid",    sortable: true,  resizeable: true },
+          { key: "name",   sortable: true,  resizeable: true },
+          { key: "email",  sortable: true,  resizeable: true },
+          { key: "groups", sortable: false, resizeable: true } ],
+        '../regdb/RequestUserAccounts.php?' + accounts_filter(),
+        true
+    );
+}
+
 function list_accounts() {
 
     set_context(
@@ -1381,21 +1423,67 @@ function list_accounts() {
     reset_workarea();
 
     document.getElementById('workarea').innerHTML=
+        '<div style="margin-bottom:20px; padding:10px; padding-top:15px; border:solid 1px #d0d0d0;">'+
+        '  <form name="accounts_filter_form" action="javascript:apply_accounts_filter()">'+
+        '    <div id="accounts_filter_form_params">Loading...</div>'+
+        '  </form>'+
+        '</div>'+
         '<div id="workarea_table_container">'+
         '  <div id="workarea_table_paginator"></div>'+
         '  <div id="workarea_table_body"></div>'+
         '</div>';
 
-    var table = new Table (
-        "workarea",
-        [ { key: "uid",    sortable: true,  resizeable: true },
-          { key: "name",   sortable: true,  resizeable: true },
-          { key: "email",  sortable: true,  resizeable: true },
-          { key: "groups", sortable: false, resizeable: true } ],
-        '../regdb/RequestUserAccounts.php',
-        true
-    );
-    table.refreshTable();
+    load(
+        'AccountsFilter.php?' + accounts_filter(),
+        'accounts_filter_form_params' );
+
+    YAHOO.util.Event.onContentReady (
+	    "accounts_filter_button",
+	    function () {
+	        var submit_filter_button = new YAHOO.widget.Button( "accounts_filter_button" );
+	        submit_filter_button.on (
+	            "click",
+	            function( p_oEvent ) {
+	                apply_accounts_filter();
+	            }
+	        );
+	    }
+	);
+    create_accounts_table();
+}
+
+function apply_accounts_filter() {
+
+	// Update filter parameters
+	//
+    accounts_string2search = document.accounts_filter_form.accounts_pattern.value;
+    for( var i=0; i < document.accounts_filter_form.scope.length; i++ ) {
+        if( document.accounts_filter_form.scope[i].checked ) {
+        	accounts_scope = document.accounts_filter_form.scope[i].value;
+            break;
+        }
+    }
+
+    // Rebuild the table
+    //
+    create_accounts_table();
+}
+
+function view_account( uid ) {
+
+    set_context(
+        '<a href="javascript:list_accounts()">Select User Account</a> > '+
+        '<i>'+uid+'</i>&nbsp;&nbsp;( <b>Viewing</b> )' );
+
+    reset_navarea();
+    reset_workarea();
+
+    document.getElementById('workarea').innerHTML=
+        '  <form name="account_edit_form" action="ProcessAccountEdit.php">'+
+        '    <div id="account_edit_form_params">Loading...</div>'+
+        '  </form>';
+
+    load( 'AccountInfo.php?uid=' + uid, 'account_edit_form_params' );
 }
 
 </script>

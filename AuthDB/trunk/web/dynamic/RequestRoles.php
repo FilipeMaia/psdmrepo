@@ -9,9 +9,9 @@ require_once('AuthDB/AuthDB.inc.php');
 if( !isset( $_GET['type'] )) die( "no valid information type in the request" );
 $type = trim( $_GET['type'] );
 
-define( ROLES_APPS,  1 );  // applications
-define( ROLES,       2 );  // roles themselves
-define( ROLES_PRIVS, 3 );  // privileges
+define( 'ROLES_APPS',  1 );  // applications
+define( 'ROLES',       2 );  // roles themselves
+define( 'ROLES_PRIVS', 3 );  // privileges
 
 $role_id     = null;
 $application = null;

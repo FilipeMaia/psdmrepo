@@ -11,6 +11,16 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10
+2010-05-28 Igor Gaponenko
+- fixed minor bugs in PHP constant definitions to avoid flooding Apache's log
+files with meaningless warnings
+- added user viewer page
+
+Tag: V00-00-09
+2010-05-03 Andrei Salnikov
+- changes in SConscript
+
 Tag: V00-00-08
 2010-03-22 Igor Gaponenko
 - fixed a bug affecting non-privileged users of some layered apps
