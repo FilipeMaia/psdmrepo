@@ -71,17 +71,15 @@ class LusiTime {
     public static function parse($str) {
 
         $expr = '/(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})(\.(\d{1,9}))?(([-+])(\d{2}):?(\d{2})?)?/';
-        if( !preg_match( $expr, $str, $matches2 ))
-            return null;
+        if( !preg_match( $expr, $str, $matches2 )) return null;
 
-        $sign = $matches2[10];
+        $sign = isset( $matches2[10] ) ? ( $matches2[10] == '-' ? +1 : -1 ) : 0;
         $tzone_hours = isset( $matches2[11] ) ? $matches2[11] : 0;
         $tzone_minutes = isset( $matches2[12] ) ? $matches2[12] : 0;
-        $shift = ($sign=='-' ? +1 : -1)*(3600*$tzone_hours + 60*$tzone_minutes);
+        $shift = $sign * ( 3600 * $tzone_hours + 60 * $tzone_minutes );
         $local_time_str = "$matches2[1]-$matches2[2]-$matches2[3] $matches2[4]:$matches2[5]:$matches2[6]";
         $local_time = strtotime( $local_time_str );
-        if( !$local_time )
-            return null;
+        if( !$local_time ) return null;
 
         //$gmt_time = ($local_time+$shift);
         $gmt_time = $local_time;
@@ -209,4 +207,8 @@ class LusiTime {
     public function equal( $rhs ) {
         return ( $this->sec == $rhs->sec ) && ($this->nsec == $rhs->nsec); }
 }
+/*
+$t = LusiTime::parse( "2010-05-28 14:39:44" );
+print("<br>".$t->toStringShort());
+*/
 ?>
