@@ -23,13 +23,8 @@ try {
         or die( "no such experiment" );
 
     $instrument = $experiment->instrument();
-    $group      = $experiment->POSIX_gid();
-
     $instrument_url =
         "<a href=\"javascript:view_instrument(".$instrument->id().",'".$instrument->name()."')\">".$instrument->name().'</a>';
-
-    $group_url =
-        "<a href=\"javascript:view_group('".$group."')\">".$group.'</a>';
 
     header( 'Content-type: text/html' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
@@ -49,7 +44,7 @@ try {
         ->value   ( 100, 125, $experiment->end_time()->toStringShort())
         ->label   ( 300, 175, 'Contact Info')
         ->label   (   0, 200, 'POSIX Group: ')
-        ->value   ( 100, 200, $group_url )
+        ->value   ( 100, 200, $experiment->POSIX_gid())
         ->textarea( 300, 200, $experiment->contact_info(), 500, 50)
         ->label   (   0, 225, 'Leader: '     )
         ->value   ( 100, 225, $experiment->leader_account())

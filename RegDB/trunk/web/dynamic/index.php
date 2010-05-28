@@ -220,10 +220,6 @@ if( isset( $_GET['action'] )) {
         echo "  edit_instrument( {$id}, '{$name}' );";
     } else if( $action == 'create_instrument' ) {
         echo "  create_instrument();";
-    } else if( $action == 'list_groups' ) {
-        echo "  list_groups();";
-    } else if( $action == 'list_users' ) {
-        echo "  list_users();";
     } else if( $action == 'view_run_numbers' ) {
         $id   = $_GET['id'];
         $name = $_GET['name'];
@@ -264,7 +260,8 @@ menubar_data.push ( {
     itemdata: [
         { text: "Authorization Database Manager", url: "../authdb/" },
         { text: "Experiment Registry Database", url: "../regdb/" },
-        { text: "Electronic Log Book", url: "../logbook/" } ],
+        { text: "Electronic Log Book", url: "../logbook/" },
+        { text: "File Explorer", url: "../explorer/" } ],
     disabled: false }
 );
 var menubar_group_home = menubar_data.length;
@@ -297,17 +294,6 @@ menubar_data.push ( {
         { text: "Select..", url: "javascript:list_instruments()" },
         { text: "Create New..", url: "javascript:create_instrument()", disabled: !auth_granted.edit } ],
     disabled: false }
-);
-var menubar_groups_home = menubar_data.length;
-menubar_data.push ( {
-    id: "ldap",
-    href: "#ldap",
-    title: 'LDAP',
-    title_style: 'font-weight:bold;',
-    itemdata: [
-        { text: "PODIX Groups..", url: "javascript:list_groups()" },
-        { text: "User accounts..", url: "javascript:list_users()" } ],
-    disabled: !auth_granted.read }
 );
 var menubar_runnumbers_home = menubar_data.length;
 menubar_data.push ( {
@@ -1191,85 +1177,6 @@ function delete_instrument( id, name ) {
         'in a permanent loss of data and potentially in a lost of referential integrity '+
         'within the ONLINE and OFFLINE data systems.'
     );
-}
-
-function list_groups() {
-
-	list_groups_grid('vertical');
-/*
-    set_context(
-        'Select POSIX Group >' );
-
-    document.getElementById('workarea').innerHTML=
-        '<div id="workarea_table_container">'+
-        '  <div id="workarea_table_paginator"></div>'+
-        '  <div id="workarea_table_body"></div>'+
-        '</div>';
-
-    var table = new Table (
-        "workarea",
-        [ { key: "group",   sortable: true, resizeable: true } ],
-        'RequestGroups.php',
-        true
-    );
-    table.refreshTable();
-*/
-}
-
-function list_groups_grid( orientation ) {
-
-    set_context(
-        'Select POSIX Group >' );
-
-    load('../regdb/RequestGroups.php?grid='+orientation, 'workarea');
-}
-
-function view_group( name ) {
-
-    set_context(
-        //'Home > '+
-        '<a href="javascript:list_groups()">Select POSIX Group</a> > '+
-        '<i>'+name+'</i>' );
-
-    document.getElementById('workarea').innerHTML=
-        '<div id="workarea_table_container">'+
-        '  <div id="workarea_table_paginator"></div>'+
-        '  <div id="workarea_table_body"></div>'+
-        '</div>';
-
-    var table = new Table (
-        "workarea",
-        [ { key: "uid",   sortable: true, resizeable: true },
-          { key: "name",  sortable: true, resizeable: true },
-          { key: "email", sortable: true, resizeable: true } ],
-        'RequestGroupMembers.php?name='+name,
-        true
-    );
-    table.refreshTable();
-}
-
-
-function list_users() {
-
-    set_context(
-        'Select User Account >' );
-
-    document.getElementById('workarea').innerHTML=
-        '<div id="workarea_table_container">'+
-        '  <div id="workarea_table_paginator"></div>'+
-        '  <div id="workarea_table_body"></div>'+
-        '</div>';
-
-    var table = new Table (
-        "workarea",
-        [ { key: "uid",    sortable: true,  resizeable: true },
-          { key: "name",   sortable: true,  resizeable: true },
-          { key: "email",  sortable: true,  resizeable: true },
-          { key: "groups", sortable: false, resizeable: true } ],
-        'RequestUserAccounts.php',
-        true
-    );
-    table.refreshTable();
 }
 
 function run_numbers() {

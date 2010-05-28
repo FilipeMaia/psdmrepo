@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-22
+2010-05-28 Igor Gaponenko
+- bug fix in RegDBHtml utility class
+- LDAP interfaces migration (yet to be fully completed)
+
 Tag: V00-00-20
 2010-04-26 Igor Gaponenko
 - a bug fix in CreateInstrument class

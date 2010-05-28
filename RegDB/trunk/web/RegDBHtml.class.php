@@ -68,7 +68,7 @@ HERE;
         //$width_str = is_null( $size ) ? '' : "width:{$size}px;";
         $this->html = $this->html.<<<HERE
 <div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
-  <input id="{$var}" type="text" name="{$var}" value="{$text}" style="padding:1px;" title="{$title} {$width_str}" {$size_str} />
+  <input id="{$var}" type="text" name="{$var}" value="{$text}" style="padding:1px;" title="{$title}" {$size_str} />
 </div>
 HERE;
         return $this;
@@ -80,7 +80,7 @@ HERE;
   <select align="center" type="text" name="{$var}" style="padding:1px;">
 HERE;
         foreach( $list as $l ) {
-            if( $i == $default_selected )
+            if( $l == $default_selected )
                 $this->html = $this->html."<option id=\"{$var}_default\" value=\"{$l}\">{$l}</option>";
             else
                 $this->html = $this->html."<option value=\"{$l}\">{$l}</option>";

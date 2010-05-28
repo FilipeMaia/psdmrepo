@@ -356,9 +356,11 @@ class RegDB {
     public function user_accounts ( $user='*' ) {
         return $this->connection->user_accounts( $user ); }
 
+    public function find_user_accounts ( $uid_or_gecos_pattern, $scope ) {
+        return $this->connection->find_user_accounts( $uid_or_gecos_pattern, $scope ); }
+
     public function find_user_account ( $user ) {
         return $this->connection->find_user_account( $user ); }
-
 }
 
 /* =======================

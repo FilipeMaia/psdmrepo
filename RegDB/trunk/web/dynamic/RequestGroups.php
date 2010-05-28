@@ -18,7 +18,7 @@ if( isset( $_GET['grid'] )) {
 		die( "illegal value of the 'grid'. Allowed values are 'vertical' or 'horizontal'" );
 }
 
-$NUM_COLUMNS = 8;
+$NUM_COLUMNS = 12;
 
 function groupUrl( $group ) {
 	return "<a href=\"javascript:view_group('".$group."')\">".$group.'</a>';

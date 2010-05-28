@@ -271,10 +271,65 @@ class RegDBConnection {
         return $list;
     }
 
+    public function find_user_accounts ( $uid_or_gecos_pattern, $scope ) {
+
+        $this->connect();
+
+        $groups = $this->groups();
+        $user2groups = $this->user2groups( $groups );
+
+        $pattern = trim( $uid_or_gecos_pattern );
+        if( $pattern == '' )
+            throw new RegDBException (
+                __METHOD__,
+               "search pattern can't be empty" );
+        if( $scope["uid"] && $scope["gecos"] ) {
+            $filter = "(|(uid=*{$pattern}*)(gecos=*{$pattern}*))";
+        } else if( $scope["uid"] ) {
+        	$filter = "(uid=*{$pattern}*)";
+        } else if( $scope["gecos"] ) {
+        	$filter = "(gecos=*{$pattern}*)";
+        } else {
+        	throw new RegDBException (
+                __METHOD__,
+               "incorrect search scope" );
+        }
+        $sr = ldap_search( $this->ldap_ds, "ou=People,dc=reg,o=slac", $filter );
+        if( !$sr )
+            throw new RegDBException (
+                __METHOD__,
+               "LDAP error: ".ldap_error( $this->ldap_ds ));
+
+        $list = array();
+        $info = ldap_get_entries( $this->ldap_ds, $sr );
+        $num_accounts = $info["count"];
+        for( $i = 0; $i < $num_accounts; $i++ ) {
+            $uid = $info[$i]["uid"][0];
+            $gid_primary = $info[$i]["gidnumber"][0];
+            $user_groups = array();
+            if( array_key_exists( $uid, $user2groups ))
+                $user_groups = $user2groups[$uid];
+            array_push( $user_groups, $groups[$gid_primary]['name'] );
+            array_push(
+                $list,
+                array(
+                    'uid'   => $uid,
+                    'gecos'  => $info[$i]["gecos"][0],
+                    'email' => $uid.'@slac.stanford.edu',
+                    'groups' => $user_groups
+                )
+            );
+        }
+        return $list;
+    }
+
     public function find_user_account ( $name ) {
 
         $this->connect();
 
+        $groups = $this->groups();
+        $user2groups = $this->user2groups( $groups );
+        
         $trim_name = trim( $name );
         if( $trim_name == '' )
             throw new RegDBException (
@@ -294,11 +349,16 @@ class RegDBConnection {
                 __METHOD__,
                "LDAP error: ".ldap_error( $this->ldap_ds ));
         $uid = $info[0]["uid"][0];
+        $gid_primary = $info[0]["gidnumber"][0];
+        $user_groups = array();
+        if( array_key_exists( $uid, $user2groups ))
+            $user_groups = $user2groups[$uid];
+        array_push( $user_groups, $groups[$gid_primary]['name'] );
         return array (
-            'uid'   => $uid,
+            'uid'    => $uid,
             'gecos'  => $info[0]["gecos"][0],
-            'email' => $uid.'@slac.stanford.edu',
-            'gid' => $this->gid2name( $info[0]["gidnumber"][0] ));
+            'email'  => $uid.'@slac.stanford.edu',
+            'groups' => $user_groups );
     }
 
     public function gid2name( $gid ) {

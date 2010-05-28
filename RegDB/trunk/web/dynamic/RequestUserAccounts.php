@@ -11,6 +11,29 @@ if( !RegDBAuth::instance()->canRead()) {
     exit;
 }
 
+/*
+ * The script has two parameters:
+ * - a substring to search in UIDs or names of users. If the parameter is empty
+ *   then all known users will be returned regardless of the scope.
+ * - a scope of the search operation
+ */
+if( isset( $_GET['string2search'] )) {
+    $string2search = trim( $_GET['string2search'] );
+} else {
+    print( RegDBAuth::reporErrorHtml( "no valid string to search in user accounts" ));
+    exit;
+}
+if( isset( $_GET['scope'] )) {
+    $scope = trim( $_GET['scope'] );
+    if( $scope == '' ) {
+        print( RegDBAuth::reporErrorHtml( "search scope can't be empty" ));
+        exit;
+    }
+} else {
+    print( RegDBAuth::reporErrorHtml( "no valid scope to earch in user accounts" ));
+    exit;
+}
+
 function account2json( $account ) {
     $groups_str = '';
     $first = true;
@@ -22,7 +45,7 @@ function account2json( $account ) {
 
     return json_encode(
         array (
-            "uid"    => $account['uid'],
+            "uid"    => "<a href=\"javascript:view_account('".$account['uid']."')\">".$account['uid']."</a> ",
             "name"   => $account['gecos'],
             "email"  => $account['email'],
             "groups" => $groups_str
@@ -37,7 +60,14 @@ try {
     $regdb = new RegDB();
     $regdb->begin();
 
-    $accounts = $regdb->user_accounts();
+    if( $string2search == '' ) {
+    	$accounts = $regdb->user_accounts();
+    } else {
+    	$search_in_scope = array( "uid" => true, "gecos" => true );
+    	if(      $scope == "uid"  ) $search_in_scope["gecos"] = false;
+    	else if( $scope == "name" ) $search_in_scope["uid"]   = false;
+    	$accounts = $regdb->find_user_accounts( $string2search, $search_in_scope );
+    }
 
     header( 'Content-type: application/json' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1

@@ -22,7 +22,7 @@ if( isset( $_GET['name'] )) {
 function member2json( $member ) {
     return json_encode(
         array (
-            "uid"   => $member['uid'],
+            "uid"   => "<a href=\"javascript:view_account('".$member['uid']."')\">".$member['uid']."</a> ",//$member['uid'],
             "name"  => $member['gecos'],
             "email" => $member['email']
         )
