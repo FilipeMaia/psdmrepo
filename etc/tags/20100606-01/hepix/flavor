@@ -1,0 +1,181 @@
+#!/bin/sh
+#
+# flavor -- present consistent uname-like info
+# 
+# $Id$
+# 
+# Copyright (C) 1996  The Board of Trustees of The Leland Stanford
+#                                  Junior University.  All Rights Reserved.
+# 
+# Creator         : Tom Pavel  <pavel>     Tue Nov  5 22:06:58 1996
+# Modifier        : Tom Pavel  <pavel>     Wed Nov  6 17:41:30 1996
+# Update Count    : 35
+# Status          : Tested on many architectures
+# 
+
+#! /bin/sh
+
+if [ -f /usr/bin/uname -o -f /bin/uname ]; then
+    # Thankfully, most systems will have uname, so we can just use
+    # that.  Currently, we just use the arch and OS names, and ignore
+    # version numbers.  This should work most of the time...
+    hardware=`uname -m`
+    software=`uname -s`
+    swversion=`uname -r`
+
+else
+    # No uname, means this is probably a NeXT.  Check for "hostinfo"
+    if [ -x /usr/bin/hostinfo ]; then
+        software=NeXT
+	swversion=`hostinfo | awk '/NeXT Mach/{print $3}' | sed -e s/://`
+	if [ -x /usr/bin/arch ]; then
+	    hardware=`/usr/bin/arch`
+	else
+	   hardware=m68k
+	fi
+    else
+	echo "$0: Unknown architecture type.  Please extend me..." >&2
+	exit 1
+    fi
+fi
+
+
+
+# OK.  Here's where we get to put in kluges for various
+# inconsistencies in what uname reports.
+case ${hardware} in 
+    sparc)
+	# This is what you get from NeXTStep:
+	hardware=sun4
+	;;
+    sun4*)
+	hwversion=$hardware
+	hardware=sun4
+	;;
+    i86pc)
+	# Apparently the Solaris name for intel
+	hardware=i386
+	;;
+    i[456]86)
+	# Well, these are all really the same...
+	hardware=i386
+	;;
+    Power*)
+	# Replace Power 
+	hardware=ppc
+	;;
+esac
+
+case $software in 
+	AIX)
+	    hardware=rs6000
+	    # Strange AIX convention for version info:
+	    swversion=`uname -v`.`uname -r`		
+            case $swversion in
+		3.2)
+		    [ -f /usr/lib/instl/newopps ] && 
+			swversion=`head -1 /usr/lib/instl/newopps`
+		    # There is no good hw info in 3.2.5, 
+		    # so use model num for now...
+		    hwversion=`uname -m | cut -c 9-10`
+		    ;;
+		4.*)
+		    swversion=`lslpp -qLc bos.rte | cut -d':' -f3 `
+		    hwversion=`/usr/sbin/lsattr -EO -l proc0 | 
+			    sed -e '1d' -e '2s/.*://' -e s/PowerPC_/MPC/`
+		    ;;
+	    esac
+	    ;;
+	SunOS)
+	    case $swversion in 
+	       4.*)
+		    # Leave 4.x alone...
+		    ;;
+	       5.*)
+		    software=Solaris
+		    swversion=`echo $swversion | sed -e 's/^5\./2\./'`
+		    ;;
+	    esac
+	    ;;
+	OSF1)
+	    software=OSF
+	    swversion=`echo $swversion | sed -e s/V//`
+	    ;;
+	HP-UX)
+	    hwversion=`echo $hardware | sed -e 's;9000/;;'`
+	    case $hardware in
+		9000/3* )
+		    hardware=m68k
+		    ;;
+		9000/7?? | 9000/8?[79] ) #hppa1.1
+		    hardware=pa
+		    ;;
+		9000/8?? )               #hppa1.0
+		    hardware=pa
+		    ;;
+	    esac
+	    software=HPUX
+	    swversion=`echo $swversion | sed -e 's/[AB]\.0*//'`
+	    ;;
+	IRIX)
+	    software=Irix
+	    hwversion=$hardware
+	    hardware=mips
+	    ;;
+	ULTRIX)
+	    software=Ultrix
+	    case $hardware in
+		RISC)
+		    hardware=mips
+		    ;;
+	    esac
+esac
+
+case $# in
+	0)
+	   if [ -n "$hwversion" ]; then
+	      echo ${hardware}-${hwversion}_${software}-${swversion}
+	   else
+	      echo ${hardware}_${software}-${swversion}
+	   fi
+	   ;;
+
+	1)
+	   case $1 in
+	      -m)
+		  echo $hardware
+		  ;;
+	      -M)
+		  if [ -n "$hwversion" ]; then
+		     echo ${hardware}-${hwversion}
+		  else
+		     echo ${hardware}
+		  fi
+		  ;;
+	      -s)   
+		  echo $software
+		  ;;
+              -S)
+		  echo ${software}-${swversion}
+		  ;;
+	      -[rv])
+		     echo $swversion
+		     ;;
+	      -h)
+		    echo $hwversion
+		    ;;
+	      -c)
+		    # colon separated fields
+		    echo ${hardware}:${hwversion}:${software}:${swversion}
+		    ;;
+	      *)
+		 echo $0: unknown option \"$1\"
+		 ;;
+	   esac
+	   ;;
+	*)
+	   echo "Usage: $0 [-mMsSvc]" >&2
+	   ;;
+esac
+
+exit 0
