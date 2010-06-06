@@ -11,6 +11,12 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-07
+2010-06-06 Andy Salnikov
+- InterfaceDb has new method controller_status() to be used by 
+  web services
+- new script ic-cleanup to be run as a cron job
+
 Tag: V00-04-06
 2010-05-27 Andy Salnikov
 - ic-store-files: catch all exceptions, protection is needed when 

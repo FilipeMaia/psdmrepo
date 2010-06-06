@@ -155,6 +155,34 @@ class InterfaceDb ( object ) :
         
         return dict ( id=controller_id, translate_uri=translate_uri, log_uri=log_uri)
 
+    @_synchronized
+    @_transaction
+    def controller_status(self, cursor=None):
+        """
+        Returns dictionary describing controller status.
+        """
+
+        # get the latest controller
+        cursor.execute("""select n.node_uri, c.started, c.stopped, c.process_id 
+            from interface_controller c, translator_node n 
+            where n.id=c.fk_translator_node 
+            order by started desc limit 1""")
+        rows = cursor.fetchall()
+        if rows :
+            row = rows[0]
+            host = row[0]
+            started = str(row[1])
+            stopped = row[2]
+            pid = row[3]
+            status = 'running'
+            if stopped : 
+                stopped = str(stopped)
+                status = 'stopped'
+            return dict ( host=host, pid=pid, started=started, stopped=stopped, status=status)
+        else :
+            return dict()
+
+
     # ===========================================
     # get configuration information from database
     # ===========================================
@@ -330,7 +358,6 @@ class InterfaceDb ( object ) :
 
         """ change the fileset to the requested status"""
 
-        cursor.execute("START TRANSACTION")
         cursor.execute("""UPDATE fileset SET fk_fileset_status = (SELECT id FROM fileset_status_def WHERE name=%s), locked = FALSE 
             WHERE fileset.id = %s""", (status, fileset_id) )
 
@@ -346,7 +373,6 @@ class InterfaceDb ( object ) :
         """Add a row for this translator process. Update statistics after run is complete.
         Return the id of the new row for later update"""
 
-        cursor.execute("START TRANSACTION")
         cursor.execute("""INSERT INTO translator_process 
                 (id, fk_interface_controller, fk_fileset, kill_tp, started)
                 VALUES(NULL, %s, %s, False, %s)""", 
@@ -373,10 +399,8 @@ class InterfaceDb ( object ) :
         usage = resource.getrusage(resource.RUSAGE_CHILDREN)
         diff = tuple([ usage[x]-perf_prev[x] for x in range(0, 16) ])
         
-    
-        cursor.execute("START TRANSACTION")
         cursor.execute("""UPDATE translator_process SET 
-            stopped = %s, filesize_bytes = %s, tstatus_code = %s, 
+           stopped = %s, filesize_bytes = %s, tstatus_code = %s, 
            tru_utime = %s,  tru_stime = %s,    tru_maxrss = %s,   tru_ixrss = %s,
            tru_idrss = %s,  tru_isrss = %s,    tru_minflt = %s,   tru_majflt = %s,
            tru_nswap = %s,  tru_inblock = %s,  tru_outblock = %s, tru_msgsnd = %s,
@@ -395,8 +419,6 @@ class InterfaceDb ( object ) :
     def update_irods_status ( self, translator_id, status_code, cursor=None) :
         """Update the irods status in the row for this translator process."""
 
-    
-        cursor.execute("START TRANSACTION")
         cursor.execute("""UPDATE translator_process SET istatus_code = %s
                WHERE id = %s """, (status_code, translator_id) )
 
