@@ -1,0 +1,79 @@
+#!/bin/sh
+#
+# Shell script which runs a manages a bunch of controllers
+#
+# $Id$
+#
+
+# Number of translator instances to run
+translators=8
+
+# release directory
+release=/reg/g/psdm/sw/releases/0.2.2
+#release=/reg/neh/home/salnikov/releases/ic-0.2.2
+
+# database options
+conn_file=/reg/g/psdm/psdatmgr/ic/.icdb-conn
+
+# config section names to read from database
+config="meta-db group-time compress no-split"
+#config="group-time compress no-split"
+
+# log directory
+logdir=/reg/g/psdm/psdatmgr/ic/log
+
+# ===================================================================
+
+usage () {
+  echo "Usage: $(basename $0) [options]"
+  echo "  Options:"
+  echo "    -h        - print this message"
+  echo "    -n number - number of controllers, def: $instances"
+  echo "    -r path   - release directory, def: $release"
+  echo "    -p path   - PID file path, def: none"
+}
+
+while getopts hn:r:p: c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    n) instances="$OPTARG" ;;
+    r) release="$OPTARG" ;;
+    p) pidfile="$OPTARG" ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# do not allow world access
+umask 027
+
+# create log dir
+test -d "$logdir" || mkdir -p "$logdir" || exit 2
+
+# redirect output
+time=`date +%Y%m%dT%H%M%S`
+log="$logdir/ic-controller-$time-`hostname`.log"
+exec >"$log" 2>&1
+
+echo "Running from release $release"
+echo "Using configurations $config"
+
+# have to be in release directory
+cd "$release"
+
+# run setup script, it should guess everything based on the current directory
+. /reg/g/psdm/bin/lusi_setup.sh
+
+# set config options
+config_opt=""
+for c in $config ; do
+	config_opt="$config_opt -c $c"
+done
+
+ic-controller -d "file:${conn_file}" $config_opt -n $translators -v -v -v &
+pid=$!
+
+# store PID
+test -n "$pidfile" && echo $pid >"$pidfile"
+
+exit
