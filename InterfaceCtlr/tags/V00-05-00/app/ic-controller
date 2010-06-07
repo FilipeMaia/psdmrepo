@@ -1,0 +1,325 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Interface Controller.
+#
+#------------------------------------------------------------------------
+
+"""Interface Controller for Photon Science Data Management.
+
+This is the Interface Controller that monitors filesets created by the online system.
+It creates a translator process to translate the fileset into HDF5 and enters the 
+translated file into iRODS. rt
+
+This software was developed for the LUSI project.  If you use all or
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$
+
+@author Robert C. Sass
+"""
+
+
+#------------------------------
+#  Module's version from SVN --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import signal
+import socket
+import time
+import fnmatch
+import traceback
+from pprint import pformat
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from InterfaceCtlr.TranslatorThread import TranslatorThread
+from InterfaceCtlr.InterfaceDb import InterfaceDb
+from LusiPython.DbConnection import DbConnection
+from LusiTime.Time import Time
+
+#---------------------
+# Local definitions --
+#---------------------
+
+_CONN_STR = "Server=psdb.slac.stanford.edu;Database=interface_db;"
+
+def _sig2int(signum, frame):
+    # convert signals to SIGINT
+    raise KeyboardInterrupt()
+    
+
+#--------------------------
+# Specialized exceptions --
+#--------------------------
+
+#--------------------------------
+# Application class definition --
+#--------------------------------
+
+class Controller ( LusiPyApp ) :
+
+
+    # ===========
+    # constructor
+    # ===========
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ (
+            self,
+            installLogger = True,
+            usage = "usage: %prog [<command>] [<parameters>] [<options>]" )
+
+        # Add application options, see optparse module for details -------------
+        #
+        self._parser.add_option ( '-d', "--conn-string",
+                                  action="store", dest="conn_string", default=_CONN_STR,
+                                  help="database connection string", metavar="CONN_STRING" )
+
+        self._parser.add_option ( '-u', "--user",
+                                  action="store", dest="user", default=None,
+                                  help="override default user name" )
+
+        self._parser.add_option ( '-p', "--password",
+                                  action="store", dest="password", default=None,
+                                  help="specify user password (no password by default)" )
+
+        self._parser.add_option ( '-c', "--config",
+                                  action="append", dest="config", default=[],
+                                  help="specify configuration section in the database", metavar="STRING" )
+
+        self._parser.add_option ( '-n', "--threads",
+                                  action="store", dest="threads", default=1, type='int',
+                                  help="number of translators to run simultaneously", metavar="NUMBER" )
+
+        # other instance variables
+        self._db = None
+        self._controller_id = None
+        self._config = {}
+        self._perm_config = {}
+        self._config_counter = 0
+
+    # ==========================================
+    # Run the controller after installing logger. 
+    # See LusiPyApp class for details.
+    # ==========================================
+
+    def _run ( self ) :
+
+        # setup signal handling
+#        signal.signal ( signal.SIGTERM, _sig2int )
+#        signal.signal ( signal.SIGABRT, _sig2int )
+#        signal.signal ( signal.SIGQUIT, _sig2int )
+
+
+        # if this throws then we are done
+        self.__init_controller()
+        
+        # current threads
+        translators = []
+        counter = 1
+        
+        # start infinite loop
+        while not self._db.test_exit_controller(self._controller_id) :
+            
+            # re-read configurations
+            self._read_config()
+            
+            try:
+                
+                # get rid of the finished threads
+                translators = [ t for t in translators if t.isAlive() ]
+                
+                if len(translators) >= self._options.threads :
+                    
+                    # wait until one more thread finishes
+                    time.sleep(10)
+
+                else :
+                    
+                    # can start one more thread
+                    
+                    # try to find new fileset, currently we expect filesets
+                    # with status Waiting_Translation which should have all
+                    # corresponding files or filesets with status  Initial_Entry
+                    # for which we need to find the files on disk
+                    
+                    # check if there is a fileset with Initial_Entry and find files for it
+                    fs = self._db.get_fileset('Initial_Entry')
+                    if fs:
+                        fs_id = fs['id']
+                        # check the files
+                        if fs['xtc_files'] :
+                            self.error ( 'expecting empty fileset: %s', pformat(fs) )
+                            self._db.change_fileset_status (fs_id, 'Empty_Fileset')
+                            fs = None
+                        else :
+                            files = self.__find_files( fs )
+                            if not files :
+                                self.error ( 'could not find files for fileset: %s', pformat(fs) )
+                                self._db.change_fileset_status (fs_id, 'Empty_Fileset')
+                                fs = None
+                            else :
+                                self._db.add_files ( fs['id'], 'XTC', files )
+                                self._db.change_fileset_status (fs_id, 'Waiting_Translation')
+
+                    # now try to see if there is a fileset with files
+                    fs = self._db.get_fileset('Waiting_Translation')
+                    if fs:
+                        fs_id = fs['id']
+                        # must have some files associated
+                        if not fs['xtc_files'] :
+                            self.error ( 'expecting non-empty fileset: %s', pformat(fs) )
+                            self._db.change_fileset_status (fs_id, 'Empty_Fileset')
+                            fs = None
+                            
+                    if fs:
+                        
+                        # Found a new fileset to translate
+                        self.trace( 'found new fileset %s', pformat(fs) )
+                        
+                        # adjust few things
+                        fs['instrument_lower'] = fs['instrument'].lower()
+
+                        counter += 1
+                        name = "Tran=%04d" % counter
+                        logger = self
+
+                        # start new thread
+                        thread = TranslatorThread( fs, name, self._db, self._config, logger )
+                        thread.start()
+
+                        translators.append(thread)
+
+                    else:
+                        
+                        # Nothing to do, sleep, look for work again
+                        time.sleep(10)
+
+            except KeyboardInterrupt:
+                
+                self.info ("Received interrupt signal, exiting.")
+                break
+
+            except Exception, ex :
+                
+                # all other exceptions are trapped
+                self.error( "Exception caught in main loop: %s", str(ex) )
+                self.error( "Exception info: %s", traceback.format_tb(sys.exc_info()[2]) )
+
+                # wait until dust settles
+                time.sleep(10.0)
+
+        # End while not exit_controller
+        
+        self.info ("Request to kill controller #%d", self._controller_id)
+        self._db.exit_controller(self._controller_id)
+        return 
+
+
+    # ========================
+    # Init Controller instance
+    # ========================
+
+    def __init_controller ( self ) :
+
+        """Perform multiple operations to initialize the controller:
+        1) Connect to the database.
+        2) Find our translator output uri in the translator_nodes table.
+        3) Insert an entry in the interface_controller table.
+        4) read config data from database and store in self._config
+
+        """
+
+        # create database instance
+        conn = DbConnection( conn_string=self._options.conn_string, 
+                             user=self._options.user,
+                             passwd=self._options.password )
+        self._db = InterfaceDb( conn, self ) 
+
+        # define new controller instance
+        host = socket.getfqdn(socket.gethostname())
+        ctrl = self._db.new_controller( host )
+        self._controller_id = ctrl['id']
+
+        self._perm_config["_log_uri"] = ctrl['log_uri']
+        self._perm_config["_translate_uri"] = ctrl['translate_uri']
+        self._perm_config["_controller_id"] = ctrl['id']
+
+        self.info ("Successful init_controller on host %s started %s", host, Time.now() )
+
+
+    # =========================================
+    # read complete configuration from database
+    # =========================================
+
+    def _read_config (self):
+
+        # read from database
+        self._config = self._db.read_config( self._options.config, self._config_counter == 0 )
+        
+        # add permanent configuration
+        self._config.update( self._perm_config )
+
+        self._config_counter += 1
+
+    # =========================================================
+    # Find the files in filesystem corresponding to the fileset
+    # =========================================================
+    
+    def __find_files( self, fs ) :
+        
+        xtc_root = self._config.get( 'xtc-location-root', None )
+        if not xtc_root :
+            self.error( 'configuration parameter xtc-location-root not defined, check -c options and config_def table' )
+            return []
+        xtc_name_pattern = self._config.get( 'xtc-name-pattern', None )
+        if not xtc_name_pattern :
+            self.error( 'configuration parameter xtc-name-pattern not defined, check -c options and config_def table' )
+            return []
+
+        # interpolate with the fileset parameters
+        xtc_root = xtc_root % fs
+
+        # look into this directory and all its subdirectories (1 level only)
+        files = [ os.path.join(xtc_root, f) for f in os.listdir( xtc_root ) ]
+        subdirs = [ f for f in files if os.path.isdir(f) ]
+
+        # find all files matching a pattern
+        pattern = xtc_name_pattern % fs
+        files = []
+        for sdir in [xtc_root]+subdirs :
+
+            
+            flist = fnmatch.filter ( os.listdir(sdir), pattern )
+            files += [os.path.join(sdir,f) for f in flist]
+
+        return files
+
+# ==============================================
+# Run application when imported as a main module
+# ==============================================
+
+if __name__ == "__main__" :
+    app = Controller()
+    rc = app.run()
+    sys.exit(rc)
