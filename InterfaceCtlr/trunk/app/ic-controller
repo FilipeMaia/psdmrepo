@@ -297,17 +297,21 @@ class Controller ( LusiPyApp ) :
             self.error( 'configuration parameter xtc-name-pattern not defined, check -c options and config_def table' )
             return []
 
-        # get the list of subdirectories
+        # interpolate with the fileset parameters
+        xtc_root = xtc_root % fs
+
+        # look into this directory and all its subdirectories (1 level only)
         files = [ os.path.join(xtc_root, f) for f in os.listdir( xtc_root ) ]
         subdirs = [ f for f in files if os.path.isdir(f) ]
 
         # find all files matching a pattern
         pattern = xtc_name_pattern % fs
         files = []
-        for sdir in subdirs :
+        for sdir in [xtc_root]+subdirs :
 
-            exp_dir = os.path.join( sdir, fs['instrument'], fs['experiment'] )
-            files += fnmatch.filter ( os.listdir(exp_dir), pattern )
+            
+            flist = fnmatch.filter ( os.listdir(sdir), pattern )
+            files += [os.path.join(sdir,f) for f in flist]
 
         return files
 

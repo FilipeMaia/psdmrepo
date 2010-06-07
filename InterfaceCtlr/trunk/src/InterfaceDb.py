@@ -157,30 +157,40 @@ class InterfaceDb ( object ) :
 
     @_synchronized
     @_transaction
-    def controller_status(self, cursor=None):
+    def controller_status(self, id=None, cursor=None):
         """
-        Returns dictionary describing controller status.
+        Returns list describing controller status. Every list item describes separate host
+        which is in active state.
         """
 
-        # get the latest controller
-        cursor.execute("""select n.node_uri, c.started, c.stopped, c.process_id 
-            from interface_controller c, translator_node n 
-            where n.id=c.fk_translator_node 
-            order by started desc limit 1""")
-        rows = cursor.fetchall()
-        if rows :
-            row = rows[0]
-            host = row[0]
-            started = str(row[1])
-            stopped = row[2]
-            pid = row[3]
-            status = 'running'
+        if id is None :
+            # get the latest controller for every active node
+            q = """SELECT c.id, n.node_uri, c.started, c.stopped, c.process_id 
+                FROM interface_controller c, translator_node n, 
+                    (SELECT fk_translator_node nid, max(started) started 
+                     FROM interface_controller 
+                     GROUP BY nid) cmax 
+                WHERE n.id = c.fk_translator_node AND c.fk_translator_node = cmax.nid 
+                     AND c.started = cmax.started AND n.active"""
+            vars = ()
+        else :
+            q = """SELECT c.id, n.node_uri, c.started, c.stopped, c.process_id 
+                FROM interface_controller c, translator_node n
+                WHERE n.id = c.fk_translator_node AND c.id = %s"""
+            vars = (id,)
+        
+        cursor.execute(q, vars)
+        
+        res = []
+        for row in cursor.fetchall():
+            cid, host, started, stopped, pid = row
+            status = 'Running'
             if stopped : 
                 stopped = str(stopped)
-                status = 'stopped'
-            return dict ( host=host, pid=pid, started=started, stopped=stopped, status=status)
-        else :
-            return dict()
+                status = 'Stopped'
+            res.append( dict ( id=cid, host=host, pid=pid, started=str(started), stopped=stopped, status=status) )
+            
+        return res
 
 
     # ===========================================
@@ -462,7 +472,7 @@ class InterfaceDb ( object ) :
     def active_experiments ( self, cursor ) :
         """Returns list of tuples (instr,exp) for all active experiments"""
 
-        cursor.execute("SELECT instrument, experiment FROM active_exp ORDER BY instrument, experiment")
+        cursor.execute("SELECT instrument, experiment, since FROM active_exp ORDER BY instrument, experiment")
         rows = cursor.fetchall()
 
         # non-empty means we found something
@@ -508,6 +518,8 @@ class InterfaceDb ( object ) :
             @param xtcfiles     list of path names
             @param duplicate    disable/enable duplicate filesets
             @param status       fileset status
+            
+            Returns ID of the new fileset.
         """
         
 
@@ -546,6 +558,7 @@ class InterfaceDb ( object ) :
         # Set fileset status to "Waiting_Translation" and we're done
         cursor.execute( "UPDATE fileset SET fk_fileset_status=%s, locked=0 WHERE fileset.id = %s", (wtstat, newset) )
 
+        return newset
 
     # ==============
     # Remove fileset
@@ -553,8 +566,27 @@ class InterfaceDb ( object ) :
 
     @_synchronized
     @_transaction
+    def remove_fileset_id (self, id, cursor=None ) :
+        """ Delete existing fileset based on its ID.
+            @param id        fileset id
+        """
+        
+        # delete all translator processes for those filesets
+        q = "DELETE FROM translator_process WHERE fk_fileset = %s"
+        cursor.execute ( q, (id,) )
+    
+        # delete all files for those filesets
+        q = "DELETE FROM files WHERE fk_fileset_id = %s"
+        cursor.execute ( q, (id,) )
+
+        # delete filesets
+        q = "DELETE FROM fileset WHERE id = %s"
+        cursor.execute ( q, (id,) )
+
+    @_synchronized
+    @_transaction
     def remove_fileset (self, instr, exper, runnum=None, cursor=None ) :
-        """ Register new fileset.         
+        """ Delete existing fileset.
             @param instr        instrument name
             @param exper        experiment name
             @param runum        run number, if None remove all run numbers

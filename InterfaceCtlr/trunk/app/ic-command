@@ -285,7 +285,7 @@ SUPPORTED COMMANDS:
         if args:
             self._parser.error("No arguments expected - %s" % command)
 
-        for instr, exp in self.icdb().active_experiments() :
+        for instr, exp, since in self.icdb().active_experiments() :
             print "%-6s %s" %(instr, exp)
         
         return 0
