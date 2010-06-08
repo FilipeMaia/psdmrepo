@@ -1,0 +1,729 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script pypdsdata-unit-test...
+#
+#------------------------------------------------------------------------
+
+"""Test script for pypdsdata module.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import unittest
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from pypdsdata import *
+from pypdsdata.xtc import *
+
+#---------------------
+# Local definitions --
+#---------------------
+
+# location of the test data file, this is downloaded together with 
+# the C++ pdsdata library
+_data = '/reg/g/psdm/sw/external/pypdsdata/test/opal1k.xtc'
+
+#-------------------------------
+#  Unit test class definition --
+#-------------------------------
+
+class pypdsdata_unit_test ( unittest.TestCase ) :
+
+    def setUp(self) :
+    	""" 
+    	Method called to prepare the test fixture. This is called immediately 
+    	before calling the test method; any exception raised by this method 
+    	will be considered an error rather than a test failure.  
+    	"""
+        pass
+    
+    def tearDown(self) :
+        """
+        Method called immediately after the test method has been called and 
+        the result recorded. This is called even if the test method raised 
+        an exception, so the implementation in subclasses may need to be 
+        particularly careful about checking internal state. Any exception raised 
+        by this method will be considered an error rather than a test failure. 
+        This method will only be called if the setUp() succeeds, regardless 
+        of the outcome of the test method. 
+        """
+        pass
+
+    def test_ClockTime(self):
+    	""" Test for ClockTime class """
+        
+        c1 = ClockTime()
+        
+        # check that we can call methods
+        c1.seconds()
+        c1.nanoseconds()
+
+        self.assertEqual( c1.seconds(), 0 )
+        self.assertEqual( c1.nanoseconds(), 0 )
+
+        
+        c2 = ClockTime(1,1)
+        self.assertEqual( c2.seconds(), 1 )
+        self.assertEqual( c2.nanoseconds(), 1 )
+
+        # compare
+        self.assert_ ( c2 > c1 ) 
+        self.assert_ ( c2 >= c1 ) 
+        self.assert_ ( c1 < c2 ) 
+        self.assert_ ( c1 <= c2 ) 
+        self.assert_ ( c2 != c1 ) 
+        self.assert_ ( c2 == c2 ) 
+        self.assertEqual ( c1, c1 ) 
+
+        # nanosecs out of range
+        self.assertRaises( TypeError, lambda : ClockTime(0,1000000000) )
+
+        # can use for keys
+        d = {}
+        d[c1] = c1
+        d[c2] = c2
+        self.assertEqual ( len(d), 2 ) 
+
+    def test_Level(self):
+        """ Test for Level class """
+        
+        # check enums
+        self.assertEqual ( Level.Control, 0 )
+        self.assertEqual ( Level.Source, 1 )
+        self.assertEqual ( Level.Segment, 2 )
+        self.assertEqual ( Level.Event, 3 )
+        self.assertEqual ( Level.Recorder, 4 )
+        self.assertEqual ( Level.Observer, 5 )
+        self.assertEqual ( Level.Reporter, 6 )
+        self.assertEqual ( Level.NumberOfLevels, 7 )
+        
+        # instantiation
+        Level( Level.Control )
+        Level( Level.Source )
+        Level( Level.Segment )
+        Level( Level.Event )
+        Level( Level.Recorder )
+        Level( Level.Observer )
+        Level( Level.Reporter )
+        
+        # out of range
+        self.assertRaises( TypeError, lambda : Level( Level.NumberOfLevels ) )
+        self.assertRaises( TypeError, lambda : Level( -1 ) )
+        self.assertRaises( TypeError, lambda : Level( 1000000 ) )
+
+        # compare
+        self.assertEqual ( Level(Level.Control), Level.Control )
+        self.assertEqual ( Level(Level.Source), Level.Source )
+        self.assertEqual ( Level(Level.Segment), Level.Segment )
+        self.assertEqual ( Level(Level.Event), Level.Event )
+        self.assertEqual ( Level(Level.Recorder), Level.Recorder )
+        self.assertEqual ( Level(Level.Observer), Level.Observer )
+        self.assertEqual ( Level(Level.Reporter), Level.Reporter )
+
+        # string names
+        self.assertEqual ( str(Level(Level.Control)), "Control" )
+        self.assertEqual ( str(Level(Level.Source)), "Source" )
+        self.assertEqual ( str(Level(Level.Segment)), "Segment" )
+        self.assertEqual ( str(Level(Level.Event)), "Event" )
+        self.assertEqual ( str(Level(Level.Recorder)), "Recorder" )
+        self.assertEqual ( str(Level(Level.Observer)), "Observer" )
+        self.assertEqual ( str(Level(Level.Reporter)), "Reporter" )
+
+
+    def test_TransitionId(self):
+        """ Test for TransitionId class """
+        
+        # check enums
+        self.assertEqual ( TransitionId.Unknown, 0 )
+        self.assertEqual ( TransitionId.Reset, 1 )
+        self.assertEqual ( TransitionId.Map, 2 )
+        self.assertEqual ( TransitionId.Unmap, 3 )
+        self.assertEqual ( TransitionId.Configure, 4 )
+        self.assertEqual ( TransitionId.Unconfigure, 5 )
+        self.assertEqual ( TransitionId.BeginRun, 6 )
+        self.assertEqual ( TransitionId.EndRun, 7 )
+        self.assertEqual ( TransitionId.BeginCalibCycle, 8 )
+        self.assertEqual ( TransitionId.EndCalibCycle, 9 )
+        self.assertEqual ( TransitionId.Enable, 10 )
+        self.assertEqual ( TransitionId.Disable, 11 )
+        self.assertEqual ( TransitionId.L1Accept, 12 )
+        self.assertEqual ( TransitionId.NumberOf, 13 )
+
+        # instantiation
+        TransitionId ( TransitionId.Unknown )
+        TransitionId ( TransitionId.Reset )
+        TransitionId ( TransitionId.Map )
+        TransitionId ( TransitionId.Unmap )
+        TransitionId ( TransitionId.Configure )
+        TransitionId ( TransitionId.Unconfigure )
+        TransitionId ( TransitionId.BeginRun )
+        TransitionId ( TransitionId.EndRun )
+        TransitionId ( TransitionId.BeginCalibCycle )
+        TransitionId ( TransitionId.EndCalibCycle )
+        TransitionId ( TransitionId.Enable )
+        TransitionId ( TransitionId.Disable )
+        TransitionId ( TransitionId.L1Accept )
+
+        # out of range
+        self.assertRaises( TypeError, lambda : TransitionId( TransitionId.NumberOf ) )
+        self.assertRaises( TypeError, lambda : TransitionId( -1 ) )
+        self.assertRaises( TypeError, lambda : TransitionId( 1000000 ) )
+
+        # compare
+        for i in range(TransitionId.NumberOf) :
+            self.assertEqual ( TransitionId(i), i )
+
+        # names
+        self.assertEqual ( str(TransitionId(TransitionId.Unknown)), "Unknown" )
+        self.assertEqual ( str(TransitionId(TransitionId.Reset)), "Reset" )
+        self.assertEqual ( str(TransitionId(TransitionId.Map)), "Map" )
+        self.assertEqual ( str(TransitionId(TransitionId.Unmap)), "Unmap" )
+        self.assertEqual ( str(TransitionId(TransitionId.Configure)), "Configure" )
+        self.assertEqual ( str(TransitionId(TransitionId.Unconfigure)), "Unconfigure" )
+        self.assertEqual ( str(TransitionId(TransitionId.BeginRun)), "BeginRun" )
+        self.assertEqual ( str(TransitionId(TransitionId.EndRun)), "EndRun" )
+        self.assertEqual ( str(TransitionId(TransitionId.BeginCalibCycle)), "BeginCalibCycle" )
+        self.assertEqual ( str(TransitionId(TransitionId.EndCalibCycle)), "EndCalibCycle" )
+        self.assertEqual ( str(TransitionId(TransitionId.Enable)), "Enable" )
+        self.assertEqual ( str(TransitionId(TransitionId.Disable)), "Disable" )
+        self.assertEqual ( str(TransitionId(TransitionId.L1Accept)), "L1Accept" )
+
+
+
+    def test_TypeId(self):
+        """ Test for TypeId class """
+        
+        # check enums
+        self.assertEqual ( TypeId.Type.Any, 0 )
+        self.assertEqual ( TypeId.Type.Id_Xtc, 1 )
+        self.assertEqual ( TypeId.Type.Id_Frame, 2 )
+        self.assertEqual ( TypeId.Type.Id_AcqWaveform, 3 )
+        self.assertEqual ( TypeId.Type.Id_AcqConfig, 4 )
+        self.assertEqual ( TypeId.Type.Id_TwoDGaussian, 5 )
+        self.assertEqual ( TypeId.Type.Id_Opal1kConfig, 6 )
+        self.assertEqual ( TypeId.Type.Id_FrameFexConfig, 7 )
+        self.assertEqual ( TypeId.Type.Id_EvrConfig, 8 )
+        self.assertEqual ( TypeId.Type.Id_TM6740Config, 9 )
+        self.assertEqual ( TypeId.Type.Id_ControlConfig, 10 )
+        self.assertEqual ( TypeId.Type.Id_pnCCDframe, 11 )
+        self.assertEqual ( TypeId.Type.Id_pnCCDconfig, 12 )
+        self.assertEqual ( TypeId.Type.Id_Epics, 13 )
+        self.assertEqual ( TypeId.Type.Id_FEEGasDetEnergy, 14 )
+        self.assertEqual ( TypeId.Type.Id_EBeam, 15 )
+        self.assertEqual ( TypeId.Type.Id_PhaseCavity, 16 )
+        self.assertEqual ( TypeId.Type.Id_PrincetonFrame, 17 )
+        self.assertEqual ( TypeId.Type.Id_PrincetonConfig, 18 )
+        self.assertEqual ( TypeId.Type.Id_EvrData, 19 )
+        self.assertEqual ( TypeId.Type.Id_FrameFccdConfig, 20 )
+        self.assertEqual ( TypeId.Type.Id_FccdConfig, 21 )
+        self.assertEqual ( TypeId.Type.Id_IpimbData, 22 )
+        self.assertEqual ( TypeId.Type.Id_IpimbConfig, 23 )
+        self.assertEqual ( TypeId.Type.Id_EncoderData, 24 )
+        self.assertEqual ( TypeId.Type.Id_EncoderConfig, 25 )
+        self.assertEqual ( TypeId.Type.Id_EvrIOConfig, 26 )
+        self.assertEqual ( TypeId.Type.NumberOf, 27 )
+
+        # instantiation
+        TypeId ()
+        TypeId ( TypeId.Type.Any, 0 )
+        TypeId ( TypeId.Type.Any, 1 )
+        TypeId ( TypeId.Type.Any, 100 )
+        TypeId ( TypeId.Type.Id_Epics, 0 )
+
+        # out of range, type error
+        self.assertRaises( TypeError, lambda : TypeId( TypeId.Type.NumberOf ) )
+        self.assertRaises( TypeError, lambda : TypeId( 1j ) )
+        self.assertRaises( TypeError, lambda : TypeId( TypeId() ) )
+
+        # compare
+        for i in range(TypeId.Type.NumberOf) :
+            self.assertEqual ( TypeId(i), TypeId(i,0) )
+            self.assertEqual ( TypeId(i,1), TypeId(i,1) )
+            self.assert_ ( TypeId(i,1) > TypeId(i,0) )
+            self.assert_ ( TypeId(i,0) < TypeId(i,1) )
+        for i in range(1,TypeId.Type.NumberOf) :
+            self.assert_ ( TypeId(i) > TypeId() )
+            self.assert_ ( TypeId(i) > TypeId(i-1) )
+            self.assert_ ( TypeId(i-1) < TypeId(i) )
+
+        # can use for keys
+        d = {}
+        d[TypeId()] = None
+        d[TypeId(1)] = None
+        d[TypeId(1,1)] = None
+        self.assertEqual ( len(d), 3 )
+        
+        # names
+        self.assertEqual ( str(TypeId()), "Any" )
+        self.assertEqual ( str(TypeId(TypeId.Type.Id_Xtc)), "Xtc" )
+        self.assertEqual ( str(TypeId(TypeId.Type.Id_Xtc,1)), "Xtc_V1" )
+        
+        
+    def test_TimeStamp(self):
+        """ Test for TimeStamp class """
+        
+        t1 = TimeStamp()
+        
+        # check that we can call methods
+        t1.ticks()
+        t1.fiducials()
+        t1.control()
+        t1.vector()
+
+        self.assertEqual( t1.ticks(), 0 )
+        self.assertEqual( t1.fiducials(), 0 )
+        self.assertEqual( t1.control(), 0 )
+        self.assertEqual( t1.vector(), 0 )
+
+        t2 = TimeStamp(1,1,1,1)
+        self.assertEqual( t2.ticks(), 1 )
+        self.assertEqual( t2.fiducials(), 1 )
+        self.assertEqual( t2.control(), 1 )
+        self.assertEqual( t2.vector(), 1 )
+
+
+        # compare
+        self.assert_ ( t2 > t1 ) 
+        self.assert_ ( t2 >= t1 ) 
+        self.assert_ ( t1 < t2 ) 
+        self.assert_ ( t1 <= t2 ) 
+        self.assert_ ( t2 != t1 ) 
+        self.assert_ ( t2 == t2 ) 
+        self.assertEqual ( t1, t1 ) 
+        
+        self.assertEqual( TimeStamp(0,1,0,0), TimeStamp(1,1,1,1) )
+
+        # out of range, parameters
+        self.assertRaises( TypeError, lambda : TimeStamp(1) )
+        self.assertRaises( TypeError, lambda : TimeStamp(1,1) )
+        self.assertRaises( TypeError, lambda : TimeStamp(1,1,1,1,1) )
+
+        # can use for keys
+        d = {}
+        d[t1] = t1
+        d[t2] = t2
+        self.assertEqual ( len(d), 2 ) 
+
+
+    def test_DetInfo(self):
+        """ Test for DetInfo class """
+        
+        # check enums
+        self.assertEqual ( DetInfo.Detector.NoDetector, 0 )
+        self.assertEqual ( DetInfo.Detector.AmoIms, 1 )
+        self.assertEqual ( DetInfo.Detector.AmoGasdet, 2 )
+        self.assertEqual ( DetInfo.Detector.AmoETof, 3 )
+        self.assertEqual ( DetInfo.Detector.AmoITof, 4 )
+        self.assertEqual ( DetInfo.Detector.AmoMbes, 5 )
+        self.assertEqual ( DetInfo.Detector.AmoVmi, 6 )
+        self.assertEqual ( DetInfo.Detector.AmoBps, 7 )
+        self.assertEqual ( DetInfo.Detector.Camp, 8 )
+        self.assertEqual ( DetInfo.Detector.EpicsArch, 9 )
+        self.assertEqual ( DetInfo.Detector.BldEb, 10 )
+        self.assertEqual ( DetInfo.Detector.SxrBeamline, 11 )
+        self.assertEqual ( DetInfo.Detector.SxrEndstation, 12 )
+        self.assertEqual ( DetInfo.Detector.XppSb1Ipm, 13 )
+        self.assertEqual ( DetInfo.Detector.XppSb1Pim, 14 )
+        self.assertEqual ( DetInfo.Detector.XppMonPim, 15 )
+        self.assertEqual ( DetInfo.Detector.XppSb2Ipm, 16 )
+        self.assertEqual ( DetInfo.Detector.XppSb3Ipm, 17 )
+        self.assertEqual ( DetInfo.Detector.XppSb3Pim, 18 )
+        self.assertEqual ( DetInfo.Detector.XppSb4Pim, 19 )
+        self.assertEqual ( DetInfo.Detector.NumDetector, 20 )
+        
+        self.assertEqual ( DetInfo.Device.NoDevice, 0 )
+        self.assertEqual ( DetInfo.Device.Evr, 1 )
+        self.assertEqual ( DetInfo.Device.Acqiris, 2 )
+        self.assertEqual ( DetInfo.Device.Opal1000, 3 )
+        self.assertEqual ( DetInfo.Device.TM6740, 4 )
+        self.assertEqual ( DetInfo.Device.pnCCD, 5 )
+        self.assertEqual ( DetInfo.Device.Princeton, 6 )
+        self.assertEqual ( DetInfo.Device.Fccd, 7 )
+        self.assertEqual ( DetInfo.Device.Ipimb, 8 )
+        self.assertEqual ( DetInfo.Device.Encoder, 9 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 10 )
+
+        
+        o1 = DetInfo(0,0,0,0,0)
+        
+        # check that we can call methods
+        o1.level()
+        o1.log()
+        o1.phy()
+        o1.processId()
+        o1.detector()
+        o1.device()
+        o1.detId()
+        o1.devId()
+
+        self.assertEqual( o1.level(), Level.Source )
+        self.assertEqual( o1.processId(), 0 )
+        self.assertEqual( o1.detector(), 0 )
+        self.assertEqual( o1.device(), 0 )
+        self.assertEqual( o1.detId(), 0 )
+        self.assertEqual( o1.devId(), 0 )
+
+        o2 = DetInfo(1,1,1,1,1)
+        self.assertEqual( o2.level(), Level.Source )
+        self.assertEqual( o2.processId(), 1 )
+        self.assertEqual( o2.detector(), 1 )
+        self.assertEqual( o2.device(), 1 )
+        self.assertEqual( o2.detId(), 1 )
+        self.assertEqual( o2.devId(), 1 )
+
+
+        # compare
+        self.assert_ ( o2 > o1 ) 
+        self.assert_ ( o2 >= o1 ) 
+        self.assert_ ( o1 < o2 ) 
+        self.assert_ ( o1 <= o2 ) 
+        self.assert_ ( o2 != o1 ) 
+        self.assert_ ( o2 == o2 ) 
+        self.assertEqual ( o1, o1 ) 
+        
+        # out of range, parameters
+        self.assertRaises( TypeError, lambda : DetInfo(1) )
+        self.assertRaises( TypeError, lambda : DetInfo(1,1) )
+        self.assertRaises( TypeError, lambda : DetInfo(1,1,1) )
+        self.assertRaises( TypeError, lambda : DetInfo(1,1,1,1) )
+        self.assertRaises( TypeError, lambda : DetInfo(1,1,1,1,1,1) )
+        self.assertRaises( TypeError, lambda : DetInfo(1,DetInfo.Detector.NumDetector,1,1,1) )
+        self.assertRaises( TypeError, lambda : DetInfo(1,1,1,DetInfo.Device.NumDevice,1) )
+
+        # can use for keys
+        d = {}
+        d[o1] = o1
+        d[o2] = o2
+        self.assertEqual ( len(d), 2 ) 
+
+
+    def test_ProcInfo(self):
+        """ Test for ProcInfo class """
+        
+        o1 = ProcInfo(Level.Segment,0,0)
+        
+        # check that we can call methods
+        o1.level()
+        o1.log()
+        o1.phy()
+        o1.processId()
+        o1.ipAddr()
+
+        self.assertEqual( o1.level(), Level.Segment )
+        self.assertEqual( o1.processId(), 0 )
+        self.assertEqual( o1.ipAddr(), 0 )
+
+        o2 = ProcInfo(Level.Event, 1, 1)
+        self.assertEqual( o2.level(), Level.Event )
+        self.assertEqual( o2.processId(), 1 )
+        self.assertEqual( o2.ipAddr(), 1 )
+
+
+        # compare
+        self.assert_ ( o2 > o1 ) 
+        self.assert_ ( o2 >= o1 ) 
+        self.assert_ ( o1 < o2 ) 
+        self.assert_ ( o1 <= o2 ) 
+        self.assert_ ( o2 != o1 ) 
+        self.assert_ ( o2 == o2 ) 
+        self.assertEqual ( o1, o1 ) 
+        
+        # out of range, parameters
+        self.assertRaises( TypeError, lambda : ProcInfo(1) )
+        self.assertRaises( TypeError, lambda : ProcInfo(1,1) )
+        self.assertRaises( TypeError, lambda : ProcInfo(1,1,1,1) )
+        self.assertRaises( TypeError, lambda : ProcInfo(Level.NumberOfLevels,1,1) )
+
+        # can use for keys
+        d = {}
+        d[o1] = o1
+        d[o2] = o2
+        self.assertEqual ( len(d), 2 ) 
+
+        
+    def test_BldInfo(self):
+        """ Test for BldInfo class """
+        
+        # check enums
+        self.assertEqual ( BldInfo.Type.EBeam, 0 )
+        self.assertEqual ( BldInfo.Type.PhaseCavity, 1 )
+        self.assertEqual ( BldInfo.Type.FEEGasDetEnergy, 2 )
+        self.assertEqual ( BldInfo.Type.NumberOf, 3 )
+
+        o1 = BldInfo(0,0)
+        
+        # check that we can call methods
+        o1.level()
+        o1.log()
+        o1.phy()
+        o1.processId()
+        o1.type()
+
+        self.assertEqual( o1.level(), Level.Reporter )
+        self.assertEqual( o1.processId(), 0 )
+        self.assertEqual( o1.type(), 0 )
+
+        o2 = BldInfo(1,1)
+        self.assertEqual( o2.level(), Level.Reporter )
+        self.assertEqual( o2.processId(), 1 )
+        self.assertEqual( o2.type(), 1 )
+
+        # compare
+        self.assert_ ( o2 > o1 ) 
+        self.assert_ ( o2 >= o1 ) 
+        self.assert_ ( o1 < o2 ) 
+        self.assert_ ( o1 <= o2 ) 
+        self.assert_ ( o2 != o1 ) 
+        self.assert_ ( o2 == o2 ) 
+        self.assertEqual ( o1, o1 ) 
+        
+        # out of range, parameters
+        self.assertRaises( TypeError, lambda : BldInfo(1) )
+        self.assertRaises( TypeError, lambda : BldInfo(1,1,1) )
+        self.assertRaises( TypeError, lambda : BldInfo(1,BldInfo.Type.NumberOf) )
+
+        # can use for keys
+        d = {}
+        d[o1] = o1
+        d[o2] = o2
+        self.assertEqual ( len(d), 2 ) 
+
+
+    def test_Damage(self):
+        """ Test for Damage class """
+        
+        # check enums
+        self.assertEqual ( Damage.Value.DroppedContribution, 1 )
+        self.assertEqual ( Damage.Value.OutOfOrder, 12 )
+        self.assertEqual ( Damage.Value.OutOfSynch, 13 )
+        self.assertEqual ( Damage.Value.UserDefined, 14 )
+        self.assertEqual ( Damage.Value.IncompleteContribution, 15 )
+        self.assertEqual ( Damage.Value.ContainsIncomplete, 16 )
+
+        self.assertEqual ( Damage.Mask.DroppedContribution, 1 << 1 )
+        self.assertEqual ( Damage.Mask.OutOfOrder, 1 << 12 )
+        self.assertEqual ( Damage.Mask.OutOfSynch, 1 << 13 )
+        self.assertEqual ( Damage.Mask.UserDefined, 1 << 14 )
+        self.assertEqual ( Damage.Mask.IncompleteContribution, 1 << 15 )
+        self.assertEqual ( Damage.Mask.ContainsIncomplete, 1 << 16 )
+
+        o1 = Damage(0)
+        
+        # check that we can call methods
+        o1.hasDamage(0)
+
+        self.assertEqual( o1.value(), 0 )
+        self.failIf ( o1.hasDamage(Damage.Value.DroppedContribution) )
+        self.failIf ( o1.hasDamage(Damage.Value.OutOfOrder) )
+        self.failIf ( o1.hasDamage(Damage.Value.OutOfSynch) )
+        self.failIf ( o1.hasDamage(Damage.Value.UserDefined) )
+        self.failIf ( o1.hasDamage(Damage.Value.IncompleteContribution) )
+        self.failIf ( o1.hasDamage(Damage.Value.ContainsIncomplete) )
+
+        o2 = Damage( Damage.Mask.OutOfOrder | Damage.Mask.IncompleteContribution )
+        self.failUnless( o2.value() != 0 )
+        self.failUnless( o2.value() == Damage.Mask.OutOfOrder | Damage.Mask.IncompleteContribution )
+
+        self.failIf ( o2.hasDamage(Damage.Value.DroppedContribution) )
+        self.failUnless ( o2.hasDamage(Damage.Value.OutOfOrder) )
+        self.failIf ( o2.hasDamage(Damage.Value.OutOfSynch) )
+        self.failIf ( o2.hasDamage(Damage.Value.UserDefined) )
+        self.failUnless ( o2.hasDamage(Damage.Value.IncompleteContribution) )
+        self.failIf ( o2.hasDamage(Damage.Value.ContainsIncomplete) )
+
+
+        # compare
+        self.assert_ ( o2 != o1 ) 
+        self.assert_ ( o2 == o2 ) 
+        self.assertEqual ( o1, o1 ) 
+        
+        # out of range, parameters
+        self.assertRaises( TypeError, lambda : Damage(1,1) )
+
+        # can use for keys
+        d = {}
+        d[o1] = o1
+        d[o2] = o2
+        self.assertEqual ( len(d), 2 ) 
+
+
+
+    def test_Sequence(self):
+        """ Test for Sequence class """
+        
+        # check enums
+        self.assertEqual ( Sequence.Type.Event, 0 )
+        self.assertEqual ( Sequence.Type.Occurrence, 1 )
+        self.assertEqual ( Sequence.Type.Marker, 2 )
+        o1 = Sequence()
+        
+        # check that we can call methods
+        o1.type()
+        o1.service()
+        o1.isExtended()
+        o1.isEvent()
+        o1.clock()
+        o1.stamp()
+        
+        self.assertEqual( o1.type(), Sequence.Type.Event )
+        self.assertEqual( o1.service(), TransitionId.Unknown )
+        self.assertEqual( o1.isExtended(), False )
+        self.assertEqual( o1.isEvent(), False )
+        self.assertEqual( o1.clock(), ClockTime() )
+        self.assertEqual( o1.stamp(), TimeStamp() )
+
+        
+    def test_XtcFileIterator(self):
+        """ Test for XtcFileIterator class """
+
+        try :
+            f = file(_data)
+        except :
+            self.fail("XtcFileIterator test failed: data file cannot be open")
+        iter = XtcFileIterator(f)
+
+        # expected file contents
+        envs = [0,28,0,0,0,0,0,0,0,0,0,0] 
+        transitions = [TransitionId.Map, TransitionId.Configure, TransitionId.BeginRun, 
+                       TransitionId.Enable,] + [TransitionId.L1Accept]*8
+        clocks = [ClockTime(0, 0), ClockTime(1246996396, 184549376), 
+                     ClockTime(1246996405, 385875968), ClockTime(1246996540, 33554432), 
+                     ClockTime(1246996540, 72305021), ClockTime(1246996540, 205604646), 
+                     ClockTime(1246996540, 338937167), ClockTime(1246996540, 472286869), 
+                     ClockTime(1246996540, 605625607), ClockTime(1246996540, 738939201), 
+                     ClockTime(1246996540, 872273538), ClockTime(1246996541, 5607735)]
+        stamps = [TimeStamp(0,0,0,2), TimeStamp(0,88086,21415,4), 
+                  TimeStamp(0,92718,21415,6), TimeStamp(0,30724,21416,10), 
+                  TimeStamp(11,110352,0,140), TimeStamp(11,110400,0,140), 
+                  TimeStamp(12,110448,0,140), TimeStamp(11,110496,0,140), 
+                  TimeStamp(11,110544,0,140), TimeStamp(12,110592,0,140), 
+                  TimeStamp(11,110640,0,140), TimeStamp(11,110688,0,140)]
+        payloads = [140, 0, 140, 0, 6291664, 6291664, 6291664, 6291664, 6291664, 6291664, 6291664, 6291664]
+        extents = [160, 20, 160, 20, 6291684, 6291684, 6291684, 6291684, 6291684, 6291684, 6291684, 6291684]
+
+        # make sure it follows iterator protocol
+        iter.next()
+        
+        # count datagrams
+        f.seek(0)
+        count = len([dg for dg in iter])
+        self.assertEqual( count, 12 )
+
+        f.seek(0)
+        self.assertEqual( [dg.env for dg in iter], envs )
+        
+        f.seek(0)
+        self.assertEqual( [dg.seq.type() for dg in iter], [Sequence.Type.Event]*12 )
+
+        f.seek(0)
+        self.assertEqual( [dg.seq.clock() for dg in iter], clocks )
+
+        f.seek(0)
+        self.assertEqual( [dg.seq.stamp() for dg in iter], stamps )
+
+        f.seek(0)
+        self.assertEqual( [dg.xtc.sizeofPayload() for dg in iter], payloads )
+
+        f.seek(0)
+        self.assertEqual( [dg.xtc.extent for dg in iter], extents )
+
+        f.seek(0)
+        self.assertEqual( [dg.xtc.damage.value() for dg in iter], [0]*12 )
+                
+
+    def test_XtcIterator(self):
+        """ Test for XtcIterator class """
+
+        def visit ( xtc, op ):
+            if xtc.contains.id() == TypeId.Type.Id_Xtc :
+                return [ visit(x,op) for x in xtc ]
+            else :
+                return op(xtc)
+
+        try :
+            f = file(_data)
+        except :
+            self.fail("XtcIterator test failed: data file cannot be open")
+        dgiter = XtcFileIterator(f)
+        xtcs = [ dg.xtc for dg in dgiter ]        
+
+        tree = visit(xtcs[0], lambda x: x.contains)
+        self.assertEqual( tree, [[], [], [[], [], [], []]] )
+
+        tree = visit(xtcs[4], lambda x: x.contains)
+        self.assertEqual( tree, [[[], [TypeId(TypeId.Type.Id_Frame,1)], [TypeId(TypeId.Type.Id_Frame,1)], [TypeId(TypeId.Type.Id_Frame,1)]]] )
+        
+        tree = visit(xtcs[4], lambda x: x.sizeofPayload())
+        self.assertEqual( tree, [[[], [2097168], [2097168], [2097168]]] )
+        
+        tree = visit(xtcs[4], lambda x: x.damage.value() )
+        self.assertEqual( tree, [[[], [0], [0], [0]]] )
+
+
+    def test_XtcFileName(self):
+        """ Test for XtcFileName class """
+
+        f1 = "/reg/d/psdm/amo/amo00409/xtc/e11-r0001-s00-c00.xtc"
+        o1 = io.XtcFileName(f1)
+        self.assertEqual( o1, f1 )
+        self.assertEqual( o1.expNum(), 11 )
+        self.assertEqual( o1.run(), 1 )
+        self.assertEqual( o1.stream(), 0 )
+        self.assertEqual( o1.chunk(), 0 )
+
+        f2 = "/reg/d/psdm/amo/amo00409/xtc/e55-r9991-s01-c01.xtc"
+        o2 = io.XtcFileName(f2)
+        self.assertEqual( o2, f2 )
+        self.assertEqual( o2.expNum(), 55 )
+        self.assertEqual( o2.run(), 9991 )
+        self.assertEqual( o2.stream(), 1 )
+        self.assertEqual( o2.chunk(), 1 )
+
+        f2 = "/reg/d/psdm/amo/amo00409/xtc/datafile.xtc"
+        o2 = io.XtcFileName(f2)
+        self.assertEqual( o2, f2 )
+        self.assertEqual( o2.expNum(), None )
+        self.assertEqual( o2.run(), None )
+        self.assertEqual( o2.stream(), None )
+        self.assertEqual( o2.chunk(), None )
+
+
+
+
+#
+#  run unit tests when imported as a main module
+#
+if __name__ == "__main__":
+    
+    # can change data file path from command line
+    if len(sys.argv) > 1 : 
+        _data = sys.argv[1]
+    
+    unittest.main(argv=[sys.argv[0], '-v'])
