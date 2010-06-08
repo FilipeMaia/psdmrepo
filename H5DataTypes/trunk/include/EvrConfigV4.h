@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_ENCODERCONFIGV1_H
-#define H5DATATYPES_ENCODERCONFIGV1_H
+#ifndef H5DATATYPES_EVRCONFIGV4_H
+#define H5DATATYPES_EVRCONFIGV4_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class EncoderConfigV1.
+//	Class EvrConfigV4.
 //
 //------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/encoder/ConfigV1.hh"
+#include "pdsdata/evr/ConfigV4.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -36,24 +36,21 @@
 namespace H5DataTypes {
 
 //
-// Helper type for Pds::Encoder::ConfigV1
+// Helper type for Pds::EvrData::ConfigV4
 //
-struct EncoderConfigV1_Data {
-  uint32_t chan_num;
-  uint32_t count_mode;
-  uint32_t quadrature_mode;
-  uint32_t input_num;
-  uint32_t input_rising;
-  uint32_t ticks_per_sec;
+struct EvrConfigV4_Data {
+  uint32_t neventcodes;
+  uint32_t npulses;
+  uint32_t noutputs;
 };
 
-class EncoderConfigV1  {
+class EvrConfigV4  {
 public:
 
-  typedef Pds::Encoder::ConfigV1 XtcType ;
+  typedef Pds::EvrData::ConfigV4 XtcType ;
 
-  EncoderConfigV1 () {}
-  EncoderConfigV1 ( const XtcType& data ) ;
+  EvrConfigV4 () {}
+  EvrConfigV4 ( const XtcType& data ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
@@ -61,14 +58,14 @@ public:
   // store single config object at specified location
   static void store( const XtcType& config, hdf5pp::Group location ) ;
 
-  static size_t xtcSize( const XtcType& xtc ) { return sizeof(xtc) ; }
+  static size_t xtcSize( const XtcType& xtc ) { return xtc.size() ; }
 
 private:
 
-  EncoderConfigV1_Data m_data ;
+  EvrConfigV4_Data m_data ;
 
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_ENCODERCONFIGV1_H
+#endif // H5DATATYPES_EVRCONFIGV4_H

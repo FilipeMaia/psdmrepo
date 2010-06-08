@@ -29,6 +29,8 @@
 #include "pdsdata/evr/PulseConfig.hh"
 #include "pdsdata/evr/PulseConfigV3.hh"
 #include "pdsdata/evr/EventCodeV3.hh"
+#include "pdsdata/evr/EventCodeV4.hh"
+#include "pdsdata/evr/IOChannel.hh"
 #include "pdsdata/evr/OutputMap.hh"
 
 //		---------------------
@@ -127,6 +129,8 @@ public:
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
+  static hdf5pp::Type conn_type() ;
+
 private:
 
   EvrOutputMap_Data m_data ;
@@ -157,6 +161,68 @@ public:
 private:
 
   EvrEventCodeV3_Data m_data ;
+
+};
+
+//
+// Helper type for Pds::EvrData::EventCodeV4
+//
+struct EvrEventCodeV4_Data {
+  uint16_t  code;
+  uint8_t   isReadout;
+  uint8_t   isTerminator;
+  uint32_t  reportDelay;
+  uint32_t  reportWidth;
+  uint32_t  maskTrigger;
+  uint32_t  maskSet;
+  uint32_t  maskClear;
+};
+
+class EvrEventCodeV4 {
+public:
+
+  EvrEventCodeV4 () {}
+  EvrEventCodeV4 ( const Pds::EvrData::EventCodeV4& evtcode ) ;
+
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
+
+private:
+
+  EvrEventCodeV4_Data m_data ;
+
+};
+
+//
+// Helper type for Pds::EvrData::IOChannel
+//
+struct EvrIOChannelDetInfo_Data {
+  uint32_t processId;
+  const char* detector;
+  const char* device;
+  uint32_t detId;
+  uint32_t devId;
+};
+
+struct EvrIOChannel_Data {
+  char*    name;
+  size_t   ninfo;
+  EvrIOChannelDetInfo_Data* info;
+};
+
+class EvrIOChannel {
+public:
+
+  EvrIOChannel () {}
+  EvrIOChannel( const Pds::EvrData::IOChannel& chan );
+  ~EvrIOChannel ();
+
+  static hdf5pp::Type stored_type();
+  static hdf5pp::Type native_type();
+
+private:
+
+  EvrIOChannel_Data m_data ;
 
 };
 

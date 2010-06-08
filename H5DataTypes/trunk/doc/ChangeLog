@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-19
+2010-06-08 Andy Salnikov
+- updated for pdsdata V02-02-00
+
 Tag: V00-00-18
 2010-05-12 Andy Salnikov
 - replaced Lusi/Lusi.h with SITConfig stuff

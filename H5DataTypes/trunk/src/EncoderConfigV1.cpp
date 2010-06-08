@@ -57,14 +57,14 @@ EncoderConfigV1::stored_type()
 hdf5pp::Type
 EncoderConfigV1::native_type()
 {
-  hdf5pp::EnumType<uint8_t> countModeEnumType = hdf5pp::EnumType<uint8_t>::enumType() ;
+  hdf5pp::EnumType<uint32_t> countModeEnumType = hdf5pp::EnumType<uint32_t>::enumType() ;
   countModeEnumType.insert ( "WRAP_FULL", Pds::Encoder::ConfigV1::count_mode::WRAP_FULL ) ;
   countModeEnumType.insert ( "LIMIT", Pds::Encoder::ConfigV1::count_mode::LIMIT ) ;
   countModeEnumType.insert ( "HALT", Pds::Encoder::ConfigV1::count_mode::HALT ) ;
   countModeEnumType.insert ( "WRAP_PRESET", Pds::Encoder::ConfigV1::count_mode::WRAP_PRESET ) ;
   countModeEnumType.insert ( "END", Pds::Encoder::ConfigV1::count_mode::END ) ;
 
-  hdf5pp::EnumType<uint8_t> quadModeEnumType = hdf5pp::EnumType<uint8_t>::enumType() ;
+  hdf5pp::EnumType<uint32_t> quadModeEnumType = hdf5pp::EnumType<uint32_t>::enumType() ;
   quadModeEnumType.insert ( "CLOCK_DIR", Pds::Encoder::ConfigV1::quad_mode::CLOCK_DIR ) ;
   quadModeEnumType.insert ( "X1", Pds::Encoder::ConfigV1::quad_mode::X1 ) ;
   quadModeEnumType.insert ( "X2", Pds::Encoder::ConfigV1::quad_mode::X2 ) ;
@@ -72,11 +72,11 @@ EncoderConfigV1::native_type()
   quadModeEnumType.insert ( "END", Pds::Encoder::ConfigV1::quad_mode::END ) ;
 
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<EncoderConfigV1>() ;
-  confType.insert_native<uint8_t>( "chan_num", offsetof(EncoderConfigV1_Data,chan_num) ) ;
+  confType.insert_native<uint32_t>( "chan_num", offsetof(EncoderConfigV1_Data,chan_num) ) ;
   confType.insert( "count_mode", offsetof(EncoderConfigV1_Data,count_mode), countModeEnumType ) ;
   confType.insert( "quadrature_mode", offsetof(EncoderConfigV1_Data,quadrature_mode), quadModeEnumType ) ;
-  confType.insert_native<uint8_t>( "input_num", offsetof(EncoderConfigV1_Data,input_num) ) ;
-  confType.insert_native<uint8_t>( "input_rising", offsetof(EncoderConfigV1_Data,input_rising) ) ;
+  confType.insert_native<uint32_t>( "input_num", offsetof(EncoderConfigV1_Data,input_num) ) ;
+  confType.insert_native<uint32_t>( "input_rising", offsetof(EncoderConfigV1_Data,input_rising) ) ;
   confType.insert_native<uint32_t>( "ticks_per_sec", offsetof(EncoderConfigV1_Data,ticks_per_sec) ) ;
 
   return confType ;

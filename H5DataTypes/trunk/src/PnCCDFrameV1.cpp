@@ -49,13 +49,31 @@ PnCCDFrameV1::PnCCDFrameV1 ( const XtcType& frame )
 }
 
 hdf5pp::Type
-PnCCDFrameV1::stored_type( const ConfigXtcType& config )
+PnCCDFrameV1::stored_type( const ConfigXtcType1& config )
 {
-  return native_type( config ) ;
+  return native_type( config.numLinks() ) ;
 }
 
 hdf5pp::Type
-PnCCDFrameV1::native_type( const ConfigXtcType& config )
+PnCCDFrameV1::native_type( const ConfigXtcType1& config )
+{
+  return native_type( config.numLinks() ) ;
+}
+
+hdf5pp::Type
+PnCCDFrameV1::stored_type( const ConfigXtcType2& config )
+{
+  return native_type( config.numLinks() ) ;
+}
+
+hdf5pp::Type
+PnCCDFrameV1::native_type( const ConfigXtcType2& config )
+{
+  return native_type( config.numLinks() ) ;
+}
+
+hdf5pp::Type
+PnCCDFrameV1::native_type( unsigned numlinks )
 {
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<PnCCDFrameV1>() ;
   type.insert_native<uint32_t>( "specialWord", offsetof(PnCCDFrameV1_Data,specialWord) ) ;
@@ -63,11 +81,24 @@ PnCCDFrameV1::native_type( const ConfigXtcType& config )
   type.insert_native<uint32_t>( "timeStampHi", offsetof(PnCCDFrameV1_Data,timeStampHi) ) ;
   type.insert_native<uint32_t>( "timeStampLo", offsetof(PnCCDFrameV1_Data,timeStampLo) ) ;
 
-  return hdf5pp::ArrayType::arrayType ( type, config.numLinks() );
+  return hdf5pp::ArrayType::arrayType ( type, numlinks );
 }
 
 hdf5pp::Type
-PnCCDFrameV1::stored_data_type( const ConfigXtcType& config )
+PnCCDFrameV1::stored_data_type( const ConfigXtcType1& config )
+{
+  hdf5pp::Type baseType = hdf5pp::TypeTraits<uint16_t>::native_type() ;
+
+  // get few constants
+  const uint32_t numLinks = config.numLinks() ;
+  const unsigned sizeofData = (config.payloadSizePerLink()-sizeof(XtcType))/sizeof(uint16_t);
+
+  hsize_t dims[] = { numLinks, sizeofData } ;
+  return hdf5pp::ArrayType::arrayType ( baseType, 2, dims );
+}
+
+hdf5pp::Type
+PnCCDFrameV1::stored_data_type( const ConfigXtcType2& config )
 {
   hdf5pp::Type baseType = hdf5pp::TypeTraits<uint16_t>::native_type() ;
 

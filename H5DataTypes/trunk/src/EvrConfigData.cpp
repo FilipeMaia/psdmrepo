@@ -25,6 +25,7 @@
 //-------------------------------
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/EnumType.h"
+#include "hdf5pp/VlenType.h"
 #include "hdf5pp/TypeTraits.h"
 
 //-----------------------------------------------------------------------
@@ -138,9 +139,7 @@ EvrOutputMap::native_type()
   srcEnumType.insert ( "Force_High", Pds::EvrData::OutputMap::Force_High ) ;
   srcEnumType.insert ( "Force_Low", Pds::EvrData::OutputMap::Force_Low ) ;
 
-  hdf5pp::EnumType<int16_t> connEnumType = hdf5pp::EnumType<int16_t>::enumType() ;
-  connEnumType.insert ( "FrontPanel", Pds::EvrData::OutputMap::FrontPanel ) ;
-  connEnumType.insert ( "UnivIO", Pds::EvrData::OutputMap::UnivIO ) ;
+  hdf5pp::Type connEnumType = conn_type() ;
 
   hdf5pp::CompoundType mapType = hdf5pp::CompoundType::compoundType< EvrOutputMap_Data >() ;
   mapType.insert( "source", offsetof(EvrOutputMap_Data,source), srcEnumType ) ;
@@ -150,6 +149,17 @@ EvrOutputMap::native_type()
 
   return mapType ;
 }
+
+hdf5pp::Type
+EvrOutputMap::conn_type()
+{
+  hdf5pp::EnumType<int16_t> connEnumType = hdf5pp::EnumType<int16_t>::enumType() ;
+  connEnumType.insert ( "FrontPanel", Pds::EvrData::OutputMap::FrontPanel ) ;
+  connEnumType.insert ( "UnivIO", Pds::EvrData::OutputMap::UnivIO ) ;
+
+  return connEnumType;
+}
+
 
 //
 // Helper type for Pds::EvrData::EventCodeV3
@@ -180,6 +190,103 @@ EvrEventCodeV3::native_type()
   type.insert_native<uint32_t>( "maskTrigger", offsetof(EvrEventCodeV3_Data,maskTrigger) ) ;
   type.insert_native<uint32_t>( "maskSet", offsetof(EvrEventCodeV3_Data,maskSet) ) ;
   type.insert_native<uint32_t>( "maskClear", offsetof(EvrEventCodeV3_Data,maskClear) ) ;
+
+  return type ;
+}
+
+//
+// Helper type for Pds::EvrData::EventCodeV4
+//
+EvrEventCodeV4::EvrEventCodeV4 ( const Pds::EvrData::EventCodeV4& evtcode )
+{
+  m_data.code = evtcode.code();
+  m_data.isReadout = evtcode.isReadout();
+  m_data.isTerminator = evtcode.isTerminator();
+  m_data.reportDelay = evtcode.reportDelay();
+  m_data.reportWidth = evtcode.reportWidth();
+  m_data.maskTrigger = evtcode.maskTrigger();
+  m_data.maskSet = evtcode.maskSet();
+  m_data.maskClear = evtcode.maskClear();
+}
+
+hdf5pp::Type
+EvrEventCodeV4::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+EvrEventCodeV4::native_type()
+{
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< EvrEventCodeV4_Data >() ;
+  type.insert_native<uint16_t>( "code", offsetof(EvrEventCodeV4_Data,code) ) ;
+  type.insert_native<uint8_t>( "isReadout", offsetof(EvrEventCodeV4_Data,isReadout) ) ;
+  type.insert_native<uint8_t>( "isTerminator", offsetof(EvrEventCodeV4_Data,isTerminator) ) ;
+  type.insert_native<uint32_t>( "reportDelay", offsetof(EvrEventCodeV4_Data,reportDelay) ) ;
+  type.insert_native<uint32_t>( "reportWidth", offsetof(EvrEventCodeV4_Data,reportWidth) ) ;
+  type.insert_native<uint32_t>( "maskTrigger", offsetof(EvrEventCodeV4_Data,maskTrigger) ) ;
+  type.insert_native<uint32_t>( "maskSet", offsetof(EvrEventCodeV4_Data,maskSet) ) ;
+  type.insert_native<uint32_t>( "maskClear", offsetof(EvrEventCodeV4_Data,maskClear) ) ;
+
+  return type ;
+}
+
+//
+// Helper type for Pds::EvrData::IOChannel
+//
+
+EvrIOChannel::EvrIOChannel ( const Pds::EvrData::IOChannel& chan )
+{
+  m_data.name = 0;
+  m_data.ninfo = chan.ninfo();
+  m_data.info = 0;
+
+  const char* p = chan.name();
+  int len = strlen(p)+1;
+  m_data.name = new char[len];
+  std::copy(p, p+len, m_data.name);
+  
+  m_data.info = new EvrIOChannelDetInfo_Data[m_data.ninfo];
+  for ( size_t i = 0 ; i != m_data.ninfo ; ++ i ) {
+    const Pds::DetInfo& detinfo = chan.info(i);
+    m_data.info[i].processId = detinfo.processId();
+    m_data.info[i].detector = Pds::DetInfo::name(detinfo.detector());
+    m_data.info[i].device = Pds::DetInfo::name(detinfo.device());
+    m_data.info[i].detId = detinfo.devId();
+    m_data.info[i].devId = detinfo.devId();
+  }
+}
+
+EvrIOChannel::~EvrIOChannel ()
+{
+  delete [] m_data.name;
+  delete [] m_data.info;
+}
+
+hdf5pp::Type
+EvrIOChannel::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+EvrIOChannel::native_type()
+{
+  // DetInfo type
+  hdf5pp::CompoundType detInfoType = hdf5pp::CompoundType::compoundType< EvrIOChannelDetInfo_Data >() ;
+  detInfoType.insert_native<uint32_t>( "processId", offsetof(EvrIOChannelDetInfo_Data, processId) ) ;
+  detInfoType.insert_native<const char*>( "detector", offsetof(EvrIOChannelDetInfo_Data, detector) ) ;
+  detInfoType.insert_native<const char*>( "device", offsetof(EvrIOChannelDetInfo_Data, device) ) ;
+  detInfoType.insert_native<uint32_t>( "detId", offsetof(EvrIOChannelDetInfo_Data, detId) ) ;
+  detInfoType.insert_native<uint32_t>( "devId", offsetof(EvrIOChannelDetInfo_Data, devId) ) ;
+
+  // variable-size type for info array
+  hdf5pp::Type infoType = hdf5pp::VlenType::vlenType ( detInfoType );
+
+  // Channel type
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< EvrIOChannel_Data >() ;
+  type.insert_native<const char*>( "name", offsetof(EvrIOChannel_Data, name) ) ;
+  type.insert( "info", offsetof(EvrIOChannel_Data, ninfo), infoType ) ;
 
   return type ;
 }
