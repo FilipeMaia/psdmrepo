@@ -399,16 +399,14 @@ class Env(object):
         """ Update environment with config info from event """
         
         # store config objects 
-        if evt.seq().service() == xtc.TransitionId.Configure :
+        if evt.seq().service() in [xtc.TransitionId.Configure, xtc.TransitionId.BeginCalibCycle] :
             
-            types = [xtc.TypeId.Type.Id_AcqConfig, 
-                     xtc.TypeId.Type.Id_pnCCDconfig,
-                     xtc.TypeId.Type.Id_Opal1kConfig,
-                     xtc.TypeId.Type.Id_PrincetonConfig]
-            
-            for typeId in types :
-                for x in evt.findXtc( typeId=typeId ) :
-                    self._storeConfig(typeId, x.src, x.payload())
+            # get all XTCs at Source level and store their payload
+            for x in evt.findXtc(level=xtc.Level.Source):
+                typeid = x.contains.id()
+                if typeid not in [xtc.TypeId.Type.Id_Epics, xtc.TypeId.Type.Id_Xtc, xtc.TypeId.Type.Any]:
+                    # don't store Epics data as config
+                    self._storeConfig(typeid, x.src, x.payload())
                     
     def getConfig(self, typeId, address=None):
         """Generic getConfig method"""
