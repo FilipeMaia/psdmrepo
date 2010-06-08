@@ -39,6 +39,10 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Ipimb::DataV1, channel1)
   FUN0_WRAPPER(pypdsdata::Ipimb::DataV1, channel2)
   FUN0_WRAPPER(pypdsdata::Ipimb::DataV1, channel3)
+  FUN0_WRAPPER(pypdsdata::Ipimb::DataV1, channel0Volts)
+  FUN0_WRAPPER(pypdsdata::Ipimb::DataV1, channel1Volts)
+  FUN0_WRAPPER(pypdsdata::Ipimb::DataV1, channel2Volts)
+  FUN0_WRAPPER(pypdsdata::Ipimb::DataV1, channel3Volts)
   FUN0_WRAPPER(pypdsdata::Ipimb::DataV1, checksum)
 
   PyMethodDef methods[] = {
@@ -50,6 +54,10 @@ namespace {
     { "channel1",       channel1,       METH_NOARGS, "" },
     { "channel2",       channel2,       METH_NOARGS, "" },
     { "channel3",       channel3,       METH_NOARGS, "" },
+    { "channel0Volts",  channel0Volts,  METH_NOARGS, "" },
+    { "channel1Volts",  channel1Volts,  METH_NOARGS, "" },
+    { "channel2Volts",  channel2Volts,  METH_NOARGS, "" },
+    { "channel3Volts",  channel3Volts,  METH_NOARGS, "" },
     { "checksum",       checksum,       METH_NOARGS, "" },
     {0, 0, 0, 0}
    };

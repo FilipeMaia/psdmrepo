@@ -47,6 +47,13 @@ namespace {
       { "BldEb",       Pds::DetInfo::BldEb },
       { "SxrBeamline", Pds::DetInfo::SxrBeamline },
       { "SxrEndstation", Pds::DetInfo::SxrEndstation },
+      { "XppSb1Ipm",   Pds::DetInfo::XppSb1Ipm },
+      { "XppSb1Pim",   Pds::DetInfo::XppSb1Pim },
+      { "XppMonPim",   Pds::DetInfo::XppMonPim },
+      { "XppSb2Ipm",   Pds::DetInfo::XppSb2Ipm },
+      { "XppSb3Ipm",   Pds::DetInfo::XppSb3Ipm },
+      { "XppSb3Pim",   Pds::DetInfo::XppSb3Pim },
+      { "XppSb4Pim",   Pds::DetInfo::XppSb4Pim },
       { "NumDetector", Pds::DetInfo::NumDetector },
       { 0, 0 }
   };

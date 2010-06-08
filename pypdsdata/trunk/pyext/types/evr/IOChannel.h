@@ -1,12 +1,12 @@
-#ifndef PYPDSDATA_EVRDATA_OUTPUTMAP_H
-#define PYPDSDATA_EVRDATA_OUTPUTMAP_H
+#ifndef PYPDSDATA_EVRDATA_IOCHANNEL_H
+#define PYPDSDATA_EVRDATA_IOCHANNEL_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class OutputMap.
+//	Class EvrData_IOChannel.
 //
 //------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "../PdsDataTypeEmbedded.h"
+#include "../PdsDataType.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -26,16 +26,13 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/evr/OutputMap.hh"
+#include "pdsdata/evr/IOChannel.hh"
 
 //    ---------------------
 //    -- Class Interface --
 //    ---------------------
 
 namespace pypdsdata {
-
-class EnumType;
-
 namespace EvrData {
 
 /**
@@ -49,20 +46,17 @@ namespace EvrData {
  *  @author Andrei Salnikov
  */
 
-class OutputMap : public PdsDataTypeEmbedded<OutputMap,Pds::EvrData::OutputMap> {
+class IOChannel : public PdsDataType<IOChannel,Pds::EvrData::IOChannel> {
 public:
 
-  typedef PdsDataTypeEmbedded<OutputMap,Pds::EvrData::OutputMap> BaseType;
+  typedef PdsDataType<IOChannel,Pds::EvrData::IOChannel> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
-  
-  /// access to Conn enum type
-  static pypdsdata::EnumType& connEnum() ;
 
 };
 
 } // namespace EvrData
 } // namespace pypdsdata
 
-#endif // PYPDSDATA_EVRDATA_OUTPUTMAP_H
+#endif // PYPDSDATA_EVRDATA_IOCHANNEL_H

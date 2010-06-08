@@ -81,9 +81,15 @@ pypdsdata::EvrData::OutputMap::initType( PyObject* module )
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
-  PyDict_SetItemString( tp_dict, "Source", sourceEnum.type() );
-  PyDict_SetItemString( tp_dict, "Conn", connEnum.type() );
+  PyDict_SetItemString( tp_dict, "Source", ::sourceEnum.type() );
+  PyDict_SetItemString( tp_dict, "Conn", ::connEnum.type() );
   type->tp_dict = tp_dict;
 
   BaseType::initType( "OutputMap", module );
+}
+
+pypdsdata::EnumType& 
+pypdsdata::EvrData::OutputMap::connEnum() 
+{
+  return ::connEnum;
 }

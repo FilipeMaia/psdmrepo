@@ -46,7 +46,9 @@
 #include "types/evr/ConfigV1.h"
 #include "types/evr/ConfigV2.h"
 #include "types/evr/ConfigV3.h"
+#include "types/evr/ConfigV4.h"
 #include "types/evr/DataV3.h"
+#include "types/evr/IOConfigV1.h"
 
 #include "types/fccd/FccdConfigV1.h"
 
@@ -145,6 +147,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     if ( not obj ) obj = xtc2obj<EvrData::ConfigV1, 1>(xtc, parent);
     if ( not obj ) obj = xtc2obj<EvrData::ConfigV2, 2>(xtc, parent);
     if ( not obj ) obj = xtc2obj<EvrData::ConfigV3, 3>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<EvrData::ConfigV4, 4>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_TM6740Config :
@@ -214,6 +217,10 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_EncoderConfig :
     if ( not obj ) obj = xtc2obj<Encoder::ConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_EvrIOConfig :
+    if ( not obj ) obj = xtc2obj<EvrData::IOConfigV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::NumberOf :

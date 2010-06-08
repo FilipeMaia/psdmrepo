@@ -1,4 +1,9 @@
 
+2010-06-08 - V00-00-09
+======================
+- new pdsdata V02-02-00, applying all changes here
+- new classes evr/IOChannel, evr/IOConfigV1, evr/ConfigV4, evr/EventCodeV4
+
 2010-05-20 - V00-00-08
 ======================
 - added new types to DataObjectFactory

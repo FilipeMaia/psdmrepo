@@ -60,6 +60,7 @@ namespace {
       { "Id_IpimbConfig",     Pds::TypeId::Id_IpimbConfig },
       { "Id_EncoderData",     Pds::TypeId::Id_EncoderData },
       { "Id_EncoderConfig",   Pds::TypeId::Id_EncoderConfig },
+      { "Id_EvrIOConfig",     Pds::TypeId::Id_EvrIOConfig },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

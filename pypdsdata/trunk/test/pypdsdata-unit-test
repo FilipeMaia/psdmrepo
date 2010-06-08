@@ -247,7 +247,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_IpimbConfig, 23 )
         self.assertEqual ( TypeId.Type.Id_EncoderData, 24 )
         self.assertEqual ( TypeId.Type.Id_EncoderConfig, 25 )
-        self.assertEqual ( TypeId.Type.NumberOf, 26 )
+        self.assertEqual ( TypeId.Type.Id_EvrIOConfig, 26 )
+        self.assertEqual ( TypeId.Type.NumberOf, 27 )
 
         # instantiation
         TypeId ()
@@ -348,7 +349,14 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Detector.BldEb, 10 )
         self.assertEqual ( DetInfo.Detector.SxrBeamline, 11 )
         self.assertEqual ( DetInfo.Detector.SxrEndstation, 12 )
-        self.assertEqual ( DetInfo.Detector.NumDetector, 13 )
+        self.assertEqual ( DetInfo.Detector.XppSb1Ipm, 13 )
+        self.assertEqual ( DetInfo.Detector.XppSb1Pim, 14 )
+        self.assertEqual ( DetInfo.Detector.XppMonPim, 15 )
+        self.assertEqual ( DetInfo.Detector.XppSb2Ipm, 16 )
+        self.assertEqual ( DetInfo.Detector.XppSb3Ipm, 17 )
+        self.assertEqual ( DetInfo.Detector.XppSb3Pim, 18 )
+        self.assertEqual ( DetInfo.Detector.XppSb4Pim, 19 )
+        self.assertEqual ( DetInfo.Detector.NumDetector, 20 )
         
         self.assertEqual ( DetInfo.Device.NoDevice, 0 )
         self.assertEqual ( DetInfo.Device.Evr, 1 )
