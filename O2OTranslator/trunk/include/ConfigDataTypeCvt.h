@@ -19,6 +19,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
+#include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/DataTypeCvt.h"
 
 //-------------------------------
@@ -76,6 +77,10 @@ public:
 
     // check data size
     if ( H5Type::xtcSize(data) != size ) {
+      if ( size == 0 ) {
+        MsgLog("ConfigDataTypeCvt", warning, "Zero XTC payload in " << m_typeGroupName << ", expected size " <<H5Type::xtcSize(data)) ;
+        return;
+      }
       throw O2OXTCSizeException ( m_typeGroupName, H5Type::xtcSize(data), size ) ;
     }
     

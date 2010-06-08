@@ -40,6 +40,8 @@
 #include "H5DataTypes/EvrConfigV1.h"
 #include "H5DataTypes/EvrConfigV2.h"
 #include "H5DataTypes/EvrConfigV3.h"
+#include "H5DataTypes/EvrConfigV4.h"
+#include "H5DataTypes/EvrIOConfigV1.h"
 #include "H5DataTypes/FccdConfigV1.h"
 #include "H5DataTypes/IpimbConfigV1.h"
 #include "H5DataTypes/IpimbDataV1.h"
@@ -214,6 +216,14 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::EvrConfigV3> ( "EvrData::ConfigV3" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_EvrConfig,3).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::EvrConfigV4> ( "EvrData::ConfigV4" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EvrConfig,4).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::EvrIOConfigV1> ( "EvrData::IOConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EvrIOConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::ControlDataConfigV1> ( "ControlData::ConfigV1" ) ) ;

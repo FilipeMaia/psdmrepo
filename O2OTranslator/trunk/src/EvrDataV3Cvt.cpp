@@ -76,14 +76,6 @@ EvrDataV3Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                         const O2OXtcSrc& src,
                                         const H5DataTypes::XtcClockTime& time )
 {
-  // find corresponding configuration object
-  Pds::TypeId cfgTypeId(Pds::TypeId::Id_EvrConfig,3);
-  const Pds::EvrData::ConfigV3* config = m_configStore.find<Pds::EvrData::ConfigV3>(cfgTypeId, src.top());
-  if ( not config ) {
-    MsgLog ( logger, error, "EvrDataV3Cvt - no configuration object was defined" );
-    return ;
-  }
-
   // create all containers if running first time
   if ( not m_evrDataCont ) {
 

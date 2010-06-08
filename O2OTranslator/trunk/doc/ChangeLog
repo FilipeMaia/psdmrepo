@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-02
+2010-06-08 Andy Salnikov
+- updating for XPP and pdsdata V02-02-00
+- added protection against zero-size payload to ConfigDataTypeCvt, there
+  are some weird XTCs in commissioning XPP data
+- EvrDataV3Cvt does not need config object at all
+
 Tag: V00-07-01
 2010-05-12 Andy Salnikov
 - replaced Lusi/Lusi.h with SITConfig/SITConfig.h
