@@ -58,6 +58,7 @@
 #include "types/opal1k/ConfigV1.h"
 
 #include "types/pnCCD/ConfigV1.h"
+#include "types/pnCCD/ConfigV2.h"
 #include "types/pnCCD/FrameV1.h"
 
 #include "types/princeton/ConfigV1.h"
@@ -164,6 +165,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_pnCCDconfig :
     if ( not obj ) obj = xtc2obj<PNCCD::ConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<PNCCD::ConfigV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_Epics :

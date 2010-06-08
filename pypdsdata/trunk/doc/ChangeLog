@@ -1,4 +1,8 @@
 
+2010-06-08 - V00-00-10
+======================
+- forgot to add PNCCD::ConfigV2 to pyext/DataObjectFactory
+
 2010-06-08 - V00-00-09
 ======================
 - new pdsdata V02-02-00, applying all changes here
