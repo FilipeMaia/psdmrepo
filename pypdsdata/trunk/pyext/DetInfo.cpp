@@ -33,6 +33,20 @@
 
 namespace {
 
+  // helper method to get enum name out of enums array
+  const char* enum_name(pypdsdata::EnumType::Enum enums[], int val, int maxval)
+  {
+    // try optimization first based on the order of enums in the list above
+    if ( val <= maxval and enums[val].value == val ) {
+      return enums[val].name;
+    }
+    // otherwise try linear search
+    for( unsigned i = 0 ; enums[i].name ; ++ i ) {
+      if (enums[i].value == val) return enums[i].name;
+    }
+    return "<Invalid>";    
+  }
+
   pypdsdata::EnumType::Enum detectorEnumValues[] = {
       { "NoDetector",  Pds::DetInfo::NoDetector },
       { "AmoIms",      Pds::DetInfo::AmoIms },
@@ -58,7 +72,23 @@ namespace {
       { 0, 0 }
   };
   pypdsdata::EnumType detectorEnum ( "Detector", detectorEnumValues );
-
+  inline const char* det_name(Pds::DetInfo::Detector det) {
+    return enum_name(detectorEnumValues, int(det), Pds::DetInfo::NumDetector);
+  }
+  
+  const char* det_name(int det) 
+  {
+    // try optimization first based on the order of enums in the list above
+    if ( det <= Pds::DetInfo::NumDetector and detectorEnumValues[det].value == det ) {
+      return detectorEnumValues[det].name;
+    }
+    // otherwise try linear search
+    for( unsigned i = 0 ; detectorEnumValues[i].name ; ++ i ) {
+      if (detectorEnumValues[i].value == det) return detectorEnumValues[i].name;
+    }
+    return "<Invalid>";
+  }
+  
   pypdsdata::EnumType::Enum deviceEnumValues[] = {
       { "NoDevice",  Pds::DetInfo::NoDevice },
       { "Evr",       Pds::DetInfo::Evr },
@@ -74,6 +104,9 @@ namespace {
       { 0, 0 }
   };
   pypdsdata::EnumType deviceEnum ( "Device", deviceEnumValues );
+  inline const char* dev_name(Pds::DetInfo::Device dev) {
+    return enum_name(deviceEnumValues, int(dev), Pds::DetInfo::NumDevice);
+  }
 
   // standard Python stuff
   int DetInfo_init( PyObject* self, PyObject* args, PyObject* kwds );
@@ -195,7 +228,10 @@ DetInfo_str( PyObject *self )
 {
   pypdsdata::DetInfo* py_this = (pypdsdata::DetInfo*) self;
   char buf[48];
-  snprintf( buf, sizeof buf, "DetInfo(%s)", Pds::DetInfo::name(py_this->m_obj) );
+  snprintf( buf, sizeof buf, "DetInfo(%s-%d|%s-%d)", ::det_name(py_this->m_obj.detector()),
+      py_this->m_obj.detId(),
+      ::dev_name(py_this->m_obj.device()),
+      py_this->m_obj.devId() );
   return PyString_FromString( buf );
 }
 
@@ -206,9 +242,9 @@ DetInfo_repr( PyObject *self )
   char buf[64];
   snprintf( buf, sizeof buf, "<DetInfo(%d, %s, %d, %s, %d)>",
       py_this->m_obj.processId(),
-      Pds::DetInfo::name(py_this->m_obj.detector()),
+      ::det_name(py_this->m_obj.detector()),
       py_this->m_obj.detId(),
-      Pds::DetInfo::name(py_this->m_obj.device()),
+      ::dev_name(py_this->m_obj.device()),
       py_this->m_obj.devId() );
   return PyString_FromString( buf );
 }

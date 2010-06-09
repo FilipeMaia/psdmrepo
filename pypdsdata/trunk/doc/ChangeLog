@@ -1,4 +1,10 @@
 
+2010-06-09 - V00-00-11
+======================
+- in DetInfo implement our own printing of detector and device names 
+  to make printed output consistent with the definition of enums
+- EnumType: suppress c++ warning about strict aliasing rules
+
 2010-06-08 - V00-00-10
 ======================
 - forgot to add PNCCD::ConfigV2 to pyext/DataObjectFactory
