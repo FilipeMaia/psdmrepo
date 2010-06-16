@@ -36,7 +36,7 @@
 namespace H5DataTypes {
 
 //
-// Helper type for Pds::Ipimb::ConfigV1
+// Helper type for Pds::FCCD::FccdConfigV1
 //
 struct FccdConfigV1_Data  {
   uint32_t width;
