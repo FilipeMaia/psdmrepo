@@ -1,0 +1,105 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package H5DataTypes
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-20
+2010-06-15 Andy Salnikov
+- updated for pdsdata V02-04-00
+
+Tag: V00-00-19
+2010-06-08 Andy Salnikov
+- updated for pdsdata V02-02-00
+
+Tag: V00-00-18
+2010-05-12 Andy Salnikov
+- replaced Lusi/Lusi.h with SITConfig stuff
+
+Tag: V00-00-17
+2010-05-12 Andy Salnikov
+- changed EvrDataV3 class to use variable length data array
+
+Tag: V00-00-16
+2010-05-12 Andy Salnikov
+- adding more classes for pdsdata V02-00-01
+
+Tag: V00-00-14
+2010-03-24 Andy Salnikov
+- bug fix in AcqirisDataDescV1, waveform type must be signed
+
+Tag: V00-00-13
+2009-12-17 Andy Salnikov
+- update for pdsdata V01-08-00, evr::ConfigV2 has an additional enum value
+
+Tag: V00-00-12
+2009-11-24 Andy Salnikov
+- removed ObjectContainer constructor with implicit type
+- new classes PnCCDConfigV1 and PnCCDFrameV1
+
+Tag: V00-00-11
+2009-11-20 Andy Salnikov
+- new types added corresponding to pdsdata V01-06-00
+
+Tag: V00-00-10
+2009-10-30 Andy Salnikov
+- adding new static method xtcSize() to a bunch of classes,
+  they are used to verify size of the XTC in files
+
+Tag: V00-00-09
+2009-10-28 Andy Salnikov
+- adding couple of new data classes
+  - extracted part of the EvrConfigV1 into separate EvrConfigData to be used
+    by both EvrConfigV1 and EvrConfigV2
+  - new class EvrConfigV2 corresponding to new XTC class
+  - new class BldDataPhaseCavity
+
+Tag: V00-00-08
+2009-10-08 Andy Salnikov
+- EpicsPvHeader: test class for EPICS data (headers only)
+
+Tag: V00-00-07
+2009-10-08 Andy Salnikov
+- ControlDataPVControlV1: fixed types for strings
+
+Tag: V00-00-06
+2009-09-30 Andy Salnikov
+- few more types, need pdsdata-20090930
+
+Tag: V00-00-05
+2009-08-04 Andy Salnikov
+- update for pdsdata-20090722:
+  - added new class PulnixTM6740ConfigV1
+  - renamed members in AcqirisTrigV1
+
+Tag: V00-00-04
+2009-04-22 Andy Salnikov
+- added option to use n-bit compression to ObjectContainer
+
+Tag: V00-00-03
+2009-04-22 Andy Salnikov
+- small refactoring, store() method becomes a static member of the 
+  corresponding classes
+- finished implementation for AcqirisDataDescV1 class
+
+Tag: V00-00-02
+2009-04-10 Andy Salnikov
+- ObjectContainer: allow passing dynamic object type to all operations
+- implemented CameraFrameV1 data
+
+Tag: V00-00-01
+2009-04-07 Andy Salnikov
+- small scale refactoring following changes in hdf5pp TypeTraits 
+
+Tag: V00-00-00
+2009-04-06 Andy Salnikov
+- first import into repository
+- just few types defined
+
