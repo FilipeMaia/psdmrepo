@@ -43,6 +43,7 @@
 #include "H5DataTypes/EvrConfigV4.h"
 #include "H5DataTypes/EvrIOConfigV1.h"
 #include "H5DataTypes/FccdConfigV1.h"
+#include "H5DataTypes/FccdConfigV2.h"
 #include "H5DataTypes/IpimbConfigV1.h"
 #include "H5DataTypes/IpimbDataV1.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
@@ -50,6 +51,7 @@
 #include "H5DataTypes/PnCCDConfigV2.h"
 #include "H5DataTypes/PrincetonConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
+#include "H5DataTypes/PulnixTM6740ConfigV2.h"
 #include "LusiTime/Time.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/AcqirisDataDescV1Cvt.h"
@@ -202,6 +204,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_TM6740Config,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::PulnixTM6740ConfigV2> ( "Pulnix::TM6740ConfigV2" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_TM6740Config,2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::CameraFrameFexConfigV1> ( "Camera::FrameFexConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_FrameFexConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
@@ -244,6 +250,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::FccdConfigV1> ( "FCCD::FccdConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_FccdConfig,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::FccdConfigV2> ( "FCCD::FccdConfigV2" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_FccdConfig,2).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::IpimbConfigV1> ( "Ipimb::ConfigV1" ) ) ;

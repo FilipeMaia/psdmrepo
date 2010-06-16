@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-03
+2010-06-08 Andy Salnikov
+- updating for pdsdata V02-04-00
+
 Tag: V00-07-02
 2010-06-08 Andy Salnikov
 - updating for XPP and pdsdata V02-02-00
