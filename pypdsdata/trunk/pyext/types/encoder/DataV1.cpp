@@ -41,6 +41,14 @@ namespace {
     {0, 0, 0, 0, 0}
   };
 
+  // methods
+  FUN0_WRAPPER(pypdsdata::Encoder::DataV1, value)
+
+  PyMethodDef methods[] = {
+    {"value",                 value,                  METH_NOARGS,  "" },
+    {0, 0, 0, 0}
+   };
+
   char typedoc[] = "Python class wrapping C++ Pds::Encoder::DataV1 class.";
 
 }
@@ -55,6 +63,7 @@ pypdsdata::Encoder::DataV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
+  type->tp_methods = ::methods;
 
   BaseType::initType( "DataV1", module );
 }

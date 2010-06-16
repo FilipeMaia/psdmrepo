@@ -1,4 +1,8 @@
 
+2010-06-10 - V00-00-12
+======================
+- upgrading to pdsdata V02-04-00
+
 2010-06-09 - V00-00-11
 ======================
 - in DetInfo implement our own printing of detector and device names 

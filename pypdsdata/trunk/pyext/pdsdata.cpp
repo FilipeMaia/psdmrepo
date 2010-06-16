@@ -79,6 +79,7 @@
 #include "types/evr/PulseConfigV3.h"
 
 #include "types/fccd/FccdConfigV1.h"
+#include "types/fccd/FccdConfigV2.h"
 
 #include "types/ipimb/ConfigV1.h"
 #include "types/ipimb/DataV1.h"
@@ -93,6 +94,7 @@
 #include "types/princeton/FrameV1.h"
 
 #include "types/pulnix/TM6740ConfigV1.h"
+#include "types/pulnix/TM6740ConfigV2.h"
 
 #define PDSDATA_IMPORT_ARRAY
 #import "pdsdata_numpy.h"
@@ -212,6 +214,7 @@ PyMODINIT_FUNC init_pdsdata()
 
   module = Py_InitModule3( "_pdsdata.fccd", 0, "The Python module for pdsdata/fccd" );
   pypdsdata::FCCD::FccdConfigV1::initType( module );
+  pypdsdata::FCCD::FccdConfigV2::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "fccd", module );
 
@@ -241,6 +244,7 @@ PyMODINIT_FUNC init_pdsdata()
 
   module = Py_InitModule3( "_pdsdata.pulnix", 0, "The Python module for pdsdata/pulnix" );
   pypdsdata::Pulnix::TM6740ConfigV1::initType( module );
+  pypdsdata::Pulnix::TM6740ConfigV2::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "pulnix", module );
 

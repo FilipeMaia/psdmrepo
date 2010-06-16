@@ -51,6 +51,7 @@
 #include "types/evr/IOConfigV1.h"
 
 #include "types/fccd/FccdConfigV1.h"
+#include "types/fccd/FccdConfigV2.h"
 
 #include "types/ipimb/ConfigV1.h"
 #include "types/ipimb/DataV1.h"
@@ -65,6 +66,7 @@
 #include "types/princeton/FrameV1.h"
 
 #include "types/pulnix/TM6740ConfigV1.h"
+#include "types/pulnix/TM6740ConfigV2.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -89,10 +91,10 @@ namespace {
   }
 
   template <typename T, int Version>
-  inline 
+  inline
   PyObject* xtc2obj(const Pds::Xtc& xtc, PyObject* parent) {
     if( Version < 0 or xtc.contains.version() == unsigned(Version) ) {
-      return T::PyObject_FromXtc(xtc, parent); 
+      return T::PyObject_FromXtc(xtc, parent);
     }
     return 0;
   }
@@ -153,6 +155,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_TM6740Config :
     if ( not obj ) obj = xtc2obj<Pulnix::TM6740ConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Pulnix::TM6740ConfigV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_ControlConfig :
@@ -203,6 +206,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_FccdConfig :
     if ( not obj ) obj = xtc2obj<FCCD::FccdConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<FCCD::FccdConfigV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_IpimbData :
@@ -231,7 +235,8 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
   }
 
   if ( not obj ) {
-    PyErr_Format(PyExc_NotImplementedError, "Error: DataObjectFactory unsupported type %s", Pds::TypeId::name(xtc.contains.id()) );
+    PyErr_Format(PyExc_NotImplementedError, "Error: DataObjectFactory unsupported type %s_V%d",
+                 Pds::TypeId::name(xtc.contains.id()), xtc.contains.version() );
   }
 
   return obj ;
