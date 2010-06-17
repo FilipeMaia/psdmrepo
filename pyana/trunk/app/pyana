@@ -40,7 +40,6 @@ from resource import *
 #-----------------------------
 from pypdsdata import xtc
 from pyana import event
-from pyana.histo import HistoMgr
 from pyana.input import dgramGen, threadedDgramGen
 from pyana.userana import mod_import, evt_dispatch
 from pyana.mp_proto import *
@@ -56,16 +55,18 @@ def _rusage(msg, ru1, ru2):
     print "%s: %.1f user %.1f sys" % ( msg, ru2.ru_utime-ru1.ru_utime, ru2.ru_stime-ru1.ru_stime )
 
 
-def _proc(jobname, id, pipe, userObjects, dg_ref):
+def _proc(jobname, id, pipes, userObjects, dg_ref):
     """ method which is running in child process when we do multi-processing """
+
+    for i in range(len(pipes)):
+        pipes[i][0].close()
+        if i != id : pipes[i][1].close()
+    pipe = pipes[id][1]
 
     ru1 = getrusage(RUSAGE_SELF)
     
-    # instantiate histo manager (memory-based)
-    hmgr = HistoMgr()
-    
     # create own environment, make unique job name
-    env = event.Env(jobname, hmgr, subproc=id)
+    env = event.Env(jobname, subproc=id)
 
     logging.info("proc-%s: starting job %s", id, jobname)
 
@@ -81,8 +82,9 @@ def _proc(jobname, id, pipe, userObjects, dg_ref):
 
             epics_data = req[1]
             dg = req[2]
+            run = req[3]
 
-            evt = event.Event(dg)
+            evt = event.Event(dg, run)
             
             # update configuration objects
             env.updateConfig(evt)
@@ -111,8 +113,8 @@ def _proc(jobname, id, pipe, userObjects, dg_ref):
             # stop here
             break
             
-    # close histo files
-    hmgr.close()
+    # done with the environment
+    env.finish()
 
     logging.info("proc-%s: processed %d events", id, nevent)
 
@@ -164,103 +166,111 @@ def main( argv ) :
     # start worker process if requested
     num_cpu = jobConfig.getJobConfig('num-cpu', 1)
     logging.info("num-cpu: %s", num_cpu)
+    nsub = max(num_cpu-1,0)
     dg_ref = jobConfig.getJobConfig('dg-ref', False)
     logging.info("dg-ref: %s", dg_ref)
-    pipes = []
-    procs = []
-    for proc in range(max(num_cpu-1,0)) :
-        parent_conn, child_conn = mp.Pipe()
-        pipes.append(mp_proto(parent_conn, dg_ref, 'prot-main'))
-        procs.append(mp.Process(target=_proc, args=(jobname, proc, child_conn, userObjects, dg_ref)))
+
+    conns = [ mp.Pipe() for i in range(nsub)]
+    procs = [mp.Process(target=_proc, args=(jobname, i, conns, userObjects, dg_ref)) for i in range(nsub)]
     for p in procs : p.start()
+    for conn in conns : conn[1].close()
+    pipes = [mp_proto(conn[0], dg_ref, 'prot-main') for conn in conns]
 
-    # instantiate histo manager
-    hmgr = HistoMgr( file=jobname+".root" )
-
-    # create environment
-    env = event.Env(jobname, hmgr)
-
-    dispatch = evt_dispatch(userObjects)
-    num_events = jobConfig.getJobConfig('num-events')
-    nevent = 0
-    ndamage = 0
-    damagemask = 0
-    next = 0
-
-    # read datagrams one by one
-    for dgtup in dgramGen( names ) :
-
-        dg, fileName, fpos = dgtup
-
-        damage = dg.xtc.damage.value()
-        svc = dg.seq.service()
-
-        if damage :
-            ndamage += 1
-            damagemask |= damage
-
-        if not damage or svc == xtc.TransitionId.Configure:
+    status = 0
+    try :
+    
+        # create environment
+        env = event.Env(jobname)
+    
+        dispatch = evt_dispatch(userObjects)
+        num_events = jobConfig.getJobConfig('num-events')
+        nevent = 0
+        ndamage = 0
+        damagemask = 0
+        next = 0
+    
+        # read datagrams one by one
+        for dgtup in dgramGen( names ) :
+    
+            dg, fileName, fpos, run = dgtup
+    
+            damage = dg.xtc.damage.value()
+            svc = dg.seq.service()
+    
+            if damage :
+                ndamage += 1
+                damagemask |= damage
+    
+            if not damage or svc == xtc.TransitionId.Configure:
+                
+                evt = event.Event(dg, run)
+                
+                # update environment
+                env.update ( evt )
+    
+                if procs:
+                    
+                    # pass all the data to children
+                    if svc == xtc.TransitionId.L1Accept :
+                        # event data goes to next child
+                        p = pipes[next]
+                        next = (next+1) % len(pipes)
+                        p.sendEventData(dgtup, env)
+                    else :
+                        # each transitions goes to each child
+                        for p in pipes : p.sendEventData(dgtup, env)
+    
+                else :
+                    
+                    # process all data
+                    dispatch.dispatch(evt, env)
+                    
+            if svc == xtc.TransitionId.L1Accept :
+                nevent += 1
+    
+            #print "Processed %d events, %d damaged, with damage mask %#x" % (nevent, ndamage, damagemask)
             
-            evt = event.Event(dg)
+            if num_events is not None and nevent >= num_events :
+                logging.info("event limit reached (%d), terminating", nevent)
+                break
+    
+        # finish
+        dispatch.finish(env)
+    
+        # send FIN to all processes
+        for p in pipes : 
+            p.sendCode(OP_FINISH)
+    
+        # get results from all processes
+        merge = merger() 
+        for p in pipes : 
+            merge.merge(p.getResult())
+        merge.finish(env)    
+    
+        # send END to all processes
+        for p in pipes :
+            p.sendCode(OP_END)
             
-            # update environment
-            env.update ( evt )
-
-            if procs:
-                
-                # pass all the data to children
-                if svc == xtc.TransitionId.Configure :
-                    # each configure transitions goes to each child
-                    for p in pipes : p.sendEventData(dgtup, env)
-                elif svc == xtc.TransitionId.L1Accept :
-                    # event data goes to next child
-                    p = pipes[next]
-                    next = (next+1) % len(pipes)
-                    p.sendEventData(dgtup, env)
-
-            else :
-                
-                # process all data
-                dispatch.dispatch(evt, env)
-                
-        if svc == xtc.TransitionId.L1Accept :
-            nevent += 1
-
-        #print "Processed %d events, %d damaged, with damage mask %#x" % (nevent, ndamage, damagemask)
+    except IOError, exc:
         
-        if num_events is not None and nevent >= num_events :
-            logging.info("event limit reached (%d), terminating", nevent)
-            break
-
-    # finish
-    dispatch.finish(env)
-
-    # send FIN to all processes
-    for p in pipes : 
-        p.sendCode(OP_FINISH)
-
-    # get results from all processes
-    merge = merger() 
-    for p in pipes : 
-        merge.merge(p.getResult())
-    merge.finish(env)    
-
-    # send END to all processes
-    for p in pipes :
-        p.sendCode(OP_END)
+        # might mean communication with sub-processes error, stop here
+        logging.error("exception caught: %s", exc)
+        status = exc.errno
 
     # wait for all processes
     for p in pipes : p.close()
     for p in procs : p.join()
 
-    # close histo file
-    hmgr.close()
+    # done with the environment
+    env.finish()
 
     logging.info("Processed %d events, %d damaged, with damage mask %#x", nevent, ndamage, damagemask)
 
     ru2 = getrusage(RUSAGE_SELF), getrusage(RUSAGE_CHILDREN)
     _rusage( "self  time", ru1[0], ru2[0] )
     _rusage( "child time", ru1[1], ru2[1] )
+
+    return status
     
 #
 #  run application when imported as a main module

@@ -38,8 +38,9 @@ def dgramGen(names):
             
             fileName = dgiter.fileName()
             fpos = dgiter.fpos()
+            run = dgiter.run()
 
-            yield (dg, fileName, fpos)
+            yield (dg, fileName, fpos, run)
 
 
 class _DgramReaderThread ( threading.Thread ):

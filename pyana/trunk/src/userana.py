@@ -62,7 +62,7 @@ class evt_dispatch(object) :
     
     def __init__ (self, userObjects) :
         self.userObjects = userObjects
-        self.jobbegun = False
+        self.lastConfigTime = None
         self.runbegun = False
         
     def dispatch (self, evt, env):
@@ -71,21 +71,38 @@ class evt_dispatch(object) :
         
         # process all data
         if svc == xtc.TransitionId.Configure :
-            if not self.jobbegun:
+            
+            # run configure if it was not run or we have a different 
+            # configure transition 
+            cfgTime = evt.getTime()
+            if cfgTime != self.lastConfigTime :
+                if self.lastConfigTime : 
+                    for userana in self.userObjects : userana.endjob( env )
                 for userana in self.userObjects : userana.beginjob( evt, env )
-                self.jobbegun = True
-            else :
-                if self.runbegun : 
-                    for userana in self.userObjects : userana.endrun()
-                for userana in self.userObjects : userana.beginrun( evt, env )
-                self.runbegun = True
+                self.lastConfigTime = cfgTime
+            
+        elif svc == xtc.TransitionId.BeginRun :
+            
+            for userana in self.userObjects : userana.beginrun( evt, env )
+            self.runbegun = True
+            
+        elif svc == xtc.TransitionId.EndRun :
+            
+            for userana in self.userObjects : userana.endrun( evt )
+            self.runbegun = False
+            
         elif svc == xtc.TransitionId.L1Accept :
             for userana in self.userObjects : userana.event( evt, env )
 
     def finish(self, env):
-        # finish
+        
+        # finish with run first if was not done yet
         if self.runbegun :
             for userana in self.userObjects : userana.endrun( env )
-        if self.jobbegun :
+            self.runbegun = False
+
+        # run unconfigure if configure was ran before
+        if self.lastConfigTime :
             for userana in self.userObjects : userana.endjob( env )
+            self.lastConfigTime = None
         

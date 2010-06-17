@@ -9,6 +9,7 @@ import numpy
 import os
 import tempfile
 
+from pyana.histo import HistoMgr
 from pypdsdata import xtc
 from pypdsdata import epics
 from pypdsdata import Error
@@ -72,10 +73,13 @@ def _addr( address ):
 class Event(object):
     
     
-    def __init__( self, dg ):
+    def __init__( self, dg, run = -1 ):
         
         self.m_dg = dg
-        
+        self.m_run = run
+
+    def run(self) :
+        return self.m_run
 
     def seq(self) :
         return self.m_dg.seq
@@ -369,6 +373,15 @@ class Env(object):
     
     def hmgr(self):
         "Returns histogram manager object"
+        
+        if not self.m_hmgr:
+            if self.m_subproc < 0 :
+                # instantiate histo manager only when needed
+                self.m_hmgr = HistoMgr( file=self.m_jobName+".root" )
+            else :
+                # instantiate histo manager (memory-based)
+                self.m_hmgr = HistoMgr()
+
         return self.m_hmgr
 
     def mkfile(self, filename, mode='w', bufsize=-1):
@@ -439,6 +452,9 @@ class Env(object):
             
             return dict ( files = self.m_files,
                           histos = histos )
+
+    def finish(self):
+        if self.m_hmgr : self.m_hmgr.close()
 
     # ==================
     #  internal methods

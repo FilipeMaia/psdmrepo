@@ -97,7 +97,7 @@ class mp_proto ( object ) :
     def sendEventData ( self, dgtup, env ) :
         """ Send event data """
 
-        dg, fileName, fpos = dgtup
+        dg, fileName, fpos, run = dgtup
         
         self.sendCode(OP_EVENT)
         
@@ -108,6 +108,7 @@ class mp_proto ( object ) :
             self._conn.send(fpos)
         else :
             self._conn.send_bytes(dg)
+        self._conn.send(run)
 
     def getRequest(self):
         """ Generator function that returns all requests """
@@ -156,7 +157,9 @@ class mp_proto ( object ) :
                         self._log.debug("received %s bytes", len(data) )
                         dg = xtc.Dgram(data)
 
-                    yield (opcode, epics_data, dg)
+                    run = self._conn.recv()
+
+                    yield (opcode, epics_data, dg, run)
                     
                 except EOFError, ex:
                     
