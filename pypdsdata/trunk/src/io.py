@@ -5,6 +5,7 @@
 # 
 
 from _pdsdata import xtc
+from _pdsdata import Error
 import logging
 import os
 
@@ -242,7 +243,7 @@ class XtcFileName(str) :
 #
 # iterator which merges multiple streams into one
 #
-class XtcMergeIterator(XtcStreamMerger) :
+class XtcMergeIterator(object) :
 
     """ Iterator class which merges datagrams from several separate streams.
     Constructor takes the list of the file names acceptable by XtcFileName. """
@@ -255,21 +256,72 @@ class XtcMergeIterator(XtcStreamMerger) :
         
         # check they all from the same experiment and run
         exp = set([file.expNum() for file in xfiles])
-        runs = set([file.run() for file in xfiles])
-        if len(exp)>1 or len(runs)>1 :
+        if len(exp)>1 :
             raise Error("file names from different runs or experiments")
 
-        # group by stream
-        streams = {}
+        # group by runs and stream
+        runmap = {}
         for file in xfiles :
+            streams = runmap.setdefault( file.run(), {} )
             chunks = streams.setdefault( file.stream(), [] )
             chunks.append( file )
-        
-        # make iterators for each stream
-        streamIters = []
-        for chunks in streams.itervalues() :
-            chunks.sort( lambda x,y : cmp(x.chunk(), y.chunk()) )
-            streamIters.append( XtcChunkIterator(chunks, bufsize) ) 
 
-        # call base class ctor and give it all this
-        XtcStreamMerger.__init__( self, streamIters, l1OffsetSec )
+        # sorted list of runs
+        runs = sorted(runmap.iterkeys())
+        
+        # make iterators for each run
+        self.m_runiters = []
+        for r in runs:
+            
+            streams = runmap[r]
+            
+            streamIters = []
+            for stream, files in streams.iteritems() :
+                
+                chunks = set([f.chunk() for f in files])
+                if len(chunks) != len(files):
+                    raise Error("Non-unique chunk numbers for run %s stream %s" % (r, stream))
+
+                # sort files according to chunk number
+                files.sort( lambda x,y : cmp(x.chunk(), y.chunk()) )
+                streamIters.append( XtcChunkIterator(files, bufsize) ) 
+    
+            self.m_runiters.append( XtcStreamMerger( streamIters, l1OffsetSec ) )
+
+    def __iter__ (self) :
+        """ imagine we are iterator """
+        return self
+
+    def next(self):
+        """ return next diagram """
+        
+        while self.m_runiters:
+            try:
+                data = self.m_runiters[0].next()
+                return data
+            except StopIteration :
+                # go to next run
+                del self.m_runiters[0]
+                pass
+            
+        raise StopIteration
+
+    def fileName(self):
+        if not self.m_runiters: return None
+        return self.m_runiters[0].fileName()
+
+    def fpos(self):
+        if not self.m_runiters: return None
+        return self.m_runiters[0].fpos()
+
+    def run(self):
+        """Returns the run number for the current file"""
+        
+        if not self.m_runiters: return None
+        
+        fn = self.m_runiters[0].fileName()
+        run = None
+        if isinstance(fn, XtcFileName):
+            run = fn.run()
+        if run is None: run = -1
+        return run

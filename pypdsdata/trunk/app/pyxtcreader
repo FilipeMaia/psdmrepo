@@ -44,7 +44,7 @@ from pypdsdata.xtc import *
 # Local definitions --
 #---------------------
 
-def _scan( xtc, offset=1 ) :
+def _scan( xtc, offset=1, verbose=0 ) :
     
     pfx = "  "*offset
     level = xtc.src.level()
@@ -59,14 +59,15 @@ def _scan( xtc, offset=1 ) :
     if xtc.contains.id() == TypeId.Type.Id_Xtc :
         print
         for x in xtc :
-            _scan( x, offset+1 )
+            _scan( x, offset+1, verbose )
     else :
         print "contains=%s" % xtc.contains
-        try:
-            data = xtc.payload()
-            print "%sPayload: %s" % ( pfx, data )
-        except:
-            pass
+        if verbose > 0:
+            try:
+                data = xtc.payload()
+                print "%sPayload: %s" % ( pfx, data )
+            except:
+                pass
 
 #---------------------------------
 #  Application class definition --
@@ -75,8 +76,11 @@ def _scan( xtc, offset=1 ) :
 def main( argv ) :
 
     parser = OptionParser(usage="%prog [options] xtc-files ...")
+    parser.set_defaults(verbose=0)
+    parser.add_option('-v', "--verbose", action='count')
 
     (options, args) = parser.parse_args()
+    verbose = options.verbose
     
     if not args :
         parser.error("at least one file name required")
@@ -84,7 +88,11 @@ def main( argv ) :
     #logging.basicConfig(level=logging.DEBUG)
 
     # read datagrams one by one
-    for dg in io.XtcMergeIterator( args ) :
+    xtciter = io.XtcMergeIterator( args )
+    for dg in xtciter :
+
+        if verbose > 1 :
+            print "file: %s, pos: %d, run: %s" % (xtciter.fileName(), xtciter.fpos(), xtciter.run()) 
 
         seq = dg.seq
         clock = seq.clock()
@@ -97,7 +105,9 @@ def main( argv ) :
                 stamp.ticks(),stamp.fiducials(),stamp.control(), xtc.sizeofPayload() )
 
         # recursively dump Xtc info
-        _scan ( xtc )
+        _scan ( xtc, verbose=verbose )
+        
+        
 #
 #  run application when imported as a main module
 #

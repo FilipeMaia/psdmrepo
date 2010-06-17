@@ -1,4 +1,9 @@
 
+2010-06-17 - V00-00-13
+======================
+- XtcMergeIterator can now accept files from multiple runs
+- pyxtcreader has -v option to control verbosity
+
 2010-06-10 - V00-00-12
 ======================
 - upgrading to pdsdata V02-04-00
