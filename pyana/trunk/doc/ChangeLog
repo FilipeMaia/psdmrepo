@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2010-06-22 - Andy Salnikov
+- event.py: filter out all bad XTC except those having ContainsIncomplete
+
 Tag: V00-00-12
 2010-06-22 - Andy Salnikov
 - histo.py fix, ROOT now is not in module scope
