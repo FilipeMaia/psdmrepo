@@ -42,7 +42,6 @@ import numpy as np
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import ROOT
 
 #----------------------------------
 # Local non-exported definitions --

@@ -87,6 +87,9 @@ class Event(object):
     def env(self) :
         return self.m_dg.env
 
+    def damage(self) :
+        return self.m_dg.xtc.damage
+
     def getTime(self) :
          return self.m_dg.seq.clock()
 
@@ -305,12 +308,15 @@ class Event(object):
     # Generator method for datagram contents, does tree traversal
     @staticmethod
     def _xtcGenerator( xtcObj ):
-        yield xtcObj
         if xtcObj.contains.id() == xtc.TypeId.Type.Id_Xtc :
+            yield xtcObj
             for child in xtcObj :
                 for x in Event._xtcGenerator(child) :
                     yield x
-                    
+        else :
+            # skip damaged data
+            if xtcObj.damage.value() == 0 :
+                yield xtcObj
                     
 #
 # class that tracks values of all Epics channels
@@ -419,7 +425,11 @@ class Env(object):
                 typeid = x.contains.id()
                 if typeid not in [xtc.TypeId.Type.Id_Epics, xtc.TypeId.Type.Id_Xtc, xtc.TypeId.Type.Any]:
                     # don't store Epics data as config
-                    self._storeConfig(typeid, x.src, x.payload())
+                    try :
+                        cfgObj = x.payload()
+                        self._storeConfig(typeid, x.src, cfgObj)
+                    except Error, e:
+                        _log.error('Failed to extract config object of type %s: %s', xtc.contains, e )
                     
     def getConfig(self, typeId, address=None):
         """Generic getConfig method"""

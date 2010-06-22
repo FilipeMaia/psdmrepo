@@ -7,15 +7,19 @@
 import logging
 import os
 
-import ROOT
-ROOT.PyConfig.IgnoreCommandLineOptions = True
-from ROOT import TFile
-
+# only import ROOT when necessary
+def _import():
+    import ROOT
+    ROOT.PyConfig.IgnoreCommandLineOptions = True
+    ROOT.PyConfig.StartGuiThread = False
+    from ROOT import TFile
 
 class HistoMgrRoot(object):
     
     def __init__ (self, **kw ):
-    
+
+        _import()
+
         self.m_file = None
         fname = kw.get('file')
         if fname : self.m_file = TFile(fname, 'RECREATE')

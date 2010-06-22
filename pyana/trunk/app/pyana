@@ -201,29 +201,27 @@ def main( argv ) :
                 ndamage += 1
                 damagemask |= damage
     
-            if not damage or svc == xtc.TransitionId.Configure:
+            evt = event.Event(dg, run)
+            
+            # update environment
+            env.update ( evt )
+
+            if procs:
                 
-                evt = event.Event(dg, run)
-                
-                # update environment
-                env.update ( evt )
-    
-                if procs:
-                    
-                    # pass all the data to children
-                    if svc == xtc.TransitionId.L1Accept :
-                        # event data goes to next child
-                        p = pipes[next]
-                        next = (next+1) % len(pipes)
-                        p.sendEventData(dgtup, env)
-                    else :
-                        # each transitions goes to each child
-                        for p in pipes : p.sendEventData(dgtup, env)
-    
+                # pass all the data to children
+                if svc == xtc.TransitionId.L1Accept :
+                    # event data goes to next child
+                    p = pipes[next]
+                    next = (next+1) % len(pipes)
+                    p.sendEventData(dgtup, env)
                 else :
-                    
-                    # process all data
-                    dispatch.dispatch(evt, env)
+                    # each transitions goes to each child
+                    for p in pipes : p.sendEventData(dgtup, env)
+
+            else :
+                
+                # process all data
+                dispatch.dispatch(evt, env)
                     
             if svc == xtc.TransitionId.L1Accept :
                 nevent += 1
