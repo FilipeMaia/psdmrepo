@@ -308,19 +308,16 @@ class Event(object):
     # Generator method for datagram contents, does tree traversal
     @staticmethod
     def _xtcGenerator( xtcObj ):
-        dmg = xtcObj.damage.value()
         if xtcObj.contains.id() == xtc.TypeId.Type.Id_Xtc :
-            # we only know that ContainsIncomplete damage could be safe,
-            # anything else is potentially bad
-            dmg &= ~xtc.Damage.Mask.ContainsIncomplete
-            if dmg == 0 :
+            # some types of damage cause abd troubles, filter them
+            if not xtcObj.damage.hasDamage(xtc.Damage.Value.DroppedContribution) :
                 yield xtcObj
                 for child in xtcObj :
                     for x in Event._xtcGenerator(child) :
                         yield x
         else :
             # skip damaged data
-            if dmg == 0 :
+            if xtcObj.damage.value() == 0 :
                 yield xtcObj
                     
 #

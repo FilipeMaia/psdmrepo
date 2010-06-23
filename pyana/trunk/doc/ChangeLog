@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-14
+2010-06-23 - Andy Salnikov
+- relax a bit filtering of damaged events
+
 Tag: V00-00-13
 2010-06-22 - Andy Salnikov
 - event.py: filter out all bad XTC except those having ContainsIncomplete
