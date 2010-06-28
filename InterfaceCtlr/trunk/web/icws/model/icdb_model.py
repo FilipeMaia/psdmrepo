@@ -66,15 +66,17 @@ class IcdbModel ( InterfaceDb ) :
         self._conn = DbConnection(conn_string=conn_str)
 
     def controller_status(self, id):
-        """Returns the controller status as a dictionary"""
+        """Returns the controller status as a list dictionaries"""
         icdb = InterfaceDb(self._conn.connection())
         res = icdb.controller_status(id)
-        if id is None :
-            return res
-        elif res : 
-            return res[0]
-        else :
-            return {}
+        for r in res :
+            # strip leading path name from log files
+            try:
+                log = r['log'].split('/')
+                r['log_url'] = 'system/'+log[-2]+'/'+log[-1]
+            except:
+                pass
+        return res
 
     def controller_stop(self, id):
         """Stop given controller instance"""
@@ -143,6 +145,24 @@ class IcdbModel ( InterfaceDb ) :
                     d.setdefault('hdf_files', []).append(fname)
                 else :
                     d.setdefault('other_files', []).append(fname)
+
+        # select translator info
+        q = """SELECT fs.id, DATE_FORMAT(tr.started, GET_FORMAT(DATETIME,'ISO')) started, 
+            DATE_FORMAT(tr.stopped, GET_FORMAT(DATETIME,'ISO')) stopped, tr.log 
+            FROM fileset fs, translator_process tr 
+            WHERE fs.id=tr.fk_fileset"""
+        if rid is not None:
+            q += " AND fs.id=%s"
+        cursor.execute(q, vars)
+        
+        # store in a dict
+        for row in cursor.fetchall():
+            
+            d = res.get(row['id'])
+            if d :
+                d['log'] = row['log']
+                d['started'] = row['started']
+                d['stopped'] = row['stopped']
 
         return res.values()
     

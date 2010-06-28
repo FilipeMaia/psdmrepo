@@ -35,6 +35,7 @@ CREATE  TABLE IF NOT EXISTS `interface_controller` (
   `kill_ic` BOOLEAN NOT NULL COMMENT 'Force interface controller process to stop.' ,
   `started` TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'Time translator started.' ,
   `stopped` TIMESTAMP NULL COMMENT 'Time translator stopped.' ,
+  `log` TEXT COMMENT 'Log file name.`,
   PRIMARY KEY (`id`) ,
   CONSTRAINT `translator_node_fk`
     FOREIGN KEY (`fk_translator_node` )
@@ -138,6 +139,7 @@ CREATE  TABLE IF NOT EXISTS `translator_process` (
   `tru_nsignals` INT UNSIGNED NULL COMMENT 'Translator Signals received' ,
   `tru_nvcsw` INT UNSIGNED NULL COMMENT 'Translator voluntary context switches' ,
   `tru_nivcsw` INT UNSIGNED NULL COMMENT 'Translator involuntary context switches' ,
+  `log` TEXT COMMENT 'Log file name.`,
   PRIMARY KEY (`id`) ,
   CONSTRAINT `interface_controller_fk`
     FOREIGN KEY (`fk_interface_controller` )

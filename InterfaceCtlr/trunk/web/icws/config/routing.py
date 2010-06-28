@@ -83,4 +83,10 @@ def make_map():
     # returns list of all requests for given experiment
     map.connect('/exp/{instrument}/{experiment}', controller='request', action='exp_requests', conditions=cond_get )
 
+    # ============== Access logs ==================
+
+    # GET /log/{mode}/...
+    # returns log file as HTML document
+    map.connect('/log/{mode}/*path', controller='log', action='show', conditions=cond_get )
+
     return map

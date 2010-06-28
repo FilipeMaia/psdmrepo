@@ -119,7 +119,7 @@ class InterfaceDb ( object ) :
 
     @_synchronized
     @_transaction
-    def new_controller(self, host, cursor=None):
+    def new_controller(self, host, log, cursor=None):
         """
         Define new controller in the database, return new controller object
         which is a dictionary with these keys:
@@ -146,9 +146,9 @@ class InterfaceDb ( object ) :
 
         # define new controller instance
         cursor.execute("""INSERT INTO interface_controller 
-            (id, fk_translator_node, process_id, kill_ic, started)
-            VALUES(NULL, %s, %s, False, %s)""", 
-            ( xlatenode_id, proc_id, start.toString("%F %T") ) )
+            (id, fk_translator_node, process_id, kill_ic, started, log)
+            VALUES(NULL, %s, %s, False, %s, %s)""", 
+            ( xlatenode_id, proc_id, start.toString("%F %T"), log ) )
         cursor.execute("SELECT LAST_INSERT_ID()")
         rows = cursor.fetchall()
         controller_id = rows[0][0]
@@ -165,7 +165,7 @@ class InterfaceDb ( object ) :
 
         if id is None :
             # get the latest controller for every active node
-            q = """SELECT c.id, n.node_uri, c.started, c.stopped, c.process_id 
+            q = """SELECT c.id, n.node_uri, c.started, c.stopped, c.process_id, c.log
                 FROM interface_controller c, translator_node n, 
                     (SELECT fk_translator_node nid, max(started) started 
                      FROM interface_controller 
@@ -174,7 +174,7 @@ class InterfaceDb ( object ) :
                      AND c.started = cmax.started AND n.active"""
             vars = ()
         else :
-            q = """SELECT c.id, n.node_uri, c.started, c.stopped, c.process_id 
+            q = """SELECT c.id, n.node_uri, c.started, c.stopped, c.process_id, c.log
                 FROM interface_controller c, translator_node n
                 WHERE n.id = c.fk_translator_node AND c.id = %s"""
             vars = (id,)
@@ -183,12 +183,12 @@ class InterfaceDb ( object ) :
         
         res = []
         for row in cursor.fetchall():
-            cid, host, started, stopped, pid = row
+            cid, host, started, stopped, pid, log = row
             status = 'Running'
             if stopped : 
                 stopped = str(stopped)
                 status = 'Stopped'
-            res.append( dict ( id=cid, host=host, pid=pid, started=str(started), stopped=stopped, status=status) )
+            res.append( dict ( id=cid, host=host, pid=pid, started=str(started), stopped=stopped, status=status, log=log) )
             
         return res
 
@@ -378,15 +378,15 @@ class InterfaceDb ( object ) :
 
     @_synchronized
     @_transaction
-    def new_translator ( self, ctlr_id,  fs_id, cursor=None ) :
+    def new_translator ( self, ctlr_id,  fs_id, log, cursor=None ) :
 
         """Add a row for this translator process. Update statistics after run is complete.
         Return the id of the new row for later update"""
 
         cursor.execute("""INSERT INTO translator_process 
-                (id, fk_interface_controller, fk_fileset, kill_tp, started)
-                VALUES(NULL, %s, %s, False, %s)""", 
-                ( ctlr_id, fs_id, Time.now().toString("%F %T") ) )
+                (id, fk_interface_controller, fk_fileset, kill_tp, started, log)
+                VALUES(NULL, %s, %s, False, %s, %s)""", 
+                ( ctlr_id, fs_id, Time.now().toString("%F %T"), log ) )
         cursor.execute("SELECT LAST_INSERT_ID()")
         rows = cursor.fetchall()
         if not rows:

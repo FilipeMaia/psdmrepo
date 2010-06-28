@@ -63,11 +63,31 @@ class SystemController ( BaseController ) :
     @jsonify
     def status ( self, id = None ) :
 
+        # check user's privileges
+        h.checkAccess('', '', 'read')
+
         model = IcdbModel()
-        return model.controller_status(id)
+        res = model.controller_status(id)
+        for r in res :
+            if 'log' in r and r['log'] :
+                try :
+                    log = r['log'].split('/')
+                    path = 'system/'+log[-2]+'/'+log[-1]
+                    r['log_url'] = h.url_for(controller='/log', action='show', mode='html', path=path)
+                except :
+                    pass
+        if id is None:
+            return res
+        elif res :
+            return res[0]
+        else :
+            return {}
 
     @jsonify
     def stop ( self, id ) :
+
+        # check user's privileges
+        h.checkAccess('', '', 'delete')
 
         model = IcdbModel()
         return model.controller_stop(id)

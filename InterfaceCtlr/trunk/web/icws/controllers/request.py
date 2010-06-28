@@ -79,11 +79,24 @@ class RequestController ( BaseController ) :
         h.checkAccess('', '', 'read')
 
         model = IcdbModel()
+        if id :
+            try:
+                id = int(id)
+            except:
+                abort(404)
         data = model.requests(id)
         
-        # add URL to every object
+        # add URLs to every object
         for d in data :
             d['url'] = h.url_for( action='requests', id=d['id'] )
+
+            if 'log' in d and d['log'] :
+                try :
+                    log = d['log'].split('/')
+                    path = 'translator/'+log[-2]+'/'+log[-1]
+                    d['log_url'] = h.url_for(controller='/log', action='show', mode='html', path=path)
+                except :
+                    pass
 
         # return list or single dict or error
         if id is None :
@@ -135,7 +148,7 @@ class RequestController ( BaseController ) :
 
     @jsonify
     def delete ( self, id ) :
-        """Create new request"""
+        """DElete request"""
 
         # check that it exists and get its info    
         model = IcdbModel()

@@ -131,7 +131,7 @@ class TranslatorThread ( threading.Thread ) :
         # start translator
         logname = os.path.join(self._log_uri,fname_dict['logname'])
         pid = self._start ( cmd, logname )
-        translator_id = self._db.new_translator(self._controller_id, fs_id)
+        translator_id = self._db.new_translator(self._controller_id, fs_id, logname)
         
         self.info ("[%s] Started translator #%d (PID=%d) with cmd %s", self._name, translator_id, pid, ' '.join(cmd) )
         self.info ("[%s] output directory %s", self._name, fname_dict['tmpdirname'] )
@@ -207,7 +207,7 @@ class TranslatorThread ( threading.Thread ) :
         if not h5name : h5name = "%(experiment)s-r%(run_number)04d-c{seq2}.h5"
         h5name = h5name % fsdbinfo
 
-        logname = "o2o-translate-%(experiment)s-r%(run_number)04d" % fsdbinfo
+        logname = "o2o-translate-%(experiment)s/o2o-translate-%(experiment)s-r%(run_number)04d" % fsdbinfo
 
         return dict ( h5name = h5name,
                       h5dirname = dir_name,
@@ -364,14 +364,23 @@ class TranslatorThread ( threading.Thread ) :
     # Start the translator, redirect output
     # =====================================
     def _start ( self, cmd, logname ) :
-        
+
+        # create log directory if needed
+        logdir = os.path.dirname(logname)
+        if logdir and not os.path.isdir(logdir):
+            try:
+                os.makedirs(logdir)
+            except OSError, e:
+                # complain but proceed, we may have race condition here
+                self.warning("Failed to create log directory: %s", str(e))
+
         pid = os.fork()
         if pid == 0 :
             
             # child
             
             # redirect output
-            fd = os.open( logname, os.O_WRONLY|os.O_CREAT|os.O_TRUNC, 0666 )
+            fd = os.open( logname, os.O_WRONLY|os.O_CREAT|os.O_APPEND, 0666 )
             os.dup2 ( fd, 1 )
             os.dup2 ( fd, 2 )
             

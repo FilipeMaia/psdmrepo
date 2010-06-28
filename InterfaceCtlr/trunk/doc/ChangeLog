@@ -11,6 +11,13 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-01
+2010-06-28 Andy Salnikov
+- add support for looking at log files from controller and translators
+- log file names are store in the database
+- web service now has /log controller which shows logs as text of 
+  formatted and colored html
+
 Tag: V00-05-00
 2010-06-07 Andy Salnikov
 - adding web service for interface controller

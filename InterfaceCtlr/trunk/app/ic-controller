@@ -111,6 +111,10 @@ class Controller ( LusiPyApp ) :
                                   action="store", dest="threads", default=1, type='int',
                                   help="number of translators to run simultaneously", metavar="NUMBER" )
 
+        self._parser.add_option ( '-l', "--log",
+                                  action="store", dest="log", default=None,
+                                  help="log file name", metavar="PATH" )
+
         # other instance variables
         self._db = None
         self._controller_id = None
@@ -124,6 +128,26 @@ class Controller ( LusiPyApp ) :
     # ==========================================
 
     def _run ( self ) :
+        
+        # send everything to log file
+        logname = self._options.log
+        if logname :
+            logdir = os.path.dirname(logname)
+            if logdir and not os.path.isdir(logdir):
+                try:
+                    os.makedirs(logdir)
+                except OSError, e:
+                    self.error("Failed to create log directory: %s", str(e))
+                    return e.errno
+            try:
+                # redirect output, append to file
+                fd = os.open( logname, os.O_WRONLY|os.O_CREAT|os.O_APPEND, 0666 )
+                os.dup2 ( fd, 1 )
+                os.dup2 ( fd, 2 )
+            except OSError, e:
+                self.error("Failed to redirect log: %s", str(e))
+                return e.errno
+
 
         # setup signal handling
 #        signal.signal ( signal.SIGTERM, _sig2int )
@@ -258,14 +282,14 @@ class Controller ( LusiPyApp ) :
 
         # define new controller instance
         host = socket.getfqdn(socket.gethostname())
-        ctrl = self._db.new_controller( host )
+        ctrl = self._db.new_controller( host, self._options.log )
         self._controller_id = ctrl['id']
 
         self._perm_config["_log_uri"] = ctrl['log_uri']
         self._perm_config["_translate_uri"] = ctrl['translate_uri']
         self._perm_config["_controller_id"] = ctrl['id']
 
-        self.info ("Successful init_controller on host %s started %s", host, Time.now() )
+        self.info ("Successful init_controller %d on host %s started %s", self._controller_id, host, Time.now() )
 
 
     # =========================================
