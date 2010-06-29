@@ -85,7 +85,7 @@ def main( argv ) :
     if not args :
         parser.error("at least one file name required")
 
-    #logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
     # read datagrams one by one
     xtciter = io.XtcMergeIterator( args )

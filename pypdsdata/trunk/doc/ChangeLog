@@ -1,4 +1,11 @@
 
+2010-06-29 - V00-00-14
+======================
+- fixing problem with stream synchronization, Disable transition
+  can appear timestamp sooner that the last event processed but their
+  order in XTC will be reversed. In the stream merge algorith ignore 
+  all Disable transitions
+
 2010-06-17 - V00-00-13
 ======================
 - XtcMergeIterator can now accept files from multiple runs

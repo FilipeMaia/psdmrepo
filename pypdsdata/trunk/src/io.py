@@ -85,7 +85,10 @@ class XtcStreamMerger(object) :
         self.m_dgs = []
         for stream in self.m_streams :
             try :
-                dg = stream.next()
+                while True :
+                    dg = stream.next()
+                    # skip Disable transitions, they mess up datagram order sometimes
+                    if dg.seq.service() != xtc.TransitionId.Disable: break
             except StopIteration :
                 dg = None
             self.m_dgs.append( dg )
@@ -134,7 +137,11 @@ class XtcStreamMerger(object) :
         if nextdg.seq.service() == xtc.TransitionId.L1Accept :
 
             try :
-                self.m_dgs[stream] = self.m_streams[stream].next()
+                while True:
+                    dg = self.m_streams[stream].next()
+                    self.m_dgs[stream] = dg
+                    # skip Disable transitions, they mess up datagram order sometimes
+                    if dg.seq.service() != xtc.TransitionId.Disable: break
             except StopIteration :
                 self.m_dgs[stream] = None
 
