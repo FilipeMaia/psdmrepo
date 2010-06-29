@@ -12,145 +12,301 @@ if( isset( $_GET['id'] )) {
 } else
     die( "no valid run identifier" );
 
-define( BEAMS_TITLE,   "&nbsp;E l e c t r o n &nbsp;&nbsp; a n d &nbsp;&nbsp; P h o t o n &nbsp;&nbsp; b e a m s");
-define( FEE_TITLE,     "&nbsp;F E E" );
-define( HFP_TITLE,     "&nbsp;H F P" );
-define( ETOF_TITLE,    "&nbsp;e T O F" );
-define( ITOF_TITLE,    "&nbsp;i T O F" );
-define( HFP_GAS_TITLE, "&nbsp;H F P &nbsp;&nbsp; G a s" );
-define( DIA_TITLE,     "&nbsp;D I A " );
-define( MBES_TITLE,    "&nbsp;M B E S" );
-define( EXTRA_TITLE,    "&nbsp;E x p e r i m e n t &nbsp;&nbsp; S p e c i f i c" );
+/* Build a dictionary of sections
+*/
+$sections = array(
 
-define( BEAMS,   0 );
-define( FEE,     BEAMS   + 10 );
-define( HFP,     FEE     +  8 );
-define( ETOF,    HFP     +  2 );
-define( ITOF,    ETOF    + 30 );
-define( HFP_GAS, ITOF    +  6 );
-define( DIA,     HFP_GAS +  7 );
-define( MBES,    DIA     +  1 );
-define( EXTRA,   MBES    +  4 );
-define( END_,    EXTRA   +  0 );
+    /* Groups of parameters which are common for all instruments
+     * and experiments
+     */
+    'HEADER' => array(
 
-$pardefs = array(
-    //
-    // Electron beam and Photon beam data
-    //
-    array( 'name' => 'BEND:DMP1:400:BDES',   'descr' => 'electron beam energy' ),
-    array( 'name' => 'BPMS:DMP1:199:TMIT1H', 'descr' => 'Particle N_electrons' ),
-    array( 'name' => 'SIOC:SYS0:ML00:AO289', 'descr' => 'E.Vernier' ),
-    array( 'name' => 'BEAM:LCLS:ELEC:Q',     'descr' => 'Charge' ),
-    array( 'name' => 'SIOC:SYS0:ML00:AO195', 'descr' => 'Peak current after second bunch compressor' ),
-    array( 'name' => 'SIOC:SYS0:ML00:AO820', 'descr' => 'Pulse length' ),
-    array( 'name' => 'SIOC:SYS0:ML00:AO569', 'descr' => 'ebeam energy loss converted to photon mJ' ),
-    array( 'name' => 'SIOC:SYS0:ML00:AO580', 'descr' => 'Calculated number of photons' ),
-    array( 'name' => 'SIOC:SYS0:ML00:AO541', 'descr' => 'Photon beam energy' ),
-    array( 'name' => 'SIOC:SYS0:ML00:AO192', 'descr' => 'Wavelength' ),
-    //
-    // FEE data
-    //
-    array( 'name' => 'VGPR:FEE1:311:PSETPOINT_DES', 'descr' => 'Gas attenuator setpoint' ),
-    array( 'name' => 'VGCP:FEE1:311:P',             'descr' => 'Gas attenuator actual pressure' ),
-    array( 'name' => 'GATT:FEE1:310:R_ACT',         'descr' => 'Gas attenuator calculated transmission' ),
-    array( 'name' => 'SATT:FEE1:321:STATE',         'descr' => 'Solid attenuator 1' ),
-    array( 'name' => 'SATT:FEE1:322:STATE',         'descr' => 'Solid attenuator 2' ),
-    array( 'name' => 'SATT:FEE1:323:STATE',         'descr' => 'Solid attenuator 3' ),
-    array( 'name' => 'SATT:FEE1:324:STATE',         'descr' => 'Solid attenuator 4' ),
-    array( 'name' => 'SATT:FEE1:320:TACT',          'descr' => 'Total attenuator length' ),
-    //
-    // HFP data
-    //
-    array( 'name' => 'AMO:HFP:GCC:01:PMON', 'descr' => 'pressure' ),
-    array( 'name' => 'AMO:HFP:MMS:table.Z', 'descr' => 'z-position' ),
-    //
-    // etof settings
-    //
-    //   etof 1
-    //
-    array( 'name' => 'AMO:R14:IOC:10:ao0:out1',                'descr' => '1' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS0:CH0:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS0:CH1:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS0:CH2:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS0:CH3:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS7:CH0:VoltageMeasure', 'descr' => '' ),
-    //
-    //   etof 2
-    //
-    array( 'name' => 'AMO:R14:IOC:10:ao0:out2',                'descr' => '2' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS1:CH0:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS1:CH1:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS1:CH2:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS1:CH3:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS7:CH1:VoltageMeasure', 'descr' => '' ),
-    //
-    //   etof 3
-    //
-    array( 'name' => 'AMO:R14:IOC:10:ao0:out3',                'descr' => '3' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS2:CH0:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS2:CH1:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS2:CH2:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS2:CH3:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS7:CH2:VoltageMeasure', 'descr' => '' ),
-    //
-    //   etof 4
-    //
-    array( 'name' => 'AMO:R14:IOC:10:ao0:out4',                'descr' => '4' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS3:CH0:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS3:CH1:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS3:CH2:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS3:CH3:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS7:CH3:VoltageMeasure', 'descr' => '' ),
-    //
-    //   etof 5
-    //
-    array( 'name' => 'AMO:R14:IOC:10:ao0:out5',                'descr' => '5' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS4:CH0:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS4:CH1:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS4:CH2:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS4:CH3:VoltageMeasure', 'descr' => '' ),
-    array( 'name' => 'AMO:R14:IOC:10:VHS8:CH0:VoltageMeasure', 'descr' => '' ),
-    //
-    // itof settings
-    //
-    array( 'name' => 'AMO:R14:IOC:21:VHS2:CH0:VoltageMeasure', 'descr' => 'repeller' ),
-    array( 'name' => 'AMO:R14:IOC:21:VHS0:CH0:VoltageMeasure', 'descr' => 'extractor' ),
-    array( 'name' => 'AMO:R14:IOC:21:VHS0:CH1:VoltageMeasure', 'descr' => 'acceleration' ),
-    array( 'name' => 'AMO:R14:IOC:21:VHS0:CH2:VoltageMeasure', 'descr' => 'MCP in' ),
-    array( 'name' => 'AMO:R14:IOC:21:VHS2:CH2:VoltageMeasure', 'descr' => 'MCP out' ),
-    array( 'name' => 'AMO:R14:IOC:21:VHS2:CH1:VoltageMeasure', 'descr' => 'Anode' ),
-    //
-    // HFP Gas data
-    //
-    array( 'name' => 'AMO:HFP:GCC:03:PMON',                    'descr' => 'pressure' ),
-    array( 'name' => 'AMO:R14:IOC:21:VHS7:CH0:VoltageMeasure', 'descr' => 'piezo voltage' ),
-    array( 'name' => 'AMO:R14:EVR:21:CTRL.DG2D',               'descr' => 'piezo timing delay' ),
-    array( 'name' => 'AMO:R14:EVR:21:CTRL.DG2W',               'descr' => 'piezo timing width' ),
-    array( 'name' => 'AMO:HFP:MMS:72.RBV',                     'descr' => 'gasjet x-position (rel. distance)' ),
-    array( 'name' => 'AMO:HFP:MMS:71.RBV',                     'descr' => 'gasjet y-position (rel. distance)' ),
-    array( 'name' => 'AMO:HFP:MMS:73.RBV',                     'descr' => 'Gas Jet motor Z axis (mm)' ),
-    //
-    // DIA data
-    //
-    array( 'name' => 'AMO:DIA:GCC:01:PMON', 'descr' => 'pressure' ),
-    //
-    // mbes settings
-    //
-    //   coils
-    //
-    array( 'name' => 'AMO:DIA:SHC:11:I', 'descr' => 'coil 1' ),
-    array( 'name' => 'AMO:DIA:SHC:12:I', 'descr' => 'coil 2' ),
-    //
-    array( 'name' => 'AMO:R15:IOC:40:VHS0:CH0:VoltageSet', 'descr' => '' ),
-    array( 'name' => 'AMO:R15:IOC:40:VHS0:CH1:VoltageSet', 'descr' => '' )
- );
+        array(
 
-$par2descr = array();
-foreach( $pardefs as $p ) $par2descr[$p['name']] = $p['descr'];
+            'SECTION' => 'BEAMS',
+            'TITLE'   => '&nbsp;E l e c t r o n &nbsp;&nbsp; a n d &nbsp;&nbsp; P h o t o n &nbsp;&nbsp; b e a m s',
+            'PARAMS'  => array(
 
-// Add extra parameters
-//
-$par2descr['AMO:DIA:GMP:06:PMON'] = 'Pressure (Torr)';
+                array( 'name' => 'BEND:DMP1:400:BDES',       'descr' => 'electron beam energy' ),
+                array( 'name' => 'EVNT:SYS0:1:LCLSBEAMRATE', 'descr' => 'beam rep rate' ),
+                array( 'name' => 'BPMS:DMP1:199:TMIT1H',     'descr' => 'Particle N_electrons' ),
+                array( 'name' => 'SIOC:SYS0:ML00:AO289',     'descr' => 'E.Vernier' ),
+                array( 'name' => 'BEAM:LCLS:ELEC:Q',         'descr' => 'Charge' ),
+                array( 'name' => 'SIOC:SYS0:ML00:AO195',     'descr' => 'Peak current after second bunch compressor' ),
+                array( 'name' => 'SIOC:SYS0:ML00:AO820',     'descr' => 'Pulse length' ),
+                array( 'name' => 'SIOC:SYS0:ML00:AO569',     'descr' => 'ebeam energy loss converted to photon mJ' ),
+                array( 'name' => 'SIOC:SYS0:ML00:AO580',     'descr' => 'Calculated number of photons' ),
+                array( 'name' => 'SIOC:SYS0:ML00:AO541',     'descr' => 'Photon beam energy' ),
+                array( 'name' => 'SIOC:SYS0:ML00:AO627',     'descr' => 'Photon beam energy' ),
+                array( 'name' => 'SIOC:SYS0:ML00:AO192',     'descr' => 'Wavelength' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'FEE',
+            'TITLE'   => '&nbsp;F E E',
+            'PARAMS'  => array(
+
+                array( 'name' => 'VGPR:FEE1:311:PSETPOINT_DES', 'descr' => 'Gas attenuator setpoint' ),
+                array( 'name' => 'VGCP:FEE1:311:P',             'descr' => 'Gas attenuator actual pressure' ),
+                array( 'name' => 'GATT:FEE1:310:R_ACT',         'descr' => 'Gas attenuator calculated transmission' ),
+                array( 'name' => 'SATT:FEE1:321:STATE',         'descr' => 'Solid attenuator 1' ),
+                array( 'name' => 'SATT:FEE1:322:STATE',         'descr' => 'Solid attenuator 2' ),
+                array( 'name' => 'SATT:FEE1:323:STATE',         'descr' => 'Solid attenuator 3' ),
+                array( 'name' => 'SATT:FEE1:324:STATE',         'descr' => 'Solid attenuator 4' ),
+                array( 'name' => 'SATT:FEE1:320:TACT',          'descr' => 'Total attenuator length' ),
+                array( 'name' => 'LVDT:FEE1:1811:LVPOS',        'descr' => 'FEE mirror LVDT position' ),
+                array( 'name' => 'LVDT:FEE1:1812:LVPOS',        'descr' => 'FEE mirror LVDT position' ),
+                array( 'name' => 'STEP:FEE1:1811:MOTR.RBV',     'descr' => 'FEE mirror RBV position' ),
+                array( 'name' => 'STEP:FEE1:1812:MOTR.RBV',     'descr' => 'FEE mirror RBV position' )
+            )
+        )
+    ),
+
+    'FOOTER' => array(
+
+        'TITLE'     => '&nbsp;A d d i t i o n a l &nbsp;&nbsp; P a r a m e t e r s',
+        'PAR2DESCR' => array(
+            'AMO:DIA:GMP:06:PMON' => 'Pressure (Torr)'
+        )
+    ),
+
+    /* Instrument-specific groups of parameters.
+     */
+    'AMO' => array(
+
+        array(
+
+            'SECTION' => 'HFP',
+            'TITLE'   => '&nbsp;H F P',
+            'PARAMS'  => array(
+
+                array( 'name' => 'AMO:HFP:GCC:01:PMON', 'descr' => 'pressure' ),
+                array( 'name' => 'AMO:HFP:MMS:table.Z', 'descr' => 'z-position' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'ETOF',
+            'TITLE'   => '&nbsp;e T O F',
+            'PARAMS'  => array(
+
+                array( 'name' => 'AMO:R14:IOC:10:ao0:out1',                'descr' => '1' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS0:CH0:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS0:CH1:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS0:CH2:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS0:CH3:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS7:CH0:VoltageMeasure', 'descr' => '' ),
+
+                array( 'name' => 'AMO:R14:IOC:10:ao0:out2',                'descr' => '2' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS1:CH0:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS1:CH1:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS1:CH2:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS1:CH3:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS7:CH1:VoltageMeasure', 'descr' => '' ),
+
+                array( 'name' => 'AMO:R14:IOC:10:ao0:out3',                'descr' => '3' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS2:CH0:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS2:CH1:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS2:CH2:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS2:CH3:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS7:CH2:VoltageMeasure', 'descr' => '' ),
+
+                array( 'name' => 'AMO:R14:IOC:10:ao0:out4',                'descr' => '4' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS3:CH0:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS3:CH1:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS3:CH2:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS3:CH3:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS7:CH3:VoltageMeasure', 'descr' => '' ),
+
+                array( 'name' => 'AMO:R14:IOC:10:ao0:out5',                'descr' => '5' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS4:CH0:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS4:CH1:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS4:CH2:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS4:CH3:VoltageMeasure', 'descr' => '' ),
+                array( 'name' => 'AMO:R14:IOC:10:VHS8:CH0:VoltageMeasure', 'descr' => '' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'ITOF',
+            'TITLE'   => '&nbsp;i T O F',
+            'PARAMS'  => array(
+
+                array( 'name' => 'AMO:R14:IOC:21:VHS2:CH0:VoltageMeasure', 'descr' => 'repeller' ),
+                array( 'name' => 'AMO:R14:IOC:21:VHS0:CH0:VoltageMeasure', 'descr' => 'extractor' ),
+                array( 'name' => 'AMO:R14:IOC:21:VHS0:CH1:VoltageMeasure', 'descr' => 'acceleration' ),
+                array( 'name' => 'AMO:R14:IOC:21:VHS0:CH2:VoltageMeasure', 'descr' => 'MCP in' ),
+                array( 'name' => 'AMO:R14:IOC:21:VHS2:CH2:VoltageMeasure', 'descr' => 'MCP out' ),
+                array( 'name' => 'AMO:R14:IOC:21:VHS2:CH1:VoltageMeasure', 'descr' => 'Anode' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'HFP_GAS',
+            'TITLE'   => '&nbsp;H F P &nbsp;&nbsp; G a s',
+            'PARAMS'  => array(
+
+                array( 'name' => 'AMO:HFP:GCC:03:PMON',                    'descr' => 'pressure' ),
+                array( 'name' => 'AMO:R14:IOC:21:VHS7:CH0:VoltageMeasure', 'descr' => 'piezo voltage' ),
+                array( 'name' => 'AMO:R14:EVR:21:CTRL.DG2D',               'descr' => 'piezo timing delay' ),
+                array( 'name' => 'AMO:R14:EVR:21:CTRL.DG2W',               'descr' => 'piezo timing width' ),
+                array( 'name' => 'AMO:HFP:MMS:72.RBV',                     'descr' => 'gasjet x-position (rel. distance)' ),
+                array( 'name' => 'AMO:HFP:MMS:71.RBV',                     'descr' => 'gasjet y-position (rel. distance)' ),
+                array( 'name' => 'AMO:HFP:MMS:73.RBV',                     'descr' => 'Gas Jet motor Z axis (mm)' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'DIA',
+            'TITLE'   => '&nbsp;D I A ',
+            'PARAMS'  => array(
+
+                array( 'name' => 'AMO:DIA:GCC:01:PMON', 'descr' => 'pressure' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'MBES',
+            'TITLE'   => '&nbsp;M B E S',
+            'PARAMS'  => array(
+
+                array( 'name' => 'AMO:DIA:SHC:11:I', 'descr' => 'coil 1' ),
+                array( 'name' => 'AMO:DIA:SHC:12:I', 'descr' => 'coil 2' ),
+
+                array( 'name' => 'AMO:R15:IOC:40:VHS0:CH0:VoltageSet', 'descr' => '' ),
+                array( 'name' => 'AMO:R15:IOC:40:VHS0:CH1:VoltageSet', 'descr' => '' )
+            )
+        )
+    ),
+        
+    'SXR' => array(
+    
+        array(
+
+            'SECTION' => 'COL',
+            'TITLE'   => '&nbsp;C o l l i m a t o r',
+            'PARAMS'  => array(
+
+                array( 'name' => 'SXR:COL:GCC:01:PMON', 'descr' => '' ),
+                array( 'name' => 'SXR:COL:PIP:01:PMON', 'descr' => '' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'EXS',
+            'TITLE'   => '&nbsp;E x i t &nbsp;&nbsp; S l i t',
+            'PARAMS'  => array(
+
+                array( 'name' => 'SXR:EXS:GCC:01:PMON', 'descr' => '' ),
+                array( 'name' => 'SXR:EXS:MMS:01.VAL',  'descr' => '' ),
+                array( 'name' => 'SXR:EXS:PIP:01:PMON', 'descr' => '' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'FLX',
+            'TITLE'   => '&nbsp;F l u x &nbsp;&nbsp; c h a m b e r',
+            'PARAMS'  => array(
+
+                array( 'name' => 'SXR:FLX:GCC:01:PMON', 'descr' => '' ),
+                array( 'name' => 'SXR:FLX:STC:01', 'descr' => '' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'KBO',
+            'TITLE'   => '&nbsp;K B O &nbsp;&nbsp; O p t i c s',
+            'PARAMS'  => array(
+
+                array( 'name' => 'SXR:KBO:GCC:01:PMON', 'descr' => '' ),
+                array( 'name' => 'SXR:KBO:GCC:02:PMON', 'descr' => '' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'LIN',
+            'TITLE'   => '&nbsp;L a s e r &nbsp;&nbsp; I n c o u p l i n g',
+            'PARAMS'  => array(
+
+                array( 'name' => 'SXR:LIN:GCC:01:PMON', 'descr' => '' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'MON',
+            'TITLE'   => '&nbsp;G r a t i n g',
+            'PARAMS'  => array(
+
+                array( 'name' => 'SXR:MON:GCC:01:PMON', 'descr' => '' ),
+                array( 'name' => 'SXR:MON:MMS:01.VAL',  'descr' => '' ),
+                array( 'name' => 'SXR:MON:MMS:02.VAL',  'descr' => '' ),
+                array( 'name' => 'SXR:MON:MMS:03.VAL',  'descr' => '' ),
+                array( 'name' => 'SXR:MON:MMS:04.VAL',  'descr' => '' ),
+                array( 'name' => 'SXR:MON:MMS:05.VAL',  'descr' => '' ),
+                array( 'name' => 'SXR:MON:MMS:06.VAL',  'descr' => '' ),
+                array( 'name' => 'SXR:MON:MMS:07.VAL',  'descr' => '' ),
+                array( 'name' => 'SXR:MON:MMS:08.VAL',  'descr' => '' ),
+                array( 'name' => 'SXR:MON:PIP:01:PMON', 'descr' => '' ),
+                array( 'name' => 'SXR:MON:STC:01',      'descr' => '' ),
+                array( 'name' => 'SXR:MON:STC:02',      'descr' => '' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'PST',
+            'TITLE'   => '&nbsp;P h o t o n &nbsp;&nbsp; S t o p p e r',
+            'PARAMS'  => array(
+
+                array( 'name' => 'SXR:PST:PIP:01:PMON', 'descr' => '' ),
+                array( 'name' => 'PPS:NEH1:2:S2STPRSUM', 'descr' => '' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'SPS',
+            'TITLE'   => '&nbsp;S i n g l e &nbsp;&nbsp; P u l s e &nbsp;&nbsp; S h u t t e r',
+            'PARAMS'  => array(
+
+                array( 'name' => 'SXR:SPS:GCC:01:PMON', 'descr' => '' ),
+                array( 'name' => 'SXR:SPS:MPA:01:OUT',  'descr' => '' ),
+                array( 'name' => 'SXR:SPS:PIP:01:PMON', 'descr' => '' ),
+                array( 'name' => 'SXR:SPS:STC:01',      'descr' => '' )
+            )
+        ),
+
+        array(
+
+            'SECTION' => 'TSS',
+            'TITLE'   => '&nbsp;T r a n s m i s s i o n &nbsp;&nbsp; S a m p l e &nbsp;&nbsp; S t a g e',
+            'PARAMS'  => array(
+
+                array( 'name' => 'SXR:TSS:GCC:01:PMON', 'descr' => '' ),
+                array( 'name' => 'SXR:TSS:GCC:02:PMON', 'descr' => '' ),
+                array( 'name' => 'SXR:TSS:MMS:01.VAL',  'descr' => '' ),
+                array( 'name' => 'SXR:TSS:MMS:02.VAL',  'descr' => '' ),
+                array( 'name' => 'SXR:TSS:MMS:03.VAL',  'descr' => '' ),
+                array( 'name' => 'SXR:TSS:PIP:01:PMON', 'descr' => '' )
+            )
+        )
+    ),
+
+    'XPP' => array(
+    )
+);
 
 /* Proceed with the operation
  */
@@ -185,118 +341,56 @@ try {
 
     $value_color = 'maroon';
     $label_color = '#b0b0b0';
-    $num_rows = count( $values ) * 20 + 9 * ( 30 + 15 );
-    $con = new RegDBHtml( 0, 0, 780, $num_rows );
+
+    $num_cols = 780;
+
+    $con = new RegDBHtml( 0, 0, $num_cols );
+
     $row = 0;
 
-    $con->label_1(0, $row, BEAMS_TITLE, 780 );
-    $row += 30;
-    for( $i = BEAMS; $i < FEE; $i++ ) {
-    	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
-        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
-            ->value(300, $row, $val, $value_color )
-            ->label(500, $row, $key, true, $label_color );
-        $row += 20;
-    }
-    $row += 15;
+    /* Normal processing for common and instrument-specific parameters
+     */
+    $used_names = array();  // Remember names of parameters displayed
+                            // in common and instrument-specific sections.
+                            // We're going to use this information later to put
+                            // remaining parameters into the footer.
 
-    $con->label_1(0, $row, FEE_TITLE, 780 );
-    $row += 30;
-    for( $i = FEE; $i < HFP; $i++ ) {
-    	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
-        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
-            ->value(300, $row, $val, $value_color )
-            ->label(500, $row, $key, true, $label_color );
-    	$row += 20;
-    }
-    $row += 15;
+    foreach( array( 'HEADER', $instrument->name()) as $area ) {
 
-    $con->label_1(0, $row, HFP_TITLE, 780 );
-    $row += 30;
-    for( $i = HFP; $i < ETOF; $i++ ) {
-    	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
-        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
-            ->value(300, $row, $val, $value_color )
-            ->label(500, $row, $key, true, $label_color );
-    	$row += 20;
-    }
-    $row += 15;
+    	foreach( $sections[$area] as $s ) {
 
-    $con->label_1(0, $row, ETOF_TITLE, 780 );
-    $row += 30;
-    for( $i = ETOF; $i < ITOF; $i++ ) {
-    	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
-        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
-            ->value(300, $row, $val, $value_color )
-            ->label(500, $row, $key, true, $label_color );
-    	$row += 20;
-    }
-    $row += 15;
+            $con->label_1(0, $row, $s['TITLE'], $num_cols );
+            $row += 30;
 
-    $con->label_1(0, $row, ITOF_TITLE, 780 );
-    $row += 30;
-    for( $i = ITOF; $i < HFP_GAS; $i++ ) {
-    	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
-        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
-            ->value(300, $row, $val, $value_color )
-            ->label(500, $row, $key, true, $label_color );
-    	$row += 20;
+          	foreach( $s['PARAMS'] as $p ) {
+                $name  = $p['name'];
+                $value = array_key_exists( $name, $values ) ? $values[$name]->value() : '&lt; no data &gt;';
+                $decsr = $p['descr'];
+                $con->value( 10, $row, '<i>'.$decsr.'</i>' )
+                    ->value(300, $row, $value, $value_color )
+                    ->label(500, $row, $name, true, $label_color );
+                $row += 20;
+                
+                $used_names[$name] = True;
+            }
+            $row += 15;
+  	    }
     }
-    $row += 15;
-    
-    $con->label_1(0, $row, HFP_GAS_TITLE, 780 );
-    $row += 30;
-    for( $i = HFP_GAS; $i < DIA; $i++ ) {
-    	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
-        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
-            ->value(300, $row, $val, $value_color )
-            ->label(500, $row, $key, true, $label_color );
-    	$row += 20;
-    }
-    $row += 15;
 
-    $con->label_1(0, $row, DIA_TITLE, 780 );
+    /* Special processing for experiment-specific parameters  not found
+     * in the dictionary.
+     */
+    $con->label_1(0, $row, $sections['FOOTER']['TITLE'], $num_cols );
     $row += 30;
-    for( $i = DIA; $i < MBES; $i++ ) {
-    	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
-        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
-            ->value(300, $row, $val, $value_color )
-            ->label(500, $row, $key, true, $label_color );
-    	$row += 20;
-    }
-    $row += 15;
 
-    $con->label_1(0, $row, MBES_TITLE, 780 );
-    $row += 30;
-    for( $i = MBES; $i < EXTRA; $i++ ) {
-    	$key = $pardefs[$i]['name'];
-    	$val = array_key_exists( $key, $values ) ? $values[$key]->value() : '&lt; no data &gt;';
-        $con->value( 10, $row, '<i>'.$pardefs[$i]['descr'].'</i>' )
-            ->value(300, $row, $val, $value_color )
-            ->label(500, $row, $key, true, $label_color );
-    	$row += 20;
-    }
-    $row += 15;
-
-    $con->label_1(0, $row, EXTRA_TITLE, 780 );
-    $row += 30;
-    $pardefs_keys = array();
-    foreach( $pardefs as $p ) $pardefs_keys[$p['name']] = $p;
     foreach( $values as $p ) {
-        $key = $p->name();
-        $val = $p->value();
-        $descr = array_key_exists( $key, $par2descr ) ? $par2descr[$key] : $key;
-        if( array_key_exists( $key, $pardefs_keys )) continue;
+        $name  = $p->name();
+        $value = $p->value();
+        $descr = array_key_exists( $name, $sections['FOOTER']['PAR2DESCR'] ) ? $sections['FOOTER']['PAR2DESCR'][$name] : $name;
+        if( array_key_exists( $name, $used_names )) continue;
         $con->value( 10, $row, '<i>'.$descr.'</i>' )
-            ->value(300, $row, $val, $value_color )
-            ->label(500, $row, $key, true, $label_color );
+            ->value(300, $row, $value, $value_color )
+            ->label(500, $row, $name, true, $label_color );
     	$row += 20;
     }
     $row += 15;

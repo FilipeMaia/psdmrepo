@@ -245,7 +245,7 @@ HERE;
          */
         return count( $this->runs( $condition )); }
 
-    public function runs_in_interval ( $begin=null, $end=null ) {
+    public function runs_in_interval ( $begin=null, $end=null, $limit=null ) {
 
         $condition = '';
         if( !is_null( $begin )) {
@@ -257,17 +257,18 @@ HERE;
             else
                 $condition .= ' AND begin_time < '.$end->to64();
         }
-        return $this->runs( $condition );
+        $limit_str = is_null( $limit ) ? '' : ' LIMIT '.$limit;
+        return $this->runs( $condition, $limit_str );
     }
 
-    public function runs ( $condition='' ) {
+    public function runs ( $condition='', $limit='' ) {
 
         $list = array();
 
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
             "SELECT * FROM {$this->connection->database}.run WHERE exper_id=".$this->attr['id'].$extra_condition.
-            ' ORDER BY begin_time DESC' );
+            ' ORDER BY begin_time DESC'.$limit );
 
         $nrows = mysql_numrows( $result );
         for( $i=0; $i<$nrows; $i++ ) {
@@ -542,7 +543,7 @@ HERE;
         $tag='',
         $author='',
         $since=null,
-        $limit=null) {
+        $limit=null ) {
 
         /* Verify parameters
          */

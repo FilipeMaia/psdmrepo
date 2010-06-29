@@ -214,7 +214,8 @@ function child2json( $entry ) {
             "content" => $entry->content(),
             "attachments" => $attachment_ids,
             "tags" => $tag_ids,
-            "children" => $children_ids
+            "children" => $children_ids,
+            "is_run" => 0
         )
     );
 }
@@ -278,7 +279,48 @@ function entry2json( $entry ) {
             "content" => $entry->content(),
             "attachments" => $attachment_ids,
             "tags" => $tag_ids,
-            "children" => $children_ids
+            "children" => $children_ids,
+            "is_run" => 0
+        )
+    );
+}
+
+function run2json( $run, $type ) {
+
+	/* TODO: WARNING! Pay attention to the artificial message identifier
+	 * for runs. an assumption is that normal message entries will
+	 * outnumber 512 million records.
+	 */
+	$timestamp = $type == 'begin_run' ? $run->begin_time()    : $run->end_time();
+    $msg       = '<b>'.( $type == 'begin_run' ? 'begin run ' : 'end run ' ).$run->num().'</b>';
+    $id        = $type == 'begin_run' ? 512*1024*1024 + $run->id() : 2*512*1024*1024 + $run->id();
+
+	$event_time_url =  "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$timestamp->toStringShort()}</a>";
+    $relevance_time_str = $timestamp->toStringShort();
+
+    $shift_begin_time_str = '';
+    $run_number_str = '';
+
+    $tag_ids = array();
+    $attachment_ids = array();
+    $children_ids = array();
+
+    $content = wordwrap( $msg, 128 );
+    return json_encode(
+        array (
+            "event_time" => $event_time_url, //$entry->insert_time()->toStringShort(),
+            "relevance_time" => $relevance_time_str,
+            "run" => $run_number_str,
+            "shift" => $shift_begin_time_str,
+            "author" => 'DAQ/RC',
+            "id" => $id,
+            "subject" => substr( $msg, 0, 72).(strlen( $msg ) > 72 ? '...' : '' ),
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$content}</pre>",
+            "content" => $msg,
+            "attachments" => $attachment_ids,
+            "tags" => $tag_ids,
+            "children" => $children_ids,
+            "is_run" => 1
         )
     );
 }
@@ -339,6 +381,76 @@ try {
         $since,
         $limit );
 
+    /* Also check for runs.
+     */
+    $runs = array();
+
+    /* Verify parameters
+     */
+    if( !is_null( $shift_id ) && !is_null( $run_id ))
+        report_error( "conflicting parameters: shift_id=".$shift_id." and run_id=".$run_id );
+
+    /* For explicitly specified shifts and runs force the search limits not
+     * to exceed their intervals (if the one is specified).
+     */
+    $begin4runs = $begin;
+    $end4runs   = $end;
+    if( !is_null( $shift_id )) {
+        $shift = $experiment->find_shift_by_id( $shift_id );
+        if( is_null( $shift ))
+            report_error( "no shift with shift_id=".$shift_id." found" );
+
+        $begin4runs = $shift->begin_time();
+        $end4runs   = $shift->end_time();
+    }
+    if( !is_null( $run_id )) {
+        $run = $experiment->find_run_by_id( $run_id );
+        if( is_null( $run ))
+            report_error( "no run with run_id=".$run_id." found" );
+
+        $begin4runs = $run->begin_time();
+        $end4runs   = $run->end_time();
+    }
+    
+    /* Readjust 'begin' parameter for runs if 'since' is present.
+     * Completelly ignore 'since' if it doesn't fall into an interval of
+     * the requst.
+     */    
+    if( !is_null( $since )) {
+        $since4runs = $since;
+    	if( !is_null( $begin4runs ) && $since->less( $begin4runs )) {
+            $since4runs = null;
+        }
+        if( !is_null( $end4runs ) && $since->greaterOrEqual( $end4runs )) {
+            $since4runs = null;
+        }
+        if( !is_null( $since4runs )) $begin4runs = $since4runs;
+    }
+    $runs = $experiment->runs_in_interval( $begin4runs, $end4runs, $limit );
+    
+    /* Mix entries and run records in the right order
+     */
+    $entries_by_timestamps = array();
+    foreach( $entries as $e )
+        $entries_by_timestamps[$e->insert_time()->to64()] = array( 'type' => 'entry', 'object' => $e );
+    foreach( $runs as $r ) {
+        $entries_by_timestamps[$r->begin_time()->to64()] = array( 'type' => 'begin_run', 'object' => $r );
+        if( !is_null($r->end_time())) {
+        	
+            /* This check would prevent start of run entry to be replaced by
+             * the end of the previous run wich was automatically closed
+             * when starting the next run.
+             */
+        	if( !array_key_exists( $r->end_time()->to64(), $entries_by_timestamps ))
+                $entries_by_timestamps[$r->end_time()->to64()] = array( 'type' => 'end_run', 'object' => $r );
+        }
+    }
+
+    $timestamps = array_keys( $entries_by_timestamps );
+    sort( $timestamps );
+
+    $limit_num = is_null( $limit ) ? 0 : (int)$limit;
+
     $status_encoded = json_encode( "success" );
     $result =<<< HERE
 {
@@ -347,13 +459,24 @@ try {
     "Result": [
 HERE;
     $first = true;
-    foreach( $entries as $e ) {
-        if( $first ) {
-            $first = false;
-            $result .= "\n".entry2json( $e );
-        } else {
-            $result .= ",\n".entry2json( $e );
-        }
+    foreach( $timestamps as $t ) {
+    	$type  = $entries_by_timestamps[$t]['type'];
+    	$entry = $entries_by_timestamps[$t]['object'];
+    	if( $type == 'entry' ) {
+    		if( $first ) {
+                $first = false;
+                $result .= "\n".entry2json( $entry );
+            } else {
+                $result .= ",\n".entry2json( $entry );
+            }
+    	} else {
+    		if( $first ) {
+                $first = false;
+                $result .= "\n".run2json( $entry, $type );
+            } else {
+                $result .= ",\n".run2json( $entry, $type );
+            }
+    	}
     }
     $result .=<<< HERE
  ] } }

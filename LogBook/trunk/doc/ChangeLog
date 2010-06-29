@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-14
+2010-06-29 Igor Gaponenko
+- inject run records into list of messages reported by the Web application
+- updated implementation of the Grabber
+- updated Eclipse project files
+
 Tag: V00-01-11
 2010-01-04 Igor Gaponenko
 - fixed bugs in the PHP API implementation

@@ -131,6 +131,7 @@ Page-specific styles
     #navarea {
         overflow: auto;
         padding: 20px;
+        padding-top: 10px;
         border-right: solid 4px #f0f0f0;
         display: none;
     }
@@ -138,6 +139,7 @@ Page-specific styles
     #workarea {
         overflow: auto;
         padding: 20px;
+        padding-top: 10px;
         /*background-color:#E3F6CE;*/ /*background-color:#f0f0f0;*/
     }
     
@@ -171,11 +173,21 @@ Page-specific styles
     #actions_container,
     #params_actions_container,
     #runs_actions_container,
-    #shifts_actions_container
-        {
+    #shifts_actions_container {
         margin-top: 18px;
         margin-left: 0px;
         text-align: left;
+    }
+
+    .section_header {
+        padding:2px;
+        /*font-family: Arial;*/
+        font-size:18px;
+        font-weight:bold;
+        background-color:#e0e0e0;
+        /*background-color:#dcefff;*/
+        border-top:solid 3px #000000;
+        /*border-top:solid 1px #c0c0c0;*/
     }
 </style>
 
@@ -583,7 +595,8 @@ menubar_data.push ( {
     itemdata: [
         { text: "Authorization Database Manager", url: "../authdb/" },
         { text: "Experiment Registry Database", url: "../regdb/" },
-        { text: "Electronic Log Book", url: "../logbook/" } ],
+        { text: "Electronic Log Book", url: "../logbook/" },
+        { text: "File Explorer", url: "../explorer/" } ],
     disabled: false }
 );
 var menubar_group_home = menubar_data.length;
@@ -981,11 +994,11 @@ function display_experiment() {
     reset_workarea();
 
     document.getElementById('workarea').innerHTML=
-        '<div style="margin-bottom:20px;">'+
-        '  <img src="images/'+( is_facility( exper_id ) ? 'Fac' : 'Exp' )+'Summary.png" />'+
+        '<div style="margin-bottom:10px; width:auto;" class="section_header" >'+
+        '&nbsp;&nbsp;&nbsp;'+( is_facility( exper_id ) ? 'F a c i l i t y' : 'E x p e r i m e n t' )+' &nbsp;&nbsp; S u m m a r y'+
         '</div>'+
         '<div id="experiment_info_container" style="height:250px;">Loading...</div>'+
-        '<div style="margin-top:40px; padding-right:15px;">'+
+        '<div style="margin-top:20px; padding-right:0px;">'+
         '  <div id="messages_actions_container"></div>'+
         '</div>';
 
@@ -1050,7 +1063,7 @@ function create_messages_dialog( scope ) {
     document.getElementById('messages_actions_container').innerHTML=
         '<div id="messagesarea"></div>';
 
-    var limit_per_view = null;
+    var limit_per_view = 25; // = null;
     var scope_str = '';
     if(      scope == "experiment" ) { scope_str = ''; limit_per_view = '25'; }
     else if( scope == "shift"      ) { scope_str = 'shift_id='+current_selection.shift.id; }
@@ -1804,21 +1817,21 @@ function display_shift() {
         '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
         'Shift >' );
     var html =
-        '<div style="margin-bottom:20px;">'+
-        '  <img src="images/ShiftSummary.png" />'+
+        '<div style="margin-bottom:10px; width:auto;" class="section_header" >'+
+        '&nbsp;&nbsp;&nbsp;S h i f t &nbsp;&nbsp; S u m m a r y'+
         '</div>'+
-        '<div id="experiment_info_container" style="height:200px;">Loading...</div>';
+        '<div id="experiment_info_container" style="height:240px;">Loading...</div>';
     if( !is_facility( current_selection.experiment.id )) {
         html +=
-        '<div style="margin-top:40px; margin-bottom:20px;">'+
-        '  <img src="images/Runs.png" />'+
-        '</div>'+
+            '<div style="margin-bottom:10px; width:auto;" class="section_header" >'+
+            '&nbsp;&nbsp;&nbsp;R u n s'+
+            '</div>'+
         '<div id="runs_table" style="margin-left:10px; padding:10px;"></div>';
     }
     html +=
         '<br>'+
         '<br>'+
-        '<div id="messages_actions_container" style="margin-top:20px;" ></div>';
+        '<div id="messages_actions_container" style="margin-top:0px;" ></div>';
 
     document.getElementById('workarea').innerHTML = html;
 
@@ -1827,7 +1840,7 @@ function display_shift() {
     if( !is_facility( current_selection.experiment.id )) {
         var runs = create_runs_table (
             'RequestRuns.php?shift_id='+current_selection.shift.id,
-            false
+            true, 10
         );
     }
     var messages_dialog = create_messages_dialog( 'shift' );
@@ -1946,7 +1959,7 @@ function list_runs() {
           { key: "end_time",         sortable: true, resizeable: false },
           { key: "shift_begin_time", sortable: true, resizeable: false } ],
         'RequestRuns.php?id='+current_selection.experiment.id,
-        false
+        true, 25
     );
     table.refreshTable();
 }
@@ -1981,16 +1994,13 @@ function display_run() {
         'Run >' );
 
     document.getElementById('workarea').innerHTML=
-        '<div style="margin-bottom:20px;">'+
-        '  <img src="images/RunSummary.png" />'+
+        '<div style="margin-bottom:10px; width:auto;" class="section_header" >'+
+        '&nbsp;&nbsp;&nbsp;R u n &nbsp;&nbsp; S t a t u s'+
         '</div>'+
         '<div id="experiment_info_container" style="height:60px;">Loading...</div>'+
-        '<div style="margin-top:40px; margin-bottom:40px;">'+
-        '  <img src="images/Parameters.png" />'+
-        '</div>'+
-        //'<div id="run_parameters" style="height:1500px;">Loading...</div>'+
-        '<div id="run_parameters" style="width:800px; height:440px; overflow:auto; border:solid 2px #e0e0e0; margin-left:20px; padding:10px;">Loading...</div>'+
-        '<div id="messages_actions_container" style="margin-top:50px;"></div>';
+        //'<div id="run_parameters" style="width:820px; height:300px; overflow:auto; background-color:#E3F5FA; border:solid 2px #e0e0e0; margin-top:10px; margin-left:20px; padding:10px;">Loading...</div>'+
+        '<div id="run_parameters" style="width:820px; height:300px; overflow:auto; background-color:#E3F5FA; margin-top:10px; margin-left:20px; padding:10px;">Loading...</div>'+
+        '<div id="messages_actions_container" style="margin-top:30px;"></div>';
 
     load( 'DisplayRun.php?id='+current_selection.run.id, 'experiment_info_container' );
     load( 'DisplayRunParams.php?id='+current_selection.run.id, 'run_parameters' );
@@ -2118,16 +2128,16 @@ function display_history( type, data ) {
     var subheader_style = 'padding:2px; background-color:#e0e0e0;';
 
     var html =
-        '<div style="margin-bottom:20px;">'+
-        '  <img src="images/Shifts.png" />'+
+        '<div style="margin-bottom:10px; width:auto;" class="section_header" >'+
+        '&nbsp;&nbsp;&nbsp;S h i f t s'+
         '</div>'+
-        '<div id="shifts_table" style="margin-left:10px; padding:10px; margin-bottom:40px;"></div>';
+        '<div id="shifts_table" style="margin-left:10px; padding:10px; margin-bottom:20px;"></div>';
     if( !is_facility( current_selection.experiment.id )) {
         html +=
-        '<div style="margin-bottom:20px;">'+
-        '  <img src="images/Runs.png" />'+
+        '<div style="margin-bottom:10px; width:auto;" class="section_header" >'+
+        '&nbsp;&nbsp;&nbsp;R u n s'+
         '</div>'+
-        '<div id="runs_table" style="margin-left:10px; padding:10px; margin-bottom:40px;"></div>';
+        '<div id="runs_table" style="margin-left:10px; padding:10px; margin-bottom:20px;"></div>';
     }
     html +=
         '<div id="messagesarea"></div>';
@@ -2138,7 +2148,7 @@ function display_history( type, data ) {
     //
     create_shifts_table( request_shifts_url, false );
     if( !is_facility( current_selection.experiment.id )) {
-        create_runs_table( request_runs_url, false );
+        create_runs_table( request_runs_url, true, 10 );
     }
     var scope='',
         text2search='',
@@ -2156,7 +2166,7 @@ function display_history( type, data ) {
         author,
         '',
         false, /* auto_refresh */
-        null   /* limit_per_view */ );
+        25 /* null */   /* limit_per_view */ );
 }
 
 var browse_tree = null;
@@ -2181,8 +2191,8 @@ function browse_contents() {
     //navarea.style.minWidth = "220px";
     //navarea.style.padding = "10px";
     navarea.innerHTML=
-        '<div style="margin-bottom:20px;">'+
-        '  <img src="images/History.png" />'+
+        '<div style="margin-bottom:10px; width:auto;" class="section_header" >'+
+        '&nbsp;&nbsp;&nbsp;H i s t o r y'+
         '</div>'+
         '<div id="browse_tree"></div>';
 
@@ -2804,10 +2814,11 @@ function event2html( message_idx ) {
         '      title="Open/close the message body">'+
         '      <b>&gt;</b>'+
         '    </span>'+
+        //'    <span style="width:auto; background-color:#c0ffff;">'+
         '    <span>'+
         '      <b><em style="padding:2px;">'+re.event_time+'</em></b>'+
-        '      by: <b><em style="padding:2px;">'+re.author+'</em></b>'+
-        '      - <em class="lb_msg_subject" style="padding:2px;">'+re.subject+'</em>'+run_shift+
+        '      <b><em style="padding:2px;">'+re.author+'</em></b>'+
+        '      <em class="lb_msg_subject" style="padding:2px;">'+re.subject+'</em>'+run_shift+
         '    </span>'+
         attachment_signs+
         child_sign+
@@ -3070,8 +3081,8 @@ function display_messages_table(
         (limit_per_view == null ? '' : '&limit='+limit_per_view);
 
     var html=
-        '<div>'+
-        '  <img src="images/OCSMessages.png" />'+
+        '<div style="margin-bottom:20px; width:auto;" class="section_header" >'+
+        '&nbsp;&nbsp;&nbsp;O p e r a t o r &nbsp;&nbsp; a n d &nbsp;&nbsp; C o n t r o l &nbsp;&nbsp; S y s t e m &nbsp;&nbsp; M e s s a g e s'+
         '</div>'+
         '<div style="margin-left:10px;">';
     if( html_new_message != '' ) {
@@ -3307,8 +3318,8 @@ function search_contents() {
     var workarea = document.getElementById('workarea');
     workarea.innerHTML=
         '<div id="messagesarea">'+
-        '  <div style="margin-bottom:8px; padding:2px; background-color:#e0e0e0;">'+
-        '    <center><b>How to use the tool</b></center>'+
+        '  <div style="margin-bottom:10px; width:auto;" class="section_header" >'+
+        '&nbsp;&nbsp;&nbsp;I n s t r u c t i o n s'+
         '  </div>'+
         '  <div id="search_instructions" style="margin:10px;"></div>'+
         '</div>';
@@ -3316,8 +3327,8 @@ function search_contents() {
     var navarea = document.getElementById('navarea');
     navarea.style.display = 'block';
     navarea.innerHTML=
-        '<div style="margin-bottom:20px;">'+
-        '  <img src="images/Filter.png" />'+
+        '<div style="margin-bottom:10px; width:auto;" class="section_header" >'+
+        '&nbsp;&nbsp;&nbsp;F i l t e r'+
         '</div>'+
         '<form name="search_form" action="javascript:search_and_display()">'+
         '  <div id="search_form_params"></div>'+
