@@ -224,7 +224,7 @@ O2O_Translate::runApp ()
     files.push_back ( O2OXtcFileName(*it) ) ;
   }
   boost::thread readerThread( DgramReader ( files, dgqueue, m_dgramsize.value(),
-                                            m_mergeMode.value(), true, m_l1offset.value() ) ) ;
+                                            m_mergeMode.value(), false, m_l1offset.value() ) ) ;
 
   uint64_t count = 0 ;
 
@@ -239,7 +239,8 @@ O2O_Translate::runApp ()
           << std::left << std::setw(12) << Pds::TransitionId::name(dg->seq.service())
           << "  time: " << clock.seconds() << '.'
           << std::setfill('0') << std::setw(9) << clock.nanoseconds()
-          << "  payloadSize: " << dg->xtc.sizeofPayload() ;
+          << "  payloadSize: " << dg->xtc.sizeofPayload()
+          << "  damage: " << std::hex << std::showbase << dg->xtc.damage.value() ;
     }
 
     // validate the XTC structure

@@ -110,7 +110,15 @@ O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files,
     // create new stream
     O2OXtcDechunk* stream = new O2OXtcDechunk( streamFiles, maxDgSize, skipDamaged ) ;
     m_streams.push_back( stream ) ;
-    m_dgrams.push_back( stream->next() ) ;
+
+    while ( true ) {
+      Pds::Dgram* dg = stream->next();
+      // skip Disable transitions, they mess up datagram order sometimes
+      if ( not dg or dg->seq.service() != Pds::TransitionId::Disable ) {
+        m_dgrams.push_back( dg ) ;
+        break;
+      }
+    }
   }
 
 }
@@ -164,7 +172,14 @@ O2OXtcMerger::next()
 
     // get next datagram from that stream
     MsgLog( logger, debug, "next -- read datagram from file: " << m_streams[stream]->chunkName().basename() ) ;
-    m_dgrams[stream] = m_streams[stream]->next() ;
+    while ( true ) {
+      Pds::Dgram* dg = m_streams[stream]->next();
+      // skip Disable transitions, they mess up datagram order sometimes
+      if ( not dg or dg->seq.service() != Pds::TransitionId::Disable ) {
+        m_dgrams[stream] = dg ;
+        break;
+      }
+    }
 
   } else {
 

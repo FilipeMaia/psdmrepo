@@ -79,13 +79,23 @@ O2OXtcIterator::process(Xtc* xtc)
 
   MsgLogRoot( debug, "O2OXtcIterator::process -- new xtc: "
               << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version
-              << " payload = " << xtc->sizeofPayload() ) ;
+              << " payload = " << xtc->sizeofPayload()
+              << " damage: " << std::hex << std::showbase << xtc->damage.value() ) ;
 
   int result = 1 ;
   if ( type == Pds::TypeId::Id_Xtc ) {
 
-    // scan all sub-xtcs
-    this->iterate( xtc );
+    if ( xtc->damage.value() & Pds::Damage::DroppedContribution ) {
+      //some types of damage cause troubles, filter them
+      // skip damaged data
+      MsgLogRoot( warning, "O2OXtcIterator::process -- damaged container xtc: "
+                  << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version
+                  << " payload = " << xtc->sizeofPayload()
+                  << " damage: " << std::hex << std::showbase << xtc->damage.value() ) ;
+    } else {
+      // scan all sub-xtcs
+      this->iterate( xtc );
+    }
 
   } else if ( type == Pds::TypeId::Any ) {
 
@@ -95,7 +105,15 @@ O2OXtcIterator::process(Xtc* xtc)
       or xtc->src.level() == Pds::Level::Reporter
       or xtc->src.level() == Pds::Level::Control ) {
 
-    m_scanner->dataObject( xtc->payload(), xtc->sizeofPayload(), xtc->contains, m_src ) ;
+    if ( xtc->damage.value() ) {
+      // skip damaged data
+      MsgLogRoot( warning, "O2OXtcIterator::process -- damaged data xtc: "
+                  << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version
+                  << " payload = " << xtc->sizeofPayload()
+                  << " damage: " << std::hex << std::showbase << xtc->damage.value() ) ;
+    } else {
+      m_scanner->dataObject( xtc->payload(), xtc->sizeofPayload(), xtc->contains, m_src ) ;
+    }
 
   } else {
 

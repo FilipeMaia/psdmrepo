@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-04
+2010-06-09 Andy Salnikov
+- fixing stream sync proble for some types of problems, Disable 
+  transition order in XTC file can be "random". For now throw away 
+  all Disable transitions in the stream merge algorithm
+- relax filtering of damaged data, make it identical to pyana 
+
 Tag: V00-07-03
 2010-06-08 Andy Salnikov
 - updating for pdsdata V02-04-00
