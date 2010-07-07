@@ -11,6 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-15
+2010-07-07 - Andy Salnikov
+- added skip option to pyanato not process fist N events
+- user midules may have optional begincalibcycle and endcalibcycle
+  methods which will be called for appropriate transitions
+- beginrun and endrun methods were made optional too
+- avoid creating ROOT files when not needed
+
 Tag: V00-00-14
 2010-06-23 - Andy Salnikov
 - relax a bit filtering of damaged events

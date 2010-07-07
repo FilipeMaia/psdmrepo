@@ -184,6 +184,7 @@ def main( argv ) :
     
         dispatch = evt_dispatch(userObjects)
         num_events = jobConfig.getJobConfig('num-events')
+        skip_events = jobConfig.getJobConfig('skip-events') or 0
         nevent = 0
         ndamage = 0
         damagemask = 0
@@ -192,15 +193,29 @@ def main( argv ) :
         # read datagrams one by one
         for dgtup in dgramGen( names ) :
     
+            if num_events is not None and nevent >= num_events+skip_events :
+                logging.info("event limit reached (%d), terminating", nevent)
+                break
+    
             dg, fileName, fpos, run = dgtup
     
             damage = dg.xtc.damage.value()
             svc = dg.seq.service()
-    
-            if damage :
-                ndamage += 1
-                damagemask |= damage
-    
+        
+            if svc == xtc.TransitionId.L1Accept :
+                
+                evtnum = nevent
+                nevent += 1
+                
+                if evtnum < skip_events :
+                    # skip this event
+                    continue
+                else:
+                    # calculate damage mask
+                    if damage :
+                        ndamage += 1
+                        damagemask |= damage
+
             evt = event.Event(dg, run)
             
             # update environment
@@ -223,31 +238,27 @@ def main( argv ) :
                 # process all data
                 dispatch.dispatch(evt, env)
                     
-            if svc == xtc.TransitionId.L1Accept :
-                nevent += 1
-    
-            #print "Processed %d events, %d damaged, with damage mask %#x" % (nevent, ndamage, damagemask)
-            
-            if num_events is not None and nevent >= num_events :
-                logging.info("event limit reached (%d), terminating", nevent)
-                break
-    
+                
         # finish
         dispatch.finish(env)
     
-        # send FIN to all processes
-        for p in pipes : 
-            p.sendCode(OP_FINISH)
     
-        # get results from all processes
-        merge = merger() 
-        for p in pipes : 
-            merge.merge(p.getResult())
-        merge.finish(env)    
-    
-        # send END to all processes
-        for p in pipes :
-            p.sendCode(OP_END)
+        # finalization for multi-processors
+        if pipes :
+            
+            # send FIN to all processes
+            for p in pipes : 
+                p.sendCode(OP_FINISH)
+                
+            # get results from all processes
+            merge = merger() 
+            for p in pipes : 
+                merge.merge(p.getResult())
+            merge.finish(env)
+
+            # send END to all processes
+            for p in pipes :
+                p.sendCode(OP_END)
             
     except IOError, exc:
         
@@ -262,7 +273,7 @@ def main( argv ) :
     # done with the environment
     env.finish()
 
-    logging.info("Processed %d events, %d damaged, with damage mask %#x", nevent, ndamage, damagemask)
+    logging.info("Processed %d events, %d damaged, with damage mask %#x", nevent-skip_events, ndamage, damagemask)
 
     ru2 = getrusage(RUSAGE_SELF), getrusage(RUSAGE_CHILDREN)
     _rusage( "self  time", ru1[0], ru2[0] )

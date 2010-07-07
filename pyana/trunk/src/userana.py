@@ -48,7 +48,7 @@ def mod_import(name, config):
         _log.error("Failure while calling %s(): None returned", classname, str(e) )
         return None
 
-    for method in ['beginjob', 'beginrun', 'event', 'endrun', 'endjob' ] :
+    for method in ['beginjob', 'event', 'endjob' ] :
         if not hasattr(userana, method) :
             _log.error("User analysis class %s does not define method %s", classname, method )
             return None
@@ -64,6 +64,7 @@ class evt_dispatch(object) :
         self.userObjects = userObjects
         self.lastConfigTime = None
         self.runbegun = False
+        self.calibbegun = False
         
     def dispatch (self, evt, env):
     
@@ -83,13 +84,31 @@ class evt_dispatch(object) :
             
         elif svc == xtc.TransitionId.BeginRun :
             
-            for userana in self.userObjects : userana.beginrun( evt, env )
+            for userana in self.userObjects :
+                if hasattr(userana, 'beginrun'):
+                    userana.beginrun( evt, env )
             self.runbegun = True
             
         elif svc == xtc.TransitionId.EndRun :
             
-            for userana in self.userObjects : userana.endrun( evt )
+            for userana in self.userObjects : 
+                if hasattr(userana, 'endrun'):
+                    userana.endrun( env )
             self.runbegun = False
+            
+        elif svc == xtc.TransitionId.BeginCalibCycle :
+            
+            for userana in self.userObjects :
+                if hasattr(userana, 'begincalibcycle'):
+                    userana.begincalibcycle( evt, env )
+            self.calibbegun = True
+            
+        elif svc == xtc.TransitionId.EndCalibCycle :
+            
+            for userana in self.userObjects :
+                if hasattr(userana, 'endcalibcycle'):
+                    userana.endcalibcycle( env )
+            self.calibbegun = False
             
         elif svc == xtc.TransitionId.L1Accept :
             for userana in self.userObjects : userana.event( evt, env )
@@ -97,8 +116,15 @@ class evt_dispatch(object) :
     def finish(self, env):
         
         # finish with run first if was not done yet
+        if self.calibbegun :
+            for userana in self.userObjects : 
+                if hasattr(userana, 'endcalibcycle'): userana.endcalibcycle( env )
+            self.runbegun = False
+
+        # finish with run first if was not done yet
         if self.runbegun :
-            for userana in self.userObjects : userana.endrun( env )
+            for userana in self.userObjects : 
+                if hasattr(userana, 'endrun'): userana.endrun( env )
             self.runbegun = False
 
         # run unconfigure if configure was ran before

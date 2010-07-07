@@ -90,9 +90,10 @@ class merger ( object ) :
         for file in self._files.itervalues() : file.close()
 
         # store histograms
-        env.hmgr().file().cd()
-        for h in self._histos.itervalues(): 
-            h.Write()
+        if self._histos :
+            env.hmgr().file().cd()
+            for h in self._histos.itervalues(): 
+                h.Write()
 
     #--------------------------------
     #  Static/class public methods --
