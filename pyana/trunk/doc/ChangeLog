@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-16
+2010-07-07 - Andy Salnikov
+- in pyana update environment even if we skip the events, EPICS data 
+  come at random and need to  be remembered
+
 Tag: V00-00-15
 2010-07-07 - Andy Salnikov
 - added skip option to pyanato not process fist N events
