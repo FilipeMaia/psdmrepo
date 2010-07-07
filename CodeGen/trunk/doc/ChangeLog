@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-14
+2010-07-07 Andy Salnikov
+- updated pyana-module for new optional methods
+
 Tag: V00-00-13
 2010-05-03 Andy Salnikov
 - switching to SIT environment

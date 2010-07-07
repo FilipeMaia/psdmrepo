@@ -79,24 +79,35 @@ class $class (object) :
     def beginjob( self, evt, env ) :
         """This method is called once at the beginning of the job. It should
         do a one-time initialization possible extracting values from event
-        data (which is a Configure object) or environment
+        data (which is a Configure object) or environment.
 
         @param evt    event data object
         @param env    environment object
         """
 
         # Preferred way to log information is via logging package
-        logging.info( "beginjob() called" )
+        logging.info( "$class.beginjob() called" )
 
 
     def beginrun( self, evt, env ) :
-        """This method is called once at the beginning of the new run.
+        """This optional method is called if present at the beginning 
+        of the new run.
 
         @param evt    event data object
         @param env    environment object
         """
 
-        logging.info( "beginrun() called" )
+        logging.info( "$class.beginrun() called" )
+
+    def begincalibcycle( self, evt, env ) :
+        """This optional method is called if present at the beginning 
+        of the new calibration cycle.
+
+        @param evt    event data object
+        @param env    environment object
+        """
+
+        logging.info( "$class.begincalibcycle() called" )
 
     def event( self, evt, env ) :
         """This method is called for every L1Accept transition.
@@ -107,13 +118,22 @@ class $class (object) :
 
         pass
 
-    def endrun( self, env ) :
-        """This method is called at the end of the run.
+    def endcalibcycle( self, env ) :
+        """This optional method is called if present at the end of the 
+        calibration cycle.
         
         @param env    environment object
         """
         
-        logging.info( "endrun() called" )
+        logging.info( "$class.endcalibcycle() called" )
+
+    def endrun( self, env ) :
+        """This optional method is called if present at the end of the run.
+        
+        @param env    environment object
+        """
+        
+        logging.info( "$class.endrun() called" )
 
     def endjob( self, env ) :
         """This method is called at the end of the job. It should do 
@@ -122,4 +142,4 @@ class $class (object) :
         @param env    environment object
         """
         
-        logging.info( "endjob() called" )
+        logging.info( "$class.endjob() called" )
