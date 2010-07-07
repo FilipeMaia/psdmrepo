@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2010-07-07 Andrei Salnikov
+- pyana user modules now may have optional methods begincalibcycle and 
+  endcalibcycle
+- evt.get() can return None if data is missing or damaged, need to check
+  return value
+
 Tag: V00-00-04
 2010-05-13 Andrei Salnikov
 - updated examples to get config objects from env instead of evt

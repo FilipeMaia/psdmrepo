@@ -41,7 +41,6 @@ from scipy import integrate
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from ROOT import TCanvas
 
 #----------------------------------
 # Local non-exported definitions --
@@ -148,9 +147,14 @@ class myana ( object ) :
         
 
     def beginrun( self, evt, env ) :
-        """This method is called at the beginning of the run"""
+        """This optional method is called at the beginning of the run"""
 
         logging.info( "myana.beginrun() called" )
+
+    def begincalibcycle( self, evt, env ) :
+        """This optional method is called at the beginning of the calib cycle"""
+
+        logging.info( "myana.begincalibcycle() called" )
 
     def event( self, evt, env ) :
         """This method is called for every L1Accept transition"""
@@ -170,24 +174,22 @@ class myana ( object ) :
         # get Acqiris data
         channel = 0
         ddesc = evt.getAcqValue( "AmoITof", channel, env )
-        wf = ddesc.waveform()
-        ts = ddesc.timestamps()
-        self.itofHistos[bin].FillN( len(ts), ts, wf, numpy.ones_like(ts) )
+        if ddesc :
+            wf = ddesc.waveform()
+            ts = ddesc.timestamps()
+            self.itofHistos[bin].FillN( len(ts), ts, wf, numpy.ones_like(ts) )
 
-        # integrate it
-        integ = integrate.trapz (wf, ts)
-        self.itofHistosIntegral[bin].Fill(integ)
-
-#        c = 1
-#        for h in self.itofHistos :
-#            self.canvas.cd(c)
-#            h.Draw()
-#            c += 1
-#        self.canvas.Update()
+            # integrate it
+            integ = integrate.trapz (wf, ts)
+            self.itofHistosIntegral[bin].Fill(integ)
 
     def endrun( self, env ) :
-        """This method is called at the end of the run"""
+        """This optional method is called if present at the end of the run"""
         logging.info( "myana.endrun() called" )
+
+    def endcalibcycle( self, env ) :
+        """This optional method is called if present at the end of the calib cycle"""
+        logging.info( "myana.endcalibcycle() called" )
 
     def endjob( self, env ) :
         """This method is called at the end of the job, close your files"""

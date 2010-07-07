@@ -79,15 +79,15 @@ class myana1 ( object ) :
     def beginjob( self, evt, env ) :
         """This method is called once at the beginning of the job"""
 
-        logging.info( "myana.beginjob() called" )
+        logging.info( "myana1.beginjob() called" )
 
     def beginrun( self, evt, env ) :
         """This method is called at the beginning of the run"""
 
-        logging.info( "myana.beginrun() called" )
+        logging.info( "myana1.beginrun() called" )
 
     def event( self, evt, env ) :
-        """This methiod is called for every L1Accept transition"""
+        """This method is called for every L1Accept transition"""
 
         # store energy in a file
         shotEnergy = evt.getFeeGasDet()
@@ -102,17 +102,18 @@ class myana1 ( object ) :
         # get Acqiris data
         channel = 0
         ddesc = evt.getAcqValue( "AmoITof", channel, env )
-        wf = ddesc.waveform()
-        ts = ddesc.timestamps()
-        if self.sum2 is None :
-            self.sum2 = wf**2
-        else :
-            self.sum2 += wf**2
+        if ddesc:
+            wf = ddesc.waveform()
+            ts = ddesc.timestamps()
+            if self.sum2 is None :
+                self.sum2 = wf**2
+            else :
+                self.sum2 += wf**2
 
     def endrun( self, env ) :
         """This method is called at the end of the run"""
-        logging.info( "myana.endrun() called" )
+        logging.info( "myana1.endrun() called" )
 
     def endjob( self, env ) :
         """This method is called at the end of the job, close your files"""
-        logging.info( "myana.endjob() called" )
+        logging.info( "myana1.endjob() called" )
