@@ -11,6 +11,10 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-02
+2010-07-15 Andy Salnikov
+- adding ic-ws-status and ic-ws-translate utilities
+
 Tag: V00-05-01
 2010-06-28 Andy Salnikov
 - add support for looking at log files from controller and translators

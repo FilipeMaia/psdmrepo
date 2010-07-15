@@ -178,6 +178,9 @@ class RequestController ( BaseController ) :
     @jsonify
     def exp_requests ( self, instrument, experiment ) :
 
+        # check user's privileges
+        h.checkAccess(instrument, experiment, 'create')
+
         model = IcdbModel()
         requests = model.exp_requests(instrument, experiment)
 
