@@ -215,13 +215,17 @@ HERE;
 if( isset( $_GET['action'] )) {
     $action = trim( $_GET['action'] );
     if( $action == 'list_roles' ) {
-        echo "  list_roles();";
+        echo '  list_roles();';
     } else if( $action == 'list_role_players' ) {
-        echo "  list_role_players();";
+        echo '  list_role_players();';
     } else if( $action == 'list_groups' ) {
-        echo "  list_groups();";
+        echo '  list_groups();';
     } else if( $action == 'list_accounts' ) {
-        echo "  list_accounts();";
+        echo '  list_accounts();';
+    } else if( $action == 'view_account' ) {
+        echo "  view_account('".$_GET['uid']."');";
+    } else if( $action == 'view_group' ) {
+        echo "  view_group('".$_GET['gid']."');";
     } else {
         echo "  alert( 'unsupported action: {$action}' );";
     }
@@ -300,7 +304,8 @@ menubar_data.push ( {
     title_style: 'font-weight:bold;',
     itemdata: [
         { text: "POSIX Groups..", url: "javascript:list_groups()" },
-        { text: "User accounts..", url: "javascript:list_accounts()" } ],
+        { text: "User accounts..", url: "javascript:list_accounts()" },
+        { text: "Manage my POSIX groups..", url: "javascript:manage_my_groups()" } ],
     disabled: !auth_granted.read }
 );
 var menubar_group_help = menubar_data.length;
@@ -1395,7 +1400,7 @@ function accounts_filter() {
 }
 
 /*
- * The bukder for acconts table. The builder will use the above specified
+ * The builder for acconts table. The builder will use the above specified
  * filter.
  *
  * TODO: Reimplement this as an object.
@@ -1473,18 +1478,103 @@ function view_account( uid ) {
 
     set_context(
         '<a href="javascript:list_accounts()">Select User Account</a> > '+
-        '<i>'+uid+'</i>&nbsp;&nbsp;( <b>Viewing</b> )' );
+        '<i>'+uid+'</i>&nbsp;&nbsp;&nbsp;( <b>viewing</b> )' );
 
     reset_navarea();
     reset_workarea();
 
     document.getElementById('workarea').innerHTML=
-        '  <form name="account_edit_form" action="ProcessAccountEdit.php">'+
+        '<div id="actions_container">'+
+        '  <button id="edit_button" title="edit group membership for this account">Edit</button>'+
+        '</div>'+
+        '<div style="margin-top:25px; width:800px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
+        '  <form name="account_edit_form">'+
         '    <div id="account_edit_form_params">Loading...</div>'+
-        '  </form>';
+        '  </form>'+
+        '</div>';
 
     load( 'AccountInfo.php?uid=' + uid, 'account_edit_form_params' );
+
+    var action_edit = create_button (
+            "edit_button",
+            function() { edit_account( uid ); },
+            !auth_granted.edit );
 }
+
+function edit_account( uid ) {
+
+    set_context(
+        '<a href="javascript:list_accounts()">Select User Account</a> > '+
+        '<i>'+uid+'</i>&nbsp;&nbsp;&nbsp;( <b><span style="color:red;">editing</span></b> )' );
+
+    reset_navarea();
+    reset_workarea();
+
+    document.getElementById('workarea').innerHTML=
+        '<div id="actions_container">'+
+        '  <button id="save_button">Save</button>'+
+        '  <button id="cancel_button">Cancel</button>'+
+        '</div>'+
+        '<div style="margin-top:25px; width:800px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
+        '  <form name="account_edit_form" action="ProcessAccountEdit.php" method="post">'+
+        '    <div id="account_edit_form_params">Loading...</div>'+
+        '    <input type="hidden" name="actionSuccess" value="view_account" />'+
+        '  </form>'+
+        '</div>';
+
+    load( 'AccountInfo.php?uid=' + uid + '&edit', 'account_edit_form_params' );
+
+    var save = create_button (
+            "save_button",
+            function() {
+                document.account_edit_form.submit();
+            },
+            !auth_granted.edit
+        );
+    var cancel = create_button (
+        "cancel_button",
+        function() { view_account( uid ); } );
+}
+
+
+function manage_my_groups() {
+
+    set_context(
+        'Manage My POSIX Groups >' );
+
+    reset_navarea();
+    reset_workarea();
+
+    document.getElementById('workarea').innerHTML=
+        '<div style="margin-bottom:20px; padding:10px; padding-top:15px; border:solid 1px #d0d0d0;">'+
+        '  <form name="accounts_filter_form" action="javascript:apply_accounts_filter()">'+
+        '    <div id="accounts_filter_form_params">Loading...</div>'+
+        '  </form>'+
+        '</div>'+
+        '<div id="workarea_table_container">'+
+        '  <div id="workarea_table_paginator"></div>'+
+        '  <div id="workarea_table_body"></div>'+
+        '</div>';
+
+    load(
+        'AccountsFilter.php?' + accounts_filter(),
+        'accounts_filter_form_params' );
+
+    YAHOO.util.Event.onContentReady (
+	    "accounts_filter_button",
+	    function () {
+	        var submit_filter_button = new YAHOO.widget.Button( "accounts_filter_button" );
+	        submit_filter_button.on (
+	            "click",
+	            function( p_oEvent ) {
+	                apply_accounts_filter();
+	            }
+	        );
+	    }
+	);
+    create_accounts_table();
+}
+
 
 </script>
 
