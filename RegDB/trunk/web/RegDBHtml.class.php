@@ -63,12 +63,13 @@ HERE;
         return $this;
     }
 
-    public function value_input( $x, $y, $var, $text='', $title='', $size=null ) {
-        $size_str = is_null( $size ) ? '' : "size=\"{$size}\"";
+    public function value_input( $x, $y, $var, $text='', $title='', $size=null, $disabled=false ) {
+        $size_attr = is_null( $size ) ? '' : "size=\"{$size}\"";
+        $disabled_attr = $disabled ? 'disabled="disabled"' : '';
         //$width_str = is_null( $size ) ? '' : "width:{$size}px;";
         $this->html = $this->html.<<<HERE
 <div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
-  <input id="{$var}" type="text" name="{$var}" value="{$text}" style="padding:1px;" title="{$title}" {$size_str} />
+  <input id="{$var}" type="text" name="{$var}" value="{$text}" style="padding:1px;" title="{$title}" {$size_attr} {$disabled_attr} />
 </div>
 HERE;
         return $this;
@@ -92,11 +93,12 @@ HERE;
         return $this;
     }
 
-    public function checkbox_input( $x, $y, $var, $text, $checked=false ) {
+    public function checkbox_input( $x, $y, $var, $text, $checked=false, $disabled=false ) {
         $checked_attr = $checked ? 'checked="checked"' : '';
+        $disabled_attr = $disabled ? 'disabled="disabled"' : '';
         $this->html = $this->html.<<<HERE
 <div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
-  <input type="checkbox" name="{$var}" value="{$text}" {$checked_attr}/>
+  <input type="checkbox" name="{$var}" value="{$text}" {$checked_attr} {$disabled_attr}/>
 </div>
 HERE;
         return $this;

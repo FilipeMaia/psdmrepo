@@ -12,20 +12,24 @@ class RegDB {
      * parameters. Put null to envorce default values of parameters.
      */
     public function __construct (
-        $host      = null,
-        $user      = null,
-        $password  = null,
-        $database  = null,
-        $ldap_host = null ) {
+        $host        = null,
+        $user        = null,
+        $password    = null,
+        $database    = null,
+        $ldap_host   = null,
+        $ldap_user   = null,
+        $ldap_passwd = null  ) {
 
         $this->connection =
             new RegDBConnection (
-                is_null($host)      ? REGDB_DEFAULT_HOST : $host,
-                is_null($user)      ? REGDB_DEFAULT_USER : $user,
-                is_null($password)  ? REGDB_DEFAULT_PASSWORD : $password,
-                is_null($database)  ? REGDB_DEFAULT_DATABASE : $database,
-                is_null($ldap_host) ? REGDB_DEFAULT_LDAP_HOST : $ldap_host );
-    }
+                is_null($host)        ? REGDB_DEFAULT_HOST       : $host,
+                is_null($user)        ? REGDB_DEFAULT_USER        : $user,
+                is_null($password)    ? REGDB_DEFAULT_PASSWORD    : $password,
+                is_null($database)    ? REGDB_DEFAULT_DATABASE    : $database,
+                is_null($ldap_host)   ? REGDB_DEFAULT_LDAP_HOST   : $ldap_host,
+                is_null($ldap_user)   ? REGDB_DEFAULT_LDAP_USER   : $ldap_user,
+                is_null($ldap_passwd) ? REGDB_DEFAULT_LDAP_PASSWD : $ldap_passwd );
+        }
 
     /*
      * ==========================
@@ -361,6 +365,55 @@ class RegDB {
 
     public function find_user_account ( $user ) {
         return $this->connection->find_user_account( $user ); }
+
+    public function add_user_to_posix_group ( $user_name, $group_name ) {
+		$this->connection->add_user_to_posix_group( $user_name, $group_name ); }
+
+    public function remove_user_from_posix_group ( $user_name, $group_name ) {
+		$this->connection->remove_user_from_posix_group( $user_name, $group_name ); }
+
+	/* Preferred groups are special groups which are managed
+	 * by LCLS.
+	 */
+    public function preffered_groups() {
+        return array(
+            'lab-admin'      => True,
+            'lab-superusers' => True,
+            'lab-users'      => True,
+            'ps-amo'         => True,
+            'ps-data'        => True,
+            'ps-mgt'         => True );
+    }
+
+    /* Return an associative array of experiment groups whose names
+     * follow the pattern:
+     * 
+     *   iiipppyyy
+     *
+     * Where:
+     *
+     *   'iii' - is TLA for an instrument name
+     *   'ppp' - proposal number for a year when the experiment is conducted
+     *   'yy'  - last two digits for the year of the experiemnt
+     * 
+     * Parameters:
+     *
+     *   'instr' - optional name of an instrument to narrow the search. If not
+     *             present then all instruments will be assumed.
+     */
+    public function experiment_specific_groups( $instr=null ) {
+    	$groups = array();
+    	$instr_names = array();
+    	if( is_null( $instr )) $instr_names = $this->instrument_names();
+    	else array_push( $instr_names, $instr );
+    	foreach( $instr_names as $i ) {
+            foreach( $this->experiments_for_instrument( $i ) as $exper ) {
+                $g = $exper->name();
+                if( 1 == preg_match( '/^[a-z]{3}[0-9]{5}$/', $g )) $groups[$g] = True;
+            }
+    	}
+    	return $groups;
+    }
 }
 
 /* =======================

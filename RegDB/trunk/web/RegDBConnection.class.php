@@ -12,6 +12,8 @@ class RegDBConnection {
     private $password;
     public  $database;
     private $ldap_host;
+    private $ldap_user;
+    private $ldap_passwd;
 
     /* Current state of the object
      */
@@ -30,12 +32,23 @@ class RegDBConnection {
      * @param string $password
      * @param string $database 
      */
-    public function __construct ( $host, $user, $password, $database, $ldap_host ) {
-        $this->host      = $host;
-        $this->user      = $user;
-        $this->password  = $password;
-        $this->database  = $database;
-        $this->ldap_host = $ldap_host;
+    public function __construct (
+        $host,
+        $user,
+        $password,
+        $database,
+        $ldap_host,
+        $ldap_user,
+        $ldap_passwd ) {
+
+    	$this->host     = $host;
+        $this->user     = $user;
+        $this->password = $password;
+        $this->database = $database;
+
+        $this->ldap_host   = $ldap_host;
+        $this->ldap_user   = $ldap_user;
+        $this->ldap_passwd = $ldap_passwd;
     }
 
     /**
@@ -523,6 +536,91 @@ class RegDBConnection {
                    "failed to bind to LDAP server due to: ".ldap_error( $this->ldap_ds ));
         }
     }
+
+
+   /* ================================
+     *   LDAP MODIFICATION REQUESTS
+     * ===============================
+     *
+     * ATTENTION: These requests are made on a separate LDAP connection
+     * using SASL bind method which requires a special account and MD5 encripted
+     * password. The connection is open just temporarily for a duration of each 
+     * function call. So, be aware about possible performance implication of
+     * these operations!
+     */
+
+    public function add_user_to_posix_group ( $user_name, $group_name ) {
+		$this->posix_group_op( 'add', $user_name, $group_name );
+    }
+
+    public function remove_user_from_posix_group ( $user_name, $group_name ) {
+		$this->posix_group_op( 'del', $user_name, $group_name );
+    }
+    private function protected_connect2ldap () {
+
+        /* Connect to LDAP server
+         */
+        $ldap_ds = ldap_connect( $this->ldap_host );
+        if( !$ldap_ds )
+            throw new RegDBException (
+                __METHOD__,
+                "failed to connect to LDAP server: ".$this->ldap_host );
+
+        /* IMPORTANT: This operation is required. Otherwise LDAP client may
+         * get confused and attempt guessing a wrong version of protocol before
+         * producing a usefull result. A problem is that the first failed attempt to use
+         * protocol version 2 will result in a warning message which would destorte
+         * the JSON output.
+         */
+        ldap_set_option( $ldap_ds, LDAP_OPT_PROTOCOL_VERSION, 3 );
+
+        if( !ldap_sasl_bind ( $ldap_ds, NULL, $this->ldap_passwd, 'digest-md5', NULL, $this->ldap_user ))
+        throw new RegDBException (
+                __METHOD__,
+               "failed to bind to LDAP server due to: ".ldap_error( $ldap_ds ));
+
+        return $ldap_ds;
+    }
+    private function posix_group_op ( $opname, $user_name, $group_name ) {
+
+        if(( $opname != 'add' ) && ( $opname != 'del' ))
+            throw new RegDBException (
+                __METHOD__,
+               "internal error: unknown operation name: ".$opname );
+
+        $trim_user_name  = trim( $user_name );
+        if( $trim_user_name == '' )
+            throw new RegDBException (
+                __METHOD__,
+               "user name can't be empty" );
+
+        $trim_group_name = trim( $group_name );
+        if( $trim_group_name == '' )
+            throw new RegDBException (
+                __METHOD__,
+               "group name can't be empty" );
+
+        $memberuid['memberUid'] = $trim_user_name;
+        $op = 'ldap_mod_'.$opname;
+
+        $ldap_ds = $this->protected_connect2ldap();
+        if(      $opname == 'add' ) $sr = $op( $ldap_ds, "cn={$trim_group_name},ou=Group,dc=reg,o=slac", $memberuid );
+        else if( $opname == 'del' ) $sr = $op( $ldap_ds, "cn={$trim_group_name},ou=Group,dc=reg,o=slac", $memberuid );
+        else {
+            ldap_close( $ldap_ds );
+            throw new RegDBException (
+                __METHOD__,
+               "Internal error - illegal LDAP operation requested: ".$op );
+        }
+        if( $sr == False ) {
+            $error = ldap_error( $ldap_ds );
+       	    ldap_close( $ldap_ds );
+            throw new RegDBException (
+                __METHOD__,
+               "LDAP error: ".$error );
+        }
+        ldap_close( $ldap_ds );
+    }
 }
 
 /* ==========================
@@ -537,10 +635,15 @@ $conn = new RegDBConnection (
     REGDB_DEFAULT_USER,
     REGDB_DEFAULT_PASSWORD,
     REGDB_DEFAULT_DATABASE,
-    REGDB_DEFAULT_LDAP_HOST );
+    REGDB_DEFAULT_LDAP_HOST,
+    REGDB_DEFAULT_LDAP_USER,
+    REGDB_DEFAULT_LDAP_PASSWD );
 
 try {
-	
+
+    $conn->remove_user_from_posix_group( "gapon", "sxr11410" );
+    $conn->remove_user_from_posix_group( "salnikov", "sxr11410" );
+
     $user = $conn->find_user_account( "gapon" );
     print_r( $user );
 
