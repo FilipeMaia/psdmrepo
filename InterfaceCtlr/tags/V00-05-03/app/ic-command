@@ -1,0 +1,353 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script ICCommand.
+#
+#------------------------------------------------------------------------
+
+"""Script for interacting with the Interface Controller database.
+
+This software was developed for the LUSI project.  If you use all or
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$
+
+@author Robert C. Sass
+"""
+
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from LusiPython.DbConnection import DbConnection
+from InterfaceCtlr.InterfaceDb import InterfaceDb
+
+#---------------------
+# Local definitions --
+#---------------------
+
+_conn_str = "Server=psdb.slac.stanford.edu;Database=interface_db;"
+
+#--------------------------------
+# Application class definition --
+#--------------------------------
+
+class ICCommand ( LusiPyApp ) :
+
+    # ===========
+    # constructor
+    # ===========
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ (
+            self,
+            installLogger = True,
+            usage = "usage: %prog [<command>] [<parameters>] [<options>]" )
+
+        # Add application options, see optparse module for details -------------
+        #
+        self._parser.add_option ( '-d', "--conn-string",
+                                  action="store", dest="conn_string", default=_conn_str,
+                                  help="database connection string", metavar="CONN_STRING" )
+
+        self._parser.add_option ( '-u', "--user",
+                                  action="store", dest="user", default=None,
+                                  help="override default user name" )
+
+        self._parser.add_option ( '-p', "--password",
+                                  action="store", dest="password", default=None,
+                                  help="specify user password (no password by default)" )
+
+        self.__conn = None
+        self.__icdb = None
+
+        self.__cmd_handlers = {}
+        self.__cmd_order = []
+
+        # Register command handlers for known command --------------------------
+        #
+        self.__add_handler(
+            'help',
+            '[<command> [<command> [...]]]',
+            """
+    If no specific command (or commands) will be presented
+    then general information about the tool will be printed.
+    Otherwise detailed description of each command will be
+    printed.
+    """,
+            self.cmd_help)
+
+        self.__add_handler(
+            'translate',
+            '<instrument> <experiment> <run_type> <run_number> <xtc_files>',
+            "Translate a set of files to Offline Data Management",
+             self.cmd_translate )
+
+        self.__add_handler(
+            'remove',
+            '<instrument> <experiment> [<run_number>]',
+            "Remove fileset(s) from the database",
+             self.cmd_remove )
+
+        self.__add_handler(
+            'active',
+            '',
+            "Display active experiments",
+             self.cmd_active )
+
+        self.__add_handler(
+            'activate',
+            '<instrument> <experiment> ',
+            "Activate experiment",
+             self.cmd_activate )
+
+        self.__add_handler(
+            'deactivate',
+            '<instrument> <experiment> ',
+            "Deactivate experiment",
+             self.cmd_deactivate )
+
+
+    # =========================================================================
+    # Command handlers are registered in the dictionary. There is a separate list
+    # to specify an order in which the command information is reported by
+    # the tool.
+    # =========================================================================
+    
+    def __add_handler(self, command, syntax, description, handler):
+        self.__cmd_handlers[command] = {
+            'SYNTAX':syntax,
+            'DESCRIPTION':description,
+            'HANDLER':handler
+        }
+        self.__cmd_order.append(command)
+
+    # ============================================================
+    # Run the whole thing after parsing the command argunments and
+    # installing logger. See LusiPyApp class for details.
+    # ============================================================
+
+    def _run ( self ) :
+
+        # Print the list of supported commands of none is given ----------------
+        #
+        if not self._args :
+            self.cmd_help('help', self._args)
+            return 0
+
+        # Get the command name,  connect to the server (unless we're -----------
+        #  dealing with the command which doesn't need this) and invoke
+        # the corresponding handler.
+        #
+        command = self._args[0]
+        if command not in self.__cmd_handlers:
+            self._parser.error("unknown command: %s" % command)
+            return 2
+
+        self.trace( "command: %s: arguments: %s" % (command, str(self._args[1:])))
+
+        return self.__cmd_handlers[command]['HANDLER'](command, self._args[1:])
+
+    # ===========================================
+    # Print the information on supported commands
+    # ===========================================
+
+    def cmd_help ( self, command, args ) :
+
+        names = args
+        if names is not None and len(names) > 0:
+            verbose = True
+        else:
+            names = self.__cmd_order
+            verbose = False
+
+        if verbose:
+
+            # Print full description of each command
+            #
+            for name in names:
+                print """COMMAND:
+
+    %s
+
+PARAMETERS:
+
+    %s
+
+DESCRIPTION:
+%s
+""" % (name,
+         self.__cmd_handlers[name]['SYNTAX'],
+         self.__cmd_handlers[name]['DESCRIPTION'] )
+
+        else:
+
+            print """APPLICATION:
+
+    %s
+
+        This is the Online script that writes to the Interface Controller
+        Database to notify the Interface Controller that Online files are
+        ready for translation. The application has been developed in the 
+        context of the OFFLINE Data Management Project for LCLS/LUSI 
+        experiments.
+
+USAGE:
+
+    command [options] [parameters]
+
+    help
+    help [command [command ...]]   (for detailed explanation)
+
+    -h | --help                    (for a full list of available options)
+
+SUPPORTED COMMANDS:
+""" %  os.path.basename(sys.argv[0])
+
+            # Reserve enough space for the command names based on
+            # the longest name.
+            max_len = max([len(n) for n in names])
+            for name in names:
+                print "    %-*s  %s" % (max_len, name, self.__cmd_handlers[name]['SYNTAX'])
+
+            print
+
+        return 0
+
+    # ===================
+    # Translate a fileset
+    # ===================
+
+    def cmd_translate ( self, command, args ) :
+
+        if len(args) < 5:
+            self._parser.error(
+                "Enter: instrument experiment run_type run_num xtc_files - %s" % command)
+
+        instr      = args[0]
+        exper      = args[1]
+        runtype    = args[2]
+        runnum     = args[3]
+        xtcfiles   = args[4:]
+
+        self.icdb().new_fileset ( instr, exper, runnum, runtype, xtcfiles, duplicate=True )
+        
+        return 0
+
+    # ===============
+    # Remove filesets
+    # ===============
+
+    def cmd_remove ( self, command, args ) :
+
+        if len(args) not in [2,3]:
+            self._parser.error(
+                "Enter: instrument experiment [run_num] - %s" % command)
+
+        instr = args[0]
+        exper = args[1]
+        runnum = None
+        if len(args) > 2 : runnum = args[2]
+
+        self.icdb().remove_fileset ( instr, exper, runnum )
+        
+        return 0
+
+    # =======================
+    # Show active experiments
+    # =======================
+
+    def cmd_active ( self, command, args ) :
+
+        if args:
+            self._parser.error("No arguments expected - %s" % command)
+
+        for instr, exp, since in self.icdb().active_experiments() :
+            print "%-6s %s" %(instr, exp)
+        
+        return 0
+
+    # ===================
+    # Activate experiment
+    # ===================
+
+    def cmd_activate ( self, command, args ) :
+
+        if len(args) != 2:
+            self._parser.error("Enter: instrument experiment - %s" % command)
+
+        self.icdb().activate_experiment(*args)
+        
+        return 0
+
+    # =====================
+    # Deactivate experiment
+    # =====================
+
+    def cmd_deactivate ( self, command, args ) :
+
+        if len(args) != 2:
+            self._parser.error("Enter: instrument experiment - %s" % command)
+
+        self.icdb().deactivate_experiment(*args)
+        
+        return 0
+
+
+    # =================
+    # Server connection
+    # =================
+
+    def connection(self):
+
+        """Connect to the database if the connection has not been established
+        yet. In case of success initialize a connection handle and
+        return True. Return False otherwise."""
+        
+        if self.__conn : return self.__conn
+
+        self.__conn = DbConnection( conn_string=self._options.conn_string, 
+                                    user=self._options.user,
+                                    passwd=self._options.password,
+                                    timeout=0 )
+        return self.__conn
+                                    
+    def icdb(self) :
+    
+        if self.__icdb : return self.__icdb
+        
+        self.__icdb = InterfaceDb( self.connection() )
+        return self.__icdb
+
+
+# ==============================================
+# Run application when imported as a main module
+# ==============================================
+
+if __name__ == "__main__" :
+    app = ICCommand()
+    rc = app.run()
+    sys.exit(rc)
