@@ -20,7 +20,7 @@ class FileMgrIrodsWs {
     private static $opts = array(
     	"timeout"      => 10,
     	"httpauthtype" => HTTP_AUTH_BASIC,
-    	"httpauth"     => "gapon:newlife2"
+    	"httpauth"     => "irodsws:pcds"
     );
 
     /**
@@ -99,9 +99,16 @@ class FileMgrIrodsWs {
 
         $response = http_get( $url, FileMgrIrodsWs::$opts, $info );
 
-        if( $info['response_code'] != 200 )
-            die( "Web service request faild: {$url}" );
+        if( $info['response_code'] != 200 ) {
+        	if( $info['response_code'] == 404 ) {
 
+        		// Special case for 404: 'File Not Found' is to return an empty
+        		// collection to caller.
+        		//
+        		return json_decode( '' );
+            }
+            die( "Web service request faild: {$url}, eror code: ".$info['response_code'] );
+        }
         $response_parsed = http_parse_message( $response );
 
         // Promote result to a string. This is needed because the body is returned
