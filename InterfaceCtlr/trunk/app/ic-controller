@@ -257,6 +257,10 @@ class Controller ( LusiPyApp ) :
         
         self.info ("Request to kill controller #%d", self._controller_id)
         self._db.exit_controller(self._controller_id)
+        
+        self.info ("Wait until all translators finish")
+        for t in translators: t.join()
+        
         return 
 
 

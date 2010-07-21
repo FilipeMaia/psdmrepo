@@ -92,7 +92,8 @@ class IcWsTranslate ( LusiPyApp ) :
 
         req_data = dict(instrument=self._args[0],
                         experiment=self._args[1],
-                        runs=self._args[2])
+                        runs=self._args[2],
+                        force=1)
         
         res_name = '/exp/%s/%s' % (self._args[0], self._args[1])
         res = WSResource( app, '/request' )

@@ -121,7 +121,12 @@ class TranslatorThread ( threading.Thread ) :
         fname_dict = self.__build_output_fnames(fs)
 
         # output directory must be empty or non-existent
-        self.__make_hdf5_dir( fname_dict['tmpdirname'] )
+        try:
+            self.__make_hdf5_dir( fname_dict['tmpdirname'] )
+        except Exception, exc:
+            self.error("[%s] Failed to make temporary directory %s: %s", self._name, fname_dict['tmpdirname'], exc )
+            self._db.change_fileset_status (fs_id, 'H5Dir_Error')
+            return
 
         # build command line for running translator
         cmd = self.__build_translate_cmd(fs_id, fname_dict, fs)

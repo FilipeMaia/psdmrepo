@@ -11,6 +11,12 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-03
+2010-07-21 Andy Salnikov
+- add force flag to ic-ws-translate, let people to re-translate runs
+  that failed for some reason
+- add protection for failed mkdir for HDF5 files, will return H5Dir_Error
+
 Tag: V00-05-02
 2010-07-15 Andy Salnikov
 - adding ic-ws-status and ic-ws-translate utilities
