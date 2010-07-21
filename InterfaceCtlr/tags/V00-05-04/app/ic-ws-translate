@@ -1,0 +1,125 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: ws-client-test 490 2009-08-10 17:53:04Z salnikov $
+#
+# Description:
+#  Script ws-client-test...
+#
+#------------------------------------------------------------------------
+
+"""Script which show the status of the translation requests using
+the web service.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id: ws-client-test 490 2009-08-10 17:53:04Z salnikov $ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 490 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import urllib
+import urllib2 as u2
+import urllib2_kerberos
+import time
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from WSClient.WSApp import WSApp
+from WSClient.WSResource import WSResource
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class IcWsTranslate ( LusiPyApp ) :
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] instrument experiment runs" )
+
+        # add application options, see optparse module for details
+        self._parser.add_option ( '-u', "--user", 
+                                  default=None, help="specify user name" )
+        self._parser.add_option ( '-p', "--password", 
+                                  default=None, help="password to access web service" )
+        self._parser.add_option ( '-f', "--pwd-file", 
+                                  default='/reg/g/psdm/psdatmgr/ic/.icws-pwd', 
+                                  help="password file to access web service" )
+        self._parser.add_option ( '-a', "--app-name",  
+                                  default='icws', help="name of the web service" )
+        self._parser.add_option ( '-r', "--re-translate", action='store_true',  
+                                  default=False, help="allows re-submission of requests for the same run" )
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # check arguments
+        if len(self._args) != 3 :
+            self._parser.error("three arguments are required, use -h for help")
+            return 2
+        
+        # make resource object
+        app = WSApp( self._options.app_name,
+                     user=self._options.user,
+                     password=self._options.password,
+                     pwdfile=self._options.pwd_file )
+
+        req_data = dict(instrument=self._args[0],
+                        experiment=self._args[1],
+                        runs=self._args[2])
+        if self._options.re_translate: req_data['force']=1
+        
+        res_name = '/exp/%s/%s' % (self._args[0], self._args[1])
+        res = WSResource( app, '/request' )
+        
+        try:
+            data = res.request( 'POST', req_data )
+        except Exception, e:
+            print str(e)
+            return 2
+
+        if data:
+            failed = 0
+            for d in data :
+                if d['status'] == 'Failed' :
+                    failed += 1
+                    print >>sys.stderr, "Run %(run)d failed: %(message)s" % d 
+                else :
+                    print "Run %(run)d OK (id=%(id)d)" % d
+            if failed:
+                return 2
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = IcWsTranslate()
+    rc = app.run()
+    sys.exit(rc)
