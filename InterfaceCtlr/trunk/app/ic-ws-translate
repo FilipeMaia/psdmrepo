@@ -72,6 +72,8 @@ class IcWsTranslate ( LusiPyApp ) :
                                   help="password file to access web service" )
         self._parser.add_option ( '-a', "--app-name",  
                                   default='icws', help="name of the web service" )
+        self._parser.add_option ( '-r', "--re-translate", action='store_true',  
+                                  default=False, help="allows re-submission of requests for the same run" )
 
     #
     #  Run the whole thing after parsing the command argunments and 
@@ -92,8 +94,8 @@ class IcWsTranslate ( LusiPyApp ) :
 
         req_data = dict(instrument=self._args[0],
                         experiment=self._args[1],
-                        runs=self._args[2],
-                        force=1)
+                        runs=self._args[2])
+        if self._options.re_translate: req_data['force']=1
         
         res_name = '/exp/%s/%s' % (self._args[0], self._args[1])
         res = WSResource( app, '/request' )
