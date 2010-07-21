@@ -1084,6 +1084,7 @@ function create_messages_dialog( scope ) {
         begin, end,
         tag,
         author,
+        true, /* inject runs */
         isAuthorizedFor( 'canPostNewMessages' ) ? html_new_message : '',
         auto_refresh,
         limit_per_view );
@@ -2164,6 +2165,7 @@ function display_history( type, data ) {
         begin, end,
         tag,
         author,
+        true, /* inject runs */
         '',
         false, /* auto_refresh */
         25 /* null */   /* limit_per_view */ );
@@ -3005,6 +3007,7 @@ var last_display_scope,
     last_display_end,
     last_display_tag,
     last_display_author,
+    last_display_inject_runs,
     last_display_html_new_message,
     last_display_auto_refresh,
     last_limit_per_view;
@@ -3024,6 +3027,7 @@ function re_display_messages_table() {
         last_display_end,
         last_display_tag,
         last_display_author,
+        last_display_inject_runs,
         last_display_html_new_message,
         last_display_auto_refresh,
         last_limit_per_view );
@@ -3042,6 +3046,7 @@ function display_messages_table(
     end,
     tag,
     author,
+    inject_runs,
     html_new_message,
     auto_refresh,
     limit_per_view ) {
@@ -3060,6 +3065,7 @@ function display_messages_table(
     last_display_end = end;
     last_display_tag = tag;
     last_display_author = author;
+    last_display_inject_runs = inject_runs;
     last_display_html_new_message = html_new_message;
     last_display_auto_refresh = auto_refresh;
     last_limit_per_view = limit_per_view;
@@ -3078,6 +3084,7 @@ function display_messages_table(
         '&end='+encodeURIComponent(end)+
         '&tag='+encodeURIComponent(tag)+
         '&author='+encodeURIComponent(author)+
+        (inject_runs ? '&inject_runs' : '')+
         (limit_per_view == null ? '' : '&limit='+limit_per_view);
 
     var html=
@@ -3271,7 +3278,7 @@ function display_messages_table(
     this.refresh = function() {
         if( last_search_result.length > 0 )
             load_then_call(
-                this.url+'&since='+encodeURIComponent(last_search_result[last_search_result.length-1].event_time),
+                this.url+'&since='+encodeURIComponent(last_search_result[last_search_result.length-1].event_timestamp),
                 callback_on_refresh,
                 callback_on_failure );
         else
@@ -3302,8 +3309,9 @@ function search_and_display() {
         document.search_form.end.value,
         tag,
         author,
+        false, /* inject_runs */
         '',
-        false );
+        false /* auto_refresh */ );
 }
 
 function search_contents() {

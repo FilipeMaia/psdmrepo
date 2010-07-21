@@ -181,7 +181,9 @@ $sections = array(
                 array( 'name' => 'AMO:DIA:SHC:12:I', 'descr' => 'coil 2' ),
 
                 array( 'name' => 'AMO:R15:IOC:40:VHS0:CH0:VoltageSet', 'descr' => '' ),
-                array( 'name' => 'AMO:R15:IOC:40:VHS0:CH1:VoltageSet', 'descr' => '' )
+                array( 'name' => 'AMO:R15:IOC:40:VHS0:CH1:VoltageSet', 'descr' => '' ),
+                array( 'name' => 'AMO:R15:IOC:40:VHS2:CH1:VoltageSet', 'descr' => '' ),
+                array( 'name' => 'AMO:R15:IOC:40:VHS2:CH2:VoltageSet', 'descr' => '' )
             )
         )
     ),

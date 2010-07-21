@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: 00-01-15
+2010-07-16 Igor Gaponenko
+- case insensitive search in the "Find" operation
+- added 2 more Run Parameters for AMO
+- automatically inject begin/end run messages for the live list of messages
+
 Tag: V00-01-14
 2010-06-29 Igor Gaponenko
 - inject run records into list of messages reported by the Web application

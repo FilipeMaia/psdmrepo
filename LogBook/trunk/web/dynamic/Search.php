@@ -100,11 +100,18 @@ $author = '';
 if( isset( $_GET['author'] ))
     $author = trim( $_GET['author'] );
 
+$inject_runs = false;
+if( isset( $_GET['inject_runs'] ))
+    $inject_runs = '0' != trim( $_GET['inject_runs'] );
+
 /* This is a special modifier which (if present) is used to return an updated list
  * of messages since (strictly newer than) the specified time.
  * 
- * ATTENTION: This parameter will only be respected if it strictly falls into
- * the [begin,end) interval of the request!
+ * NOTES:
+ * - this parameter will only be respected if it strictly falls into
+ *   the [begin,end) interval of the request!
+ * - unlike outher time related parameters of the service this one is expected
+ *   to be a full precision 64-bit numeric representation of time.
  */
 $since_str = '';
 if( isset( $_GET['since'] )) {
@@ -119,7 +126,6 @@ if( isset( $_GET['limit'] )) {
     $limit = trim( $_GET['limit'] );
     if( $limit == 'all' ) $limit = null;
 }
-
 
 /* Package the error message into a JAON object and return the one
  * back to a caller. The script's execution will end at this point.
@@ -170,6 +176,8 @@ function translate_time( $experiment, $str ) {
  */
 function child2json( $entry ) {
 
+    $timestamp = $entry->insert_time();
+
     $relevance_time_str = is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort();
     $attachments = $entry->attachments();
     $children = $entry->children();
@@ -203,6 +211,7 @@ function child2json( $entry ) {
     $content = wordwrap( $entry->content(), 128 );
     return json_encode(
         array (
+            "event_timestamp" => $timestamp->to64(),
             "event_time" => $entry->insert_time()->toStringShort(),
             "relevance_time" => $relevance_time_str,
             "run" => $run_number_str,
@@ -222,7 +231,8 @@ function child2json( $entry ) {
 
 function entry2json( $entry ) {
 
-	$event_time_url =  "<a href=\"javascript:display_message({$entry->id()})\" class=\"lb_link\">{$entry->insert_time()->toStringShort()}</a>";
+    $timestamp = $entry->insert_time();
+    $event_time_url =  "<a href=\"javascript:display_message({$entry->id()})\" class=\"lb_link\">{$timestamp->toStringShort()}</a>";
     $relevance_time_str = is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort();
     $tags = $entry->tags();
     $attachments = $entry->attachments();
@@ -268,7 +278,8 @@ function entry2json( $entry ) {
     $content = wordwrap( $entry->content(), 128 );
     return json_encode(
         array (
-            "event_time" => $event_time_url, //$entry->insert_time()->toStringShort(),
+            "event_timestamp" => $timestamp->to64(),
+            "event_time" => $event_time_url,
             "relevance_time" => $relevance_time_str,
             "run" => $run_number_str,
             "shift" => $shift_begin_time_str,
@@ -287,15 +298,15 @@ function entry2json( $entry ) {
 
 function run2json( $run, $type ) {
 
-	/* TODO: WARNING! Pay attention to the artificial message identifier
-	 * for runs. an assumption is that normal message entries will
-	 * outnumber 512 million records.
-	 */
-	$timestamp = $type == 'begin_run' ? $run->begin_time()    : $run->end_time();
+    /* TODO: WARNING! Pay attention to the artificial message identifier
+     * for runs. an assumption is that normal message entries will
+     * outnumber 512 million records.
+     */
+    $timestamp = $type == 'begin_run' ? $run->begin_time() : $run->end_time();
     $msg       = '<b>'.( $type == 'begin_run' ? 'begin run ' : 'end run ' ).$run->num().'</b>';
     $id        = $type == 'begin_run' ? 512*1024*1024 + $run->id() : 2*512*1024*1024 + $run->id();
 
-	$event_time_url =  "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$timestamp->toStringShort()}</a>";
+    $event_time_url =  "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$timestamp->toStringShort()}</a>";
     $relevance_time_str = $timestamp->toStringShort();
 
     $shift_begin_time_str = '';
@@ -308,6 +319,7 @@ function run2json( $run, $type ) {
     $content = wordwrap( $msg, 128 );
     return json_encode(
         array (
+            "event_timestamp" => $timestamp->to64(),
             "event_time" => $event_time_url, //$entry->insert_time()->toStringShort(),
             "relevance_time" => $relevance_time_str,
             "run" => $run_number_str,
@@ -324,6 +336,37 @@ function run2json( $run, $type ) {
         )
     );
 }
+
+/* Truncate the input array of timestamps if the limit has been requested.
+ * Note that the extra entries will be removed from the _HEAD_ of the input
+ * array. The function will not modify the input array. The truncated array
+ * will be returned instead.
+ */
+function sort_and_truncate_from_head( $timestamps, $limit ) {
+
+    sort( $timestamps );
+
+    /* Return the input array if no limit specified or if the array is smaller
+     * than the limit.
+     */
+    if( !$limit ) return $timestamps;
+
+    $limit_num = (int)$limit;
+    if( count( $timestamps ) <= $limit_num ) return $timestamps;
+
+    /* Do need to truncate.
+     */
+    $idx = 0;
+    $first2copy_idx =  count( $timestamps ) - $limit_num;
+
+    $result = array();
+    foreach( $timestamps as $t ) {
+        if( $idx >= $first2copy_idx ) array_push( $result, $t );
+        $idx = $idx + 1; 
+    }
+    return $result;
+}
+
 
 /* Proceed with the operation
  */
@@ -358,12 +401,7 @@ try {
     if( !is_null( $begin ) && !is_null( $end ) && !$begin->less( $end ))
         report_error( "invalid interval - begin time isn't strictly less than the end one" );
 
-    $since = null;
-    if( $since_str != '' ) {
-        $since = translate_time( $experiment, $since_str );
-        if( is_null( $since ))
-            report_error( "'since' time has invalid format" );
-    }
+    $since = !$since_str ? null : LusiTime::from64( $since_str );
 
     $entries = $experiment->search(
         $shift_id, $run_id,
@@ -426,30 +464,41 @@ try {
         }
         if( !is_null( $since4runs )) $begin4runs = $since4runs;
     }
-    $runs = $experiment->runs_in_interval( $begin4runs, $end4runs, $limit );
+    $runs = !$inject_runs ? array() : $experiment->runs_in_interval( $begin4runs, $end4runs, $limit );
     
     /* Mix entries and run records in the right order
      */
     $entries_by_timestamps = array();
-    foreach( $entries as $e )
+
+    foreach( $entries as $e ) {
         $entries_by_timestamps[$e->insert_time()->to64()] = array( 'type' => 'entry', 'object' => $e );
+    }
     foreach( $runs as $r ) {
-        $entries_by_timestamps[$r->begin_time()->to64()] = array( 'type' => 'begin_run', 'object' => $r );
-        if( !is_null($r->end_time())) {
-        	
-            /* This check would prevent start of run entry to be replaced by
-             * the end of the previous run wich was automatically closed
-             * when starting the next run.
-             */
-        	if( !array_key_exists( $r->end_time()->to64(), $entries_by_timestamps ))
+
+        /* The following fix helps to avoid duplicating "begin_run" entries because
+         * the way we are getting runs (see before) would yeld runs in the interval:
+         *
+         *   [begin4runs,end4runs)
+         */
+        if( is_null( $begin4runs ) || $begin4runs->less( $r->begin_time())) {
+            $entries_by_timestamps[$r->begin_time()->to64()] = array( 'type' => 'begin_run', 'object' => $r );
+        }
+
+        /* This check would prevent start of run entry to be replaced by
+         * the end of the previous run wich was automatically closed
+         * when starting the next run.
+         */
+        if( !is_null( $r->end_time())) {
+            if( !array_key_exists( $r->end_time()->to64(), $entries_by_timestamps )) {
                 $entries_by_timestamps[$r->end_time()->to64()] = array( 'type' => 'end_run', 'object' => $r );
+            }
         }
     }
+    $timestamps = sort_and_truncate_from_head( array_keys( $entries_by_timestamps ), $limit );
 
-    $timestamps = array_keys( $entries_by_timestamps );
-    sort( $timestamps );
-
-    $limit_num = is_null( $limit ) ? 0 : (int)$limit;
+$debug_file = fopen( "/tmp/search.txt", "a+" );
+fwrite( $debug_file, $since."\n" );
+fclose( $debug_file );
 
     $status_encoded = json_encode( "success" );
     $result =<<< HERE
@@ -490,5 +539,8 @@ HERE;
     report_error( $e->toHtml());
 } catch( RegDBException $e ) {
     report_error( $e->toHtml());
+} catch( LusiTimeException $e ) {
+    report_error( $e->toHtml());
 }
 ?>
+

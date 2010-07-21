@@ -628,19 +628,19 @@ HERE;
         $part = '';
         if( $text2search != '' ) {
             if( $search_in_messages ) {
-                $part = " ((e.content LIKE '%{$text2search}%')";
+                $part = " ((e.content COLLATE latin1_swedish_ci LIKE '%{$text2search}%')";
             }
             if( $search_in_tags ) {
                 if( $part == '' )
-                    $part = " ((t.tag LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+                    $part = " ((t.tag COLLATE latin1_swedish_ci LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
                 else
-                    $part .= " OR (t.tag LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+                    $part .= " OR (t.tag COLLATE latin1_swedish_ci LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
             }
             if( $search_in_values ) {
                 if( $part == '' )
-                    $part = " ((t.value LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+                    $part = " ((t.value COLLATE latin1_swedish_ci LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
                 else
-                    $part .= " OR (t.value LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+                    $part .= " OR (t.value COLLATE latin1_swedish_ci LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
             }
         }
         if( $part != '' )
