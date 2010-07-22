@@ -9,15 +9,15 @@
 translators=8
 
 # release directory
-release=/reg/g/psdm/sw/releases/0.2.7
-#release=/reg/neh/home/salnikov/releases/ic-0.2.7
+release=/reg/g/psdm/sw/releases/0.2.10
+#release=/reg/neh/home/salnikov/releases/ic-0.2.10
 
 # database options
 conn_file=/reg/g/psdm/psdatmgr/ic/.icdb-conn
 
 # config section names to read from database
-config="meta-db group-time compress no-split xtc-lustre"
-#config="group-time compress no-split xtc-lustre"
+#config="meta-db group-time compress no-split xtc-lustre"
+config="group-time compress no-split xtc-lustre"
 
 # log directory
 logdir=/reg/g/psdm/psdatmgr/ic/log
