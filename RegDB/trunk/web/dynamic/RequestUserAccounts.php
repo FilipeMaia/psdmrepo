@@ -34,6 +34,13 @@ if( isset( $_GET['scope'] )) {
     exit;
 }
 
+/* This optional parameter can be used to specify if a simple JSON array
+ * of triplets (uid,name,email) is to be returned instead of HTML
+ * decorated entries.
+ */
+$simple = isset( $_GET['simple'] );
+
+
 function account2json( $account ) {
     $groups_str = '';
     $first = true;
@@ -49,6 +56,17 @@ function account2json( $account ) {
             "name"   => $account['gecos'],
             "email"  => $account['email'],
             "groups" => $groups_str
+        )
+    );
+}
+
+function account2json_simple( $account ) {
+
+    return json_encode(
+        array (
+            "uid"   => $account['uid'],
+            "name"  => substr( $account['gecos'], 0, 32 ),
+            "email" => $account['email']
         )
     );
 }
@@ -80,11 +98,12 @@ try {
 HERE;
     $first = true;
     foreach( $accounts as $a ) {
+    	$entry = $simple ? account2json_simple( $a ) : account2json( $a );
         if( $first ) {
             $first = false;
-            echo "\n".account2json( $a );
+            echo "\n".$entry;
         } else {
-            echo ",\n".account2json( $a );
+            echo ",\n".$entry;
         }
     }
     print <<< HERE

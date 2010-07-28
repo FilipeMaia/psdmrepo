@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-25
+2010-07-28 Igor Gaponenko
+- more efficient implementation of RegDBConnection::find_user_account()
+which now avoids browsing through all known POSIX groups
+- added support for managing POSIX groups
+
 Tag: V00-00-23
 2010-07-20 Igor Gaponenko
 - extended input methods of the RegDBHtml utility class to allow disabling inputs

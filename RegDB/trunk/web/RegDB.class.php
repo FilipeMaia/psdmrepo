@@ -388,14 +388,29 @@ class RegDB {
     /* Return an associative array of experiment groups whose names
      * follow the pattern:
      * 
-     *   iiipppyyy
+     *   iiipppyy
      *
      * Where:
      *
      *   'iii' - is TLA for an instrument name
      *   'ppp' - proposal number for a year when the experiment is conducted
      *   'yy'  - last two digits for the year of the experiemnt
-     * 
+     *
+     * Non standard group names:
+     *
+     *   In addition to the above explained rule the method can be modified
+     *   to retuns non-standard group names. See details in th eimplementation
+     *   of the method. These group names should follow the following
+     *   convention:
+     *
+     *     iiis..yy
+     *
+     * Where:
+     *
+     *   'iii' - is TLA for an instrument name
+     *   's..' - instrument/experiment specific designation for an experiment
+     *   'yy'  - last two digits for the year of the experiemnt
+     *
      * Parameters:
      *
      *   'instr' - optional name of an instrument to narrow the search. If not
@@ -411,6 +426,20 @@ class RegDB {
                 $g = $exper->name();
                 if( 1 == preg_match( '/^[a-z]{3}[0-9]{5}$/', $g )) $groups[$g] = True;
             }
+    	}
+
+    	/* Add known POSIX groups for special experiments which aren't following
+    	 * the standard naming convention:
+    	 *
+    	 *   <instr><proposal><year>
+    	 */
+
+    	/* SXR commissionning experiments for the year of 2010.
+         */
+    	if( !is_null( $instr ) && $instr == 'SXR' ) {
+            $groups['sxrrsx10'] = True;
+            $groups['sxrsse10'] = True;
+            $groups['sxrlje10'] = True;
     	}
     	return $groups;
     }

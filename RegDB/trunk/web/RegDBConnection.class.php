@@ -209,18 +209,20 @@ class RegDBConnection {
 
         // Search members of this secondary group
         //
-        for( $i = 0; $i < $info[0]["memberuid"]["count"]; $i++ ) {
-            $uid = $info[0]["memberuid"][$i];
-            $full_name = "";
-            $passwd = posix_getpwnam( $uid );
-            if( $passwd ) $full_name = $passwd["gecos"];
-            array_push(
-                $result,
-                array(
-                    "uid" => $uid,
-                    "gecos" => $full_name,
-                    "email" => $uid.'@slac.stanford.edu' )
-            );
+        if( array_key_exists ( 'memberuid', $info[0] )) {
+          for( $i = 0; $i < $info[0]["memberuid"]["count"]; $i++ ) {
+              $uid = $info[0]["memberuid"][$i];
+              $full_name = "";
+              $passwd = posix_getpwnam( $uid );
+              if( $passwd ) $full_name = $passwd["gecos"];
+              array_push(
+                  $result,
+                  array(
+                      "uid" => $uid,
+                      "gecos" => $full_name,
+                      "email" => $uid.'@slac.stanford.edu' )
+              );
+          }
         }
 
         // (OPTIONALY) Now search user records to see who may claim this group as
@@ -340,9 +342,9 @@ class RegDBConnection {
 
         $this->connect();
 
-        $groups = $this->groups();
-        $user2groups = $this->user2groups( $groups );
-        
+        /* Find the account in LDAP. It should exist. Return null if not.
+         * Report error if there is nore than one entry.
+         */
         $trim_name = trim( $name );
         if( $trim_name == '' )
             throw new RegDBException (
@@ -361,12 +363,14 @@ class RegDBConnection {
             throw new RegDBException (
                 __METHOD__,
                "LDAP error: ".ldap_error( $this->ldap_ds ));
+
+        /* Find the primary and secondary groups the user is member of.
+         * Either of both can not exist.
+         */
         $uid = $info[0]["uid"][0];
         $gid_primary = $info[0]["gidnumber"][0];
-        $user_groups = array();
-        if( array_key_exists( $uid, $user2groups ))
-            $user_groups = $user2groups[$uid];
-        array_push( $user_groups, $groups[$gid_primary]['name'] );
+        $user_groups = $this->non_primary_groups_for( $uid );
+        array_push( $user_groups, $this->gid2name( $gid_primary ));
         return array (
             'uid'    => $uid,
             'gecos'  => $info[0]["gecos"][0],
@@ -374,6 +378,29 @@ class RegDBConnection {
             'groups' => $user_groups );
     }
 
+    /* ATTENTION; This is the fastest implementation for finding non-primary
+     * groups the specified user account would belong to.
+     */
+    public function non_primary_groups_for( $uid ) {
+    	$this->connect();
+    	$trim_uid = trim( $uid );
+        if( $trim_uid == '' )
+            throw new RegDBException (
+                __METHOD__,
+               "UID can't be empty" );
+        $sr = ldap_search( $this->ldap_ds, "ou=Group,dc=reg,o=slac", "(&(memberUid={$trim_uid})(objectClass=posixGroup))" );
+        if( !$sr )
+            throw new RegDBException (
+                __METHOD__,
+               "LDAP error: ".ldap_error( $this->ldap_ds ));
+        $result = array();
+        $info = ldap_get_entries( $this->ldap_ds, $sr );
+        for( $i = 0; $i < $info["count"]; $i++ ) {
+        	array_push( $result, $info[$i]["cn"][0] );
+        }
+        return $result;
+    }
+    
     public function gid2name( $gid ) {
     	$this->connect();
     	$trim_gid = trim( $gid );
@@ -452,27 +479,28 @@ class RegDBConnection {
                 __METHOD__,
                "LDAP error: ".ldap_error( $this->ldap_ds ));
 
-        $list = array();
+        $result = array();
+
         $info = ldap_get_entries( $this->ldap_ds, $sr );
-        $num_groups = $info["count"];
-        for( $i = 0; $i < $num_groups; $i++ ) {
+        for( $i = 0; $i < $info["count"]; $i++ ) {
             $members = array();
-            $num_members = $info[$i]["memberuid"]["count"];
-            for( $j = 0; $j < $num_members; $j++ )
-                array_push( $members, $info[$i]["memberuid"][$j] );
+            if( array_key_exists ( 'memberuid', $info[$i] )) {
+              for( $j = 0; $j < $info[$i]["memberuid"]["count"]; $j++ )
+                  array_push( $members, $info[$i]["memberuid"][$j] );
+            }
 
             if( $gid2name )
-                $list[$info[$i]["gidnumber"][0]] = array(
+                $result[$info[$i]["gidnumber"][0]] = array(
                     'name' => $info[$i]["cn"][0],
                     'members' => $members
                 );
             else
-                $list[$info[$i]["cn"][0]] = array(
+                $result[$info[$i]["cn"][0]] = array(
                     'gid' => $info[$i]["gidnumber"][0],
                     'members' => $members
                 );
         }
-        return $list;
+        return $result;
     }
 
     /**
@@ -640,6 +668,25 @@ $conn = new RegDBConnection (
     REGDB_DEFAULT_LDAP_PASSWD );
 
 try {
+	print "<br>";
+	print "<b>Testing gid2name()</b>";
+    print "<br>";
+	foreach( array(1013, 1109, 2306) as $gid ) {
+		$group = $conn->gid2name( $gid );
+	    print "<br>".$gid." : ".$group;
+	}
+	print "<br>";
+	print "<br><b>Testing find_user_account() to get a list of groups the user belongs to</b>";
+
+	foreach( array('gapon', 'sxropr', 'rhabura', 'amo14410') as $user) {
+        print "<br>";
+		$account = $conn->find_user_account($user);
+        print("<br>user=<b>".$account['uid']."</b>");
+        foreach( $account['groups'] as $g ) {
+            print("<br>".$g);
+        }
+    }
+
 
     $conn->remove_user_from_posix_group( "gapon", "sxr11410" );
     $conn->remove_user_from_posix_group( "salnikov", "sxr11410" );

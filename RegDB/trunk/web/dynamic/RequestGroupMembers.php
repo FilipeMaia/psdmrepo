@@ -16,14 +16,32 @@ if( isset( $_GET['name'] )) {
     $name = trim( $_GET['name'] );
     if( $name == '' )
         die( "group name can't be empty" );
-} else
+} else {
     die( "no valid group name" );
+}
+
+/* This optional parameter can be used to specify if a simple JSON array
+ * of triplets (uid,name,email) is to be returned instead of HTML
+ * decorated entries.
+ */
+$simple = isset( $_GET['simple'] );
+
 
 function member2json( $member ) {
     return json_encode(
         array (
             "uid"   => "<a href=\"javascript:view_account('".$member['uid']."')\">".$member['uid']."</a> ",//$member['uid'],
             "name"  => $member['gecos'],
+            "email" => $member['email']
+        )
+    );
+}
+function member2json_simple( $member ) {
+
+    return json_encode(
+        array (
+            "uid"   => $member['uid'],
+            "name"  => substr( $member['gecos'], 0, 32 ),
             "email" => $member['email']
         )
     );
@@ -49,13 +67,14 @@ try {
 HERE;
     $first = true;
     foreach( $members as $m ) {
+    	$entry = $simple ? member2json_simple( $m ) : member2json( $m );
         if( $first ) {
             $first = false;
-            echo "\n".member2json( $m );
+            echo "\n".$entry;
         } else {
-            echo ",\n".member2json( $m );
+            echo ",\n".$entry;
         }
-    }
+    	    }
     print <<< HERE
  ] } }
 HERE;
