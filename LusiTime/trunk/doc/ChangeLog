@@ -11,8 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-18
+2010-07-28 Igor Gaponenko
+p
+- upgraded PHP code for PHP 5.3
+
 Tag: V00-00-16
-2010-05-28 Igor Gaponennko
+2010-05-28 Igor Gaponenko
 - bug fix in PHP LusiTime::parse()
 
 Tag: V00-00-14

@@ -1,5 +1,12 @@
 <?php
 
+/* Set the default timezone to prevent complains from PHP run time.
+ *
+ * NOTE: this parameter would need to be properly customized
+ *       in order to use this software in a different location.
+ */
+date_default_timezone_set( 'America/Los_Angeles' );
+
 /*
  * The class representing time in Web applications. It has
  * two data members representing the number of seconds since UNIX
@@ -16,17 +23,17 @@ class LusiTime {
     /* Factory method for getting the current time
      */
     public static function now() {
-        return new LusiTime( mktime()); }
+        return new LusiTime( time()); }
 
     /* Factory method for getting the time -1 hour from now
      */
     public static function minus_hour() {
-        return new LusiTime( mktime() - 3600 ); }
+        return new LusiTime( time() - 3600 ); }
 
     /* Factory method for getting the time -24 hours from now
      */
     public static function minus_day() {
-        return new LusiTime( mktime() - 24*3600 ); }
+        return new LusiTime( time() - 24*3600 ); }
 
     /* Factory method for getting the time as of today at 00:00:00
      */
@@ -41,14 +48,14 @@ class LusiTime {
     /* Factory method for getting the time -1 week from now
      */
     public static function minus_week() {
-        return new LusiTime( mktime() - 7*24*3600 ); }
+        return new LusiTime( time() - 7*24*3600 ); }
 
     /* Factory method for getting the time -1 month from now
      *
      * NOTE: 1 "month" is equal to 31 day in this context
      */
     public static function minus_month() {
-        return new LusiTime( mktime() - 31*24*3600 ); }
+        return new LusiTime( time() - 31*24*3600 ); }
 
     /* Factory method from an input string to be parsed into an object
      * of the class.
