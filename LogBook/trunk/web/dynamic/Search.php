@@ -496,10 +496,6 @@ try {
     }
     $timestamps = sort_and_truncate_from_head( array_keys( $entries_by_timestamps ), $limit );
 
-$debug_file = fopen( "/tmp/search.txt", "a+" );
-fwrite( $debug_file, $since."\n" );
-fclose( $debug_file );
-
     $status_encoded = json_encode( "success" );
     $result =<<< HERE
 {

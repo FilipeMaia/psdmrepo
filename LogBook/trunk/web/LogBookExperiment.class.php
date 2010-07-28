@@ -468,7 +468,7 @@ HERE;
      * @return array(LogBookFFEntry)
      */
     public function entries () {
-        return $this->entries_by_();
+        return $this->entries_by_( $this->sql_4_entries_by_());
     }
 
     /**
@@ -488,10 +488,13 @@ HERE;
                 __METHOD__,
                 "begin time '".$begin."' isn't less than end time '".$end."'" );
 
-        $begin_str = is_null( $begin ) ? '' : ' AND e.insert_time >='.$begin->to64();
-        $end_str   = is_null( $end )   ? '' : ' AND e.insert_time < '.$end->to64();
         return $this->entries_by_(
-            'h.shift_id IS NULL AND h.run_id IS NULL'.$begin_str.$end_str
+            $this->sql_4_entries_by_(
+                " AND h.shift_id IS NULL\n".
+                " AND h.run_id IS NULL\n".
+                ( is_null( $begin ) ? "" : " AND e.insert_time >= ".$begin->to64()."\n" ).
+                ( is_null( $end )   ? "" : " AND e.insert_time < ".$end->to64()."\n" )
+            )
         );
     }
 
@@ -504,7 +507,7 @@ HERE;
      * @return array(LogBookFFEntry)
      */
     public function entries_of_shift ( $id ) {
-        return $this->entries_by_( 'h.shift_id='.$id );
+        return $this->entries_by_( $this->sql_4_entries_by_( " AND h.shift_id = ".$id."\n" ));
     }
 
     /**
@@ -516,7 +519,7 @@ HERE;
      * @return array(LogBookFFEntry)
      */
     public function entries_of_run ( $id ) {
-        return $this->entries_by_( 'h.run_id='.$id );
+        return $this->entries_by_( $this->sql_4_entries_by_( " AND h.run_id = ".$id."\n" ));
     }
 
 
@@ -602,22 +605,22 @@ HERE;
 
         } else {
             if( $posted_at_experiment ) {
-                $scope = '((h.shift_id IS NULL AND h.run_id IS NULL)';
+                $scope = " AND ((h.shift_id IS NULL AND h.run_id IS NULL)";
             }
             if( $posted_at_shifts ) {
-                if( $scope == '' )
-                    $scope = '((h.shift_id IS NOT NULL)';
+                if( $scope == "" )
+                    $scope = " AND ((h.shift_id IS NOT NULL)";
                 else
-                    $scope .= ' OR (h.shift_id IS NOT NULL)';
+                    $scope .= " OR (h.shift_id IS NOT NULL)";
             }
             if( $posted_at_runs ) {
-                if( $scope == '' )
-                    $scope = '((h.run_id IS NOT NULL)';
+                if( $scope == "")
+                    $scope = " AND ((h.run_id IS NOT NULL)";
                 else
-                    $scope .= ' OR (h.run_id IS NOT NULL)';
+                    $scope .= " OR (h.run_id IS NOT NULL)";
             }
-            if( $scope != '' )
-                $scope .= ")";
+            if( $scope != "" )
+                $scope .= ")\n";
             else
                 return Array();
         }
@@ -625,26 +628,26 @@ HERE;
         /* Decide at which part(a) of messages to look for. This is actually
          * an optional filter.
          */
-        $part = '';
-        if( $text2search != '' ) {
+        $part = "";
+        if( $text2search != "" ) {
             if( $search_in_messages ) {
-                $part = " ((e.content COLLATE latin1_swedish_ci LIKE '%{$text2search}%')";
+                $part = " AND ((e.content COLLATE latin1_swedish_ci LIKE '%{$text2search}%')";
             }
             if( $search_in_tags ) {
-                if( $part == '' )
-                    $part = " ((t.tag COLLATE latin1_swedish_ci LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+                if( $part == "" )
+                    $part = " AND ((t.tag COLLATE latin1_swedish_ci LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
                 else
                     $part .= " OR (t.tag COLLATE latin1_swedish_ci LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
             }
             if( $search_in_values ) {
-                if( $part == '' )
-                    $part = " ((t.value COLLATE latin1_swedish_ci LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
+                if( $part == "" )
+                    $part = " AND ((t.value COLLATE latin1_swedish_ci LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
                 else
                     $part .= " OR (t.value COLLATE latin1_swedish_ci LIKE '%{$text2search}%' AND t.hdr_id = h.id)";
             }
         }
-        if( $part != '' )
-            $part .= ")";
+        if( $part != "" )
+            $part .= ")\n";
 
         /* Consider timing constrains as well (if present).
          */
@@ -653,50 +656,45 @@ HERE;
                 __METHOD__,
                 "begin time '".$begin."' isn't less than end time '".$end."'" );
 
-        $begin_str = is_null( $begin ) ? '' : ' e.insert_time >='.$begin->to64();
-        $end_str   = is_null( $end   ) ? '' : ' e.insert_time < '.$end->to64();
-        $since_str = is_null( $since ) ? '' : ' e.insert_time > '.$since->to64();
+        $begin_str = is_null( $begin ) ? "" : " AND e.insert_time >= ".$begin->to64()."\n";
+        $end_str   = is_null( $end   ) ? "" : " AND e.insert_time < ".$end->to64()."\n";
+        $since_str = is_null( $since ) ? "" : " AND e.insert_time > ".$since->to64()."\n";
 
         /* Consider tag and/or author constrains as well (if present).
          */
-        $tag_str    = $tag    == '' ? '' : " t.tag='{$tag}' AND t.hdr_id = h.id";
-        $author_str = $author == '' ? '' : " e.author='{$author}'";
+        $tag_str    = $tag    == "" ? "" : " AND t.tag = '{$tag}' AND t.hdr_id = h.id\n";
+        $author_str = $author == "" ? "" : " AND e.author = '{$author}'\n";
 
         /* The flag which would instruct the query processor to use the tags table.
          */
-        $use_tags = (( $text2search != '' ) && $search_in_tags ) || ( $tag != '' );
+        $use_tags = (( $text2search != "" ) && $search_in_tags ) || ( $tag != "" );
 
         /* Build the extra condition and proceed with the actual search. Expect results
          * to be ordered by the insert (post) time.
+         *
+         * TODO: Modify this to produce UNION of SELECTs if 'part' includes search
+         * in tags (either names or values) and in message bodies. Replace the above
+         * presented generator for 'part' accordingly.
          */
-        function expand_condition( $condition, $extra ) {
-            if( $extra != '' ) {
-                if( $condition != '' ) $condition .= ' AND ';
-                $condition .= $extra;
-            }
-            return $condition;
-        }
-        $condition = '';
-        $condition = expand_condition( $condition, $scope );
-        $condition = expand_condition( $condition, $part );
-        $condition = expand_condition( $condition, $begin_str );
-        $condition = expand_condition( $condition, $end_str );
-        $condition = expand_condition( $condition, $since_str );
-        $condition = expand_condition( $condition, $tag_str );
-        $condition = expand_condition( $condition, $author_str );
-        
+        $condition = "";
+        $condition .= $scope;
+        $condition .= $part;
+        $condition .= $begin_str;
+        $condition .= $end_str;
+        $condition .= $since_str;
+        $condition .= $tag_str;
+        $condition .= $author_str;
+
         return $this->entries_by_(
-            $condition,
-            $limit,
-            $use_tags
+            $this->sql_4_entries_by_(
+                $condition,
+                $limit,
+                $use_tags
+            )
         );
     }
 
-    private function entries_by_ ( $condition=null, $limit=null, $use_tags=true ) {
-
-        $list = array();
-
-        $extra_condition = ( is_null( $condition ) || ( $condition == '' )) ? '' : ' AND '.$condition;
+    private function sql_4_entries_by_ ( $extra_condition="", $limit=null, $use_tags=true ) {
 
         /* Apply the limit if specified
          *
@@ -704,21 +702,36 @@ HERE;
          * from the newest entry. We need it to make sure the limit woud work. In the end
          * (before returning from the method) the array will be reversed.
          */
-        $limit_str = is_null( $limit ) ? '' : ' LIMIT '.$limit;
-
         $tables = $this->connection->database.'.header h, '.
                   $this->connection->database.'.entry e'.
-                  ($use_tags ? ','.$this->connection->database.'.tag t ' : ' ');
-        $sql =
-            'SELECT DISTINCT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.* FROM '.$tables.' WHERE h.exper_id='.$this->attr['id'].
-            ' AND h.id = e.hdr_id AND e.parent_entry_id is NULL'.$extra_condition.
-            ' ORDER BY e.insert_time DESC'.$limit_str;
-        /*
+                  ($use_tags ? ', '.$this->connection->database.'.tag t ' : ' ');
+        return
+            "SELECT DISTINCT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.*\n".
+            "FROM $tables\n".
+            "WHERE h.exper_id = ".$this->attr['id']."\n".
+            " AND h.id = e.hdr_id\n".
+            " AND e.parent_entry_id is NULL\n".
+            $extra_condition.
+            "ORDER BY e.insert_time DESC\n".
+            ( is_null( $limit ) ? "" : "LIMIT $limit\n" );
+    }
+
+    private function entries_by_ ( $sql ) {
+
+        $list = array();
+/*
+$debug_file = fopen( "/tmp/search.txt", "a+" );
+fwrite( $debug_file, $sql."\n" );
+fclose( $debug_file );
+*/
+        /* DEBUG: uncomment this exception to see the SQL statement in the client
+         * session rather than a result of actual execution.
+
         throw new LogBookException(
             __METHOD__, $sql );
         */
-        $result = $this->connection->query ( $sql );
 
+        $result = $this->connection->query ( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
             array_push(
@@ -728,6 +741,7 @@ HERE;
                     $this,
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
         }
+
         /* IMPORTANT: This is needed because the quesry returned elements
          * in the wrong order (DESC instead of ASC). We had to do it to apply
          * an optinal 'LIMIT';

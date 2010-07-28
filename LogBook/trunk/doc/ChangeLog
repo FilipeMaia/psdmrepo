@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: 00-01-17
+2010-07-28 Igor Gaponenko
+- refactoring in the search operation (to clean up the code and prepare for further
+improvements)
+- removed previously introduced debug printouts (into a temporary file)
+
 Tag: 00-01-15
 2010-07-16 Igor Gaponenko
 - case insensitive search in the "Find" operation
