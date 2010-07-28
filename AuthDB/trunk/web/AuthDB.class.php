@@ -293,26 +293,21 @@ HERE;
         }
         if( count( $authorized_groups ) <= 0 ) return false;
 
-        // Check the primary group of the user
+        // Check if the user has required privilege via one of groups
+        // his/her account is member of.
         //
         $user_account = $this->regdb->find_user_account( $user );
         if( is_null( $user_account ))
             throw new AuthDBException (
                 __METHOD__,
                 "no such user: {$user}" );
-        $primary_group = $user_account['gid'];
+
+        // TODO: We may have a better implemnetation of this algorithm
+        //       instead of the nested loops as used below.
+        //
         foreach( $authorized_groups as $g ) {
-
-        	if( $g == $primary_group ) return true;
-
-        	// ATTENTION: Note 'false' as the last parameter of the method
-        	// called below. Setting its value to 'true' would impose a significant
-        	// performance penalty! Besides, we've already know the user's primary group name
-        	// and the test for it failed above above.
-        	//
-        	$group_members = $this->regdb->posix_group_members ( $g, /*$and_as_primary_group=*/ false );
-        	foreach( $group_members as $m ) {
-        	    if( $m['uid'] == $user ) return true;
+        	foreach( $user_account['groups'] as $ug ) {
+        	    if( $ug == $g ) return true;
         	}
         }
         return false;
@@ -446,8 +441,8 @@ try {
     $authdb = new AuthDB();
     $authdb->begin();
 
-    $exper_id = resolve_exper_id( 'AMO', 'amo02709');
-    $user = 'dimauro' ; //'gapon';
+    $exper_id = resolve_exper_id( 'SXR', 'sxrcom10');
+    $user = 'sxropr'; //'maad';
 
     print( "<h1>privileges of user '{$user}' for 'LogBook' of experiment {$exper_id}</h1>" );
     print( "<br>'read: : ".toYesNo( $authdb->hasPrivilege( $user, $exper_id, 'LogBook', 'read' )));
@@ -456,23 +451,23 @@ try {
     print( "<br>'delete: : ".toYesNo( $authdb->hasPrivilege( $user, $exper_id, 'LogBook', 'delete' )));
     print( "<br>'manage_shifts: : ".toYesNo( $authdb->hasPrivilege( $user, $exper_id, 'LogBook', 'manage_shifts' )));
 
-    print( "<br>hoHasPrivilege( {$exper_id}, 'LogBook', 'read' ): " );
+    print( "<br>whoHasPrivilege( {$exper_id}, 'LogBook', 'read' ): " );
     $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'read' );
     print_r( $users );
 
-    print( "<br>hoHasPrivilege( {$exper_id}, 'LogBook', 'post' ): " );
+    print( "<br>whoHasPrivilege( {$exper_id}, 'LogBook', 'post' ): " );
     $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'post' );
     print_r( $users );
 
-    print( "<br>hoHasPrivilege( {$exper_id}, 'LogBook', 'manage_shifts' ): " );
+    print( "<br>whoHasPrivilege( {$exper_id}, 'LogBook', 'manage_shifts' ): " );
     $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'manage_shifts' );
     print_r( $users );
     
-    print( "<br>hoHasPrivilege( {$exper_id}, 'LogBook', 'edit' ): " );
+    print( "<br>whoHasPrivilege( {$exper_id}, 'LogBook', 'edit' ): " );
     $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'edit' );
     print_r( $users );
     
-    print( "<br>hoHasPrivilege( {$exper_id}, 'LogBook', 'delete' ): " );
+    print( "<br>whoHasPrivilege( {$exper_id}, 'LogBook', 'delete' ): " );
     $users = $authdb->whoHasPrivilege( $exper_id, 'LogBook', 'delete' );
     print_r( $users );
 

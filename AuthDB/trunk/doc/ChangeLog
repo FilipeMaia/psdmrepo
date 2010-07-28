@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2010-07-28 Igor Gaponenko
+- incomplete implementation of the "manage my POSIX groups" editor
+- more efficient implementation of AuthDB::hasPrivilege()
+
 Tag: V00-00-11
 2010-07-16 Igor Gaponenko
 - implemented LDAP group editor

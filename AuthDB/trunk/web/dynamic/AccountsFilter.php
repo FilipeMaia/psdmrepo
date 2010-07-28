@@ -37,18 +37,18 @@ try {
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-    $con = new RegDBHtml( 0, 0, 500, 60 );
+    $con = new RegDBHtml( 0, 0, 400, 60 );
     echo $con
 
-        ->value      (   0,  3, 'Search for' )
-        ->value_input(  70,  0, 'accounts_pattern', $string2search, $pattern_help, 8 )
+        ->value      (   0,  3, '<b>Search for user</b>' )
+        ->value_input( 105,  0, 'accounts_pattern', $string2search, $pattern_help, 8 )
 
-        ->value      ( 180,  3, 'in' )
-        ->radio_input( 210,  3, 'scope', 'uid_and_name', $scope == 'uid_and_name' )->label( 230,   3, 'UID & name', false )
-        ->radio_input( 210, 23, 'scope', 'uid',          $scope == 'uid'          )->label( 230,  23, 'UID',        false )
-        ->radio_input( 210, 43, 'scope', 'name',         $scope == 'name'         )->label( 230,  43, 'name',       false )
+        ->value      ( 210,  3, '<b>in</b>' )
+        ->radio_input( 240,  3, 'scope', 'uid_and_name', $scope == 'uid_and_name' )->label( 260,   3, '<b>UID & name</b>', false )
+        ->radio_input( 240, 23, 'scope', 'uid',          $scope == 'uid'          )->label( 260,  23, '<b>UID</b>',        false )
+        ->radio_input( 240, 43, 'scope', 'name',         $scope == 'name'         )->label( 260,  43, '<b>name</b>',       false )
 
-        ->button     ( 325,  0, 'accounts_filter_button', 'Go', 'update the table using this filter' )
+        ->button     ( 365,  0, 'accounts_filter_button', 'Go', 'update the table using this filter' )
         ->html();
 
     $authdb->commit();

@@ -87,7 +87,7 @@ try {
         foreach( array_keys( $experiment_specific_groups ) as $g ) {
 
             $displayed_groups[$g] = True;
-            if( 1 == preg_match( '/^[a-z]{3}[0-9]{5}$/', $g )) {
+            if( 1 == preg_match( '/^[a-z]{3}[a-z0-9]+[0-9]{2}$/', $g )) {
                 $group_url = "<a href=\"javascript:view_group('".$g."')\">".$g."</a>";
                 $row_pos = $row_base + $row * 20;
                 $col_pos = $col_base + $col * 120;

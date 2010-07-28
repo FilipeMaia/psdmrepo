@@ -132,6 +132,17 @@ Page-specific styles
         margin-left:0px;
         text-align:left;
     }
+
+    .section_header {
+        padding:2px;
+        /*font-family: Arial;*/
+        font-size:18px;
+        font-weight:bold;
+        background-color:#e0e0e0;
+        /*background-color:#dcefff;*/
+        border-top:solid 3px #000000;
+        /*border-top:solid 1px #c0c0c0;*/
+    }
 </style>
 
 <!--
@@ -1536,6 +1547,150 @@ function edit_account( uid ) {
         function() { view_account( uid ); } );
 }
 
+/* This array is dynamically loaded with JSON representations
+ * of selected user accounts.
+ */
+var last_search_result = null;
+
+function account2html(idx) {
+	var account = last_search_result[idx]; 
+	var include_account_button_name = 'include_account_button_'+account.uid;
+	var border_style = ( idx == 0 ? '' : 'border-top:solid 1px #d0d0d0;' );
+	var result=
+	'<div style="position:relative; left:10px; top:0px; width:425; height:30px; '+border_style+'">'+
+	'  <div style="position:absolute; left:4px; top:12px;"><b>'+account.uid+'</b></div>'+
+	'  <div style="position:absolute; left:125px; top:12px;">'+account.name+'</div>'+
+	'  <div style="position:absolute; left:370px; top:8px; width:30px;"><button id="'+include_account_button_name+'">Add</button></div>'+
+	'</div><br>';
+
+    YAHOO.util.Event.onContentReady (
+        include_account_button_name,
+        function () {
+            var include_account_button = new YAHOO.widget.Button( include_account_button_name );
+            include_account_button['uid'] = account.uid;
+            include_account_button.on (
+                "click",
+                function( p_oEvent ) {
+                    apply_modify_group('include', this.uid, document.select_group_form.group.value);
+                }
+            );
+        }
+    );
+	return result;
+}
+
+function apply_my_accounts_filter() {
+
+    document.getElementById('my_accounts_selected').innerHTML = 'Searching...';
+
+    function callback_on_load( result ) {
+        last_search_result = result.ResultSet.Result;
+        var html1 = '';
+        for( var i=0; i < last_search_result.length; i++ ) {
+            var h = account2html(i);
+            html1 += h;
+        }
+        document.getElementById('my_accounts_selected').innerHTML = html1;
+    }
+    function callback_on_failure( http_status ) {
+        document.getElementById('my_accounts_selected').innerHTML=
+            '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
+    }
+
+	/* This call would extract form parameters and cache them locally
+     */
+	apply_accounts_filter();
+
+    load_then_call(
+        '../regdb/RequestUserAccounts.php?'+accounts_filter()+'&simple',
+        callback_on_load,
+        callback_on_failure );
+}
+
+/* This array is dynamically loaded with JSON representations
+ * of members of a select group.
+ */
+var last_group_search_result = null;
+
+function groupmember_account2html(idx) {
+	var account = last_group_search_result[idx]; 
+	var exclude_account_button_name = 'exclude_account_button_'+account.uid;
+	var border_style = ( idx == 0 ? '' : 'border-top:solid 1px #d0d0d0;' );
+	var result=
+	'<div style="position:relative; left:10px; top:0px; width:425; height:30px; '+border_style+'">'+
+	'  <div style="position:absolute; left:4px; top:12px;"><b>'+account.uid+'</b></div>'+
+	'  <div style="position:absolute; left:125px; top:12px;">'+account.name+'</div>'+
+	'  <div style="position:absolute; left:350px; top:8px; width:75px;"><button id="'+exclude_account_button_name+'">Remove</button></div>'+
+	'</div><br>';
+
+    YAHOO.util.Event.onContentReady (
+   		exclude_account_button_name,
+        function () {
+            var exclude_account_button = new YAHOO.widget.Button( exclude_account_button_name );
+            exclude_account_button['uid'] = account.uid;
+            exclude_account_button.on (
+                "click",
+                function( p_oEvent ) {
+                    apply_modify_group('exclude', this.uid, document.select_group_form.group.value);
+                }
+            );
+        }
+    );
+	return result;
+}
+
+function apply_select_group(theObj) {
+
+	var group = document.select_group_form.group.value;
+
+    document.getElementById('my_group_selected').innerHTML = 'Retrieving...';
+
+    function callback_on_load( result ) {
+        last_group_search_result = result.ResultSet.Result;
+        var html1 = '';
+        for( var i=0; i < last_group_search_result.length; i++ ) {
+            var h = groupmember_account2html(i);
+            html1 += h;
+        }
+        document.getElementById('my_group_selected').innerHTML = html1;
+    }
+    function callback_on_failure( http_status ) {
+        document.getElementById('my_group_selected').innerHTML=
+            '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
+    }
+
+    load_then_call(
+        '../regdb/RequestGroupMembers.php?name='+group+'&simple',
+        callback_on_load,
+        callback_on_failure );
+}
+
+function apply_modify_group(action, uid, group) {
+
+	var request = action+'&uid='+uid+'&group='+group;
+    alert(request);
+
+    document.getElementById('my_group_selected').innerHTML = 'Retrieving...';
+
+    function callback_on_load( result ) {
+        last_group_search_result = result.ResultSet.Result;
+        var html1 = '';
+        for( var i=0; i < last_group_search_result.length; i++ ) {
+            var h = groupmember_account2html(i);
+            html1 += h;
+        }
+        document.getElementById('my_group_selected').innerHTML = html1;
+    }
+    function callback_on_failure( http_status ) {
+        document.getElementById('my_group_selected').innerHTML=
+            '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
+    }
+
+    load_then_call(
+        '../regdb/RequestGroupMembers.php?name='+group+'&simple',
+        callback_on_load,
+        callback_on_failure );
+}
 
 function manage_my_groups() {
 
@@ -1546,19 +1701,47 @@ function manage_my_groups() {
     reset_workarea();
 
     document.getElementById('workarea').innerHTML=
-        '<div style="margin-bottom:20px; padding:10px; padding-top:15px; border:solid 1px #d0d0d0;">'+
-        '  <form name="accounts_filter_form" action="javascript:apply_accounts_filter()">'+
-        '    <div id="accounts_filter_form_params">Loading...</div>'+
-        '  </form>'+
-        '</div>'+
-        '<div id="workarea_table_container">'+
-        '  <div id="workarea_table_paginator"></div>'+
-        '  <div id="workarea_table_body"></div>'+
+        '<div>'+
+        '  <div style="float:left;">'+
+        '    <div style="margin-bottom:10px; width:auto; text-align:center;" class="section_header" >'+
+        '      U s e r &nbsp;&nbsp; A c c o u n t s'+
+        '    </div>'+
+        //'    <div style="margin-bottom:20px; padding:10px;  padding-left:0px; padding-top:0px; border-bottom:solid 1px #000000;">'+
+        //'    <div style="margin-bottom:20px; padding:10px;  padding-left:10px; padding-top:10px; background-color:#d0d0d0; width:425; height:60px;">'+
+        '    <div style="margin-bottom:20px; padding:10px;  padding-left:10px; padding-top:10px; border-bottom:solid 1px #000000; width:425; height:60px;">'+
+        '      <form name="accounts_filter_form" action="javascript:apply_my_accounts_filter()">'+
+        '        <div id="accounts_filter_form_params">Loading...</div>'+
+        '      </form>'+
+        '    </div>'+
+        '    <div id="my_accounts_selected">'+
+        '    </div>'+
+        '  </div>'+
+        '  <div style="float:left;">'+
+        '    <div style="margin-left:40px; margin-bottom:10px; width:auto; text-align:center;" class="section_header" >'+
+        '      G r o u p s'+
+        '    </div>'+
+        //'    <div style="margin-left:40px; margin-bottom:20px; padding:10px; padding-left:0px; padding-top:0px; border-bottom:solid 1px #000000; height:60px;">'+
+        //'    <div style="margin-left:40px; margin-bottom:20px; padding:10px;  padding-left:10px; padding-top:10px; background-color:#d0d0d0; width:425; height:60px;">'+
+        '    <div style="margin-left:40px; margin-bottom:20px; padding:10px;  padding-left:10px; padding-top:10px; border-bottom:solid 1px #000000; width:425; height:60px;">'+
+        '      <form name="select_group_form">'+
+        '        <b>Select group to manage</b> '+
+        '        <select align="center" type="text" name="group" style="padding:1px;" onchange="javascript:apply_select_group(this);">'+
+        '          <option value="sxrrsx10">sxrrsx10</option>'+
+        '          <option id="group_default" value="amo12310">amo12310</option>'+
+        '          <option value="amo01709">amo01709</option>'+
+        '        </select>'+
+        '      </form>'+
+        '    </div>'+
+        '    <div id="my_group_selected" style="margin-left:40px;">'+
+        '    </div>'+
+        '  </div>'+
         '</div>';
 
     load(
         'AccountsFilter.php?' + accounts_filter(),
         'accounts_filter_form_params' );
+
+    apply_select_group(null);
 
     YAHOO.util.Event.onContentReady (
 	    "accounts_filter_button",
@@ -1567,7 +1750,7 @@ function manage_my_groups() {
 	        submit_filter_button.on (
 	            "click",
 	            function( p_oEvent ) {
-	                apply_accounts_filter();
+	            	apply_my_accounts_filter();
 	            }
 	        );
 	    }
