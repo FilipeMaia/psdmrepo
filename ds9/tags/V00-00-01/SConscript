@@ -1,0 +1,26 @@
+#------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package ds9
+#------------------------------------------------------------------------
+
+import os.path
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+
+# here is an example setting up a fictional package
+
+pkg = "ds9"
+pkg_ver = "6.1.2"
+
+PREFIX  = os.path.join(env['SIT_ROOT'], "sw/external", pkg, pkg_ver)
+BINDIR = "bin"
+
+standardExternalPackage ( pkg, **locals() )
