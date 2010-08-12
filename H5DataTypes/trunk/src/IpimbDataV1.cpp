@@ -37,7 +37,7 @@
 
 namespace H5DataTypes {
 
-IpimbDataV1::IpimbDataV1 ( const Pds::Ipimb::DataV1& data )
+IpimbDataV1::IpimbDataV1 ( const XtcType& data )
 {
   m_data.triggerCounter = data.triggerCounter();
   m_data.config0 = data.config0();
