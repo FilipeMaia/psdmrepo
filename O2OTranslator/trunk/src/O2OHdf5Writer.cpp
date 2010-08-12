@@ -46,10 +46,16 @@
 #include "H5DataTypes/FccdConfigV2.h"
 #include "H5DataTypes/IpimbConfigV1.h"
 #include "H5DataTypes/IpimbDataV1.h"
+#include "H5DataTypes/LusiDiodeFexConfigV1.h"
+#include "H5DataTypes/LusiDiodeFexV1.h"
+#include "H5DataTypes/LusiIpmFexConfigV1.h"
+#include "H5DataTypes/LusiIpmFexV1.h"
+#include "H5DataTypes/LusiPimImageConfigV1.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
 #include "H5DataTypes/PnCCDConfigV1.h"
 #include "H5DataTypes/PnCCDConfigV2.h"
 #include "H5DataTypes/PrincetonConfigV1.h"
+#include "H5DataTypes/PrincetonInfoV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV2.h"
 #include "LusiTime/Time.h"
@@ -264,6 +270,18 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_EncoderConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::LusiDiodeFexConfigV1> ( "Lusi::DiodeFexConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_DiodeFexConfig, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::LusiIpmFexConfigV1> ( "Lusi::IpmFexConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_IpmFexConfig, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::LusiPimImageConfigV1> ( "Lusi::PimImageConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_PimImageConfig, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   hsize_t chunk_size = 128*1024 ;
 
   // instantiate all factories for event converters
@@ -333,6 +351,12 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_PrincetonFrame,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  // version for this type is 1
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::PrincetonInfoV1> (
+      "Princeton::InfoV1", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_PrincetonInfo, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   // temporary/diagnostics  Epics converter (headers only)
 //  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::EpicsPvHeader> (
 //      "Epics::EpicsPvHeader", chunk_size, m_compression ) ) ;
@@ -343,6 +367,19 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   converter.reset( new EpicsDataTypeCvt( "Epics::EpicsPv", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_Epics,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // version for this type is 1
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::LusiDiodeFexV1> (
+      "Lusi::DiodeFexV1", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_DiodeFex, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // version for this type is 1
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::LusiIpmFexV1> (
+      "Lusi::IpmFexV1", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_IpmFex, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
 }
 
 //--------------
