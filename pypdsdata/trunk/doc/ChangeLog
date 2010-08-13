@@ -1,4 +1,8 @@
 
+2010-08-12 - V00-00-14
+======================
+- upgrading to pdsdata V02-06-00
+
 2010-06-29 - V00-00-14
 ======================
 - fixing problem with stream synchronization, Disable transition

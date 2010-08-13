@@ -61,6 +61,14 @@ namespace {
       { "Id_EncoderData",     Pds::TypeId::Id_EncoderData },
       { "Id_EncoderConfig",   Pds::TypeId::Id_EncoderConfig },
       { "Id_EvrIOConfig",     Pds::TypeId::Id_EvrIOConfig },
+      { "Id_PrincetonInfo",   Pds::TypeId::Id_PrincetonInfo },
+      { "Id_CspadElement",    Pds::TypeId::Id_CspadElement },
+      { "Id_CspadConfig",     Pds::TypeId::Id_CspadConfig },
+      { "Id_IpmFexConfig",    Pds::TypeId::Id_IpmFexConfig },
+      { "Id_IpmFex",          Pds::TypeId::Id_IpmFex },
+      { "Id_DiodeFexConfig",  Pds::TypeId::Id_DiodeFexConfig },
+      { "Id_DiodeFex",        Pds::TypeId::Id_DiodeFex },
+      { "Id_PimImageConfig",  Pds::TypeId::Id_PimImageConfig },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

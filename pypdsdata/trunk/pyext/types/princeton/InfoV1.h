@@ -1,12 +1,12 @@
-#ifndef PYPDSDATA_IPIMB_DATAV1_H
-#define PYPDSDATA_IPIMB_DATAV1_H
+#ifndef PYPDSDATA_PRINCETON_INFOV1_H
+#define PYPDSDATA_PRINCETON_INFOV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class DataV1.
+//	Class InfoV1.
 //
 //------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/ipimb/DataV1.hh"
+#include "pdsdata/princeton/InfoV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -33,7 +33,7 @@
 //		---------------------
 
 namespace pypdsdata {
-namespace Ipimb {
+namespace Princeton {
 
 /**
  *  This software was developed for the LCLS project.  If you use all or
@@ -46,17 +46,17 @@ namespace Ipimb {
  *  @author Andrei Salnikov
  */
 
-class DataV1 : public PdsDataType<DataV1,Pds::Ipimb::DataV1> {
+class InfoV1 : public PdsDataType<InfoV1,Pds::Princeton::InfoV1> {
 public:
 
-  typedef PdsDataType<DataV1,Pds::Ipimb::DataV1> BaseType;
+  typedef PdsDataType<InfoV1,Pds::Princeton::InfoV1> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
 
 };
 
-} // namespace Ipimb
+} // namespace Princeton
 } // namespace pypdsdata
 
-#endif // PYPDSDATA_IPIMB_DATAV1_H
+#endif // PYPDSDATA_PRINCETON_INFOV1_H

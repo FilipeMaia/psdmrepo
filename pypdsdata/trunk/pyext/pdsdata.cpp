@@ -84,6 +84,12 @@
 #include "types/ipimb/ConfigV1.h"
 #include "types/ipimb/DataV1.h"
 
+#include "types/lusi/DiodeFexConfigV1.h"
+#include "types/lusi/DiodeFexV1.h"
+#include "types/lusi/IpmFexConfigV1.h"
+#include "types/lusi/IpmFexV1.h"
+#include "types/lusi/PimImageConfigV1.h"
+
 #include "types/opal1k/ConfigV1.h"
 
 #include "types/pnCCD/ConfigV1.h"
@@ -92,6 +98,7 @@
 
 #include "types/princeton/ConfigV1.h"
 #include "types/princeton/FrameV1.h"
+#include "types/princeton/InfoV1.h"
 
 #include "types/pulnix/TM6740ConfigV1.h"
 #include "types/pulnix/TM6740ConfigV2.h"
@@ -224,6 +231,15 @@ PyMODINIT_FUNC init_pdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "ipimb", module );
 
+  module = Py_InitModule3( "_pdsdata.lusi", 0, "The Python module for pdsdata/lusi" );
+  pypdsdata::Lusi::DiodeFexConfigV1::initType( module );
+  pypdsdata::Lusi::DiodeFexV1::initType( module );
+  pypdsdata::Lusi::IpmFexConfigV1::initType( module );
+  pypdsdata::Lusi::IpmFexV1::initType( module );
+  pypdsdata::Lusi::PimImageConfigV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "lusi", module );
+
   module = Py_InitModule3( "_pdsdata.opal1k", 0, "The Python module for pdsdata/opal1k" );
   pypdsdata::Opal1k::ConfigV1::initType( module );
   Py_INCREF( module );
@@ -239,6 +255,7 @@ PyMODINIT_FUNC init_pdsdata()
   module = Py_InitModule3( "_pdsdata.princeton", 0, "The Python module for pdsdata/princeton" );
   pypdsdata::Princeton::ConfigV1::initType( module );
   pypdsdata::Princeton::FrameV1::initType( module );
+  pypdsdata::Princeton::InfoV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "princeton", module );
 

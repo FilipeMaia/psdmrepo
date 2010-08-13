@@ -56,6 +56,12 @@
 #include "types/ipimb/ConfigV1.h"
 #include "types/ipimb/DataV1.h"
 
+#include "types/lusi/DiodeFexConfigV1.h"
+#include "types/lusi/DiodeFexV1.h"
+#include "types/lusi/IpmFexConfigV1.h"
+#include "types/lusi/IpmFexV1.h"
+#include "types/lusi/PimImageConfigV1.h"
+
 #include "types/opal1k/ConfigV1.h"
 
 #include "types/pnCCD/ConfigV1.h"
@@ -64,6 +70,7 @@
 
 #include "types/princeton/ConfigV1.h"
 #include "types/princeton/FrameV1.h"
+#include "types/princeton/InfoV1.h"
 
 #include "types/pulnix/TM6740ConfigV1.h"
 #include "types/pulnix/TM6740ConfigV2.h"
@@ -227,6 +234,30 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_EvrIOConfig :
     if ( not obj ) obj = xtc2obj<EvrData::IOConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_PrincetonInfo :
+    if ( not obj ) obj = xtc2obj<Princeton::InfoV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_IpmFexConfig :
+    if ( not obj ) obj = xtc2obj<Lusi::IpmFexConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_IpmFex :
+    if ( not obj ) obj = xtc2obj<Lusi::IpmFexV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_DiodeFexConfig :
+    if ( not obj ) obj = xtc2obj<Lusi::DiodeFexConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_DiodeFex :
+    if ( not obj ) obj = xtc2obj<Lusi::DiodeFexV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_PimImageConfig :
+    if ( not obj ) obj = xtc2obj<Lusi::PimImageConfigV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::NumberOf :
