@@ -1037,7 +1037,7 @@ function create_messages_dialog( scope ) {
         '  <input type="hidden" name="actionSuccess" value="select_experiment_and_run" />';
     }
     html_new_message +=
-        '  <input type="hidden" name="MAX_FILE_SIZE" value="10000000">'+
+        '  <input type="hidden" name="MAX_FILE_SIZE" value="25000000">'+
         '  <div>'+
         '    <em class="lb_label">New message:</em>'+
         '  </div>'+
@@ -1377,7 +1377,7 @@ function create_message_reply_dialog( rid, message_id ) {
         '  <input type="hidden" name="scope" value="'+scope+'" />'+
         '  <input type="hidden" name="message_id" value="'+message_id+'" />'+
         '  <input type="hidden" name="actionSuccess" value="select_experiment" />'+
-        '  <input type="hidden" name="MAX_FILE_SIZE" value="10000000">'+
+        '  <input type="hidden" name="MAX_FILE_SIZE" value="25000000">'+
         '  <div id="message_reply_file_descriptions"></div>'+
         '  <div id="message_tags"></div>'+
         '  <div>'+
@@ -1760,7 +1760,8 @@ function create_message_delete_dialog( did, id ) {
 function preview_atatchment( id ) {
 
     var viewarea = document.getElementById('viewarea');
-    viewarea.innerHTML='<img src="ShowAttachment.php?id='+id+'" width="250" height="250"/>';
+    //viewarea.innerHTML='<img src="ShowAttachment.php?id='+id+'" width="250" height="250"/>';
+    viewarea.innerHTML='<img src="attachments/'+id+'/preview" width="250" height="250"/>';
 }
 
 function list_shifts() {
@@ -2541,18 +2542,22 @@ function AttachmentLoader( a, aid ) {
         var a_elem = document.getElementById( this.aid );
         if( this.type[0] == 'image' ) {
             a_elem.innerHTML =
-            '<img max-width="800" src="ShowAttachment.php?id='+this.id+'" />';
+            '<img max-width="800" src="attachments/'+this.id+'/preview" />';
+            //'<img max-width="800" src="ShowAttachment.php?id='+this.id+'" />';
         } else if( this.type[0] == 'text' ) {
             var aid4text = 'attachment_id_'+this.id+'_txt';
             a_elem.innerHTML =
             '<div style="max-width:800px; min-height:40px; max-height:200px; overflow:auto; border:solid 1px;"><textbox><pre id="'+aid4text+'"></pre></textbox></div>';
-            load( 'ShowAttachment.php?id='+this.id, aid4text );
+            load( 'attachments/'+this.id+'/preview', aid4text );
+            //load( 'ShowAttachment.php?id='+this.id, aid4text );
         } else if( this.type[0] == 'application' && this.type[1] == 'pdf' ) {
             a_elem.innerHTML =
-            '<object data="ShowAttachment.php?id='+this.id+'" type="application/pdf" width="800" height="600"></object>';
+            '<object data="attachments/'+this.id+'/preview" type="application/pdf" width="800" height="600"></object>';
+            //'<object data="ShowAttachment.php?id='+this.id+'" type="application/pdf" width="800" height="600"></object>';
         } else if( this.type[0] == 'application' && this.type[1] == 'rtf' ) {
             a_elem.innerHTML =
-            '<object data="ShowAttachment.php?id='+this.id+'" type="application/rtf" width="800" height="600"></object>';
+            '<object data="attachments/'+this.id+'/preview" type="application/rtf" width="800" height="600"></object>';
+            //'<object data="ShowAttachment.php?id='+this.id+'" type="application/rtf" width="800" height="600"></object>';
         } else {
             a_elem.innerHTML =
             '<img src="images/NoPreview.png" />';

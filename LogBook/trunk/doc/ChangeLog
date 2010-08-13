@@ -12,6 +12,14 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: 00-01-17
+2010-08-12 Igor Gaponenko
+- increased file limit for uploads from 10 MB to 25 MB
+- relying on Apache Rewrite module for downloading/previewing
+attachments (use more generic logbook/attachments/<id>/<file>
+instead of ShowAttachment.php?id=<id>
+
+
+Tag: 00-01-16
 2010-07-28 Igor Gaponenko
 - refactoring in the search operation (to clean up the code and prepare for further
 improvements)

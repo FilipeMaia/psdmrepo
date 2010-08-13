@@ -70,7 +70,8 @@ function child2json( $entry ) {
     $attachment_ids = array();
     if( count( $attachments ) != 0 ) {
         foreach( $attachments as $attachment ) {
-            $attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            //$attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            $attachment_url = '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
             array_push(
                 $attachment_ids,
                 array(
@@ -133,7 +134,8 @@ function entry2json( $entry ) {
     $attachment_ids = array();
     if( count( $attachments ) != 0 ) {
         foreach( $attachments as $attachment ) {
-            $attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            //$attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            $attachment_url = '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
             array_push(
                 $attachment_ids,
                 array(
