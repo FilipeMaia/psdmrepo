@@ -51,6 +51,10 @@ def make_map():
     # remove request
     map.connect('/request/{id}', controller='request', action='delete', conditions=cond_delete )
 
+    # PUT /request/{id}
+    # update request
+    map.connect('/request/{id}', controller='request', action='update', conditions=cond_put )
+
     # POST /request
     # create new request
     map.connect('/request', controller='request', action='create', conditions=cond_post )

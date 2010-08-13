@@ -11,6 +11,10 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-00
+2010-08-12 Andy Salnikov
+- add support for priority requests 
+
 Tag: V00-05-04
 2010-07-21 Andy Salnikov
 - add option -r to ic-ws-translate to control re-translation requests 

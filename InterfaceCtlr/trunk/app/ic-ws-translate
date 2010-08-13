@@ -74,6 +74,10 @@ class IcWsTranslate ( LusiPyApp ) :
                                   default='icws', help="name of the web service" )
         self._parser.add_option ( '-r', "--re-translate", action='store_true',  
                                   default=False, help="allows re-submission of requests for the same run" )
+        self._parser.add_option ( '-w', "--priority", type='int',  
+                                  default=None, help="sets the priority of the request" )
+        self._parser.add_option ( '-i', "--id", type='int',
+                                  default=None, help="change the priority of the existing requests" )
 
     #
     #  Run the whole thing after parsing the command argunments and 
@@ -92,16 +96,28 @@ class IcWsTranslate ( LusiPyApp ) :
                      password=self._options.password,
                      pwdfile=self._options.pwd_file )
 
-        req_data = dict(instrument=self._args[0],
-                        experiment=self._args[1],
-                        runs=self._args[2])
-        if self._options.re_translate: req_data['force']=1
         
-        res_name = '/exp/%s/%s' % (self._args[0], self._args[1])
-        res = WSResource( app, '/request' )
+        if self._options.id :
+            
+            req_data = dict()
+            if self._options.priority: req_data['priority']=self._options.priority
+        
+            res = WSResource( app, '/request/%d' % self._options.id )
+            meth = 'PUT'
+
+        else :
+
+            req_data = dict(instrument=self._args[0],
+                            experiment=self._args[1],
+                            runs=self._args[2])
+            if self._options.re_translate: req_data['force']=1
+            if self._options.priority: req_data['priority']=self._options.priority
+
+            res = WSResource( app, '/request' )
+            meth = 'POST'
         
         try:
-            data = res.request( 'POST', req_data )
+            data = res.request( meth, req_data )
         except Exception, e:
             print str(e)
             return 2
@@ -113,7 +129,7 @@ class IcWsTranslate ( LusiPyApp ) :
                     failed += 1
                     print >>sys.stderr, "Run %(run)d failed: %(message)s" % d 
                 else :
-                    print "Run %(run)d OK (id=%(id)d)" % d
+                    print "Run %(run)d OK (id=%(id)d, prio=%(priority)d)" % d
             if failed:
                 return 2
 #

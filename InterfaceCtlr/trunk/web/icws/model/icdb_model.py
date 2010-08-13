@@ -110,7 +110,7 @@ class IcdbModel ( InterfaceDb ) :
 
         # select filesets first
         vars = ()
-        q = """SELECT fs.id, fs.instrument, fs.experiment, fs.run_number run, 
+        q = """SELECT fs.id, fs.instrument, fs.experiment, fs.run_number run, fs.priority priority,
             DATE_FORMAT(fs.created, GET_FORMAT(DATETIME,'ISO')) created, st.name status
             FROM fileset fs, fileset_status_def st
             WHERE st.id = fs.fk_fileset_status"""
@@ -166,22 +166,38 @@ class IcdbModel ( InterfaceDb ) :
 
         return res.values()
     
-    def create_request(self, instrument, experiment, run, force=False):
+    def create_request(self, instrument, experiment, run, force=False, priority=0):
         """Create new translation request, returns request object."""
         
         icdb = InterfaceDb(self._conn.connection())
         stat = 'Initial_Entry'
-        id = icdb.new_fileset(instrument, experiment, run, 'DATA', [], force, stat)
-        return dict(id=id, instrument=instrument, experiment=experiment,
-                    run=run, time=Time.now().toString("%F %T"), status=stat)
+        id = icdb.new_fileset(instrument, experiment, run, 'DATA', [], force, stat, priority)
+
+        res = self.requests(id)
+        if res : 
+            res = res[0]
+        else :
+            res = None
+        return res
+
+    def change_request_priority(self, id, priority):
+        """Change priority of existing request."""
+        
+        icdb = InterfaceDb(self._conn.connection())
+        icdb.change_fileset_priority(id, priority)
+
+        res = self.requests(id)
+        if res : 
+            res = res[0]
+        else :
+            res = None
+        return res
 
     def delete_request(self, id):
         """Create new translation request, returns request object."""
         
         icdb = InterfaceDb(self._conn.connection())
-        id = icdb.remove_fileset_id(id)
-
-
+        icdb.remove_fileset_id(id)
 
     def active_index(self, instrument, experiment):
         """Get the list of active experiments"""

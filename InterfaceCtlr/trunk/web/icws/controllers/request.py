@@ -57,6 +57,13 @@ class _CreateNewRequestForm(formencode.Schema):
     experiment = formencode.validators.String(not_empty=True)
     runs = formencode.validators.String(not_empty=True)
     force = formencode.validators.StringBool(if_empty=False)
+    priority = formencode.validators.Int(if_empty=0)
+
+class _UpdateRequestForm(formencode.Schema):
+    allow_extra_fields = True
+    filter_extra_fields = True
+    if_key_missing = ""
+    priority = formencode.validators.Int(if_empty=0)
 
 #------------------------
 # Exported definitions --
@@ -121,6 +128,7 @@ class RequestController ( BaseController ) :
         experiment = form_result['experiment']
         runs = form_result['runs']
         force = form_result['force']
+        priority = form_result['priority']
 
         # check user's privileges
         h.checkAccess(instrument, experiment, 'create')
@@ -133,7 +141,7 @@ class RequestController ( BaseController ) :
             if type(run) != type(1):
                 abort(400, "Invalid run number: %s (runs=%s)" % (run, runs))
             try :
-                req = model.create_request(instrument, experiment, run, force)
+                req = model.create_request(instrument, experiment, run, force, priority)
                 req['url'] = h.url_for( action='requests', id=req['id'] )
                 res.append(req)
             except Exception, exc:
@@ -147,20 +155,72 @@ class RequestController ( BaseController ) :
         return res
 
     @jsonify
-    def delete ( self, id ) :
-        """DElete request"""
+    def update ( self, id ) :
+        """Create new request"""
 
+        try:
+            id = int(id)
+        except Exception, e:
+            abort(404, 'Non-integer request id: ' + repr(id))
+    
         # check that it exists and get its info    
         model = IcdbModel()
         data = model.requests(id)
-        if not data : abort(404, 'Request %s does not exist' % id)
+        if not data : abort(404, 'Request %d does not exist' % id)
         data = data[0]
         instr = data['instrument']
         exper = data['experiment']
         status = data['status']
         if status not in ('Initial_Entry', 'Waiting_Translation'):
-            abort(405, 'Cannot delete processed request: %s' % id)
+            abort(405, 'Cannot update processed request: %d' % id)
+
+        # check user's privileges
+        h.checkAccess(instr, exper, 'update')
             
+        # validate parameters
+        schema = _UpdateRequestForm()
+        try:
+            form_result = schema.to_python(dict(request.params))
+        except formencode.Invalid, error:
+            abort(400,str(error))
+        
+        priority = form_result['priority']
+
+        # send it all to model
+        res = []
+        code = 200
+        try :
+            req = model.change_request_priority(id, priority)
+            req['url'] = h.url_for( action='requests', id=req['id'] )
+        except Exception, exc:
+            # failed to update request, continue with others
+            #code = 400
+            req = dict(instrument=instrument, experiment=experiment,
+                run=run, status='Failed', message=str(exc))
+
+        response.status_int = code
+        return req
+
+    @jsonify
+    def delete ( self, id ) :
+        """DElete request"""
+
+        try:
+            id = int(id)
+        except Exception, e:
+            abort(404, 'Non-integer request id: ' + repr(id))
+    
+        # check that it exists and get its info    
+        model = IcdbModel()
+        data = model.requests(id)
+        if not data : abort(404, 'Request %d does not exist' % id)
+        data = data[0]
+        instr = data['instrument']
+        exper = data['experiment']
+        status = data['status']
+        if status not in ('Initial_Entry', 'Waiting_Translation'):
+            abort(405, 'Cannot delete processed request: %d' % id)
+
         # check user's privileges
         h.checkAccess(instr, exper, 'delete')
 

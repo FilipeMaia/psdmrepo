@@ -135,12 +135,12 @@ class IcWsStatus ( LusiPyApp ) :
             res_name = '/exp/%s/%s' % (self._args[0], self._args[1])
             res = WSResource( app, res_name )
             data = res.request( 'GET' )
-            fmt = '%6s  %-20s  %6s  %-19s  %s'
+            fmt = '%6s  %-20s  %6s  %4s  %-19s  %s'
             if data:
                 if not self._options.no_header :
-                    print fmt % ('Run', 'Status', 'ReqID', 'Req Time', 'Files')
+                    print fmt % ('Run', 'Status', 'ReqID', 'Prio', 'Req Time', 'Files')
                     print '  ----------------------------------------------------------------------------'
-                data = [ (d['run'], d['id'], d['created'], d['status'], d.get('xtc_files')) for d in data ]
+                data = [ (d['run'], d['id'], d['created'], d['status'], d.get('priority', 0), d.get('xtc_files')) for d in data ]
                 data.sort()
 
                 for d in data :
@@ -148,14 +148,16 @@ class IcWsStatus ( LusiPyApp ) :
                     reqid = str(d[1])
                     time = str(d[2])
                     stat = d[3]
-                    files = d[4]
+                    prio = d[4]
+                    files = d[5]
                     if not files : files = ['']
                     for f in files :
-                        print fmt % (run, stat, reqid, time, f)
+                        print fmt % (run, stat, reqid, prio, time, f)
                         run = ''
                         reqid = ''
                         time = ''
                         stat = ''
+                        prio = ''
                         
             else :
                 print 'No requests were found'

@@ -276,7 +276,7 @@ class InterfaceDb ( object ) :
                     FROM fileset AS fs, fileset_status_def AS stat, active_exp AS act
                     WHERE stat.name IN (""" + fmt + """) AND fs.fk_fileset_status = stat.id AND fs.locked = FALSE
                     AND fs.instrument = act.instrument AND fs.experiment = act.experiment
-                    ORDER BY fs.created ASC LIMIT 1 FOR UPDATE""", tuple(status) )
+                    ORDER BY fs.priority DESC, fs.created ASC LIMIT 1 FOR UPDATE""", tuple(status) )
         rows = cursor.fetchall()
         
         if rows :
@@ -370,6 +370,18 @@ class InterfaceDb ( object ) :
 
         cursor.execute("""UPDATE fileset SET fk_fileset_status = (SELECT id FROM fileset_status_def WHERE name=%s), locked = FALSE 
             WHERE fileset.id = %s""", (status, fileset_id) )
+
+    # ================================
+    # Change the priority of a request
+    # ================================
+
+    @_synchronized
+    @_transaction
+    def change_fileset_priority ( self, fileset_id, priority, cursor=None ) :
+
+        """ change the fileset to the requested status"""
+
+        cursor.execute("""UPDATE fileset SET priority = %s WHERE fileset.id = %s""", (priority, fileset_id) )
 
 
     # =====================================
@@ -509,7 +521,7 @@ class InterfaceDb ( object ) :
 
     @_synchronized
     @_transaction
-    def new_fileset (self, instr, exper, runnum, runtype, xtcfiles, duplicate=False, status = 'Waiting_Translation', cursor=None ) :
+    def new_fileset (self, instr, exper, runnum, runtype, xtcfiles, duplicate=False, status = 'Waiting_Translation', priority=0, cursor=None ) :
         """ Register new fileset.         
             @param instr        instrument name
             @param exper        experiment name
@@ -518,6 +530,7 @@ class InterfaceDb ( object ) :
             @param xtcfiles     list of path names
             @param duplicate    disable/enable duplicate filesets
             @param status       fileset status
+            @param priority     request priority
             
             Returns ID of the new fileset.
         """
@@ -538,8 +551,8 @@ class InterfaceDb ( object ) :
         stat = row[0]
            
         cursor.execute( """INSERT INTO fileset 
-            (fk_fileset_status,experiment,instrument,run_type,run_number,created,locked)
-            VALUES (%s,%s,%s,%s,%s,NOW(),1)""", ( stat, exper, instr, runtype, runnum ) )
+            (fk_fileset_status,experiment,instrument,run_type,run_number,created,locked,priority)
+            VALUES (%s,%s,%s,%s,%s,NOW(),1,%s)""", ( stat, exper, instr, runtype, runnum, priority ) )
         cursor.execute('SELECT LAST_INSERT_ID()')
         row = cursor.fetchone()
         newset = row[0]
