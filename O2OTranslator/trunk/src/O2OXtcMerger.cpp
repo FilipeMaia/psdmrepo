@@ -48,6 +48,18 @@ namespace {
     return (Pds::Dgram*)buf ;
   }
 
+  // read next datagram from a stream, skip some problematic stuff
+  Pds::Dgram* read_dg (O2OTranslator::O2OXtcDechunk* stream)
+  {
+    while ( true ) {
+      Pds::Dgram* dg = stream->next();
+      // skip Disable transitions, they mess up datagram order sometimes
+      if ( not dg or dg->seq.service() != Pds::TransitionId::Disable ) {
+        return dg;
+      }
+    }
+  }
+  
 }
 
 //		----------------------------------------
@@ -110,15 +122,8 @@ O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files,
     // create new stream
     O2OXtcDechunk* stream = new O2OXtcDechunk( streamFiles, maxDgSize, skipDamaged ) ;
     m_streams.push_back( stream ) ;
+    m_dgrams.push_back( ::read_dg(stream) ) ;
 
-    while ( true ) {
-      Pds::Dgram* dg = stream->next();
-      // skip Disable transitions, they mess up datagram order sometimes
-      if ( not dg or dg->seq.service() != Pds::TransitionId::Disable ) {
-        m_dgrams.push_back( dg ) ;
-        break;
-      }
-    }
   }
 
 }
@@ -172,14 +177,7 @@ O2OXtcMerger::next()
 
     // get next datagram from that stream
     MsgLog( logger, debug, "next -- read datagram from file: " << m_streams[stream]->chunkName().basename() ) ;
-    while ( true ) {
-      Pds::Dgram* dg = m_streams[stream]->next();
-      // skip Disable transitions, they mess up datagram order sometimes
-      if ( not dg or dg->seq.service() != Pds::TransitionId::Disable ) {
-        m_dgrams[stream] = dg ;
-        break;
-      }
-    }
+    m_dgrams[stream] = ::read_dg(m_streams[stream]) ;
 
   } else {
 
@@ -207,8 +205,7 @@ O2OXtcMerger::next()
     // datagram from every stream
     for ( unsigned i = 0 ; i < ns ; ++ i ) {
       if ( m_dgrams[i] ) {
-        MsgLog( logger, debug, "next -- read datagram from file: " << m_streams[i]->chunkName().basename() ) ;
-        m_dgrams[i] = m_streams[i]->next() ;
+        m_dgrams[i] = ::read_dg(m_streams[i]) ;
       }
     }
 
