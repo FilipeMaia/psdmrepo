@@ -252,7 +252,7 @@ class IcdbModel ( InterfaceDb ) :
         cursor = self._conn.cursor(True)
 
         # get all instruments/experiments
-        q = """SELECT fs.id, fs.instrument, fs.experiment, fs.run_number run, 
+        q = """SELECT fs.id, fs.instrument, fs.experiment, fs.run_number run, fs.priority priority,
             DATE_FORMAT(fs.created, GET_FORMAT(DATETIME,'ISO')) created, st.name status
             FROM fileset fs, fileset_status_def st
             WHERE st.id = fs.fk_fileset_status AND fs.instrument = %s AND fs.experiment = %s"""
