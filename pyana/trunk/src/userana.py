@@ -115,11 +115,13 @@ class evt_dispatch(object) :
 
     def finish(self, env):
         
+        _log.info("evt_dispatch.finish: %s", self.__dict__ )
+        
         # finish with run first if was not done yet
         if self.calibbegun :
             for userana in self.userObjects : 
                 if hasattr(userana, 'endcalibcycle'): userana.endcalibcycle( env )
-            self.runbegun = False
+            self.calibbegun = False
 
         # finish with run first if was not done yet
         if self.runbegun :

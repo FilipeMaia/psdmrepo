@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-17
+2010-08-23 - Andy Salnikov
+- bug fix, user module endrun() was not called if -n N option was given
+  to pyana (https://pswww.slac.stanford.edu/trac/psdm/ticket/30) 
+
 Tag: V00-00-16
 2010-07-07 - Andy Salnikov
 - in pyana update environment even if we skip the events, EPICS data 
