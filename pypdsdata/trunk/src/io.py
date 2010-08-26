@@ -79,31 +79,47 @@ class XtcStreamMerger(object) :
     def __init__ (self, streamItreators, l1OffsetSec = 0):
 
         self.m_streams = streamItreators
-        self.m_l1OffsetSec = l1OffsetSec
+        self.m_l1OffsetSec = int(l1OffsetSec)
+        self.m_l1OffsetNsec = int((l1OffsetSec-self.m_l1OffsetSec)*1e9)
         
         # list of datagrams per stream
         self.m_dgs = []
         for stream in self.m_streams :
-            try :
-                while True :
-                    dg = stream.next()
-                    # skip Disable transitions, they mess up datagram order sometimes
-                    if dg.seq.service() != xtc.TransitionId.Disable: break
-            except StopIteration :
-                dg = None
+            dg = XtcStreamMerger._readDgram(stream)
+            if dg: self._updateDgramTime(dg)
             self.m_dgs.append( dg )
             
         self.m_fname = None
         self.m_fpos = 0
 
+    @staticmethod
+    def _readDgram(stream):
+        """read next datagram from a stream, skip some problematic stuff"""
+        try :
+            while True :
+                dg = stream.next()
+                # skip Disable transitions, they mess up datagram order sometimes
+                if dg.seq.service() != xtc.TransitionId.Disable: break
+        except StopIteration :
+            dg = None
+        return dg
 
-    def _dgramTime(self, dg):
+    def _updateDgramTime(self, dg):
         """ corrects datagram time for L1Accept transitions """
-        if dg.seq.service == xtc.TransitionId.L1Accept :
+        if dg.seq.service() != xtc.TransitionId.L1Accept :
+
             time = dg.seq.clock()
-            return ClockTime( time.seconds()-self.m_l1OffsetSec, time.nanoseconds() )
-        else :
-            return dg.seq.clock()
+            sec = time.seconds() + self.m_l1OffsetSec;
+            nsec = time.nanoseconds() + self.m_l1OffsetNsec;
+            if nsec < 0 :
+                nsec += 1000000000
+                sec -= 1
+            elif nsec >= 1000000000 :
+                nsec -= 1000000000
+                sec += 1
+
+            newTime = xtc.ClockTime(sec, nsec) ;
+            dg.setClock( newTime )
             
     def __iter__ (self) :
         """ imagine we are iterator """
@@ -117,7 +133,7 @@ class XtcStreamMerger(object) :
         stream = -1
         for i in range(ns) :
             if self.m_dgs[i] :
-                if stream < 0 or self._dgramTime(self.m_dgs[stream]) > self._dgramTime(self.m_dgs[i]) :
+                if stream < 0 or self.m_dgs[stream].seq.clock() > self.m_dgs[i].seq.clock() :
                     stream = i
                     
         if stream < 0 :
@@ -136,14 +152,9 @@ class XtcStreamMerger(object) :
         # all other datagram types must appear in all streams, return only one copy
         if nextdg.seq.service() == xtc.TransitionId.L1Accept :
 
-            try :
-                while True:
-                    dg = self.m_streams[stream].next()
-                    self.m_dgs[stream] = dg
-                    # skip Disable transitions, they mess up datagram order sometimes
-                    if dg.seq.service() != xtc.TransitionId.Disable: break
-            except StopIteration :
-                self.m_dgs[stream] = None
+            dg = XtcStreamMerger._readDgram(self.m_streams[stream])
+            if dg: self._updateDgramTime(dg)
+            self.m_dgs[stream] = dg
 
         else :
 
@@ -174,10 +185,9 @@ class XtcStreamMerger(object) :
 
             # advance all iterators to next datagram
             for i in range(ns) :
-                try :
-                    self.m_dgs[i] = self.m_streams[i].next()
-                except StopIteration :
-                    self.m_dgs[i] = None
+                dg = XtcStreamMerger._readDgram(self.m_streams[i])
+                if dg: self._updateDgramTime(dg)
+                self.m_dgs[i] = dg
             
         return nextdg
 

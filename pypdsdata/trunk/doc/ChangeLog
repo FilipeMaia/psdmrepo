@@ -1,4 +1,10 @@
 
+2010-08-13 - V00-00-16
+======================
+- added method xtc.Dgram.setClock() to change datagram time
+- io.XtcStreamMerger now changes datagram time
+- pyxtcreader has --l1-offset option
+
 2010-08-12 - V00-00-15
 ======================
 - upgrading to pdsdata V02-06-00

@@ -76,8 +76,9 @@ def _scan( xtc, offset=1, verbose=0 ) :
 def main( argv ) :
 
     parser = OptionParser(usage="%prog [options] xtc-files ...")
-    parser.set_defaults(verbose=0)
+    parser.set_defaults(verbose=0, l1_offset=0)
     parser.add_option('-v', "--verbose", action='count')
+    parser.add_option('-l', "--l1-offset", type='float')
 
     (options, args) = parser.parse_args()
     verbose = options.verbose
@@ -88,7 +89,7 @@ def main( argv ) :
     logging.basicConfig(level=logging.INFO)
 
     # read datagrams one by one
-    xtciter = io.XtcMergeIterator( args )
+    xtciter = io.XtcMergeIterator( args, options.l1_offset )
     for dg in xtciter :
 
         if verbose > 1 :
@@ -100,8 +101,8 @@ def main( argv ) :
         xtc = dg.xtc
 
         # print datagram info
-        print "%s transition: type=%d, time=%u sec %u nsec, ticks=%u, fiducials=%u, control=%u, payloadSize=%d" \
-            % ( seq.service(), seq.type(), clock.seconds(), clock.nanoseconds(),
+        print "%s transition: damage=%#x, type=%d, time=%u.%09u, ticks=%u, fiducials=%u, control=%u, payloadSize=%d" \
+            % ( seq.service(), xtc.damage.value(), seq.type(), clock.seconds(), clock.nanoseconds(),
                 stamp.ticks(),stamp.fiducials(),stamp.control(), xtc.sizeofPayload() )
 
         # recursively dump Xtc info

@@ -25,6 +25,7 @@
 #include "Exception.h"
 #include "Sequence.h"
 #include "Xtc.h"
+#include "ClockTime.h"
 #include "pdsdata/xtc/Env.hh"
 
 //-----------------------------------------------------------------------
@@ -41,6 +42,7 @@ namespace {
   PyObject* Dgram_seq( PyObject* self, void* );
   PyObject* Dgram_xtc( PyObject* self, void* );
   PyObject* Dgram_getnewargs( PyObject* self, PyObject* );
+  PyObject* Dgram_setClock( PyObject* self, PyObject* args );
 
   PyGetSetDef getset[] = {
     { "env", Dgram_env, 0, "Returns the env field as a number.", 0 },
@@ -51,6 +53,7 @@ namespace {
 
   PyMethodDef methods[] = {
     { "__getnewargs__",    Dgram_getnewargs, METH_NOARGS, "Pickle support" },
+    { "setClock",          Dgram_setClock,   METH_VARARGS, "Updates clock value for datagram" },
     {0, 0, 0, 0}
    };
 
@@ -154,6 +157,29 @@ Dgram_getnewargs( PyObject* self, PyObject* )
   PyTuple_SET_ITEM(args, 0, pydata);
 
   return args;
+}
+
+PyObject*
+Dgram_setClock( PyObject* self, PyObject* args )
+{
+  Pds::Dgram* pdsobj = pypdsdata::Dgram::pdsObject(self);
+  if( not pdsobj ) return 0;
+
+  // parse args
+  PyObject* clockObj ;
+  if ( not PyArg_ParseTuple( args, "O:xtc.Sequence.setClock", &clockObj ) ) return 0;
+
+  if ( not pypdsdata::ClockTime::Object_TypeCheck( clockObj ) ) {
+    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a xtc.ClockTime object");
+    return 0;      
+  }
+  Pds::ClockTime& clock = pypdsdata::ClockTime::pdsObject( clockObj );
+
+  // there is no way to change clock field in datagram but there is 
+  // an assignment operator
+  pdsobj->seq = Pds::Sequence(clock, pdsobj->seq.stamp());
+
+  Py_RETURN_NONE;
 }
 
 }
