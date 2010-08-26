@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2010-08-26 Andy Salnikov
+- new method PListDataSetCreate::set_szip() to use szip compression
+
 Tag: V00-00-12
 2010-05-12 Andy Salnikov
 - new type VlenType, support for variable length types

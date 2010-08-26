@@ -50,6 +50,10 @@ namespace hdf5pp {
 class PListDataSetCreate  {
 public:
 
+  enum SzipMethod {
+	  EntropyCoding = H5_SZIP_EC_OPTION_MASK,
+	  NearestNeighbour = H5_SZIP_NN_OPTION_MASK };
+
   // Default constructor
   PListDataSetCreate () ;
 
@@ -67,6 +71,9 @@ public:
 
   // set deflate compression method
   void set_deflate ( unsigned level ) ;
+
+  // set deflate compression method
+  void set_szip ( unsigned mask, unsigned block_size ) ;
 
   // set n-bit compression method
   void set_nbit () ;

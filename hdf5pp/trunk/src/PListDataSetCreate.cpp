@@ -80,6 +80,16 @@ PListDataSetCreate::set_deflate ( unsigned level )
   }
 }
 
+// set szip compression method
+void
+PListDataSetCreate::set_szip( unsigned mask, unsigned block_size )
+{
+  herr_t stat = H5Pset_szip ( m_impl.id(), mask, block_size ) ;
+  if ( stat < 0 ) {
+    throw Hdf5CallException ( "PListDataSetCreate::set_szip", "H5Pset_szip" ) ;
+  }
+}
+
 // set n-bit compression method
 void
 PListDataSetCreate::set_nbit ()
