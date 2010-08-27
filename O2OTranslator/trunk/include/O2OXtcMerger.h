@@ -65,7 +65,7 @@ public:
                  size_t maxDgSize,
                  MergeMode mode,
                  bool skipDamaged,
-                 int l1OffsetSec = 0 ) ;
+                 double l1OffsetSec = 0 ) ;
 
   // Destructor
   ~O2OXtcMerger () ;
@@ -76,12 +76,25 @@ public:
 
 protected:
 
-  Pds::ClockTime dgramTime(const Pds::Dgram& dgram) const {
-    if ( dgram.seq.service() == Pds::TransitionId::L1Accept ) {
+  void updateDgramTime(Pds::Dgram& dgram) const {
+    if ( dgram.seq.service() != Pds::TransitionId::L1Accept ) {
+
+      // update clock values
       const Pds::ClockTime& time = dgram.seq.clock() ;
-      return Pds::ClockTime( time.seconds()-m_l1OffsetSec, time.nanoseconds() ) ;
-    } else {
-      return dgram.seq.clock() ;
+      int32_t sec = time.seconds() + m_l1OffsetSec;
+      int32_t nsec = time.nanoseconds() + m_l1OffsetNsec;
+      if (nsec < 0) {
+          nsec += 1000000000;
+          -- sec;
+      } else if (nsec >= 1000000000) {
+          nsec -= 1000000000;
+          ++ sec;
+      }      
+      Pds::ClockTime newTime(sec, nsec) ;
+
+      // there is no way to change clock field in datagram but there is 
+      // an assignment operator
+      dgram.seq = Pds::Sequence(newTime, dgram.seq.stamp());
     }
   }
 
@@ -91,7 +104,8 @@ private:
   std::vector<O2OXtcDechunk*> m_streams ;
   std::vector<Pds::Dgram*> m_dgrams ;
   MergeMode m_mode ;
-  int m_l1OffsetSec ;
+  int32_t m_l1OffsetSec ;
+  int32_t m_l1OffsetNsec ;
 
   // Copy constructor and assignment are disabled by default
   O2OXtcMerger ( const O2OXtcMerger& ) ;

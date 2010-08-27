@@ -75,11 +75,12 @@ O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files,
                              size_t maxDgSize,
                              MergeMode mode,
                              bool skipDamaged,
-                             int l1OffsetSec )
+                             double l1OffsetSec )
   : m_streams()
   , m_dgrams()
   , m_mode(mode)
-  , m_l1OffsetSec(l1OffsetSec)
+  , m_l1OffsetSec(int(l1OffsetSec))
+  , m_l1OffsetNsec(int((l1OffsetSec-m_l1OffsetSec)*1e9))
 {
   // check that we have at least one input stream
   if ( files.empty() ) {
@@ -122,7 +123,9 @@ O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files,
     // create new stream
     O2OXtcDechunk* stream = new O2OXtcDechunk( streamFiles, maxDgSize, skipDamaged ) ;
     m_streams.push_back( stream ) ;
-    m_dgrams.push_back( ::read_dg(stream) ) ;
+    Pds::Dgram* dg = ::read_dg(stream);
+    if ( dg ) updateDgramTime( *dg );
+    m_dgrams.push_back( dg ) ;
 
   }
 
@@ -149,7 +152,7 @@ O2OXtcMerger::next()
   int stream = -1 ;
   for ( unsigned i = 0 ; i < ns ; ++ i ) {
     if ( m_dgrams[i] ) {
-      if ( stream < 0 or dgramTime(*m_dgrams[stream]) > dgramTime(*m_dgrams[i]) ) {
+      if ( stream < 0 or m_dgrams[stream]->seq.clock() > m_dgrams[i]->seq.clock() ) {
         stream = i ;
       }
     }
@@ -177,7 +180,9 @@ O2OXtcMerger::next()
 
     // get next datagram from that stream
     MsgLog( logger, debug, "next -- read datagram from file: " << m_streams[stream]->chunkName().basename() ) ;
-    m_dgrams[stream] = ::read_dg(m_streams[stream]) ;
+    Pds::Dgram* dg = ::read_dg(m_streams[stream]) ;
+    if ( dg ) updateDgramTime( *dg );
+    m_dgrams[stream] = dg ;
 
   } else {
 
@@ -205,7 +210,9 @@ O2OXtcMerger::next()
     // datagram from every stream
     for ( unsigned i = 0 ; i < ns ; ++ i ) {
       if ( m_dgrams[i] ) {
-        m_dgrams[i] = ::read_dg(m_streams[i]) ;
+        Pds::Dgram* dg = ::read_dg(m_streams[i]) ;
+        if ( dg ) updateDgramTime( *dg );
+        m_dgrams[i] = dg ;
       }
     }
 

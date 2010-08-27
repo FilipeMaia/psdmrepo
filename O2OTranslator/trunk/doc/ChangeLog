@@ -11,10 +11,16 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-07
+2010-08-12 Andy Salnikov
+- O2OXtcMerger now changes datagram clock time
+- l1OffsetSec is now double so can have sub-second precision
+- o2o-scanner has --l1-offset option too
+
 Tag: V00-07-06
 2010-08-12 Andy Salnikov
 - not all Disable transitions were disabled (tag V00-07-04) which again
-  led to su=ync troubles in some rare cases, now disabling all Disable
+  led to sync troubles in some rare cases, now disabling all Disable
 
 Tag: V00-07-05
 2010-08-11 Andy Salnikov

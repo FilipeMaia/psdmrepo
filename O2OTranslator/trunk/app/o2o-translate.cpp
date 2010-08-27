@@ -93,7 +93,7 @@ private:
   AppCmdOpt<std::string>      m_experiment ;
   AppCmdOptBool               m_extGroups ;
   AppCmdOpt<std::string>      m_instrument ;
-  AppCmdOpt<int>              m_l1offset ;
+  AppCmdOpt<double>           m_l1offset ;
   AppCmdOpt<std::string>      m_mdConnStr ;
   AppCmdOptNamedValue<O2OXtcMerger::MergeMode> m_mergeMode ;
   AppCmdOptList<std::string>  m_metadata ;
