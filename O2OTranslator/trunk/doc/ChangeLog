@@ -12,7 +12,7 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-07-07
-2010-08-12 Andy Salnikov
+2010-08-26 Andy Salnikov
 - O2OXtcMerger now changes datagram clock time
 - l1OffsetSec is now double so can have sub-second precision
 - o2o-scanner has --l1-offset option too
