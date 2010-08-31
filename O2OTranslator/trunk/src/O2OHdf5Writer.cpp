@@ -158,8 +158,13 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
     fapl.set_family_driver ( splitSize, hdf5pp::PListFileAccess() ) ;
   }
 
+  // change the size of the B-Tree for chunked datasets
+  hdf5pp::PListFileCreate fcpl;
+  fcpl.set_istore_k(2); 
+  fcpl.set_sym_k(2, 2); 
+  
   hdf5pp::File::CreateMode mode = overwrite ? hdf5pp::File::Truncate : hdf5pp::File::Exclusive ;
-  m_file = hdf5pp::File::create ( fileTempl, mode, hdf5pp::PListFileCreate(), fapl ) ;
+  m_file = hdf5pp::File::create ( fileTempl, mode, fcpl, fapl ) ;
 
   // add UUID to the file attributes
   uuid_t uuid ;
@@ -282,7 +287,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_PimImageConfig, 1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
-  hsize_t chunk_size = 128*1024 ;
+  hsize_t chunk_size = 16*1024 ;
 
   // instantiate all factories for event converters
   converter.reset( new EvtDataTypeCvtDef<H5DataTypes::CameraTwoDGaussianV1> (
@@ -363,8 +368,8 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 //  typeId =  Pds::TypeId(Pds::TypeId::Id_Epics,1).value() ;
 //  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
-  // Epics converter
-  converter.reset( new EpicsDataTypeCvt( "Epics::EpicsPv", chunk_size, m_compression ) ) ;
+  // Epics converter, non-default chunk size
+  converter.reset( new EpicsDataTypeCvt( "Epics::EpicsPv", 1024, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_Epics,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 

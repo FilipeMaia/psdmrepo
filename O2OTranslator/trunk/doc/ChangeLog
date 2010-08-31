@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-08
+2010-08-31 Andy Salnikov
+- O2OHdf5Writer - use file creation property list to change the sizes
+  of the b-rtrees in a file, this should reduce overhead that we see 
+  for XPP data
+
 Tag: V00-07-07
 2010-08-26 Andy Salnikov
 - O2OXtcMerger now changes datagram clock time
