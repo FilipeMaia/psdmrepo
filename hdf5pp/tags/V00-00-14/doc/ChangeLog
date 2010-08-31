@@ -1,0 +1,79 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package hdf5pp
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-14
+2010-08-31 Andy Salnikov
+- new methods in PListFileCreate class to control various aspects
+  of file creation
+
+Tag: V00-00-13
+2010-08-26 Andy Salnikov
+- new method PListDataSetCreate::set_szip() to use szip compression
+
+Tag: V00-00-12
+2010-05-12 Andy Salnikov
+- new type VlenType, support for variable length types
+
+Tag: V00-00-10
+2009-11-24 Andy Salnikov
+- small changes, removed DataSet::createDataSet() without type parameter
+
+Tag: V00-00-09
+2009-10-08 Andy Salnikov
+- Group: new method hasChild()
+- Type: new factory method Copy(), new method set_size()
+- ArrayType: new template factory method arrayType()
+
+Tag: V00-00-08
+2009-09-08 Andy Salnikov
+- added comparison operators to Group class
+
+Tag: V00-00-07
+2009-08-26 Andy Salnikov
+- added valid() method to bunch of classes
+
+Tag: V00-00-06
+2009-06-26 Andy Salnikov
+- add createAttr/openAttr methods to File class. These are for 
+  convenience only, they are equivalent to opening top-level group in
+  the file an working with its attributes 
+
+Tag: V00-00-05
+2009-04-22 Andy Salnikov
+- added PListDataSetCreate::set_nbit(), Type::set_precision() and 
+  Type::copy() methods
+
+Tag: V00-00-04
+2009-04-22 Andy Salnikov
+- added Type::size() method
+
+Tag: V00-00-03
+2009-04-10 Andy Salnikov
+- allow dynamic data type specification when constructing DataSet
+
+Tag: V00-00-02
+2009-04-07 Andy Salnikov
+- split Types.h into ArrayTypes, EnumType, etc.
+- TypeTraits method now returns Type object instead of HDF5 hid
+- TypeTraits have two different methods for native type vs stored type
+- unspecialized TypeTraits have has "reasonable" implementation that
+  depends on the methods provided by the type itself
+
+Tag: V00-00-01
+2009-04-06 Andy Salnikov
+- many changes, woork in progress
+
+Tag: V00-00-00
+2009-04-03 Andy Salnikov
+- first import into repository, half-working basic something
+
