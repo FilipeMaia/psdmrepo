@@ -23,6 +23,27 @@ COMMENT = 'Contains one row for each translator node.';
 SHOW WARNINGS;
 
 -- -----------------------------------------------------
+-- Table `node2instr`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `node2instr` ;
+
+SHOW WARNINGS;
+CREATE  TABLE IF NOT EXISTS `node2instr` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `translator_node_id` INT UNSIGNED NOT NULL,
+  `instrument` TINYTEXT NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `node_id_fk`
+    FOREIGN KEY (`translator_node_id` )
+    REFERENCES `interface_db`.`translator_node` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = 'Defines allowed instruments for particular node.';
+
+SHOW WARNINGS;
+
+-- -----------------------------------------------------
 -- Table `interface_controller`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `interface_controller` ;
@@ -324,7 +345,9 @@ CREATE  TABLE IF NOT EXISTS `config_def` (
   `param` TINYTEXT NOT NULL ,
   `value` TINYTEXT NOT NULL ,
   `type` ENUM('Integer','Float','String','Date/Time') NOT NULL ,
-  `description` TEXT NULL )
+  `description` TEXT NULL,
+  `instrument` TINYTEXT NULL,
+  `experiment` TINYTEXT NULL)
 ENGINE = InnoDB
 COMMENT = 'Interface DB & controller config params.';
 

@@ -92,8 +92,9 @@ class TranslatorThread ( threading.Thread ) :
 
         # setup file manager
         self._file_mgr = None
-        if self._config.get('filemanager-irods-command',None) :
-            self._file_mgr = FileMgrIrods( self._config['filemanager-irods-command'], self._config, self._log )
+        irods_cmd = self._get_config('filemanager-irods-command')
+        if irods_cmd :
+            self._file_mgr = FileMgrIrods( irods_cmd, self._config, self._log )
 
     # ======================
     # Process single fileset
@@ -108,7 +109,7 @@ class TranslatorThread ( threading.Thread ) :
         self._db.change_fileset_status (fs_id, 'Being_Translated')
         
         # store XTC files in file manager
-        fm_xtc_dir = self._config.get('filemanager-xtc-dir',None)
+        fm_xtc_dir = self._get_config('filemanager-xtc-dir')
         if self._file_mgr and fm_xtc_dir :
             for xtc in fs['xtc_files'] :
                 basename = xtc.split('/')[-1]
@@ -208,7 +209,7 @@ class TranslatorThread ( threading.Thread ) :
         tmpdirname = os.path.join(dir_name,tmpdirname)
         
         # Now construct the output file name
-        h5name = self._config.get('hdf5-file-name',None)
+        h5name = self._get_config('hdf5-file-name')
         if not h5name : h5name = "%(experiment)s-r%(run_number)04d-c{seq2}.h5"
         h5name = h5name % fsdbinfo
 
@@ -248,12 +249,12 @@ class TranslatorThread ( threading.Thread ) :
         cmd_list.append(fname_dict['h5name'])
 
         # add options files
-        for f in self._config.get('list:o2o-options-file',[]) :
+        for f in self._get_config('list:o2o-options-file',[]) :
             cmd_list.append("--options-file")
             cmd_list.append(f)
 
         # any extra options
-        for opt in self._config.get('list:o2o-extra-options',[]) :
+        for opt in self._get_config('list:o2o-extra-options',[]) :
             cmd_list.extend( opt.split() )
 
         for xtc in fs['xtc_files']:
@@ -350,7 +351,7 @@ class TranslatorThread ( threading.Thread ) :
 
         # archive them
         result = 0
-        fm_hdf_dir = self._config.get('filemanager-hdf5-dir',None)
+        fm_hdf_dir = self._get_config('filemanager-hdf5-dir')
         if fm_hdf_dir :
             
             fm_hdf_dir = fm_hdf_dir % fs
@@ -397,8 +398,11 @@ class TranslatorThread ( threading.Thread ) :
             #parent
             
             return pid
-            
-            
+
+    def _get_config(self, option, default = None):
+        val = self._config.get(option, self._fs['instrument'], self._fs['experiment'])
+        if val is None : return default
+        return val
             
     #                                                                                                                                                 
     #  Logging methods                                                                                                                                

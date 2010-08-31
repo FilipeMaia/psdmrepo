@@ -44,6 +44,7 @@ from pprint import *
 # Imports for other modules --
 #-----------------------------
 from LusiTime.Time import Time
+from InterfaceCtlr.Config import Config
 
 #----------------------------------
 # Local non-exported definitions --
@@ -144,6 +145,10 @@ class InterfaceDb ( object ) :
         proc_id = os.getpid()
         start  = Time.now()
 
+        # get allowed instruments
+        cursor.execute( """SELECT instrument FROM node2instr WHERE translator_node_id = %s""", (xlatenode_id,) )
+        instruments = [row[0] for row in cursor.fetchall()]
+
         # define new controller instance
         cursor.execute("""INSERT INTO interface_controller 
             (id, fk_translator_node, process_id, kill_ic, started, log)
@@ -153,7 +158,10 @@ class InterfaceDb ( object ) :
         rows = cursor.fetchall()
         controller_id = rows[0][0]
         
-        return dict ( id=controller_id, translate_uri=translate_uri, log_uri=log_uri)
+        return dict ( id=controller_id, 
+                      instruments=instruments,
+                      translate_uri=translate_uri, 
+                      log_uri=log_uri)
 
     @_synchronized
     @_transaction
@@ -197,16 +205,10 @@ class InterfaceDb ( object ) :
     # get configuration information from database
     # ===========================================
 
-    @_synchronized
-    @_transaction
-    def get_config(self, section, cursor=None):
-        """ read single configuration section from database """
-        return self.__get_config( section, cursor )
-
     def __get_config(self, section, cursor):
         """ read single configuration section from database """
         
-        q = "SELECT param, value, type FROM config_def WHERE section=%s"
+        q = "SELECT param, value, type, instrument, experiment FROM config_def WHERE section=%s"
         cursor.execute( q, ( section, ) )
         res = cursor.fetchall()
         cursor.execute("COMMIT")
@@ -215,14 +217,13 @@ class InterfaceDb ( object ) :
                     'Float':     float,
                     'Date/Time': Time.parse }
 
-        config = {}
+        config = Config()
         for row in res :
             param = row[0]
             value = parsers.get(row[2], lambda x: x)(row[1])
-            if param.startswith('list:') :
-                config.setdefault(param, []).append(value)
-            else :
-                config[param] = value
+            instr = row[3]
+            exper = row[4]
+            config.add(param, value, instr, exper)
 
         return config
 
@@ -232,11 +233,11 @@ class InterfaceDb ( object ) :
 
     @_synchronized
     @_transaction
-    def read_config (self, sections, verbose=False, cursor=None):
+    def read_config (self, sections, verbose=0, cursor=None):
         """ read all configuration sections from database """
 
         # throw away all we got
-        fullconfig = {}
+        fullconfig = Config()
 
         # get configuration from database
         for section in sections :
@@ -245,13 +246,9 @@ class InterfaceDb ( object ) :
             config = self.__get_config(section,cursor)
             if verbose :
                 self._log.info ( 'config[%s] = %s', section, pformat(config) )
-                
+
             # merge configurations
-            for k, v in config.iteritems() :
-                if k.startswith('list:') :
-                    fullconfig.setdefault(k, []).extend(v)
-                else :
-                    fullconfig[k] = v
+            fullconfig.merge(config)
         
         return fullconfig
 
@@ -261,22 +258,26 @@ class InterfaceDb ( object ) :
 
     @_synchronized
     @_transaction
-    def get_fileset ( self, *status, **kwargs ) :
+    def get_fileset ( self, status, instruments=None, cursor=None ) :
 
         """return a fileset id with the specified status or None if
         no fileset exists with that status"""
         
         fs = None
-
-        cursor = kwargs['cursor']
         
         # find a matching fileset and lock it for update
-        fmt = ','.join(['%s']*len(status))
-        cursor.execute("""SELECT fs.id AS id, fs.experiment, fs.instrument, run_type, run_number, stat.name as status
+        q = """SELECT fs.id AS id, fs.experiment, fs.instrument, run_type, run_number, stat.name as status
                     FROM fileset AS fs, fileset_status_def AS stat, active_exp AS act
-                    WHERE stat.name IN (""" + fmt + """) AND fs.fk_fileset_status = stat.id AND fs.locked = FALSE
-                    AND fs.instrument = act.instrument AND fs.experiment = act.experiment
-                    ORDER BY fs.priority DESC, fs.created ASC LIMIT 1 FOR UPDATE""", tuple(status) )
+                    WHERE stat.name = %s AND fs.fk_fileset_status = stat.id AND fs.locked = FALSE
+                    AND fs.instrument = act.instrument AND fs.experiment = act.experiment"""
+        vars = (status,)
+        if instruments :
+            fmt = ','.join(['%s']*len(instruments))
+            q += " AND fs.instrument IN (" + fmt + ')'
+            vars += tuple(instruments)
+        q += " ORDER BY fs.priority DESC, fs.created ASC LIMIT 1 FOR UPDATE"
+
+        cursor.execute(q, vars)
         rows = cursor.fetchall()
         
         if rows :

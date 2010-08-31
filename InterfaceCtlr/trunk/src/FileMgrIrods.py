@@ -68,8 +68,9 @@ class FileMgrIrods ( object ) :
         
         # update our environment
         for env in ['irodsHost','irodsDefResource','irodsPort','irodsZone','irodsUserName','irodsAuthFileName'] :
-            if env in config :
-                os.putenv( env, str(config[env]) )
+            val = config.get(env)
+            if val:
+                os.putenv( env, val )
 
     #-------------------
     #  Public methods --

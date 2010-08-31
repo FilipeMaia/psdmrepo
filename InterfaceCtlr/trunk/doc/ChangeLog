@@ -11,9 +11,22 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-00
+2010-08-31 Andy Salnikov
+- add support for dedicated nodes on per-instrument basis
+  - database has new table node2instr which links translator nodes 
+    with the list of the instrument names
+  - if the list of instruments in the above table is not empty then 
+    the node processes requests only from that instrument
+- add support for experiment specific configuration 
+  - config_def table has two additional fields - instrument and 
+    experiment. If their values are NULL then they apply to all 
+    experiments, otherwise they only apply to specific instrument or
+    experiment overwriting less specific values
+
 Tag: V00-06-01
 2010-08-12 Andy Salnikov
-- one query was missing priority field 
+- add support for  
 
 Tag: V00-06-00
 2010-08-12 Andy Salnikov

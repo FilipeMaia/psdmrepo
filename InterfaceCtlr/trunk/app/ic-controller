@@ -51,6 +51,7 @@ from LusiPython.LusiPyApp import LusiPyApp
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+from InterfaceCtlr.Config import Config
 from InterfaceCtlr.TranslatorThread import TranslatorThread
 from InterfaceCtlr.InterfaceDb import InterfaceDb
 from LusiPython.DbConnection import DbConnection
@@ -118,8 +119,8 @@ class Controller ( LusiPyApp ) :
         # other instance variables
         self._db = None
         self._controller_id = None
-        self._config = {}
-        self._perm_config = {}
+        self._config = Config()
+        self._perm_config = Config()
         self._config_counter = 0
 
     # ==========================================
@@ -188,7 +189,7 @@ class Controller ( LusiPyApp ) :
                     # for which we need to find the files on disk
                     
                     # check if there is a fileset with Initial_Entry and find files for it
-                    fs = self._db.get_fileset('Initial_Entry')
+                    fs = self._db.get_fileset('Initial_Entry', self._config.get('_instruments'))
                     if fs:
                         fs_id = fs['id']
                         # check the files
@@ -207,7 +208,7 @@ class Controller ( LusiPyApp ) :
                                 self._db.change_fileset_status (fs_id, 'Waiting_Translation')
 
                     # now try to see if there is a fileset with files
-                    fs = self._db.get_fileset('Waiting_Translation')
+                    fs = self._db.get_fileset('Waiting_Translation', self._config.get('_instruments'))
                     if fs:
                         fs_id = fs['id']
                         # must have some files associated
@@ -289,11 +290,17 @@ class Controller ( LusiPyApp ) :
         ctrl = self._db.new_controller( host, self._options.log )
         self._controller_id = ctrl['id']
 
-        self._perm_config["_log_uri"] = ctrl['log_uri']
-        self._perm_config["_translate_uri"] = ctrl['translate_uri']
-        self._perm_config["_controller_id"] = ctrl['id']
+        self._perm_config.add("_instruments", ctrl['instruments'])
+        self._perm_config.add("_log_uri", ctrl['log_uri'])
+        self._perm_config.add("_translate_uri", ctrl['translate_uri'])
+        self._perm_config.add("_controller_id", ctrl['id'])
 
         self.info ("Successful init_controller %d on host %s started %s", self._controller_id, host, Time.now() )
+        if ctrl['instruments'] :
+            self.info ("List of instruments accepted: %s", ctrl['instruments'] )
+        else :
+            self.info ("All instruments accepted")
+            
 
 
     # =========================================
@@ -306,7 +313,7 @@ class Controller ( LusiPyApp ) :
         self._config = self._db.read_config( self._options.config, self._config_counter == 0 )
         
         # add permanent configuration
-        self._config.update( self._perm_config )
+        self._config.merge( self._perm_config )
 
         self._config_counter += 1
 
@@ -316,11 +323,14 @@ class Controller ( LusiPyApp ) :
     
     def __find_files( self, fs ) :
         
-        xtc_root = self._config.get( 'xtc-location-root', None )
+        instr = fs['instrument']
+        exper = fs['experiment']
+        
+        xtc_root = self._config.get( 'xtc-location-root', instr, exper )
         if not xtc_root :
             self.error( 'configuration parameter xtc-location-root not defined, check -c options and config_def table' )
             return []
-        xtc_name_pattern = self._config.get( 'xtc-name-pattern', None )
+        xtc_name_pattern = self._config.get( 'xtc-name-pattern', instr, exper )
         if not xtc_name_pattern :
             self.error( 'configuration parameter xtc-name-pattern not defined, check -c options and config_def table' )
             return []
