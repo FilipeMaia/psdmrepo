@@ -1,0 +1,153 @@
+#!/bin/env python
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script check-regd-links...
+#
+#------------------------------------------------------------------------
+
+"""Checks the existence of the symlinks in /reg/d/psdm area.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+from optparse import OptionParser
+import smtplib
+import pwd
+import email
+import socket
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+
+#---------------------
+# Local definitions --
+#---------------------
+
+# top level directories to skip
+_l1_dirs_skip = ['logs', 'dgs']
+
+# second level directories to skip
+_l2_dirs_skip = ['data', 'scratch']
+
+_pjoin = os.path.join
+
+def _subdirs(dir):
+    """generator for the subdirs of given dir, excludes hidden directories"""    
+    for f in os.listdir(dir):
+        if not f.startswith('.') and os.path.isdir(_pjoin(dir,f)):
+            yield f
+
+def _email():
+    """get email address for current user"""
+    passwd = pwd.getpwuid(os.getuid())
+    hname = socket.getfqdn()
+    frm = passwd.pw_name + '@' + hname
+    return frm
+    
+    
+
+#---------------------------
+#  Application definition --
+#---------------------------
+
+def main (argv) :
+
+    parser = OptionParser(usage="usage: %prog [options] dst-dir src-dir [src-dir ...]")
+    parser.set_defaults( mail=None )
+    parser.set_defaults()
+    parser.add_option ( '-m', "--mail", help="specify user email to send notifications" )
+
+    options, args = parser.parse_args()
+    
+    # check the arguments
+    if len(args) < 2 :
+        parser.error("two or more arguments required")
+        return 2
+
+    dst = args[0]
+    srcs = args[1:]
+
+    # loop over all source directories
+    missing = []
+    for src in srcs :
+
+        # build the list of first and second level directories
+        for l1 in _subdirs(src) :
+            
+            # filter out some dirs
+            if l1 in _l1_dirs_skip : continue
+            
+            for l2 in _subdirs(_pjoin(src,l1)) :
+
+                # filter out some dirs
+                if l2 in _l2_dirs_skip : continue
+                
+                dir = _pjoin(l1,l2)
+                
+                dstdir = _pjoin(dst,dir)
+                #print "checking", dstdir
+                if not os.path.isdir(dstdir):
+                    missing.append(dstdir)
+
+    if missing:
+        
+        # report 
+
+        if options.mail:
+            # send mail
+            
+            frm = _email()
+
+            # construct message
+            msg = ["From: "+frm,
+                   "To: "+options.mail,
+                   "Subject: [check-regd-links] Missing links found in "+dst,
+                   "",
+                   "Missing directories found in "+dst+":"]
+            msg += missing
+            msg = '\r\n'.join(msg)
+            
+            smtp = smtplib.SMTP('localhost')
+            smtp.sendmail(frm, options.mail, msg)
+            smtp.quit()
+
+        else:
+            
+            # dump it
+            print "Missing directories:"
+            for dir in missing:
+                print dir
+
+        return 2
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    sys.exit(main(sys.argv[1:]))
