@@ -47,7 +47,7 @@ DgramReader::DgramReader ( const FileList& files,
                            size_t maxDgSize,
                            O2OXtcMerger::MergeMode mode,
                            bool skipDamaged,
-                           int l1OffsetSec )
+                           double l1OffsetSec )
   : m_files( files )
   , m_queue( queue )
   , m_maxDgSize( maxDgSize )
