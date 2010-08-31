@@ -50,7 +50,7 @@ import socket
 #---------------------
 
 # top level directories to skip
-_l1_dirs_skip = ['logs']
+_l1_dirs_skip = ['logs', 'dgs']
 
 # second level directories to skip
 _l2_dirs_skip = ['data', 'scratch']

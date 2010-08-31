@@ -6,10 +6,10 @@
 #
 
 # Number of translator instances to run
-translators=8
+translators=4
 
 # release directory
-release=/reg/g/psdm/sw/releases/0.2.10
+release=/reg/g/psdm/sw/releases/0.2.16
 #release=/reg/neh/home/salnikov/releases/ic-0.2.10
 
 # database options
