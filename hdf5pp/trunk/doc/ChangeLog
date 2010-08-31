@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-14
+2010-08-31 Andy Salnikov
+- new methods in PListFileCreate class to control various aspects
+  of file creation
+
 Tag: V00-00-13
 2010-08-26 Andy Salnikov
 - new method PListDataSetCreate::set_szip() to use szip compression

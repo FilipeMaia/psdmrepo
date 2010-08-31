@@ -58,6 +58,22 @@ public:
   // accessor
   hid_t plist() const { return m_impl.id() ; }
 
+  // set the node size for chunked datasets b-tree,
+  // see http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetIstoreK
+  void set_istore_k(unsigned ik) ;
+  
+  // set the parameters for symbols b-tree,
+  // see http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetSymK
+  void set_sym_k(unsigned ik, unsigned lk) ;
+  
+  // Sets user block size, see
+  // http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetUserblock
+  void set_userblock(hsize_t size);
+  
+  // Sets the byte size of the offsets and lengths in an HDF5 file,
+  // see http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetSizes
+  void set_sizes(size_t sizeof_addr, size_t sizeof_size); 
+
 protected:
 
 private:
