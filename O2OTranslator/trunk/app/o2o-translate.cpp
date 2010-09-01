@@ -261,11 +261,10 @@ O2O_Translate::runApp ()
         O2OXtcScannerI* scanner = *i ;
 
         try {
-          scanner->eventStart ( *dg ) ;
-
-          O2OXtcIterator iter( &(dg->xtc), scanner );
-          iter.iterate();
-
+          if ( scanner->eventStart ( *dg ) ) {    
+              O2OXtcIterator iter( &(dg->xtc), scanner );
+              iter.iterate();
+          }    
           scanner->eventEnd ( *dg ) ;
         } catch ( std::exception& e ) {
           MsgLogRoot( error, "exception caught processing datagram: " << e.what() ) ;

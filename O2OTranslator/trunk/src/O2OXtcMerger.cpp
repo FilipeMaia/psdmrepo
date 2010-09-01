@@ -48,18 +48,6 @@ namespace {
     return (Pds::Dgram*)buf ;
   }
 
-  // read next datagram from a stream, skip some problematic stuff
-  Pds::Dgram* read_dg (O2OTranslator::O2OXtcDechunk* stream)
-  {
-    while ( true ) {
-      Pds::Dgram* dg = stream->next();
-      // skip Disable transitions, they mess up datagram order sometimes
-      if ( not dg or dg->seq.service() != Pds::TransitionId::Disable ) {
-        return dg;
-      }
-    }
-  }
-  
 }
 
 //		----------------------------------------
@@ -123,7 +111,7 @@ O2OXtcMerger::O2OXtcMerger ( const std::list<O2OXtcFileName>& files,
     // create new stream
     O2OXtcDechunk* stream = new O2OXtcDechunk( streamFiles, maxDgSize, skipDamaged ) ;
     m_streams.push_back( stream ) ;
-    Pds::Dgram* dg = ::read_dg(stream);
+    Pds::Dgram* dg = stream->next();
     if ( dg ) updateDgramTime( *dg );
     m_dgrams.push_back( dg ) ;
 
@@ -174,52 +162,38 @@ O2OXtcMerger::next()
       << dg->seq.clock().seconds() << " sec " << dg->seq.clock().nanoseconds() << " nsec" ) ;
   MsgLog( logger, debug, "next -- m_dgrams[stream].service: " << Pds::TransitionId::name(dg->seq.service()) ) ;
 
-  // check the type of the datagram, for L1Accept give it to the caller,
-  // all other datagram types must appear in all streams, return only one copy
-  if ( dg->seq.service() == Pds::TransitionId::L1Accept ) {
-
-    // get next datagram from that stream
-    MsgLog( logger, debug, "next -- read datagram from file: " << m_streams[stream]->chunkName().basename() ) ;
-    Pds::Dgram* dg = ::read_dg(m_streams[stream]) ;
-    if ( dg ) updateDgramTime( *dg );
-    m_dgrams[stream] = dg ;
-
-  } else {
-
-    // make sure that all streams have the same type of datagram
-    for ( unsigned i = 0 ; i < ns ; ++ i ) {
-      if ( m_dgrams[i] and m_dgrams[i]->seq.service() != dg->seq.service() ) {
-        MsgLog( logger, error, "next -- streams desynchronized:"
-            << "\n    stream[" << stream << "] = "
-            << m_streams[stream]->chunkName().basename()
-            << " service = " << Pds::TransitionId::name(dg->seq.service())
-            << " time = " << dg->seq.clock().seconds() << " sec " << dg->seq.clock().nanoseconds() << " nsec"
-            << " damage = " << std::hex << dg->xtc.damage.value() << std::dec
-            << "\n    stream[" << i << "] = "
-            << m_streams[i]->chunkName().basename()
-            << " service = " << Pds::TransitionId::name(m_dgrams[i]->seq.service())
-            << " time = " << m_dgrams[i]->seq.clock().seconds() << " sec " << m_dgrams[i]->seq.clock().nanoseconds() << " nsec"
-            << " damage = " << std::hex << m_dgrams[i]->xtc.damage.value() << std::dec
-            ) ;
-        delete [] (char*)dg ;
-        throw O2OXTCSyncException() ;
-      }
-    }
-
-    // delete all datagrams except the one that we return and read next
-    // datagram from every stream
-    for ( unsigned i = 0 ; i < ns ; ++ i ) {
-      if ( m_dgrams[i] ) {
-        Pds::Dgram* dg = ::read_dg(m_streams[i]) ;
-        if ( dg ) updateDgramTime( *dg );
-        m_dgrams[i] = dg ;
-      }
-    }
-
-  }
+  // get next datagram from that stream
+  MsgLog( logger, debug, "next -- read datagram from file: " << m_streams[stream]->chunkName().basename() ) ;
+  Pds::Dgram* ndg = m_streams[stream]->next();
+  if ( ndg ) updateDgramTime( *ndg );
+  m_dgrams[stream] = ndg ;
 
   return dg ;
 }
 
+
+void 
+O2OXtcMerger::updateDgramTime(Pds::Dgram& dgram) const
+{
+  if ( dgram.seq.service() != Pds::TransitionId::L1Accept ) {
+
+    // update clock values
+    const Pds::ClockTime& time = dgram.seq.clock() ;
+    int32_t sec = time.seconds() + m_l1OffsetSec;
+    int32_t nsec = time.nanoseconds() + m_l1OffsetNsec;
+    if (nsec < 0) {
+        nsec += 1000000000;
+        -- sec;
+    } else if (nsec >= 1000000000) {
+        nsec -= 1000000000;
+        ++ sec;
+    }      
+    Pds::ClockTime newTime(sec, nsec) ;
+
+    // there is no way to change clock field in datagram but there is 
+    // an assignment operator
+    dgram.seq = Pds::Sequence(newTime, dgram.seq.stamp());
+  }
+}
 
 } // namespace O2OTranslator

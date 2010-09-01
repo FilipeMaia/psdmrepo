@@ -76,27 +76,8 @@ public:
 
 protected:
 
-  void updateDgramTime(Pds::Dgram& dgram) const {
-    if ( dgram.seq.service() != Pds::TransitionId::L1Accept ) {
-
-      // update clock values
-      const Pds::ClockTime& time = dgram.seq.clock() ;
-      int32_t sec = time.seconds() + m_l1OffsetSec;
-      int32_t nsec = time.nanoseconds() + m_l1OffsetNsec;
-      if (nsec < 0) {
-          nsec += 1000000000;
-          -- sec;
-      } else if (nsec >= 1000000000) {
-          nsec -= 1000000000;
-          ++ sec;
-      }      
-      Pds::ClockTime newTime(sec, nsec) ;
-
-      // there is no way to change clock field in datagram but there is 
-      // an assignment operator
-      dgram.seq = Pds::Sequence(newTime, dgram.seq.stamp());
-    }
-  }
+  // update time in datagram
+  void updateDgramTime(Pds::Dgram& dgram) const ;
 
 private:
 

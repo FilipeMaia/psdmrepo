@@ -19,6 +19,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <algorithm>
 #include <string>
 #include <uuid/uuid.h>
 
@@ -99,6 +100,8 @@ namespace {
         return "Running" ;
       case O2OHdf5Writer::CalibCycle :
         return "CalibCycle" ;
+      case O2OHdf5Writer::NumberOfStates :
+        break ;
     }
     return "*ERROR*" ;
   }
@@ -144,7 +147,11 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_stateCounters()
   , m_transition(Pds::TransitionId::Unknown)
   , m_configStore()
+  , m_transClock()
 {
+  std::fill_n(m_stateCounters, int(NumberOfStates), 0U);
+  std::fill_n(m_transClock, int(Pds::TransitionId::NumberOf), LusiTime::Time(0,0));
+    
   std::string fileTempl = m_nameFactory.makeH5Path ( split != NoSplit ) ;
   MsgLog( logger, debug, "O2OHdf5Writer - open output file " << fileTempl ) ;
 
@@ -399,7 +406,7 @@ O2OHdf5Writer::~O2OHdf5Writer ()
 }
 
 // signal start/end of the event (datagram)
-void
+bool
 O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
 {
   MsgLog( logger, debug, "O2OHdf5Writer::eventStart " << Pds::TransitionId::name(dgram.seq.service())
@@ -407,85 +414,106 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
           << " dgram.seq.service=" << Pds::TransitionId::name(dgram.seq.service()) ) ;
 
   m_transition = dgram.seq.service();
+  Pds::ClockTime clock = dgram.seq.clock();
+  LusiTime::Time t(clock.seconds(), clock.nanoseconds());
+  bool skip = false;
   switch ( m_transition ) {
 
     case Pds::TransitionId::Map :
 
-      // close all states
-      this->closeGroup( dgram, CalibCycle ) ;
-      this->closeGroup( dgram, Running ) ;
-      this->closeGroup( dgram, Configured ) ;
-      this->closeGroup( dgram, Mapped ) ;
-      this->openGroup( dgram, Mapped ) ;
-
+      if ( t != m_transClock[m_transition] ) {
+        // close all states
+        this->closeGroup( dgram, CalibCycle ) ;
+        this->closeGroup( dgram, Running ) ;
+        this->closeGroup( dgram, Configured ) ;
+        this->closeGroup( dgram, Mapped ) ;
+        this->openGroup( dgram, Mapped ) ;
+      }
       break ;
 
     case Pds::TransitionId::Unmap :
 
-      // close all states
-      this->closeGroup( dgram, CalibCycle ) ;
-      this->closeGroup( dgram, Running ) ;
-      this->closeGroup( dgram, Configured ) ;
-      this->closeGroup( dgram, Mapped ) ;
-
+      if ( t != m_transClock[m_transition] ) {
+        // close all states
+        this->closeGroup( dgram, CalibCycle ) ;
+        this->closeGroup( dgram, Running ) ;
+        this->closeGroup( dgram, Configured ) ;
+        this->closeGroup( dgram, Mapped ) ;
+      }
       break ;
 
     case Pds::TransitionId::Configure :
 
-      // close all states up to Mapped
-      this->closeGroup( dgram, CalibCycle ) ;
-      this->closeGroup( dgram, Running ) ;
-      this->closeGroup( dgram, Configured ) ;
-      this->openGroup( dgram, Configured ) ;
-
+      if ( t != m_transClock[m_transition] ) {
+        // close all states up to Mapped
+        this->closeGroup( dgram, CalibCycle ) ;
+        this->closeGroup( dgram, Running ) ;
+        this->closeGroup( dgram, Configured ) ;
+        this->openGroup( dgram, Configured ) ;
+      }
       break ;
 
     case Pds::TransitionId::Unconfigure :
 
-      // close all states up to Mapped
-      this->closeGroup( dgram, CalibCycle ) ;
-      this->closeGroup( dgram, Running ) ;
-      this->closeGroup( dgram, Configured ) ;
-      this->closeGroup( dgram, Mapped ) ;
-
+      if ( t != m_transClock[m_transition] ) {
+         // close all states up to Mapped
+        this->closeGroup( dgram, CalibCycle ) ;
+        this->closeGroup( dgram, Running ) ;
+        this->closeGroup( dgram, Configured ) ;
+        this->closeGroup( dgram, Mapped ) ;
+      }
       break ;
 
     case Pds::TransitionId::BeginRun :
 
-      // close all states up to Configured
-      this->closeGroup( dgram, CalibCycle ) ;
-      this->closeGroup( dgram, Running ) ;
-      this->openGroup( dgram, Running ) ;
-
+      if ( t != m_transClock[m_transition] ) {
+        // close all states up to Configured
+        this->closeGroup( dgram, CalibCycle ) ;
+        this->closeGroup( dgram, Running ) ;
+        this->openGroup( dgram, Running ) ;
+      }
       break ;
 
     case Pds::TransitionId::EndRun :
 
-      // close all states up to Configured
-      this->closeGroup( dgram, CalibCycle ) ;
-      this->closeGroup( dgram, Running ) ;
-
+      if ( t != m_transClock[m_transition] ) {
+        // close all states up to Configured
+        this->closeGroup( dgram, CalibCycle ) ;
+        this->closeGroup( dgram, Running ) ;
+      }
       break ;
 
     case Pds::TransitionId::BeginCalibCycle :
 
-      // close all states up to Running
-      this->closeGroup( dgram, CalibCycle ) ;
-      this->openGroup( dgram, CalibCycle ) ;
-
+      if ( t != m_transClock[m_transition] ) {
+        // close all states up to Running
+        this->closeGroup( dgram, CalibCycle ) ;
+        this->openGroup( dgram, CalibCycle ) ;
+      }
       break ;
 
     case Pds::TransitionId::EndCalibCycle :
 
-      // close all states up to Running
-      this->closeGroup( dgram, CalibCycle ) ;
+      if ( t != m_transClock[m_transition] ) {
+        // close all states up to Running
+        this->closeGroup( dgram, CalibCycle ) ;
+      }
 
       break ;
 
     case Pds::TransitionId::L1Accept :
 
       // store current event time
-      m_eventTime = H5DataTypes::XtcClockTime(dgram.seq.clock()) ;
+      m_eventTime = H5DataTypes::XtcClockTime(clock) ;
+      
+      // check the time, should not be sooner than begin of calib cycle
+      if ( t < m_transClock[Pds::TransitionId::BeginCalibCycle] ) {
+        MsgLog( logger, warning, "O2OHdf5Writer::eventStart: L1Accept time out of sync: "
+              << Pds::TransitionId::name(dgram.seq.service())
+              << " BeginCalibCycle time=" << m_transClock[Pds::TransitionId::BeginCalibCycle].toString("S%s%f")
+              << " L1Accept time=" << t.toString("S%s%f")) ;
+        skip = true;
+      }
 
       break ;
 
@@ -498,7 +526,12 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
       break ;
   }
 
+  // store the time of the transition
+  m_transClock[m_transition] = t;
+  
   MsgLog( logger, debug, "O2OHdf5Writer -- now in the state " << ::stateName(m_state.top()) ) ;
+  
+  return not skip;
 }
 
 void
@@ -525,6 +558,7 @@ O2OHdf5Writer::openGroup ( const Pds::Dgram& dgram, State state )
   case Running:
     m_stateCounters[CalibCycle] = 0;
   case CalibCycle:
+  case NumberOfStates:
     break;
   }
 
@@ -595,7 +629,7 @@ O2OHdf5Writer::dataObject ( const void* data, size_t size,
         << " version=" <<  typeId.version() ) ;
     m_configStore.store(typeId, src.top(), data, size);
   }
-
+  
   // find this type in the converter map
   CvtMap::iterator it = m_cvtMap.find( typeId.value() ) ;
   if ( it != m_cvtMap.end() ) {
@@ -639,6 +673,8 @@ O2OHdf5Writer::groupName( State state, unsigned counter ) const
     case O2OHdf5Writer::Undefined :
     default :
       prefix = "Undefined" ;
+      break ;
+    case O2OHdf5Writer::NumberOfStates:
       break ;
   }
 

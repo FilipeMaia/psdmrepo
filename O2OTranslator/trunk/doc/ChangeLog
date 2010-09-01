@@ -11,6 +11,16 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-00
+2010-09-01 Andy Salnikov
+- first attempt to handle split events, results are far from perfect yet
+  but usable for some limited value of usable
+- O2OXtcMerger does not actually merge anyhting, it simply returs all
+  datagrams to caller trying to arrange them in time order
+- O2OHdfWriter handles all remaining issues, it filters duplicate 
+  control datagrams and filters out L1Accept histograms that have 
+  unusual time stamps
+
 Tag: V00-07-08
 2010-08-31 Andy Salnikov
 - O2OHdf5Writer - use file creation property list to change the sizes

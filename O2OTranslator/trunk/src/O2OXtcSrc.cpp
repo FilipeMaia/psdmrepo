@@ -83,14 +83,6 @@ O2OXtcSrc::name() const
   const Pds::Src& top = m_src.back() ;
   if ( top.level() == Pds::Level::Control ) {
 
-    // at Control level we need to use the host name from upper Segment level
-    for ( unsigned i = m_src.size()-1 ; i > 0 ; -- i ) {
-      const Pds::Src& src = m_src[i-1] ;
-      if ( src.level() == Pds::Level::Segment ) {
-        return ::toName(src) ;
-      }
-    }
-
     // if segment was not found then use control as source
     return ::toName(top) ;
 

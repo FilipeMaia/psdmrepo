@@ -19,6 +19,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <algorithm>
 #include <iostream>
 #include <iomanip>
 
@@ -62,7 +63,9 @@ MetaDataScanner::MetaDataScanner (const O2OMetaData& metadata,
   , m_runBeginTime()
   , m_runEndTime()
   , m_stored(false)
+  , m_transClock()
 {
+  std::fill_n(m_transClock, int(Pds::TransitionId::NumberOf), LusiTime::Time(0,0));
 }
 
 //--------------
@@ -93,9 +96,13 @@ MetaDataScanner::~MetaDataScanner ()
 }
 
 // signal start/end of the event (datagram)
-void
+bool
 MetaDataScanner::eventStart ( const Pds::Dgram& dgram )
 {
+  Pds::TransitionId::Value transition = dgram.seq.service();
+  Pds::ClockTime clock = dgram.seq.clock();
+  LusiTime::Time t(clock.seconds(), clock.nanoseconds());
+
   if ( dgram.seq.service() == Pds::TransitionId::Map ) {
 
 
@@ -104,26 +111,32 @@ MetaDataScanner::eventStart ( const Pds::Dgram& dgram )
 
   } else if ( dgram.seq.service() == Pds::TransitionId::BeginRun ) {
 
-    // reset run-specific stats
-    resetRunInfo() ;
-
-    const Pds::ClockTime& t = dgram.seq.clock() ;
-    m_runBeginTime = LusiTime::Time ( t.seconds(), t.nanoseconds() ) ;
+    if ( t != m_transClock[transition] ) {
+      // reset run-specific stats
+      resetRunInfo() ;
+  
+      m_runBeginTime = t ;
+    }
 
   } else if ( dgram.seq.service() == Pds::TransitionId::L1Accept ) {
 
-    // increment counters
-    ++ m_nevents ;
-    m_eventSize += dgram.xtc.extent ;
+    // check the time, should not be sooner than begin of calib cycle
+    if ( t >= m_transClock[Pds::TransitionId::BeginCalibCycle] ) {
+      // increment counters
+      ++ m_nevents ;
+      m_eventSize += dgram.xtc.extent ;
+    }
 
   } else if ( dgram.seq.service() == Pds::TransitionId::EndRun ) {
 
-    const Pds::ClockTime& t = dgram.seq.clock() ;
-    m_runEndTime = LusiTime::Time ( t.seconds(), t.nanoseconds() ) ;
-
-    // store run-specific stats
-    storeRunInfo() ;
-    m_stored = true ;
+    if ( t != m_transClock[transition] ) {
+      const Pds::ClockTime& t = dgram.seq.clock() ;
+      m_runEndTime = LusiTime::Time ( t.seconds(), t.nanoseconds() ) ;
+  
+      // store run-specific stats
+      storeRunInfo() ;
+      m_stored = true ;
+    }
 
   } else if ( dgram.seq.service() == Pds::TransitionId::Unconfigure ) {
 
@@ -132,6 +145,11 @@ MetaDataScanner::eventStart ( const Pds::Dgram& dgram )
 
 
   }
+  
+  // store the time of the transition
+  m_transClock[transition] = t;
+  
+  return true;
 }
 
 void

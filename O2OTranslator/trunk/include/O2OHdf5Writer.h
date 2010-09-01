@@ -29,9 +29,10 @@
 #include "hdf5pp/File.h"
 #include "hdf5pp/Group.h"
 #include "H5DataTypes/XtcClockTime.h"
+#include "LusiTime/Time.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/DataTypeCvtI.h"
-#include "pdsdata/xtc//TransitionId.hh"
+#include "pdsdata/xtc/TransitionId.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -66,7 +67,8 @@ public:
   enum SplitMode { NoSplit, Family } ;
 
   // current XTC state
-  enum State { Undefined, Mapped, Configured, Running, CalibCycle } ;
+  enum State { Undefined, Mapped, Configured, Running, CalibCycle,
+               NumberOfStates } ;
 
   // Default constructor
   O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
@@ -81,7 +83,7 @@ public:
   virtual ~O2OHdf5Writer () ;
 
   // signal start/end of the event (datagram)
-  virtual void eventStart ( const Pds::Dgram& dgram ) ;
+  virtual bool eventStart ( const Pds::Dgram& dgram ) ;
   virtual void eventEnd ( const Pds::Dgram& dgram ) ;
 
   // signal start/end of the level
@@ -104,7 +106,8 @@ private:
 
   typedef boost::shared_ptr<DataTypeCvtI> DataTypeCvtPtr ;
   typedef std::multimap<uint32_t, DataTypeCvtPtr> CvtMap ;
-  typedef std::map<State,unsigned> StateCounters ;
+  typedef unsigned StateCounters[NumberOfStates] ;
+  typedef LusiTime::Time TransitionClock[Pds::TransitionId::NumberOf] ;
 
   // Data members
   const O2OFileNameFactory& m_nameFactory ;
@@ -119,6 +122,7 @@ private:
   StateCounters m_stateCounters ;
   Pds::TransitionId::Value m_transition;
   ConfigObjectStore m_configStore;
+  TransitionClock m_transClock;
 
   // close all containers
   void closeContainers() ;

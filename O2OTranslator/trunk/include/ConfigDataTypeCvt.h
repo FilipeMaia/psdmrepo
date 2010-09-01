@@ -87,6 +87,14 @@ public:
     // get the name of the group for this object
     const std::string& grpName = m_typeGroupName + "/" + src.name() ;
 
+    if ( m_groups.top().hasChild(m_typeGroupName) ) {
+      hdf5pp::Group typeGroup = m_groups.top().openGroup(m_typeGroupName);
+      if ( typeGroup.hasChild(src.name()) ) {
+        MsgLog("ConfigDataTypeCvt", trace, "group " << grpName << " already exists") ;
+        return;
+      }
+    }
+
     // create separate group
     hdf5pp::Group grp = m_groups.top().createGroup( grpName );
 

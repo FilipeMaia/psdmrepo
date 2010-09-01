@@ -23,6 +23,7 @@
 #include "LusiTime/Time.h"
 #include "O2OTranslator/O2OXtcScannerI.h"
 #include "pdsdata/xtc/ClockTime.hh"
+#include "pdsdata/xtc/TransitionId.hh"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -62,7 +63,7 @@ public:
   virtual ~MetaDataScanner () ;
 
   // signal start/end of the event (datagram)
-  virtual void eventStart ( const Pds::Dgram& dgram ) ;
+  virtual bool eventStart ( const Pds::Dgram& dgram ) ;
   virtual void eventEnd ( const Pds::Dgram& dgram ) ;
 
   // signal start/end of the level
@@ -83,6 +84,8 @@ protected:
 
 private:
 
+  typedef LusiTime::Time TransitionClock[Pds::TransitionId::NumberOf] ;
+
   // Data members
   const O2OMetaData& m_metadata ;
   const std::string m_odbcConnStr ;
@@ -92,6 +95,7 @@ private:
   LusiTime::Time m_runBeginTime ;
   LusiTime::Time m_runEndTime ;
   bool m_stored ;
+  TransitionClock m_transClock;
 
   // Copy constructor and assignment are disabled by default
   MetaDataScanner ( const MetaDataScanner& ) ;
