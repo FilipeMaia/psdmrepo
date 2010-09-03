@@ -55,10 +55,8 @@ CsPadReadOnlyCfg_Data::operator=(const Pds::CsPad::CsPadReadOnlyCfg& o)
 }
 
 CsPadGainMapCfg_Data& 
-CsPadGainMapCfg_Data::operator=(const Pds::CsPad::CsPadGainMapCfg& o)
+CsPadGainMapCfg_Data::operator=(const Pds::CsPad::CsPadGainMapCfg& src)
 {
-  Pds::CsPad::CsPadGainMapCfg& src = const_cast<Pds::CsPad::CsPadGainMapCfg&>(o);
-  
   size_t size = ColumnsPerASIC * MaxRowsPerASIC;
   const uint16_t* srcmap = &src._gainMap[0][0];
   std::copy(srcmap, srcmap+size, &gainMap[0][0]);
@@ -66,12 +64,12 @@ CsPadGainMapCfg_Data::operator=(const Pds::CsPad::CsPadGainMapCfg& o)
 }
 
 CsPadConfigV1QuadReg_Data& 
-CsPadConfigV1QuadReg_Data::operator=(const Pds::CsPad::ConfigV1QuadReg& o)
+CsPadConfigV1QuadReg_Data::operator=(const Pds::CsPad::ConfigV1QuadReg& src)
 {
-  Pds::CsPad::ConfigV1QuadReg& src = const_cast<Pds::CsPad::ConfigV1QuadReg&>(o);
-  
-  this->shiftSelect    = src.shiftSelect();
-  this->edgeSelect     = src.edgeSelect();
+  const uint32_t* p = src.shiftSelect();
+  std::copy(p, p+TwoByTwosPerQuad, this->shiftSelect);
+  p = src.edgeSelect();
+  std::copy(p, p+TwoByTwosPerQuad, this->edgeSelect);
   this->readClkSet     = src.readClkSet();
   this->readClkHold    = src.readClkHold();
   this->dataMode       = src.dataMode();
@@ -91,19 +89,20 @@ CsPadConfigV1QuadReg_Data::operator=(const Pds::CsPad::ConfigV1QuadReg& o)
 
 CsPadConfigV1::CsPadConfigV1 ( const XtcType& data )
 {
-  XtcType& src = const_cast<XtcType&>(data);
-
+  m_data.concentratorVersion = data.concentratorVersion();
   m_data.runDelay       = data.runDelay();
   m_data.eventCode      = data.eventCode();
+  m_data.inactiveRunMode = data.inactiveRunMode();
   m_data.activeRunMode  = data.activeRunMode();
   m_data.testDataIndex  = data.tdi();
   m_data.payloadPerQuad = data.payloadSize();
-  m_data.badAsicMask    = 0;
+  m_data.badAsicMask0   = data.badAsicMask0();
+  m_data.badAsicMask1   = data.badAsicMask1();
   m_data.asicMask       = data.asicMask();
   m_data.quadMask       = data.quadMask();
   
   for ( int q = 0; q < CsPadConfigV1_Data::MaxQuadsPerSensor ; ++ q ) {
-    m_data.quads[q] = src.quads()[q];
+    m_data.quads[q] = data.quads()[q];
   }
 }
 
@@ -130,9 +129,11 @@ CsPadConfigV1::native_type()
   hdf5pp::CompoundType gainMapType = hdf5pp::CompoundType::compoundType<CsPadGainMapCfg_Data>() ;
   gainMapType.insert( "gainMap", offsetof(CsPadGainMapCfg_Data, gainMap), gainMapArrType );
 
+  hdf5pp::ArrayType shiftSelectType = hdf5pp::ArrayType::arrayType<uint32_t>(CsPadConfigV1QuadReg_Data::TwoByTwosPerQuad) ;
+  hdf5pp::ArrayType edgeSelectType = hdf5pp::ArrayType::arrayType<uint32_t>(CsPadConfigV1QuadReg_Data::TwoByTwosPerQuad) ;
   hdf5pp::CompoundType quadType = hdf5pp::CompoundType::compoundType<CsPadConfigV1QuadReg_Data>() ;
-  quadType.insert_native<uint32_t>( "shiftSelect", offsetof(CsPadConfigV1QuadReg_Data, shiftSelect) ) ;
-  quadType.insert_native<uint32_t>( "edgeSelect", offsetof(CsPadConfigV1QuadReg_Data, edgeSelect) ) ;
+  quadType.insert( "shiftSelect", offsetof(CsPadConfigV1QuadReg_Data, shiftSelect), shiftSelectType ) ;
+  quadType.insert( "edgeSelect", offsetof(CsPadConfigV1QuadReg_Data, edgeSelect), edgeSelectType ) ;
   quadType.insert_native<uint32_t>( "readClkSet", offsetof(CsPadConfigV1QuadReg_Data, readClkSet) ) ;
   quadType.insert_native<uint32_t>( "readClkHold", offsetof(CsPadConfigV1QuadReg_Data, readClkHold) ) ;
   quadType.insert_native<uint32_t>( "dataMode", offsetof(CsPadConfigV1QuadReg_Data, dataMode) ) ;
@@ -150,12 +151,15 @@ CsPadConfigV1::native_type()
   hdf5pp::ArrayType quadArrType = hdf5pp::ArrayType::arrayType(quadType, CsPadConfigV1_Data::MaxQuadsPerSensor);
   
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<CsPadConfigV1_Data>() ;
+  confType.insert_native<uint32_t>( "concentratorVersion", offsetof(CsPadConfigV1_Data, concentratorVersion) ) ;
   confType.insert_native<uint32_t>( "runDelay", offsetof(CsPadConfigV1_Data, runDelay) ) ;
   confType.insert_native<uint32_t>( "eventCode", offsetof(CsPadConfigV1_Data, eventCode) ) ;
+  confType.insert_native<uint32_t>( "inactiveRunMode", offsetof(CsPadConfigV1_Data, inactiveRunMode) ) ;
   confType.insert_native<uint32_t>( "activeRunMode", offsetof(CsPadConfigV1_Data, activeRunMode) ) ;
   confType.insert_native<uint32_t>( "testDataIndex", offsetof(CsPadConfigV1_Data, testDataIndex) ) ;
   confType.insert_native<uint32_t>( "payloadPerQuad", offsetof(CsPadConfigV1_Data, payloadPerQuad) ) ;
-  confType.insert_native<uint32_t>( "badAsicMask", offsetof(CsPadConfigV1_Data, badAsicMask) ) ;
+  confType.insert_native<uint32_t>( "badAsicMask0", offsetof(CsPadConfigV1_Data, badAsicMask0) ) ;
+  confType.insert_native<uint32_t>( "badAsicMask1", offsetof(CsPadConfigV1_Data, badAsicMask1) ) ;
   confType.insert_native<uint32_t>( "asicMask", offsetof(CsPadConfigV1_Data, asicMask) ) ;
   confType.insert_native<uint32_t>( "quadMask", offsetof(CsPadConfigV1_Data, quadMask) ) ;
   confType.insert("quads", offsetof(CsPadConfigV1_Data, quads), quadArrType ) ;

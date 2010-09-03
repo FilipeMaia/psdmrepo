@@ -71,8 +71,9 @@ struct CsPadGainMapCfg_Data  {
 // Helper type for Pds::CsPad::ConfigV1QuadReg
 //
 struct CsPadConfigV1QuadReg_Data  {
-  uint32_t                  shiftSelect;
-  uint32_t                  edgeSelect;
+  enum { TwoByTwosPerQuad = Pds::CsPad::TwoByTwosPerQuad};
+  uint32_t                  shiftSelect[TwoByTwosPerQuad];
+  uint32_t                  edgeSelect[TwoByTwosPerQuad];
   uint32_t                  readClkSet;
   uint32_t                  readClkHold;
   uint32_t                  dataMode;
@@ -95,12 +96,15 @@ struct CsPadConfigV1QuadReg_Data  {
 //
 struct CsPadConfigV1_Data  {
   enum { MaxQuadsPerSensor = Pds::CsPad::MaxQuadsPerSensor };
+  uint32_t          concentratorVersion;
   uint32_t          runDelay;
   uint32_t          eventCode;
+  uint32_t          inactiveRunMode;
   uint32_t          activeRunMode;
   uint32_t          testDataIndex;
   uint32_t          payloadPerQuad;
-  uint32_t          badAsicMask;
+  uint32_t          badAsicMask0;
+  uint32_t          badAsicMask1;
   uint32_t          asicMask;
   uint32_t          quadMask;
   CsPadConfigV1QuadReg_Data quads[MaxQuadsPerSensor];

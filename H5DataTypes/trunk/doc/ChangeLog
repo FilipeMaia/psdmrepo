@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-22
+2010-09-03 Andy Salnikov
+- updated for pdsdata V02-07-00
+- completed cspad implementation
+
 Tag: V00-00-21
 2010-08-11 Andy Salnikov
 - updated for pdsdata V02-06-00
