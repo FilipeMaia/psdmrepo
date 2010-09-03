@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-01
+2010-09-03 Andy Salnikov
+- update for pdsdata V02-07-00
+- implementing cspad conversion
+
 Tag: V00-08-00
 2010-09-01 Andy Salnikov
 - first attempt to handle split events, results are far from perfect yet
