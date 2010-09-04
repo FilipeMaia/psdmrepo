@@ -68,6 +68,13 @@ namespace {
       { "XppSb3Ipm",   Pds::DetInfo::XppSb3Ipm },
       { "XppSb3Pim",   Pds::DetInfo::XppSb3Pim },
       { "XppSb4Pim",   Pds::DetInfo::XppSb4Pim },
+      { "XppGon",      Pds::DetInfo::XppGon },
+      { "XppLas",      Pds::DetInfo::XppLas },
+      { "XppEndstation", Pds::DetInfo::XppEndstation },
+      { "AmoEndstation", Pds::DetInfo::AmoEndstation },
+      { "CxiEndstation", Pds::DetInfo::CxiEndstation },
+      { "XcsEndstation", Pds::DetInfo::XcsEndstation },
+      { "MecEndstation", Pds::DetInfo::MecEndstation },
       { "NumDetector", Pds::DetInfo::NumDetector },
       { 0, 0 }
   };
@@ -100,6 +107,7 @@ namespace {
       { "Fccd",      Pds::DetInfo::Fccd },
       { "Ipimb",     Pds::DetInfo::Ipimb },
       { "Encoder",   Pds::DetInfo::Encoder },
+      { "Cspad",     Pds::DetInfo::Cspad },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };

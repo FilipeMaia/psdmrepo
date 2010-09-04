@@ -248,7 +248,15 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_EncoderData, 24 )
         self.assertEqual ( TypeId.Type.Id_EncoderConfig, 25 )
         self.assertEqual ( TypeId.Type.Id_EvrIOConfig, 26 )
-        self.assertEqual ( TypeId.Type.NumberOf, 27 )
+        self.assertEqual ( TypeId.Type.Id_PrincetonInfo, 27 )
+        self.assertEqual ( TypeId.Type.Id_CspadElement, 28 )
+        self.assertEqual ( TypeId.Type.Id_CspadConfig, 29 )
+        self.assertEqual ( TypeId.Type.Id_IpmFexConfig, 30 )
+        self.assertEqual ( TypeId.Type.Id_IpmFex, 31 )
+        self.assertEqual ( TypeId.Type.Id_DiodeFexConfig, 32 )
+        self.assertEqual ( TypeId.Type.Id_DiodeFex, 33 )
+        self.assertEqual ( TypeId.Type.Id_PimImageConfig, 34 )
+        self.assertEqual ( TypeId.Type.NumberOf, 35 )
 
         # instantiation
         TypeId ()
@@ -356,7 +364,14 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Detector.XppSb3Ipm, 17 )
         self.assertEqual ( DetInfo.Detector.XppSb3Pim, 18 )
         self.assertEqual ( DetInfo.Detector.XppSb4Pim, 19 )
-        self.assertEqual ( DetInfo.Detector.NumDetector, 20 )
+        self.assertEqual ( DetInfo.Detector.XppGon, 20 )
+        self.assertEqual ( DetInfo.Detector.XppLas, 21 )
+        self.assertEqual ( DetInfo.Detector.XppEndstation, 22 )
+        self.assertEqual ( DetInfo.Detector.AmoEndstation, 23 )
+        self.assertEqual ( DetInfo.Detector.CxiEndstation, 24 )
+        self.assertEqual ( DetInfo.Detector.XcsEndstation, 25 )
+        self.assertEqual ( DetInfo.Detector.MecEndstation, 26 )
+        self.assertEqual ( DetInfo.Detector.NumDetector, 27 )
         
         self.assertEqual ( DetInfo.Device.NoDevice, 0 )
         self.assertEqual ( DetInfo.Device.Evr, 1 )
@@ -368,7 +383,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.Fccd, 7 )
         self.assertEqual ( DetInfo.Device.Ipimb, 8 )
         self.assertEqual ( DetInfo.Device.Encoder, 9 )
-        self.assertEqual ( DetInfo.Device.NumDevice, 10 )
+        self.assertEqual ( DetInfo.Device.Cspad, 10 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 11 )
 
         
         o1 = DetInfo(0,0,0,0,0)

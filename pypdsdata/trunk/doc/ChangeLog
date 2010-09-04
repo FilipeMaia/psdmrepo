@@ -1,4 +1,8 @@
 
+2010-09-03 - V00-00-17
+======================
+- upgrading to pdsdata V02-07-00, new cspad module
+
 2010-08-13 - V00-00-16
 ======================
 - added method xtc.Dgram.setClock() to change datagram time
