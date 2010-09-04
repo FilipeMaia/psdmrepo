@@ -14,6 +14,7 @@ from pypdsdata import xtc
 from pypdsdata import epics
 from pypdsdata import Error
 from pypdsdata import acqiris
+from pypdsdata import cspad
 from pypdsdata import pnccd
 from pypdsdata import princeton
 
@@ -229,6 +230,30 @@ class Event(object):
 
         return princeton.FrameV1( obj, cfg )
     
+    def getCsPadQuads(self, address, env):
+        """ returns CsPadElement for specific address"""
+        
+        _log.debug("Event.getCsPadElements: address=%s", address)
+
+        xtcObj = self.findFirstXtc( typeId=xtc.TypeId.Type.Id_CspadElement, address=address )
+        if not xtcObj : return None
+        quad = xtcObj.payload()
+
+        # get config object
+        cfg = env.getConfig(typeId=xtc.TypeId.Type.Id_CspadConfig, address=xtcObj.src)
+        if not cfg : 
+            raise Error("cannot find CsPad config for address %s" % xtcObj.src )
+
+        # get all elements
+        quads = []
+        numQuads = cfg.numQuads()
+        while True:
+            quads.append(cspad.ElementV1(quad, cfg))
+            if len(quads) >= numQuads : break
+            quad = quad.next(cfg)
+        
+        return quads
+
 
     #
     # Private methods not to be used by clients directly

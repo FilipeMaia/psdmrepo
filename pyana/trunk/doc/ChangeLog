@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-18
+2010-09-03 - Andy Salnikov
+- upgrade to pdsdata V02-07-00, Event class has new method getCsPadQuads()
+
 Tag: V00-00-17
 2010-08-23 - Andy Salnikov
 - bug fix, user module endrun() was not called if -n N option was given
