@@ -245,7 +245,7 @@ class InterfaceDb ( object ) :
             # read section from database
             config = self.__get_config(section,cursor)
             if verbose :
-                self._log.info ( 'config[%s] = %s', section, pformat(config) )
+                self._log.info ( 'config[%s] = %s', section, config )
 
             # merge configurations
             fullconfig.merge(config)

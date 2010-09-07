@@ -129,7 +129,7 @@ class Config ( object ) :
             if key[1] or key[2] :
                 optline += " (instr=%s, exp=%s)" % (key[1], key[2])
             res.append(optline)
-        return '\n'.join(res)
+        return ', '.join(res)
 
 #
 #  In case someone decides to run this module

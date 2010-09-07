@@ -11,6 +11,10 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-01
+2010-09-06 Andy Salnikov
+- config bug fix
+
 Tag: V00-07-00
 2010-08-31 Andy Salnikov
 - add support for dedicated nodes on per-instrument basis

@@ -84,9 +84,9 @@ class TranslatorThread ( threading.Thread ) :
         self._fs = fs
         self._name = name
         self._db = db
-        self._translate_uri = config["_translate_uri"]
-        self._log_uri = config["_log_uri"]
-        self._controller_id = config["_controller_id"]
+        self._translate_uri = config.get("_translate_uri")
+        self._log_uri = config.get("_log_uri")
+        self._controller_id = config.get("_controller_id")
         self._config = config
         self._log = logger
 
