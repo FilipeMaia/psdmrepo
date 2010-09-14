@@ -282,6 +282,22 @@ class IcdbModel ( InterfaceDb ) :
                 else :
                     d.setdefault('other_files', []).append(fname)
 
+        # select translator info
+        q = """SELECT fs.id, DATE_FORMAT(tr.started, GET_FORMAT(DATETIME,'ISO')) started, 
+            DATE_FORMAT(tr.stopped, GET_FORMAT(DATETIME,'ISO')) stopped, tr.log 
+            FROM fileset fs, translator_process tr 
+            WHERE fs.id=tr.fk_fileset AND fs.instrument = %s AND fs.experiment = %s"""
+        cursor.execute(q, (instrument, experiment))
+        
+        # store in a dict
+        for row in cursor.fetchall():
+            
+            d = res.get(row['id'])
+            if d :
+                d['log'] = row['log']
+                d['started'] = row['started']
+                d['stopped'] = row['stopped']
+
         return res.values()
 
 #

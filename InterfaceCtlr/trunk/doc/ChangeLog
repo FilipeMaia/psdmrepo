@@ -11,6 +11,12 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-02
+2010-09-13 Andy Salnikov
+- few small changes to web service:
+  - GET /system/id will return error 404 for non-existent id
+  - /exp/... did not return log file URL, fixed
+
 Tag: V00-07-01
 2010-09-06 Andy Salnikov
 - config bug fix

@@ -40,6 +40,7 @@ from icws.lib.base import BaseController
 # Imports for other modules --
 #-----------------------------
 from pylons.decorators import jsonify
+from pylons.controllers.util import abort
 from icws.lib.base import *
 from icws.model.icdb_model import IcdbModel
 
@@ -71,17 +72,20 @@ class SystemController ( BaseController ) :
         for r in res :
             if 'log' in r and r['log'] :
                 try :
+                    # add URL for the log
                     log = r['log'].split('/')
                     path = 'system/'+log[-2]+'/'+log[-1]
                     r['log_url'] = h.url_for(controller='/log', action='show', mode='html', path=path)
                 except :
                     pass
         if id is None:
+            # return full list
             return res
         elif res :
             return res[0]
         else :
-            return {}
+            # no such ID
+            abort(404)
 
     @jsonify
     def stop ( self, id ) :
@@ -90,5 +94,8 @@ class SystemController ( BaseController ) :
         h.checkAccess('', '', 'delete')
 
         model = IcdbModel()
-        return model.controller_stop(id)
+        res = model.controller_stop(id)
+        if res : return res
+        # no such request
+        abort(404)
 

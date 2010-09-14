@@ -65,6 +65,18 @@ class _UpdateRequestForm(formencode.Schema):
     if_key_missing = ""
     priority = formencode.validators.Int(if_empty=0)
 
+def _addURLs(reqDict):
+    
+    # add request URL
+    reqDict['url'] = h.url_for( action='requests', id=reqDict['id'], instrument=None, experiment=None )
+
+    # add URL for the log
+    log = reqDict.get('log')
+    if log:
+        log = log.split('/')
+        path = 'translator/'+log[-2]+'/'+log[-1]
+        reqDict['log_url'] = h.url_for(controller='/log', action='show', mode='html', path=path)
+
 #------------------------
 # Exported definitions --
 #------------------------
@@ -95,15 +107,7 @@ class RequestController ( BaseController ) :
         
         # add URLs to every object
         for d in data :
-            d['url'] = h.url_for( action='requests', id=d['id'] )
-
-            if 'log' in d and d['log'] :
-                try :
-                    log = d['log'].split('/')
-                    path = 'translator/'+log[-2]+'/'+log[-1]
-                    d['log_url'] = h.url_for(controller='/log', action='show', mode='html', path=path)
-                except :
-                    pass
+            _addURLs(d)
 
         # return list or single dict or error
         if id is None :
@@ -156,7 +160,8 @@ class RequestController ( BaseController ) :
 
     @jsonify
     def update ( self, id ) :
-        """Create new request"""
+        """Update existing request, can change few things for queued requests like 
+        priority for example."""
 
         try:
             id = int(id)
@@ -203,7 +208,7 @@ class RequestController ( BaseController ) :
 
     @jsonify
     def delete ( self, id ) :
-        """DElete request"""
+        """Delete request, can only delete queued requests which are not executed"""
 
         try:
             id = int(id)
@@ -231,12 +236,14 @@ class RequestController ( BaseController ) :
 
     @jsonify
     def experiments ( self ) :
+        """Returns the list experiments in controller database"""
 
         model = IcdbModel()
         return model.experiments()
 
     @jsonify
     def exp_requests ( self, instrument, experiment ) :
+        """Returns the list of requests for given experiment"""
 
         # check user's privileges
         h.checkAccess(instrument, experiment, 'create')
@@ -246,7 +253,7 @@ class RequestController ( BaseController ) :
 
         # add URL to every object
         for d in requests :
-            d['url'] = h.url_for( action='requests', id=d['id'], instrument=None, experiment=None )
+            _addURLs(d)
 
         return requests
 
@@ -267,5 +274,3 @@ class RequestController ( BaseController ) :
             else :
                 # return some non-number, something unknown appears as input
                 yield r
-                
-
