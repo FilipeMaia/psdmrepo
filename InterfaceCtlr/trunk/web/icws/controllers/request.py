@@ -198,8 +198,7 @@ class RequestController ( BaseController ) :
             req = model.change_request_priority(id, priority)
             req['url'] = h.url_for( action='requests', id=req['id'] )
         except Exception, exc:
-            # failed to update request, continue with others
-            #code = 400
+            code = 400
             req = dict(instrument=instrument, experiment=experiment,
                 run=run, status='Failed', message=str(exc))
 
