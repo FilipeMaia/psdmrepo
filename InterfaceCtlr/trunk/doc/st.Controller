@@ -7,7 +7,7 @@
 # description:  Interface controller for PSDM/LCLS
 # processname: ic-controller
 # config: 
-# pidfile: /var/run/ic-controller.pid
+# pidfile: /var/run/ic-controller/ic-controller.pid
 
 # Source function library.
 . /etc/init.d/functions
@@ -18,6 +18,9 @@ pidfile=/var/run/ic-controller/ic-controller.pid
 CMDPATH=/reg/g/psdm/etc/ic-controller-runner
 
 RETVAL=0
+
+# create run directory if not there
+test -d /var/run/ic-controller || mkdir /var/run/ic-controller && chown psdatmgr /var/run/ic-controller
 
 start() {
     echo -n "Starting ${prog}: "

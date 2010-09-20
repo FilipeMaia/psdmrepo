@@ -173,7 +173,7 @@ class InterfaceDb ( object ) :
 
         if id is None :
             # get the latest controller for every active node
-            q = """SELECT c.id, n.node_uri, c.started, c.stopped, c.process_id, c.log
+            q = """SELECT c.id, n.node_uri, c.started, c.stopped, c.process_id, c.log, n.id
                 FROM interface_controller c, translator_node n, 
                     (SELECT fk_translator_node nid, max(started) started 
                      FROM interface_controller 
@@ -182,7 +182,7 @@ class InterfaceDb ( object ) :
                      AND c.started = cmax.started AND n.active"""
             vars = ()
         else :
-            q = """SELECT c.id, n.node_uri, c.started, c.stopped, c.process_id, c.log
+            q = """SELECT c.id, n.node_uri, c.started, c.stopped, c.process_id, c.log, n.id
                 FROM interface_controller c, translator_node n
                 WHERE n.id = c.fk_translator_node AND c.id = %s"""
             vars = (id,)
@@ -191,12 +191,24 @@ class InterfaceDb ( object ) :
         
         res = []
         for row in cursor.fetchall():
-            cid, host, started, stopped, pid, log = row
+            cid, host, started, stopped, pid, log, nodeid = row
             status = 'Running'
             if stopped : 
                 stopped = str(stopped)
                 status = 'Stopped'
-            res.append( dict ( id=cid, host=host, pid=pid, started=str(started), stopped=stopped, status=status, log=log) )
+
+            res.append( dict ( id=cid, host=host, pid=pid, started=str(started), stopped=stopped, status=status, log=log, nodeid=nodeid) )
+
+        for ctrl in res :
+            
+            # get the list of instruments
+            q = """SELECT instrument FROM node2instr WHERE translator_node_id = %s"""
+            cursor.execute(q, (ctrl['nodeid'],))
+            instruments = [row[0] for row in cursor.fetchall()]
+
+            # update controller info
+            del ctrl['nodeid']
+            ctrl['instruments'] = instruments
             
         return res
 

@@ -117,14 +117,17 @@ class IcWsStatus ( LusiPyApp ) :
                         
             res = WSResource( app, '/system' )
             data = res.request( 'GET' )
-            fmt = '%6s  %-32s  %-8s  %-19s  %6s'
+            fmt = '%6s  %-32s  %-8s  %-19s  %6s  %s'
             if data:
                 if not self._options.no_header :
-                    print fmt % ('ID', 'Host', 'Status', 'Time', 'PID')
-                    print '-------------------------------------------------------------------------------'
-                data = [ (d['id'], d['host'], d['status'], d['stopped'] or d['started'], d['pid']) for d in data ]
+                    print fmt % ('ID', 'Host', 'Status', 'Time', 'PID', 'Instruments')
+                    print '--------------------------------------------------------------------------------------------'
+                data = [ (d['id'], d['host'], d['status'], d['stopped'] or d['started'], d['pid'], d.get('instruments',[])) for d in data ]
                 data.sort()
                 for d in data :
+                    instr = d[5]
+                    instr = ', '.join(instr)
+                    d = d[:5] + (instr,) 
                     print fmt % d
             else :
                 print 'No experiments were found'

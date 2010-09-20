@@ -11,6 +11,12 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-03
+2010-09-19 Andy Salnikov
+- updated web service to return list of instruments per in /system resources
+- ic-ws-status -s prints instrument list
+- init script creates run directory and enables psdatmgr write access to it
+
 Tag: V00-07-02
 2010-09-13 Andy Salnikov
 - few small changes to web service:
