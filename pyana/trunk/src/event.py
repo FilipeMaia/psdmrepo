@@ -448,15 +448,16 @@ class Env(object):
         if evt.seq().service() in [xtc.TransitionId.Configure, xtc.TransitionId.BeginCalibCycle] :
             
             # get all XTCs at Source level and store their payload
-            for x in evt.findXtc(level=xtc.Level.Source):
-                typeid = x.contains.id()
-                if typeid not in [xtc.TypeId.Type.Id_Epics, xtc.TypeId.Type.Id_Xtc, xtc.TypeId.Type.Any]:
-                    # don't store Epics data as config
-                    try :
-                        cfgObj = x.payload()
-                        self._storeConfig(typeid, x.src, cfgObj)
-                    except Error, e:
-                        _log.error('Failed to extract config object of type %s: %s', xtc.contains, e )
+            for level in (xtc.Level.Source, xtc.Level.Control):
+                for x in evt.findXtc(level=level):
+                    typeid = x.contains.id()
+                    if typeid not in [xtc.TypeId.Type.Id_Epics, xtc.TypeId.Type.Id_Xtc, xtc.TypeId.Type.Any]:
+                        # don't store Epics data as config
+                        try :
+                            cfgObj = x.payload()
+                            self._storeConfig(typeid, x.src, cfgObj)
+                        except Error, e:
+                            _log.error('Failed to extract config object of type %s: %s', xtc.contains, e )
                     
     def getConfig(self, typeId, address=None):
         """Generic getConfig method"""
