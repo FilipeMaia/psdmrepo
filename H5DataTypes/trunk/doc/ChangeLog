@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-23
+2010-09-24 Andy Salnikov
+- forgot to set correct dimensions of the member array in LusiIpmFexConfigV1
+
 Tag: V00-00-22
 2010-09-03 Andy Salnikov
 - updated for pdsdata V02-07-00
