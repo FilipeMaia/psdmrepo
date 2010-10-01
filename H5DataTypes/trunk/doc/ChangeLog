@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-24
+2010-10-01 Andy Salnikov
+- update for pdsdata V02-08-00
+- new classes CspadConfigV2 and CspadElementV2
+- layout of CspadElementV1 has changed, data is not compatible with the
+  previous version
+
 Tag: V00-00-23
 2010-09-24 Andy Salnikov
 - forgot to set correct dimensions of the member array in LusiIpmFexConfigV1
