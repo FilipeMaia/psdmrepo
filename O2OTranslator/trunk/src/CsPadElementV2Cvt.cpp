@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class CsPadElementV1Cvt...
+//	Class CsPadElementV2Cvt...
 //
 // Author List:
 //      Andrei Salnikov
@@ -14,7 +14,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "O2OTranslator/CsPadElementV1Cvt.h"
+#include "O2OTranslator/CsPadElementV2Cvt.h"
 
 //-----------------
 // C/C++ Headers --
@@ -34,7 +34,7 @@
 //-----------------------------------------------------------------------
 
 namespace {
-  const char logger[] = "CsPadElementV1Cvt" ;
+  const char logger[] = "CsPadElementV2Cvt" ;
   
   // slow bit count
   unsigned bitCount(uint32_t mask, unsigned maxBits) {
@@ -56,11 +56,11 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-CsPadElementV1Cvt::CsPadElementV1Cvt ( const std::string& typeGroupName,
+CsPadElementV2Cvt::CsPadElementV2Cvt ( const std::string& typeGroupName,
                                    const ConfigObjectStore& configStore,
                                    hsize_t chunk_size,
                                    int deflate )
-  : EvtDataTypeCvt<Pds::CsPad::ElementV1>(typeGroupName)
+  : EvtDataTypeCvt<Pds::CsPad::ElementV2>(typeGroupName)
   , m_configStore(configStore)
   , m_chunk_size(chunk_size)
   , m_deflate(deflate)
@@ -73,7 +73,7 @@ CsPadElementV1Cvt::CsPadElementV1Cvt ( const std::string& typeGroupName,
 //--------------
 // Destructor --
 //--------------
-CsPadElementV1Cvt::~CsPadElementV1Cvt ()
+CsPadElementV2Cvt::~CsPadElementV2Cvt ()
 {
   delete m_elementCont ;
   delete m_pixelDataCont ;
@@ -82,7 +82,7 @@ CsPadElementV1Cvt::~CsPadElementV1Cvt ()
 
 // typed conversion method
 void
-CsPadElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
+CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                           const XtcType& data,
                                           size_t size,
                                           const Pds::TypeId& typeId,
@@ -90,20 +90,20 @@ CsPadElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                           const H5DataTypes::XtcClockTime& time )
 {
   // based on cspad/ElementIterator but we cannot use that class directly
-  uint32_t qMask;
-  uint32_t sMask;
+  uint32_t qMask = 0;
+  uint32_t sMask[Pds::CsPad::MaxQuadsPerSensor];
+  unsigned sections = 0;
   
-  // find corresponding configuration object, it could be ConfigV1 or ConfigV2 
-  Pds::TypeId cfgTypeId1(Pds::TypeId::Id_CspadConfig, 1);
+  // find corresponding configuration object, it could be ConfigV1 or ConfigV2
   Pds::TypeId cfgTypeId2(Pds::TypeId::Id_CspadConfig, 2);
-  if ( const Pds::CsPad::ConfigV1* config = m_configStore.find<Pds::CsPad::ConfigV1>(cfgTypeId1, src.top()) ) {
+  if ( const Pds::CsPad::ConfigV2* config = m_configStore.find<Pds::CsPad::ConfigV2>(cfgTypeId2, src.top()) ) {
     qMask = config->quadMask();
-    sMask = config->asicMask()==1 ? 0x3 : 0xff;
-  } else if ( const Pds::CsPad::ConfigV2* config = m_configStore.find<Pds::CsPad::ConfigV2>(cfgTypeId2, src.top()) ) {
-    qMask = config->quadMask();
-    sMask = config->asicMask()==1 ? 0x3 : 0xff;
+    for (int q = 0 ; q != Pds::CsPad::MaxQuadsPerSensor; ++ q) {
+      sMask[q] = config->roiMask(q);
+      sections += ::bitCount(sMask[q], Pds::CsPad::ASICsPerQuad/2);
+    }
   } else {
-    MsgLog ( logger, error, "CsPadElementV1Cvt - no configuration object was defined" );
+    MsgLog ( logger, error, "CsPadElementV2Cvt - no configuration object was defined" );
     return ;
   }
 
@@ -111,7 +111,7 @@ CsPadElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( not m_elementCont ) {
 
     // create container for frames
-    CvtDataContFactoryTyped<H5DataTypes::CsPadElementV1> elContFactory( "element", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryTyped<H5DataTypes::CsPadElementV2> elContFactory( "element", m_chunk_size, m_deflate ) ;
     m_elementCont = new ElementCont ( elContFactory ) ;
 
     // create container for frame data
@@ -126,39 +126,55 @@ CsPadElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
 
   // get few constants
   const unsigned nQuad = ::bitCount(qMask, Pds::CsPad::MaxQuadsPerSensor);
-  const unsigned nSect = ::bitCount(sMask, Pds::CsPad::ASICsPerQuad/2);
-  const unsigned qsize = nSect*Pds::CsPad::ColumnsPerASIC*Pds::CsPad::MaxRowsPerASIC*2;
+  const unsigned nSect = sections;
+  const unsigned ssize = Pds::CsPad::ColumnsPerASIC*Pds::CsPad::MaxRowsPerASIC*2;
 
   // make data arrays
-  H5DataTypes::CsPadElementV1 elems[nQuad] ;
-  uint16_t pixelData[nQuad][nSect][Pds::CsPad::ColumnsPerASIC][Pds::CsPad::MaxRowsPerASIC*2];
+  H5DataTypes::CsPadElementV2 elems[nQuad] ;
+  uint16_t pixelData[nSect][Pds::CsPad::ColumnsPerASIC][Pds::CsPad::MaxRowsPerASIC*2];
 
   // move the data
   const XtcType* pdselem = &data ;
-  for ( unsigned iq = 0 ; iq != nQuad ; ++ iq ) {
+  unsigned quad = 0;
+  unsigned sect = 0;
+  for ( unsigned iq = 0 ; iq != Pds::CsPad::MaxQuadsPerSensor ; ++ iq ) {
+        
+    if ( not (qMask & (1 << iq))) continue;
 
     // copy frame info
-    elems[iq] = H5DataTypes::CsPadElementV1(*pdselem) ;
+    elems[quad] = H5DataTypes::CsPadElementV2(*pdselem) ;
 
-    // copy pixel data
-    const uint16_t* qdata = pdselem->data();
-    std::copy(qdata, qdata+qsize, &pixelData[iq][0][0][0]);
+    // start of pixel data
+    const uint16_t* sdata = (const uint16_t*)(pdselem+1);
+
+    for ( unsigned is = 0 ; is != Pds::CsPad::ASICsPerQuad/2 ; ++ is ) {
+    
+      if ( not (sMask[iq] & (1 << is))) continue; 
+  
+      // copy pixel data
+      std::copy(sdata, sdata+ssize, &pixelData[sect][0][0]);
+
+      // advance to next section
+      sdata += ssize;
+      ++ sect;
+    }
 
     // move to next frame
-    pdselem = (const XtcType*)(qdata+qsize+2) ;
+    pdselem = (const XtcType*)(sdata+2) ;
+    ++ quad;
   }
 
   // store the data
-  hdf5pp::Type type = H5DataTypes::CsPadElementV1::stored_type(nQuad);
+  hdf5pp::Type type = H5DataTypes::CsPadElementV2::stored_type(nQuad);
   m_elementCont->container(group,type)->append ( elems[0], type ) ;
-  type = H5DataTypes::CsPadElementV1::stored_data_type(nQuad, nSect) ;
-  m_pixelDataCont->container(group,type)->append ( pixelData[0][0][0][0], type ) ;
+  type = H5DataTypes::CsPadElementV2::stored_data_type(nSect) ;
+  m_pixelDataCont->container(group,type)->append ( pixelData[0][0][0], type ) ;
   m_timeCont->container(group)->append ( time ) ;
 }
 
 /// method called when the driver closes a group in the file
 void
-CsPadElementV1Cvt::closeSubgroup( hdf5pp::Group group )
+CsPadElementV2Cvt::closeSubgroup( hdf5pp::Group group )
 {
   if ( m_elementCont ) m_elementCont->closeGroup( group ) ;
   if ( m_pixelDataCont ) m_pixelDataCont->closeGroup( group ) ;
