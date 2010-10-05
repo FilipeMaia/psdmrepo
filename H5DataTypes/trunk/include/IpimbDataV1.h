@@ -48,6 +48,10 @@ struct IpimbDataV1_Data  {
   uint16_t channel2;
   uint16_t channel3;
   uint16_t checksum;
+  float channel0Volts;
+  float channel1Volts;
+  float channel2Volts;
+  float channel3Volts;
 };
 
 class IpimbDataV1  {

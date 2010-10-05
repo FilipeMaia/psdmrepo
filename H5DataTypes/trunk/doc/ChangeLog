@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-25
+2010-10-05 Andy Salnikov
+- extened IpimbDataV1 to include voltages data which are derived from
+  counts
+
 Tag: V00-00-24
 2010-10-01 Andy Salnikov
 - update for pdsdata V02-08-00
