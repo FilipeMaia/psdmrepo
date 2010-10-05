@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-15
+2010-09-23 Andy Salnikov
+- by default the files are generated inside package directories in their
+  final places so there is no need to move them after
+
 Tag: V00-00-14
 2010-07-07 Andy Salnikov
 - updated pyana-module for new optional methods

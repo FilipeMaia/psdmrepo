@@ -24,6 +24,84 @@ from optparse import OptionParser
 _descr = "This script will generate code for the new class"
 _kwgen = 'codegen_kwgen.py'
 
+def _get_user_name () :
+    try :
+        import pwd
+        pwde = pwd.getpwuid(os.getuid())
+        return pwde[4]
+    except :
+        return ""
+        
+
+class _KWGen(object):
+    
+    def __init__(self, fname):
+
+        # try to read the 'codegen_kwgen.py' file, ignore all errors
+        self.ldict = {}
+        try :
+            execfile ( fname, {}, self.ldict )
+        except Exception, e :
+            print >>sys.stderr, "Failed to import file %s: %s" % ( fname, str(e) )
+
+    @staticmethod
+    def lang_trans ( lang ) :
+        tr = ['_']*256
+        for x in string.ascii_letters :
+            tr[ord(x)] = x
+        for x in string.digits :
+            tr[ord(x)] = x
+        tr[ord('+')] = 'x'
+        return lang.translate ( ''.join(tr) )
+    
+    def make_keywords (self, options, args) :
+    
+        # normalized language name
+        lang = self.lang_trans(options.language)
+        
+        kw = {}
+        kw['package'] = args[0]
+        kw['class'] = args[1]
+        kw['PACKAGE'] = args[0].upper()
+        kw['CLASS'] = args[1].upper()
+        kw['author'] = _get_user_name()
+        t = time.localtime( time.time() )
+        kw['date'] = time.strftime( "%Y-%m-%d", t )
+        kw['time'] = time.strftime( "%H:%M:%S", t )
+        kw['datetime'] = kw['date'] + ' ' + kw['time'] 
+    
+        for k in [ 'BASEDECL', 'BASEINCL', 'BASEINIT' ] :
+            try :
+                method = self.ldict.get('codegen_%s_%s' % (lang,k),None)
+                if method :
+                    kw[k] = method ( options.base_class ) or ""
+            except :
+                raise
+    
+        return kw
+            
+    def list_classes (self, options) :
+
+        langs = set()
+        files = os.listdir ( options.directory )
+        for f in files :
+            if f.startswith ( "template!" ) :
+                w = f.split('!')
+                lang = w[1]
+                langs.add ( lang )
+        langs = list(langs)
+        langs.sort()
+        fmt = "%%-%ds - %%s" % max ( [ len(l) for l in langs ] )
+        for l in langs :
+            descr = self.ldict.get( 'codegen_%s_description' % _KWGen.lang_trans(l), "" )
+            print fmt % ( l, descr )
+    
+    def get_dstdir(self, lang, ext):
+        
+        tlang = _KWGen.lang_trans(lang)
+        return self.ldict.get('codegen_dstdir', {}).get(tlang, {}).get(ext, '')
+        
+
 #--------
 #  Main
 #--------
@@ -52,16 +130,21 @@ def main( argv ):
                        help="language for generated code, def: C++" )
     parser.add_option( "-b", "--base-class", default=[], action='append', metavar="NAME", 
                        help="base class name, use once for every base" )
-    parser.add_option( "-o", "--output", default='.', metavar="PATH",
-                       help="output directory, def: ." )
+    parser.add_option( "-o", "--output", default=None, metavar="PATH",
+                       help="output directory, default is to put it inside package" )
     parser.add_option( "-f", "--force", default=False, action='store_true',
                        help="override resulting files if already exist" )
 
     (options, args) = parser.parse_args()
 
+    # read kwgen file
+    kwpath = os.path.join ( options.directory, _kwgen )
+    kwgen = _KWGen(kwpath)
+
     if options.list_classes :
         try :
-            list_classes( options )
+            # just dump the list of languages and quit
+            kwgen.list_classes( options )
             return 0
         except :
             return 2
@@ -69,20 +152,34 @@ def main( argv ):
     if len(args) != 2 :
         parser.error("exactly two arguments are required")
 
-    kw = make_keywords( options, args )
-    #print kw
+    # generate keyword dictionary
+    kw = kwgen.make_keywords( options, args )
 
     templName = 'template!' + options.language + '!'
     files = os.listdir ( options.directory )
     generated = []
+    templates = []
     for f in files :
         if f.startswith ( templName ) :
+            
+            templates.append(f)
+            
             #print 'file:', f
             w = f.split('!')
+
+            # destination directory
+            dstdir = options.output
+            if dstdir is None:
+                dstdir = kwgen.get_dstdir(options.language, '.'.join(w[2:]))
+                dstdir = os.path.join( kw['package'], dstdir )
+            
+            # class name with extension
             genName = [ kw['class'] ]
             if w[2] : genName.extend( w[2:] )
             genName = '.'.join( genName )
-            genName = os.path.join( options.output, genName )
+            
+            # path name
+            genName = os.path.join( dstdir, genName )
             if not options.force and os.path.exists ( genName ) :
                 print >> sys.stderr, "File %s already exists, skipping code generation" % genName
                 continue
@@ -96,87 +193,16 @@ def main( argv ):
                 generated.append( genName )
             except Exception, e :
                 print >> sys.stderr, "Failure during code generation:", str(e)
+                break
                 
     if generated :
         print "Produced files:", " ".join(generated)
     else :
-        print >> sys.stderr, "No files generated, check language name"
+        if not templates :
+            # means no matching template found
+            print >> sys.stderr, "Language name is not known: %s" % options.language
+        else :
+            print >> sys.stderr, "No files were generated, check output for errors"
 
-def read_kwgen ( options ) :
-
-    # first try to read the 'codegen_kwgen.py' file, ignore all errors
-    fname = os.path.join ( options.directory, 'codegen_kwgen.py' )
-    ldict = {}
-    try :
-        execfile ( fname, {}, ldict )
-    except Exception, e :
-        print >>sys.stderr, "Failed to import file %s: %s" % ( fname, str(e) )
-    return ldict
-
-def make_keywords ( options, args ) :
-
-    # first try to read the 'codegen_kwgen.py' file, ignore all errors
-    ldict = read_kwgen ( options )
-    
-    # normalized language name
-    lang = lang_trans(options.language)
-    
-    kw = {}
-    kw['package'] = args[0]
-    kw['class'] = args[1]
-    kw['PACKAGE'] = args[0].upper()
-    kw['CLASS'] = args[1].upper()
-    kw['author'] = get_user_name()
-    t = time.localtime( time.time() )
-    kw['date'] = time.strftime( "%Y-%m-%d", t )
-    kw['time'] = time.strftime( "%H:%M:%S", t )
-    kw['datetime'] = kw['date'] + ' ' + kw['time'] 
-
-    for k in [ 'BASEDECL', 'BASEINCL', 'BASEINIT' ] :
-        try :
-            method = ldict.get('codegen_%s_%s' % (lang,k),None)
-            if method :
-                kw[k] = method ( options.base_class ) or ""
-        except :
-            raise
-
-    return kw
-        
-def lang_trans ( lang ) :
-    tr = ['_']*256
-    for x in string.ascii_letters :
-        tr[ord(x)] = x
-    for x in string.digits :
-        tr[ord(x)] = x
-    tr[ord('+')] = 'x'
-    return lang.translate ( ''.join(tr) )
-
-def list_classes ( options ) :
-
-    # first try to read the 'codegen_kwgen.py' file, ignore all errors
-    ldict = read_kwgen ( options )
-    
-    langs = set()
-    files = os.listdir ( options.directory )
-    for f in files :
-        if f.startswith ( "template!" ) :
-            w = f.split('!')
-            lang = w[1]
-            langs.add ( lang )
-    langs = list(langs)
-    langs.sort()
-    fmt = "%%-%ds - %%s" % max ( [ len(l) for l in langs ] )
-    for l in langs :
-        descr = ldict.get( 'codegen_%s_description' % lang_trans(l), "" )
-        print fmt % ( l, descr )
-
-def get_user_name () :
-    try :
-        import pwd
-        pwde = pwd.getpwuid(os.getuid())
-        return pwde[4]
-    except :
-        return ""
-        
 if __name__ == '__main__':
     sys.exit ( main(sys.argv) )

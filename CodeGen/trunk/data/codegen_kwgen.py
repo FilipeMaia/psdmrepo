@@ -82,3 +82,22 @@ codegen_README_description = "Template for README file"
 codegen_ChangeLog_description = "Template for ChangeLog file"
 codegen_SConscript_description = "Template for SConscript file for regular package"
 codegen_SConscript_external_description = "Template for SConscript file for proxy package"
+
+# define destinatio directory inside the package
+# this is a dictonary indexed by language and extension
+# if particular language or extension is not defined it is assumed
+# that resulting file will go to the top directory
+codegen_dstdir = {}
+
+codegen_dstdir['Cxx'] = dict(cpp='src', h='include')
+codegen_dstdir['Cxx_template'] = dict(cpp='src', h='include')
+codegen_dstdir['Cxx_app'] = dict(cpp='app')
+codegen_dstdir['Cxx_unit_test'] = dict(cpp='test')
+
+codegen_dstdir['python'] = dict(py='src')
+codegen_dstdir['python_main'] = {'': 'app'}
+codegen_dstdir['python_unit_test'] = {'': 'test'}
+codegen_dstdir['pyana_module'] = dict(py='src')
+
+codegen_dstdir['ChangeLog'] = {'': 'doc'}
+codegen_dstdir['README'] = {'': 'doc'}
