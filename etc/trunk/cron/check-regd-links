@@ -49,11 +49,9 @@ import socket
 # Local definitions --
 #---------------------
 
-# top level directories to skip
-_l1_dirs_skip = ['logs', 'dgs']
-
-# second level directories to skip
-_l2_dirs_skip = ['data', 'scratch']
+# directories to skip
+_dirs_skip = ['logs', 'dgs', 'test', 
+              'cxi/data', 'rci/scratch', 'amo/amotst']
 
 _pjoin = os.path.join
 
@@ -101,12 +99,12 @@ def main (argv) :
         for l1 in _subdirs(src) :
             
             # filter out some dirs
-            if l1 in _l1_dirs_skip : continue
+            if l1 in _dirs_skip : continue
             
             for l2 in _subdirs(_pjoin(src,l1)) :
 
                 # filter out some dirs
-                if l2 in _l2_dirs_skip : continue
+                if _pjoin(l1,l2) in _dirs_skip : continue
                 
                 dir = _pjoin(l1,l2)
                 
