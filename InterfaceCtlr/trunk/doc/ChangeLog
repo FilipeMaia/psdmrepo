@@ -11,6 +11,11 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-04
+2010-10-06 Andy Salnikov
+- fix for PSDM Trac ticket #46 - crash of translator thread when accessing
+  resulting HDF5 file 
+
 Tag: V00-07-03
 2010-09-19 Andy Salnikov
 - updated web service to return list of instruments per in /system resources

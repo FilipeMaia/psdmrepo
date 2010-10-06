@@ -269,13 +269,20 @@ class TranslatorThread ( threading.Thread ) :
 
     def __dir_size( self, dirname ) :
 
+        def safe_stat(f):
+            # version of stat which does not throw
+            try:
+                return os.stat(f).st_size
+            except:
+                return 0
+
         # generator for all file paths under given directory
         def _all_files( dirname ) :
             for root, dirs, files in os.walk( dirname ) :
                 for f in files :
                     yield os.path.join( root, f )
 
-        return sum( [ os.stat(f).st_size for f in _all_files( dirname ) ] )
+        return sum( [ safe_stat(f) for f in _all_files( dirname ) ] )
 
 
     # ===============================
