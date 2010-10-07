@@ -36,6 +36,7 @@
 #include "H5DataTypes/CameraTwoDGaussianV1.h"
 #include "H5DataTypes/ControlDataConfigV1.h"
 #include "H5DataTypes/CsPadConfigV1.h"
+#include "H5DataTypes/CsPadConfigV2.h"
 #include "H5DataTypes/EncoderConfigV1.h"
 #include "H5DataTypes/EncoderDataV1.h"
 #include "H5DataTypes/EpicsPvHeader.h"
@@ -66,6 +67,7 @@
 #include "O2OTranslator/CameraFrameV1Cvt.h"
 #include "O2OTranslator/ConfigDataTypeCvt.h"
 #include "O2OTranslator/CsPadElementV1Cvt.h"
+#include "O2OTranslator/CsPadElementV2Cvt.h"
 #include "O2OTranslator/EvrDataV3Cvt.h"
 #include "O2OTranslator/EvtDataTypeCvtDef.h"
 #include "O2OTranslator/EpicsDataTypeCvt.h"
@@ -300,6 +302,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::CsPadConfigV2> ( "CsPad::ConfigV2" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   hsize_t chunk_size = 16*1024 ;
 
   // instantiate all factories for event converters
@@ -401,6 +407,11 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   // very special converter for CsPad::ElementV1, it needs two types of data
   converter.reset( new CsPadElementV1Cvt ( "CsPad::ElementV1", m_configStore, chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadElement,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // very special converter for CsPad::ElementV2, it needs two types of data
+  converter.reset( new CsPadElementV2Cvt ( "CsPad::ElementV2", m_configStore, chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_CspadElement,2).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
 }
