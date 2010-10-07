@@ -153,20 +153,22 @@ class IcAutoTranslate ( LusiPyApp ) :
                         self.trace('No files for %s %s %d', instr, exper, run)
                         continue
 
+                    # build the file names
                     paths = []
                     for stream, chunk in files :
-                        # build the file name
                         path = "/reg/d/psdm/%s/%s/xtc/e%d-r%04d-s%02d-c%02d.xtc" % \
                             (instr, exper, expid, run, stream, chunk)
                         paths.append(path)
 
+                    # check that all files exists
                     all_files = True
                     for path in paths:
-                        # check that file exists
                         if not os.path.exists(path) : 
                             self.trace('No file %s', path)
                             all_files = False
                             break
+                        else :
+                            self.debug('Found file %s', path)
 
                     if all_files:
 
