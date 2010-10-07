@@ -1,0 +1,69 @@
+#!/bin/sh
+#
+# Shell script which runs irods-scan script
+#
+# $Id$
+#
+
+# release directory
+release=/reg/g/psdm/sw/releases/current
+
+# log directory
+logdir=/reg/g/psdm/psdatmgr/ic/log
+
+# iRODS resource
+resource=lustre-resc
+
+# mail
+expert=salnikov
+
+# ===================================================================
+
+usage () {
+  echo "Usage: $(basename $0) [options] irods-coll"
+  echo "  Options:"
+  echo "    -h        - print this message"
+  echo "    -r path   - release directory, def: $release"
+}
+
+while getopts hr: c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    r) release="$OPTARG" ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# create log dir
+test -d "$logdir" || mkdir -p "$logdir" || exit 2
+
+# redirect output
+log="$logdir/irods-scan.log"
+exec >> "$log" 2>&1
+
+time=`date +'%Y-%m-%d %H:%M:%S'`
+echo "+++ Time: $time Release: $release"
+
+
+# have to be in release directory
+cd "$release"
+
+# run setup script, it should guess everything based on the current directory
+. /reg/g/psdm/bin/sit_setup.sh
+
+# run it
+irods-scan -r -R "$resource" "$@"
+if [ $? -ne 0 ] ; then
+	
+	mail -s "[irods-scan-cron] Detected orphaned files" $expert << EOD
+$time
+Check log file $logdir/irods-scan.log
+EOD
+	
+fi
+
+time=`date +'%Y-%m-%d %H:%M:%S'`
+echo "--- Time: $time"
+
+exit $status
