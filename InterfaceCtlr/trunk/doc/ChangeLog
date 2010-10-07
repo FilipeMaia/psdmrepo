@@ -11,6 +11,13 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-05
+2010-10-07 Andy Salnikov
+- new script ic-auto-translate which check online databases for new runs,
+  check that all files have been copied from new runs and sends a 
+  translation request
+- doc/st.AutoTranslate - init.d script for ic-auto-translate
+
 Tag: V00-07-04
 2010-10-06 Andy Salnikov
 - fix for PSDM Trac ticket #46 - crash of translator thread when accessing
