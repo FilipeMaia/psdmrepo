@@ -1,0 +1,60 @@
+#!/bin/sh
+#
+# Shell script which runs a manages a bunch of controllers
+#
+# $Id$
+#
+
+# release directory
+release=/reg/g/psdm/sw/releases/current
+release=/reg/neh/home/salnikov/releases/ic-0.2.22
+
+# log directory
+logdir=/reg/g/psdm/psdatmgr/ic/log
+
+# ===================================================================
+
+usage () {
+  echo "Usage: $(basename $0) [options]"
+  echo "  Options:"
+  echo "    -h        - print this message"
+  echo "    -r path   - release directory, def: $release"
+  echo "    -p path   - PID file path, def: none"
+}
+
+while getopts hr:p: c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    r) release="$OPTARG" ;;
+    p) pidfile="$OPTARG" ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# allow world access
+umask 022
+
+# create log dir
+test -d "$logdir" || mkdir -p "$logdir" || exit 2
+
+# redirect output
+time=`date +%Y%m%dT%H%M%S`
+log="$logdir/ic-controller/ic-auto-translate-$time-`hostname`.log"
+exec 2>&1 >"${log}"
+
+echo "Running from release $release"
+
+# have to be in release directory
+cd "$release"
+
+# run setup script, it should guess everything based on the current directory
+. /reg/g/psdm/bin/sit_setup.sh
+
+ic-auto-translate -v -v &
+pid=$!
+
+# store PID
+test -n "$pidfile" && echo $pid >"$pidfile"
+
+exit
