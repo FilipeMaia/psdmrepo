@@ -103,7 +103,7 @@ class IcWsStatus ( LusiPyApp ) :
             data = res.request( 'GET' )
             if data:
                 if not self._options.no_header :
-                    print 'Host          Status        Started'
+                    print 'Instrument Experiment'
                     print '---------------------'
                 data = [ (d['instrument'], d['experiment']) for d in data ]
                 data.sort()

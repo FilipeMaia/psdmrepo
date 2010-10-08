@@ -11,6 +11,10 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-07
+2010-10-07 Andy Salnikov
+- header of the output table from 'ic-ws-status -l' was wrong
+
 Tag: V00-07-06
 2010-10-07 Andy Salnikov
 - one more message in ic-auto-translate
