@@ -1,0 +1,246 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script ic-auto-translate...
+#
+#------------------------------------------------------------------------
+
+"""Script which automatically submits translation requests.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 8 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import time
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from InterfaceCtlr.InterfaceDb import InterfaceDb
+from LusiPython.DbConnection import DbConnection
+
+#---------------------
+# Local definitions --
+#---------------------
+
+_icdb_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
+_regdb_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.regdb-conn"
+_logbook_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.logbook-conn"
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class IcAutoTranslate ( LusiPyApp ) :
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] input-file ..." )
+
+        # add application options, see optparse module for details
+        self._parser.add_option ( '-c', "--config", 
+                                  default="/reg/g/psdm/psdatmgr/ic/ic-auto-translate.cfg", help="specify config file" )
+        self._parser.add_option ( '-d', "--icdb-conn", 
+                                  default=_icdb_conn_str, help="specify interface database connection string" )
+        self._parser.add_option ( '-r', "--regdb-conn", 
+                                  default=_regdb_conn_str, help="specify regdb connection string" )
+        self._parser.add_option ( '-l', "--logbook-conn", 
+                                  default=_logbook_conn_str, help="specify logbook connection string" )
+        
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+    	# run in a loop forever
+        delay = 0
+        while True:
+
+            # if nothing happened then sleep for a while
+            time.sleep(delay)
+            delay = 60
+            
+            self.info('Starting next round')
+
+            # read config file
+            config = self._readConfig()
+            if not config :
+                # no config, pause and sleep a bit longer
+                self.info("No configuration, skip iteration")
+                delay = 180
+                continue
+            
+            # Connect to databases
+            try :
+                icdb_conn = DbConnection(conn_string=self._options.icdb_conn)
+                regdb_conn = DbConnection(conn_string=self._options.regdb_conn)
+                logbook_conn = DbConnection(conn_string=self._options.logbook_conn)
+            except Exception, ex:
+                self.warning('Failed to connect to one or more databases: %s', ex)
+                continue
+            
+            icdb = InterfaceDb( icdb_conn, self )
+
+            # loop over active experiments
+            for instr, exper, options in config :
+
+                self.info('processing experiment: %s %s', instr, exper)
+
+                # get the experiments id from regdb
+                q = """select e.id from instrument i, experiment e where 
+                    i.id = e.instr_id and i.name = %s and e.name = %s"""
+                cursor = regdb_conn.cursor()
+                cursor.execute( q, (instr, exper) )
+                ids = [ row[0] for row in cursor.fetchall() ]
+                if not ids:
+                    self.warning('Unknown experiment: %s %s', instr, exper)
+                    continue
+                if len(ids) > 1:
+                    self.warning('More than one matching experiment: %s %s', instr, exper)
+                    continue
+                expid = ids[0]
+
+                # get the list of runs from existing requests 
+                q = """select run_number from fileset where instrument = %s and experiment = %s"""
+                cursor = icdb_conn.cursor()
+                cursor.execute( q, (instr, exper) )
+                old_runs = set([ row[0] for row in cursor.fetchall() ])
+                self.trace('found %d translated runs: %s %s', len(old_runs), instr, exper)
+
+                # get the list of all finished runs from logbook
+                q = """select num from run where exper_id = %s and end_time is not NULL"""
+                cursor = logbook_conn.cursor()
+                cursor.execute( q, (expid,) )
+                all_runs = set([ row[0] for row in cursor.fetchall() ])
+                self.trace('found %d finished runs: %s %s', len(all_runs), instr, exper)
+
+                # runs that have not been requested yet
+                new_runs = all_runs - old_runs
+                for run in new_runs :
+                    
+                    q = """select stream, chunk from file where exper_id = %s and run = %s"""
+                    cursor = regdb_conn.cursor()
+                    cursor.execute( q, (expid, run) )
+                    files = [ tuple(row) for row in cursor.fetchall() ]
+                    if not files:
+                        self.trace('No files for %s %s %d', instr, exper, run)
+                        continue
+
+                    # build the file names
+                    paths = []
+                    for stream, chunk in files :
+                        path = "/reg/d/psdm/%s/%s/xtc/e%d-r%04d-s%02d-c%02d.xtc" % \
+                            (instr, exper, expid, run, stream, chunk)
+                        paths.append(path)
+
+                    # check that all files exists
+                    all_files = True
+                    for path in paths:
+                        if not os.path.exists(path) : 
+                            self.trace('No file %s', path)
+                            all_files = False
+                            break
+                        else :
+                            self.debug('Found file %s', path)
+
+                    if all_files:
+
+                        # guess priority from the option value
+                        prio = options.get('priority', 0)
+                        if prio == 'run' :
+                            prio = run
+                        elif prio == 'invrun' :
+                            prio = 10000-run
+                        else :
+                            try :
+                                prio = int(prio)
+                            except:
+                                prio = 0
+                        
+                        # submit a request
+                        try:
+                            icdb.new_fileset(instr, exper, run, 'DATA', paths, priority=prio)
+                            self.info('Submitted %s %s %d', instr, exper, run)
+                        except Exception, ex:
+                            self.warning('Failed to submit %s %s %d: %s', instr, exper, run, ex)
+                            continue
+                            
+                        
+
+    def _readConfig(self):
+        """ Read config file and parse it. Every line in config file
+        must contain instrument name, experiment name, and possibly
+        empty list of options. Options have format 'option' or 'option=value'.
+        """            
+        
+        fname = self._options.config
+        try :
+            file = open(fname)
+        except Exception, ex:
+            self.warning('cannot open config file %s: %s', fname, ex)
+            return None
+        
+        config = []
+        try :
+            for linenum, line in enumerate(file):
+                
+                # skip empty lines and comments
+                line = line.strip()
+                if not line: continue
+                if line[0] == '#' : continue
+
+                # must have at least two words, first word is instrument name
+                words = line.split()
+                if len(words) < 2 or len(words[0]) != 3:
+                    self.error('%s:%d invalid format', fname, linenum)
+                    return None
+
+                instr = words[0].upper()
+                exper = words[1]
+                options = {}
+                for w in words[2:]:
+                    option = w.split('=',1)+[None]
+                    options[option[0]] = option[1]
+
+                config.append((instr, exper, options))
+
+        except Exception, ex:
+            self.warning('error reading config file %s: %s', fname, ex)
+            return None
+            
+        return config
+        
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = IcAutoTranslate()
+    rc = app.run()
+    sys.exit(rc)
