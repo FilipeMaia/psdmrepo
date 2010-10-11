@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-04
+2010-10-11 Andy Salnikov
+- improve messages in case EOF is observed in XTC file
+
 Tag: V00-08-03
 2010-10-01 Andy Salnikov
 - forgot to add CsPad V2 converters to O2OHdf5Writer

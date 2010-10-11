@@ -93,9 +93,10 @@ O2OXtcDgIterator::next()
   if ( payloadSize ) {
     if ( fread(dg->xtc.payload(), payloadSize, 1, m_file) != 1 ) {
       if ( feof(m_file) ) {
-        MsgLog( logger, error, "next -- EOF while reading datagram payload in file " << m_path ) ;
+        throw O2OXTCEOFException(m_path);
+      } else {
+        throw O2OXTCReadException(m_path);
       }
-      throw O2OXTCReadException(m_path);
     }
   }
 

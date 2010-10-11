@@ -83,6 +83,14 @@ public:
 
 };
 
+class O2OXTCEOFException : public O2OException {
+public:
+
+    O2OXTCEOFException(const std::string& fileName)
+    : O2OException( "O2OXTCEOFException", "EOF while reading datagram payload in file "+fileName ) {}
+
+};
+
 class O2OXTCReadException : public O2OErrnoException {
 public:
 
