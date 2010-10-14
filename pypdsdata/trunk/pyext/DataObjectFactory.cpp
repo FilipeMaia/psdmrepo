@@ -39,10 +39,13 @@
 #include "types/control/ConfigV1.h"
 
 #include "types/cspad/ConfigV1.h"
+#include "types/cspad/ConfigV2.h"
 #include "types/cspad/ElementV1.h"
+#include "types/cspad/ElementV2.h"
 
 #include "types/encoder/ConfigV1.h"
 #include "types/encoder/DataV1.h"
+#include "types/encoder/DataV2.h"
 
 #include "types/epics/EpicsModule.h"
 
@@ -229,6 +232,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_EncoderData :
     if ( not obj ) obj = xtc2obj<Encoder::DataV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Encoder::DataV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_EncoderConfig :
@@ -245,10 +249,12 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_CspadElement :
     if ( not obj ) obj = xtc2obj<CsPad::ElementV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<CsPad::ElementV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_CspadConfig :
     if ( not obj ) obj = xtc2obj<CsPad::ConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<CsPad::ConfigV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_IpmFexConfig :

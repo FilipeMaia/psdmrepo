@@ -61,13 +61,16 @@
 
 #include "types/cspad/ConfigV1.h"
 #include "types/cspad/ConfigV1QuadReg.h"
+#include "types/cspad/ConfigV2.h"
 #include "types/cspad/CsPadDigitalPotsCfg.h"
 #include "types/cspad/CsPadGainMapCfg.h"
 #include "types/cspad/CsPadReadOnlyCfg.h"
 #include "types/cspad/ElementV1.h"
+#include "types/cspad/ElementV2.h"
 
 #include "types/encoder/ConfigV1.h"
 #include "types/encoder/DataV1.h"
+#include "types/encoder/DataV2.h"
 
 #include "types/epics/EpicsModule.h"
 
@@ -201,16 +204,19 @@ PyMODINIT_FUNC init_pdsdata()
   module = Py_InitModule3( "_pdsdata.cspad", 0, "The Python module for pdsdata/cspad" );
   pypdsdata::CsPad::ConfigV1::initType( module );
   pypdsdata::CsPad::ConfigV1QuadReg::initType( module );
+  pypdsdata::CsPad::ConfigV2::initType( module );
   pypdsdata::CsPad::CsPadDigitalPotsCfg::initType( module );
   pypdsdata::CsPad::CsPadGainMapCfg::initType( module );
   pypdsdata::CsPad::CsPadReadOnlyCfg::initType( module );
   pypdsdata::CsPad::ElementV1::initType( module );
+  pypdsdata::CsPad::ElementV2::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "cspad", module );
 
   module = Py_InitModule3( "_pdsdata.encoder", 0, "The Python module for pdsdata/encoder" );
   pypdsdata::Encoder::ConfigV1::initType( module );
   pypdsdata::Encoder::DataV1::initType( module );
+  pypdsdata::Encoder::DataV2::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "encoder", module );
 

@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class ElementV1...
+//	Class ElementV2...
 //
 // Author List:
 //      Andrei Salnikov
@@ -14,7 +14,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "ElementV1.h"
+#include "ElementV2.h"
 
 //-----------------
 // C/C++ Headers --
@@ -23,7 +23,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "ConfigV1.h"
 #include "ConfigV2.h"
 #include "../../Exception.h"
 #include "../TypeLib.h"
@@ -36,16 +35,16 @@
 namespace {
 
   // methods
-  FUN0_WRAPPER(pypdsdata::CsPad::ElementV1, virtual_channel)
-  FUN0_WRAPPER(pypdsdata::CsPad::ElementV1, lane)
-  FUN0_WRAPPER(pypdsdata::CsPad::ElementV1, tid)
-  FUN0_WRAPPER(pypdsdata::CsPad::ElementV1, acq_count)
-  FUN0_WRAPPER(pypdsdata::CsPad::ElementV1, op_code)
-  FUN0_WRAPPER(pypdsdata::CsPad::ElementV1, quad)
-  FUN0_WRAPPER(pypdsdata::CsPad::ElementV1, seq_count)
-  FUN0_WRAPPER(pypdsdata::CsPad::ElementV1, ticks)
-  FUN0_WRAPPER(pypdsdata::CsPad::ElementV1, fiducials)
-  FUN0_WRAPPER(pypdsdata::CsPad::ElementV1, frame_type)
+  FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, virtual_channel)
+  FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, lane)
+  FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, tid)
+  FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, acq_count)
+  FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, op_code)
+  FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, quad)
+  FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, seq_count)
+  FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, ticks)
+  FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, fiducials)
+  FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, frame_type)
   PyObject* sb_temp( PyObject* self, PyObject* args );
   PyObject* next( PyObject* self, PyObject* args );
   PyObject* data( PyObject* self, PyObject* args );
@@ -67,7 +66,7 @@ namespace {
     {0, 0, 0, 0}
    };
 
-  char typedoc[] = "Python class wrapping C++ Pds::CsPad::ElementV1 class.";
+  char typedoc[] = "Python class wrapping C++ Pds::CsPad::ElementV2 class.";
 }
 
 //              ----------------------------------------
@@ -75,7 +74,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::CsPad::ElementV1::initType( PyObject* module )
+pypdsdata::CsPad::ElementV2::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -90,7 +89,7 @@ pypdsdata::CsPad::ElementV1::initType( PyObject* module )
   PyDict_SetItemString( type->tp_dict, "MaxRowsPerASIC", val );
   Py_CLEAR(val);
 
-  BaseType::initType( "ElementV1", module );
+  BaseType::initType( "ElementV2", module );
 }
 
 namespace {
@@ -98,15 +97,15 @@ namespace {
 PyObject*
 sb_temp( PyObject* self, PyObject* args )
 {
-  const Pds::CsPad::ElementV1* obj = pypdsdata::CsPad::ElementV1::pdsObject( self );
+  const Pds::CsPad::ElementV2* obj = pypdsdata::CsPad::ElementV2::pdsObject( self );
   if ( not obj ) return 0;
 
   // parse args
   unsigned index ;
-  if ( not PyArg_ParseTuple( args, "I:ElementV1.sb_temp", &index ) ) return 0;
+  if ( not PyArg_ParseTuple( args, "I:ElementV2.sb_temp", &index ) ) return 0;
 
   if ( index >= 4 ) {
-    PyErr_SetString(PyExc_IndexError, "index outside of range [0..3] in ElementV1.sb_temp()");
+    PyErr_SetString(PyExc_IndexError, "index outside of range [0..3] in ElementV2.sb_temp()");
     return 0;
   }
   
@@ -128,63 +127,55 @@ unsigned bitCount(uint32_t mask, unsigned maxBits) {
 PyObject*
 next( PyObject* self, PyObject* args )
 {
-  Pds::CsPad::ElementV1* obj = pypdsdata::CsPad::ElementV1::pdsObject( self );
+  Pds::CsPad::ElementV2* obj = pypdsdata::CsPad::ElementV2::pdsObject( self );
   if ( not obj ) return 0;
 
   // parse args
   PyObject* configObj ;
-  if ( not PyArg_ParseTuple( args, "O:cspad.ElementV1.next", &configObj ) ) return 0;
+  if ( not PyArg_ParseTuple( args, "O:cspad.ElementV2.next", &configObj ) ) return 0;
 
   // get segment mask from config object
   uint32_t sMask;
-  unsigned payloadSize;
-  if ( pypdsdata::CsPad::ConfigV1::Object_TypeCheck( configObj ) ) {
-    const Pds::CsPad::ConfigV1* config = pypdsdata::CsPad::ConfigV1::pdsObject( configObj );
-    sMask = config->asicMask()==1 ? 0x3 : 0xff;
-    payloadSize = config->payloadSize();
-  } else if ( pypdsdata::CsPad::ConfigV2::Object_TypeCheck( configObj ) ) {
+  if ( pypdsdata::CsPad::ConfigV2::Object_TypeCheck( configObj ) ) {
     const Pds::CsPad::ConfigV2* config = pypdsdata::CsPad::ConfigV2::pdsObject( configObj );
-    sMask = config->asicMask()==1 ? 0x3 : 0xff;
-    payloadSize = config->payloadSize();
+    sMask = config->roiMask(obj->quad());
   } else {
-    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a cspad.ConfigV1 or cspad.ConfigV2 object");
+    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a cspad.ConfigV2 object");
     return 0;
   }
 
   const unsigned nSect = ::bitCount(sMask, Pds::CsPad::ASICsPerQuad/2);
   const unsigned qsize = nSect*Pds::CsPad::ColumnsPerASIC*Pds::CsPad::MaxRowsPerASIC*2;
+  const unsigned payloadSize = sizeof(*obj) + sizeof(uint16_t)*(qsize+2);
 
   // start of pixel data
-  const uint16_t* qdata = obj->data();
+  const uint16_t* qdata = (const uint16_t*)(obj+1);
 
   // move to next frame
-  Pds::CsPad::ElementV1* next = (Pds::CsPad::ElementV1*)(qdata+qsize+2) ;
+  Pds::CsPad::ElementV2* next = (Pds::CsPad::ElementV2*)(qdata+qsize+2) ;
 
   // make Python object, parent will be our parent
-  pypdsdata::CsPad::ElementV1* py_this = static_cast<pypdsdata::CsPad::ElementV1*>(self);
-  return pypdsdata::CsPad::ElementV1::PyObject_FromPds( next, py_this->m_parent, payloadSize, py_this->m_dtor );
+  pypdsdata::CsPad::ElementV2* py_this = static_cast<pypdsdata::CsPad::ElementV2*>(self);
+  return pypdsdata::CsPad::ElementV2::PyObject_FromPds( next, py_this->m_parent, payloadSize, py_this->m_dtor );
 }
 
 PyObject*
 data( PyObject* self, PyObject* args )
 {
-  Pds::CsPad::ElementV1* obj = pypdsdata::CsPad::ElementV1::pdsObject( self );
+  Pds::CsPad::ElementV2* obj = pypdsdata::CsPad::ElementV2::pdsObject( self );
   if ( not obj ) return 0;
 
   // parse args
   PyObject* configObj ;
-  if ( not PyArg_ParseTuple( args, "O:cspad.ElementV1.data", &configObj ) ) return 0;
+  if ( not PyArg_ParseTuple( args, "O:cspad.ElementV2.data", &configObj ) ) return 0;
 
   // get segment mask from config object
   uint32_t sMask;
-  if ( pypdsdata::CsPad::ConfigV1::Object_TypeCheck( configObj ) ) {
-    const Pds::CsPad::ConfigV1* config = pypdsdata::CsPad::ConfigV1::pdsObject( configObj );
-    sMask = config->asicMask()==1 ? 0x3 : 0xff;
-  } else if ( pypdsdata::CsPad::ConfigV2::Object_TypeCheck( configObj ) ) {
+  if ( pypdsdata::CsPad::ConfigV2::Object_TypeCheck( configObj ) ) {
     const Pds::CsPad::ConfigV2* config = pypdsdata::CsPad::ConfigV2::pdsObject( configObj );
-    sMask = config->asicMask()==1 ? 0x3 : 0xff;
+    sMask = config->roiMask(obj->quad());
   } else {
-    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a cspad.ConfigV1 or cspad.ConfigV2 object");
+    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a cspad.ConfigV2 object");
     return 0;
   }
   
@@ -198,9 +189,12 @@ data( PyObject* self, PyObject* args )
   const unsigned nSect = ::bitCount(sMask, Pds::CsPad::ASICsPerQuad/2);
   npy_intp dims[3] = { nSect, Pds::CsPad::ColumnsPerASIC, Pds::CsPad::MaxRowsPerASIC*2 };
 
+  // start of pixel data
+  uint16_t* qdata = (uint16_t*)(obj+1);
+
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 3, dims, typenum, 0,
-                                (void*)obj->data(), 0, flags, 0);
+                                qdata, 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);
@@ -208,5 +202,6 @@ data( PyObject* self, PyObject* args )
 
   return array;
 }
+
 
 }

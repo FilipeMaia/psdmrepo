@@ -1,4 +1,10 @@
 
+2010-10-14 - V00-00-18
+======================
+- upgrading to pdsdata V02-08-00 and V02-09-00
+- new cspad/ConfigV2 and cspad/ElementV2 classes
+- new class encoder/DataV2
+
 2010-09-03 - V00-00-17
 ======================
 - upgrading to pdsdata V02-07-00, new cspad module
