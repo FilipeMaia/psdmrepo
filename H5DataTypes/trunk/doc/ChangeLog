@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-26
+2010-10-14 Andy Salnikov
+- update for pdsdata V02-09-00
+- new class EncoderDataV2
+
 Tag: V00-00-25
 2010-10-05 Andy Salnikov
 - extened IpimbDataV1 to include voltages data which are derived from
