@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2010-10-14 Andy Salnikov
+- adding new example module myana_cspad
+
 Tag: V00-00-06
 2010-09-21 Andy Salnikov
 - added new example module myana_control_config and its config file
