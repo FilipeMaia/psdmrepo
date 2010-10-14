@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-20
+2010-10-14 - Andy Salnikov
+- some changes in cspad module need update for event class 
+
 Tag: V00-00-19
 2010-09-21 - Andy Salnikov
 - store config objects from Control level (ControlConfig) in environment

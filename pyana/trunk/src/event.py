@@ -248,7 +248,7 @@ class Event(object):
         quads = []
         numQuads = cfg.numQuads()
         while True:
-            quads.append(cspad.ElementV1(quad, cfg))
+            quads.append(cspad.wrapElement(quad, cfg))
             if len(quads) >= numQuads : break
             quad = quad.next(cfg)
         
