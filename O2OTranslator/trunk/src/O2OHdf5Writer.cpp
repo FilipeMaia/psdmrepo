@@ -39,6 +39,7 @@
 #include "H5DataTypes/CsPadConfigV2.h"
 #include "H5DataTypes/EncoderConfigV1.h"
 #include "H5DataTypes/EncoderDataV1.h"
+#include "H5DataTypes/EncoderDataV2.h"
 #include "H5DataTypes/EpicsPvHeader.h"
 #include "H5DataTypes/EvrConfigV1.h"
 #include "H5DataTypes/EvrConfigV2.h"
@@ -342,6 +343,12 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   converter.reset( new EvtDataTypeCvtDef<H5DataTypes::EncoderDataV1> (
       "Encoder::DataV1", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_EncoderData,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // version for this type is 2
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::EncoderDataV2> (
+      "Encoder::DataV2", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EncoderData,2).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // version for this type is 1
