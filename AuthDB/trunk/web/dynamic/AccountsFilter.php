@@ -37,7 +37,7 @@ try {
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-    $con = new RegDBHtml( 0, 0, 400, 60 );
+    $con = new RegDBHtml( 0, 0, 400, 65 );
     echo $con
 
         ->value      (   0,  3, '<b>Search for user</b>' )
@@ -48,7 +48,7 @@ try {
         ->radio_input( 240, 23, 'scope', 'uid',          $scope == 'uid'          )->label( 260,  23, '<b>UID</b>',        false )
         ->radio_input( 240, 43, 'scope', 'name',         $scope == 'name'         )->label( 260,  43, '<b>name</b>',       false )
 
-        ->button     ( 365,  0, 'accounts_filter_button', 'Go', 'update the table using this filter' )
+        ->button     ( 102, 35, 'accounts_filter_button', 'Search', 'update the table using this filter' )
         ->html();
 
     $authdb->commit();

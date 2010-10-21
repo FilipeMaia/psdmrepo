@@ -195,7 +195,24 @@ try {
 
     $can_read = $auth_svc->canRead() ? 'true' : 'false';
     $can_edit = $auth_svc->canEdit() ? 'true' : 'false';
-    
+
+    # TODO: Do the same for other apps. Put this code into a utility class
+    # to avoid cut-and-paste scenario.
+    #
+    if( array_key_exists( 'WEBAUTH_TOKEN_CREATION', $_SERVER ))
+        $webauth_tocken_creation = $_SERVER['WEBAUTH_TOKEN_CREATION'];
+    else if( array_key_exists( 'REDIRECT_WEBAUTH_TOKEN_CREATION', $_SERVER ))
+        $webauth_tocken_creation = $_SERVER['REDIRECT_WEBAUTH_TOKEN_CREATION'];
+    else
+        $webauth_tocken_creation = 0;
+
+    if( array_key_exists( 'WEBAUTH_TOKEN_EXPIRATION', $_SERVER ))
+        $webauth_tocken_expiration = $_SERVER['WEBAUTH_TOKEN_EXPIRATION'];
+    else if( array_key_exists( 'REDIRECT_WEBAUTH_TOKEN_EXPIRATION', $_SERVER ))
+        $webauth_tocken_expiration = $_SERVER['REDIRECT_WEBAUTH_TOKEN_EXPIRATION'];
+    else
+        $webauth_tocken_expiration = 0;
+        
     echo <<<HERE
 
 /* Authentication and authorization context
@@ -203,8 +220,8 @@ try {
 var auth_type="{$auth_svc->authType()}";
 var auth_remote_user="{$auth_svc->authName()}";
  
-var auth_webauth_token_creation="{$_SERVER['WEBAUTH_TOKEN_CREATION']}";
-var auth_webauth_token_expiration="{$_SERVER['WEBAUTH_TOKEN_EXPIRATION']}";
+var auth_webauth_token_creation="{$webauth_tocken_creation}";
+var auth_webauth_token_expiration="{$webauth_tocken_expiration}";
 
 var auth_granted = {
   read : {$can_read},
@@ -237,6 +254,8 @@ if( isset( $_GET['action'] )) {
         echo "  view_account('".$_GET['uid']."');";
     } else if( $action == 'view_group' ) {
         echo "  view_group('".$_GET['gid']."');";
+    } else if( $action == 'manage_my_groups' ) {
+        echo '  manage_my_groups();';
     } else {
         echo "  alert( 'unsupported action: {$action}' );";
     }
@@ -1390,7 +1409,7 @@ function view_group( name ) {
         [ { key: "uid",   sortable: true, resizeable: true },
           { key: "name",  sortable: true, resizeable: true },
           { key: "email", sortable: true, resizeable: true } ],
-        '../regdb/RequestGroupMembers.php?name='+name,
+        '../regdb/ManageGroupMembers.php?group='+name,
         true
     );
     table.refreshTable();
@@ -1508,8 +1527,8 @@ function view_account( uid ) {
 
     var action_edit = create_button (
             "edit_button",
-            function() { edit_account( uid ); },
-            !auth_granted.edit );
+            function() { edit_account( uid ); }/*,
+            !auth_granted.edit*/ );
 }
 
 function edit_account( uid ) {
@@ -1539,8 +1558,8 @@ function edit_account( uid ) {
             "save_button",
             function() {
                 document.account_edit_form.submit();
-            },
-            !auth_granted.edit
+            }/*,
+            !auth_granted.edit */
         );
     var cancel = create_button (
         "cancel_button",
@@ -1558,7 +1577,7 @@ function account2html(idx) {
 	var border_style = ( idx == 0 ? '' : 'border-top:solid 1px #d0d0d0;' );
 	var result=
 	'<div style="position:relative; left:10px; top:0px; width:425; height:30px; '+border_style+'">'+
-	'  <div style="position:absolute; left:4px; top:12px;"><b>'+account.uid+'</b></div>'+
+	'  <div style="position:absolute; left:4px; top:12px;"><b>'+account.uid_link+'</b></div>'+
 	'  <div style="position:absolute; left:125px; top:12px;">'+account.name+'</div>'+
 	'  <div style="position:absolute; left:370px; top:8px; width:30px;"><button id="'+include_account_button_name+'">Add</button></div>'+
 	'</div><br>';
@@ -1618,7 +1637,7 @@ function groupmember_account2html(idx) {
 	var border_style = ( idx == 0 ? '' : 'border-top:solid 1px #d0d0d0;' );
 	var result=
 	'<div style="position:relative; left:10px; top:0px; width:425; height:30px; '+border_style+'">'+
-	'  <div style="position:absolute; left:4px; top:12px;"><b>'+account.uid+'</b></div>'+
+	'  <div style="position:absolute; left:4px; top:12px;"><b>'+account.uid_link+'</b></div>'+
 	'  <div style="position:absolute; left:125px; top:12px;">'+account.name+'</div>'+
 	'  <div style="position:absolute; left:350px; top:8px; width:75px;"><button id="'+exclude_account_button_name+'">Remove</button></div>'+
 	'</div><br>';
@@ -1646,6 +1665,10 @@ function apply_select_group(theObj) {
     document.getElementById('my_group_selected').innerHTML = 'Retrieving...';
 
     function callback_on_load( result ) {
+        if( 'success' != result.ResultSet.Status ) {
+            document.getElementById('my_group_selected').innerHTML = result.ResultSet.Message;
+            return;
+        }
         last_group_search_result = result.ResultSet.Result;
         var html1 = '';
         for( var i=0; i < last_group_search_result.length; i++ ) {
@@ -1660,19 +1683,20 @@ function apply_select_group(theObj) {
     }
 
     load_then_call(
-        '../regdb/RequestGroupMembers.php?name='+group+'&simple',
+        '../regdb/ManageGroupMembers.php?group='+group+'&simple',
         callback_on_load,
         callback_on_failure );
 }
 
 function apply_modify_group(action, uid, group) {
 
-	var request = action+'&uid='+uid+'&group='+group;
-    alert(request);
-
     document.getElementById('my_group_selected').innerHTML = 'Retrieving...';
 
     function callback_on_load( result ) {
+        if( 'success' != result.ResultSet.Status ) {
+            document.getElementById('my_group_selected').innerHTML = result.ResultSet.Message;
+            return;
+        }
         last_group_search_result = result.ResultSet.Result;
         var html1 = '';
         for( var i=0; i < last_group_search_result.length; i++ ) {
@@ -1680,14 +1704,14 @@ function apply_modify_group(action, uid, group) {
             html1 += h;
         }
         document.getElementById('my_group_selected').innerHTML = html1;
-    }
+     }
     function callback_on_failure( http_status ) {
         document.getElementById('my_group_selected').innerHTML=
             '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
     }
 
     load_then_call(
-        '../regdb/RequestGroupMembers.php?name='+group+'&simple',
+        '../regdb/ManageGroupMembers.php?group='+group+'&simple&action='+action+'&uid='+uid,
         callback_on_load,
         callback_on_failure );
 }
@@ -1706,9 +1730,7 @@ function manage_my_groups() {
         '    <div style="margin-bottom:10px; width:auto; text-align:center;" class="section_header" >'+
         '      U s e r &nbsp;&nbsp; A c c o u n t s'+
         '    </div>'+
-        //'    <div style="margin-bottom:20px; padding:10px;  padding-left:0px; padding-top:0px; border-bottom:solid 1px #000000;">'+
-        //'    <div style="margin-bottom:20px; padding:10px;  padding-left:10px; padding-top:10px; background-color:#d0d0d0; width:425; height:60px;">'+
-        '    <div style="margin-bottom:20px; padding:10px;  padding-left:10px; padding-top:10px; border-bottom:solid 1px #000000; width:425; height:60px;">'+
+        '    <div style="margin-bottom:20px; padding:10px;  padding-left:10px; padding-top:10px; border-bottom:solid 1px #000000; width:425; height:65px;">'+
         '      <form name="accounts_filter_form" action="javascript:apply_my_accounts_filter()">'+
         '        <div id="accounts_filter_form_params">Loading...</div>'+
         '      </form>'+
@@ -1720,16 +1742,9 @@ function manage_my_groups() {
         '    <div style="margin-left:40px; margin-bottom:10px; width:auto; text-align:center;" class="section_header" >'+
         '      G r o u p s'+
         '    </div>'+
-        //'    <div style="margin-left:40px; margin-bottom:20px; padding:10px; padding-left:0px; padding-top:0px; border-bottom:solid 1px #000000; height:60px;">'+
-        //'    <div style="margin-left:40px; margin-bottom:20px; padding:10px;  padding-left:10px; padding-top:10px; background-color:#d0d0d0; width:425; height:60px;">'+
-        '    <div style="margin-left:40px; margin-bottom:20px; padding:10px;  padding-left:10px; padding-top:10px; border-bottom:solid 1px #000000; width:425; height:60px;">'+
+        '    <div style="margin-left:40px; margin-bottom:20px; padding:10px;  padding-left:10px; padding-top:10px; border-bottom:solid 1px #000000; width:425; height:65px;">'+
         '      <form name="select_group_form">'+
-        '        <b>Select group to manage</b> '+
-        '        <select align="center" type="text" name="group" style="padding:1px;" onchange="javascript:apply_select_group(this);">'+
-        '          <option value="sxrrsx10">sxrrsx10</option>'+
-        '          <option id="group_default" value="amo12310">amo12310</option>'+
-        '          <option value="amo01709">amo01709</option>'+
-        '        </select>'+
+        '        <div id="groups_filter_form_params">Loading...</div>'+
         '      </form>'+
         '    </div>'+
         '    <div id="my_group_selected" style="margin-left:40px;">'+
@@ -1737,12 +1752,15 @@ function manage_my_groups() {
         '  </div>'+
         '</div>';
 
-    load(
-        'AccountsFilter.php?' + accounts_filter(),
-        'accounts_filter_form_params' );
+    load( 'AccountsFilter.php?' + accounts_filter(), 'accounts_filter_form_params' );
+    load( 'GroupsFilter.php', 'groups_filter_form_params' );
 
-    apply_select_group(null);
-
+    YAHOO.util.Event.onContentReady (
+    	    "groups_filter_input",
+    	    function () {
+                apply_select_group(null);
+    	    }
+	);
     YAHOO.util.Event.onContentReady (
 	    "accounts_filter_button",
 	    function () {
@@ -1755,9 +1773,20 @@ function manage_my_groups() {
 	        );
 	    }
 	);
+    YAHOO.util.Event.onContentReady (
+        "groups_filter_button",
+        function () {
+            var groups_filter_button = new YAHOO.widget.Button( "groups_filter_button" );
+            groups_filter_button.on (
+                "click",
+                function( p_oEvent ) {
+                	apply_select_group(null);
+                }
+            );
+        }
+    );
     create_accounts_table();
 }
-
 
 </script>
 
@@ -1768,7 +1797,7 @@ function manage_my_groups() {
         <div style="float:left;">
           <p id="application_title" style="text-align:left;">
             <em>Authorization Database Manager: </em>
-            <em id="application_subtitle">LCLS Detector Control</em>
+            <em id="application_subtitle">LCLS Controls and Data Systems</em>
           </p>
         </div>
         <div style="float:right; height:50px;">

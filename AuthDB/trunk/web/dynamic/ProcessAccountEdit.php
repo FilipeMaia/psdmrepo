@@ -7,11 +7,7 @@ require_once('RegDB/RegDB.inc.php');
  * This script will process a request for creating a new experiment
  * in the database.
  */
-if( !AuthDB::instance()->canEdit()) {
-    print( AuthDB::reporErrorHtml(
-        'You are not authorized to manage the contents of the LDAP server'));
-    exit;
-}
+
 
 /* Process parameters and get user account name and a list of groups.
  */
@@ -38,11 +34,7 @@ try {
     /* Get special groups which we're going to deal with. All group operations
      * will be restricted to those only!
      */
-    $restricted_groups = array_merge(
-        array(),
-        $regdb->preffered_groups(),
-        $regdb->experiment_specific_groups()
-    );
+    $restricted_groups = $regdb->experiment_specific_groups();
 
     /* Get all groups the account is member of. The account must exist.
      */
@@ -61,19 +53,28 @@ try {
      * in the request, and add those which are in the request but
      * not registered yet.
      * 
-     * NOTE: Consider only "preffered" and "experiment specific groups"!
+     * WARNING: Due to a nature of the POST data for the list of
+     *          requested groups, the algorithm will first remove
+     *          a user from all groups not mentioned in the input request,
+     *          and then (on the second step) it will readd the user back
+     *          to those groups. THIS NEEDS TO BE EITHER FIXED OR THE WHOLE
+     *          FUNCTION BE COMPLETELLY REMOVED!!!!
      */
     foreach( array_keys( $registered_groups ) as $g ) {
     	if( !array_key_exists( $g, $requested_groups )) {
     		if( array_key_exists( $g, $restricted_groups )) {
-    		    $regdb->remove_user_from_posix_group( $uid, $g );
+    			if( RegDBAuth::instance()->canManageLDAPGroup( $g )) {
+                    $regdb->remove_user_from_posix_group( $uid, $g );
+    			}
     		}
     	}
     }
     foreach( array_keys( $requested_groups ) as $g ) {
     	if( !array_key_exists( $g, $registered_groups )) {
     		if( array_key_exists( $g, $restricted_groups )) {
-    		    $regdb->add_user_to_posix_group( $uid, $g );
+    			if( RegDBAuth::instance()->canManageLDAPGroup( $g )) {
+    			    $regdb->add_user_to_posix_group( $uid, $g );
+    			}
     		}
     	}
     }

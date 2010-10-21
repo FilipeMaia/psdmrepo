@@ -18,14 +18,6 @@ if( isset( $_GET['uid'] )) {
 }
 $edit = isset( $_GET['edit'] );
 
-if( $edit ) {
-    if( !AuthDB::instance()->canEdit()) {
-        print( AuthDB::reporErrorHtml(
-            'You are not authorized to manage the contents of the LDAP server'));
-        exit;
-    }
-}
-
 /* Proceed with the operation
  */
 try {
@@ -86,12 +78,14 @@ try {
 
         foreach( array_keys( $experiment_specific_groups ) as $g ) {
 
+        	$edit_prohibited_flag = !( $edit && RegDBAuth::instance()->canManageLDAPGroup( $g ));
+
             $displayed_groups[$g] = True;
             if( 1 == preg_match( '/^[a-z]{3}[a-z0-9]+[0-9]{2}$/', $g )) {
                 $group_url = "<a href=\"javascript:view_group('".$g."')\">".$g."</a>";
                 $row_pos = $row_base + $row * 20;
                 $col_pos = $col_base + $col * 120;
-                $con->checkbox_input( $col_pos,      $row_pos, "gid:".$g, $g, array_key_exists( $g, $account_groups ), !$edit)
+                $con->checkbox_input( $col_pos,      $row_pos, "gid:".$g, $g, array_key_exists( $g, $account_groups ), $edit_prohibited_flag /*!$edit*/ )
                     ->label         ( $col_pos + 20, $row_pos, $group_url, false );        	
                 $row += 1;
             }
@@ -99,21 +93,10 @@ try {
         $col += 1;
     }
 
-    /* Special groups.
+    /* Other groups which can't be managed by this application..
      */
     $row = 0;
-    foreach( array_keys( $regdb->preffered_groups()) as $g ) {
-   	    $displayed_groups[$g] = True;
-        $group_url = "<a href=\"javascript:view_group('".$g."')\">".$g."</a>";
-        $row_pos = $row_base + $row * 20;
-        $col_pos = $col_base + $col * 120;
-        $con->checkbox_input( $col_pos,      $row_pos, "gid:".$g, $g, array_key_exists( $g, $account_groups ), !$edit)
-            ->label         ( $col_pos + 20, $row_pos, $group_url, false );        	
-        $row += 1;
-    }
 
-    /* Append remaining groups by the end of the previous collumn
-     */
     foreach( array_keys( $account_groups ) as $g ) {
 
         if( array_key_exists( $g, $displayed_groups )) continue;
