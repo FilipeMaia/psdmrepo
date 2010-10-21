@@ -255,6 +255,16 @@ menubar_data.push ( {
         { text: "iRODS (file manager) catalogs", url: "javascript:browse_catalogs()", disabled: false } ],
     disabled: false }
 );
+var menubar_group_manage = menubar_data.length;
+menubar_data.push ( {
+    id:    'manage',
+    href:  '#manage',
+    title: 'Manage',
+    title_style: null,
+    itemdata: [
+        { text: "HDF5 translation",     url: "javascript:manage_hdf5_translation()", disabled: false } ],
+    disabled: false }
+);
 var menubar_group_help = menubar_data.length;
 menubar_data.push ( {
     id:    'help',
@@ -725,6 +735,214 @@ function display_path( path ) {
     );
 }
 
+/* HDF5 translation manager
+ */
+var MANAGE_INSTRUMENTS = 1,
+    MANAGE_EXPERIMENTS = 2,
+    MANAGE_FILES       = 3;
+
+var manage_instrument = null;
+var manage_experiment = null;
+var manage_path = null;
+
+var manage_tree = null;
+
+function manage_hdf5_translation() {
+
+    set_subtitle( 'Manage HDF5 Translation of Experimens' );
+    set_context( 'Select Experiment > ' );
+
+    reset_navarea();
+    reset_workarea();
+
+    var workarea = document.getElementById('workarea');
+    workarea.style.borderLeft = 'solid 1px #c0c0c0';
+    workarea.innerHTML=
+        '<div>'+
+        '  <div style="float:left; width:430px;">'+
+        '    <img src="images/ExpSummary.png" />'+
+        '    <div id="system_summary" style="margin-top:20px; padding-left:20px; width:430px; height:180px;"></div>'+
+        '  </div>'+
+        '  <div style="clear:both;">'+
+        '  </div>'+
+        '</div>'+
+        '<div style="margin-top:30px;">'+
+        '  <img src="images/Files.png" />'+
+        '  <div style="margin-top:20px; padding-left:20px;">'+
+        '    <table><thead>'+
+        '      <tr>'+
+        '        <td style="width: 35px;" class="first_col_hdr">Run</td>'+
+        '        <td style="width:250px;" class="col_hdr"><b>File Name</b></td>'+
+        '        <td style="width: 50px;" class="col_hdr"><b>Type</b></td>'+
+        '        <td style="width:135px;" class="col_hdr_right"><b>Size</b></td>'+
+        '        <td style="width:150px;" class="col_hdr"><b>Created</b></td>'+
+        '        <td style="width: 60px;" class="col_hdr"><b>xxxxxxxx</b></td>'+
+        '        <td style="width: 40px;" class="col_hdr"><b>xxxx</b></td>'+
+        '      </tr>'+
+        '      <tr>'+
+        '        <td><div class="first_separator"></div></td>'+
+        '        <td><div class="separator"></div></td>'+
+        '        <td><div class="separator"></div></td>'+
+        '        <td><div class="separator"></div></td>'+
+        '        <td><div class="separator"></div></td>'+
+        '        <td><div class="separator"></div></td>'+
+        '        <td><div class="separator"></div></td>'+
+        '      </tr>'+
+        '    </thead></table>'+
+        '    <br>'+
+        '    <div id="experiment_files" style="width:870px; height:340px; overflow:auto;"></div>'+
+        '  </div>'+
+        '</div>';
+
+    var navarea = document.getElementById('navarea');
+    navarea.style.display = 'block';
+    navarea.innerHTML=
+        '<img src="images/Experiment.png" />'+
+        '<div id="manage_tree" style="margin-top:20px; padding-left:20px;"></div>';
+
+    manage_tree = new YAHOO.widget.TreeView( "manage_tree" );
+
+    // The whole tree will be built dynamically
+    //
+    var root_node = new YAHOO.widget.TextNode(
+        {   label:    'Instruments/Experiments',
+            expanded: false,
+            title:    'Expand and select a folder',
+            type:     MANAGE_INSTRUMENTS },
+        manage_tree.getRoot());
+
+    var currentIconMode = 0;
+    root_node.setDynamicLoad( loadNodeData, currentIconMode );
+    root_node.toggle();  // Force the node to be instantly open. this will also
+                         // trigger the dynamic loading of its children (if any).
+
+    manage_tree.subscribe( "labelClick", onNodeSelection );
+    manage_tree.subscribe( "enterKeyPressed", onNodeSelection );
+    manage_tree.draw();
+
+    // Dispatch clicks on selected nodes to the corresponding
+    // functions.
+    //
+    function onNodeSelection( node ) {
+        if(        node.data.type == MANAGE_INSTRUMENTS) { ;
+        } else if( node.data.type == MANAGE_EXPERIMENTS) { ;
+        } else if( node.data.type == MANAGE_FILES   ) {
+            display_experiment_files(
+                node.data.instrument, node.data.experiment, node.data.exper_id );
+        }
+    }
+
+    function loadNodeData( node, fnLoadComplete ) {
+
+        // We'll create child nodes based on what we get back when we
+        // use Connection Manager to pass the text label of the
+        // expanding node to the Yahoo!
+        // Search "related suggestions" API.  Here, we're at the
+        // first part of the request -- we'll make the request to the
+        // server.  In our Connection Manager success handler, we'll build our new children
+        // and then return fnLoadComplete back to the tree.
+
+        // Get the node's label and urlencode it; this is the word/s
+        // on which we'll search for related words:
+        //
+        //     alert( "node: "+node.label+", type: "+node.data.type );
+        //     var nodeLabel = encodeURI( node.data.label );
+
+        // prepare URL for XHR request:
+        //
+        var sUrl = "RequestExperiments.php?type="+node.data.type;
+        switch( node.data.type ) {
+            case MANAGE_FILES:
+                sUrl += '&path='+node.data.path;
+            case MANAGE_EXPERIMENTS:
+                sUrl += '&instrument='+node.data.instrument;
+            case MANAGE_INSTRUMENTS:
+                break;
+        }
+
+        // prepare our callback object
+        //
+        var callback = {
+
+            // if our XHR call is successful, we want to make use
+            // of the returned data and create child nodes.
+            //
+            success: function(oResponse) {
+                var oResults = eval( "(" + oResponse.responseText + ")" );
+                if(( oResults.ResultSet.Result ) && ( oResults.ResultSet.Result.length )) {
+
+                    // Result is an array if more than one result, string otherwise
+                    //
+                    if( YAHOO.lang.isArray( oResults.ResultSet.Result )) {
+                        for( var i = 0, j = oResults.ResultSet.Result.length; i < j; i++ ) {
+                            var tempNode = new YAHOO.widget.TextNode( oResults.ResultSet.Result[i], node, false );
+                            if( tempNode.data.type != undefined )
+                                tempNode.setDynamicLoad( loadNodeData, currentIconMode );
+                        }
+                    } else {
+
+                        // there is only one result; comes as string:
+                        //
+                        var tempNode = new YAHOO.widget.TextNode( oResults.ResultSet.Result, node, false );
+                        if( tempNode.data.type != undefined )
+                            tempNode.setDynamicLoad( loadNodeData, currentIconMode );
+                    }
+                }
+
+                // When we're done creating child nodes, we execute the node's
+                // loadComplete callback method which comes in via the argument
+                // in the response object (we could also access it at node.loadComplete,
+                // if necessary):
+                //
+                oResponse.argument.fnLoadComplete();
+            },
+
+            // if our XHR call is not successful, we want to
+            // fire the TreeView callback and let the Tree
+            // proceed with its business.
+            //
+            failure: function(oResponse) {
+                alert( "failed to get the information from server for node: "+node.label+", type: "+node.data.type );
+                oResponse.argument.fnLoadComplete();
+            },
+
+            // our handlers for the XHR response will need the same
+            // argument information we got to loadNodeData, so
+            // we'll pass those along:
+            //
+            argument: {
+                "node": node,
+                "fnLoadComplete": fnLoadComplete
+            },
+
+            // timeout -- if more than 7 seconds go by, we'll abort
+            // the transaction and assume there are no children:
+            //
+            timeout: 7000
+        };
+
+        // With our callback object ready, it's now time to
+        // make our XHR call using Connection Manager's
+        // asyncRequest method:
+        //
+        YAHOO.util.Connect.asyncRequest( 'GET', sUrl, callback );
+    }
+}
+
+function display_experiment_files( instrument, experiment, exper_id ) {
+
+    set_subtitle( 'Manage HDF5 Translation of Experiment - <b>'+instrument+' / '+experiment+'</b>' );
+    set_context(
+        '<a href="javascript:manage_hdf5_translation()">Select Experiment</a> &gt; '+
+        '<b>'+instrument+' / '+experiment+'</b> [ ID='+exper_id+' ]' );
+
+    document.getElementById('experiment_summary').innerHTML='Loading...';
+    document.getElementById('experiment_files').innerHTML='Loading...';
+
+    load( 'ExperimentSummary.php?id='+exper_id, 'experiment_summary' );
+    load( 'RequestExperimentFiles.php?exper_id='+exper_id, 'experiment_files' );
+}
+
 /*
  * iRODS catalogs browser
  */
@@ -922,7 +1140,8 @@ function display_catalog_files( node_data ) {
       <div>
         <div style="float:left;">
           <p id="application_title" style="text-align:left;">
-            <em>Data Files Explorer</em>
+            <em>Data Files Explorer: </em>
+            <em id="application_subtitle">LCLS Controls and Data Systems</em>
             <em id="application_subtitle"></em>
           </p>
         </div>

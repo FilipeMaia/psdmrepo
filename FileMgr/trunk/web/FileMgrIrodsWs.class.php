@@ -53,12 +53,17 @@ class FileMgrIrodsWs {
 
         foreach( $types as $type ) {
             $range = FileMgrIrodsWs::run_range( $instrument, $experiment, $type );
-            if( $range['min']   < $min   ) $min   = $range['min'];
-            if( $range['max']   > $max   ) $max   = $range['max'];
-            if( $range['total'] > $total ) $total = $range['total'];
+
+            // Ignore empty ranges
+
+            if( $range['total'] != 0 ) {
+            	if( $range['min']   < $min   ) $min   = $range['min'];
+            	if( $range['max']   > $max   ) $max   = $range['max'];
+            	if( $range['total'] > $total ) $total = $range['total'];
+            }
         }
         
-        if( $min > $max || $min <= 0 || $max <= 0 || $total < 0 ) die( "unable to figure out a range of runs" );
+        //if( $min > $max || $min <= 0 || $max <= 0 || $total < 0 ) die( "unable to figure out a range of runs" );
 
         return array( 'min' => $min, 'max' => $max, 'total' => $total );        
     }
@@ -67,6 +72,13 @@ class FileMgrIrodsWs {
         FileMgrIrodsWs::request( $result, '/runs/'.$instrument.'/'.$experiment.'/'.$type.'/'.$range );
     }
 
+    public static function all_runs( $instrument, $experiment, $type ) {
+    	$result = null;
+    	$range = FileMgrIrodsWs::max_run_range( $instrument, $experiment, array( $type ));
+        FileMgrIrodsWs::request( $result, '/runs/'.$instrument.'/'.$experiment.'/'.$type.'/'.$range['min'].'-'.$range['max'] );
+        return $result;
+    }
+    
     public static function files( &$result, $path='' ) {
         FileMgrIrodsWs::request( $result, '/files'.$path );
     }
