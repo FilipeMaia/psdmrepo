@@ -94,19 +94,6 @@ Usage: `basename $0` [options] mktxtprop file [...]
 EOD
 }
 
-help_tag() {
-  cat << EOD
-
-Usage: `basename $0` tag [options] tag
-
-  Available options:
-    -p package    makes tag for package name, otherwise for local package
-    -r revision   makes tag for a specific revision (could be HEAD), 
-                  otherwise for working copy
-    
-EOD
-}
-
 # get SVN package name in the current directory
 localpkg() {
   svn info 2>/dev/null | sed -n "\%^URL: $SIT_SVN%s%URL: $SIT_SVN/*\([^/]*\)/.*%\1%p"
@@ -198,16 +185,23 @@ exec_tag() {
 
   tag=${1:?No tag provided}
 
-  pkg=${pkg:-`localpkg`}
-  pkg=${pkg:?Cannot determine package name}
-
   if [ -n "$rev" ] ; then
+
+    pkg=${pkg:-`localpkg`}
+    pkg=${pkg:?Cannot determine package name}
     svn copy -r "$rev" -m 'Tagging $pkg with $tag' \
       "$SIT_SVN/$pkg/trunk" "$SIT_SVN/$pkg/tags/$tag"
+
+  elif [ -n "$pkg" ] ; then
+
+    svn copy -m "Tagging $pkg with $tag" "$pkg" "$SIT_SVN/$pkg/tags/$tag"
+    
   else
-    lpkg=`localpkg`
-    lpkg=${lpkg:?Not in the package directory}
+
+    pkg=`localpkg`
+    pkg=${pkg:?Cannot determine package name}
     svn copy -m "Tagging $pkg with $tag" "." "$SIT_SVN/$pkg/tags/$tag"
+    
   fi
 }
 
