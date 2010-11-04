@@ -50,7 +50,7 @@ from LusiTime.Time import Time
 # Local definitions --
 #---------------------
 
-_conn_str = "Server=psdb.slac.stanford.edu;Database=interface_db;"
+_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
 
 #---------------------------------
 #  Application class definition --
