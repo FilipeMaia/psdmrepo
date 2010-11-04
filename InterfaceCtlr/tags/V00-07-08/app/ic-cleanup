@@ -1,0 +1,139 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script ic-status...
+#
+#------------------------------------------------------------------------
+
+"""Script to cleanup database tables after controller crashes.
+Best run as a cron job every few minutes.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import errno
+import socket
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from LusiPython.DbConnection import DbConnection
+from LusiTime.Time import Time
+
+#---------------------
+# Local definitions --
+#---------------------
+
+_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class ICStatus ( LusiPyApp ) :
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
+
+        self._parser.add_option ( '-d', "--conn-string",
+                                  action="store", dest="conn_string", default=_conn_str,
+                                  help="database connection string", metavar="CONN_STRING" )
+
+        self._parser.add_option ( '-u', "--user",
+                                  action="store", dest="user", default=None,
+                                  help="override default user name" )
+
+        self._parser.add_option ( '-p', "--password",
+                                  action="store", dest="password", default=None,
+                                  help="specify user password (no password by default)" )
+
+
+    def _run ( self ) :
+
+        # check the arguments
+        if self._args :
+            self._parser.error("unexpected arguments")
+            return 2
+
+        # create database instance
+        conn = DbConnection( conn_string=self._options.conn_string, 
+                             user=self._options.user,
+                             passwd=self._options.password,
+                             timeout = 0 )
+
+        # get host name
+        host = socket.getfqdn(socket.gethostname())
+        self.trace('host name: %s', host)
+
+        q = """SELECT c.started, c.stopped, c.process_id, c.id
+            FROM interface_controller c, translator_node n 
+            WHERE n.id=c.fk_translator_node AND n.node_uri=%s 
+            ORDER BY started DESC LIMIT 1"""
+
+        # execute query
+        cursor = conn.cursor()
+        cursor.execute( q, (host,) )
+
+        # dump it
+        rows = cursor.fetchall()
+        if not rows :
+            self.info("No information about this node in the database, stop.")
+        else :
+            info = rows[0]
+            stopped = info[1]
+            pid = info[2]
+            cid = info[3]
+            if stopped :
+                self.info("Last controller instance already stopped.")
+            else :
+                # check that process is running
+                try:
+                    os.kill(pid, 0)
+                    self.info("Process %s is still running.", pid)
+                except OSError, exc:
+                    if exc.errno == errno.ESRCH :
+                        # no such process
+                        self.info("Process %s is not running, updating database.", pid)
+                        
+                        endtime = Time.now().toString("%F %T")
+                        cursor.execute("""UPDATE interface_controller SET stopped = %s WHERE id = %s """, 
+                                            ( endtime, cid ) )
+                        cursor.execute("COMMIT")
+                    else :
+                        self.error("Unexpected error killing process %s: %s", pid, str(exc))
+                        return exc.errno
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = ICStatus()
+    rc = app.run()
+    sys.exit(rc)
