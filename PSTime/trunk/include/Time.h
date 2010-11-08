@@ -22,10 +22,10 @@
 // C/C++ Headers --
 //-----------------
 #include <time.h>
-#include <stdio.h>
+#include <stdio.h>  // for printf 
+#include <iostream> // for cout
 #include <string>
 //#include <types.h> // defines time_t
-//#include <iostream>
 
 using namespace std;
 
@@ -80,6 +80,25 @@ class Time  {
 public:
 
   enum Zone { UTC, Local, PST };
+
+  enum ParseStatus {
+    PARSE_IS_OK,
+    TOO_SHORT_TIME_STAMP,
+    TOO_LONG_TIME_STAMP,
+    WRONG_DATE_FORMAT_A,
+    WRONG_DATE_FORMAT_B,
+    WRONG_DATE_FORMAT_C,
+    TOO_SHORT_TIME_RECORD,
+    TOO_LONG_TIME_RECORD,
+    WRONG_TIME_FORMAT_A,
+    WRONG_TIME_FORMAT_B,
+    WRONG_SEC_FRACTION_FORMAT,
+    TOO_SHORT_ZONE_RECORD,
+    TOO_LONG_ZONE_RECORD,
+    WRONG_ZONE_FORMAT_A,
+    WRONG_ZONE_FORMAT_B,
+    WRONG_ZONE_FORMAT_C
+  };
 
   // Default constructor
   Time ();
@@ -230,13 +249,11 @@ public:
 
   static void getZoneTimeOffset(Zone zone, int &zoneHour, int &zoneMin);
 
-  //  static bool parseTime( const std::string& sdate, const std::string& stime, 
-  //                         Zone zone,
-  //                         Time& time );
+  //  static int parseTime( const std::string& sdate, const std::string& stime, 
+  //                        Zone zone,
+  //                        Time& time );
 
-  //  static bool parseTime( const std::string& sdatetime, 
-  //                       Zone zone,
-  //                       Time& time );
+  static int parseTimeStamp( const std::string& sdatetime, Time& time );
 
 
 
