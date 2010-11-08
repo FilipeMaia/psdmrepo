@@ -95,12 +95,23 @@ Time::Time (struct tm& stm, Zone zone) : m_utcNsec(0) // stm is defined for zone
   // nsec are ignored for low resolution tm structure ...
 }
 
+// tstamp can be presented in formats described in parseTimeStamp(...) method
+Time::Time (const std::string& tstamp) : m_utcSec(0), m_utcNsec(0) // from formatted time stamp
+{
+  Time t(0,0);
+  int status = parseTimeStamp(tstamp, t);
+  if( status == PARSE_IS_OK ) {
+    m_utcSec  = t.m_utcSec; // or t.getUTCSec();
+    m_utcNsec = t.m_utcNsec; // or t.getUTCNsec();
+  }
+  // else leave time of the Christ birth = (0,0)
+}
+
 //--------------
 // Destructor --
 //--------------
 Time::~Time ()
-{
-  
+{  
 }
 
 //--------------
@@ -122,13 +133,12 @@ Time& Time::operator = ( const Time& t1 )
 //--------------
 
 void Time::Print() const
-  {
+{
     printf ( "Time:: m_utcSec = %ld   m_utcNsec = %ld \n", m_utcSec, m_utcNsec);
     struct tm *stm = localtime ( &m_utcSec );  // localtime for UTC seconds gives UTC time...
     printf ( "UTC time (asctime) : %s", asctime (stm) );
   //printf ( "UTC time (ctime)   : %s\n", ctime (&m_utcSec) ); 
-  }
-
+}
 
 void Time::getTimeSpec( struct timespec& ts, Zone zone ) const
 {
@@ -341,6 +351,7 @@ void Time::getZoneTimeOffset(Zone zone, int &zoneHour, int &zoneMin)
       zoneMin  = abs(zoneTimeOffsetSec%3600)/60;
 }
 
+
 // Accepts the time stamp in format:
 // <date> <time>[.<fraction-of-sec>][<time-zone>]
 //   or
@@ -355,6 +366,9 @@ void Time::getZoneTimeOffset(Zone zone, int &zoneHour, int &zoneMin)
 //
 int Time::parseTimeStamp(const std::string& tstamp, Time& time_from_tstamp)
 {
+//bool printForTest = true;
+  bool printForTest = false;
+
   struct tm tm_tstamp;
   struct tm tm_zone;
 
@@ -365,13 +379,13 @@ int Time::parseTimeStamp(const std::string& tstamp, Time& time_from_tstamp)
 
   time_t zoneTimeOffsetSec  = 0;
 
+  if(printForTest)
   printf ( "\n\n\nParse the time stamp %s\n", tstamp.data());
 
   // Check time stamp size
   size_t len_time_stamp = tstamp.size();
   if( len_time_stamp < 15 ) {return TOO_SHORT_TIME_STAMP;}
   if( len_time_stamp > 35 ) {return TOO_LONG_TIME_STAMP;}
-
 
   // Find position of the <date> and <time> separator field 'T' or ' ' (space)
     size_t pos_time_sep = tstamp.find(' ');
@@ -394,7 +408,8 @@ int Time::parseTimeStamp(const std::string& tstamp, Time& time_from_tstamp)
            pos_zone_sep = tstamp.find('-',pos_time_sep); 
         }
 
-      cout << " Lenght of time stamp:" << (int)len_time_stamp
+      if(printForTest)
+      cout << "Length of the time stamp:" << (int)len_time_stamp
            << " Position of sep. : " 
 	   << " time:" << (int)pos_time_sep 
 	   << " nsec:" << (int)pos_nsec_sep 
@@ -413,6 +428,7 @@ int Time::parseTimeStamp(const std::string& tstamp, Time& time_from_tstamp)
 	if( strptime(char_date,"%Y-%m-%d",&tm_tstamp) == NULL) return WRONG_DATE_FORMAT_C;        
       }
 
+      if(printForTest)
       cout << "char_date : " << char_date << endl;
 
   // Parse <time-zone>
@@ -429,8 +445,9 @@ int Time::parseTimeStamp(const std::string& tstamp, Time& time_from_tstamp)
 
           tm_zone.tm_hour = 0;
 	  tm_zone.tm_min  = 0;
+          tm_zone.tm_isdst = 0;
 
-          if(len_zone < 2)                                   return TOO_SHORT_ZONE_RECORD;
+          if(len_zone < 2)                                    return TOO_SHORT_ZONE_RECORD;
           else if(len_zone == 2){
 	     len_zone = tstamp.copy(char_zone,2,pos_zone_sep+1); char_zone[len_zone] = '\0';
              if( strptime(char_zone,"%H",&tm_zone) == NULL)   return WRONG_ZONE_FORMAT_A;
@@ -443,7 +460,7 @@ int Time::parseTimeStamp(const std::string& tstamp, Time& time_from_tstamp)
             len_zone = tstamp.copy(char_zone,5,pos_zone_sep+1); char_zone[len_zone] = '\0';
             if( strptime(char_zone,"%H:%M",&tm_zone) == NULL) return WRONG_ZONE_FORMAT_C;
           }
-          else                                               return TOO_LONG_ZONE_RECORD;
+          else                                                return TOO_LONG_ZONE_RECORD;
 
                     zoneTimeOffsetSec = tm_zone.tm_hour * 3600
 	    	                      + tm_zone.tm_min  * 60; 
@@ -451,8 +468,10 @@ int Time::parseTimeStamp(const std::string& tstamp, Time& time_from_tstamp)
           if(tstamp[pos_zone_sep] == '-') zoneTimeOffsetSec = -zoneTimeOffsetSec;
         }
 
+      if(printForTest){
       if ( pos_zone_sep != string::npos ) cout << "char_zone : " << char_zone;
       cout << " Zone time offset in sec = " << zoneTimeOffsetSec << endl;
+      }
 
   // Parse fraction of second      
      if ( pos_nsec_sep==string::npos ) // There is no nsec in the time stamp...
@@ -470,8 +489,10 @@ int Time::parseTimeStamp(const std::string& tstamp, Time& time_from_tstamp)
             time_from_tstamp.m_utcNsec = (time_t)(fraction_of_sec * 1e9);
 	}
 
+     if(printForTest){
      if ( pos_nsec_sep != string::npos ) cout << "char_nsec : " << char_nsec;
      cout << " time_from_tstamp.m_utcNsec : " << time_from_tstamp.m_utcNsec << endl;
+     }
 
   // Parse <time>
           if(pos_nsec_sep != string::npos) len_time = pos_nsec_sep - pos_time_sep - 1; // if <second-fraction> is in record
@@ -489,6 +510,7 @@ int Time::parseTimeStamp(const std::string& tstamp, Time& time_from_tstamp)
      }
      else                                                   return TOO_LONG_TIME_RECORD;
 
+     if(printForTest)
      cout << "char_time : " << char_time << endl;
 
   // Return sparsed time stamp in seconds

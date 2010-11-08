@@ -123,7 +123,7 @@ public:
 
   //  Time (const std::string& date, const std::string& time, Zone zone = UTC); // from formatted date and time
 
-  //  Time (const std::string&, Zone zone = UTC); // from formatted time stamp
+  Time (const std::string&); // from formatted time stamp
 
 
   // Destructor

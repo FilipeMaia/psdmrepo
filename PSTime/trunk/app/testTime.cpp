@@ -11,55 +11,6 @@ using namespace PSTime;
 
 int main ()
 {
-  //-------------
-  printf ("\n\nTest various standard time methods\n\n");
-
-
-  time_t seconds;
-  seconds = time(NULL);
-  printf ("\n\n\nTest seconds = time(NULL);\n %ld UTC seconds since January 1, 1970", seconds);
-
-  printf ("\n\n\nTest struct tm *timeinfo = localtime ( &seconds );\n");  
-  struct tm * timeinfo;
-  timeinfo = localtime ( &seconds );
-
-  printf ("\nTest timeinfo->tm_sec, timeinfo->tm_min, ...:\n");  
-  printf ( "sec  = %d\n", timeinfo->tm_sec  );
-  printf ( "min  = %d\n", timeinfo->tm_min  );
-  printf ( "hour = %d\n", timeinfo->tm_hour );
-  printf ( "mday = %d\n", timeinfo->tm_mday );
-  printf ( "mon  = %d\n", timeinfo->tm_mon  );
-  printf ( "year = %d\n", timeinfo->tm_year );
-  printf ( "wday = %d\n", timeinfo->tm_wday );
-  printf ( "yday = %d\n", timeinfo->tm_yday );
-  printf ( "isdst= %d\n", timeinfo->tm_isdst);
-  printf ( "\n asctime (timeinfo)  : %s", asctime (timeinfo) );
-  printf ( " or ctime (&seconds) : %s\n", ctime (&seconds) );
-
-  char str[256];
-  size_t maxsize = 255;
-  int len = strftime(str, maxsize, "Allows to constract a local time stamp though w/o nsec : %Y-%m-%d %H:%M:%S %Z", timeinfo); 
-  printf ( "strftime(...) gives string : %s of length = %d\n",str,len);  
-
-  //-------------
-
-  time_t     local=time(NULL);                // current local time
-  tm         locTime=*localtime(&local);      // convert local to local, store as tm
-  tm         utcTime=*gmtime(&local);         // convert local to GMT, store as tm
-  time_t     utc=(mktime(&utcTime));          // convert tm to time_t 
-  double     diff=difftime(utc,local)/3600;   // difference in hours
-  printf ( "curr(s) = %d, utc(s) = %d, diff(h) = %f\n", (int)local, (int)utc, diff); 
-  printf ( " locTime.tm_hour = %d\n", locTime.tm_hour); 
-  printf ( " utcTime.tm_hour = %d\n", utcTime.tm_hour); 
-
-  //-------------
-
-  struct timespec currentHRTime;
-  int gettimeStatus = clock_gettime( CLOCK_REALTIME, &currentHRTime );
-  printf ( "\n\n\nTest gettimeStatus = clock_gettime( CLOCK_REALTIME, &currentHRTime ); \n gettimeHRStatus =  %d  currentHRTime.tv_sec = %ld  .tv_nsec = %ld", 
-           gettimeStatus, currentHRTime.tv_sec, currentHRTime.tv_nsec );  
-
-  //-------------
   printf ("\n\nTest implementation of the class PSTime\n");
   //-------------
 
@@ -99,12 +50,17 @@ int main ()
         UTCtime6 -> Print();
 
   //-------------
-
+  struct timespec currentHRTime;
+  int gettimeStatus = 0;
+      gettimeStatus = clock_gettime( CLOCK_REALTIME, &currentHRTime );
   printf ( "\n\n\nTest   Time *UTCtime7 = new Time(currentHRTime,Time::Local);\n");   
   Time *UTCtime7 = new Time(currentHRTime,Time::Local);
         UTCtime7 -> Print();
 
   //-------------
+  time_t     local=time(NULL);                // current local time
+  tm         locTime=*localtime(&local);      // convert local to local, store as tm
+  tm         utcTime=*gmtime(&local);         // convert local to GMT, store as tm
 
   printf ( "\n\n\nTest   Time *UTCtime8 = new Time(utcTime,Time::UTC);\n");   
   Time *UTCtime8 = new Time(utcTime,Time::UTC);
