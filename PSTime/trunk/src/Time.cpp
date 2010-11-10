@@ -16,6 +16,7 @@
 // This Class's Header --
 //-----------------------
 #include "PSTime/Time.h"
+#include "PSTime/TimeConstants.h"
 
 //-----------------
 // C/C++ Headers --
@@ -126,6 +127,110 @@ Time& Time::operator = ( const Time& t1 )
   m_utcNsec = t1.m_utcNsec;
   return *this;
 }
+
+// Arithmetic operators with Duration
+
+// d = |t2 - t1|
+Duration Time::operator-( const Time& t1 ) const
+{
+    // This code forms |t2-t1| without having to use signed intergers.
+
+    time_t t2Sec;
+    time_t t2Nsec;
+    time_t t1Sec;
+    time_t t1Nsec;
+
+    if ( *this > t1 )
+        {
+            t2Sec  = m_utcSec;
+            t2Nsec = m_utcNsec;
+            t1Sec  = t1.m_utcSec;
+            t1Nsec = t1.m_utcNsec;
+        }
+    else
+        {
+            t2Sec  = t1.m_utcSec;
+            t2Nsec = t1.m_utcNsec;
+            t1Sec  = m_utcSec;
+            t1Nsec = m_utcNsec;
+        }
+
+    if ( t2Nsec < t1Nsec )
+        {
+            // borrow a second from t2Sec
+            t2Nsec += TimeConstants::s_nsecInASec;
+            t2Sec--;
+        }
+
+    time_t sec  = t2Sec  - t1Sec;
+    time_t nsec = t2Nsec - t1Nsec;
+
+    Duration diff( sec, nsec );
+
+    return diff;
+}
+
+
+
+// t = t1 - d
+Time Time::operator-( const Duration& d ) const
+{
+  return Time(*this) -= d;
+}
+
+// t -= d
+Time& Time::operator-=( const Duration& d )
+{
+  // if t1 - d < 0 then return t = 0
+  if ( ( m_utcSec  < d.getSec() ) ||
+       ( m_utcSec == d.getSec()   && m_utcNsec < d.getNsec() ) ) {
+    m_utcSec  = 0;
+    m_utcNsec = 0;
+  }
+  else {
+    time_t tempSec  = m_utcSec;
+    time_t tempNsec = m_utcNsec;
+    
+    if ( tempNsec < d.getNsec() ) {
+      // if t1.m_utcNsec < d._nsec borrow a second from t1.m_utcSec
+      tempNsec += TimeConstants::s_nsecInASec;
+      tempSec--;
+    }
+    
+    m_utcSec  = tempSec  - d.getSec();
+    m_utcNsec = tempNsec - d.getNsec();
+  }
+  
+  return *this;
+}
+
+// t = t1 + d
+Time Time::operator+( const Duration& d ) const
+{
+  return Time(*this) += d;
+}
+
+// t += d
+Time& Time::operator+=( const Duration& d )
+{
+  time_t totalSec  = m_utcSec  + d.getSec();
+  time_t totalNsec = m_utcNsec + d.getNsec();
+  
+  if ( totalNsec >= TimeConstants::s_nsecInASec ) {
+    // carry nanoseconds over into seconds
+    time_t extraSec   = totalNsec / TimeConstants::s_nsecInASec;
+    time_t remainNsec = totalNsec % TimeConstants::s_nsecInASec;
+    totalSec         += extraSec;
+    totalNsec         = remainNsec;
+  }
+  
+  m_utcSec  = totalSec;
+  m_utcNsec = totalNsec;
+
+  return *this;
+}
+
+
 
 
 //--------------
@@ -534,6 +639,39 @@ time_t Time::evaluateLocalZoneTimeOffsetSec()
     printf("Time::evaluateLocalZoneTimeOffsetSec() : Local zone time offset w.r.t. UTC = %d h.\n", (int)offset/3600);
     return offset;
 }
+
+
+
+//--------------------
+// Friend functions --
+//--------------------
+
+// t = d + t1
+Time operator+( const Duration& d, const Time& t1 )
+{
+    return t1 + d;
+}
+
+// t = t1 + d
+//Time operator+( const Time& t1, const Duration& d )
+//{
+//    return t1 + d;
+//}
+
+ostream & operator <<( ostream& os, const Time& t ) 
+{
+  if ( t == TimeConstants::s_minusInfinity )
+    os << "-Infinity";
+  else if ( t == TimeConstants::s_plusInfinity )
+    os << "+Infinity";
+  else 
+    {
+      os << t.strTimeStampFreeFormat( "%c", Time::Local ) << " (local time) " 
+         << t.getUTCNsec() << " ns";
+    }
+  return os;
+}
+
 //--------------
 } // namespace PSTime
 

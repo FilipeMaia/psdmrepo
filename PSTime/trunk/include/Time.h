@@ -38,7 +38,7 @@ using namespace std;
 // Collaborating Class Headers --
 //-------------------------------
 
-//#include "PSTime/Duration.hh"
+#include "PSTime/Duration.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -177,7 +177,6 @@ public:
 
 /** Arithmetic operators with Duration */
 
-  /*
   Duration operator-(  const Time& t ) const;               
 
   Time&    operator+=( const Duration& d );
@@ -185,7 +184,6 @@ public:
 
   Time&    operator-=( const Duration& d );
   Time     operator-(  const Duration& d ) const;
-  */
 
 /** Comparison operators returns bool-ean true or false statement. */
 
@@ -255,9 +253,9 @@ public:
 
   // Friends
 /** Operators between Time and Duration objects */
-  //friend Time  operator+( const Duration& d, const Time& t     );
-  //friend Time  operator+( const Time& t,     const Duration& d );
-  //friend std::ostream& operator<<( std::ostream& os, const Time& t );
+  friend Time  operator+( const Duration& d, const Time& t     );
+//friend Time  operator+( const Time& t,     const Duration& d );
+  friend std::ostream& operator<<( std::ostream& os, const Time& t );
 
 //protected:
 

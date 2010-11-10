@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <iostream>
 
 //----------------------
 // Base Class Headers --
@@ -43,7 +44,7 @@ namespace PSTime {
  *  with a blank line. The last paragraph before the tags (preceded by @) 
  *  should be the identification and copyright, as below.
  *
- *  Please note that KDOC comments must start with /** (a forward slash
+ *  Please note that KDOC comments must start with (a forward slash
  *  followed by TWO asterisks). Interface members should be documented
  *  with KDOC comments, as should be protected members that may be of interest
  *  to those deriving from your class. Private implementation should
@@ -62,39 +63,72 @@ namespace PSTime {
 class Duration  {
 public:
 
-  // Default constructor
+/** Default constructor */
   Duration () ;
 
-  // Destructor
-  virtual ~Duration () ;
+/** Copy constructor */
+  Duration( const Duration & d );
 
-protected:
+/** Constructs from seconds and nanoseconds */
+  Duration( time_t sec, time_t nsec = 0 );
+
+/** Destructor */
+  virtual ~Duration () {};
+
+/** Operators */
+    Duration   operator  - ( const Duration & d1 ) const;            
+
+    Duration   operator  + ( const Duration & d1 ) const;            
+
+    Duration & operator  = ( const Duration & d1 );            
+
+    Duration & operator += ( const Duration & d1 );            
+
+    bool operator == ( const Duration & d ) const    
+        { 
+            return ( m_sec  == d.m_sec && m_nsec == d.m_nsec );
+        }
+
+    bool operator != ( const Duration & d ) const 
+        { 
+            return !( *this == d ); 
+        }
+
+    bool operator <  ( const Duration & d ) const  
+        { 
+            return ( m_sec < d.m_sec ) || ( m_sec == d.m_sec && m_nsec < d.m_nsec );
+        }
+
+    bool operator > ( const Duration & d ) const
+        { 
+            return ( m_sec > d.m_sec ) || ( m_sec == d.m_sec && m_nsec > d.m_nsec );
+        }
+
+    bool operator <=  ( const Duration & d ) const 
+        { 
+            return !( *this > d );
+        }
+
+    bool operator >= ( const Duration & d ) const 
+        { 
+            return !( *this <  d ); 
+        }
+
+    // Selectors
+    time_t  getSec ( ) const { return m_sec;  }
+    time_t  getNsec( ) const { return m_nsec; }
+
+    // Friends
+    friend std::ostream & operator << ( std::ostream & os, const Duration & d );  
+
+    // Static data member starts with s_.
+    //    static const time_t s_nsecInASec;   
 
 private:
 
-  // Data members
-  
-  int m_memberVariable;  // private members start with m_
-
-  // Copy constructor and assignment are disabled by default
-  Duration ( const Duration& ) ;
-  Duration& operator = ( const Duration& ) ;
-
-//------------------
-// Static Members --
-//------------------
-
-public:
-
-  // Selectors (const)
-
-  // Modifiers
-
-private:
-
-  // Data members
-  static int s_staticVariable;     // Static data member starts with s_.
-
+    // Data members
+    time_t  m_sec;         // number of seconds
+    time_t  m_nsec;        // number of nano seconds
 };
 
 } // namespace PSTime
