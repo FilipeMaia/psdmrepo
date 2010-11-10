@@ -334,12 +334,10 @@ class Event(object):
     @staticmethod
     def _xtcGenerator( xtcObj ):
         if xtcObj.contains.id() == xtc.TypeId.Type.Id_Xtc :
-            # some types of damage cause abd troubles, filter them
-            if not xtcObj.damage.hasDamage(xtc.Damage.Value.DroppedContribution) :
-                yield xtcObj
-                for child in xtcObj :
-                    for x in Event._xtcGenerator(child) :
-                        yield x
+            yield xtcObj
+            for child in xtcObj :
+                for x in Event._xtcGenerator(child) :
+                    yield x
         else :
             # skip damaged data
             if xtcObj.damage.value() == 0 :
