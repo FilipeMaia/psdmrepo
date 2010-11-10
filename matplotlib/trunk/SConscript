@@ -19,7 +19,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
-mpl_ver = "0.99.1.2"
+mpl_ver = "1.0.0"
 python_ver = env['PYTHON_VERSION']
 PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/matplotlib",mpl_ver)
 
