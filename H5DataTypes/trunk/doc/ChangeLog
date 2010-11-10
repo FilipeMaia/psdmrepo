@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-27
+2010-11-09 Andy Salnikov
+- new class CsPadPedestalsV1 which stores pedestals data from CsPad
+
 Tag: V00-00-26
 2010-10-14 Andy Salnikov
 - update for pdsdata V02-09-00

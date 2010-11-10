@@ -85,7 +85,7 @@ CsPadElementV1::native_type(unsigned nQuad)
 hdf5pp::Type
 CsPadElementV1::stored_data_type(unsigned nQuad, unsigned nSect)
 {
-  hdf5pp::Type baseType = hdf5pp::TypeTraits<uint16_t>::native_type() ;
+  hdf5pp::Type baseType = hdf5pp::TypeTraits<int16_t>::native_type() ;
 
   hsize_t dims[] = { nQuad, nSect, Pds::CsPad::ColumnsPerASIC, Pds::CsPad::MaxRowsPerASIC*2 } ;
   return hdf5pp::ArrayType::arrayType ( baseType, 4, dims );

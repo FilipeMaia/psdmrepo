@@ -24,6 +24,7 @@
 //-------------------------------
 #include "H5DataTypes/CsPadConfigV1.h"
 #include "hdf5pp/Group.h"
+#include "hdf5pp/Type.h"
 #include "pdsdata/cspad/ConfigV2.hh"
 
 //------------------------------------
