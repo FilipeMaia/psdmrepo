@@ -48,9 +48,10 @@ LIBDIR = "lib"
 
 # boost packages and their dependencies
 pkgs = {'boost_date_time' : 'boost', 
-        'boost_filesystem' : 'boost', 
+        'boost_filesystem' : 'boost_system boost', 
         'boost_iostreams' : 'boost',
         'boost_regex' : 'boost',
+        'boost_system' : 'boost',
         'boost_thread' : 'boost',
         'boost_unit_test_framework' : 'boost', 
         }
