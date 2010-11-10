@@ -19,13 +19,13 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/DataTypeCvt.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "O2OTranslator/O2OExceptions.h"
+#include "MsgLogger/MsgLogger.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

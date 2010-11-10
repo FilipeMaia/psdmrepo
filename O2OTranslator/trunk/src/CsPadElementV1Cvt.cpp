@@ -26,6 +26,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
+#include "pdscalibdata/CsPadPedestalsV1.h"
 #include "pdsdata/cspad/ConfigV1.hh"
 #include "pdsdata/cspad/ConfigV2.hh"
 
@@ -58,10 +59,12 @@ namespace O2OTranslator {
 //----------------
 CsPadElementV1Cvt::CsPadElementV1Cvt ( const std::string& typeGroupName,
                                    const ConfigObjectStore& configStore,
+                                   const CalibObjectStore& calibStore,
                                    hsize_t chunk_size,
                                    int deflate )
   : EvtDataTypeCvt<Pds::CsPad::ElementV1>(typeGroupName)
   , m_configStore(configStore)
+  , m_calibStore(calibStore)
   , m_chunk_size(chunk_size)
   , m_deflate(deflate)
   , m_elementCont(0)
@@ -115,7 +118,7 @@ CsPadElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     m_elementCont = new ElementCont ( elContFactory ) ;
 
     // create container for frame data
-    CvtDataContFactoryTyped<uint16_t> dataContFactory( "data", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryTyped<int16_t> dataContFactory( "data", m_chunk_size, m_deflate ) ;
     m_pixelDataCont = new PixelDataCont ( dataContFactory ) ;
 
     // make container for time
@@ -124,14 +127,20 @@ CsPadElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
 
   }
 
+  // get calibrarion data
+  const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
+  boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> pedestals =
+    m_calibStore.get<pdscalibdata::CsPadPedestalsV1>(address);
+
   // get few constants
   const unsigned nQuad = ::bitCount(qMask, Pds::CsPad::MaxQuadsPerSensor);
   const unsigned nSect = ::bitCount(sMask, Pds::CsPad::ASICsPerQuad/2);
-  const unsigned qsize = nSect*Pds::CsPad::ColumnsPerASIC*Pds::CsPad::MaxRowsPerASIC*2;
+  const unsigned ssize = Pds::CsPad::ColumnsPerASIC*Pds::CsPad::MaxRowsPerASIC*2;
+  const unsigned qsize = nSect*ssize;
 
   // make data arrays
   H5DataTypes::CsPadElementV1 elems[nQuad] ;
-  uint16_t pixelData[nQuad][nSect][Pds::CsPad::ColumnsPerASIC][Pds::CsPad::MaxRowsPerASIC*2];
+  int16_t pixelData[nQuad][nSect][Pds::CsPad::ColumnsPerASIC][Pds::CsPad::MaxRowsPerASIC*2];
 
   // move the data
   const XtcType* pdselem = &data ;
@@ -140,10 +149,42 @@ CsPadElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     // copy frame info
     elems[iq] = H5DataTypes::CsPadElementV1(*pdselem) ;
 
-    // copy pixel data
     const uint16_t* qdata = pdselem->data();
-    std::copy(qdata, qdata+qsize, &pixelData[iq][0][0][0]);
 
+    if (pedestals.get()) {
+
+      int sect = 0;
+      for ( int is = 0 ; is < Pds::CsPad::ASICsPerQuad/2 ; ++ is ) {
+      
+        if ( not (sMask & (1<<is)) ) continue;
+        
+        // start of output data
+        int16_t* output = &pixelData[iq][sect][0][0];
+        
+        // this sector's pedestal data
+        const float* peddata = &pedestals->pedestals()[iq][is][0][0];
+
+        // start of the section data
+        const uint16_t* sdata = qdata + sect*ssize;
+
+        // subtract pedestals
+        std::transform(sdata, sdata+ssize, peddata, output, std::minus<float>());
+        
+        ++ sect;
+      
+      }
+      
+    } else {
+
+      // start of output data
+      int16_t* output = &pixelData[iq][0][0][0];
+
+      // just copy it over to new location
+      std::copy(qdata, qdata+qsize, output);
+
+      
+    }
+    
     // move to next frame
     pdselem = (const XtcType*)(qdata+qsize+2) ;
   }

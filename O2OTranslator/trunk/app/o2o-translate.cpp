@@ -87,6 +87,7 @@ private:
 
   // more command line options and arguments
   AppCmdOptList<std::string>  m_optionsFile ;
+  AppCmdOpt<std::string>      m_calibDir ;
   AppCmdOpt<int>              m_compression ;
   AppCmdOptSize               m_dgramsize ;
   AppCmdOpt<unsigned int>     m_dgramQSize ;
@@ -114,9 +115,10 @@ private:
 O2O_Translate::O2O_Translate ( const std::string& appName )
   : AppBase( appName )
   , m_optionsFile( 'o', "options-file", "path",     "file name with options, multiple allowed", '\0' )
+  , m_calibDir   ( 'C', "calib-dir",    "path",     "directory with calibration data, def: none", "" )
   , m_compression( 'c', "compression",  "number",   "compression level, -1..9, def: -1", -1 )
   , m_dgramsize  ( 'g', "datagram-size","size",     "datagram buffer size. def: 16M", 16*1048576ULL )
-  , m_dgramQSize ( 'Q', "datagram-queue","number",     "datagram queue size. def: 32", 32 )
+  , m_dgramQSize ( 'Q', "datagram-queue","number",  "datagram queue size. def: 32", 32 )
   , m_experiment ( 'x', "experiment",   "string",   "experiment name", "" )
   , m_extGroups  ( 'G', "group-time",               "use extended group names with timestamps", false )
   , m_instrument ( 'i', "instrument",   "string",   "instrument name", "" )
@@ -131,10 +133,11 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_runNumber  ( 'r', "run-number",   "number",   "run number, non-negative number; def: 0", 0 )
   , m_runType    ( 't', "run-type",     "string",   "run type, DATA or CALIB, def: DATA", "DATA" )
   , m_splitMode  ( 's', "split-mode",   "mode-name","one of none, or family; def: none", O2OHdf5Writer::NoSplit )
-  , m_splitSize  ( 'z', "split-size",   "size",   "max. size of output files. def: 10G", 10*1073741824ULL )
+  , m_splitSize  ( 'z', "split-size",   "size",     "max. size of output files. def: 10G", 10*1073741824ULL )
   , m_eventData  ( "event-file",   "file name(s) with XTC event data" )
 {
   setOptionsFile( m_optionsFile ) ;
+  addOption( m_calibDir ) ;
   addOption( m_compression ) ;
   addOption( m_dgramsize ) ;
   addOption( m_dgramQSize ) ;
@@ -203,6 +206,7 @@ O2O_Translate::runApp ()
                          m_runType.value(),
                          m_instrument.value(),
                          m_experiment.value(),
+                         m_calibDir.value(),
                          m_metadata.value() ) ;
 
   // instantiate XTC scanner, which is also output file writer

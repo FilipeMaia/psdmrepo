@@ -23,6 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "H5DataTypes/CsPadElementV2.h"
+#include "O2OTranslator/CalibObjectStore.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/CvtDataContainer.h"
 #include "O2OTranslator/CvtDataContFactoryDef.h"
@@ -59,6 +60,7 @@ public:
   // constructor
   CsPadElementV2Cvt ( const std::string& typeGroupName,
                       const ConfigObjectStore& configStore,
+                      const CalibObjectStore& calibStore,
                       hsize_t chunk_size,
                       int deflate ) ;
 
@@ -81,11 +83,12 @@ protected:
 private:
 
   typedef CvtDataContainer<CvtDataContFactoryTyped<H5DataTypes::CsPadElementV2> > ElementCont ;
-  typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > PixelDataCont ;
+  typedef CvtDataContainer<CvtDataContFactoryTyped<int16_t> > PixelDataCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
 
   // Data members
   const ConfigObjectStore& m_configStore;
+  const CalibObjectStore& m_calibStore;
   hsize_t m_chunk_size ;
   int m_deflate ;
   ElementCont* m_elementCont ;

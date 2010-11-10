@@ -26,6 +26,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
+#include "pdscalibdata/CsPadPedestalsV1.h"
 #include "pdsdata/cspad/ConfigV1.hh"
 #include "pdsdata/cspad/ConfigV2.hh"
 
@@ -58,10 +59,12 @@ namespace O2OTranslator {
 //----------------
 CsPadElementV2Cvt::CsPadElementV2Cvt ( const std::string& typeGroupName,
                                    const ConfigObjectStore& configStore,
+                                   const CalibObjectStore& calibStore,
                                    hsize_t chunk_size,
                                    int deflate )
   : EvtDataTypeCvt<Pds::CsPad::ElementV2>(typeGroupName)
   , m_configStore(configStore)
+  , m_calibStore(calibStore)
   , m_chunk_size(chunk_size)
   , m_deflate(deflate)
   , m_elementCont(0)
@@ -115,7 +118,7 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     m_elementCont = new ElementCont ( elContFactory ) ;
 
     // create container for frame data
-    CvtDataContFactoryTyped<uint16_t> dataContFactory( "data", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryTyped<int16_t> dataContFactory( "data", m_chunk_size, m_deflate ) ;
     m_pixelDataCont = new PixelDataCont ( dataContFactory ) ;
 
     // make container for time
@@ -123,6 +126,11 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
   }
+  
+  // get calibrarion data
+  const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
+  boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> pedestals =
+    m_calibStore.get<pdscalibdata::CsPadPedestalsV1>(address);
 
   // get few constants
   const unsigned nQuad = ::bitCount(qMask, Pds::CsPad::MaxQuadsPerSensor);
@@ -131,7 +139,7 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
 
   // make data arrays
   H5DataTypes::CsPadElementV2 elems[nQuad] ;
-  uint16_t pixelData[nSect][Pds::CsPad::ColumnsPerASIC][Pds::CsPad::MaxRowsPerASIC*2];
+  int16_t pixelData[nSect][Pds::CsPad::ColumnsPerASIC][Pds::CsPad::MaxRowsPerASIC*2];
 
   // move the data
   const XtcType* pdselem = &data ;
@@ -151,9 +159,24 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     
       if ( not (sMask[iq] & (1 << is))) continue; 
   
-      // copy pixel data
-      std::copy(sdata, sdata+ssize, &pixelData[sect][0][0]);
+      // output pixel data
+      int16_t* output = &pixelData[sect][0][0];
+      
+      if (pedestals.get()) {
 
+        // this sector's pedestal data
+        const float* peddata = &pedestals->pedestals()[iq][is][0][0];
+        
+        // subtract pedestals
+        std::transform(sdata, sdata+ssize, peddata, output, std::minus<float>());
+        
+      } else {
+
+        // just copy it over to new location
+        std::copy(sdata, sdata+ssize, output);
+        
+      }
+      
       // advance to next section
       sdata += ssize;
       ++ sect;

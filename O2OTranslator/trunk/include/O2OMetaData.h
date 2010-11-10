@@ -59,6 +59,7 @@ public:
                 const std::string& runType,
                 const std::string& instrument,
                 const std::string& experiment,
+                const std::string& calibDir,
                 const std::list<std::string>& extraMetaData ) ;
 
   // Destructor
@@ -76,6 +77,9 @@ public:
   // get instrument name or empty string
   const std::string& instrument() const { return m_instrument ; }
 
+  // get path for the calibration directory
+  const std::string& calibDir() const { return m_calibDir ; }
+
   // get the iterators for extra meta data
   const_iterator extra_begin() const { return m_extraMetaData.begin() ; }
   const_iterator extra_end() const { return m_extraMetaData.end() ; }
@@ -89,6 +93,7 @@ private:
   const std::string m_runType ;
   const std::string m_instrument ;
   const std::string m_experiment ;
+  const std::string m_calibDir ;
   std::map<std::string,std::string> m_extraMetaData ;
 
   // Copy constructor and assignment are disabled by default

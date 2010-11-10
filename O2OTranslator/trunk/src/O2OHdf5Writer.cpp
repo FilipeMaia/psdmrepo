@@ -69,6 +69,7 @@
 #include "O2OTranslator/ConfigDataTypeCvt.h"
 #include "O2OTranslator/CsPadElementV1Cvt.h"
 #include "O2OTranslator/CsPadElementV2Cvt.h"
+#include "O2OTranslator/CsPadCalibV1Cvt.h"
 #include "O2OTranslator/EvrDataV3Cvt.h"
 #include "O2OTranslator/EvtDataTypeCvtDef.h"
 #include "O2OTranslator/EpicsDataTypeCvt.h"
@@ -152,6 +153,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   , m_stateCounters()
   , m_transition(Pds::TransitionId::Unknown)
   , m_configStore()
+  , m_calibStore()
   , m_transClock()
 {
   std::fill_n(m_stateCounters, int(NumberOfStates), 0U);
@@ -307,6 +309,13 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 2).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  // special converter object for CsPad calibration data
+  converter.reset( new CsPadCalibV1Cvt ( "CsPad::CalibV1", m_metadata, m_calibStore ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   hsize_t chunk_size = 16*1024 ;
 
   // instantiate all factories for event converters
@@ -412,12 +421,14 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // very special converter for CsPad::ElementV1, it needs two types of data
-  converter.reset( new CsPadElementV1Cvt ( "CsPad::ElementV1", m_configStore, chunk_size, m_compression ) ) ;
+  converter.reset( new CsPadElementV1Cvt ( "CsPad::ElementV1", m_configStore, 
+                                           m_calibStore, chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadElement,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // very special converter for CsPad::ElementV2, it needs two types of data
-  converter.reset( new CsPadElementV2Cvt ( "CsPad::ElementV2", m_configStore, chunk_size, m_compression ) ) ;
+  converter.reset( new CsPadElementV2Cvt ( "CsPad::ElementV2", m_configStore, 
+                                           m_calibStore, chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadElement,2).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 

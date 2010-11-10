@@ -11,6 +11,19 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-00
+2010-11-09 Andy Salnikov
+- adding support for calibration of cspad data during translation
+- new class CalibObjectStore which is a type-safe store for calibration
+  objects
+- new converter class CsPadCalibV1Cvt which reads calibration data from
+  external file and stores them in HDF file and also in calib store
+- o2o-translator now takes -C option which specified top directory for
+  calibration files
+- CsPadElementV1Cvt and CsPadElementV2Cvt implement pedestal subtraction
+  from cspad images before sending them to file
+- common mode subtraction is not implemented yet
+
 Tag: V00-08-05
 2010-10-14 Andy Salnikov
 - update for pdsdata V02-09-00

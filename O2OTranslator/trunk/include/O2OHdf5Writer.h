@@ -31,6 +31,7 @@
 #include "H5DataTypes/XtcClockTime.h"
 #include "LusiTime/Time.h"
 #include "O2OTranslator/ConfigObjectStore.h"
+#include "O2OTranslator/CalibObjectStore.h"
 #include "O2OTranslator/DataTypeCvtI.h"
 #include "pdsdata/xtc/TransitionId.hh"
 
@@ -122,6 +123,7 @@ private:
   StateCounters m_stateCounters ;
   Pds::TransitionId::Value m_transition;
   ConfigObjectStore m_configStore;
+  CalibObjectStore m_calibStore;
   TransitionClock m_transClock;
 
   // close all containers

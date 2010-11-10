@@ -41,11 +41,13 @@ O2OMetaData::O2OMetaData ( unsigned long runNumber,
                            const std::string& runType,
                            const std::string& instrument,
                            const std::string& experiment,
+                           const std::string& calibDir,
                            const std::list<std::string>& extraMetaData )
   : m_runNumber(runNumber)
   , m_runType(runType)
   , m_instrument(instrument)
   , m_experiment(experiment)
+  , m_calibDir(calibDir)
   , m_extraMetaData()
 {
   typedef std::list<std::string>::const_iterator MDIter ;
