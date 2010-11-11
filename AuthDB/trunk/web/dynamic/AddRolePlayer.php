@@ -1,6 +1,13 @@
 <?php
 
-require_once('AuthDB/AuthDB.inc.php');
+require_once( 'AuthDB/AuthDB.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+
+use AuthDB\AuthDB;
+use AuthDB\AuthDBException;
+
+use RegDB\RegDB;
+use RegDB\RegDBHtml;
 
 /*
  * This script will lay out a form for creating a new role player.

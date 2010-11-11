@@ -1,6 +1,10 @@
 <?php
 
-require_once( 'RegDB/RegDB.inc.php' );
+namespace AuthDB;
+
+require_once( 'AuthDB.inc.php' );
+
+use RegDB\RegDB;
 
 /**
  * Class AuthDB encapsulates operations with the 'roles' database
@@ -405,7 +409,6 @@ HERE;
 /*
  * Unit tests
  *
-require_once( 'AuthDB/AuthDB.inc.php' );
 try {
     $authdb = new AuthDB();
     $authdb->begin();
@@ -423,8 +426,8 @@ try {
 /*
  * Unit tests
  *
-require_once( 'AuthDB/AuthDB.inc.php' );
-require_once( 'RegDB/RegDB.inc.php' );
+
+use RegDB\RegDBException;
 
 function toYesNo( $boolean_val ) { return '<b>'.( $boolean_val ? 'Yes' : 'No').'</b>'; }
 

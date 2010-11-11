@@ -1,6 +1,10 @@
 <?php
 
-require_once('AuthDB/AuthDB.inc.php');
+require_once( 'AuthDB/AuthDB.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+
+use AuthDB\AuthDB;
+use AuthDB\AuthDBException;
 
 /*
  * This script will process requests for various information stored in the database.

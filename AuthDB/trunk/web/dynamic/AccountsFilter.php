@@ -1,6 +1,12 @@
 <?php
 
-require_once('AuthDB/AuthDB.inc.php');
+require_once( 'AuthDB/AuthDB.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+
+use AuthDB\AuthDB;
+use AuthDB\AuthDBException;
+
+use RegDB\RegDBHtml;
 
 /*
  * This script will generate a module with input elements for the filter form

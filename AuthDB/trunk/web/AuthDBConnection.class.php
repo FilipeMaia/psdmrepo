@@ -1,5 +1,9 @@
 <?php
 
+namespace AuthDB;
+
+require_once( 'AuthDB.inc.php' );
+
 /**
  * Class AuthDBConnection encapsulates operations with the database
  */
@@ -152,8 +156,6 @@ class AuthDBConnection {
  * UNIT TEST FOR LDAP METHODS
  * ==========================
  *
-
-require_once( "AuthDB.inc.php");
 
 $conn = new AuthDBConnection (
     AUTHDB_DEFAULT_HOST,
