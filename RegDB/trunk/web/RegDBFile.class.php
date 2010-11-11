@@ -8,11 +8,11 @@ require_once( 'LusiTime/LusiTime.inc.php' );
 use LusiTime\LusiTime;
 
 /**
- * Class RegDBRun an abstraction for experimental runs.
+ * Class RegDBFile an abstraction for a data file open/created by the DAQ system.
  *
  * @author gapon
  */
-class RegDBRun {
+class RegDBFile {
 
     /* Data members
      */
@@ -32,10 +32,16 @@ class RegDBRun {
     public function parent () {
         return $this->experiment; }
 
-    public function num () {
-        return $this->attr['num']; }
+    public function run () {
+        return (int)$this->attr['run']; }
 
-    public function request_time () {
-        return LusiTime::from64( $this->attr['request_time'] ); }
+    public function stream () {
+        return (int)$this->attr['stream']; }
+
+    public function chunk () {
+        return (int)$this->attr['chunk']; }
+        
+    public function open_time () {
+        return LusiTime::from64( $this->attr['open'] ); }
 }
 ?>

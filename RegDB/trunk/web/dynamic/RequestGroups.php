@@ -1,6 +1,10 @@
 <?php
 
-require_once('RegDB/RegDB.inc.php');
+require_once( 'RegDB/RegDB.inc.php' );
+
+use RegDB\RegDB;
+use RegDB\RegDBAuth;
+use RegDB\RegDBException;
 
 if( !RegDBAuth::instance()->canRead()) {
     print( RegDBAuth::reporErrorHtml(
@@ -113,7 +117,7 @@ HERE;
 	}
     $regdb->commit();
 
-} catch( regdbException $e ) {
+} catch( RegDBException $e ) {
     print $e->toHtml();
 }
 

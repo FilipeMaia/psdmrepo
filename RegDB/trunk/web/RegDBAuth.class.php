@@ -1,6 +1,11 @@
 <?php
 
-require_once('AuthDB/AuthDB.inc.php');
+namespace RegDB;
+
+require_once( 'RegDB.inc.php' );
+require_once( 'AuthDB/AuthDB.inc.php' );
+
+use AuthDB\AuthDB;
 
 /* 
  * To change this template, choose Tools | Templates
@@ -30,15 +35,15 @@ class RegDBAuth {
     }
 
     public function authName() {
-        return $_SERVER['REMOTE_USER'];
+        return $this->authdb->authName(); // $_SERVER['REMOTE_USER'];
     }
 
     public function authType() {
-        return $_SERVER['AUTH_TYPE'];
+        return $this->authdb->authType(); // $_SERVER['AUTH_TYPE'];
     }
 
     public function isAuthenticated() {
-        return RegDBAuth::instance()->authName() != '';
+        return $this->authdb->isAuthenticated(); // RegDBAuth::instance()->authName() != '';
     }
 
     public function canRead() {
@@ -55,6 +60,62 @@ class RegDBAuth {
             RegDBAuth::instance()->authName(), null, 'RegDB', 'edit' );
     }
 
+    /* Check if the curent user is allowed to manage POSIX group of
+     * the specified experiment.
+     * 
+     * NOTE: The current implementation of the method requires
+     * the experiment to exist. NO complain will be made if it
+     * doen't, the 'false' will be returned.
+     */
+    public function canManageLDAPGroupOf( $name ) {
+
+        if( !$this->isAuthenticated()) return false;
+
+    	/* Find experiment in order to get its identifier.
+    	 */
+    	$regdb = new RegDB();
+    	$regdb->begin();
+    	$experiment = $regdb->find_experiment_by_unique_name( $name );
+    	if( is_null( $experiment )) return false;
+    	/*
+    		throw new RegDBException (
+            	__METHOD__,
+            	"no such experiement: ".$name );
+        */
+        $this->authdb->begin();
+        return $this->authdb->hasPrivilege(
+            RegDBAuth::instance()->authName(), $experiment->id(), 'LDAP', 'manage_groups' );
+    }
+
+    /* Check if the curent user is allowed to manage the specified POSIX group.
+     * 
+     * This operation will go through all registered experiments and find out
+     * thoses in which this group group is configured as the primary one.
+     * Then the authorization record will be pulled for those experiments.
+     * 
+     * NOTE: The 'facilities' will be excluded from the search.
+     */
+    public function canManageLDAPGroup( $name ) {
+  
+        if( !$this->isAuthenticated()) return false;
+    	
+    	/* Go through all experiments. Skip 'facilities'.
+    	 */
+        $this->authdb->begin();
+        $regdb = new RegDB();
+    	$regdb->begin();
+    	foreach( $regdb->experiments() as $experiment ) {    	
+    		if( $experiment->is_facility()) continue;
+    		if( $experiment->POSIX_gid() == $name ) {
+                if( $this->authdb->hasPrivilege(
+                    RegDBAuth::instance()->authName(),
+                    $experiment->id(),
+                    'LDAP',
+                    'manage_groups' )) return true;
+    		}
+    	}
+    }
+    
     public static function reporErrorHtml( $message, $link=null ) {
         $suggested_back_link =
             is_null($link) ?

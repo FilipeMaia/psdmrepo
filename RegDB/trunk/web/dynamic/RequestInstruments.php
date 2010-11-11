@@ -1,6 +1,10 @@
 <?php
 
-require_once('RegDB/RegDB.inc.php');
+require_once( 'RegDB/RegDB.inc.php' );
+
+use RegDB\RegDB;
+use RegDB\RegDBAuth;
+use RegDB\RegDBException;
 
 function instrument2json( $instrument ) {
     $instrument_url =
@@ -48,7 +52,7 @@ HERE;
 
     $regdb->commit();
 
-} catch( regdbException $e ) {
+} catch( RegDBException $e ) {
     print $e->toHtml();
 }
 

@@ -1,6 +1,11 @@
 <?php
 
-require_once('RegDB/RegDB.inc.php');
+require_once( 'RegDB/RegDB.inc.php' );
+
+use RegDB\RegDB;
+use RegDB\RegDBAuth;
+use RegDB\RegDBHtml;
+use RegDB\RegDBException;
 
 /*
  * This script will process a request for modifying parameters of an instrument.

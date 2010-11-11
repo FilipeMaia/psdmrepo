@@ -744,7 +744,7 @@ function view_experiment( id, name ) {
 
     set_context(
         '<a href="javascript:list_experiments()">Select Experiment</a> > '+
-        '<i>'+name+'</i>'+
+        '<i>'+name+'</i>&nbsp;&nbsp;[ ID='+id+' ]'+
 //        '&nbsp;&nbsp;&nbsp;|&nbsp;<b>viewing</b>&nbsp;|' );
         '&nbsp;&nbsp;&nbsp;(&nbsp;<b>viewing</b>&nbsp;)' );
 
@@ -787,7 +787,7 @@ function edit_experiment( id, name ) {
 
     set_context(
         '<a href="javascript:list_experiments()">Select Experiment</a> > '+
-        '<i>'+name+'</i>'+
+        '<i>'+name+'</i>&nbsp;&nbsp;[ ID='+id+' ]'+
 //        '&nbsp;&nbsp;&nbsp;|&nbsp;<b><span style="color:red;">editing</span></b>&nbsp;|' );
         '&nbsp;&nbsp;&nbsp;(&nbsp;<b><span style="color:red;">editing</span></b>&nbsp;)' );
 
@@ -1251,7 +1251,7 @@ function view_run_numbers( id, name ) {
         <div style="float:left;">
           <p id="application_title" style="text-align:left;">
             <em>Experiment Registry Database: </em>
-            <em id="application_subtitle">LCLS Detector Control</em>
+            <em id="application_subtitle">LCLS Controls and Data Systems</em>
           </p>
         </div>
         <div style="float:right; height:50px;">

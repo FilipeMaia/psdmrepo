@@ -1,4 +1,9 @@
 <?php
+
+namespace RegDB;
+
+require_once( 'RegDB.inc.php' );
+
 /* 
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -75,10 +80,12 @@ HERE;
         return $this;
     }
 
-    public function select_input( $x, $y, $var, $list, $default_selected='' ) {
+    public function select_input( $x, $y, $var, $list, $default_selected='', $id='', $onchange='' ) {
+    	$id_option = ( $id == '' ? '' : "id=\"{$id}\"" );
+    	$onchange_option = ( $onchange == '' ? '' : "onchange=\"{$onchange}\"" );
         $this->html = $this->html.<<<HERE
-<div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
-  <select align="center" type="text" name="{$var}" style="padding:1px;">
+<div {$id_option} style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
+  <select align="center" type="text" name="{$var}" style="padding:1px;" {$onchange_option}>
 HERE;
         foreach( $list as $l ) {
             if( $l == $default_selected )

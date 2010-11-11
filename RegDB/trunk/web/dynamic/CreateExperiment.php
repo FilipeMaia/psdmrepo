@@ -1,6 +1,15 @@
 <?php
 
-require_once('RegDB/RegDB.inc.php');
+require_once( 'LusiTime/LusiTime.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+
+use LusiTime\LusiTime;
+use LusiTime\LusiTimeException;
+
+use RegDB\RegDB;
+use RegDB\RegDBAuth;
+use RegDB\RegDBHtml;
+use RegDB\RegDBException;
 
 /*
  * This script will lay out a form for creating a new experiment.
@@ -58,6 +67,8 @@ try {
 
     $regdb->commit();
 
+} catch( LusiTimeException $e ) {
+    print $e->toHtml();
 } catch( RegDBException $e ) {
     print $e->toHtml();
 }

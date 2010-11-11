@@ -1,6 +1,11 @@
 <?php
 
-require_once('RegDB/RegDB.inc.php');
+require_once( 'RegDB/RegDB.inc.php' );
+
+use RegDB\RegDB;
+use RegDB\RegDBAuth;
+use RegDB\RegDBHtml;
+use RegDB\RegDBException;
 
 /*
  * This script will process a request for modifying parameters of an experiment.
@@ -37,11 +42,11 @@ try {
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-    $con = new RegDBHtml( 0, 0, 700, 250 );
+    $con = new RegDBHtml( 0, 0, 800, 250 );
     echo $con
         ->label         ( 300,   0, 'Description')
         ->label         (   0,  25, 'Experiment: ' )
-        ->value         ( 100,  25, $experiment->name())
+        ->value         ( 100,  25, $experiment->name().'&nbsp;&nbsp;[ ID='.$experiment->id().' ]' )
         ->textarea_input( 300,  25, 'description', 500, 125, $experiment->description())
         ->label         (   0,  50, 'Instrument: ' )
         ->value         ( 100,  50, $instrument )

@@ -1,4 +1,9 @@
 <?php
+
+namespace RegDB;
+
+require_once( 'RegDB.inc.php' );
+
 /* 
  * To change this template, choose Tools | Templates
  * and open the template in the editor.

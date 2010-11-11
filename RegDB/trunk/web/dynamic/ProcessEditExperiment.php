@@ -1,6 +1,13 @@
 <?php
 
-require_once('RegDB/RegDB.inc.php');
+require_once( 'LusiTime/LusiTime.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+
+use LusiTime\LusiTime;
+
+use RegDB\RegDB;
+use RegDB\RegDBAuth;
+use RegDB\RegDBException;
 
 /*
  * This script will process a request for editing an experiment

@@ -1,6 +1,10 @@
 <?php
 
-require_once('RegDB/RegDB.inc.php');
+require_once( 'RegDB/RegDB.inc.php' );
+
+use RegDB\RegDB;
+use RegDB\RegDBHtml;
+use RegDB\RegDBException;
 
 /*
  * This script will process a request for displaying parameters of an experiment.
@@ -34,7 +38,7 @@ try {
     echo $con
         ->label   ( 300,   0, 'Description')
         ->label   (   0,  25, 'Experiment: ' )
-        ->value   ( 100,  25, $experiment->name())
+        ->value   ( 100,  25, $experiment->name().'&nbsp;&nbsp;[ ID='.$experiment->id().' ]' )
         ->textarea( 300,  25, $experiment->description(), 500, 125 )
         ->label   (   0,  50, 'Instrument: ' )
         ->value   ( 100,  50, $instrument_url )

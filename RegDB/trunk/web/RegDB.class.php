@@ -1,5 +1,9 @@
 <?php
 
+namespace RegDB;
+
+require_once( 'RegDB.inc.php' );
+
 class RegDB {
 
     /* Data members
@@ -93,6 +97,16 @@ class RegDB {
         throw new RegDBException (
             __METHOD__,
             "inconsistent results returned fromthe database. The database may be corrupted." );
+    }
+
+    public function find_experiment_by_unique_name ( $experiment_name ) {
+
+        $experiments = $this->find_experiments_by_ ( "name='{$experiment_name}'" );
+        if( count( $experiments ) == 0 ) return null;
+        if( count( $experiments ) == 1 ) return $experiments[0];
+        throw new RegDBException (
+            __METHOD__,
+            "too many experiments found in the database. The experiment name is not unique." );
     }
 
     private function find_experiments_by_ ( $condition='' ) {
@@ -372,19 +386,6 @@ class RegDB {
     public function remove_user_from_posix_group ( $user_name, $group_name ) {
 		$this->connection->remove_user_from_posix_group( $user_name, $group_name ); }
 
-	/* Preferred groups are special groups which are managed
-	 * by LCLS.
-	 */
-    public function preffered_groups() {
-        return array(
-            'lab-admin'      => True,
-            'lab-superusers' => True,
-            'lab-users'      => True,
-            'ps-amo'         => True,
-            'ps-data'        => True,
-            'ps-mgt'         => True );
-    }
-
     /* Return an associative array of experiment groups whose names
      * follow the pattern:
      * 
@@ -434,12 +435,33 @@ class RegDB {
     	 *   <instr><proposal><year>
     	 */
 
-    	/* SXR commissionning experiments for the year of 2010.
+    	/* In-house commissionning, in-house, etc. for the year of 2010.
          */
-    	if( !is_null( $instr ) && $instr == 'SXR' ) {
+    	if( is_null( $instr ) || ( $instr == 'AMO' )) {
+            $groups['amoi0110'] = True;
+    	}
+
+    	/* SXR commissionning, in-house, etc. experiments for the year of 2010.
+         */
+    	if( is_null( $instr ) || ( $instr == 'SXR' )) {
             $groups['sxrrsx10'] = True;
             $groups['sxrsse10'] = True;
             $groups['sxrlje10'] = True;
+            $groups['sxri0110'] = True;
+    	}
+
+    	/* Groups for which there is no entry in RegDB but which we still want
+    	 * to treat as experiment specific groups.
+    	 */
+
+    	/* XPP commissionning, in-house, etc. experiments for the year of 2010.
+         */
+    	if( is_null( $instr ) || ( $instr == 'XPP' )) {
+            $groups['xpp80610'] = True;
+            $groups['xppm0110'] = True;
+            $groups['xppi0110'] = True;
+            $groups['xppi0210'] = True;
+            $groups['xppi0310'] = True;
     	}
     	return $groups;
     }
@@ -449,8 +471,7 @@ class RegDB {
  * UNIT TEST FOR THE CLASS
  * =======================
  *
-
-require_once( "RegDB.inc.php");
+use LusiTime\LusiTime;
 
 try {
     $conn = new RegDB();

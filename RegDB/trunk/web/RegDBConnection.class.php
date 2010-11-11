@@ -1,5 +1,9 @@
 <?php
 
+namespace RegDB;
+
+require_once( 'RegDB.inc.php' );
+
 /**
  * Class RegDBConnection encapsulates operations with the database
  */

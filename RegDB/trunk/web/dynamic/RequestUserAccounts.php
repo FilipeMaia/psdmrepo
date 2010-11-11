@@ -1,6 +1,10 @@
 <?php
 
-require_once('RegDB/RegDB.inc.php');
+require_once( 'RegDB/RegDB.inc.php' );
+
+use RegDB\RegDB;
+use RegDB\RegDBAuth;
+use RegDB\RegDBException;
 
 /*
  * This script will process a request for displaying user accounts.
@@ -64,9 +68,10 @@ function account2json_simple( $account ) {
 
     return json_encode(
         array (
-            "uid"   => $account['uid'],
-            "name"  => substr( $account['gecos'], 0, 32 ),
-            "email" => $account['email']
+            "uid_link" => "<a href=\"javascript:view_account('".$account['uid']."')\">".$account['uid']."</a> ",
+            "uid"      => $account['uid'],
+            "name"     => substr( $account['gecos'], 0, 32 ),
+            "email"    => $account['email']
         )
     );
 }
@@ -112,7 +117,7 @@ HERE;
 
     $regdb->commit();
 
-} catch( regdbException $e ) {
+} catch( RegDBException $e ) {
     print $e->toHtml();
 }
 

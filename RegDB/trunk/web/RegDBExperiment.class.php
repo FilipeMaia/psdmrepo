@@ -1,4 +1,12 @@
 <?php
+
+namespace RegDB;
+
+require_once( 'RegDB.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+
+use LusiTime\LusiTime;
+
 /**
  * Class RegDBExperiment an abstraction for experiments.
  *
@@ -336,5 +344,36 @@ class RegDBExperiment {
             "unexpected size of result set returned by the query" );
 
     }
+
+   /**
+     * Get a list of files reported by the DAQ system as "open". If the optional
+     * run number is present (not null) then restrict the search to a specific
+     * run only.
+     *
+     * @param $run - optional run number
+     * @return array
+     */
+    public function files( $run=null ) {
+
+    	$list = array();
+        $table = "{$this->connection->database}.file";
+
+        $run_selector = is_null( $run ) ? '' : 'AND run='.$run;
+
+        $result = $this->connection->query(
+            "SELECT * FROM {$table} WHERE exper_id=".$this->id()." {$run_selector} ORDER BY run, stream, chunk" );
+
+        $nrows = mysql_numrows( $result );
+        for( $i = 0; $i < $nrows; $i++ )
+            array_push (
+                $list,
+                new RegDBFile (
+                    $this->connection,
+                    $this,
+                    mysql_fetch_array( $result, MYSQL_ASSOC )));
+
+        return $list;
+    }
+    
 }
 ?>
