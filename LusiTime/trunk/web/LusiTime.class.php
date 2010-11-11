@@ -1,5 +1,9 @@
 <?php
 
+namespace LusiTime;
+
+require_once( 'LusiTime.inc.php' );
+
 /* Set the default timezone to prevent complains from PHP run time.
  *
  * NOTE: this parameter would need to be properly customized
@@ -126,6 +130,11 @@ class LusiTime {
      */
     public function toStringDay() {
         return date("Y-m-d", $this->sec); }
+
+    /* Return 4-digit year number of the timestamp.
+     */
+    public function year() {
+        return (int)date("Y", $this->sec); }
 
     /* Convert the tuple into a packed representation of a 64-bit
      * number. These numbers are meant to be stored in a database.

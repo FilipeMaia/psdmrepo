@@ -1,4 +1,9 @@
 <?php
+
+namespace LusiTime;
+
+require_once( 'LusiTime.inc.php' );
+
 /* 
  * To change this template, choose Tools | Templates
  * and open the template in the editor.

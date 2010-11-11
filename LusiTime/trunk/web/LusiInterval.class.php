@@ -1,5 +1,7 @@
 <?php
 
+namespace LusiTime;
+
 require_once( 'LusiTime.inc.php' );
 
 /*
