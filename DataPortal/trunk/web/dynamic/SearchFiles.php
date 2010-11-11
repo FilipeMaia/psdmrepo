@@ -1,7 +1,16 @@
 <?php
 
-require_once('DataPortal/DataPortal.inc.php');
-require_once('LogBook/LogBook.inc.php');
+require_once( 'DataPortal/DataPortal.inc.php' );
+require_once( 'LogBook/LogBook.inc.php' );
+require_once( 'FileMgr/FileMgr.inc.php' );
+
+use DataPortal\DataPortal;
+
+use LogBook\LogBook;
+use LogBook\LogBookException;
+
+use FileMgr\FileMgrIrodsWs;
+use FileMgr\FileMgrException;
 
 /*
  * This script will process requests for various information stored in the database.
@@ -243,6 +252,8 @@ try {
     }
 
 } catch( LogBookException $e ) {
+    print $e->toHtml();
+} catch( FileMgrException $e ) {
     print $e->toHtml();
 }
 ?>

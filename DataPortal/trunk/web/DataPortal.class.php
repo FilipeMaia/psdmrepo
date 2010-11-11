@@ -1,5 +1,11 @@
 <?php
 
+namespace DataPortal;
+
+require_once( 'DataPortal.inc.php' );
+
+use LusiTime\LusiTime;
+
 /* The utility class to generate HTML documents adhering to the standard
  * look & feel. Here is how it should be used to generate a document:
  *

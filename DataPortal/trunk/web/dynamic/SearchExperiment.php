@@ -1,7 +1,12 @@
 <?php
 
-require_once('DataPortal/DataPortal.inc.php');
-require_once('RegDB/RegDB.inc.php');
+require_once( 'DataPortal/DataPortal.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+
+use DataPortal\DataPortal;
+
+use RegDB\RegDB;
+use RegDB\RegDBException;
 
 $name_or_id = $_GET[ 'name_or_id' ];
 if( isset( $name_or_id )) {
@@ -66,9 +71,6 @@ try {
 	  	$regdb->find_experiment_by_unique_name( $name_or_id )
   	);
 
-} catch( AuthDBException $e ) {
-	print $e->toHtml();
-	exit;
 } catch( RegDBException   $e ) {
 	print $e->toHtml();
 	exit;

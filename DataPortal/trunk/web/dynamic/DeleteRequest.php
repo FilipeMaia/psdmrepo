@@ -1,7 +1,9 @@
 <?php
 
-require_once('AuthDB/AuthDB.inc.php');
-require_once('FileMgr/FileMgr.inc.php');
+require_once( 'FileMgr/FileMgr.inc.php' );
+
+use FileMgr\FileMgrIfaceCtrlWs;
+use FileMgr\FileMgrException;
 
 /* This script will delete a pending translation request for the specified
  * identifier and, if successfull, return a JSON object describing the deleted
@@ -51,9 +53,6 @@ function return_result( $request ) {
 }
 
 try {
-	$authdb = new AuthDB();
-	$authdb->begin();
-
 	$request = null;
 	FileMgrIfaceCtrlWs::delete_request(
 		$request,
@@ -61,10 +60,6 @@ try {
 
 	return_result( $request );
 
-} catch( AuthDBException $e ) {
-	return_error( $e->toHtml());
-} catch( LogBookException $e ) {
-	return_error( $e->toHtml());
 } catch( FileMgrException $e ) {
 	return_error( $e->toHtml());
 }

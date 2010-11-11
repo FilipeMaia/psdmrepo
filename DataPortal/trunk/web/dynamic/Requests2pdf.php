@@ -1,12 +1,23 @@
 <?php
 
-require_once('DataPortal/DataPortal.inc.php');
-require_once('AuthDB/AuthDB.inc.php');
-require_once('RegDB/RegDB.inc.php');
-require_once('LogBook/LogBook.inc.php');
-require_once('FileMgr/FileMgr.inc.php');
+require_once( 'AuthDB/AuthDB.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+require_once( 'LogBook/LogBook.inc.php' );
+require_once( 'FileMgr/FileMgr.inc.php' );
 
-include_once('pdf-php/class.ezpdf.php');
+require_once( 'pdf-php/class.ezpdf.php' );
+
+use AuthDB\AuthDB;
+use AuthDB\AuthDBException;
+
+use RegDB\RegDBException;
+
+use LogBook\LogBook;
+use LogBook\LogBookException;
+
+use FileMgr\FileMgrIfaceCtrlWs;
+use FileMgr\FileMgrIrodsWs;
+use FileMgr\FileMgrException;
 
 class Pdf {
 

@@ -1,8 +1,19 @@
 <?php
 
-require_once('DataPortal/DataPortal.inc.php');
-require_once('RegDB/RegDB.inc.php');
-require_once('FileMgr/FileMgr.inc.php');
+require_once( 'DataPortal/DataPortal.inc.php' );
+require_once( 'FileMgr/FileMgr.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+
+use FileMgr\FileMgrIrodsWs;
+use FileMgr\FileMgrIfaceCtrlWs;
+use FileMgr\FileMgrException;
+
+use RegDB\RegDB;
+use RegDB\RegDBException;
+
+use LusiTime\LusiTime;
+
 
 /* Let a user to select an experiment first if no valid experiment
  * identifier is supplied to the script.
@@ -147,6 +158,11 @@ try {
 <!------------------- Page-specific Styles ------------------------->
 
 <link type="text/css" href="css/portal.css" rel="Stylesheet" />
+
+<style type="text/css">
+  .not4print {
+  }
+</style>
 
 <!----------------------------------------------------------------->
 
@@ -448,15 +464,16 @@ function printer_friendly( element ) {
 	var el = document.getElementById(element);
 	if (el) {
 		var html = document.getElementById(element).innerHTML;
-		var xopen = window.open("about:blank");
-		xopen.document.write('<html xmlns="http://www.w3.org/1999/xhtml">');
-		xopen.document.write('<head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />');
-		xopen.document.write('<link rel="stylesheet" type="text/css" href="css/default.css" />');
-		xopen.document.write('<link type="text/css" href="css/portal.css" rel="Stylesheet" />');
-		xopen.document.write('<title>Data Portal of Experiment: '+instrument_name+' / '+experiment_name+'</title></head><body><div class="maintext">');
-		xopen.document.write(html);
-		xopen.document.write("</div></body></html>");
-		xopen.document.close();
+		var pfcopy = window.open("about:blank");
+		pfcopy.document.write('<html xmlns="http://www.w3.org/1999/xhtml">');
+		pfcopy.document.write('<head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />');
+		pfcopy.document.write('<link rel="stylesheet" type="text/css" href="css/default.css" />');
+		pfcopy.document.write('<link type="text/css" href="css/portal.css" rel="Stylesheet" />');
+		pfcopy.document.write('<style type="text/css"> .not4print { display:none; }	</style>');
+		pfcopy.document.write('<title>Data Portal of Experiment: '+instrument_name+' / '+experiment_name+'</title></head><body><div class="maintext">');
+		pfcopy.document.write(html);
+		pfcopy.document.write("</div></body></html>");
+		pfcopy.document.close();
 	}
 }
 
@@ -488,7 +505,10 @@ function printer_friendly( element ) {
 	  <li><a href="#tabs-account">My Account</a></li>
 	</ul>
 	<div id="tabs-experiment" class="tab-inline-content">
-	  <button id="button-select-experiment">Select another experiment</button>
+      <div style="float:right;" class="not4print"><a href="javascript:printer_friendly('tabs-experiment')" title="Printer friendly version of this page"><img src="img/PRINTER_icon.png" /></a></div>
+      <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:pdf('experiment')" title="PDF version of this page"><img src="img/PDF_icon.jpg" /></a></div>
+      <div stype="clear:both;" class="not4print"></div>
+	  <button id="button-select-experiment" class="not4print">Select another experiment</button>
       <table>
         <tbody cellspacing=4>
           <tr>
@@ -527,7 +547,7 @@ function printer_friendly( element ) {
                   <td valign="top"><?=$experiment->POSIX_gid()?></td>
                   <td>&nbsp;</td>
                   <td>
-                    <button id="button-toggle-group" title="click to see/hide the list of members"><div class="ui-icon ui-icon-triangle-1-s"></div></button>
+                    <button id="button-toggle-group" class="not4print" title="click to see/hide the list of members"><div class="ui-icon ui-icon-triangle-1-s"></div></button>
                     <div id="group-members" class="group-members-hidden">
                       <table><tbody>
                       <?php
@@ -556,6 +576,9 @@ HERE;
       classes to mavoid various sorts of conflicts.</p>
 	</div>
 	<div id="tabs-files" class="tab-inline-content">
+      <div style="float:right;" class="not4print"><a href="javascript:printer_friendly('tabs-files')" title="Printer friendly version of this page"><img src="img/PRINTER_icon.png" /></a></div>
+      <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:pdf('files')" title="PDF version of this page"><img src="img/PDF_icon.jpg" /></a></div>
+      <div stype="clear:both;" class="not4print"></div>
 	  <div>
         <div id="files-search-summary" style="float: left">
           <table><tbody>
@@ -662,9 +685,9 @@ HERE;
           </div>
           <div style="clear: both;"></div>
           <div style="float: right;">
-            <button id="button-files-filter-reset">Reset Filter</button>
-            <button id="button-files-filter-apply">Apply Filter</button>
-            <button id="button-files-filter-import">Import List</button>
+            <button id="button-files-filter-reset" class="not4print">Reset Filter</button>
+            <button id="button-files-filter-apply" class="not4print">Apply Filter</button>
+            <button id="button-files-filter-import" class="not4print">Import List</button>
           </div>
           <div style="clear: both;"></div>
         </div>
@@ -681,9 +704,9 @@ HERE;
 	      <li><a href="#tabs-translate-history">History of Requests</a></li>
 	    </ul>
 	    <div id="tabs-translate-manage" class="tab-inline-content">
-	      <div style="float:right;"><a href="javascript:printer_friendly('tabs-translate-manage')" title="Printer friendly version of this page"><img src="img/PRINTER_icon.png" /></a></div>
-	      <div style="float:right; margin-right:10px;"><a href="javascript:pdf('translate-manage')" title="PDF version of this page"><img src="img/PDF_icon.jpg" /></a></div>
-	      <div stype="clear:both;"></div>
+	      <div style="float:right;" class="not4print"><a href="javascript:printer_friendly('tabs-translate-manage')" title="Printer friendly version of this page"><img src="img/PRINTER_icon.png" /></a></div>
+	      <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:pdf('translate-manage')" title="PDF version of this page"><img src="img/PDF_icon.jpg" /></a></div>
+	      <div stype="clear:both;" class="not4print"></div>
 		  <div>
 	        <div id="translate-search-summary" style="float:left">
 	          <table><tbody>
@@ -752,8 +775,8 @@ HERE;
 	          </div>
 	          <div style="clear:both;"></div>
 	          <div style="float:right;">
-	            <button id="button-translate-filter-reset">Reset Filter</button>
-	            <button id="button-translate-filter-apply">Apply Filter</button>
+	            <button id="button-translate-filter-reset" class="not4print">Reset Filter</button>
+	            <button id="button-translate-filter-apply" class="not4print">Apply Filter</button>
 	          </div>
 	          <div style="clear:both;"></div>
 	        </div>
@@ -813,10 +836,10 @@ HERE;
             </thead></table>
             <div style="margin-top:20px;">
               <center>
-                <button id="apply_filter_button" class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all">
+                <button id="apply_filter_button" class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all" class="not4print">
                   <span class="ui-button-text">Search</span>
                 </button>
-                <button id="reset_filter_button" class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all">
+                <button id="reset_filter_button" class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all" class="not4print">
                   <span class="ui-button-text">Reset Filter</span>
                 </button>
               </center>
@@ -848,11 +871,9 @@ HERE;
 
 <?php
 
-} catch( AuthDBException  $e ) { print $e->toHtml();
 } catch( FileMgrException $e ) { print $e->toHtml();
 } catch( LogBookException $e ) { print $e->toHtml();
 } catch( RegDBException   $e ) { print $e->toHtml();
-} catch( FileMgrException $e ) { print $e->toHtml();
 }
 
 ?>

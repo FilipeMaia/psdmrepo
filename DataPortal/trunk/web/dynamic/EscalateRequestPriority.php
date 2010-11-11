@@ -1,8 +1,12 @@
 <?php
 
-require_once('AuthDB/AuthDB.inc.php');
-require_once('LogBook/LogBook.inc.php');
-require_once('FileMgr/FileMgr.inc.php');
+require_once( 'LogBook/LogBook.inc.php' );
+require_once( 'FileMgr/FileMgr.inc.php' );
+
+use LogBook\LogBookException;
+
+use FileMgr\FileMgrIfaceCtrlWs;
+use FileMgr\FileMgrException;
 
 /* This script will escalate the priority of a pending translation request for the specified
  * identifier and, if successfull, return a JSON object describing the updated status of
@@ -59,9 +63,6 @@ function return_result( $request ) {
 }
 
 try {
-	$authdb = new AuthDB();
-	$authdb->begin();
-
 	$logbook = new LogBook();
 	$logbook->begin();
 
@@ -99,8 +100,6 @@ try {
 
 	return_result( $request );
 
-} catch( AuthDBException $e ) {
-	return_error( $e->toHtml());
 } catch( LogBookException $e ) {
 	return_error( $e->toHtml());
 } catch( FileMgrException $e ) {

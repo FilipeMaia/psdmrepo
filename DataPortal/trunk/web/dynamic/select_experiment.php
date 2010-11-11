@@ -1,10 +1,16 @@
 <?php
 
+require_once( 'DataPortal/DataPortal.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+
+use DataPortal\DataPortal;
+
+use RegDB\RegDB;
+use RegDB\RegDBException;
+
 $instruments = array();
 
 try {
-
-    require_once('RegDB/RegDB.inc.php');
 
 	$regdb = new RegDB();
 	$regdb->begin();
@@ -15,9 +21,6 @@ try {
 	}
 	sort( $instruments );
 
-} catch( AuthDBException $e ) {
-	print $e->toHtml();
-	exit;
 } catch( RegDBException   $e ) {
 	print $e->toHtml();
 	exit;

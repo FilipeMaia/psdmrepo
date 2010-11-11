@@ -1,10 +1,20 @@
 <?php
 
-require_once('DataPortal/DataPortal.inc.php');
-require_once('AuthDB/AuthDB.inc.php');
-require_once('RegDB/RegDB.inc.php');
-require_once('LogBook/LogBook.inc.php');
-require_once('FileMgr/FileMgr.inc.php');
+require_once( 'DataPortal/DataPortal.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+require_once( 'LogBook/LogBook.inc.php' );
+require_once( 'FileMgr/FileMgr.inc.php' );
+
+use DataPortal\DataPortal;
+
+use RegDB\RegDBException;
+
+use LogBook\LogBook;
+use LogBook\LogBookException;
+
+use FileMgr\FileMgrIfaceCtrlWs;
+use FileMgr\FileMgrIrodsWs;
+use FileMgr\FileMgrException;
 
 /*
  * This script will process requests for various information stored in the database.
@@ -308,7 +318,7 @@ try {
             	( $status_simple_if_available != 'translating' ) &&
             	( $status_simple_if_available != 'complete'    )) {
 
-            	$actions = '<button class="translate" style="font-size:12px;" value="'.$runnum.'">Translate</button>';
+            	$actions = '<button class="translate not4print" style="font-size:12px;" value="'.$runnum.'">Translate</button>';
            	}
 
            	/* Make sure disk-resident replicas for all XTC files are available (as reported
@@ -340,8 +350,8 @@ try {
              */
             if( $status_simple_if_available == 'queued' ) {
 				$priority = '<pre id="priority_'.$run_icws->id.'">'.$run_icws->priority.'</pre>';
-            	$actions .= '<button class="escalate" style="font-size:12px;" value="'.$run_icws->id.'">Escalate</button>'.
-            				'<button class="delete" style="font-size:12px;" value="'.$run_icws->id.'">Delete</button>';
+            	$actions .= '<button class="escalate not4print" style="font-size:12px;" value="'.$run_icws->id.'">Escalate</button>'.
+            				'<button class="delete not4print" style="font-size:12px;" value="'.$run_icws->id.'">Delete</button>';
             }
 
             /* Note that the translation completion status for those runs for which
@@ -452,9 +462,7 @@ try {
     	}
     //}
     echo DataPortal::table_end_html();
-    
-} catch( AuthDBException $e ) {
-	echo $e->toHtml();
+
 } catch( RegDBException $e ) {
 	echo $e->toHtml();
 } catch( LogBookException $e ) {

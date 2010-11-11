@@ -1,8 +1,13 @@
 <?php
 
-require_once('AuthDB/AuthDB.inc.php');
-require_once('LogBook/LogBook.inc.php');
-require_once('FileMgr/FileMgr.inc.php');
+require_once( 'LogBook/LogBook.inc.php' );
+require_once( 'FileMgr/FileMgr.inc.php' );
+
+use LogBook\LogBook;
+use LogBook\LogBookException;
+
+use FileMgr\FileMgrIfaceCtrlWs;
+use FileMgr\FileMgrException;
 
 /* This script will post a new translation request for the specified
  * instrument/experiment/run and, if successfull, return a JSON object
@@ -60,8 +65,6 @@ function return_result( $requests ) {
 }
 
 try {
-	$authdb = new AuthDB();
-	$authdb->begin();
 
 	$logbook = new LogBook();
 	$logbook->begin();
@@ -85,8 +88,6 @@ try {
 
 	return_result( $requests );
 
-} catch( AuthDBException $e ) {
-	return_error( $e->toHtml());
 } catch( LogBookException $e ) {
 	return_error( $e->toHtml());
 } catch( FileMgrException $e ) {

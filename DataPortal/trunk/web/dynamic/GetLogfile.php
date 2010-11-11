@@ -1,15 +1,15 @@
 <?php
 
-require_once('AuthDB/AuthDB.inc.php');
 require_once('FileMgr/FileMgr.inc.php');
+
+use FileMgr\FileMgrIfaceCtrlWs;
+use FileMgr\FileMgrException;
 
 if( !isset( $_GET[ 'id' ] )) die( 'no request identifier parameter found' );
 $id = (int)trim( $_GET[ 'id' ] );
 if( $id <= 0 ) die( 'invalid request identifier' );
 
 try {
-	$authdb = new AuthDB();
-	$authdb->begin();
 
 	/* Find the request.
 	 */
@@ -22,10 +22,7 @@ try {
 	
     echo FileMgrIfaceCtrlWs::log( $req->log_url );
 
-} catch( AuthDBException $e ) {
-	print $e->toHtml();
-	exit;
-} catch( FileMgrException   $e ) {
+} catch( FileMgrException $e ) {
 	print $e->toHtml();
 	exit;
 }
