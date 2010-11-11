@@ -1,4 +1,12 @@
 <?php
+
+namespace LogBook;
+
+require_once( 'LogBook.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+
+use LusiTime\LusiTime;
+
 class LogBookRun {
 
     /* Data members
@@ -104,7 +112,7 @@ class LogBookRun {
          */
         $param = $this->experiment->find_run_param_by_name( $param );
         if( is_null( $param ))
-            throw new LogBookException(
+            throw new LogBookException (
                 __METHOD__,
                 "no such run parameter: '".$param."'" );
 
@@ -123,7 +131,7 @@ class LogBookRun {
         $nrows = mysql_numrows( $result );
         if( $nrows == 0 ) return null;
         if( $nrows != 1 )
-            throw new LogBookException(
+            throw new LogBookException (
                 __METHOD__,
                 "unexpected size of the result set returned by query" );
 
@@ -142,7 +150,7 @@ class LogBookRun {
          */
         $param = $this->experiment->find_run_param_by_name( $param );
         if( is_null( $param ))
-            throw new LogBookException(
+            throw new LogBookException (
                 __METHOD__,
                 "no such run parameter: '".$param."'" );
 
@@ -154,13 +162,13 @@ class LogBookRun {
 
         } else if( $type =='INT' ) {
             if( 1 != sscanf( $value, "%d", $value4sql ))
-                throw new LogBookException(
+                throw new LogBookException (
                     __METHOD__,
                     "not an integer value of the parameter: ".$value );
 
         } else if( $type =='DOUBLE' ) {
             if( 1 != sscanf( $value, "%lf", $value4sql ))
-                throw new LogBookException(
+                throw new LogBookException (
                     __METHOD__,
                     "not a double precision value of the parameter: ".$value );
 
@@ -181,7 +189,7 @@ class LogBookRun {
 
         $nrows = mysql_numrows( $result );
         if( $nrows != 1 )
-            throw new LogBookException(
+            throw new LogBookException (
                 __METHOD__,
                 "unexpected size of the result set returned by query" );
 
@@ -189,7 +197,7 @@ class LogBookRun {
         if( $attr['count'] > 0 ) {
 
             if( !$allow_update )
-                throw new LogBookException(
+                throw new LogBookException (
                     __METHOD__,
                     "the value of parameter: '".$param."' was set before and it's not allowed to be updated" );
 
@@ -219,7 +227,7 @@ class LogBookRun {
 
         $nrows = mysql_numrows( $result );
         if( $nrows != 1 )
-            throw new LogBookException(
+            throw new LogBookException (
                 __METHOD__,
                 "unexpected size of the result set returned by query" );
 
@@ -234,19 +242,19 @@ class LogBookRun {
     public function close ( $end_time ) {
 
         if( !is_null($this->attr['end_time']))
-            throw new LogBookException(
+            throw new LogBookException (
                 __METHOD__,
                 "run '".$this->num()."' is already closed" );
 
         /* Verify the value of the parameter
          */
         if( is_null( $end_time ))
-            throw new LogBookException(
+            throw new LogBookException (
                 __METHOD__,
                 "end time can't be null" );
 
         if( !$this->begin_time()->less( $end_time ))
-            throw new LogBookException(
+            throw new LogBookException (
                 __METHOD__,
                 "end time '".$end_time."' isn't greater than the begin time" );
 
@@ -257,7 +265,7 @@ class LogBookRun {
         if( !is_null( $next_run )) {
             print_r( $next_run );
             if( !$this->begin_time()->greaterOrEqual( $end_time ))
-                throw new LogBookException(
+                throw new LogBookException( 
                     __METHOD__,
                     "end time '".$end_time."' isn't less or equal to the begin time of the next run" );
         }
@@ -289,7 +297,7 @@ class LogBookRun {
     public function shift () {
         $my_shift = $this->parent()->find_shift_at( $this->attr['begin_time'] );
         if( is_null( $my_shift ))
-            throw new LogBookException(
+            throw new LogBookException (
                 __METHOD__,
                 "run id:{$this->id()} has no overlapping shift. Database may be corrupted." );
         return $my_shift;

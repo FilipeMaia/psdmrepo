@@ -1,7 +1,13 @@
 <?php
 
-require_once('LogBook/LogBook.inc.php');
+require_once( 'LogBook/LogBook.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
 
+use LogBook\LogBookAuth;
+use LogBook\LogBookException;
+
+use LusiTime\LusiTime;
+use LusiTime\LusiTimeException;
 
 /*
  * This script will perform the search for free-form entries in a scope
@@ -219,13 +225,15 @@ function child2json( $entry ) {
             "shift" => $shift_begin_time_str,
             "author" => $entry->author(),
             "id" => $entry->id(),
-            "subject" => substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' ),
-            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$content}</pre>",
-            "content" => $entry->content(),
+            "subject" => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
+            "content" => htmlspecialchars( $entry->content()),
             "attachments" => $attachment_ids,
             "tags" => $tag_ids,
             "children" => $children_ids,
-            "is_run" => 0
+            "is_run" => 0,
+            "run_id" => 0,
+            "run_num" => 0
         )
     );
 }
@@ -287,15 +295,22 @@ function entry2json( $entry ) {
             "shift" => $shift_begin_time_str,
             "author" => $entry->author(),
             "id" => $entry->id(),
-            "subject" => substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' ),
-            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$content}</pre>",
-            "content" => $entry->content(),
+            "subject" => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
+            "content" => htmlspecialchars( $entry->content()),
             "attachments" => $attachment_ids,
             "tags" => $tag_ids,
             "children" => $children_ids,
-            "is_run" => 0
+            "is_run" => 0,
+            "run_id" => 0,
+            "run_num" => 0
         )
     );
+}
+
+function format_seconds( $sec ) {
+	if( $sec < 60 ) return $sec.' sec';
+	return floor( $sec / 60 ).' min '.( $sec % 60 ).' sec ';
 }
 
 function run2json( $run, $type ) {
@@ -304,9 +319,28 @@ function run2json( $run, $type ) {
      * for runs. an assumption is that normal message entries will
      * outnumber 512 million records.
      */
-    $timestamp = $type == 'begin_run' ? $run->begin_time() : $run->end_time();
-    $msg       = '<b>'.( $type == 'begin_run' ? 'begin run ' : 'end run ' ).$run->num().'</b>';
-    $id        = $type == 'begin_run' ? 512*1024*1024 + $run->id() : 2*512*1024*1024 + $run->id();
+	$timestamp = '';
+	$msg       = '';
+	$id        = '';
+
+	switch( $type ) {
+	case 'begin_run':
+		$timestamp = $run->begin_time();
+		$msg       = '<b>begin run '.$run->num().'</b>';
+		$id        = 512*1024*1024 + $run->id();
+		break;
+	case 'end_run':
+		$timestamp = $run->end_time();
+		$msg       = '<b>end run '.$run->num().'</b> ( '.format_seconds( $run->end_time()->sec - $run->begin_time()->sec ).' )';
+		$id        = 2*512*1024*1024 + $run->id();
+		break;
+	case 'run':
+		$timestamp = $run->end_time();
+		$msg       = '<b>run '.$run->num().'</b> ( '.format_seconds( $run->end_time()->sec - $run->begin_time()->sec ).' )';
+		//$msg       = '<b>run ( duration: '.( $run->end_time().$sec - $run->begin_time().$sec ).' seconds )</b>';
+		$id        = 3*512*1024*1024 + $run->id();
+		break;
+	}
 
     $event_time_url =  "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$timestamp->toStringShort()}</a>";
     $relevance_time_str = $timestamp->toStringShort();
@@ -334,19 +368,55 @@ function run2json( $run, $type ) {
             "attachments" => $attachment_ids,
             "tags" => $tag_ids,
             "children" => $children_ids,
-            "is_run" => 1
+            "is_run" => 1,
+        	"run_id" => $run->id(),
+            "run_num" => $run->num()
         )
     );
 }
 
-/* Truncate the input array of timestamps if the limit has been requested.
- * Note that the extra entries will be removed from the _HEAD_ of the input
- * array. The function will not modify the input array. The truncated array
- * will be returned instead.
+/* The functon will produce a sorted list of timestamps based on keys of
+ * the input dictionary. If two consequitive begin/end run records are found
+ * for the same run then the records will be collapsed into a single record 'run'
+ * with the begin run timestamp. The list may also be truncated if the limit has
+ * been requested. In that case excessive entries will be removed from the _HEAD_
+ * of the input array.
+ * 
+ * NOTE: The contents of input array will be modified for collapsed runs
+ *       by replacing types for 'begin_run' / 'end_run' with just 'run'.
  */
-function sort_and_truncate_from_head( $timestamps, $limit ) {
+function sort_and_truncate_from_head( &$entries_by_timestamps, $limit ) {
 
-    sort( $timestamps );
+	$all_timestamps = array_keys( $entries_by_timestamps );
+    sort( $all_timestamps );
+
+    /* First check if we need to collapse here anything.
+     * 
+     * TODO: !!!
+     */
+    $timestamps = array();
+    $prev_begin_run = null;
+    foreach( $all_timestamps as $t ) {
+    	$entry = $entries_by_timestamps[$t]['object'];
+    	switch( $entries_by_timestamps[$t]['type'] ) {
+    	case 'entry':
+    		$prev_begin_run = null;
+    		array_push( $timestamps, $t );
+    		break;
+    	case 'begin_run':
+    		$prev_begin_run = $t;
+    		array_push( $timestamps, $t );
+    		break;
+    	case 'end_run':
+    		if( is_null( $prev_begin_run )) {
+    			array_push( $timestamps, $t );
+    		} else {
+    			$entries_by_timestamps[$prev_begin_run]['type'] = 'run';
+    			$prev_begin_run = null;
+    		}
+    		break;
+    	}
+    }
 
     /* Return the input array if no limit specified or if the array is smaller
      * than the limit.
@@ -496,7 +566,7 @@ try {
             }
         }
     }
-    $timestamps = sort_and_truncate_from_head( array_keys( $entries_by_timestamps ), $limit );
+    $timestamps = sort_and_truncate_from_head( $entries_by_timestamps, $limit );
 
     $status_encoded = json_encode( "success" );
     $result =<<< HERE
@@ -534,8 +604,6 @@ HERE;
     $logbook->commit();
 
 } catch( LogBookException $e ) {
-    report_error( $e->toHtml());
-} catch( RegDBException $e ) {
     report_error( $e->toHtml());
 } catch( LusiTimeException $e ) {
     report_error( $e->toHtml());

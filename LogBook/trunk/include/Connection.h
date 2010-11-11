@@ -473,7 +473,7 @@ public:
                               bool               updateAllowed=false) throw (ValueTypeMismatch,
                                                                              WrongParams,
                                                                              DatabaseError) = 0 ;
-     /**
+    /**
       * Set a value of a run parameter (string value).
       */
     virtual void setRunParam (const std::string& instrument,
@@ -485,6 +485,26 @@ public:
                               bool               updateAllowed=false) throw (ValueTypeMismatch,
                                                                              WrongParams,
                                                                              DatabaseError) = 0 ;
+
+    /**
+      * Report an open file.
+      *
+      * The method would store the information about the new file in the Experiment
+      * Registry database in a scope of the specified experiment and run.
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"        : to report wrong parameters (non-existing experiment, run, etc.)
+      *   "DatabaseError"      : to report database related problems
+      *
+      * @see class WrongParams
+      * @see class DatabaseError
+     */
+    virtual void reportOpenFile (int exper_id,
+                                 int run,
+                                 int stream,
+                                 int chunk) throw (WrongParams,
+                                                   DatabaseError) = 0 ;
 
 protected:
 

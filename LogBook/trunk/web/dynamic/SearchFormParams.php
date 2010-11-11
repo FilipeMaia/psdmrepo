@@ -1,6 +1,17 @@
 <?php
 
-require_once('LogBook/LogBook.inc.php');
+require_once( 'LogBook/LogBook.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+
+use LogBook\LogBookAuth;
+use LogBook\LogBookException;
+
+use LusiTime\LusiTime;
+use LusiTime\LusiTimeException;
+
+use RegDB\RegDBHtml;
+use RegDB\RegDBException;
 
 /*
  * This script will generate a module with input elements for the search form
@@ -74,9 +85,9 @@ try {
         ->value_input (   0,  20, 'text2search', '', '', 32 )
 
         ->label         (  20,  50, 'Search in:' )
-        ->checkbox_input(  20,  70, 'search_in_messages','Message'   , true )->label(  40,  70, 'message body',  false )
-        ->checkbox_input(  20,  90, 'search_in_tags',    'Tag'       , true )->label(  40,  90, 'tags',       false )
-        ->checkbox_input(  20, 110, 'search_in_values',  'Value'     , true )->label(  40, 110, 'tag values', false )
+        ->checkbox_input(  20,  70, 'search_in_messages','Message'   , true  )->label(  40,  70, 'message body',  false )
+        ->checkbox_input(  20,  90, 'search_in_tags',    'Tag'       , false )->label(  40,  90, 'tags',          false )  // TODO: temporarily disabled
+        ->checkbox_input(  20, 110, 'search_in_values',  'Value'     , false )->label(  40, 110, 'tag values',    false )  // TODO: temporarily disabled
         ->label         ( 140,  50, 'Posted at:' )
         ->checkbox_input( 140,  70, 'posted_at_experiment', 'Experiment', true )->label( 160,  70, 'experiment', false )
         ->checkbox_input( 140,  90, 'posted_at_shifts',     'Shifts'    , true )->label( 160,  90, 'shifts',     false )
@@ -92,26 +103,14 @@ try {
         ->select_input(   0, 310, 'author', $authors, '' )
         ->button      (   0, 360, 'reset_form_button',  'Reset', 'reset form to its initial state' )
         ->button      (  75, 360, 'submit_search_button', 'Search', 'initiate the search operation' )
-/*
-        ->button      (   0, 350, 'reset_form_button',  'Reset', 'reset form to its initial state' )
 
-        ->label         (   0, 410, 'Presentation format:' )
-        ->radio_input   (   0, 430, 'presentation_format', 'compact',  false )->label( 20, 430, 'compact', false )
-        ->radio_input   (   0, 450, 'presentation_format', 'detailed', true  )->label( 20, 450, 'detailed', false )
-        ->checkbox_input(  80, 450, 'preview_attachments', 'preview_attachments', true )->label( 100, 450, 'preview attachments',  false )
-
-        ->label         (   0, 490, 'Show on page:' )
-        ->radio_input   (   0, 510, 'show_on_page', 'all',   false )->label( 20, 510, 'all',  false )
-        ->radio_input   (   0, 530, 'show_on_page', 'limit', true  )->label( 20, 530, 'limit to:', false )
-        ->select_input  (  80, 525, 'limit_per_page', Array( 5, 10, 20, 50, 100 ))
-
-        ->button        (   0, 570, 'submit_search_button', 'Search', 'initiate the search operation' )
-*/
         ->html();
 
     $logbook->commit();
 
 } catch( LogBookException $e ) {
+    print $e->toHtml();
+} catch( LusiTimeException $e ) {
     print $e->toHtml();
 } catch( RegDBException $e ) {
     print $e->toHtml();

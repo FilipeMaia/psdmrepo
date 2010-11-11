@@ -1,6 +1,11 @@
 <?php
 
+namespace LogBook;
+
+require_once( 'LogBook.inc.php' );
 require_once( 'AuthDB/AuthDB.inc.php' );
+
+use AuthDB\AuthDB;
 
 /* 
  * To change this template, choose Tools | Templates

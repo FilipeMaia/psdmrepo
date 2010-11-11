@@ -3,7 +3,7 @@ To change this template, choose Tools | Templates
 and open the template in the editor.
 -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<html xmlns='http://www.w3.org/1999/xhtml'>
 <head>
 <title>Electronic LogBook:</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -233,7 +233,10 @@ PHP Generated JavaScript with initialization parameters
 
 <?php
 
-require_once('LogBook/LogBook.inc.php');
+require_once( 'LogBook/LogBook.inc.php' );
+
+use LogBook\LogBookAuth;
+use LogBook\LogBookException;
 
 try {
     $auth_svc = LogBookAuth::instance();
@@ -1004,7 +1007,7 @@ function display_experiment() {
 
     load( 'Display'+( is_facility( exper_id ) ? 'Facility' : 'Experiment' )+'.php?id='+exper_id, 'experiment_info_container' );
 
-    var messages_dialog = create_messages_dialog( 'experiment' );
+    var messages_dialog = create_messages_dialog( 'experiment', null, null );
 }
 
 function close_messages_dialog() {
@@ -1014,7 +1017,7 @@ function close_messages_dialog() {
 
 var current_messages_table = null;
 
-function create_messages_dialog( scope ) {
+function create_messages_dialog( scope, shift_id, run_id ) {
 
     var html_new_message =
         '<div id="new_message_dialog" style="padding:10px; margin-left:10px; margin-top:30px; background-color:#e0e0e0; border:solid 1px #c0c0c0; display:none;">'+
@@ -1029,11 +1032,11 @@ function create_messages_dialog( scope ) {
         '  <input type="hidden" name="actionSuccess" value="select_experiment" />';
     } else if( scope == "shift") {
          html_new_message +=
-        '  <input type="hidden" name="shift_id" value="'+current_selection.shift.id+'" />'+
+        '  <input type="hidden" name="shift_id" value="'+shift_id+'" />'+
         '  <input type="hidden" name="actionSuccess" value="select_experiment_and_shift" />';
     } else if( scope == "run") {
          html_new_message +=
-        '  <input type="hidden" name="run_id" value="'+current_selection.run.id+'" />'+
+        '  <input type="hidden" name="run_id" value="'+run_id+'" />'+
         '  <input type="hidden" name="actionSuccess" value="select_experiment_and_run" />';
     }
     html_new_message +=
@@ -1066,8 +1069,8 @@ function create_messages_dialog( scope ) {
     var limit_per_view = 25; // = null;
     var scope_str = '';
     if(      scope == "experiment" ) { scope_str = ''; limit_per_view = '25'; }
-    else if( scope == "shift"      ) { scope_str = 'shift_id='+current_selection.shift.id; }
-    else if( scope == "run"        ) { scope_str = 'run_id='+current_selection.run.id; }
+    else if( scope == "shift"      ) { scope_str = 'shift_id='+shift_id; }
+    else if( scope == "run"        ) { scope_str = 'run_id='+run_id; }
 
     var text2search='',
         search_in_messages=true, search_in_tags=true, search_in_values=true,
@@ -1075,7 +1078,7 @@ function create_messages_dialog( scope ) {
         begin='', end='',
         tag='',
         author='',
-        auto_refresh=true;
+        auto_refresh=( scope == "experiment" );
     current_messages_table = display_messages_table(
         scope_str,
         text2search,
@@ -1345,9 +1348,9 @@ function create_message_link_dialog( lid, message_id ) {
 var last_rid = null;    // The last element used to display the message reply dialog
                         // This element can be reused.
 
-function create_message_reply_dialog( rid, message_id ) {
+function create_message_reply_dialog( rid, message_id, run_id, run ) {
 
-    // Close the editor if any is open
+	// Close the editor if any is open
     //
     if( last_eid != null ) last_eid.style.display = 'none';
 
@@ -1368,26 +1371,30 @@ function create_message_reply_dialog( rid, message_id ) {
     last_rid = rid;
     rid.style.display = 'block';
 
-    var scope='message';
+    var scope = run_id == null ? 'message' : 'run';
 
     rid.innerHTML =
         '<form enctype="multipart/form-data" name="message_reply_form" action="NewFFEntry.php" method="post">'+
         '  <input type="hidden" name="author_account" value="'+auth_remote_user+'" style="padding:2px; width:200px;" />'+
         '  <input type="hidden" name="id" value="'+current_selection.experiment.id+'" />'+
         '  <input type="hidden" name="scope" value="'+scope+'" />'+
-        '  <input type="hidden" name="message_id" value="'+message_id+'" />'+
+        ( run_id == null ?
+        '  <input type="hidden" name="message_id" value="'+message_id+'" />' :
+        '  <input type="hidden" name="run_id" value="'+run_id+'" />' )+
         '  <input type="hidden" name="actionSuccess" value="select_experiment" />'+
         '  <input type="hidden" name="MAX_FILE_SIZE" value="25000000">'+
         '  <div id="message_reply_file_descriptions"></div>'+
         '  <div id="message_tags"></div>'+
         '  <div>'+
-        '    <em class="lb_label">Reply with:</em>'+
+        ( run_id == null ?
+        '    <em class="lb_label">Reply with:</em>' :
+        '    <em class="lb_label">The message will be associated with run '+run+':</em>' )+
         '  </div>'+
         '  <table><tbody>'+
         '    <tr>'+
         '      <td valign="top">'+
         '        <div id="message_reply_body" style="margin-right:10px; padding:4px;">'+
-        '          <input id="message_reply_text" type="text" name="message_text" size="128" value="" />'+
+        '          <input id="message_reply_text" type="text" name="message_text" size="96" value="" />'+
         '        </div>'+
         '      </td>'+
         '      <td valign="top">'+
@@ -1501,7 +1508,7 @@ function create_message_reply_dialog( rid, message_id ) {
         if( !extendedShown ) {
             document.getElementById('message_reply_body').innerHTML=
                 '<textarea id="message_reply_text" type="text" name="message_text"'+
-                ' rows="12" cols="128" style="padding:1px;"'+
+                ' rows="12" cols="96" style="padding:1px;"'+
                 ' title="This is multi-line text area in which return will add a new line of text.'+
                 ' Use Submit button to post the message.">'+
                 document.getElementById('message_reply_text').value+'</textarea>'+
@@ -1590,7 +1597,7 @@ function create_message_reply_dialog( rid, message_id ) {
 
         } else {
             document.getElementById('message_reply_body').innerHTML=
-                '<input id="message_reply_text" type="text" name="message_text" size="128" value="'+
+                '<input id="message_reply_text" type="text" name="message_text" size="96" value="'+
                 document.getElementById('message_reply_text').value+'" />';
             message_reply_body.style.paddingBottom="4px";
             tags_table = null;
@@ -1845,7 +1852,7 @@ function display_shift() {
             true, 10
         );
     }
-    var messages_dialog = create_messages_dialog( 'shift' );
+    var messages_dialog = create_messages_dialog( 'shift', current_selection.shift.id, null );
 }
 
 function close_shift( shift_id ) {
@@ -2007,7 +2014,7 @@ function display_run() {
     load( 'DisplayRun.php?id='+current_selection.run.id, 'experiment_info_container' );
     load( 'DisplayRunParams.php?id='+current_selection.run.id, 'run_parameters' );
 
-    var messages_dialog = create_messages_dialog( 'run' );
+    var messages_dialog = create_messages_dialog( 'run', null, current_selection.run.id );
 }
 
 function select_experiment_and_message( instr_id, instr_name, exper_id, exper_name, id ) {
@@ -2540,9 +2547,24 @@ function AttachmentLoader( a, aid ) {
         if( this.loaded ) return;
         this.loaded = true;
         var a_elem = document.getElementById( this.aid );
+        if(( this.type[0] == 'text' ) || ( this.type[0] == 'application' && ( this.type[1] == 'octet-stream' || this.type[1] == 'x-octet-stream' ))) {
+            var aid4text = 'attachment_id_'+this.id+'_txt';
+            a_elem.innerHTML =
+            '<div style="max-width:800px; min-height:40px; max-height:200px; overflow:auto; border:solid 1px;"><textbox><pre id="'+aid4text+'"></pre></textbox></div>';
+            load( 'attachments/'+this.id+'/attachment', aid4text );
+            //load( 'attachments/'+this.id+'/preview', aid4text );
+        } else if( this.type[0] == 'application' && this.type[1] == 'rtf' ) {
+            a_elem.innerHTML =
+            //'<object data="attachments/'+this.id+'/preview" type="application/rtf" width="800" height="600"></object>';
+            '<object data="attachments/'+this.id+'" type="application/rtf" width="800" height="600"></object>';
+        } else {
+            a_elem.innerHTML =
+            '<a href="attachments/'+this.id+'/preview" target="_blank"><img max-width="800" src="attachments/preview/'+this.id+'" /></a>';
+        }
+        /*
         if( this.type[0] == 'image' ) {
             a_elem.innerHTML =
-            '<img max-width="800" src="attachments/'+this.id+'/preview" />';
+            '<a href="attachments/'+this.id+'/attachment" target="_blank"><img max-width="800" src="attachments/preview/'+this.id+'" /></a>';
             //'<img max-width="800" src="ShowAttachment.php?id='+this.id+'" />';
         } else if( this.type[0] == 'text' ) {
             var aid4text = 'attachment_id_'+this.id+'_txt';
@@ -2562,6 +2584,7 @@ function AttachmentLoader( a, aid ) {
             a_elem.innerHTML =
             '<img src="images/NoPreview.png" />';
         }
+        */
     }
 }
 
@@ -2834,7 +2857,8 @@ function event2html( message_idx ) {
         '  <div id="'+bid+'" style="display:none; margin-left:17px; margin-bottom:20px;">'+
         '    <div style="padding:10px; padding-left:20px; padding-bottom:0px;  padding-right:0px; border-left:solid 1px #c0c0c0;">'+
         '    <div style="float:right; position:relative; top:-8px;">';
-    result +=
+    if( !re.is_run ) {
+        result +=
         '        <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
         '          onclick="create_message_link_dialog('+lid+','+re.id+')"'+
         '          onmouseover="expander_highlight(this)" '+
@@ -2842,17 +2866,24 @@ function event2html( message_idx ) {
         '          title="Show a persistent URL for this message. The link can be embedded into other documents.">'+
         '          Link'+
         '        </span>';
+    }
     if( isAuthorizedFor( 'canPostNewMessages' )) {
         result +=
         '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
-        '        onclick="create_message_reply_dialog('+rid+','+re.id+')"'+
+        ( re.is_run ?
+        '        onclick="create_message_reply_dialog('+rid+','+re.id+','+re.run_id+','+re.run_num+')"' :
+        '        onclick="create_message_reply_dialog('+rid+','+re.id+')"' )+
         '        onmouseover="expander_highlight(this)" '+
         '        onmouseout="expander_unhighlight(this,document.bgColor)"'+
-        '        title="Open a dialog to reply to the message">'+
-        '        Reply'+
+        '        title="'+( re.is_run ?
+                		    'Open a dialog to post a new message for the run' :
+                    		'Open a dialog to reply to the message' )+'">'+
+        ( re.is_run ?
+        '        New Message' :
+        '        Reply' )+
         '      </span>';
     }
-    if( isAuthorizedFor( 'canEditMessages' )) {
+    if( isAuthorizedFor( 'canEditMessages' ) && !re.is_run ) {
         result +=
         '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
         '        onclick="create_message_edit_dialog('+eid+','+re.id+')"'+
@@ -2862,7 +2893,7 @@ function event2html( message_idx ) {
         '        Edit'+
         '      </span>';
     }
-    if( isAuthorizedFor( 'canDeleteMessages' )) {
+    if( isAuthorizedFor( 'canDeleteMessages' ) && !re.is_run ) {
         result +=
         '      <span style="border:solid 1px #c0c0c0; height:14px; padding-left:2px; padding-right:2px; margin-right:4px; font-size:14px; text-align:center; cursor:pointer;"'+
         '        onclick="create_message_delete_dialog('+did+','+re.id+')"'+
@@ -3537,6 +3568,36 @@ function subscribe() {
     );
 }
 
+function printer_friendly() {
+	var el = document.getElementById("nav-and-work-areas");
+	if (el) {
+		var scope = current_selection == null ? '' : current_selection.instrument.name+' / '+current_selection.experiment.name ;
+		var html = document.getElementById("nav-and-work-areas").innerHTML;
+		var pfcopy = window.open('about:blank');
+		pfcopy.document.write('<html xmlns="http://www.w3.org/1999/xhtml">');
+		pfcopy.document.write('  <head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />');
+		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/reset-fonts-grids/reset-fonts-grids.css">');
+		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/fonts/fonts-min.css">');
+		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/menu/assets/skins/sam/menu.css">');
+		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/paginator/assets/skins/sam/paginator.css" />');
+		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/datatable/assets/skins/sam/datatable.css" />');
+		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/button/assets/skins/sam/button.css" />');
+		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/container/assets/skins/sam/container.css" />');
+		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/treeview/assets/skins/sam/treeview.css" />');
+		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="css/printerfriendly.css" />');
+		pfcopy.document.write('    <title>Electronic LogBook of Experiment: '+scope+'</title>');
+		pfcopy.document.write('  </head>');
+		pfcopy.document.write('  <body>');
+		pfcopy.document.write('    <p id="application_title" style="margin:20px; text-align: left;"><em>Electronic LogBook of Experiment: </em><em id="application_subtitle">'+scope+'</em></p>');
+		pfcopy.document.write('    <div class="maintext">');
+		pfcopy.document.write(html);
+		pfcopy.document.write('    </div>');
+		pfcopy.document.write('  </body>');
+		pfcopy.document.write('</html>');
+		pfcopy.document.close();
+	}
+}
+
     </script>
 </head>
 <body class="yui-skin-sam" id="body" onload="init()">
@@ -3544,9 +3605,8 @@ function subscribe() {
 <div>
 <div style="float: left;">
 <p id="application_title" style="text-align: left;"><em>Electronic
-LogBook: </em> <em id="application_subtitle"></em> <!--
-            <em id="application_subtitle"><a href="javascript:list_experiments()">select &gt;</a></em>
-            --></p>
+LogBook: </em><em id="application_subtitle"><a href="javascript:list_experiments()">select &gt;</a></em>
+</p>
 </div>
 <div style="float: right; height: 50px;"><?php
 if( $auth_svc->authName() == '' ) {
@@ -3579,6 +3639,8 @@ HERE;
 </div>
 </div>
 <div id="menubar" class="yuimenubar yuimenubarnav"></div>
+<div style="float:right; padding-right:10px;"><a href="javascript:printer_friendly()" title="Printer friendly version of this page"><img src="images/PRINTER_icon.png" /></a></div>
+<div style="clear:both;"></div>
 <p id="context"></p>
 <br>
 <div id="popupdialogs"></div>
@@ -3609,8 +3671,6 @@ HERE;
 $logbook->commit();
 
 } catch( LogBookException $e ) {
-    print $e->toHtml();
-} catch( RegDBException $e ) {
     print $e->toHtml();
 }
 ?>

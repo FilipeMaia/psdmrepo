@@ -344,6 +344,17 @@ public:
                                                                              WrongParams,
                                                                              DatabaseError) ;
 
+    /**
+      * Report an open file.
+      *
+      * @see method Connection::reportOpenFile()
+      */
+    virtual void reportOpenFile (int exper_id,
+                                 int run,
+                                 int stream,
+                                 int chunk) throw (WrongParams,
+                                                   DatabaseError) ;
+
 private:
 
     // Default constructor is disabled
@@ -358,15 +369,49 @@ private:
     // Helper methods, implementations, etc.
 
     /**
-      * Find experiment description in the database.
+      * Find experiment description in the database using instrument and experiment names.
       *
       * The method will return 'true' and it will set up values
-      * of the supplied data structure if the parameter is found.
+      * of the supplied data structure if the experiemnt is found.
       */
     bool findExper(ExperDescr&        descr,
                    const std::string& instrument,
                    const std::string& experiment) throw (WrongParams,
                                                          DatabaseError) ;
+
+    /**
+      * Find experiment description in the database using experiment identifier.
+      *
+      * The method will return 'true' and it will set up values
+      * of the supplied data structure if the experiment is found.
+      */
+    bool findExper(ExperDescr& descr,
+                   int         exper_id ) throw (WrongParams,
+                                                 DatabaseError) ;
+
+    /**
+      * Internal implementation of the experiment locator.
+      *
+      * The method will return 'true' and it will set up values
+      * of the supplied data structure if the experiment is found.
+      *
+      * NOTE: This operation is used by two above defined experiment
+      * locator methods.
+      */
+    bool findExperImpl(ExperDescr&        descr,
+                       const std::string& sql) throw (WrongParams,
+                                                      DatabaseError) ;
+
+    /**
+      * Find run number request time in the database.
+      *
+      * The method will return 'true' and it will set up a value
+      * of the supplied data structure if the registration record is found.
+      */
+    bool findRunRequest (LusiTime::Time& request_time,
+                         int             exper_id,
+                         int             run) throw (WrongParams,
+                                                     DatabaseError) ;
 
     /**
       * Find run parameter description in the database.

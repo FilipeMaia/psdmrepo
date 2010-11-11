@@ -1,6 +1,18 @@
 <?php
 
-require_once('LogBook/LogBook.inc.php');
+require_once( 'LogBook/LogBook.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+
+use LogBook\LogBook;
+use LogBook\LogBookAuth;
+use LogBook\LogBookException;
+
+use LusiTime\LusiTime;
+use LusiTime\LusiTimeException;
+
+use RegDB\RegDBHtml;
+use RegDB\RegDBException;
 
 /*
  * This script will process a request for displaying a status of a run.
@@ -75,6 +87,8 @@ try {
     $logbook->commit();
 
 } catch( LogBookException $e ) {
+    print $e->toHtml();
+} catch( LusiTimeException $e ) {
     print $e->toHtml();
 } catch( RegDBException $e ) {
     print $e->toHtml();

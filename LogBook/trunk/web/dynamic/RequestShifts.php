@@ -1,6 +1,13 @@
 <?php
 
-require_once('LogBook/LogBook.inc.php');
+require_once( 'LogBook/LogBook.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+
+use LogBook\LogBookAuth;
+use LogBook\LogBookException;
+
+use LusiTime\LusiTime;
+use LusiTime\LusiTimeException;
 
 /*
  * This script will process a request for displaying parameters of an experiment.
@@ -150,8 +157,6 @@ HERE;
 
     $logbook->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
 } catch( LogBookException $e ) {
     print $e->toHtml();
 } catch( LusiTimeException $e ) {

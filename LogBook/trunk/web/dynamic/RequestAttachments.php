@@ -1,6 +1,10 @@
 <?php
 
-require_once('LogBook/LogBook.inc.php');
+require_once( 'LogBook/LogBook.inc.php' );
+
+use LogBook\LogBook;
+use LogBook\LogBookAuth;
+use LogBook\LogBookException;
 
 /*
  * This script will process a request for displaying attachments of a free-form entry.
@@ -82,11 +86,7 @@ HERE;
 
     $logbook->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
 } catch( LogBookException $e ) {
-    print $e->toHtml();
-} catch( LusiTimeException $e ) {
     print $e->toHtml();
 }
 ?>

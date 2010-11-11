@@ -172,6 +172,8 @@ private:
     int cmd_save_files        () throw (std::exception) ;
     int cmd_save_files_m      () throw (std::exception) ;
 
+    int cmd_open_file         () throw (std::exception) ;
+
 private:
 
     // Command line options and arguments
@@ -305,6 +307,7 @@ LogBookTestApp::runApp ()
         else if (command == "display_run_param") return cmd_display_run_param ();
         else if (command == "save_files")        return cmd_save_files ();
         else if (command == "save_files_m")      return cmd_save_files_m ();
+        else if (command == "open_file")         return cmd_open_file ();
         else {
             MsgLogRoot( error, "unknown command") ;
             return 2 ;
@@ -346,6 +349,8 @@ LogBookTestApp::cmd_help ()
          << "\n"
          << "  save_files       <instrument> <experiment> <run> {DATA|CALIB}\n"
          << "  save_files_m     <instrument> <experiment> <run> {DATA|CALIB} [ <file1> {XTC|EPICS} ] [ <file>2 {XTC|EPICS} ] ...\n"
+         << "\n"
+         << "  open_file     <exper_id> <run> <stream> <chunk>\n"
          << "\n"
          << "NOTES ON PARAMETERS:\n"
          << "\n"
@@ -428,6 +433,11 @@ LogBookTestApp::cmd_help ()
          << "      representation, archive, etc.) data files of a run. Unlike the previous\n"
          << "      command this one will also register the specified files in the data set\n"
          << "      associated with the run.\n"
+         << "\n"
+         << "  open_file\n"
+         << "\n"
+         << "    - tell OFFLINE that a raw data file chunk was open in a context of\n"
+         << "      the specified experiment, run and stream.\n"
          << endl ;
 
     return 0 ;
@@ -924,6 +934,32 @@ LogBookTestApp::cmd_save_files_m () throw (std::exception)
         run_type,
         files,
         file_types) ;
+    m_connection->commitTransaction () ;
+
+    return 0 ;
+}
+
+int
+LogBookTestApp::cmd_open_file () throw (std::exception)
+{
+    // Parse and verify the arguments
+    //
+    if (m_args.empty() || m_args.size() != 4) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const int exper_id = LogBook::str2int (*(itr++)) ;
+    const int run      = LogBook::str2int (*(itr++)) ;
+    const int stream   = LogBook::str2int (*(itr++)) ;
+    const int chunk    = LogBook::str2int (*(itr++)) ;
+
+    m_connection->beginTransaction () ;
+    m_connection->reportOpenFile(
+        exper_id,
+        run,
+        stream,
+        chunk) ;
     m_connection->commitTransaction () ;
 
     return 0 ;

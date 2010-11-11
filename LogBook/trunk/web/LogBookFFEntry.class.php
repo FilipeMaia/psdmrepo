@@ -1,4 +1,12 @@
 <?php
+
+namespace LogBook;
+
+require_once( 'LogBook.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+
+use LusiTime\LusiTime;
+
 /* 
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -231,7 +239,7 @@ class LogBookFFEntry {
             "INSERT INTO {$this->connection->database}.attachment VALUES(NULL,".$this->id().
             ",'".$this->connection->escape_string( $description ).
             "','".$this->connection->escape_string( $document ).
-            "','".$document_type."')" );
+            "','".$document_type."',NULL)" );
 
         return $this->find_attachment_by_id( '(SELECT LAST_INSERT_ID())' );
     }

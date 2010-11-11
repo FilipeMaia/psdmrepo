@@ -1,6 +1,11 @@
 <?php
 
+namespace LogBook;
+
+require_once( 'LogBook.inc.php' );
 require_once( 'RegDB/RegDB.inc.php' );
+
+use RegDB\RegDB;
 
 class LogBook {
 
@@ -32,6 +37,11 @@ class LogBook {
          * in the same fashion it's done for the LogBook connection.
          */
         $this->regdb = new RegDB();
+    }
+
+    public function regdb() {
+    	$this->regdb->begin();
+    	return $this->regdb;
     }
 
     /*

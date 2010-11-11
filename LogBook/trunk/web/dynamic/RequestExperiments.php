@@ -1,6 +1,17 @@
 <?php
 
-require_once('RegDB/RegDB.inc.php');
+require_once( 'LogBook/LogBook.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+
+use LogBook\LogBookAuth;
+use LogBook\LogBookException;
+
+use LusiTime\LusiTime;
+use LusiTime\LusiTimeException;
+
+use RegDB\RegDB;
+use RegDB\RegDBException;
 
 $instr = null;
 if( isset( $_GET['instr'] )) {
@@ -98,7 +109,9 @@ HERE;
 
     $regdb->commit();
 
-} catch( regdbException $e ) {
+} catch( LogBookException $e ) {
+    print $e->toHtml();
+} catch( RegDBException $e ) {
     print $e->toHtml();
 }
 

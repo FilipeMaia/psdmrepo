@@ -1,4 +1,9 @@
 <?php
+
+namespace LogBook;
+
+require_once( 'LogBook.inc.php' );
+
 class LogBookRunParam {
 
     /* Data members

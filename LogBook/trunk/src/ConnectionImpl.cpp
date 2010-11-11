@@ -728,25 +728,99 @@ ConnectionImpl::getRunParam (const std::string& instrument,
     query.get (updated, "updated") ;
 }
 
+void
+ConnectionImpl::reportOpenFile (int exper_id,
+                                int run,
+                                int stream,
+                                int chunk) throw (WrongParams,
+                                                  DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    // Make sure both the experiment and the run are already known
+    //
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, exper_id))
+        throw WrongParams ("unknown experiment") ;
+
+    LusiTime::Time run_request_time ;
+    if (!this->findRunRequest (run_request_time, exper_id, run))
+        throw WrongParams ("unknown run for the experiment") ;
+
+    // The current timestamp will be recorded as a time when the new file opening
+    // was registered.
+    //
+    const LusiTime::Time now = LusiTime::Time::now () ;
+
+    // Now proceed with the new file registration
+    //
+
+    /* The operation requires the following table:
+
+       CREATE TABLE `file` (
+         `exper_id` int(11) NOT NULL,
+         `run`      int(11) NOT NULL,
+         `stream`   int(11) NOT NULL,
+         `chunk`    int(11) NOT NULL,
+         `open`     bigint(20) unsigned NOT NULL,
+          PRIMARY KEY  (`exper_id`, `run`, `stream`, `chunk`),
+          KEY `FILE_FK_1` (`exper_id`),
+          CONSTRAINT `FILE_FK_1` FOREIGN KEY (`exper_id`) REFERENCES `experiment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+       ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+
+    */
+
+    std::ostringstream sql;
+    sql << "INSERT INTO file VALUES("
+        << exper_id << ","
+        << run      << ","
+        << stream   << ","
+        << chunk    << ","
+        << LusiTime::Time::to64 (now) << ")";
+
+    this->simpleQuery (m_regdb_mysql, sql.str());
+}
+
 bool
 ConnectionImpl::findExper (ExperDescr&        descr,
                            const std::string& instrument,
                            const std::string& experiment) throw (WrongParams,
                                                                  DatabaseError)
 {
-    if (!m_is_started)
-        throw DatabaseError ("no transaction") ;
-
-    // Formulate and execute the query
-    //
     std::ostringstream sql;
     sql << "SELECT i.name AS 'instr_name',i.descr AS 'instr_descr',e.* FROM "
         << "instrument i, experiment e WHERE i.name='" << instrument
         << "' AND e.name='" << experiment
         << "' AND e.instr_id=i.id" ;
 
+    return this->findExperImpl( descr, sql.str()) ;
+}
+
+bool
+ConnectionImpl::findExper (ExperDescr& descr,
+                           int         exper_id) throw (WrongParams,
+                                                        DatabaseError)
+{
+    std::ostringstream sql;
+    sql << "SELECT i.name AS 'instr_name',i.descr AS 'instr_descr',e.* FROM "
+        << "instrument i, experiment e WHERE e.id=" << exper_id << " AND e.instr_id=i.id" ;
+
+    return this->findExperImpl( descr, sql.str()) ;
+}
+
+bool
+ConnectionImpl::findExperImpl (ExperDescr&        descr,
+                               const std::string& sql) throw (WrongParams,
+                                                              DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    // Execute the query
+    //
     QueryProcessor query (m_regdb_mysql) ;
-    query.execute (sql.str()) ;
+    query.execute (sql) ;
 
     // Extract results
     //
@@ -767,6 +841,32 @@ ConnectionImpl::findExper (ExperDescr&        descr,
     query.get (descr.leader_account, "leader_account") ;
     query.get (descr.contact_info,   "contact_info") ;
     query.get (descr.posix_gid,      "posix_gid") ;
+
+    return true ;
+}
+
+bool
+ConnectionImpl::findRunRequest (LusiTime::Time& request_time,
+                                int             exper_id,
+                                int             run) throw (WrongParams,
+                                                            DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    // Formulate and execute the query
+    //
+    std::ostringstream sql;
+    sql << "SELECT request_time FROM run_" << exper_id << " WHERE num=" << run ;
+
+    QueryProcessor query (m_regdb_mysql) ;
+    query.execute (sql.str()) ;
+
+    // Extract results
+    //
+    if (!query.next_row()) return false ;
+
+    query.get (request_time, "request_time") ;
 
     return true ;
 }

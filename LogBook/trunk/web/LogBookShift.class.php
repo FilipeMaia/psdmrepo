@@ -1,4 +1,12 @@
 <?php
+
+namespace LogBook;
+
+require_once( 'LogBook.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+
+use LusiTime\LusiTime;
+
 /*
  * The class representing experimental shifts.
  */

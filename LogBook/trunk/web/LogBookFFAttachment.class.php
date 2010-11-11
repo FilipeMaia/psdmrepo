@@ -1,4 +1,9 @@
 <?php
+
+namespace LogBook;
+
+require_once( 'LogBook.inc.php' );
+
 /* 
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -58,6 +63,25 @@ class LogBookFFAttachment {
                 __METHOD__, "unexpected size of result set" );
 
         return mysql_result( $result, 0 );
+    }
+    public function document_preview() {
+
+        $result = $this->connection->query (
+            "SELECT document_preview FROM {$this->connection->database}.attachment WHERE id=".$this->id());
+
+        $nrows = mysql_numrows( $result );
+        if( $nrows != 1 )
+            throw new LogBookException (
+                __METHOD__, "unexpected size of result set" );
+
+        return mysql_result( $result, 0 );
+    }
+    public function update_document_preview( $preview ) {
+
+        $this->connection->query (
+            "UPDATE {$this->connection->database}.attachment SET".
+            " document_preview='".$this->connection->escape_string( $preview ).
+            "' WHERE id=".$this->id());
     }
 }
 ?>

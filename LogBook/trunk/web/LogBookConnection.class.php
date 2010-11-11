@@ -1,5 +1,9 @@
 <?php
 
+namespace LogBook;
+
+require_once( 'LogBook.inc.php' );
+
 /**
  * Class LogBookConnection encapsulates operations with the database
  */

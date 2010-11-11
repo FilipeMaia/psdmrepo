@@ -1,7 +1,9 @@
 <?php
 
-require_once('LogBook/LogBook.inc.php');
+require_once( 'LogBook/LogBook.inc.php' );
 
+use LogBook\LogBookAuth;
+use LogBook\LogBookException;
 
 /*
  * This script will perform the search for a single free-form entry in a scope
@@ -96,9 +98,9 @@ function child2json( $entry ) {
             "shift" => $shift_begin_time_str,
             "author" => $entry->author(),
             "id" => $entry->id(),
-            "subject" => substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' ),
-            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$content}</pre>",
-            "content" => $entry->content(),
+            "subject" => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
+            "content" => htmlspecialchars($entry->content()),
             "attachments" => $attachment_ids,
             "tags" => $tag_ids,
             "children" => $children_ids
@@ -160,9 +162,9 @@ function entry2json( $entry ) {
             "shift" => $shift_begin_time_str,
             "author" => $entry->author(),
             "id" => $entry->id(),
-            "subject" => substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' ),
-            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$content}</pre>",
-            "content" => $entry->content(),
+            "subject" => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
+            "content" => htmlspecialchars($entry->content()),
             "attachments" => $attachment_ids,
             "tags" => $tag_ids,
             "children" => $children_ids
@@ -205,8 +207,6 @@ HERE;
     $logbook->commit();
 
 } catch( LogBookException $e ) {
-    report_error( $e->toHtml());
-} catch( RegDBException $e ) {
     report_error( $e->toHtml());
 }
 ?>

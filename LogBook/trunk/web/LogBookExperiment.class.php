@@ -1,4 +1,13 @@
 <?php
+
+namespace LogBook;
+
+require_once( 'LogBook.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+
+use LusiTime\LusiTime;
+use LusiTime\LusiInterval;
+
 /**
  * Class LogBookExperiment an abstraction for experiments.
  *
@@ -24,6 +33,8 @@ class LogBookExperiment {
             'begin_time' => $this->regdb_experiment->begin_time()->to64(),
             'end_time'   => $this->regdb_experiment->end_time()->to64());
     }
+    public function regdb_experiment() {
+    	return $this->regdb_experiment; }
 
     public function id () {
         return $this->regdb_experiment->id(); }

@@ -1,6 +1,17 @@
 <?php
 
-require_once('LogBook/LogBook.inc.php');
+require_once( 'LogBook/LogBook.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+
+use LogBook\LogBookAuth;
+use LogBook\LogBookException;
+
+use LusiTime\LusiTime;
+use LusiTime\LusiTimeException;
+
+use RegDB\RegDBHtml;
+use RegDB\RegDBException;
 
 /*
  * This script will process requests for various information stored in the database.
@@ -247,11 +258,11 @@ HERE;
 
     $logbook->commit();
 
-} catch( RegDBException $e ) {
-    print $e->toHtml();
 } catch( LogBookException $e ) {
     print $e->toHtml();
 } catch( LusiTimeException $e ) {
+    print $e->toHtml();
+} catch( RegDBException $e ) {
     print $e->toHtml();
 }
 ?>
