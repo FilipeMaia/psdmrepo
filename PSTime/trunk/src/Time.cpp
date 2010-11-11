@@ -231,11 +231,9 @@ Time& Time::operator+=( const Duration& d )
 }
 
 
-
-
-//--------------
+//--------------------
 //  -- Public methods
-//--------------
+//--------------------
 
 void Time::Print() const
 {
@@ -646,17 +644,11 @@ time_t Time::evaluateLocalZoneTimeOffsetSec()
 // Friend functions --
 //--------------------
 
-// t = d + t1
+// t = d + t1 complementary for earlier defined t = t1 + d 
 Time operator+( const Duration& d, const Time& t1 )
 {
     return t1 + d;
 }
-
-// t = t1 + d
-//Time operator+( const Time& t1, const Duration& d )
-//{
-//    return t1 + d;
-//}
 
 ostream & operator <<( ostream& os, const Time& t ) 
 {

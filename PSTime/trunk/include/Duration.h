@@ -14,6 +14,9 @@
 // C/C++ Headers --
 //-----------------
 #include <iostream>
+#include <string>
+
+using namespace std;
 
 //----------------------
 // Base Class Headers --
@@ -31,6 +34,7 @@
 //		---------------------
 // 		-- Class Interface --
 //		---------------------
+
 
 namespace PSTime {
 
@@ -71,6 +75,14 @@ public:
 
 /** Constructs from seconds and nanoseconds */
   Duration( time_t sec, time_t nsec = 0 );
+
+/** Constructs from human numbers */
+  Duration( time_t Years,  // Needs at least in 3 parameters to distinguish from previous constructor
+            time_t Days, 
+            time_t Hours, 
+            time_t Mins  = 0, 
+	    time_t Secs  = 0,
+            time_t Nsecs = 0 );
 
 /** Destructor */
   virtual ~Duration () {};
@@ -118,6 +130,19 @@ public:
     time_t  getSec ( ) const { return m_sec;  }
     time_t  getNsec( ) const { return m_nsec; }
 
+    // Public methods
+
+    void Print() const;
+
+    //Duration in format: PnYnMnDTnHnMnS
+    string strDurationBasic() const; 
+
+    void splitDurationSecsForYDHMS(time_t &Years, 
+                                   time_t &DaysAfterY, 
+                                   time_t &HoursAfterD, 
+                                   time_t &MinsAfterH, 
+				   time_t &SecsAfterM) const;
+
     // Friends
     friend std::ostream & operator << ( std::ostream & os, const Duration & d );  
 
@@ -129,6 +154,9 @@ private:
     // Data members
     time_t  m_sec;         // number of seconds
     time_t  m_nsec;        // number of nano seconds
+
+    // Private methods
+
 };
 
 } // namespace PSTime

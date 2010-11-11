@@ -48,9 +48,11 @@ Duration::Duration () : m_sec( 0 ), m_nsec( 0 )
 {
 }
 
+
 Duration::Duration( const Duration & d ) : m_sec( d.m_sec ), m_nsec( d.m_nsec )
 {
 }
+
 
 Duration::Duration( time_t sec, time_t nsec ) 
 {
@@ -65,6 +67,20 @@ Duration::Duration( time_t sec, time_t nsec )
 
     m_sec  = sec;
     m_nsec = nsec;
+}
+
+
+Duration::Duration( time_t Years, 
+                    time_t Days, 
+                    time_t Hours, 
+                    time_t Mins, 
+	            time_t Secs,
+                    time_t Nsecs )
+{
+  time_t SecsInYDHMS = Secs + 60*(Mins + 60*(Hours + 24*(Days + 364*Years)));
+  Duration total( SecsInYDHMS, Nsecs );    
+  m_sec  = total.m_sec;  
+  m_nsec = total.m_nsec;
 }
 
 
@@ -160,6 +176,94 @@ Duration & Duration::operator += ( const Duration & d1 )
     m_sec  = totalSec;
     m_nsec = totalNsec;    
     return *this;
+}
+
+//--------------------
+//  -- Public methods
+//--------------------
+
+void Duration::Print() const
+{
+    printf ( "Duration:: m_sec = %ld   m_nsec = %ld \n", m_sec, m_nsec);
+
+      time_t Years(0); 
+      time_t DaysAfterY(0);
+      time_t HoursAfterD(0); 
+      time_t MinsAfterH(0); 
+      time_t SecsAfterM(0);
+
+    splitDurationSecsForYDHMS( Years, 
+                             DaysAfterY, 
+                             HoursAfterD, 
+                             MinsAfterH, 
+                             SecsAfterM );
+
+    printf ( "Duration:  P%ldY%ldDT%dH%dM%dS  ",
+	                     Years, 
+                             DaysAfterY, 
+                             (int)HoursAfterD, 
+                             (int)MinsAfterH, 
+                             (int)SecsAfterM );
+    printf ( " or P%ldY %ldD T%dH %dM %dS  ",
+	                     Years, 
+                             DaysAfterY, 
+                             (int)HoursAfterD, 
+                             (int)MinsAfterH, 
+                             (int)SecsAfterM );
+
+    printf ( " or %s  \n", strDurationBasic().data() );
+}
+
+
+string Duration::strDurationBasic() const
+{
+      time_t Years(0); 
+      time_t DaysAfterY(0);
+      time_t HoursAfterD(0); 
+      time_t MinsAfterH(0); 
+      time_t SecsAfterM(0);
+
+    splitDurationSecsForYDHMS( Years, 
+                               DaysAfterY, 
+                               HoursAfterD, 
+                               MinsAfterH, 
+                               SecsAfterM );
+    time_t NsecAfterS = m_nsec;
+
+    string strD = "P";
+
+    if ( Years      != 0 ) { char charY[4];   sprintf( charY,"%ldY",Years );       strD += charY; }
+    if ( DaysAfterY != 0 ) { char charD[2];   sprintf( charD,"%ldD",DaysAfterY );  strD += charD; }
+
+           strD += "T";
+
+    if ( HoursAfterD!= 0 ) { char charH[2];   sprintf( charH,"%ldH",HoursAfterD ); strD += charH; }
+    if ( MinsAfterH != 0 ) { char charM[2];   sprintf( charM,"%ldM",MinsAfterH );  strD += charM; }
+    if ( SecsAfterM != 0 ) { char charS[2];   sprintf( charS,"%ldS",SecsAfterM );  strD += charS; }
+    if ( NsecAfterS != 0 ) { char charN[2];   sprintf( charN,"%ldN",NsecAfterS );  strD += charN; }
+
+    return strD;
+}
+
+
+//--------------------
+//  -- Private methods
+//--------------------
+
+void Duration::splitDurationSecsForYDHMS(time_t &Years, 
+                                         time_t &DaysAfterY, 
+                                         time_t &HoursAfterD, 
+                                         time_t &MinsAfterH, 
+                                         time_t &SecsAfterM) const
+{
+  Years             = m_sec / (364*24*3600);  
+  time_t SecsAfterY = m_sec % (364*24*3600);
+  DaysAfterY        = SecsAfterY / (24*3600); 
+  time_t SecsAfterD = SecsAfterY % (24*3600); 
+  HoursAfterD       = SecsAfterD / 3600;
+  time_t SecsAfterH = SecsAfterD % 3600; 
+  MinsAfterH        = SecsAfterH / 60;
+  SecsAfterM        = SecsAfterH % 60; 
 }
 
 

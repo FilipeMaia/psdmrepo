@@ -253,8 +253,8 @@ public:
 
   // Friends
 /** Operators between Time and Duration objects */
-  friend Time  operator+( const Duration& d, const Time& t     );
-//friend Time  operator+( const Time& t,     const Duration& d );
+// t = d + t1 complementary for earlier defined t = t1 + d 
+  friend Time  operator+( const Duration& d, const Time& t1 );
   friend std::ostream& operator<<( std::ostream& os, const Time& t );
 
 //protected:
