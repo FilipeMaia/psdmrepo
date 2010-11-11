@@ -1,5 +1,9 @@
 <?php
 
+namespace FileMgr;
+
+require_once( 'FileMgr.inc.php' );
+
 /* ATTENTION: This limit is required to deal with huge data structures/collections
  * produced by some PHP functions when dealing with irodsws collections. Consider
  * increasing it further down if the interpreter will stop working and if the Web
@@ -18,7 +22,7 @@ class FileMgrIrodsWs {
 
     private static $base_url = 'https://pswww.slac.stanford.edu/ws-auth/irodsws';
     private static $opts = array(
-    	"timeout"      => 10,
+    	"timeout"      => 20,
     	"httpauthtype" => HTTP_AUTH_BASIC,
     	"httpauth"     => "irodsws:pcds"
     );

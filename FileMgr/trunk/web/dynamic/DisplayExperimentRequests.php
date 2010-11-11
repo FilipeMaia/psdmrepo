@@ -1,6 +1,15 @@
 <?php
-    
+
+require_once( 'RegDB/RegDB.inc.php' );
 require_once( 'FileMgr/FileMgr.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+
+use RegDB\RegDBHtml;
+
+use FileMgr\FileMgrIfaceCtrlWs;
+use FileMgr\FileMgrException;
+
+use LusiTime\LusiTime;
 
 /* ----------------------------------------
  * Parse mandatory parameters of the script

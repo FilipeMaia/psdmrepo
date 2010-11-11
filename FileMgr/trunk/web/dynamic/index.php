@@ -178,7 +178,10 @@ PHP Generated JavaScript with initialization parameters
 
 <?php
 
-require_once('AuthDB/AuthDB.inc.php');
+require_once( 'AuthDB/AuthDB.inc.php' );
+
+use AuthDB\AuthDB;
+use AuthDB\AuthDBException;
 
 try {
     $auth_svc = AuthDB::instance();

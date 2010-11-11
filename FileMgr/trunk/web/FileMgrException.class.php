@@ -1,4 +1,8 @@
 <?php
+
+namespace FileMgr;
+
+require_once( 'FileMgr.inc.php' );
 /* 
  * To change this template, choose Tools | Templates
  * and open the template in the editor.

@@ -1,6 +1,13 @@
 <?php
 
-require_once('AuthDB/AuthDB.inc.php');
+require_once( 'AuthDB/AuthDB.inc.php' );
+require_once( 'FileMgr/FileMgr.inc.php' );
+
+use AuthDB\AuthDB;
+use AuthDB\AuthDBException;
+
+use FileMgr\FileMgrIrodsWs;
+use FileMgr\FileMgrException;
 
 /*
  * This script will process requests for various information stored in the database.
@@ -90,6 +97,8 @@ HERE;
     $authdb->commit();
 
 } catch( AuthDBException $e ) {
+    print $e->toHtml();
+} catch( FileMgrException $e ) {
     print $e->toHtml();
 }
 ?>

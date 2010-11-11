@@ -2,6 +2,9 @@
     
 require_once( 'FileMgr/FileMgr.inc.php' );
 
+use FileMgr\FileMgrIfaceCtrlWs;
+use FileMgr\FileMgrException;
+
 /* ----------------------------------------
  * Parse mandatory parameters of the script
  * ----------------------------------------

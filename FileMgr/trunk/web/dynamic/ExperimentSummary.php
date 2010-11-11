@@ -1,6 +1,17 @@
 <?php
 
-require_once('RegDB/RegDB.inc.php');
+require_once( 'RegDB/RegDB.inc.php' );
+require_once( 'FileMgr/FileMgr.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+
+use RegDB\RegDB;
+use RegDB\RegDBAuth;
+use RegDB\RegDBException;
+
+use FileMgr\FileMgrIrodsWs;
+use FileMgr\FileMgrException;
+
+use LusiTime\LusiTime;
 
 /*
  * This script will process a request for displaying a status of an experiment.
@@ -126,6 +137,8 @@ try {
     $regdb->commit();
 
 } catch( RegDBException $e ) {
+    print $e->toHtml();
+} catch ( FileMgrException $e ) {
     print $e->toHtml();
 }
 ?>

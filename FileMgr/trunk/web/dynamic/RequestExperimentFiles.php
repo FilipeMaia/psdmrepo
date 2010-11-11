@@ -1,6 +1,16 @@
 <?php
 
-require_once('LogBook/LogBook.inc.php');
+require_once( 'FileMgr/FileMgr.inc.php' );
+require_once( 'LogBook/LogBook.inc.php' );
+require_once( 'RegDB/RegDB.inc.php' );
+
+use FileMgr\FileMgrIrodsWs;
+use FileMgr\FileMgrException;
+
+use LogBook\LogBook;
+use LogBook\LogBookException;
+
+use RegDB\RegDBHtml;
 
 /*
  * This script will process requests for various information stored in the database.
@@ -245,6 +255,8 @@ try {
     $logbook->commit();
 
 } catch( LogBookException $e ) {
+    print $e->toHtml();
+} catch( FileMgrException $e ) {
     print $e->toHtml();
 }
 ?>

@@ -107,7 +107,13 @@
 
 <?php
 
+require_once( 'RegDB/RegDB.inc.php' );
 require_once( 'FileMgr/FileMgr.inc.php' );
+
+use RegDB\RegDBHtml;
+
+use FileMgr\FileMgrIfaceCtrlWs;
+use FileMgr\FileMgrException;
 
 function pre( $str, $width=null ) {
     if( is_null( $width )) return '<pre>'.$str.'</pre>';

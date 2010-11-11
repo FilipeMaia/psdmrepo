@@ -1,6 +1,18 @@
 <?php
 
-require_once('RegDB/RegDB.inc.php');
+require_once( 'RegDB/RegDB.inc.php' );
+require_once( 'FileMgr/FileMgr.inc.php' );
+require_once( 'LusiTime/LusiTime.inc.php' );
+
+use RegDB\RegDB;
+use RegDB\RegDBAuth;
+use RegDB\RegDBHtml;
+use RegDB\RegDBException;
+
+use FileMgr\FileMgrIrodsWs;
+use FileMgr\FileMgrException;
+
+use LusiTime\LusiTime;
 
 /*
  * This script will generate a module with input elements for the filter form
@@ -77,7 +89,7 @@ try {
 
 } catch( RegDBException $e ) {
     print $e->toHtml();
-} catch( RegDBException $e ) {
+} catch( FileMgrException $e ) {
     print $e->toHtml();
 }
 ?>

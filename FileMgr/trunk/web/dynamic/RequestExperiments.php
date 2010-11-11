@@ -1,7 +1,9 @@
 <?php
 
-require_once('AuthDB/AuthDB.inc.php');
-require_once('RegDB/RegDB.inc.php');
+require_once( 'RegDB/RegDB.inc.php' );
+
+use RegDB\RegDB;
+use RegDB\RegDBException;
 
 /*
  * This script will process requests for various information stored in the database.
@@ -67,9 +69,6 @@ try {
     $regdb = new RegDB();
     $regdb->begin();
 
-    $authdb = new AuthDB();
-    $authdb->begin();
-
     // Proceed to the operation
     //
     header( "Content-type: application/json" );
@@ -120,11 +119,8 @@ HERE;
 HERE;
 
     $regdb->commit();
-    $authdb->commit();
 
 } catch( RegDBException $e ) {
-    print $e->toHtml();
-} catch( AuthDBException $e ) {
     print $e->toHtml();
 }
 ?>
