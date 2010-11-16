@@ -159,6 +159,8 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     
       if ( not (sMask[iq] & (1 << is))) continue; 
   
+      float cmode = 0;
+      
       // output pixel data
       int16_t* output = &pixelData[sect][0][0];
       
@@ -167,10 +169,16 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
         // this sector's pedestal data
         const float* peddata = &pedestals->pedestals()[iq][is][0][0];
         
+        // calculate common mode
+        //cmode = findCommonMode(sdata, pedestals, ssize);
+
         // subtract pedestals
         std::transform(sdata, sdata+ssize, peddata, output, std::minus<float>());
         
       } else {
+
+        // calculate common mode
+        //cmode = findCommonMode(sdata, pedestals, ssize);
 
         // just copy it over to new location
         std::copy(sdata, sdata+ssize, output);

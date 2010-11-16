@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-01
+2010-11-16 Andy Salnikov
+- added one more calibration type for CsPad
+
 Tag: V00-09-00
 2010-11-09 Andy Salnikov
 - adding support for calibration of cspad data during translation

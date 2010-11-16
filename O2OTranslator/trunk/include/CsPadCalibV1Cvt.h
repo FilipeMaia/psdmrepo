@@ -87,9 +87,6 @@ protected:
   // find pedestals data
   std::string findCalibFile(const O2OXtcSrc& src, const std::string& datatype) const;
   
-  // read pedestals data
-  boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> readPedestals(const std::string& fileName) const;
-  
 private:
 
   // Data members

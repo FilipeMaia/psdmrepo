@@ -86,7 +86,6 @@ O2OXtcDgIterator::next()
   size_t payloadSize = dg->xtc.sizeofPayload();
   if ((payloadSize+sizeof(dg))>m_maxDgramSize) {
     throw O2OXTCSizeLimitException(m_path, payloadSize+sizeof(dg), m_maxDgramSize);
-    return 0;
   }
 
   // read rest of the data

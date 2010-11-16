@@ -30,10 +30,12 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "H5DataTypes/CsPadPedestalsV1.h"
+#include "H5DataTypes/CsPadPixelStatusV1.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/CalibObjectStore.h"
 #include "O2OTranslator/O2OMetaData.h"
 #include "pdscalibdata/CsPadPedestalsV1.h"
+#include "pdscalibdata/CsPadPixelStatusV1.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -130,11 +132,23 @@ CsPadCalibV1Cvt::convert ( const void* data,
 
   // find file with pedestals
   std::string pedFileName = findCalibFile(src, "pedestals");
-  if ( pedFileName.empty() ) return;
+
+  // find file with pixel status
+  std::string pixFileName = findCalibFile(src, "pixel_status");
+  
+  if ( pedFileName.empty() and pixFileName.empty() ) return;
 
   // read pedestals
-  boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> peds = readPedestals(pedFileName);
-  MsgLogRoot(info, "Read CsPad pedestals from " << pedFileName);
+  boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> peds;
+  boost::shared_ptr<pdscalibdata::CsPadPixelStatusV1> pixStat;
+  if (not pedFileName.empty()) {
+    peds.reset(new pdscalibdata::CsPadPedestalsV1(pedFileName));
+    MsgLogRoot(info, "Read CsPad pedestals from " << pedFileName);
+  }
+  if (not pixFileName.empty()) {
+    pixStat.reset(new pdscalibdata::CsPadPixelStatusV1(pixFileName));
+    MsgLogRoot(info, "Read CsPad pixel status from " << pixFileName);
+  }
 
   // get the name of the group for this object
   const std::string& grpName = m_typeGroupName + "/" + src.name() ;
@@ -151,11 +165,17 @@ CsPadCalibV1Cvt::convert ( const void* data,
   hdf5pp::Group grp = m_groups.top().createGroup( grpName );
 
   // store it in a file
-  H5DataTypes::CsPadPedestalsV1::store(*peds, grp);
+  if (peds.get()) {
+    H5DataTypes::CsPadPedestalsV1::store(*peds, grp, pedFileName);
+  }
+  if (pixStat.get()) {
+    H5DataTypes::CsPadPixelStatusV1::store(*pixStat, grp, pixFileName);
+  }
   
   // store it in calibration object store
   Pds::DetInfo address = static_cast<const Pds::DetInfo&>(src.top());
   m_calibStore.add(peds, address);
+  m_calibStore.add(pixStat, address);
 }
 
 /// method called when the driver makes a new group in the file
@@ -173,13 +193,6 @@ CsPadCalibV1Cvt::closeGroup( hdf5pp::Group group )
   while ( m_groups.top() != group ) m_groups.pop() ;
   if ( m_groups.empty() ) return ;
   m_groups.pop() ;
-}
-
-// read pedestals data
-boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> 
-CsPadCalibV1Cvt::readPedestals(const std::string& pedFileName) const
-{
-  return boost::shared_ptr<pdscalibdata::CsPadPedestalsV1>(new pdscalibdata::CsPadPedestalsV1(pedFileName));
 }
 
 // find pedestals data
