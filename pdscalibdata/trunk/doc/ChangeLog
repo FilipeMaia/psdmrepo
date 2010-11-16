@@ -14,3 +14,7 @@ reverse time order.
 Tag: V00-00-01
 2010-11-08 Andy Salnikov
 - for now there is a single calibration class CsPadPedestalsV1
+
+Tag: V00-00-02
+2010-11-16 Andy Salnikov
+- adding new calibration type CsPadPixelStatus

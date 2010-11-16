@@ -1,12 +1,12 @@
-#ifndef PDSCALIBDATA_CSPADPEDESTALSV1_H
-#define PDSCALIBDATA_CSPADPEDESTALSV1_H
+#ifndef PDSCALIBDATA_CSPADPIXELSTATUSV1_H
+#define PDSCALIBDATA_CSPADPIXELSTATUSV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CsPadPedestalsV1.
+//	Class CsPadPixelStatusV1.
 //
 //------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ namespace pdscalibdata {
  *  @author Andrei Salnikov
  */
 
-class CsPadPedestalsV1  {
+class CsPadPixelStatusV1  {
 public:
 
   enum { Quads = Pds::CsPad::MaxQuadsPerSensor };
@@ -55,33 +55,44 @@ public:
   enum { Rows = Pds::CsPad::MaxRowsPerASIC*2 };
   enum { Size = Quads*Sections*Columns*Rows };
   
-  typedef float pedestal_t;
-  typedef pedestal_t Pedestals[Quads][Sections][Columns][Rows];
+  // This codes must be the same as in CspadCorrector
+  enum PixelStatus { 
+    VeryHot=1,
+    Hot=2,
+    Cold=4
+  };
   
-  // Default constructor
-  CsPadPedestalsV1 () ;
+  typedef uint16_t status_t;
+  typedef status_t StatusCodes[Quads][Sections][Columns][Rows];
   
-  // read pedestals from file
-  CsPadPedestalsV1 (const std::string& fname) ;
+  /// Default constructor, all pixel codes set to 0
+  CsPadPixelStatusV1 () ;
+  
+  /**
+   *  Read all codes from file.
+   *  
+   *  @throw std::exception
+   */
+  CsPadPixelStatusV1 (const std::string& fname) ;
 
   // Destructor
-  ~CsPadPedestalsV1 () ;
+  ~CsPadPixelStatusV1 () ;
 
-  // access pedestal data
-  const Pedestals& pedestals() const { return m_pedestals; }
+  // access status data
+  const StatusCodes& status() const { return m_status; }
 
 protected:
 
 private:
 
   // Data members  
-  Pedestals m_pedestals;
+  StatusCodes m_status;
 
   // Copy constructor and assignment are disabled by default
-  CsPadPedestalsV1 ( const CsPadPedestalsV1& ) ;
-  CsPadPedestalsV1& operator = ( const CsPadPedestalsV1& ) ;
+  CsPadPixelStatusV1 ( const CsPadPixelStatusV1& ) ;
+  CsPadPixelStatusV1& operator = ( const CsPadPixelStatusV1& ) ;
 };
 
 } // namespace pdscalibdata
 
-#endif // PDSCALIBDATA_CSPADPEDESTALSV1_H
+#endif // PDSCALIBDATA_CSPADPIXELSTATUSV1_H
