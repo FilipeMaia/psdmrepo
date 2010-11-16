@@ -253,6 +253,12 @@ class TranslatorThread ( threading.Thread ) :
             cmd_list.append("--options-file")
             cmd_list.append(f)
 
+        # calibration data directory
+        calibdir = self._get_config('calib-data-dir')
+        if calibdir :
+            cmd_list.append("--calib-dir")
+            cmd_list.append(calibdir % fs)
+
         # any extra options
         for opt in self._get_config('list:o2o-extra-options',[]) :
             cmd_list.extend( opt.split() )
