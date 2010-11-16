@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_CSPADPEDESTALSV1_H
-#define H5DATATYPES_CSPADPEDESTALSV1_H
+#ifndef H5DATATYPES_CSPADPIXELSTATUSV1_H
+#define H5DATATYPES_CSPADPIXELSTATUSV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CsPadPedestalsV1.
+//	Class CsPadPixelStatusV1.
 //
 //------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@
 //-------------------------------
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
-#include "pdscalibdata/CsPadPedestalsV1.h"
+#include "pdscalibdata/CsPadPixelStatusV1.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -37,17 +37,17 @@
 namespace H5DataTypes {
 
 //
-// Helper type for CsPadPedestalsV1
+// Helper type for CsPadPixelStatusV1
 //
-struct CsPadPedestalsV1_Data  {
+struct CsPadPixelStatusV1_Data  {
 
-  enum { Quads = pdscalibdata::CsPadPedestalsV1::Quads };
-  enum { Sections = pdscalibdata::CsPadPedestalsV1::Sections };
-  enum { Columns = pdscalibdata::CsPadPedestalsV1::Columns };
-  enum { Rows = pdscalibdata::CsPadPedestalsV1::Rows };
+  enum { Quads = pdscalibdata::CsPadPixelStatusV1::Quads };
+  enum { Sections = pdscalibdata::CsPadPixelStatusV1::Sections };
+  enum { Columns = pdscalibdata::CsPadPixelStatusV1::Columns };
+  enum { Rows = pdscalibdata::CsPadPixelStatusV1::Rows };
   enum { Size = Quads*Sections*Columns*Rows };
   
-  pdscalibdata::CsPadPedestalsV1::Pedestals pedestals;
+  pdscalibdata::CsPadPixelStatusV1::StatusCodes status;
 };
 
 /**
@@ -62,19 +62,19 @@ struct CsPadPedestalsV1_Data  {
  *  @author Andrei Salnikov
  */
 
-class CsPadPedestalsV1  {
+class CsPadPixelStatusV1  {
 public:
 
-  typedef pdscalibdata::CsPadPedestalsV1 DataType ;
+  typedef pdscalibdata::CsPadPixelStatusV1 DataType ;
   
   // Default constructor
-  CsPadPedestalsV1 () ;
+  CsPadPixelStatusV1 () ;
   
   // Construct from transient object
-  CsPadPedestalsV1 (const DataType& data) ;
+  CsPadPixelStatusV1 (const DataType& data) ;
 
   // Destructor
-  ~CsPadPedestalsV1 () ;
+  ~CsPadPixelStatusV1 () ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
@@ -89,14 +89,14 @@ protected:
 private:
 
   // Data members
-  CsPadPedestalsV1_Data m_data;
+  CsPadPixelStatusV1_Data m_data;
 
   // Copy constructor and assignment are disabled by default
-  CsPadPedestalsV1 ( const CsPadPedestalsV1& ) ;
-  CsPadPedestalsV1& operator = ( const CsPadPedestalsV1& ) ;
+  CsPadPixelStatusV1 ( const CsPadPixelStatusV1& ) ;
+  CsPadPixelStatusV1& operator = ( const CsPadPixelStatusV1& ) ;
 
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_CSPADPEDESTALSV1_H
+#endif // H5DATATYPES_CSPADPIXELSTATUSV1_H

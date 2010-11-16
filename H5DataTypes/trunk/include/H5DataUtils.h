@@ -47,7 +47,7 @@
 namespace H5DataTypes {
 
   template <typename T>
-  void
+  hdf5pp::DataSet<T>
   storeDataObject ( const T& data, const char* name, hdf5pp::Group grp )
   {
     // make scalar data set
@@ -55,10 +55,12 @@ namespace H5DataTypes {
 
     // store data
     ds.store ( hdf5pp::DataSpace::makeScalar(), &data ) ;
+    
+    return ds;
   }
 
   template <typename T>
-  void
+  hdf5pp::DataSet<T>
   storeDataObjects ( hsize_t size, const T* data, const char* name, hdf5pp::Group grp )
   {
     if ( size > 0 ) {
@@ -68,12 +70,14 @@ namespace H5DataTypes {
       hdf5pp::DataSet<T> ds = grp.createDataSet<T> ( name, dsp ) ;
       // store data
       ds.store ( dsp, data ) ;
+      return ds;
     } else {
       // for empty data set make null dataspace
       hdf5pp::DataSpace dsp = hdf5pp::DataSpace::makeNull () ;
       hdf5pp::DataSet<T> ds = grp.createDataSet<T> ( name, dsp ) ;
       // store data
       ds.store ( dsp, data ) ;
+      return ds;
     }
   }
 
