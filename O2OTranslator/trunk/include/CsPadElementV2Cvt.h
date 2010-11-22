@@ -84,6 +84,7 @@ private:
 
   typedef CvtDataContainer<CvtDataContFactoryTyped<H5DataTypes::CsPadElementV2> > ElementCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<int16_t> > PixelDataCont ;
+  typedef CvtDataContainer<CvtDataContFactoryTyped<float> > CommonModeDataCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
 
   // Data members
@@ -93,6 +94,7 @@ private:
   int m_deflate ;
   ElementCont* m_elementCont ;
   PixelDataCont* m_pixelDataCont ;
+  CommonModeDataCont* m_cmodeDataCont ;
   XtcClockTimeCont* m_timeCont ;
 
   // Copy constructor and assignment are disabled by default

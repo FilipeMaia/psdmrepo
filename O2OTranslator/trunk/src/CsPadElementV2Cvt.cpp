@@ -19,6 +19,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <cmath>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -26,7 +27,9 @@
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
+#include "pdscalibdata/CsPadCommonModeSubV1.h"
 #include "pdscalibdata/CsPadPedestalsV1.h"
+#include "pdscalibdata/CsPadPixelStatusV1.h"
 #include "pdsdata/cspad/ConfigV1.hh"
 #include "pdsdata/cspad/ConfigV2.hh"
 
@@ -69,6 +72,7 @@ CsPadElementV2Cvt::CsPadElementV2Cvt ( const std::string& typeGroupName,
   , m_deflate(deflate)
   , m_elementCont(0)
   , m_pixelDataCont(0)
+  , m_cmodeDataCont(0)
   , m_timeCont(0)
 {
 }
@@ -80,6 +84,7 @@ CsPadElementV2Cvt::~CsPadElementV2Cvt ()
 {
   delete m_elementCont ;
   delete m_pixelDataCont ;
+  delete m_cmodeDataCont ;
   delete m_timeCont ;
 }
 
@@ -121,6 +126,10 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     CvtDataContFactoryTyped<int16_t> dataContFactory( "data", m_chunk_size, m_deflate ) ;
     m_pixelDataCont = new PixelDataCont ( dataContFactory ) ;
 
+    // create container for common mode data
+    CvtDataContFactoryTyped<float> cmodeContFactory( "common_mode", m_chunk_size, m_deflate ) ;
+    m_cmodeDataCont = new CommonModeDataCont ( cmodeContFactory ) ;
+
     // make container for time
     CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate ) ;
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
@@ -131,6 +140,10 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
   boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> pedestals =
     m_calibStore.get<pdscalibdata::CsPadPedestalsV1>(address);
+  boost::shared_ptr<pdscalibdata::CsPadPixelStatusV1> pixStatusCalib =
+    m_calibStore.get<pdscalibdata::CsPadPixelStatusV1>(address);
+  boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cModeCalib =
+    m_calibStore.get<pdscalibdata::CsPadCommonModeSubV1>(address);
 
   // get few constants
   const unsigned nQuad = ::bitCount(qMask, Pds::CsPad::MaxQuadsPerSensor);
@@ -140,6 +153,7 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   // make data arrays
   H5DataTypes::CsPadElementV2 elems[nQuad] ;
   int16_t pixelData[nSect][Pds::CsPad::ColumnsPerASIC][Pds::CsPad::MaxRowsPerASIC*2];
+  float commonMode[nSect];
 
   // move the data
   const XtcType* pdselem = &data ;
@@ -159,30 +173,48 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     
       if ( not (sMask[iq] & (1 << is))) continue; 
   
-      float cmode = 0;
-      
       // output pixel data
       int16_t* output = &pixelData[sect][0][0];
-      
+
+      // default common mode value for this section,
+      // large negative number means unknown
+      commonMode[sect] = pdscalibdata::CsPadCommonModeSubV1::UnknownCM;
+
+      // status codes for pixels
+      const uint16_t* pixStatus = 0;
+      if (pixStatusCalib.get()) {
+        pixStatus = &pixStatusCalib->status()[iq][is][0][0];
+      }
+
+      // this sector's pedestal data
+      const float* peddata = 0;
       if (pedestals.get()) {
+        peddata = &pedestals->pedestals()[iq][is][0][0];
+      }
+      
+      // calculate common mode if requested
+      float cmode = 0;
+      if (cModeCalib.get()) {
+        MsgLog(logger, debug, "calculating common mode for q=" << iq << " s=" << is);
+        cmode = cModeCalib->findCommonMode(sdata, peddata, pixStatus, ssize);
+        if (cmode == pdscalibdata::CsPadCommonModeSubV1::UnknownCM) {
+          // reset subtracted value
+          cmode = 0;
+        } else {
+          // remember it
+          commonMode[sect] = cmode;
+        }
+      }
 
-        // this sector's pedestal data
-        const float* peddata = &pedestals->pedestals()[iq][is][0][0];
-        
-        // calculate common mode
-        //cmode = findCommonMode(sdata, pedestals, ssize);
-
-        // subtract pedestals
-        std::transform(sdata, sdata+ssize, peddata, output, std::minus<float>());
-        
+      // subtract pedestals and common mode, plus round to nearest int
+      if (peddata) {
+        for (unsigned i = 0; i != ssize; ++ i) {
+          output[i] = int(std::floor(sdata[i] - peddata[i] - cmode + 0.5));
+        }
       } else {
-
-        // calculate common mode
-        //cmode = findCommonMode(sdata, pedestals, ssize);
-
-        // just copy it over to new location
-        std::copy(sdata, sdata+ssize, output);
-        
+        for (unsigned i = 0; i != ssize; ++ i) {
+          output[i] = int(std::floor(sdata[i] - cmode + 0.5));
+        }
       }
       
       // advance to next section
@@ -200,6 +232,8 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   m_elementCont->container(group,type)->append ( elems[0], type ) ;
   type = H5DataTypes::CsPadElementV2::stored_data_type(nSect) ;
   m_pixelDataCont->container(group,type)->append ( pixelData[0][0][0], type ) ;
+  type = H5DataTypes::CsPadElementV2::cmode_data_type(nSect) ;
+  m_cmodeDataCont->container(group,type)->append ( commonMode[0], type ) ;
   m_timeCont->container(group)->append ( time ) ;
 }
 
@@ -209,6 +243,7 @@ CsPadElementV2Cvt::closeSubgroup( hdf5pp::Group group )
 {
   if ( m_elementCont ) m_elementCont->closeGroup( group ) ;
   if ( m_pixelDataCont ) m_pixelDataCont->closeGroup( group ) ;
+  if ( m_cmodeDataCont ) m_cmodeDataCont->closeGroup( group ) ;
   if ( m_timeCont ) m_timeCont->closeGroup( group ) ;
 }
 

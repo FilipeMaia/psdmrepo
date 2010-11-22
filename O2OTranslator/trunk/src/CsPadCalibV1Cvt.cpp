@@ -29,11 +29,13 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "H5DataTypes/CsPadCommonModeSubV1.h"
 #include "H5DataTypes/CsPadPedestalsV1.h"
 #include "H5DataTypes/CsPadPixelStatusV1.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/CalibObjectStore.h"
 #include "O2OTranslator/O2OMetaData.h"
+#include "pdscalibdata/CsPadCommonModeSubV1.h"
 #include "pdscalibdata/CsPadPedestalsV1.h"
 #include "pdscalibdata/CsPadPixelStatusV1.h"
 
@@ -136,11 +138,15 @@ CsPadCalibV1Cvt::convert ( const void* data,
   // find file with pixel status
   std::string pixFileName = findCalibFile(src, "pixel_status");
   
-  if ( pedFileName.empty() and pixFileName.empty() ) return;
+  // find file with common mode data
+  std::string cmodeFileName = findCalibFile(src, "common_mode");
+  
+  if ( pedFileName.empty() and pixFileName.empty() and cmodeFileName.empty()) return;
 
-  // read pedestals
+  // read everything
   boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> peds;
   boost::shared_ptr<pdscalibdata::CsPadPixelStatusV1> pixStat;
+  boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cmode;
   if (not pedFileName.empty()) {
     peds.reset(new pdscalibdata::CsPadPedestalsV1(pedFileName));
     MsgLogRoot(info, "Read CsPad pedestals from " << pedFileName);
@@ -148,6 +154,10 @@ CsPadCalibV1Cvt::convert ( const void* data,
   if (not pixFileName.empty()) {
     pixStat.reset(new pdscalibdata::CsPadPixelStatusV1(pixFileName));
     MsgLogRoot(info, "Read CsPad pixel status from " << pixFileName);
+  }
+  if (not cmodeFileName.empty()) {
+    cmode.reset(new pdscalibdata::CsPadCommonModeSubV1(cmodeFileName));
+    MsgLogRoot(info, "Read CsPad common mode data from " << cmodeFileName);
   }
 
   // get the name of the group for this object
@@ -171,11 +181,15 @@ CsPadCalibV1Cvt::convert ( const void* data,
   if (pixStat.get()) {
     H5DataTypes::CsPadPixelStatusV1::store(*pixStat, grp, pixFileName);
   }
+  if (cmode.get()) {
+    H5DataTypes::CsPadCommonModeSubV1::store(*cmode, grp, cmodeFileName);
+  }
   
   // store it in calibration object store
   Pds::DetInfo address = static_cast<const Pds::DetInfo&>(src.top());
   m_calibStore.add(peds, address);
   m_calibStore.add(pixStat, address);
+  m_calibStore.add(cmode, address);
 }
 
 /// method called when the driver makes a new group in the file
@@ -198,7 +212,7 @@ CsPadCalibV1Cvt::closeGroup( hdf5pp::Group group )
 // find pedestals data
 std::string 
 CsPadCalibV1Cvt::findCalibFile(const O2OXtcSrc& src, const std::string& datatype) const
-{
+try {
   // if no directory given then don't do anything
   if ( m_metadata.calibDir().empty() ) return std::string();
   
@@ -240,6 +254,10 @@ CsPadCalibV1Cvt::findCalibFile(const O2OXtcSrc& src, const std::string& datatype
     if (it->begin() <= run) return it->path().string();
   }
   return std::string();
+
+} catch (const fs::filesystem_error& ex) {
+  // means cannot read directory
+  return std::string();  
 }
 
 } // namespace O2OTranslator
