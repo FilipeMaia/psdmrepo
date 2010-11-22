@@ -91,4 +91,13 @@ CsPadElementV1::stored_data_type(unsigned nQuad, unsigned nSect)
   return hdf5pp::ArrayType::arrayType ( baseType, 4, dims );
 }
 
+hdf5pp::Type
+CsPadElementV1::cmode_data_type(unsigned nQuad, unsigned nSect)
+{
+  hdf5pp::Type baseType = hdf5pp::TypeTraits<float>::native_type() ;
+
+  hsize_t dims[] = { nQuad, nSect } ;
+  return hdf5pp::ArrayType::arrayType ( baseType, 2, dims );
+}
+
 } // namespace H5DataTypes

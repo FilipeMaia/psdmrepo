@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-29
+2010-11-22 Andy Salnikov
+- adding new data type CsPadCommonModeSubV1
+- extending schema for CsPadElementV1 and CsPadElementV2 to include 
+  separate dataset for common mode data
+
 Tag: V00-00-28
 2010-11-16 Andy Salnikov
 - new class CsPadPixelStatusV1 which stores pixel status bits data from CsPad

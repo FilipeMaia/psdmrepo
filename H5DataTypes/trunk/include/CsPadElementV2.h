@@ -50,6 +50,7 @@ public:
   static hdf5pp::Type native_type(unsigned nQuad) ;
 
   static hdf5pp::Type stored_data_type(unsigned nSect) ;
+  static hdf5pp::Type cmode_data_type(unsigned nSect) ;
 
 private:
 
