@@ -1,0 +1,352 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package O2OTranslator
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-09-03
+2010-11-22 Andy Salnikov
+- do not create common_mode container if the common mode calibraion is
+  not requested
+
+Tag: V00-09-02
+2010-11-22 Andy Salnikov
+- added common mode calibration to CsPad converters
+
+Tag: V00-09-01
+2010-11-16 Andy Salnikov
+- added one more calibration type for CsPad
+
+Tag: V00-09-00
+2010-11-09 Andy Salnikov
+- adding support for calibration of cspad data during translation
+- new class CalibObjectStore which is a type-safe store for calibration
+  objects
+- new converter class CsPadCalibV1Cvt which reads calibration data from
+  external file and stores them in HDF file and also in calib store
+- o2o-translator now takes -C option which specified top directory for
+  calibration files
+- CsPadElementV1Cvt and CsPadElementV2Cvt implement pedestal subtraction
+  from cspad images before sending them to file
+- common mode subtraction is not implemented yet
+
+Tag: V00-08-05
+2010-10-14 Andy Salnikov
+- update for pdsdata V02-09-00
+- implement conversion for encoder/DataV2 class
+
+Tag: V00-08-04
+2010-10-11 Andy Salnikov
+- improve messages in case EOF is observed in XTC file
+
+Tag: V00-08-03
+2010-10-01 Andy Salnikov
+- forgot to add CsPad V2 converters to O2OHdf5Writer
+
+Tag: V00-08-02
+2010-10-01 Andy Salnikov
+- update for pdsdata V02-08-00
+- new class CsPadElementV2Cvt
+- layout of CspadElementV1 has changed, CsPadElementV1Cvt
+  is reimplemented for new layout
+
+Tag: V00-08-01
+2010-09-03 Andy Salnikov
+- update for pdsdata V02-07-00
+- implementing cspad conversion
+
+Tag: V00-08-00
+2010-09-01 Andy Salnikov
+- first attempt to handle split events, results are far from perfect yet
+  but usable for some limited value of usable
+- O2OXtcMerger does not actually merge anyhting, it simply returs all
+  datagrams to caller trying to arrange them in time order
+- O2OHdfWriter handles all remaining issues, it filters duplicate 
+  control datagrams and filters out L1Accept histograms that have 
+  unusual time stamps
+
+Tag: V00-07-08
+2010-08-31 Andy Salnikov
+- O2OHdf5Writer - use file creation property list to change the sizes
+  of the b-rtrees in a file, this should reduce overhead that we see 
+  for XPP data
+
+Tag: V00-07-07
+2010-08-26 Andy Salnikov
+- O2OXtcMerger now changes datagram clock time
+- l1OffsetSec is now double so can have sub-second precision
+- o2o-scanner has --l1-offset option too
+
+Tag: V00-07-06
+2010-08-12 Andy Salnikov
+- not all Disable transitions were disabled (tag V00-07-04) which again
+  led to sync troubles in some rare cases, now disabling all Disable
+
+Tag: V00-07-05
+2010-08-11 Andy Salnikov
+- updating for pdsdata V02-06-00
+
+Tag: V00-07-04
+2010-06-09 Andy Salnikov
+- fixing stream sync proble for some types of problems, Disable 
+  transition order in XTC file can be "random". For now throw away 
+  all Disable transitions in the stream merge algorithm
+- relax filtering of damaged data, make it identical to pyana 
+
+Tag: V00-07-03
+2010-06-08 Andy Salnikov
+- updating for pdsdata V02-04-00
+
+Tag: V00-07-02
+2010-06-08 Andy Salnikov
+- updating for XPP and pdsdata V02-02-00
+- added protection against zero-size payload to ConfigDataTypeCvt, there
+  are some weird XTCs in commissioning XPP data
+- EvrDataV3Cvt does not need config object at all
+
+Tag: V00-07-01
+2010-05-12 Andy Salnikov
+- replaced Lusi/Lusi.h with SITConfig/SITConfig.h
+
+Tag: V00-07-00
+2010-05-12 Andy Salnikov
+- small-scale refactoring, extracted the code that handles configuration
+  object store into separate class, now event data converters use one 
+  instance of this store to find their configurations
+- adopt to pdsdata V02-00-01, few new types added
+- o2o-translator: default file extension is now h5, default split mode
+  is none
+
+Tag: V00-06-04
+2010-03-24 Andy Salnikov
+- change in the options for o2o-translator:
+  -e option disappears
+  -f option disappears, files are now specified as positional arguments
+
+Tag: V00-06-03
+2010-03-24 Andy Salnikov
+- bug fix in AcqirisDataDescV1Cvt, waveform type should have been 
+  signed
+
+Tag: V00-06-02
+2010-02-02 Andy Salnikov
+- O2OXtcDgIterator: bug fix, in the case when payload size is zero
+  it produces an error because fread returns 0 for zero-sized object
+
+Tag: V00-06-01
+2009-12-17 Andy Salnikov
+- add new class O2OXtcDgIterator which is a repalcement for 
+  XtcfileIterator with correct error handling
+
+Tag: V00-06-00
+2009-12-10 Andy Salnikov
+- New interface to scimd needs additional connection string for RegDB
+
+Tag: V00-05-03
+2009-12-04 Andy Salnikov
+- add option --l1-offset to translator to correct the timestamps for 
+  amo00409 runs 39-146
+
+Tag: V00-05-02
+2009-11-30 Andy Salnikov
+- enable damaged events in o2o-scanner, O2OXtcDechunk is now passed
+  a boolean flag that enables/disables damaged filter
+- o2o-scanner is now a standard AppUtil application, easier to add options
+- increased datagram buffer size in o2o-scanner
+
+Tag: V00-05-01
+2009-11-24 Andy Salnikov
+- forgot to add PnCCDFrameV1Cvt to svn
+
+Tag: V00-05-00
+2009-11-24 Andy Salnikov
+- small refactoring:
+  - removed CvtDataContFactoryImage class (not used, will need more
+    generic way to assign attributes to datasets)
+  - removed CvtDataContFactoryAcqirisV1 class (CvtDataContFactoryTyped
+    is used instead)
+  - removed CvtDataContFactoryFrameV1 class (CvtDataContFactoryTyped
+    is used instead)
+  - CvtDataContFactoryTyped now uses type that is passed as extra 
+    parameter to container() method
+- new converter class PnCCDFrameV1Cvt for Pds::PNCCD::FrameV1, this is
+  a special converter that needs both Config object and Event object
+- two new types supported by O2OHdf5Writer: Pds::PNCCD::ConfigV1 and
+  Pds::PNCCD::FrameV1 (not tested yet)
+  
+Tag: V00-04-05
+2009-11-20 Andy Salnikov
+- add one more converter (new version of BldDataEBeam)
+
+Tag: V00-04-04
+2009-11-13 Andy Salnikov
+- add some protection for damaged datagrams, right now all damaged
+  datagrams are discarded in O2OXtcDechunk class
+- also added datagram validation option via new class O2OXtcValidator
+
+Tag: V00-04-03
+2009-10-31 Andy Salnikov
+- catch-rethrow exceptions in the datagram reading thread
+
+Tag: V00-04-02
+2009-10-31 Andy Salnikov
+- adding one space to diagnostic output in O2OXtcMerger
+
+Tag: V00-04-01
+2009-10-30 Andy Salnikov
+- improving message formatting for few messages in the log file
+
+Tag: V00-04-00
+2009-10-30 Andy Salnikov
+- adding verification of the XTC size in files, XTC size is 
+  now passed around to the converters methods
+- few methods changed their signature to accept XTC size
+
+Tag: V00-03-06
+2009-10-28 Andy Salnikov
+- added couple of new data types
+
+Tag: V00-03-05
+2009-10-14 Andy Salnikov
+- added timestamp printing at start/finish
+- resource usage (real/user/sys time) printed too at the end
+- metadata scanner prints metadata even if it's not saved in database
+
+Tag: V00-03-04
+2009-10-13 Andy Salnikov
+- add new SciMD parameter 'dgramSize' with type INT64
+
+Tag: V00-03-03
+2009-10-13 Andy Salnikov
+- file name format changed, use dashes instead of underscores
+
+Tag: V00-03-02
+2009-10-08 Andy Salnikov
+- add protection for XTC with negative payload size
+
+Tag: V00-03-01
+2009-10-08 Andy Salnikov
+- change in the format of file names
+
+Tag: V00-03-00
+2009-10-08 Andy Salnikov
+- added converters for epics types
+- refactor some pieces to support data objects at Control level
+
+Tag: V00-02-02
+2009-10-08 Andy Salnikov
+
+Tag: V00-02-02
+2009-09-30 Andy Salnikov
+- couple more converter types
+
+Tag: V00-02-01
+2009-09-30 Andy Salnikov
+- added unit test for O2OXtcFileName
+
+Tag: V00-02-00
+2009-09-29 Andy Salnikov
+- implement merging of the XTC files from several streams/chunks, the
+  scheme relies on a particular naming convention defined in 
+  O2OXtcFileName class
+
+Tag: V00-01-01
+2009-09-14 Andy Salnikov
+- SciMD API has changed to use instrument name, migrating this package
+  to use this new API
+
+Tag: V00-01-00
+2009-09-08 Andy Salnikov
+- redesigned convertors classes to work correctly with more liberal
+  XTC file structure
+- reading of datagrams from XTC files is done in a separrate thread now
+
+Tag: V00-00-15
+2009-09-02 Andy Salnikov
+- trying to adopt the changes in XTC structure
+
+2009-08-26 Andy Salnikov
+- changed logic for group creation so that missing transition does not
+  crash application
+- exceptions generated in scanners stop scanning now
+- redesign Acqiris translator factory
+
+Tag: V00-00-14
+2009-08-04 Andy Salnikov
+- added support for new XTC type H5DataTypes::PulnixTM6740ConfigV1
+- added instrument name as an option for application
+
+Tag: V00-00-13
+2009-06-26 Andy Salnikov
+- added UUID attribute to the HDF5 files
+
+Tag: V00-00-12
+2009-06-19 Andy Salnikov
+- changed the structure of the HDF5 file, now events group is called
+  "Run" (or RUN:ABCDEF123) is located inside Configure group
+- there may be multiple Configure groups and Run groups
+- changed converters to handle configure/unconfigure and beginrun/endrun 
+  transitions and close old groups/create new groups
+- new class O2OMetaData which is a container for all metadata info
+- metadata is stored in HDF5 file too as attributes of top group
+
+Tag: V00-00-11
+2009-05-19 Andy Salnikov
+- improving metadata collection and storage
+
+Tag: V00-00-10
+2009-04-22 Andy Salnikov
+- tiny optimization, do not recreate type object in converters every time
+
+Tag: V00-00-09
+2009-04-22 Andy Salnikov
+- big refactoring, changed the way XTC iterator interacts with the scanners
+- type-dependent stuff moved to to the new converters classes
+- added new scanner type to collect run statistics, will be stored later
+  in metadata database
+- new application o2o-xtc-repeat which copies XTC datagrams, can make 
+  multiple copies of the L1Accept datagrams
+
+Tag: V00-00-08
+2009-04-10 Andy Salnikov
+- finished implentation of CameraFrameV1 translator
+
+Tag: V00-00-07
+2009-04-07 Andy Salnikov
+- small improvements
+
+Tag: V00-00-06
+2009-04-06 Andy Salnikov
+- progress on HDF5 writer
+
+Tag: V00-00-05
+2009-04-03 Andy Salnikov
+- lots of changes:
+- new data classes appeared in pdsdata
+- starting implementation of the native HDF5 writing
+
+Tag: V00-00-04
+2009-02-25 Andy Salnikov
+- fix few harmless compilation warnings
+
+Tag: V00-00-03
+2009-02-05 Andy Salnikov
+- O2OXtcScannerI.h: gcc41 found a bug: assignment op returned object
+- O2ONexusWriter.cpp: fix signed-unsigned comparison
+
+Tag: V00-00-02
+2008-12-09 Andy Salnikov
+- use new package nexuspp for NeXus file operations
+
+Tag: V00-00-01
+2008-12-02 Andy Salnikov
+- first half-working version of the translator
+- can read the xtc files, understands limited set of data types
+- output format is not well defined yet
