@@ -1,6 +1,6 @@
 <?php
 
-require_once( 'LusiTime.inc.php' );
+require_once( 'lusitime.inc.php' );
 
 echo <<<HERE
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">

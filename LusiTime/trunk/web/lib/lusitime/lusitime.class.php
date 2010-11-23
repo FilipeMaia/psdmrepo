@@ -2,7 +2,7 @@
 
 namespace LusiTime;
 
-require_once( 'LusiTime.inc.php' );
+require_once( 'lusitime.inc.php' );
 
 /* Set the default timezone to prevent complains from PHP run time.
  *

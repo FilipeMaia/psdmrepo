@@ -2,7 +2,7 @@
 
 namespace LusiTime;
 
-require_once( 'LusiTime.inc.php' );
+require_once( 'lusitime.inc.php' );
 
 /*
  * The class representing an interval of time in Web applications. It has
