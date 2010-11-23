@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-03
+2010-11-22 Andy Salnikov
+- do not create common_mode container if the common mode calibraion is
+  not requested
+
 Tag: V00-09-02
 2010-11-22 Andy Salnikov
 - added common mode calibration to CsPad converters

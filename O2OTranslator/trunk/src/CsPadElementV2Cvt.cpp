@@ -115,6 +115,15 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     return ;
   }
 
+  // get calibrarion data
+  const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
+  boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> pedestals =
+    m_calibStore.get<pdscalibdata::CsPadPedestalsV1>(address);
+  boost::shared_ptr<pdscalibdata::CsPadPixelStatusV1> pixStatusCalib =
+    m_calibStore.get<pdscalibdata::CsPadPixelStatusV1>(address);
+  boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cModeCalib =
+    m_calibStore.get<pdscalibdata::CsPadCommonModeSubV1>(address);
+
   // create all containers if running first time
   if ( not m_elementCont ) {
 
@@ -126,9 +135,11 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     CvtDataContFactoryTyped<int16_t> dataContFactory( "data", m_chunk_size, m_deflate ) ;
     m_pixelDataCont = new PixelDataCont ( dataContFactory ) ;
 
-    // create container for common mode data
-    CvtDataContFactoryTyped<float> cmodeContFactory( "common_mode", m_chunk_size, m_deflate ) ;
-    m_cmodeDataCont = new CommonModeDataCont ( cmodeContFactory ) ;
+    if (cModeCalib.get()) {
+      // create container for common mode data
+      CvtDataContFactoryTyped<float> cmodeContFactory( "common_mode", m_chunk_size, m_deflate ) ;
+      m_cmodeDataCont = new CommonModeDataCont ( cmodeContFactory ) ;
+    }
 
     // make container for time
     CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate ) ;
@@ -136,15 +147,6 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
 
   }
   
-  // get calibrarion data
-  const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
-  boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> pedestals =
-    m_calibStore.get<pdscalibdata::CsPadPedestalsV1>(address);
-  boost::shared_ptr<pdscalibdata::CsPadPixelStatusV1> pixStatusCalib =
-    m_calibStore.get<pdscalibdata::CsPadPixelStatusV1>(address);
-  boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cModeCalib =
-    m_calibStore.get<pdscalibdata::CsPadCommonModeSubV1>(address);
-
   // get few constants
   const unsigned nQuad = ::bitCount(qMask, Pds::CsPad::MaxQuadsPerSensor);
   const unsigned nSect = sections;
@@ -232,8 +234,10 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   m_elementCont->container(group,type)->append ( elems[0], type ) ;
   type = H5DataTypes::CsPadElementV2::stored_data_type(nSect) ;
   m_pixelDataCont->container(group,type)->append ( pixelData[0][0][0], type ) ;
-  type = H5DataTypes::CsPadElementV2::cmode_data_type(nSect) ;
-  m_cmodeDataCont->container(group,type)->append ( commonMode[0], type ) ;
+  if (m_cmodeDataCont) {
+    type = H5DataTypes::CsPadElementV2::cmode_data_type(nSect) ;
+    m_cmodeDataCont->container(group,type)->append ( commonMode[0], type ) ;
+  }
   m_timeCont->container(group)->append ( time ) ;
 }
 
