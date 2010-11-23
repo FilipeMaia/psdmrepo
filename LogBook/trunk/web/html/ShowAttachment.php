@@ -1,7 +1,8 @@
 <?php
 
-require_once( 'LogBook/LogBook.inc.php' );
+require_once( 'logbook/logbook.inc.php' );
 
+use LogBook\LogBook;
 use LogBook\LogBookAuth;
 use LogBook\LogBookException;
 

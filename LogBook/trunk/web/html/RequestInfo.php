@@ -1,8 +1,8 @@
 <?php
 
-require_once( 'LogBook/LogBook.inc.php' );
-require_once( 'LusiTime/LusiTime.inc.php' );
-require_once( 'RegDB/RegDB.inc.php' );
+require_once( 'logbook/logbook.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
+require_once( 'regdb/regdb.inc.php' );
 
 use LogBook\LogBookAuth;
 use LogBook\LogBookException;

@@ -1,7 +1,7 @@
 <?php
 
-require_once( 'LogBook/LogBook.inc.php' );
-require_once( 'RegDB/RegDB.inc.php' );
+require_once( 'logbook/logbook.inc.php' );
+require_once( 'regdb/regdb.inc.php' );
 
 use LogBook\LogBook;
 use LogBook\LogBookAuth;
