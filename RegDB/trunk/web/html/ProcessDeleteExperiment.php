@@ -1,6 +1,6 @@
 <?php
 
-require_once( 'RegDB/RegDB.inc.php' );
+require_once( 'regdb/regdb.inc.php' );
 
 use RegDB\RegDB;
 use RegDB\RegDBAuth;

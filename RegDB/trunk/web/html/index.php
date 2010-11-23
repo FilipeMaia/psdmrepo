@@ -158,7 +158,7 @@ PHP Generated JavaScript with initialization parameters
 
 <?php
 
-require_once('RegDB/RegDB.inc.php');
+require_once('regdb/regdb.inc.php');
 
 
 try {
