@@ -178,7 +178,7 @@ PHP Generated JavaScript with initialization parameters
 
 <?php
 
-require_once( 'AuthDB/AuthDB.inc.php' );
+require_once( 'authdb/authdb.inc.php' );
 
 use AuthDB\AuthDB;
 use AuthDB\AuthDBException;

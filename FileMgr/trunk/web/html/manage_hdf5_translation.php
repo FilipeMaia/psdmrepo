@@ -107,8 +107,8 @@
 
 <?php
 
-require_once( 'RegDB/RegDB.inc.php' );
-require_once( 'FileMgr/FileMgr.inc.php' );
+require_once( 'regdb/regdb.inc.php' );
+require_once( 'filemgr/filemgr.inc.php' );
 
 use RegDB\RegDBHtml;
 

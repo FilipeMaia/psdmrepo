@@ -1,8 +1,8 @@
 <?php
 
-require_once( 'RegDB/RegDB.inc.php' );
-require_once( 'FileMgr/FileMgr.inc.php' );
-require_once( 'LusiTime/LusiTime.inc.php' );
+require_once( 'regdb/regdb.inc.php' );
+require_once( 'filemgr/filemgr.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
 
 use RegDB\RegDB;
 use RegDB\RegDBAuth;
