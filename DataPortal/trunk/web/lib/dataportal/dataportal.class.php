@@ -2,8 +2,11 @@
 
 namespace DataPortal;
 
-require_once( 'DataPortal.inc.php' );
+require_once( 'dataportal.inc.php' );
+require_once( 'authdb/authdb.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
 
+use AuthDB\AuthDB;
 use LusiTime\LusiTime;
 
 /* The utility class to generate HTML documents adhering to the standard
@@ -49,8 +52,6 @@ HERE;
 	/* --------------------------------------------------------------------------------------------
 	 */
 	static function scripts( $page_specific_init  ) {
-
-		require_once('AuthDB/AuthDB.inc.php');
 
 		$auth_svc = AuthDB::instance();
 		$auth_svc->begin();
