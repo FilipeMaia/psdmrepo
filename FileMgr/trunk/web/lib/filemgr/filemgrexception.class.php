@@ -2,7 +2,7 @@
 
 namespace FileMgr;
 
-require_once( 'FileMgr.inc.php' );
+require_once( 'filemgr.inc.php' );
 /* 
  * To change this template, choose Tools | Templates
  * and open the template in the editor.

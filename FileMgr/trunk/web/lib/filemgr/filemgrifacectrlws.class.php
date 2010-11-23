@@ -2,7 +2,7 @@
 
 namespace FileMgr;
 
-require_once( 'FileMgr.inc.php' );
+require_once( 'filemgr.inc.php' );
 
 /* ATTENTION: This limit is required to deal with huge data structures/collections
  * produced by some PHP functions when dealing with irodsws collections. Consider
@@ -281,7 +281,7 @@ class FileMgrIfaceCtrlWs {
  * -------------------------------
  *
 
-require_once( 'FileMgr/FileMgr.inc.php' );
+require_once( 'filemgr/filemgr.inc.php' );
 
 function par2html( $name, $value ) {
 	return $name.': <b>'.$value.'</b><br>';

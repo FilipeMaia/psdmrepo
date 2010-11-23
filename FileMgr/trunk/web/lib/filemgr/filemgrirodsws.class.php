@@ -2,7 +2,7 @@
 
 namespace FileMgr;
 
-require_once( 'FileMgr.inc.php' );
+require_once( 'filemgr.inc.php' );
 
 /* ATTENTION: This limit is required to deal with huge data structures/collections
  * produced by some PHP functions when dealing with irodsws collections. Consider
