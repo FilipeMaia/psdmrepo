@@ -2,8 +2,8 @@
 
 namespace RegDB;
 
-require_once( 'RegDB.inc.php' );
-require_once( 'AuthDB/AuthDB.inc.php' );
+require_once( 'regdb.inc.php' );
+require_once( 'authdb/authdb.inc.php' );
 
 use AuthDB\AuthDB;
 

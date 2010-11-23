@@ -2,7 +2,7 @@
 
 namespace RegDB;
 
-require_once( 'RegDB.inc.php' );
+require_once( 'regdb.inc.php' );
 
 /**
  * Class RegDBConnection encapsulates operations with the database
@@ -660,7 +660,7 @@ class RegDBConnection {
  * ==========================
  *
 
-require_once( "RegDB.inc.php");
+require_once( "regdb.inc.php");
 
 $conn = new RegDBConnection (
     REGDB_DEFAULT_HOST,

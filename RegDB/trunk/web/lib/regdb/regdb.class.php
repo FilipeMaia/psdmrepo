@@ -2,7 +2,7 @@
 
 namespace RegDB;
 
-require_once( 'RegDB.inc.php' );
+require_once( 'regdb.inc.php' );
 
 class RegDB {
 
@@ -472,7 +472,7 @@ class RegDB {
  * =======================
  *
 
-require_once( 'LusiTime/LusiTime.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
 
 use LusiTime\LusiTime;
 

@@ -2,7 +2,7 @@
 
 namespace RegDB;
 
-require_once( 'RegDB.inc.php' );
+require_once( 'regdb.inc.php' );
 
 /**
  * Class RegDBExperimentParam an abstraction for experiment parameters.

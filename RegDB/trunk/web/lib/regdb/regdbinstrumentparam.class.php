@@ -2,7 +2,7 @@
 
 namespace RegDB;
 
-require_once( 'RegDB.inc.php' );
+require_once( 'regdb.inc.php' );
 
 /**
  * Class RegDBInstrumentParam an abstraction for instrument parameters.
