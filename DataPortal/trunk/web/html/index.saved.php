@@ -1,7 +1,7 @@
 <?php
-require_once('AuthDB/AuthDB.inc.php');
-require_once('RegDB/RegDB.inc.php');
-require_once('FileMgr/FileMgr.inc.php');
+require_once('authdb/authdb.inc.php');
+require_once('regdb/regdb.inc.php');
+require_once('filemgr/filemgr.inc.php');
 
 /* Make sure the script is run with proper experiment identifier provided.
  * Such experiment must exist in the experiments Registry database.

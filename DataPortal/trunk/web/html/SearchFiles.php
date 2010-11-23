@@ -1,8 +1,8 @@
 <?php
 
-require_once( 'DataPortal/DataPortal.inc.php' );
-require_once( 'LogBook/LogBook.inc.php' );
-require_once( 'FileMgr/FileMgr.inc.php' );
+require_once( 'dataportal/dataportal.inc.php' );
+require_once( 'logbook/logbook.inc.php' );
+require_once( 'filemgr/filemgr.inc.php' );
 
 use DataPortal\DataPortal;
 

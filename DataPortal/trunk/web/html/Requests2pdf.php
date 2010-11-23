@@ -1,9 +1,9 @@
 <?php
 
-require_once( 'AuthDB/AuthDB.inc.php' );
-require_once( 'RegDB/RegDB.inc.php' );
-require_once( 'LogBook/LogBook.inc.php' );
-require_once( 'FileMgr/FileMgr.inc.php' );
+require_once( 'authdb/authdb.inc.php' );
+require_once( 'regdb/regdb.inc.php' );
+require_once( 'logbook/logbook.inc.php' );
+require_once( 'filemgr/filemgr.inc.php' );
 
 require_once( 'pdf-php/class.ezpdf.php' );
 

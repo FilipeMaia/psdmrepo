@@ -1,7 +1,7 @@
 <?php
 
-require_once( 'DataPortal/DataPortal.inc.php' );
-require_once( 'RegDB/RegDB.inc.php' );
+require_once( 'dataportal/dataportal.inc.php' );
+require_once( 'regdb/regdb.inc.php' );
 
 use DataPortal\DataPortal;
 
@@ -32,7 +32,7 @@ try {
 
 <!------------------- Document Begins Here ------------------------->
 <?php
-    require_once('DataPortal/DataPortal.inc.php');
+    require_once('dataportal/dataportal.inc.php');
     DataPortal::begin( "Experiment Selector" );
 ?>
 

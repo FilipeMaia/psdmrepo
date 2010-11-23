@@ -1,7 +1,7 @@
 <?php
 
-require_once( 'LogBook/LogBook.inc.php' );
-require_once( 'FileMgr/FileMgr.inc.php' );
+require_once( 'logbook/logbook.inc.php' );
+require_once( 'filemgr/filemgr.inc.php' );
 
 use LogBook\LogBookException;
 
