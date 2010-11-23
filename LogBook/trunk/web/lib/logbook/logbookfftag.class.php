@@ -2,7 +2,7 @@
 
 namespace LogBook;
 
-require_once( 'LogBook.inc.php' );
+require_once( 'logbook.inc.php' );
 
 /* 
  * To change this template, choose Tools | Templates

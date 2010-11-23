@@ -2,8 +2,8 @@
 
 namespace LogBook;
 
-require_once( 'LogBook.inc.php' );
-require_once( 'RegDB/RegDB.inc.php' );
+require_once( 'logbook.inc.php' );
+require_once( 'regdb/regdb.inc.php' );
 
 use RegDB\RegDB;
 

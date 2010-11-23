@@ -2,8 +2,8 @@
 
 namespace LogBook;
 
-require_once( 'LogBook.inc.php' );
-require_once( 'LusiTime/LusiTime.inc.php' );
+require_once( 'logbook.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
 
 use LusiTime\LusiTime;
 
