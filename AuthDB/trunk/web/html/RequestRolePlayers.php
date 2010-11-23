@@ -1,7 +1,7 @@
 <?php
 
-require_once( 'AuthDB/AuthDB.inc.php' );
-require_once( 'RegDB/RegDB.inc.php' );
+require_once( 'authdb/authdb.inc.php' );
+require_once( 'regdb/regdb.inc.php' );
 
 use AuthDB\AuthDB;
 use AuthDB\AuthDBException;
