@@ -13,7 +13,7 @@ use LusiTime\LusiTime;
  * look & feel. Here is how it should be used to generate a document:
  *
  *   <?php
- *     require_once('DataPortal/DataPortal.inc.php');
+ *     require_once('dataportal/dataportal.inc.php');
  *     DataPortal::begin(<page name>);
  *   ?>
  *
@@ -170,7 +170,7 @@ HERE;
 	 */
 	static function body( $document_title, $document_subtitle=null, $document_subtitle_id=null ) {
 
-		require_once('AuthDB/AuthDB.inc.php');
+		require_once('authdb/authdb.inc.php');
 
 		$auth_svc = AuthDB::instance();
 		$auth_svc->begin();
