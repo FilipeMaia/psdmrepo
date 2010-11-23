@@ -471,6 +471,9 @@ class RegDB {
  * UNIT TEST FOR THE CLASS
  * =======================
  *
+
+require_once( 'LusiTime/LusiTime.inc.php' );
+
 use LusiTime\LusiTime;
 
 try {
