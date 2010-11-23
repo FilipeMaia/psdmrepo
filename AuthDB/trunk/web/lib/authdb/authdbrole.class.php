@@ -2,7 +2,7 @@
 
 namespace AuthDB;
 
-require_once( 'AuthDB.inc.php' );
+require_once( 'authdb.inc.php' );
 
 /**
  * Class AuthDBRole is an abstraction for roles
