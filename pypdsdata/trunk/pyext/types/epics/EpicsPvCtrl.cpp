@@ -136,6 +136,22 @@ pypdsdata::EpicsPvCtrl::initType( PyObject* module )
 
 namespace {
 
+template <int iDbrType>
+inline
+void
+print(std::ostream& out, const Pds::EpicsPvCtrlHeader& header)
+{
+  typedef Pds::EpicsPvCtrl<iDbrType> PVType;
+  const PVType& obj = static_cast<const PVType&>(header);
+  out << "id=" << obj.iPvId
+      << ", name=" << obj.sPvName
+      << ", type=" << Pds::Epics::dbr_text[obj.iDbrType]
+      << ", status=" << obj.status
+      << ", severity=" << obj.severity
+      << ", value=" << obj.value;
+}
+
+
 PyObject*
 _repr( PyObject *self )
 {
@@ -143,47 +159,43 @@ _repr( PyObject *self )
   if(not obj) return 0;
 
   std::ostringstream str;
-  str << "EpicsPvCtrl(id=" << obj->iPvId
-      << ", name=" << obj->sPvName
-      << ", type=" << Pds::Epics::dbr_text[obj->iDbrType]
-      << ", value=";
-  
+  str << "EpicsPvCtrl(";
   
   switch ( obj->iDbrType ) {
 
   case DBR_CTRL_STRING:
-    str << static_cast<Pds::EpicsPvCtrl<DBR_STRING>&>(*obj).value;
+    print<DBR_STRING>(str, *obj);
     break;
 
   case DBR_CTRL_SHORT:
-    str << static_cast<Pds::EpicsPvCtrl<DBR_SHORT>&>(*obj).value;
+    print<DBR_SHORT>(str, *obj);
     break;
 
   case DBR_CTRL_FLOAT:
-    str << static_cast<Pds::EpicsPvCtrl<DBR_FLOAT>&>(*obj).value;
+    print<DBR_FLOAT>(str, *obj);
     break;
 
   case DBR_CTRL_ENUM:
-    str << static_cast<Pds::EpicsPvCtrl<DBR_ENUM>&>(*obj).value;
+    print<DBR_ENUM>(str, *obj);
     break;
 
   case DBR_CTRL_CHAR:
-    str << static_cast<Pds::EpicsPvCtrl<DBR_CHAR>&>(*obj).value;
+    print<DBR_CHAR>(str, *obj);
     break;
 
   case DBR_CTRL_LONG:
-    str << static_cast<Pds::EpicsPvCtrl<DBR_LONG>&>(*obj).value;
+    print<DBR_LONG>(str, *obj);
     break;
 
   case DBR_CTRL_DOUBLE:
-    str << static_cast<Pds::EpicsPvCtrl<DBR_DOUBLE>&>(*obj).value;
+    print<DBR_DOUBLE>(str, *obj);
     break;
 
   default:
-    str << '?';
+    str << "id=" << obj->iPvId;
   }
 
-  str << ", ...)";
+  str << ")";
   
   return PyString_FromString( str.str().c_str() );
 }
