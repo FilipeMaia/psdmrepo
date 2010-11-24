@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-04
+2010-11-23 Andy Salnikov
+- upgrading to pdsdata V02-09-02
+- new data type BldDataIpimb added to O2OHdf5Writer
+
 Tag: V00-09-03
 2010-11-22 Andy Salnikov
 - do not create common_mode container if the common mode calibraion is
