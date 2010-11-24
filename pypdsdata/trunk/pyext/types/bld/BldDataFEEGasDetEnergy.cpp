@@ -36,6 +36,7 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::BldDataFEEGasDetEnergy, f_12_ENRC)
   MEMBER_WRAPPER(pypdsdata::BldDataFEEGasDetEnergy, f_21_ENRC)
   MEMBER_WRAPPER(pypdsdata::BldDataFEEGasDetEnergy, f_22_ENRC)
+  PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
     {"f_11_ENRC",   f_11_ENRC,   0, "PV name: GDET:FEE1:11:ENRC", 0},
@@ -58,6 +59,24 @@ pypdsdata::BldDataFEEGasDetEnergy::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "BldDataFEEGasDetEnergy", module );
+}
+
+namespace {
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::BldDataFEEGasDetEnergy* pdsObj = pypdsdata::BldDataFEEGasDetEnergy::pdsObject(self);
+  if(not pdsObj) return 0;
+
+  char buf[96];
+  snprintf( buf, sizeof buf, "BldDataFEEGasDetEnergy(11=%f, 12=%f, 21=%f, 22=%f)",
+            pdsObj->f_11_ENRC, pdsObj->f_12_ENRC, pdsObj->f_21_ENRC, pdsObj->f_22_ENRC );
+  return PyString_FromString( buf );
+}
+
 }

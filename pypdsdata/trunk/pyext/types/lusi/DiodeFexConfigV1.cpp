@@ -33,7 +33,7 @@
 namespace {
 
   // standard Python stuff
-  PyObject* __repr__( PyObject *self );
+  PyObject* _repr( PyObject *self );
 
   // methods
   PyObject* DiodeFexConfigV1_base( PyObject* self, void* );
@@ -58,8 +58,8 @@ pypdsdata::Lusi::DiodeFexConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = __repr__;
-  type->tp_repr = __repr__;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "DiodeFexConfigV1", module );
 }
@@ -70,16 +70,13 @@ namespace {
 PyObject*
 DiodeFexConfigV1_base( PyObject* self, void* )
 {
-  pypdsdata::Lusi::DiodeFexConfigV1* py_this = static_cast<pypdsdata::Lusi::DiodeFexConfigV1*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  Pds::Lusi::DiodeFexConfigV1* obj = pypdsdata::Lusi::DiodeFexConfigV1::pdsObject(self);
+  if (not obj) return 0;
 
   const int size = Pds::Lusi::DiodeFexConfigV1::NRANGES;
   PyObject* list = PyList_New( size );
   for ( int i = 0 ; i < size ; ++ i ) {
-    PyList_SET_ITEM( list, i, pypdsdata::TypeLib::toPython(py_this->m_obj->base[i]) );
+    PyList_SET_ITEM( list, i, pypdsdata::TypeLib::toPython(obj->base[i]) );
   }
   return list;
 }
@@ -87,37 +84,35 @@ DiodeFexConfigV1_base( PyObject* self, void* )
 PyObject*
 DiodeFexConfigV1_scale( PyObject* self, void* )
 {
-  pypdsdata::Lusi::DiodeFexConfigV1* py_this = static_cast<pypdsdata::Lusi::DiodeFexConfigV1*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  Pds::Lusi::DiodeFexConfigV1* obj = pypdsdata::Lusi::DiodeFexConfigV1::pdsObject(self);
+  if (not obj) return 0;
 
   const int size = Pds::Lusi::DiodeFexConfigV1::NRANGES;
   PyObject* list = PyList_New( size );
   for ( int i = 0 ; i < size ; ++ i ) {
-    PyList_SET_ITEM( list, i, pypdsdata::TypeLib::toPython(py_this->m_obj->scale[i]) );
+    PyList_SET_ITEM( list, i, pypdsdata::TypeLib::toPython(obj->scale[i]) );
   }
   return list;
 }
 
 PyObject*
-__repr__( PyObject *self )
+_repr( PyObject *self )
 {
-  pypdsdata::Lusi::DiodeFexConfigV1* py_this = (pypdsdata::Lusi::DiodeFexConfigV1*) self;
+  Pds::Lusi::DiodeFexConfigV1* obj = pypdsdata::Lusi::DiodeFexConfigV1::pdsObject(self);
+  if (not obj) return 0;
 
   std::ostringstream str ;
-  str << "Lusi.DiodeFexConfigV1(base=[" ;
+  str << "lusi.DiodeFexConfigV1(base=[" ;
   
   const int size = Pds::Lusi::DiodeFexConfigV1::NRANGES;
   for ( int i = 0 ; i < size ; ++ i ) {
     if ( i ) str << ", " ;
-    str << py_this->m_obj->base[i];
+    str << obj->base[i];
   }
   str << "], scale=[" ;
   for ( int i = 0 ; i < size ; ++ i ) {
     if ( i ) str << ", " ;
-    str << py_this->m_obj->scale[i];
+    str << obj->scale[i];
   }
   str << "])" ;
 

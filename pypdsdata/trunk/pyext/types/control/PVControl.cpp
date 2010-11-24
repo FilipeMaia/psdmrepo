@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -36,6 +37,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::ControlData::PVControl, array)
   FUN0_WRAPPER(pypdsdata::ControlData::PVControl, index)
   FUN0_WRAPPER(pypdsdata::ControlData::PVControl, value)
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"name",       name,       METH_NOARGS,  "Returns name of the monitoring channel" },
@@ -58,6 +60,32 @@ pypdsdata::ControlData::PVControl::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "PVControl", module );
+}
+
+namespace {
+  
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::ControlData::PVControl* obj = pypdsdata::ControlData::PVControl::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "control.PVControl(name=" << obj->name();
+  
+  if (obj->array()) {
+    str << ", index=" << obj->index();
+  }
+
+  str << ", value=" << obj->value();
+
+  str << ")";
+  
+  return PyString_FromString( str.str().c_str() );
+}
+
 }

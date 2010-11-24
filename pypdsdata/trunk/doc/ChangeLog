@@ -1,4 +1,14 @@
 
+2010-11-23 - V00-00-19
+======================
+- upgrading to pdsdata V02-09-02
+- new class bld/BldDataIpimb
+- new typeId Id_SharedIpimb
+- new enum in xtc/BldInfo class BldInfo::Nh2Sb1Ipm01
+- many classes now have useful __repr__ and __str__ methods
+- pyxtcreader catches Broken pipe exceptions, avoids printing 
+  stack trace when pipe is closed
+
 2010-10-14 - V00-00-18
 ======================
 - upgrading to pdsdata V02-08-00 and V02-09-00

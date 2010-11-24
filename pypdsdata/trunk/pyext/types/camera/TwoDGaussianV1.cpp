@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -38,6 +39,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Camera::TwoDGaussianV1, major_axis_width)
   FUN0_WRAPPER(pypdsdata::Camera::TwoDGaussianV1, minor_axis_width)
   FUN0_WRAPPER(pypdsdata::Camera::TwoDGaussianV1, major_axis_tilt)
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"integral",         integral,         METH_NOARGS,  "Returns integral statistics as integer number." },
@@ -62,6 +64,27 @@ pypdsdata::Camera::TwoDGaussianV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "TwoDGaussianV1", module );
+}
+
+namespace {
+  
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::Camera::TwoDGaussianV1* obj = pypdsdata::Camera::TwoDGaussianV1::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "camera.TwoDGaussianV1(integral=" << obj->integral()
+      << ", xmean=" << obj->xmean()
+      << ", ymean=" << obj->ymean()
+      << ", ...)" ;
+
+  return PyString_FromString( str.str().c_str() );
+}
+
 }

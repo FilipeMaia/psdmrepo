@@ -85,7 +85,7 @@ FrameV1_str( PyObject* self )
   if ( not obj ) return 0;
 
   char buf[64];
-  snprintf(buf, sizeof buf, "Camera.FrameV1(%dx%dx%d)",
+  snprintf(buf, sizeof buf, "camera.FrameV1(%dx%dx%d)",
       obj->width(), obj->height(), obj->depth() );
 
   return PyString_FromString(buf);
@@ -98,7 +98,7 @@ FrameV1_repr( PyObject* self )
   if ( not obj ) return 0;
 
   char buf[64];
-  snprintf(buf, sizeof buf, "<Camera.FrameV1(%dx%dx%d) at %p>",
+  snprintf(buf, sizeof buf, "<camera.FrameV1(%dx%dx%d) at %p>",
       obj->width(), obj->height(), obj->depth(), (void*)self );
 
   return PyString_FromString(buf);

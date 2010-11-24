@@ -39,6 +39,7 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::BldDataEBeamV0, fEbeamLTUPosY)
   MEMBER_WRAPPER(pypdsdata::BldDataEBeamV0, fEbeamLTUAngX)
   MEMBER_WRAPPER(pypdsdata::BldDataEBeamV0, fEbeamLTUAngY)
+  PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
     {"uDamageMask",    uDamageMask,    0, "", 0},
@@ -64,6 +65,24 @@ pypdsdata::BldDataEBeamV0::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "BldDataEBeamV0", module );
+}
+
+namespace {
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::BldDataEBeamV0* pdsObj = pypdsdata::BldDataEBeamV0::pdsObject(self);
+  if(not pdsObj) return 0;
+
+  char buf[64];
+  snprintf( buf, sizeof buf, "BldDataEBeamV0(Charge=%f, L3Energy=%f, ...)",
+            pdsObj->fEbeamCharge, pdsObj->fEbeamL3Energy );
+  return PyString_FromString( buf );
+}
+
 }

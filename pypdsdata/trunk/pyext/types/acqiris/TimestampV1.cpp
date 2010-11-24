@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -34,6 +35,7 @@ namespace {
   // methods
   FUN0_WRAPPER(pypdsdata::Acqiris::TimestampV1, pos)
   FUN0_WRAPPER(pypdsdata::Acqiris::TimestampV1, value)
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"pos",     pos,    METH_NOARGS,  "Returns floating number" },
@@ -54,6 +56,24 @@ pypdsdata::Acqiris::TimestampV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "TimestampV1", module );
+}
+
+namespace {
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::Acqiris::TimestampV1* obj = pypdsdata::Acqiris::TimestampV1::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "acqiris.TimestampV1(" << obj->value() << ")" ;
+  
+  return PyString_FromString( str.str().c_str() );
+}
+
 }

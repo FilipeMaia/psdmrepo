@@ -256,7 +256,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_DiodeFexConfig, 32 )
         self.assertEqual ( TypeId.Type.Id_DiodeFex, 33 )
         self.assertEqual ( TypeId.Type.Id_PimImageConfig, 34 )
-        self.assertEqual ( TypeId.Type.NumberOf, 35 )
+        self.assertEqual ( TypeId.Type.Id_SharedIpimb, 35 )
+        self.assertEqual ( TypeId.Type.NumberOf, 36 )
 
         # instantiation
         TypeId ()
@@ -491,7 +492,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( BldInfo.Type.EBeam, 0 )
         self.assertEqual ( BldInfo.Type.PhaseCavity, 1 )
         self.assertEqual ( BldInfo.Type.FEEGasDetEnergy, 2 )
-        self.assertEqual ( BldInfo.Type.NumberOf, 3 )
+        self.assertEqual ( BldInfo.Type.Nh2Sb1Ipm01, 3 )
+        self.assertEqual ( BldInfo.Type.NumberOf, 4 )
 
         o1 = BldInfo(0,0)
         

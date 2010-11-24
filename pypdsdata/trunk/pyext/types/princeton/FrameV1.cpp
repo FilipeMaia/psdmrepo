@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -36,6 +37,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Princeton::FrameV1, shotIdStart)
   FUN0_WRAPPER(pypdsdata::Princeton::FrameV1, readoutTime)
   PyObject* data( PyObject* self, PyObject* args );
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "shotIdStart",    shotIdStart,    METH_NOARGS, "" },
@@ -58,6 +60,8 @@ pypdsdata::Princeton::FrameV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "FrameV1", module );
 }
@@ -97,6 +101,20 @@ data( PyObject* self, PyObject* args )
   ((PyArrayObject*)array)->base = self ;
 
   return array;
+}
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::Princeton::FrameV1* obj = pypdsdata::Princeton::FrameV1::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "princeton.FrameV1(shotIdStart=" << obj->shotIdStart()
+      << ", readoutTime=" << obj->readoutTime()
+      << ", ...)";
+
+  return PyString_FromString( str.str().c_str() );
 }
 
 }

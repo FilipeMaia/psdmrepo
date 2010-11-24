@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -41,6 +42,7 @@ namespace {
   PyObject* eventcode( PyObject* self, PyObject* args );
   PyObject* pulse( PyObject* self, PyObject* args );
   PyObject* output_map( PyObject* self, PyObject* args );
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "neventcodes",neventcodes, METH_NOARGS, "event codes appended to this structure" },
@@ -67,6 +69,8 @@ pypdsdata::EvrData::ConfigV3::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "ConfigV3", module );
 }
@@ -110,6 +114,40 @@ output_map( PyObject* self, PyObject* args )
   if ( not PyArg_ParseTuple( args, "I:EvrData.ConfigV3.output_map", &idx ) ) return 0;
 
   return pypdsdata::EvrData::OutputMap::PyObject_FromPds( obj->output_map(idx) );
+}
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::EvrData::ConfigV3* pdsObj = pypdsdata::EvrData::ConfigV3::pdsObject(self);
+  if(not pdsObj) return 0;
+
+  std::ostringstream str;
+  str << "evr.ConfigV3(";
+
+  str << "eventcodes=["; 
+  for (unsigned i = 0; i != pdsObj->neventcodes(); ++ i ) {
+    if (i != 0) str << ", ";
+    str << pdsObj->eventcode(i).code();
+  }
+  str << "]";
+
+  str << ", pulses=["; 
+  for (unsigned i = 0; i != pdsObj->npulses(); ++ i ) {
+    if (i != 0) str << ", ";
+    str << pdsObj->pulse(i).pulseId();
+  }
+  str << "]";
+
+  str << ", outputs=["; 
+  for (unsigned i = 0; i != pdsObj->noutputs(); ++ i ) {
+    if (i != 0) str << ", ";
+    str << pdsObj->output_map(i).map();
+  }
+  str << "]";
+
+  str << ")";
+  return PyString_FromString( str.str().c_str() );
 }
 
 }

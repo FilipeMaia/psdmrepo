@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -34,6 +35,7 @@ namespace {
   // methods
   MEMBER_WRAPPER(pypdsdata::Encoder::DataV1, _33mhz_timestamp)
   MEMBER_WRAPPER(pypdsdata::Encoder::DataV1, _encoder_count)
+  PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
     {"_33mhz_timestamp", _33mhz_timestamp,  0, "", 0},
@@ -64,6 +66,26 @@ pypdsdata::Encoder::DataV1::initType( PyObject* module )
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "DataV1", module );
+}
+
+namespace {
+  
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::Encoder::DataV1* obj = pypdsdata::Encoder::DataV1::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "encoder.DataV1(33mhz_timestamp=" << obj->_33mhz_timestamp
+      << ", encoder_count=" << obj->_encoder_count
+      << ")";
+  
+  return PyString_FromString( str.str().c_str() );
+}
+
 }

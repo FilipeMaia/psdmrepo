@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -51,6 +52,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::FCCD::FccdConfigV1, trimmedHeight)
   FUN0_WRAPPER(pypdsdata::FCCD::FccdConfigV1, outputMode)
   FUN0_WRAPPER(pypdsdata::FCCD::FccdConfigV1, size)
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "width",         width,         METH_NOARGS, "" },
@@ -76,6 +78,8 @@ pypdsdata::FCCD::FccdConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -84,4 +88,19 @@ pypdsdata::FCCD::FccdConfigV1::initType( PyObject* module )
   type->tp_dict = tp_dict;
 
   BaseType::initType( "FccdConfigV1", module );
+}
+
+namespace {
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::FCCD::FccdConfigV1* obj = pypdsdata::FCCD::FccdConfigV1::pdsObject(self);
+  if (not obj) return 0;
+
+  std::ostringstream str;
+  str << "fccd.FccdConfigV1(outputMode" << obj->outputMode() << ")"; 
+  return PyString_FromString( str.str().c_str() );
+}
+
 }

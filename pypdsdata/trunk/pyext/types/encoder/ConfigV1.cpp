@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -58,6 +59,7 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::Encoder::ConfigV1, _input_num)
   MEMBER_WRAPPER(pypdsdata::Encoder::ConfigV1, _input_rising)
   MEMBER_WRAPPER(pypdsdata::Encoder::ConfigV1, _ticks_per_sec)
+  PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
     {"_chan_num",         _chan_num,         0, "", 0},
@@ -83,6 +85,8 @@ pypdsdata::Encoder::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -91,4 +95,24 @@ pypdsdata::Encoder::ConfigV1::initType( PyObject* module )
   type->tp_dict = tp_dict;
 
   BaseType::initType( "ConfigV1", module );
+}
+
+namespace {
+  
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::Encoder::ConfigV1* obj = pypdsdata::Encoder::ConfigV1::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "encoder.ConfigV1(chan_num=" << obj->_chan_num
+      << ", count_mode=" << obj->_count_mode
+      << ", quad_mode=" << obj->_quadrature_mode
+      << ", input_num=" << obj->_input_num
+      << ", ...)";
+  
+  return PyString_FromString( str.str().c_str() );
+}
+
 }

@@ -32,7 +32,7 @@
 namespace {
 
   // standard Python stuff
-  PyObject* __repr__( PyObject *self );
+  PyObject* _repr( PyObject *self );
 
   // methods
   MEMBER_WRAPPER(pypdsdata::Lusi::PimImageConfigV1, xscale)
@@ -57,8 +57,8 @@ pypdsdata::Lusi::PimImageConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = __repr__;
-  type->tp_repr = __repr__;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "PimImageConfigV1", module );
 }
@@ -66,13 +66,14 @@ pypdsdata::Lusi::PimImageConfigV1::initType( PyObject* module )
 namespace {
 
 PyObject*
-__repr__( PyObject *self )
+_repr( PyObject *self )
 {
-  pypdsdata::Lusi::PimImageConfigV1* py_this = (pypdsdata::Lusi::PimImageConfigV1*) self;
+  Pds::Lusi::PimImageConfigV1* obj = pypdsdata::Lusi::PimImageConfigV1::pdsObject(self);
+  if (not obj) return 0;
 
   char buf[64];
-  snprintf( buf, sizeof buf, "Lusi.PimImageConfigV1(xscale=%g, yscale=%g)", 
-      py_this->m_obj->xscale, py_this->m_obj->yscale );
+  snprintf( buf, sizeof buf, "lusi.PimImageConfigV1(xscale=%g, yscale=%g)", 
+      obj->xscale, obj->yscale );
   return PyString_FromString( buf );
 }
  

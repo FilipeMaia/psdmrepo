@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -33,8 +34,7 @@
 namespace {
 
   // standard Python stuff
-  PyObject* EpicsPvTime_str( PyObject *self );
-  PyObject* EpicsPvTime_repr( PyObject *self );
+  PyObject* _repr( PyObject *self );
 
   // methods
   MEMBER_WRAPPER(pypdsdata::EpicsPvTime, iPvId)
@@ -78,8 +78,8 @@ pypdsdata::EpicsPvTime::initType( PyObject* module )
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
   type->tp_getset = ::getset;
-  type->tp_str = EpicsPvTime_str ;
-  type->tp_repr = EpicsPvTime_repr ;
+  type->tp_str = _repr ;
+  type->tp_repr = _repr ;
 
   BaseType::initType( "EpicsPvTime", module );
 }
@@ -88,24 +88,53 @@ pypdsdata::EpicsPvTime::initType( PyObject* module )
 namespace {
 
 PyObject*
-EpicsPvTime_str( PyObject *self )
+_repr( PyObject *self )
 {
-  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
+  Pds::EpicsPvHeader* obj = pypdsdata::EpicsPvTime::pdsObject(self);
+  if(not obj) return 0;
 
-  char buf[48];
-  snprintf( buf, sizeof buf, "EpicsPv(%d)", py_this->m_obj->iPvId );
-  return PyString_FromString( buf );
-}
+  std::ostringstream str;
+  str << "EpicsPvTime(id=" << obj->iPvId
+      << ", value=";
+  
+  
+  switch ( obj->iDbrType ) {
 
-PyObject*
-EpicsPvTime_repr( PyObject *self )
-{
-  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
+  case DBR_TIME_STRING:
+    str << static_cast<Pds::EpicsPvTime<DBR_STRING>&>(*obj).value;
+    break;
 
-  char buf[48];
-  snprintf( buf, sizeof buf, "<EpicsPv(%d, %s)>",
-      py_this->m_obj->iPvId, Pds::Epics::dbr_text[py_this->m_obj->iDbrType] );
-  return PyString_FromString( buf );
+  case DBR_TIME_SHORT:
+    str << static_cast<Pds::EpicsPvTime<DBR_SHORT>&>(*obj).value;
+    break;
+
+  case DBR_TIME_FLOAT:
+    str << static_cast<Pds::EpicsPvTime<DBR_FLOAT>&>(*obj).value;
+    break;
+
+  case DBR_TIME_ENUM:
+    str << static_cast<Pds::EpicsPvTime<DBR_ENUM>&>(*obj).value;
+    break;
+
+  case DBR_TIME_CHAR:
+    str << static_cast<Pds::EpicsPvTime<DBR_CHAR>&>(*obj).value;
+    break;
+
+  case DBR_TIME_LONG:
+    str << static_cast<Pds::EpicsPvTime<DBR_LONG>&>(*obj).value;
+    break;
+
+  case DBR_TIME_DOUBLE:
+    str << static_cast<Pds::EpicsPvTime<DBR_DOUBLE>&>(*obj).value;
+    break;
+
+  default:
+    str << '?';
+  }
+
+  str << ", ...)";
+  
+  return PyString_FromString( str.str().c_str() );
 }
 
 PyObject*

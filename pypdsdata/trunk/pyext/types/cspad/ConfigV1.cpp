@@ -19,6 +19,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -62,6 +63,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV1, asicMask)
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV1, numAsicsRead)
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV1, concentratorVersion)
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"quads",               quads,               METH_NOARGS, "" },
@@ -95,6 +97,8 @@ pypdsdata::CsPad::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   // define class attributes for enums
   type->tp_dict = PyDict_New();
@@ -163,6 +167,22 @@ sections( PyObject* self, PyObject* args )
     PyList_SET_ITEM( list, i, pypdsdata::TypeLib::toPython(i) );
   }
   return list;
+}
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::CsPad::ConfigV1* obj = pypdsdata::CsPad::ConfigV1::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "cspad.ConfigV1(quadMask=" << obj->quadMask()
+      << ", eventCode=" << obj->eventCode()
+      << ", asicMask=" << obj->asicMask()
+      << ", numAsicsRead=" << obj->numAsicsRead()
+      << ", ...)" ;
+
+  return PyString_FromString( str.str().c_str() );
 }
 
 }

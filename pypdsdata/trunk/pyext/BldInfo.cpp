@@ -37,6 +37,7 @@ namespace {
         { "EBeam",           Pds::BldInfo::EBeam },
         { "PhaseCavity",     Pds::BldInfo::PhaseCavity },
         { "FEEGasDetEnergy", Pds::BldInfo::FEEGasDetEnergy },
+        { "Nh2Sb1Ipm01",     Pds::BldInfo::Nh2Sb1Ipm01 },
         { "NumberOf",        Pds::BldInfo::NumberOf },
         { 0, 0 }
     };

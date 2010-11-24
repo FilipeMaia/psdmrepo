@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -44,6 +45,7 @@ namespace {
   PyObject* next( PyObject* self, PyObject* args );
   PyObject* data( PyObject* self, PyObject* args );
   PyObject* sizeofData( PyObject* self, PyObject* args );
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"specialWord", specialWord, METH_NOARGS,  "" },
@@ -69,6 +71,8 @@ pypdsdata::PNCCD::FrameV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "FrameV1", module );
 }
@@ -185,6 +189,22 @@ sizeofData( PyObject* self, PyObject* args )
   }
 
   return PyInt_FromLong( size );
+}
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::PNCCD::FrameV1* obj = pypdsdata::PNCCD::FrameV1::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "pnccd.FrameV1(specialWord=" << obj->specialWord()
+      << ", frameNumber=" << obj->frameNumber()
+      << ", timeStampHi=" << obj->timeStampHi()
+      << ", timeStampLo=" << obj->timeStampLo()
+      << ", ...)";
+
+  return PyString_FromString( str.str().c_str() );
 }
 
 }

@@ -35,8 +35,7 @@ namespace {
   int epicsTimeStamp_init( PyObject* self, PyObject* args, PyObject* kwds );
   long epicsTimeStamp_hash( PyObject* self );
   int epicsTimeStamp_compare( PyObject *self, PyObject *other);
-  PyObject* epicsTimeStamp_str( PyObject *self );
-  PyObject* epicsTimeStamp_repr( PyObject *self );
+  PyObject* _repr( PyObject *self );
 
   PyMemberDef members[] = {
     {"secPastEpoch", T_UINT, offsetof(pypdsdata::Epics::epicsTimeStamp,m_obj.secPastEpoch),
@@ -66,8 +65,8 @@ pypdsdata::Epics::epicsTimeStamp::initType( PyObject* module )
   type->tp_init = epicsTimeStamp_init;
   type->tp_hash = epicsTimeStamp_hash;
   type->tp_compare = epicsTimeStamp_compare;
-  type->tp_str = epicsTimeStamp_str;
-  type->tp_repr = epicsTimeStamp_repr;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "epicsTimeStamp", module );
 }
@@ -122,13 +121,7 @@ epicsTimeStamp_compare( PyObject* self, PyObject* other )
 }
 
 PyObject*
-epicsTimeStamp_str( PyObject *self )
-{
-  return epicsTimeStamp_repr( self );
-}
-
-PyObject*
-epicsTimeStamp_repr( PyObject *self )
+_repr( PyObject *self )
 {
   pypdsdata::Epics::epicsTimeStamp* py_this = (pypdsdata::Epics::epicsTimeStamp*) self;
 

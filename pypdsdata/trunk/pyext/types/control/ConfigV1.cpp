@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -44,6 +45,7 @@ namespace {
   PyObject* duration( PyObject* self, PyObject* );
   PyObject* pvControl( PyObject* self, PyObject* args );
   PyObject* pvMonitor( PyObject* self, PyObject* args );
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"uses_duration", uses_duration,  METH_NOARGS,  "Returns boolean value." },
@@ -71,6 +73,8 @@ pypdsdata::ControlData::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "ConfigV1", module );
 }
@@ -112,6 +116,47 @@ pvMonitor( PyObject* self, PyObject* args )
 
   return pypdsdata::ControlData::PVMonitor::PyObject_FromPds( (Pds::ControlData::PVMonitor*)(&obj->pvMonitor(index)),
       self, sizeof(Pds::ControlData::PVMonitor) );
+}
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::ControlData::ConfigV1* pdsObj = pypdsdata::ControlData::ConfigV1::pdsObject(self);
+  if(not pdsObj) return 0;
+
+  std::ostringstream str;
+  str << "control.ConfigV1(";
+  const char* comma = "";
+  if (pdsObj->uses_duration()) {
+    const ClockTime& duration = pdsObj->duration();
+    double dur = duration.seconds() + duration.nanoseconds()/1e9;
+    str << comma << "duration=" << dur << "sec";
+    comma = ", ";
+  }
+  if (pdsObj->uses_events()) {
+    str << comma << "events=" << pdsObj->events() ;
+    comma = ", ";
+  }
+  if (pdsObj->npvControls()) {
+    str << comma << "controls=["; 
+    for (unsigned i = 0; i != pdsObj->npvControls(); ++ i ) {
+      if (i != 0) str << ", ";
+      str << pdsObj->pvControl(i).name();
+    }
+    str << "]";
+    comma = ", ";
+  }
+  if (pdsObj->npvMonitors()) {
+    str << comma << "monitors=["; 
+    for (unsigned i = 0; i != pdsObj->npvMonitors(); ++ i ) {
+      if (i != 0) str << ", ";
+      str << pdsObj->pvMonitor(i).name();
+    }
+    str << "]";
+    comma = ", ";
+  }
+  str << ")";
+  return PyString_FromString( str.str().c_str() );
 }
 
 }

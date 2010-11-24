@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -44,6 +45,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV1, errors)
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV1, calStrobeLength)
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV1, trigDelay)
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "triggerCounter",      triggerCounter,      METH_NOARGS, "" },
@@ -76,6 +78,27 @@ pypdsdata::Ipimb::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "ConfigV1", module );
+}
+
+namespace {
+  
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::Ipimb::ConfigV1* obj = pypdsdata::Ipimb::ConfigV1::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "ipimb.ConfigV1(triggerCounter=" << obj->triggerCounter()
+      << ", serialID=" << obj->serialID()
+      << ", chargeAmpRange=" << obj->chargeAmpRange()
+      << ", ...)" ;
+
+  return PyString_FromString( str.str().c_str() );
+}
+
 }

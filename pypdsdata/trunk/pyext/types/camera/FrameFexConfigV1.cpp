@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -61,6 +62,7 @@ namespace {
   PyObject* roiBegin( PyObject* self, PyObject* );
   PyObject* roiEnd( PyObject* self, PyObject* );
   PyObject* masked_pixel_coordinates( PyObject* self, PyObject* );
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"forwarding",       forwarding,       METH_NOARGS,  "Returns forwarding policy for frame data." },
@@ -88,6 +90,8 @@ pypdsdata::Camera::FrameFexConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -135,6 +139,23 @@ masked_pixel_coordinates( PyObject* self, PyObject*)
   }
 
   return list;
+}
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::Camera::FrameFexConfigV1* obj = pypdsdata::Camera::FrameFexConfigV1::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "camera.FrameFexConfigV1(forwarding=" << obj->forwarding()
+      << ", forward_prescale=" << obj->forward_prescale()
+      << ", processing=" << obj->processing()
+      << ", roiBegin=(" << obj->roiBegin().column << ',' << obj->roiBegin().row << ')'
+      << ", roiEnd=(" << obj->roiEnd().column << ',' << obj->roiEnd().row << ')'
+      << ", ...)" ;
+
+  return PyString_FromString( str.str().c_str() );
 }
 
 }

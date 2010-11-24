@@ -110,7 +110,7 @@ FrameCoord_repr( PyObject *self )
   pypdsdata::Camera::FrameCoord* py_this = (pypdsdata::Camera::FrameCoord*) self;
 
   char buf[32];
-  snprintf( buf, sizeof buf, "Camera.FrameCoord(%d, %d)",
+  snprintf( buf, sizeof buf, "camera.FrameCoord(%d, %d)",
             py_this->m_obj.column, py_this->m_obj.row );
   return PyString_FromString( buf );
 }

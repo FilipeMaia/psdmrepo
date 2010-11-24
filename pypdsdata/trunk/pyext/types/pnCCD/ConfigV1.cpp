@@ -35,6 +35,7 @@ namespace {
   // methods
   FUN0_WRAPPER(pypdsdata::PNCCD::ConfigV1, numLinks)
   FUN0_WRAPPER(pypdsdata::PNCCD::ConfigV1, payloadSizePerLink)
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"numLinks",           numLinks,           METH_NOARGS,  "Returns number of links." },
@@ -55,6 +56,24 @@ pypdsdata::PNCCD::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "ConfigV1", module );
+}
+
+namespace {
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::PNCCD::ConfigV1* obj = pypdsdata::PNCCD::ConfigV1::pdsObject( self );
+  if ( not obj ) return 0;
+
+  char buf[96];
+  snprintf( buf, sizeof buf, "pnccd.ConfigV1(numLinks=%d, payloadSizePerLink=%d)",
+            obj->numLinks(), obj->payloadSizePerLink() );
+  return PyString_FromString( buf );
+}
+
 }

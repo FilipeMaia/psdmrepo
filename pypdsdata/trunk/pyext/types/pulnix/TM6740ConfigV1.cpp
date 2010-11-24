@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -77,6 +78,7 @@ namespace {
   ENUM_FUN0_WRAPPER(pypdsdata::Pulnix::TM6740ConfigV1, horizontal_binning, binningEnum)
   ENUM_FUN0_WRAPPER(pypdsdata::Pulnix::TM6740ConfigV1, vertical_binning, binningEnum)
   ENUM_FUN0_WRAPPER(pypdsdata::Pulnix::TM6740ConfigV1, lookuptable_mode, lookupEnum)
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"vref",                   vref,                    METH_NOARGS,  "" },
@@ -106,6 +108,8 @@ pypdsdata::Pulnix::TM6740ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -116,4 +120,25 @@ pypdsdata::Pulnix::TM6740ConfigV1::initType( PyObject* module )
   type->tp_dict = tp_dict;
 
   BaseType::initType( "TM6740ConfigV1", module );
+}
+
+namespace {
+  
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::Pulnix::TM6740ConfigV1* obj = pypdsdata::Pulnix::TM6740ConfigV1::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "pulnix.TM6740ConfigV2(vref=" << obj->vref()
+      << ", gain_a=" << obj->gain_a()
+      << ", gain_b=" << obj->gain_b()
+      << ", bits=" << obj->output_resolution_bits()
+      << ", shutter_width=" << obj->shutter_width()
+      << ", ...)" ;
+
+  return PyString_FromString( str.str().c_str() );
+}
+
 }

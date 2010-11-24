@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -59,6 +60,7 @@ namespace {
   ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::VertV1, bandwidth, bandwidthEnum)
   ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::VertV1, coupling, couplingEnum)
   FUN0_WRAPPER(pypdsdata::Acqiris::VertV1, slope)
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"fullScale",    fullScale,   METH_NOARGS,  "Returns floating number" },
@@ -82,6 +84,8 @@ pypdsdata::Acqiris::VertV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -90,4 +94,23 @@ pypdsdata::Acqiris::VertV1::initType( PyObject* module )
   type->tp_dict = tp_dict;
 
   BaseType::initType( "VertV1", module );
+}
+
+namespace {
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::Acqiris::VertV1* obj = pypdsdata::Acqiris::VertV1::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "acqiris.VertV1(fullScale=" << obj->fullScale()
+      << ", offset=" << obj->offset()
+      << ", coupling=" << obj->coupling()
+      << ", bandwidth=" << obj->bandwidth()
+      << ")" ;
+  return PyString_FromString( str.str().c_str() );
+}
+
 }

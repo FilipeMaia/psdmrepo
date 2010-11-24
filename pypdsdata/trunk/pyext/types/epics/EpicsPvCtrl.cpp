@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -66,8 +67,7 @@ namespace {
   };
 
   // standard Python stuff
-  PyObject* EpicsPvCtrl_str( PyObject *self );
-  PyObject* EpicsPvCtrl_repr( PyObject *self );
+  PyObject* _repr( PyObject *self );
 
   // methods
   MEMBER_WRAPPER(pypdsdata::EpicsPvCtrl, iPvId)
@@ -127,8 +127,8 @@ pypdsdata::EpicsPvCtrl::initType( PyObject* module )
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
   type->tp_getset = ::getset;
-  type->tp_str = EpicsPvCtrl_str ;
-  type->tp_repr = EpicsPvCtrl_repr ;
+  type->tp_str = _repr ;
+  type->tp_repr = _repr ;
 
   BaseType::initType( "EpicsPvCtrl", module );
 }
@@ -137,25 +137,55 @@ pypdsdata::EpicsPvCtrl::initType( PyObject* module )
 namespace {
 
 PyObject*
-EpicsPvCtrl_str( PyObject *self )
+_repr( PyObject *self )
 {
-  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
+  Pds::EpicsPvCtrlHeader* obj = pypdsdata::EpicsPvCtrl::pdsObject(self);
+  if(not obj) return 0;
 
-  char buf[64];
-  snprintf( buf, sizeof buf, "EpicsPv(%d, %s)",
-      py_this->m_obj->iPvId, py_this->m_obj->sPvName );
-  return PyString_FromString( buf );
-}
+  std::ostringstream str;
+  str << "EpicsPvCtrl(id=" << obj->iPvId
+      << ", name=" << obj->sPvName
+      << ", type=" << Pds::Epics::dbr_text[obj->iDbrType]
+      << ", value=";
+  
+  
+  switch ( obj->iDbrType ) {
 
-PyObject*
-EpicsPvCtrl_repr( PyObject *self )
-{
-  pypdsdata::EpicsPvCtrl* py_this = (pypdsdata::EpicsPvCtrl*) self;
+  case DBR_CTRL_STRING:
+    str << static_cast<Pds::EpicsPvCtrl<DBR_STRING>&>(*obj).value;
+    break;
 
-  char buf[48];
-  snprintf( buf, sizeof buf, "<EpicsPv(%d, %s)>",
-      py_this->m_obj->iPvId, Pds::Epics::dbr_text[py_this->m_obj->iDbrType] );
-  return PyString_FromString( buf );
+  case DBR_CTRL_SHORT:
+    str << static_cast<Pds::EpicsPvCtrl<DBR_SHORT>&>(*obj).value;
+    break;
+
+  case DBR_CTRL_FLOAT:
+    str << static_cast<Pds::EpicsPvCtrl<DBR_FLOAT>&>(*obj).value;
+    break;
+
+  case DBR_CTRL_ENUM:
+    str << static_cast<Pds::EpicsPvCtrl<DBR_ENUM>&>(*obj).value;
+    break;
+
+  case DBR_CTRL_CHAR:
+    str << static_cast<Pds::EpicsPvCtrl<DBR_CHAR>&>(*obj).value;
+    break;
+
+  case DBR_CTRL_LONG:
+    str << static_cast<Pds::EpicsPvCtrl<DBR_LONG>&>(*obj).value;
+    break;
+
+  case DBR_CTRL_DOUBLE:
+    str << static_cast<Pds::EpicsPvCtrl<DBR_DOUBLE>&>(*obj).value;
+    break;
+
+  default:
+    str << '?';
+  }
+
+  str << ", ...)";
+  
+  return PyString_FromString( str.str().c_str() );
 }
 
 PyObject*

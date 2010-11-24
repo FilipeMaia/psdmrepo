@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -44,6 +45,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, delayMode)
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, size)
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV1, frameSize)
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "width",                  width,                  METH_NOARGS, "" },
@@ -76,6 +78,28 @@ pypdsdata::Princeton::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "ConfigV1", module );
+}
+
+namespace {
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::Princeton::ConfigV1* obj = pypdsdata::Princeton::ConfigV1::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "princeton.ConfigV1(width=" << obj->width()
+      << ", height=" << obj->height()
+      << ", readoutEventCode=" << obj->readoutEventCode()
+      << ", delayMode=" << obj->delayMode()
+      << ", ...)";
+
+  return PyString_FromString( str.str().c_str() );
+}
+
 }

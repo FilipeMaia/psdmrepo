@@ -30,6 +30,7 @@
 #include "types/bld/BldDataFEEGasDetEnergy.h"
 #include "types/bld/BldDataEBeamV0.h"
 #include "types/bld/BldDataEBeam.h"
+#include "types/bld/BldDataIpimb.h"
 #include "types/bld/BldDataPhaseCavity.h"
 
 #include "types/camera/FrameFexConfigV1.h"
@@ -275,6 +276,10 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_PimImageConfig :
     if ( not obj ) obj = xtc2obj<Lusi::PimImageConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_SharedIpimb :
+    if ( not obj ) obj = xtc2obj<BldDataIpimb, 0>(xtc, parent);
     break ;
 
   case Pds::TypeId::NumberOf :

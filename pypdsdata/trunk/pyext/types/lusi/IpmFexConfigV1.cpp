@@ -33,7 +33,7 @@
 namespace {
 
   // standard Python stuff
-  PyObject* __repr__( PyObject *self );
+  PyObject* _repr( PyObject *self );
 
   // methods
   MEMBER_WRAPPER(pypdsdata::Lusi::IpmFexConfigV1, xscale)
@@ -60,8 +60,8 @@ pypdsdata::Lusi::IpmFexConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = __repr__;
-  type->tp_repr = __repr__;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "IpmFexConfigV1", module );
 }
@@ -72,16 +72,13 @@ namespace {
 PyObject*
 IpmFexConfigV1_diode( PyObject* self, void* )
 {
-  pypdsdata::Lusi::IpmFexConfigV1* py_this = static_cast<pypdsdata::Lusi::IpmFexConfigV1*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  Pds::Lusi::IpmFexConfigV1* obj = pypdsdata::Lusi::IpmFexConfigV1::pdsObject(self);
+  if (not obj) return 0;
 
   const int size = Pds::Lusi::IpmFexConfigV1::NCHANNELS;
   PyObject* list = PyList_New( size );
   for ( int i = 0 ; i < size ; ++ i ) {
-    Pds::Lusi::DiodeFexConfigV1& dconf = py_this->m_obj->diode[i];
+    Pds::Lusi::DiodeFexConfigV1& dconf = obj->diode[i];
     PyObject* obj = pypdsdata::Lusi::DiodeFexConfigV1::PyObject_FromPds(&dconf, self, sizeof(Pds::Lusi::DiodeFexConfigV1));
     PyList_SET_ITEM( list, i, obj );
   }
@@ -89,13 +86,14 @@ IpmFexConfigV1_diode( PyObject* self, void* )
 }
 
 PyObject*
-__repr__( PyObject *self )
+_repr( PyObject *self )
 {
-  pypdsdata::Lusi::IpmFexConfigV1* py_this = static_cast<pypdsdata::Lusi::IpmFexConfigV1*>(self);
+  Pds::Lusi::IpmFexConfigV1* obj = pypdsdata::Lusi::IpmFexConfigV1::pdsObject(self);
+  if (not obj) return 0;
 
   char buf[80];
-  snprintf( buf, sizeof buf, "Lusi.IpmFexConfigV1(xscale=%g, yscale=%g, diode=[...])", 
-      py_this->m_obj->xscale, py_this->m_obj->yscale);
+  snprintf( buf, sizeof buf, "lusi.IpmFexConfigV1(xscale=%g, yscale=%g, ...)", 
+      obj->xscale, obj->yscale);
   return PyString_FromString( buf );
 }
 

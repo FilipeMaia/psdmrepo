@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -90,6 +91,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::FCCD::FccdConfigV2, waveform12)
   FUN0_WRAPPER(pypdsdata::FCCD::FccdConfigV2, waveform13)
   FUN0_WRAPPER(pypdsdata::FCCD::FccdConfigV2, waveform14)
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "width",         width,         METH_NOARGS, "" },
@@ -150,6 +152,8 @@ pypdsdata::FCCD::FccdConfigV2::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -158,4 +162,24 @@ pypdsdata::FCCD::FccdConfigV2::initType( PyObject* module )
   type->tp_dict = tp_dict;
 
   BaseType::initType( "FccdConfigV2", module );
+}
+
+namespace {
+
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::FCCD::FccdConfigV2* obj = pypdsdata::FCCD::FccdConfigV2::pdsObject(self);
+  if (not obj) return 0;
+
+  std::ostringstream str;
+  str << "fccd.FccdConfigV2(outputMode" << obj->outputMode()
+      << ", ccdEnable=" << (obj->ccdEnable() ? 1 : 0)
+      << ", focusMode=" << (obj->focusMode() ? 1 : 0)
+      << ", exposureTime=" << obj->exposureTime()
+      << ", ...)";
+  
+  return PyString_FromString( str.str().c_str() );
+}
+
 }

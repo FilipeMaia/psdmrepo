@@ -49,6 +49,7 @@ namespace {
   PyObject* timestamp( PyObject* self, PyObject* args );
   PyObject* waveform( PyObject* self, PyObject* args );
   PyObject* nextChannel( PyObject* self, PyObject* args );
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"nbrSamplesInSeg",  nbrSamplesInSeg,   METH_NOARGS,  "Returns integer number" },
@@ -73,6 +74,8 @@ pypdsdata::Acqiris::DataDescV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -170,6 +173,17 @@ nextChannel( PyObject* self, PyObject* args )
   return pypdsdata::Acqiris::DataDescV1::PyObject_FromPds( next, py_this->m_parent, size, py_this->m_dtor );
 }
 
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::Acqiris::DataDescV1* obj = pypdsdata::Acqiris::DataDescV1::pdsObject( self );
+  if ( not obj ) return 0;
+
+  char buf[96];
+  snprintf( buf, sizeof buf, "acqiris.DataDescV1(nbrSegments=%d, nbrSamplesInSeg=%d, ...)",
+            obj->nbrSegments(), obj->nbrSamplesInSeg() );
+  return PyString_FromString( buf );
+}
 
 }
 

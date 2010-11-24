@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -42,6 +43,7 @@ namespace {
   PyObject* horiz( PyObject* self, PyObject* );
   PyObject* trig( PyObject* self, PyObject* );
   PyObject* vert( PyObject* self, PyObject* args );
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"nbrConvertersPerChannel", nbrConvertersPerChannel, METH_NOARGS,  "Returns integer number" },
@@ -67,6 +69,8 @@ pypdsdata::Acqiris::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "ConfigV1", module );
 }
@@ -104,5 +108,19 @@ vert( PyObject* self, PyObject* args )
   return pypdsdata::Acqiris::VertV1::PyObject_FromPds( (Pds::Acqiris::VertV1*)&obj->vert(channel), self, sizeof(Pds::Acqiris::VertV1) );
 }
 
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::Acqiris::ConfigV1* pdsObj = pypdsdata::Acqiris::ConfigV1::pdsObject(self);
+  if(not pdsObj) return 0;
+
+  std::ostringstream str;
+  str << "acqiris.ConfigV1(nCPC=" << pdsObj->nbrConvertersPerChannel()
+      << ", chMask=" << pdsObj->channelMask()
+      << ", nCh=" << pdsObj->nbrChannels()
+      << ", nBanks=" << pdsObj->nbrBanks()
+      << ", ...)" ;
+  return PyString_FromString( str.str().c_str() );
+}
 
 }

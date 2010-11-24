@@ -48,6 +48,7 @@
 #include "types/bld/BldDataEBeam.h"
 #include "types/bld/BldDataEBeamV0.h"
 #include "types/bld/BldDataFEEGasDetEnergy.h"
+#include "types/bld/BldDataIpimb.h"
 #include "types/bld/BldDataPhaseCavity.h"
 
 #include "types/camera/FrameCoord.h"
@@ -182,6 +183,7 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::BldDataEBeam::initType( module );
   pypdsdata::BldDataEBeamV0::initType( module );
   pypdsdata::BldDataFEEGasDetEnergy::initType( module );
+  pypdsdata::BldDataIpimb::initType( module );
   pypdsdata::BldDataPhaseCavity::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "bld", module );

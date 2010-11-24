@@ -32,7 +32,7 @@
 namespace {
 
   // standard Python stuff
-  PyObject* __repr__( PyObject *self );
+  PyObject* _repr( PyObject *self );
 
   // methods
   MEMBER_WRAPPER(pypdsdata::Lusi::DiodeFexV1, value)
@@ -55,8 +55,8 @@ pypdsdata::Lusi::DiodeFexV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = __repr__;
-  type->tp_repr = __repr__;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "DiodeFexV1", module );
 }
@@ -64,12 +64,13 @@ pypdsdata::Lusi::DiodeFexV1::initType( PyObject* module )
 namespace {
 
 PyObject*
-__repr__( PyObject *self )
+_repr( PyObject *self )
 {
-  pypdsdata::Lusi::DiodeFexV1* py_this = (pypdsdata::Lusi::DiodeFexV1*) self;
+  Pds::Lusi::DiodeFexV1* obj = pypdsdata::Lusi::DiodeFexV1::pdsObject(self);
+  if (not obj) return 0;
 
   char buf[64];
-  snprintf( buf, sizeof buf, "Lusi.DiodeFexV1(value=%g)", py_this->m_obj->value );
+  snprintf( buf, sizeof buf, "lusi.DiodeFexV1(value=%g)", obj->value );
   return PyString_FromString( buf );
 }
  

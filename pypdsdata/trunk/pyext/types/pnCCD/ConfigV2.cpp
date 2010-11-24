@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -44,6 +45,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::PNCCD::ConfigV2, info)
   FUN0_WRAPPER(pypdsdata::PNCCD::ConfigV2, timingFName)
   FUN0_WRAPPER(pypdsdata::PNCCD::ConfigV2, size)
+  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"numLinks",                numLinks,               METH_NOARGS,  "Returns number of links." },
@@ -73,6 +75,28 @@ pypdsdata::PNCCD::ConfigV2::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "ConfigV2", module );
+}
+
+namespace {
+  
+PyObject*
+_repr( PyObject *self )
+{
+  Pds::PNCCD::ConfigV2* obj = pypdsdata::PNCCD::ConfigV2::pdsObject(self);
+  if(not obj) return 0;
+
+  std::ostringstream str;
+  str << "pnccd.ConfigV2(numLinks=" << obj->numLinks()
+      << ", payloadSizePerLink=" << obj->payloadSizePerLink()
+      << ", numChannels=" << obj->numChannels()
+      << ", numRows=" << obj->numRows()
+      << ", ...)";
+
+  return PyString_FromString( str.str().c_str() );
+}
+  
 }

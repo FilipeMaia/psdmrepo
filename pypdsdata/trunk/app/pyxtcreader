@@ -65,7 +65,7 @@ def _scan( xtc, offset=1, verbose=0 ) :
         if verbose > 0:
             try:
                 data = xtc.payload()
-                print "%sPayload: %s" % ( pfx, data )
+                print "%s  Payload: %s" % ( pfx, data )
             except:
                 pass
 
@@ -113,4 +113,8 @@ def main( argv ) :
 #  run application when imported as a main module
 #
 if __name__ == "__main__" :
-    sys.exit( main(sys.argv) )
+    try:
+        sys.exit( main(sys.argv) )
+    except IOError, ex:
+        # Filter out broken pipe from redirection
+        if ex.errno != 32 : raise

@@ -34,7 +34,7 @@
 namespace {
 
   // standard Python stuff
-  PyObject* __repr__( PyObject *self );
+  PyObject* _repr( PyObject *self );
 
   // methods
   MEMBER_WRAPPER(pypdsdata::Lusi::IpmFexV1, sum)
@@ -63,8 +63,8 @@ pypdsdata::Lusi::IpmFexV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = __repr__;
-  type->tp_repr = __repr__;
+  type->tp_str = _repr;
+  type->tp_repr = _repr;
 
   BaseType::initType( "IpmFexV1", module );
 }
@@ -75,35 +75,33 @@ namespace {
 PyObject*
 IpmFexV1_channel( PyObject* self, void* )
 {
-  pypdsdata::Lusi::IpmFexV1* py_this = static_cast<pypdsdata::Lusi::IpmFexV1*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  Pds::Lusi::IpmFexV1* obj = pypdsdata::Lusi::IpmFexV1::pdsObject(self);
+  if (not obj) return 0;
 
-  const int size = sizeof py_this->m_obj->channel / sizeof py_this->m_obj->channel[0];
+  const int size = sizeof obj->channel / sizeof obj->channel[0];
   PyObject* list = PyList_New( size );
   for ( int i = 0 ; i < size ; ++ i ) {
-    PyList_SET_ITEM( list, i, pypdsdata::TypeLib::toPython(py_this->m_obj->channel[i]) );
+    PyList_SET_ITEM( list, i, pypdsdata::TypeLib::toPython(obj->channel[i]) );
   }
   return list;
 }
 
 PyObject*
-__repr__( PyObject *self )
+_repr( PyObject *self )
 {
-  pypdsdata::Lusi::IpmFexV1* py_this = (pypdsdata::Lusi::IpmFexV1*) self;
+  Pds::Lusi::IpmFexV1* obj = pypdsdata::Lusi::IpmFexV1::pdsObject(self);
+  if (not obj) return 0;
 
   std::ostringstream str ;
-  str << "Lusi.IpmFexV1(sum=" << py_this->m_obj->sum
-      << ", xpos=" << py_this->m_obj->xpos 
-      << ", ypos=" << py_this->m_obj->ypos 
+  str << "lusi.IpmFexV1(sum=" << obj->sum
+      << ", xpos=" << obj->xpos 
+      << ", ypos=" << obj->ypos 
       << ", channel=[" ;
   
-  const int size = sizeof py_this->m_obj->channel / sizeof py_this->m_obj->channel[0];
+  const int size = sizeof obj->channel / sizeof obj->channel[0];
   for ( int i = 0 ; i < size ; ++ i ) {
     if ( i ) str << ", " ;
-    str << py_this->m_obj->channel[i];
+    str << obj->channel[i];
   }
   str << "])" ;
 
