@@ -74,7 +74,7 @@ EvrIOConfigV1::store( const XtcType& config, hdf5pp::Group grp )
   const uint32_t nchannels = config.nchannels() ;
   EvrIOChannel channels[nchannels] ;
   for ( uint32_t i = 0 ; i < nchannels ; ++ i ) {
-    channels[i] = EvrIOChannel( config.channel(i) ) ;
+    channels[i] = config.channel(i);
   }
   storeDataObjects ( nchannels, channels, "channels", grp ) ;
 }

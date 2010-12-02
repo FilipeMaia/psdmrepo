@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/utility.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -30,8 +31,10 @@
 #include "pdsdata/evr/PulseConfigV3.hh"
 #include "pdsdata/evr/EventCodeV3.hh"
 #include "pdsdata/evr/EventCodeV4.hh"
+#include "pdsdata/evr/EventCodeV5.hh"
 #include "pdsdata/evr/IOChannel.hh"
 #include "pdsdata/evr/OutputMap.hh"
+#include "pdsdata/evr/SequencerConfigV1.hh"
 
 //		---------------------
 // 		-- Class Interface --
@@ -194,6 +197,41 @@ private:
 };
 
 //
+// Helper type for Pds::EvrData::EventCodeV5
+//
+struct EvrEventCodeV5_Data {
+  uint16_t  code;
+  uint8_t   isReadout;
+  uint8_t   isCommand;
+  uint8_t   isLatch;
+  uint32_t  reportDelay;
+  uint32_t  reportWidth;
+  uint32_t  releaseCode;
+  uint32_t  maskTrigger;
+  uint32_t  maskSet;
+  uint32_t  maskClear;
+  char*     desc;
+};
+
+class EvrEventCodeV5 : boost::noncopyable {
+public:
+
+  EvrEventCodeV5 ();
+  EvrEventCodeV5 ( const Pds::EvrData::EventCodeV5& evtcode ) ;
+  ~EvrEventCodeV5 ();
+
+  EvrEventCodeV5& operator= ( const Pds::EvrData::EventCodeV5& evtcode ) ;
+
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
+
+private:
+
+  EvrEventCodeV5_Data m_data ;
+
+};
+
+//
 // Helper type for Pds::EvrData::IOChannel
 //
 struct EvrIOChannelDetInfo_Data {
@@ -210,12 +248,14 @@ struct EvrIOChannel_Data {
   EvrIOChannelDetInfo_Data* info;
 };
 
-class EvrIOChannel {
+class EvrIOChannel : boost::noncopyable {
 public:
 
-  EvrIOChannel () {}
+  EvrIOChannel ();
   EvrIOChannel( const Pds::EvrData::IOChannel& chan );
   ~EvrIOChannel ();
+
+  EvrIOChannel& operator=( const Pds::EvrData::IOChannel& chan );
 
   static hdf5pp::Type stored_type();
   static hdf5pp::Type native_type();
@@ -223,6 +263,39 @@ public:
 private:
 
   EvrIOChannel_Data m_data ;
+
+};
+
+//
+// Helper type for Pds::EvrData::SequencerConfigV1
+//
+struct EvrSequencerEntry_Data {
+  uint32_t eventcode;
+  uint32_t delay;
+};
+
+struct EvrSequencerConfigV1_Data {
+  uint16_t sync_source;
+  uint16_t beam_source;
+  uint32_t cycles;
+  uint32_t length;
+  size_t nentries;
+  EvrSequencerEntry_Data* entries;
+};
+
+class EvrSequencerConfigV1 : boost::noncopyable {
+public:
+
+  EvrSequencerConfigV1 ();
+  EvrSequencerConfigV1( const Pds::EvrData::SequencerConfigV1& chan );
+  ~EvrSequencerConfigV1 ();
+
+  static hdf5pp::Type stored_type();
+  static hdf5pp::Type native_type();
+
+private:
+
+  EvrSequencerConfigV1_Data m_data ;
 
 };
 

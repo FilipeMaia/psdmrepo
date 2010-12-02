@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/utility.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -51,7 +52,7 @@ struct PnCCDConfigV2_Data {
   char*    timingFName;
 };
 
-class PnCCDConfigV2 {
+class PnCCDConfigV2 : boost::noncopyable {
 public:
 
   typedef Pds::PNCCD::ConfigV2 XtcType ;
