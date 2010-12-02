@@ -79,15 +79,19 @@
 #include "types/evr/ConfigV2.h"
 #include "types/evr/ConfigV3.h"
 #include "types/evr/ConfigV4.h"
+#include "types/evr/ConfigV5.h"
 #include "types/evr/DataV3.h"
 #include "types/evr/DataV3_FIFOEvent.h"
 #include "types/evr/EventCodeV3.h"
 #include "types/evr/EventCodeV4.h"
+#include "types/evr/EventCodeV5.h"
 #include "types/evr/IOChannel.h"
 #include "types/evr/IOConfigV1.h"
 #include "types/evr/OutputMap.h"
 #include "types/evr/PulseConfig.h"
 #include "types/evr/PulseConfigV3.h"
+#include "types/evr/SequencerConfigV1.h"
+#include "types/evr/SequencerEntry.h"
 
 #include "types/fccd/FccdConfigV1.h"
 #include "types/fccd/FccdConfigV2.h"
@@ -232,15 +236,19 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::EvrData::ConfigV2::initType( module );
   pypdsdata::EvrData::ConfigV3::initType( module );
   pypdsdata::EvrData::ConfigV4::initType( module );
+  pypdsdata::EvrData::ConfigV5::initType( module );
   pypdsdata::EvrData::DataV3::initType( module );
   pypdsdata::EvrData::DataV3_FIFOEvent::initType( module );
   pypdsdata::EvrData::EventCodeV3::initType( module );
   pypdsdata::EvrData::EventCodeV4::initType( module );
+  pypdsdata::EvrData::EventCodeV5::initType( module );
   pypdsdata::EvrData::IOChannel::initType( module );
   pypdsdata::EvrData::IOConfigV1::initType( module );
   pypdsdata::EvrData::OutputMap::initType( module );
   pypdsdata::EvrData::PulseConfig::initType( module );
   pypdsdata::EvrData::PulseConfigV3::initType( module );
+  pypdsdata::EvrData::SequencerConfigV1::initType( module );
+  pypdsdata::EvrData::SequencerEntry::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "evr", module );
 

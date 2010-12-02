@@ -1,4 +1,10 @@
 
+2010-12-01 - V00-00-21
+======================
+- upgrading to pdsdata V02-10-00
+- new classes evr/ConfigV5, evr/EventCodeV5, evr/SequencerConfigV1, 
+  evr/SequencerEntry
+
 2010-11-23 - V00-00-20
 ======================
 - improved printing of epics data types
