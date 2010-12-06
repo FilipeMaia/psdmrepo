@@ -7,7 +7,6 @@
 
 # release directory
 release=/reg/g/psdm/sw/releases/current
-release=/reg/neh/home/salnikov/releases/ic-0.2.22
 
 # log directory
 logdir=/reg/g/psdm/psdatmgr/ic/log

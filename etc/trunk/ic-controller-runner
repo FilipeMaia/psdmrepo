@@ -9,7 +9,7 @@
 translators=0
 
 # release directory
-release=/reg/g/psdm/sw/releases/0.2.22
+release=/reg/g/psdm/sw/releases/0.2.27
 #release=/reg/neh/home/salnikov/releases/ic-0.2.20
 
 # database options
@@ -17,7 +17,7 @@ conn_file=/reg/g/psdm/psdatmgr/ic/.icdb-conn
 
 # config section names to read from database
 #config="meta-db group-time compress no-split xtc-lustre"
-config="group-time compress no-split xtc-lustre l1-offset"
+config="group-time compress no-split xtc-lustre l1-offset calib-data"
 
 # log directory
 logdir=/reg/g/psdm/psdatmgr/ic/log
@@ -65,7 +65,7 @@ echo "Using configurations $config" >> "$log"
 cd "$release"
 
 # run setup script, it should guess everything based on the current directory
-. /reg/g/psdm/bin/lusi_setup.sh
+. /reg/g/psdm/bin/sit_setup.sh
 
 # set config options
 config_opt=""
