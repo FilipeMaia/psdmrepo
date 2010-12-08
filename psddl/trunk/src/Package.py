@@ -34,6 +34,7 @@ import sys
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
+from psddl.Namespace import Namespace
 
 #-----------------------------
 # Imports for other modules --
@@ -50,23 +51,15 @@ import sys
 #---------------------
 #  Class definition --
 #---------------------
-class Package ( object ) :
+class Package ( Namespace ) :
 
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, name ) :
-        self.name = name
-         
-        self.types = []
-        self.constants = []
-        self.enums = []
-
-    def findType(self, typename):
-        for t in types:
-            if t.name == typename : return t
-        return None
-    
+    def __init__ ( self, name, parent = None ) :
+        
+        Namespace.__init__(self, name, parent)
+        
     def __str__(self):
         return "<Package(" + self.name + ")>"
 

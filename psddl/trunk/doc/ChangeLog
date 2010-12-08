@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: andy-20101208-01
+2010-12-08 Andrei Salnikov
+- further development, introduced namespaces/lookup
+
 Tag: andy-20101027-01
 2010-10-27 Andrei Salnikov
 - First version with very limited functionality, development tag.

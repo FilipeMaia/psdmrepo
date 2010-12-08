@@ -39,11 +39,13 @@ import elementtree.ElementTree as ET
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from psddl.Package import Package
 from psddl.Attribute import Attribute
+from psddl.Constant import Constant
+from psddl.Enum import Enum
 from psddl.Method import Method
+from psddl.Namespace import Namespace
+from psddl.Package import Package
 from psddl.Type import Type
-from psddl.TypeLib import TypeLib
 
 #----------------------------------
 # Local non-exported definitions --
@@ -52,20 +54,6 @@ from psddl.TypeLib import TypeLib
 _const_tag = 'const'
 _enum_tag = 'enum'
 _enum_const_tag = 'enum-const'
-
-def _findType(typename, pkg):
-    
-    typelib = TypeLib()
-    
-    w = typename.rsplit('.', 1)
-    if len(w) > 1:
-        pkgname = '.'.join(w[:-1])
-        typename = w[-1]
-        pkg = typelib.findPackage(pkgname)
-        if not pkg : return None
-        return typelib.findType(typename, pkg)
-    else:
-        return typelib.findType(typename, pkg)
 
 #------------------------
 # Exported definitions --
@@ -90,9 +78,9 @@ class XmlReader ( object ) :
     def read( self ) :
         """Parse XML tree and return the list of packages"""
 
-        typelib = TypeLib()
-
-        model = []
+        # model is the global namespace
+        model = Package('')
+        self._initTypes(model)
 
         # read element tree from file
         et = ET.parse(self.file)
@@ -116,9 +104,7 @@ class XmlReader ( object ) :
             if not pkgname: raise ValueError('Package element missing name')
 
             # make package object
-            pkg = Package(pkgname)
-            model.append(pkg)
-            typelib.addPackage(pkg)
+            pkg = self._parsePackage(pkgname, model)
 
             for subpkgel in list(pkgel) :
 
@@ -145,8 +131,6 @@ class XmlReader ( object ) :
 
     def _parseType(self, typeel, pkg):
 
-        typelib = TypeLib()
-
         # every type must have a name
         typename = typeel.get('name')
         if not typename: raise ValueError('pstype element missing name')
@@ -161,8 +145,6 @@ class XmlReader ( object ) :
                     pack = typeel.get('pack'),
                     comment = typeel.text.strip(),
                     package = pkg )
-        pkg.types.append(type)
-        typelib.addType(type)
 
         # get attributes
         for propel in list(typeel) :
@@ -185,7 +167,7 @@ class XmlReader ( object ) :
                 # find type object
                 atypename = propel.get('type')
                 if not atypename: raise ValueError('attribute element missing type')
-                atype = _findType(atypename, pkg)
+                atype = pkg.lookup(atypename, Type)
                 if not atype: raise ValueError('attribute element has unknown type '+atypename)
 
                 # get offset, make a number from it if possible
@@ -200,7 +182,6 @@ class XmlReader ( object ) :
                                   comment = propel.text.strip(), 
                                   offset = attroffset,
                                   access = propel.get('access') )
-                type.attributes.append(attr)
 
                 # accessor method for it
                 accessor = propel.get('accessor')
@@ -209,7 +190,6 @@ class XmlReader ( object ) :
                                     attribute = attr, 
                                     parent = type, 
                                     type = None)
-                    type.methods.append(method)
 
             elif propel.tag == 'xtc-config' :
                 
@@ -218,7 +198,7 @@ class XmlReader ( object ) :
                 if not cfgname: raise ValueError('xtc-config element missing name')
                 
                 # find type for this name
-                cfg = _findType(cfgname, pkg)
+                cfg = pkg.lookup(cfgname, Type)
                 if not cfg: raise ValueError('unknown xtc-config name: '+cfgname)
                 
                 # add it to the list of config classes
@@ -241,16 +221,36 @@ class XmlReader ( object ) :
         if not cname: raise ValueError('const element missing name')
         cval = constel.get('value')
         if not cval: raise ValueError('const element missing value')
-        parent.constants.append((cname, cval))
+        Constant(cname, cval, parent)
             
     def _parseEnum(self, enumel, parent):
-            
-        enums = []
+        
+        enum = Enum(enumel.get('name'), parent)
         for econst in list(enumel):
             if econst.tag != _enum_const_tag : raise ValueError('expecting %s tag'%_enum_const_tag)
-            enums.append((econst.get('name'), econst.get('value')))
-        parent.enums.append((enumel.get('name'), enums))
+            Constant(econst.get('name'), econst.get('value'), enum)
 
+    def _parsePackage(self, pkgname, parent):
+        
+        pkg = parent
+        for name in pkgname.split('.'):
+            pkg = Package(name, pkg)
+        return pkg
+    
+    def _initTypes(self, ns):
+        """ Define few basic types in global namespace """
+        Type("char", size=1, align=1, package=ns)
+        Type("int8_t", size=1, align=1, package=ns)
+        Type("uint8_t", size=1, align=1, package=ns)
+        Type("int16_t", size=2, align=2, package=ns)
+        Type("uint16_t", size=2, align=2, package=ns)
+        Type("int32_t", size=4, align=4, package=ns)
+        Type("uint32_t", size=4, align=4, package=ns)
+        Type("int64_t", size=8, align=8, package=ns)
+        Type("uint64_t", size=8, align=8, package=ns)
+        Type("float", size=4, align=4, package=ns)
+        Type("double", size=8, align=8, package=ns)
+    
 #
 #  In case someone decides to run this module
 #

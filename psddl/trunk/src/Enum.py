@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module Method...
+#  Module Enum...
 #
 #------------------------------------------------------------------------
 
-"""DDL type describing type's methods.
+"""Class representing enum definition.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -34,6 +34,7 @@ import sys
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
+from psddl.Namespace import Namespace
 
 #-----------------------------
 # Imports for other modules --
@@ -50,24 +51,29 @@ import sys
 #---------------------
 #  Class definition --
 #---------------------
-class Method ( object ) :
+class Enum ( Namespace ) :
 
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, name, attribute, parent, type ) :
-        
-        self.name = name
-        self.attribute = attribute
-        self.parent = parent
+    def __init__ ( self, name, parent ) :
 
-        if self.parent: self.parent.add(self)
+        Namespace.__init__(self, name, parent)
 
     def __str__(self):
-        return "<Method(%s)>" % self.__dict__
+        res = "<Enum(" + self.name
+        for c in self.constants() :
+            res += ", "
+            res += c.name
+            if c.value:
+                res += " = "
+                res += str(c.value)
+        res += ")>"
+        return res
 
     def __repr__(self):
-        return "<Method(%s)>" % self.name
+        res = "<Enum(" + self.name + ")>"
+        return res
 
 
 #

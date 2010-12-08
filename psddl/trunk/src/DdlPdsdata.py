@@ -103,95 +103,11 @@ class DdlPdsdata ( object ) :
         # add necessary includes
         print >>self.inc, "#include \"pdsdata/xtc/TypeId.hh\"\n"
         print >>self.cpp, "#include \"%s\"\n" % os.path.basename(self.incname)
+        print >>self.cpp, "#include <cstddef>\n"
 
         # loop over packages in the model
-        for pkg in model :
-
-            # namespaces
-            nsname = pkg.name.split('.')
-            
-            # open namespaces
-            for ns in nsname : print >>self.inc, "namespace %s {" % ns
-            for ns in nsname : print >>self.cpp, "namespace %s {" % ns
-
-            # enums for constants
-            for const in pkg.constants :
-                print >>self.inc, "  enum {%s = %s};" % const
-
-            # regular enums
-            for enum in pkg.enums :
-                print >>self.inc, "  enum %s {" % (enum[0] or "",)
-                for const in enum[1]:
-                    val = ""
-                    if const[1] : val = " = " + const[1]
-                    print >>self.inc, "    %s%s," % (const[0], val)
-                print >>self.inc, "  };"
-                        
-
-            # loop over types/classes
-            for type in pkg.types :
-
-                # calculate offsets for the data members
-                self._calcOffsets(type)
-
-                # class-level comment
-                print >>self.inc, "\n/** Class: %s\n  %s\n*/\n" % (type.name, type.comment)
-
-                # declare config classes if needed
-                for cfg in type.xtcConfig:
-                    print >>self.inc, "class %s;" % cfg
-
-                # C++ needs pack pragma
-                if type.pack : 
-                    print >>self.inc, "#pragma pack(push,%s)" % type.pack
-
-                # start class declaration
-                print >>self.inc, "\nclass %s {\npublic:" % type.name
-
-                # enums for version and typeId
-                if type.version is not None: print >>self.inc, "  enum {Version = %s};" % type.version
-                if type.type_id is not None: print >>self.inc, "  enum {TypeId = Pds::TypeId::%s};" % type.type_id
-
-                # enums for constants
-                for const in type.constants :
-                    print >>self.inc, "  enum {%s = %s};" % const
-
-                # regular enums
-                for enum in type.enums :
-                    print >>self.inc, "  enum %s {" % (enum[0] or "",)
-                    for const in enum[1]:
-                        val = ""
-                        if const[1] : val = " = " + const[1]
-                        print >>self.inc, "    %s%s," % (const[0], val)
-                    print >>self.inc, "  };"
-                        
-                # data members
-                access = "public"
-                for attr in type.attributes:
-                    newaccess = attr.access or "private"
-                    if newaccess != access:
-                        print >>self.inc, "%s:" % newaccess
-                        access = newaccess
-                    self._genAttrDecl(attr)
-
-                # all methods
-                print >>self.inc, "public:"
-                for meth in type.methods:
-                    self._genMethDecl(meth)
-
-                # declaration/definition for next() methods
-                self._genNextDecl(type)
-
-                # close class declaration
-                print >>self.inc, "};"
-
-                # close pragma pack
-                if type.pack : 
-                    print >>self.inc, "#pragma pack(pop)"
-                
-            # close namespaces
-            for ns in nsname : print >>self.inc, "} // end namespace %s" % ns
-            for ns in nsname : print >>self.cpp, "} // end namespace %s" % ns
+        for pkg in model.packages() :
+            self._parsePackage(pkg)
 
         # close include guard
         print >>self.inc, "#endif //", self.guard
@@ -201,8 +117,99 @@ class DdlPdsdata ( object ) :
         self.cpp.close()
 
 
+    def _parsePackage(self, pkg):
+
+        # open namespaces
+        print >>self.inc, "namespace %s {" % pkg.name
+        print >>self.cpp, "namespace %s {" % pkg.name
+
+        # enums for constants
+        for const in pkg.constants() :
+            print >>self.inc, "  enum {%s = %s};" % const
+
+        # regular enums
+        for enum in pkg.enums() :
+            print >>self.inc, "  enum %s {" % (enum[0] or "",)
+            for const in enum[1]:
+                val = ""
+                if const[1] : val = " = " + const[1]
+                print >>self.inc, "    %s%s," % (const[0], val)
+            print >>self.inc, "  };"
+                    
+
+        # loop over types/classes
+        for type in pkg.types() :
+
+            # calculate offsets for the data members
+            self._calcOffsets(type)
+
+            # class-level comment
+            print >>self.inc, "\n/** Class: %s\n  %s\n*/\n" % (type.name, type.comment)
+
+            # declare config classes if needed
+            for cfg in type.xtcConfig:
+                print >>self.inc, "class %s;" % cfg
+
+            # C++ needs pack pragma
+            if type.pack : 
+                print >>self.inc, "#pragma pack(push,%s)" % type.pack
+
+            # start class declaration
+            print >>self.inc, "\nclass %s {\npublic:" % type.name
+
+            # enums for version and typeId
+            if type.version is not None: print >>self.inc, "  enum {Version = %s};" % type.version
+            if type.type_id is not None: print >>self.inc, "  enum {TypeId = Pds::TypeId::%s};" % type.type_id
+
+            # enums for constants
+            for const in type.constants() :
+                print >>self.inc, "  enum {%s = %s};" % (const.name, const.value)
+
+            # regular enums
+            for enum in type.enums() :
+                print >>self.inc, "  enum %s {" % (enum.name or "",)
+                for const in enum.constants() :
+                    val = ""
+                    if const.value is not None : val = " = " + const.value
+                    print >>self.inc, "    %s%s," % (const.name, val)
+                print >>self.inc, "  };"
+                    
+            # data members
+            access = "public"
+            for attr in type.attributes() :
+                newaccess = attr.access or "private"
+                if newaccess != access:
+                    print >>self.inc, "%s:" % newaccess
+                    access = newaccess
+                self._genAttrDecl(attr)
+
+            # all methods
+            if type.methods: print >>self.inc, "public:"
+            for meth in type.methods() :
+                self._genMethDecl(meth)
+
+            # declaration/definition for next() methods
+            self._genNextDecl(type)
+
+            # close class declaration
+            print >>self.inc, "};"
+
+            # close pragma pack
+            if type.pack : 
+                print >>self.inc, "#pragma pack(pop)"
+
+        # loop over packages
+        for spkg in pkg.packages() :
+            self._parsePackage(spkg)
+            
+        # close namespaces
+        print >>self.inc, "} // end namespace %s" % pkg.name
+        print >>self.cpp, "} // end namespace %s" % pkg.name
+
     def _genAttrDecl(self, attr):
         """Generate attribute declaration"""
+        
+        logging.debug("_genAttrDecl: attr: %s", attr)
         
         def _dims(shape):
             return ''.join(['[%s]'%d for d in shape.dims])
@@ -295,7 +302,7 @@ class DdlPdsdata ( object ) :
 
         offset = ExprVal(0)
         maxalign = 1
-        for attr in typeobj.attributes:
+        for attr in typeobj.attributes():
 
             logging.debug("_calcOffsets: offset=%s attr=%s", offset, attr)
 

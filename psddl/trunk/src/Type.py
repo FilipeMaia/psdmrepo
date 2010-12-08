@@ -34,6 +34,7 @@ import sys
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
+from psddl.Namespace import Namespace
 
 #-----------------------------
 # Imports for other modules --
@@ -50,28 +51,29 @@ import sys
 #---------------------
 #  Class definition --
 #---------------------
-class Type ( object ) :
+class Type ( Namespace ) :
 
     #----------------
     #  Constructor --
     #----------------
     def __init__ ( self, name, **kw ) :
+
+        parent = kw.get('package')
+        Namespace.__init__(self, name, parent)
+        
         self.name = name
         self.version = kw.get('version')
         self.type_id = kw.get('type_id')
         self.levels = kw.get('levels')
         self.comment = kw.get('comment')
-        self.package = kw.get('package')
+        self.package = parent
         self.size = kw.get('size')
         self.align = kw.get('align')
         self.pack = kw.get('pack')
         if self.pack : self.pack = int(self.pack)
         
-        self.enums = []
-        self.constants = []
         self.xtcConfig = []
-        self.attributes = []
-        self.methods = []
+
         self.repeat = None
 
     def __str__(self):

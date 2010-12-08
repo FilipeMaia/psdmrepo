@@ -40,21 +40,11 @@ import operator
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from psddl.TypeLib import TypeLib
+from psddl.Constant import Constant
 
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
-def _fqn(name):
-    """Returns tuple (prefix, name), prefix is everything before last dot"""
-    ns = name.rsplit('.',1)
-    if len(ns) > 1: return ns[0], ns[1]
-    return None, ns[0]
-
-def _constants(obj):
-    """Iterate over constant names defined in the objects context"""
-    for c in obj.constants:
-        yield c[0]
 
 #------------------------
 # Exported definitions --
@@ -79,6 +69,9 @@ class ExprVal ( object ) :
     #-------------------
 
     def __str__(self):
+        return str(self.value)
+    
+    def __repr__(self):
         return str(self.value)
     
     def _genop(self, other, op, strop):
@@ -131,35 +124,9 @@ class ExprVal ( object ) :
         # integer value is constant
         if type(self.value) == types.IntType: return True
         
-        typelib = TypeLib()
-        
         # if expression is a constant then it's fixed
-        prefix, name = _fqn(self.value)
-        if prefix:
-            
-            pkgname, typename = _fqn(prefix)
-            
-            if pkgname:
-                
-                # Try typename in a package
-                atype = typelib.findType(typename, pkgname)
-                if atype and name in _costants(atype) : return True
-
-            else:
-                
-                # use whole prefix as a type name in the context of current packag
-                atype = typelib.findType(typename, typeobj.package)
-                if atype and name in _costants(atype) : return True
-                 
-            # try to use whole prefix as package name
-            pkg = typelib.findPackage(prefix)
-            if pkg and name in _costants(pkg) : return True
-            
-        else:
-            
-            # Find constant in the attribute's type
-            if name in _constants(typeobj) : return True
-            if name in _constants(typeobj.package) : return True
+        if typeobj.lookup(self.value, Constant) is not None:
+            return True
                 
         return False
 
