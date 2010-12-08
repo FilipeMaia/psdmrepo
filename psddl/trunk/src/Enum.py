@@ -56,9 +56,11 @@ class Enum ( Namespace ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, name, parent ) :
+    def __init__ ( self, name, parent, **kw ) :
 
         Namespace.__init__(self, name, parent)
+
+        self.external = kw.get('external')
 
     def __str__(self):
         res = "<Enum(" + self.name

@@ -89,7 +89,7 @@ class Attribute ( object ) :
         number or expression"""
         size = ExprVal(self.type.size)
         if size.value is None:
-            size = ExprVal("sizeof(%s)" % self.type)
+            size = ExprVal("sizeof(%s)" % self.type.name)
         if self.dimensions:
             size *= self.dimensions.size()
         return size

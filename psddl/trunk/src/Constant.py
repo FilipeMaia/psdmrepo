@@ -57,11 +57,12 @@ class Constant ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, name, value, parent ) :
+    def __init__ ( self, name, value, parent, **kw ) :
         
         self.name = name
         self.value = value
         self.parent = parent
+        self.external = kw.get('external')
 
         if self.parent: self.parent.add(self)
     

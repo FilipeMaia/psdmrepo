@@ -42,6 +42,8 @@ import types
 # Imports for other modules --
 #-----------------------------
 from psddl.ExprVal import ExprVal
+from psddl.Package import Package
+from psddl.Type import Type
 
 #----------------------------------
 # Local non-exported definitions --
@@ -53,6 +55,10 @@ def _interpolate(expr, typeobj):
     expr = expr.replace('{type}.', typeobj.name+"::")
     expr = expr.replace('{self}.', "this->")
     return expr
+
+def _typename(type):
+    
+    return type.fullName().replace('.', '::')
 
 #------------------------
 # Exported definitions --
@@ -105,8 +111,14 @@ class DdlPdsdata ( object ) :
         print >>self.cpp, "#include \"%s\"\n" % os.path.basename(self.incname)
         print >>self.cpp, "#include <cstddef>\n"
 
+        # headers for other included packages
+        for use in model.use:
+            header = os.path.splitext(use)[0] + '.hh'
+            print >>self.inc, "#include \"%s\"" % header
+
         # loop over packages in the model
         for pkg in model.packages() :
+            logging.debug("parseTree: package=%s", repr(pkg))
             self._parsePackage(pkg)
 
         # close include guard
@@ -121,90 +133,94 @@ class DdlPdsdata ( object ) :
 
         # open namespaces
         print >>self.inc, "namespace %s {" % pkg.name
-        print >>self.cpp, "namespace %s {" % pkg.name
 
         # enums for constants
         for const in pkg.constants() :
-            print >>self.inc, "  enum {%s = %s};" % const
+            if not const.external :
+                print >>self.inc, "  enum {%s = %s};" % (const.name, const.value)
 
         # regular enums
         for enum in pkg.enums() :
-            print >>self.inc, "  enum %s {" % (enum[0] or "",)
-            for const in enum[1]:
-                val = ""
-                if const[1] : val = " = " + const[1]
-                print >>self.inc, "    %s%s," % (const[0], val)
-            print >>self.inc, "  };"
-                    
-
-        # loop over types/classes
-        for type in pkg.types() :
-
-            # calculate offsets for the data members
-            self._calcOffsets(type)
-
-            # class-level comment
-            print >>self.inc, "\n/** Class: %s\n  %s\n*/\n" % (type.name, type.comment)
-
-            # declare config classes if needed
-            for cfg in type.xtcConfig:
-                print >>self.inc, "class %s;" % cfg
-
-            # C++ needs pack pragma
-            if type.pack : 
-                print >>self.inc, "#pragma pack(push,%s)" % type.pack
-
-            # start class declaration
-            print >>self.inc, "\nclass %s {\npublic:" % type.name
-
-            # enums for version and typeId
-            if type.version is not None: print >>self.inc, "  enum {Version = %s};" % type.version
-            if type.type_id is not None: print >>self.inc, "  enum {TypeId = Pds::TypeId::%s};" % type.type_id
-
-            # enums for constants
-            for const in type.constants() :
-                print >>self.inc, "  enum {%s = %s};" % (const.name, const.value)
-
-            # regular enums
-            for enum in type.enums() :
+            if not enum.external :
                 print >>self.inc, "  enum %s {" % (enum.name or "",)
-                for const in enum.constants() :
+                for const in enum.constants():
                     val = ""
                     if const.value is not None : val = " = " + const.value
                     print >>self.inc, "    %s%s," % (const.name, val)
                 print >>self.inc, "  };"
-                    
-            # data members
-            access = "public"
-            for attr in type.attributes() :
-                newaccess = attr.access or "private"
-                if newaccess != access:
-                    print >>self.inc, "%s:" % newaccess
-                    access = newaccess
-                self._genAttrDecl(attr)
 
-            # all methods
-            if type.methods: print >>self.inc, "public:"
-            for meth in type.methods() :
-                self._genMethDecl(meth)
-
-            # declaration/definition for next() methods
-            self._genNextDecl(type)
-
-            # close class declaration
-            print >>self.inc, "};"
-
-            # close pragma pack
-            if type.pack : 
-                print >>self.inc, "#pragma pack(pop)"
-
-        # loop over packages
-        for spkg in pkg.packages() :
-            self._parsePackage(spkg)
+        # loop over packages and types
+        for ns in pkg.namespaces() :
             
+            if isinstance(ns, Package) :
+                
+                self._parsePackage(ns)
+            
+            elif isinstance(ns, Type) :
+    
+                type = ns
+                logging.debug("_parsePackage: type=%s", repr(type))
+    
+                # skip external methods
+                if type.external : continue
+    
+                # class-level comment
+                print >>self.inc, "\n/** Class: %s\n  %s\n*/\n" % (type.name, type.comment)
+    
+                # declare config classes if needed
+                for cfg in type.xtcConfig:
+                    print >>self.inc, "class %s;" % cfg
+    
+                # C++ needs pack pragma
+                if type.pack : 
+                    print >>self.inc, "#pragma pack(push,%s)" % type.pack
+    
+                # start class declaration
+                print >>self.inc, "\nclass %s {\npublic:" % type.name
+    
+                # enums for version and typeId
+                if type.version is not None: print >>self.inc, "  enum {Version = %s};" % type.version
+                if type.type_id is not None: print >>self.inc, "  enum {TypeId = Pds::TypeId::%s};" % type.type_id
+    
+                # enums for constants
+                for const in type.constants() :
+                    print >>self.inc, "  enum {%s = %s};" % (const.name, const.value)
+    
+                # regular enums
+                for enum in type.enums() :
+                    print >>self.inc, "  enum %s {" % (enum.name or "",)
+                    for const in enum.constants() :
+                        val = ""
+                        if const.value is not None : val = " = " + const.value
+                        print >>self.inc, "    %s%s," % (const.name, val)
+                    print >>self.inc, "  };"
+                        
+                # data members
+                access = "public"
+                for attr in type.attributes() :
+                    newaccess = attr.access or "private"
+                    if newaccess != access:
+                        print >>self.inc, "%s:" % newaccess
+                        access = newaccess
+                    self._genAttrDecl(attr)
+    
+                # all methods
+                if type.methods: print >>self.inc, "public:"
+                for meth in type.methods() :
+                    self._genMethDecl(meth)
+    
+                # declaration/definition for next() methods
+                self._genNextDecl(type)
+    
+                # close class declaration
+                print >>self.inc, "};"
+    
+                # close pragma pack
+                if type.pack : 
+                    print >>self.inc, "#pragma pack(pop)"
+
         # close namespaces
-        print >>self.inc, "} // end namespace %s" % pkg.name
-        print >>self.cpp, "} // end namespace %s" % pkg.name
+        print >>self.inc, "} // namespace %s" % pkg.name
 
     def _genAttrDecl(self, attr):
         """Generate attribute declaration"""
@@ -215,13 +231,13 @@ class DdlPdsdata ( object ) :
             return ''.join(['[%s]'%d for d in shape.dims])
         
         if not attr.dimensions :
-            decl = "  %s\t%s;" % (attr.type.name, attr.name)
+            decl = "  %s\t%s;" % (_typename(attr.type), attr.name)
         elif attr.isfixed():
             dim = _interpolate(_dims(attr.dimensions), attr.parent)
-            decl = "  %s\t%s%s;" % (attr.type.name, attr.name, dim)
+            decl = "  %s\t%s%s;" % (_typename(attr.type), attr.name, dim)
         else :
             dim = _interpolate(_dims(attr.dimensions), attr.parent)
-            decl = "  //%s\t%s%s;" % (attr.type.name, attr.name, dim)
+            decl = "  //%s\t%s%s;" % (_typename(attr.type), attr.name, dim)
         if attr.comment : decl += "\t/** %s */" % attr.comment.strip()
         print >>self.inc, decl
 
@@ -232,9 +248,9 @@ class DdlPdsdata ( object ) :
         attr = meth.attribute
         if attr:
             if not attr.dimensions:
-                print >>self.inc, "  %s %s() const { return %s; }" % (attr.type.name, meth.name, attr.name)
+                print >>self.inc, "  %s %s() const { return %s; }" % (_typename(attr.type), meth.name, attr.name)
             elif attr.isfixed():
-                print >>self.inc, "  const %s* %s() const { return %s; }" % (attr.type.name, meth.name, attr.name)
+                print >>self.inc, "  const %s* %s() const { return %s; }" % (_typename(attr.type), meth.name, attr.name)
             else :
                 
                 offset = str(attr.offset)
@@ -247,11 +263,11 @@ class DdlPdsdata ( object ) :
                         raise ValueError('xtc-config is not defined')
                     
                     for cfg in meth.parent.xtcConfig:
-                        self._genAccessMethod(meth.parent.name, meth.name, attr.type.name, offset, cfg)
+                        self._genAccessMethod(_typename(meth.parent), meth.name, _typename(attr.type), offset, cfg)
 
                 else:
                     
-                    self._genAccessMethod(meth.parent.name, meth.name, attr.type.name, offset)
+                    self._genAccessMethod(_typename(meth.parent), meth.name, _typename(attr.type), offset)
 
         else:
             print >>self.inc, "  %s %s() const;" % (meth.type, meth.name)
@@ -289,104 +305,12 @@ class DdlPdsdata ( object ) :
                 raise ValueError('xtc-config is not defined')
 
             for cfg in typeobj.xtcConfig:
-                self._genAccessMethod(typeobj.name, "next", typeobj.name, objSize, cfg)
+                self._genAccessMethod(_typename(typeobj), "next", _typename(typeobj), objSize, cfg)
 
         else:
-            self._genAccessMethod(typeobj.name, "next", typeobj.name, objSize)
+            self._genAccessMethod(_typename(typeobj), "next", _typename(typeobj), objSize)
 
 
-    def _calcOffsets(self, typeobj):
-        """Calculate offsets for all members of the type"""
-
-        logging.debug("_calcOffsets: type=%s", typeobj)
-
-        offset = ExprVal(0)
-        maxalign = 1
-        for attr in typeobj.attributes():
-
-            logging.debug("_calcOffsets: offset=%s attr=%s", offset, attr)
-
-            align = attr.align()
-            if align : maxalign = max(maxalign, align)
-
-            if attr.offset is None:
-                
-                # need to calculate offset for this attribute
-            
-                if type(offset.value) == types.IntType:
-                
-                    # no explicit offset - use implicit but check alignment
-                    align = attr.align()
-                    if align is None:
-                        logging.warning('unknown alignment for %s %s.%s', attr.type.name, typeobj.name, attr.name)
-                    else :
-                        if typeobj.pack: align = min(align, typeobj.pack)
-                        if offset.value % align != 0:
-                            logging.error('unaligned attribute %s %s.%s', attr.type.name, typeobj.name, attr.name)
-                            logging.error('implicit offset = %s, alignment = %s', offset, align)
-                            logging.error('use pack="N" or add padding attributes')
-                            raise TypeError('%s.%s unaligned attribute' % (typeobj.name, attr.name))
-    
-                    attr.offset = offset
-
-                else:
-    
-                    # attribute has no offset defined, current offset is an expression
-                    # no way now to evaluate expression and check it's alignment, so we 
-                    # just accept 
-                    attr.offset = offset
-
-            else:
-
-                # attribute already has an offset defined
-
-                if type(attr.offset) is types.IntType and type(offset.value) is types.IntType:
-                    
-                    if attr.offset < offset.value :
-                        logging.error('offset specification mismatch for %s.%s', typeobj.name, attr.name)
-                        logging.error('implicit offset = %s, explicit offset = %s', offset, attr.offset)
-                        raise TypeError('%s.%s offset mismatch' % (typeobj.name, attr.name))
-                    elif attr.offset > offset.value :
-                        # need padding
-                        pad = attr.offset - offset
-                        logging.error('extra padding needed before %s.%s', typeobj.name, attr.name)
-                        raise TypeError('%s.%s extra padding needed' % (typeobj.name, attr.name))
-                    else:
-                        # this is what we expect
-                        pass
-
-                else:
-                    
-                    # at least one of them is an expression, currently there is no way 
-                    # to verify that two expressions are the same
-                    
-                    logging.warning('%s.%s has pre-defined offset, make sure it has right value', typeobj.name, attr.name)
-                    logging.warning('pre-defined offset = %s, computed offset = %s', attr.offset, offset)
-
-                    # safer to reset offset to a pre-defined value
-                    offset = ExprVal(attr.offset)
-
-            # move to a next attribute
-            offset = offset+attr.sizeBytes()
-
-        if typeobj.pack: maxalign = min(maxalign, typeobj.pack)
-        logging.debug("_calcOffsets: type=%s size=%s align=%s", repr(typeobj), offset, maxalign)
-        typeobj.align = maxalign
-        
-        if typeobj.size:
-            # size was already pre-defined
-            if type(typeobj.size) is types.IntType and type(offset.value) is types.IntType:
-                if typeobj.size != offset.value :
-                    logging.error('object size mismatch for %s', typeobj.name)
-                    logging.error('implicit size = %d, explicit size = %d', offset, typeobj.size)
-                    raise TypeError('%s size mismatch' % typeobj.name)
-            else:
-                logging.warning('%s has pre-defined size, make sure it has right value', typeobj.name)
-                logging.warning('pre-defined size = %s, computed size = %s', typeobj.size, offset)
-        else:
-            
-            # set it to calculate value
-            typeobj.size = offset
 
 #
 #  In case someone decides to run this module

@@ -77,7 +77,7 @@ class Namespace ( object ) :
     def add(self, obj):
         """ Adds one more object to a namespace, name must not exist yet """
 
-        logging.debug('adding name %s to namespace %s', obj.name, self.fullName())
+        logging.debug('Namespace.add: adding name %s to namespace %s', obj.name, self.fullName())
         
         if self._children.get(obj.name) is not None :
             raise KeyError('name %s already defined in namespace %s' % (obj.name, self.fullName()))
@@ -118,6 +118,12 @@ class Namespace ( object ) :
         
         return obj
         
+    def localName(self, name):
+        return self._children.get(name)
+
+    def namespaces(self):
+        return self.__objects(Namespace)
+
     def packages(self):
         from psddl.Package import Package
         return self.__objects(Package)

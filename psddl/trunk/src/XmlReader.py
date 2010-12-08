@@ -30,7 +30,10 @@ __version__ = "$Revision$"
 #  Imports of standard modules --
 #--------------------------------
 import sys
+import os
+import os.path
 import elementtree.ElementTree as ET
+import logging
 
 #---------------------------------
 #  Imports of base class module --
@@ -67,23 +70,35 @@ class XmlReader ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, xmlfile ) :
+    def __init__ ( self, xmlfiles, inc_dir ) :
         
-        self.file = xmlfile
+        self.files = xmlfiles
+        self.inc_dir = inc_dir
+        
+        self.included = []
 
     #-------------------
     #  Public methods --
     #-------------------
 
     def read( self ) :
-        """Parse XML tree and return the list of packages"""
 
         # model is the global namespace
         model = Package('')
         self._initTypes(model)
 
+        for file in self.files:
+            self._readFile( file, model, False )
+
+        # return the model
+        return model
+
+
+    def _readFile( self, file, model, external ) :
+        """Parse XML tree and return the list of packages"""
+
         # read element tree from file
-        et = ET.parse(self.file)
+        et = ET.parse(file)
         
         # get root element
         root = et.getroot() 
@@ -93,43 +108,81 @@ class XmlReader ( object ) :
             raise TypeError('Root element must be psddl and not '+root.tag)
         
         # scan its direct children
-        for pkgel in list(root) :
+        for topel in list(root) :
 
             # all children must be packages
-            if pkgel.tag != 'package' : 
-                raise TypeError('Root element must be contain packages and not '+pkgel.tag)
-            
-            # package must have a name
-            pkgname = pkgel.get('name')
-            if not pkgname: raise ValueError('Package element missing name')
-
-            # make package object
-            pkg = self._parsePackage(pkgname, model)
-
-            for subpkgel in list(pkgel) :
-
-                # package children can be types, constants or enums
-                if subpkgel.tag == 'pstype' :
-
-                    self._parseType(subpkgel, pkg)
-
-                elif subpkgel.tag == _const_tag :
-
-                    self._parseConstant(subpkgel, pkg)
-
-                elif subpkgel.tag == _enum_tag :
-
-                    self._parseEnum(subpkgel, pkg)
-
-                else:
-                    
-                    raise TypeError('Package contains unexpected element: '+subpkgel.tag)
+            if topel.tag == 'package' : 
+                
+                self._parsePackage(topel, model, external)
+                
+            elif topel.tag == 'use' : 
+                
+                self._parseUse(topel, model, external)
+                
+            else:
+                
+                raise TypeError('Unexpected element in the root document: '+repr(topel.tag))
 
 
-        # return the model
-        return model
 
-    def _parseType(self, typeel, pkg):
+    def _parseUse(self, useel, model, external):
+
+        file = useel.get('file')
+        
+        if file in self.included :
+            logging.debug("XmlReader._parseUse: file %s was already included", file)
+            return
+
+        logging.debug("XmlReader._parseUse: locating file %s", file)
+        path = self._findInclude(file)
+        if path is None:
+            raise ValueError("Cannot find include file: "+file)
+        logging.debug("XmlReader._parseUse: found file %s", path)
+
+        model.use.append(file)
+
+        logging.debug("XmlReader._parseUse: reading file %s", path)
+        self._readFile( path, model, True )
+
+    def _parsePackage(self, pkgel, model, external):
+        
+        # package must have a name
+        pkgname = pkgel.get('name')
+        if not pkgname: raise ValueError('Package element missing name')
+
+        # make package object if it does not exist yet
+        pkg = model
+        for name in pkgname.split('.'):
+            obj = pkg.localName(name)
+            if obj is None:
+                pkg = Package(name, pkg)
+            else:
+                # make sure that existing name is a package
+                if not isinstance(obj, Package):
+                    raise ValueError('Package %s already contains name: %s ' % (pkg.name,name) )
+                pkg = obj
+
+        for subpkgel in list(pkgel) :
+
+            # package children can be types, constants or enums
+            if subpkgel.tag == 'pstype' :
+
+                self._parseType(subpkgel, pkg, external)
+
+            elif subpkgel.tag == _const_tag :
+
+                self._parseConstant(subpkgel, pkg, external)
+
+            elif subpkgel.tag == _enum_tag :
+
+                self._parseEnum(subpkgel, pkg, external)
+
+            else:
+                
+                raise TypeError('Package contains unexpected element: '+subpkgel.tag)
+
+
+    def _parseType(self, typeel, pkg, external):
 
         # every type must have a name
         typename = typeel.get('name')
@@ -144,19 +197,20 @@ class XmlReader ( object ) :
                     total_size = typeel.get('total-size'),
                     pack = typeel.get('pack'),
                     comment = typeel.text.strip(),
-                    package = pkg )
+                    package = pkg,
+                    external = external )
 
         # get attributes
         for propel in list(typeel) :
 
             if propel.tag == _const_tag :
                 
-                self._parseConstant(propel, type)
+                self._parseConstant(propel, type, external)
                 
                 
             elif propel.tag == 'enum' :
                 
-                self._parseEnum(propel, type)
+                self._parseEnum(propel, type, external)
                 
             elif propel.tag == 'attribute' :
         
@@ -213,30 +267,37 @@ class XmlReader ( object ) :
                 # add it to the list of config classes
                 type.repeat = count
                 
+        # calculate offsets for the data members
+        type.calcOffsets()
+    
                         
-    def _parseConstant(self, constel, parent):
+    def _parseConstant(self, constel, parent, external):
 
         # every constant must have a name and value
         cname = constel.get('name')
         if not cname: raise ValueError('const element missing name')
         cval = constel.get('value')
         if not cval: raise ValueError('const element missing value')
-        Constant(cname, cval, parent)
+        Constant(cname, cval, parent, external=external)
             
-    def _parseEnum(self, enumel, parent):
+    def _parseEnum(self, enumel, parent, external):
         
-        enum = Enum(enumel.get('name'), parent)
+        enum = Enum(enumel.get('name'), parent, external=external)
         for econst in list(enumel):
             if econst.tag != _enum_const_tag : raise ValueError('expecting %s tag'%_enum_const_tag)
             Constant(econst.get('name'), econst.get('value'), enum)
 
-    def _parsePackage(self, pkgname, parent):
+    def _findInclude(self, inc):
         
-        pkg = parent
-        for name in pkgname.split('.'):
-            pkg = Package(name, pkg)
-        return pkg
-    
+        # look in every directory in include path
+        for dir in self.inc_dir:            
+            path = os.path.join(dir, inc)
+            if  os.path.isfile(path):
+                return path
+        
+        # Not found
+        return None
+
     def _initTypes(self, ns):
         """ Define few basic types in global namespace """
         Type("char", size=1, align=1, package=ns)

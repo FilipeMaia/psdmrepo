@@ -55,14 +55,17 @@ class psddlc ( LusiPyApp ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] input-file" )
+        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] input-file ..." )
         
         self._parser.set_defaults(pdsdata=False,
                                   header=None,
-                                  output=None)
+                                  output=None,
+                                  include_dir=[])
         
         self._parser.add_option("-p", "--pdsdata", action="store_true", 
                                 help="generate output for pdsdata")
+        self._parser.add_option("-I", "--include-dir",  action="append",
+                                help="directory to search for included files", metavar="PATH")
         self._parser.add_option("-d", "--header",  
                                 help="output file name for header/declarations", metavar="PATH")
         self._parser.add_option("-o", "--output",  
@@ -76,12 +79,12 @@ class psddlc ( LusiPyApp ) :
     def _run ( self ) :
 
         # check the arguments
-        if len(self._args) != 1:
-            self._parser.error("one argument is required")
+        if not self._args:
+            self._parser.error("one or more arguments required")
             return 2
 
-        input = self._args[0]
-        base = os.path.basename(input)
+        input = self._args
+        base = os.path.basename(input[0])
 
         header = self._options.header
         source = self._options.output
@@ -94,7 +97,7 @@ class psddlc ( LusiPyApp ) :
             generator = DdlPdsdata(header, source)
 
         try :
-            reader = XmlReader(input)
+            reader = XmlReader(input, self._options.include_dir)
             model = reader.read()
         except Exception, ex:
             print >>sys.stderr, "parsing failed for file", input

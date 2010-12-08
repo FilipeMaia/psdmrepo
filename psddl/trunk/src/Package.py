@@ -60,6 +60,8 @@ class Package ( Namespace ) :
         
         Namespace.__init__(self, name, parent)
         
+        self.use = []
+        
     def __str__(self):
         return "<Package(" + self.name + ")>"
 
