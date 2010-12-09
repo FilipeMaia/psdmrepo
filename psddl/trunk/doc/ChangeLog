@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: andy-20101209-01
+2010-12-09 Andrei Salnikov
+- adding bitfield support
+
 Tag: andy-20101208-02
 2010-12-08 Andrei Salnikov
 - added "use" directive to import types from other files

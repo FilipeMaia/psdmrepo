@@ -68,7 +68,7 @@ class Shape ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, val, attr ) :
+    def __init__ ( self, val, ns ) :
         """Constructor takes the ready tuple, list or a string"""
         
         if type(val) is type(()) :
@@ -78,7 +78,7 @@ class Shape ( object ) :
         else:
             self.dims = tuple(_dims(val))
 
-        self.attr = attr
+        self.ns = ns
 
     #-------------------
     #  Public methods --
@@ -88,7 +88,7 @@ class Shape ( object ) :
         """Return true if all dimensions have fixed size"""
         for dim in self.dims:
             expr = ExprVal(dim)
-            if not expr.isconst(self.attr.parent): return False
+            if not expr.isconst(self.ns): return False
         return True
 
     def size(self):

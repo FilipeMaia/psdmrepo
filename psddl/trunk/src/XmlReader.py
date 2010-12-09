@@ -43,6 +43,7 @@ import logging
 # Imports for other modules --
 #-----------------------------
 from psddl.Attribute import Attribute
+from psddl.Bitfield import Bitfield
 from psddl.Constant import Constant
 from psddl.Enum import Enum
 from psddl.Method import Method
@@ -213,37 +214,8 @@ class XmlReader ( object ) :
                 self._parseEnum(propel, type, external)
                 
             elif propel.tag == 'attribute' :
-        
-                # every attribute must have a name
-                attrname = propel.get('name')
-                if not attrname: raise ValueError('attribute element missing name')
                 
-                # find type object
-                atypename = propel.get('type')
-                if not atypename: raise ValueError('attribute element missing type')
-                atype = pkg.lookup(atypename, Type)
-                if not atype: raise ValueError('attribute element has unknown type '+atypename)
-
-                # get offset, make a number from it if possible
-                attroffset = propel.get('offset')
-                if attroffset and attroffset.isdigit(): attroffset = int(attroffset)
-
-                # create attribute
-                attr = Attribute( attrname,
-                                  type = atype,
-                                  parent = type, 
-                                  dimensions = propel.get('dimensions'), 
-                                  comment = propel.text.strip(), 
-                                  offset = attroffset,
-                                  access = propel.get('access') )
-
-                # accessor method for it
-                accessor = propel.get('accessor')
-                if accessor :
-                    method = Method(accessor, 
-                                    attribute = attr, 
-                                    parent = type, 
-                                    type = None)
+                self._parseAttr(propel, type)
 
             elif propel.tag == 'xtc-config' :
                 
@@ -270,6 +242,74 @@ class XmlReader ( object ) :
         # calculate offsets for the data members
         type.calcOffsets()
     
+
+    def _parseAttr(self, attrel, type):
+    
+        # every attribute must have a name
+        attrname = attrel.get('name')
+        if not attrname: raise ValueError('attribute element missing name')
+        
+        # find type object
+        atypename = attrel.get('type')
+        if not atypename: raise ValueError('attribute element missing type')
+        atype = type.lookup(atypename, Type)
+        if not atype: raise ValueError('attribute element has unknown type '+atypename)
+
+        # get offset, make a number from it if possible
+        attroffset = attrel.get('offset')
+        if attroffset and attroffset.isdigit(): attroffset = int(attroffset)
+
+        # create attribute
+        attr = Attribute( attrname,
+                          type = atype,
+                          parent = type, 
+                          dimensions = attrel.get('dimensions'), 
+                          comment = attrel.text.strip(), 
+                          offset = attroffset,
+                          access = attrel.get('access') )
+        logging.debug("XmlReader._parseAttr: new attribute: %s", attr)
+
+        # accessor method for it
+        accessor = attrel.get('accessor')
+        if accessor :
+            method = Method(accessor, 
+                            attribute = attr, 
+                            parent = type, 
+                            type = atype,
+                            comment = attr.comment)
+            logging.debug("XmlReader._parseAttr: new method: %s", method)
+
+        # get bitfields
+        bfoff = 0
+        for bitfel in list(attrel) :
+            
+            if bitfel.tag == "bitfield" :
+
+                size = int(bitfel.get('size'))
+                bftypename = bitfel.get('type', atypename)
+                bftype = type.lookup(bftypename, (Type, Enum))
+                if not bftype: raise ValueError('attribute bitfield has unknown type '+bftypename)
+
+                
+                bf = Bitfield(bitfel.get('name'), 
+                              offset = bfoff, 
+                              size = size,
+                              parent = attr,
+                              type = bftype,
+                              comment = bitfel.text.strip() )
+                logging.debug("XmlReader._parseAttr: new bitfield: %s", bf)
+                bfoff += size
+                
+                accessor = bitfel.get('accessor')
+                if accessor :
+                    method = Method(accessor, 
+                                    bitfield = bf, 
+                                    parent = type, 
+                                    type = bftype,
+                                    comment = bf.comment)
+                    logging.debug("XmlReader._parseAttr: new method: %s", method)
+
+
                         
     def _parseConstant(self, constel, parent, external):
 

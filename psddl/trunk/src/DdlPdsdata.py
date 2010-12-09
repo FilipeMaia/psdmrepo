@@ -269,6 +269,24 @@ class DdlPdsdata ( object ) :
                     
                     self._genAccessMethod(_typename(meth.parent), meth.name, _typename(attr.type), offset)
 
+        elif meth.bitfield:
+
+            bf = meth.bitfield
+            expr = bf.expr()
+            cfgNeeded = expr.find('{xtc-config}') >= 0
+            expr = _interpolate(expr, meth.parent)
+
+            if cfgNeeded :
+
+                if not meth.parent.xtcConfig :
+                    raise ValueError('xtc-config is not defined')
+                
+                for cfg in meth.parent.xtcConfig:
+                    self._genMethodExpr(meth.name, _typename(meth.type), expr, cfg)
+
+            else:
+                self._genMethodExpr(meth.name, _typename(meth.type), expr)
+
         else:
             print >>self.inc, "  %s %s() const;" % (meth.type, meth.name)
 
@@ -286,6 +304,18 @@ class DdlPdsdata ( object ) :
         print >>self.cpp, "  ptrdiff_t offset=%s;" % (offset,)
         print >>self.cpp, "  return (const %s*)(((const char*)this)+offset);" % (rettype,)  
         print >>self.cpp, "}\n"
+
+
+    def _genMethodExpr(self, methname, rettype, expr, cfg=None):
+        
+        if cfg:
+            cfg = "const %s& cfg" % cfg
+        else:
+            cfg = ""
+        
+        print >>self.inc, "  %s %s(%s) const {" % (rettype, methname, cfg)
+        print >>self.inc, "    return %s(%s);" % (rettype, expr)
+        print >>self.inc, "  }\n"
 
         
 

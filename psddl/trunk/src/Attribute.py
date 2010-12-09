@@ -71,10 +71,12 @@ class Attribute ( object ) :
         self.parent = kw.get('parent')
         self.dimensions = kw.get('dimensions')
         if self.dimensions: 
-            self.dimensions = Shape(self.dimensions, self)
+            self.dimensions = Shape(self.dimensions, self.parent)
         self.comment = kw.get('comment')
         self.offset = kw.get('offset')
         self.access = kw.get('access')
+
+        self.bitfields = []
 
         if self.parent: self.parent.add(self)
 

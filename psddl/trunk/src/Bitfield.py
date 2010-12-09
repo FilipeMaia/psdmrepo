@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module Method...
+#  Module Bitfield...
 #
 #------------------------------------------------------------------------
 
-"""DDL type describing type's methods.
+"""Class representing bitfield definition
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -35,6 +35,7 @@ import sys
 #  Imports of base class module --
 #---------------------------------
 
+
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
@@ -50,27 +51,39 @@ import sys
 #---------------------
 #  Class definition --
 #---------------------
-class Method ( object ) :
+class Bitfield ( object ) :
 
     #----------------
     #  Constructor --
     #----------------
     def __init__ ( self, name, **kw ) :
-        
+
         self.name = name
+        self.offset = kw.get('offset')
+        self.size = kw.get('size')
         self.type = kw.get('type')
         self.parent = kw.get('parent')
-        self.attribute = kw.get('attribute')
-        self.bitfield = kw.get('bitfield')
         self.comment = kw.get('comment')
 
-        if self.parent: self.parent.add(self)
+        self.parent.bitfields.append(self)
+
+    @property
+    def bitmask(self):
+        return (1<<self.size)-1
+
+    def expr(self):
+        
+        expr = "{self}."+self.parent.name
+        if self.offset > 0 :
+            expr = "(%s>>%d)" % (expr, self.offset)
+        expr = "(%s & %#x)" % (expr, self.bitmask)
+        return expr
 
     def __str__(self):
-        return "<Method(%s)>" % self.__dict__
+        return "<Bitfield(%s)>" % self.__dict__
 
     def __repr__(self):
-        return "<Method(%s)>" % self.name
+        return "<Bitfield(%s)>" % self.name
 
 
 #
