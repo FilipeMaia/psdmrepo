@@ -15,7 +15,7 @@
 //-----------------
 #include <string>
 #include <map>
-#include <iostream>
+#include <iosfwd>
 
 //----------------------
 // Base Class Headers --
@@ -52,8 +52,9 @@ namespace ConfigSvc {
 class ConfigSvcImplFile : public ConfigSvcImplI {
 public:
 
-  // Default constructor
-  ConfigSvcImplFile (const std::string file) ;
+  // Constructor
+  ConfigSvcImplFile (const std::string& file) ;
+  ConfigSvcImplFile (std::istream& stream, const std::string& file="<stream>") ;
 
   // Destructor
   virtual ~ConfigSvcImplFile () ;

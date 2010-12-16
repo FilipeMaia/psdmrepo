@@ -88,10 +88,19 @@ struct ConfigSvcTypeTraits<bool> {
 template <>
 struct ConfigSvcTypeTraits<std::string> {
   
-  static std::string fromString(const std::string& str) {
+  static const std::string& fromString(const std::string& str) {
     return str;
   }
   
+};
+
+// specialized trait class for strings
+template <>
+struct ConfigSvcTypeTraits<const char*> {
+  // this assumes that lifetime of the string is longer than pointer 
+  static const char* fromString(const std::string& str) {
+    return str.c_str();
+  }  
 };
 
 

@@ -144,6 +144,11 @@ public:
     if (not pstr.get()) throw ExceptionMissing(section, param);
     return Result( pstr );
   }
+  std::string getStr(const std::string& section, const std::string& param) const {
+    boost::shared_ptr<const std::string> pstr = impl().get(section, param);
+    if (not pstr.get()) throw ExceptionMissing(section, param);
+    return *pstr;
+  }
   
   // get the value of a single parameter, use default if not there
   template <typename T>
@@ -151,6 +156,15 @@ public:
   {
     boost::shared_ptr<const std::string> pstr = impl().get(section, param);
     return ResultDef<T>( pstr, def );
+  }
+  std::string getStr(const std::string& section, const std::string& param, const std::string& def) const
+  {
+    boost::shared_ptr<const std::string> pstr = impl().get(section, param);
+    if ( pstr.get() ) {
+      return *pstr;
+    } else {
+      return def;
+    }
   }
   
   // get the value of a single parameter as sequence, will throw if parameter is not there

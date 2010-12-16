@@ -19,6 +19,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <iostream>
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 
@@ -40,7 +41,7 @@ namespace ConfigSvc {
 //----------------
 // Constructors --
 //----------------
-ConfigSvcImplFile::ConfigSvcImplFile (const std::string file)
+ConfigSvcImplFile::ConfigSvcImplFile (const std::string& file)
   : ConfigSvcImplI()
   , m_config()
 {
@@ -54,6 +55,13 @@ ConfigSvcImplFile::ConfigSvcImplFile (const std::string file)
   }
 
   readStream( istream, file );
+}
+
+ConfigSvcImplFile::ConfigSvcImplFile (std::istream& stream, const std::string& file)
+  : ConfigSvcImplI()
+  , m_config()
+{
+  readStream( stream, file );
 }
 
 //--------------
@@ -99,7 +107,9 @@ ConfigSvcImplFile::getList(const std::string& section,
   // convert and add to the list map
   boost::shared_ptr<std::list<std::string> > list (new std::list<std::string>());
   plmap[param] = list;
-  boost::split (*list, *line, boost::is_any_of(" \t"), boost::token_compress_on);
+  if (not line->empty()) {
+    boost::split (*list, *line, boost::is_any_of(" \t"), boost::token_compress_on);
+  }
   return list;
 }
 
