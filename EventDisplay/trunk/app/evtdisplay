@@ -1,0 +1,71 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script evtdisplay...
+#
+#------------------------------------------------------------------------
+
+"""This script start the event display application for HDF5 files.
+
+This application takes the HDF5 file with LCLS events and  
+presents them in graphical form of images, tables etc.
+This script is started without any additional parameters.
+All dialog with user is maintained through the system of GUI 
+right after the start.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Mikhail S. Dubrovin
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 8 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from PyQt4 import QtGui
+from EventDisplay.GUIMain import GUIMain
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class EventDisplay :
+
+    def __init__ ( self ) :
+
+	print "Start the event display main GUI"
+
+        # This is a regular stuff for PyQt4:
+        app = QtGui.QApplication(sys.argv)
+        gui = GUIMain()
+        gui.show()
+        sys.exit(app.exec_())
+
+#
+#  run application when imported as a main module
+#
+
+if __name__ == "__main__" :
+    app = EventDisplay()
+    sys.exit(app.exec_())
+
+

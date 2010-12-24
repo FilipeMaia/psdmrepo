@@ -1,0 +1,24 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package EventDisplay
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Brief description:
+==================
+
+This package is ment to be used to read the hdf5 files and 
+present it in graphical form.
+
+Detailed description:
+=====================
+
+  p5py  library is used to work with hdf5 files
+  NymPy library is used to work with data types in hdf5
+  PyQt4 library is used for GUI
+
+=====================
