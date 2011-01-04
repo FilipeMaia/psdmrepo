@@ -29,20 +29,7 @@
 
 using namespace std;
 
-
-//----------------------
-// Base Class Headers --
-//----------------------
-
-//-------------------------------
-// Collaborating Class Headers --
-//-------------------------------
-
 #include "PSTime/Duration.h"
-
-//------------------------------------
-// Collaborating Class Declarations --
-//------------------------------------
 
 //		---------------------
 // 		-- Class Interface --
@@ -51,14 +38,14 @@ using namespace std;
 namespace PSTime {
 
 /**
- *  C++ source file code template. The first sentence is a brief summary of 
- *  what the class is for. It is followed by more detailed information
- *  about how to use the class. This doc comment must immediately preceed the 
- *  class definition.
  *
- *  Additional paragraphs with more details may follow; separate paragraphs
- *  with a blank line. The last paragraph before the tags (preceded by @) 
- *  should be the identification and copyright, as below.
+ *  The transformation to/from human-readable time format, required by I/O, 
+ *  is based on the standard ISO8601 time presentation.
+ *
+ *  This is essentially a wrap-up for clock_gettime() [UNIX/POSIX time]
+ *  access to high-resolution time method,
+ *  utilizing "struct timespec" and "struct tm" from <time.h>    
+ *  Some arithmetics between PSTime and PSDuration objects is also available.
  *
  *  Please note that KDOC comments must start with (a forward slash
  *  followed by TWO asterisks). Interface members should be documented
@@ -261,7 +248,6 @@ public:
 
 private:
 
-// private members start with m_ 
 /** Data members:
  * number of seconds since 00:00:00 Jan. 1, 1970 UTC
  * number of nanoseconds
@@ -269,9 +255,9 @@ private:
   time_t m_utcSec; 
   time_t m_utcNsec;
 
+  // private members start with m_ 
   //  struct timespec m_time;    
   //  struct tm       m_timeinfo;
-
 
 //------------------
 // Static Members --
@@ -283,7 +269,6 @@ public:
 /** Access methods to get member data. */
   time_t getUTCSec()  const {return m_utcSec;}  // POSIX sec. since  00:00:00 Jan. 1, 1970 UTC
   time_t getUTCNsec() const {return m_utcNsec;}
-
 
   time_t dtSecLocToUTC() const;
 
@@ -300,17 +285,19 @@ public:
   static time_t getLocalZoneTimeOffsetSec();
   static time_t getPSTZoneTimeOffsetSec();
 
+
+  // Static methods
+
 /** Converts zone time offset for specified zone (in secconds) 
  *  to the zone time offset in hours and minutes
  */
   static void getZoneTimeOffset(Zone zone, int &zoneHour, int &zoneMin);
 
-  //  static int parseTime( const std::string& sdate, const std::string& stime, 
-  //                        Zone zone,
-  //                        Time& time );
-
 /** The parsification engine, 
- *  see description of the Time (const std::string&) constructor.
+ *  takes the time stamp as a (const std::string&)
+ *  and converts it in (Time &) 
+ *  The string is accepted in any of standard ISO8601 formats 
+ *  described above in the constructor Time(const std::string&)
  */ 
   static int parseTimeStamp( const std::string& sdatetime, Time& time );
 
@@ -328,6 +315,6 @@ private:
 
 }; // class Time
 
-}  // namespace Time
+}  // namespace PSTime
 
 #endif // PSTIME_TIME_H

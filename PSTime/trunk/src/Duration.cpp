@@ -22,22 +22,12 @@
 //-----------------
 #include <iostream>
 #include <iomanip>
+#include <math.h>
+
 using std::cout;
 using std::ostream;
 using std::setw;
 
-
-//-------------------------------
-// Collaborating Class Headers --
-//-------------------------------
-
-//-----------------------------------------------------------------------
-// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
-//-----------------------------------------------------------------------
-
-//		----------------------------------------
-// 		-- Public Function Member Definitions --
-//		----------------------------------------
 
 namespace PSTime {
 
@@ -245,6 +235,137 @@ string Duration::strDurationBasic() const
     return strD;
 }
 
+//--------------------
+//  -- Static methods
+//--------------------
+
+/** The parsification engine,
+ *  the string in standard format P[nY][nM][nD][T[nH][nM][n[.f]S]] is parsed in Duration
+ */
+int Duration::parseStringToDuration( const std::string& str_dur, Duration& d )
+{
+  d.m_sec  = 0;
+  d.m_nsec = 0;
+
+  // Check the duration string size
+  size_t len_str_dur = str_dur.size();
+  if( len_str_dur < 3 ) {return DURATION_STRING_TOO_SHORT;} // i.e. P2D
+  if( len_str_dur > 30) {return DURATION_STRING_TOO_LONG;} // 20 w/o ns P01Y01M01DT01H01M01S
+
+  // Find position of separators, if available
+  size_t posP   = str_dur.find('P'); // Period
+  size_t posY   = str_dur.find('Y'); // Year
+  size_t posD   = str_dur.find('D'); // Day
+  size_t posT   = str_dur.find('T'); // Time of the duration in Hours, Minutes, Seconds
+  size_t posH   = str_dur.find('H'); // Hours
+  size_t posF   = str_dur.find('.'); // Fraction of the second's decimal point
+  size_t posS   = str_dur.find('S'); // Seconds
+  size_t posM   = str_dur.find_first_of('M'); // Month
+  size_t posMin = str_dur.find_last_of('M');  // Minutes
+
+  if ( posP == string::npos ) { return DURATION_STRING_WRONG_FORMAT_MISSING_P; }
+
+  size_t posN1 = posP + 1;
+  size_t posNN;
+
+  // sparse duration Y:
+  if ( posY != string::npos ) { 
+       posNN = posY - 1;
+       size_t lenY = posNN - posN1 + 1;
+       if( lenY > 7 ) {return DURATION_TOO_LONG_FIELD_FOR_YEARS;} 
+       char charY[8];
+       size_t lenY_copy=str_dur.copy(charY,lenY,posN1); charY[lenY_copy] = '\0';      
+       d.m_sec += atoi(charY)*3600*24*364;
+       posN1 = posY + 1;
+  }
+
+  // sparse duration M:
+  if ( posM != string::npos ) {
+       posNN = posM - 1;
+       size_t lenM = posNN - posN1 + 1;
+       if( lenM > 7 ) {return DURATION_TOO_LONG_FIELD_FOR_MONTHS;} 
+       char charM[8];
+       size_t lenM_copy=str_dur.copy(charM,lenM,posN1); charM[lenM_copy] = '\0';
+       d.m_sec += atoi(charM)*3600*24*30;
+       posN1 = posM + 1;
+  }
+
+  // sparse duration D:
+  if ( posD != string::npos ) {
+       posNN = posD - 1;
+       size_t lenD = posNN - posN1 + 1;
+       if( lenD > 7 ) {return DURATION_TOO_LONG_FIELD_FOR_DAYS;} 
+       char charD[8];
+       size_t lenD_copy=str_dur.copy(charD,lenD,posN1); charD[lenD_copy] = '\0';
+       d.m_sec += atoi(charD)*3600*24;
+       posN1 = posD + 2;
+  }
+
+  // check duration T:
+  if ( posT != string::npos ) { // T info (H, M, S) is missing
+    posN1 = posT + 1;
+  }
+  else
+  {
+    return PARSE_IS_OK;
+  }
+
+  // sparse duration H:
+  if ( posH != string::npos ) {
+    posNN = posH - 1;
+    size_t lenH = posNN - posN1 + 1;
+    if( lenH > 7 ) {return DURATION_TOO_LONG_FIELD_FOR_HOURS;} 
+    char charH[8];
+    size_t lenH_copy=str_dur.copy(charH,lenH,posN1); charH[lenH_copy] = '\0';
+    d.m_sec += atoi(charH)*3600;
+    posN1 = posH + 1;
+  }
+
+  // sparse duration M:
+  if ( posMin != string::npos ) {
+    posNN = posMin - 1;
+    size_t lenM = posNN - posN1 + 1;
+    if( lenM > 7 ) {return DURATION_TOO_LONG_FIELD_FOR_MINUTES;} 
+    char charM[8];
+    size_t lenM_copy=str_dur.copy(charM,lenM,posN1); charM[lenM_copy] = '\0';
+    d.m_sec += atoi(charM)*60;
+    posN1 = posMin + 1;
+  }
+
+  // Case of fractional second:
+  // sparse duration S integer part of seconds:
+  if ( posF != string::npos && posS != string::npos) {
+    posNN = posF - 1;
+    size_t lenS = posNN - posN1 + 1;
+    if( lenS > 15 ) {return DURATION_TOO_LONG_FIELD_FOR_SECONDS;} 
+    char charS[16];
+    size_t lenS_copy=str_dur.copy(charS,lenS,posN1); charS[lenS_copy] = '\0';
+    d.m_sec += atoi(charS);
+    posN1 = posF + 1;
+
+  // sparse duration S fractional part of second:
+    posNN = posS - 1;
+    size_t lenF = posNN - posN1 + 1;
+    if( lenF > 9 ) {return DURATION_TOO_LONG_FIELD_FOR_SECOND_FRACTION;} 
+    char charF[16];
+    size_t lenF_copy=str_dur.copy(charF,lenF,posN1); charF[lenF_copy] = '\0';
+    double frac_of_sec  = (double)atoi(charF);
+    d.m_nsec = (size_t)(frac_of_sec * pow(10,9-lenF_copy));
+    return PARSE_IS_OK;
+  }
+
+  // sparse duration S in integer seconds:
+  if ( posS != string::npos) {
+    posNN = posS - 1;
+    size_t lenS = posNN - posN1 + 1;
+    if( lenS > 7 ) {return DURATION_TOO_LONG_FIELD_FOR_SECONDS;} 
+    char charS[16];
+    size_t lenS_copy=str_dur.copy(charS,lenS,posN1); charS[lenS_copy] = '\0';
+    d.m_sec += atoi(charS);
+    posN1 = posF + 1;
+  }
+    return PARSE_IS_OK;
+}
 
 //--------------------
 //  -- Private methods
