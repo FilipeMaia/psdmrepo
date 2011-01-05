@@ -1,0 +1,30 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package lusi-xtc
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+lusi_xtc_ver = "2.10.2"
+PREFIX = pjoin(env['SIT_ROOT'],"sw/external/lusi-xtc",lusi_xtc_ver)
+BINDIR = "bin"
+LIBDIR = "lib"
+INCDIR = "pdsdata"
+PKGLIBS = "acqdata bld camdata controldata encoderdata epics evrdata " +\
+    "fccddata ipimbdata opal1kdata pnccddata princetondata pulnixdata " +\
+    "cspaddata lusidata xtcdata"
+standardExternalPackage ( 'pdsdata', **locals() )
