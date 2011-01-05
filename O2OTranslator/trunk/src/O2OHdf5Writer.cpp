@@ -27,6 +27,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "H5DataTypes/AcqirisConfigV1.h"
+#include "H5DataTypes/AcqirisTdcConfigV1.h"
 #include "H5DataTypes/BldDataEBeamV0.h"
 #include "H5DataTypes/BldDataEBeam.h"
 #include "H5DataTypes/BldDataFEEGasDetEnergy.h"
@@ -67,6 +68,7 @@
 #include "LusiTime/Time.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/AcqirisDataDescV1Cvt.h"
+#include "O2OTranslator/AcqirisTdcDataV1Cvt.h"
 #include "O2OTranslator/CameraFrameV1Cvt.h"
 #include "O2OTranslator/ConfigDataTypeCvt.h"
 #include "O2OTranslator/CsPadElementV1Cvt.h"
@@ -221,6 +223,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::AcqirisConfigV1> ( "Acqiris::ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_AcqConfig,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::AcqirisTdcConfigV1> ( "Acqiris::AcqirisTdcConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_AcqTdcConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::Opal1kConfigV1> ( "Opal1k::ConfigV1" ) ) ;
@@ -386,6 +392,11 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   // very special converter for Acqiris::DataDescV1, it needs two types of data
   converter.reset( new AcqirisDataDescV1Cvt ( "Acqiris::DataDescV1", m_configStore, chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_AcqWaveform,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // very special converter for Acqiris::TdcDataV1
+  converter.reset( new AcqirisTdcDataV1Cvt ( "Acqiris::TdcDataV1", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_AcqTdcData,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // very special converter for EvrData::DataV3, it needs two types of data

@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-06
+2011-01-05 Andy Salnikov
+- upgrading to pdsdata V02-10-02
+- new converter class AcqirisTdcDataV1Cvt
+
 Tag: V00-09-05
 2010-12-01 Andy Salnikov
 - upgrading to pdsdata V02-10-00
