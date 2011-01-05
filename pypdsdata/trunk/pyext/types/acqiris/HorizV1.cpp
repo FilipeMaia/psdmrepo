@@ -37,7 +37,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Acqiris::HorizV1, delayTime)
   FUN0_WRAPPER(pypdsdata::Acqiris::HorizV1, nbrSamples)
   FUN0_WRAPPER(pypdsdata::Acqiris::HorizV1, nbrSegments)
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"sampInterval", sampInterval, METH_NOARGS,  "Returns floating number" },
@@ -60,27 +59,20 @@ pypdsdata::Acqiris::HorizV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "HorizV1", module );
 }
 
-namespace {
-
-PyObject*
-_repr( PyObject *self )
+void 
+pypdsdata::Acqiris::HorizV1::print(std::ostream& out) const
 {
-  Pds::Acqiris::HorizV1* obj = pypdsdata::Acqiris::HorizV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "acqiris.HorizV1(sampInterval=" << obj->sampInterval()
-      << ", delayTime=" << obj->delayTime()
-      << ", nbrSamples=" << obj->nbrSamples()
-      << ", nbrSegments=" << obj->nbrSegments()
-      << ", ...)" ;
-  return PyString_FromString( str.str().c_str() );
-}
-
+  if(not m_obj) {
+    out << "acqiris.HorizV1(None)";
+  } else {  
+    out << "acqiris.HorizV1(sampInterval=" << m_obj->sampInterval()
+        << ", delayTime=" << m_obj->delayTime()
+        << ", nbrSamples=" << m_obj->nbrSamples()
+        << ", nbrSegments=" << m_obj->nbrSegments()
+        << ", ...)" ;
+  }
 }

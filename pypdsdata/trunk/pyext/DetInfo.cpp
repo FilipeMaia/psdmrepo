@@ -75,6 +75,14 @@ namespace {
       { "CxiEndstation", Pds::DetInfo::CxiEndstation },
       { "XcsEndstation", Pds::DetInfo::XcsEndstation },
       { "MecEndstation", Pds::DetInfo::MecEndstation },
+      { "CxiDg1",      Pds::DetInfo::CxiDg1 },
+      { "CxiDg2",      Pds::DetInfo::CxiDg2 },
+      { "CxiDg3",      Pds::DetInfo::CxiDg3 },
+      { "CxiDg4",      Pds::DetInfo::CxiDg4 },
+      { "CxiKb1",      Pds::DetInfo::CxiKb1 },
+      { "CxiDs1",      Pds::DetInfo::CxiDs1 },
+      { "CxiDs2",      Pds::DetInfo::CxiDs2 },
+      { "CxiDsu",      Pds::DetInfo::CxiDsu },
       { "NumDetector", Pds::DetInfo::NumDetector },
       { 0, 0 }
   };
@@ -108,6 +116,7 @@ namespace {
       { "Ipimb",     Pds::DetInfo::Ipimb },
       { "Encoder",   Pds::DetInfo::Encoder },
       { "Cspad",     Pds::DetInfo::Cspad },
+      { "AcqTDC",    Pds::DetInfo::AcqTDC },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };

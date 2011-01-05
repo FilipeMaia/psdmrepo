@@ -15,6 +15,8 @@
 //-----------------
 #include <new>
 #include <string>
+#include <iostream>
+#include <sstream>
 
 //----------------------
 // Base Class Headers --
@@ -67,6 +69,11 @@ struct PdsDataTypeEmbedded : PyObject {
     return PyObject_TypeCheck( obj, type );
   }
 
+  // Dump object info to a stream
+  void print(std::ostream& out) const {
+    out << "<" << ob_type->tp_name << "(@" << this << ")>";
+  }
+
   // --------------------------------------------------
 
   PdsType m_obj;
@@ -79,7 +86,21 @@ protected:
   // standard Python deallocation function
   static void PdsDataTypeEmbedded_dealloc( PyObject* self );
 
+  // repr() function
+  static PyObject* repr( PyObject *self )  {
+    std::ostringstream str;
+    static_cast<ConcreteType*>(self)->print(str);
+    return PyString_FromString( str.str().c_str() );
+  }
 };
+
+/// stream insertion operator
+template <typename ConcreteType, typename PdsType>
+std::ostream&
+operator<<(std::ostream& out, const PdsDataTypeEmbedded<ConcreteType, PdsType>& data) {
+  static_cast<const ConcreteType&>(data).print(out);
+  return out;
+}
 
 /// Returns the Python type opbject
 template <typename ConcreteType, typename PdsType>
@@ -98,13 +119,13 @@ PdsDataTypeEmbedded<ConcreteType, PdsType>::typeObject()
     0,                       /*tp_getattr*/
     0,                       /*tp_setattr*/
     0,                       /*tp_compare*/
-    0,                       /*tp_repr*/
+    repr,                    /*tp_repr*/
     0,                       /*tp_as_number*/
     0,                       /*tp_as_sequence*/
     0,                       /*tp_as_mapping*/
     0,                       /*tp_hash*/
     0,                       /*tp_call*/
-    0,                       /*tp_str*/
+    repr,                    /*tp_str*/
     PyObject_GenericGetAttr, /*tp_getattro*/
     PyObject_GenericSetAttr, /*tp_setattro*/
     0,                       /*tp_as_buffer*/

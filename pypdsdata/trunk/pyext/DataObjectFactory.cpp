@@ -26,6 +26,8 @@
 
 #include "types/acqiris/ConfigV1.h"
 #include "types/acqiris/DataDescV1.h"
+#include "types/acqiris/TdcConfigV1.h"
+#include "types/acqiris/TdcDataV1.h"
 
 #include "types/bld/BldDataFEEGasDetEnergy.h"
 #include "types/bld/BldDataEBeamV0.h"
@@ -282,6 +284,14 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_SharedIpimb :
     if ( not obj ) obj = xtc2obj<BldDataIpimb, 0>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_AcqTdcConfig :
+    if ( not obj ) obj = xtc2obj<Acqiris::TdcConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_AcqTdcData :
+    if ( not obj ) obj = xtc2obj<Acqiris::TdcDataV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::NumberOf :

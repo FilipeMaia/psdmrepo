@@ -41,6 +41,14 @@
 #include "types/acqiris/ConfigV1.h"
 #include "types/acqiris/DataDescV1.h"
 #include "types/acqiris/HorizV1.h"
+#include "types/acqiris/TdcAuxIO.h"
+#include "types/acqiris/TdcChannel.h"
+#include "types/acqiris/TdcConfigV1.h"
+#include "types/acqiris/TdcDataV1.h"
+#include "types/acqiris/TdcDataV1Channel.h"
+#include "types/acqiris/TdcDataV1Common.h"
+#include "types/acqiris/TdcDataV1Marker.h"
+#include "types/acqiris/TdcVetoIO.h"
 #include "types/acqiris/TimestampV1.h"
 #include "types/acqiris/TrigV1.h"
 #include "types/acqiris/VertV1.h"
@@ -177,6 +185,14 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Acqiris::ConfigV1::initType( module );
   pypdsdata::Acqiris::DataDescV1::initType( module );
   pypdsdata::Acqiris::HorizV1::initType( module );
+  pypdsdata::Acqiris::TdcAuxIO::initType( module );
+  pypdsdata::Acqiris::TdcChannel::initType( module );
+  pypdsdata::Acqiris::TdcConfigV1::initType( module );
+  pypdsdata::Acqiris::TdcDataV1::initType( module );
+  pypdsdata::Acqiris::TdcDataV1Channel::initType( module );
+  pypdsdata::Acqiris::TdcDataV1Common::initType( module );
+  pypdsdata::Acqiris::TdcDataV1Marker::initType( module );
+  pypdsdata::Acqiris::TdcVetoIO::initType( module );
   pypdsdata::Acqiris::TimestampV1::initType( module );
   pypdsdata::Acqiris::TrigV1::initType( module );
   pypdsdata::Acqiris::VertV1::initType( module );

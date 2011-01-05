@@ -124,12 +124,11 @@ pypdsdata::EnumType::~EnumType ()
 
 // Make instance of this type
 PyObject*
-pypdsdata::EnumType::Enum_FromLong( long value )
+pypdsdata::EnumType::Enum_FromLong( long value ) const
 {
   Int2Enum::const_iterator it = m_int2enum.find( value );
   if ( it == m_int2enum.end() ) {
-    PyErr_Format( PyExc_RuntimeError, "Unknown enum value (%ld)", value );
-    return 0;
+    return PyInt_FromLong(value);
   }
 
   Py_INCREF( it->second );
@@ -137,7 +136,7 @@ pypdsdata::EnumType::Enum_FromLong( long value )
 }
 
 PyObject*
-pypdsdata::EnumType::Enum_FromString( const char* name )
+pypdsdata::EnumType::Enum_FromString( const char* name ) const
 {
   // try to find a name in the class attributes
   if ( not m_type.tp_dict ) {
@@ -183,10 +182,17 @@ Enum_init(PyObject* self, PyObject* args, PyObject* kwds)
     pypdsdata::EnumType* enumType = (pypdsdata::EnumType*)self->ob_type;
     if ( PyObject* o = enumType->Enum_FromLong( PyInt_AsLong(arg) ) ) {
 
-      EnumObject* enumObj = (EnumObject*)o;
-      py_this->ob_ival = enumObj->ob_ival;
-      py_this->en_name = enumObj->en_name;
-      Py_INCREF(py_this->en_name);
+      if ( PyObject_TypeCheck( o, self->ob_type ) ) {
+        EnumObject* enumObj = (EnumObject*)o;
+        py_this->ob_ival = enumObj->ob_ival;
+        py_this->en_name = enumObj->en_name;
+        Py_INCREF(py_this->en_name);
+      } else {
+        PyIntObject* enumObj = (PyIntObject*)o;
+        py_this->ob_ival = enumObj->ob_ival;
+        py_this->en_name = Py_None;
+        Py_INCREF(py_this->en_name);
+      }
 
     } else {
 

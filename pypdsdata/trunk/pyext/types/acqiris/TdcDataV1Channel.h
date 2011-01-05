@@ -1,12 +1,12 @@
-#ifndef PYPDSDATA_ACQIRIS_DATADESCV1_H
-#define PYPDSDATA_ACQIRIS_DATADESCV1_H
+#ifndef PYPDSDATA_ACQIRIS_TDCDATAV1CHANNEL_H
+#define PYPDSDATA_ACQIRIS_TDCDATAV1CHANNEL_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class Acqiris_DataDescV1.
+//	Class Acqiris_TdcDataV1Channel.
 //
 //------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/acqiris/DataDescV1.hh"
+#include "pdsdata/acqiris/TdcDataV1.hh"
 
 //    ---------------------
 //    -- Class Interface --
@@ -46,10 +46,10 @@ namespace Acqiris {
  *  @author Andrei Salnikov
  */
 
-class DataDescV1 : public PdsDataType<DataDescV1,Pds::Acqiris::DataDescV1> {
+class TdcDataV1Channel : public PdsDataType<TdcDataV1Channel,class Pds::Acqiris::TdcDataV1::Channel> {
 public:
 
-  typedef PdsDataType<DataDescV1,Pds::Acqiris::DataDescV1> BaseType;
+  typedef PdsDataType<TdcDataV1Channel,class Pds::Acqiris::TdcDataV1::Channel> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
@@ -61,4 +61,4 @@ public:
 } // namespace Acqiris
 } // namespace pypdsdata
 
-#endif // PYPDSDATA_ACQIRIS_DATADESCV1_H
+#endif // PYPDSDATA_ACQIRIS_TDCDATAV1CHANNEL_H

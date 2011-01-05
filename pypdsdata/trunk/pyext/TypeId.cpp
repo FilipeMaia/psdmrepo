@@ -70,6 +70,8 @@ namespace {
       { "Id_DiodeFex",        Pds::TypeId::Id_DiodeFex },
       { "Id_PimImageConfig",  Pds::TypeId::Id_PimImageConfig },
       { "Id_SharedIpimb",     Pds::TypeId::Id_SharedIpimb },
+      { "Id_AcqTdcConfig",    Pds::TypeId::Id_AcqTdcConfig },
+      { "Id_AcqTdcData",      Pds::TypeId::Id_AcqTdcData },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

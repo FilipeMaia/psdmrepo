@@ -1,4 +1,12 @@
 
+2011-01-05 - V00-00-23
+======================
+- upgrading to pdsdata V02-10-02
+- new classes acqiris/Tdc*
+- more uniform aspproach to repr() and str() functions, data classes 
+  can now define (non-virtual) method |void print(std::ostream&) const|
+  which will be used by default implementation of repr() and str().
+
 2010-12-15 - V00-00-22
 ======================
 - adding pyevrcodes script to dump just evr codes

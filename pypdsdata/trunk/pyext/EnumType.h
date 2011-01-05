@@ -60,14 +60,13 @@ public:
   ~EnumType () ;
 
   // Returns _borrowed_ reference to Python type object
-  PyObject* type() {
-    void* vtype = &m_type;
-    return static_cast<PyObject*>(vtype); 
+  PyObject* type() const {
+    return static_cast<PyObject*>((void*)&m_type); 
   }
 
   // Make instance of this type, returns new reference
-  PyObject* Enum_FromLong( long value ) ;
-  PyObject* Enum_FromString( const char* name ) ;
+  PyObject* Enum_FromLong( long value ) const;
+  PyObject* Enum_FromString( const char* name ) const;
 
 protected:
 

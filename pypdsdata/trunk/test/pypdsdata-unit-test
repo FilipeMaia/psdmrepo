@@ -257,7 +257,9 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_DiodeFex, 33 )
         self.assertEqual ( TypeId.Type.Id_PimImageConfig, 34 )
         self.assertEqual ( TypeId.Type.Id_SharedIpimb, 35 )
-        self.assertEqual ( TypeId.Type.NumberOf, 36 )
+        self.assertEqual ( TypeId.Type.Id_AcqTdcConfig, 36 )
+        self.assertEqual ( TypeId.Type.Id_AcqTdcData, 37 )
+        self.assertEqual ( TypeId.Type.NumberOf, 38 )
 
         # instantiation
         TypeId ()
@@ -372,7 +374,15 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Detector.CxiEndstation, 24 )
         self.assertEqual ( DetInfo.Detector.XcsEndstation, 25 )
         self.assertEqual ( DetInfo.Detector.MecEndstation, 26 )
-        self.assertEqual ( DetInfo.Detector.NumDetector, 27 )
+        self.assertEqual ( DetInfo.Detector.CxiDg1, 27 )
+        self.assertEqual ( DetInfo.Detector.CxiDg2, 28 )
+        self.assertEqual ( DetInfo.Detector.CxiDg3, 29 )
+        self.assertEqual ( DetInfo.Detector.CxiDg4, 30 )
+        self.assertEqual ( DetInfo.Detector.CxiKb1, 31 )
+        self.assertEqual ( DetInfo.Detector.CxiDs1, 32 )
+        self.assertEqual ( DetInfo.Detector.CxiDs2, 33 )
+        self.assertEqual ( DetInfo.Detector.CxiDsu, 34 )
+        self.assertEqual ( DetInfo.Detector.NumDetector, 35 )
         
         self.assertEqual ( DetInfo.Device.NoDevice, 0 )
         self.assertEqual ( DetInfo.Device.Evr, 1 )
@@ -385,7 +395,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.Ipimb, 8 )
         self.assertEqual ( DetInfo.Device.Encoder, 9 )
         self.assertEqual ( DetInfo.Device.Cspad, 10 )
-        self.assertEqual ( DetInfo.Device.NumDevice, 11 )
+        self.assertEqual ( DetInfo.Device.AcqTDC, 11 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 12 )
 
         
         o1 = DetInfo(0,0,0,0,0)
