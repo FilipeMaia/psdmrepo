@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+	<package name="Lusi">
+
+		<!-- ========================================================================= -->
+		
+		<pstype name="DiodeFexConfigV1" version="1" type_id="Id_DiodeFexConfig" pack="4">
+		
+		    <const name="NRANGES" value="3" />
+		
+            <attribute name="base" type="float" dimensions="NRANGES" access="public">
+            </attribute>
+
+            <attribute name="scale" type="float" dimensions="NRANGES" access="public">
+            </attribute>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="DiodeFexV1" version="1" type_id="Id_DiodeFex" pack="4">
+		
+            <attribute name="value" type="float" access="public">
+            </attribute>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+
+        <pstype name="IpmFexConfigV1" version="1" type_id="Id_IpmFexConfig" pack="4">
+        
+            <const name="NCHANNELS" value="4" />
+        
+            <attribute name="diode" type="DiodeFexConfigV1" dimensions="NCHANNELS" access="public">
+            </attribute>
+
+            <attribute name="xscale" type="float" access="public">
+            </attribute>
+
+            <attribute name="yscale" type="float" access="public">
+            </attribute>
+
+        </pstype>
+        
+        
+		<!-- ========================================================================= -->
+		
+
+        <pstype name="IpmFexV1" version="1" type_id="Id_IpmFex" pack="4">
+        
+            <const name="NCHANNELS" value="4" />
+        
+            <attribute name="channel" type="float" dimensions="NCHANNELS" access="public">
+            </attribute>
+
+            <attribute name="sum" type="float" access="public">
+            </attribute>
+
+            <attribute name="xpos" type="float" access="public">
+            </attribute>
+
+            <attribute name="ypos" type="float" access="public">
+            </attribute>
+
+        </pstype>
+        
+        
+        <!-- ========================================================================= -->
+        
+
+        <pstype name="PimImageConfigV1" version="1" type_id="Id_PimImageConfig" pack="4">
+        
+            <attribute name="xscale" type="float" access="public">
+            </attribute>
+
+            <attribute name="yscale" type="float" access="public">
+            </attribute>
+
+        </pstype>
+        
+        
+        
+	</package>
+</psddl>

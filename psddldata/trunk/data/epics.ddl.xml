@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+	<package name="Epics">
+
+        <const name="iXtcVersion" value="1"/>
+
+        <const name="iMaxPvNameLength" value="64"/>
+
+        <const name="MAX_STRING_SIZE" value="40"/>
+        <const name="MAX_UNITS_SIZE" value="8"/>
+        <const name="MAX_ENUM_STRING_SIZE" value="26"/>
+        <const name="MAX_ENUM_STATES" value="16"/>
+
+        <enum name="">
+	       <enum-const name="DBR_STRING" value="0"/>
+           <enum-const name="DBR_SHORT" value="1"/>
+           <enum-const name="DBR_FLOAT" value="2"/>
+           <enum-const name="DBR_ENUM" value="3"/>
+           <enum-const name="DBR_CHAR" value="4"/>
+           <enum-const name="DBR_LONG" value="5"/>
+           <enum-const name="DBR_DOUBLE" value="6"/>
+           <enum-const name="DBR_STS_STRING" value="7"/>
+           <enum-const name="DBR_STS_SHORT" value="8"/>
+           <enum-const name="DBR_STS_FLOAT" value="9"/>
+           <enum-const name="DBR_STS_ENUM" value="10"/>
+           <enum-const name="DBR_STS_CHAR" value="11"/>
+           <enum-const name="DBR_STS_LONG" value="12"/>
+           <enum-const name="DBR_STS_DOUBLE" value="13"/>
+           <enum-const name="DBR_TIME_STRING" value="14"/>
+           <enum-const name="DBR_TIME_INT" value="15"/>
+           <enum-const name="DBR_TIME_SHORT" value="15"/>
+           <enum-const name="DBR_TIME_FLOAT" value="16"/>
+           <enum-const name="DBR_TIME_ENUM" value="17"/>
+           <enum-const name="DBR_TIME_CHAR" value="18"/>
+           <enum-const name="DBR_TIME_LONG" value="19"/>
+           <enum-const name="DBR_TIME_DOUBLE" value="20"/>
+           <enum-const name="DBR_GR_STRING" value="21"/>
+           <enum-const name="DBR_GR_SHORT" value="22"/>
+           <enum-const name="DBR_GR_FLOAT" value="23"/>
+           <enum-const name="DBR_GR_ENUM" value="24"/>
+           <enum-const name="DBR_GR_CHAR" value="25"/>
+           <enum-const name="DBR_GR_LONG" value="26"/>
+           <enum-const name="DBR_GR_DOUBLE" value="27"/>
+           <enum-const name="DBR_CTRL_STRING" value="28"/>
+           <enum-const name="DBR_CTRL_SHORT" value="29"/>
+           <enum-const name="DBR_CTRL_FLOAT" value="30"/>
+           <enum-const name="DBR_CTRL_ENUM" value="31"/>
+           <enum-const name="DBR_CTRL_CHAR" value="32"/>
+           <enum-const name="DBR_CTRL_LONG" value="33"/>
+           <enum-const name="DBR_CTRL_DOUBLE" value="34"/>
+        </enum>
+
+		<!-- ========================================================================= -->
+		
+		<pstype name="epicsTimeStamp">
+			
+			<attribute name="secPastEpoch" type="uint32_t" access="public">
+			seconds since 0000 Jan 1, 1990
+			</attribute>
+			
+			<attribute name="nsec" type="uint32_t" access="public">
+			nanoseconds within second
+			</attribute>
+			
+        </pstype>
+
+
+		<!-- ========================================================================= -->
+
+		<pstype name="dbr_time_string">
+		
+		    <const name="DBR_TYPE_ID" value="DBR_TIME_STRING"/>
+		    
+			<attribute name="status" type="int16_t" access="public"/>
+			<attribute name="severity" type="int16_t" access="public"/>
+			<attribute name="stamp" type="epicsTimeStamp" access="public"/>
+			<attribute name="value" type="char" dimensions="MAX_STRING_SIZE" access="public"/>
+        </pstype>
+
+		<!-- ========================================================================= -->
+
+		<pstype name="dbr_time_short">
+        
+            <const name="DBR_TYPE_ID" value="DBR_TIME_SHORT"/>
+            
+			<attribute name="status" type="int16_t" access="public"/>
+			<attribute name="severity" type="int16_t" access="public"/>
+            <attribute name="stamp" type="epicsTimeStamp" access="public"/>
+			<attribute name="RISC_pad" type="int16_t" access="public"/>
+			<attribute name="value" type="int16_t" access="public"/>
+        </pstype>
+
+		<!-- ========================================================================= -->
+
+		<pstype name="dbr_time_float">
+        
+            <const name="DBR_TYPE_ID" value="DBR_TIME_FLOAT"/>
+            
+			<attribute name="status" type="int16_t" access="public"/>
+			<attribute name="severity" type="int16_t" access="public"/>
+            <attribute name="stamp" type="epicsTimeStamp" access="public"/>
+			<attribute name="value" type="float" access="public"/>
+        </pstype>
+
+		<!-- ========================================================================= -->
+		
+		<pstype name="dbr_time_enum">
+        
+            <const name="DBR_TYPE_ID" value="DBR_TIME_ENUM"/>
+            
+			<attribute name="status" type="int16_t" access="public"/>
+			<attribute name="severity" type="int16_t" access="public"/>
+            <attribute name="stamp" type="epicsTimeStamp" access="public"/>
+            <attribute name="RISC_pad" type="int16_t" access="public"/>
+			<attribute name="value" type="uint16_t" access="public"/>
+        </pstype>
+
+		<!-- ========================================================================= -->
+
+		<pstype name="dbr_time_char">
+        
+            <const name="DBR_TYPE_ID" value="DBR_TIME_CHAR"/>
+            
+			<attribute name="status" type="int16_t" access="public"/>
+			<attribute name="severity" type="int16_t" access="public"/>
+            <attribute name="stamp" type="epicsTimeStamp" access="public"/>
+            <attribute name="RISC_pad0" type="int16_t" access="public"/>
+            <attribute name="RISC_pad1" type="uint8_t" access="public"/>
+			<attribute name="value" type="uint8_t" access="public"/>
+        </pstype>
+
+		<!-- ========================================================================= -->
+
+		<pstype name="dbr_time_long">
+        
+            <const name="DBR_TYPE_ID" value="DBR_TIME_LONG"/>
+            
+			<attribute name="status" type="int16_t" access="public"/>
+			<attribute name="severity" type="int16_t" access="public"/>
+            <attribute name="stamp" type="epicsTimeStamp" access="public"/>
+			<attribute name="value" type="int32_t" access="public"/>
+        </pstype>
+
+		<!-- ========================================================================= -->
+
+		<pstype name="dbr_time_double">
+        
+            <const name="DBR_TYPE_ID" value="DBR_TIME_DOUBLE"/>
+            
+			<attribute name="status" type="int16_t" access="public"/>
+			<attribute name="severity" type="int16_t" access="public"/>
+            <attribute name="stamp" type="epicsTimeStamp" access="public"/>
+            <attribute name="RISC_pad" type="int32_t" access="public"/>
+			<attribute name="value" type="double" access="public"/>
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="dbr_sts_string">
+        
+            <const name="DBR_TYPE_ID" value="DBR_CTRL_STRING"/>
+            
+            <attribute name="status" type="int16_t" access="public"/>
+            <attribute name="severity" type="int16_t" access="public"/>
+            <attribute name="value" type="char" dimensions="MAX_STRING_SIZE" access="public"/>
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="dbr_ctrl_short">
+        
+            <const name="DBR_TYPE_ID" value="DBR_CTRL_SHORT"/>
+            
+            <attribute name="status" type="int16_t" access="public"/>
+            <attribute name="severity" type="int16_t" access="public"/>
+            <attribute name="units" type="char" dimensions="MAX_UNITS_SIZE" access="public"/>
+            <attribute name="upper_disp_limit" type="int16_t" access="public"/>
+            <attribute name="lower_disp_limit" type="int16_t" access="public"/>
+            <attribute name="upper_alarm_limit" type="int16_t" access="public"/>
+            <attribute name="upper_warning_limit" type="int16_t" access="public"/>
+            <attribute name="lower_warning_limit" type="int16_t" access="public"/>
+            <attribute name="lower_alarm_limit" type="int16_t" access="public"/>
+            <attribute name="upper_ctrl_limit" type="int16_t" access="public"/>
+            <attribute name="lower_ctrl_limit" type="int16_t" access="public"/>
+            <attribute name="value" type="int16_t" access="public"/>
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="dbr_ctrl_float">
+        
+            <const name="DBR_TYPE_ID" value="DBR_CTRL_FLOAT"/>
+            
+            <attribute name="status" type="int16_t" access="public"/>
+            <attribute name="severity" type="int16_t" access="public"/>
+            <attribute name="precision" type="int16_t" access="public"/>
+            <attribute name="RISC_pad" type="int16_t" access="public"/>
+            <attribute name="units" type="char" dimensions="MAX_UNITS_SIZE" access="public"/>
+            <attribute name="upper_disp_limit" type="float" access="public"/>
+            <attribute name="lower_disp_limit" type="float" access="public"/>
+            <attribute name="upper_alarm_limit" type="float" access="public"/>
+            <attribute name="upper_warning_limit" type="float" access="public"/>
+            <attribute name="lower_warning_limit" type="float" access="public"/>
+            <attribute name="lower_alarm_limit" type="float" access="public"/>
+            <attribute name="upper_ctrl_limit" type="float" access="public"/>
+            <attribute name="lower_ctrl_limit" type="float" access="public"/>
+            <attribute name="value" type="float" access="public"/>
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="dbr_ctrl_enum">
+        
+            <const name="DBR_TYPE_ID" value="DBR_CTRL_ENUM"/>
+            
+            <attribute name="status" type="int16_t" access="public"/>
+            <attribute name="severity" type="int16_t" access="public"/>
+            <attribute name="no_str" type="int16_t" access="public"/>
+            <attribute name="strs" type="char" dimensions="MAX_ENUM_STATES,MAX_ENUM_STRING_SIZE" access="public"/>
+            <attribute name="value" type="uint16_t" access="public"/>
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="dbr_ctrl_char">
+        
+            <const name="DBR_TYPE_ID" value="DBR_CTRL_CHAR"/>
+            
+            <attribute name="status" type="int16_t" access="public"/>
+            <attribute name="severity" type="int16_t" access="public"/>
+            <attribute name="units" type="char" dimensions="MAX_UNITS_SIZE" access="public"/>
+            <attribute name="upper_disp_limit" type="uint8_t" access="public"/>
+            <attribute name="lower_disp_limit" type="uint8_t" access="public"/>
+            <attribute name="upper_alarm_limit" type="uint8_t" access="public"/>
+            <attribute name="upper_warning_limit" type="uint8_t" access="public"/>
+            <attribute name="lower_warning_limit" type="uint8_t" access="public"/>
+            <attribute name="lower_alarm_limit" type="uint8_t" access="public"/>
+            <attribute name="upper_ctrl_limit" type="uint8_t" access="public"/>
+            <attribute name="lower_ctrl_limit" type="uint8_t" access="public"/>
+            <attribute name="RISC_pad" type="uint8_t" access="public"/>
+            <attribute name="value" type="uint8_t" access="public"/>
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="dbr_ctrl_long">
+        
+            <const name="DBR_TYPE_ID" value="DBR_CTRL_LONG"/>
+            
+            <attribute name="status" type="int16_t" access="public"/>
+            <attribute name="severity" type="int16_t" access="public"/>
+            <attribute name="units" type="char" dimensions="MAX_UNITS_SIZE" access="public"/>
+            <attribute name="upper_disp_limit" type="int32_t" access="public"/>
+            <attribute name="lower_disp_limit" type="int32_t" access="public"/>
+            <attribute name="upper_alarm_limit" type="int32_t" access="public"/>
+            <attribute name="upper_warning_limit" type="int32_t" access="public"/>
+            <attribute name="lower_warning_limit" type="int32_t" access="public"/>
+            <attribute name="lower_alarm_limit" type="int32_t" access="public"/>
+            <attribute name="upper_ctrl_limit" type="int32_t" access="public"/>
+            <attribute name="lower_ctrl_limit" type="int32_t" access="public"/>
+            <attribute name="value" type="int32_t" access="public"/>
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="dbr_ctrl_double">
+        
+            <const name="DBR_TYPE_ID" value="DBR_CTRL_DOUBLE"/>
+            
+            <attribute name="status" type="int16_t" access="public"/>
+            <attribute name="severity" type="int16_t" access="public"/>
+            <attribute name="precision" type="int16_t" access="public"/>
+            <attribute name="RISC_pad0" type="int16_t" access="public"/>
+            <attribute name="units" type="char" dimensions="MAX_UNITS_SIZE" access="public"/>
+            <attribute name="upper_disp_limit" type="double" access="public"/>
+            <attribute name="lower_disp_limit" type="double" access="public"/>
+            <attribute name="upper_alarm_limit" type="double" access="public"/>
+            <attribute name="upper_warning_limit" type="double" access="public"/>
+            <attribute name="lower_warning_limit" type="double" access="public"/>
+            <attribute name="lower_alarm_limit" type="double" access="public"/>
+            <attribute name="upper_ctrl_limit" type="double" access="public"/>
+            <attribute name="lower_ctrl_limit" type="double" access="public"/>
+            <attribute name="value" type="double" access="public"/>
+        </pstype>
+
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvHeader">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			
+			<method name="print">
+			This method will be implemented separately, it will act as a virtual method.
+			</method>
+			
+        </pstype>
+        
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvCtrlHeader">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvCtrlString">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+			<attribute name="dbr" type="dbr_sts_string" access="public"/>
+			<attribute name="dbr_array_data" type="char" dimensions="{self}.iNumElements-1, MAX_STRING_SIZE" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvCtrlShort">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+			<attribute name="dbr" type="dbr_ctrl_short" access="public"/>
+			<attribute name="dbr_array_data" type="int16_t" dimensions="{self}.iNumElements-1" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvCtrlFloat">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+			<attribute name="dbr" type="dbr_ctrl_float" access="public"/>
+			<attribute name="dbr_array_data" type="float" dimensions="{self}.iNumElements-1" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvCtrlEnum">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+			<attribute name="dbr" type="dbr_ctrl_enum" access="public"/>
+			<attribute name="dbr_array_data" type="uint16_t" dimensions="{self}.iNumElements-1" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvCtrlChar">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+			<attribute name="dbr" type="dbr_ctrl_char" access="public"/>
+			<attribute name="dbr_array_data" type="uint8_t" dimensions="{self}.iNumElements-1" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvCtrlLong">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+			<attribute name="dbr" type="dbr_ctrl_long" access="public"/>
+			<attribute name="dbr_array_data" type="int32_t" dimensions="{self}.iNumElements-1" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvCtrlDouble">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+			<attribute name="dbr" type="dbr_ctrl_double" access="public"/>
+			<attribute name="dbr_array_data" type="double" dimensions="{self}.iNumElements-1" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvTimeString">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+            <attribute name="pad0" type="int16_t" access="public"/>
+            <attribute name="dbr" type="dbr_time_string" access="public"/>
+            <attribute name="dbr_array_data" type="char" dimensions="{self}.iNumElements-1, MAX_STRING_SIZE" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvTimeShort">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="pad0" type="int16_t" access="public"/>
+            <attribute name="dbr" type="dbr_time_short" access="public"/>
+            <attribute name="dbr_array_data" type="int16_t" dimensions="{self}.iNumElements-1" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvTimeFloat">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="pad0" type="int16_t" access="public"/>
+            <attribute name="dbr" type="dbr_time_float" access="public"/>
+            <attribute name="dbr_array_data" type="float" dimensions="{self}.iNumElements-1" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvTimeEnum">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="pad0" type="int16_t" access="public"/>
+            <attribute name="dbr" type="dbr_time_enum" access="public"/>
+            <attribute name="dbr_array_data" type="uint16_t" dimensions="{self}.iNumElements-1" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvTimeChar">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="pad0" type="int16_t" access="public"/>
+            <attribute name="dbr" type="dbr_time_char" access="public"/>
+            <attribute name="dbr_array_data" type="uint8_t" dimensions="{self}.iNumElements-1" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvTimeLong">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="pad0" type="int16_t" access="public"/>
+            <attribute name="dbr" type="dbr_time_long" access="public"/>
+            <attribute name="dbr_array_data" type="int32_t" dimensions="{self}.iNumElements-1" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvTimeDouble">
+			<attribute name="iPvId" type="int16_t" access="public"/>
+			<attribute name="iDbrType" type="int16_t" access="public"/>
+			<attribute name="iNumElements" type="int16_t" access="public"/>
+			<attribute name="pad0" type="int16_t" access="public"/>
+            <attribute name="dbr" type="dbr_time_double" access="public"/>
+            <attribute name="dbr_array_data" type="double" dimensions="{self}.iNumElements-1" access="public"/>
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+	</package>
+</psddl>

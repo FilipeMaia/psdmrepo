@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+	<package name="Acqiris">
+	
+		<pstype name="VertV1" version="1" pack="4">
+		
+	       	Pds.Acqiris class VertV1
+		
+		    <enum name="Coupling">
+		      <enum-const name="GND" />
+		      <enum-const name="DC" />
+		      <enum-const name="AC" />
+		      <enum-const name="DC50ohm" />
+		      <enum-const name="AC50ohm" />
+		    </enum>
+		
+            <enum name="Bandwidth">
+              <enum-const name="None" />
+              <enum-const name="MHz25" />
+              <enum-const name="MHz700" />
+              <enum-const name="MHz200" />
+              <enum-const name="MHz20" />
+              <enum-const name="MHz35" />
+            </enum>
+		
+            <attribute name="_fullScale" type="double" accessor="fullScale">
+            </attribute>
+
+            <attribute name="_offset" type="double" accessor="offset">
+            </attribute>
+
+            <attribute name="_coupling" type="uint32_t" accessor="coupling">
+            </attribute>
+
+            <attribute name="_bandwidth" type="uint32_t" accessor="bandwidth">
+            </attribute>
+
+            <method name="slope" type="double" const="true" />
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+		<pstype name="HorizV1" version="1" pack="4">
+		
+		    Pds.Acqiris class HorizV1
+		
+            <attribute name="_sampInterval" type="double" accessor="sampInterval">
+            </attribute>
+
+            <attribute name="_delayTime" type="double" accessor="delayTime">
+            </attribute>
+
+            <attribute name="_nbrSamples" type="uint32_t" accessor="nbrSamples">
+            </attribute>
+
+            <attribute name="_nbrSegments" type="uint32_t" accessor="nbrSegments">
+            </attribute>
+
+		</pstype>
+		
+        <!-- ========================================================================= -->
+
+		<pstype name="TrigV1" version="1" pack="4">
+		
+		    Pds.Acqiris class TrigV1
+		
+            <enum name="Source">
+              <enum-const name="Internal" value="1" />
+              <enum-const name="External" value="-1" />
+            </enum>
+
+            <enum name="Coupling">
+              <enum-const name="DC" value="0" />
+              <enum-const name="AC" value="1" />
+              <enum-const name="HFreject" value="2" />
+              <enum-const name="DC50ohm" value="3" />
+              <enum-const name="AC50ohm" value="4" />
+            </enum>
+
+            <enum name="Slope">
+              <enum-const name="Positive" />
+              <enum-const name="Negative" />
+              <enum-const name="OutOfWindow" />
+              <enum-const name="IntoWindow" />
+              <enum-const name="HFDivide" />
+              <enum-const name="SpikeStretcher" />
+            </enum>
+        
+            <attribute name="_coupling" type="uint32_t" accessor="coupling">
+            </attribute>
+
+            <attribute name="_input" type="uint32_t" accessor="input">
+            </attribute>
+
+            <attribute name="_slope" type="uint32_t" accessor="slope">
+            </attribute>
+
+            <attribute name="_level" type="double" accessor="level">
+            </attribute>
+
+		</pstype>
+		
+        <!-- ========================================================================= -->
+
+        <pstype name="ConfigV1" version="1" type_id="Id_AcqConfig" pack="4" levels="Source">
+        
+            Pds.Acqiris class ConfigV1
+
+            <const name="MaxChan" value="20" />
+
+            <attribute name="_nbrConvertersPerChannel" type="uint32_t" accessor="nbrConvertersPerChannel">
+            </attribute>
+
+            <attribute name="_channelMask" type="uint32_t" accessor="channelMask">
+            </attribute>
+
+            <attribute name="_nbrBanks" type="uint32_t" accessor="nbrBanks">
+            </attribute>
+
+            <attribute name="_trig" type="TrigV1" accessor="trig">
+            </attribute>
+
+            <attribute name="_horiz" type="HorizV1" accessor="horiz">
+            </attribute>
+
+            <attribute name="_vert" type="VertV1" dimensions="MaxChan" accessor="vert">
+            </attribute>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="TimestampV1" version="1" pack="4">
+        
+            Pds.Acqiris class "TimestampV1"
+
+            <attribute name="_horPos" type="double" accessor="pos">
+            </attribute>
+
+            <attribute name="_timeStampLo" type="uint32_t" accessor="timeStampLo">
+            </attribute>
+
+            <attribute name="_timeStampHi" type="uint32_t" accessor="timeStampHi">
+            </attribute>
+
+            <method name="value" type="uint64_t">
+                <expr lang="C++" value="((uint64_t){self}._timeStampHi)&lt;&lt;32 + {self}._timeStampLo" />
+            </method>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="DataDescV1" version="1" type_id="Id_AcqWaveform" pack="4" levels="Source">
+        
+            Pds.Acqiris class ConfigV1
+
+            <const name="NumberOfBits" value="10" />
+            <const name="BitShift" value="6" />
+            <const name="_extra" value="32*sizeof(short)" />
+
+            <xtc-config name="ConfigV1" />
+            <repeat count="{xtc-config}.nbrChannels()" />
+
+            <attribute name="_returnedSamplesPerSeg" type="uint32_t" accessor="nbrSamplesInSeg">
+            </attribute>
+
+            <attribute name="_indexFirstPoint" type="uint32_t" accessor="indexFirstPoint">
+            </attribute>
+
+            <attribute name="_sampTime" type="double" accessor="">
+            </attribute>
+
+            <attribute name="_vGain" type="double" accessor="">
+            </attribute>
+
+            <attribute name="_vOffset" type="double" accessor="">
+            </attribute>
+
+            <attribute name="_returnedSegments" type="uint32_t" accessor="nbrSegments">
+            </attribute>
+
+            <attribute name="_nbrAvgWforms" type="uint32_t" accessor="">
+            </attribute>
+
+            <attribute name="_actualTriggersInAcqLo" type="uint32_t" accessor="">
+            </attribute>
+
+            <attribute name="_actualTriggersInAcqHi" type="uint32_t" accessor="">
+            </attribute>
+
+            <attribute name="_actualDataSize" type="uint32_t" accessor="">
+            </attribute>
+
+            <attribute name="_reserved2" type="uint32_t" accessor="">
+            </attribute>
+
+            <attribute name="_reserved3" type="double" accessor="">
+            </attribute>
+
+            <attribute name="_timestamps" type="TimestampV1" 
+                    dimensions="{xtc-config}.horiz().nbrSegments()" accessor="_timestamp">
+            </attribute>
+
+            <attribute name="_waveforms" type="int16_t" 
+                    dimensions="{xtc-config}.horiz().nbrSegments(),{xtc-config}.horiz().nbrSamples()" 
+                    accessor="_waveform">
+            </attribute>
+
+            <attribute name="_extraSpace" type="int8_t" dimensions="_extra">
+            </attribute>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="TdcChannel" pack="4">
+        
+            Pds.Acqiris class "TdcChannel"
+
+            <enum name="Channel">
+              <enum-const name="Veto" value="-2" />
+              <enum-const name="Common" value="-1" />
+              <enum-const name="Input1" value="1" />
+              <enum-const name="Input2" value="2" />
+              <enum-const name="Input3" value="3" />
+              <enum-const name="Input4" value="4" />
+              <enum-const name="Input5" value="5" />
+              <enum-const name="Input6" value="6" />
+            </enum>
+
+            <enum name="Mode">
+              <enum-const name="Positive" value="0" />
+              <enum-const name="Inactive" value="1" />
+            </enum>
+
+            <enum name="Slope">
+              <enum-const name="Active"/>
+              <enum-const name="Negative"/>
+            </enum>
+
+            <attribute name="_channel" type="uint32_t">
+            </attribute>
+
+            <attribute name="_mode" type="uint32_t">
+            </attribute>
+
+            <attribute name="_level" type="double" accessor="level">
+            </attribute>
+
+            <method name="channel" type="Channel">
+                <expr lang="C++" value="Channel({self}._channel)" />
+            </method>
+
+            <method name="mode" type="Mode">
+                <expr lang="C++" value="Mode({self}._mode &gt;&gt; 31)" />
+            </method>
+
+            <method name="slope" type="Slope">
+                <expr lang="C++" value="Slope({self}._mode &amp; 1)" />
+            </method>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="TdcAuxIO" pack="4">
+        
+            Pds.Acqiris class "TdcAuxIO"
+
+            <enum name="Channel">
+              <enum-const name="IOAux1" value="1" />
+              <enum-const name="IOAux2" value="2" />
+            </enum>
+
+            <enum name="Mode">
+              <enum-const name="BankSwitch" value="1" />
+              <enum-const name="Marker" value="2" />
+              <enum-const name="OutputLo" value="32" />
+              <enum-const name="OutputHi" value="33" />
+            </enum>
+
+            <enum name="Termination">
+              <enum-const name="ZHigh" value="0"/>
+              <enum-const name="Z50" value="1"/>
+            </enum>
+
+            <attribute name="_channel" type="uint32_t">
+            </attribute>
+
+            <attribute name="_signal" type="uint32_t">
+            </attribute>
+
+            <attribute name="_qualifier" type="uint32_t">
+            </attribute>
+
+            <method name="channel" type="Channel">
+                <expr lang="C++" value="Channel({self}._channel)" />
+            </method>
+
+            <method name="mode" type="Mode">
+                <expr lang="C++" value="Mode({self}._signal)" />
+            </method>
+
+            <method name="term" type="Termination">
+                <expr lang="C++" value="Termination({self}._qualifier)" />
+            </method>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="TdcVetoIO" pack="4">
+        
+            Pds.Acqiris class "TdcVetoIO"
+
+            <enum name="Channel">
+              <enum-const name="ChVeto" value="13" />
+            </enum>
+
+            <enum name="Mode">
+              <enum-const name="Veto" value="1" />
+              <enum-const name="SwitchVeto" value="2" />
+              <enum-const name="InvertedVeto" value="3" />
+              <enum-const name="InvertedSwitchVeto" value="4" />
+            </enum>
+
+            <enum name="Termination">
+              <enum-const name="ZHigh" value="0"/>
+              <enum-const name="Z50" value="1"/>
+            </enum>
+
+            <attribute name="_channel" type="uint32_t">
+            </attribute>
+
+            <attribute name="_signal" type="uint32_t">
+            </attribute>
+
+            <attribute name="_qualifier" type="uint32_t">
+            </attribute>
+
+            <method name="channel" type="Channel">
+                <expr lang="C++" value="Channel({self}._channel)" />
+            </method>
+
+            <method name="mode" type="Mode">
+                <expr lang="C++" value="Mode({self}._signal)" />
+            </method>
+
+            <method name="term" type="Termination">
+                <expr lang="C++" value="Termination({self}._qualifier)" />
+            </method>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="TdcConfigV1" version="1" type_id="Id_AcqTdcConfig" pack="4" levels="Source">
+        
+            Pds.Acqiris class TdcConfigV1
+
+            <const name="NChannels" value="8" />
+            <const name="NAuxIO" value="2" />
+
+            <attribute name="_channel" type="TdcChannel" dimensions="NChannels" accessor="channels">
+            </attribute>
+
+            <attribute name="_auxIO" type="TdcAuxIO" dimensions="NAuxIO" accessor="auxio">
+            </attribute>
+
+            <attribute name="_veto" type="TdcVetoIO" accessor="veto">
+            </attribute>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <enum name="TdcSource">
+          <enum-const name="Common" />
+          <enum-const name="Chan1" />
+          <enum-const name="Chan2" />
+          <enum-const name="Chan3" />
+          <enum-const name="Chan4" />
+          <enum-const name="Chan5" />
+          <enum-const name="Chan6" />
+          <enum-const name="AuxIO" />
+        </enum>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="TdcDataV1Common">
+        
+            Pds.Acqiris class TdcDataV1::Common
+
+            <attribute name="_value" type="uint32_t">
+            
+                <bitfield name="_bf_nhits" size="28" type="uint32_t" accessor="nhits">
+                </bitfield>
+                
+                <bitfield name="_bf_source" size="3" type="TdcSource" accessor="source">
+                </bitfield>
+            
+                <bitfield name="_bf_ovf" size="1" type="uint8_t" accessor="overflow">
+                </bitfield>
+            
+            </attribute>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="TdcDataV1Channel">
+        
+            Pds.Acqiris class TdcDataV1::Channel
+
+            <attribute name="_value" type="uint32_t">
+            
+                <bitfield name="_bf_ticks" size="28" type="uint32_t" accessor="ticks">
+                </bitfield>
+                
+                <bitfield name="_bf_source" size="3" type="TdcSource" accessor="source">
+                </bitfield>
+            
+                <bitfield name="_bf_ovf" size="1" type="uint8_t" accessor="overflow">
+                </bitfield>
+            
+            </attribute>
+
+            <method name="time" type="double">
+                Tick resolution is 50 picosecond
+                <expr lang="C++" value="{self}.ticks() * 50e-12" />
+            </method>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="TdcDataV1Marker">
+        
+            Pds.Acqiris class TdcDataV1::Marker
+
+            <enum name="Type">
+              <enum-const name="AuxIOSwitch" value="0" />
+              <enum-const name="EventCntSwitch" value="1" />
+              <enum-const name="MemFullSwitch" value="2" />
+              <enum-const name="AuxIOMarker" value="16" />
+            </enum>
+
+            <attribute name="_value" type="uint32_t">
+            
+                <bitfield name="_bf_type" size="28" type="Type" accessor="type">
+                </bitfield>
+                
+                <bitfield name="_bf_source" size="3" type="TdcSource" accessor="source">
+                </bitfield>
+            
+            </attribute>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="TdcDataV1_Item">
+        
+            Pds.Acqiris class TdcDataV1
+
+            <attribute name="_value" type="uint32_t">
+            
+                <bitfield name="_bf_pad1" size="28">
+                </bitfield>
+                
+                <bitfield name="_bf_source" size="3" type="TdcSource" accessor="source">
+                </bitfield>
+            
+            </attribute>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="TdcDataV1" version="1" type_id="Id_AcqTdcData" levels="Source">
+        
+            Pds.Acqiris class TdcDataV1
+
+            <attribute name="_data" type="TdcDataV1_Item" dimensions="*" accessor="data">
+            </attribute>
+
+        </pstype>
+
+	</package>
+</psddl>

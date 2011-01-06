@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+
+    <use file="psddldata/xtc.ddl.xml"/>
+
+	<package name="EvrData">
+
+        <!-- ========================================================================= -->
+	
+		<pstype name="PulseConfig">
+		
+		    <const name="Trigger_Shift" value="0" />
+		    <const name="Set_Shift" value="8" />
+		    <const name="Clear_Shift" value="16" />
+		    
+		    <const name="Polarity_Shift" value="0" />
+		    <const name="Map_Set_Ena_Shift" value="1" />
+		    <const name="Map_Reset_Ena_Shift" value="2" />
+		    <const name="Map_Trigger_Ena_Shift" value="3" />
+		
+		
+            <attribute name="_pulse" type="uint32_t" accessor="pulse">
+            internal pulse generation channel
+            </attribute>
+
+            <attribute name="_input_control" type="uint32_t">
+            Pulse input control
+
+                <bitfield name="_bf_trigger" size="8" type="int16_t" accessor="bf_trigger" access="private"/>
+                <bitfield name="_bf_set" size="8" type="int16_t" accessor="bf_set" access="private"/>
+                <bitfield name="_bf_clear" size="8" type="int16_t" accessor="bf_clear" access="private"/>
+
+            </attribute>
+
+            <attribute name="_output_control" type="uint32_t">
+            Pulse output control
+                <bitfield name="_bf_polarity" size="1" type="uint8_t" accessor="polarity"/>
+                <bitfield name="_bf_map_set_enable" size="1" type="uint8_t" accessor="map_set_enable"/>
+                <bitfield name="_bf_map_reset_enable" size="1" type="uint8_t" accessor="map_reset_enable"/>
+                <bitfield name="_bf_map_trigger_enable" size="1" type="uint8_t" accessor="map_trigger_enable"/>
+            </attribute>
+
+            <attribute name="_prescale" type="uint32_t" accessor="prescale">
+            pulse event prescale
+            </attribute>
+
+            <attribute name="_delay" type="uint32_t" accessor="delay">
+            delay in 119MHz clks
+            </attribute>
+
+            <attribute name="_width" type="uint32_t" accessor="width">
+            width in 119MHz clks
+            </attribute>
+
+            <method name="trigger" type="int16_t">
+                <expr lang="C++" value="{self}.bf_trigger()-1"/>
+            </method>
+            <method name="set" type="int16_t">
+                <expr lang="C++" value="{self}.bf_set()-1"/>
+            </method>
+            <method name="clear" type="int16_t">
+                <expr lang="C++" value="{self}.bf_clear()-1"/>
+            </method>
+
+		</pstype>
+		
+		
+        <!-- ========================================================================= -->
+	
+		<pstype name="PulseConfigV3" pack="4">
+		
+            <attribute name="_u16PulseId" type="uint16_t" accessor="pulseId">
+            </attribute>
+
+            <attribute name="_u16Polarity" type="uint16_t" accessor="polarity">
+            0 -> positive polarity , 1 -> negative polarity
+            </attribute>
+
+            <attribute name="_u32Prescale" type="uint32_t" accessor="prescale">
+            Clock divider
+            </attribute>
+
+            <attribute name="_u32Delay" type="uint32_t" accessor="delay">
+            Delay in 119MHz clks
+            </attribute>
+
+            <attribute name="_u32Width" type="uint32_t" accessor="width">
+            Width in 119MHz clks
+            </attribute>
+
+		</pstype>
+
+        <!-- ========================================================================= -->
+	
+		<pstype name="EventCodeV3" pack="4">
+		
+            <attribute name="_u16Code" type="uint16_t" accessor="code">
+            </attribute>
+
+            <attribute name="_u16MaskEventAttr" type="uint16_t">
+                <bitfield name="_bf_isReadout" size="1" type="uint8_t" accessor="isReadout"/>                
+                <bitfield name="_bf_isTerminator" size="1" type="uint8_t" accessor="isTerminator"/>                
+            </attribute>
+
+            <attribute name="_u32MaskTrigger" type="uint32_t" accessor="maskTrigger">
+            </attribute>
+
+            <attribute name="_u32MaskSet" type="uint32_t" accessor="maskSet">
+            </attribute>
+
+            <attribute name="_u32MaskClear" type="uint32_t" accessor="maskClear">
+            </attribute>
+
+		</pstype>
+
+        <!-- ========================================================================= -->
+	
+		<pstype name="EventCodeV4" pack="4">
+		
+            <attribute name="_u16Code" type="uint16_t" accessor="code">
+            </attribute>
+
+            <attribute name="_u16MaskEventAttr" type="uint16_t">
+                <bitfield name="_bf_isReadout" size="1" type="uint8_t" accessor="isReadout"/>                
+                <bitfield name="_bf_isTerminator" size="1" type="uint8_t" accessor="isTerminator"/>                
+            </attribute>
+
+            <attribute name="_u32ReportDelay" type="uint32_t" accessor="reportDelay">
+            </attribute>
+
+            <attribute name="_u32ReportWidth" type="uint32_t" accessor="reportWidth">
+            </attribute>
+
+            <attribute name="_u32MaskTrigger" type="uint32_t" accessor="maskTrigger">
+            </attribute>
+
+            <attribute name="_u32MaskSet" type="uint32_t" accessor="maskSet">
+            </attribute>
+
+            <attribute name="_u32MaskClear" type="uint32_t" accessor="maskClear">
+            </attribute>
+
+
+		</pstype>
+
+        <!-- ========================================================================= -->
+	
+		<pstype name="EventCodeV5" pack="4">
+				
+			<const name="DescSize" value="16"/>
+				
+            <attribute name="_u16Code" type="uint16_t" accessor="code">
+            </attribute>
+
+            <attribute name="_u16MaskEventAttr" type="uint16_t">
+                <bitfield name="_bf_isReadout" size="1" type="uint8_t" accessor="isReadout"/>                
+                <bitfield name="_bf_isTerminator" size="1" type="uint8_t" accessor="isTerminator"/>                
+                <bitfield name="_bf_isLatch" size="1" type="uint8_t" accessor="isLatch"/>                
+            </attribute>
+
+            <attribute name="_u32ReportDelay" type="uint32_t" accessor="reportDelay">
+            </attribute>
+
+            <attribute name="_u32ReportWidth" type="uint32_t" accessor="reportWidth">
+            </attribute>
+
+            <attribute name="_u32MaskTrigger" type="uint32_t" accessor="maskTrigger">
+            </attribute>
+
+            <attribute name="_u32MaskSet" type="uint32_t" accessor="maskSet">
+            </attribute>
+
+            <attribute name="_u32MaskClear" type="uint32_t" accessor="maskClear">
+            </attribute>
+
+            <attribute name="_desc" type="char" dimensions="DescSize" accessor="desc">
+            </attribute>
+
+
+		</pstype>
+
+		<!-- ========================================================================= -->
+		
+
+		<pstype name="OutputMap">
+		
+		    <enum name="Source">
+		        <enum-const name="Pulse" />
+		        <enum-const name="DBus" />
+		        <enum-const name="Prescaler" />
+		        <enum-const name="Force_High" />
+		        <enum-const name="Force_Low" />
+		    </enum>
+
+            <enum name="Conn">
+                <enum-const name="FrontPanel" />
+                <enum-const name="UnivIO" />
+            </enum>
+		
+            <attribute name="_v" type="uint32_t">
+            </attribute>
+
+
+            <method name="source" type="Source">
+                <expr lang="C++" value="Source(_v &amp; 0xff)"/>
+            </method>
+            
+            <method name="source_id" type="uint8_t">
+                <expr lang="C++" value="(_v &gt;&gt; 8) &amp; 0xff"/>
+            </method>
+            
+            <method name="conn" type="Conn">
+                <expr lang="C++" value="Conn((_v &gt;&gt; 16) &amp; 0xff)"/>
+            </method>
+
+            <method name="conn_id" type="uint8_t">
+                <expr lang="C++" value="_v &gt;&gt; 24"/>
+            </method>
+
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+		<pstype name="ConfigV1" version="1" type_id="Id_EvrConfig">
+		
+            <attribute name="_npulses" type="uint32_t" accessor="npulses">
+            </attribute>
+
+            <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
+            </attribute>
+
+            <attribute name="_pulses" type="PulseConfig" dimensions="{self}._npulses" accessor="pulses">
+            </attribute>
+
+            <attribute name="_output_maps" type="OutputMap" dimensions="{self}._noutputs" accessor="output_maps">
+            </attribute>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="ConfigV2" version="2" type_id="Id_EvrConfig">
+		
+		    <const name="beamOn" value="100"/>
+		    <const name="baseRate" value="40"/>
+		    <const name="singleShot" value="150"/>
+		
+            <enum name="RateCode">
+                <enum-const name="r120Hz" />
+                <enum-const name="r60Hz" />
+                <enum-const name="r30Hz" />
+                <enum-const name="r10Hz" />
+                <enum-const name="r5Hz" />
+                <enum-const name="r1Hz" />
+                <enum-const name="r0_5Hz" />
+                <enum-const name="Single" />
+                <enum-const name="NumberOfRates" />
+            </enum>
+
+            <enum name="BeamCode">
+                <enum-const name="Off" />
+                <enum-const name="On" />
+            </enum>
+
+            <attribute name="_opcode" type="uint32_t" accessor="opcode">
+            </attribute>
+
+            <attribute name="_npulses" type="uint32_t" accessor="npulses">
+            </attribute>
+
+            <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
+            </attribute>
+
+            <attribute name="_pulses" type="PulseConfig" dimensions="{self}._npulses" accessor="pulses">
+            </attribute>
+
+            <attribute name="_output_maps" type="OutputMap" dimensions="{self}._noutputs" accessor="output_maps">
+            </attribute>
+
+
+            <method name="beam" type="BeamCode">
+                <expr lang="C++" value="({self}._opcode &gt; beamOn) ? On : Off"/>
+            </method>
+            
+            <method name="rate" type="RateCode">
+                <expr lang="C++" value="({self}._opcode &lt; beamOn) ? RateCode({self}._opcode-baseRate) : 
+                (({self}._opcode &lt; singleShot) ? RateCode({self}._opcode-beamOn-baseRate) : Single)"/>
+            </method>
+
+        </pstype>
+        
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="ConfigV3" version="3" type_id="Id_EvrConfig" pack="4">
+		
+            <attribute name="_neventcodes" type="uint32_t" accessor="neventcodes">
+            </attribute>
+
+            <attribute name="_npulses" type="uint32_t" accessor="npulses">
+            </attribute>
+
+            <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
+            </attribute>
+
+            <attribute name="_eventcodes" type="EventCodeV3" dimensions="_neventcodes" accessor="eventcodes">
+            </attribute>
+
+            <attribute name="_pulses" type="PulseConfigV3" dimensions="_npulses" accessor="pulses">
+            </attribute>
+
+            <attribute name="_output_maps" type="OutputMap" dimensions="_noutputs" accessor="output_maps">
+            </attribute>
+
+        </pstype>
+        
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="ConfigV4" version="4" type_id="Id_EvrConfig" pack="4">
+		
+            <attribute name="_neventcodes" type="uint32_t" accessor="neventcodes">
+            </attribute>
+
+            <attribute name="_npulses" type="uint32_t" accessor="npulses">
+            </attribute>
+
+            <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
+            </attribute>
+
+            <attribute name="_eventcodes" type="EventCodeV4" dimensions="_neventcodes" accessor="eventcodes">
+            </attribute>
+
+            <attribute name="_pulses" type="PulseConfigV3" dimensions="_npulses" accessor="pulses">
+            </attribute>
+
+            <attribute name="_output_maps" type="OutputMap" dimensions="_noutputs" accessor="output_maps">
+            </attribute>
+
+        </pstype>
+        
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="SequencerEntry">
+
+            <attribute name="_value" type="uint32_t" />
+
+            <method name="eventcode" type="uint32_t">
+                <expr lang="C++" value="{self}._value &gt;&gt; 24"/>
+            </method>
+
+            <method name="delay" type="uint32_t">
+                <expr lang="C++" value="{self}._value &amp; 0xffffff"/>
+            </method>
+
+        </pstype>
+		
+		<!-- ========================================================================= -->
+		
+		<pstype name="SequencerConfigV1">
+
+            <enum name="Source">
+                <enum-const name="r120Hz" />
+                <enum-const name="r60Hz" />
+                <enum-const name="r30Hz" />
+                <enum-const name="r10Hz" />
+                <enum-const name="r5Hz" />
+                <enum-const name="r1Hz" />
+                <enum-const name="r0_5Hz" />
+                <enum-const name="Disable" />
+            </enum>
+
+            <attribute name="_source" type="uint32_t" />
+
+            <attribute name="_length" type="uint32_t" accessor="length"/>
+
+            <attribute name="_cycles" type="uint32_t" accessor="cycles"/>
+
+            <attribute name="_entries" type="SequencerEntry" dimensions="{self}._length" accessor="entries"/>
+
+            <method name="sync_source" type="Source">
+                <expr lang="C++" value="Source({self}._source &amp; 0xff)"/>
+            </method>
+
+            <method name="beam_source" type="Source">
+                <expr lang="C++" value="Source(({self}._source &gt;&gt; 8) &amp; 0xff)"/>
+            </method>
+
+        </pstype>
+		
+		<!-- ========================================================================= -->
+		
+		<pstype name="ConfigV5" version="5" type_id="Id_EvrConfig" pack="4">
+		
+            <attribute name="_neventcodes" type="uint32_t" accessor="neventcodes">
+            </attribute>
+
+            <attribute name="_npulses" type="uint32_t" accessor="npulses">
+            </attribute>
+
+            <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
+            </attribute>
+
+            <attribute name="_eventcodes" type="EventCodeV4" dimensions="_neventcodes" accessor="eventcodes">
+            </attribute>
+
+            <attribute name="_pulses" type="PulseConfigV3" dimensions="_npulses" accessor="pulses">
+            </attribute>
+
+            <attribute name="_output_maps" type="OutputMap" dimensions="_noutputs" accessor="output_maps">
+            </attribute>
+
+            <attribute name="_seq_config" type="SequencerConfigV1" accessor="seq_config">
+            </attribute>
+
+        </pstype>
+        
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="FIFOEvent">
+		
+            <attribute name="TimestampHigh" type="uint32_t" access="public">
+            </attribute>
+
+            <attribute name="TimestampLow" type="uint32_t" access="public">
+            </attribute>
+
+            <attribute name="EventCode" type="uint32_t" access="public">
+            </attribute>
+
+        </pstype>
+        
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="DataV3" version="3" type_id="Id_EvrData">
+        
+            <attribute name="_u32NumFifoEvents" type="uint32_t" accessor="numFifoEvents">
+            </attribute>
+
+            <attribute name="_fifoEvents" type="FIFOEvent" dimensions="_u32NumFifoEvents" accessor="fifoEvents">
+            </attribute>
+
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="IOChannel">
+        
+            <const name="NameLength" value="12"/>
+            <const name="MaxInfos" value="8"/>
+        
+            <attribute name="_name" type="char" dimensions="NameLength" accessor="name">
+            </attribute>
+
+            <attribute name="_ninfo" type="uint32_t" accessor="ninfo">
+            </attribute>
+
+            <attribute name="_info" type="Pds.DetInfo" dimensions="MaxInfos" accessor="infos">
+            </attribute>
+
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="IOConfigV1" version="1" type_id="Id_EvrIOConfig" pack="4">
+        
+            <attribute name="_conn" type="uint16_t">
+            </attribute>
+
+            <attribute name="_nchannels" type="uint16_t" accessor="nchannels">
+            </attribute>
+
+            <attribute name="_channels" type="IOChannel" dimensions="{self}._nchannels" accessor="channels">
+            </attribute>
+
+            <method name="conn" type="OutputMap.Conn">
+                <expr lang="C++" value="OutputMap::Conn({self}._conn)"/>
+            </method>
+
+        </pstype>
+        
+        
+	</package>
+</psddl>

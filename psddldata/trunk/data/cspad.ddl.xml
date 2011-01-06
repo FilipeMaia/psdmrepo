@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+	<package name="CsPad">
+
+
+        <!-- ========================================================================= -->
+
+        <const name="MaxQuadsPerSensor" value="4" />
+        <const name="ASICsPerQuad" value="16" />
+        <const name="RowsPerBank" value="26" />
+        <const name="FullBanksPerASIC" value="7" />
+        <const name="BanksPerASIC" value="8" />
+        <const name="ColumnsPerASIC" value="185" />
+        <const name="MaxRowsPerASIC" value="194" />
+        <const name="PotsPerQuad" value="80" />
+        <const name="TwoByTwosPerQuad" value="4" />
+
+        <const name="SectorsPerQuad" value="8" />
+        
+        
+        
+        <enum name="RunModes">
+            <enum-const name="NoRunning" />
+            <enum-const name="RunButDrop" />
+            <enum-const name="RunAndSendToRCE" />
+            <enum-const name="RunAndSendTriggeredByTTL" />
+            <enum-const name="ExternalTriggerSendToRCE" />
+            <enum-const name="ExternalTriggerDrop" />
+            <enum-const name="NumberOfRunModes" />
+        </enum>
+
+        <enum name="DataModes">
+            <enum-const name="normal" value="0" />
+            <enum-const name="shiftTest" value="1" />
+            <enum-const name="testData" value="2" />
+            <enum-const name="reserved" value="3" />
+        </enum>
+
+
+        <!-- ========================================================================= -->
+	
+		<pstype name="CsPadDigitalPotsCfg">
+		
+            <attribute name="pots" type="uint8_t" dimensions="PotsPerQuad" access="public">
+            </attribute>
+
+		</pstype>
+		
+		
+		<!-- ========================================================================= -->
+		
+
+		<pstype name="CsPadReadOnlyCfg">
+		
+            <attribute name="shiftTest" type="uint32_t" access="public">
+            </attribute>
+
+            <attribute name="version" type="uint32_t" access="public">
+            </attribute>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+
+		<pstype name="CsPadGainMapCfg">
+		
+            <attribute name="_gainMap" type="uint16_t" dimensions="ColumnsPerASIC,MaxRowsPerASIC" 
+                    access="public">
+            </attribute>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+
+		<pstype name="ConfigV1QuadReg">
+		
+            <attribute name="_shiftSelect" type="uint32_t" dimensions="TwoByTwosPerQuad" accessor="shiftSelect">
+            </attribute>
+
+            <attribute name="_edgeSelect" type="uint32_t" dimensions="TwoByTwosPerQuad" accessor="edgeSelect">
+            </attribute>
+
+            <attribute name="_readClkSet" type="uint32_t" accessor="readClkSet">
+            </attribute>
+
+            <attribute name="_readClkHold" type="uint32_t" accessor="readClkHold">
+            </attribute>
+
+            <attribute name="_dataMode" type="uint32_t" accessor="dataMode">
+            </attribute>
+
+            <attribute name="_prstSel" type="uint32_t" accessor="prstSel">
+            </attribute>
+
+            <attribute name="_acqDelay" type="uint32_t" accessor="acqDelay">
+            </attribute>
+
+            <attribute name="_intTime" type="uint32_t" accessor="intTime">
+            </attribute>
+
+            <attribute name="_digDelay" type="uint32_t" accessor="digDelay">
+            </attribute>
+
+            <attribute name="_ampIdle" type="uint32_t" accessor="ampIdle">
+            </attribute>
+
+            <attribute name="_injTotal" type="uint32_t" accessor="injTotal">
+            </attribute>
+
+            <attribute name="_rowColShiftPer" type="uint32_t" accessor="rowColShiftPer">
+            </attribute>
+
+            <attribute name="_readOnly" type="CsPadReadOnlyCfg" accessor="ro">
+            </attribute>
+
+            <attribute name="_digitalPots" type="CsPadDigitalPotsCfg" accessor="dp">
+            </attribute>
+
+            <attribute name="_gainMap" type="CsPadGainMapCfg" accessor="gm">
+            </attribute>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+		<pstype name="ConfigV1" version="1" type_id="Id_CspadConfig">
+		
+            <attribute name="_concentratorVersion" type="uint32_t" accessor="concentratorVersion">
+            </attribute>
+
+            <attribute name="_runDelay" type="uint32_t" accessor="runDelay">
+            </attribute>
+
+            <attribute name="_eventCode" type="uint32_t" accessor="eventCode">
+            </attribute>
+
+            <attribute name="_inactiveRunMode" type="uint32_t" accessor="inactiveRunMode">
+            </attribute>
+
+            <attribute name="_activeRunMode" type="uint32_t" accessor="activeRunMode">
+            </attribute>
+
+            <attribute name="_testDataIndex" type="uint32_t" accessor="tdi">
+            </attribute>
+
+            <attribute name="_payloadPerQuad" type="uint32_t" accessor="payloadSize">
+            </attribute>
+
+            <attribute name="_badAsicMask0" type="uint32_t" accessor="badAsicMask0">
+            </attribute>
+
+            <attribute name="_badAsicMask1" type="uint32_t" accessor="badAsicMask1">
+            </attribute>
+
+            <attribute name="_AsicMask" type="uint32_t" accessor="asicMask">
+            </attribute>
+
+            <attribute name="_quadMask" type="uint32_t" accessor="quadMask">
+            </attribute>
+
+            <attribute name="_quads" type="ConfigV1QuadReg" dimensions="MaxQuadsPerSensor" accessor="quads">
+            </attribute>
+
+            <method name="numAsicsRead" type="uint32_t">
+                <expr lang="C++" value="({self}._AsicMask &amp; 0xf)==1 ? 4 : 16"/>
+            </method>
+            
+            <method name="numQuads" type="uint32_t">
+                <expr lang="C++" value="__builtin_popcount({self}._quadMask)"/>
+            </method>
+            <method name="numSect" type="uint32_t">
+                <expr lang="C++" value="{self}.numAsicsRead()/2"/>
+            </method>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="ConfigV2" version="2" type_id="Id_CspadConfig">
+		
+            <attribute name="_concentratorVersion" type="uint32_t" accessor="concentratorVersion">
+            </attribute>
+
+            <attribute name="_runDelay" type="uint32_t" accessor="runDelay">
+            </attribute>
+
+            <attribute name="_eventCode" type="uint32_t" accessor="eventCode">
+            </attribute>
+
+            <attribute name="_inactiveRunMode" type="uint32_t" accessor="inactiveRunMode">
+            </attribute>
+
+            <attribute name="_activeRunMode" type="uint32_t" accessor="activeRunMode">
+            </attribute>
+
+            <attribute name="_testDataIndex" type="uint32_t" accessor="tdi">
+            </attribute>
+
+            <attribute name="_payloadPerQuad" type="uint32_t" accessor="payloadSize">
+            </attribute>
+
+            <attribute name="_badAsicMask0" type="uint32_t" accessor="badAsicMask0">
+            </attribute>
+
+            <attribute name="_badAsicMask1" type="uint32_t" accessor="badAsicMask1">
+            </attribute>
+
+            <attribute name="_AsicMask" type="uint32_t" accessor="asicMask">
+            </attribute>
+
+            <attribute name="_quadMask" type="uint32_t" accessor="quadMask">
+            </attribute>
+
+            <attribute name="_roiMask" type="uint32_t">
+            </attribute>
+
+            <attribute name="_quads" type="ConfigV1QuadReg" dimensions="MaxQuadsPerSensor" accessor="quads">
+            </attribute>
+
+            <method name="numAsicsRead" type="uint32_t">
+                <expr lang="C++" value="({self}._AsicMask &amp; 0xf)==1 ? 4 : 16"/>
+            </method>
+            
+            <method name="roiMask" type="uint32_t">
+                <arg name="iq" type="uint32_t"/>
+                <expr lang="C++" value="({self}._roiMask &gt;&gt; (8*iq)) &amp; 0xff"/>
+            </method>
+            
+            <method name="numAsicsStored" type="uint32_t">
+                <arg name="iq" type="uint32_t"/>
+                <expr lang="C++" value="__builtin_popcount({self}.roiMask(iq))*2"/>
+            </method>
+            
+            <method name="numQuads" type="uint32_t">
+                <expr lang="C++" value="__builtin_popcount({self}._quadMask)"/>
+            </method>
+
+            <method name="numSect" type="uint32_t">
+                <expr lang="C++" value="__builtin_popcount({self}._roiMask)"/>
+            </method>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="ElementV1" version="1" type_id="Id_CspadElement">
+		
+		    <const name="Nsbtemp" value="4" />
+		
+		    <xtc-config name="ConfigV1" />
+		    <xtc-config name="ConfigV2" />
+		    
+		    <repeat count="{xtc-config}.numQuads()" />
+		
+            <attribute name="_word0" type="uint32_t" accessor="">
+            </attribute>
+
+            <attribute name="_word1" type="uint32_t" accessor="">
+            </attribute>
+
+            <attribute name="_seq_count" type="uint32_t" accessor="seq_count">
+            </attribute>
+
+            <attribute name="_ticks" type="uint32_t" accessor="ticks">
+            </attribute>
+
+            <attribute name="_fiducials" type="uint32_t" accessor="fiducials">
+            </attribute>
+
+            <attribute name="_sbtemp" type="uint16_t" dimensions="Nsbtemp" accessor="sb_temp">
+            </attribute>
+
+            <attribute name="_frame_type" type="uint32_t" accessor="frame_type">
+            </attribute>
+
+            <attribute name="_data" type="uint16_t" 
+                    dimensions="{xtc-config}.numQuads(), {xtc-config}.numAsicsRead()/2, ColumnsPerASIC, MaxRowsPerASIC*2" 
+                    accessor="data">
+            </attribute>
+
+            <attribute name="_extra" type="uint16_t" dimensions="2">
+            </attribute>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="ElementV2" version="2" type_id="Id_CspadElement">
+		
+		    <const name="Nsbtemp" value="4" />
+		
+		    <xtc-config name="ConfigV2" />
+		    
+		    <repeat count="{xtc-config}.numQuads()" />
+		
+            <attribute name="_word0" type="uint32_t" accessor="">
+            </attribute>
+
+            <attribute name="_word1" type="uint32_t" accessor="">
+            </attribute>
+
+            <attribute name="_seq_count" type="uint32_t" accessor="seq_count">
+            </attribute>
+
+            <attribute name="_ticks" type="uint32_t" accessor="ticks">
+            </attribute>
+
+            <attribute name="_fiducials" type="uint32_t" accessor="fiducials">
+            </attribute>
+
+            <attribute name="_sbtemp" type="uint16_t" dimensions="Nsbtemp" accessor="sb_temp">
+            </attribute>
+
+            <attribute name="_frame_type" type="uint32_t" accessor="frame_type">
+            </attribute>
+
+            <attribute name="_data" type="uint16_t" 
+                    dimensions="{xtc-config}.numSect(), ColumnsPerASIC, MaxRowsPerASIC*2" 
+                    accessor="data">
+            </attribute>
+
+            <attribute name="_extra" type="uint16_t" dimensions="2">
+            </attribute>
+
+        </pstype>
+        
+	</package>
+</psddl>

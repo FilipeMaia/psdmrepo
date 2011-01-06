@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+	<package name="Camera">
+	
+		<pstype name="FrameCoord">
+		
+            <attribute name="column" type="uint16_t" access="public">
+            </attribute>
+
+            <attribute name="row" type="uint16_t" access="public">
+            </attribute>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+
+		<pstype name="FrameFccdConfigV1" version="1" type_id="Id_FrameFccdConfig">
+		
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+		<pstype name="FrameFexConfigV1" version="1" type_id="Id_FrameFexConfig">
+		
+            <enum name="Forwarding">
+                <enum-const name="NoFrame" />
+                <enum-const name="FullFrame" />
+                <enum-const name="RegionOfInterest" />
+            </enum>
+
+            <enum name="Processing">
+                <enum-const name="NoProcessing" />
+                <enum-const name="GssFullFrame" />
+                <enum-const name="GssRegionOfInterest" />
+                <enum-const name="GssThreshold" />
+            </enum>
+
+
+            <attribute name="_forwarding" type="uint32_t">
+            frame forwarding policy
+            </attribute>
+
+            <method name="forwarding" type="Forwarding">
+                <expr lang="C++" value="Forwarding({self}._forwarding)"/>
+            </method>
+
+            <attribute name="_forward_prescale" type="uint32_t" accessor="forward_prescale">
+            event prescale for forwarding
+            </attribute>
+
+            <attribute name="_processing" type="uint32_t">
+            processing algorithm
+            </attribute>
+
+            <method name="processing" type="Processing">
+                <expr lang="C++" value="Processing({self}._processing)"/>
+            </method>
+
+            <attribute name="_roiBegin" type="FrameCoord" accessor="roiBegin">
+            starting coord of ROI (inclusive)
+            </attribute>
+
+            <attribute name="_roiEnd" type="FrameCoord" accessor="roiEnd">
+            finishing coord of ROI (exclusive)
+            </attribute>
+
+            <attribute name="_threshold" type="uint32_t" accessor="threshold">
+            threshold value for processing pixel data
+            </attribute>
+
+            <attribute name="_masked_pixel_count" type="uint32_t" accessor="number_of_masked_pixels">
+            count of pixels masked from processing
+            </attribute>
+
+            <attribute name="_masked_pixel_coordinates" type="FrameCoord"
+                dimensions="{self}._masked_pixel_count" 
+                accessor="masked_pixel_coordinates">
+            finishing coord of ROI (exclusive)
+            </attribute>
+
+
+		</pstype>
+		
+
+        <!-- ========================================================================= -->
+        
+        <pstype name="FrameV1" version="1" type_id="Id_Frame">
+        
+
+            <attribute name="_width" type="uint32_t" accessor="width">
+            number of pixels in a row
+            </attribute>
+
+            <attribute name="_height" type="uint32_t" accessor="height">
+            number of pixels in a column
+            </attribute>
+
+            <attribute name="_depth" type="uint32_t" accessor="depth">
+            number of bits per pixel
+            </attribute>
+
+            <attribute name="_offset" type="uint32_t" accessor="offset">
+            fixed offset/pedestal value of pixel data
+            </attribute>
+
+            <attribute name="_pixel_data" type="uint8_t"
+                dimensions="{self}._width*{self}._height*(({self}._depth+7)/8)" 
+                accessor="data">
+            finishing coord of ROI (exclusive)
+            </attribute>
+
+
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="TwoDGaussianV1" version="1" type_id="Id_TwoDGaussian">
+        
+
+            <attribute name="_integral" type="uint64_t" accessor="integral">
+            </attribute>
+
+            <attribute name="_xmean" type="double" accessor="xmean">
+            </attribute>
+
+            <attribute name="_ymean" type="double" accessor="ymean">
+            </attribute>
+
+            <attribute name="_major_axis_width" type="double" accessor="major_axis_width">
+            </attribute>
+
+            <attribute name="_minor_axis_width" type="double" accessor="minor_axis_width">
+            </attribute>
+
+            <attribute name="_major_axis_tilt" type="double" accessor="major_axis_tilt">
+            </attribute>
+
+
+        </pstype>
+        
+	</package>
+</psddl>
