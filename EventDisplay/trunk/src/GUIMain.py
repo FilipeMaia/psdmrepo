@@ -1,3 +1,4 @@
+
 #--------------------------------------------------------------------------
 # File and Version Information:
 #  $Id$
@@ -9,12 +10,7 @@
 
 """Renders the main GUI in the event display application.
 
-Following paragraphs provide detailed description of the module, its
-contents and usage. This is a template module (or module template:)
-which will be used by programmers to create new Python modules.
-This is the "library module" as opposed to executable module. Library
-modules provide class definitions or function definitions, but these
-scripts cannot be run by themselves.
+Following paragraphs provide detailed description of the module.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -37,6 +33,8 @@ __version__ = "$Revision: 4 $"
 #  Imports of standard modules --
 #--------------------------------
 import sys
+import os
+
 from PyQt4 import QtGui, QtCore
 import time   # for sleep(sec)
 
@@ -44,20 +42,16 @@ import time   # for sleep(sec)
 # Imports for other modules --
 #-----------------------------
 import GUIWhatToDisplay as guiwtd
+import ConfigParameters as cp
 
 #---------------------
 #  Class definition --
 #---------------------
 class GUIMain ( QtGui.QWidget ) :
-    """Brief description of a class.
+    """Deals with the main GUI for the event display project
 
-    Full description of this class. The whole purpose of this class is 
-    to serve as an example for SIT users. It shows the structure of
-    the code inside the class. Class can have class (static) variables, 
-    which can be private or public. It is good idea to define constructor 
-    for your class (in Python there is only one constructor). Put your 
-    public methods after constructor, and private methods after public.
-
+    Full description of this class.
+    
     @see BaseClass
     @see OtherClass
     """
@@ -71,11 +65,8 @@ class GUIMain ( QtGui.QWidget ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ (self, parent=None) :
+    def __init__ (self, parent=None, app=None) :
         """Constructor.
-
-        Explanation of what it does. So it does that and that, and also 
-        that, but only if x is equal to that and y is not None.
 
         @param x   first parameter
         @param y   second parameter
@@ -85,13 +76,9 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.setGeometry(300, 300, 500, 300)
         self.setWindowTitle('HDF5 Event Display')
-       
-        self.dirName         = '/reg/d/psdm/XPP/xppcom10/hdf5/'
-        self.dirName         = '/home'
-        self.dirName         = './'
-        self.fileName        = 'Click on "Browse" to select the file with exents ->'
-        self.eventCurrentInt = 1
-        self.span            = 1
+
+        cp.confpars.Print()
+        print 'Current event number directly : %d ' % (cp.confpars.eventCurrent)
 
         self.titFile  = QtGui.QLabel('File:')
         self.titCurr  = QtGui.QLabel('Current event:')
@@ -100,9 +87,9 @@ class GUIMain ( QtGui.QWidget ) :
         self.titSpan  = QtGui.QLabel('Span:')
         self.titSlShow= QtGui.QLabel('Slide show:')
 
-        self.fileEdit = QtGui.QLineEdit(self.fileName)
-        self.numbEdit = QtGui.QLineEdit(str(self.eventCurrentInt))
-        self.spanEdit = QtGui.QLineEdit(str(self.span))
+        self.fileEdit = QtGui.QLineEdit(cp.confpars.dirName+'/'+cp.confpars.fileName)
+        self.numbEdit = QtGui.QLineEdit(str(cp.confpars.eventCurrent))
+        self.spanEdit = QtGui.QLineEdit(str(cp.confpars.span))
         self.spanEdit.setMaximumWidth(45)
         self.numbEdit.setMaximumWidth(90)
 
@@ -197,7 +184,11 @@ class GUIMain ( QtGui.QWidget ) :
         self.connect(self.previous,  QtCore.SIGNAL('clicked()'), self.decrimentEventNo )
         self.connect(self.current,   QtCore.SIGNAL('clicked()'), self.currentEventNo )
         self.connect(self.start,     QtCore.SIGNAL('clicked()'), self.processStart )
-        self.connect(self.stop,      QtCore.SIGNAL('clicked()'), self.processStop )
+
+        self.connect(self.stop,      QtCore.SIGNAL('clicked()'),  self.processStop )
+        #self.connect(self.stop,      QtCore.SIGNAL('pressed()'),  self.processStop )
+        #self.connect(self.stop,      QtCore.SIGNAL('released()'), self.processStop )
+
         self.connect(self.display,   QtCore.SIGNAL('clicked()'), self.processDisplay )
         self.connect(self.save,      QtCore.SIGNAL('clicked()'), self.processSave )
         self.connect(self.config,    QtCore.SIGNAL('clicked()'), self.processConfig )
@@ -212,6 +203,26 @@ class GUIMain ( QtGui.QWidget ) :
     #-------------------
     # Private methods --
     #-------------------
+
+    def paintEvent(self, e):
+        qp = QtGui.QPainter()
+        qp.begin(self)  
+        self.drawArt(qp)
+        qp.end()
+
+    def drawArt(self, qp):
+       #pen = QtGui.QPen(QtGui.QColor(255, 100, 0, 100), 2, QtCore.Qt.SolidLine)
+        pen = QtGui.QPen(QtCore.Qt.red, 2, QtCore.Qt.SolidLine)
+        qp.setPen(pen)
+        size = self.size()
+        YfrD = 0.84
+        YfrU = 0.46
+        qp.setBrush(QtGui.QColor(0, 15, 55, 55))
+        qp.drawRect(5, YfrU*size.height(), size.width()-10, 0.38*size.height())
+        #Rx = Ry = 10
+        #qp.drawRoundedRect( 5, YfrU*size.height(), size.width()-10, 0.38*size.height(), Rx, Ry)
+        #qp.drawLine       (12, YfrD*size.height(), size.width()-12, YfrU*size.height())
+        #qp.drawLine       (12, YfrU*size.height(), size.width()-12, YfrU*size.height())
 
     def processSelection(self):
         print 'Selection\n'
@@ -228,15 +239,20 @@ class GUIMain ( QtGui.QWidget ) :
 
     def processStart(self):
         print 'Start slide show\n'
-        self.eventCurrentInt = int(self.numbEdit.displayText())
-        self.span            = int(self.spanEdit.displayText())
-        self.SHowIsOn = True
-        eventStart = self.eventCurrentInt
-        eventEnd   = self.eventCurrentInt + 100*self.span
-        for self.eventCurrentInt in range(eventStart,eventEnd,self.span):
-            print self.eventCurrentInt
+        cp.confpars.eventCurrent = int(self.numbEdit.displayText())
+        cp.confpars.span         = int(self.spanEdit.displayText())
+        self.SHowIsOn            = True
+        eventStart = cp.confpars.eventCurrent
+        eventEnd   = cp.confpars.eventCurrent + 1000*cp.confpars.span
+
+        while (self.SHowIsOn) :
+            if cp.confpars.eventCurrent>eventEnd : break
+            self.numbEdit.setText( str(cp.confpars.eventCurrent) )
+            print cp.confpars.eventCurrent
+            #self.evloop.activeWindow ()
+            QtGui.QApplication.processEvents()
             time.sleep(1) # in sec
-            if not self.SHowIsOn : break
+            cp.confpars.eventCurrent+=cp.confpars.span
 
     def processStop(self):
         print 'Stop slide show\n'
@@ -244,71 +260,76 @@ class GUIMain ( QtGui.QWidget ) :
               
     def processBrowse(self):
         print 'Browse\n'
-        #self.fileName = self.fileEdit.displayText()
-        self.fileName = QtGui.QFileDialog.getOpenFileName(self,'Open file',self.dirName)
+        str_path_file = str(self.fileEdit.displayText())
+        cp.confpars.dirName,cp.confpars.fileName = os.path.split(str_path_file)
+        print 'dirName  : %s' % (cp.confpars.dirName)         
+        print 'fileName : %s' % (cp.confpars.fileName)         
+        path_file = QtGui.QFileDialog.getOpenFileName(self,'Open file',cp.confpars.dirName)
         #fname = open(filename)
         #data = fname.read()
         #self.textEdit.setText(data)
-        print self.fileName
-        self.fileEdit.setText(self.fileName)
+        print path_file
+        str_path_file = str(path_file)
+        self.fileEdit.setText(str_path_file)
+        cp.confpars.dirName,cp.confpars.fileName = os.path.split(str_path_file)
+        print 'dirName  : %s' % (cp.confpars.dirName)         
+        print 'fileName : %s' % (cp.confpars.fileName)         
 
     def processDisplay(self):
         print 'What to display?'
         self.guiwhat = guiwtd.GUIWhatToDisplay()
         self.guiwhat.show()
-#        self.guiwhat.repaint()
 
     def processSpaninc(self):
         print 'Spaninc ',
-        self.span = int(self.spanEdit.displayText())
-        self.span+=1
-        self.spanEdit.setText(str(self.span))
-        print self.span
+        cp.confpars.span = int(self.spanEdit.displayText())
+        cp.confpars.span+=1
+        self.spanEdit.setText(str(cp.confpars.span))
+        print cp.confpars.span
 
     def processSpandec(self):
         print 'Spandec ',
-        self.span = int(self.spanEdit.displayText())
-        self.span-=1
-        if self.span<1 : self.span=1
-        self.spanEdit.setText(str(self.span))
-        print self.span
+        cp.confpars.span = int(self.spanEdit.displayText())
+        cp.confpars.span-=1
+        if cp.confpars.span<1 : cp.confpars.span=1
+        self.spanEdit.setText(str(cp.confpars.span))
+        print cp.confpars.span
 
     def incrimentEventNo(self):
         print 'Next ',
-        self.span = int(self.spanEdit.displayText())
-        self.spanEdit.setText(str(self.span))
-        self.eventCurrentInt = int(self.numbEdit.displayText())
-        self.eventCurrentInt += self.span
-        self.numbEdit.setText( str(self.eventCurrentInt) )
-        print self.eventCurrentInt 
+        cp.confpars.span = int(self.spanEdit.displayText())
+        cp.confpars.eventCurrent = int(self.numbEdit.displayText())
+        cp.confpars.eventCurrent += cp.confpars.span
+        self.numbEdit.setText( str(cp.confpars.eventCurrent) )
+        print cp.confpars.eventCurrent 
 
     def decrimentEventNo(self):
         print 'Previous ',        
-        self.span = int(self.spanEdit.displayText())
-        self.spanEdit.setText(str(self.span))
-        self.eventCurrentInt = int(self.numbEdit.displayText())
-        self.eventCurrentInt -= self.span
-        if self.eventCurrentInt<0 : self.eventCurrentInt=0
-        self.numbEdit.setText( str(self.eventCurrentInt) )
-        print self.eventCurrentInt
+        cp.confpars.span = int(self.spanEdit.displayText())
+        cp.confpars.eventCurrent = int(self.numbEdit.displayText())
+        cp.confpars.eventCurrent -= cp.confpars.span
+        if cp.confpars.eventCurrent<0 : cp.confpars.eventCurrent=0
+        self.numbEdit.setText( str(cp.confpars.eventCurrent) )
+        print cp.confpars.eventCurrent
 
     def currentEventNo(self):
         print 'Current ',
-        self.eventCurrentInt = int(self.numbEdit.displayText())
-        print self.eventCurrentInt
+        cp.confpars.eventCurrent = int(self.numbEdit.displayText())
+        print cp.confpars.eventCurrent
 
     def mousePressEvent(self, event):
         print 'Quit\n'
         self.emit(QtCore.SIGNAL('closeGUIApp()'))
                 
+    #def keyPressEvent(self, event):
+    #    if event.key() == QtCore.Qt.Key_Escape:
+    #        self.SHowIsOn = False
+
     def keyPressEvent(self, event):
+        print 'event.key() = %s' % (event.key())
         if event.key() == QtCore.Qt.Key_Escape:
-            self.SHowIsOn = False
-
-#    def keyPressEvent(self, event):
-#        if event.key() == QtCore.Qt.Key_Escape:
-#            self.close()
-
+    #        self.close()
+            self.SHowIsOn = False    
 
 #
 #  In case someone decides to run this module

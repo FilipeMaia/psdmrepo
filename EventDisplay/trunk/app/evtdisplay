@@ -55,8 +55,10 @@ class EventDisplay :
 	print "Start the event display main GUI"
 
         # This is a regular stuff for PyQt4:
+        print 'Before : QtGui.QApplication(sys.argv)'
         app = QtGui.QApplication(sys.argv)
-        gui = GUIMain()
+        print 'After  : QtGui.QApplication(sys.argv)'
+        gui = GUIMain(None,app)
         gui.show()
         sys.exit(app.exec_())
 
