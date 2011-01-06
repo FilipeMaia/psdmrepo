@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+	<package name="Princeton">
+
+        <!-- ========================================================================= -->
+	
+		
+		<pstype name="ConfigV1" version="1" type_id="Id_PrincetonConfig" pack="4">
+		
+            <attribute name="_uWidth" type="uint32_t" accessor="width">
+            </attribute>
+
+            <attribute name="_uHeight" type="uint32_t" accessor="height">
+            </attribute>
+
+            <attribute name="_uOrgX" type="uint32_t" accessor="orgX">
+            </attribute>
+
+            <attribute name="_uOrgY" type="uint32_t" accessor="orgY">
+            </attribute>
+
+            <attribute name="_uBinX" type="uint32_t" accessor="binX">
+            </attribute>
+
+            <attribute name="_uBinY" type="uint32_t" accessor="binY">
+            </attribute>
+
+            <attribute name="_f32ExposureTime" type="float" accessor="exposureTime">
+            </attribute>
+
+            <attribute name="_f32CoolingTemp" type="float" accessor="coolingTemp">
+            </attribute>
+
+            <attribute name="_u32ReadoutSpeedIndex" type="uint32_t" accessor="readoutSpeedIndex">
+            </attribute>
+
+            <attribute name="_u16ReadoutEventCode" type="uint16_t" accessor="readoutEventCode">
+            </attribute>
+
+            <attribute name="_u16DelayMode" type="uint16_t" accessor="delayMode">
+            </attribute>
+            
+            <method name="frameSize" type="uint32_t">
+            Total size in bytes of the Frame object
+                <expr lang="C++" value="sizeof(FrameV1) + {self}.numPixels()*2"/>
+            </method>
+
+            <method name="numPixels" type="uint32_t">
+            calculate the frame size in pixels based on the current ROI and binning settings
+                <expr lang="C++" value="((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY )"/>
+            </method>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+        
+        <pstype name="FrameV1" version="1" type_id="Id_PrincetonFrame" pack="4">
+        
+            <xtc-config name="ConfigV1" />
+
+            <attribute name="_iShotIdStart" type="uint32_t" accessor="shotIdStart">
+            </attribute>
+
+            <attribute name="_fReadoutTime" type="float" accessor="readoutTime">
+            </attribute>
+
+            <attribute name="_data" type="uint16_t" dimensions="{xtc-config}.numPixels()" accessor="data">
+            </attribute>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+        
+        <pstype name="InfoV1" version="1" type_id="Id_PrincetonInfo">
+        
+            <attribute name="_fTemperature" type="float" accessor="temperature">
+            </attribute>
+
+        </pstype>
+        
+        
+	</package>
+</psddl>

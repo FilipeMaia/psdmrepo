@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+
+    <use file="psddldata/xtc.ddl.xml"/>
+
+	<package name="ControlData">
+	
+		<pstype name="PVControl" pack="4">
+		
+		    <const name="NameSize" value="32" />
+		    <const name="NoArray" value="0xFFFFFFFF">
+		    Special value used for _index when PV is not an array
+		    </const>
+		
+            <attribute name="_name" type="char" dimensions="32" accessor="name">
+            </attribute>
+
+            <attribute name="_index" type="uint32_t" accessor="index">
+            </attribute>
+
+            <attribute name="_value" type="double" accessor="value">
+            </attribute>
+
+            <method name="array" type="uint8_t">
+                <expr lang="C++" value="_index != NoArray"/>
+            </method>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+		<pstype name="PVMonitor" pack="4">
+		
+		    <const name="NameSize" value="32" />
+            <const name="NoArray" value="0xFFFFFFFF">
+            Special value used for _index when PV is not an array
+            </const>
+		
+            <attribute name="_name" type="char" dimensions="32" accessor="name">
+            </attribute>
+
+            <attribute name="_index" type="uint32_t" accessor="index">
+            </attribute>
+
+            <attribute name="_loValue" type="double" accessor="loValue">
+            </attribute>
+
+            <attribute name="_hiValue" type="double" accessor="hiValue">
+            </attribute>
+
+            <method name="array" type="uint8_t">
+                <expr lang="C++" value="_index != NoArray"/>
+            </method>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+		<pstype name="ConfigV1" version="1" type_id="Id_ControlConfig">
+
+            <attribute name="_control" type="uint32_t" accessor="">
+            </attribute>
+
+            <attribute name="_reserved" type="uint32_t" accessor="">
+            </attribute>
+
+            <attribute name="_duration" type="Pds.ClockTime" accessor="duration">
+            </attribute>
+
+            <attribute name="_npvControls" type="uint32_t" accessor="npvControls">
+            </attribute>
+
+            <attribute name="_npvMonitors" type="uint32_t" accessor="npvMonitors">
+            </attribute>
+
+            <attribute name="_pvControls" type="PVControl"
+                dimensions="{self}._npvControls" accessor="pvControls">
+            </attribute>
+
+            <attribute name="_pvMonitors" type="PVMonitor"
+                dimensions="{self}._npvMonitors" accessor="pvMonitors">
+            </attribute>
+
+        </pstype>
+        
+	</package>
+</psddl>
