@@ -301,96 +301,62 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvCtrlHeader">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
+		<pstype name="EpicsPvCtrlHeader" base="EpicsPvHeader">
 			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvCtrlString">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
-			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+		<pstype name="EpicsPvCtrlString" base="EpicsPvCtrlHeader">
 			<attribute name="dbr" type="dbr_sts_string" access="public"/>
 			<attribute name="dbr_array_data" type="char" dimensions="{self}.iNumElements-1, MAX_STRING_SIZE" access="public"/>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvCtrlShort">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
-			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+		<pstype name="EpicsPvCtrlShort" base="EpicsPvCtrlHeader">
 			<attribute name="dbr" type="dbr_ctrl_short" access="public"/>
 			<attribute name="dbr_array_data" type="int16_t" dimensions="{self}.iNumElements-1" access="public"/>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvCtrlFloat">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
-			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+		<pstype name="EpicsPvCtrlFloat" base="EpicsPvCtrlHeader">
 			<attribute name="dbr" type="dbr_ctrl_float" access="public"/>
 			<attribute name="dbr_array_data" type="float" dimensions="{self}.iNumElements-1" access="public"/>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvCtrlEnum">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
-			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+		<pstype name="EpicsPvCtrlEnum" base="EpicsPvCtrlHeader">
 			<attribute name="dbr" type="dbr_ctrl_enum" access="public"/>
 			<attribute name="dbr_array_data" type="uint16_t" dimensions="{self}.iNumElements-1" access="public"/>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvCtrlChar">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
-			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+		<pstype name="EpicsPvCtrlChar" base="EpicsPvCtrlHeader">
 			<attribute name="dbr" type="dbr_ctrl_char" access="public"/>
 			<attribute name="dbr_array_data" type="uint8_t" dimensions="{self}.iNumElements-1" access="public"/>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvCtrlLong">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
-			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+		<pstype name="EpicsPvCtrlLong" base="EpicsPvCtrlHeader">
 			<attribute name="dbr" type="dbr_ctrl_long" access="public"/>
 			<attribute name="dbr_array_data" type="int32_t" dimensions="{self}.iNumElements-1" access="public"/>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvCtrlDouble">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
-			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+		<pstype name="EpicsPvCtrlDouble" base="EpicsPvCtrlHeader">
 			<attribute name="dbr" type="dbr_ctrl_double" access="public"/>
 			<attribute name="dbr_array_data" type="double" dimensions="{self}.iNumElements-1" access="public"/>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeString">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
+		<pstype name="EpicsPvTimeString" base="EpicsPvHeader">
             <attribute name="pad0" type="int16_t" access="public"/>
             <attribute name="dbr" type="dbr_time_string" access="public"/>
             <attribute name="dbr_array_data" type="char" dimensions="{self}.iNumElements-1, MAX_STRING_SIZE" access="public"/>
@@ -398,10 +364,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeShort">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
+		<pstype name="EpicsPvTimeShort" base="EpicsPvHeader">
 			<attribute name="pad0" type="int16_t" access="public"/>
             <attribute name="dbr" type="dbr_time_short" access="public"/>
             <attribute name="dbr_array_data" type="int16_t" dimensions="{self}.iNumElements-1" access="public"/>
@@ -409,10 +372,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeFloat">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
+		<pstype name="EpicsPvTimeFloat" base="EpicsPvHeader">
 			<attribute name="pad0" type="int16_t" access="public"/>
             <attribute name="dbr" type="dbr_time_float" access="public"/>
             <attribute name="dbr_array_data" type="float" dimensions="{self}.iNumElements-1" access="public"/>
@@ -420,10 +380,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeEnum">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
+		<pstype name="EpicsPvTimeEnum" base="EpicsPvHeader">
 			<attribute name="pad0" type="int16_t" access="public"/>
             <attribute name="dbr" type="dbr_time_enum" access="public"/>
             <attribute name="dbr_array_data" type="uint16_t" dimensions="{self}.iNumElements-1" access="public"/>
@@ -431,10 +388,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeChar">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
+		<pstype name="EpicsPvTimeChar" base="EpicsPvHeader">
 			<attribute name="pad0" type="int16_t" access="public"/>
             <attribute name="dbr" type="dbr_time_char" access="public"/>
             <attribute name="dbr_array_data" type="uint8_t" dimensions="{self}.iNumElements-1" access="public"/>
@@ -442,10 +396,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeLong">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
+		<pstype name="EpicsPvTimeLong" base="EpicsPvHeader">
 			<attribute name="pad0" type="int16_t" access="public"/>
             <attribute name="dbr" type="dbr_time_long" access="public"/>
             <attribute name="dbr_array_data" type="int32_t" dimensions="{self}.iNumElements-1" access="public"/>
@@ -453,10 +404,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeDouble">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
+		<pstype name="EpicsPvTimeDouble" base="EpicsPvHeader">
 			<attribute name="pad0" type="int16_t" access="public"/>
             <attribute name="dbr" type="dbr_time_double" access="public"/>
             <attribute name="dbr_array_data" type="double" dimensions="{self}.iNumElements-1" access="public"/>

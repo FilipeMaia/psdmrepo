@@ -3,7 +3,8 @@
 
 <psddl>
 
-    <use file="psddldata/xtc.ddl.xml"/>
+    <use file="psddldata/xtc.ddl.xml" 
+        cpp_headers="pdsdata/xtc/DetInfo.hh"/>
 
 	<package name="EvrData">
 

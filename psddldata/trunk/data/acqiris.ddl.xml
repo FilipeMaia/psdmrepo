@@ -378,67 +378,76 @@
 
         <!-- ========================================================================= -->
 
-        <enum name="TdcSource">
-          <enum-const name="Common" />
-          <enum-const name="Chan1" />
-          <enum-const name="Chan2" />
-          <enum-const name="Chan3" />
-          <enum-const name="Chan4" />
-          <enum-const name="Chan5" />
-          <enum-const name="Chan6" />
-          <enum-const name="AuxIO" />
-        </enum>
-
-        <!-- ========================================================================= -->
-
-        <pstype name="TdcDataV1Common">
+        <pstype name="TdcDataV1_Item">
         
-            Pds.Acqiris class TdcDataV1::Common
+            Pds.Acqiris class TdcDataV1
+
+	        <enum name="Source">
+	          <enum-const name="Common" />
+	          <enum-const name="Chan1" />
+	          <enum-const name="Chan2" />
+	          <enum-const name="Chan3" />
+	          <enum-const name="Chan4" />
+	          <enum-const name="Chan5" />
+	          <enum-const name="Chan6" />
+	          <enum-const name="AuxIO" />
+	        </enum>
 
             <attribute name="_value" type="uint32_t">
             
-                <bitfield name="_bf_nhits" size="28" type="uint32_t" accessor="nhits">
+                <bitfield name="_bf_val" size="28" type="uint32_t" accessor="bf_val_" access="protected">
                 </bitfield>
                 
-                <bitfield name="_bf_source" size="3" type="TdcSource" accessor="source">
+                <bitfield name="_bf_source" size="3" type="Source" accessor="source">
                 </bitfield>
             
-                <bitfield name="_bf_ovf" size="1" type="uint8_t" accessor="overflow">
+                <bitfield name="_bf_ovf" size="1" type="uint8_t" accessor="bf_ofv_" access="protected">
                 </bitfield>
-            
+                
             </attribute>
 
         </pstype>
 
         <!-- ========================================================================= -->
 
-        <pstype name="TdcDataV1Channel">
+        <pstype name="TdcDataV1Common" base="TdcDataV1_Item">
         
-            Pds.Acqiris class TdcDataV1::Channel
+            Pds.Acqiris class TdcDataV1::Common
 
-            <attribute name="_value" type="uint32_t">
-            
-                <bitfield name="_bf_ticks" size="28" type="uint32_t" accessor="ticks">
-                </bitfield>
-                
-                <bitfield name="_bf_source" size="3" type="TdcSource" accessor="source">
-                </bitfield>
-            
-                <bitfield name="_bf_ovf" size="1" type="uint8_t" accessor="overflow">
-                </bitfield>
-            
-            </attribute>
+            <method name="nhits" type="uint32_t">
+                <expr lang="C++" value="{self}.bf_val_()" />
+            </method>
 
-            <method name="time" type="double">
-                Tick resolution is 50 picosecond
-                <expr lang="C++" value="{self}.ticks() * 50e-12" />
+            <method name="overflow" type="uint8_t">
+                <expr lang="C++" value="{self}.bf_ofv_()" />
             </method>
 
         </pstype>
 
         <!-- ========================================================================= -->
 
-        <pstype name="TdcDataV1Marker">
+        <pstype name="TdcDataV1Channel" base="TdcDataV1_Item">
+        
+            Pds.Acqiris class TdcDataV1::Channel
+
+            <method name="ticks" type="uint32_t">
+                <expr lang="C++" value="{self}.bf_val_()" />
+            </method>
+
+            <method name="overflow" type="uint8_t">
+                <expr lang="C++" value="{self}.bf_ofv_()" />
+            </method>
+
+            <method name="time" type="double">
+                Tick resolution is 50 picosecond
+                <expr lang="C++" value="{self}.bf_val_() * 50e-12" />
+            </method>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
+
+        <pstype name="TdcDataV1Marker" base="TdcDataV1_Item">
         
             Pds.Acqiris class TdcDataV1::Marker
 
@@ -449,33 +458,9 @@
               <enum-const name="AuxIOMarker" value="16" />
             </enum>
 
-            <attribute name="_value" type="uint32_t">
-            
-                <bitfield name="_bf_type" size="28" type="Type" accessor="type">
-                </bitfield>
-                
-                <bitfield name="_bf_source" size="3" type="TdcSource" accessor="source">
-                </bitfield>
-            
-            </attribute>
-
-        </pstype>
-
-        <!-- ========================================================================= -->
-
-        <pstype name="TdcDataV1_Item">
-        
-            Pds.Acqiris class TdcDataV1
-
-            <attribute name="_value" type="uint32_t">
-            
-                <bitfield name="_bf_pad1" size="28">
-                </bitfield>
-                
-                <bitfield name="_bf_source" size="3" type="TdcSource" accessor="source">
-                </bitfield>
-            
-            </attribute>
+            <method name="type" type="Type">
+                <expr lang="C++" value="Type({self}.bf_val_())" />
+            </method>
 
         </pstype>
 
