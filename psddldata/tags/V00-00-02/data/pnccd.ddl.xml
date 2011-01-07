@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+	<package name="PNCCD">
+	
+        <!-- ========================================================================= -->
+
+		<pstype name="ConfigV1" version="1" type_id="Id_pnCCDconfig" levels="Source">
+		
+		pnCCD configuration class ConfigV1
+		
+			<attribute name="_numLinks" type="uint32_t" accessor="numLinks">
+			Number of links in the pnCCD.
+			</attribute>
+
+			<attribute name="_payloadSizePerLink" type="uint32_t" accessor="payloadSizePerLink">
+			Size of the payload in bytes for single link
+			</attribute>
+
+		</pstype>
+		
+
+        <!-- ========================================================================= -->
+
+
+		<pstype name="ConfigV2" version="2" type_id="Id_pnCCDconfig" levels="Source">
+		
+        pnCCD configuration class ConfigV2
+		
+			<attribute name="_numLinks" type="uint32_t" accessor="numLinks">
+            Number of links in the pnCCD.
+			</attribute>
+
+			<attribute name="_payloadSizePerLink" type="uint32_t" accessor="payloadSizePerLink">
+            Size of the payload in bytes for single link
+			</attribute>
+			
+            <attribute name="_numChannels" type="uint32_t" accessor="numChannels">
+            Number of channels
+            </attribute>
+            
+            <attribute name="_numRows" type="uint32_t" accessor="numRows">
+            Number of rows
+            </attribute>
+            
+            <attribute name="_numSubmoduleChannels" type="uint32_t" accessor="numSubmoduleChannels">
+            Number of submodule channels
+            </attribute>
+            
+            <attribute name="_numSubmoduleRows" type="uint32_t" accessor="numSubmoduleRows">
+            Number of submodule rows
+            </attribute>
+            
+            <attribute name="_numSubmodules" type="uint32_t" accessor="numSubmodules">
+            Number of submodules
+            </attribute>
+            
+            <attribute name="_camexMagic" type="uint32_t" accessor="camexMagic">
+            Magic word from CAMEX
+            </attribute>
+            
+            <attribute name="_info" type="char" dimensions="256" accessor="info">
+            Information data string
+            </attribute>
+            
+            <attribute name="_timingFName" type="char" dimensions="256" accessor="timingFName">
+            Timing file name string
+            </attribute>
+
+		</pstype>
+
+
+        <!-- ========================================================================= -->
+
+
+        <pstype name="FrameV1" version="1" type_id="Id_Frame" levels="Source" size="{xtc-config}.payloadSizePerLink()">
+
+        pnCCD configuration class FrameV1
+        
+            <xtc-config name="ConfigV1" />
+            <xtc-config name="ConfigV2" />
+            
+            <repeat count="{xtc-config}.numLinks()" />
+        
+            <attribute name="_specialWord" type="uint32_t" accessor="specialWord">
+            Special values
+            </attribute>
+
+            <attribute name="_frameNumber" type="uint32_t" accessor="frameNumber">
+            Frame number
+            </attribute>
+
+            <attribute name="_timeStampHi" type="uint32_t" accessor="timeStampHi">
+            Most significant part of timestamp
+            </attribute>
+
+            <attribute name="_timeStampLo" type="uint32_t" accessor="timeStampLo">
+            Least significant part of timestamp
+            </attribute>
+
+            <attribute name="__data" type="uint16_t" accessor="data" dimensions="({xtc-config}.payloadSizePerLink()-16)/2">
+            Frame data
+            </attribute>
+
+        </pstype>
+
+	</package>
+</psddl>

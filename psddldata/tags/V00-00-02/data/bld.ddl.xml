@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+
+    <use file="psddldata/ipimb.ddl.xml"/>
+    <use file="psddldata/lusi.ddl.xml"/>
+
+	<package name="Bld">
+	
+		<pstype name="BldDataFEEGasDetEnergy" type_id="Id_FEEGasDetEnergy" version="0" pack="4">
+		
+	       	PV names: GDET:FEE1:11:ENRC, GDET:FEE1:12:ENRC, GDET:FEE1:21:ENRC, GDET:FEE1:22:ENRC
+		
+            <attribute name="f_11_ENRC" type="double" access="public">
+            in mJ
+            </attribute>
+
+            <attribute name="f_12_ENRC" type="double" access="public">
+            in mJ
+            </attribute>
+
+            <attribute name="f_21_ENRC" type="double" access="public">
+            in mJ
+            </attribute>
+
+            <attribute name="f_22_ENRC" type="double" access="public">
+            in mJ
+            </attribute>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+
+		<pstype name="BldDataEBeamV0" type_id="Id_EBeam" version="0" pack="4">
+		
+            <attribute name="uDamageMask" type="uint32_t" access="public">
+            </attribute>
+
+            <attribute name="fEbeamCharge" type="double" access="public">
+            in nC
+            </attribute>
+
+            <attribute name="fEbeamL3Energy" type="double" access="public">
+            in MeV
+            </attribute>
+
+            <attribute name="fEbeamLTUPosX" type="double" access="public">
+            in mm
+            </attribute>
+
+            <attribute name="fEbeamLTUPosY" type="double" access="public">
+            in mm
+            </attribute>
+
+            <attribute name="fEbeamLTUAngX" type="double" access="public">
+            in mrad
+            </attribute>
+
+            <attribute name="fEbeamLTUAngY" type="double" access="public">
+            in mrad
+            </attribute>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+		<pstype name="BldDataEBeam" type_id="Id_EBeam" version="1" pack="4">
+		
+            <attribute name="uDamageMask" type="uint32_t" access="public">
+            </attribute>
+
+            <attribute name="fEbeamCharge" type="double" access="public">
+            in nC
+            </attribute>
+
+            <attribute name="fEbeamL3Energy" type="double" access="public">
+            in MeV
+            </attribute>
+
+            <attribute name="fEbeamLTUPosX" type="double" access="public">
+            in mm
+            </attribute>
+
+            <attribute name="fEbeamLTUPosY" type="double" access="public">
+            in mm
+            </attribute>
+
+            <attribute name="fEbeamLTUAngX" type="double" access="public">
+            in mrad
+            </attribute>
+
+            <attribute name="fEbeamLTUAngY" type="double" access="public">
+            in mrad
+            </attribute>
+
+            <attribute name="fEbeamPkCurrBC2" type="double" access="public">
+            in Amps
+            </attribute>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+
+		<pstype name="BldDataPhaseCavity" type_id="Id_PhaseCavity" version="0" pack="4">
+
+            PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2, 
+                UND:R02:IOC:16:BAT:Charge1,  UND:R02:IOC:16:BAT:Charge2
+	
+            <attribute name="fFitTime1" type="double" access="public">
+            in pico-seconds
+            </attribute>
+
+            <attribute name="fFitTime2" type="double" access="public">
+            in pico-seconds
+            </attribute>
+
+            <attribute name="fCharge1" type="double" access="public">
+            in pico-columbs
+            </attribute>
+
+            <attribute name="fCharge2" type="double" access="public">
+            in pico-columbs
+            </attribute>
+
+		</pstype>
+		
+
+		<!-- ========================================================================= -->
+		
+
+		<pstype name="BldDataIpimb" type_id="Id_SharedIpimb" version="0" pack="4">
+
+            <attribute name="ipimbData" type="Ipimb.DataV1" access="public">
+            </attribute>
+
+            <attribute name="ipimbConfig" type="Ipimb.ConfigV1" access="public">
+            </attribute>
+
+            <attribute name="ipmFexData" type="Lusi.IpmFexV1" access="public">
+            </attribute>
+
+		</pstype>
+		
+
+	</package>
+</psddl>
