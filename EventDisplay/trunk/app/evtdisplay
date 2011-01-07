@@ -60,6 +60,7 @@ class EventDisplay :
         print 'After  : QtGui.QApplication(sys.argv)'
         gui = GUIMain(None,app)
         gui.show()
+        #app.setActiveWindow(gui)
         sys.exit(app.exec_())
 
 #

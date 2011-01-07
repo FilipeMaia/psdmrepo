@@ -43,6 +43,8 @@ import time   # for sleep(sec)
 #-----------------------------
 import GUIWhatToDisplay as guiwtd
 import ConfigParameters as cp
+import DrawEvent        as drev
+import PrintHDF5        as printh5 # for my print_group(g,offset)
 
 #---------------------
 #  Class definition --
@@ -72,6 +74,7 @@ class GUIMain ( QtGui.QWidget ) :
         @param y   second parameter
         """
 
+        self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(300, 300, 500, 300)
@@ -79,6 +82,8 @@ class GUIMain ( QtGui.QWidget ) :
 
         cp.confpars.Print()
         print 'Current event number directly : %d ' % (cp.confpars.eventCurrent)
+
+        self.drawev   = drev.DrawEvent()
 
         self.titFile  = QtGui.QLabel('File:')
         self.titCurr  = QtGui.QLabel('Current event:')
@@ -94,6 +99,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.numbEdit.setMaximumWidth(90)
 
         self.browse   = QtGui.QPushButton("Browse")    
+        self.printfile= QtGui.QPushButton("Print file cont.")    
         self.display  = QtGui.QPushButton("What to display")
         self.config   = QtGui.QPushButton("Configuration")
         self.save     = QtGui.QPushButton("Save conf.")
@@ -124,7 +130,8 @@ class GUIMain ( QtGui.QWidget ) :
         hboxC = QtGui.QHBoxLayout()
         hboxC.addWidget(self.config)
         hboxC.addWidget(self.save)
-        hboxC.addStretch(1)
+        hboxC.addStretch(2)
+        hboxC.addWidget(self.printfile)
         
         hboxE = QtGui.QHBoxLayout()
         hboxE.addWidget(self.selection)
@@ -192,6 +199,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.connect(self.display,   QtCore.SIGNAL('clicked()'), self.processDisplay )
         self.connect(self.save,      QtCore.SIGNAL('clicked()'), self.processSave )
         self.connect(self.config,    QtCore.SIGNAL('clicked()'), self.processConfig )
+        self.connect(self.printfile, QtCore.SIGNAL('clicked()'), self.processPrint )
         self.connect(self.selection, QtCore.SIGNAL('clicked()'), self.processSelection )
         self.connect(self.spaninc,   QtCore.SIGNAL('clicked()'), self.processSpaninc )
         self.connect(self.spandec,   QtCore.SIGNAL('clicked()'), self.processSpandec )
@@ -233,10 +241,17 @@ class GUIMain ( QtGui.QWidget ) :
     def processSave(self):
         print 'Save\n'
 
+    def processPrint(self):
+        fname = cp.confpars.dirName+'/'+cp.confpars.fileName
+        print 'Print structure of the HDF5 file:\n %s' % (fname)
+        printh5.print_hdf5_file_structure(fname)
+
     def processQuit(self):
         print 'Quit\n'
+        self.drawev.stopDrawEvent()
+        self.SHowIsOn = False
         self.close()
-
+        
     def processStart(self):
         print 'Start slide show\n'
         cp.confpars.eventCurrent = int(self.numbEdit.displayText())
@@ -244,18 +259,22 @@ class GUIMain ( QtGui.QWidget ) :
         self.SHowIsOn            = True
         eventStart = cp.confpars.eventCurrent
         eventEnd   = cp.confpars.eventCurrent + 1000*cp.confpars.span
+        mode = 0 # for slide show
 
         while (self.SHowIsOn) :
             if cp.confpars.eventCurrent>eventEnd : break
             self.numbEdit.setText( str(cp.confpars.eventCurrent) )
-            print cp.confpars.eventCurrent
+            #print cp.confpars.eventCurrent
             #self.evloop.activeWindow ()
             QtGui.QApplication.processEvents()
-            time.sleep(1) # in sec
+            if not self.SHowIsOn : break
+            #time.sleep(1) # in sec
+            self.drawev.drawEvent(mode) # Draw everything for current event
             cp.confpars.eventCurrent+=cp.confpars.span
 
     def processStop(self):
         print 'Stop slide show\n'
+        self.drawev.stopDrawEvent() 
         self.SHowIsOn = False
               
     def processBrowse(self):
@@ -301,7 +320,8 @@ class GUIMain ( QtGui.QWidget ) :
         cp.confpars.eventCurrent = int(self.numbEdit.displayText())
         cp.confpars.eventCurrent += cp.confpars.span
         self.numbEdit.setText( str(cp.confpars.eventCurrent) )
-        print cp.confpars.eventCurrent 
+        mode = 1
+        self.drawev.drawEvent(mode) # Draw everything for current event
 
     def decrimentEventNo(self):
         print 'Previous ',        
@@ -310,12 +330,16 @@ class GUIMain ( QtGui.QWidget ) :
         cp.confpars.eventCurrent -= cp.confpars.span
         if cp.confpars.eventCurrent<0 : cp.confpars.eventCurrent=0
         self.numbEdit.setText( str(cp.confpars.eventCurrent) )
-        print cp.confpars.eventCurrent
+        mode = 1
+        self.drawev.drawEvent(mode) # Draw everything for current event
+        #print cp.confpars.eventCurrent
 
     def currentEventNo(self):
         print 'Current ',
         cp.confpars.eventCurrent = int(self.numbEdit.displayText())
-        print cp.confpars.eventCurrent
+        mode = 1
+        self.drawev.drawEvent(mode) # Draw everything for current event
+        #print cp.confpars.eventCurrent
 
     def mousePressEvent(self, event):
         print 'Quit\n'
