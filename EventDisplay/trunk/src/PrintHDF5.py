@@ -53,7 +53,6 @@ def print_hdf5_file_structure(fname):
     f.close()
     print '=== EOF ==='
 
-
 #----------------------------------
 
 def print_group(g,offset):
@@ -82,7 +81,7 @@ def print_group_content(g,offset):
 
 #----------------------------------
 
-def print_info(ds):
+def print_dataset_info(ds):
     """Prints attributes and all other available info for group or data"""
     #print "ds.value          = ", ds.value
     print "ds.name           = ", ds.name
@@ -99,7 +98,21 @@ def print_info(ds):
 
 #----------------------------------
 
+def print_file_info(file):
+    """Prints attributes and all other available info for group or data"""
 
+    print "file.name           = ", file.name
+    print "file.attrs          = ", file.attrs 
+    print "file.attrs.keys()   = ", file.attrs.keys() 
+    print "file.attrs.values() = ", file.attrs.values() 
+    print "file.id             = ", file.id 
+    print "file.ref            = ", file.ref 
+    print "file.parent         = ", file.parent
+    print "file.file           = ", file.file
+
+    print "Run number          = ", file.attrs['runNumber']
+
+#----------------------------------
 #
 #  In case someone decides to run this module
 #

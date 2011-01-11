@@ -59,7 +59,7 @@ class PlotsForCSpad ( object ) :
         print '\n Initialization of the PlotsForCSpad'
         #print 'using MPL version: ', matplotlib.__version__
 
-        self.window_is_open = False
+        self.fig1_window_is_open = False
 
     #-------------------
     #  Public methods --
@@ -72,42 +72,58 @@ class PlotsForCSpad ( object ) :
         print 'open_fig1()'
 
         plt.ion() # enables interactive mode
-        plt.figure(figsize=(10,10), dpi=80, facecolor='w',edgecolor='w',frameon=True) # parameters like in class Figure
-        plt.subplots_adjust(left=0.08, bottom=0.02, right=0.98, top=0.98, wspace=0.1, hspace=0.1)
+        fig1 = plt.figure(figsize=(10,10), dpi=80, facecolor='w',edgecolor='w',frameon=True) # parameters like in class Figure
+        plt.subplots_adjust(left=0.08, bottom=0.02, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
 
+        fig1.canvas.set_window_title("CSpad image") 
         ##f = fig.Figure(figsize=(2,5), dpi=100, facecolor='w',edgecolor='w') #,frameon=True,linewidth=0.05) # set figure parame ters
         ##plt.figure(figsize=(10,6), dpi=100, facecolor='g',edgecolor='b',frameon=True,linewidth=5) # parameters like in class Figure
         ##plt.subplots_adjust(hspace=0.4)
         ##plt.subplot(221)
         ##plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=None)
-        self.window_is_open = True
+        self.fig1_window_is_open = True
 
 
     def close_fig1( self ):
         """Close fig1 and its window."""
 
-        print 'close_fig1()'
-        plt.ioff()
-        plt.close()
-        self.window_is_open = False 
+        if self.fig1_window_is_open :
+            plt.ioff()
+            plt.close()
+            self.fig1_window_is_open = False 
+            print 'close_fig1()'
+
+    def plotCSpadV1( self, arr1ev, mode=1 ):
+        """Plot 2d image from input array. V1 for run ~546
+
+        V1 contain array for entire detector. Currently we plat quad 2 only.
+        """
+        quad=2
+        arr1quad = arr1ev[quad,...]      # V1 for run ~546
+        self.plotCSpadQuad( arr1quad, mode )
 
 
-    def plot_CSpad( self, arr1ev, mode=1 ):
+    def plotCSpadV2( self, arr1quad, mode=1 ):
+        """Plot 2d image from input array.
+
+        V2 for run ~900 contain array for quad 2, which we plot directly.
+        """
+        self.plotCSpadQuad( arr1quad, mode )
+
+  
+    def plotCSpadQuad( self, arr1quad, mode=1 ):
         """Plot 2d image from input array."""
 
-        #print 'plot_CSpad()'       
+        #print 'plot_CSpadQuad()'       
 
-        if not self.window_is_open :
+        if not self.fig1_window_is_open :
             self.open_fig1()
 
         plt.clf() # clear plot
         
         arrgap=zeros( (185,4) ) # make additional 2D-array of 0-s for the gap between two 1x1 pads
         
-        quad=2
         pair=7
-        
-        arr1quad = arr1ev[quad,...]
         
         for pair in xrange(8): # loop for pair = 0,1,2,...,7
             #print 'pair=', pair
@@ -120,12 +136,12 @@ class PlotsForCSpad ( object ) :
             arr      = hstack((asics[0],arrgap,asics[1]))
         
             panel = 421+pair
-            pantit='ASIC'+str(pair)
+            pantit='ASIC ' + str(2*pair) + ', ' + str(2*pair+1)
             plt.subplot(panel)
             plt.imshow(arr, origin='upper', interpolation='nearest') # Just a histogram
-            plt.title(pantit,color='r',fontsize=24) # pars like in class Text
-            plt.xlabel('X pixels')
-            plt.ylabel('Y pixels')
+            plt.title(pantit,color='r',fontsize=20) # pars like in class Text
+            #plt.xlabel('X pixels')
+            #plt.ylabel('Y pixels')
         
            ##plt.ion() # turn interactive mode on
            ##plt.margins(x=0.05,y=0.05,tight=True)
@@ -134,15 +150,15 @@ class PlotsForCSpad ( object ) :
            ##plt.savefig("my-image-hdf5.png")
            ##plt.show()
 
-        event = cp.confpars.eventCurrent
-        str_evN = 'Event No.' + str(event)
-        plt.text(10, -10, str_evN, fontsize=24)
+            if pair==0 :
+                str_event = 'Event ' + str(cp.confpars.eventCurrent)
+                plt.text(370, -10, str_event, fontsize=24)
         
         if mode == 1 :   # Single event mode
             plt.show()  
         else :           # Slide show 
             plt.draw()   # Draws, but does not block
-            plt.draw()   # Draws, but does not block
+            #plt.draw()   # Draws, but does not block
 
 #
 #  In case someone decides to run this module

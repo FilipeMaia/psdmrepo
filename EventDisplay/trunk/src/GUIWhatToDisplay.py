@@ -63,7 +63,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(100, 100, 250, 150)
+        self.setGeometry(80, 80, 250, 150)
         self.setWindowTitle('Checkbox')
 
         self.cb  = QtGui.QCheckBox('Show title', self)

@@ -72,8 +72,14 @@ class ConfigParameters ( object ) :
         #self.fileName        = 'test.h5'
         self.dirName         = '/reg/d/psdm/XPP/xppcom10/hdf5'
         self.fileName        = 'xppcom10-r0547.h5'
+        #self.fileName        = 'xppcom10-r0900.h5'
         self.eventCurrent    = 1
         self.span            = 1
+        
+
+        # Status parameters which do not need to be saved
+        self.h5_file_is_open = False
+        self.wtdWindowIsOpen = False
 
         
     #-------------------

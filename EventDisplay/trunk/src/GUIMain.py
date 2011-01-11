@@ -77,7 +77,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(300, 300, 500, 300)
+        self.setGeometry(100, 100, 500, 300)
         self.setWindowTitle('HDF5 Event Display')
 
         cp.confpars.Print()
@@ -99,7 +99,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.numbEdit.setMaximumWidth(90)
 
         self.browse   = QtGui.QPushButton("Browse")    
-        self.printfile= QtGui.QPushButton("Print file cont.")    
+        self.printfile= QtGui.QPushButton("Print HDF5 structure")    
         self.display  = QtGui.QPushButton("What to display")
         self.config   = QtGui.QPushButton("Configuration")
         self.save     = QtGui.QPushButton("Save conf.")
@@ -195,6 +195,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.connect(self.stop,      QtCore.SIGNAL('clicked()'),  self.processStop )
         #self.connect(self.stop,      QtCore.SIGNAL('pressed()'),  self.processStop )
         #self.connect(self.stop,      QtCore.SIGNAL('released()'), self.processStop )
+        #self.connect(self.stop,      QtCore.SIGNAL('toggled()'),  self.processStop )
 
         self.connect(self.display,   QtCore.SIGNAL('clicked()'), self.processDisplay )
         self.connect(self.save,      QtCore.SIGNAL('clicked()'), self.processSave )
@@ -248,7 +249,7 @@ class GUIMain ( QtGui.QWidget ) :
 
     def processQuit(self):
         print 'Quit\n'
-        self.drawev.stopDrawEvent()
+        self.drawev.quitDrawEvent()
         self.SHowIsOn = False
         self.close()
         
@@ -279,6 +280,7 @@ class GUIMain ( QtGui.QWidget ) :
               
     def processBrowse(self):
         print 'Browse\n'
+        self.drawev.closeHDF5File()
         str_path_file = str(self.fileEdit.displayText())
         cp.confpars.dirName,cp.confpars.fileName = os.path.split(str_path_file)
         print 'dirName  : %s' % (cp.confpars.dirName)         
@@ -290,14 +292,30 @@ class GUIMain ( QtGui.QWidget ) :
         print path_file
         str_path_file = str(path_file)
         self.fileEdit.setText(str_path_file)
-        cp.confpars.dirName,cp.confpars.fileName = os.path.split(str_path_file)
-        print 'dirName  : %s' % (cp.confpars.dirName)         
-        print 'fileName : %s' % (cp.confpars.fileName)         
+        dirName,fileName = os.path.split(str_path_file)
+        if dirName == '' or fileName == '' :
+            print 'Input dirName or fileName is empty... use default values'  
+        else :
+            cp.confpars.dirName  = dirName
+            cp.confpars.fileName = fileName
+        print 'Set new dirName  : %s' % (cp.confpars.dirName)         
+        print 'Set new fileName : %s' % (cp.confpars.fileName)         
+        str_path_file = cp.confpars.dirName + '/' + cp.confpars.fileName
+        self.fileEdit.setText(str_path_file)
+
 
     def processDisplay(self):
-        print 'What to display?'
-        self.guiwhat = guiwtd.GUIWhatToDisplay()
-        self.guiwhat.show()
+        if cp.confpars.wtdWindowIsOpen : # close wtd window
+            print 'What to display? - close GUI'
+            self.display.setText('Open GUI: What to display')
+            self.guiwhat.close()
+            cp.confpars.wtdWindowIsOpen = False            
+        else :                           # Open wtd window
+            print 'What to display? - open GUI'
+            self.display.setText('Close GUI: What to display')
+            self.guiwhat = guiwtd.GUIWhatToDisplay()
+            self.guiwhat.show()
+            cp.confpars.wtdWindowIsOpen = True
 
     def processSpaninc(self):
         print 'Spaninc ',
@@ -342,12 +360,12 @@ class GUIMain ( QtGui.QWidget ) :
         #print cp.confpars.eventCurrent
 
     def mousePressEvent(self, event):
-        print 'Quit\n'
-        self.emit(QtCore.SIGNAL('closeGUIApp()'))
-                
-    #def keyPressEvent(self, event):
-    #    if event.key() == QtCore.Qt.Key_Escape:
-    #        self.SHowIsOn = False
+        print 'Do not click on mouse just for fun!\n'
+        print 'event.button() = %s at position' % (event.button()),        
+        #print (event.pos()),
+        print ' x=%d, y=%d' % (event.x(),event.y()),        
+        print ' global x=%d, y=%d' % (event.globalX(),event.globalY())
+        #self.emit(QtCore.SIGNAL('closeGUIApp()'))
 
     def keyPressEvent(self, event):
         print 'event.key() = %s' % (event.key())
