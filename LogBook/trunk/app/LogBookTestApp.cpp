@@ -155,6 +155,7 @@ private:
 
     int cmd_help () ;
 
+    int cmd_current_experiment() throw (std::exception) ; 
     int cmd_experiments       () throw (std::exception) ;
 
     int cmd_allocate_run      () throw (std::exception) ;
@@ -295,19 +296,20 @@ LogBookTestApp::runApp ()
 
         // Proceed to commands which require the database
         //
-        if      (command == "experiments")       return cmd_experiments();
-        else if (command == "allocate_run")      return cmd_allocate_run ();
-        else if (command == "add_run")           return cmd_add_run ();
-        else if (command == "begin_run")         return cmd_begin_run ();
-        else if (command == "end_run")           return cmd_end_run ();
-        else if (command == "create_run_param")  return cmd_create_run_param ();
-        else if (command == "param_info")        return cmd_param_info ();
-        else if (command == "run_parameters")    return cmd_run_parameters ();
-        else if (command == "set_run_param")     return cmd_set_run_param ();
-        else if (command == "display_run_param") return cmd_display_run_param ();
-        else if (command == "save_files")        return cmd_save_files ();
-        else if (command == "save_files_m")      return cmd_save_files_m ();
-        else if (command == "open_file")         return cmd_open_file ();
+        if      (command == "current_experiment") return cmd_current_experiment ();
+        else if (command == "experiments")        return cmd_experiments ();
+        else if (command == "allocate_run")       return cmd_allocate_run ();
+        else if (command == "add_run")            return cmd_add_run ();
+        else if (command == "begin_run")          return cmd_begin_run ();
+        else if (command == "end_run")            return cmd_end_run ();
+        else if (command == "create_run_param")   return cmd_create_run_param ();
+        else if (command == "param_info")         return cmd_param_info ();
+        else if (command == "run_parameters")     return cmd_run_parameters ();
+        else if (command == "set_run_param")      return cmd_set_run_param ();
+        else if (command == "display_run_param")  return cmd_display_run_param ();
+        else if (command == "save_files")         return cmd_save_files ();
+        else if (command == "save_files_m")       return cmd_save_files_m ();
+        else if (command == "open_file")          return cmd_open_file ();
         else {
             MsgLogRoot( error, "unknown command") ;
             return 2 ;
@@ -332,7 +334,8 @@ LogBookTestApp::cmd_help ()
 {
     cout << "SYNTAX:\n"
          << "\n"
-         << "  experiments   [<instrument>]\n"
+         << "  current_experiment <instrument>\n"
+         << "  experiments       [<instrument>]\n"
          << "\n"
          << "  allocate_run  <instrument> <experiment>\n"
          << "\n"
@@ -439,6 +442,30 @@ LogBookTestApp::cmd_help ()
          << "    - tell OFFLINE that a raw data file chunk was open in a context of\n"
          << "      the specified experiment, run and stream.\n"
          << endl ;
+
+    return 0 ;
+}
+
+int
+LogBookTestApp::cmd_current_experiment () throw (std::exception)
+{
+    // Parse and verify the arguments
+    //
+    if (m_args.empty() || m_args.size() != 1) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument = *(itr++) ;
+
+    m_connection->beginTransaction () ;
+    LogBook::ExperDescr descr ;
+    m_connection->getCurrentExperiment (
+        descr,
+        instrument) ;
+    cout << "\n"
+         << descr;
+    m_connection->commitTransaction () ;
 
     return 0 ;
 }

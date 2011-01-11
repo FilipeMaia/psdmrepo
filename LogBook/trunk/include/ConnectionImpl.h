@@ -148,6 +148,15 @@ public:
     virtual bool transactionIsStarted () const;
 
     /**
+      * Find the current experiment for the specified instrument
+      *
+      * @see method Connection::getCurrentExperiment()
+      */
+    virtual bool getCurrentExperiment (ExperDescr&        descr,
+                                       const std::string& instrument) throw (WrongParams,
+                                                                             DatabaseError) ;
+
+    /**
       * Find experiment descriptors in the given scope.
       *
       * @see method Connection::getExperiments()
@@ -367,6 +376,14 @@ private:
     ConnectionImpl& operator = ( const ConnectionImpl& ) ;
 
     // Helper methods, implementations, etc.
+
+    /**
+      * Find the current experimenti identifier for the specified instrument
+      *
+      */
+    bool getCurrentExperimentId (int&               id,
+                                 const std::string& instrument) throw (WrongParams,
+                                                                       DatabaseError) ;
 
     /**
       * Find experiment description in the database using instrument and experiment names.

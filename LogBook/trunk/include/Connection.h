@@ -61,7 +61,7 @@ struct ExperDescr {
     std::string name ;
     std::string descr ;
 
-    // Experimenttime frame
+    // Experiment time frame
     //
     LusiTime::Time registration_time ;
     LusiTime::Time begin_time ;
@@ -161,6 +161,18 @@ public:
     // ------------------------------------------------------------------
     // ------------- Database contents inspection methods ---------------
     // ------------------------------------------------------------------
+
+
+    /**
+      * Find the current experiment for the specified instrument
+      *
+      * Return 'true' and initialize experiment descripton if there is
+      * such experiment. Return falase otherwise. In all other cases
+      * throw an exception.
+      */
+    virtual bool getCurrentExperiment (ExperDescr&        descr,
+                                       const std::string& instrument) throw (WrongParams,
+                                                                             DatabaseError) = 0 ;
 
     /**
       * Find experiment descriptors in the given scope.
