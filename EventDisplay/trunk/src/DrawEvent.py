@@ -77,7 +77,7 @@ class DrawEvent ( object ) :
     
         print 'Draw event %d' % ( cp.confpars.eventCurrent )
         runNumber = self.h5file.attrs['runNumber']
-        print 'Run number = %d' % (runNumber) 
+        #print 'Run number = %d' % (runNumber) 
 
         if runNumber < 600 :
             self.imageOfCSpadV1( mode )

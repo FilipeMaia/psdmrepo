@@ -42,6 +42,7 @@ import time   # for sleep(sec)
 # Imports for other modules --
 #-----------------------------
 import GUIWhatToDisplay as guiwtd
+import GUISelectItems   as guiselitems
 import ConfigParameters as cp
 import DrawEvent        as drev
 import PrintHDF5        as printh5 # for my print_group(g,offset)
@@ -77,7 +78,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(100, 100, 500, 300)
+        self.setGeometry(320, 10, 500, 300)
         self.setWindowTitle('HDF5 Event Display')
 
         cp.confpars.Print()
@@ -302,6 +303,9 @@ class GUIMain ( QtGui.QWidget ) :
         print 'Set new fileName : %s' % (cp.confpars.fileName)         
         str_path_file = cp.confpars.dirName + '/' + cp.confpars.fileName
         self.fileEdit.setText(str_path_file)
+        if not os.path.exists(str_path_file) :
+            print 'The file %s does not exist' % (str_path_file)
+            print 'Use existing file name ...'
 
 
     def processDisplay(self):
@@ -313,7 +317,8 @@ class GUIMain ( QtGui.QWidget ) :
         else :                           # Open wtd window
             print 'What to display? - open GUI'
             self.display.setText('Close GUI: What to display')
-            self.guiwhat = guiwtd.GUIWhatToDisplay()
+            #self.guiwhat = guiwtd.GUIWhatToDisplay()
+            self.guiwhat = guiselitems.GUISelectItems()
             self.guiwhat.show()
             cp.confpars.wtdWindowIsOpen = True
 
@@ -372,6 +377,21 @@ class GUIMain ( QtGui.QWidget ) :
         if event.key() == QtCore.Qt.Key_Escape:
     #        self.close()
             self.SHowIsOn = False    
+
+#http://doc.qt.nokia.com/4.6/qt.html#Key-enum
+
+        if event.key() == QtCore.Qt.Key_B:
+            print 'event.key() = %s' % (QtCore.Qt.Key_B)
+
+        if event.key() == QtCore.Qt.Key_Return:
+            print 'event.key() = Return'
+
+        if event.key() == QtCore.Qt.Key_Home:
+            print 'event.key() = Home'
+
+    def closeEvent(self, event):
+        print 'closeEvent'
+        self.processQuit()
 
 #
 #  In case someone decides to run this module
