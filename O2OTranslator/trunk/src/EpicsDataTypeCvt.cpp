@@ -81,6 +81,12 @@ EpicsDataTypeCvt::typedConvertSubgroup ( hdf5pp::Group group,
 {
   MsgLog(logger,debug, "EpicsDataTypeCvt -- pv id = " << data.iPvId ) ;
 
+  if (size == 0) {
+    // Rare form of data damage
+    MsgLog("ConfigDataTypeCvt", warning, "Zero XTC payload in " << typeGroupName()) ;
+    return;
+  }
+  
   // see if there is a structure setup already for this PV
   PVDataMap::iterator pv_it = m_pvdatamap.find(data.iPvId) ;
   if ( pv_it == m_pvdatamap.end() ) {
