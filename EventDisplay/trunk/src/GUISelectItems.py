@@ -36,8 +36,9 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 import HDF5TreeViewModel as h5model
-#import ConfigParameters as cp
+import ConfigParameters as cp
 import PrintHDF5        as printh5
+
 #---------------------
 #  Class definition --
 #---------------------
@@ -69,33 +70,38 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         self.icon_apply         = QtGui.QIcon("EventDisplay/src/icons/button_ok.png")
         self.icon_reset         = QtGui.QIcon("EventDisplay/src/icons/undo.png")
         self.icon_exit          = QtGui.QIcon("EventDisplay/src/icons/exit.png")
+        self.icon_expand        = QtGui.QIcon("EventDisplay/src/icons/folder_open.gif")
+        self.icon_collapse      = QtGui.QIcon("EventDisplay/src/icons/folder_closed.gif")
 
-        actApply = QtGui.QAction(self.icon_apply, 'Apply', self)
-        actReset = QtGui.QAction(self.icon_reset, 'Reset', self)
-        actExit  = QtGui.QAction(self.icon_exit,  'Exit',  self)
+        actApply    = QtGui.QAction(self.icon_apply,    'Apply',   self)
+        actReset    = QtGui.QAction(self.icon_reset,    'Reset',   self)
+        actExit     = QtGui.QAction(self.icon_exit,     'Exit',    self)
+        actExpand   = QtGui.QAction(self.icon_expand,   'Expand',  self)
+        actCollapse = QtGui.QAction(self.icon_collapse, 'Collapse',self)
 
-        self.connect(actApply, QtCore.SIGNAL('triggered()'), self.processApply)
-        self.connect(actReset, QtCore.SIGNAL('triggered()'), self.processReset)
-        self.connect(actExit,  QtCore.SIGNAL('triggered()'), self.processExit)
+        self.connect(actApply,     QtCore.SIGNAL('triggered()'), self.processApply)
+        self.connect(actReset,     QtCore.SIGNAL('triggered()'), self.processReset)
+        self.connect(actExit,      QtCore.SIGNAL('triggered()'), self.processExit)
+        self.connect(actExpand,    QtCore.SIGNAL('triggered()'), self.processExpand)
+        self.connect(actCollapse,  QtCore.SIGNAL('triggered()'), self.processCollapse)
         #self.connect(actExit,  QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
 
         menubar = self.menuBar()
-        optDo    = menubar.addMenu('&Options')
-        #optApply = menubar.addMenu('&Apply')
-        #optReset = menubar.addMenu('&Reset')
-        #optExit  = menubar.addMenu('&Exit')
-        
-        optDo   .addAction(actApply)
-        optDo   .addAction(actReset)
-        optDo   .addAction(actExit)
-        #optApply.addAction(actApply)
-        #optReset.addAction(actReset)
-        #optExit .addAction(actExit)
+        optAct  = menubar.addMenu('&Actions')
+        optAct.addAction(actApply)
+        optAct.addAction(actReset)
+        optAct.addAction(actExit)
+
+        optView = menubar.addMenu('&View')
+        optView.addAction(actExpand)
+        optView.addAction(actCollapse)
 
         toolbar = self.addToolBar('Exit')
+        toolbar.addAction(actExit)
         toolbar.addAction(actApply)
         toolbar.addAction(actReset)
-        toolbar.addAction(actExit)
+        toolbar.addAction(actExpand)
+        toolbar.addAction(actCollapse)
 
         self.model = h5model.HDF5TreeViewModel()
 
@@ -180,15 +186,21 @@ class GUISelectItems ( QtGui.QMainWindow ) :
 
     def processApply(self):
         print 'Apply button is clicked'
+        cp.confpars.list_of_checked_item_names=[]
 
-        self.model.get_list_of_checked_items()
+        list_of_checked_items = self.model.get_list_of_checked_items()
+        for item in list_of_checked_items :
+            item_full_name = self.getFullNameFromItem(item)
+            cp.confpars.list_of_checked_item_names.append(item_full_name)
+            print 'Checked item :', item_full_name
+            
+    def processExpand(self):
+        print 'Expand button is clicked'
+        self.view.expandAll()
 
-
-
-
-
-
-
+    def processCollapse(self):
+        print 'Collapse button is clicked'
+        self.view.collapseAll()
  
     def processReset(self):
         print 'Reset button is clicked'

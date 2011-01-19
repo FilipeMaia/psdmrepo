@@ -139,22 +139,31 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
 
     def get_list_of_checked_items(self):
         """Returns the list of checked item names in the QTreeModel"""
-        self._iteration_over_tree_model_item_children_v2(self.parentItem)
+        self.list_of_checked_items=[]
+        #self._iteration_over_tree_model_item_children_v1(self.parentItem)
+        #self._iteration_over_tree_model_item_children_v2(self.parentItem)
+
+        self._iteration_over_items_find_checked(self.parentItem)
+        return self.list_of_checked_items
 
     #---------------------
 
-    def _iteration_over_tree_model_item_children(self,parentItem):
+    def _iteration_over_items_find_checked(self,parentItem):
         """Recursive iteration over item children in the freame of the QtGui.QStandardItemModel"""
-        print ' parentItem.text():', parentItem.text()
+        state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][parentItem.checkState()]
+        if state == 'CHECKED' :
+            print ' checked item.text():', parentItem.text()
+            self.list_of_checked_items.append(parentItem)
+            
         if parentItem.hasChildren():
-            list_of_items = parentItem.takeColumn(0) # THIS GUY REMOVES THE COLUMN !!!!!!!!
-            parentItem.insertColumn(0, list_of_items) 
-            for item in list_of_items : 
-                self._iteration_over_tree_model_item_children(item)                
+            Nrow = parentItem.rowCount()
+            for row in range(Nrow) :
+                item = parentItem.child(row,0)
+                self._iteration_over_items_find_checked(item)                
 
     #---------------------
 
-    def _iteration_over_tree_model_item_children_v2(self,parentItem):
+    def _iteration_over_tree_model_item_children_v1(self,parentItem):
         """Recursive iteration over item children in the freame of the QtGui.QStandardItemModel"""
         parentIndex = self.indexFromItem(parentItem)
         print ' item.text():', parentItem.text(),
@@ -167,8 +176,18 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
 
             for row in range(Nrow) :
                 item = parentItem.child(row,0)
-                self._iteration_over_tree_model_item_children_v2(item)                
+                self._iteration_over_tree_model_item_children_v1(item)                
 
+    #---------------------
+
+    def _iteration_over_tree_model_item_children_v2(self,parentItem):
+        """Recursive iteration over item children in the freame of the QtGui.QStandardItemModel"""
+        print ' parentItem.text():', parentItem.text()
+        if parentItem.hasChildren():
+            list_of_items = parentItem.takeColumn(0) # THIS GUY REMOVES THE COLUMN !!!!!!!!
+            parentItem.insertColumn(0, list_of_items) 
+            for item in list_of_items : 
+                self._iteration_over_tree_model_item_children_v2(item)                
 
     #---------------------
 
