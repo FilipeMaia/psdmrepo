@@ -19,7 +19,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
-lusi_xtc_ver = "2.10.2"
+lusi_xtc_ver = "2.10.3"
 PREFIX = pjoin(env['SIT_ROOT'],"sw/external/lusi-xtc",lusi_xtc_ver)
 BINDIR = "bin"
 LIBDIR = "lib"
