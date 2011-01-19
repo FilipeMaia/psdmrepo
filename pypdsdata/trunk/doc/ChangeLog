@@ -1,4 +1,10 @@
 
+2011-01-18 - V00-00-24
+======================
+- upgrading to pdsdata V02-10-03
+- enum constant name changed in Acqiris::TdcDataV1::Source
+- DetInfo::Detector enum extended with CxiSc1 value
+
 2011-01-05 - V00-00-23
 ======================
 - upgrading to pdsdata V02-10-02

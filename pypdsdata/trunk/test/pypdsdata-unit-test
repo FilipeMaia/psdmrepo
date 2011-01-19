@@ -382,7 +382,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Detector.CxiDs1, 32 )
         self.assertEqual ( DetInfo.Detector.CxiDs2, 33 )
         self.assertEqual ( DetInfo.Detector.CxiDsu, 34 )
-        self.assertEqual ( DetInfo.Detector.NumDetector, 35 )
+        self.assertEqual ( DetInfo.Detector.CxiSc1, 35 )
+        self.assertEqual ( DetInfo.Detector.NumDetector, 36 )
         
         self.assertEqual ( DetInfo.Device.NoDevice, 0 )
         self.assertEqual ( DetInfo.Device.Evr, 1 )

@@ -39,7 +39,7 @@ using namespace pypdsdata::Acqiris;
 namespace {
 
   pypdsdata::EnumType::Enum sourceEnumValues[] = {
-      { "Common", Pds::Acqiris::TdcDataV1::Common },
+      { "Comm",   Pds::Acqiris::TdcDataV1::Comm },
       { "Chan1",  Pds::Acqiris::TdcDataV1::Chan1 },
       { "Chan2",  Pds::Acqiris::TdcDataV1::Chan2 },
       { "Chan3",  Pds::Acqiris::TdcDataV1::Chan3 },
@@ -101,10 +101,10 @@ pypdsdata::Acqiris::TdcDataV1::print(std::ostream& out) const
     if (i) out << ", ";
 
     switch (m_obj[i].source()) {
-    case Pds::Acqiris::TdcDataV1::Common:
+    case Pds::Acqiris::TdcDataV1::Comm:
     {
-      const class Pds::Acqiris::TdcDataV1::Common& item = 
-          static_cast<const class Pds::Acqiris::TdcDataV1::Common&>(m_obj[i]);
+      const Pds::Acqiris::TdcDataV1::Common& item = 
+          static_cast<const Pds::Acqiris::TdcDataV1::Common&>(m_obj[i]);
       out << "Common(over=" << item.overflow() << ", nhits=" << item.nhits() << ")";
       break;
     }
@@ -115,14 +115,14 @@ pypdsdata::Acqiris::TdcDataV1::print(std::ostream& out) const
     case Pds::Acqiris::TdcDataV1::Chan5:
     case Pds::Acqiris::TdcDataV1::Chan6:
     {
-      const class Pds::Acqiris::TdcDataV1::Channel& item = 
+      const Pds::Acqiris::TdcDataV1::Channel& item = 
           static_cast<const class Pds::Acqiris::TdcDataV1::Channel&>(m_obj[i]);
       out << "Channel(over=" << item.overflow() << ", ticks=" << item.ticks() << ")";
       break;
     }
     case Pds::Acqiris::TdcDataV1::AuxIO:
     {
-      const class Pds::Acqiris::TdcDataV1::Marker& item = 
+      const Pds::Acqiris::TdcDataV1::Marker& item = 
           static_cast<const class Pds::Acqiris::TdcDataV1::Marker&>(m_obj[i]);
       out << "Marker(type=" << item.type() << ")";
       break;
@@ -160,7 +160,7 @@ data( PyObject* self, PyObject* )
     PyObject* pyitem = 0;
     
     switch (obj[i].source()) {
-    case Pds::Acqiris::TdcDataV1::Common:
+    case Pds::Acqiris::TdcDataV1::Comm:
       pyitem = TdcDataV1Common::PyObject_FromPds((class Pds::Acqiris::TdcDataV1::Common*)(&obj[i]), self, itemSize);
       break;
     case Pds::Acqiris::TdcDataV1::Chan1:

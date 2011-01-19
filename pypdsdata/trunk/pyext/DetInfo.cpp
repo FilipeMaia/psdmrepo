@@ -83,6 +83,7 @@ namespace {
       { "CxiDs1",      Pds::DetInfo::CxiDs1 },
       { "CxiDs2",      Pds::DetInfo::CxiDs2 },
       { "CxiDsu",      Pds::DetInfo::CxiDsu },
+      { "CxiSc1",      Pds::DetInfo::CxiSc1 },
       { "NumDetector", Pds::DetInfo::NumDetector },
       { 0, 0 }
   };
