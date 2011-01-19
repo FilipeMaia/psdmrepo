@@ -37,7 +37,7 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 import HDF5TreeViewModel as h5model
 #import ConfigParameters as cp
-
+import PrintHDF5        as printh5
 #---------------------
 #  Class definition --
 #---------------------
@@ -119,6 +119,7 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         #self.view = QtGui.QTableView()
         self.view = QtGui.QTreeView()
         self.view.setModel(self.model)
+        #print 'Root is decorated ? ', self.view.rootIsDecorated() # Returns True
         #self.view.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
         #self.view.expandAll()
         #self.view.setExpanded(cp.confpars.indExpandedItem,True)
@@ -140,25 +141,26 @@ class GUISelectItems ( QtGui.QMainWindow ) :
     #-------------------
 
     def getFullNameFromItem(self, item): 
+        """Returns the full name in the HDF5 tree model for the given item"""
         #item = self.model.itemFromIndex(ind)        
         ind   = self.model.indexFromItem(item)        
         return self.getFullNameFromIndex(ind)
 
-
     def getFullNameFromIndex(self, ind): 
+        """Begin recursion from item with given ind(ex) and forms the full name in the self._full_name"""
         item = self.model.itemFromIndex(ind)
         self._full_name = item.text()
         self._getFullName(ind)
         return self._full_name
 
-
     def _getFullName(self, ind): 
+        """Recursion from child to parent"""
         ind_par  = self.model.parent(ind)
         if(ind_par.column() == -1) :
             item = self.model.itemFromIndex(ind)
             self._full_name = '/' + self._full_name
             #print 'Item full name :' + self._full_name
-            return self._full_name
+            return str(self._full_name)
         else:
             item_par = self.model.itemFromIndex(ind_par)
             self._full_name = item_par.text() + '/' + self._full_name
@@ -178,6 +180,15 @@ class GUISelectItems ( QtGui.QMainWindow ) :
 
     def processApply(self):
         print 'Apply button is clicked'
+
+        self.model.get_list_of_checked_items()
+
+
+
+
+
+
+
  
     def processReset(self):
         print 'Reset button is clicked'
@@ -206,10 +217,11 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         #print "item selected %s" % (QStandardItem(selected).text())
 
     def cellSelected(self, ind_sel, ind_desel):
-        #print "ind   selected : ", ind_sel.row(),  ind_sel.column()
-        #print "ind deselected : ", ind_desel.row(),ind_desel.column() 
-        item     = self.model.itemFromIndex(ind_sel)
-        print "Item with text '%s' is selected" % ( item.text() )
+        #print "ind   selected row, col = ", ind_sel.row(),  ind_sel.column()
+        #print "ind deselected row, col = ", ind_desel.row(),ind_desel.column() 
+        item       = self.model.itemFromIndex(ind_sel)
+        dsfullname = str(self.getFullNameFromItem(item))
+        print "Item with name '%s' is selected" % ( dsfullname )
         #print ' isEnabled=',item.isEnabled() 
         #print ' isCheckable=',item.isCheckable() 
         #print ' checkState=',item.checkState()
@@ -217,6 +229,7 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         #print ' isTristate=',item.isTristate() 
         #print ' isEditable=',item.isEditable() 
         #print ' isExpanded=',self.view.isExpanded(ind_sel)
+        printh5.print_dataset_metadata_from_file(dsfullname)
 
     def itemChanged(self, item):
         state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][item.checkState()]

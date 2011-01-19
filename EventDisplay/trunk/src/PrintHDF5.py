@@ -30,17 +30,20 @@ __version__ = "$Revision: 4 $"
 #  Imports of standard modules --
 #--------------------------------
 #import sys
+import h5py
 
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
 #from PkgPackage.PkgModule import PkgClass
 
-import h5py
+import ConfigParameters as cp
 
 #------------------------
 # Exported definitions --
 #------------------------
+
+
 
 #----------------------------------
 
@@ -83,18 +86,30 @@ def print_group_content(g,offset):
 
 def print_dataset_info(ds):
     """Prints attributes and all other available info for group or data"""
-    #print "ds.value          = ", ds.value
-    print "ds.name           = ", ds.name
-    print "ds.dtype          = ", ds.dtype
-    print "ds.shape          = ", ds.shape
-    print "ds.attrs          = ", ds.attrs 
-    print "ds.attrs.keys()   = ", ds.attrs.keys() 
-    print "ds.attrs.values() = ", ds.attrs.values() 
+
+    if isinstance(ds,h5py.Dataset):
+        print "Dataset:",
+        print "ds.name           = ", ds.name
+        print "ds.dtype          = ", ds.dtype
+        print "ds.shape          = ", ds.shape
+        print "ds.value          = ", ds.value
+
+    if isinstance(ds,h5py.Group):
+        print "Group:",
+        print "ds.name           = ", ds.name
+        print_group_items(ds)
+
+    if isinstance(ds,h5py.File):
+        print "File:"
+        print "file.name           = ", file.name
+        print "Run number          = ", file.attrs['runNumber']
+
     print "ds.id             = ", ds.id 
     print "ds.ref            = ", ds.ref 
     print "ds.parent         = ", ds.parent
     print "ds.file           = ", ds.file
-    #print "ds.items()        = ", ds.items()
+
+    #print_attributes(ds)
 
 #----------------------------------
 
@@ -111,7 +126,50 @@ def print_file_info(file):
     print "file.file           = ", file.file
 
     print "Run number          = ", file.attrs['runNumber']
+    print_attributes(file)
 
+#----------------------------------
+
+def print_group_items(g):
+    """Prints items in this group"""
+
+    list_of_items = g.items()
+    Nitems = len(list_of_items)
+    print "Number of items in the group = ", Nitems
+    #print "g.items() = ", list_of_items
+    if Nitems != 0 :
+        for item in list_of_items :
+            print '     ', item 
+                        
+#----------------------------------
+
+def print_attributes(ds):
+    """Prints all attributes for data set or file"""
+
+    Nattrs = len(ds.attrs)
+    print "Number of attrs.  = ", Nattrs
+    if Nattrs != 0 :
+        print "ds.attrs          = ", ds.attrs 
+        print "ds.attrs.keys()   = ", ds.attrs.keys() 
+        print "ds.attrs.values() = ", ds.attrs.values() 
+        print 'Attributes :'
+        for key,val in dict(ds.attrs).iteritems() :
+            print '%24s : %s' % (key, val)
+
+
+#----------------------------------
+
+def print_dataset_metadata_from_file(dsname):
+    """Open file and print attributes for input dataset"""
+    fname = cp.confpars.dirName+'/'+cp.confpars.fileName
+    print 'Open file : %s' % (fname)
+    f  = h5py.File(fname, 'r') # open read-only
+    ds = f[dsname]
+    print_dataset_info(ds)
+    print_attributes(ds)
+    f.close()
+    print '=== End of attributes ==='
+                            
 #----------------------------------
 #
 #  In case someone decides to run this module

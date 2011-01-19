@@ -92,6 +92,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.titSpace4= QtGui.QLabel('    ')
         self.titSpan  = QtGui.QLabel('Span:')
         self.titSlShow= QtGui.QLabel('Slide show:')
+        self.titWhat  = QtGui.QLabel('What to display GUI:')
 
         self.fileEdit = QtGui.QLineEdit(cp.confpars.dirName+'/'+cp.confpars.fileName)
         self.numbEdit = QtGui.QLineEdit(str(cp.confpars.eventCurrent))
@@ -101,7 +102,7 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.browse   = QtGui.QPushButton("Browse")    
         self.printfile= QtGui.QPushButton("Print HDF5 structure")    
-        self.display  = QtGui.QPushButton("What to display")
+        self.display  = QtGui.QPushButton("Open")
         self.config   = QtGui.QPushButton("Configuration")
         self.save     = QtGui.QPushButton("Save conf.")
         self.current  = QtGui.QPushButton("Current")
@@ -137,6 +138,7 @@ class GUIMain ( QtGui.QWidget ) :
         hboxE = QtGui.QHBoxLayout()
         hboxE.addWidget(self.selection)
         hboxE.addStretch(1)
+        hboxE.addWidget(self.titWhat)
         hboxE.addWidget(self.display)
 
         hboxT = QtGui.QHBoxLayout() 
@@ -310,13 +312,13 @@ class GUIMain ( QtGui.QWidget ) :
 
     def processDisplay(self):
         if cp.confpars.wtdWindowIsOpen : # close wtd window
-            print 'What to display? - close GUI'
-            self.display.setText('Open GUI: What to display')
+            print 'What to display GUI: Close'
+            self.display.setText('Open')
             self.guiwhat.close()
             cp.confpars.wtdWindowIsOpen = False            
         else :                           # Open wtd window
-            print 'What to display? - open GUI'
-            self.display.setText('Close GUI: What to display')
+            print 'What to display GUI: Open'
+            self.display.setText('Close')
             #self.guiwhat = guiwtd.GUIWhatToDisplay()
             self.guiwhat = guiselitems.GUISelectItems()
             self.guiwhat.show()

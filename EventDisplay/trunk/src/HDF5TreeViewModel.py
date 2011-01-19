@@ -57,6 +57,10 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
 
         QtGui.QStandardItemModel.__init__(self, parent)
 
+        self.str_file  = 'File'
+        self.str_data  = 'Data'
+        self.str_group = 'Group'
+
        #self._model_example()
         self._model_hdf5_tree()
 
@@ -88,13 +92,18 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
         elif isinstance(g,h5py.Group):   print "'Group' from file",
         elif isinstance(g,h5py.Dataset): print "'Dataset' from file",
         print g.file,"\n",g.name
-        parentItem = self.invisibleRootItem()
+        self.parentItem = self.invisibleRootItem()
+        self.parentItem.setAccessibleDescription(self.str_file)
+        self.parentItem.setAccessibleText(g.name) # Root item does not show this text...
+        #self.parentItem.setIcon(self.icon_folder_open) # Root item does not show icon...
+        
         if isinstance(g,h5py.Dataset):
             print offset, "(Dateset)   len =", g.shape #, subg.dtype
             item = QtGui.QStandardItem(QtCore.QString(g.key()))
-            parentItem.appendRow(item)            
+            item.setAccessibleDescription(self.str_data)
+            self.parentItem.appendRow(item)            
         else:
-            self._add_group_to_tree(g,parentItem) # start recursions from here
+            self._add_group_to_tree(g,self.parentItem) # start recursions from here
 
     #---------------------
 
@@ -103,23 +112,62 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
         for key,val in dict(g).iteritems():
             subg = val
             item = QtGui.QStandardItem(QtCore.QString(key))
-            print '    ', key, #,"   ", subg.name #, val, subg.len(), type(subg), 
-            if   isinstance(subg, h5py.Dataset):
+            #print '    ', key, #,"   ", subg.name #, val, subg.len(), type(subg), 
+            if isinstance(subg, h5py.Dataset):
                 #print " (Dateset)   len =", subg.shape #, subg.dtype
                 item.setIcon(self.icon_data)
                 item.setCheckable(True)
+                item.setAccessibleDescription(self.str_data)
+                item.setAccessibleText(str(key))
                 parentItem.appendRow(item)
                 
             elif isinstance(subg, h5py.Group):
-                print " (Group)   len =",len(subg) 
+                #print " (Group)   len =",len(subg) 
                 #offset_subg = offset + '    '
                 item.setIcon(self.icon_folder_closed)
+                item.setAccessibleDescription(self.str_group)
+                item.setAccessibleText(str(key))
                 parentItem.appendRow(item)
 
                 self._add_group_to_tree(subg,item )
 
     #---------------------
+    #---------------------
+    #---------------------
+    #---------------------
+    #---------------------
 
+    def get_list_of_checked_items(self):
+        """Returns the list of checked item names in the QTreeModel"""
+        self._iteration_over_tree_model_item_children_v2(self.parentItem)
+
+    #---------------------
+
+    def _iteration_over_tree_model_item_children(self,parentItem):
+        """Recursive iteration over item children in the freame of the QtGui.QStandardItemModel"""
+        print ' parentItem.text():', parentItem.text()
+        if parentItem.hasChildren():
+            list_of_items = parentItem.takeColumn(0) # THIS GUY REMOVES THE COLUMN !!!!!!!!
+            parentItem.insertColumn(0, list_of_items) 
+            for item in list_of_items : 
+                self._iteration_over_tree_model_item_children(item)                
+
+    #---------------------
+
+    def _iteration_over_tree_model_item_children_v2(self,parentItem):
+        """Recursive iteration over item children in the freame of the QtGui.QStandardItemModel"""
+        parentIndex = self.indexFromItem(parentItem)
+        print ' item.text():', parentItem.text(),
+        print ' row:',         parentIndex.row(),        
+        print ' col:',         parentIndex.column()
+
+        if parentItem.hasChildren():
+            Nrow = parentItem.rowCount()
+            print ' rowCount:', Nrow
+
+            for row in range(Nrow) :
+                item = parentItem.child(row,0)
+                self._iteration_over_tree_model_item_children_v2(item)                
 
 
     #---------------------
