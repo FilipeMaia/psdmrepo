@@ -72,7 +72,7 @@ hdf5pp::Type
 AcqirisTdcDataV1::native_type()
 {
   hdf5pp::EnumType<uint8_t> srcType = hdf5pp::EnumType<uint8_t>::enumType();
-  srcType.insert("Common", XtcType::Common);
+  srcType.insert("Comm", XtcType::Comm);
   srcType.insert("Chan1", XtcType::Chan1);
   srcType.insert("Chan2", XtcType::Chan2);
   srcType.insert("Chan3", XtcType::Chan3);
