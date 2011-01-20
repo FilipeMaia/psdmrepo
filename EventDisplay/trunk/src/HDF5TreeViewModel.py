@@ -135,6 +135,111 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
     #---------------------
     #---------------------
     #---------------------
+
+    def getFullNameFromItem(self, item): 
+        """Returns the full name in the HDF5 tree model for the given item"""
+        ind = self.indexFromItem(item)        
+        return self.getFullNameFromIndex(ind)
+
+    #---------------------
+    
+    def getFullNameFromIndex(self, ind): 
+        """Begin recursion from item with given ind(ex) and forms the full name in the self._full_name"""
+        item = self.itemFromIndex(ind)
+        self._full_name = item.text()
+        self._getFullName(ind)
+        return self._full_name
+
+    #---------------------
+
+    def _getFullName(self, ind): 
+        """Recursion from child to parent"""
+        ind_par  = self.parent(ind)
+        if(ind_par.column() == -1) :
+            item = self.itemFromIndex(ind)
+            self._full_name = '/' + self._full_name
+            #print 'Item full name :' + self._full_name
+            return str(self._full_name)
+        else:
+            item_par = self.itemFromIndex(ind_par)
+            self._full_name = item_par.text() + '/' + self._full_name
+            self._getFullName(ind_par)
+
+    #---------------------
+    #---------------------
+    #---------------------
+    #---------------------
+
+    def reset_checked_items(self):
+        """Iterates over the list of item in the QTreeModel and uncheck all checked items"""
+        self._iteration_over_items_and_uncheck(self.parentItem)
+
+    #---------------------
+
+    def _iteration_over_items_and_uncheck(self,parentItem):
+        """Recursive iteration over item children in the frame of the QtGui.QStandardItemModel"""
+        state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][parentItem.checkState()]
+        if state == 'CHECKED' or state == 'TRISTATE' :
+            print ' Uncheck item.text():', parentItem.text()
+            parentItem.setCheckState(0) # 0 means UNCHECKED
+            
+        if parentItem.hasChildren():
+            for row in range(parentItem.rowCount()) :
+                item = parentItem.child(row,0)
+                self._iteration_over_items_and_uncheck(item)                
+
+    #---------------------
+    #---------------------
+    #---------------------
+    #---------------------
+
+    def retreve_checked_items(self,list_of_checked_item_names):
+        """Use the input list of items and check them in the tree model"""
+        self.list_of_checked_item_names = list_of_checked_item_names
+        for name in self.list_of_checked_item_names :
+            print 'Retreve the CHECKMARK for item', name 
+        self._iteration_over_items_and_check_from_list(self.parentItem)    
+
+    #---------------------
+
+    def _iteration_over_items_and_check_from_list(self,parentItem):
+        """Recursive iteration over item children in the frame of the QtGui.QStandardItemModel"""
+
+        if parentItem.isCheckable():
+            item_name = self.getFullNameFromItem(parentItem)
+            if item_name in self.list_of_checked_item_names :
+                print ' Check the item:', item_name # parentItem.text()
+                parentItem.setCheckState(2) # 2 means CHECKED; 1-TRISTATE
+            
+        if parentItem.hasChildren():
+            for row in range(parentItem.rowCount()) :
+                item = parentItem.child(row,0)
+                self._iteration_over_items_and_check_from_list(item)                
+
+    #---------------------
+    #---------------------
+    #---------------------
+    #---------------------
+    
+    def get_list_of_checked_item_names_for_model(self):
+        """Get the list of checked item names for the self tree model"""
+        list_of_checked_items = self.get_list_of_checked_items()
+        return self.get_list_of_checked_item_names(list_of_checked_items)
+
+    #---------------------
+    
+    def get_list_of_checked_item_names(self,list_of_checked_items):
+        """Get the list of checked item names from the input list of items"""
+        self.list_of_checked_item_names=[]
+        print 'The number of CHECKED items in the tree model =', len(self.list_of_checked_items)
+        
+        for item in list_of_checked_items :
+            item_full_name = self.getFullNameFromItem(item)
+            self.list_of_checked_item_names.append(item_full_name)
+            print 'Checked item :', item_full_name
+            
+        return self.list_of_checked_item_names   
+
     #---------------------
 
     def get_list_of_checked_items(self):
@@ -149,32 +254,34 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
     #---------------------
 
     def _iteration_over_items_find_checked(self,parentItem):
-        """Recursive iteration over item children in the freame of the QtGui.QStandardItemModel"""
+        """Recursive iteration over item children in the frame of the QtGui.QStandardItemModel"""
         state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][parentItem.checkState()]
         if state == 'CHECKED' :
-            print ' checked item.text():', parentItem.text()
+            #print ' checked item.text():', parentItem.text()
             self.list_of_checked_items.append(parentItem)
             
         if parentItem.hasChildren():
-            Nrow = parentItem.rowCount()
-            for row in range(Nrow) :
+            for row in range(parentItem.rowCount()) :
                 item = parentItem.child(row,0)
                 self._iteration_over_items_find_checked(item)                
 
     #---------------------
+    #---------------------
+    #---------------------
+    #---------------------
 
     def _iteration_over_tree_model_item_children_v1(self,parentItem):
-        """Recursive iteration over item children in the freame of the QtGui.QStandardItemModel"""
+        """Recursive iteration over item children in the frame of the QtGui.QStandardItemModel"""
         parentIndex = self.indexFromItem(parentItem)
         print ' item.text():', parentItem.text(),
         print ' row:',         parentIndex.row(),        
         print ' col:',         parentIndex.column()
 
         if parentItem.hasChildren():
-            Nrow = parentItem.rowCount()
-            print ' rowCount:', Nrow
+            Nrows = parentItem.rowCount()
+            print ' rowCount:', Nrows
 
-            for row in range(Nrow) :
+            for row in range(Nrows) :
                 item = parentItem.child(row,0)
                 self._iteration_over_tree_model_item_children_v1(item)                
 

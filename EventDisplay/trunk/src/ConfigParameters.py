@@ -75,13 +75,13 @@ class ConfigParameters ( object ) :
         #self.fileName        = 'xppcom10-r0900.h5'
         self.eventCurrent    = 1
         self.span            = 1
-        
+        self.list_of_checked_item_names=[]        
 
         # Status parameters which do not need to be saved
-        self.h5_file_is_open = False
-        self.wtdWindowIsOpen = False
+        self.h5_file_is_open    = False
+        self.wtdWindowIsOpen    = False
+        self.treeViewIsExpanded = False
 
-        
     #-------------------
     #  Public methods --
     #-------------------
