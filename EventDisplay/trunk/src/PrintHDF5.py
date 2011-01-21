@@ -161,6 +161,15 @@ def print_attributes(ds):
 
 def print_dataset_metadata_from_file(dsname):
     """Open file and print attributes for input dataset"""
+
+    # Check for unreadable datasets:
+    if(dsname == '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV1/XppGon.0:Cspad.0/data'):
+        print 'This is CSpad data'
+        return
+    if(dsname == '/Configure:0000/Run:0000/CalibCycle:0000/EvrData::DataV3/NoDetector.0:Evr.0/evrData'):
+        print 'TypeError: No NumPy equivalent for TypeVlenID exists'         
+        return
+
     fname = cp.confpars.dirName+'/'+cp.confpars.fileName
     print 'Open file : %s' % (fname)
     f  = h5py.File(fname, 'r') # open read-only

@@ -92,7 +92,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.titSpace4= QtGui.QLabel('    ')
         self.titSpan  = QtGui.QLabel('Span:')
         self.titSlShow= QtGui.QLabel('Slide show:')
-        self.titWhat  = QtGui.QLabel('What to display GUI:')
+        self.titWhat  = QtGui.QLabel('HDF5 GUI')
 
         self.fileEdit = QtGui.QLineEdit(cp.confpars.dirName+'/'+cp.confpars.fileName)
         self.numbEdit = QtGui.QLineEdit(str(cp.confpars.eventCurrent))
@@ -104,7 +104,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.printfile= QtGui.QPushButton("Print HDF5 structure")    
         self.display  = QtGui.QPushButton("Open")
         self.config   = QtGui.QPushButton("Configuration")
-        self.save     = QtGui.QPushButton("Save conf.")
+        self.save     = QtGui.QPushButton("Save")
         self.current  = QtGui.QPushButton("Current")
         self.previous = QtGui.QPushButton("Previous")
         self.next     = QtGui.QPushButton("Next")
@@ -117,7 +117,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.spandec  = QtGui.QPushButton(u'\u25C0') # left-head triangle
         self.spaninc.setMaximumWidth(20) 
         self.spandec.setMaximumWidth(20) 
-
+        self.save   .setMaximumWidth(40)   
         #lcd      = QtGui.QLCDNumber(self)
         #slider   = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
 
@@ -130,16 +130,16 @@ class GUIMain ( QtGui.QWidget ) :
         hboxF.addWidget(self.browse)
 
         hboxC = QtGui.QHBoxLayout()
-        hboxC.addWidget(self.config)
-        hboxC.addWidget(self.save)
+        hboxC.addWidget(self.display)
+        hboxC.addWidget(self.titWhat)
         hboxC.addStretch(2)
         hboxC.addWidget(self.printfile)
         
         hboxE = QtGui.QHBoxLayout()
         hboxE.addWidget(self.selection)
         hboxE.addStretch(1)
-        hboxE.addWidget(self.titWhat)
-        hboxE.addWidget(self.display)
+        hboxE.addWidget(self.config)
+        hboxE.addWidget(self.save)
 
         hboxT = QtGui.QHBoxLayout() 
         hboxT.addWidget(self.titCurr)
@@ -254,6 +254,8 @@ class GUIMain ( QtGui.QWidget ) :
         print 'Quit\n'
         self.drawev.quitDrawEvent()
         self.SHowIsOn = False
+        if cp.confpars.wtdWindowIsOpen == True :
+            self.guiwhat.close()
         self.close()
         
     def processStart(self):
@@ -309,7 +311,6 @@ class GUIMain ( QtGui.QWidget ) :
             print 'The file %s does not exist' % (str_path_file)
             print 'Use existing file name ...'
 
-
     def processDisplay(self):
         if cp.confpars.wtdWindowIsOpen : # close wtd window
             print 'What to display GUI: Close'
@@ -320,7 +321,7 @@ class GUIMain ( QtGui.QWidget ) :
             print 'What to display GUI: Open'
             self.display.setText('Close')
             #self.guiwhat = guiwtd.GUIWhatToDisplay()
-            self.guiwhat = guiselitems.GUISelectItems()
+            self.guiwhat = guiselitems.GUISelectItems(self) # transmit 'self' in order to access it from GUISelectItems! 
             self.guiwhat.show()
             cp.confpars.wtdWindowIsOpen = True
 

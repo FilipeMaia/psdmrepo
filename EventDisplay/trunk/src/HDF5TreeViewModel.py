@@ -170,6 +170,28 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
     #---------------------
     #---------------------
 
+    def set_all_group_icons(self,icon):
+        """Iterates over the list of item in the QTreeModel and set icon for all groups"""
+        self.new_icon = icon
+        self._iteration_over_items_and_set_icon(self.parentItem)
+
+    #---------------------
+
+    def _iteration_over_items_and_set_icon(self,parentItem):
+        """Recursive iteration over item children in the frame of the QtGui.QStandardItemModel"""
+        if parentItem.accessibleDescription() == 'Group' :
+            parentItem.setIcon(self.new_icon)
+            
+        if parentItem.hasChildren():
+            for row in range(parentItem.rowCount()) :
+                item = parentItem.child(row,0)
+                self._iteration_over_items_and_set_icon(item)                
+
+    #---------------------
+    #---------------------
+    #---------------------
+    #---------------------
+
     def reset_checked_items(self):
         """Iterates over the list of item in the QTreeModel and uncheck all checked items"""
         self._iteration_over_items_and_uncheck(self.parentItem)
@@ -187,6 +209,42 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
             for row in range(parentItem.rowCount()) :
                 item = parentItem.child(row,0)
                 self._iteration_over_items_and_uncheck(item)                
+
+    #---------------------
+    #---------------------
+    #---------------------
+    #---------------------
+
+    def expand_checked_items(self,view):
+        """Iterates over the list of item in the QTreeModel and expand all checked items"""
+        self.view = view
+        self._iteration_over_items_and_expand_checked(self.parentItem)
+
+    #---------------------
+
+    def _iteration_over_items_and_expand_checked(self,parentItem):
+        """Recursive iteration over item children in the frame of the QtGui.QStandardItemModel"""
+        state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][parentItem.checkState()]
+        if state == 'CHECKED' or state == 'TRISTATE' :
+            print ' Expand item.text():', parentItem.text()
+            #Now we have to expand all parent groups for this checked item...
+            self._expand_parents(parentItem)
+            
+        if parentItem.hasChildren():
+            for row in range(parentItem.rowCount()) :
+                item = parentItem.child(row,0)
+                self._iteration_over_items_and_expand_checked(item)                
+
+    #---------------------
+
+    def _expand_parents(self,item):
+        item_parent = item.parent()
+        ind_parent  = self.indexFromItem(item_parent)
+        if(ind_parent.column() != -1) :
+            if item_parent.accessibleDescription() == 'Group' :
+                self.view.expand(ind_parent)
+                item_parent.setIcon(self.icon_folder_open)
+                self._expand_parents(item_parent)
 
     #---------------------
     #---------------------

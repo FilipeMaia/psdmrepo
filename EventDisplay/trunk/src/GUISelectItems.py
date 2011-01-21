@@ -58,8 +58,9 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         QtGui.QWidget.__init__(self, parent)
 
         """Constructor."""
+        self.parentGUIMain = parent
 
-        self.setGeometry(10, 10, 300, 600)
+        self.setGeometry(10, 10, 300, 800)
         self.setWindowTitle('Item selection tree')
 
         #layout = QHBoxLayout()
@@ -74,14 +75,18 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         self.icon_expand        = QtGui.QIcon("EventDisplay/src/icons/folder_open.gif")
         self.icon_collapse      = QtGui.QIcon("EventDisplay/src/icons/folder_closed.gif")
         self.icon_expcoll       = self.icon_expand
+        self.icon_expcheck      = QtGui.QIcon("EventDisplay/src/icons/folder_open_checked.gif.png")
+        self.icon_print         = QtGui.QIcon("EventDisplay/src/icons/contents.png")
 
-        actExit         = QtGui.QAction(self.icon_exit,     'Exit',    self)
-        actApply        = QtGui.QAction(self.icon_apply,    'Apply',   self)
-        actReset        = QtGui.QAction(self.icon_reset,    'Reset',   self)
-        actRetreve      = QtGui.QAction(self.icon_retreve,  'Retreve', self)
-        actExpand       = QtGui.QAction(self.icon_expand,   'Expand',  self)
-        actCollapse     = QtGui.QAction(self.icon_collapse, 'Collapse',self)
-        self.actExpColl = QtGui.QAction(self.icon_expcoll,  'Expand',  self)
+        actExit         = QtGui.QAction(self.icon_exit,     'Exit',           self)
+        actApply        = QtGui.QAction(self.icon_apply,    'Apply',          self)
+        actReset        = QtGui.QAction(self.icon_reset,    'Reset',          self)
+        actRetreve      = QtGui.QAction(self.icon_retreve,  'Retreve',        self)
+        actExpand       = QtGui.QAction(self.icon_expand,   'Expand',         self)
+        actCollapse     = QtGui.QAction(self.icon_collapse, 'Collapse',       self)
+        self.actExpColl = QtGui.QAction(self.icon_expcoll,  'Expand tree',    self)
+        actExpCheck     = QtGui.QAction(self.icon_expcheck, 'Expand checked', self)
+        actPrint        = QtGui.QAction(self.icon_print,    'Print tree',     self)
 
         self.connect(actExit,         QtCore.SIGNAL('triggered()'), self.processExit)
         self.connect(actApply,        QtCore.SIGNAL('triggered()'), self.processApply)
@@ -90,6 +95,8 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         self.connect(actExpand,       QtCore.SIGNAL('triggered()'), self.processExpand)
         self.connect(actCollapse,     QtCore.SIGNAL('triggered()'), self.processCollapse)
         self.connect(self.actExpColl, QtCore.SIGNAL('triggered()'), self.processExpColl)
+        self.connect(actExpCheck,     QtCore.SIGNAL('triggered()'), self.processExpCheck)
+        self.connect(actPrint,        QtCore.SIGNAL('triggered()'), self.processPrint)
         #self.connect(actExit,  QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
 
         menubar = self.menuBar()
@@ -102,6 +109,8 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         optView = menubar.addMenu('&View')
         optView.addAction(actExpand)
         optView.addAction(actCollapse)
+        optView.addAction(actExpCheck)
+        optView.addAction(actPrint)
 
         toolbar = self.addToolBar('Exit')
         toolbar.setMovable(True)
@@ -115,6 +124,8 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         #toolbar.addAction(actExpand)
         #toolbar.addAction(actCollapse)
         toolbar.addAction(self.actExpColl)
+        toolbar.addAction(actExpCheck)
+        toolbar.addAction(actPrint)
 
         self.model = h5model.HDF5TreeViewModel()
 
@@ -138,6 +149,11 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         self.view.expanded.connect(self.itemExpanded)
         self.view.collapsed.connect(self.itemCollapsed)
 
+        self.processRetreve() # Set all check box states for current configuration
+        if cp.confpars.treeViewIsExpanded :
+            #self.processExpand()  # Expand the tree 
+            self.processExpCheck() # Expand the tree for checked data items 
+                
     #-------------------
     # Private methods --
     #-------------------
@@ -146,13 +162,16 @@ class GUISelectItems ( QtGui.QMainWindow ) :
     #  Public methods --
     #-------------------
 
-    def closeEvent(self, event): # if the x is clicked
+    def closeEvent(self, event): # if the 'x' (in the top-right corner of the window) is clicked
         print 'closeEvent'
         self.processExit()
 
     def processExit(self):
         print 'Exit button is clicked'
-        self.close()
+        self.parentGUIMain.processDisplay() # in order to close this window as from GUIMain
+        #cp.confpars.wtdWindowIsOpen = False
+        #self.close()
+        #self.display.setText('Open')
 
     def processApply(self):
         print 'Apply button is clicked, use all checked items in the tree model for display'
@@ -166,31 +185,44 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         print 'Retreve button is clicked,\n', \
         'retreve the list of checked items from config. pars. and use them in the tree model.'
         self.model.retreve_checked_items(cp.confpars.list_of_checked_item_names)
-            
+
+    def processExpCheck(self):
+        print 'ExpandChecked button is clicked, expand the tree for checked items only.'
+        self.processCollapse() # first, collapse the tree
+        self.model.expand_checked_items(self.view)
+        cp.confpars.treeViewIsExpanded = True       # Change status for expand/collapse button
+        self.actExpColl.setIcon(self.icon_collapse)
+        self.actExpColl.setText('Collapse tree')
+
     def processExpand(self):
         print 'Expand button is clicked'
+        self.model.set_all_group_icons(self.icon_expand)
         self.view.expandAll()
         cp.confpars.treeViewIsExpanded = True
 
     def processCollapse(self):
         print 'Collapse button is clicked'
+        self.model.set_all_group_icons(self.icon_collapse)
         self.view.collapseAll()
         cp.confpars.treeViewIsExpanded = False
 
-    def processExpColl(self):
+    def processExpColl(self): # Flip/flop between Expand and Collaple the HDF5 tree
+        print 'Expand/Collapse button is clicked :',
         if cp.confpars.treeViewIsExpanded == True :
-            print 'Collapse button is clicked'
-            self.view.collapseAll()
             self.actExpColl.setIcon(self.icon_expand)
             self.actExpColl.setText('Expand tree')
-            cp.confpars.treeViewIsExpanded = False
+            self.processCollapse()
         else :
-            print 'Expand button is clicked'
-            self.view.expandAll()
             self.actExpColl.setIcon(self.icon_collapse)
             self.actExpColl.setText('Collapse tree')
-            cp.confpars.treeViewIsExpanded = True
+            self.processExpand()
  
+    def processPrint(self):
+        print 'Print button is clicked'
+        fname = cp.confpars.dirName+'/'+cp.confpars.fileName
+        print 'Print structure of the HDF5 file:\n %s' % (fname)
+        printh5.print_hdf5_file_structure(fname)
+
     def someMethod1(self):
         print '1-clicked!'
 
