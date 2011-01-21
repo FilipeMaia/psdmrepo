@@ -75,7 +75,7 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         self.icon_expand        = QtGui.QIcon("EventDisplay/src/icons/folder_open.gif")
         self.icon_collapse      = QtGui.QIcon("EventDisplay/src/icons/folder_closed.gif")
         self.icon_expcoll       = self.icon_expand
-        self.icon_expcheck      = QtGui.QIcon("EventDisplay/src/icons/folder_open_checked.gif.png")
+        self.icon_expcheck      = QtGui.QIcon("EventDisplay/src/icons/folder_open_checked.png")
         self.icon_print         = QtGui.QIcon("EventDisplay/src/icons/contents.png")
 
         actExit         = QtGui.QAction(self.icon_exit,     'Exit',           self)

@@ -86,7 +86,6 @@ def print_group_content(g,offset):
 
 def print_dataset_info(ds):
     """Prints attributes and all other available info for group or data"""
-
     if isinstance(ds,h5py.Dataset):
         print "Dataset:",
         print "ds.name           = ", ds.name
