@@ -3,7 +3,9 @@
 require_once( 'dataportal/dataportal.inc.php' );
 require_once( 'filemgr/filemgr.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
+require_once( 'logbook/logbook.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
+require_once( 'authdb/authdb.inc.php' );
 
 use DataPortal\DataPortal;
 
@@ -14,7 +16,13 @@ use FileMgr\FileMgrException;
 use RegDB\RegDB;
 use RegDB\RegDBException;
 
+use LogBook\LogBook;
+use LogBook\LogBookException;
+
 use LusiTime\LusiTime;
+
+use AuthDB\AuthDB;
+use AuthDB\AuthDBException;
 
 
 /* Let a user to select an experiment first if no valid experiment
@@ -32,17 +40,42 @@ $page2 = trim( $_GET['page2'] );
 
 try {
 
+	// Connect to databases
+	//
+	$auth_svc = AuthDB::instance();
+	$auth_svc->begin();
+
 	$regdb = new RegDB();
 	$regdb->begin();
 
-	$experiment = $regdb->find_experiment_by_id( $exper_id );
-	if( is_null( $experiment )) die( 'invalid experiment identifier provided to the script' );
+	$logbook = new LogBook();
+	$logbook->begin();
 
+	$logbook_experiment = $logbook->find_experiment_by_id( $exper_id );
+	if( is_null( $logbook_experiment )) die( 'invalid experiment identifier provided to the script' );
+
+	$experiment = $logbook_experiment->regdb_experiment();
     $instrument = $experiment->instrument();
+
+    /* Get stats for e-log
+     */
+    $min_run = null;
+    $max_run = null;
+    $logbook_runs = $logbook_experiment->runs();
+    foreach( $logbook_runs as $r ) {
+  		$run = $r->num();
+  		if( is_null( $min_run )) {
+  			$min_run = $run;
+  			$max_run = $run;
+  		} else {
+    		if( $run < $min_run ) $min_run = $run;
+  			if( $run > $max_run ) $max_run = $run;
+  		}
+    }
 
     /* Get the stats for data files
      */
-    $num_runs       = 0;
+    $num_runs = 0;
     $xtc_num_files  = 0;
     $xtc_size       = 0.0;
     $xtc_local_copy = 0;
@@ -151,6 +184,7 @@ try {
 
 
 <!------------------- Document Begins Here ------------------------->
+
 <?php
     DataPortal::begin( "Data Portal of Experiment" );
 ?>
@@ -160,7 +194,6 @@ try {
 <!------------------- Page-specific Styles ------------------------->
 
 <link type="text/css" href="css/portal.css" rel="Stylesheet" />
-
 <style type="text/css">
   .not4print {
   }
@@ -187,6 +220,8 @@ var exper_id = '<?=$exper_id?>';
 var experiment_name = '<?=$experiment->name()?>';
 var instrument_name = '<?=$experiment->instrument()->name()?>';
 var range_of_runs = '<?=$range_of_runs?>';
+var min_run = <?=(is_null($min_run)?'null':$min_run)?>;
+var max_run = <?=(is_null($max_run)?'null':$max_run)?>;
 var page1 = '<?=(isset($page1) ? $page1 : "null")?>';
 var page2 = '<?=(isset($page2) ? $page2 : "null")?>';
 
@@ -201,6 +236,7 @@ function page_specific_init() {
 	$('#tabs').tabs();
 
 	init_tab_experiment();
+	elog_init();
 	init_tab_files();
 	init_tab_hdf5();
 
@@ -242,10 +278,151 @@ function init_tab_experiment() {
 }
 
 /* --------------------------------------
+ *             TAB: E-LOG
+ * --------------------------------------
+ */
+function elog_init() {
+
+	$('#tabs-elog-subtabs').tabs();
+	elog_post_init();
+}
+
+function elog_post_init() {
+
+	$('#elog-post-context-selector').buttonset();
+	$('#elog-post-context-experiment').click(function(ev) {
+		$('#elog-post-relevance-shift').attr('disabled', 'disabled');
+		$('#elog-post-relevance-runnum').attr('disabled', 'disabled');
+	});
+	$('#elog-post-context-shift').click(function(ev) {
+		$('#elog-post-relevance-shift').removeAttr('disabled');
+		$('#elog-post-relevance-runnum').attr('disabled', 'disabled');
+	});
+	$('#elog-post-context-run').click(function(ev) {
+		$('#elog-post-relevance-shift').attr('disabled', 'disabled');
+		$('#elog-post-relevance-runnum').removeAttr('disabled');
+		$('#elog-post-relevance-eor').removeAttr('disabled');
+		$('#elog-post-relevance-run').removeAttr('disabled');
+		$('#elog-post-relevance-sor').removeAttr('disabled');
+		$('#elog-post-relevance-selector').buttonset('refresh');
+	});
+	$('#elog-post-relevance-shift').attr('disabled', 'disabled');
+	$('#elog-post-relevance-runnum').attr('disabled', 'disabled');
+
+	$('#elog-post-relevance-eor').attr('disabled', 'disabled');
+	$('#elog-post-relevance-run').attr('disabled', 'disabled');
+	$('#elog-post-relevance-sor').attr('disabled', 'disabled');
+
+	$('#elog-post-relevance-selector').buttonset();
+	$('#elog-post-relevance-now').click(function(ev) {
+		$('#elog-post-relevance-datepicker').attr('disabled', 'disabled');
+		$('#elog-post-relevance-time').attr('disabled', 'disabled');
+		if( elog_post_selected_context() != 'run' ) {
+			$('#elog-post-relevance-runnum').attr('disabled', 'disabled');
+		}
+	});
+	$('#elog-post-relevance-past').click(function(ev) {
+		$('#elog-post-relevance-datepicker').removeAttr('disabled');
+		$('#elog-post-relevance-time').removeAttr('disabled');
+		if( elog_post_selected_context() != 'run' ) {
+			$('#elog-post-relevance-runnum').attr('disabled', 'disabled');
+		}
+	});
+	$('#elog-post-relevance-eor').click(function(ev) {
+		$('#elog-post-relevance-datepicker').attr('disabled', 'disabled');
+		$('#elog-post-relevance-time').attr('disabled', 'disabled');
+		$('#elog-post-relevance-runnum').removeAttr('disabled');
+	});
+	$('#elog-post-relevance-run').click(function(ev) {
+		$('#elog-post-relevance-datepicker').attr('disabled', 'disabled');
+		$('#elog-post-relevance-time').attr('disabled', 'disabled');
+		$('#elog-post-relevance-runnum').removeAttr('disabled');
+	});
+	$('#elog-post-relevance-sor').click(function(ev) {
+		$('#elog-post-relevance-datepicker').attr('disabled', 'disabled');
+		$('#elog-post-relevance-time').attr('disabled', 'disabled');
+		$('#elog-post-relevance-runnum').removeAttr('disabled');
+	});
+	$('#elog-post-relevance-datepicker').datepicker({
+		showButtonPanel: true,
+		dateFormat: 'yy-mm-dd'
+	});
+	$('#elog-post-relevance-datepicker').attr('disabled', 'disabled');
+	$('#elog-post-relevance-time').attr('disabled', 'disabled');
+
+	$('#elog-tags-library-0').change(function(ev) {
+		var selectedIndex = $('#elog-tags-library-0').attr('selectedIndex');
+		if( selectedIndex == 0 ) return;
+		$('#elog-tag-name-0').val($('#elog-tags-library-0').val());
+		$('#elog-tags-library-0').attr('selectedIndex', 0);
+	});
+	$('#elog-tags-library-1').change(function(ev) {
+		var selectedIndex = $('#elog-tags-library-1').attr('selectedIndex');
+		if( selectedIndex == 0 ) return;
+		$('#elog-tag-name-1').val($('#elog-tags-library-1').val());
+		$('#elog-tags-library-1').attr('selectedIndex', 0);
+	});
+	$('#elog-tags-library-2').change(function(ev) {
+		var selectedIndex = $('#elog-tags-library-2').attr('selectedIndex');
+		if( selectedIndex == 0 ) return;
+		$('#elog-tag-name-2').val($('#elog-tags-library-2').val());
+		$('#elog-tags-library-2').attr('selectedIndex', 0);
+	});
+
+	$('#elog-submit').button().click(function() {
+
+		// Validate the form and add more fields if needed
+		//
+		var run = null;
+		if( elog_post_selected_context() == 'run' ) {
+			if( min_run == null ) {
+				$('#elog-post-relevance-runnum-error').text('the experiment has not taken any runs yet');
+				return;
+			}
+			run = $('#elog-post-relevance-runnum').val();
+			if(( run < min_run ) || ( run > max_run )) {
+				$('#elog-post-relevance-runnum-error').text('the run number is out of allowed range: '+min_run+'-'+max_run);
+				return;
+			}
+		}
+		var scope = null;
+		alert(elog_post_selected_context());
+		$('#elog-form-post input[name="scope"]').val(elog_post_selected_context());
+		$('#elog-form-post').trigger( 'submit' );
+	});
+
+	$('#elog-reset').button().click(function() {
+		elog_post_reset();
+	});
+
+	elog_post_reset();
+}
+
+function elog_post_reset() {
+}
+
+var elog_post_id2context = new Array();
+elog_post_id2context['elog-post-context-experiment']='experiment';
+elog_post_id2context['elog-post-context-shift']='shift';
+elog_post_id2context['elog-post-context-run']='run';
+
+function elog_post_selected_context() {
+	return elog_post_id2context[$('#elog-post-context-selector input:checked').attr('id')];
+}
+
+function elog_post_attachment_add(e) {
+	if( e.value != '' ) {
+		$( '#elog-post-attachments' ).append( '<input type="file" onchange="elog_post_attachment_add(this)" /><br>' );
+	}
+}
+
+/* --------------------------------------
  *             TAB: FILES
  * --------------------------------------
  */
 function init_tab_files() {
+
+	$('#tabs-files-subtabs').tabs();
 
 	$('#button-files-filter-reset').button();
 	$('#button-files-filter-reset').click(
@@ -436,6 +613,16 @@ function search_translate_requests() {
 }
 
 /* ----------------------------------------------
+ *             CONTEXT MANAGEMENT
+ * ----------------------------------------------
+ */
+var current_tab = 'tabs-experiment';
+
+function set_current_tab( tab ) {
+	current_tab = tab;
+}
+
+/* ----------------------------------------------
  *             UTILITY FUNCTIONS
  * ----------------------------------------------
  */
@@ -462,10 +649,10 @@ function pdf( context ) {
 	}
 }
 
-function printer_friendly( element ) {
-	var el = document.getElementById(element);
+function printer_friendly() {
+	var el = document.getElementById( current_tab );
 	if (el) {
-		var html = document.getElementById(element).innerHTML;
+		var html = document.getElementById(current_tab).innerHTML;
 		var pfcopy = window.open("about:blank");
 		pfcopy.document.write('<html xmlns="http://www.w3.org/1999/xhtml">');
 		pfcopy.document.write('<head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />');
@@ -497,90 +684,285 @@ function printer_friendly( element ) {
 
 <!------------------ Page-specific Document Body ------------------->
 
+<?php
 
-  <div id="tabs">
-	<ul>
-	  <li><a href="#tabs-experiment">Experiment</a></li>
-	  <li><a href="#tabs-elog">e-Log</a></li>
-	  <li><a href="#tabs-files">Data Files</a></li>
-	  <li><a href="#tabs-translate">XTC/HDF5 Translation</a></li>
-	  <li><a href="#tabs-account">My Account</a></li>
-	</ul>
-	<div id="tabs-experiment" class="tab-inline-content">
-      <div style="float:right;" class="not4print"><a href="javascript:printer_friendly('tabs-experiment')" title="Printer friendly version of this page"><img src="img/PRINTER_icon.png" /></a></div>
-      <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:pdf('experiment')" title="PDF version of this page"><img src="img/PDF_icon.jpg" /></a></div>
-      <div stype="clear:both;" class="not4print"></div>
+	$tabs = array();
+
+	$decorated_experiment_status  = DataPortal::decorated_experiment_status_UP   ( $experiment );
+	$decorated_experiment_contact = DataPortal::decorated_experiment_contact_info( $experiment );
+	$experiment_group_members     = "<table><tbody>\n";
+    foreach( $experiment->group_members() as $m ) {
+    	$uid   = $m['uid'];
+    	$gecos = $m['gecos'];
+        $experiment_group_members .= "<tr><td><b>{$uid}</b></td><td>{$gecos}</td></tr>\n";
+	}
+	$experiment_group_members .= "</tbody></table>\n";
+    $tabs_experiment =<<<HERE
 	  <button id="button-select-experiment" class="not4print">Select another experiment</button>
+	  <br>
+	  <br>
       <table>
-        <tbody cellspacing=4>
+        <tbody>
           <tr>
             <td class="table_cell_left">Id</td>
-            <td class="table_cell_right"><?=$experiment->id()?></td>
+            <td class="table_cell_right">{$experiment->id()}</td>
           </tr>
           <tr>
             <td class="table_cell_left">Status</td>
-            <td class="table_cell_right"><?=DataPortal::decorated_experiment_status_UP( $experiment )?></td>
+            <td class="table_cell_right">{$decorated_experiment_status}</td>
           </tr>
           <tr>
             <td class="table_cell_left">Begin</td>
-            <td class="table_cell_right"><?=$experiment->begin_time()->toStringShort()?></td>
+            <td class="table_cell_right">{$experiment->begin_time()->toStringShort()}</td>
           </tr>
           <tr>
             <td class="table_cell_left">End</td>
-            <td class="table_cell_right"><?=$experiment->end_time()->toStringShort()?></td>
+            <td class="table_cell_right">{$experiment->end_time()->toStringShort()}</td>
           </tr>
           <tr>
             <td class="table_cell_left">Description</td>
-            <td class="table_cell_right"><pre style="background-color:#e0e0e0; padding:0.5em;"><?=$experiment->description()?></pre></td>
+            <td class="table_cell_right"><pre style="background-color:#e0e0e0; padding:0.5em;">{$experiment->description()}</pre></td>
           </tr>
           <tr>
             <td class="table_cell_left">Contact</td>
-            <td class="table_cell_right"><?=DataPortal::decorated_experiment_contact_info( $experiment )?></td>
+            <td class="table_cell_right">{$decorated_experiment_contact}</td>
           </tr>
           <tr>
             <td class="table_cell_left">Leader</td>
-            <td class="table_cell_right"><?=$experiment->leader_Account()?></td>
+            <td class="table_cell_right">{$experiment->leader_Account()}</td>
           </tr>
           <tr>
             <td class="table_cell_left table_cell_bottom" valign="top">POSIX Group</td>
             <td class="table_cell_right table_cell_bottom">
               <table cellspacing=0 cellpadding=0><tbody>
                 <tr>
-                  <td valign="top"><?=$experiment->POSIX_gid()?></td>
+                  <td valign="top">{$experiment->POSIX_gid()}</td>
                   <td>&nbsp;</td>
                   <td>
                     <button id="button-toggle-group" class="not4print" title="click to see/hide the list of members"><div class="ui-icon ui-icon-triangle-1-s"></div></button>
-                    <div id="group-members" class="group-members-hidden">
-                      <table><tbody>
-                      <?php
-                        $idx = 0;
-                    	foreach( $experiment->group_members() as $m ) {
-                    		$uid   = $m['uid'];
-                    		$gecos = $m['gecos'];
-                    		echo <<<HERE
-                         <tr><td><b>{$uid}</b></td><td>{$gecos}</td></tr>
-
-HERE;
-                    	}
-                    	?>
-                      </tbody></table>
-                    </div>
+                    <div id="group-members" class="group-members-hidden">{$experiment_group_members}</div>
                   </td>
                 </tr>
               </tbody></table>
             </td>
           </tr>
         </tbody>
-      </table>
-	</div>
-	<div id="tabs-elog" class="tab-inline-content">
-      <p>Electronic LogBook should be seen here. But firt we need to redesign it using JavaScript
-      classes to mavoid various sorts of conflicts.</p>
-	</div>
-	<div id="tabs-files" class="tab-inline-content">
-      <div style="float:right;" class="not4print"><a href="javascript:printer_friendly('tabs-files')" title="Printer friendly version of this page"><img src="img/PRINTER_icon.png" /></a></div>
-      <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:pdf('files')" title="PDF version of this page"><img src="img/PDF_icon.jpg" /></a></div>
-      <div stype="clear:both;" class="not4print"></div>
+      </table>\n
+HERE;
+	array_push(
+		$tabs,
+    	array(
+    		'name' => 'Experiment',
+    		'id'   => 'tabs-experiment',
+    		'html' => $tabs_experiment,
+    	    'callback' => 'set_current_tab("tabs-experiment")'
+    	)
+    );
+
+    /*
+     * [ e-log ]
+     */
+    $tabs_elog_subtabs = array();
+
+    $tabs_elog_recent =<<<HERE
+      <p>This is the placeholder for most recent messages monitored by the application.
+      The old version of the application needs to be redesigned to avoid various sorts
+      of conflicts.</p>\n
+HERE;
+    array_push(
+		$tabs_elog_subtabs,
+    	array(
+    		'name' => 'Recent (Live)',
+    		'id'   => 'tabs-elog-recent',
+    		'html' => $tabs_elog_recent,
+    	    'callback' => 'set_current_tab("tabs-elog-recent")'
+    	)
+    );
+    $known_tags_html = "<option> - known tags - </option>\n";
+    foreach( $logbook_experiment->used_tags() as $tag ) {
+    	$known_tags_html .= "<option>{$tag}</option>\n";
+    }
+    $today = date("Y-m-d");
+    $now   = "00:00:00";
+    $last_run = 1;
+    $last_shift = date("Y-m-d H:i:s");
+    $tabs_elog_post =<<<HERE
+      <form id="elog-form-post" enctype="multipart/form-data" action="/apps-dev/logbook/NewFFEntry4portal.php" method="post">
+        <input type="hidden" name="author_account" value="{$auth_svc->authName()}" />
+        <input type="hidden" name="id" value="{$exper_id}" />
+        <input type="hidden" name="scope" value="" />
+        <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />
+        <div>
+          <div style="float:left;">
+	        <span style="font-weight:bold;">Anchor to:</span>
+            <div style="margin-top:4px;"></div>
+	        <div id="elog-post-context-selector">
+		      <input type="radio" id="elog-post-context-experiment" name="elog-post-context-selector"  checked="checked" /><label for="elog-post-context-experiment">experiment</label>
+		      <input type="radio" id="elog-post-context-shift"      name="elog-post-context-selector"                    /><label for="elog-post-context-shift"     >shift</label>
+		      <input type="radio" id="elog-post-context-run"        name="elog-post-context-selector"                    /><label for="elog-post-context-run"       >run</label>
+	        </div>
+		  </div>
+          <div style="float:left; margin-left:20px;">
+            <span style="font-weight:bold;">Shift:</span>
+            <div style="margin-top:4px;"></div>
+            <select id="elog-post-relevance-shift">
+              <option>{$last_shift}</option>
+            </select>
+          </div>
+		  <div style="float:left; margin-left:20px;">
+            <span style="font-weight:bold;">Run #:</span>
+            <div style="margin-top:4px;"></div>
+            <input type="text" id="elog-post-relevance-runnum" value="{$last_run}" size=4 />
+            <span id="elog-post-relevance-runnum-error" style="color:red;"></span>
+          </div>
+          <div style="clear:both;"></div>
+        </div>
+		<div style="margin-top:20px;">
+          <div style="float:left;">
+            <span style="font-weight:bold;">Post:</span>
+            <div style="margin-top:4px;"></div>
+            <div id="elog-post-relevance-selector">
+		      <input type="radio" id="elog-post-relevance-now"  name="elog-post-relevance-selector"  checked="checked" /><label for="elog-post-relevance-now"  title=""                                        >for the current time</label>
+		      <input type="radio" id="elog-post-relevance-past" name="elog-post-relevance-selector"                    /><label for="elog-post-relevance-past" title="use date and time selector on the right" >in the past</label>
+		      <input type="radio" id="elog-post-relevance-eor"  name="elog-post-relevance-selector"                    /><label for="elog-post-relevance-eor"  title="above specified run number"              >after run</label>
+		      <input type="radio" id="elog-post-relevance-run"  name="elog-post-relevance-selector"                    /><label for="elog-post-relevance-run"  title="above specified run number"              >in run</label>
+		      <input type="radio" id="elog-post-relevance-sor"  name="elog-post-relevance-selector"                    /><label for="elog-post-relevance-sor"  title="above specified run number"              >before run</label>
+		    </div>
+		  </div>
+          <div style="float:left; margin-left:20px;">
+            <span style="font-weight:bold;">Date & time:</span>
+            <div style="margin-top:4px;"></div>
+            <input type="text" id="elog-post-relevance-datepicker" value="{$today}" size=11 />
+            <input type="text" id="elog-post-relevance-time" value="{$now}"  size=8 />
+          </div>
+          <div style="clear:both"></div>
+		</div>
+        <div style="margin-top:20px;">
+          <div style="float:left;">
+            <span style="font-weight:bold;">Message:</span>
+            <div style="margin-top:4px;"></div>
+            <textarea name="message_text" rows="12" cols="72" style="padding:4px;" title="the first line of the message body will be used as its subject" ></textarea>
+            <div style="margin-top:20px;">
+              <span style="font-weight:bold;">Tags (= values):</span>
+              <div id="elog-tags" style="margin-top:4px;">
+                <select id="elog-tags-library-0">
+                  {$known_tags_html}
+                </select> <input type="text" id="elog-tag-name-0" value="" size=16 title="type new tag here or select a known one from the left" />
+                = <input type="text" id="elog-tag-value-0" value="" size=16 title="put an optional value here" /><br>
+                <select id="elog-tags-library-1">
+                  {$known_tags_html}
+                </select> <input type="text" id="elog-tag-name-1" value="" size=16 title="type new tag here or select a known one from the left" />
+                = <input type="text" id="elog-tag-value-1" value="" size=16 title="put an optional value here" /> <br>
+                <select id="elog-tags-library-2">
+                  {$known_tags_html}
+                </select> <input type="text" id="elog-tag-name-2" value="" size=16 title="type new tag here or select a known one from the left" />
+                = <input type="text" id="elog-tag-value-2" value="" size=16 title="put an optional value here" /> <br>
+              </div>
+            </div>
+          </div>
+          <div style="float:left; margin-left:40px;">
+            <span style="font-weight:bold;">Attachments:</span>
+            <div id="elog-post-attachments" style="margin-top:4px;">
+              <input type="file" onchange="elog_post_attachment_add(this)" /><br>
+            </div>
+          </div>
+          <div style="clear:both;"></div>
+        </div>
+        <input type="hidden" name="extra" value="its value" />
+      </form>
+      <div style="margin-top:40px;">
+        <button id="elog-submit">Submit</button>
+        <button id="elog-reset">Reset</button>
+      </div>\n
+HERE;
+    array_push(
+		$tabs_elog_subtabs,
+    	array(
+    		'name' => 'Post',
+    		'id'   => 'tabs-elog-post',
+    		'html' => $tabs_elog_post,
+    	    'callback' => 'set_current_tab("tabs-elog-post")'
+    	)
+    );
+
+    $tabs_elog_search =<<<HERE
+      <p>There will be a dialog to search for messages</p>\n
+HERE;
+    array_push(
+		$tabs_elog_subtabs,
+    	array(
+    		'name' => 'Search',
+    		'id'   => 'tabs-elog-search',
+    		'html' => $tabs_elog_search,
+    	    'callback' => 'set_current_tab("tabs-elog-search")'
+    	)
+    );
+
+    $tabs_elog_browse =<<<HERE
+      <p>This has to be an extended version of the live display allowing more
+      sophisticated ways for browsing the database.</p>\n
+HERE;
+    array_push(
+		$tabs_elog_subtabs,
+    	array(
+    		'name' => 'Browse',
+    		'id'   => 'tabs-elog-browse',
+    		'html' => $tabs_elog_browse,
+    	    'callback' => 'set_current_tab("tabs-elog-browse")'
+    	)
+    );
+
+    $tabs_elog_runs =<<<HERE
+      <p>A list of all runs, a selector for a run and runs summary page.</p>\n
+HERE;
+    array_push(
+		$tabs_elog_subtabs,
+    	array(
+    		'name' => 'Runs',
+    		'id'   => 'tabs-elog-runs',
+    		'html' => $tabs_elog_runs,
+    	    'callback' => 'set_current_tab("tabs-elog-runs")'
+    	)
+    );
+
+    $tabs_elog_shifts =<<<HERE
+      <p>A list of all shifts, a selector for a shift and the shift goals page.</p>\n
+HERE;
+    array_push(
+		$tabs_elog_subtabs,
+    	array(
+    		'name' => 'Shifts',
+    		'id'   => 'tabs-elog-shifts',
+    		'html' => $tabs_elog_shifts,
+    	    'callback' => 'set_current_tab("tabs-elog-shifts")'
+    	)
+    );
+
+    $tabs_elog_subscribe =<<<HERE
+      <p>A dialog for viewing/managing subscriptions for e-mail notifications.</p>\n
+HERE;
+    array_push(
+		$tabs_elog_subtabs,
+    	array(
+    		'name' => 'Subscribe',
+    		'id'   => 'tabs-elog-subscribe',
+    		'html' => $tabs_elog_subscribe,
+    	    'callback' => 'set_current_tab("tabs-elog-subscribe")'
+    	)
+    );
+
+    array_push(
+		$tabs,
+    	array(
+    		'name' => 'e-Log',
+    		'id'   => 'tabs-elog',
+    		'html' => DataPortal::tabs_html( "tabs-elog-subtabs", $tabs_elog_subtabs ),
+    	    'callback' => 'set_current_tab("tabs-elog")'
+    	)
+    );
+
+    $tabs_files_subtabs = array();
+    $tabs_files_4runs =<<<HERE
 	  <div>
         <div id="files-search-summary" style="float: left">
           <table><tbody>
@@ -589,37 +971,37 @@ HERE;
             </tr>
             <tr>
               <td class="grid-key">Number of runs:</td>
-              <td class="grid-value"><?=$num_runs?></td>
+              <td class="grid-value">{$num_runs}</td>
             </tr>
             <tr>
               <td class="grid-sect-hdr">X T C</td>
             </tr>
             <tr>
               <td class="grid-key">Number of files:</td>
-              <td class="grid-value"><?=$xtc_num_files?></td>
+              <td class="grid-value">{$xtc_num_files}</td>
               <td class="grid-key">Size [GB]:</td>
-              <td class="grid-value"><?=$xtc_size_str?></td>
+              <td class="grid-value">{$xtc_size_str}</td>
             </tr>
             <tr>
               <td class="grid-key">Archived to tape:</td>
-              <td class="grid-value"><?=$xtc_archived?> / <?=$xtc_num_files?></td>
+              <td class="grid-value">{$xtc_archived} / {$xtc_num_files}</td>
               <td class="grid-key">On disk:</td>
-              <td class="grid-value"><?=$xtc_local_copy?> / <?=$xtc_num_files?></td>
+              <td class="grid-value">{$xtc_local_copy} / {$xtc_num_files}</td>
             </tr>
              <tr>
              <td class="grid-sect-hdr">H D F 5</td>
             </tr>
             <tr>
               <td class="grid-key">Number of files:</td>
-              <td class="grid-value"><?=$hdf5_num_files?></td>
+              <td class="grid-value">{$hdf5_num_files}</td>
               <td class="grid-key">Size [GB]:</td>
-              <td class="grid-value"><?=$hdf5_size_str?></td>
+              <td class="grid-value">{$hdf5_size_str}</td>
             </tr>
             <tr>
               <td class="grid-key">Archived to tape:</td>
-              <td class="grid-value"><?=$hdf5_archived?> / <?=$hdf5_num_files?></td>
+              <td class="grid-value">{$hdf5_archived} / {$hdf5_num_files}</td>
               <td class="grid-key">On disk:</td>
-              <td class="grid-value"><?=$hdf5_local_copy?> / <?=$hdf5_num_files?></td>
+              <td class="grid-value">{$hdf5_local_copy} / {$hdf5_num_files}</td>
             </tr>
           </tbody></table>
         </div>
@@ -633,7 +1015,7 @@ HERE;
               </tr>
               <tr>
                 <td class="selector-option"><input type="radio" name="runs" value="range"></td>
-                <td class="selector-value"><input type="text" name="runs_range" value="<?=$range_of_runs?>" width=10 title="1,3,5,10-20,200"></td>
+                <td class="selector-value"><input type="text" name="runs_range" value="{$range_of_runs}" width=10 title="1,3,5,10-20,200"></td>
               </tr>
             </thead></table>
           </div>
@@ -695,168 +1077,156 @@ HERE;
         </div>
         <div style="clear: both;"></div>
       </div>
-      <div id="files-search-result"></div>
-	</div>
+      <div id="files-search-result"></div>\n
+HERE;
+    array_push(
+		$tabs_files_subtabs,
+    	array(
+    		'name' => 'By Runs',
+    		'id'   => 'tabs-files-4runs',
+    		'html' => $tabs_files_4runs,
+    	    'callback' => 'set_current_tab("tabs-files-4runs")'
+    	)
+    );
+    array_push(
+		$tabs,
+    	array(
+    		'name' => 'Data Files',
+    		'id'   => 'tabs-files',
+    		'html' => DataPortal::tabs_html( "tabs-files-subtabs", $tabs_files_subtabs ),
+    	    'callback' => 'set_current_tab("tabs-files")'
+    	)
+    );
 
- 	<div id="tabs-translate">
- 
-      <div id="tabs-translate-subtabs">
-	    <ul>
-	      <li><a href="#tabs-translate-manage">Manage</a></li>
-	      <li><a href="#tabs-translate-history">History of Requests</a></li>
-	    </ul>
-	    <div id="tabs-translate-manage" class="tab-inline-content">
-	      <div style="float:right;" class="not4print"><a href="javascript:printer_friendly('tabs-translate-manage')" title="Printer friendly version of this page"><img src="img/PRINTER_icon.png" /></a></div>
-	      <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:pdf('translate-manage')" title="PDF version of this page"><img src="img/PDF_icon.jpg" /></a></div>
-	      <div stype="clear:both;" class="not4print"></div>
-		  <div>
-	        <div id="translate-search-summary" style="float:left">
-	          <table><tbody>
-	            <tr>
-	              <td class="grid-sect-hdr-first">R u n s</td>
-	            </tr>
-	            <tr>
-	              <td class="grid-key">Number of runs:</td>
-	              <td class="grid-value"><?=$num_runs?></td>
-	            </tr>
-	            <tr>
-	              <td class="grid-sect-hdr">T r a n s l a t i o n</td>
-	            </tr>
-	            <tr>
-	              <td class="grid-key">Complete:</td>
-	              <td class="grid-value"><?=$hdf5_num_runs_complete?></td>
-	            </tr>
-	            <tr>
-	              <td class="grid-key">Failed:</td>
-	              <td class="grid-value"><?=$hdf5_num_runs_failed?></td>
-	            </tr>
-	            <tr>
-	              <td class="grid-key">Waiting:</td>
-	              <td class="grid-value"><?=$hdf5_num_runs_wait?></td>
-	            </tr>
-	            <tr>
-	              <td class="grid-key">Being translated:</td>
-	              <td class="grid-value"><?=$hdf5_num_runs_translate?></td>
-	            </tr>
-	            <tr>
-	              <td class="grid-key">Other state:</td>
-	              <td class="grid-value"><?=$hdf5_num_runs_unknown?></td>
-	            </tr>
-	          </tbody></table>
-	        </div>
-	        <div id="translate-search-filter" style="float:left">
-	          <div class="group" style="float:left">
-	            <div class="selector-hdr">R u n s</div>
-	            <table><thead>
-	              <tr>
-	                <td class="selector-option"><input type="radio" name="runs" value="all" checked="checked"></td>
-	                <td class="selector-value">all</td>
-	              </tr>
-	              <tr>
-	                <td class="selector-option"><input type="radio" name="runs" value="range"></td>
-	                <td class="selector-value"><input type="text" name="runs_range" value="<?=$range_of_runs?>" width=10 title="1,3,5,10-20,200"></td>
-	              </tr>
-	            </thead></table>
-	          </div>
-	          <div class="group" style="float:left">
-	            <div class="selector-hdr">T r a n s l a t e d</div>
-	            <table><thead>
-	              <tr>
-	                <td class="selector-option"><input type="radio" name="translated" value="yes_or_no" checked="checked"></td>
-	                <td class="selector-value">yes or no</td>
-	              </tr>
-	              <tr>
-	                <td class="selector-option"><input type="radio" name="translated" value="yes"></td>
-	                <td class="selector-value">yes</td>
-	              </tr>
-	              <tr>
-	                <td class="selector-option"><input type="radio" name="translated" value="no"></td>
-	                <td class="selector-value">no</td>
-	              </tr>
-	            </thead></table>
-	          </div>
-	          <div style="clear:both;"></div>
-	          <div style="float:right;">
-	            <button id="button-translate-filter-reset" class="not4print">Reset Filter</button>
-	            <button id="button-translate-filter-apply" class="not4print">Apply Filter</button>
-	          </div>
-	          <div style="clear:both;"></div>
-	        </div>
-	        <div style="clear:both;"></div>
-	      </div>
-	      <div id="translate-search-result"></div>
-	    </div>
 
-	    <div id="tabs-translate-history" class="tab-inline-content">
-	      <p>Here be the list of all translation requests. And there will be a filter on the top right
-	      side to allow.</p>
-	    <!-- 
-        <div style="margin-left:20px; width:920px;">
-          <div style="float:left; padding:10px;">
+    $tabs_translate_subtabs = array();
+    $tabs_translate_manage =<<<HERE
+	  <div>
+        <div id="translate-search-summary" style="float:left">
+          <table><tbody>
+            <tr>
+              <td class="grid-sect-hdr-first">R u n s</td>
+            </tr>
+            <tr>
+              <td class="grid-key">Number of runs:</td>
+              <td class="grid-value">{$num_runs}</td>
+            </tr>
+            <tr>
+              <td class="grid-sect-hdr">T r a n s l a t i o n</td>
+            </tr>
+            <tr>
+              <td class="grid-key">Complete:</td>
+              <td class="grid-value">{$hdf5_num_runs_complete}</td>
+            </tr>
+            <tr>
+              <td class="grid-key">Failed:</td>
+              <td class="grid-value">{$hdf5_num_runs_failed}</td>
+            </tr>
+            <tr>
+              <td class="grid-key">Waiting:</td>
+              <td class="grid-value">{$hdf5_num_runs_wait}</td>
+            </tr>
+            <tr>
+              <td class="grid-key">Being translated:</td>
+              <td class="grid-value">{$hdf5_num_runs_translate}</td>
+            </tr>
+            <tr>
+              <td class="grid-key">Other state:</td>
+              <td class="grid-value">{$hdf5_num_runs_unknown}</td>
+            </tr>
+          </tbody></table>
+        </div>
+        <div id="translate-search-filter" style="float:left">
+          <div class="group" style="float:left">
+            <div class="selector-hdr">R u n s</div>
             <table><thead>
               <tr>
-                <td>&nbsp;</td>
-                <td align="center"></td>
-                <td>&nbsp;</td>
-                <td align="center">Begin</td>
-                <td align="center">End</td>
+                <td class="selector-option"><input type="radio" name="runs" value="all" checked="checked"></td>
+                <td class="selector-value">all</td>
               </tr>
               <tr>
-                <td>Runs</td>
-                <td>
-                  <input id="filter_begin_run" size="4" name="begin_run" type="text" value="" style="padding:1px;" title="the smallest run number" disabled="disabled" /> -
-                  <input id="filter_end_run"   size="4" name="end_run"   type="text" value="" style="padding:1px;" title="the largest run number" disabled="disabled" /></td>
-                <td style="padding-left:10px;">Created</td>
-                <td><input id="filter_begin_created" name="begin_created" type="text" value="" style="padding:1px;" title="when the requests began being created" disabled="disabled" /></td>
-                <td><input id="filter_end_created"   name="end_created"   type="text" value="" style="padding:1px;" title="when the requests ended up being created" disabled="disabled" /></td>
-              </tr>
-              <tr>
-                <td>Status</td>
-                <td>
-                  <select id="filter_status" name="filter_status" onchange="apply_filter()" disabled="disabled">
-                    <option value=""></option>
-                    <option value="Initial_Entry ">Initial_Entry</option>
-                    <option value="Waiting_Translation ">Waiting_Translation</option>
-                    <option value="Empty_Fileset ">Empty_Fileset</option>
-                    <option value="H5Dir_Error ">H5Dir_Error</option>
-                    <option value="Being_Translated ">Being_Translated</option>
-                    <option value="Translation_Error ">Translation_Error</option>
-                    <option value="Archive_Error ">Archive_Error</option>
-                    <option value="Complete ">Complete</option>
-                  </select></td>
-                <td style="padding-left:10px;">Started</td>
-                <td><input id="filter_begin_started" name="begin_started" type="text" value="" style="padding:1px;" title="the oldest time the requests were started" disabled="disabled" /></td>
-                <td><input id="filter_end_started"   name="end_started"   type="text" value="" style="padding:1px;" title="the newest time the requests were started" disabled="disabled" /></td>
-              </tr>
-              <tr>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td style="padding-left:10px;">Stopped</td>
-                <td><input id="filter_begin_stopped" type="text" name="begin_stopped" value="" style="padding:1px;" title="the oldest time the requests were stopped" disabled="disabled" /></td>
-                <td><input id="filter_end_stopped"   type="text" name="end_stopped"   value="" style="padding:1px;" title="the newest time the requests were stopped" disabled="disabled" /></td>
+                <td class="selector-option"><input type="radio" name="runs" value="range"></td>
+                <td class="selector-value"><input type="text" name="runs_range" value="{$range_of_runs}" width=10 title="1,3,5,10-20,200"></td>
               </tr>
             </thead></table>
-            <div style="margin-top:20px;">
-              <center>
-                <button id="apply_filter_button" class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all" class="not4print">
-                  <span class="ui-button-text">Search</span>
-                </button>
-                <button id="reset_filter_button" class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all" class="not4print">
-                  <span class="ui-button-text">Reset Filter</span>
-                </button>
-              </center>
-            </div>
+          </div>
+          <div class="group" style="float:left">
+            <div class="selector-hdr">T r a n s l a t e d</div>
+            <table><thead>
+              <tr>
+                <td class="selector-option"><input type="radio" name="translated" value="yes_or_no" checked="checked"></td>
+                <td class="selector-value">yes or no</td>
+              </tr>
+              <tr>
+                <td class="selector-option"><input type="radio" name="translated" value="yes"></td>
+                <td class="selector-value">yes</td>
+              </tr>
+              <tr>
+                <td class="selector-option"><input type="radio" name="translated" value="no"></td>
+                <td class="selector-value">no</td>
+              </tr>
+            </thead></table>
           </div>
           <div style="clear:both;"></div>
- 	    </div>
-	     -->
+          <div style="float:right;">
+            <button id="button-translate-filter-reset" class="not4print">Reset Filter</button>
+            <button id="button-translate-filter-apply" class="not4print">Apply Filter</button>
+          </div>
+          <div style="clear:both;"></div>
         </div>
+        <div style="clear:both;"></div>
       </div>
-    </div>
-	<div id="tabs-account" class="tab-inline-content">
-      <p>User account information, privileges, POSIX groups, other experiments participation, subscriptions, etc.</p>
-	</div>
-  </div>
+	  <div id="translate-search-result"></div>\n
+HERE;
+    array_push(
+		$tabs_translate_subtabs,
+    	array(
+    		'name' => 'Manage',
+    		'id'   => 'tabs-translate-manage',
+    		'html' => $tabs_translate_manage,
+    	    'callback' => 'set_current_tab("tabs-translate-manage")'
+    	)
+    );
+    $tabs_translate_history =<<<HERE
+      <p>Here be the list of all translation requests. And there will be a filter
+      on the top right side to allow.</p>\n
+HERE;
+    array_push(
+		$tabs_translate_subtabs,
+    	array(
+    		'name' => 'History of Requests',
+    		'id'   => 'tabs-translate-history',
+    		'html' => $tabs_translate_history,
+    	    'callback' => 'set_current_tab("tabs-translate-history")'
+    	)
+    );
+    array_push(
+		$tabs,
+    	array(
+    		'name' => 'XTC/HDF5 Translation',
+    		'id'   => 'tabs-translate',
+    		'html' => DataPortal::tabs_html( "tabs-translate-subtabs", $tabs_translate_subtabs ),
+    	    'callback' => 'set_current_tab("tabs-translate")'
+    	)
+    );
+
+    $tabs_account =<<<HERE
+      <p>User account information, privileges, POSIX groups, other experiments participation,
+      subscriptions, etc.</p>\n
+HERE;
+   	array_push(
+		$tabs,
+    	array(
+    		'name' => 'My Account',
+    		'id'   => 'tabs-account',
+    		'html' => $tabs_account,
+    	    'callback' => 'set_current_tab("tabs-account")'
+    	)
+    );
+
+
+	DataPortal::tabs( "tabs", $tabs );
+?>
 
 <!----------------------------------------------------------------->
 
@@ -876,6 +1246,8 @@ HERE;
 } catch( FileMgrException $e ) { print $e->toHtml();
 } catch( LogBookException $e ) { print $e->toHtml();
 } catch( RegDBException   $e ) { print $e->toHtml();
+} catch( LogBookException $e ) { print $e->toHtml();
+} catch( AuthDBException  $e ) { print $e->toHtml();
 }
 
 ?>

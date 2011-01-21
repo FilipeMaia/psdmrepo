@@ -36,14 +36,13 @@ class DataPortal {
 	static function begin( $page_name ) {
 		echo <<<HERE
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"> 
+<!DOCTYPE html"> 
 <html> 
 <head> 
 <title>{$page_name}</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
 
-<link type="text/css" href="/jquery/jquery-ui-1.8.5/themes/base/jquery-ui.css" rel="Stylesheet" />
-<link type="text/css" href="/jquery/jquery-ui-themes-1.8.5/themes/redmond/jquery-ui.css" rel="Stylesheet" />
+<link type="text/css" href="/jquery/css/custom-theme/jquery-ui-1.8.7.custom.css" rel="Stylesheet" />
 <link type="text/css" href="css/default.css" rel="Stylesheet" />
 
 HERE;
@@ -58,8 +57,8 @@ HERE;
 		
 		echo <<<HERE
 
-<script type="text/javascript" src="/jquery/jquery-ui-1.8.5/jquery-1.4.2.js"></script>
-<script type="text/javascript" src="/jquery/jquery-ui-1.8.5/ui/jquery-ui.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery-ui-1.8.7.custom.min.js"></script>
 <script type="text/javascript" src="Utilities.js"></script>
 <script type="text/javascript">
 
@@ -184,21 +183,30 @@ HERE;
       <span class="document_title">{$document_title}</span>
       <span class="document_subtitle" id="{$document_subtitle_id}">{$document_subtitle}</span>
     </div>
-    <div id="login" style="float:right;">
-      <table><tbody>
-        <tr>
-          <td>&nbsp;</td>
-          <td>[<a href="javascript:logout()" title="close the current WebAuth session">logout</a>]</td>
-        </tr>
-        <tr>
-          <td>Welcome,&nbsp;</td>
-          <td><p><b>{$auth_svc->authName()}</b></p></td>
-        </tr>
-        <tr>
-          <td>Session expires in:&nbsp;</td>
-          <td><p id="auth_expiration_info"><b>00:00.00</b></p></td>
-        </tr>
-      </tbody></table>
+    <div style="float:right;">
+      <table><tbody><tr>
+        <td valign="bottom">
+          <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:printer_friendly('tabs-experiment')" title="Printer friendly version of this page"><img src="img/PRINTER_icon.png" /></a></div>
+          <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:pdf('experiment')" title="PDF version of this page"><img src="img/PDF_icon.jpg" /></a></div>
+          <div style="clear:both;" class="not4print"></div>
+        </td>
+        <td>
+          <table class="login"><tbody>
+            <tr>
+              <td>&nbsp;</td>
+              <td>[<a href="javascript:logout()" title="close the current WebAuth session">logout</a>]</td>
+            </tr>
+            <tr>
+              <td>Welcome,&nbsp;</td>
+              <td><p><b>{$auth_svc->authName()}</b></p></td>
+            </tr>
+            <tr>
+              <td>Session expires in:&nbsp;</td>
+              <td><p id="auth_expiration_info"><b>00:00.00</b></p></td>
+            </tr>
+          </tbody></table>
+        </td>
+      </tr></tbody></table>
     </div>
     <div style="clear:both;"></div>
   </div>
@@ -220,8 +228,10 @@ HERE;
 		foreach( $tabs as $t  ) {
 			$id = $t['id'];
 			$name = $t['name'];
+			$onclick = '';
+			if( array_key_exists ( 'callback', $t )) $onclick = "onclick='".$t['callback']."'";
 			$html .= <<<HERE
-    <li><a href="#{$id}">{$name}</a></li>
+    <li><a href="#{$id}" {$onclick}>{$name}</a></li>
 
 HERE;
 		}
@@ -254,7 +264,8 @@ HERE;
 		echo <<<HERE
 
   <div id="popupdialogs" style="display:none;"></div>
-
+  <div id="forms" style="display:none;"></div>
+  
 </div>
 </body>
 </html>

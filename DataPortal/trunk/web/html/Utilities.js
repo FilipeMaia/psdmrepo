@@ -84,4 +84,4 @@ function mktime() {
         dateManip[i](no);
     }
     return Math.floor(d.getTime()/1000);
-};
+}
