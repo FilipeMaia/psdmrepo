@@ -1,0 +1,48 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package pyana_examples
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-09
+2011-01-23 Andy Salnikov
+- added example for accessing EPICS data
+
+Tag: V00-00-08
+2010-10-14 Andy Salnikov
+- adding new example module myana_opal
+
+Tag: V00-00-07
+2010-10-14 Andy Salnikov
+- adding new example module myana_cspad
+
+Tag: V00-00-06
+2010-09-21 Andy Salnikov
+- added new example module myana_control_config and its config file
+
+Tag: V00-00-05
+2010-07-07 Andy Salnikov
+- pyana user modules now may have optional methods begincalibcycle and 
+  endcalibcycle
+- evt.get() can return None if data is missing or damaged, need to check
+  return value
+
+Tag: V00-00-04
+2010-05-13 Andy Salnikov
+- updated examples to get config objects from env instead of evt
+
+Tag: V00-00-02
+2010-04-14 Andy Salnikov
+- forgot to add SConscript and doc/ directory
+
+Tag: V00-00-01
+2010-04-14 Andy Salnikov
+- files from pyana/examples were moved into this new package
+- First import into repository
