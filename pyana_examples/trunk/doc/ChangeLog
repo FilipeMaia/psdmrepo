@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2011-01-23 Andy Salnikov
+- added example for accessing EPICS data
+
 Tag: V00-00-08
 2010-10-14 Andy Salnikov
 - adding new example module myana_opal
