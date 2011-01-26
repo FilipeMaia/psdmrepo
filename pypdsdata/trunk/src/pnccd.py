@@ -82,11 +82,11 @@ class FrameV1(object) :
         # make empty array of the same type
         self.__data = np.empty((ny*2, nx*2), data[0].dtype)
         
-        # copy the data over
+        # copy the data over, change orientation for some
         self.__data[0:ny, 0:nx] = data[0]
-        self.__data[0:ny, nx:2*nx] = data[1]
-        self.__data[ny:2*ny, 0:nx] = data[2]
-        self.__data[ny:2*ny, nx:2*nx] = data[3]
+        self.__data[0:ny, nx:2*nx] = data[3]
+        self.__data[ny:2*ny, 0:nx] = data[1][::-1,::-1]
+        self.__data[ny:2*ny, nx:2*nx] = data[2][::-1,::-1]
         
     def specialWord(self) :
         return self.__specialWord
