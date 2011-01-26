@@ -66,13 +66,13 @@ class PlotsForCSpad ( object ) :
     #-------------------
 
 
-    def open_fig1( self ):
+    def open_fig1( self, figNum ):
         """Open window for fig1."""
 
         print 'open_fig1()'
 
         plt.ion() # enables interactive mode
-        self.fig1 = plt.figure(figsize=(10,10), dpi=80, facecolor='w',edgecolor='w',frameon=True) # parameters like in class Figure
+        self.fig1 = plt.figure(num=figNum, figsize=(10,10), dpi=80, facecolor='w',edgecolor='w',frameon=True) # parameters like in class Figure
         self.fig1.subplots_adjust(left=0.08, bottom=0.02, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
         self.fig1.canvas.set_window_title("CSpad image") 
 
@@ -85,6 +85,14 @@ class PlotsForCSpad ( object ) :
         self.fig1_window_is_open = True
 
 
+    def set_fig1( self, figNum ):
+        """Set current fig1."""
+        if self.fig1_window_is_open :
+            self.fig1 = plt.figure(num=figNum)        
+        else :
+            self.open_fig1(figNum)
+       
+
     def close_fig1( self ):
         """Close fig1 and its window."""
 
@@ -95,31 +103,29 @@ class PlotsForCSpad ( object ) :
             print 'close_fig1()'
 
 
-    def plotCSpadV1( self, arr1ev, mode=1 ):
+    def plotCSpadV1( self, arr1ev, figNum ):
         """Plot 2d image from input array. V1 for run ~546
 
         V1 contain array for entire detector. Currently we plat quad 2 only.
         """
         quad=2
         arr1quad = arr1ev[quad,...]      # V1 for run ~546
-        self.plotCSpadQuad( arr1quad, mode )
+        self.plotCSpadQuad( arr1quad, figNum )
 
 
-    def plotCSpadV2( self, arr1quad, mode=1 ):
+    def plotCSpadV2( self, arr1quad, figNum ):
         """Plot 2d image from input array.
 
         V2 for run ~900 contain array for quad 2, which we plot directly.
         """
-        self.plotCSpadQuad( arr1quad, mode )
+        self.plotCSpadQuad( arr1quad, figNum )
 
   
-    def plotCSpadQuad( self, arr1quad, mode=1 ):
+    def plotCSpadQuad( self, arr1quad, figNum ):
         """Plot 2d image from input array."""
 
         #print 'plot_CSpadQuad()'       
-
-        if not self.fig1_window_is_open :
-            self.open_fig1()
+        self.set_fig1( figNum )
 
         plt.clf() # clear plot
         
@@ -162,12 +168,6 @@ class PlotsForCSpad ( object ) :
                 #subp1.text(370, -10, str_event, fontsize=24)
                 plt.text(370, -10, str_event, fontsize=24)
         
-        #if mode == 1 :   # Single event mode
-        #    plt.show()  
-        #else :           # Slide show 
-        #    plt.draw()   # Draws, but does not block
-        #   #plt.draw()   # Draws, but does not block
-
 #
 #  In case someone decides to run this module
 #

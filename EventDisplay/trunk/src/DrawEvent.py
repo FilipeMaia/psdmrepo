@@ -90,29 +90,28 @@ class DrawEvent ( object ) :
         #print 'Run number = %d' % (runNumber) 
 
         # Loop over checked data sets
+        self.figNum = 0
         print 'Number of checked items:', len(cp.confpars.list_of_checked_item_names)
         for dsname in cp.confpars.list_of_checked_item_names :
 
-            print 'dsname =', dsname
-            print 'mode =', mode
-
             ds     = self.h5file[dsname]
             arr1ev = ds[cp.confpars.eventCurrent]
+            self.figNum += 1 
 
             item_last_name = printh5.get_item_last_name(dsname)
             print 'Try to plot item:', dsname, ' item name:', item_last_name  
 
             if dsname == self.dsnameCSpadV1 :
                 print 'Draw plots for CSpad V1'
-                self.plotsCSpad.plotCSpadV1(arr1ev, mode)
+                self.plotsCSpad.plotCSpadV1(arr1ev,self.figNum)
 
             if dsname == self.dsnameCSpadV2 :
                 print 'Draw plots for CSpad V2'
                 arr1quad = arr1ev
-                self.plotsCSpad.plotCSpadV2(arr1quad, mode)
+                self.plotsCSpad.plotCSpadV2(arr1quad,self.figNum)
                 
             if item_last_name == 'image' :
-                self.plotsImage.plotImage(arr1ev, mode)
+                self.plotsImage.plotImage(arr1ev,self.figNum)
 
             if item_last_name == 'waveform' :
                 print 'Here should be an emplementation of stuff for waveform'
