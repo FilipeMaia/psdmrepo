@@ -6,7 +6,6 @@
 //	Test suite case for the config-svc-test.
 //
 //------------------------------------------------------------------------
-#include "SITConfig/SITConfig.h"
 
 //---------------
 // C++ Headers --
