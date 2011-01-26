@@ -73,7 +73,7 @@ public:
   virtual void convert ( const void* data, 
                          size_t size,
                          const Pds::TypeId& typeId,
-                         const O2OXtcSrc& src,
+                         const XtcInput::XtcSrcStack& src,
                          const H5DataTypes::XtcClockTime& time ) ;
 
   /// method called when the driver makes a new group in the file
@@ -85,7 +85,7 @@ public:
 protected:
   
   // find pedestals data
-  std::string findCalibFile(const O2OXtcSrc& src, const std::string& datatype) const;
+  std::string findCalibFile(const XtcInput::XtcSrcStack& src, const std::string& datatype) const;
   
 private:
 

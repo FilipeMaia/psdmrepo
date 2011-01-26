@@ -6,7 +6,6 @@
 //	Test suite case for the O2OFileNameFactoryTest.
 //
 //------------------------------------------------------------------------
-#include "SITConfig/SITConfig.h"
 
 //---------------
 // C++ Headers --

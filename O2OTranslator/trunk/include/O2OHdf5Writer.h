@@ -21,7 +21,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "O2OTranslator/O2OXtcScannerI.h"
+#include "XtcInput/XtcScannerI.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -62,7 +62,7 @@ class O2OMetaData ;
  *  @author Andrei Salnikov
  */
 
-class O2OHdf5Writer : public O2OXtcScannerI {
+class O2OHdf5Writer : public XtcInput::XtcScannerI {
 public:
 
   enum SplitMode { NoSplit, Family } ;
@@ -93,7 +93,7 @@ public:
 
   // visit the data object
   virtual void dataObject ( const void* data, size_t size,
-      const Pds::TypeId& typeId, const O2OXtcSrc& src ) ;
+      const Pds::TypeId& typeId, const XtcInput::XtcSrcStack& src ) ;
 
 protected:
 

@@ -9,7 +9,6 @@
 //      Andrei Salnikov
 //
 //------------------------------------------------------------------------
-#include "SITConfig/SITConfig.h"
 
 //-----------------
 // C/C++ Headers --
@@ -39,18 +38,17 @@
 #include "AppUtils/AppCmdOptNamedValue.h"
 #include "LusiTime/Time.h"
 #include "MsgLogger/MsgLogger.h"
-#include "O2OTranslator/DgramQueue.h"
-#include "O2OTranslator/DgramReader.h"
 #include "O2OTranslator/MetaDataScanner.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OHdf5Writer.h"
 #include "O2OTranslator/O2OMetaData.h"
-#include "O2OTranslator/O2OXtcFileName.h"
-#include "O2OTranslator/O2OXtcIterator.h"
-#include "O2OTranslator/O2OXtcMerger.h"
-#include "O2OTranslator/O2OXtcScannerI.h"
 #include "O2OTranslator/O2OXtcValidator.h"
-#include "pdsdata/xtc/XtcFileIterator.hh"
+#include "XtcInput/DgramQueue.h"
+#include "XtcInput/DgramReader.h"
+#include "XtcInput/XtcFileName.h"
+#include "XtcInput/XtcIterator.h"
+#include "XtcInput/XtcScannerI.h"
+#include "XtcInput/XtcStreamMerger.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -96,7 +94,7 @@ private:
   AppCmdOpt<std::string>      m_instrument ;
   AppCmdOpt<double>           m_l1offset ;
   AppCmdOpt<std::string>      m_mdConnStr ;
-  AppCmdOptNamedValue<O2OXtcMerger::MergeMode> m_mergeMode ;
+  AppCmdOptNamedValue<XtcInput::XtcStreamMerger::MergeMode> m_mergeMode ;
   AppCmdOptList<std::string>  m_metadata ;
   AppCmdOpt<std::string>      m_outputDir ;
   AppCmdOpt<std::string>      m_outputName ;
@@ -124,7 +122,8 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_instrument ( 'i', "instrument",   "string",   "instrument name", "" )
   , m_l1offset   (      "l1-offset",    "number",   "L1Accept time offset seconds, def: 0", 0 )
   , m_mdConnStr  ( 'M', "md-conn",      "string",   "metadata ODBC connection string", "" )
-  , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", O2OXtcMerger::FileName )
+  , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", 
+                  XtcInput::XtcStreamMerger::FileName )
   , m_metadata   ( 'm', "metadata",     "name:value", "science metadata values", '\0' )
   , m_outputDir  ( 'd', "output-dir",   "path",     "directory to store output files, def: .", "." )
   , m_outputName ( 'n', "output-name",  "template", "template string for output file names, def: {seq4}.h5", "{seq4}.h5" )
@@ -147,9 +146,9 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_l1offset ) ;
   addOption( m_mdConnStr ) ;
   addOption( m_mergeMode ) ;
-  m_mergeMode.add ( "one-stream", O2OXtcMerger::OneStream ) ;
-  m_mergeMode.add ( "no-chunking", O2OXtcMerger::NoChunking ) ;
-  m_mergeMode.add ( "file-name", O2OXtcMerger::FileName ) ;
+  m_mergeMode.add ( "one-stream", XtcInput::XtcStreamMerger::OneStream ) ;
+  m_mergeMode.add ( "no-chunking", XtcInput::XtcStreamMerger::NoChunking ) ;
+  m_mergeMode.add ( "file-name", XtcInput::XtcStreamMerger::FileName ) ;
   addOption( m_metadata ) ;
   addOption( m_outputDir ) ;
   addOption( m_outputName ) ;
@@ -210,7 +209,7 @@ O2O_Translate::runApp ()
                          m_metadata.value() ) ;
 
   // instantiate XTC scanner, which is also output file writer
-  std::vector<O2OXtcScannerI*> scanners ;
+  std::vector<XtcInput::XtcScannerI*> scanners ;
   scanners.push_back ( new O2OHdf5Writer ( nameFactory, m_overwrite.value(),
                                   m_splitMode.value(), m_splitSize.value(),
                                   m_compression.value(), m_extGroups.value(),
@@ -220,15 +219,15 @@ O2O_Translate::runApp ()
   scanners.push_back ( new MetaDataScanner( metadata, m_mdConnStr.value(), m_regConnStr.value() ) ) ;
 
   // make datagram queue
-  DgramQueue dgqueue( m_dgramQSize.value() ) ;
+  XtcInput::DgramQueue dgqueue( m_dgramQSize.value() ) ;
 
   // start datagram reading thread
-  std::list<O2OXtcFileName> files ;
+  std::list<XtcInput::XtcFileName> files ;
   for ( AppCmdOptList<std::string>::const_iterator it = m_eventData.begin() ; it != m_eventData.end() ; ++ it ) {
-    files.push_back ( O2OXtcFileName(*it) ) ;
+    files.push_back ( XtcInput::XtcFileName(*it) ) ;
   }
-  boost::thread readerThread( DgramReader ( files, dgqueue, m_dgramsize.value(),
-                                            m_mergeMode.value(), false, m_l1offset.value() ) ) ;
+  boost::thread readerThread( XtcInput::DgramReader ( files, dgqueue, m_dgramsize.value(),
+          m_mergeMode.value(), false, m_l1offset.value() ) ) ;
 
   uint64_t count = 0 ;
 
@@ -260,13 +259,13 @@ O2O_Translate::runApp ()
     } else {
 
       // give this event to every scanner
-      for ( std::vector<O2OXtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
+      for ( std::vector<XtcInput::XtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
 
-        O2OXtcScannerI* scanner = *i ;
+        XtcInput::XtcScannerI* scanner = *i ;
 
         try {
           if ( scanner->eventStart ( *dg ) ) {    
-              O2OXtcIterator iter( &(dg->xtc), scanner );
+              XtcInput::XtcIterator iter( &(dg->xtc), scanner );
               iter.iterate();
           }    
           scanner->eventEnd ( *dg ) ;
@@ -283,9 +282,9 @@ O2O_Translate::runApp ()
   }
 
   // finish with the scanners
-  for ( std::vector<O2OXtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
+  for ( std::vector<XtcInput::XtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
     try {
-      O2OXtcScannerI* scanner = *i ;
+      XtcInput::XtcScannerI* scanner = *i ;
       delete scanner ;
     } catch ( std::exception& e ) {
       MsgLogRoot( error, "exception caught while destroying a scanner: " << e.what() ) ;

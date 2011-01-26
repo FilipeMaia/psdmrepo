@@ -9,7 +9,6 @@
 //      Andrei Salnikov
 //
 //------------------------------------------------------------------------
-#include "SITConfig/SITConfig.h"
 
 //-----------------------
 // This Class's Header --
@@ -78,7 +77,7 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                              const XtcType& data,
                                              size_t size,
                                              const Pds::TypeId& typeId,
-                                             const O2OXtcSrc& src,
+                                             const XtcInput::XtcSrcStack& src,
                                              const H5DataTypes::XtcClockTime& time )
 {
 

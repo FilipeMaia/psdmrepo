@@ -20,14 +20,14 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "LusiTime/Time.h"
-#include "O2OTranslator/O2OXtcScannerI.h"
-#include "pdsdata/xtc/ClockTime.hh"
-#include "pdsdata/xtc/TransitionId.hh"
+#include "XtcInput/XtcScannerI.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "LusiTime/Time.h"
+#include "pdsdata/xtc/ClockTime.hh"
+#include "pdsdata/xtc/TransitionId.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -51,7 +51,7 @@ class O2OMetaData ;
  *  @author Andrei Salnikov
  */
 
-class MetaDataScanner : public O2OXtcScannerI {
+class MetaDataScanner : public XtcInput::XtcScannerI {
 public:
 
   // Default constructor
@@ -72,7 +72,7 @@ public:
 
   // visit the data object
   virtual void dataObject ( const void* data, size_t size,
-       const Pds::TypeId& typeId, const O2OXtcSrc& src ) ;
+       const Pds::TypeId& typeId, const XtcInput::XtcSrcStack& src ) ;
 
 protected:
 

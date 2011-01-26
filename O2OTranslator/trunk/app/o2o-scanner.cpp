@@ -21,14 +21,12 @@
 #include "AppUtils/AppCmdOptBool.h"
 #include "AppUtils/AppCmdOptNamedValue.h"
 #include "MsgLogger/MsgLogger.h"
-#include "O2OTranslator/O2OXtcFileName.h"
-#include "O2OTranslator/O2OXtcMerger.h"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/ProcInfo.hh"
 #include "pdsdata/xtc/XtcIterator.hh"
 #include "pdsdata/xtc/XtcFileIterator.hh"
-
-
+#include "XtcInput/XtcFileName.h"
+#include "XtcInput/XtcStreamMerger.h"
 
 //
 //  XTC iterator class which dumps XTC-level info
@@ -96,7 +94,7 @@ private:
   // more command line options and arguments
   AppCmdOptBool               m_skipDamaged ;
   AppCmdOpt<double>           m_l1offset ;
-  AppCmdOptNamedValue<O2OXtcMerger::MergeMode> m_mergeMode ;
+  AppCmdOptNamedValue<XtcInput::XtcStreamMerger::MergeMode> m_mergeMode ;
   AppCmdArgList<std::string>  m_inputFiles ;
 
 };
@@ -108,15 +106,15 @@ O2O_Scanner::O2O_Scanner ( const std::string& appName )
   : AppBase( appName )
   , m_skipDamaged( 'd', "skip-damaged",             "skip damaged datagrams", false )
   , m_l1offset   (      "l1-offset",    "number",   "L1Accept time offset seconds, def: 0", 0 )
-  , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", O2OXtcMerger::FileName )
+  , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", XtcInput::XtcStreamMerger::FileName )
   , m_inputFiles ( "input-xtc", "the list of the input XTC files" )
 {
   addOption( m_skipDamaged ) ;
   addOption( m_l1offset ) ;
   addOption( m_mergeMode ) ;
-  m_mergeMode.add ( "one-stream", O2OXtcMerger::OneStream ) ;
-  m_mergeMode.add ( "no-chunking", O2OXtcMerger::NoChunking ) ;
-  m_mergeMode.add ( "file-name", O2OXtcMerger::FileName ) ;
+  m_mergeMode.add ( "one-stream", XtcInput::XtcStreamMerger::OneStream ) ;
+  m_mergeMode.add ( "no-chunking", XtcInput::XtcStreamMerger::NoChunking ) ;
+  m_mergeMode.add ( "file-name", XtcInput::XtcStreamMerger::FileName ) ;
   addArgument( m_inputFiles ) ;
 }
 
@@ -133,9 +131,9 @@ O2O_Scanner::~O2O_Scanner ()
 int
 O2O_Scanner::runApp ()
 {
-  std::list<O2OXtcFileName> files ;
+  std::list<XtcInput::XtcFileName> files ;
   for (AppCmdArgList<std::string>::const_iterator i = m_inputFiles.begin(); i!=m_inputFiles.end(); ++i) {
-    files.push_back( O2OXtcFileName(*i) ) ;
+    files.push_back( XtcInput::XtcFileName(*i) ) ;
   }
 
   if (files.empty()) {
@@ -143,7 +141,7 @@ O2O_Scanner::runApp ()
     return 2 ;
   }
 
-  O2OTranslator::O2OXtcMerger iter(files, 0x1000000, m_mergeMode.value(), m_skipDamaged.value(), m_l1offset.value());
+  XtcInput::XtcStreamMerger iter(files, 0x1000000, m_mergeMode.value(), m_skipDamaged.value(), m_l1offset.value());
   while ( Dgram* dg = iter.next() ) {
     const Pds::Sequence& seq = dg->seq ;
     const Pds::ClockTime& clock = seq.clock() ;

@@ -70,7 +70,7 @@ protected:
                                       const XtcType& data,
                                       size_t size,
                                       const Pds::TypeId& typeId,
-                                      const O2OXtcSrc& src,
+                                      const XtcInput::XtcSrcStack& src,
                                       const H5DataTypes::XtcClockTime& time ) ;
 
   /// method called when the driver closes a group in the file

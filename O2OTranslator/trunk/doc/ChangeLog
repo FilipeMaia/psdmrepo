@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-00
+2011-01-26 Andy Salnikov
+- moved bunch of common classes from here to separate package XtcInput
+
 Tag: V00-09-07
 2011-01-15 Andy Salnikov
 - added protection for zero-size epics data

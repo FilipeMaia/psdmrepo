@@ -56,7 +56,7 @@ public:
   virtual void convert ( const void* data, 
                          size_t size,
                          const Pds::TypeId& typeId,
-                         const O2OXtcSrc& src,
+                         const XtcInput::XtcSrcStack& src,
                          const H5DataTypes::XtcClockTime& time )
   {
     const T& typedData = *static_cast<const T*>( data ) ;
@@ -74,7 +74,7 @@ private:
   virtual void typedConvert ( const T& data,
                               size_t size,
                               const Pds::TypeId& typeId,
-                              const O2OXtcSrc& src,
+                              const XtcInput::XtcSrcStack& src,
                               const H5DataTypes::XtcClockTime& time ) = 0 ;
 
   // Copy constructor and assignment are disabled by default
