@@ -182,6 +182,12 @@ public:
     return ResultListDef<Cont>(pstr, def);
   }
   
+  // set the value of the parameter, if parameter already exists it will be replaced
+  void put(const std::string& section, const std::string& param, const std::string& value)
+  {
+    impl().put(section, param, value);
+  }
+
 protected:
 
 private:

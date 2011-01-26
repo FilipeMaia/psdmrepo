@@ -6,18 +6,22 @@
 #  ChangeLog file for package ConfigSvc
 #------------------------------------------------------------------------
 
-Package author: Andrei Salnikov
+Package author: Andy Salnikov
 
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2011-01-26 Andy Salnikov
+- added put() method to ConfigSvc to add/change the value of parameters
+
 Tag: V00-00-02
-2010-12-16 Andrei Salnikov
+2010-12-16 Andry Salnikov
 - template magic did not work correctly for std::string assignments,
   the Result class conversion to std::string was too ambiguous
 - defining special method getStr() in ConfigSvc class to fix above problem
 - adding unit test for ConfigSvc
 
 Tag: V00-00-01
-2010-09-28 Andrei Salnikov
+2010-09-28 Andry Salnikov
 - first import into repository, basic functionality is here

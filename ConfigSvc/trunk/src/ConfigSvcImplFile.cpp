@@ -9,7 +9,6 @@
 //      Andrei Salnikov
 //
 //------------------------------------------------------------------------
-#include "SITConfig/SITConfig.h"
 
 //-----------------------
 // This Class's Header --
@@ -113,6 +112,18 @@ ConfigSvcImplFile::getList(const std::string& section,
   return list;
 }
 
+// set the value of the parameter, if parameter already exists it will be replaced
+void 
+ConfigSvcImplFile::put(const std::string& section, 
+                       const std::string& param, 
+                       const std::string& value)
+{
+  // remove cached list value if any
+  m_lists[section].erase(param);
+  
+  // add to map
+  m_config[section][param].reset(new std::string(value));
+}
 
 // read input file from stream
 void 

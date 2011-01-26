@@ -66,6 +66,11 @@ public:
   virtual boost::shared_ptr<const std::list<std::string> > 
     getList(const std::string& section, const std::string& param) const = 0;
 
+  // set the value of the parameter, if parameter already exists it will be replaced
+  virtual void put(const std::string& section, 
+                   const std::string& param, 
+                   const std::string& value) = 0;
+
 protected:
 
 };
