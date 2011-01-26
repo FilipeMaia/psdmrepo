@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module GUIConfigParameters...
+#  Module PlotsForWaveform...
 #
 #------------------------------------------------------------------------
 
@@ -85,7 +85,7 @@ def foo ( x ) :
 #---------------------
 #  Class definition --
 #---------------------
-class GUIConfigParameters ( object ) :
+class PlotsForWaveform ( object ) :
     """Brief description of a class.
 
     Full description of this class. The whole purpose of this class is 

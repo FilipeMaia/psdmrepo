@@ -72,10 +72,11 @@ class PlotsForCSpad ( object ) :
         print 'open_fig1()'
 
         plt.ion() # enables interactive mode
-        fig1 = plt.figure(figsize=(10,10), dpi=80, facecolor='w',edgecolor='w',frameon=True) # parameters like in class Figure
-        plt.subplots_adjust(left=0.08, bottom=0.02, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
+        self.fig1 = plt.figure(figsize=(10,10), dpi=80, facecolor='w',edgecolor='w',frameon=True) # parameters like in class Figure
+        self.fig1.subplots_adjust(left=0.08, bottom=0.02, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
+        self.fig1.canvas.set_window_title("CSpad image") 
 
-        fig1.canvas.set_window_title("CSpad image") 
+        ##plt.subplots_adjust(left=0.08, bottom=0.02, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
         ##f = fig.Figure(figsize=(2,5), dpi=100, facecolor='w',edgecolor='w') #,frameon=True,linewidth=0.05) # set figure parame ters
         ##plt.figure(figsize=(10,6), dpi=100, facecolor='g',edgecolor='b',frameon=True,linewidth=5) # parameters like in class Figure
         ##plt.subplots_adjust(hspace=0.4)
@@ -88,10 +89,11 @@ class PlotsForCSpad ( object ) :
         """Close fig1 and its window."""
 
         if self.fig1_window_is_open :
-            plt.ioff()
-            plt.close()
+            #plt.ioff()
+            #plt.close()
             self.fig1_window_is_open = False 
             print 'close_fig1()'
+
 
     def plotCSpadV1( self, arr1ev, mode=1 ):
         """Plot 2d image from input array. V1 for run ~546
@@ -140,6 +142,11 @@ class PlotsForCSpad ( object ) :
             plt.subplot(panel)
             plt.imshow(arr, origin='upper', interpolation='nearest') # Just a histogram
             plt.title(pantit,color='r',fontsize=20) # pars like in class Text
+
+            #subp1 = self.fig1.add_subplot(panel)
+            #subp1.imshow(arr, origin='upper', interpolation='nearest') # Just a histogram
+            #subp1.title(pantit,color='r',fontsize=20) # pars like in class Text
+
             #plt.xlabel('X pixels')
             #plt.ylabel('Y pixels')
         
@@ -152,13 +159,14 @@ class PlotsForCSpad ( object ) :
 
             if pair==0 :
                 str_event = 'Event ' + str(cp.confpars.eventCurrent)
+                #subp1.text(370, -10, str_event, fontsize=24)
                 plt.text(370, -10, str_event, fontsize=24)
         
-        if mode == 1 :   # Single event mode
-            plt.show()  
-        else :           # Slide show 
-            plt.draw()   # Draws, but does not block
-            #plt.draw()   # Draws, but does not block
+        #if mode == 1 :   # Single event mode
+        #    plt.show()  
+        #else :           # Slide show 
+        #    plt.draw()   # Draws, but does not block
+        #   #plt.draw()   # Draws, but does not block
 
 #
 #  In case someone decides to run this module

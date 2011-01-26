@@ -60,8 +60,8 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         """Constructor."""
         self.parentGUIMain = parent
 
-        self.setGeometry(10, 10, 300, 800)
-        self.setWindowTitle('Item selection tree')
+        self.setGeometry(10, 10, 350, 1000)
+        self.setWindowTitle('Items selection')
 
         #layout = QHBoxLayout()
 

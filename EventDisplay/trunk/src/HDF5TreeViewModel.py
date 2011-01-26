@@ -146,9 +146,9 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
     def getFullNameFromIndex(self, ind): 
         """Begin recursion from item with given ind(ex) and forms the full name in the self._full_name"""
         item = self.itemFromIndex(ind)
-        self._full_name = item.text()
-        self._getFullName(ind)
-        return self._full_name
+        self._full_name = item.text() 
+        self._getFullName(ind) 
+        return str(self._full_name) ### QString object is converted to str
 
     #---------------------
 
@@ -159,7 +159,7 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
             item = self.itemFromIndex(ind)
             self._full_name = '/' + self._full_name
             #print 'Item full name :' + self._full_name
-            return str(self._full_name)
+            return self._full_name
         else:
             item_par = self.itemFromIndex(ind_par)
             self._full_name = item_par.text() + '/' + self._full_name

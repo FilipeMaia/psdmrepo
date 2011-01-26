@@ -43,6 +43,7 @@ import time   # for sleep(sec)
 #-----------------------------
 import GUIWhatToDisplay as guiwtd
 import GUISelectItems   as guiselitems
+import GUIConfiguration as guiconfig
 import ConfigParameters as cp
 import DrawEvent        as drev
 import PrintHDF5        as printh5 # for my print_group(g,offset)
@@ -78,9 +79,12 @@ class GUIMain ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(320, 10, 500, 300)
+        self.setGeometry(370, 10, 500, 300)
         self.setWindowTitle('HDF5 Event Display')
+        self.palette = QtGui.QPalette()
+        self.resetColorIsSet = False
 
+        cp.confpars.readParameters()
         cp.confpars.Print()
         print 'Current event number directly : %d ' % (cp.confpars.eventCurrent)
 
@@ -105,6 +109,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.display  = QtGui.QPushButton("Open")
         self.config   = QtGui.QPushButton("Configuration")
         self.save     = QtGui.QPushButton("Save")
+        self.reset    = QtGui.QPushButton("Reset")
         self.current  = QtGui.QPushButton("Current")
         self.previous = QtGui.QPushButton("Previous")
         self.next     = QtGui.QPushButton("Next")
@@ -118,6 +123,8 @@ class GUIMain ( QtGui.QWidget ) :
         self.spaninc.setMaximumWidth(20) 
         self.spandec.setMaximumWidth(20) 
         self.save   .setMaximumWidth(40)   
+        self.reset  .setMaximumWidth(50)   
+
         #lcd      = QtGui.QLCDNumber(self)
         #slider   = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
 
@@ -136,8 +143,8 @@ class GUIMain ( QtGui.QWidget ) :
         hboxC.addWidget(self.printfile)
         
         hboxE = QtGui.QHBoxLayout()
-        hboxE.addWidget(self.selection)
-        hboxE.addStretch(1)
+        #hboxE.addWidget(self.selection)
+        hboxE.addStretch(2)
         hboxE.addWidget(self.config)
         hboxE.addWidget(self.save)
 
@@ -150,6 +157,7 @@ class GUIMain ( QtGui.QWidget ) :
         hboxT.addWidget(self.spanEdit)
         hboxT.addWidget(self.spaninc)
         hboxT.addStretch(1)     
+        hboxT.addWidget(self.reset)
 
         hboxM = QtGui.QHBoxLayout()
         hboxM.addWidget(self.titDraw)
@@ -194,6 +202,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.connect(self.previous,  QtCore.SIGNAL('clicked()'), self.decrimentEventNo )
         self.connect(self.current,   QtCore.SIGNAL('clicked()'), self.currentEventNo )
         self.connect(self.start,     QtCore.SIGNAL('clicked()'), self.processStart )
+        self.connect(self.reset,     QtCore.SIGNAL('clicked()'), self.processReset )
 
         self.connect(self.stop,      QtCore.SIGNAL('clicked()'),  self.processStop )
         #self.connect(self.stop,      QtCore.SIGNAL('pressed()'),  self.processStop )
@@ -210,7 +219,7 @@ class GUIMain ( QtGui.QWidget ) :
 
         #self.setFocus()
         #self.resize(500, 300)
-        print 'End of init\n'
+        print 'End of init'
 
     #-------------------
     # Private methods --
@@ -237,13 +246,22 @@ class GUIMain ( QtGui.QWidget ) :
         #qp.drawLine       (12, YfrU*size.height(), size.width()-12, YfrU*size.height())
 
     def processSelection(self):
-        print 'Selection\n'
-
+        print 'Selection'
+        print 'Is empty yet...'
+        
     def processConfig(self):
-        print 'Configuration\n'
+        print 'Configuration'
+        if  cp.confpars.configGUIIsOpen :
+            cp.confpars.configGUIIsOpen = False
+            self.configGUI.close()
+        else :    
+            self.configGUI = guiconfig.GUIConfiguration()
+            self.configGUI.show()
+            cp.confpars.configGUIIsOpen = True
 
     def processSave(self):
-        print 'Save\n'
+        print 'Save'
+        cp.confpars.writeParameters()
 
     def processPrint(self):
         fname = cp.confpars.dirName+'/'+cp.confpars.fileName
@@ -251,15 +269,17 @@ class GUIMain ( QtGui.QWidget ) :
         printh5.print_hdf5_file_structure(fname)
 
     def processQuit(self):
-        print 'Quit\n'
+        print 'Quit'
         self.drawev.quitDrawEvent()
         self.SHowIsOn = False
         if cp.confpars.wtdWindowIsOpen == True :
             self.guiwhat.close()
+        if cp.confpars.configGUIIsOpen == True :
+            self.configGUI.close()
         self.close()
         
     def processStart(self):
-        print 'Start slide show\n'
+        print 'Start slide show'
         cp.confpars.eventCurrent = int(self.numbEdit.displayText())
         cp.confpars.span         = int(self.spanEdit.displayText())
         self.SHowIsOn            = True
@@ -279,12 +299,12 @@ class GUIMain ( QtGui.QWidget ) :
             cp.confpars.eventCurrent+=cp.confpars.span
 
     def processStop(self):
-        print 'Stop slide show\n'
+        print 'Stop slide show'
         self.drawev.stopDrawEvent() 
         self.SHowIsOn = False
               
     def processBrowse(self):
-        print 'Browse\n'
+        print 'Browse'
         self.drawev.closeHDF5File()
         str_path_file = str(self.fileEdit.displayText())
         cp.confpars.dirName,cp.confpars.fileName = os.path.split(str_path_file)
@@ -325,6 +345,24 @@ class GUIMain ( QtGui.QWidget ) :
             self.guiwhat.show()
             cp.confpars.wtdWindowIsOpen = True
 
+    def processReset(self):
+        print 'Reset'
+        if self.resetColorIsSet : # swap the background color
+            self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('white'))
+            self.resetColorIsSet = False          
+        else :
+            self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('yellow'))
+            self.resetColorIsSet = True          
+        cp.confpars.span = 1
+        self.spanEdit.setPalette(self.palette)
+        self.spanEdit.setText(str(cp.confpars.span))
+        cp.confpars.eventCurrent = 1
+        self.numbEdit.setPalette(self.palette)
+        self.numbEdit.setText(str(cp.confpars.eventCurrent))
+        #time.sleep(5)
+        #self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('white'))
+        #self.spanEdit.setPalette(self.palette)
+        
     def processSpaninc(self):
         print 'Spaninc ',
         cp.confpars.span = int(self.spanEdit.displayText())

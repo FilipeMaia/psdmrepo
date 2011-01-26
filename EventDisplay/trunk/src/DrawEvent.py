@@ -31,12 +31,14 @@ __version__ = "$Revision: 4 $"
 import sys
 import h5py    # access to hdf5 file structure
 from numpy import *  # for use like       array(...)
+import matplotlib.pyplot as plt
 
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
 import ConfigParameters as cp
 import PlotsForCSpad    as cspad
+import PlotsForImage    as image
 import PrintHDF5        as printh5
 
 #---------------------
@@ -58,6 +60,15 @@ class DrawEvent ( object ) :
         print 'DrawEvent () Initialization'
         cp.confpars.h5_file_is_open = False
         self.plotsCSpad      = cspad.PlotsForCSpad()
+        self.plotsImage      = image.PlotsForImage()
+
+        # CSpad V1 for runs ~546,547...
+        self.dsnameCSpadV1 = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV1/XppGon.0:Cspad.0/data"
+
+        # CSpad V2 for runs ~900
+        self.dsnameCSpadV2 = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data"
+
+
 
     #-------------------
     #  Public methods --
@@ -66,61 +77,76 @@ class DrawEvent ( object ) :
     def drawEvent ( self, mode=1 ) :
         """Draws current event
 
-        Explanation of what it does.
         @param x   first parameter
         @param y   second parameter
         @return    return value
         """
 
-        if not cp.confpars.h5_file_is_open :
-            self.openHDF5File()
+        #if not cp.confpars.h5_file_is_open :
+        self.openHDF5File()
     
         print 'Draw event %d' % ( cp.confpars.eventCurrent )
         runNumber = self.h5file.attrs['runNumber']
         #print 'Run number = %d' % (runNumber) 
 
-        if runNumber < 600 :
-            self.imageOfCSpadV1( mode )
-        else :
-            self.imageOfCSpadV2( mode )
+        # Loop over checked data sets
+        print 'Number of checked items:', len(cp.confpars.list_of_checked_item_names)
+        for dsname in cp.confpars.list_of_checked_item_names :
+
+            print 'dsname =', dsname
+            print 'mode =', mode
+
+            ds     = self.h5file[dsname]
+            arr1ev = ds[cp.confpars.eventCurrent]
+
+            item_last_name = printh5.get_item_last_name(dsname)
+            print 'Try to plot item:', dsname, ' item name:', item_last_name  
+
+            if dsname == self.dsnameCSpadV1 :
+                print 'Draw plots for CSpad V1'
+                self.plotsCSpad.plotCSpadV1(arr1ev, mode)
+
+            if dsname == self.dsnameCSpadV2 :
+                print 'Draw plots for CSpad V2'
+                arr1quad = arr1ev
+                self.plotsCSpad.plotCSpadV2(arr1quad, mode)
+                
+            if item_last_name == 'image' :
+                self.plotsImage.plotImage(arr1ev, mode)
+
+            if item_last_name == 'waveform' :
+                print 'Here should be an emplementation of stuff for waveform'
+
+        self.showEvent(mode)
+        self.closeHDF5File()
 
 
-    def imageOfCSpadV1 ( self, mode=1 ) :
-        """Draws CSpad image for current event
-        """
-        dsname = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV1/XppGon.0:Cspad.0/data" # V1 for runs ~546,547...
-        ds     = self.h5file[dsname]
-        arr1ev = ds[cp.confpars.eventCurrent]
-        self.plotsCSpad.plotCSpadV1(arr1ev, mode)
-        #print 'Here should be an image of CSpad...'
+    def showEvent ( self, mode=1 ) :
+        """ plt.show() or draw() depending on mode"""
+        if mode == 1 :   # Single event mode
+            plt.show()  
+        else :           # Slide show 
+            plt.draw()   # Draws, but does not block
 
-
-    def imageOfCSpadV2 ( self, mode=1 ) :
-        """Draws CSpad image for current event
-        """
-        dsname = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data" # V2 for runs ~900
-        ds     = self.h5file[dsname]
-        arr1quad = ds[cp.confpars.eventCurrent]
-        self.plotsCSpad.plotCSpadV2(arr1quad, mode)
-        #print 'Here should be an image of CSpad...'
-
-
+                
     def stopDrawEvent ( self ) :
         """Operations in case of stop drawing event(s)
         """
         print 'stopDrawEvent()'
-        #self.plotsCSpad.close_fig1()
-        #self.closeHDF5File()
-        self.drawEvent() # mode=1 by default
+        self.drawEvent() # mode=1 (by default) for the last plot
 
 
     def quitDrawEvent ( self ) :
         """Operations in case of quit drawing event(s)
         """
-        print 'quitDrawEvent()'
         self.plotsCSpad.close_fig1()
+        self.plotsImage.close_fig1()
+        plt.ioff()
+        plt.close()
+
         self.closeHDF5File()
-            
+        print 'quitDrawEvent()'
+
 
     def openHDF5File( self ) :     
         fname = cp.confpars.dirName+'/'+cp.confpars.fileName

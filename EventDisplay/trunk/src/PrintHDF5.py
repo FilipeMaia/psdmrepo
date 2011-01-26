@@ -30,6 +30,8 @@ __version__ = "$Revision: 4 $"
 #  Imports of standard modules --
 #--------------------------------
 #import sys
+import os
+import time
 import h5py
 
 #-----------------------------
@@ -83,25 +85,64 @@ def print_group_content(g,offset):
             print_group_content(subg,offset_subg)
 
 #----------------------------------
+#----------------------------------
+#----------------------------------
+#----------------------------------
+
+def get_item_last_name(dsname):
+    """Returns the last part of the full item name (after last slash)"""
+
+    path,name = os.path.split(str(dsname))
+    return name
+
+#----------------------------------
+
+def print_time(ds,ind):
+    """Prints formatted time if the dataset is 'time'"""
+    
+    item_last_name = get_item_last_name(str(ds.name))
+    if item_last_name == 'time' :
+        tarr = ds[ind]
+        tloc = time.localtime(tarr[0]) # converts sec to tuple struct_time in local
+       #tgmt = time.gmtime(tarr[0])    # converts sec to tuple struct_time in UTC
+        print 'Special stuff for "time" :',tarr[0],'sec,',  tarr[1],'nsec, ', #, time.ctime(int(tarr[0]))
+        print 'time local :', time.strftime('%Y-%m-%d %H:%M:%S',tloc)
+       #print 'time (GMT) :', time.strftime('%Y-%m-%d %H:%M:%S',tgmt)
+    
+#----------------------------------
 
 def print_dataset_info(ds):
     """Prints attributes and all other available info for group or data"""
     if isinstance(ds,h5py.Dataset):
         print "Dataset:",
-        print "ds.name           = ", ds.name
-        print "ds.dtype          = ", ds.dtype
-        print "ds.shape          = ", ds.shape
-        print "ds.value          = ", ds.value
+        print "ds.name         = ", ds.name
+        print "ds.dtype        = ", ds.dtype
+        print "ds.shape        = ", ds.shape
+        print "len(ds.shape)   = ", len(ds.shape)
+
+        # Print data array
+        if len(ds.shape)==0 or ds.shape[0] == 1 : #check if the ds.shape scalar or array with dimension 1
+            print "ds.value    = ", ds.value
+
+        elif ds.shape[0] < cp.confpars.eventCurrent: #check if the ds.shape array size less than current event number
+            print " data for ds[0]:"
+            print ds[0]
+
+        else :
+            print " Assume that the array 1st index is an event number ", cp.confpars.eventCurrent
+            print ds[cp.confpars.eventCurrent]
+
+            print_time(ds,cp.confpars.eventCurrent)
 
     if isinstance(ds,h5py.Group):
         print "Group:",
-        print "ds.name           = ", ds.name
+        print "ds.name = ", ds.name
         print_group_items(ds)
 
     if isinstance(ds,h5py.File):
         print "File:"
-        print "file.name           = ", file.name
-        print "Run number          = ", file.attrs['runNumber']
+        print "file.name        = ", file.name
+        print "Run number       = ", file.attrs['runNumber']
 
     print "ds.id             = ", ds.id 
     print "ds.ref            = ", ds.ref 
@@ -162,11 +203,16 @@ def print_dataset_metadata_from_file(dsname):
     """Open file and print attributes for input dataset"""
 
     # Check for unreadable datasets:
-    if(dsname == '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV1/XppGon.0:Cspad.0/data'):
-        print 'This is CSpad data'
+    #if(dsname == '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV1/XppGon.0:Cspad.0/data'):
+    #    print 'This is CSpad data'
+    #    return
+
+    if(dsname == '/Configure:0000/Run:0000/CalibCycle:0000/EvrData::DataV3/NoDetector.0:Evr.0'):
+        print 'TypeError: No NumPy equivalent for TypeVlenID exists...\n',70*'='
         return
+
     if(dsname == '/Configure:0000/Run:0000/CalibCycle:0000/EvrData::DataV3/NoDetector.0:Evr.0/evrData'):
-        print 'TypeError: No NumPy equivalent for TypeVlenID exists'         
+        print 'TypeError: No NumPy equivalent for TypeVlenID exists...\n',70*'='        
         return
 
     fname = cp.confpars.dirName+'/'+cp.confpars.fileName
@@ -175,8 +221,9 @@ def print_dataset_metadata_from_file(dsname):
     ds = f[dsname]
     print_dataset_info(ds)
     print_attributes(ds)
+    print 'Path: %s\nItem: %s' % (os.path.split(str(dsname)))
     f.close()
-    print '=== End of attributes ==='
+    print 70*'='
                             
 #----------------------------------
 #
@@ -187,3 +234,5 @@ if __name__ == "__main__" :
     # In principle we can try to run test suite for this module,
     # have to think about it later. Right now just abort.
     sys.exit ( "Module is not supposed to be run as main module" )
+
+#----------------------------------
