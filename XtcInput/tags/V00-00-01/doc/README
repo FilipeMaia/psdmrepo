@@ -1,0 +1,15 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package XtcInput
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Brief description:
+==================
+
+This package contains common code for reading XTC data, merging streams,
+iterating over XTC, etc. 
