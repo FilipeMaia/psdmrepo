@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2011-01-26 Andy Salnikov
+- removed SITConfig/SITConfig.h include from test case
+
 Tag: V00-00-03
 2011-01-26 Andy Salnikov
 - added put() method to ConfigSvc to add/change the value of parameters
