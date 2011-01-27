@@ -125,7 +125,7 @@ void
 CsPadCalibV1Cvt::convert ( const void* data, 
                              size_t size,
                              const Pds::TypeId& typeId,
-                             const XtcInput::XtcSrcStack& src,
+                             const O2OXtcSrc& src,
                              const H5DataTypes::XtcClockTime& time ) 
 {
   // this should not happen
@@ -210,7 +210,7 @@ CsPadCalibV1Cvt::closeGroup( hdf5pp::Group group )
 
 // find pedestals data
 std::string 
-CsPadCalibV1Cvt::findCalibFile(const XtcInput::XtcSrcStack& src, const std::string& datatype) const
+CsPadCalibV1Cvt::findCalibFile(const O2OXtcSrc& src, const std::string& datatype) const
 try {
   // if no directory given then don't do anything
   if ( m_metadata.calibDir().empty() ) return std::string();

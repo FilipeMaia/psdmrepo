@@ -20,7 +20,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "XtcInput/XtcScannerI.h"
+#include "O2OTranslator/O2OXtcScannerI.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -51,7 +51,7 @@ class O2OMetaData ;
  *  @author Andrei Salnikov
  */
 
-class MetaDataScanner : public XtcInput::XtcScannerI {
+class MetaDataScanner : public O2OXtcScannerI {
 public:
 
   // Default constructor
@@ -72,7 +72,7 @@ public:
 
   // visit the data object
   virtual void dataObject ( const void* data, size_t size,
-       const Pds::TypeId& typeId, const XtcInput::XtcSrcStack& src ) ;
+       const Pds::TypeId& typeId, const O2OXtcSrc& src ) ;
 
 protected:
 

@@ -69,7 +69,7 @@ public:
   virtual void typedConvert ( const XtcType& data,
                               size_t size,
                               const Pds::TypeId& typeId,
-                              const XtcInput::XtcSrcStack& src,
+                              const O2OXtcSrc& src,
                               const H5DataTypes::XtcClockTime& time )
   {
     // this should not happen

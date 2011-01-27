@@ -143,7 +143,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
                                int compression,
                                bool extGroups,
                                const O2OMetaData& metadata )
-  : XtcInput::XtcScannerI()
+  : O2OXtcScannerI()
   , m_nameFactory( nameFactory )
   , m_file()
   , m_state()
@@ -679,7 +679,7 @@ O2OHdf5Writer::levelEnd ( const Pds::Src& src )
 // visit the data object
 void
 O2OHdf5Writer::dataObject ( const void* data, size_t size,
-    const Pds::TypeId& typeId, const XtcInput::XtcSrcStack& src )
+    const Pds::TypeId& typeId, const O2OXtcSrc& src )
 {
   // for Configure and BeginCalibCycle transitions store config objects at Source level
   if ( ( m_transition == Pds::TransitionId::Configure

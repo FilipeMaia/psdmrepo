@@ -42,12 +42,12 @@
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OHdf5Writer.h"
 #include "O2OTranslator/O2OMetaData.h"
+#include "O2OTranslator/O2OXtcIterator.h"
+#include "O2OTranslator/O2OXtcScannerI.h"
 #include "O2OTranslator/O2OXtcValidator.h"
 #include "XtcInput/DgramQueue.h"
 #include "XtcInput/DgramReader.h"
 #include "XtcInput/XtcFileName.h"
-#include "XtcInput/XtcIterator.h"
-#include "XtcInput/XtcScannerI.h"
 #include "XtcInput/XtcStreamMerger.h"
 
 //-----------------------------------------------------------------------
@@ -209,7 +209,7 @@ O2O_Translate::runApp ()
                          m_metadata.value() ) ;
 
   // instantiate XTC scanner, which is also output file writer
-  std::vector<XtcInput::XtcScannerI*> scanners ;
+  std::vector<O2OXtcScannerI*> scanners ;
   scanners.push_back ( new O2OHdf5Writer ( nameFactory, m_overwrite.value(),
                                   m_splitMode.value(), m_splitSize.value(),
                                   m_compression.value(), m_extGroups.value(),
@@ -259,13 +259,13 @@ O2O_Translate::runApp ()
     } else {
 
       // give this event to every scanner
-      for ( std::vector<XtcInput::XtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
+      for ( std::vector<O2OXtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
 
-        XtcInput::XtcScannerI* scanner = *i ;
+        O2OXtcScannerI* scanner = *i ;
 
         try {
           if ( scanner->eventStart ( *dg ) ) {    
-              XtcInput::XtcIterator iter( &(dg->xtc), scanner );
+              O2OXtcIterator iter( &(dg->xtc), scanner );
               iter.iterate();
           }    
           scanner->eventEnd ( *dg ) ;
@@ -282,9 +282,9 @@ O2O_Translate::runApp ()
   }
 
   // finish with the scanners
-  for ( std::vector<XtcInput::XtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
+  for ( std::vector<O2OXtcScannerI*>::iterator i = scanners.begin() ; i != scanners.end() ; ++ i ) {
     try {
-      XtcInput::XtcScannerI* scanner = *i ;
+      O2OXtcScannerI* scanner = *i ;
       delete scanner ;
     } catch ( std::exception& e ) {
       MsgLogRoot( error, "exception caught while destroying a scanner: " << e.what() ) ;

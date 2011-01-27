@@ -25,7 +25,7 @@
 #include "pdsdata/xtc/TypeId.hh"
 #include "H5DataTypes/XtcClockTime.h"
 #include "hdf5pp/Group.h"
-#include "XtcInput/XtcSrcStack.h"
+#include "O2OTranslator/O2OXtcSrc.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -60,7 +60,7 @@ public:
   virtual void convert ( const void* data, 
                          size_t size,
                          const Pds::TypeId& typeId,
-                         const XtcInput::XtcSrcStack& src,
+                         const O2OXtcSrc& src,
                          const H5DataTypes::XtcClockTime& time ) = 0 ;
 
   /// method called when the driver makes a new group in the file

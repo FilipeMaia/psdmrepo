@@ -71,7 +71,7 @@ CameraFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                         const XtcType& data,
                                         size_t size,
                                         const Pds::TypeId& typeId,
-                                        const XtcInput::XtcSrcStack& src,
+                                        const O2OXtcSrc& src,
                                         const H5DataTypes::XtcClockTime& time )
 {
   if ( sizeof data + data.data_size() != size ) {
