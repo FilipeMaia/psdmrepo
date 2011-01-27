@@ -55,9 +55,8 @@ class PlotsForImage ( object ) :
     #  Constructor --
     #----------------
     def __init__ ( self ) :
-        """Constructor, initialization
-        """
-        #self.fig1_window_is_open = False 
+        """Constructor, initialization"""
+        pass
 
     #-------------------
     #  Public methods --
@@ -67,7 +66,6 @@ class PlotsForImage ( object ) :
         """Plot 2d image from input array."""
 
         fig.canvas.set_window_title("Image") 
-
         plt.clf() # clear plot
         
         pantit='Image'
@@ -76,20 +74,29 @@ class PlotsForImage ( object ) :
         plt.xlabel('X pixels')
         plt.ylabel('Y pixels')
         
-        #plt.ion() # turn interactive mode on
         #plt.margins(x=0.05,y=0.05,tight=True)
         #plt.rc('lines', linewidth=2, color='r') # Set the current default parameters
         
-        #plt.savefig("my-image-hdf5.png")
-        #plt.show()
-
         str_event = 'Event ' + str(cp.confpars.eventCurrent)
-        plt.text(50, -10, str_event, fontsize=24)
-        
-        #if mode == 1 :   # Single event mode
-        #    plt.show()  
-        #else :           # Slide show 
-        #    plt.draw()   # Draws, but does not block
+        plt.text(-50, -10, str_event, fontsize=24)
+
+        #plt.savefig("my-image-hdf5.png")
+        #plt.show()        
+
+
+    def plotImageSpectrum( self, arr2d1ev, fig ):
+
+        plt.clf() # clear plot
+        fig.canvas.set_window_title('Specrum') 
+        plt.title('As a histogram',color='r',fontsize=20) # pars like in class Text
+        arrdimX,arrdimY = arr2d1ev.shape
+        #print 'arr2d1ev.shape=', arr2d1ev.shape, arrdimX, arrdimY 
+        print 'arr2d1ev=\n', arr2d1ev
+        arr1d1ev = arr2d1ev
+        arr1d1ev.resize(arrdimX*arrdimY)
+        print 'arr1d1ev=\n', arr1d1ev
+        #plt.hist(arr1d1ev,100)
+        plt.hist(arr1d1ev, bins=30, range=(15,45))
 
 #--------------------------------
 #  In case someone decides to run this module

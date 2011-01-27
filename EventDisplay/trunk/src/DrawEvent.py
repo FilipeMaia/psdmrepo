@@ -109,6 +109,7 @@ class DrawEvent ( object ) :
                 
             if item_last_name == 'image' :
                 self.plotsImage.plotImage(arr1ev,self.set_fig(1))
+                self.plotsImage.plotImageSpectrum(arr1ev,self.set_fig(1))
 
             if item_last_name == 'waveform' :
                 print 'Here should be an emplementation of stuff for waveform'
@@ -177,7 +178,7 @@ class DrawEvent ( object ) :
         plt.ion() # enables interactive mode
         if type == 1 :
             self.fig = plt.figure(num=self.figNum, figsize=(6,5), dpi=80, facecolor='w',edgecolor='w',frameon=True)
-            self.fig.subplots_adjust(left=0.02, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
+            self.fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
 
         if type == 4 :
             self.fig = plt.figure(num=self.figNum, figsize=(10,10), dpi=80, facecolor='w',edgecolor='w',frameon=True)

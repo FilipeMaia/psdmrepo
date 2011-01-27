@@ -118,12 +118,10 @@ class PlotsForCSpad ( object ) :
             #plt.xlabel('X pixels')
             #plt.ylabel('Y pixels')
         
-           ##plt.ion() # turn interactive mode on
-           ##plt.margins(x=0.05,y=0.05,tight=True)
-           ##plt.rc('lines', linewidth=2, color='r') # Set the current default parameters
+            #plt.margins(x=0.05,y=0.05,tight=True)
+            #plt.rc('lines', linewidth=2, color='r') # Set the current default parameters
         
-           ##plt.savefig("my-image-hdf5.png")
-           ##plt.show()
+            #plt.savefig("my-image-hdf5.png")
 
             if pair==0 :
                 str_event = 'Event ' + str(cp.confpars.eventCurrent)

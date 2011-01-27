@@ -434,7 +434,13 @@ class GUIMain ( QtGui.QWidget ) :
             print 'event.key() = Return'
             cp.confpars.span         = int(self.spanEdit.displayText())
             cp.confpars.eventCurrent = int(self.numbEdit.displayText())
-            self.currentEventNo()
+            str_path_file            = str(self.fileEdit.displayText())
+            cp.confpars.dirName,cp.confpars.fileName = os.path.split(str_path_file)
+            print 'Set dirName      : %s' % (cp.confpars.dirName)         
+            print 'Set fileName     : %s' % (cp.confpars.fileName)         
+            print 'Set span         : ', cp.confpars.span 
+            print 'Set eventCurrent : ', cp.confpars.eventCurrent 
+            #self.currentEventNo()
 
         if event.key() == QtCore.Qt.Key_Home:
             print 'event.key() = Home'
