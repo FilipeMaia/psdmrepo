@@ -117,6 +117,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.start    = QtGui.QPushButton("Start")
         self.stop     = QtGui.QPushButton("Stop")
         self.selection= QtGui.QPushButton("Selection")
+        self.closeplts= QtGui.QPushButton("Close plots")
         self.exit     = QtGui.QPushButton("Exit")
         self.spaninc  = QtGui.QPushButton(u'\u25B6') # right-head triangle
         self.spandec  = QtGui.QPushButton(u'\u25C0') # left-head triangle
@@ -171,7 +172,8 @@ class GUIMain ( QtGui.QWidget ) :
         hboxS.addWidget(self.stop)
         
         hbox = QtGui.QHBoxLayout()
-        hbox.addStretch(1)
+        hbox.addWidget(self.closeplts)
+        hbox.addStretch(3)
         hbox.addWidget(self.exit)
 
         #hboxL = QtGui.QHBoxLayout()
@@ -197,6 +199,7 @@ class GUIMain ( QtGui.QWidget ) :
         #self.connect(self,   QtCore.SIGNAL('closeGUIApp()'), QtCore.SLOT('close()') )
         #self.connect(self.exit,     QtCore.SIGNAL('clicked()'), QtCore.SLOT('close()') )
         self.connect(self.exit,      QtCore.SIGNAL('clicked()'), self.processQuit )
+        self.connect(self.closeplts, QtCore.SIGNAL('clicked()'), self.processClosePlots )
         self.connect(self.browse,    QtCore.SIGNAL('clicked()'), self.processBrowse )
         self.connect(self.next,      QtCore.SIGNAL('clicked()'), self.incrimentEventNo )
         self.connect(self.previous,  QtCore.SIGNAL('clicked()'), self.decrimentEventNo )
@@ -405,6 +408,10 @@ class GUIMain ( QtGui.QWidget ) :
         self.drawev.drawEvent(mode) # Draw everything for current event
         #print cp.confpars.eventCurrent
 
+    def processClosePlots(self):
+        print 'Close plots',
+        self.drawev.quitDrawEvent()
+
     def mousePressEvent(self, event):
         print 'Do not click on mouse just for fun!\n'
         print 'event.button() = %s at position' % (event.button()),        
@@ -413,19 +420,21 @@ class GUIMain ( QtGui.QWidget ) :
         print ' global x=%d, y=%d' % (event.globalX(),event.globalY())
         #self.emit(QtCore.SIGNAL('closeGUIApp()'))
 
+#http://doc.qt.nokia.com/4.6/qt.html#Key-enum
     def keyPressEvent(self, event):
         print 'event.key() = %s' % (event.key())
         if event.key() == QtCore.Qt.Key_Escape:
     #        self.close()
             self.SHowIsOn = False    
 
-#http://doc.qt.nokia.com/4.6/qt.html#Key-enum
-
         if event.key() == QtCore.Qt.Key_B:
             print 'event.key() = %s' % (QtCore.Qt.Key_B)
 
         if event.key() == QtCore.Qt.Key_Return:
             print 'event.key() = Return'
+            cp.confpars.span         = int(self.spanEdit.displayText())
+            cp.confpars.eventCurrent = int(self.numbEdit.displayText())
+            self.currentEventNo()
 
         if event.key() == QtCore.Qt.Key_Home:
             print 'event.key() = Home'

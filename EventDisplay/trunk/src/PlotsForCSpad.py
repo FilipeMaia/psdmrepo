@@ -58,75 +58,37 @@ class PlotsForCSpad ( object ) :
 
         print '\n Initialization of the PlotsForCSpad'
         #print 'using MPL version: ', matplotlib.__version__
-
-        self.fig1_window_is_open = False
+        #self.fig1_window_is_open = False
 
     #-------------------
     #  Public methods --
     #-------------------
 
 
-    def open_fig1( self, figNum ):
-        """Open window for fig1."""
-
-        print 'open_fig1()'
-
-        plt.ion() # enables interactive mode
-        self.fig1 = plt.figure(num=figNum, figsize=(10,10), dpi=80, facecolor='w',edgecolor='w',frameon=True) # parameters like in class Figure
-        self.fig1.subplots_adjust(left=0.08, bottom=0.02, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
-        self.fig1.canvas.set_window_title("CSpad image") 
-
-        ##plt.subplots_adjust(left=0.08, bottom=0.02, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
-        ##f = fig.Figure(figsize=(2,5), dpi=100, facecolor='w',edgecolor='w') #,frameon=True,linewidth=0.05) # set figure parame ters
-        ##plt.figure(figsize=(10,6), dpi=100, facecolor='g',edgecolor='b',frameon=True,linewidth=5) # parameters like in class Figure
-        ##plt.subplots_adjust(hspace=0.4)
-        ##plt.subplot(221)
-        ##plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=None)
-        self.fig1_window_is_open = True
-
-
-    def set_fig1( self, figNum ):
-        """Set current fig1."""
-        if self.fig1_window_is_open :
-            self.fig1 = plt.figure(num=figNum)        
-        else :
-            self.open_fig1(figNum)
-       
-
-    def close_fig1( self ):
-        """Close fig1 and its window."""
-
-        if self.fig1_window_is_open :
-            #plt.ioff()
-            #plt.close()
-            self.fig1_window_is_open = False 
-            print 'close_fig1()'
-
-
-    def plotCSpadV1( self, arr1ev, figNum ):
+    def plotCSpadV1( self, arr1ev, fig ):
         """Plot 2d image from input array. V1 for run ~546
 
         V1 contain array for entire detector. Currently we plat quad 2 only.
         """
         quad=2
         arr1quad = arr1ev[quad,...]      # V1 for run ~546
-        self.plotCSpadQuad( arr1quad, figNum )
+        self.plotCSpadQuad( arr1quad, fig )
 
 
-    def plotCSpadV2( self, arr1quad, figNum ):
+    def plotCSpadV2( self, arr1quad, fig ):
         """Plot 2d image from input array.
 
         V2 for run ~900 contain array for quad 2, which we plot directly.
         """
-        self.plotCSpadQuad( arr1quad, figNum )
+        self.plotCSpadQuad( arr1quad, fig )
 
   
-    def plotCSpadQuad( self, arr1quad, figNum ):
+    def plotCSpadQuad( self, arr1quad, fig ):
         """Plot 2d image from input array."""
 
         #print 'plot_CSpadQuad()'       
-        self.set_fig1( figNum )
 
+        fig.canvas.set_window_title("CSpad image")
         plt.clf() # clear plot
         
         arrgap=zeros( (185,4) ) # make additional 2D-array of 0-s for the gap between two 1x1 pads

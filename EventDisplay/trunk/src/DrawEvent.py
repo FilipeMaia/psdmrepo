@@ -31,6 +31,9 @@ __version__ = "$Revision: 4 $"
 import sys
 import h5py    # access to hdf5 file structure
 from numpy import *  # for use like       array(...)
+
+import matplotlib
+matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 import matplotlib.pyplot as plt
 
 #-----------------------------
@@ -59,8 +62,9 @@ class DrawEvent ( object ) :
         """
         print 'DrawEvent () Initialization'
         cp.confpars.h5_file_is_open = False
-        self.plotsCSpad      = cspad.PlotsForCSpad()
-        self.plotsImage      = image.PlotsForImage()
+        self.plotsCSpad             = cspad.PlotsForCSpad()
+        self.plotsImage             = image.PlotsForImage()
+        self.fig_window_is_open     = False 
 
         # CSpad V1 for runs ~546,547...
         self.dsnameCSpadV1 = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV1/XppGon.0:Cspad.0/data"
@@ -69,18 +73,12 @@ class DrawEvent ( object ) :
         self.dsnameCSpadV2 = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data"
 
 
-
     #-------------------
     #  Public methods --
     #-------------------
 
     def drawEvent ( self, mode=1 ) :
-        """Draws current event
-
-        @param x   first parameter
-        @param y   second parameter
-        @return    return value
-        """
+        """Draws current event"""
 
         #if not cp.confpars.h5_file_is_open :
         self.openHDF5File()
@@ -96,53 +94,52 @@ class DrawEvent ( object ) :
 
             ds     = self.h5file[dsname]
             arr1ev = ds[cp.confpars.eventCurrent]
-            self.figNum += 1 
 
             item_last_name = printh5.get_item_last_name(dsname)
             print 'Try to plot item:', dsname, ' item name:', item_last_name  
 
             if dsname == self.dsnameCSpadV1 :
                 print 'Draw plots for CSpad V1'
-                self.plotsCSpad.plotCSpadV1(arr1ev,self.figNum)
+                self.plotsCSpad.plotCSpadV1(arr1ev,self.set_fig(4))
 
             if dsname == self.dsnameCSpadV2 :
                 print 'Draw plots for CSpad V2'
                 arr1quad = arr1ev
-                self.plotsCSpad.plotCSpadV2(arr1quad,self.figNum)
+                self.plotsCSpad.plotCSpadV2(arr1quad,self.set_fig(4))
                 
             if item_last_name == 'image' :
-                self.plotsImage.plotImage(arr1ev,self.figNum)
+                self.plotsImage.plotImage(arr1ev,self.set_fig(1))
 
             if item_last_name == 'waveform' :
                 print 'Here should be an emplementation of stuff for waveform'
+
+        self.fig_window_is_open = True
 
         self.showEvent(mode)
         self.closeHDF5File()
 
 
     def showEvent ( self, mode=1 ) :
-        """ plt.show() or draw() depending on mode"""
+        """showEvent: plt.show() or draw() depending on mode"""
         if mode == 1 :   # Single event mode
             plt.show()  
         else :           # Slide show 
             plt.draw()   # Draws, but does not block
 
-                
+
     def stopDrawEvent ( self ) :
-        """Operations in case of stop drawing event(s)
-        """
+        """Operations in case of stop drawing event(s)"""
         print 'stopDrawEvent()'
         self.drawEvent() # mode=1 (by default) for the last plot
 
 
     def quitDrawEvent ( self ) :
-        """Operations in case of quit drawing event(s)
-        """
-        self.plotsCSpad.close_fig1()
-        self.plotsImage.close_fig1()
+        """Operations in case of quit drawing event(s)"""
+        #self.plotsCSpad.close_fig1()
+        #self.plotsImage.close_fig1()
+        self.close_fig()
         plt.ioff()
         plt.close()
-
         self.closeHDF5File()
         print 'quitDrawEvent()'
 
@@ -160,6 +157,50 @@ class DrawEvent ( object ) :
             self.h5file.close()
             cp.confpars.h5_file_is_open = False
             print 'closeHDF5File()'
+
+
+    def set_fig( self, type=None ):
+        """Set current fig."""
+        self.figNum += 1 
+        if self.fig_window_is_open :
+            self.fig = plt.figure(num=self.figNum)        
+        else :
+            self.fig = self.open_fig(type)
+            self.set_window_position()
+        return self.fig
+
+               
+    def open_fig( self, type=None ):
+        """Open window for figure."""
+        print 'open_fig()'
+
+        plt.ion() # enables interactive mode
+        if type == 1 :
+            self.fig = plt.figure(num=self.figNum, figsize=(6,5), dpi=80, facecolor='w',edgecolor='w',frameon=True)
+            self.fig.subplots_adjust(left=0.02, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
+
+        if type == 4 :
+            self.fig = plt.figure(num=self.figNum, figsize=(10,10), dpi=80, facecolor='w',edgecolor='w',frameon=True)
+            self.fig.subplots_adjust(left=0.08, bottom=0.02, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
+        else :
+            self.fig = plt.figure(num=self.figNum)
+        return self.fig
+
+    def set_window_position( self ):
+        """Move window in desired position."""
+        print 'set_window_position()'
+        #plt.get_current_fig_manager().window.move(890, 100) #### This works!
+        fig_QMainWindow = plt.get_current_fig_manager().window
+        fig_QMainWindow.move(820+50*self.figNum, 20*(self.figNum-1)) #### This works!
+
+
+    def close_fig( self ):
+        """Close fig and its window."""
+
+        if  self.fig_window_is_open :
+            self.fig_window_is_open = False 
+            print 'close_fig()'
+
 
 
 #

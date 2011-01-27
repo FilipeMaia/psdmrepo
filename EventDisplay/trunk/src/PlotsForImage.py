@@ -57,45 +57,16 @@ class PlotsForImage ( object ) :
     def __init__ ( self ) :
         """Constructor, initialization
         """
-        self.fig1_window_is_open = False 
+        #self.fig1_window_is_open = False 
 
     #-------------------
     #  Public methods --
     #-------------------
-
-    def open_fig1( self, figNum ):
-        """Open window for fig1."""
-        if not self.fig1_window_is_open :
-            print 'open_fig1()'
-            plt.ion() # enables interactive mode
-            self.fig1 = plt.figure(figsize=(8,7), dpi=80, facecolor='w',edgecolor='w',frameon=True) # parameters like in class Figure
-            #plt.subplots_adjust(left=0.08, bottom=0.02, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
-            self.fig1.canvas.set_window_title("CSpad image") 
-            self.fig1_window_is_open = True
-
-
-    def set_fig1( self, figNum ):
-        """Set current fig1."""
-        if self.fig1_window_is_open :
-            self.fig1 = plt.figure(num=figNum)        
-        else :
-            self.open_fig1(figNum)
-       
-
-    def close_fig1( self ):
-        """Close fig1 and its window."""
-
-        if self.fig1_window_is_open :
-            #plt.ioff()
-            #plt.close()
-            self.fig1_window_is_open = False 
-            print 'close_fig1()'
-
   
-    def plotImage( self, arr2d1ev, figNum ):
+    def plotImage( self, arr2d1ev, fig ):
         """Plot 2d image from input array."""
 
-        self.set_fig1(figNum)
+        fig.canvas.set_window_title("Image") 
 
         plt.clf() # clear plot
         
