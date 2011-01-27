@@ -34,7 +34,7 @@
 namespace psana_examples {
 
 /**
- *  Example of the user analysis module.
+ *  @brief Example of the user analysis module.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -56,7 +56,7 @@ public:
   virtual ~Module1 () ;
 
   /// Method which is called with event data
-  virtual void event(/*Event& evt, Env& env*/);
+  virtual void event(Event& evt, Env& env);
   
 protected:
 

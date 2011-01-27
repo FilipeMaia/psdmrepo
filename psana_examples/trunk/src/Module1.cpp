@@ -9,7 +9,6 @@
 //      Andrei Salnikov
 //
 //------------------------------------------------------------------------
-#include "SITConfig/SITConfig.h"
 
 //-----------------------
 // This Class's Header --
@@ -59,7 +58,7 @@ Module1::~Module1 ()
 
 /// Method which is called with event data
 void 
-Module1::event(/*Event& evt, Env& env*/)
+Module1::event(Event& evt, Env& env)
 {
   ++m_count;
   MsgLogRoot(info, name() << ": processing event #" << m_count);
