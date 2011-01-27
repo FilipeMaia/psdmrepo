@@ -19,6 +19,7 @@
 // C/C++ Headers --
 //-----------------
 #include <stdlib.h>
+#include <iostream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -143,6 +144,12 @@ XtcFileName::_cvt ( const char* ptr, bool& stat ) const
   int val = strtol ( ptr, &eptr, 10 ) ;
   stat = ( *eptr == 0 ) and val >= 0 ;
   return unsigned(val) ;
+}
+
+std::ostream&
+operator<<(std::ostream& out, const XtcFileName& fn)
+{
+  return out << fn.path() ;
 }
 
 } // namespace XtcInput

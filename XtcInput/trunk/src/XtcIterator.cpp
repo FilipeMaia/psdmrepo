@@ -24,13 +24,16 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "XtcInput/Exceptions.h"
-#include "XtcInput/XtcScannerI.h"
-#include "pdsdata/xtc/Xtc.hh"
-#include "pdsdata/xtc/DetInfo.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
+
+namespace {
+  
+  const char* logger = "XtcIterator";
+  
+}
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -41,10 +44,10 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcIterator::XtcIterator ( Xtc* xtc, XtcScannerI* scanner )
-  : Pds::XtcIterator( xtc )
-  , m_scanner( scanner )
-  , m_src()
+XtcIterator::XtcIterator ( Pds::Xtc* xtc )
+  : m_initial(xtc)
+  , m_xtc()
+  , m_off() 
 {
 }
 
@@ -55,79 +58,53 @@ XtcIterator::~XtcIterator ()
 {
 }
 
-// process one sub-XTC, returns >0 for success, 0 for error
-int
-XtcIterator::process(Xtc* xtc)
+Pds::Xtc* 
+XtcIterator::next()
 {
-  Pds::TypeId::Type type = xtc->contains.id() ;
-  uint32_t version = xtc->contains.version() ;
-  Pds::Level::Type level = xtc->src.level() ;
-
-  // sanity check
-  if ( xtc->sizeofPayload() < 0 ) {
-    MsgLogRoot( error, "Negative payload size in XTC: " << xtc->sizeofPayload()
-        << " level: " << int(level) << '#' << Pds::Level::name(level)
-        << " type: " << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version) ;
-    throw XTCGenException("negative payload size") ;
-  }
-
-  m_src.push( xtc->src ) ;
-
-  // say we are at the new XTC level
-  if ( m_scanner ) m_scanner->levelStart ( xtc->src ) ;
-
-  MsgLogRoot( debug, "XtcIterator::process -- new xtc: "
-              << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version
-              << " payload = " << xtc->sizeofPayload()
-              << " damage: " << std::hex << std::showbase << xtc->damage.value() ) ;
-
-  int result = 1 ;
-  if ( type == Pds::TypeId::Id_Xtc ) {
-
-    if ( xtc->damage.value() & Pds::Damage::DroppedContribution ) {
-      //some types of damage cause troubles, filter them
-      // skip damaged data
-      MsgLogRoot( warning, "XtcIterator::process -- damaged container xtc: "
-                  << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version
-                  << " payload = " << xtc->sizeofPayload()
-                  << " damage: " << std::hex << std::showbase << xtc->damage.value() ) ;
-    } else {
-      // scan all sub-xtcs
-      this->iterate( xtc );
+  // first call
+  if (Pds::Xtc* xtc = m_initial) {
+    if ( xtc->contains.id() == Pds::TypeId::Id_Xtc ) {
+      // if a container then store in a stack
+      m_xtc.push(xtc);
+      m_off.push(0);
     }
-
-  } else if ( type == Pds::TypeId::Any ) {
-
-    // NOTE: I do not know yet what this type is supposed to do, for now just ignore it
-
-  } else if ( xtc->src.level() == Pds::Level::Source
-      or xtc->src.level() == Pds::Level::Reporter
-      or xtc->src.level() == Pds::Level::Control ) {
-
-    if ( xtc->damage.value() ) {
-      // skip damaged data
-      MsgLogRoot( warning, "XtcIterator::process -- damaged data xtc: "
-                  << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version
-                  << " payload = " << xtc->sizeofPayload()
-                  << " damage: " << std::hex << std::showbase << xtc->damage.value() ) ;
-    } else {
-      m_scanner->dataObject( xtc->payload(), xtc->sizeofPayload(), xtc->contains, m_src ) ;
-    }
-
-  } else {
-
-    MsgLogRoot( warning, "XtcIterator::process -- data object at level "
-                << int(level) << '#' << Pds::Level::name(level) << ": "
-                << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version ) ;
-
+    m_initial = 0;
+    return xtc;
   }
+  
+  // if nothing left return 0
+  if (m_xtc.empty()) {
+    return 0;
+  }
+  
+  // finished iterating this xtc, drop it, move to previous
+  while (m_off.top() == m_xtc.top()->sizeofPayload()) {
+    m_off.pop();
+    m_xtc.pop();
+    // no more XTCs left, stop
+    if(m_off.empty()) {
+      return 0;
+    }
+  }  
 
-  // say we are done with this XTC level
-  if ( m_scanner ) m_scanner->levelEnd ( xtc->src ) ;
+  // at this point the XTC in stack can only be of Pds::TypeId::Id_Xtc type
+  Pds::Xtc* next = (Pds::Xtc*)(m_xtc.top()->payload() + m_off.top());
 
-  m_src.pop() ;
+  // adjust remaining size
+  int nextoff = m_off.top() + next->sizeofPayload() + sizeof(Pds::Xtc);
+  if ( nextoff >  m_xtc.top()->sizeofPayload()) {
+    // looks badly corrupted, throw exception
+    throw XTCGenException ("Corrupted XTC, size out of range");
+  }
+  m_off.top() = nextoff;
 
-  return result ;
+  if ( next->contains.id() == Pds::TypeId::Id_Xtc ) {
+    // add it to stack too
+    m_xtc.push(next);
+    m_off.push(0);
+  }
+  
+  return next;
 }
 
 } // namespace XtcInput

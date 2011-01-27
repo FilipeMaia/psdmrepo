@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2011-01-26 Andy Salnikov
+- returned XtcIterator back to translator package
+- XtcIterator class is now a simple tree-traversal iterator which 
+  returns one XTC object at a time
+
 Tag: V00-00-01
 2011-01-26 Andy Salnikov
 - Moved some common classes for XTC reading here from O2OTranslator

@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
+#include <iosfwd>
 
 //----------------------
 // Base Class Headers --
@@ -52,7 +53,9 @@ public:
 
   // Default constructor
   XtcFileName() ;
-  XtcFileName( const std::string& path ) ;
+  
+  // Construct from a full path name
+  explicit XtcFileName( const std::string& path ) ;
 
   // Destructor
   ~XtcFileName () {}
@@ -93,6 +96,9 @@ private:
   unsigned m_chunk ;
 
 };
+
+std::ostream&
+operator<<(std::ostream& out, const XtcFileName& fn);
 
 } // namespace XtcInput
 

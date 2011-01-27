@@ -15,6 +15,7 @@
 //-----------------
 #include <list>
 #include <vector>
+#include <iosfwd>
 #include <boost/utility.hpp>
 
 //----------------------
@@ -60,6 +61,14 @@ public:
   ///   FilePerStream - single file per stream, no chunking
   ///   FileName - streams and chunks are determined from file names
   enum MergeMode { OneStream, NoChunking, FileName } ;
+  
+  /**
+   *  @brief Make merge mode from string
+   *  
+   *  @throw InvalidMergeMode Thrown if string does not match the names 
+   *    of enum constants
+   */
+  static MergeMode mergeMode(const std::string& str);
 
   // Default constructor
   XtcStreamMerger ( const std::list<XtcFileName>& files,
@@ -90,6 +99,10 @@ private:
   int32_t m_l1OffsetNsec ;
 
 };
+
+/// Insertion operator for enum values
+std::ostream&
+operator<<(std::ostream& out, XtcStreamMerger::MergeMode mode);
 
 } // namespace XtcInput
 

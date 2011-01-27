@@ -13,11 +13,11 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <stack>
 
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "pdsdata/xtc/XtcIterator.hh"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -26,20 +26,18 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "XtcInput/XtcSrcStack.h"
-#include "pdsdata/xtc/TypeId.hh"
+#include "pdsdata/xtc/Xtc.hh"
 
 //		---------------------
 // 		-- Class Interface --
 //		---------------------
 
 /**
- *  Subclass of XtcIterator which forwards all
+ *  @brief XTC iterator which does recursive iteration and returns every 
+ *  individual XTC object.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgement.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -48,27 +46,26 @@
 
 namespace XtcInput {
 
-class XtcScannerI ;
-
-class XtcIterator : public Pds::XtcIterator {
+class XtcIterator {
 public:
 
-  // Default constructor
-  XtcIterator ( Xtc* xtc, XtcScannerI* scanner ) ;
+  // Constructor takes pointer to Xtc object
+  XtcIterator ( Pds::Xtc* xtc ) ;
 
   // Destructor
-  virtual ~XtcIterator () ;
+  ~XtcIterator () ;
 
-  // process one sub-XTC, returns >0 for success, 0 for error
-  virtual int process(Xtc* xtc) ;
+  // Returns next XTC or 0
+  Pds::Xtc* next() ;
 
 protected:
 
 private:
 
   // Data members
-  XtcScannerI* m_scanner ;
-  XtcSrcStack m_src ;
+  Pds::Xtc* m_initial;
+  std::stack<Pds::Xtc*> m_xtc;
+  std::stack<int> m_off;
 
   // Copy constructor and assignment are disabled by default
   XtcIterator ( const XtcIterator& ) ;

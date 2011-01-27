@@ -109,54 +109,21 @@ public:
 
 };
 
-class XTCTransitionException : public Exception {
-public:
-
-  XTCTransitionException( const std::string& type, const std::string& current )
-    : Exception( "XTCTransitionException", "unexpected XTC transition type: "+type+", current state: "+current ) {}
-
-};
-
-class XTCConfigException : public Exception {
-public:
-
-  XTCConfigException( const std::string& type )
-    : Exception( "XTCConfigException", "configuration object missing for type "+type ) {}
-
-};
-
-class XTCLevelException : public Exception {
-public:
-
-  XTCLevelException( const std::string& type, const std::string& level )
-    : Exception( "XTCLevelException", "XTC object of type "+type+" not on Source level: "+level ) {}
-
-};
-
-class XTCSyncException : public Exception {
-public:
-
-  XTCSyncException()
-    : Exception( "XTCSyncException", "XTC streams are desynchronized" ) {}
-
-};
-
-class XTCSizeException : public Exception {
-public:
-
-  XTCSizeException( const std::string& type, size_t expectedSize, size_t xtcSize )
-    : Exception( "XTCSizeException", type + ": XTC size=" +
-        boost::lexical_cast<std::string>(xtcSize) +
-        ", expected size=" + boost::lexical_cast<std::string>(expectedSize) ) {}
-
-};
-
 /// Generic XTC exception, just give it a message
 class XTCGenException : public Exception {
 public:
 
   XTCGenException( const std::string& msg )
     : Exception( "XTCGenException", msg ) {}
+
+};
+
+/// Error generated when merge mode string is invalid
+class InvalidMergeMode : public Exception {
+public:
+
+  InvalidMergeMode( const std::string& str )
+    : Exception( "InvalidMergeMode", "invalid merge mode string: " + str ) {}
 
 };
 

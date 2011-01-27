@@ -128,6 +128,23 @@ XtcStreamMerger::~XtcStreamMerger ()
   }
 }
 
+
+/// Make merge mode from string
+XtcStreamMerger::MergeMode 
+XtcStreamMerger::mergeMode(const std::string& str)
+{
+  if (str == "FileName") {
+    return FileName;
+  } else if (str == "OneStream") {
+    return OneStream;
+  } else if (str == "NoChunking") {
+    return NoChunking;
+  } else {
+    throw InvalidMergeMode(str);
+  }
+
+}
+
 // read next datagram, return zero pointer after last file has been read,
 // throws exception for errors.
 Pds::Dgram*
@@ -193,6 +210,24 @@ XtcStreamMerger::updateDgramTime(Pds::Dgram& dgram) const
     // an assignment operator
     dgram.seq = Pds::Sequence(newTime, dgram.seq.stamp());
   }
+}
+
+std::ostream&
+operator<<(std::ostream& out, XtcStreamMerger::MergeMode mode)
+{
+  const char* str = "*ERROR*";
+  switch(mode) {
+  case XtcStreamMerger::OneStream:
+    str = "OneStream";
+    break;
+  case XtcStreamMerger::NoChunking:
+    str = "NoChunking";
+    break;
+  case XtcStreamMerger::FileName:
+    str = "FileName";
+    break;
+  }
+  return out << str;
 }
 
 } // namespace XtcInput
