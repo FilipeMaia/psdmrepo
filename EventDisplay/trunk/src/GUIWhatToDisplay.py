@@ -39,6 +39,8 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 import ConfigParameters as cp
+import GUIWhatToDisplayForImage as wtdIM 
+import GUIWhatToDisplayForCSpad as wtdCS 
 
 #---------------------
 #  Class definition --
@@ -72,28 +74,6 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.titCSpad    = QtGui.QLabel('SCpad')
         self.titWaveform = QtGui.QLabel('Waveform')
 
-        self.titIMImageAmin      = QtGui.QLabel('Amin:')
-        self.titIMImageAmax      = QtGui.QLabel('Amax:')
-
-        self.titIMSpectrumAmin   = QtGui.QLabel('Amin:')
-        self.titIMSpectrumAmax   = QtGui.QLabel('Amax:')
-        self.titIMSpectrumNbins  = QtGui.QLabel('N bins:')
-        self.titIMSpectrumAlim   = QtGui.QLabel('Amp. range: 0 -')
-
-        self.editIMImageAmin     = QtGui.QLineEdit(str(cp.confpars.imageImageAmin))
-        self.editIMImageAmax     = QtGui.QLineEdit(str(cp.confpars.imageImageAmax))
-        self.editIMImageAmin     .setMaximumWidth(45)
-        self.editIMImageAmax     .setMaximumWidth(45)
-
-        self.editIMSpectrumAmin  = QtGui.QLineEdit(str(cp.confpars.imageSpectrumAmin))
-        self.editIMSpectrumAmax  = QtGui.QLineEdit(str(cp.confpars.imageSpectrumAmax))
-        self.editIMSpectrumNbins = QtGui.QLineEdit(str(cp.confpars.imageSpectrumNbins))
-        self.editIMSpectrumAmin  .setMaximumWidth(45)
-        self.editIMSpectrumAmax  .setMaximumWidth(45)
-        self.editIMSpectrumNbins .setMaximumWidth(45)
-        self.editIMAmpRange      = QtGui.QLineEdit(str(cp.confpars.imageAmplitudeRange))
-        self.editIMAmpRange      .setMaximumWidth(50)
-
         #self.titImage.setTextFormat (2) # Qt.AutoText = 2
         self.titImage   .setFont (titFont) 
         self.titCSpad   .setFont (titFont) 
@@ -115,84 +95,57 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         if cp.confpars.waveformImageIsOn    : self.cboxWFImage   .setCheckState(1)
         if cp.confpars.waveformSpectrumIsOn : self.cboxWFSpectrum.setCheckState(1)
 
+
         #self.cb.setFocusPolicy(QtCore.Qt.NoFocus) 
         #self.cb2.move(10, 50)
         #self.cb.move(10, 10)
         #self.cb.toggle() # set the check mark in the check box
 
-        #lcd           = QtGui.QLCDNumber(self)
-        self.sliderIMAmin  = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
-        self.sliderIMAmax  = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
-        self.setAmplitudeRange(cp.confpars.imageAmplitudeRange)
-        self.sliderIMAmin.setValue(cp.confpars.imageSpectrumAmin)
-        self.sliderIMAmax.setValue(cp.confpars.imageSpectrumAmax)
-        
-        self.butClose = QtGui.QPushButton("Close window")
+        self.butClose      = QtGui.QPushButton("Close window")
 
-        hboxIM01 = QtGui.QHBoxLayout()
-        hboxIM01.addWidget(self.titImage)        
-        hboxIM02 = QtGui.QHBoxLayout()
-        #hboxIM02.addStretch(1)
-        hboxIM02.addWidget(self.titIMSpectrumAlim) 
-        hboxIM02.addWidget(self.editIMAmpRange) 
-        hboxIM02.addWidget(self.sliderIMAmin)        
-        hboxIM02.addWidget(self.sliderIMAmax)        
+        self.butIMOptions  = QtGui.QPushButton("Options for Image")
+        self.butCSOptions  = QtGui.QPushButton("Options for CSpad")
+        self.butWFOptions  = QtGui.QPushButton("Options for Waveform")
 
         gridIM = QtGui.QGridLayout()
-        gridIM.addWidget(self.cboxIMImage,     0, 0)
-        gridIM.addWidget(self.titIMImageAmin,  0, 1)
-        gridIM.addWidget(self.editIMImageAmin, 0, 2)
-        gridIM.addWidget(self.titIMImageAmax,  0, 3)
-        gridIM.addWidget(self.editIMImageAmax, 0, 4)
+        gridIM.addWidget(self.titImage,       0, 0)
+        gridIM.addWidget(self.cboxIMImage,    1, 0)
+        gridIM.addWidget(self.cboxIMSpectrum, 2, 0)
+        gridIM.addWidget(self.butIMOptions,   0, 1)
         
-        gridIM.addWidget(self.cboxIMSpectrum,      1, 0)
-        gridIM.addWidget(self.titIMSpectrumAmin,   1, 1)
-        gridIM.addWidget(self.editIMSpectrumAmin,  1, 2)
-        gridIM.addWidget(self.titIMSpectrumAmax,   1, 3)
-        gridIM.addWidget(self.editIMSpectrumAmax,  1, 4)
-        gridIM.addWidget(self.titIMSpectrumNbins,  1, 5)
-        gridIM.addWidget(self.editIMSpectrumNbins, 1, 6)
+        gridCS = QtGui.QGridLayout()
+        gridCS.addWidget(self.titCSpad,       0, 0)
+        gridCS.addWidget(self.cboxCSImage,    1, 0)
+        gridCS.addWidget(self.cboxCSSpectrum, 2, 0)
+        gridCS.addWidget(self.butCSOptions,   0, 1)
         
-        hboxWF01 = QtGui.QHBoxLayout()
-        hboxWF01.addWidget(self.titWaveform)        
-
-        hboxWF02 = QtGui.QHBoxLayout()
-        hboxWF02.addWidget(self.cboxWFImage)
-
-        hboxWF03 = QtGui.QHBoxLayout()
-        hboxWF03.addWidget(self.cboxWFSpectrum)
-
-        hboxCS01 = QtGui.QHBoxLayout()
-        hboxCS01.addWidget(self.titCSpad)        
-
-        hboxCS02 = QtGui.QHBoxLayout()
-        hboxCS02.addWidget(self.cboxCSImage)
-
-        hboxCS03 = QtGui.QHBoxLayout()
-        hboxCS03.addWidget(self.cboxCSSpectrum)
-
+        gridWF = QtGui.QGridLayout()
+        gridWF.addWidget(self.titWaveform,    0, 0)
+        gridWF.addWidget(self.cboxWFImage,    1, 0)
+        gridWF.addWidget(self.cboxWFSpectrum, 2, 0)
+        gridWF.addWidget(self.butWFOptions,   0, 1)
+        
         hboxC = QtGui.QHBoxLayout()
         hboxC.addStretch(1)
         hboxC.addWidget(self.butClose)
         
         vbox = QtGui.QVBoxLayout()
-        vbox.addLayout(hboxIM01)
+        #guiwtdIM = wtdIM.GUIWhatToDisplayForImage(self) # THIS
+        #vbox.addLayout(guiwtdIM.getVBoxForLayout())     # WORKS
+        vbox.addLayout(gridCS) 
+        vbox.addStretch(1)     
         vbox.addLayout(gridIM) 
-        vbox.addLayout(hboxIM02)
         vbox.addStretch(1)     
-        vbox.addLayout(hboxWF01)
-        vbox.addLayout(hboxWF02)
-        vbox.addLayout(hboxWF03)
-        vbox.addStretch(1)     
-        vbox.addLayout(hboxCS01)
-        vbox.addLayout(hboxCS02)
-        vbox.addLayout(hboxCS03)
+        vbox.addLayout(gridWF) 
         vbox.addStretch(1)     
         vbox.addLayout(hboxC)
 
         self.setLayout(vbox)
 
         self.connect(self.butClose,            QtCore.SIGNAL('clicked()'),         self.processClose )
+        self.connect(self.butCSOptions,        QtCore.SIGNAL('clicked()'),         self.processCSOptions )
+        self.connect(self.butIMOptions,        QtCore.SIGNAL('clicked()'),         self.processIMOptions )
+        self.connect(self.butWFOptions,        QtCore.SIGNAL('clicked()'),         self.processWFOptions )
 
         self.connect(self.cboxIMImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMImage)
         self.connect(self.cboxIMSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMSpectrum)
@@ -201,86 +154,34 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.connect(self.cboxWFImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFImage)
         self.connect(self.cboxWFSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFSpectrum)
 
-        self.connect(self.sliderIMAmin,        QtCore.SIGNAL('valueChanged(int)'), self.processSliderIMAmin )
-        self.connect(self.sliderIMAmax,        QtCore.SIGNAL('valueChanged(int)'), self.processSliderIMAmax )
-
-        self.connect(self.editIMImageAmin,     QtCore.SIGNAL('textEdited(const QString&)'), self.processEditIMImageAmin )
-        self.connect(self.editIMImageAmax,     QtCore.SIGNAL('textEdited(const QString&)'), self.processEditIMImageAmax )
-        self.connect(self.editIMSpectrumAmin,  QtCore.SIGNAL('textEdited(const QString&)'), self.processEditIMSpectrumAmin )
-        self.connect(self.editIMSpectrumAmax,  QtCore.SIGNAL('textEdited(const QString&)'), self.processEditIMSpectrumAmax )
-        self.connect(self.editIMSpectrumNbins, QtCore.SIGNAL('textEdited(const QString&)'), self.processEditIMSpectrumNbins )
-        self.connect(self.editIMAmpRange,      QtCore.SIGNAL('textEdited(const QString&)'), self.processEditIMAmplitudeRange )
-
-    def setAmplitudeRange(self, amplitudeRange):
-        self.sliderIMAmin.setRange(0,amplitudeRange)
-        self.sliderIMAmax.setRange(0,amplitudeRange)
-        #self.sliderIMAmin.setTickInterval(0.02*amplitudeRange)
-        #self.sliderIMAmax.setTickInterval(0.02*amplitudeRange)
 
     def closeEvent(self, event):
         print 'closeEvent'
         self.processClose()
+
 
     def processClose(self):
         print 'Close window'
         cp.confpars.wtdWindowIsOpen = False
         self.close()
 
-    def processEditIMAmplitudeRange(self):
-        print 'EditIMAmplitudeRange'
-        cp.confpars.imageAmplitudeRange = int(self.editIMAmpRange.displayText())
-        self.setAmplitudeRange(cp.confpars.imageAmplitudeRange)
+    def processCSOptions(self):
+        print 'CSOptions'
+        self.guiwtdCS = wtdCS.GUIWhatToDisplayForCSpad()
+        self.guiwtdCS.setParentWidget(self)
+        self.guiwtdCS.move(self.pos().__add__(QtCore.QPoint(20,40))) # open window with offset w.r.t. parent
+        #self.guiwtdCS.show()
 
-    def processEditIMImageAmin(self):
-        print 'EditIMImageAmin'
-        cp.confpars.imageImageAmin = int(self.editIMImageAmin.displayText())        
+    def processIMOptions(self):
+        print 'IMOptions'
+        self.guiwtdIM = wtdIM.GUIWhatToDisplayForImage()
+        self.guiwtdIM.setParentWidget(self)
+        self.guiwtdIM.move(self.pos().__add__(QtCore.QPoint(20,100))) # open window with offset w.r.t. parent
 
-    def processEditIMImageAmax(self):
-        print 'EditIMImageAmax'
-        cp.confpars.imageImageAmax = int(self.editIMImageAmax.displayText())        
-
-    def processEditIMSpectrumAmin(self):
-        print 'EditIMSpectrumAmin'
-        cp.confpars.imageSpectrumAmin = int(self.editIMSpectrumAmin.displayText())        
-        cp.confpars.imageSpectrumNbins = cp.confpars.imageSpectrumAmax - cp.confpars.imageSpectrumAmin
-        self.editIMSpectrumNbins.setText( str(cp.confpars.imageSpectrumNbins) )        
-
-    def processEditIMSpectrumAmax(self):
-        print 'EditIMSpectrumAmax'
-        cp.confpars.imageSpectrumAmax  = int(self.editIMSpectrumAmax.displayText())        
-        cp.confpars.imageSpectrumNbins = cp.confpars.imageSpectrumAmax - cp.confpars.imageSpectrumAmin
-        self.editIMSpectrumNbins.setText( str(cp.confpars.imageSpectrumNbins) )
+        #self.guiwtdIM.show()
         
-    def processEditIMSpectrumNbins(self):
-        print 'EditIMSpectrumNbins'
-        cp.confpars.imageSpectrumNbins = int(self.editIMSpectrumNbins.displayText())        
-
-    def processSliderIMAmin(self):
-        #print 'SliderIMAmin',
-        #print self.sliderIMAmin.value()
-        value = self.sliderIMAmin.value()
-        if value > cp.confpars.imageSpectrumAmax :
-            self.sliderIMAmax.setValue(value)
-        cp.confpars.imageImageAmax     = value
-        cp.confpars.imageSpectrumAmin  = value
-        cp.confpars.imageSpectrumNbins = cp.confpars.imageSpectrumAmax - value
-        self.editIMImageAmin    .setText( str(value) )
-        self.editIMSpectrumAmin .setText( str(value) )
-        self.editIMSpectrumNbins.setText( str(cp.confpars.imageSpectrumNbins) )
-
-    def processSliderIMAmax(self):
-        #print 'SliderIMAmax',
-        #print self.sliderIMAmax.value()
-        value = self.sliderIMAmax.value()
-        if value < cp.confpars.imageSpectrumAmin :
-            #self.sliderIMAmax.setValue(cp.confpars.imageSpectrumAmin)
-            self.sliderIMAmin.setValue(value)
-        cp.confpars.imageSpectrumAmax  = value
-        cp.confpars.imageImageAmax     = value
-        cp.confpars.imageSpectrumNbins = value - cp.confpars.imageSpectrumAmin
-        self.editIMImageAmax    .setText( str(value) )
-        self.editIMSpectrumAmax .setText( str(value) )
-        self.editIMSpectrumNbins.setText( str(cp.confpars.imageSpectrumNbins) )
+    def processWFOptions(self):
+        print 'WFOptions'
 
 
     def processCBoxIMImage(self, value):
