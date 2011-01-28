@@ -13,6 +13,9 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/thread/thread.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -22,10 +25,15 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/xtc/Dgram.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+namespace XtcInput {
+  class DgramQueue;
+}
+
 
 //		---------------------
 // 		-- Class Interface --
@@ -65,11 +73,19 @@ public:
   virtual void endJob(Env& env);
 
 protected:
+  
+  // Fill event with datagram contents
+  void fillEvent(const boost::shared_ptr<Pds::Dgram>& dg, Event& evt);
+  
+  // Fill environment with datagram contents
+  void fillEnv(const boost::shared_ptr<Pds::Dgram>& dg, Env& env);
 
 private:
 
   // Data members
-
+  boost::scoped_ptr<XtcInput::DgramQueue> m_dgQueue;
+  boost::shared_ptr<Pds::Dgram> m_putBack;
+  boost::scoped_ptr<boost::thread> m_readerThread;
 };
 
 } // namespace PsXtcInput
