@@ -93,17 +93,17 @@ class ConfigParameters ( object ) :
 
 
         # Default parameters for CSpad plots
-        self.cspadAmplitudeRange= 500
+        self.cspadAmplitudeRange= 2000
 
         self.cspadImageIsOn     = True
-        self.cspadImageAmin     = 0    #  15
-        self.cspadImageAmax     = 100  #  45
+        self.cspadImageAmin     = 0   
+        self.cspadImageAmax     = 1000
 
         self.cspadSpectrumIsOn  = True
-        self.cspadSpectrumRange = None # (15,45)
-        self.cspadSpectrumAmin  = 0    #  15
-        self.cspadSpectrumAmax  = 100  #  45
-        self.cspadSpectrumNbins = 100  #  30
+        self.cspadSpectrumRange = None
+        self.cspadSpectrumAmin  = 0   
+        self.cspadSpectrumAmax  = 1000
+        self.cspadSpectrumNbins = 50
 
 
         # Default parameters for Image plots
@@ -117,7 +117,7 @@ class ConfigParameters ( object ) :
         self.imageSpectrumRange = None # (15,45)
         self.imageSpectrumAmin  = 0    #  15
         self.imageSpectrumAmax  = 100  #  45
-        self.imageSpectrumNbins = 100  #  30
+        self.imageSpectrumNbins = 50   #  30
 
 
         # Default parameters for Waveform plots

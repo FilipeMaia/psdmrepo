@@ -65,19 +65,32 @@ class PlotsForCSpad ( object ) :
     #-------------------
 
 
-    def plotCSpadV1( self, arr1ev, fig ):
+    def plotCSpadV1Image( self, arr1ev, fig ):
         """Plot 2d image from input array. V1 for run ~546, array for entire detector"""
         quad=2
         arr1quad = arr1ev[quad,...] 
-        self.plotCSpadQuad( arr1quad, fig )
+        self.plotCSpadQuadImage( arr1quad, fig )
 
+    def plotCSpadV1Spectrum( self, arr1ev, fig ):
+        """Plot 2d image from input array. V1 for run ~546, array for entire detector"""
+        quad=2
+        arr1quad = arr1ev[quad,...] 
+        #self.plotCSpadQuadSpectrum( arr1quad, fig )
+        self.plotCSpadQuad8SpectraOf2x1( arr1quad, fig )
 
-    def plotCSpadV2( self, arr1quad, fig ):
+    def plotCSpadV2Image( self, arr1quad, fig ):
         """Plot 2d image from input array. V2 for run ~900 contain array for quad 2"""
-        self.plotCSpadQuad( arr1quad, fig )
+        self.plotCSpadQuadImage( arr1quad, fig )
+
+
+    def plotCSpadV2Spectrum( self, arr1quad, fig ):
+        """Plot 2d image from input array. V2 for run ~900 contain array for quad 2"""
+        #self.plotCSpadQuadSpectrum( arr1quad, fig )
+        self.plotCSpadQuad8SpectraOf2x1( arr1quad, fig )
 
   
-    def plotCSpadQuad( self, arr1quad, fig ):
+
+    def plotCSpadQuadImage( self, arr1quad, fig ):
         """Plot 2d image from input array."""
 
         #print 'plot_CSpadQuad()'       
@@ -123,16 +136,32 @@ class PlotsForCSpad ( object ) :
                 plt.text(370, -10, str_event, fontsize=24)
 
 
-    def plotCSpadSpectrumV1( self, arr1ev, fig ):
-        """Plot 2d image from input array. V1 for run ~546, array for entire detector"""
-        quad=2
-        arr1quad = arr1ev[quad,...] 
-        self.plotCSpadQuadSpectrum( arr1quad, fig )
+    def plotCSpadQuad8SpectraOf2x1( self, arr1quad, fig ):
+        """Amplitude specra from 2d array."""
 
+        fig.canvas.set_window_title('CSpad Quad Specra of 2x1')
+        plt.clf() # clear plot
+        #plt.title('Spectra',color='r',fontsize=20)
+        fig.subplots_adjust(left=0.10, bottom=0.05, right=0.98, top=0.95, wspace=0.2, hspace=0.1)
+        
+        for pair in xrange(8): # loop for pair = 0,1,2,...,7
 
-    def plotCSpadSpectrumV2( self, arr1quad, fig ):
-        """Plot 2d image from input array. V2 for run ~900 contain array for quad 2"""
-        self.plotCSpadQuadSpectrum( arr1quad, fig )
+            asic1x2  = arr1quad[pair,...]
+            #print 'asic1x2.shape =', asic1x2.shape
+            arrdimX,arrdimY = asic1x2.shape
+            asic1d = asic1x2
+            #asic1d.shape = (1,arrdimX*arrdimY)
+            asic1d.resize(arrdimX*arrdimY)            
+            panel = 421+pair
+            plt.subplot(panel)
+            plt.hist(asic1d, bins=cp.confpars.cspadSpectrumNbins, range=(cp.confpars.cspadSpectrumAmin,cp.confpars.cspadSpectrumAmax))
+            pantit='ASIC ' + str(2*pair) + ', ' + str(2*pair+1)
+            ax = plt.gca()
+            plt.text(0.04,0.84,pantit,color='r',fontsize=20,transform = ax.transAxes)
+
+            if pair==0 :
+                str_event = 'Event ' + str(cp.confpars.eventCurrent)
+                plt.text(0.8,1.05,str_event,color='b',fontsize=24,transform = ax.transAxes)
 
 
     def plotCSpadQuadSpectrum( self, arr1quad, fig ):
@@ -160,6 +189,8 @@ class PlotsForCSpad ( object ) :
             panel = 421+pair
             plt.subplot(panel)
             plt.hist(asic1d, bins=50, range=(0,1000))
+            pantit='ASIC ' + str(2*pair) + ', ' + str(2*pair+1)
+            plt.title(pantit,color='r',fontsize=20) # pars like in class Text
                 
             #asics = hsplit(asic1x2,2)
 

@@ -102,20 +102,20 @@ class DrawEvent ( object ) :
                 print 'Draw plots for CSpad V1'
                 self.figNum += 1 
                 if cp.confpars.cspadImageIsOn : 
-                    self.plotsCSpad.plotCSpadV1(arr1ev,self.set_fig(4))
+                    self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(4))
                 self.figNum += 1 
                 if cp.confpars.cspadSpectrumIsOn : 
-                    self.plotsCSpad.plotCSpadSpectrumV1(arr1ev,self.set_fig(4))
+                    self.plotsCSpad.plotCSpadV1Spectrum(arr1ev,self.set_fig(4))
                 
             if dsname == self.dsnameCSpadV2 :
                 print 'Draw plots for CSpad V2'
                 arr1quad = arr1ev
                 self.figNum += 1 
                 if cp.confpars.cspadImageIsOn : 
-                    self.plotsCSpad.plotCSpadV2(arr1quad,self.set_fig(4))
+                    self.plotsCSpad.plotCSpadV2Image(arr1quad,self.set_fig(4))
                 self.figNum += 1 
                 if cp.confpars.cspadSpectrumIsOn : 
-                    self.plotsCSpad.plotCSpadSpectrumV2(arr1quad,self.set_fig(4))
+                    self.plotsCSpad.plotCSpadV2Spectrum(arr1quad,self.set_fig(4))
                 
             if item_last_name == 'image' :
                 self.figNum += 1 

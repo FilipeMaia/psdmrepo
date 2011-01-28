@@ -177,7 +177,6 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.guiwtdIM = wtdIM.GUIWhatToDisplayForImage()
         self.guiwtdIM.setParentWidget(self)
         self.guiwtdIM.move(self.pos().__add__(QtCore.QPoint(20,100))) # open window with offset w.r.t. parent
-
         #self.guiwtdIM.show()
         
     def processWFOptions(self):
@@ -187,30 +186,37 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
     def processCBoxIMImage(self, value):
         if self.cboxIMImage.isChecked():
             cp.confpars.imageImageIsOn = True
+            if cp.confpars.wtdIMWindowIsOpen : self.guiwtdIM.cboxIMImage.setCheckState(2)
         else:
             cp.confpars.imageImageIsOn = False
+            if cp.confpars.wtdIMWindowIsOpen : self.guiwtdIM.cboxIMImage.setCheckState(0)
 
 
     def processCBoxIMSpectrum(self, value):
         if self.cboxIMSpectrum.isChecked():
             cp.confpars.imageSpectrumIsOn = True
+            if cp.confpars.wtdIMWindowIsOpen : self.guiwtdIM.cboxIMSpectrum.setCheckState(2)
         else:
             cp.confpars.imageSpectrumIsOn = False
+            if cp.confpars.wtdIMWindowIsOpen : self.guiwtdIM.cboxIMSpectrum.setCheckState(0)
 
 
     def processCBoxCSImage(self, value):
         if self.cboxCSImage.isChecked():
             cp.confpars.cspadImageIsOn = True
+            if cp.confpars.wtdCSWindowIsOpen : self.guiwtdCS.cboxCSImage.setCheckState(2)
         else:
             cp.confpars.cspadImageIsOn = False
+            if cp.confpars.wtdCSWindowIsOpen : self.guiwtdCS.cboxCSImage.setCheckState(0)
 
 
     def processCBoxCSSpectrum(self, value):
         if self.cboxCSSpectrum.isChecked():
             cp.confpars.cspadSpectrumIsOn = True
+            if cp.confpars.wtdCSWindowIsOpen : self.guiwtdCS.cboxCSSpectrum.setCheckState(2)
         else:
             cp.confpars.cspadSpectrumIsOn = False
-
+            if cp.confpars.wtdCSWindowIsOpen : self.guiwtdCS.cboxCSSpectrum.setCheckState(0)
 
     def processCBoxWFImage(self, value):
         if self.cboxWFImage.isChecked():

@@ -207,14 +207,14 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
     def processEditCSSpectrumAmin(self):
         print 'EditCSSpectrumAmin'
         cp.confpars.cspadSpectrumAmin = int(self.editCSSpectrumAmin.displayText())        
-        cp.confpars.cspadSpectrumNbins = cp.confpars.cspadSpectrumAmax - cp.confpars.cspadSpectrumAmin
-        self.editCSSpectrumNbins.setText( str(cp.confpars.cspadSpectrumNbins) )        
+        #cp.confpars.cspadSpectrumNbins = cp.confpars.cspadSpectrumAmax - cp.confpars.cspadSpectrumAmin
+        #self.editCSSpectrumNbins.setText( str(cp.confpars.cspadSpectrumNbins) )        
 
     def processEditCSSpectrumAmax(self):
         print 'EditCSSpectrumAmax'
         cp.confpars.cspadSpectrumAmax  = int(self.editCSSpectrumAmax.displayText())        
-        cp.confpars.cspadSpectrumNbins = cp.confpars.cspadSpectrumAmax - cp.confpars.cspadSpectrumAmin
-        self.editCSSpectrumNbins.setText( str(cp.confpars.cspadSpectrumNbins) )
+        #cp.confpars.cspadSpectrumNbins = cp.confpars.cspadSpectrumAmax - cp.confpars.cspadSpectrumAmin
+        #self.editCSSpectrumNbins.setText( str(cp.confpars.cspadSpectrumNbins) )
         
     def processEditCSSpectrumNbins(self):
         print 'EditCSSpectrumNbins'
@@ -228,24 +228,23 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
             self.sliderCSAmax.setValue(value)
         cp.confpars.cspadImageAmax     = value
         cp.confpars.cspadSpectrumAmin  = value
-        cp.confpars.cspadSpectrumNbins = cp.confpars.cspadSpectrumAmax - value
+        #cp.confpars.cspadSpectrumNbins = cp.confpars.cspadSpectrumAmax - value
         self.editCSImageAmin    .setText( str(value) )
         self.editCSSpectrumAmin .setText( str(value) )
-        self.editCSSpectrumNbins.setText( str(cp.confpars.cspadSpectrumNbins) )
+        #self.editCSSpectrumNbins.setText( str(cp.confpars.cspadSpectrumNbins) )
 
     def processSliderCSAmax(self):
         #print 'SliderCSAmax',
         #print self.sliderIMAmax.value()
         value = self.sliderCSAmax.value()
         if value < cp.confpars.cspadSpectrumAmin :
-            #self.sliderCSAmax.setValue(cp.confpars.cspadSpectrumAmin)
             self.sliderCSAmin.setValue(value)
         cp.confpars.cspadSpectrumAmax  = value
         cp.confpars.cspadImageAmax     = value
-        cp.confpars.cspadSpectrumNbins = value - cp.confpars.cspadSpectrumAmin
+        #cp.confpars.cspadSpectrumNbins = value - cp.confpars.cspadSpectrumAmin
         self.editCSImageAmax    .setText( str(value) )
         self.editCSSpectrumAmax .setText( str(value) )
-        self.editCSSpectrumNbins.setText( str(cp.confpars.cspadSpectrumNbins) )
+        #self.editCSSpectrumNbins.setText( str(cp.confpars.cspadSpectrumNbins) )
 
 
     def processCBoxCSImage(self, value):

@@ -248,14 +248,14 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
     def processEditIMSpectrumAmin(self):
         print 'EditIMSpectrumAmin'
         cp.confpars.imageSpectrumAmin = int(self.editIMSpectrumAmin.displayText())        
-        cp.confpars.imageSpectrumNbins = cp.confpars.imageSpectrumAmax - cp.confpars.imageSpectrumAmin
-        self.editIMSpectrumNbins.setText( str(cp.confpars.imageSpectrumNbins) )        
+        #cp.confpars.imageSpectrumNbins = cp.confpars.imageSpectrumAmax - cp.confpars.imageSpectrumAmin
+        #self.editIMSpectrumNbins.setText( str(cp.confpars.imageSpectrumNbins) )        
 
     def processEditIMSpectrumAmax(self):
         print 'EditIMSpectrumAmax'
         cp.confpars.imageSpectrumAmax  = int(self.editIMSpectrumAmax.displayText())        
-        cp.confpars.imageSpectrumNbins = cp.confpars.imageSpectrumAmax - cp.confpars.imageSpectrumAmin
-        self.editIMSpectrumNbins.setText( str(cp.confpars.imageSpectrumNbins) )
+        #cp.confpars.imageSpectrumNbins = cp.confpars.imageSpectrumAmax - cp.confpars.imageSpectrumAmin
+        #self.editIMSpectrumNbins.setText( str(cp.confpars.imageSpectrumNbins) )
         
     def processEditIMSpectrumNbins(self):
         print 'EditIMSpectrumNbins'
@@ -269,24 +269,23 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
             self.sliderIMAmax.setValue(value)
         cp.confpars.imageImageAmax     = value
         cp.confpars.imageSpectrumAmin  = value
-        cp.confpars.imageSpectrumNbins = cp.confpars.imageSpectrumAmax - value
+        #cp.confpars.imageSpectrumNbins = cp.confpars.imageSpectrumAmax - value
         self.editIMImageAmin    .setText( str(value) )
         self.editIMSpectrumAmin .setText( str(value) )
-        self.editIMSpectrumNbins.setText( str(cp.confpars.imageSpectrumNbins) )
+        #self.editIMSpectrumNbins.setText( str(cp.confpars.imageSpectrumNbins) )
 
     def processSliderIMAmax(self):
         #print 'SliderIMAmax',
         #print self.sliderIMAmax.value()
         value = self.sliderIMAmax.value()
         if value < cp.confpars.imageSpectrumAmin :
-            #self.sliderIMAmax.setValue(cp.confpars.imageSpectrumAmin)
             self.sliderIMAmin.setValue(value)
         cp.confpars.imageSpectrumAmax  = value
         cp.confpars.imageImageAmax     = value
-        cp.confpars.imageSpectrumNbins = value - cp.confpars.imageSpectrumAmin
+        #cp.confpars.imageSpectrumNbins = value - cp.confpars.imageSpectrumAmin
         self.editIMImageAmax    .setText( str(value) )
         self.editIMSpectrumAmax .setText( str(value) )
-        self.editIMSpectrumNbins.setText( str(cp.confpars.imageSpectrumNbins) )
+        #self.editIMSpectrumNbins.setText( str(cp.confpars.imageSpectrumNbins) )
 
 
     def processCBoxIMImage(self, value):
