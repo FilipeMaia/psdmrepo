@@ -66,20 +66,14 @@ class PlotsForCSpad ( object ) :
 
 
     def plotCSpadV1( self, arr1ev, fig ):
-        """Plot 2d image from input array. V1 for run ~546
-
-        V1 contain array for entire detector. Currently we plat quad 2 only.
-        """
+        """Plot 2d image from input array. V1 for run ~546, array for entire detector"""
         quad=2
-        arr1quad = arr1ev[quad,...]      # V1 for run ~546
+        arr1quad = arr1ev[quad,...] 
         self.plotCSpadQuad( arr1quad, fig )
 
 
     def plotCSpadV2( self, arr1quad, fig ):
-        """Plot 2d image from input array.
-
-        V2 for run ~900 contain array for quad 2, which we plot directly.
-        """
+        """Plot 2d image from input array. V2 for run ~900 contain array for quad 2"""
         self.plotCSpadQuad( arr1quad, fig )
 
   
@@ -93,7 +87,7 @@ class PlotsForCSpad ( object ) :
         
         arrgap=zeros( (185,4) ) # make additional 2D-array of 0-s for the gap between two 1x1 pads
         
-        pair=7
+        #pair=7
         
         for pair in xrange(8): # loop for pair = 0,1,2,...,7
             #print 'pair=', pair
@@ -127,6 +121,70 @@ class PlotsForCSpad ( object ) :
                 str_event = 'Event ' + str(cp.confpars.eventCurrent)
                 #subp1.text(370, -10, str_event, fontsize=24)
                 plt.text(370, -10, str_event, fontsize=24)
+
+
+    def plotCSpadSpectrumV1( self, arr1ev, fig ):
+        """Plot 2d image from input array. V1 for run ~546, array for entire detector"""
+        quad=2
+        arr1quad = arr1ev[quad,...] 
+        self.plotCSpadQuadSpectrum( arr1quad, fig )
+
+
+    def plotCSpadSpectrumV2( self, arr1quad, fig ):
+        """Plot 2d image from input array. V2 for run ~900 contain array for quad 2"""
+        self.plotCSpadQuadSpectrum( arr1quad, fig )
+
+
+    def plotCSpadQuadSpectrum( self, arr1quad, fig ):
+        """Amplitude specra from 2d array."""
+
+        fig.canvas.set_window_title("CSpad quad spectra")
+        plt.clf() # clear plot
+
+        pantit='Specra, event ' + str(cp.confpars.eventCurrent)
+        plt.title(pantit,color='r',fontsize=20) # pars like in class Text
+        
+        for pair in xrange(8): # loop for pair = 0,1,2,...,7
+            #print 'pair=', pair
+        
+            asic1x2  = arr1quad[pair,...]
+            print 'asic1x2.shape =', asic1x2.shape
+
+            arrdimX,arrdimY = asic1x2.shape
+            #asic1d = asic1x2.resize(arrdimX*arrdimY)
+            asic1d = asic1x2
+            asic1d.shape = (1,arrdimX*arrdimY)
+            asic1d.resize(arrdimX*arrdimY) 
+            
+            print 'asic1d =\n',asic1d
+            panel = 421+pair
+            plt.subplot(panel)
+            plt.hist(asic1d, bins=50, range=(0,1000))
+                
+            #asics = hsplit(asic1x2,2)
+
+            #for inpair in xrange(2) :
+                #asic = asics[inpair]
+                #print 'asic.shape =', asic.shape
+                #arrdimX,arrdimY = asic.shape
+                #asic1d = asic.resize(arrdimX*arrdimY)
+                #asic1d = asic.resize(arrdimX*arrdimY)
+                #print asic1d
+
+
+                #panel = 441+pair+inpair
+                #plt.subplot(panel)
+
+                #plt.hist(asic, bins=50, range=(0,1000))
+
+                #pantit='ASIC ' + str(2*pair) + ', ' + str(2*pair+1)
+                #plt.title(pantit,color='r',fontsize=20) # pars like in class Text
+
+                #if pair==0 :
+                #    str_event = 'Event ' + str(cp.confpars.eventCurrent)
+                #    plt.text(370, -10, str_event, fontsize=24)
+
+
         
 #
 #  In case someone decides to run this module

@@ -68,7 +68,7 @@ class PlotsForImage ( object ) :
         fig.canvas.set_window_title("Image") 
         plt.clf() # clear plot
         
-        pantit='Image'
+        pantit='Image, event ' + str(cp.confpars.eventCurrent)
         plt.imshow(arr2d1ev, origin='upper', interpolation='nearest') # Just a histogram
         plt.title(pantit,color='r',fontsize=20) # pars like in class Text
         plt.xlabel('X pixels')
@@ -77,18 +77,20 @@ class PlotsForImage ( object ) :
         #plt.margins(x=0.05,y=0.05,tight=True)
         #plt.rc('lines', linewidth=2, color='r') # Set the current default parameters
         
-        str_event = 'Event ' + str(cp.confpars.eventCurrent)
-        plt.text(-50, -10, str_event, fontsize=24)
+        #str_event = 'Event ' + str(cp.confpars.eventCurrent)
+        #plt.text(-50, -10, str_event, fontsize=24)
 
         #plt.savefig("my-image-hdf5.png")
         #plt.show()        
 
 
     def plotImageSpectrum( self, arr2d1ev, fig ):
+        """Spectrum of amplitudes in the 2d input array."""
 
         plt.clf() # clear plot
         fig.canvas.set_window_title('Specrum') 
-        plt.title('As a histogram',color='r',fontsize=20) # pars like in class Text
+        pantit='Specrum, event ' + str(cp.confpars.eventCurrent)
+        plt.title(pantit,color='r',fontsize=20) # pars like in class Text
         arrdimX,arrdimY = arr2d1ev.shape
         #print 'arr2d1ev.shape=', arr2d1ev.shape, arrdimX, arrdimY 
         print 'arr2d1ev=\n', arr2d1ev
@@ -96,8 +98,14 @@ class PlotsForImage ( object ) :
         arr1d1ev.resize(arrdimX*arrdimY)
         print 'arr1d1ev=\n', arr1d1ev
         #plt.hist(arr1d1ev,100)
-        plt.hist(arr1d1ev, bins=30, range=(15,45))
 
+        cp.confpars.imageSpectrumRange=(15,45)
+        #cp.confpars.imageSpectrumNbins=30       
+        #cp.confpars.imageSpectrumRange=None        
+        #cp.confpars.imageSpectrumNbins=None        
+        plt.hist(arr1d1ev, bins=cp.confpars.imageSpectrumNbins, range=(cp.confpars.imageSpectrumAmin,cp.confpars.imageSpectrumAmax))
+        #plt.hist(arr1d1ev)
+        
 #--------------------------------
 #  In case someone decides to run this module
 #

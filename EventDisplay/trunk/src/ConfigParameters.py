@@ -83,9 +83,30 @@ class ConfigParameters ( object ) :
 
         self.h5_file_is_open    = False
         self.wtdWindowIsOpen    = False
+        self.treeWindowIsOpen   = False
         self.treeViewIsExpanded = False
         self.configGUIIsOpen    = False
 
+
+        # Default parameters for CSpad plots
+        self.cspadImageIsOn     = True
+        self.cspadSpectrumIsOn  = True
+
+        # Default parameters for Image plots
+        self.imageAmplitudeRange= 500
+        self.imageImageIsOn     = True
+        self.imageImageAmin     = 15   #  15
+        self.imageImageAmax     = 45   #  45
+
+        self.imageSpectrumIsOn  = True
+        self.imageSpectrumRange = None # (15,45)
+        self.imageSpectrumAmin  = 15   #  15
+        self.imageSpectrumAmax  = 45   #  45
+        self.imageSpectrumNbins = 30   #  30
+
+        # Default parameters for Waveform plots
+        self.waveformImageIsOn    = True
+        self.waveformSpectrumIsOn = True
 
     #-------------------
     #  Public methods --

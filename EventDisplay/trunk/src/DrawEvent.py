@@ -100,19 +100,39 @@ class DrawEvent ( object ) :
 
             if dsname == self.dsnameCSpadV1 :
                 print 'Draw plots for CSpad V1'
-                self.plotsCSpad.plotCSpadV1(arr1ev,self.set_fig(4))
-
+                self.figNum += 1 
+                if cp.confpars.cspadImageIsOn : 
+                    self.plotsCSpad.plotCSpadV1(arr1ev,self.set_fig(4))
+                self.figNum += 1 
+                if cp.confpars.cspadSpectrumIsOn : 
+                    self.plotsCSpad.plotCSpadSpectrumV1(arr1ev,self.set_fig(4))
+                
             if dsname == self.dsnameCSpadV2 :
                 print 'Draw plots for CSpad V2'
                 arr1quad = arr1ev
-                self.plotsCSpad.plotCSpadV2(arr1quad,self.set_fig(4))
+                self.figNum += 1 
+                if cp.confpars.cspadImageIsOn : 
+                    self.plotsCSpad.plotCSpadV2(arr1quad,self.set_fig(4))
+                self.figNum += 1 
+                if cp.confpars.cspadSpectrumIsOn : 
+                    self.plotsCSpad.plotCSpadSpectrumV2(arr1quad,self.set_fig(4))
                 
             if item_last_name == 'image' :
-                self.plotsImage.plotImage(arr1ev,self.set_fig(1))
-                self.plotsImage.plotImageSpectrum(arr1ev,self.set_fig(1))
+                self.figNum += 1 
+                if cp.confpars.imageImageIsOn : 
+                    self.plotsImage.plotImage(arr1ev,self.set_fig(1))
+                self.figNum += 1 
+                if cp.confpars.imageSpectrumIsOn : 
+                    self.plotsImage.plotImageSpectrum(arr1ev,self.set_fig(1))
 
             if item_last_name == 'waveform' :
                 print 'Here should be an emplementation of stuff for waveform'
+                self.figNum += 1 
+                if cp.confpars.waveformImageIsOn : 
+                    pass
+                self.figNum += 1 
+                if cp.confpars.waveformSpectrumIsOn : 
+                    pass
 
         self.fig_window_is_open = True
 
@@ -162,7 +182,7 @@ class DrawEvent ( object ) :
 
     def set_fig( self, type=None ):
         """Set current fig."""
-        self.figNum += 1 
+        #self.figNum += 1 
         if self.fig_window_is_open :
             self.fig = plt.figure(num=self.figNum)        
         else :
