@@ -31,6 +31,7 @@ __version__ = "$Revision: 4 $"
 import sys
 import h5py    # access to hdf5 file structure
 from numpy import *  # for use like       array(...)
+import time
 
 import matplotlib
 matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
@@ -142,10 +143,13 @@ class DrawEvent ( object ) :
 
     def showEvent ( self, mode=1 ) :
         """showEvent: plt.show() or draw() depending on mode"""
+
+        t_start = time.clock()
         if mode == 1 :   # Single event mode
             plt.show()  
         else :           # Slide show 
             plt.draw()   # Draws, but does not block
+        print 'Time to show/draw (sec) = %f' % (time.clock() - t_start)
 
 
     def stopDrawEvent ( self ) :

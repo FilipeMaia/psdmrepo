@@ -30,7 +30,7 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 import sys
 import matplotlib.pyplot as plt
-#import time   # for sleep(sec)
+import time
 from numpy import *  # for use like       array(...)
 
 #-----------------------------
@@ -64,19 +64,20 @@ class PlotsForCSpad ( object ) :
     #  Public methods --
     #-------------------
 
-
     def plotCSpadV1Image( self, arr1ev, fig ):
         """Plot 2d image from input array. V1 for run ~546, array for entire detector"""
         quad=2
         arr1quad = arr1ev[quad,...] 
         self.plotCSpadQuadImage( arr1quad, fig )
 
+
     def plotCSpadV1Spectrum( self, arr1ev, fig ):
         """Plot 2d image from input array. V1 for run ~546, array for entire detector"""
         quad=2
         arr1quad = arr1ev[quad,...] 
-        #self.plotCSpadQuadSpectrum( arr1quad, fig )
-        self.plotCSpadQuad8SpectraOf2x1( arr1quad, fig )
+        #self.plotCSpadQuad8SpectraOf2x1( arr1quad, fig )
+        self.plotCSpadQuad16Spectra( arr1quad, fig )
+
 
     def plotCSpadV2Image( self, arr1quad, fig ):
         """Plot 2d image from input array. V2 for run ~900 contain array for quad 2"""
@@ -89,7 +90,6 @@ class PlotsForCSpad ( object ) :
         self.plotCSpadQuad8SpectraOf2x1( arr1quad, fig )
 
   
-
     def plotCSpadQuadImage( self, arr1quad, fig ):
         """Plot 2d image from input array."""
 
@@ -143,17 +143,22 @@ class PlotsForCSpad ( object ) :
         plt.clf() # clear plot
         #plt.title('Spectra',color='r',fontsize=20)
         fig.subplots_adjust(left=0.10, bottom=0.05, right=0.98, top=0.95, wspace=0.2, hspace=0.1)
+
+        t_start = time.clock()
         
         for pair in xrange(8): # loop for pair = 0,1,2,...,7
+
+            #print 20*'=',' Pair =', pair
 
             asic1x2  = arr1quad[pair,...]
             #print 'asic1x2.shape =', asic1x2.shape
             arrdimX,arrdimY = asic1x2.shape
             asic1d = asic1x2
-            #asic1d.shape = (1,arrdimX*arrdimY)
+
+            #asic1d.shape=(arrdimX*arrdimY,1)  
             asic1d.resize(arrdimX*arrdimY)            
-            panel = 421+pair
-            plt.subplot(panel)
+
+            plt.subplot(421+pair)
             plt.hist(asic1d, bins=cp.confpars.cspadSpectrumNbins, range=(cp.confpars.cspadSpectrumAmin,cp.confpars.cspadSpectrumAmax))
             pantit='ASIC ' + str(2*pair) + ', ' + str(2*pair+1)
             ax = plt.gca()
@@ -163,60 +168,49 @@ class PlotsForCSpad ( object ) :
                 str_event = 'Event ' + str(cp.confpars.eventCurrent)
                 plt.text(0.8,1.05,str_event,color='b',fontsize=24,transform = ax.transAxes)
 
+        print 'Time to generate all histograms (sec) = %f' % (time.clock() - t_start)
 
-    def plotCSpadQuadSpectrum( self, arr1quad, fig ):
+
+    def plotCSpadQuad16Spectra( self, arr1quad, fig ):
         """Amplitude specra from 2d array."""
 
-        fig.canvas.set_window_title("CSpad quad spectra")
+        fig.canvas.set_window_title('CSpad Quad Specra of 2x1')
         plt.clf() # clear plot
+        #plt.title('Spectra',color='r',fontsize=20)
+        fig.subplots_adjust(left=0.10, bottom=0.05, right=0.98, top=0.95, wspace=0.35, hspace=0.3)
 
-        pantit='Specra, event ' + str(cp.confpars.eventCurrent)
-        plt.title(pantit,color='r',fontsize=20) # pars like in class Text
+        t_start = time.clock()
         
         for pair in xrange(8): # loop for pair = 0,1,2,...,7
-            #print 'pair=', pair
-        
+            #print 20*'=',' Pair =', pair
             asic1x2  = arr1quad[pair,...]
-            print 'asic1x2.shape =', asic1x2.shape
-
+            #print 'asic1x2.shape =', asic1x2.shape
             arrdimX,arrdimY = asic1x2.shape
-            #asic1d = asic1x2.resize(arrdimX*arrdimY)
             asic1d = asic1x2
-            asic1d.shape = (1,arrdimX*arrdimY)
-            asic1d.resize(arrdimX*arrdimY) 
+            #print 'asic1d.shape =', asic1d.shape
+            #asic1d.shape=(arrdimX*arrdimY,1)  
+            asic1d.resize(arrdimX*arrdimY)            
             
-            print 'asic1d =\n',asic1d
-            panel = 421+pair
-            plt.subplot(panel)
-            plt.hist(asic1d, bins=50, range=(0,1000))
-            pantit='ASIC ' + str(2*pair) + ', ' + str(2*pair+1)
-            plt.title(pantit,color='r',fontsize=20) # pars like in class Text
-                
-            #asics = hsplit(asic1x2,2)
+            asics=hsplit(asic1d,2)
 
-            #for inpair in xrange(2) :
-                #asic = asics[inpair]
+            for inpair in xrange(2) :
+                asic = asics[inpair]
                 #print 'asic.shape =', asic.shape
-                #arrdimX,arrdimY = asic.shape
-                #asic1d = asic.resize(arrdimX*arrdimY)
-                #asic1d = asic.resize(arrdimX*arrdimY)
-                #print asic1d
+                plt.subplot(4,4,2*pair+inpair+1)
+                #plt.xticks( arange(4), rotation=17 )
+                #plt.yticks( arange(4) )
+                plt.hist(asic, bins=50, range=(0,1000))
 
+                pantit='ASIC ' + str(2*pair+inpair)
+                plt.title(pantit,color='r',fontsize=20)
 
-                #panel = 441+pair+inpair
-                #plt.subplot(panel)
+                if pair==0 and inpair==1:
+                    str_event = 'Event ' + str(cp.confpars.eventCurrent)
+                    #ax = plt.gca()
+                    plt.text(0.8,1.08,str_event,color='b',fontsize=24,transform = plt.gca().transAxes)
 
-                #plt.hist(asic, bins=50, range=(0,1000))
+        print 'Time to generate all histograms (sec) = %f' % (time.clock() - t_start)
 
-                #pantit='ASIC ' + str(2*pair) + ', ' + str(2*pair+1)
-                #plt.title(pantit,color='r',fontsize=20) # pars like in class Text
-
-                #if pair==0 :
-                #    str_event = 'Event ' + str(cp.confpars.eventCurrent)
-                #    plt.text(370, -10, str_event, fontsize=24)
-
-
-        
 #
 #  In case someone decides to run this module
 #
