@@ -20,7 +20,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include <stdexcept>
+#include "ErrSvc/Issue.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -47,13 +47,15 @@
  *  @author Andrei Salnikov
  */
 
-namespace PsXtcInput {
+namespace PSXtcInput {
 
-class Exception : public std::runtime_error {
+class Exception : public ErrSvc::Issue {
 public:
 
   // Constructor
-  Exception ( const std::string& className, const std::string& what ) ;
+  Exception ( const ErrSvc::Context& ctx, 
+              const std::string& className, 
+              const std::string& what ) ;
 
 };
 
@@ -61,8 +63,8 @@ public:
 class EmptyFileList : public Exception {
 public:
 
-  EmptyFileList()
-    : Exception( "EmptyFileList", "No input file names specified" ) {}
+  EmptyFileList(const ErrSvc::Context& ctx)
+    : Exception( ctx, "EmptyFileList", "No input file names specified" ) {}
 
 };
 
@@ -70,11 +72,11 @@ public:
 class EmptyInput : public Exception {
 public:
 
-  EmptyInput()
-    : Exception( "EmptyInput", "XTC file(s) is empty" ) {}
+  EmptyInput(const ErrSvc::Context& ctx)
+    : Exception( ctx, "EmptyInput", "XTC file(s) is empty" ) {}
 
 };
 
-} // namespace PsXtcInput
+} // namespace PSXtcInput
 
 #endif // PSXTCINPUT_EXCEPTIONS_H

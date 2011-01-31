@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "PsXtcInput/Exceptions.h"
+#include "PSXtcInput/Exceptions.h"
 
 //-----------------
 // C/C++ Headers --
@@ -31,14 +31,16 @@
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
 
-namespace PsXtcInput {
+namespace PSXtcInput {
 
 //----------------
 // Constructors --
 //----------------
-Exception::Exception (const std::string& className, const std::string& what)
-  : std::runtime_error(className+": "+what)
+Exception::Exception (const ErrSvc::Context& ctx, 
+                      const std::string& className, 
+                      const std::string& what)
+  : ErrSvc::Issue(ctx, className+": "+what)
 {
 }
 
-} // namespace PsXtcInput
+} // namespace PSXtcInput

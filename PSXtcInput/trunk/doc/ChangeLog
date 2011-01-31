@@ -3,13 +3,18 @@
 #  $Id$
 #
 # Description:
-#  ChangeLog file for package PsXtcInput
+#  ChangeLog file for package PSXtcInput
 #------------------------------------------------------------------------
 
 Package author: Andy Salnikov
 
 Please describe any modifications that you made to the package in the
 reverse time order.
+
+Tag: V00-00-04
+2011-01-31 Andy Salnikov
+- renamed this package to PSXtcInput
+- use ErrSvc::Issue for exceptions' base class
 
 Tag: V00-00-03
 2011-01-27 Andy Salnikov

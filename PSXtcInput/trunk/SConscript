@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  SConscript file for package PsXtcInput
+#  SConscript file for package PSXtcInput
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 

@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "PsXtcInput/XtcInputModule.h"
+#include "PSXtcInput/XtcInputModule.h"
 
 //-----------------
 // C/C++ Headers --
@@ -25,7 +25,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
-#include "PsXtcInput/Exceptions.h"
+#include "PSXtcInput/Exceptions.h"
 #include "XtcInput/DgramQueue.h"
 #include "XtcInput/DgramReader.h"
 #include "XtcInput/XtcFileName.h"
@@ -38,7 +38,7 @@
 
 using namespace XtcInput;
 
-using namespace PsXtcInput;
+using namespace PSXtcInput;
 PSANA_INPUT_MODULE_FACTORY(XtcInputModule)
 
 namespace {
@@ -51,7 +51,7 @@ namespace {
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
 
-namespace PsXtcInput {
+namespace PSXtcInput {
 
 //----------------
 // Constructors --
@@ -86,7 +86,7 @@ XtcInputModule::beginJob(Env& env)
   // will throw if no files were defined in config
   std::list<std::string> fileNames = configList("files");
   if ( fileNames.empty() ) {
-    throw EmptyFileList();
+    throw EmptyFileList(ERR_LOC);
   }
   
   std::list<XtcInput::XtcFileName> files ;
@@ -110,7 +110,7 @@ XtcInputModule::beginJob(Env& env)
   boost::shared_ptr<Pds::Dgram> dg(m_dgQueue->pop());
   if (not dg.get()) {
     // Nothing there at all, this is unexpected
-    throw EmptyInput();
+    throw EmptyInput(ERR_LOC);
   }
   
   if ( dg->seq.service() != Pds::TransitionId::Configure ) {
@@ -241,4 +241,4 @@ XtcInputModule::fillEnv(const boost::shared_ptr<Pds::Dgram>& dg, Env& env)
 
 }
 
-} // namespace PsXtcInput
+} // namespace PSXtcInput

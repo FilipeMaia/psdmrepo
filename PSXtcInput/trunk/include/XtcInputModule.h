@@ -39,7 +39,7 @@ namespace XtcInput {
 // 		-- Class Interface --
 //		---------------------
 
-namespace PsXtcInput {
+namespace PSXtcInput {
 
 /**
  *  @brief PSANA module for reading XTC files.
@@ -88,6 +88,6 @@ private:
   boost::scoped_ptr<boost::thread> m_readerThread;
 };
 
-} // namespace PsXtcInput
+} // namespace PSXtcInput
 
 #endif // PSXTCINPUT_XTCINPUTMODULE_H
