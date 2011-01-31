@@ -32,6 +32,7 @@ import sys
 import matplotlib.pyplot as plt
 import time
 from numpy import *  # for use like       array(...)
+import numpy as np
 
 #-----------------------------
 # Imports for other modules --
@@ -70,26 +71,23 @@ class PlotsForCSpad ( object ) :
         arr1quad = arr1ev[quad,...] 
         self.plotCSpadQuadImage( arr1quad, fig )
 
-
-    def plotCSpadV1Spectrum( self, arr1ev, fig ):
-        """Plot 2d image from input array. V1 for run ~546, array for entire detector"""
-        quad=2
-        arr1quad = arr1ev[quad,...] 
-        #self.plotCSpadQuad8SpectraOf2x1( arr1quad, fig )
-        self.plotCSpadQuad16Spectra( arr1quad, fig )
-
-
     def plotCSpadV2Image( self, arr1quad, fig ):
         """Plot 2d image from input array. V2 for run ~900 contain array for quad 2"""
         self.plotCSpadQuadImage( arr1quad, fig )
 
 
-    def plotCSpadV2Spectrum( self, arr1quad, fig ):
-        """Plot 2d image from input array. V2 for run ~900 contain array for quad 2"""
-        #self.plotCSpadQuadSpectrum( arr1quad, fig )
-        self.plotCSpadQuad8SpectraOf2x1( arr1quad, fig )
+    def plotCSpadV1Spectrum( self, arr1ev, fig, plot=16 ):
+        """Plot 2d image from input array. V1 for run ~546, array for entire detector"""
+        quad=2
+        arr1quad = arr1ev[quad,...] 
+        if plot ==  8 : self.plotCSpadQuad8SpectraOf2x1( arr1quad, fig )
+        if plot == 16 : self.plotCSpadQuad16Spectra( arr1quad, fig )
 
-  
+    def plotCSpadV2Spectrum( self, arr1quad, fig, plot=16 ):
+        """Plot 2d image from input array. V2 for run ~900 contain array for quad 2"""
+        if plot ==  8 : self.plotCSpadQuad8SpectraOf2x1( arr1quad, fig )
+        if plot == 16 : self.plotCSpadQuadSpectrum( arr1quad, fig )
+
     def plotCSpadQuadImage( self, arr1quad, fig ):
         """Plot 2d image from input array."""
 
@@ -160,6 +158,12 @@ class PlotsForCSpad ( object ) :
 
             plt.subplot(421+pair)
             plt.hist(asic1d, bins=cp.confpars.cspadSpectrumNbins, range=(cp.confpars.cspadSpectrumAmin,cp.confpars.cspadSpectrumAmax))
+
+            xmin, xmax = plt.xlim()
+            plt.xticks( arange(int(xmin), int(xmax), int((xmax-xmin)/3)) )
+            ymin, ymax = plt.ylim()
+            plt.yticks( arange(int(ymin), int(ymax), int((ymax-ymin)/3)) )
+
             pantit='ASIC ' + str(2*pair) + ', ' + str(2*pair+1)
             ax = plt.gca()
             plt.text(0.04,0.84,pantit,color='r',fontsize=20,transform = ax.transAxes)
@@ -199,7 +203,15 @@ class PlotsForCSpad ( object ) :
                 plt.subplot(4,4,2*pair+inpair+1)
                 #plt.xticks( arange(4), rotation=17 )
                 #plt.yticks( arange(4) )
-                plt.hist(asic, bins=50, range=(0,1000))
+                #plt.hist(asic, bins=50, range=(0,1000))
+                Amin  = cp.confpars.cspadSpectrumAmin
+                Amax  = cp.confpars.cspadSpectrumAmax
+                plt.hist(asic, bins=cp.confpars.cspadSpectrumNbins,range=(Amin,Amax))
+
+                xmin, xmax = plt.xlim()
+                plt.xticks( arange(int(xmin), int(xmax), int((xmax-xmin)/3)) )
+                ymin, ymax = plt.ylim()
+                plt.yticks( arange(int(ymin), int(ymax), int((ymax-ymin)/3)) )
 
                 pantit='ASIC ' + str(2*pair+inpair)
                 plt.title(pantit,color='r',fontsize=20)

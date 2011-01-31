@@ -67,10 +67,18 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         self.setGeometry(370, 350, 500, 150)
         self.setWindowTitle('Adjust Image Parameters')
 
-        titFont = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
-        self.titImage    = QtGui.QLabel('Image')
-        #self.titCSpad    = QtGui.QLabel('SCpad')
-        #self.titWaveform = QtGui.QLabel('Waveform')
+        titFont12 = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
+        titFont10 = QtGui.QFont("Sans Serif", 10, QtGui.QFont.Bold)
+
+        #self.titWaveform        = QtGui.QLabel('Waveform')
+        self.titImage            = QtGui.QLabel('Image')
+        self.titIMImage          = QtGui.QLabel('Image plot')
+        self.titIMSpectrum       = QtGui.QLabel('Spectrum')
+
+        #self.titWaveform  .setFont (titFont12) 
+        self.titImage      .setFont (titFont12) 
+        self.titIMImage    .setFont (titFont10)   
+        self.titIMSpectrum .setFont (titFont10)
 
         self.titIMImageAmin      = QtGui.QLabel('Amin:')
         self.titIMImageAmax      = QtGui.QLabel('Amax:')
@@ -94,23 +102,14 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         self.editIMAmpRange      = QtGui.QLineEdit(str(cp.confpars.imageAmplitudeRange))
         self.editIMAmpRange      .setMaximumWidth(50)
 
-        self.titImage   .setFont (titFont) 
-        #self.titCSpad   .setFont (titFont) 
-        #self.titWaveform.setFont (titFont) 
-
-        self.cboxIMImage    = QtGui.QCheckBox('Image',    self)
-        self.cboxIMSpectrum = QtGui.QCheckBox('Spectrum', self)
-
-        #self.cboxCSImage    = QtGui.QCheckBox('Image',    self)
-        #self.cboxCSSpectrum = QtGui.QCheckBox('Spectrum', self)
+        #self.cboxIMImage    = QtGui.QCheckBox('Image',    self)
+        #self.cboxIMSpectrum = QtGui.QCheckBox('Spectrum', self)
 
         #self.cboxWFImage    = QtGui.QCheckBox('Image',    self)
         #self.cboxWFSpectrum = QtGui.QCheckBox('Spectrum', self)
 
-        if cp.confpars.imageImageIsOn       : self.cboxIMImage   .setCheckState(2)
-        if cp.confpars.imageSpectrumIsOn    : self.cboxIMSpectrum.setCheckState(2)
-        #if cp.confpars.cspadImageIsOn       : self.cboxCSImage   .setCheckState(2)
-        #if cp.confpars.cspadSpectrumIsOn    : self.cboxCSSpectrum.setCheckState(2)
+        #if cp.confpars.imageImageIsOn       : self.cboxIMImage   .setCheckState(2)
+        #if cp.confpars.imageSpectrumIsOn    : self.cboxIMSpectrum.setCheckState(2)
         #if cp.confpars.waveformImageIsOn    : self.cboxWFImage   .setCheckState(1)
         #if cp.confpars.waveformSpectrumIsOn : self.cboxWFSpectrum.setCheckState(1)
 
@@ -138,13 +137,15 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         hboxIM02.addWidget(self.sliderIMAmax)        
 
         gridIM = QtGui.QGridLayout()
-        gridIM.addWidget(self.cboxIMImage,     0, 0)
+       #gridIM.addWidget(self.cboxIMImage,     0, 0)
+        gridIM.addWidget(self.titIMImage,      0, 0)
         gridIM.addWidget(self.titIMImageAmin,  0, 1)
         gridIM.addWidget(self.editIMImageAmin, 0, 2)
         gridIM.addWidget(self.titIMImageAmax,  0, 3)
         gridIM.addWidget(self.editIMImageAmax, 0, 4)
         
-        gridIM.addWidget(self.cboxIMSpectrum,      1, 0)
+       #gridIM.addWidget(self.cboxIMSpectrum,      1, 0)
+        gridIM.addWidget(self.titIMSpectrum,       1, 0)
         gridIM.addWidget(self.titIMSpectrumAmin,   1, 1)
         gridIM.addWidget(self.editIMSpectrumAmin,  1, 2)
         gridIM.addWidget(self.titIMSpectrumAmax,   1, 3)
@@ -191,10 +192,8 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
 
         self.connect(self.butClose,            QtCore.SIGNAL('clicked()'),         self.processClose )
 
-        self.connect(self.cboxIMImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMImage)
-        self.connect(self.cboxIMSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMSpectrum)
-        #self.connect(self.cboxCSImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSImage)
-        #self.connect(self.cboxCSSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSSpectrum)
+        #self.connect(self.cboxIMImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMImage)
+        #self.connect(self.cboxIMSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMSpectrum)
         #self.connect(self.cboxWFImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFImage)
         #self.connect(self.cboxWFSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFSpectrum)
 
@@ -291,33 +290,19 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
     def processCBoxIMImage(self, value):
         if self.cboxIMImage.isChecked():
             cp.confpars.imageImageIsOn = True
-            self.parentWidget.cboxIMImage   .setCheckState(2)
+            #self.parentWidget.cboxIMImage   .setCheckState(2)
         else:
             cp.confpars.imageImageIsOn = False
-            self.parentWidget.cboxIMImage   .setCheckState(0)
+            #self.parentWidget.cboxIMImage   .setCheckState(0)
 
 
     def processCBoxIMSpectrum(self, value):
         if self.cboxIMSpectrum.isChecked():
             cp.confpars.imageSpectrumIsOn = True
-            self.parentWidget.cboxIMSpectrum.setCheckState(2)
+            #self.parentWidget.cboxIMSpectrum.setCheckState(2)
         else:
             cp.confpars.imageSpectrumIsOn = False
-            self.parentWidget.cboxIMSpectrum.setCheckState(0)
-
-
-    #def processCBoxCSImage(self, value):
-    #    if self.cboxCSImage.isChecked():
-    #        cp.confpars.cspadImageIsOn = True
-    #    else:
-    #        cp.confpars.cspadImageIsOn = False
-
-
-    #def processCBoxCSSpectrum(self, value):
-    #    if self.cboxCSSpectrum.isChecked():
-    #        cp.confpars.cspadSpectrumIsOn = True
-    #    else:
-    #        cp.confpars.cspadSpectrumIsOn = False
+            #self.parentWidget.cboxIMSpectrum.setCheckState(0)
 
 
     #def processCBoxWFImage(self, value):

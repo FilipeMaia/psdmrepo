@@ -100,6 +100,7 @@ class ConfigParameters ( object ) :
         self.cspadImageAmax     = 1000
 
         self.cspadSpectrumIsOn  = True
+        self.cspadSpectrum08IsOn= False
         self.cspadSpectrumRange = None
         self.cspadSpectrumAmin  = 0   
         self.cspadSpectrumAmax  = 1000
@@ -140,6 +141,7 @@ class ConfigParameters ( object ) :
 
         print 'CSPAD_IMAGE_IS_ON', self.cspadImageIsOn       
         print 'CSPAD_SPECT_IS_ON', self.cspadSpectrumIsOn    
+        print 'CSPAD_SPE08_IS_ON', self.cspadSpectrum08IsOn    
         print 'IMAGE_IMAGE_IS_ON', self.imageImageIsOn       
         print 'IMAGE_SPECT_IS_ON', self.imageSpectrumIsOn    
         print 'WAVEF_IMAGE_IS_ON', self.waveformImageIsOn    
@@ -166,6 +168,7 @@ class ConfigParameters ( object ) :
                 elif key == 'SPAN'              : self.span = int(val)
                 elif key == 'CSPAD_IMAGE_IS_ON' : self.cspadImageIsOn       = dicBool[val.lower()]
                 elif key == 'CSPAD_SPECT_IS_ON' : self.cspadSpectrumIsOn    = dicBool[val.lower()]
+                elif key == 'CSPAD_SPE08_IS_ON' : self.cspadSpectrum08IsOn  = dicBool[val.lower()]
                 elif key == 'IMAGE_IMAGE_IS_ON' : self.imageImageIsOn       = dicBool[val.lower()]
                 elif key == 'IMAGE_SPECT_IS_ON' : self.imageSpectrumIsOn    = dicBool[val.lower()]
                 elif key == 'WAVEF_IMAGE_IS_ON' : self.waveformImageIsOn    = dicBool[val.lower()]
@@ -191,6 +194,7 @@ class ConfigParameters ( object ) :
         f.write('SPAN'              + space + str(self.span)                + '\n')
         f.write('CSPAD_IMAGE_IS_ON' + space + str(self.cspadImageIsOn)      + '\n')
         f.write('CSPAD_SPECT_IS_ON' + space + str(self.cspadSpectrumIsOn)   + '\n')
+        f.write('CSPAD_SPE08_IS_ON' + space + str(self.cspadSpectrum08IsOn) + '\n')
         f.write('IMAGE_IMAGE_IS_ON' + space + str(self.imageImageIsOn)      + '\n')
         f.write('IMAGE_SPECT_IS_ON' + space + str(self.imageSpectrumIsOn)   + '\n')
         f.write('WAVEF_IMAGE_IS_ON' + space + str(self.waveformImageIsOn)   + '\n')

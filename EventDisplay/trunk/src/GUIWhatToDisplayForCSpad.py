@@ -67,8 +67,16 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.setGeometry(370, 350, 500, 150)
         self.setWindowTitle('Adjust CSpad Parameters')
 
-        titFont = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
-        self.titCSpad    = QtGui.QLabel('SCpad')
+        titFont12 = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
+        titFont10 = QtGui.QFont("Sans Serif", 10, QtGui.QFont.Bold)
+
+        self.titCSpad            = QtGui.QLabel('SCpad')
+        self.titCSImage          = QtGui.QLabel('Image plot')
+        self.titCSSpectrum       = QtGui.QLabel('Spectrum')
+
+        self.titCSpad      .setFont (titFont12) 
+        self.titCSImage    .setFont (titFont10)   
+        self.titCSSpectrum .setFont (titFont10)
 
         self.titCSImageAmin      = QtGui.QLabel('Amin:')
         self.titCSImageAmax      = QtGui.QLabel('Amax:')
@@ -92,13 +100,11 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.editCSAmpRange      = QtGui.QLineEdit(str(cp.confpars.cspadAmplitudeRange))
         self.editCSAmpRange      .setMaximumWidth(50)
 
-        self.titCSpad   .setFont (titFont) 
+        #self.cboxCSImage    = QtGui.QCheckBox('Image',    self)
+        #self.cboxCSSpectrum = QtGui.QCheckBox('Spectrum', self)
 
-        self.cboxCSImage    = QtGui.QCheckBox('Image',    self)
-        self.cboxCSSpectrum = QtGui.QCheckBox('Spectrum', self)
-
-        if cp.confpars.cspadImageIsOn       : self.cboxCSImage   .setCheckState(2)
-        if cp.confpars.cspadSpectrumIsOn    : self.cboxCSSpectrum.setCheckState(2)
+        #if cp.confpars.cspadImageIsOn       : self.cboxCSImage   .setCheckState(2)
+        #if cp.confpars.cspadSpectrumIsOn    : self.cboxCSSpectrum.setCheckState(2)
 
         #self.cb.setFocusPolicy(QtCore.Qt.NoFocus) 
         #self.cb2.move(10, 50)
@@ -124,13 +130,15 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         hboxCS02.addWidget(self.sliderCSAmax)        
 
         gridCS = QtGui.QGridLayout()
-        gridCS.addWidget(self.cboxCSImage,     0, 0)
+       #gridCS.addWidget(self.cboxCSImage,     0, 0)
+        gridCS.addWidget(self.titCSImage,      0, 0)
         gridCS.addWidget(self.titCSImageAmin,  0, 1)
         gridCS.addWidget(self.editCSImageAmin, 0, 2)
         gridCS.addWidget(self.titCSImageAmax,  0, 3)
         gridCS.addWidget(self.editCSImageAmax, 0, 4)
         
-        gridCS.addWidget(self.cboxCSSpectrum,      1, 0)
+       #gridCS.addWidget(self.cboxCSSpectrum,      1, 0)
+        gridCS.addWidget(self.titCSSpectrum,       1, 0)
         gridCS.addWidget(self.titCSSpectrumAmin,   1, 1)
         gridCS.addWidget(self.editCSSpectrumAmin,  1, 2)
         gridCS.addWidget(self.titCSSpectrumAmax,   1, 3)
@@ -155,8 +163,8 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
 
         self.connect(self.butClose,            QtCore.SIGNAL('clicked()'),         self.processClose )
 
-        self.connect(self.cboxCSImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSImage)
-        self.connect(self.cboxCSSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSSpectrum)
+        #self.connect(self.cboxCSImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSImage)
+        #self.connect(self.cboxCSSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSSpectrum)
 
         self.connect(self.sliderCSAmin,        QtCore.SIGNAL('valueChanged(int)'), self.processSliderCSAmin )
         self.connect(self.sliderCSAmax,        QtCore.SIGNAL('valueChanged(int)'), self.processSliderCSAmax )
@@ -250,19 +258,19 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
     def processCBoxCSImage(self, value):
         if self.cboxCSImage.isChecked():
             cp.confpars.cspadImageIsOn = True
-            self.parentWidget.cboxCSImage   .setCheckState(2)
+            #self.parentWidget.cboxCSImage   .setCheckState(2)
         else:
             cp.confpars.cspadImageIsOn = False
-            self.parentWidget.cboxCSImage   .setCheckState(0)
+            #self.parentWidget.cboxCSImage   .setCheckState(0)
 
 
     def processCBoxCSSpectrum(self, value):
         if self.cboxCSSpectrum.isChecked():
             cp.confpars.cspadSpectrumIsOn = True
-            self.parentWidget.cboxCSSpectrum.setCheckState(2)
+            #self.parentWidget.cboxCSSpectrum.setCheckState(2)
         else:
             cp.confpars.cspadSpectrumIsOn = False
-            self.parentWidget.cboxCSSpectrum.setCheckState(0)
+            #self.parentWidget.cboxCSSpectrum.setCheckState(0)
 
 
 #    def paintEvent(self, e):

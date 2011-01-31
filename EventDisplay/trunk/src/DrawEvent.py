@@ -66,6 +66,7 @@ class DrawEvent ( object ) :
         self.plotsCSpad             = cspad.PlotsForCSpad()
         self.plotsImage             = image.PlotsForImage()
         self.fig_window_is_open     = False 
+        self.list_of_open_figs      = []
 
         # CSpad V1 for runs ~546,547...
         self.dsnameCSpadV1 = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV1/XppGon.0:Cspad.0/data"
@@ -104,9 +105,20 @@ class DrawEvent ( object ) :
                 self.figNum += 1 
                 if cp.confpars.cspadImageIsOn : 
                     self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(4))
+                else :
+                    self.close_fig(self.figNum)
+
                 self.figNum += 1 
                 if cp.confpars.cspadSpectrumIsOn : 
-                    self.plotsCSpad.plotCSpadV1Spectrum(arr1ev,self.set_fig(4))
+                    self.plotsCSpad.plotCSpadV1Spectrum(arr1ev,self.set_fig(4),plot=16)
+                else :
+                    self.close_fig(self.figNum)
+
+                self.figNum += 1 
+                if cp.confpars.cspadSpectrum08IsOn : 
+                    self.plotsCSpad.plotCSpadV1Spectrum(arr1ev,self.set_fig(4),plot=8)
+                else :
+                    self.close_fig(self.figNum)
                 
             if dsname == self.dsnameCSpadV2 :
                 print 'Draw plots for CSpad V2'
@@ -116,7 +128,10 @@ class DrawEvent ( object ) :
                     self.plotsCSpad.plotCSpadV2Image(arr1quad,self.set_fig(4))
                 self.figNum += 1 
                 if cp.confpars.cspadSpectrumIsOn : 
-                    self.plotsCSpad.plotCSpadV2Spectrum(arr1quad,self.set_fig(4))
+                    self.plotsCSpad.plotCSpadV2Spectrum(arr1quad,self.set_fig(4),plot=16)
+                self.figNum += 1 
+                if cp.confpars.cspadSpectrum08IsOn : 
+                    self.plotsCSpad.plotCSpadV2Spectrum(arr1quad,self.set_fig(4),plot=8)
                 
             if item_last_name == 'image' :
                 self.figNum += 1 
@@ -186,12 +201,15 @@ class DrawEvent ( object ) :
 
     def set_fig( self, type=None ):
         """Set current fig."""
-        #self.figNum += 1 
-        if self.fig_window_is_open :
+
+        ##self.figNum += 1 
+        #if self.fig_window_is_open :
+        if self.figNum in self.list_of_open_figs :
             self.fig = plt.figure(num=self.figNum)        
         else :
             self.fig = self.open_fig(type)
             self.set_window_position()
+            self.list_of_open_figs.append(self.figNum)
         return self.fig
 
                
@@ -219,8 +237,13 @@ class DrawEvent ( object ) :
         fig_QMainWindow.move(820+50*self.figNum, 20*(self.figNum-1)) #### This works!
 
 
-    def close_fig( self ):
+    def close_fig( self, figNum=None ):
         """Close fig and its window."""
+        if figNum==None :
+            plt.close('all') # closes all the figure windows
+        else :
+            plt.close(figNum)
+            if figNum in self.list_of_open_figs : self.list_of_open_figs.remove(figNum)
 
         if  self.fig_window_is_open :
             self.fig_window_is_open = False 
