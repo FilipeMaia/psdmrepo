@@ -26,7 +26,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "pdsdata/xtc/DetInfo.hh"
-#include "PsEvt/ProxyI.h"
+#include "PSEvt/ProxyI.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -36,7 +36,7 @@
 // 		-- Class Interface --
 //		---------------------
 
-namespace PsEvt {
+namespace PSEvt {
 
 /**
  *  @brief Interface for shared 
@@ -176,6 +176,6 @@ private:
 
 };
 
-} // namespace PsEvt
+} // namespace PSEvt
 
 #endif // PSEVT_PROXYDICTI_H

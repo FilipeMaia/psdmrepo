@@ -19,7 +19,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "PsEvt/ProxyI.h"
+#include "PSEvt/ProxyI.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -29,7 +29,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-namespace PsEvt {
+namespace PSEvt {
   class ProxyDictI;
 }
 
@@ -37,7 +37,7 @@ namespace PsEvt {
 // 		-- Class Interface --
 //		---------------------
 
-namespace PsEvt {
+namespace PSEvt {
 
 /**
  *  @brief Interface class for type-save proxy classes. 
@@ -100,6 +100,6 @@ private:
   // Data members
 };
 
-} // namespace PsEvt
+} // namespace PSEvt
 
 #endif // PSEVT_PROXY_H

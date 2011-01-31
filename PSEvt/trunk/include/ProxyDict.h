@@ -21,7 +21,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "PsEvt/ProxyDictI.h"
+#include "PSEvt/ProxyDictI.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -36,7 +36,7 @@
 // 		-- Class Interface --
 //		---------------------
 
-namespace PsEvt {
+namespace PSEvt {
 
 /**
  *  @brief Implementation of the proxy dictionary interface.
@@ -137,6 +137,6 @@ private:
 
 };
 
-} // namespace PsEvt
+} // namespace PSEvt
 
 #endif // PSEVT_PROXYDICT_H

@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "PsEvt/ProxyDict.h"
+#include "PSEvt/ProxyDict.h"
 
 //-----------------
 // C/C++ Headers --
@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "PsEvt/Exceptions.h"
+#include "PSEvt/Exceptions.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -32,7 +32,7 @@
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
 
-namespace PsEvt {
+namespace PSEvt {
 
 //----------------
 // Constructors --
@@ -60,7 +60,7 @@ ProxyDict::putImpl( const boost::shared_ptr<ProxyI>& proxy,
   // there should not be existing key
   Dict::iterator it = m_dict.find(proxyKey);
   if ( it != m_dict.end() ) {
-    throw ExceptionDuplicateKey(typeinfo, detInfo, key);
+    throw ExceptionDuplicateKey(ERR_LOC, typeinfo, detInfo, key);
   }
 
   m_dict.insert(Dict::value_type(proxyKey, proxy));
@@ -100,4 +100,4 @@ ProxyDict::removeImpl( const std::type_info* typeinfo,
   return m_dict.erase(proxyKey) > 0;
 }
 
-} // namespace PsEvt
+} // namespace PSEvt

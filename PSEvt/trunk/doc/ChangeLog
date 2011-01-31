@@ -3,13 +3,18 @@
 #  $Id$
 #
 # Description:
-#  ChangeLog file for package PsEvt
+#  ChangeLog file for package PSEvt
 #------------------------------------------------------------------------
 
 Package author: Andy Salnikov
 
 Please describe any modifications that you made to the package in the
 reverse time order.
+
+Tag: V00-00-02
+2011-01-31 Andy Salnikov
+- renamed the package to PSEvt
+- use ErrSvc::Issue for exceptions' base class
 
 Tag: V00-00-01
 2011-01-26 Andy Salnikov

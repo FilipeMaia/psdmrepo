@@ -14,12 +14,12 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "PsEvt/Event.h"
-#include "PsEvt/Exceptions.h"
-#include "PsEvt/ProxyDict.h"
+#include "PSEvt/Event.h"
+#include "PSEvt/Exceptions.h"
+#include "PSEvt/ProxyDict.h"
 #include "pdsdata/xtc/DetInfo.hh"
 
-using namespace PsEvt ;
+using namespace PSEvt ;
 
 #define BOOST_TEST_MODULE psevt-unit-test
 #include <boost/test/included/unit_test.hpp>

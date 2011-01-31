@@ -19,7 +19,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "PsEvt/Proxy.h"
+#include "PSEvt/Proxy.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -29,7 +29,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-namespace PsEvt {
+namespace PSEvt {
   class ProxyDictI;
 }
 
@@ -37,7 +37,7 @@ namespace PsEvt {
 // 		-- Class Interface --
 //		---------------------
 
-namespace PsEvt {
+namespace PSEvt {
 
 /**
  *  @brief Implementation of proxy object which keeps a pointer to real object
@@ -85,6 +85,6 @@ private:
   boost::shared_ptr<T> m_data;
 };
 
-} // namespace PsEvt
+} // namespace PSEvt
 
 #endif // PSEVT_DATAPROXY_H

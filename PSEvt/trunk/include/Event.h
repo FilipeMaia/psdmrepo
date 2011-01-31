@@ -25,9 +25,9 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "PsEvt/Proxy.h"
-#include "PsEvt/DataProxy.h"
-#include "PsEvt/ProxyDictI.h"
+#include "PSEvt/Proxy.h"
+#include "PSEvt/DataProxy.h"
+#include "PSEvt/ProxyDictI.h"
 #include "pdsdata/xtc/DetInfo.hh"
 
 //------------------------------------
@@ -38,7 +38,7 @@
 // 		-- Class Interface --
 //		---------------------
 
-namespace PsEvt {
+namespace PSEvt {
 
 /**
  *  Class representing event data in psana,
@@ -217,6 +217,6 @@ private:
 
 };
 
-} // namespace PsEvt
+} // namespace PSEvt
 
 #endif // PSEVT_EVENT_H

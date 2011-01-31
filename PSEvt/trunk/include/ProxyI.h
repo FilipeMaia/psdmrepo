@@ -29,7 +29,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-namespace PsEvt {
+namespace PSEvt {
   class ProxyDictI;
 }
 
@@ -37,7 +37,7 @@ namespace PsEvt {
 // 		-- Class Interface --
 //		---------------------
 
-namespace PsEvt {
+namespace PSEvt {
 
 /**
  *  @brief Base class for all proxies.
@@ -106,6 +106,6 @@ private:
 
 };
 
-} // namespace PsEvt
+} // namespace PSEvt
 
 #endif // PSEVT_PROXYI_H

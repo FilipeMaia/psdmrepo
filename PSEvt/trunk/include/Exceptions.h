@@ -13,11 +13,11 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <stdexcept>
 
 //----------------------
 // Base Class Headers --
 //----------------------
+#include "ErrSvc/Issue.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -32,10 +32,10 @@
 // 		-- Class Interface --
 //		---------------------
 
-namespace PsEvt {
+namespace PSEvt {
 
 /**
- *  @brief Exception classes for PsEvt package.
+ *  @brief Exception classes for PSEvt package.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -47,11 +47,11 @@ namespace PsEvt {
  *  @author Andrei Salnikov
  */
 
-class Exception : public std::runtime_error {
+class Exception : public ErrSvc::Issue {
 public:
 
   /// Constructor takes the reason for an exception
-  Exception ( const std::string& what ) ;
+  Exception ( const ErrSvc::Context& ctx, const std::string& what ) ;
 
 };
 
@@ -59,12 +59,13 @@ public:
 class ExceptionDuplicateKey : public Exception {
 public:
 
-  ExceptionDuplicateKey ( const std::type_info* typeinfo, 
+  ExceptionDuplicateKey ( const ErrSvc::Context& ctx, 
+                          const std::type_info* typeinfo, 
                           const Pds::DetInfo& detInfo, 
                           const std::string& key ) ;
 
 };
 
-} // namespace PsEvt
+} // namespace PSEvt
 
 #endif // PSEVT_EXCEPTIONS_H

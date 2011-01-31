@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  SConscript file for package PsEvt
+#  SConscript file for package PSEvt
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 

@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "PsEvt/Exceptions.h"
+#include "PSEvt/Exceptions.h"
 
 //-----------------
 // C/C++ Headers --
@@ -32,19 +32,20 @@
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
 
-namespace PsEvt {
+namespace PSEvt {
 
-Exception::Exception( const std::string& what )
-  : std::runtime_error( "PsEvt::Exception: " + what )
+Exception::Exception( const ErrSvc::Context& ctx, const std::string& what )
+  : ErrSvc::Issue( ctx, "PSEvt::Exception: " + what )
 {
 }
 
-ExceptionDuplicateKey::ExceptionDuplicateKey ( const std::type_info* typeinfo, 
+ExceptionDuplicateKey::ExceptionDuplicateKey ( const ErrSvc::Context& ctx, 
+                                               const std::type_info* typeinfo, 
                                                const Pds::DetInfo& detInfo, 
                                                const std::string& key ) 
-  : Exception( "duplicate key: " + std::string(typeinfo->name()) + ":" + 
+  : Exception( ctx, "duplicate key: " + std::string(typeinfo->name()) + ":" + 
                Pds::DetInfo::name(detInfo) + ":" + key)
 {  
 }
 
-} // namespace PsEvt
+} // namespace PSEvt
