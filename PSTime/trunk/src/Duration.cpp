@@ -9,13 +9,11 @@
 //      Mikhail S. Dubrovin
 //
 //------------------------------------------------------------------------
-#include "SITConfig/SITConfig.h"
 
 //-----------------------
 // This Class's Header --
 //-----------------------
 #include "PSTime/Duration.h"
-#include "PSTime/TimeConstants.h"
 
 //-----------------
 // C/C++ Headers --
@@ -28,7 +26,13 @@ using std::cout;
 using std::ostream;
 using std::setw;
 
+namespace {
 
+  // number of nanoseconds in a second
+  const uint32_t nsecInASec = 1000000000U;
+
+}  
+  
 namespace PSTime {
 
 //----------------
@@ -46,11 +50,11 @@ Duration::Duration( const Duration & d ) : m_sec( d.m_sec ), m_nsec( d.m_nsec )
 
 Duration::Duration( time_t sec, time_t nsec ) 
 {
-    if ( nsec >= TimeConstants::s_nsecInASec )
+    if ( nsec >= ::nsecInASec )
         {
             // carry over nanoseconds into seconds
-	    time_t extraSec   = nsec / TimeConstants::s_nsecInASec;
-            time_t remainNsec = nsec % TimeConstants::s_nsecInASec;
+	    time_t extraSec   = nsec / ::nsecInASec;
+            time_t remainNsec = nsec % ::nsecInASec;
             sec              += extraSec;
             nsec              = remainNsec;
         }
@@ -106,7 +110,7 @@ Duration Duration::operator - ( const Duration & d1 ) const
     if ( d2Nsec < d1Nsec )
         {
             // borrow a second from d2Sec
-            d2Nsec += TimeConstants::s_nsecInASec;
+            d2Nsec += ::nsecInASec;
             d2Sec--;
         }
 
@@ -124,11 +128,11 @@ Duration Duration::operator + ( const Duration & d1 ) const
     time_t totalSec  = m_sec  + d1.m_sec;
     time_t totalNsec = m_nsec + d1.m_nsec;
 
-    if ( totalNsec >= TimeConstants::s_nsecInASec )
+    if ( totalNsec >= ::nsecInASec )
         {
             // carry nanoseconds over into seconds
-            time_t extraSec   = totalNsec / TimeConstants::s_nsecInASec;
-            time_t remainNsec = totalNsec % TimeConstants::s_nsecInASec;
+            time_t extraSec   = totalNsec / ::nsecInASec;
+            time_t remainNsec = totalNsec % ::nsecInASec;
             totalSec         += extraSec;
             totalNsec         = remainNsec;
         }
@@ -154,11 +158,11 @@ Duration & Duration::operator += ( const Duration & d1 )
     time_t totalSec  = m_sec  + d1.m_sec;
     time_t totalNsec = m_nsec + d1.m_nsec;
 
-    if ( totalNsec >= TimeConstants::s_nsecInASec )
+    if ( totalNsec >= ::nsecInASec )
         {
             // carry nanoseconds over into seconds
-            time_t  extraSec   = totalNsec / TimeConstants::s_nsecInASec;
-            time_t  remainNsec = totalNsec % TimeConstants::s_nsecInASec;
+            time_t  extraSec   = totalNsec / ::nsecInASec;
+            time_t  remainNsec = totalNsec % ::nsecInASec;
             totalSec          += extraSec;
             totalNsec          = remainNsec;
         }

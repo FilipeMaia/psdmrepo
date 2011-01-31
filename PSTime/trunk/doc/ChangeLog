@@ -11,11 +11,20 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2011-01-31 Andy Salnikov
+- Lots of changes to time class
+- moved parsing/formating to separate file/namespace TimeFormat (copied
+  over from LusiTime package).
+- new file/namespace TimeUtils for various non-member methods, now
+  contains only timegm() methods (forwarded to ::timegm() or 
+  optionally implemented locally)
+- many methods in Time class renamed to be more user-friendly
+- many Time methods were removed to clean up interface
+
+Tag: V00-00-02
+2011-01-27 Andy Salnikov
+- moved test to test directory
+
 Tag: V00-00-01
 2010-10-21 Mikhail S. Dubrovin
-- just created this template file, this entry is an example of the change log
-  entry
-- keep it brief and easy to read
-- always include author name and date of the change, provide CVS tag when 
-  appropriate
-
