@@ -3,13 +3,17 @@
 #  $Id$
 #
 # Description:
-#  ChangeLog file for package PsEnv
+#  ChangeLog file for package PSEnv
 #------------------------------------------------------------------------
 
 Package author: Andy Salnikov
 
 Please describe any modifications that you made to the package in the
 reverse time order.
+
+Tag: V00-00-02
+2011-01-31 Andy Salnikov
+- renamed this package to PSEnv
 
 Tag: V00-00-01
 2011-01-26 Andy Salnikov

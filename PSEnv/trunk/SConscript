@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  SConscript file for package PsEnv
+#  SConscript file for package PSEnv
 #------------------------------------------------------------------------
 
 # Do not delete following line, it must be present in 

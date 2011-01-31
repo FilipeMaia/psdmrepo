@@ -31,7 +31,7 @@
 // 		-- Class Interface --
 //		---------------------
 
-namespace PsEnv {
+namespace PSEnv {
 
 /**
  *  @brief Class representing an environment object for psana jobs.
@@ -63,6 +63,6 @@ private:
 
 };
 
-} // namespace PsEnv
+} // namespace PSEnv
 
 #endif // PSENV_ENV_H

@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "PsEnv/Env.h"
+#include "PSEnv/Env.h"
 
 //-----------------
 // C/C++ Headers --
@@ -31,7 +31,7 @@
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
 
-namespace PsEnv {
+namespace PSEnv {
 
 //----------------
 // Constructors --
@@ -48,4 +48,4 @@ Env::~Env ()
 {
 }
 
-} // namespace PsEnv
+} // namespace PSEnv
