@@ -72,8 +72,8 @@ class DrawEvent ( object ) :
         self.dsnameCSpadV1 = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV1/XppGon.0:Cspad.0/data"
 
         # CSpad V2 for runs ~900
-        self.dsnameCSpadV2 = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data"
-
+        self.dsnameCSpadV2    = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data"
+        self.dsnameCSpadV2CXI = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data"
 
     #-------------------
     #  Public methods --
@@ -102,53 +102,64 @@ class DrawEvent ( object ) :
 
             if dsname == self.dsnameCSpadV1 :
                 print 'Draw plots for CSpad V1'
+
                 self.figNum += 1 
                 if cp.confpars.cspadImageIsOn : 
                     self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(4))
-                else :
-                    self.close_fig(self.figNum)
+                else : self.close_fig(self.figNum)
 
                 self.figNum += 1 
                 if cp.confpars.cspadSpectrumIsOn : 
                     self.plotsCSpad.plotCSpadV1Spectrum(arr1ev,self.set_fig(4),plot=16)
-                else :
-                    self.close_fig(self.figNum)
+                else : self.close_fig(self.figNum)
 
                 self.figNum += 1 
                 if cp.confpars.cspadSpectrum08IsOn : 
                     self.plotsCSpad.plotCSpadV1Spectrum(arr1ev,self.set_fig(4),plot=8)
-                else :
-                    self.close_fig(self.figNum)
+                else : self.close_fig(self.figNum)
                 
-            if dsname == self.dsnameCSpadV2 :
+            if dsname == self.dsnameCSpadV2 or dsname == self.dsnameCSpadV2CXI :
                 print 'Draw plots for CSpad V2'
                 arr1quad = arr1ev
+
                 self.figNum += 1 
                 if cp.confpars.cspadImageIsOn : 
                     self.plotsCSpad.plotCSpadV2Image(arr1quad,self.set_fig(4))
+                else : self.close_fig(self.figNum)
+
                 self.figNum += 1 
                 if cp.confpars.cspadSpectrumIsOn : 
                     self.plotsCSpad.plotCSpadV2Spectrum(arr1quad,self.set_fig(4),plot=16)
+                else : self.close_fig(self.figNum)
+
                 self.figNum += 1 
                 if cp.confpars.cspadSpectrum08IsOn : 
                     self.plotsCSpad.plotCSpadV2Spectrum(arr1quad,self.set_fig(4),plot=8)
+                else : self.close_fig(self.figNum)
                 
             if item_last_name == 'image' :
                 self.figNum += 1 
                 if cp.confpars.imageImageIsOn : 
                     self.plotsImage.plotImage(arr1ev,self.set_fig(1))
+                else : self.close_fig(self.figNum)
+
                 self.figNum += 1 
                 if cp.confpars.imageSpectrumIsOn : 
                     self.plotsImage.plotImageSpectrum(arr1ev,self.set_fig(1))
+                else : self.close_fig(self.figNum)
 
             if item_last_name == 'waveform' :
                 print 'Here should be an emplementation of stuff for waveform'
+
                 self.figNum += 1 
                 if cp.confpars.waveformImageIsOn : 
                     pass
+                else : self.close_fig(self.figNum)
+
                 self.figNum += 1 
                 if cp.confpars.waveformSpectrumIsOn : 
                     pass
+                else : self.close_fig(self.figNum)
 
         self.fig_window_is_open = True
 

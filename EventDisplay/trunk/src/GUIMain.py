@@ -85,6 +85,8 @@ class GUIMain ( QtGui.QWidget ) :
         self.resetColorIsSet = False
 
         cp.confpars.readParameters()
+        if not cp.confpars.readParsFromFileAtStart :
+            cp.confpars.setDefaultParameters()
         cp.confpars.Print()
         print 'Current event number directly : %d ' % (cp.confpars.eventCurrent)
 
@@ -222,6 +224,10 @@ class GUIMain ( QtGui.QWidget ) :
         self.connect(self.selection, QtCore.SIGNAL('clicked()'), self.processSelection )
         self.connect(self.spaninc,   QtCore.SIGNAL('clicked()'), self.processSpaninc )
         self.connect(self.spandec,   QtCore.SIGNAL('clicked()'), self.processSpandec )
+
+        self.connect(self.fileEdit,  QtCore.SIGNAL('editingFinished ()'), self.processFileEdit )
+        self.connect(self.numbEdit,  QtCore.SIGNAL('editingFinished ()'), self.processNumbEdit )
+        self.connect(self.spanEdit,  QtCore.SIGNAL('editingFinished ()'), self.processSpanEdit )
 
         #self.setFocus()
         #self.resize(500, 300)
@@ -439,6 +445,23 @@ class GUIMain ( QtGui.QWidget ) :
         print ' global x=%d, y=%d' % (event.globalX(),event.globalY())
         #self.emit(QtCore.SIGNAL('closeGUIApp()'))
 
+    def processFileEdit(self):
+        print 'FileEdit'
+        str_path_file = str(self.fileEdit.displayText())
+        cp.confpars.dirName,cp.confpars.fileName = os.path.split(str_path_file)
+        print 'Set dirName      : %s' % (cp.confpars.dirName)         
+        print 'Set fileName     : %s' % (cp.confpars.fileName)         
+                
+    def processNumbEdit(self):    
+        print 'NumbEdit'
+        cp.confpars.eventCurrent = int(self.numbEdit.displayText())
+        print 'Set eventCurrent : ', cp.confpars.eventCurrent        
+
+    def processSpanEdit(self):    
+        print 'SpanEdit'
+        cp.confpars.span = int(self.spanEdit.displayText())
+        print 'Set span         : ', cp.confpars.span
+
 #http://doc.qt.nokia.com/4.6/qt.html#Key-enum
     def keyPressEvent(self, event):
         print 'event.key() = %s' % (event.key())
@@ -451,14 +474,10 @@ class GUIMain ( QtGui.QWidget ) :
 
         if event.key() == QtCore.Qt.Key_Return:
             print 'event.key() = Return'
-            cp.confpars.span         = int(self.spanEdit.displayText())
-            cp.confpars.eventCurrent = int(self.numbEdit.displayText())
-            str_path_file            = str(self.fileEdit.displayText())
-            cp.confpars.dirName,cp.confpars.fileName = os.path.split(str_path_file)
-            print 'Set dirName      : %s' % (cp.confpars.dirName)         
-            print 'Set fileName     : %s' % (cp.confpars.fileName)         
-            print 'Set span         : ', cp.confpars.span 
-            print 'Set eventCurrent : ', cp.confpars.eventCurrent 
+
+            #self.processFileEdit()
+            #self.processNumbEdit()
+            #self.processSpanEdit()
             #self.currentEventNo()
 
         if event.key() == QtCore.Qt.Key_Home:

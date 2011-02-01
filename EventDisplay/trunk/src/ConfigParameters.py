@@ -61,10 +61,14 @@ class ConfigParameters ( object ) :
     #  Constructor --
     #----------------
     def __init__ ( self ) :
-        """Constructor.
+        """Constructor"""
+        self.setDefaultParameters()
 
-        Contains initial values of main configuration parameters        
-        """
+
+    def setDefaultParameters ( self ) :
+        """Set default configuration parameters hardwired in this module"""
+
+        print 'setDefaultParameters'
 
         # define default initial values of the configuration parameters
 
@@ -91,8 +95,10 @@ class ConfigParameters ( object ) :
         self.treeViewIsExpanded = False
         self.configGUIIsOpen    = False
 
+        self.readParsFromFileAtStart = True
 
         # Default parameters for CSpad plots
+        self.cspadAmplitudeRaMin= 0
         self.cspadAmplitudeRange= 2000
 
         self.cspadImageIsOn     = True
@@ -108,6 +114,7 @@ class ConfigParameters ( object ) :
 
 
         # Default parameters for Image plots
+        self.imageAmplitudeRaMin= 0
         self.imageAmplitudeRange= 500
 
         self.imageImageIsOn     = True
@@ -147,7 +154,7 @@ class ConfigParameters ( object ) :
         print 'WAVEF_IMAGE_IS_ON', self.waveformImageIsOn    
         print 'VAVEF_SPECT_IS_ON', self.waveformSpectrumIsOn 
 
-
+        print 'READ_PARS_AT_START',self.readParsFromFileAtStart
         print 70*'='
 
 
@@ -166,13 +173,14 @@ class ConfigParameters ( object ) :
                 elif key == 'ITEM_NAME'         : self.list_of_checked_item_names.append(val) 
                 elif key == 'CURRENT_EVENT'     : self.eventCurrent = int(val)
                 elif key == 'SPAN'              : self.span = int(val)
-                elif key == 'CSPAD_IMAGE_IS_ON' : self.cspadImageIsOn       = dicBool[val.lower()]
-                elif key == 'CSPAD_SPECT_IS_ON' : self.cspadSpectrumIsOn    = dicBool[val.lower()]
-                elif key == 'CSPAD_SPE08_IS_ON' : self.cspadSpectrum08IsOn  = dicBool[val.lower()]
-                elif key == 'IMAGE_IMAGE_IS_ON' : self.imageImageIsOn       = dicBool[val.lower()]
-                elif key == 'IMAGE_SPECT_IS_ON' : self.imageSpectrumIsOn    = dicBool[val.lower()]
-                elif key == 'WAVEF_IMAGE_IS_ON' : self.waveformImageIsOn    = dicBool[val.lower()]
-                elif key == 'VAVEF_SPECT_IS_ON' : self.waveformSpectrumIsOn = dicBool[val.lower()]
+                elif key == 'CSPAD_IMAGE_IS_ON' : self.cspadImageIsOn          = dicBool[val.lower()]
+                elif key == 'CSPAD_SPECT_IS_ON' : self.cspadSpectrumIsOn       = dicBool[val.lower()]
+                elif key == 'CSPAD_SPE08_IS_ON' : self.cspadSpectrum08IsOn     = dicBool[val.lower()]
+                elif key == 'IMAGE_IMAGE_IS_ON' : self.imageImageIsOn          = dicBool[val.lower()]
+                elif key == 'IMAGE_SPECT_IS_ON' : self.imageSpectrumIsOn       = dicBool[val.lower()]
+                elif key == 'WAVEF_IMAGE_IS_ON' : self.waveformImageIsOn       = dicBool[val.lower()]
+                elif key == 'VAVEF_SPECT_IS_ON' : self.waveformSpectrumIsOn    = dicBool[val.lower()]
+                elif key == 'READ_PARS_AT_START': self.readParsFromFileAtStart = dicBool[val.lower()]
 
                 else : print 'The record : %s %s \n is UNKNOWN in readParameters()' % (key, val) 
             f.close()
@@ -189,16 +197,18 @@ class ConfigParameters ( object ) :
         f.write('HDF5_FILE_NAME'    + space + self.dirName + '/' + self.fileName + '\n')
         f.write('N_CHECKED_ITEMS'   + space + str(len(self.list_of_checked_item_names)) + '\n')
         for name in self.list_of_checked_item_names :
-            f.write('ITEM_NAME'     + space + str(name)                     + '\n')
-        f.write('CURRENT_EVENT'     + space + str(self.eventCurrent)        + '\n')
-        f.write('SPAN'              + space + str(self.span)                + '\n')
-        f.write('CSPAD_IMAGE_IS_ON' + space + str(self.cspadImageIsOn)      + '\n')
-        f.write('CSPAD_SPECT_IS_ON' + space + str(self.cspadSpectrumIsOn)   + '\n')
-        f.write('CSPAD_SPE08_IS_ON' + space + str(self.cspadSpectrum08IsOn) + '\n')
-        f.write('IMAGE_IMAGE_IS_ON' + space + str(self.imageImageIsOn)      + '\n')
-        f.write('IMAGE_SPECT_IS_ON' + space + str(self.imageSpectrumIsOn)   + '\n')
-        f.write('WAVEF_IMAGE_IS_ON' + space + str(self.waveformImageIsOn)   + '\n')
-        f.write('VAVEF_SPECT_IS_ON' + space + str(self.waveformSpectrumIsOn)+ '\n')
+            f.write('ITEM_NAME'     + space + str(name)                         + '\n')
+        f.write('CURRENT_EVENT'     + space + str(self.eventCurrent)            + '\n')
+        f.write('SPAN'              + space + str(self.span)                    + '\n')
+        f.write('CSPAD_IMAGE_IS_ON' + space + str(self.cspadImageIsOn)          + '\n')
+        f.write('CSPAD_SPECT_IS_ON' + space + str(self.cspadSpectrumIsOn)       + '\n')
+        f.write('CSPAD_SPE08_IS_ON' + space + str(self.cspadSpectrum08IsOn)     + '\n')
+        f.write('IMAGE_IMAGE_IS_ON' + space + str(self.imageImageIsOn)          + '\n')
+        f.write('IMAGE_SPECT_IS_ON' + space + str(self.imageSpectrumIsOn)       + '\n')
+        f.write('WAVEF_IMAGE_IS_ON' + space + str(self.waveformImageIsOn)       + '\n')
+        f.write('VAVEF_SPECT_IS_ON' + space + str(self.waveformSpectrumIsOn)    + '\n')
+        f.write('READ_PARS_AT_START'+ space + str(self.readParsFromFileAtStart) + '\n')
+
         f.close()
 
 

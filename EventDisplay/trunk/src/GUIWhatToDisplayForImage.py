@@ -83,10 +83,11 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         self.titIMImageAmin      = QtGui.QLabel('Amin:')
         self.titIMImageAmax      = QtGui.QLabel('Amax:')
 
+        self.titIMAmpDash        = QtGui.QLabel('-')
         self.titIMSpectrumAmin   = QtGui.QLabel('Amin:')
         self.titIMSpectrumAmax   = QtGui.QLabel('Amax:')
         self.titIMSpectrumNbins  = QtGui.QLabel('N bins:')
-        self.titIMSpectrumAlim   = QtGui.QLabel('Slider range: 0 -')
+        self.titIMSpectrumAlim   = QtGui.QLabel('Slider range:')
 
         self.editIMImageAmin     = QtGui.QLineEdit(str(cp.confpars.imageImageAmin))
         self.editIMImageAmax     = QtGui.QLineEdit(str(cp.confpars.imageImageAmax))
@@ -99,7 +100,10 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         self.editIMSpectrumAmin  .setMaximumWidth(45)
         self.editIMSpectrumAmax  .setMaximumWidth(45)
         self.editIMSpectrumNbins .setMaximumWidth(45)
+
+        self.editIMAmpRaMin      = QtGui.QLineEdit(str(cp.confpars.imageAmplitudeRaMin))
         self.editIMAmpRange      = QtGui.QLineEdit(str(cp.confpars.imageAmplitudeRange))
+        self.editIMAmpRaMin      .setMaximumWidth(50)
         self.editIMAmpRange      .setMaximumWidth(50)
 
         #self.cboxIMImage    = QtGui.QCheckBox('Image',    self)
@@ -121,7 +125,7 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         #lcd           = QtGui.QLCDNumber(self)
         self.sliderIMAmin  = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
         self.sliderIMAmax  = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
-        self.setAmplitudeRange(cp.confpars.imageAmplitudeRange)
+        self.setAmplitudeRange(cp.confpars.imageAmplitudeRaMin, cp.confpars.imageAmplitudeRange)
         self.sliderIMAmin.setValue(cp.confpars.imageSpectrumAmin)
         self.sliderIMAmax.setValue(cp.confpars.imageSpectrumAmax)
         
@@ -132,6 +136,8 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         hboxIM02 = QtGui.QHBoxLayout()
         #hboxIM02.addStretch(1)
         hboxIM02.addWidget(self.titIMSpectrumAlim) 
+        hboxIM02.addWidget(self.editIMAmpRaMin)
+        hboxIM02.addWidget(self.titIMAmpDash)
         hboxIM02.addWidget(self.editIMAmpRange) 
         hboxIM02.addWidget(self.sliderIMAmin)        
         hboxIM02.addWidget(self.sliderIMAmax)        
@@ -200,12 +206,13 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         self.connect(self.sliderIMAmin,        QtCore.SIGNAL('valueChanged(int)'), self.processSliderIMAmin )
         self.connect(self.sliderIMAmax,        QtCore.SIGNAL('valueChanged(int)'), self.processSliderIMAmax )
 
-        self.connect(self.editIMImageAmin,     QtCore.SIGNAL('textEdited(const QString&)'), self.processEditIMImageAmin )
-        self.connect(self.editIMImageAmax,     QtCore.SIGNAL('textEdited(const QString&)'), self.processEditIMImageAmax )
-        self.connect(self.editIMSpectrumAmin,  QtCore.SIGNAL('textEdited(const QString&)'), self.processEditIMSpectrumAmin )
-        self.connect(self.editIMSpectrumAmax,  QtCore.SIGNAL('textEdited(const QString&)'), self.processEditIMSpectrumAmax )
-        self.connect(self.editIMSpectrumNbins, QtCore.SIGNAL('textEdited(const QString&)'), self.processEditIMSpectrumNbins )
-        self.connect(self.editIMAmpRange,      QtCore.SIGNAL('textEdited(const QString&)'), self.processEditIMAmplitudeRange )
+        self.connect(self.editIMImageAmin,     QtCore.SIGNAL('editingFinished ()'), self.processEditIMImageAmin )
+        self.connect(self.editIMImageAmax,     QtCore.SIGNAL('editingFinished ()'), self.processEditIMImageAmax )
+        self.connect(self.editIMSpectrumAmin,  QtCore.SIGNAL('editingFinished ()'), self.processEditIMSpectrumAmin )
+        self.connect(self.editIMSpectrumAmax,  QtCore.SIGNAL('editingFinished ()'), self.processEditIMSpectrumAmax )
+        self.connect(self.editIMSpectrumNbins, QtCore.SIGNAL('editingFinished ()'), self.processEditIMSpectrumNbins )
+        self.connect(self.editIMAmpRange,      QtCore.SIGNAL('editingFinished ()'), self.processEditIMAmplitudeRange )
+        self.connect(self.editIMAmpRaMin,      QtCore.SIGNAL('editingFinished ()'), self.processEditIMAmplitudeRaMin )
 
         cp.confpars.wtdIMWindowIsOpen = True
 
@@ -216,9 +223,9 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
     def setParentWidget(self,parent):
         self.parentWidget = parent
 
-    def setAmplitudeRange(self, amplitudeRange):
-        self.sliderIMAmin.setRange(0,amplitudeRange)
-        self.sliderIMAmax.setRange(0,amplitudeRange)
+    def setAmplitudeRange(self,    amplitudeRaMin, amplitudeRange):
+        self.sliderIMAmin.setRange(amplitudeRaMin, amplitudeRange)
+        self.sliderIMAmax.setRange(amplitudeRaMin, amplitudeRange)
         #self.sliderIMAmin.setTickInterval(0.02*amplitudeRange)
         #self.sliderIMAmax.setTickInterval(0.02*amplitudeRange)
 
@@ -234,7 +241,12 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
     def processEditIMAmplitudeRange(self):
         print 'EditIMAmplitudeRange'
         cp.confpars.imageAmplitudeRange = int(self.editIMAmpRange.displayText())
-        self.setAmplitudeRange(cp.confpars.imageAmplitudeRange)
+        self.setAmplitudeRange(cp.confpars.imageAmplitudeRaMin, cp.confpars.imageAmplitudeRange)
+
+    def processEditIMAmplitudeRaMin(self):
+        print 'EditIMAmplitudeRaMin'
+        cp.confpars.imageAmplitudeRaMin = int(self.editIMAmpRaMin.displayText())
+        self.setAmplitudeRange(cp.confpars.imageAmplitudeRaMin, cp.confpars.imageAmplitudeRange)
 
     def processEditIMImageAmin(self):
         print 'EditIMImageAmin'

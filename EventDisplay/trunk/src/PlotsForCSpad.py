@@ -80,13 +80,13 @@ class PlotsForCSpad ( object ) :
         """Plot 2d image from input array. V1 for run ~546, array for entire detector"""
         quad=2
         arr1quad = arr1ev[quad,...] 
-        if plot ==  8 : self.plotCSpadQuad8SpectraOf2x1( arr1quad, fig )
+        if plot ==  8 : self.plotCSpadQuad08SpectraOf2x1( arr1quad, fig )
         if plot == 16 : self.plotCSpadQuad16Spectra( arr1quad, fig )
 
     def plotCSpadV2Spectrum( self, arr1quad, fig, plot=16 ):
         """Plot 2d image from input array. V2 for run ~900 contain array for quad 2"""
-        if plot ==  8 : self.plotCSpadQuad8SpectraOf2x1( arr1quad, fig )
-        if plot == 16 : self.plotCSpadQuadSpectrum( arr1quad, fig )
+        if plot ==  8 : self.plotCSpadQuad08SpectraOf2x1( arr1quad, fig )
+        if plot == 16 : self.plotCSpadQuad16Spectra( arr1quad, fig )
 
     def plotCSpadQuadImage( self, arr1quad, fig ):
         """Plot 2d image from input array."""
@@ -134,7 +134,7 @@ class PlotsForCSpad ( object ) :
                 plt.text(370, -10, str_event, fontsize=24)
 
 
-    def plotCSpadQuad8SpectraOf2x1( self, arr1quad, fig ):
+    def plotCSpadQuad08SpectraOf2x1( self, arr1quad, fig ):
         """Amplitude specra from 2d array."""
 
         fig.canvas.set_window_title('CSpad Quad Specra of 2x1')

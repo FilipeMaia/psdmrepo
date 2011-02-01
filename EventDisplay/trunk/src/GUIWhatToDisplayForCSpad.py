@@ -78,13 +78,14 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.titCSImage    .setFont (titFont10)   
         self.titCSSpectrum .setFont (titFont10)
 
+        self.titCSAmpDash        = QtGui.QLabel('-')
         self.titCSImageAmin      = QtGui.QLabel('Amin:')
         self.titCSImageAmax      = QtGui.QLabel('Amax:')
 
         self.titCSSpectrumAmin   = QtGui.QLabel('Amin:')
         self.titCSSpectrumAmax   = QtGui.QLabel('Amax:')
         self.titCSSpectrumNbins  = QtGui.QLabel('N bins:')
-        self.titCSSpectrumAlim   = QtGui.QLabel('Slider range: 0 -')
+        self.titCSSpectrumAlim   = QtGui.QLabel('Slider range:')
 
         self.editCSImageAmin     = QtGui.QLineEdit(str(cp.confpars.cspadImageAmin))
         self.editCSImageAmax     = QtGui.QLineEdit(str(cp.confpars.cspadImageAmax))
@@ -97,7 +98,10 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.editCSSpectrumAmin  .setMaximumWidth(45)
         self.editCSSpectrumAmax  .setMaximumWidth(45)
         self.editCSSpectrumNbins .setMaximumWidth(45)
+
+        self.editCSAmpRaMin      = QtGui.QLineEdit(str(cp.confpars.cspadAmplitudeRaMin))
         self.editCSAmpRange      = QtGui.QLineEdit(str(cp.confpars.cspadAmplitudeRange))
+        self.editCSAmpRaMin      .setMaximumWidth(50)
         self.editCSAmpRange      .setMaximumWidth(50)
 
         #self.cboxCSImage    = QtGui.QCheckBox('Image',    self)
@@ -114,7 +118,7 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         #lcd           = QtGui.QLCDNumber(self)
         self.sliderCSAmin  = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
         self.sliderCSAmax  = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
-        self.setAmplitudeRange(cp.confpars.cspadAmplitudeRange)
+        self.setAmplitudeRange(cp.confpars.cspadAmplitudeRaMin, cp.confpars.cspadAmplitudeRange)
         self.sliderCSAmin.setValue(cp.confpars.cspadSpectrumAmin)
         self.sliderCSAmax.setValue(cp.confpars.cspadSpectrumAmax)
         
@@ -125,6 +129,8 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         hboxCS02 = QtGui.QHBoxLayout()
 
         hboxCS02.addWidget(self.titCSSpectrumAlim) 
+        hboxCS02.addWidget(self.editCSAmpRaMin) 
+        hboxCS02.addWidget(self.titCSAmpDash)
         hboxCS02.addWidget(self.editCSAmpRange) 
         hboxCS02.addWidget(self.sliderCSAmin)        
         hboxCS02.addWidget(self.sliderCSAmax)        
@@ -169,12 +175,13 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.connect(self.sliderCSAmin,        QtCore.SIGNAL('valueChanged(int)'), self.processSliderCSAmin )
         self.connect(self.sliderCSAmax,        QtCore.SIGNAL('valueChanged(int)'), self.processSliderCSAmax )
 
-        self.connect(self.editCSImageAmin,     QtCore.SIGNAL('textEdited(const QString&)'), self.processEditCSImageAmin )
-        self.connect(self.editCSImageAmax,     QtCore.SIGNAL('textEdited(const QString&)'), self.processEditCSImageAmax )
-        self.connect(self.editCSSpectrumAmin,  QtCore.SIGNAL('textEdited(const QString&)'), self.processEditCSSpectrumAmin )
-        self.connect(self.editCSSpectrumAmax,  QtCore.SIGNAL('textEdited(const QString&)'), self.processEditCSSpectrumAmax )
-        self.connect(self.editCSSpectrumNbins, QtCore.SIGNAL('textEdited(const QString&)'), self.processEditCSSpectrumNbins )
-        self.connect(self.editCSAmpRange,      QtCore.SIGNAL('textEdited(const QString&)'), self.processEditCSAmplitudeRange )
+        self.connect(self.editCSImageAmin,     QtCore.SIGNAL('editingFinished ()'), self.processEditCSImageAmin )
+        self.connect(self.editCSImageAmax,     QtCore.SIGNAL('editingFinished ()'), self.processEditCSImageAmax )
+        self.connect(self.editCSSpectrumAmin,  QtCore.SIGNAL('editingFinished ()'), self.processEditCSSpectrumAmin )
+        self.connect(self.editCSSpectrumAmax,  QtCore.SIGNAL('editingFinished ()'), self.processEditCSSpectrumAmax )
+        self.connect(self.editCSSpectrumNbins, QtCore.SIGNAL('editingFinished ()'), self.processEditCSSpectrumNbins )
+        self.connect(self.editCSAmpRange,      QtCore.SIGNAL('editingFinished ()'), self.processEditCSAmplitudeRange )
+        self.connect(self.editCSAmpRaMin,      QtCore.SIGNAL('editingFinished ()'), self.processEditCSAmplitudeRaMin )
 
         cp.confpars.wtdCSWindowIsOpen = True
   
@@ -184,9 +191,9 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
     def setParentWidget(self,parent):
         self.parentWidget = parent
 
-    def setAmplitudeRange(self, amplitudeRange):
-        self.sliderCSAmin.setRange(0,amplitudeRange)
-        self.sliderCSAmax.setRange(0,amplitudeRange)
+    def setAmplitudeRange(self,    amplitudeRaMin, amplitudeRange):
+        self.sliderCSAmin.setRange(amplitudeRaMin, amplitudeRange)
+        self.sliderCSAmax.setRange(amplitudeRaMin, amplitudeRange)
         #self.sliderCSAmin.setTickInterval(0.02*amplitudeRange)
         #self.sliderCSAmax.setTickInterval(0.02*amplitudeRange)
 
@@ -202,7 +209,12 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
     def processEditCSAmplitudeRange(self):
         print 'EditCSAmplitudeRange'
         cp.confpars.cspadAmplitudeRange = int(self.editCSAmpRange.displayText())
-        self.setAmplitudeRange(cp.confpars.cspadAmplitudeRange)
+        self.setAmplitudeRange(cp.confpars.cspadAmplitudeRaMin, cp.confpars.cspadAmplitudeRange)
+
+    def processEditCSAmplitudeRaMin(self):
+        print 'EditCSAmplitudeRaMin'
+        cp.confpars.cspadAmplitudeRaMin = int(self.editCSAmpRaMin.displayText())
+        self.setAmplitudeRange(cp.confpars.cspadAmplitudeRaMin, cp.confpars.cspadAmplitudeRange)
 
     def processEditCSImageAmin(self):
         print 'EditCSImageAmin'
