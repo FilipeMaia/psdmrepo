@@ -119,6 +119,9 @@ class GUIConfiguration ( QtGui.QWidget ) :
         self.connect(self.butBrowse,    QtCore.SIGNAL('clicked()'), self.processBrowse  )
         self.connect(self.radioRead,    QtCore.SIGNAL('clicked()'), self.processRadioRead    )
         self.connect(self.radioDefault, QtCore.SIGNAL('clicked()'), self.processRadioDefault )
+        self.connect(self.fileEdit,     QtCore.SIGNAL('editingFinished ()'), self.processFileEdit )
+
+
     #-------------------
     #  Public methods --
     #-------------------
@@ -163,9 +166,22 @@ class GUIConfiguration ( QtGui.QWidget ) :
         print 'dirName  : %s' % (self.dirName)
         print 'fileName : %s' % (self.fileName)
         self.path = QtGui.QFileDialog.getOpenFileName(self,'Open file',self.dirName)
-        #self.path = cp.confpars.dirName + '/' + cp.confpars.fileName
-        self.path = self.dirName+'/'+self.fileName
-        self.fileEdit.setText(self.path)
+        self.dirName,self.fileName = os.path.split(str(self.path))
+        #path      = cp.confpars.confParsDirName + '/' + cp.confpars.confParsFileName
+        #self.path = self.dirName+'/'+self.fileName
+        if self.dirName == '' or self.fileName == '' :
+            print 'Input dirName or fileName is empty... use default values'  
+        else :
+            self.fileEdit.setText(self.path)
+            cp.confpars.confParsDirName  = self.dirName
+            cp.confpars.confParsFileName = self.fileName
+
+    def processFileEdit(self):
+        print 'FileEdit'
+        self.path = str(self.fileEdit.displayText())
+        cp.confpars.confParsDirName,cp.confpars.confParsFileName = os.path.split(self.path)
+        print 'Set dirName  : %s' % (cp.confpars.confParsDirName)
+        print 'Set fileName : %s' % (cp.confpars.confParsFileName)
  
     def confParsFileName(self):
         #One have to check that file exists...

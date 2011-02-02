@@ -103,13 +103,13 @@ class ConfigParameters ( object ) :
 
         self.cspadImageIsOn     = True
         self.cspadImageAmin     = 0   
-        self.cspadImageAmax     = 1000
+        self.cspadImageAmax     = 2000
 
         self.cspadSpectrumIsOn  = True
         self.cspadSpectrum08IsOn= False
         self.cspadSpectrumRange = None
         self.cspadSpectrumAmin  = 0   
-        self.cspadSpectrumAmax  = 1000
+        self.cspadSpectrumAmax  = 2000
         self.cspadSpectrumNbins = 50
 
 
