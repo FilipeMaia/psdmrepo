@@ -1,0 +1,30 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package XtcEventBrowser
+#------------------------------------------------------------------------
+
+Package author: Ingrid Ofte
+
+Brief description:
+==================
+
+Event Browser for Xtc files. So far this is simply a GUI interface to 
+XtcScanner (quick scan and summary) and pyana (for further analysis). 
+
+Detailed description:
+=====================
+
+Xtc Event Browser, a Gui interface to the xtc file. The main script is 
+best run from XtcEventBrowser/app/xtcbrowser. After 'scons' in your release
+directory you can run via: 
+> xtcbrowser [optional file names]
+
+The GUI window allows you to fetch input xtc files, Scan the file(s) via 
+XtcEventBrowser/src/XtcScanner.py (which can also be run as a standalone 
+script):
+> xtcscanner filenames
+
+
