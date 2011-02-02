@@ -119,7 +119,7 @@ CsPadCommonModeSubV1::findCommonMode(const uint16_t* sdata,
   for (unsigned p = 0; p != ssize; ++ p) {
     
     // ignore channels that re too noisy
-    if (pixStatus[p] & CsPadPixelStatusV1::VeryHot) continue;
+    if (pixStatus and (pixStatus[p] & CsPadPixelStatusV1::VeryHot)) continue;
     
     // pixel value with pedestal subtracted
     int val = int(std::floor(sdata[p] - peddata[p] + 0.5));
