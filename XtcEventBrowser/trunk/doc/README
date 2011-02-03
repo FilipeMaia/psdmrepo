@@ -22,9 +22,12 @@ best run from XtcEventBrowser/app/xtcbrowser. After 'scons' in your release
 directory you can run via: 
 > xtcbrowser [optional file names]
 
+This will launch the browser, defined in XtcEventBrowser/src/XtcBrowserMain.py 
+
 The GUI window allows you to fetch input xtc files, Scan the file(s) via 
 XtcEventBrowser/src/XtcScanner.py (which can also be run as a standalone 
 script):
 > xtcscanner filenames
 
 
+More functionality will be added...

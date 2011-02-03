@@ -228,17 +228,11 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         One checkbox for each Detector/Device found
         in the scan of xtc file
         """
-        if self.xtcExp is None :
+        if self.scanner is None :
             print "Can't use selector before running the scan"
             return
 
-        for d in sorted( self.xtcExp.devices.keys() ):
-            #contents = "["
-            #for i in range ( len(self.xtcExp.devices[d] ) ):
-            #    contents+="%s(%d) " % ( self.xtcExp.devices[d][i], self.xtcExp.counters[d][i] )
-            #contents+="]"
-            #clabel = "%s  %s" % (d, contents)
-            #items = str(d).split(':')
+        for d in sorted( self.scanner.devices.keys() ):
             clabel = d 
             if clabel.find("ProcInfo") >= 0 : continue
             if clabel.find("NoDetector") >= 0 : continue
@@ -254,13 +248,6 @@ class XtcBrowserMain (QtGui.QMainWindow) :
             self.det_selector.addWidget( self.pyana_button )
             self.det_selector.setAlignment( self.pyana_button, QtCore.Qt.AlignRight )
         
-        #print self.xtcExp.devices
-        #print self.xtcExp.ndev
-
-        #self.setLayout(self.det_selector)
-        
-        #self.sel_button = QtGui.QCheckBox("&Here's one", self.det_selector)
-        #self.connect(self.sel_button, QtCore.SIGNAL('clicked()'), self.runPyana )
 
 
     def __add_file(self):
@@ -329,32 +316,31 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         """
         self.close()
 
+    def __write_config_script(self):
 
-    def __run_pyana(self):
-        """Run pyana
-
-        Open a dialog in case user want to add options to pyana. Wait for OK, then
-        run pyana with the modules enabled from the checked boxes. 
-        """
-        print "Now we'll run pyana....."
-
-        configuration = "[pyana]"
-
+        nmodules = 0
         modules_to_run = []
+        options_for_mod = []
+
         for box in self.checkboxes :
             if box.isChecked() :
                 print "%s requested" % box.text() 
 
                 if str(box.text()).find("BldInfo")>=0 :
-                    modules_to_run.append("XtcEventBrowser.pyana_bld")
-                    configuration+="\nmodules = XtcEventBrowser.pyana_bld\n"
-                    configuration+="\n[XtcEventBrowser.pyana_bld]"
+                    index = None
+                    try :
+                        index = modules_to_run.index("XtcEventBrowser.pyana_bld")
+                    except ValueError:
+                        modules_to_run.append("XtcEventBrowser.pyana_bld")
+                        options_for_mod.append([])
+                        index = 0
+                    print index
                     if str(box.text()).find("EBeam")>=0 :
-                        configuration+="\ndo_ebeam = True"
+                        options_for_mod[index].append("\ndo_ebeam = True")
                     if str(box.text()).find("FEEGasDetEnergy")>=0 :
-                        configuration+="\ndo_gasdetector = True"
+                        options_for_mod[index].append("\ndo_gasdetector = True")
                     if str(box.text()).find("PhaseCavity")>=0 :
-                        configuration+="\ndo_phasecavity = True"
+                        options_for_mod[index].append("\ndo_phasecavity = True")
 
                 if str(box.text()).find("Acqiris")>=0 :
                     modules_to_run.append("XtcEventBrowser.pyana_acq")
@@ -368,25 +354,52 @@ class XtcBrowserMain (QtGui.QMainWindow) :
             print "No modules requested! Please select from list"
             return
 
-        print "configuration: "
-        print configuration
+
+        configuration = "[pyana]"
+        configuration += "\nmodules ="
+        for module in modules_to_run :
+            configuration += " "
+            configuration += module
+
+        count_m = 0
+        for module in modules_to_run :
+            configuration += "\n\n["
+            configuration += module
+            configuration += "]"
+            if len( options_for_mod[ count_m ] )>0 :
+                for options in options_for_mod[ count_m ] :
+                    configuration += options
+            count_m +=1
+            
+
         configfile = "xb_pyana_%d.cfg" % random.randint(1000,9999)
-        print "using config file ", configfile
+
         f = open(configfile,'w')
         f.write(configuration)
+        f.close()
+        
+        return  configfile
+
+
+    def __run_pyana(self):
+        """Run pyana
+
+        Open a dialog to allow chaging options to pyana. Wait for OK, then
+        run pyana with the needed modules and configurations as requested
+        based on the the checkboxes
+        """
+
+        configfile = self.__write_config_script()
+        print "pyana config file has been generated : ", configfile
+        print "Now we'll run pyana..... "
 
         runstring = "pyana -n 1000 -c %s " % configfile
-        #for module in modules_to_run:
-        #    runstring+="-m %s " % module
         for file in self.filenames :
             runstring += file
             runstring +=" "
 
-
-
-
         dialog =  QtGui.QInputDialog()
-        dialog.setMinimumWidth(300)
+        dialog.setMinimumWidth(1500)
         text, ok = dialog.getText(self,
                                   'Pyana options',
                                   'Run pyana with the following command (edit as needed and click OK):',
@@ -404,8 +417,11 @@ class XtcBrowserMain (QtGui.QMainWindow) :
 
 
         subprocess.Popen(runstring, shell=True) # this runs in separate thread.
-        #os.system(runstring)  # this will block 
 
+        # alternative ways of running pyana:
+        #
+        #os.system(runstring)  # this will block 
+        #
         #program = QtCore.QString("pyana")
         #arguments = QtCore.QStringList()
         #arguments.append("-n 1000")
@@ -426,7 +442,6 @@ class XtcBrowserMain (QtGui.QMainWindow) :
 if __name__ == "__main__" :
 
     qApp = QtGui.QApplication(sys.argv)
-    #qApp.setStyle("cleanlooks") # does nothing
     mainw = XtcBrowserMain()
     mainw.show()
     sys.exit(qApp.exec_())
