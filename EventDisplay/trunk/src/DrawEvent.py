@@ -85,23 +85,25 @@ class DrawEvent ( object ) :
         #if not cp.confpars.h5_file_is_open :
         self.openHDF5File()
     
-        print 'Draw event %d' % ( cp.confpars.eventCurrent )
+        print 'Event %d' % ( cp.confpars.eventCurrent )
         runNumber = self.h5file.attrs['runNumber']
         #print 'Run number = %d' % (runNumber) 
 
         # Loop over checked data sets
         self.figNum = 0
-        print 'Number of checked items:', len(cp.confpars.list_of_checked_item_names)
+        #print 'Number of checked items:', len(cp.confpars.list_of_checked_item_names)
         for dsname in cp.confpars.list_of_checked_item_names :
 
             ds     = self.h5file[dsname]
             arr1ev = ds[cp.confpars.eventCurrent]
 
             item_last_name = printh5.get_item_last_name(dsname)
-            print 'Try to plot item:', dsname, ' item name:', item_last_name  
+            print 'Plot item:', dsname, ' item name:', item_last_name  
 
             if dsname == self.dsnameCSpadV1 :
                 print 'Draw plots for CSpad V1'
+
+                #arr1ev # (4, 8, 185, 388) <- format of this record
 
                 self.figNum += 1 
                 if cp.confpars.cspadImageIsOn : 
@@ -119,22 +121,23 @@ class DrawEvent ( object ) :
                 else : self.close_fig(self.figNum)
                 
             if dsname == self.dsnameCSpadV2 or dsname == self.dsnameCSpadV2CXI :
-                print 'Draw plots for CSpad V2'
-                arr1quad = arr1ev
+                #print 'Draw plots for CSpad V2'
+
+                #arr1ev # (32, 185, 388) <- format of this record
 
                 self.figNum += 1 
                 if cp.confpars.cspadImageIsOn : 
-                    self.plotsCSpad.plotCSpadV2Image(arr1quad,self.set_fig(4))
+                    self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4))
                 else : self.close_fig(self.figNum)
 
                 self.figNum += 1 
                 if cp.confpars.cspadSpectrumIsOn : 
-                    self.plotsCSpad.plotCSpadV2Spectrum(arr1quad,self.set_fig(4),plot=16)
+                    self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=16)
                 else : self.close_fig(self.figNum)
 
                 self.figNum += 1 
                 if cp.confpars.cspadSpectrum08IsOn : 
-                    self.plotsCSpad.plotCSpadV2Spectrum(arr1quad,self.set_fig(4),plot=8)
+                    self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=8)
                 else : self.close_fig(self.figNum)
                 
             if item_last_name == 'image' :
@@ -197,17 +200,17 @@ class DrawEvent ( object ) :
 
     def openHDF5File( self ) :     
         fname = cp.confpars.dirName+'/'+cp.confpars.fileName
-        print 'openHDF5File() : %s' % (fname)
+        #print 'openHDF5File() : %s' % (fname)
         self.h5file=  h5py.File(fname, 'r') # open read-only       
         cp.confpars.h5_file_is_open = True
-        printh5.print_file_info(self.h5file)
+        #printh5.print_file_info(self.h5file)
 
 
     def closeHDF5File( self ) :       
         if cp.confpars.h5_file_is_open :
             self.h5file.close()
             cp.confpars.h5_file_is_open = False
-            print 'closeHDF5File()'
+            #print 'closeHDF5File()'
 
 
     def set_fig( self, type=None ):
@@ -258,7 +261,7 @@ class DrawEvent ( object ) :
 
         if  self.fig_window_is_open :
             self.fig_window_is_open = False 
-            print 'close_fig()'
+            #print 'close_fig()'
 
 
 

@@ -66,19 +66,22 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(370, 350, 500, 300)
+        self.setGeometry(370, 350, 500, 500)
         self.setWindowTitle('What to display?')
 
-        titFont = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
+        titFont   = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
+
         self.titImage    = QtGui.QLabel('Image')
         self.titCSpad    = QtGui.QLabel('SCpad')
         self.titWaveform = QtGui.QLabel('Waveform')
+        self.titOptions  = QtGui.QLabel('Settings for:')
 
         #self.titImage.setTextFormat (2) # Qt.AutoText = 2
         self.titImage   .setFont (titFont) 
         self.titCSpad   .setFont (titFont) 
         self.titWaveform.setFont (titFont) 
-
+        self.titOptions .setFont (titFont)
+        
         self.titCSImage    = QtGui.QLabel('Images:')
         self.titCSSpectra  = QtGui.QLabel('Spectra:')
 
@@ -106,11 +109,13 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         #self.cb.move(10, 10)
         #self.cb.toggle() # set the check mark in the check box
 
-        self.butClose      = QtGui.QPushButton("Close window")
+        self.butClose      = QtGui.QPushButton('Quit')
 
         self.butIMOptions  = QtGui.QPushButton("Options for Image")
         self.butCSOptions  = QtGui.QPushButton("Options for CSpad")
         self.butWFOptions  = QtGui.QPushButton("Options for Waveform")
+
+        self.showToolTips()
 
         gridCS = QtGui.QGridLayout()
         gridCS.addWidget(self. titCSpad,        0, 0)
@@ -119,41 +124,70 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         gridCS.addWidget(self. titCSSpectra,    2, 0)
         gridCS.addWidget(self.cboxCSSpectrum,   2, 1)
         gridCS.addWidget(self.cboxCSSpectrum08, 2, 2)
-        gridCS.addWidget(self.butCSOptions,     0, 1, 1, 3)
+        #gridCS.addWidget(self.butCSOptions,     0, 1, 1, 3)
         
         gridIM = QtGui.QGridLayout()
         gridIM.addWidget(self.titImage,         0, 0)
         gridIM.addWidget(self.cboxIMImage,      1, 0)
         gridIM.addWidget(self.cboxIMSpectrum,   2, 0)
-        gridIM.addWidget(self.butIMOptions,     0, 1, 1, 3)
+        #gridIM.addWidget(self.butIMOptions,     0, 1, 1, 3)
         
         gridWF = QtGui.QGridLayout()
         gridWF.addWidget(self.titWaveform,      0, 0)
         gridWF.addWidget(self.cboxWFImage,      1, 0)
         gridWF.addWidget(self.cboxWFSpectrum,   2, 0)
-        gridWF.addWidget(self.butWFOptions,     0, 1, 1, 3)
+        #gridWF.addWidget(self.butWFOptions,     0, 1, 1, 3)
         
-        hboxC = QtGui.QHBoxLayout()
-        hboxC.addStretch(1)
-        hboxC.addWidget(self.butClose)
+
+        #self.guiwtdCS = wtdCS.GUIWhatToDisplayForCSpad(self)
+        #self.guiwtdCS.setParentWidget(self)
+        #self.framewtdCS = QtGui.QFrame(self.guiwtdCS)
+
+
+        self.tabBar   = QtGui.QTabBar()
+        self.indTabCS = self.tabBar.addTab('CSpad')
+        self.indTabIM = self.tabBar.addTab('Image')
+        self.indTabWF = self.tabBar.addTab('Waveform')
+
+        self.tabBar.setTabTextColor(self.indTabCS,QtGui.QColor('red'))
+        self.tabBar.setTabTextColor(self.indTabIM,QtGui.QColor('blue'))
+        self.tabBar.setTabTextColor(self.indTabWF,QtGui.QColor('green'))
         
-        vbox = QtGui.QVBoxLayout()
+        self.hboxT = QtGui.QHBoxLayout()
+        self.hboxT.addWidget(self.tabBar) 
+
+        self.guiTab = wtdCS.GUIWhatToDisplayForCSpad()          
+        self.guiTab.setMinimumHeight(200)
+
+        self.hboxD = QtGui.QHBoxLayout()
+        #self.hboxD.addLayout(self.guiTab.getVBoxForLayout())
+        self.hboxD.addWidget(self.guiTab)
+        #self.hboxD.setMinimumHeight(100)
+        
+        self.hboxC = QtGui.QHBoxLayout()
+        self.hboxC.addWidget(self.titOptions)
+        self.hboxC.addStretch(1)
+        self.hboxC.addWidget(self.butClose)
+
+        self.vbox = QtGui.QVBoxLayout()
+        self.vbox.addLayout(gridCS) 
+        self.vbox.addStretch(1)     
+        self.vbox.addLayout(gridIM) 
+        self.vbox.addStretch(1)     
+        self.vbox.addLayout(gridWF)
+        self.vbox.addLayout(self.hboxC)
+        self.vbox.addStretch(1)     
+        self.vbox.addLayout(self.hboxT)
+        self.vbox.addLayout(self.hboxD)
         #guiwtdIM = wtdIM.GUIWhatToDisplayForImage(self) # THIS
         #vbox.addLayout(guiwtdIM.getVBoxForLayout())     # WORKS
-        vbox.addLayout(gridCS) 
-        vbox.addStretch(1)     
-        vbox.addLayout(gridIM) 
-        vbox.addStretch(1)     
-        vbox.addLayout(gridWF) 
-        vbox.addStretch(1)     
-        vbox.addLayout(hboxC)
 
-        self.setLayout(vbox)
+        self.setLayout(self.vbox)
 
         self.connect(self.butClose,            QtCore.SIGNAL('clicked()'),         self.processClose )
-        self.connect(self.butCSOptions,        QtCore.SIGNAL('clicked()'),         self.processCSOptions )
-        self.connect(self.butIMOptions,        QtCore.SIGNAL('clicked()'),         self.processIMOptions )
-        self.connect(self.butWFOptions,        QtCore.SIGNAL('clicked()'),         self.processWFOptions )
+        #self.connect(self.butCSOptions,        QtCore.SIGNAL('clicked()'),         self.processCSOptions )
+        #self.connect(self.butIMOptions,        QtCore.SIGNAL('clicked()'),         self.processIMOptions )
+        #self.connect(self.butWFOptions,        QtCore.SIGNAL('clicked()'),         self.processWFOptions )
 
         self.connect(self.cboxIMImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMImage)
         self.connect(self.cboxIMSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMSpectrum)
@@ -163,18 +197,42 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.connect(self.cboxWFImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFImage)
         self.connect(self.cboxWFSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFSpectrum)
 
+        self.connect(self.tabBar,              QtCore.SIGNAL('currentChanged(int)'),self.processTabBar)
+
+    def showToolTips(self):
+        self.butClose    .setToolTip('Close this window') 
+        self.butIMOptions.setToolTip('Adjust amplitude and other plot\nparameters for Image type plots.')
+        self.butCSOptions.setToolTip('Adjust amplitude and other plot\nparameters for CSpad type plots.')
+        self.butWFOptions.setToolTip('Adjust amplitude and other plot\nparameters for Waveform type plots.')
 
     def closeEvent(self, event):
         print 'closeEvent'
         self.processClose()
 
-
     def processClose(self):
         print 'Close window'
         cp.confpars.wtdWindowIsOpen = False
-        if cp.confpars.wtdIMWindowIsOpen : self.guiwtdIM.close()
-        if cp.confpars.wtdCSWindowIsOpen : self.guiwtdCS.close()
+        #if cp.confpars.wtdIMWindowIsOpen : self.guiwtdIM.close()
+        #if cp.confpars.wtdCSWindowIsOpen : self.guiwtdCS.close()
         self.close()
+
+    def processTabBar(self):
+        indTab = self.tabBar.currentIndex()
+        print 'TabBar index=',indTab
+
+        minSize = self.hboxD.minimumSize()
+        self.guiTab.close()
+
+        if indTab == self.indTabCS :
+            self.guiTab = wtdCS.GUIWhatToDisplayForCSpad()
+        if indTab == self.indTabIM :
+            self.guiTab = wtdIM.GUIWhatToDisplayForImage()
+        if indTab == self.indTabWF :
+            self.guiTab = QtGui.QLineEdit('Stuff for Waveform')
+
+        self.guiTab.setMinimumHeight(200)
+        self.hboxD.addWidget(self.guiTab)
+        #self.hboxD.update()
 
     def processCSOptions(self):
         print 'CSOptions'

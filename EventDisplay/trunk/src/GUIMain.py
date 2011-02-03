@@ -98,7 +98,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.titSpace4= QtGui.QLabel('    ')
         self.titSpan  = QtGui.QLabel('Span:')
         self.titSlShow= QtGui.QLabel('Slide show:')
-        self.titTree  = QtGui.QLabel('HDF5 GUI')
+        self.titTree  = QtGui.QLabel('HDF5 Tree GUI')
 
         self.fileEdit = QtGui.QLineEdit(cp.confpars.dirName+'/'+cp.confpars.fileName)
         self.numbEdit = QtGui.QLineEdit(str(cp.confpars.eventCurrent))
@@ -141,10 +141,10 @@ class GUIMain ( QtGui.QWidget ) :
         hboxF.addWidget(self.browse)
 
         hboxC = QtGui.QHBoxLayout()
-        hboxC.addWidget(self.display)
-        hboxC.addWidget(self.titTree)
+#        hboxC.addWidget(self.printfile)
         hboxC.addStretch(2)
-        hboxC.addWidget(self.printfile)
+        hboxC.addWidget(self.titTree)
+        hboxC.addWidget(self.display)
         
         hboxE = QtGui.QHBoxLayout()
         #hboxE.addWidget(self.selection)

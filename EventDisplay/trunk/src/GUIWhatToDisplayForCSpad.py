@@ -163,7 +163,7 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.vbox.addStretch(1)     
 
         if parent == None :
-            self.vbox.addLayout(hboxC)
+            #self.vbox.addLayout(hboxC)
             self.setLayout(self.vbox)
             self.show()
 

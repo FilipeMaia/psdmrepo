@@ -70,20 +70,7 @@ class GUIConfiguration ( QtGui.QWidget ) :
         path          = cp.confpars.confParsDirName + '/' + cp.confpars.confParsFileName
         self.fileEdit = QtGui.QLineEdit(path)
         
-
-        # Tips for buttons and fields:
-        #self           .setToolTip('This GUI deals with the configuration parameters.')
-        self.fileEdit  .setToolTip('Type the file path name here,\nor better use "Browse" button.')
-        self.butBrowse .setToolTip('Select the file path name\nto read/write the configuration parameters.')
-        self.butRead   .setToolTip('Read (retreave) the configuration parameters from file.')
-        self.butWrite  .setToolTip('Write (save) the configuration parameters in file.')
-        self.butDefault.setToolTip('Reset the configuration parameters\nto their default values.')
-        self.butPrint  .setToolTip('Print current values of the configuration parameters.')
-        self.butExit   .setToolTip('Exit from this GUI and close the window.')
-        self.radioRead .setToolTip('If this button is ON and configuration parameters are saved,\n' +
-                                   'then they will be read from file at the next start of this program.')
-        self.radioDefault.setToolTip('If this button is ON and configuration parameters are saved,\n' +
-                                     'then they will be reset to the default values at the next start of this program.')
+        self.showToolTips()
 
         hboxT1 = QtGui.QHBoxLayout()
         hboxT1.addWidget(self.titFile)
@@ -111,20 +98,34 @@ class GUIConfiguration ( QtGui.QWidget ) :
 
         self.setLayout(vbox)
 
-        self.connect(self.butExit,      QtCore.SIGNAL('clicked()'), self.processExit    )
-        self.connect(self.butRead,      QtCore.SIGNAL('clicked()'), self.processRead    )
-        self.connect(self.butWrite,     QtCore.SIGNAL('clicked()'), self.processWrite   )
-        self.connect(self.butPrint,     QtCore.SIGNAL('clicked()'), self.processPrint   )
-        self.connect(self.butDefault,   QtCore.SIGNAL('clicked()'), self.processDefault )
-        self.connect(self.butBrowse,    QtCore.SIGNAL('clicked()'), self.processBrowse  )
-        self.connect(self.radioRead,    QtCore.SIGNAL('clicked()'), self.processRadioRead    )
-        self.connect(self.radioDefault, QtCore.SIGNAL('clicked()'), self.processRadioDefault )
-        self.connect(self.fileEdit,     QtCore.SIGNAL('editingFinished ()'), self.processFileEdit )
-
+        self.connect(self.butExit,      QtCore.SIGNAL('clicked()'),          self.processExit         )
+        self.connect(self.butRead,      QtCore.SIGNAL('clicked()'),          self.processRead         )
+        self.connect(self.butWrite,     QtCore.SIGNAL('clicked()'),          self.processWrite        )
+        self.connect(self.butPrint,     QtCore.SIGNAL('clicked()'),          self.processPrint        )
+        self.connect(self.butDefault,   QtCore.SIGNAL('clicked()'),          self.processDefault      )
+        self.connect(self.butBrowse,    QtCore.SIGNAL('clicked()'),          self.processBrowse       )
+        self.connect(self.radioRead,    QtCore.SIGNAL('clicked()'),          self.processRadioRead    )
+        self.connect(self.radioDefault, QtCore.SIGNAL('clicked()'),          self.processRadioDefault )
+        self.connect(self.fileEdit,     QtCore.SIGNAL('editingFinished ()'), self.processFileEdit     )
 
     #-------------------
     #  Public methods --
     #-------------------
+
+    def showToolTips(self):
+        # Tips for buttons and fields:
+        #self           .setToolTip('This GUI deals with the configuration parameters.')
+        self.fileEdit  .setToolTip('Type the file path name here,\nor better use "Browse" button.')
+        self.butBrowse .setToolTip('Select the file path name\nto read/write the configuration parameters.')
+        self.butRead   .setToolTip('Read (retreave) the configuration parameters from file.')
+        self.butWrite  .setToolTip('Write (save) the configuration parameters in file.')
+        self.butDefault.setToolTip('Reset the configuration parameters\nto their default values.')
+        self.butPrint  .setToolTip('Print current values of the configuration parameters.')
+        self.butExit   .setToolTip('Exit from this GUI and close the window.')
+        self.radioRead .setToolTip('If this button is ON and configuration parameters are saved,\n' +
+                                   'then they will be read from file at the next start of this program.')
+        self.radioDefault.setToolTip('If this button is ON and configuration parameters are saved,\n' +
+                                     'then they will be reset to the default values at the next start of this program.')
 
     def closeEvent(self, event):
         print 'closeEvent'
@@ -167,7 +168,7 @@ class GUIConfiguration ( QtGui.QWidget ) :
         print 'fileName : %s' % (self.fileName)
         self.path = QtGui.QFileDialog.getOpenFileName(self,'Open file',self.dirName)
         self.dirName,self.fileName = os.path.split(str(self.path))
-        #path      = cp.confpars.confParsDirName + '/' + cp.confpars.confParsFileName
+        #self.path = cp.confpars.confParsDirName + '/' + cp.confpars.confParsFileName
         #self.path = self.dirName+'/'+self.fileName
         if self.dirName == '' or self.fileName == '' :
             print 'Input dirName or fileName is empty... use default values'  

@@ -98,6 +98,8 @@ class ConfigParameters ( object ) :
         self.readParsFromFileAtStart = True
 
         # Default parameters for CSpad plots
+        self.cspadQuadNumber    = 2
+
         self.cspadAmplitudeRaMin= 0
         self.cspadAmplitudeRange= 2000
 
