@@ -90,6 +90,14 @@ class GUIMain ( QtGui.QWidget ) :
         cp.confpars.Print()
         print 'Current event number directly : %d ' % (cp.confpars.eventCurrent)
 
+        # see http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/qframe.html
+        self.frame = QtGui.QFrame(self)
+        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken )
+        self.frame.setLineWidth(0)
+        self.frame.setMidLineWidth(1)
+        self.frame.setGeometry(self.rect())
+        #self.frame.setVisible(True)
+
         self.drawev   = drev.DrawEvent()
 
         self.titFile  = QtGui.QLabel('File:')
@@ -237,11 +245,16 @@ class GUIMain ( QtGui.QWidget ) :
     # Private methods --
     #-------------------
 
-    def paintEvent(self, e):
-        qp = QtGui.QPainter()
-        qp.begin(self)  
-        self.drawArt(qp)
-        qp.end()
+    def resizeEvent(self, e):
+        #print 'resizeEvent' 
+        self.frame.setGeometry(self.rect())
+
+    #def paintEvent(self, e):
+    #    print 'paintEvent' 
+    #    qp = QtGui.QPainter()
+    #    qp.begin(self)  
+    #    self.drawArt(qp)
+    #    qp.end()
 
     def drawArt(self, qp):
        #pen = QtGui.QPen(QtGui.QColor(255, 100, 0, 100), 2, QtCore.Qt.SolidLine)
@@ -256,24 +269,6 @@ class GUIMain ( QtGui.QWidget ) :
         #qp.drawRoundedRect( 5, YfrU*size.height(), size.width()-10, 0.38*size.height(), Rx, Ry)
         #qp.drawLine       (12, YfrD*size.height(), size.width()-12, YfrU*size.height())
         #qp.drawLine       (12, YfrU*size.height(), size.width()-12, YfrU*size.height())
-
-    def processSelection(self):
-        print 'Selection'
-        print 'Is empty yet...'
-        
-    def processConfig(self):
-        print 'Configuration'
-        if  cp.confpars.configGUIIsOpen :
-            cp.confpars.configGUIIsOpen = False
-            self.configGUI.close()
-        else :    
-            self.configGUI = guiconfig.GUIConfiguration()
-            self.configGUI.show()
-            cp.confpars.configGUIIsOpen = True
-
-    def processSave(self):
-        print 'Save'
-        cp.confpars.writeParameters()
 
     def processPrint(self):
         fname = cp.confpars.dirName+'/'+cp.confpars.fileName
@@ -345,6 +340,25 @@ class GUIMain ( QtGui.QWidget ) :
             print 'The file %s does not exist' % (str_path_file)
             print 'Use existing file name ...'
 
+    def processSelection(self):
+        print 'Selection'
+        print 'Is empty yet...'
+        
+    def processConfig(self):
+        print 'Configuration'
+        if  cp.confpars.configGUIIsOpen :
+            cp.confpars.configGUIIsOpen = False
+            self.configGUI.close()
+        else :    
+            self.configGUI = guiconfig.GUIConfiguration()
+            self.configGUI.move(self.pos().__add__(QtCore.QPoint(0,330))) # open window with offset w.r.t. parent
+            self.configGUI.show()
+            cp.confpars.configGUIIsOpen = True
+
+    def processSave(self):
+        print 'Save'
+        cp.confpars.writeParameters()
+
     def processWhatToDisplay(self):
         if cp.confpars.wtdWindowIsOpen : # close wtd window
             print 'What to display GUI: Close'
@@ -355,6 +369,7 @@ class GUIMain ( QtGui.QWidget ) :
             print 'What to display GUI: Open'
             #self.wtd.setText('Close')
             self.guiwhat = guiwtd.GUIWhatToDisplay()
+            self.guiwhat.move(self.pos().__add__(QtCore.QPoint(0,330))) # open window with offset w.r.t. parent
             self.guiwhat.show()
             cp.confpars.wtdWindowIsOpen = True
 
@@ -369,6 +384,7 @@ class GUIMain ( QtGui.QWidget ) :
             print 'What to display GUI: Open'
             self.display.setText('Close')
             self.guitree = guiselitems.GUISelectItems(self)
+            self.guitree.move(self.pos().__add__(QtCore.QPoint(-360,0))) # open window with offset w.r.t. parent
             self.guitree.show()
             cp.confpars.treeWindowIsOpen = True
 
@@ -487,11 +503,12 @@ class GUIMain ( QtGui.QWidget ) :
         print 'closeEvent'
         self.processQuit()
 
-#
+#-----------------------------
 #  In case someone decides to run this module
 #
 if __name__ == "__main__" :
-
-    # In principle we can try to run test suite for this module,
-    # have to think about it later. Right now just abort.
-    sys.exit ( "Module is not supposed to be run as main module" )
+    app = QtGui.QApplication(sys.argv)
+    ex  = GUIMain()
+    ex.show()
+    app.exec_()
+#-----------------------------

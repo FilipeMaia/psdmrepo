@@ -74,13 +74,13 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.titImage    = QtGui.QLabel('Image')
         self.titCSpad    = QtGui.QLabel('SCpad')
         self.titWaveform = QtGui.QLabel('Waveform')
-        self.titOptions  = QtGui.QLabel('Settings for:')
+        #self.titOptions  = QtGui.QLabel('Settings for:')
 
         #self.titImage.setTextFormat (2) # Qt.AutoText = 2
         self.titImage   .setFont (titFont) 
         self.titCSpad   .setFont (titFont) 
         self.titWaveform.setFont (titFont) 
-        self.titOptions .setFont (titFont)
+        #self.titOptions .setFont (titFont)
         
         self.titCSImage    = QtGui.QLabel('Images:')
         self.titCSSpectra  = QtGui.QLabel('Spectra:')
@@ -165,7 +165,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         #self.hboxD.setMinimumHeight(100)
         
         self.hboxC = QtGui.QHBoxLayout()
-        self.hboxC.addWidget(self.titOptions)
+        #self.hboxC.addWidget(self.titOptions)
         self.hboxC.addStretch(1)
         self.hboxC.addWidget(self.butClose)
 
