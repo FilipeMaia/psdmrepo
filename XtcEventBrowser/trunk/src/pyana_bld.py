@@ -101,15 +101,15 @@ class  pyana_bld ( object ) :
             array2 = np.float_(self.EB_positions)
             plt.scatter(array2[:,0],array2[:,1])
             plt.title('Beam position')
-            plt.xlabel('X',horizontalalignment='right')
-            plt.ylabel('Y',horizontalalignment='right')
+            plt.xlabel('X',horizontalalignment='left')
+            plt.ylabel('Y',horizontalalignment='left')
 
             ax3 = fig.add_subplot(223)
             array3 = np.float_(self.EB_angles)
             plt.scatter(array3[:,0],array3[:,1])
             plt.title('Beam angle')
-            plt.xlabel('X',horizontalalignment='right')
-            plt.ylabel('Y',horizontalalignment='right')
+            plt.xlabel('X',horizontalalignment='left')
+            plt.ylabel('Y',horizontalalignment='left')
 
             ax4 = fig.add_subplot(224)
             array4 = np.float_(self.EB_charge)
@@ -129,25 +129,25 @@ class  pyana_bld ( object ) :
             n, bins, patches = plt.hist(array[:,0], 60,histtype='stepfilled')
             plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
             plt.title('Gas Detector E0')
-            plt.xlabel('GasDetector Energy0',horizontalalignment='right')
+            plt.xlabel('GasDetector Energy0',horizontalalignment='left')
             
             ax2 = fig.add_subplot(222)
             n, bins, patches = plt.hist(array[:,1], 60,histtype='stepfilled')
             plt.setp(patches,'facecolor', 'g', 'alpha', 0.75)
             plt.title('Gas Detector E1')
-            plt.xlabel('GasDetector Energy1',horizontalalignment='right')
+            plt.xlabel('GasDetector Energy1',horizontalalignment='left')
 
             ax3 = fig.add_subplot(223)
             n, bins, patches = plt.hist(array[:,2], 60,histtype='stepfilled')
             plt.setp(patches,'facecolor', 'b', 'alpha', 0.75)
             plt.title('Gas Detector E2')
-            plt.xlabel('GasDetector Energy2',horizontalalignment='right')
+            plt.xlabel('GasDetector Energy2',horizontalalignment='left')
 
             ax4 = fig.add_subplot(224)
             n, bins, patches = plt.hist(array[:,3], 60,histtype='stepfilled')
             plt.setp(patches,'facecolor', 'm', 'alpha', 0.75)
             plt.title('Gas Detector E3')
-            plt.xlabel('GasDetector Energy3',horizontalalignment='right')
+            plt.xlabel('GasDetector Energy3',horizontalalignment='left')
 
 
         if self.do_PC :
@@ -159,25 +159,25 @@ class  pyana_bld ( object ) :
             n, bins, patches = plt.hist(array[:,0], 60,histtype='stepfilled')
             plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
             plt.title('PhaseCavity FitTime1')
-            plt.xlabel('PhaseCavity FitTime1',horizontalalignment='right')
+            plt.xlabel('PhaseCavity FitTime1',horizontalalignment='left')
             
             ax2 = fig.add_subplot(222)
             n, bins, patches = plt.hist(array[:,1], 60,histtype='stepfilled')
             plt.setp(patches,'facecolor', 'g', 'alpha', 0.75)
             plt.title('PhaseCavity FitTime2')
-            plt.xlabel('PhaseCavity FitTime2',horizontalalignment='right')
+            plt.xlabel('PhaseCavity FitTime2',horizontalalignment='left')
 
             ax3 = fig.add_subplot(223)
             n, bins, patches = plt.hist(array[:,2], 60,histtype='stepfilled')
             plt.setp(patches,'facecolor', 'b', 'alpha', 0.75)
             plt.title('PhaseCavity FitCharge1')
-            plt.xlabel('PhaseCavity FitCharge1',horizontalalignment='right')
+            plt.xlabel('PhaseCavity FitCharge1',horizontalalignment='left')
 
             ax4 = fig.add_subplot(224)
             n, bins, patches = plt.hist(array[:,3], 60,histtype='stepfilled')
             plt.setp(patches,'facecolor', 'm', 'alpha', 0.75)
             plt.title('PhaseCavity FitChare2')
-            plt.xlabel('PhaseCavity FitCharge2',horizontalalignment='right')
+            plt.xlabel('PhaseCavity FitCharge2',horizontalalignment='left')
 
 
-        plt.show()
+        plt.draw()

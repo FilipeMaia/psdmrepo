@@ -76,6 +76,7 @@ class XtcBrowserMain (QtGui.QMainWindow) :
     
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
+
         self.setWindowTitle("LCLS Xtc Event Browser")
         self.setWindowIcon(QtGui.QIcon('XtcEventBrowser/src/lclsLogo.gif'))
 
@@ -91,6 +92,7 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         self.create_main_frame()
 
 
+
     def create_main_frame(self):
     
         self.pic = QtGui.QLabel(self)
@@ -100,6 +102,7 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         self.__update_status()
         
         # buttons
+        self.pyana_config = None
         self.pyana_button = None
 
         self.fbrowser_button = QtGui.QPushButton("&File Browser")
@@ -120,15 +123,17 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         
         self.qscan_button = QtGui.QPushButton("&Quick Scan")
         self.connect(self.qscan_button, QtCore.SIGNAL('clicked()'), self.__scan_files_quick )
-        
-        self.det_selector = QtGui.QVBoxLayout()
-        
+
         # Quit application
         self.quit_button = QtGui.QPushButton("&Quit")
         self.connect(self.quit_button, QtCore.SIGNAL('clicked()'), self.__file_quit )
         
         self.main_widget = QtGui.QWidget(self)
         self.main_widget.setFocus()
+        
+
+        # holds checkboxes, pyana configuration and pyana run-button
+        self.det_selector = QtGui.QVBoxLayout()
         
         ### layout ###
         
@@ -326,15 +331,17 @@ class XtcBrowserMain (QtGui.QMainWindow) :
             if box.isChecked() :
                 print "%s requested" % box.text() 
 
+                # --- --- --- BLD --- --- ---
                 if str(box.text()).find("BldInfo")>=0 :
                     index = None
                     try :
                         index = modules_to_run.index("XtcEventBrowser.pyana_bld")
-                    except ValueError:
+                    except ValueError :
+                        index = len(modules_to_run)
                         modules_to_run.append("XtcEventBrowser.pyana_bld")
                         options_for_mod.append([])
-                        index = 0
-                    print index
+                    print "XtcEventBrowser.pyana_bld at ", index
+
                     if str(box.text()).find("EBeam")>=0 :
                         options_for_mod[index].append("\ndo_ebeam = True")
                     if str(box.text()).find("FEEGasDetEnergy")>=0 :
@@ -342,18 +349,69 @@ class XtcBrowserMain (QtGui.QMainWindow) :
                     if str(box.text()).find("PhaseCavity")>=0 :
                         options_for_mod[index].append("\ndo_phasecavity = True")
 
+                # --- --- --- Ipimb --- --- ---
+                if str(box.text()).find("Ipimb")>=0 :
+                    index = None
+                    try :
+                        index = modules_to_run.index("XtcEventBrowser.pyana_ipimb")
+                    except ValueError :
+                        index = len(modules_to_run)
+                        modules_to_run.append("XtcEventBrowser.pyana_ipimb")
+                        options_for_mod.append([])
+                    print "XtcEventBrowser.pyana_ipimb at ", index
+
+                    address = str(box.text()).split(":")[1]
+                    options_for_mod[index].append("\nipimb_addresses = %s" % address)
+                    
+                # --- --- --- TM6740 --- --- ---
+                if str(box.text()).find("TM6740")>=0 :
+                    index = None
+                    try :
+                        index = modules_to_run.index("XtcEventBrowser.pyana_image")
+                    except ValueError :
+                        index = len(modules_to_run)
+                        modules_to_run.append("XtcEventBrowser.pyana_image")
+                        options_for_mod.append([])
+                    print "XtcEventBrowser.pyana_image at ", index
+
+                    address = str(box.text()).split(":")[1]
+                    options_for_mod[index].append("\nimage_source = %s" % address)
+                    options_for_mod[index].append("\ngood_range = %d--%d" % (50,250) )
+                    options_for_mod[index].append("\ndark_range = %d--%d" % (250,1050) )
+
+                # --- --- --- Acqiris --- --- ---
                 if str(box.text()).find("Acqiris")>=0 :
                     modules_to_run.append("XtcEventBrowser.pyana_acq")
 
+                # --- --- --- pnCCD --- --- ---
                 if str(box.text()).find("pnCCD")>=0 :
                     modules_to_run.append("XtcEventBrowser.pyana_misc")
                     configuration+="\nmodules = XtcEventBrowser.pyana_misc\n"
                     configuration+="\n[XtcEventBrowser.pyana_misc]"
                     configuration+="\nimage_source = %s "% str(box.text()).split(":")[1]
-        if len(modules_to_run)==0 :
+
+        nmodules = len(modules_to_run)
+        if nmodules == 0 :
             print "No modules requested! Please select from list"
             return
 
+        # if several values for same option, merge into a list
+        for m in range(0,nmodules):
+            tmpoptions = {}
+            for options in options_for_mod[m] :
+                n,v = options.split("=")
+                if n in tmpoptions :
+                    oldvalue = tmpoptions[n]
+                    tmpoptions[n] = oldvalue+v
+                else :
+                    tmpoptions[n] = v
+
+            newoptions = []
+            for n, v in tmpoptions.iteritems() :
+                optstring = "%s = %s" % (n, v)
+                newoptions.append(optstring)
+
+            options_for_mod[m] = newoptions
 
         configuration = "[pyana]"
         configuration += "\nmodules ="
@@ -366,12 +424,14 @@ class XtcBrowserMain (QtGui.QMainWindow) :
             configuration += "\n\n["
             configuration += module
             configuration += "]"
-            if len( options_for_mod[ count_m ] )>0 :
-                for options in options_for_mod[ count_m ] :
-                    configuration += options
+            #if len( options_for_mod[ count_m ] )>0 :
+            for options in options_for_mod[ count_m ] :
+                configuration += options
             count_m +=1
             
-
+        print "Configuration:\n"
+        print configuration
+        print
         configfile = "xb_pyana_%d.cfg" % random.randint(1000,9999)
 
         f = open(configfile,'w')
@@ -391,6 +451,11 @@ class XtcBrowserMain (QtGui.QMainWindow) :
 
         configfile = self.__write_config_script()
         print "pyana config file has been generated : ", configfile
+
+        # pop up emacs window to edit the config file as needed:
+        subprocess.Popen("emacs %s" % configfile, shell=True) 
+        
+
         print "Now we'll run pyana..... "
 
         runstring = "pyana -n 1000 -c %s " % configfile
