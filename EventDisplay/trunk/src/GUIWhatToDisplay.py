@@ -69,6 +69,12 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.setGeometry(370, 350, 500, 500)
         self.setWindowTitle('What to display?')
 
+        self.frame = QtGui.QFrame(self)
+        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken )
+        self.frame.setLineWidth(0)
+        self.frame.setMidLineWidth(1)
+        self.frame.setGeometry(self.rect())
+        
         titFont   = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
 
         self.titImage    = QtGui.QLabel('Image')
@@ -84,25 +90,31 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         
         self.titCSImage    = QtGui.QLabel('Images:')
         self.titCSSpectra  = QtGui.QLabel('Spectra:')
+        self.titCSImageSpec= QtGui.QLabel('Image & Spectrum:')
 
-        self.cboxIMImage     = QtGui.QCheckBox('Image',         self)
-        self.cboxIMSpectrum  = QtGui.QCheckBox('Spectrum',      self)
+        self.cboxIMImage       = QtGui.QCheckBox('Image',            self)
+        self.cboxIMSpectrum    = QtGui.QCheckBox('Spectrum',         self)
 
-        self.cboxCSImage     = QtGui.QCheckBox('8 of 2x1',      self)
-        self.cboxCSSpectrum  = QtGui.QCheckBox('16 ASICs',      self)
-        self.cboxCSSpectrum08= QtGui.QCheckBox('8 of 2x1',      self)
+        self.cboxCSImageQuad   = QtGui.QCheckBox('Quad',          self)
+        self.cboxCSImageDet    = QtGui.QCheckBox('Detector',      self)
+        self.cboxCSImage       = QtGui.QCheckBox('8 of 2x1',      self)
+        self.cboxCSImageOfPair = QtGui.QCheckBox('1 of 2x1',      self)
+        self.cboxCSSpectrum    = QtGui.QCheckBox('16 ASICs',      self)
+        self.cboxCSSpectrum08  = QtGui.QCheckBox('8 of 2x1',      self)
 
-        self.cboxWFImage     = QtGui.QCheckBox('Image',         self)
-        self.cboxWFSpectrum  = QtGui.QCheckBox('Spectrum',      self)
+        self.cboxWFImage       = QtGui.QCheckBox('Image',         self)
+        self.cboxWFSpectrum    = QtGui.QCheckBox('Spectrum',      self)
 
-        if cp.confpars.imageImageIsOn       : self.cboxIMImage     .setCheckState(2)
-        if cp.confpars.imageSpectrumIsOn    : self.cboxIMSpectrum  .setCheckState(2)
-        if cp.confpars.cspadImageIsOn       : self.cboxCSImage     .setCheckState(2)
-        if cp.confpars.cspadSpectrumIsOn    : self.cboxCSSpectrum  .setCheckState(2)
-        if cp.confpars.cspadSpectrum08IsOn  : self.cboxCSSpectrum08.setCheckState(2)
-        if cp.confpars.waveformImageIsOn    : self.cboxWFImage     .setCheckState(1)
-        if cp.confpars.waveformSpectrumIsOn : self.cboxWFSpectrum  .setCheckState(1)
-
+        if cp.confpars.imageImageIsOn       : self.cboxIMImage       .setCheckState(2)
+        if cp.confpars.imageSpectrumIsOn    : self.cboxIMSpectrum    .setCheckState(2)
+        if cp.confpars.cspadImageOfPairIsOn : self.cboxCSImageOfPair .setCheckState(2)
+        if cp.confpars.cspadImageIsOn       : self.cboxCSImage       .setCheckState(2)
+        if cp.confpars.cspadImageQuadIsOn   : self.cboxCSImageQuad   .setCheckState(2)
+        if cp.confpars.cspadImageDetIsOn    : self.cboxCSImageDet    .setCheckState(2)
+        if cp.confpars.cspadSpectrumIsOn    : self.cboxCSSpectrum    .setCheckState(2)
+        if cp.confpars.cspadSpectrum08IsOn  : self.cboxCSSpectrum08  .setCheckState(2)
+        if cp.confpars.waveformImageIsOn    : self.cboxWFImage       .setCheckState(1)
+        if cp.confpars.waveformSpectrumIsOn : self.cboxWFSpectrum    .setCheckState(1)
 
         #self.cb.setFocusPolicy(QtCore.Qt.NoFocus) 
         #self.cb2.move(10, 50)
@@ -119,12 +131,20 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
         gridCS = QtGui.QGridLayout()
         gridCS.addWidget(self. titCSpad,        0, 0)
+
         gridCS.addWidget(self. titCSImage,      1, 0)
         gridCS.addWidget(self.cboxCSImage,      1, 1)
+        gridCS.addWidget(self.cboxCSImageQuad,  1, 2)
+        gridCS.addWidget(self.cboxCSImageDet,   1, 3)
+
         gridCS.addWidget(self. titCSSpectra,    2, 0)
-        gridCS.addWidget(self.cboxCSSpectrum,   2, 1)
-        gridCS.addWidget(self.cboxCSSpectrum08, 2, 2)
+        gridCS.addWidget(self.cboxCSSpectrum08, 2, 1)
+        gridCS.addWidget(self.cboxCSSpectrum,   2, 2)
         #gridCS.addWidget(self.butCSOptions,     0, 1, 1, 3)
+
+        gridCS.addWidget(self. titCSImageSpec,  3, 0)
+        gridCS.addWidget(self.cboxCSImageOfPair,3, 1)
+
         
         gridIM = QtGui.QGridLayout()
         gridIM.addWidget(self.titImage,         0, 0)
@@ -192,6 +212,9 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.connect(self.cboxIMImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMImage)
         self.connect(self.cboxIMSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMSpectrum)
         self.connect(self.cboxCSImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSImage)
+        self.connect(self.cboxCSImageQuad,     QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSImageQuad)
+        self.connect(self.cboxCSImageDet,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSImageDet)
+        self.connect(self.cboxCSImageOfPair,   QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSImageOfPair)
         self.connect(self.cboxCSSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSSpectrum)
         self.connect(self.cboxCSSpectrum08,    QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSSpectrum08)
         self.connect(self.cboxWFImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFImage)
@@ -208,6 +231,10 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
     def closeEvent(self, event):
         print 'closeEvent'
         self.processClose()
+
+    def resizeEvent(self, e):
+        #print 'resizeEvent' 
+        self.frame.setGeometry(self.rect())
 
     def processClose(self):
         print 'Close window'
@@ -260,7 +287,6 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
             cp.confpars.imageImageIsOn = False
             #if cp.confpars.wtdIMWindowIsOpen : self.guiwtdIM.cboxIMImage.setCheckState(0)
 
-
     def processCBoxIMSpectrum(self, value):
         if self.cboxIMSpectrum.isChecked():
             cp.confpars.imageSpectrumIsOn = True
@@ -277,6 +303,28 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         else:
             cp.confpars.cspadImageIsOn = False
             #if cp.confpars.wtdCSWindowIsOpen : self.guiwtdCS.cboxCSImage.setCheckState(0)
+
+    def processCBoxCSImageOfPair(self, value):
+        print 'processCBoxCSImageOfPair'
+        if self.cboxCSImageOfPair.isChecked():
+            cp.confpars.cspadImageOfPairIsOn = True
+        else:
+            cp.confpars.cspadImageOfPairIsOn = False
+
+    def processCBoxCSImageQuad(self, value):
+        if self.cboxCSImageQuad.isChecked():
+            cp.confpars.cspadImageQuadIsOn = True
+        else:
+            cp.confpars.cspadImageQuadIsOn = False
+
+    def processCBoxCSImageDet(self, value):
+        if self.cboxCSImageDet.isChecked():
+            cp.confpars.cspadImageDetIsOn = True
+        else:
+            cp.confpars.cspadImageDetIsOn = False
+
+
+
 
 
     def processCBoxCSSpectrum(self, value):

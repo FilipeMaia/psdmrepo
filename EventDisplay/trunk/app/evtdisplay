@@ -43,6 +43,7 @@ import os
 #-----------------------------
 from PyQt4 import QtGui
 from EventDisplay.GUIMain import GUIMain
+from EventDisplay.GUIMainV2 import GUIMainV2
 
 #---------------------------------
 #  Application class definition --
@@ -54,7 +55,8 @@ class EventDisplay :
         """Constructor : This is a regular stuff for PyQt4"""
 	print "Start the event display main GUI"
         app = QtGui.QApplication(sys.argv)
-        gui = GUIMain(None,app)
+        #gui = GUIMain(None,app)
+        gui = GUIMainV2(None,app)
         gui.show()
         #app.setActiveWindow(gui)
         sys.exit(app.exec_())

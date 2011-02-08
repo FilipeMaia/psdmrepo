@@ -47,6 +47,12 @@ class GUIConfiguration ( QtGui.QWidget ) :
         self.setGeometry(370, 350, 500, 200)
         self.setWindowTitle('Configuration')
 
+        self.frame = QtGui.QFrame(self)
+        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken )
+        self.frame.setLineWidth(0)
+        self.frame.setMidLineWidth(1)
+        self.frame.setGeometry(self.rect())
+        
         self.titFile     = QtGui.QLabel('File with configuration parameters:')
         self.titPars     = QtGui.QLabel('Operations on configuration parameters:')
         self.titRadio    = QtGui.QLabel('At program start:')
@@ -135,6 +141,10 @@ class GUIConfiguration ( QtGui.QWidget ) :
         print 'Exit'
         self.close()
         cp.confpars.configGUIIsOpen = False
+
+    def resizeEvent(self, e):
+        #print 'resizeEvent' 
+        self.frame.setGeometry(self.rect())
 
     def processRead(self):
         print 'Read'
