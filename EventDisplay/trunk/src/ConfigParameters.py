@@ -100,6 +100,7 @@ class ConfigParameters ( object ) :
         self.posGUIMain           = (370,10)
 
         self.readParsFromFileAtStart = True
+        self.current_item_name_for_title = 'Current extended item name for title'
 
         # Default parameters for CSpad plots
         self.cspadQuad            = 1

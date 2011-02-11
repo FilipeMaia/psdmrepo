@@ -45,7 +45,7 @@ class ConfigCSpad ( object ) :
     def __init__ ( self ) :
         """Constructor"""
         self.setCSpadParametersV0001()
-        self.Print()
+        #self.Print()
 
     def setCSpadParametersV0001 ( self ) :
         """Set default configuration parameters hardwired in this module"""
@@ -56,8 +56,11 @@ class ConfigCSpad ( object ) :
         self.quadInDetOrient = [   0,    0,   270,   0]
         self.quadInDetOriInd = [   0,    0,     3,   0]
 
-        self.quadYOffset     = [   0,  800,   800,   0]
-        self.quadXOffset     = [   0,    0,   800, 800]
+        gapX = 50
+        gapY = 50
+
+        self.quadXOffset     = [   0,    0,      800+gapX, 800+gapX]
+        self.quadYOffset     = [   0,  800+gapY, 800+gapY,        0]
 
         self.firstPairInQuad = [0, 0,  8, 16]
         self.lastPairInQuad  = [0, 8, 16, 20]

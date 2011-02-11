@@ -95,6 +95,18 @@ def get_item_last_name(dsname):
     path,name = os.path.split(str(dsname))
     return name
 
+
+#----------------------------------
+
+def get_item_name_for_title(dsname):
+    """Returns the last 3 parts of the full item name (after last slashes)"""
+
+    path1,name1 = os.path.split(str(dsname))
+    path2,name2 = os.path.split(str(path1))
+    path3,name3 = os.path.split(str(path2))
+
+    return name3 + '/' + name2 + '/' + name1
+
 #----------------------------------
 
 def print_time(ds,ind):

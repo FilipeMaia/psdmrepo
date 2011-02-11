@@ -98,7 +98,9 @@ class DrawEvent ( object ) :
             arr1ev = ds[cp.confpars.eventCurrent]
 
             item_last_name = printh5.get_item_last_name(dsname)
-            print 'Plot item:', dsname, ' item name:', item_last_name  
+            cp.confpars.current_item_name_for_title = printh5.get_item_name_for_title(dsname)
+            print 'Plot item:', dsname, ' item name:', item_last_name
+            #print 'Name for plot title:', cp.confpars.current_item_name_for_title
 
             if dsname == self.dsnameCSpadV1 :
                 print 'Draw plots for CSpad V1'

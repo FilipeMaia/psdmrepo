@@ -73,11 +73,16 @@ class PlotsForCSpad ( object ) :
     def plotCSpadV2Image( self, arr1ev, fig, plot=8 ):
         """Plot 2d image from input array. V2 for run ~900 contain array for quad 2"""
         self.quad=cp.confpars.cspadQuad        
-        pair01 = 8*self.quad
-        pair08 = pair01 + 8
-        arr1quad = arr1ev[pair01:pair08,...]
+        pair1 = cs.confcspad.firstPairInQuad[self.quad]
+        pairN = cs.confcspad. lastPairInQuad[self.quad]
+
+        #print 'Quad:',self.quad,' Pairs:',pair1,pairN
+
+        #arr1quad = arr1ev
         #arr1quad = np.zeros( (8,185,388) )
-        #arr1quad[0:8, 0:185, 0:388] += arr1ev[pair01:pair08, 0:185, 0:388]
+        #arr1quad[0:pairN-pair1, 0:185, 0:388] += arr1ev[pair1:pairN, 0:185, 0:388]
+        #arr1quad = arr1ev[pair1:pairN, 0:185, 0:388]
+        arr1quad = arr1ev[pair1:pairN,...]
 
         #print 'Quad=',          self.quad
         #print 'arr1quad.shape=',arr1quad.shape
@@ -85,11 +90,10 @@ class PlotsForCSpad ( object ) :
         #print 'arr1quad.dtype=',arr1quad.dtype
         #print 'arr1quad.ndim =',arr1quad.ndim
 
-        arr1quad = arr1ev
-        if plot ==  1     : self.plotCSpadPairImage   ( arr1quad, fig )
-        if plot ==  8     : self.plotCSpad08PairsImage( arr1quad, fig )
-        if plot == 'Quad' : self.plotCSpadQuadImage   ( arr1ev,   fig )
-        if plot == 'Det'  : self.plotCSpadDetImage    ( arr1ev,   fig )
+        if plot ==  1     : self.plotCSpadPairImage   ( arr1quad,  fig )
+        if plot ==  8     : self.plotCSpad08PairsImage( arr1quad,  fig )
+        if plot == 'Quad' : self.plotCSpadQuadImage   ( arr1ev,    fig )
+        if plot == 'Det'  : self.plotCSpadDetImage    ( arr1ev,    fig )
 
 
     def plotCSpadV1Spectrum( self, arr1ev, fig, plot=16 ):
@@ -103,10 +107,11 @@ class PlotsForCSpad ( object ) :
     def plotCSpadV2Spectrum( self, arr1ev, fig, plot=16 ):
         """Plot 2d image from input array. V2 for run ~900 contain array for quad 2"""
         self.quad=cp.confpars.cspadQuad
-        pair01 = 8*self.quad
-        pair08 = pair01 + 8
-        arr1quad = arr1ev[pair01:pair08,...]
-        #arr1quad = arr1ev        
+        pair1 = cs.confcspad.firstPairInQuad[self.quad]
+        pairN = cs.confcspad. lastPairInQuad[self.quad]
+        arr1quad = np.zeros( (8,185,388) ) # In order to have array for all 8 pairs!!!!!
+        arr1quad[0:pairN-pair1, 0:185, 0:388] += arr1ev[pair1:pairN,0:185, 0:388]
+
         if plot ==  8 : self.plotCSpadQuad08SpectraOf2x1( arr1quad, fig )
         if plot == 16 : self.plotCSpadQuad16Spectra( arr1quad, fig )
 
@@ -125,11 +130,10 @@ class PlotsForCSpad ( object ) :
 
         arrgap=zeros( (185,4) ) # make additional 2D-array of 0-s for the gap between two 1x1 pads
         
-        for pair in xrange(8): # loop for pair = 0,1,2,...,7
+        for pair in xrange(8): # loop over pair in quad = 0,1,2,...,7
             #print 'pair=', pair
         
             asic1x2  = arr1quad[pair,...]
-            #asic1x2  = arr1ev[quad,pair,...]
             #print 'asic1x2=',asic1x2    
         
             asics    = hsplit(asic1x2,2)
@@ -141,19 +145,7 @@ class PlotsForCSpad ( object ) :
             plt.subplot(panel)
             plt.imshow(arr,  origin='down', interpolation='nearest') # Just a histogram
             plt.clim(cp.confpars.cspadImageAmin,cp.confpars.cspadImageAmax)
-
             plt.title(pantit,color='r',fontsize=20) # pars like in class Text
-
-            #subp1 = self.fig1.add_subplot(panel)
-            #subp1.imshow(arr, origin='upper', interpolation='nearest') # Just a histogram
-            #subp1.title(pantit,color='r',fontsize=20) # pars like in class Text
-            #plt.xlabel('X pixels')
-            #plt.ylabel('Y pixels')
-            #plt.margins(x=0.05,y=0.05,tight=True)
-            #plt.rc('lines', linewidth=2, color='r') # Set the current default parameters
-        
-            #plt.savefig("my-image-hdf5.png")
-
             if pair==0 :
                 plt.text(370, 192, str_event, fontsize=24)
 
@@ -195,11 +187,14 @@ class PlotsForCSpad ( object ) :
             pairInQuad = pair-self.firstPair
             rotarr2d = np.rot90(asic2x1,cs.confcspad.pairInQaudOriInd[self.quad][pairInQuad])
             #print 'rotarr2d.shape=',rotarr2d.shape
+            #print 'rotarr2d.base is asic2x1 ? ',rotarr2d.base is asic2x1 
+
             dimX,dimY = rotarr2d.shape
 
             ixOff = cs.confcspad.pairXInQaud[self.quad][pairInQuad]
             iyOff = cs.confcspad.pairYInQaud[self.quad][pairInQuad]
-            #print 'ixOff, iyOff =', ixOff, iyOff           
+            #print 'ixOff, iyOff =', ixOff, iyOff,           
+            #print ' dimX,  dimY =', dimX, dimY           
 
             arr2dquad[ixOff:dimX+ixOff, iyOff:dimY+iyOff] += rotarr2d[0:dimX, 0:dimY]
 
@@ -209,7 +204,7 @@ class PlotsForCSpad ( object ) :
     def getImageArrayForDet( self, arr1ev ):
         """Returns the image array for entire CSpad detector"""
         #print 'getImageArrayForDet()'
-        arr2d = np.zeros( (1610,1610), dtype=np.int16 )
+        arr2d = np.zeros( (1650,1650), dtype=np.int16 )
         #print 'arr2d.shape=',arr2d.shape
 
         #for quad in range(0,4) : # !!!!! SHOULD BE CHANGED FOR ENTIRE DETECTOR
@@ -241,6 +236,8 @@ class PlotsForCSpad ( object ) :
         
         plottit='Event ' + str(cp.confpars.eventCurrent) + '  Quad '+str(cp.confpars.cspadQuad)
         axes = plt.imshow(arr2d, interpolation='nearest') # ,origin='down'
+        #axes = plt.imshow(arr2d, origin='down', interpolation='nearest') # ,origin='down'
+
         plt.clim(cp.confpars.cspadImageAmin,cp.confpars.cspadImageAmax)
         self.colb = plt.colorbar(axes, pad=0.03, orientation=1, fraction=0.10, shrink = 0.86, aspect = 20)#, ticks=coltickslocs
         plt.title(plottit,color='r',fontsize=20) # pars like in class Text
@@ -299,8 +296,8 @@ class PlotsForCSpad ( object ) :
             plt.text(0.04,0.84,pantit,color='r',fontsize=20,transform = ax.transAxes)
 
             if pair==0 :
-                str_event = 'Event ' + str(cp.confpars.eventCurrent)
-                plt.text(0.8,1.05,str_event,color='b',fontsize=24,transform = ax.transAxes)
+                title = 'Event ' + str(cp.confpars.eventCurrent) + '  Quad ' + str(self.quad)
+                plt.text(0.8,1.05,title ,color='b',fontsize=24,transform = ax.transAxes)
 
         print 'Time to generate all histograms (sec) = %f' % (time.clock() - t_start)
 
@@ -308,7 +305,7 @@ class PlotsForCSpad ( object ) :
     def plotCSpadQuad16Spectra( self, arr1quad, fig ):
         """Amplitude specra from 2d array."""
 
-        fig.canvas.set_window_title('CSpad Quad Specra of 2x1')
+        fig.canvas.set_window_title('CSpad Quad Specra of 16 ASICs')
         plt.clf() # clear plot
         #plt.title('Spectra',color='r',fontsize=20)
         fig.subplots_adjust(left=0.10, bottom=0.05, right=0.98, top=0.95, wspace=0.35, hspace=0.3)
@@ -347,9 +344,9 @@ class PlotsForCSpad ( object ) :
                 plt.title(pantit,color='r',fontsize=20)
 
                 if pair==0 and inpair==1:
-                    str_event = 'Event ' + str(cp.confpars.eventCurrent)
+                    title = 'Event ' + str(cp.confpars.eventCurrent) + '  Quad ' + str(self.quad)
                     #ax = plt.gca()
-                    plt.text(0.8,1.08,str_event,color='b',fontsize=24,transform = plt.gca().transAxes)
+                    plt.text(0.8,1.08,title,color='b',fontsize=24,transform = plt.gca().transAxes)
 
         print 'Time to generate all histograms (sec) = %f' % (time.clock() - t_start)
 

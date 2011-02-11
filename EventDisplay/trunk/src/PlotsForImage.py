@@ -65,7 +65,7 @@ class PlotsForImage ( object ) :
     def plotImage( self, arr2d1ev, fig ):
         """Plot 2d image from input array."""
 
-        fig.canvas.set_window_title("Image") 
+        fig.canvas.set_window_title(cp.confpars.current_item_name_for_title) 
         plt.clf() # clear plot
         fig.subplots_adjust(left=0.10, bottom=0.05, right=0.95, top=0.95, wspace=0.1, hspace=0.1)        
         
@@ -75,8 +75,8 @@ class PlotsForImage ( object ) :
         plt.clim(cp.confpars.imageImageAmin,cp.confpars.imageImageAmax)
         
         plt.title(pantit,color='r',fontsize=20) # pars like in class Text
-        plt.xlabel('X pixels')
-        plt.ylabel('Y pixels')
+        #plt.xlabel('X pixels')
+        #plt.ylabel('Y pixels')
         
         #plt.margins(x=0.05,y=0.05,tight=True)
         #plt.rc('lines', linewidth=2, color='r') # Set the current default parameters
@@ -92,7 +92,7 @@ class PlotsForImage ( object ) :
         """Spectrum of amplitudes in the 2d input array."""
 
         plt.clf() # clear plot
-        fig.canvas.set_window_title('Specrum') 
+        fig.canvas.set_window_title(cp.confpars.current_item_name_for_title) 
         pantit='Specrum, event ' + str(cp.confpars.eventCurrent)
         plt.title(pantit,color='r',fontsize=20) # pars like in class Text
         arrdimX,arrdimY = arr2d1ev.shape
@@ -116,7 +116,7 @@ class PlotsForImage ( object ) :
         #print 'Image and spectrum'
 
         self.fig = fig
-        fig.canvas.set_window_title('Image and Spectrum')
+        fig.canvas.set_window_title(cp.confpars.current_item_name_for_title)
         plt.clf() # clear plot
         fig.subplots_adjust(left=0.15, bottom=0.05, right=0.95, top=0.95, wspace=0.1, hspace=0.1)        
         
@@ -131,7 +131,7 @@ class PlotsForImage ( object ) :
         self.arr1d = copy(arr2d1ev)
         self.arr1d.resize(arrdimX*arrdimY)            
 
-        self.pantit =    'Event '   + str(cp.confpars.eventCurrent) 
+        self.pantit =    'Event ' + str(cp.confpars.eventCurrent) 
         self.drawImageAndSpectrum(cp.confpars.imageImageAmin,cp.confpars.imageImageAmax)
 
 
