@@ -75,12 +75,15 @@ class ConfigParameters ( object ) :
 
         #self.dirName         = '/reg/neh/home/dubrovin/LCLS/test_h5py'
         #self.fileName        = 'test.h5'
-        self.dirName              = '/reg/d/psdm/XPP/xppcom10/hdf5'
-        self.fileName             = 'xppcom10-r0546.h5'
-        #self.fileName             = 'xppcom10-r0900.h5'
+        #self.dirName              = '/reg/d/psdm/XPP/xppcom10/hdf5'
+        #self.fileName             = 'xppcom10-r0546.h5'
+        self.dirName              = '/reg/d/psdm/CXI/cxi80410/hdf5'
+        self.fileName             = 'cxi80410-r0430.h5'
         self.eventCurrent         = 1
         self.span                 = 1
-        self.list_of_checked_item_names=[]        
+        self.list_of_checked_item_names=[]
+        self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data')
+        self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/Camera::FrameV1/CxiSc1.0:Tm6740.0/image')       
 
         # Status parameters which do not need to be saved
         self.confParsDirName      = '.'
@@ -99,20 +102,20 @@ class ConfigParameters ( object ) :
         self.readParsFromFileAtStart = True
 
         # Default parameters for CSpad plots
-        self.cspadQuad            = 2
+        self.cspadQuad            = 1
         self.cspadPair            = 1
 
         self.cspadAmplitudeRaMin  = 0
         self.cspadAmplitudeRange  = 2000
 
-        self.cspadImageOfPairIsOn = False
+        self.cspadImageOfPairIsOn = True
         self.cspadImageIsOn       = True
         self.cspadImageQuadIsOn   = False
         self.cspadImageDetIsOn    = False
         self.cspadImageAmin       = 0   
         self.cspadImageAmax       = 2000
 
-        self.cspadSpectrumIsOn    = True
+        self.cspadSpectrumIsOn    = False
         self.cspadSpectrum08IsOn  = False
         self.cspadSpectrumRange   = None
         self.cspadSpectrumAmin    = 0   
@@ -124,16 +127,17 @@ class ConfigParameters ( object ) :
         self.imageAmplitudeRaMin  = 0
         self.imageAmplitudeRange  = 500
 
-        self.imageImageIsOn       = True
+        self.imageImageIsOn       = False
         self.imageImageAmin       = 0    #  15
         self.imageImageAmax       = 100  #  45
 
-        self.imageSpectrumIsOn    = True
+        self.imageSpectrumIsOn    = False
         self.imageSpectrumRange   = None # (15,45)
         self.imageSpectrumAmin    = 0    #  15
         self.imageSpectrumAmax    = 100  #  45
         self.imageSpectrumNbins   = 50   #  30
 
+        self.imageImageSpecIsOn   = True
 
         # Default parameters for Waveform plots
         self.waveformImageIsOn    = True
@@ -161,7 +165,14 @@ class ConfigParameters ( object ) :
         print 'CSPAD_IMAGE_DET_IS_ON',     self.cspadImageDetIsOn
         print 'CSPAD_SPECT_IS_ON',         self.cspadSpectrumIsOn    
         print 'CSPAD_SPE08_IS_ON',         self.cspadSpectrum08IsOn    
+
+        print 'CSPAD_IMAGE_AMIN',          self.cspadImageAmin
+        print 'CSPAD_IMAGE_AMAX',          self.cspadImageAmax
+        print 'CSPAD_SPECT_AMIN',          self.cspadSpectrumAmin
+        print 'CSPAD_SPECT_AMAX',          self.cspadSpectrumAmax
+
         print 'IMAGE_IMAGE_IS_ON',         self.imageImageIsOn       
+        print 'IMAGE_IMAGE_SPEC_IS_ON',    self.imageImageSpecIsOn       
         print 'IMAGE_SPECT_IS_ON',         self.imageSpectrumIsOn    
         print 'WAVEF_IMAGE_IS_ON',         self.waveformImageIsOn    
         print 'VAVEF_SPECT_IS_ON',         self.waveformSpectrumIsOn 
@@ -192,12 +203,18 @@ class ConfigParameters ( object ) :
                 elif key == 'CSPAD_SPECT_IS_ON'        : self.cspadSpectrumIsOn       = dicBool[val.lower()]
                 elif key == 'CSPAD_SPE08_IS_ON'        : self.cspadSpectrum08IsOn     = dicBool[val.lower()]
                 elif key == 'IMAGE_IMAGE_IS_ON'        : self.imageImageIsOn          = dicBool[val.lower()]
+                elif key == 'IMAGE_IMAGE_SPEC_IS_ON'   : self.imageImageSpecIsOn      = dicBool[val.lower()]
                 elif key == 'IMAGE_SPECT_IS_ON'        : self.imageSpectrumIsOn       = dicBool[val.lower()]
                 elif key == 'WAVEF_IMAGE_IS_ON'        : self.waveformImageIsOn       = dicBool[val.lower()]
                 elif key == 'VAVEF_SPECT_IS_ON'        : self.waveformSpectrumIsOn    = dicBool[val.lower()]
                 elif key == 'READ_PARS_AT_START'       : self.readParsFromFileAtStart = dicBool[val.lower()]
-                elif key == 'CSPAD_QUAD_NUMBER'        : self.cspadQuad  = int(val)
-                elif key == 'CSPAD_PAIR_NUMBER'        : self.cspadPair  = int(val)
+                elif key == 'CSPAD_QUAD_NUMBER'        : self.cspadQuad         = int(val)
+                elif key == 'CSPAD_PAIR_NUMBER'        : self.cspadPair         = int(val)
+                elif key == 'CSPAD_IMAGE_AMIN'         : self.cspadImageAmin    = int(val)
+                elif key == 'CSPAD_IMAGE_AMAX'         : self.cspadImageAmax    = int(val)
+                elif key == 'CSPAD_SPECT_AMIN'         : self.cspadSpectrumAmin = int(val)
+                elif key == 'CSPAD_SPECT_AMAX'         : self.cspadSpectrumAmax = int(val)
+
 
                 else : print 'The record : %s %s \n is UNKNOWN in readParameters()' % (key, val) 
             f.close()
@@ -224,14 +241,18 @@ class ConfigParameters ( object ) :
         f.write('CSPAD_SPECT_IS_ON'         + space + str(self.cspadSpectrumIsOn)       + '\n')
         f.write('CSPAD_SPE08_IS_ON'         + space + str(self.cspadSpectrum08IsOn)     + '\n')
         f.write('IMAGE_IMAGE_IS_ON'         + space + str(self.imageImageIsOn)          + '\n')
+        f.write('IMAGE_IMAGE_SPEC_IS_ON'    + space + str(self.imageImageSpecIsOn)      + '\n')
         f.write('IMAGE_SPECT_IS_ON'         + space + str(self.imageSpectrumIsOn)       + '\n')
         f.write('WAVEF_IMAGE_IS_ON'         + space + str(self.waveformImageIsOn)       + '\n')
         f.write('VAVEF_SPECT_IS_ON'         + space + str(self.waveformSpectrumIsOn)    + '\n')
         f.write('READ_PARS_AT_START'        + space + str(self.readParsFromFileAtStart) + '\n')
         f.write('CSPAD_QUAD_NUMBER'         + space + str(self.cspadQuad)               + '\n')
         f.write('CSPAD_PAIR_NUMBER'         + space + str(self.cspadPair)               + '\n')
+        f.write('CSPAD_IMAGE_AMIN'          + space + str(self.cspadImageAmin)          + '\n')
+        f.write('CSPAD_IMAGE_AMAX'          + space + str(self.cspadImageAmax)          + '\n')
+        f.write('CSPAD_SPECT_AMIN'          + space + str(self.cspadSpectrumAmin)       + '\n')
+        f.write('CSPAD_SPECT_AMAX'          + space + str(self.cspadSpectrumAmax)       + '\n')
 
-        
         f.close()
 
 

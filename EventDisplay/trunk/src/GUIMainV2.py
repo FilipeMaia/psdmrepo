@@ -174,7 +174,7 @@ class GUIMainV2 ( QtGui.QWidget ) :
     #-------------------
 
     def moveEvent(self, e):
-        print 'moveEvent' 
+        #print 'moveEvent' 
         cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
 
     def resizeEvent(self, e):
@@ -275,12 +275,13 @@ class GUIMainV2 ( QtGui.QWidget ) :
             cp.confpars.treeWindowIsOpen = True
 
     def mousePressEvent(self, event):
-        print 'Do not click on mouse just for fun!\n'
-        print 'event.button() = %s at position' % (event.button()),        
+        #print 'Do not click on mouse just for fun!'
+        #print 'event.button() = %s at position' % (event.button()),        
         #print (event.pos()),
-        print ' x=%d, y=%d' % (event.x(),event.y()),        
-        print ' global x=%d, y=%d' % (event.globalX(),event.globalY())
+        #print ' x=%d, y=%d' % (event.x(),event.y()),        
+        #print ' global x=%d, y=%d' % (event.globalX(),event.globalY())
         #self.emit(QtCore.SIGNAL('closeGUIApp()'))
+        pass
 
     def processFileEdit(self):
         print 'FileEdit'

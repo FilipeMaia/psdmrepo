@@ -177,13 +177,19 @@ class DrawEvent ( object ) :
             if item_last_name == 'image' :
                 self.figNum += 1 
                 if cp.confpars.imageImageIsOn : 
-                    self.plotsImage.plotImage(arr1ev,self.set_fig(1))
+                    self.plotsImage.plotImage(arr1ev,self.set_fig('1x1'))
                 else : self.close_fig(self.figNum)
 
                 self.figNum += 1 
                 if cp.confpars.imageSpectrumIsOn : 
-                    self.plotsImage.plotImageSpectrum(arr1ev,self.set_fig(1))
+                    self.plotsImage.plotImageSpectrum(arr1ev,self.set_fig('1x1'))
                 else : self.close_fig(self.figNum)
+
+                self.figNum += 1 
+                if cp.confpars.imageImageSpecIsOn : 
+                    self.plotsImage.plotImageAndSpectrum(arr1ev,self.set_fig('1x2'))
+                else : self.close_fig(self.figNum)
+
 
             if item_last_name == 'waveform' :
                 print 'Here should be an emplementation of stuff for waveform'
@@ -263,10 +269,22 @@ class DrawEvent ( object ) :
                
     def open_fig( self, type=None ):
         """Open window for figure."""
-        print 'open_fig()'
+        #print 'open_fig()'
 
         plt.ion() # enables interactive mode
         if type == 1 :
+            self.fig = plt.figure(num=self.figNum, figsize=(6,8), dpi=80, facecolor='w',edgecolor='w',frameon=True)
+            self.fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
+
+        if type == '1x1' :
+            self.fig = plt.figure(num=self.figNum, figsize=(6,6), dpi=80, facecolor='w',edgecolor='w',frameon=True)
+            self.fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
+
+        if type == '1x2' :
+            self.fig = plt.figure(num=self.figNum, figsize=(5,10), dpi=80, facecolor='w',edgecolor='w',frameon=True)
+            self.fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
+
+        if type == '3x4' :
             self.fig = plt.figure(num=self.figNum, figsize=(6,8), dpi=80, facecolor='w',edgecolor='w',frameon=True)
             self.fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
 
@@ -279,7 +297,7 @@ class DrawEvent ( object ) :
 
     def set_window_position( self ):
         """Move window in desired position."""
-        print 'set_window_position()'
+        #print 'set_window_position()'
         #plt.get_current_fig_manager().window.move(890, 100) #### This works!
         fig_QMainWindow = plt.get_current_fig_manager().window
         posx = cp.confpars.posGUIMain[0] + 460 + 50*self.figNum
