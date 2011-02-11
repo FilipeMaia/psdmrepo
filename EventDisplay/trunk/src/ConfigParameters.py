@@ -110,35 +110,36 @@ class ConfigParameters ( object ) :
         self.cspadAmplitudeRange  = 2000
 
         self.cspadImageOfPairIsOn = True
-        self.cspadImageIsOn       = True
+        self.cspadImageIsOn       = False
         self.cspadImageQuadIsOn   = False
-        self.cspadImageDetIsOn    = False
-        self.cspadImageAmin       = 0   
-        self.cspadImageAmax       = 2000
-
+        self.cspadImageDetIsOn    = True
         self.cspadSpectrumIsOn    = False
         self.cspadSpectrum08IsOn  = False
-        self.cspadSpectrumRange   = None
+
+        self.cspadImageAmin       = 0   
+        self.cspadImageAmax       = 2000
         self.cspadSpectrumAmin    = 0   
         self.cspadSpectrumAmax    = 2000
         self.cspadSpectrumNbins   = 50
+        self.cspadSpectrumRange   = None
 
 
         # Default parameters for Image plots
-        self.imageAmplitudeRaMin  = 0
-        self.imageAmplitudeRange  = 500
-
         self.imageImageIsOn       = False
+        self.imageSpectrumIsOn    = False
+        self.imageImageSpecIsOn   = True
+
         self.imageImageAmin       = 0    #  15
         self.imageImageAmax       = 100  #  45
 
-        self.imageSpectrumIsOn    = False
         self.imageSpectrumRange   = None # (15,45)
         self.imageSpectrumAmin    = 0    #  15
         self.imageSpectrumAmax    = 100  #  45
         self.imageSpectrumNbins   = 50   #  30
+        self.imageAmplitudeRaMin  = 0
+        self.imageAmplitudeRange  = 500
 
-        self.imageImageSpecIsOn   = True
+
 
         # Default parameters for Waveform plots
         self.waveformImageIsOn    = True
