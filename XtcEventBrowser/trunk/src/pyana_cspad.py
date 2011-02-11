@@ -92,6 +92,10 @@ class  pyana_cspad ( object ) :
         self.n_img = 0
         self.n_dark = 0
 
+        self.fig = plt.figure()
+        cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+        self.canvas = self.fig.add_subplot(111)
+
 
 
     # start of job
@@ -163,7 +167,7 @@ class  pyana_cspad ( object ) :
             
             # image data as 3-dimentional array
             data = q.data()
-
+            
             qimage = self.CsPadElement(data, q.quad())
             qimages[q.quad()] = qimage
 
@@ -173,34 +177,16 @@ class  pyana_cspad ( object ) :
 
 
         h1 = np.hstack( (qimages[0], qimages[1]) )
-        h2 = np.hstack( (qimages[2], qimages[3]) )
+        h2 = np.hstack( (qimages[3], qimages[2]) )
         cspad_image = np.vstack( (h1, h2) )
         vmax = np.max(cspad_image)
         vmin = np.min(cspad_image)
-        print vmin
-        print vmax
 
-        self.drawframe(cspad_image,"Event # %d" % self.n_events)
-        #ax = fig2.add_subplot(111)
-        #ax.set_title("Event # %d" % self.n_events )
-        #axes = plt.imshow( cspad_image, origin='lower', vmin=14000, vmax=vmax )
-        #plt.colorbar(axes,pad=0.01)
-
-
-
-        #def onpick(result):
-        #    print "Picked"
-        #    result = -98
-
-        print "Show event # ", self.n_events
-        #fig2.canvas.mpl_connect('button_press_event', onpick)
-        #plt.show()
-
+        self.drawframe(cspad_image,"Event # %d" % self.n_events, fig=self.fig )
 
         # collect min and max intensity of this image
         self.lolimits.append( vmin )
         self.hilimits.append( vmax )
-
 
         # select good images
         isGood = False
@@ -290,27 +276,19 @@ class  pyana_cspad ( object ) :
         print "original data array shape for quad # %d: %s" % (qn, str(np.shape(data3d)) )
         print "original data types: ", data3d.dtype.name
 
-        #
-        #  | a3 | a4 |       |    | H |
-        #  -----------   =   ------------
-        #  | a2 | a1 |       | == | H |
-
         #   +---+---+-------+
         #   |   |   |   6   |
         #   + 5 | 4 +-------+
-        #   |   |   |   7   |                        A3   A4
-        #   +---+---+---+---+   (for quadrant 0) =    
-        #   |   2   |   |   |                        A2   A1
+        #   |   |   |   7   |
+        #   +---+---+---+---+
+        #   |   2   |   |   |
         #   +-------+ 0 | 1 |
         #   |   3   |   |   |
         #   +-------+---+---+
 
-        #
-
         zeros = np.zeros((18,388),dtype=data3d.dtype)
-
-        print np.shape(data3d)
-        print np.shape(zeros)
+        zeros9 = np.zeros((9,388),dtype=data3d.dtype)
+        zeros6 = np.zeros((6,388),dtype=data3d.dtype)
 
         # if any sections are missing, insert zeros
         if len( data3d ) < 8 :
@@ -321,37 +299,51 @@ class  pyana_cspad ( object ) :
                 #print "section ", i
                 #print data3d[i]
 
-        a1 = np.hstack( (data3d[0].T, data3d[1].T, zeros.T ) )
-        a2 = np.vstack( (data3d[2], data3d[3], zeros ) )
-        m1 = np.hstack( (a2, a1) )
 
-        a3 = np.hstack( (data3d[5].T, data3d[4].T, zeros.T) )
-        print np.shape( data3d[6] )
-        print np.shape( data3d[7] )
-        a4 = np.vstack( (data3d[6], data3d[7], zeros) )
-        m2 = np.hstack( (a3, a4) )
+        s01 = np.concatenate( (zeros6.T,
+                               data3d[0][:,::-1].T,
+                               zeros6.T,
+                               data3d[1][:,::-1].T,
+                               zeros6.T),
+                              1)
+        s23 = np.concatenate( (zeros6,
+                               data3d[2], 
+                               zeros6,
+                               data3d[3],
+                               zeros6 ),
+                              0 )
+        s45 = np.concatenate( (zeros6.T,
+                               data3d[5][::-1,:].T,
+                               zeros6.T,
+                               data3d[4][::-1,:].T,
+                               zeros6.T), 
+                              1 )
+        s67 = np.concatenate( (zeros6,
+                               data3d[6], 
+                               zeros6,
+                               data3d[7],
+                               zeros6 ),
+                              0 )
+
+        m1 = np.hstack( (s23, s01) )
+        m2 = np.hstack( (s45, s67) )
         e0 = np.vstack( (m2, m1) )
 
-        for i in range (qn):
-            e0 = e0.transpose()
-            
         print "final Q%d shape: %s " % (qn,str(np.shape(e0)))
+        if qn>0 : e0 = np.rot90( e0, 4-qn)
         return e0
 
 
-    def drawframe( self, frameimage, title="" ):
+    def drawframe( self, frameimage, title="", fig = None ):
 
         # plot image frame
+        if fig is None :
+            fig = plt.figure( 1 )
 
-        fig = plt.figure( 1 )
-        cid1 = fig.canvas.mpl_connect('button_press_event', self.onclick)
-        cid2 = fig.canvas.mpl_connect('key_press_event', self.onpress)
-
-        self.canvas = fig.add_subplot(111)
         self.canvas.set_title(title)
         # canvas is the main "Axes" object
 
-        self.axes = plt.imshow( frameimage, origin='lower' )
+        self.axes = plt.imshow( frameimage )#, origin='lower' )
         # axes is the are where the image is plotted
         
         self.colb = plt.colorbar(self.axes,pad=0.01)

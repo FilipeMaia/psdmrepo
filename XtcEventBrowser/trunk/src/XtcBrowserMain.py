@@ -38,6 +38,14 @@ from    PyQt4 import QtGui, QtCore
 from  XtcScanner import XtcScanner
 from XtcPyanaControl import XtcPyanaControl
 
+import XtcEventDisplay as display
+
+import matplotlib
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+from matplotlib.figure import Figure
+
+
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
@@ -147,6 +155,10 @@ part of it, please give an appropriate acknowledgment.
         self.qscan_button = QtGui.QPushButton("&Quick Scan")
         self.connect(self.qscan_button, QtCore.SIGNAL('clicked()'), self.__scan_files_quick )
 
+        # Test matplotlib widget
+        self.mpl_button = QtGui.QPushButton("&MatPlotLib")
+        self.connect(self.mpl_button, QtCore.SIGNAL('clicked()'), self.__makeplot )
+
         # Quit application
         self.quit_button = QtGui.QPushButton("&Quit")
         self.connect(self.quit_button, QtCore.SIGNAL('clicked()'), QtGui.qApp, QtCore.SLOT('quit()') )
@@ -196,6 +208,8 @@ part of it, please give an appropriate acknowledgment.
         v3.setAlignment(self.qscan_button, QtCore.Qt.AlignLeft )
         v3.addWidget( self.scan_button )
         v3.setAlignment(self.scan_button, QtCore.Qt.AlignLeft )
+        v3.addWidget( self.mpl_button )
+        v3.setAlignment(self.mpl_button, QtCore.Qt.AlignRight )
 
         h4 = QtGui.QHBoxLayout()
         h4.addLayout(v3)
@@ -234,9 +248,99 @@ part of it, please give an appropriate acknowledgment.
         self.lineedit.setText( str(filename) )
         self.__update_currentfiles()
 
+
     #--------------------
     #  Private methods --
     #--------------------
+
+    def on_draw(self):
+        """ Redraws the figure
+        """
+        str = unicode(self.textbox.text())
+        self.data = map(int, str.split())
+        
+        x = range(len(self.data))
+        
+        # clear the axes and redraw the plot anew
+        #
+        self.axes.clear()
+        self.axes.grid(self.grid_cb.isChecked())
+        
+        self.axes.bar(
+            left=x,
+            height=self.data,
+            width=self.slider.value() / 100.0,
+            align='center',
+            alpha=0.44,
+            picker=5)
+        
+        self.canvas.draw()
+        
+        
+    def __makeplot(self):
+        print "This does not work yet. Ignore"
+        self.mpl_widget = QtGui.QWidget()
+        self.dpi = 100
+        self.fig = Figure((5.0, 4.0), dpi=self.dpi)
+        self.canvas = FigureCanvas(self.fig)
+        self.canvas.setParent(self.mpl_widget)
+        
+        # Since we have only one plot, we can use add_axes
+        # instead of add_subplot, but then the subplot
+        # configuration tool in the navigation toolbar wouldn't
+        # work.
+        #
+        self.axes = self.fig.add_subplot(111)
+        #self.canvas.mpl_connect('pick_event', self.on_pick)
+
+        # Create the navigation toolbar, tied to the canvas
+        #
+        self.mpl_toolbar = NavigationToolbar(self.canvas, self.mpl_widget)
+        
+        # Other GUI controls
+        #
+        self.textbox = QLineEdit()
+        self.textbox.setMinimumWidth(200)
+        self.connect(self.textbox, SIGNAL('editingFinished ()'), self.on_draw)
+        
+        self.draw_button = QPushButton("&Draw")
+        self.connect(self.draw_button, SIGNAL('clicked()'), self.on_draw)
+        
+        self.grid_cb = QCheckBox("Show &Grid")
+        self.grid_cb.setChecked(False)
+        self.connect(self.grid_cb, SIGNAL('stateChanged(int)'), self.on_draw)
+        
+        slider_label = QLabel('Bar width (%):')
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setRange(1, 100)
+        self.slider.setValue(20)
+        self.slider.setTracking(True)
+        self.slider.setTickPosition(QSlider.TicksBothSides)
+        self.connect(self.slider, SIGNAL('valueChanged(int)'), self.on_draw)
+        
+        #
+        # Layout with box sizers
+        #
+        hbox = QHBoxLayout()
+        
+        for w in [  self.textbox, self.draw_button, self.grid_cb,
+                    slider_label, self.slider]:
+            hbox.addWidget(w)
+            hbox.setAlignment(w, Qt.AlignVCenter)
+            
+        vbox = QVBoxLayout()
+        vbox.addWidget(self.canvas)
+        vbox.addWidget(self.mpl_toolbar)
+        vbox.addLayout(hbox)
+
+        self.mpl_widget.setLayout(vbox)
+        self.setCentralWidget(self.mpl_widget)
+
+        #myfig = display.XtcEventDisplay()
+        #myfig.show()
+        #"Showing figure?"
+
+
 
     def __file_browser(self):
         """Opens a Qt File Dialog

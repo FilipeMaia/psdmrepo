@@ -89,7 +89,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.filenames = []
         
         # buttons
-        self.pyana_config = None
+        self.pyana_config = QtGui.QLabel(self);
+        self.config_button = None
         self.pyana_button = None
 
         self.set_layout()
@@ -122,8 +123,14 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.lgroup = QtGui.QVBoxLayout()
         self.dgroup.setLayout(self.lgroup)
 
+        self.box_pconf = QtGui.QGroupBox("Current pyana configuration:")
+        self.ly_pconf = QtGui.QVBoxLayout()
+        self.ly_pconf.addWidget(self.pyana_config )
+        self.box_pconf.setLayout(self.ly_pconf)
+        
+
         v1 = QtGui.QVBoxLayout()
-        v1.addWidget( self.pyana_config )
+        v1.addWidget( self.box_pconf )
         v1.setAlignment( self.pyana_config, QtCore.Qt.AlignTop )
 
         h1.addWidget(self.dgroup)
@@ -163,6 +170,11 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 self.checks.append(clabel)
 
 
+        if self.config_button is None: 
+            self.config_button = QtGui.QPushButton("&Write configuration")
+            self.connect(self.config_button, QtCore.SIGNAL('clicked()'), self.__write_config_script )
+            self.ly_pconf.addWidget( self.config_button )
+            self.ly_pconf.setAlignment( self.config_button, QtCore.Qt.AlignRight )
 
         if self.pyana_button is None: 
             self.pyana_button = QtGui.QPushButton("&Run pyana")
@@ -288,15 +300,23 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 self.configuration += options
             count_m +=1
             
-        print "Configuration:\n"
-        print self.configuration
-        print
         configfile = "xb_pyana_%d.cfg" % random.randint(1000,9999)
+
+        self.box_pconf.setTitle("Current pyana configuration: (%s)" %configfile)
 
         f = open(configfile,'w')
         f.write(self.configuration)
         f.close()
-        
+
+        print "pyana config file has been generated : ", configfile
+
+        print "----------------------------------------"
+        print "Configuration file (%s): " % configfile
+        print "----------------------------------------"
+        print self.configuration
+        print "----------------------------------------"
+        self.pyana_config.setText(self.configuration)
+
         return  configfile
 
 
@@ -310,7 +330,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         """
 
         configfile = self.__write_config_script()
-        print "pyana config file has been generated : ", configfile
+
 
         # pop up emacs window to edit the config file as needed:
         #subprocess.Popen("emacs %s" % configfile, shell=True) 
@@ -346,16 +366,11 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         #else :
         #    return
 
+
+
         print "Calling pyana.... "
         #subprocess.Popen(runstring, shell=True) # this runs in separate thread.
 
-        self.pyana_config = QtGui.QLabel(self);
-        self.pyana_config.setText(self.configuration)
-        print "----------------------------------------"
-        print "Configuration file (%s): " % configfile
-        print "----------------------------------------"
-        print self.configuration
-        print "----------------------------------------"
         pyanascript.main(poptions)
         plt.show()
         
