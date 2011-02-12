@@ -338,40 +338,39 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
         print "Now we'll run pyana..... "
 
-        #runstring = "pyana -n 1000 -c %s " % configfile
-        poptions = []
-        poptions.append("pyana")
-        poptions.append("-n")
-        poptions.append("10")
-        poptions.append("-c")
-        poptions.append("%s" % configfile)
+        #poptions = []
+        #poptions.append("pyana")
+        #poptions.append("-n")
+        #poptions.append("10")
+        #poptions.append("-c")
+        #poptions.append("%s" % configfile)
+        #for file in self.filenames :
+        #    poptions.append(file)
+        #pyanascript.main(poptions)
+
+
+        runstring = "pyana -n 1000 -c %s " % configfile
         for file in self.filenames :
-            #runstring += file
-            #runstring +=" "
-            poptions.append(file)
+            runstring += file
+            runstring +=" "
 
-
-        #dialog =  QtGui.QInputDialog()
-        #dialog.setMinimumWidth(1500)
-        #text, ok = dialog.getText(self,
-        #                          'Pyana options',
-        #                          'Run pyana with the following command (edit as needed and click OK):',
-        #                          QtGui.QLineEdit.Normal,
-        #                          text=runstring )
-        
-        #if ok:
-        #    print "Running pyana:"
-        #    print text
-        #    runstring = str(text)
-        #else :
-        #    return
-
-
+        dialog =  QtGui.QInputDialog()
+        dialog.setMinimumWidth(1500)
+        text, ok = dialog.getText(self,
+                                  'Pyana options',
+                                  'Run pyana with the following command (edit as needed and click OK):',
+                                  QtGui.QLineEdit.Normal,
+                                  text=runstring )
+        if ok:
+            print "Running pyana:"
+            print text
+            runstring = str(text)
+        else :
+            return
 
         print "Calling pyana.... "
-        #subprocess.Popen(runstring, shell=True) # this runs in separate thread.
+        subprocess.Popen(runstring, shell=True) # this runs in separate thread.
 
-        pyanascript.main(poptions)
         plt.show()
         
 

@@ -83,6 +83,9 @@ class  pyana_cspad ( object ) :
         self.img_data = None
         self.dark_data = None
 
+        self.colmin = 0
+        self.colmax = 16360
+
         # these will be plotted too
         self.lolimits = []
         self.hilimits = []
@@ -91,11 +94,6 @@ class  pyana_cspad ( object ) :
         self.n_events = 0
         self.n_img = 0
         self.n_dark = 0
-
-        self.fig = plt.figure()
-        cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
-        self.canvas = self.fig.add_subplot(111)
-
 
 
     # start of job
@@ -145,7 +143,7 @@ class  pyana_cspad ( object ) :
             print '*** cspad information is missing ***'
             return
         
-        #fig2 = plt.figure(200)
+        #fig = plt.figure(200)
         
         # dump information about quadrants
         #print "Number of quadrants: %d" % len(quads)
@@ -179,14 +177,14 @@ class  pyana_cspad ( object ) :
         h1 = np.hstack( (qimages[0], qimages[1]) )
         h2 = np.hstack( (qimages[3], qimages[2]) )
         cspad_image = np.vstack( (h1, h2) )
-        vmax = np.max(cspad_image)
-        vmin = np.min(cspad_image)
+        self.vmax = np.max(cspad_image)
+        self.vmin = np.min(cspad_image)
 
-        self.drawframe(cspad_image,"Event # %d" % self.n_events, fig=self.fig )
+        self.drawframe(cspad_image,"Event # %d" % self.n_events )
 
         # collect min and max intensity of this image
-        self.lolimits.append( vmin )
-        self.hilimits.append( vmax )
+        self.lolimits.append( self.vmin )
+        self.hilimits.append( self.vmax )
 
         # select good images
         isGood = False
@@ -335,10 +333,15 @@ class  pyana_cspad ( object ) :
 
 
     def drawframe( self, frameimage, title="", fig = None ):
+        print "drawframe w/ figure ", fig
 
         # plot image frame
-        if fig is None :
-            fig = plt.figure( 1 )
+        #if fig is None :
+        #    fig = plt.figure( 1 )
+
+        self.fig = plt.figure(200)
+        cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+        self.canvas = self.fig.add_subplot(111)
 
         self.canvas.set_title(title)
         # canvas is the main "Axes" object
@@ -352,6 +355,9 @@ class  pyana_cspad ( object ) :
         self.orglims = self.axes.get_clim()
         # min and max values in the axes are
         print "Original value limits: ", self.orglims
+
+        plt.clim(self.colmin,self.colmax)
+        plt.draw() # redraw the current figure
 
         print """
         To change the color scale, click on the color bar:
@@ -378,34 +384,34 @@ class  pyana_cspad ( object ) :
         if event.inaxes :
             lims = self.axes.get_clim()
             
-            colmin = lims[0]
-            colmax = lims[1]
-            range = colmax - colmin
-            value = colmin + event.ydata * range
+            self.colmin = lims[0]
+            self.colmax = lims[1]
+            range = self.colmax - self.colmin
+            value = self.colmin + event.ydata * range
             #print colmin, colmax, range, value
             
             # left button
             if event.button is 1 :
-                if value > colmin and value < colmax :
-                    colmin = value
-                    print "new mininum: ", colmin
+                if value > self.colmin and value < self.colmax :
+                    self.colmin = value
+                    print "new mininum: ", self.colmin
                 else :
                     print "min has not been changed (click inside the color bar to change the range)"
                         
             # middle button
             elif event.button is 2 :
-                colmin, colmax = self.orglims
+                self.colmin, self.colmax = self.orglims
                 print "reset"
                     
             # right button
             elif event.button is 3 :
-                if value > colmin and value < colmax :
-                    colmax = value
-                    print "new maximum: ", colmax
+                if value > self.colmin and value < self.colmax :
+                    self.colmax = value
+                    print "new maximum: ", self.colmax
                 else :
                     print "max has not been changed (click inside the color bar to change the range)"
 
-            plt.clim(colmin,colmax)
+            plt.clim(self.colmin,self.colmax)
             plt.draw() # redraw the current figure
 
 
