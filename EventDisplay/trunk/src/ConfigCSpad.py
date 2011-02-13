@@ -53,8 +53,8 @@ class ConfigCSpad ( object ) :
         print 'setCSpadParameters'
 
 
-        self.quadInDetOrient = [   0,    0,   270,   0]
-        self.quadInDetOriInd = [   0,    0,     3,   0]
+        self.quadInDetOrient = [   0,    0,   270,  180]
+        self.quadInDetOriInd = [   0,    0,     3,    2]
 
         gapX = 50
         gapY = 50
@@ -65,16 +65,23 @@ class ConfigCSpad ( object ) :
         self.firstPairInQuad = [0, 0,  8, 16]
         self.lastPairInQuad  = [0, 8, 16, 20]
 
+        # We get this array dynamically from /Configure:0000/CsPad::ConfigV2/CxiDs1.0:Cspad.0/config
+        #self.indPairsInQuads = [[-1,  -1,  -1,  -1,  -1,  -1,  -1,  -1],
+        #                        [ 0,   1,   2,   3,   4,   5,   6,   7],
+        #                        [ 8,   9,  10,  11,  12,  13,  14,  15],
+        #                        [16,  17,  -1,  -1,  -1,  -1,  18,  19]]
 
         self.pairInQaudOrient = [ [   0,   0, 270, 270, 180, 180, 270, 270],
                                   [   0,   0, 270, 270, 180, 180, 270, 270],
                                   [   0,   0, 270, 270, 180, 180, 270, 270],
-                                  [ 180, 180, 270, 270,   0,   0, 270, 270] ]
+                                  [   0,   0, 270, 270, 180, 180, 270, 270] ]
+        #                         [ 180, 180, 270, 270,   0,   0, 270, 270] ]
 
         self.pairInQaudOriInd = [ [   0,   0,   3,   3,   2,   2,   3,   3],
                                   [   0,   0,   3,   3,   2,   2,   3,   3],
                                   [   0,   0,   3,   3,   2,   2,   3,   3],
-                                  [   2,   2,   1,   1,   0,   3,   3,   2] ]
+                                  [   0,   0,   3,   3,   2,   2,   3,   3] ]
+        #                         [   2,   2,   1,   1,   0,   3,   3,   2] ]
 
 
         self.dPhi = [ [0,0,0,0,0,0,0,0],
@@ -85,12 +92,14 @@ class ConfigCSpad ( object ) :
         self.pairXInQaud = [ [400,600,  0,  0,200,  0,400,400],
                              [400,600,  0,  0,200,  0,400,400],
                              [400,600,  0,  0,200,  0,400,400],
-                             [200,  0,  0,  0,400,600,  0,  0] ]
+                             [400,600,  0,  0,200,  0,400,400] ]
+        #                    [200,  0,  0,  0,400,600,  0,  0] ]
 
         self.pairYInQaud = [ [  0,  0,200,  0,400,400,600,400],
                              [  0,  0,200,  0,400,400,600,400],
                              [  0,  0,200,  0,400,400,600,400],
-                             [400,400,  0,200,  0,  0,200,  0] ]
+                             [  0,  0,200,  0,400,400,600,400] ]
+        #                    [400,400,  0,200,  0,  0,200,  0] ]
 
         #for ix in range(8) : self.pairXInQaud.append(random.randint(0,600))
         #for iy in range(8) : self.pairYInQaud.append(random.randint(0,600))

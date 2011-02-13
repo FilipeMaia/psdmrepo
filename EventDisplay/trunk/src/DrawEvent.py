@@ -41,6 +41,7 @@ import matplotlib.pyplot as plt
 # Imports for other modules --
 #-----------------------------
 import ConfigParameters as cp
+import ConfigCSpad      as cs
 import PlotsForCSpad    as cspad
 import PlotsForImage    as image
 import PrintHDF5        as printh5
@@ -74,6 +75,7 @@ class DrawEvent ( object ) :
         # CSpad V2 for runs ~900
         self.dsnameCSpadV2    = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data"
         self.dsnameCSpadV2CXI = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data"
+        self.dsnameCSpadV2Conf= "/Configure:0000/CsPad::ConfigV2/CxiDs1.0:Cspad.0/config"
 
     #-------------------
     #  Public methods --
@@ -88,6 +90,18 @@ class DrawEvent ( object ) :
         print 'Event %d' % ( cp.confpars.eventCurrent )
         runNumber = self.h5file.attrs['runNumber']
         #print 'Run number = %d' % (runNumber) 
+
+
+        dsConf = self.h5file[self.dsnameCSpadV2Conf]
+        cs.confcspad.indPairsInQuads = dsConf.value[13]
+        print "Indexes of pairs in quads =\n",cs.confcspad.indPairsInQuads 
+        
+        #self.counter = 0
+        #for element in dsConf.value:
+        #    self.counter += 1
+        #    print self.counter, element
+
+        
 
         # Loop over checked data sets
         self.figNum = 0
