@@ -53,8 +53,8 @@ class ConfigCSpad ( object ) :
         print 'setCSpadParameters'
 
 
-        self.quadInDetOrient = [   0,    0,   270,  180]
-        self.quadInDetOriInd = [   0,    0,     3,    2]
+        self.quadInDetOrient = [   90,    0,   270,  180]
+        self.quadInDetOriInd = [    1,    0,     3,    2]
 
         gapX = 50
         gapY = 50
