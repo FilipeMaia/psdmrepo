@@ -171,7 +171,7 @@ class PlotsForCSpad ( object ) :
             self.quad = quadNum            
         #print 'getImageArrayForQuad(), quad=', self.quad
 
-        arr2dquad = np.zeros( (800,800), dtype=np.int16 )
+        arr2dquad = np.zeros( (850,850), dtype=np.int16 )
         #print 'arr2dquad.shape=',arr2dquad.shape
 
         #self.firstPair = cs.confcspad.firstPairInQuad[self.quad]
@@ -203,7 +203,7 @@ class PlotsForCSpad ( object ) :
     def getImageArrayForDet( self, arr1ev ):
         """Returns the image array for entire CSpad detector"""
         #print 'getImageArrayForDet()'
-        arr2d = np.zeros( (1650,1650), dtype=np.int16 )
+        arr2d = np.zeros( (1700,1700), dtype=np.int16 )
         #print 'arr2d.shape=',arr2d.shape
 
         #for quad in range(0,4) : # !!!!! SHOULD BE CHANGED FOR ENTIRE DETECTOR

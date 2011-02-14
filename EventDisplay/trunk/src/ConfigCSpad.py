@@ -56,11 +56,11 @@ class ConfigCSpad ( object ) :
         self.quadInDetOrient = [   90,    0,   270,  180]
         self.quadInDetOriInd = [    1,    0,     3,    2]
 
-        gapX = 50
-        gapY = 50
+        gapX = 30
+        gapY = 40
 
-        self.quadXOffset     = [   0,    0,      800+gapX, 800+gapX]
-        self.quadYOffset     = [   0,  800+gapY, 800+gapY,        0]
+        self.quadXOffset     = [   3,    0,      800+gapX, 804+gapX]
+        self.quadYOffset     = [   8,  800+gapY, 810+gapY,       18]
 
         self.firstPairInQuad = [0, 0,  8, 16]
         self.lastPairInQuad  = [0, 8, 16, 20]
@@ -85,21 +85,35 @@ class ConfigCSpad ( object ) :
 
 
         self.dPhi = [ [0,0,0,0,0,0,0,0],
-                      [0,0,0,0,0,0,0,0],
                       [0.144, 0.466, -0.049, -0.186, -0.291, -0.338, 0.119, 0.135],
+                      [0,0,0,0,0,0,0,0],
                       [0,0,0,0,0,0,0,0] ]
+
+        # "0" version of coordinates:
 
         self.pairXInQaud = [ [400,600,  0,  0,200,  0,400,400],
                              [400,600,  0,  0,200,  0,400,400],
                              [400,600,  0,  0,200,  0,400,400],
                              [400,600,  0,  0,200,  0,400,400] ]
-        #                    [200,  0,  0,  0,400,600,  0,  0] ]
 
         self.pairYInQaud = [ [  0,  0,200,  0,400,400,600,400],
                              [  0,  0,200,  0,400,400,600,400],
                              [  0,  0,200,  0,400,400,600,400],
                              [  0,  0,200,  0,400,400,600,400] ]
-        #                    [400,400,  0,200,  0,  0,200,  0] ]
+
+
+        # Optical alignment:
+
+        self.pairXInQaud = [[ 414,  626,    0,    0,  213,    1,  418,  419],  # 2:5 were not measured
+                            [ 421,  634,    0,    0,  213,    1,  424,  425],
+                            [ 417,  630,    0,    1,  212,    0,  425,  426],
+                            [ 416,  630,    0,    0,  213,    1,  420,  421]] # 2:5 were not measured 
+                                                                      
+        self.pairYInQaud = [[   0,    0,  214,    1,  425,  425,  615,  402],  # 2:5 were not measured
+                            [   0,    0,  214,    1,  425,  425,  615,  402],
+                            [   0,    0,  215,    3,  431,  431,  616,  403],
+                            [   0,    0,  214,    1,  425,  425,  615,  403]] # 2:5 were not measured
+
 
         #for ix in range(8) : self.pairXInQaud.append(random.randint(0,600))
         #for iy in range(8) : self.pairYInQaud.append(random.randint(0,600))
