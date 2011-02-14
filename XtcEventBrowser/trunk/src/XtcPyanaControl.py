@@ -242,7 +242,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                     options_for_mod[index].append("\nimage_source = %s" % address)
                     options_for_mod[index].append("\ngood_range = %d--%d" % (50,250) )
                     options_for_mod[index].append("\ndark_range = %d--%d" % (250,1050) )
-                    options_for_mod[index].append("\ndraw_each_event =True")
+                    options_for_mod[index].append("\ndraw_each_event = 1")
                     
 
                 # --- --- --- CsPad --- --- ---
@@ -258,8 +258,9 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
                     address = str(box.text()).split(":")[1]
                     options_for_mod[index].append("\nimage_source = %s" % address)
-                    options_for_mod[index].append("\ngood_range = %d--%d" % (50,250) )
-                    options_for_mod[index].append("\ndark_range = %d--%d" % (250,1050) )
+                    options_for_mod[index].append("\ndraw_each_event = 1")
+                    options_for_mod[index].append("\ncollect_darks = 0")
+                    options_for_mod[index].append("\n#dark_img_file = dark_images.npy")
 
         nmodules = len(modules_to_run)
         if nmodules == 0 :

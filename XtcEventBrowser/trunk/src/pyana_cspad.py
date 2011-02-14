@@ -46,42 +46,33 @@ class  pyana_cspad ( object ) :
     # initialize
     def __init__ ( self,
                    image_source=None,
-                   good_range="0--999999",
-                   dark_range="-999999--0",
-                   draw_each_event = False):
+                   draw_each_event = 0,
+                   collect_darks = 0,
+                   dark_img_file = None):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
         All parameters are passed as strings
 
         @param image_source     address string of Detector-Id|Device-ID
-        @param good_range       threshold values selecting images of interest
-        @param dark_range       threshold values selecting dark images
-        @param draw_each_event  bool
+        @param draw_each_event  0 (False) or 1 (True) Draw plot for each event
+        @param collect_darks    0 (False) or 1 (True) Collect dark images (write to file)
+        @param dark_img_file    filename (If collecting: write to this file)
         """
 
         self.img_addr = image_source
         print "Using image_source = ", self.img_addr
 
-        tli = str(good_range).split("--")[0]
-        thi = str(good_range).split("--")[1]
-        tld = str(dark_range).split("--")[0]
-        thd = str(dark_range).split("--")[1]
-
-        self.thr_low_image = float( tli )
-        self.thr_high_image = float( thi )
-        self.thr_low_dark = float( tld )
-        self.thr_high_dark = float( thd )
-        print "Using good_range = %s " % good_range
-        print "  (thresholds =  %d (low) and %d (high) " % (self.thr_low_image, self.thr_high_image)
-        print "Using dark_range = %s " % dark_range
-        print "  (thresholds =  %d (low) and %d (high) " % (self.thr_low_dark, self.thr_high_dark)
-
-        self.draw_each_event = draw_each_event
+        self.draw_each_event = bool(int(draw_each_event))
         print "Using draw_each_event = ", draw_each_event
+
+        self.collect_darks = bool(int(collect_darks))
+        print "Collecting darks? " , self.collect_darks
+
+        self.dark_img_file = dark_img_file
+        print "Using dark image file: ", self.dark_img_file
 
         # sum up all image data (above threshold) and all dark data (below threshold)
         self.img_data = None
-        self.dark_data = None
 
         self.colmin = 0
         self.colmax = 16360
@@ -93,7 +84,14 @@ class  pyana_cspad ( object ) :
         # to keep track
         self.n_events = 0
         self.n_img = 0
-        self.n_dark = 0
+
+        # load dark image
+        self.dark_image = None
+        if not self.collect_darks :
+            if self.dark_img_file is None :
+                print "No dark-image file provided. The images will not be background subtracted."
+            else :
+                self.dark_image = np.load(self.dark_img_file)
 
 
     # start of job
@@ -180,58 +178,34 @@ class  pyana_cspad ( object ) :
         self.vmax = np.max(cspad_image)
         self.vmin = np.min(cspad_image)
 
-        self.drawframe(cspad_image,"Event # %d" % self.n_events )
-
         # collect min and max intensity of this image
         self.lolimits.append( self.vmin )
         self.hilimits.append( self.vmax )
 
-        # select good images
-        isGood = False
-        if ( cspad_image.max() > self.thr_low_image) and (cspad_image.max() < self.thr_high_image) :
-            isGood = True
-            
-            # add this image to the sum
-            self.n_img+=1
-            if self.img_data is None :
-                self.img_data = np.float_(cspad_image)
-            else :
-                self.img_data += cspad_image
+        # add this image to the sum
+        self.n_img+=1
+        if self.img_data is None :
+            self.img_data = np.float_(cspad_image)
+        else :
+            self.img_data += cspad_image
 
-        # select dark image
-        isDark = False
-        if ( cspad_image.max() > self.thr_low_dark ) and ( cspad_image.max() < self.thr_high_dark ) :
-            isDark = True
-            self.n_dark+=1
-            if self.dark_data is None :
-                self.dark_data = np.float_(cspad_image)
-            else :
-                self.dark_data += cspad_image
 
         # Draw this event. Background subtracted if possible.
-        if self.draw_each_event and isGood :
-            if self.n_dark > 0 :
-                av_dark_img = self.dark_data/self.n_dark
-                subimage = cspad_image - av_dark_img 
-                title = "Event %d, background subtracted (avg of %d dark images)" % \
-                        ( self.n_events, self.n_dark )
-                self.drawframe( subimage, title )
+        if self.draw_each_event :
+            if self.dark_image is None: 
+                self.drawframe(cspad_image,"Event # %d" % self.n_events )
             else :
-                title = "Event %d " % self.n_events
-                self.drawframe( cspad_image, title )
+                subtr_image = cspad_image - self.dark_image 
+                title = "Event # %d, background subtracted" % self.n_events 
+                self.drawframe(subtr_image, title )
+                        
 
-                
 
 
     # after last event has been processed. 
     def endjob( self, env ) :
 
         print "Done processing       ", self.n_events, " events"        
-
-        print "Range defining images: %f (lower) - %f (upper)" % (self.thr_low_image, self.thr_high_image)
-        print "Range defining darks: %f (lower) - %f (upper)" %  (self.thr_low_dark, self.thr_high_dark)
-        print "# Signal images = ", self.n_img
-        print "# Dark images = ", self.n_dark
         
         # plot the minimums and maximums
         print len(self.lolimits)
@@ -249,18 +223,18 @@ class  pyana_cspad ( object ) :
             return
 
         # plot the average image
-        av_good_img = self.img_data/self.n_img
-        av_bkgsubtracted = av_good_img 
-        self.drawframe( av_good_img, "Average of images above threshold")
-
-        if self.n_dark>0 :
-            av_dark_img = self.dark_data/self.n_dark
-            av_bkgsubtracted -= av_dark_img 
-            self.drawframe( av_dark_img, "Average of images below threshold" )
-            self.drawframe( av_bkgsubtracted, "Average background subtracted")
-
+        average_image = self.img_data/self.n_img
+        self.drawframe(average_image,"Average of %d events" % self.n_img )
         plt.show()
 
+
+        # save the average data image (numpy array)
+        # binary file .npy format
+        if self.collect_darks :
+            print "saving to ",  self.dark_img_file
+            np.save(self.dark_img_file, average_image)
+  
+        
 
 
     # -------------------------------------------------------------------
@@ -269,11 +243,6 @@ class  pyana_cspad ( object ) :
     def CsPadElement( self, data3d, qn ):
         # Construct one image for each quadrant, each with 8 sections
         # from a data3d = 3 x 2*194 x 185 data array
-
-        print "make a big array from smaller ones"
-        print "original data array shape for quad # %d: %s" % (qn, str(np.shape(data3d)) )
-        print "original data types: ", data3d.dtype.name
-
         #   +---+---+-------+
         #   |   |   |   6   |
         #   + 5 | 4 +-------+
@@ -327,13 +296,11 @@ class  pyana_cspad ( object ) :
         m2 = np.hstack( (s45, s67) )
         e0 = np.vstack( (m2, m1) )
 
-        print "final Q%d shape: %s " % (qn,str(np.shape(e0)))
         if qn>0 : e0 = np.rot90( e0, 4-qn)
         return e0
 
 
     def drawframe( self, frameimage, title="", fig = None ):
-        print "drawframe w/ figure ", fig
 
         # plot image frame
         #if fig is None :
