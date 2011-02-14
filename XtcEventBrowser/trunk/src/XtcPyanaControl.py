@@ -253,7 +253,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                     options_for_mod[index].append("\nimage_source = %s" % address)
                     options_for_mod[index].append("\ndraw_each_event = 1")
                     options_for_mod[index].append("\ncollect_darks = 0")
-                    options_for_mod[index].append("\n#dark_img_file = dark_images.npy")
+                    options_for_mod[index].append("\n#dark_img_file = pyana_cspad_average_image.npy")
 
         nmodules = len(modules_to_run)
         if nmodules == 0 :
@@ -304,6 +304,14 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             self.ly_pconf.setAlignment( self.config_button, QtCore.Qt.AlignLeft )
 
 
+    def __print_configuration(self):
+        print "----------------------------------------"
+        print "Configuration file (%s): " % self.configfile
+        print "----------------------------------------"
+        print self.configuration
+        print "----------------------------------------"
+        return
+
     def __write_configfile(self):
         """Write the configuration text to a file. Filename is generated randomly
         """
@@ -316,14 +324,15 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         f.write(self.configuration)
         f.close()
 
-        print "pyana config file has been generated : ", self.configfile
-
         print "----------------------------------------"
         print "Configuration file (%s): " % self.configfile
         print "----------------------------------------"
         print self.configuration
         print "----------------------------------------"
 
+        self.__print_configuration
+        
+        
 
         if self.econfig_button is None: 
             self.econfig_button = QtGui.QPushButton("&Edit configuration file")
@@ -352,6 +361,14 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.box_pconf.setTitle("Current pyana configuration: (%s)" % self.configfile)
         self.pyana_config.setText(self.configuration)
 
+        print "----------------------------------------"
+        print "Configuration file (%s): " % self.configfile
+        print "----------------------------------------"
+        print self.configuration
+        print "----------------------------------------"
+
+        self.__print_configuration
+        print "Done"
 
 
     def __run_pyana(self):

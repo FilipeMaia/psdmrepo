@@ -1,3 +1,4 @@
+2011-Feb-14  ofte                 rev 1516  Fix a typo and add a print_configuration function
 2011-Feb-14  ofte                 rev 1514  Allow edit (emacs popup) configuration file
 2011-Feb-14  ofte  Tag V00-00-07  rev 1513  Bkg-subtr with dark images for CsPad
 2011-Feb-11  ofte  Tag V00-00-06            bugfixed. version for testing with CsPad. 
