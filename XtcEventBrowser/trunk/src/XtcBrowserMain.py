@@ -432,7 +432,7 @@ part of it, please give an appropriate acknowledgment.
 
         print self.filenames
         self.scanner.setFiles(self.filenames)
-        self.scanner.setOption({'ndatagrams':1000})
+        self.scanner.setOption({'ndatagrams':600})
         self.scanner.scan()
 
         #self.__add_selector()
