@@ -60,8 +60,7 @@ class DrawEvent ( object ) :
     #  Constructor --
     #----------------
     def __init__ ( self ) :
-        """Constructor.
-        """
+        """Constructor"""
         print 'DrawEvent () Initialization'
         cp.confpars.h5_file_is_open = False
         self.plotsCSpad             = cspad.PlotsForCSpad()
@@ -84,24 +83,21 @@ class DrawEvent ( object ) :
     def drawEvent ( self, mode=1 ) :
         """Draws current event"""
 
+        t_drawEvent = time.clock()
+        
         #if not cp.confpars.h5_file_is_open :
-        self.openHDF5File()
-    
+        self.openHDF5File() # t=0us
+
         print 'Event %d' % ( cp.confpars.eventCurrent )
-        runNumber = self.h5file.attrs['runNumber']
+
+        runNumber = self.h5file.attrs['runNumber'] # t=0us 
         #print 'Run number = %d' % (runNumber) 
 
 
-        dsConf = self.h5file[self.dsnameCSpadV2Conf]
-        cs.confcspad.indPairsInQuads = dsConf.value[13]
+        dsConf = self.h5file[self.dsnameCSpadV2Conf]    # t=0.01us
+        cs.confcspad.indPairsInQuads = dsConf.value[13] #
         print "Indexes of pairs in quads =\n",cs.confcspad.indPairsInQuads 
-        
-        #self.counter = 0
-        #for element in dsConf.value:
-        #    self.counter += 1
-        #    print self.counter, element
 
-        
 
         # Loop over checked data sets
         self.figNum = 0
@@ -131,7 +127,6 @@ class DrawEvent ( object ) :
                     self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(1),plot=1)
                 else : self.close_fig(self.figNum)
 
-
                 self.figNum += 1 
                 if cp.confpars.cspadImageQuadIsOn : 
                     self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(4),plot='Quad')
@@ -141,7 +136,6 @@ class DrawEvent ( object ) :
                 if cp.confpars.cspadImageDetIsOn : 
                     self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(4),plot='Det')
                 else : self.close_fig(self.figNum)
-
 
                 self.figNum += 1 
                 if cp.confpars.cspadSpectrumIsOn : 
@@ -178,8 +172,6 @@ class DrawEvent ( object ) :
                     self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot='Det')
                 else : self.close_fig(self.figNum)
 
-
-
                 self.figNum += 1 
                 if cp.confpars.cspadSpectrumIsOn : 
                     self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=16)
@@ -206,7 +198,6 @@ class DrawEvent ( object ) :
                     self.plotsImage.plotImageAndSpectrum(arr1ev,self.set_fig('1x2'))
                 else : self.close_fig(self.figNum)
 
-
             if item_last_name == 'waveform' :
                 print 'Here should be an emplementation of stuff for waveform'
 
@@ -224,6 +215,9 @@ class DrawEvent ( object ) :
 
         self.showEvent(mode)
         self.closeHDF5File()
+        print 'Time to drawEvent() (sec) = %f' % (time.clock() - t_drawEvent)
+
+
 
 
     def showEvent ( self, mode=1 ) :
@@ -234,7 +228,7 @@ class DrawEvent ( object ) :
             plt.show()  
         else :           # Slide show 
             plt.draw()   # Draws, but does not block
-        print 'Time to show/draw (sec) = %f' % (time.clock() - t_start)
+        print 'Time to show or draw (sec) = %f' % (time.clock() - t_start)
 
 
     def stopDrawEvent ( self ) :

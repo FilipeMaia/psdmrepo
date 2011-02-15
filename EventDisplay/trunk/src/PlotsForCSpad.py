@@ -126,7 +126,7 @@ class PlotsForCSpad ( object ) :
         
         for ind in xrange(8): # loop over ind = 0,1,2,...,7
             pair = cs.confcspad.indPairsInQuads[self.quad][ind]
-            print 'quad,ind,pair=', self.quad, ind, pair
+            #print 'quad,ind,pair=', self.quad, ind, pair
             if pair == -1 : continue
 
             asic1x2  = arr1ev[pair,...]
@@ -195,7 +195,7 @@ class PlotsForCSpad ( object ) :
             #print 'ixOff, iyOff =', ixOff, iyOff,           
             #print ' dimX,  dimY =', dimX, dimY           
 
-            arr2dquad[ixOff:dimX+ixOff, iyOff:dimY+iyOff] += rotarr2d[0:dimX, 0:dimY]
+            arr2dquad[ixOff:dimX+ixOff, iyOff:dimY+iyOff] = rotarr2d[0:dimX, 0:dimY]
 
         return arr2dquad
 
@@ -217,7 +217,7 @@ class PlotsForCSpad ( object ) :
             ixOff = cs.confcspad.quadXOffset[quad]
             iyOff = cs.confcspad.quadYOffset[quad]
 
-            arr2d[ixOff:dimX+ixOff, iyOff:dimY+iyOff] += rotarr2d[0:dimX, 0:dimY]
+            arr2d[ixOff:dimX+ixOff, iyOff:dimY+iyOff] = rotarr2d[0:dimX, 0:dimY]
 
         return arr2d
 
@@ -245,18 +245,19 @@ class PlotsForCSpad ( object ) :
     def plotCSpadDetImage( self, arr1ev, fig ):
         """Plot 2d image of the detector from input array."""
         #print 'plotCSpadDetImage()'       
+        t_plotCSpadDetImage = time.clock()
         arr2d = self.getImageArrayForDet( arr1ev )
+        print 'Time to getImageArrayForDet() (sec) = %f' % (time.clock() - t_plotCSpadDetImage)
 
         str_event = 'Event ' + str(cp.confpars.eventCurrent)
         fig.canvas.set_window_title('CSpad image ' + str_event)
-        plt.clf() # clear plot
-        #fig.subplots_adjust(left=0.10, bottom=0.10, right=0.98, top=0.97, wspace=0, hspace=0)
+        plt.clf() # clear plot  t=0.05s
         fig.subplots_adjust(left=0.03, bottom=0.03, right=0.98, top=0.97, wspace=0, hspace=0)
-        
-        #axes = plt.imshow(arr2d,  origin='down', interpolation='nearest') # Just a histogram
-        axes = plt.imshow(arr2d, interpolation='nearest') # Just a histogram
-        plt.clim(cp.confpars.cspadImageAmin,cp.confpars.cspadImageAmax)
-        self.colb = plt.colorbar(axes, pad=0.03, orientation=1, fraction=0.10, shrink = 0.86, aspect = 20)#, ticks=coltickslocs
+       #axes = plt.imshow(arr2d,  origin='down', interpolation='nearest') # Just a histogram
+        axes = plt.imshow(arr2d, interpolation='nearest') # Just a histogram t=0.08s
+
+        plt.clim(cp.confpars.cspadImageAmin,cp.confpars.cspadImageAmax)     #t=0
+        self.colb = plt.colorbar(axes, pad=0.03, orientation=1, fraction=0.10, shrink = 0.86, aspect = 20)#, ticks=coltickslocs #t=0.04s
         plt.title(str_event,color='r',fontsize=20) # pars like in class Text
 
 
@@ -318,7 +319,7 @@ class PlotsForCSpad ( object ) :
         #for pair in xrange(8): # loop for pair = 0,1,2,...,7
         for ind in xrange(8): # loop over ind = 0,1,2,...,7
             pair = cs.confcspad.indPairsInQuads[self.quad][ind]
-            print 'quad,ind,pair=', self.quad, ind, pair
+            #print 'quad,ind,pair=', self.quad, ind, pair
             if pair == -1 : continue
 
             #print 20*'=',' Pair =', pair
