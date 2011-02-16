@@ -27,6 +27,7 @@
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
 #include "pdscalibdata/CsPadCommonModeSubV1.h"
+#include "pdscalibdata/CsPadFilterV1.h"
 #include "pdscalibdata/CsPadPedestalsV1.h"
 #include "pdscalibdata/CsPadPixelStatusV1.h"
 #include "pdsdata/cspad/ConfigV1.hh"
@@ -122,6 +123,8 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     m_calibStore.get<pdscalibdata::CsPadPixelStatusV1>(address);
   boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cModeCalib =
     m_calibStore.get<pdscalibdata::CsPadCommonModeSubV1>(address);
+  boost::shared_ptr<pdscalibdata::CsPadFilterV1> filterCalib =
+    m_calibStore.get<pdscalibdata::CsPadFilterV1>(address);
 
   // create all containers if running first time
   if ( not m_elementCont ) {
@@ -228,6 +231,14 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     ++ quad;
   }
 
+  // may not need it
+  bool filter = true;
+  if (filterCalib.get()) filter = filterCalib->filter(&pixelData[0][0][0], ssize*nSect);
+  if (not filter) {
+    MsgLog(logger, debug, "skipping CsPad data");
+    return;
+  }
+  
   // store the data
   hdf5pp::Type type = H5DataTypes::CsPadElementV2::stored_type(nQuad);
   m_elementCont->container(group,type)->append ( elems[0], type ) ;

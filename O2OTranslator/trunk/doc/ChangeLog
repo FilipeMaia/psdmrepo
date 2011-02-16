@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-02
+2011-02-15 Andy Salnikov
+- added one more calibration type for CsPad
+
 Tag: V00-10-01
 2011-01-27 Andy Salnikov
 - returned O2OXtcIterator and friends back

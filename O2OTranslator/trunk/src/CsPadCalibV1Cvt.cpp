@@ -29,12 +29,14 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "H5DataTypes/CsPadCommonModeSubV1.h"
+#include "H5DataTypes/CsPadFilterV1.h"
 #include "H5DataTypes/CsPadPedestalsV1.h"
 #include "H5DataTypes/CsPadPixelStatusV1.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/CalibObjectStore.h"
 #include "O2OTranslator/O2OMetaData.h"
 #include "pdscalibdata/CsPadCommonModeSubV1.h"
+#include "pdscalibdata/CsPadFilterV1.h"
 #include "pdscalibdata/CsPadPedestalsV1.h"
 #include "pdscalibdata/CsPadPixelStatusV1.h"
 
@@ -140,12 +142,16 @@ CsPadCalibV1Cvt::convert ( const void* data,
   // find file with common mode data
   std::string cmodeFileName = findCalibFile(src, "common_mode");
   
+  // find file with filter data
+  std::string filterFileName = findCalibFile(src, "filter");
+  
   if ( pedFileName.empty() and pixFileName.empty() and cmodeFileName.empty()) return;
 
   // read everything
   boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> peds;
   boost::shared_ptr<pdscalibdata::CsPadPixelStatusV1> pixStat;
   boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cmode;
+  boost::shared_ptr<pdscalibdata::CsPadFilterV1> filter;
   if (not pedFileName.empty()) {
     peds.reset(new pdscalibdata::CsPadPedestalsV1(pedFileName));
     MsgLogRoot(info, "Read CsPad pedestals from " << pedFileName);
@@ -157,6 +163,10 @@ CsPadCalibV1Cvt::convert ( const void* data,
   if (not cmodeFileName.empty()) {
     cmode.reset(new pdscalibdata::CsPadCommonModeSubV1(cmodeFileName));
     MsgLogRoot(info, "Read CsPad common mode data from " << cmodeFileName);
+  }
+  if (not filterFileName.empty()) {
+    filter.reset(new pdscalibdata::CsPadFilterV1(filterFileName));
+    MsgLogRoot(info, "Read CsPad filter data from " << filterFileName);
   }
 
   // get the name of the group for this object
@@ -183,12 +193,16 @@ CsPadCalibV1Cvt::convert ( const void* data,
   if (cmode.get()) {
     H5DataTypes::CsPadCommonModeSubV1::store(*cmode, grp, cmodeFileName);
   }
+  if (filter.get()) {
+    H5DataTypes::CsPadFilterV1::store(*filter, grp, filterFileName);
+  }
   
   // store it in calibration object store
   Pds::DetInfo address = static_cast<const Pds::DetInfo&>(src.top());
   m_calibStore.add(peds, address);
   m_calibStore.add(pixStat, address);
   m_calibStore.add(cmode, address);
+  m_calibStore.add(filter, address);
 }
 
 /// method called when the driver makes a new group in the file
