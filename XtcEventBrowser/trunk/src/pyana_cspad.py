@@ -43,6 +43,31 @@ from pypdsdata import xtc
 #---------------------
 class  pyana_cspad ( object ) :
 
+    #--------------------
+    #  Class variables --
+    #--------------------
+
+    npix_quad = 850
+    
+    # origin of section in quad coordinate system
+    #
+    # x-position correspond to column number
+    xpos_sec2x1 = [[ 414,  626,    0,    0,  213,    1,  418,  419],  # 2:5 were not measured
+                   [ 421,  634,    0,    0,  213,    1,  424,  425],
+                   [ 417,  630,    0,    1,  212,    0,  425,  426],
+                   [ 416,  630,    0,    0,  213,    1,  420,  421]] # 2:5 were not measured
+    # y-position correspond to maxrows - row number    
+    ypos_sec2x1 = [[   0,    0,  214,    1,  425,  425,  615,  402],  # 2:5 were not measured
+                   [   0,    0,  214,    1,  425,  425,  615,  402],
+                   [   0,    0,  215,    3,  431,  431,  616,  403],
+                   [   0,    0,  214,    1,  425,  425,  615,  403]] # 2:5 were not measured
+    
+
+
+    #----------------
+    #  Constructor --
+    #----------------
+            
     # initialize
     def __init__ ( self,
                    image_source=None,
@@ -145,7 +170,7 @@ class  pyana_cspad ( object ) :
         
         # dump information about quadrants
         #print "Number of quadrants: %d" % len(quads)
-        qimages = np.zeros((4,776,776), dtype="uint16")
+        qimages = np.zeros((4, self.npix_quad, self.npix_quad ), dtype="uint16")
 
         for q in quads:
             
@@ -239,8 +264,70 @@ class  pyana_cspad ( object ) :
 
     # -------------------------------------------------------------------
     # Additional functions
-        
+
+
     def CsPadElement( self, data3d, qn ):
+        # Construct one image for each quadrant, each with 8 sections
+        # from a data3d = 3 x 2*194 x 185 data array
+        #   +---+---+-------+
+        #   |   |   |   6   |
+        #   + 5 | 4 +-------+
+        #   |   |   |   7   |
+        #   +---+---+---+---+
+        #   |   2   |   |   |
+        #   +-------+ 0 | 1 |
+        #   |   3   |   |   |
+        #   +-------+---+---+
+
+
+        # if any sections are missing, insert zeros
+        if len( data3d ) < 8 :
+            zsec = np.zeros( (185,388), dtype=data3d.dtype)
+            for i in range (8) :
+                if i not in self.sections[qn] :
+                    data3d = np.insert( data3d, i, zsec, axis=0 )
+
+        pairs = []
+        for i in range (8) :
+        
+            # insert gap between asics in the 2x1
+            asics = np.hsplit( data3d[i], 2)
+            gap = np.zeros( (185,4), dtype=data3d.dtype )
+            pair = np.hstack( (asics[0], gap, asics[1]) )
+
+                
+            # sections 2,3 and 6,7 are as is. The others need some rotation:
+            if i==0 or i==1 :
+                pair = pair[:,::-1].T
+            if i==4 or i==5 :
+                pair = pair[::-1,:].T
+
+            pairs.append( pair )
+
+
+        # make the array for this quadrant
+        quadrant = np.zeros( (self.npix_quad, self.npix_quad), dtype=data3d.dtype )
+
+        # insert the 2x1 sections according to
+        for sec in range (8):
+            nrows, ncols = pairs[sec].shape
+
+            # x,y  in quadrant coordinate system
+            xpos = self.xpos_sec2x1[qn][sec]
+            ypos = self.ypos_sec2x1[qn][sec]
+            colp = xpos
+            rowp = self.npix_quad-ypos
+
+            quadrant[rowp-nrows:rowp, colp:colp+ncols] = pairs[sec][0:nrows,0:ncols]
+
+
+        # Finally, rotate the quadrant as needed
+        if qn>0 : quadrant = np.rot90( quadrant, 4-qn)
+        return quadrant
+
+
+
+    def CsPadElementUnaligned( self, data3d, qn ):
         # Construct one image for each quadrant, each with 8 sections
         # from a data3d = 3 x 2*194 x 185 data array
         #   +---+---+-------+
