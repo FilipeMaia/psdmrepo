@@ -66,10 +66,10 @@ class ConfigCSpad ( object ) :
         self.lastPairInQuad  = [0, 8, 16, 20]
 
         # We get this array dynamically from /Configure:0000/CsPad::ConfigV2/CxiDs1.0:Cspad.0/config
-        #self.indPairsInQuads = [[-1,  -1,  -1,  -1,  -1,  -1,  -1,  -1],
-        #                        [ 0,   1,   2,   3,   4,   5,   6,   7],
-        #                        [ 8,   9,  10,  11,  12,  13,  14,  15],
-        #                        [16,  17,  -1,  -1,  -1,  -1,  18,  19]]
+        self.indPairsInQuads = [[-1,  -1,  -1,  -1,  -1,  -1,  -1,  -1],
+                                [ 0,   1,   2,   3,   4,   5,   6,   7],
+                                [ 8,   9,  10,  11,  12,  13,  14,  15],
+                                [16,  17,  -1,  -1,  -1,  -1,  18,  19]]
 
         self.pairInQaudOrient = [ [   0,   0, 270, 270, 180, 180, 270, 270],
                                   [   0,   0, 270, 270, 180, 180, 270, 270],

@@ -221,6 +221,23 @@ class PlotsForCSpad ( object ) :
 
         return arr2d
 
+    def resizeImageArray( self, arr2d, factor ) :
+        """Discards pixels from image defined by factor"""
+        t_start = time.clock()
+        dim1,dim2 = arr2d.shape
+        size1 = dim1 / factor
+        size2 = dim2 / factor
+        arr2dresized = np.zeros( (size1,size2), dtype=np.int16 )
+        i2 = -factor 
+        for n2 in range(size2) :
+            i2 += factor
+            i1 = -factor 
+            for n1 in range(size1) :
+                i1 += factor
+                arr2dresized[n1][n2] = arr2d[i1][i2]
+        print 'Time to resizeImageArray() (sec) = %f' % (time.clock() - t_start)
+        return arr2dresized
+
 
     def plotCSpadQuadImage( self, arr1ev, fig ):
         """Plot 2d image of the quad from input array."""
@@ -248,6 +265,7 @@ class PlotsForCSpad ( object ) :
         t_plotCSpadDetImage = time.clock()
         arr2d = self.getImageArrayForDet( arr1ev )
         print 'Time to getImageArrayForDet() (sec) = %f' % (time.clock() - t_plotCSpadDetImage)
+        #arr2dresized = self.resizeImageArray(arr2d,4)
 
         str_event = 'Event ' + str(cp.confpars.eventCurrent)
         fig.canvas.set_window_title('CSpad image ' + str_event)
