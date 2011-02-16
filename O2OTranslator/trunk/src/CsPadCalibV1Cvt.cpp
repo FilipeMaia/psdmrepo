@@ -264,7 +264,7 @@ try {
   typedef std::list<CalibFile>::const_reverse_iterator FileIter;
   for (FileIter it = files.rbegin() ; it != files.rend() ; ++ it ) {
     MsgLog(logger, debug, "trying: " << *it << " for run " << run);
-    if (it->begin() <= run) return it->path().string();
+    if (it->begin() <= run and run <= it->end()) return it->path().string();
   }
   return std::string();
 
