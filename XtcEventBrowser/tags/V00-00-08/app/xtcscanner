@@ -1,0 +1,52 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script xtcscanner...
+#
+#------------------------------------------------------------------------
+
+"""Shortcut to run XtcEventBrowser/src/XtcScanner.py
+
+@version $Id: xtcscanner 0 2011-01-24 11:45:00 ofte $
+
+@author Ingrid Ofte
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 0 $"
+# $Source$
+
+import sys
+from optparse import OptionParser
+
+from XtcEventBrowser.XtcScanner import XtcScanner
+
+if __name__ == "__main__" :
+
+    parser = OptionParser(usage="%prog [options] xtc-files ...")
+    parser.set_defaults(ndatagrams=-1, verbose=0, l1_offset=0)
+    parser.add_option('-n', "--ndatagrams",  type='int')
+    parser.add_option('-v', "--verbose", action='count')
+    parser.add_option('-l', "--l1-offset", type='float')
+
+    (options, args) = parser.parse_args()
+
+    if not args :
+        parser.error("at least one file name required")
+
+        logging.basicConfig(level=logging.INFO)
+
+    # turn options into a dictionary (from optparser.Values)
+    option_dict = vars(options)
+
+    main = XtcScanner()
+    main.setFiles(args)
+    main.setOption(option_dict)
+    sys.exit( main.scan() )
+
+
