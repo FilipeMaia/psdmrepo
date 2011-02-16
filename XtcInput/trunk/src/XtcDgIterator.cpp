@@ -91,7 +91,8 @@ XtcDgIterator::next()
   if ( payloadSize ) {
     if ( fread(dg->xtc.payload(), payloadSize, 1, m_file) != 1 ) {
       if ( feof(m_file) ) {
-        throw XTCEOFException(m_path);
+        MsgLog(logger, error, "EOF while reading datagram payload from file: " << m_path);
+        return 0;
       } else {
         throw XTCReadException(m_path);
       }
