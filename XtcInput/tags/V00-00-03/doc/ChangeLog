@@ -1,0 +1,27 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package XtcInput
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-03
+2011-02-16 Andy Salnikov
+- stop throwing exceptions at premature EOF, printing error message is 
+  sufficient.
+
+Tag: V00-00-02
+2011-01-26 Andy Salnikov
+- returned XtcIterator back to translator package
+- XtcIterator class is now a simple tree-traversal iterator which 
+  returns one XTC object at a time
+
+Tag: V00-00-01
+2011-01-26 Andy Salnikov
+- Moved some common classes for XTC reading here from O2OTranslator
