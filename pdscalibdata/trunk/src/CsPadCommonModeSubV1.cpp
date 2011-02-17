@@ -144,7 +144,8 @@ CsPadCommonModeSubV1::findCommonMode(const uint16_t* sdata,
   int peakPos = -1;
   int peakCount = -1;
   int hmRight = hsize;
-  const int thresh = 100;
+  int thresh = int(m_data[2]);
+  if(thresh<=0) thresh=100;
   for (unsigned i = 0; i < hsize; ++ i ) {
     if (hist[i] > peakCount and hist[i] > thresh) {
       peakPos = i;
