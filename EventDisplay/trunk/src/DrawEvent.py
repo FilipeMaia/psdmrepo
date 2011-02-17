@@ -44,6 +44,7 @@ import ConfigParameters as cp
 import ConfigCSpad      as cs
 import PlotsForCSpad    as cspad
 import PlotsForImage    as image
+import PlotsForWaveform as wavef
 import PrintHDF5        as printh5
 
 #---------------------
@@ -65,6 +66,7 @@ class DrawEvent ( object ) :
         cp.confpars.h5_file_is_open = False
         self.plotsCSpad             = cspad.PlotsForCSpad()
         self.plotsImage             = image.PlotsForImage()
+        self.plotsWaveform          = wavef.PlotsForWaveform()
         self.fig_window_is_open     = False 
         self.list_of_open_figs      = []
 
@@ -74,7 +76,7 @@ class DrawEvent ( object ) :
         # CSpad V2 for runs ~900
         self.dsnameCSpadV2    = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data"
         self.dsnameCSpadV2CXI = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data"
-        self.dsnameCSpadV2Conf= "/Configure:0000/CsPad::ConfigV2/CxiDs1.0:Cspad.0/config"
+        self.dsnameCSpadV2Conf= "/Configure:0000/CsPad::ConfigV2/"                        #CxiDs1.0:Cspad.0/config - is added auto
 
     #-------------------
     #  Public methods --
@@ -92,11 +94,6 @@ class DrawEvent ( object ) :
 
         runNumber = self.h5file.attrs['runNumber'] # t=0us 
         #print 'Run number = %d' % (runNumber) 
-
-
-        dsConf = self.h5file[self.dsnameCSpadV2Conf]    # t=0.01us
-        cs.confcspad.indPairsInQuads = dsConf.value[13] #
-        print "Indexes of pairs in quads =\n",cs.confcspad.indPairsInQuads 
 
 
         # Loop over checked data sets
@@ -152,6 +149,9 @@ class DrawEvent ( object ) :
 
                 #arr1ev # (32, 185, 388) <- format of this record
 
+                self.getCSpadConfiguration(dsname)
+
+
                 self.figNum += 1 
                 if cp.confpars.cspadImageIsOn : 
                     self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot=8)
@@ -198,17 +198,17 @@ class DrawEvent ( object ) :
                     self.plotsImage.plotImageAndSpectrum(arr1ev,self.set_fig('1x2'))
                 else : self.close_fig(self.figNum)
 
-            if item_last_name == 'waveform' :
+            if item_last_name == 'waveforms' :
                 print 'Here should be an emplementation of stuff for waveform'
 
                 self.figNum += 1 
-                if cp.confpars.waveformImageIsOn : 
-                    pass
+                if cp.confpars.waveformWaveformIsOn : 
+                    self.plotsWaveform.plotWFWaveform(arr1ev,self.set_fig('2x1'))
                 else : self.close_fig(self.figNum)
 
                 self.figNum += 1 
                 if cp.confpars.waveformSpectrumIsOn : 
-                    pass
+                    self.plotsWaveform.plotWFSpectrum(arr1ev,self.set_fig('2x1'))
                 else : self.close_fig(self.figNum)
 
         self.fig_window_is_open = True
@@ -218,6 +218,23 @@ class DrawEvent ( object ) :
         print 'Time to drawEvent() (sec) = %f' % (time.clock() - t_drawEvent)
 
 
+    def getCSpadConfiguration( self, dsname ):
+
+        if cp.confpars.cspadImageDetIsOn    \
+        or cp.confpars.cspadImageQuadIsOn   \
+        or cp.confpars.cspadImageOfPairIsOn \
+        or cp.confpars.cspadImageIsOn       \
+        or cp.confpars.cspadSpectrumIsOn    \
+        or cp.confpars.cspadSpectrum08IsOn  : 
+
+            item_second_to_last_name = printh5.get_item_second_to_last_name(dsname)
+            cspad_config_ds_name = self.dsnameCSpadV2Conf + item_second_to_last_name + '/config' 
+            
+            print '   CSpad configuration dataset name:', cspad_config_ds_name
+
+            dsConf = self.h5file[cspad_config_ds_name]      # t=0.01us
+            cs.confcspad.indPairsInQuads = dsConf.value[13] #
+            #print "Indexes of pairs in quads =\n",cs.confcspad.indPairsInQuads 
 
 
     def showEvent ( self, mode=1 ) :
@@ -292,6 +309,10 @@ class DrawEvent ( object ) :
 
         if type == '1x2' :
             self.fig = plt.figure(num=self.figNum, figsize=(5,10), dpi=80, facecolor='w',edgecolor='w',frameon=True)
+            self.fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
+
+        if type == '2x1' :
+            self.fig = plt.figure(num=self.figNum, figsize=(10,5), dpi=80, facecolor='w',edgecolor='w',frameon=True)
             self.fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
 
         if type == '3x4' :

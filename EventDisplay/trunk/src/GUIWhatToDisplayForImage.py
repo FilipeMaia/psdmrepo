@@ -44,18 +44,7 @@ import ConfigParameters as cp
 #  Class definition --
 #---------------------
 class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
-    """Provides GUI to select information for rendering.
-
-    Detailed description should be here...
-    @see BaseClass
-    @see OtherClass
-    """
-
-    #--------------------
-    #  Class variables --
-    #--------------------
-    #publicStaticVariable = 0 
-    #__privateStaticVariable = "A string"
+    """Provides GUI to select information for rendering."""
 
     #----------------
     #  Constructor --
@@ -67,15 +56,20 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         self.setGeometry(370, 350, 500, 150)
         self.setWindowTitle('Adjust Image Parameters')
 
+        self.frame = QtGui.QFrame(self)
+        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
+        self.frame.setLineWidth(0)
+        self.frame.setMidLineWidth(1)
+        self.frame.setGeometry(self.rect())
+        #self.frame.setVisible(True)
+
         titFont12 = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
         titFont10 = QtGui.QFont("Sans Serif", 10, QtGui.QFont.Bold)
 
-        #self.titWaveform        = QtGui.QLabel('Waveform')
         self.titImage            = QtGui.QLabel('Image')
         self.titIMImage          = QtGui.QLabel('Image plot')
         self.titIMSpectrum       = QtGui.QLabel('Spectrum')
 
-        #self.titWaveform  .setFont (titFont12) 
         self.titImage      .setFont (titFont12) 
         self.titIMImage    .setFont (titFont10)   
         self.titIMSpectrum .setFont (titFont10)
@@ -109,20 +103,9 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         #self.cboxIMImage    = QtGui.QCheckBox('Image',    self)
         #self.cboxIMSpectrum = QtGui.QCheckBox('Spectrum', self)
 
-        #self.cboxWFImage    = QtGui.QCheckBox('Image',    self)
-        #self.cboxWFSpectrum = QtGui.QCheckBox('Spectrum', self)
-
         #if cp.confpars.imageImageIsOn       : self.cboxIMImage   .setCheckState(2)
         #if cp.confpars.imageSpectrumIsOn    : self.cboxIMSpectrum.setCheckState(2)
-        #if cp.confpars.waveformImageIsOn    : self.cboxWFImage   .setCheckState(1)
-        #if cp.confpars.waveformSpectrumIsOn : self.cboxWFSpectrum.setCheckState(1)
 
-        #self.cb.setFocusPolicy(QtCore.Qt.NoFocus) 
-        #self.cb2.move(10, 50)
-        #self.cb.move(10, 10)
-        #self.cb.toggle() # set the check mark in the check box
-
-        #lcd           = QtGui.QLCDNumber(self)
         self.sliderIMAmin  = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
         self.sliderIMAmax  = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
         self.setAmplitudeRange(cp.confpars.imageAmplitudeRaMin, cp.confpars.imageAmplitudeRange)
@@ -159,20 +142,6 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         gridIM.addWidget(self.titIMSpectrumNbins,  1, 5)
         gridIM.addWidget(self.editIMSpectrumNbins, 1, 6)
         
-        #hboxWF01 = QtGui.QHBoxLayout()
-        #hboxWF01.addWidget(self.titWaveform)        
-        #hboxWF02 = QtGui.QHBoxLayout()
-        #hboxWF02.addWidget(self.cboxWFImage)
-        #hboxWF03 = QtGui.QHBoxLayout()
-        #hboxWF03.addWidget(self.cboxWFSpectrum)
-
-        #hboxCS01 = QtGui.QHBoxLayout()
-        #hboxCS01.addWidget(self.titCSpad)        
-        #hboxCS02 = QtGui.QHBoxLayout()
-        #hboxCS02.addWidget(self.cboxCSImage)
-        #hboxCS03 = QtGui.QHBoxLayout()
-        #hboxCS03.addWidget(self.cboxCSSpectrum)
-
         hboxC = QtGui.QHBoxLayout()
         hboxC.addStretch(1)
         hboxC.addWidget(self.butClose)
@@ -181,14 +150,7 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         self.vbox.addLayout(hboxIM01)
         self.vbox.addLayout(gridIM) 
         self.vbox.addLayout(hboxIM02)
-        #self.vbox.addStretch(1)     
-        #self.vbox.addLayout(hboxWF01)
-        #self.vbox.addLayout(hboxWF02)
-        #self.vbox.addLayout(hboxWF03)
-        #self.vbox.addStretch(1)     
-        #self.vbox.addLayout(hboxCS01)
-        #self.vbox.addLayout(hboxCS02)
-        #self.vbox.addLayout(hboxCS03)
+
         self.vbox.addStretch(1)     
 
         if parent == None :
@@ -200,8 +162,6 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
 
         #self.connect(self.cboxIMImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMImage)
         #self.connect(self.cboxIMSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMSpectrum)
-        #self.connect(self.cboxWFImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFImage)
-        #self.connect(self.cboxWFSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFSpectrum)
 
         self.connect(self.sliderIMAmin,        QtCore.SIGNAL('valueChanged(int)'), self.processSliderIMAmin )
         self.connect(self.sliderIMAmax,        QtCore.SIGNAL('valueChanged(int)'), self.processSliderIMAmax )
@@ -216,7 +176,14 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
 
         cp.confpars.wtdIMWindowIsOpen = True
 
+    #-------------------
+    # Private methods --
+    #-------------------
 
+    def resizeEvent(self, e):
+        #print 'resizeEvent' 
+        self.frame.setGeometry(self.rect())
+  
     def getVBoxForLayout(self):
         return self.vbox
 
@@ -316,26 +283,6 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
             cp.confpars.imageSpectrumIsOn = False
             #self.parentWidget.cboxIMSpectrum.setCheckState(0)
 
-
-    #def processCBoxWFImage(self, value):
-    #    if self.cboxWFImage.isChecked():
-    #        cp.confpars.waveformImageIsOn = True
-    #    else:
-    #        cp.confpars.waveformImageIsOn = False
-
-
-    #def processCBoxWFSpectrum(self, value):
-    #    if self.cboxWFSpectrum.isChecked():
-    #        cp.confpars.waveformSpectrumIsOn = True
-    #    else:
-    #        cp.confpars.waveformSpectrumIsOn = False
-
-
-#    def paintEvent(self, e):
-#        qp = QtGui.QPainter()
-#        qp.begin(self)
-#        self.drawWidget(qp)
-#        qp.end()
 
 #-----------------------------
 #  In case someone decides to run this module

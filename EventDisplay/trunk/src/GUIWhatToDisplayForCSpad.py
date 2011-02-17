@@ -38,7 +38,8 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import ConfigParameters as cp
+import ConfigParameters     as cp
+import GUISelectQuadAndPair as guiquadpair
 
 #---------------------
 #  Class definition --
@@ -67,6 +68,13 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.setGeometry(370, 350, 500, 150)
         self.setWindowTitle('Adjust CSpad Parameters')
 
+        self.frame = QtGui.QFrame(self)
+        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
+        self.frame.setLineWidth(0)
+        self.frame.setMidLineWidth(1)
+        self.frame.setGeometry(self.rect())
+        #self.frame.setVisible(True)
+
         titFont12 = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
         titFont10 = QtGui.QFont("Sans Serif", 10, QtGui.QFont.Bold)
 
@@ -78,8 +86,8 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.titCSImage    .setFont (titFont10)   
         self.titCSSpectrum .setFont (titFont10)
 
-        self.titCSQuad           = QtGui.QLabel('Quad:')
-        self.titCSPair           = QtGui.QLabel('Pair:')
+        #self.titCSQuad           = QtGui.QLabel('Quad:')
+        #self.titCSPair           = QtGui.QLabel('Pair:')
         self.titCSAmpDash        = QtGui.QLabel('-')
         self.titCSImageAmin      = QtGui.QLabel('Amin:')
         self.titCSImageAmax      = QtGui.QLabel('Amax:')
@@ -89,10 +97,10 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.titCSSpectrumNbins  = QtGui.QLabel('N bins:')
         self.titCSSpectrumAlim   = QtGui.QLabel('Slider range:')
 
-        self.editCSQuad          = QtGui.QLineEdit(str(cp.confpars.cspadQuad))
-        self.editCSPair          = QtGui.QLineEdit(str(cp.confpars.cspadPair))
-        self.editCSQuad          .setMaximumWidth(45)
-        self.editCSPair          .setMaximumWidth(45)
+        #self.editCSQuad          = QtGui.QLineEdit(str(cp.confpars.cspadQuad))
+        #self.editCSPair          = QtGui.QLineEdit(str(cp.confpars.cspadPair))
+        #self.editCSQuad          .setMaximumWidth(45)
+        #self.editCSPair          .setMaximumWidth(45)
         
         self.editCSImageAmin     = QtGui.QLineEdit(str(cp.confpars.cspadImageAmin))
         self.editCSImageAmax     = QtGui.QLineEdit(str(cp.confpars.cspadImageAmax))
@@ -131,13 +139,16 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         
         self.butClose = QtGui.QPushButton("Close window")
 
+        self.wquadpair = guiquadpair.GUISelectQuadAndPair()
+
         hboxCS01 = QtGui.QHBoxLayout()
         hboxCS01.addWidget(self.titCSpad)        
         hboxCS01.addStretch(1) 
-        hboxCS01.addWidget(self.titCSQuad)
-        hboxCS01.addWidget(self.editCSQuad)
-        hboxCS01.addWidget(self.titCSPair)
-        hboxCS01.addWidget(self.editCSPair)
+        hboxCS01.addWidget(self.wquadpair)
+        #hboxCS01.addWidget(self.titCSQuad)
+        #hboxCS01.addWidget(self.editCSQuad)
+        #hboxCS01.addWidget(self.titCSPair)
+        #hboxCS01.addWidget(self.editCSPair)
                            
         hboxCS02 = QtGui.QHBoxLayout()
         hboxCS02.addWidget(self.titCSSpectrumAlim) 
@@ -194,10 +205,18 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.connect(self.editCSSpectrumNbins, QtCore.SIGNAL('editingFinished ()'), self.processEditCSSpectrumNbins )
         self.connect(self.editCSAmpRange,      QtCore.SIGNAL('editingFinished ()'), self.processEditCSAmplitudeRange )
         self.connect(self.editCSAmpRaMin,      QtCore.SIGNAL('editingFinished ()'), self.processEditCSAmplitudeRaMin )
-        self.connect(self.editCSQuad,          QtCore.SIGNAL('editingFinished ()'), self.processEditCSQuad )
-        self.connect(self.editCSPair,          QtCore.SIGNAL('editingFinished ()'), self.processEditCSPair )
+        #self.connect(self.editCSQuad,          QtCore.SIGNAL('editingFinished ()'), self.processEditCSQuad )
+        #self.connect(self.editCSPair,          QtCore.SIGNAL('editingFinished ()'), self.processEditCSPair )
 
         cp.confpars.wtdCSWindowIsOpen = True
+
+    #-------------------
+    # Private methods --
+    #-------------------
+
+    def resizeEvent(self, e):
+        #print 'resizeEvent' 
+        self.frame.setGeometry(self.rect())
   
     def getVBoxForLayout(self):
         return self.vbox

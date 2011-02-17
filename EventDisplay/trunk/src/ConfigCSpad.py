@@ -59,7 +59,7 @@ class ConfigCSpad ( object ) :
         gapX = 30
         gapY = 40
 
-        self.quadXOffset     = [   3,    0,      800+gapX, 804+gapX]
+        self.quadXOffset     = [   3,    0,      800+gapX, 800+gapX]
         self.quadYOffset     = [   8,  800+gapY, 810+gapY,       18]
 
         self.firstPairInQuad = [0, 0,  8, 16]
@@ -104,12 +104,12 @@ class ConfigCSpad ( object ) :
 
         # Optical alignment:
 
-        self.pairXInQaud = [[ 414,  626,    0,    0,  213,    1,  418,  419],  # 2:5 were not measured
+        self.pairXInQaud = [[ 419,  631,    0,    0,  208,    1,  423,  424],  # 2:5 were not measured
                             [ 421,  634,    0,    0,  213,    1,  424,  425],
                             [ 417,  630,    0,    1,  212,    0,  425,  426],
-                            [ 416,  630,    0,    0,  213,    1,  420,  421]] # 2:5 were not measured 
+                            [ 421,  635,    0,    0,  213,    1,  425,  426]] # 2:5 were not measured 
                                                                       
-        self.pairYInQaud = [[   0,    0,  214,    1,  425,  425,  615,  402],  # 2:5 were not measured
+        self.pairYInQaud = [[   0,    0,  214,    1,  430,  430,  615,  402],  # 2:5 were not measured
                             [   0,    0,  214,    1,  425,  425,  615,  402],
                             [   0,    0,  215,    3,  431,  431,  616,  403],
                             [   0,    0,  214,    1,  425,  425,  615,  403]] # 2:5 were not measured

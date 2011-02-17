@@ -7,14 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Brief one-line description of the module.
-
-Following paragraphs provide detailed description of the module, its
-contents and usage. This is a template module (or module template:)
-which will be used by programmers to create new Python modules.
-This is the "library module" as opposed to executable module. Library
-modules provide class definitions or function definitions, but these
-scripts cannot be run by themselves.
+"""Plots for any 'waveform' record in the EventeDisplay project.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -26,7 +19,6 @@ part of it, please give an appropriate acknowledgment.
 @author Mikhail S. Dubrovin
 """
 
-
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
@@ -37,157 +29,99 @@ __version__ = "$Revision: 4 $"
 #  Imports of standard modules --
 #--------------------------------
 import sys
+import matplotlib.pyplot as plt
+from numpy import *
 
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
 
-
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-#import PkgPackage.PkgModule
-#from PkgPackage.PkgModule import PkgClass
-
-
-#----------------------------------
-# Local non-exported definitions --
-#----------------------------------
-
-# local definitions usually start with _
-
-_OP_X = 'Y'
-
-def _localMethod ( param ) :
-    """Still have to describe what it is, even it is local."""
-    pass
-
-
-#------------------------
-# Exported definitions --
-#------------------------
-
-# these definitions are visible to the clients
-
-OP_ONE = 1             # comment it please
-OP_NONE = None         # comment it please
-
-def foo ( x ) :
-    """Brief description of a foo().
-
-    Long description - in fact everyone knows already what foo() does.
-    """
-    if x not in ( OP_ONE, OP_NONE ) :
-        return None
-    return (None,)
-
+import ConfigParameters as cp
 
 #---------------------
 #  Class definition --
 #---------------------
 class PlotsForWaveform ( object ) :
-    """Brief description of a class.
-
-    Full description of this class. The whole purpose of this class is 
-    to serve as an example for SIT users. It shows the structure of
-    the code inside the class. Class can have class (static) variables, 
-    which can be private or public. It is good idea to define constructor 
-    for your class (in Python there is only one constructor). Put your 
-    public methods after constructor, and private methods after public.
-
-    @see BaseClass
-    @see OtherClass
-    """
-
-    #--------------------
-    #  Class variables --
-    #--------------------
-    publicStaticVariable = 0 
-    __privateStaticVariable = "A string"
+    """Plots for any 'waveform' record in the EventeDisplay project."""
 
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, x, y ) :
-        """Constructor.
-
-        Explanation of what it does. So it does that and that, and also 
-        that, but only if x is equal to that and y is not None.
-
-        @param x   first parameter
-        @param y   second parameter
-        """
-
-        # call ctor for base class explicitely
-        
-
-        # define instance variables
-        self.__x = x                  # private 
-        self._p = None                # "protected"
-        self.y = y                    # public
+    def __init__ ( self ) :
+        """Constructor, initialization"""
+        pass
 
     #-------------------
     #  Public methods --
     #-------------------
+  
+    def plotWFWaveform( self, ds1ev, fig ):
+        """Plot waveform from input array."""
 
-    def myMethod ( self, x, y ) :
-        """Brief description of method.
+        print 'plotWFWaveform'
 
-        Explanation of what it does.
-        @param x   first parameter
-        @param y   second parameter
-        @return    return value
-        """
-    	if self.__x > x :
-            return self.y
-        else:
-            self._p = self.__myPrivateMethod ( y )
-            return self._p
+        numberOfWF, par2, dimX = ds1ev.shape
+        print 'numberOfWF, par2, dimX = ', numberOfWF, par2, dimX
+        arrwf = ds1ev[0,0,...]
+        
+        print 'arrwf.shape', arrwf.shape
 
-    #--------------------------------
-    #  Static/class public methods --
-    #--------------------------------
+        fig.canvas.set_window_title(cp.confpars.current_item_name_for_title) 
+        plt.clf() # clear plot
+        fig.subplots_adjust(left=0.10, bottom=0.05, right=0.95, top=0.95, wspace=0.1, hspace=0.1)        
 
-    @staticmethod
-    def myStaticMethod ( x, y ) :
-        """Brief description of method.
+        plt.plot(arrwf, range(dimX), 'b-')
+        
+        pantit='Waveform, event ' + str(cp.confpars.eventCurrent)
+        #self.axes = plt.imshow(arr2d1ev, origin='upper', interpolation='nearest') # Just a histogram
+        #self.colb = plt.colorbar(self.axes, pad=0.01, fraction=0.10, shrink = 1) #, ticks=coltickslocs)
+        #plt.clim(cp.confpars.imageImageAmin,cp.confpars.imageImageAmax)
+        
+        plt.title(pantit,color='r',fontsize=20) # pars like in class Text
+        ##plt.xlabel('X pixels')
+        ##plt.ylabel('Y pixels')
+        
+        ##plt.margins(x=0.05,y=0.05,tight=True)
+        ##plt.rc('lines', linewidth=2, color='r') # Set the current default parameters
+        
+        ##str_event = 'Event ' + str(cp.confpars.eventCurrent)
+        ##plt.text(-50, -10, str_event, fontsize=24)
 
-        Explanation of what it does.
-        @param x   second parameter
-        @param y   second parameter
-        @return    return value
-        """
-        return x**2+y**2
+        ##plt.savefig("my-image-hdf5.png")
+        ##plt.show()        
 
-    @classmethod
-    def myClassMethod ( cls, x ) :
-        """Brief description of method.
 
-        Explanation of what it does.
-        @param cls class object of this class or subclass
-        @param x   second parameter
-        @return    return value
-        """
-        return cls.x**2-x**2
+    def plotWFSpectrum( self, arr2d1ev, fig ):
+        """Spectrum of amplitudes in the 2d input array."""
 
-    #--------------------
-    #  Private methods --
-    #--------------------
+        #plt.clf() # clear plot
+        #fig.canvas.set_window_title(cp.confpars.current_item_name_for_title) 
+        #pantit='Specrum, event ' + str(cp.confpars.eventCurrent)
+        #plt.title(pantit,color='r',fontsize=20) # pars like in class Text
+        #arrdimX,arrdimY = arr2d1ev.shape
+        ##print 'arr2d1ev.shape=', arr2d1ev.shape, arrdimX, arrdimY 
+        #print 'arr2d1ev=\n', arr2d1ev
+        #arr1d1ev = copy(arr2d1ev)
+        #arr1d1ev.resize(arrdimX*arrdimY)
+        #print 'arr1d1ev=\n', arr1d1ev
+        ##plt.hist(arr1d1ev,100)
 
-    def __myPrivateMethod ( self, y ) :
-        """Brief description of method.
+        #cp.confpars.imageSpectrumRange=(15,45)
+        ##cp.confpars.imageSpectrumNbins=30       
+        ##cp.confpars.imageSpectrumRange=None        
+        ##cp.confpars.imageSpectrumNbins=None        
+        #plt.hist(arr1d1ev, bins=cp.confpars.imageSpectrumNbins, range=(cp.confpars.imageSpectrumAmin,cp.confpars.imageSpectrumAmax))
+        ##plt.hist(arr1d1ev)
 
-        Explanation of what it does.
-        @param y   second parameter
-        @return    return value
-        """
-        return y**2
 
-#
+#--------------------------------
 #  In case someone decides to run this module
 #
 if __name__ == "__main__" :
 
-    # In principle we can try to run test suite for this module,
-    # have to think about it later. Right now just abort.
     sys.exit ( "Module is not supposed to be run as main module" )
+
+#--------------------------------

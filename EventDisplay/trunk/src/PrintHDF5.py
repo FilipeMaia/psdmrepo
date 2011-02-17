@@ -98,6 +98,16 @@ def get_item_last_name(dsname):
 
 #----------------------------------
 
+def get_item_second_to_last_name(dsname):
+    """Returns the last 3 parts of the full item name (after last slashes)"""
+
+    path1,name1 = os.path.split(str(dsname))
+    path2,name2 = os.path.split(str(path1))
+
+    return name2 
+
+#----------------------------------
+
 def get_item_name_for_title(dsname):
     """Returns the last 3 parts of the full item name (after last slashes)"""
 

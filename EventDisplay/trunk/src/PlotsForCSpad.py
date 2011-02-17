@@ -139,11 +139,12 @@ class PlotsForCSpad ( object ) :
             pantit='ASIC ' + str(2*ind) + ', ' + str(2*ind+1)
 
             plt.subplot(panel)
-            plt.imshow(arr,  origin='down', interpolation='nearest') # Just a histogram
+            #plt.imshow(arr,  origin='down', interpolation='nearest') # Just a histogram
+            plt.imshow(arr, interpolation='nearest') # Just a histogram
             plt.clim(cp.confpars.cspadImageAmin,cp.confpars.cspadImageAmax)
             plt.title(pantit,color='r',fontsize=20) # pars like in class Text
             if ind==0 :
-                plt.text(280, 192, str_event, fontsize=24)
+                plt.text(280, -10, str_event, fontsize=24)
 
 
     def getImageArrayForPair( self, arr1ev, pairNum=None ):
@@ -432,7 +433,7 @@ class PlotsForCSpad ( object ) :
         #print 'colticks =', coltickslocs, coltickslabels
         
         plt.subplot(211)
-        self.axes = plt.imshow(self.arr, origin='down', interpolation='nearest') # Just a histogram, origin='upper'
+        self.axes = plt.imshow(self.arr, interpolation='nearest') # Just a histogram, origin='down'
         plt.title(self.pantit,color='r',fontsize=20) # pars like in class Text
 
         #plt.text(50, -20, pantit, fontsize=24)

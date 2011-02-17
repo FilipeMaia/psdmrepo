@@ -53,7 +53,7 @@ class GUISelectQuadAndPair ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 500, 80, 30)
+        self.setGeometry(200, 500, 80, 25)
         self.setWindowTitle('Quad and pair selection')
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False
@@ -109,6 +109,8 @@ class GUISelectQuadAndPair ( QtGui.QWidget ) :
 #        self.connect(self.editQuad,  QtCore.SIGNAL('editingFinished ()'), self.processEditQuad )
 #        self.connect(self.editPair,  QtCore.SIGNAL('editingFinished ()'), self.processEditPair )
 
+        self.showToolTips()
+
 
     #-------------------
     # Private methods --
@@ -135,6 +137,14 @@ class GUISelectQuadAndPair ( QtGui.QWidget ) :
 
 
 
+    def showToolTips(self):
+        # Tips for buttons and fields:
+        #self            .setToolTip('Click on QUAD or PAIR number using mouse left button')
+        self.butMenuQuad.setToolTip('Click mouse left on this button\nand select the QUAD number\nif it is necessary for the plot.')
+        self.butMenuPair.setToolTip('Select the PAIR number.\nN/A means that the pair is not available in the dataset.')
+
+
+
     def resizeEvent(self, e):
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
@@ -144,13 +154,11 @@ class GUISelectQuadAndPair ( QtGui.QWidget ) :
         self.close()
         
     def mousePressEvent(self, event):
-        print 'Do not click on mouse just for fun!\n'
-        print 'event.button() = %s at position' % (event.button()),        
+        print 'Click on Quad or Pair number using mouse left button\n'
+        #print 'event.button() = %s at position' % (event.button()),        
         #print (event.pos()),
-        print ' x=%d, y=%d' % (event.x(),event.y()),        
-        print ' global x=%d, y=%d' % (event.globalX(),event.globalY())
-        #self.emit(QtCore.SIGNAL('closeGUIApp()'))
-
+        #print ' x=%d, y=%d' % (event.x(),event.y()),        
+        #print ' global x=%d, y=%d' % (event.globalX(),event.globalY())
 
     def processMenuQuad(self):
         #print 'MenuQuad'
@@ -168,13 +176,16 @@ class GUISelectQuadAndPair ( QtGui.QWidget ) :
         actionSelected = self.popupMenuPair.exec_(QtGui.QCursor.pos())
         if actionSelected==None : return
         for action in self.listActMenuPair:
+            if actionSelected != action : continue
             if actionSelected.text() == 'N/A' :
+                self.butMenuPair.setText( 'N/A' + self.char_expand )
                 self.butMenuPair.setStyleSheet("background-color: rgb(255, 0, 0); color: rgb(255, 255, 255)")
-                if actionSelected == action : self.butMenuPair.setText( 'N/A' + self.char_expand )
+                self.butMenuPair.setMaximumWidth(45)
             else :
                 cp.confpars.cspadPair = int(actionSelected.text())
-                if actionSelected == action : self.butMenuPair.setText( str(cp.confpars.cspadPair) + self.char_expand )
+                self.butMenuPair.setText( str(cp.confpars.cspadPair) + self.char_expand )
                 self.butMenuPair.setStyleSheet("background-color: rgb(255, 255, 255); color: rgb(0, 0, 0)")
+                self.butMenuPair.setMaximumWidth(25)
 
 
 #    def processEditQuad(self):    

@@ -39,8 +39,9 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 import ConfigParameters as cp
-import GUIWhatToDisplayForImage as wtdIM 
-import GUIWhatToDisplayForCSpad as wtdCS 
+import GUIWhatToDisplayForImage    as wtdIM 
+import GUIWhatToDisplayForCSpad    as wtdCS 
+import GUIWhatToDisplayForWaveform as wtdWF
 
 #---------------------
 #  Class definition --
@@ -103,7 +104,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.cboxCSSpectrum    = QtGui.QCheckBox('16 ASICs',      self)
         self.cboxCSSpectrum08  = QtGui.QCheckBox('8 of 2x1',      self)
 
-        self.cboxWFImage       = QtGui.QCheckBox('Image',         self)
+        self.cboxWFWaveform    = QtGui.QCheckBox('Waveform',      self)
         self.cboxWFSpectrum    = QtGui.QCheckBox('Spectrum',      self)
 
         if cp.confpars.imageImageIsOn       : self.cboxIMImage       .setCheckState(2)
@@ -116,8 +117,8 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         if cp.confpars.cspadImageDetIsOn    : self.cboxCSImageDet    .setCheckState(2)
         if cp.confpars.cspadSpectrumIsOn    : self.cboxCSSpectrum    .setCheckState(2)
         if cp.confpars.cspadSpectrum08IsOn  : self.cboxCSSpectrum08  .setCheckState(2)
-        if cp.confpars.waveformImageIsOn    : self.cboxWFImage       .setCheckState(1)
-        if cp.confpars.waveformSpectrumIsOn : self.cboxWFSpectrum    .setCheckState(1)
+        if cp.confpars.waveformWaveformIsOn : self.cboxWFWaveform    .setCheckState(2)
+        if cp.confpars.waveformSpectrumIsOn : self.cboxWFSpectrum    .setCheckState(2)
 
         #self.cb.setFocusPolicy(QtCore.Qt.NoFocus) 
         #self.cb2.move(10, 50)
@@ -126,9 +127,9 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
         self.butClose      = QtGui.QPushButton('Quit')
 
-        self.butIMOptions  = QtGui.QPushButton("Options for Image")
-        self.butCSOptions  = QtGui.QPushButton("Options for CSpad")
-        self.butWFOptions  = QtGui.QPushButton("Options for Waveform")
+        #self.butIMOptions  = QtGui.QPushButton("Options for Image")
+        #self.butCSOptions  = QtGui.QPushButton("Options for CSpad")
+        #self.butWFOptions  = QtGui.QPushButton("Options for Waveform")
 
         self.showToolTips()
 
@@ -158,7 +159,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         
         gridWF = QtGui.QGridLayout()
         gridWF.addWidget(self.titWaveform,      0, 0)
-        gridWF.addWidget(self.cboxWFImage,      1, 0)
+        gridWF.addWidget(self.cboxWFWaveform,   1, 0)
         gridWF.addWidget(self.cboxWFSpectrum,   2, 0)
         #gridWF.addWidget(self.butWFOptions,     0, 1, 1, 3)
         
@@ -222,16 +223,16 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.connect(self.cboxCSImageOfPair,   QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSImageOfPair)
         self.connect(self.cboxCSSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSSpectrum)
         self.connect(self.cboxCSSpectrum08,    QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSSpectrum08)
-        self.connect(self.cboxWFImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFImage)
+        self.connect(self.cboxWFWaveform,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFWaveform)
         self.connect(self.cboxWFSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFSpectrum)
 
         self.connect(self.tabBar,              QtCore.SIGNAL('currentChanged(int)'),self.processTabBar)
 
     def showToolTips(self):
         self.butClose    .setToolTip('Close this window') 
-        self.butIMOptions.setToolTip('Adjust amplitude and other plot\nparameters for Image type plots.')
-        self.butCSOptions.setToolTip('Adjust amplitude and other plot\nparameters for CSpad type plots.')
-        self.butWFOptions.setToolTip('Adjust amplitude and other plot\nparameters for Waveform type plots.')
+        #self.butIMOptions.setToolTip('Adjust amplitude and other plot\nparameters for Image type plots.')
+        #self.butCSOptions.setToolTip('Adjust amplitude and other plot\nparameters for CSpad type plots.')
+        #self.butWFOptions.setToolTip('Adjust amplitude and other plot\nparameters for Waveform type plots.')
 
     def closeEvent(self, event):
         print 'closeEvent'
@@ -260,7 +261,8 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         if indTab == self.indTabIM :
             self.guiTab = wtdIM.GUIWhatToDisplayForImage()
         if indTab == self.indTabWF :
-            self.guiTab = QtGui.QLineEdit('Stuff for Waveform')
+            self.guiTab = wtdWF.GUIWhatToDisplayForWaveform()
+           #self.guiTab = QtGui.QLineEdit('Stuff for Waveform')
 
         self.guiTab.setMinimumHeight(200)
         self.hboxD.addWidget(self.guiTab)
@@ -282,7 +284,9 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         
     def processWFOptions(self):
         print 'WFOptions'
-
+        self.guiwtdWF = wtdWF.GUIWhatToDisplayForWaveform()
+        self.guiwtdWF.setParentWidget(self)
+        self.guiwtdWF.move(self.pos().__add__(QtCore.QPoint(40,120))) # open window with offset w.r.t. parent
 
     def processCBoxIMImage(self, value):
         if self.cboxIMImage.isChecked():
@@ -335,9 +339,6 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
             cp.confpars.cspadImageDetIsOn = False
 
 
-
-
-
     def processCBoxCSSpectrum(self, value):
         if self.cboxCSSpectrum.isChecked():
             cp.confpars.cspadSpectrumIsOn = True
@@ -354,11 +355,11 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
             cp.confpars.cspadSpectrum08IsOn = False
 
 
-    def processCBoxWFImage(self, value):
-        if self.cboxWFImage.isChecked():
-            cp.confpars.waveformImageIsOn = True
+    def processCBoxWFWaveform(self, value):
+        if self.cboxWFWaveform.isChecked():
+            cp.confpars.waveformWaveformIsOn = True
         else:
-            cp.confpars.waveformImageIsOn = False
+            cp.confpars.waveformWaveformIsOn = False
 
 
     def processCBoxWFSpectrum(self, value):
