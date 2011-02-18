@@ -26,7 +26,7 @@ __version__ = "$Revision$"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
-import sys, random
+import sys, random, os, signal
 import  subprocess 
 
 #---------------------------------
@@ -54,10 +54,14 @@ import pyanascript
 #------------------------
 
 
-
 #---------------------
 #  Class definition --
 #---------------------
+class myPopen(subprocess.Popen):
+    def kill(self, signal = signal.SIGTERM):
+        os.kill(self.pid, signal)
+        
+
 class XtcPyanaControl ( QtGui.QWidget ) :
     """Gui interface to pyana configuration & control
 
@@ -87,12 +91,15 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.checks = []
         self.checkboxes = []
         self.filenames = []
+
+        self.proc_pyana = None
         
         # buttons
         self.pyana_config = QtGui.QLabel(self);
         self.config_button = None
         self.econfig_button = None
         self.pyana_button = None
+        self.quit_pyana_button = None
 
         self.set_layout()
         self.show()
@@ -148,10 +155,21 @@ class XtcPyanaControl ( QtGui.QWidget ) :
     #  Public methods --
     #-------------------
 
+    def quit_pyana(self) :
+        if self.proc_pyana is None:
+            print "No pyana process to stop"
+            return
+
+        self.proc_pyana.kill()
+        #self.proc_pyana.communicate(input=subprocess.SIGTERM)
+        #self.proc_pyana.send_signal(subprocess.SIGTERM)
+        #self.proc_pyana.kill()
+        #self.proc_pyana.terminate()
+
+
     def add_selector(self, devices={} ):
         """Draw a group of checkboxes to the GUI
 
-        Draw a group of checkboxes to the GUI. 
         One checkbox for each Detector/Device found
         in the scan of xtc file
         """
@@ -350,7 +368,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
     def __edit_configfile(self):
 
         # pop up emacs window to edit the config file as needed:
-        proc_emacs = subprocess.Popen("emacs %s" % self.configfile, shell=True) 
+        proc_emacs = myPopen("emacs %s" % self.configfile, shell=True) 
         stdout_value = proc_emacs.communicate()[0]
         print stdout_value
         
@@ -378,24 +396,19 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         run pyana with the needed modules and configurations as requested
         based on the the checkboxes
         """
-        print "Now we'll run pyana..... "
 
-        #poptions = []
-        #poptions.append("pyana")
-        #poptions.append("-n")
-        #poptions.append("10")
-        #poptions.append("-c")
-        #poptions.append("%s" % configfile)
-        #for file in self.filenames :
-        #    poptions.append(file)
-        #pyanascript.main(poptions)
-
-
-        runstring = "pyana -n 1000 -c %s " % self.configfile
+        # Make a command sequence 
+        poptions = []
+        poptions.append("pyana")
+        poptions.append("-n")
+        poptions.append("10")
+        poptions.append("-c")
+        poptions.append("%s" % self.configfile)
         for file in self.filenames :
-            runstring += file
-            runstring +=" "
+            poptions.append(file)
 
+        # turn sequence into a string, allow user to modify it
+        runstring = ' '.join(poptions)
         dialog =  QtGui.QInputDialog()
         dialog.setMinimumWidth(1500)
         text, ok = dialog.getText(self,
@@ -404,18 +417,35 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                                   QtGui.QLineEdit.Normal,
                                   text=runstring )
         if ok:
-            print "Running pyana:"
-            print text
             runstring = str(text)
+            poptions = runstring.split(' ')
         else :
             return
 
-        print "Calling pyana.... "
-        subprocess.Popen(runstring, shell=True) # this runs in separate thread.
-
-        plt.show()
         
+        print "Calling pyana.... "
+        print "     ", ' '.join(poptions)
 
+        if 0 :                
+            # calling as module
+            pyanascript.main(poptions)
+            
+        if 1 :
+            # calling a new process
+            self.proc_pyana = myPopen(poptions) # this runs in separate thread.
+            #stdout_value = proc_pyana.communicate()[0]
+            #print stdout_value
+            
+        if self.quit_pyana_button is None :
+            self.quit_pyana_button = QtGui.QPushButton("&Stop pyana")
+            self.connect(self.quit_pyana_button, QtCore.SIGNAL('clicked()'), self.quit_pyana )
+            self.v0.addWidget( self.quit_pyana_button )
+            self.v0.setAlignment( self.quit_pyana_button, QtCore.Qt.AlignRight )
+
+        #plt.show()
+            
+            
+            
         # alternative ways of running pyana:
         #
         #os.system(runstring)  # this will block 

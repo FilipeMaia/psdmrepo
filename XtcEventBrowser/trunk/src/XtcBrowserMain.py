@@ -45,6 +45,10 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 from matplotlib.figure import Figure
 
+import numpy as np
+import matplotlib.pyplot as plt
+
+from test import draw_on
 
 #----------------------------------
 # Local non-exported definitions --
@@ -158,10 +162,13 @@ part of it, please give an appropriate acknowledgment.
         # Test matplotlib widget
         self.mpl_button = QtGui.QPushButton("&MatPlotLib")
         self.connect(self.mpl_button, QtCore.SIGNAL('clicked()'), self.__makeplot )
+        self.mpl2_button = QtGui.QPushButton("&MatPlotLib2")
+        self.connect(self.mpl2_button, QtCore.SIGNAL('clicked()'), self.__makeplot2 )
 
         # Quit application
         self.quit_button = QtGui.QPushButton("&Quit")
-        self.connect(self.quit_button, QtCore.SIGNAL('clicked()'), QtGui.qApp, QtCore.SLOT('quit()') )
+        #self.connect(self.quit_button, QtCore.SIGNAL('clicked()'), QtGui.qApp, QtCore.SLOT('quit()') )
+        self.connect(self.quit_button, QtCore.SIGNAL('clicked()'), self.quit )
         
         self.main_widget = QtGui.QWidget(self)
         self.main_widget.setFocus()
@@ -210,6 +217,8 @@ part of it, please give an appropriate acknowledgment.
         v3.setAlignment(self.scan_button, QtCore.Qt.AlignLeft )
         v3.addWidget( self.mpl_button )
         v3.setAlignment(self.mpl_button, QtCore.Qt.AlignRight )
+        v3.addWidget( self.mpl2_button )
+        v3.setAlignment(self.mpl2_button, QtCore.Qt.AlignRight )
 
         h4 = QtGui.QHBoxLayout()
         h4.addLayout(v3)
@@ -241,6 +250,13 @@ part of it, please give an appropriate acknowledgment.
     #-------------------
     #  Public methods --
     #-------------------
+
+    def quit(self):
+        if self.pyanactrl is not None : 
+            self.pyanactrl.quit_pyana()
+        QtGui.qApp.closeAllWindows()
+
+
 
     def add_file(self, filename):
         self.filenames.append(filename)
@@ -278,6 +294,33 @@ part of it, please give an appropriate acknowledgment.
         
         
     def __makeplot(self):
+
+        self.fig = plt.figure(200)
+        axes = self.fig.add_subplot(111)
+        axes.set_title("Hello MatPlotLib")
+        
+        plt.show()
+        
+        dark_image = np.load("pyana_cspad_average_image.npy")
+        axim = plt.imshow( dark_image )#, origin='lower' )
+        colb = plt.colorbar(axim,pad=0.01)
+        
+        plt.draw()
+        
+        print "Done drawing"
+        
+        axim = plt.imshow( dark_image[500:1000,1000:1500] )#, origin='lower' )
+        
+        return
+
+    def __makeplot2(self):
+        number = 200
+        print "number " , number
+        draw_on(number)
+        
+        return
+
+
         print "This does not work yet. Ignore"
         self.mpl_widget = QtGui.QWidget()
         self.dpi = 100
@@ -416,7 +459,7 @@ part of it, please give an appropriate acknowledgment.
 
         #self.__add_selector()
         if self.pyanactrl is None : 
-            self.pyanactrl = XtcPyanaControl()
+            self.pyanactrl = XtcPyanaControl(parent=self)
             self.pyanactrl.add_selector( self.scanner.devices )
             self.pyanactrl.set_files(self.filenames)
 
