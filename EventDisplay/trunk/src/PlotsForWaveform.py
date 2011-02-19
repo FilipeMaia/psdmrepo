@@ -71,52 +71,17 @@ class PlotsForWaveform ( object ) :
 
         fig.canvas.set_window_title(cp.confpars.current_item_name_for_title) 
         plt.clf() # clear plot
-        fig.subplots_adjust(left=0.10, bottom=0.05, right=0.95, top=0.95, wspace=0.1, hspace=0.1)        
+        fig.subplots_adjust(left=0.10, bottom=0.05, right=0.95, top=0.94, wspace=0.1, hspace=0.1)        
 
-        plt.plot(arrwf, range(dimX), 'b-')
+        plt.plot( range(dimX), arrwf, 'b-')
         
-        pantit='Waveform, event ' + str(cp.confpars.eventCurrent)
-        #self.axes = plt.imshow(arr2d1ev, origin='upper', interpolation='nearest') # Just a histogram
-        #self.colb = plt.colorbar(self.axes, pad=0.01, fraction=0.10, shrink = 1) #, ticks=coltickslocs)
+        str_title='Waveform, event ' + str(cp.confpars.eventCurrent)
         #plt.clim(cp.confpars.imageImageAmin,cp.confpars.imageImageAmax)
         
-        plt.title(pantit,color='r',fontsize=20) # pars like in class Text
+        plt.title(str_title,color='r',fontsize=20) # pars like in class Text
         ##plt.xlabel('X pixels')
         ##plt.ylabel('Y pixels')
         
-        ##plt.margins(x=0.05,y=0.05,tight=True)
-        ##plt.rc('lines', linewidth=2, color='r') # Set the current default parameters
-        
-        ##str_event = 'Event ' + str(cp.confpars.eventCurrent)
-        ##plt.text(-50, -10, str_event, fontsize=24)
-
-        ##plt.savefig("my-image-hdf5.png")
-        ##plt.show()        
-
-
-    def plotWFSpectrum( self, arr2d1ev, fig ):
-        """Spectrum of amplitudes in the 2d input array."""
-
-        #plt.clf() # clear plot
-        #fig.canvas.set_window_title(cp.confpars.current_item_name_for_title) 
-        #pantit='Specrum, event ' + str(cp.confpars.eventCurrent)
-        #plt.title(pantit,color='r',fontsize=20) # pars like in class Text
-        #arrdimX,arrdimY = arr2d1ev.shape
-        ##print 'arr2d1ev.shape=', arr2d1ev.shape, arrdimX, arrdimY 
-        #print 'arr2d1ev=\n', arr2d1ev
-        #arr1d1ev = copy(arr2d1ev)
-        #arr1d1ev.resize(arrdimX*arrdimY)
-        #print 'arr1d1ev=\n', arr1d1ev
-        ##plt.hist(arr1d1ev,100)
-
-        #cp.confpars.imageSpectrumRange=(15,45)
-        ##cp.confpars.imageSpectrumNbins=30       
-        ##cp.confpars.imageSpectrumRange=None        
-        ##cp.confpars.imageSpectrumNbins=None        
-        #plt.hist(arr1d1ev, bins=cp.confpars.imageSpectrumNbins, range=(cp.confpars.imageSpectrumAmin,cp.confpars.imageSpectrumAmax))
-        ##plt.hist(arr1d1ev)
-
-
 #--------------------------------
 #  In case someone decides to run this module
 #

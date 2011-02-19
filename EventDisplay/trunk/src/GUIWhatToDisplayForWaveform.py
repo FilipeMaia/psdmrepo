@@ -52,67 +52,62 @@ class GUIWhatToDisplayForWaveform ( QtGui.QWidget ) :
         self.setGeometry(370, 350, 500, 150)
         self.setWindowTitle('Adjust Waveform Parameters')
 
+        self.palette = QtGui.QPalette()
+
         self.frame = QtGui.QFrame(self)
         self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
         self.frame.setLineWidth(0)
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(True)
+        #self.frame.setVisible(False)
 
         titFont12 = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
         titFont10 = QtGui.QFont("Sans Serif", 10, QtGui.QFont.Bold)
 
         self.titWaveform         = QtGui.QLabel('Waveform')
-        self.titWFWaveform       = QtGui.QLabel('Waveform plot')
-        self.titWFSpectrum       = QtGui.QLabel('Spectrum')
 
         self.titWaveform   .setFont (titFont12) 
-        self.titWFWaveform .setFont (titFont10)   
-        self.titWFSpectrum .setFont (titFont10)
 
         self.titWFWaveformAmin   = QtGui.QLabel('Amin:')
         self.titWFWaveformAmax   = QtGui.QLabel('Amax:')
-
-        self.titWFSpectrumAmin   = QtGui.QLabel('Amin:')
-        self.titWFSpectrumAmax   = QtGui.QLabel('Amax:')
-        self.titWFSpectrumNbins  = QtGui.QLabel('N bins:')
-        self.titWFSpectrumAlim   = QtGui.QLabel('Slider range:')
+        self.titWFWaveformTmin   = QtGui.QLabel('Tmin:')
+        self.titWFWaveformTmax   = QtGui.QLabel('Tmax:')
 
         self.editWFWaveformAmin  = QtGui.QLineEdit(str(cp.confpars.waveformWaveformAmin))
         self.editWFWaveformAmax  = QtGui.QLineEdit(str(cp.confpars.waveformWaveformAmax))
         self.editWFWaveformAmin  .setMaximumWidth(45)
         self.editWFWaveformAmax  .setMaximumWidth(45)
 
-        self.editWFSpectrumAmin  = QtGui.QLineEdit(str(cp.confpars.waveformSpectrumAmin))
-        self.editWFSpectrumAmax  = QtGui.QLineEdit(str(cp.confpars.waveformSpectrumAmax))
-        self.editWFSpectrumNbins = QtGui.QLineEdit(str(cp.confpars.waveformSpectrumNbins))
-        self.editWFSpectrumAmin  .setMaximumWidth(45)
-        self.editWFSpectrumAmax  .setMaximumWidth(45)
-        self.editWFSpectrumNbins .setMaximumWidth(45)
+        self.editWFWaveformTmin  = QtGui.QLineEdit(str(cp.confpars.waveformWaveformTmin))
+        self.editWFWaveformTmax  = QtGui.QLineEdit(str(cp.confpars.waveformWaveformTmax))
+        self.editWFWaveformTmin  .setMaximumWidth(45)
+        self.editWFWaveformTmax  .setMaximumWidth(45)
 
-        #self.butClose = QtGui.QPushButton("Close window")
+        self.setEditFieldsReadOnly(cp.confpars.waveformAutoRangeIsOn)
+
+        self.radioAuto   = QtGui.QRadioButton("Auto range of parameters")
+        self.radioManual = QtGui.QRadioButton("Manual range control:")
+        self.radioGroup  = QtGui.QButtonGroup()
+        self.radioGroup.addButton(self.radioAuto)
+        self.radioGroup.addButton(self.radioManual)
+        if cp.confpars.waveformAutoRangeIsOn : self.radioAuto  .setChecked(True)
+        else :                                 self.radioManual.setChecked(True)
+
 
         hboxWF01 = QtGui.QHBoxLayout()
         hboxWF01.addWidget(self.titWaveform)        
 
         gridWF = QtGui.QGridLayout()
-        gridWF.addWidget(self.titWFWaveform,       0, 0)
-        gridWF.addWidget(self.titWFWaveformAmin,   0, 1)
-        gridWF.addWidget(self.editWFWaveformAmin,  0, 2)
-        gridWF.addWidget(self.titWFWaveformAmax,   0, 3)
-        gridWF.addWidget(self.editWFWaveformAmax,  0, 4)
-        
-        gridWF.addWidget(self.titWFSpectrum,       1, 0)
-        gridWF.addWidget(self.titWFSpectrumAmin,   1, 1)
-        gridWF.addWidget(self.editWFSpectrumAmin,  1, 2)
-        gridWF.addWidget(self.titWFSpectrumAmax,   1, 3)
-        gridWF.addWidget(self.editWFSpectrumAmax,  1, 4)
-        gridWF.addWidget(self.titWFSpectrumNbins,  1, 5)
-        gridWF.addWidget(self.editWFSpectrumNbins, 1, 6)
-        
-        #hboxC = QtGui.QHBoxLayout()
-        #hboxC.addStretch(1)
-        #hboxC.addWidget(self.butClose)
+        gridWF.addWidget(self.radioAuto,           0, 0)
+        gridWF.addWidget(self.radioManual,         1, 0)
+        gridWF.addWidget(self.titWFWaveformAmin,   1, 1)
+        gridWF.addWidget(self.editWFWaveformAmin,  1, 2)
+        gridWF.addWidget(self.titWFWaveformAmax,   1, 3)
+        gridWF.addWidget(self.editWFWaveformAmax,  1, 4)
+        gridWF.addWidget(self.titWFWaveformTmin,   2, 1)
+        gridWF.addWidget(self.editWFWaveformTmin,  2, 2)
+        gridWF.addWidget(self.titWFWaveformTmax,   2, 3)
+        gridWF.addWidget(self.editWFWaveformTmax,  2, 4)
         
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(hboxWF01)
@@ -130,15 +125,44 @@ class GUIWhatToDisplayForWaveform ( QtGui.QWidget ) :
 
         self.connect(self.editWFWaveformAmin,  QtCore.SIGNAL('editingFinished ()'), self.processEditWFWaveformAmin )
         self.connect(self.editWFWaveformAmax,  QtCore.SIGNAL('editingFinished ()'), self.processEditWFWaveformAmax )
-        self.connect(self.editWFSpectrumAmin,  QtCore.SIGNAL('editingFinished ()'), self.processEditWFSpectrumAmin )
-        self.connect(self.editWFSpectrumAmax,  QtCore.SIGNAL('editingFinished ()'), self.processEditWFSpectrumAmax )
-        self.connect(self.editWFSpectrumNbins, QtCore.SIGNAL('editingFinished ()'), self.processEditWFSpectrumNbins )
-
+        self.connect(self.editWFWaveformTmin,  QtCore.SIGNAL('editingFinished ()'), self.processEditWFWaveformTmin )
+        self.connect(self.editWFWaveformTmax,  QtCore.SIGNAL('editingFinished ()'), self.processEditWFWaveformTmax )
+        self.connect(self.radioAuto,           QtCore.SIGNAL('clicked()'),          self.processRadioAuto    )
+        self.connect(self.radioManual,         QtCore.SIGNAL('clicked()'),          self.processRadioManual  )
+ 
         cp.confpars.wtdWFWindowIsOpen = True
+
+        self.showToolTips()
 
     #-------------------
     # Private methods --
     #-------------------
+
+    def showToolTips(self):
+        # Tips for buttons and fields:
+        #self           .setToolTip('This GUI deals with the configuration parameters for waveforms.')
+        self.radioAuto  .setToolTip('Select between Auto and Manual range control.')
+        self.radioManual.setToolTip('Select between Auto and Manual range control.')
+        self.editWFWaveformAmin.setToolTip('This field can be edited for Manual control only.')
+        self.editWFWaveformAmax.setToolTip('This field can be edited for Manual control only.')
+        self.editWFWaveformTmin.setToolTip('This field can be edited for Manual control only.')
+        self.editWFWaveformTmax.setToolTip('This field can be edited for Manual control only.')
+
+
+    def setEditFieldsReadOnly(self, isReadOnly=False):
+
+        if isReadOnly == True : self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('grey'))
+        else :                  self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('white'))
+
+        self.editWFWaveformAmin.setPalette(self.palette)
+        self.editWFWaveformAmax.setPalette(self.palette)
+        self.editWFWaveformTmin.setPalette(self.palette)
+        self.editWFWaveformTmax.setPalette(self.palette)
+
+        self.editWFWaveformAmin.setReadOnly(isReadOnly)
+        self.editWFWaveformAmax.setReadOnly(isReadOnly)
+        self.editWFWaveformTmin.setReadOnly(isReadOnly)
+        self.editWFWaveformTmax.setReadOnly(isReadOnly)
 
     def resizeEvent(self, e):
         #print 'resizeEvent' 
@@ -167,18 +191,23 @@ class GUIWhatToDisplayForWaveform ( QtGui.QWidget ) :
         print 'EditWFWaveformAmax'
         cp.confpars.waveformWaveformAmax = int(self.editWFWaveformAmax.displayText())        
 
-    def processEditWFSpectrumAmin(self):
-        print 'EditWFSpectrumAmin'
-        cp.confpars.waveformSpectrumAmin = int(self.editWFSpectrumAmin.displayText())        
+    def processEditWFWaveformTmin(self):
+        print 'EditWFWaveformTmin'
+        cp.confpars.waveformWaveformTmin = int(self.editWFWaveformTmin.displayText())        
 
-    def processEditWFSpectrumAmax(self):
-        print 'EditWFSpectrumAmax'
-        cp.confpars.waveformSpectrumAmax  = int(self.editWFSpectrumAmax.displayText())        
-        
-    def processEditWFSpectrumNbins(self):
-        print 'EditWFSpectrumNbins'
-        cp.confpars.waveformSpectrumNbins = int(self.editWFSpectrumNbins.displayText())        
+    def processEditWFWaveformTmax(self):
+        print 'EditWFWaveformTmax'
+        cp.confpars.waveformWaveformTmax = int(self.editWFWaveformTmax.displayText())        
 
+    def processRadioAuto(self):
+        #print 'RadioAuto'
+        cp.confpars.waveformAutoRangeIsOn = True
+        self.setEditFieldsReadOnly(cp.confpars.waveformAutoRangeIsOn)
+                      
+    def processRadioManual(self):
+        #print 'RadioManual'
+        cp.confpars.waveformAutoRangeIsOn = False
+        self.setEditFieldsReadOnly(cp.confpars.waveformAutoRangeIsOn)
 
     #def processCBoxIMImage(self, value):
     #    if self.cboxIMImage.isChecked():

@@ -168,11 +168,6 @@ class DrawEvent ( object ) :
                 else : self.close_fig(self.figNum)
 
                 self.figNum += 1 
-                if cp.confpars.cspadImageDetIsOn : 
-                    self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot='Det')
-                else : self.close_fig(self.figNum)
-
-                self.figNum += 1 
                 if cp.confpars.cspadSpectrumIsOn : 
                     self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=16)
                 else : self.close_fig(self.figNum)
@@ -182,6 +177,12 @@ class DrawEvent ( object ) :
                     self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=8)
                 else : self.close_fig(self.figNum)
                 
+                for nwin in range(cp.confpars.cspadImageNWindowsMax) :
+                    self.figNum += 1 
+                    if cp.confpars.cspadImageDetIsOn and nwin < cp.confpars.cspadImageNWindows : 
+                        self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot='Det')
+                    else : self.close_fig(self.figNum)
+
             if item_last_name == 'image' :
                 self.figNum += 1 
                 if cp.confpars.imageImageIsOn : 
@@ -204,11 +205,6 @@ class DrawEvent ( object ) :
                 self.figNum += 1 
                 if cp.confpars.waveformWaveformIsOn : 
                     self.plotsWaveform.plotWFWaveform(arr1ev,self.set_fig('2x1'))
-                else : self.close_fig(self.figNum)
-
-                self.figNum += 1 
-                if cp.confpars.waveformSpectrumIsOn : 
-                    self.plotsWaveform.plotWFSpectrum(arr1ev,self.set_fig('2x1'))
                 else : self.close_fig(self.figNum)
 
         self.fig_window_is_open = True
@@ -324,6 +320,13 @@ class DrawEvent ( object ) :
             self.fig.subplots_adjust(left=0.08, bottom=0.02, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
         else :
             self.fig = plt.figure(num=self.figNum)
+
+        self.fig.myXmin = None
+        self.fig.myXmax = None
+        self.fig.myYmin = None
+        self.fig.myYmax = None
+        self.fig.myZoomIsOn = False
+
         return self.fig
 
     def set_window_position( self ):

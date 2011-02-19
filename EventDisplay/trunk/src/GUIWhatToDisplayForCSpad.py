@@ -81,13 +81,12 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.titCSpad            = QtGui.QLabel('SCpad')
         self.titCSImage          = QtGui.QLabel('Image plot')
         self.titCSSpectrum       = QtGui.QLabel('Spectrum')
+        self.titNWin             = QtGui.QLabel('N detector images:')
 
         self.titCSpad      .setFont (titFont12) 
         self.titCSImage    .setFont (titFont10)   
         self.titCSSpectrum .setFont (titFont10)
 
-        #self.titCSQuad           = QtGui.QLabel('Quad:')
-        #self.titCSPair           = QtGui.QLabel('Pair:')
         self.titCSAmpDash        = QtGui.QLabel('-')
         self.titCSImageAmin      = QtGui.QLabel('Amin:')
         self.titCSImageAmax      = QtGui.QLabel('Amax:')
@@ -97,11 +96,6 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.titCSSpectrumNbins  = QtGui.QLabel('N bins:')
         self.titCSSpectrumAlim   = QtGui.QLabel('Slider range:')
 
-        #self.editCSQuad          = QtGui.QLineEdit(str(cp.confpars.cspadQuad))
-        #self.editCSPair          = QtGui.QLineEdit(str(cp.confpars.cspadPair))
-        #self.editCSQuad          .setMaximumWidth(45)
-        #self.editCSPair          .setMaximumWidth(45)
-        
         self.editCSImageAmin     = QtGui.QLineEdit(str(cp.confpars.cspadImageAmin))
         self.editCSImageAmax     = QtGui.QLineEdit(str(cp.confpars.cspadImageAmax))
         self.editCSImageAmin     .setMaximumWidth(45)
@@ -119,24 +113,23 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.editCSAmpRaMin      .setMaximumWidth(50)
         self.editCSAmpRange      .setMaximumWidth(50)
 
-        #self.cboxCSImage    = QtGui.QCheckBox('Image',    self)
-        #self.cboxCSSpectrum = QtGui.QCheckBox('Spectrum', self)
-
-        #if cp.confpars.cspadImageIsOn       : self.cboxCSImage   .setCheckState(2)
-        #if cp.confpars.cspadSpectrumIsOn    : self.cboxCSSpectrum.setCheckState(2)
-
-        #self.cb.setFocusPolicy(QtCore.Qt.NoFocus) 
-        #self.cb2.move(10, 50)
-        #self.cb.move(10, 10)
-        #self.cb.toggle() # set the check mark in the check box
-
-        #lcd           = QtGui.QLCDNumber(self)
         self.sliderCSAmin  = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
         self.sliderCSAmax  = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
         self.setAmplitudeRange(cp.confpars.cspadAmplitudeRaMin, cp.confpars.cspadAmplitudeRange)
         self.sliderCSAmin.setValue(cp.confpars.cspadSpectrumAmin)
         self.sliderCSAmax.setValue(cp.confpars.cspadSpectrumAmax)
-        
+       #self.sliderCSAmin.setPageStep((cp.confpars.cspadAmplitudeRange - cp.confpars.cspadAmplitudeRaMin)/100)
+       #self.sliderCSAmax.setTickPosition(QtGui.QSlider.TicksBelow)
+
+        self.char_expand = u'\u25BE' # down-head triangle
+        self.butMenuNWin = QtGui.QPushButton(str(cp.confpars.cspadImageNWindows) + self.char_expand)
+        self.butMenuNWin.setMaximumWidth(30)
+
+        self.listActMenuNWin = []
+        self.popupMenuNWin = QtGui.QMenu()
+        for nwin in range(1,cp.confpars.cspadImageNWindowsMax+1) :
+            self.listActMenuNWin.append(self.popupMenuNWin.addAction(str(nwin)))
+
         self.butClose = QtGui.QPushButton("Close window")
 
         self.wquadpair = guiquadpair.GUISelectQuadAndPair()
@@ -145,10 +138,6 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         hboxCS01.addWidget(self.titCSpad)        
         hboxCS01.addStretch(1) 
         hboxCS01.addWidget(self.wquadpair)
-        #hboxCS01.addWidget(self.titCSQuad)
-        #hboxCS01.addWidget(self.editCSQuad)
-        #hboxCS01.addWidget(self.titCSPair)
-        #hboxCS01.addWidget(self.editCSPair)
                            
         hboxCS02 = QtGui.QHBoxLayout()
         hboxCS02.addWidget(self.titCSSpectrumAlim) 
@@ -158,15 +147,18 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         hboxCS02.addWidget(self.sliderCSAmin)        
         hboxCS02.addWidget(self.sliderCSAmax)        
 
+        hboxCS03 = QtGui.QHBoxLayout()
+        hboxCS03.addWidget(self.titNWin)
+        hboxCS03.addWidget(self.butMenuNWin)
+        hboxCS03.addStretch(1) 
+
         gridCS = QtGui.QGridLayout()
-       #gridCS.addWidget(self.cboxCSImage,     0, 0)
         gridCS.addWidget(self.titCSImage,      0, 0)
         gridCS.addWidget(self.titCSImageAmin,  0, 1)
         gridCS.addWidget(self.editCSImageAmin, 0, 2)
         gridCS.addWidget(self.titCSImageAmax,  0, 3)
         gridCS.addWidget(self.editCSImageAmax, 0, 4)
         
-       #gridCS.addWidget(self.cboxCSSpectrum,      1, 0)
         gridCS.addWidget(self.titCSSpectrum,       1, 0)
         gridCS.addWidget(self.titCSSpectrumAmin,   1, 1)
         gridCS.addWidget(self.editCSSpectrumAmin,  1, 2)
@@ -184,6 +176,7 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.vbox.addLayout(gridCS) 
         self.vbox.addLayout(hboxCS02)
         self.vbox.addStretch(1)     
+        self.vbox.addLayout(hboxCS03)
 
         if parent == None :
             #self.vbox.addLayout(hboxC)
@@ -191,6 +184,7 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
             self.show()
 
         self.connect(self.butClose,            QtCore.SIGNAL('clicked()'),         self.processClose )
+        self.connect(self.butMenuNWin,         QtCore.SIGNAL('clicked()'),         self.processMenuNWin )
 
         #self.connect(self.cboxCSImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSImage)
         #self.connect(self.cboxCSSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSSpectrum)
@@ -205,8 +199,6 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.connect(self.editCSSpectrumNbins, QtCore.SIGNAL('editingFinished ()'), self.processEditCSSpectrumNbins )
         self.connect(self.editCSAmpRange,      QtCore.SIGNAL('editingFinished ()'), self.processEditCSAmplitudeRange )
         self.connect(self.editCSAmpRaMin,      QtCore.SIGNAL('editingFinished ()'), self.processEditCSAmplitudeRaMin )
-        #self.connect(self.editCSQuad,          QtCore.SIGNAL('editingFinished ()'), self.processEditCSQuad )
-        #self.connect(self.editCSPair,          QtCore.SIGNAL('editingFinished ()'), self.processEditCSPair )
 
         cp.confpars.wtdCSWindowIsOpen = True
 
@@ -227,8 +219,6 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
     def setAmplitudeRange(self,    amplitudeRaMin, amplitudeRange):
         self.sliderCSAmin.setRange(amplitudeRaMin, amplitudeRange)
         self.sliderCSAmax.setRange(amplitudeRaMin, amplitudeRange)
-        #self.sliderCSAmin.setTickInterval(0.02*amplitudeRange)
-        #self.sliderCSAmax.setTickInterval(0.02*amplitudeRange)
 
     def closeEvent(self, event):
         print 'closeEvent'
@@ -238,6 +228,14 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         print 'Close window'
         cp.confpars.wtdCSWindowIsOpen = False
         self.close()
+
+    def processMenuNWin(self):
+        #print 'MenuNWin'
+        actionSelected = self.popupMenuNWin.exec_(QtGui.QCursor.pos())
+        if actionSelected==None : return
+        for action in self.listActMenuNWin :
+            cp.confpars.cspadImageNWindows = int(actionSelected.text())
+            if actionSelected == action : self.butMenuNWin.setText( str(cp.confpars.cspadImageNWindows) + self.char_expand )
 
     def processEditCSAmplitudeRange(self):
         print 'EditCSAmplitudeRange'
@@ -326,13 +324,6 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         else:
             cp.confpars.cspadSpectrumIsOn = False
             #self.parentWidget.cboxCSSpectrum.setCheckState(0)
-
-
-#    def paintEvent(self, e):
-#        qp = QtGui.QPainter()
-#        qp.begin(self)
-#        self.drawWidget(qp)
-#        qp.end()
 
 #-----------------------------
 #  In case someone decides to run this module

@@ -109,6 +109,9 @@ class ConfigParameters ( object ) :
         self.cspadAmplitudeRaMin  = 0
         self.cspadAmplitudeRange  = 2000
 
+        self.cspadImageNWindows   = 1
+        self.cspadImageNWindowsMax= 8 # Maximal number of windows for CSpad image which can be opened
+
         self.cspadImageOfPairIsOn = True
         self.cspadImageIsOn       = False
         self.cspadImageQuadIsOn   = False
@@ -142,13 +145,16 @@ class ConfigParameters ( object ) :
 
 
         # Default parameters for Waveform plots
-        self.waveformWaveformIsOn = True
-        self.waveformSpectrumIsOn = True
-        self.waveformWaveformAmin = 0
-        self.waveformWaveformAmax = 2000
-        self.waveformSpectrumAmin = 0
-        self.waveformSpectrumAmax = 2000
-        self.waveformSpectrumNbins= 50
+        self.waveformWaveformIsOn  = True
+        self.waveformAutoRangeIsOn = True
+        self.waveformWaveformAmin  = 0
+        self.waveformWaveformAmax  = 2000
+        self.waveformWaveformTmin  = 0
+        self.waveformWaveformTmax  = 10000
+        self.waveformNWindows      = 3
+        self.waveformNWindowsMax   = 5 # Maximal number of windows for waveforms which can be opened
+
+
         
     #-------------------
     #  Public methods --
@@ -182,7 +188,6 @@ class ConfigParameters ( object ) :
         print 'IMAGE_IMAGE_SPEC_IS_ON',    self.imageImageSpecIsOn       
         print 'IMAGE_SPECT_IS_ON',         self.imageSpectrumIsOn    
         print 'WAVEF_WAVEF_IS_ON',         self.waveformWaveformIsOn    
-        print 'VAVEF_SPECT_IS_ON',         self.waveformSpectrumIsOn 
 
         print 'READ_PARS_AT_START',        self.readParsFromFileAtStart
         print 70*'='
@@ -213,7 +218,6 @@ class ConfigParameters ( object ) :
                 elif key == 'IMAGE_IMAGE_SPEC_IS_ON'   : self.imageImageSpecIsOn      = dicBool[val.lower()]
                 elif key == 'IMAGE_SPECT_IS_ON'        : self.imageSpectrumIsOn       = dicBool[val.lower()]
                 elif key == 'WAVEF_WAVEF_IS_ON'        : self.waveformWaveformIsOn    = dicBool[val.lower()]
-                elif key == 'VAVEF_SPECT_IS_ON'        : self.waveformSpectrumIsOn    = dicBool[val.lower()]
                 elif key == 'READ_PARS_AT_START'       : self.readParsFromFileAtStart = dicBool[val.lower()]
                 elif key == 'CSPAD_QUAD_NUMBER'        : self.cspadQuad         = int(val)
                 elif key == 'CSPAD_PAIR_NUMBER'        : self.cspadPair         = int(val)
@@ -251,7 +255,6 @@ class ConfigParameters ( object ) :
         f.write('IMAGE_IMAGE_SPEC_IS_ON'    + space + str(self.imageImageSpecIsOn)      + '\n')
         f.write('IMAGE_SPECT_IS_ON'         + space + str(self.imageSpectrumIsOn)       + '\n')
         f.write('WAVEF_WAVEF_IS_ON'         + space + str(self.waveformWaveformIsOn)    + '\n')
-        f.write('VAVEF_SPECT_IS_ON'         + space + str(self.waveformSpectrumIsOn)    + '\n')
         f.write('READ_PARS_AT_START'        + space + str(self.readParsFromFileAtStart) + '\n')
         f.write('CSPAD_QUAD_NUMBER'         + space + str(self.cspadQuad)               + '\n')
         f.write('CSPAD_PAIR_NUMBER'         + space + str(self.cspadPair)               + '\n')

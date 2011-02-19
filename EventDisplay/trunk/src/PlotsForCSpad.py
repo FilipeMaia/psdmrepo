@@ -30,6 +30,10 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 import sys
 import matplotlib.pyplot as plt
+from matplotlib.widgets import RectangleSelector
+#from matplotlib.patches import Rectangle
+#from matplotlib.artist  import Artist
+#from matplotlib.lines   import Line2D
 import time
 from numpy import *  # for use like       array(...)
 import numpy as np
@@ -264,20 +268,82 @@ class PlotsForCSpad ( object ) :
         """Plot 2d image of the detector from input array."""
         #print 'plotCSpadDetImage()'       
         t_plotCSpadDetImage = time.clock()
-        arr2d = self.getImageArrayForDet( arr1ev )
+        self.arr2d = self.getImageArrayForDet( arr1ev )
         print 'Time to getImageArrayForDet() (sec) = %f' % (time.clock() - t_plotCSpadDetImage)
         #arr2dresized = self.resizeImageArray(arr2d,4)
+        self.str_event = 'Event ' + str(cp.confpars.eventCurrent)
+        self.figDet = fig
+        self.figDet.canvas.set_window_title('CSpad image ' + self.str_event)
+        self.figDet.subplots_adjust(left=0.03, bottom=0.03, right=0.98, top=0.97, wspace=0, hspace=0)
 
-        str_event = 'Event ' + str(cp.confpars.eventCurrent)
-        fig.canvas.set_window_title('CSpad image ' + str_event)
+        self.drawCSpadDetImage(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax)
+
+    def drawCSpadDetImage( self, xmin=None, xmax=None, ymin=None, ymax=None ):
         plt.clf() # clear plot  t=0.05s
-        fig.subplots_adjust(left=0.03, bottom=0.03, right=0.98, top=0.97, wspace=0, hspace=0)
-       #axes = plt.imshow(arr2d,  origin='down', interpolation='nearest') # Just a histogram
-        axes = plt.imshow(arr2d, interpolation='nearest') # Just a histogram t=0.08s
+        self.figDet.subplots_adjust(left=0.03, bottom=0.03, right=0.98, top=0.97, wspace=0, hspace=0)
 
+        #self.arrwin = self.arr2d
+        if xmin == None : self.arrwin = self.arr2d
+        else :
+            #dim1,dim2   = self.arr2d.shape
+            #self.arrwin = np.zeros( (dim1,dim2), dtype=np.int16 )
+            #self.arrwin[ymin:ymax,xmin:xmax] = self.arr2d[ymin:ymax,xmin:xmax]
+            self.arrwin = self.arr2d[ymin:ymax,xmin:xmax]
+
+        axescb = plt.imshow(self.arrwin, interpolation='nearest') # Just a histogram t=0.08s
+
+        if xmin != None :
+            #plt.axis([xmin, xmax, ymin, ymax])
+            pass
+
+        self.axesDet = plt.gca()
         plt.clim(cp.confpars.cspadImageAmin,cp.confpars.cspadImageAmax)     #t=0
-        self.colb = plt.colorbar(axes, pad=0.03, orientation=1, fraction=0.10, shrink = 0.86, aspect = 20)#, ticks=coltickslocs #t=0.04s
-        plt.title(str_event,color='r',fontsize=20) # pars like in class Text
+        self.colb = plt.colorbar(axescb, pad=0.03, orientation=1, fraction=0.10, shrink = 0.86, aspect = 20)#, ticks=coltickslocs #t=0.04s
+        plt.title(self.str_event,color='r',fontsize=20) # pars like in class Text
+
+        self.figDet.canvas.mpl_connect('button_press_event',   self.processMousButtonPressForDetImage)
+        #self.figDet.canvas.mpl_connect('button_release_event', self.processMousButtonReleaseForDetImage)
+        #self.figDet.canvas.mpl_connect('motion_notify_event',  self.processMousMotion)
+
+        rect_props=dict(edgecolor='black', linewidth=2, linestyle='dashed', fill=False)
+        #if not self.figDet.myZoomIsOn :
+        self.figDet.span = RectangleSelector(self.axesDet, self.onRectangleSelect, drawtype='box',rectprops=rect_props)
+
+            
+    def onRectangleSelect(self, eclick, erelease) :
+        if eclick.button == 1 : # left button
+
+            self.figDet = plt.gcf() # Get current figure
+            if self.figDet.myZoomIsOn :
+                print 'Zoom is already applied. Click other mouse buttons to unzoom first.'
+                return
+
+            xmin = int(min(eclick.xdata, erelease.xdata))
+            ymin = int(min(eclick.ydata, erelease.ydata))
+            xmax = int(max(eclick.xdata, erelease.xdata))
+            ymax = int(max(eclick.ydata, erelease.ydata))
+            print 'xmin, xmax, ymin, ymax: ', xmin, xmax, ymin, ymax
+
+            if xmax-xmin < 20 or ymax-ymin < 20 : return
+            self.drawCSpadDetImage( xmin, xmax, ymin, ymax )
+            plt.draw() # redraw the current figure
+
+            self.figDet.myXmin = xmin
+            self.figDet.myXmax = xmax
+            self.figDet.myYmin = ymin
+            self.figDet.myYmax = ymax
+            self.figDet.myZoomIsOn = True
+
+
+    def processMousButtonPressForDetImage(self, event) :
+        #print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y,
+        #print ' xdata=',event.xdata,' ydata=', event.ydata
+        self.figDet = plt.gcf() # Get current figure
+        print 'mouse click button=', event.button
+        if event.button == 2 or event.button == 3 : # middle or right button
+            self.drawCSpadDetImage()
+            plt.draw() # redraw the current figure
+            self.figDet.myZoomIsOn = False
 
 
     def plotCSpadQuad08SpectraOf2x1( self, arr1ev, fig ):

@@ -62,7 +62,7 @@ class GUIConfiguration ( QtGui.QWidget ) :
         self.butWrite    = QtGui.QPushButton("Write")
         self.butDefault  = QtGui.QPushButton("Set default")
         self.butPrint    = QtGui.QPushButton("Print current")
-        self.butExit     = QtGui.QPushButton("Exit")
+        self.butExit     = QtGui.QPushButton("Quit")
 
         self.radioRead   = QtGui.QRadioButton("Read parameters from file")
         self.radioDefault= QtGui.QRadioButton("Set default")
@@ -127,11 +127,14 @@ class GUIConfiguration ( QtGui.QWidget ) :
         self.butWrite  .setToolTip('Write (save) the configuration parameters in file.')
         self.butDefault.setToolTip('Reset the configuration parameters\nto their default values.')
         self.butPrint  .setToolTip('Print current values of the configuration parameters.')
-        self.butExit   .setToolTip('Exit from this GUI and close the window.')
+        self.butExit   .setToolTip('Quit this GUI and close the window.')
         self.radioRead .setToolTip('If this button is ON and configuration parameters are saved,\n' +
                                    'then they will be read from file at the next start of this program.')
         self.radioDefault.setToolTip('If this button is ON and configuration parameters are saved,\n' +
                                      'then they will be reset to the default values at the next start of this program.')
+
+    def setParent(self,parent) :
+        self.parent = parent
 
     def closeEvent(self, event):
         print 'closeEvent'
@@ -149,6 +152,7 @@ class GUIConfiguration ( QtGui.QWidget ) :
     def processRead(self):
         print 'Read'
         cp.confpars.readParameters(self.confParsFileName())
+        self.parent.fileEdit.setText(cp.confpars.dirName + '/' + cp.confpars.fileName)
         
     def processWrite(self):
         print 'Write'
@@ -157,6 +161,7 @@ class GUIConfiguration ( QtGui.QWidget ) :
     def processDefault(self):
         print 'Set default values of configuration parameters'
         cp.confpars.setDefaultParameters()
+        self.parent.fileEdit.setText(cp.confpars.dirName + '/' + cp.confpars.fileName)
 
     def processPrint(self):
         print 'Print'
