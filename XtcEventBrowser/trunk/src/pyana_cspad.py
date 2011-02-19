@@ -31,6 +31,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.axes_grid import AxesGrid
 
+from matplotlib.gridspec import GridSpec
+
 
 #-----------------------------
 # Imports for other modules --
@@ -82,6 +84,8 @@ class CsPad( object ):
         # if any sections are missing, insert zeros
         if len( data3d ) < 8 :
             zsec = np.zeros( (185,388), dtype=data3d.dtype)
+            #zsec = zsec * -99
+            print np.max(zsec)
             for i in range (8) :
                 if i not in self.sections[qn] :
                     data3d = np.insert( data3d, i, zsec, axis=0 )
@@ -92,6 +96,7 @@ class CsPad( object ):
             # insert gap between asics in the 2x1
             asics = np.hsplit( data3d[i], 2)
             gap = np.zeros( (185,4), dtype=data3d.dtype )
+            #gap = gap * -99
             pair = np.hstack( (asics[0], gap, asics[1]) )
 
                 
@@ -106,6 +111,7 @@ class CsPad( object ):
 
         # make the array for this quadrant
         quadrant = np.zeros( (self.npix_quad, self.npix_quad), dtype=data3d.dtype )
+        #quadrant = quadrant * -99
 
         # insert the 2x1 sections according to
         for sec in range (8):
@@ -201,7 +207,9 @@ class  pyana_cspad ( object ) :
                    image_source=None,
                    draw_each_event = 0,
                    collect_darks = 0,
-                   dark_img_file = None):
+                   dark_img_file = None,
+                   plot_min = None,
+                   plot_max = None ):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
         All parameters are passed as strings
@@ -227,8 +235,8 @@ class  pyana_cspad ( object ) :
         # sum up all image data (above threshold) and all dark data (below threshold)
         self.img_data = None
 
-        self.colmin = 0
-        self.colmax = 16360
+        self.colmin = int(plot_min)
+        self.colmax = int(plot_max)
 
         # these will be plotted too
         self.lolimits = []
@@ -315,7 +323,7 @@ class  pyana_cspad ( object ) :
             
             # image data as 3-dimentional array
             data = q.data()
-            
+            #print "min and max of original array for quad#%d: %d, %d" %(q.quad(),np.min(data),np.max(data))
             
             qimage = self.cspad.CsPadElement(data, q.quad())
             qimages[q.quad()] = qimage
@@ -346,11 +354,11 @@ class  pyana_cspad ( object ) :
         # Draw this event. Background subtracted if possible.
         if self.draw_each_event :
             if self.dark_image is None: 
-                self.drawframe(cspad_image,"Event # %d" % self.n_events, fignum=200 )
+                self.drawframemore(cspad_image,"Event # %d" % self.n_events, fignum=200 )
             else :
                 subtr_image = cspad_image - self.dark_image 
                 title = "Event # %d, background subtracted" % self.n_events 
-                self.drawframe(subtr_image, title, fignum=200 )
+                self.drawframemore(subtr_image, title, fignum=200 )
                         
         plt.show()
 
@@ -395,6 +403,53 @@ class  pyana_cspad ( object ) :
     # -------------------------------------------------------------------
     # Additional functions
 
+    def drawframemore( self, frameimage, title="", fignum=1):
+
+        # plot image frame
+        #if fig is None :
+
+        self.fig = plt.figure(figsize=(8,10),num=fignum)
+        #plt.suptitle("LCLS Event Display")
+        cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+
+
+        gs = GridSpec(2,1, height_ratios=[5,1] )
+
+        axes1 = plt.subplot(gs[0])
+        axes1.set_title(title)
+        # the main "Axes" object (on where the image is plotted)
+
+        self.axesim = plt.imshow( frameimage, vmin=self.colmin, vmax=self.colmax )#, origin='lower' )
+        # axes image 
+        
+        self.colb = plt.colorbar(self.axesim,pad=0.01)
+        # colb is the colorbar object
+
+        self.orglims = self.axesim.get_clim()
+        # min and max values in the axes are
+        print "Original value limits: ", self.orglims
+
+        if self.colmin is None: 
+            self.colmin, self.colmax = self.orglims
+
+        axes2 = plt.subplot(gs[1])
+        axes2.set_title("spectrum")
+        self.axesim2 = plt.hist( frameimage.ravel(),
+                                 bins=1000,
+                                 histtype='stepfilled',
+                                 range=(self.colmin,self.colmax))
+        
+        print """
+        To change the color scale, click on the color bar:
+          - left-click sets the lower limit
+          - right-click sets higher limit
+          - middle-click resets to original
+        """
+        plt.show() # starts the GUI main loop
+                   # you need to kill window to proceed... 
+                   # (this shouldn't be done for every event!)
+
+
     def drawframe( self, frameimage, title="", fignum=1):
 
         # plot image frame
@@ -417,8 +472,9 @@ class  pyana_cspad ( object ) :
         # min and max values in the axes are
         print "Original value limits: ", self.orglims
 
-        plt.clim(self.colmin,self.colmax)
-
+        if self.colmin is None: 
+            self.colmin, self.colmax = self.orglims
+        
         print """
         To change the color scale, click on the color bar:
           - left-click sets the lower limit
@@ -446,7 +502,7 @@ class  pyana_cspad ( object ) :
             self.colmax = lims[1]
             range = self.colmax - self.colmin
             value = self.colmin + event.ydata * range
-            #print colmin, colmax, range, value
+            #print self.colmin, self.colmax, range, value
             
             # left button
             if event.button is 1 :

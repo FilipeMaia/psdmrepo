@@ -1,3 +1,4 @@
+2011-Feb-18  ofte  Tag V00-00-10  rev 1536  Added spectrum and plot limits via config parameters
 2011-Feb-18  ofte  Tag V00-00-09  rev 1534  A few GUI improvements
 2011-Feb-15  ofte  Tag V00-00-08  rev 1517  Alignment of CsPad added (Mikhail Dubrovin's method)
 2011-Feb-14  ofte                 rev 1516  Fix a typo and add a print_configuration function

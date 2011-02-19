@@ -272,6 +272,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                     options_for_mod[index].append("\ndraw_each_event = 1")
                     options_for_mod[index].append("\ncollect_darks = 0")
                     options_for_mod[index].append("\n#dark_img_file = pyana_cspad_average_image.npy")
+                    options_for_mod[index].append("\nplot_min = 100")
+                    options_for_mod[index].append("\nplot_max = 4000")
 
         nmodules = len(modules_to_run)
         if nmodules == 0 :
