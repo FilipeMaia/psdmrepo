@@ -97,6 +97,7 @@ class DrawEvent ( object ) :
 
 
         # Loop over checked data sets
+        self.nwin_waveform = None
         self.figNum = 0
         #print 'Number of checked items:', len(cp.confpars.list_of_checked_item_names)
         for dsname in cp.confpars.list_of_checked_item_names :
@@ -200,12 +201,15 @@ class DrawEvent ( object ) :
                 else : self.close_fig(self.figNum)
 
             if item_last_name == 'waveforms' :
-                print 'Here should be an emplementation of stuff for waveform'
 
-                self.figNum += 1 
-                if cp.confpars.waveformWaveformIsOn : 
-                    self.plotsWaveform.plotWFWaveform(arr1ev,self.set_fig('2x1'))
-                else : self.close_fig(self.figNum)
+                for self.nwin_waveform in range(cp.confpars.waveformNWindows) :
+
+                    if dsname == cp.confpars.waveformWindowParameters[self.nwin_waveform][0] :
+
+                        self.figNum += 1 
+                        if cp.confpars.waveformWaveformIsOn : 
+                            self.plotsWaveform.plotWFWaveform(arr1ev,self.set_fig('2x1'))
+                        else : self.close_fig(self.figNum)
 
         self.fig_window_is_open = True
 
@@ -326,6 +330,7 @@ class DrawEvent ( object ) :
         self.fig.myYmin = None
         self.fig.myYmax = None
         self.fig.myZoomIsOn = False
+        self.fig.nwin_waveform = self.nwin_waveform
 
         return self.fig
 

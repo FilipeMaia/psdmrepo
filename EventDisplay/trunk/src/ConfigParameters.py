@@ -154,7 +154,7 @@ class ConfigParameters ( object ) :
         self.waveformWindowParameters = []
         for win in range(self.waveformNWindowsMax) :
             self.waveformWindowParameters.append(['None', True, 0, 1000, 0, 1000, 0, None, None, None, None])
-                        #[dataset, autoRangeIsOn, Amin, Amax, Tmin, Tmax, NumberOfWF, WF1, WF2, WF3, WF4]
+                        #[dataset, autoRangeIsOn, Amin, Amax, Tmin, Tmax, NumberOfWFInDS, WF1, WF2, WF3, WF4]
 
 
     #-------------------
