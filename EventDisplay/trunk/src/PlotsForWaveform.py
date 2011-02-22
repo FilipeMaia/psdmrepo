@@ -62,12 +62,10 @@ class PlotsForWaveform ( object ) :
         """Plot waveform from input array."""
 
         print 'plotWFWaveform'
-
+        print 'ds1ev.shape', ds1ev.shape
         numberOfWF, par2, dimX = ds1ev.shape
-        print 'numberOfWF, par2, dimX = ', numberOfWF, par2, dimX
-        arrwf = ds1ev[0,0,...]
-
-        print 'arrwf.shape', arrwf.shape
+        #print 'numberOfWF, par2, dimX = ', numberOfWF, par2, dimX
+        #print 'arrwf.shape', arrwf.shape
 
         nwin = fig.nwin_waveform
         indwf1 = cp.confpars.waveformWindowParameters[nwin][7]
@@ -75,30 +73,56 @@ class PlotsForWaveform ( object ) :
         indwf3 = cp.confpars.waveformWindowParameters[nwin][9]
         indwf4 = cp.confpars.waveformWindowParameters[nwin][10]
 
-        if indwf1 == None : self.arrwf1 = zeros( (dimX) ) # from numpy
-        else :              self.arrwf1 = ds1ev[indwf1,0,...]
-
-        if indwf2 == None : self.arrwf2 = zeros( (dimX) ) # from numpy
-        else :              self.arrwf2 = ds1ev[indwf2,0,...]
-
-        if indwf3 == None : self.arrwf3 = zeros( (dimX) ) # from numpy
-        else :              self.arrwf3 = ds1ev[indwf3,0,...]
-
-        if indwf4 == None : self.arrwf4 = zeros( (dimX) ) # from numpy
-        else :              self.arrwf4 = ds1ev[indwf4,0,...]
-
         arrT = range(dimX)
+        #arrZ = zeros( (dimX) )
+
+        par = []
+
+        if indwf1 != None : par.append( (arrT, ds1ev[indwf1,0,...], 'k-') )
+        if indwf2 != None : par.append( (arrT, ds1ev[indwf2,0,...], 'r-') )
+        if indwf3 != None : par.append( (arrT, ds1ev[indwf3,0,...], 'g-') )
+        if indwf4 != None : par.append( (arrT, ds1ev[indwf4,0,...], 'b-') )
 
         fig.canvas.set_window_title(cp.confpars.current_item_name_for_title) 
         plt.clf() # clear plot
         fig.subplots_adjust(left=0.10, bottom=0.05, right=0.95, top=0.94, wspace=0.1, hspace=0.1)        
 
-        plt.plot( arrT, self.arrwf1, 'k-', arrT, self.arrwf2, 'r-', arrT, self.arrwf3, 'g-', arrT, self.arrwf4, 'b-')
+        print 'Number of waves to draw =', len(par) 
 
-        #plt.plot( range(dimX)arrT, arrwf, 'b-')
+        if len(par) == 1 :
+            plt.plot( par[0][0],par[0][1],par[0][2] )
+
+        elif len(par) == 2 :
+            plt.plot( par[0][0],par[0][1],par[0][2],\
+                      par[1][0],par[1][1],par[1][2] )
+
+        elif len(par) == 3 :
+            plt.plot( par[0][0],par[0][1],par[0][2],\
+                      par[1][0],par[1][1],par[1][2],\
+                      par[2][0],par[2][1],par[2][2] )
+            
+        elif len(par) == 4 :
+            plt.plot( par[0][0],par[0][1],par[0][2],\
+                      par[1][0],par[1][1],par[1][2],\
+                      par[2][0],par[2][1],par[2][2],\
+                      par[3][0],par[3][1],par[3][2] )
+        else :
+            print 'Wrong number of waves !!!', len(par) 
+
+        autoRangeIsOn = cp.confpars.waveformWindowParameters[nwin][1]
+
+        if autoRangeIsOn : pass
+        else :
+            plt.xlim(cp.confpars.waveformWindowParameters[nwin][4],\
+                     cp.confpars.waveformWindowParameters[nwin][5]  )
+
+            plt.ylim(cp.confpars.waveformWindowParameters[nwin][2],\
+                     cp.confpars.waveformWindowParameters[nwin][3]  )
+            
+
+
         
         str_title='Waveform, event ' + str(cp.confpars.eventCurrent)
-        #plt.clim(cp.confpars.imageImageAmin,cp.confpars.imageImageAmax)
         
         plt.title(str_title,color='r',fontsize=20) # pars like in class Text
         ##plt.xlabel('X pixels')

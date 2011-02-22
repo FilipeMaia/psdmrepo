@@ -188,9 +188,29 @@ class ConfigParameters ( object ) :
         print 'IMAGE_IMAGE_IS_ON',         self.imageImageIsOn       
         print 'IMAGE_IMAGE_SPEC_IS_ON',    self.imageImageSpecIsOn       
         print 'IMAGE_SPECT_IS_ON',         self.imageSpectrumIsOn    
-        print 'WAVEF_WAVEF_IS_ON',         self.waveformWaveformIsOn    
 
         print 'READ_PARS_AT_START',        self.readParsFromFileAtStart
+
+        print 'WAVEF_WAVEF_IS_ON',         self.waveformWaveformIsOn    
+
+        print 'WAVEF_N_WINDOWS_MAX',       self.waveformNWindowsMax 
+        print 'WAVEF_N_WINDOWS',           self.waveformNWindows 
+
+        for win in range(self.waveformNWindows) :
+
+            print 'WAVEF_WINDOW_NUMBER',   win 
+            print 'WAVEF_DATASET',         self.waveformWindowParameters[win][0] 
+            print 'WAVEF_AUTO_RANGE_IS_ON',self.waveformWindowParameters[win][1] 
+            print 'WAVEF_AMIN',            self.waveformWindowParameters[win][2] 
+            print 'WAVEF_AMAX',            self.waveformWindowParameters[win][3] 
+            print 'WAVEF_TMIN',            self.waveformWindowParameters[win][4] 
+            print 'WAVEF_TMAX',            self.waveformWindowParameters[win][5] 
+            print 'WAVEF_N_WF_IN_DATA_SET',self.waveformWindowParameters[win][6] 
+            print 'WAVEF_IND_WF_IN_BLACK', self.waveformWindowParameters[win][7] 
+            print 'WAVEF_IND_WF_IN_RED',   self.waveformWindowParameters[win][8] 
+            print 'WAVEF_IND_WF_IN_GREEN', self.waveformWindowParameters[win][9] 
+            print 'WAVEF_IND_WF_IN_BLUE',  self.waveformWindowParameters[win][10] 
+
         print 70*'='
 
 
@@ -202,6 +222,7 @@ class ConfigParameters ( object ) :
             f=open(self._fname,'r')
             self.list_of_checked_item_names = []
             for line in f :
+                if len(line) == 1 : continue # line is empty
                 key = line.split()[0]
                 val = line.split()[1]
                 if   key == 'HDF5_FILE_NAME'           : self.dirName,self.fileName = os.path.split(val)
@@ -220,19 +241,40 @@ class ConfigParameters ( object ) :
                 elif key == 'IMAGE_SPECT_IS_ON'        : self.imageSpectrumIsOn       = dicBool[val.lower()]
                 elif key == 'WAVEF_WAVEF_IS_ON'        : self.waveformWaveformIsOn    = dicBool[val.lower()]
                 elif key == 'READ_PARS_AT_START'       : self.readParsFromFileAtStart = dicBool[val.lower()]
-                elif key == 'CSPAD_QUAD_NUMBER'        : self.cspadQuad         = int(val)
-                elif key == 'CSPAD_PAIR_NUMBER'        : self.cspadPair         = int(val)
-                elif key == 'CSPAD_IMAGE_AMIN'         : self.cspadImageAmin    = int(val)
-                elif key == 'CSPAD_IMAGE_AMAX'         : self.cspadImageAmax    = int(val)
-                elif key == 'CSPAD_SPECT_AMIN'         : self.cspadSpectrumAmin = int(val)
-                elif key == 'CSPAD_SPECT_AMAX'         : self.cspadSpectrumAmax = int(val)
+                elif key == 'CSPAD_QUAD_NUMBER'        : self.cspadQuad               = int(val)
+                elif key == 'CSPAD_PAIR_NUMBER'        : self.cspadPair               = int(val)
+                elif key == 'CSPAD_IMAGE_AMIN'         : self.cspadImageAmin          = int(val)
+                elif key == 'CSPAD_IMAGE_AMAX'         : self.cspadImageAmax          = int(val)
+                elif key == 'CSPAD_SPECT_AMIN'         : self.cspadSpectrumAmin       = int(val)
+                elif key == 'CSPAD_SPECT_AMAX'         : self.cspadSpectrumAmax       = int(val)
 
+                elif key == 'WAVEF_N_WINDOWS_MAX'      : self.waveformNWindowsMax     = int(val)
+                elif key == 'WAVEF_N_WINDOWS'          : self.waveformNWindows        = int(val)
+
+                elif key == 'WAVEF_WINDOW_NUMBER'      : win                          = int(val)
+
+                elif key == 'WAVEF_DATASET'            : self.waveformWindowParameters[win][0] = val
+                elif key == 'WAVEF_AUTO_RANGE_IS_ON'   : self.waveformWindowParameters[win][1] = dicBool[val.lower()]
+                elif key == 'WAVEF_AMIN'               : self.waveformWindowParameters[win][2] = int(val)
+                elif key == 'WAVEF_AMAX'               : self.waveformWindowParameters[win][3] = int(val)
+                elif key == 'WAVEF_TMIN'               : self.waveformWindowParameters[win][4] = int(val)
+                elif key == 'WAVEF_TMAX'               : self.waveformWindowParameters[win][5] = int(val)
+                elif key == 'WAVEF_N_WF_IN_DATA_SET'   : self.waveformWindowParameters[win][6] = self.getValIntOrNone(val)
+                elif key == 'WAVEF_IND_WF_IN_BLACK'    : self.waveformWindowParameters[win][7] = self.getValIntOrNone(val)
+                elif key == 'WAVEF_IND_WF_IN_RED'      : self.waveformWindowParameters[win][8] = self.getValIntOrNone(val)
+                elif key == 'WAVEF_IND_WF_IN_GREEN'    : self.waveformWindowParameters[win][9] = self.getValIntOrNone(val)
+                elif key == 'WAVEF_IND_WF_IN_BLUE'     : self.waveformWindowParameters[win][10]= self.getValIntOrNone(val)
 
                 else : print 'The record : %s %s \n is UNKNOWN in readParameters()' % (key, val) 
             f.close()
         else :
             print 'The file %s does not exist' % (fname)
             print 'WILL USE DEFAULT CONFIGURATION PARAMETERS'
+
+
+    def getValIntOrNone(self,val) :
+        if val == 'None' : return None
+        else :             return int(val)
 
 
     def writeParameters(self, fname=None) :
@@ -263,6 +305,24 @@ class ConfigParameters ( object ) :
         f.write('CSPAD_IMAGE_AMAX'          + space + str(self.cspadImageAmax)          + '\n')
         f.write('CSPAD_SPECT_AMIN'          + space + str(self.cspadSpectrumAmin)       + '\n')
         f.write('CSPAD_SPECT_AMAX'          + space + str(self.cspadSpectrumAmax)       + '\n')
+        f.write('\n')
+        f.write('WAVEF_N_WINDOWS_MAX'       + space + str(self.waveformNWindowsMax)     + '\n')
+        f.write('WAVEF_N_WINDOWS'           + space + str(self.waveformNWindows)        + '\n')
+
+        for win in range(self.waveformNWindows) :
+            f.write('\n')
+            f.write('WAVEF_WINDOW_NUMBER'             + space + str(win)                                          + '\n')
+            f.write('WAVEF_DATASET'                   + space + str(self.waveformWindowParameters[win][0] )       + '\n')
+            f.write('WAVEF_AUTO_RANGE_IS_ON'          + space + str(self.waveformWindowParameters[win][1] )       + '\n')
+            f.write('WAVEF_AMIN'                      + space + str(self.waveformWindowParameters[win][2] )       + '\n')
+            f.write('WAVEF_AMAX'                      + space + str(self.waveformWindowParameters[win][3] )       + '\n')
+            f.write('WAVEF_TMIN'                      + space + str(self.waveformWindowParameters[win][4] )       + '\n')
+            f.write('WAVEF_TMAX'                      + space + str(self.waveformWindowParameters[win][5] )       + '\n')
+            f.write('WAVEF_N_WF_IN_DATA_SET'          + space + str(self.waveformWindowParameters[win][6] )       + '\n')
+            f.write('WAVEF_IND_WF_IN_BLACK'           + space + str(self.waveformWindowParameters[win][7] )       + '\n')
+            f.write('WAVEF_IND_WF_IN_RED'             + space + str(self.waveformWindowParameters[win][8] )       + '\n')
+            f.write('WAVEF_IND_WF_IN_GREEN'           + space + str(self.waveformWindowParameters[win][9] )       + '\n')
+            f.write('WAVEF_IND_WF_IN_BLUE'            + space + str(self.waveformWindowParameters[win][10])       + '\n')
 
         f.close()
 
