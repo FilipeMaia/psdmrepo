@@ -123,8 +123,10 @@ class ConfigParameters ( object ) :
         self.cspadImageAmax       = 2000
         self.cspadSpectrumAmin    = 0   
         self.cspadSpectrumAmax    = 2000
-        self.cspadSpectrumNbins   = 50
         self.cspadSpectrumRange   = None
+        self.cspadSpectrumNbins   = 50
+        self.cspadSpectrumBinWidth= 1
+        self.cspadBinWidthIsOn    = True
 
 
         # Default parameters for Image plots
@@ -142,20 +144,19 @@ class ConfigParameters ( object ) :
         self.imageAmplitudeRaMin  = 0
         self.imageAmplitudeRange  = 500
 
-
-
         # Default parameters for Waveform plots
+
         self.waveformWaveformIsOn  = True
-        self.waveformAutoRangeIsOn = True
-        self.waveformWaveformAmin  = 0
-        self.waveformWaveformAmax  = 2000
-        self.waveformWaveformTmin  = 0
-        self.waveformWaveformTmax  = 10000
-        self.waveformNWindows      = 3
-        self.waveformNWindowsMax   = 5 # Maximal number of windows for waveforms which can be opened
+
+        self.waveformNWindows      = 2
+        self.waveformNWindowsMax   = 10 # Maximal number of windows for waveforms which can be opened
+
+        self.waveformWindowParameters = []
+        for win in range(self.waveformNWindowsMax) :
+            self.waveformWindowParameters.append(['None', True, 0, 1000, 0, 1000, 0, None, None, None, None])
+                        #[dataset, autoRangeIsOn, Amin, Amax, Tmin, Tmax, NumberOfWF, WF1, WF2, WF3, WF4]
 
 
-        
     #-------------------
     #  Public methods --
     #-------------------

@@ -68,6 +68,13 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.setGeometry(370, 350, 500, 150)
         self.setWindowTitle('Adjust CSpad Parameters')
 
+        self.palette_white = QtGui.QPalette()
+        self.palette_grey  = QtGui.QPalette()
+        self.palette_red   = QtGui.QPalette()
+        self.palette_white .setColor(QtGui.QPalette.Base,QtGui.QColor('white'))
+        self.palette_grey  .setColor(QtGui.QPalette.Base,QtGui.QColor('grey'))
+        self.palette_red   .setColor(QtGui.QPalette.Base,QtGui.QColor('red'))
+
         self.frame = QtGui.QFrame(self)
         self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
         self.frame.setLineWidth(0)
@@ -93,33 +100,57 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
 
         self.titCSSpectrumAmin   = QtGui.QLabel('Amin:')
         self.titCSSpectrumAmax   = QtGui.QLabel('Amax:')
-        self.titCSSpectrumNbins  = QtGui.QLabel('N bins:')
+       #self.titCSSpectrumNbins  = QtGui.QLabel('N bins:')
         self.titCSSpectrumAlim   = QtGui.QLabel('Slider range:')
 
-        self.editCSImageAmin     = QtGui.QLineEdit(str(cp.confpars.cspadImageAmin))
-        self.editCSImageAmax     = QtGui.QLineEdit(str(cp.confpars.cspadImageAmax))
-        self.editCSImageAmin     .setMaximumWidth(45)
-        self.editCSImageAmax     .setMaximumWidth(45)
+        self.editCSImageAmin        = QtGui.QLineEdit(str(cp.confpars.cspadImageAmin))
+        self.editCSImageAmax        = QtGui.QLineEdit(str(cp.confpars.cspadImageAmax))
+        self.editCSImageAmin        .setMaximumWidth(45)
+        self.editCSImageAmax        .setMaximumWidth(45)
+        self.editCSImageAmin        .setValidator(QtGui.QIntValidator(-32000,32000,self))
+        self.editCSImageAmax        .setValidator(QtGui.QIntValidator(-32000,32000,self))
 
-        self.editCSSpectrumAmin  = QtGui.QLineEdit(str(cp.confpars.cspadSpectrumAmin))
-        self.editCSSpectrumAmax  = QtGui.QLineEdit(str(cp.confpars.cspadSpectrumAmax))
-        self.editCSSpectrumNbins = QtGui.QLineEdit(str(cp.confpars.cspadSpectrumNbins))
-        self.editCSSpectrumAmin  .setMaximumWidth(45)
-        self.editCSSpectrumAmax  .setMaximumWidth(45)
-        self.editCSSpectrumNbins .setMaximumWidth(45)
+        self.editCSSpectrumAmin     = QtGui.QLineEdit(str(cp.confpars.cspadSpectrumAmin))
+        self.editCSSpectrumAmax     = QtGui.QLineEdit(str(cp.confpars.cspadSpectrumAmax))
+        self.editCSSpectrumNBins    = QtGui.QLineEdit(str(cp.confpars.cspadSpectrumNbins))
+        self.editCSSpectrumBinWidth = QtGui.QLineEdit(str(cp.confpars.cspadSpectrumBinWidth))
+        self.editCSSpectrumAmin     .setMaximumWidth(45)
+        self.editCSSpectrumAmax     .setMaximumWidth(45)
+        self.editCSSpectrumNBins    .setMaximumWidth(45)
+        self.editCSSpectrumBinWidth .setMaximumWidth(45)
+        self.editCSSpectrumAmin     .setValidator(QtGui.QIntValidator(-32000,32000,self))
+        self.editCSSpectrumAmax     .setValidator(QtGui.QIntValidator(-32000,32000,self))
+        self.editCSSpectrumNBins    .setValidator(QtGui.QIntValidator(1,32000,self))
+        self.editCSSpectrumBinWidth .setValidator(QtGui.QIntValidator(1,32000,self))
+        
+        self.editCSAmpRaMin         = QtGui.QLineEdit(str(cp.confpars.cspadAmplitudeRaMin))
+        self.editCSAmpRange         = QtGui.QLineEdit(str(cp.confpars.cspadAmplitudeRange))
+        self.editCSAmpRaMin         .setMaximumWidth(50)
+        self.editCSAmpRange         .setMaximumWidth(50)
+        self.editCSAmpRaMin         .setValidator(QtGui.QIntValidator(-32000,32000,self))
+        self.editCSAmpRange         .setValidator(QtGui.QIntValidator(-32000,32000,self))
 
-        self.editCSAmpRaMin      = QtGui.QLineEdit(str(cp.confpars.cspadAmplitudeRaMin))
-        self.editCSAmpRange      = QtGui.QLineEdit(str(cp.confpars.cspadAmplitudeRange))
-        self.editCSAmpRaMin      .setMaximumWidth(50)
-        self.editCSAmpRange      .setMaximumWidth(50)
-
-        self.sliderCSAmin  = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
-        self.sliderCSAmax  = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
-        self.setAmplitudeRange(cp.confpars.cspadAmplitudeRaMin, cp.confpars.cspadAmplitudeRange)
+        self.sliderCSAmin           = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
+        self.sliderCSAmax           = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
+        self.setAmplitudeRange()
         self.sliderCSAmin.setValue(cp.confpars.cspadSpectrumAmin)
         self.sliderCSAmax.setValue(cp.confpars.cspadSpectrumAmax)
        #self.sliderCSAmin.setPageStep((cp.confpars.cspadAmplitudeRange - cp.confpars.cspadAmplitudeRaMin)/100)
        #self.sliderCSAmax.setTickPosition(QtGui.QSlider.TicksBelow)
+
+        self.radioNBins    = QtGui.QRadioButton("N bins:")
+        self.radioBinWidth = QtGui.QRadioButton("Bin width:")
+        self.radioGroup    = QtGui.QButtonGroup()
+        self.radioGroup.addButton(self.radioNBins)
+        self.radioGroup.addButton(self.radioBinWidth)
+
+        if cp.confpars.cspadBinWidthIsOn :
+            self.radioBinWidth.setChecked(True)
+            self.processRadioBinWidth()
+        else :
+            self.radioNBins.setChecked(True)
+            self.processRadioNBins()
+
 
         self.char_expand = u'\u25BE' # down-head triangle
         self.butMenuNWin = QtGui.QPushButton(str(cp.confpars.cspadImageNWindows) + self.char_expand)
@@ -153,19 +184,22 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         hboxCS03.addStretch(1) 
 
         gridCS = QtGui.QGridLayout()
-        gridCS.addWidget(self.titCSImage,      0, 0)
-        gridCS.addWidget(self.titCSImageAmin,  0, 1)
-        gridCS.addWidget(self.editCSImageAmin, 0, 2)
-        gridCS.addWidget(self.titCSImageAmax,  0, 3)
-        gridCS.addWidget(self.editCSImageAmax, 0, 4)
+        gridCS.addWidget(self.titCSImage,             0, 0)
+        gridCS.addWidget(self.titCSImageAmin,         0, 1)
+        gridCS.addWidget(self.editCSImageAmin,        0, 2)
+        gridCS.addWidget(self.titCSImageAmax,         0, 3)
+        gridCS.addWidget(self.editCSImageAmax,        0, 4)
         
-        gridCS.addWidget(self.titCSSpectrum,       1, 0)
-        gridCS.addWidget(self.titCSSpectrumAmin,   1, 1)
-        gridCS.addWidget(self.editCSSpectrumAmin,  1, 2)
-        gridCS.addWidget(self.titCSSpectrumAmax,   1, 3)
-        gridCS.addWidget(self.editCSSpectrumAmax,  1, 4)
-        gridCS.addWidget(self.titCSSpectrumNbins,  1, 5)
-        gridCS.addWidget(self.editCSSpectrumNbins, 1, 6)
+        gridCS.addWidget(self.titCSSpectrum,          1, 0)
+        gridCS.addWidget(self.titCSSpectrumAmin,      1, 1)
+        gridCS.addWidget(self.editCSSpectrumAmin,     1, 2)
+        gridCS.addWidget(self.titCSSpectrumAmax,      1, 3)
+        gridCS.addWidget(self.editCSSpectrumAmax,     1, 4)
+       #gridCS.addWidget(self.titCSSpectrumNbins,     1, 5)
+        gridCS.addWidget(self.radioNBins,             1, 5)
+        gridCS.addWidget(self.editCSSpectrumNBins,    1, 6)
+        gridCS.addWidget(self.radioBinWidth,          2, 5)
+        gridCS.addWidget(self.editCSSpectrumBinWidth, 2, 6)
     
         hboxC = QtGui.QHBoxLayout()
         hboxC.addStretch(1)
@@ -196,10 +230,19 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.connect(self.editCSImageAmax,     QtCore.SIGNAL('editingFinished ()'), self.processEditCSImageAmax )
         self.connect(self.editCSSpectrumAmin,  QtCore.SIGNAL('editingFinished ()'), self.processEditCSSpectrumAmin )
         self.connect(self.editCSSpectrumAmax,  QtCore.SIGNAL('editingFinished ()'), self.processEditCSSpectrumAmax )
-        self.connect(self.editCSSpectrumNbins, QtCore.SIGNAL('editingFinished ()'), self.processEditCSSpectrumNbins )
         self.connect(self.editCSAmpRange,      QtCore.SIGNAL('editingFinished ()'), self.processEditCSAmplitudeRange )
         self.connect(self.editCSAmpRaMin,      QtCore.SIGNAL('editingFinished ()'), self.processEditCSAmplitudeRaMin )
 
+        self.connect(self.editCSSpectrumNBins,    QtCore.SIGNAL('editingFinished ()'), self.processEditCSSpectrumNBins )
+        self.connect(self.editCSSpectrumBinWidth, QtCore.SIGNAL('editingFinished ()'), self.processEditCSSpectrumBinWidth )
+
+        #self.connect(self.editCSSpectrumNBins,    QtCore.SIGNAL('textChanged (const QString&)'), self.processEditCSSpectrumNBins )
+        #self.connect(self.editCSSpectrumBinWidth, QtCore.SIGNAL('textChanged (const QString&)'), self.processEditCSSpectrumBinWidth )
+
+        self.connect(self.radioNBins,             QtCore.SIGNAL('clicked()'),          self.processRadioNBins    )
+        self.connect(self.radioBinWidth,          QtCore.SIGNAL('clicked()'),          self.processRadioBinWidth )
+
+        self.setBinning()
         cp.confpars.wtdCSWindowIsOpen = True
 
     #-------------------
@@ -210,24 +253,32 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
   
+
     def getVBoxForLayout(self):
         return self.vbox
+
 
     def setParentWidget(self,parent):
         self.parentWidget = parent
 
-    def setAmplitudeRange(self,    amplitudeRaMin, amplitudeRange):
-        self.sliderCSAmin.setRange(amplitudeRaMin, amplitudeRange)
-        self.sliderCSAmax.setRange(amplitudeRaMin, amplitudeRange)
+
+    def setAmplitudeRange(self):
+        self.sliderCSAmin.setRange(cp.confpars.cspadAmplitudeRaMin,\
+                                   cp.confpars.cspadAmplitudeRange-cp.confpars.cspadSpectrumBinWidth)
+        self.sliderCSAmax.setRange(cp.confpars.cspadAmplitudeRaMin+cp.confpars.cspadSpectrumBinWidth,\
+                                   cp.confpars.cspadAmplitudeRange)
+
 
     def closeEvent(self, event):
         print 'closeEvent'
         self.processClose()
 
+
     def processClose(self):
         print 'Close window'
         cp.confpars.wtdCSWindowIsOpen = False
         self.close()
+
 
     def processMenuNWin(self):
         #print 'MenuNWin'
@@ -237,75 +288,145 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
             cp.confpars.cspadImageNWindows = int(actionSelected.text())
             if actionSelected == action : self.butMenuNWin.setText( str(cp.confpars.cspadImageNWindows) + self.char_expand )
 
+
     def processEditCSAmplitudeRange(self):
         print 'EditCSAmplitudeRange'
         cp.confpars.cspadAmplitudeRange = int(self.editCSAmpRange.displayText())
-        self.setAmplitudeRange(cp.confpars.cspadAmplitudeRaMin, cp.confpars.cspadAmplitudeRange)
+        self.setAmplitudeRange()
+
 
     def processEditCSAmplitudeRaMin(self):
         print 'EditCSAmplitudeRaMin'
         cp.confpars.cspadAmplitudeRaMin = int(self.editCSAmpRaMin.displayText())
-        self.setAmplitudeRange(cp.confpars.cspadAmplitudeRaMin, cp.confpars.cspadAmplitudeRange)
+        self.setAmplitudeRange()
+
 
     def processEditCSImageAmin(self):
         print 'EditCSImageAmin'
         cp.confpars.cspadImageAmin = int(self.editCSImageAmin.displayText())        
+        if cp.confpars.cspadImageAmin >= cp.confpars.cspadImageAmax - cp.confpars.cspadSpectrumBinWidth:
+            cp.confpars.cspadImageAmax = cp.confpars.cspadImageAmin + cp.confpars.cspadSpectrumBinWidth
+            self.editCSImageAmax.setText( str(cp.confpars.cspadImageAmax))
 
     def processEditCSImageAmax(self):
         print 'EditCSImageAmax'
         cp.confpars.cspadImageAmax = int(self.editCSImageAmax.displayText())        
+        if cp.confpars.cspadImageAmax <= cp.confpars.cspadImageAmin + cp.confpars.cspadSpectrumBinWidth:
+            cp.confpars.cspadImageAmin = cp.confpars.cspadImageAmax - cp.confpars.cspadSpectrumBinWidth
+            self.editCSImageAmin.setText( str(cp.confpars.cspadImageAmin))
+
 
     def processEditCSSpectrumAmin(self):
         print 'EditCSSpectrumAmin'
         cp.confpars.cspadSpectrumAmin = int(self.editCSSpectrumAmin.displayText())        
-        #cp.confpars.cspadSpectrumNbins = cp.confpars.cspadSpectrumAmax - cp.confpars.cspadSpectrumAmin
-        #self.editCSSpectrumNbins.setText( str(cp.confpars.cspadSpectrumNbins) )        
+        if cp.confpars.cspadSpectrumAmin >= cp.confpars.cspadSpectrumAmax - cp.confpars.cspadSpectrumBinWidth:
+            cp.confpars.cspadSpectrumAmax = cp.confpars.cspadSpectrumAmin + cp.confpars.cspadSpectrumBinWidth
+            self.editCSSpectrumAmax.setText( str(cp.confpars.cspadSpectrumAmax))
+        self.setBinning()
 
     def processEditCSSpectrumAmax(self):
         print 'EditCSSpectrumAmax'
         cp.confpars.cspadSpectrumAmax  = int(self.editCSSpectrumAmax.displayText())        
-        #cp.confpars.cspadSpectrumNbins = cp.confpars.cspadSpectrumAmax - cp.confpars.cspadSpectrumAmin
-        #self.editCSSpectrumNbins.setText( str(cp.confpars.cspadSpectrumNbins) )
-        
-    def processEditCSSpectrumNbins(self):
-        print 'EditCSSpectrumNbins'
-        cp.confpars.cspadSpectrumNbins = int(self.editCSSpectrumNbins.displayText())        
+        if cp.confpars.cspadSpectrumAmax <= cp.confpars.cspadSpectrumAmin + cp.confpars.cspadSpectrumBinWidth :
+            cp.confpars.cspadSpectrumAmin = cp.confpars.cspadSpectrumAmax - cp.confpars.cspadSpectrumBinWidth
+            self.editCSSpectrumAmin.setText( str(cp.confpars.cspadSpectrumAmin))
+        self.setBinning()
 
-    def processEditCSQuad(self):
-        print 'EditCSQuad',
-        cp.confpars.cspadQuad = int(self.editCSQuad.displayText())        
-        print cp.confpars.cspadQuad
+    def processEditCSSpectrumNBins(self):
+        print 'EditCSSpectrumNBins'
+        cp.confpars.cspadSpectrumNbins = int(self.editCSSpectrumNBins.displayText())        
+        if  cp.confpars.cspadSpectrumNbins < 1 :
+            cp.confpars.cspadSpectrumNbins = 1
+            self.editCSSpectrumNBins.setText( str(cp.confpars.cspadSpectrumNbins) )
+        self.setBinWidth()
+
+
+    def processEditCSSpectrumBinWidth(self) : #,txt):
+        print 'EditCSSpectrumBinWidth'
+        cp.confpars.cspadSpectrumBinWidth = int(self.editCSSpectrumBinWidth.displayText())        
+        if  cp.confpars.cspadSpectrumBinWidth < 1 :
+            cp.confpars.cspadSpectrumBinWidth = 1
+            self.editCSSpectrumBinWidth.setText( str(cp.confpars.cspadSpectrumBinWidth) )
+        self.setNbins()
+        self.setAmplitudeRange()
+
+
+    def setNbins(self):
+        cp.confpars.cspadSpectrumNbins = int((cp.confpars.cspadSpectrumAmax-cp.confpars.cspadSpectrumAmin)\
+                                            / cp.confpars.cspadSpectrumBinWidth )
+        if cp.confpars.cspadSpectrumNbins < 1 : cp.confpars.cspadSpectrumNbins = 1
+        self.editCSSpectrumNBins.setText( str(cp.confpars.cspadSpectrumNbins) )
+
+
+    def setBinWidth(self):
+        cp.confpars.cspadSpectrumBinWidth = int((cp.confpars.cspadSpectrumAmax-cp.confpars.cspadSpectrumAmin)\
+                                               / cp.confpars.cspadSpectrumNbins )
+        if cp.confpars.cspadSpectrumBinWidth < 1 : cp.confpars.cspadSpectrumBinWidth = 1
+        self.editCSSpectrumBinWidth.setText( str(cp.confpars.cspadSpectrumBinWidth) )
+
+
+    def setBinning(self):
+        if cp.confpars.cspadBinWidthIsOn : self.setNbins()    
+        else :                             self.setBinWidth()
+
+
+    def processRadioNBins(self):
+        print 'RadioNBins'
+        cp.confpars.cspadBinWidthIsOn = False
+        self.editCSSpectrumNBins   .setReadOnly(False)
+        self.editCSSpectrumBinWidth.setReadOnly(True)
+        self.editCSSpectrumNBins   .setPalette(self.palette_white)
+        self.editCSSpectrumBinWidth.setPalette(self.palette_grey)
+
+
+    def processRadioBinWidth(self):
+        print 'RadioBinWidth'
+        cp.confpars.cspadBinWidthIsOn = True
+        self.editCSSpectrumNBins   .setReadOnly(True)
+        self.editCSSpectrumBinWidth.setReadOnly(False)
+        self.editCSSpectrumNBins   .setPalette(self.palette_grey)
+        self.editCSSpectrumBinWidth.setPalette(self.palette_white)
+
+
+    #def processEditCSQuad(self):
+    #    print 'EditCSQuad',
+    #    cp.confpars.cspadQuad = int(self.editCSQuad.displayText())        
+    #    print cp.confpars.cspadQuad
         
-    def processEditCSPair(self):
-        print 'EditCSPair',
-        cp.confpars.cspadPair = int(self.editCSPair.displayText())        
-        print cp.confpars.cspadPair
-        
+    #def processEditCSPair(self):
+    #    print 'EditCSPair',
+    #    cp.confpars.cspadPair = int(self.editCSPair.displayText())        
+    #    print cp.confpars.cspadPair
+
+
     def processSliderCSAmin(self):
         #print 'SliderCSAmin',
         #print self.sliderCSAmin.value()
         value = self.sliderCSAmin.value()
-        if value > cp.confpars.cspadSpectrumAmax :
-            self.sliderCSAmax.setValue(value)
+        if value > cp.confpars.cspadSpectrumAmax - cp.confpars.cspadSpectrumBinWidth :
+            self.sliderCSAmax.setValue(value + cp.confpars.cspadSpectrumBinWidth)
         cp.confpars.cspadImageAmin     = value
         cp.confpars.cspadSpectrumAmin  = value
         #cp.confpars.cspadSpectrumNbins = cp.confpars.cspadSpectrumAmax - value
         self.editCSImageAmin    .setText( str(value) )
         self.editCSSpectrumAmin .setText( str(value) )
-        #self.editCSSpectrumNbins.setText( str(cp.confpars.cspadSpectrumNbins) )
+        #self.editCSSpectrumNBins.setText( str(cp.confpars.cspadSpectrumNbins) )
+        self.setBinning()
+
 
     def processSliderCSAmax(self):
         #print 'SliderCSAmax',
         #print self.sliderIMAmax.value()
         value = self.sliderCSAmax.value()
-        if value < cp.confpars.cspadSpectrumAmin :
-            self.sliderCSAmin.setValue(value)
+        if value < cp.confpars.cspadSpectrumAmin + cp.confpars.cspadSpectrumBinWidth :
+            self.sliderCSAmin.setValue(value - cp.confpars.cspadSpectrumBinWidth)
         cp.confpars.cspadSpectrumAmax  = value
         cp.confpars.cspadImageAmax     = value
         #cp.confpars.cspadSpectrumNbins = value - cp.confpars.cspadSpectrumAmin
         self.editCSImageAmax    .setText( str(value) )
         self.editCSSpectrumAmax .setText( str(value) )
-        #self.editCSSpectrumNbins.setText( str(cp.confpars.cspadSpectrumNbins) )
+        #self.editCSSpectrumNBins.setText( str(cp.confpars.cspadSpectrumNbins) )
+        self.setBinning()
 
 
     def processCBoxCSImage(self, value):

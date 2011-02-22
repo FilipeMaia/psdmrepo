@@ -74,7 +74,8 @@ class GUIMain ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(370, 10, 500, 300)
+        #self.setGeometry(370, 10, 500, 300)
+        self.setGeometry(10, 20, 500, 300)
         self.setWindowTitle('HDF5 Event Display')
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False

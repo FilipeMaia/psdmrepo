@@ -96,8 +96,11 @@ class GUIPlayer ( QtGui.QWidget ) :
 
         self.numbEdit = QtGui.QLineEdit(str(cp.confpars.eventCurrent))
         self.spanEdit = QtGui.QLineEdit(str(cp.confpars.span))
-        self.spanEdit.setMaximumWidth(45)
         self.numbEdit.setMaximumWidth(90)
+        self.spanEdit.setMaximumWidth(45)
+        self.numbEdit.setValidator(QtGui.QIntValidator(0,10000000,self))
+        self.spanEdit.setValidator(QtGui.QIntValidator(1,1000000,self))
+
 
         self.reset    = QtGui.QPushButton("Reset")
         self.current  = QtGui.QPushButton("Current")

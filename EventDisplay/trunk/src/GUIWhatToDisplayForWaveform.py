@@ -1,3 +1,4 @@
+
 #--------------------------------------------------------------------------
 # File and Version Information:
 #  $Id$
@@ -7,17 +8,14 @@
 #
 #------------------------------------------------------------------------
 
-"""Generates GUI to select information for rendaring in the event display.
+"""GUI selects the CSpad Quad and Pair.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
-
-@see RelatedModule
-
 @version $Id: template!python!py 4 2008-10-08 19:27:36Z salnikov $
-
 @author Mikhail S. Dubrovin
 """
+
 
 #------------------------------
 #  Module's version from CVS --
@@ -29,7 +27,12 @@ __version__ = "$Revision: 4 $"
 #  Imports of standard modules --
 #--------------------------------
 import sys
+import os
+
 from PyQt4 import QtGui, QtCore
+import time   # for sleep(sec)
+import GUISettingsForWaveformWindow as guiWin
+
 
 #-----------------------------
 # Imports for other modules --
@@ -40,182 +43,179 @@ import ConfigParameters as cp
 #  Class definition --
 #---------------------
 class GUIWhatToDisplayForWaveform ( QtGui.QWidget ) :
-    """Provides GUI to select information for rendering."""
+    """GUI selects the CSpad Quad and Pair"""
 
     #----------------
     #  Constructor --
     #----------------
+    def __init__ (self, parent=None, app=None) :
+        """Constructor"""
 
-    def __init__(self, parent=None):
+        self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(370, 350, 500, 150)
-        self.setWindowTitle('Adjust Waveform Parameters')
-
+        self.setGeometry(200, 500, 500, 500)
+        self.setWindowTitle('Set windows for waveforms')
         self.palette = QtGui.QPalette()
+        self.resetColorIsSet = False
 
+        # see http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/qframe.html
         self.frame = QtGui.QFrame(self)
         self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
         self.frame.setLineWidth(0)
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
+        #self.frame.setVisible(True)
 
-        titFont12 = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
-        titFont10 = QtGui.QFont("Sans Serif", 10, QtGui.QFont.Bold)
+        self.char_expand = u'\u25BE' # down-head triangle
 
-        self.titWaveform         = QtGui.QLabel('Waveform')
+        self.titNWin  = QtGui.QLabel('Number of windows:')
 
-        self.titWaveform   .setFont (titFont12) 
+        self.butMenuNWin = QtGui.QPushButton(str(cp.confpars.waveformNWindows) + self.char_expand)
+        self.butMenuNWin.setMaximumWidth(30)
 
-        self.titWFWaveformAmin   = QtGui.QLabel('Amin:')
-        self.titWFWaveformAmax   = QtGui.QLabel('Amax:')
-        self.titWFWaveformTmin   = QtGui.QLabel('Tmin:')
-        self.titWFWaveformTmax   = QtGui.QLabel('Tmax:')
-
-        self.editWFWaveformAmin  = QtGui.QLineEdit(str(cp.confpars.waveformWaveformAmin))
-        self.editWFWaveformAmax  = QtGui.QLineEdit(str(cp.confpars.waveformWaveformAmax))
-        self.editWFWaveformAmin  .setMaximumWidth(45)
-        self.editWFWaveformAmax  .setMaximumWidth(45)
-
-        self.editWFWaveformTmin  = QtGui.QLineEdit(str(cp.confpars.waveformWaveformTmin))
-        self.editWFWaveformTmax  = QtGui.QLineEdit(str(cp.confpars.waveformWaveformTmax))
-        self.editWFWaveformTmin  .setMaximumWidth(45)
-        self.editWFWaveformTmax  .setMaximumWidth(45)
-
-        self.setEditFieldsReadOnly(cp.confpars.waveformAutoRangeIsOn)
-
-        self.radioAuto   = QtGui.QRadioButton("Auto range of parameters")
-        self.radioManual = QtGui.QRadioButton("Manual range control:")
-        self.radioGroup  = QtGui.QButtonGroup()
-        self.radioGroup.addButton(self.radioAuto)
-        self.radioGroup.addButton(self.radioManual)
-        if cp.confpars.waveformAutoRangeIsOn : self.radioAuto  .setChecked(True)
-        else :                                 self.radioManual.setChecked(True)
+        self.listActMenuNWin = []
+        self.popupMenuNWin = QtGui.QMenu()
+        for nwin in range(1,cp.confpars.waveformNWindowsMax+1) :
+            self.listActMenuNWin.append(self.popupMenuNWin.addAction(str(nwin)))
 
 
-        hboxWF01 = QtGui.QHBoxLayout()
-        hboxWF01.addWidget(self.titWaveform)        
-
-        gridWF = QtGui.QGridLayout()
-        gridWF.addWidget(self.radioAuto,           0, 0)
-        gridWF.addWidget(self.radioManual,         1, 0)
-        gridWF.addWidget(self.titWFWaveformAmin,   1, 1)
-        gridWF.addWidget(self.editWFWaveformAmin,  1, 2)
-        gridWF.addWidget(self.titWFWaveformAmax,   1, 3)
-        gridWF.addWidget(self.editWFWaveformAmax,  1, 4)
-        gridWF.addWidget(self.titWFWaveformTmin,   2, 1)
-        gridWF.addWidget(self.editWFWaveformTmin,  2, 2)
-        gridWF.addWidget(self.titWFWaveformTmax,   2, 3)
-        gridWF.addWidget(self.editWFWaveformTmax,  2, 4)
-        
-        self.vbox = QtGui.QVBoxLayout()
-        self.vbox.addLayout(hboxWF01)
-        self.vbox.addLayout(gridWF) 
-        self.vbox.addStretch(1)     
-
-        if parent == None :
-            #self.vbox.addLayout(hboxC)
-            self.setLayout(self.vbox)
-            self.show()
-
-        #self.connect(self.butClose,            QtCore.SIGNAL('clicked()'),         self.processClose )
-        #self.connect(self.cboxWFImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFImage)
-        #self.connect(self.cboxWFSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFSpectrum)
-
-        self.connect(self.editWFWaveformAmin,  QtCore.SIGNAL('editingFinished ()'), self.processEditWFWaveformAmin )
-        self.connect(self.editWFWaveformAmax,  QtCore.SIGNAL('editingFinished ()'), self.processEditWFWaveformAmax )
-        self.connect(self.editWFWaveformTmin,  QtCore.SIGNAL('editingFinished ()'), self.processEditWFWaveformTmin )
-        self.connect(self.editWFWaveformTmax,  QtCore.SIGNAL('editingFinished ()'), self.processEditWFWaveformTmax )
-        self.connect(self.radioAuto,           QtCore.SIGNAL('clicked()'),          self.processRadioAuto    )
-        self.connect(self.radioManual,         QtCore.SIGNAL('clicked()'),          self.processRadioManual  )
- 
-        cp.confpars.wtdWFWindowIsOpen = True
+        self.hboxN = QtGui.QHBoxLayout() 
+        self.hboxN.addWidget(self.titNWin)
+        self.hboxN.addWidget(self.butMenuNWin)
+        self.hboxN.addStretch(1)     
 
         self.showToolTips()
+
+        self.guiTab = guiWin.GUISettingsForWaveformWindow() # for 0th window
+        self.guiTab.setMinimumHeight(280)
+
+        self.hboxD = QtGui.QHBoxLayout()
+        self.hboxD.addWidget(self.guiTab)
+
+        self.hboxT = QtGui.QHBoxLayout()
+        self.makeTabBarLayout()
+
+        self.vboxGlobal = QtGui.QVBoxLayout()
+        self.vboxGlobal.addLayout(self.hboxN)
+        self.vboxGlobal.addLayout(self.hboxT)
+        self.vboxGlobal.addLayout(self.hboxD)
+
+        self.setLayout(self.vboxGlobal)
+
+        self.connect(self.butMenuNWin,  QtCore.SIGNAL('clicked()'), self.processMenuNWin )
+
+#        self.connect(self.editQuad,  QtCore.SIGNAL('editingFinished ()'), self.processEditQuad )
+#        self.connect(self.editPair,  QtCore.SIGNAL('editingFinished ()'), self.processEditPair )
+
 
     #-------------------
     # Private methods --
     #-------------------
 
+
     def showToolTips(self):
         # Tips for buttons and fields:
-        #self           .setToolTip('This GUI deals with the configuration parameters for waveforms.')
-        self.radioAuto  .setToolTip('Select between Auto and Manual range control.')
-        self.radioManual.setToolTip('Select between Auto and Manual range control.')
-        self.editWFWaveformAmin.setToolTip('This field can be edited for Manual control only.')
-        self.editWFWaveformAmax.setToolTip('This field can be edited for Manual control only.')
-        self.editWFWaveformTmin.setToolTip('This field can be edited for Manual control only.')
-        self.editWFWaveformTmax.setToolTip('This field can be edited for Manual control only.')
+        #self            .setToolTip('Click on QUAD or PAIR number using mouse left button')
+        self.butMenuNWin.setToolTip('Click mouse left on this button\nand select the number of windows\nto be opened for waveforms.')
 
-
-    def setEditFieldsReadOnly(self, isReadOnly=False):
-
-        if isReadOnly == True : self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('grey'))
-        else :                  self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('white'))
-
-        self.editWFWaveformAmin.setPalette(self.palette)
-        self.editWFWaveformAmax.setPalette(self.palette)
-        self.editWFWaveformTmin.setPalette(self.palette)
-        self.editWFWaveformTmax.setPalette(self.palette)
-
-        self.editWFWaveformAmin.setReadOnly(isReadOnly)
-        self.editWFWaveformAmax.setReadOnly(isReadOnly)
-        self.editWFWaveformTmin.setReadOnly(isReadOnly)
-        self.editWFWaveformTmax.setReadOnly(isReadOnly)
 
     def resizeEvent(self, e):
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
-  
-    def getVBoxForLayout(self):
-        return self.vbox
 
-    def setParentWidget(self,parent):
-        self.parentWidget = parent
+    def processQuit(self):
+        print 'Quit'
+        self.close()
+        
+    def mousePressEvent(self, event):
+        print 'Click mouse left on this button.'
+        #print 'event.button() = %s at position' % (event.button()),        
+        #print (event.pos()),
+        #print ' x=%d, y=%d' % (event.x(),event.y()),        
+        #print ' global x=%d, y=%d' % (event.globalX(),event.globalY())
+
+    def processMenuNWin(self):
+        print 'MenuNWin'
+        actionSelected = self.popupMenuNWin.exec_(QtGui.QCursor.pos())
+        if actionSelected==None : return
+        for action in self.listActMenuNWin :
+            cp.confpars.waveformNWindows = int(actionSelected.text())
+            if actionSelected == action : self.butMenuNWin.setText( str(cp.confpars.waveformNWindows) + self.char_expand )
+        self.makeTabBarLayout(mode=1)
+
+
+    def makeTabBarLayout(self,mode=None) :
+
+        if mode != None : self.tabBar.close()
+        self.tabBar = QtGui.QTabBar()
+        #self.tabBar.setMovable(True) 
+        for window in range(cp.confpars.waveformNWindows) :
+
+            indTab = self.tabBar.addTab( 'Win:' + str(window+1) )
+            self.tabBar.setTabTextColor(indTab,QtGui.QColor('red'))
+            #self.tabBar.setShape(QtGui.QTabBar.RoundedWest)
+            
+        #self.hboxT = QtGui.QHBoxLayout() # it is already defined and added in layout
+        self.hboxT.addWidget(self.tabBar) 
+        self.connect(self.tabBar,       QtCore.SIGNAL('currentChanged(int)'), self.processTabBar)
+
+
+    #def resetGlobalLayout(self):
+    #   #self.vboxGlobal.insertLayout   (0, self.hboxN)
+    #    self.vboxGlobal.insertLayout   (1, self.vboxT)
+    #   #self.vboxGlobal.insertaddLayout(2, self.hboxD)
+
+
+    def processTabBar(self):
+        indTab = self.tabBar.currentIndex()
+        print 'TabBar index=',indTab
+
+        #minSize = self.hboxD.minimumSize()
+        self.guiTab.close()
+
+        for window in range(cp.confpars.waveformNWindows) :
+            if indTab == window :
+                self.guiTab = guiWin.GUISettingsForWaveformWindow(None, window)
+
+        self.guiTab.setMinimumHeight(280)
+        self.hboxD.addWidget(self.guiTab)
+
+
+
+
+#    def processEditQuad(self):    
+#        cp.confpars.cspadQuad = int(self.editQuad.displayText())
+#        print 'Set quad: ', cp.confpars.cspadQuad
+
+#    def processEditPair(self):    
+#        cp.confpars.cspadPair = int(self.editPair.displayText())
+#        print 'Set pair: ', cp.confpars.cspadPair
+
+#http://doc.qt.nokia.com/4.6/qt.html#Key-enum
+    def keyPressEvent(self, event):
+        print 'event.key() = %s' % (event.key())
+        if event.key() == QtCore.Qt.Key_Escape:
+    #        self.close()
+            self.SHowIsOn = False    
+
+        if event.key() == QtCore.Qt.Key_B:
+            print 'event.key() = %s' % (QtCore.Qt.Key_B)
+
+        if event.key() == QtCore.Qt.Key_Return:
+            print 'event.key() = Return'
+
+            #self.processFileEdit()
+            #self.processNumbEdit()
+            #self.processSpanEdit()
+            #self.currentEventNo()
+
+        if event.key() == QtCore.Qt.Key_Home:
+            print 'event.key() = Home'
 
     def closeEvent(self, event):
         print 'closeEvent'
-        self.processClose()
-
-    def processClose(self):
-        print 'Close window'
-        cp.confpars.wtdWFWindowIsOpen = False
-        self.close()
-
-    def processEditWFWaveformAmin(self):
-        print 'EditWFWaveformAmin'
-        cp.confpars.waveformWaveformAmin = int(self.editWFWaveformAmin.displayText())        
-
-    def processEditWFWaveformAmax(self):
-        print 'EditWFWaveformAmax'
-        cp.confpars.waveformWaveformAmax = int(self.editWFWaveformAmax.displayText())        
-
-    def processEditWFWaveformTmin(self):
-        print 'EditWFWaveformTmin'
-        cp.confpars.waveformWaveformTmin = int(self.editWFWaveformTmin.displayText())        
-
-    def processEditWFWaveformTmax(self):
-        print 'EditWFWaveformTmax'
-        cp.confpars.waveformWaveformTmax = int(self.editWFWaveformTmax.displayText())        
-
-    def processRadioAuto(self):
-        #print 'RadioAuto'
-        cp.confpars.waveformAutoRangeIsOn = True
-        self.setEditFieldsReadOnly(cp.confpars.waveformAutoRangeIsOn)
-                      
-    def processRadioManual(self):
-        #print 'RadioManual'
-        cp.confpars.waveformAutoRangeIsOn = False
-        self.setEditFieldsReadOnly(cp.confpars.waveformAutoRangeIsOn)
-
-    #def processCBoxIMImage(self, value):
-    #    if self.cboxIMImage.isChecked():
-    #        cp.confpars.imageImageIsOn = True
-    #        #self.parentWidget.cboxIMImage   .setCheckState(2)
-    #    else:
-    #        cp.confpars.imageImageIsOn = False
-    #        #self.parentWidget.cboxIMImage   .setCheckState(0)
+        self.processQuit()
 
 #-----------------------------
 #  In case someone decides to run this module
@@ -226,4 +226,3 @@ if __name__ == "__main__" :
     ex.show()
     app.exec_()
 #-----------------------------
-
