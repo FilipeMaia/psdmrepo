@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-22
+2011-02-22 - Andy Salnikov
+- move pyana code to a separate module pyanamod 
+- can be imported into other apps and called by passing parameters 
+  through keyword arguments.
+
 Tag: V00-00-21
 2010-11-09 - Andy Salnikov
 - event.py: change how DroppedContribution are handled at the container 
