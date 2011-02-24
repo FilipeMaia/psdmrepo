@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-24
+2011-02-24 - Andy Salnikov
+- previous tag accidentally "overloaded" event.get() method, doing
+  proper overload now
+
 Tag: V00-00-23
 2011-02-23 - Andy Salnikov
 - added support for user data stored in event

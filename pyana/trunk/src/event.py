@@ -127,9 +127,13 @@ class Event(object):
         except StopIteration:
             return None
 
-    def get(self, typeId, address=None):
-        """Generic get method"""
-        return self.findFirst( typeId=typeId, address=address )
+    def get(self, key, address=None):
+        """Generic get method, retieves detector data or user data"""
+        if isinstance(key,int):
+            return self.findFirst( typeId=key, address=address )
+        else :
+            default = address
+            return self.m_userData.get(key, default)
 
     def getAcqValue(self, address, channel, env):
         """ returns Acquiris data for specific detector and channel, 
@@ -259,9 +263,6 @@ class Event(object):
         """ Add user data to the event, key identifies the data """
         self.m_userData[key] = data
 
-    def get(self, key, default=None):
-        """ Retrieve user data from the event, key identifies the data """
-        return self.m_userData.get(key, default)
 
     #
     # Private methods not to be used by clients directly
