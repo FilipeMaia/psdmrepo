@@ -78,6 +78,7 @@ class Event(object):
         
         self.m_dg = dg
         self.m_run = run
+        self.m_userData = {}
 
     def run(self) :
         return self.m_run
@@ -254,6 +255,13 @@ class Event(object):
         
         return quads
 
+    def put(self, data, key):
+        """ Add user data to the event, key identifies the data """
+        self.m_userData[key] = data
+
+    def get(self, key, default=None):
+        """ Retrieve user data from the event, key identifies the data """
+        return self.m_userData.get(key, default)
 
     #
     # Private methods not to be used by clients directly
