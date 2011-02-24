@@ -99,12 +99,25 @@ def get_item_last_name(dsname):
 #----------------------------------
 
 def get_item_second_to_last_name(dsname):
-    """Returns the last 3 parts of the full item name (after last slashes)"""
+    """Returns the 2nd to last part of the full item name"""
 
     path1,name1 = os.path.split(str(dsname))
     path2,name2 = os.path.split(str(path1))
 
     return name2 
+
+#----------------------------------
+
+def get_item_third_to_last_name(dsname):
+    """Returns the 3nd to last part of the full item name"""
+
+    path1,name1 = os.path.split(str(dsname))
+    path2,name2 = os.path.split(str(path1))
+    path3,name3 = os.path.split(str(path2))
+
+    str(name3)
+
+    return name3 
 
 #----------------------------------
 
@@ -116,6 +129,25 @@ def get_item_name_for_title(dsname):
     path3,name3 = os.path.split(str(path2))
 
     return name3 + '/' + name2 + '/' + name1
+
+#----------------------------------
+
+def CSpadIsInTheName(dsname):
+    
+    path1,name1 = os.path.split(str(dsname))
+    path2,name2 = os.path.split(str(path1))
+    path3,name3 = os.path.split(str(path2))
+
+    #print '       last name:', name1
+    #print '2nd to last name:', name2
+    #print '3rd to last name:', name3
+    #print 'name3[0:5]', name3[0:5]
+
+    cspadIsInTheName = False
+    if name3[0:5] == 'CsPad' and name1 == 'data' : cspadIsInTheName = True
+    #print 'cspadIsInTheName :', cspadIsInTheName
+
+    return cspadIsInTheName
 
 #----------------------------------
 

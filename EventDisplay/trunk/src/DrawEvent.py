@@ -105,6 +105,8 @@ class DrawEvent ( object ) :
             ds     = self.h5file[dsname]
             arr1ev = ds[cp.confpars.eventCurrent]
 
+            cspadIsInTheName = printh5.CSpadIsInTheName(dsname)
+
             item_last_name = printh5.get_item_last_name(dsname)
             cp.confpars.current_item_name_for_title = printh5.get_item_name_for_title(dsname)
             print 'Plot item:', dsname, ' item name:', item_last_name
@@ -145,8 +147,10 @@ class DrawEvent ( object ) :
                     self.plotsCSpad.plotCSpadV1Spectrum(arr1ev,self.set_fig(4),plot=8)
                 else : self.close_fig(self.figNum)
                 
-            if dsname == self.dsnameCSpadV2 or dsname == self.dsnameCSpadV2CXI :
+            #if dsname == self.dsnameCSpadV2 or dsname == self.dsnameCSpadV2CXI :
                 #print 'Draw plots for CSpad V2'
+
+            if cspadIsInTheName :
 
                 #arr1ev # (32, 185, 388) <- format of this record
 

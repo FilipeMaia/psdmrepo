@@ -81,6 +81,9 @@ class ConfigParameters ( object ) :
         self.fileName             = 'cxi80410-r0430.h5'
         self.eventCurrent         = 1
         self.span                 = 1
+        self.numEventsAverage     = 50
+        self.selectionIsOn        = False
+        
         self.list_of_checked_item_names=[]
         self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data')
         self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/Camera::FrameV1/CxiSc1.0:Tm6740.0/image')       
@@ -97,6 +100,8 @@ class ConfigParameters ( object ) :
         self.treeWindowIsOpen     = False
         self.treeViewIsExpanded   = False
         self.configGUIIsOpen      = False
+        self.selectionGUIIsOpen   = False
+        self.selectionWindowIsOpen= False
         self.posGUIMain           = (370,10)
 
         self.readParsFromFileAtStart = True
@@ -157,6 +162,14 @@ class ConfigParameters ( object ) :
                         #[dataset, autoRangeIsOn, Amin, Amax, Tmin, Tmax, NumberOfWFInDS, WF1, WF2, WF3, WF4]
 
 
+        # Default parameters for Selection algorithms
+        self.selectionNWindows      = 2
+        self.selectionNWindowsMax   = 10 # Maximal number of windows for selection algorithms
+
+        self.selectionWindowParameters = []
+        for win in range(self.selectionNWindowsMax) :
+            self.selectionWindowParameters.append([0, True, 0, 1000, 0, 1000])
+                                                 #[Theshold, InBin, Xmin, Xmax, Ymin, Ymax]
     #-------------------
     #  Public methods --
     #-------------------
@@ -211,6 +224,19 @@ class ConfigParameters ( object ) :
             print 'WAVEF_IND_WF_IN_GREEN', self.waveformWindowParameters[win][9] 
             print 'WAVEF_IND_WF_IN_BLUE',  self.waveformWindowParameters[win][10] 
 
+        print 'SELEC_N_WINDOWS_MAX',       self.selectionNWindowsMax 
+        print 'SELEC_N_WINDOWS',           self.selectionNWindows 
+
+        for win in range(self.selectionNWindows) :
+
+            print 'SELEC_WINDOW_NUMBER',   win 
+            print 'SELEC_THRESHOLD',       self.selectionWindowParameters[win][0] 
+            print 'SELEC_IN_BIN',          self.selectionWindowParameters[win][1] 
+            print 'SELEC_XMIN',            self.selectionWindowParameters[win][2] 
+            print 'SELEC_XMAX',            self.selectionWindowParameters[win][3] 
+            print 'SELEC_YMIN',            self.selectionWindowParameters[win][4] 
+            print 'SELEC_YMAX',            self.selectionWindowParameters[win][5] 
+
         print 70*'='
 
 
@@ -252,7 +278,6 @@ class ConfigParameters ( object ) :
                 elif key == 'WAVEF_N_WINDOWS'          : self.waveformNWindows        = int(val)
 
                 elif key == 'WAVEF_WINDOW_NUMBER'      : win                          = int(val)
-
                 elif key == 'WAVEF_DATASET'            : self.waveformWindowParameters[win][0] = val
                 elif key == 'WAVEF_AUTO_RANGE_IS_ON'   : self.waveformWindowParameters[win][1] = dicBool[val.lower()]
                 elif key == 'WAVEF_AMIN'               : self.waveformWindowParameters[win][2] = int(val)
@@ -264,6 +289,18 @@ class ConfigParameters ( object ) :
                 elif key == 'WAVEF_IND_WF_IN_RED'      : self.waveformWindowParameters[win][8] = self.getValIntOrNone(val)
                 elif key == 'WAVEF_IND_WF_IN_GREEN'    : self.waveformWindowParameters[win][9] = self.getValIntOrNone(val)
                 elif key == 'WAVEF_IND_WF_IN_BLUE'     : self.waveformWindowParameters[win][10]= self.getValIntOrNone(val)
+
+
+                elif key == 'SELEC_N_WINDOWS_MAX'      : self.selectionNWindowsMax     = int(val)
+                elif key == 'SELEC_N_WINDOWS'          : self.selectionNWindows        = int(val)
+
+                elif key == 'SELEC_WINDOW_NUMBER'      : win                           = int(val)
+                elif key == 'SELEC_THRESHOLD'          : self.selectionWindowParameters[win][0] = int(val)
+                elif key == 'SELEC_IN_BIN'             : self.selectionWindowParameters[win][1] = dicBool[val.lower()]
+                elif key == 'SELEC_XMIN'               : self.selectionWindowParameters[win][2] = int(val)
+                elif key == 'SELEC_XMAX'               : self.selectionWindowParameters[win][3] = int(val)
+                elif key == 'SELEC_YMIN'               : self.selectionWindowParameters[win][4] = int(val)
+                elif key == 'SELEC_YMAX'               : self.selectionWindowParameters[win][5] = int(val)
 
                 else : print 'The record : %s %s \n is UNKNOWN in readParameters()' % (key, val) 
             f.close()
@@ -311,19 +348,31 @@ class ConfigParameters ( object ) :
 
         for win in range(self.waveformNWindows) :
             f.write('\n')
-            f.write('WAVEF_WINDOW_NUMBER'             + space + str(win)                                          + '\n')
-            f.write('WAVEF_DATASET'                   + space + str(self.waveformWindowParameters[win][0] )       + '\n')
-            f.write('WAVEF_AUTO_RANGE_IS_ON'          + space + str(self.waveformWindowParameters[win][1] )       + '\n')
-            f.write('WAVEF_AMIN'                      + space + str(self.waveformWindowParameters[win][2] )       + '\n')
-            f.write('WAVEF_AMAX'                      + space + str(self.waveformWindowParameters[win][3] )       + '\n')
-            f.write('WAVEF_TMIN'                      + space + str(self.waveformWindowParameters[win][4] )       + '\n')
-            f.write('WAVEF_TMAX'                      + space + str(self.waveformWindowParameters[win][5] )       + '\n')
-            f.write('WAVEF_N_WF_IN_DATA_SET'          + space + str(self.waveformWindowParameters[win][6] )       + '\n')
-            f.write('WAVEF_IND_WF_IN_BLACK'           + space + str(self.waveformWindowParameters[win][7] )       + '\n')
-            f.write('WAVEF_IND_WF_IN_RED'             + space + str(self.waveformWindowParameters[win][8] )       + '\n')
-            f.write('WAVEF_IND_WF_IN_GREEN'           + space + str(self.waveformWindowParameters[win][9] )       + '\n')
-            f.write('WAVEF_IND_WF_IN_BLUE'            + space + str(self.waveformWindowParameters[win][10])       + '\n')
+            f.write('WAVEF_WINDOW_NUMBER'   + space + str(win)                                          + '\n')
+            f.write('WAVEF_DATASET'         + space + str(self.waveformWindowParameters[win][0] )       + '\n')
+            f.write('WAVEF_AUTO_RANGE_IS_ON'+ space + str(self.waveformWindowParameters[win][1] )       + '\n')
+            f.write('WAVEF_AMIN'            + space + str(self.waveformWindowParameters[win][2] )       + '\n')
+            f.write('WAVEF_AMAX'            + space + str(self.waveformWindowParameters[win][3] )       + '\n')
+            f.write('WAVEF_TMIN'            + space + str(self.waveformWindowParameters[win][4] )       + '\n')
+            f.write('WAVEF_TMAX'            + space + str(self.waveformWindowParameters[win][5] )       + '\n')
+            f.write('WAVEF_N_WF_IN_DATA_SET'+ space + str(self.waveformWindowParameters[win][6] )       + '\n')
+            f.write('WAVEF_IND_WF_IN_BLACK' + space + str(self.waveformWindowParameters[win][7] )       + '\n')
+            f.write('WAVEF_IND_WF_IN_RED'   + space + str(self.waveformWindowParameters[win][8] )       + '\n')
+            f.write('WAVEF_IND_WF_IN_GREEN' + space + str(self.waveformWindowParameters[win][9] )       + '\n')
+            f.write('WAVEF_IND_WF_IN_BLUE'  + space + str(self.waveformWindowParameters[win][10])       + '\n')
 
+        f.write('SELEC_N_WINDOWS_MAX'       + space + str(self.selectionNWindowsMax)     + '\n')
+        f.write('SELEC_N_WINDOWS'           + space + str(self.selectionNWindows)        + '\n')
+
+        for win in range(self.selectionNWindows) :
+            f.write('\n')
+            f.write('SELEC_WINDOW_NUMBER'   + space + str(win)                                           + '\n')
+            f.write('SELEC_THRESHOLD'       + space + str(self.selectionWindowParameters[win][0] )       + '\n')
+            f.write('SELEC_IN_BIN'          + space + str(self.selectionWindowParameters[win][1] )       + '\n')
+            f.write('SELEC_XMIN'            + space + str(self.selectionWindowParameters[win][2] )       + '\n')
+            f.write('SELEC_XMAX'            + space + str(self.selectionWindowParameters[win][3] )       + '\n')
+            f.write('SELEC_YMIN'            + space + str(self.selectionWindowParameters[win][4] )       + '\n')
+            f.write('SELEC_YMAX'            + space + str(self.selectionWindowParameters[win][5] )       + '\n')
         f.close()
 
 

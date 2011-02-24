@@ -45,6 +45,7 @@ import GUIPlayer        as guiplr
 import GUIWhatToDisplay as guiwtd
 import GUISelectItems   as guiselitems
 import GUIConfiguration as guiconfig
+import GUISelection     as guisel
 import ConfigParameters as cp
 #import DrawEvent        as drev
 import PrintHDF5        as printh5 # for my print_group(g,offset)
@@ -96,21 +97,20 @@ class GUIMain ( QtGui.QWidget ) :
 
         #self.drawev   = drev.DrawEvent()
 
-        self.titFile  = QtGui.QLabel('File:')
-        self.titTree  = QtGui.QLabel('HDF5 Tree GUI')
+        self.titFile   = QtGui.QLabel('File:')
+        #self.titTree   = QtGui.QLabel('HDF5 Tree GUI')
 
-        self.fileEdit = QtGui.QLineEdit(cp.confpars.dirName+'/'+cp.confpars.fileName)
+        self.fileEdit  = QtGui.QLineEdit(cp.confpars.dirName+'/'+cp.confpars.fileName)
 
-        self.browse   = QtGui.QPushButton("Browse")    
-        self.printfile= QtGui.QPushButton("Print HDF5 structure")    
-        self.display  = QtGui.QPushButton("Open")
-        self.wtd      = QtGui.QPushButton("What to display")
-        self.config   = QtGui.QPushButton("Configuration")
-        self.save     = QtGui.QPushButton("Save")
-
-        self.selection= QtGui.QPushButton("Selection")
-        self.exit     = QtGui.QPushButton("Exit")
-        self.save   .setMaximumWidth(40)   
+        self.browse    = QtGui.QPushButton("Browse")    
+        self.printfile = QtGui.QPushButton("Print HDF5 structure")    
+        self.display   = QtGui.QPushButton("Open HDF5 tree")
+        self.wtd       = QtGui.QPushButton("What to display")
+        self.config    = QtGui.QPushButton("Configuration")
+        self.save      = QtGui.QPushButton("Save")
+        self.selection = QtGui.QPushButton("Selection")
+        self.exit      = QtGui.QPushButton("Exit")
+        self.save.setMaximumWidth(40)   
 
         hboxF = QtGui.QHBoxLayout()
         hboxF.addWidget(self.titFile)
@@ -118,13 +118,13 @@ class GUIMain ( QtGui.QWidget ) :
         hboxF.addWidget(self.browse)
 
         hboxC = QtGui.QHBoxLayout()
-#        hboxC.addWidget(self.printfile)
+       #hboxC.addWidget(self.printfile)
+        hboxC.addWidget(self.selection)
         hboxC.addStretch(2)
-        hboxC.addWidget(self.titTree)
+       #hboxC.addWidget(self.titTree)
         hboxC.addWidget(self.display)
         
         hboxE = QtGui.QHBoxLayout()
-        #hboxE.addWidget(self.selection)
         hboxE.addWidget(self.wtd)
         hboxE.addStretch(2)
         hboxE.addWidget(self.config)
@@ -198,6 +198,8 @@ class GUIMain ( QtGui.QWidget ) :
             self.guitree.close()
         if cp.confpars.configGUIIsOpen == True :
             self.configGUI.close()
+        if cp.confpars.selectionGUIIsOpen == True :
+            self.guiselection.close()
         self.close()
         
     def processBrowse(self):
@@ -230,7 +232,19 @@ class GUIMain ( QtGui.QWidget ) :
 
     def processSelection(self):
         print 'Selection'
-        print 'Is empty yet...'
+        if  cp.confpars.selectionGUIIsOpen : # close wtd window
+            print 'Selection GUI: Close'
+            #self.selection.setText('Open Selection')
+            self.guiselection.close()
+            cp.confpars.selectionGUIIsOpen = False            
+        else :                           # Open wtd window
+            print 'Selection GUI: Open'
+            #self.selection.setText('Close Selection')
+            self.guiselection = guisel.GUISelection()
+            self.guiselection.move(self.pos().__add__(QtCore.QPoint(500,330))) # open window with offset w.r.t. parent
+            self.guiselection.show()
+            cp.confpars.selectionGUIIsOpen = True
+
         
     def processConfig(self):
         print 'Configuration'
@@ -265,12 +279,12 @@ class GUIMain ( QtGui.QWidget ) :
     def processDisplay(self):
         if cp.confpars.treeWindowIsOpen : # close wtd window
             print 'What to display GUI: Close'
-            self.display.setText('Open')
+            self.display.setText('Open HDF5 tree')
             self.guitree.close()
             cp.confpars.treeWindowIsOpen = False            
         else :                           # Open wtd window
             print 'What to display GUI: Open'
-            self.display.setText('Close')
+            self.display.setText('Close HDF5 tree')
             self.guitree = guiselitems.GUISelectItems(self)
             self.guitree.move(self.pos().__add__(QtCore.QPoint(-360,0))) # open window with offset w.r.t. parent
             self.guitree.show()

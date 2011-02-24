@@ -90,25 +90,30 @@ class GUIPlayer ( QtGui.QWidget ) :
 
         self.titCurr  = QtGui.QLabel('Current event:')
         self.titDraw  = QtGui.QLabel('Draw:')
-        self.titSpace4= QtGui.QLabel('    ')
         self.titSpan  = QtGui.QLabel('Span:')
         self.titSlShow= QtGui.QLabel('Slide show:')
+        self.titOver  = QtGui.QLabel('over')
+        self.titEvents= QtGui.QLabel('events')
 
         self.numbEdit = QtGui.QLineEdit(str(cp.confpars.eventCurrent))
         self.spanEdit = QtGui.QLineEdit(str(cp.confpars.span))
+        self.avevEdit = QtGui.QLineEdit(str(cp.confpars.numEventsAverage))
         self.numbEdit.setMaximumWidth(90)
         self.spanEdit.setMaximumWidth(45)
+        self.avevEdit.setMaximumWidth(45)
         self.numbEdit.setValidator(QtGui.QIntValidator(0,10000000,self))
         self.spanEdit.setValidator(QtGui.QIntValidator(1,1000000,self))
+        self.avevEdit.setValidator(QtGui.QIntValidator(1,1000000,self))
 
+        self.reset        = QtGui.QPushButton("Reset")
+        self.current      = QtGui.QPushButton("Current")
+        self.previous     = QtGui.QPushButton("Previous")
+        self.next         = QtGui.QPushButton("Next")
+        self.slideShow    = QtGui.QPushButton("Slide show")
+        self.start        = QtGui.QPushButton("Start")
+        self.stop         = QtGui.QPushButton("Stop")
+        self.butAverage   = QtGui.QPushButton("Average")
 
-        self.reset    = QtGui.QPushButton("Reset")
-        self.current  = QtGui.QPushButton("Current")
-        self.previous = QtGui.QPushButton("Previous")
-        self.next     = QtGui.QPushButton("Next")
-        self.slideShow= QtGui.QPushButton("Slide show")
-        self.start    = QtGui.QPushButton("Start")
-        self.stop     = QtGui.QPushButton("Stop")
         #self.closeplts= QtGui.QPushButton("Close plots")
         #self.exit     = QtGui.QPushButton("Exit")
         
@@ -118,7 +123,9 @@ class GUIPlayer ( QtGui.QWidget ) :
         self.spandec.setMaximumWidth(20) 
         self.reset  .setMaximumWidth(50)   
 
-
+        self.cboxSelection = QtGui.QCheckBox('Apply selection', self)
+        if cp.confpars.selectionIsOn : self.cboxSelection.setCheckState(2)
+ 
         hboxT = QtGui.QHBoxLayout() 
         hboxT.addWidget(self.titCurr)
         hboxT.addWidget(self.numbEdit)
@@ -141,7 +148,15 @@ class GUIPlayer ( QtGui.QWidget ) :
         hboxS.addWidget(self.start)
         hboxS.addWidget(self.stop)
         #hboxS.addWidget(self.closeplts)
-        
+
+        hboxA = QtGui.QHBoxLayout()
+        hboxA.addWidget(self.butAverage)
+        hboxA.addWidget(self.titOver)
+        hboxA.addWidget(self.avevEdit)
+        hboxA.addWidget(self.titEvents)
+        hboxA.addStretch(1)
+        hboxA.addWidget(self.cboxSelection)        
+
         #hbox = QtGui.QHBoxLayout()
         #hbox.addStretch(3)
         #hbox.addWidget(self.exit)
@@ -150,6 +165,7 @@ class GUIPlayer ( QtGui.QWidget ) :
         vbox.addLayout(hboxT)
         vbox.addLayout(hboxM)
         vbox.addLayout(hboxS)
+        vbox.addLayout(hboxA)
         #vbox.addStretch(1)
         #vbox.addLayout(hbox)
 
@@ -165,9 +181,13 @@ class GUIPlayer ( QtGui.QWidget ) :
         self.connect(self.reset,     QtCore.SIGNAL('clicked()'), self.processReset )
         self.connect(self.spaninc,   QtCore.SIGNAL('clicked()'), self.processSpaninc )
         self.connect(self.spandec,   QtCore.SIGNAL('clicked()'), self.processSpandec )
-
+        self.connect(self.butAverage,QtCore.SIGNAL('clicked()'), self.processAverage )
+        
         self.connect(self.numbEdit,  QtCore.SIGNAL('editingFinished ()'), self.processNumbEdit )
         self.connect(self.spanEdit,  QtCore.SIGNAL('editingFinished ()'), self.processSpanEdit )
+
+        self.connect(self.avevEdit,  QtCore.SIGNAL('editingFinished ()'), self.processAverageEventsEdit )
+        self.connect(self.cboxSelection, QtCore.SIGNAL('stateChanged(int)'), self.processCBoxSelection)
 
         #self.setFocus()
         #self.resize(500, 300)
@@ -186,7 +206,27 @@ class GUIPlayer ( QtGui.QWidget ) :
         self.drawev.quitDrawEvent()
         self.SHowIsOn = False
         self.close()
-        
+
+
+    def processAverage(self):
+        print 'Start Average'
+        #self.drawev.stopDrawEvent() 
+        #self.SHowIsOn = False
+
+
+    def processAverageEventsEdit(self):    
+        print 'AverageEventsEdit',
+        cp.confpars.numEventsAverage = int(self.avevEdit.displayText())
+        print 'Set numEventsAverage : ', cp.confpars.numEventsAverage        
+
+
+    def processCBoxSelection(self, value):
+        if self.cboxSelection.isChecked():
+            cp.confpars.selectionIsOn = True
+        else:
+            cp.confpars.selectionIsOn = False
+
+
     def processStart(self):
         print 'Start slide show'
         cp.confpars.eventCurrent = int(self.numbEdit.displayText())

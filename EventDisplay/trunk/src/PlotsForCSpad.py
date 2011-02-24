@@ -200,7 +200,7 @@ class PlotsForCSpad ( object ) :
             #print 'ixOff, iyOff =', ixOff, iyOff,           
             #print ' dimX,  dimY =', dimX, dimY           
 
-            arr2dquad[ixOff:dimX+ixOff, iyOff:dimY+iyOff] = rotarr2d[0:dimX, 0:dimY]
+            arr2dquad[ixOff:dimX+ixOff, iyOff:dimY+iyOff] += rotarr2d[0:dimX, 0:dimY]
 
         return arr2dquad
 
@@ -222,7 +222,7 @@ class PlotsForCSpad ( object ) :
             ixOff = cs.confcspad.quadXOffset[quad]
             iyOff = cs.confcspad.quadYOffset[quad]
 
-            arr2d[ixOff:dimX+ixOff, iyOff:dimY+iyOff] = rotarr2d[0:dimX, 0:dimY]
+            arr2d[ixOff:dimX+ixOff, iyOff:dimY+iyOff] += rotarr2d[0:dimX, 0:dimY]
 
         return arr2d
 
