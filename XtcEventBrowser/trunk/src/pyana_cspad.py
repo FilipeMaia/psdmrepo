@@ -257,12 +257,6 @@ class  pyana_cspad ( object ) :
                 title = "Event # %d, background subtracted" % self.n_events 
                 self.drawframemore(subtr_image, title, fignum=200 )
 
-            if self.thr_area is not None:
-                self.drawframemore(cspad_image[self.thr_area[0]:self.thr_area[1],
-                                               self.thr_area[2]:self.thr_area[3]],
-                                   "Event # %d, subset used for threshold (>%d)" %
-                                   (self.n_events, self.threshold),
-                                   fignum=300)
 
         plt.show()
 
@@ -327,6 +321,9 @@ class  pyana_cspad ( object ) :
         #plt.suptitle("LCLS Event Display")
         cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
 
+        ## To do: add insert showing the active region for thresholding
+        #if self.thr_area is not None:
+        #cspad_image[self.thr_area[0]:self.thr_area[1], self.thr_area[2]:self.thr_area[3]])
 
         gs = GridSpec(2,1, height_ratios=[6,1] )
 
@@ -401,16 +398,22 @@ class  pyana_cspad ( object ) :
         #           # (this shouldn't be done for every event!)
 
 
+        
 
                                
     # define what to do if we click on the plot
     def onclick(self, event) :
 
         # can we open a dialogue box here?
-        print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y,
-        print ' xdata=',event.xdata,' ydata=', event.ydata
+        if not event.inaxes and event.button == 3 :
+            print "can we open a menu here?"
+            
+        # check that the click was on the color bar
+        if event.inaxes == self.colb.ax :
 
-        if event.inaxes :
+            print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y
+            print ' xdata=',event.xdata,' ydata=', event.ydata
+            
             lims = self.axesim.get_clim()
             
             self.plot_vmin = lims[0]
@@ -418,14 +421,14 @@ class  pyana_cspad ( object ) :
             range = self.plot_vmax - self.plot_vmin
             value = self.plot_vmin + event.ydata * range
             #print self.plot_vmin, self.plot_vmax, range, value
-            
+
             # left button
             if event.button is 1 :
-                if value > self.plot_vmin and value < self.plot_vmax :
-                    self.plot_vmin = value
-                    print "new mininum: ", self.plot_vmin
-                else :
-                    print "min has not been changed (click inside the color bar to change the range)"
+                self.plot_vmin = value
+                print "mininum changed:   ( %.2f , %.2f ) " % (self.plot_vmin, self.plot_vmax )
+                #if value > self.plot_vmin and value < self.plot_vmax :
+                #else :
+                #    print "min has not been changed (click inside the color bar to change the range)"
                         
             # middle button
             elif event.button is 2 :
@@ -434,11 +437,11 @@ class  pyana_cspad ( object ) :
                     
             # right button
             elif event.button is 3 :
-                if value > self.plot_vmin and value < self.plot_vmax :
-                    self.plot_vmax = value
-                    print "new maximum: ", self.plot_vmax
-                else :
-                    print "max has not been changed (click inside the color bar to change the range)"
+                self.plot_vmax = value
+                print "maximum changed:   ( %.2f , %.2f ) " % (self.plot_vmin, self.plot_vmax )
+                #if value > self.plot_vmin and value < self.plot_vmax :
+                #else :
+                #    print "max has not been changed (click inside the color bar to change the range)"
 
             plt.clim(self.plot_vmin,self.plot_vmax)
             plt.draw() # redraw the current figure
