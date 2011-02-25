@@ -11,9 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-19
+2011-02-25 Igor Gaponenko
+- extended API to support data portal
+- bug fixes
+
 Tag: V00-00-18
 2010-07-28 Igor Gaponenko
-p
 - upgraded PHP code for PHP 5.3
 
 Tag: V00-00-16

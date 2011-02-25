@@ -20,7 +20,7 @@ require_once( 'lusitime.inc.php' );
  *
  * @author gapon
  */
-class LusiTimeException extends Exception {
+class LusiTimeException extends \Exception {
 
     /*
      * Data members

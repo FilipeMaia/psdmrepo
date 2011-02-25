@@ -131,6 +131,12 @@ class LusiTime {
     public function toStringDay() {
         return date("Y-m-d", $this->sec); }
 
+    /* Unlike the previous methods this one would return just the hours-minutes-seconds
+     * part of the timestamp in the human-readable format.
+     */
+    public function toStringHMS() {
+        return date("H:i:s", $this->sec); }
+        
     /* Return 4-digit year number of the timestamp.
      */
     public function year() {
