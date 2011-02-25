@@ -931,7 +931,7 @@ function manage_hdf5_translation() {
         YAHOO.util.Connect.asyncRequest( 'GET', sUrl, callback );
     }
 }
-
+/*
 function display_experiment_files( instrument, experiment, exper_id ) {
 
     set_subtitle( 'Manage HDF5 Translation of Experiment - <b>'+instrument+' / '+experiment+'</b>' );
@@ -945,7 +945,7 @@ function display_experiment_files( instrument, experiment, exper_id ) {
     load( 'ExperimentSummary.php?id='+exper_id, 'experiment_summary' );
     load( 'RequestExperimentFiles.php?exper_id='+exper_id, 'experiment_files' );
 }
-
+*/
 /*
  * iRODS catalogs browser
  */

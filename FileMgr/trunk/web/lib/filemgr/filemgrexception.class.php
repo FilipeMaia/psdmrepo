@@ -19,7 +19,7 @@ require_once( 'filemgr.inc.php' );
  *
  * @author gapon
  */
-class FileMgrException extends Exception {
+class FileMgrException extends \Exception {
 
     /*
      * Data members

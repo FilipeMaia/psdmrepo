@@ -6,6 +6,7 @@ require_once( 'lusitime/lusitime.inc.php' );
 
 use RegDB\RegDB;
 use RegDB\RegDBAuth;
+use RegDB\RegDBHtml;
 use RegDB\RegDBException;
 
 use FileMgr\FileMgrIrodsWs;

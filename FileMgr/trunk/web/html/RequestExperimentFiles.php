@@ -3,12 +3,15 @@
 require_once( 'filemgr/filemgr.inc.php' );
 require_once( 'logbook/logbook.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
 
 use FileMgr\FileMgrIrodsWs;
 use FileMgr\FileMgrException;
 
 use LogBook\LogBook;
 use LogBook\LogBookException;
+
+use LusiTime\LusiTime;
 
 use RegDB\RegDBHtml;
 
