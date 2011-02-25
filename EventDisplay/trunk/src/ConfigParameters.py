@@ -123,6 +123,9 @@ class ConfigParameters ( object ) :
         self.cspadImageDetIsOn    = True
         self.cspadSpectrumIsOn    = False
         self.cspadSpectrum08IsOn  = False
+        self.cspadProjXYIsOn      = False
+        self.cspadProjRIsOn       = False
+        self.cspadProjPhiIsOn     = False
 
         self.cspadImageAmin       = 0   
         self.cspadImageAmax       = 2000
@@ -138,6 +141,9 @@ class ConfigParameters ( object ) :
         self.imageImageIsOn       = False
         self.imageSpectrumIsOn    = False
         self.imageImageSpecIsOn   = True
+        self.imageProjXYIsOn      = False
+        self.imageProjRIsOn       = False
+        self.imageProjPhiIsOn     = False
 
         self.imageImageAmin       = 0    #  15
         self.imageImageAmax       = 100  #  45
@@ -170,6 +176,40 @@ class ConfigParameters ( object ) :
         for win in range(self.selectionNWindowsMax) :
             self.selectionWindowParameters.append([0, True, 0, 1000, 0, 1000])
                                                  #[Theshold, InBin, Xmin, Xmax, Ymin, Ymax]
+
+
+        self.perEventDistIsOn  = True
+        self.correlationsIsOn  = True
+
+        self.projCenterX       = 850
+        self.projCenterY       = 850
+
+        self.projR_BinWidthIsOn= True
+        self.projR_SliWidthIsOn= True
+
+        self.projR_NBins       = 100
+        self.projR_BinWidth    = 10
+        self.projR_NSlices     = 8
+        self.projR_SliWidth    = 45
+              
+        self.projR_Rmin        = 0
+        self.projR_Rmax        = 1000
+        self.projR_Phimin      = 0
+        self.projR_Phimax      = 360
+
+        self.projPhi_BinWidthIsOn= True
+        self.projPhi_SliWidthIsOn= True
+
+        self.projPhi_NBins       = 36
+        self.projPhi_BinWidth    = 10
+        self.projPhi_NSlices     = 10
+        self.projPhi_SliWidth    = 100
+              
+        self.projPhi_Rmin        = 0
+        self.projPhi_Rmax        = 1000
+        self.projPhi_Phimin      = 0
+        self.projPhi_Phimax      = 360
+
     #-------------------
     #  Public methods --
     #-------------------
@@ -192,6 +232,9 @@ class ConfigParameters ( object ) :
         print 'CSPAD_IMAGE_DET_IS_ON',     self.cspadImageDetIsOn
         print 'CSPAD_SPECT_IS_ON',         self.cspadSpectrumIsOn    
         print 'CSPAD_SPE08_IS_ON',         self.cspadSpectrum08IsOn    
+        print 'CSPAD_PROJ_XY_IS_ON',       self.cspadProjXYIsOn    
+        print 'CSPAD_PROJ_R_IS_ON',        self.cspadProjRIsOn    
+        print 'CSPAD_PROJ_PHI_IS_ON',      self.cspadProjPhiIsOn    
 
         print 'CSPAD_IMAGE_AMIN',          self.cspadImageAmin
         print 'CSPAD_IMAGE_AMAX',          self.cspadImageAmax
@@ -201,6 +244,9 @@ class ConfigParameters ( object ) :
         print 'IMAGE_IMAGE_IS_ON',         self.imageImageIsOn       
         print 'IMAGE_IMAGE_SPEC_IS_ON',    self.imageImageSpecIsOn       
         print 'IMAGE_SPECT_IS_ON',         self.imageSpectrumIsOn    
+        print 'IMAGE_PROJ_XY_IS_ON',       self.imageProjXYIsOn    
+        print 'IMAGE_PROJ_R_IS_ON',        self.imageProjRIsOn    
+        print 'IMAGE_PROJ_PHI_IS_ON',      self.imageProjPhiIsOn    
 
         print 'READ_PARS_AT_START',        self.readParsFromFileAtStart
 
@@ -237,6 +283,12 @@ class ConfigParameters ( object ) :
             print 'SELEC_YMIN',            self.selectionWindowParameters[win][4] 
             print 'SELEC_YMAX',            self.selectionWindowParameters[win][5] 
 
+        print 'NUM_EVENTS_FOR_AVERAGE',    self.numEventsAverage
+        print 'SELECTION_IS_ON',           self.selectionIsOn
+
+        print 'PER_EVENT_DIST_IS_ON',      self.perEventDistIsOn
+        print 'CORRELATIONS_IS_ON',        self.correlationsIsOn
+
         print 70*'='
 
 
@@ -256,15 +308,25 @@ class ConfigParameters ( object ) :
                 elif key == 'ITEM_NAME'                : self.list_of_checked_item_names.append(val) 
                 elif key == 'CURRENT_EVENT'            : self.eventCurrent = int(val)
                 elif key == 'SPAN'                     : self.span = int(val)
+                elif key == 'NUM_EVENTS_FOR_AVERAGE'   : self.numEventsAverage        = int(val)
+                elif key == 'SELECTION_IS_ON'          : self.selectionIsOn           = dicBool[val.lower()]
+
                 elif key == 'CSPAD_IMAGE_IS_ON'        : self.cspadImageIsOn          = dicBool[val.lower()]
                 elif key == 'CSPAD_IMAGE_OF_PAIR_IS_ON': self.cspadImageOfPairIsOn    = dicBool[val.lower()]
                 elif key == 'CSPAD_IMAGE_QUAD_IS_ON'   : self.cspadImageQuadIsOn      = dicBool[val.lower()]
                 elif key == 'CSPAD_IMAGE_DET_IS_ON'    : self.cspadImageDetIsOn       = dicBool[val.lower()]
                 elif key == 'CSPAD_SPECT_IS_ON'        : self.cspadSpectrumIsOn       = dicBool[val.lower()]
                 elif key == 'CSPAD_SPE08_IS_ON'        : self.cspadSpectrum08IsOn     = dicBool[val.lower()]
+                elif key == 'CSPAD_PROJ_XY_IS_ON'      : self.cspadProjXYIsOn         = dicBool[val.lower()]
+                elif key == 'CSPAD_PROJ_R_IS_ON'       : self.cspadProjRIsOn          = dicBool[val.lower()]
+                elif key == 'CSPAD_PROJ_PHI_IS_ON'     : self.cspadProjPhiIsOn        = dicBool[val.lower()]
                 elif key == 'IMAGE_IMAGE_IS_ON'        : self.imageImageIsOn          = dicBool[val.lower()]
                 elif key == 'IMAGE_IMAGE_SPEC_IS_ON'   : self.imageImageSpecIsOn      = dicBool[val.lower()]
                 elif key == 'IMAGE_SPECT_IS_ON'        : self.imageSpectrumIsOn       = dicBool[val.lower()]
+                elif key == 'IMAGE_PROJ_XY_IS_ON'      : self.imageProjXYIsOn         = dicBool[val.lower()]
+                elif key == 'IMAGE_PROJ_R_IS_ON'       : self.imageProjRIsOn          = dicBool[val.lower()]
+                elif key == 'IMAGE_PROJ_PHI_IS_ON'     : self.imageProjPhiIsOn        = dicBool[val.lower()]
+
                 elif key == 'WAVEF_WAVEF_IS_ON'        : self.waveformWaveformIsOn    = dicBool[val.lower()]
                 elif key == 'READ_PARS_AT_START'       : self.readParsFromFileAtStart = dicBool[val.lower()]
                 elif key == 'CSPAD_QUAD_NUMBER'        : self.cspadQuad               = int(val)
@@ -273,6 +335,9 @@ class ConfigParameters ( object ) :
                 elif key == 'CSPAD_IMAGE_AMAX'         : self.cspadImageAmax          = int(val)
                 elif key == 'CSPAD_SPECT_AMIN'         : self.cspadSpectrumAmin       = int(val)
                 elif key == 'CSPAD_SPECT_AMAX'         : self.cspadSpectrumAmax       = int(val)
+
+                elif key == 'PER_EVENT_DIST_IS_ON'     : self.perEventDistIsOn        = dicBool[val.lower()]
+                elif key == 'CORRELATIONS_IS_ON'       : self.correlationsIsOn        = dicBool[val.lower()]
 
                 elif key == 'WAVEF_N_WINDOWS_MAX'      : self.waveformNWindowsMax     = int(val)
                 elif key == 'WAVEF_N_WINDOWS'          : self.waveformNWindows        = int(val)
@@ -331,9 +396,15 @@ class ConfigParameters ( object ) :
         f.write('CSPAD_IMAGE_DET_IS_ON'     + space + str(self.cspadImageDetIsOn)       + '\n')
         f.write('CSPAD_SPECT_IS_ON'         + space + str(self.cspadSpectrumIsOn)       + '\n')
         f.write('CSPAD_SPE08_IS_ON'         + space + str(self.cspadSpectrum08IsOn)     + '\n')
+        f.write('CSPAD_PROJ_XY_IS_ON'       + space + str(self.cspadProjXYIsOn)         + '\n')
+        f.write('CSPAD_PROJ_R_IS_ON'        + space + str(self.cspadProjRIsOn)          + '\n')
+        f.write('CSPAD_PROJ_PHI_IS_ON'      + space + str(self.cspadProjPhiIsOn)        + '\n')
         f.write('IMAGE_IMAGE_IS_ON'         + space + str(self.imageImageIsOn)          + '\n')
         f.write('IMAGE_IMAGE_SPEC_IS_ON'    + space + str(self.imageImageSpecIsOn)      + '\n')
         f.write('IMAGE_SPECT_IS_ON'         + space + str(self.imageSpectrumIsOn)       + '\n')
+        f.write('IMAGE_PROJ_XY_IS_ON'       + space + str(self.imageProjXYIsOn)         + '\n')
+        f.write('IMAGE_PROJ_R_IS_ON'        + space + str(self.imageProjRIsOn)          + '\n')
+        f.write('IMAGE_PROJ_PHI_IS_ON'      + space + str(self.imageProjPhiIsOn)        + '\n')
         f.write('WAVEF_WAVEF_IS_ON'         + space + str(self.waveformWaveformIsOn)    + '\n')
         f.write('READ_PARS_AT_START'        + space + str(self.readParsFromFileAtStart) + '\n')
         f.write('CSPAD_QUAD_NUMBER'         + space + str(self.cspadQuad)               + '\n')
@@ -342,6 +413,9 @@ class ConfigParameters ( object ) :
         f.write('CSPAD_IMAGE_AMAX'          + space + str(self.cspadImageAmax)          + '\n')
         f.write('CSPAD_SPECT_AMIN'          + space + str(self.cspadSpectrumAmin)       + '\n')
         f.write('CSPAD_SPECT_AMAX'          + space + str(self.cspadSpectrumAmax)       + '\n')
+        f.write('PER_EVENT_DIST_IS_ON'      + space + str(self.perEventDistIsOn)        + '\n')
+        f.write('CORRELATIONS_IS_ON'        + space + str(self.correlationsIsOn)        + '\n')
+
         f.write('\n')
         f.write('WAVEF_N_WINDOWS_MAX'       + space + str(self.waveformNWindowsMax)     + '\n')
         f.write('WAVEF_N_WINDOWS'           + space + str(self.waveformNWindows)        + '\n')
@@ -373,6 +447,8 @@ class ConfigParameters ( object ) :
             f.write('SELEC_XMAX'            + space + str(self.selectionWindowParameters[win][3] )       + '\n')
             f.write('SELEC_YMIN'            + space + str(self.selectionWindowParameters[win][4] )       + '\n')
             f.write('SELEC_YMAX'            + space + str(self.selectionWindowParameters[win][5] )       + '\n')
+            f.write('NUM_EVENTS_FOR_AVERAGE'+ space + str( self.numEventsAverage )                       + '\n')
+            f.write('SELECTION_IS_ON'       + space + str( self.selectionIsOn )                          + '\n')
         f.close()
 
 

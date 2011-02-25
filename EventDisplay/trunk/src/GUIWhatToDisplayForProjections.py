@@ -4,11 +4,11 @@
 #  $Id$
 #
 # Description:
-#  Module GUISelection...
+#  Module GUIWhatToDisplayForProjections...
 #
 #------------------------------------------------------------------------
 
-"""This GUI defines the parameters for selection algorithms.
+"""This GUI defines the parameters for Projections.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -31,7 +31,8 @@ import os
 
 from PyQt4 import QtGui, QtCore
 import time   # for sleep(sec)
-import GUISelectionWindow as guiselwin
+import GUIWhatToDisplayForProjR   as guiprojr
+import GUIWhatToDisplayForProjPhi as guiprojphi
 
 #-----------------------------
 # Imports for other modules --
@@ -41,8 +42,8 @@ import ConfigParameters as cp
 #---------------------
 #  Class definition --
 #---------------------
-class GUISelection ( QtGui.QWidget ) :
-    """This GUI defines the parameters for selection algorithms"""
+class GUIWhatToDisplayForProjections ( QtGui.QWidget ) :
+    """This GUI defines the parameters for Projections"""
 
     #----------------
     #  Constructor --
@@ -54,7 +55,7 @@ class GUISelection ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(200, 500, 500, 200)
-        self.setWindowTitle('Selection GUI')
+        self.setWindowTitle('Projections GUI')
         self.palette = QtGui.QPalette()
 
         self.frame = QtGui.QFrame(self)
@@ -64,41 +65,46 @@ class GUISelection ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
         #self.frame.setVisible(True)
 
-        self.char_expand = u'\u25BE' # down-head triangle
+        self.titProjections  = QtGui.QLabel('Set parameters for projections:')
+        self.titCenter       = QtGui.QLabel('Center X and Y:')
 
-        self.titNWin  = QtGui.QLabel('Number of regions for selection:')
-
-        self.butMenuNWin = QtGui.QPushButton(str(cp.confpars.selectionNWindows) + self.char_expand)
-        self.butMenuNWin.setMaximumWidth(30)
-
-        self.popupMenuNWin = QtGui.QMenu()
-        for nwin in range(1,cp.confpars.selectionNWindowsMax+1) :
-            self.popupMenuNWin.addAction(str(nwin))
+        self.editProjCenterX = QtGui.QLineEdit(str(cp.confpars.projCenterX))
+        self.editProjCenterY = QtGui.QLineEdit(str(cp.confpars.projCenterY))
+        self.editProjCenterX.setValidator(QtGui.QIntValidator(0, 2000,self))
+        self.editProjCenterY.setValidator(QtGui.QIntValidator(0, 2000,self))
+        self.editProjCenterX.setMaximumWidth(50)
+        self.editProjCenterY.setMaximumWidth(50)
 
         self.hboxN = QtGui.QHBoxLayout() 
-        self.hboxN.addWidget(self.titNWin)
-        self.hboxN.addWidget(self.butMenuNWin)
+        self.hboxN.addWidget(self.titProjections)
         self.hboxN.addStretch(1)     
+        self.hboxN.addWidget(self.titCenter)
+        self.hboxN.addWidget(self.editProjCenterX)
+        self.hboxN.addWidget(self.editProjCenterY)
 
         self.hboxT = QtGui.QHBoxLayout()
         self.makeTabBarLayout()
 
-        self.guiWin = guiselwin.GUISelectionWindow() # for 0th window
+        self.guiWin = QtGui.QLabel('Place holder.')
         self.guiWin.setMinimumHeight(150)
 
         self.hboxD = QtGui.QHBoxLayout()
         self.hboxD.addWidget(self.guiWin)
 
-        self.vboxGlobal = QtGui.QVBoxLayout()
-        self.vboxGlobal.addLayout(self.hboxN)
-        self.vboxGlobal.addLayout(self.hboxT)
-        self.vboxGlobal.addLayout(self.hboxD)
+        self.vboxG = QtGui.QVBoxLayout()
+        self.vboxG.addLayout(self.hboxN)
+        self.vboxG.addLayout(self.hboxT)
+        self.vboxG.addLayout(self.hboxD)
 
-        self.setLayout(self.vboxGlobal)
+        self.setLayout(self.vboxG)
 
-        self.connect(self.butMenuNWin,  QtCore.SIGNAL('clicked()'), self.processMenuNWin )
+#        self.connect(self.butMenuNWin,  QtCore.SIGNAL('clicked()'), self.processMenuNWin )
+        self.connect(self.editProjCenterX, QtCore.SIGNAL('editingFinished ()'), self.processEditProjCenterX)
+        self.connect(self.editProjCenterY, QtCore.SIGNAL('editingFinished ()'), self.processEditProjCenterY)
 
         self.showToolTips()
+
+        self.processTabBar()
 
 
 
@@ -107,25 +113,34 @@ class GUISelection ( QtGui.QWidget ) :
     #-------------------
 
     def showToolTips(self):
+        pass
         # Tips for buttons and fields:
         #self            .setToolTip('Click on QUAD or PAIR number using mouse left button')
-        self.butMenuNWin.setToolTip('Click mouse left on this button\nand select the number of windows\nfor selection.')
+        #self.butMenuNWin.setToolTip('Click mouse left on this button\nand select the number of windows\nfor selection.')
 
 
     def resizeEvent(self, e):
-        #print 'resizeEvent' 
+        #print 'resizeEvent'
         self.frame.setGeometry(self.rect())
 
 
     def processQuit(self):
         print 'Quit'
-        cp.confpars.selectionGUIIsOpen = False
+        #cp.confpars.selectionGUIIsOpen = False
         self.close()
 
 
     def closeEvent(self, event):
         print 'closeEvent'
         self.processQuit()
+
+
+    def processEditProjCenterX(self):
+        cp.confpars.projCenterX = int(self.editProjCenterX.displayText())        
+
+
+    def processEditProjCenterY(self):
+        cp.confpars.projCenterY = int(self.editProjCenterY.displayText())        
 
         
     def mousePressEvent(self, event):
@@ -140,27 +155,20 @@ class GUISelection ( QtGui.QWidget ) :
         #print ' global x=%d, y=%d' % (event.globalX(),event.globalY())
 
 
-    def processMenuNWin(self):
-        #print 'MenuNWin'
-        actionSelected = self.popupMenuNWin.exec_(QtGui.QCursor.pos())
-        if actionSelected==None : return
-        cp.confpars.selectionNWindows = int(actionSelected.text())
-        self.butMenuNWin.setText( str(cp.confpars.selectionNWindows) + self.char_expand )
-        self.makeTabBarLayout(mode=1)
-
-
     def makeTabBarLayout(self,mode=None) :
 
         if mode != None : self.tabBar.close()
         self.tabBar = QtGui.QTabBar()
-        #self.tabBar.setMovable(True) 
-        for window in range(cp.confpars.selectionNWindows) :
 
-            indTab = self.tabBar.addTab( 'Region:' + str(window+1) )
-            self.tabBar.setTabTextColor(indTab,QtGui.QColor('blue'))
-            #self.tabBar.setShape(QtGui.QTabBar.RoundedWest)
-            
-        #self.hboxT = QtGui.QHBoxLayout() # it is already defined and added in layout
+        self.indTabXY  = self.tabBar.addTab( 'X and Y' )
+        self.indTabR   = self.tabBar.addTab( 'R'   )
+        self.indTabPhi = self.tabBar.addTab( 'Phi' )
+
+        self.tabBar.setTabTextColor(self.indTabXY,  QtGui.QColor('red'))
+        self.tabBar.setTabTextColor(self.indTabR,   QtGui.QColor('blue'))
+        self.tabBar.setTabTextColor(self.indTabPhi, QtGui.QColor('green'))
+
+
         self.hboxT.addWidget(self.tabBar) 
         self.connect(self.tabBar, QtCore.SIGNAL('currentChanged(int)'), self.processTabBar)
 
@@ -170,11 +178,20 @@ class GUISelection ( QtGui.QWidget ) :
         #print 'TabBar index=',indTab
 
         self.guiWin.close()
-        for window in range(cp.confpars.selectionNWindows) :
-            if indTab == window :
-                self.guiWin = guiselwin.GUISelectionWindow(None, window)
 
-        self.guiWin.setMinimumHeight(150)
+        if indTab == self.indTabXY :
+            self.guiWin = QtGui.QLabel('If the "X and Y" check-box is checked,\n' +
+                                       'the projection plots are suppose to be presented automatically\n' +
+                                       'with appropriate binning for left-mouse-button selected image box.')
+            self.guiWin.setStyleSheet("background-color: rgb(0, 255, 0); color: rgb(0, 0, 255); Text-align: right")
+
+        if indTab == self.indTabR :
+            self.guiWin = guiprojr.GUIWhatToDisplayForProjR()
+
+        if indTab == self.indTabPhi :
+            self.guiWin = guiprojphi.GUIWhatToDisplayForProjPhi()
+
+        self.guiWin.setMinimumHeight(120)
         self.hboxD.addWidget(self.guiWin)
 
 
@@ -199,7 +216,7 @@ class GUISelection ( QtGui.QWidget ) :
 #
 if __name__ == "__main__" :
     app = QtGui.QApplication(sys.argv)
-    ex  = GUISelection()
+    ex  = GUIWhatToDisplayForProjections()
     ex.show()
     app.exec_()
 #-----------------------------

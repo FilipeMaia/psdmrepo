@@ -38,10 +38,11 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import ConfigParameters as cp
-import GUIWhatToDisplayForImage    as wtdIM 
-import GUIWhatToDisplayForCSpad    as wtdCS 
-import GUIWhatToDisplayForWaveform as wtdWF
+import ConfigParameters               as cp
+import GUIWhatToDisplayForImage       as wtdIM 
+import GUIWhatToDisplayForCSpad       as wtdCS 
+import GUIWhatToDisplayForWaveform    as wtdWF
+import GUIWhatToDisplayForProjections as wtdPR
 
 #---------------------
 #  Class definition --
@@ -80,19 +81,23 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
         self.titImage    = QtGui.QLabel('Image')
         self.titCSpad    = QtGui.QLabel('SCpad')
-        self.titWaveform = QtGui.QLabel('Waveform')
+        self.titWaveform = QtGui.QLabel('Other')
 
         self.titImage   .setFont (titFont) 
         self.titCSpad   .setFont (titFont) 
         self.titWaveform.setFont (titFont) 
         
-        self.titCSImage    = QtGui.QLabel('Images:')
-        self.titCSSpectra  = QtGui.QLabel('Spectra:')
-        self.titCSImageSpec= QtGui.QLabel('Image & Spectrum:')
+        self.titCSImage       = QtGui.QLabel('Images:')
+        self.titCSSpectra     = QtGui.QLabel('Spectra:')
+        self.titCSImageSpec   = QtGui.QLabel('Image & Spectrum:')
+        self.titCSProjections = QtGui.QLabel('Projections:')
 
         self.cboxIMImage       = QtGui.QCheckBox('Image',            self)
         self.cboxIMSpectrum    = QtGui.QCheckBox('Spectrum',         self)
         self.cboxIMImageSpec   = QtGui.QCheckBox('Image and Spectrum', self)
+        self.cboxIMProjXY      = QtGui.QCheckBox('X and Y',       self)
+        self.cboxIMProjR       = QtGui.QCheckBox('R',             self)
+        self.cboxIMProjPhi     = QtGui.QCheckBox('Phi',           self)
         
         self.cboxCSImageQuad   = QtGui.QCheckBox('Quad',          self)
         self.cboxCSImageDet    = QtGui.QCheckBox('Detector',      self)
@@ -100,12 +105,20 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.cboxCSImageOfPair = QtGui.QCheckBox('1 of 2x1',      self)
         self.cboxCSSpectrum    = QtGui.QCheckBox('16 ASICs',      self)
         self.cboxCSSpectrum08  = QtGui.QCheckBox('8 of 2x1',      self)
+        self.cboxCSProjXY      = QtGui.QCheckBox('X and Y',       self)
+        self.cboxCSProjR       = QtGui.QCheckBox('R',             self)
+        self.cboxCSProjPhi     = QtGui.QCheckBox('Phi',           self)
 
-        self.cboxWFWaveform    = QtGui.QCheckBox('Waveform',      self)
+        self.cboxWFWaveform    = QtGui.QCheckBox('Waveform',          self)
+        self.cboxED            = QtGui.QCheckBox('Par vs event No.',  self)
+        self.cboxCO            = QtGui.QCheckBox('Correlations',      self)
 
         if cp.confpars.imageImageIsOn       : self.cboxIMImage       .setCheckState(2)
         if cp.confpars.imageSpectrumIsOn    : self.cboxIMSpectrum    .setCheckState(2)
         if cp.confpars.imageImageSpecIsOn   : self.cboxIMImageSpec   .setCheckState(2)
+        if cp.confpars.imageProjXYIsOn      : self.cboxIMProjXY      .setCheckState(2)
+        if cp.confpars.imageProjRIsOn       : self.cboxIMProjR       .setCheckState(2)
+        if cp.confpars.imageProjPhiIsOn     : self.cboxIMProjPhi     .setCheckState(2)
 
         if cp.confpars.cspadImageOfPairIsOn : self.cboxCSImageOfPair .setCheckState(2)
         if cp.confpars.cspadImageIsOn       : self.cboxCSImage       .setCheckState(2)
@@ -113,7 +126,13 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         if cp.confpars.cspadImageDetIsOn    : self.cboxCSImageDet    .setCheckState(2)
         if cp.confpars.cspadSpectrumIsOn    : self.cboxCSSpectrum    .setCheckState(2)
         if cp.confpars.cspadSpectrum08IsOn  : self.cboxCSSpectrum08  .setCheckState(2)
+        if cp.confpars.cspadProjXYIsOn      : self.cboxCSProjXY      .setCheckState(2)
+        if cp.confpars.cspadProjRIsOn       : self.cboxCSProjR       .setCheckState(2)
+        if cp.confpars.cspadProjPhiIsOn     : self.cboxCSProjPhi     .setCheckState(2)
+
         if cp.confpars.waveformWaveformIsOn : self.cboxWFWaveform    .setCheckState(2)
+        if cp.confpars.perEventDistIsOn     : self.cboxED            .setCheckState(2)
+        if cp.confpars.correlationsIsOn     : self.cboxCO            .setCheckState(2)
 
         self.butClose      = QtGui.QPushButton('Quit')
 
@@ -134,25 +153,40 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         gridCS.addWidget(self. titCSImageSpec,  3, 0)
         gridCS.addWidget(self.cboxCSImageOfPair,3, 1)
 
+        gridCS.addWidget(self. titCSProjections,4, 0)
+        gridCS.addWidget(self.cboxCSProjXY,     4, 1)
+        gridCS.addWidget(self.cboxCSProjR,      4, 2)
+        gridCS.addWidget(self.cboxCSProjPhi,    4, 3)
         
         gridIM = QtGui.QGridLayout()
         gridIM.addWidget(self.titImage,         0, 0)
         gridIM.addWidget(self.cboxIMImage,      1, 0)
         gridIM.addWidget(self.cboxIMSpectrum,   1, 1)
         gridIM.addWidget(self.cboxIMImageSpec,  1, 2, 1, 2)
+        gridIM.addWidget(self.cboxIMProjXY,     2, 0)
+        gridIM.addWidget(self.cboxIMProjR,      2, 1)
+        gridIM.addWidget(self.cboxIMProjPhi,    2, 2)
         
         gridWF = QtGui.QGridLayout()
         gridWF.addWidget(self.titWaveform,      0, 0)
         gridWF.addWidget(self.cboxWFWaveform,   1, 0)
+        gridWF.addWidget(self.cboxED,           1, 1)
+        gridWF.addWidget(self.cboxCO,           1, 2)
 
         self.tabBar   = QtGui.QTabBar()
         self.indTabCS = self.tabBar.addTab('CSpad')
         self.indTabIM = self.tabBar.addTab('Image')
         self.indTabWF = self.tabBar.addTab('Waveform')
+        self.indTabPR = self.tabBar.addTab('Proj.')
+        self.indTabED = self.tabBar.addTab('1D vs ev.')
+        self.indTabCO = self.tabBar.addTab('Corr.')
 
         self.tabBar.setTabTextColor(self.indTabCS,QtGui.QColor('red'))
         self.tabBar.setTabTextColor(self.indTabIM,QtGui.QColor('blue'))
         self.tabBar.setTabTextColor(self.indTabWF,QtGui.QColor('green'))
+        self.tabBar.setTabTextColor(self.indTabPR,QtGui.QColor('magenta'))
+        self.tabBar.setTabTextColor(self.indTabED,QtGui.QColor('yellow'))
+        self.tabBar.setTabTextColor(self.indTabCO,QtGui.QColor('white'))
         
         self.hboxT = QtGui.QHBoxLayout()
         self.hboxT.addWidget(self.tabBar) 
@@ -181,19 +215,30 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.vbox.addLayout(self.hboxC)
 
         self.setLayout(self.vbox)
+  
+        self.connect(self.butClose,            QtCore.SIGNAL('clicked()'),           self.processClose )
+        self.connect(self.cboxIMImage,         QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxIMImage)
+        self.connect(self.cboxIMImageSpec,     QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxIMImageSpec)
+        self.connect(self.cboxIMSpectrum,      QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxIMSpectrum)
+        self.connect(self.cboxIMProjXY,        QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxIMProjXY)
+        self.connect(self.cboxIMProjR,         QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxIMProjR)
+        self.connect(self.cboxIMProjPhi,       QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxIMProjPhi)
 
-        self.connect(self.butClose,            QtCore.SIGNAL('clicked()'),         self.processClose )
-        self.connect(self.cboxIMImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMImage)
-        self.connect(self.cboxIMImageSpec,     QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMImageSpec)
-        self.connect(self.cboxIMSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxIMSpectrum)
-        self.connect(self.cboxCSImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSImage)
-        self.connect(self.cboxCSImageQuad,     QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSImageQuad)
-        self.connect(self.cboxCSImageDet,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSImageDet)
-        self.connect(self.cboxCSImageOfPair,   QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSImageOfPair)
-        self.connect(self.cboxCSSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSSpectrum)
-        self.connect(self.cboxCSSpectrum08,    QtCore.SIGNAL('stateChanged(int)'), self.processCBoxCSSpectrum08)
-        self.connect(self.cboxWFWaveform,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFWaveform)
-        self.connect(self.tabBar,              QtCore.SIGNAL('currentChanged(int)'),self.processTabBar)
+        self.connect(self.cboxCSImage,         QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSImage)
+        self.connect(self.cboxCSImageQuad,     QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSImageQuad)
+        self.connect(self.cboxCSImageDet,      QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSImageDet)
+        self.connect(self.cboxCSImageOfPair,   QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSImageOfPair)
+        self.connect(self.cboxCSSpectrum,      QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSSpectrum)
+        self.connect(self.cboxCSSpectrum08,    QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSSpectrum08)
+        self.connect(self.cboxCSProjXY,        QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSProjXY)
+        self.connect(self.cboxCSProjR,         QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSProjR)
+        self.connect(self.cboxCSProjPhi,       QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSProjPhi)
+
+        self.connect(self.cboxWFWaveform,      QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxWFWaveform)
+        self.connect(self.cboxED,              QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxED)
+        self.connect(self.cboxCO,              QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCO)
+
+        self.connect(self.tabBar,              QtCore.SIGNAL('currentChanged(int)'), self.processTabBar)
 
 
     def showToolTips(self):
@@ -232,31 +277,109 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
             self.guiTab = wtdIM.GUIWhatToDisplayForImage()
         if indTab == self.indTabWF :
             self.guiTab = wtdWF.GUIWhatToDisplayForWaveform()
+        if indTab == self.indTabPR :
+            self.guiTab = wtdPR.GUIWhatToDisplayForProjections()
+
+        if indTab == self.indTabED :
+            self.guiTab = QtGui.QLabel('Sorry, this GUI is not implemented yet.\n' + 
+                                       'Will select 1-D parameters for plot vs event number.')
+        if indTab == self.indTabCO :
+            self.guiTab = QtGui.QLabel('Sorry, this GUI is not implemented yet.\n' + 
+                                       'Will select 1-D parameters for correlation plots.')
 
         self.guiTab.setMinimumHeight(200)
         self.hboxD.addWidget(self.guiTab)
+        
+
+    def processCBoxED(self, value):
+        if self.cboxED.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabED)
+            cp.confpars.perEventDistIsOn = True
+        else:
+            cp.confpars.perEventDistIsOn = False
+
+
+    def processCBoxCO(self, value):
+        if self.cboxCO.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabCO)
+            cp.confpars.correlationsIsOn = True
+        else:
+            cp.confpars.correlationsIsOn = False
+
+
+    def processCBoxIMProjXY(self, value):
+        if self.cboxIMProjXY.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabPR)
+            self.guiTab.tabBar.setCurrentIndex(0) # 0 stands for X-Y
+            cp.confpars.imageProjXYIsOn = True
+        else:
+            cp.confpars.imageProjXYIsOn = False
+
+
+    def processCBoxIMProjR(self, value):
+        if self.cboxIMProjR.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabPR)
+            self.guiTab.tabBar.setCurrentIndex(1) # 1 stands for R
+            cp.confpars.imageProjRIsOn = True
+        else:
+            cp.confpars.imageProjRIsOn = False
+
+
+    def processCBoxIMProjPhi(self, value):
+        if self.cboxIMProjPhi.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabPR)
+            self.guiTab.tabBar.setCurrentIndex(2) # 2 stands for Phi
+            cp.confpars.imageProjPhiIsOn = True
+        else:
+            cp.confpars.imageProjPhiIsOn = False
+
+
+    def processCBoxCSProjXY(self, value):
+        if self.cboxCSProjXY.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabPR)
+            self.guiTab.tabBar.setCurrentIndex(0) # 0 stands for X-Y
+            cp.confpars.cspadProjXYIsOn = True
+        else:
+            cp.confpars.cspadProjXYIsOn = False
+
+
+    def processCBoxCSProjR(self, value):
+        if self.cboxCSProjR.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabPR)
+            self.guiTab.tabBar.setCurrentIndex(1) # 1 stands for R
+            cp.confpars.cspadProjRIsOn = True
+        else:
+            cp.confpars.cspadProjRIsOn = False
+
+
+    def processCBoxCSProjPhi(self, value):
+        if self.cboxCSProjPhi.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabPR)
+            self.guiTab.tabBar.setCurrentIndex(2) # 2 stands for Phi
+            cp.confpars.cspadProjPhiIsOn = True
+        else:
+            cp.confpars.cspadProjPhiIsOn = False
 
 
     def processCBoxIMImage(self, value):
         if self.cboxIMImage.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabIM)
             cp.confpars.imageImageIsOn = True
-            #if cp.confpars.wtdIMWindowIsOpen : self.guiwtdIM.cboxIMImage.setCheckState(2)
         else:
             cp.confpars.imageImageIsOn = False
-            #if cp.confpars.wtdIMWindowIsOpen : self.guiwtdIM.cboxIMImage.setCheckState(0)
 
 
     def processCBoxIMSpectrum(self, value):
         if self.cboxIMSpectrum.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabIM)
             cp.confpars.imageSpectrumIsOn = True
-            #if cp.confpars.wtdIMWindowIsOpen : self.guiwtdIM.cboxIMSpectrum.setCheckState(2)
         else:
             cp.confpars.imageSpectrumIsOn = False
-            #if cp.confpars.wtdIMWindowIsOpen : self.guiwtdIM.cboxIMSpectrum.setCheckState(0)
 
 
     def processCBoxIMImageSpec(self, value):
         if self.cboxIMImageSpec.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabIM)
             cp.confpars.imageImageSpecIsOn = True
         else:
             cp.confpars.imageImageSpecIsOn = False
@@ -264,16 +387,15 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
     def processCBoxCSImage(self, value):
         if self.cboxCSImage.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabCS)
             cp.confpars.cspadImageIsOn = True
-            #if cp.confpars.wtdCSWindowIsOpen : self.guiwtdCS.cboxCSImage.setCheckState(2)
         else:
             cp.confpars.cspadImageIsOn = False
-            #if cp.confpars.wtdCSWindowIsOpen : self.guiwtdCS.cboxCSImage.setCheckState(0)
 
 
     def processCBoxCSImageOfPair(self, value):
-        print 'processCBoxCSImageOfPair'
         if self.cboxCSImageOfPair.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabCS)
             cp.confpars.cspadImageOfPairIsOn = True
         else:
             cp.confpars.cspadImageOfPairIsOn = False
@@ -281,6 +403,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
     def processCBoxCSImageQuad(self, value):
         if self.cboxCSImageQuad.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabCS)
             cp.confpars.cspadImageQuadIsOn = True
         else:
             cp.confpars.cspadImageQuadIsOn = False
@@ -288,6 +411,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
     def processCBoxCSImageDet(self, value):
         if self.cboxCSImageDet.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabCS)
             cp.confpars.cspadImageDetIsOn = True
         else:
             cp.confpars.cspadImageDetIsOn = False
@@ -295,15 +419,15 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
     def processCBoxCSSpectrum(self, value):
         if self.cboxCSSpectrum.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabCS)
             cp.confpars.cspadSpectrumIsOn = True
-            #if cp.confpars.wtdCSWindowIsOpen : self.guiwtdCS.cboxCSSpectrum.setCheckState(2)
         else:
             cp.confpars.cspadSpectrumIsOn = False
-            #if cp.confpars.wtdCSWindowIsOpen : self.guiwtdCS.cboxCSSpectrum.setCheckState(0)
 
 
     def processCBoxCSSpectrum08(self, value):
         if self.cboxCSSpectrum08.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabCS)
             cp.confpars.cspadSpectrum08IsOn = True
         else:
             cp.confpars.cspadSpectrum08IsOn = False
@@ -311,6 +435,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
     def processCBoxWFWaveform(self, value):
         if self.cboxWFWaveform.isChecked():
+            self.tabBar.setCurrentIndex(self.indTabWF)
             cp.confpars.waveformWaveformIsOn = True
         else:
             cp.confpars.waveformWaveformIsOn = False

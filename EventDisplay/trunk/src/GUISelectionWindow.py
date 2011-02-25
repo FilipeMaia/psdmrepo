@@ -87,7 +87,7 @@ class GUISelectionWindow ( QtGui.QWidget ) :
         self.editSelectionYmin  .setMaximumWidth(width)
         self.editSelectionYmax  .setMaximumWidth(width)
 
-        self.editSelectionThr   .setMaximumHeight(height)
+        self.editSelectionThr   .setMaximumHeight(45)
         self.editSelectionXmin  .setMaximumHeight(height)
         self.editSelectionXmax  .setMaximumHeight(height)
         self.editSelectionYmin  .setMaximumHeight(height)
