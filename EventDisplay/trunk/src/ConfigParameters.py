@@ -289,6 +289,35 @@ class ConfigParameters ( object ) :
         print 'PER_EVENT_DIST_IS_ON',      self.perEventDistIsOn
         print 'CORRELATIONS_IS_ON',        self.correlationsIsOn
 
+        print 'PROJ_CENTER_X',             self.projCenterX         
+        print 'PROJ_CENTER_Y',             self.projCenterY         
+                                          
+        print 'PROJ_R_BIN_WIDTH_IS_ON',    self.projR_BinWidthIsOn  
+        print 'PROJ_R_SLI_WIDTH_IS_ON',    self.projR_SliWidthIsOn  
+                                          
+        print 'PROJ_R_N_BINS',             self.projR_NBins         
+        print 'PROJ_R_BIN_WIDTH',          self.projR_BinWidth      
+        print 'PROJ_R_NSLICES',            self.projR_NSlices       
+        print 'PROJ_R_SLICE_WIDTH',        self.projR_SliWidth      
+                                          
+        print 'PROJ_R_RMIN',               self.projR_Rmin          
+        print 'PROJ_R_RMAX',               self.projR_Rmax          
+        print 'PROJ_R_PHIMIN',             self.projR_Phimin        
+        print 'PROJ_R_PHIMAX',             self.projR_Phimax        
+                                          
+        print 'PROJ_PHI_BIN_WIDTH_IS_ON',  self.projPhi_BinWidthIsOn
+        print 'PROJ_PHI_SLI_WIDTH_IS_ON',  self.projPhi_SliWidthIsOn
+                                                                  
+        print 'PROJ_PHI_N_BINS',           self.projPhi_NBins       
+        print 'PROJ_PHI_BIN_WIDTH',        self.projPhi_BinWidth    
+        print 'PROJ_PHI_NSLICES',          self.projPhi_NSlices     
+        print 'PROJ_PHI_SLICE_WIDTH',      self.projPhi_SliWidth    
+                                                                  
+        print 'PROJ_PHI_RMIN',             self.projPhi_Rmin        
+        print 'PROJ_PHI_RMAX',             self.projPhi_Rmax        
+        print 'PROJ_PHI_PHIMIN',           self.projPhi_Phimin      
+        print 'PROJ_PHI_PHIMAX',           self.projPhi_Phimax      
+
         print 70*'='
 
 
@@ -366,6 +395,31 @@ class ConfigParameters ( object ) :
                 elif key == 'SELEC_XMAX'               : self.selectionWindowParameters[win][3] = int(val)
                 elif key == 'SELEC_YMIN'               : self.selectionWindowParameters[win][4] = int(val)
                 elif key == 'SELEC_YMAX'               : self.selectionWindowParameters[win][5] = int(val)
+
+                elif key == 'PROJ_CENTER_X'            : self.projCenterX           = int(val)
+                elif key == 'PROJ_CENTER_Y'            : self.projCenterY           = int(val)
+                                                                                   
+                elif key == 'PROJ_R_BIN_WIDTH_IS_ON'   : self.projR_BinWidthIsOn    = dicBool[val.lower()]
+                elif key == 'PROJ_R_SLI_WIDTH_IS_ON'   : self.projR_SliWidthIsOn    = dicBool[val.lower()]
+                elif key == 'PROJ_R_N_BINS'            : self.projR_NBins           = int(val)
+                elif key == 'PROJ_R_BIN_WIDTH'         : self.projR_BinWidth        = int(val)
+                elif key == 'PROJ_R_NSLICES'           : self.projR_NSlices         = int(val)
+                elif key == 'PROJ_R_SLICE_WIDTH'       : self.projR_SliWidth        = int(val)
+                elif key == 'PROJ_R_RMIN'              : self.projR_Rmin            = int(val)
+                elif key == 'PROJ_R_RMAX'              : self.projR_Rmax            = int(val)
+                elif key == 'PROJ_R_PHIMIN'            : self.projR_Phimin          = int(val)
+                elif key == 'PROJ_R_PHIMAX'            : self.projR_Phimax          = int(val)
+                                                                                   
+                elif key == 'PROJ_PHI_BIN_WIDTH_IS_ON' : self.projPhi_BinWidthIsOn  = dicBool[val.lower()]
+                elif key == 'PROJ_PHI_SLI_WIDTH_IS_ON' : self.projPhi_SliWidthIsOn  = dicBool[val.lower()]
+                elif key == 'PROJ_PHI_N_BINS'          : self.projPhi_NBins         = int(val)
+                elif key == 'PROJ_PHI_BIN_WIDTH'       : self.projPhi_BinWidth      = int(val)
+                elif key == 'PROJ_PHI_NSLICES'         : self.projPhi_NSlices       = int(val)
+                elif key == 'PROJ_PHI_SLICE_WIDTH'     : self.projPhi_SliWidth      = int(val)
+                elif key == 'PROJ_PHI_RMIN'            : self.projPhi_Rmin          = int(val)
+                elif key == 'PROJ_PHI_RMAX'            : self.projPhi_Rmax          = int(val)
+                elif key == 'PROJ_PHI_PHIMIN'          : self.projPhi_Phimin        = int(val)
+                elif key == 'PROJ_PHI_PHIMAX'          : self.projPhi_Phimax        = int(val)
 
                 else : print 'The record : %s %s \n is UNKNOWN in readParameters()' % (key, val) 
             f.close()
@@ -449,6 +503,33 @@ class ConfigParameters ( object ) :
             f.write('SELEC_YMAX'            + space + str(self.selectionWindowParameters[win][5] )       + '\n')
             f.write('NUM_EVENTS_FOR_AVERAGE'+ space + str( self.numEventsAverage )                       + '\n')
             f.write('SELECTION_IS_ON'       + space + str( self.selectionIsOn )                          + '\n')
+
+
+        f.write('PROJ_CENTER_X'                     + space + str(self.projCenterX         )       + '\n')
+        f.write('PROJ_CENTER_Y'                     + space + str(self.projCenterY         )       + '\n')
+                                                                                           
+        f.write('PROJ_R_BIN_WIDTH_IS_ON'            + space + str(self.projR_BinWidthIsOn  )       + '\n')
+        f.write('PROJ_R_SLI_WIDTH_IS_ON'            + space + str(self.projR_SliWidthIsOn  )       + '\n')
+        f.write('PROJ_R_N_BINS'                     + space + str(self.projR_NBins         )       + '\n')
+        f.write('PROJ_R_BIN_WIDTH'                  + space + str(self.projR_BinWidth      )       + '\n')
+        f.write('PROJ_R_NSLICES'                    + space + str(self.projR_NSlices       )       + '\n')
+        f.write('PROJ_R_SLICE_WIDTH'                + space + str(self.projR_SliWidth      )       + '\n')
+        f.write('PROJ_R_RMIN'                       + space + str(self.projR_Rmin          )       + '\n')
+        f.write('PROJ_R_RMAX'                       + space + str(self.projR_Rmax          )       + '\n')
+        f.write('PROJ_R_PHIMIN'                     + space + str(self.projR_Phimin        )       + '\n')
+        f.write('PROJ_R_PHIMAX'                     + space + str(self.projR_Phimax        )       + '\n')
+                                                                                           
+        f.write('PROJ_PHI_BIN_WIDTH_IS_ON'          + space + str(self.projPhi_BinWidthIsOn)       + '\n')
+        f.write('PROJ_PHI_SLI_WIDTH_IS_ON'          + space + str(self.projPhi_SliWidthIsOn)       + '\n')
+        f.write('PROJ_PHI_N_BINS'                   + space + str(self.projPhi_NBins       )       + '\n')
+        f.write('PROJ_PHI_BIN_WIDTH'                + space + str(self.projPhi_BinWidth    )       + '\n')
+        f.write('PROJ_PHI_NSLICES'                  + space + str(self.projPhi_NSlices     )       + '\n')
+        f.write('PROJ_PHI_SLICE_WIDTH'              + space + str(self.projPhi_SliWidth    )       + '\n')
+        f.write('PROJ_PHI_RMIN'                     + space + str(self.projPhi_Rmin        )       + '\n')
+        f.write('PROJ_PHI_RMAX'                     + space + str(self.projPhi_Rmax        )       + '\n')
+        f.write('PROJ_PHI_PHIMIN'                   + space + str(self.projPhi_Phimin      )       + '\n')
+        f.write('PROJ_PHI_PHIMAX'                   + space + str(self.projPhi_Phimax      )       + '\n')
+
         f.close()
 
 
