@@ -1,0 +1,20 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package DataPortal
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Brief description:
+==================
+
+The Web-based Data Portal.
+
+Detailed description:
+=====================
+
+The package provides both Web UI applications and PHP based back-end services
+implementingf the Portal.
