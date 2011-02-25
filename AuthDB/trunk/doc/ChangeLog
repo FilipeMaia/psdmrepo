@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag:  V00-00-15
+2011-02-25 Igor Gaponenko
+- extended API to support experiment switch
+
 Tag:  V00-00-14
 2010-10-20 Igor Gaponenko
 - finished implementing manage my POSIX groups editor

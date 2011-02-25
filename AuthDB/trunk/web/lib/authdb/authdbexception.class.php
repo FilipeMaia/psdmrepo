@@ -20,7 +20,7 @@ require_once( 'authdb.inc.php' );
  *
  * @author gapon
  */
-class AuthDBException extends Exception {
+class AuthDBException extends \Exception {
 
     /*
      * Data members

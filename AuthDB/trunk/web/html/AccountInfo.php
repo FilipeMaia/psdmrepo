@@ -7,6 +7,7 @@ use AuthDB\AuthDB;
 use AuthDB\AuthDBException;
 
 use RegDB\RegDB;
+use RegDB\RegDBAuth;
 use RegDB\RegDBHtml;
 
 /*
@@ -55,7 +56,7 @@ try {
     
     /* Create a container with standard fields
      */
-    $con = new RegDBHtml( 0, 0, 800, 480 );
+    $con = new RegDBHtml( 0, 0, 1000, 480 );
     $con->label(   0,   0, 'Name:'   )->value( 80,   0, $account['gecos'], false )->hidden_action( 'user:gecos', $account['gecos'] )
         ->label(   0,  25, 'UID:'    )->value( 80,  25, $account['uid'],   false )->hidden_action( 'user:uid',   $account['uid'] )
         ->label(   0,  50, 'E-Mail:' )->value( 80,  50, $account['email'], false )->hidden_action( 'user:email', $account['email'] );

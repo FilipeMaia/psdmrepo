@@ -1520,7 +1520,7 @@ function view_account( uid ) {
         '<div id="actions_container">'+
         '  <button id="edit_button" title="edit group membership for this account">Edit</button>'+
         '</div>'+
-        '<div style="margin-top:25px; width:800px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
+        '<div style="margin-top:25px; width:1000px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
         '  <form name="account_edit_form">'+
         '    <div id="account_edit_form_params">Loading...</div>'+
         '  </form>'+
@@ -1548,7 +1548,7 @@ function edit_account( uid ) {
         '  <button id="save_button">Save</button>'+
         '  <button id="cancel_button">Cancel</button>'+
         '</div>'+
-        '<div style="margin-top:25px; width:800px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
+        '<div style="margin-top:25px; width:1000px; background-color:#f0f0f0; padding-left:25px; padding-right:25px; padding-top:25px; padding-bottom:25px; overflow:auto;">'+
         '  <form name="account_edit_form" action="ProcessAccountEdit.php" method="post">'+
         '    <div id="account_edit_form_params">Loading...</div>'+
         '    <input type="hidden" name="actionSuccess" value="view_account" />'+

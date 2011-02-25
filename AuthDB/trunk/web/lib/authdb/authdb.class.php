@@ -141,6 +141,95 @@ HERE;
         return $list;
     }
 
+    /**
+     * Get user roles in a context of instruments/experiments.
+     * 
+     * All parameters to the method are optional. The default value (null) of
+     * the parameter implies all possible values of the paramer. The result is
+     * returned as a list of triplets sorted by instrument and experiment names.
+     * 
+     * @param string $user
+     * @param string $application
+     * @param string $instrument
+     * @param string $experiment
+     * @return array( 'instr'=> string, 'instr' => string, 'role' => AuthDBRole )
+     */
+    public function roles_by( $user=null, $application=null, $instrument=null, $experiment=null ) {
+
+    	$user_selector        = !$user        ? '' : " AND u.user='{$user}'";
+    	$application_selector = !$application ? '' : " AND r.app='{$application}'";
+    	$instrument_selector  = !$instrument  ? '' : " AND i.name='{$instrument}'";
+    	$experiment_selector  = !$experiment  ? '' : " AND e.name='{$experiment}'";
+
+    	$sql =<<<HERE
+
+SELECT u.user AS 'user',
+       r.id   AS 'id',
+       r.name AS 'name',
+       r.app  AS 'app',
+       i.name AS 'instr',
+       e.name AS 'exper',
+       e.id   AS 'exper_id'
+
+       FROM user `u`,
+            role `r`,
+            regdb.experiment `e`,
+            regdb.instrument `i`
+
+       WHERE u.role_id IN (SELECT id FROM role)
+         AND u.role_id=r.id
+         AND u.exp_id=e.id
+         AND i.id=e.instr_id
+         {$user_selector}
+         {$application_selector}
+         {$instrument_selector}
+         {$experiment_selector}
+
+UNION
+
+SELECT u.user,
+       r.id,
+       r.name,
+       r.app,
+       '*',
+       '*',
+       '*'
+
+       FROM user `u`,
+            role `r`
+
+       WHERE r.id IN (SELECT id FROM role)
+         AND u.role_id=r.id
+         AND u.exp_id IS NULL
+         {$user_selector}
+         {$application_selector}
+
+ORDER BY instr,exper,user,app,name
+
+HERE;
+
+        $result = $this->connection->query ( $sql );
+		$nrows = mysql_numrows( $result );
+    	$list = array();
+        for( $i = 0; $i < $nrows; $i++ ) {
+        	$attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+            array_push (
+                $list,
+                array (
+                	'instr'    => $attr['instr'   ],
+                	'exper'    => $attr['exper'   ],
+                	'exper_id' => $attr['exper_id'],
+                    'role'     => new AuthDBRole (
+                    	$this->connection,
+                    	$this,
+                    	$attr
+                    )
+                )
+            );
+        }
+        return $list;
+    }
+
     public function roles_by_id( $role_id ) {
 
         $list = array();
@@ -404,6 +493,15 @@ HERE;
         $exper_id_attr = is_null( $exper_id ) ? 'NULL' : $exper_id;
         $this->connection->query ( "INSERT INTO {$this->connection->database}.user VALUES(NULL,{$exper_id_attr},'{$player}',(SELECT id FROM {$this->connection->database}.role WHERE name='{$role}' AND app='{$application}'))" );
     }
+
+    public function deleteRolePlayer( $application, $role, $exper_id, $player ) {
+        $exper_id_attr = is_null( $exper_id ) ? 'IS NULL' : "={$exper_id}";
+        $sql = "DELETE FROM {$this->connection->database}.user ".
+        	   "WHERE user='{$player}' ".
+               "AND   role_id=(SELECT id FROM {$this->connection->database}.role WHERE name='{$role}' AND app='{$application}') ".
+               "AND   exp_id {$exper_id_attr}";
+        $this->connection->query( $sql );
+    }
 }
 
 /*
@@ -413,7 +511,7 @@ try {
     $authdb = new AuthDB();
     $authdb->begin();
 
-    $roles = $authdb->roles_by_id(12);
+    $roles = $authdb->roles_by( 'xppopr', 'LogBook', 'XPP' );
     print_r($roles);
 
     $authdb->commit();
@@ -422,7 +520,6 @@ try {
     print( $e->toHtml());
 }
 */
-
 /*
  * Unit tests
  *

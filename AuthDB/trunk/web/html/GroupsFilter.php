@@ -6,7 +6,9 @@ require_once( 'regdb/regdb.inc.php' );
 use AuthDB\AuthDBException;
 
 use RegDB\RegDB;
+use RegDB\RegDBAuth;
 use RegDB\RegDBHtml;
+use RegDB\RegDBException;
 
 /*
  * This script will generate a module with input elements for the filter form
