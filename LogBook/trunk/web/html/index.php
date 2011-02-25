@@ -1074,8 +1074,8 @@ function create_messages_dialog( scope, shift_id, run_id ) {
     else if( scope == "run"        ) { scope_str = 'run_id='+run_id; }
 
     var text2search='',
-        search_in_messages=true, search_in_tags=true, search_in_values=true,
-        posted_at_experiment=true, posted_at_shifts=true, posted_at_runs=true,
+        search_in_messages=true, search_in_tags=false, search_in_values=false,
+        posted_at_instrument=false, posted_at_experiment=true, posted_at_shifts=true, posted_at_runs=true,
         begin='', end='',
         tag='',
         author='',
@@ -1084,7 +1084,7 @@ function create_messages_dialog( scope, shift_id, run_id ) {
         scope_str,
         text2search,
         search_in_messages, search_in_tags, search_in_values,
-        posted_at_experiment, posted_at_shifts, posted_at_runs,
+        posted_at_instrument, posted_at_experiment, posted_at_shifts, posted_at_runs,
         begin, end,
         tag,
         author,
@@ -2162,15 +2162,15 @@ function display_history( type, data ) {
     }
     var scope='',
         text2search='',
-        search_in_messages=true, search_in_tags=true, search_in_values=true,
-        posted_at_experiment=true, posted_at_shifts=true, posted_at_runs=true,
+        search_in_messages=true, search_in_tags=false, search_in_values=false,
+        posted_at_instrument=false, posted_at_experiment=true, posted_at_shifts=true, posted_at_runs=true,
         tag='',
         author='';
-    display_messages_table(
+    current_messages_table = display_messages_table(
         scope,
         text2search,
         search_in_messages, search_in_tags, search_in_values,
-        posted_at_experiment, posted_at_shifts, posted_at_runs,
+        posted_at_instrument, posted_at_experiment, posted_at_shifts, posted_at_runs,
         begin, end,
         tag,
         author,
@@ -3037,6 +3037,7 @@ var last_display_scope,
     last_display_search_in_messages,
     last_display_search_in_tags,
     last_display_search_in_values,
+    last_display_posted_at_instrument,
     last_display_posted_at_experiment,
     last_display_posted_at_shifts,
     last_display_posted_at_runs,
@@ -3051,12 +3052,13 @@ var last_display_scope,
 
 function re_display_messages_table() {
 	last_limit_per_view = document.search_display_form.limit_per_view.options[document.search_display_form.limit_per_view.selectedIndex].value;
-    display_messages_table(
+	current_messages_table = display_messages_table(
         last_display_scope,
         last_display_text2search,
         last_display_search_in_messages,
         last_display_search_in_tags,
         last_display_search_in_values,
+        last_display_posted_at_instrument,
         last_display_posted_at_experiment,
         last_display_posted_at_shifts,
         last_display_posted_at_runs,
@@ -3076,6 +3078,7 @@ function display_messages_table(
     search_in_messages,
     search_in_tags,
     search_in_values,
+    posted_at_instrument,
     posted_at_experiment,
     posted_at_shifts,
     posted_at_runs,
@@ -3095,6 +3098,7 @@ function display_messages_table(
     last_display_search_in_messages = search_in_messages;
     last_display_search_in_tags = search_in_tags;
     last_display_search_in_values = search_in_values;
+    last_display_posted_at_instrument = posted_at_instrument;
     last_display_posted_at_experiment = posted_at_experiment;
     last_display_posted_at_shifts = posted_at_shifts;
     last_display_posted_at_runs = posted_at_runs,
@@ -3114,6 +3118,7 @@ function display_messages_table(
         '&search_in_messages='+(search_in_messages ? '1' : '0')+
         '&search_in_tags='+(search_in_tags ? '1' : '0')+
         '&search_in_values='+(search_in_values ? '1' : '0')+
+        '&posted_at_instrument='+(posted_at_instrument ? '1' : '0')+
         '&posted_at_experiment='+(posted_at_experiment ? '1' : '0')+
         '&posted_at_shifts='+(posted_at_shifts ? '1' : '0')+
         '&posted_at_runs='+(posted_at_runs ? '1' : '0')+
@@ -3288,8 +3293,11 @@ function display_messages_table(
         }
     }
     function callback_on_failure( http_status ) {
-        document.getElementById('messages_area').innerHTML=
-            '<b><em style="color:red;" >Error</em></b>&nbsp;Request failed. HTTP status: '+http_status;
+
+    	// Wait for some time then retry as if the browser's 'Refresh' button
+    	// was pressed. Don't bother showing error code to users.
+        //
+        delayed_call( 60000, re_display_messages_table );
     }
     load_then_call( this.url, callback_on_load, callback_on_failure );
 
@@ -3333,12 +3341,13 @@ function search_and_display() {
     var tag = document.search_form.tag.options[document.search_form.tag.selectedIndex].value;
     var author = document.search_form.author.options[document.search_form.author.selectedIndex].value;
 
-    display_messages_table(
+    current_messages_table = display_messages_table(
         scope,
         document.search_form.text2search.value,
         document.search_form.search_in_messages.checked,
         document.search_form.search_in_tags.checked,
         document.search_form.search_in_values.checked,
+        document.search_form.posted_at_instrument.checked,
         document.search_form.posted_at_experiment.checked,
         document.search_form.posted_at_shifts.checked,
         document.search_form.posted_at_runs.checked,
@@ -3351,25 +3360,9 @@ function search_and_display() {
         false /* auto_refresh */ );
 }
 
-function search_contents() {
+function load_search_form( accross_instrument ) {
 
-    set_context (
-        '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
-        'Find Messages >' );
-
-    reset_navarea();
-    reset_workarea();
-
-    var workarea = document.getElementById('workarea');
-    workarea.innerHTML=
-        '<div id="messagesarea">'+
-        '  <div style="margin-bottom:10px; width:auto;" class="section_header" >'+
-        '&nbsp;&nbsp;&nbsp;I n s t r u c t i o n s'+
-        '  </div>'+
-        '  <div id="search_instructions" style="margin:10px;"></div>'+
-        '</div>';
-
-    var navarea = document.getElementById('navarea');
+	var navarea = document.getElementById('navarea');
     navarea.style.display = 'block';
     navarea.innerHTML=
         '<div style="margin-bottom:10px; width:auto;" class="section_header" >'+
@@ -3379,8 +3372,7 @@ function search_contents() {
         '  <div id="search_form_params"></div>'+
         '</form>';
 
-    load( 'SearchFormParams.php?id='+current_selection.experiment.id, 'search_form_params' );
-    load( 'help/SearchForm.html', 'search_instructions' );
+	load( 'SearchFormParams.php?id='+current_selection.experiment.id+( accross_instrument ? '&accross_instrument' : '' ), 'search_form_params' );
 
     YAHOO.util.Event.onContentReady (
         "reset_form_button",
@@ -3391,8 +3383,9 @@ function search_contents() {
                 function( p_oEvent ) {
                     document.search_form.text2search.value='';
                     document.search_form.search_in_messages.checked=true;
-                    document.search_form.search_in_tags.checked=true;
-                    document.search_form.search_in_values.checked=true;
+                    document.search_form.search_in_tags.checked=false;
+                    document.search_form.search_in_values.checked=false;
+                    document.search_form.posted_at_instrument.checked=false;
                     document.search_form.posted_at_experiment.checked=true;
                     document.search_form.posted_at_shifts.checked=true;
                     document.search_form.posted_at_runs.checked=true;
@@ -3416,6 +3409,29 @@ function search_contents() {
             );
         }
     );
+}
+
+function search_contents() {
+
+    set_context (
+        '<a href="javascript:display_experiment()">'+experiment_or_facility( current_selection.experiment.id )+'</a> > '+
+        'Find Messages >' );
+
+    reset_navarea();
+    reset_workarea();
+
+    var workarea = document.getElementById('workarea');
+    workarea.innerHTML=
+        '<div id="messagesarea">'+
+        '  <div style="margin-bottom:10px; width:auto;" class="section_header" >'+
+        '&nbsp;&nbsp;&nbsp;I n s t r u c t i o n s'+
+        '  </div>'+
+        '  <div id="search_instructions" style="margin:10px;"></div>'+
+        '</div>';
+
+    load( 'help/SearchForm.html', 'search_instructions' );
+
+    load_search_form( false );
 }
 
 function subscribe() {
@@ -3577,14 +3593,6 @@ function printer_friendly() {
 		var pfcopy = window.open('about:blank');
 		pfcopy.document.write('<html xmlns="http://www.w3.org/1999/xhtml">');
 		pfcopy.document.write('  <head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />');
-		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/reset-fonts-grids/reset-fonts-grids.css">');
-		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/fonts/fonts-min.css">');
-		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/menu/assets/skins/sam/menu.css">');
-		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/paginator/assets/skins/sam/paginator.css" />');
-		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/datatable/assets/skins/sam/datatable.css" />');
-		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/button/assets/skins/sam/button.css" />');
-		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/container/assets/skins/sam/container.css" />');
-		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="/yui/build/treeview/assets/skins/sam/treeview.css" />');
 		pfcopy.document.write('    <link rel="stylesheet" type="text/css" href="css/printerfriendly.css" />');
 		pfcopy.document.write('    <title>Electronic LogBook of Experiment: '+scope+'</title>');
 		pfcopy.document.write('  </head>');

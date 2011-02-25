@@ -1,7 +1,6 @@
 <?php
 
 require_once( 'logbook/logbook.inc.php' );
-require_once( 'lusitime/lusitime.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
 
 use LogBook\LogBookAuth;
@@ -20,19 +19,10 @@ if( isset( $_GET['instr'] )) {
         die( "instrument name can't be empty" );
     }
 }
-$is_location = isset( $_GET['is_location'] );
 
 function experiment2json( $experiment ) {
 
     $instrument = $experiment->instrument();
-    /*
-    $experiment_url =
-        "<a href=\"javascript:select_experiment(".
-        $instrument->id().",'".$instrument->name()."',".
-        $experiment->id().",'".$experiment->name()."')\" class=\"lb_link\">".
-        $experiment->name().
-        '</a>';
-    */
     $experiment_url = "<a href=\"index.php?action=select_experiment_by_id&id={$experiment->id()}\" class=\"lb_link\">{$experiment->name()}</a>";
     $status = $experiment->in_interval( LusiTime::now());
     if( $status > 0 ) {
@@ -67,24 +57,17 @@ function experiment2json( $experiment ) {
 }
 
 /*
- * Return JSON objects with a list of experiments.
+ * Return JSON objects with the name of the current experiment.
  */
 try {
     $regdb = new RegDB();
     $regdb->begin();
 
-    if( is_null( $instr )) $all_experiments = $regdb->experiments();
-    else                   $all_experiments = $regdb->experiments_for_instrument( $instr );
+    $last_switch = $regdb->last_experiment_switch( $instr ) or
+        die( "no current experiment for instrument: {$instr}" );
 
-    // Leave only those experiments the logged user is authorizated to see
-    //
-    $experiments = array();
-    foreach( $all_experiments as $e ) {
-        if( LogBookAuth::instance()->canRead( $e->id())) {
-            if( $is_location xor $e->is_facility()) continue;
-            array_push( $experiments, $e );
-        }
-    }
+    $last_experiment = $regdb->find_experiment_by_id( $last_switch['exper_id'] ) or
+        die( "failed to find experiment for id=".$last_switch['exper_id'] );
 
     // Proceed to the operation
     //
@@ -92,23 +75,7 @@ try {
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-    print <<< HERE
-{
-  "ResultSet": {
-    "Result": [
-HERE;
-    $first = true;
-    foreach( $experiments as $e ) {
-        if( $first ) {
-            $first = false;
-            echo "\n".experiment2json( $e );
-        } else {
-            echo ",\n".experiment2json( $e );
-        }
-    }
-    print <<< HERE
- ] } }
-HERE;
+    echo '{ "ResultSet": { "Result": '.experiment2json( $last_experiment ).' } }';
 
     $regdb->commit();
 

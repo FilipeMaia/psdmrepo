@@ -974,7 +974,7 @@ HERE;
         return $list;
     }
 
-    public function notify_subscribers( $entry ) {
+    public function notify_subscribers( $entry, $new_vs_modified=true ) {
 
         $subscriptions = $this->subscriptions();
         if( count( $subscriptions ) <= 0 ) return;
@@ -987,17 +987,18 @@ HERE;
 
         // Notify each subscriber.
         //
+        $time_str = $new_vs_modified ? 'Posted:   ' : 'Modified: ';
         foreach( $subscriptions as $s ) {
            
             $body =<<<HERE
-Message: {$url}
-Author:  {$author}
-Time:    {$time}
-LogBook: {$logbook}
+Message:  {$url}
+Author:   {$author}
+{$time_str}: {$time}
+LogBook:  {$logbook}
 
 ** ATTENTION **
 The message was sent by the automated notification system because this e-mail
-was registered to recieve updates on new entries posted in the Electornic LogBook
+was registered to recieve updates on new content posted in the Electornic LogBook
 of the experiment. The registration was made by user '{$s->subscriber()}'
 on {$s->subscribed_time()->toStringShort()} from {$s->subscribed_host()}. To unsubscribe
 from this service, please follow the above shown URL and select 'Subscribe' at

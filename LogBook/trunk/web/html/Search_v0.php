@@ -211,7 +211,6 @@ function child2json( $entry, $posted_at_instrument ) {
                     "id" => $attachment->id(),
                     "type" => $attachment->document_type(),
                     "size" => $attachment->document_size(),
-                    "description" => $attachment->description(),
                     "url" => $attachment_url
                 )
             );
@@ -233,16 +232,13 @@ function child2json( $entry, $posted_at_instrument ) {
             "id" => $entry->id(),
             "subject" => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
             "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
-            "html1" => "<pre>".htmlspecialchars($content)."</pre>",
-        	"content" => htmlspecialchars( $entry->content()),
+            "content" => htmlspecialchars( $entry->content()),
             "attachments" => $attachment_ids,
             "tags" => $tag_ids,
             "children" => $children_ids,
             "is_run" => 0,
             "run_id" => 0,
-            "run_num" => 0,
-        	"ymd" => $timestamp->toStringDay(),
-        	"hms" => $timestamp->toStringHMS()
+            "run_num" => 0
         )
     );
 }
@@ -286,7 +282,6 @@ function entry2json( $entry, $posted_at_instrument ) {
                     "id" => $attachment->id(),
                     "type" => $attachment->document_type(),
                     "size" => $attachment->document_size(),
-                    "description" => $attachment->description(),
                     "url" => $attachment_url
                 )
             );
@@ -308,16 +303,13 @@ function entry2json( $entry, $posted_at_instrument ) {
             "id" => $entry->id(),
             "subject" => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
             "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
-            "html1" => "<pre>".htmlspecialchars($content)."</pre>",
-        	"content" => htmlspecialchars( $entry->content()),
+            "content" => htmlspecialchars( $entry->content()),
             "attachments" => $attachment_ids,
             "tags" => $tag_ids,
             "children" => $children_ids,
             "is_run" => 0,
             "run_id" => 0,
-            "run_num" => 0,
-        	"ymd" => $timestamp->toStringDay(),
-        	"hms" => $timestamp->toStringHMS()
+            "run_num" => 0
         )
     );
 }
@@ -377,17 +369,14 @@ function run2json( $run, $type, $posted_at_instrument ) {
             "author" => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).'DAQ/RC',
             "id" => $id,
             "subject" => substr( $msg, 0, 72).(strlen( $msg ) > 72 ? '...' : '' ),
-            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".$content."</pre>",
-            "html1" => $content,
-        	"content" => $msg,
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">{$content}</pre>",
+            "content" => $msg,
             "attachments" => $attachment_ids,
             "tags" => $tag_ids,
             "children" => $children_ids,
             "is_run" => 1,
         	"run_id" => $run->id(),
-            "run_num" => $run->num(),
-        	"ymd" => $timestamp->toStringDay(),
-        	"hms" => $timestamp->toStringHMS()
+            "run_num" => $run->num()
         )
     );
 }
@@ -435,48 +424,23 @@ function sort_and_truncate_from_head( &$entries_by_timestamps, $limit ) {
     	}
     }
 
-    /* Do need to truncate. Apply different limiting techniques depending
-     * on a value of the parameter.
+    /* Return the input array if no limit specified or if the array is smaller
+     * than the limit.
      */
     if( !$limit ) return $timestamps;
 
+    $limit_num = (int)$limit;
+    if( count( $timestamps ) <= $limit_num ) return $timestamps;
+
+    /* Do need to truncate.
+     */
+    $idx = 0;
+    $first2copy_idx =  count( $timestamps ) - $limit_num;
+
     $result = array();
-
-    $limit_num = null;
-    $unit = null;
-    if( 2 == sscanf( $limit, "%d%s", &$limit_num, &$unit )) {
-
-    	$nsec_ago = 1000000000 * $limit_num;
-    	switch( $unit ) {
-    		case 's': break;
-    		case 'm': $nsec_ago *=            60; break;
-    		case 'h': $nsec_ago *=          3600; break;
-    		case 'd': $nsec_ago *=     24 * 3600; break;
-    		case 'w': $nsec_ago *= 7 * 24 * 3600; break;
-    		default:
-    			report_error( "illegal format of the limit parameter" );
-    	}
-    	$now_nsec = LusiTime::now()->to64();
-    	foreach( $timestamps as $t ) {
-    		if( $t >= ( $now_nsec - $nsec_ago )) array_push( $result, $t );
-    	}
-
-    } else {
-
-    	$limit_num = (int)$limit;
-
-    	/* Return the input array if no limit specified or if the array is smaller
-    	 * than the limit.
-	     */
-    	if( count( $timestamps ) <= $limit_num ) return $timestamps;
-
-    	$idx = 0;
-    	$first2copy_idx =  count( $timestamps ) - $limit_num;
-
-    	foreach( $timestamps as $t ) {
-        	if( $idx >= $first2copy_idx ) array_push( $result, $t );
-        	$idx = $idx + 1; 
-    	}
+    foreach( $timestamps as $t ) {
+        if( $idx >= $first2copy_idx ) array_push( $result, $t );
+        $idx = $idx + 1; 
     }
     return $result;
 }
@@ -595,10 +559,10 @@ try {
         	$end,
         	$tag,
         	$author,
-        	$since/*,
-        	$limit*/ );
+        	$since,
+        	$limit );
 
-		$runs = !$inject_runs ? array() : $e->runs_in_interval( $begin4runs, $end4runs/*, $limit*/ );
+		$runs = !$inject_runs ? array() : $e->runs_in_interval( $begin4runs, $end4runs, $limit );
 
 		/* Merge both results into the dictionary for further processing.
 		 */

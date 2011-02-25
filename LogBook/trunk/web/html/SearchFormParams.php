@@ -4,6 +4,7 @@ require_once( 'logbook/logbook.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
 
+use LogBook\LogBook;
 use LogBook\LogBookAuth;
 use LogBook\LogBookException;
 
@@ -26,40 +27,56 @@ if( isset( $_GET['id'] )) {
     die( "no valid experiment identifier" );
 }
 
+$accross_instrument = isset( $_GET['accross_instrument'] );
+
 /* Proceed with the operation
  */
 try {
     $logbook = new LogBook();
     $logbook->begin();
 
-    $experiment = $logbook->find_experiment_by_id( $id )
-        or die( "no such experiment" );
-
-    $instrument = $experiment->instrument();
-
-    // Check for the authorization
-    //
-    if( !LogBookAuth::instance()->canRead( $experiment->id())) {
-        print( LogBookAuth::reporErrorHtml(
-            'You are not authorized to access any information about the experiment',
-            'index.php?action=select_experiment'.
-                '&instr_id='.$instrument->id().
-                '&instr_name='.$instrument->name().
-                '&exper_id='.$experiment->id().
-                '&exper_name='.$experiment->name()));
-        exit;
-    }
-
-    // Proceed to the operation
-    //
-
-    /* Get names of all tags and authors which have ever been used in free-form
-     * entries of the experiment (including its shifts and runs).
+    /* Primary experiment of the request.
      */
-    $tags = $experiment->used_tags();
+    $experiment = $logbook->find_experiment_by_id( $id ) or die( "no such experiment" );
+
+    /* If 'accross_instrument' mode was requested then harvest tags and author
+     * names accross all experiments (of the current instrument) the user is
+     * authorized for
+     */
+    $all_tags = array();
+    $all_authors = array();
+
+    $experiments = null;
+    if( $accross_instrument ) {
+    	$experiments = $logbook->experiments_for_instrument( $experiment->instrument()->name());
+    } else {
+    	$experiments = array( $experiment );
+    }
+    foreach( $experiments as $e ) {
+
+    	/* Check for the authorization
+    	 */
+    	if( !LogBookAuth::instance()->canRead( $e->id())) {
+
+    		/* Silently skip this experiemnt if browsing accross the whole instrument.
+    		 * The only exception would be the main experient from which we started
+    		 * things.
+    		 */
+    		if( $accross_instrument && ( $e->id() != $id )) continue;
+
+	        report_error( 'not authorized to read messages for the experiment' );
+    	}
+    	
+    	/* Get names of all tags and authors which have ever been used in free-form
+     	 * entries of the experiment (including its shifts and runs).
+     	 */
+    	foreach( $e->used_tags   () as $tag    ) $all_tags   [$tag   ] = true;
+    	foreach( $e->used_authors() as $author ) $all_authors[$author] = true;
+    }
+    $tags = array_keys( $all_tags );
     array_unshift( $tags, '' );
 
-    $authors = $experiment->used_authors();
+    $authors = array_keys( $all_authors );
     array_unshift( $authors, '' );
 
     $time_title =
@@ -84,25 +101,26 @@ try {
         ->label       (   0,   0, 'Text to search:' )
         ->value_input (   0,  20, 'text2search', '', '', 32 )
 
-        ->label         (  20,  50, 'Search in:' )
-        ->checkbox_input(  20,  70, 'search_in_messages','Message'   , true  )->label(  40,  70, 'message body',  false )
-        ->checkbox_input(  20,  90, 'search_in_tags',    'Tag'       , false )->label(  40,  90, 'tags',          false )  // TODO: temporarily disabled
-        ->checkbox_input(  20, 110, 'search_in_values',  'Value'     , false )->label(  40, 110, 'tag values',    false )  // TODO: temporarily disabled
-        ->label         ( 140,  50, 'Posted at:' )
-        ->checkbox_input( 140,  70, 'posted_at_experiment', 'Experiment', true )->label( 160,  70, 'experiment', false )
-        ->checkbox_input( 140,  90, 'posted_at_shifts',     'Shifts'    , true )->label( 160,  90, 'shifts',     false )
-        ->checkbox_input( 140, 110, 'posted_at_runs',       'Runs'      , true )->label( 160, 110, 'runs',       false )
+        ->label         (   0,  50, 'Search in:' )
+        ->checkbox_input(   0,  70, 'search_in_messages','Message'   , true  )->label(  20,  70, 'message body',  false )
+        ->checkbox_input(   0,  90, 'search_in_tags',    'Tag'       , false )->label(  20,  90, 'tags',          false )  // TODO: temporarily disabled
+        ->checkbox_input(   0, 110, 'search_in_values',  'Value'     , false )->label(  20, 110, 'tag values',    false )  // TODO: temporarily disabled
+        ->label         ( 120,  50, 'Posted at:' )
+        ->checkbox_input( 120,  70, 'posted_at_instrument', 'Instrument', $accross_instrument, false, 'load_search_form(this.checked)' )->label( 140,  70, 'instrument', false )
+        ->checkbox_input( 120,  90, 'posted_at_experiment', 'Experiment', true  )->label( 140,  90, 'experiment', false )
+        ->checkbox_input( 120, 110, 'posted_at_shifts',     'Shifts'    , true  )->label( 140, 110, 'shifts',     false )
+        ->checkbox_input( 120, 130, 'posted_at_runs',       'Runs'      , true  )->label( 140, 130, 'runs',       false )
 
-        ->label       (   0, 140, 'Begin Time:' )
-        ->value_input (   0, 160, 'begin', '', $time_title )
-        ->label       (   0, 190, 'End Time:' )
-        ->value_input (   0, 210, 'end',   '', $time_title )
-        ->label       (   0, 240, 'Tag:' )
-        ->select_input(   0, 260, 'tag', $tags, '' )
-        ->label       (   0, 290, 'Posted by:' )
-        ->select_input(   0, 310, 'author', $authors, '' )
-        ->button      (   0, 360, 'reset_form_button',  'Reset', 'reset form to its initial state' )
-        ->button      (  75, 360, 'submit_search_button', 'Search', 'initiate the search operation' )
+        ->label       (   0, 160, 'Begin Time:' )
+        ->value_input (   0, 180, 'begin', '', $time_title )
+        ->label       (   0, 210, 'End Time:' )
+        ->value_input (   0, 230, 'end',   '', $time_title )
+        ->label       (   0, 260, 'Tag:' )
+        ->select_input(   0, 280, 'tag', $tags, '' )
+        ->label       (   0, 310, 'Posted by:' )
+        ->select_input(   0, 330, 'author', $authors, '' )
+        ->button      (   0, 380, 'reset_form_button',  'Reset', 'reset form to its initial state' )
+        ->button      (  75, 380, 'submit_search_button', 'Search', 'initiate the search operation' )
 
         ->html();
 

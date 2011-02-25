@@ -85,3 +85,23 @@ function mktime() {
     }
     return Math.floor(d.getTime()/1000);
 };
+
+/*
+ * Wait for the specified number of milliseconds then call a function.
+ */
+var delayed_call_timer = null;
+var delayed_call_fun   = null;
+
+function delayed_call_expired() {
+	if((delayed_call_timer == null) || (delayed_call_fun == null)) return;
+	window.clearTimeout(delayed_call_timer);
+	delayed_call_timer = null;
+	delayed_call_fun();
+	delayed_call_fun = null;
+}
+
+function delayed_call(timeout, f) {
+	if((delayed_call_timer != null) || (delayed_call_fun != null)) return;
+	delayed_call_fun = f;
+	delayed_call_timer = window.setTimeout(delayed_call_expired, timeout);
+}

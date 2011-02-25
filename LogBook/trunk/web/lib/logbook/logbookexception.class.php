@@ -20,7 +20,7 @@ require_once( 'logbook.inc.php' );
  *
  * @author gapon
  */
-class LogBookException extends Exception {
+class LogBookException extends \Exception {
 
     /*
      * Data members

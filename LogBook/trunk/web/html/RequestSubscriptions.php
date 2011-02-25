@@ -2,6 +2,7 @@
 
 require_once( 'logbook/logbook.inc.php' );
 
+use LogBook\LogBook;
 use LogBook\LogBookAuth;
 use LogBook\LogBookException;
 

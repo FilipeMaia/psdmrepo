@@ -3,6 +3,7 @@
 require_once( 'logbook/logbook.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
 
+use LogBook\LogBook;
 use LogBook\LogBookAuth;
 use LogBook\LogBookException;
 
