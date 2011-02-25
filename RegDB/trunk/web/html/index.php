@@ -158,8 +158,13 @@ PHP Generated JavaScript with initialization parameters
 
 <?php
 
+require_once('authdb/authdb.inc.php');
 require_once('regdb/regdb.inc.php');
 
+use AuthDB\AuthDBException;
+
+use RegDB\RegDBAuth;
+use RegDB\RegDBException;
 
 try {
     $auth_svc = RegDBAuth::instance();

@@ -3,6 +3,9 @@
 namespace RegDB;
 
 require_once( 'regdb.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
+
+use LusiTime\LusiTime;
 
 class RegDB {
 
@@ -354,6 +357,88 @@ class RegDB {
         $this->connection->query ( "DELETE FROM {$this->connection->database}.instrument_param WHERE instr_id=".$id );
         $this->connection->query ( "DELETE FROM {$this->connection->database}.instrument WHERE id=".$id );
     }
+
+    /* =====================
+     *   EXPERIMENT SWITCH
+     * =====================
+     */
+    public function switch_experiment( $experiment_name, $requestor_uid, $notifications=null ) {
+
+    	$experiment = $this->find_experiment_by_unique_name( $experiment_name );
+        if( !$experiment )
+            throw new RegDBException (
+                __METHOD__,
+                "no such experiment: {$experiment_name}" );
+
+    	$current_time = LusiTime::now();
+
+    	$this->connection->query (
+    		"INSERT INTO expswitch (id,exper_id,switch_time,requestor_uid) VALUES (NULL,{$experiment->id()},{$current_time->to64()},'{$requestor_uid}')"
+    	);
+    	if( !is_null($notifications) && count( $notifications ) > 0 ) {
+    		$sql = '';
+    		foreach( $notifications as $n ) {
+    			$uid = trim( $n['uid'] );
+    			$gecos = $this->connection->escape_string( trim( $n['gecos'] ));
+    			$email = $this->connection->escape_string( trim( $n['email'] ));
+    			$rank = trim( $n['rank'] );
+    			$notified = $n['notified'] ? 'YES' : 'NO';
+    			if( $sql != '' ) $sql .= ',';
+    			$sql .=  "(LAST_INSERT_ID(),'{$uid}','{$gecos}','{$email}','{$rank}','{$notified}')";
+    		}
+    		$sql = 'INSERT INTO expswitch_notify (switch_id,uid,full_name,email,rank,notified) VALUES '.$sql;
+    		$this->connection->query( $sql );
+    	}
+    }
+
+    /* Find the info for the last experiment switched using this interface. Return null
+     * if none was found.
+     */
+    public function last_experiment_switch( $instrument_name ) {
+
+    	$sql =<<<HERE
+SELECT * FROM {$this->connection->database}.expswitch
+WHERE exper_id IN ( SELECT e.id FROM {$this->connection->database}.experiment `e`,
+   	                                 {$this->connection->database}.instrument `i`
+                    WHERE e.instr_id=i.id
+                    AND i.name='{$instrument_name}' )
+ORDER BY switch_time DESC LIMIT 1
+HERE;
+    	$result = $this->connection->query( $sql );
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 0 ) return null;
+        if( $nrows == 1 ) {
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+            return $attr;
+        }
+        throw new RegDBException(
+            __METHOD__,
+            "unexpected size of result set returned by the query" );
+	}
+
+    /* Return a history for all known experiment switches for the specified instrument.
+     */
+    public function experiment_switches( $instrument_name ) {
+
+
+    	$sql =<<<HERE
+SELECT * FROM {$this->connection->database}.expswitch
+WHERE exper_id IN ( SELECT e.id FROM {$this->connection->database}.experiment `e`,
+   	                                 {$this->connection->database}.instrument `i`
+                    WHERE e.instr_id=i.id
+                    AND i.name='{$instrument_name}' )
+ORDER BY switch_time DESC
+HERE;
+    	$result = $this->connection->query( $sql );
+        $nrows = mysql_numrows( $result );
+        $list = array();
+        for( $i = 0; $i < $nrows; $i++ ) {
+        	array_push(
+        		$list,
+        		mysql_fetch_array( $result, MYSQL_ASSOC ));
+        }
+        return $list;
+	}
 
     /* ====================
      *   GROUPS AND USERS

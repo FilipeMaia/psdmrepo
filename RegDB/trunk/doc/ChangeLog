@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-26
+2011-02-25 Igor Gaponenko
+- added SQL schema for experiment switch tables
+- bug fixes
+
 Tag: V00-00-25
 2010-07-28 Igor Gaponenko
 - more efficient implementation of RegDBConnection::find_user_account()

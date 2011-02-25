@@ -100,12 +100,13 @@ HERE;
         return $this;
     }
 
-    public function checkbox_input( $x, $y, $var, $text, $checked=false, $disabled=false ) {
+    public function checkbox_input( $x, $y, $var, $text, $checked=false, $disabled=false, $onclick=null ) {
         $checked_attr = $checked ? 'checked="checked"' : '';
         $disabled_attr = $disabled ? 'disabled="disabled"' : '';
+        $onclick_action = is_null( $onclick ) ? '' : 'onclick="'.$onclick.'"';
         $this->html = $this->html.<<<HERE
 <div style="position:absolute; left:{$x}px; top:{$y}px; text-align:left;">
-  <input type="checkbox" name="{$var}" value="{$text}" {$checked_attr} {$disabled_attr}/>
+  <input type="checkbox" name="{$var}" value="{$text}" {$checked_attr} {$disabled_attr} {$onclick_action}/>
 </div>
 HERE;
         return $this;

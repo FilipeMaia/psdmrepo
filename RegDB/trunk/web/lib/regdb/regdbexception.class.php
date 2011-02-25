@@ -20,7 +20,7 @@ require_once( 'regdb.inc.php' );
  *
  * @author gapon
  */
-class RegDBException extends Exception {
+class RegDBException extends \Exception {
 
     /*
      * Data members
