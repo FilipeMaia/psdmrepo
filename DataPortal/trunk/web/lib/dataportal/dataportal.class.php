@@ -59,7 +59,7 @@ HERE;
 
 <script type="text/javascript" src="/jquery/js/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui-1.8.7.custom.min.js"></script>
-<script type="text/javascript" src="Utilities.js"></script>
+<script type="text/javascript" src="js/Utilities.js"></script>
 <script type="text/javascript">
 
 /* ----------------------------------------
@@ -186,8 +186,8 @@ HERE;
     <div style="float:right;">
       <table><tbody><tr>
         <td valign="bottom">
-          <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:printer_friendly('tabs-experiment')" title="Printer friendly version of this page"><img src="img/PRINTER_icon.png" /></a></div>
-          <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:pdf('experiment')" title="PDF version of this page"><img src="img/PDF_icon.jpg" /></a></div>
+          <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:printer_friendly('tabs-experiment')" title="Printer friendly version of this page"><img src="img/PRINTER_icon.gif" /></a></div>
+          <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:pdf('experiment')" title="PDF version of this page"><img src="img/PDF_icon.gif" /></a></div>
           <div style="clear:both;" class="not4print"></div>
         </td>
         <td>
@@ -243,9 +243,16 @@ HERE;
 			$id = $t['id'];
 			$tab_html = $t['html'];
 			if( is_null( $tab_html )) continue;
+			$class = $t['class'];
+			$class_html = ( isset( $class ) && !is_null( $class ) && ( $class != '' )) ? 'class="'.$class.'"' : '';
+
+			// NOTE: the inner <div> is needed to have full control over custom styles,
+			//       classes, etc. That's because JQuery UI will manage its own classes
+			//       and styles to the id-entified outer <div>.
+			//
 			$html .= <<<HERE
-<div id="{$id}" class="tab-inline-content">
-{$tab_html}
+<div id="{$id}">
+  <div {$class_html}>{$tab_html}</div>
 </div>
 
 HERE;

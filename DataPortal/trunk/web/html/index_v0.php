@@ -17,7 +17,6 @@ use RegDB\RegDB;
 use RegDB\RegDBException;
 
 use LogBook\LogBook;
-use LogBook\LogBookAuth;
 use LogBook\LogBookException;
 
 use LusiTime\LusiTime;
@@ -41,9 +40,6 @@ if( isset( $_GET['page1'] )) {
 	if( isset( $_GET['page2'] )) {
 		$page2 = trim( $_GET['page2'] );
 	}
-}
-if( isset( $_GET['params'] )) {
-	$params = explode( ',', trim( $_GET['params'] ));
 }
 
 try {
@@ -203,310 +199,10 @@ try {
 <!------------------- Page-specific Styles ------------------------->
 
 <link type="text/css" href="css/portal.css" rel="Stylesheet" />
-
 <style type="text/css">
-
   .not4print {
   }
-
-  /* -----------------------------------
-   * - Naming convention for shortcuts -
-   * -----------------------------------
-   *
-   *   el          elog
-   *   el-l        .....live
-   *   el-l-ms     ..........messages
-   *   el-l-m      ..........message
-   *   el-l-m-d    ....................messages groupped into a day
-   *   el-l-m-re   ....................message reply
-   *   el-l-m-re-s ....................submit message reply
-   *   el-l-m-re-c ....................cancel message reply
-   *   el-l-m-ed   ....................message editing
-   *   el-l-m-ed-s ....................submit message editing
-   *   el-l-m-ed-c ....................cancel message editing
-   *   el-l-m-mv   ....................message move
-   *   el-l-m-mv-s ....................submit message move
-   *   el-l-m-mv-c ....................cancel message move
-   *   el-l-c      ..........child of a message
-   *   el-l-rs     ..........runs
-   *   el-l-r      ..........run
-   *   el-p        .....post 
-   *
-   * Suffixes:
-   *
-   *   -auto    auto-refresh
-   *   -con     container
-   *   -hdr     header
-   *   -dsc     description
-   *   -ctx     context
-   *   -dlg     dialog
-   *   -dlgs    dialogs
-   *   -rdlg    'reply' dialog
-   *   -edlg    'edit' dialog
-   *   -mdlg    'move' dialog
-   *   -tgl     toggler
-   *   -hdn     hidden
-   *   -vis     visible
-   *   -info    information
-   *   -subj    subject
-   */
-
-  #el-l-mctrl {
-    margin-top:10px;
-    margin-bottom:30px;
-  }
-
-  #el-l-auto {
-    padding:8px;
-    border:1px solid #A6C9E2;
-    border-radius:5px;
-    font-size: 80%;
-  }
-
-  #el-l-ms {
-  }
-
-  #el-l-ms-info {
-    margin-right:15px;
-    margin-bottom:10px;
-    color:maroon;
-  }
-
-  .el-l-m-d-tgl,
-  .el-l-m-tgl,
-  .el-l-c-tgl,
-  .el-l-r-tgl,
-  .el-l-a-tgl {
-    background-color:#ffffff;
-    border:1px solid #c0c0c0;
-  }
-
-  .el-l-m-d {
-    font-size:120%;
-    margin-left:10px;
-  }
-
-  .el-l-a-dsc {
-    font-weight:bold;
-    margin-left:10px;
-  }
-
-  .el-l-m-time,
-  .el-l-c-time {
-    margin-left:10px;
-  }
-
-  .el-l-m-author,
-  .el-l-c-author {
-    font-weight:bold;
-    margin-left:10px;
-    width:80px;
-  }
-
-  .el-l-m-subj,
-  .el-l-c-subj {
-    margin-left:10px;
-  }
-
-  .el-l-a {
-    margin-right:10px;
-    margin-bottom:10px;
-    padding:5px;
-  }
-
-  div.el-l-a:hover {
-    background-color:#d0d0d0;
-    border-radius:5px;
-  }
-
-  .el-l-m-d-hdr {
-    padding:5px;
-    background-color:#b9dcf5;
-    border:1px solid #A6C9E2;
-    border-bottom:0px;
-    border-radius:5px;
-    border-bottom-left-radius:0px;
-    border-bottom-right-radius:0px;
-    cursor:pointer;
-  }
-
-  div.el-l-m-d-hdr:hover {
-    background-color:#A6C9E2;
-  }
-
-  .el-l-m-d-con {
-    padding:25px;
-    border:1px solid #A6C9E2;
-    border-top:0px;
-    border-bottom:0px;
-    border-radius:5px;
-    border-top-left-radius:0px;
-    border-top-right-radius:0px;
-  }
-
-  .el-l-m-hdr,
-  .el-l-c-hdr {
-    padding:5px;
-    background-color:#e0e0e0;
-    border:1px solid #d0d0d0;
-    border-bottom:0px;
-    border-radius:5px;
-    border-bottom-left-radius:0px;
-    border-bottom-right-radius:0px;
-    cursor:pointer;
-  }
-
-  div.el-l-m-hdr:hover,
-  div.el-l-c-hdr:hover {
-    background-color:#d0d0d0;
-  }
-
-  .el-l-r-hdr {
-    padding:5px;
-    background-color:#DEF0CD;
-    border:1px solid #B9DD97;
-    border-bottom:0px;
-    border-radius:5px;
-    border-bottom-left-radius:0px;
-    border-bottom-right-radius:0px;
-    cursor:pointer;
-  }
-
-  div.el-l-r-hdr:hover {
-    background-color:#B9DD97;
-  }
-
-  .el-l-m-con,
-  .el-l-c-con {
-    padding:25px;
-    padding-top:5px;
-    border:1px solid #d0d0d0;
-    border-top:0px;
-    border-radius:5px;
-    border-top-left-radius:0px;
-    border-top-right-radius:0px;
-  }
-
-  .el-l-r-con {
-    padding:20px;
-    border:1px solid #B9DD97;
-    border-top:0px;
-    border-radius:5px;
-    border-top-left-radius:0px;
-    border-top-right-radius:0px;
-  }
-
-  .el-l-a-con {
-    margin-left:10px;
-    padding-top:5px;
-    padding-left:20px;
-  }
-
-  .el-l-m-body,
-  .el-l-c-body {
-    padding-top:10px;
-    padding-bottom:10px;
-  }
-
-  .el-l-m-body pre {
-    margin: 0px;
-    padding-top: 5px;
-    padding-bottom: 10px;
-    overflow: auto;
-  }
-
-  .el-l-m-as {
-    padding:10px;
-    border-top:1px solid #c8c8c8;
-  }
-
-  .el-l-a-info {
-    margin-left:5px;
-  }
-
-  .el-l-m-tags {
-    padding:10px;
-    border-top:1px solid #c8c8c8;
-  }
-
-  .el-l-m-rdlg,
-  .el-l-m-edlg,
-  .el-l-m-mdlg {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    padding: 20px;
-    padding-bottom: 10px;
-    background-color: #e0e0e0;
-    border:1px solid #c0c0c0;
-    border-radius: 5px;
-  }
-
-  #el-l-ctx {
-    position:fixed;
-    right:15px;
-    bottom:15px;
-    border:2px solid;
-    border-radius:5px;
-    padding:10px;
-  }
-
-  #el-l-ctx-exp {
-    font-size: 150%;
-    font-weight: bold;
-  }
-
-  #el-l-ctx-day {
-    margin-top: 5px;
-    font-size:36px;
-  }
-
-  #el-l-ctx-info {
-  margin-top:5px;
-    font-size:110%;
-  }
-
-  .el-l-m-highlight {
-    background-color:#ff6666;
-    color: #ffffff;
-  }
-
-  .el-l-m-d-hdn,
-  .el-l-m-hdn,
-  .el-l-c-hdn,
-  .el-l-r-hdn,
-  .el-l-a-hdn,
-  .el-l-ctx-hdn,
-  .el-l-m-dlg-hdn {
-    display: none;
-  }
-
-  .el-l-m-d-vis,
-  .el-l-m-vis,
-  .el-l-c-vis,
-  .el-l-r-vis,
-  .el-l-a-vis,
-  .el-l-ctx-vis,
-  .el-l-m-dlg-vis {
-    display: block;
-  }
-
-  /* small button container */
-
-  .s-b-con {
-    margin-left: 5px;
-    font-size:80%;
-  }
-
 </style>
-
-<!--[if lte IE 10]>
-<style type="text/css">
-  .el-l-ctx-vis {
-    display: none;
-  }
-</style>
-
-<![endif]--> 
 
 <!----------------------------------------------------------------->
 
@@ -527,39 +223,16 @@ try {
  *             GLOBAL VARIABLES
  * -----------------------------------------
  */
-elog.author  = '<?=$auth_svc->authName()?>';
-elog.exp_id        = '<?=$exper_id?>';
-elog.exp = '<?=$experiment->name()?>';
-elog.instr = '<?=$experiment->instrument()->name()?>';
-elog.rrange   = '<?=$range_of_runs?>';
+elog.author_account  = '<?=$auth_svc->authName()?>';
+elog.exper_id        = '<?=$exper_id?>';
+elog.experiment_name = '<?=$experiment->name()?>';
+elog.instrument_name = '<?=$experiment->instrument()->name()?>';
+elog.range_of_runs   = '<?=$range_of_runs?>';
 elog.min_run         = <?=(is_null($min_run)?'null':$min_run)?>;
 elog.max_run         = <?=(is_null($max_run)?'null':$max_run)?>;
 <?php
 	foreach( $logbook_runs as $run ) echo "elog.runs[{$run->num()}]={$run->id()};\n";
 	foreach( $logbook_shifts as $shift ) echo "elog.shifts['{$shift->begin_time()->toStringShort()}']={$shift->id()};\n";
-?>
-elog.editor = <?=(LogBookAuth::instance()->canEditMessages( $experiment->id())?'true':'false')?>
-
-var extra_params = new Array();
-<?php
-	if( isset($params)) {
-		foreach( $params as $p ) {
-			$kv = explode(':',$p);
-			switch(count($kv)) {
-			case 0:
-				break;
-			case 1:
-				$k = $kv[0];
-				echo "extra_params['{$k}']=true;\n";
-				break;
-			default:
-				$k = $kv[0];
-				$v = $kv[1];
-				echo "extra_params['{$k}']='{$v}';\n";
-				break;
-			}
-		}
-	}
 ?>
 
 /* ------------------------------------------------------
@@ -594,18 +267,19 @@ function init() {
  */
 function experiment_init() {
 
+	$('#button-toggle-group').button();
 	$('#button-toggle-group').click(
 		function() {
 			if( $('#group-members').hasClass   ( 'group-members-hidden' ) ) {
 				$('#group-members').removeClass( 'group-members-hidden' )
 				                   .addClass   ( 'group-members-visible' );
-				$('#button-toggle-group').removeClass( 'ui-icon-triangle-1-e' )
-				                         .addClass   ( 'ui-icon-triangle-1-s' );
+				$('#button-toggle-group div').removeClass( 'ui-icon-triangle-1-e' )
+				                             .addClass   ( 'ui-icon-triangle-1-s' );
 			} else {
 				$('#group-members').removeClass( 'group-members-visible' )
 				                   .addClass   ( 'group-members-hidden' );
-				$('#button-toggle-group').removeClass( 'ui-icon-triangle-1-s' )
-				                         .addClass   ( 'ui-icon-triangle-1-e' );
+				$('#button-toggle-group div').removeClass( 'ui-icon-triangle-1-s' )
+				                             .addClass   ( 'ui-icon-triangle-1-e' );
 			}
 		}
 	);
@@ -650,7 +324,7 @@ function files_init() {
 function reset_files_filter() {
 
 	$('#files-search-filter :input:radio[name=runs]' ).val( ['all'] );
-	$('#files-search-filter :input:text[name=runs_range]' ).val( elog.rrange );
+	$('#files-search-filter :input:text[name=runs_range]' ).val( elog.range_of_runs );
 	$('#files-search-filter :input:radio[name=archived]' ).val( ['yes_or_no'] );
 	$('#files-search-filter :input:radio[name=local]' ).val( ['yes_or_no'] );
 	$('#files-search-filter :input:checkbox[name=xtc]' ).val( ['XTC'] );
@@ -659,11 +333,11 @@ function reset_files_filter() {
 
 function search_files( import_format ) {
 
-	var params = { exper_id: elog.exp_id };
+	var params = { exper_id: elog.exper_id };
 
 	if( $('#files-search-filter :input:radio[name=runs]:checked' ).val() != 'all' ) {
 		var runs = $('#files-search-filter :input:text[name=runs_range]' ).val();
-		if( runs != elog.rrange )	params.runs = runs;
+		if( runs != elog.range_of_runs )	params.runs = runs;
 	}
 
 	var archived = $('#files-search-filter :input:radio[name=archived]:checked' ).val();
@@ -724,20 +398,20 @@ function search_files( import_format ) {
 function reset_translate_filter() {
 
 	$('#translate-search-filter :input:radio[name=runs]' ).val( ['all'] );
-	$('#translate-search-filter :input:text[name=runs_range]' ).val( elog.rrange );
+	$('#translate-search-filter :input:text[name=runs_range]' ).val( elog.range_of_runs );
 	$('#translate-search-filter :input:radio[name=translated]' ).val( ['yes_or_no'] );
 }
 
 function search_translate_requests() {
 
 	var params = {
-		exper_id: elog.exp_id,
+		exper_id: elog.exper_id,
 		show_files: 1
 	};
 
 	if( $('#translate-search-filter :input:radio[name=runs]:checked' ).val() != 'all' ) {
 		var runs = $('#translate-search-filter :input:text[name=runs_range]' ).val();
-		if( runs != elog.rrange )	params.runs = runs;
+		if( runs != elog.range_of_runs )	params.runs = runs;
 	}
 
 	var translated = $('#translate-search-filter :input:radio[name=translated]:checked' ).val();
@@ -755,7 +429,7 @@ function search_translate_requests() {
 					e.preventDefault();
 					$.get(
 					   	'NewRequest.php',
-					   	{ exper_id: elog.exp_id, runnum: $(this).val() },
+					   	{ exper_id: elog.exper_id, runnum: $(this).val() },
 					   	function( data ) {
 						   	if( data.ResultSet.Status == 'success' )
 						   		search_translate_requests();
@@ -771,7 +445,7 @@ function search_translate_requests() {
 					e.preventDefault();
 					$.get(
 						'EscalateRequestPriority.php',
-						{ exper_id: elog.exp_id, id: $(this).val() },
+						{ exper_id: elog.exper_id, id: $(this).val() },
 						function( data ) {
 						   	if( data.ResultSet.Status == 'success' ) {
 						   		$('#translate-search-result #priority_'+data.ResultSet.Result.id).text(data.ResultSet.Result.priority);
@@ -845,7 +519,7 @@ function display_path( file ) {
 
 function pdf( context ) {
 	if( context == 'translate-manage' ) {
-		var url = 'Requests2pdf.php?exper_id='+elog.exp_id+'&show_files';
+		var url = 'Requests2pdf.php?exper_id='+elog.exper_id+'&show_files';
 		var winRef = window.open( url, 'Translation Requests' );
 	}
 }
@@ -860,7 +534,7 @@ function printer_friendly() {
 		pfcopy.document.write('<link rel="stylesheet" type="text/css" href="css/default.css" />');
 		pfcopy.document.write('<link type="text/css" href="css/portal.css" rel="Stylesheet" />');
 		pfcopy.document.write('<style type="text/css"> .not4print { display:none; }	</style>');
-		pfcopy.document.write('<title>Data Portal of Experiment: '+elog.instr+' / '+elog.exp+'</title></head><body><div class="maintext">');
+		pfcopy.document.write('<title>Data Portal of Experiment: '+elog.instrument_name+' / '+elog.experiment_name+'</title></head><body><div class="maintext">');
 		pfcopy.document.write(html);
 		pfcopy.document.write("</div></body></html>");
 		pfcopy.document.close();
@@ -940,7 +614,7 @@ function printer_friendly() {
                   <td valign="top">{$experiment->POSIX_gid()}</td>
                   <td>&nbsp;</td>
                   <td>
-                    <span id="button-toggle-group" class="ui-icon ui-icon-triangle-1-e" style="border:1px solid #c0c0c0;" title="click to see/hide the list of members"></span>
+                    <button id="button-toggle-group" class="not4print" title="click to see/hide the list of members"><div class="ui-icon ui-icon-triangle-1-s"></div></button>
                     <div id="group-members" class="group-members-hidden">{$experiment_group_members}</div>
                   </td>
                 </tr>
@@ -954,9 +628,8 @@ HERE;
 		$tabs,
     	array(
     		'name' => 'Experiment',
-    		'id' => 'tabs-experiment',
+    		'id'   => 'tabs-experiment',
     		'html' => $tabs_experiment,
-            'class' => 'tab-inline-content',
     	    'callback' => 'set_current_tab("tabs-experiment")'
     	)
     );
@@ -965,85 +638,24 @@ HERE;
      * [ e-log ]
      */
     $tabs_elog_subtabs = array();
+
     $tabs_elog_recent =<<<HERE
-    <div id="el-l-mctrl">
-      <div style="float:left; margin-left:20px;">
-        <div style="float:left;">
-          <div style="font-weight:bold;">Last messages to display:</div>
-          <div id="elog-live-range-selector" style="margin-top:4px;">
-            <input type="radio" id="elog-live-range-20"    name="range" value="20"  checked="checked" /><label for="elog-live-range-20"    >20</label>
-            <input type="radio" id="elog-live-range-100"   name="range" value="100"                   /><label for="elog-live-range-100"   >100</label>
-            <input type="radio" id="elog-live-range-shift" name="range" value="shift"                 /><label for="elog-live-range-shift" >shift</label>
-            <input type="radio" id="elog-live-range-day"   name="range" value="day"                   /><label for="elog-live-range-day"   >24 hrs</label>
-            <input type="radio" id="elog-live-range-week"  name="range" value="week"                  /><label for="elog-live-range-week"  >7 days</label>
-            <input type="radio" id="elog-live-range-all"   name="range" value="all"                   /><label for="elog-live-range-all"   >everything</label>
-          </div>
-        </div>
-        <div style="float:left; margin-left:5px;">
-          <div style="font-weight:bold;">Show runs:</div>
-          <div style="margin-top:4px;">
-            <div id="elog-live-runs-selector" style="float:left;">
-              <input type="radio" id="elog-live-runs-on"  name="show_runs" value="on"  checked="checked" /><label for="elog-live-runs-on"  >On</label>
-              <input type="radio" id="elog-live-runs-off" name="show_runs" value="off"                   /><label for="elog-live-runs-off" >Off</label>
-            </div>
-          </div>
-        </div>
-        <div style="clear:both;"></div>
-        <div style="margin-top:10px;">
-          <div style="float:left;">
-            <button id="elog-live-expand"     title="click a few times to expand the whole tree">Expand++</button>
-            <button id="elog-live-collapse"   title="each click will collapse the tree to the previous level of detail">Collapse--</button>
-            <button id="elog-live-viewattach" title="view attachments of expanded messages">View Attachments</button>
-            <button id="elog-live-hideattach" title="hide attachments of expanded messages">Hide Attachments</button>
-          </div>
-        </div>
-      </div>
-      <div style="float:right;" id="el-l-auto">
-        <div style="font-weight:bold;">Autorefresh:</div>
-        <div style="margin-top:4px;">
-          <div id="elog-live-refresh-selector" style="float:left;">
-            <input type="radio" id="elog-live-refresh-on"  name="refresh" value="on"  checked="checked" /><label for="elog-live-refresh-on"  >On</label>
-            <input type="radio" id="elog-live-refresh-off" name="refresh" value="off"                   /><label for="elog-live-refresh-off" >Off</label>
-          </div>
-          <div style="float:left; margin-left:10px;">
-            <select id="elog-live-refresh-interval">
-              <option>2</option>
-              <option>5</option>
-              <option>10</option>
-            </select>
-            s.
-          </div>
-          <div style="clear:both;"></div>
-        </div>
-        <div style="margin-top:8px;">
-          <button id="elog-live-refresh" title="check if there are new updates">Check for updates now</button>
-        </div>
-      </div>
-      <div style="clear:both;"></div>
-    </div>
-    <div id="el-l-ms-action" style="float:left;"></div>
-    <div id="el-l-ms-info" style="float:right;"></div>
-    <div style="clear:both;"></div>
-    <div id="el-l-ms"></div>
-    <div id="el-l-ctx" class="el-l-ctx-hdn">
-      <div id="el-l-ctx-exp"></div>
-      <div id="el-l-ctx-day"></div>
-      <div id="el-l-ctx-info"></div>
-    </div>\n
+      <p>This is the placeholder for most recent messages monitored by the application.
+      The old version of the application needs to be redesigned to avoid various sorts
+      of conflicts.</p>\n
 HERE;
     array_push(
 		$tabs_elog_subtabs,
     	array(
     		'name' => 'Recent (Live)',
-    		'id' => 'tabs-elog-recent',
+    		'id'   => 'tabs-elog-recent',
     		'html' => $tabs_elog_recent,
-            'class' => 'tab-inline-content',
     	    'callback' => 'set_current_tab("tabs-elog-recent")'
     	)
     );
-    $select_tag_html = "<option> - select tag - </option>\n";
+    $known_tags_html = "<option> - known tags - </option>\n";
     foreach( $logbook_experiment->used_tags() as $tag ) {
-    	$select_tag_html .= "<option>{$tag}</option>\n";
+    	$known_tags_html .= "<option>{$tag}</option>\n";
     }
 
     $tags_html = '';
@@ -1053,11 +665,11 @@ HERE;
     //       tag names.
     //
     $num_tags = 3;
-    for( $i = 0; $i < $num_tags; $i++) {
+    for( $i=0; $i<$num_tags; $i++) {
     	$tags_html .=<<<HERE
-name:  <select id="elog-tags-library-{$i}">{$select_tag_html}</select>
-       <input type="text" id="elog-tag-name-{$i}"  name="tag_name_{$i}"  value="" size=16 title="type new tag here or select a known one from the left" />
-value: <input type="text" id="elog-tag-value-{$i}" name="tag_value_{$i}" value="" size=16 title="put an optional value here" /><br>
+<select id="elog-tags-library-{$i}">{$known_tags_html}</select>
+<input type="text" id="elog-tag-name-{$i}"  name="tag_name_{$i}"  value="" size=16 title="type new tag here or select a known one from the left" /> =
+<input type="text" id="elog-tag-value-{$i}" name="tag_value_{$i}" value="" size=16 title="put an optional value here" /><br>
 HERE;
     }
 
@@ -1071,91 +683,7 @@ HERE;
     foreach( $logbook_shifts as $shift )
     	$shifts_html .= "<option>{$shift->begin_time()->toStringShort()}</option>\n";
 
-    $tabs_elog_post_extra = array();
-    array_push(
-		$tabs_elog_post_extra,
-    	array(
-    		'name' => 'Attachments',
-    		'id'   => 'tabs-el-p-as',
-    		'html' => <<<HERE
-<div id="el-p-as">
-  file: <input type="file" name="file2attach_0" onchange="elog.post_add_attachment(this)" />
-  description: <input type="text" name="file2attach_0" value="" title="put an optional file description here" /><br>
-</div>
-HERE
-			,
-			'callback' => 'set_current_tab("tabs-el-p-as")'
-    	)
-    );
-    array_push(
-		$tabs_elog_post_extra,
-    	array(
-    		'name' => 'Tags',
-    		'id'   => 'tabs-el-p-tags',
-    		'html' => <<<HERE
-<div id="elog-tags" style="margin-top:4px;">{$tags_html}</div>
-HERE
-			,
-			'callback' => 'set_current_tab("tabs-el-p-tags")'
-    	)
-    );
-    array_push(
-		$tabs_elog_post_extra,
-    	array(
-    		'name' => 'Context & Post Time',
-    		'id'   => 'tabs-el-p-context',
-    		'html' => <<<HERE
-<div>
-  <div style="float:left;">
-    <div style="font-weight:bold;">Context:</div>
-    <div id="el-p-context-selector" style="margin-top:4px;">
-      <input type="radio" id="el-p-context-experiment" name="scope" value="experiment" checked="checked" /><label for="el-p-context-experiment">experiment</label>
-      <input type="radio" id="el-p-context-shift"      name="scope" value="shift"                        /><label for="el-p-context-shift"     >shift</label>
-      <input type="radio" id="el-p-context-run"        name="scope" value="run"                          /><label for="el-p-context-run"       >run</label>
-    </div>
-  </div>
-  <div style="float:left; margin-left:10px;">
-    <div style="font-weight:bold;">Shift:</div>
-    <div style="margin-top:4px;">
-      <select id="el-p-shift">{$shifts_html}</select>
-    </div>
-  </div>
-  <div style="float:left; margin-left:10px;">
-    <div style="font-weight:bold;">Run:</div>
-    <div style="margin-top:4px;">
-      <input type="text" id="el-p-runnum" value="{$max_run}" size=4 />
-      <span id="el-p-runnum-error" style="color:red;"></span>
-    </div>
-  </div>
-  <div style="clear:both;"></div>
-</div>
-<div style="margin-top:20px;">
-  <div style="float:left;">
-    <div style="font-weight:bold;">Post time:</div>
-    <div id="el-p-relevance-selector" style="margin-top:4px;">
-      <input type="radio" id="el-p-relevance-now"   name="relevance" value="now"   checked="checked" /><label for="el-p-relevance-now"   title="it will be the actual posting time"      >now</label>
-      <input type="radio" id="el-p-relevance-past"  name="relevance" value="past"                    /><label for="el-p-relevance-past"  title="use date and time selector on the right" >past</label>
-      <input type="radio" id="el-p-relevance-shift" name="relevance" value="shift"                   /><label for="el-p-relevance-shift" title="within specified shift"                  >in shift</label>
-      <input type="radio" id="el-p-relevance-run"   name="relevance" value="run"                     /><label for="el-p-relevance-run"   title="within specified run"                    >in run</label>
-    </div>
-  </div>
-  <div style="float:left; margin-left:10px;">
-    <div style="font-weight:bold;">&nbsp;</div>
-    <div style="margin-top:4px;">
-      <input type="text" id="el-p-datepicker" value="{$today}" size=11 />
-      <input type="text" id="el-p-time" value="{$now}"  size=8 />
-    </div>
-  </div>
-  <div style="clear:both"></div>
-</div>
-HERE
-			,
-			'callback' => 'set_current_tab("tabs-el-p-context")'
-    	)
-    );
-    $tabs_elog_post_extra = DataPortal::tabs_html( "tabs-el-p-subtabs", $tabs_elog_post_extra );
     $tabs_elog_post =<<<HERE
-    <div style="float:left; margin-right:20px;">
       <form id="elog-form-post" enctype="multipart/form-data" action="/apps-dev/logbook/NewFFEntry4portal.php" method="post">
         <input type="hidden" name="author_account" value="" />
         <input type="hidden" name="id" value="" />
@@ -1165,24 +693,79 @@ HERE
         <input type="hidden" name="num_tags" value="{$num_tags}" />
         <input type="hidden" name="onsuccess" value="" />
         <input type="hidden" name="relevance_time" value="" />
-        <textarea name="message_text" rows="12" cols="80" style="padding:4px;" title="the first line of the message body will be used as its subject" ></textarea>
-        <div style="margin-top:10px;">{$tabs_elog_post_extra}</div>
+        <div>
+          <div style="float:left;">
+	        <span style="font-weight:bold;">Anchor to:</span>
+            <div style="margin-top:4px;"></div>
+	        <div id="elog-post-context-selector">
+		      <input type="radio" id="elog-post-context-experiment" name="scope" value="experiment" checked="checked" /><label for="elog-post-context-experiment">experiment</label>
+		      <input type="radio" id="elog-post-context-shift"      name="scope" value="shift"                        /><label for="elog-post-context-shift"     >shift</label>
+		      <input type="radio" id="elog-post-context-run"        name="scope" value="run"                          /><label for="elog-post-context-run"       >run</label>
+	        </div>
+		  </div>
+          <div style="float:left; margin-left:20px;">
+            <span style="font-weight:bold;">Shift:</span>
+            <div style="margin-top:4px;"></div>
+            <select id="elog-post-shift">{$shifts_html}</select>
+          </div>
+		  <div style="float:left; margin-left:20px;">
+            <span style="font-weight:bold;">Run #:</span>
+            <div style="margin-top:4px;"></div>
+            <input type="text" id="elog-post-runnum" value="{$max_run}" size=4 />
+            <span id="elog-post-runnum-error" style="color:red;"></span>
+          </div>
+          <div style="clear:both;"></div>
+        </div>
+		<div style="margin-top:20px;">
+          <div style="float:left;">
+            <span style="font-weight:bold;">Post:</span>
+            <div style="margin-top:4px;"></div>
+            <div id="elog-post-relevance-selector">
+		      <input type="radio" id="elog-post-relevance-now"   name="relevance" value="now"   checked="checked" /><label for="elog-post-relevance-now"   title="it will be the actual posting time"      >current time</label>
+		      <input type="radio" id="elog-post-relevance-past"  name="relevance" value="past"                    /><label for="elog-post-relevance-past"  title="use date and time selector on the right" >specific time</label>
+		      <input type="radio" id="elog-post-relevance-shift" name="relevance" value="shift"                   /><label for="elog-post-relevance-shift" title="within specified shift"                  >within shift</label>
+		      <input type="radio" id="elog-post-relevance-run"   name="relevance" value="run"                     /><label for="elog-post-relevance-run"   title="within specified run"                    >within run</label>
+		    </div>
+		  </div>
+          <div style="float:left; margin-left:20px;">
+            <span style="font-weight:bold;">Date & time:</span>
+            <div style="margin-top:4px;"></div>
+            <input type="text" id="elog-post-datepicker" value="{$today}" size=11 />
+            <input type="text" id="elog-post-time" value="{$now}"  size=8 />
+          </div>
+          <div style="clear:both"></div>
+		</div>
+        <div style="margin-top:20px;">
+          <div style="float:left;">
+            <span style="font-weight:bold;">Message:</span>
+            <div style="margin-top:4px;"></div>
+            <textarea name="message_text" rows="12" cols="54" style="padding:4px;" title="the first line of the message body will be used as its subject" ></textarea>
+            <div style="margin-top:20px;">
+              <span style="font-weight:bold;">Tags (= values):</span>
+              <div id="elog-tags" style="margin-top:4px;">{$tags_html}</div>
+            </div>
+          </div>
+          <div style="float:left; margin-left:40px;">
+            <span style="font-weight:bold;">Attachments:</span>
+            <div id="elog-post-attachments" style="margin-top:4px;">
+              <input type="file" name="file2attach_0" onchange="elog.post_add_attachment(this)" />
+              <input type="hidden" name="file2attach_0" value="" title="put an optional file description here" /><br>
+            </div>
+          </div>
+          <div style="clear:both;"></div>
+        </div>
       </form>
-    </div>
-    <div style="float:left;">
-      <div><button id="elog-submit-and-stay">Submit and stay on this page</button></div>
-      <div><button id="elog-submit-and-follow">Submit and follow up</button></div>
-      <div><button id="elog-reset">Reset form</button></div>
-    </div>
-    <div style="clear:both;"></div>\n
+      <div style="margin-top:40px;">
+        <button id="elog-submit">Submit</button>
+        <button id="elog-reset">Reset</button>
+      </div>\n
 HERE;
     array_push(
 		$tabs_elog_subtabs,
     	array(
     		'name' => 'Post',
-    		'id' => 'tabs-elog-post',
+    		'id'   => 'tabs-elog-post',
     		'html' => $tabs_elog_post,
-    		'class' => 'tab-inline-content',
     	    'callback' => 'set_current_tab("tabs-elog-post")'
     	)
     );
@@ -1194,9 +777,8 @@ HERE;
 		$tabs_elog_subtabs,
     	array(
     		'name' => 'Search',
-    		'id' => 'tabs-elog-search',
+    		'id'   => 'tabs-elog-search',
     		'html' => $tabs_elog_search,
-            'class' => 'tab-inline-content',
     	    'callback' => 'set_current_tab("tabs-elog-search")'
     	)
     );
@@ -1209,10 +791,9 @@ HERE;
 		$tabs_elog_subtabs,
     	array(
     		'name' => 'Browse',
-    		'id' => 'tabs-elog-browse',
-            'html' => $tabs_elog_browse,
-            'class' => 'tab-inline-content',
-            'callback' => 'set_current_tab("tabs-elog-browse")'
+    		'id'   => 'tabs-elog-browse',
+    		'html' => $tabs_elog_browse,
+    	    'callback' => 'set_current_tab("tabs-elog-browse")'
     	)
     );
 
@@ -1223,9 +804,8 @@ HERE;
 		$tabs_elog_subtabs,
     	array(
     		'name' => 'Runs',
-    		'id' => 'tabs-elog-runs',
-            'html' => $tabs_elog_runs,
-            'class' => 'tab-inline-content',
+    		'id'   => 'tabs-elog-runs',
+    		'html' => $tabs_elog_runs,
     	    'callback' => 'set_current_tab("tabs-elog-runs")'
     	)
     );
@@ -1236,11 +816,10 @@ HERE;
     array_push(
 		$tabs_elog_subtabs,
     	array(
-            'name' => 'Shifts',
-            'id' => 'tabs-elog-shifts',
-            'html' => $tabs_elog_shifts,
-            'class' => 'tab-inline-content',
-            'callback' => 'set_current_tab("tabs-elog-shifts")'
+    		'name' => 'Shifts',
+    		'id'   => 'tabs-elog-shifts',
+    		'html' => $tabs_elog_shifts,
+    	    'callback' => 'set_current_tab("tabs-elog-shifts")'
     	)
     );
 
@@ -1250,11 +829,10 @@ HERE;
     array_push(
 		$tabs_elog_subtabs,
     	array(
-            'name' => 'Subscribe',
-            'id' => 'tabs-elog-subscribe',
-            'html' => $tabs_elog_subscribe,
-            'class' => 'tab-inline-content',
-            'callback' => 'set_current_tab("tabs-elog-subscribe")'
+    		'name' => 'Subscribe',
+    		'id'   => 'tabs-elog-subscribe',
+    		'html' => $tabs_elog_subscribe,
+    	    'callback' => 'set_current_tab("tabs-elog-subscribe")'
     	)
     );
 
@@ -1262,7 +840,7 @@ HERE;
 		$tabs,
     	array(
     		'name' => 'e-Log',
-    		'id' => 'tabs-elog',
+    		'id'   => 'tabs-elog',
     		'html' => DataPortal::tabs_html( "tabs-elog-subtabs", $tabs_elog_subtabs ),
     	    'callback' => 'set_current_tab("tabs-elog")'
     	)
@@ -1389,11 +967,10 @@ HERE;
     array_push(
 		$tabs_files_subtabs,
     	array(
-           'name' => 'By Runs',
-           'id' => 'tabs-files-4runs',
-            'html' => $tabs_files_4runs,
-            'class' => 'tab-inline-content',
-            'callback' => 'set_current_tab("tabs-files-4runs")'
+    		'name' => 'By Runs',
+    		'id'   => 'tabs-files-4runs',
+    		'html' => $tabs_files_4runs,
+    	    'callback' => 'set_current_tab("tabs-files-4runs")'
     	)
     );
     array_push(
@@ -1489,11 +1066,10 @@ HERE;
     array_push(
 		$tabs_translate_subtabs,
     	array(
-            'name' => 'Manage',
-            'id'   => 'tabs-translate-manage',
-            'html' => $tabs_translate_manage,
-            'class' => 'tab-inline-content',
-            'callback' => 'set_current_tab("tabs-translate-manage")'
+    		'name' => 'Manage',
+    		'id'   => 'tabs-translate-manage',
+    		'html' => $tabs_translate_manage,
+    	    'callback' => 'set_current_tab("tabs-translate-manage")'
     	)
     );
     $tabs_translate_history =<<<HERE
@@ -1503,22 +1079,37 @@ HERE;
     array_push(
 		$tabs_translate_subtabs,
     	array(
-            'name' => 'History',
-            'id'   => 'tabs-translate-history',
-            'html' => $tabs_translate_history,
-            'class' => 'tab-inline-content',
+    		'name' => 'History of Requests',
+    		'id'   => 'tabs-translate-history',
+    		'html' => $tabs_translate_history,
     	    'callback' => 'set_current_tab("tabs-translate-history")'
     	)
     );
     array_push(
 		$tabs,
     	array(
-    		'name' => 'HDF5 Translation',
+    		'name' => 'XTC/HDF5 Translation',
     		'id'   => 'tabs-translate',
     		'html' => DataPortal::tabs_html( "tabs-translate-subtabs", $tabs_translate_subtabs ),
     	    'callback' => 'set_current_tab("tabs-translate")'
     	)
     );
+
+    $tabs_account =<<<HERE
+      <p>User account information, privileges, POSIX groups, other experiments participation,
+      subscriptions, etc.</p>\n
+HERE;
+   	array_push(
+		$tabs,
+    	array(
+    		'name' => 'My Account',
+    		'id'   => 'tabs-account',
+    		'html' => $tabs_account,
+    	    'callback' => 'set_current_tab("tabs-account")'
+    	)
+    );
+
+
 	DataPortal::tabs( "tabs", $tabs );
 ?>
 

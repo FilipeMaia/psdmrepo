@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2011-02-25 Igor Gaponenko
+- the first usable version of e-log Live & Post pages
+
 Tag: V00-00-01
 2010-10-20 Igor Gaponenko
 - this is an initial commit of the Protal implementation with the main goal to save the

@@ -303,7 +303,8 @@ HERE;
 
 			if( is_null( $experiment ))	$experiment = $e; // remember the first experiment in the list.
 
-			$experiments_html .= '<option>'.$e->name().', id='.$e->id().'</option>';
+			$selected_option = $last_experiment_id == $e->id() ? 'selected="selected"' : '';
+			$experiments_html .= "<option {$selected_option}>{$e->name()}, id={$e->id()}</option>";
 		}
 		$experiments_html .= '</select>';
 
@@ -323,9 +324,9 @@ HERE;
 		if( $opr_account_prev_auth_html != '' ) {
 			$opr_account_prev_auth_html .=<<<HERE
 </div>
-<div style="float:left; padding:10px; width:360px;">
-  <span style="color:red;">( Uncheck those authorizations which may compromise new experiment's
-  data privacy/security after accomplishing the switch )</span>
+<div style="float:left; padding:10px; width:180px;">
+  <span style="color:red;">Uncheck those authorizations which may compromise new experiment's
+  data privacy/security after accomplishing the switch.</span>
 </div>
 <div style="clear:both;"></div>
 HERE;
@@ -372,7 +373,7 @@ HERE;
 HERE;
     	}
 
-    	$pi_account = $regdb->find_user_account( $experiment->leader_account());
+    	$pi_account = $regdb->find_user_account( $last_experiment_leader /*$experiment->leader_account()*/ );
     	$pi_uid   = $pi_account['uid'];
     	$pi_gecos = $pi_account['gecos'];
     	$pi_email = $pi_account['email'];
@@ -403,7 +404,7 @@ HERE;
   <div style="clear:both;"></div>
   <div style="margin-top:20px;">
     <b>Additional instructions to be sent by e-mail:</b><br>
-    <textarea rows="10" cols="72" name="instructions"></textarea>
+    <textarea rows="10" cols="64" name="instructions"></textarea>
   </div>
 </div>
 HERE;
@@ -444,6 +445,37 @@ HERE;
 </div>
 HERE;
 
+		/* Generate a body of a tab displaying a history of previous switches.
+		 */
+		$html_history = '';
+       	$html_history .= DataPortal::table_begin_html(
+			array(
+				array( 'name' => 'Experiment',  'width' => 105 ),
+				array( 'name' => 'Id',          'width' =>  32 ),
+				array( 'name' => 'Switch Time', 'width' =>  90 ),
+				array( 'name' => 'By User',     'width' => 160 )
+			)
+		);
+		foreach( $regdb->experiment_switches( $instrument->name()) as $experiment_switch ) {
+
+			$exper_id = $experiment_switch['exper_id'];
+			$experiment = $regdb->find_experiment_by_id( $exper_id );
+
+			if( is_null( $experiment ))
+				die( "fatal internal error when resolving experiment id={$exper_id} in the database" );
+			
+			$experiment_portal_url = '<a href="index.php?exper_id='.$experiment->id().'" class="link" title="go to Experiment Data Portal">'.$experiment->name().'</a>';
+    		$html_history .= DataPortal::table_row_html(
+    			array(
+    				$experiment_portal_url,
+    				$experiment->id(),
+    				LusiTime::from64( $experiment_switch['switch_time'] )->toStringShort(),
+    				$experiment_switch['requestor_uid']
+   				)
+    		);
+		}
+    	$html_history .= DataPortal::table_end_html();
+		
 		/* Generate two tabs for each instrument: 'Current' and 'History'
 		 */
 		$instrument_tabs = array();
@@ -458,7 +490,7 @@ HERE;
 			$instrument_tabs,
 			array('name' => 'History',
 				  'id'   => 'instrument-'.$instrument->name().'-history',
-				  'html' => 'here be a log of previously made switches'
+				  'html' => $html_history
 			)
 		);
 

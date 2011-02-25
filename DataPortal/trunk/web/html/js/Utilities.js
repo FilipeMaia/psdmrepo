@@ -85,3 +85,15 @@ function mktime() {
     }
     return Math.floor(d.getTime()/1000);
 }
+
+/*
+ * Wait for the specified number of milliseconds then call a function.
+ */
+function delayed_call(timeout, f) {
+	var t = setTimeout(function() {
+			clearTimeout(t);
+			f();
+		},
+		timeout
+	);
+}
