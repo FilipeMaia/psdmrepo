@@ -25,7 +25,6 @@ import time
 
 import numpy as np
 
-
 import matplotlib 
 
 import matplotlib.pyplot as plt
@@ -38,166 +37,18 @@ from matplotlib.gridspec import GridSpec
 # Imports for other modules --
 #-----------------------------
 from pypdsdata import xtc
-
+from cspad import CsPad
 
 #---------------------
 #  Class definition --
 #---------------------
-
-class CsPad( object ):
-
-    npix_quad = 850
-    
-    # origin of section in quad coordinate system
-    #
-    # x-position correspond to column number
-    xpos_sec2x1 = [[ 414,  626,    0,    0,  213,    1,  418,  419],  # 2:5 were not measured
-                   [ 421,  634,    0,    0,  213,    1,  424,  425],
-                   [ 417,  630,    0,    1,  212,    0,  425,  426],
-                   [ 416,  630,    0,    0,  213,    1,  420,  421]] # 2:5 were not measured
-    # y-position correspond to maxrows - row number    
-    ypos_sec2x1 = [[   0,    0,  214,    1,  425,  425,  615,  402],  # 2:5 were not measured
-                   [   0,    0,  214,    1,  425,  425,  615,  402],
-                   [   0,    0,  215,    3,  431,  431,  616,  403],
-                   [   0,    0,  214,    1,  425,  425,  615,  403]] # 2:5 were not measured
-    
-
-    def __init__(self, config):
-        quads = range(4)
-        self.sections = map(config.sections, quads)
-        pass
-
-    def CsPadElement( self, data3d, qn ):
-        # Construct one image for each quadrant, each with 8 sections
-        # from a data3d = 3 x 2*194 x 185 data array
-        #   +---+---+-------+
-        #   |   |   |   6   |
-        #   + 5 | 4 +-------+
-        #   |   |   |   7   |
-        #   +---+---+---+---+
-        #   |   2   |   |   |
-        #   +-------+ 0 | 1 |
-        #   |   3   |   |   |
-        #   +-------+---+---+
-
-
-        # if any sections are missing, insert zeros
-        if len( data3d ) < 8 :
-            zsec = np.zeros( (185,388), dtype=data3d.dtype)
-            #zsec = zsec * -99
-            print np.max(zsec)
-            for i in range (8) :
-                if i not in self.sections[qn] :
-                    data3d = np.insert( data3d, i, zsec, axis=0 )
-
-        pairs = []
-        for i in range (8) :
-        
-            # insert gap between asics in the 2x1
-            asics = np.hsplit( data3d[i], 2)
-            gap = np.zeros( (185,4), dtype=data3d.dtype )
-            #gap = gap * -99
-            pair = np.hstack( (asics[0], gap, asics[1]) )
-
-                
-            # sections 2,3 and 6,7 are as is. The others need some rotation:
-            if i==0 or i==1 :
-                pair = pair[:,::-1].T
-            if i==4 or i==5 :
-                pair = pair[::-1,:].T
-
-            pairs.append( pair )
-
-
-        # make the array for this quadrant
-        quadrant = np.zeros( (self.npix_quad, self.npix_quad), dtype=data3d.dtype )
-        #quadrant = quadrant * -99
-
-        # insert the 2x1 sections according to
-        for sec in range (8):
-            nrows, ncols = pairs[sec].shape
-
-            # x,y  in quadrant coordinate system
-            xpos = self.xpos_sec2x1[qn][sec]
-            ypos = self.ypos_sec2x1[qn][sec]
-            colp = xpos
-            rowp = self.npix_quad-ypos
-
-            quadrant[rowp-nrows:rowp, colp:colp+ncols] = pairs[sec][0:nrows,0:ncols]
-
-
-        # Finally, rotate the quadrant as needed
-        if qn>0 : quadrant = np.rot90( quadrant, 4-qn)
-        return quadrant
-
-
-
-    def CsPadElementUnaligned( self, data3d, qn ):
-        # Construct one image for each quadrant, each with 8 sections
-        # from a data3d = 3 x 2*194 x 185 data array
-        #   +---+---+-------+
-        #   |   |   |   6   |
-        #   + 5 | 4 +-------+
-        #   |   |   |   7   |
-        #   +---+---+---+---+
-        #   |   2   |   |   |
-        #   +-------+ 0 | 1 |
-        #   |   3   |   |   |
-        #   +-------+---+---+
-
-        zeros = np.zeros((18,388),dtype=data3d.dtype)
-        zeros9 = np.zeros((9,388),dtype=data3d.dtype)
-        zeros6 = np.zeros((6,388),dtype=data3d.dtype)
-
-        # if any sections are missing, insert zeros
-        if len( data3d ) < 8 :
-            zsec = np.zeros( (185,388), dtype=data3d.dtype)
-            for i in range (8) :
-                if i not in self.sections[qn] :
-                    data3d = np.insert( data3d, i, zsec, axis=0 )
-                #print "section ", i
-                #print data3d[i]
-
-
-        s01 = np.concatenate( (zeros6.T,
-                               data3d[0][:,::-1].T,
-                               zeros6.T,
-                               data3d[1][:,::-1].T,
-                               zeros6.T),
-                              1)
-        s23 = np.concatenate( (zeros6,
-                               data3d[2], 
-                               zeros6,
-                               data3d[3],
-                               zeros6 ),
-                              0 )
-        s45 = np.concatenate( (zeros6.T,
-                               data3d[5][::-1,:].T,
-                               zeros6.T,
-                               data3d[4][::-1,:].T,
-                               zeros6.T), 
-                              1 )
-        s67 = np.concatenate( (zeros6,
-                               data3d[6], 
-                               zeros6,
-                               data3d[7],
-                               zeros6 ),
-                              0 )
-
-        m1 = np.hstack( (s23, s01) )
-        m2 = np.hstack( (s45, s67) )
-        e0 = np.vstack( (m2, m1) )
-
-        if qn>0 : e0 = np.rot90( e0, 4-qn)
-        return e0
-
 
 class  pyana_cspad ( object ) :
 
     #--------------------
     #  Class variables --
     #--------------------
-
+    
     #----------------
     #  Constructor --
     #----------------
@@ -206,37 +57,66 @@ class  pyana_cspad ( object ) :
     def __init__ ( self,
                    image_source=None,
                    draw_each_event = 0,
-                   collect_darks = 0,
                    dark_img_file = None,
-                   plot_min = None,
-                   plot_max = None ):
+                   output_file = None,
+                   plot_vrange = None,
+                   threshold = None,
+                   thr_area = None ):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
         All parameters are passed as strings
 
-        @param image_source     address string of Detector-Id|Device-ID
-        @param draw_each_event  0 (False) or 1 (True) Draw plot for each event
-        @param collect_darks    0 (False) or 1 (True) Collect dark images (write to file)
-        @param dark_img_file    filename (If collecting: write to this file)
+        @param image_source     string, Address of Detector-Id|Device-ID
+        @param draw_each_event  bool, Draw plot for each event? (Default=False). 
+        @param dark_img_file    filename, Dark image file to be loaded, if any
+        @param output_file      filename (If collecting: write to this file)
+        @param plot_vrange      range=vmin-vmax of values for plotting (pixel intensity)
+        @param threshold        lower threshold for image intensity in threshold area of the plot
+        @param thr_area         range=xmin,xmax,ymin,ymax defining threshold area
         """
 
+        # initializations from argument list
         self.img_addr = image_source
         print "Using image_source = ", self.img_addr
 
-        self.draw_each_event = bool(int(draw_each_event))
-        print "Using draw_each_event = ", draw_each_event
+        self.draw_each_event = bool(draw_each_event)
+        if self.draw_each_event and ( draw_each_event == "No" or
+                                      draw_each_event == "0" or
+                                      draw_each_event == "False" ) : self.draw_each_event = False
+        print "Using draw_each_event = ", self.draw_each_event
 
-        self.collect_darks = bool(int(collect_darks))
-        print "Collecting darks? " , self.collect_darks
 
         self.dark_img_file = dark_img_file
+        if dark_img_file == "" or dark_img_file == "None" : self.dark_img_file = None
         print "Using dark image file: ", self.dark_img_file
 
-        # sum up all image data (above threshold) and all dark data (below threshold)
-        self.img_data = None
+        self.output_file = output_file
+        if output_file == "" or output_file == "None" : self.output_file = None
+        print "Using output_file: ", self.output_file
 
-        self.colmin = int(plot_min)
-        self.colmax = int(plot_max)
+        self.plot_vmin = None
+        self.plot_vmax = None
+        if plot_vrange is not None and plot_vrange is not "" : 
+            self.plot_vmin = float(plot_vrange.split("-")[0])
+            self.plot_vmax = float(plot_vrange.split("-")[1])
+            print "Using plot_vrange = %f-%f"%(self.plot_vmin,self.plot_vmax)
+
+        self.threshold = None
+        if threshold is not None :
+            self.threshold = float(threshold)
+            print "Using threshold value ", self.threshold
+
+        # subset of image where threshold is applied
+        self.thr_area = None
+        if thr_area is not None: 
+            self.thr_area = np.array([0.,0.,0.,0.])
+            for i in range (4) : self.thr_area[i] = float(thr_area.split(",")[i])
+            print "Using threshold region ", self.thr_area
+
+        # initializations of other class variables
+
+        # sum of image data
+        self.img_data = None
 
         # these will be plotted too
         self.lolimits = []
@@ -248,11 +128,13 @@ class  pyana_cspad ( object ) :
 
         # load dark image
         self.dark_image = None
-        if not self.collect_darks :
-            if self.dark_img_file is None :
-                print "No dark-image file provided. The images will not be background subtracted."
-            else :
-                self.dark_image = np.load(self.dark_img_file)
+        if self.dark_img_file is None :
+            print "No dark-image file provided. The images will not be background subtracted."
+        else :
+            print "Loading dark image from ", self.dark_img_file
+            self.dark_image = np.load(self.dark_img_file)
+
+
 
 
     # start of job
@@ -333,6 +215,7 @@ class  pyana_cspad ( object ) :
             #axes = plt.imshow( qimage, origin='lower')
 
 
+        # need to do this a better way:
         h1 = np.hstack( (qimages[0], qimages[1]) )
         h2 = np.hstack( (qimages[3], qimages[2]) )
         cspad_image = np.vstack( (h1, h2) )
@@ -342,6 +225,20 @@ class  pyana_cspad ( object ) :
         # collect min and max intensity of this image
         self.lolimits.append( self.vmin )
         self.hilimits.append( self.vmax )
+
+        # set threshold
+        if self.threshold is not None:
+            if self.thr_area is not None:
+                subset = cspad_image[self.thr_area[0]:self.thr_area[1],   # x1:x2
+                                     self.thr_area[2]:self.thr_area[3]]   # y1:y2
+                if np.max(subset) < self.threshold :
+                    print "skipping this event!  %f < %f " % (float(np.max(subset)), float(self.threshold))
+                    return
+            else :
+                if np.max(cspad_image) < self.threshold :
+                    print "skipping this event!  %f < %f " % (float(np.max(subset)), float(self.threshold))
+                    return
+                
 
         # add this image to the sum
         self.n_img+=1
@@ -359,7 +256,14 @@ class  pyana_cspad ( object ) :
                 subtr_image = cspad_image - self.dark_image 
                 title = "Event # %d, background subtracted" % self.n_events 
                 self.drawframemore(subtr_image, title, fignum=200 )
-                        
+
+            if self.thr_area is not None:
+                self.drawframemore(cspad_image[self.thr_area[0]:self.thr_area[1],
+                                               self.thr_area[2]:self.thr_area[3]],
+                                   "Event # %d, subset used for threshold (>%d)" %
+                                   (self.n_events, self.threshold),
+                                   fignum=300)
+
         plt.show()
 
 
@@ -369,17 +273,13 @@ class  pyana_cspad ( object ) :
 
         print "Done processing       ", self.n_events, " events"        
         
-        # plot the minimums and maximums
-        print len(self.lolimits)
-        xaxis = np.arange(self.n_events)
-        plt.clf()
-        plt.plot( xaxis, np.array(self.lolimits), "gv", xaxis, np.array(self.hilimits), "r^" )
-        plt.title("high (A) and low (V) limits")
-        plt.show()
-        print "Show?"
+#        # plot the minimums and maximums
+#        print len(self.lolimits)
+#        xaxis = np.arange(self.n_events)
+#        plt.clf()
+#        plt.plot( xaxis, np.array(self.lolimits), "gv", xaxis, np.array(self.hilimits), "r^" )
+#        plt.title("high (A) and low (V) limits")
 
-        #plt.plot( np.array(self.lolimits))
-        #plt.plot( np.array(self.hilimits))
 
         if self.img_data is None :
             print "No image data found from source ", self.img_addr
@@ -393,12 +293,27 @@ class  pyana_cspad ( object ) :
 
         # save the average data image (numpy array)
         # binary file .npy format
-        if self.collect_darks :
-            print "saving to ",  self.dark_img_file
-            np.save(self.dark_img_file, average_image)
-  
-        
-
+        if self.output_file is not None :
+            if ".npy" in self.output_file :
+                print "saving to ",  self.output_file
+                np.save(self.output_file, average_image)
+            else :
+                print "outputfile file does not have the required .npy ending..."
+                svar = raw_input("Do you want to provide an alternative file name? ")
+                if svar == "" :
+                    print "Nothing saved"
+                else :
+                    if ".npy" not in svar:
+                        print "I still don't like your file name, saving anyway..."
+                    print "saving to ",  svar
+                    np.save(svar, average_image)
+                
+        print "-------------------"
+        print "Done running pyana."
+        print "To run pyana again, edit config file if needed and hit \"Run pyana\" button again"
+        print "Send any feedback on this program to ofte@slac.stanford.edu"
+        print "Thank you!"
+        print "-------------------"
 
     # -------------------------------------------------------------------
     # Additional functions
@@ -413,13 +328,13 @@ class  pyana_cspad ( object ) :
         cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
 
 
-        gs = GridSpec(2,1, height_ratios=[5,1] )
+        gs = GridSpec(2,1, height_ratios=[6,1] )
 
         axes1 = plt.subplot(gs[0])
         axes1.set_title(title)
         # the main "Axes" object (on where the image is plotted)
 
-        self.axesim = plt.imshow( frameimage, vmin=self.colmin, vmax=self.colmax )#, origin='lower' )
+        self.axesim = plt.imshow( frameimage, vmin=self.plot_vmin, vmax=self.plot_vmax )#, origin='lower' )
         # axes image 
         
         self.colb = plt.colorbar(self.axesim,pad=0.01)
@@ -429,15 +344,15 @@ class  pyana_cspad ( object ) :
         # min and max values in the axes are
         print "Original value limits: ", self.orglims
 
-        if self.colmin is None: 
-            self.colmin, self.colmax = self.orglims
+        if self.plot_vmin is None: 
+            self.plot_vmin, self.plot_vmax = self.orglims
 
         axes2 = plt.subplot(gs[1])
         axes2.set_title("spectrum")
         self.axesim2 = plt.hist( frameimage.ravel(),
                                  bins=1000,
                                  histtype='stepfilled',
-                                 range=(self.colmin,self.colmax))
+                                 range=(self.plot_vmin,self.plot_vmax))
         
         print """
         To change the color scale, click on the color bar:
@@ -445,9 +360,9 @@ class  pyana_cspad ( object ) :
           - right-click sets higher limit
           - middle-click resets to original
         """
-        plt.show() # starts the GUI main loop
-                   # you need to kill window to proceed... 
-                   # (this shouldn't be done for every event!)
+        #plt.show() # starts the GUI main loop
+        #           # you need to kill window to proceed... 
+        #           # (this shouldn't be done for every event!)
 
 
     def drawframe( self, frameimage, title="", fignum=1):
@@ -472,8 +387,8 @@ class  pyana_cspad ( object ) :
         # min and max values in the axes are
         print "Original value limits: ", self.orglims
 
-        if self.colmin is None: 
-            self.colmin, self.colmax = self.orglims
+        if self.plot_vmin is None: 
+            self.plot_vmin, self.plot_vmax = self.orglims
         
         print """
         To change the color scale, click on the color bar:
@@ -481,9 +396,9 @@ class  pyana_cspad ( object ) :
           - right-click sets higher limit
           - middle-click resets to original
         """
-        plt.show() # starts the GUI main loop
-                   # you need to kill window to proceed... 
-                   # (this shouldn't be done for every event!)
+        #plt.show() # starts the GUI main loop
+        #           # you need to kill window to proceed... 
+        #           # (this shouldn't be done for every event!)
 
 
 
@@ -498,34 +413,34 @@ class  pyana_cspad ( object ) :
         if event.inaxes :
             lims = self.axesim.get_clim()
             
-            self.colmin = lims[0]
-            self.colmax = lims[1]
-            range = self.colmax - self.colmin
-            value = self.colmin + event.ydata * range
-            #print self.colmin, self.colmax, range, value
+            self.plot_vmin = lims[0]
+            self.plot_vmax = lims[1]
+            range = self.plot_vmax - self.plot_vmin
+            value = self.plot_vmin + event.ydata * range
+            #print self.plot_vmin, self.plot_vmax, range, value
             
             # left button
             if event.button is 1 :
-                if value > self.colmin and value < self.colmax :
-                    self.colmin = value
-                    print "new mininum: ", self.colmin
+                if value > self.plot_vmin and value < self.plot_vmax :
+                    self.plot_vmin = value
+                    print "new mininum: ", self.plot_vmin
                 else :
                     print "min has not been changed (click inside the color bar to change the range)"
                         
             # middle button
             elif event.button is 2 :
-                self.colmin, self.colmax = self.orglims
+                self.plot_vmin, self.plot_vmax = self.orglims
                 print "reset"
                     
             # right button
             elif event.button is 3 :
-                if value > self.colmin and value < self.colmax :
-                    self.colmax = value
-                    print "new maximum: ", self.colmax
+                if value > self.plot_vmin and value < self.plot_vmax :
+                    self.plot_vmax = value
+                    print "new maximum: ", self.plot_vmax
                 else :
                     print "max has not been changed (click inside the color bar to change the range)"
 
-            plt.clim(self.colmin,self.colmax)
+            plt.clim(self.plot_vmin,self.plot_vmax)
             plt.draw() # redraw the current figure
 
 

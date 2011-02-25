@@ -42,6 +42,7 @@ import matplotlib.pyplot as plt
 # Imports for other modules --
 #-----------------------------
 import pyanascript
+from pyana import pyanamod
 
 #----------------------------------
 # Local non-exported definitions --
@@ -104,6 +105,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.set_layout()
         self.show()
 
+        # assume all events        
+        self.nevents = None 
 
     def set_files(self, filenames = [] ):
         self.filenames = filenames
@@ -161,10 +164,6 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             return
 
         self.proc_pyana.kill()
-        #self.proc_pyana.communicate(input=subprocess.SIGTERM)
-        #self.proc_pyana.send_signal(subprocess.SIGTERM)
-        #self.proc_pyana.kill()
-        #self.proc_pyana.terminate()
 
 
     def add_selector(self, devices={} ):
@@ -269,16 +268,21 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
                     address = str(box.text()).split(":")[1]
                     options_for_mod[index].append("\nimage_source = %s" % address)
-                    options_for_mod[index].append("\ndraw_each_event = 1")
-                    options_for_mod[index].append("\ncollect_darks = 0")
-                    options_for_mod[index].append("\n#dark_img_file = pyana_cspad_average_image.npy")
-                    options_for_mod[index].append("\nplot_min = 100")
-                    options_for_mod[index].append("\nplot_max = 4000")
+                    options_for_mod[index].append("\ndraw_each_event = No")
+                    options_for_mod[index].append("\ndark_img_file = ")
+                    options_for_mod[index].append("\noutput_file = ")                    
+                    options_for_mod[index].append("\nplot_vrange = ")
+                    options_for_mod[index].append("\nthreshold = 4000")
+                    options_for_mod[index].append("\nthr_area = 600,700,600,700")
 
         nmodules = len(modules_to_run)
         if nmodules == 0 :
             print "No modules requested! Please select from list"
             return
+
+        ## at the very end, append plotter module:
+        #modules_to_run.append("XtcEventBrowser.pyana_plotter")
+        #options_for_mod.append([])
 
         # if several values for same option, merge into a list
         for m in range(0,nmodules):
@@ -402,8 +406,9 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # Make a command sequence 
         poptions = []
         poptions.append("pyana")
-        poptions.append("-n")
-        poptions.append("10")
+        if self.nevents is not None:
+            poptions.append("-n")
+            poptions.append(str(self.nevents))
         poptions.append("-c")
         poptions.append("%s" % self.configfile)
         for file in self.filenames :
@@ -412,7 +417,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # turn sequence into a string, allow user to modify it
         runstring = ' '.join(poptions)
         dialog =  QtGui.QInputDialog()
-        dialog.setMinimumWidth(1500)
+        dialog.resize(400,400)
+        #dialog.setMinimumWidth(1500)
         text, ok = dialog.getText(self,
                                   'Pyana options',
                                   'Run pyana with the following command (edit as needed and click OK):',
@@ -428,9 +434,11 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         print "Calling pyana.... "
         print "     ", ' '.join(poptions)
 
-        if 0 :                
+        if 0 :   
             # calling as module
-            pyanascript.main(poptions)
+            #pyanascript.main(poptions)
+
+            pyanamod.pyana(files=self.filenames, config=self.configfile, num_events=100)
             
         if 1 :
             # calling a new process
@@ -439,30 +447,12 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             #print stdout_value
             
         if self.quit_pyana_button is None :
-            self.quit_pyana_button = QtGui.QPushButton("&Stop pyana")
+            self.quit_pyana_button = QtGui.QPushButton("&Quit pyana")
             self.connect(self.quit_pyana_button, QtCore.SIGNAL('clicked()'), self.quit_pyana )
             self.v0.addWidget( self.quit_pyana_button )
             self.v0.setAlignment( self.quit_pyana_button, QtCore.Qt.AlignRight )
 
         #plt.show()
-            
-            
-            
-        # alternative ways of running pyana:
-        #
-        #os.system(runstring)  # this will block 
-        #
-        #program = QtCore.QString("pyana")
-        #arguments = QtCore.QStringList()
-        #arguments.append("-n 1000")
-        #arguments.append("-m XtcEventBrowser.pyana_bld")
-        #arguments.append("/reg/d/psdm/CXI/cxi80410/xtc/e55-r0088-s00-c00.xtc")        
-        #pyana = QtCore.QProcess()
-        #pyana.start(program,arguments)
-        #pyana.waitForFinished() 
-        #result = pyana.readAll()
-        #print result
-        #pyana.close()    
 
 
     #--------------------------------

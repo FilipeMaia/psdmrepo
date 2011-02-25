@@ -48,7 +48,8 @@ from matplotlib.figure import Figure
 import numpy as np
 import matplotlib.pyplot as plt
 
-from test import draw_on
+from xbplotter import draw_on
+from qt_mpl_bars import AppForm
 
 #----------------------------------
 # Local non-exported definitions --
@@ -163,7 +164,7 @@ part of it, please give an appropriate acknowledgment.
         self.mpl_button = QtGui.QPushButton("&MatPlotLib")
         self.connect(self.mpl_button, QtCore.SIGNAL('clicked()'), self.__makeplot )
         self.mpl2_button = QtGui.QPushButton("&MatPlotLib2")
-        self.connect(self.mpl2_button, QtCore.SIGNAL('clicked()'), self.__makeplot2 )
+        self.connect(self.mpl2_button, QtCore.SIGNAL('clicked()'), self.__makeplot3 )
 
         # Quit application
         self.quit_button = QtGui.QPushButton("&Quit")
@@ -312,14 +313,19 @@ part of it, please give an appropriate acknowledgment.
         axim = plt.imshow( dark_image[500:1000,1000:1500] )#, origin='lower' )
         
         return
-
+ 
     def __makeplot2(self):
         number = 200
         print "number " , number
-        draw_on(number)
-        
+        self.fig = draw_on(number)
         return
 
+    def __makeplot3(self):
+        form = AppForm()
+        form.show()
+
+        return
+        
 
         print "This does not work yet. Ignore"
         self.mpl_widget = QtGui.QWidget()

@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 from   pypdsdata import xtc
 
+
 # analysis class declaration
 class  pyana_ipimb ( object ) :
     
@@ -19,6 +20,8 @@ class  pyana_ipimb ( object ) :
             
         self.ipimb_addresses = ipimb_addresses.split(" ")
         print "pyana_ipimb, %d sources: " % len(self.ipimb_addresses)
+        for sources in self.ipimb_addresses :
+            print "  ", sources
                     
         self.fex_sum = {}
         self.fex_channels = {}
@@ -50,7 +53,6 @@ class  pyana_ipimb ( object ) :
                 self.fex_sum[addr].append( ipmFex.sum )
                 self.fex_channels[addr].append( ipmFex.channel )
                 self.fex_position[addr].append( [ipmFex.xpos, ipmFex.ypos] )
-
             else :
                 print "No object of type %s found" % self.ipm_addr
 
