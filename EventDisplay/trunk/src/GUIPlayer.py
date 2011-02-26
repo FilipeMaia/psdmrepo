@@ -215,16 +215,10 @@ class GUIPlayer ( QtGui.QWidget ) :
         cp.confpars.eventCurrent     = int(self.numbEdit.displayText())
         cp.confpars.numEventsAverage = int(self.avevEdit.displayText())
         #cp.confpars.span             = int(self.spanEdit.displayText())
+
+        self.drawev.averageOverEvents()
         
-        eventStart = cp.confpars.eventCurrent
-        eventEnd   = cp.confpars.eventCurrent + cp.confpars.numEventsAverage
-
-        event = 0
-        for cp.confpars.eventCurrent in range(eventStart,eventEnd) :
-            event += 1
-            print 'Event =',event, cp.confpars.eventCurrent
-
-        cp.confpars.eventCurrent +=1
+        #cp.confpars.eventCurrent +=1
         self.numbEdit.setText(str(cp.confpars.eventCurrent))
 
 

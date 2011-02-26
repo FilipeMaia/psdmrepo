@@ -67,34 +67,105 @@ class DrawEvent ( object ) :
         self.plotsCSpad             = cspad.PlotsForCSpad()
         self.plotsImage             = image.PlotsForImage()
         self.plotsWaveform          = wavef.PlotsForWaveform()
-        self.fig_window_is_open     = False 
         self.list_of_open_figs      = []
 
         # CSpad V1 for runs ~546,547...
         self.dsnameCSpadV1 = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV1/XppGon.0:Cspad.0/data"
 
-        # CSpad V2 for runs ~900
-        self.dsnameCSpadV2    = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data"
-        self.dsnameCSpadV2CXI = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data"
+       # CSpad V2 for runs ~900
+       #self.dsnameCSpadV2    = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data"
+       #self.dsnameCSpadV2CXI = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data"
         self.dsnameCSpadV2Conf= "/Configure:0000/CsPad::ConfigV2/"                        #CxiDs1.0:Cspad.0/config - is added auto
 
     #-------------------
     #  Public methods --
     #-------------------
 
+
+
+    def averageOverEvents(self, mode=1) :
+        print 'averageOverEvents'
+
+        t_start = time.clock()
+        self.openHDF5File() # t=0us
+        
+        eventStart = cp.confpars.eventCurrent
+        eventEnd   = cp.confpars.eventCurrent + 100 * cp.confpars.numEventsAverage
+
+        print 'selectionIsOn =', cp.confpars.selectionIsOn 
+
+        self.numEventsSelected = 0
+        self.loopIsContinued   = True
+
+        # Loop over events
+        while self.loopIsContinued :
+
+            if cp.confpars.eventCurrent % 10 == 0 :
+                print ' Current event =', cp.confpars.eventCurrent, 'Selected =', self.numEventsSelected
+
+            self.loopOverDataSets() # Initialization & Accumulation
+
+            cp.confpars.eventCurrent += 1
+            self.numEventsSelected   += 1
+            self.loopIsContinued = self.numEventsSelected < cp.confpars.numEventsAverage and cp.confpars.eventCurrent < eventEnd 
+
+
+        self.loopOverDataSets(option=1) # Normalization per 1 event
+
+        self.drawAveragedArrays(mode)
+
+        print 'Time to averageOverEvents() (sec) = %f' % (time.clock() - t_start)
+        self.closeHDF5File()
+
+
+    def drawAveragedArrays(self, mode=1) :
+        """This method makes initialization and draws averaged arrays"""
+
+        self.nwin_waveform = None
+        self.figNum = 0
+        self.loopOverDataSets(option=5) # Draw normalized datasets
+        self.showEvent(mode)
+
+
+    def loopOverDataSets ( self, option=None ) :
+        """Loop over datasets and accumulating arrays"""
+
+        ind=-1
+        for dsname in cp.confpars.list_of_checked_item_names :
+            ind += 1 
+
+            ds     = self.h5file[dsname]
+            arr1ev = ds[cp.confpars.eventCurrent]
+
+            if   option == None and self.numEventsSelected < 1 : # Initialization
+                self.ave1ev    = []
+                self.avedsname = []
+                self.ave1ev    .append(arr1ev.copy())
+                self.avedsname .append(dsname)
+
+            elif option == None :                                # Accumulation
+                self.ave1ev[ind] += arr1ev
+
+            elif option == 1 :                                   # Normalization per 1 event
+                if self.numEventsSelected > 0 :
+                    self.ave1ev[ind] /= self.numEventsSelected
+
+            elif option == 5 :                                   # Draw averaged dataset
+                self.drawArrayForDSName(self.avedsname[ind], self.ave1ev[ind])
+
+
+
+
     def drawEvent ( self, mode=1 ) :
         """Draws current event"""
 
         t_drawEvent = time.clock()
-        
-        #if not cp.confpars.h5_file_is_open :
         self.openHDF5File() # t=0us
 
         print 'Event %d' % ( cp.confpars.eventCurrent )
 
-        runNumber = self.h5file.attrs['runNumber'] # t=0us 
-        #print 'Run number = %d' % (runNumber) 
-
+        #self.runNumber = self.h5file.attrs['runNumber'] # t=0us 
+        #print 'Run number = %d' % (self.runNumber) 
 
         # Loop over checked data sets
         self.nwin_waveform = None
@@ -105,121 +176,127 @@ class DrawEvent ( object ) :
             ds     = self.h5file[dsname]
             arr1ev = ds[cp.confpars.eventCurrent]
 
-            cspadIsInTheName = printh5.CSpadIsInTheName(dsname)
-
-            item_last_name = printh5.get_item_last_name(dsname)
-            cp.confpars.current_item_name_for_title = printh5.get_item_name_for_title(dsname)
-            print 'Plot item:', dsname, ' item name:', item_last_name
-            #print 'Name for plot title:', cp.confpars.current_item_name_for_title
-
-            if dsname == self.dsnameCSpadV1 :
-                print 'Draw plots for CSpad V1'
-
-                #arr1ev # (4, 8, 185, 388) <- format of this record
-
-                self.figNum += 1 
-                if cp.confpars.cspadImageIsOn : 
-                    self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(4),plot=8)
-                else : self.close_fig(self.figNum)
-
-                self.figNum += 1 
-                if cp.confpars.cspadImageOfPairIsOn : 
-                    self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(1),plot=1)
-                else : self.close_fig(self.figNum)
-
-                self.figNum += 1 
-                if cp.confpars.cspadImageQuadIsOn : 
-                    self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(4),plot='Quad')
-                else : self.close_fig(self.figNum)
-
-                self.figNum += 1 
-                if cp.confpars.cspadImageDetIsOn : 
-                    self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(4),plot='Det')
-                else : self.close_fig(self.figNum)
-
-                self.figNum += 1 
-                if cp.confpars.cspadSpectrumIsOn : 
-                    self.plotsCSpad.plotCSpadV1Spectrum(arr1ev,self.set_fig(4),plot=16)
-                else : self.close_fig(self.figNum)
-
-                self.figNum += 1 
-                if cp.confpars.cspadSpectrum08IsOn : 
-                    self.plotsCSpad.plotCSpadV1Spectrum(arr1ev,self.set_fig(4),plot=8)
-                else : self.close_fig(self.figNum)
-                
-            #if dsname == self.dsnameCSpadV2 or dsname == self.dsnameCSpadV2CXI :
-                #print 'Draw plots for CSpad V2'
-
-            if cspadIsInTheName :
-
-                #arr1ev # (32, 185, 388) <- format of this record
-
-                self.getCSpadConfiguration(dsname)
-
-
-                self.figNum += 1 
-                if cp.confpars.cspadImageIsOn : 
-                    self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot=8)
-                else : self.close_fig(self.figNum)
-
-                self.figNum += 1 
-                if cp.confpars.cspadImageOfPairIsOn : 
-                    self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(1),plot=1)
-                else : self.close_fig(self.figNum)
-
-                self.figNum += 1 
-                if cp.confpars.cspadImageQuadIsOn : 
-                    self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot='Quad')
-                else : self.close_fig(self.figNum)
-
-                self.figNum += 1 
-                if cp.confpars.cspadSpectrumIsOn : 
-                    self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=16)
-                else : self.close_fig(self.figNum)
-
-                self.figNum += 1 
-                if cp.confpars.cspadSpectrum08IsOn : 
-                    self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=8)
-                else : self.close_fig(self.figNum)
-                
-                for nwin in range(cp.confpars.cspadImageNWindowsMax) :
-                    self.figNum += 1 
-                    if cp.confpars.cspadImageDetIsOn and nwin < cp.confpars.cspadImageNWindows : 
-                        self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot='Det')
-                    else : self.close_fig(self.figNum)
-
-            if item_last_name == 'image' :
-                self.figNum += 1 
-                if cp.confpars.imageImageIsOn : 
-                    self.plotsImage.plotImage(arr1ev,self.set_fig('1x1'))
-                else : self.close_fig(self.figNum)
-
-                self.figNum += 1 
-                if cp.confpars.imageSpectrumIsOn : 
-                    self.plotsImage.plotImageSpectrum(arr1ev,self.set_fig('1x1'))
-                else : self.close_fig(self.figNum)
-
-                self.figNum += 1 
-                if cp.confpars.imageImageSpecIsOn : 
-                    self.plotsImage.plotImageAndSpectrum(arr1ev,self.set_fig('1x2'))
-                else : self.close_fig(self.figNum)
-
-            if item_last_name == 'waveforms' :
-
-                for self.nwin_waveform in range(cp.confpars.waveformNWindows) :
-
-                    if dsname == cp.confpars.waveformWindowParameters[self.nwin_waveform][0] :
-
-                        self.figNum += 1 
-                        if cp.confpars.waveformWaveformIsOn : 
-                            self.plotsWaveform.plotWFWaveform(arr1ev,self.set_fig('2x1'))
-                        else : self.close_fig(self.figNum)
-
-        self.fig_window_is_open = True
+            self.drawArrayForDSName(dsname,arr1ev)
 
         self.showEvent(mode)
         self.closeHDF5File()
         print 'Time to drawEvent() (sec) = %f' % (time.clock() - t_drawEvent)
+
+
+
+
+    def drawArrayForDSName(self, dsname, arr1ev) :
+
+        cspadIsInTheName = printh5.CSpadIsInTheName(dsname)
+        item_last_name = printh5.get_item_last_name(dsname)
+        cp.confpars.current_item_name_for_title = printh5.get_item_name_for_title(dsname)
+        print 'Plot item:', dsname, ' item name:', item_last_name
+        #print 'Name for plot title:', cp.confpars.current_item_name_for_title
+
+        if dsname == self.dsnameCSpadV1 :
+            print 'Draw plots for CSpad V1'
+
+            #arr1ev # (4, 8, 185, 388) <- format of this record
+
+            self.figNum += 1 
+            if cp.confpars.cspadImageIsOn : 
+                self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(4),plot=8)
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.cspadImageOfPairIsOn : 
+                self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(1),plot=1)
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.cspadImageQuadIsOn : 
+                self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(4),plot='Quad')
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.cspadImageDetIsOn : 
+                self.plotsCSpad.plotCSpadV1Image(arr1ev,self.set_fig(4),plot='Det')
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.cspadSpectrumIsOn : 
+                self.plotsCSpad.plotCSpadV1Spectrum(arr1ev,self.set_fig(4),plot=16)
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.cspadSpectrum08IsOn : 
+                self.plotsCSpad.plotCSpadV1Spectrum(arr1ev,self.set_fig(4),plot=8)
+            else : self.close_fig(self.figNum)
+            
+        #if dsname == self.dsnameCSpadV2 or dsname == self.dsnameCSpadV2CXI :
+            #print 'Draw plots for CSpad V2'
+
+        if cspadIsInTheName :
+
+            #arr1ev # (32, 185, 388) <- format of this record
+
+            self.getCSpadConfiguration(dsname)
+
+
+            self.figNum += 1 
+            if cp.confpars.cspadImageIsOn : 
+                self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot=8)
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.cspadImageOfPairIsOn : 
+                self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(1),plot=1)
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.cspadImageQuadIsOn : 
+                self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot='Quad')
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.cspadSpectrumIsOn : 
+                self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=16)
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.cspadSpectrum08IsOn : 
+                self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=8)
+            else : self.close_fig(self.figNum)
+            
+            for nwin in range(cp.confpars.cspadImageNWindowsMax) :
+                self.figNum += 1 
+                if cp.confpars.cspadImageDetIsOn and nwin < cp.confpars.cspadImageNWindows : 
+                    self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot='Det')
+                else : self.close_fig(self.figNum)
+
+        if item_last_name == 'image' :
+            self.figNum += 1 
+            if cp.confpars.imageImageIsOn : 
+                self.plotsImage.plotImage(arr1ev,self.set_fig('1x1'))
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.imageSpectrumIsOn : 
+                self.plotsImage.plotImageSpectrum(arr1ev,self.set_fig('1x1'))
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.imageImageSpecIsOn : 
+                self.plotsImage.plotImageAndSpectrum(arr1ev,self.set_fig('1x2'))
+            else : self.close_fig(self.figNum)
+
+        if item_last_name == 'waveforms' :
+
+            for self.nwin_waveform in range(cp.confpars.waveformNWindows) :
+
+                if dsname == cp.confpars.waveformWindowParameters[self.nwin_waveform][0] :
+
+                    self.figNum += 1 
+                    if cp.confpars.waveformWaveformIsOn : 
+                        self.plotsWaveform.plotWFWaveform(arr1ev,self.set_fig('2x1'))
+                    else : self.close_fig(self.figNum)
+
+
 
 
     def getCSpadConfiguration( self, dsname ):
@@ -288,7 +365,6 @@ class DrawEvent ( object ) :
         """Set current fig."""
 
         ##self.figNum += 1 
-        #if self.fig_window_is_open :
         if self.figNum in self.list_of_open_figs :
             self.fig = plt.figure(num=self.figNum)        
         else :
@@ -356,11 +432,6 @@ class DrawEvent ( object ) :
         else :
             plt.close(figNum)
             if figNum in self.list_of_open_figs : self.list_of_open_figs.remove(figNum)
-
-        if  self.fig_window_is_open :
-            self.fig_window_is_open = False 
-            #print 'close_fig()'
-
 
 
 #
