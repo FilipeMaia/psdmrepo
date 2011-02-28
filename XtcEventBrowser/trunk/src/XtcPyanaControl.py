@@ -94,6 +94,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.filenames = []
 
         self.proc_pyana = None
+        self.configfile = None
         
         # buttons
         self.pyana_config = QtGui.QLabel(self);
@@ -196,6 +197,12 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         """Write the configuration text (to be written to file later)
         
         """
+        # clear title 
+        self.configfile = None
+        if self.econfig_button is not None : self.econfig_button.hide()
+        self.box_pconf.setTitle("Current pyana configuration:")
+
+
         nmodules = 0
         modules_to_run = []
         options_for_mod = []
@@ -363,6 +370,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             self.connect(self.econfig_button, QtCore.SIGNAL('clicked()'), self.__edit_configfile )
             self.ly_pconf.addWidget( self.econfig_button )
             self.ly_pconf.setAlignment( self.econfig_button, QtCore.Qt.AlignRight )
+        else :
+            self.econfig_button.show()
 
         if self.pyana_button is None: 
             self.pyana_button = QtGui.QPushButton("&Run pyana")
