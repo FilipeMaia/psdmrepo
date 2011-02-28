@@ -43,6 +43,11 @@ from cspad import CsPad
 #  Class definition --
 #---------------------
 
+#class MyRectangle(plt.Rectangle):
+#    def __call__(self, ax):
+#        self.set_bounds(*ax.viewLim.bounds)
+#        ax.figure.canvas.draw_idle()
+
 class  pyana_cspad ( object ) :
 
     #--------------------
@@ -107,6 +112,7 @@ class  pyana_cspad ( object ) :
             print "Using threshold value ", self.threshold
 
         # subset of image where threshold is applied
+        self.thr_rect = None
         self.thr_area = None
         if thr_area is not None: 
             self.thr_area = np.array([0.,0.,0.,0.])
@@ -251,11 +257,11 @@ class  pyana_cspad ( object ) :
         # Draw this event. Background subtracted if possible.
         if self.draw_each_event :
             if self.dark_image is None: 
-                self.drawframemore(cspad_image,"Event # %d" % self.n_events, fignum=200 )
+                self.drawframe(cspad_image,"Event # %d" % self.n_events, fignum=200 )
             else :
                 subtr_image = cspad_image - self.dark_image 
                 title = "Event # %d, background subtracted" % self.n_events 
-                self.drawframemore(subtr_image, title, fignum=200 )
+                self.drawframe(subtr_image, title, fignum=200 )
 
 
         plt.show()
@@ -331,17 +337,18 @@ class  pyana_cspad ( object ) :
         axes1.set_title(title)
         # the main "Axes" object (on where the image is plotted)
 
+        print "vmin vmax now: ", self.plot_vmin, self.plot_vmax
         self.axesim = plt.imshow( frameimage, vmin=self.plot_vmin, vmax=self.plot_vmax )#, origin='lower' )
         # axes image 
         
         self.colb = plt.colorbar(self.axesim,pad=0.01)
         # colb is the colorbar object
 
-        self.orglims = self.axesim.get_clim()
-        # min and max values in the axes are
-        print "Original value limits: ", self.orglims
 
         if self.plot_vmin is None: 
+            self.orglims = self.axesim.get_clim()
+            # min and max values in the axes are
+            print "Original value limits: ", self.orglims
             self.plot_vmin, self.plot_vmax = self.orglims
 
         axes2 = plt.subplot(gs[1])
@@ -369,22 +376,24 @@ class  pyana_cspad ( object ) :
 
         self.fig = plt.figure(num=fignum)
         cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+        cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)
         axes = self.fig.add_subplot(111)
         
         axes.set_title(title)
         # the main "Axes" object (on where the image is plotted)
 
-        self.axesim = plt.imshow( frameimage )#, origin='lower' )
+        self.axesim = plt.imshow( frameimage, vmin=self.plot_vmin, vmax=self.plot_vmax )#, origin='lower' )
         # axes image 
         
+        print "vmin vmax now: ", self.plot_vmin, self.plot_vmax
+
         self.colb = plt.colorbar(self.axesim,pad=0.01)
         # colb is the colorbar object
 
-        self.orglims = self.axesim.get_clim()
-        # min and max values in the axes are
-        print "Original value limits: ", self.orglims
-
         if self.plot_vmin is None: 
+            self.orglims = self.axesim.get_clim()
+            # min and max values in the axes are
+            print "Original value limits: ", self.orglims
             self.plot_vmin, self.plot_vmax = self.orglims
         
         print """
@@ -393,13 +402,48 @@ class  pyana_cspad ( object ) :
           - right-click sets higher limit
           - middle-click resets to original
         """
+
+        ## show the active region for thresholding
+        if self.thr_area is not None:
+            xy = [self.thr_area[0],self.thr_area[2]]
+            w = self.thr_area[1] - self.thr_area[0]
+            h = self.thr_area[3] - self.thr_area[2]
+            self.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=5)
+            axes.add_patch(self.thr_rect)
+
+    
+        #cspad_image[self.thr_area[0]:self.thr_area[1], self.thr_area[2]:self.thr_area[3]])
+        
+        
+
         #plt.show() # starts the GUI main loop
         #           # you need to kill window to proceed... 
         #           # (this shouldn't be done for every event!)
 
 
-        
+    def onpick(self, event):
+        print "Currently active area for threshold evaluation: [xmin xmax ymin ymax] = ", self.thr_area
+        print "To change this area, right-click..." 
+        if event.mouseevent.button == 3 :
+            print "Enter new coordinates to change this area:"
+            xxyy_string = raw_input("xmin xmax ymin ymax = ")
+            xxyy_list = xxyy_string.split(" ")
 
+            if len( xxyy_list ) != 4 :
+                print "Invalid entry, ignoring"
+                return
+                
+            for i in range (4):
+                self.thr_area[i] = float( xxyy_list[i] )
+
+            x = self.thr_area[0]
+            y = self.thr_area[2]
+            w = self.thr_area[1] - self.thr_area[0]
+            h = self.thr_area[3] - self.thr_area[2]
+            
+            self.thr_rect.set_bounds(x,y,w,h)
+            plt.draw()
+        
                                
     # define what to do if we click on the plot
     def onclick(self, event) :

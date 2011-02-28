@@ -1,3 +1,4 @@
+2011-Feb-28  ofte                 rev 1569  Added changable rectangle to show active threshold area.
 2011-Feb-25  ofte                 rev 1567  removed threshold subplot. Improved dialog w/colorbar.
 2011-Feb-25  ofte                 rev 1566  fixed a silly dependency problem
 2011-Feb-25  ofte  Tag V00-00-11  rev 1550  CsPad outsourced, dependence on "test" module fixed. parameter names
