@@ -232,6 +232,10 @@ class  pyana_cspad ( object ) :
         self.lolimits.append( self.vmin )
         self.hilimits.append( self.vmax )
 
+        # subtract background if provided
+        if self.dark_image is not None: 
+            cspad_image = cspad_image - self.dark_image 
+
         # set threshold
         if self.threshold is not None:
             if self.thr_area is not None:
@@ -245,6 +249,7 @@ class  pyana_cspad ( object ) :
                     print "skipping this event!  %f < %f " % (float(np.max(subset)), float(self.threshold))
                     return
                 
+                print "Threshold area min,max = %.2f, %.2f " % (np.min(subset),np.max(subset))
 
         # add this image to the sum
         self.n_img+=1
@@ -254,15 +259,13 @@ class  pyana_cspad ( object ) :
             self.img_data += cspad_image
 
 
-        # Draw this event. Background subtracted if possible.
+        # Draw this event.
+        title = "Event # %d" % self.n_events
+        if self.dark_image is not None:
+            title = title + " (background subtracted) "
+            
         if self.draw_each_event :
-            if self.dark_image is None: 
-                self.drawframe(cspad_image,"Event # %d" % self.n_events, fignum=200 )
-            else :
-                subtr_image = cspad_image - self.dark_image 
-                title = "Event # %d, background subtracted" % self.n_events 
-                self.drawframe(subtr_image, title, fignum=200 )
-
+            self.drawframe(cspad_image,title, fignum=200 )
 
         plt.show()
 

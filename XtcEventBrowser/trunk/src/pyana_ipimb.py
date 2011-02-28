@@ -49,6 +49,7 @@ class  pyana_ipimb ( object ) :
 
             # feature-extracted data
             ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, addr )
+            print type(ipmFex)
             if ipmFex :
                 self.fex_sum[addr].append( ipmFex.sum )
                 self.fex_channels[addr].append( ipmFex.channel )
