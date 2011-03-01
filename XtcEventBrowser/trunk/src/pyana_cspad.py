@@ -108,8 +108,9 @@ class  pyana_cspad ( object ) :
 
         self.threshold = None
         if threshold is not None :
-            self.threshold = float(threshold)
-            print "Using threshold value ", self.threshold
+            if not ( threshold == "" or threshold == "None" ):
+                self.threshold = float(threshold)
+                print "Using threshold value ", self.threshold
 
         # subset of image where threshold is applied
         self.thr_rect = None
@@ -238,18 +239,19 @@ class  pyana_cspad ( object ) :
 
         # set threshold
         if self.threshold is not None:
+            topval = np.max(cspad_image)
             if self.thr_area is not None:
                 subset = cspad_image[self.thr_area[0]:self.thr_area[1],   # x1:x2
                                      self.thr_area[2]:self.thr_area[3]]   # y1:y2
-                if np.max(subset) < self.threshold :
-                    print "skipping this event!  %f < %f " % (float(np.max(subset)), float(self.threshold))
-                    return
-            else :
-                if np.max(cspad_image) < self.threshold :
-                    print "skipping this event!  %f < %f " % (float(np.max(subset)), float(self.threshold))
-                    return
+
                 
-                print "Threshold area min,max = %.2f, %.2f " % (np.min(subset),np.max(subset))
+                topval = np.max(subset)
+
+            if topval < self.threshold :
+                print "skipping this event!  %.2f < %.2f " % (topval, float(self.threshold))
+                return
+            else :
+                print "Plotting this event, vmax = %.2f > %.2f " % (topval, float(self.threshold))
 
         # add this image to the sum
         self.n_img+=1
@@ -340,7 +342,6 @@ class  pyana_cspad ( object ) :
         axes1.set_title(title)
         # the main "Axes" object (on where the image is plotted)
 
-        print "vmin vmax now: ", self.plot_vmin, self.plot_vmax
         self.axesim = plt.imshow( frameimage, vmin=self.plot_vmin, vmax=self.plot_vmax )#, origin='lower' )
         # axes image 
         
@@ -377,7 +378,7 @@ class  pyana_cspad ( object ) :
         # plot image frame
         #if fig is None :
 
-        self.fig = plt.figure(num=fignum)
+        self.fig = plt.figure(figsize=(10,8),num=fignum)
         cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
         cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)
         axes = self.fig.add_subplot(111)
@@ -427,6 +428,7 @@ class  pyana_cspad ( object ) :
     def onpick(self, event):
         print "Currently active area for threshold evaluation: [xmin xmax ymin ymax] = ", self.thr_area
         print "To change this area, right-click..." 
+        print "To change threshold, middle-click..." 
         if event.mouseevent.button == 3 :
             print "Enter new coordinates to change this area:"
             xxyy_string = raw_input("xmin xmax ymin ymax = ")
@@ -447,6 +449,12 @@ class  pyana_cspad ( object ) :
             self.thr_rect.set_bounds(x,y,w,h)
             plt.draw()
         
+        if event.mouseevent.button == 2 :
+            text = raw_input("Enter new threshold value (current = %.2f) " % self.threshold)
+            if text == "" :
+                print "Invalid entry, ignoring"
+            self.threshold = float(text)
+            print "Threshold value has been changed to ", self.threshold
                                
     # define what to do if we click on the plot
     def onclick(self, event) :

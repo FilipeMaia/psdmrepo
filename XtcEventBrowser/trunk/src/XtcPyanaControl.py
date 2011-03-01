@@ -140,13 +140,23 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.ly_pconf.addWidget(self.pyana_config )
         self.box_pconf.setLayout(self.ly_pconf)
         
+        self.hconf = QtGui.QHBoxLayout()
+        self.config_button = QtGui.QPushButton("&Write configuration to file")
+        self.connect(self.config_button, QtCore.SIGNAL('clicked()'), self.__write_configfile )
+        self.hconf.addWidget( self.config_button )
+        self.econfig_button = QtGui.QPushButton("&Edit configuration file")
+        self.connect(self.econfig_button, QtCore.SIGNAL('clicked()'), self.__edit_configfile )
+        self.hconf.addWidget( self.econfig_button )
+        self.config_button.hide()
+        self.econfig_button.hide()
 
-        v1 = QtGui.QVBoxLayout()
-        v1.addWidget( self.box_pconf )
-        v1.setAlignment( self.pyana_config, QtCore.Qt.AlignTop )
+        self.v1 = QtGui.QVBoxLayout()
+        self.v1.addWidget( self.box_pconf )
+        self.v1.setAlignment( self.pyana_config, QtCore.Qt.AlignTop )
+        self.v1.addLayout( self.hconf )
 
         h1.addWidget(self.dgroup)
-        h1.addLayout(v1)
+        h1.addLayout(self.v1)
 
         # header
         self.v0.addLayout(h0)
@@ -327,12 +337,10 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             
         self.pyana_config.setText(self.configuration)
 
-
-        if self.config_button is None: 
-            self.config_button = QtGui.QPushButton("&Write configuration to file")
-            self.connect(self.config_button, QtCore.SIGNAL('clicked()'), self.__write_configfile )
-            self.ly_pconf.addWidget( self.config_button )
-            self.ly_pconf.setAlignment( self.config_button, QtCore.Qt.AlignLeft )
+        self.config_button.show()
+        self.econfig_button.show()
+        self.config_button.setEnabled(True)
+        self.econfig_button.setDisabled(True)
 
 
     def __print_configuration(self):
@@ -363,15 +371,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
         self.__print_configuration
         
-        
-
-        if self.econfig_button is None: 
-            self.econfig_button = QtGui.QPushButton("&Edit configuration file")
-            self.connect(self.econfig_button, QtCore.SIGNAL('clicked()'), self.__edit_configfile )
-            self.ly_pconf.addWidget( self.econfig_button )
-            self.ly_pconf.setAlignment( self.econfig_button, QtCore.Qt.AlignRight )
-        else :
-            self.econfig_button.show()
+        self.config_button.setDisabled(True)
+        self.econfig_button.setEnabled(True)
 
         if self.pyana_button is None: 
             self.pyana_button = QtGui.QPushButton("&Run pyana")

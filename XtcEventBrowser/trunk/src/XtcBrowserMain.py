@@ -101,6 +101,7 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         
         self.__create_main_frame()
 
+
     def about(self):
         progname = os.path.basename(sys.argv[0])
         progversion = "0.1"
@@ -154,10 +155,20 @@ part of it, please give an appropriate acknowledgment.
 
         # --- Scan section --- 
         self.scan_button = QtGui.QPushButton("&Scan File(s)")
+        self.scan_button.setDisabled(True)
         self.connect(self.scan_button, QtCore.SIGNAL('clicked()'), self.__scan_files )
+        self.scan_label = QtGui.QLabel(self.scan_button)
+        self.scan_label.setText("(Scan all events. Not recommended!)")
         
         self.qscan_button = QtGui.QPushButton("&Quick Scan")
         self.connect(self.qscan_button, QtCore.SIGNAL('clicked()'), self.__scan_files_quick )
+        self.nev_qscan = 200
+        self.qscan_edit = QtGui.QLineEdit(str(self.nev_qscan))
+        self.qscan_edit.setMaximumWidth(100)
+        self.connect(self.qscan_edit, QtCore.SIGNAL('returnPressed()'), self.__change_nev_qscan )
+
+        self.qscan_label = QtGui.QLabel(self.qscan_button)
+        self.qscan_label.setText("(Scan the first %d events)   " % self.nev_qscan)
 
         # Test matplotlib widget
         self.mpl_button = QtGui.QPushButton("&MatPlotLib")
@@ -190,7 +201,9 @@ part of it, please give an appropriate acknowledgment.
 
         v1 = QtGui.QVBoxLayout()
         v1.addWidget( self.fbrowser_button )
+        v1.setAlignment( self.fbrowser_button, QtCore.Qt.AlignTop)
         v1.addWidget( self.fclear_button )
+        v1.setAlignment( self.fclear_button, QtCore.Qt.AlignTop)
 
         v2 = QtGui.QVBoxLayout()
         v2.addWidget( self.currentfiles )
@@ -209,12 +222,21 @@ part of it, please give an appropriate acknowledgment.
         H1.addLayout(h2)
         fgroup.setLayout(H1)
         
-        # action
+        # Scan
+        hs0 = QtGui.QHBoxLayout()
+        hs0.addWidget( self.qscan_button )
+        hs0.addWidget( self.qscan_label )
+        hs0.addWidget( self.qscan_edit )
+        hs0.setAlignment( self.qscan_edit, QtCore.Qt.AlignLeft )
+        hs1 = QtGui.QHBoxLayout()
+        hs1.addWidget( self.scan_button )
+        hs1.addWidget( self.scan_label )
+
         v3 = QtGui.QVBoxLayout()
-        v3.addWidget( self.qscan_button )
-        v3.setAlignment(self.qscan_button, QtCore.Qt.AlignLeft )
-        v3.addWidget( self.scan_button )
-        v3.setAlignment(self.scan_button, QtCore.Qt.AlignLeft )
+        v3.addLayout( hs0 )
+        v3.setAlignment( hs0, QtCore.Qt.AlignLeft )
+        v3.addLayout( hs1 )
+        v3.setAlignment( hs1, QtCore.Qt.AlignLeft )
         #v3.addWidget( self.mpl_button )
         #v3.setAlignment(self.mpl_button, QtCore.Qt.AlignRight )
         #v3.addWidget( self.mpl2_button )
@@ -441,6 +463,10 @@ part of it, please give an appropriate acknowledgment.
         self.currentfiles.setText(status)
 
 
+    def __change_nev_qscan(self):
+        self.nev_qscan = int(self.qscan_edit.text())
+        self.qscan_label.setText("(Scan the first %d events)   "%self.nev_qscan)
+        
     def __scan_files(self):
         """Scan xtc files
 
@@ -474,7 +500,7 @@ part of it, please give an appropriate acknowledgment.
 
         print self.filenames
         self.scanner.setFiles(self.filenames)
-        self.scanner.setOption({'ndatagrams':600})
+        self.scanner.setOption({'ndatagrams':self.nev_qscan})
         self.scanner.scan()
 
         #self.__add_selector()
