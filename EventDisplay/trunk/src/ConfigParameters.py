@@ -123,7 +123,8 @@ class ConfigParameters ( object ) :
         self.cspadImageDetIsOn    = True
         self.cspadSpectrumIsOn    = False
         self.cspadSpectrum08IsOn  = False
-        self.cspadProjXYIsOn      = False
+        self.cspadProjXIsOn       = False
+        self.cspadProjYIsOn       = False
         self.cspadProjRIsOn       = False
         self.cspadProjPhiIsOn     = False
 
@@ -141,7 +142,8 @@ class ConfigParameters ( object ) :
         self.imageImageIsOn       = False
         self.imageSpectrumIsOn    = False
         self.imageImageSpecIsOn   = True
-        self.imageProjXYIsOn      = False
+        self.imageProjXIsOn       = False
+        self.imageProjYIsOn       = False
         self.imageProjRIsOn       = False
         self.imageProjPhiIsOn     = False
 
@@ -186,12 +188,10 @@ class ConfigParameters ( object ) :
 
         self.projR_BinWidthIsOn= True
         self.projR_SliWidthIsOn= True
-
         self.projR_NBins       = 100
         self.projR_BinWidth    = 10
         self.projR_NSlices     = 8
         self.projR_SliWidth    = 45
-              
         self.projR_Rmin        = 0
         self.projR_Rmax        = 1000
         self.projR_Phimin      = 0
@@ -199,16 +199,37 @@ class ConfigParameters ( object ) :
 
         self.projPhi_BinWidthIsOn= True
         self.projPhi_SliWidthIsOn= True
-
         self.projPhi_NBins       = 36
         self.projPhi_BinWidth    = 10
         self.projPhi_NSlices     = 10
         self.projPhi_SliWidth    = 100
-              
         self.projPhi_Rmin        = 0
         self.projPhi_Rmax        = 1000
         self.projPhi_Phimin      = 0
-        self.projPhi_Phimax      = 360
+        self.projPhi_Phimax      = 360 
+
+
+        self.projX_BinWidthIsOn  = True
+        self.projX_SliWidthIsOn  = True
+        self.projX_NBins         = 100  
+        self.projX_BinWidth      = 20  
+        self.projX_NSlices       = 10  
+        self.projX_SliWidth      = 200 
+        self.projX_Xmin          = 0   
+        self.projX_Xmax          = 2000
+        self.projX_Ymin          = 0   
+        self.projX_Ymax          = 2000
+                                 
+        self.projY_BinWidthIsOn  = True
+        self.projY_SliWidthIsOn  = True
+        self.projY_NBins         = 100 
+        self.projY_BinWidth      = 20  
+        self.projY_NSlices       = 10  
+        self.projY_SliWidth      = 200 
+        self.projY_Xmin          = 0   
+        self.projY_Xmax          = 2000
+        self.projY_Ymin          = 0   
+        self.projY_Ymax          = 2000
 
     #-------------------
     #  Public methods --
@@ -232,7 +253,8 @@ class ConfigParameters ( object ) :
         print 'CSPAD_IMAGE_DET_IS_ON',     self.cspadImageDetIsOn
         print 'CSPAD_SPECT_IS_ON',         self.cspadSpectrumIsOn    
         print 'CSPAD_SPE08_IS_ON',         self.cspadSpectrum08IsOn    
-        print 'CSPAD_PROJ_XY_IS_ON',       self.cspadProjXYIsOn    
+        print 'CSPAD_PROJ_X_IS_ON',        self.cspadProjXIsOn    
+        print 'CSPAD_PROJ_Y_IS_ON',        self.cspadProjYIsOn    
         print 'CSPAD_PROJ_R_IS_ON',        self.cspadProjRIsOn    
         print 'CSPAD_PROJ_PHI_IS_ON',      self.cspadProjPhiIsOn    
 
@@ -244,7 +266,8 @@ class ConfigParameters ( object ) :
         print 'IMAGE_IMAGE_IS_ON',         self.imageImageIsOn       
         print 'IMAGE_IMAGE_SPEC_IS_ON',    self.imageImageSpecIsOn       
         print 'IMAGE_SPECT_IS_ON',         self.imageSpectrumIsOn    
-        print 'IMAGE_PROJ_XY_IS_ON',       self.imageProjXYIsOn    
+        print 'IMAGE_PROJ_X_IS_ON',        self.imageProjXIsOn    
+        print 'IMAGE_PROJ_Y_IS_ON',        self.imageProjYIsOn    
         print 'IMAGE_PROJ_R_IS_ON',        self.imageProjRIsOn    
         print 'IMAGE_PROJ_PHI_IS_ON',      self.imageProjPhiIsOn    
 
@@ -293,30 +316,48 @@ class ConfigParameters ( object ) :
         print 'PROJ_CENTER_Y',             self.projCenterY         
                                           
         print 'PROJ_R_BIN_WIDTH_IS_ON',    self.projR_BinWidthIsOn  
-        print 'PROJ_R_SLI_WIDTH_IS_ON',    self.projR_SliWidthIsOn  
-                                          
+        print 'PROJ_R_SLI_WIDTH_IS_ON',    self.projR_SliWidthIsOn                                            
         print 'PROJ_R_N_BINS',             self.projR_NBins         
         print 'PROJ_R_BIN_WIDTH',          self.projR_BinWidth      
         print 'PROJ_R_NSLICES',            self.projR_NSlices       
-        print 'PROJ_R_SLICE_WIDTH',        self.projR_SliWidth      
-                                          
+        print 'PROJ_R_SLICE_WIDTH',        self.projR_SliWidth                                                
         print 'PROJ_R_RMIN',               self.projR_Rmin          
         print 'PROJ_R_RMAX',               self.projR_Rmax          
         print 'PROJ_R_PHIMIN',             self.projR_Phimin        
         print 'PROJ_R_PHIMAX',             self.projR_Phimax        
                                           
         print 'PROJ_PHI_BIN_WIDTH_IS_ON',  self.projPhi_BinWidthIsOn
-        print 'PROJ_PHI_SLI_WIDTH_IS_ON',  self.projPhi_SliWidthIsOn
-                                                                  
+        print 'PROJ_PHI_SLI_WIDTH_IS_ON',  self.projPhi_SliWidthIsOn                                                                  
         print 'PROJ_PHI_N_BINS',           self.projPhi_NBins       
         print 'PROJ_PHI_BIN_WIDTH',        self.projPhi_BinWidth    
         print 'PROJ_PHI_NSLICES',          self.projPhi_NSlices     
-        print 'PROJ_PHI_SLICE_WIDTH',      self.projPhi_SliWidth    
-                                                                  
+        print 'PROJ_PHI_SLICE_WIDTH',      self.projPhi_SliWidth                                                                     
         print 'PROJ_PHI_RMIN',             self.projPhi_Rmin        
         print 'PROJ_PHI_RMAX',             self.projPhi_Rmax        
         print 'PROJ_PHI_PHIMIN',           self.projPhi_Phimin      
         print 'PROJ_PHI_PHIMAX',           self.projPhi_Phimax      
+
+        print 'PROJ_X_BIN_WIDTH_IS_ON'   , self.projX_BinWidthIsOn  
+        print 'PROJ_X_SLI_WIDTH_IS_ON'   , self.projX_SliWidthIsOn                                          
+        print 'PROJ_X_N_BINS'            , self.projX_NBins         
+        print 'PROJ_X_BIN_WIDTH'         , self.projX_BinWidth      
+        print 'PROJ_X_NSLICES'           , self.projX_NSlices       
+        print 'PROJ_X_SLICE_WIDTH'       , self.projX_SliWidth                                              
+        print 'PROJ_X_XMIN'              , self.projX_Xmin          
+        print 'PROJ_X_XMAX'              , self.projX_Xmax          
+        print 'PROJ_X_YMIN'              , self.projX_Ymin          
+        print 'PROJ_X_YMAX'              , self.projX_Ymax          
+                                                                    
+        print 'PROJ_Y_BIN_WIDTH_IS_ON'   , self.projY_BinWidthIsOn  
+        print 'PROJ_Y_SLI_WIDTH_IS_ON'   , self.projY_SliWidthIsOn                                                                  
+        print 'PROJ_Y_N_BINS'            , self.projY_NBins         
+        print 'PROJ_Y_BIN_WIDTH'         , self.projY_BinWidth      
+        print 'PROJ_Y_NSLICES'           , self.projY_NSlices       
+        print 'PROJ_Y_SLICE_WIDTH'       , self.projY_SliWidth                                                                     
+        print 'PROJ_Y_XMIN'              , self.projY_Xmin          
+        print 'PROJ_Y_XMAX'              , self.projY_Xmax          
+        print 'PROJ_Y_YMIN'              , self.projY_Ymin          
+        print 'PROJ_Y_YMAX'              , self.projY_Ymax          
 
         print 70*'='
 
@@ -346,13 +387,15 @@ class ConfigParameters ( object ) :
                 elif key == 'CSPAD_IMAGE_DET_IS_ON'    : self.cspadImageDetIsOn       = dicBool[val.lower()]
                 elif key == 'CSPAD_SPECT_IS_ON'        : self.cspadSpectrumIsOn       = dicBool[val.lower()]
                 elif key == 'CSPAD_SPE08_IS_ON'        : self.cspadSpectrum08IsOn     = dicBool[val.lower()]
-                elif key == 'CSPAD_PROJ_XY_IS_ON'      : self.cspadProjXYIsOn         = dicBool[val.lower()]
+                elif key == 'CSPAD_PROJ_X_IS_ON'       : self.cspadProjXIsOn          = dicBool[val.lower()]
+                elif key == 'CSPAD_PROJ_Y_IS_ON'       : self.cspadProjYIsOn          = dicBool[val.lower()]
                 elif key == 'CSPAD_PROJ_R_IS_ON'       : self.cspadProjRIsOn          = dicBool[val.lower()]
                 elif key == 'CSPAD_PROJ_PHI_IS_ON'     : self.cspadProjPhiIsOn        = dicBool[val.lower()]
                 elif key == 'IMAGE_IMAGE_IS_ON'        : self.imageImageIsOn          = dicBool[val.lower()]
                 elif key == 'IMAGE_IMAGE_SPEC_IS_ON'   : self.imageImageSpecIsOn      = dicBool[val.lower()]
                 elif key == 'IMAGE_SPECT_IS_ON'        : self.imageSpectrumIsOn       = dicBool[val.lower()]
-                elif key == 'IMAGE_PROJ_XY_IS_ON'      : self.imageProjXYIsOn         = dicBool[val.lower()]
+                elif key == 'IMAGE_PROJ_X_IS_ON'       : self.imageProjXIsOn          = dicBool[val.lower()]
+                elif key == 'IMAGE_PROJ_Y_IS_ON'       : self.imageProjYIsOn          = dicBool[val.lower()]
                 elif key == 'IMAGE_PROJ_R_IS_ON'       : self.imageProjRIsOn          = dicBool[val.lower()]
                 elif key == 'IMAGE_PROJ_PHI_IS_ON'     : self.imageProjPhiIsOn        = dicBool[val.lower()]
 
@@ -421,6 +464,28 @@ class ConfigParameters ( object ) :
                 elif key == 'PROJ_PHI_PHIMIN'          : self.projPhi_Phimin        = int(val)
                 elif key == 'PROJ_PHI_PHIMAX'          : self.projPhi_Phimax        = int(val)
 
+                elif key == 'PROJ_X_BIN_WIDTH_IS_ON'   : self.projX_BinWidthIsOn    = dicBool[val.lower()]
+                elif key == 'PROJ_X_SLI_WIDTH_IS_ON'   : self.projX_SliWidthIsOn    = dicBool[val.lower()]
+                elif key == 'PROJ_X_N_BINS'            : self.projX_NBins           = int(val)
+                elif key == 'PROJ_X_BIN_WIDTH'         : self.projX_BinWidth        = int(val)
+                elif key == 'PROJ_X_NSLICES'           : self.projX_NSlices         = int(val)
+                elif key == 'PROJ_X_SLICE_WIDTH'       : self.projX_SliWidth        = int(val)
+                elif key == 'PROJ_X_XMIN'              : self.projX_Xmin            = int(val)
+                elif key == 'PROJ_X_XMAX'              : self.projX_Xmax            = int(val)
+                elif key == 'PROJ_X_YMIN'              : self.projX_Ymin            = int(val)
+                elif key == 'PROJ_X_YMAX'              : self.projX_Ymax            = int(val)
+                                                                                  
+                elif key == 'PROJ_Y_BIN_WIDTH_IS_ON'   : self.projY_BinWidthIsOn    = dicBool[val.lower()]
+                elif key == 'PROJ_Y_SLI_WIDTH_IS_ON'   : self.projY_SliWidthIsOn    = dicBool[val.lower()]
+                elif key == 'PROJ_Y_N_BINS'            : self.projY_NBins           = int(val)
+                elif key == 'PROJ_Y_BIN_WIDTH'         : self.projY_BinWidth        = int(val)
+                elif key == 'PROJ_Y_NSLICES'           : self.projY_NSlices         = int(val)
+                elif key == 'PROJ_Y_SLICE_WIDTH'       : self.projY_SliWidth        = int(val)
+                elif key == 'PROJ_Y_XMIN'              : self.projY_Xmin            = int(val)
+                elif key == 'PROJ_Y_XMAX'              : self.projY_Xmax            = int(val)
+                elif key == 'PROJ_Y_YMIN'              : self.projY_Ymin            = int(val)
+                elif key == 'PROJ_Y_YMAX'              : self.projY_Ymax            = int(val)
+
                 else : print 'The record : %s %s \n is UNKNOWN in readParameters()' % (key, val) 
             f.close()
         else :
@@ -450,13 +515,15 @@ class ConfigParameters ( object ) :
         f.write('CSPAD_IMAGE_DET_IS_ON'     + space + str(self.cspadImageDetIsOn)       + '\n')
         f.write('CSPAD_SPECT_IS_ON'         + space + str(self.cspadSpectrumIsOn)       + '\n')
         f.write('CSPAD_SPE08_IS_ON'         + space + str(self.cspadSpectrum08IsOn)     + '\n')
-        f.write('CSPAD_PROJ_XY_IS_ON'       + space + str(self.cspadProjXYIsOn)         + '\n')
+        f.write('CSPAD_PROJ_X_IS_ON'        + space + str(self.cspadProjXIsOn)          + '\n')
+        f.write('CSPAD_PROJ_Y_IS_ON'        + space + str(self.cspadProjYIsOn)          + '\n')
         f.write('CSPAD_PROJ_R_IS_ON'        + space + str(self.cspadProjRIsOn)          + '\n')
         f.write('CSPAD_PROJ_PHI_IS_ON'      + space + str(self.cspadProjPhiIsOn)        + '\n')
         f.write('IMAGE_IMAGE_IS_ON'         + space + str(self.imageImageIsOn)          + '\n')
         f.write('IMAGE_IMAGE_SPEC_IS_ON'    + space + str(self.imageImageSpecIsOn)      + '\n')
         f.write('IMAGE_SPECT_IS_ON'         + space + str(self.imageSpectrumIsOn)       + '\n')
-        f.write('IMAGE_PROJ_XY_IS_ON'       + space + str(self.imageProjXYIsOn)         + '\n')
+        f.write('IMAGE_PROJ_X_IS_ON'        + space + str(self.imageProjXIsOn)          + '\n')
+        f.write('IMAGE_PROJ_Y_IS_ON'        + space + str(self.imageProjYIsOn)          + '\n')
         f.write('IMAGE_PROJ_R_IS_ON'        + space + str(self.imageProjRIsOn)          + '\n')
         f.write('IMAGE_PROJ_PHI_IS_ON'      + space + str(self.imageProjPhiIsOn)        + '\n')
         f.write('WAVEF_WAVEF_IS_ON'         + space + str(self.waveformWaveformIsOn)    + '\n')
@@ -530,6 +597,27 @@ class ConfigParameters ( object ) :
         f.write('PROJ_PHI_PHIMIN'                   + space + str(self.projPhi_Phimin      )       + '\n')
         f.write('PROJ_PHI_PHIMAX'                   + space + str(self.projPhi_Phimax      )       + '\n')
 
+        f.write('PROJ_X_BIN_WIDTH_IS_ON'            + space + str(self.projX_BinWidthIsOn  )       + '\n')
+        f.write('PROJ_X_SLI_WIDTH_IS_ON'            + space + str(self.projX_SliWidthIsOn  )       + '\n')
+        f.write('PROJ_X_N_BINS'                     + space + str(self.projX_NBins         )       + '\n')
+        f.write('PROJ_X_BIN_WIDTH'                  + space + str(self.projX_BinWidth      )       + '\n')
+        f.write('PROJ_X_NSLICES'                    + space + str(self.projX_NSlices       )       + '\n')
+        f.write('PROJ_X_SLICE_WIDTH'                + space + str(self.projX_SliWidth      )       + '\n')
+        f.write('PROJ_X_XMIN'                       + space + str(self.projX_Xmin          )       + '\n')
+        f.write('PROJ_X_XMAX'                       + space + str(self.projX_Xmax          )       + '\n')
+        f.write('PROJ_X_YMIN'                       + space + str(self.projX_Ymin          )       + '\n')
+        f.write('PROJ_X_YMAX'                       + space + str(self.projX_Ymax          )       + '\n')
+                                                                                           
+        f.write('PROJ_Y_BIN_WIDTH_IS_ON'            + space + str(self.projY_BinWidthIsOn  )       + '\n')
+        f.write('PROJ_Y_SLI_WIDTH_IS_ON'            + space + str(self.projY_SliWidthIsOn  )       + '\n')
+        f.write('PROJ_Y_N_BINS'                     + space + str(self.projY_NBins         )       + '\n')
+        f.write('PROJ_Y_BIN_WIDTH'                  + space + str(self.projY_BinWidth      )       + '\n')
+        f.write('PROJ_Y_NSLICES'                    + space + str(self.projY_NSlices       )       + '\n')
+        f.write('PROJ_Y_SLICE_WIDTH'                + space + str(self.projY_SliWidth      )       + '\n')
+        f.write('PROJ_Y_XMIN'                       + space + str(self.projY_Xmin          )       + '\n')
+        f.write('PROJ_Y_XMAX'                       + space + str(self.projY_Xmax          )       + '\n')
+        f.write('PROJ_Y_YMIN'                       + space + str(self.projY_Ymin          )       + '\n')
+        f.write('PROJ_Y_YMAX'                       + space + str(self.projY_Ymax          )       + '\n')
         f.close()
 
 

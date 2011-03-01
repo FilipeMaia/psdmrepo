@@ -33,6 +33,8 @@ from PyQt4 import QtGui, QtCore
 import time   # for sleep(sec)
 import GUIWhatToDisplayForProjR   as guiprojr
 import GUIWhatToDisplayForProjPhi as guiprojphi
+import GUIWhatToDisplayForProjX   as guiprojx
+import GUIWhatToDisplayForProjY   as guiprojy
 
 #-----------------------------
 # Imports for other modules --
@@ -160,11 +162,13 @@ class GUIWhatToDisplayForProjections ( QtGui.QWidget ) :
         if mode != None : self.tabBar.close()
         self.tabBar = QtGui.QTabBar()
 
-        self.indTabXY  = self.tabBar.addTab( 'X and Y' )
+        self.indTabX   = self.tabBar.addTab( 'X' )
+        self.indTabY   = self.tabBar.addTab( 'Y' )
         self.indTabR   = self.tabBar.addTab( 'R'   )
         self.indTabPhi = self.tabBar.addTab( 'Phi' )
 
-        self.tabBar.setTabTextColor(self.indTabXY,  QtGui.QColor('red'))
+        self.tabBar.setTabTextColor(self.indTabX,   QtGui.QColor('red'))
+        self.tabBar.setTabTextColor(self.indTabY,   QtGui.QColor('magenta'))
         self.tabBar.setTabTextColor(self.indTabR,   QtGui.QColor('blue'))
         self.tabBar.setTabTextColor(self.indTabPhi, QtGui.QColor('green'))
 
@@ -179,11 +183,11 @@ class GUIWhatToDisplayForProjections ( QtGui.QWidget ) :
 
         self.guiWin.close()
 
-        if indTab == self.indTabXY :
-            self.guiWin = QtGui.QLabel('If the "X and Y" check-box is checked,\n' +
-                                       'the projection plots are suppose to be presented automatically\n' +
-                                       'with appropriate binning for left-mouse-button selected image box.')
-            self.guiWin.setStyleSheet("background-color: rgb(0, 255, 0); color: rgb(0, 0, 255); Text-align: right")
+        if indTab == self.indTabX :
+            self.guiWin = guiprojx.GUIWhatToDisplayForProjX()
+
+        if indTab == self.indTabY :
+            self.guiWin = guiprojy.GUIWhatToDisplayForProjY()
 
         if indTab == self.indTabR :
             self.guiWin = guiprojr.GUIWhatToDisplayForProjR()
@@ -219,4 +223,5 @@ if __name__ == "__main__" :
     ex  = GUIWhatToDisplayForProjections()
     ex.show()
     app.exec_()
+
 #-----------------------------
