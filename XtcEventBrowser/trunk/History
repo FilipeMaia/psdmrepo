@@ -1,4 +1,5 @@
-2011-Feb-28  ofte                 rev 1571  Thresholding *after* background subtraction
+2011-Feb-28  ofte                 rev 1574  commented out pyanamod dependence
+2011-Feb-28  ofte  Tag V00-00-12  rev 1571  Thresholding *after* background subtraction
 2011-Feb-28  ofte                 rev 1570  Improved the config file editing
 2011-Feb-28  ofte                 rev 1569  Added changable rectangle to show active threshold area.
 2011-Feb-25  ofte                 rev 1567  removed threshold subplot. Improved dialog w/colorbar.

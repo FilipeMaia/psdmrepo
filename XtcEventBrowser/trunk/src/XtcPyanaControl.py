@@ -42,7 +42,7 @@ import matplotlib.pyplot as plt
 # Imports for other modules --
 #-----------------------------
 import pyanascript
-from pyana import pyanamod
+#from pyana import pyanamod
 
 #----------------------------------
 # Local non-exported definitions --
@@ -443,11 +443,10 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         print "Calling pyana.... "
         print "     ", ' '.join(poptions)
 
-        if 0 :   
-            # calling as module
-            #pyanascript.main(poptions)
-
-            pyanamod.pyana(files=self.filenames, config=self.configfile, num_events=100)
+        #if 0 :   
+        #    # calling as module
+        #    #pyanascript.main(poptions)
+        #    pyanamod.pyana(files=self.filenames, config=self.configfile, num_events=100)
             
         if 1 :
             # calling a new process
