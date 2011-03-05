@@ -24,16 +24,14 @@ import sys
 import time
 
 import numpy as np
-import matplotlib 
-matplotlib.use('Qt4Agg')
-
 import matplotlib.pyplot as plt
 
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
 from pypdsdata import xtc
-
+#from xbplotter import Plotter
+from mpl_toolkits.axes_grid1 import AxesGrid
 
 #---------------------
 #  Class definition --
@@ -42,7 +40,7 @@ class  pyana_image ( object ) :
 
     # initialize
     def __init__ ( self,
-                   image_source=None,
+                   image_addresses = None,
                    good_range="0--999999",
                    dark_range="-999999--0",
                    draw_each_event = False):
@@ -50,15 +48,21 @@ class  pyana_image ( object ) :
         Parameters are passed from pyana.cfg configuration file.
         All parameters are passed as strings
 
-        @param image_source     address string of Detector-Id|Device-ID
+        @param image_adresses   address string of Detector-Id|Device-ID
         @param good_range       threshold values selecting images of interest
         @param dark_range       threshold values selecting dark images
         @param draw_each_event  bool
         """
+        if image_addresses is None :
+            print "Error! You've called pyana_image without specifying an image address"
+            
+        self.image_addresses = image_addresses.split(" ")
+        print "pyana_image, %d sources: " % len(self.image_addresses)
+        for sources in self.image_addresses :
+            print "  ", sources
 
-        self.img_addr = image_source
-        print "Using image_source = ", self.img_addr
-
+            
+        # ranges
         tli = str(good_range).split("--")[0]
         thi = str(good_range).split("--")[1]
         tld = str(dark_range).split("--")[0]
@@ -76,24 +80,36 @@ class  pyana_image ( object ) :
         self.draw_each_event = draw_each_event
         print "Using draw_each_event = ", draw_each_event
 
-        # sum up all image data (above threshold) and all dark data (below threshold)
-        self.img_data = None
-        self.dark_data = None
-
-        # these will be plotted too
-        self.lolimits = []
-        self.hilimits = []
-
-        # to keep track
-        self.n_events = 0
-        self.n_img = 0
-        self.n_dark = 0
-
 
     # start of job
     def beginjob ( self, evt, env ) : 
-        # ideally we should open a figure canvas here.
-        pass
+
+        #self.plotter = Plotter()
+
+        # to keep track
+        self.n_events = 0
+
+        # averages
+        self.image_data = {}
+        self.dark_data = {}
+        self.lolimits = {}
+        self.hilimits = {}
+        self.fignum = {}
+        self.n_img = {}
+        self.n_dark = {}
+        for addr in self.image_addresses :
+            self.image_data[addr] = None
+            self.dark_data[addr] = None
+
+            # these will be plotted too
+            self.lolimits[addr] = []
+            self.hilimits[addr] = []
+
+            self.fignum[addr] = 200 + self.image_addresses.index(addr)
+
+            self.n_img[addr] = 0
+            self.n_dark[addr] = 0
+
 
 
     # process event/shot data
@@ -104,57 +120,136 @@ class  pyana_image ( object ) :
         # print a progress report
         if (self.n_events%1000)==0 :
             print "Event ", self.n_events
-        
 
-        # get the requested pnCCD image
-        frame = evt.getFrameValue(self.img_addr)
-        if frame :
+
+        # for each event, append images to be plotted to this list
+        event_display_images = []
+
+        fignum = 101
+        axspos = 0
+
+        # get the requested images
+        for addr in self.image_addresses :
+        
+            frame = evt.getFrameValue(addr)
+            if not frame : continue
 
             # image is a numpy array (pixels)
             image = np.float_(frame.data())
-            if self.n_events<2 : print "Image dimensions: ", np.shape(image)
 
             # collect min and max intensity of this image
-            self.lolimits.append( image.min() )
-            self.hilimits.append( image.max() )
+            self.lolimits[addr].append( image.min() )
+            self.hilimits[addr].append( image.max() )
 
-            # select good images
+            # select good (signal) images
             isGood = False
             if ( image.max() > self.thr_low_image) and (image.max() < self.thr_high_image) :
                 isGood = True
                 
-                # add this image to the sum
-                self.n_img+=1
-                if self.img_data is None :
-                    self.img_data = np.float_(image)
-                else :
-                    self.img_data += image
-
-            # select dark image
+            # select dark images
             isDark = False
             if ( image.max() > self.thr_low_dark ) and ( image.max() < self.thr_high_dark ) :
                 isDark = True
 
-                self.n_dark+=1
-                if self.dark_data is None :
-                    self.dark_data = np.float_(image)
+            # sanity check
+            if isGood and isDark :
+                print "WARNING! This image has been selected both as signal AND dark! "
+
+            # add this image to the sum (for average)
+            if isGood :
+                self.n_img[addr]+=1
+                if self.image_data[addr] is None :
+                    self.image_data[addr] = np.float_(image)
                 else :
-                    self.dark_data += image
+                    self.image_data[addr] += image
 
-            # Draw this event. Background subtracted if possible.
-            if self.draw_each_event and isGood :
-                if self.n_dark > 0 :
-                    av_dark_img = self.dark_data/self.n_dark
-                    subimage = image - av_dark_img 
-                    title = "Event %d, background subtracted (avg of %d dark images)" % \
-                            ( self.n_events, self.n_dark )
-                    self.drawframe( subimage, title )
+            elif isDark :                
+                self.n_dark[addr]+=1
+                if self.dark_data[addr] is None :
+                    self.dark_data[addr] = np.float_(image)
                 else :
-                    title = "Event %d " % self.n_events
-                    self.drawframe( image, title )
+                    self.dark_data[addr] += image
 
-                
 
+            # images for plotting
+            #if isGood :
+            #    if self.subtract_bkg and self.n_dark[addr] > 0 :
+            #        # subtract average of darks so far collected
+            #        image_bkgsub = image - self.dark_data[addr]/self.n_dark[addr]
+            #        event_display_images.append( (addr, image_bkgsub) )
+            #    else :
+            event_display_images.append( (addr, image) )
+                    
+
+        # Draw images from this event
+        if len(event_display_images) == 3 :
+            ad0,im0 = event_display_images[0]
+            ad1,im1 = event_display_images[1]
+            ad2,im2 = event_display_images[2]
+            event_display_images.append( ("%s - %s" % (ad1.split("-")[0], ad0.split("-")[0]), im1-im0) )
+            event_display_images.append( ("%s - %s" % (ad2.split("-")[0], ad1.split("-")[0]), im2-im1) )
+
+            F = np.fft.fftn(im1-im0)
+            event_display_images.append( ("FFT", np.log(np.abs(np.fft.fftshift(F))**2) ) )
+
+        nplots = len(event_display_images)
+        ncol = 3
+        if nplots<3 : ncol = nplots
+        nrow = int( nplots/ncol)
+        fig = plt.figure(101,(4*ncol,4*nrow))
+        fig.clf()
+        fig.suptitle("Event#%d"%self.n_events)
+
+        #grid = AxesGrid( fig, 111,
+        #                 nrows_ncols = (2,3),
+        #                 axes_pad = 0.6,
+        #                 label_mode = 1,
+        #                 share_all = True,
+        #                 cbar_mode = "each",
+        #                 cbar_location = "right",
+        #                 cbar_size = "7%",
+        #                 cbar_pad = "3%",
+        #                 )
+
+
+        pos = 0
+        self.caxes = [] # list of references to colorbar Axes
+        self.axims = [] # list of references to image Axes
+        for ad, im in event_display_images :
+            pos += 1
+            
+            # Axes
+            ax = fig.add_subplot(2,3,pos)
+            ax.set_title( "%s" % (ad) )
+
+            # AxesImage
+            axim = plt.imshow( im, origin='lower' )
+            self.axims.append( axim )
+        
+            cbar = plt.colorbar(axim,pad=0.02,shrink=0.78) 
+            self.caxes.append( cbar.ax )
+            
+            self.orglims = axim.get_clim()
+            # min and max values in the axes are
+
+
+            #grid[pos-1].set_title("%s"%(ad))
+            #axesim = grid[pos-1].imshow( im )
+            #grid.cbar_axes[pos-1].colorbar(axesim)
+
+
+            #self.plotter.gridplot( image, title, fignum, (2,ncols,axspos) )
+        for cax in self.caxes :
+            print cax
+        for axim in self.axims :
+            print axim
+
+        #self.plotter.gridplot(self.image_diff,"Difference", fignum, (2,ncols,axspos+1) )
+        #self.plotter.suptitle(fignum,"Event#%d"%self.n_events)
+        #plt.draw()
+                    
+
+        plt.draw()
 
     # after last event has been processed. 
     def endjob( self, env ) :
@@ -162,30 +257,31 @@ class  pyana_image ( object ) :
         print "Done processing       ", self.n_events, " events"
         print "Range defining images: %f (lower) - %f (upper)" % (self.thr_low_image, self.thr_high_image)
         print "Range defining darks: %f (lower) - %f (upper)" %  (self.thr_low_dark, self.thr_high_dark)
-        print "# Signal images = ", self.n_img
-        print "# Dark images = ", self.n_dark
         
-        if self.img_data is None :
-            print "No image data found from source ", self.img_addr
-            return
+        for addr in self.image_addresses:
+            print "# Signal images from %s = %d "% (addr, self.n_img[addr])
+            print "# Dark images from %s = %d" % (addr, self.n_dark[addr])
 
-        # plot the minimums and maximums
-        xaxis = np.arange(self.n_events)
-        plt.plot( xaxis, np.array(self.lolimits), "gv", xaxis, np.array(self.hilimits), "r^" )
-        plt.title("Maxim (^)and lower (v) limits")
-        #plt.plot( np.array(self.lolimits))
-        #plt.plot( np.array(self.hilimits))
 
-        # plot the average image
-        av_good_img = self.img_data/self.n_img
-        av_bkgsubtracted = av_good_img 
-        self.drawframe( av_good_img, "Average of images above threshold")
+            # plot the minimums and maximums
+            xaxis = np.arange(self.n_events)
+            plt.plot( xaxis, np.array(self.lolimits[addr]), "gv", xaxis, np.array(self.hilimits[addr]), "r^" )
+            plt.title("Maxim (^)and lower (v) limits")
+            #plt.plot( np.array(self.lolimits))
+            #plt.plot( np.array(self.hilimits))
 
-        if self.n_dark>0 :
-            av_dark_img = self.dark_data/self.n_dark
-            av_bkgsubtracted -= av_dark_img 
-            self.drawframe( av_dark_img, "Average of images below threshold" )
-            self.drawframe( av_bkgsubtracted, "Average background subtracted")
+            # plot the average image
+            av_good_img = self.image_data[addr]/self.n_img[addr]
+            self.plotter.drawframe( av_good_img, "%s: Average of images above threshold"%addr,
+                                    100+self.fignum[addr])
+
+            if self.n_dark[addr]>0 :
+                av_dark_img = self.dark_data[addr]/self.n_dark[addr]
+                av_bkgsubtracted = av_good_img - av_dark_img 
+                self.plotter.drawframe( av_dark_img, "%s: Average of images below threshold"%addr,
+                                        200+self.fignum[addr] )
+                self.plotter.drawframe( av_bkgsubtracted, "%s: Average background subtracted"%add,
+                                        300+self.fignum[addr])
 
         plt.show()
 
@@ -275,22 +371,3 @@ class  pyana_image ( object ) :
 
 
 
-
-    # define what to do if a button is pressed
-    def onpress(self, event) :
-
-        if event.key not in ('t', 'l'): return
-        if event.key=='t' : self.set_threshold()
-        if event.key=='l' : self.add_savelist()
-        
-
-    def set_threshold(self) :
-        print " open a dialog to change the threshold to a new value"
-        pass
-
-
-    def add_savelist(self) :
-        print "Schedule this image array for saving to binary file"
-        pass
-
-    

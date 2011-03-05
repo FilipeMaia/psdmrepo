@@ -153,10 +153,10 @@ class XtcScanner ( object ) :
 
             # progress bar
             progr+=1
-            if (progr%1000) == 1:
+            if (progr%100) == 1:
                 print "\r  %d datagrams read " % progr ,
                 sys.stdout.flush()
-            if (progr%100) == 0:
+            if (progr%10) == 0:
                 print " . " ,
                 sys.stdout.flush()
 

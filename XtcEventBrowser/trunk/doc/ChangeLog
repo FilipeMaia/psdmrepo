@@ -11,6 +11,12 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Mar-04  ofte  Tag V00-00-15 rev 1578
+	- added pyana_plotter to issue plt.show() command. more tasks later
+	- added stuff to xbplotter. try to outsource plotting functions to xbplotter.Plotter 
+	- pyana_image plots any number of images. Start adding some functionality / analysis algorithms. 
+	- minor modifications to pyana_cspad
+	
 2011-Mar-01  ofte  Tag V00-00-14  rev 1576  doc/ChangeLog replaces History. Cosmetic changes to GUIs
 2011-Feb-28  ofte                 rev 1574  commented out pyanamod dependence
 2011-Feb-28  ofte  Tag V00-00-12  rev 1571  Thresholding *after* background subtraction

@@ -28,7 +28,6 @@ import numpy as np
 import matplotlib 
 
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1.axes_grid import AxesGrid
 
 from matplotlib.gridspec import GridSpec
 
@@ -267,9 +266,8 @@ class  pyana_cspad ( object ) :
             title = title + " (background subtracted) "
             
         if self.draw_each_event :
-            self.drawframe(cspad_image,title, fignum=200 )
+            self.drawframe(cspad_image,title, fignum=201 )
 
-        plt.show()
 
 
 

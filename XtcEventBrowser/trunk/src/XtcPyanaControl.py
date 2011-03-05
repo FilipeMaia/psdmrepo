@@ -28,6 +28,7 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys, random, os, signal
 import  subprocess 
+#from multiprocessing import Process
 
 #---------------------------------
 #  Imports of base class module --
@@ -36,12 +37,10 @@ import matplotlib
 matplotlib.use('Qt4Agg')
 
 from PyQt4 import QtCore, QtGui
-import matplotlib.pyplot as plt
 
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import pyanascript
 #from pyana import pyanamod
 
 #----------------------------------
@@ -217,6 +216,10 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         modules_to_run = []
         options_for_mod = []
 
+        # at the very beginning, append plotter module:
+        modules_to_run.append("XtcEventBrowser.pyana_plotter")
+        options_for_mod.append([])
+
         self.configuration = ""
         for box in self.checkboxes :
             if box.isChecked() :
@@ -266,10 +269,10 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                     print "XtcEventBrowser.pyana_image at ", index
 
                     address = str(box.text()).split(":")[1]
-                    options_for_mod[index].append("\nimage_source = %s" % address)
-                    options_for_mod[index].append("\ngood_range = %d--%d" % (50,250) )
-                    options_for_mod[index].append("\ndark_range = %d--%d" % (250,1050) )
-                    options_for_mod[index].append("\ndraw_each_event = 1")
+                    options_for_mod[index].append("\nimage_addresses = %s" % address)
+                    options_for_mod[index].append("\ngood_range = %d--%d" % (250,1050) )
+                    options_for_mod[index].append("\ndark_range = %d--%d" % (50,250) )
+                    options_for_mod[index].append("\ndraw_each_event = Yes")
                     
 
                 # --- --- --- CsPad --- --- ---
@@ -285,7 +288,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
                     address = str(box.text()).split(":")[1]
                     options_for_mod[index].append("\nimage_source = %s" % address)
-                    options_for_mod[index].append("\ndraw_each_event = No")
+                    options_for_mod[index].append("\ndraw_each_event = Yes")
                     options_for_mod[index].append("\ndark_img_file = ")
                     options_for_mod[index].append("\noutput_file = ")                    
                     options_for_mod[index].append("\nplot_vrange = ")
@@ -297,9 +300,6 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             print "No modules requested! Please select from list"
             return
 
-        ## at the very end, append plotter module:
-        #modules_to_run.append("XtcEventBrowser.pyana_plotter")
-        #options_for_mod.append([])
 
         # if several values for same option, merge into a list
         for m in range(0,nmodules):
@@ -308,7 +308,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 n,v = options.split("=")
                 if n in tmpoptions :
                     oldvalue = tmpoptions[n]
-                    tmpoptions[n] = oldvalue+v
+                    if oldvalue!=v:   # avoid duplicates
+                        tmpoptions[n] = oldvalue+v
                 else :
                     tmpoptions[n] = v
 
@@ -440,28 +441,38 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         else :
             return
 
-        
         print "Calling pyana.... "
         print "     ", ' '.join(poptions)
-
-        #if 0 :   
-        #    # calling as module
-        #    #pyanascript.main(poptions)
-        #    pyanamod.pyana(files=self.filenames, config=self.configfile, num_events=100)
-            
+        
+        
         if 1 :
             # calling a new process
             self.proc_pyana = myPopen(poptions) # this runs in separate thread.
             #stdout_value = proc_pyana.communicate()[0]
             #print stdout_value
+            # the benefit of this option is that the GUI remains unlocked
+            # the drawback is that pyana needs to supply its own plots, ie. no Qt plots?
+            
+        if 0 :
+            # calling as module... plain
+            pyanamod.pyana(argv=poptions)
+            # the benefit of this option is that pyana will draw plots on the GUI. 
+            # the drawback is that GUI hangs while waiting for pyana to finish...
+
+        if 0 :
+            # calling as module... using multiprocessing
+            kwargs = {'argv':poptions}
+            p = Process(target=pyanamod.pyana,kwargs=kwargs)
+            p.start()
+            p.join()
+            # this option is nothing but trouble
+            
             
         if self.quit_pyana_button is None :
             self.quit_pyana_button = QtGui.QPushButton("&Quit pyana")
             self.connect(self.quit_pyana_button, QtCore.SIGNAL('clicked()'), self.quit_pyana )
             self.v0.addWidget( self.quit_pyana_button )
             self.v0.setAlignment( self.quit_pyana_button, QtCore.Qt.AlignRight )
-
-        #plt.show()
 
 
     #--------------------------------
