@@ -23,6 +23,7 @@ part of it, please give an appropriate acknowledgment.
 import sys
 import time
 
+import scipy.ndimage.interpolation as interpol
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -41,6 +42,9 @@ class  pyana_image ( object ) :
     # initialize
     def __init__ ( self,
                    image_addresses = None,
+                   image_rotations = None,
+                   image_shifts = None,
+                   image_scales = None,
                    good_range="0--999999",
                    dark_range="-999999--0",
                    draw_each_event = False):
@@ -48,7 +52,10 @@ class  pyana_image ( object ) :
         Parameters are passed from pyana.cfg configuration file.
         All parameters are passed as strings
 
-        @param image_adresses   address string of Detector-Id|Device-ID
+        @param image_addresses   (list) address string of Detector-Id|Device-ID
+        @param image_rotations  (list) rotation, in degrees, to be applied to image(s)
+        @param image_shifts     (list) shift, in (npixX,npixY), to be applied to image(s)
+        @param image_scales     (list) scale factor to be applied to images
         @param good_range       threshold values selecting images of interest
         @param dark_range       threshold values selecting dark images
         @param draw_each_event  bool
@@ -57,11 +64,43 @@ class  pyana_image ( object ) :
             print "Error! You've called pyana_image without specifying an image address"
             
         self.image_addresses = image_addresses.split(" ")
-        print "pyana_image, %d sources: " % len(self.image_addresses)
+        nsources = len(self.image_addresses)
+        print "pyana_image, %d sources: " % nsources
         for sources in self.image_addresses :
             print "  ", sources
 
+        self.image_rotations = None
+        if image_rotations is not None:
+            self.image_rotations = {}
+            list_of_rotations = image_rotations.split(" ")
+            if len(list_of_rotations) != nsources: print "Plz provide rotation angles for *all* images!"
+            i = 0
+            for source in self.image_addresses :
+                self.image_rotations[source] = list_of_rotations[i]
+                i+=1
+                
             
+        self.image_shifts = None
+        if image_shifts is not None:
+            self.image_shifts = {}
+            list_of_shifts =  image_shifts.split(" ") 
+            if len(list_of_shifts) != nsources: print "Plz provide shift amount for *all* images!"
+            i = 0
+            for source in self.image_addresses :
+                self.image_shifts[source] = list_of_shifts[i]
+                i+=1
+
+        self.image_scales = None
+        if image_scales is not None:
+            self.image_scales = {}
+            list_of_scales = image_scales.split(" ")            
+            if len(list_of_scales) != nsources: print "Plz provide scale factors for *all* images!"
+            i = 0
+            for sources in self.image_adresses :
+                self.image_scales[source] = list_of_scales[i]
+                i+=1
+
+                
         # ranges
         tli = str(good_range).split("--")[0]
         thi = str(good_range).split("--")[1]
@@ -114,6 +153,7 @@ class  pyana_image ( object ) :
 
     # process event/shot data
     def event ( self, evt, env ) :
+        print "pyana_image event"
 
         # this one counts every event
         self.n_events+=1
@@ -132,7 +172,9 @@ class  pyana_image ( object ) :
         for addr in self.image_addresses :
         
             frame = evt.getFrameValue(addr)
-            if not frame : continue
+            if not frame :
+                print "No frame from ", addr
+                continue
 
             # image is a numpy array (pixels)
             image = np.float_(frame.data())
@@ -154,6 +196,23 @@ class  pyana_image ( object ) :
             # sanity check
             if isGood and isDark :
                 print "WARNING! This image has been selected both as signal AND dark! "
+
+
+            # Apply shift, rotation, scaling of this image if needed:
+            if self.image_shifts is not None:
+                # implement this!
+                pass
+
+            if self.image_rotations is not None:
+                rotatedimage = interpol.rotate( image, self.image_rotations[addr] )
+                print "shape of old image = ", np.shape(image)
+                print "shape of new image = ", np.shape(rotatedimage)
+                image = rotateimage
+                
+            if self.image_scales is not None:
+                #implement this!
+                pass
+
 
             # add this image to the sum (for average)
             if isGood :
@@ -179,7 +238,7 @@ class  pyana_image ( object ) :
             #        event_display_images.append( (addr, image_bkgsub) )
             #    else :
             event_display_images.append( (addr, image) )
-                    
+            
 
         # Draw images from this event
         if len(event_display_images) == 3 :
@@ -191,6 +250,8 @@ class  pyana_image ( object ) :
 
             F = np.fft.fftn(im1-im0)
             event_display_images.append( ("FFT", np.log(np.abs(np.fft.fftshift(F))**2) ) )
+
+
 
         nplots = len(event_display_images)
         ncol = 3

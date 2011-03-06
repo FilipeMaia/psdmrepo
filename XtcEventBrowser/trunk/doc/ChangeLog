@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Mar-05  ofte  no tag        rev 1580
+	- parameters for pyana_image to rotate, shift and scale images. 
+	- only rotate implemented so far
+	- not extensively tested...
 2011-Mar-04  ofte  Tag V00-00-15 rev 1578
 	- added pyana_plotter to issue plt.show() command. more tasks later
 	- added stuff to xbplotter. try to outsource plotting functions to xbplotter.Plotter 

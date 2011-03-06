@@ -270,6 +270,9 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
                     address = str(box.text()).split(":")[1]
                     options_for_mod[index].append("\nimage_addresses = %s" % address)
+                    options_for_mod[index].append("\nimage_rotations = " )
+                    options_for_mod[index].append("\nimage_shifts = " )
+                    options_for_mod[index].append("\nimage_scales = " )
                     options_for_mod[index].append("\ngood_range = %d--%d" % (250,1050) )
                     options_for_mod[index].append("\ndark_range = %d--%d" % (50,250) )
                     options_for_mod[index].append("\ndraw_each_event = Yes")
