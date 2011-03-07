@@ -42,9 +42,11 @@ class  pyana_image ( object ) :
     # initialize
     def __init__ ( self,
                    image_addresses = None,
+                   image_nicknames = None,
                    image_rotations = None,
                    image_shifts = None,
                    image_scales = None,
+                   output_file = None,
                    good_range="0--999999",
                    dark_range="-999999--0",
                    draw_each_event = False):
@@ -56,6 +58,7 @@ class  pyana_image ( object ) :
         @param image_rotations  (list) rotation, in degrees, to be applied to image(s)
         @param image_shifts     (list) shift, in (npixX,npixY), to be applied to image(s)
         @param image_scales     (list) scale factor to be applied to images
+        @param output_file      filename (If collecting: write to this file)
         @param good_range       threshold values selecting images of interest
         @param dark_range       threshold values selecting dark images
         @param draw_each_event  bool
@@ -69,36 +72,58 @@ class  pyana_image ( object ) :
         for sources in self.image_addresses :
             print "  ", sources
 
+        self.image_nicknames = []
+        if image_nicknames is None:
+            for i in range (0, len(self.image_addresses) ):
+                self.image_nicknames.append( "Im%d"%(i+1) )
+        else :
+            self.image_nicknames = image_nicknames.split(" ")
+
+        
         self.image_rotations = None
         if image_rotations is not None:
-            self.image_rotations = {}
-            list_of_rotations = image_rotations.split(" ")
-            if len(list_of_rotations) != nsources: print "Plz provide rotation angles for *all* images!"
-            i = 0
-            for source in self.image_addresses :
-                self.image_rotations[source] = list_of_rotations[i]
-                i+=1
+            if image_rotations == "" or image_rotations == "None" :
+                self.image_rotations = None
+            else :    
+                self.image_rotations = {}
+                list_of_rotations = image_rotations.split(" ")
+                if len(list_of_rotations) != nsources: print "Plz provide rotation angles for *all* images!"
+                i = 0
+                for source in self.image_addresses :
+                    self.image_rotations[source] = float( list_of_rotations[i] )
+                    i+=1
                 
             
         self.image_shifts = None
         if image_shifts is not None:
-            self.image_shifts = {}
-            list_of_shifts =  image_shifts.split(" ") 
-            if len(list_of_shifts) != nsources: print "Plz provide shift amount for *all* images!"
-            i = 0
-            for source in self.image_addresses :
-                self.image_shifts[source] = list_of_shifts[i]
-                i+=1
+            if image_shifts == "" or image_shift == "None" :
+                self.image_shifts = None
+            else :
+                self.image_shifts = {}
+                list_of_shifts =  image_shifts.split(" ") 
+                if len(list_of_shifts) != nsources: print "Plz provide shift amount for *all* images!"
+                i = 0
+                for source in self.image_addresses :
+                    self.image_shifts[source] = int( list_of_shifts[i] )
+                    i+=1
 
         self.image_scales = None
         if image_scales is not None:
-            self.image_scales = {}
-            list_of_scales = image_scales.split(" ")            
-            if len(list_of_scales) != nsources: print "Plz provide scale factors for *all* images!"
-            i = 0
-            for sources in self.image_adresses :
-                self.image_scales[source] = list_of_scales[i]
-                i+=1
+            if image_scales == "" or image_scales == "None" :
+                self.image_scales = None
+            else :
+                self.image_scales = {}
+                list_of_scales = image_scales.split(" ")            
+                if len(list_of_scales) != nsources: print "Plz provide scale factors for *all* images!"
+                i = 0
+                for sources in self.image_adresses :
+                    self.image_scales[source] = float( list_of_scales[i] )
+                    i+=1
+
+        self.output_file = output_file
+        if output_file == "" or output_file == "None" :
+            self.output_file = None
+        print "Using output_file: ", self.output_file
 
                 
         # ranges
@@ -204,10 +229,10 @@ class  pyana_image ( object ) :
                 pass
 
             if self.image_rotations is not None:
-                rotatedimage = interpol.rotate( image, self.image_rotations[addr] )
+                rotatedimage = interpol.rotate( image, self.image_rotations[addr], reshape=False )
                 print "shape of old image = ", np.shape(image)
                 print "shape of new image = ", np.shape(rotatedimage)
-                image = rotateimage
+                image = rotatedimage
                 
             if self.image_scales is not None:
                 #implement this!
@@ -241,16 +266,16 @@ class  pyana_image ( object ) :
             
 
         # Draw images from this event
-        if len(event_display_images) == 3 :
-            ad0,im0 = event_display_images[0]
-            ad1,im1 = event_display_images[1]
-            ad2,im2 = event_display_images[2]
-            event_display_images.append( ("%s - %s" % (ad1.split("-")[0], ad0.split("-")[0]), im1-im0) )
-            event_display_images.append( ("%s - %s" % (ad2.split("-")[0], ad1.split("-")[0]), im2-im1) )
+        for i in range ( 0, len(event_display_images) ):
 
-            F = np.fft.fftn(im1-im0)
-            event_display_images.append( ("FFT", np.log(np.abs(np.fft.fftshift(F))**2) ) )
+            ad1,im1 = event_display_images[i]
+            ad2,im2 = event_display_images[i-1]
+            lb1 = self.image_nicknames[i]
+            lb2 = self.image_nicknames[i-1]
+            event_display_images.append( ("Diff %s-%s"%(lb1,lb2), im1-im2) )
 
+            F = np.fft.fftn(im1-im2)
+            event_display_images.append( ("FFT %s-%s"%(lb1,lb2), np.log(np.abs(np.fft.fftshift(F))**2) ) )
 
 
         nplots = len(event_display_images)
@@ -276,12 +301,17 @@ class  pyana_image ( object ) :
         pos = 0
         self.caxes = [] # list of references to colorbar Axes
         self.axims = [] # list of references to image Axes
-        for ad, im in event_display_images :
+        for ad, im in sorted(event_display_images) :
             pos += 1
             
             # Axes
-            ax = fig.add_subplot(2,3,pos)
-            ax.set_title( "%s" % (ad) )
+            ax = fig.add_subplot(nrow,ncol,pos)
+            indx = event_display_images.index((ad,im))
+            nickn = ""
+            if indx < len(self.image_addresses):
+                nickn = self.image_nicknames[indx]
+                nickn+=": "
+            ax.set_title( "%s%s" % (nickn,ad) )
 
             # AxesImage
             axim = plt.imshow( im, origin='lower' )
@@ -309,8 +339,32 @@ class  pyana_image ( object ) :
         #self.plotter.suptitle(fignum,"Event#%d"%self.n_events)
         #plt.draw()
                     
-
         plt.draw()
+
+
+        # save the average data image (numpy array)
+        # binary file .npy format
+        if self.output_file is not None :
+
+            for ad, im in event_display_images :
+                fname = self.output_file.split('.')
+                label = ad.replace("|","_")
+                label = label.replace(" ","")
+                filnamn = ''.join( (fname[0],"%s_ev%d."%(label,self.n_events),fname[-1]) )
+                print filnamn
+                
+                if ".npy" in self.output_file :
+                    np.save(filnamn, im)
+                    print "saving to ", filnamn
+                elif ".txt" in self.output_file :
+                    np.savetxt(filnamn, im) 
+                    print "saving to ", filnamn
+                else :
+                    print "Output file does not have the expected file extension (.txt or .npy): ", fname[-1]
+                    print "I'm not sure what file format to save it as. Please correct."
+                    print "I'm not saving this event... "
+        
+                        
 
     # after last event has been processed. 
     def endjob( self, env ) :

@@ -11,8 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Mar-05  ofte  no tag        rev 1581
+         - pyana_image.py tuned and tested some more. 
+	 - still need to implement translation and scaling of images	
 2011-Mar-05  ofte  no tag        rev 1580
-	- parameters for pyana_image to rotate, shift and scale images. 
+        - parameters for pyana_image to rotate, shift and scale images. 
 	- only rotate implemented so far
 	- not extensively tested...
 2011-Mar-04  ofte  Tag V00-00-15 rev 1578
