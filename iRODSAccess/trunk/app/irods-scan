@@ -144,16 +144,42 @@ class irodsScan ( LusiPyApp ) :
 
                 # check that file exists
                 path = obj['path']
-                if not os.path.exists(path):
-                    stat = errno.ENOENT
-                    if not self._options.no_print:
-                        if self._options.command:
-                            print "irm -U -n %(replica)s %(collName)s/%(name)s" % obj
-                        else :
-                            print "resource=%(resource)s replica=%(replica)s object=%(collName)s/%(name)s path=%(path)s" % obj
+                try:
+
+                    st = os.stat(path)
+                    # it exists, check file size
+                    self.trace("irods size=%d, disk size=%d", obj['size'], st.st_size)
+                    if obj['size'] != st.st_size :
+                        self.dump('size mismatch', obj)
+                        stat = errno.ENOENT
+
+                except OSError,ex:
+
+                    if ex.errno != errno.ENOENT:
+                        
+                        self.dump(ex.strerror , obj)
+                        
+                    else:
+                        
+                        # stat failed, file does not exist
+                        stat = errno.ENOENT
+                        if not self._options.no_print:
+                            if self._options.command:
+                                print "irm -U -n %(replica)s %(collName)s/%(name)s" % obj
+                            else :
+                                self.dump('missing file', obj)
+                            
+                except Exception, ex:
+                    
+                    print "Exception:", ex
+                    
                         
         return stat
 
+
+    def dump(self, msg, obj):
+        msg += ": resource=%(resource)s replica=%(replica)s object=%(collName)s/%(name)s path=%(path)s" % obj
+        print msg
 #
 #  run application when imported as a main module
 #

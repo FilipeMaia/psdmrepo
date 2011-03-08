@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-11
+2011-03-08 Andy Salnikov
+- irods-scan now reports mismatched file sizes and problems accessing
+  files (such as access protection problems).
+
 Tag: V00-00-10
 2010-10-04 Andy Salnikov
 - added application irods-scan which prints the list of the orphaned 
