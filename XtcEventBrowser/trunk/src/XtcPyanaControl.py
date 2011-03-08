@@ -273,9 +273,12 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                     options_for_mod[index].append("\nimage_rotations = " )
                     options_for_mod[index].append("\nimage_shifts = " )
                     options_for_mod[index].append("\nimage_scales = " )
+                    options_for_mod[index].append("\nimage_manipulations = ")
                     options_for_mod[index].append("\ngood_range = %d--%d" % (250,1050) )
                     options_for_mod[index].append("\ndark_range = %d--%d" % (50,250) )
                     options_for_mod[index].append("\ndraw_each_event = Yes")
+                    options_for_mod[index].append("\noutput_file = out.hdf5")
+                    options_for_mod[index].append("\nn_hdf5 = ")
                     
 
                 # --- --- --- CsPad --- --- ---

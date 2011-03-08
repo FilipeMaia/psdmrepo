@@ -11,11 +11,15 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Mar-08  ofte  V00-00-16     rev 1589
+         - pyana_image.py works OK now
+	 - option to save as hdf5 file
+	 - more options to control what to plot / save
 2011-Mar-07  ofte  no tag        rev 1582
          - pyana_image.py tuned and tested some more. 
 	 - translation of images included (using numpy.roll)
-
-2011-Mar-05  ofte  no tag        rev 1581
+	 - option to save as numpy array (txt or npy)
+2011-Mar-06  ofte  no tag        rev 1581
          - pyana_image.py tuned and tested some more. 
 	 - still need to implement translation and scaling of images	
 2011-Mar-05  ofte  no tag        rev 1580

@@ -147,7 +147,6 @@ class pyana_plotter (object) :
             plt.show()
 
         self.nevents += 1
-        print "going on to event # ", self.nevents
 
     def endcalibcycle( self, env ) :
         """This optional method is called if present at the end of the 

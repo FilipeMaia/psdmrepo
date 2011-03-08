@@ -43,25 +43,27 @@ class  pyana_image ( object ) :
     # initialize
     def __init__ ( self,
                    image_addresses = None,
-                   image_nicknames = None,
+                   good_range="0--999999",
+                   dark_range="-999999--0",
                    image_rotations = None,
                    image_shifts = None,
                    image_scales = None,
+                   image_nicknames = None,
+                   image_manipulations = None, 
                    output_file = None,
-                   good_range="0--999999",
-                   dark_range="-999999--0",
+                   n_hdf5 = None,
                    draw_each_event = False):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
         All parameters are passed as strings
 
         @param image_addresses   (list) address string of Detector-Id|Device-ID
+        @param good_range       threshold values selecting images of interest
+        @param dark_range       threshold values selecting dark images
         @param image_rotations  (list) rotation, in degrees, to be applied to image(s)
         @param image_shifts     (list) shift, in (npixX,npixY), to be applied to image(s)
         @param image_scales     (list) scale factor to be applied to images
         @param output_file      filename (If collecting: write to this file)
-        @param good_range       threshold values selecting images of interest
-        @param dark_range       threshold values selecting dark images
         @param draw_each_event  bool
         """
         if image_addresses is None :
@@ -122,6 +124,14 @@ class  pyana_image ( object ) :
                     self.image_scales[source] = float( list_of_scales[i] )
                     i+=1
 
+        self.image_manipulations = None
+        if image_manipulations is not None:
+            if image_manipulations == "" or image_manipulations == "None" :
+                self.image_manipulations = None
+            else :    
+                self.image_manipulations = image_manipulations
+
+
         self.output_file = output_file
         if output_file == "" or output_file == "None" :
             self.output_file = None
@@ -145,6 +155,13 @@ class  pyana_image ( object ) :
 
         self.draw_each_event = draw_each_event
         print "Using draw_each_event = ", draw_each_event
+
+        self.n_hdf5 = None
+        if n_hdf5 is not None :
+            if n_hdf5 == "" or n_hdf5 == "None" :
+                self.n_hdf5 = None
+            else :
+                self.n_hdf5 = int(n_hdf5)
 
 
     # start of job
@@ -176,11 +193,15 @@ class  pyana_image ( object ) :
             self.n_img[addr] = 0
             self.n_dark[addr] = 0
 
-
+        # output file
+        self.hdf5file = None
+        if self.output_file is not None :
+            if ".hdf5" in self.output_file  and self.n_hdf5 is None:
+                print "opening %s for writing" % self.output_file
+                self.hdf5file = h5py.File(self.output_file, 'w')
 
     # process event/shot data
     def event ( self, evt, env ) :
-        print "pyana_image event"
 
         # this one counts every event
         self.n_events+=1
@@ -188,6 +209,16 @@ class  pyana_image ( object ) :
         if (self.n_events%1000)==0 :
             print "Event ", self.n_events
 
+
+        # new hdf5-file every N events
+        if self.output_file is not None :
+            if ".hdf5" in self.output_file and self.n_hdf5 is not None:
+                if (self.n_events%self.n_hdf5)==1 :
+                    start = self.n_events # this event
+                    stop = self.n_events+self.n_hdf5-1
+                    self.sub_output_file = self.output_file.replace('.hdf5',"_%d-%d.hdf5"%(start,stop) )
+                    print "opening %s for writing" % self.sub_output_file
+                    self.hdf5file = h5py.File(self.sub_output_file, 'w')
 
         # for each event, append images to be plotted to this list
         event_display_images = []
@@ -228,8 +259,6 @@ class  pyana_image ( object ) :
             # Apply shift, rotation, scaling of this image if needed:
             if self.image_rotations is not None:
                 rotatedimage = interpol.rotate( image, self.image_rotations[addr], reshape=False )                
-                print "rot: shape of old image = ", np.shape(image)
-                print "rot: shape of new image = ", np.shape(rotatedimage)
                 image = rotatedimage
 
             if self.image_shifts is not None:
@@ -237,8 +266,6 @@ class  pyana_image ( object ) :
                 shiftx, shifty = self.image_shifts[addr]
                 shiftedimage = np.roll(image,shiftx,0)
                 shiftedimage = np.roll(image,shifty,1)
-                print "shift: shape of old image = ", np.shape(image)
-                print "shift: shape of new image = ", np.shape(shiftedimage)
                 image = shiftedimage
                 
             if self.image_scales is not None:
@@ -273,36 +300,29 @@ class  pyana_image ( object ) :
             
 
         # Draw images from this event
-        for i in range ( 0, len(event_display_images) ):
+        if self.image_manipulations is not None: 
+            for i in range ( 0, len(event_display_images) ):
 
-            ad1,im1 = event_display_images[i]
-            ad2,im2 = event_display_images[i-1]
-            lb1 = self.image_nicknames[i]
-            lb2 = self.image_nicknames[i-1]
-            event_display_images.append( ("Diff %s-%s"%(lb1,lb2), im1-im2) )
+                if "Diff" in self.image_manipulations :
+                    ad1,im1 = event_display_images[i]
+                    ad2,im2 = event_display_images[i-1]
+                    lb1 = self.image_nicknames[i]
+                    lb2 = self.image_nicknames[i-1]
+                    event_display_images.append( ("Diff %s-%s"%(lb1,lb2), im1-im2) )
 
-            F = np.fft.fftn(im1-im2)
-            event_display_images.append( ("FFT %s-%s"%(lb1,lb2), np.log(np.abs(np.fft.fftshift(F))**2) ) )
+                    if "FFT" in self.image_manipulations :
+                        F = np.fft.fftn(im1-im2)
+                        event_display_images.append( \
+                            ("FFT %s-%s"%(lb1,lb2), np.log(np.abs(np.fft.fftshift(F))**2) ) )
 
 
         nplots = len(event_display_images)
         ncol = 3
         if nplots<3 : ncol = nplots
         nrow = int( nplots/ncol)
-        fig = plt.figure(101,(4*ncol,4*nrow))
+        fig = plt.figure(101,(5.0*ncol,4*nrow))
         fig.clf()
         fig.suptitle("Event#%d"%self.n_events)
-
-        #grid = AxesGrid( fig, 111,
-        #                 nrows_ncols = (2,3),
-        #                 axes_pad = 0.6,
-        #                 label_mode = 1,
-        #                 share_all = True,
-        #                 cbar_mode = "each",
-        #                 cbar_location = "right",
-        #                 cbar_size = "7%",
-        #                 cbar_pad = "3%",
-        #                 )
 
 
         pos = 0
@@ -337,44 +357,53 @@ class  pyana_image ( object ) :
 
 
             #self.plotter.gridplot( image, title, fignum, (2,ncols,axspos) )
-        for cax in self.caxes :
-            print cax
-        for axim in self.axims :
-            print axim
+        #for cax in self.caxes :
+        #    print cax
+        #for axim in self.axims :
+        #    print axim
 
-        #self.plotter.gridplot(self.image_diff,"Difference", fignum, (2,ncols,axspos+1) )
-        #self.plotter.suptitle(fignum,"Event#%d"%self.n_events)
-        #plt.draw()
                     
         plt.draw()
 
-
+        if self.hdf5file is not None :
+            # save this event as a group in hdf5 file:
+            group = self.hdf5file.create_group("Event%d" % self.n_events)
+        
         # save the average data image (numpy array)
         # binary file .npy format
         if self.output_file is not None :
 
             for ad, im in event_display_images :
+
                 fname = self.output_file.split('.')
                 label = ad.replace("|","_")
                 label = label.replace(" ","")
                 filnamn = ''.join( (fname[0],"%s_ev%d."%(label,self.n_events),fname[-1]) )
-                print filnamn
-                
-                if ".npy" in self.output_file :
+
+                # HDF5
+                if self.hdf5file is not None :
+                    # save each image as a dataset in this event group
+                    dset = group.create_dataset("%s"%ad,data=im)
+
+                # Numpy array
+                elif ".npy" in self.output_file :
                     np.save(filnamn, im)
                     print "saving to ", filnamn
                 elif ".txt" in self.output_file :
                     np.savetxt(filnamn, im) 
                     print "saving to ", filnamn
+                        
                 else :
-                    print "Output file does not have the expected file extension (.txt or .npy): ", fname[-1]
-                    print "I'm not sure what file format to save it as. Please correct."
+                    print "Output file does not have the expected file extension: ", fname[-1]
+                    print "Expected hdf5, txt or npy. Please correct."
                     print "I'm not saving this event... "
         
-                        
 
     # after last event has been processed. 
     def endjob( self, env ) :
+
+        if self.hdf5file is not None :
+            self.hdf5file.close()
 
         print "Done processing       ", self.n_events, " events"
         print "Range defining images: %f (lower) - %f (upper)" % (self.thr_low_image, self.thr_high_image)
@@ -394,16 +423,16 @@ class  pyana_image ( object ) :
 
             # plot the average image
             av_good_img = self.image_data[addr]/self.n_img[addr]
-            self.plotter.drawframe( av_good_img, "%s: Average of images above threshold"%addr,
-                                    100+self.fignum[addr])
+            self.drawframe( av_good_img, "%s: Average of images above threshold"%addr )
+            #100+self.fignum[addr])
 
             if self.n_dark[addr]>0 :
                 av_dark_img = self.dark_data[addr]/self.n_dark[addr]
                 av_bkgsubtracted = av_good_img - av_dark_img 
-                self.plotter.drawframe( av_dark_img, "%s: Average of images below threshold"%addr,
-                                        200+self.fignum[addr] )
-                self.plotter.drawframe( av_bkgsubtracted, "%s: Average background subtracted"%add,
-                                        300+self.fignum[addr])
+                self.drawframe( av_dark_img, "%s: Average of images below threshold"%addr )
+                #200+self.fignum[addr] )
+                self.drawframe( av_bkgsubtracted, "%s: Average background subtracted"%addr )
+                #300+self.fignum[addr])
 
         plt.show()
 
@@ -419,7 +448,7 @@ class  pyana_image ( object ) :
         plt.ion()
         fig = plt.figure( 1 )
         cid1 = fig.canvas.mpl_connect('button_press_event', self.onclick)
-        cid2 = fig.canvas.mpl_connect('key_press_event', self.onpress)
+        #cid2 = fig.canvas.mpl_connect('key_press_event', self.onpress)
 
         self.canvas = fig.add_subplot(111)
         self.canvas.set_title(title)
