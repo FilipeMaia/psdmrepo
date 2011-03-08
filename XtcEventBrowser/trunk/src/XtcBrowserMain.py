@@ -444,7 +444,6 @@ part of it, please give an appropriate acknowledgment.
         
         """
         self.filenames = []
-        self.lineedit.setText("")
         self.__update_currentfiles()
 
         self.checks = []

@@ -26,6 +26,7 @@ import time
 import scipy.ndimage.interpolation as interpol
 import numpy as np
 import matplotlib.pyplot as plt
+import h5py
 
 #-----------------------------
 # Imports for other modules --
@@ -96,7 +97,7 @@ class  pyana_image ( object ) :
             
         self.image_shifts = None
         if image_shifts is not None:
-            if image_shifts == "" or image_shift == "None" :
+            if image_shifts == "" or image_shifts == "None" :
                 self.image_shifts = None
             else :
                 self.image_shifts = {}
@@ -104,7 +105,8 @@ class  pyana_image ( object ) :
                 if len(list_of_shifts) != nsources: print "Plz provide shift amount for *all* images!"
                 i = 0
                 for source in self.image_addresses :
-                    self.image_shifts[source] = int( list_of_shifts[i] )
+                    shift = list_of_shifts[i].lstrip("(").rstrip(")").split(",")
+                    self.image_shifts[source] = (int(shift[0]), int(shift[1]))
                     i+=1
 
         self.image_scales = None
@@ -224,15 +226,20 @@ class  pyana_image ( object ) :
 
 
             # Apply shift, rotation, scaling of this image if needed:
-            if self.image_shifts is not None:
-                # implement this!
-                pass
-
             if self.image_rotations is not None:
-                rotatedimage = interpol.rotate( image, self.image_rotations[addr], reshape=False )
-                print "shape of old image = ", np.shape(image)
-                print "shape of new image = ", np.shape(rotatedimage)
+                rotatedimage = interpol.rotate( image, self.image_rotations[addr], reshape=False )                
+                print "rot: shape of old image = ", np.shape(image)
+                print "rot: shape of new image = ", np.shape(rotatedimage)
                 image = rotatedimage
+
+            if self.image_shifts is not None:
+                #implement this
+                shiftx, shifty = self.image_shifts[addr]
+                shiftedimage = np.roll(image,shiftx,0)
+                shiftedimage = np.roll(image,shifty,1)
+                print "shift: shape of old image = ", np.shape(image)
+                print "shift: shape of new image = ", np.shape(shiftedimage)
+                image = shiftedimage
                 
             if self.image_scales is not None:
                 #implement this!
