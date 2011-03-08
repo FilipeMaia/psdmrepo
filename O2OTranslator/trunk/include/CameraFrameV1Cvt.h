@@ -81,6 +81,7 @@ private:
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::CameraFrameV1> > DataCont ;
   typedef CvtDataContainer<CvtDataContFactoryTyped<const unsigned char> > ImageCont ;
+  typedef CvtDataContainer<CvtDataContFactoryTyped<uint16_t> > DimFixFlagCont ;
 
   // Data members
   hsize_t m_chunk_size ;
@@ -89,6 +90,7 @@ private:
   DataCont* m_dataCont ;
   ImageCont* m_imageCont ;
   XtcClockTimeCont* m_timeCont ;
+  DimFixFlagCont* m_dimFixFlagCont ;
 
   // Copy constructor and assignment are disabled by default
   CameraFrameV1Cvt ( const CameraFrameV1Cvt& ) ;

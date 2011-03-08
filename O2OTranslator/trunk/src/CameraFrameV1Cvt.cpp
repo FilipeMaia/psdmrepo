@@ -24,6 +24,7 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/O2OExceptions.h"
+#include "hdf5pp/TypeTraits.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -92,6 +93,9 @@ CameraFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate ) ;
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
+    // separate dataset which indicates that image dimensions are correct
+    CvtDataContFactoryTyped<uint16_t> dimFixFlagFactory ( "_dim_fix_flag_201103", 1, m_deflate ) ;
+    m_dimFixFlagCont = new DimFixFlagCont(dimFixFlagFactory);
   }
 
   // store the data in the containers
@@ -99,6 +103,10 @@ CameraFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   hdf5pp::Type imgType = H5DataTypes::CameraFrameV1::imageType ( data ) ;
   m_imageCont->container(group,imgType)->append ( *data.data(), imgType ) ;
   m_timeCont->container(group)->append ( time ) ;
+  
+  // do not store anything in the flag container, just create it
+  hdf5pp::Type flagType = hdf5pp::TypeTraits<uint16_t>::stored_type();
+  m_dimFixFlagCont->container(group,flagType);
 }
 
 /// method called when the driver closes a group in the file

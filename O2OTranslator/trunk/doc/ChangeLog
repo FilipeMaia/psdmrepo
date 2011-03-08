@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-04
+2011-03-08 Andy Salnikov
+- bug fix in CameraFrameV1, image dimensions were swapped
+- to mark the data with the correct dimensions we add new empty dataset 
+  to the CameraFrameV1 group with the name "_dim_fix_flag_201103",
+  presence of this dataset means that dimensions are fixed
+
 Tag: V00-10-03
 2011-02-16 Andy Salnikov
 - bug fix for calibration file search
