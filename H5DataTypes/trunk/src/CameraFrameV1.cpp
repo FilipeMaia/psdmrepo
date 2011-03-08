@@ -80,7 +80,7 @@ CameraFrameV1::imageType( const Pds::Camera::FrameV1& frame )
     baseType = hdf5pp::TypeTraits<uint16_t>::native_type() ;
   }
 
-  hsize_t dims[] = { frame.width(), frame.height() } ;
+  hsize_t dims[] = { frame.height(), frame.width() } ;
   return hdf5pp::ArrayType::arrayType ( baseType, 2, dims );
 }
 
