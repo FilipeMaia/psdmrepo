@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Mar-09  ofte                rev 1593
+	- xbplotter now takes care of pyana_image plotting too
+	- fixed a clash btw raw_input and Qt
+	
 2011-Mar-09  ofte                rev 1591
 	- xbplotter now handles all plotting for pyana_cspad
 	- xbplotter Threshold class handles threshold value and region

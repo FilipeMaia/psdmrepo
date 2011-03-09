@@ -32,7 +32,7 @@ import h5py
 # Imports for other modules --
 #-----------------------------
 from pypdsdata import xtc
-#from xbplotter import Plotter
+from xbplotter import Plotter
 from mpl_toolkits.axes_grid1 import AxesGrid
 
 #---------------------
@@ -163,12 +163,6 @@ class  pyana_image ( object ) :
             else :
                 self.n_hdf5 = int(n_hdf5)
 
-
-    # start of job
-    def beginjob ( self, evt, env ) : 
-
-        #self.plotter = Plotter()
-
         # to keep track
         self.n_events = 0
 
@@ -200,11 +194,20 @@ class  pyana_image ( object ) :
                 print "opening %s for writing" % self.output_file
                 self.hdf5file = h5py.File(self.output_file, 'w')
 
+        self.plotter = Plotter()
+
+
+    def beginjob ( self, evt, env ) : 
+        # at Configure transition
+        pass
+
     # process event/shot data
     def event ( self, evt, env ) :
 
         # this one counts every event
         self.n_events+=1
+        self.plotter.shot_number = self.n_events
+
         # print a progress report
         if (self.n_events%1000)==0 :
             print "Event ", self.n_events
@@ -315,57 +318,7 @@ class  pyana_image ( object ) :
         # -----------------------------------
         # Draw images from this event
         # -----------------------------------
-        fignum = 101
-        axspos = 0
-
-        nplots = len(event_display_images)
-        ncol = 3
-        if nplots<3 : ncol = nplots
-        nrow = int( nplots/ncol)
-        fig = plt.figure(101,(5.0*ncol,4*nrow))
-        fig.clf()
-        fig.suptitle("Event#%d"%self.n_events)
-
-
-        pos = 0
-        self.caxes = [] # list of references to colorbar Axes
-        self.axims = [] # list of references to image Axes
-        for ad, im in sorted(event_display_images) :
-            pos += 1
-            
-            # Axes
-            ax = fig.add_subplot(nrow,ncol,pos)
-            indx = event_display_images.index((ad,im))
-            nickn = ""
-            if indx < len(self.image_addresses):
-                nickn = self.image_nicknames[indx]
-                nickn+=": "
-            ax.set_title( "%s%s" % (nickn,ad) )
-
-            # AxesImage
-            axim = plt.imshow( im, origin='lower' )
-            self.axims.append( axim )
-        
-            cbar = plt.colorbar(axim,pad=0.02,shrink=0.78) 
-            self.caxes.append( cbar.ax )
-            
-            self.orglims = axim.get_clim()
-            # min and max values in the axes are
-
-
-            #grid[pos-1].set_title("%s"%(ad))
-            #axesim = grid[pos-1].imshow( im )
-            #grid.cbar_axes[pos-1].colorbar(axesim)
-
-
-            #self.plotter.gridplot( image, title, fignum, (2,ncols,axspos) )
-        #for cax in self.caxes :
-        #    print cax
-        #for axim in self.axims :
-        #    print axim
-
-                    
-        plt.draw()
+        self.plotter.draw_figurelist( 101, event_display_images )
 
         # -----------------------------------
         # Saving to file
@@ -440,90 +393,6 @@ class  pyana_image ( object ) :
                 #300+self.fignum[addr])
 
         plt.show()
-
-
-
-    # -------------------------------------------------------------------
-    # Additional functions
         
-    def drawframe( self, frameimage, title="" ):
-
-        # plot image frame
-
-        plt.ion()
-        fig = plt.figure( 1 )
-        cid1 = fig.canvas.mpl_connect('button_press_event', self.onclick)
-        #cid2 = fig.canvas.mpl_connect('key_press_event', self.onpress)
-
-        self.canvas = fig.add_subplot(111)
-        self.canvas.set_title(title)
-        # canvas is the main "Axes" object
-
-        self.axes = plt.imshow( frameimage, origin='lower' )
-        # axes is the are where the image is plotted
-        
-        self.colb = plt.colorbar(self.axes,pad=0.01)
-        # colb is the colorbar object
-
-        self.orglims = self.axes.get_clim()
-        # min and max values in the axes are
-        print "Original value limits: ", self.orglims
-
-        print """
-        To change the color scale, click on the color bar:
-          - left-click sets the lower limit
-          - right-click sets higher limit
-          - middle-click resets to original
-        """
-        plt.draw() 
-        plt.draw() 
-
-        #plt.show() # starts the GUI main loop
-                   # you need to kill window to proceed... 
-                   # (this shouldn't be done for every event!)
-
-
-
-                               
-    # define what to do if we click on the plot
-    def onclick(self, event) :
-
-        # can we open a dialogue box here?
-        print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y,
-        print ' xdata=',event.xdata,' ydata=', event.ydata
-
-        if event.inaxes :
-            lims = self.axes.get_clim()
-            
-            colmin = lims[0]
-            colmax = lims[1]
-            range = colmax - colmin
-            value = colmin + event.ydata * range
-            #print colmin, colmax, range, value
-            
-            # left button
-            if event.button is 1 :
-                if value > colmin and value < colmax :
-                    colmin = value
-                    print "new mininum: ", colmin
-                else :
-                    print "min has not been changed (click inside the color bar to change the range)"
-                        
-            # middle button
-            elif event.button is 2 :
-                colmin, colmax = self.orglims
-                print "reset"
-                    
-            # right button
-            elif event.button is 3 :
-                if value > colmin and value < colmax :
-                    colmax = value
-                    print "new maximum: ", colmax
-                else :
-                    print "max has not been changed (click inside the color bar to change the range)"
-
-            plt.clim(colmin,colmax)
-            plt.draw() # redraw the current figure
-
 
 

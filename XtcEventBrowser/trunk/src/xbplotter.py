@@ -1,6 +1,7 @@
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+from PyQt4 import QtCore
 
 from mpl_toolkits.axes_grid1 import AxesGrid
 
@@ -65,6 +66,12 @@ class Plotter(object):
         self.colb = None
         self.grid = None
         self.threshold = None
+        self.shot_number = None
+
+        # matplotlib backend is set to QtAgg, and this is needed to avoid
+        # a bug in raw_input ("QCoreApplication::exec: The event loop is already running")
+        QtCore.pyqtRemoveInputHook()
+
         
     def connect(self):
 
@@ -129,6 +136,55 @@ class Plotter(object):
     def addcolbar(self):
         self.colb = plt.colorbar(self.axesim,ax=self.axes,pad=0.01,fraction=0.10,shrink=0.90)
 
+    def draw_figurelist(self, fignum, event_display_images ) :
+        """
+        @fignum                  figure number, i.e. fig = plt.figure(num=fignum)
+        @event_display_images    a list of tuples (title,image)
+        """
+        axspos = 0
+
+        nplots = len(event_display_images)
+        ncol = 3
+        if nplots<3 : ncol = nplots
+        nrow = int( nplots/ncol)
+        fig = plt.figure(101,(5.0*ncol,4*nrow))
+        fig.clf()
+        fig.suptitle("Event#%d"%self.shot_number)
+
+
+        pos = 0
+        self.caxes = [] # list of references to colorbar Axes
+        self.axims = [] # list of references to image Axes
+        for ad, im in sorted(event_display_images) :
+            pos += 1
+            
+            # Axes
+            ax = fig.add_subplot(nrow,ncol,pos)
+            ax.set_title( "%s" % ad )
+
+            # AxesImage
+            axim = plt.imshow( im, origin='lower' )
+            self.axims.append( axim )
+        
+            cbar = plt.colorbar(axim,pad=0.02,shrink=0.78) 
+            self.caxes.append( cbar.ax )
+            
+            self.orglims = axim.get_clim()
+            # min and max values in the axes are
+
+
+            #grid[pos-1].set_title("%s"%(ad))
+            #axesim = grid[pos-1].imshow( im )
+            #grid.cbar_axes[pos-1].colorbar(axesim)
+
+
+            #self.plotter.gridplot( image, title, fignum, (2,ncols,axspos) )
+        #for cax in self.caxes :
+        #    print cax
+        #for axim in self.axims :
+        #    print axim
+
+        plt.draw()
 
     def drawframe( self, frameimage, title="", fignum=1):
 
@@ -176,9 +232,12 @@ class Plotter(object):
 
 
     def onpick(self, event):
-        print "Currently active area for threshold evaluation: [xmin xmax ymin ymax] = ", self.threshold.area
-        print "To change this area, right-click..." 
+        print "Currently threshold: "
+        print "         require a max value above threshold: ", self.threshold.minvalue
+        print "         active area [xmin xmax ymin ymax] = ", self.threshold.area
         print "To change threshold, middle-click..." 
+        print "To change this area, right-click..." 
+
         if event.mouseevent.button == 3 :
             print "Enter new coordinates to change this area:"
             xxyy_string = raw_input("xmin xmax ymin ymax = ")
@@ -197,14 +256,16 @@ class Plotter(object):
             h = self.threshold.area[3] - self.threshold.area[2]
             
             self.thr_rect.set_bounds(x,y,w,h)
-            #plt.draw()
+            plt.draw()
             
         if event.mouseevent.button == 2 :
             text = raw_input("Enter new threshold value (current = %.2f) " % self.threshold.minvalue)
             if text == "" :
                 print "Invalid entry, ignoring"
-                self.threshold = float(text)
-                print "Threshold value has been changed to ", self.threshold.minvalue
+            self.threshold.minvalue = float(text)
+            print "Threshold value has been changed to ", self.threshold.minvalue
+            plt.draw()
+
             
     # define what to do if we click on the plot
     def onclick(self, event) :

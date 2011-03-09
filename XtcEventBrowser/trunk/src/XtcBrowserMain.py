@@ -85,7 +85,9 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         Description
         """
         QtGui.QMainWindow.__init__(self)
-    
+
+        QtCore.pyqtRemoveInputHook()
+        
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
 

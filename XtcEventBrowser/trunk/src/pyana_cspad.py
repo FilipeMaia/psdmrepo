@@ -75,6 +75,7 @@ class  pyana_cspad ( object ) :
         @param thr_area         range=xmin,xmax,ymin,ymax defining threshold area
         """
 
+
         # initializations from argument list
         self.img_addr = image_source
         print "Using image_source = ", self.img_addr
