@@ -37,16 +37,12 @@ from matplotlib.gridspec import GridSpec
 #-----------------------------
 from pypdsdata import xtc
 from cspad import CsPad
+from xbplotter import Plotter
+from xbplotter import Threshold
 
 #---------------------
 #  Class definition --
 #---------------------
-
-#class MyRectangle(plt.Rectangle):
-#    def __call__(self, ax):
-#        self.set_bounds(*ax.viewLim.bounds)
-#        ax.figure.canvas.draw_idle()
-
 class  pyana_cspad ( object ) :
 
     #--------------------
@@ -105,19 +101,27 @@ class  pyana_cspad ( object ) :
             self.plot_vmax = float(plot_vrange.split("-")[1])
             print "Using plot_vrange = %f-%f"%(self.plot_vmin,self.plot_vmax)
 
+        self.plotter = Plotter()
+
         self.threshold = None
         if threshold is not None :
-            if not ( threshold == "" or threshold == "None" ):
-                self.threshold = float(threshold)
-                print "Using threshold value ", self.threshold
+            if threshold == "" or threshold == "None" :
+                self.threshold = None
+            else :
+                value = float(threshold)
+                if thr_area is None :
+                    self.threshold = Threshold( minvalue=value )
+                else :
+                    area = np.array([0.,0.,0.,0.])
+                    for i in range (4) :
+                        area[i] = float(thr_area.split(",")[i])
 
-        # subset of image where threshold is applied
-        self.thr_rect = None
-        self.thr_area = None
-        if thr_area is not None: 
-            self.thr_area = np.array([0.,0.,0.,0.])
-            for i in range (4) : self.thr_area[i] = float(thr_area.split(",")[i])
-            print "Using threshold region ", self.thr_area
+                    self.threshold = Threshold( minvalue=value, area=area )
+
+                print "Using threshold value ", self.threshold.minvalue
+                print "Using threshold area ", self.threshold.area
+                self.plotter.threshold = self.threshold
+
 
         # initializations of other class variables
 
@@ -140,10 +144,8 @@ class  pyana_cspad ( object ) :
             print "Loading dark image from ", self.dark_img_file
             self.dark_image = np.load(self.dark_img_file)
 
-
-
-
-    # start of job
+        
+    # this method is called at an xtc Configure transition
     def beginjob ( self, evt, env ) : 
 
         config = env.getConfig(xtc.TypeId.Type.Id_CspadConfig, self.img_addr )
@@ -174,7 +176,6 @@ class  pyana_cspad ( object ) :
 
     # process event/shot data
     def event ( self, evt, env ) :
-
 
         self.images = []
         self.ititle = []
@@ -239,18 +240,18 @@ class  pyana_cspad ( object ) :
         # set threshold
         if self.threshold is not None:
             topval = np.max(cspad_image)
-            if self.thr_area is not None:
-                subset = cspad_image[self.thr_area[0]:self.thr_area[1],   # x1:x2
-                                     self.thr_area[2]:self.thr_area[3]]   # y1:y2
+            if self.threshold.area is not None:
+                subset = cspad_image[self.threshold.area[0]:self.threshold.area[1],   # x1:x2
+                                     self.threshold.area[2]:self.threshold.area[3]]   # y1:y2
 
                 
                 topval = np.max(subset)
 
-            if topval < self.threshold :
-                print "skipping this event!  %.2f < %.2f " % (topval, float(self.threshold))
+            if topval < self.threshold.minvalue :
+                print "skipping this event!  %.2f < %.2f " % (topval, float(self.threshold.minvalue))
                 return
             else :
-                print "Plotting this event, vmax = %.2f > %.2f " % (topval, float(self.threshold))
+                print "Plotting this event, vmax = %.2f > %.2f " % (topval, float(self.threshold.minvalue))
 
         # add this image to the sum
         self.n_img+=1
@@ -266,7 +267,8 @@ class  pyana_cspad ( object ) :
             title = title + " (background subtracted) "
             
         if self.draw_each_event :
-            self.drawframe(cspad_image,title, fignum=201 )
+            #self.drawframe(cspad_image,title, fignum=201 )
+            self.plotter.drawframe(cspad_image,title, fignum=201 )
 
 
 
@@ -290,7 +292,8 @@ class  pyana_cspad ( object ) :
 
         # plot the average image
         average_image = self.img_data/self.n_img 
-        self.drawframe(average_image,"Average of %d events" % self.n_img, fignum=100 )
+        #self.drawframe(average_image,"Average of %d events" % self.n_img, fignum=100 )
+        self.plotter.drawframe(average_image,"Average of %d events" % self.n_img, fignum=100 )
         plt.show()
 
 
@@ -318,205 +321,3 @@ class  pyana_cspad ( object ) :
         print "Thank you!"
         print "-------------------"
 
-    # -------------------------------------------------------------------
-    # Additional functions
-
-    def drawframemore( self, frameimage, title="", fignum=1):
-
-        # plot image frame
-        #if fig is None :
-
-        self.fig = plt.figure(figsize=(8,10),num=fignum)
-        #plt.suptitle("LCLS Event Display")
-        cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
-
-        ## To do: add insert showing the active region for thresholding
-        #if self.thr_area is not None:
-        #cspad_image[self.thr_area[0]:self.thr_area[1], self.thr_area[2]:self.thr_area[3]])
-
-        gs = GridSpec(2,1, height_ratios=[6,1] )
-
-        axes1 = plt.subplot(gs[0])
-        axes1.set_title(title)
-        # the main "Axes" object (on where the image is plotted)
-
-        self.axesim = plt.imshow( frameimage, vmin=self.plot_vmin, vmax=self.plot_vmax )#, origin='lower' )
-        # axes image 
-        
-        self.colb = plt.colorbar(self.axesim,pad=0.01)
-        # colb is the colorbar object
-
-
-        if self.plot_vmin is None: 
-            self.orglims = self.axesim.get_clim()
-            # min and max values in the axes are
-            print "Original value limits: ", self.orglims
-            self.plot_vmin, self.plot_vmax = self.orglims
-
-        axes2 = plt.subplot(gs[1])
-        axes2.set_title("spectrum")
-        self.axesim2 = plt.hist( frameimage.ravel(),
-                                 bins=1000,
-                                 histtype='stepfilled',
-                                 range=(self.plot_vmin,self.plot_vmax))
-        
-        print """
-        To change the color scale, click on the color bar:
-          - left-click sets the lower limit
-          - right-click sets higher limit
-          - middle-click resets to original
-        """
-        #plt.show() # starts the GUI main loop
-        #           # you need to kill window to proceed... 
-        #           # (this shouldn't be done for every event!)
-
-
-    def drawframe( self, frameimage, title="", fignum=1):
-
-        # plot image frame
-        #if fig is None :
-
-        self.fig = plt.figure(figsize=(10,8),num=fignum)
-        cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
-        cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)
-        axes = self.fig.add_subplot(111)
-        
-        axes.set_title(title)
-        # the main "Axes" object (on where the image is plotted)
-
-        self.axesim = plt.imshow( frameimage, vmin=self.plot_vmin, vmax=self.plot_vmax )#, origin='lower' )
-        # axes image 
-        
-        print "vmin vmax now: ", self.plot_vmin, self.plot_vmax
-
-        self.colb = plt.colorbar(self.axesim,pad=0.01)
-        # colb is the colorbar object
-
-        if self.plot_vmin is None: 
-            self.orglims = self.axesim.get_clim()
-            # min and max values in the axes are
-            print "Original value limits: ", self.orglims
-            self.plot_vmin, self.plot_vmax = self.orglims
-        
-        print """
-        To change the color scale, click on the color bar:
-          - left-click sets the lower limit
-          - right-click sets higher limit
-          - middle-click resets to original
-        """
-
-        ## show the active region for thresholding
-        if self.thr_area is not None:
-            xy = [self.thr_area[0],self.thr_area[2]]
-            w = self.thr_area[1] - self.thr_area[0]
-            h = self.thr_area[3] - self.thr_area[2]
-            self.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=5)
-            axes.add_patch(self.thr_rect)
-
-    
-        #cspad_image[self.thr_area[0]:self.thr_area[1], self.thr_area[2]:self.thr_area[3]])
-        
-        
-
-        #plt.show() # starts the GUI main loop
-        #           # you need to kill window to proceed... 
-        #           # (this shouldn't be done for every event!)
-
-
-    def onpick(self, event):
-        print "Currently active area for threshold evaluation: [xmin xmax ymin ymax] = ", self.thr_area
-        print "To change this area, right-click..." 
-        print "To change threshold, middle-click..." 
-        if event.mouseevent.button == 3 :
-            print "Enter new coordinates to change this area:"
-            xxyy_string = raw_input("xmin xmax ymin ymax = ")
-            xxyy_list = xxyy_string.split(" ")
-
-            if len( xxyy_list ) != 4 :
-                print "Invalid entry, ignoring"
-                return
-                
-            for i in range (4):
-                self.thr_area[i] = float( xxyy_list[i] )
-
-            x = self.thr_area[0]
-            y = self.thr_area[2]
-            w = self.thr_area[1] - self.thr_area[0]
-            h = self.thr_area[3] - self.thr_area[2]
-            
-            self.thr_rect.set_bounds(x,y,w,h)
-            plt.draw()
-        
-        if event.mouseevent.button == 2 :
-            text = raw_input("Enter new threshold value (current = %.2f) " % self.threshold)
-            if text == "" :
-                print "Invalid entry, ignoring"
-            self.threshold = float(text)
-            print "Threshold value has been changed to ", self.threshold
-                               
-    # define what to do if we click on the plot
-    def onclick(self, event) :
-
-        # can we open a dialogue box here?
-        if not event.inaxes and event.button == 3 :
-            print "can we open a menu here?"
-            
-        # check that the click was on the color bar
-        if event.inaxes == self.colb.ax :
-
-            print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y
-            print ' xdata=',event.xdata,' ydata=', event.ydata
-            
-            lims = self.axesim.get_clim()
-            
-            self.plot_vmin = lims[0]
-            self.plot_vmax = lims[1]
-            range = self.plot_vmax - self.plot_vmin
-            value = self.plot_vmin + event.ydata * range
-            #print self.plot_vmin, self.plot_vmax, range, value
-
-            # left button
-            if event.button is 1 :
-                self.plot_vmin = value
-                print "mininum changed:   ( %.2f , %.2f ) " % (self.plot_vmin, self.plot_vmax )
-                #if value > self.plot_vmin and value < self.plot_vmax :
-                #else :
-                #    print "min has not been changed (click inside the color bar to change the range)"
-                        
-            # middle button
-            elif event.button is 2 :
-                self.plot_vmin, self.plot_vmax = self.orglims
-                print "reset"
-                    
-            # right button
-            elif event.button is 3 :
-                self.plot_vmax = value
-                print "maximum changed:   ( %.2f , %.2f ) " % (self.plot_vmin, self.plot_vmax )
-                #if value > self.plot_vmin and value < self.plot_vmax :
-                #else :
-                #    print "max has not been changed (click inside the color bar to change the range)"
-
-            plt.clim(self.plot_vmin,self.plot_vmax)
-            plt.draw() # redraw the current figure
-
-
-
-
-    # define what to do if a button is pressed
-    def onpress(self, event) :
-
-        if event.key not in ('t', 'l'): return
-        if event.key=='t' : self.set_threshold()
-        if event.key=='l' : self.add_savelist()
-        
-
-    def set_threshold(self) :
-        print " open a dialog to change the threshold to a new value"
-        pass
-
-
-    def add_savelist(self) :
-        print "Schedule this image array for saving to binary file"
-        pass
-
-    

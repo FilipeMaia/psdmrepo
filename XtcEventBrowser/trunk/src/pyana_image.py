@@ -223,9 +223,6 @@ class  pyana_image ( object ) :
         # for each event, append images to be plotted to this list
         event_display_images = []
 
-        fignum = 101
-        axspos = 0
-
         # get the requested images
         for addr in self.image_addresses :
         
@@ -299,7 +296,6 @@ class  pyana_image ( object ) :
             event_display_images.append( (addr, image) )
             
 
-        # Draw images from this event
         if self.image_manipulations is not None: 
             for i in range ( 0, len(event_display_images) ):
 
@@ -315,6 +311,12 @@ class  pyana_image ( object ) :
                         event_display_images.append( \
                             ("FFT %s-%s"%(lb1,lb2), np.log(np.abs(np.fft.fftshift(F))**2) ) )
 
+
+        # -----------------------------------
+        # Draw images from this event
+        # -----------------------------------
+        fignum = 101
+        axspos = 0
 
         nplots = len(event_display_images)
         ncol = 3
@@ -365,6 +367,9 @@ class  pyana_image ( object ) :
                     
         plt.draw()
 
+        # -----------------------------------
+        # Saving to file
+        # -----------------------------------
         if self.hdf5file is not None :
             # save this event as a group in hdf5 file:
             group = self.hdf5file.create_group("Event%d" % self.n_events)

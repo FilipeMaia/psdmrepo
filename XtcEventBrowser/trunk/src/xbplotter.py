@@ -43,6 +43,18 @@ def draw_on_simple(fignr):
     return fig
 
 
+class Threshold( object ) :
+    def __init__( self,
+                  area = None,
+                  minvalue = None,
+                  maxvalue = None,
+                  ) :
+
+        self.area = area        
+        self.minvalue = minvalue
+        self.maxvalue = maxvalue
+
+
 
 class Plotter(object):
     def __init__(self):
@@ -52,6 +64,7 @@ class Plotter(object):
         self.cid2 = None
         self.colb = None
         self.grid = None
+        self.threshold = None
         
     def connect(self):
 
@@ -116,30 +129,29 @@ class Plotter(object):
     def addcolbar(self):
         self.colb = plt.colorbar(self.axesim,ax=self.axes,pad=0.01,fraction=0.10,shrink=0.90)
 
+
     def drawframe( self, frameimage, title="", fignum=1):
 
         self.fig = plt.figure(figsize=(10,8),num=fignum)
-        self.fig.subplots_adjust(left=0.10, bottom=0.05, right=0.95, top=0.95, wspace=0.1, hspace=0.1)
+        self.cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+        self.cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)
+
         axes = self.fig.add_subplot(111)        
         axes.set_title(title)
+
+        self.fig.subplots_adjust(left=0.10, bottom=0.05, right=0.95, top=0.95, wspace=0.1, hspace=0.1)
+
         self.axesim = plt.imshow( frameimage,
                                   vmin=self.plot_vmin, vmax=self.plot_vmax )
 
-        self.cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
-        self.cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)
-    
-    
-        print "vmin vmax now: ", self.plot_vmin, self.plot_vmax
-        if self.colb is None: 
-            self.colb = plt.colorbar(self.axesim,ax=axes,pad=0.01,fraction=0.10,shrink=0.90)
+        self.colb = plt.colorbar(self.axesim,ax=axes,pad=0.01)#,fraction=0.10,shrink=0.90)
         # colb is the colorbar object
-    
-    
-        #        if self.plot_vmin is None: 
-        #            self.orglims = self.axesim.get_clim()
-        #            # min and max values in the axes are
-        #            print "Original value limits: ", self.orglims
-        #            self.plot_vmin, self.plot_vmax = self.orglims
+        
+        if self.plot_vmin is None: 
+            self.orglims = self.axesim.get_clim()
+            # min and max values in the axes are
+            print "Original value limits: ", self.orglims
+            self.plot_vmin, self.plot_vmax = self.orglims
         
         print """
         To change the color scale, click on the color bar:
@@ -148,26 +160,23 @@ class Plotter(object):
         - middle-click resets to original
         """
     
-        ## show the active region for thresholding
-        #        if self.thr_area is not None:
-        #            xy = [self.thr_area[0],self.thr_area[2]]
-        #            w = self.thr_area[1] - self.thr_area[0]
-        #            h = self.thr_area[3] - self.thr_area[2]
-        #            self.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=5)
-        #            myplot.axes.add_patch(self.thr_rect)
+        # show the active region for thresholding
+        if self.threshold.area is not None:
+            xy = [self.threshold.area[0],self.threshold.area[2]]
+            w = self.threshold.area[1] - self.threshold.area[0]
+            h = self.threshold.area[3] - self.threshold.area[2]
+            self.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=5)
+            axes.add_patch(self.thr_rect)
         
-        
-        #cspad_image[self.thr_area[0]:self.thr_area[1], self.thr_area[2]:self.thr_area[3]])
 
-
-
+        plt.draw()
         #plt.show() # starts the GUI main loop
         #           # you need to kill window to proceed... 
         #           # (this shouldn't be done for every event!)
 
 
     def onpick(self, event):
-        print "Currently active area for threshold evaluation: [xmin xmax ymin ymax] = ", self.thr_area
+        print "Currently active area for threshold evaluation: [xmin xmax ymin ymax] = ", self.threshold.area
         print "To change this area, right-click..." 
         print "To change threshold, middle-click..." 
         if event.mouseevent.button == 3 :
@@ -180,22 +189,22 @@ class Plotter(object):
                 return
         
             for i in range (4):
-                self.thr_area[i] = float( xxyy_list[i] )
+                self.threshold.area[i] = float( xxyy_list[i] )
             
-            x = self.thr_area[0]
-            y = self.thr_area[2]
-            w = self.thr_area[1] - self.thr_area[0]
-            h = self.thr_area[3] - self.thr_area[2]
+            x = self.threshold.area[0]
+            y = self.threshold.area[2]
+            w = self.threshold.area[1] - self.threshold.area[0]
+            h = self.threshold.area[3] - self.threshold.area[2]
             
             self.thr_rect.set_bounds(x,y,w,h)
             #plt.draw()
             
         if event.mouseevent.button == 2 :
-            text = raw_input("Enter new threshold value (current = %.2f) " % self.threshold)
+            text = raw_input("Enter new threshold value (current = %.2f) " % self.threshold.minvalue)
             if text == "" :
                 print "Invalid entry, ignoring"
                 self.threshold = float(text)
-                print "Threshold value has been changed to ", self.threshold
+                print "Threshold value has been changed to ", self.threshold.minvalue
             
     # define what to do if we click on the plot
     def onclick(self, event) :
