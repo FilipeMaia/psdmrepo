@@ -97,10 +97,10 @@ class PlotsForImage ( object ) :
         plt.title(pantit,color='r',fontsize=20) # pars like in class Text
         arrdimX,arrdimY = arr2d1ev.shape
         #print 'arr2d1ev.shape=', arr2d1ev.shape, arrdimX, arrdimY 
-        print 'arr2d1ev=\n', arr2d1ev
+        #print 'arr2d1ev=\n', arr2d1ev
         arr1d1ev = copy(arr2d1ev)
         arr1d1ev.resize(arrdimX*arrdimY)
-        print 'arr1d1ev=\n', arr1d1ev
+        #print 'arr1d1ev=\n', arr1d1ev
         #plt.hist(arr1d1ev,100)
 
         cp.confpars.imageSpectrumRange=(15,45)
@@ -150,7 +150,7 @@ class PlotsForImage ( object ) :
         ax1 = plt.subplot2grid((4,4), (0,0), rowspan=3, colspan=4)
         #plt.subplot(211)
         #print 'self.arr2d.shape=', self.arr2d.shape
-        self.axes = plt.imshow(self.arr2d, origin='down', interpolation='nearest') # Just a histogram, origin='upper'
+        self.axes = plt.imshow(self.arr2d, interpolation='nearest') # Just a histogram, origin='upper', origin='down'
         plt.title(self.pantit,color='r',fontsize=20) # pars like in class Text
 
         #plt.text(50, -20, pantit, fontsize=24)

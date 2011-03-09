@@ -35,7 +35,7 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 import ConfigParameters as cp
-
+import PrintHDF5        as printh5
 #---------------------
 #  Class definition --
 #---------------------
@@ -109,19 +109,33 @@ class GUISelectionWindow ( QtGui.QWidget ) :
         if cp.confpars.selectionWindowParameters[self.window][1] : self.radioInBin.setChecked(True)
         else :                                                     self.radioInWin.setChecked(True)
 
+        self.titSelDataSet        = QtGui.QLabel('Dataset:')
+        self.butSelDataSet = QtGui.QPushButton(cp.confpars.selectionWindowParameters[self.window][6])
+        self.butSelDataSet.setMaximumWidth(350)
+        self.setButSelDataSetTextAlignment()
+
+        self.popupMenuForDataSet = QtGui.QMenu()
+        self.fillPopupMenuForDataSet()
+
+
         grid = QtGui.QGridLayout()
-        grid.addWidget(self.titThreshold,        0, 0, 2, 2)
-        grid.addWidget(self.editSelectionThr,    0, 2, 2, 1)
-        grid.addWidget(self.radioInBin,          0, 3)
-        grid.addWidget(self.radioInWin,          1, 3)
 
-        grid.addWidget(self.titXminmax,          3, 0)
-        grid.addWidget(self.editSelectionXmin,   3, 1)
-        grid.addWidget(self.editSelectionXmax,   3, 2)
+        grid.addWidget(self.titSelDataSet,       0, 0)
+        grid.addWidget(self.butSelDataSet,       0, 1, 1, 4)
 
-        grid.addWidget(self.titYminmax,          4, 0)
-        grid.addWidget(self.editSelectionYmin,   4, 1)
-        grid.addWidget(self.editSelectionYmax,   4, 2)
+        grid.addWidget(self.titThreshold,        1, 0, 2, 2)
+        grid.addWidget(self.editSelectionThr,    1, 2, 2, 1)
+        grid.addWidget(self.radioInBin,          1, 3)
+        grid.addWidget(self.radioInWin,          2, 3)
+
+        grid.addWidget(self.titXminmax,          4, 0)
+        grid.addWidget(self.editSelectionXmin,   4, 1)
+        grid.addWidget(self.editSelectionXmax,   4, 2)
+
+        grid.addWidget(self.titYminmax,          5, 0)
+        grid.addWidget(self.editSelectionYmin,   5, 1)
+        grid.addWidget(self.editSelectionYmax,   5, 2)
+
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(grid) 
@@ -138,7 +152,8 @@ class GUISelectionWindow ( QtGui.QWidget ) :
         self.connect(self.editSelectionXmax,  QtCore.SIGNAL('editingFinished ()'), self.processEditSelectionXmax )
         self.connect(self.editSelectionYmin,  QtCore.SIGNAL('editingFinished ()'), self.processEditSelectionYmin )
         self.connect(self.editSelectionYmax,  QtCore.SIGNAL('editingFinished ()'), self.processEditSelectionYmax )
- 
+        self.connect(self.butSelDataSet,      QtCore.SIGNAL('clicked()'),          self.processMenuForDataSet )
+  
         cp.confpars.selectionWindowIsOpen = True
 
         self.showToolTips()
@@ -221,6 +236,35 @@ class GUISelectionWindow ( QtGui.QWidget ) :
 
     def processEditSelectionYmax(self):
         cp.confpars.selectionWindowParameters[self.window][5] = int(self.editSelectionYmax.displayText())        
+
+
+    def setButSelDataSetTextAlignment(self):
+        if self.butSelDataSet.text() == 'None' :
+            self.butSelDataSet.setStyleSheet('Text-align:center')
+        else :
+            self.butSelDataSet.setStyleSheet('Text-align:right')
+
+
+    def fillPopupMenuForDataSet(self):
+        print 'fillPopupMenuForDataSet'
+        self.popupMenuForDataSet.addAction('None')
+        for dsname in cp.confpars.list_of_checked_item_names :
+            item_last_name   = printh5.get_item_last_name(dsname)           
+            cspadIsInTheName = printh5.CSpadIsInTheName(dsname)
+            if item_last_name == 'image' or cspadIsInTheName:
+
+                self.popupMenuForDataSet.addAction(dsname)
+
+
+    def processMenuForDataSet(self):
+        print 'MenuForDataSet'
+        actionSelected = self.popupMenuForDataSet.exec_(QtGui.QCursor.pos())
+        if actionSelected==None : return
+        selected_ds = actionSelected.text()
+        self.butSelDataSet.setText( selected_ds )
+        self.setButSelDataSetTextAlignment()
+        cp.confpars.selectionWindowParameters[self.window][6] = str(selected_ds)
+
 
 #-----------------------------
 #  In case someone decides to run this module

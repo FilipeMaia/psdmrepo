@@ -31,6 +31,7 @@ __version__ = "$Revision: 4 $"
 import sys
 import h5py    # access to hdf5 file structure
 from numpy import *  # for use like       array(...)
+import numpy as np
 import time
 
 import matplotlib
@@ -81,6 +82,57 @@ class DrawEvent ( object ) :
     #  Public methods --
     #-------------------
 
+    def dimIsFixed(self, dsname) :
+        #print 'Check if the item "_dim_fix_flag_201103" is in the group', dsname
+        path  = printh5.get_item_path_to_last_name(dsname)
+        group = self.h5file[path]
+        if '_dim_fix_flag_201103' in group.keys() : return True
+        else :                                      return False 
+
+    def selectionIsPassed(self) :
+
+        if not cp.confpars.selectionIsOn : return True           # Is passed if selection is OFF
+
+        for win in range(cp.confpars.selectionNWindows) :        # Loop over all windows
+
+            dsname = cp.confpars.selectionWindowParameters[win][6]
+            if dsname == 'None' : continue
+
+            if printh5.get_item_last_name(dsname) == 'image' : # Check for IMAGE
+
+                ds     = self.h5file[dsname]
+                self.arr1ev = ds[cp.confpars.eventCurrent]
+                if not self.dimIsFixed(dsname) :
+                    self.arr1ev.shape = (self.arr1ev.shape[1],self.arr1ev.shape[0])
+
+                if not self.selectionInWindowIsPassed(win,self.arr1ev) : return False
+
+            elif printh5.CSpadIsInTheName(dsname) :            # Check for CSpad 
+                pass
+            
+        return True
+        
+    def selectionInWindowIsPassed(self, win, arr2d) :
+
+        Thr   = cp.confpars.selectionWindowParameters[win][0]
+        inBin = cp.confpars.selectionWindowParameters[win][1]
+        iXmin = cp.confpars.selectionWindowParameters[win][2]
+        iXmax = cp.confpars.selectionWindowParameters[win][3]
+        iYmin = cp.confpars.selectionWindowParameters[win][4]
+        iYmax = cp.confpars.selectionWindowParameters[win][5]
+
+        arrInWindow = arr2d[iXmin:iXmax,iYmin:iYmax]
+
+        #print 'arrInWindow.shape', arrInWindow.shape
+        #print 'arrInWindow.max()', arrInWindow.max()
+        #print 'arrInWindow.sum()', arrInWindow.sum()
+
+        if inBin :
+            if arrInWindow.max() > Thr : return True
+        else :
+            if arrInWindow.sum() > Thr : return True
+
+        return False
 
 
     def averageOverEvents(self, mode=1) :
@@ -89,8 +141,8 @@ class DrawEvent ( object ) :
         t_start = time.clock()
         self.openHDF5File() # t=0us
         
-        eventStart = cp.confpars.eventCurrent
-        eventEnd   = cp.confpars.eventCurrent + 100 * cp.confpars.numEventsAverage
+        self.eventStart = cp.confpars.eventCurrent
+        self.eventEnd   = cp.confpars.eventCurrent + 10 # This is have changed at 1st call loopOverDataSets
 
         print 'selectionIsOn =', cp.confpars.selectionIsOn 
 
@@ -106,8 +158,8 @@ class DrawEvent ( object ) :
             self.loopOverDataSets() # Initialization & Accumulation
 
             cp.confpars.eventCurrent += 1
-            self.numEventsSelected   += 1
-            self.loopIsContinued = self.numEventsSelected < cp.confpars.numEventsAverage and cp.confpars.eventCurrent < eventEnd 
+            if self.selectionIsPassed() : self.numEventsSelected   += 1
+            self.loopIsContinued = self.numEventsSelected < cp.confpars.numEventsAverage and cp.confpars.eventCurrent < self.eventEnd 
 
 
         self.loopOverDataSets(option=1) # Normalization per 1 event
@@ -130,21 +182,33 @@ class DrawEvent ( object ) :
     def loopOverDataSets ( self, option=None ) :
         """Loop over datasets and accumulating arrays"""
 
+        if option == None :                                   # Initialization of lists
+            if cp.confpars.eventCurrent == self.eventStart :  # for the start event
+                self.ave1ev    = []                         
+                self.avedsname = []
+
         ind=-1
         for dsname in cp.confpars.list_of_checked_item_names :
             ind += 1 
 
-            ds     = self.h5file[dsname]
-            arr1ev = ds[cp.confpars.eventCurrent]
+            ds          = self.h5file[dsname]
+            self.arr1ev = ds[cp.confpars.eventCurrent]
 
-            if   option == None and self.numEventsSelected < 1 : # Initialization
-                self.ave1ev    = []
-                self.avedsname = []
-                self.ave1ev    .append(arr1ev.copy())
-                self.avedsname .append(dsname)
+            if printh5.get_item_last_name(dsname) == 'image' : 
+                if not self.dimIsFixed(dsname) :
+                    self.arr1ev.shape = (self.arr1ev.shape[1],self.arr1ev.shape[0])
 
-            elif option == None :                                # Accumulation
-                self.ave1ev[ind] += arr1ev
+            if  option == None :
+                if cp.confpars.eventCurrent != self.eventStart :
+
+                    self.ave1ev[ind] += self.arr1ev              # Accumulation
+                else :                                           # Initialization
+                    self.ave          = np.zeros(self.arr1ev.shape, dtype=np.float32)
+                    self.ave1ev       .append(self.ave)
+                    self.ave1ev[ind] += self.arr1ev   
+                    self.avedsname    .append(dsname)
+                    self.eventEnd     = ds.shape[0]
+                    print 'Total numbr of events in averaged sample [', ind, '] =', self.eventEnd
 
             elif option == 1 :                                   # Normalization per 1 event
                 if self.numEventsSelected > 0 :
@@ -164,6 +228,8 @@ class DrawEvent ( object ) :
 
         print 'Event %d' % ( cp.confpars.eventCurrent )
 
+        print 'selectionIsPassed', self.selectionIsPassed() 
+
         #self.runNumber = self.h5file.attrs['runNumber'] # t=0us 
         #print 'Run number = %d' % (self.runNumber) 
 
@@ -174,9 +240,13 @@ class DrawEvent ( object ) :
         for dsname in cp.confpars.list_of_checked_item_names :
 
             ds     = self.h5file[dsname]
-            arr1ev = ds[cp.confpars.eventCurrent]
+            self.arr1ev = ds[cp.confpars.eventCurrent]
 
-            self.drawArrayForDSName(dsname,arr1ev)
+            if printh5.get_item_last_name(dsname) == 'image' : 
+                if not self.dimIsFixed(dsname) :
+                    self.arr1ev.shape = (self.arr1ev.shape[1],self.arr1ev.shape[0])
+
+            self.drawArrayForDSName(dsname,self.arr1ev)
 
         self.showEvent(mode)
         self.closeHDF5File()
@@ -270,6 +340,7 @@ class DrawEvent ( object ) :
                 else : self.close_fig(self.figNum)
 
         if item_last_name == 'image' :
+
             self.figNum += 1 
             if cp.confpars.imageImageIsOn : 
                 self.plotsImage.plotImage(arr1ev,self.set_fig('1x1'))

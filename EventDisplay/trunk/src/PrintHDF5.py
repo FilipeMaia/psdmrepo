@@ -95,6 +95,17 @@ def get_item_last_name(dsname):
     path,name = os.path.split(str(dsname))
     return name
 
+def get_item_path_to_last_name(dsname):
+    """Returns the path to the last part of the item name"""
+
+    path,name = os.path.split(str(dsname))
+    return path
+
+def get_item_path_and_last_name(dsname):
+    """Returns the path and last part of the full item name"""
+
+    path,name = os.path.split(str(dsname))
+    return path, name
 
 #----------------------------------
 
@@ -165,6 +176,11 @@ def print_time(ds,ind):
     
 #----------------------------------
 
+def isDataset(ds):
+    """Check if the input dataset is a h5py.Dataset (exists as expected in HDF5)"""
+    return isinstance(ds,h5py.Dataset)
+
+
 def print_dataset_info(ds):
     """Prints attributes and all other available info for group or data"""
     if isinstance(ds,h5py.Dataset):
@@ -172,10 +188,14 @@ def print_dataset_info(ds):
         print "ds.name         = ", ds.name
         print "ds.dtype        = ", ds.dtype
         print "ds.shape        = ", ds.shape
+        print "ds.shape[0]     = ", ds.shape[0]
         print "len(ds.shape)   = ", len(ds.shape)
 
         # Print data array
-        if len(ds.shape)==0 or ds.shape[0] == 1 : #check if the ds.shape scalar or array with dimension 1
+        if   len(ds.shape)==1 and ds.shape[0] == 0 : #check if the ds.shape scalar and in not an array 
+            print get_item_last_name(ds.name) + ' - item has no associated data.'
+
+        elif len(ds.shape)==0 or ds.shape[0] == 0  or ds.shape[0] == 1 : #check if the ds.shape scalar or array with dimension 0 or 1
             print "ds.value    = ", ds.value
 
         elif ds.shape[0] < cp.confpars.eventCurrent: #check if the ds.shape array size less than current event number

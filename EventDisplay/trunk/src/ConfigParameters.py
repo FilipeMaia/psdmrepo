@@ -111,9 +111,6 @@ class ConfigParameters ( object ) :
         self.cspadQuad            = 1
         self.cspadPair            = 1
 
-        self.cspadAmplitudeRaMin  = 0
-        self.cspadAmplitudeRange  = 2000
-
         self.cspadImageNWindows   = 1
         self.cspadImageNWindowsMax= 8 # Maximal number of windows for CSpad image which can be opened
 
@@ -128,15 +125,16 @@ class ConfigParameters ( object ) :
         self.cspadProjRIsOn       = False
         self.cspadProjPhiIsOn     = False
 
+        self.cspadAmplitudeRaMin  = 0
+        self.cspadAmplitudeRange  = 2000
         self.cspadImageAmin       = 0   
         self.cspadImageAmax       = 2000
         self.cspadSpectrumAmin    = 0   
         self.cspadSpectrumAmax    = 2000
-        self.cspadSpectrumRange   = None
         self.cspadSpectrumNbins   = 50
         self.cspadSpectrumBinWidth= 1
         self.cspadBinWidthIsOn    = True
-
+       #self.cspadSpectrumRange   = None
 
         # Default parameters for Image plots
         self.imageImageIsOn       = False
@@ -147,15 +145,17 @@ class ConfigParameters ( object ) :
         self.imageProjRIsOn       = False
         self.imageProjPhiIsOn     = False
 
+        self.imageAmplitudeRaMin  = 0
+        self.imageAmplitudeRange  = 500
         self.imageImageAmin       = 0    #  15
         self.imageImageAmax       = 100  #  45
-
-        self.imageSpectrumRange   = None # (15,45)
         self.imageSpectrumAmin    = 0    #  15
         self.imageSpectrumAmax    = 100  #  45
         self.imageSpectrumNbins   = 50   #  30
-        self.imageAmplitudeRaMin  = 0
-        self.imageAmplitudeRange  = 500
+        self.imageSpectrumBinWidth= 1 
+        self.imageBinWidthIsOn    = True
+        self.imageDataset         = 'All'
+       #self.imageSpectrumRange   = None # (15,45)
 
         # Default parameters for Waveform plots
 
@@ -176,7 +176,7 @@ class ConfigParameters ( object ) :
 
         self.selectionWindowParameters = []
         for win in range(self.selectionNWindowsMax) :
-            self.selectionWindowParameters.append([0, True, 0, 1000, 0, 1000])
+            self.selectionWindowParameters.append([0, True, 0, 1000, 0, 1000, 'None'])
                                                  #[Theshold, InBin, Xmin, Xmax, Ymin, Ymax]
 
 
@@ -258,10 +258,15 @@ class ConfigParameters ( object ) :
         print 'CSPAD_PROJ_R_IS_ON',        self.cspadProjRIsOn    
         print 'CSPAD_PROJ_PHI_IS_ON',      self.cspadProjPhiIsOn    
 
+        print 'CSPAD_RANGE_AMIN',          self.cspadAmplitudeRaMin   
+        print 'CSPAD_RANGE_AMAX',          self.cspadAmplitudeRange            
         print 'CSPAD_IMAGE_AMIN',          self.cspadImageAmin
         print 'CSPAD_IMAGE_AMAX',          self.cspadImageAmax
         print 'CSPAD_SPECT_AMIN',          self.cspadSpectrumAmin
         print 'CSPAD_SPECT_AMAX',          self.cspadSpectrumAmax
+        print 'CSPAD_SPECT_NBINS',         self.cspadSpectrumNbins    
+        print 'CSPAD_SPECT_BIN_WIDTH',     self.cspadSpectrumBinWidth 
+        print 'CSPAD_BIN_WIDTH_IS_ON',     self.cspadBinWidthIsOn     
 
         print 'IMAGE_IMAGE_IS_ON',         self.imageImageIsOn       
         print 'IMAGE_IMAGE_SPEC_IS_ON',    self.imageImageSpecIsOn       
@@ -270,6 +275,17 @@ class ConfigParameters ( object ) :
         print 'IMAGE_PROJ_Y_IS_ON',        self.imageProjYIsOn    
         print 'IMAGE_PROJ_R_IS_ON',        self.imageProjRIsOn    
         print 'IMAGE_PROJ_PHI_IS_ON',      self.imageProjPhiIsOn    
+
+        print 'IMAGE_RANGE_AMIN',          self.imageAmplitudeRaMin   
+        print 'IMAGE_RANGE_AMAX',          self.imageAmplitudeRange            
+        print 'IMAGE_IMAGE_AMIN',          self.imageImageAmin        
+        print 'IMAGE_IMAGE_AMAX',          self.imageImageAmax        
+        print 'IMAGE_SPECT_AMIN',          self.imageSpectrumAmin     
+        print 'IMAGE_SPECT_AMAX',          self.imageSpectrumAmax             
+        print 'IMAGE_SPECT_NBINS',         self.imageSpectrumNbins    
+        print 'IMAGE_SPECT_BIN_WIDTH',     self.imageSpectrumBinWidth 
+        print 'IMAGE_BIN_WIDTH_IS_ON',     self.imageBinWidthIsOn     
+        print 'IMAGE_DATASET',             self.imageDataset          
 
         print 'READ_PARS_AT_START',        self.readParsFromFileAtStart
 
@@ -305,6 +321,7 @@ class ConfigParameters ( object ) :
             print 'SELEC_XMAX',            self.selectionWindowParameters[win][3] 
             print 'SELEC_YMIN',            self.selectionWindowParameters[win][4] 
             print 'SELEC_YMAX',            self.selectionWindowParameters[win][5] 
+            print 'SELEC_DATASET',         self.selectionWindowParameters[win][6] 
 
         print 'NUM_EVENTS_FOR_AVERAGE',    self.numEventsAverage
         print 'SELECTION_IS_ON',           self.selectionIsOn
@@ -327,7 +344,7 @@ class ConfigParameters ( object ) :
         print 'PROJ_R_PHIMAX',             self.projR_Phimax        
                                           
         print 'PROJ_PHI_BIN_WIDTH_IS_ON',  self.projPhi_BinWidthIsOn
-        print 'PROJ_PHI_SLI_WIDTH_IS_ON',  self.projPhi_SliWidthIsOn                                                                  
+        print 'PROJ_PHI_SLI_WIDTH_IS_ON',  self.projPhi_SliWidthIsOn             
         print 'PROJ_PHI_N_BINS',           self.projPhi_NBins       
         print 'PROJ_PHI_BIN_WIDTH',        self.projPhi_BinWidth    
         print 'PROJ_PHI_NSLICES',          self.projPhi_NSlices     
@@ -403,10 +420,27 @@ class ConfigParameters ( object ) :
                 elif key == 'READ_PARS_AT_START'       : self.readParsFromFileAtStart = dicBool[val.lower()]
                 elif key == 'CSPAD_QUAD_NUMBER'        : self.cspadQuad               = int(val)
                 elif key == 'CSPAD_PAIR_NUMBER'        : self.cspadPair               = int(val)
+
+                elif key == 'CSPAD_RANGE_AMIN'         : self.cspadAmplitudeRaMin     = int(val)
+                elif key == 'CSPAD_RANGE_AMAX'         : self.cspadAmplitudeRange     = int(val)
                 elif key == 'CSPAD_IMAGE_AMIN'         : self.cspadImageAmin          = int(val)
                 elif key == 'CSPAD_IMAGE_AMAX'         : self.cspadImageAmax          = int(val)
                 elif key == 'CSPAD_SPECT_AMIN'         : self.cspadSpectrumAmin       = int(val)
                 elif key == 'CSPAD_SPECT_AMAX'         : self.cspadSpectrumAmax       = int(val)
+                elif key == 'CSPAD_SPECT_NBINS'        : self.cspadSpectrumNbins      = int(val)
+                elif key == 'CSPAD_SPECT_BIN_WIDTH'    : self.cspadSpectrumBinWidth   = int(val)
+                elif key == 'CSPAD_BIN_WIDTH_IS_ON'    : self.cspadBinWidthIsOn       = dicBool[val.lower()]
+
+                elif key == 'IMAGE_RANGE_AMIN'         : self.imageAmplitudeRaMin     = int(val)
+                elif key == 'IMAGE_RANGE_AMAX'         : self.imageAmplitudeRange     = int(val)
+                elif key == 'IMAGE_IMAGE_AMIN'         : self.imageImageAmin          = int(val)
+                elif key == 'IMAGE_IMAGE_AMAX'         : self.imageImageAmax          = int(val)
+                elif key == 'IMAGE_SPECT_AMIN'         : self.imageSpectrumAmin       = int(val)
+                elif key == 'IMAGE_SPECT_AMAX'         : self.imageSpectrumAmax       = int(val)
+                elif key == 'IMAGE_SPECT_NBINS'        : self.imageSpectrumNbins      = int(val)
+                elif key == 'IMAGE_SPECT_BIN_WIDTH'    : self.imageSpectrumBinWidth   = int(val)
+                elif key == 'IMAGE_BIN_WIDTH_IS_ON'    : self.imageBinWidthIsOn       = dicBool[val.lower()]
+                elif key == 'IMAGE_DATASET'            : self.imageDataset            = val
 
                 elif key == 'PER_EVENT_DIST_IS_ON'     : self.perEventDistIsOn        = dicBool[val.lower()]
                 elif key == 'CORRELATIONS_IS_ON'       : self.correlationsIsOn        = dicBool[val.lower()]
@@ -438,6 +472,7 @@ class ConfigParameters ( object ) :
                 elif key == 'SELEC_XMAX'               : self.selectionWindowParameters[win][3] = int(val)
                 elif key == 'SELEC_YMIN'               : self.selectionWindowParameters[win][4] = int(val)
                 elif key == 'SELEC_YMAX'               : self.selectionWindowParameters[win][5] = int(val)
+                elif key == 'SELEC_DATASET'            : self.selectionWindowParameters[win][6] = val
 
                 elif key == 'PROJ_CENTER_X'            : self.projCenterX           = int(val)
                 elif key == 'PROJ_CENTER_Y'            : self.projCenterY           = int(val)
@@ -528,12 +563,30 @@ class ConfigParameters ( object ) :
         f.write('IMAGE_PROJ_PHI_IS_ON'      + space + str(self.imageProjPhiIsOn)        + '\n')
         f.write('WAVEF_WAVEF_IS_ON'         + space + str(self.waveformWaveformIsOn)    + '\n')
         f.write('READ_PARS_AT_START'        + space + str(self.readParsFromFileAtStart) + '\n')
+
         f.write('CSPAD_QUAD_NUMBER'         + space + str(self.cspadQuad)               + '\n')
         f.write('CSPAD_PAIR_NUMBER'         + space + str(self.cspadPair)               + '\n')
+        f.write('CSPAD_RANGE_AMIN'          + space + str(self.cspadAmplitudeRaMin)     + '\n')
+        f.write('CSPAD_RANGE_AMAX'          + space + str(self.cspadAmplitudeRange)     + '\n')
         f.write('CSPAD_IMAGE_AMIN'          + space + str(self.cspadImageAmin)          + '\n')
         f.write('CSPAD_IMAGE_AMAX'          + space + str(self.cspadImageAmax)          + '\n')
         f.write('CSPAD_SPECT_AMIN'          + space + str(self.cspadSpectrumAmin)       + '\n')
         f.write('CSPAD_SPECT_AMAX'          + space + str(self.cspadSpectrumAmax)       + '\n')
+        f.write('CSPAD_SPECT_NBINS'         + space + str(self.cspadSpectrumNbins)      + '\n')
+        f.write('CSPAD_SPECT_BIN_WIDTH'     + space + str(self.cspadSpectrumBinWidth)   + '\n')
+        f.write('CSPAD_BIN_WIDTH_IS_ON'     + space + str(self.cspadBinWidthIsOn)       + '\n')
+                                                                                
+        f.write('IMAGE_RANGE_AMIN'          + space + str(self.imageAmplitudeRaMin)     + '\n')
+        f.write('IMAGE_RANGE_AMAX'          + space + str(self.imageAmplitudeRange)     + '\n')
+        f.write('IMAGE_IMAGE_AMIN'          + space + str(self.imageImageAmin)          + '\n')
+        f.write('IMAGE_IMAGE_AMAX'          + space + str(self.imageImageAmax)          + '\n')
+        f.write('IMAGE_SPECT_AMIN'          + space + str(self.imageSpectrumAmin)       + '\n')
+        f.write('IMAGE_SPECT_AMAX'          + space + str(self.imageSpectrumAmax)       + '\n')
+        f.write('IMAGE_SPECT_NBINS'         + space + str(self.imageSpectrumNbins)      + '\n')
+        f.write('IMAGE_SPECT_BIN_WIDTH'     + space + str(self.imageSpectrumBinWidth)   + '\n')
+        f.write('IMAGE_BIN_WIDTH_IS_ON'     + space + str(self.imageBinWidthIsOn)       + '\n')
+        f.write('IMAGE_DATASET'             + space + str(self.imageDataset)            + '\n')
+
         f.write('PER_EVENT_DIST_IS_ON'      + space + str(self.perEventDistIsOn)        + '\n')
         f.write('CORRELATIONS_IS_ON'        + space + str(self.correlationsIsOn)        + '\n')
 
@@ -568,6 +621,7 @@ class ConfigParameters ( object ) :
             f.write('SELEC_XMAX'            + space + str(self.selectionWindowParameters[win][3] )       + '\n')
             f.write('SELEC_YMIN'            + space + str(self.selectionWindowParameters[win][4] )       + '\n')
             f.write('SELEC_YMAX'            + space + str(self.selectionWindowParameters[win][5] )       + '\n')
+            f.write('SELEC_DATASET'         + space + str(self.selectionWindowParameters[win][6] )       + '\n')
             f.write('NUM_EVENTS_FOR_AVERAGE'+ space + str( self.numEventsAverage )                       + '\n')
             f.write('SELECTION_IS_ON'       + space + str( self.selectionIsOn )                          + '\n')
 
