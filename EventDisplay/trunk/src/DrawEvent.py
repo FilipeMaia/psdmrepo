@@ -38,6 +38,8 @@ import matplotlib
 matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 import matplotlib.pyplot as plt
 
+from PyQt4 import QtGui
+
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
@@ -61,7 +63,7 @@ class DrawEvent ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self ) :
+    def __init__ ( self, parent=None ) :
         """Constructor"""
         print 'DrawEvent () Initialization'
         cp.confpars.h5_file_is_open = False
@@ -69,6 +71,7 @@ class DrawEvent ( object ) :
         self.plotsImage             = image.PlotsForImage()
         self.plotsWaveform          = wavef.PlotsForWaveform()
         self.list_of_open_figs      = []
+        self.parent                 = parent
 
         # CSpad V1 for runs ~546,547...
         self.dsnameCSpadV1 = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV1/XppGon.0:Cspad.0/data"
@@ -131,11 +134,6 @@ class DrawEvent ( object ) :
 
         self.arrInWindowMax = arrInWindow.max()
         self.arrInWindowSum = arrInWindow.sum()
-
-        #print 'arrInWindow.shape', arrInWindow.shape
-        #print ' arrInWindow.max()', self.arrInWindowMax,
-        #print ' arrInWindow.sum()', self.arrInWindowSum
-
 
         if inBin :
             if self.arrInWindowMax > Thr : return True
@@ -235,14 +233,76 @@ class DrawEvent ( object ) :
                 self.drawArrayForDSName(self.avedsname[ind], self.ave1ev[ind])
 
 
+    def drawNextEvent ( self, mode=1 ) :
+        """Draws the next (selected) event"""
+
+        self.openHDF5File() # t=0us
+        while True :
+            cp.confpars.eventCurrent += cp.confpars.span
+            if self.selectionIsPassed() : 
+                self.drawEventFromOpenFile(mode) # Draw everything for current event
+                break
+        self.closeHDF5File()
+
+
+    def drawPreviousEvent ( self, mode=1 ) :
+        """Draws the previous (selected) event"""
+
+        self.openHDF5File() # t=0us
+        while True :
+            cp.confpars.eventCurrent -= cp.confpars.span
+            if cp.confpars.eventCurrent<0 :
+                cp.confpars.eventCurrent=0
+                print 'Event = 0, there is no more previous event in this file.'
+                break
+            if self.selectionIsPassed() : 
+                self.drawEventFromOpenFile(mode) # Draw everything for current event
+                break
+        self.closeHDF5File()
+
+
+
+    def startSlideShow ( self ) :
+        """Start show (selected) events in permanent mode"""
+
+        self.openHDF5File() # t=0us
+
+        eventStart = cp.confpars.eventCurrent
+        eventEnd   = cp.confpars.eventCurrent + 1000*cp.confpars.span
+
+        while (self.parent.SHowIsOn) :
+            if cp.confpars.eventCurrent>eventEnd : break
+            QtGui.QApplication.processEvents()
+            if not self.parent.SHowIsOn : break
+            if self.selectionIsPassed() :
+                self.drawEventFromOpenFile(mode=0) # mode for slide show (draw())
+                self.parent.numbEdit.setText( str(cp.confpars.eventCurrent) )
+
+            cp.confpars.eventCurrent+=cp.confpars.span
+
+        self.closeHDF5File()
+
+
+    def stopSlideShow ( self ) :
+        """Operations in case of stop drawing event(s)"""
+        print 'stopSlideShow()'
+        #self.drawEventFromOpenFile() # mode=1 (by default) for the last plot
+        self.showEvent (mode=1) # apply show() mode for the last event
+        self.closeHDF5File()
 
 
     def drawEvent ( self, mode=1 ) :
         """Draws current event"""
 
-        t_drawEvent = time.clock()
         self.openHDF5File() # t=0us
+        self.drawEventFromOpenFile (mode)
+        self.closeHDF5File()
 
+
+    def drawEventFromOpenFile ( self, mode=1 ) :
+        """Draws current event when the file is already open"""
+
+        t_drawEvent = time.clock()
         print 'Event %d' % ( cp.confpars.eventCurrent )
 
         print 'selectionIsPassed', self.selectionIsPassed() 
@@ -266,7 +326,6 @@ class DrawEvent ( object ) :
             self.drawArrayForDSName(dsname,self.arr1ev)
 
         self.showEvent(mode)
-        self.closeHDF5File()
         print 'Time to drawEvent() (sec) = %f' % (time.clock() - t_drawEvent)
 
 
@@ -416,12 +475,6 @@ class DrawEvent ( object ) :
         print 'Time to show or draw (sec) = %f' % (time.clock() - t_start)
 
 
-    def stopDrawEvent ( self ) :
-        """Operations in case of stop drawing event(s)"""
-        print 'stopDrawEvent()'
-        self.drawEvent() # mode=1 (by default) for the last plot
-
-
     def quitDrawEvent ( self ) :
         """Operations in case of quit drawing event(s)"""
         #self.plotsCSpad.close_fig1()
@@ -434,11 +487,12 @@ class DrawEvent ( object ) :
 
 
     def openHDF5File( self ) :     
-        fname = cp.confpars.dirName+'/'+cp.confpars.fileName
-        #print 'openHDF5File() : %s' % (fname)
-        self.h5file=  h5py.File(fname, 'r') # open read-only       
-        cp.confpars.h5_file_is_open = True
-        #printh5.print_file_info(self.h5file)
+        if not cp.confpars.h5_file_is_open :
+            fname = cp.confpars.dirName+'/'+cp.confpars.fileName
+            #print 'openHDF5File() : %s' % (fname)
+            self.h5file=  h5py.File(fname, 'r') # open read-only       
+            cp.confpars.h5_file_is_open = True
+            #printh5.print_file_info(self.h5file)
 
 
     def closeHDF5File( self ) :       
@@ -500,6 +554,7 @@ class DrawEvent ( object ) :
         self.fig.nwin_waveform = self.nwin_waveform
 
         return self.fig
+
 
     def set_window_position( self ):
         """Move window in desired position."""

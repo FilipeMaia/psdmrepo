@@ -86,7 +86,7 @@ class GUIPlayer ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
         #self.frame.setVisible(True)
 
-        self.drawev   = drev.DrawEvent()
+        self.drawev   = drev.DrawEvent(self)
 
         self.titCurr  = QtGui.QLabel('Current event:')
         self.titDraw  = QtGui.QLabel('Draw:')
@@ -240,25 +240,14 @@ class GUIPlayer ( QtGui.QWidget ) :
         cp.confpars.eventCurrent = int(self.numbEdit.displayText())
         cp.confpars.span         = int(self.spanEdit.displayText())
         self.SHowIsOn            = True
-        eventStart = cp.confpars.eventCurrent
-        eventEnd   = cp.confpars.eventCurrent + 1000*cp.confpars.span
-        mode = 0 # for slide show
+        self.drawev.startSlideShow() 
 
-        while (self.SHowIsOn) :
-            if cp.confpars.eventCurrent>eventEnd : break
-            self.numbEdit.setText( str(cp.confpars.eventCurrent) )
-            #print cp.confpars.eventCurrent
-            #self.evloop.activeWindow ()
-            QtGui.QApplication.processEvents()
-            if not self.SHowIsOn : break
-            #time.sleep(1) # in sec
-            self.drawev.drawEvent(mode) # Draw everything for current event
-            cp.confpars.eventCurrent+=cp.confpars.span
 
     def processStop(self):
         print 'Stop slide show'
-        self.drawev.stopDrawEvent() 
+        self.drawev.stopSlideShow() 
         self.SHowIsOn = False
+
 
     def processReset(self):
         print 'Reset'
@@ -271,7 +260,7 @@ class GUIPlayer ( QtGui.QWidget ) :
         cp.confpars.span = 1
         self.spanEdit.setPalette(self.palette)
         self.spanEdit.setText(str(cp.confpars.span))
-        cp.confpars.eventCurrent = 1
+        cp.confpars.eventCurrent = 0
         self.numbEdit.setPalette(self.palette)
         self.numbEdit.setText(str(cp.confpars.eventCurrent))
         #time.sleep(5)
@@ -297,28 +286,20 @@ class GUIPlayer ( QtGui.QWidget ) :
         print 'Next ',
         cp.confpars.span = int(self.spanEdit.displayText())
         cp.confpars.eventCurrent = int(self.numbEdit.displayText())
-        cp.confpars.eventCurrent += cp.confpars.span
+        self.drawev.drawNextEvent(mode=1) # Draw everything for the next (selected) event
         self.numbEdit.setText( str(cp.confpars.eventCurrent) )
-        mode = 1
-        self.drawev.drawEvent(mode) # Draw everything for current event
 
     def decrimentEventNo(self):
         print 'Previous ',        
         cp.confpars.span = int(self.spanEdit.displayText())
         cp.confpars.eventCurrent = int(self.numbEdit.displayText())
-        cp.confpars.eventCurrent -= cp.confpars.span
-        if cp.confpars.eventCurrent<0 : cp.confpars.eventCurrent=0
+        self.drawev.drawPreviousEvent(mode=1) # Draw everything for the previous (selected) event
         self.numbEdit.setText( str(cp.confpars.eventCurrent) )
-        mode = 1
-        self.drawev.drawEvent(mode) # Draw everything for current event
-        #print cp.confpars.eventCurrent
 
     def currentEventNo(self):
         print 'Current ',
         cp.confpars.eventCurrent = int(self.numbEdit.displayText())
-        mode = 1
-        self.drawev.drawEvent(mode) # Draw everything for current event
-        #print cp.confpars.eventCurrent
+        self.drawev.drawEvent(mode=1) # Draw everything for current event
 
     def processClosePlots(self):
         print 'Close plots',
