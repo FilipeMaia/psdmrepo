@@ -98,20 +98,26 @@ class DrawEvent ( object ) :
             dsname = cp.confpars.selectionWindowParameters[win][6]
             if dsname == 'None' : continue
 
+            ds     = self.h5file[dsname]
+            self.arr1ev = ds[cp.confpars.eventCurrent]
+
             if printh5.get_item_last_name(dsname) == 'image' : # Check for IMAGE
 
-                ds     = self.h5file[dsname]
-                self.arr1ev = ds[cp.confpars.eventCurrent]
                 if not self.dimIsFixed(dsname) :
                     self.arr1ev.shape = (self.arr1ev.shape[1],self.arr1ev.shape[0])
+                self.arr2d = self.arr1ev
 
-                if not self.selectionInWindowIsPassed(win,self.arr1ev) : return False
 
             elif printh5.CSpadIsInTheName(dsname) :            # Check for CSpad 
-                pass
-            
+
+                self.getCSpadConfiguration(dsname)
+                self.arr2d = self.plotsCSpad.getImageArrayForDet( self.arr1ev )
+
+            if not self.selectionInWindowIsPassed(win,self.arr2d) : return False
+                            
         return True
-        
+
+
     def selectionInWindowIsPassed(self, win, arr2d) :
 
         Thr   = cp.confpars.selectionWindowParameters[win][0]
@@ -123,14 +129,18 @@ class DrawEvent ( object ) :
 
         arrInWindow = arr2d[iXmin:iXmax,iYmin:iYmax]
 
+        self.arrInWindowMax = arrInWindow.max()
+        self.arrInWindowSum = arrInWindow.sum()
+
         #print 'arrInWindow.shape', arrInWindow.shape
-        #print 'arrInWindow.max()', arrInWindow.max()
-        #print 'arrInWindow.sum()', arrInWindow.sum()
+        #print ' arrInWindow.max()', self.arrInWindowMax,
+        #print ' arrInWindow.sum()', self.arrInWindowSum
+
 
         if inBin :
-            if arrInWindow.max() > Thr : return True
+            if self.arrInWindowMax > Thr : return True
         else :
-            if arrInWindow.sum() > Thr : return True
+            if self.arrInWindowSum > Thr : return True
 
         return False
 
@@ -153,7 +163,14 @@ class DrawEvent ( object ) :
         while self.loopIsContinued :
 
             if cp.confpars.eventCurrent % 10 == 0 :
-                print ' Current event =', cp.confpars.eventCurrent, 'Selected =', self.numEventsSelected
+                if cp.confpars.selectionIsOn :
+                    print ' Current event =', cp.confpars.eventCurrent,\
+                          ' Selected =',      self.numEventsSelected,  \
+                          ' arrInWindow.max() =', self.arrInWindowMax, \
+                          ' arrInWindow.sum() =', self.arrInWindowSum
+                else :
+                    print ' Current event =', cp.confpars.eventCurrent
+
 
             self.loopOverDataSets() # Initialization & Accumulation
 
@@ -369,7 +386,6 @@ class DrawEvent ( object ) :
 
 
 
-
     def getCSpadConfiguration( self, dsname ):
 
         if cp.confpars.cspadImageDetIsOn    \
@@ -382,7 +398,7 @@ class DrawEvent ( object ) :
             item_second_to_last_name = printh5.get_item_second_to_last_name(dsname)
             cspad_config_ds_name = self.dsnameCSpadV2Conf + item_second_to_last_name + '/config' 
             
-            print '   CSpad configuration dataset name:', cspad_config_ds_name
+            #print '   CSpad configuration dataset name:', cspad_config_ds_name
 
             dsConf = self.h5file[cspad_config_ds_name]      # t=0.01us
             cs.confcspad.indPairsInQuads = dsConf.value[13] #
