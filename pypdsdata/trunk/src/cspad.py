@@ -56,7 +56,7 @@ class ElementV1(object) :
 
     # class constants imported without change
     ColumnsPerASIC = _ElementV1.ColumnsPerASIC
-    ColumnsPerASIC = _ElementV1.MaxRowsPerASIC
+    MaxRowsPerASIC = _ElementV1.MaxRowsPerASIC
     
 
     def __init__ (self, quad, cfg):
@@ -118,7 +118,7 @@ class ElementV2(object) :
 
     # class constants imported without change
     ColumnsPerASIC = _ElementV2.ColumnsPerASIC
-    ColumnsPerASIC = _ElementV2.MaxRowsPerASIC
+    MaxRowsPerASIC = _ElementV2.MaxRowsPerASIC
     
 
     def __init__ (self, quad, cfg):

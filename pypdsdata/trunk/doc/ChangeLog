@@ -1,4 +1,8 @@
 
+2011-03-11 - V00-00-26
+======================
+- fixing copy and paste error in cspad.py
+
 2011-01-26 - V00-00-25
 ======================
 - fixing image gluing for PNCCD
