@@ -232,7 +232,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                         modules_to_run.append("XtcEventBrowser.pyana_bld")
                         options_for_mod.append([])
                     print "XtcEventBrowser.pyana_bld at ", index
-
+                    options_for_mod[index].append("\nplot_every_n = 100")
                     if str(box.text()).find("EBeam")>=0 :
                         options_for_mod[index].append("\ndo_ebeam = True")
                     if str(box.text()).find("FEEGasDetEnergy")>=0 :

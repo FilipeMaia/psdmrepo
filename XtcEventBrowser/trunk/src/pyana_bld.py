@@ -5,17 +5,33 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-
+from utilities import PyanaOptions 
 
 # analysis class declaration
 class  pyana_bld ( object ) :
     
-    def __init__ ( self, do_ebeam=False, do_gasdetector=False, do_phasecavity=False ):
-        # initialize data
-        
-        self.do_EBeam  = do_ebeam
-        self.do_GasDet = do_gasdetector
-        self.do_PC     = do_phasecavity
+    def __init__ ( self,
+                   do_ebeam=False,
+                   do_gasdetector=False,
+                   do_phasecavity=False,
+                   plot_every_n = None ) :
+        """
+        Initialize data. Parameters:
+        @do_ebeam            Plot data from EBeam object
+        @do_gasdetector      Plot data from GasDetector
+        @do_phasecavity      Plot data from PhaseCavity
+        @plot_every_n        Plot after every N events
+        """
+
+        # parameters
+        opt = PyanaOptions() # convert option string to appropriate type
+        self.do_EBeam      =  opt.getOptBoolean( do_ebeam )
+        self.do_GasDet     =  opt.getOptBoolean( do_gasdetector )
+        self.do_PC         =  opt.getOptBoolean( do_phasecavity )
+        self.plot_every_n  =  opt.getOptInteger( plot_every_n )
+
+        # other
+        self.shot_number = None
 
         # lists to fill numpy arrays
         #self.EB_time = []
@@ -29,9 +45,12 @@ class  pyana_bld ( object ) :
         self.PC_data = []
         
     def beginjob ( self, evt, env ) : 
+        self.shot_number = 0
         pass
 
     def event ( self, evt, env ) :
+
+        self.shot_number += 1
 
         if self.do_EBeam :
             # EBeam object (of type bld.BldDataEBeam or bld.BldDataEBeamV0)
@@ -81,13 +100,26 @@ class  pyana_bld ( object ) :
             else :
                 print "No Phase Cavity object found"
 
+
+        if self.plot_every_n is not None:
+            if (self.shot_number%self.plot_every_n)==0 :
+                print "Shot#%d ... plotting " % self.shot_number
+                self.make_plots(301, suptitle="Accumulated up to Shot#%d"%self.shot_number)
+                                                
             
                 
     def endjob( self, env ) :
+
+        self.make_plots(300, suptitle="Average of all (%d) events"%self.shot_number)
+
+
+    def make_plots(self, fignum = 1, suptitle = ""):
         
         if self.do_EBeam :
 
-            fig = plt.figure( figsize=(10,10) )
+            fig = plt.figure(num=(fignum+10), figsize=(8,8) )
+            fig.suptitle(suptitle)
+
             ax1 = fig.add_subplot(221)
             array = np.float_(self.EB_energies)
             #time = np.float_(self.EB_time)
@@ -97,24 +129,24 @@ class  pyana_bld ( object ) :
             plt.xlabel('Datagram record',horizontalalignment='left') # the other right
             plt.ylabel('Beam Energy',horizontalalignment='right')
 
-            ax2 = fig.add_subplot(222)
             array2 = np.float_(self.EB_positions)
-            plt.scatter(array2[:,0],array2[:,1])
-            plt.title('Beam position')
-            plt.xlabel('X',horizontalalignment='left')
-            plt.ylabel('Y',horizontalalignment='left')
+            array3 = np.float_(self.EB_angles)
+
+            ax2 = fig.add_subplot(222)
+            plt.scatter(array2[:,0],array3[:,0])
+            plt.title('Beam X')
+            plt.xlabel('position X',horizontalalignment='left')
+            plt.ylabel('angle X',horizontalalignment='left')
 
             ax3 = fig.add_subplot(223)
-            array3 = np.float_(self.EB_angles)
-            plt.scatter(array3[:,0],array3[:,1])
-            plt.title('Beam angle')
-            plt.xlabel('X',horizontalalignment='left')
-            plt.ylabel('Y',horizontalalignment='left')
+            plt.scatter(array2[:,1],array3[:,1])
+            plt.title('Beam Y')
+            plt.xlabel('position Y',horizontalalignment='left')
+            plt.ylabel('angle Y',horizontalalignment='left')
 
             ax4 = fig.add_subplot(224)
             array4 = np.float_(self.EB_charge)
             n, bins, patches = plt.hist(array4, 100, normed=1, histtype='stepfilled')
-            print patches
             plt.setp(patches, 'facecolor', 'g', 'alpha', 0.75)
             plt.title('Beam Charge')
             plt.xlabel('Beam Charge',horizontalalignment='left') # the other right
@@ -122,8 +154,10 @@ class  pyana_bld ( object ) :
 
         if self.do_GasDet :
 
+            fig = plt.figure(num=(fignum+20), figsize=(8,8) )
+            fig.suptitle(suptitle)
+
             array = np.float_(self.GD_energies)
-            fig = plt.figure( figsize=(10,10) )
 
             ax1 = fig.add_subplot(221)
             n, bins, patches = plt.hist(array[:,0], 60,histtype='stepfilled')
@@ -152,9 +186,11 @@ class  pyana_bld ( object ) :
 
         if self.do_PC :
 
-            array = np.float_(self.PC_data)
-            fig = plt.figure( figsize=(10,10) )
+            fig = plt.figure(num=(fignum+30), figsize=(8,8) )
+            fig.suptitle(suptitle)
             
+            array = np.float_(self.PC_data)
+
             ax1 = fig.add_subplot(221)
             n, bins, patches = plt.hist(array[:,0], 60,histtype='stepfilled')
             plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
