@@ -181,3 +181,4 @@ class  pyana_bld ( object ) :
 
 
         plt.draw()
+        plt.show()

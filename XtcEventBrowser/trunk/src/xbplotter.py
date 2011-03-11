@@ -67,6 +67,7 @@ class Plotter(object):
         self.grid = None
         self.threshold = None
         self.shot_number = None
+        self.display_mode = None
 
         # matplotlib backend is set to QtAgg, and this is needed to avoid
         # a bug in raw_input ("QCoreApplication::exec: The event loop is already running")
@@ -188,9 +189,10 @@ class Plotter(object):
 
     def drawframe( self, frameimage, title="", fignum=1):
 
+        if self.display_mode == 2 :
+            plt.ion()
+
         self.fig = plt.figure(figsize=(10,8),num=fignum)
-        self.cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
-        self.cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)
 
         axes = self.fig.add_subplot(111)        
         axes.set_title(title)
@@ -209,13 +211,7 @@ class Plotter(object):
             print "Original value limits: ", self.orglims
             self.plot_vmin, self.plot_vmax = self.orglims
         
-        print """
-        To change the color scale, click on the color bar:
-        - left-click sets the lower limit
-        - right-click sets higher limit
-        - middle-click resets to original
-        """
-    
+            
         # show the active region for thresholding
         if self.threshold.area is not None:
             xy = [self.threshold.area[0],self.threshold.area[2]]
@@ -223,20 +219,24 @@ class Plotter(object):
             h = self.threshold.area[3] - self.threshold.area[2]
             self.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=5)
             axes.add_patch(self.thr_rect)
-        
+            
+        if self.display_mode == 1 :
 
-        plt.draw()
-        #plt.show() # starts the GUI main loop
-        #           # you need to kill window to proceed... 
-        #           # (this shouldn't be done for every event!)
+            self.cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+            self.cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)
 
+            print """
+            To change the color scale, click on the color bar:
+            - left-click sets the lower limit
+            - right-click sets higher limit
+            - middle-click resets to original
+            """
 
     def onpick(self, event):
-        print "Currently threshold: "
-        print "         require a max value above threshold: ", self.threshold.minvalue
-        print "         active area [xmin xmax ymin ymax] = ", self.threshold.area
-        print "To change threshold, middle-click..." 
-        print "To change this area, right-click..." 
+        print "Current   threshold = ", self.threshold.minvalue
+        print "          active area [xmin xmax ymin ymax] = ", self.threshold.area
+        print "To change threshold value, middle-click..." 
+        print "To change active area, right-click..." 
 
         if event.mouseevent.button == 3 :
             print "Enter new coordinates to change this area:"
@@ -262,8 +262,9 @@ class Plotter(object):
             text = raw_input("Enter new threshold value (current = %.2f) " % self.threshold.minvalue)
             if text == "" :
                 print "Invalid entry, ignoring"
-            self.threshold.minvalue = float(text)
-            print "Threshold value has been changed to ", self.threshold.minvalue
+            else :
+                self.threshold.minvalue = float(text)
+                print "Threshold value has been changed to ", self.threshold.minvalue
             plt.draw()
 
             
@@ -274,7 +275,21 @@ class Plotter(object):
         if not event.inaxes and event.button == 3 :
             print "can we open a menu here?"
             
-        # check that the click was on the color bar
+
+        # change display mode
+        if not event.inaxes and event.button == 2 :
+            new_mode = None
+            new_mode_str = raw_input("Switch display mode? Enter new mode: ")
+            if new_mode_str != "":
+                if new_mode_str == "NoDisplay"   or new_mode_str == "0" : new_mode = 0
+                if new_mode_str == "Interactive" or new_mode_str == "1" : new_mode = 1
+                if new_mode_str == "SlideShow"   or new_mode_str == "2" : new_mode = 2
+            if self.display_mode != new_mode:
+                print "Display mode has been changed from (%d) to (%d)" , (self.display_mode,new_mode)
+                self.display_mode = new_mode
+                
+
+        # change color scale
         if self.colb is not None and event.inaxes == self.colb.ax :
 
             print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y
@@ -304,8 +319,9 @@ class Plotter(object):
                 print "maximum changed:   ( %.2f , %.2f ) " % (self.plot_vmin, self.plot_vmax )
                 
             
-        plt.clim(self.plot_vmin,self.plot_vmax)
-        plt.draw() # redraw the current figure
+        
+            plt.clim(self.plot_vmin,self.plot_vmax)
+            plt.draw() # redraw the current figure
 
 
 

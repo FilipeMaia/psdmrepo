@@ -32,17 +32,17 @@ import sys
 import logging
 import time
 
-import matplotlib 
-matplotlib.use('Qt4Agg')
+#import matplotlib 
+#matplotlib.use('Qt4Agg')
 
 # alternative 1: pyplot (matlab-like)
 import matplotlib.pyplot as plt
 
-# alternative 2: object oriented matplotlib
-import matplotlib as mpl
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
-from matplotlib.figure import Figure
+## alternative 2: object oriented matplotlib
+#import matplotlib as mpl
+#from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+#from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+#from matplotlib.figure import Figure
 
 
 #-----------------------------
@@ -58,20 +58,20 @@ from matplotlib.figure import Figure
 #---------------------
 #  Class definition --
 #---------------------
-class ImagePlot(FigureCanvas) :
-    def __init__(self, parent=None,
-                 width=10, height=8, dpi=100, bgcolor=None, num=1 ):
-        fig = Figure(figsize=(width,height),dpi=dpi,facecolor=bgcolor, edgecolor=bgcolor)
-        FigureCanvas.__init__(self, fig)
-        self.setParent(parent)
-        fig.suptitle("ImagePlot Changed")
-        self.axes = fig.add_subplot(111)
-        #self.toolbar = NavigationToolbar(self,self)
+#class ImagePlot(FigureCanvas) :
+#    def __init__(self, parent=None,
+#                 width=10, height=8, dpi=100, bgcolor=None, num=1 ):
+#        fig = Figure(figsize=(width,height),dpi=dpi,facecolor=bgcolor, edgecolor=bgcolor)
+#        FigureCanvas.__init__(self, fig)
+#        self.setParent(parent)
+#        fig.suptitle("ImagePlot Changed")
+#        self.axes = fig.add_subplot(111)
+#        #self.toolbar = NavigationToolbar(self,self)
 
-    def draw_array(self,array):
-        self.axesim = self.axes.imshow( array, origin='lower' )
-        # axes image 
-        self.show()
+#    def draw_array(self,array):
+#        self.axesim = self.axes.imshow( array, origin='lower' )
+#        # axes image 
+#        self.show()
 
 
 class pyana_plotter (object) :
@@ -87,14 +87,21 @@ class pyana_plotter (object) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self ) :
+    def __init__ ( self,
+                   display_mode = "None" ) :
         """Class constructor. The parameters to the constructor are passed
         from pyana configuration file. If parameters do not have default 
         values  here then the must be defined in pyana.cfg. All parameters 
         are passed as strings, convert to correct type before use.
 
+        @param display_mode        Interactive (1) or SlideShow (2) or NoDisplay (0)
         """
         self.nevents = 0
+
+        self.display_mode = None
+        if display_mode == "NoDisplay" : self.display_mode = 0
+        if display_mode == "Interactive" : self.display_mode = 1
+        if display_mode == "SlideShow" :   self.display_mode = 2
 
     #-------------------
     #  Public methods --
@@ -112,6 +119,18 @@ class pyana_plotter (object) :
         # Preferred way to log information is via logging package
         logging.info( "pyana_plotter.beginjob() called" )
 
+        # let the framework know what display_mode (Interactive = 1, SlideShow = 0)
+        # was selected. The other modules will pick this up in their event functions
+        evt.put(self.display_mode, 'display_mode')
+
+        if self.display_mode == 0 :
+            plt.ioff()
+        if self.display_mode == 1 :
+            plt.ioff()
+        if self.display_mode == 2 :
+            plt.ion()
+
+        plt.ion()
 
     def beginrun( self, evt, env ) :
         """This optional method is called if present at the beginning 
@@ -139,14 +158,33 @@ class pyana_plotter (object) :
         @param evt    event data object
         @param env    environment object
         """
+        self.nevents += 1
 
-        # being the first module to run, 
-        # display all plots from previous event
-        if self.nevents > 0 :
-            print "pyana_plotter plotting event # ", self.nevents 
+        # if any module changed the display mode, pick it up (we're last)
+        event_display_mode = evt.get('display_mode')
+        if event_display_mode is not None and event_display_mode != self.display_mode :
+            self.display_mode = event_display_mode
+            print "pyana_plotter display mode changed: ", self.display_mode,
+            if self.display_mode == 0:
+                plt.ioff()
+                print " (NoDisplay)" 
+            if self.display_mode == 1:
+                plt.ioff()
+                print " (Interactive)" 
+            if self.display_mode == 2:
+                plt.ion()
+                print " (SlideShow)" 
+            print
+        if self.display_mode == 1:
+            # Interactive
+            plt.ioff()
             plt.show()
 
-        self.nevents += 1
+        elif self.display_mode == 2:
+            # SlideShow
+            plt.draw()
+            plt.draw()
+            
 
     def endcalibcycle( self, env ) :
         """This optional method is called if present at the end of the 
@@ -173,3 +211,7 @@ class pyana_plotter (object) :
         """
         
         logging.info( "pyana_plotter.endjob() called" )
+
+        if self.display_mode > 0 :
+            plt.ioff()
+            plt.show()

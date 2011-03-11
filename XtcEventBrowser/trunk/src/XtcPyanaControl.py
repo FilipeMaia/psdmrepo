@@ -216,9 +216,6 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         modules_to_run = []
         options_for_mod = []
 
-        # at the very beginning, append plotter module:
-        modules_to_run.append("XtcEventBrowser.pyana_plotter")
-        options_for_mod.append([])
 
         self.configuration = ""
         for box in self.checkboxes :
@@ -256,6 +253,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
                     address = str(box.text()).split(":")[1]
                     options_for_mod[index].append("\nipimb_addresses = %s" % address)
+                    options_for_mod[index].append("\nplot_every_n = 100")
                     
                 # --- --- --- TM6740 --- --- ---
                 if str(box.text()).find("TM6740")>=0 :
@@ -301,11 +299,16 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                     options_for_mod[index].append("\nthreshold = 4000")
                     options_for_mod[index].append("\nthr_area = 600,700,600,700")
 
+
         nmodules = len(modules_to_run)
         if nmodules == 0 :
             print "No modules requested! Please select from list"
             return
 
+        # at the end, append plotter module:
+        modules_to_run.append("XtcEventBrowser.pyana_plotter")
+        options_for_mod.append([])
+        options_for_mod[nmodules].append("\ndisplay_mode = Interactive")
 
         # if several values for same option, merge into a list
         for m in range(0,nmodules):

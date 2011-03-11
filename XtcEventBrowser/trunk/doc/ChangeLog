@@ -11,6 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Mar-10 ofte                rev 1597
+        - Display mode: Interactive (plt.show()) or SlideShow(plt.draw()) or None
+	- This version needs pyana V00-00-24 or later (use evt.put and evt.get)
+	- pyana_ipimb updated to also plot every N events
+	
 2011-Mar-09  ofte                rev 1593
 	- xbplotter now takes care of pyana_image plotting too
 	- fixed a clash btw raw_input and Qt

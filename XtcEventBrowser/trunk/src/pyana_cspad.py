@@ -25,13 +25,6 @@ import time
 
 import numpy as np
 
-import matplotlib 
-
-import matplotlib.pyplot as plt
-
-from matplotlib.gridspec import GridSpec
-
-
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
@@ -103,6 +96,7 @@ class  pyana_cspad ( object ) :
             print "Using plot_vrange = %f-%f"%(self.plot_vmin,self.plot_vmax)
 
         self.plotter = Plotter()
+        if self.draw_each_event : self.plotter.display_mode = 1 # interactive 
 
         self.threshold = None
         if threshold is not None :
@@ -218,10 +212,6 @@ class  pyana_cspad ( object ) :
             qimage = self.cspad.CsPadElement(data, q.quad())
             qimages[q.quad()] = qimage
 
-            #ax = fig2.add_subplot(2,2,q.quad())
-            #ax.set_title("Q %d" % q.quad() )
-            #axes = plt.imshow( qimage, origin='lower')
-
 
         # need to do this a better way:
         h1 = np.hstack( (qimages[0], qimages[1]) )
@@ -249,10 +239,12 @@ class  pyana_cspad ( object ) :
                 topval = np.max(subset)
 
             if topval < self.threshold.minvalue :
-                print "skipping this event!  %.2f < %.2f " % (topval, float(self.threshold.minvalue))
+                print "skipping event #%d %.2f < %.2f " % \
+                      (self.n_events, topval, float(self.threshold.minvalue))
                 return
             else :
-                print "Plotting this event, vmax = %.2f > %.2f " % (topval, float(self.threshold.minvalue))
+                print "accepting event #%d, vmax = %.2f > %.2f " % \
+                      (self.n_events, topval, float(self.threshold.minvalue))
 
         # add this image to the sum
         self.n_img+=1
@@ -267,36 +259,33 @@ class  pyana_cspad ( object ) :
         if self.dark_image is not None:
             title = title + " (background subtracted) "
             
-        if self.draw_each_event :
-            #self.drawframe(cspad_image,title, fignum=201 )
+        if self.draw_each_event:
             self.plotter.drawframe(cspad_image,title, fignum=201 )
 
-
-
+            # check if plotter has changed its display mode. If so, tell the event
+            switchmode = self.plotter.display_mode
+            if switchmode is not None :
+                evt.put(switchmode,'display_mode')
+                if switchmode == 0 : self.draw_each_event = 0
 
     # after last event has been processed. 
     def endjob( self, env ) :
 
         print "Done processing       ", self.n_events, " events"        
         
-#        # plot the minimums and maximums
-#        print len(self.lolimits)
-#        xaxis = np.arange(self.n_events)
-#        plt.clf()
-#        plt.plot( xaxis, np.array(self.lolimits), "gv", xaxis, np.array(self.hilimits), "r^" )
-#        plt.title("high (A) and low (V) limits")
-
-
         if self.img_data is None :
             print "No image data found from source ", self.img_addr
             return
 
         # plot the average image
         average_image = self.img_data/self.n_img 
+        print "the average intensity of average image ", np.mean(average_image)
+        print "the highest intensity of average image ", np.max(average_image)
+        print "the lowest intensity of average image ", np.min(average_image)
+
         #self.drawframe(average_image,"Average of %d events" % self.n_img, fignum=100 )
         self.plotter.drawframe(average_image,"Average of %d events" % self.n_img, fignum=100 )
-        plt.show()
-
+        
 
         # save the average data image (numpy array)
         # binary file .npy format
