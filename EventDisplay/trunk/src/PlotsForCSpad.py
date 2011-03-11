@@ -44,6 +44,7 @@ import numpy as np
 
 import ConfigParameters as cp
 import ConfigCSpad      as cs
+import PrintHDF5        as printh5
 
 #---------------------
 #  Class definition --
@@ -265,23 +266,35 @@ class PlotsForCSpad ( object ) :
         self.drawCSpadDetImage(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax)
 
 
+    def addSelectionRectangle( self ):
+        if cp.confpars.selectionIsOn :
+            for win in range(cp.confpars.selectionNWindows) :
+
+                print 'Selection for dataset:', cp.confpars.selectionWindowParameters[win][6]
+                if printh5.CSpadIsInTheName(cp.confpars.selectionWindowParameters[win][6]) :
+
+                    xy = cp.confpars.selectionWindowParameters[win][2],  cp.confpars.selectionWindowParameters[win][4]
+                    w  = cp.confpars.selectionWindowParameters[win][3] - cp.confpars.selectionWindowParameters[win][2]
+                    h  = cp.confpars.selectionWindowParameters[win][5] - cp.confpars.selectionWindowParameters[win][4]
+
+                    rec = plt.Rectangle(xy, width=w, height=h, edgecolor='w', linewidth=2, fill=False)
+                    plt.gca().add_patch(rec)
+
+
     def drawCSpadDetImage( self, xmin=None, xmax=None, ymin=None, ymax=None ):
         plt.clf() # clear plot  t=0.05s
         self.figDet.subplots_adjust(left=0.03, bottom=0.03, right=0.98, top=0.97, wspace=0, hspace=0)
 
-        #self.arrwin = self.arr2d
-        if xmin == None : self.arrwin = self.arr2d
+        if xmin == None :
+            self.arrwin  = self.arr2d
+            self.range   = None # original image range in pixels
         else :
-            #dim1,dim2   = self.arr2d.shape
-            #self.arrwin = np.zeros( (dim1,dim2), dtype=np.int16 )
-            #self.arrwin[ymin:ymax,xmin:xmax] = self.arr2d[ymin:ymax,xmin:xmax]
             self.arrwin = self.arr2d[ymin:ymax,xmin:xmax]
+            self.range  = [xmin, xmax, ymax, ymin]
+    
+        axescb = plt.imshow(self.arrwin, origin='upper',interpolation='nearest',extent=self.range) # Just a histogram t=0.08s
 
-        axescb = plt.imshow(self.arrwin, interpolation='nearest') # Just a histogram t=0.08s
-
-        if xmin != None :
-            #plt.axis([xmin, xmax, ymin, ymax])
-            pass
+        self.addSelectionRectangle()
 
         self.axesDet = plt.gca()
         plt.clim(cp.confpars.cspadImageAmin,cp.confpars.cspadImageAmax)     #t=0
@@ -296,14 +309,15 @@ class PlotsForCSpad ( object ) :
         #if not self.figDet.myZoomIsOn :
         self.figDet.span = RectangleSelector(self.axesDet, self.onRectangleSelect, drawtype='box',rectprops=rect_props)
 
+
             
     def onRectangleSelect(self, eclick, erelease) :
         if eclick.button == 1 : # left button
 
             self.figDet = plt.gcf() # Get current figure
-            if self.figDet.myZoomIsOn :
-                print 'Zoom is already applied. Click other mouse buttons to unzoom first.'
-                return
+            #if self.figDet.myZoomIsOn :
+            #    print 'Zoom is already applied. Click other mouse buttons to unzoom first.'
+            #    return
 
             xmin = int(min(eclick.xdata, erelease.xdata))
             ymin = int(min(eclick.ydata, erelease.ydata))
