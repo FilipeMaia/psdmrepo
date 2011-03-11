@@ -61,6 +61,8 @@ class PlotsForCSpad ( object ) :
         #print 'using MPL version: ', matplotlib.__version__
         #self.fig1_window_is_open = False
 
+        self.eventWithAlreadyGeneratedCSpadDetImage  = None
+
     #-------------------
     #  Public methods --
     #-------------------
@@ -207,13 +209,14 @@ class PlotsForCSpad ( object ) :
 
     def getImageArrayForDet( self, arr1ev ):
         """Returns the image array for entire CSpad detector"""
-        #print 'getImageArrayForDet()'
-        arr2d = np.zeros( (1700,1700), dtype=np.int16 )
-        #print 'arr2d.shape=',arr2d.shape
 
-        #for quad in range(0,4) : # !!!!! SHOULD BE CHANGED FOR ENTIRE DETECTOR
+        if cp.confpars.eventCurrent == self.eventWithAlreadyGeneratedCSpadDetImage :
+            #print 'Use already generated image for CSpad and save time'
+            return self.arr2dCSpad
+
+        self.arr2dCSpad = np.zeros( (1700,1700), dtype=np.int16 )
+
         for quad in range(0,4) :
-            #print 'Quad =', quad
             arr2dquad = self.getImageArrayForQuad(arr1ev, quad)
             rotarr2d = np.rot90(arr2dquad,cs.confcspad.quadInDetOriInd[quad])
             #print 'rotarr2d.shape=',rotarr2d.shape
@@ -222,26 +225,10 @@ class PlotsForCSpad ( object ) :
             ixOff = cs.confcspad.quadXOffset[quad]
             iyOff = cs.confcspad.quadYOffset[quad]
 
-            arr2d[ixOff:dimX+ixOff, iyOff:dimY+iyOff] += rotarr2d[0:dimX, 0:dimY]
+            self.arr2dCSpad[ixOff:dimX+ixOff, iyOff:dimY+iyOff] += rotarr2d[0:dimX, 0:dimY]
 
-        return arr2d
-
-    def resizeImageArray( self, arr2d, factor ) :
-        """Discards pixels from image defined by factor"""
-        t_start = time.clock()
-        dim1,dim2 = arr2d.shape
-        size1 = dim1 / factor
-        size2 = dim2 / factor
-        arr2dresized = np.zeros( (size1,size2), dtype=np.int16 )
-        i2 = -factor 
-        for n2 in range(size2) :
-            i2 += factor
-            i1 = -factor 
-            for n1 in range(size1) :
-                i1 += factor
-                arr2dresized[n1][n2] = arr2d[i1][i2]
-        print 'Time to resizeImageArray() (sec) = %f' % (time.clock() - t_start)
-        return arr2dresized
+        self.eventWithAlreadyGeneratedCSpadDetImage = cp.confpars.eventCurrent
+        return self.arr2dCSpad
 
 
     def plotCSpadQuadImage( self, arr1ev, fig ):
@@ -269,14 +256,14 @@ class PlotsForCSpad ( object ) :
         #print 'plotCSpadDetImage()'       
         t_plotCSpadDetImage = time.clock()
         self.arr2d = self.getImageArrayForDet( arr1ev )
-        print 'Time to getImageArrayForDet() (sec) = %f' % (time.clock() - t_plotCSpadDetImage)
-        #arr2dresized = self.resizeImageArray(arr2d,4)
+        #print 'Time to getImageArrayForDet() (sec) = %f' % (time.clock() - t_plotCSpadDetImage)
         self.str_event = 'Event ' + str(cp.confpars.eventCurrent)
         self.figDet = fig
         self.figDet.canvas.set_window_title('CSpad image ' + self.str_event)
         self.figDet.subplots_adjust(left=0.03, bottom=0.03, right=0.98, top=0.97, wspace=0, hspace=0)
 
         self.drawCSpadDetImage(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax)
+
 
     def drawCSpadDetImage( self, xmin=None, xmax=None, ymin=None, ymax=None ):
         plt.clf() # clear plot  t=0.05s
@@ -341,6 +328,10 @@ class PlotsForCSpad ( object ) :
         self.figDet = plt.gcf() # Get current figure
         print 'mouse click button=', event.button
         if event.button == 2 or event.button == 3 : # middle or right button
+            self.figDet.myXmin = None
+            self.figDet.myXmax = None
+            self.figDet.myYmin = None
+            self.figDet.myYmax = None
             self.drawCSpadDetImage()
             plt.draw() # redraw the current figure
             self.figDet.myZoomIsOn = False

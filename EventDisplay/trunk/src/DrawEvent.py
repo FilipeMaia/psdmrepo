@@ -73,6 +73,8 @@ class DrawEvent ( object ) :
         self.list_of_open_figs      = []
         self.parent                 = parent
 
+        self.fileNameWithAlreadySetCSpadConfiguration = None
+
         # CSpad V1 for runs ~546,547...
         self.dsnameCSpadV1 = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV1/XppGon.0:Cspad.0/data"
 
@@ -307,13 +309,10 @@ class DrawEvent ( object ) :
 
         print 'selectionIsPassed', self.selectionIsPassed() 
 
-        #self.runNumber = self.h5file.attrs['runNumber'] # t=0us 
-        #print 'Run number = %d' % (self.runNumber) 
-
         # Loop over checked data sets
         self.nwin_waveform = None
         self.figNum = 0
-        #print 'Number of checked items:', len(cp.confpars.list_of_checked_item_names)
+
         for dsname in cp.confpars.list_of_checked_item_names :
 
             ds     = self.h5file[dsname]
@@ -444,8 +443,9 @@ class DrawEvent ( object ) :
                     else : self.close_fig(self.figNum)
 
 
-
     def getCSpadConfiguration( self, dsname ):
+
+        if cp.confpars.fileName == self.fileNameWithAlreadySetCSpadConfiguration : return
 
         if cp.confpars.cspadImageDetIsOn    \
         or cp.confpars.cspadImageQuadIsOn   \
@@ -462,6 +462,8 @@ class DrawEvent ( object ) :
             dsConf = self.h5file[cspad_config_ds_name]      # t=0.01us
             cs.confcspad.indPairsInQuads = dsConf.value[13] #
             #print "Indexes of pairs in quads =\n",cs.confcspad.indPairsInQuads 
+
+            self.fileNameWithAlreadySetCSpadConfiguration = cp.confpars.fileName
 
 
     def showEvent ( self, mode=1 ) :
