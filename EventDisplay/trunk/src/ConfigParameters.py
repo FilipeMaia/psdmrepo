@@ -102,6 +102,8 @@ class ConfigParameters ( object ) :
         self.configGUIIsOpen      = False
         self.selectionGUIIsOpen   = False
         self.selectionWindowIsOpen= False
+        self.correlationGUIIsOpen = False
+
         self.posGUIMain           = (370,10)
 
         self.readParsFromFileAtStart = True
@@ -180,8 +182,18 @@ class ConfigParameters ( object ) :
                                                  #[Theshold, InBin, Xmin, Xmax, Ymin, Ymax]
 
 
-        self.perEventDistIsOn  = True
+        # Default parameters for Selection algorithms
+        self.correlationNWindows      = 2
+        self.correlationNWindowsMax   = 10 # Maximal number of windows for selection algorithms
+
+        self.correlationWindowParameters = []
+        for win in range(self.correlationNWindowsMax) :
+            self.correlationWindowParameters.append(['None', 'None',    0, None, None])
+                                                   #[ Ypar,   Xpar, Radio, Ymin, Ymax]
+
+
         self.correlationsIsOn  = True
+       #self.perEventDistIsOn  = True
 
         self.projCenterX       = 850
         self.projCenterY       = 850

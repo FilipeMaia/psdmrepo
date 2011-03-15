@@ -132,7 +132,17 @@ class DrawEvent ( object ) :
         iYmin = cp.confpars.selectionWindowParameters[win][4]
         iYmax = cp.confpars.selectionWindowParameters[win][5]
 
-        arrInWindow = arr2d[iXmin:iXmax,iYmin:iYmax]
+        #print 'win, Thr, inBin, iXmin, iXmax, iYmin, iYmax, dsname =',\
+        #      win, Thr, inBin, iXmin, iXmax, iYmin, iYmax,\
+        #      cp.confpars.selectionWindowParameters[win][6]
+
+        if iYmin > arr2d.shape[0] : iYmin = arr2d.shape[0]
+        if iYmax > arr2d.shape[0] : iYmax = arr2d.shape[0]
+        if iXmin > arr2d.shape[1] : iXmin = arr2d.shape[1]
+        if iXmax > arr2d.shape[1] : iXmax = arr2d.shape[1]
+        
+        arrInWindow = arr2d[iYmin:iYmax,iXmin:iXmax]
+
 
         self.arrInWindowMax = arrInWindow.max()
         self.arrInWindowSum = arrInWindow.sum()
@@ -232,6 +242,7 @@ class DrawEvent ( object ) :
                     self.ave1ev[ind] /= self.numEventsSelected
 
             elif option == 5 :                                   # Draw averaged dataset
+                self.plotsCSpad.resetEventWithAlreadyGeneratedCSpadDetImage()
                 self.drawArrayForDSName(self.avedsname[ind], self.ave1ev[ind])
 
 
@@ -418,7 +429,7 @@ class DrawEvent ( object ) :
 
             self.figNum += 1 
             if cp.confpars.imageImageIsOn : 
-                self.plotsImage.plotImage(arr1ev,self.set_fig('1x1'))
+                self.plotsImage.plotImage(arr1ev,self.set_fig('1x1',dsname))
             else : self.close_fig(self.figNum)
 
             self.figNum += 1 
@@ -504,20 +515,20 @@ class DrawEvent ( object ) :
             #print 'closeHDF5File()'
 
 
-    def set_fig( self, type=None ):
+    def set_fig( self, type=None, dsname=None ):
         """Set current fig."""
 
         ##self.figNum += 1 
         if self.figNum in self.list_of_open_figs :
             self.fig = plt.figure(num=self.figNum)        
         else :
-            self.fig = self.open_fig(type)
+            self.fig = self.open_fig(type,dsname)
             self.set_window_position()
             self.list_of_open_figs.append(self.figNum)
         return self.fig
 
                
-    def open_fig( self, type=None ):
+    def open_fig( self, type=None, dsname=None ):
         """Open window for figure."""
         #print 'open_fig()'
 
@@ -552,6 +563,11 @@ class DrawEvent ( object ) :
         self.fig.myXmax = None
         self.fig.myYmin = None
         self.fig.myYmax = None
+        self.fig.myCmin = None
+        self.fig.myCmax = None
+        self.fig.myarr  = None
+        self.fig.mydsname = dsname
+
         self.fig.myZoomIsOn = False
         self.fig.nwin_waveform = self.nwin_waveform
 

@@ -208,6 +208,11 @@ class PlotsForCSpad ( object ) :
         return arr2dquad
 
 
+    def resetEventWithAlreadyGeneratedCSpadDetImage( self ):
+        """This method is used in order to update image for averaging"""
+        self.eventWithAlreadyGeneratedCSpadDetImage = None
+
+
     def getImageArrayForDet( self, arr1ev ):
         """Returns the image array for entire CSpad detector"""
 
@@ -261,24 +266,8 @@ class PlotsForCSpad ( object ) :
         self.str_event = 'Event ' + str(cp.confpars.eventCurrent)
         self.figDet = fig
         self.figDet.canvas.set_window_title('CSpad image ' + self.str_event)
-        self.figDet.subplots_adjust(left=0.03, bottom=0.03, right=0.98, top=0.97, wspace=0, hspace=0)
 
         self.drawCSpadDetImage(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax)
-
-
-    def addSelectionRectangle( self ):
-        if cp.confpars.selectionIsOn :
-            for win in range(cp.confpars.selectionNWindows) :
-
-                print 'Selection for dataset:', cp.confpars.selectionWindowParameters[win][6]
-                if printh5.CSpadIsInTheName(cp.confpars.selectionWindowParameters[win][6]) :
-
-                    xy = cp.confpars.selectionWindowParameters[win][2],  cp.confpars.selectionWindowParameters[win][4]
-                    w  = cp.confpars.selectionWindowParameters[win][3] - cp.confpars.selectionWindowParameters[win][2]
-                    h  = cp.confpars.selectionWindowParameters[win][5] - cp.confpars.selectionWindowParameters[win][4]
-
-                    rec = plt.Rectangle(xy, width=w, height=h, edgecolor='w', linewidth=2, fill=False)
-                    plt.gca().add_patch(rec)
 
 
     def drawCSpadDetImage( self, xmin=None, xmax=None, ymin=None, ymax=None ):
@@ -301,9 +290,9 @@ class PlotsForCSpad ( object ) :
         self.colb = plt.colorbar(axescb, pad=0.03, orientation=1, fraction=0.10, shrink = 0.86, aspect = 20)#, ticks=coltickslocs #t=0.04s
         plt.title(self.str_event,color='r',fontsize=20) # pars like in class Text
 
-        self.figDet.canvas.mpl_connect('button_press_event',   self.processMousButtonPressForDetImage)
-        #self.figDet.canvas.mpl_connect('button_release_event', self.processMousButtonReleaseForDetImage)
-        #self.figDet.canvas.mpl_connect('motion_notify_event',  self.processMousMotion)
+        self.figDet.canvas.mpl_connect('button_press_event',   self.processMouseButtonPressForDetImage)
+        #self.figDet.canvas.mpl_connect('button_release_event', self.processMouseButtonReleaseForDetImage)
+        #self.figDet.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
 
         rect_props=dict(edgecolor='black', linewidth=2, linestyle='dashed', fill=False)
         #if not self.figDet.myZoomIsOn :
@@ -336,7 +325,7 @@ class PlotsForCSpad ( object ) :
             self.figDet.myZoomIsOn = True
 
 
-    def processMousButtonPressForDetImage(self, event) :
+    def processMouseButtonPressForDetImage(self, event) :
         #print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y,
         #print ' xdata=',event.xdata,' ydata=', event.ydata
         self.figDet = plt.gcf() # Get current figure
@@ -349,6 +338,23 @@ class PlotsForCSpad ( object ) :
             self.drawCSpadDetImage()
             plt.draw() # redraw the current figure
             self.figDet.myZoomIsOn = False
+
+
+    def addSelectionRectangle( self ):
+        if cp.confpars.selectionIsOn :
+            for win in range(cp.confpars.selectionNWindows) :
+
+                print 'Selection for dataset:', cp.confpars.selectionWindowParameters[win][6]
+                if printh5.CSpadIsInTheName(cp.confpars.selectionWindowParameters[win][6]) :
+
+                    xy = cp.confpars.selectionWindowParameters[win][2],  cp.confpars.selectionWindowParameters[win][4]
+                    w  = cp.confpars.selectionWindowParameters[win][3] - cp.confpars.selectionWindowParameters[win][2]
+                    h  = cp.confpars.selectionWindowParameters[win][5] - cp.confpars.selectionWindowParameters[win][4]
+
+                    rec = plt.Rectangle(xy, width=w, height=h, edgecolor='w', linewidth=2, fill=False)
+                    plt.gca().add_patch(rec)
+
+
 
 
     def plotCSpadQuad08SpectraOf2x1( self, arr1ev, fig ):

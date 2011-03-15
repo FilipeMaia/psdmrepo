@@ -43,6 +43,7 @@ import GUIWhatToDisplayForImage       as wtdIM
 import GUIWhatToDisplayForCSpad       as wtdCS 
 import GUIWhatToDisplayForWaveform    as wtdWF
 import GUIWhatToDisplayForProjections as wtdPR
+import GUICorrelation                 as wtdCO
 
 #---------------------
 #  Class definition --
@@ -80,7 +81,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         titFont   = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
 
         self.titImage    = QtGui.QLabel('Image')
-        self.titCSpad    = QtGui.QLabel('SCpad')
+        self.titCSpad    = QtGui.QLabel('CSpad')
         self.titWaveform = QtGui.QLabel('Other')
 
         self.titImage   .setFont (titFont) 
@@ -112,8 +113,8 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.cboxCSProjPhi     = QtGui.QCheckBox('Phi',                self)
 
         self.cboxWFWaveform    = QtGui.QCheckBox('Waveform',           self)
-        self.cboxED            = QtGui.QCheckBox('Par vs event No.',   self)
         self.cboxCO            = QtGui.QCheckBox('Correlations',       self)
+       #self.cboxED            = QtGui.QCheckBox('Par vs event No.',   self)
 
         if cp.confpars.imageImageIsOn       : self.cboxIMImage       .setCheckState(2)
         if cp.confpars.imageSpectrumIsOn    : self.cboxIMSpectrum    .setCheckState(2)
@@ -135,8 +136,8 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         if cp.confpars.cspadProjPhiIsOn     : self.cboxCSProjPhi     .setCheckState(2)
 
         if cp.confpars.waveformWaveformIsOn : self.cboxWFWaveform    .setCheckState(2)
-        if cp.confpars.perEventDistIsOn     : self.cboxED            .setCheckState(2)
         if cp.confpars.correlationsIsOn     : self.cboxCO            .setCheckState(2)
+       #if cp.confpars.perEventDistIsOn     : self.cboxED            .setCheckState(2)
 
         self.butClose      = QtGui.QPushButton('Quit')
 
@@ -176,23 +177,23 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         gridWF = QtGui.QGridLayout()
         gridWF.addWidget(self.titWaveform,      0, 0)
         gridWF.addWidget(self.cboxWFWaveform,   1, 0)
-        gridWF.addWidget(self.cboxED,           1, 1)
-        gridWF.addWidget(self.cboxCO,           1, 2)
+        gridWF.addWidget(self.cboxCO,           1, 1)
+       #gridWF.addWidget(self.cboxED,           1, 2)
 
         self.tabBar   = QtGui.QTabBar()
         self.indTabCS = self.tabBar.addTab('CSpad')
         self.indTabIM = self.tabBar.addTab('Image')
         self.indTabWF = self.tabBar.addTab('Waveform')
         self.indTabPR = self.tabBar.addTab('Proj.')
-        self.indTabED = self.tabBar.addTab('1D vs ev.')
         self.indTabCO = self.tabBar.addTab('Corr.')
+       #self.indTabED = self.tabBar.addTab('1D vs ev.')
 
         self.tabBar.setTabTextColor(self.indTabCS,QtGui.QColor('red'))
         self.tabBar.setTabTextColor(self.indTabIM,QtGui.QColor('blue'))
         self.tabBar.setTabTextColor(self.indTabWF,QtGui.QColor('green'))
         self.tabBar.setTabTextColor(self.indTabPR,QtGui.QColor('magenta'))
-        self.tabBar.setTabTextColor(self.indTabED,QtGui.QColor('yellow'))
-        self.tabBar.setTabTextColor(self.indTabCO,QtGui.QColor('white'))
+        self.tabBar.setTabTextColor(self.indTabCO,QtGui.QColor('black'))
+       #self.tabBar.setTabTextColor(self.indTabED,QtGui.QColor('white'))
         
         self.hboxT = QtGui.QHBoxLayout()
         self.hboxT.addWidget(self.tabBar) 
@@ -243,8 +244,8 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.connect(self.cboxCSProjPhi,       QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSProjPhi)
 
         self.connect(self.cboxWFWaveform,      QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxWFWaveform)
-        self.connect(self.cboxED,              QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxED)
         self.connect(self.cboxCO,              QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCO)
+       #self.connect(self.cboxED,              QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxED)
 
         self.connect(self.tabBar,              QtCore.SIGNAL('currentChanged(int)'), self.processTabBar)
 
@@ -287,24 +288,22 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
             self.guiTab = wtdWF.GUIWhatToDisplayForWaveform()
         if indTab == self.indTabPR :
             self.guiTab = wtdPR.GUIWhatToDisplayForProjections()
-
-        if indTab == self.indTabED :
-            self.guiTab = QtGui.QLabel('Sorry, this GUI is not implemented yet.\n' + 
-                                       'Will select 1-D parameters for plot vs event number.')
         if indTab == self.indTabCO :
-            self.guiTab = QtGui.QLabel('Sorry, this GUI is not implemented yet.\n' + 
-                                       'Will select 1-D parameters for correlation plots.')
+            self.guiTab = wtdCO.GUICorrelation()
+        #if indTab == self.indTabED :
+        #    self.guiTab = QtGui.QLabel('Sorry, this GUI is not implemented yet.\n' + 
+        #                               'Will select 1-D parameters for plot vs event number.')
 
         self.guiTab.setMinimumHeight(200)
         self.hboxD.addWidget(self.guiTab)
         
 
-    def processCBoxED(self, value):
-        if self.cboxED.isChecked():
-            self.tabBar.setCurrentIndex(self.indTabED)
-            cp.confpars.perEventDistIsOn = True
-        else:
-            cp.confpars.perEventDistIsOn = False
+    #def processCBoxED(self, value):
+    #    if self.cboxED.isChecked():
+    #        self.tabBar.setCurrentIndex(self.indTabED)
+    #        cp.confpars.perEventDistIsOn = True
+    #    else:
+    #        cp.confpars.perEventDistIsOn = False
 
 
     def processCBoxCO(self, value):

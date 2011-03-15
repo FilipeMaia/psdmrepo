@@ -85,7 +85,7 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         titFont12 = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
         titFont10 = QtGui.QFont("Sans Serif", 10, QtGui.QFont.Bold)
 
-        self.titCSpad            = QtGui.QLabel('SCpad')
+        self.titCSpad            = QtGui.QLabel('CSpad')
         self.titCSImage          = QtGui.QLabel('Image plot')
         self.titCSSpectrum       = QtGui.QLabel('Spectrum')
         self.titNWin             = QtGui.QLabel('N detector images:')
