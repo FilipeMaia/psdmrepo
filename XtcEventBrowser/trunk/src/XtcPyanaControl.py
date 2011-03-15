@@ -26,7 +26,7 @@ __version__ = "$Revision$"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
-import sys, random, os, signal
+import sys, random, os, signal, time
 import  subprocess 
 #from multiprocessing import Process
 
@@ -88,13 +88,20 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.setWindowTitle('Pyana Control Center')
         self.setWindowIcon(QtGui.QIcon('XtcEventBrowser/src/lclsLogo.gif'))
 
-        self.checks = []
+        self.checklabels = []
         self.checkboxes = []
         self.filenames = []
 
         self.proc_pyana = None
         self.configfile = None
+
+        self.pvWindow = None
+        self.scrollArea = None
         
+        self.pvlabels = []
+        self.pvboxes = []
+        self.pvGroupLayout = None
+
         # buttons
         self.pyana_config = QtGui.QLabel(self);
         self.config_button = None
@@ -176,6 +183,60 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.proc_pyana.kill()
 
 
+    def add_epicslist(self, epicses=[] ):
+        self.epicsPVs = epicses
+
+    def __change_epics_channel(self):
+        for pv in self.pvboxes :
+            if pv.checkState() :
+                self.lgroup.addWidget(pv) # move widget to checkboxes
+            else :
+                pass
+                #self.pvGroupLayout.addWidget(pv)
+                
+    def show_epicslist(self):
+        if self.c.checkState() :
+            if self.pvWindow is None:
+
+                # open Epics window
+                self.pvWindow = QtGui.QWidget()
+                self.pvWindow.setStyleSheet("QWidget {background-color: #FFFFFF }")
+                self.pvWindow.setWindowTitle('Available Epics PVs')
+                self.pvWindow.setWindowIcon(QtGui.QIcon('XtcEventBrowser/src/lclsLogo.gif'))
+
+                # scroll area
+                self.scrollArea = QtGui.QScrollArea()
+                self.scrollArea.setWidgetResizable(True)
+                
+                # list of PVs, a child of self.scrollArea
+                pvGroup = QtGui.QGroupBox("Epics channels:")
+                self.scrollArea.setWidget(pvGroup)
+
+                self.pvGroupLayout = QtGui.QVBoxLayout()
+                pvGroup.setLayout(self.pvGroupLayout)
+
+                # layout of pvWindow:
+                pvLayout = QtGui.QHBoxLayout(self.pvWindow)
+                self.pvWindow.setLayout(pvLayout)
+
+                # show window
+                #pvLayout.addWidget(pvGroup)
+                pvLayout.addWidget(self.scrollArea)
+                self.pvWindow.show()
+            
+                for self.pv in self.epicsPVs:
+                    pvtext = "EpicsPV:" + self.pv
+                    self.pvi = QtGui.QCheckBox(pvtext,self.pvWindow)
+                    #self.connect(self.pvi, QtCore.SIGNAL('stateChanged(int)'), self.__change_epics_channel )
+                    #self.pvboxes.append(self.pvi)
+                    #self.pvlabels.append(self.pv)
+                    self.connect(self.pvi, QtCore.SIGNAL('stateChanged(int)'), self.__write_configuration )
+                    self.checkboxes.append(self.pvi)
+                    self.checklabels.append(self.pvi.text())
+                    self.pvGroupLayout.addWidget(self.pvi)
+        else :
+            print "unchecked"
+            
     def add_selector(self, devices={} ):
         """Draw a group of checkboxes to the GUI
 
@@ -191,12 +252,16 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             clabel = d 
             if clabel.find("ProcInfo") >= 0 : continue
             if clabel.find("NoDetector") >= 0 : continue
-            if self.checks.count( clabel )==0 :
+            
+            if self.checklabels.count( clabel )==0 :
                 self.c = QtGui.QCheckBox(clabel, self)
-                self.connect(self.c, QtCore.SIGNAL('stateChanged(int)'), self.__write_configuration )
+                if clabel.find("Epics") >= 0 :
+                    self.connect(self.c, QtCore.SIGNAL('stateChanged(int)'), self.show_epicslist )
+                else :
+                    self.connect(self.c, QtCore.SIGNAL('stateChanged(int)'), self.__write_configuration )
                 self.lgroup.addWidget(self.c)
                 self.checkboxes.append(self.c)
-                self.checks.append(clabel)
+                self.checklabels.append(clabel)
 
 
 
@@ -299,7 +364,20 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                     options_for_mod[index].append("\nthreshold = 4000")
                     options_for_mod[index].append("\nthr_area = 600,700,600,700")
 
+                # --- --- --- Epics --- --- ---
+                if str(box.text()).find("EpicsPV:")>=0 :
+                    index = None
+                    try :
+                        index = modules_to_run.index("XtcEventBrowser.pyana_epics")
+                    except ValueError :
+                        index = len(modules_to_run)
+                        modules_to_run.append("XtcEventBrowser.pyana_epics")
+                        options_for_mod.append([])
+                    print "XtcEventBrowser.pyana_epics at ", index
+                    pvname = str(box.text()).split("PV:")[1]
+                    options_for_mod[index].append("\npv = %s" % pvname)
 
+                    
         nmodules = len(modules_to_run)
         if nmodules == 0 :
             print "No modules requested! Please select from list"

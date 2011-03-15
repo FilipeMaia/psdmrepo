@@ -487,6 +487,7 @@ part of it, please give an appropriate acknowledgment.
         if self.pyanactrl is None : 
             self.pyanactrl = XtcPyanaControl(parent=self)
             self.pyanactrl.add_selector( self.scanner.devices )
+            self.pyanactrl.add_epicslist( self.scanner.epicses )
             self.pyanactrl.set_files(self.filenames)
 
     def __scan_files_quick(self):
@@ -508,8 +509,8 @@ part of it, please give an appropriate acknowledgment.
         if self.pyanactrl is None : 
             self.pyanactrl = XtcPyanaControl()
             self.pyanactrl.add_selector( self.scanner.devices )
+            self.pyanactrl.add_epicslist( self.scanner.epicses )
             self.pyanactrl.set_files(self.filenames)
-        
 
 
 
