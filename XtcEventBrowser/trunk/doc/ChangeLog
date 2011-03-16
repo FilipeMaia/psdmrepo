@@ -11,6 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Mar-16 ofte                rev 1607
+        - Some tuning of figure numbers etc. 
+	- pyana_epics improved
+	- made SlideShow default (only CSPad has Interactive functionality so far anyway)
+
 2011-Mar-16 ofte                rev 1606
         - Improved parameters and defaults for all moduls. SlideShow now should work for all.
 

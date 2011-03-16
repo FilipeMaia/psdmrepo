@@ -122,6 +122,7 @@ class  pyana_bld ( object ) :
         if self.do_EBeam :
 
             fig = plt.figure(num=(fignum+10), figsize=(8,8) )
+            fig.clf()
             fig.suptitle(suptitle)
 
             ax1 = fig.add_subplot(221)
@@ -159,6 +160,7 @@ class  pyana_bld ( object ) :
         if self.do_GasDet :
 
             fig = plt.figure(num=(fignum+20), figsize=(8,8) )
+            fig.clf()
             fig.suptitle(suptitle)
 
             array = np.float_(self.GD_energies)
@@ -191,6 +193,7 @@ class  pyana_bld ( object ) :
         if self.do_PC :
 
             fig = plt.figure(num=(fignum+30), figsize=(8,8) )
+            fig.clf()
             fig.suptitle(suptitle)
             
             array = np.float_(self.PC_data)

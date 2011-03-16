@@ -56,7 +56,7 @@ class pyana_epics (object) :
     #----------------
     def __init__ ( self, pv = "BEAM:LCLS:ELEC:Q",
                    plot_every_n = None,
-                   plot_number = 1 ) :
+                   fignum = "1" ) :
         """Class constructor. The parameters to the constructor are passed
         from pyana configuration file. If parameters do not have default 
         values  here then the must be defined in pyana.cfg. All parameters 
@@ -66,9 +66,8 @@ class pyana_epics (object) :
         """
 
         opt = PyanaOptions()
-        self.pv_names = opt.getOptStrings( pv )
-        print "Init epics: "
-        print self.pv_names
+        self.pv_names = opt.getOptStrings(pv)
+        self.mpl_num = opt.getOptInteger(fignum)
 
         # structure for storing the data
         # dictionary = { 'pvname': datalist[calibcycle] }
@@ -230,29 +229,37 @@ class pyana_epics (object) :
         
         logging.info( "pyana_epics.endjob() called" )
 
+        
+        fignum = self.mpl_num*100
         for pv_name in self.pv_names :
+
+            print len(self.pv_data_all[pv_name])
 
             # make a 2d array
             array = np.array( self.pv_data_all[pv_name] )
 
             # for each calib cycle (axis=0), get the mean vaue of all events (axis=1)
             meanarray = np.sum(array,axis=1)
-            print np.shape(meanarray)
-            self.make_graph(meanarray)                            
 
+            fignum += 1
+            self.make_graph(meanarray, fignum=fignum,
+                            xtitle='Scan cycle',
+                            ytitle="%s (average per event)"%pv_name,
+                            suptitle="End of run summary")
 
     def make_histogram(self, array):
         pass
     
-    def make_graph(self, array, fignum=600, suptitle=""):
+    def make_graph(self, array, fignum=600, xtitle="",ytitle="",suptitle=""):
         print "Make graph from array ", np.shape(array)
 
-        fig = plt.figure(num=(fignum+10), figsize=(8,8) )
+        fig = plt.figure(num=fignum, figsize=(8,8) )
         fig.suptitle(suptitle)
         
         ax1 = fig.add_subplot(111)
-        plt.plot(array)
+        plt.plot(array,'bo:')
         plt.title('')
-        plt.xlabel('Shot#',horizontalalignment='left') # the other right
-        plt.ylabel('Value',horizontalalignment='right')
-        plt.show()
+        plt.xlabel(xtitle,horizontalalignment='left') # the other right
+        plt.ylabel(ytitle,horizontalalignment='right')
+        plt.draw()
+

@@ -240,7 +240,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             self.connect(self.quit_pyana_button, QtCore.SIGNAL('clicked()'), self.quit_pyana )
             self.v0.addWidget( self.quit_pyana_button )
             self.v0.setAlignment( self.quit_pyana_button, QtCore.Qt.AlignRight )
-
+        else :
+            self.quit_pyana_button.show()
 
     def quit_pyana(self) :
         """Kill the pyana process
@@ -479,6 +480,9 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # clear title 
         self.configfile = None
         if self.econfig_button is not None : self.econfig_button.hide()
+        if self.pyana_button is not None: self.pyana_button.hide()
+        if self.quit_pyana_button is not None: self.quit_pyana_button.hide()
+
         self.box_pconf.setTitle("Current pyana configuration:")
 
         modules_to_run = []
@@ -493,7 +497,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             # at the end, append plotter module:
             modules_to_run.append("XtcEventBrowser.pyana_plotter")
             options_for_mod.append([])
-            options_for_mod[nmodules].append("\ndisplay_mode = Interactive")
+            options_for_mod[nmodules].append("\ndisplay_mode = SlideShow")
 
         # if several values for same option, merge into a list
         for m in range(0,nmodules):
@@ -574,7 +578,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             self.connect(self.pyana_button, QtCore.SIGNAL('clicked()'), self.run_pyana )
             self.v0.addWidget( self.pyana_button )
             self.v0.setAlignment( self.pyana_button, QtCore.Qt.AlignRight )
-
+        else :
+            self.pyana_button.show()
 
     def edit_configfile(self):
 

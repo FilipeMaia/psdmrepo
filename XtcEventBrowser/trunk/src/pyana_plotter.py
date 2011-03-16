@@ -181,10 +181,9 @@ class pyana_plotter (object) :
             plt.show()
 
         elif self.display_mode == 2:
+            pass
             # SlideShow
-            plt.draw()
-            plt.draw()
-            
+            # plt.draw()            
 
     def endcalibcycle( self, env ) :
         """This optional method is called if present at the end of the 

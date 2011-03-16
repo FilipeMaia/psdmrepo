@@ -121,7 +121,7 @@ class Plotter(object):
         h = r*5.0
 
         self.fig = plt.figure(figsize=(w,h),num=fignum)
-        fig.clf()
+        self.fig.clf()
         self.connect()
 
         self.axes = self.fig.add_subplot(r,c,p)
@@ -194,7 +194,7 @@ class Plotter(object):
             plt.ion()
 
         self.fig = plt.figure(figsize=(10,8),num=fignum)
-        fig.clf()
+        self.fig.clf()
 
         axes = self.fig.add_subplot(111)        
         axes.set_title(title)
