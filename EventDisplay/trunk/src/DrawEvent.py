@@ -43,12 +43,13 @@ from PyQt4 import QtGui
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import ConfigParameters as cp
-import ConfigCSpad      as cs
-import PlotsForCSpad    as cspad
-import PlotsForImage    as image
-import PlotsForWaveform as wavef
-import PrintHDF5        as printh5
+import ConfigParameters     as cp
+import ConfigCSpad          as cs
+import PlotsForCSpad        as cspad
+import PlotsForImage        as image
+import PlotsForWaveform     as wavef
+import PlotsForCorrelations as corrs
+import PrintHDF5            as printh5
 
 #---------------------
 #  Class definition --
@@ -70,10 +71,14 @@ class DrawEvent ( object ) :
         self.plotsCSpad             = cspad.PlotsForCSpad()
         self.plotsImage             = image.PlotsForImage()
         self.plotsWaveform          = wavef.PlotsForWaveform()
+        self.plotsCorrelations      = corrs.PlotsForCorrelations()
+        
         self.list_of_open_figs      = []
         self.parent                 = parent
-
         self.fileNameWithAlreadySetCSpadConfiguration = None
+
+        #self.arrInWindowMax         = 0 
+        #self.arrInWindowSum         = 0
 
         # CSpad V1 for runs ~546,547...
         self.dsnameCSpadV1 = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV1/XppGon.0:Cspad.0/data"
@@ -118,9 +123,9 @@ class DrawEvent ( object ) :
                 self.getCSpadConfiguration(dsname)
                 self.arr2d = self.plotsCSpad.getImageArrayForDet( self.arr1ev )
 
-            if not self.selectionInWindowIsPassed(win,self.arr2d) : return False
+            if self.selectionInWindowIsPassed(win,self.arr2d) : return True # All selections are included as OR
                             
-        return True
+        return False
 
 
     def selectionInWindowIsPassed(self, win, arr2d) :
@@ -172,20 +177,12 @@ class DrawEvent ( object ) :
         # Loop over events
         while self.loopIsContinued :
 
-            if cp.confpars.eventCurrent % 10 == 0 :
-                if cp.confpars.selectionIsOn :
-                    print ' Current event =', cp.confpars.eventCurrent,\
-                          ' Selected =',      self.numEventsSelected,  \
-                          ' arrInWindow.max() =', self.arrInWindowMax, \
-                          ' arrInWindow.sum() =', self.arrInWindowSum
-                else :
-                    print ' Current event =', cp.confpars.eventCurrent
-
-
+            selectionIsPassed = self.selectionIsPassed() 
+            self.printEventSelectionStatistics()
             self.loopOverDataSets() # Initialization & Accumulation
 
             cp.confpars.eventCurrent += 1
-            if self.selectionIsPassed() : self.numEventsSelected   += 1
+            if selectionIsPassed : self.numEventsSelected   += 1
             self.loopIsContinued = self.numEventsSelected < cp.confpars.numEventsAverage and cp.confpars.eventCurrent < self.eventEnd 
 
 
@@ -197,10 +194,21 @@ class DrawEvent ( object ) :
         self.closeHDF5File()
 
 
+    def printEventSelectionStatistics(self) :
+        if cp.confpars.eventCurrent % 10 == 0 :
+            if cp.confpars.selectionIsOn :
+                print ' Current event =', cp.confpars.eventCurrent,\
+                      ' Selected =',      self.numEventsSelected,  \
+                      ' arrInWindow.max() =', self.arrInWindowMax, \
+                      ' arrInWindow.sum() =', self.arrInWindowSum
+            else :
+                print ' Current event =', cp.confpars.eventCurrent
+
+
     def drawAveragedArrays(self, mode=1) :
         """This method makes initialization and draws averaged arrays"""
 
-        self.nwin_waveform = None
+        self.nwin   = None
         self.figNum = 0
         self.loopOverDataSets(option=5) # Draw normalized datasets
         self.showEvent(mode)
@@ -216,12 +224,19 @@ class DrawEvent ( object ) :
 
         ind=-1
         for dsname in cp.confpars.list_of_checked_item_names :
-            ind += 1 
 
+            item_last_name = printh5.get_item_last_name(dsname)
+            itemIsForAverage = item_last_name=='image' or    \
+                               item_last_name=='waveform' or \
+                               printh5.CSpadIsInTheName(dsname)
+
+            if not itemIsForAverage : continue
+
+            ind += 1 
             ds          = self.h5file[dsname]
             self.arr1ev = ds[cp.confpars.eventCurrent]
 
-            if printh5.get_item_last_name(dsname) == 'image' : 
+            if item_last_name == 'image' : 
                 if not self.dimIsFixed(dsname) :
                     self.arr1ev.shape = (self.arr1ev.shape[1],self.arr1ev.shape[0])
 
@@ -250,11 +265,15 @@ class DrawEvent ( object ) :
         """Draws the next (selected) event"""
 
         self.openHDF5File() # t=0us
+
+        self.numEventsSelected = 0
         while True :
             cp.confpars.eventCurrent += cp.confpars.span
             if self.selectionIsPassed() : 
                 self.drawEventFromOpenFile(mode) # Draw everything for current event
                 break
+            self.printEventSelectionStatistics()
+
         self.closeHDF5File()
 
 
@@ -262,6 +281,8 @@ class DrawEvent ( object ) :
         """Draws the previous (selected) event"""
 
         self.openHDF5File() # t=0us
+
+        self.numEventsSelected = 0
         while True :
             cp.confpars.eventCurrent -= cp.confpars.span
             if cp.confpars.eventCurrent<0 :
@@ -271,6 +292,8 @@ class DrawEvent ( object ) :
             if self.selectionIsPassed() : 
                 self.drawEventFromOpenFile(mode) # Draw everything for current event
                 break
+            self.printEventSelectionStatistics()
+
         self.closeHDF5File()
 
 
@@ -282,6 +305,7 @@ class DrawEvent ( object ) :
 
         eventStart = cp.confpars.eventCurrent
         eventEnd   = cp.confpars.eventCurrent + 1000*cp.confpars.span
+        self.numEventsSelected = 0
 
         while (self.parent.SHowIsOn) :
             if cp.confpars.eventCurrent>eventEnd : break
@@ -291,6 +315,7 @@ class DrawEvent ( object ) :
                 self.drawEventFromOpenFile(mode=0) # mode for slide show (draw())
                 self.parent.numbEdit.setText( str(cp.confpars.eventCurrent) )
 
+            self.printEventSelectionStatistics()
             cp.confpars.eventCurrent+=cp.confpars.span
 
         self.closeHDF5File()
@@ -321,7 +346,7 @@ class DrawEvent ( object ) :
         print 'selectionIsPassed', self.selectionIsPassed() 
 
         # Loop over checked data sets
-        self.nwin_waveform = None
+        self.nwin   = None
         self.figNum = 0
 
         for dsname in cp.confpars.list_of_checked_item_names :
@@ -444,9 +469,9 @@ class DrawEvent ( object ) :
 
         if item_last_name == 'waveforms' :
 
-            for self.nwin_waveform in range(cp.confpars.waveformNWindows) :
+            for self.nwin in range(cp.confpars.waveformNWindows) :
 
-                if dsname == cp.confpars.waveformWindowParameters[self.nwin_waveform][0] :
+                if dsname == cp.confpars.waveformWindowParameters[self.nwin][0] :
 
                     self.figNum += 1 
                     if cp.confpars.waveformWaveformIsOn : 
@@ -569,7 +594,7 @@ class DrawEvent ( object ) :
         self.fig.mydsname = dsname
 
         self.fig.myZoomIsOn = False
-        self.fig.nwin_waveform = self.nwin_waveform
+        self.fig.nwin   = self.nwin
 
         return self.fig
 
@@ -592,6 +617,36 @@ class DrawEvent ( object ) :
         else :
             plt.close(figNum)
             if figNum in self.list_of_open_figs : self.list_of_open_figs.remove(figNum)
+
+
+
+    def drawCorrelationPlots ( self ) :
+        """Draw Correlation Plots"""
+
+        self.openHDF5File()
+        self.drawCorrelationPlotsFromOpenFile()
+        self.closeHDF5File()
+
+
+    def drawCorrelationPlotsFromOpenFile ( self ) :
+
+        #cp.confpars.correlationNWindowsMax 
+        #cp.confpars.correlationNWindows 
+ 
+        self.figNum = 100
+
+        for self.nwin in range(cp.confpars.correlationNWindows) :
+
+            Ydsname = cp.confpars.correlationWindowParameters[self.nwin][0]
+            Xdsname = cp.confpars.correlationWindowParameters[self.nwin][1]
+            dsY     = self.h5file[Ydsname]
+            print 'dsY.shape=',dsY.shape
+            dsX     = None
+
+            self.figNum += 1 
+            if cp.confpars.correlationsIsOn : 
+                self.plotsCorrelations.plotCorrelations(self.set_fig('2x1'), dsY, dsX)
+            else : self.close_fig(self.figNum)
 
 
 #

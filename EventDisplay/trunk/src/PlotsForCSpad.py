@@ -344,7 +344,7 @@ class PlotsForCSpad ( object ) :
         if cp.confpars.selectionIsOn :
             for win in range(cp.confpars.selectionNWindows) :
 
-                print 'Selection for dataset:', cp.confpars.selectionWindowParameters[win][6]
+                #print 'Selection for dataset:', cp.confpars.selectionWindowParameters[win][6]
                 if printh5.CSpadIsInTheName(cp.confpars.selectionWindowParameters[win][6]) :
 
                     xy = cp.confpars.selectionWindowParameters[win][2],  cp.confpars.selectionWindowParameters[win][4]

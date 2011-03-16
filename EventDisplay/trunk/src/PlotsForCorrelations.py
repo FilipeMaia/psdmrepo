@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module PlotsForWaveform...
+#  Module PlotsForCorrelations...
 #
 #------------------------------------------------------------------------
 
-"""Plots for any 'waveform' record in the EventeDisplay project.
+"""Plots for correlations.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -31,6 +31,7 @@ __version__ = "$Revision: 4 $"
 import sys
 import matplotlib.pyplot as plt
 from numpy import *
+import numpy as np
 
 #---------------------------------
 #  Imports of base class module --
@@ -44,8 +45,8 @@ import ConfigParameters as cp
 #---------------------
 #  Class definition --
 #---------------------
-class PlotsForWaveform ( object ) :
-    """Plots for any 'waveform' record in the EventeDisplay project."""
+class PlotsForCorrelations ( object ) :
+    """Plots for correlations."""
 
     #----------------
     #  Constructor --
@@ -58,6 +59,37 @@ class PlotsForWaveform ( object ) :
     #  Public methods --
     #-------------------
   
+
+    def plotCorrelations ( self, fig, dsY, dsX=None ) :
+        
+        win = fig.nwin
+        radioXPar = cp.confpars.correlationWindowParameters[win][2] 
+
+        nYpoints = dsY.shape[0]
+
+
+        print '\nNew Win:', win, ' Correlation plot for nYpoints =', nYpoints 
+
+
+        #self.arr1ev = ds[cp.confpars.eventCurrent]
+
+        print 'dsY=',dsY
+
+        Yarr = np.zeros( (nYpoints), dtype=np.int16 )
+        for ind in range (nYpoints) :
+            #print ind, dsY[ind][5] 
+            Yarr[ind] = dsY[ind][5]
+
+        Xarr = range(nYpoints)
+
+        plt.clf()
+        plt.plot(Xarr, Yarr, 'b-')
+        plt.show()
+
+
+
+
+
     def plotWFWaveform( self, ds1ev, fig ):
         """Plot waveform from input array."""
 

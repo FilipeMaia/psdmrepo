@@ -99,7 +99,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.cboxIMProjX       = QtGui.QCheckBox('X',                  self)
         self.cboxIMProjY       = QtGui.QCheckBox('Y',                  self)
         self.cboxIMProjR       = QtGui.QCheckBox('R',                  self)
-        self.cboxIMProjPhi     = QtGui.QCheckBox('Phi',                self)
+        self.cboxIMProjPhi     = QtGui.QCheckBox(u'\u03C6',            self) # Phi in Greek
         
         self.cboxCSImageQuad   = QtGui.QCheckBox('Quad',               self)
         self.cboxCSImageDet    = QtGui.QCheckBox('Detector',           self)
@@ -110,7 +110,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.cboxCSProjX       = QtGui.QCheckBox('X',                  self)
         self.cboxCSProjY       = QtGui.QCheckBox('Y',                  self)
         self.cboxCSProjR       = QtGui.QCheckBox('R',                  self)
-        self.cboxCSProjPhi     = QtGui.QCheckBox('Phi',                self)
+        self.cboxCSProjPhi     = QtGui.QCheckBox(u'\u03C6',            self) # Phi in Greek
 
         self.cboxWFWaveform    = QtGui.QCheckBox('Waveform',           self)
         self.cboxCO            = QtGui.QCheckBox('Correlations',       self)

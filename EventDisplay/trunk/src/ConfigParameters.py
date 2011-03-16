@@ -335,6 +335,18 @@ class ConfigParameters ( object ) :
             print 'SELEC_YMAX',            self.selectionWindowParameters[win][5] 
             print 'SELEC_DATASET',         self.selectionWindowParameters[win][6] 
 
+        print 'CORR_N_WINDOWS_MAX',       self.correlationNWindowsMax 
+        print 'CORR_N_WINDOWS',           self.correlationNWindows 
+
+        for win in range(self.correlationNWindows) :
+
+            print 'CORR_WINDOW_NUMBER',    win 
+            print 'CORR_YDATASET',         self.correlationWindowParameters[win][0] 
+            print 'CORR_YDATASET',         self.correlationWindowParameters[win][1] 
+            print 'CORR_XPARRADIO',        self.correlationWindowParameters[win][2] 
+            print 'CORR_YMIN',             self.correlationWindowParameters[win][3] 
+            print 'CORR_YMAX',             self.correlationWindowParameters[win][4] 
+
         print 'NUM_EVENTS_FOR_AVERAGE',    self.numEventsAverage
         print 'SELECTION_IS_ON',           self.selectionIsOn
 
@@ -486,6 +498,18 @@ class ConfigParameters ( object ) :
                 elif key == 'SELEC_YMAX'               : self.selectionWindowParameters[win][5] = int(val)
                 elif key == 'SELEC_DATASET'            : self.selectionWindowParameters[win][6] = val
 
+
+                elif key == 'CORR_N_WINDOWS_MAX'       : self.correlationNWindowsMax   = int(val)
+                elif key == 'CORR_N_WINDOWS'           : self.correlationNWindows      = int(val)
+
+                elif key == 'CORR_WINDOW_NUMBER'       : win                           = int(val)
+                elif key == 'CORR_YDATASET'            : self.correlationWindowParameters[win][0] = val
+                elif key == 'CORR_XDATASET'            : self.correlationWindowParameters[win][1] = val
+                elif key == 'CORR_XPARRADIO'           : self.correlationWindowParameters[win][2] = int(val)
+                elif key == 'CORR_YMIN'                : self.correlationWindowParameters[win][3] = self.getValIntOrNone(val)
+                elif key == 'CORR_YMAX'                : self.correlationWindowParameters[win][4] = self.getValIntOrNone(val)
+
+
                 elif key == 'PROJ_CENTER_X'            : self.projCenterX           = int(val)
                 elif key == 'PROJ_CENTER_Y'            : self.projCenterY           = int(val)
                                                                                    
@@ -602,41 +626,53 @@ class ConfigParameters ( object ) :
         f.write('PER_EVENT_DIST_IS_ON'      + space + str(self.perEventDistIsOn)        + '\n')
         f.write('CORRELATIONS_IS_ON'        + space + str(self.correlationsIsOn)        + '\n')
 
+        f.write('NUM_EVENTS_FOR_AVERAGE'+ space + str( self.numEventsAverage )          + '\n')
+        f.write('SELECTION_IS_ON'       + space + str( self.selectionIsOn )             + '\n')
+
         f.write('\n')
         f.write('WAVEF_N_WINDOWS_MAX'       + space + str(self.waveformNWindowsMax)     + '\n')
         f.write('WAVEF_N_WINDOWS'           + space + str(self.waveformNWindows)        + '\n')
 
         for win in range(self.waveformNWindows) :
             f.write('\n')
-            f.write('WAVEF_WINDOW_NUMBER'   + space + str(win)                                          + '\n')
-            f.write('WAVEF_DATASET'         + space + str(self.waveformWindowParameters[win][0] )       + '\n')
-            f.write('WAVEF_AUTO_RANGE_IS_ON'+ space + str(self.waveformWindowParameters[win][1] )       + '\n')
-            f.write('WAVEF_AMIN'            + space + str(self.waveformWindowParameters[win][2] )       + '\n')
-            f.write('WAVEF_AMAX'            + space + str(self.waveformWindowParameters[win][3] )       + '\n')
-            f.write('WAVEF_TMIN'            + space + str(self.waveformWindowParameters[win][4] )       + '\n')
-            f.write('WAVEF_TMAX'            + space + str(self.waveformWindowParameters[win][5] )       + '\n')
-            f.write('WAVEF_N_WF_IN_DATA_SET'+ space + str(self.waveformWindowParameters[win][6] )       + '\n')
-            f.write('WAVEF_IND_WF_IN_BLACK' + space + str(self.waveformWindowParameters[win][7] )       + '\n')
-            f.write('WAVEF_IND_WF_IN_RED'   + space + str(self.waveformWindowParameters[win][8] )       + '\n')
-            f.write('WAVEF_IND_WF_IN_GREEN' + space + str(self.waveformWindowParameters[win][9] )       + '\n')
-            f.write('WAVEF_IND_WF_IN_BLUE'  + space + str(self.waveformWindowParameters[win][10])       + '\n')
+            f.write('WAVEF_WINDOW_NUMBER'   + space + str(win)                                       + '\n')
+            f.write('WAVEF_DATASET'         + space + str(self.waveformWindowParameters[win][0] )    + '\n')
+            f.write('WAVEF_AUTO_RANGE_IS_ON'+ space + str(self.waveformWindowParameters[win][1] )    + '\n')
+            f.write('WAVEF_AMIN'            + space + str(self.waveformWindowParameters[win][2] )    + '\n')
+            f.write('WAVEF_AMAX'            + space + str(self.waveformWindowParameters[win][3] )    + '\n')
+            f.write('WAVEF_TMIN'            + space + str(self.waveformWindowParameters[win][4] )    + '\n')
+            f.write('WAVEF_TMAX'            + space + str(self.waveformWindowParameters[win][5] )    + '\n')
+            f.write('WAVEF_N_WF_IN_DATA_SET'+ space + str(self.waveformWindowParameters[win][6] )    + '\n')
+            f.write('WAVEF_IND_WF_IN_BLACK' + space + str(self.waveformWindowParameters[win][7] )    + '\n')
+            f.write('WAVEF_IND_WF_IN_RED'   + space + str(self.waveformWindowParameters[win][8] )    + '\n')
+            f.write('WAVEF_IND_WF_IN_GREEN' + space + str(self.waveformWindowParameters[win][9] )    + '\n')
+            f.write('WAVEF_IND_WF_IN_BLUE'  + space + str(self.waveformWindowParameters[win][10])    + '\n')
 
         f.write('SELEC_N_WINDOWS_MAX'       + space + str(self.selectionNWindowsMax)     + '\n')
         f.write('SELEC_N_WINDOWS'           + space + str(self.selectionNWindows)        + '\n')
 
         for win in range(self.selectionNWindows) :
             f.write('\n')
-            f.write('SELEC_WINDOW_NUMBER'   + space + str(win)                                           + '\n')
-            f.write('SELEC_THRESHOLD'       + space + str(self.selectionWindowParameters[win][0] )       + '\n')
-            f.write('SELEC_IN_BIN'          + space + str(self.selectionWindowParameters[win][1] )       + '\n')
-            f.write('SELEC_XMIN'            + space + str(self.selectionWindowParameters[win][2] )       + '\n')
-            f.write('SELEC_XMAX'            + space + str(self.selectionWindowParameters[win][3] )       + '\n')
-            f.write('SELEC_YMIN'            + space + str(self.selectionWindowParameters[win][4] )       + '\n')
-            f.write('SELEC_YMAX'            + space + str(self.selectionWindowParameters[win][5] )       + '\n')
-            f.write('SELEC_DATASET'         + space + str(self.selectionWindowParameters[win][6] )       + '\n')
-            f.write('NUM_EVENTS_FOR_AVERAGE'+ space + str( self.numEventsAverage )                       + '\n')
-            f.write('SELECTION_IS_ON'       + space + str( self.selectionIsOn )                          + '\n')
+            f.write('SELEC_WINDOW_NUMBER'   + space + str(win)                                       + '\n')
+            f.write('SELEC_THRESHOLD'       + space + str(self.selectionWindowParameters[win][0] )   + '\n')
+            f.write('SELEC_IN_BIN'          + space + str(self.selectionWindowParameters[win][1] )   + '\n')
+            f.write('SELEC_XMIN'            + space + str(self.selectionWindowParameters[win][2] )   + '\n')
+            f.write('SELEC_XMAX'            + space + str(self.selectionWindowParameters[win][3] )   + '\n')
+            f.write('SELEC_YMIN'            + space + str(self.selectionWindowParameters[win][4] )   + '\n')
+            f.write('SELEC_YMAX'            + space + str(self.selectionWindowParameters[win][5] )   + '\n')
+            f.write('SELEC_DATASET'         + space + str(self.selectionWindowParameters[win][6] )   + '\n')
 
+        f.write('CORR_N_WINDOWS_MAX'        + space + str(self.correlationNWindowsMax)   + '\n')
+        f.write('CORR_N_WINDOWS'            + space + str(self.correlationNWindows)      + '\n')
+
+        for win in range(self.correlationNWindows) :
+            f.write('\n')
+            f.write('CORR_WINDOW_NUMBER'    + space + str(win)                                       + '\n')
+            f.write('CORR_YDATASET'         + space + str(self.correlationWindowParameters[win][0] ) + '\n')
+            f.write('CORR_XDATASET'         + space + str(self.correlationWindowParameters[win][1] ) + '\n')
+            f.write('CORR_XPARRADIO'        + space + str(self.correlationWindowParameters[win][2] ) + '\n')
+            f.write('CORR_YMIN'             + space + str(self.correlationWindowParameters[win][3] ) + '\n')
+            f.write('CORR_YMAX'             + space + str(self.correlationWindowParameters[win][4] ) + '\n')
 
         f.write('PROJ_CENTER_X'                     + space + str(self.projCenterX         )       + '\n')
         f.write('PROJ_CENTER_Y'                     + space + str(self.projCenterY         )       + '\n')

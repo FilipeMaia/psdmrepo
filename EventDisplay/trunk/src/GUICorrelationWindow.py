@@ -87,9 +87,9 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.editCorrelationYmax  .setValidator(QtGui.QIntValidator(-1000000, 1000000, self))
 
         self.titVs         = QtGui.QLabel('Versus:')
-        self.radioVsIndex  = QtGui.QRadioButton("index")
-        self.radioVsTime   = QtGui.QRadioButton("time" )
-        self.radioVsXPar   = QtGui.QRadioButton("X-par")
+        self.radioVsIndex  = QtGui.QRadioButton('Index')
+        self.radioVsTime   = QtGui.QRadioButton('Time' )
+        self.radioVsXPar   = QtGui.QRadioButton('X-par')
 
         self.radioGroup    = QtGui.QButtonGroup()
         self.radioGroup.addButton(self.radioVsIndex)
@@ -205,6 +205,7 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         cp.confpars.correlationWindowParameters[self.window][2] = 0
         dsname = 'Index'
         self.butCorrXDataSet.setText(dsname)
+        self.setButCorrXDataSetTextAlignment()
         cp.confpars.correlationWindowParameters[self.window][1] = str(dsname)
 
 
@@ -212,6 +213,7 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         cp.confpars.correlationWindowParameters[self.window][2] = 1
         dsname = 'Time'
         self.butCorrXDataSet.setText(dsname)
+        self.setButCorrXDataSetTextAlignment()
         cp.confpars.correlationWindowParameters[self.window][1] = str(dsname)
 
 
@@ -219,6 +221,8 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         cp.confpars.correlationWindowParameters[self.window][2] = 2
         dsname = 'Select X parameter'
         self.butCorrXDataSet.setText(dsname)
+        self.setButCorrXDataSetTextAlignment()
+        self.butCorrXDataSet.setStyleSheet("background-color: rgb(255, 0, 0); color: rgb(255, 255, 255)")
         cp.confpars.correlationWindowParameters[self.window][1] = str(dsname)
 
 
@@ -231,13 +235,16 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
 
 
     def setButCorrYDataSetTextAlignment(self):
-        if  self.butCorrYDataSet.text() == 'None' :
+        if     self.butCorrYDataSet.text() == 'None' :
             self.butCorrYDataSet.setStyleSheet('Text-align:center')
         else :
             self.butCorrYDataSet.setStyleSheet('Text-align:right')
 
     def setButCorrXDataSetTextAlignment(self):
-        if  self.butCorrXDataSet.text() == 'None' :
+        if     self.butCorrXDataSet.text() == 'None' \
+            or self.butCorrXDataSet.text() == 'Select X parameter' \
+            or self.butCorrXDataSet.text() == 'Time' \
+            or self.butCorrXDataSet.text() == 'Index' :
             self.butCorrXDataSet.setStyleSheet('Text-align:center')
         else :
             self.butCorrXDataSet.setStyleSheet('Text-align:right')

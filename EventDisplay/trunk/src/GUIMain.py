@@ -118,24 +118,21 @@ class GUIMain ( QtGui.QWidget ) :
         hboxF.addWidget(self.browse)
 
         hboxC = QtGui.QHBoxLayout()
-       #hboxC.addWidget(self.printfile)
-        hboxC.addWidget(self.selection)
         hboxC.addStretch(2)
-       #hboxC.addWidget(self.titTree)
         hboxC.addWidget(self.display)
         
         hboxE = QtGui.QHBoxLayout()
-        hboxE.addWidget(self.wtd)
+        hboxE.addWidget(self.selection)
         hboxE.addStretch(2)
-        hboxE.addWidget(self.config)
-        hboxE.addWidget(self.save)
+        hboxE.addWidget(self.wtd)
 
         self.wplayer = guiplr.GUIPlayer()
         hboxT = QtGui.QHBoxLayout() 
         hboxT.addWidget(self.wplayer)
 
         hbox = QtGui.QHBoxLayout()
-        #hbox.addWidget(self.closeplts)
+        hbox.addWidget(self.config)
+        hbox.addWidget(self.save)
         hbox.addStretch(3)
         hbox.addWidget(self.exit)
 
@@ -272,7 +269,7 @@ class GUIMain ( QtGui.QWidget ) :
             print 'What to display GUI: Open'
             #self.wtd.setText('Close')
             self.guiwhat = guiwtd.GUIWhatToDisplay()
-            self.guiwhat.move(self.pos().__add__(QtCore.QPoint(0,330))) # open window with offset w.r.t. parent
+            self.guiwhat.move(self.pos().__add__(QtCore.QPoint(0,360))) # open window with offset w.r.t. parent
             self.guiwhat.show()
             cp.confpars.wtdWindowIsOpen = True
 

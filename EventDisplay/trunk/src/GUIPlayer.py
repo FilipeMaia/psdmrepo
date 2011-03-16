@@ -113,6 +113,11 @@ class GUIPlayer ( QtGui.QWidget ) :
         self.start        = QtGui.QPushButton("Start")
         self.stop         = QtGui.QPushButton("Stop")
         self.butAverage   = QtGui.QPushButton("Average")
+        self.butCorr      = QtGui.QPushButton("Correlations")
+
+       #self.avevEdit     .setStyleSheet("background-color: rgb(0, 255, 0); color: rgb(0, 0, 0)")
+        self.butAverage   .setStyleSheet("background-color: rgb(0, 255, 0); color: rgb(0, 0, 0)")
+        self.butCorr      .setStyleSheet("background-color: magenta; color: rgb(0, 0, 0)")
 
         #self.closeplts= QtGui.QPushButton("Close plots")
         #self.exit     = QtGui.QPushButton("Exit")
@@ -149,19 +154,24 @@ class GUIPlayer ( QtGui.QWidget ) :
         hboxS.addWidget(self.stop)
         #hboxS.addWidget(self.closeplts)
 
+        hboxC = QtGui.QHBoxLayout()
+        hboxC.addWidget(self.cboxSelection)        
+        hboxC.addStretch(1)
+
         hboxA = QtGui.QHBoxLayout()
         hboxA.addWidget(self.butAverage)
         hboxA.addWidget(self.titOver)
         hboxA.addWidget(self.avevEdit)
         hboxA.addWidget(self.titEvents)
-        hboxA.addStretch(1)
-        hboxA.addWidget(self.cboxSelection)        
+        hboxA.addStretch(2)
+        hboxA.addWidget(self.butCorr)
 
         #hbox = QtGui.QHBoxLayout()
         #hbox.addStretch(3)
         #hbox.addWidget(self.exit)
 
         vbox = QtGui.QVBoxLayout()
+        vbox.addLayout(hboxC)
         vbox.addLayout(hboxT)
         vbox.addLayout(hboxM)
         vbox.addLayout(hboxS)
@@ -182,6 +192,7 @@ class GUIPlayer ( QtGui.QWidget ) :
         self.connect(self.spaninc,   QtCore.SIGNAL('clicked()'), self.processSpaninc )
         self.connect(self.spandec,   QtCore.SIGNAL('clicked()'), self.processSpandec )
         self.connect(self.butAverage,QtCore.SIGNAL('clicked()'), self.processAverage )
+        self.connect(self.butCorr,   QtCore.SIGNAL('clicked()'), self.processCorrelations )
         
         self.connect(self.numbEdit,  QtCore.SIGNAL('editingFinished ()'), self.processNumbEdit )
         self.connect(self.spanEdit,  QtCore.SIGNAL('editingFinished ()'), self.processSpanEdit )
@@ -206,6 +217,11 @@ class GUIPlayer ( QtGui.QWidget ) :
         self.drawev.quitDrawEvent()
         self.SHowIsOn = False
         self.close()
+
+
+    def processCorrelations(self):
+        print 'Correlations'
+        self.drawev.drawCorrelationPlots()
 
 
     def processAverage(self):
