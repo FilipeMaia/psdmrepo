@@ -483,12 +483,12 @@ part of it, please give an appropriate acknowledgment.
         self.scanner.setOption({'ndatagrams':-1}) # all
         self.scanner.scan()
 
-        #self.__add_selector()
         if self.pyanactrl is None : 
             self.pyanactrl = XtcPyanaControl(parent=self)
-            self.pyanactrl.add_selector( self.scanner.devices )
-            self.pyanactrl.add_epicslist( self.scanner.epicses )
-            self.pyanactrl.set_files(self.filenames)
+
+        self.pyanactrl.update(devices=self.scanner.devices.keys(),
+                              epicsPVs = self.scanner.epicsPVs,
+                              filenames = self.filenames )
 
     def __scan_files_quick(self):
         """Quick scan of xtc files
@@ -508,10 +508,10 @@ part of it, please give an appropriate acknowledgment.
         #self.__add_selector()
         if self.pyanactrl is None : 
             self.pyanactrl = XtcPyanaControl()
-            self.pyanactrl.add_selector( self.scanner.devices )
-            self.pyanactrl.add_epicslist( self.scanner.epicses )
-            self.pyanactrl.set_files(self.filenames)
 
+        self.pyanactrl.update(devices=self.scanner.devices.keys(),
+                              epicsPVs = self.scanner.epicsPVs,
+                              filenames = self.filenames )
 
 
 

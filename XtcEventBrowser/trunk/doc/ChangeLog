@@ -11,6 +11,8 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Mar-16 ofte                rev 1605
+        - Cleaned up XtcPyanaControl some. pyana_epics still rudimentary
 2011-Mar-15 ofte                rev 1603
         - Added pyana_epics, and a new GUI to select epics channels 
 2011-Mar-10 ofte                rev 1601

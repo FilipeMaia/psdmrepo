@@ -79,7 +79,7 @@ class XtcScanner ( object ) :
     #--------------------
     devices = {}
     counters = {}
-    epicses = []
+    epicsPVs = []
 
     #----------------
     #  Constructor --
@@ -187,7 +187,7 @@ class XtcScanner ( object ) :
             print
 
         if opt_epics > 0 :
-            print "Epics PVs: ", self.epicses
+            print "Epics PVs: ", self.epicsPVs
 
 
 
@@ -254,7 +254,7 @@ class XtcScanner ( object ) :
             if self._state == "Configure" :
                 if xtc.contains.id() == TypeId.Type.Id_Epics :
                     data = xtc.payload()
-                    self.epicses.append(data.sPvName)
+                    self.epicsPVs.append(data.sPvName)
                     
             if dkey not in self.devices :
                 # first occurence of this detector/device
