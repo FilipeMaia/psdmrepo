@@ -54,7 +54,9 @@ class pyana_epics (object) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, pv = "BEAM:LCLS:ELEC:Q") :
+    def __init__ ( self, pv = "BEAM:LCLS:ELEC:Q",
+                   plot_every_n = None,
+                   plot_number = 1 ) :
         """Class constructor. The parameters to the constructor are passed
         from pyana configuration file. If parameters do not have default 
         values  here then the must be defined in pyana.cfg. All parameters 

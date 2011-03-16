@@ -32,8 +32,9 @@ import h5py
 # Imports for other modules --
 #-----------------------------
 from pypdsdata import xtc
+
 from xbplotter import Plotter
-from mpl_toolkits.axes_grid1 import AxesGrid
+from utilities import PyanaOptions
 
 #---------------------
 #  Class definition --
@@ -43,6 +44,8 @@ class  pyana_image ( object ) :
     # initialize
     def __init__ ( self,
                    image_addresses = None,
+                   plot_every_n = None,
+                   fignum = "1", 
                    good_range="0--999999",
                    dark_range="-999999--0",
                    image_rotations = None,
@@ -51,25 +54,28 @@ class  pyana_image ( object ) :
                    image_nicknames = None,
                    image_manipulations = None, 
                    output_file = None,
-                   n_hdf5 = None,
-                   draw_each_event = False):
+                   n_hdf5 = None ):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
         All parameters are passed as strings
 
         @param image_addresses   (list) address string of Detector-Id|Device-ID
+        @param plot_every_n     int, Draw plot for every N event? (if None or 0, don't plot till end)
+        @param fignum           int, matplotlib figure number
         @param good_range       threshold values selecting images of interest
         @param dark_range       threshold values selecting dark images
         @param image_rotations  (list) rotation, in degrees, to be applied to image(s)
         @param image_shifts     (list) shift, in (npixX,npixY), to be applied to image(s)
         @param image_scales     (list) scale factor to be applied to images
         @param output_file      filename (If collecting: write to this file)
-        @param draw_each_event  bool
         """
-        if image_addresses is None :
-            print "Error! You've called pyana_image without specifying an image address"
-            
-        self.image_addresses = image_addresses.split(" ")
+
+        opt = PyanaOptions() # convert option string to appropriate type
+        self.plot_every_n  =  opt.getOptInteger(plot_every_n)
+        self.mpl_num = opt.getOptInteger(fignum)
+
+        self.image_addresses = opt.getOptStrings(image_addresses)
+        print image_addresses, self.image_addresses
         nsources = len(self.image_addresses)
         print "pyana_image, %d sources: " % nsources
         for sources in self.image_addresses :
@@ -153,9 +159,6 @@ class  pyana_image ( object ) :
         print "Using dark_range = %s " % dark_range
         print "  (thresholds =  %d (low) and %d (high) " % (self.thr_low_dark, self.thr_high_dark)
 
-        self.draw_each_event = draw_each_event
-        print "Using draw_each_event = ", draw_each_event
-
         self.n_hdf5 = None
         if n_hdf5 is not None :
             if n_hdf5 == "" or n_hdf5 == "None" :
@@ -182,7 +185,7 @@ class  pyana_image ( object ) :
             self.lolimits[addr] = []
             self.hilimits[addr] = []
 
-            self.fignum[addr] = 200 + self.image_addresses.index(addr)
+            self.fignum[addr] = self.mpl_num*1000 + 100*self.image_addresses.index(addr)
 
             self.n_img[addr] = 0
             self.n_dark[addr] = 0
@@ -318,7 +321,9 @@ class  pyana_image ( object ) :
         # -----------------------------------
         # Draw images from this event
         # -----------------------------------
-        self.plotter.draw_figurelist( 101, event_display_images )
+        if self.plot_every_n and (self.n_events%self.plot_every_n)==0 :
+            fignum = self.mpl_num*100
+            self.plotter.draw_figurelist(fignum, event_display_images )
 
         # -----------------------------------
         # Saving to file
@@ -381,18 +386,18 @@ class  pyana_image ( object ) :
 
             # plot the average image
             av_good_img = self.image_data[addr]/self.n_img[addr]
-            self.drawframe( av_good_img, "%s: Average of images above threshold"%addr )
+            self.plotter.drawframe( av_good_img, "%s: Average of images above threshold"%addr )
             #100+self.fignum[addr])
 
             if self.n_dark[addr]>0 :
                 av_dark_img = self.dark_data[addr]/self.n_dark[addr]
                 av_bkgsubtracted = av_good_img - av_dark_img 
-                self.drawframe( av_dark_img, "%s: Average of images below threshold"%addr )
+                self.plotter.drawframe( av_dark_img, "%s: Average of images below threshold"%addr )
                 #200+self.fignum[addr] )
-                self.drawframe( av_bkgsubtracted, "%s: Average background subtracted"%addr )
+                self.self.drawframe( av_bkgsubtracted, "%s: Average background subtracted"%addr )
                 #300+self.fignum[addr])
 
-        plt.show()
+        plt.draw()
         
 
 

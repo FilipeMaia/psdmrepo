@@ -121,6 +121,7 @@ class Plotter(object):
         h = r*5.0
 
         self.fig = plt.figure(figsize=(w,h),num=fignum)
+        fig.clf()
         self.connect()
 
         self.axes = self.fig.add_subplot(r,c,p)
@@ -148,7 +149,7 @@ class Plotter(object):
         ncol = 3
         if nplots<3 : ncol = nplots
         nrow = int( nplots/ncol)
-        fig = plt.figure(101,(5.0*ncol,4*nrow))
+        fig = plt.figure(fignum,(5.0*ncol,4*nrow))
         fig.clf()
         fig.suptitle("Event#%d"%self.shot_number)
 
@@ -193,6 +194,7 @@ class Plotter(object):
             plt.ion()
 
         self.fig = plt.figure(figsize=(10,8),num=fignum)
+        fig.clf()
 
         axes = self.fig.add_subplot(111)        
         axes.set_title(title)
@@ -213,7 +215,7 @@ class Plotter(object):
         
             
         # show the active region for thresholding
-        if self.threshold.area is not None:
+        if self.threshold and self.threshold.area is not None:
             xy = [self.threshold.area[0],self.threshold.area[2]]
             w = self.threshold.area[1] - self.threshold.area[0]
             h = self.threshold.area[3] - self.threshold.area[2]

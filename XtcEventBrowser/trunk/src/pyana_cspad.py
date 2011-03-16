@@ -32,6 +32,7 @@ from pypdsdata import xtc
 from cspad import CsPad
 from xbplotter import Plotter
 from xbplotter import Threshold
+from utilities import PyanaOptions
 
 #---------------------
 #  Class definition --
@@ -49,7 +50,8 @@ class  pyana_cspad ( object ) :
     # initialize
     def __init__ ( self,
                    image_source=None,
-                   draw_each_event = 0,
+                   plot_every_n = None,
+                   fignum = "1", 
                    dark_img_file = None,
                    output_file = None,
                    plot_vrange = None,
@@ -60,7 +62,8 @@ class  pyana_cspad ( object ) :
         All parameters are passed as strings
 
         @param image_source     string, Address of Detector-Id|Device-ID
-        @param draw_each_event  bool, Draw plot for each event? (Default=False). 
+        @param plot_every_n     int, Draw plot for every N event? (if None or 0, don't plot till end) 
+        @param plot_number      plotnumber
         @param dark_img_file    filename, Dark image file to be loaded, if any
         @param output_file      filename (If collecting: write to this file)
         @param plot_vrange      range=vmin-vmax of values for plotting (pixel intensity)
@@ -73,12 +76,11 @@ class  pyana_cspad ( object ) :
         self.img_addr = image_source
         print "Using image_source = ", self.img_addr
 
-        self.draw_each_event = bool(draw_each_event)
-        if self.draw_each_event and ( draw_each_event == "No" or
-                                      draw_each_event == "0" or
-                                      draw_each_event == "False" ) : self.draw_each_event = False
-        print "Using draw_each_event = ", self.draw_each_event
+        opt = PyanaOptions()
+        self.plot_every_n = opt.getOptInteger(plot_every_n)
+        print "Using plot_every_n = ", self.plot_every_n
 
+        self.mpl_num = opt.getOptInteger(fignum)
 
         self.dark_img_file = dark_img_file
         if dark_img_file == "" or dark_img_file == "None" : self.dark_img_file = None
@@ -96,7 +98,7 @@ class  pyana_cspad ( object ) :
             print "Using plot_vrange = %f-%f"%(self.plot_vmin,self.plot_vmax)
 
         self.plotter = Plotter()
-        if self.draw_each_event : self.plotter.display_mode = 1 # interactive 
+        if self.plot_every_n > 0 : self.plotter.display_mode = 1 # interactive 
 
         self.threshold = None
         if threshold is not None :
@@ -259,14 +261,15 @@ class  pyana_cspad ( object ) :
         if self.dark_image is not None:
             title = title + " (background subtracted) "
             
-        if self.draw_each_event:
-            self.plotter.drawframe(cspad_image,title, fignum=201 )
+        if (self.n_events%self.plot_every_n)==0 :
+            fignum = self.mpl_num*100+1
+            self.plotter.drawframe(cspad_image,title, fignum=fignum)
 
             # check if plotter has changed its display mode. If so, tell the event
             switchmode = self.plotter.display_mode
             if switchmode is not None :
                 evt.put(switchmode,'display_mode')
-                if switchmode == 0 : self.draw_each_event = 0
+                if switchmode == 0 : self.plot_every_n = 0
 
     # after last event has been processed. 
     def endjob( self, env ) :
@@ -283,8 +286,8 @@ class  pyana_cspad ( object ) :
         print "the highest intensity of average image ", np.max(average_image)
         print "the lowest intensity of average image ", np.min(average_image)
 
-        #self.drawframe(average_image,"Average of %d events" % self.n_img, fignum=100 )
-        self.plotter.drawframe(average_image,"Average of %d events" % self.n_img, fignum=100 )
+        fignum = self.mpl_num*100
+        self.plotter.drawframe(average_image,"Average of %d events" % self.n_img, fignum=fignum )
         
 
         # save the average data image (numpy array)

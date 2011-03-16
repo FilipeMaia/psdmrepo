@@ -11,10 +11,11 @@ from utilities import PyanaOptions
 class  pyana_bld ( object ) :
     
     def __init__ ( self,
-                   do_ebeam=False,
-                   do_gasdetector=False,
-                   do_phasecavity=False,
-                   plot_every_n = None ) :
+                   do_ebeam="False",
+                   do_gasdetector="False",
+                   do_phasecavity="False",
+                   plot_every_n = None,
+                   fignum = "1" ) :
         """
         Initialize data. Parameters:
         @do_ebeam            Plot data from EBeam object
@@ -25,10 +26,11 @@ class  pyana_bld ( object ) :
 
         # parameters
         opt = PyanaOptions() # convert option string to appropriate type
-        self.do_EBeam      =  opt.getOptBoolean( do_ebeam )
-        self.do_GasDet     =  opt.getOptBoolean( do_gasdetector )
-        self.do_PC         =  opt.getOptBoolean( do_phasecavity )
-        self.plot_every_n  =  opt.getOptInteger( plot_every_n )
+        self.do_EBeam     = opt.getOptBoolean(do_ebeam)
+        self.do_GasDet    = opt.getOptBoolean(do_gasdetector)
+        self.do_PC        = opt.getOptBoolean(do_phasecavity)
+        self.plot_every_n = opt.getOptInteger(plot_every_n)
+        self.mpl_num      = opt.getOptInteger(fignum)
 
         # other
         self.shot_number = None
@@ -104,13 +106,15 @@ class  pyana_bld ( object ) :
         if self.plot_every_n is not None:
             if (self.shot_number%self.plot_every_n)==0 :
                 print "Shot#%d ... plotting " % self.shot_number
-                self.make_plots(301, suptitle="Accumulated up to Shot#%d"%self.shot_number)
+                fignum = self.mpl_num*100+1
+                self.make_plots(fignum, suptitle="Accumulated up to Shot#%d"%self.shot_number)
                                                 
             
                 
     def endjob( self, env ) :
 
-        self.make_plots(300, suptitle="Average of all (%d) events"%self.shot_number)
+        fignum = self.mpl_num*100
+        self.make_plots(fignum, suptitle="Average of all (%d) events"%self.shot_number)
 
 
     def make_plots(self, fignum = 1, suptitle = ""):
@@ -215,6 +219,4 @@ class  pyana_bld ( object ) :
             plt.title('PhaseCavity FitChare2')
             plt.xlabel('PhaseCavity FitCharge2',horizontalalignment='left')
 
-
         plt.draw()
-        plt.show()

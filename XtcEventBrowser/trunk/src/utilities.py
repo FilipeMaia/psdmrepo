@@ -2,7 +2,6 @@ class PyanaOptions( object ):
     def __init__( self ):
         pass
 
-
     def getOptStrings(self, options_string) :
         """
         parse the option string,
@@ -65,7 +64,7 @@ class PyanaOptions( object ):
         if   opt == "False" or opt == "0" or opt == "No" or opt == "" : return False
         elif opt == "True" or opt == "1" or opt == "Yes" : return True
         else :
-            print "utilities.py: cannot parse option ", opt
+            print "utilities.getOptBoolean: cannot parse option ", opt
             return None
 
     def getOptBooleans(self, options_string):

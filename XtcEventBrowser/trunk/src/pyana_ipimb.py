@@ -7,30 +7,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from   pypdsdata import xtc
-
+from utilities import PyanaOptions
 
 # analysis class declaration
 class  pyana_ipimb ( object ) :
     
     def __init__ ( self,
                    ipimb_addresses = None,
-                   plot_every_n = None ) :
+                   plot_every_n = None,
+                   fignum = "1" ) :
         """
-        @ipimb_addresses   list of IPIMB addresses
-        @plot_every_n      None (don't plot until the end), or N (int, plot every N event)
+        @param ipimb_addresses   list of IPIMB addresses
+        @param plot_every_n      None (don't plot until the end), or N (int, plot every N event)
+        @param fignum            matplotlib figure number
         """
 
 
         # initialize data
-
-        if ipimb_addresses is None :
-            print "Error! You've called pyana_ipimb without specifying an ipimb address"
-            
-        self.ipimb_addresses = ipimb_addresses.split(" ")
+        opt = PyanaOptions()
+        self.ipimb_addresses = opt.getOptStrings(ipimb_addresses)
         print "pyana_ipimb, %d sources: " % len(self.ipimb_addresses)
         for sources in self.ipimb_addresses :
             print "  ", sources
 
+        self.mpl_num = opt.getOptInteger(fignum)
+        
         self.plot_every_n = None
         if plot_every_n is not None : self.plot_every_n = int(plot_every_n)
 
@@ -77,11 +78,13 @@ class  pyana_ipimb ( object ) :
         if self.plot_every_n is not None: 
             if (self.shot_number%self.plot_every_n)==0 : 
                 print "Shot#%d ... plotting " % self.shot_number
-                self.make_plots(301, suptitle="Accumulated up to Shot#%d"%self.shot_number)
+                fignum = self.mpl_num*100
+                self.make_plots(fignum, suptitle="Accumulated up to Shot#%d"%self.shot_number)
                 
     def endjob( self, env ) :
-
-        self.make_plots(300, suptitle="Average of all events")
+        
+        fignum = self.mpl_num*100
+        self.make_plots(fignum, suptitle="Average of all events")
 
     def make_plots(self, fignum = 1, suptitle = ""):
         ncols = 3
@@ -90,6 +93,7 @@ class  pyana_ipimb ( object ) :
               (len(self.ipimb_addresses), nrows, ncols)
 
         fig = plt.figure(num=fignum, figsize=(10*ncols/2,10*nrows/2) )
+        fig.clf()
         fig.subplots_adjust(wspace=0.35, hspace=0.35)
         fig.suptitle(suptitle)
         
@@ -124,4 +128,4 @@ class  pyana_ipimb ( object ) :
             plt.xlabel('Beam position X',horizontalalignment='left')
             plt.ylabel('Beam position Y',horizontalalignment='left')
 
-        plt.show()
+        plt.draw()

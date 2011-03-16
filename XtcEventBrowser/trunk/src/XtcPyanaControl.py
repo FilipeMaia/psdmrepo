@@ -359,11 +359,11 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 
 
     def add_module(self,box,modules_to_run,options_for_mod) :
-        #print "%s requested" % box.text() 
 
+        index = None
+        plot_every_n = 10
         # --- --- --- BLD --- --- ---
         if str(box.text()).find("BldInfo")>=0 :
-            index = None
 
             try :
                 index = modules_to_run.index("XtcEventBrowser.pyana_bld")
@@ -373,17 +373,18 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 options_for_mod.append([])
 
             #print "XtcEventBrowser.pyana_bld at ", index
-            options_for_mod[index].append("\nplot_every_n = 100")
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
             if str(box.text()).find("EBeam")>=0 :
                 options_for_mod[index].append("\ndo_ebeam = True")
             if str(box.text()).find("FEEGasDetEnergy")>=0 :
                 options_for_mod[index].append("\ndo_gasdetector = True")
             if str(box.text()).find("PhaseCavity")>=0 :
                 options_for_mod[index].append("\ndo_phasecavity = True")
+            return
 
         # --- --- --- Ipimb --- --- ---
         if str(box.text()).find("Ipimb")>=0 :
-            index = None
 
             try :
                 index = modules_to_run.index("XtcEventBrowser.pyana_ipimb")
@@ -395,11 +396,14 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             #print "XtcEventBrowser.pyana_ipimb at ", index
             address = str(box.text()).split(":")[1]
             options_for_mod[index].append("\nipimb_addresses = %s" % address)
-            options_for_mod[index].append("\nplot_every_n = 100")
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            return
                     
         # --- --- --- TM6740 --- --- ---
-        if str(box.text()).find("TM6740")>=0 :
-            index = None
+        if ( str(box.text()).find("TM6740")>=0 or
+             str(box.text()).find("Opal1000")>=0 or
+             str(box.text()).find("Princeton")>=0 ) :
 
             try :
                 index = modules_to_run.index("XtcEventBrowser.pyana_image")
@@ -417,13 +421,14 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             options_for_mod[index].append("\nimage_manipulations = ")
             options_for_mod[index].append("\ngood_range = %d--%d" % (0,99999999.9) )
             options_for_mod[index].append("\ndark_range = %d--%d" % (0,0) )
-            options_for_mod[index].append("\ndraw_each_event = Yes")
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
             options_for_mod[index].append("\noutput_file = ")
             options_for_mod[index].append("\nn_hdf5 = ")        
+            return
 
         # --- --- --- CsPad --- --- ---
         if str(box.text()).find("Cspad")>=0 :
-            index = None
 
             try :
                 index = modules_to_run.index("XtcEventBrowser.pyana_cspad")
@@ -435,16 +440,20 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             #print "XtcEventBrowser.pyana_cspad at ", index
             address = str(box.text()).split(":")[1]
             options_for_mod[index].append("\nimage_source = %s" % address)
-            options_for_mod[index].append("\ndraw_each_event = Yes")
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
             options_for_mod[index].append("\ndark_img_file = ")
             options_for_mod[index].append("\noutput_file = ")                    
             options_for_mod[index].append("\nplot_vrange = ")
-            options_for_mod[index].append("\nthreshold = 4000")
-            options_for_mod[index].append("\nthr_area = 600,700,600,700")
+            options_for_mod[index].append("\nthreshold = ")
+            options_for_mod[index].append("\nthr_area = ")
+            return
 
         # --- --- --- Epics --- --- ---
+        if str(box.text()).find("EpicsArch")>=0 :
+            return
+
         if str(box.text()).find("EpicsPV:")>=0 :
-            index = None
 
             try :
                 index = modules_to_run.index("XtcEventBrowser.pyana_epics")
@@ -456,7 +465,12 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             #print "XtcEventBrowser.pyana_epics at ", index
             pvname = str(box.text()).split("PV:")[1]
             options_for_mod[index].append("\npv = %s" % pvname)
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n )
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            return
         
+        print "FIXME! %s requested, not implemented" % box.text() 
+
 
     def write_configuration(self):
         """Write the configuration text (to be written to file later)
@@ -475,9 +489,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 self.add_module(box, modules_to_run, options_for_mod)
 
         nmodules = len(modules_to_run)
-        if nmodules == 0 :
-            print "No modules requested! Please select from list"
-        else :
+        if nmodules > 0 :
             # at the end, append plotter module:
             modules_to_run.append("XtcEventBrowser.pyana_plotter")
             options_for_mod.append([])
