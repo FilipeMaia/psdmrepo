@@ -59,8 +59,7 @@ def main(argv) :
     browser = XtcBrowserMain()
 
     for file in files :
-	browser.add_file(file)
-        print "processing file: ", file
+	browser.add_file_from_cmd(file)
 
     browser.show()
     sys.exit(app.exec_())

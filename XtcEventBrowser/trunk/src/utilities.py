@@ -10,8 +10,13 @@ class PyanaOptions( object ):
         if options_string is None:
             return None
 
+        # make sure there are no newline characters here
+        options_string = options_string.split("\n")
+        options_string = " ".join(options_string)
+
+        # make a list
         options = options_string.split(" ")
-        
+
         if len(options)==0 :
             print "option %s has no items!" % options_string
             return []

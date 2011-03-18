@@ -82,12 +82,8 @@ class  pyana_bld ( object ) :
             if fee_energy_array is None :
                 print "No Gas Detector"
             else :
+                # fee_energy_array is a 4-number vector
                 self.GD_energies.append( fee_energy_array )
-                gdENRC11 = fee_energy_array[0]
-                gdENRC12 = fee_energy_array[1]
-                gdENRC21 = fee_energy_array[2]
-                gdENRC22 = fee_energy_array[3]
-
 
             
         if self.do_PC:

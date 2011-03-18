@@ -101,7 +101,7 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         self.scanner = None
         self.pyanactrl = None
         
-        self.__create_main_frame()
+        self.create_main_frame()
 
 
     def about(self):
@@ -120,7 +120,7 @@ part of it, please give an appropriate acknowledgment.
         
                 
         
-    def __create_main_frame(self):
+    def create_main_frame(self):
 
         # Icon
         self.pic = QtGui.QLabel(self)
@@ -135,48 +135,48 @@ part of it, please give an appropriate acknowledgment.
 
         # Label showing currently selected files
         self.currentfiles = QtGui.QLabel(self);
-        self.__update_currentfiles()
+        self.update_currentfiles()
 
         # Button: open file browser
         self.fbrowser_button = QtGui.QPushButton("&File Browser")
-        self.connect(self.fbrowser_button, QtCore.SIGNAL('clicked()'), self.__file_browser )
+        self.connect(self.fbrowser_button, QtCore.SIGNAL('clicked()'), self.file_browser )
 
         # Button: clear file list
         self.fclear_button = QtGui.QPushButton("&Clear File List")
-        self.connect(self.fclear_button, QtCore.SIGNAL('clicked()'), self.__clear_file_list )
+        self.connect(self.fclear_button, QtCore.SIGNAL('clicked()'), self.clear_file_list )
 
         # Line edit: enter file name
         self.lineedit = QtGui.QLineEdit("")
         self.lineedit.setMinimumWidth(200)
-        self.connect(self.lineedit, QtCore.SIGNAL('returnPressed()'), self.__add_file )
+        self.connect(self.lineedit, QtCore.SIGNAL('returnPressed()'), self.add_file_from_lineedit )
 
         # Button: add file from line edit
         self.addfile_button = QtGui.QPushButton("&Add")
-        self.connect(self.addfile_button, QtCore.SIGNAL('clicked()'), self.__add_file )
+        self.connect(self.addfile_button, QtCore.SIGNAL('clicked()'), self.add_file_from_lineedit )
              
 
         # --- Scan section --- 
         self.scan_button = QtGui.QPushButton("&Scan File(s)")
         self.scan_button.setDisabled(True)
-        self.connect(self.scan_button, QtCore.SIGNAL('clicked()'), self.__scan_files )
+        self.connect(self.scan_button, QtCore.SIGNAL('clicked()'), self.scan_files )
         self.scan_label = QtGui.QLabel(self.scan_button)
         self.scan_label.setText("(Scan all events. Not recommended!)")
         
         self.qscan_button = QtGui.QPushButton("&Quick Scan")
-        self.connect(self.qscan_button, QtCore.SIGNAL('clicked()'), self.__scan_files_quick )
+        self.connect(self.qscan_button, QtCore.SIGNAL('clicked()'), self.scan_files_quick )
         self.nev_qscan = 200
         self.qscan_edit = QtGui.QLineEdit(str(self.nev_qscan))
         self.qscan_edit.setMaximumWidth(100)
-        self.connect(self.qscan_edit, QtCore.SIGNAL('returnPressed()'), self.__change_nev_qscan )
+        self.connect(self.qscan_edit, QtCore.SIGNAL('returnPressed()'), self.change_nev_qscan )
 
         self.qscan_label = QtGui.QLabel(self.qscan_button)
         self.qscan_label.setText("(Scan the first %d events)   " % self.nev_qscan)
 
         # Test matplotlib widget
         self.mpl_button = QtGui.QPushButton("&MatPlotLib")
-        self.connect(self.mpl_button, QtCore.SIGNAL('clicked()'), self.__makeplot )
+        self.connect(self.mpl_button, QtCore.SIGNAL('clicked()'), self.makeplot )
         self.mpl2_button = QtGui.QPushButton("&MatPlotLib2")
-        self.connect(self.mpl2_button, QtCore.SIGNAL('clicked()'), self.__makeplot2 )
+        self.connect(self.mpl2_button, QtCore.SIGNAL('clicked()'), self.makeplot2 )
 
         # Quit application
         self.quit_button = QtGui.QPushButton("&Quit")
@@ -282,12 +282,13 @@ part of it, please give an appropriate acknowledgment.
 
 
 
-    def add_file(self, filename):
+    def add_file_from_cmd(self, filename):
+        """Add file
+        """
         self.filenames.append(filename)
         # add the last file opened to the line dialog
         self.lineedit.setText( str(filename) )
-        self.__update_currentfiles()
-
+        self.update_currentfiles()
 
     #--------------------
     #  Private methods --
@@ -317,7 +318,7 @@ part of it, please give an appropriate acknowledgment.
         self.canvas.draw()
         
         
-    def __makeplot(self):
+    def makeplot(self):
 
         self.fig = plt.figure(200)
         axes = self.fig.add_subplot(111)
@@ -337,7 +338,7 @@ part of it, please give an appropriate acknowledgment.
         
         return
  
-    def __makeplot2(self):
+    def makeplot2(self):
         number = 200
         print "number " , number
         self.fig = draw_on(number)
@@ -408,7 +409,7 @@ part of it, please give an appropriate acknowledgment.
 
 
 
-    def __file_browser(self):
+    def file_browser(self):
         """Opens a Qt File Dialog
 
         Opens a Qt File dialog which allows user
@@ -426,33 +427,33 @@ part of it, please give an appropriate acknowledgment.
 
         # add the last file opened to the line dialog
         self.lineedit.setText( str(file) )
-        self.__update_currentfiles()
+        self.update_currentfiles()
 
 
         
 
 
-    def __add_file(self):
+    def add_file_from_lineedit(self):
         """Add a file to list of files
         
         Add a file to list of files. Input from lineedit
         """
         if self.filenames.count( str(self.lineedit.text()))==0:
             self.filenames.append(str(self.lineedit.text()))
-            self.__update_currentfiles()
+            self.update_currentfiles()
             
-    def __clear_file_list(self):
+    def clear_file_list(self):
         """Empty the file list
         
         """
         self.filenames = []
-        self.__update_currentfiles()
+        self.update_currentfiles()
 
         self.checks = []
         self.checkboxes = []
         
             
-    def __update_currentfiles(self):
+    def update_currentfiles(self):
         """Update status text (list of files)
         """
         status = "Currently selected file(s):       (%d)\n " % len(self.filenames )
@@ -464,11 +465,11 @@ part of it, please give an appropriate acknowledgment.
         self.currentfiles.setText(status)
 
 
-    def __change_nev_qscan(self):
+    def change_nev_qscan(self):
         self.nev_qscan = int(self.qscan_edit.text())
         self.qscan_label.setText("(Scan the first %d events)   "%self.nev_qscan)
         
-    def __scan_files(self):
+    def scan_files(self, quick=False):
         """Scan xtc files
 
         Run XtcScanner to scan the files.
@@ -476,43 +477,25 @@ part of it, please give an appropriate acknowledgment.
         to configure pyana / plotting
         """
         if self.scanner is None:
-            self.scanner = XtcScanner()
-                
-        print self.filenames
-        self.scanner.setFiles(self.filenames)
-        self.scanner.setOption({'ndatagrams':-1}) # all
+            self.scanner = XtcScanner()                
+        self.scanner.setFiles(self.filenames)        
+        if quick :
+            self.scanner.setOption({'ndatagrams':self.nev_qscan})
+        else :
+            self.scanner.setOption({'ndatagrams':-1}) # all
         self.scanner.scan()
 
-        if self.pyanactrl is None : 
-            self.pyanactrl = XtcPyanaControl(parent=self)
-
-        self.pyanactrl.update(devices=self.scanner.devices.keys(),
-                              epicsPVs = self.scanner.epicsPVs,
-                              filenames = self.filenames )
-
-    def __scan_files_quick(self):
-        """Quick scan of xtc files
-
-        Run XtcScanner to scan the first 1000 datagrams of the file(s).
-        When scan is done, open a new Gui Widget
-        to configure pyana / plotting
-        """
-        if self.scanner is None:
-            self.scanner = XtcScanner()
-
-        print self.filenames
-        self.scanner.setFiles(self.filenames)
-        self.scanner.setOption({'ndatagrams':self.nev_qscan})
-        self.scanner.scan()
-
-        #self.__add_selector()
         if self.pyanactrl is None : 
             self.pyanactrl = XtcPyanaControl()
-
         self.pyanactrl.update(devices=self.scanner.devices.keys(),
-                              epicsPVs = self.scanner.epicsPVs,
-                              filenames = self.filenames )
+                              epicsPVs=self.scanner.epicsPVs,
+                              controls=self.scanner.controls,
+                              filenames=self.filenames )
 
+    def scan_files_quick(self):
+        """Quick scan of xtc files
+        """
+        self.scan_files(quick=True)
 
 
 

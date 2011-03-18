@@ -112,7 +112,7 @@ class Plotter(object):
                                       vmin = self.plot_vmin,
                                       vmax = self.plot_vmax )
         self.grid.cbar_axes[p].colorbar(self.axesim)
-
+        plt.draw()
         
     def addtofigure( self, frameimage, title="", fignum=1, subplot=(1,1,1)):
 
@@ -134,6 +134,7 @@ class Plotter(object):
                                   vmin = self.plot_vmin,
                                   vmax = self.plot_vmax )
         self.colb = plt.colorbar(self.axesim,ax=self.axes,pad=0.04,fraction=0.10,shrink=0.90)
+        plt.draw()
 
     def addcolbar(self):
         self.colb = plt.colorbar(self.axesim,ax=self.axes,pad=0.01,fraction=0.10,shrink=0.90)
@@ -185,7 +186,6 @@ class Plotter(object):
         #    print cax
         #for axim in self.axims :
         #    print axim
-
         plt.draw()
 
     def drawframe( self, frameimage, title="", fignum=1):
@@ -233,7 +233,8 @@ class Plotter(object):
             - right-click sets higher limit
             - middle-click resets to original
             """
-
+        plt.draw()
+        
     def onpick(self, event):
         print "Current   threshold = ", self.threshold.minvalue
         print "          active area [xmin xmax ymin ymax] = ", self.threshold.area

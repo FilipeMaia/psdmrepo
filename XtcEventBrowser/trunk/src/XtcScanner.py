@@ -80,6 +80,7 @@ class XtcScanner ( object ) :
     devices = {}
     counters = {}
     epicsPVs = []
+    controls = []
 
     #----------------
     #  Constructor --
@@ -178,7 +179,10 @@ class XtcScanner ( object ) :
         print "  - Events per calib cycle: \n  ", self.nevents
         print
 
-        print "Information from ", len(self.devices), " items found"
+        print "Information from ", len(self.controls), " control channels found:"
+        for ctrl in self.controls :
+            print ctrl
+        print "Information from ", len(self.devices), " devices found"
         sortedkeys = sorted( self.devices.keys() )
         for d in sortedkeys :
             print d, ": \t    ",  
@@ -252,6 +256,12 @@ class XtcScanner ( object ) :
             dkey = dtype + ':' + dname
 
             if self._state == "Configure" :
+                if xtc.contains.id() == TypeId.Type.Id_ControlConfig :
+                    data = xtc.payload()
+                    for i in range(0,data.npvControls()):
+                        pv_control = data.pvControl(i).name()
+                        if pv_control not in self.controls :
+                            self.controls.append( pv_control )
                 if xtc.contains.id() == TypeId.Type.Id_Epics :
                     data = xtc.payload()
                     self.epicsPVs.append(data.sPvName)

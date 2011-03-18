@@ -92,6 +92,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.filenames = []
         self.devices = []
         self.epicsPVs = []
+        self.controls = []
 
         self.checklabels = []
         self.checkboxes = []
@@ -272,8 +273,12 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
             # add epics channels to list of checkboxes, place them in a different widget
             for self.pv in self.epicsPVs:
-                pvtext = "EpicsPV:" + self.pv
+                pvtext = "EpicsPV:  " + self.pv
                 self.pvi = QtGui.QCheckBox(pvtext,self.pvWindow)
+                for ctrl in self.controls: 
+                    if ctrl in pvtext :
+                        self.pvi.setChecked(True)
+
                 self.connect(self.pvi, QtCore.SIGNAL('stateChanged(int)'), self.write_configuration )
                 self.checkboxes.append(self.pvi)
                 self.checklabels.append(self.pvi.text())
@@ -318,13 +323,14 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.pvWindow.show()
         
             
-    def update(self, filenames=[],devices=[],epicsPVs=[]):
+    def update(self, filenames=[],devices=[],epicsPVs=[],controls=[]):
         """Update lists of filenames, devices and epics channels
            Make sure GUI gets updated too
         """
-        self.filenames=filenames
-        self.devices=devices
-        self.epicsPVs=epicsPVs
+        self.filenames = filenames
+        self.devices = devices
+        self.epicsPVs = epicsPVs
+        self.controls = controls
 
         self.update_gui_checkboxes()
 
@@ -335,18 +341,19 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         One checkbox for each Detector/Device found
         in the scan of xtc file
         """
-        if len( self.devices ) == 0 :
-            print "Can't use selector before running the scan"
-            return
+        for ctrl in sorted(self.controls):
+            self.ctrl_label = QtGui.QLabel(self);
+            self.ctrl_label.setText("pvControls = %s"%ctrl)
+            self.lgroup.addWidget(self.ctrl_label)
         
-        for label in sorted( self.devices ):
+        for label in sorted(self.devices) :
             if label.find("ProcInfo") >= 0 : continue  # ignore
             if label.find("NoDetector") >= 0 : continue  # ignore
             
             if self.checklabels.count(label)!=0 : continue # avoid duplicates
 
             # make checkbox for this device
-            checkbox = QtGui.QCheckBox(label, self)
+            checkbox = QtGui.QCheckBox(': '.join(label.split(":")), self)
             self.connect(checkbox, QtCore.SIGNAL('stateChanged(int)'), self.write_configuration )
             
             self.lgroup.addWidget(checkbox)
@@ -464,7 +471,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 options_for_mod.append([])
 
             #print "XtcEventBrowser.pyana_epics at ", index
-            pvname = str(box.text()).split("PV:")[1]
+            pvname = str(box.text()).split("PV:  ")[1]
             options_for_mod[index].append("\npv = %s" % pvname)
             options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n )
             options_for_mod[index].append("\nfignum = %d" % (index+1))
@@ -487,7 +494,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
         modules_to_run = []
         options_for_mod = []
-        self.configuration = ""
+        self.configuration= ""
         for box in self.checkboxes :
             if box.isChecked() :
                 self.add_module(box, modules_to_run, options_for_mod)
@@ -534,6 +541,11 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 self.configuration += options
             count_m +=1
             
+
+        # add linebreaks if needed
+        self.configuration = self.add_linebreaks(self.configuration, width=70)
+        print self.configuration
+
         self.pyana_config.setText(self.configuration)
 
         self.config_button.show()
@@ -541,6 +553,34 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.config_button.setEnabled(True)
         self.econfig_button.setDisabled(True)
 
+    def add_linebreaks(self, configtext, width=70):
+        lines = configtext.split('\n')
+        l = 0
+        for line in lines :
+            if len(line) > width : # split line
+                words = line.split(" ")
+                i = 0
+                newlines = []
+                newline = ""
+                while len(newline) <= width and i <len(words) :
+                    newline += (words[i]+" ")
+                    i += 1
+                    if len(newline) > width or i==len(words):
+                        newlines.append(newline)
+                        newline = "     "
+                        
+                # now replace the original line with newlines
+                l = lines.index(line)
+                lines.remove(line)
+                if len(newlines)>1 :
+                    newlines.reverse()
+                for linje in newlines :
+                    if linje.strip() != '' :
+                        lines.insert(l,linje)
+                    
+        configtext = "\n".join(lines)
+        return configtext
+        
 
     def print_configuration(self):
         print "----------------------------------------"

@@ -34,10 +34,13 @@ import logging
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from utilities import PyanaOptions
-
 import numpy as np
 import matplotlib.pyplot as plt
+
+from pypdsdata import xtc
+
+from utilities import PyanaOptions
+
 
 #----------------------------------
 # Local non-exported definitions --
@@ -82,9 +85,7 @@ class pyana_epics (object) :
         self.n_run    = 0 # run number (resets every begin job / configure )
         self.n_config = 0 # configuration number
 
-
-
-
+        self.pv_controls = {}
 
     #-------------------
     #  Public methods --
@@ -119,6 +120,16 @@ class pyana_epics (object) :
                 #        pv.status, pv.severity, pv.values)
                              
 
+        # Get epics configuration to find the changing PV of this scan
+        epics_config = env.getConfig(xtc.TypeId.Type.Id_ControlConfig)
+        for ic in range (0,epics_config.npvControls() ):
+            pv_control = epics_config.pvControl(ic)
+            if pv_control.array() :
+                print "PV Control appears to be an array... investigate!!"
+
+            # add to dictionary
+            self.pv_controls[ pv_control.name() ] = []
+            
             
     def beginrun( self, evt, env ) :
         """This optional method is called if present at the beginning 
@@ -163,6 +174,13 @@ class pyana_epics (object) :
                 pass
 
 
+        # Get epics configuration to find the changing PV of this scan
+        epics_config = env.getConfig(xtc.TypeId.Type.Id_ControlConfig)
+        for ic in range (0,epics_config.npvControls() ):
+            pv_control = epics_config.pvControl(ic)
+            self.pv_controls[pv_control.name()].append( pv_control.value() )
+
+            
     def event( self, evt, env ) :
         """This method is called for every L1Accept transition.
 
@@ -204,13 +222,10 @@ class pyana_epics (object) :
         """
         
         logging.info( "pyana_epics.endcalibcycle() called" )
-        print "Report from calibcycle #%d"%self.n_calib
+
         for pv_name in self.pv_names :
-
             array = np.float_( self.pv_data_calib[pv_name] )
-
             self.pv_data_all[pv_name].append( array )
-
 
     def endrun( self, env ) :
         """This optional method is called if present at the end of the run.
@@ -231,26 +246,41 @@ class pyana_epics (object) :
 
         
         fignum = self.mpl_num*100
+
+        pv_data_array = None # (ncalib x nevents)
+        pv_mean_array = None # (ncalib x 1)
+        pv_ctrl_array = None # (ncalib x 1)
+
         for pv_name in self.pv_names :
 
-            print len(self.pv_data_all[pv_name])
-
-            # make a 2d array
-            array = np.array( self.pv_data_all[pv_name] )
-
+            # make a 2d array (ncalib,nevents)
+            pv_data_array = np.array( self.pv_data_all[pv_name] )
+            
             # for each calib cycle (axis=0), get the mean vaue of all events (axis=1)
-            meanarray = np.sum(array,axis=1)
+            pv_mean_array = np.sum(pv_data_array,axis=1)
+
 
             fignum += 1
-            self.make_graph(meanarray, fignum=fignum,
-                            xtitle='Scan cycle',
-                            ytitle="%s (average per event)"%pv_name,
-                            suptitle="End of run summary")
+            self.make_graph1(pv_mean_array, fignum=fignum,
+                             xtitle='Scan cycle',
+                             ytitle="%s (average per event)"%pv_name,
+                             suptitle="End of run summary")
+
+            for pv_ctrl_name, values in self.pv_controls.iteritems():
+
+                pv_ctrl_array = np.float_( values )
+
+                self.make_graph2(pv_ctrl_array,pv_mean_array, fignum=fignum+(fignum*10),
+                                 xtitle=pv_ctrl_name,
+                                 ytitle="%s (average per event)"%pv_name,
+                                 suptitle="End of run summary")
+
+
 
     def make_histogram(self, array):
         pass
     
-    def make_graph(self, array, fignum=600, xtitle="",ytitle="",suptitle=""):
+    def make_graph1(self, array, fignum=600, xtitle="",ytitle="",suptitle=""):
         print "Make graph from array ", np.shape(array)
 
         fig = plt.figure(num=fignum, figsize=(8,8) )
@@ -258,6 +288,18 @@ class pyana_epics (object) :
         
         ax1 = fig.add_subplot(111)
         plt.plot(array,'bo:')
+        plt.title('')
+        plt.xlabel(xtitle,horizontalalignment='left') # the other right
+        plt.ylabel(ytitle,horizontalalignment='right')
+        plt.draw()
+
+    def make_graph2(self, array1, array2, fignum=600, xtitle="",ytitle="",suptitle=""):
+
+        fig = plt.figure(num=fignum, figsize=(8,8) )
+        fig.suptitle(suptitle)
+        
+        ax1 = fig.add_subplot(111)
+        plt.plot(array1,array2,'bo:')
         plt.title('')
         plt.xlabel(xtitle,horizontalalignment='left') # the other right
         plt.ylabel(ytitle,horizontalalignment='right')
