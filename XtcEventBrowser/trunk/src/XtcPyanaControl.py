@@ -341,12 +341,14 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         One checkbox for each Detector/Device found
         in the scan of xtc file
         """
-        for ctrl in sorted(self.controls):
+        self.checkboxes = []
+        self.checklabels = []
+        for ctrl in self.controls:
             self.ctrl_label = QtGui.QLabel(self);
             self.ctrl_label.setText("pvControls = %s"%ctrl)
             self.lgroup.addWidget(self.ctrl_label)
         
-        for label in sorted(self.devices) :
+        for label in sorted(self.devices):
             if label.find("ProcInfo") >= 0 : continue  # ignore
             if label.find("NoDetector") >= 0 : continue  # ignore
             
@@ -359,9 +361,9 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             self.lgroup.addWidget(checkbox)
             self.checkboxes.append(checkbox)
             self.checklabels.append(label)
-            
-            # special case: EPICS
-            if label.find("EpicsArch") >= 0 :
+
+            # special case: Epics PVs
+            if label.find("Epics") >= 0 : 
                 self.connect(checkbox, QtCore.SIGNAL('stateChanged(int)'), self.update_gui_epics )
                 self.epics_checkbox = checkbox
                 
@@ -391,6 +393,27 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 options_for_mod[index].append("\ndo_phasecavity = True")
             return
 
+        # --- --- --- Waveform --- --- ---
+        if ( str(box.text()).find("Acq")>=0  or
+             str(box.text()).find("ETof")>=0  or
+             str(box.text()).find("ITof")>=0  or
+             str(box.text()).find("Mbes")>=0  or
+             str(box.text()).find("Camp")>=0  ) :
+            
+            try :
+                index = modules_to_run.index("XtcEventBrowser.pyana_waveform")
+            except ValueError :
+                index = len(modules_to_run)
+                modules_to_run.append("XtcEventBrowser.pyana_waveform")
+                options_for_mod.append([])
+
+            #print "XtcEventBrowser.pyana_ipimb at ", index
+            address = str(box.text()).split(":")[1].strip()
+            options_for_mod[index].append("\nsources = %s" % address)
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            return
+                    
         # --- --- --- Ipimb --- --- ---
         if str(box.text()).find("Ipimb")>=0 :
 
@@ -402,7 +425,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 options_for_mod.append([])
 
             #print "XtcEventBrowser.pyana_ipimb at ", index
-            address = str(box.text()).split(":")[1]
+            address = str(box.text()).split(": ")[1].strip()
             options_for_mod[index].append("\nipimb_addresses = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
             options_for_mod[index].append("\nfignum = %d" % (index+1))
@@ -421,7 +444,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 options_for_mod.append([])
 
             #print "XtcEventBrowser.pyana_image at ", index
-            address = str(box.text()).split(":")[1]
+            address = str(box.text()).split(": ")[1].strip()
             options_for_mod[index].append("\nimage_addresses = %s" % address)
             options_for_mod[index].append("\nimage_rotations = " )
             options_for_mod[index].append("\nimage_shifts = " )
@@ -446,7 +469,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 options_for_mod.append([])
 
             #print "XtcEventBrowser.pyana_cspad at ", index
-            address = str(box.text()).split(":")[1]
+            address = str(box.text()).split(":")[1].strip()
             options_for_mod[index].append("\nimage_source = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
             options_for_mod[index].append("\nfignum = %d" % (index+1))
@@ -495,7 +518,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         modules_to_run = []
         options_for_mod = []
         self.configuration= ""
-        for box in self.checkboxes :
+        for box in sorted(self.checkboxes):
             if box.isChecked() :
                 self.add_module(box, modules_to_run, options_for_mod)
 

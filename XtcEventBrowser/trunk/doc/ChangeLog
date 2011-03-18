@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Mar-18 ofte V00-00-17     rev 1611
+        - Some tweaking. And a tag
+
 2011-Mar-18 ofte                rev 1609
         - Epics PV controls variable now in xtcscanner, pyana GUI and pyana_epics.py
 	- pyana_misc.py and pyana_pnccd.py removed. 

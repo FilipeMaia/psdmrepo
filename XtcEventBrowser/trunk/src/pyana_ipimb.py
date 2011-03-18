@@ -89,8 +89,6 @@ class  pyana_ipimb ( object ) :
     def make_plots(self, fignum = 1, suptitle = ""):
         ncols = 3
         nrows = len(self.ipimb_addresses)
-        print "Will now start to produce plots from %d IPMs in %d rows and %d columns" % \
-              (len(self.ipimb_addresses), nrows, ncols)
 
         fig = plt.figure(num=fignum, figsize=(10*ncols/2,10*nrows/2) )
         fig.clf()
@@ -103,7 +101,6 @@ class  pyana_ipimb ( object ) :
             i+=1
             ax1 = fig.add_subplot(nrows, ncols, i)
             array = np.float_(self.fex_sum[addr])
-            print "plot 1) shape of array = ", np.shape(array)
             plt.hist(array, 60)
             plt.title(addr)
             plt.xlabel('Sum of channels',horizontalalignment='left') # the other right
@@ -111,7 +108,6 @@ class  pyana_ipimb ( object ) :
             i+=1
             ax2 = fig.add_subplot(nrows, ncols, i)
             array = np.float_(self.fex_channels[addr])
-            print "plot 2) shape of array = ", np.shape(array)
             xaxis = np.arange( 0, len(self.fex_channels[addr]) )
             plt.plot(xaxis, array[:,0],xaxis, array[:,1],xaxis, array[:,2],xaxis, array[:,3])
             plt.title(addr)
@@ -121,8 +117,6 @@ class  pyana_ipimb ( object ) :
             i+=1
             ax3 = fig.add_subplot(nrows, ncols, i)
             array2 = np.float_(self.fex_position[addr])
-            print "plot 3) shape of array = ", np.shape(array2)
-
             plt.scatter(array2[:,0],array2[:,1])
             plt.title(addr)
             plt.xlabel('Beam position X',horizontalalignment='left')

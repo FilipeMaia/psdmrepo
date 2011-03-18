@@ -118,6 +118,11 @@ class XtcScanner ( object ) :
         For each xtc datagram that is of type
         datagram.xtc, call _scan.
         """
+        # reset:
+        self.devices = {}
+        self.counters = {}
+        self.epicsPVs = []
+        self.controls = []
 
         if len(self.files)==0 :
             print "You need to select an xtc file"

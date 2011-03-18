@@ -18,20 +18,15 @@ class PyanaOptions( object ):
         options = options_string.split(" ")
 
         if len(options)==0 :
-            print "option %s has no items!" % options_string
             return []
 
         elif len(options)==1 :
-            print "option %s has one item" % options_string
-
             if ( options_string == "" or
                  options_string == "None" or
                  options_string == "No" ) :
                 return []
 
-        elif len(options)>1 :
-            print "option %s has %d items" % (options_string, len(options))
-
+        # all other cases:
         return options
 
 

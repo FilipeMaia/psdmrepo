@@ -161,6 +161,9 @@ part of it, please give an appropriate acknowledgment.
         self.connect(self.scan_button, QtCore.SIGNAL('clicked()'), self.scan_files )
         self.scan_label = QtGui.QLabel(self.scan_button)
         self.scan_label.setText("(Scan all events. Not recommended!)")
+
+        self.scan_enable_button = QtGui.QPushButton("&Enable")
+        self.connect(self.scan_enable_button, QtCore.SIGNAL('clicked()'), self.scan_enable )
         
         self.qscan_button = QtGui.QPushButton("&Quick Scan")
         self.connect(self.qscan_button, QtCore.SIGNAL('clicked()'), self.scan_files_quick )
@@ -233,6 +236,7 @@ part of it, please give an appropriate acknowledgment.
         hs1 = QtGui.QHBoxLayout()
         hs1.addWidget( self.scan_button )
         hs1.addWidget( self.scan_label )
+        hs1.addWidget( self.scan_enable_button )
 
         v3 = QtGui.QVBoxLayout()
         v3.addLayout( hs0 )
@@ -469,6 +473,10 @@ part of it, please give an appropriate acknowledgment.
         self.nev_qscan = int(self.qscan_edit.text())
         self.qscan_label.setText("(Scan the first %d events)   "%self.nev_qscan)
         
+    def scan_enable(self) :
+        if self.scan_button :
+            self.scan_button.setEnabled(True)
+
     def scan_files(self, quick=False):
         """Scan xtc files
 
@@ -491,6 +499,9 @@ part of it, please give an appropriate acknowledgment.
                               epicsPVs=self.scanner.epicsPVs,
                               controls=self.scanner.controls,
                               filenames=self.filenames )
+        if self.scan_button :
+            self.scan_button.setDisabled(True)
+
 
     def scan_files_quick(self):
         """Quick scan of xtc files
