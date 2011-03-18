@@ -188,9 +188,9 @@ class ConfigParameters ( object ) :
 
         self.correlationWindowParameters = []
         for win in range(self.correlationNWindowsMax) :
-            self.correlationWindowParameters.append(['None', 'None',    0, None, None])
-                                                   #[ Ypar,   Xpar, Radio, Ymin, Ymax]
-
+            self.correlationWindowParameters.append(['None','None',    0, None, None, None, None,'None','None', None, None])
+                                                   #[ Ydsn,  Xdsn, Radio, Ymin, Ymax, Xmin, Xmax, Ypar,  Xpar,  Yind, Xind]
+                                                   #[    0,     1,     2,    3,    4,    5,    6,    7,     8,     9,   10]
 
         self.correlationsIsOn  = True
        #self.perEventDistIsOn  = True
@@ -342,15 +342,21 @@ class ConfigParameters ( object ) :
 
             print 'CORR_WINDOW_NUMBER',    win 
             print 'CORR_YDATASET',         self.correlationWindowParameters[win][0] 
-            print 'CORR_YDATASET',         self.correlationWindowParameters[win][1] 
+            print 'CORR_XDATASET',         self.correlationWindowParameters[win][1] 
             print 'CORR_XPARRADIO',        self.correlationWindowParameters[win][2] 
             print 'CORR_YMIN',             self.correlationWindowParameters[win][3] 
             print 'CORR_YMAX',             self.correlationWindowParameters[win][4] 
+            print 'CORR_XMIN',             self.correlationWindowParameters[win][5] 
+            print 'CORR_XMAX',             self.correlationWindowParameters[win][6] 
+            print 'CORR_YPARNAME',         self.correlationWindowParameters[win][7] 
+            print 'CORR_XPARNAME',         self.correlationWindowParameters[win][8] 
+            print 'CORR_YPARINDEX',        self.correlationWindowParameters[win][9] 
+            print 'CORR_XPARINDEX',        self.correlationWindowParameters[win][10] 
 
         print 'NUM_EVENTS_FOR_AVERAGE',    self.numEventsAverage
         print 'SELECTION_IS_ON',           self.selectionIsOn
 
-        print 'PER_EVENT_DIST_IS_ON',      self.perEventDistIsOn
+       #print 'PER_EVENT_DIST_IS_ON',      self.perEventDistIsOn
         print 'CORRELATIONS_IS_ON',        self.correlationsIsOn
 
         print 'PROJ_CENTER_X',             self.projCenterX         
@@ -466,7 +472,7 @@ class ConfigParameters ( object ) :
                 elif key == 'IMAGE_BIN_WIDTH_IS_ON'    : self.imageBinWidthIsOn       = dicBool[val.lower()]
                 elif key == 'IMAGE_DATASET'            : self.imageDataset            = val
 
-                elif key == 'PER_EVENT_DIST_IS_ON'     : self.perEventDistIsOn        = dicBool[val.lower()]
+               #elif key == 'PER_EVENT_DIST_IS_ON'     : self.perEventDistIsOn        = dicBool[val.lower()]
                 elif key == 'CORRELATIONS_IS_ON'       : self.correlationsIsOn        = dicBool[val.lower()]
 
                 elif key == 'WAVEF_N_WINDOWS_MAX'      : self.waveformNWindowsMax     = int(val)
@@ -508,7 +514,12 @@ class ConfigParameters ( object ) :
                 elif key == 'CORR_XPARRADIO'           : self.correlationWindowParameters[win][2] = int(val)
                 elif key == 'CORR_YMIN'                : self.correlationWindowParameters[win][3] = self.getValIntOrNone(val)
                 elif key == 'CORR_YMAX'                : self.correlationWindowParameters[win][4] = self.getValIntOrNone(val)
-
+                elif key == 'CORR_XMIN'                : self.correlationWindowParameters[win][5] = self.getValIntOrNone(val)      
+                elif key == 'CORR_XMAX'                : self.correlationWindowParameters[win][6] = self.getValIntOrNone(val)      
+                elif key == 'CORR_YPARNAME'            : self.correlationWindowParameters[win][7] = val  
+                elif key == 'CORR_XPARNAME'            : self.correlationWindowParameters[win][8] = val  
+                elif key == 'CORR_YPARINDEX'           : self.correlationWindowParameters[win][9] = self.getValIntOrNone(val) 
+                elif key == 'CORR_XPARINDEX'           : self.correlationWindowParameters[win][10]= self.getValIntOrNone(val) 
 
                 elif key == 'PROJ_CENTER_X'            : self.projCenterX           = int(val)
                 elif key == 'PROJ_CENTER_Y'            : self.projCenterY           = int(val)
@@ -623,7 +634,7 @@ class ConfigParameters ( object ) :
         f.write('IMAGE_BIN_WIDTH_IS_ON'     + space + str(self.imageBinWidthIsOn)       + '\n')
         f.write('IMAGE_DATASET'             + space + str(self.imageDataset)            + '\n')
 
-        f.write('PER_EVENT_DIST_IS_ON'      + space + str(self.perEventDistIsOn)        + '\n')
+       #f.write('PER_EVENT_DIST_IS_ON'      + space + str(self.perEventDistIsOn)        + '\n')
         f.write('CORRELATIONS_IS_ON'        + space + str(self.correlationsIsOn)        + '\n')
 
         f.write('NUM_EVENTS_FOR_AVERAGE'+ space + str( self.numEventsAverage )          + '\n')
@@ -673,6 +684,12 @@ class ConfigParameters ( object ) :
             f.write('CORR_XPARRADIO'        + space + str(self.correlationWindowParameters[win][2] ) + '\n')
             f.write('CORR_YMIN'             + space + str(self.correlationWindowParameters[win][3] ) + '\n')
             f.write('CORR_YMAX'             + space + str(self.correlationWindowParameters[win][4] ) + '\n')
+            f.write('CORR_XMIN'             + space + str(self.correlationWindowParameters[win][5] ) + '\n') 
+            f.write('CORR_XMAX'             + space + str(self.correlationWindowParameters[win][6] ) + '\n') 
+            f.write('CORR_YPARNAME'         + space + str(self.correlationWindowParameters[win][7] ) + '\n') 
+            f.write('CORR_XPARNAME'         + space + str(self.correlationWindowParameters[win][8] ) + '\n') 
+            f.write('CORR_YPARINDEX'        + space + str(self.correlationWindowParameters[win][9] ) + '\n') 
+            f.write('CORR_XPARINDEX'        + space + str(self.correlationWindowParameters[win][10]) + '\n') 
 
         f.write('PROJ_CENTER_X'                     + space + str(self.projCenterX         )       + '\n')
         f.write('PROJ_CENTER_Y'                     + space + str(self.projCenterY         )       + '\n')

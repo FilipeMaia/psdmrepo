@@ -61,104 +61,58 @@ class PlotsForCorrelations ( object ) :
   
 
     def plotCorrelations ( self, fig, dsY, dsX=None ) :
+
         
         win = fig.nwin
+        Ydsname   = cp.confpars.correlationWindowParameters[win][0] 
+        Xdsname   = cp.confpars.correlationWindowParameters[win][1] 
         radioXPar = cp.confpars.correlationWindowParameters[win][2] 
+        YParName  = cp.confpars.correlationWindowParameters[win][7] 
+        XParName  = cp.confpars.correlationWindowParameters[win][8] 
+        #YParInd   = cp.confpars.correlationWindowParameters[win][9] 
+        #XParInd   = cp.confpars.correlationWindowParameters[win][10] 
 
         nYpoints = dsY.shape[0]
-
-
         print '\nNew Win:', win, ' Correlation plot for nYpoints =', nYpoints 
 
+        self.Yarr = dsY[YParName]
+        print 'Y-Parameter array :\n', self.Yarr
 
-        #self.arr1ev = ds[cp.confpars.eventCurrent]
+        self.markerStyle = 'bs-'
 
-        print 'dsY=',dsY
+        if   radioXPar == 0 : # for Index
+            self.Xarr = range(nYpoints)
+            print 'Index array from 0 to', nYpoints
+            self.XTitle = 'Index'
+            self.PlotTitle = 'Parameter vs Index'
+            
+        elif radioXPar == 1 : # for Time
+            self.Xarr = 0.000000001 * dsX['nanoseconds'] + dsX['seconds']
+            self.Xarr -= self.Xarr[0]
+            print 'Time array :\n', self.Xarr 
+            self.XTitle = 'Time (sec)'
+            self.PlotTitle = 'Parameter vs Time'
 
-        Yarr = np.zeros( (nYpoints), dtype=np.int16 )
-        for ind in range (nYpoints) :
-            #print ind, dsY[ind][5] 
-            Yarr[ind] = dsY[ind][5]
-
-        Xarr = range(nYpoints)
+        elif radioXPar == 2 : # for X-Parameter
+            self.Xarr = dsX[XParName]
+            print 'X-Parameter array :\n', self.Xarr
+            self.XTitle = XParName
+            self.PlotTitle = 'Correlations of two parameters'
+            self.markerStyle = 'bo-'
 
         plt.clf()
-        plt.plot(Xarr, Yarr, 'b-')
+        plt.plot(self.Xarr, self.Yarr, self.markerStyle, markersize=2)
+        plt.ylabel(YParName)
+        plt.xlabel(self.XTitle)
+        plt.title(self.PlotTitle,color='r',fontsize=20) # pars like in class Text
+        fig.canvas.set_window_title(Ydsname)
+ 
         plt.show()
 
 
 
-
-
-    def plotWFWaveform( self, ds1ev, fig ):
-        """Plot waveform from input array."""
-
-        print 'plotWFWaveform'
-        print 'ds1ev.shape', ds1ev.shape
-        numberOfWF, par2, dimX = ds1ev.shape
-        #print 'numberOfWF, par2, dimX = ', numberOfWF, par2, dimX
-        #print 'arrwf.shape', arrwf.shape
-
-        nwin = fig.nwin
-        indwf1 = cp.confpars.waveformWindowParameters[nwin][7]
-        indwf2 = cp.confpars.waveformWindowParameters[nwin][8]
-        indwf3 = cp.confpars.waveformWindowParameters[nwin][9]
-        indwf4 = cp.confpars.waveformWindowParameters[nwin][10]
-
-        arrT = range(dimX)
-        #arrZ = zeros( (dimX) )
-
-        par = []
-
-        if indwf1 != None : par.append( (arrT, ds1ev[indwf1,0,...], 'k-') )
-        if indwf2 != None : par.append( (arrT, ds1ev[indwf2,0,...], 'r-') )
-        if indwf3 != None : par.append( (arrT, ds1ev[indwf3,0,...], 'g-') )
-        if indwf4 != None : par.append( (arrT, ds1ev[indwf4,0,...], 'b-') )
-
-        fig.canvas.set_window_title(cp.confpars.current_item_name_for_title) 
-        plt.clf() # clear plot
-        fig.subplots_adjust(left=0.10, bottom=0.05, right=0.95, top=0.94, wspace=0.1, hspace=0.1)        
-
-        print 'Number of waves to draw =', len(par) 
-
-        if len(par) == 1 :
-            plt.plot( par[0][0],par[0][1],par[0][2] )
-
-        elif len(par) == 2 :
-            plt.plot( par[0][0],par[0][1],par[0][2],\
-                      par[1][0],par[1][1],par[1][2] )
-
-        elif len(par) == 3 :
-            plt.plot( par[0][0],par[0][1],par[0][2],\
-                      par[1][0],par[1][1],par[1][2],\
-                      par[2][0],par[2][1],par[2][2] )
-            
-        elif len(par) == 4 :
-            plt.plot( par[0][0],par[0][1],par[0][2],\
-                      par[1][0],par[1][1],par[1][2],\
-                      par[2][0],par[2][1],par[2][2],\
-                      par[3][0],par[3][1],par[3][2] )
-        else :
-            print 'Wrong number of waves !!!', len(par) 
-
-        autoRangeIsOn = cp.confpars.waveformWindowParameters[nwin][1]
-
-        if autoRangeIsOn : pass
-        else :
-            plt.xlim(cp.confpars.waveformWindowParameters[nwin][4],\
-                     cp.confpars.waveformWindowParameters[nwin][5]  )
-
-            plt.ylim(cp.confpars.waveformWindowParameters[nwin][2],\
-                     cp.confpars.waveformWindowParameters[nwin][3]  )
-            
-
-
         
-        str_title='Waveform, event ' + str(cp.confpars.eventCurrent)
-        
-        plt.title(str_title,color='r',fontsize=20) # pars like in class Text
-        ##plt.xlabel('X pixels')
-        ##plt.ylabel('Y pixels')
+
         
 #--------------------------------
 #  In case someone decides to run this module

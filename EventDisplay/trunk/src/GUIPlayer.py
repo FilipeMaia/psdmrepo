@@ -115,9 +115,10 @@ class GUIPlayer ( QtGui.QWidget ) :
         self.butAverage   = QtGui.QPushButton("Average")
         self.butCorr      = QtGui.QPushButton("Correlations")
 
-       #self.avevEdit     .setStyleSheet("background-color: rgb(0, 255, 0); color: rgb(0, 0, 0)")
-        self.butAverage   .setStyleSheet("background-color: rgb(0, 255, 0); color: rgb(0, 0, 0)")
-        self.butCorr      .setStyleSheet("background-color: magenta; color: rgb(0, 0, 0)")
+        #self.butAverage   .setStyleSheet("background-color: rgb(0, 255, 0); color: rgb(0, 0, 0)")
+        #self.butCorr      .setStyleSheet("background-color: magenta; color: rgb(0, 0, 0)")
+        self.butAverage   .setStyleSheet("background-color: rgb(230, 255, 230); color: rgb(0, 0, 0)")
+        self.butCorr      .setStyleSheet("background-color: rgb(255, 230, 255); color: rgb(0, 0, 0)")
 
         #self.closeplts= QtGui.QPushButton("Close plots")
         #self.exit     = QtGui.QPushButton("Exit")

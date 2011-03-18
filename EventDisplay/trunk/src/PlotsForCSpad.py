@@ -214,7 +214,7 @@ class PlotsForCSpad ( object ) :
 
 
     def getImageArrayForDet( self, arr1ev ):
-        """Returns the image array for entire CSpad detector"""
+        """Returns the image array for entire CSpad detector"""       
 
         if cp.confpars.eventCurrent == self.eventWithAlreadyGeneratedCSpadDetImage :
             #print 'Use already generated image for CSpad and save time'

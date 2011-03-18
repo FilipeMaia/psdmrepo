@@ -298,6 +298,35 @@ def print_dataset_metadata_from_file(dsname):
     print 'Path: %s\nItem: %s' % (os.path.split(str(dsname)))
     f.close()
     print 70*'='
+
+
+#----------------------------------
+
+def getListOfDatasetParNames(dsname=None):
+    """Makes a list of the dataset parameter names"""
+
+    listOfDatasetParNames = []
+    if dsname=='None'  or \
+       dsname=='Index' or \
+       dsname=='Time'  or \
+       dsname=='Select X parameter' :
+
+        listOfDatasetParNames.append('None')
+        return listOfDatasetParNames
+
+    fname = cp.confpars.dirName+'/'+cp.confpars.fileName
+    f = h5py.File(fname, 'r') # open read-only
+    ds = f[dsname]
+
+    for parName in ds.dtype.names :
+        print parName
+        listOfDatasetParNames.append(parName)
+
+    f.close()
+
+    listOfDatasetParNames.append('None')
+    return listOfDatasetParNames
+
                             
 #----------------------------------
 #

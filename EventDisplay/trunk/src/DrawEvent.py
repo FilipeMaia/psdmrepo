@@ -257,6 +257,9 @@ class DrawEvent ( object ) :
                     self.ave1ev[ind] /= self.numEventsSelected
 
             elif option == 5 :                                   # Draw averaged dataset
+
+                #print 'Plot the dataset', dsname, '\naveraged over .numEventsSelected=', self.numEventsSelected
+
                 self.plotsCSpad.resetEventWithAlreadyGeneratedCSpadDetImage()
                 self.drawArrayForDSName(self.avedsname[ind], self.ave1ev[ind])
 
@@ -604,8 +607,16 @@ class DrawEvent ( object ) :
         #print 'set_window_position()'
         #plt.get_current_fig_manager().window.move(890, 100) #### This works!
         fig_QMainWindow = plt.get_current_fig_manager().window
-        posx = cp.confpars.posGUIMain[0] + 460 + 50*self.figNum
-        posy = cp.confpars.posGUIMain[1]       + 20*(self.figNum-1)
+
+        if self.figNum<100 :
+            self.figOffsetNum = 0
+            self.figOffsetX   = 460
+        else :
+            self.figOffsetNum = 100
+            self.figOffsetX   = 500
+
+        posx = cp.confpars.posGUIMain[0] + self.figOffsetX + 50*(self.figNum-self.figOffsetNum)
+        posy = cp.confpars.posGUIMain[1]                   + 20*(self.figNum-self.figOffsetNum-1)
         fig_QMainWindow.move(posx,posy)
         #fig_QMainWindow.move(820+50*self.figNum, 20*(self.figNum-1)) #### This works!
 
@@ -627,7 +638,6 @@ class DrawEvent ( object ) :
         self.drawCorrelationPlotsFromOpenFile()
         self.closeHDF5File()
 
-
     def drawCorrelationPlotsFromOpenFile ( self ) :
 
         #cp.confpars.correlationNWindowsMax 
@@ -637,15 +647,34 @@ class DrawEvent ( object ) :
 
         for self.nwin in range(cp.confpars.correlationNWindows) :
 
-            Ydsname = cp.confpars.correlationWindowParameters[self.nwin][0]
-            Xdsname = cp.confpars.correlationWindowParameters[self.nwin][1]
-            dsY     = self.h5file[Ydsname]
-            print 'dsY.shape=',dsY.shape
-            dsX     = None
+            Ydsname   = cp.confpars.correlationWindowParameters[self.nwin][0]
+            Xdsname   = cp.confpars.correlationWindowParameters[self.nwin][1]
+            radioXPar = cp.confpars.correlationWindowParameters[self.nwin][2] 
+
+            if Ydsname == 'None' :
+                print 'THE Ydsname IS SET INCORRECTLY TO', Ydsname, ' THE CORRELATION PLOT', self.nwin,' IS IGNORED'
+                continue
+
+            self.dsY     = self.h5file[Ydsname]
+            print 'dsY.shape=',self.dsY.shape
+
+            if radioXPar == 0 : # for Index
+                self.dsX = None
+
+            if radioXPar == 1 : # for Time
+                Xdsname  = printh5.get_item_path_to_last_name(Ydsname) + '/time'
+                print 'Xdsname =',Xdsname 
+                self.dsX = self.h5file[Xdsname]
+
+            if radioXPar == 2 : # for X-Parameter
+                if Xdsname == 'None' :
+                    print 'THE Xdsname IS SET INCORRECTLY TO', Xdsname, ' THE CORRELATION PLOT', self.nwin,' IS IGNORED' 
+                    continue
+                self.dsX = self.h5file[Xdsname]
 
             self.figNum += 1 
             if cp.confpars.correlationsIsOn : 
-                self.plotsCorrelations.plotCorrelations(self.set_fig('2x1'), dsY, dsX)
+                self.plotsCorrelations.plotCorrelations(self.set_fig('2x1'), self.dsY, self.dsX)
             else : self.close_fig(self.figNum)
 
 
