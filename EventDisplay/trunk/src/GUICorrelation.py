@@ -109,8 +109,8 @@ class GUICorrelation ( QtGui.QWidget ) :
     def showToolTips(self):
         # Tips for buttons and fields:
         #self            .setToolTip('Click on QUAD or PAIR number using mouse left button')
-        self.butMenuNWin.setToolTip('Click mouse left on this button\nand select the number of windows\nfor selection.')
-
+        self.butMenuNWin.setToolTip('Click on mouse left button\n' +
+                                    'and select the number of correlation plots.')
 
     def resizeEvent(self, e):
         #print 'resizeEvent' 

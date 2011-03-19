@@ -86,6 +86,7 @@ def coordinateToIndex(V,VRange) :
 
 def transformCartToPolarArray(arr, RRange, ThetaRange, origin) :
     """Input Cartesian array elements are summed together in 2D polar array bins"""
+
     dimY,dimX = arr.shape 
     x = np.arange(dimX) - origin[0]
     y = np.arange(dimY) - origin[1]
@@ -102,14 +103,19 @@ def transformCartToPolarArray(arr, RRange, ThetaRange, origin) :
     
 #----------------------------------    
 
-def rebinArray(arr, XRange, YRange) :
+def rebinArray(arr2d, XRange, YRange) :
     """Input 2D array elements are summed together in new 2D array bins"""
+
+    arr = arr2d[YRange[0]:YRange[1],XRange[0]:XRange[1]]
+    XRangeOff = (0,XRange[1]-XRange[0],XRange[2])
+    YRangeOff = (0,YRange[1]-YRange[0],YRange[2])
+
     dimY,dimX = arr.shape 
     x = np.arange(dimX)
     y = np.arange(dimY)
     X, Y   = np.meshgrid(x, y)
-    iXnew = coordinateToIndex(X,XRange)
-    iYnew = coordinateToIndex(Y,YRange)
+    iXnew = coordinateToIndex(X,XRangeOff)
+    iYnew = coordinateToIndex(Y,YRangeOff)
     i1D = iXnew + iYnew * XRange[2]
     i1DInNew = np.arange(XRange[2] * YRange[2], dtype=np.int32)
     
@@ -162,6 +168,20 @@ def getCartesianArray() :
 #----------------------------------
 #----------------------------------
 
+def draw2DImage(arr, showTimeSec=None, winTitle='Three images') :
+    """Graphical presentation for three 2D arrays.""" 
+
+    plt.ion() 
+    fig = plt.figure(figsize=(6,4), dpi=80, facecolor='w',edgecolor='w',frameon=True)
+    #fig.subplots_adjust(left=0.10, bottom=0.05, right=0.98, top=0.94, wspace=0.3, hspace=0)
+    fig.canvas.set_window_title(winTitle) 
+    plt.clf() 
+    #plt.get_current_fig_manager().window.move(100,0)
+    drawImage(arr,'Image and Spectrum')
+
+    drawOrShow(showTimeSec)
+
+
 def drawImageAndSpectrum(arr, showTimeSec=None, winTitle='Three images') :
     """Graphical presentation for three 2D arrays.""" 
 
@@ -170,7 +190,7 @@ def drawImageAndSpectrum(arr, showTimeSec=None, winTitle='Three images') :
     #fig.subplots_adjust(left=0.10, bottom=0.05, right=0.98, top=0.94, wspace=0.3, hspace=0)
     fig.canvas.set_window_title(winTitle) 
     plt.clf() 
-    plt.get_current_fig_manager().window.move(100,0)
+    #plt.get_current_fig_manager().window.move(100,0)
 
     plt.subplot2grid((10,10), (0,0), rowspan=7, colspan=10)  
     drawImage(arr,'Image and Spectrum')
@@ -217,7 +237,7 @@ def drawHistogram(arr) :
 
 def mainTest() :
     arr = getCartesianArray()
-    drawImageAndSpectrum(arr, showTimeSec=0)
+    draw2DImage(arr, showTimeSec=0)
     plt.get_current_fig_manager().window.move(10,10)
 
     origin     = (0,0)
@@ -225,15 +245,15 @@ def mainTest() :
     ThetaRange = (0,90,90)
 
     polar_arr = transformCartToPolarArray(arr, RRange, ThetaRange, origin)
-    drawImageAndSpectrum(polar_arr, showTimeSec=0)
-    plt.get_current_fig_manager().window.move(40,20)
+    draw2DImage(polar_arr, showTimeSec=0)
+    plt.get_current_fig_manager().window.move(500,10)
 
     XRange     = (0,200,100)
     YRange     = (0,100,50)
 
     rebinned_arr = rebinArray(arr, XRange, YRange)
-    drawImageAndSpectrum(rebinned_arr, showTimeSec=0) #'show')
-    plt.get_current_fig_manager().window.move(70,30)
+    draw2DImage(rebinned_arr, showTimeSec=0)
+    plt.get_current_fig_manager().window.move(10,394)
 
     drawOrShow(showTimeSec='show')
 

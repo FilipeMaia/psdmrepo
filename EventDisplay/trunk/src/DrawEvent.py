@@ -43,13 +43,16 @@ from PyQt4 import QtGui
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import ConfigParameters     as cp
-import ConfigCSpad          as cs
-import PlotsForCSpad        as cspad
-import PlotsForImage        as image
-import PlotsForWaveform     as wavef
-import PlotsForCorrelations as corrs
-import PrintHDF5            as printh5
+import ConfigParameters          as cp
+import ConfigCSpad               as cs
+import PlotsForCSpad             as cspad
+import PlotsForImage             as image
+import PlotsForWaveform          as wavef
+import PlotsForCorrelations      as corrs
+import PlotsForCSpadProjections  as cspadproj
+import PlotsForImageProjections  as imageproj
+
+import PrintHDF5                 as printh5
 
 #---------------------
 #  Class definition --
@@ -72,6 +75,8 @@ class DrawEvent ( object ) :
         self.plotsImage             = image.PlotsForImage()
         self.plotsWaveform          = wavef.PlotsForWaveform()
         self.plotsCorrelations      = corrs.PlotsForCorrelations()
+        self.plotsCSpadProj         = cspadproj.PlotsForCSpadProjections(self.plotsCSpad)
+        self.plotsImageProj         = imageproj.PlotsForImageProjections()
         
         self.list_of_open_figs      = []
         self.parent                 = parent
@@ -446,7 +451,31 @@ class DrawEvent ( object ) :
             if cp.confpars.cspadSpectrum08IsOn : 
                 self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=8)
             else : self.close_fig(self.figNum)
+
+
+
+            self.figNum += 1 
+            if cp.confpars.cspadProjXIsOn : 
+                self.plotsCSpadProj.plotProjX(arr1ev,self.set_fig('1x1'))
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.cspadProjYIsOn : 
+                self.plotsCSpadProj.plotProjY(arr1ev,self.set_fig('1x1'))
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.cspadProjRIsOn : 
+                self.plotsCSpadProj.plotProjR(arr1ev,self.set_fig('1x1'))
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.cspadProjPhiIsOn : 
+                self.plotsCSpadProj.plotProjPhi(arr1ev,self.set_fig('1x1'))
+            else : self.close_fig(self.figNum)
             
+
+
             for nwin in range(cp.confpars.cspadImageNWindowsMax) :
                 self.figNum += 1 
                 if cp.confpars.cspadImageDetIsOn and nwin < cp.confpars.cspadImageNWindows : 
@@ -490,6 +519,10 @@ class DrawEvent ( object ) :
         or cp.confpars.cspadImageQuadIsOn   \
         or cp.confpars.cspadImageOfPairIsOn \
         or cp.confpars.cspadImageIsOn       \
+        or cp.confpars.cspadProjXIsOn       \
+        or cp.confpars.cspadProjYIsOn       \
+        or cp.confpars.cspadProjRIsOn       \
+        or cp.confpars.cspadProjPhiIsOn     \
         or cp.confpars.cspadSpectrumIsOn    \
         or cp.confpars.cspadSpectrum08IsOn  : 
 
@@ -629,11 +662,16 @@ class DrawEvent ( object ) :
             plt.close(figNum)
             if figNum in self.list_of_open_figs : self.list_of_open_figs.remove(figNum)
 
-
+#-----------------------------------------
 
     def drawCorrelationPlots ( self ) :
         """Draw Correlation Plots"""
 
+        if not cp.confpars.correlationsIsOn :
+            print 'Check the "Correlations" checkbox in the "What to display?" GUI\n' +\
+                  'and set the correlation plot(s) parameters.'
+            return
+        
         self.openHDF5File()
         self.drawCorrelationPlotsFromOpenFile()
         self.closeHDF5File()
@@ -677,7 +715,7 @@ class DrawEvent ( object ) :
                 self.plotsCorrelations.plotCorrelations(self.set_fig('2x1'), self.dsY, self.dsX)
             else : self.close_fig(self.figNum)
 
-
+#-----------------------------------------
 #
 #  In case someone decides to run this module
 #

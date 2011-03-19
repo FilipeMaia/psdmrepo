@@ -138,9 +138,9 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         grid.addWidget(self.butCorrXDataSet,     3, 1, 1, 4)
         grid.addWidget(self.butCorrXParName,     3, 5)
         
-        grid.addWidget(self.titYminmax,          4, 0, 1, 2)
-        grid.addWidget(self.editCorrelationYmin, 4, 2)
-        grid.addWidget(self.editCorrelationYmax, 4, 3)
+        #grid.addWidget(self.titYminmax,          4, 0, 1, 2)
+        #grid.addWidget(self.editCorrelationYmin, 4, 2)
+        #grid.addWidget(self.editCorrelationYmax, 4, 3)
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(grid) 
@@ -176,9 +176,10 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.radioVsIndex      .setToolTip('Select X axis parameter between Index/Time/Parameter')
         self.radioVsTime       .setToolTip('Select X axis parameter between Index/Time/Parameter')
         self.radioVsXPar       .setToolTip('Select X axis parameter between Index/Time/Parameter')
-        #self.editSelectionYmin.setToolTip('This field can be edited for Manual control only.')
-        #self.editSelectionYmax.setToolTip('This field can be edited for Manual control only.')
-
+        self.butCorrYDataSet   .setToolTip('Select the dataset for the Y axis parameter.\n' +\
+                                           'The list of datasets is formed from the checked items in the HDF5 tree GUI')
+        self.butCorrYParName   .setToolTip('Select the parameter name in the dataset.\n' +\
+                                           'The dataset should be selected first in the left box')
 
     def setEditFieldsReadOnly(self, isReadOnly=False):
 
