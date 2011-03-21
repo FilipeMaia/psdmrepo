@@ -1,0 +1,46 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psana
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-07
+2011-03-21 Andrei Salnikov
+- added PrintEventId module
+
+Tag: V00-00-06
+2011-03-21 Andrei Salnikov
+- added EventKeys module which dumps the keys in event and config store
+- modules from psana package do not need psana. prefix
+
+Tag: V00-00-05
+2011-03-20 Andrei Salnikov
+- added -m option to specify module list on command line
+
+Tag: V00-00-04
+2011-01-31 Andrei Salnikov
+- some packages were renamed, fixing their names here
+- use ErrSvc::Issue as base class for exceptions
+
+Tag: V00-00-03
+2011-01-27 Andrei Salnikov
+- main loop is now driven by the codes from input module
+- module interface got few new methods
+
+Tag: V00-00-02
+2011-01-26 Andrei Salnikov
+- added base class for input modules, loading of the input modules
+
+Tag: V00-00-01
+2010-09-28 Andrei Salnikov
+- first commit to repository
+- functionality currently here: dynamic loader, base class for module
+  (not finished)
+ 
