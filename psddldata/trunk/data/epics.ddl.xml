@@ -14,7 +14,7 @@
         <const name="MAX_ENUM_STATES" value="16"/>
 
         <enum name="">
-	       <enum-const name="DBR_STRING" value="0"/>
+	   <enum-const name="DBR_STRING" value="0"/>
            <enum-const name="DBR_SHORT" value="1"/>
            <enum-const name="DBR_FLOAT" value="2"/>
            <enum-const name="DBR_ENUM" value="3"/>
@@ -56,14 +56,26 @@
 		
 		<pstype name="epicsTimeStamp">
 			
-			<attribute name="secPastEpoch" type="uint32_t" access="public">
-			seconds since 0000 Jan 1, 1990
+            <tag name="value-type"/>
+        
+			<attribute name="_secPastEpoch" type="uint32_t" accessor="sec">
+			seconds since 00:00 Jan 1, 1990 UTC
 			</attribute>
 			
-			<attribute name="nsec" type="uint32_t" access="public">
+			<attribute name="_nsec" type="uint32_t" accessor="nsec">
 			nanoseconds within second
 			</attribute>
 			
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
 
 
@@ -71,226 +83,415 @@
 
 		<pstype name="dbr_time_string">
 		
+            <tag name="value-type"/>
+        
 		    <const name="DBR_TYPE_ID" value="DBR_TIME_STRING"/>
 		    
-			<attribute name="status" type="int16_t" access="public"/>
-			<attribute name="severity" type="int16_t" access="public"/>
-			<attribute name="stamp" type="epicsTimeStamp" access="public"/>
-			<attribute name="value" type="char" dimensions="MAX_STRING_SIZE" access="public"/>
+			<attribute name="_status" type="int16_t" accessor="status"/>
+			<attribute name="_severity" type="int16_t" accessor="severity"/>
+			<attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status" dest="_status"/>
+                <arg name="severity" dest="_severity"/>
+                <arg name="stamp" dest="_stamp"/>
+            </ctor>
+
         </pstype>
 
 		<!-- ========================================================================= -->
 
 		<pstype name="dbr_time_short">
         
+            <tag name="value-type"/>
+        
             <const name="DBR_TYPE_ID" value="DBR_TIME_SHORT"/>
             
-			<attribute name="status" type="int16_t" access="public"/>
-			<attribute name="severity" type="int16_t" access="public"/>
-            <attribute name="stamp" type="epicsTimeStamp" access="public"/>
-			<attribute name="RISC_pad" type="int16_t" access="public"/>
-			<attribute name="value" type="int16_t" access="public"/>
+			<attribute name="_status" type="int16_t" accessor="status"/>
+			<attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
+			<attribute name="RISC_pad" type="int16_t"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg name="stamp"       dest="_stamp"/>
+                <attr-init dest="RISC_pad" value="0"/>
+            </ctor>
+
         </pstype>
 
 		<!-- ========================================================================= -->
 
 		<pstype name="dbr_time_float">
         
+            <tag name="value-type"/>
+        
             <const name="DBR_TYPE_ID" value="DBR_TIME_FLOAT"/>
             
-			<attribute name="status" type="int16_t" access="public"/>
-			<attribute name="severity" type="int16_t" access="public"/>
-            <attribute name="stamp" type="epicsTimeStamp" access="public"/>
-			<attribute name="value" type="float" access="public"/>
+			<attribute name="_status" type="int16_t" accessor="status"/>
+			<attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg name="stamp"       dest="_stamp"/>
+            </ctor>
+
         </pstype>
 
 		<!-- ========================================================================= -->
 		
 		<pstype name="dbr_time_enum">
         
+            <tag name="value-type"/>
+        
             <const name="DBR_TYPE_ID" value="DBR_TIME_ENUM"/>
             
-			<attribute name="status" type="int16_t" access="public"/>
-			<attribute name="severity" type="int16_t" access="public"/>
-            <attribute name="stamp" type="epicsTimeStamp" access="public"/>
-            <attribute name="RISC_pad" type="int16_t" access="public"/>
-			<attribute name="value" type="uint16_t" access="public"/>
+			<attribute name="_status" type="int16_t" accessor="status"/>
+			<attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
+            <attribute name="RISC_pad" type="int16_t"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg name="stamp"       dest="_stamp"/>
+                <attr-init dest="RISC_pad" value="0"/>
+            </ctor>
+
         </pstype>
 
 		<!-- ========================================================================= -->
 
 		<pstype name="dbr_time_char">
         
+            <tag name="value-type"/>
+        
             <const name="DBR_TYPE_ID" value="DBR_TIME_CHAR"/>
             
-			<attribute name="status" type="int16_t" access="public"/>
-			<attribute name="severity" type="int16_t" access="public"/>
-            <attribute name="stamp" type="epicsTimeStamp" access="public"/>
-            <attribute name="RISC_pad0" type="int16_t" access="public"/>
-            <attribute name="RISC_pad1" type="uint8_t" access="public"/>
-			<attribute name="value" type="uint8_t" access="public"/>
+			<attribute name="_status" type="int16_t" accessor="status"/>
+			<attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
+            <attribute name="RISC_pad0" type="int16_t"/>
+            <attribute name="RISC_pad1" type="uint8_t"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg name="stamp"       dest="_stamp"/>
+                <attr-init dest="RISC_pad0" value="0"/>
+                <attr-init dest="RISC_pad1" value="0"/>
+            </ctor>
+
         </pstype>
 
 		<!-- ========================================================================= -->
 
 		<pstype name="dbr_time_long">
         
+            <tag name="value-type"/>
+        
             <const name="DBR_TYPE_ID" value="DBR_TIME_LONG"/>
             
-			<attribute name="status" type="int16_t" access="public"/>
-			<attribute name="severity" type="int16_t" access="public"/>
-            <attribute name="stamp" type="epicsTimeStamp" access="public"/>
-			<attribute name="value" type="int32_t" access="public"/>
+			<attribute name="_status" type="int16_t" accessor="status"/>
+			<attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg name="stamp"       dest="_stamp"/>
+            </ctor>
+
         </pstype>
 
 		<!-- ========================================================================= -->
 
 		<pstype name="dbr_time_double">
         
+            <tag name="value-type"/>
+        
             <const name="DBR_TYPE_ID" value="DBR_TIME_DOUBLE"/>
             
-			<attribute name="status" type="int16_t" access="public"/>
-			<attribute name="severity" type="int16_t" access="public"/>
-            <attribute name="stamp" type="epicsTimeStamp" access="public"/>
-            <attribute name="RISC_pad" type="int32_t" access="public"/>
-			<attribute name="value" type="double" access="public"/>
+			<attribute name="_status" type="int16_t" accessor="status"/>
+			<attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
+            <attribute name="RISC_pad" type="int32_t"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg name="stamp"       dest="_stamp"/>
+                <attr-init dest="RISC_pad" value="0"/>
+            </ctor>
+
         </pstype>
 
         <!-- ========================================================================= -->
 
         <pstype name="dbr_sts_string">
         
+            <tag name="value-type"/>
+        
             <const name="DBR_TYPE_ID" value="DBR_CTRL_STRING"/>
             
-            <attribute name="status" type="int16_t" access="public"/>
-            <attribute name="severity" type="int16_t" access="public"/>
-            <attribute name="value" type="char" dimensions="MAX_STRING_SIZE" access="public"/>
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+            </ctor>
+
         </pstype>
 
         <!-- ========================================================================= -->
 
         <pstype name="dbr_ctrl_short">
         
+            <tag name="value-type"/>
+        
             <const name="DBR_TYPE_ID" value="DBR_CTRL_SHORT"/>
             
-            <attribute name="status" type="int16_t" access="public"/>
-            <attribute name="severity" type="int16_t" access="public"/>
-            <attribute name="units" type="char" dimensions="MAX_UNITS_SIZE" access="public"/>
-            <attribute name="upper_disp_limit" type="int16_t" access="public"/>
-            <attribute name="lower_disp_limit" type="int16_t" access="public"/>
-            <attribute name="upper_alarm_limit" type="int16_t" access="public"/>
-            <attribute name="upper_warning_limit" type="int16_t" access="public"/>
-            <attribute name="lower_warning_limit" type="int16_t" access="public"/>
-            <attribute name="lower_alarm_limit" type="int16_t" access="public"/>
-            <attribute name="upper_ctrl_limit" type="int16_t" access="public"/>
-            <attribute name="lower_ctrl_limit" type="int16_t" access="public"/>
-            <attribute name="value" type="int16_t" access="public"/>
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_units" type="char" dimensions="MAX_UNITS_SIZE" accessor="units"/>
+            <attribute name="_upper_disp_limit" type="int16_t" accessor="upper_disp_limit"/>
+            <attribute name="_lower_disp_limit" type="int16_t" accessor="lower_disp_limit"/>
+            <attribute name="_upper_alarm_limit" type="int16_t" accessor="upper_alarm_limit"/>
+            <attribute name="_upper_warning_limit" type="int16_t" accessor="upper_warning_limit"/>
+            <attribute name="_lower_warning_limit" type="int16_t" accessor="lower_warning_limit"/>
+            <attribute name="_lower_alarm_limit" type="int16_t" accessor="lower_alarm_limit"/>
+            <attribute name="_upper_ctrl_limit" type="int16_t" accessor="upper_ctrl_limit"/>
+            <attribute name="_lower_ctrl_limit" type="int16_t" accessor="lower_ctrl_limit"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg name="units"       dest="_units"/>
+	            <arg dest="_upper_disp_limit"      name="upper_disp_limit"/>
+	            <arg dest="_lower_disp_limit"      name="lower_disp_limit"/>
+	            <arg dest="_upper_alarm_limit"     name="upper_alarm_limit"/>
+	            <arg dest="_upper_warning_limit"   name="upper_warning_limit"/>
+	            <arg dest="_lower_warning_limit"   name="lower_warning_limit"/>
+	            <arg dest="_lower_alarm_limit"     name="lower_alarm_limit"/>
+	            <arg dest="_upper_ctrl_limit"      name="upper_ctrl_limit"/>
+	            <arg dest="_lower_ctrl_limit"      name="lower_ctrl_limit"/>
+            </ctor>
+
         </pstype>
 
         <!-- ========================================================================= -->
 
         <pstype name="dbr_ctrl_float">
         
+            <tag name="value-type"/>
+        
             <const name="DBR_TYPE_ID" value="DBR_CTRL_FLOAT"/>
             
-            <attribute name="status" type="int16_t" access="public"/>
-            <attribute name="severity" type="int16_t" access="public"/>
-            <attribute name="precision" type="int16_t" access="public"/>
-            <attribute name="RISC_pad" type="int16_t" access="public"/>
-            <attribute name="units" type="char" dimensions="MAX_UNITS_SIZE" access="public"/>
-            <attribute name="upper_disp_limit" type="float" access="public"/>
-            <attribute name="lower_disp_limit" type="float" access="public"/>
-            <attribute name="upper_alarm_limit" type="float" access="public"/>
-            <attribute name="upper_warning_limit" type="float" access="public"/>
-            <attribute name="lower_warning_limit" type="float" access="public"/>
-            <attribute name="lower_alarm_limit" type="float" access="public"/>
-            <attribute name="upper_ctrl_limit" type="float" access="public"/>
-            <attribute name="lower_ctrl_limit" type="float" access="public"/>
-            <attribute name="value" type="float" access="public"/>
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_precision" type="int16_t" accessor="precision"/>
+            <attribute name="RISC_pad" type="int16_t"/>
+            <attribute name="_units" type="char" dimensions="MAX_UNITS_SIZE" accessor="units"/>
+            <attribute name="_upper_disp_limit" type="float" accessor="upper_disp_limit"/>
+            <attribute name="_lower_disp_limit" type="float" accessor="lower_disp_limit"/>
+            <attribute name="_upper_alarm_limit" type="float" accessor="upper_alarm_limit"/>
+            <attribute name="_upper_warning_limit" type="float" accessor="upper_warning_limit"/>
+            <attribute name="_lower_warning_limit" type="float" accessor="lower_warning_limit"/>
+            <attribute name="_lower_alarm_limit" type="float" accessor="lower_alarm_limit"/>
+            <attribute name="_upper_ctrl_limit" type="float" accessor="upper_ctrl_limit"/>
+            <attribute name="_lower_ctrl_limit" type="float" accessor="lower_ctrl_limit"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg name="units"       dest="_units"/>
+                <arg dest="_upper_disp_limit"      name="upper_disp_limit"/>
+                <arg dest="_lower_disp_limit"      name="lower_disp_limit"/>
+                <arg dest="_upper_alarm_limit"     name="upper_alarm_limit"/>
+                <arg dest="_upper_warning_limit"   name="upper_warning_limit"/>
+                <arg dest="_lower_warning_limit"   name="lower_warning_limit"/>
+                <arg dest="_lower_alarm_limit"     name="lower_alarm_limit"/>
+                <arg dest="_upper_ctrl_limit"      name="upper_ctrl_limit"/>
+                <arg dest="_lower_ctrl_limit"      name="lower_ctrl_limit"/>
+                <attr-init dest="RISC_pad" value="0"/>
+            </ctor>
+
         </pstype>
 
         <!-- ========================================================================= -->
 
         <pstype name="dbr_ctrl_enum">
         
+            <tag name="value-type"/>
+        
             <const name="DBR_TYPE_ID" value="DBR_CTRL_ENUM"/>
             
-            <attribute name="status" type="int16_t" access="public"/>
-            <attribute name="severity" type="int16_t" access="public"/>
-            <attribute name="no_str" type="int16_t" access="public"/>
-            <attribute name="strs" type="char" dimensions="MAX_ENUM_STATES,MAX_ENUM_STRING_SIZE" access="public"/>
-            <attribute name="value" type="uint16_t" access="public"/>
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_no_str" type="int16_t" accessor="no_str"/>
+            <attribute name="_strs" type="char" dimensions="MAX_ENUM_STATES,MAX_ENUM_STRING_SIZE" accessor="strings"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg dest="_no_str"     name="no_str"/>
+                <arg dest="_strs"       name="strings"/>
+            </ctor>
+
         </pstype>
 
         <!-- ========================================================================= -->
 
         <pstype name="dbr_ctrl_char">
         
+            <tag name="value-type"/>
+        
             <const name="DBR_TYPE_ID" value="DBR_CTRL_CHAR"/>
             
-            <attribute name="status" type="int16_t" access="public"/>
-            <attribute name="severity" type="int16_t" access="public"/>
-            <attribute name="units" type="char" dimensions="MAX_UNITS_SIZE" access="public"/>
-            <attribute name="upper_disp_limit" type="uint8_t" access="public"/>
-            <attribute name="lower_disp_limit" type="uint8_t" access="public"/>
-            <attribute name="upper_alarm_limit" type="uint8_t" access="public"/>
-            <attribute name="upper_warning_limit" type="uint8_t" access="public"/>
-            <attribute name="lower_warning_limit" type="uint8_t" access="public"/>
-            <attribute name="lower_alarm_limit" type="uint8_t" access="public"/>
-            <attribute name="upper_ctrl_limit" type="uint8_t" access="public"/>
-            <attribute name="lower_ctrl_limit" type="uint8_t" access="public"/>
-            <attribute name="RISC_pad" type="uint8_t" access="public"/>
-            <attribute name="value" type="uint8_t" access="public"/>
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_units" type="char" dimensions="MAX_UNITS_SIZE" accessor="units"/>
+            <attribute name="_upper_disp_limit" type="uint8_t" accessor="upper_disp_limit"/>
+            <attribute name="_lower_disp_limit" type="uint8_t" accessor="lower_disp_limit"/>
+            <attribute name="_upper_alarm_limit" type="uint8_t" accessor="upper_alarm_limit"/>
+            <attribute name="_upper_warning_limit" type="uint8_t" accessor="upper_warning_limit"/>
+            <attribute name="_lower_warning_limit" type="uint8_t" accessor="lower_warning_limit"/>
+            <attribute name="_lower_alarm_limit" type="uint8_t" accessor="lower_alarm_limit"/>
+            <attribute name="_upper_ctrl_limit" type="uint8_t" accessor="upper_ctrl_limit"/>
+            <attribute name="_lower_ctrl_limit" type="uint8_t" accessor="lower_ctrl_limit"/>
+            <attribute name="RISC_pad" type="uint8_t"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg name="units"       dest="_units"/>
+                <arg dest="_upper_disp_limit"      name="upper_disp_limit"/>
+                <arg dest="_lower_disp_limit"      name="lower_disp_limit"/>
+                <arg dest="_upper_alarm_limit"     name="upper_alarm_limit"/>
+                <arg dest="_upper_warning_limit"   name="upper_warning_limit"/>
+                <arg dest="_lower_warning_limit"   name="lower_warning_limit"/>
+                <arg dest="_lower_alarm_limit"     name="lower_alarm_limit"/>
+                <arg dest="_upper_ctrl_limit"      name="upper_ctrl_limit"/>
+                <arg dest="_lower_ctrl_limit"      name="lower_ctrl_limit"/>
+                <attr-init dest="RISC_pad" value="0"/>
+            </ctor>
+
         </pstype>
 
         <!-- ========================================================================= -->
 
         <pstype name="dbr_ctrl_long">
         
+            <tag name="value-type"/>
+        
             <const name="DBR_TYPE_ID" value="DBR_CTRL_LONG"/>
             
-            <attribute name="status" type="int16_t" access="public"/>
-            <attribute name="severity" type="int16_t" access="public"/>
-            <attribute name="units" type="char" dimensions="MAX_UNITS_SIZE" access="public"/>
-            <attribute name="upper_disp_limit" type="int32_t" access="public"/>
-            <attribute name="lower_disp_limit" type="int32_t" access="public"/>
-            <attribute name="upper_alarm_limit" type="int32_t" access="public"/>
-            <attribute name="upper_warning_limit" type="int32_t" access="public"/>
-            <attribute name="lower_warning_limit" type="int32_t" access="public"/>
-            <attribute name="lower_alarm_limit" type="int32_t" access="public"/>
-            <attribute name="upper_ctrl_limit" type="int32_t" access="public"/>
-            <attribute name="lower_ctrl_limit" type="int32_t" access="public"/>
-            <attribute name="value" type="int32_t" access="public"/>
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_units" type="char" dimensions="MAX_UNITS_SIZE" accessor="units"/>
+            <attribute name="_upper_disp_limit" type="int32_t" accessor="upper_disp_limit"/>
+            <attribute name="_lower_disp_limit" type="int32_t" accessor="lower_disp_limit"/>
+            <attribute name="_upper_alarm_limit" type="int32_t" accessor="upper_alarm_limit"/>
+            <attribute name="_upper_warning_limit" type="int32_t" accessor="upper_warning_limit"/>
+            <attribute name="_lower_warning_limit" type="int32_t" accessor="lower_warning_limit"/>
+            <attribute name="_lower_alarm_limit" type="int32_t" accessor="lower_alarm_limit"/>
+            <attribute name="_upper_ctrl_limit" type="int32_t" accessor="upper_ctrl_limit"/>
+            <attribute name="_lower_ctrl_limit" type="int32_t" accessor="lower_ctrl_limit"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg name="units"       dest="_units"/>
+                <arg dest="_upper_disp_limit"      name="upper_disp_limit"/>
+                <arg dest="_lower_disp_limit"      name="lower_disp_limit"/>
+                <arg dest="_upper_alarm_limit"     name="upper_alarm_limit"/>
+                <arg dest="_upper_warning_limit"   name="upper_warning_limit"/>
+                <arg dest="_lower_warning_limit"   name="lower_warning_limit"/>
+                <arg dest="_lower_alarm_limit"     name="lower_alarm_limit"/>
+                <arg dest="_upper_ctrl_limit"      name="upper_ctrl_limit"/>
+                <arg dest="_lower_ctrl_limit"      name="lower_ctrl_limit"/>
+            </ctor>
+
         </pstype>
 
         <!-- ========================================================================= -->
 
         <pstype name="dbr_ctrl_double">
         
+            <tag name="value-type"/>
+        
             <const name="DBR_TYPE_ID" value="DBR_CTRL_DOUBLE"/>
             
-            <attribute name="status" type="int16_t" access="public"/>
-            <attribute name="severity" type="int16_t" access="public"/>
-            <attribute name="precision" type="int16_t" access="public"/>
-            <attribute name="RISC_pad0" type="int16_t" access="public"/>
-            <attribute name="units" type="char" dimensions="MAX_UNITS_SIZE" access="public"/>
-            <attribute name="upper_disp_limit" type="double" access="public"/>
-            <attribute name="lower_disp_limit" type="double" access="public"/>
-            <attribute name="upper_alarm_limit" type="double" access="public"/>
-            <attribute name="upper_warning_limit" type="double" access="public"/>
-            <attribute name="lower_warning_limit" type="double" access="public"/>
-            <attribute name="lower_alarm_limit" type="double" access="public"/>
-            <attribute name="upper_ctrl_limit" type="double" access="public"/>
-            <attribute name="lower_ctrl_limit" type="double" access="public"/>
-            <attribute name="value" type="double" access="public"/>
+            <attribute name="_status" type="int16_t" accessor="status"/>
+            <attribute name="_severity" type="int16_t" accessor="severity"/>
+            <attribute name="_precision" type="int16_t" accessor="precision"/>
+            <attribute name="RISC_pad0" type="int16_t"/>
+            <attribute name="_units" type="char" dimensions="MAX_UNITS_SIZE" accessor="units"/>
+            <attribute name="_upper_disp_limit" type="double" accessor="upper_disp_limit"/>
+            <attribute name="_lower_disp_limit" type="double" accessor="lower_disp_limit"/>
+            <attribute name="_upper_alarm_limit" type="double" accessor="upper_alarm_limit"/>
+            <attribute name="_upper_warning_limit" type="double" accessor="upper_warning_limit"/>
+            <attribute name="_lower_warning_limit" type="double" accessor="lower_warning_limit"/>
+            <attribute name="_lower_alarm_limit" type="double" accessor="lower_alarm_limit"/>
+            <attribute name="_upper_ctrl_limit" type="double" accessor="upper_ctrl_limit"/>
+            <attribute name="_lower_ctrl_limit" type="double" accessor="lower_ctrl_limit"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <arg name="status"      dest="_status"/>
+                <arg name="severity"    dest="_severity"/>
+                <arg name="units"       dest="_units"/>
+                <arg dest="_upper_disp_limit"      name="upper_disp_limit"/>
+                <arg dest="_lower_disp_limit"      name="lower_disp_limit"/>
+                <arg dest="_upper_alarm_limit"     name="upper_alarm_limit"/>
+                <arg dest="_upper_warning_limit"   name="upper_warning_limit"/>
+                <arg dest="_lower_warning_limit"   name="lower_warning_limit"/>
+                <arg dest="_lower_alarm_limit"     name="lower_alarm_limit"/>
+                <arg dest="_upper_ctrl_limit"      name="upper_ctrl_limit"/>
+                <arg dest="_lower_ctrl_limit"      name="lower_ctrl_limit"/>
+                <attr-init dest="RISC_pad0" value="0"/>
+            </ctor>
+
         </pstype>
 
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvHeader">
-			<attribute name="iPvId" type="int16_t" access="public"/>
-			<attribute name="iDbrType" type="int16_t" access="public"/>
-			<attribute name="iNumElements" type="int16_t" access="public"/>
+
+			<attribute name="_iPvId" type="int16_t" accessor="pvId"/>
+			<attribute name="_iDbrType" type="int16_t" accessor="dbrType"/>
+			<attribute name="_iNumElements" type="int16_t" accessor="numElements"/>
 			
 			<method name="print">
 			This method will be implemented separately, it will act as a virtual method.
@@ -302,112 +503,187 @@
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvCtrlHeader" base="EpicsPvHeader">
-			<attribute name="sPvName" type="char" dimensions="iMaxPvNameLength" access="public"/>
+
+			<attribute name="_sPvName" type="char" dimensions="iMaxPvNameLength" accessor="pvName"/>
+
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvCtrlString" base="EpicsPvCtrlHeader">
-			<attribute name="dbr" type="dbr_sts_string" access="public"/>
-			<attribute name="dbr_array_data" type="char" dimensions="{self}.iNumElements-1, MAX_STRING_SIZE" access="public"/>
+			<attribute name="_dbr" type="dbr_sts_string" accessor="dbr"/>
+			<attribute name="_data" type="char" dimensions="{self}.numElements(), MAX_STRING_SIZE" accessor="data"/>
+			
+			<method name="value" type="string">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()+i*MAX_STRING_SIZE"/>
+			</method>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvCtrlShort" base="EpicsPvCtrlHeader">
-			<attribute name="dbr" type="dbr_ctrl_short" access="public"/>
-			<attribute name="dbr_array_data" type="int16_t" dimensions="{self}.iNumElements-1" access="public"/>
+			<attribute name="_dbr" type="dbr_ctrl_short" accessor="dbr"/>
+			<attribute name="_data" type="int16_t" dimensions="{self}.numElements()" accessor="data"/>
+
+            <method name="value" type="int16_t">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()[i]"/>
+            </method>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvCtrlFloat" base="EpicsPvCtrlHeader">
-			<attribute name="dbr" type="dbr_ctrl_float" access="public"/>
-			<attribute name="dbr_array_data" type="float" dimensions="{self}.iNumElements-1" access="public"/>
+            <attribute name="pad0" type="int16_t"/>
+			<attribute name="_dbr" type="dbr_ctrl_float" accessor="dbr"/>
+			<attribute name="_data" type="float" dimensions="{self}.numElements()" accessor="data"/>
+
+            <method name="value" type="float">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()[i]"/>
+            </method>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvCtrlEnum" base="EpicsPvCtrlHeader">
-			<attribute name="dbr" type="dbr_ctrl_enum" access="public"/>
-			<attribute name="dbr_array_data" type="uint16_t" dimensions="{self}.iNumElements-1" access="public"/>
+			<attribute name="_dbr" type="dbr_ctrl_enum" accessor="dbr"/>
+			<attribute name="_data" type="uint16_t" dimensions="{self}.numElements()" accessor="data"/>
+
+            <method name="value" type="uint16_t">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()[i]"/>
+            </method>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvCtrlChar" base="EpicsPvCtrlHeader">
-			<attribute name="dbr" type="dbr_ctrl_char" access="public"/>
-			<attribute name="dbr_array_data" type="uint8_t" dimensions="{self}.iNumElements-1" access="public"/>
+			<attribute name="_dbr" type="dbr_ctrl_char" accessor="dbr"/>
+			<attribute name="_data" type="uint8_t" dimensions="{self}.numElements()" accessor="data"/>
+
+            <method name="value" type="uint8_t">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()[i]"/>
+            </method>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvCtrlLong" base="EpicsPvCtrlHeader">
-			<attribute name="dbr" type="dbr_ctrl_long" access="public"/>
-			<attribute name="dbr_array_data" type="int32_t" dimensions="{self}.iNumElements-1" access="public"/>
+            <attribute name="pad0" type="int16_t"/>
+			<attribute name="_dbr" type="dbr_ctrl_long" accessor="dbr"/>
+			<attribute name="_data" type="int32_t" dimensions="{self}.numElements()" accessor="data"/>
+
+            <method name="value" type="int32_t">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()[i]"/>
+            </method>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvCtrlDouble" base="EpicsPvCtrlHeader">
-			<attribute name="dbr" type="dbr_ctrl_double" access="public"/>
-			<attribute name="dbr_array_data" type="double" dimensions="{self}.iNumElements-1" access="public"/>
+            <attribute name="pad0" type="int16_t"/>
+			<attribute name="_dbr" type="dbr_ctrl_double" accessor="dbr"/>
+			<attribute name="_data" type="double" dimensions="{self}.numElements()" accessor="data"/>
+
+            <method name="value" type="double">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()[i]"/>
+            </method>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvTimeString" base="EpicsPvHeader">
-            <attribute name="pad0" type="int16_t" access="public"/>
-            <attribute name="dbr" type="dbr_time_string" access="public"/>
-            <attribute name="dbr_array_data" type="char" dimensions="{self}.iNumElements-1, MAX_STRING_SIZE" access="public"/>
+            <attribute name="pad0" type="int16_t"/>
+            <attribute name="_dbr" type="dbr_time_string" accessor="dbr"/>
+            <attribute name="_data" type="char" dimensions="{self}.numElements(), MAX_STRING_SIZE" accessor="data"/>
+            
+            <method name="value" type="string">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()+MAX_STRING_SIZE*i"/>
+            </method>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvTimeShort" base="EpicsPvHeader">
-			<attribute name="pad0" type="int16_t" access="public"/>
-            <attribute name="dbr" type="dbr_time_short" access="public"/>
-            <attribute name="dbr_array_data" type="int16_t" dimensions="{self}.iNumElements-1" access="public"/>
+			<attribute name="pad0" type="int16_t"/>
+            <attribute name="_dbr" type="dbr_time_short" accessor="dbr"/>
+            <attribute name="_data" type="int16_t" dimensions="{self}.numElements()" accessor="data"/>
+
+            <method name="value" type="int16_t">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()[i]"/>
+            </method>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvTimeFloat" base="EpicsPvHeader">
-			<attribute name="pad0" type="int16_t" access="public"/>
-            <attribute name="dbr" type="dbr_time_float" access="public"/>
-            <attribute name="dbr_array_data" type="float" dimensions="{self}.iNumElements-1" access="public"/>
+			<attribute name="pad0" type="int16_t"/>
+            <attribute name="_dbr" type="dbr_time_float" accessor="dbr"/>
+            <attribute name="_data" type="float" dimensions="{self}.numElements()" accessor="data"/>
+
+            <method name="value" type="float">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()[i]"/>
+            </method>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvTimeEnum" base="EpicsPvHeader">
-			<attribute name="pad0" type="int16_t" access="public"/>
-            <attribute name="dbr" type="dbr_time_enum" access="public"/>
-            <attribute name="dbr_array_data" type="uint16_t" dimensions="{self}.iNumElements-1" access="public"/>
+			<attribute name="pad0" type="int16_t"/>
+            <attribute name="_dbr" type="dbr_time_enum" accessor="dbr"/>
+            <attribute name="_data" type="uint16_t" dimensions="{self}.numElements()" accessor="data"/>
+
+            <method name="value" type="uint16_t">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()[i]"/>
+            </method>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvTimeChar" base="EpicsPvHeader">
-			<attribute name="pad0" type="int16_t" access="public"/>
-            <attribute name="dbr" type="dbr_time_char" access="public"/>
-            <attribute name="dbr_array_data" type="uint8_t" dimensions="{self}.iNumElements-1" access="public"/>
+			<attribute name="pad0" type="int16_t"/>
+            <attribute name="_dbr" type="dbr_time_char" accessor="dbr"/>
+            <attribute name="_data" type="uint8_t" dimensions="{self}.numElements()" accessor="data"/>
+
+            <method name="value" type="uint8_t">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()[i]"/>
+            </method>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvTimeLong" base="EpicsPvHeader">
-			<attribute name="pad0" type="int16_t" access="public"/>
-            <attribute name="dbr" type="dbr_time_long" access="public"/>
-            <attribute name="dbr_array_data" type="int32_t" dimensions="{self}.iNumElements-1" access="public"/>
+			<attribute name="pad0" type="int16_t"/>
+            <attribute name="_dbr" type="dbr_time_long" accessor="dbr"/>
+            <attribute name="_data" type="int32_t" dimensions="{self}.numElements()" accessor="data"/>
+
+            <method name="value" type="int32_t">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()[i]"/>
+            </method>
         </pstype>
         
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvTimeDouble" base="EpicsPvHeader">
-			<attribute name="pad0" type="int16_t" access="public"/>
-            <attribute name="dbr" type="dbr_time_double" access="public"/>
-            <attribute name="dbr_array_data" type="double" dimensions="{self}.iNumElements-1" access="public"/>
+			<attribute name="pad0" type="int16_t" />
+            <attribute name="_dbr" type="dbr_time_double" accessor="dbr"/>
+            <attribute name="_data" type="double" dimensions="{self}.numElements()" accessor="data"/>
+
+            <method name="value" type="double">
+                <arg name="i" type="uint32_t"/>
+                <expr lang="C++" value="data()[i]"/>
+            </method>
         </pstype>
         
 		<!-- ========================================================================= -->

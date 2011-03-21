@@ -8,13 +8,26 @@
 		
 		<pstype name="DiodeFexConfigV1" version="1" type_id="Id_DiodeFexConfig" pack="4">
 		
+            <tag name="value-type"/>
+
 		    <const name="NRANGES" value="3" />
 		
-            <attribute name="base" type="float" dimensions="NRANGES" access="public">
+            <attribute name="_base" type="float" dimensions="NRANGES" accessor="base">
             </attribute>
 
-            <attribute name="scale" type="float" dimensions="NRANGES" access="public">
+            <attribute name="_scale" type="float" dimensions="NRANGES" accessor="scale">
             </attribute>
+
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
@@ -22,8 +35,17 @@
 		
 		<pstype name="DiodeFexV1" version="1" type_id="Id_DiodeFex" pack="4">
 		
-            <attribute name="value" type="float" access="public">
+            <tag name="value-type"/>
+
+            <attribute name="_value" type="float" accessor="value">
             </attribute>
+
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
@@ -34,13 +56,13 @@
         
             <const name="NCHANNELS" value="4" />
         
-            <attribute name="diode" type="DiodeFexConfigV1" dimensions="NCHANNELS" access="public">
+            <attribute name="_diode" type="DiodeFexConfigV1" dimensions="NCHANNELS" accessor="diode">
             </attribute>
 
-            <attribute name="xscale" type="float" access="public">
+            <attribute name="_xscale" type="float" accessor="xscale">
             </attribute>
 
-            <attribute name="yscale" type="float" access="public">
+            <attribute name="_yscale" type="float" accessor="yscale">
             </attribute>
 
         </pstype>
@@ -51,19 +73,28 @@
 
         <pstype name="IpmFexV1" version="1" type_id="Id_IpmFex" pack="4">
         
+            <tag name="value-type"/>
+
             <const name="NCHANNELS" value="4" />
         
-            <attribute name="channel" type="float" dimensions="NCHANNELS" access="public">
+            <attribute name="_channel" type="float" dimensions="NCHANNELS" accessor="channel">
             </attribute>
 
-            <attribute name="sum" type="float" access="public">
+            <attribute name="_sum" type="float" accessor="sum">
             </attribute>
 
-            <attribute name="xpos" type="float" access="public">
+            <attribute name="_xpos" type="float" accessor="xpos">
             </attribute>
 
-            <attribute name="ypos" type="float" access="public">
+            <attribute name="_ypos" type="float" accessor="ypos">
             </attribute>
+
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
@@ -73,11 +104,20 @@
 
         <pstype name="PimImageConfigV1" version="1" type_id="Id_PimImageConfig" pack="4">
         
-            <attribute name="xscale" type="float" access="public">
+            <tag name="value-type"/>
+
+            <attribute name="_xscale" type="float" accessor="xscale">
             </attribute>
 
-            <attribute name="yscale" type="float" access="public">
+            <attribute name="_yscale" type="float" accessor="yscale">
             </attribute>
+
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         

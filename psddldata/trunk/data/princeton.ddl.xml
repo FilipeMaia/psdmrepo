@@ -76,9 +76,17 @@
 		
         
         <pstype name="InfoV1" version="1" type_id="Id_PrincetonInfo">
+
+            <tag name="value-type"/>
         
             <attribute name="_fTemperature" type="float" accessor="temperature">
             </attribute>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         

@@ -10,6 +10,8 @@
 	
 		<pstype name="PVControl" pack="4">
 		
+            <tag name="value-type"/>
+        
 		    <const name="NameSize" value="32" />
 		    <const name="NoArray" value="0xFFFFFFFF">
 		    Special value used for _index when PV is not an array
@@ -28,12 +30,24 @@
                 <expr lang="C++" value="_index != NoArray"/>
             </method>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+                <tag name="inline"/>
+            </ctor>
+
 		</pstype>
 		
 		<!-- ========================================================================= -->
 		
 		<pstype name="PVMonitor" pack="4">
 		
+            <tag name="value-type"/>
+        
 		    <const name="NameSize" value="32" />
             <const name="NoArray" value="0xFFFFFFFF">
             Special value used for _index when PV is not an array
@@ -54,6 +68,16 @@
             <method name="array" type="uint8_t">
                 <expr lang="C++" value="_index != NoArray"/>
             </method>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+                <tag name="inline"/>
+            </ctor>
 
 		</pstype>
 		

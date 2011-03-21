@@ -89,12 +89,12 @@
             </attribute>
             
             <attribute name="_lookup_table" type="uint16_t" 
-                      dimensions="Output_LUT_Size*defect_pixel_correction_enabled()" 
+                      dimensions="Output_LUT_Size*{self}.defect_pixel_correction_enabled()" 
                       accessor="output_lookup_table">
             </attribute>
             
             <attribute name="_defectPixels" type="Camera.FrameCoord" 
-                      dimensions="_defectPixelCount" accessor="defect_pixel_coordinates">
+                      dimensions="{self}._defectPixelCount" accessor="defect_pixel_coordinates">
             </attribute>
             
             <method name="output_offset" type="uint16_t">

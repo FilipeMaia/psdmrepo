@@ -12,6 +12,8 @@
 	
 		<pstype name="PulseConfig">
 		
+		    <tag name="value-type"/>
+
 		    <const name="Trigger_Shift" value="0" />
 		    <const name="Set_Shift" value="8" />
 		    <const name="Clear_Shift" value="16" />
@@ -26,7 +28,7 @@
             internal pulse generation channel
             </attribute>
 
-            <attribute name="_input_control" type="uint32_t">
+            <attribute name="_input_control" type="uint32_t" accessor="_input_control_value">
             Pulse input control
 
                 <bitfield name="_bf_trigger" size="8" type="int16_t" accessor="bf_trigger" access="private"/>
@@ -35,7 +37,7 @@
 
             </attribute>
 
-            <attribute name="_output_control" type="uint32_t">
+            <attribute name="_output_control" type="uint32_t" accessor="_output_control_value">
             Pulse output control
                 <bitfield name="_bf_polarity" size="1" type="uint8_t" accessor="polarity"/>
                 <bitfield name="_bf_map_set_enable" size="1" type="uint8_t" accessor="map_set_enable"/>
@@ -65,6 +67,16 @@
                 <expr lang="C++" value="{self}.bf_clear()-1"/>
             </method>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
 		</pstype>
 		
 		
@@ -72,6 +84,8 @@
 	
 		<pstype name="PulseConfigV3" pack="4">
 		
+		    <tag name="value-type"/>
+
             <attribute name="_u16PulseId" type="uint16_t" accessor="pulseId">
             </attribute>
 
@@ -91,16 +105,28 @@
             Width in 119MHz clks
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
 		</pstype>
 
         <!-- ========================================================================= -->
 	
 		<pstype name="EventCodeV3" pack="4">
 		
+		    <tag name="value-type"/>
+
             <attribute name="_u16Code" type="uint16_t" accessor="code">
             </attribute>
 
-            <attribute name="_u16MaskEventAttr" type="uint16_t">
+            <attribute name="_u16MaskEventAttr" type="uint16_t" accessor="_u16MaskEventAttr_value">
                 <bitfield name="_bf_isReadout" size="1" type="uint8_t" accessor="isReadout"/>                
                 <bitfield name="_bf_isTerminator" size="1" type="uint8_t" accessor="isTerminator"/>                
             </attribute>
@@ -114,16 +140,28 @@
             <attribute name="_u32MaskClear" type="uint32_t" accessor="maskClear">
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
 		</pstype>
 
         <!-- ========================================================================= -->
 	
 		<pstype name="EventCodeV4" pack="4">
 		
+		    <tag name="value-type"/>
+
             <attribute name="_u16Code" type="uint16_t" accessor="code">
             </attribute>
 
-            <attribute name="_u16MaskEventAttr" type="uint16_t">
+            <attribute name="_u16MaskEventAttr" type="uint16_t" accessor="_u16MaskEventAttr_value">
                 <bitfield name="_bf_isReadout" size="1" type="uint8_t" accessor="isReadout"/>                
                 <bitfield name="_bf_isTerminator" size="1" type="uint8_t" accessor="isTerminator"/>                
             </attribute>
@@ -143,6 +181,15 @@
             <attribute name="_u32MaskClear" type="uint32_t" accessor="maskClear">
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
 		</pstype>
 
@@ -150,12 +197,14 @@
 	
 		<pstype name="EventCodeV5" pack="4">
 				
+		    <tag name="value-type"/>
+
 			<const name="DescSize" value="16"/>
 				
             <attribute name="_u16Code" type="uint16_t" accessor="code">
             </attribute>
 
-            <attribute name="_u16MaskEventAttr" type="uint16_t">
+            <attribute name="_u16MaskEventAttr" type="uint16_t" accessor="_u16MaskEventAttr_value">
                 <bitfield name="_bf_isReadout" size="1" type="uint8_t" accessor="isReadout"/>                
                 <bitfield name="_bf_isTerminator" size="1" type="uint8_t" accessor="isTerminator"/>                
                 <bitfield name="_bf_isLatch" size="1" type="uint8_t" accessor="isLatch"/>                
@@ -179,6 +228,15 @@
             <attribute name="_desc" type="char" dimensions="DescSize" accessor="desc">
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
 		</pstype>
 
@@ -187,6 +245,8 @@
 
 		<pstype name="OutputMap">
 		
+            <tag name="value-type"/>
+        
 		    <enum name="Source">
 		        <enum-const name="Pulse" />
 		        <enum-const name="DBus" />
@@ -200,7 +260,7 @@
                 <enum-const name="UnivIO" />
             </enum>
 		
-            <attribute name="_v" type="uint32_t">
+            <attribute name="_v" type="uint32_t" accessor="value">
             </attribute>
 
 
@@ -220,6 +280,15 @@
                 <expr lang="C++" value="_v &gt;&gt; 24"/>
             </method>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
 		</pstype>
 		
@@ -307,13 +376,13 @@
             <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
             </attribute>
 
-            <attribute name="_eventcodes" type="EventCodeV3" dimensions="_neventcodes" accessor="eventcodes">
+            <attribute name="_eventcodes" type="EventCodeV3" dimensions="{self}._neventcodes" accessor="eventcodes">
             </attribute>
 
-            <attribute name="_pulses" type="PulseConfigV3" dimensions="_npulses" accessor="pulses">
+            <attribute name="_pulses" type="PulseConfigV3" dimensions="{self}._npulses" accessor="pulses">
             </attribute>
 
-            <attribute name="_output_maps" type="OutputMap" dimensions="_noutputs" accessor="output_maps">
+            <attribute name="_output_maps" type="OutputMap" dimensions="{self}._noutputs" accessor="output_maps">
             </attribute>
 
         </pstype>
@@ -332,13 +401,13 @@
             <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
             </attribute>
 
-            <attribute name="_eventcodes" type="EventCodeV4" dimensions="_neventcodes" accessor="eventcodes">
+            <attribute name="_eventcodes" type="EventCodeV4" dimensions="{self}._neventcodes" accessor="eventcodes">
             </attribute>
 
-            <attribute name="_pulses" type="PulseConfigV3" dimensions="_npulses" accessor="pulses">
+            <attribute name="_pulses" type="PulseConfigV3" dimensions="{self}._npulses" accessor="pulses">
             </attribute>
 
-            <attribute name="_output_maps" type="OutputMap" dimensions="_noutputs" accessor="output_maps">
+            <attribute name="_output_maps" type="OutputMap" dimensions="{self}._noutputs" accessor="output_maps">
             </attribute>
 
         </pstype>
@@ -348,15 +417,28 @@
 		
 		<pstype name="SequencerEntry">
 
-            <attribute name="_value" type="uint32_t" />
+		    <tag name="value-type"/>
 
-            <method name="eventcode" type="uint32_t">
-                <expr lang="C++" value="{self}._value &gt;&gt; 24"/>
-            </method>
+            <attribute name="_value" type="uint32_t">
+            
+                <bitfield name="_bf_delay" size="24" type="uint32_t" accessor="delay">
+                </bitfield>
 
-            <method name="delay" type="uint32_t">
-                <expr lang="C++" value="{self}._value &amp; 0xffffff"/>
-            </method>
+                <bitfield name="_bf_eventcode" size="8" type="uint32_t" accessor="eventcode">
+                </bitfield>
+            
+            </attribute>
+
+            <ctor>
+                Default constructor without arguments
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Standard constructor
+                <tag name="inline"/>
+                <arg name="eventcode" type="uint32_t" dest="_bf_eventcode"/>
+                <arg name="delay" type="uint32_t" dest="_bf_delay"/>
+            </ctor>
 
         </pstype>
 		
@@ -375,7 +457,15 @@
                 <enum-const name="Disable" />
             </enum>
 
-            <attribute name="_source" type="uint32_t" />
+            <attribute name="_source" type="uint32_t">
+            
+                <bitfield name="_bf_sync_source" size="8" type="Source" accessor="sync_source">
+                </bitfield>
+
+                <bitfield name="_bf_beam_source" size="8" type="Source" accessor="beam_source">
+                </bitfield>
+            
+            </attribute>
 
             <attribute name="_length" type="uint32_t" accessor="length"/>
 
@@ -383,13 +473,19 @@
 
             <attribute name="_entries" type="SequencerEntry" dimensions="{self}._length" accessor="entries"/>
 
-            <method name="sync_source" type="Source">
-                <expr lang="C++" value="Source({self}._source &amp; 0xff)"/>
-            </method>
+            <ctor>
+                Default constructor without arguments
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Standard constructor
+                <tag name="inline"/>
+                <arg name="sync_source" type="Source" dest="_bf_sync_source"/>
+                <arg name="beam_source" type="Source" dest="_bf_beam_source"/>
+                <arg name="length" type="uint32_t" dest="_length"/>
+                <arg name="cycles" type="uint32_t" dest="_cycles"/>
+            </ctor>
 
-            <method name="beam_source" type="Source">
-                <expr lang="C++" value="Source(({self}._source &gt;&gt; 8) &amp; 0xff)"/>
-            </method>
 
         </pstype>
 		
@@ -406,13 +502,13 @@
             <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
             </attribute>
 
-            <attribute name="_eventcodes" type="EventCodeV4" dimensions="_neventcodes" accessor="eventcodes">
+            <attribute name="_eventcodes" type="EventCodeV4" dimensions="{self}._neventcodes" accessor="eventcodes">
             </attribute>
 
-            <attribute name="_pulses" type="PulseConfigV3" dimensions="_npulses" accessor="pulses">
+            <attribute name="_pulses" type="PulseConfigV3" dimensions="{self}._npulses" accessor="pulses">
             </attribute>
 
-            <attribute name="_output_maps" type="OutputMap" dimensions="_noutputs" accessor="output_maps">
+            <attribute name="_output_maps" type="OutputMap" dimensions="{self}._noutputs" accessor="output_maps">
             </attribute>
 
             <attribute name="_seq_config" type="SequencerConfigV1" accessor="seq_config">
@@ -425,14 +521,26 @@
 		
 		<pstype name="FIFOEvent">
 		
-            <attribute name="TimestampHigh" type="uint32_t" access="public">
+            <tag name="value-type"/>
+        
+            <attribute name="_timestampHigh" type="uint32_t" accessor="timestampHigh">
             </attribute>
 
-            <attribute name="TimestampLow" type="uint32_t" access="public">
+            <attribute name="_timestampLow" type="uint32_t" accessor="timestampLow">
             </attribute>
 
-            <attribute name="EventCode" type="uint32_t" access="public">
+            <attribute name="_eventCode" type="uint32_t" accessor="eventCode">
             </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
@@ -444,7 +552,7 @@
             <attribute name="_u32NumFifoEvents" type="uint32_t" accessor="numFifoEvents">
             </attribute>
 
-            <attribute name="_fifoEvents" type="FIFOEvent" dimensions="_u32NumFifoEvents" accessor="fifoEvents">
+            <attribute name="_fifoEvents" type="FIFOEvent" dimensions="{self}._u32NumFifoEvents" accessor="fifoEvents">
             </attribute>
 
         </pstype>

@@ -43,7 +43,7 @@
 	
 		<pstype name="CsPadDigitalPotsCfg">
 		
-            <attribute name="pots" type="uint8_t" dimensions="PotsPerQuad" access="public">
+            <attribute name="_pots" type="uint8_t" dimensions="PotsPerQuad" accessor="pots">
             </attribute>
 
 		</pstype>
@@ -54,10 +54,10 @@
 
 		<pstype name="CsPadReadOnlyCfg">
 		
-            <attribute name="shiftTest" type="uint32_t" access="public">
+            <attribute name="_shiftTest" type="uint32_t" accessor="shiftTest">
             </attribute>
 
-            <attribute name="version" type="uint32_t" access="public">
+            <attribute name="_version" type="uint32_t" accessor="version">
             </attribute>
 
 		</pstype>
@@ -68,7 +68,7 @@
 		<pstype name="CsPadGainMapCfg">
 		
             <attribute name="_gainMap" type="uint16_t" dimensions="ColumnsPerASIC,MaxRowsPerASIC" 
-                    access="public">
+                    accessor="gainMap">
             </attribute>
 
 		</pstype>

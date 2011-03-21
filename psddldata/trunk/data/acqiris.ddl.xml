@@ -8,6 +8,8 @@
 		
 	       	Pds.Acqiris class VertV1
 		
+		    <tag name="value-type"/>
+		
 		    <enum name="Coupling">
 		      <enum-const name="GND" />
 		      <enum-const name="DC" />
@@ -37,7 +39,19 @@
             <attribute name="_bandwidth" type="uint32_t" accessor="bandwidth">
             </attribute>
 
-            <method name="slope" type="double" const="true" />
+            <method name="slope" type="double">
+                <expr lang="C++" value="_fullScale / ((1 &lt;&lt; Acqiris::DataDescV1Elem::NumberOfBits)*(1 &lt;&lt; Acqiris::DataDescV1Elem::BitShift))" />
+            </method>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
 		</pstype>
 		
@@ -47,6 +61,8 @@
 		
 		    Pds.Acqiris class HorizV1
 		
+            <tag name="value-type"/>
+        
             <attribute name="_sampInterval" type="double" accessor="sampInterval">
             </attribute>
 
@@ -59,6 +75,16 @@
             <attribute name="_nbrSegments" type="uint32_t" accessor="nbrSegments">
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
 		</pstype>
 		
         <!-- ========================================================================= -->
@@ -67,6 +93,8 @@
 		
 		    Pds.Acqiris class TrigV1
 		
+            <tag name="value-type"/>
+        
             <enum name="Source">
               <enum-const name="Internal" value="1" />
               <enum-const name="External" value="-1" />
@@ -101,6 +129,16 @@
             <attribute name="_level" type="double" accessor="level">
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
 		</pstype>
 		
         <!-- ========================================================================= -->
@@ -129,6 +167,10 @@
             <attribute name="_vert" type="VertV1" dimensions="MaxChan" accessor="vert">
             </attribute>
 
+            <method name="nbrChannels" type="uint32_t">
+                <expr lang="C++" value="__builtin_popcount({self}._channelMask)"/>
+            </method>
+
         </pstype>
 
         <!-- ========================================================================= -->
@@ -137,6 +179,8 @@
         
             Pds.Acqiris class "TimestampV1"
 
+            <tag name="value-type"/>
+        
             <attribute name="_horPos" type="double" accessor="pos">
             </attribute>
 
@@ -150,20 +194,28 @@
                 <expr lang="C++" value="((uint64_t){self}._timeStampHi)&lt;&lt;32 + {self}._timeStampLo" />
             </method>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
         </pstype>
 
         <!-- ========================================================================= -->
 
-        <pstype name="DataDescV1" version="1" type_id="Id_AcqWaveform" pack="4" levels="Source">
+        <pstype name="DataDescV1Elem" version="1" pack="4">
         
-            Pds.Acqiris class ConfigV1
+            Pds.Acqiris class DataDescV1Elem
 
             <const name="NumberOfBits" value="10" />
             <const name="BitShift" value="6" />
             <const name="_extra" value="32*sizeof(short)" />
 
             <xtc-config name="ConfigV1" />
-            <repeat count="{xtc-config}.nbrChannels()" />
 
             <attribute name="_returnedSamplesPerSeg" type="uint32_t" accessor="nbrSamplesInSeg">
             </attribute>
@@ -217,10 +269,24 @@
 
         <!-- ========================================================================= -->
 
+        <pstype name="DataDescV1" version="1" type_id="Id_AcqWaveform" pack="4" levels="Source">
+        
+            Pds.Acqiris class DataDescV1
+
+            <xtc-config name="ConfigV1" />
+
+            <attribute name="_data" type="DataDescV1Elem" dimensions="{xtc-config}.nbrChannels()" accessor="data"/>
+            
+        </pstype>
+
+        <!-- ========================================================================= -->
+
         <pstype name="TdcChannel" pack="4">
         
             Pds.Acqiris class "TdcChannel"
 
+            <tag name="value-type"/>
+        
             <enum name="Channel">
               <enum-const name="Veto" value="-2" />
               <enum-const name="Common" value="-1" />
@@ -233,19 +299,29 @@
             </enum>
 
             <enum name="Mode">
-              <enum-const name="Positive" value="0" />
+              <enum-const name="Active" value="0" />
               <enum-const name="Inactive" value="1" />
             </enum>
 
             <enum name="Slope">
-              <enum-const name="Active"/>
+              <enum-const name="Positive"/>
               <enum-const name="Negative"/>
             </enum>
 
-            <attribute name="_channel" type="uint32_t">
+            <attribute name="_channel" type="uint32_t" accessor="_channel_int">
             </attribute>
 
-            <attribute name="_mode" type="uint32_t">
+            <attribute name="_mode" type="uint32_t" accessor="_mode_int">
+
+                <bitfield name="_bf_slope" size="1" type="Slope" accessor="slope">
+                </bitfield>
+
+                <bitfield name="_bf_pad" size="30">
+                </bitfield>
+
+                <bitfield name="_bf_mode" size="1" type="Mode" accessor="mode">
+                </bitfield>
+
             </attribute>
 
             <attribute name="_level" type="double" accessor="level">
@@ -253,15 +329,18 @@
 
             <method name="channel" type="Channel">
                 <expr lang="C++" value="Channel({self}._channel)" />
+                <tag name="inline"/>
             </method>
 
-            <method name="mode" type="Mode">
-                <expr lang="C++" value="Mode({self}._mode &gt;&gt; 31)" />
-            </method>
-
-            <method name="slope" type="Slope">
-                <expr lang="C++" value="Slope({self}._mode &amp; 1)" />
-            </method>
+            <ctor>
+                Default constructor without arguments
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Standard constructor
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
 
@@ -271,6 +350,8 @@
         
             Pds.Acqiris class "TdcAuxIO"
 
+            <tag name="value-type"/>
+        
             <enum name="Channel">
               <enum-const name="IOAux1" value="1" />
               <enum-const name="IOAux2" value="2" />
@@ -288,26 +369,39 @@
               <enum-const name="Z50" value="1"/>
             </enum>
 
-            <attribute name="_channel" type="uint32_t">
+            <attribute name="_channel" type="uint32_t" accessor="channel_int">
             </attribute>
 
-            <attribute name="_signal" type="uint32_t">
+            <attribute name="_signal" type="uint32_t" accessor="signal_int">
             </attribute>
 
-            <attribute name="_qualifier" type="uint32_t">
+            <attribute name="_qualifier" type="uint32_t" accessor="qualifier_int">
             </attribute>
 
             <method name="channel" type="Channel">
                 <expr lang="C++" value="Channel({self}._channel)" />
+                <tag name="inline"/>
             </method>
 
             <method name="mode" type="Mode">
                 <expr lang="C++" value="Mode({self}._signal)" />
+                <tag name="inline"/>
             </method>
 
             <method name="term" type="Termination">
                 <expr lang="C++" value="Termination({self}._qualifier)" />
+                <tag name="inline"/>
             </method>
+
+            <ctor>
+                Default constructor without arguments
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Standard constructor
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
 
@@ -317,6 +411,8 @@
         
             Pds.Acqiris class "TdcVetoIO"
 
+            <tag name="value-type"/>
+        
             <enum name="Channel">
               <enum-const name="ChVeto" value="13" />
             </enum>
@@ -336,23 +432,38 @@
             <attribute name="_channel" type="uint32_t">
             </attribute>
 
-            <attribute name="_signal" type="uint32_t">
+            <attribute name="_signal" type="uint32_t" accessor="signal_int">
             </attribute>
 
-            <attribute name="_qualifier" type="uint32_t">
+            <attribute name="_qualifier" type="uint32_t" accessor="qualifier_int">
             </attribute>
 
             <method name="channel" type="Channel">
                 <expr lang="C++" value="Channel({self}._channel)" />
+                <tag name="inline"/>
             </method>
 
             <method name="mode" type="Mode">
                 <expr lang="C++" value="Mode({self}._signal)" />
+                <tag name="inline"/>
             </method>
 
             <method name="term" type="Termination">
                 <expr lang="C++" value="Termination({self}._qualifier)" />
+                <tag name="inline"/>
             </method>
+
+            <ctor>
+                Default constructor without arguments
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Standard constructor
+                <tag name="inline"/>
+                <arg name="mode" dest="_signal"/>
+                <arg name="term" dest="_qualifier"/>
+                <attr-init dest="_channel" value="ChVeto"/>
+            </ctor>
 
         </pstype>
 
@@ -382,8 +493,10 @@
         
             Pds.Acqiris class TdcDataV1
 
+            <tag name="value-type"/>
+        
 	        <enum name="Source">
-	          <enum-const name="Common" />
+	          <enum-const name="Comm" />
 	          <enum-const name="Chan1" />
 	          <enum-const name="Chan2" />
 	          <enum-const name="Chan3" />
@@ -393,7 +506,7 @@
 	          <enum-const name="AuxIO" />
 	        </enum>
 
-            <attribute name="_value" type="uint32_t">
+            <attribute name="_value" type="uint32_t" accessor="value">
             
                 <bitfield name="_bf_val" size="28" type="uint32_t" accessor="bf_val_" access="protected">
                 </bitfield>
@@ -406,6 +519,16 @@
                 
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
 
         <!-- ========================================================================= -->
@@ -414,6 +537,8 @@
         
             Pds.Acqiris class TdcDataV1::Common
 
+            <tag name="value-type"/>
+        
             <method name="nhits" type="uint32_t">
                 <expr lang="C++" value="{self}.bf_val_()" />
             </method>
@@ -430,6 +555,8 @@
         
             Pds.Acqiris class TdcDataV1::Channel
 
+            <tag name="value-type"/>
+        
             <method name="ticks" type="uint32_t">
                 <expr lang="C++" value="{self}.bf_val_()" />
             </method>
@@ -451,6 +578,8 @@
         
             Pds.Acqiris class TdcDataV1::Marker
 
+            <tag name="value-type"/>
+        
             <enum name="Type">
               <enum-const name="AuxIOSwitch" value="0" />
               <enum-const name="EventCntSwitch" value="1" />

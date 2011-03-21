@@ -6,11 +6,23 @@
 	
 		<pstype name="FrameCoord">
 		
-            <attribute name="column" type="uint16_t" access="public">
+            <tag name="value-type"/>
+        
+            <attribute name="_column" type="uint16_t" accessor="column">
             </attribute>
 
-            <attribute name="row" type="uint16_t" access="public">
+            <attribute name="_row" type="uint16_t" accessor="row">
             </attribute>
+            
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
 		</pstype>
 		
@@ -138,6 +150,13 @@
             <attribute name="_major_axis_tilt" type="double" accessor="major_axis_tilt">
             </attribute>
 
+            <ctor>
+                Default constructor
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         

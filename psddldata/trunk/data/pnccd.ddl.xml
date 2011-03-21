@@ -74,7 +74,7 @@
         <!-- ========================================================================= -->
 
 
-        <pstype name="FrameV1" version="1" type_id="Id_Frame" levels="Source" size="{xtc-config}.payloadSizePerLink()">
+        <pstype name="FrameV1" version="1" type_id="Id_pnCCDframe" levels="Source" size="{xtc-config}.payloadSizePerLink()">
 
         pnCCD configuration class FrameV1
         

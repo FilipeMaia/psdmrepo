@@ -8,6 +8,10 @@
 	
 		<pstype name="ClockTime">
 		
+		    <tag name="no-sizeof"/>
+		    <tag name="value-type"/>
+	        <tag name="external"/>
+		
             <attribute name="_low" type="uint32_t" accessor="nanoseconds">
             </attribute>
 
@@ -19,6 +23,10 @@
         <!-- ========================================================================= -->
 	
 		<pstype name="DetInfo">
+
+            <tag name="no-sizeof"/>
+		    <tag name="value-type"/>
+	        <tag name="external"/>
 		
             <attribute name="_low" type="uint32_t">
             </attribute>

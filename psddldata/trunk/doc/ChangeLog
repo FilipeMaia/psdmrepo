@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2011-03-20 Andrei Salnikov
+- removed src and include directories
+- lots of changes in data models, added constructors, reworked epics stuff
+
 Tag: V00-00-02
 2011-01-06 Andrei Salnikov
 - removed C++ files that do not belong here
