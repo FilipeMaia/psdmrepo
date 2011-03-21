@@ -452,8 +452,6 @@ class DrawEvent ( object ) :
                 self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=8)
             else : self.close_fig(self.figNum)
 
-
-
             self.figNum += 1 
             if cp.confpars.cspadProjXIsOn : 
                 self.plotsCSpadProj.plotProjX(arr1ev,self.set_fig('1x1'))
@@ -474,8 +472,6 @@ class DrawEvent ( object ) :
                 self.plotsCSpadProj.plotProjPhi(arr1ev,self.set_fig('1x1'))
             else : self.close_fig(self.figNum)
             
-
-
             for nwin in range(cp.confpars.cspadImageNWindowsMax) :
                 self.figNum += 1 
                 if cp.confpars.cspadImageDetIsOn and nwin < cp.confpars.cspadImageNWindows : 
@@ -498,6 +494,32 @@ class DrawEvent ( object ) :
             if cp.confpars.imageImageSpecIsOn : 
                 self.plotsImage.plotImageAndSpectrum(arr1ev,self.set_fig('1x2'))
             else : self.close_fig(self.figNum)
+
+
+
+
+            self.figNum += 1 
+            if cp.confpars.imageProjXIsOn : 
+                self.plotsImageProj.plotProjX(arr1ev,self.set_fig('1x1'))
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.imageProjYIsOn : 
+                self.plotsImageProj.plotProjY(arr1ev,self.set_fig('1x1'))
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.imageProjRIsOn : 
+                self.plotsImageProj.plotProjR(arr1ev,self.set_fig('1x1'))
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.imageProjPhiIsOn : 
+                self.plotsImageProj.plotProjPhi(arr1ev,self.set_fig('1x1'))
+            else : self.close_fig(self.figNum)
+
+
+            
 
         if item_last_name == 'waveforms' :
 

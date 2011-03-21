@@ -1,3 +1,4 @@
+
 #--------------------------------------------------------------------------
 # File and Version Information:
 #  $Id$
@@ -7,7 +8,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Plots for any 'image' record in the EventeDisplay project.
+"""Plots for camera image projections in the EventeDisplay project..
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -29,301 +30,260 @@ __version__ = "$Revision: 4 $"
 #  Imports of standard modules --
 #--------------------------------
 import sys
-from numpy import *
-
-import matplotlib
-#matplotlib.use('GTKAgg') # forse Agg rendering to a GTK canvas (backend)
-#matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RectangleSelector
-
-#---------------------------------
-#  Imports of base class module --
-#---------------------------------
+#from matplotlib.patches import Rectangle
+#from matplotlib.artist  import Artist
+#from matplotlib.lines   import Line2D
+import time
+from numpy import *  # for use like       array(...)
+import numpy as np
 
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import ConfigParameters as cp
-import PrintHDF5        as printh5
+
+import ConfigParameters        as cp
+import PrintHDF5               as printh5
+import FastArrayTransformation as fat
 
 #---------------------
 #  Class definition --
 #---------------------
 class PlotsForImageProjections ( object ) :
-    """Plots for any 'image' record in the EventeDisplay project.
-
-    @see BaseClass
-    @see OtherClass
-    """
+    """Plots for camera image projections in the EventeDisplay project."""
 
     #----------------
     #  Constructor --
     #----------------
     def __init__ ( self ) :
-        """Constructor, initialization"""
-        pass
+        """Constructor - initialization."""
+
+        print '\n Initialization of the PlotsForImageProjections'
 
     #-------------------
     #  Public methods --
     #-------------------
 
-  
-    def plotImage( self, arr2d1ev, fig ):
-        """Plot 2d image from input array."""
+    def plotProjX(self, arr1ev, fig) :
+        print 'plotProjX'
 
-        self.figDet = fig
-        self.figDet.myarr = arr2d1ev
-        self.figDet.canvas.set_window_title(cp.confpars.current_item_name_for_title)
+        arrDet = arr1ev # self.plotsCSpad.getImageArrayForDet( arr1ev )
+
+        NBins    = cp.confpars.projX_NBins    
+        BinWidth = cp.confpars.projX_BinWidth
+        NSlices  = cp.confpars.projX_NSlices 
+        SliWidth = cp.confpars.projX_SliWidth
+        Xmin     = cp.confpars.projX_Xmin    
+        Xmax     = cp.confpars.projX_Xmax    
+        Ymin     = cp.confpars.projX_Ymin    
+        Ymax     = cp.confpars.projX_Ymax    
+
+        XRange        = (Xmin,Xmax,NBins)
+        YRange        = (Ymin,Ymax,NSlices)
+        self.XYRange  = (Xmin,Xmax,Ymax,Ymin)
+        self.HRange   = (Xmin,Xmax)
+
+        fig.canvas.set_window_title('X projection')
+
+        fig.subplots_adjust(left=0.15, bottom=0.06, right=0.98, top=0.95, wspace=0.35, hspace=0.3)
+        plt.clf()
+
+        #plt.subplot(222)
+        #axes = plt.imshow(arrDet[Ymin:Ymax,Xmin:Xmax], origin='upper',interpolation='nearest',extent=self.XYRange)
+
+        plt.subplot(211)
+        arr2d = fat.rebinArray(arrDet, XRange, YRange) 
+        axes = plt.imshow(arr2d, origin='upper',interpolation='nearest',extent=self.XYRange)
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.title('Event '+str(cp.confpars.eventCurrent),color='r',fontsize=20) 
+
+        #print 'arr2d.shape=',arr2d.shape
+
+        plt.subplot(212)
+        for slice in range(NSlices):
+
+            arr1slice = arr2d[slice,...]
+            xarr = linspace(Xmin, Xmax, num=NBins, endpoint=True)
+            #print 'xarr.shape=',xarr.shape
+            #print 'arr1slice.shape=',arr1slice.shape
+
+            axes = plt.hist(xarr, bins=NBins, weights=arr1slice, histtype='step')
+            plt.xlim(Xmin,Xmax)
+
+        plt.xlabel('X')
+
+
+    def plotProjY(self, arr1ev, fig) :
+        print 'plotProjY'
+
+        arrDet = arr1ev # self.plotsCSpad.getImageArrayForDet( arr1ev )
+
+        NBins    = cp.confpars.projY_NBins    
+        BinWidth = cp.confpars.projY_BinWidth
+        NSlices  = cp.confpars.projY_NSlices 
+        SliWidth = cp.confpars.projY_SliWidth
+        Xmin     = cp.confpars.projY_Xmin    
+        Xmax     = cp.confpars.projY_Xmax    
+        Ymin     = cp.confpars.projY_Ymin    
+        Ymax     = cp.confpars.projY_Ymax    
+
+        XRange          = (Xmin,Xmax,NSlices)
+        YRange          = (Ymin,Ymax,NBins)
+        self.HRange     = (Ymin,Ymax)
+        self.XYRange    = (Xmin,Xmax,Ymax,Ymin)
+        self.XYRangeR90 = (Ymin,Ymax,Xmin,Xmax,) 
+
+        arr2d = fat.rebinArray(arrDet, XRange, YRange) 
+
+        fig.canvas.set_window_title('Y projection')
+
+        fig.subplots_adjust(left=0.15, bottom=0.06, right=0.98, top=0.95, wspace=0.35, hspace=0.3)
+        plt.clf()
+
+        #plt.subplot(222)
+        #axes = plt.imshow(arrDet[Ymin:Ymax,Xmin:Xmax], origin='upper',interpolation='nearest',extent=self.XYRange)
+
+        plt.subplot(211)
+        #axes = plt.imshow(arr2d, origin='upper',interpolation='nearest',extent=self.XYRange)
+        #plt.xlabel('X')
+        #plt.ylabel('Y')
+
+        axes = plt.imshow(np.rot90(arr2d), origin='upper',interpolation='nearest',extent=self.XYRangeR90)
+        plt.xlabel('Y')
+        plt.ylabel('X')
+
+        plt.title('Event '+str(cp.confpars.eventCurrent),color='r',fontsize=20) 
+        #print 'arr2d.shape=',arr2d.shape
+
+        plt.subplot(212)
+        for slice in range(NSlices):
+
+            arr1slice = arr2d[...,slice]
+            arrbins   = linspace(Ymin, Ymax, num=NBins, endpoint=True)
+
+            axes = plt.hist(arrbins, bins=NBins, weights=arr1slice, histtype='step')
+            plt.xlim(Ymin,Ymax)
+
+        plt.xlabel('Y')
+
+
+    def plotProjR(self, arr1ev, fig) :
+        print 'plotProjR'
+
+        arrDet = arr1ev # self.plotsCSpad.getImageArrayForDet( arr1ev )
+
+        NBins    = cp.confpars.projR_NBins    
+        BinWidth = cp.confpars.projR_BinWidth
+        NSlices  = cp.confpars.projR_NSlices 
+        SliWidth = cp.confpars.projR_SliWidth
+        Rmin     = cp.confpars.projR_Rmin    
+        Rmax     = cp.confpars.projR_Rmax    
+        Pmin     = cp.confpars.projR_Phimin    
+        Pmax     = cp.confpars.projR_Phimax    
+
+        RRange   = (Rmin,Rmax,NBins)
+        PRange   = (Pmin,Pmax,NSlices)
+        RPRange  = (Rmin,Rmax,Pmax,Pmin)
+        HRange   = (Rmin,Rmax)
+        Origin   = (cp.confpars.projCenterX, cp.confpars.projCenterY)
+
+        fig.canvas.set_window_title('R projection')
+
+        fig.subplots_adjust(left=0.15, bottom=0.06, right=0.98, top=0.95, wspace=0.35, hspace=0.3)
+        plt.clf()
+
+        #plt.subplot(222)
+        #axes = plt.imshow(arrDet[Ymin:Ymax,Xmin:Xmax], origin='upper',interpolation='nearest',extent=self.XYRange)
+
+        plt.subplot(211)
+
+        arrRPhi = fat.transformCartToPolarArray(arrDet, RRange, PRange, Origin)
+        print 'arrRPhi.shape=', arrRPhi.shape
         
-        self.drawImage(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax)
+        axes = plt.imshow(arrRPhi, origin='upper', interpolation='nearest', extent=RPRange)
+        plt.xlabel('R')
+        plt.ylabel('Phi')
+        plt.title('Event '+str(cp.confpars.eventCurrent),color='r',fontsize=20) 
+
+        #print 'arr2d.shape=',arr2d.shape
+
+        plt.subplot(212)
+        for slice in range(NSlices):
+
+            arr1slice = arrRPhi[slice,...]
+            xarr = linspace(Rmin, Rmax, num=NBins, endpoint=True)
+            #print 'xarr.shape=',xarr.shape
+            #print 'arr1slice.shape=',arr1slice.shape
+
+            axes = plt.hist(xarr, bins=NBins, weights=arr1slice, histtype='step')
+            plt.xlim(Rmin,Rmax)
+
+        plt.xlabel('R')
 
 
-    def drawImage( self, xmin=None, xmax=None, ymin=None, ymax=None ):
-        plt.clf() # clear plot
-        self.figDet.subplots_adjust(left=0.10, bottom=0.05, right=0.95, top=0.95, wspace=0.1, hspace=0.1)
-        plt.title('Event ' + str(cp.confpars.eventCurrent),color='r',fontsize=20) # pars like in class Text
-        
-        if xmin == None :
-            self.arrwin  = self.figDet.myarr
-            self.range   = None # original image range in pixels
-        else :
-            self.arrwin = self.figDet.myarr[ymin:ymax,xmin:xmax]
-            self.range  = [xmin, xmax, ymax, ymin]
+    def plotProjPhi(self, arr1ev, fig) :
+        print 'plotProjPhi'
 
-        self.axescb = plt.imshow(self.arrwin, origin='upper', interpolation='nearest', extent=self.range) # Just a histogram t=0.08s
+        arrDet = arr1ev # self.plotsCSpad.getImageArrayForDet( arr1ev )
 
-        self.addSelectionRectangleForImage()
+        NBins    = cp.confpars.projPhi_NBins    
+        BinWidth = cp.confpars.projPhi_BinWidth
+        NSlices  = cp.confpars.projPhi_NSlices 
+        SliWidth = cp.confpars.projPhi_SliWidth
+        Rmin     = cp.confpars.projPhi_Rmin    
+        Rmax     = cp.confpars.projPhi_Rmax    
+        Pmin     = cp.confpars.projPhi_Phimin    
+        Pmax     = cp.confpars.projPhi_Phimax    
 
-        self.axesDet = plt.gca()
+        RRange   = (Rmin,Rmax,NSlices)
+        PRange   = (Pmin,Pmax,NBins)
+        RPRange  = (Rmin,Rmax,Pmax,Pmin)
+        PRRange  = (Pmin,Pmax,Rmin,Rmax)
 
-        colmin = {True: cp.confpars.imageImageAmin, False: self.figDet.myCmin}[self.figDet.myCmin == None]
-        colmax = {True: cp.confpars.imageImageAmax, False: self.figDet.myCmax}[self.figDet.myCmax == None]
-        plt.clim(colmin,colmax)
-        self.colb = plt.colorbar(self.axescb, pad=0.05, orientation=1, fraction=0.10, shrink = 1, aspect = 20)#, ticks=coltickslocs #t=0.04s
+        HRange   = (Pmin,Pmax)
+        Origin   = (cp.confpars.projCenterX, cp.confpars.projCenterY)
 
-       #self.figDet.canvas.mpl_connect('button_press_event',   self.processMouseButtonClickForImageColorbar)
-        self.figDet.canvas.mpl_connect('button_press_event',   self.processMouseButtonPressForImage)
+        fig.canvas.set_window_title('Phi projection')
 
-        rect_props=dict(edgecolor='black', linewidth=2, linestyle='dashed', fill=False)
-        self.figDet.span = RectangleSelector(self.axesDet, self.onRectangleSelect, drawtype='box',rectprops=rect_props)
+        fig.subplots_adjust(left=0.15, bottom=0.06, right=0.98, top=0.95, wspace=0.35, hspace=0.3)
+        plt.clf()
 
-        plt.draw()
+        #plt.subplot(222)
+        #axes = plt.imshow(arrDet[Ymin:Ymax,Xmin:Xmax], origin='upper',interpolation='nearest',extent=self.XYRange)
 
+        plt.subplot(211)
 
-    def onRectangleSelect(self, eclick, erelease) :
-        if eclick.button == 1 : # left button
+        arrRPhi = fat.transformCartToPolarArray(arrDet, RRange, PRange, Origin)
+        print 'arrRPhi.shape=', arrRPhi.shape
 
-            self.figDet = plt.gcf() # Get current figure
+        axes = plt.imshow(np.rot90(arrRPhi), origin='upper',interpolation='nearest',extent=PRRange)
+        plt.xlabel('Phi')
+        plt.ylabel('R')
+        #axes = plt.imshow(arrRPhi, origin='upper', interpolation='nearest', extent=RPRange)
+        #plt.xlabel('R')
+        #plt.ylabel('Phi') #u'\u03C6'
+        plt.title('Event '+str(cp.confpars.eventCurrent),color='r',fontsize=20) 
 
-            xmin = int(min(eclick.xdata, erelease.xdata))
-            ymin = int(min(eclick.ydata, erelease.ydata))
-            xmax = int(max(eclick.xdata, erelease.xdata))
-            ymax = int(max(eclick.ydata, erelease.ydata))
-            print 'xmin, xmax, ymin, ymax: ', xmin, xmax, ymin, ymax
+        plt.subplot(212)
+        for slice in range(NSlices):
 
-            if xmax-xmin < 20 or ymax-ymin < 20 : return
-            self.drawImage( xmin, xmax, ymin, ymax )
-            #plt.draw() # redraw the current figure
+            arr1slice = arrRPhi[...,slice]
+            xarr = linspace(Pmin, Pmax, num=NBins, endpoint=True)
+            #print 'xarr.shape=',xarr.shape
+            #print 'arr1slice.shape=',arr1slice.shape
 
-            self.figDet.myXmin = xmin
-            self.figDet.myXmax = xmax
-            self.figDet.myYmin = ymin
-            self.figDet.myYmax = ymax
-            self.figDet.myZoomIsOn = True
+            axes = plt.hist(xarr, bins=NBins, weights=arr1slice, histtype='step')
+            plt.xlim(Pmin,Pmax)
 
-
-    def processMouseButtonPressForImage(self, event) :
-        #print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y,
-        #print ' xdata=',event.xdata,' ydata=', event.ydata
-        self.figDet = plt.gcf() # Get current figure
-        print 'mouse click button=', event.button
-        if event.button == 2 or event.button == 3 : # middle or right button
-            self.figDet.myXmin = None
-            self.figDet.myXmax = None
-            self.figDet.myYmin = None
-            self.figDet.myYmax = None
-            self.drawImage()
-            #plt.draw() # redraw the current figure
-            self.figDet.myZoomIsOn = False
+        plt.xlabel('Phi') #u'\u03C6'
 
 
-    def addSelectionRectangleForImage( self ):
-        if cp.confpars.selectionIsOn :
-            for win in range(cp.confpars.selectionNWindows) :
-
-                if cp.confpars.selectionWindowParameters[win][6] == self.figDet.mydsname:
-                    #print 'Draw the selection box for dataset:', cp.confpars.selectionWindowParameters[win][6]
-                    xy = cp.confpars.selectionWindowParameters[win][2],  cp.confpars.selectionWindowParameters[win][4]
-                    w  = cp.confpars.selectionWindowParameters[win][3] - cp.confpars.selectionWindowParameters[win][2]
-                    h  = cp.confpars.selectionWindowParameters[win][5] - cp.confpars.selectionWindowParameters[win][4]
-
-                    rec = plt.Rectangle(xy, width=w, height=h, edgecolor='w', linewidth=2, fill=False)
-                    plt.gca().add_patch(rec)
-
-
-    def processMouseButtonClickForImageColorbar(self, event) :
-       #print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y,
-       #print ' xdata=',event.xdata,' ydata=', event.ydata
-
-       fig = self.figDet = plt.gcf() # Get current figure
-
-       if event.inaxes :
-           lims = self.axescb.get_clim()
-
-           colmin = lims[0]
-           colmax = lims[1]
-           range = colmax - colmin
-           value = colmin + event.xdata * range
-           #print colmin, colmax, range, value
-
-           # left button
-           if event.button is 1 :
-               if value > colmin and value < colmax :
-                   self.figDet.myCmin = value
-                   print "new mininum: ", self.figDet.myCmin
-               else :
-                   print "min has not been changed (click inside the color bar to change the range)"
-
-           # middle button
-           elif event.button is 2 :
-               self.figDet.myCmin, self.figDet.myCmax = cp.confpars.imageImageAmin, cp.confpars.imageImageAmax
-               print "reset"
-
-           # right button
-           elif event.button is 3 :
-               if value > colmin and value < colmax :
-                   self.figDet.myCmax = value
-                   print "new maximum: ", self.figDet.myCmax
-               else :
-                   print "max has not been changed (click inside the color bar to change the range)"
-
-           self.drawImage(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax)
-           plt.draw() # redraw the current figure
-
-#--------------------------------
-#--------------------------------
-#--------------------------------
-#--------------------------------
-
-
-    def plotImageSpectrum( self, arr2d1ev, fig ):
-        """Spectrum of amplitudes in the 2d input array."""
-
-        plt.clf() # clear plot
-        fig.canvas.set_window_title(cp.confpars.current_item_name_for_title) 
-        pantit='Specrum, event ' + str(cp.confpars.eventCurrent)
-        plt.title(pantit,color='r',fontsize=20) # pars like in class Text
-        arrdimX,arrdimY = arr2d1ev.shape
-        #print 'arr2d1ev.shape=', arr2d1ev.shape, arrdimX, arrdimY 
-        #print 'arr2d1ev=\n', arr2d1ev
-        arr1d1ev = copy(arr2d1ev)
-        arr1d1ev.resize(arrdimX*arrdimY)
-        #print 'arr1d1ev=\n', arr1d1ev
-        #plt.hist(arr1d1ev,100)
-
-        cp.confpars.imageSpectrumRange=(15,45)
-        #cp.confpars.imageSpectrumNbins=30       
-        #cp.confpars.imageSpectrumRange=None        
-        #cp.confpars.imageSpectrumNbins=None        
-        plt.hist(arr1d1ev, bins=cp.confpars.imageSpectrumNbins, range=(cp.confpars.imageSpectrumAmin,cp.confpars.imageSpectrumAmax))
-        #plt.hist(arr1d1ev)
-
-
-    def plotImageAndSpectrum( self, arr2d1ev, fig ):
-        """Image and spectrum of amplitudes in the 2d input array."""
-        #print 'Image and spectrum'
-
-        self.fig = fig
-        fig.canvas.set_window_title(cp.confpars.current_item_name_for_title)
-        plt.clf() # clear plot
-        fig.subplots_adjust(left=0.15, bottom=0.05, right=0.95, top=0.95, wspace=0.1, hspace=0.1)        
-        
-        #For Image 
-        self.arr2d = arr2d1ev
-
-        #print 'arr2d1ev.shape=', arr2d1ev.shape
-        #print 'self.arr2d.shape=', self.arr2d.shape
-
-        #For spectrum
-        arrdimX,arrdimY = self.arr2d.shape
-        self.arr1d = copy(arr2d1ev)
-        self.arr1d.resize(arrdimX*arrdimY)            
-
-        self.pantit =    'Event ' + str(cp.confpars.eventCurrent) 
-        self.drawImageAndSpectrum(cp.confpars.imageImageAmin,cp.confpars.imageImageAmax)
-
-
-
-    def drawImageAndSpectrum(self, Amin=None, Amax=None):
-        """Plot 2d image from input array for a single pair"""
-
-        ax2 = plt.subplot2grid((4,4), (3,0), rowspan=1, colspan=4)
-        #plt.subplot(212)
-        self.axes1d = plt.hist(self.arr1d, bins=cp.confpars.imageSpectrumNbins, range=(Amin, Amax))
-        #plt.xticks( arange(int(Amin), int(Amax), int((Amax-Amin)/3)) )
-        colmin, colmax = plt.xlim()
-        coltickslocs, coltickslabels = plt.xticks()
-        #print 'colticks =', coltickslocs, coltickslabels
-        
-        ax1 = plt.subplot2grid((4,4), (0,0), rowspan=3, colspan=4)
-        #plt.subplot(211)
-        #print 'self.arr2d.shape=', self.arr2d.shape
-        self.axes = plt.imshow(self.arr2d, interpolation='nearest') # Just a histogram, origin='upper', origin='down'
-        plt.title(self.pantit,color='r',fontsize=20) # pars like in class Text
-
-        #plt.text(50, -20, pantit, fontsize=24)
-        self.colb = plt.colorbar(self.axes, pad=0.10, orientation=2, fraction=0.10, shrink = 1, aspect = 8, ticks=coltickslocs)
-
-        plt.clim(colmin,colmax)
-        #self.orglims = self.axes.get_clim()
-           
-        self.fig.canvas.mpl_connect('button_press_event', self.processMouseButtonClick)
-
-    def processMouseButtonClick(self, event) :
-       #print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y,
-       #print ' xdata=',event.xdata,' ydata=', event.ydata
-       if event.inaxes :
-           lims = self.axes.get_clim()
-
-           colmin = lims[0]
-           colmax = lims[1]
-           range = colmax - colmin
-           value = colmin + event.xdata * range
-           #print colmin, colmax, range, value
-
-           # left button
-           if event.button is 1 :
-               if value > colmin and value < colmax :
-                   colmin = value
-                   print "new mininum: ", colmin
-               else :
-                   print "min has not been changed (click inside the color bar to change the range)"
-
-           # middle button
-           elif event.button is 2 :
-               colmin, colmax = cp.confpars.imageImageAmin, cp.confpars.imageImageAmax
-               print "reset"
-
-           # right button
-           elif event.button is 3 :
-               if value > colmin and value < colmax :
-                   colmax = value
-                   print "new maximum: ", colmax
-               else :
-                   print "max has not been changed (click inside the color bar to change the range)"
-
-           plt.clim(colmin,colmax)
-           plt.clf()
-           self.drawImageAndSpectrum(colmin,colmax)
-           plt.draw() # redraw the current figure
-    
-        
-#--------------------------------
+#
 #  In case someone decides to run this module
 #
 if __name__ == "__main__" :
-
+    # In principle we can try to run test suite for this module,
+    # have to think about it later. Right now just abort.
     sys.exit ( "Module is not supposed to be run as main module" )
-
-#--------------------------------

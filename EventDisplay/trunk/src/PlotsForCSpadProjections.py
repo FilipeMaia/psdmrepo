@@ -64,8 +64,6 @@ class PlotsForCSpadProjections ( object ) :
 
         self.plotsCSpad = plotsCSpad
 
-
-
     #-------------------
     #  Public methods --
     #-------------------
@@ -118,7 +116,6 @@ class PlotsForCSpadProjections ( object ) :
             plt.xlim(Xmin,Xmax)
 
         plt.xlabel('X')
-
 
 
     def plotProjY(self, arr1ev, fig) :
@@ -175,11 +172,6 @@ class PlotsForCSpadProjections ( object ) :
         plt.xlabel('Y')
 
 
-
-
-
-
-
     def plotProjR(self, arr1ev, fig) :
         print 'plotProjR'
 
@@ -234,10 +226,6 @@ class PlotsForCSpadProjections ( object ) :
         plt.xlabel('R')
 
 
-
-
-
-
     def plotProjPhi(self, arr1ev, fig) :
         print 'plotProjPhi'
 
@@ -255,6 +243,7 @@ class PlotsForCSpadProjections ( object ) :
         RRange   = (Rmin,Rmax,NSlices)
         PRange   = (Pmin,Pmax,NBins)
         RPRange  = (Rmin,Rmax,Pmax,Pmin)
+        PRRange  = (Pmin,Pmax,Rmin,Rmax)
         HRange   = (Pmin,Pmax)
         Origin   = (cp.confpars.projCenterX, cp.confpars.projCenterY)
 
@@ -270,6 +259,10 @@ class PlotsForCSpadProjections ( object ) :
 
         arrRPhi = fat.transformCartToPolarArray(arrDet, RRange, PRange, Origin)
         print 'arrRPhi.shape=', arrRPhi.shape
+
+        #axes = plt.imshow(np.rot90(arrRPhi), origin='upper',interpolation='nearest',extent=PRRange)
+        #plt.xlabel('Phi')
+        #plt.ylabel('R')
 
         axes = plt.imshow(arrRPhi, origin='upper', interpolation='nearest', extent=RPRange)
         plt.xlabel('R')
