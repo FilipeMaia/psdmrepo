@@ -25,7 +25,9 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+#include "PSTime/Time.h"
 #include "PSXtcInput/Exceptions.h"
+#include "PSXtcInput/XtcEventId.h"
 #include "XtcInput/DgramQueue.h"
 #include "XtcInput/DgramReader.h"
 #include "XtcInput/XtcFileName.h"
@@ -61,6 +63,7 @@ XtcInputModule::XtcInputModule (const std::string& name)
   , m_dgQueue(new XtcInput::DgramQueue(10))
   , m_putBack()
   , m_readerThread()
+  , m_cvt()
 {
 }
 
@@ -107,7 +110,7 @@ XtcInputModule::beginJob(Env& env)
   
   
   // try to read first event and see if it is a Configure transition
-  boost::shared_ptr<Pds::Dgram> dg(m_dgQueue->pop());
+  XtcInput::Dgram::ptr dg(m_dgQueue->pop());
   if (not dg.get()) {
     // Nothing there at all, this is unexpected
     throw EmptyInput(ERR_LOC);
@@ -130,12 +133,12 @@ InputModule::Status
 XtcInputModule::event(Event& evt, Env& env)
 {
   // get datagram either from saved event or queue
-  boost::shared_ptr<Pds::Dgram> dg;
+  XtcInput::Dgram::ptr dg;
   if (m_putBack.get()) {
     dg = m_putBack;
     m_putBack.reset();
   } else {
-    dg.reset(m_dgQueue->pop());
+    dg = m_dgQueue->pop();
   }
 
   if (not dg.get()) {
@@ -181,7 +184,7 @@ XtcInputModule::event(Event& evt, Env& env)
   case Pds::TransitionId::L1Accept:
     // regular event
     fillEnv(dg, env);
-    fillEvent(dg, evt);
+    fillEvent(dg, evt, env);
     status = DoEvent;
     break;
   
@@ -208,36 +211,68 @@ XtcInputModule::endJob(Env& env)
 
 // Fill event with datagram contents
 void 
-XtcInputModule::fillEvent(const boost::shared_ptr<Pds::Dgram>& dg, Event& evt)
+XtcInputModule::fillEvent(const XtcInput::Dgram::ptr& dg, Event& evt, Env& env)
 {
   // Store datagram itself in the event
   evt.put(dg);
   
   const Pds::Sequence& seq = dg->seq ;
   const Pds::ClockTime& clock = seq.clock() ;
-  std::cout << Pds::TransitionId::name(seq.service()) << " transition: damage " << dg->xtc.damage.value() 
-        << ", type " << int(seq.type()) 
-        << ", time " << clock.seconds() << " sec " << clock.nanoseconds() << " nsec"
-        << ", payloadSize " << dg->xtc.sizeofPayload() << "\n";
 
+  // Store event ID
+  PSTime::Time evtTime(clock.seconds(), clock.nanoseconds());
+  boost::shared_ptr<PSEvt::EventId> eventId( new XtcEventId(-1, evtTime) );
+  evt.put(eventId);
+
+  // Loop over all XTC contained in the datagram
   XtcInput::XtcIterator iter(&dg->xtc);
   while (Pds::Xtc* xtc = iter.next()) {
-    
-    std::cout << "  XTC type " << Pds::TypeId::name(xtc->contains.id())
-          << " V" << xtc->contains.version()
-          << ", payloadSize " << xtc->sizeofPayload() << "\n";
-    
+      
+    boost::shared_ptr<Pds::Xtc> xptr(dg, xtc);
+    // call the converter which will fill event with data
+    m_cvt.convert(xptr, evt, env.configStore());
     
   }
 }
 
 // Fill environment with datagram contents
 void 
-XtcInputModule::fillEnv(const boost::shared_ptr<Pds::Dgram>& dg, Env& env)
+XtcInputModule::fillEnv(const XtcInput::Dgram::ptr& dg, Env& env)
 {
   // All objects in datagram in Configuration and BeginCalibCycle transitions
   // (except for EPICS data) are considered configuration data. Just store them
   // them in the ConfigStore part of the environment
+
+  const Pds::Sequence& seq = dg->seq ;
+  if (seq.service() == Pds::TransitionId::Configure or 
+      seq.service() == Pds::TransitionId::BeginCalibCycle) {
+    
+    // Loop over all XTC contained in the datagram
+    XtcInput::XtcIterator iter(&dg->xtc);
+    while (Pds::Xtc* xtc = iter.next()) {
+
+      if (xtc->contains.id() != Pds::TypeId::Id_Epics) {
+        boost::shared_ptr<Pds::Xtc> xptr(dg, xtc);
+        // call the converter which will fill config store
+        m_cvt.convertConfig(xptr, env.configStore());
+      }
+      
+    }
+      
+  }
+
+  // Convert EPICS too and store it in EPICS store
+  // Loop over all XTC contained in the datagram
+  XtcInput::XtcIterator iter(&dg->xtc);
+  while (Pds::Xtc* xtc = iter.next()) {
+
+    if (xtc->contains.id() == Pds::TypeId::Id_Epics) {
+      // call the converter which will fill config store
+      boost::shared_ptr<Pds::Xtc> xptr(dg, xtc);
+      //m_cvt.convertEpics(*xtc, env.epicsStore(), dg);
+    }
+    
+  }
 
 }
 

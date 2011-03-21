@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2011-03-20 Andy Salnikov
+- added implementation of the event ID class
+
 Tag: V00-00-04
 2011-01-31 Andy Salnikov
 - renamed this package to PSXtcInput

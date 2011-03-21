@@ -25,7 +25,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/xtc/Dgram.hh"
+#include "XtcInput/Dgram.h"
+#include "psddl_pds2psana/XtcConverter.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -75,17 +76,18 @@ public:
 protected:
   
   // Fill event with datagram contents
-  void fillEvent(const boost::shared_ptr<Pds::Dgram>& dg, Event& evt);
+  void fillEvent(const XtcInput::Dgram::ptr& dg, Event& evt, Env& env);
   
   // Fill environment with datagram contents
-  void fillEnv(const boost::shared_ptr<Pds::Dgram>& dg, Env& env);
+  void fillEnv(const XtcInput::Dgram::ptr& dg, Env& env);
 
 private:
 
   // Data members
   boost::scoped_ptr<XtcInput::DgramQueue> m_dgQueue;
-  boost::shared_ptr<Pds::Dgram> m_putBack;
+  XtcInput::Dgram::ptr m_putBack;
   boost::scoped_ptr<boost::thread> m_readerThread;
+  psddl_pds2psana::XtcConverter m_cvt;
 };
 
 } // namespace PSXtcInput
