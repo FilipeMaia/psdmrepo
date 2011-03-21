@@ -545,6 +545,12 @@ class DdlPds2Psana ( object ) :
 
         print >>self.cpp, "  {"
         
+        cfgNeeded = False
+        if str(attr.offset).find('{xtc-config}') >= 0:
+            cfgNeeded = True
+        if str(attr.type.size).find('{xtc-config}') >= 0:
+            cfgNeeded = True
+        
         cfg = ''
         for d in attr.dimensions.dims:
             if '{xtc-config}' in str(d) : cfg = "*cfgPtr"
@@ -562,7 +568,10 @@ class DdlPds2Psana ( object ) :
                 if attr.access == 'public' :
                     expr = "xtcPtr->%s%s" % (attr.name, subscr(r+1))
                 elif attr.accessor is not None:
-                    expr = "xtcPtr->%s(%s)" % (attr.accessor.name, subscr_comma(r+1))
+                    if cfgNeeded:
+                        expr = "xtcPtr->%s(*cfgPtr, %s)" % (attr.accessor.name, subscr_comma(r+1))
+                    else:
+                        expr = "xtcPtr->%s(%s)" % (attr.accessor.name, subscr_comma(r+1))
                 if attr.type.external:
                     pass
                 elif attr.type.value_type:

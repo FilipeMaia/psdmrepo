@@ -437,10 +437,17 @@ class CppTypeCodegen ( object ) :
         else:
             
             idxexpr = ExprVal(0)
+            sizeofCfg = ''
             if attr.dimensions : 
+                
                 idxexpr = ExprVal('i0', self._type)
                 for i in range(1,len(attr.dimensions.dims)):
                     idxexpr = idxexpr*attr.dimensions.dims[i] + ExprVal('i%d'%i, self._type)
+                    
+                # _sizeof may need config
+                if str(attr.type.size).find('{xtc-config}') >= 0: 
+                    cfgNeeded = True
+                    sizeofCfg = 'cfg'
             
             configs = [None]
             if cfgNeeded : configs = attr.parent.xtcConfig
@@ -454,8 +461,9 @@ class CppTypeCodegen ( object ) :
 
                 print >>self._inc, "  const %s& %s(%s) const {" % (typename, methname, argstr)
                 print >>self._inc, "    ptrdiff_t offset=%s;" % (offset,)
-                print >>self._inc, "    const %s* memptr = (const %s*)(((const char*)this)+offset);" % (typename,typename)
-                print >>self._inc, "    return *(memptr + %s);" % (idxexpr,)
+                print >>self._inc, "    const %s* memptr = (const %s*)(((const char*)this)+offset);" % (typename, typename)
+                print >>self._inc, "    size_t memsize = memptr->_sizeof(%s);" % (sizeofCfg,)
+                print >>self._inc, "    return *(const %s*)((const char*)memptr + (%s)*memsize);" % (typename, idxexpr)
                 print >>self._inc, "  }"
 
 
