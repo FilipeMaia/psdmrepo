@@ -92,12 +92,14 @@ public:
   const ControlData::PVControl& pvControls(uint32_t i0) const {
     ptrdiff_t offset=24;
     const ControlData::PVControl* memptr = (const ControlData::PVControl*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const ControlData::PVControl*)((const char*)memptr + (i0)*memsize);
   }
   const ControlData::PVMonitor& pvMonitors(uint32_t i0) const {
     ptrdiff_t offset=24+(44*(this->_npvControls));
     const ControlData::PVMonitor* memptr = (const ControlData::PVMonitor*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const ControlData::PVMonitor*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return (24+(ControlData::PVControl::_sizeof()*(this->_npvControls)))+(ControlData::PVMonitor::_sizeof()*(this->_npvMonitors));}
   std::vector<int> _pvControls_shape() const;

@@ -211,7 +211,8 @@ public:
   const Acqiris::TimestampV1& _timestamp(uint32_t i0) const {
     ptrdiff_t offset=64;
     const Acqiris::TimestampV1* memptr = (const Acqiris::TimestampV1*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const Acqiris::TimestampV1*)((const char*)memptr + (i0)*memsize);
   }
   const int16_t* _waveform(const Acqiris::ConfigV1& cfg) const {
     ptrdiff_t offset=64+(16*(cfg.horiz().nbrSegments()));
@@ -251,10 +252,11 @@ class DataDescV1 {
 public:
   enum {Version = 1};
   enum {TypeId = Pds::TypeId::Id_AcqWaveform};
-  const Acqiris::DataDescV1Elem& data(uint32_t i0) const {
+  const Acqiris::DataDescV1Elem& data(const Acqiris::ConfigV1& cfg, uint32_t i0) const {
     ptrdiff_t offset=0;
     const Acqiris::DataDescV1Elem* memptr = (const Acqiris::DataDescV1Elem*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof(cfg);
+    return *(const Acqiris::DataDescV1Elem*)((const char*)memptr + (i0)*memsize);
   }
   static uint32_t _sizeof(const Acqiris::ConfigV1& cfg)  {return 0+(Acqiris::DataDescV1Elem::_sizeof(cfg)*(cfg.nbrChannels()));}
   std::vector<int> _data_shape(const Acqiris::ConfigV1& cfg) const;
@@ -510,7 +512,8 @@ public:
   const Acqiris::TdcDataV1_Item& data(uint32_t i0) const {
     ptrdiff_t offset=0;
     const Acqiris::TdcDataV1_Item* memptr = (const Acqiris::TdcDataV1_Item*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const Acqiris::TdcDataV1_Item*)((const char*)memptr + (i0)*memsize);
   }
   static uint32_t _sizeof()  {return ~uint32_t(0);}
   std::vector<int> _data_shape() const;

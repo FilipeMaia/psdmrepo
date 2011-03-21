@@ -76,7 +76,8 @@ public:
   const Camera::FrameCoord& masked_pixel_coordinates(uint32_t i0) const {
     ptrdiff_t offset=28;
     const Camera::FrameCoord* memptr = (const Camera::FrameCoord*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const Camera::FrameCoord*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return ((((12+(Camera::FrameCoord::_sizeof()))+(Camera::FrameCoord::_sizeof()))+4)+4)+(Camera::FrameCoord::_sizeof()*(this->_masked_pixel_count));}
   std::vector<int> _masked_pixel_coordinates_shape() const;

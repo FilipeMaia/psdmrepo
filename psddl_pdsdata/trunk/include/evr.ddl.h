@@ -251,12 +251,14 @@ public:
   const EvrData::PulseConfig& pulses(uint32_t i0) const {
     ptrdiff_t offset=8;
     const EvrData::PulseConfig* memptr = (const EvrData::PulseConfig*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::PulseConfig*)((const char*)memptr + (i0)*memsize);
   }
   const EvrData::OutputMap& output_maps(uint32_t i0) const {
     ptrdiff_t offset=8+(24*(this->_npulses));
     const EvrData::OutputMap* memptr = (const EvrData::OutputMap*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::OutputMap*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return (8+(EvrData::PulseConfig::_sizeof()*(this->_npulses)))+(EvrData::OutputMap::_sizeof()*(this->_noutputs));}
   std::vector<int> _pulses_shape() const;
@@ -301,12 +303,14 @@ public:
   const EvrData::PulseConfig& pulses(uint32_t i0) const {
     ptrdiff_t offset=12;
     const EvrData::PulseConfig* memptr = (const EvrData::PulseConfig*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::PulseConfig*)((const char*)memptr + (i0)*memsize);
   }
   const EvrData::OutputMap& output_maps(uint32_t i0) const {
     ptrdiff_t offset=12+(24*(this->_npulses));
     const EvrData::OutputMap* memptr = (const EvrData::OutputMap*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::OutputMap*)((const char*)memptr + (i0)*memsize);
   }
   EvrData::ConfigV2::BeamCode beam() const;
   EvrData::ConfigV2::RateCode rate() const;
@@ -337,17 +341,20 @@ public:
   const EvrData::EventCodeV3& eventcodes(uint32_t i0) const {
     ptrdiff_t offset=12;
     const EvrData::EventCodeV3* memptr = (const EvrData::EventCodeV3*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::EventCodeV3*)((const char*)memptr + (i0)*memsize);
   }
   const EvrData::PulseConfigV3& pulses(uint32_t i0) const {
     ptrdiff_t offset=12+(16*(this->_neventcodes));
     const EvrData::PulseConfigV3* memptr = (const EvrData::PulseConfigV3*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::PulseConfigV3*)((const char*)memptr + (i0)*memsize);
   }
   const EvrData::OutputMap& output_maps(uint32_t i0) const {
     ptrdiff_t offset=(12+(16*(this->_neventcodes)))+(16*(this->_npulses));
     const EvrData::OutputMap* memptr = (const EvrData::OutputMap*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::OutputMap*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return ((12+(EvrData::EventCodeV3::_sizeof()*(this->_neventcodes)))+(EvrData::PulseConfigV3::_sizeof()*(this->_npulses)))+(EvrData::OutputMap::_sizeof()*(this->_noutputs));}
   std::vector<int> _eventcodes_shape() const;
@@ -379,17 +386,20 @@ public:
   const EvrData::EventCodeV4& eventcodes(uint32_t i0) const {
     ptrdiff_t offset=12;
     const EvrData::EventCodeV4* memptr = (const EvrData::EventCodeV4*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::EventCodeV4*)((const char*)memptr + (i0)*memsize);
   }
   const EvrData::PulseConfigV3& pulses(uint32_t i0) const {
     ptrdiff_t offset=12+(24*(this->_neventcodes));
     const EvrData::PulseConfigV3* memptr = (const EvrData::PulseConfigV3*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::PulseConfigV3*)((const char*)memptr + (i0)*memsize);
   }
   const EvrData::OutputMap& output_maps(uint32_t i0) const {
     ptrdiff_t offset=(12+(24*(this->_neventcodes)))+(16*(this->_npulses));
     const EvrData::OutputMap* memptr = (const EvrData::OutputMap*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::OutputMap*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return ((12+(EvrData::EventCodeV4::_sizeof()*(this->_neventcodes)))+(EvrData::PulseConfigV3::_sizeof()*(this->_npulses)))+(EvrData::OutputMap::_sizeof()*(this->_noutputs));}
   std::vector<int> _eventcodes_shape() const;
@@ -457,7 +467,8 @@ public:
   const EvrData::SequencerEntry& entries(uint32_t i0) const {
     ptrdiff_t offset=12;
     const EvrData::SequencerEntry* memptr = (const EvrData::SequencerEntry*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::SequencerEntry*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return 12+(EvrData::SequencerEntry::_sizeof()*(this->_length));}
   std::vector<int> _entries_shape() const;
@@ -484,22 +495,26 @@ public:
   const EvrData::EventCodeV4& eventcodes(uint32_t i0) const {
     ptrdiff_t offset=12;
     const EvrData::EventCodeV4* memptr = (const EvrData::EventCodeV4*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::EventCodeV4*)((const char*)memptr + (i0)*memsize);
   }
   const EvrData::PulseConfigV3& pulses(uint32_t i0) const {
     ptrdiff_t offset=12+(24*(this->_neventcodes));
     const EvrData::PulseConfigV3* memptr = (const EvrData::PulseConfigV3*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::PulseConfigV3*)((const char*)memptr + (i0)*memsize);
   }
   const EvrData::OutputMap& output_maps(uint32_t i0) const {
     ptrdiff_t offset=(12+(24*(this->_neventcodes)))+(16*(this->_npulses));
     const EvrData::OutputMap* memptr = (const EvrData::OutputMap*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::OutputMap*)((const char*)memptr + (i0)*memsize);
   }
   const EvrData::SequencerConfigV1& seq_config() const {
     ptrdiff_t offset=((12+(24*(this->_neventcodes)))+(16*(this->_npulses)))+(4*(this->_noutputs));
     const EvrData::SequencerConfigV1* memptr = (const EvrData::SequencerConfigV1*)(((const char*)this)+offset);
-    return *(memptr + 0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::SequencerConfigV1*)((const char*)memptr + (0)*memsize);
   }
   uint32_t _sizeof() const {return (((12+(EvrData::EventCodeV4::_sizeof()*(this->_neventcodes)))+(EvrData::PulseConfigV3::_sizeof()*(this->_npulses)))+(EvrData::OutputMap::_sizeof()*(this->_noutputs)))+(this->seq_config()._sizeof());}
   std::vector<int> _eventcodes_shape() const;
@@ -553,7 +568,8 @@ public:
   const EvrData::FIFOEvent& fifoEvents(uint32_t i0) const {
     ptrdiff_t offset=4;
     const EvrData::FIFOEvent* memptr = (const EvrData::FIFOEvent*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::FIFOEvent*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return 4+(EvrData::FIFOEvent::_sizeof()*(this->_u32NumFifoEvents));}
   std::vector<int> _fifoEvents_shape() const;
@@ -597,7 +613,8 @@ public:
   const EvrData::IOChannel& channels(uint32_t i0) const {
     ptrdiff_t offset=4;
     const EvrData::IOChannel* memptr = (const EvrData::IOChannel*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const EvrData::IOChannel*)((const char*)memptr + (i0)*memsize);
   }
   EvrData::OutputMap::Conn conn() const;
   uint32_t _sizeof() const {return 4+(EvrData::IOChannel::_sizeof()*(this->_nchannels));}

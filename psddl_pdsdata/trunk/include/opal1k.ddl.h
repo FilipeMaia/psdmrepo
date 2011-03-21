@@ -59,7 +59,8 @@ public:
   const Camera::FrameCoord& defect_pixel_coordinates(uint32_t i0) const {
     ptrdiff_t offset=12+(2*(Output_LUT_Size*this->defect_pixel_correction_enabled()));
     const Camera::FrameCoord* memptr = (const Camera::FrameCoord*)(((const char*)this)+offset);
-    return *(memptr + i0);
+    size_t memsize = memptr->_sizeof();
+    return *(const Camera::FrameCoord*)((const char*)memptr + (i0)*memsize);
   }
   uint16_t output_offset() const;
   uint32_t output_resolution_bits() const;
