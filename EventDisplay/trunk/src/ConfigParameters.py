@@ -77,8 +77,10 @@ class ConfigParameters ( object ) :
         #self.fileName        = 'test.h5'
         #self.dirName              = '/reg/d/psdm/XPP/xppcom10/hdf5'
         #self.fileName             = 'xppcom10-r0546.h5'
+
         self.dirName              = '/reg/d/psdm/CXI/cxi80410/hdf5'
-        self.fileName             = 'cxi80410-r0430.h5'
+        self.fileName             = 'cxi80410-r0730.h5'
+
         self.eventCurrent         = 1
         self.span                 = 1
         self.numEventsAverage     = 50
@@ -87,6 +89,8 @@ class ConfigParameters ( object ) :
         self.list_of_checked_item_names=[]
         self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data')
         self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/Camera::FrameV1/CxiSc1.0:Tm6740.0/image')       
+        #self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/Ipimb::DataV1/CxiDg1.0:Ipimb.0/data')
+        #self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/Ipimb::DataV1/CxiDg1.0:Ipimb.0/time')
 
         # Status parameters which do not need to be saved
         self.confParsDirName      = '.'

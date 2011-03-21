@@ -131,7 +131,7 @@ def ringIntensity(r,r0,sigma) :
     rr = factor*(r-r0)
     return np.exp(-rr*rr)
 
-def getCartesianArray() :
+def getCartesianArray3Rings() :
     """Generates the cortesian 2D array with ring-distributed intensity"""
     npx = 201
     npy = 101
@@ -152,23 +152,46 @@ def getCartesianArray() :
     y = np.arange(0,npy,1,dtype = np.float32) # np.linspace(0,100,101)
     X, Y = np.meshgrid(x, y)
 
-    #A = 100 * abs( np.sin( np.sqrt(X*X+Y*Y)/20 ) )
-
     R = np.sqrt(X*X+Y*Y)
     #print 'R=\n',R
 
     A = a1 * ringIntensity(R, r1, s1)
     A+= a2 * ringIntensity(R, r2, s2)
     A+= a3 * ringIntensity(R, r3, s3)
-
     #print 'A=\n',A
 
     return A
 
+
+def getCartesianArray1Ring() :
+    """Generates the cortesian 2D array with ring-distributed intensity"""
+    npx = 601
+    npy = 501
+
+    xc  = 300
+    yc  = 250
+    
+    a1  = 100
+    r1  = 150
+    s1  = 10
+
+    x = np.arange(0,npx,1,dtype = np.float32) # np.linspace(0,200,201)
+    y = np.arange(0,npy,1,dtype = np.float32) # np.linspace(0,100,101)
+    X, Y = np.meshgrid(x, y)
+
+    R = np.sqrt((X-xc)*(X-xc)+(Y-yc)*(Y-yc))
+    #print 'R=\n',R
+
+    A = a1 * X * Y * ringIntensity(R, r1, s1)
+    #print 'A=\n',A
+
+    return A
+
+
 #----------------------------------
 #----------------------------------
 
-def draw2DImage(arr, showTimeSec=None, winTitle='Three images') :
+def draw2DImage(arr, showTimeSec=None, winTitle='Three images',Range=None) :
     """Graphical presentation for three 2D arrays.""" 
 
     plt.ion() 
@@ -177,7 +200,7 @@ def draw2DImage(arr, showTimeSec=None, winTitle='Three images') :
     fig.canvas.set_window_title(winTitle) 
     plt.clf() 
     #plt.get_current_fig_manager().window.move(100,0)
-    drawImage(arr,'Image and Spectrum')
+    drawImage(arr,'Image',Range)
 
     drawOrShow(showTimeSec)
 
@@ -219,9 +242,9 @@ def drawOrShow(showTimeSec=None) :
         plt.draw()
 
 
-def drawImage(arr2d, title) :
+def drawImage(arr2d, title, Range=None) :
     """Draws the image and color bar for a single 2D array."""
-    axes = plt.imshow(arr2d, origin='lower', interpolation='nearest') # origin='lower', origin='upper'
+    axes = plt.imshow(arr2d, origin='lower', interpolation='nearest',extent=Range) # origin='lower', origin='upper'
     colb = plt.colorbar(axes, pad=0.05, fraction=0.10, shrink = 1, aspect = 20, orientation=1) #, ticks=coltickslocs
     plt.title(title, color='r', fontsize=20)
     #plt.clim(imageAmin,imageAmax)
@@ -235,11 +258,12 @@ def drawHistogram(arr) :
 
 #----------------------------------
 
-def mainTest() :
-    arr = getCartesianArray()
+def mainTest3Rings() :
+    arr = getCartesianArray3Rings()
     draw2DImage(arr, showTimeSec=0)
     plt.get_current_fig_manager().window.move(10,10)
-
+    plt.title('Original 2D array', color='r', fontsize=20)
+    
     origin     = (0,0)
     RRange     = (0,200,200)
     ThetaRange = (0,90,90)
@@ -247,6 +271,7 @@ def mainTest() :
     polar_arr = transformCartToPolarArray(arr, RRange, ThetaRange, origin)
     draw2DImage(polar_arr, showTimeSec=0)
     plt.get_current_fig_manager().window.move(500,10)
+    plt.title('R-Phi transformation', color='r', fontsize=20)
 
     XRange     = (0,200,100)
     YRange     = (0,100,50)
@@ -254,6 +279,36 @@ def mainTest() :
     rebinned_arr = rebinArray(arr, XRange, YRange)
     draw2DImage(rebinned_arr, showTimeSec=0)
     plt.get_current_fig_manager().window.move(10,394)
+    plt.title('Re-binned 2D array', color='r', fontsize=20)
+
+    drawOrShow(showTimeSec='show')
+
+#----------------------------------
+
+def mainTest1Ring() :
+    arr = getCartesianArray1Ring()
+    draw2DImage(arr, showTimeSec=0)
+    plt.get_current_fig_manager().window.move(10,10)
+    plt.title('Original 2D array', color='r', fontsize=20)
+    
+    origin = (300,250)
+    RRange = (0,300,100)
+    PRange = (-180,180,4)
+    RPRange= (RRange[0], RRange[1], PRange[0], PRange[1])
+
+    polar_arr = transformCartToPolarArray(arr, RRange, PRange, origin)
+    draw2DImage(polar_arr, showTimeSec=0, Range=RPRange)
+    plt.get_current_fig_manager().window.move(500,10)
+    plt.title('R-Phi transformation', color='r', fontsize=20)
+
+    XRange     = (0,600,100)
+    YRange     = (0,500,100)
+    XYRange= (XRange[0], XRange[1], YRange[0], YRange[1])
+
+    rebinned_arr = rebinArray(arr, XRange, YRange)
+    draw2DImage(rebinned_arr, showTimeSec=0, Range=XYRange)
+    plt.get_current_fig_manager().window.move(10,394)
+    plt.title('Re-binned 2D array', color='r', fontsize=20)
 
     drawOrShow(showTimeSec='show')
 
@@ -261,7 +316,8 @@ def mainTest() :
 
 if __name__ == "__main__" :
 
-    mainTest()
+    mainTest1Ring()
+    #mainTest3Rings()
 
 #----------------------------------
 #----------------------------------
