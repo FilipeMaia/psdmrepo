@@ -11,9 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-18
+2011-03-20 Andy Salnikov
+- update psana-module template
+
 Tag: V00-00-17
 2011-03-20 Andy Salnikov
-added templates for psana-module
+- added templates for psana-module
 
 Tag: V00-00-16
 2011-01-19 Andy Salnikov
