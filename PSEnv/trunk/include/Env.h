@@ -13,15 +13,16 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/scoped_ptr.hpp>
 
 //----------------------
 // Base Class Headers --
 //----------------------
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "PSEnv/ConfigStore.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -46,21 +47,25 @@ namespace PSEnv {
  *  @author Andrei Salnikov
  */
 
-class Env  {
+class Env : boost::noncopyable {
 public:
 
   // Default constructor
   Env () ;
 
   // Destructor
-  virtual ~Env () ;
+  ~Env () ;
+  
+  /// Access Configuration Store
+  ConfigStore& configStore() { return *m_cfgStore; }
 
 protected:
 
 private:
 
   // Data members
-
+  boost::scoped_ptr<ConfigStore> m_cfgStore;
+  
 };
 
 } // namespace PSEnv

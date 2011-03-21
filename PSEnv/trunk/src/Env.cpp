@@ -22,6 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "PSEvt/ProxyDict.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -37,8 +38,11 @@ namespace PSEnv {
 // Constructors --
 //----------------
 Env::Env ()
-
+  : m_cfgStore()
 {
+  // instantiate dictionary for config store and store itself
+  boost::shared_ptr<PSEvt::ProxyDict> cfgDict(new PSEvt::ProxyDict());
+  m_cfgStore.reset(new ConfigStore(cfgDict));
 }
 
 //--------------

@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2011-03-20 Andy Salnikov
+- added ConfigStore class which is a part of the environment storing 
+  configuration objects
+
 Tag: V00-00-02
 2011-01-31 Andy Salnikov
 - renamed this package to PSEnv
