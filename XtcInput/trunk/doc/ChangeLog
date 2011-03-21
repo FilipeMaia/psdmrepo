@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2011-03-20 Andy Salnikov
+- fix compilation issue after merge with V00-00-03
+
 Tag: V00-00-04
 2011-03-20 Andy Salnikov
 - added smart pointer typedef for datagram class and couple of utility
