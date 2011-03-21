@@ -150,7 +150,7 @@ DataDescV1::DataDescV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boo
     const std::vector<int>& dims = xtcPtr->_data_shape(*cfgPtr);
     _data.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
-      const PsddlPds::Acqiris::DataDescV1Elem& d = xtcPtr->data(i0);
+      const PsddlPds::Acqiris::DataDescV1Elem& d = xtcPtr->data(*cfgPtr, i0);
       boost::shared_ptr<const PsddlPds::Acqiris::DataDescV1Elem> dPtr(m_xtcObj, &d);
       _data.push_back(psddl_pds2psana::Acqiris::DataDescV1Elem(dPtr, cfgPtr));
     }
