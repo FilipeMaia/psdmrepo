@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2011-03-21 Andy Salnikov
+- fixing code generation for array member access
+
 Tag: V00-00-01
 2011-03-20 Andy Salnikov
 - first production tag
