@@ -26,7 +26,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/xtc/DetInfo.hh"
+#include "PSEvt/EventKey.h"
+#include "pdsdata/xtc/Src.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -66,71 +67,58 @@ protected:
    *  @brief Add one more proxy object to the dictionary.
    *  
    *  @param[in] proxy   Proxy object for type T.
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    */
   virtual void putImpl( const boost::shared_ptr<ProxyI>& proxy, 
                         const std::type_info* typeinfo, 
-                        const Pds::DetInfo& detInfo, 
+                        const Pds::Src& source, 
                         const std::string& key ) ;
 
   /**
    *  @brief Get an object from event
    *  
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return Shared pointer of void type.
    */
   virtual boost::shared_ptr<void> getImpl( const std::type_info* typeinfo, 
-                                           const Pds::DetInfo& detInfo, 
+                                           const Pds::Src& source, 
                                            const std::string& key ) ;
 
   /**
    *  @brief Check if proxy of given type exists in the event
    *  
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return true if proxy exists
    */
   virtual bool existsImpl( const std::type_info* typeinfo, 
-                           const Pds::DetInfo& detInfo, 
+                           const Pds::Src& source, 
                            const std::string& key) ;
 
   /**
    *  @brief Remove object of given type from the event
    *  
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return false if object did not exist before this call
    */
   virtual bool removeImpl( const std::type_info* typeinfo, 
-                           const Pds::DetInfo& detInfo, 
+                           const Pds::Src& source, 
                            const std::string& key ) ;
+
+  /**
+   *  @brief Get the list of event keys defined in event
+   *  
+   *  @param[out] keys list of the EventKey objects
+   */
+  virtual void keysImpl(std::list<EventKey>& keys) const;
 
 private:
 
-  // uniquely identifying key for stored object
-  struct Key {
-    Key(const std::type_info* a_typeinfo, const Pds::DetInfo& a_address, const std::string& a_key) 
-      : typeinfo(a_typeinfo), phy(a_address.phy()), key(a_key) {}
-    
-    bool operator<(const Key& other) const 
-    {
-      if (phy < other.phy) return true;
-      if (phy > other.phy) return false;
-      if( typeinfo->before(*other.typeinfo) ) return true;
-      if( other.typeinfo->before(*typeinfo) ) return false;
-      if (key < other.key) return true;
-      return false;
-    }
-    
-    const std::type_info* typeinfo;
-    const uint32_t phy;
-    const std::string key;
-  };
-
   typedef boost::shared_ptr<ProxyI> proxy_ptr;
-  typedef std::map<Key,proxy_ptr> Dict;
+  typedef std::map<EventKey,proxy_ptr> Dict;
 
   // Data members
   Dict m_dict;

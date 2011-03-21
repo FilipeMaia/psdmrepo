@@ -24,7 +24,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/xtc/DetInfo.hh"
+#include "pdsdata/xtc/Src.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -72,27 +72,27 @@ protected:
    *  detector. 
    *  
    *  @param[in] dict    Proxy dictionary containing this proxy.
-   *  @param[in] detInfo Detector address information
+   *  @param[in] source Detector address information
    *  @param[in] key     String key, additional key supplied by user.
    *  @return Shared pointer of void type.
    */
   virtual boost::shared_ptr<void> getImpl(ProxyDictI* dict,
-                                          const Pds::DetInfo& detInfo, 
+                                          const Pds::Src& source, 
                                           const std::string& key)
   {
-    return boost::static_pointer_cast<void>(getTypedImpl(dict, detInfo, key));
+    return boost::static_pointer_cast<void>(getTypedImpl(dict, source, key));
   }
 
   /**
    *  @brief Get the correctly-typed object from the proxy.
    *    
    *  @param[in] dict    Proxy dictionary containing this proxy.
-   *  @param[in] detInfo Detector address information
+   *  @param[in] source Detector address information
    *  @param[in] key     String key, additional key supplied by user.
    *  @return Shared pointer of the correct type.
    */
   virtual boost::shared_ptr<T> getTypedImpl(ProxyDictI* dict,
-                                            const Pds::DetInfo& detInfo, 
+                                            const Pds::Src& source, 
                                             const std::string& key) = 0;
 
 private:

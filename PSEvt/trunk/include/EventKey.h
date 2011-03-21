@@ -1,12 +1,12 @@
-#ifndef PSEVT_DATAPROXY_H
-#define PSEVT_DATAPROXY_H
+#ifndef PSEVT_EVENTKEY_H
+#define PSEVT_EVENTKEY_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class DataProxy.
+//	Class EventKey.
 //
 //------------------------------------------------------------------------
 
@@ -14,12 +14,12 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <iosfwd>
+#include <typeinfo>
 
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "PSEvt/Proxy.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -29,9 +29,6 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-namespace PSEvt {
-  class ProxyDictI;
-}
 
 //		---------------------
 // 		-- Class Interface --
@@ -40,7 +37,7 @@ namespace PSEvt {
 namespace PSEvt {
 
 /**
- *  @brief Implementation of proxy object which keeps a pointer to real object
+ *  Class describing an addre5ss of the data object in event.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -52,39 +49,53 @@ namespace PSEvt {
  *  @author Andrei Salnikov
  */
 
-template <typename T>
-class DataProxy : public Proxy<T> {
+class EventKey  {
 public:
 
   // Default constructor
-  DataProxy (const boost::shared_ptr<T>& data) : m_data(data) {}
+  EventKey (const std::type_info* typeinfo, const Pds::Src& src, const std::string& key)
+    : m_typeinfo(typeinfo), m_src(src), m_key(key) 
+  {}
 
   // Destructor
-  virtual ~DataProxy () {}
+  ~EventKey () {}
 
+  // Compare two keys
+  bool operator<(const EventKey& other) const;
+
+  // format the key
+  void print(std::ostream& str) const;
+
+  // return typeinfo
+  const std::type_info* typeinfo() const {return m_typeinfo;}
+  
+  // return source
+  const Pds::Src& src() const {return m_src;}
+  
+  // return string key
+  const std::string& key() const {return m_key;}
+  
+  // is src valid
+  bool validSrc() const { return not (m_src == Pds::Src()); }
+  
 protected:
-
-  /**
-   *  @brief Get the correctly-typed object from the proxy.
-   *    
-   *  @param[in] dict    Proxy dictionary containing this proxy.
-   *  @param[in] source Detector address information
-   *  @param[in] key     String key, additional key supplied by user.
-   *  @return Shared pointer of the correct type.
-   */
-  virtual boost::shared_ptr<T> getTypedImpl(ProxyDictI* dict,
-                                            const Pds::Src& source, 
-                                            const std::string& key)
-  {
-    return m_data;
-  }
 
 private:
 
   // Data members
-  boost::shared_ptr<T> m_data;
+  const std::type_info* m_typeinfo;
+  const Pds::Src m_src;
+  const std::string m_key;
+
 };
+
+inline
+std::ostream&
+operator<<(std::ostream& out, const EventKey& key) {
+  key.print(out);
+  return out;
+}
 
 } // namespace PSEvt
 
-#endif // PSEVT_DATAPROXY_H
+#endif // PSEVT_EVENTKEY_H

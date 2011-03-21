@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class Exceptions...
+//	Class EventId...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,12 +13,12 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "PSEvt/Exceptions.h"
+#include "PSEvt/EventId.h"
 
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <boost/lexical_cast.hpp>
+#include <iostream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -34,18 +34,12 @@
 
 namespace PSEvt {
 
-Exception::Exception( const ErrSvc::Context& ctx, const std::string& what )
-  : ErrSvc::Issue( ctx, "PSEvt::Exception: " + what )
+/// Standard stream insertion operator
+std::ostream&
+operator<<(std::ostream& os, const EventId& eid)
 {
-}
-
-ExceptionDuplicateKey::ExceptionDuplicateKey ( const ErrSvc::Context& ctx, 
-                                               const std::type_info* typeinfo, 
-                                               const Pds::Src& source, 
-                                               const std::string& key ) 
-  : Exception( ctx, "duplicate key: " + std::string(typeinfo->name()) + ":phy(" + 
-      boost::lexical_cast<std::string>(source.phy()) + "):" + key)
-{  
+  eid.print(os);
+  return os;
 }
 
 } // namespace PSEvt

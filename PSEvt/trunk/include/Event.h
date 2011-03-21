@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
+#include <list>
 #include <typeinfo>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
@@ -25,10 +26,11 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "PSEvt/EventKey.h"
 #include "PSEvt/Proxy.h"
 #include "PSEvt/DataProxy.h"
 #include "PSEvt/ProxyDictI.h"
-#include "pdsdata/xtc/DetInfo.hh"
+#include "pdsdata/xtc/Src.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -75,22 +77,22 @@ public:
   template <typename T>
   void putProxy(const boost::shared_ptr<Proxy<T> >& proxy, const std::string& key=std::string()) 
   {
-    m_dict->put(boost::static_pointer_cast<ProxyI>(proxy), &typeid(const T), Pds::DetInfo(), key);
+    m_dict->put(boost::static_pointer_cast<ProxyI>(proxy), &typeid(const T), Pds::Src(), key);
   }
   
   /**
    *  @brief Add one more proxy object to the event
    *  
    *  @param[in] proxy   Proxy object for type T.
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    */
   template <typename T>
   void putProxy(const boost::shared_ptr<Proxy<T> >& proxy, 
-                const Pds::DetInfo& detInfo, 
+                const Pds::Src& source, 
                 const std::string& key=std::string()) 
   {
-    m_dict->put(boost::static_pointer_cast<ProxyI>(proxy), &typeid(const T), detInfo, key);
+    m_dict->put(boost::static_pointer_cast<ProxyI>(proxy), &typeid(const T), source, key);
   }
   
   /**
@@ -103,23 +105,23 @@ public:
   void put(const boost::shared_ptr<T>& data, const std::string& key=std::string()) 
   {
     boost::shared_ptr<ProxyI> proxyPtr( new DataProxy<T>(data) );
-    m_dict->put(proxyPtr, &typeid(const T), Pds::DetInfo(), key);
+    m_dict->put(proxyPtr, &typeid(const T), Pds::Src(), key);
   }
   
   /**
    *  @brief Add one more object to the event
    *  
    *  @param[in] data    Object to store in the event.
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    */
   template <typename T>
   void put(const boost::shared_ptr<T>& data, 
-           const Pds::DetInfo& detInfo, 
+           const Pds::Src& source, 
            const std::string& key=std::string()) 
   {
     boost::shared_ptr<ProxyI> proxyPtr( new DataProxy<T>(data) );
-    m_dict->put(proxyPtr, &typeid(const T), detInfo, key);
+    m_dict->put(proxyPtr, &typeid(const T), source, key);
   }
   
   /**
@@ -131,21 +133,21 @@ public:
   template<typename T>
   boost::shared_ptr<T> get(const std::string& key=std::string()) 
   {
-    boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), Pds::DetInfo(), key);
+    boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), Pds::Src(), key);
     return boost::static_pointer_cast<T>(vptr);
   }
   
   /**
    *  @brief Get an object from event
    *  
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return Shared pointer which can be zero if object not found.
    */
   template<typename T>
-  boost::shared_ptr<T> get(const Pds::DetInfo& detInfo, const std::string& key=std::string()) 
+  boost::shared_ptr<T> get(const Pds::Src& source, const std::string& key=std::string()) 
   {
-    boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), detInfo, key);
+    boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), source, key);
     return boost::static_pointer_cast<T>(vptr);
   }
   
@@ -155,14 +157,13 @@ public:
    *  This is optimized version of get() which only checks whether the proxy
    *  is there but does not ask proxy to do any real work.
    *  
-   *  @param[in] detInfo Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return true if object or proxy exists
    */
   template <typename T>
   bool exists(const std::string& key=std::string()) 
   {
-    return m_dict->exists(&typeid(const T), Pds::DetInfo(), key);
+    return m_dict->exists(&typeid(const T), Pds::Src(), key);
   }
   
   /**
@@ -171,15 +172,15 @@ public:
    *  This is optimized version of get() which only checks whether the proxy
    *  is there but does not ask proxy to do any real work.
    *  
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return true if object or proxy exists
    */
   template <typename T>
-  bool exists(const Pds::DetInfo& detInfo, 
+  bool exists(const Pds::Src& source, 
               const std::string& key=std::string()) 
   {
-    return m_dict->exists(&typeid(const T), detInfo, key);
+    return m_dict->exists(&typeid(const T), source, key);
   }
   
   /**
@@ -191,21 +192,33 @@ public:
   template <typename T>
   bool remove(const std::string& key=std::string()) 
   {
-    return m_dict->remove(&typeid(const T), Pds::DetInfo(), key);
+    return m_dict->remove(&typeid(const T), Pds::Src(), key);
   }
   
   /**
    *  @brief Remove object of given type from the event
    *  
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return false if object did not exist before this call
    */
   template <typename T>
-  bool remove(const Pds::DetInfo& detInfo, 
+  bool remove(const Pds::Src& source, 
               const std::string& key=std::string()) 
   {
-    return m_dict->remove(&typeid(const T), detInfo, key);
+    return m_dict->remove(&typeid(const T), source, key);
+  }
+  
+  /**
+   *  @brief Get the list of event keys defined in event
+   *  
+   *  @return list of the EventKey objects
+   */
+  std::list<EventKey> keys() const
+  {
+    std::list<EventKey> result;
+    m_dict->keys(result);
+    return result;
   }
   
 protected:

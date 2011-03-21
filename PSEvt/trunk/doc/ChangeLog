@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2011-03-20 Andy Salnikov
+- added EventId class which is an interface for the Event ID objects
+- added EventKey class which is the key for objects in the event structure
+
 Tag: V00-00-02
 2011-01-31 Andy Salnikov
 - renamed the package to PSEvt

@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
+#include <list>
 #include <typeinfo>
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
@@ -25,7 +26,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/xtc/DetInfo.hh"
+#include "pdsdata/xtc/Src.hh"
+#include "PSEvt/EventKey.h"
 #include "PSEvt/ProxyI.h"
 
 //------------------------------------
@@ -65,28 +67,28 @@ public:
    *  else too if needed.
 
    *  @param[in] proxy   Proxy object for type T.
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    */
   void put( const boost::shared_ptr<ProxyI>& proxy, 
             const std::type_info* typeinfo, 
-            const Pds::DetInfo& detInfo, 
+            const Pds::Src& source, 
             const std::string& key ) 
   {
-    this->putImpl(proxy, typeinfo, detInfo, key);
+    this->putImpl(proxy, typeinfo, source, key);
   }
 
   /**
    *  @brief Get an object from event
    *  
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    */
   boost::shared_ptr<void> get( const std::type_info* typeinfo, 
-                               const Pds::DetInfo& detInfo, 
+                               const Pds::Src& source, 
                                const std::string& key )
   {
-   return this->getImpl(typeinfo, detInfo, key);
+   return this->getImpl(typeinfo, source, key);
   }
 
   /**
@@ -95,29 +97,39 @@ public:
    *  This is optimized version of get() which only checks whether the proxy
    *  is there but does not ask proxy to do any real work.
    *  
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return true if proxy exists
    */
   bool exists( const std::type_info* typeinfo, 
-               const Pds::DetInfo& detInfo, 
+               const Pds::Src& source, 
                const std::string& key)
   {
-   return this->existsImpl(typeinfo, detInfo, key);
+   return this->existsImpl(typeinfo, source, key);
   }
 
   /**
    *  @brief Remove object of given type from the event
    *  
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return false if object did not exist before this call
    */
   bool remove( const std::type_info* typeinfo, 
-               const Pds::DetInfo& detInfo, 
+               const Pds::Src& source, 
                const std::string& key )
   {
-   return this->removeImpl(typeinfo, detInfo, key);
+   return this->removeImpl(typeinfo, source, key);
+  }
+
+  /**
+   *  @brief Get the list of event keys defined in event
+   *  
+   *  @param[out] keys list of the EventKey objects
+   */
+  void keys(std::list<EventKey>& keys) const
+  {
+    this->keysImpl(keys);
   }
 
 protected:
@@ -130,46 +142,53 @@ protected:
    *  @brief Add one more proxy object to the dictionary.
    *  
    *  @param[in] proxy   Proxy object for type T.
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    */
   virtual void putImpl( const boost::shared_ptr<ProxyI>& proxy, 
                         const std::type_info* typeinfo, 
-                        const Pds::DetInfo& detInfo, 
+                        const Pds::Src& source, 
                         const std::string& key ) = 0;
 
   /**
    *  @brief Get an object from event
    *  
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return Shared pointer of void type.
    */
   virtual boost::shared_ptr<void> getImpl( const std::type_info* typeinfo, 
-                                           const Pds::DetInfo& detInfo, 
+                                           const Pds::Src& source, 
                                            const std::string& key ) = 0;
 
   /**
    *  @brief Check if proxy of given type exists in the event
    *  
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return true if proxy exists
    */
   virtual bool existsImpl( const std::type_info* typeinfo, 
-                           const Pds::DetInfo& detInfo, 
+                           const Pds::Src& source, 
                            const std::string& key) = 0;
 
   /**
    *  @brief Remove object of given type from the event
    *  
-   *  @param[in] detInfo Source detector address.
+   *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return false if object did not exist before this call
    */
   virtual bool removeImpl( const std::type_info* typeinfo, 
-                           const Pds::DetInfo& detInfo, 
+                           const Pds::Src& source, 
                            const std::string& key ) = 0;
+
+  /**
+   *  @brief Get the list of event keys defined in event
+   *  
+   *  @param[out] keys list of the EventKey objects
+   */
+  virtual void keysImpl(std::list<EventKey>& keys) const = 0;
 
 private:
 

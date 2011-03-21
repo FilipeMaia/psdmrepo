@@ -52,15 +52,15 @@ ProxyDict::~ProxyDict ()
 void 
 ProxyDict::putImpl( const boost::shared_ptr<ProxyI>& proxy, 
                     const std::type_info* typeinfo, 
-                    const Pds::DetInfo& detInfo, 
+                    const Pds::Src& source, 
                     const std::string& key )
 {
-  Key proxyKey(typeinfo, detInfo, key);
+  EventKey proxyKey(typeinfo, source, key);
   
   // there should not be existing key
   Dict::iterator it = m_dict.find(proxyKey);
   if ( it != m_dict.end() ) {
-    throw ExceptionDuplicateKey(ERR_LOC, typeinfo, detInfo, key);
+    throw ExceptionDuplicateKey(ERR_LOC, typeinfo, source, key);
   }
 
   m_dict.insert(Dict::value_type(proxyKey, proxy));
@@ -69,35 +69,44 @@ ProxyDict::putImpl( const boost::shared_ptr<ProxyI>& proxy,
 
 boost::shared_ptr<void> 
 ProxyDict::getImpl( const std::type_info* typeinfo, 
-                    const Pds::DetInfo& detInfo, 
+                    const Pds::Src& source, 
                     const std::string& key )
 {
-  Key proxyKey(typeinfo, detInfo, key);
+  EventKey proxyKey(typeinfo, source, key);
 
   Dict::const_iterator it = m_dict.find(proxyKey);
   if ( it != m_dict.end() ) {
     // call proxy to get the value
-    return it->second->get(this, detInfo, key);
+    return it->second->get(this, source, key);
   }
   return proxy_ptr();
 }
 
 bool 
 ProxyDict::existsImpl( const std::type_info* typeinfo, 
-                       const Pds::DetInfo& detInfo, 
+                       const Pds::Src& source, 
                        const std::string& key)
 {
-  Key proxyKey(typeinfo, detInfo, key);
+  EventKey proxyKey(typeinfo, source, key);
   return m_dict.find(proxyKey) != m_dict.end();
 }
 
 bool 
 ProxyDict::removeImpl( const std::type_info* typeinfo, 
-                       const Pds::DetInfo& detInfo, 
+                       const Pds::Src& source, 
                        const std::string& key )
 {
-  Key proxyKey(typeinfo, detInfo, key);
+  EventKey proxyKey(typeinfo, source, key);
   return m_dict.erase(proxyKey) > 0;
+}
+
+void 
+ProxyDict::keysImpl(std::list<EventKey>& keys) const
+{
+  keys.clear();
+  for (Dict::const_iterator it = m_dict.begin(); it != m_dict.end(); ++ it) {
+    keys.push_back(it->first);
+  }
 }
 
 } // namespace PSEvt

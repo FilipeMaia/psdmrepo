@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/xtc/DetInfo.hh"
+#include "pdsdata/xtc/Src.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -61,7 +61,7 @@ public:
 
   ExceptionDuplicateKey ( const ErrSvc::Context& ctx, 
                           const std::type_info* typeinfo, 
-                          const Pds::DetInfo& detInfo, 
+                          const Pds::Src& source, 
                           const std::string& key ) ;
 
 };
