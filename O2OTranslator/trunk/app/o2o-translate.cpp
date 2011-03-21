@@ -232,7 +232,8 @@ O2O_Translate::runApp ()
   uint64_t count = 0 ;
 
   // get all datagrams
-  while ( Pds::Dgram* dg = dgqueue.pop() ) {
+  XtcInput::Dgram::ptr dg;
+  while ( (dg = dgqueue.pop()).get() ) {
 
     ++ count ;
 
@@ -277,8 +278,6 @@ O2O_Translate::runApp ()
 
     }
 
-    // all datagrams must be explicitely deleted
-    delete [] (char*)dg ;
   }
 
   // finish with the scanners

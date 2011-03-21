@@ -142,7 +142,8 @@ O2O_Scanner::runApp ()
   }
 
   XtcInput::XtcStreamMerger iter(files, 0x1000000, m_mergeMode.value(), m_skipDamaged.value(), m_l1offset.value());
-  while ( Dgram* dg = iter.next() ) {
+  XtcInput::Dgram::ptr dg;
+  while ( (dg = iter.next()).get() ) {
     const Pds::Sequence& seq = dg->seq ;
     const Pds::ClockTime& clock = seq.clock() ;
     const Pds::TimeStamp& stamp = seq.stamp() ;
@@ -153,10 +154,9 @@ O2O_Scanner::runApp ()
            clock.seconds(), clock.nanoseconds(),
            stamp.ticks(),stamp.fiducials(),stamp.control(),
            dg->xtc.sizeofPayload());
+    
     myLevelIter iter(&(dg->xtc));
     iter.iterate();
-
-    delete [] (char*)dg ;
   }
 
   return 0;

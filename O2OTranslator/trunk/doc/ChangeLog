@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-05
+2011-03-20 Andy Salnikov
+- use smart pointer for datagram class
+
 Tag: V00-10-04
 2011-03-08 Andy Salnikov
 - bug fix in CameraFrameV1, image dimensions were swapped
