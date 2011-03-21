@@ -62,7 +62,7 @@ class Constant ( object ) :
         self.name = name
         self.value = value
         self.parent = parent
-        self.external = kw.get('external')
+        self.included = kw.get('included')
 
         if self.parent: self.parent.add(self)
     

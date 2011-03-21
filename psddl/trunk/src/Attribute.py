@@ -75,6 +75,11 @@ class Attribute ( object ) :
         self.comment = kw.get('comment')
         self.offset = kw.get('offset')
         self.access = kw.get('access')
+        self.accessor = kw.get('accessor')
+        self.shape_meth = None
+        if self.dimensions:
+            self.shape_meth = kw.get('shape_meth') or (name + '_shape')
+        self.tags = kw.get('tags', {}).copy()
 
         self.bitfields = []
 
@@ -99,7 +104,9 @@ class Attribute ( object ) :
     def isfixed(self):
         """Returns true if both offset and dimensions are fixed"""
         offset = ExprVal(self.offset)
-        return offset.isconst(self.parent) and self.dimensions.isfixed()
+        if not offset.isconst(): return False
+        if self.dimensions and not self.dimensions.isfixed(): return False
+        return True
 
     def __str__(self):
         return "<Attribute(%s)>" % self.__dict__

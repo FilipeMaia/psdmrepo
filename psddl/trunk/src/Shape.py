@@ -9,8 +9,6 @@
 
 """Class describing the shape of the arrays.
 
-@see RelatedModule
-
 @version $Id$
 
 @author Andrei Salnikov
@@ -87,13 +85,13 @@ class Shape ( object ) :
     def isfixed(self):
         """Return true if all dimensions have fixed size"""
         for dim in self.dims:
-            expr = ExprVal(dim)
-            if not expr.isconst(self.ns): return False
+            expr = ExprVal(dim, self.ns)
+            if not expr.isconst(): return False
         return True
 
     def size(self):
         """Return total array size as ExprVal or None for unknown size array"""
-        return reduce(operator.add, [ExprVal(dim) for dim in self.dims])
+        return reduce(operator.mul, [ExprVal(dim, self.ns) for dim in self.dims])
 
     def __str__(self):
         return ','.join([_str(d) for d in self.dims])

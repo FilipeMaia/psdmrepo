@@ -56,12 +56,33 @@ class Package ( Namespace ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, name, parent = None ) :
+    def __init__ ( self, name, parent = None) :
         
         Namespace.__init__(self, name, parent)
         
         self.use = []
-        
+
+    @property
+    def included(self):
+        """Package is included if all entities in it are included"""
+        # constants
+        for const in self.constants() :
+            if not const.included :
+                return False
+
+        # regular enums
+        for enum in self.enums() :
+            if not enum.included :
+                return False
+
+        # loop over packages and types
+        for ns in self.namespaces() :
+            if not ns.included:
+                return False
+
+        return True
+
+    
     def __str__(self):
         return "<Package(" + self.name + ")>"
 

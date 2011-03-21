@@ -67,11 +67,15 @@ class Namespace ( object ) :
 
         if parent: parent.add(self)
 
-    def fullName(self):
+    def fullName(self, lang=None, topNs=None):
+        sep = {'C++' : '::'}.get(lang, '.')
         name = self.name
         if self._parent: 
-            parent = self._parent.fullName() 
-            if parent: name = parent + '.' + name
+            parent = self._parent.fullName(lang, topNs)
+            if parent: 
+                name = parent + sep + name
+            elif topNs:
+                name = topNs + sep + name
         return name
 
     def add(self, obj):
@@ -106,7 +110,7 @@ class Namespace ( object ) :
         
             for n in name[1:] :
     
-                # it must be a namspace
+                # it must be a namespace
                 if not isinstance(obj, Namespace): 
                     obj = None
                     break

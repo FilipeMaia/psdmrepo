@@ -45,6 +45,7 @@ import logging
 from psddl.Attribute import Attribute
 from psddl.Bitfield import Bitfield
 from psddl.Constant import Constant
+from psddl.Constructor import Constructor
 from psddl.Enum import Enum
 from psddl.Method import Method
 from psddl.Namespace import Namespace
@@ -95,7 +96,7 @@ class XmlReader ( object ) :
         return model
 
 
-    def _readFile( self, file, model, external ) :
+    def _readFile( self, file, model, included ) :
         """Parse XML tree and return the list of packages"""
 
         # read element tree from file
@@ -114,11 +115,11 @@ class XmlReader ( object ) :
             # all children must be packages
             if topel.tag == 'package' : 
                 
-                self._parsePackage(topel, model, external)
+                self._parsePackage(topel, model, included)
                 
             elif topel.tag == 'use' : 
                 
-                self._parseUse(topel, model, external)
+                self._parseUse(topel, model, included)
                 
             else:
                 
@@ -126,9 +127,10 @@ class XmlReader ( object ) :
 
 
 
-    def _parseUse(self, useel, model, external):
+    def _parseUse(self, useel, model, included):
 
         file = useel.get('file')
+        headers = useel.get('cpp_headers','').split()
         
         if file in self.included :
             logging.debug("XmlReader._parseUse: file %s was already included", file)
@@ -140,12 +142,12 @@ class XmlReader ( object ) :
             raise ValueError("Cannot find include file: "+file)
         logging.debug("XmlReader._parseUse: found file %s", path)
 
-        model.use.append(file)
+        model.use.append(dict(file=file, cpp_headers=headers))
 
         logging.debug("XmlReader._parseUse: reading file %s", path)
         self._readFile( path, model, True )
 
-    def _parsePackage(self, pkgel, model, external):
+    def _parsePackage(self, pkgel, model, included):
         
         # package must have a name
         pkgname = pkgel.get('name')
@@ -168,26 +170,33 @@ class XmlReader ( object ) :
             # package children can be types, constants or enums
             if subpkgel.tag == 'pstype' :
 
-                self._parseType(subpkgel, pkg, external)
+                self._parseType(subpkgel, pkg, included)
 
             elif subpkgel.tag == _const_tag :
 
-                self._parseConstant(subpkgel, pkg, external)
+                self._parseConstant(subpkgel, pkg, included)
 
             elif subpkgel.tag == _enum_tag :
 
-                self._parseEnum(subpkgel, pkg, external)
+                self._parseEnum(subpkgel, pkg, included)
+
+            elif subpkgel.tag == 'tag' :
+
+                pass
 
             else:
                 
                 raise TypeError('Package contains unexpected element: '+subpkgel.tag)
 
 
-    def _parseType(self, typeel, pkg, external):
+    def _parseType(self, typeel, pkg, included):
 
         # every type must have a name
         typename = typeel.get('name')
         if not typename: raise ValueError('pstype element missing name')
+
+        base = typeel.get('base')
+        if base: base = pkg.lookup(base, Type)
 
         # make new type object
         type = Type(typename,
@@ -197,25 +206,35 @@ class XmlReader ( object ) :
                     object_size = typeel.get('object-size'),
                     total_size = typeel.get('total-size'),
                     pack = typeel.get('pack'),
+                    base = base,
                     comment = typeel.text.strip(),
+                    tags = self._tags(typeel),
                     package = pkg,
-                    external = external )
+                    included = included )
 
         # get attributes
         for propel in list(typeel) :
 
             if propel.tag == _const_tag :
                 
-                self._parseConstant(propel, type, external)
+                self._parseConstant(propel, type, included)
                 
                 
             elif propel.tag == 'enum' :
                 
-                self._parseEnum(propel, type, external)
+                self._parseEnum(propel, type, included)
                 
             elif propel.tag == 'attribute' :
                 
                 self._parseAttr(propel, type)
+
+            elif propel.tag == 'method' :
+                
+                self._parseMeth(propel, type)
+
+            elif propel.tag == 'ctor' :
+                
+                self._parseCtor(propel, type)
 
             elif propel.tag == 'xtc-config' :
                 
@@ -228,7 +247,7 @@ class XmlReader ( object ) :
                 if not cfg: raise ValueError('unknown xtc-config name: '+cfgname)
                 
                 # add it to the list of config classes
-                type.xtcConfig.append(cfgname)
+                type.xtcConfig.append(cfg)
                 
             elif propel.tag == 'repeat' :
                 
@@ -238,6 +257,15 @@ class XmlReader ( object ) :
                 
                 # add it to the list of config classes
                 type.repeat = count
+
+            elif propel.tag == 'tag' :
+
+                # every tag must have a name
+                tagname = propel.get('name')
+                if not tagname: raise ValueError('tag element missing name')
+
+                type.tags[tagname] = propel.get('value')
+
                 
         # calculate offsets for the data members
         type.calcOffsets()
@@ -264,8 +292,9 @@ class XmlReader ( object ) :
                           type = atype,
                           parent = type, 
                           dimensions = attrel.get('dimensions'), 
-                          comment = attrel.text.strip(), 
+                          comment = (attrel.text or '').strip(), 
                           offset = attroffset,
+                          tags = self._tags(attrel),
                           access = attrel.get('access') )
         logging.debug("XmlReader._parseAttr: new attribute: %s", attr)
 
@@ -277,6 +306,7 @@ class XmlReader ( object ) :
                             parent = type, 
                             type = atype,
                             comment = attr.comment)
+            attr.accessor = method
             logging.debug("XmlReader._parseAttr: new method: %s", method)
 
         # get bitfields
@@ -296,7 +326,7 @@ class XmlReader ( object ) :
                               size = size,
                               parent = attr,
                               type = bftype,
-                              comment = bitfel.text.strip() )
+                              comment = (bitfel.text or "").strip() )
                 logging.debug("XmlReader._parseAttr: new bitfield: %s", bf)
                 bfoff += size
                 
@@ -306,23 +336,110 @@ class XmlReader ( object ) :
                                     bitfield = bf, 
                                     parent = type, 
                                     type = bftype,
+                                    access = bitfel.get('access', 'public'),
                                     comment = bf.comment)
+                    bf.accessor = method
                     logging.debug("XmlReader._parseAttr: new method: %s", method)
 
+    def _tags(self, elem):
+
+        tags = {}
+        for subel in list(elem) :
+            if subel.tag == 'tag' :    
+                # every tag must have a name
+                tagname = subel.get('name')
+                if not tagname: raise ValueError('tag element missing name')
+                tags[tagname] = subel.get('value')
+        return tags
+
+    def _parseCtor(self, ctorel, parent):
+    
+        # constructor type, any string
+        ctor_type = ctorel.get('type')
+
+        # may have arguments defined
+        args = []
+        for argel in list(ctorel) :
+            if argel.tag == "arg" :
+                argname = argel.get('name')
+                atype = None
+                typename = argel.get('type')
+                if typename:
+                    atype = parent.lookup(typename, (Type, Enum))
+                    if not atype: raise ValueError('argument element has unknown type '+typename)
+                dest = argel.get('dest')
+                args.append((argname, atype, dest))
+
+        attr_init = {}
+        for attrel in list(ctorel) :
+            if argel.tag == "attr-init" :
+                dest = argel.get('dest')
+                value = argel.get('value')
+                attr_init[dest] = value
+
+
+        ctor = Constructor(parent, 
+                           type = ctor_type,
+                           args = args,
+                           attr_init = attr_init,
+                           access = ctorel.get('access', 'public'),
+                           tags = self._tags(ctorel),
+                           comment = (ctorel.text or "").strip())
+        logging.debug("XmlReader._parseCtor: new constructor: %s", ctor)
 
                         
-    def _parseConstant(self, constel, parent, external):
+    def _parseMeth(self, methel, type):
+    
+        # every method must have a name
+        name = methel.get('name')
+        if not name: raise ValueError('method element missing name')
+        
+        # find type object
+        mtype = None
+        typename = methel.get('type')
+        if typename:
+            mtype = type.lookup(typename, (Type, Enum))
+            if not mtype: raise ValueError('method element has unknown type '+typename)
+
+        args = []
+        for argel in list(methel) :
+            if argel.tag == "arg" :
+                argname = argel.get('name')
+                typename = argel.get('type')
+                atype = type.lookup(typename, (Type, Enum))
+                if not atype: raise ValueError('argument element has unknown type '+typename)
+                args.append((argname, atype))
+
+        expr = {}
+        for exprel in list(methel) :
+            if exprel.tag == "expr" :
+                lang = exprel.get('lang', "Any")
+                value = exprel.get('value')
+                expr[lang] = value
+
+        method = Method(name, 
+                        parent = type, 
+                        type = mtype,
+                        args = args,
+                        expr = expr,
+                        access = methel.get('access', 'public'),
+                        tags = self._tags(methel),
+                        comment = (methel.text or "").strip())
+        logging.debug("XmlReader._parseMeth: new method: %s", method)
+
+                        
+    def _parseConstant(self, constel, parent, included):
 
         # every constant must have a name and value
         cname = constel.get('name')
         if not cname: raise ValueError('const element missing name')
         cval = constel.get('value')
         if not cval: raise ValueError('const element missing value')
-        Constant(cname, cval, parent, external=external)
+        Constant(cname, cval, parent, included=included)
             
-    def _parseEnum(self, enumel, parent, external):
+    def _parseEnum(self, enumel, parent, included):
         
-        enum = Enum(enumel.get('name'), parent, external=external)
+        enum = Enum(enumel.get('name'), parent, included=included)
         for econst in list(enumel):
             if econst.tag != _enum_const_tag : raise ValueError('expecting %s tag'%_enum_const_tag)
             Constant(econst.get('name'), econst.get('value'), enum)
@@ -340,17 +457,22 @@ class XmlReader ( object ) :
 
     def _initTypes(self, ns):
         """ Define few basic types in global namespace """
-        Type("char", size=1, align=1, package=ns)
-        Type("int8_t", size=1, align=1, package=ns)
-        Type("uint8_t", size=1, align=1, package=ns)
-        Type("int16_t", size=2, align=2, package=ns)
-        Type("uint16_t", size=2, align=2, package=ns)
-        Type("int32_t", size=4, align=4, package=ns)
-        Type("uint32_t", size=4, align=4, package=ns)
-        Type("int64_t", size=8, align=8, package=ns)
-        Type("uint64_t", size=8, align=8, package=ns)
-        Type("float", size=4, align=4, package=ns)
-        Type("double", size=8, align=8, package=ns)
+        
+        tags = {'basic': 1, 'external': 2}
+        Type("char", size=1, align=1, package=ns, tags=tags)
+        Type("int8_t", size=1, align=1, package=ns, tags=tags)
+        Type("uint8_t", size=1, align=1, package=ns, tags=tags)
+        Type("int16_t", size=2, align=2, package=ns, tags=tags)
+        Type("uint16_t", size=2, align=2, package=ns, tags=tags)
+        Type("int32_t", size=4, align=4, package=ns, tags=tags)
+        Type("uint32_t", size=4, align=4, package=ns, tags=tags)
+        Type("int64_t", size=8, align=8, package=ns, tags=tags)
+        Type("uint64_t", size=8, align=8, package=ns, tags=tags)
+        Type("float", size=4, align=4, package=ns, tags=tags)
+        Type("double", size=8, align=8, package=ns, tags=tags)
+
+        tags = {'basic': 1, 'external': 2, 'c++-name': 'const char*'}
+        Type("string", size=0, align=0, package=ns, tags=tags)
     
 #
 #  In case someone decides to run this module

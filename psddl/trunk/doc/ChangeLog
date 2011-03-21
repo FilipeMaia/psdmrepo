@@ -6,10 +6,15 @@
 #  ChangeLog file for package psddl
 #------------------------------------------------------------------------
 
-Package author: Andrei Salnikov
+Package author: Andy Salnikov
 
 Please describe any modifications that you made to the package in the
 reverse time order.
+
+Tag: V00-00-01
+2011-03-20 Andy Salnikov
+- first production tag
+- lots of changes, almost complete
 
 Tag: andy-20101209-01
 2010-12-09 Andrei Salnikov

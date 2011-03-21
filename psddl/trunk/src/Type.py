@@ -42,6 +42,7 @@ from psddl.Namespace import Namespace
 # Imports for other modules --
 #-----------------------------
 from psddl.ExprVal import ExprVal
+from psddl.Method import Method
 
 #----------------------------------
 # Local non-exported definitions --
@@ -74,12 +75,45 @@ class Type ( Namespace ) :
         self.align = kw.get('align')
         self.pack = kw.get('pack')
         if self.pack : self.pack = int(self.pack)
-        self.external = kw.get('external')
-        
+        self.included = kw.get('included')
+        self.base = kw.get('base')
+        self.tags = kw.get('tags', {}).copy()
+
         self.xtcConfig = []
 
         self.repeat = None
+                
+        self.ctors = []   # constructors
 
+    @property
+    def basic(self):
+        return 'basic' in self.tags
+
+    @property
+    def external(self):
+        return 'external' in self.tags
+
+    @property
+    def value_type(self):
+        return 'value-type' in self.tags
+
+    def fullName(self, lang=None, topNs=None):
+        if self.external: topNs = None
+        return Namespace.fullName(self, lang, topNs)
+
+    def fullName(self, lang=None, topNs=None):
+        if self.external: topNs = None
+        sep = {'C++' : '::'}.get(lang, '.')
+        name = self.name
+        if lang == 'C++' and 'c++-name' in self.tags: name = self.tags['c++-name']
+        if self._parent: 
+            parent = self._parent.fullName(lang, topNs)
+            if parent: 
+                name = parent + sep + name
+            elif topNs:
+                name = topNs + sep + name
+        return name
+    
     def __str__(self):
         
         return "<Type(%s)>" % self.__dict__
@@ -94,6 +128,7 @@ class Type ( Namespace ) :
         logging.debug("_calcOffsets: type=%s", self)
 
         offset = ExprVal(0)
+        if self.base : offset = self.base.size
         maxalign = 1
         for attr in self.attributes():
 
@@ -180,6 +215,58 @@ class Type ( Namespace ) :
             
             # set it to calculate value
             self.size = offset
+
+        if 'no-sizeof' not in self.tags:
+            self._genSizeof()
+
+    def _genSizeof(self):
+
+        # generate public _sizeof method
+
+        if self.size.value is None :
+            
+            # special case for unknown size
+            expr = "~uint32_t(0)"
+            needCfg = False
+            static = True
+            logging.debug("_genSizeof: expr=%s", expr)
+            
+        else :
+
+            expr = ExprVal(0, self)
+            if self.base :
+                expr = ExprVal(self.base.fullName('C++')+"::_sizeof()", self)
+            for attr in self.attributes():
+                meth = attr.type.lookup('_sizeof', Method)
+                if not meth:
+                    size = ExprVal(attr.type.size, self)
+                else:
+                    cfg = ''
+                    if meth.expr.get('C++',"").find("{xtc-config}") >= 0: cfg = 'cfg'
+                    if meth.expr.get('C++',"").find("{self}") >= 0:
+                        if attr.isfixed():
+                            size = ExprVal("{self}."+attr.name+"._sizeof(%s)"%cfg, self)
+                        else:
+                            size = ExprVal("{self}."+attr.accessor.name+"()._sizeof(%s)"%cfg, self)
+                    else:
+                        size = ExprVal(attr.type.fullName('C++')+"::_sizeof(%s)"%cfg, self)
+
+                if attr.dimensions: 
+                    size = str(size)
+                    for dim in attr.dimensions.dims:
+                        size += '*(%s)' % dim
+                    size = ExprVal(size, self)
+                expr += size
+            expr = str(expr)
+            logging.debug("_genSizeof: expr=%s", expr)
+
+            needCfg = expr.find('{xtc-config}') >= 0
+            static = expr.find('{self}') < 0
+
+        type = self.lookup('uint32_t', Type)
+        tags = dict(inline=None)
+        meth = Method('_sizeof', type=type, parent=self,
+                      expr={"C++": expr}, tags=tags, static=static)
 
 #
 #  In case someone decides to run this module

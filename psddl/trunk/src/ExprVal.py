@@ -58,11 +58,33 @@ class ExprVal ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, val = None ) :
-        if type(val) == ExprVal : 
+    def __init__ ( self, val = None, ns = None ) :
+        if val is None : 
+            self.value = None
+            self.const = False
+        elif type(val) == ExprVal :
+            # copy constructor
             self.value = val.value
-        else:
+            self.const = val.const
+        elif type(val) == types.IntType: 
+            # integer value is constant
             self.value = val
+            self.const = True
+        else:
+            if ns is None: raise TypeError("ExprVal requires namespace object")
+            self.value = val
+            self.const = False
+            
+            # try to resolve the expression (recursively)
+            v = ns.lookup(self.value, Constant)
+            while v is not None:
+                self.const = True
+                self.value = v.value
+                try:
+                    self.value = int(self.value)
+                    break
+                except ValueError:
+                    v = ns.lookup(self.value, Constant)
 
     #-------------------
     #  Public methods --
@@ -93,19 +115,23 @@ class ExprVal ( object ) :
         return op(self.value, other.value)
 
     def __add__(self, other):
-        newval = self._genop(other, operator.add, '+')
-        return ExprVal(newval)
+        expr = ExprVal(self)
+        expr += other
+        return expr
 
     def __iadd__(self, other):
         self.value = self._genop(other, operator.add, '+')
+        self.const = self.const and other.const
         return self
 
     def __mul__(self, other):
-        newval = self._genop(other, operator.mul, '*')
-        return ExprVal(newval)
+        expr = ExprVal(self)
+        expr *= other
+        return expr
 
     def __imul__(self, other):
         self.value = self._genop(other, operator.mul, '*')
+        self.const = self.const and other.const
         return self
 
     def __cmp__(self, other):
@@ -114,21 +140,9 @@ class ExprVal ( object ) :
         else:
             return self.value == other
 
-
-    def isconst(self, typeobj):
+    def isconst(self):
         """Returns true if the expression is constant"""
-
-        # None is non-constant (or rather unknown)
-        if self.value is None: return False
-        
-        # integer value is constant
-        if type(self.value) == types.IntType: return True
-        
-        # if expression is a constant then it's fixed
-        if typeobj.lookup(self.value, Constant) is not None:
-            return True
-                
-        return False
+        return self.const
 
 #
 #  In case someone decides to run this module

@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module DdlPdsdata...
+#  Module DdlPsanaInterfaces...
 #
 #------------------------------------------------------------------------
 
@@ -56,7 +56,7 @@ from psddl.Type import Type
 #---------------------
 #  Class definition --
 #---------------------
-class DdlPdsdata ( object ) :
+class DdlPsanaInterfaces ( object ) :
 
     #----------------
     #  Constructor --
@@ -65,13 +65,12 @@ class DdlPdsdata ( object ) :
         """Constructor
         
             @param incname  include file name
-            @param cppname  source file name
         """
         self.incname = incname
         self.cppname = cppname
         self.incdirname = backend_options.get('gen-incdir', "")
         self.top_pkg = backend_options.get('top-package')
-        
+
         #include guard
         g = os.path.split(self.incname)[1]
         if self.top_pkg: g = self.top_pkg + '_' + g
@@ -86,7 +85,7 @@ class DdlPdsdata ( object ) :
         # open output files
         self.inc = file(self.incname, 'w')
         self.cpp = file(self.cppname, 'w')
-        
+
         # include guard to header
         print >>self.inc, "#ifndef", self.guard 
         print >>self.inc, "#define", self.guard, "1"
@@ -98,10 +97,10 @@ class DdlPdsdata ( object ) :
         # add necessary includes
         print >>self.inc, "#include \"pdsdata/xtc/TypeId.hh\"\n"
         print >>self.inc, "#include <vector>\n"
-        print >>self.inc, "#include <cstddef>\n"
 
         inc = os.path.join(self.incdirname, os.path.basename(self.incname))
         print >>self.cpp, "#include \"%s\"\n" % inc
+        print >>self.cpp, "#include <cstddef>\n"
 
         # headers for other included packages
         for use in model.use:
@@ -120,8 +119,9 @@ class DdlPdsdata ( object ) :
 
         # loop over packages in the model
         for pkg in model.packages() :
-            logging.debug("parseTree: package=%s", repr(pkg))
-            self._parsePackage(pkg)
+            if not pkg.included :
+                logging.debug("parseTree: package=%s", repr(pkg))
+                self._parsePackage(pkg)
 
         if self.top_pkg : 
             print >>self.inc, "} // namespace %s" % self.top_pkg
@@ -136,8 +136,6 @@ class DdlPdsdata ( object ) :
 
 
     def _parsePackage(self, pkg):
-
-        if pkg.included: return
 
         # open namespaces
         print >>self.inc, "namespace %s {" % pkg.name
@@ -175,7 +173,10 @@ class DdlPdsdata ( object ) :
         # skip included types
         if type.included : return
 
-        codegen = CppTypeCodegen(self.inc, self.cpp, type)
+        # type is abstract by default but can be reset with tag "value-type"
+        abstract = "value-type" not in type.tags
+
+        codegen = CppTypeCodegen(self.inc, self.cpp, type, abstract)
         codegen.codegen()
 
     def _genConst(self, const):

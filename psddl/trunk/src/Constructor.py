@@ -3,11 +3,12 @@
 #  $Id$
 #
 # Description:
-#  Module Bitfield...
+#  Module Constructor...
 #
 #------------------------------------------------------------------------
 
-"""Class representing bitfield definition
+"""Class describing type's constructor.
+
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -35,7 +36,6 @@ import sys
 #  Imports of base class module --
 #---------------------------------
 
-
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
@@ -51,47 +51,31 @@ import sys
 #---------------------
 #  Class definition --
 #---------------------
-class Bitfield ( object ) :
-
+class Constructor ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, name, **kw ) :
+    def __init__ ( self, parent, **kw ) :
+        
+        self.parent = parent
 
-        self.name = name
-        self.offset = kw.get('offset')
-        self.size = kw.get('size')
-        self.type = kw.get('type')
-        self.parent = kw.get('parent')
+        self.args = kw.get('args', [])
+        self.attr_init = kw.get('attr_init', {})
         self.comment = kw.get('comment')
-
-        self.parent.bitfields.append(self)
-
-    @property
-    def bitmask(self):
-        return (1<<self.size)-1
-
-    def expr(self):
+        self.access = kw.get('access', "public")
+        self.tags = kw.get('tags', {}).copy()
         
-        expr = "{self}."+self.parent.name
-        if self.offset > 0 :
-            expr = "(%s>>%d)" % (expr, self.offset)
-        expr = "%s(%s & %#x)" % (self.type.name, expr, self.bitmask)
-        return expr
+        self.parent.ctors.append(self)
 
-    def assignExpr(self, name):
-        
-        expr = "(%s & %#x)" % (name, self.bitmask)
-        if self.offset > 0 :
-            expr = "(%s<<%d)" % (expr, self.offset)
-        return expr
+    #-------------------
+    #  Public methods --
+    #-------------------
 
     def __str__(self):
-        return "<Bitfield(%s)>" % self.__dict__
+        return "<%s(%s)>" % (self.parent.name, self.args)
 
     def __repr__(self):
-        return "<Bitfield(%s)>" % self.name
-
+        return "<%s(%s)>" % (self.parent.name, self.__dict__)
 
 #
 #  In case someone decides to run this module

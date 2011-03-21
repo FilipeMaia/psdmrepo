@@ -60,7 +60,9 @@ class Enum ( Namespace ) :
 
         Namespace.__init__(self, name, parent)
 
-        self.external = kw.get('external')
+        self.included = kw.get('included')
+        
+        self.basic = True
 
     def __str__(self):
         res = "<Enum(" + self.name

@@ -62,7 +62,12 @@ class Method ( object ) :
         self.parent = kw.get('parent')
         self.attribute = kw.get('attribute')
         self.bitfield = kw.get('bitfield')
+        self.args = kw.get('args', [])
+        self.expr = kw.get('expr', {}).copy()
         self.comment = kw.get('comment')
+        self.access = kw.get('access', "public")
+        self.static = kw.get('static', False)
+        self.tags = kw.get('tags', {}).copy()
 
         if self.parent: self.parent.add(self)
 
