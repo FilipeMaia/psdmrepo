@@ -28,7 +28,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/xtc/Dgram.hh"
+#include "XtcInput/Dgram.h"
 
 //		---------------------
 // 		-- Class Interface --
@@ -60,7 +60,7 @@ public:
   ~XtcDgIterator () ;
 
   // Returns next datagram, zero or EOF, throws exceptions for errors
-  Pds::Dgram* next() ;
+  Dgram::ptr next() ;
 
 protected:
 
@@ -70,7 +70,6 @@ private:
   std::string m_path;
   FILE* m_file;
   size_t m_maxDgramSize ;
-  char* m_buf ;
 
 };
 

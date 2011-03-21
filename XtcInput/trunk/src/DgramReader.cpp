@@ -70,7 +70,8 @@ DgramReader::operator() ()
   try {
 
     XtcStreamMerger iter(m_files, m_maxDgSize, m_mode, m_skipDamaged, m_l1OffsetSec);
-    while ( Pds::Dgram* dg = iter.next() ) {
+    Dgram::ptr dg;
+    while ( (dg = iter.next()).get() ) {
 
       // move it to the queue
       m_queue.push ( dg ) ;
@@ -78,7 +79,7 @@ DgramReader::operator() ()
     }
 
     // tell all we are done
-    m_queue.push ( (Pds::Dgram*)0 ) ;
+    m_queue.push ( Dgram::ptr() ) ;
 
   } catch ( std::exception& e ) {
 

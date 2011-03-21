@@ -36,17 +36,6 @@ namespace {
 
   const char* logger = "XtcStreamMerger" ;
 
-
-  Pds::Dgram* dg_copy ( Pds::Dgram*dg )
-  {
-    // make a copy
-    char* dgbuf = (char*)dg ;
-    size_t dgsize = sizeof(Pds::Dgram) + dg->xtc.sizeofPayload();
-    char* buf = new char[dgsize] ;
-    std::copy( dgbuf, dgbuf+dgsize, buf ) ;
-    return (Pds::Dgram*)buf ;
-  }
-
 }
 
 //		----------------------------------------
@@ -110,8 +99,8 @@ XtcStreamMerger::XtcStreamMerger ( const std::list<XtcFileName>& files,
     // create new stream
     XtcDechunk* stream = new XtcDechunk( streamFiles, maxDgSize, skipDamaged ) ;
     m_streams.push_back( stream ) ;
-    Pds::Dgram* dg = stream->next();
-    if ( dg ) updateDgramTime( *dg );
+    Dgram::ptr dg = stream->next();
+    if ( dg.get() ) updateDgramTime( *dg );
     m_dgrams.push_back( dg ) ;
 
   }
@@ -147,7 +136,7 @@ XtcStreamMerger::mergeMode(const std::string& str)
 
 // read next datagram, return zero pointer after last file has been read,
 // throws exception for errors.
-Pds::Dgram*
+Dgram::ptr
 XtcStreamMerger::next()
 {
   unsigned ns =  m_streams.size() ;
@@ -155,7 +144,7 @@ XtcStreamMerger::next()
   // find datagram with lowest timestamp
   int stream = -1 ;
   for ( unsigned i = 0 ; i < ns ; ++ i ) {
-    if ( m_dgrams[i] ) {
+    if ( m_dgrams[i].get() ) {
       if ( stream < 0 or m_dgrams[stream]->seq.clock() > m_dgrams[i]->seq.clock() ) {
         stream = i ;
       }
@@ -166,13 +155,13 @@ XtcStreamMerger::next()
 
   if ( stream < 0 ) {
     // means no datagrams left
-    return 0 ;
+    return Dgram::ptr() ;
   }
 
   MsgLog( logger, debug, "next -- file: " << m_streams[stream]->chunkName().basename() ) ;
 
   // make a copy of the datagram
-  Pds::Dgram* dg = ::dg_copy( m_dgrams[stream] );
+  Dgram::ptr dg = m_dgrams[stream];
 
   MsgLog( logger, debug, "next -- m_dgrams[stream].clock: "
       << dg->seq.clock().seconds() << " sec " << dg->seq.clock().nanoseconds() << " nsec" ) ;
@@ -180,8 +169,8 @@ XtcStreamMerger::next()
 
   // get next datagram from that stream
   MsgLog( logger, debug, "next -- read datagram from file: " << m_streams[stream]->chunkName().basename() ) ;
-  Pds::Dgram* ndg = m_streams[stream]->next();
-  if ( ndg ) updateDgramTime( *ndg );
+  Dgram::ptr ndg = m_streams[stream]->next();
+  if ( ndg.get() ) updateDgramTime( *ndg );
   m_dgrams[stream] = ndg ;
 
   return dg ;

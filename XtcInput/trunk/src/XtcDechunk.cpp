@@ -67,11 +67,11 @@ XtcDechunk::~XtcDechunk ()
 
 // read next datagram, return zero pointer after last file has been read,
 // throws exception for errors.
-Pds::Dgram*
+Dgram::ptr
 XtcDechunk::next()
 {
-  Pds::Dgram* dgram = 0 ;
-  while ( not dgram ) {
+  Dgram::ptr dgram;
+  while ( not dgram.get() ) {
 
     if ( not m_dgiter ) {
 
@@ -88,7 +88,7 @@ XtcDechunk::next()
     ++ m_count ;
 
     // if failed to read go to next file
-    if ( not dgram ) {
+    if ( not dgram.get() ) {
       delete m_dgiter ;
       m_dgiter = 0 ;
 
@@ -103,7 +103,7 @@ XtcDechunk::next()
             << " type: " << int(xtc.contains.id()) << '#' << Pds::TypeId::name(xtc.contains.id())
             << "/V" << xtc.contains.version()
             << "\n    Skipping damaged event -- file: " << m_iter->path() << " event: " << m_count ) ;
-        dgram = 0 ;
+        dgram.reset();
       }
 
     }

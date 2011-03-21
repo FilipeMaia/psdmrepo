@@ -49,7 +49,6 @@ XtcDgIterator::XtcDgIterator (const std::string& path, size_t maxDgramSize)
   : m_path(path)
   , m_file(0)
   , m_maxDgramSize(maxDgramSize)
-  , m_buf(new char[maxDgramSize])
 {
   m_file = fopen( m_path.c_str(), "rb" );
   if ( ! m_file ) {
@@ -64,18 +63,17 @@ XtcDgIterator::XtcDgIterator (const std::string& path, size_t maxDgramSize)
 XtcDgIterator::~XtcDgIterator ()
 {
   fclose( m_file );
-  delete[] m_buf;
 }
 
-Pds::Dgram*
+Dgram::ptr
 XtcDgIterator::next()
 {
-  Pds::Dgram* dg = (Pds::Dgram*)m_buf;
+  Pds::Dgram* dg = (Pds::Dgram*)new char[m_maxDgramSize];
 
   // read header
   if ( fread(dg, sizeof(Pds::Dgram), 1, m_file) != 1 ) {
     if ( feof(m_file) ) {
-      return 0;
+      return Dgram::ptr();
     } else {
       throw XTCReadException( m_path );
     }
@@ -99,7 +97,7 @@ XtcDgIterator::next()
     }
   }
 
-  return dg;
+  return Dgram::make_ptr(dg);
 }
 
 } // namespace XtcInput

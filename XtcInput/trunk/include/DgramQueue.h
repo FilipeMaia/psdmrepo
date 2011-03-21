@@ -26,7 +26,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/xtc/Dgram.hh"
+#include "XtcInput/Dgram.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -54,7 +54,7 @@ namespace XtcInput {
 class DgramQueue : boost::noncopyable {
 public:
 
-  typedef Pds::Dgram* pointer_type ;
+  typedef Dgram::ptr pointer_type ;
 
   // Default constructor
   DgramQueue ( size_t maxSize ) ;

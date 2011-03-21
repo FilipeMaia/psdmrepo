@@ -25,7 +25,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/xtc/Dgram.hh"
+#include "XtcInput/Dgram.h"
 #include "XtcInput/XtcFileName.h"
 
 //------------------------------------
@@ -65,7 +65,7 @@ public:
 
   // read next datagram, return zero pointer after last file has been read,
   // throws exception for errors.
-  Pds::Dgram* next() ;
+  Dgram::ptr next() ;
 
   // get current file name
   XtcFileName chunkName() const ;

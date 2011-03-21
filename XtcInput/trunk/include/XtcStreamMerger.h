@@ -25,7 +25,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/xtc/Dgram.hh"
+#include "XtcInput/Dgram.h"
 #include "XtcInput/XtcDechunk.h"
 #include "XtcInput/XtcFileName.h"
 
@@ -82,7 +82,7 @@ public:
 
   // read next datagram, return zero pointer after last file has been read,
   // throws exception for errors.
-  Pds::Dgram* next() ;
+  Dgram::ptr next() ;
 
 protected:
 
@@ -93,7 +93,7 @@ private:
 
   // Data members
   std::vector<XtcDechunk*> m_streams ;
-  std::vector<Pds::Dgram*> m_dgrams ;
+  std::vector<Dgram::ptr> m_dgrams ;
   MergeMode m_mode ;
   int32_t m_l1OffsetSec ;
   int32_t m_l1OffsetNsec ;
