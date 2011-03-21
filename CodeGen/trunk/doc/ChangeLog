@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-17
+2011-03-20 Andy Salnikov
+added templates for psana-module
+
 Tag: V00-00-16
 2011-01-19 Andy Salnikov
 - we are not really using SITConfig, I'm going to remove it entirely,

@@ -72,6 +72,7 @@ codegen_Cxx_description = "Template for regular non-templated C++ classes"
 codegen_Cxx_template_description = "Template for templated C++ classes"
 codegen_Cxx_app_description = "Template for C++ applications based on AppBase class"
 codegen_Cxx_unit_test_description = "Template for C++ unit test module"
+codegen_psana_module_description = "Template for PSANA user analysis module"
 
 codegen_python_description = "Template for Python library module"
 codegen_python_main_description = "Template for Python executable script"
@@ -91,6 +92,7 @@ codegen_dstdir = {}
 
 codegen_dstdir['Cxx'] = dict(cpp='src', h='include')
 codegen_dstdir['Cxx_template'] = dict(cpp='src', h='include')
+codegen_dstdir['psana_module'] = dict(cpp='src', h='include')
 codegen_dstdir['Cxx_app'] = dict(cpp='app')
 codegen_dstdir['Cxx_unit_test'] = dict(cpp='test')
 
