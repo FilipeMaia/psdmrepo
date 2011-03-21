@@ -40,6 +40,12 @@ namespace ConfigSvc {
 //----------------
 // Constructors --
 //----------------
+ConfigSvcImplFile::ConfigSvcImplFile ()
+  : ConfigSvcImplI()
+  , m_config()
+{
+}
+
 ConfigSvcImplFile::ConfigSvcImplFile (const std::string& file)
   : ConfigSvcImplI()
   , m_config()

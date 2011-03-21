@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2011-03-20 Andy Salnikov
+- added default constructor to ConfigSvcImplFile to instantiate 
+  empty configuration
+
 Tag: V00-00-04
 2011-01-26 Andy Salnikov
 - removed SITConfig/SITConfig.h include from test case

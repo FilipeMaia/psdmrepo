@@ -53,6 +53,7 @@ class ConfigSvcImplFile : public ConfigSvcImplI {
 public:
 
   // Constructor
+  ConfigSvcImplFile () ;
   ConfigSvcImplFile (const std::string& file) ;
   ConfigSvcImplFile (std::istream& stream, const std::string& file="<stream>") ;
 
