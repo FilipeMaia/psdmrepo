@@ -1,0 +1,44 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PSXtcInput
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-05
+2011-03-20 Andy Salnikov
+- added implementation of the event ID class
+
+Tag: V00-00-04
+2011-01-31 Andy Salnikov
+- renamed this package to PSXtcInput
+- use ErrSvc::Issue for exceptions' base class
+
+Tag: V00-00-03
+2011-01-27 Andy Salnikov
+- fix properties on files
+
+Tag: V00-00-02
+2011-01-27 Andy Salnikov
+- added exception classes
+- started implementation of the event filling part
+
+Tag: V00-00-01
+2011-01-26 Andy Salnikov
+- retag with standard tag, good for nightly
+
+Tag: andy-20110126-02
+2011-01-26 Andy Salnikov
+- moved common classes to new package XtcInput
+
+Tag: andy-20110126-01
+2011-01-26 Andy Salnikov
+- copied few classes from translator
+- added XtcInputModule class
+- common classes will probably be moved to XtcInput package
