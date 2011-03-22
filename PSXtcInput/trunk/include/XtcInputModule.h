@@ -27,6 +27,8 @@
 //-------------------------------
 #include "XtcInput/Dgram.h"
 #include "psddl_pds2psana/XtcConverter.h"
+#include "pdsdata/xtc/TransitionId.hh"
+#include "pdsdata/xtc/ClockTime.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -88,6 +90,7 @@ private:
   XtcInput::Dgram::ptr m_putBack;
   boost::scoped_ptr<boost::thread> m_readerThread;
   psddl_pds2psana::XtcConverter m_cvt;
+  Pds::ClockTime m_transitions[Pds::TransitionId::NumberOf];
 };
 
 } // namespace PSXtcInput

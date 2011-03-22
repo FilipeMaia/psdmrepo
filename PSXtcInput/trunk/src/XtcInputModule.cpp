@@ -124,6 +124,8 @@ XtcInputModule::beginJob(Env& env)
     return;
   }
   
+  m_transitions[dg->seq.service()] = dg->seq.clock();
+  
   // Store configuration info in the environment
   fillEnv(dg, env);
 
@@ -132,74 +134,102 @@ XtcInputModule::beginJob(Env& env)
 InputModule::Status 
 XtcInputModule::event(Event& evt, Env& env)
 {
-  // get datagram either from saved event or queue
-  XtcInput::Dgram::ptr dg;
-  if (m_putBack.get()) {
-    dg = m_putBack;
-    m_putBack.reset();
-  } else {
-    dg = m_dgQueue->pop();
-  }
-
-  if (not dg.get()) {
-    // finita
-    return Stop;
-  }
-
   Status status = Skip;
-  switch( dg->seq.service()) {
-  
-  case Pds::TransitionId::Configure:
-    // That should not happen
-    MsgLog(logger, error, "Unexpected Configure transition");
-    status = Skip;
-    break;
-    
-  case Pds::TransitionId::Unconfigure:
-    // Nothing is expected after this
-    status = Stop;
-    break;
- 
-  case Pds::TransitionId::BeginRun:
-    // signal new run, content is not relevant
-    status = BeginRun;
-    break;
-  
-  case Pds::TransitionId::EndRun:
-    // signal end of run, content is not relevant
-    status = EndRun;
-    break;
-  
-  case Pds::TransitionId::BeginCalibCycle:
-    // copy config data and signal new calib cycle
-    fillEnv(dg, env);
-    status = BeginCalibCycle;
-    break;
-  
-  case Pds::TransitionId::EndCalibCycle:
-    // stop calib cycle
-    status = EndCalibCycle;
-    break;
-  
-  case Pds::TransitionId::L1Accept:
-    // regular event
-    fillEnv(dg, env);
-    fillEvent(dg, evt, env);
-    status = DoEvent;
-    break;
-  
-  case Pds::TransitionId::Unknown:
-  case Pds::TransitionId::Reset:
-  case Pds::TransitionId::Map:
-  case Pds::TransitionId::Unmap:
-  case Pds::TransitionId::Enable:
-  case Pds::TransitionId::Disable:
-  case Pds::TransitionId::NumberOf:
-    // Do not do anything for these transitions, just go to next
-    status = Skip;
-    break;
-  }
+  bool found = false;
+  while (not found) {
 
+    // get datagram either from saved event or queue
+    XtcInput::Dgram::ptr dg;
+    if (m_putBack.get()) {
+      dg = m_putBack;
+      m_putBack.reset();
+    } else {
+      dg = m_dgQueue->pop();
+    }
+  
+    if (not dg.get()) {
+      // finita
+      MsgLog(logger, warning, "EOF seen before Unconfigure");
+      return Stop;
+    }
+  
+    const Pds::Sequence& seq = dg->seq ;
+    const Pds::ClockTime& clock = seq.clock() ;
+    Pds::TransitionId::Value trans = seq.service();
+
+    switch( seq.service()) {
+    
+    case Pds::TransitionId::Configure:
+      if (not (clock == m_transitions[trans])) {
+        MsgLog(logger, error, "Unexpected Configure transition");
+        // still want to update environment data from it
+        fillEnv(dg, env);
+      }
+      break;
+      
+    case Pds::TransitionId::Unconfigure:
+      // Nothing is expected after this
+      status = Stop;
+      found = true;
+      break;
+   
+    case Pds::TransitionId::BeginRun:
+      // signal new run, content is not relevant
+      if (not (clock == m_transitions[trans])) {
+        status = BeginRun;
+        found = true;
+        m_transitions[trans] = clock;
+      }
+      break;
+    
+    case Pds::TransitionId::EndRun:
+      // signal end of run, content is not relevant
+      if (not (clock == m_transitions[trans])) {
+        status = EndRun;
+        found = true;
+        m_transitions[trans] = clock;
+      }
+      break;
+    
+    case Pds::TransitionId::BeginCalibCycle:
+      // copy config data and signal new calib cycle
+      if (not (clock == m_transitions[trans])) {
+        fillEnv(dg, env);
+        status = BeginCalibCycle;
+        found = true;
+        m_transitions[trans] = clock;
+      }
+      break;
+    
+    case Pds::TransitionId::EndCalibCycle:
+      // stop calib cycle
+      if (not (clock == m_transitions[trans])) {
+        status = EndCalibCycle;
+        found = true;
+        m_transitions[trans] = clock;
+      }
+      break;
+    
+    case Pds::TransitionId::L1Accept:
+      // regular event
+      fillEnv(dg, env);
+      fillEvent(dg, evt, env);
+      found = true;
+      status = DoEvent;
+      break;
+    
+    case Pds::TransitionId::Unknown:
+    case Pds::TransitionId::Reset:
+    case Pds::TransitionId::Map:
+    case Pds::TransitionId::Unmap:
+    case Pds::TransitionId::Enable:
+    case Pds::TransitionId::Disable:
+    case Pds::TransitionId::NumberOf:
+      // Do not do anything for these transitions, just go to next
+      break;
+    }
+  }
+  
   return status ;
 }
 
