@@ -94,7 +94,7 @@ namespace {
     typedef typename FinalType::PsanaType PsanaType;
     
     // get config object
-    boost::shared_ptr<XtcConfigType> cfgPtr = cfgStore.get<XtcConfigType>(xtc->src);
+    boost::shared_ptr<XtcConfigType> cfgPtr = cfgStore.get(xtc->src);
     if (not cfgPtr.get()) return false;
     
     // XTC data object
