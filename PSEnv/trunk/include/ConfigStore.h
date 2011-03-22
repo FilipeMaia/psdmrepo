@@ -58,6 +58,19 @@ namespace PSEnv {
 class ConfigStore : boost::noncopyable {
 public:
 
+  // Special class used for type-less return from get()
+  struct GetResultProxy {
+    
+    template<typename T>
+    operator boost::shared_ptr<T>() {
+      boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), m_source, std::string());
+      return boost::static_pointer_cast<T>(vptr);
+    }
+    
+    boost::shared_ptr<PSEvt::ProxyDictI> m_dict;
+    Pds::Src m_source;
+  };
+
   // Default constructor
   ConfigStore(const boost::shared_ptr<PSEvt::ProxyDictI>& dict) : m_dict(dict) {}
 
@@ -90,11 +103,10 @@ public:
    *  @param[in] source Source detector address.
    *  @return Shared pointer which can be zero if object not found.
    */
-  template<typename T>
-  boost::shared_ptr<T> get(const Pds::Src& source) 
+  GetResultProxy get(const Pds::Src& source) 
   {
-    boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), source, std::string());
-    return boost::static_pointer_cast<T>(vptr);
+    GetResultProxy pxy = { m_dict, source };
+    return pxy;
   }
 
   /**

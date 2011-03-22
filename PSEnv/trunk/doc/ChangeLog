@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2011-03-21 Andy Salnikov
+- ConfigStore::get() does not need template parameter
+
 Tag: V00-00-03
 2011-03-20 Andy Salnikov
 - added ConfigStore class which is a part of the environment storing 
