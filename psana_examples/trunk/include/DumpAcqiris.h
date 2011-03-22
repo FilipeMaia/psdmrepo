@@ -1,12 +1,12 @@
-#ifndef PSANA_EXAMPLES_MODULE1_H
-#define PSANA_EXAMPLES_MODULE1_H
+#ifndef PSANA_EXAMPLES_DUMPACQIRIS_H
+#define PSANA_EXAMPLES_DUMPACQIRIS_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class Module1.
+//	Class DumpAcqiris.
 //
 //------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@
 namespace psana_examples {
 
 /**
- *  @brief Example of the user analysis module.
+ *  @brief Example module class for psana
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -46,15 +46,18 @@ namespace psana_examples {
  *  @author Andrei Salnikov
  */
 
-class Module1 : public Module {
+class DumpAcqiris : public Module {
 public:
 
   // Default constructor
-  Module1 (const std::string& name) ;
+  DumpAcqiris (const std::string& name) ;
 
   // Destructor
-  virtual ~Module1 () ;
+  virtual ~DumpAcqiris () ;
 
+  /// Method which is called at the beginning of the calibration cycle
+  virtual void beginCalibCycle(Env& env);
+  
   /// Method which is called with event data
   virtual void event(Event& evt, Env& env);
   
@@ -62,13 +65,12 @@ protected:
 
 private:
 
-  // Data members
-  unsigned m_count;
+  // Data members, this is for example purposes only
   unsigned m_maxEvents;
   bool m_filter;
-  
+
 };
 
 } // namespace psana_examples
 
-#endif // PSANA_EXAMPLES_MODULE1_H
+#endif // PSANA_EXAMPLES_DUMPACQIRIS_H

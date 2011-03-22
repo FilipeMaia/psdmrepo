@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2011-03-21 Andy Salnikov
+- removed Module1 module
+- added DumpAcqiris and DumpBld examples
+
 Tag: V00-00-02
 2011-01-26 Andy Salnikov
 - fixed event() arguments
