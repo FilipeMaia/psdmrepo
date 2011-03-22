@@ -56,7 +56,8 @@ import matplotlib.pyplot as plt
 
 def cart2polar(x, y) :
     r = np.sqrt(x*x + y*y)
-    theta = np.rad2deg(np.arctan2(y, x))
+    theta  = np.rad2deg(np.arctan2(y, x)) #[-180,180]
+    #theta0 = np.select([theta<0, theta>=0],[theta+360,theta]) #[0,360]
     return r, theta
 
 def polar2cart(r, theta) :
@@ -70,8 +71,8 @@ def coordinateToIndexOpenEnd(V,VRange) :
     Vmin = VRange[0]
     Vmax = VRange[1]
     Nbins= VRange[2]
-    factor = float(Nbins) / float(Vmax-Vmin) * (1-1e-9) # In order to get open endpoint [Vmin,Vmax)
-    return np.uint32( factor * (V-Vmin) )
+    factor = float(Nbins-1) / float(Vmax-Vmin) #* (1-1e-9) # In order to get open endpoint [Vmin,Vmax)
+    return np.int32( factor * (V-Vmin) )
 
 #----------------------------------    
 
@@ -80,8 +81,18 @@ def coordinateToIndex(V,VRange) :
     Vmax = VRange[1]
     Nbins= VRange[2]
     factor = float(Nbins) / float(Vmax-Vmin)
-    return np.uint32( factor * (V-Vmin) )
+    return np.int32( factor * (V-Vmin) )
 
+#----------------------------------    
+
+def coordinateToIndexProtected(V,VRange) :
+    Vmin = VRange[0]
+    Vmax = VRange[1]
+    Nbins= VRange[2]
+    factor = float(Nbins) / float(Vmax-Vmin)
+    indarr = np.int32( factor * (V-Vmin) )
+    return np.select([V<Vmin], [-1000], default=indarr)
+ 
 #----------------------------------    
 
 def transformCartToPolarArray(arr, RRange, ThetaRange, origin) :
@@ -90,16 +101,49 @@ def transformCartToPolarArray(arr, RRange, ThetaRange, origin) :
     dimY,dimX = arr.shape 
     x = np.arange(dimX) - origin[0]
     y = np.arange(dimY) - origin[1]
-    X, Y     = np.meshgrid(x, y)
-    R, Theta = cart2polar (X, Y)    
-    iR     = coordinateToIndexOpenEnd(R,RRange)        
-    iTheta = coordinateToIndexOpenEnd(Theta,ThetaRange)
-    i1D = iR + iTheta * RRange[2]
+
+    X, Y       = np.meshgrid(x, y)
+    R, Theta   = cart2polar (X, Y)
+
+    iR         = coordinateToIndexProtected(R,RRange)        
+    iTheta     = coordinateToIndexProtected(Theta,ThetaRange)
+
+    arrMaskedT = np.select([iTheta<0], [0], default=arr)
+    arrMasked  = np.select([iR<0],     [0], default=arrMaskedT)
+    #arrMasked  = arr * maskT * maskR
+
+    #i1D        = iR + iTheta * RRange[2] #THIS IS WRONG
+    i1D        = iTheta + iR * ThetaRange[2]
     i1DInPolar = np.arange(ThetaRange[2] * RRange[2], dtype=np.int32)
-    
-    arrPolar = np.array( sp.ndimage.sum(arr, i1D, index=i1DInPolar) )
-    arrPolar.shape = (ThetaRange[2], RRange[2]) 
+
+    arrPolar = np.array( sp.ndimage.sum(arrMasked, i1D, index=i1DInPolar) )
+    #arrPolar.shape = (ThetaRange[2], RRange[2]) 
+    arrPolar.shape = (RRange[2], ThetaRange[2])
     return arrPolar
+
+#----------------------------------    
+
+def applyRadialNormalizationToPolarArray(arrPolar, RRange) :
+    """ Apply radial normalization (per bin) to polar array"""
+
+    #print 'arrPolar.shape=', arrPolar.shape
+    #print 'RRange=', RRange[0],RRange[1],RRange[2]
+
+    r = np.linspace(RRange[0],RRange[1],RRange[2],endpoint=False)
+    #print 'r=\n', r
+
+    twopi = 2 * 3.14159265359
+    f =  np.select([r<1],[1], default=1/(twopi * r))
+    #print 'f=\n', f
+
+    farr = np.repeat(f,arrPolar.shape[1])
+    farr.shape = arrPolar.shape
+    #print 'farr.shape=', farr.shape
+    #print 'farr=\n', farr
+
+    return arrPolar * farr
+
+
     
 #----------------------------------    
 
@@ -133,8 +177,8 @@ def ringIntensity(r,r0,sigma) :
 
 def getCartesianArray3Rings() :
     """Generates the cortesian 2D array with ring-distributed intensity"""
-    npx = 201
-    npy = 101
+    npx = 200
+    npy = 100
 
     a1  = 50
     r1  = 80
@@ -162,18 +206,20 @@ def getCartesianArray3Rings() :
 
     return A
 
+#----------------------------------
+
 
 def getCartesianArray1Ring() :
     """Generates the cortesian 2D array with ring-distributed intensity"""
-    npx = 601
-    npy = 501
+    npx = 100
+    npy = 80
 
-    xc  = 300
-    yc  = 250
+    xc  = 50
+    yc  = 40
     
     a1  = 100
-    r1  = 150
-    s1  = 10
+    r1  = 30
+    s1  = 5
 
     x = np.arange(0,npx,1,dtype = np.float32) # np.linspace(0,200,201)
     y = np.arange(0,npy,1,dtype = np.float32) # np.linspace(0,100,101)
@@ -245,7 +291,7 @@ def drawOrShow(showTimeSec=None) :
 def drawImage(arr2d, title, Range=None) :
     """Draws the image and color bar for a single 2D array."""
     axes = plt.imshow(arr2d, origin='lower', interpolation='nearest',extent=Range) # origin='lower', origin='upper'
-    colb = plt.colorbar(axes, pad=0.05, fraction=0.10, shrink = 1, aspect = 20, orientation=1) #, ticks=coltickslocs
+    colb = plt.colorbar(axes, pad=0.06, fraction=0.10, shrink = 0.7, aspect = 20, orientation=1) #, ticks=coltickslocs
     plt.title(title, color='r', fontsize=20)
     #plt.clim(imageAmin,imageAmax)
     
@@ -291,9 +337,10 @@ def mainTest1Ring() :
     plt.get_current_fig_manager().window.move(10,10)
     plt.title('Original 2D array', color='r', fontsize=20)
     
-    origin = (300,250)
-    RRange = (0,300,100)
-    PRange = (-180,180,4)
+    origin = (50,40)
+    RRange = (0,50,10)
+    PRange = (-90,90,90)
+    #PRange = (-180,180,18)
     RPRange= (RRange[0], RRange[1], PRange[0], PRange[1])
 
     polar_arr = transformCartToPolarArray(arr, RRange, PRange, origin)
@@ -301,8 +348,8 @@ def mainTest1Ring() :
     plt.get_current_fig_manager().window.move(500,10)
     plt.title('R-Phi transformation', color='r', fontsize=20)
 
-    XRange     = (0,600,100)
-    YRange     = (0,500,100)
+    XRange     = (0,100,50)
+    YRange     = (0,80,40)
     XYRange= (XRange[0], XRange[1], YRange[0], YRange[1])
 
     rebinned_arr = rebinArray(arr, XRange, YRange)
@@ -316,8 +363,8 @@ def mainTest1Ring() :
 
 if __name__ == "__main__" :
 
-    mainTest1Ring()
-    #mainTest3Rings()
+    #mainTest1Ring()
+    mainTest3Rings()
 
 #----------------------------------
 #----------------------------------

@@ -100,10 +100,10 @@ class GUIWhatToDisplayForProjR ( QtGui.QWidget ) :
         self.editProjNBins   .setValidator(QtGui.QIntValidator(1, 1000,self))
         self.editProjBinWidth.setValidator(QtGui.QIntValidator(1, 1000,self))
 
-        self.editProjRmin    .setValidator(QtGui.QIntValidator(    0, 1000,self))
-        self.editProjRmax    .setValidator(QtGui.QIntValidator(    0, 1000,self))
-        self.editProjPhimin  .setValidator(QtGui.QIntValidator(-1000, 1000,self))
-        self.editProjPhimax  .setValidator(QtGui.QIntValidator(-1000, 1000,self))
+        self.editProjRmin    .setValidator(QtGui.QIntValidator(   0, 1000,self))
+        self.editProjRmax    .setValidator(QtGui.QIntValidator(   0, 1000,self))
+        self.editProjPhimin  .setValidator(QtGui.QIntValidator(-180,  180,self))
+        self.editProjPhimax  .setValidator(QtGui.QIntValidator(-180,  180,self))
 
         self.radioBinWidth = QtGui.QRadioButton("Bin width:")
         self.radioNBins    = QtGui.QRadioButton("N bins:")

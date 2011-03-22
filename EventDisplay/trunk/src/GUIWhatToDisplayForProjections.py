@@ -60,6 +60,11 @@ class GUIWhatToDisplayForProjections ( QtGui.QWidget ) :
         self.setWindowTitle('Projections GUI')
         self.palette = QtGui.QPalette()
 
+        self.palette_grey  = QtGui.QPalette()
+        self.palette_white = QtGui.QPalette()
+        self.palette_grey  .setColor(QtGui.QPalette.Base,QtGui.QColor('grey'))
+        self.palette_white .setColor(QtGui.QPalette.Base,QtGui.QColor('white'))
+
         self.frame = QtGui.QFrame(self)
         self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
         self.frame.setLineWidth(0)
@@ -72,8 +77,8 @@ class GUIWhatToDisplayForProjections ( QtGui.QWidget ) :
 
         self.editProjCenterX = QtGui.QLineEdit(str(cp.confpars.projCenterX))
         self.editProjCenterY = QtGui.QLineEdit(str(cp.confpars.projCenterY))
-        self.editProjCenterX.setValidator(QtGui.QIntValidator(0, 2000,self))
-        self.editProjCenterY.setValidator(QtGui.QIntValidator(0, 2000,self))
+        #self.editProjCenterX.setValidator(QtGui.QDoubleValidator(float(0), float(2000),self)) # QIntValidator
+        #self.editProjCenterY.setValidator(QtGui.QDoubleValidator(float(0), float(2000),self))
         self.editProjCenterX.setMaximumWidth(50)
         self.editProjCenterY.setMaximumWidth(50)
 
@@ -138,11 +143,11 @@ class GUIWhatToDisplayForProjections ( QtGui.QWidget ) :
 
 
     def processEditProjCenterX(self):
-        cp.confpars.projCenterX = int(self.editProjCenterX.displayText())        
+        cp.confpars.projCenterX = float(self.editProjCenterX.displayText())        
 
 
     def processEditProjCenterY(self):
-        cp.confpars.projCenterY = int(self.editProjCenterY.displayText())        
+        cp.confpars.projCenterY = float(self.editProjCenterY.displayText())        
 
         
     def mousePressEvent(self, event):
@@ -177,6 +182,19 @@ class GUIWhatToDisplayForProjections ( QtGui.QWidget ) :
         self.connect(self.tabBar, QtCore.SIGNAL('currentChanged(int)'), self.processTabBar)
 
 
+    def setXYCenterReadOnly(self, isReadOnly=False):
+        if isReadOnly == True :
+            self.editProjCenterX.setPalette(self.palette_grey)
+            self.editProjCenterY.setPalette(self.palette_grey)
+        else :
+            self.editProjCenterX.setPalette(self.palette_white)
+            self.editProjCenterY.setPalette(self.palette_white)
+
+        self.editProjCenterX.setReadOnly(isReadOnly)
+        self.editProjCenterY.setReadOnly(isReadOnly)
+
+
+
     def processTabBar(self):
         indTab = self.tabBar.currentIndex()
         #print 'TabBar index=',indTab
@@ -185,15 +203,19 @@ class GUIWhatToDisplayForProjections ( QtGui.QWidget ) :
 
         if indTab == self.indTabX :
             self.guiWin = guiprojx.GUIWhatToDisplayForProjX()
+            self.setXYCenterReadOnly(True)
 
         if indTab == self.indTabY :
             self.guiWin = guiprojy.GUIWhatToDisplayForProjY()
+            self.setXYCenterReadOnly(True)
 
         if indTab == self.indTabR :
             self.guiWin = guiprojr.GUIWhatToDisplayForProjR()
+            self.setXYCenterReadOnly(False)
 
         if indTab == self.indTabPhi :
             self.guiWin = guiprojphi.GUIWhatToDisplayForProjPhi()
+            self.setXYCenterReadOnly(False)
 
         self.guiWin.setMinimumHeight(120)
         self.hboxD.addWidget(self.guiWin)

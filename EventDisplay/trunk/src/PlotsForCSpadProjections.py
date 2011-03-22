@@ -93,11 +93,11 @@ class PlotsForCSpadProjections ( object ) :
         plt.clf()
 
         #plt.subplot(222)
-        #axes = plt.imshow(arrDet[Ymin:Ymax,Xmin:Xmax], origin='upper',interpolation='nearest',extent=self.XYRange)
+        #axes = plt.imshow(arrDet[Ymin:Ymax,Xmin:Xmax], origin='upper',interpolation='nearest',extent=self.XYRange, aspect='auto')
 
         plt.subplot(211)
         arr2d = fat.rebinArray(arrDet, XRange, YRange) 
-        axes = plt.imshow(arr2d, origin='upper',interpolation='nearest',extent=self.XYRange)
+        axes = plt.imshow(arr2d, origin='upper',interpolation='nearest',extent=self.XYRange, aspect='auto')
         plt.xlabel('X')
         plt.ylabel('Y')
         plt.title('Event '+str(cp.confpars.eventCurrent),color='r',fontsize=20) 
@@ -146,14 +146,14 @@ class PlotsForCSpadProjections ( object ) :
         plt.clf()
 
         #plt.subplot(222)
-        #axes = plt.imshow(arrDet[Ymin:Ymax,Xmin:Xmax], origin='upper',interpolation='nearest',extent=self.XYRange)
+        #axes = plt.imshow(arrDet[Ymin:Ymax,Xmin:Xmax], origin='upper',interpolation='nearest',extent=self.XYRange, aspect='auto')
 
         plt.subplot(211)
         #axes = plt.imshow(arr2d, origin='upper',interpolation='nearest',extent=self.XYRange)
         #plt.xlabel('X')
         #plt.ylabel('Y')
 
-        axes = plt.imshow(np.rot90(arr2d), origin='upper',interpolation='nearest',extent=self.XYRangeR90)
+        axes = plt.imshow(np.rot90(arr2d), origin='upper',interpolation='nearest',extent=self.XYRangeR90, aspect='auto')
         plt.xlabel('Y')
         plt.ylabel('X')
 
@@ -189,6 +189,7 @@ class PlotsForCSpadProjections ( object ) :
         RRange   = (Rmin,Rmax,NBins)
         PRange   = (Pmin,Pmax,NSlices)
         RPRange  = (Rmin,Rmax,Pmax,Pmin)
+        PRRange  = (Pmin,Pmax,Rmax,Rmin)
         HRange   = (Rmin,Rmax)
         Origin   = (cp.confpars.projCenterX, cp.confpars.projCenterY)
 
@@ -202,10 +203,12 @@ class PlotsForCSpadProjections ( object ) :
 
         plt.subplot(211)
 
-        arrRPhi = fat.transformCartToPolarArray(arrDet, RRange, PRange, Origin)
-        print 'arrRPhi.shape=', arrRPhi.shape
+        arrRPhi0 = fat.transformCartToPolarArray(arrDet, RRange, PRange, Origin)
+        arrRPhi  = fat.applyRadialNormalizationToPolarArray(arrRPhi0, RRange)
+        #print 'arrRPhi.shape=', arrRPhi.shape
         
-        axes = plt.imshow(arrRPhi, origin='upper', interpolation='nearest', extent=RPRange)
+        #axes = plt.imshow(arrRPhi, origin='upper', interpolation='nearest', extent=RPRange)
+        axes = plt.imshow(np.rot90(arrRPhi), origin='upper', interpolation='nearest', extent=RPRange, aspect='auto')
         plt.xlabel('R')
         plt.ylabel('Phi')
         plt.title('Event '+str(cp.confpars.eventCurrent),color='r',fontsize=20) 
@@ -215,7 +218,7 @@ class PlotsForCSpadProjections ( object ) :
         plt.subplot(212)
         for slice in range(NSlices):
 
-            arr1slice = arrRPhi[slice,...]
+            arr1slice = arrRPhi[...,slice]
             xarr = linspace(Rmin, Rmax, num=NBins, endpoint=True)
             #print 'xarr.shape=',xarr.shape
             #print 'arr1slice.shape=',arr1slice.shape
@@ -243,7 +246,7 @@ class PlotsForCSpadProjections ( object ) :
         RRange   = (Rmin,Rmax,NSlices)
         PRange   = (Pmin,Pmax,NBins)
         RPRange  = (Rmin,Rmax,Pmax,Pmin)
-        PRRange  = (Pmin,Pmax,Rmin,Rmax)
+        PRRange  = (Pmin,Pmax,Rmax,Rmin)
         HRange   = (Pmin,Pmax)
         Origin   = (cp.confpars.projCenterX, cp.confpars.projCenterY)
 
@@ -257,22 +260,19 @@ class PlotsForCSpadProjections ( object ) :
 
         plt.subplot(211)
 
-        arrRPhi = fat.transformCartToPolarArray(arrDet, RRange, PRange, Origin)
-        print 'arrRPhi.shape=', arrRPhi.shape
+        arrRPhi0 = fat.transformCartToPolarArray(arrDet, RRange, PRange, Origin)
+        arrRPhi  = fat.applyRadialNormalizationToPolarArray(arrRPhi0, RRange)
+        #print 'arrRPhi.shape=', arrRPhi.shape
 
-        #axes = plt.imshow(np.rot90(arrRPhi), origin='upper',interpolation='nearest',extent=PRRange)
-        #plt.xlabel('Phi')
-        #plt.ylabel('R')
-
-        axes = plt.imshow(arrRPhi, origin='upper', interpolation='nearest', extent=RPRange)
-        plt.xlabel('R')
-        plt.ylabel('Phi') #u'\u03C6'
+        axes = plt.imshow(arrRPhi, origin='upper', interpolation='nearest', extent=PRRange, aspect='auto')
+        plt.xlabel('Phi')
+        plt.ylabel('R') #u'\u03C6'
         plt.title('Event '+str(cp.confpars.eventCurrent),color='r',fontsize=20) 
-
+  
         plt.subplot(212)
         for slice in range(NSlices):
 
-            arr1slice = arrRPhi[...,slice]
+            arr1slice = arrRPhi[slice,...]
             xarr = linspace(Pmin, Pmax, num=NBins, endpoint=True)
             #print 'xarr.shape=',xarr.shape
             #print 'arr1slice.shape=',arr1slice.shape

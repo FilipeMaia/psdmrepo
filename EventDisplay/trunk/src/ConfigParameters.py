@@ -525,8 +525,8 @@ class ConfigParameters ( object ) :
                 elif key == 'CORR_YPARINDEX'           : self.correlationWindowParameters[win][9] = self.getValIntOrNone(val) 
                 elif key == 'CORR_XPARINDEX'           : self.correlationWindowParameters[win][10]= self.getValIntOrNone(val) 
 
-                elif key == 'PROJ_CENTER_X'            : self.projCenterX           = int(val)
-                elif key == 'PROJ_CENTER_Y'            : self.projCenterY           = int(val)
+                elif key == 'PROJ_CENTER_X'            : self.projCenterX           = float(val)
+                elif key == 'PROJ_CENTER_Y'            : self.projCenterY           = float(val)
                                                                                    
                 elif key == 'PROJ_R_BIN_WIDTH_IS_ON'   : self.projR_BinWidthIsOn    = dicBool[val.lower()]
                 elif key == 'PROJ_R_SLI_WIDTH_IS_ON'   : self.projR_SliWidthIsOn    = dicBool[val.lower()]
