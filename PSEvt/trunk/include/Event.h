@@ -58,6 +58,21 @@ namespace PSEvt {
 class Event {
 public:
 
+  // Special class used for type-less return from get()
+  struct GetResultProxy {
+    
+    template<typename T>
+    operator boost::shared_ptr<T>() {
+      boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), m_source, m_key);
+      return boost::static_pointer_cast<T>(vptr);
+    }
+    
+    boost::shared_ptr<ProxyDictI> m_dict;
+    Pds::Src m_source;
+    std::string m_key;
+  };
+  
+  
   /**
    *  @brief Standard constructor takes proxy dictionary object
    *  
@@ -130,11 +145,10 @@ public:
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return Shared pointer which can be zero if object not found.
    */
-  template<typename T>
-  boost::shared_ptr<T> get(const std::string& key=std::string()) 
+  GetResultProxy get(const std::string& key=std::string()) 
   {
-    boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), Pds::Src(), key);
-    return boost::static_pointer_cast<T>(vptr);
+    GetResultProxy pxy = {m_dict, Pds::Src(), key};
+    return pxy;
   }
   
   /**
@@ -144,11 +158,10 @@ public:
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return Shared pointer which can be zero if object not found.
    */
-  template<typename T>
-  boost::shared_ptr<T> get(const Pds::Src& source, const std::string& key=std::string()) 
+  GetResultProxy get(const Pds::Src& source, const std::string& key=std::string()) 
   {
-    boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), source, key);
-    return boost::static_pointer_cast<T>(vptr);
+    GetResultProxy pxy = {m_dict, source, key};
+    return pxy;
   }
   
   /**
