@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2011-03-23 Andy Salnikov
+- modified examples to work with Source class instead of Pds::Src
+
 Tag: V00-00-03
 2011-03-21 Andy Salnikov
 - removed Module1 module

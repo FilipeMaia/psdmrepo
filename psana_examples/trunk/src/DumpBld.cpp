@@ -52,6 +52,9 @@ namespace psana_examples {
 DumpBld::DumpBld (const std::string& name)
   : Module(name)
 {
+  m_ebeamSrc = configStr("eBeamSource", "BldInfo(EBeam)");
+  m_cavSrc = configStr("phaseCavSource", "BldInfo(PhaseCavity)");
+  m_feeSrc = configStr("feeSource", "BldInfo(FEEGasDetEnergy)");
 }
 
 //--------------
@@ -66,9 +69,7 @@ DumpBld::~DumpBld ()
 void 
 DumpBld::event(Event& evt, Env& env)
 {
-  Pds::BldInfo address1(0, Pds::BldInfo::EBeam);
-
-  shared_ptr<Psana::Bld::BldDataEBeam> ebeam = evt.get(address1);
+  shared_ptr<Psana::Bld::BldDataEBeam> ebeam = evt.get(m_ebeamSrc);
   if (not ebeam.get()) {
     MsgLog(logger, info, name() << ": Bld::BldDataEBeam not found");    
   } else {
@@ -76,9 +77,7 @@ DumpBld::event(Event& evt, Env& env)
          << " ebeamL3Energy=" << ebeam->ebeamL3Energy());
   }
 
-  Pds::BldInfo address2(0, Pds::BldInfo::PhaseCavity);
-
-  shared_ptr<Psana::Bld::BldDataPhaseCavity> cav = evt.get(address2);
+  shared_ptr<Psana::Bld::BldDataPhaseCavity> cav = evt.get(m_cavSrc);
   if (not cav.get()) {
     MsgLog(logger, info, name() << ": Bld::BldDataPhaseCavity not found");    
   } else {
@@ -89,9 +88,7 @@ DumpBld::event(Event& evt, Env& env)
          );
   }
   
-  Pds::BldInfo address3(0, Pds::BldInfo::FEEGasDetEnergy);
-
-  shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy> fee = evt.get(address3);
+  shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy> fee = evt.get(m_feeSrc);
   if (not fee.get()) {
     MsgLog(logger, info, name() << ": Bld::BldDataFEEGasDetEnergy not found");    
   } else {

@@ -39,8 +39,6 @@ namespace psana_examples {
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
- *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
@@ -66,8 +64,7 @@ protected:
 private:
 
   // Data members, this is for example purposes only
-  unsigned m_maxEvents;
-  bool m_filter;
+  Source m_acqSrc;
 
 };
 

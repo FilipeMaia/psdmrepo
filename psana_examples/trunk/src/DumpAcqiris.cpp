@@ -51,12 +51,9 @@ namespace psana_examples {
 //----------------
 DumpAcqiris::DumpAcqiris (const std::string& name)
   : Module(name)
-  , m_maxEvents()
-  , m_filter()
 {
   // get the values from configuration or use defaults
-  m_maxEvents = config("events", 32U);
-  m_filter = config("filter", false);
+  m_acqSrc = configStr("acqSource", "DetInfo(AmoGD)");
 }
 
 //--------------
@@ -72,10 +69,7 @@ DumpAcqiris::beginCalibCycle(Env& env)
 {
   MsgLog(logger, info, name() << ": in beginCalibCycle()");
 
-  // Get Psana::Acqiris::ConfigV1 data
-  Pds::DetInfo address(0, Pds::DetInfo::AmoGasdet, 0, Pds::DetInfo::Acqiris, 0);
-
-  shared_ptr<Psana::Acqiris::ConfigV1> acqConfig = env.configStore().get(address);
+  shared_ptr<Psana::Acqiris::ConfigV1> acqConfig = env.configStore().get(m_acqSrc);
   if (not acqConfig.get()) {
     MsgLog(logger, info, name() << ": Acqiris::ConfigV1 not found");    
   } else {
@@ -99,9 +93,8 @@ DumpAcqiris::beginCalibCycle(Env& env)
 void 
 DumpAcqiris::event(Event& evt, Env& env)
 {
-  Pds::DetInfo address(0, Pds::DetInfo::AmoGasdet, 0, Pds::DetInfo::Acqiris, 0);
-  
-  shared_ptr<Psana::Acqiris::DataDescV1> acqData = evt.get(address);
+
+  shared_ptr<Psana::Acqiris::DataDescV1> acqData = evt.get(m_acqSrc);
   if (not acqData.get()) {
     MsgLog(logger, info, name() << ": Acqiris::DataDescV1 not found");    
   } else {

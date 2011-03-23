@@ -62,6 +62,10 @@ public:
 protected:
 
 private:
+  
+  Source m_ebeamSrc;
+  Source m_cavSrc;
+  Source m_feeSrc;
 
 };
 
