@@ -28,6 +28,7 @@
 #include "PSEvt/ProxyDictI.h"
 #include "PSEvt/DataProxy.h"
 #include "PSEvt/EventKey.h"
+#include "PSEvt/Source.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -68,7 +69,7 @@ public:
     }
     
     boost::shared_ptr<PSEvt::ProxyDictI> m_dict;
-    Pds::Src m_source;
+    PSEvt::Source m_source;
   };
 
   // Default constructor
@@ -104,6 +105,18 @@ public:
    *  @return Shared pointer which can be zero if object not found.
    */
   GetResultProxy get(const Pds::Src& source) 
+  {
+    GetResultProxy pxy = { m_dict, PSEvt::Source(source) };
+    return pxy;
+  }
+
+  /**
+   *  @brief Get an object from store.
+   *  
+   *  @param[in] source Source detector address.
+   *  @return Shared pointer which can be zero if object not found.
+   */
+  GetResultProxy get(const PSEvt::Source& source) 
   {
     GetResultProxy pxy = { m_dict, source };
     return pxy;
