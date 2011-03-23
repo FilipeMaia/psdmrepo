@@ -15,6 +15,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "PSEvt/Source.h"
+#include "PSEvt/Exceptions.h"
 
 using namespace PSEvt;
 using namespace Pds;
@@ -411,6 +412,28 @@ BOOST_AUTO_TEST_CASE( test_str_valid )
   BOOST_CHECK_NO_THROW(Source("ProcInfo(0.0.0.0)"));
   BOOST_CHECK_NO_THROW(Source("ProcInfo(1.1.1.1)"));
   BOOST_CHECK_NO_THROW(Source("ProcInfo(255.255.255.255)"));
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_str_invalid )
+{
+  BOOST_CHECK_THROW(Source("G"), ExceptionSourceFormat);
+  BOOST_CHECK_THROW(Source("!"), ExceptionSourceFormat);
+  BOOST_CHECK_THROW(Source("Info()"), ExceptionSourceFormat);
+  
+  BOOST_CHECK_THROW(Source("DetInfo(Unknown)"), ExceptionSourceFormat);
+  BOOST_CHECK_THROW(Source("DetInfo(:Unknown)"), ExceptionSourceFormat);
+  BOOST_CHECK_THROW(Source("DetInfo(.Unknown)"), ExceptionSourceFormat);
+
+  BOOST_CHECK_THROW(Source("BldInfo(Unknown)"), ExceptionSourceFormat);
+  BOOST_CHECK_THROW(Source("BldInfo(.EBeam)"), ExceptionSourceFormat);
+
+  BOOST_CHECK_THROW(Source("ProcInfo(1)"), ExceptionSourceFormat);
+  BOOST_CHECK_THROW(Source("ProcInfo(1.1.1)"), ExceptionSourceFormat);
+  BOOST_CHECK_THROW(Source("ProcInfo(1.1.1.1.1)"), ExceptionSourceFormat);
+  BOOST_CHECK_THROW(Source("ProcInfo(1024.1.1.1)"), ExceptionSourceFormat);
+  BOOST_CHECK_THROW(Source("ProcInfo(psimport.slac.stanford.edu)"), ExceptionSourceFormat);
 }
 
 // ==============================================================

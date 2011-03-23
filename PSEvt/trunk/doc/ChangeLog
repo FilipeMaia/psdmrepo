@@ -11,9 +11,16 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2011-03-23 Andy Salnikov
+- extended psevt-source-unit-test.cpp slightly
+- add Event::get method which takes Source in addition to Pds::Src 
+- modified ProxyDict to work with Source instead of Pds::Src and 
+  do matching if source is not exact
+
 Tag: V00-00-05
 2011-03-23 Andy Salnikov
-- added  Source class and unit test for it
+- added Source class and unit test for it
 
 Tag: V00-00-04
 2011-03-21 Andy Salnikov

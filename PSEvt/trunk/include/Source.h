@@ -68,6 +68,13 @@ public:
   Source ();
 
   /**
+   *  @brief Exact match for source.
+   *  
+   *  This object will match fully-specified source.
+   */
+  explicit Source (const Pds::Src& src);
+  
+  /**
    *  @brief Exact match for DetInfo source.
    *  
    *  This object will match fully-specified DetInfo source.
@@ -75,25 +82,11 @@ public:
   Source (Pds::DetInfo::Detector det, uint32_t detId, Pds::DetInfo::Device dev, uint32_t devId);
   
   /**
-   *  @brief Exact match for DetInfo.
-   *  
-   *  This object will match fully-specified DetInfo source.
-   */
-  explicit Source (const Pds::DetInfo& info);
-  
-  /**
    *  @brief Exact match for BldInfo.
    *  
    *  This object will match fully-specified BldInfo source.
    */
   explicit Source (Pds::BldInfo::Type type);
-
-  /**
-   *  @brief Exact match for BldInfo.
-   *  
-   *  This object will match fully-specified BldInfo source.
-   */
-  explicit Source (const Pds::BldInfo& info);
 
   /**
    *  @brief Approximate matching specified via string.
@@ -134,6 +127,9 @@ public:
   
   /// Returns true if it is exact match
   bool isExact() const;
+  
+  /// Returns the source
+  const Pds::Src& src() const { return m_src; }
   
 protected:
 

@@ -30,6 +30,7 @@
 #include "PSEvt/Proxy.h"
 #include "PSEvt/DataProxy.h"
 #include "PSEvt/ProxyDictI.h"
+#include "PSEvt/Source.h"
 #include "pdsdata/xtc/Src.hh"
 
 //------------------------------------
@@ -68,7 +69,7 @@ public:
     }
     
     boost::shared_ptr<ProxyDictI> m_dict;
-    Pds::Src m_source;
+    Source m_source;
     std::string m_key;
   };
   
@@ -147,7 +148,7 @@ public:
    */
   GetResultProxy get(const std::string& key=std::string()) 
   {
-    GetResultProxy pxy = {m_dict, Pds::Src(), key};
+    GetResultProxy pxy = {m_dict, Source(Source::null), key};
     return pxy;
   }
   
@@ -159,6 +160,19 @@ public:
    *  @return Shared pointer which can be zero if object not found.
    */
   GetResultProxy get(const Pds::Src& source, const std::string& key=std::string()) 
+  {
+    GetResultProxy pxy = {m_dict, Source(source), key};
+    return pxy;
+  }
+  
+  /**
+   *  @brief Get an object from event
+   *  
+   *  @param[in] source Source detector address.
+   *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *  @return Shared pointer which can be zero if object not found.
+   */
+  GetResultProxy get(const Source& source, const std::string& key=std::string()) 
   {
     GetResultProxy pxy = {m_dict, source, key};
     return pxy;

@@ -69,17 +69,44 @@ ProxyDict::putImpl( const boost::shared_ptr<ProxyI>& proxy,
 
 boost::shared_ptr<void> 
 ProxyDict::getImpl( const std::type_info* typeinfo, 
-                    const Pds::Src& source, 
+                    const Source& source, 
                     const std::string& key )
 {
-  EventKey proxyKey(typeinfo, source, key);
+  if (source.isExact()) {
+    
+    EventKey proxyKey(typeinfo, source.src(), key);
+    Dict::const_iterator it = m_dict.find(proxyKey);
+    if ( it != m_dict.end() ) {
+      // call proxy to get the value
+      return it->second->get(this, it->first.src(), key);
+    }
+    return proxy_ptr();
+    
+  } else {
 
-  Dict::const_iterator it = m_dict.find(proxyKey);
-  if ( it != m_dict.end() ) {
-    // call proxy to get the value
-    return it->second->get(this, source, key);
+    // When source is a match then no-source objects have priority. Try to
+    // find no-source object first and see if it matches
+    if (source.match(Pds::Src())) {
+      EventKey proxyKey(typeinfo, Pds::Src(), key);
+      Dict::const_iterator it = m_dict.find(proxyKey);
+      if ( it != m_dict.end() ) {
+        // call proxy to get the value
+        return it->second->get(this, it->first.src(), key);
+      }
+    }
+
+    // Do linear search, find first match
+    for (Dict::const_iterator it = m_dict.begin(); it != m_dict.end(); ++ it) {
+      if (*typeinfo == *it->first.typeinfo() and
+          key == it->first.key() and 
+          source.match(it->first.src()) ) {
+        // call proxy to get the value
+        return it->second->get(this, it->first.src(), key);
+      }
+    }
+    
+    
   }
-  return proxy_ptr();
 }
 
 bool 

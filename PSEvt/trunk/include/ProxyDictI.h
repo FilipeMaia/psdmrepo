@@ -29,6 +29,7 @@
 #include "pdsdata/xtc/Src.hh"
 #include "PSEvt/EventKey.h"
 #include "PSEvt/ProxyI.h"
+#include "PSEvt/Source.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -85,7 +86,7 @@ public:
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    */
   boost::shared_ptr<void> get( const std::type_info* typeinfo, 
-                               const Pds::Src& source, 
+                               const Source& source, 
                                const std::string& key )
   {
     return this->getImpl(typeinfo, source, key);
@@ -158,7 +159,7 @@ protected:
    *  @return Shared pointer of void type.
    */
   virtual boost::shared_ptr<void> getImpl( const std::type_info* typeinfo, 
-                                           const Pds::Src& source, 
+                                           const Source& source, 
                                            const std::string& key ) = 0;
 
   /**

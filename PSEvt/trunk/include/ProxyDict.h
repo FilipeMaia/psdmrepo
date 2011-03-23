@@ -83,7 +83,7 @@ protected:
    *  @return Shared pointer of void type.
    */
   virtual boost::shared_ptr<void> getImpl( const std::type_info* typeinfo, 
-                                           const Pds::Src& source, 
+                                           const Source& source, 
                                            const std::string& key ) ;
 
   /**

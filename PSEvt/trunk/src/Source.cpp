@@ -60,6 +60,11 @@ Source::Source ()
 {
 }
 
+Source::Source (const Pds::Src& src) 
+  : m_src(src) 
+{
+} 
+
 /**
  *  @brief Exact match for DetInfo source.
  *  
@@ -71,32 +76,12 @@ Source::Source(Pds::DetInfo::Detector det, uint32_t detId, Pds::DetInfo::Device 
 }
 
 /**
- *  @brief Exact match for DetInfo.
- *  
- *  This object will match fully-specified DetInfo source.
- */
-Source::Source (const Pds::DetInfo& info) 
-  : m_src(info) 
-{
-} 
-
-/**
  *  @brief Exact match for BldInfo.
  *  
  *  This object will match fully-specified BldInfo source.
  */
 Source::Source(Pds::BldInfo::Type type)
   : m_src(Pds::BldInfo(0, type))
-{
-}
-
-/**
- *  @brief Exact match for BldInfo.
- *  
- *  This object will match fully-specified BldInfo source.
- */
-Source::Source(const Pds::BldInfo& info) 
-  : m_src(info) 
 {
 }
 
