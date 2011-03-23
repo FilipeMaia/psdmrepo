@@ -107,9 +107,7 @@ def transformCartToPolarArray(arr, RRange, ThetaRange, origin) :
 
     iR         = coordinateToIndexProtected(R,RRange)        
     iTheta     = coordinateToIndexProtected(Theta,ThetaRange)
-
-    arrMaskedT = np.select([iTheta<0], [0], default=arr)
-    arrMasked  = np.select([iR<0],     [0], default=arrMaskedT)
+    arrMasked = np.select([iTheta<0,iR<0], [0,0], default=arr)
     #arrMasked  = arr * maskT * maskR
 
     #i1D        = iR + iTheta * RRange[2] #THIS IS WRONG
