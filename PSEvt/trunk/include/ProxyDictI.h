@@ -88,7 +88,7 @@ public:
                                const Pds::Src& source, 
                                const std::string& key )
   {
-   return this->getImpl(typeinfo, source, key);
+    return this->getImpl(typeinfo, source, key);
   }
 
   /**
@@ -105,7 +105,7 @@ public:
                const Pds::Src& source, 
                const std::string& key)
   {
-   return this->existsImpl(typeinfo, source, key);
+    return this->existsImpl(typeinfo, source, key);
   }
 
   /**
@@ -119,7 +119,7 @@ public:
                const Pds::Src& source, 
                const std::string& key )
   {
-   return this->removeImpl(typeinfo, source, key);
+    return this->removeImpl(typeinfo, source, key);
   }
 
   /**

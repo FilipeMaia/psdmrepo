@@ -94,35 +94,35 @@ BOOST_AUTO_TEST_CASE( test )
 
   /// get data back
   
-  p1 = evt.get<int>();
+  p1 = evt.get();
   BOOST_CHECK( p1.get() );
   BOOST_CHECK_EQUAL( *p1, 1 );
   
-  p2 = evt.get<int>("p2");
+  p2 = evt.get("p2");
   BOOST_CHECK( p2.get() );
   BOOST_CHECK_EQUAL( *p2, 2 );
   
-  p3 = evt.get<int>(di1);
+  p3 = evt.get(di1);
   BOOST_CHECK( p3.get() );
   BOOST_CHECK_EQUAL( *p3, 3 );
   
-  p4 = evt.get<int>(di2);
+  p4 = evt.get(di2);
   BOOST_CHECK( p4.get() );
   BOOST_CHECK_EQUAL( *p4, 4 );
   
-  p3 = evt.get<int>(di1, "p3");
+  p3 = evt.get(di1, "p3");
   BOOST_CHECK( p3.get() );
   BOOST_CHECK_EQUAL( *p3, 3 );
   
-  p4 = evt.get<int>(di2, "p4");
+  p4 = evt.get(di2, "p4");
   BOOST_CHECK( p4.get() );
   BOOST_CHECK_EQUAL( *p4, 4 );
   
-  p1 = evt.get<int>("pp1");
+  p1 = evt.get("pp1");
   BOOST_CHECK( p1.get() );
   BOOST_CHECK_EQUAL( *p1, 1 );
   
-  p2 = evt.get<int>("pp2");
+  p2 = evt.get("pp2");
   BOOST_CHECK( p2.get() );
   BOOST_CHECK_EQUAL( *p2, 2 );  
   

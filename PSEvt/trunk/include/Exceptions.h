@@ -55,7 +55,7 @@ public:
 
 };
 
-/// Exception thrown when rtying to store multiple objects with the same key
+/// Exception thrown when trying to store multiple objects with the same key
 class ExceptionDuplicateKey : public Exception {
 public:
 
@@ -65,6 +65,17 @@ public:
                           const std::string& key ) ;
 
 };
+
+/// Exception thrown when Source format string is not recognized
+class ExceptionSourceFormat : public Exception {
+public:
+
+  ExceptionSourceFormat ( const ErrSvc::Context& ctx,
+                          const std::string& format ) ;
+
+};
+
+
 
 } // namespace PSEvt
 

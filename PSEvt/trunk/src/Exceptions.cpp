@@ -48,4 +48,10 @@ ExceptionDuplicateKey::ExceptionDuplicateKey ( const ErrSvc::Context& ctx,
 {  
 }
 
+ExceptionSourceFormat::ExceptionSourceFormat ( const ErrSvc::Context& ctx, 
+                                               const std::string& format ) 
+  : Exception( ctx, "Source string cannot be parsed: '" + format + "'")
+{  
+}
+
 } // namespace PSEvt
