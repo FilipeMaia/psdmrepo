@@ -63,7 +63,7 @@ class  pyana_cspad ( object ) :
 
         @param image_source     string, Address of Detector-Id|Device-ID
         @param plot_every_n     int, Draw plot for every N event? (if None or 0, don't plot till end) 
-        @param plot_number      plotnumber
+        @param fignum           int, Matplotlib figure number
         @param dark_img_file    filename, Dark image file to be loaded, if any
         @param output_file      filename (If collecting: write to this file)
         @param plot_vrange      range=vmin-vmax of values for plotting (pixel intensity)

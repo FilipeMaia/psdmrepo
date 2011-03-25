@@ -60,14 +60,16 @@ class  pyana_image ( object ) :
         All parameters are passed as strings
 
         @param image_addresses   (list) address string of Detector-Id|Device-ID
-        @param plot_every_n     int, Draw plot for every N event? (if None or 0, don't plot till end)
-        @param fignum           int, matplotlib figure number
+        @param plot_every_n     Frequency for plotting. If n=0, no plots till the end
+        @param fignum           Matplotlib figure number
         @param good_range       threshold values selecting images of interest
         @param dark_range       threshold values selecting dark images
         @param image_rotations  (list) rotation, in degrees, to be applied to image(s)
         @param image_shifts     (list) shift, in (npixX,npixY), to be applied to image(s)
         @param image_scales     (list) scale factor to be applied to images
+        @param image_nicknames  (list) nicknames for plot titles
         @param output_file      filename (If collecting: write to this file)
+        @param n_hdf5           if output file is hdf5, combine n events in each output file. 
         """
 
         opt = PyanaOptions() # convert option string to appropriate type
@@ -301,7 +303,9 @@ class  pyana_image ( object ) :
             #    else :
             event_display_images.append( (addr, image) )
             
-
+        if len(event_display_images)==0 :
+            return
+        
         if self.image_manipulations is not None: 
             for i in range ( 0, len(event_display_images) ):
 

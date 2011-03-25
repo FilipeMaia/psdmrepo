@@ -160,7 +160,7 @@ part of it, please give an appropriate acknowledgment.
         self.scan_button.setDisabled(True)
         self.connect(self.scan_button, QtCore.SIGNAL('clicked()'), self.scan_files )
         self.scan_label = QtGui.QLabel(self.scan_button)
-        self.scan_label.setText("(Scan all events. Not recommended!)")
+        self.scan_label.setText("(Scan all events)")
 
         self.scan_enable_button = QtGui.QPushButton("&Enable")
         self.connect(self.scan_enable_button, QtCore.SIGNAL('clicked()'), self.scan_enable )
@@ -169,7 +169,7 @@ part of it, please give an appropriate acknowledgment.
         self.connect(self.qscan_button, QtCore.SIGNAL('clicked()'), self.scan_files_quick )
         self.nev_qscan = 200
         self.qscan_edit = QtGui.QLineEdit(str(self.nev_qscan))
-        self.qscan_edit.setMaximumWidth(100)
+        self.qscan_edit.setMaximumWidth(80)
         self.connect(self.qscan_edit, QtCore.SIGNAL('returnPressed()'), self.change_nev_qscan )
 
         self.qscan_label = QtGui.QLabel(self.qscan_button)
@@ -230,13 +230,13 @@ part of it, please give an appropriate acknowledgment.
         # Scan
         hs0 = QtGui.QHBoxLayout()
         hs0.addWidget( self.qscan_button )
-        hs0.addWidget( self.qscan_label )
         hs0.addWidget( self.qscan_edit )
+        hs0.addWidget( self.qscan_label )
         hs0.setAlignment( self.qscan_edit, QtCore.Qt.AlignLeft )
         hs1 = QtGui.QHBoxLayout()
         hs1.addWidget( self.scan_button )
-        hs1.addWidget( self.scan_label )
         hs1.addWidget( self.scan_enable_button )
+        hs1.addWidget( self.scan_label )
 
         v3 = QtGui.QVBoxLayout()
         v3.addLayout( hs0 )

@@ -344,9 +344,13 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.checkboxes = []
         self.checklabels = []
         for ctrl in self.controls:
-            self.ctrl_label = QtGui.QLabel(self);
-            self.ctrl_label.setText("pvControls = %s"%ctrl)
+            #self.ctrl_label = QtGui.QLabel(self);
+            #self.ctrl_label.setText("pvControls = %s"%ctrl)
+            self.ctrl_label = QtGui.QCheckBox("ControlPV: %s"%ctrl, self)
+            self.connect(self.ctrl_label, QtCore.SIGNAL('stateChanged(int)'), self.write_configuration )
             self.lgroup.addWidget(self.ctrl_label)
+            self.checkboxes.append(self.ctrl_label)
+            self.checklabels.append(self.ctrl_label.text())
         
         for label in sorted(self.devices):
             if label.find("ProcInfo") >= 0 : continue  # ignore
@@ -481,6 +485,24 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             return
 
         # --- --- --- Epics --- --- ---
+        if str(box.text()).find("ControlPV:")>=0 :
+
+            try :
+                index = modules_to_run.index("XtcEventBrowser.pyana_scan")
+            except ValueError :
+                index = len(modules_to_run)
+                modules_to_run.append("XtcEventBrowser.pyana_scan")
+                options_for_mod.append([])
+
+            #print "XtcEventBrowser.pyana_scan at ", index
+            pvname = str(box.text()).split("PV: ")[1]
+            options_for_mod[index].append("\ninput_epics = ")
+            options_for_mod[index].append("\ninput_scalars = ")
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n )
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            return
+        
+        # --- --- --- Epics --- --- ---
         if str(box.text()).find("EpicsArch")>=0 :
             return
 
@@ -518,7 +540,9 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         modules_to_run = []
         options_for_mod = []
         self.configuration= ""
+        print "Boxes: "
         for box in sorted(self.checkboxes):
+            print box.text()
             if box.isChecked() :
                 self.add_module(box, modules_to_run, options_for_mod)
 

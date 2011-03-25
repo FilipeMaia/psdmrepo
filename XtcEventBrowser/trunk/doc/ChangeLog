@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Mar-25 ofte               rev 1682
+	- added waveform data support
+	- added scan processing
+	
 2011-Mar-18 ofte V00-00-17     rev 1611
         - Some tweaking. And a tag
 

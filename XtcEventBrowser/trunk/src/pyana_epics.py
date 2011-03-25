@@ -65,7 +65,9 @@ class pyana_epics (object) :
         values  here then the must be defined in pyana.cfg. All parameters 
         are passed as strings, convert to correct type before use.
 
-        @param pv   Name(s) of the EPICS PV(s) to dump
+        @param pv             Name(s) of the EPICS PV(s) to dump
+        @param plot_every_n   Frequency for plotting. If n=0, no plots till the end
+        @param fignum         Matplotlib figure number
         """
 
         opt = PyanaOptions()

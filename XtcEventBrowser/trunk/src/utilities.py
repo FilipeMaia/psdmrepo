@@ -2,10 +2,30 @@ class PyanaOptions( object ):
     def __init__( self ):
         pass
 
+    def getOptString(self, options_string) :
+        """
+        parse the option string,
+        return the string, strip of any whitespaces
+        """
+        if options_string is None:
+            return None
+
+        # make sure there are no newline characters here
+        options_string = options_string.strip()
+
+        if ( options_string == "" or
+             options_string == "None" or
+             options_string == "No" ) :
+            return None
+
+        # all other cases:
+        return options_string
+
+
     def getOptStrings(self, options_string) :
         """
         parse the option string,
-        return a tuple of N, item(s), i.e. item or list of items
+        return a list of strings
         """
         if options_string is None:
             return None

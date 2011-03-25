@@ -87,12 +87,16 @@ class  pyana_ipimb ( object ) :
         self.make_plots(fignum, suptitle="Average of all events")
 
     def make_plots(self, fignum = 1, suptitle = ""):
+
         ncols = 3
         nrows = len(self.ipimb_addresses)
-
-        fig = plt.figure(num=fignum, figsize=(10*ncols/2,10*nrows/2) )
+        height=3.5
+        if nrows * 3.5 > 14 : height = 14/nrows
+        width=height*1.3
+        
+        fig = plt.figure(num=fignum, figsize=(width*ncols,height*nrows) )
         fig.clf()
-        fig.subplots_adjust(wspace=0.35, hspace=0.35)
+        #fig.subplots_adjust(wspace=0.35, hspace=0.35)
         fig.suptitle(suptitle)
         
         i = 0
@@ -112,7 +116,7 @@ class  pyana_ipimb ( object ) :
             plt.plot(xaxis, array[:,0],xaxis, array[:,1],xaxis, array[:,2],xaxis, array[:,3])
             plt.title(addr)
             plt.xlabel('Channels',horizontalalignment='left') # the other right
-            leg = ax2.legend(('ch0','ch1','ch2','ch3'),'upper center')
+            #leg = ax2.legend(('ch0','ch1','ch2','ch3'),'upper center')
             
             i+=1
             ax3 = fig.add_subplot(nrows, ncols, i)
