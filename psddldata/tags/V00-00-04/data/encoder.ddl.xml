@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+	<package name="Encoder">
+
+
+		<!-- ========================================================================= -->
+		
+		<pstype name="ConfigV1" version="1" type_id="Id_EncoderConfig">
+		
+		    <enum name="count_mode_type">
+                <enum-const name="WRAP_FULL"/>
+                <enum-const name="LIMIT"/>
+                <enum-const name="HALT"/>
+                <enum-const name="WRAP_PRESET"/>
+                <enum-const name="COUNT_END"/>
+            </enum>
+		
+		    <enum name="quad_mode">
+                <enum-const name="CLOCK_DIR"/>
+                <enum-const name="X1"/>
+                <enum-const name="X2"/>
+                <enum-const name="X4"/>
+                <enum-const name="QUAD_END"/>
+            </enum>
+		
+            <attribute name="_chan_num" type="uint32_t" accessor="chan_num">
+            </attribute>
+
+            <attribute name="_count_mode" type="uint32_t" accessor="count_mode">
+            </attribute>
+
+            <attribute name="_quadrature_mode" type="uint32_t" accessor="quadrature_mode">
+            </attribute>
+
+            <attribute name="_input_num" type="uint32_t" accessor="input_num">
+            </attribute>
+
+            <attribute name="_input_rising" type="uint32_t" accessor="input_rising">
+            </attribute>
+
+            <attribute name="_ticks_per_sec" type="uint32_t" accessor="ticks_per_sec">
+            </attribute>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="DataV1" version="1" type_id="Id_EncoderData">
+		
+            <attribute name="_33mhz_timestamp" type="uint32_t" accessor="timestamp">
+            </attribute>
+
+            <attribute name="_encoder_count" type="uint32_t" accessor="encoder_count">
+            </attribute>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="DataV2" version="2" type_id="Id_EncoderData">
+		
+		    <const name="NEncoders" value="3" />
+		
+            <attribute name="_33mhz_timestamp" type="uint32_t" accessor="timestamp">
+            </attribute>
+
+            <attribute name="_encoder_count" type="uint32_t" dimensions="NEncoders" accessor="encoder_count">
+            </attribute>
+
+        </pstype>
+        
+	</package>
+</psddl>
