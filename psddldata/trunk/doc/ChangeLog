@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2011-03-28 Andrei Salnikov
+- few changes to epics classes:
+  - new intermediate type EpicsPvTimeHeader which is base for all *Time*
+    classes and has a single method stamp()
+  - EpicsPvHeader type has new methods isCtrl(), isTime(), status(), and
+    severity()
+  - precision() method was missing in floating point DBR classes
+
 Tag: V00-00-03
 2011-03-20 Andrei Salnikov
 - removed src and include directories

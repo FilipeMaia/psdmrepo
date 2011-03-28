@@ -328,6 +328,7 @@
                 <tag name="inline"/>
                 <arg name="status"      dest="_status"/>
                 <arg name="severity"    dest="_severity"/>
+                <arg name="precision"   dest="_precision"/>
                 <arg name="units"       dest="_units"/>
                 <arg dest="_upper_disp_limit"      name="upper_disp_limit"/>
                 <arg dest="_lower_disp_limit"      name="lower_disp_limit"/>
@@ -471,6 +472,7 @@
                 <tag name="inline"/>
                 <arg name="status"      dest="_status"/>
                 <arg name="severity"    dest="_severity"/>
+                <arg name="precision"   dest="_precision"/>
                 <arg name="units"       dest="_units"/>
                 <arg dest="_upper_disp_limit"      name="upper_disp_limit"/>
                 <arg dest="_lower_disp_limit"      name="lower_disp_limit"/>
@@ -497,6 +499,24 @@
 			This method will be implemented separately, it will act as a virtual method.
 			</method>
 			
+			<method name="isCtrl" type="uint8_t">
+				Returns 1 if PV is one of CTRL types, 0 otherwise.
+                <expr lang="C++" value="_iDbrType &gt;= DBR_CTRL_STRING and _iDbrType &lt;= DBR_CTRL_DOUBLE"/>
+			</method>
+			
+			<method name="isTime" type="uint8_t">
+				Returns 1 if PV is one of TIME types, 0 otherwise.
+                <expr lang="C++" value="_iDbrType &gt;= DBR_TIME_STRING and _iDbrType &lt;= DBR_TIME_DOUBLE"/>
+			</method>
+			
+			<method name="status" type="uint16_t">
+				Returns status value for the PV.
+			</method>
+			
+			<method name="severity" type="uint16_t">
+				Returns severity value for the PV.
+			</method>
+			
         </pstype>
         
         
@@ -505,6 +525,16 @@
 		<pstype name="EpicsPvCtrlHeader" base="EpicsPvHeader">
 
 			<attribute name="_sPvName" type="char" dimensions="iMaxPvNameLength" accessor="pvName"/>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="EpicsPvTimeHeader" base="EpicsPvHeader">
+
+			<method name="stamp" type="epicsTimeStamp">
+				Returns timestamp.
+			</method>
 
         </pstype>
         
@@ -597,7 +627,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeString" base="EpicsPvHeader">
+		<pstype name="EpicsPvTimeString" base="EpicsPvTimeHeader">
             <attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_string" accessor="dbr"/>
             <attribute name="_data" type="char" dimensions="{self}.numElements(), MAX_STRING_SIZE" accessor="data"/>
@@ -610,7 +640,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeShort" base="EpicsPvHeader">
+		<pstype name="EpicsPvTimeShort" base="EpicsPvTimeHeader">
 			<attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_short" accessor="dbr"/>
             <attribute name="_data" type="int16_t" dimensions="{self}.numElements()" accessor="data"/>
@@ -623,7 +653,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeFloat" base="EpicsPvHeader">
+		<pstype name="EpicsPvTimeFloat" base="EpicsPvTimeHeader">
 			<attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_float" accessor="dbr"/>
             <attribute name="_data" type="float" dimensions="{self}.numElements()" accessor="data"/>
@@ -636,7 +666,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeEnum" base="EpicsPvHeader">
+		<pstype name="EpicsPvTimeEnum" base="EpicsPvTimeHeader">
 			<attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_enum" accessor="dbr"/>
             <attribute name="_data" type="uint16_t" dimensions="{self}.numElements()" accessor="data"/>
@@ -649,7 +679,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeChar" base="EpicsPvHeader">
+		<pstype name="EpicsPvTimeChar" base="EpicsPvTimeHeader">
 			<attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_char" accessor="dbr"/>
             <attribute name="_data" type="uint8_t" dimensions="{self}.numElements()" accessor="data"/>
@@ -662,7 +692,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeLong" base="EpicsPvHeader">
+		<pstype name="EpicsPvTimeLong" base="EpicsPvTimeHeader">
 			<attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_long" accessor="dbr"/>
             <attribute name="_data" type="int32_t" dimensions="{self}.numElements()" accessor="data"/>
@@ -675,7 +705,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="EpicsPvTimeDouble" base="EpicsPvHeader">
+		<pstype name="EpicsPvTimeDouble" base="EpicsPvTimeHeader">
 			<attribute name="pad0" type="int16_t" />
             <attribute name="_dbr" type="dbr_time_double" accessor="dbr"/>
             <attribute name="_data" type="double" dimensions="{self}.numElements()" accessor="data"/>
