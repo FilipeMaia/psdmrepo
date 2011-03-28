@@ -299,5 +299,134 @@ EpicsPvHeader::print() const
   }
 }
 
+uint16_t
+EpicsPvHeader::status() const
+{
+  switch (this->dbrType()) {
+  case DBR_TIME_STRING:
+    return ((const EpicsPvTimeString*)this)->dbr().status();
+    break;
+  case DBR_TIME_SHORT:
+    return ((const EpicsPvTimeShort*)this)->dbr().status();
+    break;
+  case DBR_TIME_FLOAT:
+    return ((const EpicsPvTimeFloat*)this)->dbr().status();
+    break;
+  case DBR_TIME_ENUM:
+    return ((const EpicsPvTimeEnum*)this)->dbr().status();
+    break;
+  case DBR_TIME_CHAR:
+    return ((const EpicsPvTimeChar*)this)->dbr().status();
+    break;
+  case DBR_TIME_LONG:
+    return ((const EpicsPvTimeLong*)this)->dbr().status();
+    break;
+  case DBR_TIME_DOUBLE:
+    return ((const EpicsPvTimeDouble*)this)->dbr().status();
+    break;
+  case DBR_CTRL_STRING:
+    return ((const EpicsPvCtrlString*)this)->dbr().status();
+    break;
+  case DBR_CTRL_SHORT:
+    return ((const EpicsPvCtrlShort*)this)->dbr().status();
+    break;
+  case DBR_CTRL_FLOAT:
+    return ((const EpicsPvCtrlFloat*)this)->dbr().status();
+    break;
+  case DBR_CTRL_ENUM:
+    return ((const EpicsPvCtrlEnum*)this)->dbr().status();
+    break;
+  case DBR_CTRL_CHAR:
+    return ((const EpicsPvCtrlChar*)this)->dbr().status();
+    break;
+  case DBR_CTRL_LONG:
+    return ((const EpicsPvCtrlLong*)this)->dbr().status();
+    break;
+  case DBR_CTRL_DOUBLE:
+    return ((const EpicsPvCtrlDouble*)this)->dbr().status();
+    break;
+  }
+  return 0;
+}
+
+uint16_t
+EpicsPvHeader::severity() const
+{
+  switch (this->dbrType()) {
+  case DBR_TIME_STRING:
+    return ((const EpicsPvTimeString*)this)->dbr().severity();
+    break;
+  case DBR_TIME_SHORT:
+    return ((const EpicsPvTimeShort*)this)->dbr().severity();
+    break;
+  case DBR_TIME_FLOAT:
+    return ((const EpicsPvTimeFloat*)this)->dbr().severity();
+    break;
+  case DBR_TIME_ENUM:
+    return ((const EpicsPvTimeEnum*)this)->dbr().severity();
+    break;
+  case DBR_TIME_CHAR:
+    return ((const EpicsPvTimeChar*)this)->dbr().severity();
+    break;
+  case DBR_TIME_LONG:
+    return ((const EpicsPvTimeLong*)this)->dbr().severity();
+    break;
+  case DBR_TIME_DOUBLE:
+    return ((const EpicsPvTimeDouble*)this)->dbr().severity();
+    break;
+  case DBR_CTRL_STRING:
+    return ((const EpicsPvCtrlString*)this)->dbr().severity();
+    break;
+  case DBR_CTRL_SHORT:
+    return ((const EpicsPvCtrlShort*)this)->dbr().severity();
+    break;
+  case DBR_CTRL_FLOAT:
+    return ((const EpicsPvCtrlFloat*)this)->dbr().severity();
+    break;
+  case DBR_CTRL_ENUM:
+    return ((const EpicsPvCtrlEnum*)this)->dbr().severity();
+    break;
+  case DBR_CTRL_CHAR:
+    return ((const EpicsPvCtrlChar*)this)->dbr().severity();
+    break;
+  case DBR_CTRL_LONG:
+    return ((const EpicsPvCtrlLong*)this)->dbr().severity();
+    break;
+  case DBR_CTRL_DOUBLE:
+    return ((const EpicsPvCtrlDouble*)this)->dbr().severity();
+    break;
+  }
+  return 0;
+}
+
+epicsTimeStamp
+EpicsPvTimeHeader::stamp() const
+{
+  switch (this->dbrType()) {
+  case DBR_TIME_STRING:
+    return ((const EpicsPvTimeString*)this)->dbr().stamp();
+    break;
+  case DBR_TIME_SHORT:
+    return ((const EpicsPvTimeShort*)this)->dbr().stamp();
+    break;
+  case DBR_TIME_FLOAT:
+    return ((const EpicsPvTimeFloat*)this)->dbr().stamp();
+    break;
+  case DBR_TIME_ENUM:
+    return ((const EpicsPvTimeEnum*)this)->dbr().stamp();
+    break;
+  case DBR_TIME_CHAR:
+    return ((const EpicsPvTimeChar*)this)->dbr().stamp();
+    break;
+  case DBR_TIME_LONG:
+    return ((const EpicsPvTimeLong*)this)->dbr().stamp();
+    break;
+  case DBR_TIME_DOUBLE:
+    return ((const EpicsPvTimeDouble*)this)->dbr().stamp();
+    break;
+  }
+  return epicsTimeStamp();
+}
+
 } // namespace Epics
 } // namespace PsddlPds

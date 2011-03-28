@@ -54,6 +54,14 @@ std::vector<int> dbr_ctrl_double::_units_shape() const
   return shape;
 }
 
+uint8_t
+EpicsPvHeader::isCtrl() const {
+  return _iDbrType >= DBR_CTRL_STRING and _iDbrType <= DBR_CTRL_DOUBLE;
+}
+uint8_t
+EpicsPvHeader::isTime() const {
+  return _iDbrType >= DBR_TIME_STRING and _iDbrType <= DBR_TIME_DOUBLE;
+}
 std::vector<int> EpicsPvCtrlHeader::_sPvName_shape() const
 {
   std::vector<int> shape;
