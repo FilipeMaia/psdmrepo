@@ -1,0 +1,25 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psddl_pdsdata
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-03
+2011-03-28 Andy Salnikov
+- few changes in epics classes, see psddldata package for details
+
+Tag: V00-00-02
+2011-03-21 Andy Salnikov
+- changes in the array member access code
+
+Tag: V00-00-01
+2011-03-21 Andy Salnikov
+- first import into svn
+- mostly working, but there will be updates no doubt
