@@ -105,6 +105,7 @@ ProxyDict::getImpl( const std::type_info* typeinfo,
       }
     }
     
+    return proxy_ptr();
     
   }
 }
