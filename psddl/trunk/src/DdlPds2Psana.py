@@ -298,6 +298,12 @@ class DdlPds2Psana ( object ) :
 
     def _genAbsType(self, type):
         
+        def _types(type):
+            """Generator for the type list of the given type plus all it bases"""
+            if type.base:
+                for t in _types(type.base): yield t
+            yield type
+        
         logging.debug("_genAbsType: type=%s", repr(type))
 
         pdstypename = type.fullName('C++', self.pdsdata_ns)
@@ -316,17 +322,20 @@ class DdlPds2Psana ( object ) :
         print >>self.cpp, "%s::~%s()\n{\n}\n" % (type.name, type.name)
 
         # declarations for public methods 
-        for meth in type.methods(): 
-            if meth.access == 'public': self._genMethDecl(meth)
+        for t in _types(type):
+            for meth in t.methods(): 
+                if meth.access == 'public': self._genMethDecl(meth, type)
 
         # generate method declaration for public members without accessors
-        for attr in type.attributes() :
-            if attr.access == "public" and attr.accessor is None:
-                self._genPubAttrMethod(attr)
+        for t in _types(type):
+            for attr in t.attributes() :
+                if attr.access == "public" and attr.accessor is None:
+                    self._genPubAttrMethod(attr, type)
 
         # generate _shape() methods for array attributes
-        for attr in type.attributes() :
-            self._genAttrShapeDecl(attr)
+        for t in _types(type):
+            for attr in t.attributes() :
+                self._genAttrShapeDecl(attr, type)
 
         print >>self.inc, "  const XtcType& _xtcObj() const { return *m_xtcObj; }"
 
@@ -348,7 +357,7 @@ class DdlPds2Psana ( object ) :
         print >>self.inc, "};\n"
 
 
-    def _genMethDecl(self, meth):
+    def _genMethDecl(self, meth, type):
         """Generate method declaration and definition"""
 
         logging.debug("_genMethDecl: meth: %s", meth)
@@ -367,7 +376,7 @@ class DdlPds2Psana ( object ) :
                 rettype = attr.type.fullName('C++')
                 if attr.dimensions:
                     rettype = "const "+rettype+'*'
-                self._genFwdMeth(meth.name, rettype, attr.parent, cfgNeeded)
+                self._genFwdMeth(meth.name, rettype, type, cfgNeeded)
             
             else:
 
@@ -379,7 +388,7 @@ class DdlPds2Psana ( object ) :
                     print >>self.inc, "  virtual const %s& %s() const;" % \
                             (psana_type, meth.name)
                     print >>self.cpp, "\nconst %s& %s::%s() const { return %s; }" % \
-                            (psana_type, attr.parent.name, meth.name, attr.name)
+                            (psana_type, type.name, meth.name, attr.name)
                         
                 else:
     
@@ -389,7 +398,7 @@ class DdlPds2Psana ( object ) :
                     print >>self.inc, "  virtual const %s& %s(%s) const;" % \
                             (psana_type, meth.name, _dimargs(attr.dimensions))
                     print >>self.cpp, "\nconst %s& %s::%s(%s) const { return %s; }" % \
-                            (psana_type, attr.parent.name, meth.name, _dimargs(attr.dimensions), expr)
+                            (psana_type, type.name, meth.name, _dimargs(attr.dimensions), expr)
 
         else:
 
@@ -404,17 +413,17 @@ class DdlPds2Psana ( object ) :
                 cfgNeeded = expr.find('{xtc-config}') >= 0
 
             # if no type given then it does not return anything
-            type = meth.type
+            rettype = meth.type
             cvt = False
-            if type is None:
-                type = "void"
-            elif type.basic and not isinstance(type, Enum):
-                type = type.fullName('C++')
+            if rettype is None:
+                rettype = "void"
+            elif rettype.basic and not isinstance(rettype, Enum):
+                rettype = rettype.fullName('C++')
             else:
                 cvt = True
-                type = type.fullName('C++', self.psana_ns)
+                rettype = rettype.fullName('C++', self.psana_ns)
 
-            self._genFwdMeth(meth.name, type, meth.parent, cfgNeeded, cvt, meth.args)
+            self._genFwdMeth(meth.name, rettype, type, cfgNeeded, cvt, meth.args)
 
     def _genFwdMeth(self, name, typedecl, type, cfgNeeded=False, cvt=False, args=None):
         args = args or []
@@ -593,7 +602,7 @@ class DdlPds2Psana ( object ) :
         print >>self.cpp, "  }" 
 
 
-    def _genAttrShapeDecl(self, attr):
+    def _genAttrShapeDecl(self, attr, type):
 
         if not attr.shape_meth: return 
         
@@ -603,7 +612,7 @@ class DdlPds2Psana ( object ) :
             if attr.dimensions:
                 for d in attr.dimensions.dims:
                     if '{xtc-config}' in str(d) : cfgNeeded = True
-            self._genFwdMeth(attr.shape_meth, "std::vector<int>", attr.parent, cfgNeeded)
+            self._genFwdMeth(attr.shape_meth, "std::vector<int>", type, cfgNeeded)
             
         else:
 
@@ -615,7 +624,7 @@ class DdlPds2Psana ( object ) :
 
             print >>self.inc, "  virtual std::vector<int> %s() const;" % (attr.shape_meth)
             
-            print >>self.cpp, "std::vector<int> %s::%s() const\n{" % (attr.parent.name, attr.shape_meth)
+            print >>self.cpp, "std::vector<int> %s::%s() const\n{" % (type.name, attr.shape_meth)
             print >>self.cpp, "  std::vector<int> shape;" 
             print >>self.cpp, "  shape.reserve(%d);" % len(shape)
             v = name
@@ -624,7 +633,7 @@ class DdlPds2Psana ( object ) :
                 v += '[0]'
             print >>self.cpp, "  return shape;\n}\n"
 
-    def _genPubAttrMethod(self, attr):
+    def _genPubAttrMethod(self, attr, type):
         """Generate virtual method declaration for accessing public attribute"""
 
         def subscr(r):
@@ -641,7 +650,7 @@ class DdlPds2Psana ( object ) :
                 rettype = "const "+rettype+'*'
 
             print >>self.inc, "  virtual %s %s() const;" % (rettype, attr.name)
-            print >>self.cpp, "\n%s %s::%s() const { return m_xtcObj->%s; }" % (rettype, attr.parent.name, attr.name, attr.name)
+            print >>self.cpp, "\n%s %s::%s() const { return m_xtcObj->%s; }" % (rettype, type.name, attr.name, attr.name)
 
         else:
 
@@ -658,7 +667,7 @@ class DdlPds2Psana ( object ) :
             
             print >>self.inc, "  virtual const %s& %s(%s) const;" % (rettype, attr.name, argexpr)
             print >>self.cpp, "\nconst %s& %s::%s(%s) const { return %s%s; }" % \
-                    (rettype, attr.parent.name, attr.name, argexpr, name, subexpr)
+                    (rettype, type.name, attr.name, argexpr, name, subexpr)
                 
 
 #
