@@ -50,6 +50,10 @@ public:
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
   virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -62,8 +66,37 @@ public:
   typedef Psana::Epics::EpicsPvCtrlHeader PsanaType;
   EpicsPvCtrlHeader(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlHeader();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual std::vector<int> _sPvName_shape() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
+
+class EpicsPvTimeHeader : public Psana::Epics::EpicsPvTimeHeader {
+public:
+  typedef PsddlPds::Epics::EpicsPvTimeHeader XtcType;
+  typedef Psana::Epics::EpicsPvTimeHeader PsanaType;
+  EpicsPvTimeHeader(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~EpicsPvTimeHeader();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual Psana::Epics::epicsTimeStamp stamp() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -76,9 +109,19 @@ public:
   typedef Psana::Epics::EpicsPvCtrlString PsanaType;
   EpicsPvCtrlString(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlString();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_sts_string& dbr() const;
   virtual const char* data() const;
   virtual const char* value(uint32_t i) const;
+  virtual std::vector<int> _sPvName_shape() const;
   virtual std::vector<int> _data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -93,9 +136,19 @@ public:
   typedef Psana::Epics::EpicsPvCtrlShort PsanaType;
   EpicsPvCtrlShort(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlShort();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_short& dbr() const;
   virtual const int16_t* data() const;
   virtual int16_t value(uint32_t i) const;
+  virtual std::vector<int> _sPvName_shape() const;
   virtual std::vector<int> _data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -110,9 +163,19 @@ public:
   typedef Psana::Epics::EpicsPvCtrlFloat PsanaType;
   EpicsPvCtrlFloat(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlFloat();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_float& dbr() const;
   virtual const float* data() const;
   virtual float value(uint32_t i) const;
+  virtual std::vector<int> _sPvName_shape() const;
   virtual std::vector<int> _data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -127,9 +190,19 @@ public:
   typedef Psana::Epics::EpicsPvCtrlEnum PsanaType;
   EpicsPvCtrlEnum(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlEnum();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_enum& dbr() const;
   virtual const uint16_t* data() const;
   virtual uint16_t value(uint32_t i) const;
+  virtual std::vector<int> _sPvName_shape() const;
   virtual std::vector<int> _data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -144,9 +217,19 @@ public:
   typedef Psana::Epics::EpicsPvCtrlChar PsanaType;
   EpicsPvCtrlChar(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlChar();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_char& dbr() const;
   virtual const uint8_t* data() const;
   virtual uint8_t value(uint32_t i) const;
+  virtual std::vector<int> _sPvName_shape() const;
   virtual std::vector<int> _data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -161,9 +244,19 @@ public:
   typedef Psana::Epics::EpicsPvCtrlLong PsanaType;
   EpicsPvCtrlLong(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlLong();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_long& dbr() const;
   virtual const int32_t* data() const;
   virtual int32_t value(uint32_t i) const;
+  virtual std::vector<int> _sPvName_shape() const;
   virtual std::vector<int> _data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -178,9 +271,19 @@ public:
   typedef Psana::Epics::EpicsPvCtrlDouble PsanaType;
   EpicsPvCtrlDouble(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlDouble();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_double& dbr() const;
   virtual const double* data() const;
   virtual double value(uint32_t i) const;
+  virtual std::vector<int> _sPvName_shape() const;
   virtual std::vector<int> _data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -195,6 +298,15 @@ public:
   typedef Psana::Epics::EpicsPvTimeString PsanaType;
   EpicsPvTimeString(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeString();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_string& dbr() const;
   virtual const char* data() const;
   virtual const char* value(uint32_t i) const;
@@ -212,6 +324,15 @@ public:
   typedef Psana::Epics::EpicsPvTimeShort PsanaType;
   EpicsPvTimeShort(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeShort();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_short& dbr() const;
   virtual const int16_t* data() const;
   virtual int16_t value(uint32_t i) const;
@@ -229,6 +350,15 @@ public:
   typedef Psana::Epics::EpicsPvTimeFloat PsanaType;
   EpicsPvTimeFloat(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeFloat();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_float& dbr() const;
   virtual const float* data() const;
   virtual float value(uint32_t i) const;
@@ -246,6 +376,15 @@ public:
   typedef Psana::Epics::EpicsPvTimeEnum PsanaType;
   EpicsPvTimeEnum(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeEnum();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_enum& dbr() const;
   virtual const uint16_t* data() const;
   virtual uint16_t value(uint32_t i) const;
@@ -263,6 +402,15 @@ public:
   typedef Psana::Epics::EpicsPvTimeChar PsanaType;
   EpicsPvTimeChar(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeChar();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_char& dbr() const;
   virtual const uint8_t* data() const;
   virtual uint8_t value(uint32_t i) const;
@@ -280,6 +428,15 @@ public:
   typedef Psana::Epics::EpicsPvTimeLong PsanaType;
   EpicsPvTimeLong(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeLong();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_long& dbr() const;
   virtual const int32_t* data() const;
   virtual int32_t value(uint32_t i) const;
@@ -297,6 +454,15 @@ public:
   typedef Psana::Epics::EpicsPvTimeDouble PsanaType;
   EpicsPvTimeDouble(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeDouble();
+  virtual int16_t pvId() const;
+  virtual int16_t dbrType() const;
+  virtual int16_t numElements() const;
+  virtual void print() const;
+  virtual uint8_t isCtrl() const;
+  virtual uint8_t isTime() const;
+  virtual uint16_t status() const;
+  virtual uint16_t severity() const;
+  virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_double& dbr() const;
   virtual const double* data() const;
   virtual double value(uint32_t i) const;

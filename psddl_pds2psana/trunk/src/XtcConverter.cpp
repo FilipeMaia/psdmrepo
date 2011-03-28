@@ -149,7 +149,22 @@ namespace {
     // create and store psana object in config store
     cfgStore.put(boost::make_shared<PsanaType>(data), xtc->src);
   }
-  
+
+  template<typename FinalType>
+  void 
+  storeEpicsObject(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EpicsStore& eStore)
+  {
+    typedef typename FinalType::XtcType XtcType;
+    typedef typename FinalType::PsanaType PsanaType;
+    
+    // XTC object
+    boost::shared_ptr<XtcType> xptr(xtc, (XtcType*)(xtc->payload()));
+    
+    // create and store psana object in epics store
+    boost::shared_ptr<Psana::Epics::EpicsPvHeader> obj(new FinalType(xptr));
+    eStore.store(obj);
+  }
+
 }
 
 //		----------------------------------------
@@ -292,7 +307,6 @@ void
 XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::ConfigStore& cfgStore)
 {
   const Pds::TypeId& typeId = xtc->contains;
-  //uint32_t size = xtc->sizeofPayload();
 
   int version = typeId.version();
   switch(typeId.id()) {
@@ -404,5 +418,65 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::Confi
 
 }
 
+/**
+ *  @brief Convert one object and store it in the epics store.
+ */
+void 
+XtcConverter::convertEpics(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EpicsStore& eStore)
+{
+  const Pds::TypeId& typeId = xtc->contains;
+  if(typeId.id() == Pds::TypeId::Id_Epics) {
+
+    const PsddlPds::Epics::EpicsPvHeader* pvhdr = (const PsddlPds::Epics::EpicsPvHeader*)(xtc->payload());
+    switch(pvhdr->dbrType()) {
+    
+    case PsddlPds::Epics::DBR_TIME_STRING:
+      ::storeEpicsObject<Epics::EpicsPvTimeString>(xtc, eStore);
+      break;
+    case PsddlPds::Epics::DBR_TIME_SHORT:
+      ::storeEpicsObject<Epics::EpicsPvTimeShort>(xtc, eStore);
+      break;
+    case PsddlPds::Epics::DBR_TIME_FLOAT:
+      ::storeEpicsObject<Epics::EpicsPvTimeFloat>(xtc, eStore);
+      break;
+    case PsddlPds::Epics::DBR_TIME_ENUM:
+      ::storeEpicsObject<Epics::EpicsPvTimeEnum>(xtc, eStore);
+      break;
+    case PsddlPds::Epics::DBR_TIME_CHAR:
+      ::storeEpicsObject<Epics::EpicsPvTimeChar>(xtc, eStore);
+      break;
+    case PsddlPds::Epics::DBR_TIME_LONG:
+      ::storeEpicsObject<Epics::EpicsPvTimeLong>(xtc, eStore);
+      break;
+    case PsddlPds::Epics::DBR_TIME_DOUBLE:
+      ::storeEpicsObject<Epics::EpicsPvTimeDouble>(xtc, eStore);
+      break;
+    case PsddlPds::Epics::DBR_CTRL_STRING:
+      ::storeEpicsObject<Epics::EpicsPvCtrlString>(xtc, eStore);
+      break;
+    case PsddlPds::Epics::DBR_CTRL_SHORT:
+      ::storeEpicsObject<Epics::EpicsPvCtrlShort>(xtc, eStore);
+      break;
+    case PsddlPds::Epics::DBR_CTRL_FLOAT:
+      ::storeEpicsObject<Epics::EpicsPvCtrlFloat>(xtc, eStore);
+      break;
+    case PsddlPds::Epics::DBR_CTRL_ENUM:
+      ::storeEpicsObject<Epics::EpicsPvCtrlEnum>(xtc, eStore);
+      break;
+    case PsddlPds::Epics::DBR_CTRL_CHAR:
+      ::storeEpicsObject<Epics::EpicsPvCtrlChar>(xtc, eStore);
+      break;
+    case PsddlPds::Epics::DBR_CTRL_LONG:
+      ::storeEpicsObject<Epics::EpicsPvCtrlLong>(xtc, eStore);
+      break;
+    case PsddlPds::Epics::DBR_CTRL_DOUBLE: 
+      ::storeEpicsObject<Epics::EpicsPvCtrlDouble>(xtc, eStore);
+      break;
+    default:
+      break;
+    }
+  }
+  
+}
 
 } // namespace psddl_pds2psana

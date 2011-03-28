@@ -25,6 +25,7 @@
 #include "pdsdata/xtc/Xtc.hh"
 #include "PSEvt/Event.h"
 #include "PSEnv/ConfigStore.h"
+#include "PSEnv/EpicsStore.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -68,7 +69,12 @@ public:
    *  @brief Convert one object and store it in the config store.
    */
   void convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::ConfigStore& cfgStore);
-  
+
+  /**
+   *  @brief Convert one object and store it in the epics store.
+   */
+  void convertEpics(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EpicsStore& eStore);
+
 protected:
 
 private:
