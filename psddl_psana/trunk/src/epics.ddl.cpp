@@ -63,6 +63,9 @@ EpicsPvHeader::~EpicsPvHeader() {}
 EpicsPvCtrlHeader::~EpicsPvCtrlHeader() {}
 
 
+EpicsPvTimeHeader::~EpicsPvTimeHeader() {}
+
+
 EpicsPvCtrlString::~EpicsPvCtrlString() {}
 
 

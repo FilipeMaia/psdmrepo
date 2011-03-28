@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2011-03-28 Andy Salnikov
+- added template EpicsLib.h with few helper tempaltes which should
+  simplify access to epics data
+- few changes in epics classes, regenerated epics.ddh.*
+
 Tag: V00-00-01
 2011-03-21 Andy Salnikov
 - first import into svn

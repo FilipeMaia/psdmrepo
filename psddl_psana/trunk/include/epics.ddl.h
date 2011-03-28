@@ -303,8 +303,8 @@ private:
 class dbr_ctrl_float {
 public:
   enum {DBR_TYPE_ID = DBR_CTRL_FLOAT};
-  dbr_ctrl_float(int16_t status, int16_t severity, const char* units, float upper_disp_limit, float lower_disp_limit, float upper_alarm_limit, float upper_warning_limit, float lower_warning_limit, float lower_alarm_limit, float upper_ctrl_limit, float lower_ctrl_limit)
-    : _status(status), _severity(severity), RISC_pad(0), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit)
+  dbr_ctrl_float(int16_t status, int16_t severity, int16_t precision, const char* units, float upper_disp_limit, float lower_disp_limit, float upper_alarm_limit, float upper_warning_limit, float lower_warning_limit, float lower_alarm_limit, float upper_ctrl_limit, float lower_ctrl_limit)
+    : _status(status), _severity(severity), _precision(precision), RISC_pad(0), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit)
   {
     std::copy(units, units+(8), _units);
   }
@@ -453,8 +453,8 @@ private:
 class dbr_ctrl_double {
 public:
   enum {DBR_TYPE_ID = DBR_CTRL_DOUBLE};
-  dbr_ctrl_double(int16_t status, int16_t severity, const char* units, double upper_disp_limit, double lower_disp_limit, double upper_alarm_limit, double upper_warning_limit, double lower_warning_limit, double lower_alarm_limit, double upper_ctrl_limit, double lower_ctrl_limit)
-    : _status(status), _severity(severity), RISC_pad0(0), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit)
+  dbr_ctrl_double(int16_t status, int16_t severity, int16_t precision, const char* units, double upper_disp_limit, double lower_disp_limit, double upper_alarm_limit, double upper_warning_limit, double lower_warning_limit, double lower_alarm_limit, double upper_ctrl_limit, double lower_ctrl_limit)
+    : _status(status), _severity(severity), _precision(precision), RISC_pad0(0), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit)
   {
     std::copy(units, units+(8), _units);
   }
@@ -500,6 +500,10 @@ public:
   virtual int16_t dbrType() const = 0;
   virtual int16_t numElements() const = 0;
   virtual void print() const = 0;
+  virtual uint8_t isCtrl() const = 0;
+  virtual uint8_t isTime() const = 0;
+  virtual uint16_t status() const = 0;
+  virtual uint16_t severity() const = 0;
 };
 
 /** Class: EpicsPvCtrlHeader
@@ -512,6 +516,17 @@ public:
   virtual ~EpicsPvCtrlHeader();
   virtual const char* pvName() const = 0;
   virtual std::vector<int> _sPvName_shape() const = 0;
+};
+
+/** Class: EpicsPvTimeHeader
+  
+*/
+
+
+class EpicsPvTimeHeader: public EpicsPvHeader {
+public:
+  virtual ~EpicsPvTimeHeader();
+  virtual Epics::epicsTimeStamp stamp() const = 0;
 };
 
 /** Class: EpicsPvCtrlString
@@ -617,7 +632,7 @@ public:
 */
 
 
-class EpicsPvTimeString: public EpicsPvHeader {
+class EpicsPvTimeString: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeString();
   virtual const Epics::dbr_time_string& dbr() const = 0;
@@ -631,7 +646,7 @@ public:
 */
 
 
-class EpicsPvTimeShort: public EpicsPvHeader {
+class EpicsPvTimeShort: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeShort();
   virtual const Epics::dbr_time_short& dbr() const = 0;
@@ -645,7 +660,7 @@ public:
 */
 
 
-class EpicsPvTimeFloat: public EpicsPvHeader {
+class EpicsPvTimeFloat: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeFloat();
   virtual const Epics::dbr_time_float& dbr() const = 0;
@@ -659,7 +674,7 @@ public:
 */
 
 
-class EpicsPvTimeEnum: public EpicsPvHeader {
+class EpicsPvTimeEnum: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeEnum();
   virtual const Epics::dbr_time_enum& dbr() const = 0;
@@ -673,7 +688,7 @@ public:
 */
 
 
-class EpicsPvTimeChar: public EpicsPvHeader {
+class EpicsPvTimeChar: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeChar();
   virtual const Epics::dbr_time_char& dbr() const = 0;
@@ -687,7 +702,7 @@ public:
 */
 
 
-class EpicsPvTimeLong: public EpicsPvHeader {
+class EpicsPvTimeLong: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeLong();
   virtual const Epics::dbr_time_long& dbr() const = 0;
@@ -701,7 +716,7 @@ public:
 */
 
 
-class EpicsPvTimeDouble: public EpicsPvHeader {
+class EpicsPvTimeDouble: public EpicsPvTimeHeader {
 public:
   virtual ~EpicsPvTimeDouble();
   virtual const Epics::dbr_time_double& dbr() const = 0;
