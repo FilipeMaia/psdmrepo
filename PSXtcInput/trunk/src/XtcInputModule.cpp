@@ -299,7 +299,7 @@ XtcInputModule::fillEnv(const XtcInput::Dgram::ptr& dg, Env& env)
     if (xtc->contains.id() == Pds::TypeId::Id_Epics) {
       // call the converter which will fill config store
       boost::shared_ptr<Pds::Xtc> xptr(dg, xtc);
-      //m_cvt.convertEpics(*xtc, env.epicsStore(), dg);
+      m_cvt.convertEpics(xptr, env.epicsStore());
     }
     
   }
