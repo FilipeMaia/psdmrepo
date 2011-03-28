@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class Env...
+//	Class EpicsStore...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "PSEnv/Env.h"
+#include "PSEnv/EpicsStore.h"
 
 //-----------------
 // C/C++ Headers --
@@ -22,7 +22,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "PSEvt/ProxyDict.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -37,19 +36,15 @@ namespace PSEnv {
 //----------------
 // Constructors --
 //----------------
-Env::Env ()
-  : m_cfgStore()
-  , m_epicsStore(new EpicsStore())
+EpicsStore::EpicsStore ()
+  : m_impl(new EpicsStoreImpl())
 {
-  // instantiate dictionary for config store and store itself
-  boost::shared_ptr<PSEvt::ProxyDict> cfgDict(new PSEvt::ProxyDict());
-  m_cfgStore.reset(new ConfigStore(cfgDict));
 }
 
 //--------------
 // Destructor --
 //--------------
-Env::~Env ()
+EpicsStore::~EpicsStore ()
 {
 }
 
