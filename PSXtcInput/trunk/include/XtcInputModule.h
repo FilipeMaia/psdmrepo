@@ -78,16 +78,16 @@ public:
 protected:
   
   // Fill event with datagram contents
-  void fillEvent(const XtcInput::Dgram::ptr& dg, Event& evt, Env& env);
+  void fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env);
   
   // Fill environment with datagram contents
-  void fillEnv(const XtcInput::Dgram::ptr& dg, Env& env);
+  void fillEnv(const XtcInput::Dgram& dg, Env& env);
 
 private:
 
   // Data members
   boost::scoped_ptr<XtcInput::DgramQueue> m_dgQueue;
-  XtcInput::Dgram::ptr m_putBack;
+  XtcInput::Dgram m_putBack;
   boost::scoped_ptr<boost::thread> m_readerThread;
   psddl_pds2psana::XtcConverter m_cvt;
   Pds::ClockTime m_transitions[Pds::TransitionId::NumberOf];

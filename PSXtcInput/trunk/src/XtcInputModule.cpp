@@ -110,21 +110,23 @@ XtcInputModule::beginJob(Env& env)
   
   
   // try to read first event and see if it is a Configure transition
-  XtcInput::Dgram::ptr dg(m_dgQueue->pop());
-  if (not dg.get()) {
+  XtcInput::Dgram dg(m_dgQueue->pop());
+  if (dg.empty()) {
     // Nothing there at all, this is unexpected
     throw EmptyInput(ERR_LOC);
   }
   
-  if ( dg->seq.service() != Pds::TransitionId::Configure ) {
+  Dgram::ptr dgptr = dg.dg();
+
+  if ( dgptr->seq.service() != Pds::TransitionId::Configure ) {
     // Something else than Configure, store if for event()
     MsgLog(logger, warning, "Expected Configure transition for first datagram, received " 
-           << Pds::TransitionId::name(dg->seq.service()) );
+           << Pds::TransitionId::name(dgptr->seq.service()) );
     m_putBack = dg;
     return;
   }
   
-  m_transitions[dg->seq.service()] = dg->seq.clock();
+  m_transitions[dgptr->seq.service()] = dgptr->seq.clock();
   
   // Store configuration info in the environment
   fillEnv(dg, env);
@@ -139,21 +141,21 @@ XtcInputModule::event(Event& evt, Env& env)
   while (not found) {
 
     // get datagram either from saved event or queue
-    XtcInput::Dgram::ptr dg;
-    if (m_putBack.get()) {
+    XtcInput::Dgram dg;
+    if (not m_putBack.empty()) {
       dg = m_putBack;
-      m_putBack.reset();
+      m_putBack = Dgram();
     } else {
       dg = m_dgQueue->pop();
     }
   
-    if (not dg.get()) {
+    if (dg.empty()) {
       // finita
       MsgLog(logger, debug, "EOF seen");
       return Stop;
     }
   
-    const Pds::Sequence& seq = dg->seq ;
+    const Pds::Sequence& seq = dg.dg()->seq ;
     const Pds::ClockTime& clock = seq.clock() ;
     Pds::TransitionId::Value trans = seq.service();
 
@@ -238,24 +240,27 @@ XtcInputModule::endJob(Env& env)
 
 // Fill event with datagram contents
 void 
-XtcInputModule::fillEvent(const XtcInput::Dgram::ptr& dg, Event& evt, Env& env)
+XtcInputModule::fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env)
 {
+  Dgram::ptr dgptr = dg.dg();
+    
   // Store datagram itself in the event
-  evt.put(dg);
+  evt.put(dgptr);
   
-  const Pds::Sequence& seq = dg->seq ;
+  const Pds::Sequence& seq = dgptr->seq ;
   const Pds::ClockTime& clock = seq.clock() ;
 
   // Store event ID
   PSTime::Time evtTime(clock.seconds(), clock.nanoseconds());
-  boost::shared_ptr<PSEvt::EventId> eventId( new XtcEventId(-1, evtTime) );
+  unsigned run = dg.file().run();
+  boost::shared_ptr<PSEvt::EventId> eventId( new XtcEventId(run, evtTime) );
   evt.put(eventId);
 
   // Loop over all XTC contained in the datagram
-  XtcInput::XtcIterator iter(&dg->xtc);
+  XtcInput::XtcIterator iter(&dgptr->xtc);
   while (Pds::Xtc* xtc = iter.next()) {
       
-    boost::shared_ptr<Pds::Xtc> xptr(dg, xtc);
+    boost::shared_ptr<Pds::Xtc> xptr(dgptr, xtc);
     // call the converter which will fill event with data
     m_cvt.convert(xptr, evt, env.configStore());
     
@@ -264,22 +269,24 @@ XtcInputModule::fillEvent(const XtcInput::Dgram::ptr& dg, Event& evt, Env& env)
 
 // Fill environment with datagram contents
 void 
-XtcInputModule::fillEnv(const XtcInput::Dgram::ptr& dg, Env& env)
+XtcInputModule::fillEnv(const XtcInput::Dgram& dg, Env& env)
 {
   // All objects in datagram in Configuration and BeginCalibCycle transitions
   // (except for EPICS data) are considered configuration data. Just store them
   // them in the ConfigStore part of the environment
 
-  const Pds::Sequence& seq = dg->seq ;
+  Dgram::ptr dgptr = dg.dg();
+
+  const Pds::Sequence& seq = dgptr->seq ;
   if (seq.service() == Pds::TransitionId::Configure or 
       seq.service() == Pds::TransitionId::BeginCalibCycle) {
     
     // Loop over all XTC contained in the datagram
-    XtcInput::XtcIterator iter(&dg->xtc);
+    XtcInput::XtcIterator iter(&dgptr->xtc);
     while (Pds::Xtc* xtc = iter.next()) {
 
       if (xtc->contains.id() != Pds::TypeId::Id_Epics) {
-        boost::shared_ptr<Pds::Xtc> xptr(dg, xtc);
+        boost::shared_ptr<Pds::Xtc> xptr(dgptr, xtc);
         // call the converter which will fill config store
         m_cvt.convertConfig(xptr, env.configStore());
       }
@@ -290,12 +297,12 @@ XtcInputModule::fillEnv(const XtcInput::Dgram::ptr& dg, Env& env)
 
   // Convert EPICS too and store it in EPICS store
   // Loop over all XTC contained in the datagram
-  XtcInput::XtcIterator iter(&dg->xtc);
+  XtcInput::XtcIterator iter(&dgptr->xtc);
   while (Pds::Xtc* xtc = iter.next()) {
 
     if (xtc->contains.id() == Pds::TypeId::Id_Epics) {
       // call the converter which will fill config store
-      boost::shared_ptr<Pds::Xtc> xptr(dg, xtc);
+      boost::shared_ptr<Pds::Xtc> xptr(dgptr, xtc);
       m_cvt.convertEpics(xptr, env.epicsStore());
     }
     
