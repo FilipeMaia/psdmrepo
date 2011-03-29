@@ -98,7 +98,7 @@ class  pyana_cspad ( object ) :
             print "Using plot_vrange = %f-%f"%(self.plot_vmin,self.plot_vmax)
 
         self.plotter = Plotter()
-        if self.plot_every_n > 0 : self.plotter.display_mode = 1 # interactive 
+        #if self.plot_every_n > 0 : self.plotter.display_mode = 1 # interactive 
 
         self.threshold = None
         if threshold is not None :
@@ -307,10 +307,3 @@ class  pyana_cspad ( object ) :
                     print "saving to ",  svar
                     np.save(svar, average_image)
                 
-        print "-------------------"
-        print "Done running pyana."
-        print "To run pyana again, edit config file if needed and hit \"Run pyana\" button again"
-        print "Send any feedback on this program to ofte@slac.stanford.edu"
-        print "Thank you!"
-        print "-------------------"
-

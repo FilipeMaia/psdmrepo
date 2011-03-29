@@ -93,6 +93,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.devices = []
         self.epicsPVs = []
         self.controls = []
+        self.moreinfo = []
 
         self.checklabels = []
         self.checkboxes = []
@@ -323,12 +324,13 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.pvWindow.show()
         
             
-    def update(self, filenames=[],devices=[],epicsPVs=[],controls=[]):
+    def update(self, filenames=[],devices=[],epicsPVs=[],controls=[],moreinfo=[]):
         """Update lists of filenames, devices and epics channels
            Make sure GUI gets updated too
         """
         self.filenames = filenames
         self.devices = devices
+        self.moreinfo = moreinfo
         self.epicsPVs = epicsPVs
         self.controls = controls
 
@@ -341,6 +343,13 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         One checkbox for each Detector/Device found
         in the scan of xtc file
         """
+        #if self.lgroup.count() > 0:            
+        #    item = self.lgroup.takeAt(0)
+        #    while item is not None :
+        #        del item
+        #        item = self.lgroup.takeAt(0)
+        #    self.lgroup.update()
+            
         self.checkboxes = []
         self.checklabels = []
         for ctrl in self.controls:

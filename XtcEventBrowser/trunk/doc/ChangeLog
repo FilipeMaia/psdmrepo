@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Mar-29 ofte               rev 1711
+	- added file size checking, cleaned up the GUIs
+	- XtcScanner: improved print layout, more config information
+
 2011-Mar-25 ofte               rev 1682
 	- added waveform data support
 	- added scan processing

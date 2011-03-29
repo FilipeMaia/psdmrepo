@@ -198,9 +198,9 @@ class pyana_plotter (object) :
         """This optional method is called if present at the end of the run.
         
         @param env    environment object
-        """
-        
+        """        
         logging.info( "pyana_plotter.endrun() called" )
+
 
     def endjob( self, env ) :
         """This method is called at the end of the job. It should do 
@@ -214,3 +214,11 @@ class pyana_plotter (object) :
         if self.display_mode > 0 :
             plt.ioff()
             plt.show()
+
+        print "-------------------"
+        print "Done running pyana."
+        print "To run pyana again, edit config file if needed and hit \"Run pyana\" button again"
+        print "Send any feedback on this program to ofte@slac.stanford.edu"
+        print "Thank you!"
+        print "-------------------"
+

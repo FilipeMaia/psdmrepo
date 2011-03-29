@@ -79,6 +79,7 @@ class XtcScanner ( object ) :
     #--------------------
     devices = {}
     counters = {}
+    moreinfo = {}
     epicsPVs = []
     controls = []
 
@@ -119,11 +120,17 @@ class XtcScanner ( object ) :
         datagram.xtc, call _scan.
         """
         # reset:
-        self.devices = {}
-        self.counters = {}
+        self.ncalib = 0
+        self.nevents = []
+        self.devices.clear()
+        self.moreinfo.clear()
+        self.counters.clear()
         self.epicsPVs = []
         self.controls = []
 
+        print "Scanning...."
+        print self.counters
+        
         if len(self.files)==0 :
             print "You need to select an xtc file"
             return
@@ -179,7 +186,8 @@ class XtcScanner ( object ) :
 
     def printSummary(self, opt_bld = 1, opt_det=1, opt_epics = 0):
 
-        print "Here's what I find: "
+        print "-------------------------------------------------------------"
+        print "XtcScanner information: "
         print "  - %d calibration cycles." % self.ncalib
         print "  - Events per calib cycle: \n  ", self.nevents
         print
@@ -190,7 +198,12 @@ class XtcScanner ( object ) :
         print "Information from ", len(self.devices), " devices found"
         sortedkeys = sorted( self.devices.keys() )
         for d in sortedkeys :
-            print d, ": \t    ",  
+            print "%35s: " % d,
+            for info in self.moreinfo[d] :
+                if info is not None:
+                    print "(%s)\t" % info,
+                else :
+                    print "%s\t" % "   ",
             for i in range ( len(self.devices[d] ) ):
                 print " %s (%d) " % ( self.devices[d][i],  self.counters[d][i] ),
             print
@@ -198,6 +211,8 @@ class XtcScanner ( object ) :
         if opt_epics > 0 :
             print "Epics PVs: ", self.epicsPVs
 
+        print "XtcScanner is done!"
+        print "-------------------------------------------------------------"
 
 
     def setFiles(self, filenames):
@@ -246,6 +261,7 @@ class XtcScanner ( object ) :
 
             source = str(xtc.src)
             contents = str(xtc.contains)
+            worthknowing = None
 
             dtype = type(xtc.src).__name__
             dname = ''
@@ -270,11 +286,18 @@ class XtcScanner ( object ) :
                 if xtc.contains.id() == TypeId.Type.Id_Epics :
                     data = xtc.payload()
                     self.epicsPVs.append(data.sPvName)
-                    
+
+                if xtc.contains.id() == TypeId.Type.Id_AcqConfig :
+                    data = xtc.payload()
+                    worthknowing = "%s ch" % data.nbrChannels()
+                    #self.nchannels.append(data.nbrChannels())
+
             if dkey not in self.devices :
                 # first occurence of this detector/device
                 self.devices[dkey] = []
                 self.devices[dkey].append( contents )
+                self.moreinfo[dkey] = []
+                self.moreinfo[dkey].append( worthknowing )
                 self.counters[dkey] = []
                 self.counters[dkey].append( 1 )
             else :

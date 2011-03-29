@@ -87,6 +87,7 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         QtGui.QMainWindow.__init__(self)
 
         QtCore.pyqtRemoveInputHook()
+        # to avoid a problems with raw_input()
         
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
@@ -94,31 +95,16 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         self.setWindowTitle("LCLS Xtc Event Browser")
         self.setWindowIcon(QtGui.QIcon('XtcEventBrowser/src/lclsLogo.gif'))
 
-        # list of current files
         self.filenames = []
+        # list of current files
 
-        # make only one instance of these
+        # keep reference to these objects at all times, they know a lot...
         self.scanner = None
         self.pyanactrl = None
         
         self.create_main_frame()
+        print "Welcome to Xtc Event Display!"
 
-
-    def about(self):
-        progname = os.path.basename(sys.argv[0])
-        progversion = "0.1"
-        QtGui.QMessageBox.about(self, "About %s" % os.path.basename(sys.argv[0]),
-u"""%(prog)s version %(version)s
-GUI interface to analysis of xtc files.
-
-This software was developed for the LCLS project at 
-SLAC National Accelerator Center. If you use all or
-part of it, please give an appropriate acknowledgment.
-
-2011   Ingrid Ofte
-"""   % {"prog": progname, "version": progversion})
-        
-                
         
     def create_main_frame(self):
 
@@ -129,16 +115,40 @@ part of it, please give an appropriate acknowledgment.
         # menu
         self.help_menu = QtGui.QMenu('&Help', self)
         self.menuBar().addMenu(self.help_menu)
+        self.help_menu.addAction('&Documentation',self.documentation)
         self.help_menu.addAction('&About',self.about)
+
+        # --- Scan section --- 
+        self.scan_button = QtGui.QPushButton("&Scan File(s)")
+        self.connect(self.scan_button, QtCore.SIGNAL('clicked()'), self.scan_files )
+        self.scan_button.setDisabled(True)
+        self.scan_label = QtGui.QLabel(self.scan_button)
+        self.scan_label.setText("Scan all events")
+
+        self.scan_enable_button = QtGui.QPushButton("&Enable")
+        self.connect(self.scan_enable_button, QtCore.SIGNAL('clicked()'), self.scan_enable )
+        
+        self.qscan_button = QtGui.QPushButton("&Quick Scan")
+        self.qscan_button.setDisabled(True)
+        self.connect(self.qscan_button, QtCore.SIGNAL('clicked()'), self.scan_files_quick )
+        self.nev_qscan = 200
+        self.qscan_edit = QtGui.QLineEdit(str(self.nev_qscan))
+        self.qscan_edit.setMaximumWidth(80)
+        self.connect(self.qscan_edit, QtCore.SIGNAL('returnPressed()'), self.change_nev_qscan )
+
+        self.qscan_label = QtGui.QLabel(self.qscan_button)
+        self.qscan_label.setText("Scan the first %d events   " % self.nev_qscan)
+
+        self.fileinfo = QtGui.QLabel(self)
 
         # --- File section ---
 
         # Label showing currently selected files
-        self.currentfiles = QtGui.QLabel(self);
+        self.currentfiles = QtGui.QLabel(self)
         self.update_currentfiles()
 
         # Button: open file browser
-        self.fbrowser_button = QtGui.QPushButton("&File Browser")
+        self.fbrowser_button = QtGui.QPushButton("&File Browser...")
         self.connect(self.fbrowser_button, QtCore.SIGNAL('clicked()'), self.file_browser )
 
         # Button: clear file list
@@ -155,26 +165,8 @@ part of it, please give an appropriate acknowledgment.
         self.connect(self.addfile_button, QtCore.SIGNAL('clicked()'), self.add_file_from_lineedit )
              
 
-        # --- Scan section --- 
-        self.scan_button = QtGui.QPushButton("&Scan File(s)")
-        self.scan_button.setDisabled(True)
-        self.connect(self.scan_button, QtCore.SIGNAL('clicked()'), self.scan_files )
-        self.scan_label = QtGui.QLabel(self.scan_button)
-        self.scan_label.setText("(Scan all events)")
-
-        self.scan_enable_button = QtGui.QPushButton("&Enable")
-        self.connect(self.scan_enable_button, QtCore.SIGNAL('clicked()'), self.scan_enable )
+        # ---- Test section -------
         
-        self.qscan_button = QtGui.QPushButton("&Quick Scan")
-        self.connect(self.qscan_button, QtCore.SIGNAL('clicked()'), self.scan_files_quick )
-        self.nev_qscan = 200
-        self.qscan_edit = QtGui.QLineEdit(str(self.nev_qscan))
-        self.qscan_edit.setMaximumWidth(80)
-        self.connect(self.qscan_edit, QtCore.SIGNAL('returnPressed()'), self.change_nev_qscan )
-
-        self.qscan_label = QtGui.QLabel(self.qscan_button)
-        self.qscan_label.setText("(Scan the first %d events)   " % self.nev_qscan)
-
         # Test matplotlib widget
         self.mpl_button = QtGui.QPushButton("&MatPlotLib")
         self.connect(self.mpl_button, QtCore.SIGNAL('clicked()'), self.makeplot )
@@ -201,8 +193,7 @@ part of it, please give an appropriate acknowledgment.
         h0.setAlignment( self.pic, QtCore.Qt.AlignLeft )
 
         # files
-        fgroup = QtGui.QGroupBox("File section")
-        
+        fgroup = QtGui.QGroupBox("File section")        
 
         v1 = QtGui.QVBoxLayout()
         v1.addWidget( self.fbrowser_button )
@@ -228,6 +219,8 @@ part of it, please give an appropriate acknowledgment.
         fgroup.setLayout(H1)
         
         # Scan
+        sgroup = QtGui.QGroupBox("Scan section")
+
         hs0 = QtGui.QHBoxLayout()
         hs0.addWidget( self.qscan_button )
         hs0.addWidget( self.qscan_edit )
@@ -237,12 +230,15 @@ part of it, please give an appropriate acknowledgment.
         hs1.addWidget( self.scan_button )
         hs1.addWidget( self.scan_enable_button )
         hs1.addWidget( self.scan_label )
-
+        hs2 = QtGui.QHBoxLayout()
+        hs2.addWidget( self.fileinfo )
+        
         v3 = QtGui.QVBoxLayout()
-        v3.addLayout( hs0 )
-        v3.setAlignment( hs0, QtCore.Qt.AlignLeft )
-        v3.addLayout( hs1 )
-        v3.setAlignment( hs1, QtCore.Qt.AlignLeft )
+        v3.addLayout(hs0)
+        v3.setAlignment(hs0, QtCore.Qt.AlignLeft)
+        v3.addLayout(hs1)
+        v3.setAlignment(hs1, QtCore.Qt.AlignLeft)
+        v3.addLayout(hs2)
         #v3.addWidget( self.mpl_button )
         #v3.setAlignment(self.mpl_button, QtCore.Qt.AlignRight )
         #v3.addWidget( self.mpl2_button )
@@ -250,6 +246,7 @@ part of it, please give an appropriate acknowledgment.
 
         h4 = QtGui.QHBoxLayout()
         h4.addLayout(v3)
+        sgroup.setLayout(h4)
         
         # Pyana
         #h5 = QtGui.QHBoxLayout()
@@ -265,8 +262,9 @@ part of it, please give an appropriate acknowledgment.
         #l.addLayout(h1)
         #l.addLayout(h2)
         l.addWidget(fgroup)
+        l.addWidget(sgroup)
         
-        l.addLayout(h4)
+        #l.addLayout(h4)
         #l.addLayout(h5)
         #l.addLayout(self.det_layout)
         l.addLayout(h6)
@@ -285,19 +283,191 @@ part of it, please give an appropriate acknowledgment.
         QtGui.qApp.closeAllWindows()
 
 
+    #--------------------
+    #  Private methods --
+    #--------------------
+    
+    def file_browser(self):
+        """Opens a Qt File Dialog
+
+        Opens a Qt File dialog which allows user
+        to select one or more xtc files. The file names
+        are added to a list holding current files.
+        """
+        selectedfiles = QtGui.QFileDialog.getOpenFileNames( \
+            self, "Select File","/reg/d/psdm/","xtc files (*.xtc)")
+        
+        # convert QStringList to python list of strings
+        file = ''
+        for file in selectedfiles :
+            if self.filenames.count( str(file) )==0 :
+                self.filenames.append( str(file) )
+
+        # add the last file opened to the line dialog
+        self.lineedit.setText( str(file) )
+        self.update_currentfiles()
+        
 
     def add_file_from_cmd(self, filename):
         """Add file
         """
-        self.filenames.append(filename)
-        # add the last file opened to the line dialog
-        self.lineedit.setText( str(filename) )
+        if self.filenames.count(filename)==0:
+            if os.path.isfile(filename) :
+                self.filenames.append(filename)
+                # add the last file opened to the line dialog
+                self.lineedit.setText( str(filename) )
+                self.update_currentfiles()
+            
+
+    def add_file_from_lineedit(self):
+        """Add a file to list of files
+        
+        Add a file to list of files. Input from lineedit
+        """
+        filestring = str(self.lineedit.text())
+        if self.filenames.count(filestring)==0:
+            if os.path.isfile(filestring):
+                self.filenames.append(filestring)
+                self.update_currentfiles()
+            
+    def clear_file_list(self):
+        """Empty the file list
+        
+        """
+        self.filenames = []
         self.update_currentfiles()
 
-    #--------------------
-    #  Private methods --
-    #--------------------
+        self.checks = []
+        self.checkboxes = []
+        
+        if self.pyanactrl is not None :
+            del self.pyanactrl
+            self.pyanactrl = None
+            
+    def update_currentfiles(self):
+        """Update text describing the list of current files
+        """
+        # number of files
+        nfiles = len(self.filenames)
+        status = "Currently selected:  %d file(s)  " % nfiles
+        
+        # total file size
+        self.filesize = 0.0
+        for filename in self.filenames :
+            self.filesize += os.path.getsize(filename)
+            
+        filesizetxt = ""
+        if nfiles > 0 :
+            filesize = self.filesize/1024
+            if filesize < 1024 :
+                filesizetxt = "%.1fk" % (filesize)
+            elif filesize < 1024**2 :
+                filesizetxt = "%.1fM" % (filesize/1024)
+            elif filesize < 1024**3 :
+                filesizetxt = "%.1fG" % (filesize/1024**2)
+            elif filesize < 1024**4 :
+                filesizetxt = "%.1fT" % (filesize/1024**3)
+            else :
+                filesizetxt = "Big! "
 
+            # if files, enable the buttons
+            if self.qscan_button :
+                self.qscan_button.setEnabled(True)
+            if self.scan_button and self.scan_label :
+                if self.filesize < 2*1024**3 :
+                    self.scan_enable()
+                    self.scan_label.setText("Scan all events (%s)"%filesizetxt)
+                else :
+                    self.scan_label.setText("Scan all events (%s!)"%filesizetxt)
+
+        status+="\t %s \n" % filesizetxt
+        for filename in self.filenames :
+            addline = filename+"\n"
+            status+=addline
+        self.currentfiles.setText(status)
+                
+
+
+    def change_nev_qscan(self):
+        self.nev_qscan = int(self.qscan_edit.text())
+        self.qscan_label.setText("(Scan the first %d events)   "%self.nev_qscan)
+        
+    def scan_enable(self) :
+        if self.scan_button :
+            if self.scan_button.isEnabled() :
+                self.scan_button.setDisabled(True)
+                self.scan_enable_button.setText("Enable")
+            else :
+                self.scan_button.setEnabled(True)
+                self.scan_enable_button.setText("Disable")
+
+
+    def scan_files(self, quick=False):
+        """Scan xtc files
+
+        Run XtcScanner to scan the files.
+        When scan is done, open a new Gui Widget
+        to configure pyana / plotting
+        """
+        if self.scanner is None:
+            self.scanner = XtcScanner()                
+        self.scanner.setFiles(self.filenames)        
+        if quick :
+            self.scanner.setOption({'ndatagrams':self.nev_qscan})
+        else :
+            self.scanner.setOption({'ndatagrams':-1}) # all
+        self.scanner.scan()
+
+        # (re)make the pyana control object
+        if self.pyanactrl: del self.pyanactrl
+        self.pyanactrl = XtcPyanaControl()
+                    
+        self.pyanactrl.update(devices=self.scanner.devices.keys(),
+                              epicsPVs=self.scanner.epicsPVs,
+                              controls=self.scanner.controls,
+                              moreinfo=self.scanner.moreinfo.values(),
+                              filenames=self.filenames )
+
+        if self.scan_button :
+            self.scan_enable()
+            
+        fileinfo_text = "The scan found: \n     %d calib cycles (scan steps) "\
+                        "for a total of %d L1Accepts (shots)"\
+                        % (self.scanner.ncalib, sum(self.scanner.nevents) )
+        if len(self.scanner.nevents) > 1 :
+            fileinfo_text += ":\n     nShots[scanstep] = %s " % str(self.scanner.nevents)
+
+        self.fileinfo.setText(fileinfo_text)
+
+
+    def scan_files_quick(self):
+        """Quick scan of xtc files
+        """
+        self.scan_files(quick=True)
+
+
+    def documentation(self):        
+        print "Documentation on Confluence"
+        
+    def about(self):
+        progname = os.path.basename(sys.argv[0])
+        progversion = "0.1"
+        QtGui.QMessageBox.about(self, "About %s" % os.path.basename(sys.argv[0]),
+u"""%(prog)s version %(version)s
+GUI interface to analysis of xtc files.
+
+This software was developed for the LCLS project at 
+SLAC National Accelerator Center. If you use all or
+part of it, please give an appropriate acknowledgment.
+
+2011   Ingrid Ofte
+"""   % {"prog": progname, "version": progversion})
+
+
+
+    # ------------------
+    # -- Experimental --
+    # ------------------
     def on_draw(self):
         """ Redraws the figure
         """
@@ -410,104 +580,6 @@ part of it, please give an appropriate acknowledgment.
         #myfig = display.XtcEventDisplay()
         #myfig.show()
         #"Showing figure?"
-
-
-
-    def file_browser(self):
-        """Opens a Qt File Dialog
-
-        Opens a Qt File dialog which allows user
-        to select one or more xtc files. The file names
-        are added to a list holding current files.
-        """
-        selectedfiles = QtGui.QFileDialog.getOpenFileNames( \
-            self, "Select File","/reg/d/psdm/","xtc files (*.xtc)")
-        
-        # convert QStringList to python list of strings
-        file = ''
-        for file in selectedfiles :
-            if self.filenames.count( str(file) )==0 :
-                self.filenames.append( str(file) )
-
-        # add the last file opened to the line dialog
-        self.lineedit.setText( str(file) )
-        self.update_currentfiles()
-
-
-        
-
-
-    def add_file_from_lineedit(self):
-        """Add a file to list of files
-        
-        Add a file to list of files. Input from lineedit
-        """
-        if self.filenames.count( str(self.lineedit.text()))==0:
-            self.filenames.append(str(self.lineedit.text()))
-            self.update_currentfiles()
-            
-    def clear_file_list(self):
-        """Empty the file list
-        
-        """
-        self.filenames = []
-        self.update_currentfiles()
-
-        self.checks = []
-        self.checkboxes = []
-        
-            
-    def update_currentfiles(self):
-        """Update status text (list of files)
-        """
-        status = "Currently selected file(s):       (%d)\n " % len(self.filenames )
-
-        for filename in self.filenames :
-            addline = filename+"\n"
-            status+=addline
-                
-        self.currentfiles.setText(status)
-
-
-    def change_nev_qscan(self):
-        self.nev_qscan = int(self.qscan_edit.text())
-        self.qscan_label.setText("(Scan the first %d events)   "%self.nev_qscan)
-        
-    def scan_enable(self) :
-        if self.scan_button :
-            self.scan_button.setEnabled(True)
-
-    def scan_files(self, quick=False):
-        """Scan xtc files
-
-        Run XtcScanner to scan the files.
-        When scan is done, open a new Gui Widget
-        to configure pyana / plotting
-        """
-        if self.scanner is None:
-            self.scanner = XtcScanner()                
-        self.scanner.setFiles(self.filenames)        
-        if quick :
-            self.scanner.setOption({'ndatagrams':self.nev_qscan})
-        else :
-            self.scanner.setOption({'ndatagrams':-1}) # all
-        self.scanner.scan()
-
-        if self.pyanactrl is None : 
-            self.pyanactrl = XtcPyanaControl()
-        self.pyanactrl.update(devices=self.scanner.devices.keys(),
-                              epicsPVs=self.scanner.epicsPVs,
-                              controls=self.scanner.controls,
-                              filenames=self.filenames )
-        if self.scan_button :
-            self.scan_button.setDisabled(True)
-
-
-    def scan_files_quick(self):
-        """Quick scan of xtc files
-        """
-        self.scan_files(quick=True)
-
 
 
 #
