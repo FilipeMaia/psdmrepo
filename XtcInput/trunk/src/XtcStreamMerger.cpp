@@ -99,8 +99,8 @@ XtcStreamMerger::XtcStreamMerger ( const std::list<XtcFileName>& files,
     // create new stream
     XtcDechunk* stream = new XtcDechunk( streamFiles, maxDgSize, skipDamaged ) ;
     m_streams.push_back( stream ) ;
-    Dgram::ptr dg = stream->next();
-    if ( dg.get() ) updateDgramTime( *dg );
+    Dgram dg(stream->next(), stream->chunkName());
+    if (not dg.empty()) updateDgramTime( *dg.dg() );
     m_dgrams.push_back( dg ) ;
 
   }
@@ -136,7 +136,7 @@ XtcStreamMerger::mergeMode(const std::string& str)
 
 // read next datagram, return zero pointer after last file has been read,
 // throws exception for errors.
-Dgram::ptr
+Dgram
 XtcStreamMerger::next()
 {
   unsigned ns =  m_streams.size() ;
@@ -144,8 +144,9 @@ XtcStreamMerger::next()
   // find datagram with lowest timestamp
   int stream = -1 ;
   for ( unsigned i = 0 ; i < ns ; ++ i ) {
-    if ( m_dgrams[i].get() ) {
-      if ( stream < 0 or m_dgrams[stream]->seq.clock() > m_dgrams[i]->seq.clock() ) {
+    if (not m_dgrams[i].empty()) {
+      Dgram::ptr dgptr = m_dgrams[i].dg();
+      if ( stream < 0 or dgptr->seq.clock() > dgptr->seq.clock() ) {
         stream = i ;
       }
     }
@@ -155,22 +156,23 @@ XtcStreamMerger::next()
 
   if ( stream < 0 ) {
     // means no datagrams left
-    return Dgram::ptr() ;
+    return Dgram() ;
   }
 
   MsgLog( logger, debug, "next -- file: " << m_streams[stream]->chunkName().basename() ) ;
 
-  // make a copy of the datagram
-  Dgram::ptr dg = m_dgrams[stream];
+  // this datagram will be returned
+  Dgram dg = m_dgrams[stream];
+  Dgram::ptr dgptr = dg.dg();
 
   MsgLog( logger, debug, "next -- m_dgrams[stream].clock: "
-      << dg->seq.clock().seconds() << " sec " << dg->seq.clock().nanoseconds() << " nsec" ) ;
-  MsgLog( logger, debug, "next -- m_dgrams[stream].service: " << Pds::TransitionId::name(dg->seq.service()) ) ;
+      << dgptr->seq.clock().seconds() << " sec " << dgptr->seq.clock().nanoseconds() << " nsec" ) ;
+  MsgLog( logger, debug, "next -- m_dgrams[stream].service: " << Pds::TransitionId::name(dgptr->seq.service()) ) ;
 
   // get next datagram from that stream
   MsgLog( logger, debug, "next -- read datagram from file: " << m_streams[stream]->chunkName().basename() ) ;
-  Dgram::ptr ndg = m_streams[stream]->next();
-  if ( ndg.get() ) updateDgramTime( *ndg );
+  Dgram ndg(m_streams[stream]->next(), m_streams[stream]->chunkName());
+  if (not ndg.empty()) updateDgramTime(*ndg.dg());
   m_dgrams[stream] = ndg ;
 
   return dg ;

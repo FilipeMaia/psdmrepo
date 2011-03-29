@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2011-03-29 Andy Salnikov
+- add support for extracting run number from datagrams stored in a queue
+- Dgram is now a class instead of namespace, instances contain pointer 
+  to Pds::Dgram and XtcFileName.
+- XtcStreamMerge::next() returns Dgram object
+- DgramQueue class stores Dgram objects
+
 Tag: V00-00-05
 2011-03-20 Andy Salnikov
 - fix compilation issue after merge with V00-00-03

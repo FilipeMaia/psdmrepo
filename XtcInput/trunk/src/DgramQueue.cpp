@@ -55,7 +55,7 @@ DgramQueue::~DgramQueue ()
 // add one more datagram to the queue, if the queue
 // is full already then wait until somebody calls pop()
 void
-DgramQueue::push ( DgramQueue::pointer_type dg )
+DgramQueue::push (const value_type& dg)
 {
   boost::mutex::scoped_lock qlock ( m_mutex ) ;
 
@@ -74,7 +74,7 @@ DgramQueue::push ( DgramQueue::pointer_type dg )
 
 // get one datagram from the head of the queue, if the queue is
 // empty then wait until somebody calls push()
-DgramQueue::pointer_type
+DgramQueue::value_type
 DgramQueue::pop()
 {
   boost::mutex::scoped_lock qlock ( m_mutex ) ;
@@ -85,7 +85,7 @@ DgramQueue::pop()
   }
 
   // get a packet
-  pointer_type p = m_queue.front() ;
+  value_type p = m_queue.front() ;
   m_queue.pop() ;
 
   // tell anybody waiting for queue to become non-full

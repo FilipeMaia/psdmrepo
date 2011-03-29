@@ -18,11 +18,12 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "pdsdata/xtc/Dgram.hh"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/xtc/Dgram.hh"
+#include "XtcInput/XtcFileName.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,10 +36,10 @@
 namespace XtcInput {
 
 /**
- *  @brief Safer wrapper for Pds::Dgram class.
+ *  @brief Wrapper for Pds::Dgram class.
  *  
- *  This namespace defines smart pointer class for datagram objects and 
- *  the factory methods for creating pointers.
+ *  This class wraps Pds::Datagram class and also adds some additional 
+ *  context information to it such as file name and position.
  *  
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -50,27 +51,52 @@ namespace XtcInput {
  *  @author Andrei Salnikov
  */
 
-namespace Dgram {
-
-  typedef boost::shared_ptr<Pds::Dgram> ptr;
+class Dgram {
+public:
   
-  /**
-   *  @brief This method will be used in place of regular delete.
-   */
-  void destroy(const Pds::Dgram* dg) ;
+  typedef boost::shared_ptr<Pds::Dgram> ptr;
 
   /**
    *  @brief Factory method which wraps existing object into a smart pointer.
    */
-  ptr make_ptr(Pds::Dgram* dg) ;
+  static ptr make_ptr(Pds::Dgram* dg) ;
+
+  /**
+   *  Constructor takes a smart pointer to XTC datagram object and
+   *  the file name where datagram has originated.
+   */
+  Dgram(const ptr& dg, XtcFileName file) : m_dg(dg), m_file(file) {}
+
+  /**
+   *  Default ctor
+   */
+  Dgram() : m_dg(), m_file() {}
+
+  /// Return pointer to the datagream
+  ptr dg() const { return m_dg; }
+  
+  /// Return file name
+  const XtcFileName& file() const { return m_file; }
+
+  bool empty() const { return not m_dg.get(); }
+  
+private:
+  
+  /**
+   *  @brief This method will be used in place of regular delete.
+   */
+  static void destroy(const Pds::Dgram* dg) ;
 
   /**
    *  @brief Factory method which copies existing datagram and wraps new 
    *  object into a smart pointer.
    */
-  ptr copy(Pds::Dgram* dg) ;
+  static ptr copy(Pds::Dgram* dg) ;
 
-}
+  // Data members
+  ptr m_dg;
+  XtcFileName m_file;
+};
 
 } // namespace XtcInput
 

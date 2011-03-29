@@ -59,7 +59,7 @@ public:
   // Destructor
   ~XtcDgIterator () ;
 
-  // Returns next datagram, zero or EOF, throws exceptions for errors
+  // Returns next datagram, zero on EOF, throws exceptions for errors
   Dgram::ptr next() ;
 
 protected:

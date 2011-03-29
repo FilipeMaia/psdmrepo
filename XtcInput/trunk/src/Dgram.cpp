@@ -32,13 +32,12 @@
 //		----------------------------------------
 
 namespace XtcInput {
-namespace Dgram {
 
 /**
  *  @brief This method will be used in place of regular delete.
  */
 void 
-destroy(const Pds::Dgram* dg) 
+Dgram::destroy(const Pds::Dgram* dg) 
 { 
   delete [] (const char*)dg; 
 }
@@ -46,10 +45,10 @@ destroy(const Pds::Dgram* dg)
 /**
  *  @brief Factory method which wraps existing object into a smart pointer.
  */
-ptr 
-make_ptr(Pds::Dgram* dg)
+Dgram::ptr 
+Dgram::make_ptr(Pds::Dgram* dg)
 {
-  return ptr(dg, &destroy);
+  return ptr(dg, &Dgram::destroy);
 }
 
 
@@ -57,8 +56,8 @@ make_ptr(Pds::Dgram* dg)
  *  @brief Factory method which copies existing datagram and wraps new 
  *  object into a smart pointer.
  */
-ptr 
-copy(Pds::Dgram* dg) 
+Dgram::ptr 
+Dgram::copy(Pds::Dgram* dg) 
 {
   // make a copy
   char* dgbuf = (char*)dg ;
@@ -68,5 +67,4 @@ copy(Pds::Dgram* dg)
   return ptr((Pds::Dgram*)buf, &destroy);
 }
 
-} // namespace Dgram
 } // namespace XtcInput

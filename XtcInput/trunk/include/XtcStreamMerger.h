@@ -80,9 +80,13 @@ public:
   // Destructor
   ~XtcStreamMerger () ;
 
-  // read next datagram, return zero pointer after last file has been read,
-  // throws exception for errors.
-  Dgram::ptr next() ;
+  /**
+   *  @brief Read next datagram
+   *  
+   *  Returns object with zero pointer after last file has been read,
+   *  throws exception for errors.
+   */
+  Dgram next() ;
 
 protected:
 
@@ -93,7 +97,7 @@ private:
 
   // Data members
   std::vector<XtcDechunk*> m_streams ;
-  std::vector<Dgram::ptr> m_dgrams ;
+  std::vector<Dgram> m_dgrams ;
   MergeMode m_mode ;
   int32_t m_l1OffsetSec ;
   int32_t m_l1OffsetNsec ;

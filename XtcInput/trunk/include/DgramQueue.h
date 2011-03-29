@@ -54,21 +54,21 @@ namespace XtcInput {
 class DgramQueue : boost::noncopyable {
 public:
 
-  typedef Dgram::ptr pointer_type ;
+  typedef Dgram value_type ;
 
   // Default constructor
-  DgramQueue ( size_t maxSize ) ;
+  DgramQueue (size_t maxSize) ;
 
   // Destructor
   ~DgramQueue () ;
 
   // add one more datagram to the queue, if the queue
   // is full already then wait until somebody calls pop()
-  void push ( pointer_type dg ) ;
+  void push (const value_type& dg) ;
 
   // get one datagram from the head of the queue, if the queue is
   // empty then wait until somebody calls push()
-  pointer_type pop() ;
+  value_type pop() ;
 
 protected:
 
@@ -76,7 +76,7 @@ private:
 
   // Data members
   size_t m_maxSize ;
-  std::queue<pointer_type> m_queue ;
+  std::queue<value_type> m_queue ;
   boost::mutex m_mutex ;
   boost::condition m_condFull ;
   boost::condition m_condEmpty ;
