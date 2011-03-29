@@ -149,7 +149,7 @@ XtcInputModule::event(Event& evt, Env& env)
   
     if (not dg.get()) {
       // finita
-      MsgLog(logger, warning, "EOF seen before Unconfigure");
+      MsgLog(logger, debug, "EOF seen");
       return Stop;
     }
   
@@ -161,16 +161,13 @@ XtcInputModule::event(Event& evt, Env& env)
     
     case Pds::TransitionId::Configure:
       if (not (clock == m_transitions[trans])) {
-        MsgLog(logger, error, "Unexpected Configure transition");
-        // still want to update environment data from it
+        MsgLog(logger, warning, "Multiple Configure transitions encountered");
+        m_transitions[trans] = clock;
         fillEnv(dg, env);
       }
       break;
       
     case Pds::TransitionId::Unconfigure:
-      // Nothing is expected after this
-      status = Stop;
-      found = true;
       break;
    
     case Pds::TransitionId::BeginRun:
