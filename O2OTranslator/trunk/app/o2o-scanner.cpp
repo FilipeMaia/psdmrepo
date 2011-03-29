@@ -142,20 +142,23 @@ O2O_Scanner::runApp ()
   }
 
   XtcInput::XtcStreamMerger iter(files, 0x1000000, m_mergeMode.value(), m_skipDamaged.value(), m_l1offset.value());
-  XtcInput::Dgram::ptr dg;
-  while ( (dg = iter.next()).get() ) {
-    const Pds::Sequence& seq = dg->seq ;
+  while ( true ) {
+    
+    XtcInput::Dgram dg = iter.next();
+    if (dg.empty()) break;
+    
+    const Pds::Sequence& seq = dg.dg()->seq ;
     const Pds::ClockTime& clock = seq.clock() ;
     const Pds::TimeStamp& stamp = seq.stamp() ;
     printf("%s transition: damage %x, type %d, time %u sec %u nsec, ticks %u, fiducials %u, control %u, payloadSize %d\n",
            TransitionId::name(seq.service()),
-           dg->xtc.damage.value(),
+           dg.dg()->xtc.damage.value(),
            int(seq.type()),
            clock.seconds(), clock.nanoseconds(),
            stamp.ticks(),stamp.fiducials(),stamp.control(),
-           dg->xtc.sizeofPayload());
+           dg.dg()->xtc.sizeofPayload());
     
-    myLevelIter iter(&(dg->xtc));
+    myLevelIter iter(&(dg.dg()->xtc));
     iter.iterate();
   }
 

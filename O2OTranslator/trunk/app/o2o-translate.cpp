@@ -232,28 +232,31 @@ O2O_Translate::runApp ()
   uint64_t count = 0 ;
 
   // get all datagrams
-  XtcInput::Dgram::ptr dg;
-  while ( (dg = dgqueue.pop()).get() ) {
+  while ( true ) {
+    
+    XtcInput::Dgram dg = dgqueue.pop();
+    if (dg.empty()) break;
+    XtcInput::Dgram::ptr dgptr = dg.dg();
 
     ++ count ;
 
     WithMsgLogRoot( trace, out ) {
-      const ClockTime& clock = dg->seq.clock() ;
+      const ClockTime& clock = dgptr->seq.clock() ;
       out << "Transition: #" << count << " "
-          << std::left << std::setw(12) << Pds::TransitionId::name(dg->seq.service())
+          << std::left << std::setw(12) << Pds::TransitionId::name(dgptr->seq.service())
           << "  time: " << clock.seconds() << '.'
           << std::setfill('0') << std::setw(9) << clock.nanoseconds()
-          << "  payloadSize: " << dg->xtc.sizeofPayload()
-          << "  damage: " << std::hex << std::showbase << dg->xtc.damage.value() ;
+          << "  payloadSize: " << dgptr->xtc.sizeofPayload()
+          << "  damage: " << std::hex << std::showbase << dgptr->xtc.damage.value() ;
     }
 
     // validate the XTC structure
     O2OXtcValidator validator ;
-    if ( validator.process( &(dg->xtc) ) == 0 ) {
+    if ( validator.process( &(dgptr->xtc) ) == 0 ) {
 
       WithMsgLogRoot( error, out ) {
         out << "Validation failed: Transition: #" << count << " "
-            << Pds::TransitionId::name(dg->seq.service())
+            << Pds::TransitionId::name(dgptr->seq.service())
             << ", skipping datagram";
       }
 
@@ -265,11 +268,11 @@ O2O_Translate::runApp ()
         O2OXtcScannerI* scanner = *i ;
 
         try {
-          if ( scanner->eventStart ( *dg ) ) {    
-              O2OXtcIterator iter( &(dg->xtc), scanner );
+          if ( scanner->eventStart ( *dgptr ) ) {    
+              O2OXtcIterator iter( &(dgptr->xtc), scanner );
               iter.iterate();
           }    
-          scanner->eventEnd ( *dg ) ;
+          scanner->eventEnd ( *dgptr ) ;
         } catch ( std::exception& e ) {
           MsgLogRoot( error, "exception caught processing datagram: " << e.what() ) ;
           return 3 ;
