@@ -60,7 +60,10 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.styleSheetRed   = "background-color: rgb(255, 0, 0); color: rgb(255, 255, 255)"
         self.styleSheetGreen = "background-color: rgb(0, 255, 0); color: rgb(255, 255, 255)"
         self.styleSheetWhite = "background-color: rgb(230, 230, 230); color: rgb(0, 0, 0)"
+        self.styleSheetGrey  = "background-color: rgb(100, 100, 100); color: rgb(0, 0, 0)"
 
+        titFont12 = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
+        titFont10 = QtGui.QFont("Sans Serif", 10, QtGui.QFont.Bold)
 
         self.frame = QtGui.QFrame(self)
         self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
@@ -69,43 +72,64 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
         self.frame.setVisible(False)
 
-        titFont12 = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
-        titFont10 = QtGui.QFont("Sans Serif", 10, QtGui.QFont.Bold)
+        #self.titYminmax= QtGui.QLabel('Ylims:')
+        #self.titXminmax= QtGui.QLabel('Xlims:')
 
-        self.titYminmax= QtGui.QLabel('Ymin, Ymax:')
+        self.cboxYlimits   = QtGui.QCheckBox('Ylims:',self)
+        self.cboxXlimits   = QtGui.QCheckBox('Xlims:',self)
+
+        if cp.confpars.correlationWindowParameters[self.window][9]  : self.cboxYlimits.setCheckState(2)
+        if cp.confpars.correlationWindowParameters[self.window][10] : self.cboxXlimits.setCheckState(2)
 
         self.char_expand = u'\u25BE' # down-head triangle
         height = 18
-        width  = 80
+        width  = 60
 
         self.editCorrelationYmin  = QtGui.QLineEdit(str(cp.confpars.correlationWindowParameters[self.window][3]))
         self.editCorrelationYmax  = QtGui.QLineEdit(str(cp.confpars.correlationWindowParameters[self.window][4]))
+        self.editCorrelationXmin  = QtGui.QLineEdit(str(cp.confpars.correlationWindowParameters[self.window][5]))
+        self.editCorrelationXmax  = QtGui.QLineEdit(str(cp.confpars.correlationWindowParameters[self.window][6]))
 
-        #self.editCorrelationYmin  .setMaximumWidth(width)
-        #self.editCorrelationYmax  .setMaximumWidth(width)
+        self.editCorrelationYmin  .setMaximumWidth(width)
+        self.editCorrelationYmax  .setMaximumWidth(width)
+        self.editCorrelationXmin  .setMaximumWidth(width)
+        self.editCorrelationXmax  .setMaximumWidth(width)
 
         self.editCorrelationYmin  .setMaximumHeight(height)
         self.editCorrelationYmax  .setMaximumHeight(height)
+        self.editCorrelationXmin  .setMaximumHeight(height)
+        self.editCorrelationXmax  .setMaximumHeight(height)
 
         self.editCorrelationYmin  .setValidator(QtGui.QIntValidator(-1000000, 1000000, self))
         self.editCorrelationYmax  .setValidator(QtGui.QIntValidator(-1000000, 1000000, self))
+        self.editCorrelationXmin  .setValidator(QtGui.QIntValidator(-1000000, 1000000, self))
+        self.editCorrelationXmax  .setValidator(QtGui.QIntValidator(-1000000, 1000000, self))
 
         self.titVs         = QtGui.QLabel('Versus:')
         self.radioVsIndex  = QtGui.QRadioButton('Index')
         self.radioVsTime   = QtGui.QRadioButton('Time' )
         self.radioVsXPar   = QtGui.QRadioButton('X-par')
+        self.radioYHist    = QtGui.QRadioButton('Y-par hist.')
 
         self.radioGroup    = QtGui.QButtonGroup()
         self.radioGroup.addButton(self.radioVsIndex)
         self.radioGroup.addButton(self.radioVsTime )
         self.radioGroup.addButton(self.radioVsXPar )
+        self.radioGroup.addButton(self.radioYHist  )
 
         self.titCorrXDataSet = QtGui.QLabel('X-par:')
         self.titCorrYDataSet = QtGui.QLabel('Y-par:')
+        #self.titCorrXDataSet.setFont (titFont10)   
+        #self.titCorrYDataSet.setFont (titFont10)   
         self.butCorrXDataSet = QtGui.QPushButton(cp.confpars.correlationWindowParameters[self.window][1])
         self.butCorrYDataSet = QtGui.QPushButton(cp.confpars.correlationWindowParameters[self.window][0])
         self.butCorrXParName = QtGui.QPushButton(cp.confpars.correlationWindowParameters[self.window][8])
         self.butCorrYParName = QtGui.QPushButton(cp.confpars.correlationWindowParameters[self.window][7])
+
+        self.butCorrXDataSet  .setMaximumHeight(height)
+        self.butCorrYDataSet  .setMaximumHeight(height)
+        self.butCorrXParName  .setMaximumHeight(height)
+        self.butCorrYParName  .setMaximumHeight(height)
 
         self.butCorrXDataSet.setMaximumWidth(295)
         self.butCorrYDataSet.setMaximumWidth(295)
@@ -133,20 +157,26 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         grid.addWidget(self.radioVsIndex,        2, 1)
         grid.addWidget(self.radioVsTime,         2, 2)
         grid.addWidget(self.radioVsXPar,         2, 3)
+        grid.addWidget(self.radioYHist,          2, 5)
 
         grid.addWidget(self.titCorrXDataSet,     3, 0)
         grid.addWidget(self.butCorrXDataSet,     3, 1, 1, 4)
         grid.addWidget(self.butCorrXParName,     3, 5)
         
-        #grid.addWidget(self.titYminmax,          4, 0, 1, 2)
-        #grid.addWidget(self.editCorrelationYmin, 4, 2)
-        #grid.addWidget(self.editCorrelationYmax, 4, 3)
+        grid.addWidget(self.cboxYlimits,         4, 0)
+        grid.addWidget(self.editCorrelationYmin, 4, 1)
+        grid.addWidget(self.editCorrelationYmax, 4, 2)
+
+        grid.addWidget(self.cboxXlimits,         4, 3)
+        grid.addWidget(self.editCorrelationXmin, 4, 4)
+        grid.addWidget(self.editCorrelationXmax, 4, 5)
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(grid) 
         self.vbox.addStretch(1)     
 
         self.setButStatus()
+        self.setEditFieldsStatus()
 
         if parent == None :
             self.setLayout(self.vbox)
@@ -155,16 +185,27 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.connect(self.radioVsIndex,        QtCore.SIGNAL('clicked()'),          self.processRadioVsIndex )
         self.connect(self.radioVsTime,         QtCore.SIGNAL('clicked()'),          self.processRadioVsTime )
         self.connect(self.radioVsXPar,         QtCore.SIGNAL('clicked()'),          self.processRadioVsXPar )
-        self.connect(self.editCorrelationYmin, QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationYmin )
-        self.connect(self.editCorrelationYmax, QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationYmax )
+        self.connect(self.radioYHist,          QtCore.SIGNAL('clicked()'),          self.processRadioYHist )
+
         self.connect(self.butCorrXDataSet,     QtCore.SIGNAL('clicked()'),          self.processMenuForXDataSet )
         self.connect(self.butCorrYDataSet,     QtCore.SIGNAL('clicked()'),          self.processMenuForYDataSet )
         self.connect(self.butCorrXParName,     QtCore.SIGNAL('clicked()'),          self.processMenuForXParName )
         self.connect(self.butCorrYParName,     QtCore.SIGNAL('clicked()'),          self.processMenuForYParName )
+
+        self.connect(self.editCorrelationYmin, QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationYmin )
+        self.connect(self.editCorrelationYmax, QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationYmax )
+        self.connect(self.editCorrelationXmin, QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationXmin )
+        self.connect(self.editCorrelationXmax, QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationXmax )
+
+        self.connect(self.cboxYlimits,         QtCore.SIGNAL('stateChanged(int)'),  self.processCboxYlimits)
+        self.connect(self.cboxXlimits,         QtCore.SIGNAL('stateChanged(int)'),  self.processCboxXlimits)
   
         cp.confpars.selectionWindowIsOpen = True
 
         self.showToolTips()
+
+        self.setMinimumHeight(150)
+        self.setMaximumHeight(200)
 
     #-------------------
     # Private methods --
@@ -176,21 +217,11 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.radioVsIndex      .setToolTip('Select X axis parameter between Index/Time/Parameter')
         self.radioVsTime       .setToolTip('Select X axis parameter between Index/Time/Parameter')
         self.radioVsXPar       .setToolTip('Select X axis parameter between Index/Time/Parameter')
+        self.radioYHist        .setToolTip('Select 1-D histogram for Y-parameter')
         self.butCorrYDataSet   .setToolTip('Select the dataset for the Y axis parameter.\n' +\
                                            'The list of datasets is formed from the checked items in the HDF5 tree GUI')
         self.butCorrYParName   .setToolTip('Select the parameter name in the dataset.\n' +\
                                            'The dataset should be selected first in the left box')
-
-    def setEditFieldsReadOnly(self, isReadOnly=False):
-
-        if isReadOnly == True : self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('grey'))
-        else :                  self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('white'))
-
-        self.editCorrelationYmin.setPalette(self.palette)
-        self.editCorrelationYmax.setPalette(self.palette)
-
-        self.editCorrelationYmin.setReadOnly(isReadOnly)
-        self.editCorrelationYmax.setReadOnly(isReadOnly)
 
 
     def resizeEvent(self, e):
@@ -226,7 +257,12 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
             self.radioVsXPar.setChecked(True)
             self.processRadioVsXPar()
 
+        elif cp.confpars.correlationWindowParameters[self.window][2] == 3 :
+            self.radioYHist.setChecked(True)
+            self.processRadioYHist()
+
         self.setButCorrYDataSetTextAlignment()
+
 
 
     def processRadioVsIndex(self):
@@ -253,6 +289,18 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.setButCorrXDataSetTextAlignment()
 
 
+    def processRadioYHist(self):
+        cp.confpars.correlationWindowParameters[self.window][2] = 3
+        dsname = 'Is-not-used'
+        self.butCorrXDataSet.setText(dsname)
+        cp.confpars.correlationWindowParameters[self.window][1] = str(dsname)
+
+        self.butCorrXParName.setText('None')
+        cp.confpars.correlationWindowParameters[self.window][8] = 'None'
+
+        self.setButCorrXDataSetTextAlignment()
+  
+
     def processRadioVsXPar(self):
         cp.confpars.correlationWindowParameters[self.window][2] = 2
 
@@ -260,9 +308,10 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
 
         if     dsname == 'None' \
             or dsname == 'Time' \
-            or dsname == 'Index' :
+            or dsname == 'Index' \
+            or dsname == 'Is-not-used' :
 
-            self.butCorrXDataSet.setText('Select X parameter')
+            self.butCorrXDataSet.setText('Select-X-parameter')
             self.butCorrXParName.setText('None')
             cp.confpars.correlationWindowParameters[self.window][8] = 'None'
 
@@ -273,12 +322,62 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         #self.setButCorrXParNameTextAlignment()
 
 
+    def setEditFieldsStatus(self):
+        if self.cboxYlimits.isChecked() :
+            self.editCorrelationYmin.setStyleSheet(self.styleSheetWhite)
+            self.editCorrelationYmax.setStyleSheet(self.styleSheetWhite)
+            self.editCorrelationYmin.setReadOnly(False)
+            self.editCorrelationYmax.setReadOnly(False)
+
+        else :
+            self.editCorrelationYmin.setStyleSheet(self.styleSheetGrey)
+            self.editCorrelationYmax.setStyleSheet(self.styleSheetGrey)
+            self.editCorrelationYmin.setReadOnly(True)
+            self.editCorrelationYmax.setReadOnly(True)
+
+        if self.cboxXlimits.isChecked() :
+            self.editCorrelationXmin.setStyleSheet(self.styleSheetWhite)
+            self.editCorrelationXmax.setStyleSheet(self.styleSheetWhite)
+            self.editCorrelationXmin.setReadOnly(False)
+            self.editCorrelationXmax.setReadOnly(False)
+
+        else :
+            self.editCorrelationXmin.setStyleSheet(self.styleSheetGrey)
+            self.editCorrelationXmax.setStyleSheet(self.styleSheetGrey)
+            self.editCorrelationXmin.setReadOnly(True)
+            self.editCorrelationXmax.setReadOnly(True)
+
+
+    def processCboxYlimits(self):
+        if self.cboxYlimits.isChecked():
+            cp.confpars.correlationWindowParameters[self.window][9] = True
+        else:
+            cp.confpars.correlationWindowParameters[self.window][9] = False
+        self.setEditFieldsStatus()
+
+
+    def processCboxXlimits(self):
+        if self.cboxXlimits.isChecked():
+            cp.confpars.correlationWindowParameters[self.window][10] = True
+        else:
+            cp.confpars.correlationWindowParameters[self.window][10] = False
+        self.setEditFieldsStatus()
+
+
     def processEditCorrelationYmin(self):
         cp.confpars.correlationWindowParameters[self.window][3] = int(self.editCorrelationYmin.displayText())        
 
 
     def processEditCorrelationYmax(self):
         cp.confpars.correlationWindowParameters[self.window][4] = int(self.editCorrelationYmax.displayText())        
+
+
+    def processEditCorrelationXmin(self):
+        cp.confpars.correlationWindowParameters[self.window][5] = int(self.editCorrelationXmin.displayText())        
+
+
+    def processEditCorrelationXmax(self):
+        cp.confpars.correlationWindowParameters[self.window][6] = int(self.editCorrelationXmax.displayText())        
 
 
     def setButCorrYDataSetTextAlignment(self):
@@ -295,13 +394,14 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
 
     def setButCorrXDataSetTextAlignment(self):
         if     self.butCorrXDataSet.text() == 'Time' \
-            or self.butCorrXDataSet.text() == 'Index' :
+            or self.butCorrXDataSet.text() == 'Index' \
+            or self.butCorrXDataSet.text() == 'Is-not-used' :
             self.butCorrXDataSet.setStyleSheet('Text-align:center;' + self.styleSheetWhite)
             self.butCorrXParName.setStyleSheet(self.styleSheetWhite)
             self.butCorrXParName.setText('None')
 
         elif   self.butCorrXDataSet.text() == 'None' \
-            or self.butCorrXDataSet.text() == 'Select X parameter' :
+            or self.butCorrXDataSet.text() == 'Select-X-parameter' :
             self.butCorrXDataSet.setStyleSheet('Text-align:center;' + self.styleSheetRed)
             self.butCorrXParName.setStyleSheet(self.styleSheetRed)
             self.butCorrXParName.setText('None')

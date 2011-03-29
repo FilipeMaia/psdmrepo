@@ -51,7 +51,6 @@ import PlotsForWaveform          as wavef
 import PlotsForCorrelations      as corrs
 import PlotsForCSpadProjections  as cspadproj
 import PlotsForImageProjections  as imageproj
-
 import PrintHDF5                 as printh5
 
 #---------------------
@@ -707,34 +706,13 @@ class DrawEvent ( object ) :
 
         for self.nwin in range(cp.confpars.correlationNWindows) :
 
-            Ydsname   = cp.confpars.correlationWindowParameters[self.nwin][0]
-            Xdsname   = cp.confpars.correlationWindowParameters[self.nwin][1]
-            radioXPar = cp.confpars.correlationWindowParameters[self.nwin][2] 
-
-            if Ydsname == 'None' :
-                print 'THE Ydsname IS SET INCORRECTLY TO', Ydsname, ' THE CORRELATION PLOT', self.nwin,' IS IGNORED'
-                continue
-
-            self.dsY     = self.h5file[Ydsname]
-            print 'dsY.shape=',self.dsY.shape
-
-            if radioXPar == 0 : # for Index
-                self.dsX = None
-
-            if radioXPar == 1 : # for Time
-                Xdsname  = printh5.get_item_path_to_last_name(Ydsname) + '/time'
-                print 'Xdsname =',Xdsname 
-                self.dsX = self.h5file[Xdsname]
-
-            if radioXPar == 2 : # for X-Parameter
-                if Xdsname == 'None' :
-                    print 'THE Xdsname IS SET INCORRECTLY TO', Xdsname, ' THE CORRELATION PLOT', self.nwin,' IS IGNORED' 
-                    continue
-                self.dsX = self.h5file[Xdsname]
+            #Ydsname   = cp.confpars.correlationWindowParameters[self.nwin][0]
+            #Xdsname   = cp.confpars.correlationWindowParameters[self.nwin][1]
+            #radioXPar = cp.confpars.correlationWindowParameters[self.nwin][2] 
 
             self.figNum += 1 
             if cp.confpars.correlationsIsOn : 
-                self.plotsCorrelations.plotCorrelations(self.set_fig('2x1'), self.dsY, self.dsX)
+                self.plotsCorrelations.plotCorrelations(self.set_fig('2x1'), self.h5file)
             else : self.close_fig(self.figNum)
 
 #-----------------------------------------

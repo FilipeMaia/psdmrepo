@@ -44,7 +44,7 @@ class GUIConfiguration ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(370, 350, 500, 200)
+        self.setGeometry(370, 350, 500, 150)
         self.setWindowTitle('Configuration')
 
         self.frame = QtGui.QFrame(self)
@@ -60,7 +60,7 @@ class GUIConfiguration ( QtGui.QWidget ) :
         self.butBrowse   = QtGui.QPushButton("Browse")
         self.butRead     = QtGui.QPushButton("Read")
         self.butWrite    = QtGui.QPushButton("Write")
-        self.butDefault  = QtGui.QPushButton("Set default")
+        self.butDefault  = QtGui.QPushButton("Reset default")
         self.butPrint    = QtGui.QPushButton("Print current")
         self.butExit     = QtGui.QPushButton("Quit")
 
@@ -91,9 +91,9 @@ class GUIConfiguration ( QtGui.QWidget ) :
         grid.addWidget(self.butWrite,      1, 1)
         grid.addWidget(self.butDefault,    1, 2)
         grid.addWidget(self.butPrint,      1, 3)
-        grid.addWidget(self.titRadio,      2, 0)
-        grid.addWidget(self.radioRead,     2, 1, 1, 2)
-        grid.addWidget(self.radioDefault,  3, 1, 1, 2)
+        #grid.addWidget(self.titRadio,      2, 0)
+        #grid.addWidget(self.radioRead,     2, 1, 1, 2)
+        #grid.addWidget(self.radioDefault,  3, 1, 1, 2)
         grid.addWidget(self.butExit,       4, 3)
 
         vbox = QtGui.QVBoxLayout()

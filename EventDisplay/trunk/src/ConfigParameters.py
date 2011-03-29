@@ -192,9 +192,9 @@ class ConfigParameters ( object ) :
 
         self.correlationWindowParameters = []
         for win in range(self.correlationNWindowsMax) :
-            self.correlationWindowParameters.append(['None','None',    0, None, None, None, None,'None','None', None, None])
-                                                   #[ Ydsn,  Xdsn, Radio, Ymin, Ymax, Xmin, Xmax, Ypar,  Xpar,  Yind, Xind]
-                                                   #[    0,     1,     2,    3,    4,    5,    6,    7,     8,     9,   10]
+            self.correlationWindowParameters.append(['None','None',    0,    0, 1000,    0, 1000,'None','None', False,     False])
+                                                   #[ Ydsn,  Xdsn, Radio, Ymin, Ymax, Xmin, Xmax, Ypar,  Xpar,  YLimsIsOn, XLimsIsOn]
+                                                   #[    0,     1,     2,    3,    4,    5,    6,    7,     8,     9,      10]
 
         self.correlationsIsOn  = True
        #self.perEventDistIsOn  = True
@@ -354,8 +354,8 @@ class ConfigParameters ( object ) :
             print 'CORR_XMAX',             self.correlationWindowParameters[win][6] 
             print 'CORR_YPARNAME',         self.correlationWindowParameters[win][7] 
             print 'CORR_XPARNAME',         self.correlationWindowParameters[win][8] 
-            print 'CORR_YPARINDEX',        self.correlationWindowParameters[win][9] 
-            print 'CORR_XPARINDEX',        self.correlationWindowParameters[win][10] 
+            print 'CORR_YLIMS_IS_ON',      self.correlationWindowParameters[win][9] 
+            print 'CORR_XLIMS_IS_ON',      self.correlationWindowParameters[win][10] 
 
         print 'NUM_EVENTS_FOR_AVERAGE',    self.numEventsAverage
         print 'SELECTION_IS_ON',           self.selectionIsOn
@@ -522,8 +522,8 @@ class ConfigParameters ( object ) :
                 elif key == 'CORR_XMAX'                : self.correlationWindowParameters[win][6] = self.getValIntOrNone(val)      
                 elif key == 'CORR_YPARNAME'            : self.correlationWindowParameters[win][7] = val  
                 elif key == 'CORR_XPARNAME'            : self.correlationWindowParameters[win][8] = val  
-                elif key == 'CORR_YPARINDEX'           : self.correlationWindowParameters[win][9] = self.getValIntOrNone(val) 
-                elif key == 'CORR_XPARINDEX'           : self.correlationWindowParameters[win][10]= self.getValIntOrNone(val) 
+                elif key == 'CORR_YLIMS_IS_ON'         : self.correlationWindowParameters[win][9] = dicBool[val.lower()] 
+                elif key == 'CORR_XLIMS_IS_ON'         : self.correlationWindowParameters[win][10]= dicBool[val.lower()] 
 
                 elif key == 'PROJ_CENTER_X'            : self.projCenterX           = float(val)
                 elif key == 'PROJ_CENTER_Y'            : self.projCenterY           = float(val)
@@ -692,8 +692,8 @@ class ConfigParameters ( object ) :
             f.write('CORR_XMAX'             + space + str(self.correlationWindowParameters[win][6] ) + '\n') 
             f.write('CORR_YPARNAME'         + space + str(self.correlationWindowParameters[win][7] ) + '\n') 
             f.write('CORR_XPARNAME'         + space + str(self.correlationWindowParameters[win][8] ) + '\n') 
-            f.write('CORR_YPARINDEX'        + space + str(self.correlationWindowParameters[win][9] ) + '\n') 
-            f.write('CORR_XPARINDEX'        + space + str(self.correlationWindowParameters[win][10]) + '\n') 
+            f.write('CORR_YLIMS_IS_ON'      + space + str(self.correlationWindowParameters[win][9] ) + '\n') 
+            f.write('CORR_XLIMS_IS_ON'      + space + str(self.correlationWindowParameters[win][10]) + '\n') 
 
         f.write('PROJ_CENTER_X'                     + space + str(self.projCenterX         )       + '\n')
         f.write('PROJ_CENTER_Y'                     + space + str(self.projCenterY         )       + '\n')

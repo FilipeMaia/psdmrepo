@@ -41,14 +41,15 @@ import time   # for sleep(sec)
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import GUIPlayer        as guiplr
-import GUIWhatToDisplay as guiwtd
-import GUISelectItems   as guiselitems
-import GUIConfiguration as guiconfig
-import GUISelection     as guisel
-import ConfigParameters as cp
-#import DrawEvent        as drev
-import PrintHDF5        as printh5 # for my print_group(g,offset)
+import GUIPlayer          as guiplr
+import GUIComplexCommands as guicomplex
+import GUIWhatToDisplay   as guiwtd
+import GUISelectItems     as guiselitems
+import GUIConfiguration   as guiconfig
+import GUISelection       as guisel
+import ConfigParameters   as cp
+#import DrawEvent          as drev
+import PrintHDF5          as printh5 # for my print_group(g,offset)
 
 #---------------------
 #  Class definition --
@@ -130,6 +131,10 @@ class GUIMain ( QtGui.QWidget ) :
         hboxT = QtGui.QHBoxLayout() 
         hboxT.addWidget(self.wplayer)
 
+        self.wcomplex = guicomplex.GUIComplexCommands(None, self.wplayer)
+        hboxA = QtGui.QHBoxLayout() 
+        hboxA.addWidget(self.wcomplex)
+
         hbox = QtGui.QHBoxLayout()
         hbox.addWidget(self.config)
         hbox.addWidget(self.save)
@@ -148,6 +153,7 @@ class GUIMain ( QtGui.QWidget ) :
         vbox.addLayout(hboxE)
         vbox.addStretch(1)     
         vbox.addLayout(hboxT)
+        vbox.addLayout(hboxA)
         vbox.addStretch(1)
         vbox.addLayout(hbox)
 

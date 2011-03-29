@@ -100,8 +100,8 @@ class GUISelectionWindow ( QtGui.QWidget ) :
         self.editSelectionYmax  .setValidator(QtGui.QIntValidator(0, 2000,self))
 
         self.titThreshold  = QtGui.QLabel('Threshold on min intensity (ADU) ')
-        self.radioInWin    = QtGui.QRadioButton("in window")
-        self.radioInBin    = QtGui.QRadioButton("in bin")
+        self.radioInWin    = QtGui.QRadioButton("integral")
+        self.radioInBin    = QtGui.QRadioButton("maximal")
         self.radioGroup    = QtGui.QButtonGroup()
         self.radioGroup.addButton(self.radioInWin)
         self.radioGroup.addButton(self.radioInBin)

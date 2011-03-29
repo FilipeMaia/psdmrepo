@@ -168,6 +168,9 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         hboxCS01 = QtGui.QHBoxLayout()
         hboxCS01.addWidget(self.titCSpad)        
         hboxCS01.addStretch(1) 
+        hboxCS01.addWidget(self.titNWin)
+        hboxCS01.addWidget(self.butMenuNWin)
+        hboxCS01.addStretch(1) 
         hboxCS01.addWidget(self.wquadpair)
                            
         hboxCS02 = QtGui.QHBoxLayout()
@@ -178,10 +181,10 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         hboxCS02.addWidget(self.sliderCSAmin)        
         hboxCS02.addWidget(self.sliderCSAmax)        
 
-        hboxCS03 = QtGui.QHBoxLayout()
-        hboxCS03.addWidget(self.titNWin)
-        hboxCS03.addWidget(self.butMenuNWin)
-        hboxCS03.addStretch(1) 
+        #hboxCS03 = QtGui.QHBoxLayout()
+        #hboxCS03.addWidget(self.titNWin)
+        #hboxCS03.addWidget(self.butMenuNWin)
+        #hboxCS03.addStretch(1) 
 
         gridCS = QtGui.QGridLayout()
         gridCS.addWidget(self.titCSImage,             0, 0)
@@ -209,8 +212,8 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.vbox.addLayout(hboxCS01)
         self.vbox.addLayout(gridCS) 
         self.vbox.addLayout(hboxCS02)
-        self.vbox.addStretch(1)     
-        self.vbox.addLayout(hboxCS03)
+        #self.vbox.addStretch(1)     
+        #self.vbox.addLayout(hboxCS03)
 
         if parent == None :
             #self.vbox.addLayout(hboxC)

@@ -309,7 +309,8 @@ def getListOfDatasetParNames(dsname=None):
     if dsname=='None'  or \
        dsname=='Index' or \
        dsname=='Time'  or \
-       dsname=='Select X parameter' :
+       dsname=='Is-not-used' or \
+       dsname=='Select-X-parameter' :
 
         listOfDatasetParNames.append('None')
         return listOfDatasetParNames
