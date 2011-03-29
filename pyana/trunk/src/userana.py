@@ -77,9 +77,10 @@ class evt_dispatch(object) :
             # configure transition 
             cfgTime = evt.getTime()
             if cfgTime != self.lastConfigTime :
-                if self.lastConfigTime : 
-                    for userana in self.userObjects : userana.endjob( env )
-                for userana in self.userObjects : userana.beginjob( evt, env )
+                if not self.lastConfigTime :
+                    for userana in self.userObjects : userana.beginjob( evt, env )
+                else:
+                    _log.warning("Multiple Configure transitions encountered.")
                 self.lastConfigTime = cfgTime
             
         elif svc == xtc.TransitionId.BeginRun :
@@ -115,7 +116,7 @@ class evt_dispatch(object) :
 
     def finish(self, env):
         
-        _log.info("evt_dispatch.finish: %s", self.__dict__ )
+        _log.debug("evt_dispatch.finish: %s", self.__dict__ )
         
         # finish with run first if was not done yet
         if self.calibbegun :

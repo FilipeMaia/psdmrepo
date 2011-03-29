@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-25
+2011-03-28 - Andy Salnikov
+- changed method dispatch so that beginjob/endjob is called only
+  once per job, not per configure/unconfigure.
+- if there are multiple configure transition in the same job the 
+  warning will be printed.
+
 Tag: V00-00-24
 2011-02-24 - Andy Salnikov
 - previous tag accidentally "overloaded" event.get() method, doing
