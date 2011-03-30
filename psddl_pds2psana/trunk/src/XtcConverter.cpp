@@ -78,12 +78,31 @@ namespace {
     
     // XTC data object
     boost::shared_ptr<XtcType> xptr(xtc, (XtcType*)(xtc->payload()));
-    
+    size_t xtcSize = xtc->sizeofPayload();
+
     // Proxy type
     typedef EvtProxy<PsanaType, FinalType, XtcType> ProxyType; 
 
     // store proxy
-    evt.putProxy<PsanaType>(boost::make_shared<ProxyType>(xptr), xtc->src);
+    evt.putProxy<PsanaType>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+  }
+  
+  template<typename FinalType>
+  void 
+  storeDataProxyWithSize(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt)
+  {
+    typedef typename FinalType::XtcType XtcType;
+    typedef typename FinalType::PsanaType PsanaType;
+    
+    // XTC data object
+    boost::shared_ptr<XtcType> xptr(xtc, (XtcType*)(xtc->payload()));
+    size_t xtcSize = xtc->sizeofPayload();
+    
+    // Proxy type
+    typedef EvtProxy<PsanaType, FinalType, XtcType, true> ProxyType; 
+
+    // store proxy
+    evt.putProxy<PsanaType>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
   }
   
   template<typename FinalType, typename XtcConfigType>
@@ -292,6 +311,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
   case Pds::TypeId::Id_AcqTdcConfig:
     break;
   case Pds::TypeId::Id_AcqTdcData:
+    if (version == 1) ::storeDataProxyWithSize<Acqiris::TdcDataV1>(xtc, evt);
     break;
   case Pds::TypeId::NumberOf:
     break;

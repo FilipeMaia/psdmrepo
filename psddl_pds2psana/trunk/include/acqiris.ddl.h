@@ -111,7 +111,7 @@ class TdcDataV1 : public Psana::Acqiris::TdcDataV1 {
 public:
   typedef PsddlPds::Acqiris::TdcDataV1 XtcType;
   typedef Psana::Acqiris::TdcDataV1 PsanaType;
-  TdcDataV1(const boost::shared_ptr<const XtcType>& xtcPtr);
+  TdcDataV1(const boost::shared_ptr<const XtcType>& xtcPtr, size_t xtcSize);
   virtual ~TdcDataV1();
   virtual const Psana::Acqiris::TdcDataV1_Item& data(uint32_t i0) const;
   virtual std::vector<int> _data_shape() const;

@@ -35,6 +35,26 @@
 
 namespace psddl_pds2psana {
 
+  
+// Factory methods to create new object with different constructor signatures
+template <typename PDS2PSType, typename XTCType, bool UseSize>
+struct EvtProxyFactory {};
+
+template <typename PDS2PSType, typename XTCType>
+struct EvtProxyFactory<PDS2PSType, XTCType, false> { 
+  static PDS2PSType* create(const boost::shared_ptr<XTCType> xtcObj, size_t /*xtcSize*/) {
+    return new PDS2PSType(xtcObj);
+  }
+};
+
+template <typename PDS2PSType, typename XTCType>
+struct EvtProxyFactory<PDS2PSType, XTCType, true> { 
+  static PDS2PSType* create(const boost::shared_ptr<XTCType> xtcObj, size_t xtcSize) {
+    return new PDS2PSType(xtcObj, xtcSize);
+  }
+};
+
+  
 /**
  *  @brief Implementation of the proxy interface for the XTC data object 
  *  that does not need config object.
@@ -49,13 +69,13 @@ namespace psddl_pds2psana {
  *  @author Andrei Salnikov
  */
 
-template <typename PSType, typename PDS2PSType, typename XTCType>
+template <typename PSType, typename PDS2PSType, typename XTCType, bool UseSize=false>
 class EvtProxy : public PSEvt::Proxy<PSType> {
 public:
 
   // Default constructor
-  EvtProxy (const boost::shared_ptr<XTCType>& xtcObj) 
-    : m_xtcObj(xtcObj) {}
+  EvtProxy (const boost::shared_ptr<XTCType>& xtcObj, size_t xtcSize) 
+    : m_xtcObj(xtcObj), m_xtcSize(xtcSize) {}
 
   // Destructor
   virtual ~EvtProxy () {}
@@ -75,15 +95,18 @@ protected:
                                             const std::string& key)
   {
     if (not m_psObj.get()) {
-      m_psObj.reset(new PDS2PSType(m_xtcObj));
+      typedef EvtProxyFactory<PDS2PSType, XTCType, UseSize> Factory;
+      m_psObj.reset(Factory::create(m_xtcObj, m_xtcSize));
     }
     return m_psObj;
   }
   
 private:
 
+  
   // Data members
   boost::shared_ptr<XTCType> m_xtcObj;
+  size_t m_xtcSize;
   boost::shared_ptr<PSType> m_psObj;
   
 };

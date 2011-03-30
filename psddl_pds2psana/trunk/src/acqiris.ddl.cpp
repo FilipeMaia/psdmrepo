@@ -291,18 +291,6 @@ Psana::Acqiris::TdcDataV1Marker::Type pds_to_psana(PsddlPds::Acqiris::TdcDataV1M
   return Psana::Acqiris::TdcDataV1Marker::Type(e);
 }
 
-TdcDataV1::TdcDataV1(const boost::shared_ptr<const XtcType>& xtcPtr)
-  : Psana::Acqiris::TdcDataV1()
-  , m_xtcObj(xtcPtr)
-{
-  {
-    const std::vector<int>& dims = xtcPtr->_data_shape();
-    _data.reserve(dims[0]);
-    for (int i0=0; i0 != dims[0]; ++i0) {
-      _data.push_back(psddl_pds2psana::Acqiris::pds_to_psana(xtcPtr->data(i0)));
-    }
-  }
-}
 TdcDataV1::~TdcDataV1()
 {
 }
