@@ -481,28 +481,38 @@ class DdlPds2Psana ( object ) :
 
     def _genCtor(self, type, cfg, cfgnum):
 
+        logging.debug("_genCtor: type: %s", type)
+
         args = "const boost::shared_ptr<const XtcType>& xtcPtr"
-        if cfg : 
+        if cfg :
             cfgName = cfg.fullName('C++', self.pdsdata_ns)
             args += ", const boost::shared_ptr<const %s>& cfgPtr" % cfgName
+        if type.size.value is None:
+            # special case when the data size have to be guessed from XTC size
+            args += ", size_t xtcSize"
+            
         print >>self.inc, "  %s(%s);" % (type.name, args)
         
-        print >>self.cpp, "%s::%s(%s)" % (type.name, type.name, args)
-        print >>self.cpp, "  : %s()" % (type.fullName('C++', self.psana_ns))
-        print >>self.cpp, "  , m_xtcObj(xtcPtr)"
-        if cfg : print >>self.cpp, "  , m_cfgPtr%i(cfgPtr)" % cfgnum
-        
-        # member initialization
-        for attr in type.attributes() :
-            self._genAttrInitNonArray(attr)
-        
-        print >>self.cpp, "{"
-
-        # member initialization
-        for attr in type.attributes() :
-            self._genAttrInitArray(attr)
+        if type.size.value is not None:
             
-        print >>self.cpp, "}"
+            # if size is None manual implementation of the constructor will be provided
+            
+            print >>self.cpp, "%s::%s(%s)" % (type.name, type.name, args)
+            print >>self.cpp, "  : %s()" % (type.fullName('C++', self.psana_ns))
+            print >>self.cpp, "  , m_xtcObj(xtcPtr)"
+            if cfg : print >>self.cpp, "  , m_cfgPtr%i(cfgPtr)" % cfgnum
+            
+            # member initialization
+            for attr in type.attributes() :
+                self._genAttrInitNonArray(attr)
+            
+            print >>self.cpp, "{"
+    
+            # member initialization
+            for attr in type.attributes() :
+                self._genAttrInitArray(attr)
+                
+            print >>self.cpp, "}"
 
 
     def _genAttrInitNonArray(self, attr):
