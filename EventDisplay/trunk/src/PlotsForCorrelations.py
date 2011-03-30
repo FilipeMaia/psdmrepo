@@ -82,7 +82,8 @@ class PlotsForCorrelations ( object ) :
         self.XLimsIsOn = cp.confpars.correlationWindowParameters[win][10] 
         self.XNBins    = 50
         self.YNBins    = 50
-
+        self.LogIsOn   = False
+        
         if self.Ydsname == 'None' :
             print 'THE Ydsname=', self.Ydsname, ' IS SET INCORRECTLY. THE CORRELATION PLOT', self.nwin,' IS IGNORED'
             return
@@ -167,7 +168,6 @@ class PlotsForCorrelations ( object ) :
 
 
 
-
     def plot1DHistogram( self ) :
         plt.clf()
         plt.xlim(auto=True)
@@ -197,17 +197,17 @@ class PlotsForCorrelations ( object ) :
         
         arr2d, xedges, yedges = np.histogram2d(self.Xarr, self.Yarr, bins=XYNBins, range=XYRange) #, normed=False, weights=None) 
 
-        axes = plt.imshow(np.rot90(arr2d), interpolation='nearest', extent=XYExtent, aspect='auto') #, origin='upper'
+        if self.LogIsOn : self.arrImage = log(arr2d)
+        else :            self.arrImage =     arr2d
 
-        colb = plt.colorbar(axes, pad=0.005, fraction=0.10, aspect=12, shrink=1) # pad=0.10, orientation=2, aspect = 8,, ticks=coltickslocs
+        axes = plt.imshow(np.rot90(self.arrImage), interpolation='nearest', extent=XYExtent, aspect='auto') #, origin='upper'
+
+        colb = plt.colorbar(axes, pad=0.005, fraction=0.10, aspect=12, shrink=1) # pad=0.10, orientation=2, aspect = 8, ticks=coltickslocs
 
         plt.xlabel(self.XParName)
         plt.ylabel(self.YParName)
         plt.title(self.PlotTitle,color='r',fontsize=20) # pars like in class Text
         self.fig.canvas.set_window_title(self.Ydsname)        
-
-
-
 
 
     def mapCorrelatingArraysByTimeInit( self ) :
