@@ -80,6 +80,8 @@ class PlotsForCorrelations ( object ) :
         self.XParName  = cp.confpars.correlationWindowParameters[win][8] 
         self.YLimsIsOn = cp.confpars.correlationWindowParameters[win][9] 
         self.XLimsIsOn = cp.confpars.correlationWindowParameters[win][10] 
+        self.XNBins    = 50
+        self.YNBins    = 50
 
         if self.Ydsname == 'None' :
             print 'THE Ydsname=', self.Ydsname, ' IS SET INCORRECTLY. THE CORRELATION PLOT', self.nwin,' IS IGNORED'
@@ -102,7 +104,9 @@ class PlotsForCorrelations ( object ) :
             print 'Index array from 0 to', nYpoints
             self.XTitle = 'Index'
             self.PlotTitle = 'Parameter vs Index'
-            
+            self.plotWaveform()
+
+
         elif self.radioXPar == 1 : # for Time
             self.Xdsname  = printh5.get_item_path_to_last_name(self.Ydsname) + '/time'
             print 'Xdsname =',self.Xdsname 
@@ -112,7 +116,9 @@ class PlotsForCorrelations ( object ) :
             print 'Time array :\n', self.Xarr 
             self.XTitle = 'Time (sec)'
             self.PlotTitle = 'Parameter vs Time'
+            self.plotWaveform()
 
+            
         elif self.radioXPar == 2 : # for X-Parameter
             if self.Xdsname == 'None' :
                 print 'THE Xdsname=', self.Xdsname, ' IS SET INCORRECTLY. THE CORRELATION PLOT', win,' IS IGNORED' 
@@ -132,13 +138,13 @@ class PlotsForCorrelations ( object ) :
             self.XTitle = self.XParName
             self.PlotTitle = 'Correlations of two parameters'
             self.markerStyle = 'bo-'
+            #self.plotWaveform()
+            self.plot2DHistogram()
 
-
+ 
         elif self.radioXPar == 3 : # for Y-Parameter histogram 
             self.PlotTitle = 'Y-parameter histogram'
-            self.plotHistogram() 
-
-        if self.radioXPar != 3 : self.plotWaveform() 
+            self.plot1DHistogram() 
 
         plt.show()
 
@@ -162,14 +168,46 @@ class PlotsForCorrelations ( object ) :
 
 
 
-    def plotHistogram( self ) :
-
+    def plot1DHistogram( self ) :
+        plt.clf()
         plt.xlim(auto=True)
-        axes = plt.hist(self.Yarr, bins=100, color='b')
+        axes = plt.hist(self.Yarr, bins=self.YNBins, color='b')
         if self.YLimsIsOn : plt.xlim(self.Ymin,self.Ymax)
         plt.xlabel(self.YParName)
         plt.title(self.PlotTitle,color='r',fontsize=20) # pars like in class Text
         self.fig.canvas.set_window_title(self.Ydsname)        
+
+
+
+    def plot2DHistogram( self ) :
+        plt.clf()
+        if self.YLimsIsOn :
+            self._Yrange = [self.Ymin,self.Ymax]
+        else :
+            self._Yrange = [self.Yarr.min(),self.Yarr.max()]
+
+        if self.XLimsIsOn :
+            self._Xrange = [self.Xmin,self.Xmax]
+        else :
+            self._Xrange = [self.Xarr.min(),self.Xarr.max()]
+
+        XYNBins = (self.XNBins, self.YNBins)
+        XYRange = [self._Xrange, self._Yrange]
+        XYExtent = (self._Xrange[0], self._Xrange[1], self._Yrange[0], self._Yrange[1])
+        
+        arr2d, xedges, yedges = np.histogram2d(self.Xarr, self.Yarr, bins=XYNBins, range=XYRange) #, normed=False, weights=None) 
+
+        axes = plt.imshow(np.rot90(arr2d), interpolation='nearest', extent=XYExtent, aspect='auto') #, origin='upper'
+
+        colb = plt.colorbar(axes, pad=0.005, fraction=0.10, aspect=12, shrink=1) # pad=0.10, orientation=2, aspect = 8,, ticks=coltickslocs
+
+        plt.xlabel(self.XParName)
+        plt.ylabel(self.YParName)
+        plt.title(self.PlotTitle,color='r',fontsize=20) # pars like in class Text
+        self.fig.canvas.set_window_title(self.Ydsname)        
+
+
+
 
 
     def mapCorrelatingArraysByTimeInit( self ) :
