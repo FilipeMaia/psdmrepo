@@ -280,7 +280,7 @@ public:
   int16_t upper_ctrl_limit() const {return _upper_ctrl_limit;}
   int16_t lower_ctrl_limit() const {return _lower_ctrl_limit;}
   static uint32_t _sizeof()  {return ((((((((4+(1*(MAX_UNITS_SIZE)))+2)+2)+2)+2)+2)+2)+2)+2;}
-  std::vector<int> _units_shape() const;
+  std::vector<int> units_shape() const;
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -321,7 +321,7 @@ public:
   float upper_ctrl_limit() const {return _upper_ctrl_limit;}
   float lower_ctrl_limit() const {return _lower_ctrl_limit;}
   static uint32_t _sizeof()  {return ((((((((8+(1*(MAX_UNITS_SIZE)))+4)+4)+4)+4)+4)+4)+4)+4;}
-  std::vector<int> _units_shape() const;
+  std::vector<int> units_shape() const;
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -356,7 +356,7 @@ public:
   int16_t no_str() const {return _no_str;}
   const char* strings() const {return &_strs[0][0];}
   static uint32_t _sizeof()  {return 6+(1*(MAX_ENUM_STATES)*(MAX_ENUM_STRING_SIZE));}
-  std::vector<int> _strs_shape() const;
+  std::vector<int> strings_shape() const;
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -389,7 +389,7 @@ public:
   uint8_t upper_ctrl_limit() const {return _upper_ctrl_limit;}
   uint8_t lower_ctrl_limit() const {return _lower_ctrl_limit;}
   static uint32_t _sizeof()  {return (((((((((4+(1*(MAX_UNITS_SIZE)))+1)+1)+1)+1)+1)+1)+1)+1)+1;}
-  std::vector<int> _units_shape() const;
+  std::vector<int> units_shape() const;
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -430,7 +430,7 @@ public:
   int32_t upper_ctrl_limit() const {return _upper_ctrl_limit;}
   int32_t lower_ctrl_limit() const {return _lower_ctrl_limit;}
   static uint32_t _sizeof()  {return ((((((((4+(1*(MAX_UNITS_SIZE)))+4)+4)+4)+4)+4)+4)+4)+4;}
-  std::vector<int> _units_shape() const;
+  std::vector<int> units_shape() const;
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -471,7 +471,7 @@ public:
   double upper_ctrl_limit() const {return _upper_ctrl_limit;}
   double lower_ctrl_limit() const {return _lower_ctrl_limit;}
   static uint32_t _sizeof()  {return ((((((((8+(1*(MAX_UNITS_SIZE)))+8)+8)+8)+8)+8)+8)+8)+8;}
-  std::vector<int> _units_shape() const;
+  std::vector<int> units_shape() const;
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -515,7 +515,7 @@ class EpicsPvCtrlHeader: public EpicsPvHeader {
 public:
   virtual ~EpicsPvCtrlHeader();
   virtual const char* pvName() const = 0;
-  virtual std::vector<int> _sPvName_shape() const = 0;
+  virtual std::vector<int> pvName_shape() const = 0;
 };
 
 /** Class: EpicsPvTimeHeader
@@ -540,7 +540,7 @@ public:
   virtual const Epics::dbr_sts_string& dbr() const = 0;
   virtual const char* data() const = 0;
   virtual const char* value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: EpicsPvCtrlShort
@@ -554,7 +554,7 @@ public:
   virtual const Epics::dbr_ctrl_short& dbr() const = 0;
   virtual const int16_t* data() const = 0;
   virtual int16_t value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: EpicsPvCtrlFloat
@@ -568,7 +568,7 @@ public:
   virtual const Epics::dbr_ctrl_float& dbr() const = 0;
   virtual const float* data() const = 0;
   virtual float value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: EpicsPvCtrlEnum
@@ -582,7 +582,7 @@ public:
   virtual const Epics::dbr_ctrl_enum& dbr() const = 0;
   virtual const uint16_t* data() const = 0;
   virtual uint16_t value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: EpicsPvCtrlChar
@@ -596,7 +596,7 @@ public:
   virtual const Epics::dbr_ctrl_char& dbr() const = 0;
   virtual const uint8_t* data() const = 0;
   virtual uint8_t value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: EpicsPvCtrlLong
@@ -610,7 +610,7 @@ public:
   virtual const Epics::dbr_ctrl_long& dbr() const = 0;
   virtual const int32_t* data() const = 0;
   virtual int32_t value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: EpicsPvCtrlDouble
@@ -624,7 +624,7 @@ public:
   virtual const Epics::dbr_ctrl_double& dbr() const = 0;
   virtual const double* data() const = 0;
   virtual double value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: EpicsPvTimeString
@@ -638,7 +638,7 @@ public:
   virtual const Epics::dbr_time_string& dbr() const = 0;
   virtual const char* data() const = 0;
   virtual const char* value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: EpicsPvTimeShort
@@ -652,7 +652,7 @@ public:
   virtual const Epics::dbr_time_short& dbr() const = 0;
   virtual const int16_t* data() const = 0;
   virtual int16_t value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: EpicsPvTimeFloat
@@ -666,7 +666,7 @@ public:
   virtual const Epics::dbr_time_float& dbr() const = 0;
   virtual const float* data() const = 0;
   virtual float value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: EpicsPvTimeEnum
@@ -680,7 +680,7 @@ public:
   virtual const Epics::dbr_time_enum& dbr() const = 0;
   virtual const uint16_t* data() const = 0;
   virtual uint16_t value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: EpicsPvTimeChar
@@ -694,7 +694,7 @@ public:
   virtual const Epics::dbr_time_char& dbr() const = 0;
   virtual const uint8_t* data() const = 0;
   virtual uint8_t value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: EpicsPvTimeLong
@@ -708,7 +708,7 @@ public:
   virtual const Epics::dbr_time_long& dbr() const = 0;
   virtual const int32_t* data() const = 0;
   virtual int32_t value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: EpicsPvTimeDouble
@@ -722,7 +722,7 @@ public:
   virtual const Epics::dbr_time_double& dbr() const = 0;
   virtual const double* data() const = 0;
   virtual double value(uint32_t i) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 } // namespace Epics
 } // namespace Psana

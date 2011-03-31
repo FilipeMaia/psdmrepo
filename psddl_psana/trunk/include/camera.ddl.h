@@ -73,7 +73,7 @@ public:
   virtual uint32_t threshold() const = 0;
   virtual uint32_t number_of_masked_pixels() const = 0;
   virtual const Camera::FrameCoord& masked_pixel_coordinates(uint32_t i0) const = 0;
-  virtual std::vector<int> _masked_pixel_coordinates_shape() const = 0;
+  virtual std::vector<int> masked_pixel_shape() const = 0;
 };
 
 /** Class: FrameV1
@@ -91,7 +91,7 @@ public:
   virtual uint32_t depth() const = 0;
   virtual uint32_t offset() const = 0;
   virtual const uint8_t* data() const = 0;
-  virtual std::vector<int> _pixel_data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: TwoDGaussianV1

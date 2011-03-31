@@ -49,7 +49,7 @@ public:
   virtual uint32_t shotIdStart() const = 0;
   virtual float readoutTime() const = 0;
   virtual const uint16_t* data() const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: InfoV1

@@ -187,7 +187,7 @@ public:
   uint32_t maskClear() const {return _u32MaskClear;}
   const char* desc() const {return &_desc[0];}
   static uint32_t _sizeof()  {return 24+(1*(DescSize));}
-  std::vector<int> _desc_shape() const;
+  std::vector<int> desc_shape() const;
 private:
   uint16_t	_u16Code;
   uint16_t	_u16MaskEventAttr;
@@ -249,8 +249,8 @@ public:
   virtual uint32_t noutputs() const = 0;
   virtual const EvrData::PulseConfig& pulses(uint32_t i0) const = 0;
   virtual const EvrData::OutputMap& output_maps(uint32_t i0) const = 0;
-  virtual std::vector<int> _pulses_shape() const = 0;
-  virtual std::vector<int> _output_maps_shape() const = 0;
+  virtual std::vector<int> pulses_shape() const = 0;
+  virtual std::vector<int> output_maps_shape() const = 0;
 };
 
 /** Class: ConfigV2
@@ -288,8 +288,8 @@ public:
   virtual const EvrData::OutputMap& output_maps(uint32_t i0) const = 0;
   virtual EvrData::ConfigV2::BeamCode beam() const = 0;
   virtual EvrData::ConfigV2::RateCode rate() const = 0;
-  virtual std::vector<int> _pulses_shape() const = 0;
-  virtual std::vector<int> _output_maps_shape() const = 0;
+  virtual std::vector<int> pulses_shape() const = 0;
+  virtual std::vector<int> output_maps_shape() const = 0;
 };
 
 /** Class: ConfigV3
@@ -308,9 +308,9 @@ public:
   virtual const EvrData::EventCodeV3& eventcodes(uint32_t i0) const = 0;
   virtual const EvrData::PulseConfigV3& pulses(uint32_t i0) const = 0;
   virtual const EvrData::OutputMap& output_maps(uint32_t i0) const = 0;
-  virtual std::vector<int> _eventcodes_shape() const = 0;
-  virtual std::vector<int> _pulses_shape() const = 0;
-  virtual std::vector<int> _output_maps_shape() const = 0;
+  virtual std::vector<int> eventcodes_shape() const = 0;
+  virtual std::vector<int> pulses_shape() const = 0;
+  virtual std::vector<int> output_maps_shape() const = 0;
 };
 
 /** Class: ConfigV4
@@ -329,9 +329,9 @@ public:
   virtual const EvrData::EventCodeV4& eventcodes(uint32_t i0) const = 0;
   virtual const EvrData::PulseConfigV3& pulses(uint32_t i0) const = 0;
   virtual const EvrData::OutputMap& output_maps(uint32_t i0) const = 0;
-  virtual std::vector<int> _eventcodes_shape() const = 0;
-  virtual std::vector<int> _pulses_shape() const = 0;
-  virtual std::vector<int> _output_maps_shape() const = 0;
+  virtual std::vector<int> eventcodes_shape() const = 0;
+  virtual std::vector<int> pulses_shape() const = 0;
+  virtual std::vector<int> output_maps_shape() const = 0;
 };
 
 /** Class: SequencerEntry
@@ -378,7 +378,7 @@ public:
   virtual uint32_t length() const = 0;
   virtual uint32_t cycles() const = 0;
   virtual const EvrData::SequencerEntry& entries(uint32_t i0) const = 0;
-  virtual std::vector<int> _entries_shape() const = 0;
+  virtual std::vector<int> entries_shape() const = 0;
 };
 
 /** Class: ConfigV5
@@ -394,13 +394,13 @@ public:
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
-  virtual const EvrData::EventCodeV4& eventcodes(uint32_t i0) const = 0;
+  virtual const EvrData::EventCodeV5& eventcodes(uint32_t i0) const = 0;
   virtual const EvrData::PulseConfigV3& pulses(uint32_t i0) const = 0;
   virtual const EvrData::OutputMap& output_maps(uint32_t i0) const = 0;
   virtual const EvrData::SequencerConfigV1& seq_config() const = 0;
-  virtual std::vector<int> _eventcodes_shape() const = 0;
-  virtual std::vector<int> _pulses_shape() const = 0;
-  virtual std::vector<int> _output_maps_shape() const = 0;
+  virtual std::vector<int> eventcodes_shape() const = 0;
+  virtual std::vector<int> pulses_shape() const = 0;
+  virtual std::vector<int> output_maps_shape() const = 0;
 };
 
 /** Class: FIFOEvent
@@ -439,7 +439,7 @@ public:
   virtual ~DataV3();
   virtual uint32_t numFifoEvents() const = 0;
   virtual const EvrData::FIFOEvent& fifoEvents(uint32_t i0) const = 0;
-  virtual std::vector<int> _fifoEvents_shape() const = 0;
+  virtual std::vector<int> fifoEvents_shape() const = 0;
 };
 
 /** Class: IOChannel
@@ -455,8 +455,8 @@ public:
   virtual const char* name() const = 0;
   virtual uint32_t ninfo() const = 0;
   virtual const Pds::DetInfo& infos(uint32_t i0) const = 0;
-  virtual std::vector<int> _name_shape() const = 0;
-  virtual std::vector<int> _info_shape() const = 0;
+  virtual std::vector<int> name_shape() const = 0;
+  virtual std::vector<int> infos_shape() const = 0;
 };
 
 /** Class: IOConfigV1
@@ -472,7 +472,7 @@ public:
   virtual uint16_t nchannels() const = 0;
   virtual const EvrData::IOChannel& channels(uint32_t i0) const = 0;
   virtual EvrData::OutputMap::Conn conn() const = 0;
-  virtual std::vector<int> _channels_shape() const = 0;
+  virtual std::vector<int> channels_shape() const = 0;
 };
 } // namespace EvrData
 } // namespace Psana

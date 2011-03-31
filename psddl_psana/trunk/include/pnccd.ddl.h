@@ -44,8 +44,8 @@ public:
   virtual uint32_t camexMagic() const = 0;
   virtual const char* info() const = 0;
   virtual const char* timingFName() const = 0;
-  virtual std::vector<int> _info_shape() const = 0;
-  virtual std::vector<int> _timingFName_shape() const = 0;
+  virtual std::vector<int> info_shape() const = 0;
+  virtual std::vector<int> timingFName_shape() const = 0;
 };
 
 /** Class: FrameV1
@@ -65,7 +65,7 @@ public:
   virtual uint32_t timeStampHi() const = 0;
   virtual uint32_t timeStampLo() const = 0;
   virtual const uint16_t* data() const = 0;
-  virtual std::vector<int> __data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 } // namespace PNCCD
 } // namespace Psana

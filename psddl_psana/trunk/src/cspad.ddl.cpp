@@ -29,7 +29,13 @@ ConfigV2::~ConfigV2() {}
 ElementV1::~ElementV1() {}
 
 
+DataV1::~DataV1() {}
+
+
 ElementV2::~ElementV2() {}
+
+
+DataV2::~DataV2() {}
 
 } // namespace CsPad
 } // namespace Psana

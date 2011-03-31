@@ -69,7 +69,7 @@ public:
   virtual ~DataV2();
   virtual uint32_t timestamp() const = 0;
   virtual const uint32_t* encoder_count() const = 0;
-  virtual std::vector<int> _encoder_count_shape() const = 0;
+  virtual std::vector<int> encoder_count_shape() const = 0;
 };
 } // namespace Encoder
 } // namespace Psana

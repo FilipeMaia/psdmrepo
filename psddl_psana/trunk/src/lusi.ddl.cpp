@@ -7,7 +7,7 @@
 
 namespace Psana {
 namespace Lusi {
-std::vector<int> DiodeFexConfigV1::_base_shape() const
+std::vector<int> DiodeFexConfigV1::base_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -15,7 +15,7 @@ std::vector<int> DiodeFexConfigV1::_base_shape() const
   return shape;
 }
 
-std::vector<int> DiodeFexConfigV1::_scale_shape() const
+std::vector<int> DiodeFexConfigV1::scale_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -26,7 +26,7 @@ std::vector<int> DiodeFexConfigV1::_scale_shape() const
 
 IpmFexConfigV1::~IpmFexConfigV1() {}
 
-std::vector<int> IpmFexV1::_channel_shape() const
+std::vector<int> IpmFexV1::channel_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

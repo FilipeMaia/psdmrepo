@@ -34,7 +34,7 @@ public:
   double value() const {return _value;}
   uint8_t array() const;
   static uint32_t _sizeof()  {return ((0+(1*(32)))+4)+8;}
-  std::vector<int> _name_shape() const;
+  std::vector<int> name_shape() const;
 private:
   char	_name[32];
   uint32_t	_index;
@@ -66,7 +66,7 @@ public:
   double hiValue() const {return _hiValue;}
   uint8_t array() const;
   static uint32_t _sizeof()  {return (((0+(1*(32)))+4)+8)+8;}
-  std::vector<int> _name_shape() const;
+  std::vector<int> name_shape() const;
 private:
   char	_name[32];
   uint32_t	_index;
@@ -90,8 +90,8 @@ public:
   virtual uint32_t npvMonitors() const = 0;
   virtual const ControlData::PVControl& pvControls(uint32_t i0) const = 0;
   virtual const ControlData::PVMonitor& pvMonitors(uint32_t i0) const = 0;
-  virtual std::vector<int> _pvControls_shape() const = 0;
-  virtual std::vector<int> _pvMonitors_shape() const = 0;
+  virtual std::vector<int> pvControls_shape() const = 0;
+  virtual std::vector<int> pvMonitors_shape() const = 0;
 };
 } // namespace ControlData
 } // namespace Psana

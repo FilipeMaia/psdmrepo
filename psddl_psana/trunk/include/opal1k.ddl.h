@@ -55,8 +55,8 @@ public:
   virtual const Camera::FrameCoord& defect_pixel_coordinates(uint32_t i0) const = 0;
   virtual uint16_t output_offset() const = 0;
   virtual uint32_t output_resolution_bits() const = 0;
-  virtual std::vector<int> _lookup_table_shape() const = 0;
-  virtual std::vector<int> _defectPixels_shape() const = 0;
+  virtual std::vector<int> output_lookup_table_shape() const = 0;
+  virtual std::vector<int> defect_pixel_coordinates_shape() const = 0;
 };
 } // namespace Opal1k
 } // namespace Psana

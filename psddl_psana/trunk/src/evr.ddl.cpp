@@ -19,7 +19,7 @@ int16_t
 PulseConfig::clear() const {
   return this->bf_clear()-1;
 }
-std::vector<int> EventCodeV5::_desc_shape() const
+std::vector<int> EventCodeV5::desc_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

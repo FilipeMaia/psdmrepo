@@ -7,7 +7,7 @@
 
 namespace Psana {
 namespace Epics {
-std::vector<int> dbr_ctrl_short::_units_shape() const
+std::vector<int> dbr_ctrl_short::units_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -15,7 +15,7 @@ std::vector<int> dbr_ctrl_short::_units_shape() const
   return shape;
 }
 
-std::vector<int> dbr_ctrl_float::_units_shape() const
+std::vector<int> dbr_ctrl_float::units_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -23,7 +23,7 @@ std::vector<int> dbr_ctrl_float::_units_shape() const
   return shape;
 }
 
-std::vector<int> dbr_ctrl_enum::_strs_shape() const
+std::vector<int> dbr_ctrl_enum::strings_shape() const
 {
   std::vector<int> shape;
   shape.reserve(2);
@@ -32,7 +32,7 @@ std::vector<int> dbr_ctrl_enum::_strs_shape() const
   return shape;
 }
 
-std::vector<int> dbr_ctrl_char::_units_shape() const
+std::vector<int> dbr_ctrl_char::units_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -40,7 +40,7 @@ std::vector<int> dbr_ctrl_char::_units_shape() const
   return shape;
 }
 
-std::vector<int> dbr_ctrl_long::_units_shape() const
+std::vector<int> dbr_ctrl_long::units_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -48,7 +48,7 @@ std::vector<int> dbr_ctrl_long::_units_shape() const
   return shape;
 }
 
-std::vector<int> dbr_ctrl_double::_units_shape() const
+std::vector<int> dbr_ctrl_double::units_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

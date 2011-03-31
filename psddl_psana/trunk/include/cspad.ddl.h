@@ -44,7 +44,7 @@ class CsPadDigitalPotsCfg {
 public:
   virtual ~CsPadDigitalPotsCfg();
   virtual const uint8_t* pots() const = 0;
-  virtual std::vector<int> _pots_shape() const = 0;
+  virtual std::vector<int> pots_shape() const = 0;
 };
 
 /** Class: CsPadReadOnlyCfg
@@ -68,7 +68,7 @@ class CsPadGainMapCfg {
 public:
   virtual ~CsPadGainMapCfg();
   virtual const uint16_t* gainMap() const = 0;
-  virtual std::vector<int> _gainMap_shape() const = 0;
+  virtual std::vector<int> gainMap_shape() const = 0;
 };
 
 /** Class: ConfigV1QuadReg
@@ -94,8 +94,8 @@ public:
   virtual const CsPad::CsPadReadOnlyCfg& ro() const = 0;
   virtual const CsPad::CsPadDigitalPotsCfg& dp() const = 0;
   virtual const CsPad::CsPadGainMapCfg& gm() const = 0;
-  virtual std::vector<int> _shiftSelect_shape() const = 0;
-  virtual std::vector<int> _edgeSelect_shape() const = 0;
+  virtual std::vector<int> shiftSelect_shape() const = 0;
+  virtual std::vector<int> edgeSelect_shape() const = 0;
 };
 
 /** Class: ConfigV1
@@ -123,7 +123,7 @@ public:
   virtual uint32_t numAsicsRead() const = 0;
   virtual uint32_t numQuads() const = 0;
   virtual uint32_t numSect() const = 0;
-  virtual std::vector<int> _quads_shape() const = 0;
+  virtual std::vector<int> quads_shape() const = 0;
 };
 
 /** Class: ConfigV2
@@ -153,7 +153,7 @@ public:
   virtual uint32_t numAsicsStored(uint32_t iq) const = 0;
   virtual uint32_t numQuads() const = 0;
   virtual uint32_t numSect() const = 0;
-  virtual std::vector<int> _quads_shape() const = 0;
+  virtual std::vector<int> quads_shape() const = 0;
 };
 
 /** Class: ElementV1
@@ -165,19 +165,39 @@ class ConfigV2;
 
 class ElementV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_CspadElement};
   enum {Nsbtemp = 4};
   virtual ~ElementV1();
+  virtual uint32_t virtual_channel() const = 0;
+  virtual uint32_t lane() const = 0;
+  virtual uint32_t tid() const = 0;
+  virtual uint32_t acq_count() const = 0;
+  virtual uint32_t op_code() const = 0;
+  virtual uint32_t quad() const = 0;
   virtual uint32_t seq_count() const = 0;
   virtual uint32_t ticks() const = 0;
   virtual uint32_t fiducials() const = 0;
   virtual const uint16_t* sb_temp() const = 0;
   virtual uint32_t frame_type() const = 0;
   virtual const uint16_t* data() const = 0;
-  virtual std::vector<int> _sbtemp_shape() const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> sb_temp_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
   virtual std::vector<int> _extra_shape() const = 0;
+};
+
+/** Class: DataV1
+  
+*/
+
+class ConfigV1;
+class ConfigV2;
+
+class DataV1 {
+public:
+  enum {Version = 1};
+  enum {TypeId = Pds::TypeId::Id_CspadElement};
+  virtual ~DataV1();
+  virtual const CsPad::ElementV1& quads(uint32_t i0) const = 0;
+  virtual std::vector<int> quads_shape() const = 0;
 };
 
 /** Class: ElementV2
@@ -188,19 +208,38 @@ class ConfigV2;
 
 class ElementV2 {
 public:
-  enum {Version = 2};
-  enum {TypeId = Pds::TypeId::Id_CspadElement};
   enum {Nsbtemp = 4};
   virtual ~ElementV2();
+  virtual uint32_t virtual_channel() const = 0;
+  virtual uint32_t lane() const = 0;
+  virtual uint32_t tid() const = 0;
+  virtual uint32_t acq_count() const = 0;
+  virtual uint32_t op_code() const = 0;
+  virtual uint32_t quad() const = 0;
   virtual uint32_t seq_count() const = 0;
   virtual uint32_t ticks() const = 0;
   virtual uint32_t fiducials() const = 0;
   virtual const uint16_t* sb_temp() const = 0;
   virtual uint32_t frame_type() const = 0;
   virtual const uint16_t* data() const = 0;
-  virtual std::vector<int> _sbtemp_shape() const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> sb_temp_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
   virtual std::vector<int> _extra_shape() const = 0;
+};
+
+/** Class: DataV2
+  
+*/
+
+class ConfigV2;
+
+class DataV2 {
+public:
+  enum {Version = 2};
+  enum {TypeId = Pds::TypeId::Id_CspadElement};
+  virtual ~DataV2();
+  virtual const CsPad::ElementV2& quads(uint32_t i0) const = 0;
+  virtual std::vector<int> quads_shape() const = 0;
 };
 } // namespace CsPad
 } // namespace Psana

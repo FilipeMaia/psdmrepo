@@ -150,7 +150,7 @@ public:
   virtual const Acqiris::HorizV1& horiz() const = 0;
   virtual const Acqiris::VertV1& vert(uint32_t i0) const = 0;
   virtual uint32_t nbrChannels() const = 0;
-  virtual std::vector<int> _vert_shape() const = 0;
+  virtual std::vector<int> vert_shape() const = 0;
 };
 
 /** Class: TimestampV1
@@ -197,10 +197,10 @@ public:
   virtual uint32_t nbrSamplesInSeg() const = 0;
   virtual uint32_t indexFirstPoint() const = 0;
   virtual uint32_t nbrSegments() const = 0;
-  virtual const Acqiris::TimestampV1& _timestamp(uint32_t i0) const = 0;
-  virtual const int16_t* _waveform() const = 0;
-  virtual std::vector<int> _timestamps_shape() const = 0;
-  virtual std::vector<int> _waveforms_shape() const = 0;
+  virtual const Acqiris::TimestampV1& timestamp(uint32_t i0) const = 0;
+  virtual const int16_t* waveforms() const = 0;
+  virtual std::vector<int> timestamps_shape() const = 0;
+  virtual std::vector<int> waveforms_shape() const = 0;
   virtual std::vector<int> _extraSpace_shape() const = 0;
 };
 
@@ -216,7 +216,7 @@ public:
   enum {TypeId = Pds::TypeId::Id_AcqWaveform};
   virtual ~DataDescV1();
   virtual const Acqiris::DataDescV1Elem& data(uint32_t i0) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 
 /** Class: TdcChannel
@@ -365,8 +365,8 @@ public:
   virtual const Acqiris::TdcChannel& channels(uint32_t i0) const = 0;
   virtual const Acqiris::TdcAuxIO& auxio(uint32_t i0) const = 0;
   virtual const Acqiris::TdcVetoIO& veto() const = 0;
-  virtual std::vector<int> _channel_shape() const = 0;
-  virtual std::vector<int> _auxIO_shape() const = 0;
+  virtual std::vector<int> channels_shape() const = 0;
+  virtual std::vector<int> auxio_shape() const = 0;
 };
 
 /** Class: TdcDataV1_Item
@@ -459,7 +459,7 @@ public:
   enum {TypeId = Pds::TypeId::Id_AcqTdcData};
   virtual ~TdcDataV1();
   virtual const Acqiris::TdcDataV1_Item& data(uint32_t i0) const = 0;
-  virtual std::vector<int> _data_shape() const = 0;
+  virtual std::vector<int> data_shape() const = 0;
 };
 } // namespace Acqiris
 } // namespace Psana

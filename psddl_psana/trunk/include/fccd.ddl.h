@@ -75,8 +75,8 @@ public:
   virtual uint32_t height() const = 0;
   virtual uint32_t trimmedWidth() const = 0;
   virtual uint32_t trimmedHeight() const = 0;
-  virtual std::vector<int> _dacVoltage_shape() const = 0;
-  virtual std::vector<int> _waveform_shape() const = 0;
+  virtual std::vector<int> dacVoltages_shape() const = 0;
+  virtual std::vector<int> waveforms_shape() const = 0;
 };
 } // namespace FCCD
 } // namespace Psana
