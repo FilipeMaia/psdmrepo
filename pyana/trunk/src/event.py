@@ -105,27 +105,25 @@ class Event(object):
         """ Returns the list of payload objects matching the criteria.
         Accepts keyword parameters same as _filter() """
 
-        return [ x.payload() for x in Event._filter(self.m_dg.xtc,**kw) ]
+        objects = [x.payload() for x in Event._filter(self.m_dg.xtc,**kw)]
+        return filter(None, objects)
 
     def findFirstXtc(self, **kw):
         """ Returns the first Xtc object matching the criteria.
         Accepts keyword parameters same as _filter() """
         
-        gen = Event._filter(self.m_dg.xtc, **kw)
-        try :
-            return gen.next()
-        except StopIteration:
-            return None
+        for x in Event._filter(self.m_dg.xtc, **kw):
+            return x
+        return None
 
     def findFirst(self, **kw):
-        """ Returns the list of Xtc objects matching the criteria.
+        """ Returns first data object (XTC's payload) matching the criteria.
         Accepts keyword parameters same as _filter() """
         
-        gen = Event._filter(self.m_dg.xtc, **kw)
-        try :
-            return gen.next().payload()
-        except StopIteration:
-            return None
+        for x in Event._filter(self.m_dg.xtc, **kw):
+            obj = x.payload()
+            if obj: return obj
+        return None
 
     def get(self, key, address=None):
         """Generic get method, retieves detector data or user data"""

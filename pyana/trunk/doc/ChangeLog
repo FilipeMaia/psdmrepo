@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-26
+2011-03-31 - Andy Salnikov
+- fix for zero-sized Epics XTC objects
+
 Tag: V00-00-25
 2011-03-28 - Andy Salnikov
 - changed method dispatch so that beginjob/endjob is called only
