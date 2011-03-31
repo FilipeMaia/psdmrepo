@@ -86,7 +86,7 @@ class XtcScanner ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__(self, filenames = [], options={'ndatagrams':-1, 'l1_offset': 0, 'verbose': 0, 'opt_epics':False } ):
+    def __init__(self, filenames = [], options={'ndatagrams':-1, 'l1_offset': 0, 'verbose': 0, 'epics':False } ):
         """Constructor.
 
         Initialize list of files and options and creates
