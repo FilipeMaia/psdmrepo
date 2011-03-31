@@ -86,7 +86,7 @@ class XtcScanner ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__(self, filenames = [], options={'ndatagrams':-1, 'l1_offset': 0, 'verbose': 0} ):
+    def __init__(self, filenames = [], options={'ndatagrams':-1, 'l1_offset': 0, 'verbose': 0, 'opt_epics':False } ):
         """Constructor.
 
         Initialize list of files and options and creates
@@ -129,7 +129,6 @@ class XtcScanner ( object ) :
         self.controls = []
 
         print "Scanning...."
-        print self.counters
         
         if len(self.files)==0 :
             print "You need to select an xtc file"
@@ -176,7 +175,7 @@ class XtcScanner ( object ) :
         elapsed = ( time.clock() - start )
         print "\r  %d datagrams read in %f s " % (progr, elapsed)
 
-        self.printSummary(opt_epics=0)
+        self.printSummary(opt_epics=self.options['epics'])
 
 
     def addCountInfo(self):
@@ -184,7 +183,7 @@ class XtcScanner ( object ) :
 
 
 
-    def printSummary(self, opt_bld = 1, opt_det=1, opt_epics = 0):
+    def printSummary(self, opt_bld=1, opt_det=1, opt_epics=False):
 
         print "-------------------------------------------------------------"
         print "XtcScanner information: "
@@ -208,8 +207,10 @@ class XtcScanner ( object ) :
                 print " %s (%d) " % ( self.devices[d][i],  self.counters[d][i] ),
             print
 
-        if opt_epics > 0 :
-            print "Epics PVs: ", self.epicsPVs
+        if opt_epics :
+            print "Epics PVs: ", len(self.epicsPVs)
+            print self.epicsPVs
+
 
         print "XtcScanner is done!"
         print "-------------------------------------------------------------"
@@ -284,9 +285,13 @@ class XtcScanner ( object ) :
                         if pv_control not in self.controls :
                             self.controls.append( pv_control )
                 if xtc.contains.id() == TypeId.Type.Id_Epics :
-                    data = xtc.payload()
-                    self.epicsPVs.append(data.sPvName)
-
+                    try:
+                        data = xtc.payload()
+                        self.epicsPVs.append(data.sPvName)
+                    except:
+                        #print "An epics object with no payload (size %d)" % xtc.sizeofPayload()
+                        pass
+                    
                 if xtc.contains.id() == TypeId.Type.Id_AcqConfig :
                     data = xtc.payload()
                     worthknowing = "%s ch" % data.nbrChannels()
@@ -318,13 +323,14 @@ class XtcScanner ( object ) :
 if __name__ == "__main__" :
 
     parser = OptionParser(usage="%prog [options] xtc-files ...")
-    parser.set_defaults(ndatagrams=-1, verbose=0, l1_offset=0)
+    parser.set_defaults(ndatagrams=-1, verbose=0, l1_offset=0, epics=False)
     parser.add_option('-n', "--ndatagrams",  type='int')
     parser.add_option('-v', "--verbose", action='count')
     parser.add_option('-l', "--l1-offset", type='float')
-
+    parser.add_option('-e', "--epics", action='store_true')
+    
     (options, args) = parser.parse_args()
-
+    
     if not args :
         parser.error("at least one file name required")
 

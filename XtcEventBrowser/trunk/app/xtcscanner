@@ -29,10 +29,11 @@ from XtcEventBrowser.XtcScanner import XtcScanner
 if __name__ == "__main__" :
 
     parser = OptionParser(usage="%prog [options] xtc-files ...")
-    parser.set_defaults(ndatagrams=-1, verbose=0, l1_offset=0)
+    parser.set_defaults(ndatagrams=-1, verbose=0, l1_offset=0, epics=False)
     parser.add_option('-n', "--ndatagrams",  type='int')
     parser.add_option('-v', "--verbose", action='count')
     parser.add_option('-l', "--l1-offset", type='float')
+    parser.add_option('-e', "--epics", action='store_true')
 
     (options, args) = parser.parse_args()
 
