@@ -225,7 +225,7 @@
             <attribute name="_u32MaskClear" type="uint32_t" accessor="maskClear">
             </attribute>
 
-            <attribute name="_desc" type="char" dimensions="DescSize" accessor="desc">
+            <attribute name="_desc" type="char" shape="DescSize" accessor="desc">
             </attribute>
 
             <ctor>
@@ -302,10 +302,12 @@
             <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
             </attribute>
 
-            <attribute name="_pulses" type="PulseConfig" dimensions="{self}._npulses" accessor="pulses">
+            <attribute name="_pulses" type="PulseConfig" shape="{self}._npulses" 
+                    accessor="pulses" shape_method="pulses_shape">
             </attribute>
 
-            <attribute name="_output_maps" type="OutputMap" dimensions="{self}._noutputs" accessor="output_maps">
+            <attribute name="_output_maps" type="OutputMap" shape="{self}._noutputs" 
+                    accessor="output_maps" shape_method="output_maps_shape">
             </attribute>
 
         </pstype>
@@ -344,10 +346,11 @@
             <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
             </attribute>
 
-            <attribute name="_pulses" type="PulseConfig" dimensions="{self}._npulses" accessor="pulses">
+            <attribute name="_pulses" type="PulseConfig" shape="{self}._npulses" 
+                accessor="pulses" shape_method="pulses_shape">
             </attribute>
 
-            <attribute name="_output_maps" type="OutputMap" dimensions="{self}._noutputs" accessor="output_maps">
+            <attribute name="_output_maps" type="OutputMap" shape="{self}._noutputs" accessor="output_maps">
             </attribute>
 
 
@@ -376,13 +379,13 @@
             <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
             </attribute>
 
-            <attribute name="_eventcodes" type="EventCodeV3" dimensions="{self}._neventcodes" accessor="eventcodes">
+            <attribute name="_eventcodes" type="EventCodeV3" shape="{self}._neventcodes" accessor="eventcodes">
             </attribute>
 
-            <attribute name="_pulses" type="PulseConfigV3" dimensions="{self}._npulses" accessor="pulses">
+            <attribute name="_pulses" type="PulseConfigV3" shape="{self}._npulses" accessor="pulses">
             </attribute>
 
-            <attribute name="_output_maps" type="OutputMap" dimensions="{self}._noutputs" accessor="output_maps">
+            <attribute name="_output_maps" type="OutputMap" shape="{self}._noutputs" accessor="output_maps">
             </attribute>
 
         </pstype>
@@ -401,13 +404,13 @@
             <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
             </attribute>
 
-            <attribute name="_eventcodes" type="EventCodeV4" dimensions="{self}._neventcodes" accessor="eventcodes">
+            <attribute name="_eventcodes" type="EventCodeV4" shape="{self}._neventcodes" accessor="eventcodes">
             </attribute>
 
-            <attribute name="_pulses" type="PulseConfigV3" dimensions="{self}._npulses" accessor="pulses">
+            <attribute name="_pulses" type="PulseConfigV3" shape="{self}._npulses" accessor="pulses">
             </attribute>
 
-            <attribute name="_output_maps" type="OutputMap" dimensions="{self}._noutputs" accessor="output_maps">
+            <attribute name="_output_maps" type="OutputMap" shape="{self}._noutputs" accessor="output_maps">
             </attribute>
 
         </pstype>
@@ -471,7 +474,7 @@
 
             <attribute name="_cycles" type="uint32_t" accessor="cycles"/>
 
-            <attribute name="_entries" type="SequencerEntry" dimensions="{self}._length" accessor="entries"/>
+            <attribute name="_entries" type="SequencerEntry" shape="{self}._length" accessor="entries"/>
 
             <ctor>
                 Default constructor without arguments
@@ -502,13 +505,13 @@
             <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
             </attribute>
 
-            <attribute name="_eventcodes" type="EventCodeV4" dimensions="{self}._neventcodes" accessor="eventcodes">
+            <attribute name="_eventcodes" type="EventCodeV5" shape="{self}._neventcodes" accessor="eventcodes">
             </attribute>
 
-            <attribute name="_pulses" type="PulseConfigV3" dimensions="{self}._npulses" accessor="pulses">
+            <attribute name="_pulses" type="PulseConfigV3" shape="{self}._npulses" accessor="pulses">
             </attribute>
 
-            <attribute name="_output_maps" type="OutputMap" dimensions="{self}._noutputs" accessor="output_maps">
+            <attribute name="_output_maps" type="OutputMap" shape="{self}._noutputs" accessor="output_maps">
             </attribute>
 
             <attribute name="_seq_config" type="SequencerConfigV1" accessor="seq_config">
@@ -552,7 +555,7 @@
             <attribute name="_u32NumFifoEvents" type="uint32_t" accessor="numFifoEvents">
             </attribute>
 
-            <attribute name="_fifoEvents" type="FIFOEvent" dimensions="{self}._u32NumFifoEvents" accessor="fifoEvents">
+            <attribute name="_fifoEvents" type="FIFOEvent" shape="{self}._u32NumFifoEvents" accessor="fifoEvents">
             </attribute>
 
         </pstype>
@@ -564,13 +567,13 @@
             <const name="NameLength" value="12"/>
             <const name="MaxInfos" value="8"/>
         
-            <attribute name="_name" type="char" dimensions="NameLength" accessor="name">
+            <attribute name="_name" type="char" shape="NameLength" accessor="name">
             </attribute>
 
             <attribute name="_ninfo" type="uint32_t" accessor="ninfo">
             </attribute>
 
-            <attribute name="_info" type="Pds.DetInfo" dimensions="MaxInfos" accessor="infos">
+            <attribute name="_info" type="Pds.DetInfo" shape="MaxInfos" accessor="infos">
             </attribute>
 
         </pstype>
@@ -585,7 +588,7 @@
             <attribute name="_nchannels" type="uint16_t" accessor="nchannels">
             </attribute>
 
-            <attribute name="_channels" type="IOChannel" dimensions="{self}._nchannels" accessor="channels">
+            <attribute name="_channels" type="IOChannel" shape="{self}._nchannels" accessor="channels">
             </attribute>
 
             <method name="conn" type="OutputMap.Conn">

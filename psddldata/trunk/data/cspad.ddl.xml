@@ -43,7 +43,7 @@
 	
 		<pstype name="CsPadDigitalPotsCfg">
 		
-            <attribute name="_pots" type="uint8_t" dimensions="PotsPerQuad" accessor="pots">
+            <attribute name="_pots" type="uint8_t" shape="PotsPerQuad" accessor="pots">
             </attribute>
 
 		</pstype>
@@ -67,7 +67,7 @@
 
 		<pstype name="CsPadGainMapCfg">
 		
-            <attribute name="_gainMap" type="uint16_t" dimensions="ColumnsPerASIC,MaxRowsPerASIC" 
+            <attribute name="_gainMap" type="uint16_t" shape="ColumnsPerASIC,MaxRowsPerASIC" 
                     accessor="gainMap">
             </attribute>
 
@@ -78,10 +78,10 @@
 
 		<pstype name="ConfigV1QuadReg">
 		
-            <attribute name="_shiftSelect" type="uint32_t" dimensions="TwoByTwosPerQuad" accessor="shiftSelect">
+            <attribute name="_shiftSelect" type="uint32_t" shape="TwoByTwosPerQuad" accessor="shiftSelect">
             </attribute>
 
-            <attribute name="_edgeSelect" type="uint32_t" dimensions="TwoByTwosPerQuad" accessor="edgeSelect">
+            <attribute name="_edgeSelect" type="uint32_t" shape="TwoByTwosPerQuad" accessor="edgeSelect">
             </attribute>
 
             <attribute name="_readClkSet" type="uint32_t" accessor="readClkSet">
@@ -162,7 +162,7 @@
             <attribute name="_quadMask" type="uint32_t" accessor="quadMask">
             </attribute>
 
-            <attribute name="_quads" type="ConfigV1QuadReg" dimensions="MaxQuadsPerSensor" accessor="quads">
+            <attribute name="_quads" type="ConfigV1QuadReg" shape="MaxQuadsPerSensor" accessor="quads">
             </attribute>
 
             <method name="numAsicsRead" type="uint32_t">
@@ -218,7 +218,7 @@
             <attribute name="_roiMask" type="uint32_t">
             </attribute>
 
-            <attribute name="_quads" type="ConfigV1QuadReg" dimensions="MaxQuadsPerSensor" accessor="quads">
+            <attribute name="_quads" type="ConfigV1QuadReg" shape="MaxQuadsPerSensor" accessor="quads">
             </attribute>
 
             <method name="numAsicsRead" type="uint32_t">
@@ -226,20 +226,24 @@
             </method>
             
             <method name="roiMask" type="uint32_t">
+                ROI mask for given quadrant
                 <arg name="iq" type="uint32_t"/>
                 <expr lang="C++" value="({self}._roiMask &gt;&gt; (8*iq)) &amp; 0xff"/>
             </method>
             
             <method name="numAsicsStored" type="uint32_t">
+                Number of ASICs in given quadrant
                 <arg name="iq" type="uint32_t"/>
                 <expr lang="C++" value="__builtin_popcount({self}.roiMask(iq))*2"/>
             </method>
             
             <method name="numQuads" type="uint32_t">
+                Total number of quadrants in setup
                 <expr lang="C++" value="__builtin_popcount({self}._quadMask)"/>
             </method>
 
             <method name="numSect" type="uint32_t">
+                Total number of sections (2x1) in all quadrants
                 <expr lang="C++" value="__builtin_popcount({self}._roiMask)"/>
             </method>
 
@@ -247,19 +251,40 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="ElementV1" version="1" type_id="Id_CspadElement">
+		<pstype name="ElementV1">
 		
 		    <const name="Nsbtemp" value="4" />
 		
 		    <xtc-config name="ConfigV1" />
 		    <xtc-config name="ConfigV2" />
-		    
-		    <repeat count="{xtc-config}.numQuads()" />
 		
             <attribute name="_word0" type="uint32_t" accessor="">
+            
+                <bitfield name="_bf_virtual_channel" size="2" type="uint32_t" accessor="virtual_channel">
+                </bitfield>
+
+                <bitfield name="_bf_pad" size="4">
+                </bitfield>
+            
+                <bitfield name="_bf_lane" size="2" type="uint32_t" accessor="lane">
+                </bitfield>
+            
+                <bitfield name="_bf_tid" size="24" type="uint32_t" accessor="tid">
+                </bitfield>
+            
             </attribute>
 
             <attribute name="_word1" type="uint32_t" accessor="">
+
+                <bitfield name="_bf_acq_count" size="16" type="uint32_t" accessor="acq_count">
+                </bitfield>
+
+                <bitfield name="_bf_op_code" size="8" type="uint32_t" accessor="op_code">
+                </bitfield>
+
+                <bitfield name="_bf_quad" size="2" type="uint32_t" accessor="quad">
+                </bitfield>
+
             </attribute>
 
             <attribute name="_seq_count" type="uint32_t" accessor="seq_count">
@@ -271,36 +296,71 @@
             <attribute name="_fiducials" type="uint32_t" accessor="fiducials">
             </attribute>
 
-            <attribute name="_sbtemp" type="uint16_t" dimensions="Nsbtemp" accessor="sb_temp">
+            <attribute name="_sbtemp" type="uint16_t" shape="Nsbtemp" accessor="sb_temp">
             </attribute>
 
             <attribute name="_frame_type" type="uint32_t" accessor="frame_type">
             </attribute>
 
             <attribute name="_data" type="uint16_t" 
-                    dimensions="{xtc-config}.numQuads(), {xtc-config}.numAsicsRead()/2, ColumnsPerASIC, MaxRowsPerASIC*2" 
+                    shape="{xtc-config}.numAsicsRead()/2, ColumnsPerASIC, MaxRowsPerASIC*2" 
                     accessor="data">
             </attribute>
 
-            <attribute name="_extra" type="uint16_t" dimensions="2">
+            <attribute name="_extra" type="uint16_t" shape="2">
             </attribute>
 
         </pstype>
         
+        
 		<!-- ========================================================================= -->
 		
-		<pstype name="ElementV2" version="2" type_id="Id_CspadElement">
+        <pstype name="DataV1" version="1" type_id="Id_CspadElement">
+
+            <xtc-config name="ConfigV1" />
+            <xtc-config name="ConfigV2" />
+
+            <attribute name="_quads" type="ElementV1" shape="{xtc-config}.numQuads()" 
+                    accessor="quads"/>
+        
+        </pstype>
+        
+        
+		<!-- ========================================================================= -->
+		
+		<pstype name="ElementV2">
 		
 		    <const name="Nsbtemp" value="4" />
 		
 		    <xtc-config name="ConfigV2" />
 		    
-		    <repeat count="{xtc-config}.numQuads()" />
-		
             <attribute name="_word0" type="uint32_t" accessor="">
+            
+                <bitfield name="_bf_virtual_channel" size="2" type="uint32_t" accessor="virtual_channel">
+                </bitfield>
+
+                <bitfield name="_bf_pad" size="4">
+                </bitfield>
+            
+                <bitfield name="_bf_lane" size="2" type="uint32_t" accessor="lane">
+                </bitfield>
+            
+                <bitfield name="_bf_tid" size="24" type="uint32_t" accessor="tid">
+                </bitfield>
+            
             </attribute>
 
             <attribute name="_word1" type="uint32_t" accessor="">
+
+                <bitfield name="_bf_acq_count" size="16" type="uint32_t" accessor="acq_count">
+                </bitfield>
+
+                <bitfield name="_bf_op_code" size="8" type="uint32_t" accessor="op_code">
+                </bitfield>
+
+                <bitfield name="_bf_quad" size="2" type="uint32_t" accessor="quad">
+                </bitfield>
+
             </attribute>
 
             <attribute name="_seq_count" type="uint32_t" accessor="seq_count">
@@ -312,21 +372,33 @@
             <attribute name="_fiducials" type="uint32_t" accessor="fiducials">
             </attribute>
 
-            <attribute name="_sbtemp" type="uint16_t" dimensions="Nsbtemp" accessor="sb_temp">
+            <attribute name="_sbtemp" type="uint16_t" shape="Nsbtemp" accessor="sb_temp">
             </attribute>
 
             <attribute name="_frame_type" type="uint32_t" accessor="frame_type">
             </attribute>
 
             <attribute name="_data" type="uint16_t" 
-                    dimensions="{xtc-config}.numSect(), ColumnsPerASIC, MaxRowsPerASIC*2" 
+                    shape="{xtc-config}.numAsicsStored({self}.quad())/2, ColumnsPerASIC, MaxRowsPerASIC*2" 
                     accessor="data">
             </attribute>
 
-            <attribute name="_extra" type="uint16_t" dimensions="2">
+            <attribute name="_extra" type="uint16_t" shape="2">
             </attribute>
 
         </pstype>
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="DataV2" version="2" type_id="Id_CspadElement">
+
+            <xtc-config name="ConfigV2" />
+
+            <attribute name="_quads" type="ElementV2" shape="{xtc-config}.numQuads()" 
+            accessor="quads"/>
+        
+        </pstype>
+        
         
 	</package>
 </psddl>

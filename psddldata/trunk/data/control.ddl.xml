@@ -17,7 +17,7 @@
 		    Special value used for _index when PV is not an array
 		    </const>
 		
-            <attribute name="_name" type="char" dimensions="32" accessor="name">
+            <attribute name="_name" type="char" shape="32" accessor="name" shape_method="name_shape">
             </attribute>
 
             <attribute name="_index" type="uint32_t" accessor="index">
@@ -53,7 +53,7 @@
             Special value used for _index when PV is not an array
             </const>
 		
-            <attribute name="_name" type="char" dimensions="32" accessor="name">
+            <attribute name="_name" type="char" shape="32" accessor="name" shape_method="name_shape">
             </attribute>
 
             <attribute name="_index" type="uint32_t" accessor="index">
@@ -101,11 +101,11 @@
             </attribute>
 
             <attribute name="_pvControls" type="PVControl"
-                dimensions="{self}._npvControls" accessor="pvControls">
+                shape="{self}._npvControls" accessor="pvControls" shape_method="pvControls_shape">
             </attribute>
 
             <attribute name="_pvMonitors" type="PVMonitor"
-                dimensions="{self}._npvMonitors" accessor="pvMonitors">
+                shape="{self}._npvMonitors" accessor="pvMonitors" shape_method="pvMonitors_shape">
             </attribute>
 
         </pstype>

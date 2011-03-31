@@ -66,7 +66,8 @@
             <attribute name="_33mhz_timestamp" type="uint32_t" accessor="timestamp">
             </attribute>
 
-            <attribute name="_encoder_count" type="uint32_t" dimensions="NEncoders" accessor="encoder_count">
+            <attribute name="_encoder_count" type="uint32_t" shape="NEncoders" 
+                    accessor="encoder_count" shape_method="encoder_count_shape">
             </attribute>
 
         </pstype>

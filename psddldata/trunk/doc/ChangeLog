@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2011-03-31 Andrei Salnikov
+- renamed "dimentions" attribute into "shape"
+- added "shape_method" attribute
+
 Tag: V00-00-04
 2011-03-28 Andrei Salnikov
 - few changes to epics classes:

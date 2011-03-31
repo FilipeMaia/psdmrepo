@@ -83,10 +83,10 @@
             <attribute name="_exposureTime" type="uint32_t" accessor="exposureTime">
             </attribute>
 
-            <attribute name="_dacVoltage" type="float" dimensions="NVoltages" accessor="dacVoltages">
+            <attribute name="_dacVoltage" type="float" shape="NVoltages" accessor="dacVoltages">
             </attribute>
 
-            <attribute name="_waveform" type="uint16_t" dimensions="NWaveforms" accessor="waveforms">
+            <attribute name="_waveform" type="uint16_t" shape="NWaveforms" accessor="waveforms">
             </attribute>
 
             <method name="width" type="uint32_t">

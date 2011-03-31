@@ -67,7 +67,7 @@
             <attribute name="_fReadoutTime" type="float" accessor="readoutTime">
             </attribute>
 
-            <attribute name="_data" type="uint16_t" dimensions="{xtc-config}.numPixels()" accessor="data">
+            <attribute name="_data" type="uint16_t" shape="{xtc-config}.numPixels()" accessor="data">
             </attribute>
 
         </pstype>

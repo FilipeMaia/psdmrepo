@@ -273,7 +273,7 @@
             
             <attribute name="_status" type="int16_t" accessor="status"/>
             <attribute name="_severity" type="int16_t" accessor="severity"/>
-            <attribute name="_units" type="char" dimensions="MAX_UNITS_SIZE" accessor="units"/>
+            <attribute name="_units" type="char" shape="MAX_UNITS_SIZE" accessor="units"/>
             <attribute name="_upper_disp_limit" type="int16_t" accessor="upper_disp_limit"/>
             <attribute name="_lower_disp_limit" type="int16_t" accessor="lower_disp_limit"/>
             <attribute name="_upper_alarm_limit" type="int16_t" accessor="upper_alarm_limit"/>
@@ -313,7 +313,7 @@
             <attribute name="_severity" type="int16_t" accessor="severity"/>
             <attribute name="_precision" type="int16_t" accessor="precision"/>
             <attribute name="RISC_pad" type="int16_t"/>
-            <attribute name="_units" type="char" dimensions="MAX_UNITS_SIZE" accessor="units"/>
+            <attribute name="_units" type="char" shape="MAX_UNITS_SIZE" accessor="units"/>
             <attribute name="_upper_disp_limit" type="float" accessor="upper_disp_limit"/>
             <attribute name="_lower_disp_limit" type="float" accessor="lower_disp_limit"/>
             <attribute name="_upper_alarm_limit" type="float" accessor="upper_alarm_limit"/>
@@ -354,7 +354,7 @@
             <attribute name="_status" type="int16_t" accessor="status"/>
             <attribute name="_severity" type="int16_t" accessor="severity"/>
             <attribute name="_no_str" type="int16_t" accessor="no_str"/>
-            <attribute name="_strs" type="char" dimensions="MAX_ENUM_STATES,MAX_ENUM_STRING_SIZE" accessor="strings"/>
+            <attribute name="_strs" type="char" shape="MAX_ENUM_STATES,MAX_ENUM_STRING_SIZE" accessor="strings"/>
 
             <ctor>
                 Constructor which takes values for every attribute
@@ -377,7 +377,7 @@
             
             <attribute name="_status" type="int16_t" accessor="status"/>
             <attribute name="_severity" type="int16_t" accessor="severity"/>
-            <attribute name="_units" type="char" dimensions="MAX_UNITS_SIZE" accessor="units"/>
+            <attribute name="_units" type="char" shape="MAX_UNITS_SIZE" accessor="units"/>
             <attribute name="_upper_disp_limit" type="uint8_t" accessor="upper_disp_limit"/>
             <attribute name="_lower_disp_limit" type="uint8_t" accessor="lower_disp_limit"/>
             <attribute name="_upper_alarm_limit" type="uint8_t" accessor="upper_alarm_limit"/>
@@ -417,7 +417,7 @@
             
             <attribute name="_status" type="int16_t" accessor="status"/>
             <attribute name="_severity" type="int16_t" accessor="severity"/>
-            <attribute name="_units" type="char" dimensions="MAX_UNITS_SIZE" accessor="units"/>
+            <attribute name="_units" type="char" shape="MAX_UNITS_SIZE" accessor="units"/>
             <attribute name="_upper_disp_limit" type="int32_t" accessor="upper_disp_limit"/>
             <attribute name="_lower_disp_limit" type="int32_t" accessor="lower_disp_limit"/>
             <attribute name="_upper_alarm_limit" type="int32_t" accessor="upper_alarm_limit"/>
@@ -457,7 +457,7 @@
             <attribute name="_severity" type="int16_t" accessor="severity"/>
             <attribute name="_precision" type="int16_t" accessor="precision"/>
             <attribute name="RISC_pad0" type="int16_t"/>
-            <attribute name="_units" type="char" dimensions="MAX_UNITS_SIZE" accessor="units"/>
+            <attribute name="_units" type="char" shape="MAX_UNITS_SIZE" accessor="units"/>
             <attribute name="_upper_disp_limit" type="double" accessor="upper_disp_limit"/>
             <attribute name="_lower_disp_limit" type="double" accessor="lower_disp_limit"/>
             <attribute name="_upper_alarm_limit" type="double" accessor="upper_alarm_limit"/>
@@ -524,7 +524,7 @@
 		
 		<pstype name="EpicsPvCtrlHeader" base="EpicsPvHeader">
 
-			<attribute name="_sPvName" type="char" dimensions="iMaxPvNameLength" accessor="pvName"/>
+			<attribute name="_sPvName" type="char" shape="iMaxPvNameLength" accessor="pvName"/>
 
         </pstype>
         
@@ -542,7 +542,7 @@
 		
 		<pstype name="EpicsPvCtrlString" base="EpicsPvCtrlHeader">
 			<attribute name="_dbr" type="dbr_sts_string" accessor="dbr"/>
-			<attribute name="_data" type="char" dimensions="{self}.numElements(), MAX_STRING_SIZE" accessor="data"/>
+			<attribute name="_data" type="char" shape="{self}.numElements(), MAX_STRING_SIZE" accessor="data"/>
 			
 			<method name="value" type="string">
                 <arg name="i" type="uint32_t"/>
@@ -554,7 +554,7 @@
 		
 		<pstype name="EpicsPvCtrlShort" base="EpicsPvCtrlHeader">
 			<attribute name="_dbr" type="dbr_ctrl_short" accessor="dbr"/>
-			<attribute name="_data" type="int16_t" dimensions="{self}.numElements()" accessor="data"/>
+			<attribute name="_data" type="int16_t" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="int16_t">
                 <arg name="i" type="uint32_t"/>
@@ -567,7 +567,7 @@
 		<pstype name="EpicsPvCtrlFloat" base="EpicsPvCtrlHeader">
             <attribute name="pad0" type="int16_t"/>
 			<attribute name="_dbr" type="dbr_ctrl_float" accessor="dbr"/>
-			<attribute name="_data" type="float" dimensions="{self}.numElements()" accessor="data"/>
+			<attribute name="_data" type="float" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="float">
                 <arg name="i" type="uint32_t"/>
@@ -579,7 +579,7 @@
 		
 		<pstype name="EpicsPvCtrlEnum" base="EpicsPvCtrlHeader">
 			<attribute name="_dbr" type="dbr_ctrl_enum" accessor="dbr"/>
-			<attribute name="_data" type="uint16_t" dimensions="{self}.numElements()" accessor="data"/>
+			<attribute name="_data" type="uint16_t" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="uint16_t">
                 <arg name="i" type="uint32_t"/>
@@ -591,7 +591,7 @@
 		
 		<pstype name="EpicsPvCtrlChar" base="EpicsPvCtrlHeader">
 			<attribute name="_dbr" type="dbr_ctrl_char" accessor="dbr"/>
-			<attribute name="_data" type="uint8_t" dimensions="{self}.numElements()" accessor="data"/>
+			<attribute name="_data" type="uint8_t" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="uint8_t">
                 <arg name="i" type="uint32_t"/>
@@ -604,7 +604,7 @@
 		<pstype name="EpicsPvCtrlLong" base="EpicsPvCtrlHeader">
             <attribute name="pad0" type="int16_t"/>
 			<attribute name="_dbr" type="dbr_ctrl_long" accessor="dbr"/>
-			<attribute name="_data" type="int32_t" dimensions="{self}.numElements()" accessor="data"/>
+			<attribute name="_data" type="int32_t" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="int32_t">
                 <arg name="i" type="uint32_t"/>
@@ -617,7 +617,7 @@
 		<pstype name="EpicsPvCtrlDouble" base="EpicsPvCtrlHeader">
             <attribute name="pad0" type="int16_t"/>
 			<attribute name="_dbr" type="dbr_ctrl_double" accessor="dbr"/>
-			<attribute name="_data" type="double" dimensions="{self}.numElements()" accessor="data"/>
+			<attribute name="_data" type="double" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="double">
                 <arg name="i" type="uint32_t"/>
@@ -630,7 +630,7 @@
 		<pstype name="EpicsPvTimeString" base="EpicsPvTimeHeader">
             <attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_string" accessor="dbr"/>
-            <attribute name="_data" type="char" dimensions="{self}.numElements(), MAX_STRING_SIZE" accessor="data"/>
+            <attribute name="_data" type="char" shape="{self}.numElements(), MAX_STRING_SIZE" accessor="data"/>
             
             <method name="value" type="string">
                 <arg name="i" type="uint32_t"/>
@@ -643,7 +643,7 @@
 		<pstype name="EpicsPvTimeShort" base="EpicsPvTimeHeader">
 			<attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_short" accessor="dbr"/>
-            <attribute name="_data" type="int16_t" dimensions="{self}.numElements()" accessor="data"/>
+            <attribute name="_data" type="int16_t" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="int16_t">
                 <arg name="i" type="uint32_t"/>
@@ -656,7 +656,7 @@
 		<pstype name="EpicsPvTimeFloat" base="EpicsPvTimeHeader">
 			<attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_float" accessor="dbr"/>
-            <attribute name="_data" type="float" dimensions="{self}.numElements()" accessor="data"/>
+            <attribute name="_data" type="float" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="float">
                 <arg name="i" type="uint32_t"/>
@@ -669,7 +669,7 @@
 		<pstype name="EpicsPvTimeEnum" base="EpicsPvTimeHeader">
 			<attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_enum" accessor="dbr"/>
-            <attribute name="_data" type="uint16_t" dimensions="{self}.numElements()" accessor="data"/>
+            <attribute name="_data" type="uint16_t" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="uint16_t">
                 <arg name="i" type="uint32_t"/>
@@ -682,7 +682,7 @@
 		<pstype name="EpicsPvTimeChar" base="EpicsPvTimeHeader">
 			<attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_char" accessor="dbr"/>
-            <attribute name="_data" type="uint8_t" dimensions="{self}.numElements()" accessor="data"/>
+            <attribute name="_data" type="uint8_t" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="uint8_t">
                 <arg name="i" type="uint32_t"/>
@@ -695,7 +695,7 @@
 		<pstype name="EpicsPvTimeLong" base="EpicsPvTimeHeader">
 			<attribute name="pad0" type="int16_t"/>
             <attribute name="_dbr" type="dbr_time_long" accessor="dbr"/>
-            <attribute name="_data" type="int32_t" dimensions="{self}.numElements()" accessor="data"/>
+            <attribute name="_data" type="int32_t" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="int32_t">
                 <arg name="i" type="uint32_t"/>
@@ -708,7 +708,7 @@
 		<pstype name="EpicsPvTimeDouble" base="EpicsPvTimeHeader">
 			<attribute name="pad0" type="int16_t" />
             <attribute name="_dbr" type="dbr_time_double" accessor="dbr"/>
-            <attribute name="_data" type="double" dimensions="{self}.numElements()" accessor="data"/>
+            <attribute name="_data" type="double" shape="{self}.numElements()" accessor="data"/>
 
             <method name="value" type="double">
                 <arg name="i" type="uint32_t"/>

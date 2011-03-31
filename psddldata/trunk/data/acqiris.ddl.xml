@@ -164,7 +164,7 @@
             <attribute name="_horiz" type="HorizV1" accessor="horiz">
             </attribute>
 
-            <attribute name="_vert" type="VertV1" dimensions="MaxChan" accessor="vert">
+            <attribute name="_vert" type="VertV1" shape="MaxChan" accessor="vert" shape_method="vert_shape">
             </attribute>
 
             <method name="nbrChannels" type="uint32_t">
@@ -254,15 +254,16 @@
             </attribute>
 
             <attribute name="_timestamps" type="TimestampV1" 
-                    dimensions="{xtc-config}.horiz().nbrSegments()" accessor="_timestamp">
+                    shape="{xtc-config}.horiz().nbrSegments()" accessor="timestamp"
+                    shape_method="timestamps_shape">
             </attribute>
 
             <attribute name="_waveforms" type="int16_t" 
-                    dimensions="{xtc-config}.horiz().nbrSegments(),{xtc-config}.horiz().nbrSamples()" 
-                    accessor="_waveform">
+                    shape="{xtc-config}.horiz().nbrSegments(),{xtc-config}.horiz().nbrSamples()" 
+                    accessor="waveforms" shape_method="waveforms_shape">
             </attribute>
 
-            <attribute name="_extraSpace" type="int8_t" dimensions="_extra">
+            <attribute name="_extraSpace" type="int8_t" shape="_extra">
             </attribute>
 
         </pstype>
@@ -275,7 +276,8 @@
 
             <xtc-config name="ConfigV1" />
 
-            <attribute name="_data" type="DataDescV1Elem" dimensions="{xtc-config}.nbrChannels()" accessor="data"/>
+            <attribute name="_data" type="DataDescV1Elem" shape="{xtc-config}.nbrChannels()" 
+                accessor="data" shape_method="data_shape"/>
             
         </pstype>
 
@@ -476,10 +478,12 @@
             <const name="NChannels" value="8" />
             <const name="NAuxIO" value="2" />
 
-            <attribute name="_channel" type="TdcChannel" dimensions="NChannels" accessor="channels">
+            <attribute name="_channel" type="TdcChannel" shape="NChannels" 
+                       accessor="channels" shape_method="channels_shape">
             </attribute>
 
-            <attribute name="_auxIO" type="TdcAuxIO" dimensions="NAuxIO" accessor="auxio">
+            <attribute name="_auxIO" type="TdcAuxIO" shape="NAuxIO" 
+                    accessor="auxio" shape_method="auxio_shape">
             </attribute>
 
             <attribute name="_veto" type="TdcVetoIO" accessor="veto">
@@ -599,7 +603,8 @@
         
             Pds.Acqiris class TdcDataV1
 
-            <attribute name="_data" type="TdcDataV1_Item" dimensions="*" accessor="data">
+            <attribute name="_data" type="TdcDataV1_Item" shape="*" accessor="data"
+                        shape_method="data_shape">
             </attribute>
 
         </pstype>

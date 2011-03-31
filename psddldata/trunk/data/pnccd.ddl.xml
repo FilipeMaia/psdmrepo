@@ -60,11 +60,11 @@
             Magic word from CAMEX
             </attribute>
             
-            <attribute name="_info" type="char" dimensions="256" accessor="info">
+            <attribute name="_info" type="char" shape="256" accessor="info">
             Information data string
             </attribute>
             
-            <attribute name="_timingFName" type="char" dimensions="256" accessor="timingFName">
+            <attribute name="_timingFName" type="char" shape="256" accessor="timingFName">
             Timing file name string
             </attribute>
 
@@ -99,7 +99,7 @@
             Least significant part of timestamp
             </attribute>
 
-            <attribute name="__data" type="uint16_t" accessor="data" dimensions="({xtc-config}.payloadSizePerLink()-16)/2">
+            <attribute name="__data" type="uint16_t" accessor="data" shape="({xtc-config}.payloadSizePerLink()-16)/2">
             Frame data
             </attribute>
 
