@@ -29,7 +29,7 @@ public:
   virtual const Psana::Acqiris::HorizV1& horiz() const;
   virtual const Psana::Acqiris::VertV1& vert(uint32_t i0) const;
   virtual uint32_t nbrChannels() const;
-  virtual std::vector<int> _vert_shape() const;
+  virtual std::vector<int> vert_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -50,10 +50,10 @@ public:
   virtual uint32_t nbrSamplesInSeg() const;
   virtual uint32_t indexFirstPoint() const;
   virtual uint32_t nbrSegments() const;
-  virtual const Psana::Acqiris::TimestampV1& _timestamp(uint32_t i0) const;
-  virtual const int16_t* _waveform() const;
-  virtual std::vector<int> _timestamps_shape() const;
-  virtual std::vector<int> _waveforms_shape() const;
+  virtual const Psana::Acqiris::TimestampV1& timestamp(uint32_t i0) const;
+  virtual const int16_t* waveforms() const;
+  virtual std::vector<int> timestamps_shape() const;
+  virtual std::vector<int> waveforms_shape() const;
   virtual std::vector<int> _extraSpace_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -70,7 +70,7 @@ public:
   DataDescV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Acqiris::ConfigV1>& cfgPtr);
   virtual ~DataDescV1();
   virtual const Psana::Acqiris::DataDescV1Elem& data(uint32_t i0) const;
-  virtual std::vector<int> _data_shape() const;
+  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -94,8 +94,8 @@ public:
   virtual const Psana::Acqiris::TdcChannel& channels(uint32_t i0) const;
   virtual const Psana::Acqiris::TdcAuxIO& auxio(uint32_t i0) const;
   virtual const Psana::Acqiris::TdcVetoIO& veto() const;
-  virtual std::vector<int> _channel_shape() const;
-  virtual std::vector<int> _auxIO_shape() const;
+  virtual std::vector<int> channels_shape() const;
+  virtual std::vector<int> auxio_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -114,7 +114,7 @@ public:
   TdcDataV1(const boost::shared_ptr<const XtcType>& xtcPtr, size_t xtcSize);
   virtual ~TdcDataV1();
   virtual const Psana::Acqiris::TdcDataV1_Item& data(uint32_t i0) const;
-  virtual std::vector<int> _data_shape() const;
+  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

@@ -30,8 +30,8 @@ public:
   virtual const Psana::Camera::FrameCoord& defect_pixel_coordinates(uint32_t i0) const;
   virtual uint16_t output_offset() const;
   virtual uint32_t output_resolution_bits() const;
-  virtual std::vector<int> _lookup_table_shape() const;
-  virtual std::vector<int> _defectPixels_shape() const;
+  virtual std::vector<int> output_lookup_table_shape() const;
+  virtual std::vector<int> defect_pixel_coordinates_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

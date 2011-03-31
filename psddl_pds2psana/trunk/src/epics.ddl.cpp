@@ -137,7 +137,7 @@ uint16_t EpicsPvCtrlHeader::severity() const { return m_xtcObj->severity(); }
 
 const char* EpicsPvCtrlHeader::pvName() const { return m_xtcObj->pvName(); }
 
-std::vector<int> EpicsPvCtrlHeader::_sPvName_shape() const { return m_xtcObj->_sPvName_shape(); }
+std::vector<int> EpicsPvCtrlHeader::pvName_shape() const { return m_xtcObj->pvName_shape(); }
 EpicsPvTimeHeader::EpicsPvTimeHeader(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvTimeHeader()
   , m_xtcObj(xtcPtr)
@@ -200,9 +200,9 @@ const char* EpicsPvCtrlString::data() const { return m_xtcObj->data(); }
 
 const char* EpicsPvCtrlString::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvCtrlString::_sPvName_shape() const { return m_xtcObj->_sPvName_shape(); }
+std::vector<int> EpicsPvCtrlString::pvName_shape() const { return m_xtcObj->pvName_shape(); }
 
-std::vector<int> EpicsPvCtrlString::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvCtrlString::data_shape() const { return m_xtcObj->data_shape(); }
 EpicsPvCtrlShort::EpicsPvCtrlShort(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvCtrlShort()
   , m_xtcObj(xtcPtr)
@@ -238,9 +238,9 @@ const int16_t* EpicsPvCtrlShort::data() const { return m_xtcObj->data(); }
 
 int16_t EpicsPvCtrlShort::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvCtrlShort::_sPvName_shape() const { return m_xtcObj->_sPvName_shape(); }
+std::vector<int> EpicsPvCtrlShort::pvName_shape() const { return m_xtcObj->pvName_shape(); }
 
-std::vector<int> EpicsPvCtrlShort::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvCtrlShort::data_shape() const { return m_xtcObj->data_shape(); }
 EpicsPvCtrlFloat::EpicsPvCtrlFloat(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvCtrlFloat()
   , m_xtcObj(xtcPtr)
@@ -276,9 +276,9 @@ const float* EpicsPvCtrlFloat::data() const { return m_xtcObj->data(); }
 
 float EpicsPvCtrlFloat::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvCtrlFloat::_sPvName_shape() const { return m_xtcObj->_sPvName_shape(); }
+std::vector<int> EpicsPvCtrlFloat::pvName_shape() const { return m_xtcObj->pvName_shape(); }
 
-std::vector<int> EpicsPvCtrlFloat::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvCtrlFloat::data_shape() const { return m_xtcObj->data_shape(); }
 EpicsPvCtrlEnum::EpicsPvCtrlEnum(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvCtrlEnum()
   , m_xtcObj(xtcPtr)
@@ -314,9 +314,9 @@ const uint16_t* EpicsPvCtrlEnum::data() const { return m_xtcObj->data(); }
 
 uint16_t EpicsPvCtrlEnum::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvCtrlEnum::_sPvName_shape() const { return m_xtcObj->_sPvName_shape(); }
+std::vector<int> EpicsPvCtrlEnum::pvName_shape() const { return m_xtcObj->pvName_shape(); }
 
-std::vector<int> EpicsPvCtrlEnum::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvCtrlEnum::data_shape() const { return m_xtcObj->data_shape(); }
 EpicsPvCtrlChar::EpicsPvCtrlChar(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvCtrlChar()
   , m_xtcObj(xtcPtr)
@@ -352,9 +352,9 @@ const uint8_t* EpicsPvCtrlChar::data() const { return m_xtcObj->data(); }
 
 uint8_t EpicsPvCtrlChar::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvCtrlChar::_sPvName_shape() const { return m_xtcObj->_sPvName_shape(); }
+std::vector<int> EpicsPvCtrlChar::pvName_shape() const { return m_xtcObj->pvName_shape(); }
 
-std::vector<int> EpicsPvCtrlChar::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvCtrlChar::data_shape() const { return m_xtcObj->data_shape(); }
 EpicsPvCtrlLong::EpicsPvCtrlLong(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvCtrlLong()
   , m_xtcObj(xtcPtr)
@@ -390,9 +390,9 @@ const int32_t* EpicsPvCtrlLong::data() const { return m_xtcObj->data(); }
 
 int32_t EpicsPvCtrlLong::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvCtrlLong::_sPvName_shape() const { return m_xtcObj->_sPvName_shape(); }
+std::vector<int> EpicsPvCtrlLong::pvName_shape() const { return m_xtcObj->pvName_shape(); }
 
-std::vector<int> EpicsPvCtrlLong::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvCtrlLong::data_shape() const { return m_xtcObj->data_shape(); }
 EpicsPvCtrlDouble::EpicsPvCtrlDouble(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvCtrlDouble()
   , m_xtcObj(xtcPtr)
@@ -428,9 +428,9 @@ const double* EpicsPvCtrlDouble::data() const { return m_xtcObj->data(); }
 
 double EpicsPvCtrlDouble::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvCtrlDouble::_sPvName_shape() const { return m_xtcObj->_sPvName_shape(); }
+std::vector<int> EpicsPvCtrlDouble::pvName_shape() const { return m_xtcObj->pvName_shape(); }
 
-std::vector<int> EpicsPvCtrlDouble::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvCtrlDouble::data_shape() const { return m_xtcObj->data_shape(); }
 EpicsPvTimeString::EpicsPvTimeString(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvTimeString()
   , m_xtcObj(xtcPtr)
@@ -466,7 +466,7 @@ const char* EpicsPvTimeString::data() const { return m_xtcObj->data(); }
 
 const char* EpicsPvTimeString::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvTimeString::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvTimeString::data_shape() const { return m_xtcObj->data_shape(); }
 EpicsPvTimeShort::EpicsPvTimeShort(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvTimeShort()
   , m_xtcObj(xtcPtr)
@@ -502,7 +502,7 @@ const int16_t* EpicsPvTimeShort::data() const { return m_xtcObj->data(); }
 
 int16_t EpicsPvTimeShort::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvTimeShort::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvTimeShort::data_shape() const { return m_xtcObj->data_shape(); }
 EpicsPvTimeFloat::EpicsPvTimeFloat(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvTimeFloat()
   , m_xtcObj(xtcPtr)
@@ -538,7 +538,7 @@ const float* EpicsPvTimeFloat::data() const { return m_xtcObj->data(); }
 
 float EpicsPvTimeFloat::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvTimeFloat::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvTimeFloat::data_shape() const { return m_xtcObj->data_shape(); }
 EpicsPvTimeEnum::EpicsPvTimeEnum(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvTimeEnum()
   , m_xtcObj(xtcPtr)
@@ -574,7 +574,7 @@ const uint16_t* EpicsPvTimeEnum::data() const { return m_xtcObj->data(); }
 
 uint16_t EpicsPvTimeEnum::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvTimeEnum::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvTimeEnum::data_shape() const { return m_xtcObj->data_shape(); }
 EpicsPvTimeChar::EpicsPvTimeChar(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvTimeChar()
   , m_xtcObj(xtcPtr)
@@ -610,7 +610,7 @@ const uint8_t* EpicsPvTimeChar::data() const { return m_xtcObj->data(); }
 
 uint8_t EpicsPvTimeChar::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvTimeChar::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvTimeChar::data_shape() const { return m_xtcObj->data_shape(); }
 EpicsPvTimeLong::EpicsPvTimeLong(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvTimeLong()
   , m_xtcObj(xtcPtr)
@@ -646,7 +646,7 @@ const int32_t* EpicsPvTimeLong::data() const { return m_xtcObj->data(); }
 
 int32_t EpicsPvTimeLong::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvTimeLong::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvTimeLong::data_shape() const { return m_xtcObj->data_shape(); }
 EpicsPvTimeDouble::EpicsPvTimeDouble(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::EpicsPvTimeDouble()
   , m_xtcObj(xtcPtr)
@@ -682,6 +682,6 @@ const double* EpicsPvTimeDouble::data() const { return m_xtcObj->data(); }
 
 double EpicsPvTimeDouble::value(uint32_t i) const { return m_xtcObj->value(i); }
 
-std::vector<int> EpicsPvTimeDouble::_data_shape() const { return m_xtcObj->_data_shape(); }
+std::vector<int> EpicsPvTimeDouble::data_shape() const { return m_xtcObj->data_shape(); }
 } // namespace Epics
 } // namespace psddl_pds2psana

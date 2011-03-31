@@ -26,8 +26,8 @@ public:
   virtual uint32_t npvMonitors() const;
   virtual const Psana::ControlData::PVControl& pvControls(uint32_t i0) const;
   virtual const Psana::ControlData::PVMonitor& pvMonitors(uint32_t i0) const;
-  virtual std::vector<int> _pvControls_shape() const;
-  virtual std::vector<int> _pvMonitors_shape() const;
+  virtual std::vector<int> pvControls_shape() const;
+  virtual std::vector<int> pvMonitors_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

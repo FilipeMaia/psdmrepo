@@ -78,8 +78,8 @@ uint32_t FccdConfigV2::trimmedWidth() const { return m_xtcObj->trimmedWidth(); }
 
 uint32_t FccdConfigV2::trimmedHeight() const { return m_xtcObj->trimmedHeight(); }
 
-std::vector<int> FccdConfigV2::_dacVoltage_shape() const { return m_xtcObj->_dacVoltage_shape(); }
+std::vector<int> FccdConfigV2::dacVoltages_shape() const { return m_xtcObj->dacVoltages_shape(); }
 
-std::vector<int> FccdConfigV2::_waveform_shape() const { return m_xtcObj->_waveform_shape(); }
+std::vector<int> FccdConfigV2::waveforms_shape() const { return m_xtcObj->waveforms_shape(); }
 } // namespace FCCD
 } // namespace psddl_pds2psana

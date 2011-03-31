@@ -40,8 +40,8 @@ public:
   virtual uint32_t camexMagic() const;
   virtual const char* info() const;
   virtual const char* timingFName() const;
-  virtual std::vector<int> _info_shape() const;
-  virtual std::vector<int> _timingFName_shape() const;
+  virtual std::vector<int> info_shape() const;
+  virtual std::vector<int> timingFName_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -60,7 +60,7 @@ public:
   virtual uint32_t timeStampHi() const;
   virtual uint32_t timeStampLo() const;
   virtual const uint16_t* data() const;
-  virtual std::vector<int> __data_shape() const;
+  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

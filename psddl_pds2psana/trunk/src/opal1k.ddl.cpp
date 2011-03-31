@@ -29,7 +29,7 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   , m_xtcObj(xtcPtr)
 {
   {
-    const std::vector<int>& dims = xtcPtr->_defectPixels_shape();
+    const std::vector<int>& dims = xtcPtr->defect_pixel_coordinates_shape();
     _defectPixels.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
       _defectPixels.push_back(psddl_pds2psana::Camera::pds_to_psana(xtcPtr->defect_pixel_coordinates(i0)));
@@ -67,8 +67,8 @@ uint16_t ConfigV1::output_offset() const { return m_xtcObj->output_offset(); }
 
 uint32_t ConfigV1::output_resolution_bits() const { return m_xtcObj->output_resolution_bits(); }
 
-std::vector<int> ConfigV1::_lookup_table_shape() const { return m_xtcObj->_lookup_table_shape(); }
-std::vector<int> ConfigV1::_defectPixels_shape() const
+std::vector<int> ConfigV1::output_lookup_table_shape() const { return m_xtcObj->output_lookup_table_shape(); }
+std::vector<int> ConfigV1::defect_pixel_coordinates_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

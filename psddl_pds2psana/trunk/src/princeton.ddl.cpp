@@ -61,9 +61,9 @@ float FrameV1::readoutTime() const { return m_xtcObj->readoutTime(); }
 
 const uint16_t* FrameV1::data() const { return m_xtcObj->data(); }
 
-std::vector<int> FrameV1::_data_shape() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->_data_shape(*m_cfgPtr0);
-  throw std::runtime_error("FrameV1::_data_shape: config object pointer is zero");
+std::vector<int> FrameV1::data_shape() const {
+  if (m_cfgPtr0.get()) return m_xtcObj->data_shape(*m_cfgPtr0);
+  throw std::runtime_error("FrameV1::data_shape: config object pointer is zero");
 }
 
 Psana::Princeton::InfoV1 pds_to_psana(PsddlPds::Princeton::InfoV1 pds)

@@ -24,7 +24,7 @@ IpmFexConfigV1::IpmFexConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   , m_xtcObj(xtcPtr)
 {
   {
-    const std::vector<int>& dims = xtcPtr->_diode_shape();
+    const std::vector<int>& dims = xtcPtr->diode_shape();
     _diode.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
       _diode.push_back(psddl_pds2psana::Lusi::pds_to_psana(xtcPtr->diode(i0)));
@@ -41,7 +41,7 @@ const Psana::Lusi::DiodeFexConfigV1& IpmFexConfigV1::diode(uint32_t i0) const { 
 float IpmFexConfigV1::xscale() const { return m_xtcObj->xscale(); }
 
 float IpmFexConfigV1::yscale() const { return m_xtcObj->yscale(); }
-std::vector<int> IpmFexConfigV1::_diode_shape() const
+std::vector<int> IpmFexConfigV1::diode_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

@@ -25,14 +25,14 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   , _duration(xtcPtr->duration())
 {
   {
-    const std::vector<int>& dims = xtcPtr->_pvControls_shape();
+    const std::vector<int>& dims = xtcPtr->pvControls_shape();
     _pvControls.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
       _pvControls.push_back(psddl_pds2psana::ControlData::pds_to_psana(xtcPtr->pvControls(i0)));
     }
   }
   {
-    const std::vector<int>& dims = xtcPtr->_pvMonitors_shape();
+    const std::vector<int>& dims = xtcPtr->pvMonitors_shape();
     _pvMonitors.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
       _pvMonitors.push_back(psddl_pds2psana::ControlData::pds_to_psana(xtcPtr->pvMonitors(i0)));
@@ -53,7 +53,7 @@ uint32_t ConfigV1::npvMonitors() const { return m_xtcObj->npvMonitors(); }
 const Psana::ControlData::PVControl& ConfigV1::pvControls(uint32_t i0) const { return _pvControls[i0]; }
 
 const Psana::ControlData::PVMonitor& ConfigV1::pvMonitors(uint32_t i0) const { return _pvMonitors[i0]; }
-std::vector<int> ConfigV1::_pvControls_shape() const
+std::vector<int> ConfigV1::pvControls_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -61,7 +61,7 @@ std::vector<int> ConfigV1::_pvControls_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV1::_pvMonitors_shape() const
+std::vector<int> ConfigV1::pvMonitors_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

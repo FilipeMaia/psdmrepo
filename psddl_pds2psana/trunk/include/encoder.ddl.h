@@ -50,7 +50,7 @@ public:
   virtual ~DataV2();
   virtual uint32_t timestamp() const;
   virtual const uint32_t* encoder_count() const;
-  virtual std::vector<int> _encoder_count_shape() const;
+  virtual std::vector<int> encoder_count_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

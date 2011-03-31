@@ -31,7 +31,7 @@ CsPadDigitalPotsCfg::~CsPadDigitalPotsCfg()
 
 const uint8_t* CsPadDigitalPotsCfg::pots() const { return m_xtcObj->pots(); }
 
-std::vector<int> CsPadDigitalPotsCfg::_pots_shape() const { return m_xtcObj->_pots_shape(); }
+std::vector<int> CsPadDigitalPotsCfg::pots_shape() const { return m_xtcObj->pots_shape(); }
 CsPadReadOnlyCfg::CsPadReadOnlyCfg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::CsPadReadOnlyCfg()
   , m_xtcObj(xtcPtr)
@@ -57,7 +57,7 @@ CsPadGainMapCfg::~CsPadGainMapCfg()
 
 const uint16_t* CsPadGainMapCfg::gainMap() const { return m_xtcObj->gainMap(); }
 
-std::vector<int> CsPadGainMapCfg::_gainMap_shape() const { return m_xtcObj->_gainMap_shape(); }
+std::vector<int> CsPadGainMapCfg::gainMap_shape() const { return m_xtcObj->gainMap_shape(); }
 ConfigV1QuadReg::ConfigV1QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::ConfigV1QuadReg()
   , m_xtcObj(xtcPtr)
@@ -101,15 +101,15 @@ const Psana::CsPad::CsPadDigitalPotsCfg& ConfigV1QuadReg::dp() const { return _d
 
 const Psana::CsPad::CsPadGainMapCfg& ConfigV1QuadReg::gm() const { return _gainMap; }
 
-std::vector<int> ConfigV1QuadReg::_shiftSelect_shape() const { return m_xtcObj->_shiftSelect_shape(); }
+std::vector<int> ConfigV1QuadReg::shiftSelect_shape() const { return m_xtcObj->shiftSelect_shape(); }
 
-std::vector<int> ConfigV1QuadReg::_edgeSelect_shape() const { return m_xtcObj->_edgeSelect_shape(); }
+std::vector<int> ConfigV1QuadReg::edgeSelect_shape() const { return m_xtcObj->edgeSelect_shape(); }
 ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::ConfigV1()
   , m_xtcObj(xtcPtr)
 {
   {
-    const std::vector<int>& dims = xtcPtr->_quads_shape();
+    const std::vector<int>& dims = xtcPtr->quads_shape();
     _quads.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
       const PsddlPds::CsPad::ConfigV1QuadReg& d = xtcPtr->quads(i0);
@@ -152,7 +152,7 @@ uint32_t ConfigV1::numAsicsRead() const { return m_xtcObj->numAsicsRead(); }
 uint32_t ConfigV1::numQuads() const { return m_xtcObj->numQuads(); }
 
 uint32_t ConfigV1::numSect() const { return m_xtcObj->numSect(); }
-std::vector<int> ConfigV1::_quads_shape() const
+std::vector<int> ConfigV1::quads_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -165,7 +165,7 @@ ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   , m_xtcObj(xtcPtr)
 {
   {
-    const std::vector<int>& dims = xtcPtr->_quads_shape();
+    const std::vector<int>& dims = xtcPtr->quads_shape();
     _quads.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
       const PsddlPds::CsPad::ConfigV1QuadReg& d = xtcPtr->quads(i0);
@@ -212,7 +212,7 @@ uint32_t ConfigV2::numAsicsStored(uint32_t iq) const { return m_xtcObj->numAsics
 uint32_t ConfigV2::numQuads() const { return m_xtcObj->numQuads(); }
 
 uint32_t ConfigV2::numSect() const { return m_xtcObj->numSect(); }
-std::vector<int> ConfigV2::_quads_shape() const
+std::vector<int> ConfigV2::quads_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -237,6 +237,18 @@ ElementV1::~ElementV1()
 }
 
 
+uint32_t ElementV1::virtual_channel() const { return m_xtcObj->virtual_channel(); }
+
+uint32_t ElementV1::lane() const { return m_xtcObj->lane(); }
+
+uint32_t ElementV1::tid() const { return m_xtcObj->tid(); }
+
+uint32_t ElementV1::acq_count() const { return m_xtcObj->acq_count(); }
+
+uint32_t ElementV1::op_code() const { return m_xtcObj->op_code(); }
+
+uint32_t ElementV1::quad() const { return m_xtcObj->quad(); }
+
 uint32_t ElementV1::seq_count() const { return m_xtcObj->seq_count(); }
 
 uint32_t ElementV1::ticks() const { return m_xtcObj->ticks(); }
@@ -249,16 +261,60 @@ uint32_t ElementV1::frame_type() const { return m_xtcObj->frame_type(); }
 
 const uint16_t* ElementV1::data() const { return m_xtcObj->data(); }
 
-std::vector<int> ElementV1::_sbtemp_shape() const { return m_xtcObj->_sbtemp_shape(); }
+std::vector<int> ElementV1::sb_temp_shape() const { return m_xtcObj->sb_temp_shape(); }
 
-std::vector<int> ElementV1::_data_shape() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->_data_shape(*m_cfgPtr0);
-  if (m_cfgPtr1.get()) return m_xtcObj->_data_shape(*m_cfgPtr1);
-  throw std::runtime_error("ElementV1::_data_shape: config object pointer is zero");
+std::vector<int> ElementV1::data_shape() const {
+  if (m_cfgPtr0.get()) return m_xtcObj->data_shape(*m_cfgPtr0);
+  if (m_cfgPtr1.get()) return m_xtcObj->data_shape(*m_cfgPtr1);
+  throw std::runtime_error("ElementV1::data_shape: config object pointer is zero");
 }
 
 
 std::vector<int> ElementV1::_extra_shape() const { return m_xtcObj->_extra_shape(); }
+DataV1::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV1>& cfgPtr)
+  : Psana::CsPad::DataV1()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr0(cfgPtr)
+{
+  {
+    const std::vector<int>& dims = xtcPtr->quads_shape(*cfgPtr);
+    _quads.reserve(dims[0]);
+    for (int i0=0; i0 != dims[0]; ++i0) {
+      const PsddlPds::CsPad::ElementV1& d = xtcPtr->quads(*cfgPtr, i0);
+      boost::shared_ptr<const PsddlPds::CsPad::ElementV1> dPtr(m_xtcObj, &d);
+      _quads.push_back(psddl_pds2psana::CsPad::ElementV1(dPtr, cfgPtr));
+    }
+  }
+}
+DataV1::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV2>& cfgPtr)
+  : Psana::CsPad::DataV1()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr1(cfgPtr)
+{
+  {
+    const std::vector<int>& dims = xtcPtr->quads_shape(*cfgPtr);
+    _quads.reserve(dims[0]);
+    for (int i0=0; i0 != dims[0]; ++i0) {
+      const PsddlPds::CsPad::ElementV1& d = xtcPtr->quads(*cfgPtr, i0);
+      boost::shared_ptr<const PsddlPds::CsPad::ElementV1> dPtr(m_xtcObj, &d);
+      _quads.push_back(psddl_pds2psana::CsPad::ElementV1(dPtr, cfgPtr));
+    }
+  }
+}
+DataV1::~DataV1()
+{
+}
+
+
+const Psana::CsPad::ElementV1& DataV1::quads(uint32_t i0) const { return _quads[i0]; }
+std::vector<int> DataV1::quads_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(_quads.size());
+  return shape;
+}
+
 ElementV2::ElementV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV2>& cfgPtr)
   : Psana::CsPad::ElementV2()
   , m_xtcObj(xtcPtr)
@@ -269,6 +325,18 @@ ElementV2::~ElementV2()
 {
 }
 
+
+uint32_t ElementV2::virtual_channel() const { return m_xtcObj->virtual_channel(); }
+
+uint32_t ElementV2::lane() const { return m_xtcObj->lane(); }
+
+uint32_t ElementV2::tid() const { return m_xtcObj->tid(); }
+
+uint32_t ElementV2::acq_count() const { return m_xtcObj->acq_count(); }
+
+uint32_t ElementV2::op_code() const { return m_xtcObj->op_code(); }
+
+uint32_t ElementV2::quad() const { return m_xtcObj->quad(); }
 
 uint32_t ElementV2::seq_count() const { return m_xtcObj->seq_count(); }
 
@@ -282,14 +350,43 @@ uint32_t ElementV2::frame_type() const { return m_xtcObj->frame_type(); }
 
 const uint16_t* ElementV2::data() const { return m_xtcObj->data(); }
 
-std::vector<int> ElementV2::_sbtemp_shape() const { return m_xtcObj->_sbtemp_shape(); }
+std::vector<int> ElementV2::sb_temp_shape() const { return m_xtcObj->sb_temp_shape(); }
 
-std::vector<int> ElementV2::_data_shape() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->_data_shape(*m_cfgPtr0);
-  throw std::runtime_error("ElementV2::_data_shape: config object pointer is zero");
+std::vector<int> ElementV2::data_shape() const {
+  if (m_cfgPtr0.get()) return m_xtcObj->data_shape(*m_cfgPtr0);
+  throw std::runtime_error("ElementV2::data_shape: config object pointer is zero");
 }
 
 
 std::vector<int> ElementV2::_extra_shape() const { return m_xtcObj->_extra_shape(); }
+DataV2::DataV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV2>& cfgPtr)
+  : Psana::CsPad::DataV2()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr0(cfgPtr)
+{
+  {
+    const std::vector<int>& dims = xtcPtr->quads_shape(*cfgPtr);
+    _quads.reserve(dims[0]);
+    for (int i0=0; i0 != dims[0]; ++i0) {
+      const PsddlPds::CsPad::ElementV2& d = xtcPtr->quads(*cfgPtr, i0);
+      boost::shared_ptr<const PsddlPds::CsPad::ElementV2> dPtr(m_xtcObj, &d);
+      _quads.push_back(psddl_pds2psana::CsPad::ElementV2(dPtr, cfgPtr));
+    }
+  }
+}
+DataV2::~DataV2()
+{
+}
+
+
+const Psana::CsPad::ElementV2& DataV2::quads(uint32_t i0) const { return _quads[i0]; }
+std::vector<int> DataV2::quads_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(_quads.size());
+  return shape;
+}
+
 } // namespace CsPad
 } // namespace psddl_pds2psana

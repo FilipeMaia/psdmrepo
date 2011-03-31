@@ -43,8 +43,8 @@ public:
   virtual uint32_t height() const;
   virtual uint32_t trimmedWidth() const;
   virtual uint32_t trimmedHeight() const;
-  virtual std::vector<int> _dacVoltage_shape() const;
-  virtual std::vector<int> _waveform_shape() const;
+  virtual std::vector<int> dacVoltages_shape() const;
+  virtual std::vector<int> waveforms_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

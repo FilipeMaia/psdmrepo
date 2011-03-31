@@ -44,7 +44,7 @@ public:
   virtual uint32_t shotIdStart() const;
   virtual float readoutTime() const;
   virtual const uint16_t* data() const;
-  virtual std::vector<int> _data_shape() const;
+  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

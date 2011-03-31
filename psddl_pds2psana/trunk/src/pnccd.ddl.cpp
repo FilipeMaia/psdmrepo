@@ -52,9 +52,9 @@ const char* ConfigV2::info() const { return m_xtcObj->info(); }
 
 const char* ConfigV2::timingFName() const { return m_xtcObj->timingFName(); }
 
-std::vector<int> ConfigV2::_info_shape() const { return m_xtcObj->_info_shape(); }
+std::vector<int> ConfigV2::info_shape() const { return m_xtcObj->info_shape(); }
 
-std::vector<int> ConfigV2::_timingFName_shape() const { return m_xtcObj->_timingFName_shape(); }
+std::vector<int> ConfigV2::timingFName_shape() const { return m_xtcObj->timingFName_shape(); }
 FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1>& cfgPtr)
   : Psana::PNCCD::FrameV1()
   , m_xtcObj(xtcPtr)
@@ -82,10 +82,10 @@ uint32_t FrameV1::timeStampLo() const { return m_xtcObj->timeStampLo(); }
 
 const uint16_t* FrameV1::data() const { return m_xtcObj->data(); }
 
-std::vector<int> FrameV1::__data_shape() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->__data_shape(*m_cfgPtr0);
-  if (m_cfgPtr1.get()) return m_xtcObj->__data_shape(*m_cfgPtr1);
-  throw std::runtime_error("FrameV1::__data_shape: config object pointer is zero");
+std::vector<int> FrameV1::data_shape() const {
+  if (m_cfgPtr0.get()) return m_xtcObj->data_shape(*m_cfgPtr0);
+  if (m_cfgPtr1.get()) return m_xtcObj->data_shape(*m_cfgPtr1);
+  throw std::runtime_error("FrameV1::data_shape: config object pointer is zero");
 }
 
 } // namespace PNCCD

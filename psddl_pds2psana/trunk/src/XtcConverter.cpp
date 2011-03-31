@@ -288,8 +288,8 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     if (version == 1) ::storeValueType<Psana::Princeton::InfoV1, PsddlPds::Princeton::InfoV1>(xtc, evt);
     break;
   case Pds::TypeId::Id_CspadElement:
-    if (version == 1) ::storeDataProxyCfg2<CsPad::ElementV1, PsddlPds::CsPad::ConfigV1, PsddlPds::CsPad::ConfigV2>(xtc, evt, cfgStore);
-    if (version == 2) ::storeDataProxyCfg<CsPad::ElementV2, PsddlPds::CsPad::ConfigV2>(xtc, evt, cfgStore);
+    if (version == 1) ::storeDataProxyCfg2<CsPad::DataV1, PsddlPds::CsPad::ConfigV1, PsddlPds::CsPad::ConfigV2>(xtc, evt, cfgStore);
+    if (version == 2) ::storeDataProxyCfg<CsPad::DataV2, PsddlPds::CsPad::ConfigV2>(xtc, evt, cfgStore);
     break;
   case Pds::TypeId::Id_CspadConfig:
     break;

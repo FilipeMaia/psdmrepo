@@ -23,7 +23,7 @@ public:
   virtual const Psana::Lusi::DiodeFexConfigV1& diode(uint32_t i0) const;
   virtual float xscale() const;
   virtual float yscale() const;
-  virtual std::vector<int> _diode_shape() const;
+  virtual std::vector<int> diode_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
