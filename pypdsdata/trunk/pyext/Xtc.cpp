@@ -168,6 +168,11 @@ Xtc_src( PyObject* self, void* )
   }
 }
 
+/**
+ *  Return payload as Python object. May return None in some cases 
+ *  (for Any object or non-fatal errors such as zero-payload Epics) or 
+ *  throw an exception if error is fatal.
+ */
 PyObject*
 Xtc_payload( PyObject* self, PyObject* )
 {

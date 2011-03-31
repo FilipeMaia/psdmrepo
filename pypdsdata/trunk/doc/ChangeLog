@@ -1,4 +1,8 @@
 
+2011-03-31 - V00-00-27
+======================
+- fix for zero-sized Epics XTC objects
+
 2011-03-11 - V00-00-26
 ======================
 - fixing copy and paste error in cspad.py

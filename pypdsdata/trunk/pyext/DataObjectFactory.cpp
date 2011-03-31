@@ -190,9 +190,14 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     break ;
 
   case Pds::TypeId::Id_Epics :
-    clone = ::cloneXtc( xtc );
-    obj = EpicsModule::PyObject_FromXtc(*clone->m_obj, clone);
-    Py_CLEAR(clone);
+    if (xtc.sizeofPayload() == 0) {
+      // some strange kind of damage where Epics data has 0 size
+      Py_RETURN_NONE;
+    } else {
+      clone = ::cloneXtc( xtc );
+      obj = EpicsModule::PyObject_FromXtc(*clone->m_obj, clone);
+      Py_CLEAR(clone);
+    }
     break ;
 
   case Pds::TypeId::Id_FEEGasDetEnergy :
