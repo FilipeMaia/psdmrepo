@@ -108,7 +108,7 @@ DumpAcqTdc::event(Event& evt, Env& env)
     
   } else {
   
-    const std::vector<int>& shape = tdcData->_data_shape();
+    const std::vector<int>& shape = tdcData->data_shape();
     for (int i = 0; i < shape[0]; ++ i) {
       
       const Psana::Acqiris::TdcDataV1_Item& item = tdcData->data(i);

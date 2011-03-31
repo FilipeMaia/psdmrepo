@@ -98,7 +98,7 @@ DumpAcqiris::event(Event& evt, Env& env)
   if (not acqData.get()) {
     MsgLog(logger, info, name() << ": Acqiris::DataDescV1 not found");    
   } else {
-    const std::vector<int>& shape = acqData->_data_shape();
+    const std::vector<int>& shape = acqData->data_shape();
     for (int i = 0; i < shape[0]; ++ i) {
       const Psana::Acqiris::DataDescV1Elem& elem = acqData->data(i);
       MsgLog(logger, info, name() << ": Acqiris::DataDescV1: element=" << i 

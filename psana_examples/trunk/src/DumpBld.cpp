@@ -69,18 +69,33 @@ DumpBld::~DumpBld ()
 void 
 DumpBld::event(Event& evt, Env& env)
 {
+  shared_ptr<Psana::Bld::BldDataEBeamV0> ebeam0 = evt.get(m_ebeamSrc);
+  if (ebeam0.get()) {
+    MsgLog(logger, info, name() << ": Bld::BldDataEBeamV0: damageMask=" << ebeam0->damageMask()
+         << " ebeamCharge=" << ebeam0->ebeamCharge()
+         << " ebeamL3Energy=" << ebeam0->ebeamL3Energy()
+         << " ebeamLTUPosX=" << ebeam0->ebeamLTUPosX()
+         << " ebeamLTUPosY=" << ebeam0->ebeamLTUPosY()
+         << " ebeamLTUAngX=" << ebeam0->ebeamLTUAngX()
+         << " ebeamLTUAngY=" << ebeam0->ebeamLTUAngY()
+         );
+  }
+
   shared_ptr<Psana::Bld::BldDataEBeam> ebeam = evt.get(m_ebeamSrc);
-  if (not ebeam.get()) {
-    MsgLog(logger, info, name() << ": Bld::BldDataEBeam not found");    
-  } else {
-    MsgLog(logger, info, name() << ": Bld::BldDataEBeam: ebeamCharge=" << ebeam->ebeamCharge()
-         << " ebeamL3Energy=" << ebeam->ebeamL3Energy());
+  if (ebeam.get()) {
+    MsgLog(logger, info, name() << ": Bld::BldDataEBeam: damageMask=" << ebeam->damageMask()
+         << " ebeamCharge=" << ebeam->ebeamCharge()
+         << " ebeamL3Energy=" << ebeam->ebeamL3Energy()
+         << " ebeamLTUPosX=" << ebeam->ebeamLTUPosX()
+         << " ebeamLTUPosY=" << ebeam->ebeamLTUPosY()
+         << " ebeamLTUAngX=" << ebeam->ebeamLTUAngX()
+         << " ebeamLTUAngY=" << ebeam->ebeamLTUAngY()
+         << " ebeamPkCurrBC2=" << ebeam->ebeamPkCurrBC2()
+         );
   }
 
   shared_ptr<Psana::Bld::BldDataPhaseCavity> cav = evt.get(m_cavSrc);
-  if (not cav.get()) {
-    MsgLog(logger, info, name() << ": Bld::BldDataPhaseCavity not found");    
-  } else {
+  if (cav.get()) {
     MsgLog(logger, info, name() << ": Bld::BldDataPhaseCavity: fitTime1=" << cav->fitTime1()
          << " fitTime2=" << cav->fitTime2()
          << " charge1=" << cav->charge1()
@@ -89,9 +104,7 @@ DumpBld::event(Event& evt, Env& env)
   }
   
   shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy> fee = evt.get(m_feeSrc);
-  if (not fee.get()) {
-    MsgLog(logger, info, name() << ": Bld::BldDataFEEGasDetEnergy not found");    
-  } else {
+  if (fee.get()) {
     MsgLog(logger, info, name() << ": Bld::BldDataFEEGasDetEnergy: f_11_ENRC=" << fee->f_11_ENRC()
          << " f_12_ENRC=" << fee->f_12_ENRC()
          << " f_21_ENRC=" << fee->f_21_ENRC()
