@@ -282,7 +282,7 @@ public:
   int16_t upper_ctrl_limit() const {return _upper_ctrl_limit;}
   int16_t lower_ctrl_limit() const {return _lower_ctrl_limit;}
   static uint32_t _sizeof()  {return ((((((((4+(1*(MAX_UNITS_SIZE)))+2)+2)+2)+2)+2)+2)+2)+2;}
-  std::vector<int> _units_shape() const;
+  std::vector<int> units_shape() const;
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -323,7 +323,7 @@ public:
   float upper_ctrl_limit() const {return _upper_ctrl_limit;}
   float lower_ctrl_limit() const {return _lower_ctrl_limit;}
   static uint32_t _sizeof()  {return ((((((((8+(1*(MAX_UNITS_SIZE)))+4)+4)+4)+4)+4)+4)+4)+4;}
-  std::vector<int> _units_shape() const;
+  std::vector<int> units_shape() const;
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -358,7 +358,7 @@ public:
   int16_t no_str() const {return _no_str;}
   const char* strings() const {return &_strs[0][0];}
   static uint32_t _sizeof()  {return 6+(1*(MAX_ENUM_STATES)*(MAX_ENUM_STRING_SIZE));}
-  std::vector<int> _strs_shape() const;
+  std::vector<int> strings_shape() const;
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -391,7 +391,7 @@ public:
   uint8_t upper_ctrl_limit() const {return _upper_ctrl_limit;}
   uint8_t lower_ctrl_limit() const {return _lower_ctrl_limit;}
   static uint32_t _sizeof()  {return (((((((((4+(1*(MAX_UNITS_SIZE)))+1)+1)+1)+1)+1)+1)+1)+1)+1;}
-  std::vector<int> _units_shape() const;
+  std::vector<int> units_shape() const;
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -432,7 +432,7 @@ public:
   int32_t upper_ctrl_limit() const {return _upper_ctrl_limit;}
   int32_t lower_ctrl_limit() const {return _lower_ctrl_limit;}
   static uint32_t _sizeof()  {return ((((((((4+(1*(MAX_UNITS_SIZE)))+4)+4)+4)+4)+4)+4)+4)+4;}
-  std::vector<int> _units_shape() const;
+  std::vector<int> units_shape() const;
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -473,7 +473,7 @@ public:
   double upper_ctrl_limit() const {return _upper_ctrl_limit;}
   double lower_ctrl_limit() const {return _lower_ctrl_limit;}
   static uint32_t _sizeof()  {return ((((((((8+(1*(MAX_UNITS_SIZE)))+8)+8)+8)+8)+8)+8)+8)+8;}
-  std::vector<int> _units_shape() const;
+  std::vector<int> units_shape() const;
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -521,7 +521,7 @@ class EpicsPvCtrlHeader: public EpicsPvHeader {
 public:
   const char* pvName() const {return &_sPvName[0];}
   static uint32_t _sizeof()  {return (Epics::EpicsPvHeader::_sizeof())+(1*(iMaxPvNameLength));}
-  std::vector<int> _sPvName_shape() const;
+  std::vector<int> pvName_shape() const;
 private:
   char	_sPvName[iMaxPvNameLength];
 };
@@ -551,7 +551,7 @@ public:
   }
   const char* value(uint32_t i) const;
   uint32_t _sizeof() const {return ((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_sts_string::_sizeof()))+(1*(this->numElements())*( MAX_STRING_SIZE));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   Epics::dbr_sts_string	_dbr;
   //char	_data[this->numElements()][ MAX_STRING_SIZE];
@@ -571,7 +571,7 @@ public:
   }
   int16_t value(uint32_t i) const;
   uint32_t _sizeof() const {return ((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_ctrl_short::_sizeof()))+(2*(this->numElements()));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   Epics::dbr_ctrl_short	_dbr;
   //int16_t	_data[this->numElements()];
@@ -591,7 +591,7 @@ public:
   }
   float value(uint32_t i) const;
   uint32_t _sizeof() const {return (((Epics::EpicsPvCtrlHeader::_sizeof())+2)+(Epics::dbr_ctrl_float::_sizeof()))+(4*(this->numElements()));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   int16_t	pad0;
   Epics::dbr_ctrl_float	_dbr;
@@ -612,7 +612,7 @@ public:
   }
   uint16_t value(uint32_t i) const;
   uint32_t _sizeof() const {return ((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_ctrl_enum::_sizeof()))+(2*(this->numElements()));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   Epics::dbr_ctrl_enum	_dbr;
   //uint16_t	_data[this->numElements()];
@@ -632,7 +632,7 @@ public:
   }
   uint8_t value(uint32_t i) const;
   uint32_t _sizeof() const {return ((Epics::EpicsPvCtrlHeader::_sizeof())+(Epics::dbr_ctrl_char::_sizeof()))+(1*(this->numElements()));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   Epics::dbr_ctrl_char	_dbr;
   //uint8_t	_data[this->numElements()];
@@ -652,7 +652,7 @@ public:
   }
   int32_t value(uint32_t i) const;
   uint32_t _sizeof() const {return (((Epics::EpicsPvCtrlHeader::_sizeof())+2)+(Epics::dbr_ctrl_long::_sizeof()))+(4*(this->numElements()));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   int16_t	pad0;
   Epics::dbr_ctrl_long	_dbr;
@@ -673,7 +673,7 @@ public:
   }
   double value(uint32_t i) const;
   uint32_t _sizeof() const {return (((Epics::EpicsPvCtrlHeader::_sizeof())+2)+(Epics::dbr_ctrl_double::_sizeof()))+(8*(this->numElements()));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   int16_t	pad0;
   Epics::dbr_ctrl_double	_dbr;
@@ -694,7 +694,7 @@ public:
   }
   const char* value(uint32_t i) const;
   uint32_t _sizeof() const {return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_string::_sizeof()))+(1*(this->numElements())*( MAX_STRING_SIZE));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   int16_t	pad0;
   Epics::dbr_time_string	_dbr;
@@ -715,7 +715,7 @@ public:
   }
   int16_t value(uint32_t i) const;
   uint32_t _sizeof() const {return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_short::_sizeof()))+(2*(this->numElements()));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   int16_t	pad0;
   Epics::dbr_time_short	_dbr;
@@ -736,7 +736,7 @@ public:
   }
   float value(uint32_t i) const;
   uint32_t _sizeof() const {return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_float::_sizeof()))+(4*(this->numElements()));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   int16_t	pad0;
   Epics::dbr_time_float	_dbr;
@@ -757,7 +757,7 @@ public:
   }
   uint16_t value(uint32_t i) const;
   uint32_t _sizeof() const {return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_enum::_sizeof()))+(2*(this->numElements()));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   int16_t	pad0;
   Epics::dbr_time_enum	_dbr;
@@ -778,7 +778,7 @@ public:
   }
   uint8_t value(uint32_t i) const;
   uint32_t _sizeof() const {return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_char::_sizeof()))+(1*(this->numElements()));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   int16_t	pad0;
   Epics::dbr_time_char	_dbr;
@@ -799,7 +799,7 @@ public:
   }
   int32_t value(uint32_t i) const;
   uint32_t _sizeof() const {return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_long::_sizeof()))+(4*(this->numElements()));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   int16_t	pad0;
   Epics::dbr_time_long	_dbr;
@@ -820,7 +820,7 @@ public:
   }
   double value(uint32_t i) const;
   uint32_t _sizeof() const {return (((Epics::EpicsPvTimeHeader::_sizeof())+2)+(Epics::dbr_time_double::_sizeof()))+(8*(this->numElements()));}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   int16_t	pad0;
   Epics::dbr_time_double	_dbr;

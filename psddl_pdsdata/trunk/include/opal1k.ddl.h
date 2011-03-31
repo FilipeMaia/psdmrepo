@@ -65,8 +65,8 @@ public:
   uint16_t output_offset() const;
   uint32_t output_resolution_bits() const;
   uint32_t _sizeof() const {return (12+(2*(Output_LUT_Size*this->defect_pixel_correction_enabled())))+(Camera::FrameCoord::_sizeof()*(this->_defectPixelCount));}
-  std::vector<int> _lookup_table_shape() const;
-  std::vector<int> _defectPixels_shape() const;
+  std::vector<int> output_lookup_table_shape() const;
+  std::vector<int> defect_pixel_coordinates_shape() const;
 private:
   uint32_t	_offsetAndGain;	/* offset and gain */
   uint32_t	_outputOptions;	/* bit mask of output formatting options */

@@ -13,7 +13,7 @@ uint32_t
 ConfigV1::output_resolution_bits() const {
   return this->output_resolution()*2+8;
 }
-std::vector<int> ConfigV1::_lookup_table_shape() const
+std::vector<int> ConfigV1::output_lookup_table_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -21,7 +21,7 @@ std::vector<int> ConfigV1::_lookup_table_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV1::_defectPixels_shape() const
+std::vector<int> ConfigV1::defect_pixel_coordinates_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

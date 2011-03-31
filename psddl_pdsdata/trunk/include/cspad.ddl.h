@@ -46,7 +46,7 @@ class CsPadDigitalPotsCfg {
 public:
   const uint8_t* pots() const {return &_pots[0];}
   static uint32_t _sizeof()  {return 0+(1*(PotsPerQuad));}
-  std::vector<int> _pots_shape() const;
+  std::vector<int> pots_shape() const;
 private:
   uint8_t	_pots[PotsPerQuad];
 };
@@ -75,7 +75,7 @@ class CsPadGainMapCfg {
 public:
   const uint16_t* gainMap() const {return &_gainMap[0][0];}
   static uint32_t _sizeof()  {return 0+(2*(ColumnsPerASIC)*(MaxRowsPerASIC));}
-  std::vector<int> _gainMap_shape() const;
+  std::vector<int> gainMap_shape() const;
 private:
   uint16_t	_gainMap[ColumnsPerASIC][MaxRowsPerASIC];
 };
@@ -103,8 +103,8 @@ public:
   const CsPad::CsPadDigitalPotsCfg& dp() const {return _digitalPots;}
   const CsPad::CsPadGainMapCfg& gm() const {return _gainMap;}
   static uint32_t _sizeof()  {return ((((((((((((((0+(4*(TwoByTwosPerQuad)))+(4*(TwoByTwosPerQuad)))+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad::CsPadReadOnlyCfg::_sizeof()))+(CsPad::CsPadDigitalPotsCfg::_sizeof()))+(CsPad::CsPadGainMapCfg::_sizeof());}
-  std::vector<int> _shiftSelect_shape() const;
-  std::vector<int> _edgeSelect_shape() const;
+  std::vector<int> shiftSelect_shape() const;
+  std::vector<int> edgeSelect_shape() const;
 private:
   uint32_t	_shiftSelect[TwoByTwosPerQuad];
   uint32_t	_edgeSelect[TwoByTwosPerQuad];
@@ -148,7 +148,7 @@ public:
   uint32_t numQuads() const;
   uint32_t numSect() const;
   static uint32_t _sizeof()  {return 44+(CsPad::ConfigV1QuadReg::_sizeof()*(MaxQuadsPerSensor));}
-  std::vector<int> _quads_shape() const;
+  std::vector<int> quads_shape() const;
 private:
   uint32_t	_concentratorVersion;
   uint32_t	_runDelay;
@@ -191,7 +191,7 @@ public:
   uint32_t numQuads() const;
   uint32_t numSect() const;
   static uint32_t _sizeof()  {return 48+(CsPad::ConfigV1QuadReg::_sizeof()*(MaxQuadsPerSensor));}
-  std::vector<int> _quads_shape() const;
+  std::vector<int> quads_shape() const;
 private:
   uint32_t	_concentratorVersion;
   uint32_t	_runDelay;
@@ -217,9 +217,13 @@ class ConfigV2;
 
 class ElementV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_CspadElement};
   enum {Nsbtemp = 4};
+  uint32_t virtual_channel() const {return uint32_t(this->_word0 & 0x3);}
+  uint32_t lane() const {return uint32_t((this->_word0>>6) & 0x3);}
+  uint32_t tid() const {return uint32_t((this->_word0>>8) & 0xffffff);}
+  uint32_t acq_count() const {return uint32_t(this->_word1 & 0xffff);}
+  uint32_t op_code() const {return uint32_t((this->_word1>>16) & 0xff);}
+  uint32_t quad() const {return uint32_t((this->_word1>>24) & 0x3);}
   uint32_t seq_count() const {return _seq_count;}
   uint32_t ticks() const {return _ticks;}
   uint32_t fiducials() const {return _fiducials;}
@@ -229,11 +233,11 @@ public:
     ptrdiff_t offset=32;
     return (const uint16_t*)(((const char*)this)+offset);
   }
-  static uint32_t _sizeof(const CsPad::ConfigV1& cfg)  {return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numQuads())*( cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2));}
-  static uint32_t _sizeof(const CsPad::ConfigV2& cfg)  {return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numQuads())*( cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2));}
-  std::vector<int> _sbtemp_shape() const;
-  std::vector<int> _data_shape(const CsPad::ConfigV1& cfg) const;
-  std::vector<int> _data_shape(const CsPad::ConfigV2& cfg) const;
+  static uint32_t _sizeof(const CsPad::ConfigV1& cfg)  {return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2));}
+  static uint32_t _sizeof(const CsPad::ConfigV2& cfg)  {return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2));}
+  std::vector<int> sb_temp_shape() const;
+  std::vector<int> data_shape(const CsPad::ConfigV1& cfg) const;
+  std::vector<int> data_shape(const CsPad::ConfigV2& cfg) const;
   std::vector<int> _extra_shape() const;
 private:
   uint32_t	_word0;
@@ -243,8 +247,39 @@ private:
   uint32_t	_fiducials;
   uint16_t	_sbtemp[Nsbtemp];
   uint32_t	_frame_type;
-  //uint16_t	_data[cfg.numQuads()][ cfg.numAsicsRead()/2][ ColumnsPerASIC][ MaxRowsPerASIC*2];
+  //uint16_t	_data[cfg.numAsicsRead()/2][ ColumnsPerASIC][ MaxRowsPerASIC*2];
   //uint16_t	_extra[2];
+};
+
+/** Class: DataV1
+  
+*/
+
+class ConfigV1;
+class ConfigV2;
+
+class DataV1 {
+public:
+  enum {Version = 1};
+  enum {TypeId = Pds::TypeId::Id_CspadElement};
+  const CsPad::ElementV1& quads(const CsPad::ConfigV1& cfg, uint32_t i0) const {
+    ptrdiff_t offset=0;
+    const CsPad::ElementV1* memptr = (const CsPad::ElementV1*)(((const char*)this)+offset);
+    size_t memsize = memptr->_sizeof(cfg);
+    return *(const CsPad::ElementV1*)((const char*)memptr + (i0)*memsize);
+  }
+  const CsPad::ElementV1& quads(const CsPad::ConfigV2& cfg, uint32_t i0) const {
+    ptrdiff_t offset=0;
+    const CsPad::ElementV1* memptr = (const CsPad::ElementV1*)(((const char*)this)+offset);
+    size_t memsize = memptr->_sizeof(cfg);
+    return *(const CsPad::ElementV1*)((const char*)memptr + (i0)*memsize);
+  }
+  static uint32_t _sizeof(const CsPad::ConfigV1& cfg)  {return 0+(CsPad::ElementV1::_sizeof(cfg)*(cfg.numQuads()));}
+  static uint32_t _sizeof(const CsPad::ConfigV2& cfg)  {return 0+(CsPad::ElementV1::_sizeof(cfg)*(cfg.numQuads()));}
+  std::vector<int> quads_shape(const CsPad::ConfigV1& cfg) const;
+  std::vector<int> quads_shape(const CsPad::ConfigV2& cfg) const;
+private:
+  //CsPad::ElementV1	_quads[cfg.numQuads()];
 };
 
 /** Class: ElementV2
@@ -255,9 +290,13 @@ class ConfigV2;
 
 class ElementV2 {
 public:
-  enum {Version = 2};
-  enum {TypeId = Pds::TypeId::Id_CspadElement};
   enum {Nsbtemp = 4};
+  uint32_t virtual_channel() const {return uint32_t(this->_word0 & 0x3);}
+  uint32_t lane() const {return uint32_t((this->_word0>>6) & 0x3);}
+  uint32_t tid() const {return uint32_t((this->_word0>>8) & 0xffffff);}
+  uint32_t acq_count() const {return uint32_t(this->_word1 & 0xffff);}
+  uint32_t op_code() const {return uint32_t((this->_word1>>16) & 0xff);}
+  uint32_t quad() const {return uint32_t((this->_word1>>24) & 0x3);}
   uint32_t seq_count() const {return _seq_count;}
   uint32_t ticks() const {return _ticks;}
   uint32_t fiducials() const {return _fiducials;}
@@ -267,9 +306,9 @@ public:
     ptrdiff_t offset=32;
     return (const uint16_t*)(((const char*)this)+offset);
   }
-  static uint32_t _sizeof(const CsPad::ConfigV2& cfg)  {return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numSect())*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2));}
-  std::vector<int> _sbtemp_shape() const;
-  std::vector<int> _data_shape(const CsPad::ConfigV2& cfg) const;
+  uint32_t _sizeof(const CsPad::ConfigV2& cfg) const {return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsStored(this->quad())/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2));}
+  std::vector<int> sb_temp_shape() const;
+  std::vector<int> data_shape(const CsPad::ConfigV2& cfg) const;
   std::vector<int> _extra_shape() const;
 private:
   uint32_t	_word0;
@@ -279,8 +318,30 @@ private:
   uint32_t	_fiducials;
   uint16_t	_sbtemp[Nsbtemp];
   uint32_t	_frame_type;
-  //uint16_t	_data[cfg.numSect()][ ColumnsPerASIC][ MaxRowsPerASIC*2];
+  //uint16_t	_data[cfg.numAsicsStored(this->quad())/2][ ColumnsPerASIC][ MaxRowsPerASIC*2];
   //uint16_t	_extra[2];
+};
+
+/** Class: DataV2
+  
+*/
+
+class ConfigV2;
+
+class DataV2 {
+public:
+  enum {Version = 2};
+  enum {TypeId = Pds::TypeId::Id_CspadElement};
+  const CsPad::ElementV2& quads(const CsPad::ConfigV2& cfg, uint32_t i0) const {
+    const char* memptr = ((const char*)this)+0;
+    for (uint32_t i=0; i != i0; ++ i) {
+      memptr += ((const CsPad::ElementV2*)memptr)->_sizeof(cfg);
+    }
+    return *(const CsPad::ElementV2*)(memptr);
+  }
+  std::vector<int> quads_shape(const CsPad::ConfigV2& cfg) const;
+private:
+  //CsPad::ElementV2	_quads[cfg.numQuads()];
 };
 } // namespace CsPad
 } // namespace PsddlPds

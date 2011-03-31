@@ -5,7 +5,7 @@
 
 namespace PsddlPds {
 namespace Epics {
-std::vector<int> dbr_ctrl_short::_units_shape() const
+std::vector<int> dbr_ctrl_short::units_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -13,7 +13,7 @@ std::vector<int> dbr_ctrl_short::_units_shape() const
   return shape;
 }
 
-std::vector<int> dbr_ctrl_float::_units_shape() const
+std::vector<int> dbr_ctrl_float::units_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -21,7 +21,7 @@ std::vector<int> dbr_ctrl_float::_units_shape() const
   return shape;
 }
 
-std::vector<int> dbr_ctrl_enum::_strs_shape() const
+std::vector<int> dbr_ctrl_enum::strings_shape() const
 {
   std::vector<int> shape;
   shape.reserve(2);
@@ -30,7 +30,7 @@ std::vector<int> dbr_ctrl_enum::_strs_shape() const
   return shape;
 }
 
-std::vector<int> dbr_ctrl_char::_units_shape() const
+std::vector<int> dbr_ctrl_char::units_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -38,7 +38,7 @@ std::vector<int> dbr_ctrl_char::_units_shape() const
   return shape;
 }
 
-std::vector<int> dbr_ctrl_long::_units_shape() const
+std::vector<int> dbr_ctrl_long::units_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -46,7 +46,7 @@ std::vector<int> dbr_ctrl_long::_units_shape() const
   return shape;
 }
 
-std::vector<int> dbr_ctrl_double::_units_shape() const
+std::vector<int> dbr_ctrl_double::units_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -62,7 +62,7 @@ uint8_t
 EpicsPvHeader::isTime() const {
   return _iDbrType >= DBR_TIME_STRING and _iDbrType <= DBR_TIME_DOUBLE;
 }
-std::vector<int> EpicsPvCtrlHeader::_sPvName_shape() const
+std::vector<int> EpicsPvCtrlHeader::pvName_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -74,7 +74,7 @@ const char*
 EpicsPvCtrlString::value(uint32_t i) const {
   return data()+i*MAX_STRING_SIZE;
 }
-std::vector<int> EpicsPvCtrlString::_data_shape() const
+std::vector<int> EpicsPvCtrlString::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(2);
@@ -87,7 +87,7 @@ int16_t
 EpicsPvCtrlShort::value(uint32_t i) const {
   return data()[i];
 }
-std::vector<int> EpicsPvCtrlShort::_data_shape() const
+std::vector<int> EpicsPvCtrlShort::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -99,7 +99,7 @@ float
 EpicsPvCtrlFloat::value(uint32_t i) const {
   return data()[i];
 }
-std::vector<int> EpicsPvCtrlFloat::_data_shape() const
+std::vector<int> EpicsPvCtrlFloat::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -111,7 +111,7 @@ uint16_t
 EpicsPvCtrlEnum::value(uint32_t i) const {
   return data()[i];
 }
-std::vector<int> EpicsPvCtrlEnum::_data_shape() const
+std::vector<int> EpicsPvCtrlEnum::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -123,7 +123,7 @@ uint8_t
 EpicsPvCtrlChar::value(uint32_t i) const {
   return data()[i];
 }
-std::vector<int> EpicsPvCtrlChar::_data_shape() const
+std::vector<int> EpicsPvCtrlChar::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -135,7 +135,7 @@ int32_t
 EpicsPvCtrlLong::value(uint32_t i) const {
   return data()[i];
 }
-std::vector<int> EpicsPvCtrlLong::_data_shape() const
+std::vector<int> EpicsPvCtrlLong::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -147,7 +147,7 @@ double
 EpicsPvCtrlDouble::value(uint32_t i) const {
   return data()[i];
 }
-std::vector<int> EpicsPvCtrlDouble::_data_shape() const
+std::vector<int> EpicsPvCtrlDouble::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -159,7 +159,7 @@ const char*
 EpicsPvTimeString::value(uint32_t i) const {
   return data()+MAX_STRING_SIZE*i;
 }
-std::vector<int> EpicsPvTimeString::_data_shape() const
+std::vector<int> EpicsPvTimeString::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(2);
@@ -172,7 +172,7 @@ int16_t
 EpicsPvTimeShort::value(uint32_t i) const {
   return data()[i];
 }
-std::vector<int> EpicsPvTimeShort::_data_shape() const
+std::vector<int> EpicsPvTimeShort::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -184,7 +184,7 @@ float
 EpicsPvTimeFloat::value(uint32_t i) const {
   return data()[i];
 }
-std::vector<int> EpicsPvTimeFloat::_data_shape() const
+std::vector<int> EpicsPvTimeFloat::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -196,7 +196,7 @@ uint16_t
 EpicsPvTimeEnum::value(uint32_t i) const {
   return data()[i];
 }
-std::vector<int> EpicsPvTimeEnum::_data_shape() const
+std::vector<int> EpicsPvTimeEnum::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -208,7 +208,7 @@ uint8_t
 EpicsPvTimeChar::value(uint32_t i) const {
   return data()[i];
 }
-std::vector<int> EpicsPvTimeChar::_data_shape() const
+std::vector<int> EpicsPvTimeChar::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -220,7 +220,7 @@ int32_t
 EpicsPvTimeLong::value(uint32_t i) const {
   return data()[i];
 }
-std::vector<int> EpicsPvTimeLong::_data_shape() const
+std::vector<int> EpicsPvTimeLong::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -232,7 +232,7 @@ double
 EpicsPvTimeDouble::value(uint32_t i) const {
   return data()[i];
 }
-std::vector<int> EpicsPvTimeDouble::_data_shape() const
+std::vector<int> EpicsPvTimeDouble::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

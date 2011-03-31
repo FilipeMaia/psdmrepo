@@ -13,7 +13,7 @@ uint32_t
 ConfigV1::nbrChannels() const {
   return __builtin_popcount(this->_channelMask);
 }
-std::vector<int> ConfigV1::_vert_shape() const
+std::vector<int> ConfigV1::vert_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -25,7 +25,7 @@ uint64_t
 TimestampV1::value() const {
   return ((uint64_t)this->_timeStampHi)<<32 + this->_timeStampLo;
 }
-std::vector<int> DataDescV1Elem::_timestamps_shape(const Acqiris::ConfigV1& cfg) const
+std::vector<int> DataDescV1Elem::timestamps_shape(const Acqiris::ConfigV1& cfg) const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -33,7 +33,7 @@ std::vector<int> DataDescV1Elem::_timestamps_shape(const Acqiris::ConfigV1& cfg)
   return shape;
 }
 
-std::vector<int> DataDescV1Elem::_waveforms_shape(const Acqiris::ConfigV1& cfg) const
+std::vector<int> DataDescV1Elem::waveforms_shape(const Acqiris::ConfigV1& cfg) const
 {
   std::vector<int> shape;
   shape.reserve(2);
@@ -50,7 +50,7 @@ std::vector<int> DataDescV1Elem::_extraSpace_shape() const
   return shape;
 }
 
-std::vector<int> DataDescV1::_data_shape(const Acqiris::ConfigV1& cfg) const
+std::vector<int> DataDescV1::data_shape(const Acqiris::ConfigV1& cfg) const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -58,7 +58,7 @@ std::vector<int> DataDescV1::_data_shape(const Acqiris::ConfigV1& cfg) const
   return shape;
 }
 
-std::vector<int> TdcConfigV1::_channel_shape() const
+std::vector<int> TdcConfigV1::channels_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -66,7 +66,7 @@ std::vector<int> TdcConfigV1::_channel_shape() const
   return shape;
 }
 
-std::vector<int> TdcConfigV1::_auxIO_shape() const
+std::vector<int> TdcConfigV1::auxio_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -98,7 +98,7 @@ Acqiris::TdcDataV1Marker::Type
 TdcDataV1Marker::type() const {
   return Type(this->bf_val_());
 }
-std::vector<int> TdcDataV1::_data_shape() const
+std::vector<int> TdcDataV1::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

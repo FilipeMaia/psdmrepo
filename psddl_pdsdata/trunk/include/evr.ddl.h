@@ -189,7 +189,7 @@ public:
   uint32_t maskClear() const {return _u32MaskClear;}
   const char* desc() const {return &_desc[0];}
   static uint32_t _sizeof()  {return 24+(1*(DescSize));}
-  std::vector<int> _desc_shape() const;
+  std::vector<int> desc_shape() const;
 private:
   uint16_t	_u16Code;
   uint16_t	_u16MaskEventAttr;
@@ -261,8 +261,8 @@ public:
     return *(const EvrData::OutputMap*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return (8+(EvrData::PulseConfig::_sizeof()*(this->_npulses)))+(EvrData::OutputMap::_sizeof()*(this->_noutputs));}
-  std::vector<int> _pulses_shape() const;
-  std::vector<int> _output_maps_shape() const;
+  std::vector<int> pulses_shape() const;
+  std::vector<int> output_maps_shape() const;
 private:
   uint32_t	_npulses;
   uint32_t	_noutputs;
@@ -315,8 +315,8 @@ public:
   EvrData::ConfigV2::BeamCode beam() const;
   EvrData::ConfigV2::RateCode rate() const;
   uint32_t _sizeof() const {return (12+(EvrData::PulseConfig::_sizeof()*(this->_npulses)))+(EvrData::OutputMap::_sizeof()*(this->_noutputs));}
-  std::vector<int> _pulses_shape() const;
-  std::vector<int> _output_maps_shape() const;
+  std::vector<int> pulses_shape() const;
+  std::vector<int> output_maps_shape() const;
 private:
   uint32_t	_opcode;
   uint32_t	_npulses;
@@ -357,9 +357,9 @@ public:
     return *(const EvrData::OutputMap*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return ((12+(EvrData::EventCodeV3::_sizeof()*(this->_neventcodes)))+(EvrData::PulseConfigV3::_sizeof()*(this->_npulses)))+(EvrData::OutputMap::_sizeof()*(this->_noutputs));}
-  std::vector<int> _eventcodes_shape() const;
-  std::vector<int> _pulses_shape() const;
-  std::vector<int> _output_maps_shape() const;
+  std::vector<int> eventcodes_shape() const;
+  std::vector<int> pulses_shape() const;
+  std::vector<int> output_maps_shape() const;
 private:
   uint32_t	_neventcodes;
   uint32_t	_npulses;
@@ -402,9 +402,9 @@ public:
     return *(const EvrData::OutputMap*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return ((12+(EvrData::EventCodeV4::_sizeof()*(this->_neventcodes)))+(EvrData::PulseConfigV3::_sizeof()*(this->_npulses)))+(EvrData::OutputMap::_sizeof()*(this->_noutputs));}
-  std::vector<int> _eventcodes_shape() const;
-  std::vector<int> _pulses_shape() const;
-  std::vector<int> _output_maps_shape() const;
+  std::vector<int> eventcodes_shape() const;
+  std::vector<int> pulses_shape() const;
+  std::vector<int> output_maps_shape() const;
 private:
   uint32_t	_neventcodes;
   uint32_t	_npulses;
@@ -471,7 +471,7 @@ public:
     return *(const EvrData::SequencerEntry*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return 12+(EvrData::SequencerEntry::_sizeof()*(this->_length));}
-  std::vector<int> _entries_shape() const;
+  std::vector<int> entries_shape() const;
 private:
   uint32_t	_source;
   uint32_t	_length;
@@ -492,39 +492,38 @@ public:
   uint32_t neventcodes() const {return _neventcodes;}
   uint32_t npulses() const {return _npulses;}
   uint32_t noutputs() const {return _noutputs;}
-  const EvrData::EventCodeV4& eventcodes(uint32_t i0) const {
+  const EvrData::EventCodeV5& eventcodes(uint32_t i0) const {
     ptrdiff_t offset=12;
-    const EvrData::EventCodeV4* memptr = (const EvrData::EventCodeV4*)(((const char*)this)+offset);
+    const EvrData::EventCodeV5* memptr = (const EvrData::EventCodeV5*)(((const char*)this)+offset);
     size_t memsize = memptr->_sizeof();
-    return *(const EvrData::EventCodeV4*)((const char*)memptr + (i0)*memsize);
+    return *(const EvrData::EventCodeV5*)((const char*)memptr + (i0)*memsize);
   }
   const EvrData::PulseConfigV3& pulses(uint32_t i0) const {
-    ptrdiff_t offset=12+(24*(this->_neventcodes));
+    ptrdiff_t offset=12+(40*(this->_neventcodes));
     const EvrData::PulseConfigV3* memptr = (const EvrData::PulseConfigV3*)(((const char*)this)+offset);
     size_t memsize = memptr->_sizeof();
     return *(const EvrData::PulseConfigV3*)((const char*)memptr + (i0)*memsize);
   }
   const EvrData::OutputMap& output_maps(uint32_t i0) const {
-    ptrdiff_t offset=(12+(24*(this->_neventcodes)))+(16*(this->_npulses));
+    ptrdiff_t offset=(12+(40*(this->_neventcodes)))+(16*(this->_npulses));
     const EvrData::OutputMap* memptr = (const EvrData::OutputMap*)(((const char*)this)+offset);
     size_t memsize = memptr->_sizeof();
     return *(const EvrData::OutputMap*)((const char*)memptr + (i0)*memsize);
   }
   const EvrData::SequencerConfigV1& seq_config() const {
-    ptrdiff_t offset=((12+(24*(this->_neventcodes)))+(16*(this->_npulses)))+(4*(this->_noutputs));
+    ptrdiff_t offset=((12+(40*(this->_neventcodes)))+(16*(this->_npulses)))+(4*(this->_noutputs));
     const EvrData::SequencerConfigV1* memptr = (const EvrData::SequencerConfigV1*)(((const char*)this)+offset);
     size_t memsize = memptr->_sizeof();
     return *(const EvrData::SequencerConfigV1*)((const char*)memptr + (0)*memsize);
   }
-  uint32_t _sizeof() const {return (((12+(EvrData::EventCodeV4::_sizeof()*(this->_neventcodes)))+(EvrData::PulseConfigV3::_sizeof()*(this->_npulses)))+(EvrData::OutputMap::_sizeof()*(this->_noutputs)))+(this->seq_config()._sizeof());}
-  std::vector<int> _eventcodes_shape() const;
-  std::vector<int> _pulses_shape() const;
-  std::vector<int> _output_maps_shape() const;
+  std::vector<int> eventcodes_shape() const;
+  std::vector<int> pulses_shape() const;
+  std::vector<int> output_maps_shape() const;
 private:
   uint32_t	_neventcodes;
   uint32_t	_npulses;
   uint32_t	_noutputs;
-  //EvrData::EventCodeV4	_eventcodes[this->_neventcodes];
+  //EvrData::EventCodeV5	_eventcodes[this->_neventcodes];
   //EvrData::PulseConfigV3	_pulses[this->_npulses];
   //EvrData::OutputMap	_output_maps[this->_noutputs];
   //EvrData::SequencerConfigV1	_seq_config;
@@ -572,7 +571,7 @@ public:
     return *(const EvrData::FIFOEvent*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return 4+(EvrData::FIFOEvent::_sizeof()*(this->_u32NumFifoEvents));}
-  std::vector<int> _fifoEvents_shape() const;
+  std::vector<int> fifoEvents_shape() const;
 private:
   uint32_t	_u32NumFifoEvents;
   //EvrData::FIFOEvent	_fifoEvents[this->_u32NumFifoEvents];
@@ -591,8 +590,8 @@ public:
   uint32_t ninfo() const {return _ninfo;}
   const Pds::DetInfo& infos(uint32_t i0) const {return _info[i0];}
   static uint32_t _sizeof()  {return ((0+(1*(NameLength)))+4)+(8*(MaxInfos));}
-  std::vector<int> _name_shape() const;
-  std::vector<int> _info_shape() const;
+  std::vector<int> name_shape() const;
+  std::vector<int> infos_shape() const;
 private:
   char	_name[NameLength];
   uint32_t	_ninfo;
@@ -618,7 +617,7 @@ public:
   }
   EvrData::OutputMap::Conn conn() const;
   uint32_t _sizeof() const {return 4+(EvrData::IOChannel::_sizeof()*(this->_nchannels));}
-  std::vector<int> _channels_shape() const;
+  std::vector<int> channels_shape() const;
 private:
   uint16_t	_conn;
   uint16_t	_nchannels;

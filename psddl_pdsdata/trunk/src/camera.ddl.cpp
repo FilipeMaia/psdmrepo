@@ -13,7 +13,7 @@ Camera::FrameFexConfigV1::Processing
 FrameFexConfigV1::processing() const {
   return Processing(this->_processing);
 }
-std::vector<int> FrameFexConfigV1::_masked_pixel_coordinates_shape() const
+std::vector<int> FrameFexConfigV1::masked_pixel_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -21,7 +21,7 @@ std::vector<int> FrameFexConfigV1::_masked_pixel_coordinates_shape() const
   return shape;
 }
 
-std::vector<int> FrameV1::_pixel_data_shape() const
+std::vector<int> FrameV1::data_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

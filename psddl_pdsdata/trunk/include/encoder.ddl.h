@@ -81,7 +81,7 @@ public:
   uint32_t timestamp() const {return _33mhz_timestamp;}
   const uint32_t* encoder_count() const {return &_encoder_count[0];}
   static uint32_t _sizeof()  {return 4+(4*(NEncoders));}
-  std::vector<int> _encoder_count_shape() const;
+  std::vector<int> encoder_count_shape() const;
 private:
   uint32_t	_33mhz_timestamp;
   uint32_t	_encoder_count[NEncoders];

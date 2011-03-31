@@ -37,7 +37,7 @@ uint32_t
 FccdConfigV2::trimmedHeight() const {
   return Trimmed_Row_Pixels;
 }
-std::vector<int> FccdConfigV2::_dacVoltage_shape() const
+std::vector<int> FccdConfigV2::dacVoltages_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -45,7 +45,7 @@ std::vector<int> FccdConfigV2::_dacVoltage_shape() const
   return shape;
 }
 
-std::vector<int> FccdConfigV2::_waveform_shape() const
+std::vector<int> FccdConfigV2::waveforms_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

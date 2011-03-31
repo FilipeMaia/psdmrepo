@@ -34,8 +34,8 @@ public:
   const float* base() const {return &_base[0];}
   const float* scale() const {return &_scale[0];}
   static uint32_t _sizeof()  {return (0+(4*(NRANGES)))+(4*(NRANGES));}
-  std::vector<int> _base_shape() const;
-  std::vector<int> _scale_shape() const;
+  std::vector<int> base_shape() const;
+  std::vector<int> scale_shape() const;
 private:
   float	_base[NRANGES];
   float	_scale[NRANGES];
@@ -78,7 +78,7 @@ public:
   float xscale() const {return _xscale;}
   float yscale() const {return _yscale;}
   static uint32_t _sizeof()  {return ((0+(Lusi::DiodeFexConfigV1::_sizeof()*(NCHANNELS)))+4)+4;}
-  std::vector<int> _diode_shape() const;
+  std::vector<int> diode_shape() const;
 private:
   Lusi::DiodeFexConfigV1	_diode[NCHANNELS];
   float	_xscale;
@@ -107,7 +107,7 @@ public:
   float xpos() const {return _xpos;}
   float ypos() const {return _ypos;}
   static uint32_t _sizeof()  {return (((0+(4*(NCHANNELS)))+4)+4)+4;}
-  std::vector<int> _channel_shape() const;
+  std::vector<int> channel_shape() const;
 private:
   float	_channel[NCHANNELS];
   float	_sum;

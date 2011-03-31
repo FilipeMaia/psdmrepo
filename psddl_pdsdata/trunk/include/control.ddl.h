@@ -36,7 +36,7 @@ public:
   double value() const {return _value;}
   uint8_t array() const;
   static uint32_t _sizeof()  {return ((0+(1*(32)))+4)+8;}
-  std::vector<int> _name_shape() const;
+  std::vector<int> name_shape() const;
 private:
   char	_name[32];
   uint32_t	_index;
@@ -68,7 +68,7 @@ public:
   double hiValue() const {return _hiValue;}
   uint8_t array() const;
   static uint32_t _sizeof()  {return (((0+(1*(32)))+4)+8)+8;}
-  std::vector<int> _name_shape() const;
+  std::vector<int> name_shape() const;
 private:
   char	_name[32];
   uint32_t	_index;
@@ -102,8 +102,8 @@ public:
     return *(const ControlData::PVMonitor*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return (24+(ControlData::PVControl::_sizeof()*(this->_npvControls)))+(ControlData::PVMonitor::_sizeof()*(this->_npvMonitors));}
-  std::vector<int> _pvControls_shape() const;
-  std::vector<int> _pvMonitors_shape() const;
+  std::vector<int> pvControls_shape() const;
+  std::vector<int> pvMonitors_shape() const;
 private:
   uint32_t	_control;
   uint32_t	_reserved;

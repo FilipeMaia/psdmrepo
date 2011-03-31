@@ -210,7 +210,7 @@ namespace {
           printf( "EnumState Num: %d\n", pvCtrlVal.no_str() );
           
           const char* strings = pvCtrlVal.strings();
-          std::vector<int> shape = pvCtrlVal._strs_shape();
+          std::vector<int> shape = pvCtrlVal.strings_shape();
           for (int iEnumState = 0; iEnumState < pvCtrlVal.no_str(); iEnumState++ ) {
               printf( "EnumState[%d]: %s\n", iEnumState, strings );
               strings += shape[1];

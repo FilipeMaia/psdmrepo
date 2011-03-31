@@ -153,7 +153,7 @@ public:
   const Acqiris::VertV1& vert(uint32_t i0) const {return _vert[i0];}
   uint32_t nbrChannels() const;
   static uint32_t _sizeof()  {return ((12+(Acqiris::TrigV1::_sizeof()))+(Acqiris::HorizV1::_sizeof()))+(Acqiris::VertV1::_sizeof()*(MaxChan));}
-  std::vector<int> _vert_shape() const;
+  std::vector<int> vert_shape() const;
 private:
   uint32_t	_nbrConvertersPerChannel;
   uint32_t	_channelMask;
@@ -208,19 +208,19 @@ public:
   uint32_t nbrSamplesInSeg() const {return _returnedSamplesPerSeg;}
   uint32_t indexFirstPoint() const {return _indexFirstPoint;}
   uint32_t nbrSegments() const {return _returnedSegments;}
-  const Acqiris::TimestampV1& _timestamp(uint32_t i0) const {
+  const Acqiris::TimestampV1& timestamp(uint32_t i0) const {
     ptrdiff_t offset=64;
     const Acqiris::TimestampV1* memptr = (const Acqiris::TimestampV1*)(((const char*)this)+offset);
     size_t memsize = memptr->_sizeof();
     return *(const Acqiris::TimestampV1*)((const char*)memptr + (i0)*memsize);
   }
-  const int16_t* _waveform(const Acqiris::ConfigV1& cfg) const {
+  const int16_t* waveforms(const Acqiris::ConfigV1& cfg) const {
     ptrdiff_t offset=64+(16*(cfg.horiz().nbrSegments()));
     return (const int16_t*)(((const char*)this)+offset);
   }
   static uint32_t _sizeof(const Acqiris::ConfigV1& cfg)  {return ((64+(Acqiris::TimestampV1::_sizeof()*(cfg.horiz().nbrSegments())))+(2*(cfg.horiz().nbrSegments())*(cfg.horiz().nbrSamples())))+(1*(_extra));}
-  std::vector<int> _timestamps_shape(const Acqiris::ConfigV1& cfg) const;
-  std::vector<int> _waveforms_shape(const Acqiris::ConfigV1& cfg) const;
+  std::vector<int> timestamps_shape(const Acqiris::ConfigV1& cfg) const;
+  std::vector<int> waveforms_shape(const Acqiris::ConfigV1& cfg) const;
   std::vector<int> _extraSpace_shape() const;
 private:
   uint32_t	_returnedSamplesPerSeg;
@@ -259,7 +259,7 @@ public:
     return *(const Acqiris::DataDescV1Elem*)((const char*)memptr + (i0)*memsize);
   }
   static uint32_t _sizeof(const Acqiris::ConfigV1& cfg)  {return 0+(Acqiris::DataDescV1Elem::_sizeof(cfg)*(cfg.nbrChannels()));}
-  std::vector<int> _data_shape(const Acqiris::ConfigV1& cfg) const;
+  std::vector<int> data_shape(const Acqiris::ConfigV1& cfg) const;
 private:
   //Acqiris::DataDescV1Elem	_data[cfg.nbrChannels()];
 };
@@ -412,8 +412,8 @@ public:
   const Acqiris::TdcAuxIO& auxio(uint32_t i0) const {return _auxIO[i0];}
   const Acqiris::TdcVetoIO& veto() const {return _veto;}
   static uint32_t _sizeof()  {return ((0+(Acqiris::TdcChannel::_sizeof()*(NChannels)))+(Acqiris::TdcAuxIO::_sizeof()*(NAuxIO)))+(Acqiris::TdcVetoIO::_sizeof());}
-  std::vector<int> _channel_shape() const;
-  std::vector<int> _auxIO_shape() const;
+  std::vector<int> channels_shape() const;
+  std::vector<int> auxio_shape() const;
 private:
   Acqiris::TdcChannel	_channel[NChannels];
   Acqiris::TdcAuxIO	_auxIO[NAuxIO];
@@ -516,7 +516,7 @@ public:
     return *(const Acqiris::TdcDataV1_Item*)((const char*)memptr + (i0)*memsize);
   }
   static uint32_t _sizeof()  {return ~uint32_t(0);}
-  std::vector<int> _data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   //Acqiris::TdcDataV1_Item	_data[None];
 };

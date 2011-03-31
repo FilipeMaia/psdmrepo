@@ -69,7 +69,7 @@ public:
     return (const uint16_t*)(((const char*)this)+offset);
   }
   static uint32_t _sizeof(const Princeton::ConfigV1& cfg)  {return 8+(2*(cfg.numPixels()));}
-  std::vector<int> _data_shape(const Princeton::ConfigV1& cfg) const;
+  std::vector<int> data_shape(const Princeton::ConfigV1& cfg) const;
 private:
   uint32_t	_iShotIdStart;
   float	_fReadoutTime;

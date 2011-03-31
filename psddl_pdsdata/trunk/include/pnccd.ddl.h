@@ -49,8 +49,8 @@ public:
   const char* info() const {return &_info[0];}
   const char* timingFName() const {return &_timingFName[0];}
   static uint32_t _sizeof()  {return (32+(1*(256)))+(1*(256));}
-  std::vector<int> _info_shape() const;
-  std::vector<int> _timingFName_shape() const;
+  std::vector<int> info_shape() const;
+  std::vector<int> timingFName_shape() const;
 private:
   uint32_t	_numLinks;	/* Number of links in the pnCCD. */
   uint32_t	_payloadSizePerLink;	/* Size of the payload in bytes for single link */
@@ -85,8 +85,8 @@ public:
   }
   static uint32_t _sizeof(const PNCCD::ConfigV1& cfg)  {return 16+(2*((cfg.payloadSizePerLink()-16)/2));}
   static uint32_t _sizeof(const PNCCD::ConfigV2& cfg)  {return 16+(2*((cfg.payloadSizePerLink()-16)/2));}
-  std::vector<int> __data_shape(const PNCCD::ConfigV1& cfg) const;
-  std::vector<int> __data_shape(const PNCCD::ConfigV2& cfg) const;
+  std::vector<int> data_shape(const PNCCD::ConfigV1& cfg) const;
+  std::vector<int> data_shape(const PNCCD::ConfigV2& cfg) const;
 private:
   uint32_t	_specialWord;	/* Special values */
   uint32_t	_frameNumber;	/* Frame number */

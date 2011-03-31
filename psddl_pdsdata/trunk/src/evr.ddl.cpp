@@ -17,7 +17,7 @@ int16_t
 PulseConfig::clear() const {
   return this->bf_clear()-1;
 }
-std::vector<int> EventCodeV5::_desc_shape() const
+std::vector<int> EventCodeV5::desc_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -41,7 +41,7 @@ uint8_t
 OutputMap::conn_id() const {
   return _v >> 24;
 }
-std::vector<int> ConfigV1::_pulses_shape() const
+std::vector<int> ConfigV1::pulses_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -49,7 +49,7 @@ std::vector<int> ConfigV1::_pulses_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV1::_output_maps_shape() const
+std::vector<int> ConfigV1::output_maps_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -65,7 +65,7 @@ EvrData::ConfigV2::RateCode
 ConfigV2::rate() const {
   return (this->_opcode < beamOn) ? RateCode(this->_opcode-baseRate) :                  ((this->_opcode < singleShot) ? RateCode(this->_opcode-beamOn-baseRate) : Single);
 }
-std::vector<int> ConfigV2::_pulses_shape() const
+std::vector<int> ConfigV2::pulses_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -73,7 +73,7 @@ std::vector<int> ConfigV2::_pulses_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV2::_output_maps_shape() const
+std::vector<int> ConfigV2::output_maps_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -81,7 +81,7 @@ std::vector<int> ConfigV2::_output_maps_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV3::_eventcodes_shape() const
+std::vector<int> ConfigV3::eventcodes_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -89,7 +89,7 @@ std::vector<int> ConfigV3::_eventcodes_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV3::_pulses_shape() const
+std::vector<int> ConfigV3::pulses_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -97,7 +97,7 @@ std::vector<int> ConfigV3::_pulses_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV3::_output_maps_shape() const
+std::vector<int> ConfigV3::output_maps_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -105,7 +105,7 @@ std::vector<int> ConfigV3::_output_maps_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV4::_eventcodes_shape() const
+std::vector<int> ConfigV4::eventcodes_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -113,7 +113,7 @@ std::vector<int> ConfigV4::_eventcodes_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV4::_pulses_shape() const
+std::vector<int> ConfigV4::pulses_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -121,7 +121,7 @@ std::vector<int> ConfigV4::_pulses_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV4::_output_maps_shape() const
+std::vector<int> ConfigV4::output_maps_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -129,7 +129,7 @@ std::vector<int> ConfigV4::_output_maps_shape() const
   return shape;
 }
 
-std::vector<int> SequencerConfigV1::_entries_shape() const
+std::vector<int> SequencerConfigV1::entries_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -137,7 +137,7 @@ std::vector<int> SequencerConfigV1::_entries_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV5::_eventcodes_shape() const
+std::vector<int> ConfigV5::eventcodes_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -145,7 +145,7 @@ std::vector<int> ConfigV5::_eventcodes_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV5::_pulses_shape() const
+std::vector<int> ConfigV5::pulses_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -153,7 +153,7 @@ std::vector<int> ConfigV5::_pulses_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV5::_output_maps_shape() const
+std::vector<int> ConfigV5::output_maps_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -161,7 +161,7 @@ std::vector<int> ConfigV5::_output_maps_shape() const
   return shape;
 }
 
-std::vector<int> DataV3::_fifoEvents_shape() const
+std::vector<int> DataV3::fifoEvents_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -169,7 +169,7 @@ std::vector<int> DataV3::_fifoEvents_shape() const
   return shape;
 }
 
-std::vector<int> IOChannel::_name_shape() const
+std::vector<int> IOChannel::name_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -177,7 +177,7 @@ std::vector<int> IOChannel::_name_shape() const
   return shape;
 }
 
-std::vector<int> IOChannel::_info_shape() const
+std::vector<int> IOChannel::infos_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -189,7 +189,7 @@ EvrData::OutputMap::Conn
 IOConfigV1::conn() const {
   return OutputMap::Conn(this->_conn);
 }
-std::vector<int> IOConfigV1::_channels_shape() const
+std::vector<int> IOConfigV1::channels_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

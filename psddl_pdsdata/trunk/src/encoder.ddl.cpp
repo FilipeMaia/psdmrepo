@@ -5,7 +5,7 @@
 
 namespace PsddlPds {
 namespace Encoder {
-std::vector<int> DataV2::_encoder_count_shape() const
+std::vector<int> DataV2::encoder_count_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

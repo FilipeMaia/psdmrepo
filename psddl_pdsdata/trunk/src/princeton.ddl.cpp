@@ -13,7 +13,7 @@ uint32_t
 ConfigV1::numPixels() const {
   return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY );
 }
-std::vector<int> FrameV1::_data_shape(const Princeton::ConfigV1& cfg) const
+std::vector<int> FrameV1::data_shape(const Princeton::ConfigV1& cfg) const
 {
   std::vector<int> shape;
   shape.reserve(1);

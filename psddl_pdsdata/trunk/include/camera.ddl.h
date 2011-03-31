@@ -80,7 +80,7 @@ public:
     return *(const Camera::FrameCoord*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return ((((12+(Camera::FrameCoord::_sizeof()))+(Camera::FrameCoord::_sizeof()))+4)+4)+(Camera::FrameCoord::_sizeof()*(this->_masked_pixel_count));}
-  std::vector<int> _masked_pixel_coordinates_shape() const;
+  std::vector<int> masked_pixel_shape() const;
 private:
   uint32_t	_forwarding;	/* frame forwarding policy */
   uint32_t	_forward_prescale;	/* event prescale for forwarding */
@@ -110,7 +110,7 @@ public:
     return (const uint8_t*)(((const char*)this)+offset);
   }
   uint32_t _sizeof() const {return 16+(1*(this->_width*this->_height*((this->_depth+7)/8)));}
-  std::vector<int> _pixel_data_shape() const;
+  std::vector<int> data_shape() const;
 private:
   uint32_t	_width;	/* number of pixels in a row */
   uint32_t	_height;	/* number of pixels in a column */

@@ -5,7 +5,7 @@
 
 namespace PsddlPds {
 namespace CsPad {
-std::vector<int> CsPadDigitalPotsCfg::_pots_shape() const
+std::vector<int> CsPadDigitalPotsCfg::pots_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -13,7 +13,7 @@ std::vector<int> CsPadDigitalPotsCfg::_pots_shape() const
   return shape;
 }
 
-std::vector<int> CsPadGainMapCfg::_gainMap_shape() const
+std::vector<int> CsPadGainMapCfg::gainMap_shape() const
 {
   std::vector<int> shape;
   shape.reserve(2);
@@ -22,7 +22,7 @@ std::vector<int> CsPadGainMapCfg::_gainMap_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV1QuadReg::_shiftSelect_shape() const
+std::vector<int> ConfigV1QuadReg::shiftSelect_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -30,7 +30,7 @@ std::vector<int> ConfigV1QuadReg::_shiftSelect_shape() const
   return shape;
 }
 
-std::vector<int> ConfigV1QuadReg::_edgeSelect_shape() const
+std::vector<int> ConfigV1QuadReg::edgeSelect_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -50,7 +50,7 @@ uint32_t
 ConfigV1::numSect() const {
   return this->numAsicsRead()/2;
 }
-std::vector<int> ConfigV1::_quads_shape() const
+std::vector<int> ConfigV1::quads_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -78,7 +78,7 @@ uint32_t
 ConfigV2::numSect() const {
   return __builtin_popcount(this->_roiMask);
 }
-std::vector<int> ConfigV2::_quads_shape() const
+std::vector<int> ConfigV2::quads_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -86,7 +86,7 @@ std::vector<int> ConfigV2::_quads_shape() const
   return shape;
 }
 
-std::vector<int> ElementV1::_sbtemp_shape() const
+std::vector<int> ElementV1::sb_temp_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -94,23 +94,21 @@ std::vector<int> ElementV1::_sbtemp_shape() const
   return shape;
 }
 
-std::vector<int> ElementV1::_data_shape(const CsPad::ConfigV1& cfg) const
+std::vector<int> ElementV1::data_shape(const CsPad::ConfigV1& cfg) const
 {
   std::vector<int> shape;
-  shape.reserve(4);
-  shape.push_back(cfg.numQuads());
-  shape.push_back( cfg.numAsicsRead()/2);
+  shape.reserve(3);
+  shape.push_back(cfg.numAsicsRead()/2);
   shape.push_back( ColumnsPerASIC);
   shape.push_back( MaxRowsPerASIC*2);
   return shape;
 }
 
-std::vector<int> ElementV1::_data_shape(const CsPad::ConfigV2& cfg) const
+std::vector<int> ElementV1::data_shape(const CsPad::ConfigV2& cfg) const
 {
   std::vector<int> shape;
-  shape.reserve(4);
-  shape.push_back(cfg.numQuads());
-  shape.push_back( cfg.numAsicsRead()/2);
+  shape.reserve(3);
+  shape.push_back(cfg.numAsicsRead()/2);
   shape.push_back( ColumnsPerASIC);
   shape.push_back( MaxRowsPerASIC*2);
   return shape;
@@ -124,7 +122,23 @@ std::vector<int> ElementV1::_extra_shape() const
   return shape;
 }
 
-std::vector<int> ElementV2::_sbtemp_shape() const
+std::vector<int> DataV1::quads_shape(const CsPad::ConfigV1& cfg) const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(cfg.numQuads());
+  return shape;
+}
+
+std::vector<int> DataV1::quads_shape(const CsPad::ConfigV2& cfg) const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(cfg.numQuads());
+  return shape;
+}
+
+std::vector<int> ElementV2::sb_temp_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -132,11 +146,11 @@ std::vector<int> ElementV2::_sbtemp_shape() const
   return shape;
 }
 
-std::vector<int> ElementV2::_data_shape(const CsPad::ConfigV2& cfg) const
+std::vector<int> ElementV2::data_shape(const CsPad::ConfigV2& cfg) const
 {
   std::vector<int> shape;
   shape.reserve(3);
-  shape.push_back(cfg.numSect());
+  shape.push_back(cfg.numAsicsStored(this->quad())/2);
   shape.push_back( ColumnsPerASIC);
   shape.push_back( MaxRowsPerASIC*2);
   return shape;
@@ -147,6 +161,14 @@ std::vector<int> ElementV2::_extra_shape() const
   std::vector<int> shape;
   shape.reserve(1);
   shape.push_back(2);
+  return shape;
+}
+
+std::vector<int> DataV2::quads_shape(const CsPad::ConfigV2& cfg) const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(cfg.numQuads());
   return shape;
 }
 

@@ -80,8 +80,8 @@ public:
   uint32_t trimmedWidth() const;
   uint32_t trimmedHeight() const;
   static uint32_t _sizeof()  {return (8+(4*(NVoltages)))+(2*(NWaveforms));}
-  std::vector<int> _dacVoltage_shape() const;
-  std::vector<int> _waveform_shape() const;
+  std::vector<int> dacVoltages_shape() const;
+  std::vector<int> waveforms_shape() const;
 private:
   uint16_t	_outputMode;
   uint8_t	_ccdEnable;
