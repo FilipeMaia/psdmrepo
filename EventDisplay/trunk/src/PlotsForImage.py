@@ -105,10 +105,18 @@ class PlotsForImage ( object ) :
        #self.figDet.canvas.mpl_connect('button_press_event',   self.processMouseButtonClickForImageColorbar)
         self.figDet.canvas.mpl_connect('button_press_event',   self.processMouseButtonPressForImage)
 
+        #self.figDet.canvas.mpl_connect('close_event', self.processCloseEvent)
+
         rect_props=dict(edgecolor='black', linewidth=2, linestyle='dashed', fill=False)
         self.figDet.span = RectangleSelector(self.axesDet, self.onRectangleSelect, drawtype='box',rectprops=rect_props)
 
         plt.draw()
+
+
+    def processCloseEvent( self, event ):
+        print 'The signal CloseEvent is received',
+        figNum = plt.gcf().myFigNum 
+        print ' figNum = ', figNum
 
 
     def onRectangleSelect(self, eclick, erelease) :

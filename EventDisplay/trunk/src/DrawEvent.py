@@ -641,6 +641,8 @@ class DrawEvent ( object ) :
         else :
             self.fig = plt.figure(num=self.figNum)
 
+        self.fig.canvas.mpl_connect('close_event', self.processCloseEvent)
+
         self.fig.myXmin = None
         self.fig.myXmax = None
         self.fig.myYmin = None
@@ -652,6 +654,9 @@ class DrawEvent ( object ) :
 
         self.fig.myZoomIsOn = False
         self.fig.nwin   = self.nwin
+        self.fig.myFigNum = self.figNum
+
+        print 'Open figNum=', self.figNum
 
         return self.fig
 
@@ -673,6 +678,14 @@ class DrawEvent ( object ) :
         posy = cp.confpars.posGUIMain[1]                   + 20*(self.figNum-self.figOffsetNum-1)
         fig_QMainWindow.move(posx,posy)
         #fig_QMainWindow.move(820+50*self.figNum, 20*(self.figNum-1)) #### This works!
+
+
+    def processCloseEvent( self, event ):
+        """Figure will be closed automatically, but it is necesary to remove its number from the list..."""
+        fig    = event.canvas.figure # plt.gcf() does not work, because closed canva may be non active
+        figNum = fig.myFigNum 
+        print 'The signal CloseEvent is received, figNum = ', figNum
+        if figNum in self.list_of_open_figs : self.list_of_open_figs.remove(figNum)
 
 
     def close_fig( self, figNum=None ):
@@ -714,6 +727,8 @@ class DrawEvent ( object ) :
             if cp.confpars.correlationsIsOn : 
                 self.plotsCorrelations.plotCorrelations(self.set_fig('2x1'), self.h5file)
             else : self.close_fig(self.figNum)
+
+
 
 #-----------------------------------------
 #

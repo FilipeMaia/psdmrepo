@@ -80,9 +80,9 @@ class PlotsForCorrelations ( object ) :
         self.XParName  = cp.confpars.correlationWindowParameters[win][8] 
         self.YLimsIsOn = cp.confpars.correlationWindowParameters[win][9] 
         self.XLimsIsOn = cp.confpars.correlationWindowParameters[win][10] 
-        self.XNBins    = 50
-        self.YNBins    = 50
-        self.LogIsOn   = False
+        self.LogIsOn   = cp.confpars.correlationWindowParameters[win][11]
+        self.YNBins    = cp.confpars.correlationWindowParameters[win][12]
+        self.XNBins    = cp.confpars.correlationWindowParameters[win][13]
         
         if self.Ydsname == 'None' :
             print 'THE Ydsname=', self.Ydsname, ' IS SET INCORRECTLY. THE CORRELATION PLOT', self.nwin,' IS IGNORED'

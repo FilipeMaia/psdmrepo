@@ -82,34 +82,56 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         if cp.confpars.correlationWindowParameters[self.window][10] : self.cboxXlimits.setCheckState(2)
 
         self.char_expand = u'\u25BE' # down-head triangle
-        height = 18
+        height = 20
         width  = 60
 
         self.editCorrelationYmin  = QtGui.QLineEdit(str(cp.confpars.correlationWindowParameters[self.window][3]))
         self.editCorrelationYmax  = QtGui.QLineEdit(str(cp.confpars.correlationWindowParameters[self.window][4]))
         self.editCorrelationXmin  = QtGui.QLineEdit(str(cp.confpars.correlationWindowParameters[self.window][5]))
         self.editCorrelationXmax  = QtGui.QLineEdit(str(cp.confpars.correlationWindowParameters[self.window][6]))
+        self.editCorrelationYNBins= QtGui.QLineEdit(str(cp.confpars.correlationWindowParameters[self.window][12]))
+        self.editCorrelationXNBins= QtGui.QLineEdit(str(cp.confpars.correlationWindowParameters[self.window][13]))
 
         self.editCorrelationYmin  .setMaximumWidth(width)
         self.editCorrelationYmax  .setMaximumWidth(width)
         self.editCorrelationXmin  .setMaximumWidth(width)
         self.editCorrelationXmax  .setMaximumWidth(width)
+        self.editCorrelationYNBins.setMaximumWidth(width)
+        self.editCorrelationXNBins.setMaximumWidth(width)
+
 
         self.editCorrelationYmin  .setMaximumHeight(height)
         self.editCorrelationYmax  .setMaximumHeight(height)
         self.editCorrelationXmin  .setMaximumHeight(height)
         self.editCorrelationXmax  .setMaximumHeight(height)
+        self.editCorrelationYNBins.setMaximumHeight(height)
+        self.editCorrelationXNBins.setMaximumHeight(height)
 
         self.editCorrelationYmin  .setValidator(QtGui.QIntValidator(-1000000, 1000000, self))
         self.editCorrelationYmax  .setValidator(QtGui.QIntValidator(-1000000, 1000000, self))
         self.editCorrelationXmin  .setValidator(QtGui.QIntValidator(-1000000, 1000000, self))
         self.editCorrelationXmax  .setValidator(QtGui.QIntValidator(-1000000, 1000000, self))
-
+        self.editCorrelationYNBins.setValidator(QtGui.QIntValidator(1, 1000, self))
+        self.editCorrelationXNBins.setValidator(QtGui.QIntValidator(1, 1000, self))
+        
+        self.titYNBins     = QtGui.QLabel('Y Nbins:')
+        self.titXNBins     = QtGui.QLabel('X Nbins:')
         self.titVs         = QtGui.QLabel('Versus:')
+
+        self.radioLogZ     = QtGui.QRadioButton('log Z')
+        self.radioLinZ     = QtGui.QRadioButton('lin Z')
+
+        self.radioGroupZScale = QtGui.QButtonGroup()
+        self.radioGroupZScale.addButton(self.radioLogZ)
+        self.radioGroupZScale.addButton(self.radioLinZ)
+
+        if cp.confpars.correlationWindowParameters[self.window][11] : self.radioLogZ.setChecked(True)
+        else :                                                        self.radioLinZ.setChecked(True)
+
         self.radioVsIndex  = QtGui.QRadioButton('Index')
         self.radioVsTime   = QtGui.QRadioButton('Time' )
         self.radioVsXPar   = QtGui.QRadioButton('X-par')
-        self.radioYHist    = QtGui.QRadioButton('Y-par hist.')
+        self.radioYHist    = QtGui.QRadioButton('Y-histo.')
 
         self.radioGroup    = QtGui.QButtonGroup()
         self.radioGroup.addButton(self.radioVsIndex)
@@ -149,27 +171,33 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
 
         grid = QtGui.QGridLayout()
 
-        grid.addWidget(self.titCorrYDataSet,     0, 0)
-        grid.addWidget(self.butCorrYDataSet,     0, 1, 1, 4)
-        grid.addWidget(self.butCorrYParName,     0, 5)
+        grid.addWidget(self.titCorrYDataSet,      0, 0)
+        grid.addWidget(self.butCorrYDataSet,      0, 1, 1, 4)
+        grid.addWidget(self.butCorrYParName,      0, 5)
 
-        grid.addWidget(self.titVs,               2, 0)
-        grid.addWidget(self.radioVsIndex,        2, 1)
-        grid.addWidget(self.radioVsTime,         2, 2)
-        grid.addWidget(self.radioVsXPar,         2, 3)
-        grid.addWidget(self.radioYHist,          2, 5)
+        grid.addWidget(self.titVs,                1, 0)
+        grid.addWidget(self.radioVsIndex,         1, 1)
+        grid.addWidget(self.radioVsTime,          1, 2)
+        grid.addWidget(self.radioVsXPar,          1, 3)
+        grid.addWidget(self.radioYHist,           1, 6)
 
-        grid.addWidget(self.titCorrXDataSet,     3, 0)
-        grid.addWidget(self.butCorrXDataSet,     3, 1, 1, 4)
-        grid.addWidget(self.butCorrXParName,     3, 5)
+        grid.addWidget(self.titCorrXDataSet,      2, 0)
+        grid.addWidget(self.butCorrXDataSet,      2, 1, 1, 4)
+        grid.addWidget(self.butCorrXParName,      2, 5)
         
-        grid.addWidget(self.cboxYlimits,         4, 0)
-        grid.addWidget(self.editCorrelationYmin, 4, 1)
-        grid.addWidget(self.editCorrelationYmax, 4, 2)
+        grid.addWidget(self.cboxYlimits,          3, 0)
+        grid.addWidget(self.editCorrelationYmin,  3, 1)
+        grid.addWidget(self.editCorrelationYmax,  3, 2)
+        grid.addWidget(self.titYNBins,            3, 3)
+        grid.addWidget(self.editCorrelationYNBins,3, 5)
+        grid.addWidget(self.radioLinZ,            3, 6)
 
-        grid.addWidget(self.cboxXlimits,         4, 3)
-        grid.addWidget(self.editCorrelationXmin, 4, 4)
-        grid.addWidget(self.editCorrelationXmax, 4, 5)
+        grid.addWidget(self.cboxXlimits,          4, 0)
+        grid.addWidget(self.editCorrelationXmin,  4, 1)
+        grid.addWidget(self.editCorrelationXmax,  4, 2)
+        grid.addWidget(self.titXNBins,            4, 3)
+        grid.addWidget(self.editCorrelationXNBins,4, 5)
+        grid.addWidget(self.radioLogZ,            4, 6)
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(grid) 
@@ -182,30 +210,35 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
             self.setLayout(self.vbox)
             self.show()
 
-        self.connect(self.radioVsIndex,        QtCore.SIGNAL('clicked()'),          self.processRadioVsIndex )
-        self.connect(self.radioVsTime,         QtCore.SIGNAL('clicked()'),          self.processRadioVsTime )
-        self.connect(self.radioVsXPar,         QtCore.SIGNAL('clicked()'),          self.processRadioVsXPar )
-        self.connect(self.radioYHist,          QtCore.SIGNAL('clicked()'),          self.processRadioYHist )
+        self.connect(self.radioVsIndex,          QtCore.SIGNAL('clicked()'),          self.processRadioVsIndex )
+        self.connect(self.radioVsTime,           QtCore.SIGNAL('clicked()'),          self.processRadioVsTime )
+        self.connect(self.radioVsXPar,           QtCore.SIGNAL('clicked()'),          self.processRadioVsXPar )
+        self.connect(self.radioYHist,            QtCore.SIGNAL('clicked()'),          self.processRadioYHist )
 
-        self.connect(self.butCorrXDataSet,     QtCore.SIGNAL('clicked()'),          self.processMenuForXDataSet )
-        self.connect(self.butCorrYDataSet,     QtCore.SIGNAL('clicked()'),          self.processMenuForYDataSet )
-        self.connect(self.butCorrXParName,     QtCore.SIGNAL('clicked()'),          self.processMenuForXParName )
-        self.connect(self.butCorrYParName,     QtCore.SIGNAL('clicked()'),          self.processMenuForYParName )
+        self.connect(self.butCorrXDataSet,       QtCore.SIGNAL('clicked()'),          self.processMenuForXDataSet )
+        self.connect(self.butCorrYDataSet,       QtCore.SIGNAL('clicked()'),          self.processMenuForYDataSet )
+        self.connect(self.butCorrXParName,       QtCore.SIGNAL('clicked()'),          self.processMenuForXParName )
+        self.connect(self.butCorrYParName,       QtCore.SIGNAL('clicked()'),          self.processMenuForYParName )
 
-        self.connect(self.editCorrelationYmin, QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationYmin )
-        self.connect(self.editCorrelationYmax, QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationYmax )
-        self.connect(self.editCorrelationXmin, QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationXmin )
-        self.connect(self.editCorrelationXmax, QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationXmax )
+        self.connect(self.editCorrelationYmin,   QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationYmin )
+        self.connect(self.editCorrelationYmax,   QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationYmax )
+        self.connect(self.editCorrelationXmin,   QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationXmin )
+        self.connect(self.editCorrelationXmax,   QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationXmax )
 
-        self.connect(self.cboxYlimits,         QtCore.SIGNAL('stateChanged(int)'),  self.processCboxYlimits)
-        self.connect(self.cboxXlimits,         QtCore.SIGNAL('stateChanged(int)'),  self.processCboxXlimits)
+        self.connect(self.cboxYlimits,           QtCore.SIGNAL('stateChanged(int)'),  self.processCboxYlimits)
+        self.connect(self.cboxXlimits,           QtCore.SIGNAL('stateChanged(int)'),  self.processCboxXlimits)
+
+        self.connect(self.editCorrelationYNBins, QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationYNBins )
+        self.connect(self.editCorrelationXNBins, QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationXNBins )
+        self.connect(self.radioLogZ,             QtCore.SIGNAL('clicked()'),          self.processRadioLogZ )
+        self.connect(self.radioLinZ,             QtCore.SIGNAL('clicked()'),          self.processRadioLinZ )
   
         cp.confpars.selectionWindowIsOpen = True
 
         self.showToolTips()
 
-        self.setMinimumHeight(150)
-        self.setMaximumHeight(200)
+        self.setMinimumHeight(250)
+        self.setMaximumHeight(300)
 
     #-------------------
     # Private methods --
@@ -264,6 +297,13 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.setButCorrYDataSetTextAlignment()
 
 
+    def processRadioLogZ(self): 
+        cp.confpars.correlationWindowParameters[self.window][11] = True 
+
+
+    def processRadioLinZ(self): 
+        cp.confpars.correlationWindowParameters[self.window][11] = False 
+
 
     def processRadioVsIndex(self):
         cp.confpars.correlationWindowParameters[self.window][2] = 0
@@ -275,7 +315,8 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         cp.confpars.correlationWindowParameters[self.window][8] = 'None'
 
         self.setButCorrXDataSetTextAlignment()
-  
+        self.setEditFieldsStatusForMode()
+        
             
     def processRadioVsTime(self):
         cp.confpars.correlationWindowParameters[self.window][2] = 1
@@ -287,7 +328,8 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         cp.confpars.correlationWindowParameters[self.window][8] = 'None'
 
         self.setButCorrXDataSetTextAlignment()
-
+        self.setEditFieldsStatusForMode()
+        
 
     def processRadioYHist(self):
         cp.confpars.correlationWindowParameters[self.window][2] = 3
@@ -299,7 +341,8 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         cp.confpars.correlationWindowParameters[self.window][8] = 'None'
 
         self.setButCorrXDataSetTextAlignment()
-  
+        self.setEditFieldsStatusForMode()  
+
 
     def processRadioVsXPar(self):
         cp.confpars.correlationWindowParameters[self.window][2] = 2
@@ -320,15 +363,50 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
 
         self.setButCorrXDataSetTextAlignment()
         #self.setButCorrXParNameTextAlignment()
+        self.setEditFieldsStatusForMode()
+
+        
+    def setEditFieldsStatusForMode(self):
+
+        self.cboxXlimits.setCheckable(True)
+        #self.processRadioLinZ(self)
+        self.radioLogZ.setCheckable(False)
+  
+        if   cp.confpars.correlationWindowParameters[self.window][2] == 0 :
+            self.editCorrelationYNBins.setStyleSheet(self.styleSheetGrey)
+            self.editCorrelationXNBins.setStyleSheet(self.styleSheetGrey)
+            self.editCorrelationYNBins.setReadOnly(True)
+            self.editCorrelationXNBins.setReadOnly(True)
+
+        elif cp.confpars.correlationWindowParameters[self.window][2] == 1 :
+            self.editCorrelationYNBins.setStyleSheet(self.styleSheetGrey)
+            self.editCorrelationXNBins.setStyleSheet(self.styleSheetGrey)
+            self.editCorrelationYNBins.setReadOnly(True)
+            self.editCorrelationXNBins.setReadOnly(True)
+
+        elif cp.confpars.correlationWindowParameters[self.window][2] == 2 :
+            self.editCorrelationYNBins.setStyleSheet(self.styleSheetWhite)
+            self.editCorrelationXNBins.setStyleSheet(self.styleSheetWhite)
+            self.editCorrelationYNBins.setReadOnly(False)
+            self.editCorrelationXNBins.setReadOnly(False)
+            self.radioLogZ.setCheckable(True)
+
+        elif cp.confpars.correlationWindowParameters[self.window][2] == 3 :
+            self.editCorrelationYNBins.setStyleSheet(self.styleSheetWhite)
+            self.editCorrelationXNBins.setStyleSheet(self.styleSheetGrey)
+            self.editCorrelationYNBins.setReadOnly(False)
+            self.editCorrelationXNBins.setReadOnly(True)
+            self.cboxXlimits.setCheckState(0)
+            self.cboxXlimits.setCheckable(False)
 
 
     def setEditFieldsStatus(self):
+
         if self.cboxYlimits.isChecked() :
             self.editCorrelationYmin.setStyleSheet(self.styleSheetWhite)
             self.editCorrelationYmax.setStyleSheet(self.styleSheetWhite)
             self.editCorrelationYmin.setReadOnly(False)
             self.editCorrelationYmax.setReadOnly(False)
-
         else :
             self.editCorrelationYmin.setStyleSheet(self.styleSheetGrey)
             self.editCorrelationYmax.setStyleSheet(self.styleSheetGrey)
@@ -340,7 +418,6 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
             self.editCorrelationXmax.setStyleSheet(self.styleSheetWhite)
             self.editCorrelationXmin.setReadOnly(False)
             self.editCorrelationXmax.setReadOnly(False)
-
         else :
             self.editCorrelationXmin.setStyleSheet(self.styleSheetGrey)
             self.editCorrelationXmax.setStyleSheet(self.styleSheetGrey)
@@ -378,6 +455,14 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
 
     def processEditCorrelationXmax(self):
         cp.confpars.correlationWindowParameters[self.window][6] = int(self.editCorrelationXmax.displayText())        
+
+
+    def processEditCorrelationYNBins(self):
+        cp.confpars.correlationWindowParameters[self.window][12] = int(self.editCorrelationYNBins.displayText())
+
+
+    def processEditCorrelationXNBins(self):
+        cp.confpars.correlationWindowParameters[self.window][13] = int(self.editCorrelationXNBins.displayText())
 
 
     def setButCorrYDataSetTextAlignment(self):

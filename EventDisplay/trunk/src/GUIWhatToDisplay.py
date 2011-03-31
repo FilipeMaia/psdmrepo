@@ -69,7 +69,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
     def __init__(self, parent=None):
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(370, 350, 500, 500)
+        self.setGeometry(370, 350, 500, 600)
         self.setWindowTitle('What to display?')
 
         self.frame = QtGui.QFrame(self)
