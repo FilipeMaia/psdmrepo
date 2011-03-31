@@ -86,6 +86,8 @@ XtcInputModule::~XtcInputModule ()
 void 
 XtcInputModule::beginJob(Env& env)
 {
+  MsgLog(logger, debug, "XtcInputModule: in beginJob()");
+
   // will throw if no files were defined in config
   std::list<std::string> fileNames = configList("files");
   if ( fileNames.empty() ) {
@@ -108,7 +110,6 @@ XtcInputModule::beginJob(Env& env)
   m_readerThread.reset( new boost::thread( DgramReader ( 
       files, *m_dgQueue, dgSizeMB*1048576, merge, false, l1offset) ) );
   
-  
   // try to read first event and see if it is a Configure transition
   XtcInput::Dgram dg(m_dgQueue->pop());
   if (dg.empty()) {
@@ -117,6 +118,9 @@ XtcInputModule::beginJob(Env& env)
   }
   
   Dgram::ptr dgptr = dg.dg();
+
+  MsgLog(logger, debug, "XtcInputModule: read first datagram, transition = " 
+        << Pds::TransitionId::name(dgptr->seq.service()));
 
   if ( dgptr->seq.service() != Pds::TransitionId::Configure ) {
     // Something else than Configure, store if for event()
@@ -136,6 +140,8 @@ XtcInputModule::beginJob(Env& env)
 InputModule::Status 
 XtcInputModule::event(Event& evt, Env& env)
 {
+  MsgLog(logger, debug, "XtcInputModule: in event()");
+
   Status status = Skip;
   bool found = false;
   while (not found) {
@@ -154,10 +160,14 @@ XtcInputModule::event(Event& evt, Env& env)
       MsgLog(logger, debug, "EOF seen");
       return Stop;
     }
-  
+
+
     const Pds::Sequence& seq = dg.dg()->seq ;
     const Pds::ClockTime& clock = seq.clock() ;
     Pds::TransitionId::Value trans = seq.service();
+
+    MsgLog(logger, debug, "XtcInputModule: found new datagram, transition = " 
+          << Pds::TransitionId::name(trans));
 
     switch( seq.service()) {
     
@@ -242,6 +252,8 @@ XtcInputModule::endJob(Env& env)
 void 
 XtcInputModule::fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env)
 {
+  MsgLog(logger, debug, "XtcInputModule: in fillEvent()");
+
   Dgram::ptr dgptr = dg.dg();
     
   // Store datagram itself in the event
@@ -271,6 +283,8 @@ XtcInputModule::fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env)
 void 
 XtcInputModule::fillEnv(const XtcInput::Dgram& dg, Env& env)
 {
+  MsgLog(logger, debug, "XtcInputModule: in fillEnv()");
+
   // All objects in datagram in Configuration and BeginCalibCycle transitions
   // (except for EPICS data) are considered configuration data. Just store them
   // them in the ConfigStore part of the environment
