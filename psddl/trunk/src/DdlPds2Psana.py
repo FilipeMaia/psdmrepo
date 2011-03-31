@@ -374,7 +374,7 @@ class DdlPds2Psana ( object ) :
                 if '{xtc-config}' in str(attr.offset) : cfgNeeded = True
 
                 rettype = attr.type.fullName('C++')
-                if attr.dimensions:
+                if attr.shape:
                     rettype = "const "+rettype+'*'
                 self._genFwdMeth(meth.name, rettype, type, cfgNeeded)
             
@@ -382,7 +382,7 @@ class DdlPds2Psana ( object ) :
 
                 psana_type = attr.type.fullName('C++', self.psana_ns)
 
-                if not attr.dimensions:
+                if not attr.shape:
                     
                     # attribute is a regular non-array object
                     print >>self.inc, "  virtual const %s& %s() const;" % \
@@ -394,11 +394,11 @@ class DdlPds2Psana ( object ) :
     
                     # attribute is an array object, return pointer for basic types,
                     # or reference to elements for composite types
-                    expr = attr.name + _dimexpr(attr.dimensions)
+                    expr = attr.name + _dimexpr(attr.shape)
                     print >>self.inc, "  virtual const %s& %s(%s) const;" % \
-                            (psana_type, meth.name, _dimargs(attr.dimensions))
+                            (psana_type, meth.name, _dimargs(attr.shape))
                     print >>self.cpp, "\nconst %s& %s::%s(%s) const { return %s; }" % \
-                            (psana_type, type.name, meth.name, _dimargs(attr.dimensions), expr)
+                            (psana_type, type.name, meth.name, _dimargs(attr.shape), expr)
 
         else:
 
@@ -467,14 +467,14 @@ class DdlPds2Psana ( object ) :
         name = attr.name
         if attr.access == 'public' : name += "_pub_member_"
         
-        if not attr.dimensions:
+        if not attr.shape:
             
             print >>self.inc, "  %s %s;" % (psana_type, name)
 
         else :
 
             atype = psana_type     
-            for d in attr.dimensions.dims:
+            for d in attr.shape.dims:
                 atype = "std::vector< %s >" % atype
             print >>self.inc, "  %s %s;" % (atype, name)
 
@@ -521,7 +521,7 @@ class DdlPds2Psana ( object ) :
         if attr.type.basic: return
         
         # arrays are initialized inside constructor
-        if attr.dimensions: return
+        if attr.shape: return
 
         # how to get access to member
         if attr.access == 'public' :
@@ -554,13 +554,13 @@ class DdlPds2Psana ( object ) :
         if attr.type.basic: return
         
         # arrays are initialized inside constructor
-        if not attr.dimensions: return
+        if not attr.shape: return
         
         # may need to mangle name
         name = attr.name
         if attr.access == 'public' : name += "_pub_member_"
 
-        ndims = len(attr.dimensions.dims)
+        ndims = len(attr.shape.dims)
 
         print >>self.cpp, "  {"
         
@@ -571,9 +571,9 @@ class DdlPds2Psana ( object ) :
             cfgNeeded = True
         
         cfg = ''
-        for d in attr.dimensions.dims:
+        for d in attr.shape.dims:
             if '{xtc-config}' in str(d) : cfg = "*cfgPtr"
-        print >>self.cpp, "    const std::vector<int>& dims = xtcPtr->%s(%s);" % (attr.shape_meth, cfg)
+        print >>self.cpp, "    const std::vector<int>& dims = xtcPtr->%s(%s);" % (attr.shape_method, cfg)
 
         for r in range(ndims):
             idx = 'i%d'%r
@@ -614,15 +614,15 @@ class DdlPds2Psana ( object ) :
 
     def _genAttrShapeDecl(self, attr, type):
 
-        if not attr.shape_meth: return 
+        if not attr.shape_method: return 
         
         if attr.type.basic:
 
             cfgNeeded = False
-            if attr.dimensions:
-                for d in attr.dimensions.dims:
+            if attr.shape:
+                for d in attr.shape.dims:
                     if '{xtc-config}' in str(d) : cfgNeeded = True
-            self._genFwdMeth(attr.shape_meth, "std::vector<int>", type, cfgNeeded)
+            self._genFwdMeth(attr.shape_method, "std::vector<int>", type, cfgNeeded)
             
         else:
 
@@ -630,11 +630,11 @@ class DdlPds2Psana ( object ) :
             name = attr.name
             if attr.access == 'public' : name += "_pub_member_"
 
-            shape = attr.dimensions.dims
+            shape = attr.shape.dims
 
-            print >>self.inc, "  virtual std::vector<int> %s() const;" % (attr.shape_meth)
+            print >>self.inc, "  virtual std::vector<int> %s() const;" % (attr.shape_method)
             
-            print >>self.cpp, "std::vector<int> %s::%s() const\n{" % (type.name, attr.shape_meth)
+            print >>self.cpp, "std::vector<int> %s::%s() const\n{" % (type.name, attr.shape_method)
             print >>self.cpp, "  std::vector<int> shape;" 
             print >>self.cpp, "  shape.reserve(%d);" % len(shape)
             v = name
@@ -656,7 +656,7 @@ class DdlPds2Psana ( object ) :
         if attr.type.basic:
             
             rettype = attr.type.fullName('C++')
-            if attr.dimensions:
+            if attr.shape:
                 rettype = "const "+rettype+'*'
 
             print >>self.inc, "  virtual %s %s() const;" % (rettype, attr.name)
@@ -670,8 +670,8 @@ class DdlPds2Psana ( object ) :
             
             argexpr = ''
             subexpr = ''
-            if attr.dimensions:
-                rank = len(attr.dimensions.dims)
+            if attr.shape:
+                rank = len(attr.shape.dims)
                 argexpr = subscr_comma(rank)
                 subexpr = subscr(rank)
             

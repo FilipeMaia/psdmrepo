@@ -211,17 +211,17 @@ class CppTypeCodegen ( object ) :
         def _dims(shape):
             return ''.join(['[%s]'%d for d in shape.dims])
         
-        if not attr.dimensions :
+        if not attr.shape :
             if attr.isfixed():
                 decl = "  %s\t%s;" % (_typename(attr.type), attr.name)
             else:
                 decl = "  //%s\t%s;" % (_typename(attr.type), attr.name)
         else:
             if attr.isfixed():
-                dim = _interpolate(_dims(attr.dimensions), attr.parent)
+                dim = _interpolate(_dims(attr.shape), attr.parent)
                 decl = "  %s\t%s%s;" % (_typename(attr.type), attr.name, dim)
             else :
-                dim = _interpolate(_dims(attr.dimensions), attr.parent)
+                dim = _interpolate(_dims(attr.shape), attr.parent)
                 decl = "  //%s\t%s%s;" % (_typename(attr.type), attr.name, dim)
         if attr.comment : decl += "\t/* %s */" % attr.comment.strip()
         print >>self._inc, decl
@@ -236,7 +236,7 @@ class CppTypeCodegen ( object ) :
             # attribute can only be access through calculated offset
             self._genAccessMethod(attr.name, attr)
 
-        elif not attr.dimensions:
+        elif not attr.shape:
             
             # attribute is a regular non-array object, 
             # return value or reference depending on what type it is
@@ -248,12 +248,12 @@ class CppTypeCodegen ( object ) :
             # or reference to elements for composite types
             if attr.type.basic:
                 rettype = "const "+_typename(attr.type)+'*'
-                expr = '&' + attr.name + '[0]'*len(attr.dimensions.dims)
+                expr = '&' + attr.name + '[0]'*len(attr.shape.dims)
                 self._genMethodExpr(attr.name, rettype, expr, inline=True)
             else:
                 rettype = _typedecl(attr.type)
-                expr = attr.name + _dimexpr(attr.dimensions)
-                self._genMethodExpr(attr.name, rettype, expr, args=_dimargs(attr.dimensions, self._type), inline=True)
+                expr = attr.name + _dimexpr(attr.shape)
+                self._genMethodExpr(attr.name, rettype, expr, args=_dimargs(attr.shape, self._type), inline=True)
 
 
     def _genMethDecl(self, meth):
@@ -272,7 +272,7 @@ class CppTypeCodegen ( object ) :
                 # attribute can only be access through calculated offset
                 self._genAccessMethod(meth.name, attr)
 
-            elif not attr.dimensions:
+            elif not attr.shape:
                 
                 # attribute is a regular non-array object, 
                 # return value or reference depending on what type it is
@@ -284,12 +284,12 @@ class CppTypeCodegen ( object ) :
                 # or reference to elements for composite types
                 if attr.type.basic:
                     rettype = "const "+_typename(attr.type)+'*'
-                    expr = '&' + attr.name + '[0]'*len(attr.dimensions.dims)
+                    expr = '&' + attr.name + '[0]'*len(attr.shape.dims)
                     self._genMethodExpr(meth.name, rettype, expr, inline=True)
                 else:
                     rettype = _typedecl(attr.type)
-                    expr = attr.name + _dimexpr(attr.dimensions)
-                    self._genMethodExpr(meth.name, rettype, expr, args=_dimargs(attr.dimensions, self._type), inline=True)
+                    expr = attr.name + _dimexpr(attr.shape)
+                    self._genMethodExpr(meth.name, rettype, expr, args=_dimargs(attr.shape, self._type), inline=True)
 
         elif meth.bitfield:
 
@@ -404,14 +404,14 @@ class CppTypeCodegen ( object ) :
         offset = _interpolate(offset, attr.parent)
         logging.debug("_genAccessMethod: cfgNeeded: %s", cfgNeeded)
 
-        args = _dimargs(attr.dimensions, attr.parent)
+        args = _dimargs(attr.shape, attr.parent)
         rettype = _typedecl(attr.type)
         
         if self._abs:
 
             logging.debug("_genAccessMethod: self._abs")
             
-            if attr.dimensions and attr.type.basic : 
+            if attr.shape and attr.type.basic : 
                 rettype = 'const '+rettype+'*'
                 argstr = ""
             else:
@@ -434,15 +434,46 @@ class CppTypeCodegen ( object ) :
                 print >>self._inc, "    return (const %s*)(((const char*)this)+offset);" % (rettype,)  
                 print >>self._inc, "  }"
 
+        elif attr.shape and attr.type.variable:
+
+            if len(attr.shape.dims) != 1:
+                raise ValueError('only one-dimentional arrays are supported now')
+
+            idxexpr = ExprVal(0)
+            sizeofCfg = ''
+                
+            # _sizeof may need config
+            if str(attr.type.size).find('{xtc-config}') >= 0: 
+                cfgNeeded = True
+                sizeofCfg = 'cfg'
+            
+            configs = [None]
+            if cfgNeeded : configs = attr.parent.xtcConfig
+            for cfg in configs:
+
+                if cfg :
+                    argstr = ', '.join([_argdecl(*x) for x in [('cfg', cfg)] + args])
+                else :
+                    argstr = ', '.join([_argdecl(*x) for x in args])
+                typename = _typename(attr.type)
+
+                print >>self._inc, "  const %s& %s(%s) const {" % (typename, methname, argstr)
+                print >>self._inc, "    const char* memptr = ((const char*)this)+%s;" % (offset,)
+                print >>self._inc, "    for (uint32_t i=0; i != i0; ++ i) {"
+                print >>self._inc, "      memptr += ((const %s*)memptr)->_sizeof(%s);" % (typename, sizeofCfg)
+                print >>self._inc, "    }"
+                print >>self._inc, "    return *(const %s*)(memptr);" % (typename)
+                print >>self._inc, "  }"
+
         else:
             
             idxexpr = ExprVal(0)
             sizeofCfg = ''
-            if attr.dimensions : 
+            if attr.shape : 
                 
                 idxexpr = ExprVal('i0', self._type)
-                for i in range(1,len(attr.dimensions.dims)):
-                    idxexpr = idxexpr*attr.dimensions.dims[i] + ExprVal('i%d'%i, self._type)
+                for i in range(1,len(attr.shape.dims)):
+                    idxexpr = idxexpr*attr.shape.dims[i] + ExprVal('i%d'%i, self._type)
                     
                 # _sizeof may need config
                 if str(attr.type.size).find('{xtc-config}') >= 0: 
@@ -511,7 +542,7 @@ class CppTypeCodegen ( object ) :
         for argname, argtype, attr in args:
             if not argtype: argtype = attr.type
             tname = _typename(argtype)
-            if isinstance(attr,Attribute) and attr.dimensions:
+            if isinstance(attr,Attribute) and attr.shape:
                 tname = "const "+tname+'*'
             elif not attr.type.basic : 
                 tname = "const "+tname+'&'
@@ -522,7 +553,7 @@ class CppTypeCodegen ( object ) :
         initlist = []
         for attr in self._type.attributes():
             arg = attr2arg.get(attr,"")
-            if attr.dimensions:
+            if attr.shape:
                 init = ''
             elif arg :
                 init = arg
@@ -561,9 +592,9 @@ class CppTypeCodegen ( object ) :
             print >>self._inc, "  {"
             for attr in self._type.attributes():
                 arg = attr2arg.get(attr,"")
-                if attr.dimensions and arg:
-                    size = attr.dimensions.size()
-                    first = '[0]' * (len(attr.dimensions.dims)-1)
+                if attr.shape and arg:
+                    size = attr.shape.size()
+                    first = '[0]' * (len(attr.shape.dims)-1)
                     print >>self._inc, "    std::copy(%s, %s+(%s), %s%s);" % (arg, arg, size, attr.name, first)
             print >>self._inc, "  }"
 
@@ -577,24 +608,24 @@ class CppTypeCodegen ( object ) :
             print >>self._cpp, "{"
             for attr in self._type.attributes():
                 arg = attr2arg.get(attr,"")
-                if attr.dimensions and arg:
-                    size = attr.dimensions.size()
-                    first = '[0]' * (len(attr.dimensions.dims)-1)
+                if attr.shape and arg:
+                    size = attr.shape.size()
+                    first = '[0]' * (len(attr.shape.dims)-1)
                     print >>self._inc, "  std::copy(%s, %s+(%s), %s%s);" % (arg, arg, size, attr.name, first)
             print >>self._cpp, "}"
 
 
     def _genAttrShapeDecl(self, attr):
 
-        if not attr.shape_meth: return 
+        if not attr.shape_method: return 
 
         if self._abs:
         
-            print >>self._inc, "  virtual std::vector<int> %s() const = 0;" % (attr.shape_meth)
+            print >>self._inc, "  virtual std::vector<int> %s() const = 0;" % (attr.shape_method)
         
         else:
 
-            shape = attr.dimensions.dims
+            shape = attr.shape.dims
 
             cfgNeeded = False        
             for s in shape:
@@ -609,8 +640,8 @@ class CppTypeCodegen ( object ) :
                 args = ['']
                 
             for arg in args:    
-                print >>self._inc, "  std::vector<int> %s(%s) const;" % (attr.shape_meth, arg)
-                print >>self._cpp, "std::vector<int> %s::%s(%s) const\n{" % (self._type.name, attr.shape_meth, arg)
+                print >>self._inc, "  std::vector<int> %s(%s) const;" % (attr.shape_method, arg)
+                print >>self._cpp, "std::vector<int> %s::%s(%s) const\n{" % (self._type.name, attr.shape_method, arg)
                 print >>self._cpp, "  std::vector<int> shape;" 
                 print >>self._cpp, "  shape.reserve(%d);" % len(shape)
                 for s in shape:

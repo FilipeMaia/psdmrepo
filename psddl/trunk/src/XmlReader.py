@@ -249,15 +249,6 @@ class XmlReader ( object ) :
                 # add it to the list of config classes
                 type.xtcConfig.append(cfg)
                 
-            elif propel.tag == 'repeat' :
-                
-                # every attribute must have a name
-                count = propel.get('count')
-                if not count: raise ValueError('repeat element missing count attribute')
-                
-                # add it to the list of config classes
-                type.repeat = count
-
             elif propel.tag == 'tag' :
 
                 # every tag must have a name
@@ -291,11 +282,13 @@ class XmlReader ( object ) :
         attr = Attribute( attrname,
                           type = atype,
                           parent = type, 
-                          dimensions = attrel.get('dimensions'), 
+                          shape = attrel.get('shape'), 
                           comment = (attrel.text or '').strip(), 
                           offset = attroffset,
                           tags = self._tags(attrel),
-                          access = attrel.get('access') )
+                          access = attrel.get('access'),
+                          shape_method = attrel.get('shape_method'),
+                          accessor_name = attrel.get('accessor') )
         logging.debug("XmlReader._parseAttr: new attribute: %s", attr)
 
         # accessor method for it

@@ -69,16 +69,21 @@ class Attribute ( object ) :
         self.name = name
         self.type = kw.get('type')
         self.parent = kw.get('parent')
-        self.dimensions = kw.get('dimensions')
-        if self.dimensions: 
-            self.dimensions = Shape(self.dimensions, self.parent)
+        self.shape = kw.get('shape')
+        if self.shape: 
+            self.shape = Shape(self.shape, self.parent)
         self.comment = kw.get('comment')
         self.offset = kw.get('offset')
         self.access = kw.get('access')
         self.accessor = kw.get('accessor')
-        self.shape_meth = None
-        if self.dimensions:
-            self.shape_meth = kw.get('shape_meth') or (name + '_shape')
+        self.shape_method = None
+        if self.shape:
+            if kw.get('shape_method') :
+                self.shape_method = kw.get('shape_method')
+            elif kw.get('accessor_name') :
+                self.shape_method = kw.get('accessor_name') + '_shape'
+            else:
+                self.shape_method = name + '_shape'
         self.tags = kw.get('tags', {}).copy()
 
         self.bitfields = []
@@ -97,15 +102,15 @@ class Attribute ( object ) :
         size = ExprVal(self.type.size)
         if size.value is None:
             size = ExprVal("sizeof(%s)" % self.type.name)
-        if self.dimensions:
-            size *= self.dimensions.size()
+        if self.shape:
+            size *= self.shape.size()
         return size
 
     def isfixed(self):
-        """Returns true if both offset and dimensions are fixed"""
+        """Returns true if both offset and shape are fixed"""
         offset = ExprVal(self.offset)
         if not offset.isconst(): return False
-        if self.dimensions and not self.dimensions.isfixed(): return False
+        if self.shape and not self.shape.isfixed(): return False
         return True
 
     def __str__(self):

@@ -81,13 +81,22 @@ class Type ( Namespace ) :
 
         self.xtcConfig = []
 
-        self.repeat = None
-                
         self.ctors = []   # constructors
 
     @property
     def basic(self):
         return 'basic' in self.tags
+
+    @property
+    def variable(self):
+        """ variable means instances may have different size """
+        if self.base and self.base.variable: return True
+        for attr in self.attributes():
+            if attr.type.variable: return True
+            if attr.shape: 
+                for dim in attr.shape.dims:
+                    if str(dim).find('{self}') >= 0: return True
+        return False
 
     @property
     def external(self):
@@ -160,7 +169,7 @@ class Type ( Namespace ) :
                 else:
     
                     # attribute has no offset defined, current offset is an expression
-                    # no way now to evaluate expression and check it's alignment, so we 
+                    # no way now to evaluate expression and check its alignment, so we 
                     # just accept 
                     attr.offset = offset
 
@@ -237,6 +246,11 @@ class Type ( Namespace ) :
             if self.base :
                 expr = ExprVal(self.base.fullName('C++')+"::_sizeof()", self)
             for attr in self.attributes():
+                
+                if attr.type.variable:
+                    logging.warning("Cannot generate _sizeof for type "+self.fullName('C++'))
+                    return
+                
                 meth = attr.type.lookup('_sizeof', Method)
                 if not meth:
                     size = ExprVal(attr.type.size, self)
@@ -251,9 +265,9 @@ class Type ( Namespace ) :
                     else:
                         size = ExprVal(attr.type.fullName('C++')+"::_sizeof(%s)"%cfg, self)
 
-                if attr.dimensions: 
+                if attr.shape: 
                     size = str(size)
-                    for dim in attr.dimensions.dims:
+                    for dim in attr.shape.dims:
                         size += '*(%s)' % dim
                     size = ExprVal(size, self)
                 expr += size
