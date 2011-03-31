@@ -145,8 +145,7 @@ XtcStreamMerger::next()
   int stream = -1 ;
   for ( unsigned i = 0 ; i < ns ; ++ i ) {
     if (not m_dgrams[i].empty()) {
-      Dgram::ptr dgptr = m_dgrams[i].dg();
-      if ( stream < 0 or dgptr->seq.clock() > dgptr->seq.clock() ) {
+      if ( stream < 0 or m_dgrams[stream].dg()->seq.clock() > m_dgrams[i].dg()->seq.clock() ) {
         stream = i ;
       }
     }

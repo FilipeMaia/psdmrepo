@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2011-03-31 Andy Salnikov
+- XtcStreamMerger::next - last change introduced a bug, fixed now
+- XtcIterator.cpp: trying to find a workaround for some weird cases 
+  with CsPad::ElementV2 reading when nested XTC object indicated larger
+  data size than its containing XTC container.
+
 Tag: V00-01-00
 2011-03-29 Andy Salnikov
 - add support for extracting run number from datagrams stored in a queue
