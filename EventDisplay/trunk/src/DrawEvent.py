@@ -654,10 +654,8 @@ class DrawEvent ( object ) :
 
         self.fig.myZoomIsOn = False
         self.fig.nwin   = self.nwin
-        self.fig.myFigNum = self.figNum
 
-        print 'Open figNum=', self.figNum
-
+        #print 'Open figure number=', self.figNum
         return self.fig
 
 
@@ -683,8 +681,8 @@ class DrawEvent ( object ) :
     def processCloseEvent( self, event ):
         """Figure will be closed automatically, but it is necesary to remove its number from the list..."""
         fig    = event.canvas.figure # plt.gcf() does not work, because closed canva may be non active
-        figNum = fig.myFigNum 
-        print 'The signal CloseEvent is received, figNum = ', figNum
+        figNum = fig.number 
+        print 'CloseEvent for figure number = ', figNum
         if figNum in self.list_of_open_figs : self.list_of_open_figs.remove(figNum)
 
 

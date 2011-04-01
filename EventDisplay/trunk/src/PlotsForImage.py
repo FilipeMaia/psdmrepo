@@ -28,6 +28,7 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
+import os
 import sys
 from numpy import *
 
@@ -36,6 +37,12 @@ import matplotlib
 #matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RectangleSelector
+
+#from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg       as FigureCanvas
+#from matplotlib.backend_bases           import NavigationToolbar2      as NavigationToolbar2
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar2
+
+from PyQt4 import QtCore, QtGui
 
 #---------------------------------
 #  Imports of base class module --
@@ -50,6 +57,38 @@ import PrintHDF5        as printh5
 #---------------------
 #  Class definition --
 #---------------------
+
+
+# THIS STUFF DOES NOT RE-IMPLEMENT NECESSARY METHODS !!!
+
+class MyNavigationToolbar ( NavigationToolbar2 ) :
+    """ Need to re-emplement a few methods in order to get control on toolbar button click"""
+
+    def __init__(self, canvas):
+        print 'MyNavigationToolbar.__init__'
+        #self.canvas = canvas
+        #self.coordinates = True
+        ##QtGui.QToolBar.__init__( self, parent )
+        #NavigationToolbar2.__init__( self, canvas, None )
+        self = canvas.toolbar
+
+    def press(self, event):
+        print 'my press'
+
+    def press_zoom(self, event):
+        print 'zoom is clicked'
+ 
+    def home(self, *args) :
+        print 'Home is clicked'
+        NavigationToolbar2.home()
+  
+    def zoom(self, *args) :
+        print 'Zoom is clicked'
+        NavigationToolbar2.zoom()
+
+#---------------------
+#---------------------
+
 class PlotsForImage ( object ) :
     """Plots for any 'image' record in the EventeDisplay project.
 
@@ -101,22 +140,54 @@ class PlotsForImage ( object ) :
         colmax = {True: cp.confpars.imageImageAmax, False: self.figDet.myCmax}[self.figDet.myCmax == None]
         plt.clim(colmin,colmax)
         self.colb = plt.colorbar(self.axescb, pad=0.05, orientation=1, fraction=0.10, shrink = 1, aspect = 20)#, ticks=coltickslocs #t=0.04s
+            
+        canvas  = self.figDet.canvas
+        toolbar = self.figDet.canvas.toolbar
 
-       #self.figDet.canvas.mpl_connect('button_press_event',   self.processMouseButtonClickForImageColorbar)
-        self.figDet.canvas.mpl_connect('button_press_event',   self.processMouseButtonPressForImage)
+        #print 'XXX =', canvas.window
+        #self.figDet.canvas.toolbar = MyNavigationToolbar(self.figDet.canvas)
+        #toolbar = MyNavigationToolbar(self.figDet.canvas.toolbar)
 
-        #self.figDet.canvas.mpl_connect('close_event', self.processCloseEvent)
+        #mytoolbar = MyNavigationToolbar(canvas)
 
-        rect_props=dict(edgecolor='black', linewidth=2, linestyle='dashed', fill=False)
-        self.figDet.span = RectangleSelector(self.axesDet, self.onRectangleSelect, drawtype='box',rectprops=rect_props)
+        #toolbar.canvas.mpl_connect('button_press_event',   self.processTestEvent)
+        #self.figDet.canvas.mpl_connect('button_press_event',   self.processMouseButtonClickForImageColorbar)
+        #self.figDet.canvas.mpl_connect('button_press_event',   self.processMouseButtonPressForImage)
 
+        #rect_props=dict(edgecolor='black', linewidth=2, linestyle='dashed', fill=False)
+        #self.figDet.span = RectangleSelector(self.axesDet, self.onRectangleSelect, drawtype='box',rectprops=rect_props)
+
+        self.figDet.canvas.mpl_connect('button_release_event',   self.processMouseButtonReleaseForImage)
         plt.draw()
 
 
-    def processCloseEvent( self, event ):
-        print 'The signal CloseEvent is received',
-        figNum = plt.gcf().myFigNum 
-        print ' figNum = ', figNum
+    def processTestEvent(self, event) :
+        print 'TestEvent=', event 
+
+
+    def processMouseButtonReleaseForImage(self, event) :
+
+        fig         = event.canvas.figure # or plt.gcf()
+        figNum      = fig.number 
+        self.figDet = fig
+        
+        if event.button == 1 :
+            bounds = fig.gca().viewLim.bounds
+            fig.myXmin = Xmin = bounds[0]
+            fig.myXmax = Xmax = bounds[0] + bounds[2] 
+            fig.myYmin = Ymin = bounds[1] + bounds[3]
+            fig.myYmax = Ymax = bounds[1]
+            fig.myZoomIsOn = True
+            #print ' Xmin, Xmax, Ymin, Ymax =', Xmin, Xmax, Ymin, Ymax
+
+        if event.button == 2 or event.button == 3 : # middle or right button
+            fig.myXmin = None
+            fig.myXmax = None
+            fig.myYmin = None
+            fig.myYmax = None
+            self.drawImage()
+            #plt.draw() # redraw the current figure
+            fig.myZoomIsOn = False
 
 
     def onRectangleSelect(self, eclick, erelease) :
@@ -139,6 +210,7 @@ class PlotsForImage ( object ) :
             self.figDet.myYmin = ymin
             self.figDet.myYmax = ymax
             self.figDet.myZoomIsOn = True
+
 
 
     def processMouseButtonPressForImage(self, event) :
