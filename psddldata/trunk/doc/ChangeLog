@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2011-04-01 Andrei Salnikov
+- small fix in opal1k.ConfigV1 class
+
 Tag: V00-00-05
 2011-03-31 Andrei Salnikov
 - renamed "dimentions" attribute into "shape"

@@ -89,7 +89,7 @@
             </attribute>
             
             <attribute name="_lookup_table" type="uint16_t" 
-                      shape="Output_LUT_Size*{self}.defect_pixel_correction_enabled()" 
+                      shape="Output_LUT_Size*{self}.output_lookup_table_enabled()" 
                       accessor="output_lookup_table">
             </attribute>
             
