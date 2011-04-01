@@ -85,7 +85,7 @@ XtcStreamMerger::XtcStreamMerger ( const std::list<XtcFileName>& files,
 
     std::list<XtcFileName> streamFiles = it->second ;
 
-    WithMsgLog( logger, info, out ) {
+    WithMsgLog( logger, trace, out ) {
       out << "XtcStreamMerger -- stream: " << it->first ;
       for ( std::list<XtcFileName>::const_iterator it = streamFiles.begin() ; it != streamFiles.end() ; ++ it ) {
         out << "\n             " << it->path() ;

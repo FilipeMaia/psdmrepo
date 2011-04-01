@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-02
+2011-04-01 Andy Salnikov
+- change logging level for few messages
+
 Tag: V00-01-01
 2011-03-31 Andy Salnikov
 - XtcStreamMerger::next - last change introduced a bug, fixed now

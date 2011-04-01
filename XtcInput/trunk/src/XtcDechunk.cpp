@@ -78,7 +78,7 @@ XtcDechunk::next()
       if ( m_iter == m_files.end() ) break ;
 
       // open next xtc file if there is none open
-      MsgLog( logger, info, "processing file: " << m_iter->path() ) ;
+      MsgLog( logger, trace, "processing file: " << m_iter->path() ) ;
       m_dgiter = new XtcDgIterator ( m_iter->path(), m_maxDgSize ) ;
       m_count = 0 ;
     }
