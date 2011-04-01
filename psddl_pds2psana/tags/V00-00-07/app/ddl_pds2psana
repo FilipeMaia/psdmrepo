@@ -1,0 +1,6 @@
+#!/bin/sh
+
+for f in  psddldata/data/[a-w]*.ddl.xml ; do 
+    psddlc -b pds2psana -I data -E psddl_pds2psana/include -O psddl_pds2psana/src -i psddl_pds2psana -t psddl_pds2psana \
+        -B psana-inc:psddl_psana -B pdsdata-inc:psddl_pdsdata -B psana-ns:Psana -B pdsdata-ns:PsddlPds $f
+done
