@@ -82,6 +82,8 @@ protected:
 private:
 
   // Data members, this is for example purposes only
+  
+  Source m_src;         // Data source set from config file
   unsigned m_maxEvents;
   bool m_filter;
 

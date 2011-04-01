@@ -23,20 +23,17 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+// to work with detector data include corresponding 
+// header from psddl_psana package
+#include "psddl_psana/acqiris.ddl.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+// This declares this class as psana module
 using namespace $package;
 PSANA_MODULE_FACTORY($class)
-
-namespace {
-  
-  // name of the logger to be used with MsgLogger
-  const char* logger = "$class"; 
-  
-}
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -49,10 +46,12 @@ namespace $package {
 //----------------
 $class::$class (const std::string& name)
   : Module(name)
+  , m_src()
   , m_maxEvents()
   , m_filter()
 {
   // get the values from configuration or use defaults
+  m_src = configStr("source", "DetInfo(:Acqiris)");
   m_maxEvents = config("events", 32U);
   m_filter = config("filter", false);
 }
@@ -87,12 +86,11 @@ $class::beginCalibCycle(Env& env)
 void 
 $class::event(Event& evt, Env& env)
 {
-  // get event ID
+  // example of getting non-detector data from event
   boost::shared_ptr<PSEvt::EventId> eventId = evt.get<PSEvt::EventId>();
-  if (not eventId.get()) {
-    MsgLog(logger, info, name() << ": event ID not found");    
-  } else {
-    MsgLog(logger, info, name() << ": event ID: " << *eventId);
+  if (eventId.get()) {
+    // example of producing messages using MgsLog facility
+    MsgLog(name(), info, "event ID: " << *eventId);
   }
   
   // tis is how to skip event (all downstream modules will not be called)
@@ -100,6 +98,15 @@ $class::event(Event& evt, Env& env)
   
   // this is how to gracefully stop analysis job
   if (m_count >= m_maxEvents) stop();
+
+  // example of getting detector data from event
+  shared_ptr<Psana::Acqiris::DataDescV1> acqData = evt.get(m_src);
+  if (acqData.get()) {
+    // another example of printing using MgsLog facility
+    WithMsgLog(name(), debug, log) {
+      log << "found Acqiris::DataDescV1 object";
+    }
+  }
 }
   
 /// Method which is called at the end of the calibration cycle
