@@ -33,13 +33,6 @@
 using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpAcqiris)
 
-namespace {
-  
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpAcqiris"; 
-  
-}
-
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -53,7 +46,7 @@ DumpAcqiris::DumpAcqiris (const std::string& name)
   : Module(name)
 {
   // get the values from configuration or use defaults
-  m_acqSrc = configStr("acqSource", "DetInfo(AmoGD)");
+  m_src = configStr("source", "DetInfo(:Acqiris)");
 }
 
 //--------------
@@ -67,13 +60,11 @@ DumpAcqiris::~DumpAcqiris ()
 void 
 DumpAcqiris::beginCalibCycle(Env& env)
 {
-  MsgLog(logger, info, name() << ": in beginCalibCycle()");
+  MsgLog(name(), trace, "in beginCalibCycle()");
 
-  shared_ptr<Psana::Acqiris::ConfigV1> acqConfig = env.configStore().get(m_acqSrc);
-  if (not acqConfig.get()) {
-    MsgLog(logger, info, name() << ": Acqiris::ConfigV1 not found");    
-  } else {
-    MsgLog(logger, info, name() << ": Acqiris::ConfigV1: nbrBanks=" << acqConfig->nbrBanks()
+  shared_ptr<Psana::Acqiris::ConfigV1> acqConfig = env.configStore().get(m_src);
+  if (acqConfig.get()) {
+    MsgLog(name(), info, "Acqiris::ConfigV1: nbrBanks=" << acqConfig->nbrBanks()
            << " channelMask=" << acqConfig->channelMask()
            << " nbrChannels=" << acqConfig->nbrChannels()
            << " h.sampInterval=" << acqConfig->horiz().sampInterval()
@@ -94,14 +85,12 @@ void
 DumpAcqiris::event(Event& evt, Env& env)
 {
 
-  shared_ptr<Psana::Acqiris::DataDescV1> acqData = evt.get(m_acqSrc);
-  if (not acqData.get()) {
-    MsgLog(logger, info, name() << ": Acqiris::DataDescV1 not found");    
-  } else {
+  shared_ptr<Psana::Acqiris::DataDescV1> acqData = evt.get(m_src);
+  if (acqData.get()) {
     const std::vector<int>& shape = acqData->data_shape();
     for (int i = 0; i < shape[0]; ++ i) {
       const Psana::Acqiris::DataDescV1Elem& elem = acqData->data(i);
-      MsgLog(logger, info, name() << ": Acqiris::DataDescV1: element=" << i 
+      MsgLog(name(), info, "Acqiris::DataDescV1: element=" << i 
            << " nbrSegments=" << elem.nbrSegments()
            << " nbrSamplesInSeg= " << elem.nbrSamplesInSeg());
     }

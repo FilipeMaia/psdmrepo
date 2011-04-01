@@ -33,13 +33,6 @@
 using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpBld)
 
-namespace {
-  
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpBld"; 
-  
-}
-
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -72,7 +65,7 @@ DumpBld::event(Event& evt, Env& env)
 {
   shared_ptr<Psana::Bld::BldDataEBeamV0> ebeam0 = evt.get(m_ebeamSrc);
   if (ebeam0.get()) {
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Bld::BldDataEBeamV0:"
           << "\n  damageMask=" << ebeam0->damageMask()
           << "\n  ebeamCharge=" << ebeam0->ebeamCharge()
@@ -86,7 +79,7 @@ DumpBld::event(Event& evt, Env& env)
 
   shared_ptr<Psana::Bld::BldDataEBeam> ebeam = evt.get(m_ebeamSrc);
   if (ebeam.get()) {
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Bld::BldDataEBeam:"
           << "\n  damageMask=" << ebeam->damageMask()
           << "\n  ebeamCharge=" << ebeam->ebeamCharge()
@@ -101,7 +94,7 @@ DumpBld::event(Event& evt, Env& env)
 
   shared_ptr<Psana::Bld::BldDataPhaseCavity> cav = evt.get(m_cavSrc);
   if (cav.get()) {
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Bld::BldDataPhaseCavity:" 
           << "\n  fitTime1=" << cav->fitTime1()
           << "\n  fitTime2=" << cav->fitTime2()
@@ -112,7 +105,7 @@ DumpBld::event(Event& evt, Env& env)
   
   shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy> fee = evt.get(m_feeSrc);
   if (fee.get()) {
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Bld::BldDataFEEGasDetEnergy:"
           << "\n  f_11_ENRC=" << fee->f_11_ENRC()
           << "\n  f_12_ENRC=" << fee->f_12_ENRC()
@@ -123,7 +116,7 @@ DumpBld::event(Event& evt, Env& env)
 
   shared_ptr<Psana::Bld::BldDataIpimb> ipimb = evt.get(m_ipimbSrc);
   if (ipimb.get()) {
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Bld::BldDataIpimb:";
       const Psana::Ipimb::DataV1& ipimbData = ipimb->ipimbData();
       str << "\n  Ipimb::DataV1:"

@@ -32,13 +32,6 @@
 using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpPrinceton)
 
-namespace {
-  
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpPrinceton"; 
-  
-}
-
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -51,7 +44,7 @@ namespace psana_examples {
 DumpPrinceton::DumpPrinceton (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("princSource", "DetInfo(:Princeton)");
+  m_src = configStr("source", "DetInfo(:Princeton)");
 }
 
 //--------------
@@ -65,12 +58,12 @@ DumpPrinceton::~DumpPrinceton ()
 void 
 DumpPrinceton::beginCalibCycle(Env& env)
 {
-  MsgLog(logger, info, name() << ": in beginCalibCycle()");
+  MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::Princeton::ConfigV1> config1 = env.configStore().get(m_src);
   if (config1.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Princeton::ConfigV1:";
       str << "\n  width = " << config1->width();
       str << "\n  height = " << config1->height();
@@ -97,7 +90,7 @@ DumpPrinceton::event(Event& evt, Env& env)
 {
   shared_ptr<Psana::Princeton::FrameV1> frame = evt.get(m_src);
   if (frame.get()) {
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Princeton::FrameV1:";
       str << "\n  readoutTime = " << frame->readoutTime();
 

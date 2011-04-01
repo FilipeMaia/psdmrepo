@@ -35,9 +35,6 @@ PSANA_MODULE_FACTORY(DumpControl)
 
 namespace {
   
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpControl"; 
-  
   void
   printClockTime(std::ostream& str, const Pds::ClockTime& time) 
   {
@@ -63,7 +60,7 @@ namespace psana_examples {
 DumpControl::DumpControl (const std::string& name)
   : Module(name)
 {
-  m_controlSrc = configStr("controlSource", "ProcInfo()");
+  m_src = configStr("source", "ProcInfo()");
 }
 
 //--------------
@@ -77,14 +74,14 @@ DumpControl::~DumpControl ()
 void 
 DumpControl::beginCalibCycle(Env& env)
 {
-  MsgLog(logger, info, name() << ": in beginCalibCycle()");
+  MsgLog(name(), trace, "in beginCalibCycle()");
 
-  shared_ptr<Psana::ControlData::ConfigV1> config = env.configStore().get(m_controlSrc);
+  shared_ptr<Psana::ControlData::ConfigV1> config = env.configStore().get(m_src);
   if (not config.get()) {
-    MsgLog(logger, info, name() << ": ControlData::ConfigV1 not found");    
+    MsgLog(name(), info, "ControlData::ConfigV1 not found");    
   } else {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       
       str << "ControlData::ConfigV1:\n  duration = ";
       printClockTime(str, config->duration());

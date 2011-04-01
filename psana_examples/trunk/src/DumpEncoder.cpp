@@ -32,13 +32,6 @@
 using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpEncoder)
 
-namespace {
-  
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpEncoder"; 
-  
-}
-
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -51,7 +44,7 @@ namespace psana_examples {
 DumpEncoder::DumpEncoder (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("encoderSource", "DetInfo(:Encoder)");
+  m_src = configStr("source", "DetInfo(:Encoder)");
 }
 
 //--------------
@@ -65,12 +58,12 @@ DumpEncoder::~DumpEncoder ()
 void 
 DumpEncoder::beginCalibCycle(Env& env)
 {
-  MsgLog(logger, info, name() << ": in beginCalibCycle()");
+  MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::Encoder::ConfigV1> config1 = env.configStore().get(m_src);
   if (config1.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Encoder::ConfigV1:";
       str << "\n  chan_num = " << config1->chan_num();
       str << "\n  count_mode = " << config1->count_mode();
@@ -91,7 +84,7 @@ DumpEncoder::event(Event& evt, Env& env)
   shared_ptr<Psana::Encoder::DataV1> data1 = evt.get(m_src);
   if (data1.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Encoder::DataV1:"
           << " timestamp = " << data1->timestamp()
           << " encoder_count = " << data1->encoder_count();
@@ -101,7 +94,7 @@ DumpEncoder::event(Event& evt, Env& env)
   shared_ptr<Psana::Encoder::DataV2> data2 = evt.get(m_src);
   if (data2.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Encoder::DataV2:"
           << " timestamp = " << data2->timestamp()
           << " encoder_count =";

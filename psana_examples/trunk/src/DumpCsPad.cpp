@@ -35,13 +35,6 @@
 using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpCsPad)
 
-namespace {
-  
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpCsPad"; 
-  
-}
-
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -54,7 +47,7 @@ namespace psana_examples {
 DumpCsPad::DumpCsPad (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("cspadSource", "DetInfo(:Cspad)");
+  m_src = configStr("source", "DetInfo(:Cspad)");
 }
 
 //--------------
@@ -68,12 +61,12 @@ DumpCsPad::~DumpCsPad ()
 void 
 DumpCsPad::beginCalibCycle(Env& env)
 {
-  MsgLog(logger, info, name() << ": in beginCalibCycle()");
+  MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::CsPad::ConfigV1> config1 = env.configStore().get(m_src);
   if (config1.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "CsPad::ConfigV1:";
       str << "\n  concentratorVersion = " << config1->concentratorVersion();
       str << "\n  runDelay = " << config1->runDelay();
@@ -96,7 +89,7 @@ DumpCsPad::beginCalibCycle(Env& env)
   shared_ptr<Psana::CsPad::ConfigV2> config2 = env.configStore().get(m_src);
   if (config2.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "CsPad::ConfigV2:";
       str << "\n  concentratorVersion = " << config2->concentratorVersion();
       str << "\n  runDelay = " << config2->runDelay();
@@ -135,7 +128,7 @@ DumpCsPad::event(Event& evt, Env& env)
   shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_src);
   if (data1.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "CsPad::DataV1:";
       int nQuads = data1->quads_shape()[0];
       for (int q = 0; q < nQuads; ++ q) {
@@ -165,7 +158,7 @@ DumpCsPad::event(Event& evt, Env& env)
   shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src);
   if (data2.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "CsPad::DataV2:";
       int nQuads = data2->quads_shape()[0];
       for (int q = 0; q < nQuads; ++ q) {

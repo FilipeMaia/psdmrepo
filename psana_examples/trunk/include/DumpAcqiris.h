@@ -64,7 +64,7 @@ protected:
 private:
 
   // Data members, this is for example purposes only
-  Source m_acqSrc;
+  Source m_src;
 
 };
 

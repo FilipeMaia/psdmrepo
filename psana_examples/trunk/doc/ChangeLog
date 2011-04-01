@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2011-04-01 Andy Salnikov
+- make things more uniform
+- use module name for logger name, remove explicit logger name
+- added data/DumpAll.cfg config file which uses all modules from this
+  package
+
 Tag: V00-00-08
 2011-04-01 Andy Salnikov
 - added DumpEncoder, DumpEvr, DumpFccd, DumpIpimb, DumpLusi, DumpOpal1k,

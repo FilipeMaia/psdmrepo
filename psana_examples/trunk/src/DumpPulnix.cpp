@@ -32,13 +32,6 @@
 using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpPulnix)
 
-namespace {
-  
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpPulnix"; 
-  
-}
-
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -65,12 +58,12 @@ DumpPulnix::~DumpPulnix ()
 void 
 DumpPulnix::beginCalibCycle(Env& env)
 {
-  MsgLog(logger, info, name() << ": in beginCalibCycle()");
+  MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::Pulnix::TM6740ConfigV1> config1 = env.configStore().get(m_src);
   if (config1.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Pulnix::TM6740ConfigV1:";
       str << "\n  gain_a = " << config1->gain_a();
       str << "\n  gain_b = " << config1->gain_b();
@@ -89,7 +82,7 @@ DumpPulnix::beginCalibCycle(Env& env)
   shared_ptr<Psana::Pulnix::TM6740ConfigV2> config2 = env.configStore().get(m_src);
   if (config2.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Pulnix::TM6740ConfigV2:";
       str << "\n  gain_a = " << config2->gain_a();
       str << "\n  gain_b = " << config2->gain_b();

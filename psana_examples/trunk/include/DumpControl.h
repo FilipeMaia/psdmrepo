@@ -66,7 +66,7 @@ protected:
 
 private:
 
-  Source m_controlSrc;
+  Source m_src;
 };
 
 } // namespace psana_examples

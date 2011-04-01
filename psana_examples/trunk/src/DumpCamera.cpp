@@ -34,9 +34,6 @@ PSANA_MODULE_FACTORY(DumpCamera)
 
 namespace {
   
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpCamera"; 
-  
   void
   printFrameCoord(std::ostream& str, const Psana::Camera::FrameCoord& coord) 
   {
@@ -57,7 +54,7 @@ namespace psana_examples {
 DumpCamera::DumpCamera (const std::string& name)
   : Module(name)
 {
-  m_camSrc = configStr("cameraSource", "DetInfo(:Opal1000)");
+  m_src = configStr("source", "DetInfo(:Opal1000)");
 }
 
 //--------------
@@ -71,14 +68,14 @@ DumpCamera::~DumpCamera ()
 void 
 DumpCamera::beginCalibCycle(Env& env)
 {
-  MsgLog(logger, info, name() << ": in beginCalibCycle()");
+  MsgLog(name(), trace, ": in beginCalibCycle()");
 
-  shared_ptr<Psana::Camera::FrameFexConfigV1> frmConfig = env.configStore().get(m_camSrc);
+  shared_ptr<Psana::Camera::FrameFexConfigV1> frmConfig = env.configStore().get(m_src);
   if (not frmConfig.get()) {
-    MsgLog(logger, info, name() << ": Camera::FrameFexConfigV1 not found");    
+    MsgLog(name(), info, "Camera::FrameFexConfigV1 not found");    
   } else {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Camera::FrameFexConfigV1:";
       str << "\n  forwarding = " << frmConfig->forwarding();
       str << "\n  forward_prescale = " << frmConfig->forward_prescale();
@@ -104,9 +101,9 @@ void
 DumpCamera::event(Event& evt, Env& env)
 {
 
-  shared_ptr<Psana::Camera::FrameV1> frmData = evt.get(m_camSrc);
+  shared_ptr<Psana::Camera::FrameV1> frmData = evt.get(m_src);
   if (frmData.get()) {
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Camera::FrameV1: width=" << frmData->width()
           << " height=" << frmData->height()
           << " depth=" << frmData->depth()
@@ -117,9 +114,9 @@ DumpCamera::event(Event& evt, Env& env)
     }
   }
 
-  shared_ptr<Psana::Camera::TwoDGaussianV1> gaussData = evt.get(m_camSrc);
+  shared_ptr<Psana::Camera::TwoDGaussianV1> gaussData = evt.get(m_src);
   if (gaussData.get()) {
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Camera::TwoDGaussianV1: integral=" << gaussData->integral()
           << " xmean=" << gaussData->xmean()
           << " ymean=" << gaussData->ymean()

@@ -32,13 +32,6 @@
 using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpPnccd)
 
-namespace {
-  
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpPnccd"; 
-  
-}
-
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -51,7 +44,7 @@ namespace psana_examples {
 DumpPnccd::DumpPnccd (const std::string& name)
   : Module(name)
 {
-    m_src = configStr("pnccdSource", "DetInfo(:pnCCD)");
+    m_src = configStr("source", "DetInfo(:pnCCD)");
 }
 
 //--------------
@@ -65,12 +58,12 @@ DumpPnccd::~DumpPnccd ()
 void 
 DumpPnccd::beginCalibCycle(Env& env)
 {
-  MsgLog(logger, info, name() << ": in beginCalibCycle()");
+  MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::PNCCD::ConfigV1> config1 = env.configStore().get(m_src);
   if (config1.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "PNCCD::ConfigV1:";
       str << "\n  numLinks = " << config1->numLinks();
       str << "\n  payloadSizePerLink = " << config1->payloadSizePerLink();
@@ -81,7 +74,7 @@ DumpPnccd::beginCalibCycle(Env& env)
   shared_ptr<Psana::PNCCD::ConfigV2> config2 = env.configStore().get(m_src);
   if (config2.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "PNCCD::ConfigV2:";
       str << "\n  numLinks = " << config2->numLinks();
       str << "\n  payloadSizePerLink = " << config2->payloadSizePerLink();
@@ -106,7 +99,7 @@ DumpPnccd::event(Event& evt, Env& env)
 {
   shared_ptr<Psana::PNCCD::FrameV1> frame = evt.get(m_src);
   if (frame.get()) {
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "PNCCD::FrameV1:";
       str << "\n  specialWord = " << frame->specialWord();
       str << "\n  frameNumber = " << frame->frameNumber();

@@ -32,13 +32,6 @@
 using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpEvr)
 
-namespace {
-  
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpEvr"; 
-  
-}
-
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -51,7 +44,7 @@ namespace psana_examples {
 DumpEvr::DumpEvr (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("encoderSource", "DetInfo(:Evr)");
+  m_src = configStr("source", "DetInfo(:Evr)");
 }
 
 //--------------
@@ -65,13 +58,13 @@ DumpEvr::~DumpEvr ()
 void 
 DumpEvr::beginCalibCycle(Env& env)
 {
-  MsgLog(logger, info, name() << ": in beginCalibCycle()");
+  MsgLog(name(), trace, "in beginCalibCycle()");
 
   // Try to get V1 config object
   shared_ptr<Psana::EvrData::ConfigV1> config1 = env.configStore().get(m_src);
   if (config1.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "EvrData::ConfigV1: npulses = " << config1->npulses()
           << " noutputs = " << config1->noutputs();
       for (unsigned i = 0; i < config1->npulses(); ++ i) {
@@ -99,7 +92,7 @@ DumpEvr::beginCalibCycle(Env& env)
   shared_ptr<Psana::EvrData::ConfigV2> config2 = env.configStore().get(m_src);
   if (config2.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "EvrData::ConfigV2: npulses = " << config2->npulses()
           << " noutputs = " << config2->noutputs()
           << " beam = " << config2->beam()
@@ -129,7 +122,7 @@ DumpEvr::beginCalibCycle(Env& env)
   shared_ptr<Psana::EvrData::ConfigV3> config3 = env.configStore().get(m_src);
   if (config3.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "EvrData::ConfigV3: npulses = " << config3->npulses()
           << " noutputs = " << config3->noutputs()
           << " neventcodes = " << config3->neventcodes();
@@ -168,7 +161,7 @@ DumpEvr::beginCalibCycle(Env& env)
   shared_ptr<Psana::EvrData::ConfigV4> config4 = env.configStore().get(m_src);
   if (config4.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "EvrData::ConfigV4: npulses = " << config4->npulses()
           << " noutputs = " << config4->noutputs()
           << " neventcodes = " << config4->neventcodes();
@@ -209,7 +202,7 @@ DumpEvr::beginCalibCycle(Env& env)
   shared_ptr<Psana::EvrData::ConfigV5> config5 = env.configStore().get(m_src);
   if (config5.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "EvrData::ConfigV5: npulses = " << config5->npulses()
           << " noutputs = " << config5->noutputs()
           << " neventcodes = " << config5->neventcodes();
@@ -259,7 +252,7 @@ DumpEvr::beginCalibCycle(Env& env)
   shared_ptr<Psana::EvrData::IOConfigV1> iocfg1 = env.configStore().get(m_src);
   if (iocfg1.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "EvrData::IOConfigV1: nchannels = " << iocfg1->nchannels()
           << " conn = " << iocfg1->conn();
       for (unsigned i = 0; i < iocfg1->nchannels(); ++ i) {
@@ -286,7 +279,7 @@ DumpEvr::event(Event& evt, Env& env)
   shared_ptr<Psana::EvrData::DataV3> data3 = evt.get(m_src);
   if (data3.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Encoder::DataV3: numFifoEvents=" << data3->numFifoEvents();
       for (unsigned i = 0; i < data3->numFifoEvents(); ++ i) {
         const Psana::EvrData::FIFOEvent& f = data3->fifoEvents(i);

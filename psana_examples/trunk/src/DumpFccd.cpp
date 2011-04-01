@@ -32,13 +32,6 @@
 using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpFccd)
 
-namespace {
-  
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpFccd"; 
-  
-}
-
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -51,7 +44,7 @@ namespace psana_examples {
 DumpFccd::DumpFccd (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("fccdSource", "DetInfo(:Fccd)");
+  m_src = configStr("source", "DetInfo(:Fccd)");
 }
 
 //--------------
@@ -65,12 +58,12 @@ DumpFccd::~DumpFccd ()
 void 
 DumpFccd::beginCalibCycle(Env& env)
 {
-  MsgLog(logger, info, name() << ": in beginCalibCycle()");
+  MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::FCCD::FccdConfigV1> config1 = env.configStore().get(m_src);
   if (config1.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "FCCD::FccdConfigV1:";
       str << "\n  outputMode = " << config1->outputMode();
       str << "\n  width = " << config1->width();
@@ -84,7 +77,7 @@ DumpFccd::beginCalibCycle(Env& env)
   shared_ptr<Psana::FCCD::FccdConfigV2> config2 = env.configStore().get(m_src);
   if (config2.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "FCCD::FccdConfigV2:";
       str << "\n  outputMode = " << config2->outputMode();
       str << "\n  ccdEnable = " << int(config2->ccdEnable());

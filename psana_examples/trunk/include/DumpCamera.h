@@ -67,7 +67,7 @@ protected:
 private:
 
   // Data members, this is for example purposes only
-  Source m_camSrc;
+  Source m_src;
 
 };
 

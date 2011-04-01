@@ -34,9 +34,6 @@ PSANA_MODULE_FACTORY(DumpOpal1k)
 
 namespace {
   
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpOpal1k"; 
-  
   void
   printFrameCoord(std::ostream& str, const Psana::Camera::FrameCoord& coord) 
   {
@@ -56,7 +53,7 @@ namespace psana_examples {
 DumpOpal1k::DumpOpal1k (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("opalSource", "DetInfo(:Opal1000)");
+  m_src = configStr("source", "DetInfo(:Opal1000)");
 }
 
 //--------------
@@ -70,12 +67,12 @@ DumpOpal1k::~DumpOpal1k ()
 void 
 DumpOpal1k::beginCalibCycle(Env& env)
 {
-  MsgLog(logger, info, name() << ": in beginCalibCycle()");
+  MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::Opal1k::ConfigV1> config = env.configStore().get(m_src);
   if (config.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Psana::Opal1k::ConfigV1:";
       str << "\n  black_level = " << config->black_level();
       str << "\n  gain_percent = " << config->gain_percent();

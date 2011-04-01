@@ -32,13 +32,6 @@
 using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpAcqTdc)
 
-namespace {
-  
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpAcqTdc"; 
-  
-}
-
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -52,7 +45,7 @@ DumpAcqTdc::DumpAcqTdc (const std::string& name)
   : Module(name)
 {
   // get the values from configuration or use defaults
-  m_acqSrc = configStr("acqSource", "DetInfo(:AcqTDC.0)");
+  m_src = configStr("source", "DetInfo(:AcqTDC.0)");
 }
 
 //--------------
@@ -66,15 +59,14 @@ DumpAcqTdc::~DumpAcqTdc ()
 void 
 DumpAcqTdc::beginCalibCycle(Env& env)
 {
-  MsgLog(logger, info, name() << ": in beginCalibCycle()");
+  MsgLog(name(), trace, "in beginCalibCycle()");
 
-  shared_ptr<Psana::Acqiris::TdcConfigV1> tdcConfig = env.configStore().get(m_acqSrc);
-  if (not tdcConfig.get()) {
-    MsgLog(logger, info, name() << ": Acqiris::TdcConfigV1 not found");    
-  } else {
-    WithMsgLog(logger, info, str) {
+  shared_ptr<Psana::Acqiris::TdcConfigV1> tdcConfig = env.configStore().get(m_src);
+  if (tdcConfig.get()) {
+
+    WithMsgLog(name(), info, str) {
       
-      str << name() << ": Acqiris::TdcConfigV1:";
+      str << "Acqiris::TdcConfigV1:";
       
       for (int ch = 0; ch < Psana::Acqiris::TdcConfigV1::NChannels; ++ ch) {
         const Psana::Acqiris::TdcChannel& chan = tdcConfig->channels(ch);
@@ -101,12 +93,8 @@ DumpAcqTdc::beginCalibCycle(Env& env)
 void 
 DumpAcqTdc::event(Event& evt, Env& env)
 {
-  shared_ptr<Psana::Acqiris::TdcDataV1> tdcData = evt.get(m_acqSrc);
-  if (not tdcData.get()) {
-    
-    MsgLog(logger, info, name() << ": Acqiris::TdcDataV1 not found");
-    
-  } else {
+  shared_ptr<Psana::Acqiris::TdcDataV1> tdcData = evt.get(m_src);
+  if (tdcData.get()) {
   
     const std::vector<int>& shape = tdcData->data_shape();
     for (int i = 0; i < shape[0]; ++ i) {
@@ -117,7 +105,7 @@ DumpAcqTdc::event(Event& evt, Env& env)
         
         const Psana::Acqiris::TdcDataV1Common& comm = 
             static_cast<const Psana::Acqiris::TdcDataV1Common&>(item);
-        MsgLog(logger, info, name() << ": Acqiris::TdcDataV1: item=" << i 
+        MsgLog(name(), info, "Acqiris::TdcDataV1: item=" << i 
              << " type=TdcDataV1Common" 
              << " source=" << comm.source()
              << " nhits= " << comm.nhits()
@@ -127,7 +115,7 @@ DumpAcqTdc::event(Event& evt, Env& env)
       
         const Psana::Acqiris::TdcDataV1Marker& mark = 
             static_cast<const Psana::Acqiris::TdcDataV1Marker&>(item);
-        MsgLog(logger, info, name() << ": Acqiris::TdcDataV1: item=" << i 
+        MsgLog(name(), info, "Acqiris::TdcDataV1: item=" << i 
              << " type=TdcDataV1Marker" 
              << " source=" << mark.source()
              << " type= " << mark.type() );
@@ -136,7 +124,7 @@ DumpAcqTdc::event(Event& evt, Env& env)
         
         const Psana::Acqiris::TdcDataV1Channel& chan = 
             static_cast<const Psana::Acqiris::TdcDataV1Channel&>(item);
-        MsgLog(logger, info, name() << ": Acqiris::TdcDataV1: item=" << i 
+        MsgLog(name(), info, "Acqiris::TdcDataV1: item=" << i 
              << " type=TdcDataV1Channel" 
              << " source=" << chan.source()
              << " ticks= " << chan.ticks()

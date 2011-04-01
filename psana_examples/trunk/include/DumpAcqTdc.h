@@ -66,7 +66,7 @@ protected:
 
 private:
 
-  Source m_acqSrc;
+  Source m_src;
 
 };
 

@@ -32,13 +32,6 @@
 using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpLusi)
 
-namespace {
-  
-  // name of the logger to be used with MsgLogger
-  const char* logger = "DumpLusi"; 
-  
-}
-
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -66,12 +59,12 @@ DumpLusi::~DumpLusi ()
 void 
 DumpLusi::beginCalibCycle(Env& env)
 {
-  MsgLog(logger, info, name() << ": in beginCalibCycle()");
+  MsgLog(name(), info, "in beginCalibCycle()");
 
   shared_ptr<Psana::Lusi::DiodeFexConfigV1> dconfig = env.configStore().get(m_ipimbSrc);
   if (dconfig.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Lusi::DiodeFexConfigV1:";
       const float* base = dconfig->base();
       const float* scale = dconfig->scale();
@@ -90,7 +83,7 @@ DumpLusi::beginCalibCycle(Env& env)
   shared_ptr<Psana::Lusi::IpmFexConfigV1> iconfig = env.configStore().get(m_ipimbSrc);
   if (iconfig.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Psana::Lusi::IpmFexConfigV1:";
       str << "\n  xscale = " << iconfig->xscale();
       str << "\n  yscale = " << iconfig->yscale();
@@ -116,7 +109,7 @@ DumpLusi::beginCalibCycle(Env& env)
   shared_ptr<Psana::Lusi::PimImageConfigV1> pconfig = env.configStore().get(m_tmSrc);
   if (pconfig.get()) {
     
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Psana::Lusi::PimImageConfigV1:";
       str << "\n  xscale = " << iconfig->xscale();
       str << "\n  yscale = " << iconfig->yscale();
@@ -133,14 +126,14 @@ DumpLusi::event(Event& evt, Env& env)
 {
   shared_ptr<Psana::Lusi::DiodeFexV1> diode = evt.get(m_ipimbSrc);
   if (diode.get()) {
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Lusi::DiodeFexV1: value = " << diode->value();
     }
   }
 
   shared_ptr<Psana::Lusi::IpmFexV1> fex = evt.get(m_ipimbSrc);
   if (fex.get()) {
-    WithMsgLog(logger, info, str) {
+    WithMsgLog(name(), info, str) {
       str << "Psana::Lusi::IpmFexV1:";
       str << "\n  sum = " << fex->sum();
       str << "\n  xpos = " << fex->xpos();
