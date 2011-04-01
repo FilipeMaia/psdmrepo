@@ -357,6 +357,7 @@ class XtcBrowserMain (QtGui.QMainWindow) :
             self.filesize += os.path.getsize(filename)
             
         filesizetxt = ""
+        scantext = "Scan all events"
         if nfiles > 0 :
             filesize = self.filesize/1024
             if filesize < 1024 :
@@ -376,16 +377,18 @@ class XtcBrowserMain (QtGui.QMainWindow) :
             if self.scan_button and self.scan_label :
                 if self.filesize < 2*1024**3 :
                     self.scan_enable()
-                    self.scan_label.setText("Scan all events (%s)"%filesizetxt)
+                    scantext = "Scan all events (%s)"%filesizetxt
                 else :
-                    self.scan_label.setText("Scan all events (%s!)"%filesizetxt)
+                    scantext = "Scan all events (%s!)"%filesizetxt
 
         status+="\t %s \n" % filesizetxt
         for filename in self.filenames :
             addline = filename+"\n"
             status+=addline
+
         self.currentfiles.setText(status)
-                
+        self.scan_label.setText(scantext)
+        self.fileinfo.setText("")
 
 
     def change_nev_qscan(self):

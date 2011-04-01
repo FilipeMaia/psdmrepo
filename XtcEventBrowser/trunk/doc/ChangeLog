@@ -11,6 +11,15 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Apr-1 ofte               rev 1763
+	- Remember pyana command line from one run to the next
+	- scan wrt control variables by pyana_scan.py. If ControlPV is selected, 
+	  a scan will be configured (i.e. no other pyana modules). Else, as before. 
+	- pyana_scan still needs some work to be fully functional
+	
+2011-Mar-31 ofte               rev 1723
+	- Fix to XtcScanner to deal with (skip) empty epics records
+
 2011-Mar-29 ofte               rev 1711
 	- added file size checking, cleaned up the GUIs
 	- XtcScanner: improved print layout, more config information

@@ -30,6 +30,7 @@ __version__ = "$Revision: 1095 $"
 #--------------------------------
 import sys
 import logging
+import time
 
 #-----------------------------
 # Imports for other modules --
@@ -141,6 +142,7 @@ class pyana_waveform (object) :
         @param env    environment object
         """
         logging.info( "pyana_waveform.event() called ")
+        
         self.n_evts+=1
 
         for source in self.sources:
@@ -167,9 +169,11 @@ class pyana_waveform (object) :
                     ts_array = ts
                     
                     # constant threshold
+                    #baseline = -0.0002
+                    #threshold = +0.0001
                     baseline = -0.03
                     threshold = -0.06
-                    edge = np.zeros(100,dtype=float)
+                    edge = np.zeros(nsamples,dtype=float)
                     self.fill_const_frac_hist(ts, wf, nsamples,
                                               baseline, threshold, edge )
                     if self.edges[source] is None :
@@ -192,6 +196,7 @@ class pyana_waveform (object) :
                 #    self.data[source]+=wf
                 
 
+        
     def endcalibcycle( self, env ) :
         """This optional method is called if present at the end of the 
         calibration cycle.
@@ -223,7 +228,9 @@ class pyana_waveform (object) :
 
             data = np.array(self.data[source])
             print "shape of data array: ", np.shape(data)
-
+            print "shape of edge array: ", np.shape(self.edges[source])
+            print self.edges[source]
+            
             self.make_plots(data, self.edges[source], suptitle=source)
 
 
@@ -244,12 +251,10 @@ class pyana_waveform (object) :
             
         ax2 = fig.add_subplot(212)
         xt = edges
-        print xt
-        dim = np.shape(xt)
-        for i in range (0, dim[0]):
-            plt.plot(xt[i])
-        plt.xlabel('Seconds')
-        plt.ylabel('Volts')
+
+        plt.plot(xt)
+        plt.xlabel('Bin')
+        plt.ylabel('Edge')
         
         print "drawing..."
         plt.draw()
@@ -258,6 +263,9 @@ class pyana_waveform (object) :
     def fill_const_frac(self, t, v, num_samples, baseline, threshold, edge, n, maxhits):
         """Find the boundaries where the pulse crosses the threshold
            copied from myana's main.cc
+
+           This obviously needs to be optimized (rewritten) for python!
+           (plus it doesn't seem to be doing the right thing either...)
         """
         n = 0
         peak = 0.0
@@ -293,8 +301,11 @@ class pyana_waveform (object) :
             elif (( rising and y>peak ) or
                   (not rising and y<peak )) :
                 peak = y
-    
 
-    def fill_const_frac_hist(self, t, v, num_samples, baseline, threshold, edge_array ): 
+
+    def fill_const_frac_hist(self, t, v, num_samples, baseline, threshold, histogram ): 
         n = 0
+        edge_array = np.zeros(100,dtype=float)
         self.fill_const_frac(t, v, num_samples, baseline, threshold, edge_array, n, 100 )
+        for i in range (0,n) :
+            histogram[edge_array[i]]+=1

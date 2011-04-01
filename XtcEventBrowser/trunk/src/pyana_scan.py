@@ -58,7 +58,8 @@ class pyana_scan (object) :
     #  Constructor --
     #----------------
     def __init__ ( self,
-                   input_epics = "BEAM:LCLS:ELEC:Q",
+                   controlpv = None,
+                   input_epics = None,
                    input_scalars = None,
                    plot_every_n = None,
                    fignum = "1" ) :
@@ -67,19 +68,20 @@ class pyana_scan (object) :
         values  here then the must be defined in pyana.cfg. All parameters 
         are passed as strings, convert to correct type before use.
 
+        @param controlpv        Name(s) of control PVs to use
+                                if none given, use whatever we find in the event. 
         @param input_epics      Name(s) of other scalars to correlate in scan
         @param input_scalars    Name(s) of other scalars to correlate in scan
         @param plot_every_n     Frequency for plotting. If n=0, no plots till the end
         @param fignum           Matplotlib figure number
         """
         opt = PyanaOptions()
+        self.controlpv = opt.getOptStrings(controlpv)
         self.input_epics = opt.getOptStrings(input_epics)
         self.input_scalars = opt.getOptStrings(input_scalars)
         self.plot_every_n = opt.getOptInteger(plot_every_n)
         self.mpl_num = opt.getOptInteger(fignum)
         
-        # count number of begin/end job (configure transitions)
-        self.n_jobs = 0 
 
     #-------------------
     #  Public methods --
@@ -95,7 +97,6 @@ class pyana_scan (object) :
         """
 
         # data counters
-        self.n_jobs += 1 # number of jobs / configurations
         self.n_runs =  0 # number of runs in this job             
             
     def beginrun( self, evt, env ) :
@@ -159,18 +160,22 @@ class pyana_scan (object) :
         # Use environment object to access EPICS data
         for epv_name in self.input_epics :
 
+            # at first event, make a list for each scalar, to store event data
             if epv_name not in self.evts_scalars.keys() :
+                print epv_name
                 self.evts_scalars[epv_name] = []
 
             # store the value
-            epv = env.epicsStore().value(epv_name).value
+            epv = env.epicsStore().value(epv_name)
             if not epv:
-                logging.warning('EPICS PV %s does not exist', pv_name)
-
-            self.evts_scalars[epv_name].append(epv)
+                logging.warning('EPICS PV %s does not exist', epv_name)
+            else :
+                self.evts_scalars[epv_name].append(epv.value)
 
         # Other scalars in the event
         for scalar in self.input_scalars :
+
+            # at first event, make a list for each scalar, to store event data
             if scalar not in self.evts_scalars.keys() :
                 self.evts_scalars[scalar] = []
 
@@ -236,7 +241,7 @@ class pyana_scan (object) :
         @param env    environment object
         """
         logging.info( "pyana_scan.endjob() called" )
-        print "End job %d had %d runs " % (self.n_jobs, self.n_runs)
+        print "End job had %d runs " % (self.n_runs)
 
 
     def make_histogram(self, array):

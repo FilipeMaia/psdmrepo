@@ -60,7 +60,7 @@ from PyQt4 import QtCore, QtGui
 class myPopen(subprocess.Popen):
     def kill(self, signal = signal.SIGTERM):
         os.kill(self.pid, signal)
-        
+
 
 class XtcPyanaControl ( QtGui.QWidget ) :
     """Gui interface to pyana configuration & control
@@ -88,13 +88,20 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.setWindowTitle('Pyana Control Center')
         self.setWindowIcon(QtGui.QIcon('XtcEventBrowser/src/lclsLogo.gif'))
 
-        # these must be initialized before use 
+        # --------------- INPUT --------------
+        # these must be initialized before use (by calling module)
         self.filenames = []
         self.devices = []
         self.epicsPVs = []
         self.controls = []
         self.moreinfo = []
 
+        # pyana options
+        self.poptions = None
+        # -------------------------------------
+        
+
+        # ------- SELECTION / CONFIGURATION ------
         self.checklabels = []
         self.checkboxes = []
 
@@ -103,7 +110,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
         self.pvWindow = None
         self.scrollArea = None
-        
+
         self.pvlabels = []
         self.pvboxes = []
         self.pvGroupLayout = None
@@ -115,175 +122,218 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.pyana_button = None
         self.quit_pyana_button = None
 
-        self.show()
+        self.scan_widget = None
+        self.pyana_widget = None
+        self.info_widget = None
+
 
         # assume all events        
         self.nevents = None 
+
+        self.define_layout()
+
+        self.show()
         
-        # Layout of window
-        self.v0 = QtGui.QVBoxLayout(self)
 
-        # header
+
+    def define_layout(self):
+        """ Main layout of Pyana Control Center
+        """
+        self.layout = QtGui.QVBoxLayout(self)
+
+        # header: icon
         h0 = QtGui.QHBoxLayout()
-
-        # Icon
         pic = QtGui.QLabel(self)
         pic.setPixmap( QtGui.QPixmap('XtcEventBrowser/src/lclsLogo.gif'))
-
         h0.addWidget( pic )
         h0.setAlignment( pic, QtCore.Qt.AlignLeft )
 
-        # Layout of devices and configuration
+        # mid layer: almost everything
         h1 = QtGui.QHBoxLayout()
-
-        # Layout of device selection
-        self.dgroup = QtGui.QGroupBox("Available Detectors/Devices:")
+        # to the left: 
+        detector_gbox = QtGui.QGroupBox("In the file(s):")
+        # layout of the group must be global, checkboxes added later
         self.lgroup = QtGui.QVBoxLayout()
-        self.dgroup.setLayout(self.lgroup)
+        detector_gbox.setLayout(self.lgroup)
+        h1.addWidget(detector_gbox)
 
-        self.box_pconf = QtGui.QGroupBox("Current pyana configuration:")
-        self.ly_pconf = QtGui.QVBoxLayout()
-        self.ly_pconf.addWidget(self.pyana_config )
-        self.box_pconf.setLayout(self.ly_pconf)
-        
-        self.hconf = QtGui.QHBoxLayout()
-        self.config_button = QtGui.QPushButton("&Write configuration to file")
-        self.connect(self.config_button, QtCore.SIGNAL('clicked()'), self.write_configfile )
-        self.hconf.addWidget( self.config_button )
-        self.econfig_button = QtGui.QPushButton("&Edit configuration file")
-        self.connect(self.econfig_button, QtCore.SIGNAL('clicked()'), self.edit_configfile )
-        self.hconf.addWidget( self.econfig_button )
-        self.config_button.hide()
-        self.econfig_button.hide()
-
-        self.v1 = QtGui.QVBoxLayout()
-        self.v1.addWidget( self.box_pconf )
-        self.v1.setAlignment( self.pyana_config, QtCore.Qt.AlignTop )
-        self.v1.addLayout( self.hconf )
-
-        h1.addWidget(self.dgroup)
-        h1.addLayout(self.v1)
+        # to the right:
+        self.config_tabs = QtGui.QTabWidget()
+        self.config_tabs.setMinimumWidth(500)
+        self.intro_tab()
+        h1.addWidget(self.config_tabs)
 
         # header
-        self.v0.addLayout(h0)
-        self.v0.addLayout(h1)
+        self.layout.addLayout(h0)
+        self.layout.addLayout(h1)
 
+                
+    def intro_tab(self):
+        # First tab: help/info
+        self.help_widget = QtGui.QWidget()
+        self.help_layout = QtGui.QHBoxLayout(self.help_widget)
+        self.help_subwg1 = QtGui.QLabel(self.help_widget)
+        self.help_subwg1_text = """
+    Configure your Event Display / Analysis:
 
+    Select the information / detectors of interest to you from list
+    to the left. Pyana modules will be configured for you to analyze
+    the information.
+
+    You can edit the configuration or pyana modules afterwards, 
+    if you want to further customize your analysis.
+    """
+        self.help_subwg1.setText(self.help_subwg1_text)
+        self.help_layout.addWidget(self.help_subwg1)
+        self.config_tabs.addTab(self.help_widget,"Help")
+        self.config_tabs.tabBar().hide()
+
+    def scan_tab(self, who):
+        """ Second tab: Scan
+        """
+        if self.scan_widget is None :
+            self.scan_widget = QtGui.QWidget()
+            self.scan_layout = QtGui.QVBoxLayout(self.scan_widget)
+
+            message = QtGui.QLabel()
+            message.setText("Scan vs. %s"%"Hallo")
+
+            self.scan_layout.addWidget(message)
+
+            self.config_tabs.addTab(self.scan_widget,"Scan Configuration")
+
+        self.config_tabs.setCurrentWidget(self.scan_widget)
+        self.config_tabs.tabBar().show()
+        self.write_configuration()
+
+        
+    def pyana_tab(self):
+        """Pyana configuration text
+        """
+        if self.pyana_widget is None :
+            pyana_widget = QtGui.QWidget()
+            pyana_layout = QtGui.QVBoxLayout(pyana_widget)
+
+            pyana_txtbox = QtGui.QGroupBox("Current pyana configuration:")
+            pyana_txtbox_layout = QtGui.QVBoxLayout()
+            pyana_txtbox_layout.addWidget(self.pyana_config)
+            pyana_txtbox.setLayout(pyana_txtbox_layout)
+            pyana_layout.addWidget(pyana_txtbox)
+            self.pyana_txtbox = pyana_txtbox
+        
+            pyana_button_layout = QtGui.QHBoxLayout()
+            self.config_button = QtGui.QPushButton("&Write configuration to file")
+            self.connect(self.config_button, QtCore.SIGNAL('clicked()'), self.write_configfile )
+            pyana_button_layout.addWidget( self.config_button )
+            self.econfig_button = QtGui.QPushButton("&Edit configuration file")
+            self.connect(self.econfig_button, QtCore.SIGNAL('clicked()'), self.edit_configfile )
+            pyana_button_layout.addWidget( self.econfig_button )
+            self.config_button.hide()
+            self.econfig_button.hide()
+            pyana_layout.addLayout(pyana_button_layout)
+            
+            self.config_tabs.addTab(pyana_widget,"Pyana")
+            self.config_tabs.setCurrentWidget(pyana_widget)
+            self.config_tabs.tabBar().show()
+            self.pyana_widget = pyana_widget
 
 
     #-------------------
     #  Public methods --
     #-------------------
-
-    def run_pyana(self):
-        """Run pyana
-
-        Open a dialog to allow chaging options to pyana. Wait for OK, then
-        run pyana with the needed modules and configurations as requested
-        based on the the checkboxes
-        """
-
-        # Make a command sequence 
-        poptions = []
-        poptions.append("pyana")
-        if self.nevents is not None:
-            poptions.append("-n")
-            poptions.append(str(self.nevents))
-        poptions.append("-c")
-        poptions.append("%s" % self.configfile)
-        for file in self.filenames :
-            poptions.append(file)
-
-        # turn sequence into a string, allow user to modify it
-        runstring = ' '.join(poptions)
-        dialog =  QtGui.QInputDialog()
-        dialog.resize(400,400)
-        #dialog.setMinimumWidth(1500)
-        text, ok = dialog.getText(self,
-                                  'Pyana options',
-                                  'Run pyana with the following command (edit as needed and click OK):',
-                                  QtGui.QLineEdit.Normal,
-                                  text=runstring )
-        if ok:
-            runstring = str(text)
-            poptions = runstring.split(' ')
-        else :
-            return
-
-        print "Calling pyana.... "
-        print "     ", ' '.join(poptions)
-        
-        
-        if 1 :
-            # calling a new process
-            self.proc_pyana = myPopen(poptions) # this runs in separate thread.
-            #stdout_value = proc_pyana.communicate()[0]
-            #print stdout_value
-            # the benefit of this option is that the GUI remains unlocked
-            # the drawback is that pyana needs to supply its own plots, ie. no Qt plots?
-            
-        if 0 :
-            # calling as module... plain
-            pyanamod.pyana(argv=poptions)
-            # the benefit of this option is that pyana will draw plots on the GUI. 
-            # the drawback is that GUI hangs while waiting for pyana to finish...
-
-        if 0 :
-            # calling as module... using multiprocessing
-            kwargs = {'argv':poptions}
-            p = Process(target=pyanamod.pyana,kwargs=kwargs)
-            p.start()
-            p.join()
-            # this option is nothing but trouble
-            
-            
-        if self.quit_pyana_button is None :
-            self.quit_pyana_button = QtGui.QPushButton("&Quit pyana")
-            self.connect(self.quit_pyana_button, QtCore.SIGNAL('clicked()'), self.quit_pyana )
-            self.v0.addWidget( self.quit_pyana_button )
-            self.v0.setAlignment( self.quit_pyana_button, QtCore.Qt.AlignRight )
-        else :
-            self.quit_pyana_button.show()
-
-    def quit_pyana(self) :
-        """Kill the pyana process
-        """
-        if self.proc_pyana is None:
-            print "No pyana process to stop"
-            return
-        self.proc_pyana.kill()
-
-
-
-    def change_epics_channel(self):
-        for pv in self.pvboxes :
-            if pv.checkState() :
-                self.lgroup.addWidget(pv) # move widget to checkboxes
-            else :
-                pass
-                #self.pvGroupLayout.addWidget(pv)
                 
-    def update_gui_epics(self):
-        """Connect the epics variables to checkboxes
+    def update(self, filenames=[],devices=[],epicsPVs=[],controls=[],moreinfo=[]):
+        """Update lists of filenames, devices and epics channels
+           Make sure GUI gets updated too
+        """
+        self.filenames = filenames
+        self.devices = devices
+        self.moreinfo = moreinfo
+        self.epicsPVs = epicsPVs
+        self.controls = controls
+
+        # show all of this in the Gui
+        self.setup_gui_checkboxes()
+        for ch in self.checkboxes:
+            print ch.text()
+
+    def setup_gui_checkboxes(self) :
+        """Draw a group of checkboxes to the GUI
+
+        Each checkbox gets connected to the function process_checkboxes,
+        i.e., whenerver *one* checkbox is checked/unchecked, the state of 
+        every checkbox is investigated. Not pretty, but works OK.
+        """
+        # lists of QCheckBoxes and their text lables. 
+        self.checkboxes = []
+        self.checklabels = []
+
+
+        # from the controls list
+        nctrl = 0
+        for ctrl in self.controls:
+            ckbox = QtGui.QCheckBox("ControlPV: %s"%ctrl, self)
+            self.checkboxes.append(ckbox)
+            self.checklabels.append(ckbox.text())
+            self.connect(ckbox, QtCore.SIGNAL('stateChanged(int)'), self.process_checkboxes)
+            nctrl += 1
+
+        for label in sorted(self.devices):
+            if label.find("ProcInfo") >= 0 : continue  # ignore
+            if label.find("NoDetector") >= 0 : continue  # ignore
+            
+            if self.checklabels.count(label)!=0 : continue # avoid duplicates
+
+            # make checkbox for this device
+            checkbox = QtGui.QCheckBox(': '.join(label.split(":")), self)
+            self.connect(checkbox, QtCore.SIGNAL('stateChanged(int)'), self.process_checkboxes )
+            
+            # special case: Epics PVs
+            if label.find("Epics") >= 0 : 
+                checkbox.setText("Epics Process Variables (%d)"%len(self.epicsPVs))
+                self.connect(checkbox, QtCore.SIGNAL('stateChanged(int)'), self.setup_gui_epics )
+                # add epics to front
+                self.checkboxes.insert(nctrl,checkbox)
+                self.checklabels.insert(nctrl,checkbox.text())
+                # make global
+                self.epics_checkbox = checkbox
+            else :
+                # add everything else to the end
+                self.checkboxes.append(checkbox)
+                self.checklabels.append(label)
+                
+        # finally, add each to the layout
+        for checkbox in self.checkboxes :
+            self.lgroup.addWidget(checkbox)
+            
+
+    def setup_gui_epics(self):
+        """Open a new window if epics_checkbox is checked.
+        If not, clear all fields and hide. 
+        Add checkboxes for each known epics PV channel.
+        connect each of these to process_checkboxes
         """
         if self.epics_checkbox.isChecked():
             if self.pvWindow is None:
                 self.make_epics_window()
+
+                # add epics channels to list of checkboxes, place them in a different widget
+                for self.pv in self.epicsPVs:
+                    pvtext = "EpicsPV:  " + self.pv
+                    self.pvi = QtGui.QCheckBox(pvtext,self.pvWindow)
+
+                    ## check those that are control pvs
+                    #for ctrl in self.controls: 
+                    #    if ctrl in pvtext :
+                    #        self.pvi.setChecked(True)
+
+                    self.connect(self.pvi, QtCore.SIGNAL('stateChanged(int)'), self.process_checkboxes )
+                    self.checkboxes.append(self.pvi)
+                    self.checklabels.append(self.pvi.text())
+                    self.pvGroupLayout.addWidget(self.pvi)
+
             else :
                 self.pvWindow.show()
-
-            # add epics channels to list of checkboxes, place them in a different widget
-            for self.pv in self.epicsPVs:
-                pvtext = "EpicsPV:  " + self.pv
-                self.pvi = QtGui.QCheckBox(pvtext,self.pvWindow)
-                for ctrl in self.controls: 
-                    if ctrl in pvtext :
-                        self.pvi.setChecked(True)
-
-                self.connect(self.pvi, QtCore.SIGNAL('stateChanged(int)'), self.write_configuration )
-                self.checkboxes.append(self.pvi)
-                self.checklabels.append(self.pvi.text())
-                self.pvGroupLayout.addWidget(self.pvi)
 
         else :
             # 
@@ -308,7 +358,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.scrollArea.setWidgetResizable(True)
                 
         # list of PVs, a child of self.scrollArea
-        pvGroup = QtGui.QGroupBox("Epics channels:")
+        pvGroup = QtGui.QGroupBox("Epics channels (%d):"%len(self.epicsPVs))
         self.scrollArea.setWidget(pvGroup)
 
         self.pvGroupLayout = QtGui.QVBoxLayout()
@@ -324,237 +374,38 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.pvWindow.show()
         
             
-    def update(self, filenames=[],devices=[],epicsPVs=[],controls=[],moreinfo=[]):
-        """Update lists of filenames, devices and epics channels
-           Make sure GUI gets updated too
+
+    def process_checkboxes(self):
+        """Process the list of checkboxes and
+        call the appropriate function based on the
+        checkbox name/label
         """
-        self.filenames = filenames
-        self.devices = devices
-        self.moreinfo = moreinfo
-        self.epicsPVs = epicsPVs
-        self.controls = controls
-
-        self.update_gui_checkboxes()
-
-
-    def update_gui_checkboxes(self) :
-        """Draw a group of checkboxes to the GUI
-
-        One checkbox for each Detector/Device found
-        in the scan of xtc file
-        """
-        #if self.lgroup.count() > 0:            
-        #    item = self.lgroup.takeAt(0)
-        #    while item is not None :
-        #        del item
-        #        item = self.lgroup.takeAt(0)
-        #    self.lgroup.update()
-            
-        self.checkboxes = []
-        self.checklabels = []
-        for ctrl in self.controls:
-            #self.ctrl_label = QtGui.QLabel(self);
-            #self.ctrl_label.setText("pvControls = %s"%ctrl)
-            self.ctrl_label = QtGui.QCheckBox("ControlPV: %s"%ctrl, self)
-            self.connect(self.ctrl_label, QtCore.SIGNAL('stateChanged(int)'), self.write_configuration )
-            self.lgroup.addWidget(self.ctrl_label)
-            self.checkboxes.append(self.ctrl_label)
-            self.checklabels.append(self.ctrl_label.text())
+        self.pyana_tab()
         
-        for label in sorted(self.devices):
-            if label.find("ProcInfo") >= 0 : continue  # ignore
-            if label.find("NoDetector") >= 0 : continue  # ignore
-            
-            if self.checklabels.count(label)!=0 : continue # avoid duplicates
-
-            # make checkbox for this device
-            checkbox = QtGui.QCheckBox(': '.join(label.split(":")), self)
-            self.connect(checkbox, QtCore.SIGNAL('stateChanged(int)'), self.write_configuration )
-            
-            self.lgroup.addWidget(checkbox)
-            self.checkboxes.append(checkbox)
-            self.checklabels.append(label)
-
-            # special case: Epics PVs
-            if label.find("Epics") >= 0 : 
-                self.connect(checkbox, QtCore.SIGNAL('stateChanged(int)'), self.update_gui_epics )
-                self.epics_checkbox = checkbox
-                
-
-    def add_module(self,box,modules_to_run,options_for_mod) :
-
-        index = None
-        plot_every_n = 10
-        # --- --- --- BLD --- --- ---
-        if str(box.text()).find("BldInfo")>=0 :
-
-            try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_bld")
-            except ValueError :
-                index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_bld")
-                options_for_mod.append([])
-
-            #print "XtcEventBrowser.pyana_bld at ", index
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
-            if str(box.text()).find("EBeam")>=0 :
-                options_for_mod[index].append("\ndo_ebeam = True")
-            if str(box.text()).find("FEEGasDetEnergy")>=0 :
-                options_for_mod[index].append("\ndo_gasdetector = True")
-            if str(box.text()).find("PhaseCavity")>=0 :
-                options_for_mod[index].append("\ndo_phasecavity = True")
-            return
-
-        # --- --- --- Waveform --- --- ---
-        if ( str(box.text()).find("Acq")>=0  or
-             str(box.text()).find("ETof")>=0  or
-             str(box.text()).find("ITof")>=0  or
-             str(box.text()).find("Mbes")>=0  or
-             str(box.text()).find("Camp")>=0  ) :
-            
-            try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_waveform")
-            except ValueError :
-                index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_waveform")
-                options_for_mod.append([])
-
-            #print "XtcEventBrowser.pyana_ipimb at ", index
-            address = str(box.text()).split(":")[1].strip()
-            options_for_mod[index].append("\nsources = %s" % address)
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
-            return
-                    
-        # --- --- --- Ipimb --- --- ---
-        if str(box.text()).find("Ipimb")>=0 :
-
-            try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_ipimb")
-            except ValueError :
-                index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_ipimb")
-                options_for_mod.append([])
-
-            #print "XtcEventBrowser.pyana_ipimb at ", index
-            address = str(box.text()).split(": ")[1].strip()
-            options_for_mod[index].append("\nipimb_addresses = %s" % address)
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
-            return
-                    
-        # --- --- --- TM6740 --- --- ---
-        if ( str(box.text()).find("TM6740")>=0 or
-             str(box.text()).find("Opal1000")>=0 or
-             str(box.text()).find("Princeton")>=0 ) :
-
-            try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_image")
-            except ValueError :
-                index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_image")
-                options_for_mod.append([])
-
-            #print "XtcEventBrowser.pyana_image at ", index
-            address = str(box.text()).split(": ")[1].strip()
-            options_for_mod[index].append("\nimage_addresses = %s" % address)
-            options_for_mod[index].append("\nimage_rotations = " )
-            options_for_mod[index].append("\nimage_shifts = " )
-            options_for_mod[index].append("\nimage_scales = " )
-            options_for_mod[index].append("\nimage_manipulations = ")
-            options_for_mod[index].append("\ngood_range = %d--%d" % (0,99999999.9) )
-            options_for_mod[index].append("\ndark_range = %d--%d" % (0,0) )
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
-            options_for_mod[index].append("\noutput_file = ")
-            options_for_mod[index].append("\nn_hdf5 = ")        
-            return
-
-        # --- --- --- CsPad --- --- ---
-        if str(box.text()).find("Cspad")>=0 :
-
-            try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_cspad")
-            except ValueError :
-                index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_cspad")
-                options_for_mod.append([])
-
-            #print "XtcEventBrowser.pyana_cspad at ", index
-            address = str(box.text()).split(":")[1].strip()
-            options_for_mod[index].append("\nimage_source = %s" % address)
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
-            options_for_mod[index].append("\ndark_img_file = ")
-            options_for_mod[index].append("\noutput_file = ")                    
-            options_for_mod[index].append("\nplot_vrange = ")
-            options_for_mod[index].append("\nthreshold = ")
-            options_for_mod[index].append("\nthr_area = ")
-            return
-
-        # --- --- --- Epics --- --- ---
-        if str(box.text()).find("ControlPV:")>=0 :
-
-            try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_scan")
-            except ValueError :
-                index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_scan")
-                options_for_mod.append([])
-
-            #print "XtcEventBrowser.pyana_scan at ", index
-            pvname = str(box.text()).split("PV: ")[1]
-            options_for_mod[index].append("\ninput_epics = ")
-            options_for_mod[index].append("\ninput_scalars = ")
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n )
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
-            return
-        
-        # --- --- --- Epics --- --- ---
-        if str(box.text()).find("EpicsArch")>=0 :
-            return
-
-        if str(box.text()).find("EpicsPV:")>=0 :
-
-            try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_epics")
-            except ValueError :
-                index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_epics")
-                options_for_mod.append([])
-
-            #print "XtcEventBrowser.pyana_epics at ", index
-            pvname = str(box.text()).split("PV:  ")[1]
-            options_for_mod[index].append("\npv = %s" % pvname)
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n )
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
-            return
-        
-        print "FIXME! %s requested, not implemented" % box.text() 
-
-
-    def write_configuration(self):
-        """Write the configuration text (to be written to file later)
-        
-        """
         # clear title 
         self.configfile = None
         if self.econfig_button is not None : self.econfig_button.hide()
         if self.pyana_button is not None: self.pyana_button.hide()
         if self.quit_pyana_button is not None: self.quit_pyana_button.hide()
 
-        self.box_pconf.setTitle("Current pyana configuration:")
+        self.pyana_txtbox.setTitle("Current pyana configuration:")
 
         modules_to_run = []
         options_for_mod = []
         self.configuration= ""
-        print "Boxes: "
-        for box in sorted(self.checkboxes):
-            print box.text()
-            if box.isChecked() :
-                self.add_module(box, modules_to_run, options_for_mod)
 
+        print 
+        do_scan = False
+        for box in sorted(self.checkboxes):
+            if box.isChecked() :
+                if str(box.text()).find("ControlPV:")>=0 :
+                    do_scan = True
+                    self.add_module(box, modules_to_run, options_for_mod)
+                elif do_scan :
+                    self.add_to_scan(box, modules_to_run, options_for_mod)
+                else :
+                    self.add_module(box, modules_to_run, options_for_mod)
+                
         nmodules = len(modules_to_run)
         if nmodules > 0 :
             # at the end, append plotter module:
@@ -600,7 +451,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
         # add linebreaks if needed
         self.configuration = self.add_linebreaks(self.configuration, width=70)
-        print self.configuration
+        #print self.configuration
 
         self.pyana_config.setText(self.configuration)
 
@@ -608,6 +459,181 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.econfig_button.show()
         self.config_button.setEnabled(True)
         self.econfig_button.setDisabled(True)
+
+
+    def add_to_scan(self,box,modules_to_run,options_for_mod) :
+  
+        index = None
+        try:
+            index = modules_to_run.index("XtcEventBrowser.pyana_scan")
+        except ValueError :
+            print "ValueError"
+            
+        #print "XtcEventBrowser.pyana_scan at ", index
+        source = str(box.text())
+        if source.find("BldInfo")>=0 :
+            options_for_mod[index].append("\ninput_scalars = %s" % source.split(": ")[1] )
+            return
+        if source.find("EpicsPV")>=0 :
+            options_for_mod[index].append("\ninput_epics = %s" % source.split(": ")[1])
+            return
+        if source.find("DetInfo")>=0 :
+            options_for_mod[index].append("\ninput_scalars = %s" % source.split(": ")[1])
+            return
+
+
+
+    def add_module(self,box,modules_to_run,options_for_mod) :
+
+        index = None
+        plot_every_n = 10
+
+        # The following sets up one out of two analysis modes:
+        #      1) scan
+        #      2) all-in-one analysis 
+
+        # --- --- --- Scan --- --- ---
+        if str(box.text()).find("ControlPV:")>=0 :
+            try :
+                index = modules_to_run.index("XtcEventBrowser.pyana_scan")
+            except ValueError :
+                index = len(modules_to_run)
+                modules_to_run.append("XtcEventBrowser.pyana_scan")
+                options_for_mod.append([])
+
+            #print "XtcEventBrowser.pyana_scan at ", index
+            pvname = str(box.text()).split("PV: ")[1]
+            options_for_mod[index].append("\ncontrolpv = %s" % pvname)
+            options_for_mod[index].append("\ninput_epics = ")
+            options_for_mod[index].append("\ninput_scalars = ")
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n )
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            return
+
+        # --- --- --- BLD --- --- ---
+        if str(box.text()).find("BldInfo")>=0 :
+            try :
+                index = modules_to_run.index("XtcEventBrowser.pyana_bld")
+            except ValueError :
+                index = len(modules_to_run)
+                modules_to_run.append("XtcEventBrowser.pyana_bld")
+                options_for_mod.append([])
+
+            #print "XtcEventBrowser.pyana_bld at ", index
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            if str(box.text()).find("EBeam")>=0 :
+                options_for_mod[index].append("\ndo_ebeam = True")
+            if str(box.text()).find("FEEGasDetEnergy")>=0 :
+                options_for_mod[index].append("\ndo_gasdetector = True")
+            if str(box.text()).find("PhaseCavity")>=0 :
+                options_for_mod[index].append("\ndo_phasecavity = True")
+            return
+        
+        # --- --- --- Waveform --- --- ---
+        if ( str(box.text()).find("Acq")>=0  or
+             str(box.text()).find("ETof")>=0  or
+             str(box.text()).find("ITof")>=0  or
+             str(box.text()).find("Mbes")>=0  or
+             str(box.text()).find("Camp")>=0  ) :
+            try :
+                index = modules_to_run.index("XtcEventBrowser.pyana_waveform")
+            except ValueError :
+                index = len(modules_to_run)
+                modules_to_run.append("XtcEventBrowser.pyana_waveform")
+                options_for_mod.append([])
+
+            #print "XtcEventBrowser.pyana_ipimb at ", index
+            address = str(box.text()).split(":")[1].strip()
+            options_for_mod[index].append("\nsources = %s" % address)
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            return
+                    
+        # --- --- --- Ipimb --- --- ---
+        if str(box.text()).find("Ipimb")>=0 :
+            try :
+                index = modules_to_run.index("XtcEventBrowser.pyana_ipimb")
+            except ValueError :
+                index = len(modules_to_run)
+                modules_to_run.append("XtcEventBrowser.pyana_ipimb")
+                options_for_mod.append([])
+
+            #print "XtcEventBrowser.pyana_ipimb at ", index
+            address = str(box.text()).split(": ")[1].strip()
+            options_for_mod[index].append("\nipimb_addresses = %s" % address)
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            return
+                    
+        # --- --- --- TM6740 --- --- ---
+        if ( str(box.text()).find("TM6740")>=0 or
+             str(box.text()).find("Opal1000")>=0 or
+             str(box.text()).find("Princeton")>=0 ) :
+            try :
+                index = modules_to_run.index("XtcEventBrowser.pyana_image")
+            except ValueError :
+                index = len(modules_to_run)
+                modules_to_run.append("XtcEventBrowser.pyana_image")
+                options_for_mod.append([])
+
+            #print "XtcEventBrowser.pyana_image at ", index
+            address = str(box.text()).split(": ")[1].strip()
+            options_for_mod[index].append("\nimage_addresses = %s" % address)
+            options_for_mod[index].append("\nimage_rotations = " )
+            options_for_mod[index].append("\nimage_shifts = " )
+            options_for_mod[index].append("\nimage_scales = " )
+            options_for_mod[index].append("\nimage_manipulations = ")
+            options_for_mod[index].append("\ngood_range = %d--%d" % (0,99999999.9) )
+            options_for_mod[index].append("\ndark_range = %d--%d" % (0,0) )
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            options_for_mod[index].append("\noutput_file = ")
+            options_for_mod[index].append("\nn_hdf5 = ")        
+            return
+
+        # --- --- --- CsPad --- --- ---
+        if str(box.text()).find("Cspad")>=0 :
+            try :
+                index = modules_to_run.index("XtcEventBrowser.pyana_cspad")
+            except ValueError :
+                index = len(modules_to_run)
+                modules_to_run.append("XtcEventBrowser.pyana_cspad")
+                options_for_mod.append([])
+
+            #print "XtcEventBrowser.pyana_cspad at ", index
+            address = str(box.text()).split(":")[1].strip()
+            options_for_mod[index].append("\nimage_source = %s" % address)
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            options_for_mod[index].append("\ndark_img_file = ")
+            options_for_mod[index].append("\noutput_file = ")                    
+            options_for_mod[index].append("\nplot_vrange = ")
+            options_for_mod[index].append("\nthreshold = ")
+            options_for_mod[index].append("\nthr_area = ")
+            return
+        
+        # --- --- --- Epics --- --- ---
+        if str(box.text()).find("Epics Process Variables")>=0 :
+            return
+
+        if str(box.text()).find("EpicsPV:")>=0 :
+
+            try :
+                index = modules_to_run.index("XtcEventBrowser.pyana_epics")
+            except ValueError :
+                index = len(modules_to_run)
+                modules_to_run.append("XtcEventBrowser.pyana_epics")
+                options_for_mod.append([])
+
+            #print "XtcEventBrowser.pyana_epics at ", index
+            pvname = str(box.text()).split("PV:  ")[1]
+            options_for_mod[index].append("\npv = %s" % pvname)
+            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n )
+            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            return
+        
+        print "FIXME! %s requested, not implemented" % box.text() 
 
     def add_linebreaks(self, configtext, width=70):
         lines = configtext.split('\n')
@@ -652,7 +678,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
         self.configfile = "xb_pyana_%d.cfg" % random.randint(1000,9999)
 
-        self.box_pconf.setTitle("Current pyana configuration: (%s)" % self.configfile)
+        self.pyana_txtbox.setTitle("Current pyana configuration: (%s)" % self.configfile)
 
         f = open(self.configfile,'w')
         f.write(self.configuration)
@@ -672,8 +698,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         if self.pyana_button is None: 
             self.pyana_button = QtGui.QPushButton("&Run pyana")
             self.connect(self.pyana_button, QtCore.SIGNAL('clicked()'), self.run_pyana )
-            self.v0.addWidget( self.pyana_button )
-            self.v0.setAlignment( self.pyana_button, QtCore.Qt.AlignRight )
+            self.layout.addWidget( self.pyana_button )
+            self.layout.setAlignment( self.pyana_button, QtCore.Qt.AlignRight )
         else :
             self.pyana_button.show()
 
@@ -688,7 +714,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.configuration = f.read()
         f.close()
 
-        self.box_pconf.setTitle("Current pyana configuration: (%s)" % self.configfile)
+        self.pyana_txtbox.setTitle("Current pyana configuration: (%s)" % self.configfile)
         self.pyana_config.setText(self.configuration)
 
         print "----------------------------------------"
@@ -700,6 +726,92 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.print_configuration
         print "Done"
 
+
+    def run_pyana(self):
+        """Run pyana
+
+        Open a dialog to allow chaging options to pyana. Wait for OK, then
+        run pyana with the needed modules and configurations as requested
+        based on the the checkboxes
+        """
+
+        # Make a command sequence 
+        lpoptions = []
+        if self.poptions is not None:
+            # remember line from last time
+            lpoptions = self.poptions
+            # but replace with the latest config file
+            lpoptions[ lpoptions.index("-c")+1 ] = self.configfile
+        else :
+            lpoptions.append("pyana")
+            if self.nevents is not None:
+                lpoptions.append("-n")
+                lpoptions.append(str(self.nevents))
+            lpoptions.append("-c")
+            lpoptions.append("%s" % self.configfile)
+            for file in self.filenames :
+                lpoptions.append(file)
+
+        # turn sequence into a string, allow user to modify it
+        runstring = ' '.join(lpoptions)
+        dialog =  QtGui.QInputDialog()
+        dialog.resize(400,400)
+        #dialog.setMinimumWidth(1500)
+        text, ok = dialog.getText(self,
+                                  'Pyana options',
+                                  'Run pyana with the following command (edit as needed and click OK):',
+                                  QtGui.QLineEdit.Normal,
+                                  text=runstring )
+        if ok:
+            runstring = str(text)
+            lpoptions = runstring.split(' ')
+        else :
+            return
+
+        print "Calling pyana.... "
+        print "     ", ' '.join(lpoptions)
+
+        # use this as default next time
+        self.poptions = lpoptions
+        
+        if 1 :
+            # calling a new process
+            self.proc_pyana = myPopen(lpoptions) # this runs in separate thread.
+            #stdout_value = proc_pyana.communicate()[0]
+            #print stdout_value
+            # the benefit of this option is that the GUI remains unlocked
+            # the drawback is that pyana needs to supply its own plots, ie. no Qt plots?
+            
+        if 0 :
+            # calling as module... plain
+            pyanamod.pyana(argv=lpoptions)
+            # the benefit of this option is that pyana will draw plots on the GUI. 
+            # the drawback is that GUI hangs while waiting for pyana to finish...
+
+        if 0 :
+            # calling as module... using multiprocessing
+            kwargs = {'argv':lpoptions}
+            p = Process(target=pyanamod.pyana,kwargs=kwargs)
+            p.start()
+            p.join()
+            # this option is nothing but trouble
+
+            
+        if self.quit_pyana_button is None :
+            self.quit_pyana_button = QtGui.QPushButton("&Quit pyana")
+            self.connect(self.quit_pyana_button, QtCore.SIGNAL('clicked()'), self.quit_pyana )
+            self.layout.addWidget( self.quit_pyana_button )
+            self.layout.setAlignment( self.quit_pyana_button, QtCore.Qt.AlignRight )
+        else :
+            self.quit_pyana_button.show()
+
+    def quit_pyana(self) :
+        """Kill the pyana process
+        """
+        if self.proc_pyana is None:
+            print "No pyana process to stop"
+            return
+        self.proc_pyana.kill()
 
 
     #--------------------------------
