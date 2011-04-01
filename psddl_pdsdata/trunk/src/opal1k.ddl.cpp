@@ -17,7 +17,7 @@ std::vector<int> ConfigV1::output_lookup_table_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
-  shape.push_back(Output_LUT_Size*this->defect_pixel_correction_enabled());
+  shape.push_back(Output_LUT_Size*this->output_lookup_table_enabled());
   return shape;
 }
 

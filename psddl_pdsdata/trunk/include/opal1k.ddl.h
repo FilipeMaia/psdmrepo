@@ -57,21 +57,21 @@ public:
     return (const uint16_t*)(((const char*)this)+offset);
   }
   const Camera::FrameCoord& defect_pixel_coordinates(uint32_t i0) const {
-    ptrdiff_t offset=12+(2*(Output_LUT_Size*this->defect_pixel_correction_enabled()));
+    ptrdiff_t offset=12+(2*(Output_LUT_Size*this->output_lookup_table_enabled()));
     const Camera::FrameCoord* memptr = (const Camera::FrameCoord*)(((const char*)this)+offset);
     size_t memsize = memptr->_sizeof();
     return *(const Camera::FrameCoord*)((const char*)memptr + (i0)*memsize);
   }
   uint16_t output_offset() const;
   uint32_t output_resolution_bits() const;
-  uint32_t _sizeof() const {return (12+(2*(Output_LUT_Size*this->defect_pixel_correction_enabled())))+(Camera::FrameCoord::_sizeof()*(this->_defectPixelCount));}
+  uint32_t _sizeof() const {return (12+(2*(Output_LUT_Size*this->output_lookup_table_enabled())))+(Camera::FrameCoord::_sizeof()*(this->_defectPixelCount));}
   std::vector<int> output_lookup_table_shape() const;
   std::vector<int> defect_pixel_coordinates_shape() const;
 private:
   uint32_t	_offsetAndGain;	/* offset and gain */
   uint32_t	_outputOptions;	/* bit mask of output formatting options */
   uint32_t	_defectPixelCount;
-  //uint16_t	_lookup_table[Output_LUT_Size*this->defect_pixel_correction_enabled()];
+  //uint16_t	_lookup_table[Output_LUT_Size*this->output_lookup_table_enabled()];
   //Camera::FrameCoord	_defectPixels[this->_defectPixelCount];
 };
 } // namespace Opal1k

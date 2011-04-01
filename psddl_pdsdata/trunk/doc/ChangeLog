@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2011-04-01 Andy Salnikov
+- regenerated opal1k classes after small fix in schema
+
 Tag: V00-00-04
 2011-03-31 Andy Salnikov
 - regenerated whole thing after changes in psddl
