@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2011-04-01 Andy Salnikov
+- support line continuation with backslashes at end of line
+
 Tag: V00-00-05
 2011-03-20 Andy Salnikov
 - added default constructor to ConfigSvcImplFile to instantiate 

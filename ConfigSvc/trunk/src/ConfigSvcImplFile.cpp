@@ -137,23 +137,40 @@ ConfigSvcImplFile::readStream(std::istream& in, const std::string& name)
 {
   // read all the lines from the file
   std::string line ;
+  std::string curline ;
   std::string section ;
   unsigned int nlines = 0 ;
-  while ( std::getline ( in, line ) ) {
+  while ( std::getline ( in, curline ) ) {
     nlines ++ ;
 
     // skip comments
-    std::string::size_type fchar = line.find_first_not_of(" \t") ;
+    std::string::size_type fchar = curline.find_first_not_of(" \t") ;
     if ( fchar == std::string::npos ) {
       // empty line
       //std::cout << "line " << nlines << ": empty\n" ;
-      continue ;
-    } else if ( line[fchar] == '#' ) {
+      curline.clear();
+    } else if ( curline[fchar] == '#' ) {
       // comment
       //std::cout << "line " << nlines << ": comment\n" ;
-      continue ;
+      continue;
     }
 
+    line += curline;
+    
+    // skip empty lines
+    if (line.empty()) {
+      //std::cout << "line " << nlines << ": empty\n" ;
+      continue;
+    }
+    
+    if (line[line.size()-1] == '\\') {
+      // continuation, read next line and add to current one
+      line.erase(line.size()-1);
+      //std::cout << "line " << nlines << ": continuation \"" << line << "\"\n" ;      
+      continue;
+    }
+    
+    fchar = line.find_first_not_of(" \t") ;
     if ( line[fchar] == '[' ) {
       // must be section name, whole string ends with ']' and we take 
       // everything between as section name
@@ -168,7 +185,8 @@ ConfigSvcImplFile::readStream(std::istream& in, const std::string& name)
       section = line.substr( fchar, lchar-fchar+1 );
       m_config[section];
       
-      //std::cout << "line " << nlines << ": section [" << section << "]\n" ;      
+      //std::cout << "line " << nlines << ": section [" << section << "]\n" ;
+      line.clear();
       continue;
     }
     
@@ -210,6 +228,7 @@ ConfigSvcImplFile::readStream(std::istream& in, const std::string& name)
     m_config[section][optname] = boost::shared_ptr<std::string>(new std::string(optval));
     //std::cout << "line " << nlines << ": '" << optname << "' = '" << optval << "'\n" ;
 
+    line.clear();
   }
 
   // check the status of the file, must be at EOF
