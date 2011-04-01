@@ -243,7 +243,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
   case Pds::TypeId::Id_ControlConfig:
     break;
   case Pds::TypeId::Id_pnCCDframe:
-    if (version == 1) ::storeDataProxyCfg2<PNCCD::FrameV1, PsddlPds::PNCCD::ConfigV1, PsddlPds::PNCCD::ConfigV1>(xtc, evt, cfgStore);
+    if (version == 1) ::storeDataProxyCfg2<PNCCD::FrameV1, PsddlPds::PNCCD::ConfigV1, PsddlPds::PNCCD::ConfigV2>(xtc, evt, cfgStore);
     break;
   case Pds::TypeId::Id_pnCCDconfig:
     break;
