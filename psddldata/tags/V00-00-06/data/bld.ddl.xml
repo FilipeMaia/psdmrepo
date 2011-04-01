@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+
+    <use file="psddldata/ipimb.ddl.xml"/>
+    <use file="psddldata/lusi.ddl.xml"/>
+
+	<package name="Bld">
+	
+		<pstype name="BldDataFEEGasDetEnergy" type_id="Id_FEEGasDetEnergy" version="0" pack="4">
+		
+	       	PV names: GDET:FEE1:11:ENRC, GDET:FEE1:12:ENRC, GDET:FEE1:21:ENRC, GDET:FEE1:22:ENRC
+		
+            <tag name="value-type"/>
+        
+            <attribute name="_f_11_ENRC" type="double" accessor="f_11_ENRC">
+            in mJ
+            </attribute>
+
+            <attribute name="_f_12_ENRC" type="double" accessor="f_12_ENRC">
+            in mJ
+            </attribute>
+
+            <attribute name="_f_21_ENRC" type="double" accessor="f_21_ENRC">
+            in mJ
+            </attribute>
+
+            <attribute name="_f_22_ENRC" type="double" accessor="f_22_ENRC">
+            in mJ
+            </attribute>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+
+		<pstype name="BldDataEBeamV0" type_id="Id_EBeam" version="0" pack="4">
+		
+            <tag name="value-type"/>
+        
+            <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
+            </attribute>
+
+            <attribute name="_fEbeamCharge" type="double" accessor="ebeamCharge">
+            in nC
+            </attribute>
+
+            <attribute name="_fEbeamL3Energy" type="double" accessor="ebeamL3Energy">
+            in MeV
+            </attribute>
+
+            <attribute name="_fEbeamLTUPosX" type="double" accessor="ebeamLTUPosX">
+            in mm
+            </attribute>
+
+            <attribute name="_fEbeamLTUPosY" type="double" accessor="ebeamLTUPosY">
+            in mm
+            </attribute>
+
+            <attribute name="_fEbeamLTUAngX" type="double" accessor="ebeamLTUAngX">
+            in mrad
+            </attribute>
+
+            <attribute name="_fEbeamLTUAngY" type="double" accessor="ebeamLTUAngY">
+            in mrad
+            </attribute>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+		<pstype name="BldDataEBeam" type_id="Id_EBeam" version="1" pack="4">
+		
+            <tag name="value-type"/>
+        
+            <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
+            </attribute>
+
+            <attribute name="_fEbeamCharge" type="double" accessor="ebeamCharge">
+            in nC
+            </attribute>
+
+            <attribute name="_fEbeamL3Energy" type="double" accessor="ebeamL3Energy">
+            in MeV
+            </attribute>
+
+            <attribute name="_fEbeamLTUPosX" type="double" accessor="ebeamLTUPosX">
+            in mm
+            </attribute>
+
+            <attribute name="_fEbeamLTUPosY" type="double" accessor="ebeamLTUPosY">
+            in mm
+            </attribute>
+
+            <attribute name="_fEbeamLTUAngX" type="double" accessor="ebeamLTUAngX">
+            in mrad
+            </attribute>
+
+            <attribute name="_fEbeamLTUAngY" type="double" accessor="ebeamLTUAngY">
+            in mrad
+            </attribute>
+
+            <attribute name="_fEbeamPkCurrBC2" type="double" accessor="ebeamPkCurrBC2">
+            in Amps
+            </attribute>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+
+		<pstype name="BldDataPhaseCavity" type_id="Id_PhaseCavity" version="0" pack="4">
+
+            PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2, 
+                UND:R02:IOC:16:BAT:Charge1,  UND:R02:IOC:16:BAT:Charge2
+	
+            <tag name="value-type"/>
+        
+            <attribute name="_fFitTime1" type="double" accessor="fitTime1">
+            in pico-seconds
+            </attribute>
+
+            <attribute name="_fFitTime2" type="double" accessor="fitTime2">
+            in pico-seconds
+            </attribute>
+
+            <attribute name="_fCharge1" type="double" accessor="charge1">
+            in pico-columbs
+            </attribute>
+
+            <attribute name="_fCharge2" type="double" accessor="charge2">
+            in pico-columbs
+            </attribute>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
+		</pstype>
+		
+
+		<!-- ========================================================================= -->
+		
+
+		<pstype name="BldDataIpimb" type_id="Id_SharedIpimb" version="0" pack="4">
+
+            <attribute name="_ipimbData" type="Ipimb.DataV1" accessor="ipimbData">
+            </attribute>
+
+            <attribute name="_ipimbConfig" type="Ipimb.ConfigV1" accessor="ipimbConfig">
+            </attribute>
+
+            <attribute name="_ipmFexData" type="Lusi.IpmFexV1" accessor="ipmFexData">
+            </attribute>
+
+		</pstype>
+		
+
+	</package>
+</psddl>
