@@ -1,12 +1,12 @@
-#ifndef PSANA_EXAMPLES_DUMPBLD_H
-#define PSANA_EXAMPLES_DUMPBLD_H
+#ifndef PSANA_EXAMPLES_DUMPOPAL1K_H
+#define PSANA_EXAMPLES_DUMPOPAL1K_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class DumpBld.
+//	Class DumpOpal1k.
 //
 //------------------------------------------------------------------------
 
@@ -46,15 +46,18 @@ namespace psana_examples {
  *  @author Andrei Salnikov
  */
 
-class DumpBld : public Module {
+class DumpOpal1k : public Module {
 public:
 
   // Default constructor
-  DumpBld (const std::string& name) ;
+  DumpOpal1k (const std::string& name) ;
 
   // Destructor
-  virtual ~DumpBld () ;
+  virtual ~DumpOpal1k () ;
 
+  /// Method which is called at the beginning of the calibration cycle
+  virtual void beginCalibCycle(Env& env);
+  
   /// Method which is called with event data, this is the only required 
   /// method, all other methods are optional
   virtual void event(Event& evt, Env& env);
@@ -62,14 +65,11 @@ public:
 protected:
 
 private:
-  
-  Source m_ebeamSrc;
-  Source m_cavSrc;
-  Source m_feeSrc;
-  Source m_ipimbSrc;
+
+  Source m_src;
 
 };
 
 } // namespace psana_examples
 
-#endif // PSANA_EXAMPLES_DUMPBLD_H
+#endif // PSANA_EXAMPLES_DUMPOPAL1K_H
