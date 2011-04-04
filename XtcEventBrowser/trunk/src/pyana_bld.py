@@ -194,34 +194,47 @@ class  pyana_bld ( object ) :
 
         if self.do_PC :
 
-            fig = plt.figure(num=(fignum+30), figsize=(8,8) )
+            fig = plt.figure(num=(fignum+30), figsize=(12,8) )
             fig.clf()
             fig.suptitle(suptitle)
             
             array = np.float_(self.PC_data)
 
-            ax1 = fig.add_subplot(221)
+            ax1 = fig.add_subplot(231)
             n, bins, patches = plt.hist(array[:,0], 60,histtype='stepfilled')
             plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
             plt.title('PhaseCavity FitTime1')
             plt.xlabel('PhaseCavity FitTime1',horizontalalignment='left')
-            
-            ax2 = fig.add_subplot(222)
+             
+            ax2 = fig.add_subplot(232)
             n, bins, patches = plt.hist(array[:,1], 60,histtype='stepfilled')
-            plt.setp(patches,'facecolor', 'g', 'alpha', 0.75)
+            plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
             plt.title('PhaseCavity FitTime2')
             plt.xlabel('PhaseCavity FitTime2',horizontalalignment='left')
-
-            ax3 = fig.add_subplot(223)
+             
+            ax3 = fig.add_subplot(233)
+            n, bins, patches = plt.hist(array[:,0]-array[:,1], 60,histtype='stepfilled')
+            plt.setp(patches,'facecolor', 'r', 'alpha', 0.75)
+            plt.title('PhaseCavity t1-t2')
+            plt.xlabel('PhaseCavity t1-t2',horizontalalignment='left')
+             
+ 
+            ax4 = fig.add_subplot(234)
             n, bins, patches = plt.hist(array[:,2], 60,histtype='stepfilled')
             plt.setp(patches,'facecolor', 'b', 'alpha', 0.75)
             plt.title('PhaseCavity FitCharge1')
             plt.xlabel('PhaseCavity FitCharge1',horizontalalignment='left')
 
-            ax4 = fig.add_subplot(224)
+            ax5 = fig.add_subplot(235)
             n, bins, patches = plt.hist(array[:,3], 60,histtype='stepfilled')
-            plt.setp(patches,'facecolor', 'm', 'alpha', 0.75)
+            plt.setp(patches,'facecolor', 'b', 'alpha', 0.75)
             plt.title('PhaseCavity FitChare2')
             plt.xlabel('PhaseCavity FitCharge2',horizontalalignment='left')
+
+            ax6 = fig.add_subplot(236)
+            n, bins, patches = plt.hist(array[:,2]-array[:,3], 60,histtype='stepfilled')
+            plt.setp(patches,'facecolor', 'b', 'alpha', 0.75)
+            plt.title('PhaseCavity ch1-ch2')
+            plt.xlabel('PhaseCavity ch1-ch2',horizontalalignment='left')
 
             plt.draw()

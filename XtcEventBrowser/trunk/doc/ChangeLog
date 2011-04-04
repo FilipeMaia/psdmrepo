@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Apr-4 ofte               rev 1764
+	- Some more plotting for pyana_scan (motor scan)
+
 2011-Apr-1 ofte               rev 1763
 	- Remember pyana command line from one run to the next
 	- scan wrt control variables by pyana_scan.py. If ControlPV is selected, 

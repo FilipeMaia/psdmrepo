@@ -179,9 +179,39 @@ class pyana_scan (object) :
             if scalar not in self.evts_scalars.keys() :
                 self.evts_scalars[scalar] = []
 
-            #scalar = evt.get(scalar)
-            ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, scalar )
-            self.evts_scalars[scalar].append(ipmFex.sum)
+
+            """Here's a lot of hardcoded stuff. If you want other
+            things plotted to evaluate the motor scan, you need
+            to edit this code.
+            """
+            if scalar.find("Ipimb")>=0 :
+                ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, scalar )
+                if ipmFex :
+                    self.evts_scalars[scalar].append(ipmFex.sum)
+                else:
+                    self.evts_scalars[scalar].append(-99.0)
+                    
+            elif scalar.find("EBeam")>= 0 :
+                ebeam = evt.getEBeam()
+                if ebeam:
+                    self.evts_scalars[scalar].append(ebeam.fEbeamL3Energy)
+                else :
+                    self.evts_scalars[scalar].append(-99.0)
+
+            elif scalar.find("FeeGasDetEnergy")>= 0 :
+                fee_energy_array = evt.getFeeGasDet()
+                if fee_energy_array:
+                    self.evts_scalars[scalar].append( np.sum(fee_energy_array) )
+                else :
+                    self.evts_scalars[scalar].append(-99.0)
+
+            elif scalar.find("PhaseCavity")>= 0 :
+                pc = evt.getPhaseCavity()
+                if pc:
+                    val = (pc.fCharge1 - pc.fCharge2) / (pc.fFitTime1 - pc.fFitTime2)
+                    self.evts_scalars[scalar].append( val )
+                else :
+                    self.evts_scalars[scalar].append(-99.0)
 
 
     def endcalibcycle( self, env ) :
@@ -206,33 +236,18 @@ class pyana_scan (object) :
 
             self.ccls_scalars[name].append( np.array([mean,std]) )
 
+
     def endrun( self, env ) :
         """This optional method is called if present at the end of the run.
+        This is where we draw plots: One window showing several plots
         
         @param env    environment object
         """
+        logging.info( "pyana_scan.endrun() called" )
         print "End run %d had %d calibcycles " % (self.n_runs, self.n_ccls)
 
-        #arr = np.array(self.ccls_nevts)
+        self.make_plots(fignum=1, suptitle="All in one")        
 
-        for ctrl, values in self.ccls_ctrl.iteritems() : 
-            ctrl_array = np.array(values)
-            self.make_graph1(ctrl_array,fignum=1,xtitle='Scan step',ytitle=ctrl)
-
-            for sc_name, sc_list in self.ccls_scalars.iteritems() :
-                mean_std_arr = np.array( sc_list )
-
-                self.make_profile(ctrl_array,
-                                  mean_std_arr[:,0], xtitle = ctrl, 
-                                  yerr=mean_std_arr[:,1], ytitle = sc_name,
-                                  fignum=2 )
-
-        plt.show()
-
-        
-        return
-        
-        logging.info( "pyana_scan.endrun() called" )
 
     def endjob( self, env ) :
         """This method is called at the end of the job. It should do 
@@ -244,43 +259,57 @@ class pyana_scan (object) :
         print "End job had %d runs " % (self.n_runs)
 
 
-    def make_histogram(self, array):
-        pass
-    
-    def make_graph1(self, array, fignum=600, xtitle="",ytitle="",suptitle=""):
-        print "Make graph from array ", np.shape(array)
+    def make_plots(self, fignum=1, suptitle=""):
 
-        fig = plt.figure(num=fignum, figsize=(8,8) )
+        nplots = 1 + len(self.ccls_scalars)
+        ncols = 1
+        nrows = 1
+        if nplots == 2: ncols = 2
+        if nplots == 3: ncols = 3
+        if nplots == 4: ncols = 2; nrows = 2
+        if nplots > 4:
+            ncols = 3
+            nrows = nplots / 3
+            if nplots%3 > 0 : nrows += 1
+
+        height=3.5
+        if nrows * 3.5 > 14 : height = 14/nrows
+        width=height*1.3
+
+        print "Have %d variables to be plotted, layout = %d x %d" % (nplots, nrows,ncols)
+                
+        fig = plt.figure(num=fignum, figsize=(width*ncols,height*nrows) )
         fig.suptitle(suptitle)
-        
-        ax1 = fig.add_subplot(111)
-        plt.plot(array,'bo:')
-        plt.title('')
-        plt.xlabel(xtitle,horizontalalignment='left') # the other right
-        plt.ylabel(ytitle,horizontalalignment='right')
+
+        pos = 0
+        for ctrl, values in self.ccls_ctrl.iteritems() : 
+            ctrl_array = np.array(values)
+
+            pos += 1
+            ax1 = fig.add_subplot(nrows,ncols,pos)
+
+            plt.plot(ctrl_array,'bo:')
+            plt.title('')
+            plt.xlabel("Scan step",horizontalalignment='left') # the other right
+            plt.ylabel(ctrl,horizontalalignment='right')
+            plt.draw()
+
+            for sc_name, sc_list in self.ccls_scalars.iteritems() :
+                
+                pos += 1
+                axn = fig.add_subplot(nrows,ncols,pos)
+
+                mean_std_arr = np.array( sc_list )
+
+                plt.errorbar(ctrl_array,
+                             mean_std_arr[:,0],
+                             yerr=mean_std_arr[:,1])
+                plt.title('')
+                plt.xlabel(ctrl,horizontalalignment='left') # the other right
+                plt.ylabel(sc_name,horizontalalignment='right')
+                plt.draw()
+
+
         plt.draw()
 
-    def make_graph2(self, array1, array2, fignum=600, xtitle="",ytitle="",suptitle=""):
-
-        fig = plt.figure(num=fignum, figsize=(8,8) )
-        fig.suptitle(suptitle)
         
-        ax1 = fig.add_subplot(111)
-        plt.plot(array1,array2,'bo:')
-        plt.title('')
-        plt.xlabel(xtitle,horizontalalignment='left') # the other right
-        plt.ylabel(ytitle,horizontalalignment='right')
-        plt.draw()
-
-    def make_profile(self, array1, array2, xerr=None, yerr=None, fignum=600, xtitle="",ytitle="",suptitle=""):
-
-        fig = plt.figure(num=fignum, figsize=(8,8) )
-        fig.suptitle(suptitle)
-        
-        ax1 = fig.add_subplot(111)
-        plt.errorbar(array1,array2,xerr=xerr, yerr=yerr)
-        plt.title('')
-        plt.xlabel(xtitle,horizontalalignment='left') # the other right
-        plt.ylabel(ytitle,horizontalalignment='right')
-        plt.draw()
-
