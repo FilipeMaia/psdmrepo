@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10
+2011-04-05 Andy Salnikov
+- insert missing newline in DumpEpics output
+
 Tag: V00-00-09
 2011-04-01 Andy Salnikov
 - make things more uniform

@@ -94,6 +94,7 @@ DumpEpics::event(Event& evt, Env& env)
         str << ' ' << value;
       }
   
+      str << "\n";
     }
   
   }
