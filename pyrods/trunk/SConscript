@@ -20,7 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 pkg = "pyrods"
-pkg_ver = "2.3.0"
+pkg_ver = "2.4.1"
 PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/PyRods",pkg_ver)
 
 PYDIR = "lib"
