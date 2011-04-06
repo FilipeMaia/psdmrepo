@@ -88,7 +88,7 @@ class pyana_plotter (object) :
     #  Constructor --
     #----------------
     def __init__ ( self,
-                   display_mode = "None" ) :
+                   display_mode = "Interactive" ) :
         """Class constructor. The parameters to the constructor are passed
         from pyana configuration file. If parameters do not have default 
         values  here then the must be defined in pyana.cfg. All parameters 

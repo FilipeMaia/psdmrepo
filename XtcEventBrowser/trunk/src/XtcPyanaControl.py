@@ -28,7 +28,6 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys, random, os, signal, time
 import  subprocess 
-#from multiprocessing import Process
 
 #---------------------------------
 #  Imports of base class module --
@@ -41,7 +40,10 @@ from PyQt4 import QtCore, QtGui
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-#from pyana import pyanamod
+
+import threading
+from multiprocessing import Process
+from pyana import pyanamod
 
 #----------------------------------
 # Local non-exported definitions --
@@ -60,7 +62,37 @@ from PyQt4 import QtCore, QtGui
 class myPopen(subprocess.Popen):
     def kill(self, signal = signal.SIGTERM):
         os.kill(self.pid, signal)
+        print "pyana process %d has been killed "% self.pid
 
+#class MyThread( threading.Thread ):
+class MyThread( QtCore.QThread ):
+    """Run pyana module in a separate thread.
+    This allows the GUI windows to stay active.
+    The only problem is that Matplotlib windows
+    need to me made beforehand, by the Gui. Not
+    in pyana. Not a problem as long as they are
+    declared beforehand. Pyana can still call the
+    plt.figure command, that way it can be run
+    standalone or from the GUI. 
+    In principle...
+    Still some issues to look into:
+    - matplotlib figure must be created before pyana runs
+    - This begs embedded mpl in a tool GUI. 
+    """
+    def __init__(self,pyanastring = ""):
+        self.lpoptions = pyanastring
+        QtCore.QThread.__init__(self)
+        #threading.Thread.__init__ ( self )        
+        
+    def run(self):
+        pyanamod.pyana(argv=self.lpoptions)
+
+    def kill(self):
+        print " !   python threads cannot be interupted..."
+        print " !   you'll have to wait..."
+        print " !   or ^Z and kill the whole xtcbrowser process."
+
+    
 
 class XtcPyanaControl ( QtGui.QWidget ) :
     """Gui interface to pyana configuration & control
@@ -125,7 +157,6 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.scan_widget = None
         self.pyana_widget = None
         self.info_widget = None
-
 
         # assume all events        
         self.nevents = None 
@@ -796,6 +827,12 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             p.join()
             # this option is nothing but trouble
 
+        if 0 :
+            # calling as module... using threading
+            self.proc_pyana = MyThread(lpoptions)
+            self.proc_pyana.start()
+            print "I'm back"
+            
             
         if self.quit_pyana_button is None :
             self.quit_pyana_button = QtGui.QPushButton("&Quit pyana")
@@ -808,10 +845,11 @@ class XtcPyanaControl ( QtGui.QWidget ) :
     def quit_pyana(self) :
         """Kill the pyana process
         """
-        if self.proc_pyana is None:
-            print "No pyana process to stop"
+        if self.proc_pyana :
+            self.proc_pyana.kill()
             return
-        self.proc_pyana.kill()
+
+        print "No pyana process to stop"
 
 
     #--------------------------------

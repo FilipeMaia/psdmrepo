@@ -11,6 +11,16 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Apr-6 ofte               rev 1769
+	- added XtcEventBrowser/src/pyana_xppscan.py as a testing module 
+	  for adding XPP matlab functionality. Will add to pyana_scan whatever 
+	  works well / seems general enough. 
+	- XtcPyanaControl now has the (hardcoded, default False) option of 
+	  running pyana in a separate *thread*. Need to launch mpl figures from 
+	  the GUI, not fully implemented yet, but might be in the future. Could allow
+	  for more interactive data manipulation with ipython. For now, 
+	  running as separate process is more convenient (currently default). 
+
 2011-Apr-4 ofte               rev 1764
 	- Some more plotting for pyana_scan (motor scan)
 

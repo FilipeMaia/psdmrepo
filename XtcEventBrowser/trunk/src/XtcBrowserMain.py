@@ -108,6 +108,10 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         
     def create_main_frame(self):
 
+        self.main_widget = QtGui.QWidget(self)
+        self.main_widget.setMinimumWidth(550)
+        self.main_widget.setFocus()
+
         # Icon
         self.pic = QtGui.QLabel(self)
         self.pic.setPixmap( QtGui.QPixmap('XtcEventBrowser/src/lclsLogo.gif'))
@@ -178,8 +182,6 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         #self.connect(self.quit_button, QtCore.SIGNAL('clicked()'), QtGui.qApp, QtCore.SLOT('quit()') )
         self.connect(self.quit_button, QtCore.SIGNAL('clicked()'), self.quit )
         
-        self.main_widget = QtGui.QWidget(self)
-        self.main_widget.setFocus()
         
 
         # holds checkboxes, pyana configuration and pyana run-button
@@ -239,10 +241,6 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         v3.addLayout(hs1)
         v3.setAlignment(hs1, QtCore.Qt.AlignLeft)
         v3.addLayout(hs2)
-        #v3.addWidget( self.mpl_button )
-        #v3.setAlignment(self.mpl_button, QtCore.Qt.AlignRight )
-        #v3.addWidget( self.mpl2_button )
-        #v3.setAlignment(self.mpl2_button, QtCore.Qt.AlignRight )
 
         h4 = QtGui.QHBoxLayout()
         h4.addLayout(v3)
@@ -254,6 +252,10 @@ class XtcBrowserMain (QtGui.QMainWindow) :
 
         # Quit
         h6 = QtGui.QHBoxLayout()
+        h6.addWidget( self.mpl_button )
+        h6.setAlignment(self.mpl_button, QtCore.Qt.AlignLeft )
+        #h6.addWidget( self.mpl2_button )
+        #h6.setAlignment(self.mpl2_button, QtCore.Qt.AlignRight )
         h6.addWidget( self.quit_button )
         h6.setAlignment( self.quit_button, QtCore.Qt.AlignRight )
 
@@ -439,7 +441,9 @@ class XtcBrowserMain (QtGui.QMainWindow) :
                         % (self.scanner.ncalib, sum(self.scanner.nevents) )
         if len(self.scanner.nevents) > 1 :
             fileinfo_text += ":\n     nShots[scanstep] = %s " % str(self.scanner.nevents)
-
+            # add linebreak
+            fileinfo_text = self.pyanactrl.add_linebreaks(fileinfo_text,width=70)
+        
         self.fileinfo.setText(fileinfo_text)
 
 
@@ -497,7 +501,7 @@ part of it, please give an appropriate acknowledgment.
         
     def makeplot(self):
 
-        self.fig = plt.figure(200)
+        self.fig = plt.figure(1)
         axes = self.fig.add_subplot(111)
         axes.set_title("Hello MatPlotLib")
         

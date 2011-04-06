@@ -51,7 +51,7 @@ from utilities import PyanaOptions
 #---------------------
 #  Class definition --
 #---------------------
-class pyana_scan (object) :
+class pyana_xppscan (object) :
     """Class whose instance will be used as a user analysis module. """
 
     #----------------
@@ -61,6 +61,7 @@ class pyana_scan (object) :
                    controlpv = None,
                    input_epics = None,
                    input_scalars = None,
+                   ipimb_addresses = "",
                    plot_every_n = None,
                    fignum = "1" ) :
         """Class constructor. The parameters to the constructor are passed
@@ -72,6 +73,7 @@ class pyana_scan (object) :
                                 if none given, use whatever we find in the event. 
         @param input_epics      Name(s) of other scalars to correlate in scan
         @param input_scalars    Name(s) of other scalars to correlate in scan
+        @param ipimb_addresses  list of IPIMB addresses
         @param plot_every_n     Frequency for plotting. If n=0, no plots till the end
         @param fignum           Matplotlib figure number
         """
@@ -79,9 +81,11 @@ class pyana_scan (object) :
         self.controlpv = opt.getOptStrings(controlpv)
         self.input_epics = opt.getOptStrings(input_epics)
         self.input_scalars = opt.getOptStrings(input_scalars)
+        self.ipimb_addresses = opt.getOptStrings(ipimb_addresses)
         self.plot_every_n = opt.getOptInteger(plot_every_n)
         self.mpl_num = opt.getOptInteger(fignum)
-        
+
+        print self.ipimb_addresses
 
     #-------------------
     #  Public methods --
@@ -108,15 +112,22 @@ class pyana_scan (object) :
         """
         self.n_runs += 1
 
+        print "Processing run number ", evt.run()
+        logging.info( "pyana_xppscan.beginrun() called (%d)"%self.n_runs )
+
         # initialize calibcycle data
         self.n_ccls = 0
         self.ccls_nevts  = []
         self.ccls_ctrl = {}   # to hold ControlPV names and values
         self.ccls_scalars = {} # to hold epics and other scalar mean and std
 
-        print "Processing run number ", evt.run()
-        logging.info( "pyana_scan.beginrun() called (%d)"%self.n_runs )
+        self.fex_channels = {}
 
+        for addr in self.ipimb_addresses :
+            self.fex_channels[addr] = list()
+            
+        # histogram of ipm
+        self.ipm_channels = None
                 
     def begincalibcycle( self, evt, env ) :
         """This optional method is called if present at the beginning 
@@ -155,7 +166,7 @@ class pyana_scan (object) :
         @param env    environment object
         """
         self.n_evts += 1
-        logging.info( "pyana_scan.event() called (%d)"%self.n_evts )
+        logging.info( "pyana_xppscan.event() called (%d)"%self.n_evts )
 
         # Use environment object to access EPICS data
         for epv_name in self.input_epics :
@@ -171,6 +182,12 @@ class pyana_scan (object) :
                 logging.warning('EPICS PV %s does not exist', epv_name)
             else :
                 self.evts_scalars[epv_name].append(epv.value)
+
+        for ipimb in self.ipimb_addresses :
+            ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, ipimb)
+
+            self.fex_channels[ipimb].append(ipmFex.channel)
+
 
         # Other scalars in the event
         for scalar in self.input_scalars :
@@ -221,7 +238,7 @@ class pyana_scan (object) :
         @param env    environment object
         """
         print "End calibcycle %d had %d events " % (self.n_ccls, self.n_evts)
-        logging.info( "pyana_scan.endcalibcycle() called" )
+        logging.info( "pyana_xppscan.endcalibcycle() called" )
         
         self.ccls_nevts.append(self.n_evts)
 
@@ -243,9 +260,10 @@ class pyana_scan (object) :
         
         @param env    environment object
         """
-        logging.info( "pyana_scan.endrun() called" )
+        logging.info( "pyana_xppscan.endrun() called" )
         print "End run %d had %d calibcycles " % (self.n_runs, self.n_ccls)
 
+        self.get_limits(fignum=2, suptitle="Click to select limits")
         self.make_plots(fignum=1, suptitle="All in one")        
 
 
@@ -255,9 +273,57 @@ class pyana_scan (object) :
         
         @param env    environment object
         """
-        logging.info( "pyana_scan.endjob() called" )
+        logging.info( "pyana_xppscan.endjob() called" )
         print "End job had %d runs " % (self.n_runs)
 
+    def filtvec(self, vec,lims):
+        return ((vec>min(lims))&(vec<max(lims)))
+
+    def get_limits(self, fignum=1, suptitle=""):
+
+        plt.clf()
+
+        fig = plt.figure(num=fignum, figsize=(10,10))
+        fig.suptitle(suptitle)
+
+        lims = np.zeros((4,2),dtype="float")
+        for addr in self.ipimb_addresses :
+
+            channels = np.float_(self.fex_channels[addr])
+
+            ax2 = fig.add_subplot(1,2,1)
+            xaxis = np.arange( 0, len(self.fex_channels[addr]) )
+            plt.loglog(channels[:,0],channels[:,1],'o')
+            plt.xlabel('Channel0')
+            plt.ylabel('Channel1')
+            plt.title(addr)
+        
+            ax3 = fig.add_subplot(1,2,2)
+            xaxis = np.arange( 0, len(self.fex_channels[addr]) )
+            plt.loglog(channels[:,2],channels[:,3],'o')
+            plt.xlabel('Channel0')
+            plt.ylabel('Channel1')
+            plt.title(addr)
+
+            plt.axes(ax2)
+            plt.hold(True)
+            lims[0:2,:] = plt.ginput(2)
+            fbool = (self.filtvec(channels[:,0],lims[0:2,0]))&self.filtvec(channels[:,1],lims[0:2,1])
+            plt.loglog(channels[fbool,0],channels[fbool,1],'or')
+
+            plt.axes(ax3)
+            plt.hold(True)
+            lims[2:4,:] = plt.ginput(2)
+            fbool = (self.filtvec(channels[:,2],lims[2:4,0]))&self.filtvec(channels[:,3],lims[2:4,1])
+            plt.loglog(channels[fbool,2],channels[fbool,3],'or')
+
+            print np.shape(lims[0:2,:]), np.shape(lims[2:4,:])
+            print lims
+            print lims[0:2,:]
+            print lims[2:4,:]
+
+        plt.draw()
+        
 
     def make_plots(self, fignum=1, suptitle=""):
 
@@ -277,10 +343,11 @@ class pyana_scan (object) :
         height=3.5
         if nrows * 3.5 > 14 : height = 14/nrows
         width=height*1.3
-
+        print "width, height = ", width, height
         print "Have %d variables to be plotted, layout = %d x %d" % (nplots, nrows,ncols)
                 
-        fig = plt.figure(num=fignum, figsize=(width*ncols,height*nrows) )
+        #fig = plt.figure(num=fignum, figsize=(height*nrows,width*ncols) )
+        fig = plt.figure(num=fignum, figsize=(10,10))
         fig.suptitle(suptitle)
 
         pos = 0
