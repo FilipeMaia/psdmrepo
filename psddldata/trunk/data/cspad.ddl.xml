@@ -4,24 +4,49 @@
 <psddl>
 	<package name="CsPad">
 
+    Package containing definitions for CsPad-produced data types.
+
 
         <!-- ========================================================================= -->
 
-        <const name="MaxQuadsPerSensor" value="4" />
-        <const name="ASICsPerQuad" value="16" />
-        <const name="RowsPerBank" value="26" />
-        <const name="FullBanksPerASIC" value="7" />
-        <const name="BanksPerASIC" value="8" />
-        <const name="ColumnsPerASIC" value="185" />
-        <const name="MaxRowsPerASIC" value="194" />
-        <const name="PotsPerQuad" value="80" />
-        <const name="TwoByTwosPerQuad" value="4" />
-
-        <const name="SectorsPerQuad" value="8" />
+        <const name="MaxQuadsPerSensor" value="4">
+        Defines number of quadrants in a CsPad device.
+        </const>
+        <const name="ASICsPerQuad" value="16">
+        Total number of ASICs in one quadrant.
+        </const>
+        <const name="RowsPerBank" value="26">
+        Number of rows per readout bank?
+        </const>
+        <const name="FullBanksPerASIC" value="7">
+        Number of full readout banks per one ASIC?
+        </const>
+        <const name="BanksPerASIC" value="8">
+        Number of readout banks per one ASIC?
+        </const>
+        <const name="ColumnsPerASIC" value="185">
+        Number of columns readout by single ASIC.
+        </const>
+        <const name="MaxRowsPerASIC" value="194">
+        Maximum number of rows readout by single ASIC.
+        </const>
+        <const name="PotsPerQuad" value="80">
+        Number of POTs? per single quadrant.
+        </const>
         
+        <const name="TwoByTwosPerQuad" value="4">
+        Total number of 2x2s in single quadrant.
+        </const>
+
+        <const name="SectorsPerQuad" value="8">
+        Total number of sectors (2x1) per single quadrant.
+        </const>
         
         
         <enum name="RunModes">
+        	
+        	Enum specifying different running modes.
+        
             <enum-const name="NoRunning" />
             <enum-const name="RunButDrop" />
             <enum-const name="RunAndSendToRCE" />
@@ -32,6 +57,9 @@
         </enum>
 
         <enum name="DataModes">
+        	
+        	Enum specifying different data collection modes.
+        
             <enum-const name="normal" value="0" />
             <enum-const name="shiftTest" value="1" />
             <enum-const name="testData" value="2" />
@@ -43,6 +71,8 @@
 	
 		<pstype name="CsPadDigitalPotsCfg">
 		
+		    Class defining configuration for CsPad POTs?
+		
             <attribute name="_pots" type="uint8_t" shape="PotsPerQuad" accessor="pots">
             </attribute>
 
@@ -53,6 +83,8 @@
 		
 
 		<pstype name="CsPadReadOnlyCfg">
+		
+		    Class defining read-only configuration.
 		
             <attribute name="_shiftTest" type="uint32_t" accessor="shiftTest">
             </attribute>
@@ -66,9 +98,12 @@
 		
 
 		<pstype name="CsPadGainMapCfg">
+
+            Class defining ASIC gain map.
 		
             <attribute name="_gainMap" type="uint16_t" shape="ColumnsPerASIC,MaxRowsPerASIC" 
                     accessor="gainMap">
+            Array with the gain map for single ASIC.
             </attribute>
 
 		</pstype>
@@ -77,6 +112,8 @@
 		
 
 		<pstype name="ConfigV1QuadReg">
+		
+		    Configuration data for single quadrant.
 		
             <attribute name="_shiftSelect" type="uint32_t" shape="TwoByTwosPerQuad" accessor="shiftSelect">
             </attribute>
@@ -115,12 +152,14 @@
             </attribute>
 
             <attribute name="_readOnly" type="CsPadReadOnlyCfg" accessor="ro">
+            read-only configuration
             </attribute>
 
             <attribute name="_digitalPots" type="CsPadDigitalPotsCfg" accessor="dp">
             </attribute>
 
             <attribute name="_gainMap" type="CsPadGainMapCfg" accessor="gm">
+            Gain map.
             </attribute>
 
 		</pstype>
@@ -128,6 +167,8 @@
 		<!-- ========================================================================= -->
 		
 		<pstype name="ConfigV1" version="1" type_id="Id_CspadConfig">
+
+            Configuration data for complete CsPad device.
 		
             <attribute name="_concentratorVersion" type="uint32_t" accessor="concentratorVersion">
             </attribute>
@@ -182,6 +223,8 @@
 		
 		<pstype name="ConfigV2" version="2" type_id="Id_CspadConfig">
 		
+            Configuration data for complete CsPad device.
+        
             <attribute name="_concentratorVersion" type="uint32_t" accessor="concentratorVersion">
             </attribute>
 
@@ -252,8 +295,12 @@
 		<!-- ========================================================================= -->
 		
 		<pstype name="ElementV1">
+
+            CsPad data from single CsPad quadrant.
 		
-		    <const name="Nsbtemp" value="4" />
+		    <const name="Nsbtemp" value="4">
+		    Number of the elements in _sbtemp array.
+		    </const>
 		
 		    <xtc-config name="ConfigV1" />
 		    <xtc-config name="ConfigV2" />
@@ -261,12 +308,14 @@
             <attribute name="_word0" type="uint32_t" accessor="">
             
                 <bitfield name="_bf_virtual_channel" size="2" type="uint32_t" accessor="virtual_channel">
+                Virtual channel number.
                 </bitfield>
 
                 <bitfield name="_bf_pad" size="4">
                 </bitfield>
             
                 <bitfield name="_bf_lane" size="2" type="uint32_t" accessor="lane">
+                Lane number.
                 </bitfield>
             
                 <bitfield name="_bf_tid" size="24" type="uint32_t" accessor="tid">
@@ -283,11 +332,13 @@
                 </bitfield>
 
                 <bitfield name="_bf_quad" size="2" type="uint32_t" accessor="quad">
+                Quadrant number.
                 </bitfield>
 
             </attribute>
 
             <attribute name="_seq_count" type="uint32_t" accessor="seq_count">
+            Counter incremented on every event.
             </attribute>
 
             <attribute name="_ticks" type="uint32_t" accessor="ticks">
@@ -308,6 +359,7 @@
             </attribute>
 
             <attribute name="_extra" type="uint16_t" shape="2">
+            Unused.
             </attribute>
 
         </pstype>
@@ -317,11 +369,16 @@
 		
         <pstype name="DataV1" version="1" type_id="Id_CspadElement">
 
+            CsPad data from whole detector.
+
             <xtc-config name="ConfigV1" />
             <xtc-config name="ConfigV2" />
 
             <attribute name="_quads" type="ElementV1" shape="{xtc-config}.numQuads()" 
-                    accessor="quads"/>
+                    accessor="quads">
+            Data objects, one element per quadrant. The size of the array is determined by 
+            the numQuads() method of the configuration object.
+            </attribute>
         
         </pstype>
         
@@ -330,19 +387,25 @@
 		
 		<pstype name="ElementV2">
 		
-		    <const name="Nsbtemp" value="4" />
+		    CsPad data from single CsPad quadrant.
+		
+		    <const name="Nsbtemp" value="4">
+		    Number of the elements in _sbtemp array.
+		    </const>
 		
 		    <xtc-config name="ConfigV2" />
 		    
             <attribute name="_word0" type="uint32_t" accessor="">
             
                 <bitfield name="_bf_virtual_channel" size="2" type="uint32_t" accessor="virtual_channel">
+                Virtual channel number.
                 </bitfield>
 
                 <bitfield name="_bf_pad" size="4">
                 </bitfield>
             
                 <bitfield name="_bf_lane" size="2" type="uint32_t" accessor="lane">
+                Lane number.
                 </bitfield>
             
                 <bitfield name="_bf_tid" size="24" type="uint32_t" accessor="tid">
@@ -359,6 +422,7 @@
                 </bitfield>
 
                 <bitfield name="_bf_quad" size="2" type="uint32_t" accessor="quad">
+                Quadrant number.
                 </bitfield>
 
             </attribute>
@@ -384,6 +448,7 @@
             </attribute>
 
             <attribute name="_extra" type="uint16_t" shape="2">
+            Unused.
             </attribute>
 
         </pstype>
@@ -392,10 +457,15 @@
         
         <pstype name="DataV2" version="2" type_id="Id_CspadElement">
 
+            CsPad data from whole detector.
+
             <xtc-config name="ConfigV2" />
 
             <attribute name="_quads" type="ElementV2" shape="{xtc-config}.numQuads()" 
-            accessor="quads"/>
+                        accessor="quads">
+            Data objects, one element per quadrant. The size of the array is determined by 
+            the numQuads() method of the configuration object.
+            </attribute>
         
         </pstype>
         

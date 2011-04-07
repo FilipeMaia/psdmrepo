@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2011-04-07 Andrei Salnikov
+- added comments everywhere to generate docs for psana classes
+- some bitfields were missing in Control.ConfigV1
+
 Tag: V00-00-06
 2011-04-01 Andrei Salnikov
 - small fix in opal1k.ConfigV1 class

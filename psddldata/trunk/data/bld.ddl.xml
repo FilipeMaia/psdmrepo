@@ -8,26 +8,30 @@
 
 	<package name="Bld">
 	
+	   Package (namespace) containing all data types pproduced by BLD 
+	   (BeamLine Data) devices.
+	
 		<pstype name="BldDataFEEGasDetEnergy" type_id="Id_FEEGasDetEnergy" version="0" pack="4">
 		
-	       	PV names: GDET:FEE1:11:ENRC, GDET:FEE1:12:ENRC, GDET:FEE1:21:ENRC, GDET:FEE1:22:ENRC
+		    Four energy measurements from Front End Enclosure Gas Detector.
+	       	PV names: GDET:FEE1:11:ENRC, GDET:FEE1:12:ENRC, GDET:FEE1:21:ENRC, GDET:FEE1:22:ENRC.
 		
             <tag name="value-type"/>
         
             <attribute name="_f_11_ENRC" type="double" accessor="f_11_ENRC">
-            in mJ
+            Value of GDET:FEE1:11:ENRC, in mJ.
             </attribute>
 
             <attribute name="_f_12_ENRC" type="double" accessor="f_12_ENRC">
-            in mJ
+            Value of GDET:FEE1:12:ENRC, in mJ.
             </attribute>
 
             <attribute name="_f_21_ENRC" type="double" accessor="f_21_ENRC">
-            in mJ
+            Value of GDET:FEE1:21:ENRC, in mJ.
             </attribute>
 
             <attribute name="_f_22_ENRC" type="double" accessor="f_22_ENRC">
-            in mJ
+            Value of GDET:FEE1:22:ENRC, in mJ.
             </attribute>
 
             <ctor>
@@ -43,33 +47,36 @@
 
 		<pstype name="BldDataEBeamV0" type_id="Id_EBeam" version="0" pack="4">
 		
+		    Beam parameters.
+		
             <tag name="value-type"/>
         
             <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
+            Damage mask.
             </attribute>
 
             <attribute name="_fEbeamCharge" type="double" accessor="ebeamCharge">
-            in nC
+            Beam charge in nC.
             </attribute>
 
             <attribute name="_fEbeamL3Energy" type="double" accessor="ebeamL3Energy">
-            in MeV
+            Beam energy in MeV.
             </attribute>
 
             <attribute name="_fEbeamLTUPosX" type="double" accessor="ebeamLTUPosX">
-            in mm
+            LTU beam position in mm.
             </attribute>
 
             <attribute name="_fEbeamLTUPosY" type="double" accessor="ebeamLTUPosY">
-            in mm
+            LTU beam position in mm.
             </attribute>
 
             <attribute name="_fEbeamLTUAngX" type="double" accessor="ebeamLTUAngX">
-            in mrad
+            LTU beam angle in mrad.
             </attribute>
 
             <attribute name="_fEbeamLTUAngY" type="double" accessor="ebeamLTUAngY">
-            in mrad
+            LTU beam angle in mrad.
             </attribute>
 
             <ctor>
@@ -87,34 +94,35 @@
             <tag name="value-type"/>
         
             <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
+            Damage mask.
             </attribute>
 
             <attribute name="_fEbeamCharge" type="double" accessor="ebeamCharge">
-            in nC
+            Beam charge in nC.
             </attribute>
 
             <attribute name="_fEbeamL3Energy" type="double" accessor="ebeamL3Energy">
-            in MeV
+            Beam energy in MeV.
             </attribute>
 
             <attribute name="_fEbeamLTUPosX" type="double" accessor="ebeamLTUPosX">
-            in mm
+            LTU beam position in mm.
             </attribute>
 
             <attribute name="_fEbeamLTUPosY" type="double" accessor="ebeamLTUPosY">
-            in mm
+            LTU beam position in mm.
             </attribute>
 
             <attribute name="_fEbeamLTUAngX" type="double" accessor="ebeamLTUAngX">
-            in mrad
+            LTU beam angle in mrad.
             </attribute>
 
             <attribute name="_fEbeamLTUAngY" type="double" accessor="ebeamLTUAngY">
-            in mrad
+            LTU beam angle in mrad.
             </attribute>
 
             <attribute name="_fEbeamPkCurrBC2" type="double" accessor="ebeamPkCurrBC2">
-            in Amps
+            Beam current in Amps.
             </attribute>
 
             <ctor>
@@ -136,19 +144,19 @@
             <tag name="value-type"/>
         
             <attribute name="_fFitTime1" type="double" accessor="fitTime1">
-            in pico-seconds
+            UND:R02:IOC:16:BAT:FitTime1 value in pico-seconds.
             </attribute>
 
             <attribute name="_fFitTime2" type="double" accessor="fitTime2">
-            in pico-seconds
+            UND:R02:IOC:16:BAT:FitTime2 value in pico-seconds.
             </attribute>
 
             <attribute name="_fCharge1" type="double" accessor="charge1">
-            in pico-columbs
+            UND:R02:IOC:16:BAT:Charge1 value in pico-columbs.
             </attribute>
 
             <attribute name="_fCharge2" type="double" accessor="charge2">
-            in pico-columbs
+            UND:R02:IOC:16:BAT:Charge2 value in pico-columbs.
             </attribute>
 
             <ctor>
@@ -164,6 +172,9 @@
 		
 
 		<pstype name="BldDataIpimb" type_id="Id_SharedIpimb" version="0" pack="4">
+
+            Combined structure which includes Ipimb.DataV1, Ipimb.ConfigV1, and 
+            Lusi.IpmFexV1 objects.
 
             <attribute name="_ipimbData" type="Ipimb.DataV1" accessor="ipimbData">
             </attribute>

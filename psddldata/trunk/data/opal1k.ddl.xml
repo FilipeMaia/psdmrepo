@@ -7,12 +7,15 @@
 
 	<package name="Opal1k">
 
+    Package containing definitions for Opal Camera data types.
+
         <!-- ========================================================================= -->
 	
 		
 		<pstype name="ConfigV1" version="1" type_id="Id_Opal1kConfig">
 		
             <enum name="Depth">
+            Image bit depth modes.
                 <enum-const name="Eight_bit" />
                 <enum-const name="Ten_bit" />
                 <enum-const name="Twelve_bit" />
@@ -69,7 +72,7 @@
                 
                 <bitfield name="_bf_vremap" size="1" type="uint8_t" accessor="vertical_remapping">
 	            1: remap the pixels to appear in natural geometric order 
-	                  (left->right, top->bottom)
+	                  (left->right, top->bottom);
 	            0: pixels appear on dual taps from different rows
 	                  (left->right, top->bottom) alternated with
 	                  (left->right, bottom->top) pixel by pixel

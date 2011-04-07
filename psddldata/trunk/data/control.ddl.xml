@@ -12,21 +12,27 @@
 		
             <tag name="value-type"/>
         
-		    <const name="NameSize" value="32" />
+		    <const name="NameSize" value="32">
+		    Length of the name array.
+		    </const>
 		    <const name="NoArray" value="0xFFFFFFFF">
 		    Special value used for _index when PV is not an array
 		    </const>
 		
-            <attribute name="_name" type="char" shape="32" accessor="name" shape_method="name_shape">
+            <attribute name="_name" type="char" shape="32" accessor="name" shape_method="None">
+            Name of the control.
             </attribute>
 
             <attribute name="_index" type="uint32_t" accessor="index">
+            Index of the control PV (for arrays) or NoArray.
             </attribute>
 
             <attribute name="_value" type="double" accessor="value">
+            Value for this control.
             </attribute>
 
             <method name="array" type="uint8_t">
+                Returns true if the control is an array.
                 <expr lang="C++" value="_index != NoArray"/>
             </method>
 
@@ -48,24 +54,31 @@
 		
             <tag name="value-type"/>
         
-		    <const name="NameSize" value="32" />
+            <const name="NameSize" value="32">
+            Length of the name array.
+            </const>
             <const name="NoArray" value="0xFFFFFFFF">
             Special value used for _index when PV is not an array
             </const>
 		
-            <attribute name="_name" type="char" shape="32" accessor="name" shape_method="name_shape">
+            <attribute name="_name" type="char" shape="32" accessor="name" shape_method="None">
+            Name of the control.
             </attribute>
 
             <attribute name="_index" type="uint32_t" accessor="index">
+            Index of the control PV (for arrays) or NoArray.
             </attribute>
 
             <attribute name="_loValue" type="double" accessor="loValue">
+            Lowest value for this monitor.
             </attribute>
 
             <attribute name="_hiValue" type="double" accessor="hiValue">
+            Highest value for this monitor.
             </attribute>
 
             <method name="array" type="uint8_t">
+                Returns true if the monitor is an array.
                 <expr lang="C++" value="_index != NoArray"/>
             </method>
 
@@ -84,28 +97,46 @@
 		<!-- ========================================================================= -->
 		
 		<pstype name="ConfigV1" version="1" type_id="Id_ControlConfig">
-
+		
             <attribute name="_control" type="uint32_t" accessor="">
+            
+                <bitfield name="_bf_events" size="30" type="uint32_t" accessor="events">
+                Maximum number of events per scan.
+                </bitfield>
+            
+                <bitfield name="_bf_uses_duration" size="1" type="uint8_t" accessor="uses_duration">
+                returns true if the configuration uses duration control.
+                </bitfield>
+            
+                <bitfield name="_bf_uses_events" size="1" type="uint8_t" accessor="uses_events">
+                returns true if the configuration uses events limit.
+                </bitfield>
+            
             </attribute>
 
             <attribute name="_reserved" type="uint32_t" accessor="">
             </attribute>
 
             <attribute name="_duration" type="Pds.ClockTime" accessor="duration">
+            Maximum duration of the scan.
             </attribute>
 
             <attribute name="_npvControls" type="uint32_t" accessor="npvControls">
+            Number of PVControl objects in this configuration.
             </attribute>
 
             <attribute name="_npvMonitors" type="uint32_t" accessor="npvMonitors">
+            Number of PVMonitor objects in this configuration.
             </attribute>
 
             <attribute name="_pvControls" type="PVControl"
                 shape="{self}._npvControls" accessor="pvControls" shape_method="pvControls_shape">
+                PVControl configuration objects
             </attribute>
 
             <attribute name="_pvMonitors" type="PVMonitor"
                 shape="{self}._npvMonitors" accessor="pvMonitors" shape_method="pvMonitors_shape">
+                PVMonitor configuration objects
             </attribute>
 
         </pstype>

@@ -4,14 +4,20 @@
 <psddl>
 	<package name="Camera">
 	
+	   Package which defines data types for different kinds of cameras.
+	
 		<pstype name="FrameCoord">
+
+            Class representing the coordinates of pixels iside the camera frame.
 		
             <tag name="value-type"/>
         
             <attribute name="_column" type="uint16_t" accessor="column">
+            Column index (x value).
             </attribute>
 
             <attribute name="_row" type="uint16_t" accessor="row">
+            Row index (y value).
             </attribute>
             
             <ctor>
@@ -31,11 +37,15 @@
 
 		<pstype name="FrameFccdConfigV1" version="1" type_id="Id_FrameFccdConfig">
 		
+		    This class was never defined/implemented.
+		
 		</pstype>
 		
 		<!-- ========================================================================= -->
 		
 		<pstype name="FrameFexConfigV1" version="1" type_id="Id_FrameFexConfig">
+
+            Class containing configuration data for online frame feature extraction process.
 		
             <enum name="Forwarding">
                 <enum-const name="NoFrame" />
@@ -56,42 +66,44 @@
             </attribute>
 
             <method name="forwarding" type="Forwarding">
+                Forwarding policy for frame data.
                 <expr lang="C++" value="Forwarding({self}._forwarding)"/>
             </method>
 
             <attribute name="_forward_prescale" type="uint32_t" accessor="forward_prescale">
-            event prescale for forwarding
+            Prescale of events with forwarded frames
             </attribute>
 
             <attribute name="_processing" type="uint32_t">
-            processing algorithm
+            algorithm to apply to frames to produce processed output
             </attribute>
 
             <method name="processing" type="Processing">
+            Algorithm to apply to frames to produce processed output.
                 <expr lang="C++" value="Processing({self}._processing)"/>
             </method>
 
             <attribute name="_roiBegin" type="FrameCoord" accessor="roiBegin">
-            starting coord of ROI (inclusive)
+            Coordinate of start of rectangular region of interest (inclusive).
             </attribute>
 
             <attribute name="_roiEnd" type="FrameCoord" accessor="roiEnd">
-            finishing coord of ROI (exclusive)
+            Coordinate of finish of rectangular region of interest (exclusive).
             </attribute>
 
             <attribute name="_threshold" type="uint32_t" accessor="threshold">
-            threshold value for processing pixel data
+            Pixel data threshold value to apply in processing.
             </attribute>
 
             <attribute name="_masked_pixel_count" type="uint32_t" accessor="number_of_masked_pixels">
-            count of pixels masked from processing
+            Count of masked pixels to exclude from processing.
             </attribute>
 
             <attribute name="_masked_pixel_coordinates" type="FrameCoord"
                 shape="{self}._masked_pixel_count" 
                 accessor="masked_pixel_coordinates"
                 shape_method="masked_pixel_shape">
-            finishing coord of ROI (exclusive)
+            Location of masked pixel coordinates.
             </attribute>
 
 
@@ -104,25 +116,25 @@
         
 
             <attribute name="_width" type="uint32_t" accessor="width">
-            number of pixels in a row
+            Number of pixels in a row.
             </attribute>
 
             <attribute name="_height" type="uint32_t" accessor="height">
-            number of pixels in a column
+            Number of pixels in a column.
             </attribute>
 
             <attribute name="_depth" type="uint32_t" accessor="depth">
-            number of bits per pixel
+            Number of bits per pixel.
             </attribute>
 
             <attribute name="_offset" type="uint32_t" accessor="offset">
-            fixed offset/pedestal value of pixel data
+            Fixed offset/pedestal value of pixel data.
             </attribute>
 
             <attribute name="_pixel_data" type="uint8_t"
                 shape="{self}._width*{self}._height*(({self}._depth+7)/8)" 
                 accessor="data" shape_method="data_shape">
-            finishing coord of ROI (exclusive)
+            Pixel data as array of bytes.
             </attribute>
 
 

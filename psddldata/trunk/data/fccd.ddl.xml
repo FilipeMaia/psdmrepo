@@ -4,6 +4,8 @@
 <psddl>
 	<package name="FCCD">
 
+    Package containing definitions for Fast CCD Camera (FCCD) data types.
+
         <!-- ========================================================================= -->
 	
 		

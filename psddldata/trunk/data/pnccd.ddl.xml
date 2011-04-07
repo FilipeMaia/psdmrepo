@@ -3,6 +3,8 @@
 
 <psddl>
 	<package name="PNCCD">
+
+    Package containing definitions for pn-CCD Camera data types.
 	
         <!-- ========================================================================= -->
 

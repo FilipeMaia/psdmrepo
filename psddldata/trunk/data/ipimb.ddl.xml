@@ -4,6 +4,20 @@
 <psddl>
 	<package name="Ipimb">
 
+        Package containing definitions for IPIMB (Intensity Position, Intensity 
+        Monitoring Boards) data types.
+        
+        IPIMB devices are used by several of the LCLS endstations/instruments to measure 
+        position and intensity of the X-ray beam. It has four diodes situated around the 
+        beamline, and the bias voltage of these diodes measures the intensity of the beam 
+        at the location of each diode. By comparing the signal from each diode, the position 
+        of the beam can be inferred.
+
+        The classes in this package provide the raw data from these devices. 
+        For feature-extracted data from the same devices, take a look at the classes 
+        in the lusi package.
+
+
         <!-- ========================================================================= -->
 	
 		
@@ -71,33 +85,41 @@
             </attribute>
 
             <attribute name="_channel0" type="uint16_t" accessor="channel0">
+            Raw counts value returned from channel 0.
             </attribute>
 
             <attribute name="_channel1" type="uint16_t" accessor="channel1">
+            Raw counts value returned from channel 1.
             </attribute>
 
             <attribute name="_channel2" type="uint16_t" accessor="channel2">
+            Raw counts value returned from channel 2.
             </attribute>
 
             <attribute name="_channel3" type="uint16_t" accessor="channel3">
+            Raw counts value returned from channel 3.
             </attribute>
 
             <attribute name="_checksum" type="uint16_t" accessor="checksum">
             </attribute>
 
             <method name="channel0Volts" type="float">
+            Value of of channel0() converted to Volts.
                 <expr lang="C++" value="float({self}._channel0)*3.3/65535"/>
             </method>
             
             <method name="channel1Volts" type="float">
+            Value of of channel1() converted to Volts.
                 <expr lang="C++" value="float({self}._channel1)*3.3/65535"/>
             </method>
             
             <method name="channel2Volts" type="float">
+            Value of of channel2() converted to Volts.
                 <expr lang="C++" value="float({self}._channel2)*3.3/65535"/>
             </method>
             
             <method name="channel3Volts" type="float">
+            Value of of channel3() converted to Volts.
                 <expr lang="C++" value="float({self}._channel3)*3.3/65535"/>
             </method>
             

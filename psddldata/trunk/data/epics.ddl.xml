@@ -3,67 +3,84 @@
 
 <psddl>
 	<package name="Epics">
+	
+	Package containing definitions for EPICS data types.
+	
 
         <const name="iXtcVersion" value="1"/>
 
-        <const name="iMaxPvNameLength" value="64"/>
+        <const name="iMaxPvNameLength" value="64">
+        Maximum size of PV name string.
+        </const>
 
-        <const name="MAX_STRING_SIZE" value="40"/>
-        <const name="MAX_UNITS_SIZE" value="8"/>
-        <const name="MAX_ENUM_STRING_SIZE" value="26"/>
-        <const name="MAX_ENUM_STATES" value="16"/>
+        <const name="MAX_STRING_SIZE" value="40">
+        Maximum length of strings in EPICS.
+        </const>
+        <const name="MAX_UNITS_SIZE" value="8">
+        Maximum lenght of units strings.
+        </const>
+        <const name="MAX_ENUM_STRING_SIZE" value="26">
+        Maximum length of strings specifying ENUMs.
+        </const>
+        <const name="MAX_ENUM_STATES" value="16">
+        Maximum number of different ENUM constants.
+        </const>
 
-        <enum name="">
-	   <enum-const name="DBR_STRING" value="0"/>
-           <enum-const name="DBR_SHORT" value="1"/>
-           <enum-const name="DBR_FLOAT" value="2"/>
-           <enum-const name="DBR_ENUM" value="3"/>
-           <enum-const name="DBR_CHAR" value="4"/>
-           <enum-const name="DBR_LONG" value="5"/>
-           <enum-const name="DBR_DOUBLE" value="6"/>
-           <enum-const name="DBR_STS_STRING" value="7"/>
-           <enum-const name="DBR_STS_SHORT" value="8"/>
-           <enum-const name="DBR_STS_FLOAT" value="9"/>
-           <enum-const name="DBR_STS_ENUM" value="10"/>
-           <enum-const name="DBR_STS_CHAR" value="11"/>
-           <enum-const name="DBR_STS_LONG" value="12"/>
-           <enum-const name="DBR_STS_DOUBLE" value="13"/>
-           <enum-const name="DBR_TIME_STRING" value="14"/>
-           <enum-const name="DBR_TIME_INT" value="15"/>
-           <enum-const name="DBR_TIME_SHORT" value="15"/>
-           <enum-const name="DBR_TIME_FLOAT" value="16"/>
-           <enum-const name="DBR_TIME_ENUM" value="17"/>
-           <enum-const name="DBR_TIME_CHAR" value="18"/>
-           <enum-const name="DBR_TIME_LONG" value="19"/>
-           <enum-const name="DBR_TIME_DOUBLE" value="20"/>
-           <enum-const name="DBR_GR_STRING" value="21"/>
-           <enum-const name="DBR_GR_SHORT" value="22"/>
-           <enum-const name="DBR_GR_FLOAT" value="23"/>
-           <enum-const name="DBR_GR_ENUM" value="24"/>
-           <enum-const name="DBR_GR_CHAR" value="25"/>
-           <enum-const name="DBR_GR_LONG" value="26"/>
-           <enum-const name="DBR_GR_DOUBLE" value="27"/>
-           <enum-const name="DBR_CTRL_STRING" value="28"/>
-           <enum-const name="DBR_CTRL_SHORT" value="29"/>
-           <enum-const name="DBR_CTRL_FLOAT" value="30"/>
-           <enum-const name="DBR_CTRL_ENUM" value="31"/>
-           <enum-const name="DBR_CTRL_CHAR" value="32"/>
-           <enum-const name="DBR_CTRL_LONG" value="33"/>
-           <enum-const name="DBR_CTRL_DOUBLE" value="34"/>
+        <enum name="DbrTypes">
+            Enum specifying type of DBR structures.
+            <enum-const name="DBR_STRING" value="0"/>
+			<enum-const name="DBR_SHORT" value="1"/>
+			<enum-const name="DBR_FLOAT" value="2"/>
+			<enum-const name="DBR_ENUM" value="3"/>
+			<enum-const name="DBR_CHAR" value="4"/>
+			<enum-const name="DBR_LONG" value="5"/>
+			<enum-const name="DBR_DOUBLE" value="6"/>
+			<enum-const name="DBR_STS_STRING" value="7"/>
+			<enum-const name="DBR_STS_SHORT" value="8"/>
+			<enum-const name="DBR_STS_FLOAT" value="9"/>
+			<enum-const name="DBR_STS_ENUM" value="10"/>
+			<enum-const name="DBR_STS_CHAR" value="11"/>
+			<enum-const name="DBR_STS_LONG" value="12"/>
+			<enum-const name="DBR_STS_DOUBLE" value="13"/>
+			<enum-const name="DBR_TIME_STRING" value="14"/>
+			<enum-const name="DBR_TIME_INT" value="15"/>
+			<enum-const name="DBR_TIME_SHORT" value="15"/>
+			<enum-const name="DBR_TIME_FLOAT" value="16"/>
+			<enum-const name="DBR_TIME_ENUM" value="17"/>
+			<enum-const name="DBR_TIME_CHAR" value="18"/>
+			<enum-const name="DBR_TIME_LONG" value="19"/>
+			<enum-const name="DBR_TIME_DOUBLE" value="20"/>
+			<enum-const name="DBR_GR_STRING" value="21"/>
+			<enum-const name="DBR_GR_SHORT" value="22"/>
+			<enum-const name="DBR_GR_FLOAT" value="23"/>
+			<enum-const name="DBR_GR_ENUM" value="24"/>
+			<enum-const name="DBR_GR_CHAR" value="25"/>
+			<enum-const name="DBR_GR_LONG" value="26"/>
+			<enum-const name="DBR_GR_DOUBLE" value="27"/>
+			<enum-const name="DBR_CTRL_STRING" value="28"/>
+			<enum-const name="DBR_CTRL_SHORT" value="29"/>
+			<enum-const name="DBR_CTRL_FLOAT" value="30"/>
+			<enum-const name="DBR_CTRL_ENUM" value="31"/>
+			<enum-const name="DBR_CTRL_CHAR" value="32"/>
+			<enum-const name="DBR_CTRL_LONG" value="33"/>
+			<enum-const name="DBR_CTRL_DOUBLE" value="34"/>
         </enum>
 
 		<!-- ========================================================================= -->
 		
 		<pstype name="epicsTimeStamp">
+
+           EPICS timestamp type, includes seconds and nanoseconds.
+           EPICS epoch corresponds to 1990-01-01 00:00:00Z.
 			
             <tag name="value-type"/>
         
 			<attribute name="_secPastEpoch" type="uint32_t" accessor="sec">
-			seconds since 00:00 Jan 1, 1990 UTC
+            Seconds since Jan 1, 1990 00:00 UTC
 			</attribute>
 			
 			<attribute name="_nsec" type="uint32_t" accessor="nsec">
-			nanoseconds within second
+			Nanoseconds within second.
 			</attribute>
 			
             <ctor>
@@ -491,12 +508,20 @@
 		
 		<pstype name="EpicsPvHeader">
 
-			<attribute name="_iPvId" type="int16_t" accessor="pvId"/>
-			<attribute name="_iDbrType" type="int16_t" accessor="dbrType"/>
-			<attribute name="_iNumElements" type="int16_t" accessor="numElements"/>
+            Base class for EPICS data types stored in XTC files.
+
+			<attribute name="_iPvId" type="int16_t" accessor="pvId">
+			PV ID number assigned by DAQ.
+			</attribute>
+			<attribute name="_iDbrType" type="int16_t" accessor="dbrType">
+			DBR structure type.
+			</attribute>
+			<attribute name="_iNumElements" type="int16_t" accessor="numElements">
+			Number of elements in EPICS DBR structure
+			</attribute>
 			
 			<method name="print">
-			This method will be implemented separately, it will act as a virtual method.
+			Dumps the content of PV to standard output.
 			</method>
 			
 			<method name="isCtrl" type="uint8_t">
@@ -524,7 +549,11 @@
 		
 		<pstype name="EpicsPvCtrlHeader" base="EpicsPvHeader">
 
-			<attribute name="_sPvName" type="char" shape="iMaxPvNameLength" accessor="pvName"/>
+            Base class for all CTRL-type PV values.
+
+			<attribute name="_sPvName" type="char" shape="iMaxPvNameLength" accessor="pvName">
+			PV name.
+			</attribute>
 
         </pstype>
         
@@ -532,8 +561,10 @@
 		
 		<pstype name="EpicsPvTimeHeader" base="EpicsPvHeader">
 
+            Base class for all TIME-type PV values.
+
 			<method name="stamp" type="epicsTimeStamp">
-				Returns timestamp.
+            EPICS timestamp value.
 			</method>
 
         </pstype>
@@ -541,6 +572,7 @@
 		<!-- ========================================================================= -->
 		
 		<pstype name="EpicsPvCtrlString" base="EpicsPvCtrlHeader">
+		
 			<attribute name="_dbr" type="dbr_sts_string" accessor="dbr"/>
 			<attribute name="_data" type="char" shape="{self}.numElements(), MAX_STRING_SIZE" accessor="data"/>
 			

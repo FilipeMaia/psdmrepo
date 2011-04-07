@@ -3,6 +3,9 @@
 
 <psddl>
 	<package name="Pulnix">
+	
+	
+	    Package containing definitions for Pulnix Camera data types.
 
 		<!-- ========================================================================= -->
 		

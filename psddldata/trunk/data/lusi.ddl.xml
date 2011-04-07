@@ -4,6 +4,9 @@
 <psddl>
 	<package name="Lusi">
 
+        This package and namespace gives access to some feature-extracted parameters 
+        for IPIMB and YAG.
+
 		<!-- ========================================================================= -->
 		
 		<pstype name="DiodeFexConfigV1" version="1" type_id="Id_DiodeFexConfig" pack="4">

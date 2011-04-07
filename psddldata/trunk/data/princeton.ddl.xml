@@ -4,6 +4,8 @@
 <psddl>
 	<package name="Princeton">
 
+    Package containing definitions for Princeton Camera data types.
+
         <!-- ========================================================================= -->
 	
 		

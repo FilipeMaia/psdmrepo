@@ -4,6 +4,8 @@
 <psddl>
 	<package name="Encoder">
 
+        Package containing definitions for Encoder data types.
+
 
 		<!-- ========================================================================= -->
 		
@@ -61,7 +63,9 @@
 		
 		<pstype name="DataV2" version="2" type_id="Id_EncoderData">
 		
-		    <const name="NEncoders" value="3" />
+		    <const name="NEncoders" value="3">
+		    Number of encoders.
+		    </const>
 		
             <attribute name="_33mhz_timestamp" type="uint32_t" accessor="timestamp">
             </attribute>
