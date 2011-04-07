@@ -1,0 +1,4 @@
+#!/bin/sh
+
+psddlc -b psana-doc -I data -O psddl_psana/doc/html -t Psana \
+    -B psana-inc:psddl_psana  psddldata/data/[a-w]*.ddl.xml
