@@ -13,19 +13,34 @@
 namespace PsddlPds {
 namespace Opal1k {
 
-/** Class: ConfigV1
+/** @class ConfigV1
+
   
 */
 
 
 class ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_Opal1kConfig};
-  enum {LUT_Size = 4096};
-  enum {Row_Pixels = 1024};
-  enum {Column_Pixels = 1024};
-  enum {Output_LUT_Size = 4096};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_Opal1kConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    LUT_Size = 4096 /**<  */
+  };
+  enum {
+    Row_Pixels = 1024 /**<  */
+  };
+  enum {
+    Column_Pixels = 1024 /**<  */
+  };
+  enum {
+    Output_LUT_Size = 4096 /**<  */
+  };
+
+  /** Image bit depth modes. */
   enum Depth {
     Eight_bit,
     Ten_bit,
@@ -43,13 +58,25 @@ public:
     VFlip,
     HVFlip,
   };
+  /** offset/pedestal setting for camera (before gain) */
   uint16_t black_level() const {return uint16_t(this->_offsetAndGain & 0xffff);}
+  /** camera gain setting in percentile [100-3200] = [1x-32x] */
   uint16_t gain_percent() const {return uint16_t((this->_offsetAndGain>>16) & 0xffff);}
+  /** bit-depth of pixel counts */
   Opal1k::ConfigV1::Depth output_resolution() const {return Depth(this->_outputOptions & 0xf);}
+  /** vertical re-binning of output (consecutive rows summed) */
   Opal1k::ConfigV1::Binning vertical_binning() const {return Binning((this->_outputOptions>>4) & 0xf);}
+  /** geometric transformation of the image */
   Opal1k::ConfigV1::Mirroring output_mirroring() const {return Mirroring((this->_outputOptions>>8) & 0xf);}
+  /** 1: remap the pixels to appear in natural geometric order 
+	                  (left->right, top->bottom);
+	            0: pixels appear on dual taps from different rows
+	                  (left->right, top->bottom) alternated with
+	                  (left->right, bottom->top) pixel by pixel */
   uint8_t vertical_remapping() const {return uint8_t((this->_outputOptions>>12) & 0x1);}
+  /** correct defective pixels internally */
   uint8_t defect_pixel_correction_enabled() const {return uint8_t((this->_outputOptions>>13) & 0x1);}
+  /** apply output lookup table corrections */
   uint8_t output_lookup_table_enabled() const {return uint8_t((this->_outputOptions>>14) & 0x1);}
   uint32_t number_of_defect_pixels() const {return _defectPixelCount;}
   const uint16_t* output_lookup_table() const {
@@ -62,14 +89,18 @@ public:
     size_t memsize = memptr->_sizeof();
     return *(const Camera::FrameCoord*)((const char*)memptr + (i0)*memsize);
   }
+  /** offset/pedestal value in pixel counts */
   uint16_t output_offset() const;
+  /** bit-depth of pixel counts */
   uint32_t output_resolution_bits() const;
   uint32_t _sizeof() const {return (12+(2*(Output_LUT_Size*this->output_lookup_table_enabled())))+(Camera::FrameCoord::_sizeof()*(this->_defectPixelCount));}
+  /** Method which returns the shape (dimensions) of the data returned by output_lookup_table() method. */
   std::vector<int> output_lookup_table_shape() const;
+  /** Method which returns the shape (dimensions) of the data returned by defect_pixel_coordinates() method. */
   std::vector<int> defect_pixel_coordinates_shape() const;
 private:
-  uint32_t	_offsetAndGain;	/* offset and gain */
-  uint32_t	_outputOptions;	/* bit mask of output formatting options */
+  uint32_t	_offsetAndGain;	/**< offset and gain */
+  uint32_t	_outputOptions;	/**< bit mask of output formatting options */
   uint32_t	_defectPixelCount;
   //uint16_t	_lookup_table[Output_LUT_Size*this->output_lookup_table_enabled()];
   //Camera::FrameCoord	_defectPixels[this->_defectPixelCount];

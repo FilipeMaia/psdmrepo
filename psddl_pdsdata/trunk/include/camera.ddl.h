@@ -12,8 +12,9 @@
 namespace PsddlPds {
 namespace Camera {
 
-/** Class: FrameCoord
-  
+/** @class FrameCoord
+
+  Class representing the coordinates of pixels iside the camera frame.
 */
 
 
@@ -26,35 +27,47 @@ public:
     : _column(arg__column), _row(arg__row)
   {
   }
+  /** Column index (x value). */
   uint16_t column() const {return _column;}
+  /** Row index (y value). */
   uint16_t row() const {return _row;}
   static uint32_t _sizeof()  {return 4;}
 private:
-  uint16_t	_column;
-  uint16_t	_row;
+  uint16_t	_column;	/**< Column index (x value). */
+  uint16_t	_row;	/**< Row index (y value). */
 };
 
-/** Class: FrameFccdConfigV1
-  
+/** @class FrameFccdConfigV1
+
+  This class was never defined/implemented.
 */
 
 
 class FrameFccdConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_FrameFccdConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_FrameFccdConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   static uint32_t _sizeof()  {return 0;}
 };
 
-/** Class: FrameFexConfigV1
-  
+/** @class FrameFexConfigV1
+
+  Class containing configuration data for online frame feature extraction process.
 */
 
 
 class FrameFexConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_FrameFexConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_FrameFexConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   enum Forwarding {
     NoFrame,
     FullFrame,
@@ -66,13 +79,21 @@ public:
     GssRegionOfInterest,
     GssThreshold,
   };
+  /** Forwarding policy for frame data. */
   Camera::FrameFexConfigV1::Forwarding forwarding() const;
+  /** Prescale of events with forwarded frames */
   uint32_t forward_prescale() const {return _forward_prescale;}
+  /** Algorithm to apply to frames to produce processed output. */
   Camera::FrameFexConfigV1::Processing processing() const;
+  /** Coordinate of start of rectangular region of interest (inclusive). */
   const Camera::FrameCoord& roiBegin() const {return _roiBegin;}
+  /** Coordinate of finish of rectangular region of interest (exclusive). */
   const Camera::FrameCoord& roiEnd() const {return _roiEnd;}
+  /** Pixel data threshold value to apply in processing. */
   uint32_t threshold() const {return _threshold;}
+  /** Count of masked pixels to exclude from processing. */
   uint32_t number_of_masked_pixels() const {return _masked_pixel_count;}
+  /** Location of masked pixel coordinates. */
   const Camera::FrameCoord& masked_pixel_coordinates(uint32_t i0) const {
     ptrdiff_t offset=28;
     const Camera::FrameCoord* memptr = (const Camera::FrameCoord*)(((const char*)this)+offset);
@@ -80,54 +101,71 @@ public:
     return *(const Camera::FrameCoord*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return ((((12+(Camera::FrameCoord::_sizeof()))+(Camera::FrameCoord::_sizeof()))+4)+4)+(Camera::FrameCoord::_sizeof()*(this->_masked_pixel_count));}
+  /** Method which returns the shape (dimensions) of the data returned by masked_pixel_coordinates() method. */
   std::vector<int> masked_pixel_shape() const;
 private:
-  uint32_t	_forwarding;	/* frame forwarding policy */
-  uint32_t	_forward_prescale;	/* event prescale for forwarding */
-  uint32_t	_processing;	/* processing algorithm */
-  Camera::FrameCoord	_roiBegin;	/* starting coord of ROI (inclusive) */
-  Camera::FrameCoord	_roiEnd;	/* finishing coord of ROI (exclusive) */
-  uint32_t	_threshold;	/* threshold value for processing pixel data */
-  uint32_t	_masked_pixel_count;	/* count of pixels masked from processing */
-  //Camera::FrameCoord	_masked_pixel_coordinates[this->_masked_pixel_count];	/* finishing coord of ROI (exclusive) */
+  uint32_t	_forwarding;	/**< frame forwarding policy */
+  uint32_t	_forward_prescale;	/**< Prescale of events with forwarded frames */
+  uint32_t	_processing;	/**< algorithm to apply to frames to produce processed output */
+  Camera::FrameCoord	_roiBegin;	/**< Coordinate of start of rectangular region of interest (inclusive). */
+  Camera::FrameCoord	_roiEnd;	/**< Coordinate of finish of rectangular region of interest (exclusive). */
+  uint32_t	_threshold;	/**< Pixel data threshold value to apply in processing. */
+  uint32_t	_masked_pixel_count;	/**< Count of masked pixels to exclude from processing. */
+  //Camera::FrameCoord	_masked_pixel_coordinates[this->_masked_pixel_count];
 };
 
-/** Class: FrameV1
+/** @class FrameV1
+
   
 */
 
 
 class FrameV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_Frame};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_Frame /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  /** Number of pixels in a row. */
   uint32_t width() const {return _width;}
+  /** Number of pixels in a column. */
   uint32_t height() const {return _height;}
+  /** Number of bits per pixel. */
   uint32_t depth() const {return _depth;}
+  /** Fixed offset/pedestal value of pixel data. */
   uint32_t offset() const {return _offset;}
+  /** Pixel data as array of bytes. */
   const uint8_t* data() const {
     ptrdiff_t offset=16;
     return (const uint8_t*)(((const char*)this)+offset);
   }
   uint32_t _sizeof() const {return 16+(1*(this->_width*this->_height*((this->_depth+7)/8)));}
+  /** Method which returns the shape (dimensions) of the data returned by data() method. */
   std::vector<int> data_shape() const;
 private:
-  uint32_t	_width;	/* number of pixels in a row */
-  uint32_t	_height;	/* number of pixels in a column */
-  uint32_t	_depth;	/* number of bits per pixel */
-  uint32_t	_offset;	/* fixed offset/pedestal value of pixel data */
-  //uint8_t	_pixel_data[this->_width*this->_height*((this->_depth+7)/8)];	/* finishing coord of ROI (exclusive) */
+  uint32_t	_width;	/**< Number of pixels in a row. */
+  uint32_t	_height;	/**< Number of pixels in a column. */
+  uint32_t	_depth;	/**< Number of bits per pixel. */
+  uint32_t	_offset;	/**< Fixed offset/pedestal value of pixel data. */
+  //uint8_t	_pixel_data[this->_width*this->_height*((this->_depth+7)/8)];
 };
 
-/** Class: TwoDGaussianV1
+/** @class TwoDGaussianV1
+
   
 */
 
 
 class TwoDGaussianV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_TwoDGaussian};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_TwoDGaussian /**< XTC type ID value (from Pds::TypeId class) */
+  };
   TwoDGaussianV1();
   TwoDGaussianV1(uint64_t arg__integral, double arg__xmean, double arg__ymean, double arg__major_axis_width, double arg__minor_axis_width, double arg__major_axis_tilt);
   uint64_t integral() const {return _integral;}

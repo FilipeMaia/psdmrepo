@@ -13,7 +13,8 @@
 namespace PsddlPds {
 namespace ControlData {
 
-/** Class: PVControl
+/** @class PVControl
+
   
 */
 
@@ -21,8 +22,12 @@ namespace ControlData {
 
 class PVControl {
 public:
-  enum {NameSize = 32};
-  enum {NoArray = 0xFFFFFFFF};
+  enum {
+    NameSize = 32 /**< Length of the name array. */
+  };
+  enum {
+    NoArray = 0xFFFFFFFF /**< Special value used for _index when PV is not an array */
+  };
   PVControl()
   {
   }
@@ -31,20 +36,24 @@ public:
   {
     std::copy(arg__name, arg__name+(32), _name);
   }
+  /** Name of the control. */
   const char* name() const {return &_name[0];}
+  /** Index of the control PV (for arrays) or NoArray. */
   uint32_t index() const {return _index;}
+  /** Value for this control. */
   double value() const {return _value;}
+  /** Returns true if the control is an array. */
   uint8_t array() const;
   static uint32_t _sizeof()  {return ((0+(1*(32)))+4)+8;}
-  std::vector<int> name_shape() const;
 private:
-  char	_name[32];
-  uint32_t	_index;
-  double	_value;
+  char	_name[32];	/**< Name of the control. */
+  uint32_t	_index;	/**< Index of the control PV (for arrays) or NoArray. */
+  double	_value;	/**< Value for this control. */
 };
 #pragma pack(pop)
 
-/** Class: PVMonitor
+/** @class PVMonitor
+
   
 */
 
@@ -52,8 +61,12 @@ private:
 
 class PVMonitor {
 public:
-  enum {NameSize = 32};
-  enum {NoArray = 0xFFFFFFFF};
+  enum {
+    NameSize = 32 /**< Length of the name array. */
+  };
+  enum {
+    NoArray = 0xFFFFFFFF /**< Special value used for _index when PV is not an array */
+  };
   PVMonitor()
   {
   }
@@ -62,39 +75,59 @@ public:
   {
     std::copy(arg__name, arg__name+(32), _name);
   }
+  /** Name of the control. */
   const char* name() const {return &_name[0];}
+  /** Index of the control PV (for arrays) or NoArray. */
   uint32_t index() const {return _index;}
+  /** Lowest value for this monitor. */
   double loValue() const {return _loValue;}
+  /** Highest value for this monitor. */
   double hiValue() const {return _hiValue;}
+  /** Returns true if the monitor is an array. */
   uint8_t array() const;
   static uint32_t _sizeof()  {return (((0+(1*(32)))+4)+8)+8;}
-  std::vector<int> name_shape() const;
 private:
-  char	_name[32];
-  uint32_t	_index;
-  double	_loValue;
-  double	_hiValue;
+  char	_name[32];	/**< Name of the control. */
+  uint32_t	_index;	/**< Index of the control PV (for arrays) or NoArray. */
+  double	_loValue;	/**< Lowest value for this monitor. */
+  double	_hiValue;	/**< Highest value for this monitor. */
 };
 #pragma pack(pop)
 
-/** Class: ConfigV1
+/** @class ConfigV1
+
   
 */
 
 
 class ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_ControlConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_ControlConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  /** Maximum number of events per scan. */
+  uint32_t events() const {return uint32_t(this->_control & 0x3fffffff);}
+  /** returns true if the configuration uses duration control. */
+  uint8_t uses_duration() const {return uint8_t((this->_control>>30) & 0x1);}
+  /** returns true if the configuration uses events limit. */
+  uint8_t uses_events() const {return uint8_t((this->_control>>31) & 0x1);}
+  /** Maximum duration of the scan. */
   const Pds::ClockTime& duration() const {return _duration;}
+  /** Number of PVControl objects in this configuration. */
   uint32_t npvControls() const {return _npvControls;}
+  /** Number of PVMonitor objects in this configuration. */
   uint32_t npvMonitors() const {return _npvMonitors;}
+  /** PVControl configuration objects */
   const ControlData::PVControl& pvControls(uint32_t i0) const {
     ptrdiff_t offset=24;
     const ControlData::PVControl* memptr = (const ControlData::PVControl*)(((const char*)this)+offset);
     size_t memsize = memptr->_sizeof();
     return *(const ControlData::PVControl*)((const char*)memptr + (i0)*memsize);
   }
+  /** PVMonitor configuration objects */
   const ControlData::PVMonitor& pvMonitors(uint32_t i0) const {
     ptrdiff_t offset=24+(44*(this->_npvControls));
     const ControlData::PVMonitor* memptr = (const ControlData::PVMonitor*)(((const char*)this)+offset);
@@ -102,14 +135,16 @@ public:
     return *(const ControlData::PVMonitor*)((const char*)memptr + (i0)*memsize);
   }
   uint32_t _sizeof() const {return (24+(ControlData::PVControl::_sizeof()*(this->_npvControls)))+(ControlData::PVMonitor::_sizeof()*(this->_npvMonitors));}
+  /** Method which returns the shape (dimensions) of the data returned by pvControls() method. */
   std::vector<int> pvControls_shape() const;
+  /** Method which returns the shape (dimensions) of the data returned by pvMonitors() method. */
   std::vector<int> pvMonitors_shape() const;
 private:
   uint32_t	_control;
   uint32_t	_reserved;
-  Pds::ClockTime	_duration;
-  uint32_t	_npvControls;
-  uint32_t	_npvMonitors;
+  Pds::ClockTime	_duration;	/**< Maximum duration of the scan. */
+  uint32_t	_npvControls;	/**< Number of PVControl objects in this configuration. */
+  uint32_t	_npvMonitors;	/**< Number of PVMonitor objects in this configuration. */
   //ControlData::PVControl	_pvControls[this->_npvControls];
   //ControlData::PVMonitor	_pvMonitors[this->_npvMonitors];
 };

@@ -12,59 +12,84 @@
 namespace PsddlPds {
 namespace PNCCD {
 
-/** Class: ConfigV1
+/** @class ConfigV1
+
   pnCCD configuration class ConfigV1
 */
 
 
 class ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_pnCCDconfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_pnCCDconfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  /** Number of links in the pnCCD. */
   uint32_t numLinks() const {return _numLinks;}
+  /** Size of the payload in bytes for single link */
   uint32_t payloadSizePerLink() const {return _payloadSizePerLink;}
   static uint32_t _sizeof()  {return 8;}
 private:
-  uint32_t	_numLinks;	/* Number of links in the pnCCD. */
-  uint32_t	_payloadSizePerLink;	/* Size of the payload in bytes for single link */
+  uint32_t	_numLinks;	/**< Number of links in the pnCCD. */
+  uint32_t	_payloadSizePerLink;	/**< Size of the payload in bytes for single link */
 };
 
-/** Class: ConfigV2
+/** @class ConfigV2
+
   pnCCD configuration class ConfigV2
 */
 
 
 class ConfigV2 {
 public:
-  enum {Version = 2};
-  enum {TypeId = Pds::TypeId::Id_pnCCDconfig};
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_pnCCDconfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  /** Number of links in the pnCCD. */
   uint32_t numLinks() const {return _numLinks;}
+  /** Size of the payload in bytes for single link */
   uint32_t payloadSizePerLink() const {return _payloadSizePerLink;}
+  /** Number of channels */
   uint32_t numChannels() const {return _numChannels;}
+  /** Number of rows */
   uint32_t numRows() const {return _numRows;}
+  /** Number of submodule channels */
   uint32_t numSubmoduleChannels() const {return _numSubmoduleChannels;}
+  /** Number of submodule rows */
   uint32_t numSubmoduleRows() const {return _numSubmoduleRows;}
+  /** Number of submodules */
   uint32_t numSubmodules() const {return _numSubmodules;}
+  /** Magic word from CAMEX */
   uint32_t camexMagic() const {return _camexMagic;}
+  /** Information data string */
   const char* info() const {return &_info[0];}
+  /** Timing file name string */
   const char* timingFName() const {return &_timingFName[0];}
   static uint32_t _sizeof()  {return (32+(1*(256)))+(1*(256));}
+  /** Method which returns the shape (dimensions) of the data returned by info() method. */
   std::vector<int> info_shape() const;
+  /** Method which returns the shape (dimensions) of the data returned by timingFName() method. */
   std::vector<int> timingFName_shape() const;
 private:
-  uint32_t	_numLinks;	/* Number of links in the pnCCD. */
-  uint32_t	_payloadSizePerLink;	/* Size of the payload in bytes for single link */
-  uint32_t	_numChannels;	/* Number of channels */
-  uint32_t	_numRows;	/* Number of rows */
-  uint32_t	_numSubmoduleChannels;	/* Number of submodule channels */
-  uint32_t	_numSubmoduleRows;	/* Number of submodule rows */
-  uint32_t	_numSubmodules;	/* Number of submodules */
-  uint32_t	_camexMagic;	/* Magic word from CAMEX */
-  char	_info[256];	/* Information data string */
-  char	_timingFName[256];	/* Timing file name string */
+  uint32_t	_numLinks;	/**< Number of links in the pnCCD. */
+  uint32_t	_payloadSizePerLink;	/**< Size of the payload in bytes for single link */
+  uint32_t	_numChannels;	/**< Number of channels */
+  uint32_t	_numRows;	/**< Number of rows */
+  uint32_t	_numSubmoduleChannels;	/**< Number of submodule channels */
+  uint32_t	_numSubmoduleRows;	/**< Number of submodule rows */
+  uint32_t	_numSubmodules;	/**< Number of submodules */
+  uint32_t	_camexMagic;	/**< Magic word from CAMEX */
+  char	_info[256];	/**< Information data string */
+  char	_timingFName[256];	/**< Timing file name string */
 };
 
-/** Class: FrameV1
+/** @class FrameV1
+
   pnCCD configuration class FrameV1
 */
 
@@ -73,26 +98,37 @@ class ConfigV2;
 
 class FrameV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_pnCCDframe};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_pnCCDframe /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  /** Special values */
   uint32_t specialWord() const {return _specialWord;}
+  /** Frame number */
   uint32_t frameNumber() const {return _frameNumber;}
+  /** Most significant part of timestamp */
   uint32_t timeStampHi() const {return _timeStampHi;}
+  /** Least significant part of timestamp */
   uint32_t timeStampLo() const {return _timeStampLo;}
+  /** Frame data */
   const uint16_t* data() const {
     ptrdiff_t offset=16;
     return (const uint16_t*)(((const char*)this)+offset);
   }
   static uint32_t _sizeof(const PNCCD::ConfigV1& cfg)  {return 16+(2*((cfg.payloadSizePerLink()-16)/2));}
   static uint32_t _sizeof(const PNCCD::ConfigV2& cfg)  {return 16+(2*((cfg.payloadSizePerLink()-16)/2));}
+  /** Method which returns the shape (dimensions) of the data returned by data() method. */
   std::vector<int> data_shape(const PNCCD::ConfigV1& cfg) const;
+  /** Method which returns the shape (dimensions) of the data returned by data() method. */
   std::vector<int> data_shape(const PNCCD::ConfigV2& cfg) const;
 private:
-  uint32_t	_specialWord;	/* Special values */
-  uint32_t	_frameNumber;	/* Frame number */
-  uint32_t	_timeStampHi;	/* Most significant part of timestamp */
-  uint32_t	_timeStampLo;	/* Least significant part of timestamp */
-  //uint16_t	__data[(cfg.payloadSizePerLink()-16)/2];	/* Frame data */
+  uint32_t	_specialWord;	/**< Special values */
+  uint32_t	_frameNumber;	/**< Frame number */
+  uint32_t	_timeStampHi;	/**< Most significant part of timestamp */
+  uint32_t	_timeStampLo;	/**< Least significant part of timestamp */
+  //uint16_t	__data[(cfg.payloadSizePerLink()-16)/2];
 };
 } // namespace PNCCD
 } // namespace PsddlPds

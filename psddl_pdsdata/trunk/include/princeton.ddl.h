@@ -12,7 +12,8 @@
 namespace PsddlPds {
 namespace Princeton {
 
-/** Class: ConfigV1
+/** @class ConfigV1
+
   
 */
 
@@ -20,8 +21,12 @@ namespace Princeton {
 
 class ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_PrincetonConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   uint32_t width() const {return _uWidth;}
   uint32_t height() const {return _uHeight;}
   uint32_t orgX() const {return _uOrgX;}
@@ -33,7 +38,9 @@ public:
   uint32_t readoutSpeedIndex() const {return _u32ReadoutSpeedIndex;}
   uint16_t readoutEventCode() const {return _u16ReadoutEventCode;}
   uint16_t delayMode() const {return _u16DelayMode;}
+  /** Total size in bytes of the Frame object */
   uint32_t frameSize() const;
+  /** calculate the frame size in pixels based on the current ROI and binning settings */
   uint32_t numPixels() const;
   static uint32_t _sizeof()  {return 40;}
 private:
@@ -51,7 +58,8 @@ private:
 };
 #pragma pack(pop)
 
-/** Class: FrameV1
+/** @class FrameV1
+
   
 */
 
@@ -60,8 +68,12 @@ class ConfigV1;
 
 class FrameV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_PrincetonFrame};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_PrincetonFrame /**< XTC type ID value (from Pds::TypeId class) */
+  };
   uint32_t shotIdStart() const {return _iShotIdStart;}
   float readoutTime() const {return _fReadoutTime;}
   const uint16_t* data() const {
@@ -69,6 +81,7 @@ public:
     return (const uint16_t*)(((const char*)this)+offset);
   }
   static uint32_t _sizeof(const Princeton::ConfigV1& cfg)  {return 8+(2*(cfg.numPixels()));}
+  /** Method which returns the shape (dimensions) of the data returned by data() method. */
   std::vector<int> data_shape(const Princeton::ConfigV1& cfg) const;
 private:
   uint32_t	_iShotIdStart;
@@ -77,15 +90,20 @@ private:
 };
 #pragma pack(pop)
 
-/** Class: InfoV1
+/** @class InfoV1
+
   
 */
 
 
 class InfoV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_PrincetonInfo};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_PrincetonInfo /**< XTC type ID value (from Pds::TypeId class) */
+  };
   InfoV1(float arg__fTemperature)
     : _fTemperature(arg__fTemperature)
   {

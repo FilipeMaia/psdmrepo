@@ -12,7 +12,8 @@
 namespace PsddlPds {
 namespace Ipimb {
 
-/** Class: ConfigV1
+/** @class ConfigV1
+
   
 */
 
@@ -20,8 +21,12 @@ namespace Ipimb {
 
 class ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_IpimbConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_IpimbConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   uint64_t triggerCounter() const {return _triggerCounter;}
   uint64_t serialID() const {return _serialID;}
   uint16_t chargeAmpRange() const {return _chargeAmpRange;}
@@ -54,7 +59,8 @@ private:
 };
 #pragma pack(pop)
 
-/** Class: DataV1
+/** @class DataV1
+
   
 */
 
@@ -62,20 +68,32 @@ private:
 
 class DataV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_IpimbData};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_IpimbData /**< XTC type ID value (from Pds::TypeId class) */
+  };
   uint64_t triggerCounter() const {return _triggerCounter;}
   uint16_t config0() const {return _config0;}
   uint16_t config1() const {return _config1;}
   uint16_t config2() const {return _config2;}
+  /** Raw counts value returned from channel 0. */
   uint16_t channel0() const {return _channel0;}
+  /** Raw counts value returned from channel 1. */
   uint16_t channel1() const {return _channel1;}
+  /** Raw counts value returned from channel 2. */
   uint16_t channel2() const {return _channel2;}
+  /** Raw counts value returned from channel 3. */
   uint16_t channel3() const {return _channel3;}
   uint16_t checksum() const {return _checksum;}
+  /** Value of of channel0() converted to Volts. */
   float channel0Volts() const;
+  /** Value of of channel1() converted to Volts. */
   float channel1Volts() const;
+  /** Value of of channel2() converted to Volts. */
   float channel2Volts() const;
+  /** Value of of channel3() converted to Volts. */
   float channel3Volts() const;
   static uint32_t _sizeof()  {return 24;}
 private:
@@ -83,10 +101,10 @@ private:
   uint16_t	_config0;
   uint16_t	_config1;
   uint16_t	_config2;
-  uint16_t	_channel0;
-  uint16_t	_channel1;
-  uint16_t	_channel2;
-  uint16_t	_channel3;
+  uint16_t	_channel0;	/**< Raw counts value returned from channel 0. */
+  uint16_t	_channel1;	/**< Raw counts value returned from channel 1. */
+  uint16_t	_channel2;	/**< Raw counts value returned from channel 2. */
+  uint16_t	_channel3;	/**< Raw counts value returned from channel 3. */
   uint16_t	_checksum;
 };
 #pragma pack(pop)

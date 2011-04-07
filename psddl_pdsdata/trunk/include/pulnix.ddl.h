@@ -12,17 +12,26 @@
 namespace PsddlPds {
 namespace Pulnix {
 
-/** Class: TM6740ConfigV1
+/** @class TM6740ConfigV1
+
   
 */
 
 
 class TM6740ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_TM6740Config};
-  enum {Row_Pixels = 480};
-  enum {Column_Pixels = 640};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_TM6740Config /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    Row_Pixels = 480 /**<  */
+  };
+  enum {
+    Column_Pixels = 640 /**<  */
+  };
   enum Depth {
     Eight_bit,
     Ten_bit,
@@ -45,6 +54,7 @@ public:
   Pulnix::TM6740ConfigV1::Binning horizontal_binning() const {return Binning((this->_control>>2) & 0x3);}
   Pulnix::TM6740ConfigV1::Binning vertical_binning() const {return Binning((this->_control>>4) & 0x3);}
   Pulnix::TM6740ConfigV1::LookupTable lookuptable_mode() const {return LookupTable((this->_control>>6) & 0x1);}
+  /** bit-depth of pixel counts */
   uint8_t output_resolution_bits() const;
   static uint32_t _sizeof()  {return 12;}
 private:
@@ -53,17 +63,26 @@ private:
   uint32_t	_control;
 };
 
-/** Class: TM6740ConfigV2
+/** @class TM6740ConfigV2
+
   
 */
 
 
 class TM6740ConfigV2 {
 public:
-  enum {Version = 2};
-  enum {TypeId = Pds::TypeId::Id_TM6740Config};
-  enum {Row_Pixels = 480};
-  enum {Column_Pixels = 640};
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_TM6740Config /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    Row_Pixels = 480 /**<  */
+  };
+  enum {
+    Column_Pixels = 640 /**<  */
+  };
   enum Depth {
     Eight_bit,
     Ten_bit,
@@ -86,6 +105,7 @@ public:
   Pulnix::TM6740ConfigV2::Binning horizontal_binning() const {return Binning((this->_control>>2) & 0x3);}
   Pulnix::TM6740ConfigV2::Binning vertical_binning() const {return Binning((this->_control>>4) & 0x3);}
   Pulnix::TM6740ConfigV2::LookupTable lookuptable_mode() const {return LookupTable((this->_control>>6) & 0x1);}
+  /** bit-depth of pixel counts */
   uint8_t output_resolution_bits() const;
   static uint32_t _sizeof()  {return 12;}
 private:

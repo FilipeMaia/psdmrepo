@@ -12,15 +12,20 @@
 namespace PsddlPds {
 namespace Encoder {
 
-/** Class: ConfigV1
+/** @class ConfigV1
+
   
 */
 
 
 class ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_EncoderConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EncoderConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   enum count_mode_type {
     WRAP_FULL,
     LIMIT,
@@ -51,15 +56,20 @@ private:
   uint32_t	_ticks_per_sec;
 };
 
-/** Class: DataV1
+/** @class DataV1
+
   
 */
 
 
 class DataV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_EncoderData};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EncoderData /**< XTC type ID value (from Pds::TypeId class) */
+  };
   uint32_t timestamp() const {return _33mhz_timestamp;}
   uint32_t encoder_count() const {return _encoder_count;}
   static uint32_t _sizeof()  {return 8;}
@@ -68,19 +78,27 @@ private:
   uint32_t	_encoder_count;
 };
 
-/** Class: DataV2
+/** @class DataV2
+
   
 */
 
 
 class DataV2 {
 public:
-  enum {Version = 2};
-  enum {TypeId = Pds::TypeId::Id_EncoderData};
-  enum {NEncoders = 3};
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EncoderData /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    NEncoders = 3 /**< Number of encoders. */
+  };
   uint32_t timestamp() const {return _33mhz_timestamp;}
   const uint32_t* encoder_count() const {return &_encoder_count[0];}
   static uint32_t _sizeof()  {return 4+(4*(NEncoders));}
+  /** Method which returns the shape (dimensions) of the data returned by encoder_count() method. */
   std::vector<int> encoder_count_shape() const;
 private:
   uint32_t	_33mhz_timestamp;

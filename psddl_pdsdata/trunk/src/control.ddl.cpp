@@ -9,26 +9,10 @@ uint8_t
 PVControl::array() const {
   return _index != NoArray;
 }
-std::vector<int> PVControl::name_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(32);
-  return shape;
-}
-
 uint8_t
 PVMonitor::array() const {
   return _index != NoArray;
 }
-std::vector<int> PVMonitor::name_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(32);
-  return shape;
-}
-
 std::vector<int> ConfigV1::pvControls_shape() const
 {
   std::vector<int> shape;

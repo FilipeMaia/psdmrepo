@@ -12,19 +12,32 @@
 namespace PsddlPds {
 namespace FCCD {
 
-/** Class: FccdConfigV1
+/** @class FccdConfigV1
+
   
 */
 
 
 class FccdConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_FccdConfig};
-  enum {Row_Pixels = 500};
-  enum {Column_Pixels = 576};
-  enum {Trimmed_Row_Pixels = 480};
-  enum {Trimmed_Column_Pixels = 480};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_FccdConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    Row_Pixels = 500 /**<  */
+  };
+  enum {
+    Column_Pixels = 576 /**<  */
+  };
+  enum {
+    Trimmed_Row_Pixels = 480 /**<  */
+  };
+  enum {
+    Trimmed_Column_Pixels = 480 /**<  */
+  };
   enum Depth {
     Sixteen_bit = 16,
   };
@@ -42,7 +55,8 @@ private:
   uint16_t	_u16OutputMode;
 };
 
-/** Class: FccdConfigV2
+/** @class FccdConfigV2
+
   
 */
 
@@ -50,14 +64,30 @@ private:
 
 class FccdConfigV2 {
 public:
-  enum {Version = 2};
-  enum {TypeId = Pds::TypeId::Id_FccdConfig};
-  enum {Row_Pixels = 500};
-  enum {Column_Pixels = 576 * 2};
-  enum {Trimmed_Row_Pixels = 480};
-  enum {Trimmed_Column_Pixels = 480};
-  enum {NVoltages = 17};
-  enum {NWaveforms = 15};
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_FccdConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    Row_Pixels = 500 /**<  */
+  };
+  enum {
+    Column_Pixels = 576 * 2 /**<  */
+  };
+  enum {
+    Trimmed_Row_Pixels = 480 /**<  */
+  };
+  enum {
+    Trimmed_Column_Pixels = 480 /**<  */
+  };
+  enum {
+    NVoltages = 17 /**<  */
+  };
+  enum {
+    NWaveforms = 15 /**<  */
+  };
   enum Depth {
     Eight_bit = 8,
     Sixteen_bit = 16,
@@ -80,7 +110,9 @@ public:
   uint32_t trimmedWidth() const;
   uint32_t trimmedHeight() const;
   static uint32_t _sizeof()  {return (8+(4*(NVoltages)))+(2*(NWaveforms));}
+  /** Method which returns the shape (dimensions) of the data returned by dacVoltages() method. */
   std::vector<int> dacVoltages_shape() const;
+  /** Method which returns the shape (dimensions) of the data returned by waveforms() method. */
   std::vector<int> waveforms_shape() const;
 private:
   uint16_t	_outputMode;
