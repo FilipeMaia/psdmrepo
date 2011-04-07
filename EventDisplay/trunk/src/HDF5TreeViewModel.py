@@ -109,10 +109,20 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
 
     def _add_group_to_tree(self, g, parentItem):
         """Adds content of the file/group/dataset iteratively, starting from the sub-groups of g"""
-        for key,val in dict(g).iteritems():
-            subg = val
+
+        d = dict(g)
+        list_keys = sorted(d.keys())
+        list_vals = d.values()
+        #print 'list_keys =', list_keys 
+
+        for key in list_keys:
+        #for key,val in dict(g).iteritems():
+
+            #subg = val
+            subg = d[key]
+
             item = QtGui.QStandardItem(QtCore.QString(key))
-            #print '    ', key, #,"   ", subg.name #, val, subg.len(), type(subg), 
+            #print '    k=', key, #,"   ", subg.name #, val, subg.len(), type(subg), 
             if isinstance(subg, h5py.Dataset):
                 #print " (Dateset)   len =", subg.shape #, subg.dtype
                 item.setIcon(self.icon_data)

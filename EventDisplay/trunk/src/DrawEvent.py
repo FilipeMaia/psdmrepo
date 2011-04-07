@@ -171,7 +171,7 @@ class DrawEvent ( object ) :
         self.openHDF5File() # t=0us
         
         self.eventStart = cp.confpars.eventCurrent
-        self.eventEnd   = cp.confpars.eventCurrent + 10 # This is have changed at 1st call loopOverDataSets
+        self.eventEnd   = cp.confpars.eventCurrent + 1000 # This is have changed at 1st call loopOverDataSets
 
         print 'selectionIsOn =', cp.confpars.selectionIsOn 
 
@@ -231,7 +231,7 @@ class DrawEvent ( object ) :
 
             item_last_name = printh5.get_item_last_name(dsname)
             itemIsForAverage = item_last_name=='image' or    \
-                               item_last_name=='waveform' or \
+                               item_last_name=='waveforms' or \
                                printh5.CSpadIsInTheName(dsname)
 
             if not itemIsForAverage : continue
@@ -479,20 +479,25 @@ class DrawEvent ( object ) :
 
         if item_last_name == 'image' :
 
-            self.figNum += 1 
-            if cp.confpars.imageImageIsOn : 
-                self.plotsImage.plotImage(arr1ev,self.set_fig('1x1',dsname))
-            else : self.close_fig(self.figNum)
+            for self.nwin in range(cp.confpars.imageNWindows) :
 
-            self.figNum += 1 
-            if cp.confpars.imageSpectrumIsOn : 
-                self.plotsImage.plotImageSpectrum(arr1ev,self.set_fig('1x1'))
-            else : self.close_fig(self.figNum)
+                if       cp.confpars.imageWindowParameters[self.nwin][0] == dsname \
+                      or cp.confpars.imageWindowParameters[self.nwin][0] == 'All'  :
 
-            self.figNum += 1 
-            if cp.confpars.imageImageSpecIsOn : 
-                self.plotsImage.plotImageAndSpectrum(arr1ev,self.set_fig('1x2'))
-            else : self.close_fig(self.figNum)
+                    self.figNum += 1 
+                    if cp.confpars.imageImageIsOn : 
+                        self.plotsImage.plotImage(arr1ev,self.set_fig('1x1',dsname))
+                    else : self.close_fig(self.figNum)
+
+                    self.figNum += 1 
+                    if cp.confpars.imageSpectrumIsOn : 
+                        self.plotsImage.plotImageSpectrum(arr1ev,self.set_fig('1x1'))
+                    else : self.close_fig(self.figNum)
+
+                    self.figNum += 1 
+                    if cp.confpars.imageImageSpecIsOn : 
+                        self.plotsImage.plotImageAndSpectrum(arr1ev,self.set_fig('1x2'))
+                    else : self.close_fig(self.figNum)
 
 
 

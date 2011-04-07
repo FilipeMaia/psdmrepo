@@ -290,14 +290,35 @@ class PlotsForCSpad ( object ) :
         self.colb = plt.colorbar(axescb, pad=0.03, orientation=1, fraction=0.10, shrink = 0.86, aspect = 20)#, ticks=coltickslocs #t=0.04s
         plt.title(self.str_event,color='r',fontsize=20) # pars like in class Text
 
-        self.figDet.canvas.mpl_connect('button_press_event',   self.processMouseButtonPressForDetImage)
-        #self.figDet.canvas.mpl_connect('button_release_event', self.processMouseButtonReleaseForDetImage)
-        #self.figDet.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
+        #self.figDet.canvas.mpl_connect('button_press_event',   self.processMouseButtonPressForDetImage)
+        #rect_props=dict(edgecolor='black', linewidth=2, linestyle='dashed', fill=False)
+        #self.figDet.span = RectangleSelector(self.axesDet, self.onRectangleSelect, drawtype='box',rectprops=rect_props)
 
-        rect_props=dict(edgecolor='black', linewidth=2, linestyle='dashed', fill=False)
-        #if not self.figDet.myZoomIsOn :
-        self.figDet.span = RectangleSelector(self.axesDet, self.onRectangleSelect, drawtype='box',rectprops=rect_props)
+        self.figDet.canvas.mpl_connect('button_release_event', self.processMouseButtonReleaseForImage)
 
+
+    def processMouseButtonReleaseForImage(self, event) :
+
+        fig = self.figDet = event.canvas.figure # or plt.gcf()
+        figNum = fig.number 
+        
+        if event.button == 1 :
+            bounds = fig.gca().viewLim.bounds
+            fig.myXmin = Xmin = bounds[0]
+            fig.myXmax = Xmax = bounds[0] + bounds[2] 
+            fig.myYmin = Ymin = bounds[1] + bounds[3]
+            fig.myYmax = Ymax = bounds[1]
+            fig.myZoomIsOn = True
+            #print ' Xmin, Xmax, Ymin, Ymax =', Xmin, Xmax, Ymin, Ymax
+
+        if event.button == 2 or event.button == 3 : # middle or right button
+            fig.myXmin = None
+            fig.myXmax = None
+            fig.myYmin = None
+            fig.myYmax = None
+            self.drawCSpadDetImage()
+            #plt.draw() # redraw the current figure
+            fig.myZoomIsOn = False
 
             
     def onRectangleSelect(self, eclick, erelease) :
@@ -412,6 +433,8 @@ class PlotsForCSpad ( object ) :
 
         t_start = time.clock()
         
+        asicN_vs_plot_posN = {0:9, 1:10, 2:13, 3:14, 4:2, 5:6, 6:1, 7:5, 8:8, 9:7, 10:4, 11:3, 12:12, 13:16, 14:11, 15:15}
+
         #for pair in xrange(8): # loop for pair = 0,1,2,...,7
         for ind in xrange(8): # loop over ind = 0,1,2,...,7
             pair = cs.confcspad.indPairsInQuads[self.quad][ind]
@@ -431,11 +454,9 @@ class PlotsForCSpad ( object ) :
 
             for inpair in xrange(2) :
                 asic = asics[inpair]
-                #print 'asic.shape =', asic.shape
-                plt.subplot(4,4,2*ind+inpair+1)
-                #plt.xticks( arange(4), rotation=17 )
-                #plt.yticks( arange(4) )
-                #plt.hist(asic, bins=50, range=(0,1000))
+                #plt.subplot(4,4,2*ind+inpair+1)
+                plt.subplot(4,4,asicN_vs_plot_posN[2*ind+inpair])
+
                 Amin  = cp.confpars.cspadSpectrumAmin
                 Amax  = cp.confpars.cspadSpectrumAmax
                 plt.hist(asic, bins=cp.confpars.cspadSpectrumNbins,range=(Amin,Amax))
@@ -448,7 +469,7 @@ class PlotsForCSpad ( object ) :
                 pantit='ASIC ' + str(2*ind+inpair)
                 plt.title(pantit,color='r',fontsize=20)
 
-                if ind==0 and inpair==1:
+                if ind==2 and inpair==0:
                     title = 'Event ' + str(cp.confpars.eventCurrent) + '  Quad ' + str(self.quad)
                     #ax = plt.gca()
                     plt.text(0.8,1.08,title,color='b',fontsize=24,transform = plt.gca().transAxes)

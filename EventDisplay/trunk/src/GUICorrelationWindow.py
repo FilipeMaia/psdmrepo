@@ -125,8 +125,8 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.radioGroupZScale.addButton(self.radioLogZ)
         self.radioGroupZScale.addButton(self.radioLinZ)
 
-        if cp.confpars.correlationWindowParameters[self.window][11] : self.radioLogZ.setChecked(True)
-        else :                                                        self.radioLinZ.setChecked(True)
+        self.setZScaleRadioButtons()
+
 
         self.radioVsIndex  = QtGui.QRadioButton('Index')
         self.radioVsTime   = QtGui.QRadioButton('Time' )
@@ -299,10 +299,12 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
 
     def processRadioLogZ(self): 
         cp.confpars.correlationWindowParameters[self.window][11] = True 
+        #self.radioLogZ.setChecked(True)
 
 
     def processRadioLinZ(self): 
         cp.confpars.correlationWindowParameters[self.window][11] = False 
+        #self.radioLinZ.setChecked(True)
 
 
     def processRadioVsIndex(self):
@@ -365,6 +367,13 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         #self.setButCorrXParNameTextAlignment()
         self.setEditFieldsStatusForMode()
 
+
+    def setZScaleRadioButtons(self):
+            if cp.confpars.correlationWindowParameters[self.window][11] :
+                self.radioLogZ.setChecked(True)
+            else :
+                self.radioLinZ.setChecked(True)
+
         
     def setEditFieldsStatusForMode(self):
 
@@ -390,6 +399,7 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
             self.editCorrelationYNBins.setReadOnly(False)
             self.editCorrelationXNBins.setReadOnly(False)
             self.radioLogZ.setCheckable(True)
+            self.setZScaleRadioButtons()
 
         elif cp.confpars.correlationWindowParameters[self.window][2] == 3 :
             self.editCorrelationYNBins.setStyleSheet(self.styleSheetWhite)

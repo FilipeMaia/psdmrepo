@@ -82,15 +82,15 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
         #self.frame.setVisible(True)
 
-        titFont12 = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
+        #titFont12 = QtGui.QFont("Sans Serif", 12, QtGui.QFont.Bold)
         titFont10 = QtGui.QFont("Sans Serif", 10, QtGui.QFont.Bold)
 
-        self.titCSpad            = QtGui.QLabel('CSpad')
+        #self.titCSpad            = QtGui.QLabel('CSpad')
         self.titCSImage          = QtGui.QLabel('Image plot')
         self.titCSSpectrum       = QtGui.QLabel('Spectrum')
-        self.titNWin             = QtGui.QLabel('N detector images:')
+        self.titNWin             = QtGui.QLabel('Number of CSpad images:')
 
-        self.titCSpad      .setFont (titFont12) 
+        #self.titCSpad      .setFont (titFont12) 
         self.titCSImage    .setFont (titFont10)   
         self.titCSSpectrum .setFont (titFont10)
 
@@ -166,8 +166,7 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.wquadpair = guiquadpair.GUISelectQuadAndPair()
 
         hboxCS01 = QtGui.QHBoxLayout()
-        hboxCS01.addWidget(self.titCSpad)        
-        hboxCS01.addStretch(1) 
+        #hboxCS01.addWidget(self.titCSpad)        
         hboxCS01.addWidget(self.titNWin)
         hboxCS01.addWidget(self.butMenuNWin)
         hboxCS01.addStretch(1) 

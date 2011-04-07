@@ -153,6 +153,7 @@ class ConfigParameters ( object ) :
 
         self.imageAmplitudeRaMin  = 0
         self.imageAmplitudeRange  = 500
+
         self.imageImageAmin       = 0    #  15
         self.imageImageAmax       = 100  #  45
         self.imageSpectrumAmin    = 0    #  15
@@ -162,6 +163,18 @@ class ConfigParameters ( object ) :
         self.imageBinWidthIsOn    = True
         self.imageDataset         = 'All'
        #self.imageSpectrumRange   = None # (15,45)
+
+        # Default parameters for Image plots
+
+        self.imageNWindows      = 1
+        self.imageNWindowsMax   = 10 # Maximal number of windows for waveforms which can be opened
+
+        self.imageWindowParameters = []
+        for win in range(self.imageNWindowsMax) :
+            self.imageWindowParameters.append(['All', 0, 100, 0, 100, 100, 1, False, False, False])
+            #[dataset, ImAmin, ImAmax, SpAmin, SpAmax, SpNBins, SpBinWidth, ImALimsIsOn, SpALimsIsOn, SpBinWidthIsOn]
+            #[0,       1,      2,      3,      4,      5,       6,          7,           8,           9]
+
 
         # Default parameters for Waveform plots
 
@@ -177,7 +190,7 @@ class ConfigParameters ( object ) :
 
 
         # Default parameters for Selection algorithms
-        self.selectionNWindows      = 2
+        self.selectionNWindows      = 1
         self.selectionNWindowsMax   = 10 # Maximal number of windows for selection algorithms
 
         self.selectionWindowParameters = []
@@ -292,16 +305,23 @@ class ConfigParameters ( object ) :
         print 'IMAGE_PROJ_R_IS_ON',        self.imageProjRIsOn    
         print 'IMAGE_PROJ_PHI_IS_ON',      self.imageProjPhiIsOn    
 
-        print 'IMAGE_RANGE_AMIN',          self.imageAmplitudeRaMin   
-        print 'IMAGE_RANGE_AMAX',          self.imageAmplitudeRange            
-        print 'IMAGE_IMAGE_AMIN',          self.imageImageAmin        
-        print 'IMAGE_IMAGE_AMAX',          self.imageImageAmax        
-        print 'IMAGE_SPECT_AMIN',          self.imageSpectrumAmin     
-        print 'IMAGE_SPECT_AMAX',          self.imageSpectrumAmax             
-        print 'IMAGE_SPECT_NBINS',         self.imageSpectrumNbins    
-        print 'IMAGE_SPECT_BIN_WIDTH',     self.imageSpectrumBinWidth 
-        print 'IMAGE_BIN_WIDTH_IS_ON',     self.imageBinWidthIsOn     
-        print 'IMAGE_DATASET',             self.imageDataset          
+        print 'IMAGE_N_WINDOWS_MAX',       self.imageNWindowsMax 
+        print 'IMAGE_N_WINDOWS',           self.imageNWindows 
+
+        for win in range(self.imageNWindows) :
+
+            print 'IMAGE_WINDOW_NUMBER',   win 
+            print 'IMAGE_DATASET',         self.imageWindowParameters[win][0] 
+            print 'IMAGE_IMAGE_AMIN',      self.imageWindowParameters[win][1] 
+            print 'IMAGE_IMAGE_AMAX',      self.imageWindowParameters[win][2] 
+            print 'IMAGE_SPECT_AMIN',      self.imageWindowParameters[win][3] 
+            print 'IMAGE_SPECT_AMAX',      self.imageWindowParameters[win][4]         
+            print 'IMAGE_SPECT_NBINS',     self.imageWindowParameters[win][5] 
+            print 'IMAGE_SPECT_BIN_WIDTH', self.imageWindowParameters[win][6] 
+            print 'IMAGE_IM_LIMITS_IS_ON', self.imageWindowParameters[win][7] 
+            print 'IMAGE_SP_LIMITS_IS_ON', self.imageWindowParameters[win][8] 
+            print 'IMAGE_BIN_WIDTH_IS_ON', self.imageWindowParameters[win][9] 
+
 
         print 'READ_PARS_AT_START',        self.readParsFromFileAtStart
 
@@ -420,6 +440,7 @@ class ConfigParameters ( object ) :
         self.__setConfigParsFileName(fname)        
         print 'Read parameters from file:', self._fname
         dicBool = {'false':False, 'true':True}
+        win = 0
         if os.path.exists(self._fname) :
             f=open(self._fname,'r')
             self.list_of_checked_item_names = []
@@ -468,16 +489,21 @@ class ConfigParameters ( object ) :
                 elif key == 'CSPAD_SPECT_BIN_WIDTH'    : self.cspadSpectrumBinWidth   = int(val)
                 elif key == 'CSPAD_BIN_WIDTH_IS_ON'    : self.cspadBinWidthIsOn       = dicBool[val.lower()]
 
-                elif key == 'IMAGE_RANGE_AMIN'         : self.imageAmplitudeRaMin     = int(val)
-                elif key == 'IMAGE_RANGE_AMAX'         : self.imageAmplitudeRange     = int(val)
-                elif key == 'IMAGE_IMAGE_AMIN'         : self.imageImageAmin          = int(val)
-                elif key == 'IMAGE_IMAGE_AMAX'         : self.imageImageAmax          = int(val)
-                elif key == 'IMAGE_SPECT_AMIN'         : self.imageSpectrumAmin       = int(val)
-                elif key == 'IMAGE_SPECT_AMAX'         : self.imageSpectrumAmax       = int(val)
-                elif key == 'IMAGE_SPECT_NBINS'        : self.imageSpectrumNbins      = int(val)
-                elif key == 'IMAGE_SPECT_BIN_WIDTH'    : self.imageSpectrumBinWidth   = int(val)
-                elif key == 'IMAGE_BIN_WIDTH_IS_ON'    : self.imageBinWidthIsOn       = dicBool[val.lower()]
-                elif key == 'IMAGE_DATASET'            : self.imageDataset            = val
+                elif key == 'IMAGE_N_WINDOWS_MAX'      : self.imageNWindowsMax        = int(val)
+                elif key == 'IMAGE_N_WINDOWS'          : self.imageNWindows           = int(val)
+
+                elif key == 'IMAGE_WINDOW_NUMBER'      : win                          = int(val)
+                elif key == 'IMAGE_DATASET'            : self.imageWindowParameters[win][0] = val
+                elif key == 'IMAGE_IMAGE_AMIN'         : self.imageWindowParameters[win][1] = int(val)
+                elif key == 'IMAGE_IMAGE_AMAX'         : self.imageWindowParameters[win][2] = int(val)
+                elif key == 'IMAGE_SPECT_AMIN'         : self.imageWindowParameters[win][3] = int(val)
+                elif key == 'IMAGE_SPECT_AMAX'         : self.imageWindowParameters[win][4] = int(val)
+                elif key == 'IMAGE_SPECT_NBINS'        : self.imageWindowParameters[win][5] = int(val)
+                elif key == 'IMAGE_SPECT_BIN_WIDTH'    : self.imageWindowParameters[win][6] = int(val)
+                elif key == 'IMAGE_IM_LIMITS_IS_ON'    : self.imageWindowParameters[win][7] = dicBool[val.lower()]
+                elif key == 'IMAGE_SP_LIMITS_IS_ON'    : self.imageWindowParameters[win][8] = dicBool[val.lower()]
+                elif key == 'IMAGE_BIN_WIDTH_IS_ON'    : self.imageWindowParameters[win][9] = dicBool[val.lower()]
+
 
                #elif key == 'PER_EVENT_DIST_IS_ON'     : self.perEventDistIsOn        = dicBool[val.lower()]
                 elif key == 'CORRELATIONS_IS_ON'       : self.correlationsIsOn        = dicBool[val.lower()]
@@ -633,16 +659,25 @@ class ConfigParameters ( object ) :
         f.write('CSPAD_SPECT_BIN_WIDTH'     + space + str(self.cspadSpectrumBinWidth)   + '\n')
         f.write('CSPAD_BIN_WIDTH_IS_ON'     + space + str(self.cspadBinWidthIsOn)       + '\n')
                                                                                 
-        f.write('IMAGE_RANGE_AMIN'          + space + str(self.imageAmplitudeRaMin)     + '\n')
-        f.write('IMAGE_RANGE_AMAX'          + space + str(self.imageAmplitudeRange)     + '\n')
-        f.write('IMAGE_IMAGE_AMIN'          + space + str(self.imageImageAmin)          + '\n')
-        f.write('IMAGE_IMAGE_AMAX'          + space + str(self.imageImageAmax)          + '\n')
-        f.write('IMAGE_SPECT_AMIN'          + space + str(self.imageSpectrumAmin)       + '\n')
-        f.write('IMAGE_SPECT_AMAX'          + space + str(self.imageSpectrumAmax)       + '\n')
-        f.write('IMAGE_SPECT_NBINS'         + space + str(self.imageSpectrumNbins)      + '\n')
-        f.write('IMAGE_SPECT_BIN_WIDTH'     + space + str(self.imageSpectrumBinWidth)   + '\n')
-        f.write('IMAGE_BIN_WIDTH_IS_ON'     + space + str(self.imageBinWidthIsOn)       + '\n')
-        f.write('IMAGE_DATASET'             + space + str(self.imageDataset)            + '\n')
+
+        f.write('\n')
+        f.write('IMAGE_N_WINDOWS_MAX'       + space + str(self.imageNWindowsMax)     + '\n')
+        f.write('IMAGE_N_WINDOWS'           + space + str(self.imageNWindows)        + '\n')
+
+        for win in range(self.imageNWindows) :
+            f.write('\n')
+            f.write('IMAGE_WINDOW_NUMBER'  + space + str(win)                                    + '\n')
+            f.write('IMAGE_DATASET'        + space + str(self.imageWindowParameters[win][0] )    + '\n')
+            f.write('IMAGE_IMAGE_AMIN'     + space + str(self.imageWindowParameters[win][1] )    + '\n')
+            f.write('IMAGE_IMAGE_AMAX'     + space + str(self.imageWindowParameters[win][2] )    + '\n')
+            f.write('IMAGE_SPECT_AMIN'     + space + str(self.imageWindowParameters[win][3] )    + '\n')
+            f.write('IMAGE_SPECT_AMAX'     + space + str(self.imageWindowParameters[win][4] )    + '\n')
+            f.write('IMAGE_SPECT_NBINS'    + space + str(self.imageWindowParameters[win][5] )    + '\n')
+            f.write('IMAGE_SPECT_BIN_WIDTH'+ space + str(self.imageWindowParameters[win][6] )    + '\n')
+            f.write('IMAGE_IM_LIMITS_IS_ON'+ space + str(self.imageWindowParameters[win][7] )    + '\n')
+            f.write('IMAGE_SP_LIMITS_IS_ON'+ space + str(self.imageWindowParameters[win][8] )    + '\n')
+            f.write('IMAGE_BIN_WIDTH_IS_ON'+ space + str(self.imageWindowParameters[win][9] )    + '\n')
+
 
        #f.write('PER_EVENT_DIST_IS_ON'      + space + str(self.perEventDistIsOn)        + '\n')
         f.write('CORRELATIONS_IS_ON'        + space + str(self.correlationsIsOn)        + '\n')

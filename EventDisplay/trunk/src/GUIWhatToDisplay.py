@@ -199,7 +199,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.hboxT.addWidget(self.tabBar) 
 
         self.guiTab = wtdCS.GUIWhatToDisplayForCSpad()          
-        self.guiTab.setMinimumHeight(200)
+        self.guiTab.setMinimumHeight(240)
 
         self.hboxD = QtGui.QHBoxLayout()
         self.hboxD.addWidget(self.guiTab)
@@ -294,7 +294,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         #    self.guiTab = QtGui.QLabel('Sorry, this GUI is not implemented yet.\n' + 
         #                               'Will select 1-D parameters for plot vs event number.')
 
-        self.guiTab.setMinimumHeight(200)
+        self.guiTab.setMinimumHeight(240)
         self.hboxD.addWidget(self.guiTab)
         
 
