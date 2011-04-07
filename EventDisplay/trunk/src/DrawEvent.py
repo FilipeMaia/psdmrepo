@@ -533,7 +533,7 @@ class DrawEvent ( object ) :
 
                     self.figNum += 1 
                     if cp.confpars.waveformWaveformIsOn : 
-                        self.plotsWaveform.plotWFWaveform(arr1ev,self.set_fig('2x1'))
+                        self.plotsWaveform.plotWFWaveform(arr1ev,self.set_fig('2x1'),self.h5file)
                     else : self.close_fig(self.figNum)
 
 

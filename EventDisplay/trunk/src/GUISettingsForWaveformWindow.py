@@ -73,8 +73,18 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
         self.titWFDataSet        = QtGui.QLabel('Dataset:')
         self.titWFIndexes        = QtGui.QLabel('WF:    Black')
 
-        self.titWFWaveformAminmax= QtGui.QLabel('Alims:')
-        self.titWFWaveformTminmax= QtGui.QLabel('Tlims:')
+        #self.titWFWaveformAminmax= QtGui.QLabel('Alims:')
+        #self.titWFWaveformTminmax= QtGui.QLabel('Tlims:')
+
+        self.cboxALimits   = QtGui.QCheckBox('A min, max:',self)
+        self.cboxTLimits   = QtGui.QCheckBox('T min, max:',self)
+        self.cboxAUnits    = QtGui.QCheckBox('Use A units (V)',self)
+        self.cboxTUnits    = QtGui.QCheckBox('Use T units (ns)',self)
+
+        if cp.confpars.waveformWindowParameters[self.window][1]&1 : self.cboxALimits.setCheckState(2)
+        if cp.confpars.waveformWindowParameters[self.window][1]&2 : self.cboxTLimits.setCheckState(2)
+        if cp.confpars.waveformWindowParameters[self.window][1]&4 : self.cboxAUnits .setCheckState(2)
+        if cp.confpars.waveformWindowParameters[self.window][1]&8 : self.cboxTUnits .setCheckState(2)
 
         self.char_expand = u'\u25BE' # down-head triangle
         height = 22
@@ -125,34 +135,37 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
         self.editWFWaveformTmin.setMaximumHeight(height)
         self.editWFWaveformTmax.setMaximumHeight(height)
 
-        self.editWFWaveformAmin.setValidator(QtGui.QIntValidator(-1000000,1000000,self))
-        self.editWFWaveformAmax.setValidator(QtGui.QIntValidator(-1000000,1000000,self))
-        self.editWFWaveformTmin.setValidator(QtGui.QIntValidator(0,100000,self))
-        self.editWFWaveformTmax.setValidator(QtGui.QIntValidator(0,100000,self))
+        #self.editWFWaveformAmin.setValidator(QtGui.QDoubleValidator(-1000000,1000000,self))
+        #self.editWFWaveformAmax.setValidator(QtGui.QDoubleValidator(-1000000,1000000,self))
+        #self.editWFWaveformTmin.setValidator(QtGui.QDoubleValidator(0,100000,self))
+        #self.editWFWaveformTmax.setValidator(QtGui.QDoubleValidator(0,100000,self))
 
-        self.setEditFieldsReadOnly(cp.confpars.waveformWindowParameters[self.window][1])
+        self.setAEditFieldsStatus()
+        self.setTEditFieldsStatus()
 
-        self.radioAuto   = QtGui.QRadioButton("Auto range control")
-        self.radioManual = QtGui.QRadioButton("Manual")
-        self.radioGroup  = QtGui.QButtonGroup()
-        self.radioGroup.addButton(self.radioAuto)
-        self.radioGroup.addButton(self.radioManual)
-        if cp.confpars.waveformWindowParameters[self.window][1] : self.radioAuto  .setChecked(True)
-        else :                                                    self.radioManual.setChecked(True)
+        #self.radioAuto   = QtGui.QRadioButton("Auto range control")
+        #self.radioManual = QtGui.QRadioButton("Manual")
+        #self.radioGroup  = QtGui.QButtonGroup()
+        #self.radioGroup.addButton(self.radioAuto)
+        #self.radioGroup.addButton(self.radioManual)
+        #if cp.confpars.waveformWindowParameters[self.window][1] : self.radioAuto  .setChecked(True)
+        #else :                                                    self.radioManual.setChecked(True)
 
 
         gridWF = QtGui.QGridLayout()
         gridWF.addWidget(self.titWFDataSet,        0, 0)
         gridWF.addWidget(self.butWFDataSet,        0, 1, 1, 7)
         gridWF.addWidget(self.titWFIndexes,        1, 0)
-        gridWF.addWidget(self.radioAuto,           2, 0, 1, 3)
-        gridWF.addWidget(self.radioManual,         3, 0)
-        gridWF.addWidget(self.titWFWaveformAminmax,3, 1)
-        gridWF.addWidget(self.editWFWaveformAmin,  3, 2)
-        gridWF.addWidget(self.editWFWaveformAmax,  3, 3)
-        gridWF.addWidget(self.titWFWaveformTminmax,3, 5)
-        gridWF.addWidget(self.editWFWaveformTmin,  3, 6)
-        gridWF.addWidget(self.editWFWaveformTmax,  3, 7)
+
+        gridWF.addWidget(self.cboxAUnits,          2, 0, 1, 3)
+        gridWF.addWidget(self.cboxALimits,         2, 3, 1, 2)
+        gridWF.addWidget(self.editWFWaveformAmin,  2, 5)
+        gridWF.addWidget(self.editWFWaveformAmax,  2, 6)
+
+        gridWF.addWidget(self.cboxTUnits,          3, 0, 1, 3)
+        gridWF.addWidget(self.cboxTLimits,         3, 3, 1, 2)
+        gridWF.addWidget(self.editWFWaveformTmin,  3, 5)
+        gridWF.addWidget(self.editWFWaveformTmax,  3, 6)
 
         gridWF.addWidget(self.butWFInd1,           1, 1)
         gridWF.addWidget(self.titWFInd2,           1, 2)
@@ -173,6 +186,8 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
         #self.connect(self.butClose,            QtCore.SIGNAL('clicked()'),         self.processClose )
         #self.connect(self.cboxWFImage,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFImage)
         #self.connect(self.cboxWFSpectrum,      QtCore.SIGNAL('stateChanged(int)'), self.processCBoxWFSpectrum)
+        #self.connect(self.radioAuto,           QtCore.SIGNAL('clicked()'), self.processRadioAuto    )
+        #self.connect(self.radioManual,         QtCore.SIGNAL('clicked()'), self.processRadioManual  )
 
         self.connect(self.editWFWaveformAmin,  QtCore.SIGNAL('editingFinished ()'), self.processEditWFWaveformAmin )
         self.connect(self.editWFWaveformAmax,  QtCore.SIGNAL('editingFinished ()'), self.processEditWFWaveformAmax )
@@ -184,8 +199,10 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
         self.connect(self.butWFInd3,           QtCore.SIGNAL('clicked()'), self.processMenuWFInd3 )
         self.connect(self.butWFInd4,           QtCore.SIGNAL('clicked()'), self.processMenuWFInd4 )
 
-        self.connect(self.radioAuto,           QtCore.SIGNAL('clicked()'), self.processRadioAuto    )
-        self.connect(self.radioManual,         QtCore.SIGNAL('clicked()'), self.processRadioManual  )
+        self.connect(self.cboxALimits,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxALimits)
+        self.connect(self.cboxTLimits,         QtCore.SIGNAL('stateChanged(int)'), self.processCBoxTLimits)
+        self.connect(self.cboxAUnits,          QtCore.SIGNAL('stateChanged(int)'), self.processCBoxAUnits)
+        self.connect(self.cboxTUnits,          QtCore.SIGNAL('stateChanged(int)'), self.processCBoxTUnits)
         
         self.connect(self.butWFDataSet,        QtCore.SIGNAL('clicked()'), self.processMenuForDataSet )
  
@@ -197,11 +214,41 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
     # Private methods --
     #-------------------
 
+    def getBitStatus(self,bit):
+        return cp.confpars.waveformWindowParameters[self.window][1] & bit
+
+
+    def setBitStatus(self,bit,isOn=True):
+        if isOn:
+            cp.confpars.waveformWindowParameters[self.window][1] |= bit # set bit
+        else:
+            cp.confpars.waveformWindowParameters[self.window][1] ^= bit # clear bit
+        print 'rangeUnitBits =', cp.confpars.waveformWindowParameters[self.window][1]
+
+
+    def processCBoxALimits(self):
+        self.setBitStatus( 1, self.cboxALimits.isChecked() )
+        self.setAEditFieldsStatus()
+
+
+    def processCBoxTLimits(self):
+        self.setBitStatus( 2, self.cboxTLimits.isChecked() )
+        self.setTEditFieldsStatus()
+
+    
+    def processCBoxAUnits(self):
+        self.setBitStatus( 4, self.cboxAUnits.isChecked() )
+
+
+    def processCBoxTUnits(self):
+        self.setBitStatus( 8, self.cboxTUnits.isChecked() )
+
+
     def showToolTips(self):
         # Tips for buttons and fields:
         #self           .setToolTip('This GUI deals with the configuration parameters for waveforms.')
-        self.radioAuto  .setToolTip('Select between Auto and Manual range control.')
-        self.radioManual.setToolTip('Select between Auto and Manual range control.')
+        #self.radioAuto  .setToolTip('Select between Auto and Manual range control.')
+        #self.radioManual.setToolTip('Select between Auto and Manual range control.')
         self.editWFWaveformAmin.setToolTip('This field can be edited for Manual control only.')
         self.editWFWaveformAmax.setToolTip('This field can be edited for Manual control only.')
         self.editWFWaveformTmin.setToolTip('This field can be edited for Manual control only.')
@@ -266,19 +313,30 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
             self.butWFDataSet.setStyleSheet('Text-align:right')
 
 
+    def setAEditFieldsStatus(self):
 
-    def setEditFieldsReadOnly(self, isReadOnly=False):
+        isChecked  = cp.confpars.waveformWindowParameters[self.window][1]&1
+        isReadOnly = not isChecked
 
-        if isReadOnly == True : self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('grey'))
-        else :                  self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('white'))
+        if isReadOnly : self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('grey'))
+        else :          self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('white'))
 
         self.editWFWaveformAmin.setPalette(self.palette)
         self.editWFWaveformAmax.setPalette(self.palette)
-        self.editWFWaveformTmin.setPalette(self.palette)
-        self.editWFWaveformTmax.setPalette(self.palette)
-
         self.editWFWaveformAmin.setReadOnly(isReadOnly)
         self.editWFWaveformAmax.setReadOnly(isReadOnly)
+
+
+    def setTEditFieldsStatus(self):
+
+        isChecked  = cp.confpars.waveformWindowParameters[self.window][1]&2
+        isReadOnly = not isChecked
+
+        if isReadOnly : self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('grey'))
+        else :          self.palette.setColor(QtGui.QPalette.Base,QtGui.QColor('white'))
+        
+        self.editWFWaveformTmin.setPalette(self.palette)
+        self.editWFWaveformTmax.setPalette(self.palette)
         self.editWFWaveformTmin.setReadOnly(isReadOnly)
         self.editWFWaveformTmax.setReadOnly(isReadOnly)
 
@@ -308,16 +366,16 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
 
 
     def processEditWFWaveformAmin(self):
-        cp.confpars.waveformWindowParameters[self.window][2] = int(self.editWFWaveformAmin.displayText())        
+        cp.confpars.waveformWindowParameters[self.window][2] = float(self.editWFWaveformAmin.displayText())        
 
     def processEditWFWaveformAmax(self):
-        cp.confpars.waveformWindowParameters[self.window][3] = int(self.editWFWaveformAmax.displayText())        
+        cp.confpars.waveformWindowParameters[self.window][3] = float(self.editWFWaveformAmax.displayText())        
 
     def processEditWFWaveformTmin(self):
-        cp.confpars.waveformWindowParameters[self.window][4] = int(self.editWFWaveformTmin.displayText())        
+        cp.confpars.waveformWindowParameters[self.window][4] = float(self.editWFWaveformTmin.displayText())        
 
     def processEditWFWaveformTmax(self):
-        cp.confpars.waveformWindowParameters[self.window][5] = int(self.editWFWaveformTmax.displayText())        
+        cp.confpars.waveformWindowParameters[self.window][5] = float(self.editWFWaveformTmax.displayText())        
 
     def processMenuWFInd1(self):
         actionSelected = self.popupMenuForWaveNumber.exec_(QtGui.QCursor.pos())

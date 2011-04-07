@@ -188,8 +188,9 @@ def print_dataset_info(ds):
         print "ds.name         = ", ds.name
         print "ds.dtype        = ", ds.dtype
         print "ds.shape        = ", ds.shape
-        print "ds.shape[0]     = ", ds.shape[0]
         print "len(ds.shape)   = ", len(ds.shape)
+        if len(ds.shape) != 0 :
+            print "ds.shape[0]     = ", ds.shape[0]
 
         # Print data array
         if   len(ds.shape)==1 and ds.shape[0] == 0 : #check if the ds.shape scalar and in not an array 

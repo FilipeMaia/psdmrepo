@@ -185,8 +185,9 @@ class ConfigParameters ( object ) :
 
         self.waveformWindowParameters = []
         for win in range(self.waveformNWindowsMax) :
-            self.waveformWindowParameters.append(['None', True, 0, 1000, 0, 1000, 0, None, None, None, None])
-                        #[dataset, autoRangeIsOn, Amin, Amax, Tmin, Tmax, NumberOfWFInDS, WF1, WF2, WF3, WF4]
+            self.waveformWindowParameters.append(['None', 0, 0, 1000, 0, 1000, 0, None, None, None, None])
+                        #[dataset, rangeUnitsBits, Amin, Amax, Tmin, Tmax, NumberOfWFInDS, WF1, WF2, WF3, WF4]
+        #rangeUnitsBits : 1-ALimits, 2-TLimits, 4-AUnits, 8-TUnits
 
 
         # Default parameters for Selection algorithms
@@ -334,7 +335,7 @@ class ConfigParameters ( object ) :
 
             print 'WAVEF_WINDOW_NUMBER',   win 
             print 'WAVEF_DATASET',         self.waveformWindowParameters[win][0] 
-            print 'WAVEF_AUTO_RANGE_IS_ON',self.waveformWindowParameters[win][1] 
+            print 'WAVEF_RANGE_UNITS_BITS',self.waveformWindowParameters[win][1] 
             print 'WAVEF_AMIN',            self.waveformWindowParameters[win][2] 
             print 'WAVEF_AMAX',            self.waveformWindowParameters[win][3] 
             print 'WAVEF_TMIN',            self.waveformWindowParameters[win][4] 
@@ -513,11 +514,11 @@ class ConfigParameters ( object ) :
 
                 elif key == 'WAVEF_WINDOW_NUMBER'      : win                          = int(val)
                 elif key == 'WAVEF_DATASET'            : self.waveformWindowParameters[win][0] = val
-                elif key == 'WAVEF_AUTO_RANGE_IS_ON'   : self.waveformWindowParameters[win][1] = dicBool[val.lower()]
-                elif key == 'WAVEF_AMIN'               : self.waveformWindowParameters[win][2] = int(val)
-                elif key == 'WAVEF_AMAX'               : self.waveformWindowParameters[win][3] = int(val)
-                elif key == 'WAVEF_TMIN'               : self.waveformWindowParameters[win][4] = int(val)
-                elif key == 'WAVEF_TMAX'               : self.waveformWindowParameters[win][5] = int(val)
+                elif key == 'WAVEF_RANGE_UNITS_BITS'   : self.waveformWindowParameters[win][1] = int(val)
+                elif key == 'WAVEF_AMIN'               : self.waveformWindowParameters[win][2] = float(val)
+                elif key == 'WAVEF_AMAX'               : self.waveformWindowParameters[win][3] = float(val)
+                elif key == 'WAVEF_TMIN'               : self.waveformWindowParameters[win][4] = float(val)
+                elif key == 'WAVEF_TMAX'               : self.waveformWindowParameters[win][5] = float(val)
                 elif key == 'WAVEF_N_WF_IN_DATA_SET'   : self.waveformWindowParameters[win][6] = self.getValIntOrNone(val)
                 elif key == 'WAVEF_IND_WF_IN_BLACK'    : self.waveformWindowParameters[win][7] = self.getValIntOrNone(val)
                 elif key == 'WAVEF_IND_WF_IN_RED'      : self.waveformWindowParameters[win][8] = self.getValIntOrNone(val)
@@ -693,7 +694,7 @@ class ConfigParameters ( object ) :
             f.write('\n')
             f.write('WAVEF_WINDOW_NUMBER'   + space + str(win)                                       + '\n')
             f.write('WAVEF_DATASET'         + space + str(self.waveformWindowParameters[win][0] )    + '\n')
-            f.write('WAVEF_AUTO_RANGE_IS_ON'+ space + str(self.waveformWindowParameters[win][1] )    + '\n')
+            f.write('WAVEF_RANGE_UNITS_BITS'+ space + str(self.waveformWindowParameters[win][1] )    + '\n')
             f.write('WAVEF_AMIN'            + space + str(self.waveformWindowParameters[win][2] )    + '\n')
             f.write('WAVEF_AMAX'            + space + str(self.waveformWindowParameters[win][3] )    + '\n')
             f.write('WAVEF_TMIN'            + space + str(self.waveformWindowParameters[win][4] )    + '\n')
