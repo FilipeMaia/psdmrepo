@@ -9,6 +9,11 @@
 
 namespace psddl_pds2psana {
 namespace Epics {
+Psana::Epics::DbrTypes pds_to_psana(PsddlPds::Epics::DbrTypes e)
+{
+  return Psana::Epics::DbrTypes(e);
+}
+
 Psana::Epics::epicsTimeStamp pds_to_psana(PsddlPds::Epics::epicsTimeStamp pds)
 {
   return Psana::Epics::epicsTimeStamp(pds.sec(), pds.nsec());

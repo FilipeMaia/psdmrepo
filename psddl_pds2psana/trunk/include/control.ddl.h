@@ -21,6 +21,9 @@ public:
   typedef Psana::ControlData::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
+  virtual uint32_t events() const;
+  virtual uint8_t uses_duration() const;
+  virtual uint8_t uses_events() const;
   virtual const Pds::ClockTime& duration() const;
   virtual uint32_t npvControls() const;
   virtual uint32_t npvMonitors() const;

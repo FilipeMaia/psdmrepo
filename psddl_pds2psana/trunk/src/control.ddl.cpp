@@ -44,6 +44,12 @@ ConfigV1::~ConfigV1()
 }
 
 
+uint32_t ConfigV1::events() const { return m_xtcObj->events(); }
+
+uint8_t ConfigV1::uses_duration() const { return m_xtcObj->uses_duration(); }
+
+uint8_t ConfigV1::uses_events() const { return m_xtcObj->uses_events(); }
+
 const Pds::ClockTime& ConfigV1::duration() const { return _duration; }
 
 uint32_t ConfigV1::npvControls() const { return m_xtcObj->npvControls(); }
