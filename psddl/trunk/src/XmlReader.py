@@ -64,6 +64,12 @@ _enum_const_tag = 'enum-const'
 # Exported definitions --
 #------------------------
 
+def _cmpFiles(f1, f2):
+    """Brute force file compare"""
+    c1 = file(f1).read()
+    c2 = file(f2).read()
+    return c1 == c2
+
 #---------------------
 #  Class definition --
 #---------------------
@@ -77,11 +83,17 @@ class XmlReader ( object ) :
         self.files = xmlfiles
         self.inc_dir = inc_dir
         
-        self.included = []
+        self.processed = []
 
     #-------------------
     #  Public methods --
     #-------------------
+
+    def _processed(self, file):
+        for f in self.processed:
+            if _cmpFiles(file, f):
+                return True
+        return False
 
     def read( self ) :
 
@@ -90,6 +102,8 @@ class XmlReader ( object ) :
         self._initTypes(model)
 
         for file in self.files:
+            if self._processed(file): continue 
+            logging.debug("XmlReader.read: opening file %s", file)
             self._readFile( file, model, False )
 
         # return the model
@@ -98,6 +112,9 @@ class XmlReader ( object ) :
 
     def _readFile( self, file, model, included ) :
         """Parse XML tree and return the list of packages"""
+
+        # remember current file name 
+        self.location = file
 
         # read element tree from file
         et = ET.parse(file)
@@ -119,24 +136,36 @@ class XmlReader ( object ) :
                 
             elif topel.tag == 'use' : 
                 
-                self._parseUse(topel, model, included)
+                self._parseUse(topel, model)
                 
             else:
                 
                 raise TypeError('Unexpected element in the root document: '+repr(topel.tag))
 
+        self.processed.append(file)
 
 
-    def _parseUse(self, useel, model, included):
+    def _parseUse(self, useel, model):
 
         file = useel.get('file')
         headers = useel.get('cpp_headers','').split()
-        
-        if file in self.included :
+
+        logging.debug("XmlReader._parseUse: locating include file %s", file)
+        path = self._findInclude(file)
+
+        # if this file was processed already just skip it
+        if self._processed(path):
             logging.debug("XmlReader._parseUse: file %s was already included", file)
             return
 
-        logging.debug("XmlReader._parseUse: locating file %s", file)
+        # if the include file is in the list of regular files then process it as regular file
+        included = True
+        for f in self.files:
+            if f not in self.processed and _cmpFiles(path, f) :
+                included = False
+                break
+
+        logging.debug("XmlReader._parseUse: locating include file %s", file)
         path = self._findInclude(file)
         if path is None:
             raise ValueError("Cannot find include file: "+file)
@@ -145,7 +174,7 @@ class XmlReader ( object ) :
         model.use.append(dict(file=file, cpp_headers=headers))
 
         logging.debug("XmlReader._parseUse: reading file %s", path)
-        self._readFile( path, model, True )
+        self._readFile( path, model, included )
 
     def _parsePackage(self, pkgel, model, included):
         
@@ -158,7 +187,9 @@ class XmlReader ( object ) :
         for name in pkgname.split('.'):
             obj = pkg.localName(name)
             if obj is None:
-                pkg = Package(name, pkg)
+                pkg = Package(name, pkg, 
+                              comment = pkgel.text.strip(),
+                              tags = self._tags(pkgel))
             else:
                 # make sure that existing name is a package
                 if not isinstance(obj, Package):
@@ -210,7 +241,8 @@ class XmlReader ( object ) :
                     comment = typeel.text.strip(),
                     tags = self._tags(typeel),
                     package = pkg,
-                    included = included )
+                    included = included,
+                    location = self.location )
 
         # get attributes
         for propel in list(typeel) :
@@ -428,14 +460,14 @@ class XmlReader ( object ) :
         if not cname: raise ValueError('const element missing name')
         cval = constel.get('value')
         if not cval: raise ValueError('const element missing value')
-        Constant(cname, cval, parent, included=included)
+        Constant(cname, cval, parent, included=included, comment = (constel.text or "").strip())
             
     def _parseEnum(self, enumel, parent, included):
         
-        enum = Enum(enumel.get('name'), parent, included=included)
+        enum = Enum(enumel.get('name'), parent, included=included, comment = (enumel.text or "").strip())
         for econst in list(enumel):
             if econst.tag != _enum_const_tag : raise ValueError('expecting %s tag'%_enum_const_tag)
-            Constant(econst.get('name'), econst.get('value'), enum)
+            Constant(econst.get('name'), econst.get('value'), enum, comment = (econst.text or "").strip())
 
     def _findInclude(self, inc):
         

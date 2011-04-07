@@ -180,17 +180,20 @@ class DdlPdsdata ( object ) :
 
     def _genConst(self, const):
         
-        print >>self.inc, "  enum {%s = %s};" % (const.name, const.value)
+        print >>self.inc, "  enum {\n    %s = %s /**< %s */\n  };" % \
+                (const.name, const.value, const.comment)
 
     def _genEnum(self, enum):
-        
+
+        if enum.comment: print >>self.inc, "\n  /** %s */" % (enum.comment)
         print >>self.inc, "  enum %s {" % (enum.name or "",)
         for const in enum.constants() :
             val = ""
             if const.value is not None : val = " = " + const.value
-            print >>self.inc, "    %s%s," % (const.name, val)
+            doc = ""
+            if const.comment: doc = ' /**< %s */' % const.comment
+            print >>self.inc, "    %s%s,%s" % (const.name, val, doc)
         print >>self.inc, "  };"
-
 
 #
 #  In case someone decides to run this module

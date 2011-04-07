@@ -63,6 +63,7 @@ class Constant ( object ) :
         self.value = value
         self.parent = parent
         self.included = kw.get('included')
+        self.comment = kw.get('comment', '')
 
         if self.parent: self.parent.add(self)
     

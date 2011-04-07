@@ -61,8 +61,13 @@ class Enum ( Namespace ) :
         Namespace.__init__(self, name, parent)
 
         self.included = kw.get('included')
+        self.comment = kw.get('comment', '')
         
         self.basic = True
+
+    @property
+    def external(self):
+        return 'external' in self.tags
 
     def __str__(self):
         res = "<Enum(" + self.name

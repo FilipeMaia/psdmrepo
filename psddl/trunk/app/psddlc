@@ -42,6 +42,7 @@ from LusiPython.LusiPyApp import LusiPyApp
 #-----------------------------
 from psddl.XmlReader import XmlReader
 from psddl.DdlPds2Psana import DdlPds2Psana
+from psddl.DdlPsanaDoc import DdlPsanaDoc
 from psddl.DdlPsanaInterfaces import DdlPsanaInterfaces
 from psddl.DdlPdsdata import DdlPdsdata
 
@@ -133,6 +134,8 @@ class psddlc ( LusiPyApp ) :
             if self._options.header_dir: header = os.path.join(self._options.header_dir, header)
             if self._options.output_dir: source = os.path.join(self._options.output_dir, source)
             generator = DdlPsanaInterfaces(header, source, backend_options)
+        elif self._options.backend == "psana-doc" :
+            generator = DdlPsanaDoc(self._options.output_dir, backend_options)
         elif self._options.backend == "pds2psana" :
             if not header : header = os.path.splitext(base)[0] + '.h'
             if not source : source = os.path.splitext(base)[0] + '.cpp'

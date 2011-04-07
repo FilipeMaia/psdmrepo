@@ -104,7 +104,7 @@ class CppTypeCodegen ( object ) :
         logging.debug("CppTypeCodegen.codegen: type=%s", repr(self._type))
 
         # class-level comment
-        print >>self._inc, "\n/** Class: %s\n  %s\n*/\n" % (self._type.name, self._type.comment)
+        print >>self._inc, "\n/** @class %s\n\n  %s\n*/\n" % (self._type.name, self._type.comment)
 
         # declare config classes if needed
         for cfg in self._type.xtcConfig:
@@ -125,8 +125,12 @@ class CppTypeCodegen ( object ) :
 
         # enums for version and typeId
         access = self._access("public", access)
-        if self._type.version is not None: print >>self._inc, "  enum {Version = %s};" % self._type.version
-        if self._type.type_id is not None: print >>self._inc, "  enum {TypeId = Pds::TypeId::%s};" % self._type.type_id
+        if self._type.version is not None: 
+            doc = '/**< XTC type version number */'
+            print >>self._inc, "  enum {\n    Version = %s %s\n  };" % (self._type.version, doc)
+        if self._type.type_id is not None: 
+            doc = '/**< XTC type ID value (from Pds::TypeId class) */'
+            print >>self._inc, "  enum {\n    TypeId = Pds::TypeId::%s %s\n  };" % (self._type.type_id, doc)
 
         # enums for constants
         access = self._access("public", access)
@@ -192,15 +196,19 @@ class CppTypeCodegen ( object ) :
         
     def _genConst(self, const):
         
-        print >>self._inc, "  enum {%s = %s};" % (const.name, const.value)
+        print >>self._inc, "  enum {\n    %s = %s /**< %s */\n  };" % \
+                (const.name, const.value, const.comment)
 
     def _genEnum(self, enum):
         
+        if enum.comment: print >>self._inc, "\n  /** %s */" % (enum.comment)
         print >>self._inc, "  enum %s {" % (enum.name or "",)
         for const in enum.constants() :
             val = ""
             if const.value is not None : val = " = " + const.value
-            print >>self._inc, "    %s%s," % (const.name, val)
+            doc = ""
+            if const.comment: doc = ' /**< %s */' % const.comment
+            print >>self._inc, "    %s%s,%s" % (const.name, val, doc)
         print >>self._inc, "  };"
 
     def _genAttrDecl(self, attr):
@@ -210,20 +218,22 @@ class CppTypeCodegen ( object ) :
         
         def _dims(shape):
             return ''.join(['[%s]'%d for d in shape.dims])
+
+        doc = ""
+        if attr.comment : doc = "\t/**< %s */" % attr.comment.strip()
         
         if not attr.shape :
             if attr.isfixed():
-                decl = "  %s\t%s;" % (_typename(attr.type), attr.name)
+                decl = "  %s\t%s;%s" % (_typename(attr.type), attr.name, doc)
             else:
                 decl = "  //%s\t%s;" % (_typename(attr.type), attr.name)
         else:
             if attr.isfixed():
                 dim = _interpolate(_dims(attr.shape), attr.parent)
-                decl = "  %s\t%s%s;" % (_typename(attr.type), attr.name, dim)
+                decl = "  %s\t%s%s;%s" % (_typename(attr.type), attr.name, dim, doc)
             else :
                 dim = _interpolate(_dims(attr.shape), attr.parent)
                 decl = "  //%s\t%s%s;" % (_typename(attr.type), attr.name, dim)
-        if attr.comment : decl += "\t/* %s */" % attr.comment.strip()
         print >>self._inc, decl
 
     def _genPubAttrMethod(self, attr):
@@ -240,7 +250,7 @@ class CppTypeCodegen ( object ) :
             
             # attribute is a regular non-array object, 
             # return value or reference depending on what type it is
-            self._genMethodExpr(attr.name, _typedecl(attr.type), attr.name, inline=True)
+            self._genMethodExpr(attr.name, _typedecl(attr.type), attr.name, inline=True, doc=attr.comment)
                 
         else:
 
@@ -249,11 +259,12 @@ class CppTypeCodegen ( object ) :
             if attr.type.basic:
                 rettype = "const "+_typename(attr.type)+'*'
                 expr = '&' + attr.name + '[0]'*len(attr.shape.dims)
-                self._genMethodExpr(attr.name, rettype, expr, inline=True)
+                self._genMethodExpr(attr.name, rettype, expr, inline=True, doc=attr.comment)
             else:
                 rettype = _typedecl(attr.type)
                 expr = attr.name + _dimexpr(attr.shape)
-                self._genMethodExpr(attr.name, rettype, expr, args=_dimargs(attr.shape, self._type), inline=True)
+                self._genMethodExpr(attr.name, rettype, expr, 
+                    args=_dimargs(attr.shape, self._type), inline=True, doc=attr.comment)
 
 
     def _genMethDecl(self, meth):
@@ -276,7 +287,7 @@ class CppTypeCodegen ( object ) :
                 
                 # attribute is a regular non-array object, 
                 # return value or reference depending on what type it is
-                self._genMethodExpr(meth.name, _typedecl(attr.type), attr.name, inline=True)
+                self._genMethodExpr(meth.name, _typedecl(attr.type), attr.name, inline=True, doc=meth.comment)
                     
             else:
 
@@ -285,11 +296,12 @@ class CppTypeCodegen ( object ) :
                 if attr.type.basic:
                     rettype = "const "+_typename(attr.type)+'*'
                     expr = '&' + attr.name + '[0]'*len(attr.shape.dims)
-                    self._genMethodExpr(meth.name, rettype, expr, inline=True)
+                    self._genMethodExpr(meth.name, rettype, expr, inline=True, doc=meth.comment)
                 else:
                     rettype = _typedecl(attr.type)
                     expr = attr.name + _dimexpr(attr.shape)
-                    self._genMethodExpr(meth.name, rettype, expr, args=_dimargs(attr.shape, self._type), inline=True)
+                    self._genMethodExpr(meth.name, rettype, expr, 
+                        args=_dimargs(attr.shape, self._type), inline=True, doc=meth.comment)
 
         elif meth.bitfield:
 
@@ -307,11 +319,11 @@ class CppTypeCodegen ( object ) :
 
                 for cfg in meth.parent.xtcConfig:
                     args = [('cfg', cfg)]
-                    self._genMethodExpr(meth.name, _typename(meth.type), expr, args)
+                    self._genMethodExpr(meth.name, _typename(meth.type), expr, args, doc=meth.comment)
 
             else:
                 
-                self._genMethodExpr(meth.name, _typename(meth.type), expr, inline=True)
+                self._genMethodExpr(meth.name, _typename(meth.type), expr, inline=True, doc=meth.comment)
 
         else:
 
@@ -343,14 +355,14 @@ class CppTypeCodegen ( object ) :
 
                 for cfg in meth.parent.xtcConfig:
                     args = [('cfg', cfg)] + meth.args
-                    self._genMethodExpr(meth.name, type, expr, args, inline, static=meth.static)
+                    self._genMethodExpr(meth.name, type, expr, args, inline, static=meth.static, doc=meth.comment)
 
             else:
                 
-                self._genMethodExpr(meth.name, type, expr, meth.args, inline, static=meth.static)
+                self._genMethodExpr(meth.name, type, expr, meth.args, inline, static=meth.static, doc=meth.comment)
 
 
-    def _genMethodExpr(self, methname, rettype, expr, args=[], inline=False, static=False):
+    def _genMethodExpr(self, methname, rettype, expr, args=[], inline=False, static=False, doc=None):
         
         # make argument list
         argsspec = [_argdecl(*arg) for arg in args]
@@ -366,12 +378,14 @@ class CppTypeCodegen ( object ) :
 
         if self._abs and not static:
             # abstract method declaration
+            if doc: print >>self._inc, '  /** %s */' % doc
             print >>self._inc, "  virtual %s %s(%s) const = 0;" % (rettype, methname, argsspec)
         else:
             
             if not expr:
 
                 # declaration only, implementation provided somewhere else
+                if doc: print >>self._inc, '  /** %s */' % doc
                 print >>self._inc, "  %s%s %s(%s) %s;" % (static, rettype, methname, argsspec, const)
 
             else:
@@ -379,8 +393,10 @@ class CppTypeCodegen ( object ) :
                 if rettype == "void":
                     
                     if inline:
+                        if doc: print >>self._inc, '  /** %s */' % doc
                         print >>self._inc, "  %s%s %s(%s) %s {%s;}" % (static, rettype, methname, argsspec, const, expr)
                     else:
+                        if doc: print >>self._inc, '  /** %s */' % doc
                         print >>self._inc, "  %s%s %s(%s) %s;" % (static, rettype, methname, argsspec, const)
                         print >>self._cpp, "%s\n%s::%s(%s) %s {\n  %s;\n}" % \
                                 (rettype, self._type.name, methname, argsspec, const, expr)
@@ -388,9 +404,11 @@ class CppTypeCodegen ( object ) :
                 else:
                     
                     if inline:
+                        if doc: print >>self._inc, '  /** %s */' % doc
                         print >>self._inc, "  %s%s %s(%s) %s {return %s;}" % \
                                 (static, rettype, methname, argsspec, const, expr)
                     else:
+                        if doc: print >>self._inc, '  /** %s */' % doc
                         print >>self._inc, "  %s%s %s(%s) %s;" % (static, rettype, methname, argsspec, const)
                         print >>self._cpp, "%s\n%s::%s(%s) %s {\n  return %s;\n}" % \
                                 (rettype, self._type.name, methname, argsspec, const, expr)
@@ -404,6 +422,8 @@ class CppTypeCodegen ( object ) :
         offset = _interpolate(offset, attr.parent)
         logging.debug("_genAccessMethod: cfgNeeded: %s", cfgNeeded)
 
+        doc = attr.comment
+
         args = _dimargs(attr.shape, attr.parent)
         rettype = _typedecl(attr.type)
         
@@ -416,6 +436,7 @@ class CppTypeCodegen ( object ) :
                 argstr = ""
             else:
                 argstr = ', '.join([_argdecl(*x) for x in args])
+            if doc: print >>self._inc, '  /** %s */' % doc
             print >>self._inc, "  virtual %s %s(%s) const = 0;" % (rettype, methname, argstr)
 
         elif attr.type.basic:
@@ -429,6 +450,7 @@ class CppTypeCodegen ( object ) :
                 args = ''
                 if cfg : args = _argdecl('cfg', cfg)
             
+                if doc: print >>self._inc, '  /** %s */' % doc
                 print >>self._inc, "  const %s* %s(%s) const {" % (rettype, methname, args)
                 print >>self._inc, "    ptrdiff_t offset=%s;" % (offset,)
                 print >>self._inc, "    return (const %s*)(((const char*)this)+offset);" % (rettype,)  
@@ -457,6 +479,7 @@ class CppTypeCodegen ( object ) :
                     argstr = ', '.join([_argdecl(*x) for x in args])
                 typename = _typename(attr.type)
 
+                if doc: print >>self._inc, '  /** %s */' % doc
                 print >>self._inc, "  const %s& %s(%s) const {" % (typename, methname, argstr)
                 print >>self._inc, "    const char* memptr = ((const char*)this)+%s;" % (offset,)
                 print >>self._inc, "    for (uint32_t i=0; i != i0; ++ i) {"
@@ -490,6 +513,7 @@ class CppTypeCodegen ( object ) :
                     argstr = ', '.join([_argdecl(*x) for x in args])
                 typename = _typename(attr.type)
 
+                if doc: print >>self._inc, '  /** %s */' % doc
                 print >>self._inc, "  const %s& %s(%s) const {" % (typename, methname, argstr)
                 print >>self._inc, "    ptrdiff_t offset=%s;" % (offset,)
                 print >>self._inc, "    const %s* memptr = (const %s*)(((const char*)this)+offset);" % (typename, typename)
@@ -619,8 +643,15 @@ class CppTypeCodegen ( object ) :
 
         if not attr.shape_method: return 
 
+        if attr.accessor:
+            doc = "Method which returns the shape (dimensions) of the data returned by %s() method." % \
+                    attr.accessor.name
+        else:
+            doc = "Method which returns the shape (dimensions) of the data member %s." % attr.name
+
         if self._abs:
         
+            print >>self._inc, "  /** %s */" % doc
             print >>self._inc, "  virtual std::vector<int> %s() const = 0;" % (attr.shape_method)
         
         else:
@@ -639,7 +670,9 @@ class CppTypeCodegen ( object ) :
             else:
                 args = ['']
                 
-            for arg in args:    
+            for arg in args:
+                
+                print >>self._inc, "  /** %s */" % doc
                 print >>self._inc, "  std::vector<int> %s(%s) const;" % (attr.shape_method, arg)
                 print >>self._cpp, "std::vector<int> %s::%s(%s) const\n{" % (self._type.name, attr.shape_method, arg)
                 print >>self._cpp, "  std::vector<int> shape;" 

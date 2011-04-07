@@ -79,7 +79,8 @@ class Attribute ( object ) :
         self.shape_method = None
         if self.shape:
             if kw.get('shape_method') :
-                self.shape_method = kw.get('shape_method')
+                if kw.get('shape_method') != "None" :
+                    self.shape_method = kw.get('shape_method')
             elif kw.get('accessor_name') :
                 self.shape_method = kw.get('accessor_name') + '_shape'
             else:

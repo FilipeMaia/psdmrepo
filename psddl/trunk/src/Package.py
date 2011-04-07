@@ -56,10 +56,12 @@ class Package ( Namespace ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, name, parent = None) :
+    def __init__ ( self, name, parent = None, **kw) :
         
         Namespace.__init__(self, name, parent)
         
+        self.comment = kw.get('comment')
+        self.tags = kw.get('tags', {}).copy()
         self.use = []
 
     @property
@@ -70,18 +72,31 @@ class Package ( Namespace ) :
             if not const.included :
                 return False
 
-        # regular enums
-        for enum in self.enums() :
-            if not enum.included :
-                return False
-
-        # loop over packages and types
+        # loop over packages, enums and types
         for ns in self.namespaces() :
             if not ns.included:
                 return False
 
         return True
 
+    @property
+    def external(self):
+        if 'external' in self.tags : return True
+        if self._parent: return self._parent.external
+        return False
+    
+    def fullName(self, lang=None, topNs=None):
+        if self.external: topNs = None
+        sep = {'C++' : '::'}.get(lang, '.')
+        name = self.name
+        if lang == 'C++' and 'c++-name' in self.tags: name = self.tags['c++-name']
+        if self._parent: 
+            parent = self._parent.fullName(lang, topNs)
+            if parent: 
+                name = parent + sep + name
+            elif topNs:
+                name = topNs + sep + name
+        return name
     
     def __str__(self):
         return "<Package(" + self.name + ")>"

@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""DDL parser which generates pdsdata C++ code.
+"""DDL parser which generates psana C++ interfaces.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -181,15 +181,19 @@ class DdlPsanaInterfaces ( object ) :
 
     def _genConst(self, const):
         
-        print >>self.inc, "  enum {%s = %s};" % (const.name, const.value)
+        print >>self.inc, "  enum {\n    %s = %s /**< %s */\n  };" % \
+                (const.name, const.value, const.comment)
 
     def _genEnum(self, enum):
         
+        if enum.comment: print >>self.inc, "\n  /** %s */" % (enum.comment)
         print >>self.inc, "  enum %s {" % (enum.name or "",)
         for const in enum.constants() :
             val = ""
             if const.value is not None : val = " = " + const.value
-            print >>self.inc, "    %s%s," % (const.name, val)
+            doc = ""
+            if const.comment: doc = ' /**< %s */' % const.comment
+            print >>self.inc, "    %s%s,%s" % (const.name, val, doc)
         print >>self.inc, "  };"
 
 

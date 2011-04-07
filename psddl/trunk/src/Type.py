@@ -76,6 +76,7 @@ class Type ( Namespace ) :
         self.pack = kw.get('pack')
         if self.pack : self.pack = int(self.pack)
         self.included = kw.get('included')
+        self.location = kw.get('location')
         self.base = kw.get('base')
         self.tags = kw.get('tags', {}).copy()
 
@@ -100,15 +101,13 @@ class Type ( Namespace ) :
 
     @property
     def external(self):
-        return 'external' in self.tags
+        if 'external' in self.tags : return True
+        if self._parent: return self._parent.external
+        return False
 
     @property
     def value_type(self):
         return 'value-type' in self.tags
-
-    def fullName(self, lang=None, topNs=None):
-        if self.external: topNs = None
-        return Namespace.fullName(self, lang, topNs)
 
     def fullName(self, lang=None, topNs=None):
         if self.external: topNs = None
