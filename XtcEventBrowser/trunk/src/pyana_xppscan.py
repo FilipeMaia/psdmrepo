@@ -263,8 +263,8 @@ class pyana_xppscan (object) :
         logging.info( "pyana_xppscan.endrun() called" )
         print "End run %d had %d calibcycles " % (self.n_runs, self.n_ccls)
 
-        self.get_limits(fignum=2, suptitle="Click to select limits")
-        self.make_plots(fignum=1, suptitle="All in one")        
+        self.get_limits_channelhist(fignum=2)
+        #self.make_plots(fignum=1, suptitle="All in one")        
 
 
     def endjob( self, env ) :
@@ -279,51 +279,298 @@ class pyana_xppscan (object) :
     def filtvec(self, vec,lims):
         return ((vec>min(lims))&(vec<max(lims)))
 
-    def get_limits(self, fignum=1, suptitle=""):
+    def get_limits_correlation(self, fignum=1, suptitle="Diagnostics: correlation"):
 
         plt.clf()
-
         fig = plt.figure(num=fignum, figsize=(10,10))
         fig.suptitle(suptitle)
+        
+        nplots = 2 * len(self.ipimb_addresses)
+        ncols = 1
+        nrows = 1
+        if nplots == 2: ncols = 2
+        if nplots == 3: ncols = 3
+        if nplots == 4: ncols = 2; nrows = 2
+        if nplots > 4:
+            ncols = 3
+            nrows = nplots / 3
+            if nplots%3 > 0 : nrows += 1
 
+        height=3.5
+        if nrows * 3.5 > 14 : height = 14/nrows
+        width=height*1.3
+        print "width, height = ", width, height
+        print "Have %d variables to be plotted, layout = %d x %d" % (nplots, nrows,ncols)
+                
+        pos = 0
         lims = np.zeros((4,2),dtype="float")
         for addr in self.ipimb_addresses :
 
             channels = np.float_(self.fex_channels[addr])
 
-            ax2 = fig.add_subplot(1,2,1)
+            pos+=1
+            ax2 = fig.add_subplot(nrows,ncols,pos)
             xaxis = np.arange( 0, len(self.fex_channels[addr]) )
             plt.loglog(channels[:,0],channels[:,1],'o')
             plt.xlabel('Channel0')
             plt.ylabel('Channel1')
             plt.title(addr)
-        
-            ax3 = fig.add_subplot(1,2,2)
-            xaxis = np.arange( 0, len(self.fex_channels[addr]) )
-            plt.loglog(channels[:,2],channels[:,3],'o')
-            plt.xlabel('Channel0')
-            plt.ylabel('Channel1')
-            plt.title(addr)
+            plt.draw()
 
+            print "Select limits for Channel 0 and 1 of ", addr
             plt.axes(ax2)
             plt.hold(True)
             lims[0:2,:] = plt.ginput(2)
             fbool = (self.filtvec(channels[:,0],lims[0:2,0]))&self.filtvec(channels[:,1],lims[0:2,1])
             plt.loglog(channels[fbool,0],channels[fbool,1],'or')
+            plt.draw()
+            print "indexes that pass filter: ", np.where(fbool==True)
+            
+        
+            pos+=1
+            ax3 = fig.add_subplot(nrows,ncols,pos)
+            xaxis = np.arange( 0, len(self.fex_channels[addr]) )
+            plt.loglog(channels[:,2],channels[:,3],'o')
+            plt.xlabel('Channel2')
+            plt.ylabel('Channel3')
+            plt.title(addr)
+            plt.draw()
 
+            print "Select limits for Channel 2 and 3 of ", addr
             plt.axes(ax3)
             plt.hold(True)
             lims[2:4,:] = plt.ginput(2)
             fbool = (self.filtvec(channels[:,2],lims[2:4,0]))&self.filtvec(channels[:,3],lims[2:4,1])
             plt.loglog(channels[fbool,2],channels[fbool,3],'or')
+            plt.draw()            
+            print "indexes that pass filter: ", np.where(fbool==True)
+            
+        plt.draw()
+        
+            
+    def get_limits_corrfrac(self, fignum=1, suptitle="Diagnostics: corrfrac"):
 
-            print np.shape(lims[0:2,:]), np.shape(lims[2:4,:])
-            print lims
-            print lims[0:2,:]
-            print lims[2:4,:]
+        plt.clf()
+        fig = plt.figure(num=fignum, figsize=(10,10))
+        fig.suptitle(suptitle)
+        
+        nplots = 2 * len(self.ipimb_addresses)
+        ncols = 1
+        nrows = 1
+        if nplots == 2: ncols = 2
+        if nplots == 3: ncols = 3
+        if nplots == 4: ncols = 2; nrows = 2
+        if nplots > 4:
+            ncols = 3
+            nrows = nplots / 3
+            if nplots%3 > 0 : nrows += 1
+
+        height=3.5
+        if nrows * 3.5 > 14 : height = 14/nrows
+        width=height*1.3
+        print "width, height = ", width, height
+        print "Have %d variables to be plotted, layout = %d x %d" % (nplots, nrows,ncols)
+                
+        pos = 0
+        lims = np.zeros((4,2),dtype="float")
+        for addr in self.ipimb_addresses :
+
+            channels = np.float_(self.fex_channels[addr])
+
+            ax1 = fig.add_subplot(2,2,1)
+            plt.loglog(channels[:,0],channels[:,1]/channels[:,0],'o')
+            plt.xlabel('Channel0')
+            plt.ylabel('Channel1/Channel0')
+            plt.title(addr)
+            plt.axvline(np.mean( channels[:,0] ))
+            a1xlim = np.log10( plt.xlim() )
+
+            a1N = fig.add_subplot(2,2,2)
+            histv = np.logspace(a1xlim[0],a1xlim[1], np.round( channels[:,0].size / 50 ))
+            N1plot, bin_edges1 = np.histogram(channels[:,0],bins=histv)
+            plt.semilogx(bin_edges1[0:N1plot.size],N1plot,'k')
+            plt.xlabel("Channel0")
+            plt.ylabel('N')
+            plt.draw()
+
+            ax2 = fig.add_subplot(2,2,3)
+            plt.loglog(channels[:,2],channels[:,3]/channels[:,2],'o')
+            plt.xlabel('Channel2')
+            plt.ylabel('Channel3/Channel2')
+            plt.title(addr)            
+            plt.axvline(np.mean( channels[:,2] ))
+            a2xlim = np.log10( plt.xlim() )
+
+            a2N = fig.add_subplot(2,2,4)
+            histv = np.logspace(a2xlim[0],a2xlim[1],np.round( channels[:,2].size / 50 ))
+            N2plot, bin_edges2 = np.histogram( channels[:,2],bins=histv )
+            plt.semilogx(bin_edges2[0:N2plot.size],N2plot,'k')
+            plt.xlabel('Channel2')
+            plt.ylabel('N')
+
+            print "Select limits for Channel 0 and 1 of ", addr
+            plt.axes(ax1)
+            plt.hold(True)
+            lims[0:2,:] = plt.ginput(2)
+            fbool = (self.filtvec(channels[:,0],lims[0:2,0]))&self.filtvec(channels[:,1],lims[0:2,1])
+            plt.loglog(channels[fbool,0],channels[fbool,1],'or')
+            plt.draw()
+
+            print "Select limits for Channel 2 and 3 of ", addr
+            plt.axes(ax2)
+            plt.hold(True)
+            lims[2:4,:] = plt.ginput(2)
+            fbool = (self.filtvec(channels[:,2],lims[2:4,0]))&self.filtvec(channels[:,3],lims[2:4,1])
+            plt.loglog(channels[fbool,2],channels[fbool,3],'or')
+            plt.draw()            
+            
+            
+        plt.draw()
+        
+
+    def getSTDMEANfrac_from_startpoint(self,x,y,x0):
+        """Get fraction std/mean of y
+        x = ch0
+        y = ch1/ch0
+        x0 = mean(ch0)
+        iP are those indices for which x > x0
+        iN are those indices for which x < x0
+        """
+        ind = np.argsort(x)
+        xn = x[ind] #sorted according to x
+        yn = y[ind] #sorted according to x
+
+        frac = np.zeros(np.shape(yn))
+        
+        iP = (xn>x0) #array of True's and False's. 
+        iN = (xn<x0) #array of True's and False's. 
+
+        yP = yn[iP] # y, sorted according to x, and only for values where x > x0
+        yN = yn[iN] # y, sorted according to x, and only for values where x < x0
+
+        indx_xpos = np.nonzero(iP)[0] # indexes of x for which x>x0
+        indx_xneg = np.nonzero(iN)[0] # indexes of x for which x<x0
+
+        firstindexP = indx_xpos[0]  # first index of sorted x where x>x0
+        lastindexN  = indx_xneg[-1] #  last index of sorted x where x<x0
+        
+        for n in range (0,len(yP)):
+            frac[firstindexP+n] = np.std(yP[0:n])/np.mean(yP[0:n]);
+
+            
+        for n in range (0,len(yN)):
+            frac[lastindexN-n] = np.std(yN[-(1+n):])/np.mean(yN[-(1+n):]);
+
+        return xn,frac 
+
+
+    def get_limits_automatic(self, fignum=1, suptitle="Diagnostics: automatic"):
+
+        plt.clf()
+        fig = plt.figure(num=fignum, figsize=(10,10))
+        fig.suptitle(suptitle)
+        
+        nplots = 2 * len(self.ipimb_addresses)
+        ncols = 1
+        nrows = 1
+        if nplots == 2: ncols = 2
+        if nplots == 3: ncols = 3
+        if nplots == 4: ncols = 2; nrows = 2
+        if nplots > 4:
+            ncols = 3
+            nrows = nplots / 3
+            if nplots%3 > 0 : nrows += 1
+
+        height=3.5
+        if nrows * 3.5 > 14 : height = 14/nrows
+        width=height*1.3
+        print "width, height = ", width, height
+        print "Have %d variables to be plotted, layout = %d x %d" % (nplots, nrows,ncols)
+                
+        pos = 0
+        lims = np.zeros((4,2),dtype="float")
+        for addr in self.ipimb_addresses :
+
+            channels = np.float_(self.fex_channels[addr])
+
+            ax1 = fig.add_subplot(1,3,1)
+            plt.loglog(channels[:,0],channels[:,1]/channels[:,0],'o')
+            plt.axvline(np.mean( channels[:,0] )) # draw vertical line
+            plt.xlabel('Channel0')
+            plt.ylabel('Channel1/Channel0')
+            plt.title(addr)
+
+            ax2 = fig.add_subplot(1,3,2)
+            plt.loglog(channels[:,2],channels[:,3]/channels[:,2],'o')
+            plt.axvline(np.mean( channels[:,2] )) # draw vertical line
+            plt.xlabel('Channel2')
+            plt.ylabel('Channel3/Channel2')
+            plt.title(addr)            
+
+            xn, frac = self.getSTDMEANfrac_from_startpoint(channels[:,0],
+                                                           channels[:,1]/channels[:,0],
+                                                           np.mean(channels[:,0]) )
+            
+            ax3 = fig.add_subplot(1,3,3)
+            plt.plot(xn, frac,'o-')
+            plt.show()
 
         plt.draw()
         
+
+    def get_limits_channelhist(self, fignum=1, suptitle="Diagnostics: channelhist"):
+
+        fig = plt.figure(num=fignum, figsize=(10,10))
+        plt.clf()
+        fig.suptitle(suptitle)
+        
+        nplots = 2 * len(self.ipimb_addresses)
+        ncols = 1
+        nrows = 1
+        if nplots == 2: ncols = 2
+        if nplots == 3: ncols = 3
+        if nplots == 4: ncols = 2; nrows = 2
+        if nplots > 4:
+            ncols = 3
+            nrows = nplots / 3
+            if nplots%3 > 0 : nrows += 1
+
+        height=3.5
+        if nrows * 3.5 > 14 : height = 14/nrows
+        width=height*1.3
+        print "width, height = ", width, height
+        print "Have %d variables to be plotted, layout = %d x %d" % (nplots, nrows,ncols)
+                
+        pos = 0
+        lims = np.zeros((4,2),dtype="float")
+        for addr in self.ipimb_addresses :
+
+            channels = np.float_(self.fex_channels[addr])
+            plt.hold(True)
+            for chNO in range (0, 4):
+                tN, tx, patches = plt.hist(channels[:,chNO], len(channels[:,chNO])/100)
+                plt.plot(tx[0:tN.size],tN,'.',label="Channel%d"%chNO)
+                
+            plt.legend(loc=2)
+            plt.title(addr)
+            plt.draw()
+
+            print 'Select lower and upper limit of all 4 channels, reverse order in case channel is bad'
+            for chNO in range (0, 4):
+                tN, tx, patches = plt.hist(channels[:,chNO], len(channels[:,chNO])/100)
+                tph = plt.plot(tx[0:tN.size],tN,'.',label="Channel%d"%chNO)
+                print "expecting input"
+                tlim = plt.ginput(2)
+                plt.draw()
+
+            print "show"
+            plt.show()            
+
+            
+        #print "draw"
+        #plt.draw()
+        
+
 
     def make_plots(self, fignum=1, suptitle=""):
 

@@ -11,7 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-2011-Apr-6 ofte               rev 1769
+2011-Apr-7 ofte               rev 1784
+        - Almost done implementing the xpp IPMdiagnostics functionality. 
+	
+2011-Apr-6 ofte               rev 1770
 	- added XtcEventBrowser/src/pyana_xppscan.py as a testing module 
 	  for adding XPP matlab functionality. Will add to pyana_scan whatever 
 	  works well / seems general enough. 
