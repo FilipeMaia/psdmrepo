@@ -10,8 +10,9 @@
 namespace Psana {
 namespace Camera {
 
-/** Class: FrameCoord
-  
+/** @class FrameCoord
+
+  Class representing the coordinates of pixels iside the camera frame.
 */
 
 
@@ -24,35 +25,47 @@ public:
     : _column(arg__column), _row(arg__row)
   {
   }
+  /** Column index (x value). */
   uint16_t column() const {return _column;}
+  /** Row index (y value). */
   uint16_t row() const {return _row;}
   static uint32_t _sizeof()  {return 4;}
 private:
-  uint16_t	_column;
-  uint16_t	_row;
+  uint16_t	_column;	/**< Column index (x value). */
+  uint16_t	_row;	/**< Row index (y value). */
 };
 
-/** Class: FrameFccdConfigV1
-  
+/** @class FrameFccdConfigV1
+
+  This class was never defined/implemented.
 */
 
 
 class FrameFccdConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_FrameFccdConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_FrameFccdConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~FrameFccdConfigV1();
 };
 
-/** Class: FrameFexConfigV1
-  
+/** @class FrameFexConfigV1
+
+  Class containing configuration data for online frame feature extraction process.
 */
 
 
 class FrameFexConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_FrameFexConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_FrameFexConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   enum Forwarding {
     NoFrame,
     FullFrame,
@@ -65,44 +78,69 @@ public:
     GssThreshold,
   };
   virtual ~FrameFexConfigV1();
+  /** Forwarding policy for frame data. */
   virtual Camera::FrameFexConfigV1::Forwarding forwarding() const = 0;
+  /** Prescale of events with forwarded frames */
   virtual uint32_t forward_prescale() const = 0;
+  /** Algorithm to apply to frames to produce processed output. */
   virtual Camera::FrameFexConfigV1::Processing processing() const = 0;
+  /** Coordinate of start of rectangular region of interest (inclusive). */
   virtual const Camera::FrameCoord& roiBegin() const = 0;
+  /** Coordinate of finish of rectangular region of interest (exclusive). */
   virtual const Camera::FrameCoord& roiEnd() const = 0;
+  /** Pixel data threshold value to apply in processing. */
   virtual uint32_t threshold() const = 0;
+  /** Count of masked pixels to exclude from processing. */
   virtual uint32_t number_of_masked_pixels() const = 0;
+  /** Location of masked pixel coordinates. */
   virtual const Camera::FrameCoord& masked_pixel_coordinates(uint32_t i0) const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by masked_pixel_coordinates() method. */
   virtual std::vector<int> masked_pixel_shape() const = 0;
 };
 
-/** Class: FrameV1
+/** @class FrameV1
+
   
 */
 
 
 class FrameV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_Frame};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_Frame /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~FrameV1();
+  /** Number of pixels in a row. */
   virtual uint32_t width() const = 0;
+  /** Number of pixels in a column. */
   virtual uint32_t height() const = 0;
+  /** Number of bits per pixel. */
   virtual uint32_t depth() const = 0;
+  /** Fixed offset/pedestal value of pixel data. */
   virtual uint32_t offset() const = 0;
+  /** Pixel data as array of bytes. */
   virtual const uint8_t* data() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by data() method. */
   virtual std::vector<int> data_shape() const = 0;
 };
 
-/** Class: TwoDGaussianV1
+/** @class TwoDGaussianV1
+
   
 */
 
 
 class TwoDGaussianV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_TwoDGaussian};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_TwoDGaussian /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~TwoDGaussianV1();
   virtual uint64_t integral() const = 0;
   virtual double xmean() const = 0;

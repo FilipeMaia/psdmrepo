@@ -10,15 +10,20 @@
 namespace Psana {
 namespace Ipimb {
 
-/** Class: ConfigV1
+/** @class ConfigV1
+
   
 */
 
 
 class ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_IpimbConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_IpimbConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~ConfigV1();
   virtual uint64_t triggerCounter() const = 0;
   virtual uint64_t serialID() const = 0;
@@ -35,28 +40,41 @@ public:
   virtual uint32_t trigDelay() const = 0;
 };
 
-/** Class: DataV1
+/** @class DataV1
+
   
 */
 
 
 class DataV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_IpimbData};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_IpimbData /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~DataV1();
   virtual uint64_t triggerCounter() const = 0;
   virtual uint16_t config0() const = 0;
   virtual uint16_t config1() const = 0;
   virtual uint16_t config2() const = 0;
+  /** Raw counts value returned from channel 0. */
   virtual uint16_t channel0() const = 0;
+  /** Raw counts value returned from channel 1. */
   virtual uint16_t channel1() const = 0;
+  /** Raw counts value returned from channel 2. */
   virtual uint16_t channel2() const = 0;
+  /** Raw counts value returned from channel 3. */
   virtual uint16_t channel3() const = 0;
   virtual uint16_t checksum() const = 0;
+  /** Value of of channel0() converted to Volts. */
   virtual float channel0Volts() const = 0;
+  /** Value of of channel1() converted to Volts. */
   virtual float channel1Volts() const = 0;
+  /** Value of of channel2() converted to Volts. */
   virtual float channel2Volts() const = 0;
+  /** Value of of channel3() converted to Volts. */
   virtual float channel3Volts() const = 0;
 };
 } // namespace Ipimb

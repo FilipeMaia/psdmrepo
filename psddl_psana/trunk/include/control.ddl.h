@@ -11,7 +11,8 @@
 namespace Psana {
 namespace ControlData {
 
-/** Class: PVControl
+/** @class PVControl
+
   
 */
 
@@ -19,8 +20,12 @@ namespace ControlData {
 
 class PVControl {
 public:
-  enum {NameSize = 32};
-  enum {NoArray = 0xFFFFFFFF};
+  enum {
+    NameSize = 32 /**< Length of the name array. */
+  };
+  enum {
+    NoArray = 0xFFFFFFFF /**< Special value used for _index when PV is not an array */
+  };
   PVControl()
   {
   }
@@ -29,20 +34,24 @@ public:
   {
     std::copy(arg__name, arg__name+(32), _name);
   }
+  /** Name of the control. */
   const char* name() const {return &_name[0];}
+  /** Index of the control PV (for arrays) or NoArray. */
   uint32_t index() const {return _index;}
+  /** Value for this control. */
   double value() const {return _value;}
+  /** Returns true if the control is an array. */
   uint8_t array() const;
   static uint32_t _sizeof()  {return ((0+(1*(32)))+4)+8;}
-  std::vector<int> name_shape() const;
 private:
-  char	_name[32];
-  uint32_t	_index;
-  double	_value;
+  char	_name[32];	/**< Name of the control. */
+  uint32_t	_index;	/**< Index of the control PV (for arrays) or NoArray. */
+  double	_value;	/**< Value for this control. */
 };
 #pragma pack(pop)
 
-/** Class: PVMonitor
+/** @class PVMonitor
+
   
 */
 
@@ -50,8 +59,12 @@ private:
 
 class PVMonitor {
 public:
-  enum {NameSize = 32};
-  enum {NoArray = 0xFFFFFFFF};
+  enum {
+    NameSize = 32 /**< Length of the name array. */
+  };
+  enum {
+    NoArray = 0xFFFFFFFF /**< Special value used for _index when PV is not an array */
+  };
   PVMonitor()
   {
   }
@@ -60,37 +73,59 @@ public:
   {
     std::copy(arg__name, arg__name+(32), _name);
   }
+  /** Name of the control. */
   const char* name() const {return &_name[0];}
+  /** Index of the control PV (for arrays) or NoArray. */
   uint32_t index() const {return _index;}
+  /** Lowest value for this monitor. */
   double loValue() const {return _loValue;}
+  /** Highest value for this monitor. */
   double hiValue() const {return _hiValue;}
+  /** Returns true if the monitor is an array. */
   uint8_t array() const;
   static uint32_t _sizeof()  {return (((0+(1*(32)))+4)+8)+8;}
-  std::vector<int> name_shape() const;
 private:
-  char	_name[32];
-  uint32_t	_index;
-  double	_loValue;
-  double	_hiValue;
+  char	_name[32];	/**< Name of the control. */
+  uint32_t	_index;	/**< Index of the control PV (for arrays) or NoArray. */
+  double	_loValue;	/**< Lowest value for this monitor. */
+  double	_hiValue;	/**< Highest value for this monitor. */
 };
 #pragma pack(pop)
 
-/** Class: ConfigV1
+/** @class ConfigV1
+
   
 */
 
 
 class ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_ControlConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_ControlConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~ConfigV1();
+  /** Maximum number of events per scan. */
+  virtual uint32_t events() const = 0;
+  /** returns true if the configuration uses duration control. */
+  virtual uint8_t uses_duration() const = 0;
+  /** returns true if the configuration uses events limit. */
+  virtual uint8_t uses_events() const = 0;
+  /** Maximum duration of the scan. */
   virtual const Pds::ClockTime& duration() const = 0;
+  /** Number of PVControl objects in this configuration. */
   virtual uint32_t npvControls() const = 0;
+  /** Number of PVMonitor objects in this configuration. */
   virtual uint32_t npvMonitors() const = 0;
+  /** PVControl configuration objects */
   virtual const ControlData::PVControl& pvControls(uint32_t i0) const = 0;
+  /** PVMonitor configuration objects */
   virtual const ControlData::PVMonitor& pvMonitors(uint32_t i0) const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by pvControls() method. */
   virtual std::vector<int> pvControls_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by pvMonitors() method. */
   virtual std::vector<int> pvMonitors_shape() const = 0;
 };
 } // namespace ControlData

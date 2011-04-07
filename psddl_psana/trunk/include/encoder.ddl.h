@@ -10,15 +10,20 @@
 namespace Psana {
 namespace Encoder {
 
-/** Class: ConfigV1
+/** @class ConfigV1
+
   
 */
 
 
 class ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_EncoderConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EncoderConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   enum count_mode_type {
     WRAP_FULL,
     LIMIT,
@@ -42,33 +47,46 @@ public:
   virtual uint32_t ticks_per_sec() const = 0;
 };
 
-/** Class: DataV1
+/** @class DataV1
+
   
 */
 
 
 class DataV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_EncoderData};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EncoderData /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~DataV1();
   virtual uint32_t timestamp() const = 0;
   virtual uint32_t encoder_count() const = 0;
 };
 
-/** Class: DataV2
+/** @class DataV2
+
   
 */
 
 
 class DataV2 {
 public:
-  enum {Version = 2};
-  enum {TypeId = Pds::TypeId::Id_EncoderData};
-  enum {NEncoders = 3};
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EncoderData /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    NEncoders = 3 /**< Number of encoders. */
+  };
   virtual ~DataV2();
   virtual uint32_t timestamp() const = 0;
   virtual const uint32_t* encoder_count() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by encoder_count() method. */
   virtual std::vector<int> encoder_count_shape() const = 0;
 };
 } // namespace Encoder

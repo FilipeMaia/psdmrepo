@@ -10,7 +10,8 @@
 namespace Psana {
 namespace Lusi {
 
-/** Class: DiodeFexConfigV1
+/** @class DiodeFexConfigV1
+
   
 */
 
@@ -18,9 +19,15 @@ namespace Lusi {
 
 class DiodeFexConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_DiodeFexConfig};
-  enum {NRANGES = 3};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_DiodeFexConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    NRANGES = 3 /**<  */
+  };
   DiodeFexConfigV1()
   {
   }
@@ -32,7 +39,9 @@ public:
   const float* base() const {return &_base[0];}
   const float* scale() const {return &_scale[0];}
   static uint32_t _sizeof()  {return (0+(4*(NRANGES)))+(4*(NRANGES));}
+  /** Method which returns the shape (dimensions) of the data returned by base() method. */
   std::vector<int> base_shape() const;
+  /** Method which returns the shape (dimensions) of the data returned by scale() method. */
   std::vector<int> scale_shape() const;
 private:
   float	_base[NRANGES];
@@ -40,7 +49,8 @@ private:
 };
 #pragma pack(pop)
 
-/** Class: DiodeFexV1
+/** @class DiodeFexV1
+
   
 */
 
@@ -48,8 +58,12 @@ private:
 
 class DiodeFexV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_DiodeFex};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_DiodeFex /**< XTC type ID value (from Pds::TypeId class) */
+  };
   DiodeFexV1(float arg__value)
     : _value(arg__value)
   {
@@ -61,24 +75,33 @@ private:
 };
 #pragma pack(pop)
 
-/** Class: IpmFexConfigV1
+/** @class IpmFexConfigV1
+
   
 */
 
 
 class IpmFexConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_IpmFexConfig};
-  enum {NCHANNELS = 4};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_IpmFexConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    NCHANNELS = 4 /**<  */
+  };
   virtual ~IpmFexConfigV1();
   virtual const Lusi::DiodeFexConfigV1& diode(uint32_t i0) const = 0;
   virtual float xscale() const = 0;
   virtual float yscale() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by diode() method. */
   virtual std::vector<int> diode_shape() const = 0;
 };
 
-/** Class: IpmFexV1
+/** @class IpmFexV1
+
   
 */
 
@@ -86,9 +109,15 @@ public:
 
 class IpmFexV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_IpmFex};
-  enum {NCHANNELS = 4};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_IpmFex /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    NCHANNELS = 4 /**<  */
+  };
   IpmFexV1(const float* arg__channel, float arg__sum, float arg__xpos, float arg__ypos)
     : _sum(arg__sum), _xpos(arg__xpos), _ypos(arg__ypos)
   {
@@ -99,6 +128,7 @@ public:
   float xpos() const {return _xpos;}
   float ypos() const {return _ypos;}
   static uint32_t _sizeof()  {return (((0+(4*(NCHANNELS)))+4)+4)+4;}
+  /** Method which returns the shape (dimensions) of the data returned by channel() method. */
   std::vector<int> channel_shape() const;
 private:
   float	_channel[NCHANNELS];
@@ -108,7 +138,8 @@ private:
 };
 #pragma pack(pop)
 
-/** Class: PimImageConfigV1
+/** @class PimImageConfigV1
+
   
 */
 
@@ -116,8 +147,12 @@ private:
 
 class PimImageConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_PimImageConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_PimImageConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   PimImageConfigV1(float arg__xscale, float arg__yscale)
     : _xscale(arg__xscale), _yscale(arg__yscale)
   {

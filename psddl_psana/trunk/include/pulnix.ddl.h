@@ -10,17 +10,26 @@
 namespace Psana {
 namespace Pulnix {
 
-/** Class: TM6740ConfigV1
+/** @class TM6740ConfigV1
+
   
 */
 
 
 class TM6740ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_TM6740Config};
-  enum {Row_Pixels = 480};
-  enum {Column_Pixels = 640};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_TM6740Config /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    Row_Pixels = 480 /**<  */
+  };
+  enum {
+    Column_Pixels = 640 /**<  */
+  };
   enum Depth {
     Eight_bit,
     Ten_bit,
@@ -44,20 +53,30 @@ public:
   virtual Pulnix::TM6740ConfigV1::Binning horizontal_binning() const = 0;
   virtual Pulnix::TM6740ConfigV1::Binning vertical_binning() const = 0;
   virtual Pulnix::TM6740ConfigV1::LookupTable lookuptable_mode() const = 0;
+  /** bit-depth of pixel counts */
   virtual uint8_t output_resolution_bits() const = 0;
 };
 
-/** Class: TM6740ConfigV2
+/** @class TM6740ConfigV2
+
   
 */
 
 
 class TM6740ConfigV2 {
 public:
-  enum {Version = 2};
-  enum {TypeId = Pds::TypeId::Id_TM6740Config};
-  enum {Row_Pixels = 480};
-  enum {Column_Pixels = 640};
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_TM6740Config /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    Row_Pixels = 480 /**<  */
+  };
+  enum {
+    Column_Pixels = 640 /**<  */
+  };
   enum Depth {
     Eight_bit,
     Ten_bit,
@@ -81,6 +100,7 @@ public:
   virtual Pulnix::TM6740ConfigV2::Binning horizontal_binning() const = 0;
   virtual Pulnix::TM6740ConfigV2::Binning vertical_binning() const = 0;
   virtual Pulnix::TM6740ConfigV2::LookupTable lookuptable_mode() const = 0;
+  /** bit-depth of pixel counts */
   virtual uint8_t output_resolution_bits() const = 0;
 };
 } // namespace Pulnix

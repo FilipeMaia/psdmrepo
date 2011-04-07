@@ -9,16 +9,38 @@
 
 namespace Psana {
 namespace CsPad {
-  enum {MaxQuadsPerSensor = 4};
-  enum {ASICsPerQuad = 16};
-  enum {RowsPerBank = 26};
-  enum {FullBanksPerASIC = 7};
-  enum {BanksPerASIC = 8};
-  enum {ColumnsPerASIC = 185};
-  enum {MaxRowsPerASIC = 194};
-  enum {PotsPerQuad = 80};
-  enum {TwoByTwosPerQuad = 4};
-  enum {SectorsPerQuad = 8};
+  enum {
+    MaxQuadsPerSensor = 4 /**< Defines number of quadrants in a CsPad device. */
+  };
+  enum {
+    ASICsPerQuad = 16 /**< Total number of ASICs in one quadrant. */
+  };
+  enum {
+    RowsPerBank = 26 /**< Number of rows per readout bank? */
+  };
+  enum {
+    FullBanksPerASIC = 7 /**< Number of full readout banks per one ASIC? */
+  };
+  enum {
+    BanksPerASIC = 8 /**< Number of readout banks per one ASIC? */
+  };
+  enum {
+    ColumnsPerASIC = 185 /**< Number of columns readout by single ASIC. */
+  };
+  enum {
+    MaxRowsPerASIC = 194 /**< Maximum number of rows readout by single ASIC. */
+  };
+  enum {
+    PotsPerQuad = 80 /**< Number of POTs? per single quadrant. */
+  };
+  enum {
+    TwoByTwosPerQuad = 4 /**< Total number of 2x2s in single quadrant. */
+  };
+  enum {
+    SectorsPerQuad = 8 /**< Total number of sectors (2x1) per single quadrant. */
+  };
+
+  /** Enum specifying different running modes. */
   enum RunModes {
     NoRunning,
     RunButDrop,
@@ -28,6 +50,8 @@ namespace CsPad {
     ExternalTriggerDrop,
     NumberOfRunModes,
   };
+
+  /** Enum specifying different data collection modes. */
   enum DataModes {
     normal = 0,
     shiftTest = 1,
@@ -35,8 +59,9 @@ namespace CsPad {
     reserved = 3,
   };
 
-/** Class: CsPadDigitalPotsCfg
-  
+/** @class CsPadDigitalPotsCfg
+
+  Class defining configuration for CsPad POTs?
 */
 
 
@@ -44,11 +69,13 @@ class CsPadDigitalPotsCfg {
 public:
   virtual ~CsPadDigitalPotsCfg();
   virtual const uint8_t* pots() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by pots() method. */
   virtual std::vector<int> pots_shape() const = 0;
 };
 
-/** Class: CsPadReadOnlyCfg
-  
+/** @class CsPadReadOnlyCfg
+
+  Class defining read-only configuration.
 */
 
 
@@ -59,20 +86,24 @@ public:
   virtual uint32_t version() const = 0;
 };
 
-/** Class: CsPadGainMapCfg
-  
+/** @class CsPadGainMapCfg
+
+  Class defining ASIC gain map.
 */
 
 
 class CsPadGainMapCfg {
 public:
   virtual ~CsPadGainMapCfg();
+  /** Array with the gain map for single ASIC. */
   virtual const uint16_t* gainMap() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by gainMap() method. */
   virtual std::vector<int> gainMap_shape() const = 0;
 };
 
-/** Class: ConfigV1QuadReg
-  
+/** @class ConfigV1QuadReg
+
+  Configuration data for single quadrant.
 */
 
 
@@ -91,22 +122,31 @@ public:
   virtual uint32_t ampIdle() const = 0;
   virtual uint32_t injTotal() const = 0;
   virtual uint32_t rowColShiftPer() const = 0;
+  /** read-only configuration */
   virtual const CsPad::CsPadReadOnlyCfg& ro() const = 0;
   virtual const CsPad::CsPadDigitalPotsCfg& dp() const = 0;
+  /** Gain map. */
   virtual const CsPad::CsPadGainMapCfg& gm() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by shiftSelect() method. */
   virtual std::vector<int> shiftSelect_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by edgeSelect() method. */
   virtual std::vector<int> edgeSelect_shape() const = 0;
 };
 
-/** Class: ConfigV1
-  
+/** @class ConfigV1
+
+  Configuration data for complete CsPad device.
 */
 
 
 class ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_CspadConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_CspadConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~ConfigV1();
   virtual uint32_t concentratorVersion() const = 0;
   virtual uint32_t runDelay() const = 0;
@@ -123,18 +163,24 @@ public:
   virtual uint32_t numAsicsRead() const = 0;
   virtual uint32_t numQuads() const = 0;
   virtual uint32_t numSect() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   virtual std::vector<int> quads_shape() const = 0;
 };
 
-/** Class: ConfigV2
-  
+/** @class ConfigV2
+
+  Configuration data for complete CsPad device.
 */
 
 
 class ConfigV2 {
 public:
-  enum {Version = 2};
-  enum {TypeId = Pds::TypeId::Id_CspadConfig};
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_CspadConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~ConfigV2();
   virtual uint32_t concentratorVersion() const = 0;
   virtual uint32_t runDelay() const = 0;
@@ -149,15 +195,21 @@ public:
   virtual uint32_t quadMask() const = 0;
   virtual const CsPad::ConfigV1QuadReg& quads(uint32_t i0) const = 0;
   virtual uint32_t numAsicsRead() const = 0;
+  /** ROI mask for given quadrant */
   virtual uint32_t roiMask(uint32_t iq) const = 0;
+  /** Number of ASICs in given quadrant */
   virtual uint32_t numAsicsStored(uint32_t iq) const = 0;
+  /** Total number of quadrants in setup */
   virtual uint32_t numQuads() const = 0;
+  /** Total number of sections (2x1) in all quadrants */
   virtual uint32_t numSect() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   virtual std::vector<int> quads_shape() const = 0;
 };
 
-/** Class: ElementV1
-  
+/** @class ElementV1
+
+  CsPad data from single CsPad quadrant.
 */
 
 class ConfigV1;
@@ -165,27 +217,37 @@ class ConfigV2;
 
 class ElementV1 {
 public:
-  enum {Nsbtemp = 4};
+  enum {
+    Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */
+  };
   virtual ~ElementV1();
+  /** Virtual channel number. */
   virtual uint32_t virtual_channel() const = 0;
+  /** Lane number. */
   virtual uint32_t lane() const = 0;
   virtual uint32_t tid() const = 0;
   virtual uint32_t acq_count() const = 0;
   virtual uint32_t op_code() const = 0;
+  /** Quadrant number. */
   virtual uint32_t quad() const = 0;
+  /** Counter incremented on every event. */
   virtual uint32_t seq_count() const = 0;
   virtual uint32_t ticks() const = 0;
   virtual uint32_t fiducials() const = 0;
   virtual const uint16_t* sb_temp() const = 0;
   virtual uint32_t frame_type() const = 0;
   virtual const uint16_t* data() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by sb_temp() method. */
   virtual std::vector<int> sb_temp_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by data() method. */
   virtual std::vector<int> data_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data member _extra. */
   virtual std::vector<int> _extra_shape() const = 0;
 };
 
-/** Class: DataV1
-  
+/** @class DataV1
+
+  CsPad data from whole detector.
 */
 
 class ConfigV1;
@@ -193,28 +255,41 @@ class ConfigV2;
 
 class DataV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_CspadElement};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_CspadElement /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~DataV1();
+  /** Data objects, one element per quadrant. The size of the array is determined by 
+            the numQuads() method of the configuration object. */
   virtual const CsPad::ElementV1& quads(uint32_t i0) const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   virtual std::vector<int> quads_shape() const = 0;
 };
 
-/** Class: ElementV2
-  
+/** @class ElementV2
+
+  CsPad data from single CsPad quadrant.
 */
 
 class ConfigV2;
 
 class ElementV2 {
 public:
-  enum {Nsbtemp = 4};
+  enum {
+    Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */
+  };
   virtual ~ElementV2();
+  /** Virtual channel number. */
   virtual uint32_t virtual_channel() const = 0;
+  /** Lane number. */
   virtual uint32_t lane() const = 0;
   virtual uint32_t tid() const = 0;
   virtual uint32_t acq_count() const = 0;
   virtual uint32_t op_code() const = 0;
+  /** Quadrant number. */
   virtual uint32_t quad() const = 0;
   virtual uint32_t seq_count() const = 0;
   virtual uint32_t ticks() const = 0;
@@ -222,23 +297,34 @@ public:
   virtual const uint16_t* sb_temp() const = 0;
   virtual uint32_t frame_type() const = 0;
   virtual const uint16_t* data() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by sb_temp() method. */
   virtual std::vector<int> sb_temp_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by data() method. */
   virtual std::vector<int> data_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data member _extra. */
   virtual std::vector<int> _extra_shape() const = 0;
 };
 
-/** Class: DataV2
-  
+/** @class DataV2
+
+  CsPad data from whole detector.
 */
 
 class ConfigV2;
 
 class DataV2 {
 public:
-  enum {Version = 2};
-  enum {TypeId = Pds::TypeId::Id_CspadElement};
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_CspadElement /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~DataV2();
+  /** Data objects, one element per quadrant. The size of the array is determined by 
+            the numQuads() method of the configuration object. */
   virtual const CsPad::ElementV2& quads(uint32_t i0) const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   virtual std::vector<int> quads_shape() const = 0;
 };
 } // namespace CsPad

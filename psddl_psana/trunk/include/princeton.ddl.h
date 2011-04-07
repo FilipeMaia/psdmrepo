@@ -10,15 +10,20 @@
 namespace Psana {
 namespace Princeton {
 
-/** Class: ConfigV1
+/** @class ConfigV1
+
   
 */
 
 
 class ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_PrincetonConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~ConfigV1();
   virtual uint32_t width() const = 0;
   virtual uint32_t height() const = 0;
@@ -31,11 +36,14 @@ public:
   virtual uint32_t readoutSpeedIndex() const = 0;
   virtual uint16_t readoutEventCode() const = 0;
   virtual uint16_t delayMode() const = 0;
+  /** Total size in bytes of the Frame object */
   virtual uint32_t frameSize() const = 0;
+  /** calculate the frame size in pixels based on the current ROI and binning settings */
   virtual uint32_t numPixels() const = 0;
 };
 
-/** Class: FrameV1
+/** @class FrameV1
+
   
 */
 
@@ -43,24 +51,34 @@ class ConfigV1;
 
 class FrameV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_PrincetonFrame};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_PrincetonFrame /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~FrameV1();
   virtual uint32_t shotIdStart() const = 0;
   virtual float readoutTime() const = 0;
   virtual const uint16_t* data() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by data() method. */
   virtual std::vector<int> data_shape() const = 0;
 };
 
-/** Class: InfoV1
+/** @class InfoV1
+
   
 */
 
 
 class InfoV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_PrincetonInfo};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_PrincetonInfo /**< XTC type ID value (from Pds::TypeId class) */
+  };
   InfoV1(float arg__fTemperature)
     : _fTemperature(arg__fTemperature)
   {

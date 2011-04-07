@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Package Psana::CsPad Reference</title>
+<link href="psana.css" rel="stylesheet" type="text/css">
+</head><body>
+<h1>Package Psana::CsPad Reference</h1>
+Package containing definitions for CsPad-produced data types.
+<h2>Constants</h2>
+<div class="descr"><div class="def">
+MaxQuadsPerSensor = 4
+</div>
+Defines number of quadrants in a CsPad device.
+</div>
+<div class="descr"><div class="def">
+ASICsPerQuad = 16
+</div>
+Total number of ASICs in one quadrant.
+</div>
+<div class="descr"><div class="def">
+RowsPerBank = 26
+</div>
+Number of rows per readout bank?
+</div>
+<div class="descr"><div class="def">
+FullBanksPerASIC = 7
+</div>
+Number of full readout banks per one ASIC?
+</div>
+<div class="descr"><div class="def">
+BanksPerASIC = 8
+</div>
+Number of readout banks per one ASIC?
+</div>
+<div class="descr"><div class="def">
+ColumnsPerASIC = 185
+</div>
+Number of columns readout by single ASIC.
+</div>
+<div class="descr"><div class="def">
+MaxRowsPerASIC = 194
+</div>
+Maximum number of rows readout by single ASIC.
+</div>
+<div class="descr"><div class="def">
+PotsPerQuad = 80
+</div>
+Number of POTs? per single quadrant.
+</div>
+<div class="descr"><div class="def">
+TwoByTwosPerQuad = 4
+</div>
+Total number of 2x2s in single quadrant.
+</div>
+<div class="descr"><div class="def">
+SectorsPerQuad = 8
+</div>
+Total number of sectors (2x1) per single quadrant.
+</div>
+<h2>Enumeration types</h2><dl>
+<div class="descr"><div class="def" id="enum_RunModes">
+Enumeration <font class="enumname">Psana::CsPad::RunModes</font>
+</div>
+<p>Enum specifying different running modes.</p>
+<p>Enumerators:<table>
+<tr>
+<td class="const">NoRunning</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">RunButDrop</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">RunAndSendToRCE</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">RunAndSendTriggeredByTTL</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">ExternalTriggerSendToRCE</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">ExternalTriggerDrop</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">NumberOfRunModes</td>
+<td class="const"></td>
+<td></td>
+</tr>
+</table></p>
+</div>
+<div class="descr"><div class="def" id="enum_DataModes">
+Enumeration <font class="enumname">Psana::CsPad::DataModes</font>
+</div>
+<p>Enum specifying different data collection modes.</p>
+<p>Enumerators:<table>
+<tr>
+<td class="const">normal</td>
+<td class="const"> = 0</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">shiftTest</td>
+<td class="const"> = 1</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">testData</td>
+<td class="const"> = 2</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">reserved</td>
+<td class="const"> = 3</td>
+<td></td>
+</tr>
+</table></p>
+</div>
+</dl>
+<h2>Types/classes</h2><ul>
+<li><a href="type.Psana.CsPad.ConfigV1.html">Psana::CsPad::ConfigV1</a></li>
+<li><a href="type.Psana.CsPad.ConfigV1QuadReg.html">Psana::CsPad::ConfigV1QuadReg</a></li>
+<li><a href="type.Psana.CsPad.ConfigV2.html">Psana::CsPad::ConfigV2</a></li>
+<li><a href="type.Psana.CsPad.CsPadDigitalPotsCfg.html">Psana::CsPad::CsPadDigitalPotsCfg</a></li>
+<li><a href="type.Psana.CsPad.CsPadGainMapCfg.html">Psana::CsPad::CsPadGainMapCfg</a></li>
+<li><a href="type.Psana.CsPad.CsPadReadOnlyCfg.html">Psana::CsPad::CsPadReadOnlyCfg</a></li>
+<li><a href="type.Psana.CsPad.DataV1.html">Psana::CsPad::DataV1</a></li>
+<li><a href="type.Psana.CsPad.DataV2.html">Psana::CsPad::DataV2</a></li>
+<li><a href="type.Psana.CsPad.ElementV1.html">Psana::CsPad::ElementV1</a></li>
+<li><a href="type.Psana.CsPad.ElementV2.html">Psana::CsPad::ElementV2</a></li>
+</ul>
+</body></html>

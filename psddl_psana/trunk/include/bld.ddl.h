@@ -12,67 +12,90 @@
 namespace Psana {
 namespace Bld {
 
-/** Class: BldDataFEEGasDetEnergy
-  PV names: GDET:FEE1:11:ENRC, GDET:FEE1:12:ENRC, GDET:FEE1:21:ENRC, GDET:FEE1:22:ENRC
+/** @class BldDataFEEGasDetEnergy
+
+  Four energy measurements from Front End Enclosure Gas Detector.
+	       	PV names: GDET:FEE1:11:ENRC, GDET:FEE1:12:ENRC, GDET:FEE1:21:ENRC, GDET:FEE1:22:ENRC.
 */
 
 #pragma pack(push,4)
 
 class BldDataFEEGasDetEnergy {
 public:
-  enum {Version = 0};
-  enum {TypeId = Pds::TypeId::Id_FEEGasDetEnergy};
+  enum {
+    Version = 0 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_FEEGasDetEnergy /**< XTC type ID value (from Pds::TypeId class) */
+  };
   BldDataFEEGasDetEnergy(double arg__f_11_ENRC, double arg__f_12_ENRC, double arg__f_21_ENRC, double arg__f_22_ENRC)
     : _f_11_ENRC(arg__f_11_ENRC), _f_12_ENRC(arg__f_12_ENRC), _f_21_ENRC(arg__f_21_ENRC), _f_22_ENRC(arg__f_22_ENRC)
   {
   }
+  /** Value of GDET:FEE1:11:ENRC, in mJ. */
   double f_11_ENRC() const {return _f_11_ENRC;}
+  /** Value of GDET:FEE1:12:ENRC, in mJ. */
   double f_12_ENRC() const {return _f_12_ENRC;}
+  /** Value of GDET:FEE1:21:ENRC, in mJ. */
   double f_21_ENRC() const {return _f_21_ENRC;}
+  /** Value of GDET:FEE1:22:ENRC, in mJ. */
   double f_22_ENRC() const {return _f_22_ENRC;}
   static uint32_t _sizeof()  {return 32;}
 private:
-  double	_f_11_ENRC;	/* in mJ */
-  double	_f_12_ENRC;	/* in mJ */
-  double	_f_21_ENRC;	/* in mJ */
-  double	_f_22_ENRC;	/* in mJ */
+  double	_f_11_ENRC;	/**< Value of GDET:FEE1:11:ENRC, in mJ. */
+  double	_f_12_ENRC;	/**< Value of GDET:FEE1:12:ENRC, in mJ. */
+  double	_f_21_ENRC;	/**< Value of GDET:FEE1:21:ENRC, in mJ. */
+  double	_f_22_ENRC;	/**< Value of GDET:FEE1:22:ENRC, in mJ. */
 };
 #pragma pack(pop)
 
-/** Class: BldDataEBeamV0
-  
+/** @class BldDataEBeamV0
+
+  Beam parameters.
 */
 
 #pragma pack(push,4)
 
 class BldDataEBeamV0 {
 public:
-  enum {Version = 0};
-  enum {TypeId = Pds::TypeId::Id_EBeam};
+  enum {
+    Version = 0 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EBeam /**< XTC type ID value (from Pds::TypeId class) */
+  };
   BldDataEBeamV0(uint32_t arg__uDamageMask, double arg__fEbeamCharge, double arg__fEbeamL3Energy, double arg__fEbeamLTUPosX, double arg__fEbeamLTUPosY, double arg__fEbeamLTUAngX, double arg__fEbeamLTUAngY)
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY)
   {
   }
+  /** Damage mask. */
   uint32_t damageMask() const {return _uDamageMask;}
+  /** Beam charge in nC. */
   double ebeamCharge() const {return _fEbeamCharge;}
+  /** Beam energy in MeV. */
   double ebeamL3Energy() const {return _fEbeamL3Energy;}
+  /** LTU beam position in mm. */
   double ebeamLTUPosX() const {return _fEbeamLTUPosX;}
+  /** LTU beam position in mm. */
   double ebeamLTUPosY() const {return _fEbeamLTUPosY;}
+  /** LTU beam angle in mrad. */
   double ebeamLTUAngX() const {return _fEbeamLTUAngX;}
+  /** LTU beam angle in mrad. */
   double ebeamLTUAngY() const {return _fEbeamLTUAngY;}
   static uint32_t _sizeof()  {return 52;}
 private:
-  uint32_t	_uDamageMask;
-  double	_fEbeamCharge;	/* in nC */
-  double	_fEbeamL3Energy;	/* in MeV */
-  double	_fEbeamLTUPosX;	/* in mm */
-  double	_fEbeamLTUPosY;	/* in mm */
-  double	_fEbeamLTUAngX;	/* in mrad */
-  double	_fEbeamLTUAngY;	/* in mrad */
+  uint32_t	_uDamageMask;	/**< Damage mask. */
+  double	_fEbeamCharge;	/**< Beam charge in nC. */
+  double	_fEbeamL3Energy;	/**< Beam energy in MeV. */
+  double	_fEbeamLTUPosX;	/**< LTU beam position in mm. */
+  double	_fEbeamLTUPosY;	/**< LTU beam position in mm. */
+  double	_fEbeamLTUAngX;	/**< LTU beam angle in mrad. */
+  double	_fEbeamLTUAngY;	/**< LTU beam angle in mrad. */
 };
 #pragma pack(pop)
 
-/** Class: BldDataEBeam
+/** @class BldDataEBeam
+
   
 */
 
@@ -80,34 +103,47 @@ private:
 
 class BldDataEBeam {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_EBeam};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EBeam /**< XTC type ID value (from Pds::TypeId class) */
+  };
   BldDataEBeam(uint32_t arg__uDamageMask, double arg__fEbeamCharge, double arg__fEbeamL3Energy, double arg__fEbeamLTUPosX, double arg__fEbeamLTUPosY, double arg__fEbeamLTUAngX, double arg__fEbeamLTUAngY, double arg__fEbeamPkCurrBC2)
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2)
   {
   }
+  /** Damage mask. */
   uint32_t damageMask() const {return _uDamageMask;}
+  /** Beam charge in nC. */
   double ebeamCharge() const {return _fEbeamCharge;}
+  /** Beam energy in MeV. */
   double ebeamL3Energy() const {return _fEbeamL3Energy;}
+  /** LTU beam position in mm. */
   double ebeamLTUPosX() const {return _fEbeamLTUPosX;}
+  /** LTU beam position in mm. */
   double ebeamLTUPosY() const {return _fEbeamLTUPosY;}
+  /** LTU beam angle in mrad. */
   double ebeamLTUAngX() const {return _fEbeamLTUAngX;}
+  /** LTU beam angle in mrad. */
   double ebeamLTUAngY() const {return _fEbeamLTUAngY;}
+  /** Beam current in Amps. */
   double ebeamPkCurrBC2() const {return _fEbeamPkCurrBC2;}
   static uint32_t _sizeof()  {return 60;}
 private:
-  uint32_t	_uDamageMask;
-  double	_fEbeamCharge;	/* in nC */
-  double	_fEbeamL3Energy;	/* in MeV */
-  double	_fEbeamLTUPosX;	/* in mm */
-  double	_fEbeamLTUPosY;	/* in mm */
-  double	_fEbeamLTUAngX;	/* in mrad */
-  double	_fEbeamLTUAngY;	/* in mrad */
-  double	_fEbeamPkCurrBC2;	/* in Amps */
+  uint32_t	_uDamageMask;	/**< Damage mask. */
+  double	_fEbeamCharge;	/**< Beam charge in nC. */
+  double	_fEbeamL3Energy;	/**< Beam energy in MeV. */
+  double	_fEbeamLTUPosX;	/**< LTU beam position in mm. */
+  double	_fEbeamLTUPosY;	/**< LTU beam position in mm. */
+  double	_fEbeamLTUAngX;	/**< LTU beam angle in mrad. */
+  double	_fEbeamLTUAngY;	/**< LTU beam angle in mrad. */
+  double	_fEbeamPkCurrBC2;	/**< Beam current in Amps. */
 };
 #pragma pack(pop)
 
-/** Class: BldDataPhaseCavity
+/** @class BldDataPhaseCavity
+
   PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2, 
                 UND:R02:IOC:16:BAT:Charge1,  UND:R02:IOC:16:BAT:Charge2
 */
@@ -116,34 +152,48 @@ private:
 
 class BldDataPhaseCavity {
 public:
-  enum {Version = 0};
-  enum {TypeId = Pds::TypeId::Id_PhaseCavity};
+  enum {
+    Version = 0 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_PhaseCavity /**< XTC type ID value (from Pds::TypeId class) */
+  };
   BldDataPhaseCavity(double arg__fFitTime1, double arg__fFitTime2, double arg__fCharge1, double arg__fCharge2)
     : _fFitTime1(arg__fFitTime1), _fFitTime2(arg__fFitTime2), _fCharge1(arg__fCharge1), _fCharge2(arg__fCharge2)
   {
   }
+  /** UND:R02:IOC:16:BAT:FitTime1 value in pico-seconds. */
   double fitTime1() const {return _fFitTime1;}
+  /** UND:R02:IOC:16:BAT:FitTime2 value in pico-seconds. */
   double fitTime2() const {return _fFitTime2;}
+  /** UND:R02:IOC:16:BAT:Charge1 value in pico-columbs. */
   double charge1() const {return _fCharge1;}
+  /** UND:R02:IOC:16:BAT:Charge2 value in pico-columbs. */
   double charge2() const {return _fCharge2;}
   static uint32_t _sizeof()  {return 32;}
 private:
-  double	_fFitTime1;	/* in pico-seconds */
-  double	_fFitTime2;	/* in pico-seconds */
-  double	_fCharge1;	/* in pico-columbs */
-  double	_fCharge2;	/* in pico-columbs */
+  double	_fFitTime1;	/**< UND:R02:IOC:16:BAT:FitTime1 value in pico-seconds. */
+  double	_fFitTime2;	/**< UND:R02:IOC:16:BAT:FitTime2 value in pico-seconds. */
+  double	_fCharge1;	/**< UND:R02:IOC:16:BAT:Charge1 value in pico-columbs. */
+  double	_fCharge2;	/**< UND:R02:IOC:16:BAT:Charge2 value in pico-columbs. */
 };
 #pragma pack(pop)
 
-/** Class: BldDataIpimb
-  
+/** @class BldDataIpimb
+
+  Combined structure which includes Ipimb.DataV1, Ipimb.ConfigV1, and 
+            Lusi.IpmFexV1 objects.
 */
 
 
 class BldDataIpimb {
 public:
-  enum {Version = 0};
-  enum {TypeId = Pds::TypeId::Id_SharedIpimb};
+  enum {
+    Version = 0 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_SharedIpimb /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~BldDataIpimb();
   virtual const Ipimb::DataV1& ipimbData() const = 0;
   virtual const Ipimb::ConfigV1& ipimbConfig() const = 0;

@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2011-04-07 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-07
+- generated documentation is in doc/html directory
+
 Tag: V00-00-03
 2011-03-31 Andy Salnikov
 - regenerated whole thing after changes in psddl

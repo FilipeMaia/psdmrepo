@@ -11,20 +11,35 @@
 namespace Psana {
 namespace EvrData {
 
-/** Class: PulseConfig
+/** @class PulseConfig
+
   
 */
 
 
 class PulseConfig {
 public:
-  enum {Trigger_Shift = 0};
-  enum {Set_Shift = 8};
-  enum {Clear_Shift = 16};
-  enum {Polarity_Shift = 0};
-  enum {Map_Set_Ena_Shift = 1};
-  enum {Map_Reset_Ena_Shift = 2};
-  enum {Map_Trigger_Ena_Shift = 3};
+  enum {
+    Trigger_Shift = 0 /**<  */
+  };
+  enum {
+    Set_Shift = 8 /**<  */
+  };
+  enum {
+    Clear_Shift = 16 /**<  */
+  };
+  enum {
+    Polarity_Shift = 0 /**<  */
+  };
+  enum {
+    Map_Set_Ena_Shift = 1 /**<  */
+  };
+  enum {
+    Map_Reset_Ena_Shift = 2 /**<  */
+  };
+  enum {
+    Map_Trigger_Ena_Shift = 3 /**<  */
+  };
   PulseConfig()
   {
   }
@@ -32,35 +47,42 @@ public:
     : _pulse(arg__pulse), _input_control(arg__input_control), _output_control(arg__output_control), _prescale(arg__prescale), _delay(arg__delay), _width(arg__width)
   {
   }
+  /** internal pulse generation channel */
   uint32_t pulse() const {return _pulse;}
+  /** Pulse input control */
   uint32_t _input_control_value() const {return _input_control;}
 private:
   int16_t bf_trigger() const {return int16_t(this->_input_control & 0xff);}
   int16_t bf_set() const {return int16_t((this->_input_control>>8) & 0xff);}
   int16_t bf_clear() const {return int16_t((this->_input_control>>16) & 0xff);}
 public:
+  /** Pulse output control */
   uint32_t _output_control_value() const {return _output_control;}
   uint8_t polarity() const {return uint8_t(this->_output_control & 0x1);}
   uint8_t map_set_enable() const {return uint8_t((this->_output_control>>1) & 0x1);}
   uint8_t map_reset_enable() const {return uint8_t((this->_output_control>>2) & 0x1);}
   uint8_t map_trigger_enable() const {return uint8_t((this->_output_control>>3) & 0x1);}
+  /** pulse event prescale */
   uint32_t prescale() const {return _prescale;}
+  /** delay in 119MHz clks */
   uint32_t delay() const {return _delay;}
+  /** width in 119MHz clks */
   uint32_t width() const {return _width;}
   int16_t trigger() const;
   int16_t set() const;
   int16_t clear() const;
   static uint32_t _sizeof()  {return 24;}
 private:
-  uint32_t	_pulse;	/* internal pulse generation channel */
-  uint32_t	_input_control;	/* Pulse input control */
-  uint32_t	_output_control;	/* Pulse output control */
-  uint32_t	_prescale;	/* pulse event prescale */
-  uint32_t	_delay;	/* delay in 119MHz clks */
-  uint32_t	_width;	/* width in 119MHz clks */
+  uint32_t	_pulse;	/**< internal pulse generation channel */
+  uint32_t	_input_control;	/**< Pulse input control */
+  uint32_t	_output_control;	/**< Pulse output control */
+  uint32_t	_prescale;	/**< pulse event prescale */
+  uint32_t	_delay;	/**< delay in 119MHz clks */
+  uint32_t	_width;	/**< width in 119MHz clks */
 };
 
-/** Class: PulseConfigV3
+/** @class PulseConfigV3
+
   
 */
 
@@ -76,21 +98,26 @@ public:
   {
   }
   uint16_t pulseId() const {return _u16PulseId;}
+  /** 0 -> positive polarity , 1 -> negative polarity */
   uint16_t polarity() const {return _u16Polarity;}
+  /** Clock divider */
   uint32_t prescale() const {return _u32Prescale;}
+  /** Delay in 119MHz clks */
   uint32_t delay() const {return _u32Delay;}
+  /** Width in 119MHz clks */
   uint32_t width() const {return _u32Width;}
   static uint32_t _sizeof()  {return 16;}
 private:
   uint16_t	_u16PulseId;
-  uint16_t	_u16Polarity;	/* 0 -> positive polarity , 1 -> negative polarity */
-  uint32_t	_u32Prescale;	/* Clock divider */
-  uint32_t	_u32Delay;	/* Delay in 119MHz clks */
-  uint32_t	_u32Width;	/* Width in 119MHz clks */
+  uint16_t	_u16Polarity;	/**< 0 -> positive polarity , 1 -> negative polarity */
+  uint32_t	_u32Prescale;	/**< Clock divider */
+  uint32_t	_u32Delay;	/**< Delay in 119MHz clks */
+  uint32_t	_u32Width;	/**< Width in 119MHz clks */
 };
 #pragma pack(pop)
 
-/** Class: EventCodeV3
+/** @class EventCodeV3
+
   
 */
 
@@ -122,7 +149,8 @@ private:
 };
 #pragma pack(pop)
 
-/** Class: EventCodeV4
+/** @class EventCodeV4
+
   
 */
 
@@ -158,7 +186,8 @@ private:
 };
 #pragma pack(pop)
 
-/** Class: EventCodeV5
+/** @class EventCodeV5
+
   
 */
 
@@ -166,7 +195,9 @@ private:
 
 class EventCodeV5 {
 public:
-  enum {DescSize = 16};
+  enum {
+    DescSize = 16 /**<  */
+  };
   EventCodeV5()
   {
   }
@@ -187,6 +218,7 @@ public:
   uint32_t maskClear() const {return _u32MaskClear;}
   const char* desc() const {return &_desc[0];}
   static uint32_t _sizeof()  {return 24+(1*(DescSize));}
+  /** Method which returns the shape (dimensions) of the data returned by desc() method. */
   std::vector<int> desc_shape() const;
 private:
   uint16_t	_u16Code;
@@ -200,7 +232,8 @@ private:
 };
 #pragma pack(pop)
 
-/** Class: OutputMap
+/** @class OutputMap
+
   
 */
 
@@ -235,36 +268,54 @@ private:
   uint32_t	_v;
 };
 
-/** Class: ConfigV1
+/** @class ConfigV1
+
   
 */
 
 
 class ConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_EvrConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~ConfigV1();
   virtual uint32_t npulses() const = 0;
   virtual uint32_t noutputs() const = 0;
   virtual const EvrData::PulseConfig& pulses(uint32_t i0) const = 0;
   virtual const EvrData::OutputMap& output_maps(uint32_t i0) const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by pulses() method. */
   virtual std::vector<int> pulses_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by output_maps() method. */
   virtual std::vector<int> output_maps_shape() const = 0;
 };
 
-/** Class: ConfigV2
+/** @class ConfigV2
+
   
 */
 
 
 class ConfigV2 {
 public:
-  enum {Version = 2};
-  enum {TypeId = Pds::TypeId::Id_EvrConfig};
-  enum {beamOn = 100};
-  enum {baseRate = 40};
-  enum {singleShot = 150};
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    beamOn = 100 /**<  */
+  };
+  enum {
+    baseRate = 40 /**<  */
+  };
+  enum {
+    singleShot = 150 /**<  */
+  };
   enum RateCode {
     r120Hz,
     r60Hz,
@@ -288,19 +339,26 @@ public:
   virtual const EvrData::OutputMap& output_maps(uint32_t i0) const = 0;
   virtual EvrData::ConfigV2::BeamCode beam() const = 0;
   virtual EvrData::ConfigV2::RateCode rate() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by pulses() method. */
   virtual std::vector<int> pulses_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by output_maps() method. */
   virtual std::vector<int> output_maps_shape() const = 0;
 };
 
-/** Class: ConfigV3
+/** @class ConfigV3
+
   
 */
 
 
 class ConfigV3 {
 public:
-  enum {Version = 3};
-  enum {TypeId = Pds::TypeId::Id_EvrConfig};
+  enum {
+    Version = 3 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~ConfigV3();
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
@@ -308,20 +366,28 @@ public:
   virtual const EvrData::EventCodeV3& eventcodes(uint32_t i0) const = 0;
   virtual const EvrData::PulseConfigV3& pulses(uint32_t i0) const = 0;
   virtual const EvrData::OutputMap& output_maps(uint32_t i0) const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by eventcodes() method. */
   virtual std::vector<int> eventcodes_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by pulses() method. */
   virtual std::vector<int> pulses_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by output_maps() method. */
   virtual std::vector<int> output_maps_shape() const = 0;
 };
 
-/** Class: ConfigV4
+/** @class ConfigV4
+
   
 */
 
 
 class ConfigV4 {
 public:
-  enum {Version = 4};
-  enum {TypeId = Pds::TypeId::Id_EvrConfig};
+  enum {
+    Version = 4 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~ConfigV4();
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
@@ -329,12 +395,16 @@ public:
   virtual const EvrData::EventCodeV4& eventcodes(uint32_t i0) const = 0;
   virtual const EvrData::PulseConfigV3& pulses(uint32_t i0) const = 0;
   virtual const EvrData::OutputMap& output_maps(uint32_t i0) const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by eventcodes() method. */
   virtual std::vector<int> eventcodes_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by pulses() method. */
   virtual std::vector<int> pulses_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by output_maps() method. */
   virtual std::vector<int> output_maps_shape() const = 0;
 };
 
-/** Class: SequencerEntry
+/** @class SequencerEntry
+
   
 */
 
@@ -355,7 +425,8 @@ private:
   uint32_t	_value;
 };
 
-/** Class: SequencerConfigV1
+/** @class SequencerConfigV1
+
   
 */
 
@@ -378,18 +449,24 @@ public:
   virtual uint32_t length() const = 0;
   virtual uint32_t cycles() const = 0;
   virtual const EvrData::SequencerEntry& entries(uint32_t i0) const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by entries() method. */
   virtual std::vector<int> entries_shape() const = 0;
 };
 
-/** Class: ConfigV5
+/** @class ConfigV5
+
   
 */
 
 
 class ConfigV5 {
 public:
-  enum {Version = 5};
-  enum {TypeId = Pds::TypeId::Id_EvrConfig};
+  enum {
+    Version = 5 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~ConfigV5();
   virtual uint32_t neventcodes() const = 0;
   virtual uint32_t npulses() const = 0;
@@ -398,12 +475,16 @@ public:
   virtual const EvrData::PulseConfigV3& pulses(uint32_t i0) const = 0;
   virtual const EvrData::OutputMap& output_maps(uint32_t i0) const = 0;
   virtual const EvrData::SequencerConfigV1& seq_config() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by eventcodes() method. */
   virtual std::vector<int> eventcodes_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by pulses() method. */
   virtual std::vector<int> pulses_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by output_maps() method. */
   virtual std::vector<int> output_maps_shape() const = 0;
 };
 
-/** Class: FIFOEvent
+/** @class FIFOEvent
+
   
 */
 
@@ -427,51 +508,70 @@ private:
   uint32_t	_eventCode;
 };
 
-/** Class: DataV3
+/** @class DataV3
+
   
 */
 
 
 class DataV3 {
 public:
-  enum {Version = 3};
-  enum {TypeId = Pds::TypeId::Id_EvrData};
+  enum {
+    Version = 3 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EvrData /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~DataV3();
   virtual uint32_t numFifoEvents() const = 0;
   virtual const EvrData::FIFOEvent& fifoEvents(uint32_t i0) const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by fifoEvents() method. */
   virtual std::vector<int> fifoEvents_shape() const = 0;
 };
 
-/** Class: IOChannel
+/** @class IOChannel
+
   
 */
 
 
 class IOChannel {
 public:
-  enum {NameLength = 12};
-  enum {MaxInfos = 8};
+  enum {
+    NameLength = 12 /**<  */
+  };
+  enum {
+    MaxInfos = 8 /**<  */
+  };
   virtual ~IOChannel();
   virtual const char* name() const = 0;
   virtual uint32_t ninfo() const = 0;
   virtual const Pds::DetInfo& infos(uint32_t i0) const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by name() method. */
   virtual std::vector<int> name_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by infos() method. */
   virtual std::vector<int> infos_shape() const = 0;
 };
 
-/** Class: IOConfigV1
+/** @class IOConfigV1
+
   
 */
 
 
 class IOConfigV1 {
 public:
-  enum {Version = 1};
-  enum {TypeId = Pds::TypeId::Id_EvrIOConfig};
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EvrIOConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
   virtual ~IOConfigV1();
   virtual uint16_t nchannels() const = 0;
   virtual const EvrData::IOChannel& channels(uint32_t i0) const = 0;
   virtual EvrData::OutputMap::Conn conn() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by channels() method. */
   virtual std::vector<int> channels_shape() const = 0;
 };
 } // namespace EvrData
