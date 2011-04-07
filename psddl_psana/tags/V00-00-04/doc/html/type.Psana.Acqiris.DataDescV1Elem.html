@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Class Psana::Acqiris::DataDescV1Elem Reference</title>
+<link href="psana.css" rel="stylesheet" type="text/css">
+</head><body>
+<h1>Class Psana::Acqiris::DataDescV1Elem Reference</h1>
+<p>Include: <span class="code">#include "psddl_psana/acqiris.ddl.h"</span></p>
+Class representing Acqiris waveforms from single channel.
+<h2>Constants</h2>
+<div class="descr"><div class="def">
+Version = 1
+</div>
+XTC type version number
+</div>
+<div class="descr"><div class="def">
+NumberOfBits = 10
+</div>
+
+</div>
+<div class="descr"><div class="def">
+BitShift = 6
+</div>
+
+</div>
+<div class="descr"><div class="def">
+_extra = 32*sizeof(short)
+</div>
+
+</div>
+<h2>Member Functions</h2>
+<div class="descr">
+<table class="methods">
+<tr><td class="methrettype">std::vector&lt;int&gt;</td><td class="methdecl"><a href="#meth__extraSpace_shape">_extraSpace_shape</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_indexFirstPoint">indexFirstPoint</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_nbrSamplesInSeg">nbrSamplesInSeg</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_nbrSegments">nbrSegments</a>()</td></tr>
+<tr><td class="methrettype">const <a href="type.Psana.Acqiris.TimestampV1.html">Psana::Acqiris::TimestampV1</a>&</td><td class="methdecl"><a href="#meth_timestamp">timestamp</a>(uint32_t i0)</td></tr>
+<tr><td class="methrettype">std::vector&lt;int&gt;</td><td class="methdecl"><a href="#meth_timestamps_shape">timestamps_shape</a>()</td></tr>
+<tr><td class="methrettype">const int16_t*</td><td class="methdecl"><a href="#meth_waveforms">waveforms</a>()</td></tr>
+<tr><td class="methrettype">std::vector&lt;int&gt;</td><td class="methdecl"><a href="#meth_waveforms_shape">waveforms_shape</a>()</td></tr>
+</table></div>
+<h2>Member Functions Reference</h2>
+<div class="descr">
+<div class="def" id="meth__extraSpace_shape">
+std::vector&lt;int&gt; _extraSpace_shape()
+</div>
+Method which returns the shape (dimensions) of the data member _extraSpace.
+</div>
+<div class="descr">
+<div class="def" id="meth_indexFirstPoint">
+uint32_t indexFirstPoint()
+</div>
+
+</div>
+<div class="descr">
+<div class="def" id="meth_nbrSamplesInSeg">
+uint32_t nbrSamplesInSeg()
+</div>
+Number of samples in one segment.
+</div>
+<div class="descr">
+<div class="def" id="meth_nbrSegments">
+uint32_t nbrSegments()
+</div>
+Number of segments.
+</div>
+<div class="descr">
+<div class="def" id="meth_timestamp">
+const <a href="type.Psana.Acqiris.TimestampV1.html">Psana::Acqiris::TimestampV1</a>& timestamp(uint32_t i0)
+</div>
+Timestamps, one timestamp per segment.
+</div>
+<div class="descr">
+<div class="def" id="meth_timestamps_shape">
+std::vector&lt;int&gt; timestamps_shape()
+</div>
+Method which returns the shape (dimensions) of the data returned by 
+                <a href="#meth_timestamp">timestamp</a>() method.
+</div>
+<div class="descr">
+<div class="def" id="meth_waveforms">
+const int16_t* waveforms()
+</div>
+Waveforms data, two-dimensional array segments*samples.
+</div>
+<div class="descr">
+<div class="def" id="meth_waveforms_shape">
+std::vector&lt;int&gt; waveforms_shape()
+</div>
+Method which returns the shape (dimensions) of the data returned by 
+                <a href="#meth_waveforms">waveforms</a>() method.
+</div>
+</body></html>

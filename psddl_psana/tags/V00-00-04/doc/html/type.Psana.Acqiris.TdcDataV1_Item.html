@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Class Psana::Acqiris::TdcDataV1_Item Reference</title>
+<link href="psana.css" rel="stylesheet" type="text/css">
+</head><body>
+<h1>Class Psana::Acqiris::TdcDataV1_Item Reference</h1>
+<p>Include: <span class="code">#include "psddl_psana/acqiris.ddl.h"</span></p>
+Base class for all Acqiris TDC data objects.
+<h2>Enumeration types</h2><dl>
+<div class="descr"><div class="def" id="enum_Source">
+Enumeration <font class="enumname">Psana::Acqiris::TdcDataV1_Item::Source</font>
+</div>
+<p>Enum for types of data objects. Comm means data object has TdcDataV1Common
+	          type, AuxIO means TdcDataV1Marker class, all others are for TdcDataV1Channel.</p>
+<p>Enumerators:<table>
+<tr>
+<td class="const">Comm</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Chan1</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Chan2</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Chan3</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Chan4</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Chan5</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Chan6</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">AuxIO</td>
+<td class="const"></td>
+<td></td>
+</tr>
+</table></p>
+</div>
+</dl>
+<h2>Member Functions</h2>
+<div class="descr">
+<table class="methods">
+<tr><td class="methrettype">Psana::Acqiris::TdcDataV1_Item::Source</td><td class="methdecl"><a href="#meth_source">source</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_value">value</a>()</td></tr>
+</table></div>
+<h2>Member Functions Reference</h2>
+<div class="descr">
+<div class="def" id="meth_source">
+Psana::Acqiris::TdcDataV1_Item::Source source()
+</div>
+Source of this data object, use returned enum to distinguish between actual 
+                types of data objecs and cast appropriately.
+</div>
+<div class="descr">
+<div class="def" id="meth_value">
+uint32_t value()
+</div>
+Value as integer number whiis composed of several bit fields. Do not use value directly,
+                instead cast this object to one of the actual types and use corresponding methods.
+</div>
+</body></html>
