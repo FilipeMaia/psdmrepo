@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Class Psana::Camera::FrameV1 Reference</title>
+<link href="psana.css" rel="stylesheet" type="text/css">
+</head><body>
+<h1>Class Psana::Camera::FrameV1 Reference</h1>
+<p>Include: <span class="code">#include "psddl_psana/camera.ddl.h"</span></p>
+
+<h2>Constants</h2>
+<div class="descr"><div class="def">
+TypeId = Pds::TypeId::Id_Frame
+</div>
+XTC type ID value (from Pds::TypeId class)
+</div>
+<div class="descr"><div class="def">
+Version = 1
+</div>
+XTC type version number
+</div>
+<h2>Member Functions</h2>
+<div class="descr">
+<table class="methods">
+<tr><td class="methrettype">const uint8_t*</td><td class="methdecl"><a href="#meth_data">data</a>()</td></tr>
+<tr><td class="methrettype">std::vector&lt;int&gt;</td><td class="methdecl"><a href="#meth_data_shape">data_shape</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_depth">depth</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_height">height</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_offset">offset</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_width">width</a>()</td></tr>
+</table></div>
+<h2>Member Functions Reference</h2>
+<div class="descr">
+<div class="def" id="meth_data">
+const uint8_t* data()
+</div>
+Pixel data as array of bytes.
+</div>
+<div class="descr">
+<div class="def" id="meth_data_shape">
+std::vector&lt;int&gt; data_shape()
+</div>
+Method which returns the shape (dimensions) of the data returned by 
+                <a href="#meth_data">data</a>() method.
+</div>
+<div class="descr">
+<div class="def" id="meth_depth">
+uint32_t depth()
+</div>
+Number of bits per pixel.
+</div>
+<div class="descr">
+<div class="def" id="meth_height">
+uint32_t height()
+</div>
+Number of pixels in a column.
+</div>
+<div class="descr">
+<div class="def" id="meth_offset">
+uint32_t offset()
+</div>
+Fixed offset/pedestal value of pixel data.
+</div>
+<div class="descr">
+<div class="def" id="meth_width">
+uint32_t width()
+</div>
+Number of pixels in a row.
+</div>
+</body></html>

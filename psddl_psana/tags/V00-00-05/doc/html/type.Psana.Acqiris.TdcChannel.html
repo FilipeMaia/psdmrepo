@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Class Psana::Acqiris::TdcChannel Reference</title>
+<link href="psana.css" rel="stylesheet" type="text/css">
+</head><body>
+<h1>Class Psana::Acqiris::TdcChannel Reference</h1>
+<p>Include: <span class="code">#include "psddl_psana/acqiris.ddl.h"</span></p>
+Configuration for Acqiris TDC channel.
+<h2>Enumeration types</h2><dl>
+<div class="descr"><div class="def" id="enum_Channel">
+Enumeration <font class="enumname">Psana::Acqiris::TdcChannel::Channel</font>
+</div>
+<p>Types of channels.</p>
+<p>Enumerators:<table>
+<tr>
+<td class="const">Veto</td>
+<td class="const"> = -2</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Common</td>
+<td class="const"> = -1</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Input1</td>
+<td class="const"> = 1</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Input2</td>
+<td class="const"> = 2</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Input3</td>
+<td class="const"> = 3</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Input4</td>
+<td class="const"> = 4</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Input5</td>
+<td class="const"> = 5</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Input6</td>
+<td class="const"> = 6</td>
+<td></td>
+</tr>
+</table></p>
+</div>
+<div class="descr"><div class="def" id="enum_Mode">
+Enumeration <font class="enumname">Psana::Acqiris::TdcChannel::Mode</font>
+</div>
+<p></p>
+<p>Enumerators:<table>
+<tr>
+<td class="const">Active</td>
+<td class="const"> = 0</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Inactive</td>
+<td class="const"> = 1</td>
+<td></td>
+</tr>
+</table></p>
+</div>
+<div class="descr"><div class="def" id="enum_Slope">
+Enumeration <font class="enumname">Psana::Acqiris::TdcChannel::Slope</font>
+</div>
+<p></p>
+<p>Enumerators:<table>
+<tr>
+<td class="const">Positive</td>
+<td class="const"></td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Negative</td>
+<td class="const"></td>
+<td></td>
+</tr>
+</table></p>
+</div>
+</dl>
+<h2>Member Functions</h2>
+<div class="descr">
+<table class="methods">
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth__channel_int">_channel_int</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth__mode_int">_mode_int</a>()</td></tr>
+<tr><td class="methrettype">Psana::Acqiris::TdcChannel::Channel</td><td class="methdecl"><a href="#meth_channel">channel</a>()</td></tr>
+<tr><td class="methrettype">double</td><td class="methdecl"><a href="#meth_level">level</a>()</td></tr>
+<tr><td class="methrettype">Psana::Acqiris::TdcChannel::Mode</td><td class="methdecl"><a href="#meth_mode">mode</a>()</td></tr>
+<tr><td class="methrettype">Psana::Acqiris::TdcChannel::Slope</td><td class="methdecl"><a href="#meth_slope">slope</a>()</td></tr>
+</table></div>
+<h2>Member Functions Reference</h2>
+<div class="descr">
+<div class="def" id="meth__channel_int">
+uint32_t _channel_int()
+</div>
+Channel type as integer number, clients should use channel() method instead.
+</div>
+<div class="descr">
+<div class="def" id="meth__mode_int">
+uint32_t _mode_int()
+</div>
+Bitfield value, should not be used directly. Use mode() and slope()
+                in the client code.
+</div>
+<div class="descr">
+<div class="def" id="meth_channel">
+Psana::Acqiris::TdcChannel::Channel channel()
+</div>
+
+</div>
+<div class="descr">
+<div class="def" id="meth_level">
+double level()
+</div>
+
+</div>
+<div class="descr">
+<div class="def" id="meth_mode">
+Psana::Acqiris::TdcChannel::Mode mode()
+</div>
+
+</div>
+<div class="descr">
+<div class="def" id="meth_slope">
+Psana::Acqiris::TdcChannel::Slope slope()
+</div>
+
+</div>
+</body></html>

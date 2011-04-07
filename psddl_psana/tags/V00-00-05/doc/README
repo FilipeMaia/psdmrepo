@@ -1,0 +1,15 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package psddl_psana
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Brief description:
+==================
+
+Package contains files (mostly generated from psddldata) describing 
+psana interface for LCLS data types.

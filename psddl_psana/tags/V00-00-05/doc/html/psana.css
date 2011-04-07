@@ -1,0 +1,60 @@
+
+BODY,H1,H2,H3,H4,H5,H6,P,CENTER,TD,TH,UL,DL,DIV {
+    font-family: Geneva, Arial, Helvetica, sans-serif;
+}
+
+BODY,TD {
+       font-size: 90%;
+}
+H1 {
+    text-align: center;
+       font-size: 160%;
+}
+H2 {
+       font-size: 120%;
+}
+H3 {
+       font-size: 100%;
+}
+
+
+A {
+       text-decoration: none;
+       font-weight: bold;
+       color: #000080;
+}
+A:visited {
+       text-decoration: none;
+       font-weight: bold;
+       color: #000080
+}
+A:hover {
+    text-decoration: none;
+    background-color: #E0E0E0;
+}
+
+dt { 
+margin: 2px;
+padding: 2px;
+}
+
+.const {font-family:monospace;}
+.code {font-family:monospace;}
+
+.methrettype {text-align:right;}
+
+div.def {
+background-color: #E0E0E0;
+margin: 0px;
+padding: 2px;
+line-height: 140%;
+border: 1px solid #000000;
+}
+
+div.descr {
+margin: 10px;
+padding: 2px;
+line-height: 140%;
+border: 1px solid #000000;
+}
+

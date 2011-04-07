@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Class Psana::Epics::EpicsPvHeader Reference</title>
+<link href="psana.css" rel="stylesheet" type="text/css">
+</head><body>
+<h1>Class Psana::Epics::EpicsPvHeader Reference</h1>
+<p>Include: <span class="code">#include "psddl_psana/epics.ddl.h"</span></p>
+Base class for EPICS data types stored in XTC files.
+<h2>Member Functions</h2>
+<div class="descr">
+<table class="methods">
+<tr><td class="methrettype">int16_t</td><td class="methdecl"><a href="#meth_dbrType">dbrType</a>()</td></tr>
+<tr><td class="methrettype">uint8_t</td><td class="methdecl"><a href="#meth_isCtrl">isCtrl</a>()</td></tr>
+<tr><td class="methrettype">uint8_t</td><td class="methdecl"><a href="#meth_isTime">isTime</a>()</td></tr>
+<tr><td class="methrettype">int16_t</td><td class="methdecl"><a href="#meth_numElements">numElements</a>()</td></tr>
+<tr><td class="methrettype">void</td><td class="methdecl"><a href="#meth_print">print</a>()</td></tr>
+<tr><td class="methrettype">int16_t</td><td class="methdecl"><a href="#meth_pvId">pvId</a>()</td></tr>
+<tr><td class="methrettype">uint16_t</td><td class="methdecl"><a href="#meth_severity">severity</a>()</td></tr>
+<tr><td class="methrettype">uint16_t</td><td class="methdecl"><a href="#meth_status">status</a>()</td></tr>
+</table></div>
+<h2>Member Functions Reference</h2>
+<div class="descr">
+<div class="def" id="meth_dbrType">
+int16_t dbrType()
+</div>
+DBR structure type.
+</div>
+<div class="descr">
+<div class="def" id="meth_isCtrl">
+uint8_t isCtrl()
+</div>
+Returns 1 if PV is one of CTRL types, 0 otherwise.
+</div>
+<div class="descr">
+<div class="def" id="meth_isTime">
+uint8_t isTime()
+</div>
+Returns 1 if PV is one of TIME types, 0 otherwise.
+</div>
+<div class="descr">
+<div class="def" id="meth_numElements">
+int16_t numElements()
+</div>
+Number of elements in EPICS DBR structure
+</div>
+<div class="descr">
+<div class="def" id="meth_print">
+void print()
+</div>
+Dumps the content of PV to standard output.
+</div>
+<div class="descr">
+<div class="def" id="meth_pvId">
+int16_t pvId()
+</div>
+PV ID number assigned by DAQ.
+</div>
+<div class="descr">
+<div class="def" id="meth_severity">
+uint16_t severity()
+</div>
+Returns severity value for the PV.
+</div>
+<div class="descr">
+<div class="def" id="meth_status">
+uint16_t status()
+</div>
+Returns status value for the PV.
+</div>
+</body></html>
