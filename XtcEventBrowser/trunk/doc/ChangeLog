@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Apr-8 ofte               rev 1786
+        - XtcEventBrowser/src/pyana_xppscan.py: fixed some mistake.
+	  IPMdiagnostics and IPMfilt utilities done, still some more plotting needed
+
 2011-Apr-7 ofte               rev 1784
         - Almost done implementing the xpp IPMdiagnostics functionality. 
 	
