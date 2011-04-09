@@ -37,7 +37,7 @@ $id = trim( $_GET['id'] );
 if( $id == '' ) report_error( "message id can't be empty" );
 
 
-/* Package the error message into a JAON object and return the one
+/* Package the error message into a JSON object and return the one
  * back to a caller. The script's execution will end at this point.
  */
 function report_error( $msg ) {

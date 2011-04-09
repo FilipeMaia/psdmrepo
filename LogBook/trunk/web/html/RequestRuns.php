@@ -10,6 +10,23 @@ use LogBook\LogBookException;
 use LusiTime\LusiTime;
 use LusiTime\LusiTimeException;
 
+/* Package the error message into a JSON object and return the one
+ * back to a caller. The script's execution will end at this point.
+ */
+function report_error( $msg ) {
+    $status_encoded = json_encode( "error" );
+    $msg_encoded = json_encode( '<b><em style="color:red;" >Error:</em></b>&nbsp;'.$msg );
+    print <<< HERE
+{
+  "ResultSet": {
+    "Status": {$status_encoded},
+    "Message": {$msg_encoded}
+  }
+}
+HERE;
+    exit;
+}
+
 /*
  * This script will process a request for displaying runs of an experiment.
  */
