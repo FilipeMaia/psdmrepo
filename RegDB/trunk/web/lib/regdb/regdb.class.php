@@ -524,6 +524,7 @@ HERE;
          */
     	if( is_null( $instr ) || ( $instr == 'AMO' )) {
             $groups['amoi0110'] = True;
+            $groups['ps-amo'] = True;
     	}
 
     	/* SXR commissionning, in-house, etc. experiments for the year of 2010.
@@ -533,6 +534,7 @@ HERE;
             $groups['sxrsse10'] = True;
             $groups['sxrlje10'] = True;
             $groups['sxri0110'] = True;
+            $groups['ps-sxr'] = True;
     	}
 
     	/* Groups for which there is no entry in RegDB but which we still want
@@ -547,6 +549,22 @@ HERE;
             $groups['xppi0110'] = True;
             $groups['xppi0210'] = True;
             $groups['xppi0310'] = True;
+            $groups['ps-xpp'] = True;
+    	}
+    	/* CXI commissionning, in-house, etc. experiments for the year of 2010.
+         */
+    	if( is_null( $instr ) || ( $instr == 'CXI' )) {
+            $groups['ps-cxi'] = True;
+    	}
+    	/* MEC commissionning, in-house, etc. experiments for the year of 2010.
+         */
+    	if( is_null( $instr ) || ( $instr == 'MEC' )) {
+            $groups['ps-mec'] = True;
+    	}
+    	/* XCS commissionning, in-house, etc. experiments for the year of 2010.
+         */
+    	if( is_null( $instr ) || ( $instr == 'XCS' )) {
+            $groups['ps-xcs'] = True;
     	}
     	return $groups;
     }

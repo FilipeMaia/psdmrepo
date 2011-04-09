@@ -98,10 +98,20 @@ class RegDBAuth {
     public function canManageLDAPGroup( $name ) {
   
         if( !$this->isAuthenticated()) return false;
-    	
-    	/* Go through all experiments. Skip 'facilities'.
-    	 */
+
         $this->authdb->begin();
+
+        /* Check if a user is allowed to manage any groups.
+         * If so then unconditionally proceed with teh authorization.
+         */
+        if( $this->authdb->hasPrivilege(
+            RegDBAuth::instance()->authName(),
+            null, /* exper_id */
+            'LDAP',
+            'manage_groups' )) return true;
+
+        /* Go through all experiments. Skip 'facilities'.
+    	 */
         $regdb = new RegDB();
     	$regdb->begin();
     	foreach( $regdb->experiments() as $experiment ) {    	
