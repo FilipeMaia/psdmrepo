@@ -227,11 +227,12 @@ HERE;
 HERE;
 		foreach( $tabs as $t  ) {
 			$id = $t['id'];
+			$href = isset($id) ? '#'.$id : $t['url'];
 			$name = $t['name'];
 			$onclick = '';
 			if( array_key_exists ( 'callback', $t )) $onclick = "onclick='".$t['callback']."'";
 			$html .= <<<HERE
-    <li><a href="#{$id}" {$onclick}>{$name}</a></li>
+    <li><a href="{$href}" {$onclick}>{$name}</a></li>
 
 HERE;
 		}
@@ -241,9 +242,9 @@ HERE;
 HERE;
 		foreach( $tabs as $t  ) {
 			$id = $t['id'];
+			if(!isset($id)) continue;
 			$tab_html = $t['html'];
-			if( is_null( $tab_html )) continue;
-			$class = $t['class'];
+			$class    = $t['class'];
 			$class_html = ( isset( $class ) && !is_null( $class ) && ( $class != '' )) ? 'class="'.$class.'"' : '';
 
 			// NOTE: the inner <div> is needed to have full control over custom styles,
