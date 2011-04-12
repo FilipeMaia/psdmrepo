@@ -238,10 +238,12 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
     
     def processCBoxAUnits(self):
         self.setBitStatus( 4, self.cboxAUnits.isChecked() )
+        self.cboxALimits.setCheckState(0)
 
 
     def processCBoxTUnits(self):
         self.setBitStatus( 8, self.cboxTUnits.isChecked() )
+        self.cboxTLimits.setCheckState(0)
 
 
     def showToolTips(self):
@@ -304,6 +306,37 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
         cp.confpars.waveformWindowParameters[self.window][8]  = None
         cp.confpars.waveformWindowParameters[self.window][9]  = None
         cp.confpars.waveformWindowParameters[self.window][10] = None
+
+        self.setWFButtonColors()
+
+
+    def setWFButtonColors(self) :
+        
+        if  self.butWFDataSet.text() == 'None' :
+            self.butWFDataSet.setStyleSheet("background-color: rgb(255, 200, 200); color: rgb(0, 0, 0)")
+        else :
+            self.butWFDataSet.setStyleSheet("background-color: rgb(255, 255, 255); color: rgb(0, 0, 0)")
+        
+        if  self.butWFInd1.text() == 'None' :
+            self.butWFInd1.setStyleSheet("background-color: rgb(255, 200, 200); color: rgb(0, 0, 0)")
+        else :
+            self.butWFInd1.setStyleSheet("background-color: rgb(255, 255, 255); color: rgb(0, 0, 0)")
+
+        if  self.butWFInd2.text() == 'None' :
+            self.butWFInd2.setStyleSheet("background-color: rgb(255, 200, 200); color: rgb(0, 0, 0)")
+        else :
+            self.butWFInd2.setStyleSheet("background-color: rgb(255, 255, 255); color: rgb(0, 0, 0)")
+
+        if  self.butWFInd3.text() == 'None' :
+            self.butWFInd3.setStyleSheet("background-color: rgb(255, 200, 200); color: rgb(0, 0, 0)")
+        else :
+            self.butWFInd3.setStyleSheet("background-color: rgb(255, 255, 255); color: rgb(0, 0, 0)")
+
+        if  self.butWFInd4.text() == 'None' :
+            self.butWFInd4.setStyleSheet("background-color: rgb(255, 200, 200); color: rgb(0, 0, 0)")
+        else :
+            self.butWFInd4.setStyleSheet("background-color: rgb(255, 255, 255); color: rgb(0, 0, 0)")
+
 
 
     def setButWFDataSetTextAlignment(self):
@@ -385,6 +418,8 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
         else :                         wfnum = int(selected_wfnum) 
         self.butWFInd1.setText( selected_wfnum )
         cp.confpars.waveformWindowParameters[self.window][7] = wfnum
+        self.setWFButtonColors()
+
 
     def processMenuWFInd2(self):
         actionSelected = self.popupMenuForWaveNumber.exec_(QtGui.QCursor.pos())
@@ -394,6 +429,8 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
         else :                         wfnum = int(selected_wfnum) 
         self.butWFInd2.setText( selected_wfnum )
         cp.confpars.waveformWindowParameters[self.window][8] = wfnum       
+        self.setWFButtonColors()
+
 
     def processMenuWFInd3(self):
         actionSelected = self.popupMenuForWaveNumber.exec_(QtGui.QCursor.pos())
@@ -403,6 +440,8 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
         else :                         wfnum = int(selected_wfnum) 
         self.butWFInd3.setText( selected_wfnum )
         cp.confpars.waveformWindowParameters[self.window][9] = wfnum       
+        self.setWFButtonColors()
+
 
     def processMenuWFInd4(self):
         actionSelected = self.popupMenuForWaveNumber.exec_(QtGui.QCursor.pos())
@@ -412,6 +451,7 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
         else :                         wfnum = int(selected_wfnum) 
         self.butWFInd4.setText( selected_wfnum )
         cp.confpars.waveformWindowParameters[self.window][10] = wfnum       
+        self.setWFButtonColors()
 
 
     def processRadioAuto(self):

@@ -105,7 +105,7 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.browse    = QtGui.QPushButton("Browse")    
         self.printfile = QtGui.QPushButton("Print HDF5 structure")    
-        self.display   = QtGui.QPushButton("Open HDF5 tree")
+        self.display   = QtGui.QPushButton("HDF5 tree")
         self.wtd       = QtGui.QPushButton("What to display")
         self.config    = QtGui.QPushButton("Configuration")
         self.save      = QtGui.QPushButton("Save")
@@ -191,19 +191,23 @@ class GUIMain ( QtGui.QWidget ) :
         printh5.print_hdf5_file_structure(fname)
 
     def processQuit(self):
-        print 'Quit'
+        print 'Begin GUIMain Quit'
         #self.drawev.quitDrawEvent()
         self.wplayer.processQuit()
         self.SHowIsOn = False
-        if cp.confpars.wtdWindowIsOpen == True :
-            self.guiwhat.close()
-        if cp.confpars.treeWindowIsOpen == True :
-            self.guitree.close()
-        if cp.confpars.configGUIIsOpen == True :
+        if cp.confpars.wtdWindowIsOpen :
+            cp.confpars.guiwhat.close()
+        if cp.confpars.treeWindowIsOpen :
+            cp.confpars.guitree.close()
+        if cp.confpars.configGUIIsOpen :
             self.configGUI.close()
-        if cp.confpars.selectionGUIIsOpen == True :
+        if cp.confpars.selectionGUIIsOpen :
             self.guiselection.close()
+        print 'Segmentation fault may happen at closing of the Main GUI window. The reason for that is not clear yet...'
+              #It happens after opening/closing HDF5 Tree and WTD GUIs...
         self.close()
+
+
         
     def processBrowse(self):
         print 'Browse'
@@ -269,28 +273,29 @@ class GUIMain ( QtGui.QWidget ) :
         if cp.confpars.wtdWindowIsOpen : # close wtd window
             print 'What to display GUI: Close'
             #self.wtd.setText('Open')
-            self.guiwhat.close()
+            cp.confpars.guiwhat.close()
             cp.confpars.wtdWindowIsOpen = False            
         else :                           # Open wtd window
             print 'What to display GUI: Open'
             #self.wtd.setText('Close')
-            self.guiwhat = guiwtd.GUIWhatToDisplay()
-            self.guiwhat.move(self.pos().__add__(QtCore.QPoint(0,360))) # open window with offset w.r.t. parent
-            self.guiwhat.show()
+            cp.confpars.guiwhat = guiwtd.GUIWhatToDisplay()
+            cp.confpars.guiwhat.move(self.pos().__add__(QtCore.QPoint(0,360))) # open window with offset w.r.t. parent
+            cp.confpars.guiwhat.show()
             cp.confpars.wtdWindowIsOpen = True
-
+            
     def processDisplay(self):
         if cp.confpars.treeWindowIsOpen : # close wtd window
             print 'What to display GUI: Close'
-            self.display.setText('Open HDF5 tree')
-            self.guitree.close()
+            #self.display.setText('Open HDF5 tree')
+            cp.confpars.guitree.close()
             cp.confpars.treeWindowIsOpen = False            
         else :                           # Open wtd window
             print 'What to display GUI: Open'
-            self.display.setText('Close HDF5 tree')
-            self.guitree = guiselitems.GUISelectItems(self)
-            self.guitree.move(self.pos().__add__(QtCore.QPoint(-360,0))) # open window with offset w.r.t. parent
-            self.guitree.show()
+            #self.display.setText('Close HDF5 tree')
+            cp.confpars.guitree = guiselitems.GUISelectItems()
+            #cp.confpars.guitree.setParent(self) # bypass for parent initialization in the base QWidget
+            cp.confpars.guitree.move(self.pos().__add__(QtCore.QPoint(-360,0))) # open window with offset w.r.t. parent
+            cp.confpars.guitree.show()
             cp.confpars.treeWindowIsOpen = True
 
     def mousePressEvent(self, event):

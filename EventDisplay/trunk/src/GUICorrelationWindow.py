@@ -523,6 +523,13 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         print 'fillPopupMenuForDataSet'
         self.popupMenuForDataSet.addAction('None')
         for dsname in cp.confpars.list_of_checked_item_names :
+
+            item_last_name   = printh5.get_item_last_name(dsname)           
+            if item_last_name == 'waveforms'    : continue
+            if item_last_name == 'image'        : continue
+            if item_last_name == 'timestamps'   : continue
+            if printh5.CSpadIsInTheName(dsname) : continue
+ 
             self.popupMenuForDataSet.addAction(dsname)
 
 
@@ -585,9 +592,10 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         print 'selected_dsname = ', selected_dsname
         self.butCorrYParName.setText( selected_dsname )
         cp.confpars.correlationWindowParameters[self.window][7] = str(selected_dsname)
-        cp.confpars.correlationWindowParameters[self.window][9] = selected_ind
 
         self.setButCorrYParNameTextAlignment()
+        self.cboxYlimits.setCheckState(0)
+
 
     def processMenuForXParName(self):
         print 'MenuForXParName'
@@ -602,10 +610,9 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         print 'selected_dsname = ', selected_dsname
         self.butCorrXParName.setText( selected_dsname )
         cp.confpars.correlationWindowParameters[self.window][8]  = str(selected_dsname)
-        cp.confpars.correlationWindowParameters[self.window][10] = selected_ind
-
 
         self.setButCorrXParNameTextAlignment()
+        self.cboxXlimits.setCheckState(0)
 
 #-----------------------------
 #  In case someone decides to run this module

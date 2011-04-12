@@ -85,10 +85,14 @@ class PlotsForCorrelations ( object ) :
         self.XNBins    = cp.confpars.correlationWindowParameters[win][13]
         
         if self.Ydsname == 'None' :
-            print 'THE Ydsname=', self.Ydsname, ' IS SET INCORRECTLY. THE CORRELATION PLOT', self.nwin,' IS IGNORED'
+            print 'THE Ydsname=', self.Ydsname, ' IS SET INCORRECTLY. THE CORRELATION PLOT', win,' IS IGNORED'
             return
 
+        if self.YParName == 'None' : 
+            print 'THE YParName=', self.YParName, ' IS NOT SET. THE CORRELATION PLOT', win,' IS IGNORED'
+            return
 
+        
         self.dsY = h5file[self.Ydsname]
         print 'dsY.shape=',self.dsY.shape
 
@@ -104,7 +108,7 @@ class PlotsForCorrelations ( object ) :
             self.Xarr = range(nYpoints)
             print 'Index array from 0 to', nYpoints
             self.XTitle = 'Index'
-            self.PlotTitle = 'Parameter vs Index'
+            self.PlotTitle = 'Plot ' + str(win+1) + ': Parameter vs Index'
             self.plotWaveform()
 
 
@@ -116,7 +120,7 @@ class PlotsForCorrelations ( object ) :
             self.Xarr -= self.Xarr[0]
             print 'Time array :\n', self.Xarr 
             self.XTitle = 'Time (sec)'
-            self.PlotTitle = 'Parameter vs Time'
+            self.PlotTitle = 'Plot ' + str(win+1) + ': Parameter vs Time'
             self.plotWaveform()
 
             
@@ -124,6 +128,11 @@ class PlotsForCorrelations ( object ) :
             if self.Xdsname == 'None' :
                 print 'THE Xdsname=', self.Xdsname, ' IS SET INCORRECTLY. THE CORRELATION PLOT', win,' IS IGNORED' 
                 return
+
+            if self.XParName == 'None' : 
+                print 'THE XParName=', self.XParName, ' IS NOT SET. THE CORRELATION PLOT', win,' IS IGNORED'
+                return
+
             self.dsX = h5file[self.Xdsname]
 
             self.Xarr = self.dsX[self.XParName]
@@ -137,14 +146,14 @@ class PlotsForCorrelations ( object ) :
 
             print 'X-Parameter array :\n', self.Xarr
             self.XTitle = self.XParName
-            self.PlotTitle = 'Correlations of two parameters'
+            self.PlotTitle = 'Plot ' + str(win+1) + ': Correlations of two parameters'
             self.markerStyle = 'bo-'
             #self.plotWaveform()
             self.plot2DHistogram()
 
  
         elif self.radioXPar == 3 : # for Y-Parameter histogram 
-            self.PlotTitle = 'Y-parameter histogram'
+            self.PlotTitle = 'Plot ' + str(win+1) + ': Y-parameter histogram'
             self.plot1DHistogram() 
 
         plt.show()

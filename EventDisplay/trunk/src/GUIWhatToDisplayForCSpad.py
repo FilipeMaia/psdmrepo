@@ -272,12 +272,12 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
 
 
     def closeEvent(self, event):
-        print 'closeEvent'
+        #print 'closeEvent'
         self.processClose()
 
 
     def processClose(self):
-        print 'Close window'
+        #print 'Close window'
         cp.confpars.wtdCSWindowIsOpen = False
         self.close()
 

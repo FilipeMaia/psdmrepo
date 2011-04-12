@@ -138,7 +138,7 @@ class GUIWhatToDisplayForProjections ( QtGui.QWidget ) :
 
 
     def closeEvent(self, event):
-        print 'closeEvent'
+        #print 'closeEvent'
         self.processQuit()
 
 

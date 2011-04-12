@@ -118,13 +118,13 @@ class GUICorrelation ( QtGui.QWidget ) :
 
 
     def processQuit(self):
-        print 'Quit'
+        #print 'Quit'
         cp.confpars.correlationGUIIsOpen = False
         self.close()
 
 
     def closeEvent(self, event):
-        print 'closeEvent'
+        #print 'closeEvent'
         self.processQuit()
 
         

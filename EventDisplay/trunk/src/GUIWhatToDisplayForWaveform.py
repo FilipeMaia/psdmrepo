@@ -125,7 +125,7 @@ class GUIWhatToDisplayForWaveform ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
 
     def processQuit(self):
-        print 'Quit'
+        #print 'Quit'
         self.close()
         
     def mousePressEvent(self, event):

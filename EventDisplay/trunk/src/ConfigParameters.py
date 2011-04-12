@@ -93,22 +93,23 @@ class ConfigParameters ( object ) :
         #self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/Ipimb::DataV1/CxiDg1.0:Ipimb.0/time')
 
         # Status parameters which do not need to be saved
-        self.confParsDirName      = '.'
-        self.confParsFileName     = 'evtdispconfig'
+        self.confParsDirName         = '.'
+        self.confParsFileName        = 'evtdispconfig'
 
-        self.h5_file_is_open      = False
-        self.wtdWindowIsOpen      = False
-        self.wtdIMWindowIsOpen    = False
-        self.wtdCSWindowIsOpen    = False
-        self.wtdWFWindowIsOpen    = False
-        self.treeWindowIsOpen     = False
-        self.treeViewIsExpanded   = False
-        self.configGUIIsOpen      = False
-        self.selectionGUIIsOpen   = False
-        self.selectionWindowIsOpen= False
-        self.correlationGUIIsOpen = False
+        self.h5_file_is_open         = False
+        self.wtdWindowIsOpen         = False
+        self.wtdIMWindowIsOpen       = False
+        self.wtdCSWindowIsOpen       = False
+        self.wtdWFWindowIsOpen       = False
+        self.treeWindowIsOpen        = False
+       #self.treeWindowIsOpenFromWTD = False
+        self.treeViewIsExpanded      = False
+        self.configGUIIsOpen         = False
+        self.selectionGUIIsOpen      = False
+        self.selectionWindowIsOpen   = False
+        self.correlationGUIIsOpen    = False
 
-        self.posGUIMain           = (370,10)
+        self.posGUIMain              = (370,10)
 
         self.readParsFromFileAtStart = True
         self.current_item_name_for_title = 'Current extended item name for title'

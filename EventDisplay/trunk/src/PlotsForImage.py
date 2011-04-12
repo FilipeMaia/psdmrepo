@@ -145,6 +145,7 @@ class PlotsForImage ( object ) :
 
         self.axescb = plt.imshow(self.arrwin, origin='upper', interpolation='nearest', extent=self.range) # Just a histogram t=0.08s
 
+        self.arr2d = self.arrwin
         self.addSelectionRectangleForImage()
 
         self.axesDet = plt.gca()

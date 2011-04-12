@@ -53,15 +53,16 @@ class GUISelectItems ( QtGui.QMainWindow ) :
     #----------------
     #  Constructor --
     #----------------
+
     def __init__(self, parent=None):
         #super(GUISelectItems, self).__init__(parent)
         QtGui.QWidget.__init__(self, parent)
 
         """Constructor."""
-        self.parentGUIMain = parent
+        #self.parent = parent # See setParent for bypass
 
         self.setGeometry(10, 10, 350, 1000)
-        self.setWindowTitle('Items selection')
+        self.setWindowTitle('HDF5 tree, items selection')
 
         #layout = QHBoxLayout()
 
@@ -162,20 +163,26 @@ class GUISelectItems ( QtGui.QMainWindow ) :
     #  Public methods --
     #-------------------
 
+    def setParent(self,parent) :
+        self.parent = parent
+
     def closeEvent(self, event): # if the 'x' (in the top-right corner of the window) is clicked
         print 'closeEvent'
         self.processExit()
 
     def processExit(self):
         print 'Exit button is clicked'
-        self.parentGUIMain.processDisplay() # in order to close this window as from GUIMain
-        #cp.confpars.wtdWindowIsOpen = False
-        #self.close()
+        #self.parent.processDisplay() # in order to close this window as from GUIMain
+        cp.confpars.treeWindowIsOpen = False
+        self.close()
         #self.display.setText('Open')
 
     def processApply(self):
         print 'Apply button is clicked, use all checked items in the tree model for display'
         cp.confpars.list_of_checked_item_names = self.model.get_list_of_checked_item_names_for_model()
+        if cp.confpars.wtdWindowIsOpen :
+            cp.confpars.guiwhat.processRefresh()
+
 
     def processReset(self):
         print 'Reset button is clicked, uncheck all items'

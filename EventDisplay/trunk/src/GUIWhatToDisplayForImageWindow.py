@@ -250,8 +250,9 @@ class GUIWhatToDisplayForImageWindow ( QtGui.QWidget ) :
         self.popupMenuForDataSet.addAction('All')
         for dsname in cp.confpars.list_of_checked_item_names :
             item_last_name   = printh5.get_item_last_name(dsname)           
-            cspadIsInTheName = printh5.CSpadIsInTheName(dsname)
-            if item_last_name == 'image' or cspadIsInTheName:
+            #cspadIsInTheName = printh5.CSpadIsInTheName(dsname)
+            #if item_last_name == 'image' or cspadIsInTheName:
+            if item_last_name == 'image':
 
                 self.popupMenuForDataSet.addAction(dsname)
         #self.popupMenuForDataSet.addAction('All')
