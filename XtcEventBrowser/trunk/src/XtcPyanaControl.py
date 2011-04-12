@@ -128,8 +128,6 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.controls = []
         self.moreinfo = []
 
-        # pyana options
-        self.poptions = None
         # -------------------------------------
         
 
@@ -159,7 +157,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.info_widget = None
 
         # assume all events        
-        self.nevents = None 
+        self.run_n = None 
+        self.skip_n = None 
 
         self.define_layout()
 
@@ -181,7 +180,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
         # mid layer: almost everything
         h1 = QtGui.QHBoxLayout()
-        # to the left: 
+        # to the left:
         detector_gbox = QtGui.QGroupBox("In the file(s):")
         # layout of the group must be global, checkboxes added later
         self.lgroup = QtGui.QVBoxLayout()
@@ -202,10 +201,10 @@ class XtcPyanaControl ( QtGui.QWidget ) :
     def intro_tab(self):
         # First tab: help/info
         self.help_widget = QtGui.QWidget()
-        self.help_layout = QtGui.QHBoxLayout(self.help_widget)
+        self.help_layout = QtGui.QVBoxLayout(self.help_widget)
         self.help_subwg1 = QtGui.QLabel(self.help_widget)
         self.help_subwg1_text = """
-    Configure your Event Display / Analysis:
+Configure your Event Display / Analysis:
 
     Select the information / detectors of interest to you from list
     to the left. Pyana modules will be configured for you to analyze
@@ -213,11 +212,89 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
     You can edit the configuration or pyana modules afterwards, 
     if you want to further customize your analysis.
+
+
+Default settings:
     """
         self.help_subwg1.setText(self.help_subwg1_text)
         self.help_layout.addWidget(self.help_subwg1)
-        self.config_tabs.addTab(self.help_widget,"Help")
+
+        # run pyana with the first Nr events. Skip Ns events. 
+        self.run_n_status = QtGui.QLabel("Process all events")
+        self.run_n_enter = QtGui.QLineEdit("")
+        if self.run_n is not None:
+            self.run_n_status = QtGui.QLabel("Process %d events"% self.run_n)
+            self.run_n_enter.setText( str(self.run_n) )
+        self.run_n_enter.setMaximumWidth(90)
+        self.connect(self.run_n_enter, QtCore.SIGNAL('returnPressed()'), self.run_n_change )
+        self.run_n_change_btn = QtGui.QPushButton("Change") 
+        self.connect(self.run_n_change_btn, QtCore.SIGNAL('clicked()'), self.run_n_change )
+
+        self.run_n_layout = QtGui.QHBoxLayout()
+        self.run_n_layout.setAlignment(QtCore.Qt.AlignRight)
+        self.run_n_layout.addWidget(self.run_n_status)
+        self.run_n_layout.addWidget(self.run_n_enter)
+        self.run_n_layout.addWidget(self.run_n_change_btn)
+        self.help_layout.addLayout(self.run_n_layout )
+
+        self.skip_n_layout = QtGui.QHBoxLayout()
+        self.skip_n_status = QtGui.QLabel("Skip no events")
+        self.skip_n_enter = QtGui.QLineEdit("")
+        self.skip_n_enter.setMaximumWidth(90)
+        if self.skip_n is not None:
+            self.skip_n_status = QtGui.QLabel("Skip %d events"%self.skip_n )
+            self.skip_n_enter.setText( str(self.skip_n) )
+            
+        self.connect(self.skip_n_enter, QtCore.SIGNAL('returnPressed()'), self.skip_n_change )
+        self.skip_n_change_btn = QtGui.QPushButton("Change") 
+        self.connect(self.skip_n_change_btn, QtCore.SIGNAL('clicked()'), self.skip_n_change )
+
+        self.skip_n_layout.addWidget(self.skip_n_status)
+        self.skip_n_layout.addWidget(self.skip_n_enter)
+        self.skip_n_layout.addWidget(self.skip_n_change_btn)
+        self.help_layout.addLayout(self.skip_n_layout, QtCore.Qt.AlignRight )
+
+        # plot every N events
+        self.plot_n_layout = QtGui.QHBoxLayout()
+        self.plot_n = 100
+        self.plotn_status = QtGui.QLabel("Plot every %d events"%self.plot_n )
+        self.plotn_enter = QtGui.QLineEdit( str(self.plot_n) )
+        self.plotn_enter.setMaximumWidth(90)
+        self.connect(self.plotn_enter, QtCore.SIGNAL('returnPressed()'), self.plotn_change )
+        self.plotn_change_btn = QtGui.QPushButton("&Change") 
+        self.connect(self.plotn_change_btn, QtCore.SIGNAL('clicked()'), self.plotn_change )
+        self.plot_n_layout.addWidget(self.plotn_status)
+        self.plot_n_layout.addWidget(self.plotn_enter)
+        self.plot_n_layout.addWidget(self.plotn_change_btn)
+        self.help_layout.addLayout(self.plot_n_layout, QtCore.Qt.AlignRight )
+
+        self.config_tabs.addTab(self.help_widget,"General")
         self.config_tabs.tabBar().hide()
+
+    def plotn_change(self):
+        self.plot_n = int(self.plotn_enter.text())            
+        self.plotn_status.setText("Plot every %d events"%self.plot_n )
+
+    def run_n_change(self):
+        text = self.run_n_enter.text()
+        if text == "all" or text == "All" or text == "None" :
+            self.run_n = None
+            self.run_n_status.setText("Process all events")
+        else :
+            self.run_n = int( text )
+            self.run_n_status.setText("Process %d events"%self.run_n )
+        self.run_n_enter.setText("")
+
+    def skip_n_change(self):
+        text = self.skip_n_enter.text()
+        if text == "no" or text == "None" :
+            self.skip_n = None
+            self.skip_n_status.setText("Skip no events")
+        else :
+            self.skip_n = int(self.skip_n_enter.text())            
+            self.skip_n_status.setText("Skip %d events"%self.skip_n )
+        self.skip_n_enter.setText("")
+
 
     def scan_tab(self, who):
         """ Second tab: Scan
@@ -253,7 +330,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             self.pyana_txtbox = pyana_txtbox
         
             pyana_button_layout = QtGui.QHBoxLayout()
-            self.config_button = QtGui.QPushButton("&Write configuration to file")
+            self.config_button = QtGui.QPushButton("&Write configuration to file") 
             self.connect(self.config_button, QtCore.SIGNAL('clicked()'), self.write_configfile )
             pyana_button_layout.addWidget( self.config_button )
             self.econfig_button = QtGui.QPushButton("&Edit configuration file")
@@ -517,7 +594,6 @@ class XtcPyanaControl ( QtGui.QWidget ) :
     def add_module(self,box,modules_to_run,options_for_mod) :
 
         index = None
-        plot_every_n = 10
 
         # The following sets up one out of two analysis modes:
         #      1) scan
@@ -537,7 +613,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             options_for_mod[index].append("\ncontrolpv = %s" % pvname)
             options_for_mod[index].append("\ninput_epics = ")
             options_for_mod[index].append("\ninput_scalars = ")
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n )
+            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\nfignum = %d" % (index+1))
             return
 
@@ -551,7 +627,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 options_for_mod.append([])
 
             #print "XtcEventBrowser.pyana_bld at ", index
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\nfignum = %d" % (index+1))
             if str(box.text()).find("EBeam")>=0 :
                 options_for_mod[index].append("\ndo_ebeam = True")
@@ -577,7 +653,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             #print "XtcEventBrowser.pyana_ipimb at ", index
             address = str(box.text()).split(":")[1].strip()
             options_for_mod[index].append("\nsources = %s" % address)
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\nfignum = %d" % (index+1))
             return
                     
@@ -593,7 +669,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             #print "XtcEventBrowser.pyana_ipimb at ", index
             address = str(box.text()).split(": ")[1].strip()
             options_for_mod[index].append("\nipimb_addresses = %s" % address)
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\nfignum = %d" % (index+1))
             return
                     
@@ -617,7 +693,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             options_for_mod[index].append("\nimage_manipulations = ")
             options_for_mod[index].append("\ngood_range = %d--%d" % (0,99999999.9) )
             options_for_mod[index].append("\ndark_range = %d--%d" % (0,0) )
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\nfignum = %d" % (index+1))
             options_for_mod[index].append("\noutput_file = ")
             options_for_mod[index].append("\nn_hdf5 = ")        
@@ -635,7 +711,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             #print "XtcEventBrowser.pyana_cspad at ", index
             address = str(box.text()).split(":")[1].strip()
             options_for_mod[index].append("\nimage_source = %s" % address)
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n)
+            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\nfignum = %d" % (index+1))
             options_for_mod[index].append("\ndark_img_file = ")
             options_for_mod[index].append("\noutput_file = ")                    
@@ -660,7 +736,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             #print "XtcEventBrowser.pyana_epics at ", index
             pvname = str(box.text()).split("PV:  ")[1]
             options_for_mod[index].append("\npv = %s" % pvname)
-            options_for_mod[index].append("\nplot_every_n = %d" % plot_every_n )
+            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n )
             options_for_mod[index].append("\nfignum = %d" % (index+1))
             return
         
@@ -728,7 +804,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
         if self.pyana_button is None: 
             self.pyana_button = QtGui.QPushButton("&Run pyana")
-            self.connect(self.pyana_button, QtCore.SIGNAL('clicked()'), self.run_pyana )
+            self.connect(self.pyana_button, QtCore.SIGNAL('clicked()'), self.run_pyana)
             self.layout.addWidget( self.pyana_button )
             self.layout.setAlignment( self.pyana_button, QtCore.Qt.AlignRight )
         else :
@@ -768,20 +844,17 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
         # Make a command sequence 
         lpoptions = []
-        if self.poptions is not None:
-            # remember line from last time
-            lpoptions = self.poptions
-            # but replace with the latest config file
-            lpoptions[ lpoptions.index("-c")+1 ] = self.configfile
-        else :
-            lpoptions.append("pyana")
-            if self.nevents is not None:
-                lpoptions.append("-n")
-                lpoptions.append(str(self.nevents))
-            lpoptions.append("-c")
-            lpoptions.append("%s" % self.configfile)
-            for file in self.filenames :
-                lpoptions.append(file)
+        lpoptions.append("pyana")
+        if self.run_n is not None:
+            lpoptions.append("-n")
+            lpoptions.append(str(self.run_n))
+        if self.skip_n is not None:
+            lpoptions.append("-s")
+            lpoptions.append(str(self.skip_n))
+        lpoptions.append("-c")
+        lpoptions.append("%s" % self.configfile)
+        for file in self.filenames :
+            lpoptions.append(file)
 
         # turn sequence into a string, allow user to modify it
         runstring = ' '.join(lpoptions)
@@ -796,15 +869,20 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         if ok:
             runstring = str(text)
             lpoptions = runstring.split(' ')
+
+            # and update run_n and skip_n in the Gui:
+            if "-n" in lpoptions:
+                self.run_n = int(lpoptions[ lpoptions.index("-n")+1 ])
+                self.run_n_status.setText("Process %d events"% self.run_n)
+            if "-s" in lpoptions:
+                self.skip_n = int(lpoptions[ lpoptions.index("-s")+1 ])
+                self.skip_n_status.setText("Skip %d events"% self.skip_n)
         else :
             return
 
         print "Calling pyana.... "
         print "     ", ' '.join(lpoptions)
 
-        # use this as default next time
-        self.poptions = lpoptions
-        
         if 1 :
             # calling a new process
             self.proc_pyana = myPopen(lpoptions) # this runs in separate thread.

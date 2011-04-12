@@ -198,10 +198,14 @@ class pyana_scan (object) :
                 #else :
                 #    self.evts_scalars[scalar].append(-99.0)
 
-            elif scalar.find("FeeGasDetEnergy")>= 0 :
+            elif scalar.find("FEEGasDetEnergy")>= 0 :
                 fee_energy_array = evt.getFeeGasDet()
                 if fee_energy_array:
-                    self.evts_scalars[scalar].append( np.sum(fee_energy_array) )
+                    # nenergy 20
+                    # e1 = 0.1
+                    # e2 = 4.0
+                    energy= (fee_energy_array[2]+fee_energy_array[3])/2.0 - 0.1;
+                    self.evts_scalars[scalar].append( energy)
                 #else :
                 #    self.evts_scalars[scalar].append(-99.0)
 
@@ -246,7 +250,7 @@ class pyana_scan (object) :
         logging.info( "pyana_scan.endrun() called" )
         print "End run %d had %d calibcycles " % (self.n_runs, self.n_ccls)
 
-        self.make_plots(fignum=1, suptitle="All in one")        
+        self.make_plots(fignum=10, suptitle="Motor Scan")
 
 
     def endjob( self, env ) :
@@ -261,9 +265,9 @@ class pyana_scan (object) :
 
     def make_plots(self, fignum=1, suptitle=""):
 
-        plt.clf()
-        
-        nplots = 1 + len(self.ccls_scalars)
+        nctrl = len(self.ccls_ctrl) 
+        nsclr = len(self.ccls_scalars)
+        nplots = nctrl + nctrl*nsclr
         ncols = 1
         nrows = 1
         if nplots == 2: ncols = 2
@@ -274,13 +278,16 @@ class pyana_scan (object) :
             nrows = nplots / 3
             if nplots%3 > 0 : nrows += 1
 
-        height=3.5
-        if nrows * 3.5 > 14 : height = 14/nrows
+        height=4.2
+        if (nrows * height) > 14 : height = 14/nrows
         width=height*1.3
 
-        print "Have %d variables to be plotted, layout = %d x %d" % (nplots, nrows,ncols)
+        print "Have %d variables to be plotted, layout = %d x %d, %.2f x %.2f" % \
+              (nplots, nrows,ncols,(nrows*height),(ncols*width))
                 
         fig = plt.figure(num=fignum, figsize=(width*ncols,height*nrows) )
+        plt.clf()
+        fig.subplots_adjust(wspace=0.4)
         fig.suptitle(suptitle)
 
         pos = 0
@@ -290,8 +297,14 @@ class pyana_scan (object) :
             pos += 1
             ax1 = fig.add_subplot(nrows,ncols,pos)
 
+            min,max = ctrl_array[0],ctrl_array[-1]
+            nsteps = len(ctrl_array)
+
             plt.plot(ctrl_array,'bo:')
+
             plt.title('')
+            plt.xlim(0-nsteps*0.1,nsteps+nsteps*0.1)
+            plt.ylim(min-(max-min)/10,max+(max-min)/10)
             plt.xlabel("Scan step",horizontalalignment='left') # the other right
             plt.ylabel(ctrl,horizontalalignment='right')
             plt.draw()
@@ -305,8 +318,10 @@ class pyana_scan (object) :
 
                 plt.errorbar(ctrl_array,
                              mean_std_arr[:,0],
-                             yerr=mean_std_arr[:,1])
+                             yerr=mean_std_arr[:,1],
+                             marker='s')
                 plt.title('')
+                plt.xlim(min-((max-min)/10),max+((max-min)/10))
                 plt.xlabel(ctrl,horizontalalignment='left') # the other right
                 plt.ylabel(sc_name,horizontalalignment='right')
                 plt.draw()

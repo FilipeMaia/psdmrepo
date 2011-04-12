@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 from   pypdsdata import xtc
 from utilities import PyanaOptions
 
+import ipmtools
+
 # analysis class declaration
 class  pyana_ipimb ( object ) :
     
@@ -84,6 +86,18 @@ class  pyana_ipimb ( object ) :
     def endjob( self, env ) :
         
         fignum = self.mpl_num*100
+
+        # <stuff to test>
+        for addr in self.ipimb_addresses :
+            channels = np.float_(self.fex_channels[addr])
+            plt.title(addr)
+            lims = ipmtools.get_limits(channels,fignum=2,method="corrfrac")
+            filtbool = ipmtools.get_filter(channels, lims)
+            print len(filtbool)
+
+
+        # </stuff to test>
+
         self.make_plots(fignum, suptitle="Average of all events")
 
     def make_plots(self, fignum = 1, suptitle = ""):

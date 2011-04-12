@@ -121,6 +121,7 @@ class  pyana_bld ( object ) :
 
             fig = plt.figure(num=(fignum+10), figsize=(8,8) )
             fig.clf()
+            fig.subplots_adjust(wspace=0.3, hspace=0.3)
             fig.suptitle(suptitle)
 
             ax1 = fig.add_subplot(221)

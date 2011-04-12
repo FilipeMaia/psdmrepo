@@ -168,18 +168,18 @@ class pyana_waveform (object) :
                     wf_arrays.append(wf)
                     ts_array = ts
                     
-                    # constant threshold
-                    #baseline = -0.0002
-                    #threshold = +0.0001
-                    baseline = -0.03
-                    threshold = -0.06
-                    edge = np.zeros(nsamples,dtype=float)
-                    self.fill_const_frac_hist(ts, wf, nsamples,
-                                              baseline, threshold, edge )
-                    if self.edges[source] is None :
-                        self.edges[source] = edge
-                    else :
-                        self.edges[source] += edge
+                    ## constant threshold
+                    ##baseline = -0.0002
+                    ##threshold = +0.0001
+                    #baseline = -0.03
+                    #threshold = -0.06
+                    #edge = np.zeros(nsamples,dtype=float)
+                    #self.fill_const_frac_hist(ts, wf, nsamples,
+                    #                          baseline, threshold, edge )
+                    #if self.edges[source] is None :
+                    #    self.edges[source] = edge
+                    #else :
+                    #    self.edges[source] += edge
                      
             wf_arrays.insert(0,ts_array )
             
@@ -228,10 +228,11 @@ class pyana_waveform (object) :
 
             data = np.array(self.data[source])
             print "shape of data array: ", np.shape(data)
-            print "shape of edge array: ", np.shape(self.edges[source])
-            print self.edges[source]
-            
-            self.make_plots(data, self.edges[source], suptitle=source)
+            self.make_plots(data, self.data[source], suptitle=source)
+
+            #print "shape of edge array: ", np.shape(self.edges[source])
+            #print self.edges[source]
+            #self.make_plots(data, self.edges[source], suptitle=source)
 
 
     def make_plots(self, data, edges, fignum=1, suptitle = ""):

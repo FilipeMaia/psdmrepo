@@ -154,10 +154,12 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         # Button: open file browser
         self.fbrowser_button = QtGui.QPushButton("&File Browser...")
         self.connect(self.fbrowser_button, QtCore.SIGNAL('clicked()'), self.file_browser )
+        self.fbrowser_button.setMaximumWidth(100)
 
         # Button: clear file list
         self.fclear_button = QtGui.QPushButton("&Clear File List")
         self.connect(self.fclear_button, QtCore.SIGNAL('clicked()'), self.clear_file_list )
+        self.fclear_button.setMaximumWidth(100)
 
         # Line edit: enter file name
         self.lineedit = QtGui.QLineEdit("")
@@ -252,8 +254,8 @@ class XtcBrowserMain (QtGui.QMainWindow) :
 
         # Quit
         h6 = QtGui.QHBoxLayout()
-        h6.addWidget( self.mpl_button )
-        h6.setAlignment(self.mpl_button, QtCore.Qt.AlignLeft )
+        #h6.addWidget( self.mpl_button )
+        #h6.setAlignment(self.mpl_button, QtCore.Qt.AlignLeft )
         #h6.addWidget( self.mpl2_button )
         #h6.setAlignment(self.mpl2_button, QtCore.Qt.AlignRight )
         h6.addWidget( self.quit_button )
