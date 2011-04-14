@@ -23,7 +23,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
-#include "pdsdata/xtc/BldInfo.hh"
 #include "psddl_psana/bld.ddl.h"
 
 //-----------------------------------------------------------------------
