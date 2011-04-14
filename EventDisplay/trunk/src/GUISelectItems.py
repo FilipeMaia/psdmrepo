@@ -154,6 +154,9 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         if cp.confpars.treeViewIsExpanded :
             #self.processExpand()  # Expand the tree 
             self.processExpCheck() # Expand the tree for checked data items 
+
+        cp.confpars.treeWindowIsOpen = True
+
                 
     #-------------------
     # Private methods --
@@ -173,8 +176,8 @@ class GUISelectItems ( QtGui.QMainWindow ) :
     def processExit(self):
         print 'Exit button is clicked'
         #self.parent.processDisplay() # in order to close this window as from GUIMain
-        cp.confpars.treeWindowIsOpen = False
         self.close()
+        cp.confpars.treeWindowIsOpen = False
         #self.display.setText('Open')
 
     def processApply(self):

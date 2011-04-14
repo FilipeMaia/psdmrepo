@@ -143,9 +143,9 @@ class PlotsForImage ( object ) :
             self.arrwin = self.fig.myarr[ymin:ymax,xmin:xmax]
             self.range  = [xmin, xmax, ymax, ymin]
 
-        self.axescb = plt.imshow(self.arrwin, origin='upper', interpolation='nearest', extent=self.range) # Just a histogram t=0.08s
+        self.fig.axescb = plt.imshow(self.arrwin, origin='upper', interpolation='nearest', extent=self.range) # Just a histogram t=0.08s
 
-        self.arr2d = self.arrwin
+        self.arr2d = self.fig.arr2d = self.arrwin
         self.addSelectionRectangleForImage()
 
         self.axesDet = plt.gca()
@@ -154,7 +154,7 @@ class PlotsForImage ( object ) :
         #colmax = {True: Amax, False: self.fig.myCmax}[self.fig.myCmax == None]
         #plt.clim(colmin,colmax)
         plt.clim(Amin,Amax)
-        self.colb = plt.colorbar(self.axescb, pad=0.05, orientation=1, fraction=0.10, shrink = 1, aspect = 20)#, ticks=coltickslocs #t=0.04s
+        self.fig.colb = plt.colorbar(self.fig.axescb, pad=0.05, orientation=1, fraction=0.10, shrink = 1, aspect = 20)#, ticks=coltickslocs #t=0.04s
             
         canvas  = self.fig.canvas
         toolbar = self.fig.canvas.toolbar
@@ -272,7 +272,7 @@ class PlotsForImage ( object ) :
        fig = self.fig = event.canvas.figure # or plt.gcf()
         
        if event.inaxes :
-           lims = self.axescb.get_clim()
+           lims = self.fig.axescb.get_clim()
 
            colmin = lims[0]
            colmax = lims[1]
@@ -314,23 +314,15 @@ class PlotsForImage ( object ) :
         """Spectrum of amplitudes in the 2d input array."""
 
         self.fig   = fig
-        self.arr2d = arr2d1ev
+        self.arr2d = self.fig.arr2d = arr2d1ev
 
         plt.clf() # clear plot
         fig.canvas.set_window_title(cp.confpars.current_item_name_for_title) 
         pantit='Specrum, event ' + str(cp.confpars.eventCurrent)
         plt.title(pantit,color='r',fontsize=20) # pars like in class Text
-        arrdimX,arrdimY = arr2d1ev.shape
-        #print 'arr2d1ev.shape=', arr2d1ev.shape, arrdimX, arrdimY 
-        #print 'arr2d1ev=\n', arr2d1ev
-        arr1d1ev = copy(arr2d1ev)
-        arr1d1ev.resize(arrdimX*arrdimY)
-        #print 'arr1d1ev=\n', arr1d1ev
-        #plt.hist(arr1d1ev,100)
 
         ampRange = self.getSpectrumAmpLimitsFromWindowParameters() 
-        plt.hist(arr1d1ev, bins=cp.confpars.imageWindowParameters[self.fig.nwin][5], range=ampRange)
-        #plt.hist(arr1d1ev)
+        plt.hist(arr2d1ev.flatten(), bins=cp.confpars.imageWindowParameters[self.fig.nwin][5], range=ampRange)
 
 
     def plotImageAndSpectrum( self, arr2d1ev, fig ):
@@ -343,15 +335,7 @@ class PlotsForImage ( object ) :
         fig.subplots_adjust(left=0.15, bottom=0.05, right=0.95, top=0.95, wspace=0.1, hspace=0.1)        
         
         #For Image 
-        self.arr2d = arr2d1ev
-
-        #print 'arr2d1ev.shape=', arr2d1ev.shape
-        #print 'self.arr2d.shape=', self.arr2d.shape
-
-        #For spectrum
-        arrdimX,arrdimY = self.arr2d.shape
-        self.arr1d = copy(arr2d1ev)
-        self.arr1d.resize(arrdimX*arrdimY)            
+        self.arr2d = self.fig.arr2d = arr2d1ev
 
         self.pantit =    'Event ' + str(cp.confpars.eventCurrent) 
 
@@ -359,29 +343,25 @@ class PlotsForImage ( object ) :
         self.drawImageAndSpectrum(Amin, Amax)
 
 
+
     def drawImageAndSpectrum(self, Amin=None, Amax=None):
         """Plot 2d image from input array for a single pair"""
 
+        self.arr2d = self.fig.arr2d
+
         ax2 = plt.subplot2grid((4,4), (3,0), rowspan=1, colspan=4)
-        #plt.subplot(212)
-        self.axes1d = plt.hist(self.arr1d, bins=cp.confpars.imageWindowParameters[self.fig.nwin][5], range=(Amin, Amax))
-        #plt.xticks( arange(int(Amin), int(Amax), int((Amax-Amin)/3)) )
+        self.axes1d = plt.hist(self.arr2d.flatten(), bins=cp.confpars.imageWindowParameters[self.fig.nwin][5], range=(Amin, Amax))
         colmin, colmax = plt.xlim()
         coltickslocs, coltickslabels = plt.xticks()
         #print 'colticks =', coltickslocs, coltickslabels
         
         ax1 = plt.subplot2grid((4,4), (0,0), rowspan=3, colspan=4)
-        #plt.subplot(211)
-        #print 'self.arr2d.shape=', self.arr2d.shape
-        self.axes = plt.imshow(self.arr2d, interpolation='nearest') # Just a histogram, origin='upper', origin='down'
+        self.fig.myaxes = plt.imshow(self.arr2d, interpolation='nearest') # Just a histogram, origin='upper', origin='down'
         plt.title(self.pantit,color='r',fontsize=20) # pars like in class Text
 
-        #plt.text(50, -20, pantit, fontsize=24)
-        self.colb = plt.colorbar(self.axes, pad=0.10, orientation=2, fraction=0.10, shrink = 1, aspect = 8, ticks=coltickslocs)
-
+        self.fig.colb = plt.colorbar(self.fig.myaxes, pad=0.10, orientation=2, fraction=0.10, shrink = 1, aspect = 8, ticks=coltickslocs)
         plt.clim(colmin,colmax)
-        #self.orglims = self.axes.get_clim()
-           
+
         self.fig.canvas.mpl_connect('button_press_event', self.processMouseButtonClick)
 
 
@@ -391,8 +371,10 @@ class PlotsForImage ( object ) :
 
        fig = self.fig = event.canvas.figure 
 
+       #print 'Click on fig for window =',self.fig.number, self.fig.nwin 
+
        if event.inaxes :
-           lims = self.axes.get_clim()
+           lims = self.fig.myaxes.get_clim()
 
            colmin = lims[0]
            colmax = lims[1]
@@ -411,7 +393,7 @@ class PlotsForImage ( object ) :
            # middle button
            elif event.button is 2 :
                colmin, colmax = self.getImageAmpLimitsFromWindowParameters()
-               print "reset"
+               print 'Reset for fig, window =',self.fig.number, self.fig.nwin 
 
            # right button
            elif event.button is 3 :
@@ -421,6 +403,7 @@ class PlotsForImage ( object ) :
                else :
                    print "max has not been changed (click inside the color bar to change the range)"
 
+           #print ' colmin, colmax', colmin, colmax
            plt.clim(colmin,colmax)
            plt.clf()
            self.drawImageAndSpectrum(colmin,colmax)
@@ -428,6 +411,7 @@ class PlotsForImage ( object ) :
 
 
     def getImageAmpLimitsFromWindowParameters(self) :
+        self.arr2d = self.fig.arr2d
         if  cp.confpars.imageWindowParameters[self.fig.nwin][7] : # ImALimsIsOn 
             return [cp.confpars.imageWindowParameters[self.fig.nwin][1], cp.confpars.imageWindowParameters[self.fig.nwin][2]]
         else :
@@ -435,6 +419,7 @@ class PlotsForImage ( object ) :
 
 
     def getSpectrumAmpLimitsFromWindowParameters(self) :
+        self.arr2d = self.fig.arr2d
         if  cp.confpars.imageWindowParameters[self.fig.nwin][8] : # ImALimsIsOn 
             return [cp.confpars.imageWindowParameters[self.fig.nwin][3], cp.confpars.imageWindowParameters[self.fig.nwin][4]]
         else :

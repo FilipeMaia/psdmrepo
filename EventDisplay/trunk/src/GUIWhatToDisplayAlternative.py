@@ -81,6 +81,7 @@ class GUIWhatToDisplayAlternative ( QtGui.QWidget ) :
 
         self.titH5Tree = QtGui.QLabel('check relevant dataset(s) from')
         self.butH5Tree = QtGui.QPushButton('HDF5 tree')
+        self.butH5Tree.setStyleSheet("background-color: rgb(180, 255, 180); color: rgb(0, 0, 0)") # Yellowish
         
         self.hboxT = QtGui.QHBoxLayout()
         self.hboxT.addWidget(self.titFor)
@@ -121,8 +122,6 @@ class GUIWhatToDisplayAlternative ( QtGui.QWidget ) :
 
     def processClose(self):
         #print 'Close window'
-        #if cp.confpars.treeWindowIsOpen :
-        #    cp.confpars.guitree.close()
         self.close()
 
 
@@ -131,15 +130,12 @@ class GUIWhatToDisplayAlternative ( QtGui.QWidget ) :
             print 'HDF5 tree GUI is already open, use it...'
             #self.butH5Tree.setText('Open HDF5 tree')
             #cp.confpars.guitree.close()
-            #cp.confpars.treeWindowIsOpen = False            
         else :
             print 'Open HDF5 tree GUI'
             #self.butH5Tree.setText('Close HDF5 tree')
             cp.confpars.guitree = guiselitems.GUISelectItems(self)
-            #cp.confpars.guitree.setParent(self)
             cp.confpars.guitree.move(self.pos().__add__(QtCore.QPoint(-50,-100))) # open window with offset w.r.t. parent
             cp.confpars.guitree.show()
-            cp.confpars.treeWindowIsOpen = True
 
 #-----------------------------
 #  In case someone decides to run this module

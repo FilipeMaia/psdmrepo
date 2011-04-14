@@ -100,6 +100,9 @@ class GUISelection ( QtGui.QWidget ) :
 
         self.showToolTips()
 
+        cp.confpars.selectionGUIIsOpen = True
+
+
 
 
     #-------------------
@@ -119,13 +122,13 @@ class GUISelection ( QtGui.QWidget ) :
 
 
     def processQuit(self):
-        print 'Quit'
-        cp.confpars.selectionGUIIsOpen = False
+        #print 'Quit'
         self.close()
+        cp.confpars.selectionGUIIsOpen = False
 
 
     def closeEvent(self, event):
-        print 'closeEvent'
+        #print 'closeEvent'
         self.processQuit()
 
         

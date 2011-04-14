@@ -231,11 +231,11 @@ class GUIWhatToDisplayForImageWindow ( QtGui.QWidget ) :
         self.parentWidget = parent
 
     def closeEvent(self, event):
-        print 'closeEvent'
+        #print 'closeEvent'
         self.processClose()
 
     def processClose(self):
-        print 'Close window'
+        #print 'Close window'
         #cp.confpars.wtdIMWindowIsOpen = False
         self.close()
 
@@ -246,7 +246,7 @@ class GUIWhatToDisplayForImageWindow ( QtGui.QWidget ) :
             self.butSelDataSet.setStyleSheet('Text-align:right')
 
     def fillPopupMenuForDataSet(self):
-        print 'fillPopupMenuForDataSet'
+        #print 'fillPopupMenuForDataSet'
         self.popupMenuForDataSet.addAction('All')
         for dsname in cp.confpars.list_of_checked_item_names :
             item_last_name   = printh5.get_item_last_name(dsname)           
@@ -258,7 +258,7 @@ class GUIWhatToDisplayForImageWindow ( QtGui.QWidget ) :
         #self.popupMenuForDataSet.addAction('All')
 
     def processMenuForDataSet(self):
-        print 'MenuForDataSet'
+        #print 'MenuForDataSet'
         actionSelected = self.popupMenuForDataSet.exec_(QtGui.QCursor.pos())
         if actionSelected==None : return
         selected_ds = actionSelected.text()
@@ -313,20 +313,20 @@ class GUIWhatToDisplayForImageWindow ( QtGui.QWidget ) :
         self.setBinning()
 
     def processEditIMImageAmin(self):
-        print 'EditIMImageAmin'
+        #print 'EditIMImageAmin'
         cp.confpars.imageWindowParameters[self.window][1] = int(self.editIMImageAmin.displayText())        
 
     def processEditIMImageAmax(self):
-        print 'EditIMImageAmax'
+        #print 'EditIMImageAmax'
         cp.confpars.imageWindowParameters[self.window][2] = int(self.editIMImageAmax.displayText())        
 
     def processEditIMSpectrumAmin(self):
-        print 'EditIMSpectrumAmin'
+        #print 'EditIMSpectrumAmin'
         cp.confpars.imageWindowParameters[self.window][3] = int(self.editIMSpectrumAmin.displayText())        
         self.setBinning()
 
     def processEditIMSpectrumAmax(self):
-        print 'EditIMSpectrumAmax'
+        #print 'EditIMSpectrumAmax'
         cp.confpars.imageWindowParameters[self.window][4] = int(self.editIMSpectrumAmax.displayText())        
         self.setBinning()
 

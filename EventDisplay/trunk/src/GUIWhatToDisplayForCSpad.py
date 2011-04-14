@@ -292,26 +292,26 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
 
 
     def processEditCSAmplitudeRange(self):
-        print 'EditCSAmplitudeRange'
+        #print 'EditCSAmplitudeRange'
         cp.confpars.cspadAmplitudeRange = int(self.editCSAmpRange.displayText())
         self.setAmplitudeRange()
 
 
     def processEditCSAmplitudeRaMin(self):
-        print 'EditCSAmplitudeRaMin'
+        #print 'EditCSAmplitudeRaMin'
         cp.confpars.cspadAmplitudeRaMin = int(self.editCSAmpRaMin.displayText())
         self.setAmplitudeRange()
 
 
     def processEditCSImageAmin(self):
-        print 'EditCSImageAmin'
+        #print 'EditCSImageAmin'
         cp.confpars.cspadImageAmin = int(self.editCSImageAmin.displayText())        
         if cp.confpars.cspadImageAmin >= cp.confpars.cspadImageAmax - cp.confpars.cspadSpectrumBinWidth:
             cp.confpars.cspadImageAmax = cp.confpars.cspadImageAmin + cp.confpars.cspadSpectrumBinWidth
             self.editCSImageAmax.setText( str(cp.confpars.cspadImageAmax))
 
     def processEditCSImageAmax(self):
-        print 'EditCSImageAmax'
+        #print 'EditCSImageAmax'
         cp.confpars.cspadImageAmax = int(self.editCSImageAmax.displayText())        
         if cp.confpars.cspadImageAmax <= cp.confpars.cspadImageAmin + cp.confpars.cspadSpectrumBinWidth:
             cp.confpars.cspadImageAmin = cp.confpars.cspadImageAmax - cp.confpars.cspadSpectrumBinWidth
@@ -319,7 +319,7 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
 
 
     def processEditCSSpectrumAmin(self):
-        print 'EditCSSpectrumAmin'
+        #print 'EditCSSpectrumAmin'
         cp.confpars.cspadSpectrumAmin = int(self.editCSSpectrumAmin.displayText())        
         if cp.confpars.cspadSpectrumAmin >= cp.confpars.cspadSpectrumAmax - cp.confpars.cspadSpectrumBinWidth:
             cp.confpars.cspadSpectrumAmax = cp.confpars.cspadSpectrumAmin + cp.confpars.cspadSpectrumBinWidth
@@ -327,7 +327,7 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.setBinning()
 
     def processEditCSSpectrumAmax(self):
-        print 'EditCSSpectrumAmax'
+        #print 'EditCSSpectrumAmax'
         cp.confpars.cspadSpectrumAmax  = int(self.editCSSpectrumAmax.displayText())        
         if cp.confpars.cspadSpectrumAmax <= cp.confpars.cspadSpectrumAmin + cp.confpars.cspadSpectrumBinWidth :
             cp.confpars.cspadSpectrumAmin = cp.confpars.cspadSpectrumAmax - cp.confpars.cspadSpectrumBinWidth
@@ -335,7 +335,7 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
         self.setBinning()
 
     def processEditCSSpectrumNBins(self):
-        print 'EditCSSpectrumNBins'
+        #print 'EditCSSpectrumNBins'
         cp.confpars.cspadSpectrumNbins = int(self.editCSSpectrumNBins.displayText())        
         if  cp.confpars.cspadSpectrumNbins < 1 :
             cp.confpars.cspadSpectrumNbins = 1
@@ -344,7 +344,7 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
 
 
     def processEditCSSpectrumBinWidth(self) : #,txt):
-        print 'EditCSSpectrumBinWidth'
+        #print 'EditCSSpectrumBinWidth'
         cp.confpars.cspadSpectrumBinWidth = int(self.editCSSpectrumBinWidth.displayText())        
         if  cp.confpars.cspadSpectrumBinWidth < 1 :
             cp.confpars.cspadSpectrumBinWidth = 1
@@ -373,7 +373,7 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
 
 
     def processRadioNBins(self):
-        print 'RadioNBins'
+        #print 'RadioNBins'
         cp.confpars.cspadBinWidthIsOn = False
         self.editCSSpectrumNBins   .setReadOnly(False)
         self.editCSSpectrumBinWidth.setReadOnly(True)
@@ -382,7 +382,7 @@ class GUIWhatToDisplayForCSpad ( QtGui.QWidget ) :
 
 
     def processRadioBinWidth(self):
-        print 'RadioBinWidth'
+        #print 'RadioBinWidth'
         cp.confpars.cspadBinWidthIsOn = True
         self.editCSSpectrumNBins   .setReadOnly(True)
         self.editCSSpectrumBinWidth.setReadOnly(False)

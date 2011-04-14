@@ -82,11 +82,15 @@ class GUIMain ( QtGui.QWidget ) :
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False
 
+        cp.confpars.guimain = self
+
         cp.confpars.readParameters()
         if not cp.confpars.readParsFromFileAtStart :
             cp.confpars.setDefaultParameters()
         cp.confpars.Print()
         print 'Current event number directly : %d ' % (cp.confpars.eventCurrent)
+
+	print 'sys.argv=',sys.argv
 
         # see http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/qframe.html
         self.frame = QtGui.QFrame(self)
@@ -104,14 +108,20 @@ class GUIMain ( QtGui.QWidget ) :
         self.fileEdit  = QtGui.QLineEdit(cp.confpars.dirName+'/'+cp.confpars.fileName)
 
         self.browse    = QtGui.QPushButton("Browse")    
-        self.printfile = QtGui.QPushButton("Print HDF5 structure")    
         self.display   = QtGui.QPushButton("HDF5 tree")
-        self.wtd       = QtGui.QPushButton("What to display")
-        self.config    = QtGui.QPushButton("Configuration")
-        self.save      = QtGui.QPushButton("Save")
-        self.selection = QtGui.QPushButton("Selection")
+        self.wtd       = QtGui.QPushButton("What and how to display")
         self.exit      = QtGui.QPushButton("Exit")
-        self.save.setMaximumWidth(40)   
+        #self.printfile = QtGui.QPushButton("Print HDF5 structure")    
+        #self.config    = QtGui.QPushButton("Configuration")
+        #self.save      = QtGui.QPushButton("Save")
+        #self.selection = QtGui.QPushButton("Selection")
+        #self.save.setMaximumWidth(40)   
+
+        #self.wtd.setStyleSheet("background-color: rgb(255, 255, 230); color: rgb(0, 0, 0)") # Yellowish
+        #self.wtd.setStyleSheet("background-color: rgb(255, 240, 245); color: rgb(0, 0, 0)") # Pink
+        self.wtd.setStyleSheet("background-color: rgb(180, 255, 180); color: rgb(0, 0, 0)") # Pink
+        self.wtd.setMinimumHeight(30)
+        self.wtd.setMinimumWidth(210)
 
         hboxF = QtGui.QHBoxLayout()
         hboxF.addWidget(self.titFile)
@@ -123,9 +133,10 @@ class GUIMain ( QtGui.QWidget ) :
         hboxC.addWidget(self.display)
         
         hboxE = QtGui.QHBoxLayout()
-        hboxE.addWidget(self.selection)
-        hboxE.addStretch(2)
+        #hboxE.addWidget(self.selection)
+        hboxE.addStretch(1)
         hboxE.addWidget(self.wtd)
+        hboxE.addStretch(1)
 
         self.wplayer = guiplr.GUIPlayer()
         hboxT = QtGui.QHBoxLayout() 
@@ -136,8 +147,8 @@ class GUIMain ( QtGui.QWidget ) :
         hboxA.addWidget(self.wcomplex)
 
         hbox = QtGui.QHBoxLayout()
-        hbox.addWidget(self.config)
-        hbox.addWidget(self.save)
+        #hbox.addWidget(self.config)
+        #hbox.addWidget(self.save)
         hbox.addStretch(3)
         hbox.addWidget(self.exit)
 
@@ -163,11 +174,11 @@ class GUIMain ( QtGui.QWidget ) :
         self.connect(self.browse,    QtCore.SIGNAL('clicked()'), self.processBrowse )
         self.connect(self.display,   QtCore.SIGNAL('clicked()'), self.processDisplay )
         self.connect(self.wtd,       QtCore.SIGNAL('clicked()'), self.processWhatToDisplay )
-        self.connect(self.save,      QtCore.SIGNAL('clicked()'), self.processSave )
-        self.connect(self.config,    QtCore.SIGNAL('clicked()'), self.processConfig )
-        self.connect(self.printfile, QtCore.SIGNAL('clicked()'), self.processPrint )
-        self.connect(self.selection, QtCore.SIGNAL('clicked()'), self.processSelection )
         self.connect(self.fileEdit,  QtCore.SIGNAL('editingFinished ()'), self.processFileEdit )
+        #self.connect(self.printfile, QtCore.SIGNAL('clicked()'), self.processPrint )
+        #self.connect(self.save,      QtCore.SIGNAL('clicked()'), self.processSave )
+        #self.connect(self.config,    QtCore.SIGNAL('clicked()'), self.processConfig )
+        #self.connect(self.selection, QtCore.SIGNAL('clicked()'), self.processSelection )
 
         #self.setFocus()
         #self.resize(500, 300)
@@ -200,9 +211,9 @@ class GUIMain ( QtGui.QWidget ) :
         if cp.confpars.treeWindowIsOpen :
             cp.confpars.guitree.close()
         if cp.confpars.configGUIIsOpen :
-            self.configGUI.close()
+            cp.confpars.guiconfig.close()
         if cp.confpars.selectionGUIIsOpen :
-            self.guiselection.close()
+            cp.confpars.guiselection.close()
         print 'Segmentation fault may happen at closing of the Main GUI window. The reason for that is not clear yet...'
               #It happens after opening/closing HDF5 Tree and WTD GUIs...
         self.close()
@@ -242,53 +253,49 @@ class GUIMain ( QtGui.QWidget ) :
         if  cp.confpars.selectionGUIIsOpen : # close wtd window
             print 'Selection GUI: Close'
             #self.selection.setText('Open Selection')
-            self.guiselection.close()
-            cp.confpars.selectionGUIIsOpen = False            
+            cp.confpars.guiselection.close()
         else :                           # Open wtd window
             print 'Selection GUI: Open'
             #self.selection.setText('Close Selection')
-            self.guiselection = guisel.GUISelection()
-            self.guiselection.move(self.pos().__add__(QtCore.QPoint(500,330))) # open window with offset w.r.t. parent
-            self.guiselection.show()
-            cp.confpars.selectionGUIIsOpen = True
+            cp.confpars.guiselection = guisel.GUISelection()
+            cp.confpars.guiselection.move(self.pos().__add__(QtCore.QPoint(500,330))) # open window with offset w.r.t. parent
+            cp.confpars.guiselection.show()
 
         
     def processConfig(self):
         print 'Configuration'
         if  cp.confpars.configGUIIsOpen :
-            cp.confpars.configGUIIsOpen = False
-            self.configGUI.close()
+            cp.confpars.guiconfig.close()
         else :    
-            self.configGUI = guiconfig.GUIConfiguration()
-            self.configGUI.setParent(self)
-            self.configGUI.move(self.pos().__add__(QtCore.QPoint(100,330))) # open window with offset w.r.t. parent
-            self.configGUI.show()
-            cp.confpars.configGUIIsOpen = True
+            cp.confpars.guiconfig = guiconfig.GUIConfiguration()
+            cp.confpars.guiconfig.setParent(self)
+            cp.confpars.guiconfig.move(self.pos().__add__(QtCore.QPoint(100,330))) # open window with offset w.r.t. parent
+            cp.confpars.guiconfig.show()
+
 
     def processSave(self):
         print 'Save'
         cp.confpars.writeParameters()
+
 
     def processWhatToDisplay(self):
         if cp.confpars.wtdWindowIsOpen : # close wtd window
             print 'What to display GUI: Close'
             #self.wtd.setText('Open')
             cp.confpars.guiwhat.close()
-            cp.confpars.wtdWindowIsOpen = False            
         else :                           # Open wtd window
             print 'What to display GUI: Open'
             #self.wtd.setText('Close')
             cp.confpars.guiwhat = guiwtd.GUIWhatToDisplay()
-            cp.confpars.guiwhat.move(self.pos().__add__(QtCore.QPoint(0,360))) # open window with offset w.r.t. parent
+            cp.confpars.guiwhat.move(self.pos().__add__(QtCore.QPoint(0,380))) # open window with offset w.r.t. parent
             cp.confpars.guiwhat.show()
-            cp.confpars.wtdWindowIsOpen = True
+
             
     def processDisplay(self):
         if cp.confpars.treeWindowIsOpen : # close wtd window
             print 'What to display GUI: Close'
             #self.display.setText('Open HDF5 tree')
             cp.confpars.guitree.close()
-            cp.confpars.treeWindowIsOpen = False            
         else :                           # Open wtd window
             print 'What to display GUI: Open'
             #self.display.setText('Close HDF5 tree')
@@ -296,7 +303,7 @@ class GUIMain ( QtGui.QWidget ) :
             #cp.confpars.guitree.setParent(self) # bypass for parent initialization in the base QWidget
             cp.confpars.guitree.move(self.pos().__add__(QtCore.QPoint(-360,0))) # open window with offset w.r.t. parent
             cp.confpars.guitree.show()
-            cp.confpars.treeWindowIsOpen = True
+
 
     def mousePressEvent(self, event):
         #print 'Do not click on mouse just for fun!'

@@ -44,6 +44,8 @@ class GUIConfiguration ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
+        self.parent = cp.confpars.guimain
+
         self.setGeometry(370, 350, 500, 150)
         self.setWindowTitle('Configuration')
 
@@ -59,10 +61,10 @@ class GUIConfiguration ( QtGui.QWidget ) :
 
         self.butBrowse   = QtGui.QPushButton("Browse")
         self.butRead     = QtGui.QPushButton("Read")
-        self.butWrite    = QtGui.QPushButton("Write")
+        self.butWrite    = QtGui.QPushButton("Save")
         self.butDefault  = QtGui.QPushButton("Reset default")
         self.butPrint    = QtGui.QPushButton("Print current")
-        self.butExit     = QtGui.QPushButton("Quit")
+        #self.butExit     = QtGui.QPushButton("Quit")
 
         self.radioRead   = QtGui.QRadioButton("Read parameters from file")
         self.radioDefault= QtGui.QRadioButton("Set default")
@@ -94,9 +96,10 @@ class GUIConfiguration ( QtGui.QWidget ) :
         #grid.addWidget(self.titRadio,      2, 0)
         #grid.addWidget(self.radioRead,     2, 1, 1, 2)
         #grid.addWidget(self.radioDefault,  3, 1, 1, 2)
-        grid.addWidget(self.butExit,       4, 3)
+        #grid.addWidget(self.butExit,       4, 3)
 
         vbox = QtGui.QVBoxLayout()
+        vbox.addStretch(2)
         vbox.addLayout(hboxT1)
         vbox.addLayout(hboxF)
         vbox.addStretch(1)     
@@ -104,7 +107,7 @@ class GUIConfiguration ( QtGui.QWidget ) :
 
         self.setLayout(vbox)
 
-        self.connect(self.butExit,      QtCore.SIGNAL('clicked()'),          self.processExit         )
+        #self.connect(self.butExit,      QtCore.SIGNAL('clicked()'),          self.processExit         )
         self.connect(self.butRead,      QtCore.SIGNAL('clicked()'),          self.processRead         )
         self.connect(self.butWrite,     QtCore.SIGNAL('clicked()'),          self.processWrite        )
         self.connect(self.butPrint,     QtCore.SIGNAL('clicked()'),          self.processPrint        )
@@ -114,6 +117,9 @@ class GUIConfiguration ( QtGui.QWidget ) :
         self.connect(self.radioDefault, QtCore.SIGNAL('clicked()'),          self.processRadioDefault )
         self.connect(self.fileEdit,     QtCore.SIGNAL('editingFinished ()'), self.processFileEdit     )
 
+        cp.confpars.configGUIIsOpen = True
+
+
     #-------------------
     #  Public methods --
     #-------------------
@@ -121,13 +127,13 @@ class GUIConfiguration ( QtGui.QWidget ) :
     def showToolTips(self):
         # Tips for buttons and fields:
         #self           .setToolTip('This GUI deals with the configuration parameters.')
+        #self.butExit   .setToolTip('Quit this GUI and close the window.')
         self.fileEdit  .setToolTip('Type the file path name here,\nor better use "Browse" button.')
         self.butBrowse .setToolTip('Select the file path name\nto read/write the configuration parameters.')
-        self.butRead   .setToolTip('Read (retreave) the configuration parameters from file.')
-        self.butWrite  .setToolTip('Write (save) the configuration parameters in file.')
+        self.butRead   .setToolTip('Read the configuration parameters from file.')
+        self.butWrite  .setToolTip('Save (write) the configuration parameters in file.')
         self.butDefault.setToolTip('Reset the configuration parameters\nto their default values.')
         self.butPrint  .setToolTip('Print current values of the configuration parameters.')
-        self.butExit   .setToolTip('Quit this GUI and close the window.')
         self.radioRead .setToolTip('If this button is ON and configuration parameters are saved,\n' +
                                    'then they will be read from file at the next start of this program.')
         self.radioDefault.setToolTip('If this button is ON and configuration parameters are saved,\n' +
@@ -149,11 +155,15 @@ class GUIConfiguration ( QtGui.QWidget ) :
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
 
+    def refreshGUIWhatToDisplay(self):
+        cp.confpars.guiwhat.processRefresh()
+        
     def processRead(self):
         print 'Read'
         cp.confpars.readParameters(self.confParsFileName())
         self.parent.fileEdit.setText(cp.confpars.dirName + '/' + cp.confpars.fileName)
-        
+        self.refreshGUIWhatToDisplay()
+
     def processWrite(self):
         print 'Write'
         cp.confpars.writeParameters(self.confParsFileName())
@@ -162,6 +172,7 @@ class GUIConfiguration ( QtGui.QWidget ) :
         print 'Set default values of configuration parameters'
         cp.confpars.setDefaultParameters()
         self.parent.fileEdit.setText(cp.confpars.dirName + '/' + cp.confpars.fileName)
+        self.refreshGUIWhatToDisplay()
 
     def processPrint(self):
         print 'Print'

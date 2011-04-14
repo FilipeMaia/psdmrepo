@@ -63,7 +63,23 @@ class ConfigParameters ( object ) :
     #----------------
     def __init__ ( self ) :
         """Constructor"""
+        self.setRunTimeParametersInit()
         self.setDefaultParameters()
+
+
+    def setRunTimeParametersInit ( self ) :
+
+        self.h5_file_is_open         = False
+        self.wtdWindowIsOpen         = False
+        self.wtdIMWindowIsOpen       = False
+        self.wtdCSWindowIsOpen       = False
+        self.wtdWFWindowIsOpen       = False
+        self.treeWindowIsOpen        = False
+        self.treeViewIsExpanded      = False
+        self.configGUIIsOpen         = False
+        self.selectionGUIIsOpen      = False
+        self.selectionWindowIsOpen   = False
+        self.correlationGUIIsOpen    = False
 
 
     def setDefaultParameters ( self ) :
@@ -81,33 +97,19 @@ class ConfigParameters ( object ) :
         self.dirName              = '/reg/d/psdm/CXI/cxi80410/hdf5'
         self.fileName             = 'cxi80410-r0730.h5'
 
-        self.eventCurrent         = 1
+        self.eventCurrent         = 0
         self.span                 = 1
         self.numEventsAverage     = 50
         self.selectionIsOn        = False
         
         self.list_of_checked_item_names=[]
-        self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data')
-        self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/Camera::FrameV1/CxiSc1.0:Tm6740.0/image')       
-        #self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/Ipimb::DataV1/CxiDg1.0:Ipimb.0/data')
-        #self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/Ipimb::DataV1/CxiDg1.0:Ipimb.0/time')
+        self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/Camera::FrameV1/CxiSc1.0:Tm6740.1/image')       
+        #self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/Camera::FrameV1/CxiSc1.0:Tm6740.2/image')
+        #self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/Camera::FrameV1/CxiSc1.0:Tm6740.3/image')
 
         # Status parameters which do not need to be saved
         self.confParsDirName         = '.'
         self.confParsFileName        = 'evtdispconfig'
-
-        self.h5_file_is_open         = False
-        self.wtdWindowIsOpen         = False
-        self.wtdIMWindowIsOpen       = False
-        self.wtdCSWindowIsOpen       = False
-        self.wtdWFWindowIsOpen       = False
-        self.treeWindowIsOpen        = False
-       #self.treeWindowIsOpenFromWTD = False
-        self.treeViewIsExpanded      = False
-        self.configGUIIsOpen         = False
-        self.selectionGUIIsOpen      = False
-        self.selectionWindowIsOpen   = False
-        self.correlationGUIIsOpen    = False
 
         self.posGUIMain              = (370,10)
 
@@ -121,10 +123,10 @@ class ConfigParameters ( object ) :
         self.cspadImageNWindows   = 1
         self.cspadImageNWindowsMax= 8 # Maximal number of windows for CSpad image which can be opened
 
-        self.cspadImageOfPairIsOn = True
+        self.cspadImageOfPairIsOn = False
         self.cspadImageIsOn       = False
         self.cspadImageQuadIsOn   = False
-        self.cspadImageDetIsOn    = True
+        self.cspadImageDetIsOn    = False
         self.cspadSpectrumIsOn    = False
         self.cspadSpectrum08IsOn  = False
         self.cspadProjXIsOn       = False
@@ -178,10 +180,9 @@ class ConfigParameters ( object ) :
 
 
         # Default parameters for Waveform plots
+        self.waveformWaveformIsOn  = False
 
-        self.waveformWaveformIsOn  = True
-
-        self.waveformNWindows      = 2
+        self.waveformNWindows      = 1
         self.waveformNWindowsMax   = 10 # Maximal number of windows for waveforms which can be opened
 
         self.waveformWindowParameters = []
@@ -201,8 +202,10 @@ class ConfigParameters ( object ) :
                                                  #[Theshold, InBin, Xmin, Xmax, Ymin, Ymax]
 
 
-        # Default parameters for Selection algorithms
-        self.correlationNWindows      = 2
+        # Default parameters for Correlation algorithms
+        self.correlationsIsOn         = False
+
+        self.correlationNWindows      = 1
         self.correlationNWindowsMax   = 10 # Maximal number of windows for selection algorithms
 
         self.correlationWindowParameters = []
@@ -211,8 +214,6 @@ class ConfigParameters ( object ) :
                                                    #[ Ydsn,  Xdsn, Radio, Ymin, Ymax, Xmin, Xmax, Ypar,  Xpar,  YLimsIsOn, XLimsIsOn, LogZIsOn, YNBins, XNBins]
                                                    #[    0,     1,     2,    3,    4,    5,    6,    7,     8,     9,      10,        11,       12,     13    ]
 
-        self.correlationsIsOn  = True
-       #self.perEventDistIsOn  = True
 
         self.projCenterX       = 850
         self.projCenterY       = 850

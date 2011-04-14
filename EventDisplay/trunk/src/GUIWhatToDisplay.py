@@ -49,8 +49,8 @@ import GUIWhatToDisplayForCSpad        as wtdCS
 import GUIWhatToDisplayForWaveform     as wtdWF
 import GUIWhatToDisplayForProjections  as wtdPR
 import GUICorrelation                  as wtdCO
-
-
+import GUIConfiguration                as guiconfig
+import GUISelection                    as guisel
 
 #---------------------
 #  Class definition --
@@ -77,7 +77,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(370, 350, 500, 600)
-        self.setWindowTitle('What to display?')
+        self.setWindowTitle('What and how to display')
 
         self.parent = parent
 
@@ -87,16 +87,21 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
         
-        self.butClose   = QtGui.QPushButton('Quit')
-        self.butRefresh = QtGui.QPushButton('Refresh')
+        #self.butRefresh       = QtGui.QPushButton('Refresh')
+        self.butClose         = QtGui.QPushButton('Quit')
+        self.butSave          = QtGui.QPushButton('Save')
+        #self.butSave.setMaximumWidth(40)   
 
-        self.tabBar   = QtGui.QTabBar()
-        self.indTabCS = self.tabBar.addTab('CSpad')
-        self.indTabIM = self.tabBar.addTab('Image')
-        self.indTabWF = self.tabBar.addTab('Waveform')
-        self.indTabPR = self.tabBar.addTab('Proj.')
-        self.indTabCO = self.tabBar.addTab('Corr.')
-       #self.indTabED = self.tabBar.addTab('1D vs ev.')
+        self.tabBar      = QtGui.QTabBar()
+        self.tabBar.setShape(QtGui.QTabBar.RoundedNorth)
+       #self.tabBar.setShape(QtGui.QTabBar.TriangularNorth)
+        self.indTabCS    = self.tabBar.addTab('CSpad')
+        self.indTabIM    = self.tabBar.addTab('Image')
+        self.indTabWF    = self.tabBar.addTab('Waveform')
+        self.indTabPR    = self.tabBar.addTab('Proj.')
+        self.indTabCO    = self.tabBar.addTab('Corr.')
+        self.indTabEmpty = self.tabBar.addTab(31*' ')
+        self.tabBar.setTabEnabled(self.indTabEmpty,False)
         self.isFirstEntry = True
 
         self.tabBar.setTabTextColor(self.indTabCS,QtGui.QColor('red'))
@@ -106,6 +111,14 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.tabBar.setTabTextColor(self.indTabCO,QtGui.QColor('black'))
        #self.tabBar.setTabTextColor(self.indTabED,QtGui.QColor('white'))
 
+        self.tabBarBot       = QtGui.QTabBar()
+        self.tabBarBot.setShape(QtGui.QTabBar.RoundedSouth)
+        #self.tabBarBot.setShape(QtGui.QTabBar.TriangularSouth)
+        self.indTabBotConfig = self.tabBarBot.addTab('Configuration')
+        self.indTabBotSelect = self.tabBarBot.addTab('Selection')
+        self.indTabBotEmpty  = self.tabBarBot.addTab(65*' ')
+        self.tabBarBot.setTabEnabled(self.indTabBotEmpty,False)
+        
         self.hboxT = QtGui.QHBoxLayout()
         self.hboxT.addWidget(self.tabBar) 
 
@@ -116,10 +129,13 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.hboxD.addWidget(self.guiTab)
         
         self.hboxC = QtGui.QHBoxLayout()
-        self.hboxC.addWidget(self.butRefresh)
-        self.hboxC.addStretch(1)
+        #self.hboxC.addWidget(self.butRefresh)
+        self.hboxC.addWidget(self.butSave)
+        self.hboxC.addStretch(2)
         self.hboxC.addWidget(self.butClose)
 
+        self.hboxTB = QtGui.QHBoxLayout()
+        self.hboxTB.addWidget(self.tabBarBot) 
 
         self.vboxB = QtGui.QVBoxLayout()
         self.isOpenCS = False
@@ -132,17 +148,23 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.vbox.addLayout(self.vboxB)
         self.vbox.addStretch(1)     
         self.vbox.addLayout(self.hboxT)
-        self.vbox.addLayout(self.hboxD)
+        self.vbox.addLayout(self.hboxD) 
+        self.vbox.addLayout(self.hboxTB)
         self.vbox.addStretch(1)
         self.vbox.addLayout(self.hboxC)
 
         self.setLayout(self.vbox)
   
-        self.connect(self.butRefresh, QtCore.SIGNAL('clicked()'),           self.processRefresh)
-        self.connect(self.butClose,   QtCore.SIGNAL('clicked()'),           self.processClose  )
-        self.connect(self.tabBar,     QtCore.SIGNAL('currentChanged(int)'), self.processTabBar )
+        #self.connect(self.butRefresh,       QtCore.SIGNAL('clicked()'),           self.processRefresh   )
+        self.connect(self.butSave,          QtCore.SIGNAL('clicked()'),           self.processSave   )
+        self.connect(self.butClose,         QtCore.SIGNAL('clicked()'),           self.processClose  )
+        self.connect(self.tabBar,           QtCore.SIGNAL('currentChanged(int)'), self.processTabBar )
+        self.connect(self.tabBarBot,        QtCore.SIGNAL('currentChanged(int)'), self.processTabBarBot )
 
         self.showToolTips()
+
+        cp.confpars.wtdWindowIsOpen = True
+
 
 
 
@@ -153,7 +175,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         wavefDatasetIsChecked = gm.WaveformDatasetIsChecked()
         correDatasetIsChecked = gm.CorrelationDatasetIsChecked()
 
-        self.vertSize = 350 # accounts for the tab bar and buttons vertical sice
+        self.vertSize = 365 # accounts for the tab bars and buttons vertical size
 
         if self.isOpenCS: self.cboxguiCS.close()
         if self.isOpenIM: self.cboxguiIM.close()
@@ -207,12 +229,12 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
 
     def closeEvent(self, event):
-        print 'closeEvent for WTD GUI'
+        #print 'closeEvent for WTD GUI'
         self.processClose()
 
 
     def processClose(self):
-        print 'Close window'
+        #print 'Close window'
         if self.isOpenCS: self.cboxguiCS.close()
         if self.isOpenIM: self.cboxguiIM.close()
         if self.isOpenOT: self.cboxguiOT.close()
@@ -222,15 +244,48 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         cp.confpars.wtdWindowIsOpen = False
 
 
+    def processSelection(self):
+        #print 'Selection'
+        self.guiTab.close()
+        self.guiTab = cp.confpars.guiselection = guisel.GUISelection() 
+        self.guiTab.setMinimumHeight(240)
+        self.hboxD.addWidget(self.guiTab)
+
+
+    def processConfiguration(self):
+        #print 'Configuration'
+        self.guiTab.close()
+        self.guiTab = cp.confpars.guiconfig = guiconfig.GUIConfiguration() 
+        self.guiTab.setMinimumHeight(240)
+        self.hboxD.addWidget(self.guiTab)
+
+
+    def processSave(self):
+        print 'Save'
+        cp.confpars.writeParameters()
+
+
     def processRefresh(self):
-        print 'Refresh'
+        print 'Refresh WTD GUI'
         self.makeVBoxB()
-
     
-    def processTabBar(self):
 
-        indTab = self.indTabOpen = self.tabBar.currentIndex()
-        print 'TabBar index=',indTab
+    def processTabBarBot(self):
+        indTab = self.tabBarBot.currentIndex()
+        #print 'TabBarBot index=',indTab
+        if indTab == self.indTabBotEmpty  : return
+        if indTab == self.indTabBotSelect : self.processSelection()
+        if indTab == self.indTabBotConfig : self.processConfiguration()
+
+        self.tabBar.setCurrentIndex(self.indTabEmpty)
+
+
+    def processTabBar(self):
+        indTab = self.tabBar.currentIndex()
+        self.indTabOpen = indTab
+        #print 'TabBar index=',indTab
+
+        if indTab == self.indTabEmpty: return
 
         self.guiTab.close()
 
@@ -267,6 +322,8 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.guiTab.setMinimumHeight(240)
         self.hboxD.addWidget(self.guiTab)
         
+        self.tabBarBot.setCurrentIndex(self.indTabBotEmpty)
+
 
 #-----------------------------
 #  In case someone decides to run this module

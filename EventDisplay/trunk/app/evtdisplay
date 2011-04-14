@@ -52,12 +52,29 @@ class EventDisplay :
 
     def __init__ ( self ) :
         """Constructor : This is a regular stuff for PyQt4"""
+
+        self.input_parameters()
+
 	print "Start the event display main GUI"
         app = QtGui.QApplication(sys.argv)
         gui = GUIMain(None,app)
         gui.show()
         #app.setActiveWindow(gui)
         sys.exit(app.exec_())
+        L3 = '\nIf this file is missing, the default values of parameters will be used at start, untill the "evtdispconfig" is not created.'
+
+    def input_parameters(self):	
+        msg = """EventDisplay:
+         To run this program use command "evtdisplay" without parameters. 
+         All necessary parameters will be set through the GUIs of this program. 
+         By default all configuration parameters are taken from the file "evtdispconfig". 
+         If this file is missing, the default values of parameters will be used at start, 
+         untill the "evtdispconfig" is not created.
+        """
+	if len(sys.argv) > 1 : 
+            print 90*'-','\n',msg,'\n',90*'-'
+            sys.exit()
+	
 
 #
 #  run application when imported as a main module

@@ -246,7 +246,7 @@ class GUISelectionWindow ( QtGui.QWidget ) :
 
 
     def fillPopupMenuForDataSet(self):
-        print 'fillPopupMenuForDataSet'
+        #print 'fillPopupMenuForDataSet'
         self.popupMenuForDataSet.addAction('None')
         for dsname in cp.confpars.list_of_checked_item_names :
             item_last_name   = printh5.get_item_last_name(dsname)           
@@ -257,7 +257,7 @@ class GUISelectionWindow ( QtGui.QWidget ) :
 
 
     def processMenuForDataSet(self):
-        print 'MenuForDataSet'
+        #print 'MenuForDataSet'
         actionSelected = self.popupMenuForDataSet.exec_(QtGui.QCursor.pos())
         if actionSelected==None : return
         selected_ds = actionSelected.text()

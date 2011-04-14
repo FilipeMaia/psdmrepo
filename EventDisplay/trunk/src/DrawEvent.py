@@ -236,14 +236,23 @@ class DrawEvent ( object ) :
 
             if not itemIsForAverage : continue
 
-            ind += 1 
             ds          = self.h5file[dsname]
+
+            if cp.confpars.eventCurrent > ds.shape[0] :
+                print 80*'=', \
+                      '\nWARNING! CURRENT EVENT NUMBER', cp.confpars.eventCurrent, \
+                      ' EXCEEDS THE ARRAY INDEX', ds.shape[0], \
+                      '\nfor dataset:', dsname, \
+                      '\nTHIS EVENT IS NOT INCLUDED IN AVERAGE!'
+                continue
+
             self.arr1ev = ds[cp.confpars.eventCurrent]
 
             if item_last_name == 'image' : 
                 if not self.dimIsFixed(dsname) :
                     self.arr1ev.shape = (self.arr1ev.shape[1],self.arr1ev.shape[0])
 
+            ind += 1 
             if  option == None :
                 if cp.confpars.eventCurrent != self.eventStart :
 
@@ -359,6 +368,13 @@ class DrawEvent ( object ) :
         for dsname in cp.confpars.list_of_checked_item_names :
 
             ds     = self.h5file[dsname]
+            if cp.confpars.eventCurrent > ds.shape[0] :
+                print 'WARNING! CURRENT EVENT NUMBER ', cp.confpars.eventCurrent, \
+                      ' EXCEEDS THE ARRAY INDEX ', ds.shape[0], \
+                      '\nfor dataset: ', dsname, \
+                      '\nPLOTS ARE IGNORED!'
+                return
+
             self.arr1ev = ds[cp.confpars.eventCurrent]
 
             if printh5.get_item_last_name(dsname) == 'image' : 
@@ -378,6 +394,14 @@ class DrawEvent ( object ) :
         cspadIsInTheName = printh5.CSpadIsInTheName(dsname)
         item_last_name = printh5.get_item_last_name(dsname)
         cp.confpars.current_item_name_for_title = printh5.get_item_name_for_title(dsname)
+
+        
+        itemIsForDrawing = item_last_name=='image' or    \
+                           item_last_name=='waveforms' or \
+                           cspadIsInTheName
+        if not itemIsForDrawing : return
+
+
         print 'Plot item:', dsname, ' item name:', item_last_name
         #print 'Name for plot title:', cp.confpars.current_item_name_for_title
 
@@ -496,7 +520,7 @@ class DrawEvent ( object ) :
 
                     self.figNum += 1 
                     if cp.confpars.imageImageSpecIsOn : 
-                        self.plotsImage.plotImageAndSpectrum(arr1ev,self.set_fig('1x2'))
+                        self.plotsImage.plotImageAndSpectrum(arr1ev,self.set_fig('2x3'))
                     else : self.close_fig(self.figNum)
 
 
@@ -632,6 +656,10 @@ class DrawEvent ( object ) :
             self.fig = plt.figure(num=self.figNum, figsize=(5,10), dpi=80, facecolor='w',edgecolor='w',frameon=True)
             self.fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
 
+        if type == '2x3' :
+            self.fig = plt.figure(num=self.figNum, figsize=(6,9), dpi=80, facecolor='w',edgecolor='w',frameon=True)
+            self.fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
+
         if type == '2x1' :
             self.fig = plt.figure(num=self.figNum, figsize=(10,5), dpi=80, facecolor='w',edgecolor='w',frameon=True)
             self.fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
@@ -660,7 +688,7 @@ class DrawEvent ( object ) :
         self.fig.myZoomIsOn = False
         self.fig.nwin   = self.nwin
 
-        #print 'Open figure number=', self.figNum
+        print 'Open figure number=', self.figNum, ' for window=', self.fig.nwin
         return self.fig
 
 

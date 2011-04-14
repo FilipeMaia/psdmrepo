@@ -121,10 +121,10 @@ class GUIPlayer ( QtGui.QWidget ) :
         #self.closeplts= QtGui.QPushButton("Close plots")
         #self.exit     = QtGui.QPushButton("Exit")
         
-        self.spaninc  = QtGui.QPushButton(u'\u25B6') # right-head triangle
-        self.spandec  = QtGui.QPushButton(u'\u25C0') # left-head triangle
-        self.spaninc.setMaximumWidth(20) 
-        self.spandec.setMaximumWidth(20) 
+        #self.spaninc  = QtGui.QPushButton(u'\u25B6') # right-head triangle
+        #self.spandec  = QtGui.QPushButton(u'\u25C0') # left-head triangle
+        #self.spaninc.setMaximumWidth(20) 
+        #self.spandec.setMaximumWidth(20) 
         self.reset  .setMaximumWidth(50)   
 
         self.cboxSelection = QtGui.QCheckBox('Apply selection', self)
@@ -135,9 +135,9 @@ class GUIPlayer ( QtGui.QWidget ) :
         hboxT.addWidget(self.numbEdit)
         hboxT.addStretch(1)     
         hboxT.addWidget(self.titSpan)
-        hboxT.addWidget(self.spandec)
+        #hboxT.addWidget(self.spandec)
         hboxT.addWidget(self.spanEdit)
-        hboxT.addWidget(self.spaninc)
+        #hboxT.addWidget(self.spaninc)
         hboxT.addStretch(1)     
         hboxT.addWidget(self.reset)
 
@@ -188,8 +188,8 @@ class GUIPlayer ( QtGui.QWidget ) :
         self.connect(self.start,     QtCore.SIGNAL('clicked()'), self.processStart )
         self.connect(self.stop,      QtCore.SIGNAL('clicked()'), self.processStop )
         self.connect(self.reset,     QtCore.SIGNAL('clicked()'), self.processReset )
-        self.connect(self.spaninc,   QtCore.SIGNAL('clicked()'), self.processSpaninc )
-        self.connect(self.spandec,   QtCore.SIGNAL('clicked()'), self.processSpandec )
+        #self.connect(self.spaninc,   QtCore.SIGNAL('clicked()'), self.processSpaninc )
+        #self.connect(self.spandec,   QtCore.SIGNAL('clicked()'), self.processSpandec )
         #self.connect(self.butAverage,QtCore.SIGNAL('clicked()'), self.processAverage )
         #self.connect(self.butCorr,   QtCore.SIGNAL('clicked()'), self.processCorrelations )
         #self.connect(self.avevEdit,  QtCore.SIGNAL('editingFinished ()'), self.processAverageEventsEdit )
