@@ -80,7 +80,12 @@ class ConfigParameters ( object ) :
         self.selectionGUIIsOpen      = False
         self.selectionWindowIsOpen   = False
         self.correlationGUIIsOpen    = False
+        self.playerGUIIsOpen         = False
 
+        self.step01IsDone            = False
+        self.step02IsDone            = False
+        self.step03IsDone            = False
+        self.step04IsDone            = False
 
     def setDefaultParameters ( self ) :
         """Set default configuration parameters hardwired in this module"""
@@ -277,6 +282,13 @@ class ConfigParameters ( object ) :
         for name in self.list_of_checked_item_names :
             print str(name)
 
+        print 'PLAYER_GUI_IS_OPEN',        self.playerGUIIsOpen
+
+        print 'STEP_01_IS_DONE',           self.step01IsDone
+        print 'STEP_02_IS_DONE',           self.step02IsDone
+        print 'STEP_03_IS_DONE',           self.step03IsDone
+        print 'STEP_04_IS_DONE',           self.step04IsDone
+        
         print 'CSPAD_QUAD_NUMBER',         self.cspadQuad
         print 'CSPAD_PAIR_NUMBER',         self.cspadPair
         print 'CSPAD_IMAGE_IS_ON',         self.cspadImageIsOn       
@@ -458,6 +470,11 @@ class ConfigParameters ( object ) :
                 elif key == 'SPAN'                     : self.span = int(val)
                 elif key == 'NUM_EVENTS_FOR_AVERAGE'   : self.numEventsAverage        = int(val)
                 elif key == 'SELECTION_IS_ON'          : self.selectionIsOn           = dicBool[val.lower()]
+                elif key == 'PLAYER_GUI_IS_OPEN'       : self.playerGUIIsOpen         = dicBool[val.lower()]
+                elif key == 'STEP_01_IS_DONE'          : self.step01IsDone            = dicBool[val.lower()]
+                elif key == 'STEP_02_IS_DONE'          : self.step02IsDone            = dicBool[val.lower()]
+                elif key == 'STEP_03_IS_DONE'          : self.step03IsDone            = dicBool[val.lower()]
+                elif key == 'STEP_04_IS_DONE'          : self.step04IsDone            = dicBool[val.lower()]
 
                 elif key == 'CSPAD_IMAGE_IS_ON'        : self.cspadImageIsOn          = dicBool[val.lower()]
                 elif key == 'CSPAD_IMAGE_OF_PAIR_IS_ON': self.cspadImageOfPairIsOn    = dicBool[val.lower()]
@@ -630,6 +647,12 @@ class ConfigParameters ( object ) :
             f.write('ITEM_NAME'             + space + str(name)                         + '\n')
         f.write('CURRENT_EVENT'             + space + str(self.eventCurrent)            + '\n')
         f.write('SPAN'                      + space + str(self.span)                    + '\n')
+        f.write('PLAYER_GUI_IS_OPEN'        + space + str(self.playerGUIIsOpen)         + '\n')
+        f.write('STEP_01_IS_DONE'           + space + str(self.step01IsDone)            + '\n')
+        f.write('STEP_02_IS_DONE'           + space + str(self.step02IsDone)            + '\n')
+        f.write('STEP_03_IS_DONE'           + space + str(self.step03IsDone)            + '\n')
+        f.write('STEP_04_IS_DONE'           + space + str(self.step04IsDone)            + '\n')
+
         f.write('CSPAD_IMAGE_IS_ON'         + space + str(self.cspadImageIsOn)          + '\n')
         f.write('CSPAD_IMAGE_OF_PAIR_IS_ON' + space + str(self.cspadImageOfPairIsOn)    + '\n')
         f.write('CSPAD_IMAGE_QUAD_IS_ON'    + space + str(self.cspadImageQuadIsOn)      + '\n')

@@ -134,7 +134,7 @@ class GUIWhatToDisplayAlternative ( QtGui.QWidget ) :
             print 'Open HDF5 tree GUI'
             #self.butH5Tree.setText('Close HDF5 tree')
             cp.confpars.guitree = guiselitems.GUISelectItems(self)
-            cp.confpars.guitree.move(self.pos().__add__(QtCore.QPoint(-50,-100))) # open window with offset w.r.t. parent
+            cp.confpars.guitree.move(self.pos().__add__(QtCore.QPoint(500,-300))) # (-50,-100)open window with offset w.r.t. parent
             cp.confpars.guitree.show()
 
 #-----------------------------

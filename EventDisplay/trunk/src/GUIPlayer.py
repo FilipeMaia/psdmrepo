@@ -201,6 +201,8 @@ class GUIPlayer ( QtGui.QWidget ) :
         #self.setFocus()
         #self.resize(500, 300)
         print 'End of init'
+        cp.confpars.playerGUIIsOpen = True
+
 
     #-------------------
     # Private methods --
@@ -215,7 +217,7 @@ class GUIPlayer ( QtGui.QWidget ) :
         self.drawev.quitDrawEvent()
         self.SHowIsOn = False
         self.close()
-
+        cp.confpars.playerGUIIsOpen = False
 
     def processCorrelations(self):
         print 'Correlations'

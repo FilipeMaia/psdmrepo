@@ -53,7 +53,7 @@ class GUISelection ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 500, 500, 200)
+        self.setGeometry(200, 500, 500, 150)
         self.setWindowTitle('Selection GUI')
         self.palette = QtGui.QPalette()
 

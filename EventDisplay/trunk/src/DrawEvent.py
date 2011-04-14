@@ -110,7 +110,10 @@ class DrawEvent ( object ) :
         for win in range(cp.confpars.selectionNWindows) :        # Loop over all windows
 
             dsname = cp.confpars.selectionWindowParameters[win][6]
-            if dsname == 'None' : continue
+            if dsname == 'None' :
+                print '\n',70*'!','\nWARNING: SELECTION IS REQUESTED, BUT ITS DATASET IS NOT SET.', \
+                      '\nFIX THIS PROBLEM IN SELECTION GUI\n',70*'!','\n'
+                return True
 
             ds     = self.h5file[dsname]
             self.arr1ev = ds[cp.confpars.eventCurrent]

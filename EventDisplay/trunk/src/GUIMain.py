@@ -77,7 +77,7 @@ class GUIMain ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         #self.setGeometry(370, 10, 500, 300)
-        self.setGeometry(10, 20, 500, 300)
+        self.setGeometry(10, 20, 500, 150)
         self.setWindowTitle('HDF5 Event Display')
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False
@@ -90,7 +90,7 @@ class GUIMain ( QtGui.QWidget ) :
         cp.confpars.Print()
         print 'Current event number directly : %d ' % (cp.confpars.eventCurrent)
 
-	print 'sys.argv=',sys.argv
+	#print 'sys.argv=',sys.argv # list of input parameters
 
         # see http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/qframe.html
         self.frame = QtGui.QFrame(self)
@@ -102,59 +102,54 @@ class GUIMain ( QtGui.QWidget ) :
 
         #self.drawev   = drev.DrawEvent()
 
-        self.titFile   = QtGui.QLabel('File:')
+        #self.titFile   = QtGui.QLabel('File:')
         #self.titTree   = QtGui.QLabel('HDF5 Tree GUI')
 
         self.fileEdit  = QtGui.QLineEdit(cp.confpars.dirName+'/'+cp.confpars.fileName)
 
-        self.browse    = QtGui.QPushButton("Browse")    
-        self.display   = QtGui.QPushButton("HDF5 tree")
-        self.wtd       = QtGui.QPushButton("What and how to display")
+        self.browse    = QtGui.QPushButton("1. Select file:")    
+        self.display   = QtGui.QPushButton("2. Check datasets in HDF5 tree")
+        self.wtd       = QtGui.QPushButton("3. Set what and how to display")
+        self.player    = QtGui.QPushButton("4. Plot data in several modes")
         self.exit      = QtGui.QPushButton("Exit")
+        self.save      = QtGui.QPushButton("Save")
         #self.printfile = QtGui.QPushButton("Print HDF5 structure")    
         #self.config    = QtGui.QPushButton("Configuration")
-        #self.save      = QtGui.QPushButton("Save")
         #self.selection = QtGui.QPushButton("Selection")
         #self.save.setMaximumWidth(40)   
 
-        #self.wtd.setStyleSheet("background-color: rgb(255, 255, 230); color: rgb(0, 0, 0)") # Yellowish
-        #self.wtd.setStyleSheet("background-color: rgb(255, 240, 245); color: rgb(0, 0, 0)") # Pink
-        self.wtd.setStyleSheet("background-color: rgb(180, 255, 180); color: rgb(0, 0, 0)") # Pink
-        self.wtd.setMinimumHeight(30)
-        self.wtd.setMinimumWidth(210)
+        #self.wtd.setMinimumHeight(30)
+        #self.wtd.setMinimumWidth(210)
+
+        self.setButtonColors()
 
         hboxF = QtGui.QHBoxLayout()
-        hboxF.addWidget(self.titFile)
-        hboxF.addWidget(self.fileEdit)
+        #hboxF.addWidget(self.titFile)
         hboxF.addWidget(self.browse)
+        hboxF.addWidget(self.fileEdit)
 
         hboxC = QtGui.QHBoxLayout()
-        hboxC.addStretch(2)
+        #hboxC.addStretch(1)
         hboxC.addWidget(self.display)
+        hboxC.addStretch(1)
         
         hboxE = QtGui.QHBoxLayout()
         #hboxE.addWidget(self.selection)
-        hboxE.addStretch(1)
+        #hboxE.addStretch(1)
         hboxE.addWidget(self.wtd)
         hboxE.addStretch(1)
 
-        self.wplayer = guiplr.GUIPlayer()
-        hboxT = QtGui.QHBoxLayout() 
-        hboxT.addWidget(self.wplayer)
+        self.hboxT = QtGui.QHBoxLayout() 
+        self.hboxA = QtGui.QHBoxLayout() 
 
-        self.wcomplex = guicomplex.GUIComplexCommands(None, self.wplayer)
-        hboxA = QtGui.QHBoxLayout() 
-        hboxA.addWidget(self.wcomplex)
+        if cp.confpars.playerGUIIsOpen : # At initialization it means that "should be open..."
+            self.setPlayerWidgets()
 
         hbox = QtGui.QHBoxLayout()
-        #hbox.addWidget(self.config)
-        #hbox.addWidget(self.save)
-        hbox.addStretch(3)
+        hbox.addWidget(self.player)
+        hbox.addStretch(1)
+        hbox.addWidget(self.save)
         hbox.addWidget(self.exit)
-
-        #hboxL = QtGui.QHBoxLayout()
-        #hboxL.addWidget(self.lcd)
-        #hboxL.addWidget(self.slider)
 
         vbox = QtGui.QVBoxLayout()
         vbox.addLayout(hboxF)
@@ -163,10 +158,10 @@ class GUIMain ( QtGui.QWidget ) :
         vbox.addStretch(1)     
         vbox.addLayout(hboxE)
         vbox.addStretch(1)     
-        vbox.addLayout(hboxT)
-        vbox.addLayout(hboxA)
-        vbox.addStretch(1)
         vbox.addLayout(hbox)
+        vbox.addStretch(1)
+        vbox.addLayout(self.hboxT)
+        vbox.addLayout(self.hboxA)
 
         self.setLayout(vbox)
 
@@ -174,19 +169,46 @@ class GUIMain ( QtGui.QWidget ) :
         self.connect(self.browse,    QtCore.SIGNAL('clicked()'), self.processBrowse )
         self.connect(self.display,   QtCore.SIGNAL('clicked()'), self.processDisplay )
         self.connect(self.wtd,       QtCore.SIGNAL('clicked()'), self.processWhatToDisplay )
+        self.connect(self.player,    QtCore.SIGNAL('clicked()'), self.processPlayer )
         self.connect(self.fileEdit,  QtCore.SIGNAL('editingFinished ()'), self.processFileEdit )
+        self.connect(self.save,      QtCore.SIGNAL('clicked()'), self.processSave )
         #self.connect(self.printfile, QtCore.SIGNAL('clicked()'), self.processPrint )
-        #self.connect(self.save,      QtCore.SIGNAL('clicked()'), self.processSave )
         #self.connect(self.config,    QtCore.SIGNAL('clicked()'), self.processConfig )
         #self.connect(self.selection, QtCore.SIGNAL('clicked()'), self.processSelection )
 
         #self.setFocus()
         #self.resize(500, 300)
+        self.showToolTips()
         print 'End of init'
-
+        
     #-------------------
     # Private methods --
     #-------------------
+
+
+    def showToolTips(self):
+        self.save.setToolTip('Save all current settings in the \nfile with configuration parameters.') 
+        self.exit.setToolTip('Close all windows and \nexit this program') 
+
+
+    def setButtonColors(self):
+        #self.styleYellow = "background-color: rgb(255, 255, 230); color: rgb(0, 0, 0)" # Yellowish
+        #self.stylePink   = "background-color: rgb(255, 240, 245); color: rgb(0, 0, 0)" # Pinkish
+        self.styleGreen  = "background-color: rgb(220, 255, 220); color: rgb(0, 0, 0)" # Greenish
+        self.styleGray   = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0)" # Pinkish
+
+        if cp.confpars.step01IsDone : self.browse .setStyleSheet(self.styleGray)
+        else                        : self.browse .setStyleSheet(self.styleGreen)
+
+        if cp.confpars.step02IsDone : self.display.setStyleSheet(self.styleGray)
+        else                        : self.display.setStyleSheet(self.styleGreen)
+
+        if cp.confpars.step03IsDone : self.wtd    .setStyleSheet(self.styleGray)
+        else                        : self.wtd    .setStyleSheet(self.styleGreen)
+
+        if cp.confpars.step04IsDone : self.player .setStyleSheet(self.styleGray)
+        else                        : self.player .setStyleSheet(self.styleGreen)
+
 
     def moveEvent(self, e):
         #print 'moveEvent' 
@@ -201,10 +223,16 @@ class GUIMain ( QtGui.QWidget ) :
         print 'Print structure of the HDF5 file:\n %s' % (fname)
         printh5.print_hdf5_file_structure(fname)
 
+    def closeEvent(self, event):
+        print 'closeEvent'
+        self.processQuit()
+
     def processQuit(self):
-        print 'Begin GUIMain Quit'
+        print 'Quit GUIMain'
         #self.drawev.quitDrawEvent()
-        self.wplayer.processQuit()
+        if cp.confpars.playerGUIIsOpen :
+            self.wplayer.processQuit()
+            self.wcomplex.processQuit()
         self.SHowIsOn = False
         if cp.confpars.wtdWindowIsOpen :
             cp.confpars.guiwhat.close()
@@ -214,14 +242,15 @@ class GUIMain ( QtGui.QWidget ) :
             cp.confpars.guiconfig.close()
         if cp.confpars.selectionGUIIsOpen :
             cp.confpars.guiselection.close()
-        print 'Segmentation fault may happen at closing of the Main GUI window. The reason for that is not clear yet...'
+        #print 'Segmentation fault may happen at closing of the Main GUI window. The reason for that is not clear yet...'
               #It happens after opening/closing HDF5 Tree and WTD GUIs...
         self.close()
 
 
-        
     def processBrowse(self):
         print 'Browse'
+        cp.confpars.step01IsDone = True
+        self.setButtonColors()
         #self.drawev.closeHDF5File()
         str_path_file = str(self.fileEdit.displayText())
         cp.confpars.dirName,cp.confpars.fileName = os.path.split(str_path_file)
@@ -290,7 +319,10 @@ class GUIMain ( QtGui.QWidget ) :
             cp.confpars.guiwhat.move(self.pos().__add__(QtCore.QPoint(0,380))) # open window with offset w.r.t. parent
             cp.confpars.guiwhat.show()
 
-            
+        cp.confpars.step03IsDone = True
+        self.setButtonColors()
+
+
     def processDisplay(self):
         if cp.confpars.treeWindowIsOpen : # close wtd window
             print 'What to display GUI: Close'
@@ -301,8 +333,32 @@ class GUIMain ( QtGui.QWidget ) :
             #self.display.setText('Close HDF5 tree')
             cp.confpars.guitree = guiselitems.GUISelectItems()
             #cp.confpars.guitree.setParent(self) # bypass for parent initialization in the base QWidget
-            cp.confpars.guitree.move(self.pos().__add__(QtCore.QPoint(-360,0))) # open window with offset w.r.t. parent
+            cp.confpars.guitree.move(self.pos().__add__(QtCore.QPoint(510,0))) # (-360,0)open window with offset w.r.t. parent
             cp.confpars.guitree.show()
+        cp.confpars.step02IsDone = True
+        self.setButtonColors()
+
+
+    def processPlayer(self):
+        print 'Player GUI'
+        if  cp.confpars.playerGUIIsOpen :
+            self.wplayer.close()
+            self.wcomplex.close()
+            self.setFixedSize(500,150)
+        else :    
+            self.setPlayerWidgets()
+            #self.show()
+        cp.confpars.step04IsDone = True
+        self.setButtonColors()
+
+
+    def setPlayerWidgets(self):
+        #if cp.confpars.playerGUIIsOpen :
+        self.wplayer  = guiplr.GUIPlayer()
+        self.wcomplex = guicomplex.GUIComplexCommands(None, self.wplayer)
+        self.hboxT.addWidget(self.wplayer)
+        self.hboxA.addWidget(self.wcomplex)
+        self.setFixedSize(500,350)
 
 
     def mousePressEvent(self, event):
@@ -341,10 +397,6 @@ class GUIMain ( QtGui.QWidget ) :
 
         if event.key() == QtCore.Qt.Key_Home:
             print 'event.key() = Home'
-
-    def closeEvent(self, event):
-        print 'closeEvent'
-        self.processQuit()
 
 #-----------------------------
 #  In case someone decides to run this module
