@@ -1,0 +1,27 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package irods-client
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+import os
+from os.path import join as pjoin
+
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+irods_ver = "2.4.1"
+PREFIX  = pjoin(env['SIT_ROOT'],"sw/external/irods-client",irods_ver)
+BINDIR  = "bin"
+standardExternalPackage ( 'irods-client', **locals() )
