@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <string>
 #include <boost/scoped_ptr.hpp>
 
 //----------------------
@@ -24,6 +25,7 @@
 //-------------------------------
 #include "PSEnv/ConfigStore.h"
 #include "PSEnv/EpicsStore.h"
+#include "RootHistoManager/RootHMgr.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -52,10 +54,13 @@ class Env : boost::noncopyable {
 public:
 
   // Default constructor
-  Env () ;
+  Env (const std::string& jobName) ;
 
   // Destructor
   ~Env () ;
+
+  /// Return job name
+  const std::string& jobName() const { return m_jobName; }
   
   /// Access Configuration Store
   ConfigStore& configStore() { return *m_cfgStore; }
@@ -63,13 +68,18 @@ public:
   /// Access EPICS Store
   EpicsStore& epicsStore() { return *m_epicsStore; }
 
+  /// Access ROT histogram manager
+  RootHistoManager::RootHMgr& rhmgr() { return *m_rhmgr; }
+
 protected:
 
 private:
 
   // Data members
+  std::string m_jobName;
   boost::scoped_ptr<ConfigStore> m_cfgStore;
   boost::scoped_ptr<EpicsStore> m_epicsStore;
+  boost::scoped_ptr<RootHistoManager::RootHMgr> m_rhmgr;
   
 };
 

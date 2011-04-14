@@ -37,13 +37,19 @@ namespace PSEnv {
 //----------------
 // Constructors --
 //----------------
-Env::Env ()
-  : m_cfgStore()
+Env::Env (const std::string& jobName)
+  : m_jobName(jobName)
+  , m_cfgStore()
   , m_epicsStore(new EpicsStore())
+  , m_rhmgr()
 {
   // instantiate dictionary for config store and store itself
   boost::shared_ptr<PSEvt::ProxyDict> cfgDict(new PSEvt::ProxyDict());
   m_cfgStore.reset(new ConfigStore(cfgDict));
+  
+  // make root file name
+  std::string rfname = jobName + ".root";
+  m_rhmgr.reset(new RootHistoManager::RootHMgr(rfname));
 }
 
 //--------------
