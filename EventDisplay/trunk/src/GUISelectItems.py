@@ -62,7 +62,7 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         #self.parent = parent # See setParent for bypass
 
         self.setGeometry(10, 10, 350, 1000)
-        self.setWindowTitle('HDF5 tree, items selection')
+        self.setWindowTitle('HDF5 tree, select items')
 
         #layout = QHBoxLayout()
 
@@ -100,33 +100,33 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         self.connect(actPrint,        QtCore.SIGNAL('triggered()'), self.processPrint)
         #self.connect(actExit,  QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
 
-        menubar = self.menuBar()
-        optAct  = menubar.addMenu('&Actions')
+        self.menubar = self.menuBar()
+        optAct = self.menubar.addMenu('&Actions')
         optAct.addAction(actApply)
         optAct.addAction(actReset)
         optAct.addAction(actRetreve)
         optAct.addAction(actExit)
 
-        optView = menubar.addMenu('&View')
+        optView = self.menubar.addMenu('&View')
         optView.addAction(actExpand)
         optView.addAction(actCollapse)
         optView.addAction(actExpCheck)
         optView.addAction(actPrint)
 
-        toolbar = self.addToolBar('Exit')
-        toolbar.setMovable(True)
-        toolbar.addAction(actExit)
-        #toolbar.insertSeparator(....)
-        toolbar.addSeparator()
-        toolbar.addAction(actApply)
-        toolbar.addAction(actReset)
-        toolbar.addAction(actRetreve)
-        toolbar.addSeparator()
-        #toolbar.addAction(actExpand)
-        #toolbar.addAction(actCollapse)
-        toolbar.addAction(self.actExpColl)
-        toolbar.addAction(actExpCheck)
-        toolbar.addAction(actPrint)
+        self.toolbar = self.addToolBar('Exit')
+        self.toolbar.setMovable(True)
+        self.toolbar.addAction(actExit)
+        #self.toolbar.insertSeparator(....)
+        self.toolbar.addSeparator()
+        self.toolbar.addAction(actApply)
+        self.toolbar.addAction(actReset)
+        self.toolbar.addAction(actRetreve)
+        self.toolbar.addSeparator()
+        #self.toolbar.addAction(actExpand)
+        #self.toolbar.addAction(actCollapse)
+        self.toolbar.addAction(self.actExpColl)
+        self.toolbar.addAction(actExpCheck)
+        self.toolbar.addAction(actPrint)
 
         self.model = h5model.HDF5TreeViewModel()
 
@@ -170,12 +170,17 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         self.parent = parent
 
     def closeEvent(self, event): # if the 'x' (in the top-right corner of the window) is clicked
-        print 'closeEvent'
+        #print 'closeEvent'
         self.processExit()
 
     def processExit(self):
-        print 'Exit button is clicked'
+        #print 'Exit button is clicked'
         #self.parent.processDisplay() # in order to close this window as from GUIMain
+        #self.disconnect()
+        self.view.close()
+        #self.model.close()
+        self.menubar.close()
+        self.toolbar.close()
         self.close()
         cp.confpars.treeWindowIsOpen = False
         #self.display.setText('Open')

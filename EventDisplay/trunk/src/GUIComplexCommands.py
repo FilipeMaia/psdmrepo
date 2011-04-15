@@ -118,7 +118,7 @@ class GUIComplexCommands ( QtGui.QWidget ) :
 
         #self.setFocus()
         #self.resize(500, 300)
-        print 'End of init'
+        #print 'End of init'
 
     #-------------------
     # Private methods --
@@ -130,12 +130,12 @@ class GUIComplexCommands ( QtGui.QWidget ) :
 
 
     def closeEvent(self, event):
-        print 'closeEvent'
+        #print 'closeEvent'
         self.processQuit()
 
 
     def processQuit(self):
-        print 'Quit'
+        #print 'Quit'
         self.drawev.quitDrawEvent()
         self.SHowIsOn = False
         self.close()
@@ -161,7 +161,7 @@ class GUIComplexCommands ( QtGui.QWidget ) :
 
 
     def processClosePlots(self):
-        print 'Close plots',
+        #print 'Close plots',
         self.drawev.quitDrawEvent()
 
 #-----------------------------

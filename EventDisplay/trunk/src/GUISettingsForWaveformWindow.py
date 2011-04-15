@@ -51,7 +51,7 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
     def __init__(self, parent=None, window=0):
         QtGui.QWidget.__init__(self, parent)
 
-        print 'GUISettingsForWaveformWindow for window ', window
+        #print 'GUISettingsForWaveformWindow for window ', window
 
         self.window = window
 
@@ -258,7 +258,7 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
 
 
     def fillPopupMenuForWaveNumber(self):
-        print 'fillPopupMenuForWaveNumber'
+        #print 'fillPopupMenuForWaveNumber'
 
         self.popupMenuForWaveNumber.close()
         self.popupMenuForWaveNumber = QtGui.QMenu()
@@ -269,7 +269,7 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
 
 
     def fillPopupMenuForDataSet(self):
-        print 'fillPopupMenuForDataSet'
+        #print 'fillPopupMenuForDataSet'
         self.popupMenuForDataSet.addAction('None')
         for dsname in cp.confpars.list_of_checked_item_names :
             item_last_name = printh5.get_item_last_name(dsname)           
@@ -388,12 +388,12 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
 
 
     def closeEvent(self, event):
-        print 'closeEvent'
+        #print 'closeEvent'
         self.processClose()
 
 
     def processClose(self):
-        print 'Close window'
+        #print 'Close window'
         cp.confpars.wtdWFWindowIsOpen = False
         self.close()
 

@@ -68,7 +68,7 @@ class DrawEvent ( object ) :
     #----------------
     def __init__ ( self, parent=None ) :
         """Constructor"""
-        print 'DrawEvent () Initialization'
+        #print 'DrawEvent () Initialization'
         cp.confpars.h5_file_is_open = False
         self.plotsCSpad             = cspad.PlotsForCSpad()
         self.plotsImage             = image.PlotsForImage()
@@ -610,7 +610,7 @@ class DrawEvent ( object ) :
         plt.ioff()
         plt.close()
         self.closeHDF5File()
-        print 'quitDrawEvent()'
+        #print 'quitDrawEvent()'
 
 
     def openHDF5File( self ) :     

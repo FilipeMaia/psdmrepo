@@ -149,9 +149,16 @@ class GUISelectQuadAndPair ( QtGui.QWidget ) :
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
 
+
+    def closeEvent(self, event):
+        #print 'closeEvent'
+        self.processQuit()
+
+
     def processQuit(self):
-        print 'Quit'
+        #print 'Quit'
         self.close()
+
         
     def mousePressEvent(self, event):
         print 'Click on Quad or Pair number using mouse left button\n'
@@ -159,6 +166,7 @@ class GUISelectQuadAndPair ( QtGui.QWidget ) :
         #print (event.pos()),
         #print ' x=%d, y=%d' % (event.x(),event.y()),        
         #print ' global x=%d, y=%d' % (event.globalX(),event.globalY())
+
 
     def processMenuQuad(self):
         #print 'MenuQuad'
@@ -216,10 +224,6 @@ class GUISelectQuadAndPair ( QtGui.QWidget ) :
 
         if event.key() == QtCore.Qt.Key_Home:
             print 'event.key() = Home'
-
-    def closeEvent(self, event):
-        print 'closeEvent'
-        self.processQuit()
 
 #-----------------------------
 #  In case someone decides to run this module

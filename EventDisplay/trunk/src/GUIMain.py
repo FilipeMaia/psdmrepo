@@ -88,7 +88,7 @@ class GUIMain ( QtGui.QWidget ) :
         if not cp.confpars.readParsFromFileAtStart :
             cp.confpars.setDefaultParameters()
         cp.confpars.Print()
-        print 'Current event number directly : %d ' % (cp.confpars.eventCurrent)
+        print 'Current event number : %d ' % (cp.confpars.eventCurrent)
 
 	#print 'sys.argv=',sys.argv # list of input parameters
 
@@ -179,7 +179,7 @@ class GUIMain ( QtGui.QWidget ) :
         #self.setFocus()
         #self.resize(500, 300)
         self.showToolTips()
-        print 'End of init'
+        #print 'End of init'
         
     #-------------------
     # Private methods --
@@ -215,7 +215,7 @@ class GUIMain ( QtGui.QWidget ) :
         cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
 
     def resizeEvent(self, e):
-        print 'resizeEvent' 
+        #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
 
     def processPrint(self):
@@ -224,11 +224,11 @@ class GUIMain ( QtGui.QWidget ) :
         printh5.print_hdf5_file_structure(fname)
 
     def closeEvent(self, event):
-        print 'closeEvent'
+        #print 'closeEvent'
         self.processQuit()
 
     def processQuit(self):
-        print 'Quit GUIMain'
+        #print 'Quit GUIMain'
         #self.drawev.quitDrawEvent()
         if cp.confpars.playerGUIIsOpen :
             self.wplayer.processQuit()
@@ -255,7 +255,7 @@ class GUIMain ( QtGui.QWidget ) :
         str_path_file = str(self.fileEdit.displayText())
         cp.confpars.dirName,cp.confpars.fileName = os.path.split(str_path_file)
         print 'dirName  : %s' % (cp.confpars.dirName)         
-        print 'fileName : %s' % (cp.confpars.fileName)         
+        print 'fileName : %s' % (cp.confpars.fileName)
         path_file = QtGui.QFileDialog.getOpenFileName(self,'Open file',cp.confpars.dirName)
         #fname = open(filename)
         #data = fname.read()
@@ -309,11 +309,11 @@ class GUIMain ( QtGui.QWidget ) :
 
     def processWhatToDisplay(self):
         if cp.confpars.wtdWindowIsOpen : # close wtd window
-            print 'What to display GUI: Close'
+            print 'Close What to display GUI'
             #self.wtd.setText('Open')
             cp.confpars.guiwhat.close()
         else :                           # Open wtd window
-            print 'What to display GUI: Open'
+            print 'Open What to display GUI'
             #self.wtd.setText('Close')
             cp.confpars.guiwhat = guiwtd.GUIWhatToDisplay()
             cp.confpars.guiwhat.move(self.pos().__add__(QtCore.QPoint(0,380))) # open window with offset w.r.t. parent
@@ -325,11 +325,11 @@ class GUIMain ( QtGui.QWidget ) :
 
     def processDisplay(self):
         if cp.confpars.treeWindowIsOpen : # close wtd window
-            print 'What to display GUI: Close'
+            print 'Close HDF5 tree GUI'
             #self.display.setText('Open HDF5 tree')
             cp.confpars.guitree.close()
         else :                           # Open wtd window
-            print 'What to display GUI: Open'
+            print 'Open HDF5 tree GUI'
             #self.display.setText('Close HDF5 tree')
             cp.confpars.guitree = guiselitems.GUISelectItems()
             #cp.confpars.guitree.setParent(self) # bypass for parent initialization in the base QWidget
@@ -340,12 +340,14 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def processPlayer(self):
-        print 'Player GUI'
+        #print 'Player GUI'
         if  cp.confpars.playerGUIIsOpen :
+            print 'Close Player sub-GUI'
             self.wplayer.close()
             self.wcomplex.close()
             self.setFixedSize(500,150)
         else :    
+            print 'Open Player sub-GUI'
             self.setPlayerWidgets()
             #self.show()
         cp.confpars.step04IsDone = True

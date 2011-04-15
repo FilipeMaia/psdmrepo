@@ -253,9 +253,9 @@ class ConfigParameters ( object ) :
         self.projX_NSlices       = 10  
         self.projX_SliWidth      = 200 
         self.projX_Xmin          = 0   
-        self.projX_Xmax          = 2000
+        self.projX_Xmax          = 400
         self.projX_Ymin          = 0   
-        self.projX_Ymax          = 2000
+        self.projX_Ymax          = 400
                                  
         self.projY_BinWidthIsOn  = True
         self.projY_SliWidthIsOn  = True
@@ -264,9 +264,9 @@ class ConfigParameters ( object ) :
         self.projY_NSlices       = 10  
         self.projY_SliWidth      = 200 
         self.projY_Xmin          = 0   
-        self.projY_Xmax          = 2000
+        self.projY_Xmax          = 400
         self.projY_Ymin          = 0   
-        self.projY_Ymax          = 2000
+        self.projY_Ymax          = 400
 
     #-------------------
     #  Public methods --

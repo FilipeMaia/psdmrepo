@@ -72,6 +72,10 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
     #  Private methods --
     #--------------------
 
+    def close(self) :
+        print "HDF5TreeViewModel.close()"
+
+
     def _model_hdf5_tree(self) :
         """Puts the HDF5 file structure in the model tree"""
 

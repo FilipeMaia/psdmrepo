@@ -143,11 +143,11 @@ class GUIConfiguration ( QtGui.QWidget ) :
         self.parent = parent
 
     def closeEvent(self, event):
-        print 'closeEvent'
+        #print 'closeEvent'
         self.processExit()
             
     def processExit(self):
-        print 'Exit'
+        #print 'Exit'
         self.close()
         cp.confpars.configGUIIsOpen = False
 

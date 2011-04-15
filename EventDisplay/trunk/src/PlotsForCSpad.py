@@ -58,7 +58,7 @@ class PlotsForCSpad ( object ) :
     def __init__ ( self ) :
         """Constructor - initialization."""
 
-        print '\n Initialization of the PlotsForCSpad'
+        #print '\n Initialization of the PlotsForCSpad'
         #print 'using MPL version: ', matplotlib.__version__
         #self.fig1_window_is_open = False
 

@@ -200,7 +200,7 @@ class GUIPlayer ( QtGui.QWidget ) :
 
         #self.setFocus()
         #self.resize(500, 300)
-        print 'End of init'
+        #print 'End of init'
         cp.confpars.playerGUIIsOpen = True
 
 
@@ -212,8 +212,12 @@ class GUIPlayer ( QtGui.QWidget ) :
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
 
+    def closeEvent(self, event):
+        #print 'closeEvent'
+        self.processQuit()
+
     def processQuit(self):
-        print 'Quit'
+        #print 'Quit'
         self.drawev.quitDrawEvent()
         self.SHowIsOn = False
         self.close()
@@ -359,10 +363,6 @@ class GUIPlayer ( QtGui.QWidget ) :
 
         if event.key() == QtCore.Qt.Key_Home:
             print 'event.key() = Home'
-
-    def closeEvent(self, event):
-        print 'closeEvent'
-        self.processQuit()
 
 #-----------------------------
 #  In case someone decides to run this module

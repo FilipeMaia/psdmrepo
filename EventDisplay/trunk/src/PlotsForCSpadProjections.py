@@ -60,7 +60,7 @@ class PlotsForCSpadProjections ( object ) :
     def __init__ ( self, plotsCSpad ) :
         """Constructor - initialization."""
 
-        print '\n Initialization of the PlotsForCSpadProjections'
+        #print '\n Initialization of the PlotsForCSpadProjections'
 
         self.plotsCSpad = plotsCSpad
 
@@ -111,6 +111,10 @@ class PlotsForCSpadProjections ( object ) :
             xarr = linspace(Xmin, Xmax, num=NBins, endpoint=True)
             #print 'xarr.shape=',xarr.shape
             #print 'arr1slice.shape=',arr1slice.shape
+
+            if arr1slice.sum()== 0 :
+                print 'Empty histogram for slice =', slice,'is ignored'
+                continue
 
             axes = plt.hist(xarr, bins=NBins, weights=arr1slice, histtype='step')
             plt.xlim(Xmin,Xmax)
@@ -165,6 +169,10 @@ class PlotsForCSpadProjections ( object ) :
 
             arr1slice = arr2d[...,slice]
             arrbins   = linspace(Ymin, Ymax, num=NBins, endpoint=True)
+
+            if arr1slice.sum()== 0 :
+                print 'Empty histogram for slice =', slice,'is ignored'
+                continue
 
             axes = plt.hist(arrbins, bins=NBins, weights=arr1slice, histtype='step')
             plt.xlim(Ymin,Ymax)
@@ -222,6 +230,9 @@ class PlotsForCSpadProjections ( object ) :
             xarr = linspace(Rmin, Rmax, num=NBins, endpoint=True)
             #print 'xarr.shape=',xarr.shape
             #print 'arr1slice.shape=',arr1slice.shape
+            if arr1slice.sum()== 0 :
+                print 'Empty histogram for slice =', slice,'is ignored'
+                continue
 
             axes = plt.hist(xarr, bins=NBins, weights=arr1slice, histtype='step')
             plt.xlim(Rmin,Rmax)
@@ -276,6 +287,9 @@ class PlotsForCSpadProjections ( object ) :
             xarr = linspace(Pmin, Pmax, num=NBins, endpoint=True)
             #print 'xarr.shape=',xarr.shape
             #print 'arr1slice.shape=',arr1slice.shape
+            if arr1slice.sum()== 0 :
+                print 'Empty histogram for slice =', slice,'is ignored'
+                continue
 
             axes = plt.hist(xarr, bins=NBins, weights=arr1slice, histtype='step')
             plt.xlim(Pmin,Pmax)

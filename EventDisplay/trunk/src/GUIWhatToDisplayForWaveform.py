@@ -124,6 +124,12 @@ class GUIWhatToDisplayForWaveform ( QtGui.QWidget ) :
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
 
+
+    def closeEvent(self, event):
+        #print 'closeEvent'
+        self.processQuit()
+
+
     def processQuit(self):
         #print 'Quit'
         self.close()
@@ -169,7 +175,7 @@ class GUIWhatToDisplayForWaveform ( QtGui.QWidget ) :
 
     def processTabBar(self):
         indTab = self.tabBar.currentIndex()
-        print 'TabBar index=',indTab
+        #print 'TabBar index=',indTab
 
         #minSize = self.hboxD.minimumSize()
         self.guiTab.close()
@@ -212,10 +218,6 @@ class GUIWhatToDisplayForWaveform ( QtGui.QWidget ) :
 
         if event.key() == QtCore.Qt.Key_Home:
             print 'event.key() = Home'
-
-    def closeEvent(self, event):
-        print 'closeEvent'
-        self.processQuit()
 
 #-----------------------------
 #  In case someone decides to run this module
