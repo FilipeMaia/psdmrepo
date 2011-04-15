@@ -169,21 +169,23 @@ class GUISelectItems ( QtGui.QMainWindow ) :
     def setParent(self,parent) :
         self.parent = parent
 
+
     def closeEvent(self, event): # if the 'x' (in the top-right corner of the window) is clicked
         #print 'closeEvent'
-        self.processExit()
-
-    def processExit(self):
-        #print 'Exit button is clicked'
         #self.parent.processDisplay() # in order to close this window as from GUIMain
         #self.disconnect()
         self.view.close()
         #self.model.close()
         self.menubar.close()
         self.toolbar.close()
-        self.close()
         cp.confpars.treeWindowIsOpen = False
         #self.display.setText('Open')
+
+
+    def processExit(self):
+        #print 'Exit button is clicked'
+        self.close()
+
 
     def processApply(self):
         print 'Apply button is clicked, use all checked items in the tree model for display'

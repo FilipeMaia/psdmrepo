@@ -225,9 +225,6 @@ class GUIMain ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        self.processQuit()
-
-    def processQuit(self):
         #print 'Quit GUIMain'
         #self.drawev.quitDrawEvent()
         if cp.confpars.playerGUIIsOpen :
@@ -242,9 +239,15 @@ class GUIMain ( QtGui.QWidget ) :
             cp.confpars.guiconfig.close()
         if cp.confpars.selectionGUIIsOpen :
             cp.confpars.guiselection.close()
-        #print 'Segmentation fault may happen at closing of the Main GUI window. The reason for that is not clear yet...'
-              #It happens after opening/closing HDF5 Tree and WTD GUIs...
+        #print 'Segmentation fault may happen at exit, when the dialog is closed. \nThis is a known problem of python-qt4 version.'
+        print 'Exit Event Display'
+
+
+        
+    def processQuit(self):
+        print 'Exit button is clicked'
         self.close()
+        
 
 
     def processBrowse(self):

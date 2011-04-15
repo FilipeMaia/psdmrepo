@@ -100,7 +100,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.indTabWF    = self.tabBar.addTab('Waveform')
         self.indTabPR    = self.tabBar.addTab('Proj.')
         self.indTabCO    = self.tabBar.addTab('Corr.')
-        self.indTabEmpty = self.tabBar.addTab(31*' ')
+        self.indTabEmpty = self.tabBar.addTab(30*' ')
         self.tabBar.setTabEnabled(self.indTabEmpty,False)
         self.isFirstEntry = True
 
@@ -116,7 +116,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         #self.tabBarBot.setShape(QtGui.QTabBar.TriangularSouth)
         self.indTabBotConfig = self.tabBarBot.addTab('Configuration')
         self.indTabBotSelect = self.tabBarBot.addTab('Selection')
-        self.indTabBotEmpty  = self.tabBarBot.addTab(65*' ')
+        self.indTabBotEmpty  = self.tabBarBot.addTab(64*' ')
         self.tabBarBot.setTabEnabled(self.indTabBotEmpty,False)
         
         self.hboxT = QtGui.QHBoxLayout()
@@ -218,7 +218,6 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.setFixedSize(500, self.vertSize)
 
 
-
     def showToolTips(self):
         self.butClose    .setToolTip('Close this window') 
 
@@ -229,19 +228,18 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
 
     def closeEvent(self, event):
-        #print 'closeEvent for WTD GUI'
-        self.processClose()
-
-
-    def processClose(self):
-        #print 'Close window'
+        print 'closeEvent for WTD GUI'
         if self.isOpenCS: self.cboxguiCS.close()
         if self.isOpenIM: self.cboxguiIM.close()
         if self.isOpenOT: self.cboxguiOT.close()
         self.guiTab.close()
         self.tabBar.close()
-        self.close()
         cp.confpars.wtdWindowIsOpen = False
+
+
+    def processClose(self):
+        print 'Close button is clicked for WTD GUI'
+        self.close()
 
 
     def processSelection(self):

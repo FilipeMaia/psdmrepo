@@ -144,12 +144,11 @@ class GUIConfiguration ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        self.processExit()
+        cp.confpars.configGUIIsOpen = False
             
     def processExit(self):
-        #print 'Exit'
+        #print 'Exit button'
         self.close()
-        cp.confpars.configGUIIsOpen = False
 
     def resizeEvent(self, e):
         #print 'resizeEvent' 

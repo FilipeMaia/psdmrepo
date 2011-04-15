@@ -127,19 +127,21 @@ class GUIWhatToDisplayForWaveform ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        self.processQuit()
+        pass
 
 
     def processQuit(self):
-        #print 'Quit'
+        #print 'Quit button'
         self.close()
         
+
     def mousePressEvent(self, event):
         print 'Click mouse left on this button.'
         #print 'event.button() = %s at position' % (event.button()),        
         #print (event.pos()),
         #print ' x=%d, y=%d' % (event.x(),event.y()),        
         #print ' global x=%d, y=%d' % (event.globalX(),event.globalY())
+
 
     def processMenuNWin(self):
         print 'MenuNWin'

@@ -292,11 +292,13 @@ class GUIWhatToDisplayForProjY ( QtGui.QWidget ) :
     def resizeEvent(self, e):
         self.frame.setGeometry(self.rect())
 
-    def closeEvent(self, event):
-        self.processClose()
 
+    def closeEvent(self, event):
+        #cp.confpars....WindowIsOpen = False
+        pass
+
+    
     def processClose(self):
-        cp.confpars.selectionWindowIsOpen = False
         self.close()
 
 #-----------------------------

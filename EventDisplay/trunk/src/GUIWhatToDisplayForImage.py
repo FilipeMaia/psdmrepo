@@ -117,15 +117,14 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
 
 
-    def processQuit(self):
-        #print 'Quit'
-        cp.confpars.wtdIMWindowIsOpen = False
-        self.close()
-
-
     def closeEvent(self, event):
         #print 'closeEvent'
-        self.processQuit()
+        cp.confpars.wtdIMWindowIsOpen = False
+
+
+    def processQuit(self):
+        #print 'Quit button'
+        self.close()
 
         
     def mousePressEvent(self, event):

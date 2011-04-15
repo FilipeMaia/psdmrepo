@@ -223,22 +223,27 @@ class GUIWhatToDisplayForImageWindow ( QtGui.QWidget ) :
     def resizeEvent(self, e):
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
+
   
     def getVBoxForLayout(self):
         return self.vbox
 
+
     def setParentWidget(self,parent):
         self.parentWidget = parent
 
+
     def closeEvent(self, event):
         #print 'closeEvent'
-        self.processClose()
+        pass
+
 
     def processClose(self):
-        #print 'Close window'
+        #print 'Close button'
         #cp.confpars.wtdIMWindowIsOpen = False
         self.close()
 
+  
     def setButSelDataSetTextAlignment(self):
         if self.butSelDataSet.text() == 'None' or self.butSelDataSet.text() == 'All' :
             self.butSelDataSet.setStyleSheet('Text-align:center')

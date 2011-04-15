@@ -81,7 +81,7 @@ class EventDisplay :
 #
 
 if __name__ == "__main__" :
+
     app = EventDisplay()
     sys.exit(app.exec_())
-
 

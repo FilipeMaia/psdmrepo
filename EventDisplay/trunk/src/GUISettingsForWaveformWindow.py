@@ -389,12 +389,11 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        self.processClose()
+        cp.confpars.wtdWFWindowIsOpen = False
 
 
     def processClose(self):
-        #print 'Close window'
-        cp.confpars.wtdWFWindowIsOpen = False
+        #print 'Close button'
         self.close()
 
 

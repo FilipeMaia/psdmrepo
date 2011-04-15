@@ -212,16 +212,18 @@ class GUIPlayer ( QtGui.QWidget ) :
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
 
+
     def closeEvent(self, event):
         #print 'closeEvent'
-        self.processQuit()
-
-    def processQuit(self):
-        #print 'Quit'
         self.drawev.quitDrawEvent()
         self.SHowIsOn = False
-        self.close()
         cp.confpars.playerGUIIsOpen = False
+
+
+    def processQuit(self):
+        #print 'Quit button'
+        self.close()
+
 
     def processCorrelations(self):
         print 'Correlations'

@@ -117,15 +117,14 @@ class GUICorrelation ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
 
 
-    def processQuit(self):
-        #print 'Quit'
-        cp.confpars.correlationGUIIsOpen = False
-        self.close()
-
-
     def closeEvent(self, event):
         #print 'closeEvent'
-        self.processQuit()
+        cp.confpars.correlationGUIIsOpen = False
+
+
+    def processQuit(self):
+        #print 'Quit buttun'
+        self.close()
 
         
     def mousePressEvent(self, event):

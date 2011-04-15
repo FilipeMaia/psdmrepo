@@ -72,7 +72,7 @@ class GUISelectionWindow ( QtGui.QWidget ) :
         self.titYminmax= QtGui.QLabel('Ymin, Ymax:')
 
         self.char_expand = u'\u25BE' # down-head triangle
-        height = 22
+        height = 20
         width  = 50
 
         self.editSelectionThr   = QtGui.QLineEdit(str(cp.confpars.selectionWindowParameters[self.window][0]))
@@ -87,7 +87,7 @@ class GUISelectionWindow ( QtGui.QWidget ) :
         self.editSelectionYmin  .setMaximumWidth(width)
         self.editSelectionYmax  .setMaximumWidth(width)
 
-        self.editSelectionThr   .setMaximumHeight(45)
+        self.editSelectionThr   .setMaximumHeight(40)
         self.editSelectionXmin  .setMaximumHeight(height)
         self.editSelectionXmax  .setMaximumHeight(height)
         self.editSelectionYmin  .setMaximumHeight(height)
@@ -99,7 +99,7 @@ class GUISelectionWindow ( QtGui.QWidget ) :
         self.editSelectionYmin  .setValidator(QtGui.QIntValidator(0, 2000,self))
         self.editSelectionYmax  .setValidator(QtGui.QIntValidator(0, 2000,self))
 
-        self.titThreshold  = QtGui.QLabel('Threshold on min intensity (ADU) ')
+        self.titThreshold  = QtGui.QLabel('Threshold on intensity')
         self.radioInWin    = QtGui.QRadioButton("integral")
         self.radioInBin    = QtGui.QRadioButton("maximal")
         self.radioGroup    = QtGui.QButtonGroup()
@@ -202,11 +202,10 @@ class GUISelectionWindow ( QtGui.QWidget ) :
 
 
     def closeEvent(self, event):
-        self.processClose()
+        cp.confpars.selectionWindowIsOpen = False
 
 
     def processClose(self):
-        cp.confpars.selectionWindowIsOpen = False
         self.close()
 
 

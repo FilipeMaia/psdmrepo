@@ -121,15 +121,14 @@ class GUISelection ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
 
 
-    def processQuit(self):
-        #print 'Quit'
-        self.close()
+    def closeEvent(self, event):
+        #print 'closeEvent'
         cp.confpars.selectionGUIIsOpen = False
 
 
-    def closeEvent(self, event):
-        #print 'closeEvent'
-        self.processQuit()
+    def processQuit(self):
+        #print 'Quit button'
+        self.close()
 
         
     def mousePressEvent(self, event):

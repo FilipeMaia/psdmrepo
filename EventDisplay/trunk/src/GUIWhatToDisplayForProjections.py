@@ -131,16 +131,15 @@ class GUIWhatToDisplayForProjections ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
 
 
-    def processQuit(self):
-        print 'Quit'
-        #cp.confpars.selectionGUIIsOpen = False
-        self.close()
-
-
     def closeEvent(self, event):
         #print 'closeEvent'
-        self.processQuit()
+        #cp.confpars.projectionGUIIsOpen = False
+        pass
 
+
+    def processQuit(self):
+        #print 'Quit button'
+        self.close()
 
     def processEditProjCenterX(self):
         cp.confpars.projCenterX = float(self.editProjCenterX.displayText())        

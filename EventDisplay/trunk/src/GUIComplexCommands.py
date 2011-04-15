@@ -131,14 +131,13 @@ class GUIComplexCommands ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         #print 'closeEvent'
-        self.processQuit()
+        self.drawev.quitDrawEvent()
+        self.SHowIsOn = False
 
 
     def processQuit(self):
-        #print 'Quit'
-        self.drawev.quitDrawEvent()
-        self.SHowIsOn = False
-        self.close()
+        #print 'Quit button is clicked'
+        self.close() # this call closeEvent()
 
 
     def processCorrelations(self):
