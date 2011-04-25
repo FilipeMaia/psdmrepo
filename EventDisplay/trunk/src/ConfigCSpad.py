@@ -59,8 +59,8 @@ class ConfigCSpad ( object ) :
         gapX = 30
         gapY = 40
 
-        self.quadXOffset     = [   3,    0,      800+gapX, 800+gapX]
-        self.quadYOffset     = [   8,  800+gapY, 810+gapY,       18]
+        self.quadXOffset     = [   3,    0,      800+gapX, 806+gapX]
+        self.quadYOffset     = [   7,  799+gapY, 810+gapY,       17]
 
         self.firstPairInQuad = [0, 0,  8, 16]
         self.lastPairInQuad  = [0, 8, 16, 20]
@@ -102,17 +102,29 @@ class ConfigCSpad ( object ) :
                              [  0,  0,200,  0,400,400,600,400] ]
 
 
-        # Optical alignment:
+        # Optical alignment 2011-02-10 before run3:
 
-        self.pairXInQaud = [[ 419,  631,    0,    0,  208,    1,  423,  424],  # 2:5 were not measured
-                            [ 421,  634,    0,    0,  213,    1,  424,  425],
-                            [ 417,  630,    0,    1,  212,    0,  425,  426],
-                            [ 421,  635,    0,    0,  213,    1,  425,  426]] # 2:5 were not measured 
+        #self.pairXInQaud = [[ 419,  631,    0,    0,  208,    1,  423,  424],  # 2:5 were not measured
+        #                    [ 421,  634,    0,    0,  213,    1,  424,  425],
+        #                    [ 417,  630,    0,    1,  212,    0,  425,  426],
+        #                    [ 421,  635,    0,    0,  213,    1,  425,  426]] # 2:5 were not measured 
                                                                       
-        self.pairYInQaud = [[   0,    0,  214,    1,  430,  430,  615,  402],  # 2:5 were not measured
-                            [   0,    0,  214,    1,  425,  425,  615,  402],
-                            [   0,    0,  215,    3,  431,  431,  616,  403],
-                            [   0,    0,  214,    1,  425,  425,  615,  403]] # 2:5 were not measured
+        #self.pairYInQaud = [[   0,    0,  214,    1,  430,  430,  615,  402],  # 2:5 were not measured
+        #                    [   0,    0,  214,    1,  425,  425,  615,  402],
+        #                    [   0,    0,  215,    3,  431,  431,  616,  403],
+        #                    [   0,    0,  214,    1,  425,  425,  615,  403]] # 2:5 were not measured
+
+        # Optical alignment 2011-03-29 post run3:
+
+        self.pairXInQaud = [[422,  635,    0,    0,  212,    0,  427,  428],
+                            [421,  634,    0,    0,  214,    1,  425,  425],
+                            [418,  631,    2,    0,  216,    3,  431,  430],
+                            [422,  636,    0,    0,  215,    1,  430,  425]] # 4,6 (215,430) were not measured
+                                                                     
+        self.pairYInQaud = [[  1,    0,  216,    3,  431,  432,  616,  403],
+                            [  0,    0,  214,    2,  426,  426,  615,  402],
+                            [  1,    0,  219,    8,  433,  435,  617,  404],
+                            [  1,    0,  215,    2,  430,  430,  615,  404]] # 4,6 (430,615) were not measured
 
 
         #for ix in range(8) : self.pairXInQaud.append(random.randint(0,600))
