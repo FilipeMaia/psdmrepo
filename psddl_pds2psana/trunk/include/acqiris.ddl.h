@@ -53,6 +53,7 @@ public:
   virtual const Psana::Acqiris::TimestampV1& timestamp(uint32_t i0) const;
   virtual const int16_t* waveforms() const;
   virtual std::vector<int> timestamps_shape() const;
+  virtual std::vector<int> _skip_shape() const;
   virtual std::vector<int> waveforms_shape() const;
   virtual std::vector<int> _extraSpace_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }

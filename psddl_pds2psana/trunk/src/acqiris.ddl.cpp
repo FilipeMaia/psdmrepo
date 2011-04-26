@@ -134,6 +134,8 @@ std::vector<int> DataDescV1Elem::timestamps_shape() const
 }
 
 
+std::vector<int> DataDescV1Elem::_skip_shape() const { return m_xtcObj->_skip_shape(); }
+
 std::vector<int> DataDescV1Elem::waveforms_shape() const {
   if (m_cfgPtr0.get()) return m_xtcObj->waveforms_shape(*m_cfgPtr0);
   throw std::runtime_error("DataDescV1Elem::waveforms_shape: config object pointer is zero");
