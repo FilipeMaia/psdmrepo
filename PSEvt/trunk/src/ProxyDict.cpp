@@ -70,7 +70,8 @@ ProxyDict::putImpl( const boost::shared_ptr<ProxyI>& proxy,
 boost::shared_ptr<void> 
 ProxyDict::getImpl( const std::type_info* typeinfo, 
                     const Source& source, 
-                    const std::string& key )
+                    const std::string& key,
+                    Pds::Src* foundSrc )
 {
   if (source.isExact()) {
     
@@ -78,6 +79,7 @@ ProxyDict::getImpl( const std::type_info* typeinfo,
     Dict::const_iterator it = m_dict.find(proxyKey);
     if ( it != m_dict.end() ) {
       // call proxy to get the value
+      if (foundSrc) *foundSrc = it->first.src();
       return it->second->get(this, it->first.src(), key);
     }
     return proxy_ptr();
@@ -91,6 +93,7 @@ ProxyDict::getImpl( const std::type_info* typeinfo,
       Dict::const_iterator it = m_dict.find(proxyKey);
       if ( it != m_dict.end() ) {
         // call proxy to get the value
+        if (foundSrc) *foundSrc = it->first.src();
         return it->second->get(this, it->first.src(), key);
       }
     }
@@ -101,6 +104,7 @@ ProxyDict::getImpl( const std::type_info* typeinfo,
           key == it->first.key() and 
           source.match(it->first.src()) ) {
         // call proxy to get the value
+        if (foundSrc) *foundSrc = it->first.src();
         return it->second->get(this, it->first.src(), key);
       }
     }

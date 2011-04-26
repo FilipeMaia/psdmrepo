@@ -64,13 +64,14 @@ public:
     
     template<typename T>
     operator boost::shared_ptr<T>() {
-      boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), m_source, m_key);
+      boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), m_source, m_key, m_foundSrc);
       return boost::static_pointer_cast<T>(vptr);
     }
     
     boost::shared_ptr<ProxyDictI> m_dict;
     Source m_source;
     std::string m_key;
+    Pds::Src* m_foundSrc;
   };
   
   
@@ -144,11 +145,13 @@ public:
    *  @brief Get an object from event
    *  
    *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned 
+   *                       with the exact source address of the returned object.
    *  @return Shared pointer which can be zero if object not found.
    */
-  GetResultProxy get(const std::string& key=std::string()) 
+  GetResultProxy get(const std::string& key=std::string(), Pds::Src* foundSrc=0)
   {
-    GetResultProxy pxy = {m_dict, Source(Source::null), key};
+    GetResultProxy pxy = {m_dict, Source(Source::null), key, foundSrc};
     return pxy;
   }
   
@@ -157,11 +160,14 @@ public:
    *  
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned 
+   *                       with the exact source address of the returned object (must 
+   *                       be the same as source)
    *  @return Shared pointer which can be zero if object not found.
    */
-  GetResultProxy get(const Pds::Src& source, const std::string& key=std::string()) 
+  GetResultProxy get(const Pds::Src& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) 
   {
-    GetResultProxy pxy = {m_dict, Source(source), key};
+    GetResultProxy pxy = {m_dict, Source(source), key, foundSrc};
     return pxy;
   }
   
@@ -170,11 +176,13 @@ public:
    *  
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned 
+   *                       with the exact source address of the returned object.
    *  @return Shared pointer which can be zero if object not found.
    */
-  GetResultProxy get(const Source& source, const std::string& key=std::string()) 
+  GetResultProxy get(const Source& source, const std::string& key=std::string(), Pds::Src* foundSrc=0) 
   {
-    GetResultProxy pxy = {m_dict, source, key};
+    GetResultProxy pxy = {m_dict, source, key, foundSrc};
     return pxy;
   }
   

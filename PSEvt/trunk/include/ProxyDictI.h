@@ -68,6 +68,7 @@ public:
    *  else too if needed.
 
    *  @param[in] proxy   Proxy object for type T.
+   *  @param[in] typeinfo  Dynamic type info object
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    */
@@ -82,14 +83,19 @@ public:
   /**
    *  @brief Get an object from event
    *  
-   *  @param[in] source Source detector address.
-   *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *  @param[in] typeinfo  Dynamic type info object
+   *  @param[in] source    Source detector address.
+   *  @param[in] key       Optional key to distinguish different objects of the same type.
+   *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned 
+   *                       with the exact source address of the returned object.
+   *  @return Shared pointer of void type.
    */
   boost::shared_ptr<void> get( const std::type_info* typeinfo, 
                                const Source& source, 
-                               const std::string& key )
+                               const std::string& key,
+                               Pds::Src* foundSrc)
   {
-    return this->getImpl(typeinfo, source, key);
+    return this->getImpl(typeinfo, source, key, foundSrc);
   }
 
   /**
@@ -98,8 +104,9 @@ public:
    *  This is optimized version of get() which only checks whether the proxy
    *  is there but does not ask proxy to do any real work.
    *  
-   *  @param[in] source Source detector address.
-   *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *  @param[in] typeinfo  Dynamic type info object
+   *  @param[in] source    Source detector address.
+   *  @param[in] key       Optional key to distinguish different objects of the same type.
    *  @return true if proxy exists
    */
   bool exists( const std::type_info* typeinfo, 
@@ -112,6 +119,7 @@ public:
   /**
    *  @brief Remove object of given type from the event
    *  
+   *  @param[in] typeinfo  Dynamic type info object
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return false if object did not exist before this call
@@ -143,6 +151,7 @@ protected:
    *  @brief Add one more proxy object to the dictionary.
    *  
    *  @param[in] proxy   Proxy object for type T.
+   *  @param[in] typeinfo  Dynamic type info object
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    */
@@ -154,17 +163,22 @@ protected:
   /**
    *  @brief Get an object from event
    *  
+   *  @param[in] typeinfo  Dynamic type info object
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned 
+   *                       with the exact source address of the returned object.
    *  @return Shared pointer of void type.
    */
   virtual boost::shared_ptr<void> getImpl( const std::type_info* typeinfo, 
                                            const Source& source, 
-                                           const std::string& key ) = 0;
+                                           const std::string& key,
+                                           Pds::Src* foundSrc ) = 0;
 
   /**
    *  @brief Check if proxy of given type exists in the event
    *  
+   *  @param[in] typeinfo  Dynamic type info object
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return true if proxy exists
@@ -176,6 +190,7 @@ protected:
   /**
    *  @brief Remove object of given type from the event
    *  
+   *  @param[in] typeinfo  Dynamic type info object
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return false if object did not exist before this call

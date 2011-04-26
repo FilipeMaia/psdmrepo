@@ -105,7 +105,7 @@ public:
    *  
    *  @throw PSEvt::ExceptionSourceFormat if string is not recognized
    */
-  explicit Source (const std::string& spec) ;
+  Source (const std::string& spec) ;
   
   // Destructor
   ~Source () {}

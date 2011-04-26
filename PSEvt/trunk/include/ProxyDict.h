@@ -67,6 +67,7 @@ protected:
    *  @brief Add one more proxy object to the dictionary.
    *  
    *  @param[in] proxy   Proxy object for type T.
+   *  @param[in] typeinfo  Dynamic type info object
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    */
@@ -78,17 +79,22 @@ protected:
   /**
    *  @brief Get an object from event
    *  
+   *  @param[in] typeinfo  Dynamic type info object
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned 
+   *                       with the exact source address of the returned object.
    *  @return Shared pointer of void type.
    */
   virtual boost::shared_ptr<void> getImpl( const std::type_info* typeinfo, 
                                            const Source& source, 
-                                           const std::string& key ) ;
+                                           const std::string& key,
+                                           Pds::Src* foundSrc );
 
   /**
    *  @brief Check if proxy of given type exists in the event
    *  
+   *  @param[in] typeinfo  Dynamic type info object
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return true if proxy exists
@@ -100,6 +106,7 @@ protected:
   /**
    *  @brief Remove object of given type from the event
    *  
+   *  @param[in] typeinfo  Dynamic type info object
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
    *  @return false if object did not exist before this call
