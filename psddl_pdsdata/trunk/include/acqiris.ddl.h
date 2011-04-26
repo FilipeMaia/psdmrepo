@@ -258,7 +258,7 @@ public:
     BitShift = 6 /**<  */
   };
   enum {
-    _extra = 32*sizeof(short) /**<  */
+    _extraSize = 32 /**<  */
   };
   /** Number of samples in one segment. */
   uint32_t nbrSamplesInSeg() const {return _returnedSamplesPerSeg;}
@@ -272,14 +272,16 @@ public:
     size_t memsize = memptr->_sizeof();
     return *(const Acqiris::TimestampV1*)((const char*)memptr + (i0)*memsize);
   }
-  /** Waveforms data, two-dimensional array segments*samples. */
+  /** Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()] */
   const int16_t* waveforms(const Acqiris::ConfigV1& cfg) const {
-    ptrdiff_t offset=64+(16*(cfg.horiz().nbrSegments()));
+    ptrdiff_t offset=(64+(16*(cfg.horiz().nbrSegments())))+(2*(this->indexFirstPoint()));
     return (const int16_t*)(((const char*)this)+offset);
   }
-  static uint32_t _sizeof(const Acqiris::ConfigV1& cfg)  {return ((64+(Acqiris::TimestampV1::_sizeof()*(cfg.horiz().nbrSegments())))+(2*(cfg.horiz().nbrSegments())*(cfg.horiz().nbrSamples())))+(1*(_extra));}
+  uint32_t _sizeof(const Acqiris::ConfigV1& cfg) const {return (((64+(Acqiris::TimestampV1::_sizeof()*(cfg.horiz().nbrSegments())))+(2*(this->indexFirstPoint())))+(2*(cfg.horiz().nbrSegments())*(cfg.horiz().nbrSamples())))+(2*(_extraSize-this->indexFirstPoint()));}
   /** Method which returns the shape (dimensions) of the data returned by timestamp() method. */
   std::vector<int> timestamps_shape(const Acqiris::ConfigV1& cfg) const;
+  /** Method which returns the shape (dimensions) of the data member _skip. */
+  std::vector<int> _skip_shape() const;
   /** Method which returns the shape (dimensions) of the data returned by waveforms() method. */
   std::vector<int> waveforms_shape(const Acqiris::ConfigV1& cfg) const;
   /** Method which returns the shape (dimensions) of the data member _extraSpace. */
@@ -298,8 +300,9 @@ private:
   uint32_t	_reserved2;
   double	_reserved3;
   //Acqiris::TimestampV1	_timestamps[cfg.horiz().nbrSegments()];
+  //int16_t	_skip[this->indexFirstPoint()];
   //int16_t	_waveforms[cfg.horiz().nbrSegments()][cfg.horiz().nbrSamples()];
-  //int8_t	_extraSpace[_extra];
+  //int16_t	_extraSpace[_extraSize-this->indexFirstPoint()];
 };
 #pragma pack(pop)
 
@@ -321,12 +324,12 @@ public:
   };
   /** Waveform data, one object per channel. */
   const Acqiris::DataDescV1Elem& data(const Acqiris::ConfigV1& cfg, uint32_t i0) const {
-    ptrdiff_t offset=0;
-    const Acqiris::DataDescV1Elem* memptr = (const Acqiris::DataDescV1Elem*)(((const char*)this)+offset);
-    size_t memsize = memptr->_sizeof(cfg);
-    return *(const Acqiris::DataDescV1Elem*)((const char*)memptr + (i0)*memsize);
+    const char* memptr = ((const char*)this)+0;
+    for (uint32_t i=0; i != i0; ++ i) {
+      memptr += ((const Acqiris::DataDescV1Elem*)memptr)->_sizeof(cfg);
+    }
+    return *(const Acqiris::DataDescV1Elem*)(memptr);
   }
-  static uint32_t _sizeof(const Acqiris::ConfigV1& cfg)  {return 0+(Acqiris::DataDescV1Elem::_sizeof(cfg)*(cfg.nbrChannels()));}
   /** Method which returns the shape (dimensions) of the data returned by data() method. */
   std::vector<int> data_shape(const Acqiris::ConfigV1& cfg) const;
 private:

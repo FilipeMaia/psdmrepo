@@ -33,6 +33,14 @@ std::vector<int> DataDescV1Elem::timestamps_shape(const Acqiris::ConfigV1& cfg) 
   return shape;
 }
 
+std::vector<int> DataDescV1Elem::_skip_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(this->indexFirstPoint());
+  return shape;
+}
+
 std::vector<int> DataDescV1Elem::waveforms_shape(const Acqiris::ConfigV1& cfg) const
 {
   std::vector<int> shape;
@@ -46,7 +54,7 @@ std::vector<int> DataDescV1Elem::_extraSpace_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
-  shape.push_back(_extra);
+  shape.push_back(_extraSize-this->indexFirstPoint());
   return shape;
 }
 
