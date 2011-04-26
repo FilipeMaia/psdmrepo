@@ -64,12 +64,13 @@ public:
     
     template<typename T>
     operator boost::shared_ptr<T>() {
-      boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), m_source, std::string());
+      boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), m_source, std::string(), m_foundSrc);
       return boost::static_pointer_cast<T>(vptr);
     }
     
     boost::shared_ptr<PSEvt::ProxyDictI> m_dict;
     PSEvt::Source m_source;
+    Pds::Src* m_foundSrc;
   };
 
   // Default constructor
@@ -114,11 +115,14 @@ public:
    *  @brief Get an object from store.
    *  
    *  @param[in] source Source detector address.
+   *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned 
+   *                       with the exact source address of the returned object (must 
+   *                       be the same as source)
    *  @return Shared pointer which can be zero if object not found.
    */
-  GetResultProxy get(const PSEvt::Source& source) 
+  GetResultProxy get(const PSEvt::Source& source, Pds::Src* foundSrc=0) 
   {
-    GetResultProxy pxy = { m_dict, source };
+    GetResultProxy pxy = { m_dict, source, foundSrc};
     return pxy;
   }
 
