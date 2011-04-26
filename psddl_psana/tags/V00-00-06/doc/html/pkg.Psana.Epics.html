@@ -1,0 +1,262 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Package Psana::Epics Reference</title>
+<link href="psana.css" rel="stylesheet" type="text/css">
+</head><body>
+<h1>Package Psana::Epics Reference</h1>
+Package containing definitions for EPICS data types.
+<h2>Constants</h2>
+<div class="descr"><div class="def">
+iXtcVersion = 1
+</div>
+
+</div>
+<div class="descr"><div class="def">
+iMaxPvNameLength = 64
+</div>
+Maximum size of PV name string.
+</div>
+<div class="descr"><div class="def">
+MAX_STRING_SIZE = 40
+</div>
+Maximum length of strings in EPICS.
+</div>
+<div class="descr"><div class="def">
+MAX_UNITS_SIZE = 8
+</div>
+Maximum lenght of units strings.
+</div>
+<div class="descr"><div class="def">
+MAX_ENUM_STRING_SIZE = 26
+</div>
+Maximum length of strings specifying ENUMs.
+</div>
+<div class="descr"><div class="def">
+MAX_ENUM_STATES = 16
+</div>
+Maximum number of different ENUM constants.
+</div>
+<h2>Enumeration types</h2><dl>
+<div class="descr"><div class="def" id="enum_DbrTypes">
+Enumeration <font class="enumname">Psana::Epics::DbrTypes</font>
+</div>
+<p>Enum specifying type of DBR structures.</p>
+<p>Enumerators:<table>
+<tr>
+<td class="const">DBR_STRING</td>
+<td class="const"> = 0</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_SHORT</td>
+<td class="const"> = 1</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_FLOAT</td>
+<td class="const"> = 2</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_ENUM</td>
+<td class="const"> = 3</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_CHAR</td>
+<td class="const"> = 4</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_LONG</td>
+<td class="const"> = 5</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_DOUBLE</td>
+<td class="const"> = 6</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_STS_STRING</td>
+<td class="const"> = 7</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_STS_SHORT</td>
+<td class="const"> = 8</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_STS_FLOAT</td>
+<td class="const"> = 9</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_STS_ENUM</td>
+<td class="const"> = 10</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_STS_CHAR</td>
+<td class="const"> = 11</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_STS_LONG</td>
+<td class="const"> = 12</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_STS_DOUBLE</td>
+<td class="const"> = 13</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_TIME_STRING</td>
+<td class="const"> = 14</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_TIME_INT</td>
+<td class="const"> = 15</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_TIME_SHORT</td>
+<td class="const"> = 15</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_TIME_FLOAT</td>
+<td class="const"> = 16</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_TIME_ENUM</td>
+<td class="const"> = 17</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_TIME_CHAR</td>
+<td class="const"> = 18</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_TIME_LONG</td>
+<td class="const"> = 19</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_TIME_DOUBLE</td>
+<td class="const"> = 20</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_GR_STRING</td>
+<td class="const"> = 21</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_GR_SHORT</td>
+<td class="const"> = 22</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_GR_FLOAT</td>
+<td class="const"> = 23</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_GR_ENUM</td>
+<td class="const"> = 24</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_GR_CHAR</td>
+<td class="const"> = 25</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_GR_LONG</td>
+<td class="const"> = 26</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_GR_DOUBLE</td>
+<td class="const"> = 27</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_CTRL_STRING</td>
+<td class="const"> = 28</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_CTRL_SHORT</td>
+<td class="const"> = 29</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_CTRL_FLOAT</td>
+<td class="const"> = 30</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_CTRL_ENUM</td>
+<td class="const"> = 31</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_CTRL_CHAR</td>
+<td class="const"> = 32</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_CTRL_LONG</td>
+<td class="const"> = 33</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">DBR_CTRL_DOUBLE</td>
+<td class="const"> = 34</td>
+<td></td>
+</tr>
+</table></p>
+</div>
+</dl>
+<h2>Types/classes</h2><ul>
+<li><a href="type.Psana.Epics.EpicsPvCtrlChar.html">Psana::Epics::EpicsPvCtrlChar</a></li>
+<li><a href="type.Psana.Epics.EpicsPvCtrlDouble.html">Psana::Epics::EpicsPvCtrlDouble</a></li>
+<li><a href="type.Psana.Epics.EpicsPvCtrlEnum.html">Psana::Epics::EpicsPvCtrlEnum</a></li>
+<li><a href="type.Psana.Epics.EpicsPvCtrlFloat.html">Psana::Epics::EpicsPvCtrlFloat</a></li>
+<li><a href="type.Psana.Epics.EpicsPvCtrlHeader.html">Psana::Epics::EpicsPvCtrlHeader</a></li>
+<li><a href="type.Psana.Epics.EpicsPvCtrlLong.html">Psana::Epics::EpicsPvCtrlLong</a></li>
+<li><a href="type.Psana.Epics.EpicsPvCtrlShort.html">Psana::Epics::EpicsPvCtrlShort</a></li>
+<li><a href="type.Psana.Epics.EpicsPvCtrlString.html">Psana::Epics::EpicsPvCtrlString</a></li>
+<li><a href="type.Psana.Epics.EpicsPvHeader.html">Psana::Epics::EpicsPvHeader</a></li>
+<li><a href="type.Psana.Epics.EpicsPvTimeChar.html">Psana::Epics::EpicsPvTimeChar</a></li>
+<li><a href="type.Psana.Epics.EpicsPvTimeDouble.html">Psana::Epics::EpicsPvTimeDouble</a></li>
+<li><a href="type.Psana.Epics.EpicsPvTimeEnum.html">Psana::Epics::EpicsPvTimeEnum</a></li>
+<li><a href="type.Psana.Epics.EpicsPvTimeFloat.html">Psana::Epics::EpicsPvTimeFloat</a></li>
+<li><a href="type.Psana.Epics.EpicsPvTimeHeader.html">Psana::Epics::EpicsPvTimeHeader</a></li>
+<li><a href="type.Psana.Epics.EpicsPvTimeLong.html">Psana::Epics::EpicsPvTimeLong</a></li>
+<li><a href="type.Psana.Epics.EpicsPvTimeShort.html">Psana::Epics::EpicsPvTimeShort</a></li>
+<li><a href="type.Psana.Epics.EpicsPvTimeString.html">Psana::Epics::EpicsPvTimeString</a></li>
+<li><a href="type.Psana.Epics.dbr_ctrl_char.html">Psana::Epics::dbr_ctrl_char</a></li>
+<li><a href="type.Psana.Epics.dbr_ctrl_double.html">Psana::Epics::dbr_ctrl_double</a></li>
+<li><a href="type.Psana.Epics.dbr_ctrl_enum.html">Psana::Epics::dbr_ctrl_enum</a></li>
+<li><a href="type.Psana.Epics.dbr_ctrl_float.html">Psana::Epics::dbr_ctrl_float</a></li>
+<li><a href="type.Psana.Epics.dbr_ctrl_long.html">Psana::Epics::dbr_ctrl_long</a></li>
+<li><a href="type.Psana.Epics.dbr_ctrl_short.html">Psana::Epics::dbr_ctrl_short</a></li>
+<li><a href="type.Psana.Epics.dbr_sts_string.html">Psana::Epics::dbr_sts_string</a></li>
+<li><a href="type.Psana.Epics.dbr_time_char.html">Psana::Epics::dbr_time_char</a></li>
+<li><a href="type.Psana.Epics.dbr_time_double.html">Psana::Epics::dbr_time_double</a></li>
+<li><a href="type.Psana.Epics.dbr_time_enum.html">Psana::Epics::dbr_time_enum</a></li>
+<li><a href="type.Psana.Epics.dbr_time_float.html">Psana::Epics::dbr_time_float</a></li>
+<li><a href="type.Psana.Epics.dbr_time_long.html">Psana::Epics::dbr_time_long</a></li>
+<li><a href="type.Psana.Epics.dbr_time_short.html">Psana::Epics::dbr_time_short</a></li>
+<li><a href="type.Psana.Epics.dbr_time_string.html">Psana::Epics::dbr_time_string</a></li>
+<li><a href="type.Psana.Epics.epicsTimeStamp.html">Psana::Epics::epicsTimeStamp</a></li>
+</ul>
+</body></html>

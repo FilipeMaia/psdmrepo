@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Class Psana::Acqiris::DataDescV1 Reference</title>
+<link href="psana.css" rel="stylesheet" type="text/css">
+</head><body>
+<h1>Class Psana::Acqiris::DataDescV1 Reference</h1>
+<p>Include: <span class="code">#include "psddl_psana/acqiris.ddl.h"</span></p>
+Class containing waveform data (DataDescV1Elem) for all channels.
+<h2>Constants</h2>
+<div class="descr"><div class="def">
+TypeId = Pds::TypeId::Id_AcqWaveform
+</div>
+XTC type ID value (from Pds::TypeId class)
+</div>
+<div class="descr"><div class="def">
+Version = 1
+</div>
+XTC type version number
+</div>
+<h2>Member Functions</h2>
+<div class="descr">
+<table class="methods">
+<tr><td class="methrettype">const <a href="type.Psana.Acqiris.DataDescV1Elem.html">Psana::Acqiris::DataDescV1Elem</a>&</td><td class="methdecl"><a href="#meth_data">data</a>(uint32_t i0)</td></tr>
+<tr><td class="methrettype">std::vector&lt;int&gt;</td><td class="methdecl"><a href="#meth_data_shape">data_shape</a>()</td></tr>
+</table></div>
+<h2>Member Functions Reference</h2>
+<div class="descr">
+<div class="def" id="meth_data">
+const <a href="type.Psana.Acqiris.DataDescV1Elem.html">Psana::Acqiris::DataDescV1Elem</a>& data(uint32_t i0)
+</div>
+Waveform data, one object per channel.
+</div>
+<div class="descr">
+<div class="def" id="meth_data_shape">
+std::vector&lt;int&gt; data_shape()
+</div>
+Method which returns the shape (dimensions) of the data returned by 
+                <a href="#meth_data">data</a>() method.
+</div>
+</body></html>

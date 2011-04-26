@@ -1,0 +1,192 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Class Psana::FCCD::FccdConfigV2 Reference</title>
+<link href="psana.css" rel="stylesheet" type="text/css">
+</head><body>
+<h1>Class Psana::FCCD::FccdConfigV2 Reference</h1>
+<p>Include: <span class="code">#include "psddl_psana/fccd.ddl.h"</span></p>
+
+<h2>Constants</h2>
+<div class="descr"><div class="def">
+TypeId = Pds::TypeId::Id_FccdConfig
+</div>
+XTC type ID value (from Pds::TypeId class)
+</div>
+<div class="descr"><div class="def">
+Version = 2
+</div>
+XTC type version number
+</div>
+<div class="descr"><div class="def">
+Row_Pixels = 500
+</div>
+
+</div>
+<div class="descr"><div class="def">
+Column_Pixels = 576 * 2
+</div>
+
+</div>
+<div class="descr"><div class="def">
+Trimmed_Row_Pixels = 480
+</div>
+
+</div>
+<div class="descr"><div class="def">
+Trimmed_Column_Pixels = 480
+</div>
+
+</div>
+<div class="descr"><div class="def">
+NVoltages = 17
+</div>
+
+</div>
+<div class="descr"><div class="def">
+NWaveforms = 15
+</div>
+
+</div>
+<h2>Enumeration types</h2><dl>
+<div class="descr"><div class="def" id="enum_Depth">
+Enumeration <font class="enumname">Psana::FCCD::FccdConfigV2::Depth</font>
+</div>
+<p></p>
+<p>Enumerators:<table>
+<tr>
+<td class="const">Eight_bit</td>
+<td class="const"> = 8</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Sixteen_bit</td>
+<td class="const"> = 16</td>
+<td></td>
+</tr>
+</table></p>
+</div>
+<div class="descr"><div class="def" id="enum_Output_Source">
+Enumeration <font class="enumname">Psana::FCCD::FccdConfigV2::Output_Source</font>
+</div>
+<p></p>
+<p>Enumerators:<table>
+<tr>
+<td class="const">Output_FIFO</td>
+<td class="const"> = 0</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Test_Pattern1</td>
+<td class="const"> = 1</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Test_Pattern2</td>
+<td class="const"> = 2</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Test_Pattern3</td>
+<td class="const"> = 3</td>
+<td></td>
+</tr>
+<tr>
+<td class="const">Test_Pattern4</td>
+<td class="const"> = 4</td>
+<td></td>
+</tr>
+</table></p>
+</div>
+</dl>
+<h2>Member Functions</h2>
+<div class="descr">
+<table class="methods">
+<tr><td class="methrettype">uint8_t</td><td class="methdecl"><a href="#meth_ccdEnable">ccdEnable</a>()</td></tr>
+<tr><td class="methrettype">const float*</td><td class="methdecl"><a href="#meth_dacVoltages">dacVoltages</a>()</td></tr>
+<tr><td class="methrettype">std::vector&lt;int&gt;</td><td class="methdecl"><a href="#meth_dacVoltages_shape">dacVoltages_shape</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_exposureTime">exposureTime</a>()</td></tr>
+<tr><td class="methrettype">uint8_t</td><td class="methdecl"><a href="#meth_focusMode">focusMode</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_height">height</a>()</td></tr>
+<tr><td class="methrettype">uint16_t</td><td class="methdecl"><a href="#meth_outputMode">outputMode</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_trimmedHeight">trimmedHeight</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_trimmedWidth">trimmedWidth</a>()</td></tr>
+<tr><td class="methrettype">const uint16_t*</td><td class="methdecl"><a href="#meth_waveforms">waveforms</a>()</td></tr>
+<tr><td class="methrettype">std::vector&lt;int&gt;</td><td class="methdecl"><a href="#meth_waveforms_shape">waveforms_shape</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_width">width</a>()</td></tr>
+</table></div>
+<h2>Member Functions Reference</h2>
+<div class="descr">
+<div class="def" id="meth_ccdEnable">
+uint8_t ccdEnable()
+</div>
+
+</div>
+<div class="descr">
+<div class="def" id="meth_dacVoltages">
+const float* dacVoltages()
+</div>
+
+</div>
+<div class="descr">
+<div class="def" id="meth_dacVoltages_shape">
+std::vector&lt;int&gt; dacVoltages_shape()
+</div>
+Method which returns the shape (dimensions) of the data returned by 
+                <a href="#meth_dacVoltages">dacVoltages</a>() method.
+</div>
+<div class="descr">
+<div class="def" id="meth_exposureTime">
+uint32_t exposureTime()
+</div>
+
+</div>
+<div class="descr">
+<div class="def" id="meth_focusMode">
+uint8_t focusMode()
+</div>
+
+</div>
+<div class="descr">
+<div class="def" id="meth_height">
+uint32_t height()
+</div>
+
+</div>
+<div class="descr">
+<div class="def" id="meth_outputMode">
+uint16_t outputMode()
+</div>
+
+</div>
+<div class="descr">
+<div class="def" id="meth_trimmedHeight">
+uint32_t trimmedHeight()
+</div>
+
+</div>
+<div class="descr">
+<div class="def" id="meth_trimmedWidth">
+uint32_t trimmedWidth()
+</div>
+
+</div>
+<div class="descr">
+<div class="def" id="meth_waveforms">
+const uint16_t* waveforms()
+</div>
+
+</div>
+<div class="descr">
+<div class="def" id="meth_waveforms_shape">
+std::vector&lt;int&gt; waveforms_shape()
+</div>
+Method which returns the shape (dimensions) of the data returned by 
+                <a href="#meth_waveforms">waveforms</a>() method.
+</div>
+<div class="descr">
+<div class="def" id="meth_width">
+uint32_t width()
+</div>
+
+</div>
+</body></html>

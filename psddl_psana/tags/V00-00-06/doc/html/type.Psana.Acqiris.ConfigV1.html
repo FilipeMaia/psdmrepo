@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">
+<title>Class Psana::Acqiris::ConfigV1 Reference</title>
+<link href="psana.css" rel="stylesheet" type="text/css">
+</head><body>
+<h1>Class Psana::Acqiris::ConfigV1 Reference</h1>
+<p>Include: <span class="code">#include "psddl_psana/acqiris.ddl.h"</span></p>
+Class containing all Acqiris configuration data.
+<h2>Constants</h2>
+<div class="descr"><div class="def">
+TypeId = Pds::TypeId::Id_AcqConfig
+</div>
+XTC type ID value (from Pds::TypeId class)
+</div>
+<div class="descr"><div class="def">
+Version = 1
+</div>
+XTC type version number
+</div>
+<div class="descr"><div class="def">
+MaxChan = 20
+</div>
+Maximum number of the configured channels.
+</div>
+<h2>Member Functions</h2>
+<div class="descr">
+<table class="methods">
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_channelMask">channelMask</a>()</td></tr>
+<tr><td class="methrettype">const <a href="type.Psana.Acqiris.HorizV1.html">Psana::Acqiris::HorizV1</a>&</td><td class="methdecl"><a href="#meth_horiz">horiz</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_nbrBanks">nbrBanks</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_nbrChannels">nbrChannels</a>()</td></tr>
+<tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_nbrConvertersPerChannel">nbrConvertersPerChannel</a>()</td></tr>
+<tr><td class="methrettype">const <a href="type.Psana.Acqiris.TrigV1.html">Psana::Acqiris::TrigV1</a>&</td><td class="methdecl"><a href="#meth_trig">trig</a>()</td></tr>
+<tr><td class="methrettype">const <a href="type.Psana.Acqiris.VertV1.html">Psana::Acqiris::VertV1</a>&</td><td class="methdecl"><a href="#meth_vert">vert</a>(uint32_t i0)</td></tr>
+<tr><td class="methrettype">std::vector&lt;int&gt;</td><td class="methdecl"><a href="#meth_vert_shape">vert_shape</a>()</td></tr>
+</table></div>
+<h2>Member Functions Reference</h2>
+<div class="descr">
+<div class="def" id="meth_channelMask">
+uint32_t channelMask()
+</div>
+Bit mask for channels.
+</div>
+<div class="descr">
+<div class="def" id="meth_horiz">
+const <a href="type.Psana.Acqiris.HorizV1.html">Psana::Acqiris::HorizV1</a>& horiz()
+</div>
+Configuration for horizontal axis
+</div>
+<div class="descr">
+<div class="def" id="meth_nbrBanks">
+uint32_t nbrBanks()
+</div>
+Total number of banks.
+</div>
+<div class="descr">
+<div class="def" id="meth_nbrChannels">
+uint32_t nbrChannels()
+</div>
+Number of channels calculated from channel bit mask.
+</div>
+<div class="descr">
+<div class="def" id="meth_nbrConvertersPerChannel">
+uint32_t nbrConvertersPerChannel()
+</div>
+Number of ADCs per channel.
+</div>
+<div class="descr">
+<div class="def" id="meth_trig">
+const <a href="type.Psana.Acqiris.TrigV1.html">Psana::Acqiris::TrigV1</a>& trig()
+</div>
+Trigger configuration.
+</div>
+<div class="descr">
+<div class="def" id="meth_vert">
+const <a href="type.Psana.Acqiris.VertV1.html">Psana::Acqiris::VertV1</a>& vert(uint32_t i0)
+</div>
+Configuration for vertical axis (one per channel).
+</div>
+<div class="descr">
+<div class="def" id="meth_vert_shape">
+std::vector&lt;int&gt; vert_shape()
+</div>
+Method which returns the shape (dimensions) of the data returned by 
+                <a href="#meth_vert">vert</a>() method.
+</div>
+</body></html>
