@@ -243,7 +243,7 @@
 
             <const name="NumberOfBits" value="10" />
             <const name="BitShift" value="6" />
-            <const name="_extra" value="32*sizeof(short)" />
+            <const name="_extraSize" value="32" />
 
             <xtc-config name="ConfigV1" />
 
@@ -291,13 +291,15 @@
             Timestamps, one timestamp per segment.
             </attribute>
 
+            <attribute name="_skip" type="int16_t" shape="{self}.indexFirstPoint()" />
+
             <attribute name="_waveforms" type="int16_t" 
                     shape="{xtc-config}.horiz().nbrSegments(),{xtc-config}.horiz().nbrSamples()" 
                     accessor="waveforms" shape_method="waveforms_shape">
-            Waveforms data, two-dimensional array segments*samples.
+            Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()]
             </attribute>
 
-            <attribute name="_extraSpace" type="int8_t" shape="_extra">
+            <attribute name="_extraSpace" type="int16_t" shape="_extraSize-{self}.indexFirstPoint()">
             </attribute>
 
         </pstype>
