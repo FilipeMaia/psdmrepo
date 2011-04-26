@@ -23,7 +23,7 @@ BitShift = 6
 
 </div>
 <div class="descr"><div class="def">
-_extra = 32*sizeof(short)
+_extraSize = 32
 </div>
 
 </div>
@@ -31,6 +31,7 @@ _extra = 32*sizeof(short)
 <div class="descr">
 <table class="methods">
 <tr><td class="methrettype">std::vector&lt;int&gt;</td><td class="methdecl"><a href="#meth__extraSpace_shape">_extraSpace_shape</a>()</td></tr>
+<tr><td class="methrettype">std::vector&lt;int&gt;</td><td class="methdecl"><a href="#meth__skip_shape">_skip_shape</a>()</td></tr>
 <tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_indexFirstPoint">indexFirstPoint</a>()</td></tr>
 <tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_nbrSamplesInSeg">nbrSamplesInSeg</a>()</td></tr>
 <tr><td class="methrettype">uint32_t</td><td class="methdecl"><a href="#meth_nbrSegments">nbrSegments</a>()</td></tr>
@@ -45,6 +46,12 @@ _extra = 32*sizeof(short)
 std::vector&lt;int&gt; _extraSpace_shape()
 </div>
 Method which returns the shape (dimensions) of the data member _extraSpace.
+</div>
+<div class="descr">
+<div class="def" id="meth__skip_shape">
+std::vector&lt;int&gt; _skip_shape()
+</div>
+Method which returns the shape (dimensions) of the data member _skip.
 </div>
 <div class="descr">
 <div class="def" id="meth_indexFirstPoint">
@@ -81,7 +88,7 @@ Method which returns the shape (dimensions) of the data returned by
 <div class="def" id="meth_waveforms">
 const int16_t* waveforms()
 </div>
-Waveforms data, two-dimensional array segments*samples.
+Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()]
 </div>
 <div class="descr">
 <div class="def" id="meth_waveforms_shape">

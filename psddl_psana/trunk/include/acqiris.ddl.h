@@ -246,7 +246,7 @@ public:
     BitShift = 6 /**<  */
   };
   enum {
-    _extra = 32*sizeof(short) /**<  */
+    _extraSize = 32 /**<  */
   };
   virtual ~DataDescV1Elem();
   /** Number of samples in one segment. */
@@ -256,10 +256,12 @@ public:
   virtual uint32_t nbrSegments() const = 0;
   /** Timestamps, one timestamp per segment. */
   virtual const Acqiris::TimestampV1& timestamp(uint32_t i0) const = 0;
-  /** Waveforms data, two-dimensional array segments*samples. */
+  /** Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()] */
   virtual const int16_t* waveforms() const = 0;
   /** Method which returns the shape (dimensions) of the data returned by timestamp() method. */
   virtual std::vector<int> timestamps_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data member _skip. */
+  virtual std::vector<int> _skip_shape() const = 0;
   /** Method which returns the shape (dimensions) of the data returned by waveforms() method. */
   virtual std::vector<int> waveforms_shape() const = 0;
   /** Method which returns the shape (dimensions) of the data member _extraSpace. */
