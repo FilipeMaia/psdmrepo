@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <algorithm>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -45,8 +46,6 @@ namespace psana_examples {
 DumpAcqiris::DumpAcqiris (const std::string& name)
   : Module(name)
 {
-  // get the values from configuration or use defaults
-  m_src = configStr("source", "DetInfo(:Acqiris)");
 }
 
 //--------------
@@ -62,20 +61,31 @@ DumpAcqiris::beginCalibCycle(Env& env)
 {
   MsgLog(name(), trace, "in beginCalibCycle()");
 
-  shared_ptr<Psana::Acqiris::ConfigV1> acqConfig = env.configStore().get(m_src);
+  Source src = configStr("source", "DetInfo(:Acqiris)");
+  shared_ptr<Psana::Acqiris::ConfigV1> acqConfig = env.configStore().get(src, &m_src);
   if (acqConfig.get()) {
-    MsgLog(name(), info, "Acqiris::ConfigV1: nbrBanks=" << acqConfig->nbrBanks()
-           << " channelMask=" << acqConfig->channelMask()
-           << " nbrChannels=" << acqConfig->nbrChannels()
-           << " h.sampInterval=" << acqConfig->horiz().sampInterval()
-           << " h.delayTime=" << acqConfig->horiz().delayTime()
-           << " h.nbrSamples=" << acqConfig->horiz().nbrSamples()
-           << " h.nbrSegments=" << acqConfig->horiz().nbrSegments()
-           << " v[0].fullScale=" << acqConfig->vert(0).fullScale()
-           << " v[0].offset=" << acqConfig->vert(0).offset()
-           << " v[1].fullScale=" << acqConfig->vert(1).fullScale()
-           << " v[1].offset=" << acqConfig->vert(1).offset()
-           );
+    WithMsgLog(name(), info, str) {
+      str << "Acqiris::ConfigV1: nbrBanks=" << acqConfig->nbrBanks()
+          << " channelMask=" << acqConfig->channelMask()
+          << " nbrChannels=" << acqConfig->nbrChannels()
+          << " nbrConvertersPerChannel=" << acqConfig->nbrConvertersPerChannel();
+     
+      const Psana::Acqiris::HorizV1& h = acqConfig->horiz();
+      str << "\n  horiz: sampInterval=" << h.sampInterval()
+           << " delayTime=" << h.delayTime()
+           << " nbrSegments=" << h.nbrSegments()
+           << " nbrSamples=" << h.nbrSamples();
+      
+      for (unsigned ch = 0; ch < acqConfig->nbrChannels() ; ++ ch) {
+        const Psana::Acqiris::VertV1& v = acqConfig->vert(ch);
+        str << "\n  vert(" << ch << "):"
+            << " fullScale=" << v.fullScale()
+            << " slope=" << v.slope()
+            << " offset=" << v.offset()
+            << " coupling=" << v.coupling()
+            << " bandwidth=" << v.bandwidth();
+      }
+    }
   }
 }
 
@@ -85,14 +95,47 @@ void
 DumpAcqiris::event(Event& evt, Env& env)
 {
 
+  Pds::Src src;
   shared_ptr<Psana::Acqiris::DataDescV1> acqData = evt.get(m_src);
   if (acqData.get()) {
-    const std::vector<int>& shape = acqData->data_shape();
-    for (int i = 0; i < shape[0]; ++ i) {
-      const Psana::Acqiris::DataDescV1Elem& elem = acqData->data(i);
-      MsgLog(name(), info, "Acqiris::DataDescV1: element=" << i 
-           << " nbrSegments=" << elem.nbrSegments()
-           << " nbrSamplesInSeg= " << elem.nbrSamplesInSeg());
+    
+    // find matching config object
+    shared_ptr<Psana::Acqiris::ConfigV1> acqConfig = env.configStore().get(m_src);
+    
+    // loop over channels
+    int nchan = acqData->data_shape()[0];
+    for (int chan = 0; chan < nchan; ++ chan) {
+      
+      const Psana::Acqiris::DataDescV1Elem& elem = acqData->data(chan);
+
+      const Psana::Acqiris::VertV1& v = acqConfig->vert(chan);
+      double slope = v.slope();
+      double offset = v.offset();
+
+      WithMsgLog(name(), info, str ) {
+
+        str << "Acqiris::DataDescV1: channel=" << chan
+           << "\n  nbrSegments=" << elem.nbrSegments()
+           << "\n  nbrSamplesInSeg=" << elem.nbrSamplesInSeg()
+           << "\n  indexFirstPoint=" << elem.indexFirstPoint();
+        
+        // loop over segments
+        for (unsigned seg = 0; seg < elem.nbrSegments(); ++ seg) {
+          
+          str << "\n  Segment #" << seg
+              << "\n    timestamp=" << elem.timestamp(seg).pos()
+              << "\n    data=[";
+          
+          const int16_t* wf = elem.waveforms() + seg*elem.nbrSamplesInSeg();
+
+          unsigned size = std::min(elem.nbrSamplesInSeg(), 32U);
+          for (unsigned i = 0; i < size; ++ i) {
+            str << (wf[i]*slope + offset) << ", ";
+          }
+          str << "...]";
+        
+        }
+      }
     }
   }
 }

@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2011-04-26 Andy Salnikov
+- extended DumpAcqiris module to make waveforms() usage example
+
 Tag: V00-00-11
 2011-04-14 Andy Salnikov
 - new module EBeamHist to test histogramming
