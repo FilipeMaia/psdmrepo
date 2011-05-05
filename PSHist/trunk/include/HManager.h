@@ -112,7 +112,6 @@ namespace PSHist {
  *  @author Mikhail S. Dubrovin
  */
 
-
 class HManager  {
 public:
 
@@ -146,13 +145,20 @@ public:
          type_float, 
          type_double };
 
-    virtual H1 *hist1d(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh) = 0;
+  //const char type_names[type_double];
+
+  virtual H1 *hist1i(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh) = 0;
+  virtual H1 *hist1i(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
+
+  virtual H1 *hist1f(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh) = 0;
+  virtual H1 *hist1f(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
+
+  virtual H1 *hist1d(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh) = 0;
+  virtual H1 *hist1d(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
+
+
 
    /*
-   virtual H1 *hist1f(const std::string &hTitle, int nBins, double low, double high) = 0;
-
-   virtual H1 *hist1d(const std::string &hTitle, int nBins, double low, double high) = 0;
-
    virtual H2 *hist2i(const std::string &hTitle, int XnBins, double Xlow, double Xhigh, 
                                                 int YnBins, double Ylow, double Yhigh) = 0;
 

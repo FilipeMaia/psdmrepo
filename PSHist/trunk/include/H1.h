@@ -50,16 +50,18 @@ class H1 {
 public:
 
   // Constructors
-  H1 () { std::cout << "H1:: default constructor" << std::endl; }
+  H1 () { 
+    //std::cout << "H1:: default constructor" << std::endl; 
+  }
 
 //H1 ( std::string &title ) : m_title(title) {}
 
   H1 ( int type, const std::string &name, const std::string &title, int nbins, double xlow, double xhigh ) { 
-     std::cout << "H1:: default constractor for equidistant bins" << std::endl;
+    //std::cout << "H1:: default constractor for equidistant bins" << std::endl;
   }
 
   H1 ( int type, const std::string &name, const std::string &title, int nbins, double *xbinedges ) {
-     std::cout << "H1:: default constractor for variable bin size" << std::endl;
+    //std::cout << "H1:: default constractor for variable bin size" << std::endl;
   }
 
   // Destructor

@@ -47,12 +47,14 @@ int main ()
 {
   cout << "Stars ex_PSHist_1 : main()" << endl; 
 
+  double edges[]={0, 0.05, 0.1, 0.2, 0.25, 0.3, 0.5, 0.55, 0.7, 0.9, 1};
 
   PSHist::HManager *hMan = new RootHist::RootHManager("pshist-test.root", "RECREATE");
 
-  PSHist::H1 *pHis1 = hMan->hist1d( "H1_N0001", "My his1d 1 title", 100, 0., 1.);
-  PSHist::H1 *pHis2 = hMan->hist1d( "H1_N0002", "My his1d 2 title", 100, 0., 1.);
-  PSHist::H1 *pHis3 = hMan->hist1d( "H1_N0003", "My his1d 3 title", 100, 0., 1.01);
+  PSHist::H1 *pHis1 = hMan->hist1i( "H1_N0001", "My his1d 1 title^{#alpha}", 100, 0., 1.);
+  PSHist::H1 *pHis2 = hMan->hist1f( "H1_N0002", "My his1d 2 title^{#beta}", 100, 0., 1.);
+  PSHist::H1 *pHis3 = hMan->hist1d( "H1_N0003", "My his1d 3 title^{#gamma}", 100, 0., 1.01);
+  PSHist::H1 *pHis4 = hMan->hist1d( "H1_N0004", "My his1d 4 title^{#delta}", 10, edges);
 
   cout << "Fill histogram" << endl;
 	for (int i=0; i<10000; i++)
@@ -60,6 +62,7 @@ int main ()
             pHis1 -> fill( gRandom->Rndm(1)        ); // Uniform distribution on [0,1]
             pHis2 -> fill( gRandom->Gaus(0.5, 0.1) ); // Gaussian for mu and sigma
             pHis3 -> fill( double(0.0001*i), double(i) );
+            pHis4 -> fill( gRandom->Rndm(1)        );
 	  }
 
   hMan -> write();
