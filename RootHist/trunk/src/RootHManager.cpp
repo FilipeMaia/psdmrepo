@@ -26,7 +26,8 @@
 //-------------------------------
 
 #include "root/TFile.h"
-#include "root/TH1.h"
+//#include "root/TH1.h"
+#include "RootHist/RootH1.h"
 //#include "root/TTree.h"
 
 using std::cout;
@@ -62,14 +63,34 @@ RootHManager::~RootHManager () {
     delete m_file;
 }
 
+PSHist::H1* RootHManager::hist1i(const std::string &name, const std::string &title, int nbins, double low, double high) {
+  //cout << "RootHManager::hist1i - equi-distant bins" << endl;  
+    return new RootH1(type_int, name, title, nbins, low, high);
+}
 
-RootH1* RootHManager::hist1d(const std::string &name, const std::string &title, int nbins, double low, double high) {
+PSHist::H1* RootHManager::hist1i(const std::string &name, const std::string &title, int nbins, double *xbinedges) {
+  //cout << "RootHManager::hist1i - variable bin sizes" << endl;
+    return new RootH1(type_int, name, title, nbins, xbinedges);
+}
 
-    cout << "RootHManager::hist1d" << endl;  
+PSHist::H1* RootHManager::hist1f(const std::string &name, const std::string &title, int nbins, double low, double high) {
+  //cout << "RootHManager::hist1f - equi-distant bins" << endl;  
+    return new RootH1(type_float, name, title, nbins, low, high);
+}
 
-    m_histp = new RootH1(type_double, name, title, nbins, low, high);
+PSHist::H1* RootHManager::hist1f(const std::string &name, const std::string &title, int nbins, double *xbinedges) {
+  //cout << "RootHManager::hist1f - variable bin sizes" << endl;
+    return new RootH1(type_float, name, title, nbins, xbinedges);
+}
 
-    return m_histp;
+PSHist::H1* RootHManager::hist1d(const std::string &name, const std::string &title, int nbins, double low, double high) {
+  //cout << "RootHManager::hist1d - equi-distant bins" << endl;  
+    return new RootH1(type_double, name, title, nbins, low, high);
+}
+
+PSHist::H1* RootHManager::hist1d(const std::string &name, const std::string &title, int nbins, double *xbinedges) {
+  //cout << "RootHManager::hist1d - variable bin sizes" << endl;
+    return new RootH1(type_double, name, title, nbins, xbinedges);
 }
 
 

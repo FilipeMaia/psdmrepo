@@ -21,8 +21,8 @@
 // Base Class Headers --
 //----------------------
 #include "PSHist/HManager.h"
-//#include "PSHist/H1.h"
-#include "RootHist/RootH1.h"
+#include "PSHist/H1.h"
+//#include "RootHist/RootH1.h"
 //#include "PSHist/Tuple.h"
 
 //-------------------------------
@@ -69,14 +69,22 @@ public:
 
   virtual int write(); // = 0; !!!!!!! 
 
-  virtual RootH1* hist1d(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh);
+  virtual PSHist::H1* hist1i(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh);
+  virtual PSHist::H1* hist1i(const std::string &name, const std::string &title, int nbins, double *xbinedges);
 
+  virtual PSHist::H1* hist1f(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh);
+  virtual PSHist::H1* hist1f(const std::string &name, const std::string &title, int nbins, double *xbinedges);
+
+  virtual PSHist::H1* hist1d(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh);
+  virtual PSHist::H1* hist1d(const std::string &name, const std::string &title, int nbins, double *xbinedges);
 
 private:
 
   // Data members
   TFile   *m_file;
-  RootH1  *m_histp;  
+
+  //H1      *m_histp;  
+  //RootH1  *m_histp;  
 
   // Copy constructor and assignment are disabled by default
   RootHManager ( const RootHManager& ) ;

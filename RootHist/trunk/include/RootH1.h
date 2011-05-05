@@ -31,7 +31,7 @@
 //------------------------------------
 
 #include "root/TH1.h"
-#include "root/TH2.h"
+//#include "root/TH2.h"
 #include "root/TProfile.h"
 
 //		---------------------
@@ -57,6 +57,7 @@ public:
   // Constructors
   RootH1 () ;
   RootH1 ( int type, const std::string &name, const std::string &title, int nbins, double xlow, double xhigh ) ;
+  RootH1 ( int type, const std::string &name, const std::string &title, int nbins, double *xbinedges ) ;
 
   // Destructor
   virtual ~RootH1 () ;
@@ -75,9 +76,11 @@ private:
   std::string m_hname;
   int         m_hnumber;
   int         m_type;
-  TH1I       *m_hist1i;
-  TH1F       *m_hist1f;
-  TH1D       *m_hist1d;
+  TH1        *m_histp;
+
+  //TH1I       *m_hist1i;
+  //TH1F       *m_hist1f;
+  //TH1D       *m_hist1d;
 
   // Static members
   static int s_number_of_booked_histograms;
