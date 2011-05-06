@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PyQt4 import QtCore
 
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1 import AxesGrid
 
 def draw_on(fignr):
@@ -54,7 +55,6 @@ class Threshold( object ) :
         self.area = area        
         self.minvalue = minvalue
         self.maxvalue = maxvalue
-
 
 
 class Plotter(object):
@@ -196,24 +196,71 @@ class Plotter(object):
         self.fig = plt.figure(figsize=(10,8),num=fignum)
         self.fig.clf()
 
-        axes = self.fig.add_subplot(111)        
-        axes.set_title(title)
+        axes = self.fig.add_subplot(111)
 
-        self.fig.subplots_adjust(left=0.10, bottom=0.05, right=0.95, top=0.95, wspace=0.1, hspace=0.1)
+        self.fig.subplots_adjust(left=0.10,
+                                 bottom=0.05,
+                                 right=0.90,
+                                 top=0.90,
+                                 wspace=0.1,
+                                 hspace=0.1)
 
         self.axesim = plt.imshow( frameimage,
                                   vmin=self.plot_vmin, vmax=self.plot_vmax )
 
-        self.colb = plt.colorbar(self.axesim,ax=axes,pad=0.01)#,fraction=0.10,shrink=0.90)
+        #self.colb = plt.colorbar(self.axesim,ax=axes,pad=0.01)#,fraction=0.10,shrink=0.90)
+        divider = make_axes_locatable(axes)
+
+        x = np.sum(frameimage,0)
+        y = np.sum(frameimage,1)
+
+        #axes.set_aspect(1.0)
+        axHistx = divider.append_axes("top", size="20%", pad=0.05,sharex=axes)
+        axHisty = divider.append_axes("left", size="20%", pad=0.05,sharey=axes)
+
+        # vertical and horizontal dimensions, axes, projections
+        vdim,hdim = np.shape(frameimage)
+        vbins = np.arange(0,vdim,1)
+        hbins = np.arange(0,hdim,1)
+
+        proj_vert = np.sum(frameimage,1) # sum along horizontal axis
+        proj_horiz = np.sum(frameimage,0) # sum along vertical axis
+
+        # these are the limits I want my histogram to use
+        vmin = np.min(proj_vert) - 0.1 * np.min(proj_vert)
+        vmax = np.max(proj_vert) + 0.1 * np.max(proj_vert)
+        hmin = np.min(proj_horiz) - 0.1 * np.min(proj_horiz)
+        hmax = np.max(proj_horiz) + 0.1 * np.max(proj_horiz) 
+
+        axHistx.plot(hbins,proj_horiz)
+        axHisty.plot(proj_vert,vbins)
+        #axHistx.hist(hbins, bins=hdim, histtype='step', weights=proj_horiz)
+        #axHisty.hist(vbins, bins=vdim, histtype='step', weights=proj_vert,orientation='horizontal')
+
+        axHistx.set_xlim(0,hdim)
+        axHistx.set_ylim(hmin, hmax )
+        ticks = [ 10000 * np.around(hmin/10000) ,
+                  10000 * np.around((hmax-hmin)/20000),
+                  10000 * np.around(hmax/10000) ]
+        axHistx.set_yticks( ticks )
+
+        axHisty.set_ylim(0,vdim)
+        axHisty.set_xlim(vmin, vmax )
+        ticks = [ 10000 * np.around( vmin/10000) ,
+                  10000 * np.around((vmax-vmin)/20000),
+                  10000 * np.around(vmax/10000) ]
+        axHisty.set_xticks( ticks )
+
+        cax = divider.append_axes("right",size="5%", pad=0.05)
+        self.colb = plt.colorbar(self.axesim,cax=cax)
         # colb is the colorbar object
-        
+
         if self.plot_vmin is None: 
             self.orglims = self.axesim.get_clim()
             # min and max values in the axes are
             print "Original value limits: ", self.orglims
             self.plot_vmin, self.plot_vmax = self.orglims
-        
-            
+                    
         # show the active region for thresholding
         if self.threshold and self.threshold.area is not None:
             xy = [self.threshold.area[0],self.threshold.area[2]]
@@ -233,6 +280,8 @@ class Plotter(object):
             - right-click sets higher limit
             - middle-click resets to original
             """
+
+        axes.set_title(title)
         plt.draw()
         
     def onpick(self, event):

@@ -66,7 +66,7 @@ class  pyana_cspad ( object ) :
         @param fignum           int, Matplotlib figure number
         @param dark_img_file    filename, Dark image file to be loaded, if any
         @param output_file      filename (If collecting: write to this file)
-        @param plot_vrange      range=vmin-vmax of values for plotting (pixel intensity)
+        @param plot_vrange      range=vmin,vmax of values for plotting (pixel intensity)
         @param threshold        lower threshold for image intensity in threshold area of the plot
         @param thr_area         range=xmin,xmax,ymin,ymax defining threshold area
         """
@@ -93,8 +93,8 @@ class  pyana_cspad ( object ) :
         self.plot_vmin = None
         self.plot_vmax = None
         if plot_vrange is not None and plot_vrange is not "" : 
-            self.plot_vmin = float(plot_vrange.split("-")[0])
-            self.plot_vmax = float(plot_vrange.split("-")[1])
+            self.plot_vmin = float(plot_vrange.split(",")[0])
+            self.plot_vmax = float(plot_vrange.split(",")[1])
             print "Using plot_vrange = %f-%f"%(self.plot_vmin,self.plot_vmax)
 
         self.plotter = Plotter()
@@ -118,6 +118,11 @@ class  pyana_cspad ( object ) :
                 print "Using threshold value ", self.threshold.minvalue
                 print "Using threshold area ", self.threshold.area
                 self.plotter.threshold = self.threshold
+
+        # could also threshold on one of these...
+        # print "sum  ",np.sum(frameimage)
+        # print "mean ",np.mean(frameimage)
+
 
 
         # initializations of other class variables
@@ -236,7 +241,6 @@ class  pyana_cspad ( object ) :
             if self.threshold.area is not None:
                 subset = cspad_image[self.threshold.area[0]:self.threshold.area[1],   # x1:x2
                                      self.threshold.area[2]:self.threshold.area[3]]   # y1:y2
-
                 
                 topval = np.max(subset)
 
@@ -257,20 +261,20 @@ class  pyana_cspad ( object ) :
 
 
         # Draw this event.
-        title = "Event # %d" % self.n_events
-        if self.dark_image is not None:
-            title = title + " (background subtracted) "
+        if self.plot_every_n > 0 :
+            title = "Event # %d" % self.n_events
+            if self.dark_image is not None:
+                title = title + " (background subtracted) "
             
-        if (self.n_events%self.plot_every_n)==0 :
-            fignum = self.mpl_num*100+1
-            self.plotter.drawframe(cspad_image,title, fignum=fignum)
+            if (self.n_events%self.plot_every_n)==0 :
+                self.plotter.drawframe(cspad_image,title, fignum=self.mpl_num)
 
-            # check if plotter has changed its display mode. If so, tell the event
-            switchmode = self.plotter.display_mode
-            if switchmode is not None :
-                evt.put(switchmode,'display_mode')
-                if switchmode == 0 : self.plot_every_n = 0
-
+        # check if plotter has changed its display mode. If so, tell the event
+        switchmode = self.plotter.display_mode
+        if switchmode is not None :
+            evt.put(switchmode,'display_mode')
+            if switchmode == 0 : self.plot_every_n = 0
+            
     # after last event has been processed. 
     def endjob( self, env ) :
 
@@ -286,9 +290,7 @@ class  pyana_cspad ( object ) :
         print "the highest intensity of average image ", np.max(average_image)
         print "the lowest intensity of average image ", np.min(average_image)
 
-        fignum = self.mpl_num*100
-        self.plotter.drawframe(average_image,"Average of %d events" % self.n_img, fignum=fignum )
-        
+        self.plotter.drawframe(average_image,"Average of %d events" % self.n_img, fignum=self.mpl_num )        
 
         # save the average data image (numpy array)
         # binary file .npy format

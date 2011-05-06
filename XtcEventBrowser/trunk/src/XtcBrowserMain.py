@@ -176,8 +176,6 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         # Test matplotlib widget
         self.mpl_button = QtGui.QPushButton("&MatPlotLib")
         self.connect(self.mpl_button, QtCore.SIGNAL('clicked()'), self.makeplot )
-        self.mpl2_button = QtGui.QPushButton("&MatPlotLib2")
-        self.connect(self.mpl2_button, QtCore.SIGNAL('clicked()'), self.makeplot2 )
 
         # Quit application
         self.quit_button = QtGui.QPushButton("&Quit")
@@ -256,8 +254,6 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         h6 = QtGui.QHBoxLayout()
         #h6.addWidget( self.mpl_button )
         #h6.setAlignment(self.mpl_button, QtCore.Qt.AlignLeft )
-        #h6.addWidget( self.mpl2_button )
-        #h6.setAlignment(self.mpl2_button, QtCore.Qt.AlignRight )
         h6.addWidget( self.quit_button )
         h6.setAlignment( self.quit_button, QtCore.Qt.AlignRight )
 
@@ -433,6 +429,7 @@ class XtcBrowserMain (QtGui.QMainWindow) :
                               epicsPVs=self.scanner.epicsPVs,
                               controls=self.scanner.controls,
                               moreinfo=self.scanner.moreinfo.values(),
+                              nevents=self.scanner.nevents,
                               filenames=self.filenames )
 
         if self.scan_button :
@@ -503,93 +500,23 @@ part of it, please give an appropriate acknowledgment.
         
     def makeplot(self):
 
-        self.fig = plt.figure(1)
+        self.fig = plt.figure(110)
         axes = self.fig.add_subplot(111)
         axes.set_title("Hello MatPlotLib")
         
         plt.show()
         
-        dark_image = np.load("pyana_cspad_average_image.npy")
-        axim = plt.imshow( dark_image )#, origin='lower' )
-        colb = plt.colorbar(axim,pad=0.01)
+        #dark_image = np.load("pyana_cspad_average_image.npy")
+        #axim = plt.imshow( dark_image )#, origin='lower' )
+        #colb = plt.colorbar(axim,pad=0.01)
         
         plt.draw()
         
         print "Done drawing"
         
-        axim = plt.imshow( dark_image[500:1000,1000:1500] )#, origin='lower' )
-        
-        return
+        #axim = plt.imshow( dark_image[500:1000,1000:1500] )#, origin='lower' )
+
  
-    def makeplot2(self):
-        number = 200
-        print "number " , number
-        self.fig = draw_on(number)
-        return
-
-
-        print "This does not work yet. Ignore"
-        self.mpl_widget = QtGui.QWidget()
-        self.dpi = 100
-        self.fig = Figure((5.0, 4.0), dpi=self.dpi)
-        self.canvas = FigureCanvas(self.fig)
-        self.canvas.setParent(self.mpl_widget)
-        
-        # Since we have only one plot, we can use add_axes
-        # instead of add_subplot, but then the subplot
-        # configuration tool in the navigation toolbar wouldn't
-        # work.
-        #
-        self.axes = self.fig.add_subplot(111)
-        #self.canvas.mpl_connect('pick_event', self.on_pick)
-
-        # Create the navigation toolbar, tied to the canvas
-        #
-        self.mpl_toolbar = NavigationToolbar(self.canvas, self.mpl_widget)
-        
-        # Other GUI controls
-        #
-        self.textbox = QLineEdit()
-        self.textbox.setMinimumWidth(200)
-        self.connect(self.textbox, SIGNAL('editingFinished ()'), self.on_draw)
-        
-        self.draw_button = QPushButton("&Draw")
-        self.connect(self.draw_button, SIGNAL('clicked()'), self.on_draw)
-        
-        self.grid_cb = QCheckBox("Show &Grid")
-        self.grid_cb.setChecked(False)
-        self.connect(self.grid_cb, SIGNAL('stateChanged(int)'), self.on_draw)
-        
-        slider_label = QLabel('Bar width (%):')
-        self.slider = QSlider(Qt.Horizontal)
-        self.slider.setRange(1, 100)
-        self.slider.setValue(20)
-        self.slider.setTracking(True)
-        self.slider.setTickPosition(QSlider.TicksBothSides)
-        self.connect(self.slider, SIGNAL('valueChanged(int)'), self.on_draw)
-        
-        #
-        # Layout with box sizers
-        #
-        hbox = QHBoxLayout()
-        
-        for w in [  self.textbox, self.draw_button, self.grid_cb,
-                    slider_label, self.slider]:
-            hbox.addWidget(w)
-            hbox.setAlignment(w, Qt.AlignVCenter)
-            
-        vbox = QVBoxLayout()
-        vbox.addWidget(self.canvas)
-        vbox.addWidget(self.mpl_toolbar)
-        vbox.addLayout(hbox)
-
-        self.mpl_widget.setLayout(vbox)
-        self.setCentralWidget(self.mpl_widget)
-
-        #myfig = display.XtcEventDisplay()
-        #myfig.show()
-        #"Showing figure?"
-
 
 #
 #  In case someone decides to run this module

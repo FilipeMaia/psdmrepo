@@ -44,10 +44,12 @@ import matplotlib.pyplot as plt
 #from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 #from matplotlib.figure import Figure
 
+from IPython.Shell import IPShellEmbed
 
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+from utilities import PyanaOptions 
 
 #----------------------------------
 # Local non-exported definitions --
@@ -88,13 +90,15 @@ class pyana_plotter (object) :
     #  Constructor --
     #----------------
     def __init__ ( self,
-                   display_mode = "Interactive" ) :
+                   display_mode = "Interactive",
+                   ipython         = "False"):
         """Class constructor. The parameters to the constructor are passed
         from pyana configuration file. If parameters do not have default 
         values  here then the must be defined in pyana.cfg. All parameters 
         are passed as strings, convert to correct type before use.
 
         @param display_mode        Interactive (1) or SlideShow (2) or NoDisplay (0)
+        @param ipython             Drop into ipython at the end of the job
         """
         self.nevents = 0
 
@@ -102,6 +106,9 @@ class pyana_plotter (object) :
         if display_mode == "NoDisplay" : self.display_mode = 0
         if display_mode == "Interactive" : self.display_mode = 1
         if display_mode == "SlideShow" :   self.display_mode = 2
+
+        opt = PyanaOptions() # convert option string to appropriate type        
+        self.ipython      = opt.getOptBoolean(ipython)
 
     #-------------------
     #  Public methods --
@@ -211,9 +218,18 @@ class pyana_plotter (object) :
         
         logging.info( "pyana_plotter.endjob() called" )
 
+        plt.draw()
+
+        if self.ipython :
+            argv = ['-pi1','In \\# >> ','-po','Out \\#: ']
+            self.ipshell = IPShellEmbed(argv,banner='Dropping into iPython', exit_msg='Leaving iPython')
+            self.ipshell()
+
+        print "Pyana will exit once you close all the MatPlotLib windows"            
         if self.display_mode > 0 :
             plt.ioff()
             plt.show()
+
 
         print "-------------------"
         print "Done running pyana."

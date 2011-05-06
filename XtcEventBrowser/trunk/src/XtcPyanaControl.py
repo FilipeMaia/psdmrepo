@@ -27,7 +27,6 @@ __version__ = "$Revision$"
 #  Imports of standard modules --
 #--------------------------------
 import sys, random, os, signal, time
-import  subprocess 
 
 #---------------------------------
 #  Imports of base class module --
@@ -43,6 +42,7 @@ from PyQt4 import QtCore, QtGui
 
 import threading
 from multiprocessing import Process
+import  subprocess 
 from pyana import pyanamod
 
 #----------------------------------
@@ -87,6 +87,12 @@ class MyThread( QtCore.QThread ):
     def run(self):
         pyanamod.pyana(argv=self.lpoptions)
 
+    def stop(self):
+        self._stop.set()
+
+    def stopped(self):
+        return self._stop.isSet()
+
     def kill(self):
         print " !   python threads cannot be interupted..."
         print " !   you'll have to wait..."
@@ -127,7 +133,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.epicsPVs = []
         self.controls = []
         self.moreinfo = []
-
+        self.nevents = []
+        self.ncalib = None
         # -------------------------------------
         
 
@@ -159,6 +166,9 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # assume all events        
         self.run_n = None 
         self.skip_n = None 
+        self.plot_n = 100
+
+        self.bool_string = { False: "No" , True: "Yes" }
 
         self.define_layout()
 
@@ -214,7 +224,7 @@ Configure your Event Display / Analysis:
     if you want to further customize your analysis.
 
 
-Default settings:
+General settings:
     """
         self.help_subwg1.setText(self.help_subwg1_text)
         self.help_layout.addWidget(self.help_subwg1)
@@ -256,9 +266,11 @@ Default settings:
 
         # plot every N events
         self.plot_n_layout = QtGui.QHBoxLayout()
-        self.plot_n = 100
-        self.plotn_status = QtGui.QLabel("Plot every %d events"%self.plot_n )
-        self.plotn_enter = QtGui.QLineEdit( str(self.plot_n) )
+        if self.plot_n == 0:
+            self.plotn_status = QtGui.QLabel("Plot only after all events")
+        else:
+            self.plotn_status = QtGui.QLabel("Plot every %d events"%self.plot_n )
+        self.plotn_enter = QtGui.QLineEdit()
         self.plotn_enter.setMaximumWidth(90)
         self.connect(self.plotn_enter, QtCore.SIGNAL('returnPressed()'), self.plotn_change )
         self.plotn_change_btn = QtGui.QPushButton("&Change") 
@@ -268,12 +280,57 @@ Default settings:
         self.plot_n_layout.addWidget(self.plotn_change_btn)
         self.help_layout.addLayout(self.plot_n_layout, QtCore.Qt.AlignRight )
 
+        # Global Display mode
+        self.dmode_layout = QtGui.QHBoxLayout()
+        self.displaymode = "SlideShow"
+        self.dmode_status = QtGui.QLabel("Display mode is %s"% self.displaymode)
+
+        self.dmode_menu = QtGui.QComboBox()
+        self.dmode_menu.setMaximumWidth(90)
+        self.connect(self.dmode_menu,  QtCore.SIGNAL('currentIndexChanged(int)'), self.process_dmode )
+        self.dmode_menu.addItem("SlideShow")
+        self.dmode_menu.addItem("Interactive")
+        self.dmode_menu.addItem("NoDisplay")
+        self.dmode_layout.addWidget(self.dmode_status)
+        self.dmode_layout.addWidget(self.dmode_menu)
+        self.help_layout.addLayout(self.dmode_layout, QtCore.Qt.AlignRight)
+
+        # Drop into iPython session at the end of the job?
+        self.ipython = False
+        self.ipython_status = QtGui.QLabel("Drop into iPython at the end of the job?  %s" \
+                                           % self.bool_string[ self.ipython ] )
+        self.ipython_layout = QtGui.QHBoxLayout()
+        self.ipython_menu = QtGui.QComboBox()
+        self.ipython_menu.setMaximumWidth(150)
+        self.connect(self.ipython_menu,  QtCore.SIGNAL('currentIndexChanged(int)'), self.process_ipython )
+        self.ipython_menu.addItem("No")
+        self.ipython_menu.addItem("Yes (Doesn't work yet)")
+        self.ipython_layout.addWidget(self.ipython_status)
+        self.ipython_layout.addWidget(self.ipython_menu)
+        self.help_layout.addLayout(self.ipython_layout)
+
         self.config_tabs.addTab(self.help_widget,"General")
         self.config_tabs.tabBar().hide()
 
+
+    def process_ipython(self):
+        self.ipython = bool(self.ipython_menu.currentIndex())
+        self.ipython_status.setText("Drop into iPython at the end of the job?  %s" \
+                                    % self.bool_string[ self.ipython ] )
+
+    def process_dmode(self):
+        self.displaymode = self.dmode_menu.currentText()
+        self.dmode_status.setText("Display mode is %s"%self.displaymode)
+        
     def plotn_change(self):
-        self.plot_n = int(self.plotn_enter.text())            
-        self.plotn_status.setText("Plot every %d events"%self.plot_n )
+        self.plot_n = self.plotn_enter.text()
+        if self.plot_n == "":
+            self.plot_n = 0
+            self.plotn_status.setText("Plot only after all events")
+        else:
+            self.plot_n = int(self.plot_n)
+            self.plotn_status.setText("Plot every %d events"%self.plot_n )
+        self.plotn_enter.setText("")
 
     def run_n_change(self):
         text = self.run_n_enter.text()
@@ -341,16 +398,17 @@ Default settings:
             pyana_layout.addLayout(pyana_button_layout)
             
             self.config_tabs.addTab(pyana_widget,"Pyana")
-            self.config_tabs.setCurrentWidget(pyana_widget)
+
             self.config_tabs.tabBar().show()
             self.pyana_widget = pyana_widget
 
+        self.config_tabs.setCurrentWidget(self.pyana_widget)
 
     #-------------------
     #  Public methods --
     #-------------------
                 
-    def update(self, filenames=[],devices=[],epicsPVs=[],controls=[],moreinfo=[]):
+    def update(self, filenames=[],devices=[],epicsPVs=[],controls=[],moreinfo=[],nevents=[]):
         """Update lists of filenames, devices and epics channels
            Make sure GUI gets updated too
         """
@@ -359,11 +417,21 @@ Default settings:
         self.moreinfo = moreinfo
         self.epicsPVs = epicsPVs
         self.controls = controls
+        self.nevents = nevents
+        self.ncalib = len(nevents)
+        print self.nevents
 
         # show all of this in the Gui
         self.setup_gui_checkboxes()
         for ch in self.checkboxes:
             print ch.text()
+
+        # if scan, plot every calib cycle 
+        if self.ncalib > 1 :
+            self.plotn_enter.setText( str(self.nevents[0]) )
+            self.plotn_change()
+            self.plotn_enter.setText("")
+
 
     def setup_gui_checkboxes(self) :
         """Draw a group of checkboxes to the GUI
@@ -502,7 +570,6 @@ Default settings:
         options_for_mod = []
         self.configuration= ""
 
-        print 
         do_scan = False
         for box in sorted(self.checkboxes):
             if box.isChecked() :
@@ -519,7 +586,8 @@ Default settings:
             # at the end, append plotter module:
             modules_to_run.append("XtcEventBrowser.pyana_plotter")
             options_for_mod.append([])
-            options_for_mod[nmodules].append("\ndisplay_mode = SlideShow")
+            options_for_mod[nmodules].append("\ndisplay_mode = %s"%self.displaymode )
+            options_for_mod[nmodules].append("\nipython = %d"%self.ipython)
 
         # if several values for same option, merge into a list
         for m in range(0,nmodules):
@@ -614,7 +682,7 @@ Default settings:
             options_for_mod[index].append("\ninput_epics = ")
             options_for_mod[index].append("\ninput_scalars = ")
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
 
         # --- --- --- BLD --- --- ---
@@ -628,13 +696,15 @@ Default settings:
 
             #print "XtcEventBrowser.pyana_bld at ", index
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             if str(box.text()).find("EBeam")>=0 :
                 options_for_mod[index].append("\ndo_ebeam = True")
             if str(box.text()).find("FEEGasDetEnergy")>=0 :
                 options_for_mod[index].append("\ndo_gasdetector = True")
             if str(box.text()).find("PhaseCavity")>=0 :
                 options_for_mod[index].append("\ndo_phasecavity = True")
+            if str(box.text()).find("Nh2Sb1Ipm")>=0 :
+                options_for_mod[index].append("\ndo_ipimb = True")
             return
         
         # --- --- --- Waveform --- --- ---
@@ -654,7 +724,7 @@ Default settings:
             address = str(box.text()).split(":")[1].strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
                     
         # --- --- --- Ipimb --- --- ---
@@ -670,7 +740,7 @@ Default settings:
             address = str(box.text()).split(": ")[1].strip()
             options_for_mod[index].append("\nipimb_addresses = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
                     
         # --- --- --- TM6740 --- --- ---
@@ -694,7 +764,7 @@ Default settings:
             options_for_mod[index].append("\ngood_range = %d--%d" % (0,99999999.9) )
             options_for_mod[index].append("\ndark_range = %d--%d" % (0,0) )
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             options_for_mod[index].append("\noutput_file = ")
             options_for_mod[index].append("\nn_hdf5 = ")        
             return
@@ -712,7 +782,7 @@ Default settings:
             address = str(box.text()).split(":")[1].strip()
             options_for_mod[index].append("\nimage_source = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             options_for_mod[index].append("\ndark_img_file = ")
             options_for_mod[index].append("\noutput_file = ")                    
             options_for_mod[index].append("\nplot_vrange = ")
@@ -737,7 +807,7 @@ Default settings:
             pvname = str(box.text()).split("PV:  ")[1]
             options_for_mod[index].append("\npv = %s" % pvname)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n )
-            options_for_mod[index].append("\nfignum = %d" % (index+1))
+            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
         
         print "FIXME! %s requested, not implemented" % box.text() 
@@ -816,6 +886,8 @@ Default settings:
         proc_emacs = myPopen("emacs %s" % self.configfile, shell=True) 
         stdout_value = proc_emacs.communicate()[0]
         print stdout_value
+        #proc_emacs = MyThread("emacs %s" % self.configfile) 
+        #proc_emacs.start()
         
         f = open(self.configfile,'r')
         self.configuration = f.read()
@@ -899,12 +971,12 @@ Default settings:
 
         if 0 :
             # calling as module... using multiprocessing
-            kwargs = {'argv':lpoptions}
-            p = Process(target=pyanamod.pyana,kwargs=kwargs)
-            p.start()
-            p.join()
+            #kwargs = {'argv':lpoptions}
+            #p = Process(target=pyanamod.pyana,kwargs=kwargs)
+            #p.start()
+            #p.join()
             # this option is nothing but trouble
-
+            pass
         if 0 :
             # calling as module... using threading
             self.proc_pyana = MyThread(lpoptions)

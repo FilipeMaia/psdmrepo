@@ -41,6 +41,8 @@ from pypdsdata import xtc
 
 from utilities import PyanaOptions
 
+#from IPython.Shell import IPShellEmbed
+
 
 #----------------------------------
 # Local non-exported definitions --
@@ -98,6 +100,8 @@ class pyana_scan (object) :
 
         # data counters
         self.n_runs =  0 # number of runs in this job             
+
+        #self.ipshell = IPShellEmbed(banner='Dropping into iPython', exit_msg='Leaving iPython')
             
     def beginrun( self, evt, env ) :
         """This optional method is called if present at the beginning 
@@ -201,10 +205,7 @@ class pyana_scan (object) :
             elif scalar.find("FEEGasDetEnergy")>= 0 :
                 fee_energy_array = evt.getFeeGasDet()
                 if fee_energy_array:
-                    # nenergy 20
-                    # e1 = 0.1
-                    # e2 = 4.0
-                    energy= (fee_energy_array[2]+fee_energy_array[3])/2.0 - 0.1;
+                    energy= (fee_energy_array[2]+fee_energy_array[3])/2.0 
                     self.evts_scalars[scalar].append( energy)
                 #else :
                 #    self.evts_scalars[scalar].append(-99.0)
@@ -214,6 +215,13 @@ class pyana_scan (object) :
                 if pc:
                     val = (pc.fCharge1 - pc.fCharge2) / (pc.fFitTime1 - pc.fFitTime2)
                     self.evts_scalars[scalar].append( val )
+                #else :
+                #    self.evts_scalars[scalar].append(-99.0)
+
+            elif scalar.find("Nh2Sb1Ipm01")>= 0 :
+                ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb )
+                if ipm:
+                    self.evts_scalars[scalar].append( ipm.ipmFexData.sum )
                 #else :
                 #    self.evts_scalars[scalar].append(-99.0)
 
@@ -250,8 +258,7 @@ class pyana_scan (object) :
         logging.info( "pyana_scan.endrun() called" )
         print "End run %d had %d calibcycles " % (self.n_runs, self.n_ccls)
 
-        self.make_plots(fignum=10, suptitle="Motor Scan")
-
+        self.make_plots(fignum=self.mpl_num, suptitle="Motor Scan")
 
     def endjob( self, env ) :
         """This method is called at the end of the job. It should do 
@@ -262,6 +269,7 @@ class pyana_scan (object) :
         logging.info( "pyana_scan.endjob() called" )
         print "End job had %d runs " % (self.n_runs)
 
+        #self.ipshell()
 
     def make_plots(self, fignum=1, suptitle=""):
 

@@ -94,26 +94,28 @@ class pyana_waveform (object) :
 
         # containers to store data from this job
         self.n_evts = 0
-        self.data = {}
-        self.datasize = {}
-        self.edges = {}
+        self.ts = {} # time waveform
+        self.wf = {} # voltage waveform
+        self.wf2 = {} # waveform squared (for computation of RMS)
+        self.cfg = {}
 
         for source in self.sources:
             print source
 
-            self.data[source] = []
-            self.edges[source] = None
+            self.ts[source] = None
+            self.wf[source] = None
+            self.wf2[source] = None
 
-            #how many channels?
-            cfg = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, source )
-            print "  # channels ", cfg.nbrChannels()
-            print "  # samples  ", cfg.horiz().nbrSamples()
-            print "  s interval ", cfg.horiz().sampInterval()
+            cfg = env.getAcqConfig(self.source)
+            self.cfg[source] = { 'nCh' : cfg.nbrChannels(),
+                                 'nSamp' : cfg.horiz().nbrSamples(),
+                                 'smpInt' : cfg.horiz().sampInterval() }
 
-            
-            self.datasize[source] = [cfg.nbrChannels(), cfg.horiz().nbrSamples() ]  
-            
+            #print "  # channels ", cfg.nbrChannels()
+            #print "  # samples  ", cfg.horiz().nbrSamples()
+            #print "  s interval ", cfg.horiz().sampInterval()
         
+
     def beginrun( self, evt, env ) :
         """This optional method is called if present at the beginning 
         of the new run.
@@ -133,7 +135,6 @@ class pyana_waveform (object) :
         @param env    environment object
         """
         logging.info( "pyana_waveform.begincalibcycle() called ")
-
             
     def event( self, evt, env ) :
         """This method is called for every L1Accept transition.
@@ -147,54 +148,25 @@ class pyana_waveform (object) :
 
         for source in self.sources:
 
-            # get data from each channel
-            nchannels, nsamples = self.datasize[source]
+            print source , self.cfg[source]['nCh'] 
+            for channel in range ( 0, self.cfg[source]['nCh'] ) :
 
-            wf_arrays = []
-            ts_array = None
-            for channel in range ( 0, nchannels ) :
                 acqData = evt.getAcqValue( source, channel, env)
-
-                m = None
                 if acqData :
-                    wf = acqData.waveform() 
-                    ts = acqData.timestamps()
+
+                    if self.ts[source] is None:
+                        self.ts[source] = acqData.timestamps()
+                        
+                    # average waveform
+                    awf = acqData.waveform()
+
+                    if self.wf[source] is None:
+                        self.wf[source] = awf
+                        self.wf2[source] = (awf*awf)
+                    else :
+                        self.wf[source] += awf
+                        self.wf[source] += (awf*awf)
                     
-                    # make sure dimensions are the same
-                    if np.shape(wf) != np.shape(ts) :
-                        dim = np.shape(wf)
-                        ts = ts[0:dim[0]]
-
-                    wf_arrays.append(wf)
-                    ts_array = ts
-                    
-                    ## constant threshold
-                    ##baseline = -0.0002
-                    ##threshold = +0.0001
-                    #baseline = -0.03
-                    #threshold = -0.06
-                    #edge = np.zeros(nsamples,dtype=float)
-                    #self.fill_const_frac_hist(ts, wf, nsamples,
-                    #                          baseline, threshold, edge )
-                    #if self.edges[source] is None :
-                    #    self.edges[source] = edge
-                    #else :
-                    #    self.edges[source] += edge
-                     
-            wf_arrays.insert(0,ts_array )
-            
-            self.data[source].append( np.array(wf_arrays) )
-            
-
-                             
-            
-
-                #if self.data[source] is None :
-                #    self.data[source] = np.float_(wf)
-                #    print len(self.data[source])
-                #else :
-                #    self.data[source]+=wf
-                
 
         
     def endcalibcycle( self, env ) :
@@ -260,53 +232,3 @@ class pyana_waveform (object) :
         print "drawing..."
         plt.draw()
 
-
-    def fill_const_frac(self, t, v, num_samples, baseline, threshold, edge, n, maxhits):
-        """Find the boundaries where the pulse crosses the threshold
-           copied from myana's main.cc
-
-           This obviously needs to be optimized (rewritten) for python!
-           (plus it doesn't seem to be doing the right thing either...)
-        """
-        n = 0
-        peak = 0.0
-        crossed = False
-        rising = threshold > baseline
-        for k in range (0, num_samples):
-            y = v[k]
-            over = (( rising and y>threshold ) or
-                    ( not rising and y<threshold ) )
-            
-            if (not crossed and over ):
-                crossed = True
-                start = k
-                peak = y
-            elif (crossed and not over ):
-                #find the edge
-                edge_v = 0.5*(peak+baseline)
-                i = start
-                if (rising): # leading edge +
-                    while ( v[i] < edge_v ):
-                        i += 1
-                else :      # leading edge -
-                    while ( v[i] > edge_v ):
-                        i += 1
-                if (i > 0) :
-                    edge[n] = ((edge_v-v[i-1])*t[i] - (edge_v-v[i])*t[i-1])/(v[i]-v[i-1]);
-                else :
-                    edge[n] = t[0]
-                n+=1
-                if ( n >= maxhits ):
-                    break
-                crossed = False
-            elif (( rising and y>peak ) or
-                  (not rising and y<peak )) :
-                peak = y
-
-
-    def fill_const_frac_hist(self, t, v, num_samples, baseline, threshold, histogram ): 
-        n = 0
-        edge_array = np.zeros(100,dtype=float)
-        self.fill_const_frac(t, v, num_samples, baseline, threshold, edge_array, n, 100 )
-        for i in range (0,n) :
-            histogram[edge_array[i]]+=1

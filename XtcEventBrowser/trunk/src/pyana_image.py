@@ -187,7 +187,7 @@ class  pyana_image ( object ) :
             self.lolimits[addr] = []
             self.hilimits[addr] = []
 
-            self.fignum[addr] = self.mpl_num*1000 + 100*self.image_addresses.index(addr)
+            self.fignum[addr] = self.mpl_num*10 + 100*self.image_addresses.index(addr)
 
             self.n_img[addr] = 0
             self.n_dark[addr] = 0
@@ -326,8 +326,7 @@ class  pyana_image ( object ) :
         # Draw images from this event
         # -----------------------------------
         if self.plot_every_n and (self.n_events%self.plot_every_n)==0 :
-            fignum = self.mpl_num*100
-            self.plotter.draw_figurelist(fignum, event_display_images )
+            self.plotter.draw_figurelist( self.mpl_num, event_display_images)
 
         # -----------------------------------
         # Saving to file
@@ -380,26 +379,18 @@ class  pyana_image ( object ) :
             print "# Signal images from %s = %d "% (addr, self.n_img[addr])
             print "# Dark images from %s = %d" % (addr, self.n_dark[addr])
 
-
-            # plot the minimums and maximums
-            xaxis = np.arange(self.n_events)
-            plt.plot( xaxis, np.array(self.lolimits[addr]), "gv", xaxis, np.array(self.hilimits[addr]), "r^" )
-            plt.title("Maxim (^)and lower (v) limits")
-            #plt.plot( np.array(self.lolimits))
-            #plt.plot( np.array(self.hilimits))
-
             # plot the average image
             av_good_img = self.image_data[addr]/self.n_img[addr]
-            self.plotter.drawframe( av_good_img, "%s: Average of images above threshold"%addr )
-            #100+self.fignum[addr])
+            self.plotter.drawframe( av_good_img, "%s: Average of images above threshold"%addr,
+                                    fignum=self.fignum[addr])
 
             if self.n_dark[addr]>0 :
                 av_dark_img = self.dark_data[addr]/self.n_dark[addr]
                 av_bkgsubtracted = av_good_img - av_dark_img 
-                self.plotter.drawframe( av_dark_img, "%s: Average of images below threshold"%addr )
-                #200+self.fignum[addr] )
-                self.self.drawframe( av_bkgsubtracted, "%s: Average background subtracted"%addr )
-                #300+self.fignum[addr])
+                self.plotter.drawframe( av_dark_img, "%s: Average of images below threshold"%addr,
+                                        fignum=self.fignum[addr]+1 )
+                self.self.drawframe( av_bkgsubtracted, "%s: Average background subtracted"%addr,
+                                     fignum=self.fignum[addr]+2)
 
         plt.draw()
         

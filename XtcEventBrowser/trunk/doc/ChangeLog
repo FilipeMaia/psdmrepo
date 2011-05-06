@@ -11,6 +11,34 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-May-6 ofte               rev 1835
+        XtcPyanaControl.py
+	- Experimented with threading / subprocesses, but all is restored back I hope. 
+	- More GUI control for general settings (display mode, plotting frequency etc, ipython)
+	XtcBrowserMain.py
+	- added nevents to the transferred info from xtcscanner
+	pyana_ipimb.py
+	- Changed the plot layout a bit
+	pyana_bld.py
+	- Added support for the SharedIpimb
+	pyana_image.py
+	- cleaned up endjob some
+	pyana_scan.py
+	- experimented with ipython, but restored. 
+	- support for shared ipimb included
+	pyana_waveform.py
+	- More sensible tracking of average waveform
+	- removed the non-functioning const threshold routine
+	pyana_plotter.py
+	- ipython functionality is moved here, although here it doesn't actually work. 
+	  Will add a way to get to the "stored" interactive data from this module which 
+	  is run last. 
+	pyana_cspad.py
+	- vrange now separated by comma. 
+	- Don't automatically start in interactive mode. Respect the GUI settings. 
+	xbplotter.py
+	- For drawframe (used by cspad and image), add projection plots	
+	
 2011-Apr-8 ofte V00-00-18     rev 1792
         - Some tuning. This goes with another version of the confluence documentation. 
 	- waveforms still not working. 
