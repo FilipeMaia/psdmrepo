@@ -26,14 +26,16 @@ using namespace std;
 namespace PSTime {
 
 /**
- *  This class is intended to work with durations in the ISO8601 standard.
+ *  @ingroup PSTime
+ * 
+ *  @brief This class is intended to work with durations in the ISO8601 standard.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see Time
  *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Mikhail S. Dubrovin
  */

@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2011-05-06 Andy Salnikov
+- improve doxygenated comments
+
 Tag: V00-01-00
 2011-01-31 Andy Salnikov
 - Lots of changes to time class

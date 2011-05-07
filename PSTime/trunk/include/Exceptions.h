@@ -37,14 +37,12 @@
 namespace PSTime {
 
 /**
- *  Exception classes for PSTime package
+ *  @brief Base class for exceptions in PSTime package
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgement.
  *
- *  @see AdditionalClass
- *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */

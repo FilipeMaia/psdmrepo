@@ -31,9 +31,27 @@
 // 		-- Class Interface --
 //		---------------------
 
+/**
+ *  @defgroup PSTime PSTime package
+ *  
+ *  @brief Package defining time-related classes for psana framework.
+ *  
+ *  This package include several classes and functions which define
+ *  time representation and operations with time. It is based on on 
+ *  standard ISO8601 external representation (http://en.wikipedia.org/wiki/ISO_8601)
+ *  but it does not provide complete support and in samoe cases it is
+ *  made more human-oriented.
+ *  
+ *  Core of the package are two classes: Time and Duration. Other classes define 
+ *  formatting functions and various utility functions.
+ */
+
+
 namespace PSTime {
 
 /**
+ *  @ingroup PSTime
+ * 
  *  @brief Standard time class for use in LCLS software.
  *
  *  The transformation to/from human-readable time format, required by I/O, 
@@ -47,7 +65,7 @@ namespace PSTime {
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Mikhail S. Dubrovin
  */
@@ -115,19 +133,19 @@ public:
    * @brief Constructs a time from the string representation.
    * 
    * Accepts the time stamp in format:
-   *     @li <date>, or
-   *     @li <date> <time>[.<fraction-of-sec>][<zone>], or
-   *     @li <date>T<time>[.<fraction-of-sec>][<zone>]
+   *     @li \<date\>, or
+   *     @li \<date\> \<time\>[.\<fraction-of-sec\>][\<zone\>], or
+   *     @li \<date\>T\<time\>[.\<fraction-of-sec\>][\<zone\>]
    *     
    *     where
    *     
-   *     @li <date> should be in format @c YYYY-MM-DD, @c YYYYMMDD, @c YYYY-MM, @c YYYYMM, 
+   *     @li \<date\> should be in format @c YYYY-MM-DD, @c YYYYMMDD, @c YYYY-MM, @c YYYYMM, 
    *            or @c YYYY, if month or day is missing they are assumed to be 1;
-   *     @li <time> should be in format @c HH:MM:SS, @c HHMMSS, @c HH:MM, @c HHMM, @c HH, 
+   *     @li \<time\> should be in format @c HH:MM:SS, @c HHMMSS, @c HH:MM, @c HHMM, @c HH, 
    *            if minutes or seconds are missing they are assumed to be 0;
-   *     @li <fraction-of-sec> may have up to 9 digits; if this field is missing,
+   *     @li \<fraction-of-sec\> may have up to 9 digits; if this field is missing,
    *            it is assumed equal to 0, fraction require seconds to be specified;
-   *     @li <zone> should be @c Z for UTC or in format @c {sign}HH[:MM] or {sign}HHMM,
+   *     @li \<zone\> should be @c Z for UTC or in format @c {sign}HH[:MM] or {sign}HHMM,
    *             if this field is missing time is assumed to be in local time zone.
    *             
    *  Examples of valid input are:

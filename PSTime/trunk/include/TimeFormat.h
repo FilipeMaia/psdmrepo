@@ -36,12 +36,12 @@
 namespace PSTime {
 
 /**
- *  Utility class to deal with the presentation of the times/dates.
+ *  @brief Namespace with utility methods to deal with the presentation of the times/dates.
  *
  *  This software was developed for the LUSI project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */
@@ -52,18 +52,18 @@ namespace TimeFormat  {
    *  @brief Parse the time string and return time.
    *  
    * Accepts the time stamp in format:
-   *     @li <date>, or
-   *     @li <date> <time>[.<fraction-of-sec>][<zone>], or
-   *     @li <date>T<time>[.<fraction-of-sec>][<zone>]
+   *     @li \<date\>, or
+   *     @li \<date\> \<time\>[.\<fraction-of-sec\>][\<zone\>], or
+   *     @li \<date\>T\<time\>[.\<fraction-of-sec\>][\<zone\>]
    *     
    *     where
-   *     @li <date> should be in format YYYY-MM-DD, YYYYMMDD, YYYY-MM, YYYYMM, or YYYY, if
+   *     @li \<date\> should be in format YYYY-MM-DD, YYYYMMDD, YYYY-MM, YYYYMM, or YYYY, if
    *            month or day is missing they are assumed to be 1;
-   *     @li <time> should be in format HH:MM:SS, HHMMSS, HH:MM, HHMM, HH, if minutes or 
+   *     @li \<time\> should be in format HH:MM:SS, HHMMSS, HH:MM, HHMM, HH, if minutes or 
    *            seconds are missing they are assumed to be 0;
-   *     @li <fraction-of-sec> may have up to 9 digits for nsec; if this field is missing, 
-   *                       it is assumed equal to 0, fraction requre seconds to be specified;
-   *     @li <zone> should be Z for UTC or in format <sign + or ->HH[:MM] or <sign + or ->HHMM
+   *     @li \<fraction-of-sec\> may have up to 9 digits for nsec; if this field is missing, 
+   *                       it is assumed equal to 0, fraction require seconds to be specified;
+   *     @li \<zone\> should be Z for UTC or in format <sign + or ->HH[:MM] or <sign + or ->HHMM
    *             if this field is missing time is assumed to be in local time zone.
    *
    *  @throw TimeParseException
@@ -76,7 +76,7 @@ namespace TimeFormat  {
    *  Following format codes are understood:
    *  
    *   @li @c  %d     The day of the month as a decimal number (range 01 to 31).
-   *   @li @c  %.<N>f Fractional seconds, will print dot followed by <N> digits.
+   *   @li @c  %.Nf   Fractional seconds, will print dot followed by @c N digits.
    *   @li @c  %f     Equivalent to %.9f
    *   @li @c  %F     Equivalent to %Y-%m-%d (the ISO 8601 date format).
    *   @li @c  %H     The hour as a decimal number using a 24-hour clock (range 00 to 23).
@@ -87,15 +87,17 @@ namespace TimeFormat  {
    *   @li @c  %T     The time in 24-hour notation (%H:%M:%S).
    *   @li @c  %Y     The year as a decimal number including the century.
    *   @li @c  %z     'Z' if time is printed in UTC zone, or offset from UTC to local time.
-   *   @li @c  %%     A literal '%' character.
+   *   @li @c  %%     A literal percent character.
    *  
    *  Any unrecognized characters not in the above set are copied to output string intact.
    *    
-   *  @param[in] time   
+   *  @param[in] time   Time object
+   *  @param[in] afmt   Format string
+   *  @param[in] zone   Time zone specification
    */
   std::string format ( const Time& time, const std::string& afmt, Time::Zone zone );
   
-  
+  /// Format to standard stream object instead of string, same parametes as for previous method.
   void format ( std::ostream& str, const Time& time, const std::string& afmt, Time::Zone zone );
 
 } // namespace TimeFormat
