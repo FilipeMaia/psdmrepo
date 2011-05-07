@@ -39,17 +39,30 @@
 // 		-- Class Interface --
 //		---------------------
 
+/**
+ *  @defgroup RootHistoManager RootHistoManager package
+ *  
+ *  @brief Interim implementation of the histogramming service based on pure ROOT classes.
+ *  
+ *  This package is a thin wrapper around standard ROOT package. It just adds one more
+ *  class RootHMgr which is a factory class for ROOT histograms and also manages the 
+ *  lifetime of the associated ROOT file and histograms that it creates.
+ */
+
+
 namespace RootHistoManager {
 
 /**
- *  ROOT-specific histogram manager for psana. 
+ *  @ingroup RootHistoManager
+ *  
+ *  @brief ROOT-specific histogram manager for psana. 
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see PSEnv::Env
  *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */
@@ -57,30 +70,33 @@ namespace RootHistoManager {
 class RootHMgr : boost::noncopyable {
 public:
 
-  // Default constructor
+  /**
+   *  @brief Constructor takes the name of the ROOT file which will be 
+   *  overwritten if it exists already.
+   */
   RootHMgr (const std::string& path) ;
 
   // Destructor
   ~RootHMgr () ;
 
-  /// create new 1-dim histogram with 32-bin integer bin contents
+  /// create new 1-dimensional histogram with 32-bin integer bin contents
   TH1* h1i(const std::string& name, const std::string& title, const AxisDef& axis);
 
-  /// create new 1-dim histogram with double (64-bin) bin contents
+  /// create new 1-dimensional histogram with double (64-bin) bin contents
   TH1* h1d(const std::string& name, const std::string& title, const AxisDef& axis);
 
-  /// create new 1-dim histogram with floating (32-bin) bin contents
+  /// create new 1-dimensional histogram with floating (32-bin) bin contents
   TH1* h1f(const std::string& name, const std::string& title, const AxisDef& axis);
 
-  /// create new 2-dim histogram with 32-bin integer bin contents
+  /// create new 2-dimensional histogram with 32-bin integer bin contents
   TH2* h2i(const std::string& name, const std::string& title, 
       const AxisDef& xaxis, const AxisDef& yaxis);
 
-  /// create new 2-dim histogram with double (64-bin) bin contents
+  /// create new 2-dimensional histogram with double (64-bin) bin contents
   TH2* h2d(const std::string& name, const std::string& title, 
       const AxisDef& xaxis, const AxisDef& yaxis);
 
-  /// create new 1-dim histogram with floating (32-bin) bin contents
+  /// create new 2-dimensional histogram with floating (32-bin) bin contents
   TH2* h2f(const std::string& name, const std::string& title, 
       const AxisDef& xaxis, const AxisDef& yaxis);
 
@@ -90,12 +106,13 @@ public:
 
 protected:
 
+  /// Create file if needed, return pointer.
   TFile* file();
   
 private:
   
-  std::string m_path;
-  boost::scoped_ptr<TFile> m_file;
+  std::string m_path;              ///< File name
+  boost::scoped_ptr<TFile> m_file; ///< Do not use directly, use file() method
 
 };
 
