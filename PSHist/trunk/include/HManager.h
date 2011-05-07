@@ -141,9 +141,11 @@ private:
 
 public:
 
+  
   enum { type_int, 
          type_float, 
          type_double };
+  
 
   //const char type_names[type_double];
 
