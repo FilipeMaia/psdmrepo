@@ -22,6 +22,9 @@
 //----------------------
 #include "PSHist/HManager.h"
 #include "PSHist/H1.h"
+#include "PSHist/H2.h"
+#include "PSHist/Axis.h"
+
 //#include "RootHist/RootH1.h"
 //#include "PSHist/Tuple.h"
 
@@ -69,14 +72,26 @@ public:
 
   virtual int write(); // = 0; !!!!!!! 
 
+  // 1-d histograms
+
   virtual PSHist::H1* hist1i(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh);
   virtual PSHist::H1* hist1i(const std::string &name, const std::string &title, int nbins, double *xbinedges);
+  virtual PSHist::H1* hist1i(const std::string &name, const std::string &title, PSHist::Axis &axis);
 
   virtual PSHist::H1* hist1f(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh);
   virtual PSHist::H1* hist1f(const std::string &name, const std::string &title, int nbins, double *xbinedges);
+  virtual PSHist::H1* hist1f(const std::string &name, const std::string &title, PSHist::Axis &axis);
 
   virtual PSHist::H1* hist1d(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh);
   virtual PSHist::H1* hist1d(const std::string &name, const std::string &title, int nbins, double *xbinedges);
+  virtual PSHist::H1* hist1d(const std::string &name, const std::string &title, PSHist::Axis &axis);
+
+
+  // 2-d histograms
+
+  virtual PSHist::H2* hist2i(const std::string &name, const std::string &title, PSHist::Axis &xaxis, PSHist::Axis &yaxis );
+  virtual PSHist::H2* hist2f(const std::string &name, const std::string &title, PSHist::Axis &xaxis, PSHist::Axis &yaxis );
+  virtual PSHist::H2* hist2d(const std::string &name, const std::string &title, PSHist::Axis &xaxis, PSHist::Axis &yaxis );
 
 private:
 
