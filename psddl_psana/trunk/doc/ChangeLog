@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2011-05-06 Andy Salnikov
+- removed generated documentation from package
+- added option to ddl_psanadoc to generate files in given location
+
 Tag: V00-00-06
 2011-04-26 Andy Salnikov
 - regenerated whole thing from psddldata V00-00-08
