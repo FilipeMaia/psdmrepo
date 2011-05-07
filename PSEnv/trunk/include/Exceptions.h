@@ -34,14 +34,14 @@
 namespace PSEnv {
 
 /**
- *  @brief Exception classes for PSEnv package.
+ *  @brief Base class for all exception classes for PSEnv package.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
  *  @see AdditionalClass
  *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */

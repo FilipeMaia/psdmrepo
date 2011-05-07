@@ -40,14 +40,20 @@
 namespace PSEnv {
 
 /**
- *  Class implementing storage for EPICS data in psana framework.
+ *  @ingroup PSEnv
+ *  
+ *  @brief Class implementing storage for EPICS data in psana framework.
+ *  
+ *  The EPICS store keeps track of all current EPICS value during the event 
+ *  loop in the framework. It is updated with the new values whenever 
+ *  new EPICS data is read from the input file.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see Env
  *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */
@@ -55,8 +61,12 @@ namespace PSEnv {
 class EpicsStore : boost::noncopyable {
 public:
 
-  /// Helper class which converts the result of EpicsStore::getPV() call into
-  /// real data object
+  /**
+   *  Helper class which converts the result of EpicsStore::getPV() call into
+   *  real data object. The object of this type can be converted to smart
+   *  pointer to one of the Psana::Epics::EpicsPv* classes (defined in psddl_psana
+   *  package).
+   */
   struct EpicsPV {
     
     // conversion operators
@@ -118,8 +128,11 @@ public:
     std::string m_name;
   };
   
-  /// Helper class which converts the result of EpicsStore::get() call into
-  /// real data
+  /**
+   *  Helper class which converts the result of EpicsStore::get() call into
+   *  real data. Objects of this type can be converted to one of the basic
+   *  numeric types of std::string.
+   */
   struct EpicsValue {
     
     // conversion operators
@@ -149,24 +162,25 @@ public:
   // Destructor
   ~EpicsStore () ;
 
-  /// Store EPICS PV
+  /// Store EPICS PV, will add new PV or update existing PV.
   void store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv) {
     m_impl->store(pv);
   }
 
-  // Get the list of PV names
-  std::vector<std::string> pvNames() const {
+  /// Get the list of PV names, all known names are returned.
+  std::vector<std::string> pvNames() const 
+  {
     std::vector<std::string> names;
     m_impl->pvNames(names);
     return names;
   }
 
   /**
-   *   Get the value for a given PV name
+   *   @brief Get the value for a given PV name
    *   
    *   @param[in] name      PV name
    *   @param[in] idx       value index (for array PVs)
-   *   @return  object that is convertible to regular numeric types or std::string
+   *   @return  object that is convertible to regular numeric types or std::string.
    *   
    *   This method does not throw but conversion from EpicsValue to final 
    *   type can throw ExceptionEpicsName or ExceptionEpicsConversion.
@@ -177,7 +191,7 @@ public:
   }
   
   /**
-   *   Get status information for a given PV name.
+   *   @brief Get status information for a given PV name.
    *   
    *   @param[in] name      PV name
    *   @param[out] status   EPICS status value
@@ -191,7 +205,7 @@ public:
   }
   
   /** 
-   *  Find EPICS PV given its name.
+   *  @brief Find EPICS PV given its name.
    *  
    *  @param[in] name      PV name
    *  @return  Object convertible to shared_ptr<T> where T is one of the epics PV classes.
@@ -207,7 +221,7 @@ protected:
 private:
 
   // Data members
-  boost::scoped_ptr<EpicsStoreImpl> m_impl;
+  boost::scoped_ptr<EpicsStoreImpl> m_impl;  ///< Pointer to implementation.
 
 };
 

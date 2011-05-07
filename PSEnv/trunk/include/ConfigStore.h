@@ -41,17 +41,21 @@
 namespace PSEnv {
 
 /**
- *  @brief Class to store configuration object.
+ *  @ingroup PSEnv
+ *  
+ *  @brief Class to store configuration objects corresponding to event data objects.
  *
  *  This class is very similar to PSEvt::Event class (and is implemented 
- *  on top of the same proxy dictionary stuff) but has limited interface.
+ *  on top of the same proxy dictionary classes) but it has more specialized 
+ *  interface. In particular it does not support additional string keys as
+ *  it is expected that there will be only one version of the configuration objects.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see Env
  *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */
@@ -59,21 +63,26 @@ namespace PSEnv {
 class ConfigStore : boost::noncopyable {
 public:
 
-  // Special class used for type-less return from get()
+  /// Special class used for type-less return from get()
   struct GetResultProxy {
     
+    /// Convert the result of Env::get() call to smart pointer to configuraiton object
     template<typename T>
     operator boost::shared_ptr<T>() {
       boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), m_source, std::string(), m_foundSrc);
       return boost::static_pointer_cast<T>(vptr);
     }
     
-    boost::shared_ptr<PSEvt::ProxyDictI> m_dict;
-    PSEvt::Source m_source;
-    Pds::Src* m_foundSrc;
+    boost::shared_ptr<PSEvt::ProxyDictI> m_dict;  ///< Proxy dictionary containing the data
+    PSEvt::Source m_source;    ///< Data source address
+    Pds::Src* m_foundSrc;      ///< Pointer to where to store the exact address of found object
   };
 
-  // Default constructor
+  /**
+   *  @brief Standard constructor takes proxy dictionary object
+   *  
+   *  @param[in] dict Pointer to proxy dictionary
+   */
   ConfigStore(const boost::shared_ptr<PSEvt::ProxyDictI>& dict) : m_dict(dict) {}
 
   // Destructor
@@ -92,18 +101,18 @@ public:
   void put(const boost::shared_ptr<T>& data, const Pds::Src& source) 
   {
     boost::shared_ptr<PSEvt::ProxyI> proxyPtr(new PSEvt::DataProxy<T>(data));
-    const std::type_info& typeinfo = typeid(const T);
-    if ( m_dict->exists(&typeinfo, source, std::string()) ) {
-      m_dict->remove(&typeinfo, source, std::string());
+    PSEvt::EventKey key(&typeid(const T), source, std::string());
+    if ( m_dict->exists(key) ) {
+      m_dict->remove(key);
     }
-    m_dict->put(proxyPtr, &typeinfo, source, std::string());
+    m_dict->put(proxyPtr, key);
   }
   
   /**
    *  @brief Get an object from store.
    *  
    *  @param[in] source Source detector address.
-   *  @return Shared pointer which can be zero if object not found.
+   *  @return Shared pointer (or object convertible to it) which can be zero when object is not found.
    */
   GetResultProxy get(const Pds::Src& source) 
   {
@@ -116,9 +125,8 @@ public:
    *  
    *  @param[in] source Source detector address.
    *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned 
-   *                       with the exact source address of the returned object (must 
-   *                       be the same as source)
-   *  @return Shared pointer which can be zero if object not found.
+   *                       with the exact source address of the returned object.
+   *  @return Shared pointer (or object convertible to it) which can be zero when object is not found.
    */
   GetResultProxy get(const PSEvt::Source& source, Pds::Src* foundSrc=0) 
   {

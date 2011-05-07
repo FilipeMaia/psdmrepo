@@ -42,12 +42,18 @@
 namespace PSEnv {
 
 /**
- *  Class that provides implementation for the EPICS PV store.
+ *  @ingroup PSEnv
+ *  
+ *  @brief Class that provides implementation for the EPICS PV store.
+ *  
+ *  This is a part of the EpicsStore implementation detail, should not
+ *  be of much interest to end users. Hides all complexities from
+ *  EpicsStore class declaration.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */
@@ -85,7 +91,7 @@ public:
   boost::shared_ptr<Psana::Epics::EpicsPvHeader> getAny(const std::string& name) const ;
 
   /**
-   *   Get status info for the EPIVS PV.
+   *   @brief Get status info for the EPIVS PV.
    *   
    *   @param[in] name      PV name
    *   @param[out] status   EPICS status value
@@ -97,7 +103,7 @@ public:
   void getStatus(const std::string& name, int& status, int& severity, PSTime::Time& time) const ;
 
   /**
-   *  Get the value of the EPICS PV, convert to requested type.
+   *  @brief Get the value of the EPICS PV, convert to requested type.
    *  
    *   @param[in] name     PV name
    *   @param[in] idx      value index (for array PVs use non-zero index)
@@ -123,10 +129,10 @@ protected:
   /// Get the index of the PV
   int findIndex(const std::string& name) const;
 
-  // Implementation of the getCtrl which returns generic pointer
+  /// Implementation of the getCtrl which returns generic pointer
   boost::shared_ptr<Psana::Epics::EpicsPvCtrlHeader> getCtrlImpl(const std::string& name) const;
 
-  // Implementation of the getTime which returns generic pointer
+  /// Implementation of the getTime which returns generic pointer
   boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> getTimeImpl(const std::string& name) const;
   
 private:
@@ -141,9 +147,9 @@ private:
   typedef std::map<int, boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> > TimeMap;
   
   // Data members
-  Name2ID m_name2id;
-  CrtlMap m_ctrlMap;
-  TimeMap m_timeMap;
+  Name2ID m_name2id;  ///< Mapping from PV name to its ID.
+  CrtlMap m_ctrlMap;  ///< Mapping from ID to EPICS object for CTRL objects
+  TimeMap m_timeMap;  ///< Mapping from ID to EPICS object for TIME objects
 
 };
 
