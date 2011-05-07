@@ -1,0 +1,23 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package RootHistoManager
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-02
+2011-05-06 Andy Salnikov
+- improve doxygenated comments
+
+Tag: V00-00-01
+2011-04-14 Andy Salnikov
+- first import into svn
+- simple implementation of manager which supports 1-d, 2-d histograms
+  and 1-d profile
+ 
