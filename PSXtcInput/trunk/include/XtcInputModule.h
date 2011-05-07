@@ -42,15 +42,22 @@ namespace XtcInput {
 // 		-- Class Interface --
 //		---------------------
 
+/**
+ *  @defgroup PSXtcInput PSXtcInput package
+ *  
+ *  @brief Package with the implementation if psana input module for XTC files.
+ *  
+ */
+
 namespace PSXtcInput {
 
 /**
- *  @brief PSANA module for reading XTC files.
+ *  @ingroup PSXtcInput
+ *  
+ *  @brief Psana input module for reading XTC files.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -60,7 +67,7 @@ namespace PSXtcInput {
 class XtcInputModule : public InputModule {
 public:
 
-  // Default constructor
+  /// Constructor takes the name of the module.
   XtcInputModule (const std::string& name) ;
 
   // Destructor
@@ -77,20 +84,20 @@ public:
 
 protected:
   
-  // Fill event with datagram contents
+  /// Fill event with datagram contents
   void fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env);
   
-  // Fill environment with datagram contents
+  /// Fill environment with datagram contents
   void fillEnv(const XtcInput::Dgram& dg, Env& env);
 
 private:
 
   // Data members
-  boost::scoped_ptr<XtcInput::DgramQueue> m_dgQueue;
-  XtcInput::Dgram m_putBack;
-  boost::scoped_ptr<boost::thread> m_readerThread;
-  psddl_pds2psana::XtcConverter m_cvt;
-  Pds::ClockTime m_transitions[Pds::TransitionId::NumberOf];
+  boost::scoped_ptr<XtcInput::DgramQueue> m_dgQueue;  ///< Input datagram queue
+  XtcInput::Dgram m_putBack;                          ///< Buffer for one put-back datagram
+  boost::scoped_ptr<boost::thread> m_readerThread;    ///< Thread which does datagram reading
+  psddl_pds2psana::XtcConverter m_cvt;                ///< Data converter object
+  Pds::ClockTime m_transitions[Pds::TransitionId::NumberOf];  ///< Timestamps of the observed transitions
 };
 
 } // namespace PSXtcInput
