@@ -51,19 +51,15 @@ ProxyDict::~ProxyDict ()
 
 void 
 ProxyDict::putImpl( const boost::shared_ptr<ProxyI>& proxy, 
-                    const std::type_info* typeinfo, 
-                    const Pds::Src& source, 
-                    const std::string& key )
+                    const EventKey& key )
 {
-  EventKey proxyKey(typeinfo, source, key);
-  
   // there should not be existing key
-  Dict::iterator it = m_dict.find(proxyKey);
+  Dict::iterator it = m_dict.find(key);
   if ( it != m_dict.end() ) {
-    throw ExceptionDuplicateKey(ERR_LOC, typeinfo, source, key);
+    throw ExceptionDuplicateKey(ERR_LOC, key);
   }
 
-  m_dict.insert(Dict::value_type(proxyKey, proxy));
+  m_dict.insert(Dict::value_type(key, proxy));
 }
 
 
@@ -115,21 +111,15 @@ ProxyDict::getImpl( const std::type_info* typeinfo,
 }
 
 bool 
-ProxyDict::existsImpl( const std::type_info* typeinfo, 
-                       const Pds::Src& source, 
-                       const std::string& key)
+ProxyDict::existsImpl(const EventKey& key)
 {
-  EventKey proxyKey(typeinfo, source, key);
-  return m_dict.find(proxyKey) != m_dict.end();
+  return m_dict.find(key) != m_dict.end();
 }
 
 bool 
-ProxyDict::removeImpl( const std::type_info* typeinfo, 
-                       const Pds::Src& source, 
-                       const std::string& key )
+ProxyDict::removeImpl(const EventKey& key)
 {
-  EventKey proxyKey(typeinfo, source, key);
-  return m_dict.erase(proxyKey) > 0;
+  return m_dict.erase(key) > 0;
 }
 
 void 

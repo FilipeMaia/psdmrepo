@@ -40,11 +40,8 @@ Exception::Exception( const ErrSvc::Context& ctx, const std::string& what )
 }
 
 ExceptionDuplicateKey::ExceptionDuplicateKey ( const ErrSvc::Context& ctx, 
-                                               const std::type_info* typeinfo, 
-                                               const Pds::Src& source, 
-                                               const std::string& key ) 
-  : Exception( ctx, "duplicate key: " + std::string(typeinfo->name()) + ":phy(" + 
-      boost::lexical_cast<std::string>(source.phy()) + "):" + key)
+                                               const EventKey& key ) 
+  : Exception( ctx, "duplicate key: " + boost::lexical_cast<std::string>(key))
 {  
 }
 

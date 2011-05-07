@@ -37,22 +37,33 @@
 namespace PSEvt {
 
 /**
- *  Class describing an addre5ss of the data object in event.
+ *  @ingroup PSEvt
+ *  
+ *  @brief Class describing an address or key of the data object in event.
+ *  
+ *  Event key consists of three components - object type represented by 
+ *  its typeinfo pointer, data source address, and string key. 
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see Event
  *
- *  @version $Id$
+ *  @version \$Id$
  *
- *  @author Andrei Salnikov
+ *  @author Andy Salnikov
  */
 
-class EventKey  {
+class EventKey {
 public:
 
-  // Default constructor
+  /**
+   *  @brief Constructor for EventKey.
+   *  
+   *  @param[in] typeinfo    Pointer to typeinfo object
+   *  @param[in] src         Data source address
+   *  @param[in] key         String key
+   */
   EventKey (const std::type_info* typeinfo, const Pds::Src& src, const std::string& key)
     : m_typeinfo(typeinfo), m_src(src), m_key(key) 
   {}
@@ -60,22 +71,22 @@ public:
   // Destructor
   ~EventKey () {}
 
-  // Compare two keys
+  /// Compare two keys
   bool operator<(const EventKey& other) const;
 
-  // format the key
+  /// Rormat the key
   void print(std::ostream& str) const;
 
-  // return typeinfo
+  /// Returns pointer to typeinfo object
   const std::type_info* typeinfo() const {return m_typeinfo;}
   
-  // return source
+  /// Returns data source address
   const Pds::Src& src() const {return m_src;}
   
-  // return string key
+  /// Returns string key
   const std::string& key() const {return m_key;}
   
-  // is src valid
+  /// Returns true if data source address is a valid address.
   bool validSrc() const { return not (m_src == Pds::Src()); }
   
 protected:
@@ -83,9 +94,9 @@ protected:
 private:
 
   // Data members
-  const std::type_info* m_typeinfo;
-  const Pds::Src m_src;
-  const std::string m_key;
+  const std::type_info* m_typeinfo; ///< Pointer to typeinfo object
+  const Pds::Src m_src;             ///< Data source address
+  const std::string m_key;          ///< String key
 
 };
 

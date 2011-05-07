@@ -38,14 +38,23 @@ namespace PSTime {
 namespace PSEvt {
 
 /**
- *  @brief Abstract interface for Event ID objects.
+ *  @ingroup PSEvt
+ *  
+ *  @brief Class defining abstract interface for Event ID objects.
+ *  
+ *  Event ID should include enough information to uniquely identify
+ *  an event (and possibly a location of the event in data file).
+ *  Currently we include event timestamp (PSTime::Time object) and
+ *  run number into Event ID.
+ *  
+ *  Implementation of this interface will probably be tied to a 
+ *  particular input data format so the interface will be implemented 
+ *  in the packages responsible for reading data (e.g. PSXtcInput). 
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
- *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */

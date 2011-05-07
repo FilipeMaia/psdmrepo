@@ -37,15 +37,22 @@
 namespace PSEvt {
 
 /**
- *  @brief This class implements source matching for finding things 
+ *  @ingroup PSEvt
+ *  
+ *  @brief This class implements source matching for finding data 
  *  inside event.
+ *  
+ *  Event dictionary has to support location of the event data without 
+ *  complete source address specification. This class provides facility
+ *  for matching the data source address against partially-specified 
+ *  match.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see Event
  *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */
@@ -53,15 +60,18 @@ namespace PSEvt {
 class Source  {
 public:
 
-  enum NoSource { null };
+  /// Special enum type to signify objects without source
+  enum NoSource { 
+    null   ///< Special constant to be used as argument for constructor  
+  };
   
   /**
-   *  @brief Matches objects without source only.
+   *  @brief Make source which matches objects without source only.
    */
   Source (NoSource) : m_src() {}
 
   /**
-   *  @brief Match for any source.
+   *  @brief Make source which matches any source.
    *  
    *  This object will match any source.
    */
@@ -117,9 +127,7 @@ public:
    */
   Source& operator=(const std::string& spec) ;
 
-  /**
-   *  @brief Match source with Pds::Src object.
-   */
+  /// Match source with Pds::Src object.
   bool match(const Pds::Src& src) const;
   
   /// Returns true if matches no-source only

@@ -42,14 +42,25 @@
 namespace PSEvt {
 
 /**
- *  @brief Interface for shared 
+ *  @ingroup PSEvt
+ *  
+ *  @brief Class defining an interface for all proxy dictionary classes.
+ *  
+ *  The client-side interface of this class is non-virtual and it 
+ *  forwards every class to virtual methods which define customization
+ *  oints to be implemented in subclasses.
+ *  
+ *  Proxy dictionary stores proxy objects of type ProxyI which represent
+ *  actual objects and know how to create or retrieve an object when
+ *  requested. Proxy collection is indexed by the EventKey which identifies
+ *  object data type, data source address, and additional string key.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see ProxyDict
  *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */
@@ -68,25 +79,20 @@ public:
    *  else too if needed.
 
    *  @param[in] proxy   Proxy object for type T.
-   *  @param[in] typeinfo  Dynamic type info object
-   *  @param[in] source Source detector address.
-   *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *  @param[in] key     Event key for the data object.
    */
-  void put( const boost::shared_ptr<ProxyI>& proxy, 
-            const std::type_info* typeinfo, 
-            const Pds::Src& source, 
-            const std::string& key ) 
+  void put( const boost::shared_ptr<ProxyI>& proxy, const EventKey& key ) 
   {
-    this->putImpl(proxy, typeinfo, source, key);
+    this->putImpl(proxy, key);
   }
 
   /**
    *  @brief Get an object from event
-   *  
+   * 
    *  @param[in] typeinfo  Dynamic type info object
    *  @param[in] source    Source detector address.
    *  @param[in] key       Optional key to distinguish different objects of the same type.
-   *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned 
+   *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned
    *                       with the exact source address of the returned object.
    *  @return Shared pointer of void type.
    */
@@ -98,37 +104,30 @@ public:
     return this->getImpl(typeinfo, source, key, foundSrc);
   }
 
+
   /**
    *  @brief Check if proxy of given type exists in the event
    *  
    *  This is optimized version of get() which only checks whether the proxy
    *  is there but does not ask proxy to do any real work.
    *  
-   *  @param[in] typeinfo  Dynamic type info object
-   *  @param[in] source    Source detector address.
-   *  @param[in] key       Optional key to distinguish different objects of the same type.
+   *  @param[in] key     Event key for the data object.
    *  @return true if proxy exists
    */
-  bool exists( const std::type_info* typeinfo, 
-               const Pds::Src& source, 
-               const std::string& key)
+  bool exists(const EventKey& key)
   {
-    return this->existsImpl(typeinfo, source, key);
+    return this->existsImpl(key);
   }
 
   /**
    *  @brief Remove object of given type from the event
    *  
-   *  @param[in] typeinfo  Dynamic type info object
-   *  @param[in] source Source detector address.
-   *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *  @param[in] key     Event key for the data object.
    *  @return false if object did not exist before this call
    */
-  bool remove( const std::type_info* typeinfo, 
-               const Pds::Src& source, 
-               const std::string& key )
+  bool remove(const EventKey& key)
   {
-    return this->removeImpl(typeinfo, source, key);
+    return this->removeImpl(key);
   }
 
   /**
@@ -151,22 +150,17 @@ protected:
    *  @brief Add one more proxy object to the dictionary.
    *  
    *  @param[in] proxy   Proxy object for type T.
-   *  @param[in] typeinfo  Dynamic type info object
-   *  @param[in] source Source detector address.
-   *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *  @param[in] key     Event key for the data object.
    */
-  virtual void putImpl( const boost::shared_ptr<ProxyI>& proxy, 
-                        const std::type_info* typeinfo, 
-                        const Pds::Src& source, 
-                        const std::string& key ) = 0;
+  virtual void putImpl( const boost::shared_ptr<ProxyI>& proxy, const EventKey& key ) = 0;
 
   /**
    *  @brief Get an object from event
-   *  
+   * 
    *  @param[in] typeinfo  Dynamic type info object
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
-   *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned 
+   *  @param[out] foundSrc If pointer is non-zero then pointed object will be assigned
    *                       with the exact source address of the returned object.
    *  @return Shared pointer of void type.
    */
@@ -178,26 +172,18 @@ protected:
   /**
    *  @brief Check if proxy of given type exists in the event
    *  
-   *  @param[in] typeinfo  Dynamic type info object
-   *  @param[in] source Source detector address.
-   *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *  @param[in] key     Event key for the data object.
    *  @return true if proxy exists
    */
-  virtual bool existsImpl( const std::type_info* typeinfo, 
-                           const Pds::Src& source, 
-                           const std::string& key) = 0;
+  virtual bool existsImpl(const EventKey& key) = 0;
 
   /**
    *  @brief Remove object of given type from the event
    *  
-   *  @param[in] typeinfo  Dynamic type info object
-   *  @param[in] source Source detector address.
-   *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *  @param[in] key     Event key for the data object.
    *  @return false if object did not exist before this call
    */
-  virtual bool removeImpl( const std::type_info* typeinfo, 
-                           const Pds::Src& source, 
-                           const std::string& key ) = 0;
+  virtual bool removeImpl(const EventKey& key) = 0;
 
   /**
    *  @brief Get the list of event keys defined in event

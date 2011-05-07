@@ -41,17 +41,39 @@
 // 		-- Class Interface --
 //		---------------------
 
+/**
+ *  @defgroup PSEvt  PSEvt package
+ *  
+ *  @brief PSEvt package contains classes which provide storage and 
+ *  access to event data in the context of psana framework.
+ *  
+ *  The core of the package is the proxy dictionary classes which allow 
+ *  storage of the arbitrary types. Dictionaries to not store data 
+ *  directly, instead they store proxy objects which can either contain
+ *  data objects or implement algorithm to generate data objects when
+ *  necessary.
+ *  
+ *  Main user interface to this package is the Event class which is a 
+ *  wrapper for proxy dictionary providing more user-friendly interface.
+ */
+
 namespace PSEvt {
 
 /**
- *  Class representing event data in psana,
+ *  @ingroup PSEvt
+ *  
+ *  @brief Class which manages event data in psana framework.
+ *  
+ *  This class is a user-friendly interface to proxy dictionary object. 
+ *  It provides a number of put() and get() methods to store/retrieve 
+ *  arbitrarily typed data.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see ProxyDictI
  *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */
@@ -59,19 +81,20 @@ namespace PSEvt {
 class Event {
 public:
 
-  // Special class used for type-less return from get()
+  /// Special class used for type-less return from get()
   struct GetResultProxy {
     
+    /// Convert the result of Event::get() call to smart pointer to data object
     template<typename T>
     operator boost::shared_ptr<T>() {
       boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), m_source, m_key, m_foundSrc);
       return boost::static_pointer_cast<T>(vptr);
     }
     
-    boost::shared_ptr<ProxyDictI> m_dict;
-    Source m_source;
-    std::string m_key;
-    Pds::Src* m_foundSrc;
+    boost::shared_ptr<ProxyDictI> m_dict; ///< Proxy dictionary containing the data
+    Source m_source;         ///< Data source address
+    std::string m_key;       ///< String key
+    Pds::Src* m_foundSrc;    ///< Pointer to where to store the exact address of found object
   };
   
   
@@ -94,7 +117,8 @@ public:
   template <typename T>
   void putProxy(const boost::shared_ptr<Proxy<T> >& proxy, const std::string& key=std::string()) 
   {
-    m_dict->put(boost::static_pointer_cast<ProxyI>(proxy), &typeid(const T), Pds::Src(), key);
+    EventKey evKey(&typeid(const T), Pds::Src(), key);
+    m_dict->put(boost::static_pointer_cast<ProxyI>(proxy), evKey);
   }
   
   /**
@@ -109,7 +133,8 @@ public:
                 const Pds::Src& source, 
                 const std::string& key=std::string()) 
   {
-    m_dict->put(boost::static_pointer_cast<ProxyI>(proxy), &typeid(const T), source, key);
+    EventKey evKey(&typeid(const T), source, key);
+    m_dict->put(boost::static_pointer_cast<ProxyI>(proxy), evKey);
   }
   
   /**
@@ -122,7 +147,8 @@ public:
   void put(const boost::shared_ptr<T>& data, const std::string& key=std::string()) 
   {
     boost::shared_ptr<ProxyI> proxyPtr( new DataProxy<T>(data) );
-    m_dict->put(proxyPtr, &typeid(const T), Pds::Src(), key);
+    EventKey evKey(&typeid(const T), Pds::Src(), key);
+    m_dict->put(proxyPtr, evKey);
   }
   
   /**
@@ -138,7 +164,8 @@ public:
            const std::string& key=std::string()) 
   {
     boost::shared_ptr<ProxyI> proxyPtr( new DataProxy<T>(data) );
-    m_dict->put(proxyPtr, &typeid(const T), source, key);
+    EventKey evKey(&typeid(const T), source, key);
+    m_dict->put(proxyPtr, evKey);
   }
   
   /**
@@ -198,7 +225,8 @@ public:
   template <typename T>
   bool exists(const std::string& key=std::string()) 
   {
-    return m_dict->exists(&typeid(const T), Pds::Src(), key);
+    EventKey evKey(&typeid(const T), Pds::Src(), key);
+    return m_dict->exists(evKey);
   }
   
   /**
@@ -215,7 +243,8 @@ public:
   bool exists(const Pds::Src& source, 
               const std::string& key=std::string()) 
   {
-    return m_dict->exists(&typeid(const T), source, key);
+    EventKey evKey(&typeid(const T), source, key);
+    return m_dict->exists(evKey);
   }
   
   /**
@@ -227,7 +256,8 @@ public:
   template <typename T>
   bool remove(const std::string& key=std::string()) 
   {
-    return m_dict->remove(&typeid(const T), Pds::Src(), key);
+    EventKey evKey(&typeid(const T), Pds::Src(), key);
+    return m_dict->remove(evKey);
   }
   
   /**
@@ -241,7 +271,8 @@ public:
   bool remove(const Pds::Src& source, 
               const std::string& key=std::string()) 
   {
-    return m_dict->remove(&typeid(const T), source, key);
+    EventKey evKey(&typeid(const T), source, key);
+    return m_dict->remove(evKey);
   }
   
   /**

@@ -23,6 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "pdsdata/xtc/Src.hh"
+#include "PSEvt/EventKey.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,14 +36,12 @@
 namespace PSEvt {
 
 /**
- *  @brief Exception classes for PSEvt package.
+ *  @brief Base class for exception classes for PSEvt package.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
- *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */
@@ -59,10 +58,7 @@ public:
 class ExceptionDuplicateKey : public Exception {
 public:
 
-  ExceptionDuplicateKey ( const ErrSvc::Context& ctx, 
-                          const std::type_info* typeinfo, 
-                          const Pds::Src& source, 
-                          const std::string& key ) ;
+  ExceptionDuplicateKey ( const ErrSvc::Context& ctx, const EventKey& key ) ;
 
 };
 
@@ -70,12 +66,9 @@ public:
 class ExceptionSourceFormat : public Exception {
 public:
 
-  ExceptionSourceFormat ( const ErrSvc::Context& ctx,
-                          const std::string& format ) ;
+  ExceptionSourceFormat ( const ErrSvc::Context& ctx, const std::string& format ) ;
 
 };
-
-
 
 } // namespace PSEvt
 

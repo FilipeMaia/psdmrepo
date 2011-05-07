@@ -40,23 +40,25 @@ namespace PSEvt {
 namespace PSEvt {
 
 /**
- *  @brief Implementation of proxy object which keeps a pointer to real object
+ *  @ingroup PSEvt
+ *  
+ *  @brief Implementation of proxy object which keeps a pointer to real object.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see Proxy
  *
- *  @version $Id$
+ *  @version \$Id$
  *
- *  @author Andrei Salnikov
+ *  @author Andy Salnikov
  */
 
 template <typename T>
 class DataProxy : public Proxy<T> {
 public:
 
-  // Default constructor
+  /// Constructor takes a smart pointer to the data object.
   DataProxy (const boost::shared_ptr<T>& data) : m_data(data) {}
 
   // Destructor
@@ -65,12 +67,12 @@ public:
 protected:
 
   /**
-   *  @brief Get the correctly-typed object from the proxy.
+   *  @brief Get the data object from the proxy.
    *    
    *  @param[in] dict    Proxy dictionary containing this proxy.
    *  @param[in] source Detector address information
    *  @param[in] key     String key, additional key supplied by user.
-   *  @return Shared pointer of the correct type.
+   *  @return Shared pointer to the data object passed to the constructor.
    */
   virtual boost::shared_ptr<T> getTypedImpl(ProxyDictI* dict,
                                             const Pds::Src& source, 
@@ -82,7 +84,7 @@ protected:
 private:
 
   // Data members
-  boost::shared_ptr<T> m_data;
+  boost::shared_ptr<T> m_data; ///< Stored pointer to the data object.
 };
 
 } // namespace PSEvt

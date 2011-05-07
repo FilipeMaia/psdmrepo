@@ -40,14 +40,20 @@ namespace PSEvt {
 namespace PSEvt {
 
 /**
- *  @brief Base class for all proxies.
+ *  @ingroup PSEvt
+ *  
+ *  @brief Class defining interface for all proxy classes.
+ *  
+ *  This is the interface used by the proxy dictionary which stores
+ *  the objects of this type. This interface is untyped, as it returns 
+ *  pointer to void. It should not be exposed to user code.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see ProxyDictI
  *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */

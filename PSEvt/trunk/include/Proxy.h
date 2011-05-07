@@ -40,14 +40,22 @@ namespace PSEvt {
 namespace PSEvt {
 
 /**
- *  @brief Interface class for type-save proxy classes. 
+ *  @ingroup PSEvt
+ *  
+ *  @brief Interface class for type-safe proxy classes. 
+ *  
+ *  Proxy dictionary stores proxies of type ProxyI which are not 
+ *  type-safe (they work with void pointers). To make code safer
+ *  this class implements ProxyI interface and introduces type-safe 
+ *  method to generate typed data. User-level interface should use this
+ *  type instead of ProxyI.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see ProxyI
  *
- *  @version $Id$
+ *  @version \$Id$
  *
  *  @author Andrei Salnikov
  */
@@ -65,11 +73,14 @@ protected:
   Proxy () {}
 
   /**
-   *  @brief Get the object from the proxy.
+   *  @brief Get untyped object from the proxy.
    *  
    *  The parameters passed to the proxy can be used by the proxy 
    *  to find additional information from the same (or different)
    *  detector. 
+   *  
+   *  This is implementation of ProxyI interface which forwards 
+   *  call to the type-safe method getTypedImpl().
    *  
    *  @param[in] dict    Proxy dictionary containing this proxy.
    *  @param[in] source Detector address information
