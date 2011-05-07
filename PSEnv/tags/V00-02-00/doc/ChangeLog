@@ -1,0 +1,54 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PSEnv
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-02-00
+2011-05-06 Andy Salnikov
+- few methods in proxy dict classes now take EventKey instead of triplet
+  of parameters
+- doxygenating headers
+
+Tag: V00-01-00
+2011-04-26 Andy Salnikov
+- added optional argument to ConfigStore::get to return exact address
+  of the data object
+
+Tag: V00-00-07
+2011-04-14 Andy Salnikov
+- added root histo manager to the environment
+
+Tag: V00-00-06
+2011-03-28 Andy Salnikov
+- added EpicsStore class and Env::epicsStore() method
+- added few exception classes for use in this package
+
+Tag: V00-00-05
+2011-03-23 Andy Salnikov
+- modified ConfigStore to work with PSEvt::Source instead of Pds::Data
+
+Tag: V00-00-04
+2011-03-21 Andy Salnikov
+- ConfigStore::get() does not need template parameter
+
+Tag: V00-00-03
+2011-03-20 Andy Salnikov
+- added ConfigStore class which is a part of the environment storing 
+  configuration objects
+
+Tag: V00-00-02
+2011-01-31 Andy Salnikov
+- renamed this package to PSEnv
+
+Tag: V00-00-01
+2011-01-26 Andy Salnikov
+- first commit to repository
+- Env class exists with nothing in it, placeholder for future dev
