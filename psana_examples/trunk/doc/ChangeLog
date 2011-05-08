@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2011-05-07 Andy Salnikov
+- fix parameter name in DumpBld
+
 Tag: V00-00-12
 2011-04-26 Andy Salnikov
 - extended DumpAcqiris module to make waveforms() usage example

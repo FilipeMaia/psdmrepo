@@ -47,7 +47,7 @@ DumpBld::DumpBld (const std::string& name)
   m_ebeamSrc = configStr("eBeamSource", "BldInfo(EBeam)");
   m_cavSrc = configStr("phaseCavSource", "BldInfo(PhaseCavity)");
   m_feeSrc = configStr("feeSource", "BldInfo(FEEGasDetEnergy)");
-  m_ipimbSrc = configStr("feeSource", "BldInfo(NH2-SB1-IPM-01)");
+  m_ipimbSrc = configStr("ipimbSource", "BldInfo(NH2-SB1-IPM-01)");
 }
 
 //--------------
