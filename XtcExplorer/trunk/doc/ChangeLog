@@ -11,6 +11,18 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-May-9 ofte               rev 1859
+        D       XtcExplorer/app/xtcbrowser
+        A  +    XtcExplorer/app/xtcexplorer
+
+2011-May-9 ofte               rev 1858
+        Deleting       XtcExplorer/src/XtcBrowserMain.py
+	Adding         XtcExplorer/src/XtcExplorerMain.py
+
+2011-May-9 ofte               rev 1857
+        Changed the name of the package to XtcExplorer (was XtcEventBrowser)
+
+	
 2011-May-6 ofte               rev 1835
         XtcPyanaControl.py
 	- Experimented with threading / subprocesses, but all is restored back I hope. 
