@@ -28,8 +28,10 @@
 //-------------------------------
 
 #include "PSHist/Tuple.h"
+#include "PSHist/Axis.h"
 #include "PSHist/H1.h"
 #include "PSHist/H2.h"
+#include "PSHist/Profile.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -141,37 +143,32 @@ private:
 
 public:
 
-  
-  enum { type_int, 
-         type_float, 
-         type_double };
-  
-
-  //const char type_names[type_double];
+  // 1-d histograms
 
   virtual H1 *hist1i(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh) = 0;
   virtual H1 *hist1i(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
+  virtual H1 *hist1i(const std::string &name, const std::string &title, PSHist::Axis &axis) = 0;
 
   virtual H1 *hist1f(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh) = 0;
   virtual H1 *hist1f(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
+  virtual H1 *hist1f(const std::string &name, const std::string &title, PSHist::Axis &axis) = 0;
+
 
   virtual H1 *hist1d(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh) = 0;
   virtual H1 *hist1d(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
+  virtual H1 *hist1d(const std::string &name, const std::string &title, PSHist::Axis &axis) = 0;
 
+  // 2-d histograms
 
+  virtual H2 *hist2i(const std::string &name, const std::string &title, PSHist::Axis &xaxis, PSHist::Axis &yaxis ) = 0;
+  virtual H2 *hist2f(const std::string &name, const std::string &title, PSHist::Axis &xaxis, PSHist::Axis &yaxis ) = 0;
+  virtual H2 *hist2d(const std::string &name, const std::string &title, PSHist::Axis &xaxis, PSHist::Axis &yaxis ) = 0;
 
-   /*
-   virtual H2 *hist2i(const std::string &hTitle, int XnBins, double Xlow, double Xhigh, 
-                                                int YnBins, double Ylow, double Yhigh) = 0;
+  // 1-d profile histograms
 
-   virtual H2 *hist2f(const std::string &hTitle, int XnBins, double Xlow, double Xhigh, 
-                                                int YnBins, double Ylow, double Yhigh) = 0;
-
-   virtual H2 *hist2d(const std::string &hTitle, int XnBins, double Xlow, double Xhigh, 
-                                                int YnBins, double Ylow, double Yhigh) = 0;
-
-   virtual Tuple *tuple(const std::string &tTitle) = 0;
-   */
+  virtual Profile *prof1(const std::string &name, const std::string &title, int nbinsx, double xlow, double xhigh, double ylow, double yhigh, const std::string &option="") = 0;
+  virtual Profile *prof1(const std::string &name, const std::string &title, int nbins, double *xbinedges, double ylow, double yhigh, const std::string &option="") = 0;
+  virtual Profile *prof1(const std::string &name, const std::string &title, PSHist::Axis &axis, double ylow, double yhigh, const std::string &option="") = 0;
 
    // This function returns a pointer to the ntuple with the given title. 
    // If the ntuple is known (ie. there is an ntuple with that title), the
