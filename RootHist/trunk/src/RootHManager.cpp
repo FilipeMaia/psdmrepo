@@ -25,9 +25,10 @@
 // Collaborating Class Headers --
 //-------------------------------
 
-#include "root/TFile.h"
+//#include "root/TFile.h"
 #include "RootHist/RootH1.h"
 #include "RootHist/RootH2.h"
+#include "RootHist/RootProfile.h"
 
 using std::cout;
 using std::endl;
@@ -131,6 +132,26 @@ PSHist::H2* RootHManager::hist2f(const std::string &name, const std::string &tit
 PSHist::H2* RootHManager::hist2d(const std::string &name, const std::string &title, PSHist::Axis &xaxis, PSHist::Axis &yaxis ) {
   return new RootH2<TH2D> (name, title, xaxis, yaxis);
 }
+
+
+
+//----------------------
+// 1D profile histograms : equi-distant bins and variable bin size profile histograms.
+//----------------------
+
+PSHist::Profile* RootHManager::prof1(const std::string &name, const std::string &title, int nbins, double low, double high, double ylow, double yhigh, const std::string &option) {
+    return new RootProfile (name, title, nbins, low, high, ylow, yhigh, option);
+}
+
+PSHist::Profile* RootHManager::prof1(const std::string &name, const std::string &title, int nbins, double *xbinedges, double ylow, double yhigh, const std::string &option) {
+    return new RootProfile (name, title, nbins, xbinedges, ylow, yhigh, option);
+}
+
+PSHist::Profile* RootHManager::prof1(const std::string &name, const std::string &title, PSHist::Axis &axis, double ylow, double yhigh, const std::string &option) {
+    return new RootProfile (name, title, axis, ylow, yhigh, option);
+}
+
+
 
 //--------------
 //--------------

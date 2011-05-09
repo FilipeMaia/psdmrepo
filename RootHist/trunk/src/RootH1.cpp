@@ -38,6 +38,7 @@ RootH1<HTYPE>::RootH1 ( const std::string &name, const std::string &title, PSHis
 { 
   if(axis.edges()) m_histp = new HTYPE( name.c_str(), title.c_str(), axis.nbins(), axis.edges() ); 
   else             m_histp = new HTYPE( name.c_str(), title.c_str(), axis.nbins(), axis.amin(), axis.amax() );
+  std::cout << "RootH1::RootH1(...) - Created the 1d histogram " << name << " with title=" << title << std::endl;
 }
 
 
@@ -45,7 +46,7 @@ template <typename HTYPE>
 RootH1<HTYPE>::RootH1 ( const std::string &name, const std::string &title, int nbins, double xlow, double xhigh ) : PSHist::H1()
 {
   m_histp = new HTYPE( name.c_str(), title.c_str(), nbins, xlow, xhigh ); 
-  std::cout << "RootH1::RootH1(...) - Created the 1d equal bin size histogram " << name << " with title=" << title << std::endl;
+  std::cout << "RootH1::RootH1(...) - Created the 1d histogram " << name << " with title=" << title << " and equal bin size" << std::endl;
 }
 
 
@@ -53,8 +54,9 @@ template <typename HTYPE>
 RootH1<HTYPE>::RootH1 ( const std::string &name, const std::string &title, int nbins, double *xbinedges ) : PSHist::H1()
 {
   m_histp = new HTYPE( name.c_str(), title.c_str(), nbins, xbinedges ); 
-  std::cout << "RootH1::RootH1(...) - Created the 1d variable bin size histogram " << name << " with title=" << title << std::endl;
+  std::cout << "RootH1::RootH1(...) - Created the 1d histogram " << name << " with title=" << title << " and variable bin size" <<  std::endl;
 }
+
 
 template <typename HTYPE>
 void RootH1<HTYPE>::print( std::ostream &o ) const

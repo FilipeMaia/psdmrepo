@@ -20,10 +20,12 @@
 //----------------------
 // Base Class Headers --
 //----------------------
+
 #include "PSHist/HManager.h"
+#include "PSHist/Axis.h"
 #include "PSHist/H1.h"
 #include "PSHist/H2.h"
-#include "PSHist/Axis.h"
+#include "PSHist/Profile.h"
 
 //#include "RootHist/RootH1.h"
 //#include "PSHist/Tuple.h"
@@ -31,6 +33,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+
+#include "root/TFile.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -93,13 +97,18 @@ public:
   virtual PSHist::H2* hist2f(const std::string &name, const std::string &title, PSHist::Axis &xaxis, PSHist::Axis &yaxis );
   virtual PSHist::H2* hist2d(const std::string &name, const std::string &title, PSHist::Axis &xaxis, PSHist::Axis &yaxis );
 
+
+  // 1-d profile histograms
+
+  virtual PSHist::Profile* prof1(const std::string &name, const std::string &title, int nbinsx, double xlow, double xhigh, double ylow, double yhigh, const std::string &option="");
+  virtual PSHist::Profile* prof1(const std::string &name, const std::string &title, int nbins, double *xbinedges, double ylow, double yhigh, const std::string &option="");
+  virtual PSHist::Profile* prof1(const std::string &name, const std::string &title, PSHist::Axis &axis, double ylow, double yhigh, const std::string &option="");
+
+
 private:
 
   // Data members
   TFile   *m_file;
-
-  //H1      *m_histp;  
-  //RootH1  *m_histp;  
 
   // Copy constructor and assignment are disabled by default
   RootHManager ( const RootHManager& ) ;
