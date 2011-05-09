@@ -4,7 +4,7 @@
 #  $Id$
 #
 # Description:
-#  Module XtcBrowserMain...
+#  Module XtcExplorerMain...
 #
 #------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ part of it, please give an appropriate acknowledgment.
 
 @see RelatedModule
 
-@version $Id: XtcBrowserMain 2011-01-27 14:15:00 ofte $
+@version $Id: XtcExplorerMain 2011-01-27 14:15:00 ofte $
 
 @author Ingrid Ofte
 """
@@ -37,8 +37,6 @@ import sys, os, random
 from    PyQt4 import QtGui, QtCore
 from  XtcScanner import XtcScanner
 from XtcPyanaControl import XtcPyanaControl
-
-import XtcEventDisplay as display
 
 import matplotlib
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -64,7 +62,7 @@ from xbplotter import draw_on
 #  Class definition --
 #---------------------
 
-class XtcBrowserMain (QtGui.QMainWindow) :
+class XtcExplorerMain (QtGui.QMainWindow) :
     """Gui Main Window
     
     Gui Main Widget for browsing Xtc files.
@@ -92,8 +90,8 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
 
-        self.setWindowTitle("LCLS Xtc Event Browser")
-        self.setWindowIcon(QtGui.QIcon('XtcEventBrowser/src/lclsLogo.gif'))
+        self.setWindowTitle("LCLS Xtc Explorer")
+        self.setWindowIcon(QtGui.QIcon('XtcExplorer/src/lclsLogo.gif'))
 
         self.filenames = []
         # list of current files
@@ -103,7 +101,7 @@ class XtcBrowserMain (QtGui.QMainWindow) :
         self.pyanactrl = None
         
         self.create_main_frame()
-        print "Welcome to Xtc Event Display!"
+        print "Welcome to Xtc Explorer!"
 
         
     def create_main_frame(self):
@@ -114,7 +112,7 @@ class XtcBrowserMain (QtGui.QMainWindow) :
 
         # Icon
         self.pic = QtGui.QLabel(self)
-        self.pic.setPixmap( QtGui.QPixmap('XtcEventBrowser/src/lclsLogo.gif'))
+        self.pic.setPixmap( QtGui.QPixmap('XtcExplorer/src/lclsLogo.gif'))
 
         # menu
         self.help_menu = QtGui.QMenu('&Help', self)
@@ -524,7 +522,7 @@ part of it, please give an appropriate acknowledgment.
 if __name__ == "__main__" :
 
     qApp = QtGui.QApplication(sys.argv)
-    mainw = XtcBrowserMain()
+    mainw = XtcExplorerMain()
     mainw.show()
     sys.exit(qApp.exec_())
 
