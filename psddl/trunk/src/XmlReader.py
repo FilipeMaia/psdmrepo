@@ -84,6 +84,7 @@ class XmlReader ( object ) :
         self.inc_dir = inc_dir
         
         self.processed = []
+        self.location = []
 
     #-------------------
     #  Public methods --
@@ -114,7 +115,7 @@ class XmlReader ( object ) :
         """Parse XML tree and return the list of packages"""
 
         # remember current file name 
-        self.location = file
+        self.location.append( file )
 
         # read element tree from file
         et = ET.parse(file)
@@ -143,6 +144,7 @@ class XmlReader ( object ) :
                 raise TypeError('Unexpected element in the root document: '+repr(topel.tag))
 
         self.processed.append(file)
+        del self.location[-1]
 
 
     def _parseUse(self, useel, model):
@@ -242,7 +244,7 @@ class XmlReader ( object ) :
                     tags = self._tags(typeel),
                     package = pkg,
                     included = included,
-                    location = self.location )
+                    location = self.location[-1] )
 
         # get attributes
         for propel in list(typeel) :
