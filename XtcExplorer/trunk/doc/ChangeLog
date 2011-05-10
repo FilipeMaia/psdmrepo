@@ -11,6 +11,13 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-May-10 ofte               rev 1865
+        - removed XtcEventDisplay.py. Not used
+	
+2011-May-10 ofte               rev 1864
+	- Got pyana_waveform.py in a decent working condition
+	- Got rid of some remaining name issues in XtcPyanaControl.py
+
 2011-May-9 ofte               rev 1859
         D       XtcExplorer/app/xtcbrowser
         A  +    XtcExplorer/app/xtcexplorer

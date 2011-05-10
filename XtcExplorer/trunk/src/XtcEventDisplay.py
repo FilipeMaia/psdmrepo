@@ -124,7 +124,7 @@ class XtcEventDisplay ( QtGui.QWidget ) :
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
             
         self.setWindowTitle('Xtc Event Diplay')
-        self.setWindowIcon(QtGui.QIcon('XtcEventBrowser/src/lclsLogo.gif'))
+        self.setWindowIcon(QtGui.QIcon('XtcExplorer/src/lclsLogo.gif'))
 
 
         #l = QtGui.QVBoxLayout(self)

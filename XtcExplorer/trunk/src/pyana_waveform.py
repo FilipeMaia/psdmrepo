@@ -99,22 +99,25 @@ class pyana_waveform (object) :
         self.wf2 = {} # waveform squared (for computation of RMS)
         self.cfg = {}
 
+        # list of channels and source (names)
+        self.src_ch = []
+        
         for source in self.sources:
             print source
 
-            self.ts[source] = None
-            self.wf[source] = None
-            self.wf2[source] = None
-
-            cfg = env.getAcqConfig(self.source)
+            cfg = env.getAcqConfig(source)
             self.cfg[source] = { 'nCh' : cfg.nbrChannels(),
                                  'nSamp' : cfg.horiz().nbrSamples(),
                                  'smpInt' : cfg.horiz().sampInterval() }
 
-            #print "  # channels ", cfg.nbrChannels()
-            #print "  # samples  ", cfg.horiz().nbrSamples()
-            #print "  s interval ", cfg.horiz().sampInterval()
-        
+            for i in range (0, cfg.nbrChannels() ):
+                label =  "%s Ch%s" % (source,i) 
+                self.src_ch.append(label)
+                    
+                self.ts[label] = None
+                self.wf[label] = None
+                self.wf2[label] = None
+
 
     def beginrun( self, evt, env ) :
         """This optional method is called if present at the beginning 
@@ -148,25 +151,30 @@ class pyana_waveform (object) :
 
         for source in self.sources:
 
-            print source , self.cfg[source]['nCh'] 
+            #print source , self.cfg[source]['nCh'] 
             for channel in range ( 0, self.cfg[source]['nCh'] ) :
+
+                label =  "%s Ch%s" % (source,channel) 
 
                 acqData = evt.getAcqValue( source, channel, env)
                 if acqData :
 
-                    if self.ts[source] is None:
-                        self.ts[source] = acqData.timestamps()
+                    if self.ts[label] is None:
+                        self.ts[label] = acqData.timestamps()
                         
                     # average waveform
                     awf = acqData.waveform()
 
-                    if self.wf[source] is None:
-                        self.wf[source] = awf
-                        self.wf2[source] = (awf*awf)
+                    if self.wf[label] is None:
+                        self.wf[label] = awf
+                        self.wf2[label] = (awf*awf)
                     else :
-                        self.wf[source] += awf
-                        self.wf[source] += (awf*awf)
+                        self.wf[label] += awf
+                        self.wf[label] += (awf*awf)
                     
+
+        if (self.n_evts%self.plot_every_n)==0 :
+            self.make_plots()
 
         
     def endcalibcycle( self, env ) :
@@ -193,42 +201,71 @@ class pyana_waveform (object) :
         """
         
         logging.info( "pyana_waveform.endjob() called" )
-
-        fignum = self.mpl_num*100
-
-        for source in self.sources :
-
-            data = np.array(self.data[source])
-            print "shape of data array: ", np.shape(data)
-            self.make_plots(data, self.data[source], suptitle=source)
-
-            #print "shape of edge array: ", np.shape(self.edges[source])
-            #print self.edges[source]
-            #self.make_plots(data, self.edges[source], suptitle=source)
+        self.make_plots()
 
 
-    def make_plots(self, data, edges, fignum=1, suptitle = ""):
-        
-        fig = plt.figure()
-        
-        ax1 = fig.add_subplot(211)
-        xs = np.mean(data, axis=0)
-        
-        nch,nsmp = np.shape(xs)
-        timestamps = xs[0]
-        for i in range (1, nch):
-            plt.plot(timestamps,xs[i])            
-        plt.title('average')
-        plt.xlabel('Seconds')
-        plt.ylabel('Volts')
+
+    def make_plots(self):
+
+        nplots = len(self.src_ch)
+
+        ncols = 1
+        nrows = 1
+        if nplots == 2: ncols = 2
+        if nplots == 3: ncols = 3
+        if nplots == 4: ncols = 2; nrows = 2
+        if nplots > 4:
+            ncols = 3
+            nrows = nplots / 3
+            if nplots%3 > 0 : nrows += 1
             
-        ax2 = fig.add_subplot(212)
-        xt = edges
-
-        plt.plot(xt)
-        plt.xlabel('Bin')
-        plt.ylabel('Edge')
+        height=4.2
+        if (nrows * height) > 14 : height = 14/nrows
+        width=height*1.3
         
-        print "drawing..."
+        fig = plt.figure(num=self.mpl_num, figsize=(width*ncols,height*nrows) )
+        fig.clf()
+        fig.suptitle("Average waveforms after %d shots" % self.n_evts)
+
+        if nplots > 1 :
+            fig.subplots_adjust(wspace=0.45, hspace=0.45)
+
+        pos = 1
+        for source in self.src_ch :
+            
+            self.wf_avg = self.wf[source] / self.n_evts
+            self.wf2_avg = self.wf2[source] / self.n_evts
+            self.wf_rms = np.sqrt( self.wf2_avg - self.wf_avg*self.wf_avg ) / np.sqrt(self.n_evts)
+
+            dim1 = np.shape(self.wf_avg)
+            dim2 = np.shape(self.wf_rms)
+            dim3 = np.shape(self.ts[source])
+
+            #print "Making plot for %s:" % source
+            #print " wf shape ", dim1
+            #print " rms shape ", dim2
+            #print " time shape ", dim3
+
+            ts_axis = self.ts[source]
+            if dim3 != dim1 :
+                ts_axis = self.ts[source][0:dim1[0]]
+
+            ax = fig.add_subplot(nrows,ncols,pos)
+            pos+=1 
+
+            # scientific notation for time axis
+            plt.ticklabel_format(style='sci',axis='x',scilimits=(0,0))
+
+            unit = ts_axis[1]-ts_axis[0]
+            plt.xlim(ts_axis[0]-unit,ts_axis[-1]+unit)
+                
+            plt.errorbar(ts_axis, self.wf_avg,yerr=self.wf_rms, mew=0.0)
+            plt.title(source)
+            plt.xlabel("time   [s]")
+            plt.ylabel("voltage   [V]")
+
+
         plt.draw()
+        print "wf avg histogram plotted for %d sources" % nplots
+        
 

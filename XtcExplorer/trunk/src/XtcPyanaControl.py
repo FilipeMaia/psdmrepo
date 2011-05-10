@@ -9,7 +9,7 @@
 
 """Brief one-line description of the module.
 
-@see XtcBrowserMain.py
+@see XtcExplorerMain.py
 
 @version $Id: template!python!py 4 2011-02-04 16:01:36Z ofte $
 
@@ -104,7 +104,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
     """Gui interface to pyana configuration & control
 
     @see pyana
-    @see XtcBrowserMain
+    @see XtcExplorerMain
     """
 
     #--------------------
@@ -124,7 +124,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
 
         self.setWindowTitle('Pyana Control Center')
-        self.setWindowIcon(QtGui.QIcon('XtcEventBrowser/src/lclsLogo.gif'))
+        self.setWindowIcon(QtGui.QIcon('XtcExplorer/src/lclsLogo.gif'))
 
         # --------------- INPUT --------------
         # these must be initialized before use (by calling module)
@@ -184,7 +184,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # header: icon
         h0 = QtGui.QHBoxLayout()
         pic = QtGui.QLabel(self)
-        pic.setPixmap( QtGui.QPixmap('XtcEventBrowser/src/lclsLogo.gif'))
+        pic.setPixmap( QtGui.QPixmap('XtcExplorer/src/lclsLogo.gif'))
         h0.addWidget( pic )
         h0.setAlignment( pic, QtCore.Qt.AlignLeft )
 
@@ -525,7 +525,7 @@ General settings:
         self.pvWindow = QtGui.QWidget()
         self.pvWindow.setStyleSheet("QWidget {background-color: #FFFFFF }")
         self.pvWindow.setWindowTitle('Available Epics PVs')
-        self.pvWindow.setWindowIcon(QtGui.QIcon('XtcEventBrowser/src/lclsLogo.gif'))
+        self.pvWindow.setWindowIcon(QtGui.QIcon('XtcExplorer/src/lclsLogo.gif'))
         self.pvWindow.setMinimumWidth(300)
         self.pvWindow.setMinimumHeight(700)
 
@@ -584,7 +584,7 @@ General settings:
         nmodules = len(modules_to_run)
         if nmodules > 0 :
             # at the end, append plotter module:
-            modules_to_run.append("XtcEventBrowser.pyana_plotter")
+            modules_to_run.append("XtcExplorer.pyana_plotter")
             options_for_mod.append([])
             options_for_mod[nmodules].append("\ndisplay_mode = %s"%self.displaymode )
             options_for_mod[nmodules].append("\nipython = %d"%self.ipython)
@@ -641,11 +641,11 @@ General settings:
   
         index = None
         try:
-            index = modules_to_run.index("XtcEventBrowser.pyana_scan")
+            index = modules_to_run.index("XtcExplorer.pyana_scan")
         except ValueError :
             print "ValueError"
             
-        #print "XtcEventBrowser.pyana_scan at ", index
+        #print "XtcExplorer.pyana_scan at ", index
         source = str(box.text())
         if source.find("BldInfo")>=0 :
             options_for_mod[index].append("\ninput_scalars = %s" % source.split(": ")[1] )
@@ -670,13 +670,13 @@ General settings:
         # --- --- --- Scan --- --- ---
         if str(box.text()).find("ControlPV:")>=0 :
             try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_scan")
+                index = modules_to_run.index("XtcExplorer.pyana_scan")
             except ValueError :
                 index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_scan")
+                modules_to_run.append("XtcExplorer.pyana_scan")
                 options_for_mod.append([])
 
-            #print "XtcEventBrowser.pyana_scan at ", index
+            #print "XtcExplorer.pyana_scan at ", index
             pvname = str(box.text()).split("PV: ")[1]
             options_for_mod[index].append("\ncontrolpv = %s" % pvname)
             options_for_mod[index].append("\ninput_epics = ")
@@ -688,13 +688,13 @@ General settings:
         # --- --- --- BLD --- --- ---
         if str(box.text()).find("BldInfo")>=0 :
             try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_bld")
+                index = modules_to_run.index("XtcExplorer.pyana_bld")
             except ValueError :
                 index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_bld")
+                modules_to_run.append("XtcExplorer.pyana_bld")
                 options_for_mod.append([])
 
-            #print "XtcEventBrowser.pyana_bld at ", index
+            #print "XtcExplorer.pyana_bld at ", index
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             if str(box.text()).find("EBeam")>=0 :
@@ -714,13 +714,13 @@ General settings:
              str(box.text()).find("Mbes")>=0  or
              str(box.text()).find("Camp")>=0  ) :
             try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_waveform")
+                index = modules_to_run.index("XtcExplorer.pyana_waveform")
             except ValueError :
                 index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_waveform")
+                modules_to_run.append("XtcExplorer.pyana_waveform")
                 options_for_mod.append([])
 
-            #print "XtcEventBrowser.pyana_ipimb at ", index
+            #print "XtcExplorer.pyana_ipimb at ", index
             address = str(box.text()).split(":")[1].strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
@@ -730,13 +730,13 @@ General settings:
         # --- --- --- Ipimb --- --- ---
         if str(box.text()).find("Ipimb")>=0 :
             try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_ipimb")
+                index = modules_to_run.index("XtcExplorer.pyana_ipimb")
             except ValueError :
                 index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_ipimb")
+                modules_to_run.append("XtcExplorer.pyana_ipimb")
                 options_for_mod.append([])
 
-            #print "XtcEventBrowser.pyana_ipimb at ", index
+            #print "XtcExplorer.pyana_ipimb at ", index
             address = str(box.text()).split(": ")[1].strip()
             options_for_mod[index].append("\nipimb_addresses = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
@@ -748,13 +748,13 @@ General settings:
              str(box.text()).find("Opal1000")>=0 or
              str(box.text()).find("Princeton")>=0 ) :
             try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_image")
+                index = modules_to_run.index("XtcExplorer.pyana_image")
             except ValueError :
                 index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_image")
+                modules_to_run.append("XtcExplorer.pyana_image")
                 options_for_mod.append([])
 
-            #print "XtcEventBrowser.pyana_image at ", index
+            #print "XtcExplorer.pyana_image at ", index
             address = str(box.text()).split(": ")[1].strip()
             options_for_mod[index].append("\nimage_addresses = %s" % address)
             options_for_mod[index].append("\nimage_rotations = " )
@@ -772,13 +772,13 @@ General settings:
         # --- --- --- CsPad --- --- ---
         if str(box.text()).find("Cspad")>=0 :
             try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_cspad")
+                index = modules_to_run.index("XtcExplorer.pyana_cspad")
             except ValueError :
                 index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_cspad")
+                modules_to_run.append("XtcExplorer.pyana_cspad")
                 options_for_mod.append([])
 
-            #print "XtcEventBrowser.pyana_cspad at ", index
+            #print "XtcExplorer.pyana_cspad at ", index
             address = str(box.text()).split(":")[1].strip()
             options_for_mod[index].append("\nimage_source = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
@@ -797,13 +797,13 @@ General settings:
         if str(box.text()).find("EpicsPV:")>=0 :
 
             try :
-                index = modules_to_run.index("XtcEventBrowser.pyana_epics")
+                index = modules_to_run.index("XtcExplorer.pyana_epics")
             except ValueError :
                 index = len(modules_to_run)
-                modules_to_run.append("XtcEventBrowser.pyana_epics")
+                modules_to_run.append("XtcExplorer.pyana_epics")
                 options_for_mod.append([])
 
-            #print "XtcEventBrowser.pyana_epics at ", index
+            #print "XtcExplorer.pyana_epics at ", index
             pvname = str(box.text()).split("PV:  ")[1]
             options_for_mod[index].append("\npv = %s" % pvname)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n )
