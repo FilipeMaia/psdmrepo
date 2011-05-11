@@ -26,9 +26,11 @@
 
 #include "RootHist/RootHManager.h"
 #include "PSHist/HManager.h"
+#include "PSHist/Axis.h"
 #include "PSHist/H1.h"
 #include "PSHist/H2.h"
-#include "PSHist/Axis.h"
+#include "PSHist/Tuple.h"
+#include "PSHist/Column.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -55,7 +57,6 @@ int main ()
 
 
   // Axis
-
   PSHist::Axis axis1(60,0,1);
   PSHist::Axis axis2(40,0,1);
   PSHist::Axis axis3(10,edges);
@@ -85,6 +86,19 @@ int main ()
   PSHist::Profile *pP1_4 = hMan->prof1( "P1_N0004", "My profile 4 title^{#lambda}",  axis3,     0, 1 ); 
 
 
+  // Tuple
+  PSHist::Tuple *pTuple_1 = hMan->tuple( "TUPLE_N1", "My tuple title^{#alpha}" ); 
+
+  // Column (parameter(s)) for the tuple
+  // The ROOT-style constructor
+  double val;
+  PSHist::Column *pColumn_1 = pTuple_1->column( "C_N0001", &val, "EBEAM/D" );
+
+  float freq;
+  PSHist::Column *pColumn_2 = pTuple_1->column( "C_N0002", &freq, "Freq/F" );
+
+
+
   cout << "Fill histograms" << endl;
 	for (int i=0; i<10000; i++)
 	  {
@@ -102,6 +116,10 @@ int main ()
             pP1_2 -> fill( gRandom->Gaus(0.5, 0.1), gRandom->Rndm(1) );
             pP1_3 -> fill( gRandom->Gaus(0.4, 0.1), gRandom->Gaus(0.6, 0.2) );
             pP1_4 -> fill( gRandom->Gaus(0.3, 0.2), gRandom->Gaus(0.7, 0.1) );
+
+	    val  = gRandom->Gaus(2.5, 0.1);
+	    freq = gRandom->Gaus(1.5, 0.1);
+            pTuple_1 -> fill();
 	  }
 
   hMan -> write();
