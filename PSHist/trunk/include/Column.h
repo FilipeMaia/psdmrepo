@@ -1,12 +1,12 @@
-#ifndef PSHIST_TUPLE_H
-#define PSHIST_TUPLE_H
+#ifndef PSHIST_COLUMN_H
+#define PSHIST_COLUMN_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class Tuple.
+//	Class Column.
 //
 //------------------------------------------------------------------------
 
@@ -26,8 +26,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 
-#include "PSHist/Column.h"
-
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
@@ -40,9 +38,9 @@ namespace PSHist {
 
 /**
  *  PSHist is a fully abstract package for histogramming in PSANA
- *  Tuple is an abstract class which provides the final-package-implementation-independent
- *  interface to the N-tuple-like object. All methods of this class are virtual and should
- *  be implemented in derived package/class, i.e. RootHist/RootTuple.
+ *  Column is an abstract class which provides the final-package-implementation-independent
+ *  interface to the N-tuple-like parameter. All methods of this class are virtual and should
+ *  be implemented in derived package/class, i.e. RootHist/RootColumn.
  *   
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -54,24 +52,18 @@ namespace PSHist {
  *  @author Mikhail S. Dubrovin
  */
 
-class Tuple  {
+class Column  {
 public:
 
   // Default constructor
-  Tuple () {}
+  Column () {}
 
   // Destructor
-  virtual ~Tuple () {}
+  virtual ~Column () {}
 
   // Selectors (const)
 
   // Modifiers
-
-  virtual Column* column( const std::string &name, void* address, const std::string &columnlist ) = 0;
-
-  virtual void fill() = 0;
-
-  virtual void reset() = 0;
 
   virtual void print(std::ostream &o) const = 0;
 
@@ -79,8 +71,8 @@ public:
 private:
 
   // Copy constructor and assignment are disabled by default
-  Tuple ( const Tuple& ) ;
-  Tuple& operator = ( const Tuple& ) ;
+  Column ( const Column& ) ;
+  Column& operator = ( const Column& ) ;
 
   // Data members
   
@@ -89,4 +81,4 @@ private:
 
 } // namespace PSHist
 
-#endif // PSHIST_TUPLE_H
+#endif // PSHIST_COLUMN_H

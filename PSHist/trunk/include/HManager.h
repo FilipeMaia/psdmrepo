@@ -27,11 +27,11 @@
 // Collaborating Class Headers --
 //-------------------------------
 
-#include "PSHist/Tuple.h"
 #include "PSHist/Axis.h"
 #include "PSHist/H1.h"
 #include "PSHist/H2.h"
 #include "PSHist/Profile.h"
+#include "PSHist/Tuple.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -56,12 +56,13 @@ namespace PSHist {
  *  
  *  Usage
  *  =====
- *  #include "PSHist/HManager.h"
  *  #include "RootHist/RootHManager.h"
+ *  #include "PSHist/HManager.h"
+ *  #include "PSHist/Axis.h"
  *  #include "PSHist/H1.h"
  *  #include "PSHist/H2.h"
+ *  #include "PSHist/Profile.h"  
  *  #include "PSHist/Tuple.h"
- *  
  *  
  *  
  *  1. Create a HManager with specific constructor (root for example):
@@ -146,16 +147,15 @@ public:
   // 1-d histograms
 
   virtual H1 *hist1i(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh) = 0;
-  virtual H1 *hist1i(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
-  virtual H1 *hist1i(const std::string &name, const std::string &title, PSHist::Axis &axis) = 0;
-
   virtual H1 *hist1f(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh) = 0;
-  virtual H1 *hist1f(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
-  virtual H1 *hist1f(const std::string &name, const std::string &title, PSHist::Axis &axis) = 0;
-
-
   virtual H1 *hist1d(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh) = 0;
+
+  virtual H1 *hist1i(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
+  virtual H1 *hist1f(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
   virtual H1 *hist1d(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
+
+  virtual H1 *hist1i(const std::string &name, const std::string &title, PSHist::Axis &axis) = 0;
+  virtual H1 *hist1f(const std::string &name, const std::string &title, PSHist::Axis &axis) = 0;
   virtual H1 *hist1d(const std::string &name, const std::string &title, PSHist::Axis &axis) = 0;
 
   // 2-d histograms
@@ -166,9 +166,17 @@ public:
 
   // 1-d profile histograms
 
-  virtual Profile *prof1(const std::string &name, const std::string &title, int nbinsx, double xlow, double xhigh, double ylow, double yhigh, const std::string &option="") = 0;
-  virtual Profile *prof1(const std::string &name, const std::string &title, int nbins, double *xbinedges, double ylow, double yhigh, const std::string &option="") = 0;
-  virtual Profile *prof1(const std::string &name, const std::string &title, PSHist::Axis &axis, double ylow, double yhigh, const std::string &option="") = 0;
+  virtual Profile *prof1(const std::string &name, const std::string &title, int nbinsx, double xlow, double xhigh, 
+                                                  double ylow, double yhigh, const std::string &option="") = 0;
+  virtual Profile *prof1(const std::string &name, const std::string &title, int nbins, double *xbinedges, 
+                                                  double ylow, double yhigh, const std::string &option="") = 0;
+  virtual Profile *prof1(const std::string &name, const std::string &title, PSHist::Axis &axis, 
+                                                  double ylow, double yhigh, const std::string &option="") = 0;
+
+  // Tuple
+
+  virtual Tuple *tuple(const std::string &name, const std::string &title) = 0;
+
 
    // This function returns a pointer to the ntuple with the given title. 
    // If the ntuple is known (ie. there is an ntuple with that title), the
