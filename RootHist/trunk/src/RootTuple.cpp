@@ -42,7 +42,7 @@ RootTuple::RootTuple ( const std::string &name, const std::string &title )
 
 
 PSHist::Column* RootTuple::column( const std::string &name, void* address, const std::string &columnlist ) {
-  cout << "RootTuple::column(...) - create the RootColumn " << name << " with list of parameters: " << columnlist.c_str() << endl;
+  // cout << "RootTuple::column(...) - create the RootColumn " << name << " with list of parameters: " << columnlist.c_str() << endl;
   return new RootColumn (this, name, address, columnlist);
 }
 

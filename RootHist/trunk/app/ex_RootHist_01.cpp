@@ -87,17 +87,19 @@ int main ()
 
 
   // Tuple
-  PSHist::Tuple *pTuple_1 = hMan->tuple( "TUPLE_N1", "My tuple title^{#alpha}" ); 
+  PSHist::Tuple *pTuple = hMan->tuple( "TUPLE_N1", "My tuple title^{#alpha}" ); 
 
-  // Column (parameter(s)) for the tuple
-  // The ROOT-style constructor
+  // Column (parameter(s)) for the tuple; use the ROOT-style constructor
   double val;
-  PSHist::Column *pColumn_1 = pTuple_1->column( "C_N0001", &val, "EBEAM/D" );
-
   float freq;
-  PSHist::Column *pColumn_2 = pTuple_1->column( "C_N0002", &freq, "Freq/F" );
+  typedef struct {float x,y,z;} POINT;
+  static POINT point;
 
+  PSHist::Column *pColumn_1 = pTuple->column( "C_N0001", &val,  "EBEAM/D" );
+                              pTuple->column( "C_N0002", &freq, "Freq/F"  );
+                              pTuple->column( "point",   &point,"x:y:z"   );
 
+                  pColumn_1->print(cout);
 
   cout << "Fill histograms" << endl;
 	for (int i=0; i<10000; i++)
@@ -119,7 +121,12 @@ int main ()
 
 	    val  = gRandom->Gaus(2.5, 0.1);
 	    freq = gRandom->Gaus(1.5, 0.1);
-            pTuple_1 -> fill();
+
+            point.x = gRandom->Gaus(1, 1); 
+            point.y = gRandom->Gaus(2, 1); 
+            point.z = gRandom->Gaus(3, 1); 
+
+            pTuple -> fill();
 	  }
 
   hMan -> write();
@@ -128,83 +135,4 @@ int main ()
 
 }
 
-
-/*
-
-int garbage()
-{
-
-  TFile *pfile = new TFile("file.root", "RECREATE", "Created for you by RootManager" );
-  cout << "Open Root file with name : " << pfile ->GetName() << endl;
-
-
-  cout << "Create histogram" << endl;
-  TH1D *pHis1 = new TH1D("pHis1","My comment to TH1D", 100, 0.5, 100+0.5);
-
-
-  cout << "Reset and fill histogram" << endl;
-        pHis1 -> Reset();
-	for (int i=0 ;i<10000;i++)
-	  {
-            double random = 100 * gRandom->Rndm(1);
-
-	    //pHis1 -> Fill( double(i), 0.1*i );
-	    pHis1 -> Fill( random );
-
-	  }
-
-
-  cout << "Write histogram in file" << endl;
-        pHis1 -> Write();
-
-
-// Define some simple structures
-   typedef struct {float x,y,z;} POINT;
-
-   static POINT point;
-
-
-  cout << "Create tree" << endl;
-//TTree *t3 = (TTree*)->Get("t3"); // if tuple existed
-  TTree *ptree = new TTree("ptree", "My comment to TTree");
-
-
-  cout << "Create  a couple of branches" << endl;
-  float new_v;
-  TBranch *pbranch = ptree->Branch("new_v", &new_v, "new_v/F");
-
-                     ptree->Branch("point",&point,"x:y:z");
-
-
-  cout << "Fill branch" << endl;
-  for (int i = 0; i < 10000; i++){
-
-      new_v   = gRandom->Gaus(0, 1);
-
-      point.x = gRandom->Gaus(1, 1); 
-      point.y = gRandom->Gaus(2, 1); 
-      point.z = gRandom->Gaus(3, 1); 
-
-      ptree->Fill();
-      //pbranch->Fill();
-  }
-
-
-  cout << "Write tree in file" << endl;
-  ptree -> Write();
-
-  
-  cout << "Close file" << endl;
-  pfile -> Close();
-
-
-  //cout << "Delete all objects" << endl;
-  //delete pHis1;
-  //delete ptree;
-
-  return 0;
-
-}
-
-
-*/
+//===================== EOF

@@ -40,13 +40,13 @@ RootColumn::RootColumn (RootTuple* tuple, const std::string &name, void* address
 
   m_column = tuple -> getTuplePointer() -> Branch(name.c_str(), address, columnlist.c_str()); 
 
-  cout << "RootColumn::RootColumn(...) - Created the column " << name 
-       << " with list of parameters: " << columnlist.c_str() << endl;
+  cout << "RootColumn::RootColumn(...) - Created the column '" << name 
+       << "' with the list of parameters: " << columnlist.c_str() << endl;
 }
 
 
 void RootColumn::print( std::ostream &o ) const { 
-  o << "RootColumn" << endl;
+  o << "RootColumn::print(...) " << endl;
 }
 
 
