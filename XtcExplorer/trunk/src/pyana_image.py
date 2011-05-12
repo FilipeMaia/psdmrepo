@@ -33,7 +33,7 @@ import h5py
 #-----------------------------
 from pypdsdata import xtc
 
-from xbplotter import Plotter
+from utilities import Plotter
 from utilities import PyanaOptions
 
 #---------------------
@@ -43,23 +43,23 @@ class  pyana_image ( object ) :
 
     # initialize
     def __init__ ( self,
-                   image_addresses = None,
-                   plot_every_n = None,
-                   fignum = "1", 
-                   good_range="0--999999",
-                   dark_range="-999999--0",
+                   img_sources = None,
+                   good_range = "0,999999",
+                   dark_range = "-999999,0",
                    image_rotations = None,
                    image_shifts = None,
                    image_scales = None,
                    image_nicknames = None,
                    image_manipulations = None, 
                    output_file = None,
-                   n_hdf5 = None ):
+                   n_hdf5 = None ,
+                   plot_every_n = None,
+                   fignum = "1" ):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
         All parameters are passed as strings
 
-        @param image_addresses   (list) address string of Detector-Id|Device-ID
+        @param img_sources   (list) address string of Detector-Id|Device-ID
         @param plot_every_n     Frequency for plotting. If n=0, no plots till the end
         @param fignum           Matplotlib figure number
         @param good_range       threshold values selecting images of interest
@@ -76,16 +76,16 @@ class  pyana_image ( object ) :
         self.plot_every_n  =  opt.getOptInteger(plot_every_n)
         self.mpl_num = opt.getOptInteger(fignum)
 
-        self.image_addresses = opt.getOptStrings(image_addresses)
-        print image_addresses, self.image_addresses
-        nsources = len(self.image_addresses)
+        self.img_sources = opt.getOptStrings(img_sources)
+        print img_sources, self.img_sources
+        nsources = len(self.img_sources)
         print "pyana_image, %d sources: " % nsources
-        for sources in self.image_addresses :
+        for sources in self.img_sources :
             print "  ", sources
 
         self.image_nicknames = []
         if image_nicknames is None:
-            for i in range (0, len(self.image_addresses) ):
+            for i in range (0, len(self.img_sources) ):
                 self.image_nicknames.append( "Im%d"%(i+1) )
         else :
             self.image_nicknames = image_nicknames.split(" ")
@@ -100,7 +100,7 @@ class  pyana_image ( object ) :
                 list_of_rotations = image_rotations.split(" ")
                 if len(list_of_rotations) != nsources: print "Plz provide rotation angles for *all* images!"
                 i = 0
-                for source in self.image_addresses :
+                for source in self.img_sources :
                     self.image_rotations[source] = float( list_of_rotations[i] )
                     i+=1
                 
@@ -114,7 +114,7 @@ class  pyana_image ( object ) :
                 list_of_shifts =  image_shifts.split(" ") 
                 if len(list_of_shifts) != nsources: print "Plz provide shift amount for *all* images!"
                 i = 0
-                for source in self.image_addresses :
+                for source in self.img_sources :
                     shift = list_of_shifts[i].lstrip("(").rstrip(")").split(",")
                     self.image_shifts[source] = (int(shift[0]), int(shift[1]))
                     i+=1
@@ -147,10 +147,10 @@ class  pyana_image ( object ) :
 
                 
         # ranges
-        tli = str(good_range).split("--")[0]
-        thi = str(good_range).split("--")[1]
-        tld = str(dark_range).split("--")[0]
-        thd = str(dark_range).split("--")[1]
+        tli = str(good_range).split(",")[0]
+        thi = str(good_range).split(",")[1]
+        tld = str(dark_range).split(",")[0]
+        thd = str(dark_range).split(",")[1]
 
         self.thr_low_image = float( tli )
         self.thr_high_image = float( thi )
@@ -169,7 +169,7 @@ class  pyana_image ( object ) :
                 self.n_hdf5 = int(n_hdf5)
 
         # to keep track
-        self.n_events = 0
+        self.n_shots = 0
 
         # averages
         self.image_data = {}
@@ -179,7 +179,7 @@ class  pyana_image ( object ) :
         self.fignum = {}
         self.n_img = {}
         self.n_dark = {}
-        for addr in self.image_addresses :
+        for addr in self.img_sources :
             self.image_data[addr] = None
             self.dark_data[addr] = None
 
@@ -187,7 +187,7 @@ class  pyana_image ( object ) :
             self.lolimits[addr] = []
             self.hilimits[addr] = []
 
-            self.fignum[addr] = self.mpl_num*10 + 100*self.image_addresses.index(addr)
+            self.fignum[addr] = self.mpl_num*10 + 100*self.img_sources.index(addr)
 
             self.n_img[addr] = 0
             self.n_dark[addr] = 0
@@ -210,20 +210,20 @@ class  pyana_image ( object ) :
     def event ( self, evt, env ) :
 
         # this one counts every event
-        self.n_events+=1
-        self.plotter.shot_number = self.n_events
+        self.n_shots+=1
+        self.plotter.shot_number = self.n_shots
 
         # print a progress report
-        if (self.n_events%1000)==0 :
-            print "Event ", self.n_events
+        if (self.n_shots%1000)==0 :
+            print "Event ", self.n_shots
 
 
         # new hdf5-file every N events
         if self.output_file is not None :
             if ".hdf5" in self.output_file and self.n_hdf5 is not None:
-                if (self.n_events%self.n_hdf5)==1 :
-                    start = self.n_events # this event
-                    stop = self.n_events+self.n_hdf5-1
+                if (self.n_shots%self.n_hdf5)==1 :
+                    start = self.n_shots # this event
+                    stop = self.n_shots+self.n_hdf5-1
                     self.sub_output_file = self.output_file.replace('.hdf5',"_%d-%d.hdf5"%(start,stop) )
                     print "opening %s for writing" % self.sub_output_file
                     self.hdf5file = h5py.File(self.sub_output_file, 'w')
@@ -232,7 +232,7 @@ class  pyana_image ( object ) :
         event_display_images = []
 
         # get the requested images
-        for addr in self.image_addresses :
+        for addr in self.img_sources :
         
             frame = evt.getFrameValue(addr)
             if not frame :
@@ -325,7 +325,7 @@ class  pyana_image ( object ) :
         # -----------------------------------
         # Draw images from this event
         # -----------------------------------
-        if self.plot_every_n and (self.n_events%self.plot_every_n)==0 :
+        if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
             self.plotter.draw_figurelist( self.mpl_num, event_display_images)
 
         # -----------------------------------
@@ -333,7 +333,7 @@ class  pyana_image ( object ) :
         # -----------------------------------
         if self.hdf5file is not None :
             # save this event as a group in hdf5 file:
-            group = self.hdf5file.create_group("Event%d" % self.n_events)
+            group = self.hdf5file.create_group("Event%d" % self.n_shots)
         
         # save the average data image (numpy array)
         # binary file .npy format
@@ -344,7 +344,7 @@ class  pyana_image ( object ) :
                 fname = self.output_file.split('.')
                 label = ad.replace("|","_")
                 label = label.replace(" ","")
-                filnamn = ''.join( (fname[0],"%s_ev%d."%(label,self.n_events),fname[-1]) )
+                filnamn = ''.join( (fname[0],"%s_ev%d."%(label,self.n_shots),fname[-1]) )
 
                 # HDF5
                 if self.hdf5file is not None :
@@ -371,11 +371,11 @@ class  pyana_image ( object ) :
         if self.hdf5file is not None :
             self.hdf5file.close()
 
-        print "Done processing       ", self.n_events, " events"
+        print "Done processing       ", self.n_shots, " events"
         print "Range defining images: %f (lower) - %f (upper)" % (self.thr_low_image, self.thr_high_image)
         print "Range defining darks: %f (lower) - %f (upper)" %  (self.thr_low_dark, self.thr_high_dark)
         
-        for addr in self.image_addresses:
+        for addr in self.img_sources:
             print "# Signal images from %s = %d "% (addr, self.n_img[addr])
             print "# Dark images from %s = %d" % (addr, self.n_dark[addr])
 

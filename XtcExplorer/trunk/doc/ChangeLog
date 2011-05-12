@@ -11,6 +11,15 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-May-10 ofte                  rev 1876
+       - some cosmetic and some functional improvements
+       - removed xbplotter, moved Threshold and Plotter classes into the utilities library
+       - consistent parameter style, use comma for ranges. 
+       - consistent event/shot counter (self.n_shots)
+	
+2011-May-10 ofte  tag V00-01-01   rev 1866
+       - No other changes. Just to have a reference for confluence. 
+	
 2011-May-10 ofte               rev 1865
         - removed XtcEventDisplay.py. Not used
 	

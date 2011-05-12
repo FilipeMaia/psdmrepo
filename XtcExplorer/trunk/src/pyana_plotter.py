@@ -100,7 +100,7 @@ class pyana_plotter (object) :
         @param display_mode        Interactive (1) or SlideShow (2) or NoDisplay (0)
         @param ipython             Drop into ipython at the end of the job
         """
-        self.nevents = 0
+        self.n_shots = 0
 
         self.display_mode = None
         if display_mode == "NoDisplay" : self.display_mode = 0
@@ -165,7 +165,7 @@ class pyana_plotter (object) :
         @param evt    event data object
         @param env    environment object
         """
-        self.nevents += 1
+        self.n_shots += 1
 
         # if any module changed the display mode, pick it up (we're last)
         event_display_mode = evt.get('display_mode')

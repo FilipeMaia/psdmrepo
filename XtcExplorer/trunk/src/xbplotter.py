@@ -55,7 +55,7 @@ class Threshold( object ) :
         self.area = area        
         self.minvalue = minvalue
         self.maxvalue = maxvalue
-
+        
 
 class Plotter(object):
     def __init__(self):

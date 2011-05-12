@@ -93,7 +93,7 @@ class pyana_waveform (object) :
         logging.info( "pyana_waveform.beginjob() called " )
 
         # containers to store data from this job
-        self.n_evts = 0
+        self.n_shots = 0
         self.ts = {} # time waveform
         self.wf = {} # voltage waveform
         self.wf2 = {} # waveform squared (for computation of RMS)
@@ -147,7 +147,7 @@ class pyana_waveform (object) :
         """
         logging.info( "pyana_waveform.event() called ")
         
-        self.n_evts+=1
+        self.n_shots+=1
 
         for source in self.sources:
 
@@ -173,7 +173,7 @@ class pyana_waveform (object) :
                         self.wf[label] += (awf*awf)
                     
 
-        if (self.n_evts%self.plot_every_n)==0 :
+        if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
             self.make_plots()
 
         
@@ -225,7 +225,7 @@ class pyana_waveform (object) :
         
         fig = plt.figure(num=self.mpl_num, figsize=(width*ncols,height*nrows) )
         fig.clf()
-        fig.suptitle("Average waveforms after %d shots" % self.n_evts)
+        fig.suptitle("Average waveforms after %d shots" % self.n_shots)
 
         if nplots > 1 :
             fig.subplots_adjust(wspace=0.45, hspace=0.45)
@@ -233,9 +233,9 @@ class pyana_waveform (object) :
         pos = 1
         for source in self.src_ch :
             
-            self.wf_avg = self.wf[source] / self.n_evts
-            self.wf2_avg = self.wf2[source] / self.n_evts
-            self.wf_rms = np.sqrt( self.wf2_avg - self.wf_avg*self.wf_avg ) / np.sqrt(self.n_evts)
+            self.wf_avg = self.wf[source] / self.n_shots
+            self.wf2_avg = self.wf2[source] / self.n_shots
+            self.wf_rms = np.sqrt( self.wf2_avg - self.wf_avg*self.wf_avg ) / np.sqrt(self.n_shots)
 
             dim1 = np.shape(self.wf_avg)
             dim2 = np.shape(self.wf_rms)

@@ -33,7 +33,7 @@ class  pyana_ipimb ( object ) :
         self.mpl_num = opt.getOptInteger(fignum)
         self.plot_every_n = opt.getOptInteger(plot_every_n)
 
-        self.shot_number = None
+        self.n_shots = None
 
         self.fex_sum = {}
         self.fex_channels = {}
@@ -45,11 +45,11 @@ class  pyana_ipimb ( object ) :
 
 
     def beginjob ( self, evt, env ) : 
-        self.shot_number = 0
+        self.n_shots = 0
 
     def event ( self, evt, env ) :
 
-        self.shot_number+=1
+        self.n_shots+=1
 
         # IPM diagnostics, for saturation and low count filtering
         for addr in self.ipimb_addresses :
@@ -73,13 +73,13 @@ class  pyana_ipimb ( object ) :
 
 
         if self.plot_every_n != 0: 
-            if (self.shot_number%self.plot_every_n)==0 : 
-                print "Shot#%d ... plotting " % self.shot_number
-                self.make_plots(title="IPIMB info accumulated up to shot#%d"%self.shot_number)
+            if (self.n_shots%self.plot_every_n)==0 : 
+                print "Shot#%d ... plotting " % self.n_shots
+                self.make_plots(title="IPIMB info accumulated up to shot#%d"%self.n_shots)
                 
     def endjob( self, env ) :
 
-        self.make_plots(title="IPIMB info accumulated from all %d shots"%self.shot_number)
+        self.make_plots(title="IPIMB info accumulated from all %d shots"%self.n_shots)
 
 
     def make_plots(self, title = ""):

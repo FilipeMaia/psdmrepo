@@ -199,7 +199,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
         # to the right:
         self.config_tabs = QtGui.QTabWidget()
-        self.config_tabs.setMinimumWidth(500)
+        self.config_tabs.setMinimumWidth(600)
         self.intro_tab()
         h1.addWidget(self.config_tabs)
 
@@ -241,11 +241,10 @@ General settings:
         self.connect(self.run_n_change_btn, QtCore.SIGNAL('clicked()'), self.run_n_change )
 
         self.run_n_layout = QtGui.QHBoxLayout()
-        self.run_n_layout.setAlignment(QtCore.Qt.AlignRight)
         self.run_n_layout.addWidget(self.run_n_status)
         self.run_n_layout.addWidget(self.run_n_enter)
         self.run_n_layout.addWidget(self.run_n_change_btn)
-        self.help_layout.addLayout(self.run_n_layout )
+        self.help_layout.addLayout(self.run_n_layout, QtCore.Qt.AlignRight )
 
         self.skip_n_layout = QtGui.QHBoxLayout()
         self.skip_n_status = QtGui.QLabel("Skip no events")
@@ -287,10 +286,11 @@ General settings:
 
         self.dmode_menu = QtGui.QComboBox()
         self.dmode_menu.setMaximumWidth(90)
-        self.connect(self.dmode_menu,  QtCore.SIGNAL('currentIndexChanged(int)'), self.process_dmode )
+        self.dmode_menu.addItem("NoDisplay")
         self.dmode_menu.addItem("SlideShow")
         self.dmode_menu.addItem("Interactive")
-        self.dmode_menu.addItem("NoDisplay")
+        self.dmode_menu.setCurrentIndex(1) # SlideShow
+        self.connect(self.dmode_menu,  QtCore.SIGNAL('currentIndexChanged(int)'), self.process_dmode )
         self.dmode_layout.addWidget(self.dmode_status)
         self.dmode_layout.addWidget(self.dmode_menu)
         self.help_layout.addLayout(self.dmode_layout, QtCore.Qt.AlignRight)
@@ -309,7 +309,7 @@ General settings:
         self.ipython_layout.addWidget(self.ipython_menu)
         self.help_layout.addLayout(self.ipython_layout)
 
-        self.config_tabs.addTab(self.help_widget,"General")
+        self.config_tabs.addTab(self.help_widget,"General Settings")
         self.config_tabs.tabBar().hide()
 
 
@@ -321,8 +321,14 @@ General settings:
     def process_dmode(self):
         self.displaymode = self.dmode_menu.currentText()
         self.dmode_status.setText("Display mode is %s"%self.displaymode)
-        
+        print "hah!"
+        if self.displaymode == "NoDisplay" :
+            self.plot_n = 0
+            self.plotn_status.setText("Plot only after all events")
+
+            
     def plotn_change(self):
+        print "plotn_change"
         self.plot_n = self.plotn_enter.text()
         if self.plot_n == "":
             self.plot_n = 0
@@ -330,6 +336,10 @@ General settings:
         else:
             self.plot_n = int(self.plot_n)
             self.plotn_status.setText("Plot every %d events"%self.plot_n )
+            if self.displaymode == "NoDisplay" :
+                self.displaymode = "SlideShow"
+                self.dmode_status.setText("Display mode is %s"%self.displaymode)                
+                self.dmode_menu.setCurrentIndex(1) # SlideShow
         self.plotn_enter.setText("")
 
     def run_n_change(self):
@@ -397,7 +407,7 @@ General settings:
             self.econfig_button.hide()
             pyana_layout.addLayout(pyana_button_layout)
             
-            self.config_tabs.addTab(pyana_widget,"Pyana")
+            self.config_tabs.addTab(pyana_widget,"Pyana Configuration")
 
             self.config_tabs.tabBar().show()
             self.pyana_widget = pyana_widget
@@ -428,6 +438,8 @@ General settings:
 
         # if scan, plot every calib cycle 
         if self.ncalib > 1 :
+            print "Have %d scan steps a %d events each. Set up to plot after every %d shots" %\
+                  (self.ncalib, self.nevents[0], self.nevents[0] )
             self.plotn_enter.setText( str(self.nevents[0]) )
             self.plotn_change()
             self.plotn_enter.setText("")
@@ -756,13 +768,13 @@ General settings:
 
             #print "XtcExplorer.pyana_image at ", index
             address = str(box.text()).split(": ")[1].strip()
-            options_for_mod[index].append("\nimage_addresses = %s" % address)
+            options_for_mod[index].append("\nimg_sources = %s" % address)
             options_for_mod[index].append("\nimage_rotations = " )
             options_for_mod[index].append("\nimage_shifts = " )
             options_for_mod[index].append("\nimage_scales = " )
             options_for_mod[index].append("\nimage_manipulations = ")
-            options_for_mod[index].append("\ngood_range = %d--%d" % (0,99999999.9) )
-            options_for_mod[index].append("\ndark_range = %d--%d" % (0,0) )
+            options_for_mod[index].append("\ngood_range = %d,%d" % (0,99999999.9) )
+            options_for_mod[index].append("\ndark_range = %d,%d" % (0,0) )
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             options_for_mod[index].append("\noutput_file = ")
@@ -780,11 +792,11 @@ General settings:
 
             #print "XtcExplorer.pyana_cspad at ", index
             address = str(box.text()).split(":")[1].strip()
-            options_for_mod[index].append("\nimage_source = %s" % address)
+            options_for_mod[index].append("\nimg_sources = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             options_for_mod[index].append("\ndark_img_file = ")
-            options_for_mod[index].append("\noutput_file = ")                    
+            options_for_mod[index].append("\nout_img_file = ")                    
             options_for_mod[index].append("\nplot_vrange = ")
             options_for_mod[index].append("\nthreshold = ")
             options_for_mod[index].append("\nthr_area = ")

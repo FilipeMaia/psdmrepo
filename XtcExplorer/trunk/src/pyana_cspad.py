@@ -30,8 +30,9 @@ import numpy as np
 #-----------------------------
 from pypdsdata import xtc
 from cspad import CsPad
-from xbplotter import Plotter
-from xbplotter import Threshold
+
+from utilities import Plotter
+from utilities import Threshold
 from utilities import PyanaOptions
 
 #---------------------
@@ -49,75 +50,74 @@ class  pyana_cspad ( object ) :
             
     # initialize
     def __init__ ( self,
-                   image_source=None,
-                   plot_every_n = None,
-                   fignum = "1", 
+                   img_sources = None,
                    dark_img_file = None,
-                   output_file = None,
+                   out_img_file = None,
                    plot_vrange = None,
                    threshold = None,
-                   thr_area = None ):
+                   thr_area = None,
+                   plot_every_n = None,
+                   fignum = "1" ):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
         All parameters are passed as strings
 
-        @param image_source     string, Address of Detector-Id|Device-ID
-        @param plot_every_n     int, Draw plot for every N event? (if None or 0, don't plot till end) 
-        @param fignum           int, Matplotlib figure number
+        @param img_sources      string, Address of Detector-Id|Device-ID
         @param dark_img_file    filename, Dark image file to be loaded, if any
-        @param output_file      filename (If collecting: write to this file)
+        @param out_img_file      filename (If collecting: write to this file)
         @param plot_vrange      range=vmin,vmax of values for plotting (pixel intensity)
         @param threshold        lower threshold for image intensity in threshold area of the plot
         @param thr_area         range=xmin,xmax,ymin,ymax defining threshold area
+        @param plot_every_n     int, Draw plot for every N event? (if None or 0, don't plot till end) 
+        @param fignum           int, Matplotlib figure number
         """
 
 
         # initializations from argument list
-        self.img_addr = image_source
-        print "Using image_source = ", self.img_addr
-
         opt = PyanaOptions()
+        self.img_sources = opt.getOptString(img_sources)
+        print "Using img_sources = ", self.img_sources
+
         self.plot_every_n = opt.getOptInteger(plot_every_n)
         print "Using plot_every_n = ", self.plot_every_n
 
         self.mpl_num = opt.getOptInteger(fignum)
+        print "Using matplotlib fignum ", self.mpl_num
 
         self.dark_img_file = dark_img_file
         if dark_img_file == "" or dark_img_file == "None" : self.dark_img_file = None
         print "Using dark image file: ", self.dark_img_file
 
-        self.output_file = output_file
-        if output_file == "" or output_file == "None" : self.output_file = None
-        print "Using output_file: ", self.output_file
+        self.out_img_file = out_img_file
+        if out_img_file == "" or out_img_file == "None" : self.out_img_file = None
+        print "Using out_img_file: ", self.out_img_file
 
         self.plot_vmin = None
         self.plot_vmax = None
         if plot_vrange is not None and plot_vrange is not "" : 
             self.plot_vmin = float(plot_vrange.split(",")[0])
             self.plot_vmax = float(plot_vrange.split(",")[1])
-            print "Using plot_vrange = %f-%f"%(self.plot_vmin,self.plot_vmax)
+            print "Using plot_vrange = %f,%f"%(self.plot_vmin,self.plot_vmax)
 
         self.plotter = Plotter()
         #if self.plot_every_n > 0 : self.plotter.display_mode = 1 # interactive 
 
-        self.threshold = None
-        if threshold is not None :
-            if threshold == "" or threshold == "None" :
-                self.threshold = None
-            else :
-                value = float(threshold)
-                if thr_area is None :
-                    self.threshold = Threshold( minvalue=value )
-                else :
-                    area = np.array([0.,0.,0.,0.])
-                    for i in range (4) :
-                        area[i] = float(thr_area.split(",")[i])
-
-                    self.threshold = Threshold( minvalue=value, area=area )
-
-                print "Using threshold value ", self.threshold.minvalue
-                print "Using threshold area ", self.threshold.area
-                self.plotter.threshold = self.threshold
+        self.threshold = Threshold()
+        self.threshold.minvalue = opt.getOptFloat(threshold)
+        if self.threshold.minvalue :
+            tarea = opt.getOptString(thr_area)
+            if tarea is not None: 
+                tarea = np.array([0.,0.,0.,0.])
+                for i in range (4) :
+                    tarea[i] = float(thr_area.split(",")[i])                    
+                self.threshold.area = tarea
+            print "Using threshold value ", self.threshold.minvalue
+            print "Using threshold area ", self.threshold.area
+        else :
+            del self.threshold
+            self.threshold = None
+            
+        self.plotter.threshold = self.threshold
 
         # could also threshold on one of these...
         # print "sum  ",np.sum(frameimage)
@@ -135,7 +135,7 @@ class  pyana_cspad ( object ) :
         self.hilimits = []
 
         # to keep track
-        self.n_events = 0
+        self.n_shots = 0
         self.n_img = 0
 
         # load dark image
@@ -150,7 +150,7 @@ class  pyana_cspad ( object ) :
     # this method is called at an xtc Configure transition
     def beginjob ( self, evt, env ) : 
 
-        config = env.getConfig(xtc.TypeId.Type.Id_CspadConfig, self.img_addr )
+        config = env.getConfig(xtc.TypeId.Type.Id_CspadConfig, self.img_sources )
         if not config:
             print '*** cspad config object is missing ***'
             return
@@ -183,13 +183,13 @@ class  pyana_cspad ( object ) :
         self.ititle = []
 
         # this one counts every event
-        self.n_events+=1
+        self.n_shots+=1
 
         # print a progress report
-        if (self.n_events%1000)==0 :
-            print "Event ", self.n_events
+        if (self.n_shots%1000)==0 :
+            print "Event ", self.n_shots
         
-        quads = evt.getCsPadQuads(self.img_addr, env)
+        quads = evt.getCsPadQuads(self.img_sources, env)
         if not quads :
             print '*** cspad information is missing ***'
             return
@@ -246,11 +246,11 @@ class  pyana_cspad ( object ) :
 
             if topval < self.threshold.minvalue :
                 print "skipping event #%d %.2f < %.2f " % \
-                      (self.n_events, topval, float(self.threshold.minvalue))
+                      (self.n_shots, topval, float(self.threshold.minvalue))
                 return
             else :
                 print "accepting event #%d, vmax = %.2f > %.2f " % \
-                      (self.n_events, topval, float(self.threshold.minvalue))
+                      (self.n_shots, topval, float(self.threshold.minvalue))
 
         # add this image to the sum
         self.n_img+=1
@@ -262,11 +262,11 @@ class  pyana_cspad ( object ) :
 
         # Draw this event.
         if self.plot_every_n > 0 :
-            title = "Event # %d" % self.n_events
+            title = "Event # %d" % self.n_shots
             if self.dark_image is not None:
                 title = title + " (background subtracted) "
             
-            if (self.n_events%self.plot_every_n)==0 :
+            if (self.n_shots%self.plot_every_n)==0 :
                 self.plotter.drawframe(cspad_image,title, fignum=self.mpl_num)
 
         # check if plotter has changed its display mode. If so, tell the event
@@ -278,10 +278,10 @@ class  pyana_cspad ( object ) :
     # after last event has been processed. 
     def endjob( self, env ) :
 
-        print "Done processing       ", self.n_events, " events"        
+        print "Done processing       ", self.n_shots, " events"        
         
         if self.img_data is None :
-            print "No image data found from source ", self.img_addr
+            print "No image data found from source ", self.img_sources
             return
 
         # plot the average image
@@ -294,10 +294,10 @@ class  pyana_cspad ( object ) :
 
         # save the average data image (numpy array)
         # binary file .npy format
-        if self.output_file is not None :
-            if ".npy" in self.output_file :
-                print "saving to ",  self.output_file
-                np.save(self.output_file, average_image)
+        if self.out_img_file is not None :
+            if ".npy" in self.out_img_file :
+                print "saving to ",  self.out_img_file
+                np.save(self.out_img_file, average_image)
             else :
                 print "outputfile file does not have the required .npy ending..."
                 svar = raw_input("Do you want to provide an alternative file name? ")

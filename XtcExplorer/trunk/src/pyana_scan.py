@@ -132,7 +132,7 @@ class pyana_scan (object) :
         self.n_ccls += 1
 
         # initialize event data
-        self.n_evts = 0
+        self.n_shots = 0
         self.evts_scalars = {}
         print "Begin calibcycle ", self.n_ccls
 
@@ -158,8 +158,8 @@ class pyana_scan (object) :
         @param evt    event data object
         @param env    environment object
         """
-        self.n_evts += 1
-        logging.info( "pyana_scan.event() called (%d)"%self.n_evts )
+        self.n_shots += 1
+        logging.info( "pyana_scan.event() called (%d)"%self.n_shots )
 
         # Use environment object to access EPICS data
         for epv_name in self.input_epics :
@@ -232,10 +232,10 @@ class pyana_scan (object) :
         
         @param env    environment object
         """
-        print "End calibcycle %d had %d events " % (self.n_ccls, self.n_evts)
+        print "End calibcycle %d had %d events " % (self.n_ccls, self.n_shots)
         logging.info( "pyana_scan.endcalibcycle() called" )
         
-        self.ccls_nevts.append(self.n_evts)
+        self.ccls_nevts.append(self.n_shots)
 
         # process the chunk of events collected in this scan cycle
         for name, list in self.evts_scalars.iteritems() :

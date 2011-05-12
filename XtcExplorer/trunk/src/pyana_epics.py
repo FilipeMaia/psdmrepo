@@ -82,7 +82,7 @@ class pyana_epics (object) :
             self.pv_data_all[pv_name] = [] # one list for the whole job            
             self.pv_data_calib[pv_name] = None
 
-        self.n_shot   = 0 # event number (resets every calibration cycle)
+        self.n_shots  = 0 # event number (resets every calibration cycle)
         self.n_calib  = 0 # calibration number (resets every run)
         self.n_run    = 0 # run number (resets every begin job / configure )
         self.n_config = 0 # configuration number
@@ -160,7 +160,7 @@ class pyana_epics (object) :
         @param env    environment object
         """
 
-        self.n_shot = 0
+        self.n_shots = 0
         self.n_calib += 1
         logging.info( "pyana_epics.begincalibcycle() called (%d)"%self.n_calib )
 
@@ -190,8 +190,8 @@ class pyana_epics (object) :
         @param env    environment object
         """
 
-        self.n_shot += 1
-        logging.info( "pyana_epics.event() called (%d)"%self.n_shot )
+        self.n_shots += 1
+        logging.info( "pyana_epics.event() called (%d)"%self.n_shots )
 
         # Use environment object to access EPICS data
         for pv_name in self.pv_names :
