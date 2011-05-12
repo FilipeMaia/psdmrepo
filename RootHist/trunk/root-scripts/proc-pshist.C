@@ -73,6 +73,13 @@
 
   //------------------------------------
 
+  c1 -> Print("plot1.gif"); // works for gif, eps, etc.
+  c2 -> Print("plot2.gif");
+  c3 -> Print("plot3.gif");
+  c4 -> Print("plot4.gif");
+
+  //------------------------------------
+
   cout << "Sleep for 10 sec..." << endl;
   gSystem->Sleep(10*1000);
   cout << "Wake up, and exit root." << endl;

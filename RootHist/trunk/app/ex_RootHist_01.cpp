@@ -95,9 +95,16 @@ int main ()
   typedef struct {float x,y,z;} POINT;
   static POINT point;
 
+  /* 
   PSHist::Column *pColumn_1 = pTuple->column( "C_N0001", &val,  "EBEAM/D" );
                               pTuple->column( "C_N0002", &freq, "Freq/F"  );
                               pTuple->column( "point",   &point,"x:y:z"   );
+  */
+
+
+  PSHist::Column *pColumn_1 = pTuple->column( &val,  "EBEAM/D" );
+                              pTuple->column( &freq, "Freq/F"  );
+                              pTuple->column( &point,"x:y:z"   );
 
                   pColumn_1->print(cout);
 
