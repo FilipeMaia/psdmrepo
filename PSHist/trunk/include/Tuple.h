@@ -69,6 +69,8 @@ public:
 
   virtual Column* column( const std::string &name, void* address, const std::string &columnlist ) = 0;
 
+  virtual Column* column( void* address, const std::string &columnlist ) = 0; // for auto-generated name
+
   virtual void fill() = 0;
 
   virtual void reset() = 0;
