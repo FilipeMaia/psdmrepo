@@ -280,7 +280,7 @@ class  pyana_bld ( object ) :
                 plt.hist(array[:,3], 60, histtype='stepfilled', color='m', label='Ch3')
                 plt.title("IPIMB Channels")
                 plt.xlabel('Channels',horizontalalignment='left') # the other right
-                leg = ax2.legend()
+                leg = ax1.legend()
                 
                 ax2 = fig.add_subplot(1,3,2)
                 array2 = np.float_(self.ipm_position)

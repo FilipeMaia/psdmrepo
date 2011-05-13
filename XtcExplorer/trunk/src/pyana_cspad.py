@@ -72,9 +72,9 @@ class  pyana_cspad ( object ) :
         @param fignum           int, Matplotlib figure number
         """
 
-
         # initializations from argument list
         opt = PyanaOptions()
+
         self.img_sources = opt.getOptString(img_sources)
         print "Using img_sources = ", self.img_sources
 
@@ -84,12 +84,10 @@ class  pyana_cspad ( object ) :
         self.mpl_num = opt.getOptInteger(fignum)
         print "Using matplotlib fignum ", self.mpl_num
 
-        self.dark_img_file = dark_img_file
-        if dark_img_file == "" or dark_img_file == "None" : self.dark_img_file = None
-        print "Using dark image file: ", self.dark_img_file
-
-        self.out_img_file = out_img_file
-        if out_img_file == "" or out_img_file == "None" : self.out_img_file = None
+        self.darkfile = opt.getOptString(dark_img_file)
+        print "Using dark image file: ", self.darkfile
+                
+        self.out_img_file = opt.getOptString(out_img_file)
         print "Using out_img_file: ", self.out_img_file
 
         self.plot_vmin = None
@@ -117,35 +115,32 @@ class  pyana_cspad ( object ) :
             del self.threshold
             self.threshold = None
             
+        # pass this Threshold to the Plotter
         self.plotter.threshold = self.threshold
 
-        # could also threshold on one of these...
-        # print "sum  ",np.sum(frameimage)
-        # print "mean ",np.mean(frameimage)
-
-
-
+        # ----
         # initializations of other class variables
-
-        # sum of image data
-        self.img_data = None
-
-        # these will be plotted too
-        self.lolimits = []
-        self.hilimits = []
+        # ----
 
         # to keep track
         self.n_shots = 0
         self.n_img = 0
 
-        # load dark image
+        # accumulate image data above and below threshold
+        self.sum_good_images = None
+        self.sum_dark_images = None
+
+        # load dark image from file
         self.dark_image = None
-        if self.dark_img_file is None :
+        if self.darkfile is None :
             print "No dark-image file provided. The images will not be background subtracted."
         else :
-            print "Loading dark image from ", self.dark_img_file
-            self.dark_image = np.load(self.dark_img_file)
-
+            print "Loading dark image from ", self.darkfile
+            try: 
+                self.dark_image = np.load(self.darkfile)
+            except IOError:
+                print "No dark file found, will compute darks on the fly"
+                print "(will only work if a reasonable threshold is used)"
         
     # this method is called at an xtc Configure transition
     def beginjob ( self, evt, env ) : 
@@ -227,47 +222,54 @@ class  pyana_cspad ( object ) :
         self.vmax = np.max(cspad_image)
         self.vmin = np.min(cspad_image)
 
-        # collect min and max intensity of this image
-        self.lolimits.append( self.vmin )
-        self.hilimits.append( self.vmax )
-
-        # subtract background if provided
+        # subtract background if provided from a file
         if self.dark_image is not None: 
             cspad_image = cspad_image - self.dark_image 
 
-        # set threshold
-        if self.threshold is not None:
-            topval = np.max(cspad_image)
+        # apply threshold filter
+        if self.threshold is not None:            
+            #topval = np.max(cspad_image) # value of maximum bin
+            topval = np.sum(cspad_image)/np.size(cspad_image) # average value of bins
             if self.threshold.area is not None:
                 subset = cspad_image[self.threshold.area[0]:self.threshold.area[1],   # x1:x2
-                                     self.threshold.area[2]:self.threshold.area[3]]   # y1:y2
-                
-                topval = np.max(subset)
+                                     self.threshold.area[2]:self.threshold.area[3]]   # y1:y2                
+                #topval = np.max(subset) # value of maximum bin
+                topval = np.sum(subset)/np.size(cspad_image) # average value of bins
 
             if topval < self.threshold.minvalue :
                 print "skipping event #%d %.2f < %.2f " % \
                       (self.n_shots, topval, float(self.threshold.minvalue))
+
+                # collect the rejected shots before returning to the next event
+                if self.sum_dark_images is None :
+                    self.sum_dark_images = np.float_(cspad_image)
+                else :
+                    self.sum_dark_images += cspad_image
                 return
             else :
                 print "accepting event #%d, vmax = %.2f > %.2f " % \
                       (self.n_shots, topval, float(self.threshold.minvalue))
 
-        # add this image to the sum
+        # -----
+        # Passed the threshold filter. Add this to the sum
+        # -----
         self.n_img+=1
-        if self.img_data is None :
-            self.img_data = np.float_(cspad_image)
+        if self.sum_good_images is None :
+            self.sum_good_images = np.float_(cspad_image)
         else :
-            self.img_data += cspad_image
+            self.sum_good_images += cspad_image
 
-
+        # -----
         # Draw this event.
+        # -----
         if self.plot_every_n > 0 :
-            title = "Event # %d" % self.n_shots
+            title = "CsPad shot # %d" % self.n_shots
             if self.dark_image is not None:
                 title = title + " (background subtracted) "
             
             if (self.n_shots%self.plot_every_n)==0 :
-                self.plotter.drawframe(cspad_image,title, fignum=self.mpl_num)
+                print "plotting CsPad data for shot # ", self.n_shots
+                self.plotter.drawframe(cspad_image,title, fignum=self.mpl_num, showProj = True)
 
         # check if plotter has changed its display mode. If so, tell the event
         switchmode = self.plotter.display_mode

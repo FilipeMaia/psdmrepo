@@ -895,7 +895,8 @@ General settings:
     def edit_configfile(self):
 
         # pop up emacs window to edit the config file as needed:
-        proc_emacs = myPopen("emacs %s" % self.configfile, shell=True) 
+        #proc_emacs = myPopen("emacs %s" % self.configfile, shell=True)
+        proc_emacs = myPopen("nano %s" % self.configfile, shell=True) 
         stdout_value = proc_emacs.communicate()[0]
         print stdout_value
         #proc_emacs = MyThread("emacs %s" % self.configfile) 

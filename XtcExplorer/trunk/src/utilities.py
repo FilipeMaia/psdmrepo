@@ -217,7 +217,7 @@ class Plotter(object):
 
         plt.draw()
 
-    def drawframe( self, frameimage, title="", fignum=1):
+    def drawframe( self, frameimage, title="", fignum=1, showProj = False):
 
         if self.display_mode == 2 :
             plt.ion()
@@ -240,45 +240,54 @@ class Plotter(object):
         #self.colb = plt.colorbar(self.axesim,ax=axes,pad=0.01)#,fraction=0.10,shrink=0.90)
         divider = make_axes_locatable(axes)
 
-        x = np.sum(frameimage,0)
-        y = np.sum(frameimage,1)
+        if showProj :
+            #axes.set_aspect(1.0)
+            axHistx = divider.append_axes("top", size="20%", pad=0.2,sharex=axes)
+            axHisty = divider.append_axes("left", size="20%", pad=0.6,sharey=axes)
 
-        #axes.set_aspect(1.0)
-        axHistx = divider.append_axes("top", size="20%", pad=0.05,sharex=axes)
-        axHisty = divider.append_axes("left", size="20%", pad=0.05,sharey=axes)
+            # vertical and horizontal dimensions, axes, projections
+            vdim,hdim = np.shape(frameimage)
+            vbins = np.arange(0,vdim,1)
+            hbins = np.arange(0,hdim,1)
 
-        # vertical and horizontal dimensions, axes, projections
-        vdim,hdim = np.shape(frameimage)
-        vbins = np.arange(0,vdim,1)
-        hbins = np.arange(0,hdim,1)
+            proj_vert = np.sum(frameimage,1)/hdim # sum along horizontal axis
+            proj_horiz = np.sum(frameimage,0)/vdim # sum along vertical axis
 
-        proj_vert = np.sum(frameimage,1) # sum along horizontal axis
-        proj_horiz = np.sum(frameimage,0) # sum along vertical axis
+            # these are the limits I want my histogram to use
+            vmin = np.min(proj_vert) - 0.1 * np.min(proj_vert)
+            vmax = np.max(proj_vert) + 0.1 * np.max(proj_vert)
+            hmin = np.min(proj_horiz) - 0.1 * np.min(proj_horiz)
+            hmax = np.max(proj_horiz) + 0.1 * np.max(proj_horiz) 
 
-        # these are the limits I want my histogram to use
-        vmin = np.min(proj_vert) - 0.1 * np.min(proj_vert)
-        vmax = np.max(proj_vert) + 0.1 * np.max(proj_vert)
-        hmin = np.min(proj_horiz) - 0.1 * np.min(proj_horiz)
-        hmax = np.max(proj_horiz) + 0.1 * np.max(proj_horiz) 
+            print vmin,vmax,hmin,hmax
+            plt.clim( np.min(vmin,hmin), np.max(vmax,hmax))
 
-        axHistx.plot(hbins,proj_horiz)
-        axHisty.plot(proj_vert,vbins)
-        #axHistx.hist(hbins, bins=hdim, histtype='step', weights=proj_horiz)
-        #axHisty.hist(vbins, bins=vdim, histtype='step', weights=proj_vert,orientation='horizontal')
+            axHistx.plot(hbins,proj_horiz)
+            axHisty.plot(proj_vert[::-1], vbins[::-1])
+            #axHistx.hist(hbins, bins=hdim, histtype='step', weights=proj_horiz)
+            #axHisty.hist(vbins, bins=vdim, histtype='step', weights=proj_vert,orientation='horizontal')
 
-        axHistx.set_xlim(0,hdim)
-        axHistx.set_ylim(hmin, hmax )
-        ticks = [ 10000 * np.around(hmin/10000) ,
-                  10000 * np.around((hmax-hmin)/20000),
-                  10000 * np.around(hmax/10000) ]
-        axHistx.set_yticks( ticks )
+            axHistx.set_xlim(0,hdim)
+            axHistx.set_ylim(hmin, hmax )
+            #ticks = [ 10000 * np.around(hmin/10000) ,
+            #          10000 * np.around((hmax-hmin)/20000),
+            #          10000 * np.around(hmax/10000) ]
+            ticks = [ np.around(hmin),
+                      np.around((hmax-hmin)/2),
+                      np.around(hmax) ]
+            axHistx.set_yticks( ticks )
 
-        axHisty.set_ylim(0,vdim)
-        axHisty.set_xlim(vmin, vmax )
-        ticks = [ 10000 * np.around( vmin/10000) ,
-                  10000 * np.around((vmax-vmin)/20000),
-                  10000 * np.around(vmax/10000) ]
-        axHisty.set_xticks( ticks )
+            #axHisty.set_ylim(0,vdim)
+            #axHisty.set_xlim(vmin, vmax )
+            axHisty.set_ylim(0,vdim)
+            axHisty.set_xlim(vmax, vmin )
+            #ticks = [ 10000 * np.around( vmin/10000) ,
+            #          10000 * np.around((vmax-vmin)/20000),
+            #          10000 * np.around(vmax/10000) ]
+            ticks = [ np.around( vmax ) ,
+                     np.around((vmax-vmin)/2),
+                      np.around(vmin) ]
+            axHisty.set_xticks( ticks )
 
         cax = divider.append_axes("right",size="5%", pad=0.05)
         self.colb = plt.colorbar(self.axesim,cax=cax)
@@ -310,7 +319,8 @@ class Plotter(object):
             - middle-click resets to original
             """
 
-        axes.set_title(title)
+        plt.suptitle(title)
+        #axes.set_title(title)
         plt.draw()
         
     def onpick(self, event):
