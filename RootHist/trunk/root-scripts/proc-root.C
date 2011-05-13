@@ -34,6 +34,8 @@
 
   gPad -> Update();   
 
+  c1->Print("test-histograms.gif");
+
   cout << "Sleep for 10 sec..." << endl;
   gSystem->Sleep(10*1000);
   cout << "Wake up!" << endl;
