@@ -1,0 +1,678 @@
+<?php
+
+require_once( 'logbook/logbook.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
+
+use LogBook\LogBook;
+use LogBook\LogBookAuth;
+use LogBook\LogBookException;
+
+use LusiTime\LusiTime;
+use LusiTime\LusiTimeException;
+
+/*
+ * This script will perform the search for free-form entries in a scope
+ * of an experiment using values of specified parameter. The result is returned
+ * as a JASON obejct which in case of success will have the following format:
+ *
+ *   "ResultSet": {
+ *     "Status": "success",
+ *     "Result": [
+ *       { "event_time": <timestamp>, "html": <free-form entry markup> }
+ *       { .. }
+ *     ]
+ *   }
+ *
+ * And in case of any error it will be:
+ *
+ *   "ResultSet": {
+ *     "Status": "error",
+ *     "Message": <markup with the explanation>
+ *   }
+ *
+ * Errors are reported via function report_error().
+ */
+header( "Content-type: application/json" );
+header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
+header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
+
+if( !isset( $_GET['id'] )) report_error( "no valid experiment id parameter" );
+$id = trim( $_GET['id'] );
+if( $id == '' ) report_error( "experiment id can't be empty" );
+
+$shift_id = null;
+if( isset( $_GET['shift_id'] )) {
+    $shift_id = trim( $_GET['shift_id'] );
+    if( $shift_id == '' ) report_error( "shift identifier parameter can't be empty" );
+}
+
+$run_id = null;
+if( isset( $_GET['run_id'] )) {
+    $run_id = trim( $_GET['run_id'] );
+    if( $run_id == '' ) report_error( "run identifier parameter can't be empty" );
+}
+
+if( !is_null( $shift_id ) && !is_null( $run_id ))
+    report_error( "conflicting parameters found in the request: <b>shift_id</b> and <b>run_id</b>" );
+
+$text2search = '';
+if( isset( $_GET['text2search'] ))
+    $text2search = trim( $_GET['text2search'] );
+
+
+$search_in_messages = false;
+if( isset( $_GET['search_in_messages'] ))
+    $search_in_messages = '0' != trim( $_GET['search_in_messages'] );
+
+$search_in_tags = false;
+if( isset( $_GET['search_in_tags'] ))
+    $search_in_tags = '0' != trim( $_GET['search_in_tags'] );
+
+$search_in_values = false;
+if( isset( $_GET['search_in_values'] ))
+    $search_in_values = '0' != trim( $_GET['search_in_values'] );
+
+if( !$search_in_messages && !$search_in_tags && !$search_in_values )
+    report_error( "at least one of (<b>search_in_messages</b>, <b>search_in_tags</b>, <b>search_in_values</b>) parameters must be set" );
+
+
+$posted_at_instrument = false;
+if( isset( $_GET['posted_at_instrument'] ))
+    $posted_at_instrument = '0' != trim( $_GET['posted_at_instrument'] );
+
+$posted_at_experiment = false;
+if( isset( $_GET['posted_at_experiment'] ))
+    $posted_at_experiment = '0' != trim( $_GET['posted_at_experiment'] );
+
+$posted_at_shifts = false;
+if( isset( $_GET['posted_at_shifts'] ))
+    $posted_at_shifts = '0' != trim( $_GET['posted_at_shifts'] );
+
+$posted_at_runs = false;
+if( isset( $_GET['posted_at_runs'] ))
+    $posted_at_runs = '0' != trim( $_GET['posted_at_runs'] );
+
+if( !$posted_at_experiment && !$posted_at_shifts && !$posted_at_runs )
+    report_error( "at least one of (<b>posted_at_experiment</b>, <b>posted_at_shifts</b>, <b>posted_at_runs</b>) parameters must be set" );
+
+$begin_str = '';
+if( isset( $_GET['begin'] ))
+    $begin_str = trim( $_GET['begin'] );
+
+$end_str = '';
+if( isset( $_GET['end'] ))
+    $end_str = trim( $_GET['end'] );
+
+$tag = '';
+if( isset( $_GET['tag'] ))
+    $tag = trim( $_GET['tag'] );
+
+$author = '';
+if( isset( $_GET['author'] ))
+    $author = trim( $_GET['author'] );
+
+$inject_runs = false;
+if( isset( $_GET['inject_runs'] ))
+    $inject_runs = '0' != trim( $_GET['inject_runs'] );
+
+/* This is a special modifier which (if present) is used to return an updated list
+ * of messages since (strictly newer than) the specified time.
+ * 
+ * NOTES:
+ * - this parameter will only be respected if it strictly falls into
+ *   the [begin,end) interval of the request!
+ * - unlike outher time related parameters of the service this one is expected
+ *   to be a full precision 64-bit numeric representation of time.
+ */
+$since_str = '';
+if( isset( $_GET['since'] )) {
+    $since_str = trim( $_GET['since'] );
+}
+
+/* This is a special modifier which (if present) is used to return a shortened list
+ * of messages.
+ */
+$limit = null;  // no limit
+if( isset( $_GET['limit'] )) {
+    $limit = trim( $_GET['limit'] );
+    if( $limit == 'all' ) $limit = null;
+}
+
+/* Package the error message into a JAON object and return the one
+ * back to a caller. The script's execution will end at this point.
+ */
+function report_error( $msg ) {
+    $status_encoded = json_encode( "error" );
+    $msg_encoded = json_encode( '<b><em style="color:red;" >Error:</em></b>&nbsp;'.$msg );
+    print <<< HERE
+{
+  "ResultSet": {
+    "Status": {$status_encoded},
+    "Message": {$msg_encoded}
+  }
+}
+HERE;
+    exit;
+}
+
+/* Translate timestamps which may also contain shortcuts
+ */
+function translate_time( $experiment, $str ) {
+    $str_trimmed = trim( $str );
+    if( $str_trimmed == '' ) return null;
+    switch( $str_trimmed[0] ) {
+        case 'b':
+        case 'B': return $experiment->begin_time();
+        case 'e':
+        case 'E': return $experiment->end_time();
+        case 'm':
+        case 'M': return LusiTime::minus_month();
+        case 'w':
+        case 'W': return LusiTime::minus_week();
+        case 'd':
+        case 'D': return LusiTime::minus_day();
+        case 'y':
+        case 'Y': return LusiTime::yesterday();
+        case 't':
+        case 'T': return LusiTime::today();
+        case 'h':
+        case 'H': return LusiTime::minus_hour();
+    }
+    $result = LusiTime::parse( $str_trimmed );
+    if( is_null( $result )) $result = LusiTime::from64( $str_trimmed );
+    return $result;
+}
+
+/* Translate an entry into a JASON object. Return the serialized object.
+ */
+function child2json( $entry, $posted_at_instrument ) {
+
+    $timestamp = $entry->insert_time();
+
+    $relevance_time_str = is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort();
+    $attachments = $entry->attachments();
+    $children = $entry->children();
+
+    $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".$entry->shift()->begin_time()->toStringShort().'</a>';
+    $run_number_str = '';
+    if( !is_null( $entry->run_id())) {
+        $run = $entry->run();
+        $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
+    }
+    $tag_ids = array();
+    $attachment_ids = array();
+    if( count( $attachments ) != 0 ) {
+        foreach( $attachments as $attachment ) {
+            //$attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            $attachment_url = '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            array_push(
+                $attachment_ids,
+                array(
+                    "id" => $attachment->id(),
+                    "type" => $attachment->document_type(),
+                    "size" => $attachment->document_size(),
+                    "description" => $attachment->description(),
+                    "url" => $attachment_url
+                )
+            );
+        }
+    }
+    $children_ids = array();
+    foreach( $children as $child )
+        array_push( $children_ids, child2json( $child, $posted_at_instrument ));
+
+    $content = wordwrap( $entry->content(), 128 );
+    return json_encode(
+        array (
+            "event_timestamp" => $timestamp->to64(),
+            "event_time" => $entry->insert_time()->toStringShort(),
+            "relevance_time" => $relevance_time_str,
+            "run" => $run_number_str,
+            "shift" => $shift_begin_time_str,
+            "author" => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
+            "id" => $entry->id(),
+            "subject" => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
+            "html1" => "<pre>".htmlspecialchars($content)."</pre>",
+        	"content" => htmlspecialchars( $entry->content()),
+            "attachments" => $attachment_ids,
+            "tags" => $tag_ids,
+            "children" => $children_ids,
+            "is_run" => 0,
+            "run_id" => 0,
+            "run_num" => 0,
+        	"ymd" => $timestamp->toStringDay(),
+        	"hms" => $timestamp->toStringHMS()
+        )
+    );
+}
+
+function entry2json( $entry, $posted_at_instrument ) {
+
+    $timestamp = $entry->insert_time();
+    //$event_time_url =  "<a href=\"javascript:display_message({$entry->id()})\" class=\"lb_link\">{$timestamp->toStringShort()}</a>";
+    $event_time_url =  "<a href=\"index.php?action=select_message&id={$entry->id()}\"  target=\"_blank\" class=\"lb_link\">{$timestamp->toStringShort()}</a>";
+    $relevance_time_str = is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort();
+    $tags = $entry->tags();
+    $attachments = $entry->attachments();
+    $children = $entry->children();
+
+    $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".$entry->shift()->begin_time()->toStringShort().'</a>';
+    $run_number_str = '';
+    if( !is_null( $entry->run_id())) {
+        $run = $entry->run();
+        $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
+    }
+    $tag_ids = array();
+    if( count( $tags ) != 0 ) {
+        foreach( $tags as $tag ) {
+            array_push(
+                $tag_ids,
+                array(
+                    "tag" => $tag->tag(),
+                    "value" => $tag->value()
+                )
+            );
+        }
+    }
+    $attachment_ids = array();
+    if( count( $attachments ) != 0 ) {
+        foreach( $attachments as $attachment ) {
+            //$attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            $attachment_url = '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            array_push(
+                $attachment_ids,
+                array(
+                    "id" => $attachment->id(),
+                    "type" => $attachment->document_type(),
+                    "size" => $attachment->document_size(),
+                    "description" => $attachment->description(),
+                    "url" => $attachment_url
+                )
+            );
+        }
+    }
+    $children_ids = array();
+    foreach( $children as $child )
+        array_push( $children_ids, child2json( $child, $posted_at_instrument ));
+
+    $content = wordwrap( $entry->content(), 128 );
+    return json_encode(
+        array (
+            "event_timestamp" => $timestamp->to64(),
+            "event_time" => $event_time_url,
+            "relevance_time" => $relevance_time_str,
+            "run" => $run_number_str,
+            "shift" => $shift_begin_time_str,
+            "author" => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
+            "id" => $entry->id(),
+            "subject" => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
+            "html1" => "<pre>".htmlspecialchars($content)."</pre>",
+        	"content" => htmlspecialchars( $entry->content()),
+            "attachments" => $attachment_ids,
+            "tags" => $tag_ids,
+            "children" => $children_ids,
+            "is_run" => 0,
+            "run_id" => 0,
+            "run_num" => 0,
+        	"ymd" => $timestamp->toStringDay(),
+        	"hms" => $timestamp->toStringHMS()
+        )
+    );
+}
+
+function format_seconds( $sec ) {
+	if( $sec < 60 ) return $sec.' sec';
+	return floor( $sec / 60 ).' min '.( $sec % 60 ).' sec ';
+}
+
+function run2json( $run, $type, $posted_at_instrument ) {
+
+    /* TODO: WARNING! Pay attention to the artificial message identifier
+     * for runs. an assumption is that normal message entries will
+     * outnumber 512 million records.
+     */
+	$timestamp = '';
+	$msg       = '';
+	$id        = '';
+
+	switch( $type ) {
+	case 'begin_run':
+		$timestamp = $run->begin_time();
+		$msg       = '<b>begin run '.$run->num().'</b>';
+		$id        = 512*1024*1024 + $run->id();
+		break;
+	case 'end_run':
+		$timestamp = $run->end_time();
+		$msg       = '<b>end run '.$run->num().'</b> ( '.format_seconds( $run->end_time()->sec - $run->begin_time()->sec ).' )';
+		$id        = 2*512*1024*1024 + $run->id();
+		break;
+	case 'run':
+		$timestamp = $run->end_time();
+		$msg       = '<b>run '.$run->num().'</b> ( '.format_seconds( $run->end_time()->sec - $run->begin_time()->sec ).' )';
+		//$msg       = '<b>run ( duration: '.( $run->end_time().$sec - $run->begin_time().$sec ).' seconds )</b>';
+		$id        = 3*512*1024*1024 + $run->id();
+		break;
+	}
+
+    $event_time_url =  "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$timestamp->toStringShort()}</a>";
+    $relevance_time_str = $timestamp->toStringShort();
+
+    $shift_begin_time_str = '';
+    $run_number_str = '';
+
+    $tag_ids = array();
+    $attachment_ids = array();
+    $children_ids = array();
+
+    $content = wordwrap( $msg, 128 );
+    return json_encode(
+        array (
+            "event_timestamp" => $timestamp->to64(),
+            "event_time" => $event_time_url, //$entry->insert_time()->toStringShort(),
+            "relevance_time" => $relevance_time_str,
+            "run" => $run_number_str,
+            "shift" => $shift_begin_time_str,
+            "author" => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).'DAQ/RC',
+            "id" => $id,
+            "subject" => substr( $msg, 0, 72).(strlen( $msg ) > 72 ? '...' : '' ),
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".$content."</pre>",
+            "html1" => $content,
+        	"content" => $msg,
+            "attachments" => $attachment_ids,
+            "tags" => $tag_ids,
+            "children" => $children_ids,
+            "is_run" => 1,
+        	"run_id" => $run->id(),
+        	"begin_run" => $run->begin_time()->toStringShort(),
+        	"end_run" => is_null($run->end_time()) ? '' : $run->end_time()->toStringShort(),
+        	"run_num" => $run->num(),
+        	"ymd" => $timestamp->toStringDay(),
+        	"hms" => $timestamp->toStringHMS()
+        )
+    );
+}
+
+/* The functon will produce a sorted list of timestamps based on keys of
+ * the input dictionary. If two consequitive begin/end run records are found
+ * for the same run then the records will be collapsed into a single record 'run'
+ * with the begin run timestamp. The list may also be truncated if the limit has
+ * been requested. In that case excessive entries will be removed from the _HEAD_
+ * of the input array.
+ * 
+ * NOTE: The contents of input array will be modified for collapsed runs
+ *       by replacing types for 'begin_run' / 'end_run' with just 'run'.
+ */
+function sort_and_truncate_from_head( &$entries_by_timestamps, $limit ) {
+
+	$all_timestamps = array_keys( $entries_by_timestamps );
+    sort( $all_timestamps );
+
+    /* First check if we need to collapse here anything.
+     * 
+     * TODO: !!!
+     */
+    $timestamps = array();
+    $prev_begin_run = null;
+    foreach( $all_timestamps as $t ) {
+    	$entry = $entries_by_timestamps[$t]['object'];
+    	switch( $entries_by_timestamps[$t]['type'] ) {
+    	case 'entry':
+    		$prev_begin_run = null;
+    		array_push( $timestamps, $t );
+    		break;
+    	case 'begin_run':
+    		$prev_begin_run = $t;
+    		array_push( $timestamps, $t );
+    		break;
+    	case 'end_run':
+    		if( is_null( $prev_begin_run )) {
+    			array_push( $timestamps, $t );
+    		} else {
+    			$entries_by_timestamps[$prev_begin_run]['type'] = 'run';
+    			$prev_begin_run = null;
+    		}
+    		break;
+    	}
+    }
+
+    /* Do need to truncate. Apply different limiting techniques depending
+     * on a value of the parameter.
+     */
+    if( !$limit ) return $timestamps;
+
+    $result = array();
+
+    $limit_num = null;
+    $unit = null;
+    if( 2 == sscanf( $limit, "%d%s", &$limit_num, &$unit )) {
+
+    	$nsec_ago = 1000000000 * $limit_num;
+    	switch( $unit ) {
+    		case 's': break;
+    		case 'm': $nsec_ago *=            60; break;
+    		case 'h': $nsec_ago *=          3600; break;
+    		case 'd': $nsec_ago *=     24 * 3600; break;
+    		case 'w': $nsec_ago *= 7 * 24 * 3600; break;
+    		default:
+    			report_error( "illegal format of the limit parameter" );
+    	}
+    	$now_nsec = LusiTime::now()->to64();
+    	foreach( $timestamps as $t ) {
+    		if( $t >= ( $now_nsec - $nsec_ago )) array_push( $result, $t );
+    	}
+
+    } else {
+
+    	$limit_num = (int)$limit;
+
+    	/* Return the input array if no limit specified or if the array is smaller
+    	 * than the limit.
+	     */
+    	if( count( $timestamps ) <= $limit_num ) return $timestamps;
+
+    	$idx = 0;
+    	$first2copy_idx =  count( $timestamps ) - $limit_num;
+
+    	foreach( $timestamps as $t ) {
+        	if( $idx >= $first2copy_idx ) array_push( $result, $t );
+        	$idx = $idx + 1; 
+    	}
+    }
+    return $result;
+}
+
+
+/* Proceed with the operation
+ */
+try {
+    $logbook = new LogBook();
+    $logbook->begin();
+
+    /* Make adjustments relative to the primary experiment of the search.
+     */
+   	$experiment = $logbook->find_experiment_by_id( $id );
+   	if( is_null( $experiment)) report_error( "no such experiment" );
+
+    /* Timestamps are translated here because of possible shoftcuts which
+	 * may reffer to the experiment's validity limits.
+	 */
+    $begin = null;
+   	if( $begin_str != '' ) {
+       	$begin = translate_time( $experiment, $begin_str );
+       	if( is_null( $begin ))
+           	report_error( "begin time has invalid format" );
+    }
+    $end = null;
+    if( $end_str != '' ) {
+       	$end = translate_time( $experiment, $end_str );
+       	if( is_null( $end ))
+           	report_error( "end time has invalid format" );
+	}
+    if( !is_null( $begin ) && !is_null( $end ) && !$begin->less( $end ))
+       	report_error( "invalid interval - begin time isn't strictly less than the end one" );        
+        	
+	/* For explicitly specified shifts and runs force the search limits not
+     * to exceed their intervals (if the one is specified).
+     */
+	$begin4runs = $begin;
+    $end4runs   = $end;
+    if( !is_null( $shift_id )) {
+       	$shift = $experiment->find_shift_by_id( $shift_id );
+       	if( is_null( $shift ))
+           	report_error( "no shift with shift_id=".$shift_id." found" );
+
+        $begin4runs = $shift->begin_time();
+   	    $end4runs   = $shift->end_time();
+   	}
+   	if( !is_null( $run_id )) {
+       	$run = $experiment->find_run_by_id( $run_id );
+       	if( is_null( $run ))
+           	report_error( "no run with run_id=".$run_id." found" );
+
+        $begin4runs = $run->begin_time();
+   	    $end4runs   = $run->end_time();
+   	}
+    $since = !$since_str ? null : LusiTime::from64( $since_str );
+
+    /* Readjust 'begin' parameter for runs if 'since' is present.
+     * Completelly ignore 'since' if it doesn't fall into an interval of
+     * the requst.
+     */    
+    if( !is_null( $since )) {
+        $since4runs = $since;
+    	if( !is_null( $begin4runs ) && $since->less( $begin4runs )) {
+            $since4runs = null;
+        }
+        if( !is_null( $end4runs ) && $since->greaterOrEqual( $end4runs )) {
+            $since4runs = null;
+        }
+        if( !is_null( $since4runs )) $begin4runs = $since4runs;
+    }
+
+    /* Mix entries and run records in the right order. Results will be merged
+     * into this dictionary before returning to the client.
+     */
+    $entries_by_timestamps = array();
+
+    /* Scan all relevant experiments. Normally it would be just one. However, if
+     * the instrument is selected then all experiments of the given instrument will
+     * be taken into consideration.
+     */
+    $experiments = array();
+    if( $posted_at_instrument ) {
+    	$experiments = $logbook->experiments_for_instrument( $experiment->instrument()->name());
+    } else {
+       	$experiments = array( $experiment );
+    }
+    foreach( $experiments as $e ) {
+
+    	/* Check for the authorization
+    	 */
+    	if( !LogBookAuth::instance()->canRead( $e->id())) {
+
+    		/* Silently skip this experiemnt if browsing accross the whole instrument.
+    		 * The only exception would be the main experient from which we started
+    		 * things.
+    		 */
+    		if( $posted_at_instrument && ( $e->id() != $id )) continue;
+
+	        report_error( 'not authorized to read messages for the experiment' );
+    	}
+ 
+    	/* Get the info for entries and (if requested) for runs.
+    	 */
+    	$entries = $e->search(
+        	$e->id() == $id ? $shift_id : null,	// the parameter makes sense for the main experiment only
+        	$e->id() == $id ? $run_id   : null,	// ditto
+        	$text2search,
+        	$search_in_messages,
+        	$search_in_tags,
+        	$search_in_values,
+        	$posted_at_experiment,
+        	$posted_at_shifts,
+        	$posted_at_runs,
+        	$begin,
+        	$end,
+        	$tag,
+        	$author,
+        	$since/*,
+        	$limit*/ );
+
+		$runs = !$inject_runs ? array() : $e->runs_in_interval( $begin4runs, $end4runs/*, $limit*/ );
+
+		/* Merge both results into the dictionary for further processing.
+		 */
+    	foreach( $entries as $e ) {
+        	$entries_by_timestamps[$e->insert_time()->to64()] = array( 'type' => 'entry', 'object' => $e );
+    	}
+    	foreach( $runs as $r ) {
+
+	        /* The following fix helps to avoid duplicating "begin_run" entries because
+    	     * the way we are getting runs (see before) would yeld runs in the interval:
+        	 *
+	         *   [begin4runs,end4runs)
+    	     */
+        	if( is_null( $begin4runs ) || $begin4runs->less( $r->begin_time())) {
+            	$entries_by_timestamps[$r->begin_time()->to64()] = array( 'type' => 'begin_run', 'object' => $r );
+	        }
+
+    	    /* This check would prevent start of run entry to be replaced by
+        	 * the end of the previous run wich was automatically closed
+	         * when starting the next run.
+    	     */
+        	if( !is_null( $r->end_time())) {
+            	if( !array_key_exists( $r->end_time()->to64(), $entries_by_timestamps )) {
+                	$entries_by_timestamps[$r->end_time()->to64()] = array( 'type' => 'end_run', 'object' => $r );
+	            }
+    	    }
+	    }
+    }
+
+    /* Now produce the desired output.
+     */
+    $timestamps = sort_and_truncate_from_head( $entries_by_timestamps, $limit );
+
+    $status_encoded = json_encode( "success" );
+    $result =<<< HERE
+{
+  "ResultSet": {
+    "Status": {$status_encoded},
+    "Result": [
+HERE;
+    $first = true;
+    foreach( $timestamps as $t ) {
+    	$type  = $entries_by_timestamps[$t]['type'];
+    	$entry = $entries_by_timestamps[$t]['object'];
+    	if( $type == 'entry' ) {
+    		if( $first ) {
+                $first = false;
+                $result .= "\n".entry2json( $entry, $posted_at_instrument );
+            } else {
+                $result .= ",\n".entry2json( $entry, $posted_at_instrument );
+            }
+    	} else {
+    		if( $first ) {
+                $first = false;
+                $result .= "\n".run2json( $entry, $type, $posted_at_instrument );
+            } else {
+                $result .= ",\n".run2json( $entry, $type, $posted_at_instrument );
+            }
+    	}
+    }
+    $result .=<<< HERE
+ ] } }
+HERE;
+
+    print $result;
+
+    $logbook->commit();
+
+} catch( LogBookException $e ) {
+    report_error( $e->toHtml());
+} catch( LusiTimeException $e ) {
+    report_error( $e->toHtml());
+}
+?>
+
