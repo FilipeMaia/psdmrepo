@@ -524,6 +524,8 @@ HERE;
          */
     	if( is_null( $instr ) || ( $instr == 'AMO' )) {
             $groups['amoi0110'] = True;
+            $groups['amoi0111'] = True;
+            $groups['amoi0211'] = True;
             $groups['ps-amo'] = True;
     	}
 
@@ -534,6 +536,7 @@ HERE;
             $groups['sxrsse10'] = True;
             $groups['sxrlje10'] = True;
             $groups['sxri0110'] = True;
+            $groups['sxri0111'] = True;
             $groups['ps-sxr'] = True;
     	}
 
@@ -549,11 +552,15 @@ HERE;
             $groups['xppi0110'] = True;
             $groups['xppi0210'] = True;
             $groups['xppi0310'] = True;
+            $groups['xppi0111'] = True;
+            $groups['xppi0211'] = True;
             $groups['ps-xpp'] = True;
     	}
     	/* CXI commissionning, in-house, etc. experiments for the year of 2010.
          */
     	if( is_null( $instr ) || ( $instr == 'CXI' )) {
+            $groups['cxii0111'] = True;
+            $groups['cxii0211'] = True;
             $groups['ps-cxi'] = True;
     	}
     	/* MEC commissionning, in-house, etc. experiments for the year of 2010.
