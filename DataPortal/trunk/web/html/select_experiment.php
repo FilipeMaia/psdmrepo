@@ -1,30 +1,47 @@
 <?php
 
+require_once( 'authdb/authdb.inc.php' );
 require_once( 'dataportal/dataportal.inc.php' );
+require_once( 'logbook/logbook.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
+
+use AuthDB\AuthDB;
+use AuthDB\AuthDBException;
 
 use DataPortal\DataPortal;
 
-use RegDB\RegDB;
+use LogBook\LogBook;
+use LogBook\LogBookException;
+
+use LusiTime\LusiTimeException;
+
 use RegDB\RegDBException;
 
-$instruments = array();
+/* Descending sort experiments by their identifiers
+ */
+
+
+function sort_experiments_by_id_desc( $experiments ) {
+	usort( $experiments, function($a, $b) {	return $b->id() - $a->id();	});
+	return $experiments;
+}
+
+/* Global variables used by the rest of the script
+ */
+$logbook = null;
+$instrument_names = array();
 
 try {
 
-	$regdb = new RegDB();
-	$regdb->begin();
+	$logbook = new LogBook();
+	$logbook->begin();
 
-	foreach( $regdb->instruments() as $i ) {
-		if( $i->is_location()) continue;
-		array_push( $instruments, $i->name());
-	}
-	sort( $instruments );
+	foreach( $logbook->regdb()->instruments() as $instrument )
+		if( !$instrument->is_location())
+			array_push( $instrument_names, $instrument->name());
 
-} catch( RegDBException   $e ) {
-	print $e->toHtml();
-	exit;
-}
+	sort( $instrument_names );
 ?>
 
 
@@ -112,30 +129,129 @@ function show_email( user, addr ) {
 			array(
 				array( 'name' => 'Experiment',  'width' => 105 ),
 				array( 'name' => 'Id',          'width' =>  32 ),
-				array( 'name' => 'Status',      'width' =>  85 ),
-				array( 'name' => 'Begin',       'width' =>  90 ),
-				array( 'name' => 'End',         'width' =>  90 ),
+				array( 'name' => 'First Run',   'width' =>  90 ),
+				array( 'name' => 'Last Run',    'width' =>  90 ),
 				array( 'name' => 'Contact',     'width' => 160 ),
 				array( 'name' => 'Description', 'width' => 300 )
 			)
 		);
 	}
 	function table_row( $e ) {
-		$name = '<a href="index.php?exper_id='.$e->id().'" class="link">'.$e->name().'</a>';
+		$first_run = $e->find_first_run();
+		$last_run  = $e->find_last_run();
     	return DataPortal::table_row_html(
     		array(
-    			$name,
+    			'<a href="index.php?exper_id='.$e->id().'" class="link">'.$e->name().'</a>',
     			$e->id(),
-    			DataPortal::decorated_experiment_status( $e ),
-    			$e->begin_time()->toStringDay(),
-    			$e->end_time()->toStringDay(),
+    			is_null($first_run) ? '' : $first_run->begin_time()->toStringDay(),
+    			is_null( $last_run) ? '' :  $last_run->begin_time()->toStringDay(),
     			DataPortal::decorated_experiment_contact_info( $e ),
     			$e->description()
    			)
     	);
 	}
 
-	$h = <<<HERE
+	$experiment_tabs = array();
+
+	/* Experiments my account is a member of.
+	 */
+	$html = table_header();
+	$my_account = $logbook->regdb()->find_user_account( AuthDB::instance()->authName());
+	foreach( sort_experiments_by_id_desc( $logbook->experiments()) as $e ) {
+   		if( $e->is_facility()) continue;
+   		if( $e->leader_account() == $my_account['uid']) {
+   			$html .= table_row( $e );
+   		} else {
+   			$experiment_group = $e->POSIX_gid();
+   			foreach( $my_account['groups'] as $group )
+   				if( $experiment_group == $group ) {
+   					$html .= table_row( $e );
+   					break;
+   				}
+   		}
+	}
+	$html .= DataPortal::table_end_html();
+	array_push(
+		$experiment_tabs,
+    	array(
+    		'name' => 'My Experiments',
+    		'id'   => 'experiment-my',
+    		'html' => $html,
+    		'class' => 'tab-inline-content'
+    	)
+    );
+
+	/* All experiments in one tab. The tab has a subtab for each year of operation.
+     */
+    $experiment_by_year = array();
+   	foreach( sort_experiments_by_id_desc( $logbook->experiments()) as $e ) {
+   		if( $e->is_facility()) continue;
+   		$first_run = $e->find_first_run();
+   		$year = is_null($first_run) ? 0 : $first_run->begin_time()->year();
+   		if( !array_key_exists( $year,$experiment_by_year ))
+   			$experiment_by_year[$year] =
+   				array(
+   					'id' => 'experiments-by-year-'.$year,
+   					'html' => table_header());
+   		$experiment_by_year[$year]['html'] .= table_row( $e );
+   	}
+    $experiment_tabs_by_year = array();
+   	foreach( array_keys( $experiment_by_year ) as $year ) {
+   		array_push(
+   			$experiment_tabs_by_year,
+   			array(
+   				'name' => $year == 0 ? 'No runs taken yet' : $year,
+   				'id'   => 'experiments-by-year-'.$year,
+	   			'html' => $experiment_by_year[$year]['html'].DataPortal::table_end_html(),
+   				'class' => 'tab-inline-content'
+   			)
+   		);
+   	}
+   	array_push(
+		$experiment_tabs,
+    	array(
+    		'name' => 'all experiments',
+    		'id'   => 'experiments-by-year',
+    		'html' => DataPortal::tabs_html( "experiments-by-year-contents", $experiment_tabs_by_year ),
+	    	'class' => 'tab-inline-content'
+    	)
+    );
+
+	/* One tab per instrument.
+	 */
+    foreach( $instrument_names as $i ) {
+    	$experiment_by_year = array();
+    	foreach( sort_experiments_by_id_desc( $logbook->experiments_for_instrument( $i )) as $e ) {
+   			if( $e->is_facility()) continue;
+			$first_run = $e->find_first_run();
+   			$year = is_null($first_run) ? 0 : $first_run->begin_time()->year();
+   			if( !array_key_exists( $year,$experiment_by_year ))
+   				$experiment_by_year[$year] =
+   					array(
+   						'id' => 'experiments-by-year-'.$year,
+   						'html' => table_header());
+   				$experiment_by_year[$year]['html'] .= table_row( $e );
+   		}
+	    $html = '';
+	   	foreach( array_keys( $experiment_by_year ) as $year ) {
+	   		$html .=
+	   			'<p class="section1">'.($year == 0 ? 'No runs taken yet' : $year).'</p>'.
+	   			$experiment_by_year[$year]['html'].DataPortal::table_end_html();
+   		}
+    	array_push(
+    		$experiment_tabs,
+    		array(
+   				'name' => $i,
+    			'id'   => 'experiments-'.$i,
+    			'html' => $html,
+    			'class' => 'tab-inline-content'
+    		)
+    	);
+    }
+
+    /* Search experiments by partial names or numeric identifiers
+     */
+	$html = <<<HERE
 <div id="experiment-search" stype="display:none;">
   <div>
     <input type="text" title="enter experiment name or its numeric identifier"/>
@@ -146,86 +262,16 @@ function show_email( user, addr ) {
 
 HERE;
 
-	$experiment_tabs = array();
    	array_push(
 		$experiment_tabs,
     	array(
     		'name' => 'Search',
     		'id'   => 'experiment-search',
-    		'html' => $h
+    		'html' => $html,
+    		'class' => 'tab-inline-content'
     	)
     );
-	
-    /* All experiments in one tab. The tab has a subtab for each year of operation.
-     */
-    $experiment_tabs_by_year = array();
-   	$html = '';
-   	$year = null;
-   	foreach( $regdb->experiments() as $e ) {
-   		if( $e->is_facility()) continue;
-   		if( is_null( $year ) || ( $year != $e->begin_time()->year())) {
-   			if( !is_null( $year )) {
-   				$html .= DataPortal::table_end_html();
-   				array_push(
-   					$experiment_tabs_by_year,
-   					array('name' => $year,
-   						  'id'   => 'experiments-by-year-'.$year,
-			   			  'html' => $html
-   					)
-   				);
-   				$html = '';
-   			}
-   			$year = $e->begin_time()->year();
-   			$html .= table_header();
-   		}
-   		$html .= table_row( $e );
-   	}
-   	if(( $html != '' ) && !is_null( $year )) {
-   		$html .= DataPortal::table_end_html();
-   		array_push(
-   			$experiment_tabs_by_year,
-   			array(
-   				'name' => $year,
-   				'id'   => 'experiments-by-year-'.$year,
-   				'html' => $html
-   			)
-		);
-   	}
-   	array_push(
-		$experiment_tabs,
-    	array(
-    		'name' => 'all experiments',
-    		'id'   => 'experiments-by-year',
-    		'html' => DataPortal::tabs_html( "experiments-by-year-contents", $experiment_tabs_by_year  )
-    	)
-    );
-
-	/* One tab per instrument.
-	 */
-    foreach( $instruments as $i ) {
-    	$html = '';
-    	$year = null;
-    	foreach( $regdb->experiments_for_instrument( $i ) as $e ) {
-    		if( is_null( $year ) || ( $year != $e->begin_time()->year())) {
-    			if( !is_null( $year )) {
-    				$html .= DataPortal::table_end_html();
-    			}
-    			$year = $e->begin_time()->year();
-    			$html .= '<p class="section1">'.$year.'</p>'.table_header();
-     		}
-    		$html .= table_row( $e );
-    	}
-    	$html .= DataPortal::table_end_html();
-    	array_push(
-    		$experiment_tabs,
-    		array(
-    			'name' => $i,
-    			'id'   => 'experiments-'.$i,
-    			'html' => $html
-    		)
-    	);
-    }
-
+    
    	/* Print the whole tab and its contents (including sub-tabs).
    	 */
 	DataPortal::tabs( "experiments", $experiment_tabs );
@@ -241,3 +287,15 @@ HERE;
     DataPortal::end();
 ?>
 <!--------------------- Document End Here -------------------------->
+
+<?php
+
+	$logbook->commit();
+
+} catch( AuthDBException   $e ) { print $e->toHtml(); exit; }
+  catch( LogBookException  $e ) { print $e->toHtml(); exit; }
+  catch( LusiTimeException $e ) { print $e->toHtml(); exit; }
+  catch( RegDBException    $e ) { print $e->toHtml(); exit; }
+  catch( Exception         $e ) { print $e; exit; }
+
+?>

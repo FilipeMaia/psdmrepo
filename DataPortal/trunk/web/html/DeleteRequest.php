@@ -15,25 +15,22 @@ use FileMgr\FileMgrException;
  *
  * @param $msg - a message to be reported
  */
-function return_error( $msg ) {
+function report_error( $msg ) {
 
 	header( 'Content-type: application/json' );
 	header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
 	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
 
-	echo '{"ResultSet":{"Status":"error","Reason":"'.json_encode( $msg ).'"}}';
-
+	echo '{"Status":"error","Message":'.json_encode( $msg ).'}';
 	exit;
 }
 
 /* Translate & analyze input parameters
  */
-if( !isset( $_GET[ 'id' ] ))
-	return_error( 'no request identifier parameter found' );
+if( !isset( $_GET[ 'id' ] )) report_error( 'no request identifier parameter found' );
 
 $id = (int)trim( $_GET[ 'id' ] );
-if( $id <= 0 )
-	return_error( 'invalid request identifier' );
+if( $id <= 0 ) report_error( 'invalid request identifier' );
 
 /**
  * Produce a document with JSON representation of successfully
@@ -47,8 +44,7 @@ function return_result( $request ) {
 	header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
 	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
 
-	echo '{"ResultSet":{"Status":"success","Result":'.json_encode( $request ).'}}';
-
+	echo '{"Status":"success","Result":'.json_encode( $request ).'}';
 	exit;
 }
 
@@ -60,7 +56,6 @@ try {
 
 	return_result( $request );
 
-} catch( FileMgrException $e ) {
-	return_error( $e->toHtml());
-}
+} catch( FileMgrException $e ) { report_error( $e->toHtml()); }
+
 ?>

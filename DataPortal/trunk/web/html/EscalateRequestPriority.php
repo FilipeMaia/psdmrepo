@@ -3,6 +3,7 @@
 require_once( 'logbook/logbook.inc.php' );
 require_once( 'filemgr/filemgr.inc.php' );
 
+use LogBook\LogBook;
 use LogBook\LogBookException;
 
 use FileMgr\FileMgrIfaceCtrlWs;
@@ -18,47 +19,38 @@ use FileMgr\FileMgrException;
  *
  * @param $msg - a message to be reported
  */
-function return_error( $msg ) {
+function report_error( $msg ) {
 
 	header( 'Content-type: application/json' );
 	header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
 	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
 
-	echo '{"ResultSet":{"Status":"error","Reason":"'.json_encode( $msg ).'"}}';
-
+	echo '{"Status":"error","Reason":'.json_encode( $msg ).'}';
 	exit;
 }
 
 /* Translate & analyze input parameters
  */
-if( !isset( $_GET[ 'exper_id' ] ))
-	return_error( 'no experiment identifier parameter found' );
-
+if( !isset( $_GET[ 'exper_id' ] )) report_error( 'no experiment identifier parameter found' );
 $exper_id = (int)trim( $_GET[ 'exper_id' ] );
-if( $exper_id <= 0 )
-	return_error( 'invalid experiment identifier' );
+if( $exper_id <= 0 ) report_error( 'invalid experiment identifier' );
 
-if( !isset( $_GET[ 'id' ] ))
-	return_error( 'no request identifier parameter found' );
-
+if( !isset( $_GET[ 'id' ] )) report_error( 'no request identifier parameter found' );
 $id = (int)trim( $_GET[ 'id' ] );
-if( $id <= 0 )
-	return_error( 'invalid request identifier' );
+if( $id <= 0 ) report_error( 'invalid request identifier' );
 
 /**
- * Produce a document with JSON representation of successfully
- * deleted requests.
+ * Return a JSON document with the new priority of the request.
  *
- * @param $result - an array of requests
+ * @param $priority - the new priority
  */	
-function return_result( $request ) {
+function return_result( $priority ) {
 
 	header( 'Content-type: application/json' );
 	header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
 	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
 
-	echo '{"ResultSet":{"Status":"success","Result":'.json_encode( $request ).'}}';
-
+	echo '{"Status":"success","Priority":'.json_encode( $priority ).'}';
 	exit;
 }
 
@@ -69,8 +61,7 @@ try {
 	/* Find the experiment & run
 	 */
 	$experiment = $logbook->find_experiment_by_id( $exper_id );
-	if( is_null( $experiment ))
-		return_error( 'no such experiment exists' );
+	if( is_null( $experiment )) report_error( 'no such experiment exists' );
 	
 	/* Find pending requests for the experiment in order to calculate
 	 * the desired priority range for the modified request.
@@ -98,11 +89,9 @@ try {
 		$id,
 		$priority );
 
-	return_result( $request );
+	return_result( $priority );
 
-} catch( LogBookException $e ) {
-	return_error( $e->toHtml());
-} catch( FileMgrException $e ) {
-	return_error( $e->toHtml());
-}
+} catch( LogBookException $e ) { report_error( $e->toHtml()); }
+  catch( FileMgrException $e ) { report_error( $e->toHtml()); }
+
 ?>

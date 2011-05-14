@@ -14,6 +14,7 @@ use FileMgr\FileMgrIfaceCtrlWs;
 use FileMgr\FileMgrException;
 
 use RegDB\RegDB;
+use RegDB\RegDBAuth;
 use RegDB\RegDBException;
 
 use LogBook\LogBook;
@@ -67,178 +68,995 @@ try {
 
     /* Get stats for e-log
      */
+    $num_runs = 0;
     $min_run = null;
     $max_run = null;
     $logbook_runs = $logbook_experiment->runs();
-    foreach( $logbook_runs as $r ) {
-  		$run = $r->num();
+    foreach( $logbook_runs as $run ) {
+    	$num_runs++;
   		if( is_null( $min_run )) {
   			$min_run = $run;
   			$max_run = $run;
   		} else {
-    		if( $run < $min_run ) $min_run = $run;
-  			if( $run > $max_run ) $max_run = $run;
+    		if( $run->num() < $min_run->num()) $min_run = $run;
+  			if( $run->num() > $max_run->num()) $max_run = $run;
   		}
     }
+    $range_of_runs = ( is_null($min_run) || is_null($max_run)) ? 'no runs taken yet' : $min_run->num().' .. '.$max_run->num();
+
     $logbook_shifts = $logbook_experiment->shifts();
-    
-    /* Get the stats for data files
-     */
-    $num_runs = 0;
-    $xtc_num_files  = 0;
-    $xtc_size       = 0.0;
-    $xtc_local_copy = 0;
-    $xtc_archived   = 0;
 
-    $hdf5_num_files  = 0;
-    $hdf5_size       = 0.0;
-    $hdf5_local_copy = 0;
-    $hdf5_archived   = 0;
+    $document_title = 'Data Portal of Experiment:';
+    $document_subtitle = '<a href="select_experiment.php" title="Switch to another experiment">'.$experiment->instrument()->name().'&nbsp;/&nbsp;'.$experiment->name().'</a>';
 
-    if( $experiment->begin_time()->greaterOrEqual( LusiTime::now())) {
-        ;
+    $decorated_experiment_status = '<span style="color:#b0b0b0; font-weight:bold;">NOT ACTIVE</span>';
+    $last_experiment_switch = $regdb->last_experiment_switch( $instrument->name());
+    if( !is_null( $last_experiment_switch ) && ( $exper_id == $last_experiment_switch['exper_id'] )) $decorated_experiment_status = '<span style="color:#ff0000; font-weight:bold;">ACTIVE</span>';
+	$decorated_experiment_contact = DataPortal::decorated_experiment_contact_info( $experiment );
+	$min_run_num = is_null($min_run) ? '' : $min_run->num();
+	$max_run_num = is_null($max_run) ? '' : $max_run->num();
+	$decorated_min_run = is_null($min_run) ? 'n/a' : $min_run->begin_time()->toStringShort().' (<b>run '.$min_run->num().'</b>)';
+	$decorated_max_run = is_null($max_run) ? 'n/a' : $max_run->end_time()->toStringShort().' (<b>run '.$max_run->num().'</b>)';
+	$experiment_group_members     = "<table><tbody>\n";
+    $experiment_group_members .= '<tr><td class="table_cell table_cell_left"></td><td class="table_cell table_cell_right"></td></tr>';
+	foreach( $experiment->group_members() as $m ) {
+    	$uid   = $m['uid'];
+    	$gecos = $m['gecos'];
+        $experiment_group_members .= '<tr><td class="table_cell table_cell_left">'.$uid.'</td><td class="table_cell table_cell_right">'.$gecos.'</td></tr>';
+	}
+	$experiment_group_members .= "</tbody></table>\n";
+    $experiment_summary_workarea =<<<HERE
+
+<table><tbody>
+  <tr><td class="table_cell table_cell_left">Id</td>
+      <td class="table_cell table_cell_right">{$experiment->id()}</td></tr>
+  <tr><td class="table_cell table_cell_left">Status</td>
+      <td class="table_cell table_cell_right">{$decorated_experiment_status}</td></tr>
+  <tr><td class="table_cell table_cell_left">Total # of runs taken</td>
+      <td class="table_cell table_cell_right">{$num_runs}</td></tr>
+  <tr><td class="table_cell table_cell_left">First run</td>
+      <td class="table_cell table_cell_right">{$decorated_min_run}</td></tr>
+  <tr><td class="table_cell table_cell_left">Last run</td>
+      <td class="table_cell table_cell_right">{$decorated_max_run}</td></tr>
+  <tr><td class="table_cell table_cell_left">Description</td>
+      <td class="table_cell table_cell_right"><pre style="background-color:#e0e0e0; padding:0.5em;">{$experiment->description()}</pre></td></tr>
+  <tr><td class="table_cell table_cell_left">Contact</td>
+      <td class="table_cell table_cell_right">{$decorated_experiment_contact}</td></tr>
+  <tr><td class="table_cell table_cell_left">Leader</td>
+      <td class="table_cell table_cell_right">{$experiment->leader_Account()}</td></tr>
+  <tr><td class="table_cell table_cell_left table_cell_bottom" valign="top">POSIX Group</td>
+      <td class="table_cell table_cell_right table_cell_bottom">
+        <table cellspacing=0 cellpadding=0><tbody>
+          <tr><td style="font-size: 75%;" valign="top">{$experiment->POSIX_gid()}</td>
+              <td>&nbsp;</td>
+              <td><span id="exp-group-toggler" class="toggler ui-icon ui-icon-triangle-1-e" title="click to see/hide the list of members"></span>
+                  <div id="exp-group-members" class="exp-group-members-hidden">{$experiment_group_members}</div>
+              </td></tr>
+        </tbody></table>
+      </td></tr>
+</tbody></table>
+
+HERE;
+	$can_manage_group = false;
+    foreach( array_keys( $regdb->experiment_specific_groups()) as $g ) {
+    	
+  		if( $g == $experiment->POSIX_gid()) {
+	        $can_manage_group = RegDBAuth::instance()->canManageLDAPGroup( $g );
+            break;
+        }
+    }
+    if($can_manage_group) {
+	    $experiment_manage_group_workarea =<<<HERE
+
+<div style="float:left; margin-left:10px; margin-right:20px; margin-bottom:40px; padding-right:30px; border-right: 1px solid #c0c0c0;">
+  <div style="height:55px;">
+    <div style="float:left; font-size: 300%; font-family: Times, sans-serif;"><b>{$experiment->POSIX_gid()}</b></div>
+    <div style="float:left; margin-left:10px; padding-top:4px;"><button id="exp-m-g-refresh">Refresh</button></div>
+    <div style="clear:both;"></div>
+  </div>
+  <div id="exp-m-g-members-stat"></div>
+  <div id="exp-m-g-members" style="margin-top:4px;"></div>
+</div>
+<div style="float:left; padding-left:10px;">
+  <div style="height:55px;">
+    <div style="float:left; font-weight:bold; padding-top:8px;">Search users:</div>
+    <div style="float:left; margin-left:5px;"><input type="text" style="padding:2px;" id="exp-m-g-string2search" value="" size=16 title="enter the pattern to search then press RETURN" /></div>
+    <div style="float:left; margin-left:10px; font-weight:bold; padding-top:6px;">by:</div>
+    <div style="float:left; margin-left:5px; padding-top:3px;" id="exp-m-g-scope">
+      <input type="radio" id="exp-m-g-uid"   name="scope" value="uid"                         /><label for="exp-m-g-uid"  >UID</label>
+      <input type="radio" id="exp-m-g-gecos" name="scope" value="gecos"                       /><label for="exp-m-g-gecos">name</label>
+      <input type="radio" id="exp-m-g-both"  name="scope" value="uid_gecos" checked="checked" /><label for="exp-m-g-both" >both</label>
+    </div>
+    <div style="clear:both;"></div>
+  </div>
+  <div id="exp-m-g-users-stat"></div>
+  <div id="exp-m-g-users" style="margin-top:4px;"></div>
+</div>
+<div style="clear:both;"></div>
+
+HERE;
     } else {
-
-        $range = FileMgrIrodsWs::max_run_range( $instrument->name(), $experiment->name(), array('xtc','hdf5'));
-
-        $num_runs      = $range['total'];
-        $range_of_runs = $range['min'].'-'.$range['max'];
-
-        $xtc_runs = null;
-        FileMgrIrodsWs::runs( $xtc_runs, $instrument->name(), $experiment->name(), 'xtc', $range_of_runs );
-        foreach( $xtc_runs as $run ) {
-            $unique_files = array();  // per this run
-            $files = $run->files;
-            foreach( $files as $file ) {
-                if( !array_key_exists( $file->name, $unique_files )) {
-                    $unique_files[$file->name] = $run->run;
-                    $xtc_num_files++;
-                    $xtc_size += $file->size / (1024.0 * 1024.0 * 1024.0);
-                }
-                if( $file->resource == 'hpss-resc'   ) $xtc_archived++;
-                if( $file->resource == 'lustre-resc' ) $xtc_local_copy++;
-            }
-        }
-        $xtc_size_str = sprintf( "%.0f", $xtc_size );
-
-        $hdf5_runs = null;
-        FileMgrIrodsWs::runs( $hdf5_runs, $instrument->name(), $experiment->name(), 'hdf5', $range_of_runs );
-        foreach( $hdf5_runs as $run ) {
-            $unique_files = array();  // per this run
-            $files = $run->files;
-            foreach( $files as $file ) {
-                if( !array_key_exists( $file->name, $unique_files )) {
-                    $unique_files[$file->name] = $run->run;
-                    $hdf5_num_files++;
-                    $hdf5_size += $file->size / (1024.0 * 1024.0 * 1024.0);
-                }
-                if( $file->resource == 'hpss-resc'   ) $hdf5_archived++;
-                if( $file->resource == 'lustre-resc' ) $hdf5_local_copy++;
-            }
-        }
-        $hdf5_size_str = sprintf( "%.0f", $hdf5_size );
+	    $experiment_manage_group_workarea =<<<HERE
+<br><br>
+<center>
+  <span style="color: red; font-size: 175%; font-weight: bold; font-family: Times, sans-serif;">
+    A c c e s s &nbsp; E r r o r
+  </span>
+</center>
+<div style="margin: 10px 10% 10px 10%; padding: 10px; font-size: 125%; font-family: Times, sans-serif; border-top: 1px solid #b0b0b0;">
+  We're sorry! Your SLAC UNIX account <b>{$auth_svc->authName()}</b> has no proper permissions to manage POSIX
+  group <b>{$experiment->POSIX_gid()}</b> associated with the experiment. Normally we assign this task to
+  the PI of the experiment. The PI may also delegate the role to another member of the experiment.
+  If you're the PI then please contact us by sending a e-mail request to <b>pcds-help</b> (at SLAC). Otherwise
+  contact the PI of the experiment.
+</div>
+HERE;
     }
 
-    $range_of_runs = '0-0';
-    if( !$experiment->begin_time()->greaterOrEqual( LusiTime::now())) {
-        $range = FileMgrIrodsWs::max_run_range( $instrument->name(), $experiment->name(), array( 'xtc', 'hdf5' ));
-        $range_of_runs = $range['min'].'-'.$range['max'];
+    $elog_recent_workarea =<<<HERE
+
+<div id="el-l-mctrl">
+  <div style="float:left;">
+    <div style="font-weight:bold; margin-bottom:4px;">Show runs:</div>
+    <div id="el-l-rs-selector">
+      <input type="radio" id="el-l-rs-on"  name="show_runs" value="on" checked="checked"/><label for="el-l-rs-on" >Yes</label>
+      <input type="radio" id="el-l-rs-off" name="show_runs" value="off"/><label for="el-l-rs-off">No</label>
+    </div>
+  </div>
+  <div style="float:left; margin-left:20px;">
+    <div style="font-weight:bold; margin-bottom:2px;">Messages:</div>
+    <select name="messages" style="font-size:90%; padding:1px;" title="Select non-blank option to select how many events to load">
+      <option>20</option>
+      <option>100</option>
+      <option>shift</option>
+      <option>24 hrs</option>
+      <option>7 days</option>
+      <option>everything</option>
+    </select>
+  </div>
+  <div style="float:right;" class="el-l-auto">
+    <div style="float:left;">
+      <div style="font-weight:bold; margin-bottom:4px;">Autorefresh:</div>
+      <div id="el-l-refresh-selector" style="float:left;">
+        <input type="radio" id="el-l-refresh-on"  name="refresh" value="on"  checked="checked" /><label for="el-l-refresh-on"  >On</label>
+        <input type="radio" id="el-l-refresh-off" name="refresh" value="off"                   /><label for="el-l-refresh-off" >Off</label>
+      </div>
+      <div style="float:left; margin-left:10px; font-size:80%;">
+        <select id="el-l-refresh-interval">
+          <option>2</option>
+          <option>5</option>
+          <option>10</option>
+        </select>
+        s.
+      </div>
+      <div style="clear:both;"></div>
+    </div>
+    <div style="float:right; margin-left:10px;">
+      <button id="el-l-refresh" title="check if there are new messages or runs">Refresh</button>
+    </div>    
+    <div style="clear:both;"></div>
+  </div>
+  <div style="clear:both;"></div>
+</div>
+<div class="el-wa">
+  <div class="el-ms-mctrl">
+    <button id="el-l-expand"     title="click a few times to expand the whole tree">Expand++</button>
+    <button id="el-l-collapse"   title="each click will collapse the tree to the previous level of detail">Collapse--</button>
+    <button id="el-l-viewattach" title="view attachments of expanded messages">View Attachments</button>
+    <button id="el-l-hideattach" title="hide attachments of expanded messages">Hide Attachments</button>
+  </div>  
+  <div class="el-ms-info" id="el-l-ms-info" style="float:right;"></div><div style="clear:both;"></div>
+  <div class="el-ms" id="el-l-ms"></div>
+</div>
+
+HERE;
+
+    $num_tags = 3;
+    $tags_html = '';
+    for( $i = 0; $i < $num_tags; $i++) {
+    	$select_tag_html = "<option> select tag </option>\n";
+    	foreach( $logbook_experiment->used_tags() as $tag ) {
+    		$select_tag_html .= "<option>{$tag}</option>\n";
+    	}
+    	$tags_html .=<<<HERE
+<div style="width: 100%;">
+  <select id="elog-tags-library-{$i}">{$select_tag_html}</select>
+  <input type="text" class="elog-tag-name" id="elog-tag-name-{$i}" name="tag_name_{$i}" value="" size=16 title="type new tag here or select a known one from the left" />
+  <input type="hidden" id="elog-tag-value-{$i}" name="tag_value_{$i}" value="" />
+</div>
+
+HERE;
     }
 
-    /* Get the stats for HDF translation
-     */
-    $latest_only = true;
-	$hdf5_requests = FileMgrIfaceCtrlWs::experiment_requests (
-		$instrument->name(),
-		$experiment->name(),
-		$latest_only
-	);
+    $today = date("Y-m-d");
+    $now   = "00:00:00";
+    $shifts_html = '';
+    foreach( $logbook_shifts as $shift )
+    	$shifts_html .= "<option>{$shift->begin_time()->toStringShort()}</option>";
+    
+    $elog_post_workarea =<<<HERE
+<div id="el-p">
+  <div>
+    <div style="float:left;">
+      <div>
+        <div id="el-p-message4experiment" class="hidden">
+          <div style="font-weight:bold; padding-top:5px; padding-bottom:5px;">Message for the experiment:</div>
+        </div>
+        <div id="el-p-message4shift">
+          <div style="float:left; font-weight:bold; padding-top:5px;">Message for shift</div>
+          <div style="float:left; margin-left:5px;">
+            <select id="el-p-shift">{$shifts_html}</select>
+          </div>
+          <div style="clear:both;"></div>
+        </div>
+        <div id="el-p-message4run" class="hidden">
+          <div style="float:left; font-weight:bold; padding-top:5px;">Message for run</div>
+          <div style="float:left; margin-left:5px;">
+            <input type="text" id="el-p-runnum" value="{$max_run_num}" size=2 />
+            <span id="el-p-runnum-error" style="color:red;"></span>
+          </div>
+          <div style="clear:both;"></div>
+        </div>
+      </div>
+      <form id="elog-form-post" enctype="multipart/form-data" action="/apps-dev/logbook/NewFFEntry4portal.php" method="post">
+        <input type="hidden" name="id" value="{$experiment->id()}" />
+        <input type="hidden" name="scope" value="" />
+        <input type="hidden" name="run_id" value="" />
+        <input type="hidden" name="shift_id" value="" />
+        <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />
+        <input type="hidden" name="num_tags" value="{$num_tags}" />
+        <input type="hidden" name="onsuccess" value="" />
+        <input type="hidden" name="relevance_time" value="" />
+        <textarea name="message_text" rows="12" cols="64" style="padding:4px; margin-top:5px;" title="the first line of the message body will be used as its subject" ></textarea>
+        <div style="margin-top: 10px;">
+          <div style="float:left;">
+            <div style="font-weight:bold;">Author:</div>
+            <input type="text" name="author_account" value="{$auth_svc->authName()}" size=32 style="padding:2px; margin-top:5px; width:100%;" />
+            <div style="margin-top:20px;"> 
+              <div style="font-weight:bold;">Tags:</div>
+              <div style="margin-top:5px;">{$tags_html}</div>
+            </div>
+          </div>
+          <div style="float:left; margin-left:30px;"> 
+            <div style="font-weight:bold;">Attachments:</div>
+            <div id="el-p-as" style="margin-top:5px;">
+              <div>
+                <input type="file" name="file2attach_0" onchange="elog.post_add_attachment()" />
+                <input type="hidden" name="file2attach_0" value="" />
+              </div>
+            </div>
+          </div>
+          <div style="clear:both;"></div>
+        </div>
+      </form>
+    </div>
+    <div style="float:right; margin-left:4px;"><button id="elog-post-reset">Reset form</button></div>
+    <div style="float:right; margin-left:5px;"><button id="elog-post-submit">Submit</button></div>
+    <div style="clear:both;"></div>
+  </div>
+  <div style="margin-top:10px;">
+    <div style="float:left;">
+      <div style="font-weight:bold;">Adjust Post Time:</div>
+      <div id="el-p-relevance-selector" style="margin-top:8px;">
+        <input type="radio" id="el-p-relevance-now"   name="relevance" value="now"   checked="checked" /><label for="el-p-relevance-now"   title="it will be the actual posting time"      >now</label>
+        <input type="radio" id="el-p-relevance-past"  name="relevance" value="past"                    /><label for="el-p-relevance-past"  title="use date and time selector on the right" >past</label>
+        <input type="radio" id="el-p-relevance-shift" name="relevance" value="shift"                   /><label for="el-p-relevance-shift" title="within specified shift"                  >in shift</label>
+        <input type="radio" id="el-p-relevance-run"   name="relevance" value="run"                     /><label for="el-p-relevance-run"   title="within specified run"                    >in run</label>
+      </div>
+    </div>
+    <div style="float:left; margin-left:10px;">
+      <div style="font-weight:bold;">&nbsp;</div>
+      <div style="margin-top:4px;">
+        <input type="text" id="el-p-datepicker" value="{$today}" size=11 />
+        <input type="text" id="el-p-time" value="{$now}"  size=8 />
+      </div>
+    </div>
+    <div style="clear:both"></div>
+  </div>
+</div>
 
-    $hdf5_num_runs_complete = 0;
-    $hdf5_num_runs_failed = 0;
-    $hdf5_num_runs_wait = 0;
-    $hdf5_num_runs_translate = 0;
-	$hdf5_num_runs_unknown = 0;
+HERE;
 
-   	foreach( $hdf5_requests as $req ) {
-		switch( $req->status ) {
+    $time_title =
+        "Valid format:\n".
+        "\t".LusiTime::now()->toStringShort()."\n".
+        "Also the (case neutral) shortcuts are allowed:\n".
+        "\t'b' - the begin time of the experiment\n".
+        "\t'e' - the end time of the experiment\n".
+        "\t'm' - month (-31 days) ago\n".
+        "\t'w' - week (-7 days) ago\n".
+        "\t'd' - day (-24 hours) ago\n".
+        "\t'y' - since yesterday (at 00:00:00)\n".
+        "\t't' - today (at 00:00:00)\n".
+        "\t'h' - an hour (-60 minutes) ago";
 
-			case 'Initial_Entry':
-			case 'Waiting_Translation':
-				$hdf5_num_runs_wait++;
-				break;
+    $tag2search_html = '<option></option>';
+    foreach( $logbook_experiment->used_tags() as $tag ) {
+    	$tag2search_html .= "<option>{$tag}</option>\n";
+    }
+    $author2search_html = '<option></option>';
+    foreach( $logbook_experiment->used_authors() as $author ) {
+    	$author2search_html .= "<option>{$author}</option>\n";
+    }
+    $elog_search_workarea =<<<HERE
+<div id="el-s-ctrl">
+  <div style="float:left;">
+    <form id="elog-form-search" action="../logbook/Search.php" method="get">
+      <div style="float:left;">
+        <div style="font-weight:bold;">Text to search:</div>
+        <div><input type="text" name="text2search" value="" size=24 style="font-size:90%; padding:1px; margin-top:5px; width:100%;" /></div>
+        <div style="float:left; margin-top:5px;">
+          <div style="font-weight:bold;">Tag:</div>
+          <div style="margin-top:5px;"><select name="tag" style="font-size:90%; padding:1px;">{$tag2search_html}</select></div>
+        </div>
+        <div style="float:left; margin-top:5px; margin-left:10px;">
+          <div style="font-weight:bold;">Posted by:</div>
+          <div style="margin-top:5px;"><select name="author" style="font-size:90%; padding:1px;">{$author2search_html}</select></div>
+        </div>
+        <div style="clear:both;"></div>
+      </div>
+      <div style="float:left; margin-left:20px;">
+        <div style="font-weight:bold; margin-bottom:5px;">Search in:</div>
+        <div><input type="checkbox" name="search_in_messages" value="Message" checked="checked" /> message body</div>
+        <div><input type="checkbox" name="search_in_tags" value="Tag" /> tags</div>
+        <div><input type="checkbox" name="search_in_values" value="Value" /> tag values</div>
+      </div>
+      <div style="float:left; margin-left:20px;">
+        <div style="font-weight:bold; margin-bottom:5px;">Posted at:</div>
+        <div><input type="checkbox" name="posted_at_instrument" value="Instrument" /> instrument</div>
+        <div><input type="checkbox" name="posted_at_experiment" value="Experiment" checked="checked" /> experiment</div>
+        <div><input type="checkbox" name="posted_at_shifts" value="Shifts" checked="checked" /> shifts</div>
+        <div><input type="checkbox" name="posted_at_runs" value="Runs" checked="checked" /> runs</div>
+      </div>
+      <div style="float:left; margin-left:20px;">
+        <div title="{$time_title}">
+          <div style="font-weight:bold;">Begin Time:</div>
+          <div><input type="text" name="begin" value="" size=24 style="font-size:90%; padding:1px; margin-top:5px;"/></div>
+        </div>
+        <div style="margin-top:5px;" title="{$time_title}">
+          <div style="font-weight:bold;">End Time:</div>
+          <div><input type="text" name="end" value="" size=24 style="font-size:90%; padding:1px; margin-top:5px;"/></div>
+        </div>
+      </div>
+      <div style="clear:both;"></div>
+    </form>
+  </div>
+  <div style="float:right; margin-left:4px;"><button id="elog-search-reset">Reset form</button></div>
+  <div style="float:right; margin-left:5px;"><button id="elog-search-submit">Submit</button></div>
+  <div style="clear:both;"></div>
+</div>
+<div class="el-wa">
+  <div class="el-ms-mctrl">
+    <button id="el-s-expand"     title="click a few times to expand the whole tree">Expand++</button>
+    <button id="el-s-collapse"   title="each click will collapse the tree to the previous level of detail">Collapse--</button>
+    <button id="el-s-viewattach" title="view attachments of expanded messages">View Attachments</button>
+    <button id="el-s-hideattach" title="hide attachments of expanded messages">Hide Attachments</button>
+  </div>  
+  <div class="el-ms-info" id="el-s-ms-info" style="float:right;"></div><div style="clear:both;"></div>
+  <div class="el-ms" id="el-s-ms"></div>
+</div>
+HERE;
 
-			case 'Being_Translated':
-				$hdf5_num_runs_translate++;
-				break;
+    $datafiles_summary_workarea =<<<HERE
+<div id="datafiles-summary-ctrl">
+  <div style="float:right;"><button id="datafiles-summary-refresh" title="click to refresh the summary information">Refresh</button></div>
+  <div style="clear:both;"></div>
+</div>
+<div id="datafiles-summary-wa">
+  <div class="datafiles-info" id="datafiles-summary-info" style="float:right;">&nbsp;</div><div style="clear:both;"></div>
+  <table><tbody>
+    <tr><td class="table_cell table_cell_left"># of runs</td>
+        <td class="table_cell table_cell_right" id="datafiles-summary-runs">no data</td></tr>
+    <tr><td class="table_cell table_cell_left">First run #</td>
+        <td class="table_cell table_cell_right" id="datafiles-summary-firstrun">no data</td></tr>
+    <tr><td class="table_cell table_cell_left">Last run #</td>
+        <td class="table_cell table_cell_right" id="datafiles-summary-lastrun">no data</td></tr>
+    <tr><td class="table_cell table_cell_left" valign="center">XTC</td>
+        <td class="table_cell table_cell_right">
+          <table cellspacing=0 cellpadding=0><tbody>
+            <tr><td class="table_cell table_cell_left">Size [GB]</td>
+                <td class="table_cell table_cell_right" id="datafiles-summary-xtc-size">no data</td></tr>
+            <tr><td class="table_cell table_cell_left"># of files</td>
+                <td class="table_cell table_cell_right" id="datafiles-summary-xtc-files">no data</td></tr>
+            <tr><td class="table_cell table_cell_left">Archived to HPSS</td>
+                <td class="table_cell table_cell_right" id="datafiles-summary-xtc-archived">no data</td></tr>
+            <tr><td class="table_cell table_cell_left  table_cell_bottom">Available on disk</td>
+                <td class="table_cell table_cell_right table_cell_bottom" id="datafiles-summary-xtc-disk">no data</td></tr>
+            </tbody></table>
+        </td></tr>
+    <tr><td class="table_cell table_cell_left table_cell_bottom" valign="center">HDF5</td>
+        <td class="table_cell table_cell_right table_cell_bottom">
+          <table cellspacing=0 cellpadding=0><tbody>
+            <tr><td class="table_cell table_cell_left">Size [GB]</td>
+                <td class="table_cell table_cell_right" id="datafiles-summary-hdf5-size">no data</td></tr>
+            <tr><td class="table_cell table_cell_left"># of files</td>
+                <td class="table_cell table_cell_right" id="datafiles-summary-hdf5-files">no data</td></tr>
+            <tr><td class="table_cell table_cell_left">Archived to HPSS</td>
+                <td class="table_cell table_cell_right" id="datafiles-summary-hdf5-archived">no data</td></tr>
+            <tr><td class="table_cell table_cell_left  table_cell_bottom">Available on disk</td>
+                <td class="table_cell table_cell_right table_cell_bottom" id="datafiles-summary-hdf5-disk">no data</td></tr>
+            </tbody></table>
+        </td></tr>
+  </tbody></table>
+</div>
+HERE;
 
-			case 'Empty_Fileset':
-			case 'H5Dir_Error':
-			case 'Translation_Error':
-		    case 'Archive_Error':
-		    	$hdf5_num_runs_failed++;
-		    	break;
+    $datafiles_files_workarea =<<<HERE
+<div id="datafiles-files-ctrl">
+  <div style="float:left;">
+    <div style="float:left;">
+      <div style="font-weight:bold;">Search runs:</div>
+      <div style="margin-top:5px;">
+        <input type="text" name="runs" style="font-size:90%; padding:1px;" title="Put a range of runs to activate the filter. Use the following syntax: 1,3,5,10-20,211"></input>
+      </div>
+    </div>
+    <div style="float:left; margin-left:20px;">
+      <div style="font-weight:bold;">Types:</div>
+      <div style="margin-top:5px;">
+        <select name="types" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
+          <option>any</option>
+          <option>XTC</option>
+          <option>HDF5</option>
+        </select>
+      </div>
+    </div>
+    <div style="float:left; margin-left:20px;">
+      <div style="font-weight:bold;">Created:</div>
+      <div style="margin-top:5px;">
+        <select name="created" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
+          <option>any</option>
+          <option>1 hr</option>
+          <option>12 hrs</option>
+          <option>24 hrs</option>
+          <option>7 days</option>
+          <option>1 month</option>
+          <option>1 year</option>
+          </select>
+      </div>
+    </div>
+    <div style="float:left; margin-left:20px;">
+      <div style="font-weight:bold;">Checksum:</div>
+      <div style="margin-top:5px;">
+        <select name="checksum" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
+          <option>any</option>
+          <option>none</option>
+          <option>is known</option>
+        </select>
+      </div>
+    </div>
+    <div style="float:left; margin-left:20px;">
+      <div style="font-weight:bold;">Archived:</div>
+      <div style="margin-top:5px;">
+        <select name="archived" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
+          <option>any</option>
+          <option>yes</option>
+          <option>no</option>
+        </select>
+      </div>
+    </div>
+    <div style="float:left; margin-left:20px;">
+      <div style="font-weight:bold;">On disk:</div>
+      <div style="margin-top:5px;">
+        <select name="local" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
+          <option>any</option>
+          <option>yes</option>
+          <option>no</option>
+        </select>
+      </div>
+    </div>
+    <div style="clear:both;"></div>
+  </div>
+  <div style="float:right; margin-left:5px;"><button id="datafiles-files-refresh" title="click to refresh the file list according to the last filter">Refresh</button></div>
+  <div style="clear:both;"></div>
+</div>
+<div id="datafiles-files-wa">
+  <div class="datafiles-info" id="datafiles-files-info" style="float:left;">&nbsp;</div>
+  <div class="datafiles-info" id="datafiles-files-updated" style="float:right;">&nbsp;</div>
+  <div style="clear:both;"></div>
+  <div style="margin-top:10px;" >
+    <table style="font-size:80%;"><tbody>
+      <tr>
+        <td style="font-size:120%;"><b>Sort by:</b></td>
+        <td>
+          <select name="sort" style="padding:1px;">
+            <option>run</option>
+            <option>name</option>
+            <option>type</option>
+            <option>size</option>
+            <option>created</option>
+            <option>archived</option>
+            <option>disk</option>
+          </select>
+        </td>
+        <td style="font-size:120%; padding-left: 40px;"><b>Columns:</b></td>
+        <td><input type="checkbox" name="type" /></td><td>Type</td>
+        <td><input type="checkbox" name="size" /></td><td>Size</td>
+        <td><input type="checkbox" name="created" /></td><td>Created</td>
+        <td><input type="checkbox" name="checksum" /></td><td>Checksum</td>
+      </tr><tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><input type="checkbox" name="archived" /></td><td>Archived</td>
+        <td><input type="checkbox" name="local" /></td><td>On disk</td>
+        <td><input type="checkbox" name="archived_path" /></td><td>Archived path</td>
+        <td><input type="checkbox" name="local_path" /></td><td>Disk path</td>
+      </tr>
+    </tbody></table>
+  </div>
+  <div id="datafiles-files-list" style="margin-top:15px;"></div>
+</div>
+HERE;
 
-		    case 'Complete':
-		    	$hdf5_num_runs_complete++;
-		    	break;
+    $hdf_manage_workarea = <<<HERE
+<div id="hdf-manage-ctrl">
+  <div style="float:left;">
+    <div style="float:left;">
+      <div style="font-weight:bold;">Search runs:</div>
+      <div style="margin-top:5px;">
+        <input type="text" name="runs" style="font-size:90%; padding:1px;" title="Put a range of runs to activate the filter. Use the following syntax: 1,3,5,10-20,211"></input>
+      </div>
+    </div>
+    <div style="float:left; margin-left:20px;">
+      <div style="font-weight:bold;">Translation status:</div>
+      <div style="margin-top:5px;">
+        <select name="status" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
+          <option>any</option>
+          <option>FINISHED</option>
+          <option>FAILED</option>
+          <option>TRANSLATING</option>
+          <option>QUEUED</option>
+          <option>NOT-TRANSLATED</option>
+          </select>
+      </div>
+    </div>
+    <div style="clear:both;"></div>
+  </div>
+  <div style="float:right; margin-left:5px;"><button id="hdf-manage-refresh" title="click to refresh the file list according to the last filter">Refresh</button></div>
+  <div style="clear:both;"></div>
+</div>
+<div id="hdf-manage-wa">
+  <div class="hdf-info" id="hdf-manage-info" style="float:left;">&nbsp;</div>
+  <div class="hdf-info" id="hdf-manage-updated" style="float:right;">&nbsp;</div>
+  <div style="clear:both;"></div>
+  <div id="hdf-manage-list" style="margin-top:5px;"></div>
+</div>
+HERE;
 
-		    default:
-		    	$hdf5_num_runs_unknown++;
-		}
-   	}
+    $hdf_history_workarea = <<<HERE
+HERE;
+
+    $hdf_translators_workarea = <<<HERE
+HERE;
+
 ?>
-
-
 
 
 <!------------------- Document Begins Here ------------------------->
 
-<?php
-    DataPortal::begin( "Data Portal of Experiment" );
-?>
+<!DOCTYPE html"> 
+<html>
+<head>
 
+<title>Test</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
 
-<!------------------- Page-specific Styles ------------------------->
+<link type="text/css" href="/jquery/css/custom-theme/jquery-ui-1.8.7.custom.css" rel="Stylesheet" />
+<link type="text/css" href="css/common.css" rel="Stylesheet" />
+<link type="text/css" href="css/ELog4test1_2.css" rel="Stylesheet" />
+<link type="text/css" href="css/Exper4test1_2.css" rel="Stylesheet" />
+<link type="text/css" href="css/Data4test1_2.css" rel="Stylesheet" />
+<link type="text/css" href="css/Hdf4test1_2.css" rel="Stylesheet" />
 
-<link type="text/css" href="css/portal.css" rel="Stylesheet" />
-<link type="text/css" href="css/ELog.css" rel="Stylesheet" />
+<script type="text/javascript" src="/jquery/js/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery-ui-1.8.7.custom.min.js"></script>
+<script type="text/javascript" src="js/Utilities.js"></script>
+<script type="text/javascript" src="js/ELog4test1_2.js"></script>
+<script type="text/javascript" src="js/Exper4test1_2.js"></script>
+<script type="text/javascript" src="js/Data4test1_2.js"></script>
+<script type="text/javascript" src="js/Hdf4test1_2.js"></script>
+
+<!----------- Window layout styles and supppot actions ----------->
 
 <style type="text/css">
 
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  #p-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 124px;
+    border-bottom: 1px solid #a0a0a0;
+    background-color: #e0e0e0;
+  }
+  #p-top-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 87px;
+    background-color: #ffffff;
+    z-index: 9999;
+  }
+  #p-left {
+    position: absolute;
+    left: 0;
+    top: 125px;
+    width: 200px;
+    overflow: auto;
+  }
+  #p-splitter {
+    position: absolute;
+    left: 200px;
+    top: 125px;
+    width: 1px;
+    overflow: none;
+    cursor: e-resize;
+    border-left: 1px solid #a0a0a0;
+    border-right: 1px solid #a0a0a0;
+  }
+  #p-bottom {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 20px;
+    width: 100%;
+    background-color: #a0a0a0;
+    border-top: 1px solid #c0c0c0;
+  }
+  #p-status {
+    padding: 2px;
+    font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+    font-size: 75%;
+  }
+  #p-center {
+    position: relative;
+    top:125px;
+    margin: 0px 0px 20px 203px;
+    overflow: auto;
+    background-color: #ffffff;
+    border-left: 1px solid #a0a0a0;
+  }
+
 </style>
 
-<!----------------------------------------------------------------->
-
-
-
-<?php
-    DataPortal::scripts( "init" );
-?>
-
-
-<!------------------ Page-specific JavaScript ---------------------->
-
-<script type="text/javascript" src="js/ELog.js"></script>
 <script type="text/javascript">
+
+function resize() {
+	$('#p-left').height($(window).height()-125-20);
+	$('#p-splitter').height($(window).height()-125-20);
+	$('#p-center').height($(window).height()-125-20);
+}
+
+/* Get mouse position relative to the document.
+ */
+function getMousePosition(e) {
+
+	var posx = 0;
+	var posy = 0;
+	if (!e) var e = window.event;
+	if (e.pageX || e.pageY) 	{
+		posx = e.pageX;
+		posy = e.pageY;
+	}
+	else if (e.clientX || e.clientY) 	{
+		posx = e.clientX + document.body.scrollLeft
+			+ document.documentElement.scrollLeft;
+		posy = e.clientY + document.body.scrollTop
+			+ document.documentElement.scrollTop;
+	}
+	return {'x': posx, 'y': posy };
+}
+
+function move_split(e) {
+	var pos = getMousePosition(e);
+	$('#p-left').css('width', pos['x']);
+	$('#p-splitter').css('left', pos['x']);
+	$('#p-center').css('margin-left', pos['x']+3);
+}
+
+$(function() {
+
+	resize();
+
+	var mouse_down = false;
+
+	$('#p-splitter').mousedown (function(e) { mouse_down = true; return false; });
+
+	$('#p-left'    ).mousemove(function(e) { if(mouse_down) move_split(e); });
+	$('#p-center'  ).mousemove(function(e) { if(mouse_down) move_split(e); });
+
+	$('#p-left'    ).mouseup   (function(e) { mouse_down = false; });
+	$('#p-splitter').mouseup   (function(e) { mouse_down = false; });
+	$('#p-center'  ).mouseup   (function(e) { mouse_down = false; });
+});
+
+
+</script>
+
+
+<!--------------------------------------------------------->
+
+
+<style type="text/css">
+
+#p-title,
+#p-subtitle {
+  font-family: "Times", serif;
+  font-size: 32px;
+  font-weight: bold;
+  text-align: left;
+}
+#p-subtitle {
+  margin-left: 10px;
+  color: #0071bc;
+}
+#p-login {
+  font-size: 70%;
+  font-family: Arial, Helvetica, Verdana, Sans-Serif;
+}
+
+a, a.link {
+  text-decoration: none;
+  font-weight: bold;
+  color: #0071bc;
+}
+a:hover, a.link:hover {
+  color: red;
+}
+
+span.toggler {
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  cursor: pointer;
+}
+
+#p-menu {
+  font-family: Arial, sans-serif;
+  font-size: 75%;
+  height: 25px;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  border-bottom: 1px solid #c0c0c0;
+}
+
+#p-context {
+  padding-top: 12px;
+  padding-left: 15px;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-size: 75%;
+}
+#p-search, #p-post {
+  padding-top: 2px;
+  padding-right: 10px;
+  font-size: 75%;
+}
+
+div.m-item {
+
+  margin-left: 2px;
+  margin-top: 3px;
+
+  padding: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  background: #DFEFFC url(/jquery/css/custom-theme/images/ui-bg_glass_85_dfeffc_1x400.png) 50% 50% repeat-x;
+
+  border-top: 1px solid #c0c0c0;
+  border-bottom: 1px solid #c0c0c0;
+  border-right: 1px solid #c0c0c0;
+
+  border-radius: 5px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+
+  -moz-border-radius: 5px;
+  -moz-border-radius-bottomleft: 0;
+  -moz-border-radius-bottomright: 0;
+
+  cursor: pointer;
+}
+
+div.m-item:hover {
+  background: #d0e5f5 url(/jquery/css/custom-theme/images/ui-bg_glass_75_d0e5f5_1x400.png) 50% 50% repeat-x;
+}
+div.m-item-first {
+  margin-left: 6px;
+  float: left;
+}
+.m-item-next {
+  float: left;
+}
+.m-item-last {
+  float: right;
+  margin-right: 6px;
+  border-left: 1px solid #c0c0c0;
+  border-right: 0;
+}
+.m-item-end {
+  clear: both;
+}
+div.m-select {
+  font-weight: bold;
+  background: #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+#v-menu {
+  width: 100%;
+  height: 100%;
+  background: url('img/menu-bg-gradient-4.png') repeat;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-size: 75%;
+}
+#menu-title {
+  height: 10px;
+}
+div.v-item {
+  padding: 4px;
+  padding-left: 10px;
+  cursor: pointer;
+}
+div.v-item:hover {
+  background:#f0f0f0;
+}
+.v-select {
+  font-weight: bold;
+}
+.v-group {
+  padding: 4px;
+  padding-left: 10px;
+  cursor: pointer;
+}
+.v-group-members {
+  padding: 4px;
+  padding-left: 20px;
+}
+.v-group-members-hidden {
+  display: none;
+}
+.v-group-members-visible {
+  display: block;
+}
+.application-workarea {
+  overflow: auto;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-size: 75%;
+}
+.hidden  { display: none; }
+.visible { display: block; }
+
+</style>
+
+<script type="text/javascript">
+
+/* ----------------------------------------
+ * Authentication and authorization context
+ * ----------------------------------------
+ */
+var auth_is_authenticated="<?php echo $auth_svc->isAuthenticated()?>";
+var auth_type="<?php echo $auth_svc->authType()?>";
+var auth_remote_user="<?php echo $auth_svc->authName()?>";
+
+var auth_webauth_token_creation="<?php echo $_SERVER['WEBAUTH_TOKEN_CREATION']?>";
+var auth_webauth_token_expiration="<?php echo $_SERVER['WEBAUTH_TOKEN_EXPIRATION']?>";
+
+function refresh_page() {
+    window.location = "<?php echo $_SERVER['REQUEST_URI']?>";
+}
+
+/*
+ * Session expiration timer for WebAuth authentication.
+ */
+var auth_timer = null;
+function auth_timer_restart() {
+    if( auth_is_authenticated && ( auth_type == 'WebAuth' ))
+        auth_timer = window.setTimeout('auth_timer_event()', 1000 );
+}
+
+var auth_last_secs = null;
+function auth_timer_event() {
+
+    var auth_expiration_info = document.getElementById('auth_expiration_info');
+    var now = mktime();
+    var seconds = auth_webauth_token_expiration - now;
+    if( seconds <= 0 ) {
+        $('#popupdialogs').html(
+        	'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
+        	'Your WebAuth session has expired. Press <b>Ok</b> or use <b>Refresh</b> button'+
+        	'of the browser to renew your credentials.</p>'
+        );
+        $('#popupdialogs').dialog({
+        	resizable: false,
+        	modal: true,
+        	buttons: {
+        		'Ok': function() {
+        			$(this).dialog('close');
+        			refresh_page();
+        		}
+        	},
+        	title: 'Session Expiration Notification'
+        });
+        return;
+    }
+    var hours_left   = Math.floor(seconds / 3600);
+    var minutes_left = Math.floor((seconds % 3600) / 60);
+    var seconds_left = Math.floor((seconds % 3600) % 60);
+
+    var hours_left_str = hours_left;
+    if( hours_left < 10 ) hours_left_str = '0'+hours_left_str;
+    var minutes_left_str = minutes_left;
+    if( minutes_left < 10 ) minutes_left_str = '0'+minutes_left_str;
+    var seconds_left_str = seconds_left;
+    if( seconds_left < 10 ) seconds_left_str = '0'+seconds_left_str;
+
+    auth_expiration_info.innerHTML=
+        '<b>'+hours_left_str+':'+minutes_left_str+'.'+seconds_left_str+'</b>';
+
+    auth_timer_restart();
+}
+
+function logout() {
+	$('#popupdialogs').html(
+		'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
+    	'This will log yout out from the current WebAuth session. Are you sure?</p>'
+	 );
+	$('#popupdialogs').dialog({
+		resizable: false,
+		modal: true,
+		buttons: {
+			"Yes": function() {
+				$( this ).dialog('close');
+	            document.cookie = 'webauth_wpt_krb5=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
+	            document.cookie = 'webauth_at=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
+	            refresh_page();
+			},
+			Cancel: function() {
+				$(this).dialog('close');
+			}
+		},
+		title: 'Session Logout Warning'
+	});
+}
+
+/* --------------------------------------------------- 
+ * The starting point where the JavaScript code starts
+ * ---------------------------------------------------
+ */
+$(document).ready(function(){
+	auth_timer_restart();
+});
 
 
 /* -----------------------------------------
  *             GLOBAL VARIABLES
  * -----------------------------------------
  */
-elog.author  = '<?=$auth_svc->authName()?>';
-elog.exp_id        = '<?=$exper_id?>';
+elog.author = '<?=$auth_svc->authName()?>';
+elog.exp_id = '<?=$exper_id?>';
 elog.exp = '<?=$experiment->name()?>';
 elog.instr = '<?=$experiment->instrument()->name()?>';
-elog.rrange   = '<?=$range_of_runs?>';
-elog.min_run         = <?=(is_null($min_run)?'null':$min_run)?>;
-elog.max_run         = <?=(is_null($max_run)?'null':$max_run)?>;
+elog.rrange = '<?=$range_of_runs?>';
+elog.min_run = <?=(is_null($min_run)?'null':$min_run->num())?>;
+elog.max_run = <?=(is_null($max_run)?'null':$max_run->num())?>;
 <?php
 	foreach( $logbook_runs as $run ) echo "elog.runs[{$run->num()}]={$run->id()};\n";
 	foreach( $logbook_shifts as $shift ) echo "elog.shifts['{$shift->begin_time()->toStringShort()}']={$shift->id()};\n";
 ?>
-elog.editor = <?=(LogBookAuth::instance()->canEditMessages( $experiment->id())?'true':'false')?>
+elog.editor = <?=(LogBookAuth::instance()->canEditMessages( $experiment->id())?'true':'false')?>;
+
+exper.posix_group = '<?=$experiment->POSIX_gid()?>';
+
+datafiles.exp_id = '<?=$exper_id?>';
+hdf.exp_id = '<?=$exper_id?>';
 
 var extra_params = new Array();
 <?php
@@ -262,265 +1080,30 @@ var extra_params = new Array();
 	}
 ?>
 
-/* ------------------------------------------------------
- *             APPLICATION INITIALIZATION
- * ------------------------------------------------------
- */
-
-function init() {
-
-	$('#tabs').tabs();
-
-	experiment_init();
-	elog.init();
-	files_init();
-	hdf5_init();
-
-	/* Open the initial tab if explicitly requested. Otherwise the first
-	 * tab will be shown.
-	 */
-<?php
-	if( isset($page1)) {
-		echo "\t$('#tabs').tabs('select', '#tabs-{$page1}');\n";
-		if( isset($page2))
-			echo "\t$('#tabs-{$page1}-subtabs').tabs('select', '#tabs-{$page1}-{$page2}');\n";
-	}
-?>
-}
-
-/* ----------------------------------------
- *             TAB: EXPERIMENT
- * ----------------------------------------
- */
-function experiment_init() {
-
-	$('#button-toggle-group').click(
-		function() {
-			if( $('#group-members').hasClass   ( 'group-members-hidden' ) ) {
-				$('#group-members').removeClass( 'group-members-hidden' )
-				                   .addClass   ( 'group-members-visible' );
-				$('#button-toggle-group').removeClass( 'ui-icon-triangle-1-e' )
-				                         .addClass   ( 'ui-icon-triangle-1-s' );
-			} else {
-				$('#group-members').removeClass( 'group-members-visible' )
-				                   .addClass   ( 'group-members-hidden' );
-				$('#button-toggle-group').removeClass( 'ui-icon-triangle-1-s' )
-				                         .addClass   ( 'ui-icon-triangle-1-e' );
-			}
-		}
-	);
-	$( '#button-select-experiment' ).button();
-	$( '#button-select-experiment' ).click(
-		function() {
-			window.location = 'select_experiment.php';
-		}
-	);
-}
-
-/* --------------------------------------
- *             TAB: FILES
- * --------------------------------------
- */
-function files_init() {
-
-	$('#tabs-files-subtabs').tabs();
-
-	$('#button-files-filter-reset').button();
-	$('#button-files-filter-reset').click(
-		function() {
-			reset_files_filter();
-			search_files();
-		}
-	);
-	$('#button-files-filter-apply').button();
-	$('#button-files-filter-apply').click(
-		function() {
-			search_files();
-		}
-	);
-	$('#button-files-filter-import').button();
-	$('#button-files-filter-import').click(
-		function() {
-			search_files( true );
-		}
-	);
-	search_files();
-}
-
-function reset_files_filter() {
-
-	$('#files-search-filter :input:radio[name=runs]' ).val( ['all'] );
-	$('#files-search-filter :input:text[name=runs_range]' ).val( elog.rrange );
-	$('#files-search-filter :input:radio[name=archived]' ).val( ['yes_or_no'] );
-	$('#files-search-filter :input:radio[name=local]' ).val( ['yes_or_no'] );
-	$('#files-search-filter :input:checkbox[name=xtc]' ).val( ['XTC'] );
-    $('#files-search-filter :input:checkbox[name=hdf5]' ).val( ['HDF5'] );
-}
-
-function search_files( import_format ) {
-
-	var params = { exper_id: elog.exp_id };
-
-	if( $('#files-search-filter :input:radio[name=runs]:checked' ).val() != 'all' ) {
-		var runs = $('#files-search-filter :input:text[name=runs_range]' ).val();
-		if( runs != elog.rrange )	params.runs = runs;
-	}
-
-	var archived = $('#files-search-filter :input:radio[name=archived]:checked' ).val();
-	if( archived != 'yes_or_no' ) params.archived = ( archived == 'no' ? 0 : 1 );
-
-	var local = $('#files-search-filter :input:radio[name=local]:checked' ).val();
-	if( local != 'yes_or_no' ) params.local = ( local == 'no' ? 0 : 1 );
-
-	var checked_types = [
-		$('#files-search-filter :input:checkbox[name=xtc]:checked' ).val(),
-	    $('#files-search-filter :input:checkbox[name=hdf5]:checked' ).val()
-	];
-
-	var types = null;
-	for( idx in checked_types ) {
-		if( checked_types[idx] == null ) continue;
-		types = ( types == null ? '' : types + ',' );
-		types += checked_types[idx];
-	}
-	if( types != null ) params.types = types;
-
-	if( import_format ) params.import_format = null;
-
-	$( '#files-search-result' ).html( 'Searching...' );
-	$.get(
-	   	'SearchFiles.php',
-	   	params,
-	   	function( data ) {
-			$( '#files-search-result' ).html( data );
-	    }
-	);
-}
-
-/* --------------------------------------
- *             TAB: HDF5
- * --------------------------------------
- */
- function hdf5_init() {
-
-    $('#tabs-translate-subtabs').tabs();
-
-	$('#button-translate-filter-reset').button();
-	$('#button-translate-filter-reset').click(
-		function() {
-			reset_translate_filter();
-			search_translate_requests();
-		}
-	);
-	$('#button-translate-filter-apply').button();
-	$('#button-translate-filter-apply').click(
-		function() {
-			search_translate_requests();
-		}
-	);
-	search_translate_requests();
-}
-
-function reset_translate_filter() {
-
-	$('#translate-search-filter :input:radio[name=runs]' ).val( ['all'] );
-	$('#translate-search-filter :input:text[name=runs_range]' ).val( elog.rrange );
-	$('#translate-search-filter :input:radio[name=translated]' ).val( ['yes_or_no'] );
-}
-
-function search_translate_requests() {
-
-	var params = {
-		exper_id: elog.exp_id,
-		show_files: 1
-	};
-
-	if( $('#translate-search-filter :input:radio[name=runs]:checked' ).val() != 'all' ) {
-		var runs = $('#translate-search-filter :input:text[name=runs_range]' ).val();
-		if( runs != elog.rrange )	params.runs = runs;
-	}
-
-	var translated = $('#translate-search-filter :input:radio[name=translated]:checked' ).val();
-	if( translated != 'yes_or_no' ) params.translated = ( translated == 'no' ? 0 : 1 );
-
-	$('#translate-search-result').html( 'Searching...' );
-	$.get(
-	   	'SearchRequests.php',
-	   	params,
-	   	function( data ) {
-			$('#translate-search-result').html( data );
-			$('#translate-search-result .translate').button();
-			$('#translate-search-result .translate').click(
-				function(e) {
-					e.preventDefault();
-					$.get(
-					   	'NewRequest.php',
-					   	{ exper_id: elog.exp_id, runnum: $(this).val() },
-					   	function( data ) {
-						   	if( data.ResultSet.Status == 'success' )
-						   		search_translate_requests();
-						   	else
-						   		alert( 'The request has failed because of: '+data.ResultSet.Reason );
-					   	}
-				   	);
-				}
-			);
-			$('#translate-search-result .escalate').button();
-			$('#translate-search-result .escalate').click(
-				function(e) {
-					e.preventDefault();
-					$.get(
-						'EscalateRequestPriority.php',
-						{ exper_id: elog.exp_id, id: $(this).val() },
-						function( data ) {
-						   	if( data.ResultSet.Status == 'success' ) {
-						   		$('#translate-search-result #priority_'+data.ResultSet.Result.id).text(data.ResultSet.Result.priority);
-						   	} else
-								alert( 'The request has failed because of: '+data.ResultSet.Reason );
-						}
-					);
-				}
-			);
-			$('#translate-search-result .delete').button();
-			$('#translate-search-result .delete').click(
-				function(e) {
-					e.preventDefault();
-					$.get(
-						'DeleteRequest.php',
-						{ id: $(this).val() },
-						function( data ) {
-						   	if( data.ResultSet.Status == 'success' )
-						   		search_translate_requests();
-						   	else
-								alert( 'The request has failed because of: '+data.ResultSet.Reason );
-						}
-					);
-				}
-			);
-			/* ----------------------------------
-			 * THIS IS HOW IT WILL WORK FOR MS IE
-			 * ----------------------------------
-
-			 	function(e) {
-					var event = e || window.event;
-					var target = event.target || event.srcElement;
-					$.get(
-						'DeleteRequest.php',
-						{ id: e.originalEvent.target.value },
-						...
-			*/
-	    }
-	);
-}
-
 /* ----------------------------------------------
  *             CONTEXT MANAGEMENT
  * ----------------------------------------------
  */
-var current_tab = 'tabs-experiment';
+var current_tab = 'applications';
 
 function set_current_tab( tab ) {
 	current_tab = tab;
+}
+/*
+function set_context(app) {
+	var ctx = '<b>'+app.full_name+'</b> &gt;';
+	if(app.context1) ctx += ' <b>'+app.context1+'</b>';
+	if(app.context2) ctx += ' &gt; <b>'+app.context2+'</b>';
+	if(app.context3) ctx += ' &gt; <b>'+app.context3+'</b>';;
+	$('#p-context').html(ctx);
+}
+*/
+function set_context(app) {
+	var ctx = app.full_name+' &gt;';
+	if(app.context1) ctx += ' '+app.context1;
+	if(app.context2) ctx += ' &gt; '+app.context2;
+	if(app.context3) ctx += ' &gt; '+app.context3;;
+	$('#p-context').html(ctx);
 }
 
 /* ----------------------------------------------
@@ -543,13 +1126,6 @@ function display_path( file ) {
 	});
 }
 
-function pdf( context ) {
-	if( context == 'translate-manage' ) {
-		var url = 'Requests2pdf.php?exper_id='+elog.exp_id+'&show_files';
-		var winRef = window.open( url, 'Translation Requests' );
-	}
-}
-
 function printer_friendly() {
 	var el = document.getElementById( current_tab );
 	if (el) {
@@ -559,6 +1135,7 @@ function printer_friendly() {
 		pfcopy.document.write('<head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />');
 		pfcopy.document.write('<link rel="stylesheet" type="text/css" href="css/default.css" />');
 		pfcopy.document.write('<link type="text/css" href="css/portal.css" rel="Stylesheet" />');
+		pfcopy.document.write('<link type="text/css" href="css/ELog.css" rel="Stylesheet" />');
 		pfcopy.document.write('<style type="text/css"> .not4print { display:none; }	</style>');
 		pfcopy.document.write('<title>Data Portal of Experiment: '+elog.instr+' / '+elog.exp+'</title></head><body><div class="maintext">');
 		pfcopy.document.write(html);
@@ -567,681 +1144,471 @@ function printer_friendly() {
 	}
 }
 
-</script>
-<!----------------------------------------------------------------->
 
 
+/* ------------------------------------------------------
+ *             APPLICATION INITIALIZATION
+ * ------------------------------------------------------
+ */
+var applications = null;
+var current_application = 'experiment';
 
-<?php
-    DataPortal::body(
-    	'Data Portal of Experiment:',
-    	'<a href="select_experiment.php" title="Switch to another experiment">'.$experiment->instrument()->name().'&nbsp;/&nbsp;'.$experiment->name().'</a>',
-    	'experiment'
-   	);
-?>
+function v_item_group(item) {
+	var parent = $(item).parent();
+	if(parent.hasClass('v-group-members')) return parent.prev();
+	return null;
+}
 
+/* Event handler for application selections from the top-level menu bar:
+ * - fill set the current application context.
+ */
+function m_item_selected(item) {
 
+	current_application = applications[item.id];
 
+	$('.m-select').removeClass('m-select');
+	$(item).addClass('m-select');
+	$('#p-left > #v-menu .visible').removeClass('visible').addClass('hidden');
+	$('#p-left > #v-menu > #'+current_application.name).removeClass('hidden').addClass('visible');
 
-<!------------------ Page-specific Document Body ------------------->
+	$('#p-center .application-workarea.visible').removeClass('visible').addClass('hidden');
+	var wa_id = current_application.name;
+	if(current_application.context1 != '') wa_id += '-'+current_application.context1;
+	$('#p-center .application-workarea#'+wa_id).removeClass('hidden').addClass('visible');
 
-<?php
+	current_application.select_default();
+	if(current_application.context2 == '')
+		v_item_selected($('#v-menu > #'+current_application.name).children('.v-item#'+current_application.context1));
+	else
+		v_item_selected($('#v-menu > #'+current_application.name+' > #'+current_application.context1).next().children('.v-item#'+current_application.context2));
+	
+	set_context(current_application);
+}
 
-	$tabs = array();
-
-	$decorated_experiment_status  = DataPortal::decorated_experiment_status_UP   ( $experiment );
-	$decorated_experiment_contact = DataPortal::decorated_experiment_contact_info( $experiment );
-	$experiment_group_members     = "<table><tbody>\n";
-    foreach( $experiment->group_members() as $m ) {
-    	$uid   = $m['uid'];
-    	$gecos = $m['gecos'];
-        $experiment_group_members .= "<tr><td><b>{$uid}</b></td><td>{$gecos}</td></tr>\n";
+/* Event handler for vertical menu group selections:
+ * - only show/hide children (if any).
+ */
+function v_group_selected(group) {
+	var toggler = $(group).children('.ui-icon');
+	if(toggler.hasClass('ui-icon-triangle-1-s')) {
+		toggler.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+		$(group).next().removeClass('v-group-members-visible').addClass('v-group-members-hidden');
+	} else {
+		toggler.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+		$(group).next().removeClass('v-group-members-hidden').addClass('v-group-members-visible');
 	}
-	$experiment_group_members .= "</tbody></table>\n";
-    $tabs_experiment =<<<HERE
-	  <button id="button-select-experiment" class="not4print">Select another experiment</button>
-	  <br>
-	  <br>
-      <table>
-        <tbody>
-          <tr>
-            <td class="table_cell_left">Id</td>
-            <td class="table_cell_right">{$experiment->id()}</td>
-          </tr>
-          <tr>
-            <td class="table_cell_left">Status</td>
-            <td class="table_cell_right">{$decorated_experiment_status}</td>
-          </tr>
-          <tr>
-            <td class="table_cell_left">Begin</td>
-            <td class="table_cell_right">{$experiment->begin_time()->toStringShort()}</td>
-          </tr>
-          <tr>
-            <td class="table_cell_left">End</td>
-            <td class="table_cell_right">{$experiment->end_time()->toStringShort()}</td>
-          </tr>
-          <tr>
-            <td class="table_cell_left">Description</td>
-            <td class="table_cell_right"><pre style="background-color:#e0e0e0; padding:0.5em;">{$experiment->description()}</pre></td>
-          </tr>
-          <tr>
-            <td class="table_cell_left">Contact</td>
-            <td class="table_cell_right">{$decorated_experiment_contact}</td>
-          </tr>
-          <tr>
-            <td class="table_cell_left">Leader</td>
-            <td class="table_cell_right">{$experiment->leader_Account()}</td>
-          </tr>
-          <tr>
-            <td class="table_cell_left table_cell_bottom" valign="top">POSIX Group</td>
-            <td class="table_cell_right table_cell_bottom">
-              <table cellspacing=0 cellpadding=0><tbody>
-                <tr>
-                  <td valign="top">{$experiment->POSIX_gid()}</td>
-                  <td>&nbsp;</td>
-                  <td>
-                    <span id="button-toggle-group" class="ui-icon ui-icon-triangle-1-e" style="border:1px solid #c0c0c0;" title="click to see/hide the list of members"></span>
-                    <div id="group-members" class="group-members-hidden">{$experiment_group_members}</div>
-                  </td>
-                </tr>
-              </tbody></table>
-            </td>
-          </tr>
-        </tbody>
-      </table>\n
-HERE;
-	array_push(
-		$tabs,
-    	array(
-    		'name' => 'Experiment',
-    		'id' => 'tabs-experiment',
-    		'html' => $tabs_experiment,
-            'class' => 'tab-inline-content',
-    	    'callback' => 'set_current_tab("tabs-experiment")'
-    	)
-    );
+}
 
-    /*
-     * [ e-log ]
-     */
-    $tabs_elog_subtabs = array();
-    $tabs_elog_recent =<<<HERE
-    <div id="el-l-mctrl">
-      <div style="float:left; margin-left:20px;">
-        <div style="float:left;">
-          <div style="font-weight:bold;">Last messages to display:</div>
-          <div id="elog-live-range-selector" style="margin-top:4px;">
-            <input type="radio" id="elog-live-range-20"    name="range" value="20"  checked="checked" /><label for="elog-live-range-20"    >20</label>
-            <input type="radio" id="elog-live-range-100"   name="range" value="100"                   /><label for="elog-live-range-100"   >100</label>
-            <input type="radio" id="elog-live-range-shift" name="range" value="shift"                 /><label for="elog-live-range-shift" >shift</label>
-            <input type="radio" id="elog-live-range-day"   name="range" value="day"                   /><label for="elog-live-range-day"   >24 hrs</label>
-            <input type="radio" id="elog-live-range-week"  name="range" value="week"                  /><label for="elog-live-range-week"  >7 days</label>
-            <input type="radio" id="elog-live-range-all"   name="range" value="all"                   /><label for="elog-live-range-all"   >everything</label>
-          </div>
-        </div>
-        <div style="float:left; margin-left:5px;">
-          <div style="font-weight:bold;">Show runs:</div>
-          <div style="margin-top:4px;">
-            <div id="elog-live-runs-selector" style="float:left;">
-              <input type="radio" id="elog-live-runs-on"  name="show_runs" value="on"  checked="checked" /><label for="elog-live-runs-on"  >On</label>
-              <input type="radio" id="elog-live-runs-off" name="show_runs" value="off"                   /><label for="elog-live-runs-off" >Off</label>
-            </div>
-          </div>
-        </div>
-        <div style="clear:both;"></div>
-        <div style="margin-top:10px;">
-          <div style="float:left;">
-            <button id="elog-live-expand"     title="click a few times to expand the whole tree">Expand++</button>
-            <button id="elog-live-collapse"   title="each click will collapse the tree to the previous level of detail">Collapse--</button>
-            <button id="elog-live-viewattach" title="view attachments of expanded messages">View Attachments</button>
-            <button id="elog-live-hideattach" title="hide attachments of expanded messages">Hide Attachments</button>
-          </div>
-        </div>
-      </div>
-      <div style="float:right;" id="el-l-auto">
-        <div style="font-weight:bold;">Autorefresh:</div>
-        <div style="margin-top:4px;">
-          <div id="elog-live-refresh-selector" style="float:left;">
-            <input type="radio" id="elog-live-refresh-on"  name="refresh" value="on"  checked="checked" /><label for="elog-live-refresh-on"  >On</label>
-            <input type="radio" id="elog-live-refresh-off" name="refresh" value="off"                   /><label for="elog-live-refresh-off" >Off</label>
-          </div>
-          <div style="float:left; margin-left:10px;">
-            <select id="elog-live-refresh-interval">
-              <option>2</option>
-              <option>5</option>
-              <option>10</option>
-            </select>
-            s.
-          </div>
-          <div style="clear:both;"></div>
-        </div>
-        <div style="margin-top:8px;">
-          <button id="elog-live-refresh" title="check if there are new updates">Check for updates now</button>
-        </div>
-      </div>
-      <div style="clear:both;"></div>
+/* Event handler for vertical menu item (actual commands) selections:
+ * - dim the poreviously active item (and if applies - its group)
+ * - hightlight the new item (and if applies - its group)
+ * - change the current context
+ * - execute the commands
+ * - switch the work area (make the old one invisible, and the new one visible)
+ */
+function v_item_selected(item) {
+	var item = $(item);
+	if($(item).hasClass('v-select')) return;
+
+	$('#'+current_application.name).find('.v-item.v-select').each(function(){
+		$(this).children('.ui-icon').removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+		$(this).removeClass('v-select');
+		var this_group = v_item_group(this);
+		if(this_group != null) this_group.removeClass('v-select');
+	});
+
+	$(item).children('.ui-icon').removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+	$(item).addClass('v-select');
+
+	var group = v_item_group(item);
+	if(group != null) {
+
+		/* Force the group to unwrap
+		 *
+		 * NOTE: This migth be needed of the current method is called out of
+		 *       normal sequence.
+		 *
+		 * TODO: Do it "right" when refactoring the menu classes.
+		 */
+		var toggler = $(group).children('.ui-icon');
+		if(!toggler.hasClass('ui-icon-triangle-1-s')) {
+			toggler.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+			$(group).next().removeClass('v-group-members-hidden').addClass('v-group-members-visible');
+		}
+
+		/* Hide the older work area
+		 */
+		var wa_id = current_application.name;
+		if(current_application.context1 != '') wa_id += '-'+current_application.context1;
+		$('#p-center > #application-workarea > #'+wa_id).removeClass('visible').addClass('hidden');
+
+		/* Activate new application
+		 */
+		group.addClass('v-select');
+		current_application.select(group.attr('id'), item.attr('id'));
+
+		/* display the new work area
+		 */
+		wa_id = current_application.name;
+		if(current_application.context1 != '') wa_id += '-'+current_application.context1;
+		$('#p-center > #application-workarea > #'+wa_id).removeClass('hidden').addClass('visible');
+
+	} else {
+
+		/* Hide the older work area
+		 */
+		var wa_id = current_application.name;
+		if(current_application.context1 != '') wa_id += '-'+current_application.context1;
+		$('#p-center > #application-workarea > #'+wa_id).removeClass('visible').addClass('hidden');
+
+		current_application.select(item.attr('id'), null);
+
+		/* display the new work area
+		 */
+		wa_id = current_application.name;
+		if(current_application.context1 != '') wa_id += '-'+current_application.context1;
+		$('#p-center > #application-workarea > #'+wa_id).removeClass('hidden').addClass('visible');
+	}
+	set_context(current_application);
+}
+
+$(function() {
+
+	$('.m-item' ).click(function() { m_item_selected (this); });
+	$('.v-group').click(function() { v_group_selected(this); });
+	$('.v-item' ).click(function() { v_item_selected (this); });
+
+	function simple_search() {
+		for(var id in applications) {
+			var application = applications[id];
+			if(application.name == 'elog') {
+				$('#p-menu').children('#'+id).each(function() {	m_item_selected(this); });
+				v_item_selected($('#v-menu > #elog > #search').next().children('.v-item#simple'));
+				application.select('search','simple');
+				application.simple_search($('#p-search-elog-text').val());
+				break;
+			}
+		}
+	}
+	$('#p-search-elog-text').keyup(function(e) { if(($('#p-search-elog-text').val() != '') && (e.keyCode == 13)) simple_search(); });
+	function simple_post() {
+		for(var id in applications) {
+			var application = applications[id];
+			if(application.name == 'elog') {
+				$('#p-menu').children('#'+id).each(function() {	m_item_selected(this); });
+				v_item_selected($('#v-menu > #elog > #post').next().children('.v-item#experiment'));
+				application.select('post','experiment');
+				application.simple_post4experiment($('#p-post-elog-text').val());
+				break;
+			}
+		}
+	}
+	$('#p-post-elog-text').keyup(function(e) { if(($('#p-post-elog-text').val() != '') && (e.keyCode == 13)) simple_post(); });
+
+	applications = {
+		'p-appl-experiment' : exper,
+		'p-appl-elog'       : elog,
+		'p-appl-datafiles'  : datafiles,
+		'p-appl-hdf5'       : hdf,
+		'p-appl-help'       : new p_appl_help()			// TODO: implement it the same wa as for e-Log
+	};
+
+	/* TODO: Fix this, either by recpecting the GET parameter of this PHP script
+	 *       or by analyzing the code. (better not to do the last thing).
+	 */
+	current_application = applications['p-appl-experiment'];
+	current_application.select_default();
+	v_item_selected($('#v-menu > #experiment').children('.v-item#summary'));
+});
+
+/* TODO: Merge these application objects into statically create JavaScript
+ *       objects like elog. This should result in a better code encapsulation
+ *       and management.
+ *
+ *       Implement similar objects (JS + CSS) for other applications.
+ */
+
+function p_appl_help() {
+	var that = this;
+	var context2_default = {
+		'' : ''
+	};
+	this.name = 'help';
+	this.full_name = 'Help';
+	this.context1 = '';
+	this.context2 = '';
+	this.select = function(ctx1, ctx2) {
+		that.context1 = ctx1;
+		that.context2 = ctx2 == null ? context2_default[ctx1] : ctx2;
+	};
+	$('#p-center > #application-workarea > #help').html('<center>The help area</center>');
+	$('#p-left > #v-menu > #help').html('<center>The workarea of the HDF5 translation</center>');
+
+	return this;
+}
+
+</script>
+
+</head>
+
+<body onresize="resize()">
+
+<div id="p-top">
+<div id="p-top-header">
+  <div id="header">
+    <div style="float:left;  padding-left:15px; padding-top:10px;">
+      <span id="p-title"><?php echo $document_title?></span>
+      <span id="p-subtitle"><?php echo $document_subtitle?></span>
     </div>
-    <div id="el-l-ms-action" style="float:left;"></div>
-    <div id="el-l-ms-info" style="float:right;"></div>
+    <div style="float:right; padding-right:4px;">
+      <table><tbody><tr>
+        <td valign="bottom">
+          <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:printer_friendly('tabs-experiment')" title="Printer friendly version of this page"><img src="img/PRINTER_icon.gif" style="border-radius: 5px;" /></a></div>
+          <div style="clear:both;" class="not4print"></div>
+        </td>
+        <td>
+          <table id="p-login"><tbody>
+            <tr>
+              <td>&nbsp;</td>
+              <td>[<a href="javascript:logout()" title="close the current WebAuth session">logout</a>]</td>
+            </tr>
+            <tr>
+              <td>Welcome,&nbsp;</td>
+              <td><p><b><?php echo $auth_svc->authName()?></b></p></td>
+            </tr>
+            <tr>
+              <td>Session expires in:&nbsp;</td>
+              <td><p id="auth_expiration_info"><b>00:00.00</b></p></td>
+            </tr>
+          </tbody></table>
+        </td>
+      </tr></tbody></table>
+    </div>
     <div style="clear:both;"></div>
-    <div id="el-l-ms"></div>
-    <div id="el-l-ctx" class="el-l-ctx-hdn">
-      <div id="el-l-ctx-exp"></div>
-      <div id="el-l-ctx-day"></div>
-      <div id="el-l-ctx-info"></div>
-    </div>\n
-HERE;
-    array_push(
-		$tabs_elog_subtabs,
-    	array(
-    		'name' => 'Recent (Live)',
-    		'id' => 'tabs-elog-recent',
-    		'html' => $tabs_elog_recent,
-            'class' => 'tab-inline-content',
-    	    'callback' => 'set_current_tab("tabs-elog-recent")'
-    	)
-    );
-    $select_tag_html = "<option> - select tag - </option>\n";
-    foreach( $logbook_experiment->used_tags() as $tag ) {
-    	$select_tag_html .= "<option>{$tag}</option>\n";
-    }
-
-    $tags_html = '';
-
-    // TODO: Move this parameter upstream and make it available
-    //       to JavaScript which would use th elibrary to fill ouut
-    //       tag names.
-    //
-    $num_tags = 3;
-    for( $i = 0; $i < $num_tags; $i++) {
-    	$tags_html .=<<<HERE
-name:  <select id="elog-tags-library-{$i}">{$select_tag_html}</select>
-       <input type="text" id="elog-tag-name-{$i}"  name="tag_name_{$i}"  value="" size=16 title="type new tag here or select a known one from the left" />
-value: <input type="text" id="elog-tag-value-{$i}" name="tag_value_{$i}" value="" size=16 title="put an optional value here" /><br>
-HERE;
-    }
-
-    $today = date("Y-m-d");
-    $now   = "00:00:00";
-
-    // TODO: load these two parameters from the database. Update them from thedatabase
-    //       when the form gets reset.
-    //
-    $shifts_html = '';
-    foreach( $logbook_shifts as $shift )
-    	$shifts_html .= "<option>{$shift->begin_time()->toStringShort()}</option>\n";
-
-    $tabs_elog_post_extra = array();
-    array_push(
-		$tabs_elog_post_extra,
-    	array(
-    		'name' => 'Attachments',
-    		'id'   => 'tabs-el-p-as',
-    		'html' => <<<HERE
-<div id="el-p-as">
-  file: <input type="file" name="file2attach_0" onchange="elog.post_add_attachment(this)" />
-  description: <input type="text" name="file2attach_0" value="" title="put an optional file description here" /><br>
+  </div>
+  <div id="p-menu">
+    <div class="m-item m-item-first m-select" id="p-appl-experiment">Experment</div>
+    <div class="m-item m-item-next" id="p-appl-elog">e-Log</div>
+    <div class="m-item m-item-next" id="p-appl-datafiles">File Manager</div>
+    <div class="m-item m-item-next" id="p-appl-hdf5">HDF5 Translation</div>
+    <div class="m-item m-item-last" id="p-appl-help">Help</div>
+    <div class="m-item-end"></div>
+  </div>
+  <div>
+    <div id="p-context" style="float:left"></div>
+    <div id="p-search" style="float:right">
+      search e-log: <input type="text" id="p-search-elog-text" value="" size=16 title="enter text to search in e-Log, then press RETURN to proceed"  style="font-size:80%; padding:1px; margin-top:6px;" />
+    </div>
+    <div id="p-post" style="float:right">
+      post in e-log: <input type="text" id="p-post-elog-text" value="" size=32 title="enter text to post in e-Log, then press RETURN to proceed"  style="font-size:80%; padding:1px; margin-top:6px;" />
+    </div>
+    <div style="clear:both;"></div>
+  </div>
 </div>
-HERE
-			,
-			'callback' => 'set_current_tab("tabs-el-p-as")'
-    	)
-    );
-    array_push(
-		$tabs_elog_post_extra,
-    	array(
-    		'name' => 'Tags',
-    		'id'   => 'tabs-el-p-tags',
-    		'html' => <<<HERE
-<div id="elog-tags" style="margin-top:4px;">{$tags_html}</div>
-HERE
-			,
-			'callback' => 'set_current_tab("tabs-el-p-tags")'
-    	)
-    );
-    array_push(
-		$tabs_elog_post_extra,
-    	array(
-    		'name' => 'Context & Post Time',
-    		'id'   => 'tabs-el-p-context',
-    		'html' => <<<HERE
-<div>
-  <div style="float:left;">
-    <div style="font-weight:bold;">Context:</div>
-    <div id="el-p-context-selector" style="margin-top:4px;">
-      <input type="radio" id="el-p-context-experiment" name="scope" value="experiment" checked="checked" /><label for="el-p-context-experiment">experiment</label>
-      <input type="radio" id="el-p-context-shift"      name="scope" value="shift"                        /><label for="el-p-context-shift"     >shift</label>
-      <input type="radio" id="el-p-context-run"        name="scope" value="run"                          /><label for="el-p-context-run"       >run</label>
-    </div>
-  </div>
-  <div style="float:left; margin-left:10px;">
-    <div style="font-weight:bold;">Shift:</div>
-    <div style="margin-top:4px;">
-      <select id="el-p-shift">{$shifts_html}</select>
-    </div>
-  </div>
-  <div style="float:left; margin-left:10px;">
-    <div style="font-weight:bold;">Run:</div>
-    <div style="margin-top:4px;">
-      <input type="text" id="el-p-runnum" value="{$max_run}" size=4 />
-      <span id="el-p-runnum-error" style="color:red;"></span>
-    </div>
-  </div>
-  <div style="clear:both;"></div>
 </div>
-<div style="margin-top:20px;">
-  <div style="float:left;">
-    <div style="font-weight:bold;">Post time:</div>
-    <div id="el-p-relevance-selector" style="margin-top:4px;">
-      <input type="radio" id="el-p-relevance-now"   name="relevance" value="now"   checked="checked" /><label for="el-p-relevance-now"   title="it will be the actual posting time"      >now</label>
-      <input type="radio" id="el-p-relevance-past"  name="relevance" value="past"                    /><label for="el-p-relevance-past"  title="use date and time selector on the right" >past</label>
-      <input type="radio" id="el-p-relevance-shift" name="relevance" value="shift"                   /><label for="el-p-relevance-shift" title="within specified shift"                  >in shift</label>
-      <input type="radio" id="el-p-relevance-run"   name="relevance" value="run"                     /><label for="el-p-relevance-run"   title="within specified run"                    >in run</label>
-    </div>
-  </div>
-  <div style="float:left; margin-left:10px;">
-    <div style="font-weight:bold;">&nbsp;</div>
-    <div style="margin-top:4px;">
-      <input type="text" id="el-p-datepicker" value="{$today}" size=11 />
-      <input type="text" id="el-p-time" value="{$now}"  size=8 />
-    </div>
-  </div>
-  <div style="clear:both"></div>
-</div>
-HERE
-			,
-			'callback' => 'set_current_tab("tabs-el-p-context")'
-    	)
-    );
-    $tabs_elog_post_extra = DataPortal::tabs_html( "tabs-el-p-subtabs", $tabs_elog_post_extra );
-    $tabs_elog_post =<<<HERE
-    <div style="float:left; margin-right:20px;">
-      <form id="elog-form-post" enctype="multipart/form-data" action="/apps-dev/logbook/NewFFEntry4portal.php" method="post">
-        <input type="hidden" name="author_account" value="" />
-        <input type="hidden" name="id" value="" />
-        <input type="hidden" name="run_id" value="" />
-        <input type="hidden" name="shift_id" value="" />
-        <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />
-        <input type="hidden" name="num_tags" value="{$num_tags}" />
-        <input type="hidden" name="onsuccess" value="" />
-        <input type="hidden" name="relevance_time" value="" />
-        <textarea name="message_text" rows="12" cols="80" style="padding:4px;" title="the first line of the message body will be used as its subject" ></textarea>
-        <div style="margin-top:10px;">{$tabs_elog_post_extra}</div>
-      </form>
-    </div>
-    <div style="float:left;">
-      <div><button id="elog-submit-and-stay">Submit and stay on this page</button></div>
-      <div><button id="elog-submit-and-follow">Submit and follow up</button></div>
-      <div><button id="elog-reset">Reset form</button></div>
-    </div>
-    <div style="clear:both;"></div>\n
-HERE;
-    array_push(
-		$tabs_elog_subtabs,
-    	array(
-    		'name' => 'Post',
-    		'id' => 'tabs-elog-post',
-    		'html' => $tabs_elog_post,
-    		'class' => 'tab-inline-content',
-    	    'callback' => 'set_current_tab("tabs-elog-post")'
-    	)
-    );
+<div id="p-left">
 
-    $tabs_elog_search =<<<HERE
-      <p>There will be a dialog to search for messages</p>\n
-HERE;
-    array_push(
-		$tabs_elog_subtabs,
-    	array(
-    		'name' => 'Search',
-    		'id' => 'tabs-elog-search',
-    		'html' => $tabs_elog_search,
-            'class' => 'tab-inline-content',
-    	    'callback' => 'set_current_tab("tabs-elog-search")'
-    	)
-    );
+  <div id="v-menu">
 
-    $tabs_elog_browse =<<<HERE
-      <p>This has to be an extended version of the live display allowing more
-      sophisticated ways for browsing the database.</p>\n
-HERE;
-    array_push(
-		$tabs_elog_subtabs,
-    	array(
-    		'name' => 'Browse',
-    		'id' => 'tabs-elog-browse',
-            'html' => $tabs_elog_browse,
-            'class' => 'tab-inline-content',
-            'callback' => 'set_current_tab("tabs-elog-browse")'
-    	)
-    );
+    <div id="menu-title"></div>
 
-    $tabs_elog_runs =<<<HERE
-      <p>A list of all runs, a selector for a run and runs summary page.</p>\n
-HERE;
-    array_push(
-		$tabs_elog_subtabs,
-    	array(
-    		'name' => 'Runs',
-    		'id' => 'tabs-elog-runs',
-            'html' => $tabs_elog_runs,
-            'class' => 'tab-inline-content',
-    	    'callback' => 'set_current_tab("tabs-elog-runs")'
-    	)
-    );
-
-    $tabs_elog_shifts =<<<HERE
-      <p>A list of all shifts, a selector for a shift and the shift goals page.</p>\n
-HERE;
-    array_push(
-		$tabs_elog_subtabs,
-    	array(
-            'name' => 'Shifts',
-            'id' => 'tabs-elog-shifts',
-            'html' => $tabs_elog_shifts,
-            'class' => 'tab-inline-content',
-            'callback' => 'set_current_tab("tabs-elog-shifts")'
-    	)
-    );
-
-    $tabs_elog_subscribe =<<<HERE
-      <p>A dialog for viewing/managing subscriptions for e-mail notifications.</p>\n
-HERE;
-    array_push(
-		$tabs_elog_subtabs,
-    	array(
-            'name' => 'Subscribe',
-            'id' => 'tabs-elog-subscribe',
-            'html' => $tabs_elog_subscribe,
-            'class' => 'tab-inline-content',
-            'callback' => 'set_current_tab("tabs-elog-subscribe")'
-    	)
-    );
-
-    array_push(
-		$tabs,
-    	array(
-    		'name' => 'e-Log',
-    		'id' => 'tabs-elog',
-    		'html' => DataPortal::tabs_html( "tabs-elog-subtabs", $tabs_elog_subtabs ),
-    	    'callback' => 'set_current_tab("tabs-elog")'
-    	)
-    );
-
-    $tabs_files_subtabs = array();
-    $tabs_files_4runs =<<<HERE
-	  <div>
-        <div id="files-search-summary" style="float: left">
-          <table><tbody>
-            <tr>
-              <td class="grid-sect-hdr-first">R u n s</td>
-            </tr>
-            <tr>
-              <td class="grid-key">Number of runs:</td>
-              <td class="grid-value">{$num_runs}</td>
-            </tr>
-            <tr>
-              <td class="grid-sect-hdr">X T C</td>
-            </tr>
-            <tr>
-              <td class="grid-key">Number of files:</td>
-              <td class="grid-value">{$xtc_num_files}</td>
-              <td class="grid-key">Size [GB]:</td>
-              <td class="grid-value">{$xtc_size_str}</td>
-            </tr>
-            <tr>
-              <td class="grid-key">Archived to tape:</td>
-              <td class="grid-value">{$xtc_archived} / {$xtc_num_files}</td>
-              <td class="grid-key">On disk:</td>
-              <td class="grid-value">{$xtc_local_copy} / {$xtc_num_files}</td>
-            </tr>
-             <tr>
-             <td class="grid-sect-hdr">H D F 5</td>
-            </tr>
-            <tr>
-              <td class="grid-key">Number of files:</td>
-              <td class="grid-value">{$hdf5_num_files}</td>
-              <td class="grid-key">Size [GB]:</td>
-              <td class="grid-value">{$hdf5_size_str}</td>
-            </tr>
-            <tr>
-              <td class="grid-key">Archived to tape:</td>
-              <td class="grid-value">{$hdf5_archived} / {$hdf5_num_files}</td>
-              <td class="grid-key">On disk:</td>
-              <td class="grid-value">{$hdf5_local_copy} / {$hdf5_num_files}</td>
-            </tr>
-          </tbody></table>
-        </div>
-        <div id="files-search-filter" style="float: left">
-          <div class="group" style="float: left">
-            <div class="selector-hdr">R u n s</div>
-            <table><thead>
-              <tr>
-                <td class="selector-option"><input type="radio" name="runs" value="all" checked="checked"></td>
-                <td class="selector-value">all</td>
-              </tr>
-              <tr>
-                <td class="selector-option"><input type="radio" name="runs" value="range"></td>
-                <td class="selector-value"><input type="text" name="runs_range" value="{$range_of_runs}" width=10 title="1,3,5,10-20,200"></td>
-              </tr>
-            </thead></table>
-          </div>
-          <div class="group" style="float: left">
-            <div class="selector-hdr">A r c h i v e d</div>
-            <table><thead>
-              <tr>
-                <td class="selector-option"><input type="radio" name="archived" value="yes_or_no" checked="checked"></td>
-                <td class="selector-value">yes or no</td>
-              </tr>
-              <tr>
-                <td class="selector-option"><input type="radio" name="archived" value="yes"></td>
-                <td class="selector-value">yes</td>
-              </tr>
-              <tr>
-                <td class="selector-option"><input type="radio" name="archived" value="no"></td>
-                <td class="selector-value">no</td>
-              </tr>
-            </thead></table>
-          </div>
-          <div class="group" style="float: left">
-            <div class="selector-hdr">D i s k</div>
-            <table><thead>
-              <tr>
-                <td class="selector-option"><input type="radio" name="local" value="yes_or_no" checked="checked"></td>
-                <td class="selector-value">yes or no</td>
-              </tr>
-              <tr>
-                <td class="selector-option"><input type="radio" name="local" value="yes"></td>
-                <td class="selector-value">yes</td>
-              </tr>
-              <tr>
-                <td class="selector-option"><input type="radio" name="local" value="no"></td>
-                <td class="selector-value">no</td>
-              </tr>
-            </thead></table>
-          </div>
-          <div style="clear: both;"></div>
-          <div class="group" style="float: left">
-            <div class="selector-hdr">T y p e s</div>
-            <table><thead>
-              <tr>
-                <td class="selector-option"><input type="checkbox" name="xtc" value="XTC" checked="checked"></td>
-                <td class="selector-value">XTC</td>
-              </tr>
-              <tr>
-                <td class="selector-option"><input class="grid-key" type="checkbox" name="hdf5" value="HDF5" checked="checked"></td>
-                <td class="selector-value">HDF5</td>
-              </tr>
-              </thead></table>
-          </div>
-          <div style="clear: both;"></div>
-          <div style="float: right;">
-            <button id="button-files-filter-reset" class="not4print">Reset Filter</button>
-            <button id="button-files-filter-apply" class="not4print">Apply Filter</button>
-            <button id="button-files-filter-import" class="not4print">Import List</button>
-          </div>
-          <div style="clear: both;"></div>
-        </div>
-        <div style="clear: both;"></div>
-      </div>
-      <div id="files-search-result"></div>\n
-HERE;
-    array_push(
-		$tabs_files_subtabs,
-    	array(
-           'name' => 'By Runs',
-           'id' => 'tabs-files-4runs',
-            'html' => $tabs_files_4runs,
-            'class' => 'tab-inline-content',
-            'callback' => 'set_current_tab("tabs-files-4runs")'
-    	)
-    );
-    array_push(
-		$tabs,
-    	array(
-    		'name' => 'Data Files',
-    		'id'   => 'tabs-files',
-    		'html' => DataPortal::tabs_html( "tabs-files-subtabs", $tabs_files_subtabs ),
-    	    'callback' => 'set_current_tab("tabs-files")'
-    	)
-    );
-
-
-    $tabs_translate_subtabs = array();
-    $tabs_translate_manage =<<<HERE
-	  <div>
-        <div id="translate-search-summary" style="float:left">
-          <table><tbody>
-            <tr>
-              <td class="grid-sect-hdr-first">R u n s</td>
-            </tr>
-            <tr>
-              <td class="grid-key">Number of runs:</td>
-              <td class="grid-value">{$num_runs}</td>
-            </tr>
-            <tr>
-              <td class="grid-sect-hdr">T r a n s l a t i o n</td>
-            </tr>
-            <tr>
-              <td class="grid-key">Complete:</td>
-              <td class="grid-value">{$hdf5_num_runs_complete}</td>
-            </tr>
-            <tr>
-              <td class="grid-key">Failed:</td>
-              <td class="grid-value">{$hdf5_num_runs_failed}</td>
-            </tr>
-            <tr>
-              <td class="grid-key">Waiting:</td>
-              <td class="grid-value">{$hdf5_num_runs_wait}</td>
-            </tr>
-            <tr>
-              <td class="grid-key">Being translated:</td>
-              <td class="grid-value">{$hdf5_num_runs_translate}</td>
-            </tr>
-            <tr>
-              <td class="grid-key">Other state:</td>
-              <td class="grid-value">{$hdf5_num_runs_unknown}</td>
-            </tr>
-          </tbody></table>
-        </div>
-        <div id="translate-search-filter" style="float:left">
-          <div class="group" style="float:left">
-            <div class="selector-hdr">R u n s</div>
-            <table><thead>
-              <tr>
-                <td class="selector-option"><input type="radio" name="runs" value="all" checked="checked"></td>
-                <td class="selector-value">all</td>
-              </tr>
-              <tr>
-                <td class="selector-option"><input type="radio" name="runs" value="range"></td>
-                <td class="selector-value"><input type="text" name="runs_range" value="{$range_of_runs}" width=10 title="1,3,5,10-20,200"></td>
-              </tr>
-            </thead></table>
-          </div>
-          <div class="group" style="float:left">
-            <div class="selector-hdr">T r a n s l a t e d</div>
-            <table><thead>
-              <tr>
-                <td class="selector-option"><input type="radio" name="translated" value="yes_or_no" checked="checked"></td>
-                <td class="selector-value">yes or no</td>
-              </tr>
-              <tr>
-                <td class="selector-option"><input type="radio" name="translated" value="yes"></td>
-                <td class="selector-value">yes</td>
-              </tr>
-              <tr>
-                <td class="selector-option"><input type="radio" name="translated" value="no"></td>
-                <td class="selector-value">no</td>
-              </tr>
-            </thead></table>
-          </div>
-          <div style="clear:both;"></div>
-          <div style="float:right;">
-            <button id="button-translate-filter-reset" class="not4print">Reset Filter</button>
-            <button id="button-translate-filter-apply" class="not4print">Apply Filter</button>
-          </div>
-          <div style="clear:both;"></div>
-        </div>
+    <div id="experiment" class="visible">
+      <div class="v-item" id="summary">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Summary</div>
         <div style="clear:both;"></div>
       </div>
-	  <div id="translate-search-result"></div>\n
-HERE;
-    array_push(
-		$tabs_translate_subtabs,
-    	array(
-            'name' => 'Manage',
-            'id'   => 'tabs-translate-manage',
-            'html' => $tabs_translate_manage,
-            'class' => 'tab-inline-content',
-            'callback' => 'set_current_tab("tabs-translate-manage")'
-    	)
-    );
-    $tabs_translate_history =<<<HERE
-      <p>Here be the list of all translation requests. And there will be a filter
-      on the top right side to allow.</p>\n
-HERE;
-    array_push(
-		$tabs_translate_subtabs,
-    	array(
-            'name' => 'History',
-            'id' => 'tabs-translate-history',
-            'html' => $tabs_translate_history,
-            'class' => 'tab-inline-content',
-    	    'callback' => 'set_current_tab("tabs-translate-history")'
-    	)
-    );
-    array_push(
-		$tabs,
-    	array(
-    		'name' => 'HDF5 Translation',
-    		'id' => 'tabs-translate',
-    		'html' => DataPortal::tabs_html( "tabs-translate-subtabs", $tabs_translate_subtabs ),
-    	    'callback' => 'set_current_tab("tabs-translate")'
-    	)
-    );
-    DataPortal::tabs( "tabs", $tabs );
-?>
+      <div class="v-group" id="manage">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div class="link" style="float:left;" >Manage</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-group-members v-group-members-hidden">
+        <div class="v-item v-item-first" id="group">
+          <div class="ui-icon ui-icon-triangle-1-s" style="float:left;"></div>
+          <div class="link" style="float:left;" >POSIX group</div>
+          <div style="clear:both;"></div>
+        </div>
+      </div>
+    </div>
 
-<!----------------------------------------------------------------->
+    <div id="elog" class="hidden">
+      <div class="v-item" id="recent">
+        <div class="ui-icon ui-icon-triangle-1-s" style="float:left;"></div>
+        <div class="link" style="float:left;" >Recent (Live)</div>
+        <div style="clear:both;"></div>
+      </div>
+<!--
+      <div class="v-group-members v-group-members-visible">
+        <div class="v-item v-item-first" id="20">
+          <div class="ui-icon ui-icon-triangle-1-s" style="float:left;"></div>
+          <div class="link" style="float:left;" >20</div>
+          <div style="clear:both;"></div>
+        </div>
+        <div class="v-item" id="100">
+          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+          <div class="link" style="float:left;" >100</div>
+          <div style="clear:both;"></div>
+        </div>
+        <div class="v-item" id="12h">
+          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+          <div class="link" style="float:left;" >shift</div>
+          <div style="clear:both;"></div>
+        </div>
+        <div class="v-item" id="24h">
+          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+          <div class="link" style="float:left;" >24 hrs</div>
+          <div style="clear:both;"></div>
+        </div>
+        <div class="v-item" id="7d">
+          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+          <div class="link" style="float:left;" >7 days</div>
+          <div style="clear:both;"></div>
+        </div>
+        <div class="v-item" id="">
+          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+          <div class="link" style="float:left;" >everything</div>
+          <div style="clear:both;"></div>
+        </div>
+      </div>
+-->
+      <div class="v-group" id="post">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div class="link" style="float:left;" >Post</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-group-members v-group-members-hidden">
+        <div class="v-item v-item-first" id="experiment">
+          <div class="ui-icon ui-icon-triangle-1-s" style="float:left;"></div>
+          <div class="link" style="float:left;" >for experiment</div>
+          <div style="clear:both;"></div>
+        </div>
+        <div class="v-item" id="shift">
+          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+          <div class="link" style="float:left;" >for shift</div>
+          <div style="clear:both;"></div>
+        </div>
+        <div class="v-item" id="run">
+          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+          <div class="link" style="float:left;" >for run</div>
+          <div style="clear:both;"></div>
+        </div>
+      </div>
+      <div class="v-group" id="search">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div class="link" style="float:left;" >Search</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-group-members v-group-members-hidden">
+        <div class="v-item v-item-first" id="simple">
+          <div class="ui-icon ui-icon-triangle-1-s" style="float:left;"></div>
+          <div class="link" style="float:left;" >simple</div>
+          <div style="clear:both;"></div>
+        </div>
+        <div class="v-item" id="advanced">
+          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+          <div class="link" style="float:left;" >advanced</div>
+          <div style="clear:both;"></div>
+        </div>
+      </div>
+      <div class="v-item" id="browse">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Browse</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-item" id="shifts">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Shifts</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-item" id="runs">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Runs</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-item" id="subscribe">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Subscribe</div>
+        <div style="clear:both;"></div>
+      </div>
+    </div>
 
+    <div id="datafiles" class="hidden">
+      <div class="v-item" id="summary">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Summary</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-item" id="files">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Files</div>
+        <div style="clear:both;"></div>
+      </div>
+    </div>
 
+    <div id="hdf" class="hidden">
+      <div class="v-item" id="manage">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Manage</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-item" id="history">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >History</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-item" id="translators">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Translators</div>
+        <div style="clear:both;"></div>
+      </div>
+    </div>
 
+    <div id="help" class="hidden">
+      No menu for help yet
+    </div>
 
+  </div>
 
+</div>
 
-<?php
-    DataPortal::end();
-?>
+<div id="p-splitter"></div>
+
+<div id="p-bottom">
+  <div id="p-status">
+    <center>- status bar to be here at some point -</center>
+  </div>
+</div>
+
+<div id="p-center">
+  <div id="application-workarea">
+    <div id="experiment-summary" class="application-workarea hidden"><?php echo $experiment_summary_workarea ?></div>
+    <div id="experiment-manage"  class="application-workarea hidden"><?php echo $experiment_manage_group_workarea ?></div>
+    <div id="elog-recent"        class="application-workarea hidden"><?php echo $elog_recent_workarea ?></div>
+    <div id="elog-post"          class="application-workarea hidden"><?php echo $elog_post_workarea ?></div>
+    <div id="elog-search"        class="application-workarea hidden"><?php echo $elog_search_workarea ?></div>
+    <div id="datafiles-summary"  class="application-workarea hidden"><?php echo $datafiles_summary_workarea ?></div>
+    <div id="datafiles-files"    class="application-workarea hidden"><?php echo $datafiles_files_workarea ?></div>
+    <div id="hdf-manage"         class="application-workarea hidden"><?php echo $hdf_manage_workarea ?></div>
+    <div id="hdf-history"        class="application-workarea hidden"><?php echo $hdf_history_workarea ?></div>
+    <div id="hdf-translators"    class="application-workarea hidden"><?php echo $hdf_translators_workarea ?></div>
+    <div id="help"               class="application-workarea hidden"></div>
+  </div>
+  <div id="popupdialogs" style="display:none;"></div>
+</div>
+</body>
+
+</html>
+
 <!--------------------- Document End Here -------------------------->
 
 
 <?php
 
-} catch( FileMgrException $e ) { print $e->toHtml();
-} catch( LogBookException $e ) { print $e->toHtml();
-} catch( RegDBException   $e ) { print $e->toHtml();
-} catch( LogBookException $e ) { print $e->toHtml();
-} catch( AuthDBException  $e ) { print $e->toHtml();
-}
+} catch( FileMgrException  $e ) { print $e->toHtml(); }
+  catch( LusiTimeException $e ) { print $e->toHtml(); }
+  catch( RegDBException    $e ) { print $e->toHtml(); }
+  catch( LogBookException  $e ) { print $e->toHtml(); }
+  catch( AuthDBException   $e ) { print $e->toHtml(); }
 
 ?>

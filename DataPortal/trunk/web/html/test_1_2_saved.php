@@ -197,27 +197,41 @@ HERE;
   <div style="float:left;">
     <div style="font-weight:bold; margin-bottom:4px;">Show runs:</div>
     <div id="el-l-rs-selector">
-      <input type="radio" id="el-l-rs-on"  name="show_runs" value="on"  checked="checked" /><label for="el-l-rs-on"  >On</label>
-      <input type="radio" id="el-l-rs-off" name="show_runs" value="off"                   /><label for="el-l-rs-off" >Off</label>
+      <input type="radio" id="el-l-rs-on"  name="show_runs" value="on" checked="checked"/><label for="el-l-rs-on" >Yes</label>
+      <input type="radio" id="el-l-rs-off" name="show_runs" value="off"/><label for="el-l-rs-off">No</label>
     </div>
   </div>
+  <div style="float:left; margin-left:20px;">
+    <div style="font-weight:bold; margin-bottom:2px;">Messages:</div>
+    <select name="messages" style="font-size:90%; padding:1px;" title="Select non-blank option to select how many events to load">
+      <option>20</option>
+      <option>100</option>
+      <option>shift</option>
+      <option>24 hrs</option>
+      <option>7 days</option>
+      <option>everything</option>
+    </select>
+  </div>
   <div style="float:right;" class="el-l-auto">
-    <div style="font-weight:bold; margin-bottom:4px;">Autorefresh:</div>
-    <div id="el-l-refresh-selector" style="float:left;">
-      <input type="radio" id="el-l-refresh-on"  name="refresh" value="on"  checked="checked" /><label for="el-l-refresh-on"  >On</label>
-      <input type="radio" id="el-l-refresh-off" name="refresh" value="off"                   /><label for="el-l-refresh-off" >Off</label>
+    <div style="float:left;">
+      <div style="font-weight:bold; margin-bottom:4px;">Autorefresh:</div>
+      <div id="el-l-refresh-selector" style="float:left;">
+        <input type="radio" id="el-l-refresh-on"  name="refresh" value="on"  checked="checked" /><label for="el-l-refresh-on"  >On</label>
+        <input type="radio" id="el-l-refresh-off" name="refresh" value="off"                   /><label for="el-l-refresh-off" >Off</label>
+      </div>
+      <div style="float:left; margin-left:10px; font-size:80%;">
+        <select id="el-l-refresh-interval">
+          <option>2</option>
+          <option>5</option>
+          <option>10</option>
+        </select>
+        s.
+      </div>
+      <div style="clear:both;"></div>
     </div>
-    <div style="float:left; margin-left:10px;">
-      <select id="el-l-refresh-interval">
-        <option>2</option>
-        <option>5</option>
-        <option>10</option>
-      </select>
-      s.
-    </div>
-    <div style="float:left; margin-left:10px;">
-      <button id="el-l-refresh" title="check if there are new updates">Check for updates</button>
-    </div>
+    <div style="float:right; margin-left:10px;">
+      <button id="el-l-refresh" title="check if there are new messages or runs">Refresh</button>
+    </div>    
     <div style="clear:both;"></div>
   </div>
   <div style="clear:both;"></div>
@@ -245,7 +259,7 @@ HERE;
     	$tags_html .=<<<HERE
 <div style="width: 100%;">
   <select id="elog-tags-library-{$i}">{$select_tag_html}</select>
-  <input type="text" id="elog-tag-name-{$i}" name="tag_name_{$i}"  value="" size=16 title="type new tag here or select a known one from the left" />
+  <input type="text" class="elog-tag-name" id="elog-tag-name-{$i}" name="tag_name_{$i}" value="" size=16 title="type new tag here or select a known one from the left" />
   <input type="hidden" id="elog-tag-value-{$i}" name="tag_value_{$i}" value="" />
 </div>
 
@@ -365,8 +379,7 @@ HERE;
     $elog_search_workarea =<<<HERE
 <div id="el-s-ctrl">
   <div style="float:left;">
-    <form id="elog-form-search" action="/apps-dev/logbook/Search.php" method="get">
-
+    <form id="elog-form-search" action="../logbook/Search.php" method="get">
       <div style="float:left;">
         <div style="font-weight:bold;">Text to search:</div>
         <div><input type="text" name="text2search" value="" size=24 style="font-size:90%; padding:1px; margin-top:5px; width:100%;" /></div>
@@ -421,7 +434,183 @@ HERE;
   <div class="el-ms" id="el-s-ms"></div>
 </div>
 HERE;
-    
+
+    $datafiles_summary_workarea =<<<HERE
+<div id="datafiles-summary-ctrl">
+  <div style="float:right;"><button id="datafiles-summary-refresh" title="click to refresh the summary information">Refresh</button></div>
+  <div style="clear:both;"></div>
+</div>
+<div id="datafiles-summary-wa">
+  <div class="datafiles-info" id="datafiles-summary-info" style="float:right;">&nbsp;</div><div style="clear:both;"></div>
+  <table><tbody>
+    <tr><td class="table_cell table_cell_left"># of runs</td>
+        <td class="table_cell table_cell_right" id="datafiles-summary-runs">no data</td></tr>
+    <tr><td class="table_cell table_cell_left">First run #</td>
+        <td class="table_cell table_cell_right" id="datafiles-summary-firstrun">no data</td></tr>
+    <tr><td class="table_cell table_cell_left">Last run #</td>
+        <td class="table_cell table_cell_right" id="datafiles-summary-lastrun">no data</td></tr>
+    <tr><td class="table_cell table_cell_left" valign="center">XTC</td>
+        <td class="table_cell table_cell_right">
+          <table cellspacing=0 cellpadding=0><tbody>
+            <tr><td class="table_cell table_cell_left">Size [GB]</td>
+                <td class="table_cell table_cell_right" id="datafiles-summary-xtc-size">no data</td></tr>
+            <tr><td class="table_cell table_cell_left"># of files</td>
+                <td class="table_cell table_cell_right" id="datafiles-summary-xtc-files">no data</td></tr>
+            <tr><td class="table_cell table_cell_left">Archived to HPSS</td>
+                <td class="table_cell table_cell_right" id="datafiles-summary-xtc-archived">no data</td></tr>
+            <tr><td class="table_cell table_cell_left  table_cell_bottom">Available on disk</td>
+                <td class="table_cell table_cell_right table_cell_bottom" id="datafiles-summary-xtc-disk">no data</td></tr>
+            </tbody></table>
+        </td></tr>
+    <tr><td class="table_cell table_cell_left table_cell_bottom" valign="center">HDF5</td>
+        <td class="table_cell table_cell_right table_cell_bottom">
+          <table cellspacing=0 cellpadding=0><tbody>
+            <tr><td class="table_cell table_cell_left">Size [GB]</td>
+                <td class="table_cell table_cell_right" id="datafiles-summary-hdf5-size">no data</td></tr>
+            <tr><td class="table_cell table_cell_left"># of files</td>
+                <td class="table_cell table_cell_right" id="datafiles-summary-hdf5-files">no data</td></tr>
+            <tr><td class="table_cell table_cell_left">Archived to HPSS</td>
+                <td class="table_cell table_cell_right" id="datafiles-summary-hdf5-archived">no data</td></tr>
+            <tr><td class="table_cell table_cell_left  table_cell_bottom">Available on disk</td>
+                <td class="table_cell table_cell_right table_cell_bottom" id="datafiles-summary-hdf5-disk">no data</td></tr>
+            </tbody></table>
+        </td></tr>
+  </tbody></table>
+</div>
+HERE;
+
+    $datafiles_files_workarea =<<<HERE
+<div id="datafiles-files-ctrl">
+  <div style="float:left;">
+    <div style="float:left;">
+      <div style="font-weight:bold;">Search runs:</div>
+      <div style="margin-top:5px;">
+        <input type="text" name="runs" style="font-size:90%; padding:1px;" title="Put a range of runs to activate the filter. Use the following syntax: 1,3,5,10-20,211"></input>
+      </div>
+    </div>
+    <div style="float:left; margin-left:20px;">
+      <div style="font-weight:bold;">Types:</div>
+      <div style="margin-top:5px;">
+        <select name="types" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
+          <option>any</option>
+          <option>XTC</option>
+          <option>HDF5</option>
+        </select>
+      </div>
+    </div>
+    <div style="float:left; margin-left:20px;">
+      <div style="font-weight:bold;">Created:</div>
+      <div style="margin-top:5px;">
+        <select name="created" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
+          <option>any</option>
+          <option>1 hr</option>
+          <option>12 hrs</option>
+          <option>24 hrs</option>
+          <option>7 days</option>
+          <option>1 month</option>
+          <option>1 year</option>
+          </select>
+      </div>
+    </div>
+    <div style="float:left; margin-left:20px;">
+      <div style="font-weight:bold;">Checksum:</div>
+      <div style="margin-top:5px;">
+        <select name="checksum" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
+          <option>any</option>
+          <option>none</option>
+          <option>is known</option>
+        </select>
+      </div>
+    </div>
+    <div style="float:left; margin-left:20px;">
+      <div style="font-weight:bold;">Archived:</div>
+      <div style="margin-top:5px;">
+        <select name="archived" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
+          <option>any</option>
+          <option>yes</option>
+          <option>no</option>
+        </select>
+      </div>
+    </div>
+    <div style="float:left; margin-left:20px;">
+      <div style="font-weight:bold;">On disk:</div>
+      <div style="margin-top:5px;">
+        <select name="local" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
+          <option>any</option>
+          <option>yes</option>
+          <option>no</option>
+        </select>
+      </div>
+    </div>
+    <div style="clear:both;"></div>
+  </div>
+  <div style="float:right; margin-left:5px;"><button id="datafiles-files-refresh" title="click to refresh the file list according to the last filter">Refresh</button></div>
+  <div style="clear:both;"></div>
+</div>
+<div id="datafiles-files-wa">
+  <div class="datafiles-info" id="datafiles-files-info" style="float:left;">&nbsp;</div>
+  <div class="datafiles-info" id="datafiles-files-updated" style="float:right;">&nbsp;</div>
+  <div style="clear:both;"></div>
+  <div style="margin-top:10px; margin-bottom:10px;" >
+    <table style=" font-size:80%;"><tbody>
+      <tr>
+        <td><input type="checkbox" name="type" /></td><td>Type</td>
+        <td><input type="checkbox" name="size" /></td><td>Size</td>
+        <td><input type="checkbox" name="created" /></td><td>Created</td>
+        <td><input type="checkbox" name="checksum" /></td><td>Checksum</td>
+      </tr><tr>
+        <td><input type="checkbox" name="archived" /></td><td>Archived</td>
+        <td><input type="checkbox" name="local" /></td><td>On disk</td>
+        <td><input type="checkbox" name="archived_path" /></td><td>Archived path</td>
+        <td><input type="checkbox" name="local_path" /></td><td>Disk path</td>
+      </tr>
+    </tbody></table>
+  </div>
+  <div id="datafiles-files-list" style="margin-top:5px;"></div>
+</div>
+HERE;
+
+    $hdf_manage_workarea = <<<HERE
+<div id="hdf-manage-ctrl">
+  <div style="float:left;">
+    <div style="float:left;">
+      <div style="font-weight:bold;">Search runs:</div>
+      <div style="margin-top:5px;">
+        <input type="text" name="runs" style="font-size:90%; padding:1px;" title="Put a range of runs to activate the filter. Use the following syntax: 1,3,5,10-20,211"></input>
+      </div>
+    </div>
+    <div style="float:left; margin-left:20px;">
+      <div style="font-weight:bold;">Translation status:</div>
+      <div style="margin-top:5px;">
+        <select name="status" style="font-size:90%; padding:1px;" title="Select non-blank option to activate the filter">
+          <option>any</option>
+          <option>COMPLETE</option>
+          <option>FAILED</option>
+          <option>TRANSLATING</option>
+          <option>QUEUED</option>
+          <option>READY</option>
+          </select>
+      </div>
+    </div>
+    <div style="clear:both;"></div>
+  </div>
+  <div style="float:right; margin-left:5px;"><button id="hdf-manage-refresh" title="click to refresh the file list according to the last filter">Refresh</button></div>
+  <div style="clear:both;"></div>
+</div>
+<div id="hdf-manage-wa">
+  <div class="hdf-info" id="hdf-manage-info" style="float:left;">&nbsp;</div>
+  <div class="hdf-info" id="hdf-manage-updated" style="float:right;">&nbsp;</div>
+  <div style="clear:both;"></div>
+  <div id="hdf-manage-list" style="margin-top:5px;"></div>
+</div>
+HERE;
+
+    $hdf_history_workarea = <<<HERE
+HERE;
+
+    $hdf_translators_workarea = <<<HERE
+HERE;
+
 ?>
 
 
@@ -435,14 +624,19 @@ HERE;
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
 
 <link type="text/css" href="/jquery/css/custom-theme/jquery-ui-1.8.7.custom.css" rel="Stylesheet" />
+<link type="text/css" href="css/common.css" rel="Stylesheet" />
 <link type="text/css" href="css/ELog4test1_2.css" rel="Stylesheet" />
 <link type="text/css" href="css/Exper4test1_2.css" rel="Stylesheet" />
+<link type="text/css" href="css/Data4test1_2.css" rel="Stylesheet" />
+<link type="text/css" href="css/Hdf4test1_2.css" rel="Stylesheet" />
 
 <script type="text/javascript" src="/jquery/js/jquery-1.5.1.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui-1.8.7.custom.min.js"></script>
 <script type="text/javascript" src="js/Utilities.js"></script>
 <script type="text/javascript" src="js/ELog4test1_2.js"></script>
 <script type="text/javascript" src="js/Exper4test1_2.js"></script>
+<script type="text/javascript" src="js/Data4test1_2.js"></script>
+<script type="text/javascript" src="js/Hdf4test1_2.js"></script>
 
 <!----------- Window layout styles and supppot actions ----------->
 
@@ -621,7 +815,7 @@ span.toggler {
   font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
   font-size: 75%;
 }
-#p-search {
+#p-search, #p-post {
   padding-top: 2px;
   padding-right: 10px;
   font-size: 75%;
@@ -842,6 +1036,9 @@ elog.max_run = <?=(is_null($max_run)?'null':$max_run->num())?>;
 elog.editor = <?=(LogBookAuth::instance()->canEditMessages( $experiment->id())?'true':'false')?>;
 
 exper.posix_group = '<?=$experiment->POSIX_gid()?>';
+
+datafiles.exp_id = '<?=$exper_id?>';
+hdf.exp_id = '<?=$exper_id?>';
 
 var extra_params = new Array();
 <?php
@@ -1076,12 +1273,25 @@ $(function() {
 		}
 	}
 	$('#p-search-elog-text').keyup(function(e) { if(($('#p-search-elog-text').val() != '') && (e.keyCode == 13)) simple_search(); });
+	function simple_post() {
+		for(var id in applications) {
+			var application = applications[id];
+			if(application.name == 'elog') {
+				$('#p-menu').children('#'+id).each(function() {	m_item_selected(this); });
+				v_item_selected($('#v-menu > #elog > #post').next().children('.v-item#experiment'));
+				application.select('post','experiment');
+				application.simple_post4experiment($('#p-post-elog-text').val());
+				break;
+			}
+		}
+	}
+	$('#p-post-elog-text').keyup(function(e) { if(($('#p-post-elog-text').val() != '') && (e.keyCode == 13)) simple_post(); });
 
 	applications = {
 		'p-appl-experiment' : exper,
 		'p-appl-elog'       : elog,
-		'p-appl-datafiles'  : new p_appl_datafiles(),	// TODO: implement it the same wa as for e-Log
-		'p-appl-hdf5'       : new p_appl_hdf5(),		// TODO: implement it the same wa as for e-Log
+		'p-appl-datafiles'  : datafiles,
+		'p-appl-hdf5'       : hdf,
 		'p-appl-help'       : new p_appl_help()			// TODO: implement it the same wa as for e-Log
 	};
 
@@ -1099,44 +1309,6 @@ $(function() {
  *
  *       Implement similar objects (JS + CSS) for other applications.
  */
-
-function p_appl_datafiles() {
-	var that = this;
-	var context2_default = {
-		'' : ''
-	};
-	this.name = 'datafiles';
-	this.full_name = 'Data Files';
-	this.context1 = '';
-	this.context2 = '';
-	this.select = function(ctx1, ctx2) {
-		that.context1 = ctx1;
-		that.context2 = ctx2 == null ? context2_default[ctx1] : ctx2;
-	};
-	$('#p-center > #application-workarea > #datafiles').html('<center>The work area for data files</center>');
-	$('#p-left > #v-menu > #datafiles').html('<center>The menu area of the data files</center>');
-
-	return this;
-}
-
-function p_appl_hdf5() {
-	var that = this;
-	var context2_default = {
-		'' : ''
-	};
-	this.name = 'hdf5';
-	this.full_name = 'HDF5 Translation';
-	this.context1 = '';
-	this.context2 = '';
-	this.select = function(ctx1, ctx2) {
-		that.context1 = ctx1;
-		that.context2 = ctx2 == null ? context2_default[ctx1] : ctx2;
-	};
-	$('#p-center > #application-workarea > #hdf5').html('<center>The workarea of the HDF5 translation</center>');
-	$('#p-left > #v-menu > #hdf5').html('<center>The workarea of the HDF5 translation</center>');
-
-	return this;
-}
 
 function p_appl_help() {
 	var that = this;
@@ -1199,7 +1371,7 @@ function p_appl_help() {
   <div id="p-menu">
     <div class="m-item m-item-first m-select" id="p-appl-experiment">Experment</div>
     <div class="m-item m-item-next" id="p-appl-elog">e-Log</div>
-    <div class="m-item m-item-next" id="p-appl-datafiles">Data Files</div>
+    <div class="m-item m-item-next" id="p-appl-datafiles">File Manager</div>
     <div class="m-item m-item-next" id="p-appl-hdf5">HDF5 Translation</div>
     <div class="m-item m-item-last" id="p-appl-help">Help</div>
     <div class="m-item-end"></div>
@@ -1207,7 +1379,10 @@ function p_appl_help() {
   <div>
     <div id="p-context" style="float:left"></div>
     <div id="p-search" style="float:right">
-      search e-log: <input type="text" id="p-search-elog-text" value="" size=16 title="text to search in e-Log"  style="font-size:80%; padding:1px; margin-top:6px;" />
+      search e-log: <input type="text" id="p-search-elog-text" value="" size=16 title="enter text to search in e-Log, then press RETURN to proceed"  style="font-size:80%; padding:1px; margin-top:6px;" />
+    </div>
+    <div id="p-post" style="float:right">
+      post in e-log: <input type="text" id="p-post-elog-text" value="" size=32 title="enter text to post in e-Log, then press RETURN to proceed"  style="font-size:80%; padding:1px; margin-top:6px;" />
     </div>
     <div style="clear:both;"></div>
   </div>
@@ -1339,11 +1514,34 @@ function p_appl_help() {
     </div>
 
     <div id="datafiles" class="hidden">
-      No menu for data files yet
+      <div class="v-item" id="summary">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Summary</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-item" id="files">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Files</div>
+        <div style="clear:both;"></div>
+      </div>
     </div>
 
-    <div id="hdf5" class="hidden">
-      No menu for HDF5 translation yet
+    <div id="hdf" class="hidden">
+      <div class="v-item" id="manage">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Manage</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-item" id="history">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >History</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-item" id="translators">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Translators</div>
+        <div style="clear:both;"></div>
+      </div>
     </div>
 
     <div id="help" class="hidden">
@@ -1366,12 +1564,15 @@ function p_appl_help() {
   <div id="application-workarea">
     <div id="experiment-summary" class="application-workarea hidden"><?php echo $experiment_summary_workarea ?></div>
     <div id="experiment-manage"  class="application-workarea hidden"><?php echo $experiment_manage_group_workarea ?></div>
-    <div id="elog-recent"   class="application-workarea hidden"><?php echo $elog_recent_workarea ?></div>
-    <div id="elog-post"     class="application-workarea hidden"><?php echo $elog_post_workarea ?></div>
-    <div id="elog-search"   class="application-workarea hidden"><?php echo $elog_search_workarea ?></div>
-    <div id="datafiles"     class="application-workarea hidden"></div>
-    <div id="hdf5"          class="application-workarea hidden"></div>
-    <div id="help"          class="application-workarea hidden"></div>
+    <div id="elog-recent"        class="application-workarea hidden"><?php echo $elog_recent_workarea ?></div>
+    <div id="elog-post"          class="application-workarea hidden"><?php echo $elog_post_workarea ?></div>
+    <div id="elog-search"        class="application-workarea hidden"><?php echo $elog_search_workarea ?></div>
+    <div id="datafiles-summary"  class="application-workarea hidden"><?php echo $datafiles_summary_workarea ?></div>
+    <div id="datafiles-files"    class="application-workarea hidden"><?php echo $datafiles_files_workarea ?></div>
+    <div id="hdf-manage"         class="application-workarea hidden"><?php echo $hdf_manage_workarea ?></div>
+    <div id="hdf-history"        class="application-workarea hidden"><?php echo $hdf_history_workarea ?></div>
+    <div id="hdf-translators"    class="application-workarea hidden"><?php echo $hdf_translators_workarea ?></div>
+    <div id="help"               class="application-workarea hidden"></div>
   </div>
   <div id="popupdialogs" style="display:none;"></div>
 </div>

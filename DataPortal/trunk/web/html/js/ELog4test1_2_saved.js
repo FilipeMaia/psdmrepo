@@ -34,7 +34,7 @@ function elog_create() {
 	/* The context for v-menu items
 	 */
 	var context2_default = {
-		'recent' : '',
+		'recent' : '20',
 		'post'   : 'experiment',
 		'search' : 'simple',
 		'browse' : '',
@@ -64,7 +64,8 @@ function elog_create() {
 			// Do nothing if nothing has changed since the previous call to the function,
 			// such as: fresh initialization, change in the slected context, subcontext, etc.
 			//
-			if( just_initialized || (prev_context1 != this.context1 )) {
+			if( just_initialized || (prev_context1 != this.context1) || (prev_context2 != this.context2)) {
+				this.live_current_selected_range = this.context2;
 				this.live_dim_all_highlights();
 				this.live_message_viewer.reload(live_selected_runs(), this.live_selected_range());
 			}
@@ -315,11 +316,6 @@ function elog_create() {
 			that.live_dim_all_highlights();
 			that.live_message_viewer.reload(live_selected_runs(), that.live_selected_range());
 		});
-		$('#el-l-mctrl').find('select[name="messages"]').change(function() {
-			that.live_message_viewer.dim_day();
-			that.live_dim_all_highlights();
-			that.live_message_viewer.reload(live_selected_runs(), that.live_selected_range());
-		});
 		$('#el-l-refresh-selector').buttonset().change(function() {
 			if(live_selected_refresh()) {
 				$('#el-l-refresh-interval').removeAttr('disabled');
@@ -413,17 +409,10 @@ function elog_create() {
 		return live_id2runs[$('#el-l-rs-selector input:checked').attr('id')];
 	}
 
+	this.live_current_selected_range = '20';
 	this.live_selected_range = function() {
-		var str = $('#el-l-mctrl').find('select[name="messages"]').val();
-		switch(str) {
-		case '20': return str;
-		case '100': return str;
-		case 'shift': return '12h';
-		case 'day': return '24h';
-		case 'week': return '7d';
-		}
-		return '';
-	};
+		return this.live_current_selected_range;
+	}
 
 	var live_id2refresh = new Array();
 	live_id2refresh['el-l-refresh-on']=1;

@@ -41,8 +41,18 @@
  *   -subj    subject
  */
 
-#el-l-mctrl,
-#el-s-ctrl,
+#el-l-mctrl {
+  width: inherit;
+  padding: 10px 10px 5px 10px;
+  background-color:#f0f0f0;
+}
+
+#el-s-ctrl {
+  width: inherit;
+  padding: 10px 10px 0px 10px;
+  background-color:#f0f0f0;
+}
+
 #el-p {
   width: inherit;
   padding: 10px 20px 0px 20px;
@@ -53,7 +63,8 @@
 }
 
 .el-wa {
-  padding: 10px 20px 10px 20px;
+  padding: 20px 20px 10px 20px;
+  border-top: solid 1px #c0c0c0;
 }
 .el-ms-mctrl {
   margin-bottom: 10px;
@@ -119,6 +130,7 @@ div.el-l-a:hover {
 }
 
 .el-l-m-d-hdr {
+  margin-bottom:1px;
   padding:3px;
   background-color:#b9dcf5;
 
@@ -158,11 +170,13 @@ div.el-l-m-d-hdr:hover {
 
 .el-l-m-hdr,
 .el-l-c-hdr {
+  margin-bottom:1px;
   padding:3px;
   background-color:#e0e0e0;
-  border:1px solid #d0d0d0;
-  border-bottom:0px;
 
+  border:1px solid #d0d0d0;
+  border-bottom:1px solid #080808;
+  
   border-radius:5px;
   border-bottom-left-radius:0px;
   border-bottom-right-radius:0px;
@@ -180,11 +194,12 @@ div.el-l-c-hdr:hover {
 }
 
 .el-l-r-hdr {
+  margin-bottom:1px;
   padding:3px;
   background-color:#DEF0CD;
 
   border:1px solid #B9DD97;
-  border-bottom:0px;
+  border-bottom:1px solid #080808;
 
   border-radius:5px;
   border-bottom-left-radius:0px;
@@ -205,6 +220,8 @@ div.el-l-r-hdr:hover {
 .el-l-c-con {
   padding:25px;
   padding-top:5px;
+
+  background-color:#f8f8f8;
 
   border:1px solid #d0d0d0;
   border-top:0px;
