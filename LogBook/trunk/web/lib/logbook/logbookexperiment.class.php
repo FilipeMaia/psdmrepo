@@ -299,6 +299,11 @@ HERE;
     public function find_run_by_num ( $num ) {
         return $this->find_run_by_( "num=".$num) ; }
 
+    public function find_first_run () {
+        return $this->find_run_by_(
+            "id=(SELECT MIN(id) FROM {$this->connection->database}.run WHERE exper_id=".
+            $this->attr['id'].')' ); }
+
     public function find_last_run () {
         return $this->find_run_by_(
             "id=(SELECT MAX(id) FROM {$this->connection->database}.run WHERE exper_id=".

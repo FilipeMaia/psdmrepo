@@ -385,7 +385,9 @@ function run2json( $run, $type, $posted_at_instrument ) {
             "children" => $children_ids,
             "is_run" => 1,
         	"run_id" => $run->id(),
-            "run_num" => $run->num(),
+        	"begin_run" => $run->begin_time()->toStringShort(),
+        	"end_run" => is_null($run->end_time()) ? '' : $run->end_time()->toStringShort(),
+        	"run_num" => $run->num(),
         	"ymd" => $timestamp->toStringDay(),
         	"hms" => $timestamp->toStringHMS()
         )
