@@ -202,13 +202,13 @@ class FileMgrIfaceCtrlWs {
     	/* ATTENTION: Using this OO interface is the only way to make PUT to work
     	 * with the current implementation of PHP and HTTP module.
     	 */
-		$http = new HttpRequest( $uri, HttpRequest::METH_PUT );
+		$http = new \HttpRequest( $uri, \HttpRequest::METH_PUT );
 		$http->setOptions( FileMgrIfaceCtrlWs::opts());
 		$http->setContentType( "application/x-www-form-urlencoded; charset=utf-8" );
 		$http->addPutData( "priority={$priority}" );
 		try {
     		$result = json_decode( $http->send()->getBody());
-		} catch ( HttpException $ex ) {
+		} catch ( \HttpException $ex ) {
 			throw new FileMgrException(
     			__METHOD__,
         		"Web service request failed: {$uri}, due to: ".$ex );
