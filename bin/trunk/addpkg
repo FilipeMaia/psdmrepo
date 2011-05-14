@@ -140,22 +140,18 @@ fi
 # the file .sit_release must be in the current directory
 if [ -f .sit_release ] ; then
   base_release=`cat .sit_release | tr -d ' '`
-elif [ -f .lusi_release ] ; then
-  base_release=`cat .lusi_release | tr -d ' '`
 else
-  echo "Release not setup, file .lusi_release or .sit_release does not exist in current directory"
+  echo "Release not setup, file .sit_release does not exist in current directory"
   exit 2
 fi
 
-svnroot="$LUSI_SVN"
-test -z "$svnroot" && svnroot="$SIT_SVN"
+svnroot="$SIT_SVN"
 if [ -z "$svnroot" ] ; then
-  echo "SIT_SVN or LUSI_SVN environment variable is not defined"
+  echo "SIT_SVN environment variable is not defined"
   exit 2
 fi
 
-svncmd=lusvn
-test -z "$LUSI_SVN" && svncmd=psvn
+svncmd=psvn
 
 if [ "$tag_file" = '-' ] ; then
 

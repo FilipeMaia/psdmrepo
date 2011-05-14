@@ -40,15 +40,12 @@ getPkgList() {
   rel=${1:?No release name provided}	
   
   if [ "$rel" == "REPO" ] ; then
-  	# not a release, but SVN repository
-    # TODO: remove once migration is finished
-  	repo="$LUSI_SVN"
-  	test -n "$SIT_SVN" && repo="$SIT_SVN"
+    # not a release, but SVN repository
+    repo="$SIT_SVN"
     svn -v list "$repo" | sed 's%.* \([^ ]*\)/$%\1%'
   else
     # get the list of directories with SConscript file inside
     if [ "$rel" != "." ] ; then
-      test -n "$LUSI_ROOT" && rel="$LUSI_ROOT/sw/releases/$rel"
       test -n "$SIT_RELDIR" && rel="$SIT_RELDIR/$rel"
     fi
     for f in $rel/* ; do
@@ -68,22 +65,17 @@ getPkgTag() {
   if [ "$rel" == "REPO" ] ; then
   	
   	# get most recent tag from SVN repository
-    repo="$LUSI_SVN"
-    test -n "$SIT_SVN" && repo="$SIT_SVN"
+    repo="$SIT_SVN"
   	svn -v list "$repo/$pkg/tags" | sort -k1,1n | tail -1 | sed 's%.* \([^ ]*\)/$%\1%'
   	
   else
   
     if [ "$rel" != "." ] ; then
-      test -n "$LUSI_ROOT" && rel="$LUSI_ROOT/sw/releases/$rel"
       test -n "$SIT_RELDIR" && rel="$SIT_RELDIR/$rel"
     fi
     pkg="$rel/$pkg"
   
-    if [ -f "$pkg/.lusi-tag" ] ; then
-      # .lusi-tag means exported package
-      cat "$pkg/.lusi-tag"
-    elif [ -f "$pkg/.sit-tag" ] ; then
+    if [ -f "$pkg/.sit-tag" ] ; then
       # .sit-tag means exported package
       cat "$pkg/.sit-tag"
     elif [ -d "$pkg/.svn" ] ; then
@@ -132,21 +124,19 @@ normReleases() {
 
   for r in "$@" ; do 
   	if [ $r = "BASE" ] ; then
-      if [ -f .lusi_release ] ; then
-      	cat .lusi_release
-  	  elif [ -f .sit_release ] ; then
+      if [ -f .sit_release ] ; then
   	    cat .sit_release
   	  else 
-        echo ".sit_release [or .lusi_release] is absent, cannot use BASE" 1>&2
+        echo ".sit_release is absent, cannot use BASE" 1>&2
         exit 2
   	  fi
     elif [ "$r" == "." ] ; then
-      test -f .lusi_release -o -f .sit_release || { echo ".sit_release [or .lusi_release] is absent, cannot use ." 1>&2 ; exit 2 ; }
+      test -f .sit_release || { echo ".sit_release is absent, cannot use ." 1>&2 ; exit 2 ; }
       echo $r
     elif [ "$r" == "REPO" ] ; then
       echo $r
   	else
-      test -d "$LUSI_ROOT/sw/releases/$r" -o -d "$SIT_RELDIR/$r" || { echo "release $r does not exist" 1>&2 ; exit 2 ; }
+      test -d "$SIT_RELDIR/$r" || { echo "release $r does not exist" 1>&2 ; exit 2 ; }
       echo $r
     fi
   done
@@ -160,9 +150,7 @@ normReleases() {
 relHeader() {
   for r in "$@" ; do 
     if [ $r = "BASE" ] ; then
-      if [ -r .lusi_release ] ; then
-      	echo "BASE(`cat .lusi_release`)"
-      elif [ -r .sit_release ] ; then
+      if [ -r .sit_release ] ; then
       	echo "BASE(`cat .sit_release`)"
       fi
     elif [ "$r" == "." ] ; then

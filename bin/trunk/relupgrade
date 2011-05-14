@@ -45,8 +45,8 @@ if [ -z "$release" ] ; then
 fi
 
 # check that we are in the release dir
-if [ ! -f .sit_release -a ! .lusi_release ] ; then
-  echo ".sit_release or .lusi_release are not present in current directory"
+if [ ! -f .sit_release ] ; then
+  echo ".sit_release are not present in current directory"
   exit 2
 fi
 
@@ -58,7 +58,6 @@ fi
 
 # update release names
 echo "$release" > .sit_release
-test -f .lusi_release && echo "$release" > .lusi_release
 
 # if we don't have SConsTools checked out then copy SConstruct from new release
 test -d SConsTools || cp $SIT_RELDIR/$release/SConstruct ./

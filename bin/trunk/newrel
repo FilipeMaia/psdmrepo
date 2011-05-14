@@ -48,8 +48,6 @@ fi
 release="$1"
 directory="$2"
 
-# TODO: remove once migration is finished
-test -n "$LUSI_ROOT" && reldir="$LUSI_ROOT/sw/releases"
 test -n "$SIT_RELDIR" && reldir="$SIT_RELDIR"
 
 # check it
@@ -63,15 +61,10 @@ mkdir "$directory" || exit 3
 # if release is linked to another one get its real name
 if [ -f "$reldir/$release/.sit_release" ] ; then
   release=`cat "$reldir/$release/.sit_release"`
-elif [ -f "$reldir/$release/.lusi_release" ] ; then
-  # TODO: remove once migration is finished
-  release=`cat "$reldir/$release/.lusi_release"`
 fi
 
 # store its number
 echo "$release" > "$directory/.sit_release" || exit 3
-# TODO: remove once migration is finished
-echo "$release" > "$directory/.lusi_release" || exit 3
 
 # copy SConstruct 
 if [ -r "$reldir/$release/SConstruct" ] ; then
