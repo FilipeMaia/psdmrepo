@@ -1,0 +1,36 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package FileMgr
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-07
+2011-05-13 Igor Gaponenko
+- bug fix in the Interface Controller Web service
+
+Tag: V00-00-06
+2011-02-25 Igor Gaponenko
+- bug fixes
+
+Tag: V00-00-05
+2010-10-20 Igor Gaponenko
+- added Interface Controller service
+- added HDF5 translation monitor
+- added FileMgrConfig.inc.php
+
+Tag: V00-00-03
+2010-07-20 Igor Gaponenko
+- correct error processing in iRODS web service interaction class
+
+Tag: V00-00-01
+2010-01-04 Igor Gaponenko
+- the first (yet to be finished) implementation of the experimental data
+and iRODS catalogs exporers
+
