@@ -510,7 +510,8 @@ HERE;
     	foreach( $instr_names as $i ) {
             foreach( $this->experiments_for_instrument( $i ) as $exper ) {
                 $g = $exper->name();
-                if( 1 == preg_match( '/^[a-z]{3}[0-9]{5}$/', $g )) $groups[$g] = True;
+                if(( 1 == preg_match( '/^[a-z]{3}[0-9]{5}$/', $g )) ||
+                   ( 1 == preg_match( '/^[a-z]{3}[im][0-9]{4}$/', $g ))) $groups[$g] = True;
             }
     	}
 
@@ -523,10 +524,8 @@ HERE;
     	/* In-house commissionning, in-house, etc. for the year of 2010.
          */
     	if( is_null( $instr ) || ( $instr == 'AMO' )) {
-            $groups['amoi0110'] = True;
-            $groups['amoi0111'] = True;
-            $groups['amoi0211'] = True;
             $groups['ps-amo'] = True;
+            $groups['amoopr'] = True;
     	}
 
     	/* SXR commissionning, in-house, etc. experiments for the year of 2010.
@@ -535,9 +534,8 @@ HERE;
             $groups['sxrrsx10'] = True;
             $groups['sxrsse10'] = True;
             $groups['sxrlje10'] = True;
-            $groups['sxri0110'] = True;
-            $groups['sxri0111'] = True;
             $groups['ps-sxr'] = True;
+            $groups['sxropr'] = True;
     	}
 
     	/* Groups for which there is no entry in RegDB but which we still want
@@ -548,30 +546,27 @@ HERE;
          */
     	if( is_null( $instr ) || ( $instr == 'XPP' )) {
             $groups['xpp80610'] = True;
-            $groups['xppm0110'] = True;
-            $groups['xppi0110'] = True;
-            $groups['xppi0210'] = True;
-            $groups['xppi0310'] = True;
-            $groups['xppi0111'] = True;
-            $groups['xppi0211'] = True;
             $groups['ps-xpp'] = True;
+            $groups['xppopr'] = True;
     	}
     	/* CXI commissionning, in-house, etc. experiments for the year of 2010.
          */
     	if( is_null( $instr ) || ( $instr == 'CXI' )) {
-            $groups['cxii0111'] = True;
-            $groups['cxii0211'] = True;
             $groups['ps-cxi'] = True;
+            $groups['cxiopr'] = True;
     	}
     	/* MEC commissionning, in-house, etc. experiments for the year of 2010.
          */
     	if( is_null( $instr ) || ( $instr == 'MEC' )) {
             $groups['ps-mec'] = True;
+            $groups['mecopr'] = True;
     	}
+
     	/* XCS commissionning, in-house, etc. experiments for the year of 2010.
          */
     	if( is_null( $instr ) || ( $instr == 'XCS' )) {
             $groups['ps-xcs'] = True;
+            $groups['xcsopr'] = True;
     	}
     	return $groups;
     }
