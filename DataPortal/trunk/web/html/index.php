@@ -66,9 +66,22 @@ try {
 	$experiment = $logbook_experiment->regdb_experiment();
     $instrument = $experiment->instrument();
 
-    /* Get stats for e-log
-     */
-    $num_runs = 0;
+    $can_manage_group = false;
+    foreach( array_keys( $regdb->experiment_specific_groups()) as $g ) {
+    	
+  		if( $g == $experiment->POSIX_gid()) {
+	        $can_manage_group = RegDBAuth::instance()->canManageLDAPGroup( $g );
+            break;
+        }
+    }
+	$has_data_access =
+		$can_manage_group ||
+		$regdb->is_member_of_posix_group( $logbook_experiment->POSIX_gid(), $auth_svc->authName()) ||
+		$regdb->is_member_of_posix_group( 'ps-'.strtolower( $instrument->name()), $auth_svc->authName());
+
+	$has_elog_access = LogBookAuth::instance()->canRead( $logbook_experiment->id());
+
+	$num_runs = 0;
     $min_run = null;
     $max_run = null;
     $logbook_runs = $logbook_experiment->runs();
@@ -137,16 +150,10 @@ try {
 </tbody></table>
 
 HERE;
-	$can_manage_group = false;
-    foreach( array_keys( $regdb->experiment_specific_groups()) as $g ) {
-    	
-  		if( $g == $experiment->POSIX_gid()) {
-	        $can_manage_group = RegDBAuth::instance()->canManageLDAPGroup( $g );
-            break;
-        }
-    }
+
     if($can_manage_group) {
-	    $experiment_manage_group_workarea =<<<HERE
+
+    	$experiment_manage_group_workarea =<<<HERE
 
 <div style="float:left; margin-left:10px; margin-right:20px; margin-bottom:40px; padding-right:30px; border-right: 1px solid #c0c0c0;">
   <div style="height:55px;">
@@ -187,13 +194,15 @@ HERE;
   We're sorry! Your SLAC UNIX account <b>{$auth_svc->authName()}</b> has no proper permissions to manage POSIX
   group <b>{$experiment->POSIX_gid()}</b> associated with the experiment. Normally we assign this task to
   the PI of the experiment. The PI may also delegate the role to another member of the experiment.
-  If you're the PI then please contact us by sending a e-mail request to <b>pcds-help</b> (at SLAC). Otherwise
+  If you're the PI then please contact us by sending an e-mail request to <b>pcds-help</b> (at SLAC). Otherwise
   contact the PI of the experiment.
 </div>
 HERE;
     }
 
-    $elog_recent_workarea =<<<HERE
+    if( $has_elog_access ) {
+
+    	$elog_recent_workarea =<<<HERE
 
 <div id="el-l-mctrl">
   <div style="float:left;">
@@ -437,7 +446,32 @@ HERE;
 </div>
 HERE;
 
-    $datafiles_summary_workarea =<<<HERE
+    } else {
+
+    	$no_elog_access_message =<<<HERE
+<br><br>
+<center>
+  <span style="color: red; font-size: 175%; font-weight: bold; font-family: Times, sans-serif;">
+    A c c e s s &nbsp; E r r o r
+  </span>
+</center>
+<div style="margin: 10px 10% 10px 10%; padding: 10px; font-size: 125%; font-family: Times, sans-serif; border-top: 1px solid #b0b0b0;">
+  We're sorry! Your SLAC UNIX account <b>{$auth_svc->authName()}</b> has no proper permissions to access
+  this page. The page access is reserved to members of group <b>{$experiment->POSIX_gid()}</b> associated with the experiment,
+  <b>{$instrument->name()}</b> instrument scientists, and <b>PCDS</b> operations crew.
+  If you want to be a member of the group then contact directly the PI of the experiment.
+  In all other cases please contact us by sending an e-mail request to <b>pcds-help</b> (at SLAC).
+</div>
+HERE;
+
+    	$elog_recent_workarea = $no_elog_access_message;
+    	$elog_post_workarea   = $no_elog_access_message;
+    	$elog_search_workarea = $no_elog_access_message;
+
+    }
+    if( $has_data_access ) {
+
+    	$datafiles_summary_workarea =<<<HERE
 <div id="datafiles-summary-ctrl">
   <div style="float:right;"><button id="datafiles-summary-refresh" title="click to refresh the summary information">Refresh</button></div>
   <div style="clear:both;"></div>
@@ -481,7 +515,7 @@ HERE;
 </div>
 HERE;
 
-    $datafiles_files_workarea =<<<HERE
+    	$datafiles_files_workarea =<<<HERE
 <div id="datafiles-files-ctrl">
   <div style="float:left;">
     <div style="float:left;">
@@ -588,7 +622,7 @@ HERE;
 </div>
 HERE;
 
-    $hdf_manage_workarea = <<<HERE
+    	$hdf_manage_workarea = <<<HERE
 <div id="hdf-manage-ctrl">
   <div style="float:left;">
     <div style="float:left;">
@@ -623,11 +657,34 @@ HERE;
 </div>
 HERE;
 
-    $hdf_history_workarea = <<<HERE
+    	$hdf_history_workarea = <<<HERE
 HERE;
 
-    $hdf_translators_workarea = <<<HERE
+    	$hdf_translators_workarea = <<<HERE
 HERE;
+
+    } else {
+
+    	$no_data_access_message =<<<HERE
+<br><br>
+<center>
+  <span style="color: red; font-size: 175%; font-weight: bold; font-family: Times, sans-serif;">
+    A c c e s s &nbsp; E r r o r
+  </span>
+</center>
+<div style="margin: 10px 10% 10px 10%; padding: 10px; font-size: 125%; font-family: Times, sans-serif; border-top: 1px solid #b0b0b0;">
+  We're sorry! Your SLAC UNIX account <b>{$auth_svc->authName()}</b> has no proper permissions to access
+  this page. The page access is reserved to members of group <b>{$experiment->POSIX_gid()}</b> associated with the experiment.
+  Please, contact the PI to request your account to be included into the group.
+</div>
+HERE;
+
+		$datafiles_summary_workarea = $no_data_access_message;
+		$datafiles_files_workarea   = $no_data_access_message;
+		$hdf_manage_workarea        = $no_data_access_message;
+    	$hdf_history_workarea       = $no_data_access_message;
+		$hdf_translators_workarea   = $no_data_access_message;
+    }
 
 ?>
 
