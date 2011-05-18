@@ -139,6 +139,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         
 
         # ------- SELECTION / CONFIGURATION ------
+        self.configuration = None
         self.checklabels = []
         self.checkboxes = []
 
@@ -214,7 +215,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.help_layout = QtGui.QVBoxLayout(self.help_widget)
         self.help_subwg1 = QtGui.QLabel(self.help_widget)
         self.help_subwg1_text = """
-Configure your Event Display / Analysis:
+ * Configure your Event Display / Analysis:
 
     Select the information / detectors of interest to you from list
     to the left. Pyana modules will be configured for you to analyze
@@ -223,8 +224,8 @@ Configure your Event Display / Analysis:
     You can edit the configuration or pyana modules afterwards, 
     if you want to further customize your analysis.
 
-
-General settings:
+ * The following are general settings for pyana and
+   defaults for plotting:
     """
         self.help_subwg1.setText(self.help_subwg1_text)
         self.help_layout.addWidget(self.help_subwg1)
@@ -242,6 +243,7 @@ General settings:
 
         self.run_n_layout = QtGui.QHBoxLayout()
         self.run_n_layout.addWidget(self.run_n_status)
+        self.run_n_layout.addStretch()
         self.run_n_layout.addWidget(self.run_n_enter)
         self.run_n_layout.addWidget(self.run_n_change_btn)
         self.help_layout.addLayout(self.run_n_layout, QtCore.Qt.AlignRight )
@@ -259,6 +261,7 @@ General settings:
         self.connect(self.skip_n_change_btn, QtCore.SIGNAL('clicked()'), self.skip_n_change )
 
         self.skip_n_layout.addWidget(self.skip_n_status)
+        self.skip_n_layout.addStretch()
         self.skip_n_layout.addWidget(self.skip_n_enter)
         self.skip_n_layout.addWidget(self.skip_n_change_btn)
         self.help_layout.addLayout(self.skip_n_layout, QtCore.Qt.AlignRight )
@@ -275,6 +278,7 @@ General settings:
         self.plotn_change_btn = QtGui.QPushButton("&Change") 
         self.connect(self.plotn_change_btn, QtCore.SIGNAL('clicked()'), self.plotn_change )
         self.plot_n_layout.addWidget(self.plotn_status)
+        self.plot_n_layout.addStretch()
         self.plot_n_layout.addWidget(self.plotn_enter)
         self.plot_n_layout.addWidget(self.plotn_change_btn)
         self.help_layout.addLayout(self.plot_n_layout, QtCore.Qt.AlignRight )
@@ -302,9 +306,9 @@ General settings:
         self.ipython_layout = QtGui.QHBoxLayout()
         self.ipython_menu = QtGui.QComboBox()
         self.ipython_menu.setMaximumWidth(150)
-        self.connect(self.ipython_menu,  QtCore.SIGNAL('currentIndexChanged(int)'), self.process_ipython )
         self.ipython_menu.addItem("No")
         self.ipython_menu.addItem("Yes (Doesn't work yet)")
+        self.connect(self.ipython_menu,  QtCore.SIGNAL('currentIndexChanged(int)'), self.process_ipython )
         self.ipython_layout.addWidget(self.ipython_status)
         self.ipython_layout.addWidget(self.ipython_menu)
         self.help_layout.addLayout(self.ipython_layout)
@@ -318,17 +322,23 @@ General settings:
         self.ipython_status.setText("Drop into iPython at the end of the job?  %s" \
                                     % self.bool_string[ self.ipython ] )
 
+        if self.configuration is not None:
+            self.process_checkboxes()
+
     def process_dmode(self):
         self.displaymode = self.dmode_menu.currentText()
         self.dmode_status.setText("Display mode is %s"%self.displaymode)
-        print "hah!"
+
         if self.displaymode == "NoDisplay" :
             self.plot_n = 0
             self.plotn_status.setText("Plot only after all events")
 
+        if self.configuration is not None:
+            self.process_checkboxes()
+
             
     def plotn_change(self):
-        print "plotn_change"
+
         self.plot_n = self.plotn_enter.text()
         if self.plot_n == "":
             self.plot_n = 0
@@ -341,6 +351,9 @@ General settings:
                 self.dmode_status.setText("Display mode is %s"%self.displaymode)                
                 self.dmode_menu.setCurrentIndex(1) # SlideShow
         self.plotn_enter.setText("")
+
+        if self.configuration is not None:
+            self.process_checkboxes()
 
     def run_n_change(self):
         text = self.run_n_enter.text()
@@ -429,12 +442,12 @@ General settings:
         self.controls = controls
         self.nevents = nevents
         self.ncalib = len(nevents)
-        print self.nevents
+        #print self.nevents
 
         # show all of this in the Gui
         self.setup_gui_checkboxes()
-        for ch in self.checkboxes:
-            print ch.text()
+        #for ch in self.checkboxes:
+        #    print ch.text()
 
         # if scan, plot every calib cycle 
         if self.ncalib > 1 :
@@ -444,6 +457,8 @@ General settings:
             self.plotn_change()
             self.plotn_enter.setText("")
 
+
+        print "Configure pyana by selecting from the detector list"
 
     def setup_gui_checkboxes(self) :
         """Draw a group of checkboxes to the GUI
@@ -750,7 +765,7 @@ General settings:
 
             #print "XtcExplorer.pyana_ipimb at ", index
             address = str(box.text()).split(": ")[1].strip()
-            options_for_mod[index].append("\nipimb_addresses = %s" % address)
+            options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
@@ -896,7 +911,8 @@ General settings:
 
         # pop up emacs window to edit the config file as needed:
         #proc_emacs = myPopen("emacs %s" % self.configfile, shell=True)
-        proc_emacs = myPopen("nano %s" % self.configfile, shell=True) 
+        #proc_emacs = myPopen("nano %s" % self.configfile, shell=True)
+        proc_emacs = myPopen("$EDITOR %s" % self.configfile, shell=True) 
         stdout_value = proc_emacs.communicate()[0]
         print stdout_value
         #proc_emacs = MyThread("emacs %s" % self.configfile) 

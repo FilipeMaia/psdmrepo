@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-May-18 ofte                  rev 1891
+       - Fixed some bugs, alignment
+	
 2011-May-10 ofte                  rev 1880
        - improved cspad, still not able to subtract on-the-fly background. 
 

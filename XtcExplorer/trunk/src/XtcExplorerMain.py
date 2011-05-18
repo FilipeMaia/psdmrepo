@@ -127,19 +127,25 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.scan_label = QtGui.QLabel(self.scan_button)
         self.scan_label.setText("Scan all events")
 
-        self.scan_enable_button = QtGui.QPushButton("&Enable")
+        self.scan_enable_button = QtGui.QPushButton("&Enable full scan")
+        self.scan_enable_button.setMinimumWidth(140)
         self.connect(self.scan_enable_button, QtCore.SIGNAL('clicked()'), self.scan_enable )
         
         self.qscan_button = QtGui.QPushButton("&Quick Scan")
         self.qscan_button.setDisabled(True)
         self.connect(self.qscan_button, QtCore.SIGNAL('clicked()'), self.scan_files_quick )
+        self.qscan_label = QtGui.QLabel(self.qscan_button)
         self.nev_qscan = 200
+        self.qscan_label.setText("Scan the first %d events   " % self.nev_qscan)
+
         self.qscan_edit = QtGui.QLineEdit(str(self.nev_qscan))
-        self.qscan_edit.setMaximumWidth(80)
+        self.qscan_edit.setAlignment(QtCore.Qt.AlignRight)
+        self.qscan_edit.setMaximumWidth(60)
         self.connect(self.qscan_edit, QtCore.SIGNAL('returnPressed()'), self.change_nev_qscan )
 
-        self.qscan_label = QtGui.QLabel(self.qscan_button)
-        self.qscan_label.setText("Scan the first %d events   " % self.nev_qscan)
+        self.qscan_edit_btn = QtGui.QPushButton("Change") 
+        self.qscan_edit_btn.setMaximumWidth(70)
+        self.connect(self.qscan_edit_btn, QtCore.SIGNAL('clicked()'), self.change_nev_qscan )
 
         self.fileinfo = QtGui.QLabel(self)
 
@@ -223,13 +229,16 @@ class XtcExplorerMain (QtGui.QMainWindow) :
 
         hs0 = QtGui.QHBoxLayout()
         hs0.addWidget( self.qscan_button )
-        hs0.addWidget( self.qscan_edit )
         hs0.addWidget( self.qscan_label )
+        hs0.addStretch()
+        hs0.addWidget( self.qscan_edit )
+        hs0.addWidget( self.qscan_edit_btn )
         hs0.setAlignment( self.qscan_edit, QtCore.Qt.AlignLeft )
         hs1 = QtGui.QHBoxLayout()
         hs1.addWidget( self.scan_button )
-        hs1.addWidget( self.scan_enable_button )
         hs1.addWidget( self.scan_label )
+        hs1.addStretch()
+        hs1.addWidget( self.scan_enable_button )
         hs2 = QtGui.QHBoxLayout()
         hs2.addWidget( self.fileinfo )
         
@@ -391,16 +400,16 @@ class XtcExplorerMain (QtGui.QMainWindow) :
 
     def change_nev_qscan(self):
         self.nev_qscan = int(self.qscan_edit.text())
-        self.qscan_label.setText("(Scan the first %d events)   "%self.nev_qscan)
+        self.qscan_label.setText("Scan the first %d events   "%self.nev_qscan)
         
     def scan_enable(self) :
         if self.scan_button :
             if self.scan_button.isEnabled() :
                 self.scan_button.setDisabled(True)
-                self.scan_enable_button.setText("Enable")
+                self.scan_enable_button.setText("Enable full scan")
             else :
                 self.scan_button.setEnabled(True)
-                self.scan_enable_button.setText("Disable")
+                self.scan_enable_button.setText("Disable full scan")
 
 
     def scan_files(self, quick=False):
@@ -430,7 +439,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
                               nevents=self.scanner.nevents,
                               filenames=self.filenames )
 
-        if self.scan_button :
+        if self.scan_button.isEnabled():
             self.scan_enable()
             
         fileinfo_text = "The scan found: \n     %d calib cycles (scan steps) "\

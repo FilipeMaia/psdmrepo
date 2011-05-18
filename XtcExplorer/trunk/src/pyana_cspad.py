@@ -55,7 +55,7 @@ class  pyana_cspad ( object ) :
                    out_img_file = None,
                    plot_vrange = None,
                    threshold = None,
-                   thr_area = None,
+                   thr_area = None, 
                    plot_every_n = None,
                    fignum = "1" ):
         """Class constructor.
@@ -126,7 +126,7 @@ class  pyana_cspad ( object ) :
         self.n_shots = 0
         self.n_img = 0
 
-        # accumulate image data above and below threshold
+        # accumulate image data 
         self.sum_good_images = None
         self.sum_dark_images = None
 
@@ -219,6 +219,11 @@ class  pyana_cspad ( object ) :
         h1 = np.hstack( (qimages[0], qimages[1]) )
         h2 = np.hstack( (qimages[3], qimages[2]) )
         cspad_image = np.vstack( (h1, h2) )
+
+        # mask out hot pixels (16383)
+        cspad_image_masked = np.ma.masked_greater_equal( cspad_image,16383 )
+        cspad_image = np.ma.filled(cspad_image_masked, 0)
+        
         self.vmax = np.max(cspad_image)
         self.vmin = np.min(cspad_image)
 
@@ -228,13 +233,13 @@ class  pyana_cspad ( object ) :
 
         # apply threshold filter
         if self.threshold is not None:            
-            #topval = np.max(cspad_image) # value of maximum bin
-            topval = np.sum(cspad_image)/np.size(cspad_image) # average value of bins
+            topval = np.max(cspad_image) # value of maximum bin
+            #topval = np.sum(cspad_image)/np.size(cspad_image) # average value of bins
             if self.threshold.area is not None:
                 subset = cspad_image[self.threshold.area[0]:self.threshold.area[1],   # x1:x2
                                      self.threshold.area[2]:self.threshold.area[3]]   # y1:y2                
-                #topval = np.max(subset) # value of maximum bin
-                topval = np.sum(subset)/np.size(cspad_image) # average value of bins
+                topval = np.max(subset) # value of maximum bin
+                #topval = np.sum(subset)/np.size(cspad_image) # average value of bins
 
             if topval < self.threshold.minvalue :
                 print "skipping event #%d %.2f < %.2f " % \
@@ -262,20 +267,19 @@ class  pyana_cspad ( object ) :
         # -----
         # Draw this event.
         # -----
-        if self.plot_every_n > 0 :
+        if self.plot_every_n > 0 and (self.n_shots%self.plot_every_n)==0 :
             title = "CsPad shot # %d" % self.n_shots
             if self.dark_image is not None:
                 title = title + " (background subtracted) "
             
-            if (self.n_shots%self.plot_every_n)==0 :
-                print "plotting CsPad data for shot # ", self.n_shots
-                self.plotter.drawframe(cspad_image,title, fignum=self.mpl_num, showProj = True)
+            print "plotting CsPad data for shot # ", self.n_shots
+            self.plotter.drawframe(cspad_image,title, fignum=self.mpl_num, showProj=True)
 
-        # check if plotter has changed its display mode. If so, tell the event
-        switchmode = self.plotter.display_mode
-        if switchmode is not None :
-            evt.put(switchmode,'display_mode')
-            if switchmode == 0 : self.plot_every_n = 0
+            # check if plotter has changed its display mode. If so, tell the event
+            switchmode = self.plotter.display_mode
+            if switchmode is not None :
+                evt.put(switchmode,'display_mode')
+                if switchmode == 0 : self.plot_every_n = 0
             
     # after last event has been processed. 
     def endjob( self, env ) :

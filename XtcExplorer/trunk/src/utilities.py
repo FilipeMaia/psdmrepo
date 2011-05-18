@@ -260,7 +260,7 @@ class Plotter(object):
             hmax = np.max(proj_horiz) + 0.1 * np.max(proj_horiz) 
 
             print vmin,vmax,hmin,hmax
-            plt.clim( np.min(vmin,hmin), np.max(vmax,hmax))
+            #plt.clim( np.min(vmin,hmin), np.max(vmax,hmax))
 
             axHistx.plot(hbins,proj_horiz)
             axHisty.plot(proj_vert[::-1], vbins[::-1])
@@ -307,11 +307,11 @@ class Plotter(object):
             self.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=5)
             axes.add_patch(self.thr_rect)
             
+
+        self.cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+        self.cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)
+
         if self.display_mode == 1 :
-
-            self.cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
-            self.cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)
-
             print """
             To change the color scale, click on the color bar:
             - left-click sets the lower limit
