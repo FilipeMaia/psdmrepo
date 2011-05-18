@@ -38,10 +38,12 @@ class  pyana_ipimb ( object ) :
         self.fex_sum = {}
         self.fex_channels = {}
         self.fex_position = {}
+        self.raw_channels = {}
         for source in self.sources :
             self.fex_sum[source] = list()
             self.fex_channels[source] = list()
             self.fex_position[source] = list()
+            self.raw_channels[source] = list()
 
 
     def beginjob ( self, evt, env ) : 
@@ -57,9 +59,14 @@ class  pyana_ipimb ( object ) :
             # raw data
             ipmRaw = evt.get(xtc.TypeId.Type.Id_IpimbData, source )
             if ipmRaw :
-                pass
+                channelVoltages = []
+                channelVoltages.append( ipmRaw.channel0Volts() )
+                channelVoltages.append( ipmRaw.channel1Volts() )
+                channelVoltages.append( ipmRaw.channel2Volts() )
+                channelVoltages.append( ipmRaw.channel3Volts() )
+                self.raw_channels[source].append( channelVoltages )
             else :
-                print "No object of type %s found" % source
+                print "pyana_ipimb: No IpimbData from %s found" % source
 
             # feature-extracted data
             ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, source )
@@ -69,7 +76,7 @@ class  pyana_ipimb ( object ) :
                 self.fex_channels[source].append( ipmFex.channel )
                 self.fex_position[source].append( [ipmFex.xpos, ipmFex.ypos] )
             else :
-                print "No object of type %s found" % source
+                print "pyana_ipimb: No IpmFex from %s found" % source
 
 
         if self.plot_every_n != 0: 

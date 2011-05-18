@@ -63,7 +63,7 @@ class pyana_scan (object) :
                    controlpv = None,
                    input_epics = None,
                    input_scalars = None,
-                   plot_every_n = None,
+                   #plot_every_n = None,
                    fignum = "1" ) :
         """Class constructor. The parameters to the constructor are passed
         from pyana configuration file. If parameters do not have default 
@@ -74,14 +74,14 @@ class pyana_scan (object) :
                                 if none given, use whatever we find in the event. 
         @param input_epics      Name(s) of other scalars to correlate in scan
         @param input_scalars    Name(s) of other scalars to correlate in scan
-        @param plot_every_n     Frequency for plotting. If n=0, no plots till the end
+        #@param plot_every_n     Frequency for plotting. If n=0, no plots till the end
         @param fignum           Matplotlib figure number
         """
         opt = PyanaOptions()
         self.controlpv = opt.getOptStrings(controlpv)
         self.input_epics = opt.getOptStrings(input_epics)
         self.input_scalars = opt.getOptStrings(input_scalars)
-        self.plot_every_n = opt.getOptInteger(plot_every_n)
+        #self.plot_every_n = opt.getOptInteger(plot_every_n)
         self.mpl_num = opt.getOptInteger(fignum)
         
 
@@ -258,7 +258,8 @@ class pyana_scan (object) :
         logging.info( "pyana_scan.endrun() called" )
         print "End run %d had %d calibcycles " % (self.n_runs, self.n_ccls)
 
-        self.make_plots(fignum=self.mpl_num, suptitle="Motor Scan")
+        self.make_plots(fignum=self.mpl_num, suptitle="Scan (%d calib cycles, %d shots each)" \
+                        %(self.n_ccls,self.n_shots))
 
     def endjob( self, env ) :
         """This method is called at the end of the job. It should do 

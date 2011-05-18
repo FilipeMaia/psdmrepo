@@ -234,7 +234,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.run_n_status = QtGui.QLabel("Process all events")
         self.run_n_enter = QtGui.QLineEdit("")
         if self.run_n is not None:
-            self.run_n_status = QtGui.QLabel("Process %d events"% self.run_n)
+            self.run_n_status = QtGui.QLabel("Process %s events"% self.run_n)
             self.run_n_enter.setText( str(self.run_n) )
         self.run_n_enter.setMaximumWidth(90)
         self.connect(self.run_n_enter, QtCore.SIGNAL('returnPressed()'), self.run_n_change )
@@ -340,7 +340,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
     def plotn_change(self):
 
         self.plot_n = self.plotn_enter.text()
-        if self.plot_n == "":
+        if self.plot_n == "" or self.plot_n == "all" or self.plot_n == "All":
             self.plot_n = 0
             self.plotn_status.setText("Plot only after all events")
         else:
@@ -708,7 +708,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             options_for_mod[index].append("\ncontrolpv = %s" % pvname)
             options_for_mod[index].append("\ninput_epics = ")
             options_for_mod[index].append("\ninput_scalars = ")
-            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
+            #options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
 
@@ -839,7 +839,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         
         print "FIXME! %s requested, not implemented" % box.text() 
 
-    def add_linebreaks(self, configtext, width=70):
+    def add_linebreaks(self, configtext, width=50):
         lines = configtext.split('\n')
         l = 0
         for line in lines :

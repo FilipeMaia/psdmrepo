@@ -11,7 +11,12 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-2011-May-18 ofte                  rev 1891
+2011-May-18 ofte                  rev 1905
+       - Some more tweaking. 
+       - Added option (parameter) to accumulate_n events in pyana_waveform. 
+       - TODO: Need to speed up waveform plotting. 
+       - TODO: Still need to compute on-the-fly background in images/cspad
+2011-May-18 ofte                  rev 1904
        - Fixed some bugs, alignment
 	
 2011-May-10 ofte                  rev 1880
