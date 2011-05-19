@@ -32,7 +32,7 @@ __version__ = "$Revision: 4 $"
 #import sys
 import os
 import time
-
+import numpy as np
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
@@ -140,6 +140,18 @@ def CorrelationDatasetIsChecked():
         if item_last_name == 'time': return True
         if item_last_name == 'data' and (not CSpadIsInTheName(dsname)): return True
     return False
+
+#----------------------------------
+
+def saveNumpyArrayInFile(arr, fname='nparray.txt', format='%f') : # format='%f'
+    print """Save numpy array in file """, fname
+    np.savetxt(fname, arr, fmt=format)
+
+#----------------------------------
+
+def getNumpyArrayFromFile(fname='nparray.txt', datatype=np.float32) : # np.int16, np.float16, np.float32
+    print """Load numpy array from file """, fname
+    return np.loadtxt(fname, dtype=datatype)
 
 #----------------------------------
 #

@@ -87,6 +87,7 @@ class ConfigParameters ( object ) :
         self.step03IsDone            = False
         self.step04IsDone            = False
 
+
     def setDefaultParameters ( self ) :
         """Set default configuration parameters hardwired in this module"""
 
@@ -138,6 +139,7 @@ class ConfigParameters ( object ) :
         self.cspadProjYIsOn       = False
         self.cspadProjRIsOn       = False
         self.cspadProjPhiIsOn     = False
+        self.cspadApplyTiltAngle  = False # Is used in PlotsForCSpad.py
 
         self.cspadAmplitudeRaMin  = 0
         self.cspadAmplitudeRange  = 2000
@@ -301,7 +303,8 @@ class ConfigParameters ( object ) :
         print 'CSPAD_PROJ_Y_IS_ON',        self.cspadProjYIsOn    
         print 'CSPAD_PROJ_R_IS_ON',        self.cspadProjRIsOn    
         print 'CSPAD_PROJ_PHI_IS_ON',      self.cspadProjPhiIsOn    
-
+        print 'CSPAD_APPLY_TILT_ANGLE',    self.cspadApplyTiltAngle
+        
         print 'CSPAD_RANGE_AMIN',          self.cspadAmplitudeRaMin   
         print 'CSPAD_RANGE_AMAX',          self.cspadAmplitudeRange            
         print 'CSPAD_IMAGE_AMIN',          self.cspadImageAmin
@@ -486,6 +489,8 @@ class ConfigParameters ( object ) :
                 elif key == 'CSPAD_PROJ_Y_IS_ON'       : self.cspadProjYIsOn          = dicBool[val.lower()]
                 elif key == 'CSPAD_PROJ_R_IS_ON'       : self.cspadProjRIsOn          = dicBool[val.lower()]
                 elif key == 'CSPAD_PROJ_PHI_IS_ON'     : self.cspadProjPhiIsOn        = dicBool[val.lower()]
+                elif key == 'CSPAD_APPLY_TILT_ANGLE'   : self.cspadApplyTiltAngle     = dicBool[val.lower()]
+
                 elif key == 'IMAGE_IMAGE_IS_ON'        : self.imageImageIsOn          = dicBool[val.lower()]
                 elif key == 'IMAGE_IMAGE_SPEC_IS_ON'   : self.imageImageSpecIsOn      = dicBool[val.lower()]
                 elif key == 'IMAGE_SPECT_IS_ON'        : self.imageSpectrumIsOn       = dicBool[val.lower()]
@@ -663,6 +668,8 @@ class ConfigParameters ( object ) :
         f.write('CSPAD_PROJ_Y_IS_ON'        + space + str(self.cspadProjYIsOn)          + '\n')
         f.write('CSPAD_PROJ_R_IS_ON'        + space + str(self.cspadProjRIsOn)          + '\n')
         f.write('CSPAD_PROJ_PHI_IS_ON'      + space + str(self.cspadProjPhiIsOn)        + '\n')
+        f.write('CSPAD_APPLY_TILT_ANGLE'    + space + str(self.cspadApplyTiltAngle)     + '\n')
+
         f.write('IMAGE_IMAGE_IS_ON'         + space + str(self.imageImageIsOn)          + '\n')
         f.write('IMAGE_IMAGE_SPEC_IS_ON'    + space + str(self.imageImageSpecIsOn)      + '\n')
         f.write('IMAGE_SPECT_IS_ON'         + space + str(self.imageSpectrumIsOn)       + '\n')

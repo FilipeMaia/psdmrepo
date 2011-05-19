@@ -52,6 +52,8 @@ class ConfigCSpad ( object ) :
 
         print 'setCSpadParameters'
 
+        self.preventiveRotationOffset = 5 # (pixel) increase effective canva for rotation
+        off2 = 2*self.preventiveRotationOffset
 
         self.quadInDetOrient = [   90,    0,   270,  180]
         self.quadInDetOriInd = [    1,    0,     3,    2]
@@ -59,8 +61,11 @@ class ConfigCSpad ( object ) :
         gapX = 30
         gapY = 40
 
-        self.quadXOffset     = [   3,    0,      800+gapX, 806+gapX]
-        self.quadYOffset     = [   7,  799+gapY, 810+gapY,       17]
+        #self.quadXOffset     = [   3,    0,      800+gapX, 806+gapX]
+        #self.quadYOffset     = [   0,  792+gapY, 803+gapY,       10]
+
+        self.quadXOffset     = [   3+off2,    0,      800+gapX, 806+gapX+off2]
+        self.quadYOffset     = [   0,  792+gapY, 803+gapY+off2,       10+off2]
 
         self.firstPairInQuad = [0, 0,  8, 16]
         self.lastPairInQuad  = [0, 8, 16, 20]
@@ -84,10 +89,17 @@ class ConfigCSpad ( object ) :
         #                         [   2,   2,   1,   1,   0,   3,   3,   2] ]
 
 
-        self.dPhi = [ [0,0,0,0,0,0,0,0],
-                      [0.144, 0.466, -0.049, -0.186, -0.291, -0.338, 0.119, 0.135],
-                      [0,0,0,0,0,0,0,0],
-                      [0,0,0,0,0,0,0,0] ]
+        # 2011-02-10 before run3:
+        #self.dPhi = [ [0,0,0,0,0,0,0,0],
+        #              [0.144, 0.466, -0.049, -0.186, -0.291, -0.338, 0.119, 0.135],
+        #              [0,0,0,0,0,0,0,0],
+        #              [0,0,0,0,0,0,0,0] ]
+
+        # 2011-03-29 post run3: 
+        self.dPhi = [ [-0.27305, 0.01711, 0.34736, 0.08158,-0.15462,-0.12369,-0.09212,-0.39342],
+                      [ 0.14215, 0.00395,-0.13488,-0.12106, 0.11221, 0.11025, 0.00921,-0.06316],
+                      [-0.33008, 0.00196, 0.16524, 0.56502,-0.44282,-0.39677, 0.18349, 0.22444],
+                      [-0.35074, 0.00131, 0.01513,-0.03882, 0.00000, 0.34609, 0.00000,-0.08816] ]
 
         # "0" version of coordinates:
 

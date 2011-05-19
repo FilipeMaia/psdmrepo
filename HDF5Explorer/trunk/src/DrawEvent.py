@@ -52,6 +52,7 @@ import PlotsForCorrelations      as corrs
 import PlotsForCSpadProjections  as cspadproj
 import PlotsForImageProjections  as imageproj
 import PrintHDF5                 as printh5
+import GlobalMethods             as gm
 
 #---------------------
 #  Class definition --
@@ -278,6 +279,7 @@ class DrawEvent ( object ) :
 
                 self.plotsCSpad.resetEventWithAlreadyGeneratedCSpadDetImage()
                 self.drawArrayForDSName(self.avedsname[ind], self.ave1ev[ind])
+                self.saveArrayForDSNameInFile(self.avedsname[ind], self.ave1ev[ind]) 
 
 
     def drawNextEvent ( self, mode=1 ) :
@@ -390,6 +392,26 @@ class DrawEvent ( object ) :
         print 'Time to drawEvent() (sec) = %f' % (time.clock() - t_drawEvent)
 
 
+    def saveArrayForDSNameInFile(self, dsname, arr1ev) :
+
+        cspadIsInTheName = printh5.CSpadIsInTheName(dsname)
+        #item_last_name = printh5.get_item_last_name(dsname)
+        #cp.confpars.current_item_name_for_title = printh5.get_item_name_for_title(dsname)
+
+        itemIsForSaving = cspadIsInTheName        # or    \
+        #                  item_last_name=='image'   or    \
+        #                  item_last_name=='waveforms'
+        if not itemIsForSaving : return
+        if cspadIsInTheName :
+
+            print 'saveArrayForDSNameInFile'
+            #arr1ev # (32, 185, 388) <- format of this record
+            #print 'arr1ev.shape=', arr1ev.shape
+            self.getCSpadConfiguration(dsname)
+            arr2d = self.plotsCSpad.getImageArrayForDet( arr1ev )
+            #print 'arr2d.shape=', arr2d.shape
+            gm.saveNumpyArrayInFile(arr2d,  fname='cspad-ave.txt' , format='%i') # , format='%f')
+           #gm.saveNumpyArrayInFile(arr1ev, fname='cspad-arr.txt' , format='%i') # , format='%f')
 
 
     def drawArrayForDSName(self, dsname, arr1ev) :

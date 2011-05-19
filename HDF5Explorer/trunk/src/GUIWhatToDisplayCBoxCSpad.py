@@ -80,50 +80,53 @@ class GUIWhatToDisplayCBoxCSpad ( QtGui.QWidget ) :
         self.titCSImageSpec   = QtGui.QLabel('Image & Spectrum:')
         self.titCSProjections = QtGui.QLabel('Projections:')
 
-        self.cboxCSImageQuad   = QtGui.QCheckBox('Quad',               self)
-        self.cboxCSImageDet    = QtGui.QCheckBox('Detector',           self)
-        self.cboxCSImage       = QtGui.QCheckBox('8 of 2x1',           self)
-        self.cboxCSImageOfPair = QtGui.QCheckBox('1 of 2x1',           self)
-        self.cboxCSSpectrum    = QtGui.QCheckBox('16 ASICs',           self)
-        self.cboxCSSpectrum08  = QtGui.QCheckBox('8 of 2x1',           self)
-        self.cboxCSProjX       = QtGui.QCheckBox('X',                  self)
-        self.cboxCSProjY       = QtGui.QCheckBox('Y',                  self)
-        self.cboxCSProjR       = QtGui.QCheckBox('R',                  self)
-        self.cboxCSProjPhi     = QtGui.QCheckBox(u'\u03C6',            self) # Phi in Greek
+        self.cboxCSApplyTiltAngle = QtGui.QCheckBox('Apply tilt angle for Quad and Det.', self)
+        self.cboxCSImageQuad      = QtGui.QCheckBox('Quad',               self)
+        self.cboxCSImageDet       = QtGui.QCheckBox('Detector',           self)
+        self.cboxCSImage          = QtGui.QCheckBox('8 of 2x1',           self)
+        self.cboxCSImageOfPair    = QtGui.QCheckBox('1 of 2x1',           self)
+        self.cboxCSSpectrum       = QtGui.QCheckBox('16 ASICs',           self)
+        self.cboxCSSpectrum08     = QtGui.QCheckBox('8 of 2x1',           self)
+        self.cboxCSProjX          = QtGui.QCheckBox('X',                  self)
+        self.cboxCSProjY          = QtGui.QCheckBox('Y',                  self)
+        self.cboxCSProjR          = QtGui.QCheckBox('R',                  self)
+        self.cboxCSProjPhi        = QtGui.QCheckBox(u'\u03C6',            self) # Phi in Greek
 
-        if cp.confpars.cspadImageOfPairIsOn : self.cboxCSImageOfPair .setCheckState(2)
-        if cp.confpars.cspadImageIsOn       : self.cboxCSImage       .setCheckState(2)
-        if cp.confpars.cspadImageQuadIsOn   : self.cboxCSImageQuad   .setCheckState(2)
-        if cp.confpars.cspadImageDetIsOn    : self.cboxCSImageDet    .setCheckState(2)
-        if cp.confpars.cspadSpectrumIsOn    : self.cboxCSSpectrum    .setCheckState(2)
-        if cp.confpars.cspadSpectrum08IsOn  : self.cboxCSSpectrum08  .setCheckState(2)
-        if cp.confpars.cspadProjXIsOn       : self.cboxCSProjX       .setCheckState(2)
-        if cp.confpars.cspadProjYIsOn       : self.cboxCSProjY       .setCheckState(2)
-        if cp.confpars.cspadProjRIsOn       : self.cboxCSProjR       .setCheckState(2)
-        if cp.confpars.cspadProjPhiIsOn     : self.cboxCSProjPhi     .setCheckState(2)
+        if cp.confpars.cspadImageOfPairIsOn : self.cboxCSImageOfPair   .setCheckState(2)
+        if cp.confpars.cspadImageIsOn       : self.cboxCSImage         .setCheckState(2)
+        if cp.confpars.cspadImageQuadIsOn   : self.cboxCSImageQuad     .setCheckState(2)
+        if cp.confpars.cspadImageDetIsOn    : self.cboxCSImageDet      .setCheckState(2)
+        if cp.confpars.cspadSpectrumIsOn    : self.cboxCSSpectrum      .setCheckState(2)
+        if cp.confpars.cspadSpectrum08IsOn  : self.cboxCSSpectrum08    .setCheckState(2)
+        if cp.confpars.cspadProjXIsOn       : self.cboxCSProjX         .setCheckState(2)
+        if cp.confpars.cspadProjYIsOn       : self.cboxCSProjY         .setCheckState(2)
+        if cp.confpars.cspadProjRIsOn       : self.cboxCSProjR         .setCheckState(2)
+        if cp.confpars.cspadProjPhiIsOn     : self.cboxCSProjPhi       .setCheckState(2)
+        if cp.confpars.cspadApplyTiltAngle  : self.cboxCSApplyTiltAngle.setCheckState(2)
 
         self.showToolTips()
 
         gridCS = QtGui.QGridLayout()
-        gridCS.addWidget(self. titCSpad,        0, 0)
+        gridCS.addWidget(self. titCSpad,            0, 0)
+        gridCS.addWidget(self.cboxCSApplyTiltAngle, 0, 2, 1, 3)
 
-        gridCS.addWidget(self. titCSImage,      1, 0)
-        gridCS.addWidget(self.cboxCSImage,      1, 1)
-        gridCS.addWidget(self.cboxCSImageQuad,  1, 2)
-        gridCS.addWidget(self.cboxCSImageDet,   1, 3)
+        gridCS.addWidget(self. titCSImage,          1, 0)
+        gridCS.addWidget(self.cboxCSImage,          1, 1)
+        gridCS.addWidget(self.cboxCSImageQuad,      1, 2)
+        gridCS.addWidget(self.cboxCSImageDet,       1, 3)
 
-        gridCS.addWidget(self. titCSSpectra,    2, 0)
-        gridCS.addWidget(self.cboxCSSpectrum08, 2, 1)
-        gridCS.addWidget(self.cboxCSSpectrum,   2, 2)
+        gridCS.addWidget(self. titCSSpectra,        2, 0)
+        gridCS.addWidget(self.cboxCSSpectrum08,     2, 1)
+        gridCS.addWidget(self.cboxCSSpectrum,       2, 2)
 
-        gridCS.addWidget(self. titCSImageSpec,  3, 0)
-        gridCS.addWidget(self.cboxCSImageOfPair,3, 1)
+        gridCS.addWidget(self. titCSImageSpec,      3, 0)
+        gridCS.addWidget(self.cboxCSImageOfPair,    3, 1)
 
-        gridCS.addWidget(self. titCSProjections,4, 0)
-        gridCS.addWidget(self.cboxCSProjX,      4, 1)
-        gridCS.addWidget(self.cboxCSProjY,      4, 2)
-        gridCS.addWidget(self.cboxCSProjR,      4, 3)
-        gridCS.addWidget(self.cboxCSProjPhi,    4, 4)
+        gridCS.addWidget(self. titCSProjections,    4, 0)
+        gridCS.addWidget(self.cboxCSProjX,          4, 1)
+        gridCS.addWidget(self.cboxCSProjY,          4, 2)
+        gridCS.addWidget(self.cboxCSProjR,          4, 3)
+        gridCS.addWidget(self.cboxCSProjPhi,        4, 4)
         
 
         self.vbox = QtGui.QVBoxLayout()
@@ -140,6 +143,7 @@ class GUIWhatToDisplayCBoxCSpad ( QtGui.QWidget ) :
         self.connect(self.cboxCSProjY,         QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSProjY)
         self.connect(self.cboxCSProjR,         QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSProjR)
         self.connect(self.cboxCSProjPhi,       QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSProjPhi)
+        self.connect(self.cboxCSApplyTiltAngle,QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSApplyTiltAngle)
 
 
     def showToolTips(self):
@@ -217,6 +221,14 @@ class GUIWhatToDisplayCBoxCSpad ( QtGui.QWidget ) :
             cp.confpars.cspadImageOfPairIsOn = True
         else:
             cp.confpars.cspadImageOfPairIsOn = False
+
+
+    def processCBoxCSApplyTiltAngle(self, value):
+        if self.cboxCSApplyTiltAngle.isChecked():
+            self.setActiveTabBarForIndex(self.parent.indTabCS)
+            cp.confpars.cspadApplyTiltAngle = True
+        else:
+            cp.confpars.cspadApplyTiltAngle = False
 
 
     def processCBoxCSImageQuad(self, value):

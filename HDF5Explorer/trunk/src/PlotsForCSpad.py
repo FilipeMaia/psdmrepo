@@ -37,6 +37,8 @@ from matplotlib.widgets import RectangleSelector
 import time
 from numpy import *  # for use like       array(...)
 import numpy as np
+import scipy.ndimage as spi # rotate(...)
+import math # cos(x), sin(x), radians(x), degrees()
 
 #-----------------------------
 # Imports for other modules --
@@ -170,7 +172,6 @@ class PlotsForCSpad ( object ) :
         return arr2d
 
 
-
     def getImageArrayForQuad( self, arr1ev, quadNum=None ):
         """Returns the image array for one quad"""
         if quadNum == None :
@@ -182,27 +183,39 @@ class PlotsForCSpad ( object ) :
         arr2dquad = np.zeros( (850,850), dtype=np.int16 )
         #print 'arr2dquad.shape=',arr2dquad.shape
 
-        #self.firstPair = cs.confcspad.firstPairInQuad[self.quad]
-        #self.lastPair  = cs.confcspad.lastPairInQuad[self.quad]
-        
-        #for pair in range(self.firstPair,self.lastPair): # loop for pairs, i.e. = 0,1,2,...,7
         for ind in xrange(8): # loop over ind = 0,1,2,...,7
             pair = cs.confcspad.indPairsInQuads[self.quad][ind]
             #print 'quad,ind,pair=', self.quad, ind, pair
             if pair == -1 : continue
 
             asic2x1 = self.getImageArrayForPair( arr1ev, pair )
-            rotarr2d = np.rot90(asic2x1,cs.confcspad.pairInQaudOriInd[self.quad][ind])
+            rotarr2d_0 = np.rot90(asic2x1,cs.confcspad.pairInQaudOriInd[self.quad][ind])
             #print 'rotarr2d.shape=',rotarr2d.shape
             #print 'rotarr2d.base is asic2x1 ? ',rotarr2d.base is asic2x1 
 
-            dimX,dimY = rotarr2d.shape
+            rotarr2d = rotarr2d_0
 
-            ixOff = cs.confcspad.pairXInQaud[self.quad][ind]
-            iyOff = cs.confcspad.pairYInQaud[self.quad][ind]
+            offset = cs.confcspad.preventiveRotationOffset
+            ixOff  = offset + cs.confcspad.pairXInQaud[self.quad][ind]
+            iyOff  = offset + cs.confcspad.pairYInQaud[self.quad][ind]
+
+            #-------- Apply tilt angle of 2x1 sensors
+            if cp.confpars.cspadApplyTiltAngle :
+
+                angle  = cs.confcspad.dPhi[self.quad][ind]
+                rotarr2d = spi.rotate(rotarr2d_0, angle, reshape=True, output=np.float32 )
+                dimX0,dimY0 = rotarr2d_0.shape
+
+                if angle > 0:
+                    ixOff -= int(dimY0 * math.sin(math.radians(angle)))
+                else:
+                    iyOff += int(dimX0 * math.sin(math.radians(angle))) #or subtract modulus
+            #-------- 
+
+            dimX, dimY = rotarr2d.shape
             #print 'ixOff, iyOff =', ixOff, iyOff,           
             #print ' dimX,  dimY =', dimX, dimY           
-
+            
             arr2dquad[ixOff:dimX+ixOff, iyOff:dimY+iyOff] += rotarr2d[0:dimX, 0:dimY]
 
         return arr2dquad
@@ -213,6 +226,7 @@ class PlotsForCSpad ( object ) :
         self.eventWithAlreadyGeneratedCSpadDetImage = None
 
 
+
     def getImageArrayForDet( self, arr1ev ):
         """Returns the image array for entire CSpad detector"""       
 
@@ -220,7 +234,7 @@ class PlotsForCSpad ( object ) :
             #print 'Use already generated image for CSpad and save time'
             return self.arr2dCSpad
 
-        self.arr2dCSpad = np.zeros( (1700,1700), dtype=np.int16 )
+        self.arr2dCSpad = np.zeros( (1710,1710), dtype=np.int16 )
 
         for quad in range(0,4) :
             arr2dquad = self.getImageArrayForQuad(arr1ev, quad)
@@ -240,6 +254,7 @@ class PlotsForCSpad ( object ) :
     def plotCSpadQuadImage( self, arr1ev, fig ):
         """Plot 2d image of the quad from input array."""
         #print 'plotCSpadQuadImage()'       
+
         arr2d = self.getImageArrayForQuad( arr1ev )
         #arr2d = self.getImageArrayForPair( arr1ev )
 
@@ -266,7 +281,6 @@ class PlotsForCSpad ( object ) :
         self.str_event = 'Event ' + str(cp.confpars.eventCurrent)
         self.figDet = fig
         self.figDet.canvas.set_window_title('CSpad image ' + self.str_event)
-
         self.drawCSpadDetImage(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax)
 
 
