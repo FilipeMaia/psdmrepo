@@ -1,0 +1,39 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package svn-test1
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+2011-05-18 Andy Salnikov
+- test tag commit
+
+2011-05-18 Andy Salnikov
+- testing hooks
+
+2011-05-17 Andy Salnikov
+i- one more test
+
+2011-05-14 Andy Salnikov
+- testing after moving SVN repository to apache
+
+2009-06-23 Andy Salnikov
+- testing svn2feed.py hook again 2
+
+2009-06-23 Andy Salnikov
+- testing svn2feed.py hook
+
+Tag: V00-00-00
+2008-10-07 Andy Salnikov
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
+
