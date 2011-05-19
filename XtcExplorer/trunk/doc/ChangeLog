@@ -11,6 +11,7 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-May-18 ofte   Tag: V00-01-02 rev 1910
 2011-May-18 ofte                  rev 1905
        - Some more tweaking. 
        - Added option (parameter) to accumulate_n events in pyana_waveform. 
