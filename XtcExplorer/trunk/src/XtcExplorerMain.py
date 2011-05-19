@@ -46,8 +46,6 @@ from matplotlib.figure import Figure
 import numpy as np
 import matplotlib.pyplot as plt
 
-from xbplotter import draw_on
-
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
@@ -382,7 +380,8 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             if self.qscan_button :
                 self.qscan_button.setEnabled(True)
             if self.scan_button and self.scan_label :
-                if self.filesize < 2*1024**3 :
+                # automatically enable full scan if smaller than 1.2G
+                if self.filesize < 1.2*1024**3 :
                     self.scan_enable()
                     scantext = "Scan all events (%s)"%filesizetxt
                 else :
