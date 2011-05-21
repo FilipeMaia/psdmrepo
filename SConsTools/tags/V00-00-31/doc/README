@@ -1,0 +1,29 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package SConsTools
+#------------------------------------------------------------------------
+
+Author: Andrei Salnikov
+
+Brief description:
+==================
+
+SConsTools package contains Python modules to be used by SCons for LUSI
+release construction. There may also be other scripts or utilities, but
+their use should be very limited.
+
+Detailed description:
+=====================
+
+Most important file in this package is SConstruct.main. It should be copied 
+to the top release directory under the name SConstruct (or linked from the 
+top release directory to a file in this package) as a first step of the 
+release construction. SConstruct file is used by SCons when it builds release.
+SConstruct file itself uses various Python modules from this package and
+SConscript files from other packages to describe complete setup to SCons.
+SConscript for most standard packages should be simple, most of them will 
+call standardSConscript() function defined in the standardSConscript.py
+module in this package, passing zero or few optional parameters.
