@@ -94,7 +94,11 @@ class evt_dispatch(object) :
             
             for userana in self.userObjects : 
                 if hasattr(userana, 'endrun'):
-                    userana.endrun( env )
+                    meth = userana.endrun
+                    if meth.func_code.co_argcount == 3:
+                        meth( evt, env )
+                    else:
+                        meth( env )
             self.runbegun = False
             
         elif svc == xtc.TransitionId.BeginCalibCycle :
@@ -108,30 +112,49 @@ class evt_dispatch(object) :
             
             for userana in self.userObjects :
                 if hasattr(userana, 'endcalibcycle'):
-                    userana.endcalibcycle( env )
+                    meth = userana.endcalibcycle
+                    if meth.func_code.co_argcount == 3:
+                        meth( evt, env )
+                    else:
+                        meth( env )
             self.calibbegun = False
             
         elif svc == xtc.TransitionId.L1Accept :
             for userana in self.userObjects : userana.event( evt, env )
 
-    def finish(self, env):
+    def finish(self, evt, env):
         
         _log.debug("evt_dispatch.finish: %s", self.__dict__ )
         
         # finish with run first if was not done yet
         if self.calibbegun :
             for userana in self.userObjects : 
-                if hasattr(userana, 'endcalibcycle'): userana.endcalibcycle( env )
+                if hasattr(userana, 'endcalibcycle'): 
+                    meth = userana.endcalibcycle
+                    if meth.func_code.co_argcount == 3:
+                        meth( evt, env )
+                    else:
+                        meth( env )
             self.calibbegun = False
 
         # finish with run first if was not done yet
         if self.runbegun :
             for userana in self.userObjects : 
-                if hasattr(userana, 'endrun'): userana.endrun( env )
+                if hasattr(userana, 'endrun'): 
+                    meth = userana.endrun
+                    if meth.func_code.co_argcount == 3:
+                        meth( evt, env )
+                    else:
+                        meth( env )
             self.runbegun = False
 
         # run unconfigure if configure was ran before
         if self.lastConfigTime :
-            for userana in self.userObjects : userana.endjob( env )
+            for userana in self.userObjects : 
+                meth = userana.endjob
+                if meth.func_code.co_argcount == 3:
+                    meth( evt, env )
+                else:
+                    meth( env )
             self.lastConfigTime = None
         

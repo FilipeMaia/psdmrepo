@@ -11,6 +11,16 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-27
+2011-05-21 - Andy Salnikov
+- modules' methods endjob, endtrun, endcalibcycle now can
+  be declared with three arguments (self, evt, env) instead of
+  two arguments (self, env). 
+- Number of arguments is discovered at run time, so this change 
+  should be backward compatible
+- With three arguments the methods receive standard event object 
+  which can be used to exchange data between modules. 
+
 Tag: V00-00-26
 2011-03-31 - Andy Salnikov
 - fix for zero-sized Epics XTC objects

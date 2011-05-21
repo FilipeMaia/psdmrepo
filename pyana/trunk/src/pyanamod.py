@@ -104,7 +104,8 @@ def _proc(jobname, id, pipes, userObjects, dg_ref):
         elif req[0] == OP_FINISH :
             
             logging.info("proc-%s: received FIN", id)
-            dispatch.finish(env)
+            evt = event.Event(None, run)
+            dispatch.finish(evt, env)
             
         elif req[0] == OP_RESULT :
             
@@ -241,7 +242,8 @@ def _pyana ( argv ) :
                     
                 
         # finish
-        dispatch.finish(env)
+        evt = event.Event(None, run)
+        dispatch.finish(evt, env)
     
     
         # finalization for multi-processors
