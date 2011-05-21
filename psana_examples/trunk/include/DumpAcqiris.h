@@ -54,7 +54,7 @@ public:
   virtual ~DumpAcqiris () ;
 
   /// Method which is called at the beginning of the calibration cycle
-  virtual void beginCalibCycle(Env& env);
+  virtual void beginCalibCycle(Event& evt, Env& env);
   
   /// Method which is called with event data
   virtual void event(Event& evt, Env& env);

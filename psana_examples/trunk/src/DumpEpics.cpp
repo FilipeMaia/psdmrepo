@@ -53,8 +53,7 @@ DumpEpics::~DumpEpics ()
 {
 }
 
-/// Method which is called with event data, this is the only required 
-/// method, all other methods are optional
+// Method which is called with event data
 void 
 DumpEpics::event(Event& evt, Env& env)
 {

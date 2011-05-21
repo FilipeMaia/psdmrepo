@@ -53,8 +53,7 @@ public:
   // Destructor
   virtual ~DumpEpics () ;
 
-  /// Method which is called with event data, this is the only required 
-  /// method, all other methods are optional
+  /// Method which is called with event data
   virtual void event(Event& evt, Env& env);
   
 protected:

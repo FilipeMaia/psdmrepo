@@ -57,16 +57,15 @@ EBeamHist::~EBeamHist ()
 {
 }
 
-/// Method which is called once at the beginning of the job
+// Method which is called once at the beginning of the job
 void 
-EBeamHist::beginJob(Env& env)
+EBeamHist::beginJob(Event& evt, Env& env)
 {
   m_ebeamHisto = env.rhmgr().h1i("ebeamHisto", "ebeamL3Energy value", AxisDef(0, 50000, 1000));
   m_chargeHisto = env.rhmgr().h1i("echargeHisto", "ebeamCharge value", AxisDef(0, 0.25, 250));
 }
 
-/// Method which is called with event data, this is the only required 
-/// method, all other methods are optional
+// Method which is called with event data
 void 
 EBeamHist::event(Event& evt, Env& env)
 {

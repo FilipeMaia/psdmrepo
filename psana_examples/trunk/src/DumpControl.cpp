@@ -70,9 +70,9 @@ DumpControl::~DumpControl ()
 {
 }
 
-/// Method which is called at the beginning of the calibration cycle
+// Method which is called at the beginning of the calibration cycle
 void 
-DumpControl::beginCalibCycle(Env& env)
+DumpControl::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), trace, "in beginCalibCycle()");
 
@@ -108,8 +108,7 @@ DumpControl::beginCalibCycle(Env& env)
   }
 }
 
-/// Method which is called with event data, this is the only required 
-/// method, all other methods are optional
+// Method which is called with event data
 void 
 DumpControl::event(Event& evt, Env& env)
 {

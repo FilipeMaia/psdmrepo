@@ -57,9 +57,9 @@ DumpCsPad::~DumpCsPad ()
 {
 }
 
-/// Method which is called at the beginning of the calibration cycle
+// Method which is called at the beginning of the calibration cycle
 void 
-DumpCsPad::beginCalibCycle(Env& env)
+DumpCsPad::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), trace, "in beginCalibCycle()");
 
@@ -119,8 +119,7 @@ DumpCsPad::beginCalibCycle(Env& env)
   }
 }
 
-/// Method which is called with event data, this is the only required 
-/// method, all other methods are optional
+// Method which is called with event data
 void 
 DumpCsPad::event(Event& evt, Env& env)
 {

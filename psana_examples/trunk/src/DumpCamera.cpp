@@ -64,9 +64,9 @@ DumpCamera::~DumpCamera ()
 {
 }
 
-/// Method which is called at the beginning of the calibration cycle
+// Method which is called at the beginning of the calibration cycle
 void 
-DumpCamera::beginCalibCycle(Env& env)
+DumpCamera::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), trace, ": in beginCalibCycle()");
 
@@ -95,8 +95,7 @@ DumpCamera::beginCalibCycle(Env& env)
   }
 }
 
-/// Method which is called with event data, this is the only required 
-/// method, all other methods are optional
+// Method which is called with event data
 void 
 DumpCamera::event(Event& evt, Env& env)
 {

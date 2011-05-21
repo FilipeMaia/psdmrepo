@@ -54,9 +54,9 @@ DumpIpimb::~DumpIpimb ()
 {
 }
 
-/// Method which is called at the beginning of the calibration cycle
+// Method which is called at the beginning of the calibration cycle
 void 
-DumpIpimb::beginCalibCycle(Env& env)
+DumpIpimb::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), info, "in beginCalibCycle()");
 
@@ -84,8 +84,7 @@ DumpIpimb::beginCalibCycle(Env& env)
 
 }
 
-/// Method which is called with event data, this is the only required 
-/// method, all other methods are optional
+// Method which is called with event data
 void 
 DumpIpimb::event(Event& evt, Env& env)
 {

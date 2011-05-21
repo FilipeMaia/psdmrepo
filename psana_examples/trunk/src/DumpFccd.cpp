@@ -54,9 +54,9 @@ DumpFccd::~DumpFccd ()
 {
 }
 
-/// Method which is called at the beginning of the calibration cycle
+// Method which is called at the beginning of the calibration cycle
 void 
-DumpFccd::beginCalibCycle(Env& env)
+DumpFccd::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), trace, "in beginCalibCycle()");
 
@@ -96,8 +96,7 @@ DumpFccd::beginCalibCycle(Env& env)
   }
 }
 
-/// Method which is called with event data, this is the only required 
-/// method, all other methods are optional
+// Method which is called with event data
 void 
 DumpFccd::event(Event& evt, Env& env)
 {

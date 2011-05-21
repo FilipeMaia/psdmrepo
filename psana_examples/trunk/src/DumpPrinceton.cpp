@@ -54,9 +54,9 @@ DumpPrinceton::~DumpPrinceton ()
 {
 }
 
-/// Method which is called at the beginning of the calibration cycle
+// Method which is called at the beginning of the calibration cycle
 void 
-DumpPrinceton::beginCalibCycle(Env& env)
+DumpPrinceton::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), trace, "in beginCalibCycle()");
 
@@ -83,8 +83,7 @@ DumpPrinceton::beginCalibCycle(Env& env)
   }
 }
 
-/// Method which is called with event data, this is the only required 
-/// method, all other methods are optional
+// Method which is called with event data
 void 
 DumpPrinceton::event(Event& evt, Env& env)
 {

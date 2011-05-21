@@ -54,9 +54,9 @@ DumpEncoder::~DumpEncoder ()
 {
 }
 
-/// Method which is called at the beginning of the calibration cycle
+// Method which is called at the beginning of the calibration cycle
 void 
-DumpEncoder::beginCalibCycle(Env& env)
+DumpEncoder::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), trace, "in beginCalibCycle()");
 
@@ -76,8 +76,7 @@ DumpEncoder::beginCalibCycle(Env& env)
   }
 }
 
-/// Method which is called with event data, this is the only required 
-/// method, all other methods are optional
+// Method which is called with event data
 void 
 DumpEncoder::event(Event& evt, Env& env)
 {

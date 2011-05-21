@@ -63,9 +63,9 @@ DumpOpal1k::~DumpOpal1k ()
 {
 }
 
-/// Method which is called at the beginning of the calibration cycle
+// Method which is called at the beginning of the calibration cycle
 void 
-DumpOpal1k::beginCalibCycle(Env& env)
+DumpOpal1k::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), trace, "in beginCalibCycle()");
 
@@ -108,8 +108,7 @@ DumpOpal1k::beginCalibCycle(Env& env)
   }
 }
 
-/// Method which is called with event data, this is the only required 
-/// method, all other methods are optional
+// Method which is called with event data
 void 
 DumpOpal1k::event(Event& evt, Env& env)
 {

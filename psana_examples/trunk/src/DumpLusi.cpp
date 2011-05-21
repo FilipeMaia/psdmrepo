@@ -55,9 +55,9 @@ DumpLusi::~DumpLusi ()
 {
 }
 
-/// Method which is called at the beginning of the calibration cycle
+// Method which is called at the beginning of the calibration cycle
 void 
-DumpLusi::beginCalibCycle(Env& env)
+DumpLusi::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), info, "in beginCalibCycle()");
 
@@ -119,8 +119,7 @@ DumpLusi::beginCalibCycle(Env& env)
 
 }
 
-/// Method which is called with event data, this is the only required 
-/// method, all other methods are optional
+// Method which is called with event data
 void 
 DumpLusi::event(Event& evt, Env& env)
 {

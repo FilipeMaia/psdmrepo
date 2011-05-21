@@ -56,10 +56,9 @@ public:
   virtual ~EBeamHist () ;
 
   /// Method which is called once at the beginning of the job
-  virtual void beginJob(Env& env);
+  virtual void beginJob(Event& evt, Env& env);
   
-  /// Method which is called with event data, this is the only required 
-  /// method, all other methods are optional
+  /// Method which is called with event data
   virtual void event(Event& evt, Env& env);
   
 protected:

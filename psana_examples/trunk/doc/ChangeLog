@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2011-05-21 Andy Salnikov
+- Module interface changed, all subclasses need update; 
+  now all methods have Event argument.
+
 Tag: V00-00-13
 2011-05-07 Andy Salnikov
 - fix parameter name in DumpBld
