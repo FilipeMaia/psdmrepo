@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2011-05-22 Andy Salnikov
+- there was a tag V00-01-00 already which prevented latest tags to
+  appear in the nightly builds
+
 Tag: V00-00-31
 2011-05-21 Andy Salnikov
 - suppress invalid offsetof warnings
