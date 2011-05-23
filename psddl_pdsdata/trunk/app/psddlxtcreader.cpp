@@ -195,7 +195,8 @@ public:
   void process(const DetInfo&, const Bld::BldDataIpimb& bldData) {
     printf("*** Processing Bld-Ipimb object\n");
     printf("BLD Shared IPIMB Data:\n");
-    printf("  Trig Count      : %llu \n",bldData.ipimbData().triggerCounter());
+    unsigned long long int counter = bldData.ipimbData().triggerCounter();
+    printf("  Trig Count      : %llu \n",counter);
     printf("  IpimbDataCh-0   : %f   \n",bldData.ipimbData().channel0Volts());
     printf("  IpimbDataCh-1   : %f   \n",bldData.ipimbData().channel1Volts());            
     printf("  IpimbDataCh-2   : %f   \n",bldData.ipimbData().channel2Volts());    
