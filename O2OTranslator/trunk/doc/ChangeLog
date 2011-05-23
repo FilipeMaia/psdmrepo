@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-07
+2011-05-23 Andy Salnikov
+- removed SITConfig include, not useful any more
+
 Tag: V00-10-06
 2011-03-29 Andy Salnikov
 - one more change in Dgram class, now instead of smart pointer we use
