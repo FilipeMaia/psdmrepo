@@ -47,7 +47,8 @@ namespace H5DataTypes {
 CsPadPixelStatusV1::CsPadPixelStatusV1 ()
 {
   // fill all codes with zeros
-  std::fill_n(&m_data.status[0][0][0][0], int(CsPadPixelStatusV1_Data::Size), 0.0f);
+  pdscalibdata::CsPadPixelStatusV1::status_t zero=0;
+  std::fill_n(&m_data.status[0][0][0][0], int(CsPadPixelStatusV1_Data::Size), zero);
 }
 
 CsPadPixelStatusV1::CsPadPixelStatusV1 (const DataType& data) 
