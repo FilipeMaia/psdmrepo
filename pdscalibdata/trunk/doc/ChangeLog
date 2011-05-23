@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2011-05-23 Andy Salnikov
+- suppress compilation warnings for comparison between int and 
+  unsigned in ScPadCommonModeSubV1.cpp  
+
 Tag: V00-00-06
 2011-02-17 Andy Salnikov
 - for common mode correction make the threshold value configurable 

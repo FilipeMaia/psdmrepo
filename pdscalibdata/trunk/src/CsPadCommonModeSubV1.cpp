@@ -181,7 +181,7 @@ CsPadCommonModeSubV1::findCommonMode(const uint16_t* sdata,
     double s1 = 0;
     double s2 = 0;
     int d = int(sigma*2+0.5);
-    for (int i = std::max(0,peakPos-d); i < hsize and i <= peakPos+d; ++ i) {
+    for (int i = std::max(0,peakPos-d); i < int(hsize) and i <= peakPos+d; ++ i) {
       s0 += hist[i];
       s1 += (i-mean)*hist[i];
       s2 += (i-mean)*(i-mean)*hist[i];
