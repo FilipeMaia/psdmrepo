@@ -23,6 +23,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "MsgLogger/MsgLogger.h"
+#include "PSEvt/Exceptions.h"
 #include "psddl_pds2psana/EvtProxy.h"
 #include "psddl_pds2psana/EvtProxyCfg.h"
 #include "psddl_pds2psana/acqiris.ddl.h"
@@ -53,6 +55,8 @@ using psddl_pds2psana::Princeton::pds_to_psana;
 
 namespace {
   
+  const char logger[] = "XtcConverter";
+
   template<typename FinalType>
   void 
   storeCfgObject(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::ConfigStore& cfgStore)
@@ -84,7 +88,11 @@ namespace {
     typedef EvtProxy<PsanaType, FinalType, XtcType> ProxyType; 
 
     // store proxy
-    evt.putProxy<PsanaType>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+    try {
+      evt.putProxy<PsanaType>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+    } catch (const PSEvt::ExceptionDuplicateKey& ex) {
+      MsgLog(logger, warning, ex.what());
+    }
   }
   
   template<typename FinalType>
@@ -102,7 +110,11 @@ namespace {
     typedef EvtProxy<PsanaType, FinalType, XtcType, true> ProxyType; 
 
     // store proxy
-    evt.putProxy<PsanaType>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+    try {
+      evt.putProxy<PsanaType>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+    } catch (const PSEvt::ExceptionDuplicateKey& ex) {
+      MsgLog(logger, warning, ex.what());
+    }
   }
   
   template<typename FinalType, typename XtcConfigType>
@@ -123,8 +135,12 @@ namespace {
     typedef EvtProxyCfg<PsanaType, FinalType, XtcType, XtcConfigType> ProxyType; 
 
     // store proxy
-    evt.putProxy<PsanaType>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
-    
+    try {
+      evt.putProxy<PsanaType>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+    } catch (const PSEvt::ExceptionDuplicateKey& ex) {
+      MsgLog(logger, warning, ex.what());
+    }
+
     return true;
   }
   
@@ -148,7 +164,11 @@ namespace {
     const PsanaType& data = pds_to_psana(xdata);
     
     // store data
-    evt.put(boost::make_shared<PsanaType>(data), xtc->src);
+    try {
+      evt.put(boost::make_shared<PsanaType>(data), xtc->src);
+    } catch (const PSEvt::ExceptionDuplicateKey& ex) {
+      MsgLog(logger, warning, ex.what());
+    }
   }
   
   template<typename PsanaType, typename XtcType>

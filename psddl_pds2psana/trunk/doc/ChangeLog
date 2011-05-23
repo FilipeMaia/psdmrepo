@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10
+2011-05-23 Andy Salnikov
+- catch DuplicateKey exceptions when adding stuff to event, print warning
+
 Tag: V00-00-09
 2011-04-26 Andy Salnikov
 - regenerated whole thing from psddldata V00-00-08
