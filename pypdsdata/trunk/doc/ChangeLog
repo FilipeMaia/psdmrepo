@@ -1,4 +1,8 @@
 
+2011-05-23 - V00-00-29
+======================
+- removed SITConfig include, not useful any more
+
 2011-05-23 - V00-00-28
 ======================
 - suppress compilation warning about missing enum value in switch
