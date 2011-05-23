@@ -1,4 +1,9 @@
 
+2011-05-23 - V00-00-28
+======================
+- suppress compilation warning about missing enum value in switch
+  in DataObjectFactory.cpp
+
 2011-03-31 - V00-00-27
 ======================
 - fix for zero-sized Epics XTC objects

@@ -227,6 +227,10 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     if ( not obj ) obj = xtc2obj<EvrData::DataV3, 3>(xtc, parent);
     break ;
 
+  case Pds::TypeId::Id_FrameFccdConfig :
+    // there is no sensible data definition for this type, XTC class is empty
+    break ;
+
   case Pds::TypeId::Id_FccdConfig :
     if ( not obj ) obj = xtc2obj<FCCD::FccdConfigV1, 1>(xtc, parent);
     if ( not obj ) obj = xtc2obj<FCCD::FccdConfigV2, 2>(xtc, parent);
