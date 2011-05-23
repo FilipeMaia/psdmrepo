@@ -539,7 +539,7 @@ SciMDTestApp::cmd_set_run_param () throw (std::exception)
 
     } else if (type == "INT64") {
 
-        int64_t value_int ;
+        long long int value_int ;
         if (1 != sscanf(value.c_str(), "%lld", &value_int)) {
             MsgLogRoot (error, "parameter value is not of the claimed type") ;
             return 2 ;
@@ -550,7 +550,7 @@ SciMDTestApp::cmd_set_run_param () throw (std::exception)
             experiment,
             run,
             param,
-            value_int,
+            int64_t(value_int),
             "SciMDTestApp",
             m_update.value () > 0) ;
         m_connection->commitTransaction () ;
