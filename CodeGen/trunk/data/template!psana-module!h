@@ -41,7 +41,7 @@ namespace $package {
  *
  *  @see AdditionalClass
  *
- *  @version $$Id$$
+ *  @version \$$Id$$
  *
  *  @author $author
  */

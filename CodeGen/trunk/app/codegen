@@ -25,6 +25,13 @@ _descr = "This script will generate code for the new class"
 _kwgen = 'codegen_kwgen.py'
 
 def _get_user_name () :
+
+    try :
+        path = os.path.expanduser("~/.codegen-user")
+        return file(path).read().strip()
+    except:
+        pass
+
     try :
         import pwd
         pwde = pwd.getpwuid(os.getuid())
