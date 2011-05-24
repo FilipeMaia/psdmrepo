@@ -9,6 +9,39 @@ import matplotlib.pyplot as plt
 from   pypdsdata import xtc
 from utilities import PyanaOptions
 
+class IpimbData( object ):
+    """Container to store data (as numpy arrays)
+    for a given IPIMB
+    """
+    def __init__( self, name ):
+        self.name = name 
+        self.fex_sum = None
+        self.fex_channels = None
+        self.fex_position = None
+        self.raw_channels = None
+
+    def __str__( self ):
+        """Printable description 
+        (returned when doing print IpimbData)
+        """
+        itsme = "\nIpimbData: \n\t name = %s" % self.name
+        if self.fex_sum is not None :
+            itsme+="\n\t fex_sum = array of shape %s"%str(np.shape(self.fex_sum))
+        if self.fex_channels is not None :
+            itsme+="\n\t fex_channels = array of shape %s"%str(np.shape(self.fex_channels))
+        if self.fex_position is not None :
+            itsme+="\n\t fex_position = array of shape %s"%str(np.shape(self.fex_position))
+        if self.raw_channels is not None :
+            itsme+="\n\t raw_channels = array of shape %s"%str(np.shape(self.raw_channels))
+        return itsme
+
+    def __repr__( self ):
+        """Short version"""
+        itsme = "<IpimbData: %s>" % self.name
+        return itsme
+
+
+
 # analysis class declaration
 class  pyana_ipimb ( object ) :
     
@@ -21,7 +54,6 @@ class  pyana_ipimb ( object ) :
         @param plot_every_n      Zero (don't plot until the end), or N (int, plot every N event)
         @param fignum            matplotlib figure number
         """
-
 
         # initialize data
         opt = PyanaOptions()
@@ -48,7 +80,11 @@ class  pyana_ipimb ( object ) :
 
     def beginjob ( self, evt, env ) : 
         self.n_shots = 0
-
+        
+        self.data = {}
+        for source in self.sources :
+            self.data[source] = IpimbData( source ) 
+            
     def event ( self, evt, env ) :
 
         self.n_shots+=1
@@ -83,11 +119,19 @@ class  pyana_ipimb ( object ) :
             if (self.n_shots%self.plot_every_n)==0 : 
                 print "Shot#%d ... plotting " % self.n_shots
                 self.make_plots(title="IPIMB info accumulated up to shot#%d"%self.n_shots)
+
+                print self.data[source].fex_sum
                 
-    def endjob( self, env ) :
+    def endjob( self, evt, env ) :
 
         self.make_plots(title="IPIMB info accumulated from all %d shots"%self.n_shots)
 
+        # convert dict to a list:
+        data_ipimb = []
+        for source in self.sources :
+            data_ipimb.append( self.data[source] )
+        # give the list to the event object
+        evt.put( data_ipimb, 'data_ipimb' )
 
     def make_plots(self, title = ""):
 
@@ -130,6 +174,9 @@ class  pyana_ipimb ( object ) :
             plt.ylabel('Sum of channels',horizontalalignment='left') # the other right
             plt.xlabel('Shot number',horizontalalignment='left') # the other right
             i+=1
+
+            self.data[source].fex_sum = array
+
             #ax2 = fig.add_subplot(nrows, ncols, i)
             self.ax[i].clear()
             plt.axes(self.ax[i])
@@ -143,6 +190,10 @@ class  pyana_ipimb ( object ) :
             plt.xlabel('IPIMB Value',horizontalalignment='left') # the other right
             leg = self.ax[i].legend()#('ch0','ch1','ch2','ch3'),'upper center')
             i+=1
+
+            self.data[source].fex_channels = array
+            self.data[source].raw_channels = np.float_(self.raw_channels[source])
+
             #ax3 = fig.add_subplot(nrows, ncols, i)
             self.ax[i].clear()
             plt.axes(self.ax[i])
@@ -153,4 +204,8 @@ class  pyana_ipimb ( object ) :
             plt.ylabel('Beam position Y',horizontalalignment='left')
             i+=1
 
+            self.data[source].fex_position = array2
+
         plt.draw()
+
+                                            

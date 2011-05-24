@@ -306,7 +306,7 @@ class Plotter(object):
             h = self.threshold.area[3] - self.threshold.area[2]
             self.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=5)
             axes.add_patch(self.thr_rect)
-            
+
 
         self.cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
         self.cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)

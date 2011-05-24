@@ -41,8 +41,6 @@ from pypdsdata import xtc
 
 from utilities import PyanaOptions
 
-#from IPython.Shell import IPShellEmbed
-
 
 #----------------------------------
 # Local non-exported definitions --
@@ -53,6 +51,36 @@ from utilities import PyanaOptions
 #---------------------
 #  Class definition --
 #---------------------
+
+class ScanData(object) :
+    """Structure to store data from a 'scan'
+    """
+    def __init__(self, name):
+        self.name = name
+        self.scanvec = None
+        self.arheader = None
+        self.scandata = None
+
+    def __str__(self):
+        """Printable description 
+        (returned when doing print ScanData)
+        """
+        itsme = "\nScanData: \n\t name = %s" % self.name
+        if self.scanvec is not None :
+            itsme+="\n\t scanvec = array of shape %s"%str(np.shape(self.scanvec))
+        if self.arheader is not None :
+            itsme+="\n\t arheader = list of scan data %s"% self.arheader 
+        if self.scandata is not None :
+            itsme+="\n\t scandata = array of shape %s"%str(np.shape(self.scandata))
+
+        return itsme
+
+    def __repr__(self):
+        """Short version"""
+        itsme = "<ScanData: %s>" % self.name
+        return itsme
+
+
 class pyana_scan (object) :
     """Class whose instance will be used as a user analysis module. """
 
@@ -101,7 +129,11 @@ class pyana_scan (object) :
         # data counters
         self.n_runs =  0 # number of runs in this job             
 
-        #self.ipshell = IPShellEmbed(banner='Dropping into iPython', exit_msg='Leaving iPython')
+        # store in a datastructure for ipython
+        self.data_scan = {}
+        for pv in self.controlpv :
+            self.data_scan[pv] = ScanData( pv )
+        
             
     def beginrun( self, evt, env ) :
         """This optional method is called if present at the beginning 
@@ -258,10 +290,8 @@ class pyana_scan (object) :
         logging.info( "pyana_scan.endrun() called" )
         print "End run %d had %d calibcycles " % (self.n_runs, self.n_ccls)
 
-        self.make_plots(fignum=self.mpl_num, suptitle="Scan (%d calib cycles, %d shots each)" \
-                        %(self.n_ccls,self.n_shots))
 
-    def endjob( self, env ) :
+    def endjob( self, evt, env ) :
         """This method is called at the end of the job. It should do 
         final cleanup, e.g. close all open files.
         
@@ -270,7 +300,13 @@ class pyana_scan (object) :
         logging.info( "pyana_scan.endjob() called" )
         print "End job had %d runs " % (self.n_runs)
 
-        #self.ipshell()
+        self.make_plots(fignum=self.mpl_num, suptitle="Scan (%d calib cycles, %d shots each)" \
+                        %(self.n_ccls,self.n_shots))
+        
+        self.data = []
+        for pv,data in self.data_scan.iteritems():
+            self.data.append( data )
+        evt.put( self.data, "data_scan")
 
     def make_plots(self, fignum=1, suptitle=""):
 
@@ -294,6 +330,8 @@ class pyana_scan (object) :
         print "Have %d variables to be plotted, layout = %d x %d, %.2f x %.2f" % \
               (nplots, nrows,ncols,(nrows*height),(ncols*width))
                 
+        
+        # make figure
         fig = plt.figure(num=fignum, figsize=(width*ncols,height*nrows) )
         plt.clf()
         fig.subplots_adjust(wspace=0.4)
@@ -301,7 +339,14 @@ class pyana_scan (object) :
 
         pos = 0
         for ctrl, values in self.ccls_ctrl.iteritems() : 
+
+            # convert to numpy arrays
             ctrl_array = np.array(values)
+            data_names = []
+            data_array = []
+        
+            # store arrays (for iptyhon)
+            self.data_scan[ctrl].scanvec = ctrl_array
 
             pos += 1
             ax1 = fig.add_subplot(nrows,ncols,pos)
@@ -323,7 +368,10 @@ class pyana_scan (object) :
                 pos += 1
                 axn = fig.add_subplot(nrows,ncols,pos)
 
-                mean_std_arr = np.array( sc_list )
+                mean_std_arr = np.array( sc_list ) 
+
+                data_names.append( sc_name )
+                data_array.append( mean_std_arr )
 
                 plt.errorbar(ctrl_array,
                              mean_std_arr[:,0],
@@ -334,6 +382,10 @@ class pyana_scan (object) :
                 plt.xlabel(ctrl,horizontalalignment='left') # the other right
                 plt.ylabel(sc_name,horizontalalignment='right')
                 plt.draw()
+
+            # store more arrays (for iptyhon)
+            self.data_scan[ctrl].arheader = data_names
+            self.data_scan[ctrl].scandata = np.float_( data_array )
 
 
         plt.draw()

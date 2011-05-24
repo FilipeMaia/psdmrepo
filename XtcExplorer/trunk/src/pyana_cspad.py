@@ -124,7 +124,8 @@ class  pyana_cspad ( object ) :
 
         # to keep track
         self.n_shots = 0
-        self.n_img = 0
+        self.n_good = 0
+        self.n_dark = 0
 
         # accumulate image data 
         self.sum_good_images = None
@@ -238,7 +239,13 @@ class  pyana_cspad ( object ) :
             if self.threshold.area is not None:
                 subset = cspad_image[self.threshold.area[0]:self.threshold.area[1],   # x1:x2
                                      self.threshold.area[2]:self.threshold.area[3]]   # y1:y2                
-                topval = np.max(subset) # value of maximum bin
+                #topval = np.max(subset) # value of maximum bin
+                dims = np.shape(subset)
+                maxbin = subset.argmax()
+                topval = subset.ravel()[maxbin]
+                print "Maxbin ", maxbin, " value ", topval 
+                print np.unravel_index(maxbin,dims)
+
                 #topval = np.sum(subset)/np.size(cspad_image) # average value of bins
 
             if topval < self.threshold.minvalue :
@@ -246,6 +253,7 @@ class  pyana_cspad ( object ) :
                       (self.n_shots, topval, float(self.threshold.minvalue))
 
                 # collect the rejected shots before returning to the next event
+                self.n_dark+=1
                 if self.sum_dark_images is None :
                     self.sum_dark_images = np.float_(cspad_image)
                 else :
@@ -258,7 +266,7 @@ class  pyana_cspad ( object ) :
         # -----
         # Passed the threshold filter. Add this to the sum
         # -----
-        self.n_img+=1
+        self.n_good+=1
         if self.sum_good_images is None :
             self.sum_good_images = np.float_(cspad_image)
         else :
@@ -286,32 +294,31 @@ class  pyana_cspad ( object ) :
 
         print "Done processing       ", self.n_shots, " events"        
         
-        if self.img_data is None :
-            print "No image data found from source ", self.img_sources
-            return
+        if self.sum_good_images is None :
+            print "No good images collected!", self.img_sources
+        else :
+            # plot the average image
+            average_image = self.sum_good_images/self.n_good 
+            print "the average intensity of average image ", np.mean(average_image)
+            print "the highest intensity of average image ", np.max(average_image)
+            print "the lowest intensity of average image ", np.min(average_image)
+            
+            self.plotter.drawframe(average_image,"Average of %d events" % self.n_good, fignum=self.mpl_num )        
 
-        # plot the average image
-        average_image = self.img_data/self.n_img 
-        print "the average intensity of average image ", np.mean(average_image)
-        print "the highest intensity of average image ", np.max(average_image)
-        print "the lowest intensity of average image ", np.min(average_image)
-
-        self.plotter.drawframe(average_image,"Average of %d events" % self.n_img, fignum=self.mpl_num )        
-
-        # save the average data image (numpy array)
-        # binary file .npy format
-        if self.out_img_file is not None :
-            if ".npy" in self.out_img_file :
-                print "saving to ",  self.out_img_file
-                np.save(self.out_img_file, average_image)
-            else :
-                print "outputfile file does not have the required .npy ending..."
-                svar = raw_input("Do you want to provide an alternative file name? ")
-                if svar == "" :
-                    print "Nothing saved"
+            # save the average data image (numpy array)
+            # binary file .npy format
+            if self.out_img_file is not None :
+                if ".npy" in self.out_img_file :
+                    print "saving to ",  self.out_img_file
+                    np.save(self.out_img_file, average_image)
                 else :
-                    if ".npy" not in svar:
-                        print "I still don't like your file name, saving anyway..."
-                    print "saving to ",  svar
-                    np.save(svar, average_image)
+                    print "outputfile file does not have the required .npy ending..."
+                    svar = raw_input("Do you want to provide an alternative file name? ")
+                    if svar == "" :
+                        print "Nothing saved"
+                    else :
+                        if ".npy" not in svar:
+                            print "I still don't like your file name, saving anyway..."
+                        print "saving to ",  svar
+                        np.save(svar, average_image)
                 
