@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2011-05-24 Andrei Salnikov
+- fixing argument parsing in doxy-driver
+
 Tag: V00-00-01
 2011-05-06 Andrei Salnikov
 - first commit, only app/doxy-driver is there

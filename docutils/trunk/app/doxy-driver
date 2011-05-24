@@ -5,11 +5,11 @@
 pack_psana="PSEnv PSEvt PSTime PSXtcInput RootHistoManager psana psana/doc/mainpage.dox"
 
 usage() {
-  echo "Usage: $0 [options] output-dir [package ...]"
+  echo "Usage: $(basename $0) [options] output-dir [package ...]"
   echo
   echo "Availabale options:"
   echo "    -h        print this message"
-  echo "    -h        debug (turn on -x shell option)"
+  echo "    -d        debug (turn on -x shell option)"
   echo "    -m mode   use predefined mode"
   echo
   echo "Predefined modes:"
@@ -26,7 +26,7 @@ while getopts hdm: c ; do
   case $c in
     h) usage ; exit 0 ;;
     d) set -x ;;
-    f) mode="$OPTARG" ;;
+    m) mode="$OPTARG" ;;
     \?) usage ; exit 2 ;;
   esac
 done
