@@ -168,6 +168,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.run_n = None 
         self.skip_n = None 
         self.plot_n = 100
+        self.accum_n = 0
 
         self.bool_string = { False: "No" , True: "Yes" }
 
@@ -215,7 +216,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.help_layout = QtGui.QVBoxLayout(self.help_widget)
         self.help_subwg1 = QtGui.QLabel(self.help_widget)
         self.help_subwg1_text = """
- * Configure your Event Display / Analysis:
+ * Configure what data to display and analyze:
 
     Select the information / detectors of interest to you from list
     to the left. Pyana modules will be configured for you to analyze
@@ -231,10 +232,10 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.help_layout.addWidget(self.help_subwg1)
 
         # run pyana with the first Nr events. Skip Ns events. 
-        self.run_n_status = QtGui.QLabel("Process all events")
+        self.run_n_status = QtGui.QLabel("Process all shots (or enter how many to process)")
         self.run_n_enter = QtGui.QLineEdit("")
         if self.run_n is not None:
-            self.run_n_status = QtGui.QLabel("Process %s events"% self.run_n)
+            self.run_n_status = QtGui.QLabel("Process %s shots"% self.run_n)
             self.run_n_enter.setText( str(self.run_n) )
         self.run_n_enter.setMaximumWidth(90)
         self.connect(self.run_n_enter, QtCore.SIGNAL('returnPressed()'), self.run_n_change )
@@ -249,11 +250,11 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.help_layout.addLayout(self.run_n_layout, QtCore.Qt.AlignRight )
 
         self.skip_n_layout = QtGui.QHBoxLayout()
-        self.skip_n_status = QtGui.QLabel("Skip no events")
+        self.skip_n_status = QtGui.QLabel("Skip no shots (or enter how many to skip)")
         self.skip_n_enter = QtGui.QLineEdit("")
         self.skip_n_enter.setMaximumWidth(90)
         if self.skip_n is not None:
-            self.skip_n_status = QtGui.QLabel("Skip %d events"%self.skip_n )
+            self.skip_n_status = QtGui.QLabel("Skip the first %d shots of xtc file"%self.skip_n )
             self.skip_n_enter.setText( str(self.skip_n) )
             
         self.connect(self.skip_n_enter, QtCore.SIGNAL('returnPressed()'), self.skip_n_change )
@@ -269,9 +270,9 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # plot every N events
         self.plot_n_layout = QtGui.QHBoxLayout()
         if self.plot_n == 0:
-            self.plotn_status = QtGui.QLabel("Plot only after all events")
+            self.plotn_status = QtGui.QLabel("Plot only after all shots")
         else:
-            self.plotn_status = QtGui.QLabel("Plot every %d events"%self.plot_n )
+            self.plotn_status = QtGui.QLabel("Plot every %d shots"%self.plot_n )
         self.plotn_enter = QtGui.QLineEdit()
         self.plotn_enter.setMaximumWidth(90)
         self.connect(self.plotn_enter, QtCore.SIGNAL('returnPressed()'), self.plotn_change )
@@ -282,6 +283,23 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.plot_n_layout.addWidget(self.plotn_enter)
         self.plot_n_layout.addWidget(self.plotn_change_btn)
         self.help_layout.addLayout(self.plot_n_layout, QtCore.Qt.AlignRight )
+
+        # Accumulate N events (reset after N events)
+        self.accum_n_layout = QtGui.QHBoxLayout()
+        if self.accum_n == 0:
+            self.accumn_status = QtGui.QLabel("Accumulate all shots (or enter how many to accumulate)")
+        else:
+            self.accumn_status = QtGui.QLabel("Accumulate %d shots (then reset)"%self.accum_n )
+        self.accumn_enter = QtGui.QLineEdit()
+        self.accumn_enter.setMaximumWidth(90)
+        self.connect(self.accumn_enter, QtCore.SIGNAL('returnPressed()'), self.accumn_change )
+        self.accumn_change_btn = QtGui.QPushButton("&Change") 
+        self.connect(self.accumn_change_btn, QtCore.SIGNAL('clicked()'), self.accumn_change )
+        self.accum_n_layout.addWidget(self.accumn_status)
+        self.accum_n_layout.addStretch()
+        self.accum_n_layout.addWidget(self.accumn_enter)
+        self.accum_n_layout.addWidget(self.accumn_change_btn)
+        self.help_layout.addLayout(self.accum_n_layout, QtCore.Qt.AlignRight )
 
         # Global Display mode
         self.dmode_layout = QtGui.QHBoxLayout()
@@ -331,7 +349,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
         if self.displaymode == "NoDisplay" :
             self.plot_n = 0
-            self.plotn_status.setText("Plot only after all events")
+            self.plotn_status.setText("Plot only after all shots")
 
         if self.configuration is not None:
             self.process_checkboxes()
@@ -340,12 +358,12 @@ class XtcPyanaControl ( QtGui.QWidget ) :
     def plotn_change(self):
 
         self.plot_n = self.plotn_enter.text()
-        if self.plot_n == "" or self.plot_n == "all" or self.plot_n == "All":
+        if self.plot_n == "" or self.plot_n == "0" or self.plot_n == "all" or self.plot_n == "All":
             self.plot_n = 0
-            self.plotn_status.setText("Plot only after all events")
+            self.plotn_status.setText("Plot only after all shots")
         else:
             self.plot_n = int(self.plot_n)
-            self.plotn_status.setText("Plot every %d events"%self.plot_n )
+            self.plotn_status.setText("Plot every %d shots"%self.plot_n )
             if self.displaymode == "NoDisplay" :
                 self.displaymode = "SlideShow"
                 self.dmode_status.setText("Display mode is %s"%self.displaymode)                
@@ -355,24 +373,42 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         if self.configuration is not None:
             self.process_checkboxes()
 
+    def accumn_change(self):
+
+        self.accum_n = self.accumn_enter.text()
+        if self.accum_n == "" or self.accum_n == "0" or self.accum_n == "all" or self.accum_n == "All":
+            self.accum_n = 0
+            self.accumn_status.setText("Accumulate all shots (or enter how many to accumulate)")
+        else:
+            self.accum_n = int(self.accum_n)
+            self.accumn_status.setText("Accumulate %d shots (reset after)"%self.accum_n )
+            if self.displaymode == "NoDisplay" :
+                self.displaymode = "SlideShow"
+                self.dmode_status.setText("Display mode is %s"%self.displaymode)                
+                self.dmode_menu.setCurrentIndex(1) # SlideShow
+        self.accumn_enter.setText("")
+
+        if self.configuration is not None:
+            self.process_checkboxes()
+
     def run_n_change(self):
         text = self.run_n_enter.text()
-        if text == "all" or text == "All" or text == "None" :
+        if text == "" or text == "all" or text == "All" or text == "None" :
             self.run_n = None
-            self.run_n_status.setText("Process all events")
+            self.run_n_status.setText("Process all shots (or enter how many to process)")
         else :
             self.run_n = int( text )
-            self.run_n_status.setText("Process %d events"%self.run_n )
+            self.run_n_status.setText("Process %d shots"%self.run_n )
         self.run_n_enter.setText("")
 
     def skip_n_change(self):
         text = self.skip_n_enter.text()
-        if text == "no" or text == "None" :
+        if text == "" or text == "0" or text == "no" or text == "None" :
             self.skip_n = None
-            self.skip_n_status.setText("Skip no events")
+            self.skip_n_status.setText("Skip no shots (or enter how many to skip)")
         else :
             self.skip_n = int(self.skip_n_enter.text())            
-            self.skip_n_status.setText("Skip %d events"%self.skip_n )
+            self.skip_n_status.setText("Skip the first %d shots of xtc file"%self.skip_n )
         self.skip_n_enter.setText("")
 
 
@@ -451,7 +487,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
         # if scan, plot every calib cycle 
         if self.ncalib > 1 :
-            print "Have %d scan steps a %d events each. Set up to plot after every %d shots" %\
+            print "Have %d scan steps a %d shots each. Set up to plot after every %d shots" %\
                   (self.ncalib, self.nevents[0], self.nevents[0] )
             self.plotn_enter.setText( str(self.nevents[0]) )
             self.plotn_change()
@@ -723,6 +759,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
             #print "XtcExplorer.pyana_bld at ", index
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
+            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             if str(box.text()).find("EBeam")>=0 :
                 options_for_mod[index].append("\ndo_ebeam = True")
@@ -751,6 +788,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             address = str(box.text()).split(":")[1].strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
+            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
                     
@@ -767,6 +805,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             address = str(box.text()).split(": ")[1].strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
+            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
                     
@@ -974,10 +1013,10 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             # and update run_n and skip_n in the Gui:
             if "-n" in lpoptions:
                 self.run_n = int(lpoptions[ lpoptions.index("-n")+1 ])
-                self.run_n_status.setText("Process %d events"% self.run_n)
+                self.run_n_status.setText("Process %d shots"% self.run_n)
             if "-s" in lpoptions:
                 self.skip_n = int(lpoptions[ lpoptions.index("-s")+1 ])
-                self.skip_n_status.setText("Skip %d events"% self.skip_n)
+                self.skip_n_status.setText("Skip the fist %d shots of xtc file"% self.skip_n)
         else :
             return
 

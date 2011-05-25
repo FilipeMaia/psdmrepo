@@ -70,7 +70,7 @@ class  pyana_bld ( object ) :
                    do_phasecavity  = "False",
                    do_ipimb        = "False",
                    plot_every_n    = None,
-                   reset           = "False",
+                   accumulate_n    = "0",
                    fignum          = "1" ):
         """
         Initialize data. Parameters:
@@ -79,7 +79,7 @@ class  pyana_bld ( object ) :
         @param do_phasecavity      Plot data from PhaseCavity
         @param do_ipimb            Plot data from Shared Ipimb
         @param plot_every_n        Plot after every N events
-        @param reset               If true, reset arrays after each plotting
+        @param accumulate_n        Accumulate all (0) or reset the array every n shots
         @param fignum              Matplotlib figure number
         """
 
@@ -90,11 +90,18 @@ class  pyana_bld ( object ) :
         self.do_PC        = opt.getOptBoolean(do_phasecavity)
         self.do_ipimb     = opt.getOptBoolean(do_ipimb)
         self.plot_every_n = opt.getOptInteger(plot_every_n)
-        self.reset        = opt.getOptBoolean(reset)
+        self.accumulate_n = opt.getOptInteger(accumulate_n)
         self.mpl_num      = opt.getOptInteger(fignum)
 
         # other
         self.n_shots = None
+        self.accu_start = None
+
+        # flags
+        self.hadEB = False
+        self.hadPC = False
+        self.hadGD = False
+        self.hadIPM = False
 
         # lists to fill numpy arrays
         self.initlists()
@@ -121,6 +128,7 @@ class  pyana_bld ( object ) :
         self.IPM_fex_position = []
 
     def resetlists(self):
+        self.accu_start = self.n_shots
         del self.time[:]
 
         del self.EB_damages[:]
@@ -144,6 +152,7 @@ class  pyana_bld ( object ) :
 
     def beginjob ( self, evt, env ) : 
         self.n_shots = 0
+        self.accu_start = 0
 
         self.data = {}
         if self.do_EBeam:  self.data["EBeam"]       = BldData("EBeam") 
@@ -161,6 +170,7 @@ class  pyana_bld ( object ) :
         if self.do_EBeam :
             # EBeam object (of type bld.BldDataEBeam or bld.BldDataEBeamV0)
             ebeam = evt.getEBeam()
+            self.hadEB = True
             if ebeam :
                 beamDmgM = ebeam.uDamageMask
                 beamChrg = ebeam.fEbeamCharge 
@@ -177,8 +187,14 @@ class  pyana_bld ( object ) :
                 self.EB_charge.append( beamChrg )
             else : 
                 if self.n_shots < 2 :
-                    print "No EBeam object found"
-
+                    print "No EBeam object found in shot#%d" % self.n_shots
+                if self.hadEB :
+                    print "No EBeam object found in shot#%d" % self.n_shots
+                    self.EB_energies.append( -9.0 )
+                    self.EB_positions.append( [-9.0, -9.0] )
+                    self.EB_angles.append( [0.0, 0.0] )
+                    self.EB_charge.append( 0.0 )
+                    
             
         if self.do_GasDet :
             # returns array of 4 numbers obtained from the bld.BldDataFEEGasDetEnergy object
@@ -186,7 +202,10 @@ class  pyana_bld ( object ) :
 
             if fee_energy_array is None :
                 if self.n_shots < 2 :
-                    print "No Gas Detector dataobject found"
+                    print "No Gas Detector data object found in shot#%d"%self.n_shots
+                if self.hadGD:
+                    print "No Gas Detector data object found in shot#%d" % self.n_shots
+                    self.GD_energies.append( [0.0,0.0,0.0,0.0] )
             else :
                 # fee_energy_array is a 4-number vector
                 self.GD_energies.append( fee_energy_array )
@@ -202,7 +221,13 @@ class  pyana_bld ( object ) :
                 self.PC_fchrg2.append( pc.fCharge2 ) 
             else :
                 if self.n_shots < 2 :
-                    print "No Phase Cavity data object found"
+                    print "No Phase Cavity data object found in shot#%d" % self.n_shots
+                if self.hadPC :
+                    print "No Phase Cavity data object found in shot#%d" % self.n_shots
+                    self.PC_ftime1.append( -999.0 )
+                    self.PC_ftime2.append( -999.0 )
+                    self.PC_fchrg1.append( -999.0 )
+                    self.PC_fchrg2.append( -999.0 ) 
 
 
         if self.do_ipimb : # BldDataIpimb / SharedIpimb
@@ -217,19 +242,30 @@ class  pyana_bld ( object ) :
                 self.IPM_fex_position.append( [ipm.ipmFexData.xpos, ipm.ipmFexData.ypos] )
             else :
                 if self.n_shots < 2 :
-                    print "No BldDataIpimb data object found"
-            
-
+                    print "No BldDataIpimb data object found in shot#%d" % self.n_shots
+                if self.hadIPM:
+                    print "No BldDataIpimb data object found in shot#%d" % self.n_shots
+                    self.IPM_raw_channels.append( [0.0,0.0,0.0,0.0] )
+                    self.IPM_fex_channels.append( [0.0,0.0,0.0,0.0] )
+                    self.IPM_fex_sum.append( 0.0 )
+                    self.IPM_fex_position.append( [0.0,0.0] )
+                    
         # ----------------- Plotting --------------------- 
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
 
-            self.make_plots(self.mpl_num, suptitle="Accumulated up to Shot#%d"%self.n_shots)
+            header = "shots %d-%d" % (self.accu_start, self.n_shots)
+                
+            self.make_plots(self.mpl_num, suptitle=header)
             data_bld = []
             for name,data in self.data.iteritems() :
                 data_bld.append( data )
                     
             # give the list to the event object
             evt.put( data_bld, 'data_bld' )
+
+        # --------- Reset -------------
+        if self.accumulate_n!=0 and (self.n_shots%self.accumulate_n)==0 :
+            self.resetlists()
                 
                 
     def endjob( self, evt, env ) :
@@ -237,7 +273,8 @@ class  pyana_bld ( object ) :
         print "EndJob has been reached"
 
         # ----------------- Plotting ---------------------
-        self.make_plots(self.mpl_num, suptitle="Accumulated up to Shot#%d"%self.n_shots)
+        header = "shots %d-%d" % (self.accu_start, self.n_shots)
+        self.make_plots(self.mpl_num, suptitle=header)
         data_bld = []
         for name,data in self.data.iteritems() :
             data_bld.append( data )
@@ -253,6 +290,7 @@ class  pyana_bld ( object ) :
             if len(self.EB_charge) > 0 :
 
                 # numpy arrays
+                xaxis = np.arange( self.accu_start, self.n_shots ) 
                 charge = np.float_(self.EB_charge)
                 energies = np.float_(self.EB_energies)
                 positions = np.float_(self.EB_positions)
@@ -268,10 +306,14 @@ class  pyana_bld ( object ) :
                 fig = plt.figure(num=(fignum+1), figsize=(8,8) )
                 fig.clf()
                 fig.subplots_adjust(wspace=0.4, hspace=0.4)
-                fig.suptitle("BldInfo:EBeam accumulated up to shot #%d"%self.n_shots)
+                fig.suptitle("BldInfo:EBeam data " + suptitle)
 
                 ax1 = fig.add_subplot(221)
-                plt.plot(energies)
+                if (np.size(xaxis) != np.size(energies) ):
+                    print "event    ", self.n_shots
+                    print "axis     ", np.size(xaxis), np.shape(xaxis)
+                    print "energies ", np.size(energies), np.shape(energies)
+                plt.plot(xaxis,energies)
                 plt.title("Beam Energy")
                 plt.xlabel('Datagram record',horizontalalignment='left') # the other right
                 plt.ylabel('Beam Energy',horizontalalignment='right')
@@ -310,7 +352,7 @@ class  pyana_bld ( object ) :
                 fig = plt.figure(num=(fignum+2), figsize=(8,8) )
                 fig.clf()
                 fig.subplots_adjust(wspace=0.4, hspace=0.4)
-                fig.suptitle("BldInfo:FEEGasDetEnergy data accumulated up to shot #%d"%self.n_shots)
+                fig.suptitle("BldInfo:FEEGasDetEnergy data " + suptitle)
 
                 ax1 = fig.add_subplot(221)
                 n, bins, patches = plt.hist(array[:,0], 60,histtype='stepfilled')
@@ -357,7 +399,7 @@ class  pyana_bld ( object ) :
                 fig = plt.figure(num=(fignum+3), figsize=(12,8) )
                 fig.clf()
                 fig.subplots_adjust(wspace=0.4, hspace=0.4)
-                fig.suptitle("BldInfo:PhaseCavity data accumulated up to shot #%d"%self.n_shots)            
+                fig.suptitle("BldInfo:PhaseCavity data " + suptitle)
 
                 ax1 = fig.add_subplot(231)
                 n, bins, patches = plt.hist(ftime1, 60,histtype='stepfilled')
@@ -425,7 +467,7 @@ class  pyana_bld ( object ) :
                 fig = plt.figure(num=(fignum+4), figsize=(12,5) ) 
                 fig.clf()
                 fig.subplots_adjust(wspace=0.4, hspace=0.4)
-                fig.suptitle("BldInfo:SharedIpimb data accumulated up to shot #%d"%self.n_shots)
+                fig.suptitle("BldInfo:SharedIpimb data " + suptitle)
                 
                 ax1 = fig.add_subplot(1,3,1)
                 plt.hist(arrayCh[:,0], 60, histtype='stepfilled', color='r', label='Ch0')
@@ -450,5 +492,3 @@ class  pyana_bld ( object ) :
             
                 plt.draw()
 
-        if self.reset :
-            self.resetlists()

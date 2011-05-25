@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-May-25 ofte                  rev 1953
+       - Accumulate/Reset option added to ipimb, bld, waveform. Will add to the rest ASAP
+       - Some bugfixes in XtcPyanaControl
+	
 2011-May-24 ofte                  rev 1952
        - Added XxxData structure to pyana_bld, pyana_ipimb and pyana_scan
 	 to hold information to pass to the ipython session launched in pyana_plotter.

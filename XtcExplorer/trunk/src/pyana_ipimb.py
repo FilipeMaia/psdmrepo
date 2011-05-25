@@ -48,10 +48,12 @@ class  pyana_ipimb ( object ) :
     def __init__ ( self,
                    sources = None,
                    plot_every_n = "0",
+                   accumulate_n    = "0",
                    fignum = "1" ) :
         """
         @param ipimb_addresses   list of IPIMB addresses
         @param plot_every_n      Zero (don't plot until the end), or N (int, plot every N event)
+        @param accumulate_n      Accumulate all (0) or reset the array every n shots
         @param fignum            matplotlib figure number
         """
 
@@ -62,11 +64,18 @@ class  pyana_ipimb ( object ) :
         for source in self.sources :
             print "  ", source
 
-        self.mpl_num = opt.getOptInteger(fignum)
         self.plot_every_n = opt.getOptInteger(plot_every_n)
+        self.accumulate_n = opt.getOptInteger(accumulate_n)
+        self.mpl_num = opt.getOptInteger(fignum)
 
+        # other
         self.n_shots = None
+        self.accu_start = None
+        
+        # lists to fill numpy arrays
+        self.initlists()
 
+    def initlists(self):
         self.fex_sum = {}
         self.fex_channels = {}
         self.fex_position = {}
@@ -77,9 +86,18 @@ class  pyana_ipimb ( object ) :
             self.fex_position[source] = list()
             self.raw_channels[source] = list()
 
+    def resetlists(self):
+        self.accu_start = self.n_shots
+        for source in self.sources :
+            del self.fex_sum[source][:]
+            del self.fex_channels[source][:]
+            del self.fex_position[source][:]
+            del self.raw_channels[source][:]
+
 
     def beginjob ( self, evt, env ) : 
         self.n_shots = 0
+        self.accu_start = 0
         
         self.data = {}
         for source in self.sources :
@@ -115,16 +133,30 @@ class  pyana_ipimb ( object ) :
                 print "pyana_ipimb: No IpmFex from %s found" % source
 
 
-        if self.plot_every_n != 0: 
-            if (self.n_shots%self.plot_every_n)==0 : 
-                print "Shot#%d ... plotting " % self.n_shots
-                self.make_plots(title="IPIMB info accumulated up to shot#%d"%self.n_shots)
+        # ----------------- Plotting ---------------------
+        if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
 
-                print self.data[source].fex_sum
-                
+            header = "shots %d-%d" % (self.accu_start, self.n_shots)
+            self.make_plots(title=header)
+
+            # convert dict to a list:
+            data_ipimb = []
+            for source in self.sources :
+                data_ipimb.append( self.data[source] )
+            # give the list to the event object
+            evt.put( data_ipimb, 'data_ipimb' )
+
+                        
+        # --------- Reset -------------
+        if self.accumulate_n!=0 and (self.n_shots%self.accumulate_n)==0 :
+            self.resetlists()
+
+
     def endjob( self, evt, env ) :
 
-        self.make_plots(title="IPIMB info accumulated from all %d shots"%self.n_shots)
+        # ----------------- Plotting ---------------------
+        header = "shots %d-%d" % (self.accu_start, self.n_shots)
+        self.make_plots(title=header)
 
         # convert dict to a list:
         data_ipimb = []
@@ -161,7 +193,8 @@ class  pyana_ipimb ( object ) :
         i = 0
         for source in self.sources :
 
-            xaxis = np.arange( 0, len(self.fex_channels[source]) )
+            xaxis = np.arange( self.accu_start, self.n_shots )
+            #xaxis = np.arange( 0, len(self.fex_channels[source]) )
 
             #ax1 = fig.add_subplot(nrows, ncols, i)
             #plt.axes(self.ax[i])
