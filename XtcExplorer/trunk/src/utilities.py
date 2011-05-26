@@ -220,12 +220,21 @@ class IpimbData( BaseData ):
 class EpicsData( BaseData ):
     def __init__( self, name, type="EpicsData" ):
         BaseData.__init__(self,name,type)
-        self.value = None
+        self.values = None
+        self.shotnr = None
+        self.status = None
+        self.severity = None
 
     def show( self ):
         itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
-        if self.value is not None :
-            itsme+="\n\t value = array of shape %s"%str(np.shape(self.value))
+        if self.values is not None :
+            itsme+="\n\t values = array of shape %s"%str(np.shape(self.values))
+        if self.shotnr is not None :
+            itsme+="\n\t shotnr = array of shape %s"%str(np.shape(self.shotnr))
+        if self.status is not None :
+            itsme+="\n\t status = array of shape %s"%str(np.shape(self.status))
+        if self.severity is not None :
+            itsme+="\n\t severity = array of shape %s"%str(np.shape(self.severity))
         print itsme
 
 

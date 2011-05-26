@@ -231,6 +231,10 @@ class pyana_plotter (object) :
             if data_bld :   print "data_bld: ", data_bld
             else :          del data_bld
 
+            data_epics = evt.get('data_epics')
+            if data_epics :   print "data_epics: ", data_epics
+            else :          del data_epics
+
             data_scan = evt.get('data_scan')
             if data_scan :  print "data_scan: ", data_scan
             else :          del data_scan
@@ -243,9 +247,9 @@ class pyana_plotter (object) :
             if data_cspad:  print "data_cspad: ", data_cspad
             else:           del data_cspad
 
-            self.ipshell = IPShellEmbed(argv  = ['-pi1','In \\# >> ','-po','Out \\#: '], 
-                                        banner = '--------- Dropping into iPython ---------',
-                                        exit_msg = '--------- Leaving iPython -------------')
+            self.ipshell = IPShellEmbed(argv=['-pi1','In \\# >> ','-po','Out \\#: '], 
+                                        banner='--------- Dropping into iPython ---------',
+                                        exit_msg='--------- Leaving iPython -------------')
             
             self.ipshell("Called from endjob. \nTry 'whos' to see the workspace. " \
                          "\nHit Ctrl-D to exit iPython and continue program.")

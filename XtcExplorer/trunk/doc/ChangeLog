@@ -11,6 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-May-26 ofte                  rev 1955
+       - Some more useful stuff in pyana_epics. New plots and data for ipython.
+       - Moved definition of datastructures to utilities.py
+       - ipython support (basic) can be considered done / ready
+	
 2011-May-25 ofte                  rev 1954
        - removed pyana_xppscan (was just a test)
        - simplified pyana_scan. 

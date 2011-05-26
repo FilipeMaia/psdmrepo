@@ -83,18 +83,26 @@ class pyana_epics (object) :
         self.initlists()
         
     def initlists(self):
-        self.time = []
-        self.shotnmb = []
-        self.value = {}
+        self.pv_value = {}
+        self.pv_shots = {}
+        self.pv_status = {}
+        self.pv_severity = {} 
+        self.prev_val = {}
         for pv_name in self.pv_names :
-            self.value[pv_name] = []
+            self.pv_value[pv_name] = []
+            self.pv_shots[pv_name] = []
+            self.pv_status[pv_name] = []
+            self.pv_severity[pv_name] = []
+            self.prev_val[pv_name] = None
 
     def resetlists(self):
         self.accu_start = self.n_shots
-        del self.time[:]
-        del self.shotnmb[:]
         for pv_name in self.pv_names :
-            del self.value[pv_name][:]
+            del self.pv_value[pv_name][:]
+            del self.pv_shots[pv_name][:]
+            del self.pv_status[pv_name][:]
+            del self.pv_severity[pv_name][:]
+            self.prev_val[pv_name] = None
                 
         
     #-------------------
@@ -114,6 +122,7 @@ class pyana_epics (object) :
         
 
         # Use environment object to access EPICS data
+        self.epics_data = {}
         for pv_name in self.pv_names :
 
             pv = env.epicsStore().value( pv_name )
@@ -125,26 +134,49 @@ class pyana_epics (object) :
                 print "PV %s: id=%d type=%d size=%d status=%s severity=%s values=%s" % \
                       (pv_name, pv.iPvId, pv.iDbrType, pv.iNumElements,
                        pv.status, pv.severity, pv.values)
+                self.epics_data[pv_name] = EpicsData(pv_name)
         
     def event( self, evt, env ) :
         """
         @param evt    event data object
         @param env    environment object
         """
+        # --------- Reset -------------
+        if self.accumulate_n!=0 and (self.n_shots%self.accumulate_n)==0 :
+            self.resetlists()
+
 
         self.n_shots += 1
         logging.info( "pyana_epics.event() called (%d)"%self.n_shots )
 
         # Use environment object to access EPICS data
         for pv_name in self.pv_names :
+
+            ## The returned value should be of the type epics.EpicsPvTime.
             pv = env.epicsStore().value( pv_name )
             if not pv:
                 logging.warning('EPICS PV %s does not exist', pv_name)
             else:
+                # only add to list if it changed since last event
+                if pv.value != self.prev_val[pv_name] :
+                    self.prev_val[pv_name] = pv.value
 
-                ## The returned value should be of the type epics.EpicsPvTime.
-                self.value[pv_name].append( pv.values )
+                    self.pv_value[pv_name].append( pv.value )
+                    self.pv_shots[pv_name].append( self.n_shots )
+                    self.pv_status[pv_name].append( pv.status )
+                    self.pv_severity[pv_name].append( pv.severity )
 
+
+        # ----------------- Plotting ---------------------
+        if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
+            header = "EpicsPV plots shots %d-%d" % (self.accu_start, self.n_shots)
+            self.make_plots(header)
+            data_epics = []
+            for pv_name in self.pv_names :
+                data_epics.append( self.epics_data[pv_name] )
+                # send it to the evt object
+            evt.put(data_epics, 'data_epics')
+                        
 
     def endjob( self, evt, env ) :
         """
@@ -154,8 +186,86 @@ class pyana_epics (object) :
         
         logging.info( "pyana_epics.endjob() called" )
 
-
+        # ----------------- Plotting ---------------------
+        self.make_plots("EpicsPV plots at endjob")
+        data_epics = []
         for pv_name in self.pv_names :
+            data_epics.append( self.epics_data[pv_name] )
+        # send it to the evt object
+        evt.put(data_epics, 'data_epics')
 
-            array = np.float_( self.value[pv_name] )
-            print "For epics PV %s, array of shape"%pv_name, np.shape(array)
+
+    def make_plots(self, title=""):
+        
+        # -------- Begin: move this to beginJob
+        """ This part should move to begin job, but I can't get
+        it to update the plot in SlideShow mode when I don't recreate
+        the figure each time. Therefore plotting is slow...
+        """
+        nplots = len(self.pv_names)
+        ncols = 1
+        nrows = 1
+        if nplots == 2: ncols = 2
+        if nplots == 3: ncols = 3
+        if nplots == 4:
+            ncols = 2
+            nrows = 2
+        if nplots > 4 :
+            ncols = 3
+            nrows = nplots / ncols
+        
+        height=3.5
+        if nrows * 3.5 > 12 : height = 12/nrows
+        width=height*1.3
+        
+        fig = plt.figure(num=self.mpl_num, figsize=(width*ncols,height*nrows) )
+        fig.clf()
+        fig.subplots_adjust(wspace=0.45, hspace=0.45, top=0.85, bottom=0.15)
+        fig.suptitle(title)
+        # -------- End: move this to beginJob
+            
+        i = 0
+        for pv_name in self.pv_names :
+            i+=1
+            
+            fig.add_subplot(nrows, ncols, i) 
+
+            # append one more bin to the shots array (bin boundaries)
+            if self.n_shots != self.pv_shots[pv_name][-1] :
+                self.pv_shots[pv_name].append( self.n_shots )
+
+            shots_array = np.float_( self.pv_shots[pv_name] )
+            values_array = np.float_( self.pv_value[pv_name] )
+            status_array = np.float_( self.pv_status[pv_name] )
+            severity_array = np.float_( self.pv_severity[pv_name] )
+
+
+            self.epics_data[pv_name].values = values_array
+            self.epics_data[pv_name].shotnr = shots_array
+            self.epics_data[pv_name].status = status_array
+            self.epics_data[pv_name].severity = severity_array
+
+            nbins = values_array.size
+            if nbins == 0 :
+                print "No bins for ", pv_name, self.n_shots, self.accu_start
+                continue
+            
+            ymax = np.amax( values_array )
+            ymin = np.amin( values_array )
+            span = ymax - ymin
+
+            (n,bins,patches) = plt.hist(shots_array[:nbins],
+                                        weights=values_array,
+                                        bins=shots_array,
+                                        histtype='step')
+            plt.xlim(shots_array[0],shots_array[-1])
+            plt.ylim(ymin-0.3*span,ymax+0.3*span)
+            plt.plot(shots_array[:nbins], values_array,'bo')
+
+
+            plt.title(pv_name)
+            plt.xlabel("Shot number",horizontalalignment='left') # the other right
+            plt.ylabel("PV value ",horizontalalignment='right')
+            plt.draw()
+        plt.draw()
+        

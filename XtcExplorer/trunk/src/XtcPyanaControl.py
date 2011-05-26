@@ -325,7 +325,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.ipython_menu = QtGui.QComboBox()
         self.ipython_menu.setMaximumWidth(150)
         self.ipython_menu.addItem("No")
-        self.ipython_menu.addItem("Yes (Doesn't work yet)")
+        self.ipython_menu.addItem("Yes")
         self.connect(self.ipython_menu,  QtCore.SIGNAL('currentIndexChanged(int)'), self.process_ipython )
         self.ipython_layout.addWidget(self.ipython_status)
         self.ipython_layout.addWidget(self.ipython_menu)
