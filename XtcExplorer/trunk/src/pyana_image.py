@@ -35,6 +35,7 @@ from pypdsdata import xtc
 
 from utilities import Plotter
 from utilities import PyanaOptions
+from utilities import ImageData
 
 #---------------------
 #  Class definition --
@@ -169,7 +170,7 @@ class  pyana_image ( object ) :
                 self.n_hdf5 = int(n_hdf5)
 
         # to keep track
-        self.n_shots = 0
+        self.n_shots = None
 
         # averages
         self.image_data = {}
@@ -203,8 +204,14 @@ class  pyana_image ( object ) :
 
 
     def beginjob ( self, evt, env ) : 
-        # at Configure transition
-        pass
+
+        self.n_shots = 0
+        self.n_accum = 0
+
+        self.data = {}
+        for source in self.img_sources:
+            self.data[source] = ImageData(source)
+
 
     # process event/shot data
     def event ( self, evt, env ) :
@@ -303,6 +310,13 @@ class  pyana_image ( object ) :
             #    else :
             event_display_images.append( (addr, image) )
             
+            self.data[addr].image   = image
+            if self.n_img[addr] > 0 :
+                self.data[addr].average = self.image_data[addr]/self.n_img[addr]
+            if self.n_dark[addr] > 0 :
+                self.data[addr].dark    = self.dark_data[addr]/self.n_dark[addr]
+            
+            
         if len(event_display_images)==0 :
             return
         
@@ -328,6 +342,14 @@ class  pyana_image ( object ) :
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
             self.plotter.draw_figurelist( self.mpl_num, event_display_images)
 
+            # convert dict to a list:
+            data_image = []
+            for source in self.img_sources :
+                data_image.append( self.data[source] )
+                # give the list to the event object
+                evt.put( data_image, 'data_image' )
+                                                            
+            
         # -----------------------------------
         # Saving to file
         # -----------------------------------
@@ -366,7 +388,7 @@ class  pyana_image ( object ) :
         
 
     # after last event has been processed. 
-    def endjob( self, env ) :
+    def endjob( self, evt, env ) :
 
         if self.hdf5file is not None :
             self.hdf5file.close()
@@ -395,4 +417,11 @@ class  pyana_image ( object ) :
         plt.draw()
         
 
+        # convert dict to a list:
+        data_image = []
+        for source in self.img_sources :
+            data_image.append( self.data[source] )
+            # give the list to the event object
+            evt.put( data_image, 'data_image' )
+            
 

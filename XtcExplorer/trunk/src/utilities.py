@@ -1,3 +1,7 @@
+#-----------------------------------------
+# PyanaOptions
+#-----------------------------------------
+
 class PyanaOptions( object ):
     def __init__( self ):
         pass
@@ -129,6 +133,161 @@ class PyanaOptions( object ):
         return float(options_string)
 
 
+#-----------------------------------------
+# Data Storage Classes
+#-----------------------------------------
+
+class BaseData( object ):
+    """ Base class for container objects
+    storing event data in memory (as numpy arrays mainly).
+    Useful for passing the data to e.g. ipython for further investigation
+    """
+    def __init__(self, name,type="BaseData"):
+        self.name = name
+        self.type = type
+        
+    def __str__( self ):
+        itsme = "<%s object with name %s>" % (self.type, self.name)
+        return itsme
+
+    def __repr__( self ):
+        itsme = "<%s object with name %s>" % (self.type, self.name)
+        return itsme
+
+
+class BldData( BaseData ):
+    def __init__(self, name, type="BldData"):
+        BaseData.__init__(self,name,type)
+        self.time = None
+        self.damage = None
+        self.energy = None
+        self.position = None
+        self.angle = None
+        self.charge = None
+        self.fex_sum = None
+        self.fex_channels = None
+        self.raw_channels = None
+        self.fex_position = None
+
+    def show( self ):
+        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
+        if self.time is not None :
+            itsme+="\n\t time = array of shape %s"%str(np.shape(self.time))
+        if self.damage is not None :
+            itsme+="\n\t damage = array of shape %s"%str(np.shape(self.damage))
+        if self.energy is not None :
+            itsme+="\n\t energy = array of shape %s"%str(np.shape(self.energy))
+        if self.position is not None :
+            itsme+="\n\t position = array of shape %s"%str(np.shape(self.position))
+        if self.angle is not None :
+            itsme+="\n\t angle = array of shape %s"%str(np.shape(self.angle))
+        if self.charge is not None :
+            itsme+="\n\t charge = array of shape %s"%str(np.shape(self.charge))
+        if self.fex_sum is not None :
+            itsme+="\n\t fex_sum = array of shape %s"%str(np.shape(self.fex_sum))
+        if self.fex_channels is not None :
+            itsme+="\n\t fex_channels = array of shape %s"%str(np.shape(self.fex_channels))
+        if self.raw_channels is not None :
+            itsme+="\n\t raw_channels = array of shape %s"%str(np.shape(self.raw_channels))
+        if self.fex_position is not None :
+            itsme+="\n\t fex_position = array of shape %s"%str(np.shape(self.fex_position))
+        print itsme
+
+
+class IpimbData( BaseData ):
+    def __init__( self, name, type="IpimbData" ):
+        BaseData.__init__(self,name,type)
+        self.fex_sum = None
+        self.fex_channels = None
+        self.fex_position = None
+        self.raw_channels = None
+
+    def show( self ):
+        """Printable description 
+        """
+        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
+        if self.fex_sum is not None :
+            itsme+="\n\t fex_sum = array of shape %s"%str(np.shape(self.fex_sum))
+        if self.fex_channels is not None :
+            itsme+="\n\t fex_channels = array of shape %s"%str(np.shape(self.fex_channels))
+        if self.fex_position is not None :
+            itsme+="\n\t fex_position = array of shape %s"%str(np.shape(self.fex_position))
+        if self.raw_channels is not None :
+            itsme+="\n\t raw_channels = array of shape %s"%str(np.shape(self.raw_channels))
+        print itsme
+
+
+class EpicsData( BaseData ):
+    def __init__( self, name, type="EpicsData" ):
+        BaseData.__init__(self,name,type)
+        self.value = None
+
+    def show( self ):
+        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
+        if self.value is not None :
+            itsme+="\n\t value = array of shape %s"%str(np.shape(self.value))
+        print itsme
+
+
+class ScanData( BaseData ) :
+    def __init__(self, name, type="ScanData"):
+        BaseData.__init__(self,name,type)
+
+        self.scanvec = None
+        self.arheader = None
+        self.scandata = None
+
+    def show(self):
+        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
+        if self.scanvec is not None :
+            itsme+="\n\t scanvec = array of shape %s"%str(np.shape(self.scanvec))
+        if self.arheader is not None :
+            itsme+="\n\t arheader = list of scan data %s"% self.arheader 
+        if self.scandata is not None :
+            itsme+="\n\t scandata = array of shape %s"%str(np.shape(self.scandata))
+        print itsme
+
+
+
+class ImageData( BaseData ):
+    def __init__(self, name, type="ImageData"):
+        BaseData.__init__(self,name,type)
+        self.image = None
+        self.average = None
+        self.dark = None
+
+    def show( self ):
+        itsme = "\n%s \n\t name = %s" % (self.type, self.name)
+        if self.image is not None :
+            itsme+="\n\t image = array of shape %s"%str(np.shape(self.image))
+        if self.average is not None :
+            itsme+="\n\t average = array of shape %s"%str(np.shape(self.average))
+        if self.dark is not None :
+            itsme+="\n\t dark = array of shape %s"%str(np.shape(self.dark))
+        print itsme
+
+class CsPadData( BaseData ):
+    def __init__(self, name, type="CsPadData"):
+        BaseData.__init__(self,name,type)
+        self.image = None
+        self.average = None
+        self.dark = None
+
+    def show( self ):
+        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
+        if self.image is not None :
+            itsme+="\n\t image = array of shape %s"%str(np.shape(self.image))
+        if self.average is not None :
+            itsme+="\n\t average = array of shape %s"%str(np.shape(self.average))
+        if self.dark is not None :
+            itsme+="\n\t dark = array of shape %s"%str(np.shape(self.dark))
+        print itsme
+
+
+
+#-------------------------------------------------------
+# Threshold
+#-------------------------------------------------------
 
 class Threshold( object ) :
     def __init__( self,
@@ -142,6 +301,10 @@ class Threshold( object ) :
         self.maxvalue = maxvalue
 
 
+
+#-------------------------------------------------------
+# Plotter
+#-------------------------------------------------------
 
 import time
 import numpy as np

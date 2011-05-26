@@ -40,6 +40,7 @@ import matplotlib.pyplot as plt
 from pypdsdata import xtc
 
 from utilities import PyanaOptions
+from utilities import ScanData
 
 
 #----------------------------------
@@ -51,35 +52,6 @@ from utilities import PyanaOptions
 #---------------------
 #  Class definition --
 #---------------------
-
-class ScanData(object) :
-    """Structure to store data from a 'scan'
-    """
-    def __init__(self, name):
-        self.name = name
-        self.scanvec = None
-        self.arheader = None
-        self.scandata = None
-
-    def __str__(self):
-        """Printable description 
-        (returned when doing print ScanData)
-        """
-        itsme = "\nScanData: \n\t name = %s" % self.name
-        if self.scanvec is not None :
-            itsme+="\n\t scanvec = array of shape %s"%str(np.shape(self.scanvec))
-        if self.arheader is not None :
-            itsme+="\n\t arheader = list of scan data %s"% self.arheader 
-        if self.scandata is not None :
-            itsme+="\n\t scandata = array of shape %s"%str(np.shape(self.scandata))
-
-        return itsme
-
-    def __repr__(self):
-        """Short version"""
-        itsme = "<ScanData: %s>" % self.name
-        return itsme
-
 
 class pyana_scan (object) :
     """Class whose instance will be used as a user analysis module. """

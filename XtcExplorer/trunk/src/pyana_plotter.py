@@ -224,25 +224,32 @@ class pyana_plotter (object) :
 
             # get pointer to the data from each of the modules
             data_ipimb = evt.get('data_ipimb')
-            if data_ipimb :
-                print "data_ipimb: ", data_ipimb
+            if data_ipimb :  print "data_ipimb: ", data_ipimb
+            else :           del data_ipimb
 
             data_bld = evt.get('data_bld')
-            if data_bld :
-                print "data_bld: ", data_bld
+            if data_bld :   print "data_bld: ", data_bld
+            else :          del data_bld
 
             data_scan = evt.get('data_scan')
-            if data_scan :
-                print "data_scan: ", data_scan
+            if data_scan :  print "data_scan: ", data_scan
+            else :          del data_scan
                 
-                
-            self.ipshell = IPShellEmbed(argv  = ['-pi1','In \\# >> ','-po','Out \\#: '], 
-                                        banner = 'Dropping into iPython',
-                                        exit_msg = 'Leaving iPython')
+            data_image = evt.get('data_image')
+            if data_image:  print "data_image: ", data_image
+            else:           del data_image
 
+            data_cspad = evt.get('data_cspad')
+            if data_cspad:  print "data_cspad: ", data_cspad
+            else:           del data_cspad
+
+            self.ipshell = IPShellEmbed(argv  = ['-pi1','In \\# >> ','-po','Out \\#: '], 
+                                        banner = '--------- Dropping into iPython ---------',
+                                        exit_msg = '--------- Leaving iPython -------------')
+            
             self.ipshell("Called from endjob. \nTry 'whos' to see the workspace. " \
                          "\nHit Ctrl-D to exit iPython and continue program.")
-
+            
             
         print "Pyana will exit once you close all the MatPlotLib windows"            
         if self.display_mode > 0 :

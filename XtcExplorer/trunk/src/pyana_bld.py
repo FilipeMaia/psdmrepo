@@ -6,59 +6,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from utilities import PyanaOptions 
+from utilities import BldData
 from pypdsdata import xtc
-
-
-class BldData( object ):
-    """Container to store data in memory (as numpy arrays)
-    for a given BldInfo data (useful for ipython)
-    """
-    def __init__( self, name ):
-        self.name = name 
-        self.time = None
-        self.damage = None
-        self.energy = None
-        self.position = None
-        self.angle = None
-        self.charge = None
-        self.fex_sum = None
-        self.fex_channels = None
-        self.raw_channels = None
-        self.fex_position = None
-
-
-    def __str__( self ):
-        """Printable description 
-        (returned when doing print BldData)
-        """
-        itsme = "\nBldData: \n\t name = %s" % self.name
-        if self.time is not None :
-            itsme+="\n\t time = array of shape %s"%str(np.shape(self.time))
-        if self.damage is not None :
-            itsme+="\n\t damage = array of shape %s"%str(np.shape(self.damage))
-        if self.energy is not None :
-            itsme+="\n\t energy = array of shape %s"%str(np.shape(self.energy))
-        if self.position is not None :
-            itsme+="\n\t position = array of shape %s"%str(np.shape(self.position))
-        if self.angle is not None :
-            itsme+="\n\t angle = array of shape %s"%str(np.shape(self.angle))
-        if self.charge is not None :
-            itsme+="\n\t charge = array of shape %s"%str(np.shape(self.charge))
-        if self.fex_sum is not None :
-            itsme+="\n\t fex_sum = array of shape %s"%str(np.shape(self.fex_sum))
-        if self.fex_channels is not None :
-            itsme+="\n\t fex_channels = array of shape %s"%str(np.shape(self.fex_channels))
-        if self.raw_channels is not None :
-            itsme+="\n\t raw_channels = array of shape %s"%str(np.shape(self.raw_channels))
-        if self.fex_position is not None :
-            itsme+="\n\t fex_position = array of shape %s"%str(np.shape(self.fex_position))
-        return itsme
-
-    def __repr__( self ):
-        """Short version"""
-        itsme = "<BldData: %s>" % self.name
-        return itsme
-
 
 
 # analysis class declaration

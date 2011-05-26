@@ -8,37 +8,7 @@ import matplotlib.pyplot as plt
 
 from   pypdsdata import xtc
 from utilities import PyanaOptions
-
-class IpimbData( object ):
-    """Container to store data (as numpy arrays)
-    for a given IPIMB
-    """
-    def __init__( self, name ):
-        self.name = name 
-        self.fex_sum = None
-        self.fex_channels = None
-        self.fex_position = None
-        self.raw_channels = None
-
-    def __str__( self ):
-        """Printable description 
-        (returned when doing print IpimbData)
-        """
-        itsme = "\nIpimbData: \n\t name = %s" % self.name
-        if self.fex_sum is not None :
-            itsme+="\n\t fex_sum = array of shape %s"%str(np.shape(self.fex_sum))
-        if self.fex_channels is not None :
-            itsme+="\n\t fex_channels = array of shape %s"%str(np.shape(self.fex_channels))
-        if self.fex_position is not None :
-            itsme+="\n\t fex_position = array of shape %s"%str(np.shape(self.fex_position))
-        if self.raw_channels is not None :
-            itsme+="\n\t raw_channels = array of shape %s"%str(np.shape(self.raw_channels))
-        return itsme
-
-    def __repr__( self ):
-        """Short version"""
-        itsme = "<IpimbData: %s>" % self.name
-        return itsme
+from utilities import IpimbData
 
 
 
@@ -136,7 +106,7 @@ class  pyana_ipimb ( object ) :
         # ----------------- Plotting ---------------------
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
 
-            header = "shots %d-%d" % (self.accu_start, self.n_shots)
+            header = "DetInfo:IPIMB data shots %d-%d" % (self.accu_start, self.n_shots)
             self.make_plots(title=header)
 
             # convert dict to a list:
@@ -155,7 +125,7 @@ class  pyana_ipimb ( object ) :
     def endjob( self, evt, env ) :
 
         # ----------------- Plotting ---------------------
-        header = "shots %d-%d" % (self.accu_start, self.n_shots)
+        header = "DetInfo:IPIMB data shots %d-%d" % (self.accu_start, self.n_shots)
         self.make_plots(title=header)
 
         # convert dict to a list:

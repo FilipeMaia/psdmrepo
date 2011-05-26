@@ -871,8 +871,9 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
             #print "XtcExplorer.pyana_epics at ", index
             pvname = str(box.text()).split("PV:  ")[1]
-            options_for_mod[index].append("\npv = %s" % pvname)
+            options_for_mod[index].append("\npv_names = %s" % pvname)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n )
+            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n )
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
         

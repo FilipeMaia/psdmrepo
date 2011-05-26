@@ -11,6 +11,12 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-May-25 ofte                  rev 1954
+       - removed pyana_xppscan (was just a test)
+       - simplified pyana_scan. 
+       - Added more accumulation/reset control
+       - all modules now have Datastructures for ipython
+	
 2011-May-25 ofte                  rev 1953
        - Accumulate/Reset option added to ipimb, bld, waveform. Will add to the rest ASAP
        - Some bugfixes in XtcPyanaControl
