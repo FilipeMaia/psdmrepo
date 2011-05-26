@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-May-26 ofte  Tag: V00-01-04  rev 1956-7
+	- minor tweak, and tagging
+
 2011-May-26 ofte                  rev 1955
        - Some more useful stuff in pyana_epics. New plots and data for ipython.
        - Moved definition of datastructures to utilities.py

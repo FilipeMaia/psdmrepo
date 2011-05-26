@@ -413,7 +413,7 @@ class  pyana_bld ( object ) :
                 self.data["SharedIpimb"].fex_sum = arraySm
 
                 # make figure
-                fig = plt.figure(num=(fignum+4), figsize=(12,5) ) 
+                fig = plt.figure(num=(fignum+4), figsize=(12,4) ) 
                 fig.clf()
                 fig.subplots_adjust(wspace=0.4, hspace=0.4)
                 fig.suptitle("BldInfo:SharedIpimb data " + suptitle)
