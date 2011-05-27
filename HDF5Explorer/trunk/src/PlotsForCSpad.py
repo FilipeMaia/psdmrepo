@@ -184,6 +184,7 @@ class PlotsForCSpad ( object ) :
         #print 'arr2dquad.shape=',arr2dquad.shape
 
         for ind in xrange(8): # loop over ind = 0,1,2,...,7
+#        for ind in xrange(1): # loop over ind = 0,1,2,...,7
             pair = cs.confcspad.indPairsInQuads[self.quad][ind]
             #print 'quad,ind,pair=', self.quad, ind, pair
             if pair == -1 : continue
@@ -198,6 +199,21 @@ class PlotsForCSpad ( object ) :
             offset = cs.confcspad.preventiveRotationOffset
             ixOff  = offset + cs.confcspad.pairXInQaud[self.quad][ind]
             iyOff  = offset + cs.confcspad.pairYInQaud[self.quad][ind]
+
+            # 0:185, 0:388
+            rot_index = cs.confcspad.pairInQaudOriInd[self.quad][ind] 
+
+            offS = 92 # 185/2
+            offL = 195 #(388+2)/2
+
+            if rot_index == 0 or rot_index == 2 :
+                ixOff -= offS  
+                iyOff -= offL  
+
+            else :
+                ixOff -= offL  
+                iyOff -= offS  
+
 
             #-------- Apply tilt angle of 2x1 sensors
             if cp.confpars.cspadApplyTiltAngle :
@@ -234,7 +250,8 @@ class PlotsForCSpad ( object ) :
             #print 'Use already generated image for CSpad and save time'
             return self.arr2dCSpad
 
-        self.arr2dCSpad = np.zeros( (1710,1710), dtype=np.int16 )
+        #self.arr2dCSpad = np.zeros( (1710,1710), dtype=np.int16 )
+        self.arr2dCSpad = np.zeros( (1750,1750), dtype=np.int16 )
 
         for quad in range(0,4) :
             arr2dquad = self.getImageArrayForQuad(arr1ev, quad)

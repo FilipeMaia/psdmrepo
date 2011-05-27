@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------
 
-"""GUI which handles the Average and Correlations buttons in the HDF5Explorer package.
+"""GUI which handles the Average, Correlations, and CalibCycles buttons in the HDF5Explorer package.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -46,7 +46,7 @@ import DrawEvent        as drev
 #  Class definition --
 #---------------------
 class GUIComplexCommands ( QtGui.QWidget ) :
-    """GUI which handles the Average and Correlations buttons
+    """GUI which handles the Average, Correlations, and CalibCycles buttons
 
     @see BaseClass
     @see OtherClass
@@ -82,7 +82,7 @@ class GUIComplexCommands ( QtGui.QWidget ) :
 
         self.drawev   = drev.DrawEvent(self)
 
-        self.titComplex = QtGui.QLabel('Multi-events:')
+        #self.titComplex = QtGui.QLabel('Multi-events:')
         self.titOver    = QtGui.QLabel('over')
         self.titEvents  = QtGui.QLabel('events')
 
@@ -92,28 +92,32 @@ class GUIComplexCommands ( QtGui.QWidget ) :
 
         self.butAverage   = QtGui.QPushButton("Average")
         self.butCorr      = QtGui.QPushButton("Correlations")
+        self.butCalibC    = QtGui.QPushButton("CalibCycles")
 
         #self.butAverage   .setStyleSheet("background-color: rgb(0, 255, 0); color: rgb(0, 0, 0)")
         #self.butCorr      .setStyleSheet("background-color: magenta; color: rgb(0, 0, 0)")
         self.butAverage   .setStyleSheet("background-color: rgb(230, 255, 230); color: rgb(0, 0, 0)")
         self.butCorr      .setStyleSheet("background-color: rgb(255, 230, 255); color: rgb(0, 0, 0)")
+        self.butCalibC    .setStyleSheet("background-color: rgb(255, 255, 220); color: rgb(0, 0, 0)")
 
         #self.closeplts= QtGui.QPushButton("Close plots")
         #self.exit     = QtGui.QPushButton("Exit")
         
         hboxA = QtGui.QHBoxLayout()
-        hboxA.addWidget(self.titComplex)
+        #hboxA.addWidget(self.titComplex)
         hboxA.addWidget(self.butAverage)
         hboxA.addWidget(self.titOver)
         hboxA.addWidget(self.avevEdit)
         hboxA.addWidget(self.titEvents)
         hboxA.addStretch(2)
         hboxA.addWidget(self.butCorr)
+        hboxA.addWidget(self.butCalibC)
 
         self.setLayout(hboxA)
 
         self.connect(self.butAverage,QtCore.SIGNAL('clicked()'),          self.processAverage )
         self.connect(self.butCorr,   QtCore.SIGNAL('clicked()'),          self.processCorrelations )
+        self.connect(self.butCalibC, QtCore.SIGNAL('clicked()'),          self.processCalibCycles )
         self.connect(self.avevEdit,  QtCore.SIGNAL('editingFinished ()'), self.processAverageEventsEdit )
 
         #self.setFocus()
@@ -143,6 +147,11 @@ class GUIComplexCommands ( QtGui.QWidget ) :
     def processCorrelations(self):
         print 'Correlations'
         self.drawev.drawCorrelationPlots()
+
+
+    def processCalibCycles(self):
+        print 'CalibCycles'
+        self.drawev.drawCalibCyclePlots()
 
 
     def processAverage(self):

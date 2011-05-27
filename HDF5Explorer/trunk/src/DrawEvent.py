@@ -49,6 +49,7 @@ import PlotsForCSpad             as cspad
 import PlotsForImage             as image
 import PlotsForWaveform          as wavef
 import PlotsForCorrelations      as corrs
+import PlotsForCalibCycles       as calib
 import PlotsForCSpadProjections  as cspadproj
 import PlotsForImageProjections  as imageproj
 import PrintHDF5                 as printh5
@@ -75,6 +76,7 @@ class DrawEvent ( object ) :
         self.plotsImage             = image.PlotsForImage()
         self.plotsWaveform          = wavef.PlotsForWaveform()
         self.plotsCorrelations      = corrs.PlotsForCorrelations()
+        self.plotsCalibCycles       = calib.PlotsForCalibCycles()
         self.plotsCSpadProj         = cspadproj.PlotsForCSpadProjections(self.plotsCSpad)
         self.plotsImageProj         = imageproj.PlotsForImageProjections()
         
@@ -784,7 +786,39 @@ class DrawEvent ( object ) :
                 self.plotsCorrelations.plotCorrelations(self.set_fig('2x1'), self.h5file)
             else : self.close_fig(self.figNum)
 
+#-----------------------------------------
 
+    def drawCalibCyclePlots ( self ) :
+        """Draw CalibCycle Plots"""
+
+        if not cp.confpars.calibcycleIsOn :
+            print 'Check the "CalibCycle" checkbox in the "What to display?" GUI\n' +\
+                  'and set the correlation plot(s) parameters.'
+            return
+        
+        self.openHDF5File()
+        self.drawCalibCyclePlotsFromOpenFile()
+        self.closeHDF5File()
+
+    def drawCalibCyclePlotsFromOpenFile ( self ) :
+
+        #cp.confpars.calibcycleNWindowsMax 
+        #cp.confpars.calibcycleNWindows 
+ 
+        self.figNum = 200
+
+        print 'drawCalibCyclePlotsFromOpenFile for nwin=', cp.confpars.calibcycleNWindows
+
+        for self.nwin in range(cp.confpars.calibcycleNWindows) :
+
+            #Ydsname   = cp.confpars.calibcycleWindowParameters[self.nwin][0]
+            #Xdsname   = cp.confpars.calibcycleWindowParameters[self.nwin][1]
+            #radioXPar = cp.confpars.calibcycleWindowParameters[self.nwin][2] 
+
+            self.figNum += 1 
+            if cp.confpars.calibcycleIsOn : 
+                self.plotsCalibCycles.plotCalibCycles(self.set_fig('2x1'), self.h5file)
+            else : self.close_fig(self.figNum)
 
 #-----------------------------------------
 #

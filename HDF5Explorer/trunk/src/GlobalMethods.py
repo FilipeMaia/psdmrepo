@@ -31,6 +31,7 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 #import sys
 import os
+import string as st
 import time
 import numpy as np
 #-----------------------------
@@ -139,6 +140,42 @@ def CorrelationDatasetIsChecked():
         item_last_name = get_item_last_name(dsname)
         if item_last_name == 'time': return True
         if item_last_name == 'data' and (not CSpadIsInTheName(dsname)): return True
+    return False
+
+#----------------------------------
+
+def getPatternEndsInTheString(symbolic_string, pattern='CalibCycle:'):
+
+    start = st.find(symbolic_string, pattern)
+    pattern_length = len(pattern)
+    if start<0 : 
+        return -1, -1, False
+    else :
+        return start, start+pattern_length, True
+    
+#----------------------------------
+
+def CalibCycleIsInThePath(path_and_name):
+
+    pattern = 'CalibCycle:'
+    start = st.find(path_and_name,pattern)
+    if start>0 : 
+        #name = path_and_name[start:start+11] 
+        #numb = path_and_name[start+11:start+11+4]
+        #print 'name,numb=',name,numb
+        return True
+    else :
+        return False
+    
+#----------------------------------
+
+def CalibCycleDatasetIsChecked():
+    for dsname in cp.confpars.list_of_checked_item_names :
+        if CalibCycleIsInThePath(dsname):
+            print 'CalibCycleDatasetIsChecked(): True'
+            return True
+
+    print 'CalibCycleDatasetIsChecked(): False'
     return False
 
 #----------------------------------

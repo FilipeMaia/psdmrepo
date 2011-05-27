@@ -52,20 +52,30 @@ class ConfigCSpad ( object ) :
 
         print 'setCSpadParameters'
 
-        self.preventiveRotationOffset = 5 # (pixel) increase effective canva for rotation
-        off2 = 2*self.preventiveRotationOffset
+        self.preventiveRotationOffset = 15 # (pixel) increase effective canva for rotation
+        off = self.preventiveRotationOffset
 
-        self.quadInDetOrient = [   90,    0,   270,  180]
-        self.quadInDetOriInd = [    1,    0,     3,    2]
+        # Old orientation
+        #self.quadInDetOrient = [   90,    0,   270,  180]
+        #self.quadInDetOriInd = [    1,    0,     3,    2]
+        #gapX = 30
+        #gapY = 40
+        #self.quadXOffset     = [   3+off2,    0,      800+gapX, 806+gapX+off2]
+        #self.quadYOffset     = [   0,  792+gapY, 803+gapY+off2,       10+off2]
 
-        gapX = 30
-        gapY = 40
 
-        #self.quadXOffset     = [   3,    0,      800+gapX, 806+gapX]
-        #self.quadYOffset     = [   0,  792+gapY, 803+gapY,       10]
+        # New orientation
+        self.quadInDetOrient = [ 180,   90,    0,  270]
+        self.quadInDetOriInd = [   2,    1,    0,    3]
 
-        self.quadXOffset     = [   3+off2,    0,      800+gapX, 806+gapX+off2]
-        self.quadYOffset     = [   0,  792+gapY, 803+gapY+off2,       10+off2]
+        gapX = 3
+        gapY = 3
+
+        shiftX = 18
+        shiftY = 18
+
+        self.quadXOffset = [  22-gapX+shiftX+off,   22-gapX-shiftX+off,  855+gapX-shiftX+off,  856+gapX+shiftX+off]
+        self.quadYOffset = [  12-gapY-shiftY+off,  846+gapY-shiftY+off,  844+gapY+shiftY+off,   12-gapY+shiftY+off]
 
         self.firstPairInQuad = [0, 0,  8, 16]
         self.lastPairInQuad  = [0, 8, 16, 20]
@@ -76,17 +86,27 @@ class ConfigCSpad ( object ) :
                                 [ 8,   9,  10,  11,  12,  13,  14,  15],
                                 [16,  17,  -1,  -1,  -1,  -1,  18,  19]]
 
-        self.pairInQaudOrient = [ [   0,   0, 270, 270, 180, 180, 270, 270],
-                                  [   0,   0, 270, 270, 180, 180, 270, 270],
-                                  [   0,   0, 270, 270, 180, 180, 270, 270],
-                                  [   0,   0, 270, 270, 180, 180, 270, 270] ]
-        #                         [ 180, 180, 270, 270,   0,   0, 270, 270] ]
+        # Old orientation
+        #self.pairInQaudOrient = [ [   0,   0, 270, 270, 180, 180, 270, 270],
+        #                          [   0,   0, 270, 270, 180, 180, 270, 270],
+        #                          [   0,   0, 270, 270, 180, 180, 270, 270],
+        #                          [   0,   0, 270, 270, 180, 180, 270, 270] ]
 
-        self.pairInQaudOriInd = [ [   0,   0,   3,   3,   2,   2,   3,   3],
-                                  [   0,   0,   3,   3,   2,   2,   3,   3],
-                                  [   0,   0,   3,   3,   2,   2,   3,   3],
-                                  [   0,   0,   3,   3,   2,   2,   3,   3] ]
-        #                         [   2,   2,   1,   1,   0,   3,   3,   2] ]
+        #self.pairInQaudOriInd = [ [   0,   0,   3,   3,   2,   2,   3,   3],
+        #                          [   0,   0,   3,   3,   2,   2,   3,   3],
+        #                          [   0,   0,   3,   3,   2,   2,   3,   3],
+        #                          [   0,   0,   3,   3,   2,   2,   3,   3] ]
+
+        # New orientation
+        self.pairInQaudOrient = [ [ 270, 270, 180, 180,  90,  90, 180, 180],
+                                  [ 270, 270, 180, 180,  90,  90, 180, 180],
+                                  [ 270, 270, 180, 180,  90,  90, 180, 180],
+                                  [ 270, 270, 180, 180,  90,  90, 180, 180] ]
+
+        self.pairInQaudOriInd = [ [   3,   3,   2,   2,   1,   1,   2,   2],
+                                  [   3,   3,   2,   2,   1,   1,   2,   2],
+                                  [   3,   3,   2,   2,   1,   1,   2,   2],
+                                  [   3,   3,   2,   2,   1,   1,   2,   2] ]
 
 
         # 2011-02-10 before run3:
@@ -128,15 +148,28 @@ class ConfigCSpad ( object ) :
 
         # Optical alignment 2011-03-29 post run3:
 
-        self.pairXInQaud = [[422,  635,    0,    0,  212,    0,  427,  428],
-                            [421,  634,    0,    0,  214,    1,  425,  425],
-                            [418,  631,    2,    0,  216,    3,  431,  430],
-                            [422,  636,    0,    0,  215,    1,  430,  425]] # 4,6 (215,430) were not measured
-                                                                     
-        self.pairYInQaud = [[  1,    0,  216,    3,  431,  432,  616,  403],
-                            [  0,    0,  214,    2,  426,  426,  615,  402],
-                            [  1,    0,  219,    8,  433,  435,  617,  404],
-                            [  1,    0,  215,    2,  430,  430,  615,  404]] # 4,6 (430,615) were not measured
+        #self.pairXInQaud = [[422,  635,    0,    0,  212,    0,  427,  428],
+        #                    [421,  634,    0,    0,  214,    1,  425,  425],
+        #                    [418,  631,    2,    0,  216,    3,  431,  430],
+        #                    [422,  636,    0,    0,  215,    1,  430,  425]] # 4,6 (215,430) were not measured
+                                                                      
+        #self.pairYInQaud = [[  1,    0,  216,    3,  431,  432,  616,  403],
+        #                    [  0,    0,  214,    2,  426,  426,  615,  402],
+        #                    [  1,    0,  219,    8,  433,  435,  617,  404],
+        #                    [  1,    0,  215,    2,  430,  430,  615,  404]] # 4,6 (430,615) were not measured
+
+        # Optical alignment 2011-03-29 post run3:
+        # New version: 1) no rotation w.r.t. optical measurements
+        #              2) center coordanates are calculated as an average of 4 corner coordinates.
+        self.pairXInQaud = [[198,  198,  310,   98,  629,  630,  712,  499],
+                            [198,  198,  310,   97,  626,  626,  710,  498],
+                            [200,  199,  314,  103,  631,  633,  714,  501],
+                            [198,  198,  310,   98,  630,  629,  710,  499]] # 4,6 (630,710) were not measured
+                                                                          
+        self.pairYInQaud = [[307,   95,  626,  627,  517,  730,  200,  200],
+                            [308,   95,  626,  626,  513,  725,  200,  200],
+                            [309,   97,  622,  625,  513,  725,  199,  199],
+                            [307,   95,  628,  628,  515,  730,  200,  202]] # 4,6 (515,200) were not measured
 
 
         #for ix in range(8) : self.pairXInQaud.append(random.randint(0,600))

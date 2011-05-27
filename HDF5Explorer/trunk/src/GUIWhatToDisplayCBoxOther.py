@@ -80,11 +80,13 @@ class GUIWhatToDisplayCBoxOther ( QtGui.QWidget ) :
         self.titWaveform = QtGui.QLabel('Other')
         self.titWaveform.setFont (titFont) 
         
-        self.cboxWFWaveform    = QtGui.QCheckBox('Waveform',           self)
-        self.cboxCO            = QtGui.QCheckBox('Correlations',       self)
+        self.cboxWFWaveform    = QtGui.QCheckBox('Waveform',     self)
+        self.cboxCO            = QtGui.QCheckBox('Correlations', self)
+        self.cboxCC            = QtGui.QCheckBox('CalibCycles',  self)
 
-        if cp.confpars.waveformWaveformIsOn : self.cboxWFWaveform    .setCheckState(2)
-        if cp.confpars.correlationsIsOn     : self.cboxCO            .setCheckState(2)
+        if cp.confpars.waveformWaveformIsOn : self.cboxWFWaveform.setCheckState(2)
+        if cp.confpars.correlationsIsOn     : self.cboxCO        .setCheckState(2)
+        if cp.confpars.calibcycleIsOn       : self.cboxCC        .setCheckState(2)
 
         self.showToolTips()
 
@@ -92,7 +94,8 @@ class GUIWhatToDisplayCBoxOther ( QtGui.QWidget ) :
         gridWF.addWidget(self.titWaveform,      0, 0)
         gridWF.addWidget(self.cboxWFWaveform,   1, 0)
         gridWF.addWidget(self.cboxCO,           1, 1)
-       #gridWF.addWidget(self.cboxED,           1, 2)
+        gridWF.addWidget(self.cboxCC,           1, 2)
+       #gridWF.addWidget(self.cboxED,           1, 3)
 
 
         self.vbox = QtGui.QVBoxLayout()
@@ -102,6 +105,7 @@ class GUIWhatToDisplayCBoxOther ( QtGui.QWidget ) :
   
         self.connect(self.cboxWFWaveform,      QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxWFWaveform)
         self.connect(self.cboxCO,              QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCO)
+        self.connect(self.cboxCC,              QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCC)
 
     def showToolTips(self):
         #self.butClose    .setToolTip('Close this window') 
@@ -137,6 +141,14 @@ class GUIWhatToDisplayCBoxOther ( QtGui.QWidget ) :
             cp.confpars.correlationsIsOn = True
         else:
             cp.confpars.correlationsIsOn = False
+
+
+    def processCBoxCC(self, value):
+        if self.cboxCC.isChecked():
+            self.setActiveTabBarForIndex(self.parent.indTabCC)
+            cp.confpars.calibcycleIsOn = True
+        else:
+            cp.confpars.calibcycleIsOn = False
 
 
     def processCBoxWFWaveform(self, value):

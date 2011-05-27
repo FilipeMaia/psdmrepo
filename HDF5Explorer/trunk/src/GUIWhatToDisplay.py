@@ -49,6 +49,7 @@ import GUIWhatToDisplayForCSpad        as wtdCS
 import GUIWhatToDisplayForWaveform     as wtdWF
 import GUIWhatToDisplayForProjections  as wtdPR
 import GUICorrelation                  as wtdCO
+import GUICalibCycle                   as wtdCC
 import GUIConfiguration                as guiconfig
 import GUISelection                    as guisel
 
@@ -100,7 +101,8 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.indTabWF    = self.tabBar.addTab('Waveform')
         self.indTabPR    = self.tabBar.addTab('Proj.')
         self.indTabCO    = self.tabBar.addTab('Corr.')
-        self.indTabEmpty = self.tabBar.addTab(30*' ')
+        self.indTabCC    = self.tabBar.addTab('CalibC.')
+        self.indTabEmpty = self.tabBar.addTab(12*' ')
         self.tabBar.setTabEnabled(self.indTabEmpty,False)
         self.isFirstEntry = True
 
@@ -109,6 +111,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.tabBar.setTabTextColor(self.indTabWF,QtGui.QColor('green'))
         self.tabBar.setTabTextColor(self.indTabPR,QtGui.QColor('magenta'))
         self.tabBar.setTabTextColor(self.indTabCO,QtGui.QColor('black'))
+        self.tabBar.setTabTextColor(self.indTabCC,QtGui.QColor('red'))
        #self.tabBar.setTabTextColor(self.indTabED,QtGui.QColor('white'))
 
         self.tabBarBot       = QtGui.QTabBar()
@@ -174,6 +177,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         imageDatasetIsChecked = gm.ImageDatasetIsChecked()
         wavefDatasetIsChecked = gm.WaveformDatasetIsChecked()
         correDatasetIsChecked = gm.CorrelationDatasetIsChecked()
+        calibDatasetIsChecked = gm.CalibCycleDatasetIsChecked()
 
         self.vertSize = 365 # accounts for the tab bars and buttons vertical size
 
@@ -291,6 +295,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         imageDatasetIsChecked = gm.ImageDatasetIsChecked()
         wavefDatasetIsChecked = gm.WaveformDatasetIsChecked()
         correDatasetIsChecked = gm.CorrelationDatasetIsChecked()
+        calibDatasetIsChecked = gm.CalibCycleDatasetIsChecked()
 
         if indTab == self.indTabCS:
             if cspadDatasetIsChecked: self.guiTab = wtdCS.GUIWhatToDisplayForCSpad()
@@ -312,6 +317,10 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         if indTab == self.indTabCO:
             if correDatasetIsChecked: self.guiTab = wtdCO.GUICorrelation()
             else :                    self.guiTab = wtdAL.GUIWhatToDisplayAlternative(None, 'Correlations')
+
+        if indTab == self.indTabCC:
+            if calibDatasetIsChecked: self.guiTab = wtdCC.GUICalibCycle()
+            else :                    self.guiTab = wtdAL.GUIWhatToDisplayAlternative(None, 'CalibCycle')
 
         #if indTab == self.indTabED:
         #    self.guiTab = QtGui.QLabel('Sorry, this GUI is not implemented yet.\n' + 
