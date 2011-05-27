@@ -772,11 +772,12 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             return
         
         # --- --- --- Waveform --- --- ---
-        if ( str(box.text()).find("Acq")>=0  or
-             str(box.text()).find("ETof")>=0  or
-             str(box.text()).find("ITof")>=0  or
-             str(box.text()).find("Mbes")>=0  or
-             str(box.text()).find("Camp")>=0  ) :
+        if ( str(box.text()).find("Acq")>=0  
+             or str(box.text()).find("ETof")>=0
+             or str(box.text()).find("ITof")>=0
+             or str(box.text()).find("Mbes")>=0
+             #or str(box.text()).find("Camp")>=0
+             ) :
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_waveform")
             except ValueError :
@@ -810,9 +811,10 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             return
                     
         # --- --- --- TM6740 --- --- ---
-        if ( str(box.text()).find("TM6740")>=0 or
-             str(box.text()).find("Opal1000")>=0 or
-             str(box.text()).find("Princeton")>=0 ) :
+        if ( str(box.text()).find("TM6740")>=0 
+             or str(box.text()).find("Opal1000")>=0 
+             or str(box.text()).find("Princeton")>=0
+             or str(box.text()).find("pnCCD")>=0 ) :
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_image")
             except ValueError :
@@ -822,7 +824,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
             #print "XtcExplorer.pyana_image at ", index
             address = str(box.text()).split(": ")[1].strip()
-            options_for_mod[index].append("\nimg_sources = %s" % address)
+            options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nimage_rotations = " )
             options_for_mod[index].append("\nimage_shifts = " )
             options_for_mod[index].append("\nimage_scales = " )

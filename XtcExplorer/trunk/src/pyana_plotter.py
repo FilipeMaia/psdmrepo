@@ -166,6 +166,10 @@ class pyana_plotter (object) :
         @param env    environment object
         """
         self.n_shots += 1
+        # print a progress report
+        if (self.n_shots%1000)==0 :
+            print "Shot#", self.n_shots
+
 
         # if any module changed the display mode, pick it up (we're last)
         event_display_mode = evt.get('display_mode')
