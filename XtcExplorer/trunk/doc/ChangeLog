@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-May-27 ofte                  rev 1958
+	- added pyana_encoder
+	- cleaned up waveform a little, added WaveformData (for ipython)
+
 2011-May-26 ofte  Tag: V00-01-04  rev 1956-7
 	- minor tweak, and tagging
 

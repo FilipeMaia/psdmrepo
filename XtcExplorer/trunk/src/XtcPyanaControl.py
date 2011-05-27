@@ -855,6 +855,23 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             options_for_mod[index].append("\nthreshold = ")
             options_for_mod[index].append("\nthr_area = ")
             return
+
+        # --- --- --- Encoder --- --- ---
+        if str(box.text()).find("Encoder")>=0 :
+            try :
+                index = modules_to_run.index("XtcExplorer.pyana_encoder")
+            except ValueError :
+                index = len(modules_to_run)
+                modules_to_run.append("XtcExplorer.pyana_encoder") 
+                options_for_mod.append([])
+
+            #print "XtcExplorer.pyana_encoder at ", index 
+            address = str(box.text()).split(": ")[1].strip()
+            options_for_mod[index].append("\nsources = %s" % address)
+            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n )
+            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n )
+            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
+            return
         
         # --- --- --- Epics --- --- ---
         if str(box.text()).find("Epics Process Variables")>=0 :

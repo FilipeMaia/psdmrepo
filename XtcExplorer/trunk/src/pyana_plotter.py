@@ -238,7 +238,15 @@ class pyana_plotter (object) :
             data_scan = evt.get('data_scan')
             if data_scan :  print "data_scan: ", data_scan
             else :          del data_scan
-                
+
+            data_encoder = evt.get('data_encoder')
+            if data_encoder :  print "data_encoder: ", data_encoder
+            else :          del data_encoder
+
+            data_waveform = evt.get('data_waveform')
+            if data_waveform :  print "data_waveform: ", data_waveform
+            else :          del data_waveform
+
             data_image = evt.get('data_image')
             if data_image:  print "data_image: ", data_image
             else:           del data_image

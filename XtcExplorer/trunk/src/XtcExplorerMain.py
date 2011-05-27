@@ -123,7 +123,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.connect(self.scan_button, QtCore.SIGNAL('clicked()'), self.scan_files )
         self.scan_button.setDisabled(True)
         self.scan_label = QtGui.QLabel(self.scan_button)
-        self.scan_label.setText("Scan all datagrams")
+        self.scan_label.setText("Scan all events")
 
         self.scan_enable_button = QtGui.QPushButton("&Enable full scan")
         self.scan_enable_button.setMinimumWidth(140)
@@ -134,7 +134,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.connect(self.qscan_button, QtCore.SIGNAL('clicked()'), self.scan_files_quick )
         self.qscan_label = QtGui.QLabel(self.qscan_button)
         self.nev_qscan = 200
-        self.qscan_label.setText("Scan the first %d datagrams   " % self.nev_qscan)
+        self.qscan_label.setText("Scan the first %d events   " % self.nev_qscan)
 
         self.qscan_edit = QtGui.QLineEdit(str(self.nev_qscan))
         self.qscan_edit.setAlignment(QtCore.Qt.AlignRight)
@@ -362,7 +362,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             self.filesize += os.path.getsize(filename)
             
         filesizetxt = ""
-        scantext = "Scan all datagrams"
+        scantext = "Scan all events"
         if nfiles > 0 :
             filesize = self.filesize/1024
             if filesize < 1024 :
@@ -383,9 +383,9 @@ class XtcExplorerMain (QtGui.QMainWindow) :
                 # automatically enable full scan if smaller than 1.2G
                 if self.filesize < 1.2*1024**3 :
                     self.scan_enable()
-                    scantext = "Scan all datagrams (%s)"%filesizetxt
+                    scantext = "Scan all events (%s)"%filesizetxt
                 else :
-                    scantext = "Scan all datagrams (%s!)"%filesizetxt
+                    scantext = "Scan all events (%s!)"%filesizetxt
 
         status+="\t %s \n" % filesizetxt
         for filename in self.filenames :
@@ -399,7 +399,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
 
     def change_nev_qscan(self):
         self.nev_qscan = int(self.qscan_edit.text())
-        self.qscan_label.setText("Scan the first %d datagrams   "%self.nev_qscan)
+        self.qscan_label.setText("Scan the first %d events   "%self.nev_qscan)
         
     def scan_enable(self) :
         if self.scan_button :
@@ -422,7 +422,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             self.scanner = XtcScanner()                
         self.scanner.setFiles(self.filenames)        
         if quick :
-            self.scanner.setOption({'ndatagrams':self.nev_qscan})
+            self.scanner.setOption({'ndatagrams':(self.nev_qscan+3)})
         else :
             self.scanner.setOption({'ndatagrams':-1}) # all
         self.scanner.scan()

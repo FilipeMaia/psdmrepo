@@ -217,6 +217,37 @@ class IpimbData( BaseData ):
         print itsme
 
 
+class EncoderData( BaseData ):
+    def __init__( self, name, type="EncoderData" ):
+        BaseData.__init__(self,name,type)
+        self.values = None
+
+    def show( self ):
+        """Printable description 
+        """
+        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
+        if self.values is not None :
+            itsme+="\n\t values = array of shape %s"%str(np.shape(self.values))
+        print itsme
+
+
+class WaveformData( BaseData ):
+    def __init__( self, name, type="WaveformData" ):
+        BaseData.__init__(self,name,type)
+        self.wf_voltage = None
+        self.wf_time = None
+
+    def show( self ):
+        """Printable description 
+        """
+        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
+        if self.wf_voltage is not None :
+            itsme+="\n\t wf_voltage = array of shape %s"%str(np.shape(self.wf_voltage))
+        if self.wf_time is not None :
+            itsme+="\n\t wf_time = array of shape %s"%str(np.shape(self.wf_time))
+        print itsme
+
+
 class EpicsData( BaseData ):
     def __init__( self, name, type="EpicsData" ):
         BaseData.__init__(self,name,type)
