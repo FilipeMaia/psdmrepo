@@ -56,7 +56,7 @@ cd "$release"
 irods-scan -r -R "$resource" "$@"
 if [ $? -ne 0 ] ; then
 	
-	mail -s "[irods-scan-cron] Detected orphaned files" $expert << EOD
+	mail -s "[irods-scan-cron] Detected orphaned or wrong size files" $expert << EOD
 $time
 Check log file $logdir/irods-scan.log
 EOD
