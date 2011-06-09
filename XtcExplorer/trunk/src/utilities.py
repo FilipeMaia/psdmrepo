@@ -366,8 +366,11 @@ class Frame(object):
         self.name = name
 
         self.axes = None       # the patch containing the image
-        self.axesim = None     # the image
+        self.axesim = None     # the image AxesImage
+        self.image = None      # the image (numpy array)
         self.colb = None       # the colorbar
+        self.projx = None      # projection onto the horizontal axis
+        self.projy = None      # projection onto the vertical axis
 
         # threshold associated with this plot (image)
         self.threshold = None
@@ -379,7 +382,67 @@ class Frame(object):
         self.vmax = None
         self.orglims = None
 
+    def show(self):
+        itsme = "%s"%self
+        itsme +="\n name = %s " % self.name        
+        itsme +="\n axes = %s " % self.axes
+        itsme +="\n axesim = %s " % self.axesim
+        itsme +="\n threshold = %s " % self.threshold
+        itsme +="\n vmin = %s " % self.vmin
+        itsme +="\n vmax = %s " % self.vmax
+        itsme +="\n orglims = %s " % str(self.orglims)
+        itsme +="\n projx = %s " % self.projx
+        itsme +="\n projy = %s " % self.projy
+        print itsme
 
+    def update_axes(self):
+        # max along each axis
+        proj_vert = self.image.max(axis=1) # for each row, maximum bin value
+        proj_horiz = self.image.max(axis=0) # for each column, maximum bin value
+        
+        # ---------------------------------------------------------
+        # these are the limits I want my histogram to use
+        vmin = np.min(proj_vert) - 0.1 * np.min(proj_vert)
+        #vmin = 0
+        vmax = np.max(proj_vert) + 0.1 * np.max(proj_vert)
+        hmin = np.min(proj_horiz) - 0.2 * np.min(proj_horiz)
+        #hmin = 0.0
+        hmax = np.max(proj_horiz) + 0.2 * np.max(proj_horiz) 
+        
+        # unless vmin and vmax has been set for the image
+        if self.vmax is not None: 
+            vmax = self.vmax + 0.1 * self.vmax
+            hmax = self.vmax + 0.1 * self.vmax
+        if self.vmin is not None: 
+            vmin = self.vmin - 0.1 * self.vmin
+            hmin = self.vmin - 0.1 * self.vmin
+            
+        # -------------horizontal-------------------
+        roundto = 1
+        if hmax > 100 : roundto = 10
+        if hmax > 1000 : roundto = 100
+        if hmax > 10000 : roundto = 1000
+        ticks = [ roundto * np.around(hmin/roundto) ,
+                  roundto * np.around((hmax-hmin)/(2*roundto)),
+                  roundto * np.around(hmax/roundto) ]
+        self.projx.set_yticks( ticks )
+        
+        self.projx.set_ylim( np.min(ticks[0],hmin), np.max(ticks[-1],hmax) )
+        
+        
+        # -------------vertical---------------
+        roundto = 1
+        if vmax > 100 : roundto = 10
+        if vmax > 1000 : roundto = 100
+        if vmax > 10000 : roundto = 1000
+        ticks = [ roundto * np.around( vmin/roundto) ,
+                  roundto * np.around((vmax-vmin)/(2*roundto)),
+                  roundto * np.around(vmax/roundto) ]
+        self.projy.set_xticks( ticks )
+        
+        self.projy.set_xlim( np.max(ticks[-1],vmax), np.min(ticks[0],vmin) )
+
+    
 class Plotter(object):
     """Figure (canvas) manager
     """
@@ -437,9 +500,9 @@ class Plotter(object):
         self.fignum = fignum
         self.fig.clf()
 
-        self.fig.subplots_adjust(left=0.10,   right=0.90,
+        self.fig.subplots_adjust(left=0.05,   right=0.95,
                                  bottom=0.05, top=0.90,
-                                 wspace=0.1,  hspace=0.1 )
+                                 wspace=0.2,  hspace=0.2 )
         
         # add subplots and frames
         if self.frames is None:
@@ -454,7 +517,6 @@ class Plotter(object):
                 aframe = Frame()
                 aframe.axes = ax
                 self.frames.append(aframe)
-
                     
         self.connect()
 
@@ -474,12 +536,12 @@ class Plotter(object):
 
     def onpick(self, event):
 
-        print "The following artist object was picked: ", event.artist
+        #print "The following artist object was picked: ", event.artist
 
         # in which Frame?
         for aplot in self.frames :
-            if aplot.axes.contains( event.mouseevent ):
-                
+            if aplot.axes == event.artist.axes : 
+
                 print "Current   threshold = ", aplot.threshold.minvalue
                 print "          active area [xmin xmax ymin ymax] = ", aplot.threshold.area
                 print "To change threshold value, middle-click..." 
@@ -610,7 +672,9 @@ class Plotter(object):
                 
                     
                     aplot.axesim.set_clim(aplot.vmin,aplot.vmax)
+                    aplot.update_axes()
                     plt.draw()
+
 
 
 
@@ -653,6 +717,7 @@ class Plotter(object):
         """
         index= position-1
         aplot = self.frames[index]
+        aplot.image = frameimage
         
         # get axes
         aplot.axes = self.fig.axes[index]
@@ -672,14 +737,20 @@ class Plotter(object):
         divider = make_axes_locatable(aplot.axes)
 
         if showProj :
-            axHistx = divider.append_axes("top", size="20%", pad=0.03,sharex=aplot.axes)
-            axHisty = divider.append_axes("left", size="20%", pad=0.03,sharey=aplot.axes)
-            axHistx.set_title( aplot.axes.get_title() )
+            aplot.projx = divider.append_axes("top", size="20%", pad=0.03,sharex=aplot.axes)
+            aplot.projy = divider.append_axes("left", size="20%", pad=0.03,sharey=aplot.axes)
+            aplot.projx.set_title( aplot.axes.get_title() )
+
+            start_x = 0
+            start_y = 0
+            if extent is not None:
+                start_x = extent[0]
+                start_y = extent[2]
 
             # vertical and horizontal dimensions, axes, projections
             vdim,hdim = np.shape(frameimage)
-            vbins = np.arange(0,vdim,1)
-            hbins = np.arange(0,hdim,1)
+            hbins = np.arange(start_x, start_x+hdim, 1)
+            vbins = np.arange(start_y, start_y+vdim, 1)
 
             # sum or average along each axis, 
             #proj_vert = np.sum(frameimage,1)/hdim # for each row, sum of elements
@@ -689,50 +760,17 @@ class Plotter(object):
             proj_vert = frameimage.max(axis=1) # for each row, maximum bin value
             proj_horiz = frameimage.max(axis=0) # for each column, maximum bin value
 
-            # these are the limits I want my histogram to use
-            vmin = np.min(proj_vert) - 0.1 * np.min(proj_vert)
-            vmin = 0.0
-            vmax = np.max(proj_vert) + 0.1 * np.max(proj_vert)
-            hmin = np.min(proj_horiz) - 0.2 * np.min(proj_horiz)
-            hmin = 0.0
-            hmax = np.max(proj_horiz) + 0.2 * np.max(proj_horiz) 
+            aplot.projx.plot(hbins,proj_horiz)
+            aplot.projy.plot(proj_vert[::-1], vbins[::-1])
+            #aplot.projx.hist(hbins, bins=hdim, histtype='step', weights=proj_horiz)
+            #aplot.projy.hist(vbins, bins=vdim, histtype='step', weights=proj_vert,orientation='horizontal')
+            aplot.projx.get_xaxis().set_visible(False)
 
-            print vmin,vmax,hmin,hmax
-            #plt.clim( np.min(vmin,hmin), np.max(vmax,hmax))
+            aplot.projx.set_xlim( start_x, start_x+hdim)
+            aplot.projy.set_ylim( start_y, start_y+vdim)
 
-            axHistx.plot(hbins,proj_horiz)
-            axHisty.plot(proj_vert[::-1], vbins[::-1])
-            #axHistx.hist(hbins, bins=hdim, histtype='step', weights=proj_horiz)
-            #axHisty.hist(vbins, bins=vdim, histtype='step', weights=proj_vert,orientation='horizontal')
-            axHistx.get_xaxis().set_visible(False)
-
-            # -------------horizontal-------------------
-            roundto = 1
-            if hmax > 100 : roundto = 10
-            if hmax > 1000 : roundto = 100
-            if hmax > 10000 : roundto = 1000
-            ticks = [ roundto * np.around(hmin/roundto) ,
-                      roundto * np.around((hmax-hmin)/(2*roundto)),
-                      roundto * np.around(hmax/roundto) ]
-            axHistx.set_yticks( ticks )
-
-            axHistx.set_xlim(0,hdim)
-            axHistx.set_ylim( np.min(ticks[0],hmin), np.max(ticks[-1],hmax) )
-
-
-            # -------------vertical---------------
-            roundto = 1
-            if vmax > 100 : roundto = 10
-            if vmax > 1000 : roundto = 100
-            if vmax > 10000 : roundto = 1000
-            ticks = [ roundto * np.around( vmin/roundto) ,
-                      roundto * np.around((vmax-vmin)/(2*roundto)),
-                      roundto * np.around(vmax/roundto) ]
-            axHisty.set_xticks( ticks )
-
-            axHisty.set_ylim(0,vdim)
-            axHisty.set_xlim( np.max(ticks[-1],vmax), np.min(ticks[0],vmin) )
-
+            aplot.update_axes()
+            
 
         cax = divider.append_axes("right",size="5%", pad=0.05)
         aplot.colb = plt.colorbar(aplot.axesim,cax=cax)

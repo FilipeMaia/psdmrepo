@@ -74,6 +74,9 @@ class  pyana_encoder ( object ) :
 
         self.n_shots+=1
 
+        if evt.get('skip_event') :
+            return
+
         # IPM diagnostics, for saturation and low count filtering
         for source in self.sources :
 

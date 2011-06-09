@@ -181,6 +181,9 @@ class pyana_waveform (object) :
         logging.info( "pyana_waveform.event() called ")
         self.n_shots+=1
         
+        if evt.get('skip_event') :
+            return
+
         for label in self.src_ch :
 
             parts = label.split(' Ch')

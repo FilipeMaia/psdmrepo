@@ -114,6 +114,9 @@ class  pyana_bld ( object ) :
 
         self.n_shots += 1
 
+        if evt.get('skip_event'):
+            return
+
         self.time.append( evt.getTime().seconds() + 1.0e-9*evt.getTime().nanoseconds() )
 
         if self.do_EBeam :

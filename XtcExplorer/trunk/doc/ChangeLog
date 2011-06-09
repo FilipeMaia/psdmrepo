@@ -11,6 +11,12 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Jun-09 ofte                  rev 1964
+        - Cleaned up utilities, cspad and image modules somewhat more. 
+	- The projections now reflect the (interactive) change of vmin/vmax
+	- Allow filtering / skipping events / not running modules downstream 
+	  if this shot is not passing threshold (using evt.put(True,'skip_event'))	
+	
 2011-Jun-08 ofte                  rev 1961
 	- Several structural changes to utilities.py and some to 
 	  pyana_image and pyana_cspad. Attempt at better organization 

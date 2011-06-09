@@ -141,13 +141,16 @@ class pyana_epics (object) :
         @param evt    event data object
         @param env    environment object
         """
+        self.n_shots += 1
+        logging.info( "pyana_epics.event() called (%d)"%self.n_shots )
+
+        if evt.get('skip_event') :
+            return
+
         # --------- Reset -------------
         if self.accumulate_n!=0 and (self.n_shots%self.accumulate_n)==0 :
             self.resetlists()
 
-
-        self.n_shots += 1
-        logging.info( "pyana_epics.event() called (%d)"%self.n_shots )
 
         # Use environment object to access EPICS data
         for pv_name in self.pv_names :

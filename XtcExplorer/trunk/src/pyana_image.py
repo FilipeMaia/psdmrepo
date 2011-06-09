@@ -217,6 +217,9 @@ class  pyana_image ( object ) :
         # this one counts every event
         self.n_shots+=1
 
+        if evt.get('skip_event') :
+            return
+
         # new hdf5-file every N events
         if self.output_file is not None :
             if ".hdf5" in self.output_file and self.n_hdf5 is not None:

@@ -183,11 +183,14 @@ class  pyana_cspad ( object ) :
     # process event/shot data
     def event ( self, evt, env ) :
 
-        self.images = []
-        self.ititle = []
-
         # this one counts every event
         self.n_shots+=1
+
+        if evt.get('skip_event'):
+            return
+
+        self.images = []
+        self.ititle = []
 
         # print a progress report
         if (self.n_shots%1000)==0 :
@@ -257,23 +260,24 @@ class  pyana_cspad ( object ) :
             maxbin = roi.argmax()
             maxvalue = roi.ravel()[maxbin] 
             maxbin_coord = np.unravel_index(maxbin,dims)
-            print "CsPad: Max value of ROI %s is %d, in bin %d == %s"%(dims,maxvalue,maxbin,maxbin_coord)
+            #print "CsPad: Max value of ROI %s is %d, in bin %d == %s"%(dims,maxvalue,maxbin,maxbin_coord)
             
 
+            print "pyana_cspad: shot#%d "%self.n_shots ,
             if maxvalue < self.threshold.minvalue :
-                print "skipping event #%d %.2f < %.2f " % \
-                      (self.n_shots, maxvalue, float(self.threshold.minvalue))
-
+                print " skipped (%.2f < %.2f) " % (maxvalue, float(self.threshold.minvalue))
+                
                 # collect the rejected shots before returning to the next event
                 self.n_dark+=1
                 if self.sum_dark_images is None :
                     self.sum_dark_images = np.float_(cspad_image)
                 else :
                     self.sum_dark_images += cspad_image
+
+                evt.put(True,'skip_event') # tell downstream modules to skip this event
                 return
             else :
-                print "accepting event #%d, vmax = %.2f > %.2f " % \
-                      (self.n_shots, maxvalue, float(self.threshold.minvalue))
+                print "accepted (%.2f > %.2f) " % (maxvalue, float(self.threshold.minvalue))
 
         # -----
         # Passed the threshold filter. Add this to the sum
@@ -301,12 +305,13 @@ class  pyana_cspad ( object ) :
 
             if roi is not None: 
                 event_display_images = []
-                event_display_images.append( (title, cspad_image ) )
+                event_display_images.append( (self.img_source, cspad_image ) )
                 event_display_images.append( ("Region of Interest", roi ) )
                 
                 newmode = self.plotter.draw_figurelist(self.mpl_num,
                                                        event_display_images,
                                                        title="CsPad shot#%d"%self.n_shots,
+                                                       extent=[None,self.threshold.area],
                                                        showProj=True)
 
             else :

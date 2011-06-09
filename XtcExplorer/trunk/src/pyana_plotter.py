@@ -126,14 +126,13 @@ class pyana_plotter (object) :
         # Preferred way to log information is via logging package
         logging.info( "pyana_plotter.beginjob() called" )
 
-        #if self.display_mode == 0 :
-        #    plt.ioff()
-        #if self.display_mode == 1 :
-        #    plt.ioff()
-        #if self.display_mode == 2 :
-        #    plt.ion()
+        if self.display_mode == 0 :
+            plt.ioff()
+        if self.display_mode == 1 :
+            plt.ioff()
+        if self.display_mode == 2 :
+            plt.ion()
 
-        plt.ion()
 
     def beginrun( self, evt, env ) :
         """This optional method is called if present at the beginning 
@@ -162,6 +161,10 @@ class pyana_plotter (object) :
         @param env    environment object
         """
         self.n_shots += 1
+
+        if evt.get('skip_event'):
+            return
+        
         # print a progress report
         if (self.n_shots%1000)==0 :
             print "Shot#", self.n_shots
@@ -186,7 +189,8 @@ class pyana_plotter (object) :
                     print " (SlideShow)" 
                 print
 
-        print "pyana_plotter current display mode: ", self.display_mode
+            #print "pyana_plotter current display mode: ", self.display_mode
+
 
         if self.display_mode == 1:
             # Interactive

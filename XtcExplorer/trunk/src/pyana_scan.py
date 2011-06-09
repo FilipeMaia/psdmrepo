@@ -165,6 +165,9 @@ class pyana_scan (object) :
         self.n_shots += 1
         logging.info( "pyana_scan.event() called (%d)"%self.n_shots )
 
+        if evt.get('skip_event'):
+            return
+
         # Use environment object to access EPICS data
         for epv_name in self.input_epics :
 
