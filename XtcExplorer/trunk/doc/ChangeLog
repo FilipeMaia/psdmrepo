@@ -11,6 +11,15 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Jun-08 ofte                  rev 1961
+	- Several structural changes to utilities.py and some to 
+	  pyana_image and pyana_cspad. Attempt at better organization 
+	  and similarity of the two modules. Some additional features 
+	  and probably bugs too. Will clean this up further in the coming
+	  days. Frame object to hold threshold and other information from 
+	  each plot, instead of the Plotter object which contains all plots 
+	  (Frames) in one figure canvas. 
+
 2011-May-27 ofte                  rev 1959
 	- minor changes
 

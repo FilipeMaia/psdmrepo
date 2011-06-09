@@ -175,8 +175,7 @@ class  pyana_image ( object ) :
         # averages
         self.image_data = {}
         self.dark_data = {}
-        self.lolimits = {}
-        self.hilimits = {}
+        self.minmax = {}
         self.fignum = {}
         self.n_img = {}
         self.n_dark = {}
@@ -185,8 +184,7 @@ class  pyana_image ( object ) :
             self.dark_data[addr] = None
 
             # these will be plotted too
-            self.lolimits[addr] = []
-            self.hilimits[addr] = []
+            self.minmax[addr] = []
 
             self.fignum[addr] = self.mpl_num*10 + 100*self.sources.index(addr)
 
@@ -218,7 +216,6 @@ class  pyana_image ( object ) :
 
         # this one counts every event
         self.n_shots+=1
-        self.plotter.shot_number = self.n_shots
 
         # new hdf5-file every N events
         if self.output_file is not None :
@@ -230,7 +227,7 @@ class  pyana_image ( object ) :
                     print "opening %s for writing" % self.sub_output_file
                     self.hdf5file = h5py.File(self.sub_output_file, 'w')
 
-        # for each event, append images to be plotted to this list
+        # for each event, collect a list of images to be plotted 
         event_display_images = []
 
         # get the requested images
@@ -251,10 +248,15 @@ class  pyana_image ( object ) :
             # image is a numpy array (pixels)
             image = np.float_(frame.data())
 
-            # collect min and max intensity of this image
-            self.lolimits[addr].append( image.min() )
-            self.hilimits[addr].append( image.max() )
+            # check that it has dimensions as expected from a camera image
+            dim = np.shape( image )
+            if len( dim )!= 2 :
+                print "Unexpected dimensions of image array from %s: %s" % (addr,dim)
 
+            # collect min and max intensities of images from this detector
+            self.minmax[addr].append( [image.min(), image.max()] )
+
+            # ---------------------------------------------------------------------------------------
             # select good (signal) images
             isGood = False
             if ( image.max() > self.thr_low_image) and (image.max() < self.thr_high_image) :
@@ -270,6 +272,7 @@ class  pyana_image ( object ) :
                 print "WARNING! This image has been selected both as signal AND dark! "
 
 
+            # ---------------------------------------------------------------------------------------
             # Apply shift, rotation, scaling of this image if needed:
             if self.image_rotations is not None:
                 rotatedimage = interpol.rotate( image, self.image_rotations[addr], reshape=False )                
@@ -287,6 +290,7 @@ class  pyana_image ( object ) :
                 pass
 
 
+            # ---------------------------------------------------------------------------------------
             # add this image to the sum (for average)
             if isGood :
                 self.n_img[addr]+=1
@@ -310,8 +314,13 @@ class  pyana_image ( object ) :
             #        image_bkgsub = image - self.dark_data[addr]/self.n_dark[addr]
             #        event_display_images.append( (addr, image_bkgsub) )
             #    else :
+
+
+            # ---------------------------------------------------------------------------------------
+            # Here's where we add the raw (or subtracted) image to the list for plotting
             event_display_images.append( (addr, image) )
-            
+
+            # This is for use by ipython
             self.data[addr].image   = image
             if self.n_img[addr] > 0 :
                 self.data[addr].average = self.image_data[addr]/self.n_img[addr]
@@ -342,7 +351,15 @@ class  pyana_image ( object ) :
         # Draw images from this event
         # -----------------------------------
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
-            self.plotter.draw_figurelist( self.mpl_num, event_display_images)
+            newmode = self.plotter.draw_figurelist(self.mpl_num,
+                                                   event_display_images,
+                                                   title="Cameras shot#%d"%self.n_shots,
+                                                   showProj=True)
+            if newmode is not None:
+                # propagate new display mode to the evt object 
+                evt.put(newmode,'display_mode')
+                # reset
+                self.plotter.display_mode = None
 
             # convert dict to a list:
             data_image = []
@@ -405,15 +422,15 @@ class  pyana_image ( object ) :
 
             # plot the average image
             av_good_img = self.image_data[addr]/self.n_img[addr]
-            self.plotter.drawframe( av_good_img, "%s: Average of images above threshold"%addr,
+            self.plotter.draw_figure( av_good_img, "%s: Average of images above threshold"%addr,
                                     fignum=self.fignum[addr])
 
             if self.n_dark[addr]>0 :
                 av_dark_img = self.dark_data[addr]/self.n_dark[addr]
                 av_bkgsubtracted = av_good_img - av_dark_img 
-                self.plotter.drawframe( av_dark_img, "%s: Average of images below threshold"%addr,
+                self.plotter.draw_figure( av_dark_img, "%s: Average of images below threshold"%addr,
                                         fignum=self.fignum[addr]+1 )
-                self.self.drawframe( av_bkgsubtracted, "%s: Average background subtracted"%addr,
+                self.self.draw_figure( av_bkgsubtracted, "%s: Average background subtracted"%addr,
                                      fignum=self.fignum[addr]+2)
 
         plt.draw()

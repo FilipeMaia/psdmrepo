@@ -126,16 +126,12 @@ class pyana_plotter (object) :
         # Preferred way to log information is via logging package
         logging.info( "pyana_plotter.beginjob() called" )
 
-        # let the framework know what display_mode (Interactive = 1, SlideShow = 0)
-        # was selected. The other modules will pick this up in their event functions
-        evt.put(self.display_mode, 'display_mode')
-
-        if self.display_mode == 0 :
-            plt.ioff()
-        if self.display_mode == 1 :
-            plt.ioff()
-        if self.display_mode == 2 :
-            plt.ion()
+        #if self.display_mode == 0 :
+        #    plt.ioff()
+        #if self.display_mode == 1 :
+        #    plt.ioff()
+        #if self.display_mode == 2 :
+        #    plt.ion()
 
         plt.ion()
 
@@ -172,29 +168,35 @@ class pyana_plotter (object) :
 
 
         # if any module changed the display mode, pick it up (we're last)
-        event_display_mode = evt.get('display_mode')
-        if event_display_mode is not None and event_display_mode != self.display_mode :
-            self.display_mode = event_display_mode
-            print "pyana_plotter display mode changed: ", self.display_mode,
-            if self.display_mode == 0:
-                plt.ioff()
-                print " (NoDisplay)" 
-            if self.display_mode == 1:
-                plt.ioff()
-                print " (Interactive)" 
-            if self.display_mode == 2:
-                plt.ion()
-                print " (SlideShow)" 
-            print
+        evmode = evt.get('display_mode')
+        if evmode is not None:
+
+            if evmode != self.display_mode :
+                self.display_mode = evmode
+                print "pyana_plotter display mode changed: ", self.display_mode,
+                
+                if self.display_mode == 0:
+                    plt.ioff()
+                    print " (NoDisplay)" 
+                if self.display_mode == 1:
+                    plt.ioff()
+                    print " (Interactive)" 
+                if self.display_mode == 2:
+                    plt.ion()
+                    print " (SlideShow)" 
+                print
+
+        print "pyana_plotter current display mode: ", self.display_mode
+
         if self.display_mode == 1:
             # Interactive
             plt.ioff()
             plt.show()
 
         elif self.display_mode == 2:
-            pass
             # SlideShow
-            # plt.draw()            
+            plt.ion()
+            plt.draw()            
 
     def endcalibcycle( self, env ) :
         """This optional method is called if present at the end of the 

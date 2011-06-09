@@ -354,113 +354,348 @@ from PyQt4 import QtCore
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1 import AxesGrid
 
-        
-class Plotter(object):
-    def __init__(self):
-        self.plot_vmin = None
-        self.plot_vmax = None
-        self.cid1 = None
-        self.cid2 = None
-        self.colb = None
-        self.grid = None
+class Frame(object):
+    """Frame (axes/subplot) manager
+
+    In principle one should think that the 'figure' and 'axes' 
+    containers would be sufficient to navigate the plot, right?
+    Yet, I find no way to have access to everything, like colorbar.
+    # So I make my own container... let me know if you know a better way
+    """
+    def __init__(self, name=""):
+        self.name = name
+
+        self.axes = None       # the patch containing the image
+        self.axesim = None     # the image
+        self.colb = None       # the colorbar
+
+        # threshold associated with this plot (image)
         self.threshold = None
-        self.shot_number = None
+
+        self.first = True
+
+        # display-limits for this plot (image)
+        self.vmin = None
+        self.vmax = None
+        self.orglims = None
+
+
+class Plotter(object):
+    """Figure (canvas) manager
+    """
+    def __init__(self):
+        self.fig = None
+        self.fignum = None
+        # a figure has one or more plots/frames
+        self.frames = None # list of class Frame in this figure
+        self.frame = {} # dictionary / hash table to access the Frames (only if named)
+
         self.display_mode = None
+        # flag if interactively changed
+
+        self.first = True
+
+        self.settings() # defaults
 
         # matplotlib backend is set to QtAgg, and this is needed to avoid
         # a bug in raw_input ("QCoreApplication::exec: The event loop is already running")
         QtCore.pyqtRemoveInputHook()
 
+    def add_frame(self, frame_name=""):
+        if self.frames is None:
+            self.frames = []
+        aframe = Frame(frame_name)
+        self.frames.append(aframe)
         
-    def connect(self):
-
-        if self.cid1 is None:
-            self.cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
-
-        if self.cid2 is None:
-            self.cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)
-
-
-    def draw_figurelist(self, fignum, event_display_images ) :
-        """
-        @fignum                  figure number, i.e. fig = plt.figure(num=fignum)
-        @event_display_images    a list of tuples (title,image)
-        """
-        axspos = 0
-
-        nplots = len(event_display_images)
-        ncol = 3
-        if nplots<3 : ncol = nplots
-        nrow = int( nplots/ncol)
-        fig = plt.figure(fignum,(5.0*ncol,4*nrow))
-        fig.clf()
-        fig.suptitle("Event#%d"%self.shot_number)
-
-
-        pos = 0
-        self.caxes = [] # list of references to colorbar Axes
-        self.axims = [] # list of references to image Axes
-        for ad, im in sorted(event_display_images) :
-            pos += 1
-            
-            # Axes
-            ax = fig.add_subplot(nrow,ncol,pos)
-            ax.set_title( "%s" % ad )
-
-            # AxesImage
-            axim = plt.imshow( im, origin='lower' )
-            self.axims.append( axim )
+        if frame_name != "" :
+            self.frame[frame_name] = aframe
         
-            cbar = plt.colorbar(axim,pad=0.02,shrink=0.78) 
-            self.caxes.append( cbar.ax )
-            
-            self.orglims = axim.get_clim()
-            # min and max values in the axes are
+    def settings(self
+                 , figsize=(10,8) # size of the figure canvas
+                 , nplots=1  # total number of plots in the figure
+                 , maxcol=3  # maximum number of columns
+                 ):
+        self.w = 10
+        self.h = 8
+        self.nplots = nplots
+        self.maxcol = maxcol
+        
 
+    def create_figure(self, fignum, nplots=1):
+        """ Make the matplotlib figure.
+        This clears and rebuilds the canvas, although
+        if the figure was made earlier, some of it is recycled
+        """
+        ncol = 1
+        nrow = 1
+        if nplots > 1 :
+            ncol = self.maxcol
+            if nplots<self.maxcol : ncol = nplots
+            nrow = int( nplots/ncol )
 
-        plt.draw()
-
-    def drawframe( self, frameimage, title="", fignum=1, showProj = False):
-
-        if self.display_mode == 2 :
-            plt.ion()
-
-        self.fig = plt.figure(figsize=(10,8),num=fignum)
+        self.fig = plt.figure(fignum,(self.w*ncol,self.h*nrow))
+        self.fignum = fignum
         self.fig.clf()
 
-        axes = self.fig.add_subplot(111)
+        self.fig.subplots_adjust(left=0.10,   right=0.90,
+                                 bottom=0.05, top=0.90,
+                                 wspace=0.1,  hspace=0.1 )
+        
+        # add subplots and frames
+        if self.frames is None:
+            self.frames = []
 
-        self.fig.subplots_adjust(left=0.10,
-                                 bottom=0.05,
-                                 right=0.90,
-                                 top=0.90,
-                                 wspace=0.1,
-                                 hspace=0.1)
+        for i in range (1,nplots+1):
+            ax = self.fig.add_subplot(nrow,ncol,i)
 
-        self.axesim = plt.imshow( frameimage,
-                                  vmin=self.plot_vmin, vmax=self.plot_vmax )
+            if len(self.frames) >=  i:
+                self.frames[i-1].axes = ax
+            else :
+                aframe = Frame()
+                aframe.axes = ax
+                self.frames.append(aframe)
 
-        #self.colb = plt.colorbar(self.axesim,ax=axes,pad=0.01)#,fraction=0.10,shrink=0.90)
-        divider = make_axes_locatable(axes)
+                    
+        self.connect()
+
+    def close_figure(self):
+        #print plt.get_fignums()
+        plt.close(self.fignum)
+        
+    def connect(self,plot=None):
+        if plot is None: 
+            self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+            self.fig.canvas.mpl_connect('pick_event', self.onpick)
+
+        else :
+            self.fig.canvas.mpl_connect('button_press_event', plot.onclick)
+            self.fig.canvas.mpl_connect('pick_event', plot.onpick)
+            
+
+    def onpick(self, event):
+
+        print "The following artist object was picked: ", event.artist
+
+        # in which Frame?
+        for aplot in self.frames :
+            if aplot.axes.contains( event.mouseevent ):
+                
+                print "Current   threshold = ", aplot.threshold.minvalue
+                print "          active area [xmin xmax ymin ymax] = ", aplot.threshold.area
+                print "To change threshold value, middle-click..." 
+                print "To change active area, right-click..." 
+                
+                if event.mouseevent.button == 3 :
+                    print "Enter new coordinates to change this area:"
+                    xxyy_string = raw_input("xmin xmax ymin ymax = ")
+                    xxyy_list = xxyy_string.split(" ")
+                    
+                    if len( xxyy_list ) != 4 :
+                        print "Invalid entry, ignoring"
+                        return
+                    
+                    for i in range (4):
+                        aplot.threshold.area[i] = float( xxyy_list[i] )
+            
+                    x = aplot.threshold.area[0]
+                    y = aplot.threshold.area[2]
+                    w = aplot.threshold.area[1] - aplot.threshold.area[0]
+                    h = aplot.threshold.area[3] - aplot.threshold.area[2]
+                    
+                    aplot.thr_rect.set_bounds(x,y,w,h)
+                    plt.draw()
+            
+                if event.mouseevent.button == 2 :
+                    text = raw_input("Enter new threshold value (current = %.2f) " % aplot.threshold.minvalue)
+                    if text == "" :
+                        print "Invalid entry, ignoring"
+                    else :
+                        aplot.threshold.minvalue = float(text)
+                        print "Threshold value has been changed to ", aplot.threshold.minvalue
+                        plt.draw()
+
+            
+    # define what to do if we click on the plot
+    def onclick(self, event) :
+
+        if self.first : 
+            print """
+            To change the color scale, click on the color bar:
+            - left-click sets the lower limit
+            - right-click sets higher limit
+            - middle-click resets to original
+            """
+            self.first = False
+        
+
+        # -------------- clicks outside axes ----------------------
+        # can we open a dialogue box here?
+        if not event.inaxes and event.button == 3 :
+            print "can we open a menu here?"
+            
+        # change display mode
+        if not event.inaxes and event.button == 2 :
+            new_mode = None
+            new_mode_str = raw_input("Plotter: switch display mode? Enter new mode: ")
+            if new_mode_str != "":
+                
+                if new_mode_str == "NoDisplay"   :
+                    new_mode = 0
+                if new_mode_str == "0"           :
+                    new_mode = 0
+                    new_mode_str = "NoDisplay"
+
+                if new_mode_str == "Interactive" :
+                    new_mode = 1
+                if new_mode_str == "1"           :
+                    new_mode = 1
+                    new_mode_str = "Interactive" 
+
+                if new_mode_str == "SlideShow"   :
+                    new_mode = 2
+                if new_mode_str == "2"           :
+                    new_mode = 2
+                    new_mode_str = "SlideShow"   
+
+                print "Plotter display mode has been changed from %s to %d (%s)" % \
+                      (self.display_mode,new_mode,new_mode_str)
+                self.display_mode = new_mode 
+
+                if new_mode == 2 :
+                    # if we switch from Interactive to SlideShow mode
+                    # the figure needs to be properly closed 
+                    # and recreated after setting ion (mpl interactive mode)
+                    # if not, the figure remains hidden after you close the GUI
+                    #self.close_figure()
+                    plt.close('all')
+                    plt.ion()
+
+
+        # -------------- clicks inside axes ----------------------
+        if event.inaxes :
+
+            # find out which axes was clicked...
+
+            # ... colorbar?
+            for aplot in self.frames :
+                if aplot.colb and aplot.colb.ax == event.inaxes: 
+                    
+                    print "You clicked on colorbar of plot ", aplot.name
+
+                    print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y
+                    print ' xdata=',event.xdata,' ydata=', event.ydata
+        
+                    lims = aplot.axesim.get_clim()
+        
+                    aplot.vmin = lims[0]
+                    aplot.vmax = lims[1]
+                    range = aplot.vmax - aplot.vmin
+                    value = aplot.vmin + event.ydata * range
+                    print "min,max,range,value = ",aplot.vmin,aplot.vmax,range,value
+            
+                    # left button
+                    if event.button == 1 :
+                        aplot.vmin = value
+                        print "mininum changed:   ( %.2f , %.2f ) " % (aplot.vmin, aplot.vmax )
+                
+                    # middle button
+                    elif event.button == 2 :
+                        aplot.vmin, aplot.vmax = aplot.orglims
+                        print "reset"
+                        
+                    # right button
+                    elif event.button == 3 :
+                        aplot.vmax = value
+                        print "maximum changed:   ( %.2f , %.2f ) " % (aplot.vmin, aplot.vmax )
+                
+                    
+                    aplot.axesim.set_clim(aplot.vmin,aplot.vmax)
+                    plt.draw()
+
+
+
+    def draw_figurelist(self, fignum, event_display_images, title="",showProj=False,extent=None ) :
+        """ Draw several frames in one canvas
+        
+        @fignum                  figure number, i.e. fig = plt.figure(num=fignum)
+        @event_display_images    a list of tuples (title,image)
+        @return                  new display_mode if any (else return None)
+        """
+
+        self.create_figure(fignum, nplots=len(event_display_images))
+        self.fig.suptitle(title)
+
+        pos = 0
+        for ad, im in sorted(event_display_images) :
+            pos += 1
+
+            xt = None
+            if extent is not None: xt = extent[pos-1]
+
+            self.drawframe(im,title=ad,fignum=fignum,position=pos,showProj=showProj,extent=xt)
+            
+        plt.draw()
+        return self.display_mode
+
+    def draw_figure( self, frameimage, title="", fignum=1,position=1, showProj = False,extent=None):
+        """ Draw a single frame in one canvas
+        """
+        self.create_figure(fignum)
+        self.fig.suptitle(title)
+        self.drawframe(frameimage,title,fignum,position,showProj,extent)
+
+        plt.draw()
+        return self.display_mode
+
+
+    def drawframe( self, frameimage, title="", fignum=1,position=1, showProj = False,extent=None):
+        """ Draw a single frame
+        """
+        index= position-1
+        aplot = self.frames[index]
+        
+        # get axes
+        aplot.axes = self.fig.axes[index]
+        aplot.axes.set_title( title )
+
+        if aplot.name == "" and title != "" :
+            aplot.name = title
+
+        # AxesImage
+        aplot.axesim = aplot.axes.imshow( frameimage,
+                                          origin='lower',
+                                          extent=extent,
+                                          vmin=aplot.vmin,
+                                          vmax=aplot.vmax )
+        
+
+        divider = make_axes_locatable(aplot.axes)
 
         if showProj :
-            #axes.set_aspect(1.0)
-            axHistx = divider.append_axes("top", size="20%", pad=0.2,sharex=axes)
-            axHisty = divider.append_axes("left", size="20%", pad=0.6,sharey=axes)
+            axHistx = divider.append_axes("top", size="20%", pad=0.03,sharex=aplot.axes)
+            axHisty = divider.append_axes("left", size="20%", pad=0.03,sharey=aplot.axes)
+            axHistx.set_title( aplot.axes.get_title() )
 
             # vertical and horizontal dimensions, axes, projections
             vdim,hdim = np.shape(frameimage)
             vbins = np.arange(0,vdim,1)
             hbins = np.arange(0,hdim,1)
 
-            proj_vert = np.sum(frameimage,1)/hdim # sum along horizontal axis
-            proj_horiz = np.sum(frameimage,0)/vdim # sum along vertical axis
+            # sum or average along each axis, 
+            #proj_vert = np.sum(frameimage,1)/hdim # for each row, sum of elements
+            #proj_horiz = np.sum(frameimage,0)/vdim # for each column, sum of elements
+
+            # max along each axis
+            proj_vert = frameimage.max(axis=1) # for each row, maximum bin value
+            proj_horiz = frameimage.max(axis=0) # for each column, maximum bin value
 
             # these are the limits I want my histogram to use
             vmin = np.min(proj_vert) - 0.1 * np.min(proj_vert)
+            vmin = 0.0
             vmax = np.max(proj_vert) + 0.1 * np.max(proj_vert)
-            hmin = np.min(proj_horiz) - 0.1 * np.min(proj_horiz)
-            hmax = np.max(proj_horiz) + 0.1 * np.max(proj_horiz) 
+            hmin = np.min(proj_horiz) - 0.2 * np.min(proj_horiz)
+            hmin = 0.0
+            hmax = np.max(proj_horiz) + 0.2 * np.max(proj_horiz) 
 
             print vmin,vmax,hmin,hmax
             #plt.clim( np.min(vmin,hmin), np.max(vmax,hmax))
@@ -469,153 +704,54 @@ class Plotter(object):
             axHisty.plot(proj_vert[::-1], vbins[::-1])
             #axHistx.hist(hbins, bins=hdim, histtype='step', weights=proj_horiz)
             #axHisty.hist(vbins, bins=vdim, histtype='step', weights=proj_vert,orientation='horizontal')
+            axHistx.get_xaxis().set_visible(False)
 
-            axHistx.set_xlim(0,hdim)
-            axHistx.set_ylim(hmin, hmax )
-            #ticks = [ 10000 * np.around(hmin/10000) ,
-            #          10000 * np.around((hmax-hmin)/20000),
-            #          10000 * np.around(hmax/10000) ]
-            ticks = [ np.around(hmin),
-                      np.around((hmax-hmin)/2),
-                      np.around(hmax) ]
+            # -------------horizontal-------------------
+            roundto = 1
+            if hmax > 100 : roundto = 10
+            if hmax > 1000 : roundto = 100
+            if hmax > 10000 : roundto = 1000
+            ticks = [ roundto * np.around(hmin/roundto) ,
+                      roundto * np.around((hmax-hmin)/(2*roundto)),
+                      roundto * np.around(hmax/roundto) ]
             axHistx.set_yticks( ticks )
 
-            #axHisty.set_ylim(0,vdim)
-            #axHisty.set_xlim(vmin, vmax )
-            axHisty.set_ylim(0,vdim)
-            axHisty.set_xlim(vmax, vmin )
-            #ticks = [ 10000 * np.around( vmin/10000) ,
-            #          10000 * np.around((vmax-vmin)/20000),
-            #          10000 * np.around(vmax/10000) ]
-            ticks = [ np.around( vmax ) ,
-                     np.around((vmax-vmin)/2),
-                      np.around(vmin) ]
+            axHistx.set_xlim(0,hdim)
+            axHistx.set_ylim( np.min(ticks[0],hmin), np.max(ticks[-1],hmax) )
+
+
+            # -------------vertical---------------
+            roundto = 1
+            if vmax > 100 : roundto = 10
+            if vmax > 1000 : roundto = 100
+            if vmax > 10000 : roundto = 1000
+            ticks = [ roundto * np.around( vmin/roundto) ,
+                      roundto * np.around((vmax-vmin)/(2*roundto)),
+                      roundto * np.around(vmax/roundto) ]
             axHisty.set_xticks( ticks )
 
+            axHisty.set_ylim(0,vdim)
+            axHisty.set_xlim( np.max(ticks[-1],vmax), np.min(ticks[0],vmin) )
+
+
         cax = divider.append_axes("right",size="5%", pad=0.05)
-        self.colb = plt.colorbar(self.axesim,cax=cax)
+        aplot.colb = plt.colorbar(aplot.axesim,cax=cax)
         # colb is the colorbar object
 
-        if self.plot_vmin is None: 
-            self.orglims = self.axesim.get_clim()
+        if aplot.vmin is None: 
+            aplot.orglims = aplot.axesim.get_clim()
             # min and max values in the axes are
-            print "Original value limits: ", self.orglims
-            self.plot_vmin, self.plot_vmax = self.orglims
+            print "%s original value limits: %s" % (aplot.name,aplot.orglims)
+            aplot.vmin, aplot.vmax = aplot.orglims
                     
         # show the active region for thresholding
-        if self.threshold and self.threshold.area is not None:
-            xy = [self.threshold.area[0],self.threshold.area[2]]
-            w = self.threshold.area[1] - self.threshold.area[0]
-            h = self.threshold.area[3] - self.threshold.area[2]
-            self.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=5)
-            axes.add_patch(self.thr_rect)
+        if aplot.threshold and aplot.threshold.area is not None:
+            xy = [aplot.threshold.area[0],aplot.threshold.area[2]]
+            w = aplot.threshold.area[1] - aplot.threshold.area[0]
+            h = aplot.threshold.area[3] - aplot.threshold.area[2]
+            aplot.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=10)
+            aplot.axes.add_patch(aplot.thr_rect)
 
-
-        self.cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
-        self.cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)
-
-        if self.display_mode == 1 :
-            print """
-            To change the color scale, click on the color bar:
-            - left-click sets the lower limit
-            - right-click sets higher limit
-            - middle-click resets to original
-            """
-
-        plt.suptitle(title)
-        #axes.set_title(title)
-        plt.draw()
+        aplot.axes.set_title(title)
         
-    def onpick(self, event):
-        print "Current   threshold = ", self.threshold.minvalue
-        print "          active area [xmin xmax ymin ymax] = ", self.threshold.area
-        print "To change threshold value, middle-click..." 
-        print "To change active area, right-click..." 
-
-        if event.mouseevent.button == 3 :
-            print "Enter new coordinates to change this area:"
-            xxyy_string = raw_input("xmin xmax ymin ymax = ")
-            xxyy_list = xxyy_string.split(" ")
-            
-            if len( xxyy_list ) != 4 :
-                print "Invalid entry, ignoring"
-                return
         
-            for i in range (4):
-                self.threshold.area[i] = float( xxyy_list[i] )
-            
-            x = self.threshold.area[0]
-            y = self.threshold.area[2]
-            w = self.threshold.area[1] - self.threshold.area[0]
-            h = self.threshold.area[3] - self.threshold.area[2]
-            
-            self.thr_rect.set_bounds(x,y,w,h)
-            plt.draw()
-            
-        if event.mouseevent.button == 2 :
-            text = raw_input("Enter new threshold value (current = %.2f) " % self.threshold.minvalue)
-            if text == "" :
-                print "Invalid entry, ignoring"
-            else :
-                self.threshold.minvalue = float(text)
-                print "Threshold value has been changed to ", self.threshold.minvalue
-            plt.draw()
-
-            
-    # define what to do if we click on the plot
-    def onclick(self, event) :
-    
-        # can we open a dialogue box here?
-        if not event.inaxes and event.button == 3 :
-            print "can we open a menu here?"
-            
-
-        # change display mode
-        if not event.inaxes and event.button == 2 :
-            new_mode = None
-            new_mode_str = raw_input("Switch display mode? Enter new mode: ")
-            if new_mode_str != "":
-                if new_mode_str == "NoDisplay"   or new_mode_str == "0" : new_mode = 0
-                if new_mode_str == "Interactive" or new_mode_str == "1" : new_mode = 1
-                if new_mode_str == "SlideShow"   or new_mode_str == "2" : new_mode = 2
-            if self.display_mode != new_mode:
-                print "Display mode has been changed from (%d) to (%d)" , (self.display_mode,new_mode)
-                self.display_mode = new_mode
-                
-
-        # change color scale
-        if self.colb is not None and event.inaxes == self.colb.ax :
-
-            print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y
-            print ' xdata=',event.xdata,' ydata=', event.ydata
-        
-            lims = self.axesim.get_clim()
-        
-            self.plot_vmin = lims[0]
-            self.plot_vmax = lims[1]
-            range = self.plot_vmax - self.plot_vmin
-            value = self.plot_vmin + event.ydata * range
-            #print self.plot_vmin, self.plot_vmax, range, value
-        
-            # left button
-            if event.button is 1 :
-                self.plot_vmin = value
-                print "mininum changed:   ( %.2f , %.2f ) " % (self.plot_vmin, self.plot_vmax )
-                
-                # middle button
-            elif event.button is 2 :
-                self.plot_vmin, self.plot_vmax = self.orglims
-                print "reset"
-                    
-                # right button
-            elif event.button is 3 :
-                self.plot_vmax = value
-                print "maximum changed:   ( %.2f , %.2f ) " % (self.plot_vmin, self.plot_vmax )
-                
-            
-        
-            plt.clim(self.plot_vmin,self.plot_vmax)
-            plt.draw() # redraw the current figure
-
-
-

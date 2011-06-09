@@ -116,8 +116,11 @@ class  pyana_cspad ( object ) :
             del self.threshold
             self.threshold = None
             
-        # pass this Threshold to the Plotter
-        self.plotter.threshold = self.threshold
+
+        # Set up the plotter's frame by hand, since
+        # we need to also tell it about thresholds
+        self.plotter.add_frame(self.img_source)
+        self.plotter.frame[self.img_source].threshold = self.threshold
 
         # ----
         # initializations of other class variables
@@ -154,7 +157,8 @@ class  pyana_cspad ( object ) :
             return
         
         quads = range(4)
-        
+
+        print 
         print "Cspad configuration"
         print "  N quadrants   : %d" % config.numQuads()
         print "  Quad mask     : %#x" % config.quadMask()
@@ -170,6 +174,7 @@ class  pyana_cspad ( object ) :
         except:
             pass
         print "  sections      : %s" % str(map(config.sections, quads))
+        print
         
         self.cspad = CsPad(config)
 
@@ -235,25 +240,29 @@ class  pyana_cspad ( object ) :
         if self.dark_image is not None: 
             cspad_image = cspad_image - self.dark_image 
 
-        # apply threshold filter
+        # threshold filter
+        roi = None
         if self.threshold is not None:            
-            topval = np.max(cspad_image) # value of maximum bin
-            #topval = np.sum(cspad_image)/np.size(cspad_image) # average value of bins
+
+            # first, assume we're considering the whole image
+            roi = cspad_image
+
             if self.threshold.area is not None:
-                subset = cspad_image[self.threshold.area[0]:self.threshold.area[1],   # x1:x2
-                                     self.threshold.area[2]:self.threshold.area[3]]   # y1:y2                
-                #topval = np.max(subset) # value of maximum bin
-                dims = np.shape(subset)
-                maxbin = subset.argmax()
-                topval = subset.ravel()[maxbin]
-                print "Maxbin ", maxbin, " value ", topval 
-                print np.unravel_index(maxbin,dims)
+                # or set it to the selected threshold area
+                roi = cspad_image[self.threshold.area[2]:self.threshold.area[3],   # rows (y-range)
+                                  self.threshold.area[0]:self.threshold.area[1]]   # columns (x-range)
 
-                #topval = np.sum(subset)/np.size(cspad_image) # average value of bins
+            
+            dims = np.shape(roi)
+            maxbin = roi.argmax()
+            maxvalue = roi.ravel()[maxbin] 
+            maxbin_coord = np.unravel_index(maxbin,dims)
+            print "CsPad: Max value of ROI %s is %d, in bin %d == %s"%(dims,maxvalue,maxbin,maxbin_coord)
+            
 
-            if topval < self.threshold.minvalue :
+            if maxvalue < self.threshold.minvalue :
                 print "skipping event #%d %.2f < %.2f " % \
-                      (self.n_shots, topval, float(self.threshold.minvalue))
+                      (self.n_shots, maxvalue, float(self.threshold.minvalue))
 
                 # collect the rejected shots before returning to the next event
                 self.n_dark+=1
@@ -264,7 +273,7 @@ class  pyana_cspad ( object ) :
                 return
             else :
                 print "accepting event #%d, vmax = %.2f > %.2f " % \
-                      (self.n_shots, topval, float(self.threshold.minvalue))
+                      (self.n_shots, maxvalue, float(self.threshold.minvalue))
 
         # -----
         # Passed the threshold filter. Add this to the sum
@@ -279,24 +288,45 @@ class  pyana_cspad ( object ) :
         # Draw this event.
         # -----
         if self.plot_every_n > 0 and (self.n_shots%self.plot_every_n)==0 :
-            title = "CsPad shot # %d" % self.n_shots
+            title = "%s shot # %d" % (self.img_source,self.n_shots)
             if self.dark_image is not None:
                 title = title + " (background subtracted) "
             
-            print "plotting CsPad data for shot # ", self.n_shots
-            self.plotter.drawframe(cspad_image,title, fignum=self.mpl_num, showProj=True)
+            
+            #newmode = self.plotter.draw_figure(cspad_image,title, fignum=self.mpl_num, showProj=True)
+            #if roi is not None:
+            #    self.plotter.draw_figure(roi,title="Threshold region",fignum=self.mpl_num+1,
+            #                             showProj=False,extent=self.threshold.area)
+            newmode = None
 
+            if roi is not None: 
+                event_display_images = []
+                event_display_images.append( (title, cspad_image ) )
+                event_display_images.append( ("Region of Interest", roi ) )
+                
+                newmode = self.plotter.draw_figurelist(self.mpl_num,
+                                                       event_display_images,
+                                                       title="CsPad shot#%d"%self.n_shots,
+                                                       showProj=True)
+
+            else :
+                # Just one plot
+                newmode = self.plotter.draw_figure(cspad_image,title, fignum=self.mpl_num, showProj=True)
+                
+            if newmode is not None:
+                # propagate new display mode to the evt object 
+                evt.put(newmode,'display_mode')
+                # reset
+                self.plotter.display_mode = None
+                
+            
+            
+            # data for iPython
             self.data.image = cspad_image
             self.data.average = self.sum_good_images/self.n_shots
             self.data.dark = self.dark_image
-            print "******* image data in event ", self.n_shots
-            print self.data.image
 
-            # check if plotter has changed its display mode. If so, tell the event
-            switchmode = self.plotter.display_mode
-            if switchmode is not None :
-                evt.put(switchmode,'display_mode')
-                if switchmode == 0 : self.plot_every_n = 0
+
             
     # after last event has been processed. 
     def endjob( self, evt, env ) :
@@ -312,7 +342,7 @@ class  pyana_cspad ( object ) :
             print "the highest intensity of average image ", np.max(average_image)
             print "the lowest intensity of average image ", np.min(average_image)
             
-            self.plotter.drawframe(average_image,"Average of %d events" % self.n_good, fignum=self.mpl_num )        
+            self.plotter.draw_figure(average_image,"Average of %d events" % self.n_good, fignum=self.mpl_num )
             print "******* image data in endjob "
             print self.data.image
 
