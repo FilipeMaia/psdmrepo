@@ -86,7 +86,7 @@ try {
             if( $file->resource == 'lustre-resc' ) $xtc_local_copy++;
         }
     }
-
+    
     $hdf5_runs = null;
     FileMgrIrodsWs::runs( $hdf5_runs, $experiment->instrument()->name(), $experiment->name(), 'hdf5', $range_of_runs );
     foreach( $hdf5_runs as $run ) {

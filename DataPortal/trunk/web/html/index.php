@@ -37,12 +37,31 @@ if( !isset( $_GET['exper_id'] )) {
 $exper_id = trim( $_GET['exper_id'] );
 if( $exper_id == '' ) die( 'no valid experiment identifier provided to the script' );
 
-if( isset( $_GET['page1'] )) {
-	$page1 = trim( $_GET['page1'] );
-	if( isset( $_GET['page2'] )) {
-		$page2 = trim( $_GET['page2'] );
+/* If a specific application is requested by a user then open
+ * the corresponding tab.
+ */
+$known_apps = array(
+	'experiment' => True,
+	'elog'       => True,
+	'datafiles'  => True,
+	'hdf5'       => True );
+
+$select_app = 'experiment';
+$select_app_context1 = '';
+
+if( isset( $_GET['app'] )) {
+	$app_path = explode( ':', strtolower( trim( $_GET['app'] )));
+	$app = $app_path[0];
+	if( array_key_exists( $app, $known_apps )) {
+		$select_app = $app;
+		if( count($app_path) > 1 ) $select_app_context1 = $app_path[1];
 	}
 }
+
+/* Parse optional parameters which may be used by applications. The parameters
+ * will be passed directly into applications for further analysis (syntax, values,
+ * etc.).
+ */
 if( isset( $_GET['params'] )) {
 	$params = explode( ',', trim( $_GET['params'] ));
 }
@@ -74,8 +93,21 @@ try {
             break;
         }
     }
+    /* TODO: This neeeds to be replaced by a separate POSIX group, or
+     * an authorization triplet: PCDS_Adminstration -> Manage -> any experiment.
+     */
+    $is_pcds_admin = array_key_exists (
+    	$auth_svc->authName(),
+    	array(
+    		'perazzo'  => True,
+    		'mcmesser' => True,
+    		'salnikov' => True,
+    		'gapon'    => True
+    	)
+    );
 	$has_data_access =
 		$can_manage_group ||
+		$is_pcds_admin ||
 		$regdb->is_member_of_posix_group( $logbook_experiment->POSIX_gid(), $auth_svc->authName()) ||
 		$regdb->is_member_of_posix_group( 'ps-'.strtolower( $instrument->name()), $auth_svc->authName());
 
@@ -99,7 +131,7 @@ try {
 
     $logbook_shifts = $logbook_experiment->shifts();
 
-    $document_title = 'Data Portal of Experiment:';
+    $document_title = 'Web Portal of Experiment:';
     $document_subtitle = '<a href="select_experiment.php" title="Switch to another experiment">'.$experiment->instrument()->name().'&nbsp;/&nbsp;'.$experiment->name().'</a>';
 
     $decorated_experiment_status = '<span style="color:#b0b0b0; font-weight:bold;">NOT ACTIVE</span>';
@@ -109,7 +141,7 @@ try {
 	$min_run_num = is_null($min_run) ? '' : $min_run->num();
 	$max_run_num = is_null($max_run) ? '' : $max_run->num();
 	$decorated_min_run = is_null($min_run) ? 'n/a' : $min_run->begin_time()->toStringShort().' (<b>run '.$min_run->num().'</b>)';
-	$decorated_max_run = is_null($max_run) ? 'n/a' : $max_run->end_time()->toStringShort().' (<b>run '.$max_run->num().'</b>)';
+	$decorated_max_run = is_null($max_run) ? 'n/a' : $max_run->begin_time()->toStringShort().' (<b>run '.$max_run->num().'</b>)';
 	$experiment_group_members     = "<table><tbody>\n";
     $experiment_group_members .= '<tr><td class="table_cell table_cell_left"></td><td class="table_cell table_cell_right"></td></tr>';
 	foreach( $experiment->group_members() as $m ) {
@@ -215,8 +247,7 @@ HERE;
   <div style="float:left; margin-left:20px;">
     <div style="font-weight:bold; margin-bottom:2px;">Messages:</div>
     <select name="messages" style="font-size:90%; padding:1px;" title="Select non-blank option to select how many events to load">
-      <option>20</option>
-      <option>100</option>
+      <option selected="selected">100</option>
       <option>shift</option>
       <option>24 hrs</option>
       <option>7 days</option>
@@ -427,6 +458,16 @@ HERE;
           <div><input type="text" name="end" value="" size=24 style="font-size:90%; padding:1px; margin-top:5px;"/></div>
         </div>
       </div>
+      <div style="float:left; margin-left:20px;">
+        <div style="font-weight:bold;">Around Run(s):</div>
+        <div>
+          <input type="text" name="runs" value="" size=5 style="font-size:90%; padding:1px; margin-top:5px;"
+                 title="Enter a run number or a range of runs
+where to look for messages. For a single run
+put its number. For a range the correct syntax is: 12-35
+Make sure the Begin and End time limits are not used!"/>
+        </div>
+      </div>
       <div style="clear:both;"></div>
     </form>
   </div>
@@ -446,6 +487,192 @@ HERE;
 </div>
 HERE;
 
+    	$elog_shifts_workarea =<<<HERE
+<div id="el-sh-ctrl">
+  <div style="float:right; margin-left:5px;"><button id="el-sh-refresh" title="click to refresh the shifts list">Refresh</button></div>
+  <div style="clear:both;"></div>
+</div>
+<div id="el-sh-wa">
+  <div class="el-sh-info" id="el-sh-info" style="float:left;">&nbsp;</div>
+  <div class="el-sh-info" id="el-sh-updated" style="float:right;">&nbsp;</div>
+  <div style="clear:both;"></div>
+  <div style="margin-top:10px; font-size:80%;">
+    <table style="font-size:120%;"><tbody>
+      <tr>
+        <td><b>Sort by:</b></td>
+        <td><select name="sort" style="padding:1px;">
+              <option>begin</option>
+              <option>runs</option>
+              <option>duration</option>
+            </select></td>
+        <td><div style="width:20px;"></div></td>
+        <td><button id="el-sh-reverse">Show in Reverse Order</button></td>
+        <td><div style="width:10px;"></div></td>
+        <td><button id="el-sh-new-begin">Begin New Shift</button></td></tr>
+    </tbody></table>
+    <div id="el-sh-new-wa" class="el-sh-new-hdn">
+      <div style="float:left;">
+        <form id="elog_new_shift_form" action="../logbook/CreateShift.php" method="post">
+          <div style="float:left;">
+            <input type="hidden" name="id" value="{$exper_id}" />
+            <input type="hidden" name="actionSuccess" value="" />
+            <input type="hidden" name="max_crew_size" value="5" />
+            <input type="hidden" name="author" value="{$auth_svc->authName()}" />
+            <table><tbody>
+              <tr>
+                <td class="ctable_cell ctable_cell_left" valign="center">Leader:&nbsp;&nbsp;</td>
+                <td class="ctable_cell ctable_cell_right"><input type="text" name="leader"  size=20 style="padding:1px;" value="{$auth_svc->authName()}"/></td></tr>
+              <tr>
+                <td class="ctable_cell ctable_cell_left ctable_cell_bottom" valign="center">Crew:&nbsp;&nbsp;</td>
+                <td class="ctable_cell ctable_cell_right"><input type="text" name="member0" value="" size=20 style="padding:1px;" /></td></tr>
+              <tr>
+                <td class="ctable_cell ctable_cell_left ctable_cell_bottom"></td>
+                <td class="ctable_cell ctable_cell_right"><input type="text" name="member1" value="" size=20 style="padding:1px;" /></td></tr>
+              <tr>
+                <td class="ctable_cell ctable_cell_left ctable_cell_bottom"></td>
+                <td class="ctable_cell ctable_cell_right"><input type="text" name="member2" value="" size=20 style="padding:1px;" /></td></tr>
+              <tr>
+                <td class="ctable_cell ctable_cell_left ctable_cell_bottom"></td>
+                <td class="ctable_cell ctable_cell_right"><input type="text" name="member3" value="" size=20 style="padding:1px;" /></td></tr>
+              <tr>
+                <td class="ctable_cell ctable_cell_left ctable_cell_bottom"></td>
+                <td class="ctable_cell ctable_cell_right"><input type="text" name="member4" value="" size=20 style="padding:1px;" /></td></tr>
+            </tbody></table>
+          </div>
+          <div style="float:left; margin-left:20px;">
+            <table><tbody>
+              <tr>
+                <td class="ctable_cell ctable_cell_left  ctable_cell_bottom" valign="center">Goals:&nbsp;&nbsp;</td>
+                <td class="ctable_cell ctable_cell_right ctable_cell_bottom"><textarea rows="10" cols="64" name="goals" style="padding:4px;"></textarea ></td></tr>
+            </tbody></table>
+          </div>
+        </form>
+      </div>
+      <div style="float:left; margin-left:20px;"><button id="el-sh-new-submit">Submit</button></div>
+      <div style="float:left; margin-left:10px;"><button id="el-sh-new-cancel">Cancel</button></div>
+      <div style="clear:both;"></div>
+    </div>
+  </div>
+  <div id="el-sh-list"></div>
+</div>
+HERE;
+
+    	$elog_runs_workarea =<<<HERE
+<div id="el-r-ctrl">
+  <div style="float:right; margin-left:5px;"><button id="el-r-refresh" title="click to refresh the runs list">Refresh</button></div>
+  <div style="clear:both;"></div>
+</div>
+<div id="el-r-wa">
+  <div class="el-r-info" id="el-r-info" style="float:left;">&nbsp;</div>
+  <div class="el-r-info" id="el-r-updated" style="float:right;">&nbsp;</div>
+  <div style="clear:both;"></div>
+  <div style="margin-top:10px; font-size:80%;">
+    <table style="font-size:120%;"><tbody>
+      <tr>
+        <td><b>Sort by:</b></td>
+        <td><select name="sort" style="padding:1px;">
+              <option>run</option>
+              <option>duration</option>
+            </select></td>
+        <td><div style="width:20px;"></div></td>
+        <td><button id="el-r-reverse">Show in Reverse Order</button></td>
+      </tr>
+    </tbody></table>
+  </div>
+  <div id="el-r-list"></div>
+</div>
+HERE;
+
+    	$elog_attachments_workarea =<<<HERE
+<div id="el-at-ctrl">
+  <div style="float:right; margin-left:5px;"><button id="el-at-refresh" title="click to refresh the attachments list">Refresh</button></div>
+  <div style="clear:both;"></div>
+</div>
+<div id="el-at-wa">
+  <div class="el-at-info" id="el-at-info" style="float:left;">&nbsp;</div>
+  <div class="el-at-info" id="el-at-updated" style="float:right;">&nbsp;</div>
+  <div style="clear:both;"></div>
+  <div style="margin-top:10px; font-size:80%;">
+    <table style="font-size:120%;"><tbody>
+      <tr>
+        <td><b>Sort by:</b></td>
+        <td><select name="sort" style="padding:1px;">
+              <option>posted</option>
+              <option>author</option>
+              <option>name</option>
+              <option>type</option>
+              <option>size</option>
+            </select></td>
+        <td><div style="width:20px;"></div></td>
+        <td><b>View as:</b></td>
+        <td><select name="view" style="padding:1px;">
+              <option>table</option>
+              <option>thumbnails</option>
+              <option>hybrid</option>
+            </select></td>
+        <td><div style="width:20px;"></div></td>
+        <td><b>Mix-in runs:</b></td>
+        <td><select name="runs" style="padding:1px;">
+              <option>no</option>
+              <option>yes</option>
+              </select></td>
+        <td><div style="width:20px;"></div></td>
+        <td><button id="el-at-reverse">Show in Reverse Order</button></td>
+      </tr>
+    </tbody></table>
+  </div>
+  <div id="el-at-list"></div>
+</div>
+HERE;
+
+    	$elog_subscribe_workarea =<<<HERE
+
+<div class="el-subscribe" id="el-subscribed" style="display:none;">
+  <h3 style="font-size:140%;">Your subscription:</h3>
+  <div style="padding-left:10px;">
+    <p align="justify">Your SLAC UNIX account <b>{$auth_svc->authName()}</b> is already subscribed to receive automated e-mail
+       notifications on various e-log events of this experiment. The notifications are sent
+       onto your SLAC e-mail address:</p>
+    <div style="padding-left: 10px;">
+      <b>{$auth_svc->authName()}@slac.stanford.edu</b>
+      <button style="margin-left:10px;" id="el-unsubscribe" title="stop receiving automatic notifications">Unsubscribe</button>
+    </div>
+    <p align="justify">You may subscribe or unsubscribe at any time. You'll receive a confirmation
+       message shortly after unsubscribing.</p>
+  </div>
+</div>
+<div class="el-subscribe" id="el-unsubscribed" style="display:none;">
+  <h3 style="font-size:140%;">Your subscription:</h3>
+  <div style="padding-left:10px;">
+    <p align="justify">At the moment, your SLAC UNIX account <b>{$auth_svc->authName()}</b> is not subscribed to receive automated
+       e-mail notifications on various e-log events of this experiment. If you choose to do so
+       then notifications will be sent onto your SLAC e-mail address:</p>
+    <div style="padding-left: 10px;">
+      <b>{$auth_svc->authName()}@slac.stanford.edu</b>
+      <button style="margin-left:10px;" id="el-subscribe" title="start receiving automatic notifications">Subscribe</button>
+    </div>
+    <p align="justify">You may subscribe or unsubscribe at any time. You'll receive a confirmation
+       message shortly after subscribing. If your primary e-mail address differs from
+       the one mentioned above then make sure you set proper e-mail forwarding from
+       SLAC to your primary address. Also check if your SPAM filter won't be blocking
+       messages with the following properties:</p>
+    <div>
+      <table><tbody>
+        <tr><td class="table_cell table_cell_left" >From</td>
+            <td class="table_cell table_cell_right">LCLS E-Log [apache@slac.stanford.edu]</td></tr>
+        <tr><td class="table_cell table_cell_left  table_cell_bottom">Subject</td>
+            <td class="table_cell table_cell_right table_cell_bottom">[ {$instrument->name()} / {$experiment->name()} ]</td></tr>
+      </tbody></table>
+    </div>
+    <p align="justify">And here is the final remark: do not try to reply to e-log messages! Injecting
+       replies into e-Log stream via e-mail transport is not presently implemented.
+      We're still debating whether this would be a useful feature to have in the Portal.</p>
+  </div>
+</div>
+<div id="el-subscribe-all"></div>
+
+HERE;
+    	
     } else {
 
     	$no_elog_access_message =<<<HERE
@@ -464,9 +691,13 @@ HERE;
 </div>
 HERE;
 
-    	$elog_recent_workarea = $no_elog_access_message;
-    	$elog_post_workarea   = $no_elog_access_message;
-    	$elog_search_workarea = $no_elog_access_message;
+    	$elog_recent_workarea      = $no_elog_access_message;
+    	$elog_post_workarea        = $no_elog_access_message;
+    	$elog_search_workarea      = $no_elog_access_message;
+    	$elog_shifts_workarea      = $no_elog_access_message;
+    	$elog_runs_workarea        = $no_elog_access_message;
+    	$elog_attachments_workarea = $no_elog_access_message;
+    	$elog_subscribe_workarea   = $no_elog_access_message;
 
     }
     if( $has_data_access ) {
@@ -726,8 +957,8 @@ HERE;
     top: 0;
     left: 0;
     width: 100%;
-    height: 124px;
-    border-bottom: 1px solid #a0a0a0;
+    height: 129px;
+    border-bottom: 1px solid #0b0b0b;
     background-color: #e0e0e0;
   }
   #p-top-header {
@@ -735,21 +966,21 @@ HERE;
     top: 0;
     left: 0;
     width: 100%;
-    height: 87px;
+    height: 92px;
     background-color: #ffffff;
     z-index: 9999;
   }
   #p-left {
     position: absolute;
     left: 0;
-    top: 125px;
+    top: 130px;
     width: 200px;
     overflow: auto;
   }
   #p-splitter {
     position: absolute;
     left: 200px;
-    top: 125px;
+    top: 130px;
     width: 1px;
     overflow: none;
     cursor: e-resize;
@@ -757,6 +988,7 @@ HERE;
     border-right: 1px solid #a0a0a0;
   }
   #p-bottom {
+    z-index: 100;
     position: absolute;
     left: 0;
     bottom: 0;
@@ -772,7 +1004,7 @@ HERE;
   }
   #p-center {
     position: relative;
-    top:125px;
+    top:130px;
     margin: 0px 0px 20px 203px;
     overflow: auto;
     background-color: #ffffff;
@@ -876,8 +1108,8 @@ span.toggler {
 
 #p-menu {
   font-family: Arial, sans-serif;
-  font-size: 75%;
-  height: 25px;
+  font-size: 14px;
+  height: 31px;
   width: 100%;
   border: 0;
   padding: 0;
@@ -885,31 +1117,35 @@ span.toggler {
 }
 
 #p-context {
-  padding-top: 12px;
-  padding-left: 15px;
+  margin-left: 0px;
+  padding-top: 10px;
+  padding-left: 10px;
   font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
-  font-size: 75%;
+  font-size: 12px;
 }
 #p-search, #p-post {
   padding-top: 2px;
   padding-right: 10px;
-  font-size: 75%;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-size: 11px;
 }
 
 div.m-item {
 
-  margin-left: 2px;
+  margin-left: 3px;
   margin-top: 3px;
 
-  padding: 3px;
+  padding: 5px;
   padding-left: 10px;
   padding-right: 10px;
 
   background: #DFEFFC url(/jquery/css/custom-theme/images/ui-bg_glass_85_dfeffc_1x400.png) 50% 50% repeat-x;
 
-  border-top: 1px solid #c0c0c0;
+  color: #0071BC;
+
+  border-top: 2px solid #c0c0c0;
   border-bottom: 1px solid #c0c0c0;
-  border-right: 1px solid #c0c0c0;
+  border-right: 2px solid #c0c0c0;
 
   border-radius: 5px;
   border-bottom-left-radius: 0;
@@ -926,17 +1162,24 @@ div.m-item:hover {
   background: #d0e5f5 url(/jquery/css/custom-theme/images/ui-bg_glass_75_d0e5f5_1x400.png) 50% 50% repeat-x;
 }
 div.m-item-first {
-  margin-left: 6px;
+  margin-left: 0px;
   float: left;
+
+  border-top-left-radius: 0;
+
+  -moz-border-radius-topleft: 0;
 }
 .m-item-next {
   float: left;
 }
 .m-item-last {
+  float: left;
+/*
   float: right;
-  margin-right: 6px;
+  margin-right: 0px;
   border-left: 1px solid #c0c0c0;
   border-right: 0;
+  */
 }
 .m-item-end {
   clear: both;
@@ -1115,6 +1358,9 @@ exper.posix_group = '<?=$experiment->POSIX_gid()?>';
 datafiles.exp_id = '<?=$exper_id?>';
 hdf.exp_id = '<?=$exper_id?>';
 
+var select_app = '<?=$select_app?>';
+var select_app_context1 = '<?=$select_app_context1?>';
+
 var extra_params = new Array();
 <?php
 	if( isset($params)) {
@@ -1194,7 +1440,7 @@ function printer_friendly() {
 		pfcopy.document.write('<link type="text/css" href="css/portal.css" rel="Stylesheet" />');
 		pfcopy.document.write('<link type="text/css" href="css/ELog.css" rel="Stylesheet" />');
 		pfcopy.document.write('<style type="text/css"> .not4print { display:none; }	</style>');
-		pfcopy.document.write('<title>Data Portal of Experiment: '+elog.instr+' / '+elog.exp+'</title></head><body><div class="maintext">');
+		pfcopy.document.write('<title>Web Portal of Experiment: '+elog.instr+' / '+elog.exp+'</title></head><body><div class="maintext">');
 		pfcopy.document.write(html);
 		pfcopy.document.write("</div></body></html>");
 		pfcopy.document.close();
@@ -1207,8 +1453,15 @@ function printer_friendly() {
  *             APPLICATION INITIALIZATION
  * ------------------------------------------------------
  */
-var applications = null;
-var current_application = 'experiment';
+var applications = {
+	'p-appl-experiment' : exper,
+	'p-appl-elog'       : elog,
+	'p-appl-datafiles'  : datafiles,
+	'p-appl-hdf5'       : hdf,
+	'p-appl-help'       : new p_appl_help()			// TODO: implement it the same wa as for e-Log
+};
+
+var current_application = null;
 
 function v_item_group(item) {
 	var parent = $(item).parent();
@@ -1340,8 +1593,8 @@ $(function() {
 			var application = applications[id];
 			if(application.name == 'elog') {
 				$('#p-menu').children('#'+id).each(function() {	m_item_selected(this); });
-				v_item_selected($('#v-menu > #elog > #search').next().children('.v-item#simple'));
-				application.select('search','simple');
+				v_item_selected($('#v-menu > #elog').children('.v-item#search'));
+				application.select('search');
 				application.simple_search($('#p-search-elog-text').val());
 				break;
 			}
@@ -1360,22 +1613,22 @@ $(function() {
 			}
 		}
 	}
-	$('#p-post-elog-text').keyup(function(e) { if(($('#p-post-elog-text').val() != '') && (e.keyCode == 13)) simple_post(); });
+	$('#p-post-elog-text').keyup(function(e) {
+		if(($('#p-post-elog-text').val() != '') && (e.keyCode == 13)) simple_post();
+	});
 
-	applications = {
-		'p-appl-experiment' : exper,
-		'p-appl-elog'       : elog,
-		'p-appl-datafiles'  : datafiles,
-		'p-appl-hdf5'       : hdf,
-		'p-appl-help'       : new p_appl_help()			// TODO: implement it the same wa as for e-Log
-	};
-
-	/* TODO: Fix this, either by recpecting the GET parameter of this PHP script
-	 *       or by analyzing the code. (better not to do the last thing).
-	 */
-	current_application = applications['p-appl-experiment'];
-	current_application.select_default();
-	v_item_selected($('#v-menu > #experiment').children('.v-item#summary'));
+	// Finally, activate the selected application.
+	//
+	for(var id in applications) {
+		var application = applications[id];
+		if(application.name == select_app) {
+			$('#p-menu').children('#p-appl-'+select_app).each(function() { m_item_selected(this); });
+			if( '' != select_app_context1 ) {
+				v_item_selected($('#v-menu > #'+select_app+' > #'+select_app_context1));
+				application.select(select_app_context1);
+			}
+		}
+	}
 });
 
 /* TODO: Merge these application objects into statically create JavaScript
@@ -1495,40 +1748,6 @@ function p_appl_help() {
         <div class="link" style="float:left;" >Recent (Live)</div>
         <div style="clear:both;"></div>
       </div>
-<!--
-      <div class="v-group-members v-group-members-visible">
-        <div class="v-item v-item-first" id="20">
-          <div class="ui-icon ui-icon-triangle-1-s" style="float:left;"></div>
-          <div class="link" style="float:left;" >20</div>
-          <div style="clear:both;"></div>
-        </div>
-        <div class="v-item" id="100">
-          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
-          <div class="link" style="float:left;" >100</div>
-          <div style="clear:both;"></div>
-        </div>
-        <div class="v-item" id="12h">
-          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
-          <div class="link" style="float:left;" >shift</div>
-          <div style="clear:both;"></div>
-        </div>
-        <div class="v-item" id="24h">
-          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
-          <div class="link" style="float:left;" >24 hrs</div>
-          <div style="clear:both;"></div>
-        </div>
-        <div class="v-item" id="7d">
-          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
-          <div class="link" style="float:left;" >7 days</div>
-          <div style="clear:both;"></div>
-        </div>
-        <div class="v-item" id="">
-          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
-          <div class="link" style="float:left;" >everything</div>
-          <div style="clear:both;"></div>
-        </div>
-      </div>
--->
       <div class="v-group" id="post">
         <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
         <div class="link" style="float:left;" >Post</div>
@@ -1551,26 +1770,9 @@ function p_appl_help() {
           <div style="clear:both;"></div>
         </div>
       </div>
-      <div class="v-group" id="search">
+      <div class="v-item" id="search">
         <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
         <div class="link" style="float:left;" >Search</div>
-        <div style="clear:both;"></div>
-      </div>
-      <div class="v-group-members v-group-members-hidden">
-        <div class="v-item v-item-first" id="simple">
-          <div class="ui-icon ui-icon-triangle-1-s" style="float:left;"></div>
-          <div class="link" style="float:left;" >simple</div>
-          <div style="clear:both;"></div>
-        </div>
-        <div class="v-item" id="advanced">
-          <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
-          <div class="link" style="float:left;" >advanced</div>
-          <div style="clear:both;"></div>
-        </div>
-      </div>
-      <div class="v-item" id="browse">
-        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
-        <div style="float:left;" >Browse</div>
         <div style="clear:both;"></div>
       </div>
       <div class="v-item" id="shifts">
@@ -1581,6 +1783,11 @@ function p_appl_help() {
       <div class="v-item" id="runs">
         <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
         <div style="float:left;" >Runs</div>
+        <div style="clear:both;"></div>
+      </div>
+      <div class="v-item" id="attachments">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Attachments</div>
         <div style="clear:both;"></div>
       </div>
       <div class="v-item" id="subscribe">
@@ -1644,6 +1851,10 @@ function p_appl_help() {
     <div id="elog-recent"        class="application-workarea hidden"><?php echo $elog_recent_workarea ?></div>
     <div id="elog-post"          class="application-workarea hidden"><?php echo $elog_post_workarea ?></div>
     <div id="elog-search"        class="application-workarea hidden"><?php echo $elog_search_workarea ?></div>
+    <div id="elog-shifts"        class="application-workarea hidden"><?php echo $elog_shifts_workarea ?></div>
+    <div id="elog-runs"          class="application-workarea hidden"><?php echo $elog_runs_workarea ?></div>
+    <div id="elog-attachments"   class="application-workarea hidden"><?php echo $elog_attachments_workarea ?></div>
+    <div id="elog-subscribe"     class="application-workarea hidden"><?php echo $elog_subscribe_workarea ?></div>
     <div id="datafiles-summary"  class="application-workarea hidden"><?php echo $datafiles_summary_workarea ?></div>
     <div id="datafiles-files"    class="application-workarea hidden"><?php echo $datafiles_files_workarea ?></div>
     <div id="hdf-manage"         class="application-workarea hidden"><?php echo $hdf_manage_workarea ?></div>

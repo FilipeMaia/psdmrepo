@@ -34,13 +34,13 @@ function elog_create() {
 	/* The context for v-menu items
 	 */
 	var context2_default = {
-		'recent' : '',
-		'post'   : 'experiment',
-		'search' : 'simple',
-		'browse' : '',
-		'shifts' : '',
-		'runs'   : '',
-		'subscribe' : ''
+		'recent'      : '',
+		'post'        : 'experiment',
+		'search'      : '',
+		'shifts'      : '',
+		'runs'        : '',
+		'attachments' : '',
+		'subscribe'   : ''
 	};
 	this.name      = 'elog';
 	this.full_name = 'e-Log';
@@ -90,16 +90,6 @@ function elog_create() {
 				$('#el-p-message4run'       ).removeClass('hidden' ).addClass('visible');
 			}
 			this.post_reset();
-
-		} else if(this.context1 == 'search') {
-			if(this.context2 == 'simple') {
-				$('#elog-form-search input').attr('disabled', 'disabled');
-				$('#elog-form-search select').attr('disabled', 'disabled');
-				$('#elog-form-search input[name="text2search"]').removeAttr('disabled');
-			} else {
-				$('#elog-form-search input').removeAttr('disabled');
-				$('#elog-form-search select').removeAttr('disabled');
-			}
 		}
 	};
 
@@ -188,7 +178,7 @@ function elog_create() {
 			var urlbase = window.location.href;
 			var idx = urlbase.indexOf( '&' );
 			if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
-			$('#elog-form-post input[name="onsuccess"]').val(urlbase+'&page1=elog&page2=post');
+			$('#elog-form-post input[name="onsuccess"]').val(urlbase+'&app=elog:post');
 
 			if( that.context2 == 'run' ) {
 
@@ -441,6 +431,7 @@ function elog_create() {
 		this.search_message_viewer = new elog_message_viewer_create('elog.search_message_viewer', this, 'el-s');
 		$('#elog-search-submit').button().click(function() { that.search(); });
 		$('#elog-search-reset').button().click(function() {	that.search_reset(); });
+		$('#elog-form-search').find('input[name="text2search"]').keyup(function(e) { if( e.keyCode == 13 ) that.search(); });
 		$('#elog-form-search input[name="posted_at_instrument"]').change( function() {
 			$('#el-s-ms-info').html('Updating tags and authors...');
 			var params = {id: that.exp_id};
@@ -465,8 +456,10 @@ function elog_create() {
 				alert('failed because of: '+jqXHR.statusText);
 			});
 		});
+		$('#elog-form-search').find('input[name="runs"]').keyup(function(e) { if( e.keyCode == 13 ) that.search(); });
 	};
 	this.simple_search = function(text2search) {
+		this.search_reset();
 		$('#elog-form-search input[name="text2search"]').val(text2search);
 		var search_in_messages   = 1,
 		    search_in_tags       = 0,
@@ -478,7 +471,8 @@ function elog_create() {
 		    begin                = '',
 		    end                  = '',
 		    tag                  = '',
-		    author               = '';
+		    author               = '',
+		    range_of_runs        = '';
 		this.search_message_viewer.search(
 			text2search,
 			search_in_messages,
@@ -491,14 +485,11 @@ function elog_create() {
 			begin,
 			end,
 			tag,
-			author
+			author,
+			range_of_runs
 		);
 	};
 	this.search = function() {
-		if(this.context2 == 'simple') {
-			this.simple_search($('#elog-form-search input[name="text2search"]').val());
-			return;
-		}
 		function is_checked(checkbox) {
 			return $('#elog-form-search input[name="'+checkbox+'"]').attr('checked') ? 1 : 0;
 		}
@@ -514,7 +505,8 @@ function elog_create() {
 			$('#elog-form-search input[name="begin"]').val(),
 			$('#elog-form-search input[name="end"]').val(),
 			$('#elog-form-search select[name="tag"]').val(),
-			$('#elog-form-search select[name="author"]').val()
+			$('#elog-form-search select[name="author"]').val(),
+			$('#elog-form-search input[name="runs"]').val()
 		);
 	};
 
@@ -539,6 +531,616 @@ function elog_create() {
 		$('#elog-form-search input[name="end"]').val('');
 		$('#elog-form-search select[name="tag"]').val('');
 		$('#elog-form-search select[name="author"]').val('');
+		$('#elog-form-search input[name="runs"]').val('');
+	};
+
+	/* ---------------------------------------------
+	 *  Initialize the page with the list of shifts
+	 * ---------------------------------------------
+	 */
+	this.shifts_last_request = null;
+	this.shifts_max_seconds = 1;
+	this.toggle_shift = function(idx) {
+		var s = this.shifts_last_request[idx];
+		var toggler='#el-sh-tgl-'+s.id;
+		var container='#el-sh-con-'+s.id;
+		if( $(container).hasClass('el-sh-hdn')) {
+			$(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+			$(container).removeClass('el-sh-hdn').addClass('el-sh-vis');
+		} else {
+			$(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+			$(container).removeClass('el-sh-vis').addClass('el-sh-hdn');
+		}
+
+	};
+	this.shift2html = function(idx) {
+		var s = this.shifts_last_request[idx];
+		var crew = '';
+		for( var i=0; i < s.crew.length; i++ ) {
+			crew += s.crew[i]+'<br>';
+		}
+		var runs = '';
+		for( var i=0; i < s.runs.length; i++ ) {
+			var r = s.runs[i];
+			runs += '<div style="float:left; margin-right:10px;"><a class="link" href="../logbook/?action=select_run_by_id&id='+r.id+'" target="_blank">'+r.num+'</a></div>';
+		}
+		if( runs != '' ) runs += '<div style="clear:both;"></div>';
+		var html =
+'<div class="el-sh-hdr" id="el-sh-hdr-'+idx+'" onclick="elog.toggle_shift('+idx+');">'+
+'  <div style="float:left; margin-right:20px;"><span class="toggler ui-icon ui-icon-triangle-1-e el-sh-tgl" id="el-sh-tgl-'+s.id+'"></span></div>'+
+'  <div style="float:left;"><b>begin:</b></div>'+
+'  <div style="float:left;" class="el-sh-begin">'+s.begin+'</div>'+
+'  <div style="float:left;"><b>end:</b></div>'+
+'  <div style="float:left;" class="el-sh-end">'+s.end+'</div>'+
+'  <div style="float:left;"><b>leader:</b></div>'+
+'  <div style="float:left;" class="el-sh-leader">'+s.leader+'</div>'+
+'  <div style="float:left;"><b># of runs:</b></div>'+
+'  <div style="float:left;" class="el-sh-runs">'+s.num_runs+'</div>'+
+'  <div style="float:left;"><b>duration:</b></div>'+
+'  <div style="float:left;" class="el-sh-durat">'+s.durat+'</div>'+
+'  <div style="float:left; width:'+Math.floor(200*(s.sec/this.shifts_max_seconds))+'px;" class="el-sh-bar">&nbsp;</div>'+
+'  <div style="clear:both;"></div>'+
+'</div>'+
+'<div class="el-sh-con el-sh-hdn" id="el-sh-con-'+s.id+'">'+
+'  <table><tbody>'+
+'    <tr>'+
+'      <td class="table_cell table_cell_left  table_cell_top">Crew:&nbsp;&nbsp;</td>'+
+'      <td class="table_cell table_cell_right table_cell_top">'+crew+'</td></tr>'+
+'    <tr>'+
+'     <td class="table_cell table_cell_left  ">Goals:&nbsp;&nbsp;</td>'+
+'     <td class="table_cell table_cell_right "><textbox rows="10" cols="64">'+s.goals+'</textbox ></td></tr>'+
+'    <tr>'+
+'     <td class="table_cell table_cell_left  table_cell_bottom">Runs:&nbsp;&nbsp;</td>'+
+'     <td class="table_cell table_cell_right table_cell_bottom">'+runs+'</td></tr>'+
+'  </tbody></table>'+
+'</div>';
+		return html;
+	};
+	this.display_shifts = function() {
+		var shifts = this.shifts_last_request;
+		var html = '';
+		for( var i=0; i < shifts.length; i++ ) {
+			html += this.shift2html(i);
+		}
+		$('#el-sh-list').html(html);
+	};
+	this.sort_shifts = function() {
+		function compare_elements_by_begin(a, b) { return b.begin_sec - a.begin_sec; }
+		function compare_elements_by_runs(a, b) { return b.num_runs - a.num_runs; }
+		function compare_elements_by_duration(a, b) { return b.sec - a.sec; }
+		var sort_function = null;
+		switch( $('#el-sh-wa' ).find('select[name="sort"]').val()) {
+		case 'begin'   : sort_function = compare_elements_by_begin; break;
+		case 'runs'    : sort_function = compare_elements_by_runs; break;
+		case 'duration': sort_function = compare_elements_by_duration; break;
+		}
+		this.shifts_last_request.sort( sort_function );
+	};
+	this.update_shifts = function() {
+		$('#el-sh-updated').html('Updating shifts...');
+		var params = {exper_id: that.exp_id};
+		var jqXHR = $.get('../logbook/RequestAllShifts.php',params,function(data) {
+			var result = eval(data);
+			if(result.Status != 'success') {
+				$('#el-sh-updated').html(result.Message);
+				return;
+			}
+			that.shifts_last_request = result.Shifts;
+			that.shifts_max_seconds  = result.MaxSeconds;
+			that.sort_shifts();
+			that.display_shifts();
+			$('#el-sh-info').html('<b>'+that.shifts_last_request.length+'</b> shifts');
+			$('#el-sh-updated').html('[ Last update on: <b>'+result.Updated+'</b> ]');
+		},
+		'JSON').error(function () {
+			alert('failed because of: '+jqXHR.statusText);
+		});
+	};
+	this.shifts_init = function() {
+		$('#el-sh-refresh').button().click(function() { that.update_shifts(); });
+		$('#el-sh-wa' ).find('select[name="sort"]').change(function() {
+			that.sort_shifts();
+			that.display_shifts();
+		});
+		$('#el-sh-reverse').button().click(function() {
+			that.shifts_last_request.reverse();
+			that.display_shifts();
+		});
+		$('#el-sh-new-begin').button().click(function() {
+			$('#el-sh-new-wa').removeClass("el-sh-new-hdn").addClass("el-sh-new-vis");
+			$(this).button("disable");
+		});
+		$('#el-sh-new-submit').button().click(function() {
+			$('#el-sh-new-wa').removeClass("el-sh-new-vis").addClass("el-sh-new-hdn");
+			$('#el-sh-new-begin').button("enable");
+			var urlbase = window.location.href;
+			var idx = urlbase.indexOf( '&' );
+			if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
+			$('#elog_new_shift_form input[name="actionSuccess"]').val(urlbase+'&app=elog:shifts');
+			$('#elog_new_shift_form').trigger('submit');
+		});
+		$('#el-sh-new-cancel').button().click(function() {
+			$('#el-sh-new-wa').removeClass("el-sh-new-vis").addClass("el-sh-new-hdn");
+			$('#el-sh-new-begin').button("enable");
+		});
+		this.update_shifts();
+	};
+
+	/* -------------------------------------------
+	 *  Initialize the page with the list of runs
+	 * -------------------------------------------
+	 */
+	this.runs_last_request = null;
+	this.runs_max_seconds = 1;
+	this.toggle_run = function(idx) {
+		var r = this.runs_last_request[idx];
+		var toggler='#el-r-tgl-'+r.id;
+		var container='#el-r-con-'+r.id;
+		if( $(container).hasClass('el-r-hdn')) {
+			$(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+			$(container).removeClass('el-r-hdn').addClass('el-r-vis');
+			if(r.loaded) return;
+			$('#el-r-con-'+r.id).html('Loading...');
+			$.get('../logbook/DisplayRunParams.php',{id:r.id},function(data) {
+				$('#el-r-con-'+r.id).html(
+					'<div style="width:800px; height:300px; overflow:auto; padding:10px; background-color:#ffffff; ">'+data+'</div>'
+				);
+				r.loaded = true;
+			});
+		} else {
+			$(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+			$(container).removeClass('el-r-vis').addClass('el-r-hdn');
+		}
+
+	};
+	this.run2html = function(idx) {
+		var r = this.runs_last_request[idx];
+		var html =
+'  <div class="el-r-hdr" id="el-r-hdr-'+idx+'" onclick="elog.toggle_run('+idx+');">'+
+'    <div style="float:left;"><span class="toggler ui-icon ui-icon-triangle-1-e el-r-tgl" id="el-r-tgl-'+r.id+'"></span></div>'+
+'    <div style="float:left;" class="el-r-num">run:&nbsp;&nbsp;'+r.num+'</div>'+
+'    <div style="float:left;" class="el-r-day">'+r.day+'</div>'+
+'    <div style="float:left;" class="el-r-ival">'+r.ival+'</div>'+
+'    <div style="float:left;"><b>duration:&nbsp;&nbsp;</b></div>'+
+'    <div style="float:left;" class="el-r-durat">'+r.durat+'</div>'+
+'    <div style="float:left; width:'+Math.floor(200*(r.sec/this.runs_max_seconds))+'px;" class="el-r-bar">&nbsp;</div>'+
+'    <div style="clear:both;"></div>'+
+'  </div>'+
+'  <div class="el-r-con el-r-hdn" id="el-r-con-'+r.id+'"></div>';
+		return html;
+	};
+	this.display_runs = function() {
+		var runs = this.runs_last_request;
+		var html = '';
+		for( var i=0; i < runs.length; i++ ) {
+			runs[i].loaded = false;
+			html += this.run2html(i);
+		}
+		$('#el-r-list').html(html);
+	};
+	this.sort_runs = function() {
+		function compare_elements_by_run(a, b) { return b.num - a.num; }
+		function compare_elements_by_duration(a, b) { return b.sec - a.sec; }
+		var sort_function = null;
+		switch( $('#el-r-wa' ).find('select[name="sort"]').val()) {
+		case 'run'     : sort_function = compare_elements_by_run; break;
+		case 'duration': sort_function = compare_elements_by_duration; break;
+		}
+		this.runs_last_request.sort( sort_function );
+	};
+	this.update_runs = function() {
+		$('#el-r-updated').html('Updating runs...');
+		var params = {exper_id: that.exp_id};
+		var jqXHR = $.get('../logbook/RequestAllRuns.php',params,function(data) {
+			var result = eval(data);
+			if(result.Status != 'success') {
+				$('#el-r-updated').html(result.Message);
+				return;
+			}
+			that.runs_last_request = result.Runs;
+			that.runs_max_seconds  = result.MaxSeconds;
+			that.sort_runs();
+			that.display_runs();
+			$('#el-r-info').html('<b>'+that.runs_last_request.length+'</b> runs');
+			$('#el-r-updated').html('[ Last update on: <b>'+result.Updated+'</b> ]');
+		},
+		'JSON').error(function () {
+			alert('failed because of: '+jqXHR.statusText);
+		});
+	};
+	this.runs_init = function() {
+		$('#el-r-refresh').button().click(function() { that.update_runs(); });
+		$('#el-r-wa' ).find('select[name="sort"]').change(function() {
+			that.sort_runs();
+			that.display_runs();
+		});
+		$('#el-r-reverse').button().click(function() {
+			that.runs_last_request.reverse();
+			that.display_runs();
+		});
+		this.update_runs();
+	};
+
+	/* --------------------------------------------------
+	 *  Initialize the page with the list of attachments
+	 * --------------------------------------------------
+	 */
+	this.attachments_last_request = null;
+	this.sort_attachments = function() {
+		function compare_elements_by_posted(a, b) { return b.time64 - a.time64; }
+		function compare_elements_by_author(a, b) { if( a.type != 'a' ) return -1; if( b.type != 'a' ) return 1; return ( a.e_author  < b.e_author ? -1 : (a.e_author > b.e_author ? 1 : 0 )); }
+		function compare_elements_by_name  (a, b) { if( a.type != 'a' ) return -1; if( b.type != 'a' ) return 1; return ( a.a_name    < b.a_name   ? -1 : (a.a_name   > b.a_name   ? 1 : 0 )); }
+		function compare_elements_by_type  (a, b) { if( a.type != 'a' ) return -1; if( b.type != 'a' ) return 1; return ( a.a_type    < b.a_type   ? -1 : (a.a_type   > b.a_type   ? 1 : 0 )); }
+		function compare_elements_by_size  (a, b) { if( a.type != 'a' ) return -1; if( b.type != 'a' ) return 1; return   b.a_size    - a.a_size; }
+		var sort_function = null;
+		switch( $('#el-at-wa' ).find('select[name="sort"]').val()) {
+		case 'posted': sort_function = compare_elements_by_posted; break;
+		case 'author': sort_function = compare_elements_by_author; break;
+		case 'name':   sort_function = compare_elements_by_name;   break;
+		case 'type':   sort_function = compare_elements_by_type;   break;
+		case 'size':   sort_function = compare_elements_by_size;   break;
+		}
+		this.attachments_last_request.sort( sort_function );
+	};
+	this.display_attachments_as_table = function() {
+		var html =
+'<table><tbody>'+
+'  <tr>'+
+'    <td class="table_hdr">Host Message</td>'+
+'    <td class="table_hdr">Posted</td>'+
+'    <td class="table_hdr">Author</td>'+
+'    <td class="table_hdr">Attachment Name</td>'+
+'    <td class="table_hdr">Type</td>'+
+'    <td class="table_hdr">Size</td>'+
+'  </tr>';
+		var attachments = this.attachments_last_request;
+		for(var i=0; i < attachments.length; i++) {
+			var extra_class = (i == attachments.length-1 ? 'table_cell_bottom' : '');
+			var a = attachments[i];
+			if( a.type != 'a' ) continue;
+			html +=
+'  <tr>'+
+'    <td class="table_cell '+extra_class+' table_cell_left">' +a.e_url   +'</td>'+
+'    <td class="table_cell '+extra_class+'">'                 +a.e_time  +'</td>'+
+'    <td class="table_cell '+extra_class+'">'                 +a.e_author+'</td>'+
+'    <td class="table_cell '+extra_class+'">'                 +a.a_url   +'</td>'+
+'    <td class="table_cell '+extra_class+'">'                 +a.a_type  +'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_right">'+a.a_size  +'</td>'+
+'  </tr>';
+		}
+		html +=
+'</tbody></table>';
+		return html;
+	};
+	this.display_attachments_as_table_with_runs = function() {
+		var html =
+'<table><tbody>'+
+'  <tr>'+
+'    <td class="table_hdr">Run</td>'+
+'    <td class="table_hdr">Started</td>'+
+'    <td class="table_hdr">Message</td>'+
+'    <td class="table_hdr">Posted</td>'+
+'    <td class="table_hdr">Author</td>'+
+'    <td class="table_hdr">Attachment Name</td>'+
+'    <td class="table_hdr">Type</td>'+
+'    <td class="table_hdr">Size</td>'+
+'  </tr>';
+		var run_specific_style = 'style="background-color:#f0f0f0;"';
+		var attachments = this.attachments_last_request;
+		for(var i=0; i < attachments.length; i++) {
+			var extra_class = (i == attachments.length-1 ? 'table_cell_bottom' : '');
+			var a = attachments[i];
+			if( a.type == 'a' ) {
+				html +=
+'  <tr>'+
+'    <td class="table_cell '+extra_class+' table_cell_left">'            +'</td>'+
+'    <td class="table_cell '+extra_class+'">'                            +'</td>'+
+'    <td class="table_cell '+extra_class+'">'                 +a.e_url   +'</td>'+
+'    <td class="table_cell '+extra_class+'">'                 +a.e_time  +'</td>'+
+'    <td class="table_cell '+extra_class+'">'                 +a.e_author+'</td>'+
+'    <td class="table_cell '+extra_class+'">'                 +a.a_url   +'</td>'+
+'    <td class="table_cell '+extra_class+'">'                 +a.a_type  +'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_right">'+a.a_size  +'</td>'+
+'  </tr>';
+			} else {
+				html +=
+'  <tr>'+
+'    <td class="table_cell '+extra_class+' table_cell_left" ' +run_specific_style+'>'+a.r_url  +'</td>'+
+'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'+a.r_begin+'</td>'+
+'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'          +'</td>'+
+'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'          +'</td>'+
+'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'          +'</td>'+
+'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'          +'</td>'+
+'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'          +'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_right" '+run_specific_style+'>'          +'</td>'+
+'  </tr>';
+			}
+		}
+		html +=
+'</tbody></table>';
+		return html;
+	};
+	this.display_attachments_as_thumbnail = function() {
+		var html = '';
+		var attachments = this.attachments_last_request;
+		for(var i=0; i < attachments.length; i++) {
+			var extra_class = (i == attachments.length-1 ? 'table_cell_bottom' : '');
+			var a = attachments[i];
+			if( a.type != 'a' ) continue;
+			var title =
+				'name: '+a.a_name+'\n'+
+				'type: '+a.a_type+'\n'+
+				'size: '+a.a_size+'\n'+
+				'posted: '+a.e_time+'\n'+
+				'author: '+a.e_author;
+			html +=
+'<div style="float:left;" title="'+title+'"><a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank"><img style="height:160px; padding:8px;" src="../logbook/attachments/preview/'+a.a_id+'" /></a></div>';
+		}
+		return html;
+	};
+	this.display_attachments_as_thumbnail_with_runs = function() {
+		var html = '';
+		var attachments = this.attachments_last_request;
+		for(var i=0; i < attachments.length; i++) {
+			var extra_class = (i == attachments.length-1 ? 'table_cell_bottom' : '');
+			var a = attachments[i];
+			if( a.type == 'a' ) {
+				var title =
+					'name: '+a.a_name+'\n'+
+					'type: '+a.a_type+'\n'+
+					'size: '+a.a_size+'\n'+
+					'posted: '+a.e_time+'\n'+
+					'author: '+a.e_author;
+				html +=
+'<div style="float:left;" title="'+title+'"><a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank"><img style="height:160px;  border-top:solid 1px #d0d0d0; padding:8px; padding-left:0px;" src="../logbook/attachments/preview/'+a.a_id+'" /></a></div>';
+			} else {
+				var title =
+					'run #: '+a.r_num+'\n'+
+					'begin: '+a.r_begin+'\n'+
+					'end: '+a.r_end;
+				html +=
+'<div style="float:left; height:160px; padding:8px; border-left:solid 1px #d0d0d0; border-top:solid 1px #d0d0d0; font-weight:bold;" title="'+title+'">'+a.r_num+' . .</div>';
+			}
+		}
+		return html;
+	};
+	this.display_attachments_as_hybrid = function() {
+		var html =
+'<table><tbody>'+
+'  <tr>'+
+'    <td class="table_hdr">Attachment</td>'+
+'    <td class="table_hdr">Info</td>'+
+'  </tr>';
+		var title = 'open the attachment in a separate tab';
+		var attachments = this.attachments_last_request;
+		for(var i=0; i < attachments.length; i++) {
+			var extra_class = (i == attachments.length-1 ? 'table_cell_bottom' : '');
+			var a = attachments[i];
+			if( a.type != 'a' ) continue;
+			var thumb =
+'<div style="float:left;" title="'+title+'">'+
+'  <a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank">'+
+'    <img style="height:130px;" src="../logbook/attachments/preview/'+a.a_id+'"/>'+
+'  </a>'+
+'</div>';
+			var info =
+'<table><tbody>'+
+'  <tr>'+
+'    <td class="table_cell table_cell_top table_cell_left">Host Message</td>'+
+'    <td class="table_cell table_cell_top table_cell_right">'+a.e_url+'</td>'+
+'  </tr>'+
+'  <tr>'+
+'    <td class="table_cell table_cell_left">Posted</td>'+
+'    <td class="table_cell table_cell_right">'+a.e_time+'</td>'+
+'  </tr>'+
+'  <tr>'+
+'    <td class="table_cell table_cell_left">Author</td>'+
+'    <td class="table_cell table_cell_right">'+a.e_author+'</td>'+
+'  </tr>'+
+'  <tr>'+
+'    <td class="table_cell table_cell_left">Attachment Name</td>'+
+'    <td class="table_cell table_cell_right">'+a.a_url+'</td>'+
+'  </tr>'+
+'  <tr>'+
+'    <td class="table_cell table_cell_left">Type</td>'+
+'    <td class="table_cell table_cell_right">'+a.a_type+'</td>'+
+'  </tr>'+
+'  <tr>'+
+'    <td class="table_cell table_cell_bottom table_cell_left">Size</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_right">'+a.a_size+'</td>'+
+'  </tr>'+
+'</tbody></table>';
+			html +=
+'  <tr>'+
+'    <td class="table_cell '+extra_class+' table_cell_left">' +thumb+'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_right">'+info +'</td>'+
+'  </tr>';
+		}
+		html +=
+'</tbody></table>';
+		return html;
+	};
+	this.display_attachments_as_hybrid_with_runs = function() {
+		var run_specific_style = 'style="background-color:#f0f0f0;"';
+		var html =
+'<table><tbody>'+
+'  <tr>'+
+'    <td class="table_hdr">Run</td>'+
+'    <td class="table_hdr">Started</td>'+
+'    <td class="table_hdr">Attachment</td>'+
+'    <td class="table_hdr">Info</td>'+
+'  </tr>';
+		var title = 'open the attachment in a separate tab';
+		var attachments = this.attachments_last_request;
+		for(var i=0; i < attachments.length; i++) {
+			var extra_class = (i == attachments.length-1 ? 'table_cell_bottom' : '');
+			var a = attachments[i];
+			if( a.type == 'a' ) {
+				var thumb =
+'<div style="float:left;" title="'+title+'">'+
+'  <a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank">'+
+'    <img style="height:130px;" src="../logbook/attachments/preview/'+a.a_id+'"/>'+
+'  </a>'+
+'</div>';
+				var info =
+'<table><tbody>'+
+'  <tr>'+
+'    <td class="table_cell table_cell_top table_cell_left">Host Message</td>'+
+'    <td class="table_cell table_cell_top table_cell_right">'+a.e_url+'</td>'+
+'  </tr>'+
+'  <tr>'+
+'    <td class="table_cell table_cell_left">Posted</td>'+
+'    <td class="table_cell table_cell_right">'+a.e_time+'</td>'+
+'  </tr>'+
+'  <tr>'+
+'    <td class="table_cell table_cell_left">Author</td>'+
+'    <td class="table_cell table_cell_right">'+a.e_author+'</td>'+
+'  </tr>'+
+'  <tr>'+
+'    <td class="table_cell table_cell_left">Attachment Name</td>'+
+'    <td class="table_cell table_cell_right">'+a.a_url+'</td>'+
+'  </tr>'+
+'  <tr>'+
+'    <td class="table_cell table_cell_left">Type</td>'+
+'    <td class="table_cell table_cell_right">'+a.a_type+'</td>'+
+'  </tr>'+
+'  <tr>'+
+'    <td class="table_cell table_cell_bottom table_cell_left">Size</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_right">'+a.a_size+'</td>'+
+'  </tr>'+
+'</tbody></table>';
+				html +=
+'  <tr>'+
+'    <td class="table_cell '+extra_class+' table_cell_left"></td>'+
+'    <td class="table_cell '+extra_class+'"></td>'+
+'    <td class="table_cell '+extra_class+'">' +thumb+'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_right">'+info +'</td>'+
+'  </tr>';
+			} else {
+				html +=
+'  <tr>'+
+'    <td class="table_cell '+extra_class+' table_cell_left" ' +run_specific_style+'>'+a.r_url  +'</td>'+
+'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'+a.r_begin+'</td>'+
+'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'          +'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_right" '+run_specific_style+'>'          +'</td>'+
+'  </tr>';
+			}
+		}
+		html +=
+'</tbody></table>';
+		return html;
+	};
+	this.display_attachments = function() {
+		var html='';
+		var display_name =
+			$('#el-at-wa' ).find('select[name="view"]').val()+
+			($('#el-at-wa' ).find('select[name="runs"]').val() == 'yes' ? 'runs' : '');
+		switch(display_name) {
+		case 'table'         : html = this.display_attachments_as_table              (); break;
+		case 'tableruns'     : html = this.display_attachments_as_table_with_runs    (); break;
+		case 'thumbnails'    : html = this.display_attachments_as_thumbnail          (); break;
+		case 'thumbnailsruns': html = this.display_attachments_as_thumbnail_with_runs(); break;
+		case 'hybrid'        : html = this.display_attachments_as_hybrid             (); break;
+		case 'hybridruns'    : html = this.display_attachments_as_hybrid_with_runs   (); break;
+		}
+		$('#el-at-list').html(html);
+	};
+	this.update_attachments = function() {
+		$('#el-at-updated').html('Updating attachments...');
+		var params = {exper_id: that.exp_id};
+		var jqXHR = $.get('../logbook/RequestAllAttachments.php',params,function(data) {
+			var result = eval(data);
+			if(result.Status != 'success') {
+				$('#el-at-updated').html(result.Message);
+				return;
+			}
+			that.attachments_last_request = result.Attachments;
+			that.sort_attachments();
+			that.display_attachments();
+			var num_attachments = 0;
+			for(var i=0; i < that.attachments_last_request.length; i++) {
+				var a = that.attachments_last_request[i];
+				if( a.type == 'a' ) num_attachments++;
+			}
+			$('#el-at-info').html('<b>'+num_attachments+'</b> attachments');
+			$('#el-at-updated').html('[ Last update on: <b>'+result.Updated+'</b> ]');
+		},
+		'JSON').error(function () {
+			alert('failed because of: '+jqXHR.statusText);
+		});
+	};
+	this.attachments_init = function() {
+		$('#el-at-refresh').button().click(function() { that.update_attachments(); });
+		$('#el-at-wa').find('select[name="sort"]').change(function(){
+			that.sort_attachments();
+			that.display_attachments();
+		});
+		$('#el-at-wa').find('select[name="view"]').change(function(){
+			that.display_attachments();
+		});
+		$('#el-at-wa').find('select[name="runs"]').change(function(){
+			that.display_attachments();
+		});
+		$('#el-at-reverse').button().click(function() {
+			that.attachments_last_request.reverse();
+			that.display_attachments();
+		});
+		this.update_attachments();
+	};
+
+	/* ----------------------------------------------
+	 *  Initialize page with subscription management
+	 * ----------------------------------------------
+	 */
+	this.subscription = function(operation, id) {
+		var params = {exper_id: this.exp_id, operation: operation};
+		if( id != null ) params.id = id;
+		var jqXHR = $.get('../logbook/CheckSubscription.php',params,function(data) {
+			var result = eval(data);
+			if(result.Status != 'success') {
+				alert( 'failed because of: '+result.Message );
+				return;
+			}
+			$('#el-subscribed'  ).css('display', result.Subscribed ? 'block' : 'none' );
+			$('#el-unsubscribed').css('display', result.Subscribed ? 'none'  : 'block');
+			var html = '';
+			var all_subscriptions = result.AllSubscriptions;
+			for( var i=0; i < all_subscriptions.length; i++) {
+				var s = all_subscriptions[i];
+				var extra_class = (i == all_subscriptions.length-1 ? 'table_cell_bottom' : '');
+				html +=
+'  <tr><td class="table_cell '+extra_class+' table_cell_left" >'+s.address        +'</td>'+
+'      <td class="table_cell '+extra_class+' "                >'+s.subscriber     +'</td>'+
+'      <td class="table_cell '+extra_class+' "                >'+s.subscribed_host+'</td>'+
+'      <td class="table_cell '+extra_class+' "                >'+s.subscribed_time+'</td>'+
+'      <td class="table_cell '+extra_class+' table_cell_right"><button title="Stop receiving automated notifications" value='+s.id+'>Unsubscribe</button></td></tr>';
+			}
+			if( html != '' ) {
+				html =
+'<h3>All subscriptions for this e-Log:</h3>'+
+'<table style="padding-left:10px;"><tbody>'+
+'  <tr><td class="table_hdr">Recipient</td>'+
+'      <td class="table_hdr">Subscribed by</td>'+
+'      <td class="table_hdr">From host</td>'+
+'      <td class="table_hdr">Date</td>'+
+'      <td class="table_hdr">Actions</td></tr>'+
+html+
+'</tbody></table>';
+
+			}
+			$('#el-subscribe-all').html(html);
+			$('#el-subscribe-all').find('button').button().click(function() {
+				that.subscription('UNSUBSCRIBE', $(this).val());
+			});
+		},
+		'JSON').error(function () {
+			alert('failed because of: '+jqXHR.statusText);
+		});
+	};
+	this.subscribe_init = function() {
+		$('#el-subscribe'  ).button().click(function() { that.subscription('SUBSCRIBE',   null); });
+		$('#el-unsubscribe').button().click(function() { that.subscription('UNSUBSCRIBE', null); });
+		this.subscription('CHECK', null);
 	};
 
 	/* ----------------------------------
@@ -555,6 +1157,10 @@ function elog_create() {
 		this.live_init();
 		this.post_init();
 		this.search_init();
+		this.shifts_init();
+		this.runs_init();
+		this.attachments_init();
+		this.subscribe_init();
 		return true;
 	};
 }
@@ -737,7 +1343,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			$('#'+this.base+'-r-con-'+entry.id).html('Loading...');
 			$.get('../logbook/DisplayRunParams.php',{id:entry.run_id},function(data) {
 				$('#'+that.base+'-r-con-'+entry.id).html(
-					'<div style="width:800px; height:300px; overflow:auto; padding:10px; background-color:#ffffff; ">'+data+'</div>'
+					'<div style="width:100%; height:300px; overflow:auto; padding:10px; background-color:#ffffff; ">'+data+'</div>'
 				);
 				entry.loaded = true;
 			});
@@ -780,7 +1386,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 
 
 	/**
-	 * Check if new messages/rusn are aavailable, and if so - refresh the view.
+	 * Check if new messages/rusn are available, and if so - refresh the view.
 	 * Highlight the new content if teh 'highlighter' function is passed as
 	 * a parameter.
 	 * 
@@ -934,7 +1540,8 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		begin,
 		end,
 		tag,
-		author) {
+		author,
+		range_of_runs) {
 
 		var params = {
 			id                  : this.parent.exp_id,
@@ -950,7 +1557,8 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			begin               : begin,
 			end                 : end,
 			tag                 : tag,
-			author              : author
+			author              : author,
+			range_of_runs       : range_of_runs
 		};
 		this.do_reload(params);
 	};
@@ -1237,7 +1845,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
 			html +=
 '      <div style="float:right;" class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',false);">reply</button></div>'+
-'      <div style="float:left; font-size:12px;">'+entry.html1+'</div>'+
+'      <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>'+
 '      <div style="clear:both;"></div>'+
 '      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
 '    </div>';
@@ -1305,7 +1913,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '</div>'+
 '<div class="el-l-c-con el-l-c-hdn" id="'+this.base+'-c-con-'+entry.id+'">'+
 '  <div class="el-l-c-body">'+
-'    <div style="float:left; font-size:12px;">'+entry.html1+'</div>';
+'    <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>';
 		if(this.parent.editor)
 			html +=
 '    <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',true);">edit</button></div>';
@@ -1362,14 +1970,16 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 	 *       designed and used.
 	 */
 	this.highlight_day = function(idx) {
+		return;
 		if(that.current_day == idx) return;
 		that.current_day = idx;
 		var day = that.days2threads[idx];
-		applications['p-appl-elog'].context3 = '<a class="link" href="#'+this.base+'-m-d-hdr-'+idx+'" title="go to the day header">'+day.ymd+'</a>';
+		applications['p-appl-elog'].context3 = '<a class="link" href="#'+this.base+'-m-d-hdr-'+idx+'" title="go to the day header">'+that.days2threads[idx].ymd+'</a>';
 		set_context(applications['p-appl-elog']);
 	};
 
 	this.dim_day = function() {
+		return;
 		if(that.current_day == null) return;
 		that.current_day = null;
 		applications['p-appl-elog'].context3 ='';

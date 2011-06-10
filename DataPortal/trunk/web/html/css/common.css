@@ -30,3 +30,27 @@ td.table_cell_bottom {
 td.table_cell_within_group {
   border-bottom: none;
 }
+
+/* Compact borderless table */
+
+td.ctable_hdr {
+  background-color:#d0d0d0;
+  padding: 2px 6px 2px 6px;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 75%;
+}
+
+td.ctable_cell {
+  font-family: Arial, sans-serif;
+  font-size: 75%;
+}
+td.ctable_cell_left {
+  font-weight: bold;
+}
+td.ctable_cell_right {
+}
+td.ctable_cell_bottom {
+}
+td.ctable_cell_within_group {
+}

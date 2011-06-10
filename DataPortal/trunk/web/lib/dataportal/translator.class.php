@@ -161,7 +161,7 @@ class Translator {
    					'id' => $run_icws->id,
 					'run_number' => $run_logbook->num(),
 					'run_id' => $run_logbook->id(),
-					'end_of_run' => $run_logbook->end_time()->toStringShort(),
+					'end_of_run' => is_null( $run_logbook->end_time()) ? '' : $run_logbook->end_time()->toStringShort(),
 					'status' => $status,
 					'changed' => $changed,
 					'log_available' => ( !is_null( $run_icws ) && ( $run_icws->log_url != '' )) ? 1 : 0,
