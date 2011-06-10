@@ -1,0 +1,36 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package DataPortal
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-04
+2011-06-10 Igor Gaponenko
+- committing and tagging the first production version of the Protal
+
+Tag: V00-00-03
+2011-05-15 Igor Gaponenko
+- protected Portal pages from being accessed by non-authorized users
+- tagging as the first production version
+
+2011-05-13 Igor Gaponenko
+- save results of the on-going development
+
+2011-04-08 Igor Gaponenko
+- save results of the on-going development
+
+Tag: V00-00-02
+2011-02-25 Igor Gaponenko
+- the first usable version of e-log Live & Post pages
+
+Tag: V00-00-01
+2010-10-20 Igor Gaponenko
+- this is an initial commit of the Protal implementation with the main goal to save the
+code to SVN.

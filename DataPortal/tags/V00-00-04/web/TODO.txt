@@ -1,0 +1,45 @@
+
+			====================================
+			The development ideas for the Portal
+			====================================
+
+________________
+October 29, 2010
+
+  ________________________
+  1. E-logs for facilities
+
+  Investigate the best way of adding special logbooks for so called facilities ('Laser',
+  'SXR Instrument', 'AMO Instrument', etc.). Possible options:
+
+  - introduce a subtabs layer under the 'e-log' tab
+  (main disadvantage: too many clicks to get to the e-log)
+
+  - add them as separate top-level tabs: 'Laser', 'SXR Instrument', 'AMO Instrument'
+  (disadvantage: too many top-level tabs)
+
+  - add a top level tab 'Facilities' (or 'More...') and put these e-logs as separate
+  sub-tabs
+  (probably the best solution)
+
+  Look at how to avoid (as much as possible) code duplication when implementing e-log
+  UI and PHP services.
+
+  _________________
+  2. PDF generators
+
+  Look at how to better follow the MVC pattern for HTML & PDF generation. The idea is to avoid
+  code duplication where it's possible.
+
+
+
+  _________________________________________________
+  3. Dealig with browsers' Refresh and Back buttons
+ 
+  Investigate if it's possible to rewrite the browsers' History object to return
+  to the same tab after pressing Refresh.
+
+  Look at possibility to pop-up a dialog to warn a user not to use the Back button
+  when the one is pressed (accidentally). Investigate side effects of the second
+  dialog which might be automatically launched by browsers under certain conditions.
+
