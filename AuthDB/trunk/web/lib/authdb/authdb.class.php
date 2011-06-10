@@ -416,7 +416,7 @@ HERE;
             "SELECT * FROM {$this->connection->database}.user u, {$this->connection->database}.role r, {$this->connection->database}.priv p".
             " WHERE p.name='{$priv}' AND p.role_id=r.id AND r.app='{$app}'".
             " AND u.user='{$user}' AND u.role_id=r.id".
-            (is_null($exper_id) ? "" : " AND ((u.exp_id={$exper_id}) OR (u.exp_id IS NULL))");
+            (is_null($exper_id) ? " AND u.exp_id IS NULL" : " AND ((u.exp_id={$exper_id}) OR (u.exp_id IS NULL))");
         $result = $this->connection->query ( $sql );
 
         $nrows = mysql_numrows( $result );
@@ -507,12 +507,17 @@ HERE;
 /*
  * Unit tests
  *
+
+function toYesNo( $boolean_val ) { return '<b>'.( $boolean_val ? 'Yes' : 'No').'</b>'; }
 try {
     $authdb = new AuthDB();
     $authdb->begin();
 
-    $roles = $authdb->roles_by( 'xppopr', 'LogBook', 'XPP' );
-    print_r($roles);
+    print( "<br>has LogBook privelege: : ".toYesNo( $authdb->hasPrivilege( 'rolles', 86, 'LogBook', 'read' )));
+    //print( "<br>has LDAP privelege: : ".toYesNo( $authdb->hasPrivilege( 'rolles', null, 'LDAP', 'manage_groups' )));
+    
+//    $roles = $authdb->roles_by( 'xppopr', 'LogBook', 'XPP' );
+//    print_r($roles);
 
     $authdb->commit();
 
@@ -526,7 +531,6 @@ try {
 
 use RegDB\RegDBException;
 
-function toYesNo( $boolean_val ) { return '<b>'.( $boolean_val ? 'Yes' : 'No').'</b>'; }
 
 function resolve_exper_id( $instrument_name, $experiment_name ) {
     $regdb = new RegDB();

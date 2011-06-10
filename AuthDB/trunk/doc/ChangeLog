@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-17
+2011-06-10 Igor Gaponenko
+- fixed a bug in a method fetching privilges from a database
+
 Tag: V00-00-16
 2011-05-13 Igor Gaponenko
 - added two scripts for reporting and fixing group authorizations
