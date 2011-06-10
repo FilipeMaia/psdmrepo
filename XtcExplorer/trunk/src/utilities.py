@@ -326,20 +326,17 @@ class CsPadData( BaseData ):
 
 
 #-------------------------------------------------------
-# Threshold
+# Threshold  
 #-------------------------------------------------------
 
 class Threshold( object ) :
     def __init__( self,
                   area = None,
-                  minvalue = None,
-                  maxvalue = None,
+                  value = None,
                   ) :
 
         self.area = area        
-        self.minvalue = minvalue
-        self.maxvalue = maxvalue
-
+        self.value = value
 
 
 #-------------------------------------------------------
@@ -474,12 +471,13 @@ class Plotter(object):
             self.frame[frame_name] = aframe
         
     def settings(self
-                 , figsize=(10,8) # size of the figure canvas
+                 , width = 5 # width of a single plot
+                 , height = 4 # height of a single plot
                  , nplots=1  # total number of plots in the figure
                  , maxcol=3  # maximum number of columns
                  ):
-        self.w = 10
-        self.h = 8
+        self.w = width
+        self.h = height
         self.nplots = nplots
         self.maxcol = maxcol
         
@@ -491,11 +489,25 @@ class Plotter(object):
         """
         ncol = 1
         nrow = 1
-        if nplots > 1 :
+        if nplots == 4:
+            ncol = 2
+            nrow = 2
+        elif nplots > 1 :
             ncol = self.maxcol
             if nplots<self.maxcol : ncol = nplots
             nrow = int( nplots/ncol )
+            if (nplots%ncol) > 0 : nrow+=1
+        
+        print "Figuresize: ", self.w*ncol,self.h*nrow
+        print "Figure conf: %d rows x %d cols" % ( nrow, ncol)
+        
+        # --- sanity check ---
+        max =  ncol * nrow
+        if nplots > max :
+            print "utitilities.py: Something wrong with the subplot configuration"
+            print "                Not enough space for %d plots in %d x %d"%(nplots,ncol,nrow)
 
+        
         self.fig = plt.figure(fignum,(self.w*ncol,self.h*nrow))
         self.fignum = fignum
         self.fig.clf()
@@ -517,6 +529,8 @@ class Plotter(object):
                 aframe = Frame()
                 aframe.axes = ax
                 self.frames.append(aframe)
+
+            print "Subplot ", i, " created ", nrow, ncol, i, self.frames[i-1].name
                     
         self.connect()
 
@@ -542,7 +556,7 @@ class Plotter(object):
         for aplot in self.frames :
             if aplot.axes == event.artist.axes : 
 
-                print "Current   threshold = ", aplot.threshold.minvalue
+                print "Current   threshold = ", aplot.threshold.value
                 print "          active area [xmin xmax ymin ymax] = ", aplot.threshold.area
                 print "To change threshold value, middle-click..." 
                 print "To change active area, right-click..." 
@@ -568,12 +582,12 @@ class Plotter(object):
                     plt.draw()
             
                 if event.mouseevent.button == 2 :
-                    text = raw_input("Enter new threshold value (current = %.2f) " % aplot.threshold.minvalue)
+                    text = raw_input("Enter new threshold value (current = %.2f) " % aplot.threshold.value)
                     if text == "" :
                         print "Invalid entry, ignoring"
                     else :
-                        aplot.threshold.minvalue = float(text)
-                        print "Threshold value has been changed to ", aplot.threshold.minvalue
+                        aplot.threshold.value = float(text)
+                        print "Threshold value has been changed to ", aplot.threshold.value
                         plt.draw()
 
             
@@ -690,12 +704,13 @@ class Plotter(object):
         self.fig.suptitle(title)
 
         pos = 0
-        for ad, im in sorted(event_display_images) :
-            pos += 1
-
+        for tuple in event_display_images :
+            ad = tuple[0]
+            im = tuple[1]
             xt = None
-            if extent is not None: xt = extent[pos-1]
+            if len(tuple)==3 : xt = tuple[2]
 
+            pos += 1
             self.drawframe(im,title=ad,fignum=fignum,position=pos,showProj=showProj,extent=xt)
             
         plt.draw()

@@ -106,6 +106,9 @@ class pyana_plotter (object) :
         if display_mode == "NoDisplay" : self.display_mode = 0
         if display_mode == "Interactive" : self.display_mode = 1
         if display_mode == "SlideShow" :   self.display_mode = 2
+        if self.display_mode is None:
+            print "Unknown display mode %s, using NoDisplay (0)"%display_mode
+            self.display_mode = 0
 
         opt = PyanaOptions() # convert option string to appropriate type        
         self.ipython      = opt.getOptBoolean(ipython)
@@ -124,7 +127,7 @@ class pyana_plotter (object) :
         """
 
         # Preferred way to log information is via logging package
-        logging.info( "pyana_plotter.beginjob() called" )
+        logging.info( "pyana_plotter.beginjob() called with displaymode %d"%self.display_mode )
 
         if self.display_mode == 0 :
             plt.ioff()

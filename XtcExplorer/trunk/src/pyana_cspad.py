@@ -53,10 +53,10 @@ class  pyana_cspad ( object ) :
     def __init__ ( self,
                    img_sources = None,
                    dark_img_file = None,
-                   out_img_file = None,
+                   out_avg_file = None,
+                   out_shot_file = None,
                    plot_vrange = None,
                    threshold = None,
-                   thr_area = None, 
                    plot_every_n = None,
                    accumulate_n = "0",
                    fignum = "1" ):
@@ -65,11 +65,11 @@ class  pyana_cspad ( object ) :
         All parameters are passed as strings
 
         @param img_sources      string, Address of Detector-Id|Device-ID
-        @param dark_img_file    filename, Dark image file to be loaded, if any
-        @param out_img_file      filename (If collecting: write to this file)
-        @param plot_vrange      range=vmin,vmax of values for plotting (pixel intensity)
-        @param threshold        lower threshold for image intensity in threshold area of the plot
-        @param thr_area         range=xmin,xmax,ymin,ymax defining threshold area
+        @param dark_img_file    name (base) of dark image file (numpy array) to be loaded, if any
+        @param out_avg_file     name (base) of output file for average image (numpy array)
+        @param out_shot_file    name (base) of numpy array file for selected single-shot events
+        @param plot_vrange      range (format vmin:vmax) of values for plotting (pixel intensity)
+        @param threshold        threshold intensity and threshold area (xlow:xhigh,ylow:yhigh)
         @param plot_every_n     int, Draw plot for every N event? (if None or 0, don't plot till end) 
         @param accumulate_n     Accumulate all (0) or reset the array every n shots
         @param fignum           int, Matplotlib figure number
@@ -86,35 +86,44 @@ class  pyana_cspad ( object ) :
         self.mpl_num = opt.getOptInteger(fignum)
 
         self.darkfile = opt.getOptString(dark_img_file)
-        print "Using dark image file: ", self.darkfile
+        if self.darkfile is not None: print "Input dark image file: ", self.darkfile
                 
-        self.out_img_file = opt.getOptString(out_img_file)
-        print "Using outputfile: ", self.out_img_file
+        self.out_avg_file = opt.getOptString(out_avg_file)
+        if self.out_avg_file is not None: print "Output average image file: ", self.out_avg_file
+
+        self.out_shot_file = opt.getOptString(out_shot_file)
+        if self.out_shot_file is not None: print "Output shot image file: ", self.out_shot_file
 
         self.plot_vmin = None
         self.plot_vmax = None
         if plot_vrange is not None and plot_vrange is not "" : 
-            self.plot_vmin = float(plot_vrange.split(",")[0])
-            self.plot_vmax = float(plot_vrange.split(",")[1])
+            self.plot_vmin = float(plot_vrange.strip("()").split(":")[0])
+            self.plot_vmax = float(plot_vrange.strip("()").split(":")[1])
             print "Using plot_vrange = %f,%f"%(self.plot_vmin,self.plot_vmax)
 
         self.plotter = Plotter()
         #if self.plot_every_n > 0 : self.plotter.display_mode = 1 # interactive 
 
-        self.threshold = Threshold()
-        self.threshold.minvalue = opt.getOptFloat(threshold)
-        if self.threshold.minvalue :
-            tarea = opt.getOptString(thr_area)
-            if tarea is not None: 
-                tarea = np.array([0.,0.,0.,0.])
-                for i in range (4) :
-                    tarea[i] = float(thr_area.split(",")[i])                    
-                self.threshold.area = tarea
-            print "Using threshold value ", self.threshold.minvalue
+        threshold_string = opt.getOptStrings(threshold)
+        # format: 'value (xlow:xhigh,ylow:yhigh)', only value is required
+
+        self.threshold = None
+        if len(threshold_string)>0:
+            self.threshold = Threshold()
+            self.threshold.value = opt.getOptFloat(threshold_string[0])
+            print "Using threshold value ", self.threshold.value
+        if len(threshold_string)>1:
+            self.threshold.area = np.array([0.,0.,0.,0.])            
+
+            intervals = threshold_string[1].strip('()').split(',')
+            xrange = intervals[0].split(":")
+            yrange = intervals[1].split(":")
+            self.threshold.area[0] = float(xrange[0])
+            self.threshold.area[1] = float(xrange[1])
+            self.threshold.area[2] = float(yrange[0])
+            self.threshold.area[3] = float(yrange[1])
+
             print "Using threshold area ", self.threshold.area
-        else :
-            del self.threshold
-            self.threshold = None
             
 
         # Set up the plotter's frame by hand, since
@@ -264,8 +273,8 @@ class  pyana_cspad ( object ) :
             
 
             print "pyana_cspad: shot#%d "%self.n_shots ,
-            if maxvalue < self.threshold.minvalue :
-                print " skipped (%.2f < %.2f) " % (maxvalue, float(self.threshold.minvalue))
+            if maxvalue < self.threshold.value :
+                print " skipped (%.2f < %.2f) " % (maxvalue, float(self.threshold.value))
                 
                 # collect the rejected shots before returning to the next event
                 self.n_dark+=1
@@ -277,7 +286,7 @@ class  pyana_cspad ( object ) :
                 evt.put(True,'skip_event') # tell downstream modules to skip this event
                 return
             else :
-                print "accepted (%.2f > %.2f) " % (maxvalue, float(self.threshold.minvalue))
+                print "accepted (%.2f > %.2f) " % (maxvalue, float(self.threshold.value))
 
         # -----
         # Passed the threshold filter. Add this to the sum
@@ -292,32 +301,35 @@ class  pyana_cspad ( object ) :
         # Draw this event.
         # -----
         if self.plot_every_n > 0 and (self.n_shots%self.plot_every_n)==0 :
-            title = "%s shot # %d" % (self.img_source,self.n_shots)
-            if self.dark_image is not None:
-                title = title + " (background subtracted) "
-            
-            
-            #newmode = self.plotter.draw_figure(cspad_image,title, fignum=self.mpl_num, showProj=True)
-            #if roi is not None:
-            #    self.plotter.draw_figure(roi,title="Threshold region",fignum=self.mpl_num+1,
-            #                             showProj=False,extent=self.threshold.area)
-            newmode = None
 
-            if roi is not None: 
-                event_display_images = []
-                event_display_images.append( (self.img_source, cspad_image ) )
-                event_display_images.append( ("Region of Interest", roi ) )
-                
-                newmode = self.plotter.draw_figurelist(self.mpl_num,
-                                                       event_display_images,
-                                                       title="CsPad shot#%d"%self.n_shots,
-                                                       extent=[None,self.threshold.area],
-                                                       showProj=True)
+            title = "CsPad shot#%d"%self.n_shots
 
-            else :
-                # Just one plot
-                newmode = self.plotter.draw_figure(cspad_image,title, fignum=self.mpl_num, showProj=True)
+            # keep a list of images 
+            event_display_images = []
+            event_display_images.append( (self.img_source, cspad_image ) )
+
+            if roi is not None:
+                extent=self.threshold.area                
+                event_display_images.append( ("Region of Interest", roi, extent ) )
                 
+            if self.dark_image is not None :
+                title += " (bkg. subtr.)"
+                event_display_images.append( ("Dark image", self.dark_image ) )
+            elif self.n_dark > 1 :
+                dark = self.sum_dark_images/self.n_dark
+                event_display_images.append( ("%s (bkg. subtr.)"%self.img_source, cspad_image-dark ) )
+                event_display_images.append( ("Dark (average of %d shots)"%self.n_dark, dark ) )
+            
+
+            ## Just one plot
+            # newmode = self.plotter.draw_figure(cspad_image,title, fignum=self.mpl_num, showProj=True)
+                
+            self.plotter.settings(6,6)
+            newmode = self.plotter.draw_figurelist(self.mpl_num,
+                                                   event_display_images,
+                                                   title=title,
+                                                   showProj=True)
+            
             if newmode is not None:
                 # propagate new display mode to the evt object 
                 evt.put(newmode,'display_mode')
@@ -331,6 +343,19 @@ class  pyana_cspad ( object ) :
             self.data.average = self.sum_good_images/self.n_shots
             self.data.dark = self.dark_image
 
+            # save this shot image (numpy array)
+            # binary file .npy format
+            if self.out_shot_file is not None :
+                filename = self.out_shot_file
+                if ".npy" not in filename :
+                    filename += ".npy"
+                    
+                parts = filename.split('.')
+                filename = "".join(parts[0:-1]) + "_shot%d."%self.n_shots + parts[-1]
+
+                print "Saving this shot to file ", filename
+                np.save(filename, cspad_image)
+
 
             
     # after last event has been processed. 
@@ -338,35 +363,65 @@ class  pyana_cspad ( object ) :
 
         print "Done processing       ", self.n_shots, " events"        
         
-        if self.sum_good_images is None :
-            print "No good images collected!", self.img_source
-        else :
-            # plot the average image
+        title = self.img_source
+
+        # keep a list of images 
+        event_display_images = []
+
+        average_image = None
+        if self.n_good > 0 :
+            label = "Average of %d shots"%self.n_good
+
             average_image = self.sum_good_images/self.n_good 
-            print "the average intensity of average image ", np.mean(average_image)
-            print "the highest intensity of average image ", np.max(average_image)
-            print "the lowest intensity of average image ", np.min(average_image)
+            event_display_images.append( (label, average_image ) )
+
+        rejected_image = None
+        if self.n_dark > 0 :
+            label = "Average of %d dark/rejected shots"%self.n_dark
+
+            rejected_image = self.sum_dark_images/self.n_dark
+            event_display_images.append( (label, rejected_image ) )
             
-            self.plotter.draw_figure(average_image,"Average of %d events" % self.n_good, fignum=self.mpl_num )
-            print "******* image data in endjob "
-            print self.data.image
+        if self.dark_image is not None :
+            label = "Dark image from input file"
+            event_display_images.append( ("Dark image from file", self.dark_image ) )
 
-            evt.put( self.data, 'data_cspad')
+            
+        ## Just one plot
+        # newmode = self.plotter.draw_figure(cspad_image,title, fignum=self.mpl_num, showProj=True)
 
-            # save the average data image (numpy array)
-            # binary file .npy format
-            if self.out_img_file is not None :
-                if ".npy" in self.out_img_file :
-                    print "saving to ",  self.out_img_file
-                    np.save(self.out_img_file, average_image)
-                else :
-                    print "outputfile file does not have the required .npy ending..."
-                    svar = raw_input("Do you want to provide an alternative file name? ")
-                    if svar == "" :
-                        print "Nothing saved"
-                    else :
-                        if ".npy" not in svar:
-                            print "I still don't like your file name, saving anyway..."
-                        print "saving to ",  svar
-                        np.save(svar, average_image)
+        if len(event_display_images) == 0:
+            print "No images to display from ", self.img_source
+            return
                 
+        
+        evt.put( self.data, 'data_cspad')
+
+        # save the average data image (numpy array)
+        # binary file .npy format
+        if self.out_avg_file is not None :
+            filename1 = self.out_avg_file
+            filename2 = self.out_avg_file
+            if ".npy" not in filename1 :
+                filename1 += ".npy"
+
+            parts = filename1.split('.')
+            filename1 = "".join(parts[0:-1]) + "_lumi." + parts[-1]
+            filename2 = "".join(parts[0:-1]) + "_dark." + parts[-1]
+
+            if average_image is not None:
+                print "Saving average of good shots to file ", filename1
+                np.save(filename1, average_image)
+
+            if rejected_image is not None: 
+                print "Saving average of dark shots to file ", filename2
+                np.save(filename2, rejected_image)
+
+
+
+        self.plotter.settings(7,7)
+        self.plotter.draw_figurelist(self.mpl_num+1,
+                                     event_display_images,
+                                     title=title,
+                                     showProj=True)
+            

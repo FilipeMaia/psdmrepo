@@ -11,6 +11,12 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Jun-09 ofte                  rev 1965
+	- Much improved pyana_cspad
+	- Supports background subtraction, both from dark file and on-the-fly dark average
+	- Supports saving good average and dark average as numpy file. 
+	- Supports saving good single-events to file (numpy)
+	
 2011-Jun-09 ofte                  rev 1964
         - Cleaned up utilities, cspad and image modules somewhat more. 
 	- The projections now reflect the (interactive) change of vmin/vmax

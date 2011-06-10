@@ -785,7 +785,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 modules_to_run.append("XtcExplorer.pyana_waveform")
                 options_for_mod.append([])
 
-            #print "XtcExplorer.pyana_ipimb at ", index
+            #print "XtcExplorer.pyana_waveform at ", index
             address = str(box.text()).split(":")[1].strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
@@ -832,6 +832,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             options_for_mod[index].append("\ngood_range = %d,%d" % (0,99999999.9) )
             options_for_mod[index].append("\ndark_range = %d,%d" % (0,0) )
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
+            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             options_for_mod[index].append("\noutput_file = ")
             options_for_mod[index].append("\nn_hdf5 = ")        
@@ -850,12 +851,13 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             address = str(box.text()).split(":")[1].strip()
             options_for_mod[index].append("\nimg_sources = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
+            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             options_for_mod[index].append("\ndark_img_file = ")
-            options_for_mod[index].append("\nout_img_file = ")                    
+            options_for_mod[index].append("\nout_avg_file = ")
+            options_for_mod[index].append("\nout_shot_file = ")
             options_for_mod[index].append("\nplot_vrange = ")
             options_for_mod[index].append("\nthreshold = ")
-            options_for_mod[index].append("\nthr_area = ")
             return
 
         # --- --- --- Encoder --- --- ---
