@@ -57,52 +57,43 @@ try {
     $hdf5_local_copy = 0;
     $hdf5_archived   = 0;
 
-    if( $experiment->begin_time()->greaterOrEqual( LusiTime::now())) {
-        ;
-    } else {
+    $range = FileMgrIrodsWs::max_run_range( $instrument->name(), $experiment->name(), array('xtc','hdf5'));
 
-        $range = FileMgrIrodsWs::max_run_range( $instrument->name(), $experiment->name(), array('xtc','hdf5'));
-
-        $num_runs      = $range['total'];
-        $range_of_runs = $range['min'].'-'.$range['max'];
-
-        $xtc_runs = null;
-        FileMgrIrodsWs::runs( $xtc_runs, $instrument->name(), $experiment->name(), 'xtc', $range_of_runs );
-        foreach( $xtc_runs as $run ) {
-            $unique_files = array();  // per this run
-            $files = $run->files;
-            foreach( $files as $file ) {
-                if( !array_key_exists( $file->name, $unique_files )) {
-                    $unique_files[$file->name] = $run->run;
-                    $xtc_num_files++;
-                    $xtc_size += $file->size / (1024.0 * 1024.0 * 1024.0);
-                }
-                if( $file->resource == 'hpss-resc'   ) $xtc_archived++;
-                if( $file->resource == 'lustre-resc' ) $xtc_local_copy++;
+    $num_runs      = $range['total'];
+    $range_of_runs = $range['min'].'-'.$range['max'];
+    $xtc_runs = null;
+    FileMgrIrodsWs::runs( $xtc_runs, $instrument->name(), $experiment->name(), 'xtc', $range_of_runs );
+    foreach( $xtc_runs as $run ) {
+        $unique_files = array();  // per this run
+        $files = $run->files;
+        foreach( $files as $file ) {
+            if( !array_key_exists( $file->name, $unique_files )) {
+                $unique_files[$file->name] = $run->run;
+                $xtc_num_files++;
+                $xtc_size += $file->size / (1024.0 * 1024.0 * 1024.0);
             }
+            if( $file->resource == 'hpss-resc'   ) $xtc_archived++;
+            if( $file->resource == 'lustre-resc' ) $xtc_local_copy++;
         }
-        $xtc_size_str = sprintf( "%.0f", $xtc_size );
-
-        $hdf5_runs = null;
-        FileMgrIrodsWs::runs( $hdf5_runs, $instrument->name(), $experiment->name(), 'hdf5', $range_of_runs );
-        foreach( $hdf5_runs as $run ) {
-            $unique_files = array();  // per this run
-            $files = $run->files;
-            foreach( $files as $file ) {
-                if( !array_key_exists( $file->name, $unique_files )) {
-                    $unique_files[$file->name] = $run->run;
-                    $hdf5_num_files++;
-                    $hdf5_size += $file->size / (1024.0 * 1024.0 * 1024.0);
-                }
-                if( $file->resource == 'hpss-resc'   ) $hdf5_archived++;
-                if( $file->resource == 'lustre-resc' ) $hdf5_local_copy++;
-            }
-        }
-        $hdf5_size_str = sprintf( "%.0f", $hdf5_size );
     }
+    $xtc_size_str = sprintf( "%.0f", $xtc_size );
+    $hdf5_runs = null;
+    FileMgrIrodsWs::runs( $hdf5_runs, $instrument->name(), $experiment->name(), 'hdf5', $range_of_runs );
+    foreach( $hdf5_runs as $run ) {
+        $unique_files = array();  // per this run
+        $files = $run->files;
+        foreach( $files as $file ) {
+            if( !array_key_exists( $file->name, $unique_files )) {
+                $unique_files[$file->name] = $run->run;
+                $hdf5_num_files++;
+                $hdf5_size += $file->size / (1024.0 * 1024.0 * 1024.0);
+            }
+            if( $file->resource == 'hpss-resc'   ) $hdf5_archived++;
+            if( $file->resource == 'lustre-resc' ) $hdf5_local_copy++;
+        }
+    }
+    $hdf5_size_str = sprintf( "%.0f", $hdf5_size );
 
-    /* Proceed to the operation
-     */
     header( 'Content-type: text/html' );
     header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
     header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past

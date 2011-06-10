@@ -46,11 +46,8 @@ try {
             'index.php'));
         exit;
     }
-    $range_of_runs = '0-0';
-    if( !$experiment->begin_time()->greaterOrEqual( LusiTime::now())) {
-        $range = FileMgrIrodsWs::max_run_range( $instrument->name(), $experiment->name(), array( 'xtc', 'hdf5' ));
-        $range_of_runs = $range['min'].'-'.$range['max'];
-    }
+    $range = FileMgrIrodsWs::max_run_range( $instrument->name(), $experiment->name(), array( 'xtc', 'hdf5' ));
+    $range_of_runs = $range['min'].'-'.$range['max'];
     $range_help = '1,3,5,10-20,200';
 
     /* Proceed to the operation

@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2011-06-10 Igor Gaponenko
+- fixed bugs preventing File Explorer from seeing files info of "future" experiments
+
 Tag: V00-00-07
 2011-05-13 Igor Gaponenko
 - bug fix in the Interface Controller Web service
