@@ -111,9 +111,16 @@ $author = '';
 if( isset( $_GET['author'] ))
     $author = trim( $_GET['author'] );
 
+$range_of_runs = '';
+if( isset( $_GET['range_of_runs'] ))
+    $range_of_runs = trim( $_GET['range_of_runs'] );
+
 $inject_runs = false;
 if( isset( $_GET['inject_runs'] ))
     $inject_runs = '0' != trim( $_GET['inject_runs'] );
+
+if( '' != $range_of_runs ) $inject_runs = true;		// Force it because a request was made to search around
+													// a specific run or a range of those.
 
 /* This is a special modifier which (if present) is used to return an updated list
  * of messages since (strictly newer than) the specified time.
@@ -495,20 +502,72 @@ try {
    	$experiment = $logbook->find_experiment_by_id( $id );
    	if( is_null( $experiment)) report_error( "no such experiment" );
 
-    /* Timestamps are translated here because of possible shoftcuts which
+   	/* Make sure the 'range_of_runs' parameters isn't used along with
+   	 * explicitly specified 'begin' or 'end' time limits. A reason for that
+   	 * is that we're going to redefine these limits for the range of runs.
+   	 * The new limits will include all messages posted:
+   	 * 
+   	 *   - after the end of the previous to the first run. If no such previous run
+   	 *   exist then all messages before the begin time of the first run will be
+   	 *   selected.
+   	 *   - before the beginning of the next to the last run. Of no such next run
+   	 *   is found then all messages till the end of the logbook will be selected.
+   	 */
+   	if( '' != $range_of_runs ) {
+   		if(( '' != $begin_str ) or ( '' != $end_str ))
+	   		report_error( "begin/end time limits can't be used together with the run limi" );
+
+	   	/* Pasrse the run numbers first. If the parse sucseeds and no last run
+	   	 * is provided then assume the second run as the last one.
+	   	 */
+		list($r1,$r2) = explode( '-', $range_of_runs, 2 );
+		$r1 = trim( $r1 );
+		$r2 = trim( $r2 );
+		if( '' == $r1 ) report_error( "syntax error in the range of runs" );
+
+		$first_run_num = null;
+		if(( 1 != sscanf( $r1, "%d", $first_run_num )) or ( $first_run_num <= 0 ))
+			report_error( "syntax error in the first run number of the range" );
+
+		$last_run_num = $first_run_num;
+		if( '' != $r2 )
+			if(( 1 != sscanf( $r2, "%d", $last_run_num )) or ( $last_run_num <= 0 ))
+				report_error( "syntax error in the last run number of the range" );
+
+		if( $last_run_num < $first_run_num ) report_error( "last run in the range can't be less than the first one" );
+
+		if( is_null( $experiment->find_run_by_num( $first_run_num ))) report_error( "run {$first_run_num} can't be found" );
+		if( is_null( $experiment->find_run_by_num( $last_run_num  ))) report_error( "run {$last_run_num} can't be found" );
+
+		$previous_run = $experiment->find_run_by_num( $first_run_num - 1 );
+		if( !is_null( $previous_run )) {
+
+			// ATTENTION: If the previous run has never been explicitly closed
+			//            then it's okay to use its begin time.
+			//
+			$begin_str =
+				is_null($previous_run->end_time()) ?
+				$previous_run->begin_time()->toStringShort() :
+				$previous_run->end_time()->toStringShort();
+		}
+		$next_run = $experiment->find_run_by_num( $last_run_num + 1 );
+		if( !is_null( $next_run )) {
+			$end_str = $next_run->begin_time()->toStringShort();
+		}
+   	}
+
+	/* Timestamps are translated here because of possible shoftcuts which
 	 * may reffer to the experiment's validity limits.
 	 */
     $begin = null;
    	if( $begin_str != '' ) {
        	$begin = translate_time( $experiment, $begin_str );
-       	if( is_null( $begin ))
-           	report_error( "begin time has invalid format" );
+       	if( is_null( $begin )) report_error( "begin time has invalid format" );
     }
     $end = null;
     if( $end_str != '' ) {
        	$end = translate_time( $experiment, $end_str );
-       	if( is_null( $end ))
-           	report_error( "end time has invalid format" );
+       	if( is_null( $end )) report_error( "end time has invalid format" );
 	}
     if( !is_null( $begin ) && !is_null( $end ) && !$begin->less( $end ))
        	report_error( "invalid interval - begin time isn't strictly less than the end one" );        

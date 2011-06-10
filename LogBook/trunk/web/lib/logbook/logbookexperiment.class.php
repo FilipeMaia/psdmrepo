@@ -147,6 +147,7 @@ class LogBookExperiment {
          * if the leader isn't there yet. Also make sure the array has
          * no duplicate names, and the names aren't empty.
          */
+        $leader_in_crew = false;
         $shift_crew = array_unique( $crew );
         foreach( $shift_crew as $member ) {
 
@@ -484,7 +485,11 @@ HERE;
      * @return array(LogBookFFEntry)
      */
     public function entries () {
-        return $this->entries_by_( $this->sql_4_entries_by_());
+        return $this->entries_by_(
+        	$this->sql_4_entries_by_(
+        		/* $extra_condition=*/ "",
+        		/* $limit=          */ null,
+        	    /* $use_tags=       */ false));
     }
 
     /**
@@ -734,7 +739,12 @@ HERE;
 
     private function entries_by_ ( $sql ) {
 
-        $list = array();
+    	/* DEBUG:
+		throw new LogBookException(
+        	__METHOD__,
+            $sql );
+*/
+    	$list = array();
 /*
 $debug_file = fopen( "/tmp/search.txt", "a+" );
 fwrite( $debug_file, $sql."\n" );
@@ -905,6 +915,8 @@ personnel.
 HERE;
                 
         $this->do_notify( $s->address(), $logbook, "*** SUBSCRIBED ***", $body );
+        
+        return $s;
     }
 
     public function unsubscribe( $id ) {
@@ -954,6 +966,9 @@ HERE;
         throw new LogBookException(
             __METHOD__,
             "inconsistent results returned by the query" );
+    }
+    public function find_subscriber_by_id( $id ) {
+    	return $this->find_subscriber_by_( "s.id={$id}");
     }
 
     public function subscriptions( $subscribed_by=null ) {

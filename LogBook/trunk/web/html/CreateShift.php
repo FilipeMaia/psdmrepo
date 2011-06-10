@@ -96,7 +96,7 @@ try {
                 '&exper_name='.$experiment->name().
                 '&shift_id='.$shift->id());
         else
-            ;
+            header( 'Location: '.$actionSuccess );
     }
     $logbook->commit();
 

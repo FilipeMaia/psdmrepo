@@ -35,11 +35,11 @@ class LogBookAuth {
     }
 
     public function authName() {
-        return $_SERVER['REMOTE_USER'];
+        return $this->authdb->authName(); //return $_SERVER['REMOTE_USER'];
     }
 
     public function authType() {
-        return $_SERVER['AUTH_TYPE'];
+        return $this->authdb->authName(); //return $_SERVER['AUTH_TYPE'];
     }
 
     public function isAuthenticated() {
