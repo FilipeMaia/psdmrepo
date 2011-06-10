@@ -55,6 +55,7 @@ class  pyana_image ( object ) :
                    output_file = None,
                    n_hdf5 = None ,
                    plot_every_n = None,
+                   accumulate_n = None,
                    fignum = "1" ):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
@@ -62,6 +63,7 @@ class  pyana_image ( object ) :
 
         @param sources          (list) address string of Detector-Id|Device-ID
         @param plot_every_n     Frequency for plotting. If n=0, no plots till the end
+        @param accumulate_n     Not implemented yet
         @param fignum           Matplotlib figure number
         @param good_range       threshold values selecting images of interest
         @param dark_range       threshold values selecting dark images
