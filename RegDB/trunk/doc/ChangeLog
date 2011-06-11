@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-29
+2011-06-10 Igor Gaponenko
+- fixed a logic flaw in the authorization test method
+
 Tag: V00-00-28
 2011-05-15 Igor Gaponenko
 - automated algorithm for discovering most common special groups to replace

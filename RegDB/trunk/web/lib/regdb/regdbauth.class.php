@@ -102,7 +102,7 @@ class RegDBAuth {
         $this->authdb->begin();
 
         /* Check if a user is allowed to manage any groups.
-         * If so then unconditionally proceed with teh authorization.
+         * If so then unconditionally proceed with the authorization.
          */
         if( $this->authdb->hasPrivilege(
             RegDBAuth::instance()->authName(),
@@ -124,6 +124,7 @@ class RegDBAuth {
                     'manage_groups' )) return true;
     		}
     	}
+    	return false;
     }
     
     public static function reporErrorHtml( $message, $link=null ) {
