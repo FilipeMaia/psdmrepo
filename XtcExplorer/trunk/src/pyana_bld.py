@@ -55,6 +55,7 @@ class  pyana_bld ( object ) :
         # lists to fill numpy arrays
         self.initlists()
 
+
     def initlists(self):
         self.time = []
 

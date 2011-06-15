@@ -3,13 +3,16 @@
 #-----------------------------------------
 
 class PyanaOptions( object ):
+    """Class PyanaOptions
+
+    Collection of functions to convert the string options of pyana
+    into values, or lists of values, of the expected type
+    """
     def __init__( self ):
         pass
 
     def getOptString(self, options_string) :
-        """
-        parse the option string,
-        return the string, strip of any whitespaces
+        """Return the string, strip of any whitespaces
         """
         if options_string is None:
             return None
@@ -27,9 +30,7 @@ class PyanaOptions( object ):
 
 
     def getOptStrings(self, options_string) :
-        """
-        parse the option string,
-        return a list of strings
+        """Return a list of strings 
         """
         if options_string is None:
             return None
@@ -138,9 +139,9 @@ class PyanaOptions( object ):
 #-----------------------------------------
 
 class BaseData( object ):
-    """ Base class for container objects
-    storing event data in memory (as numpy arrays mainly).
-    Useful for passing the data to e.g. ipython for further investigation
+    """Base class for container objects storing event data
+    in memory (as numpy arrays mainly). Useful for passing
+    the data to e.g. ipython for further investigation
     """
     def __init__(self, name,type="BaseData"):
         self.name = name
@@ -156,6 +157,8 @@ class BaseData( object ):
 
 
 class BldData( BaseData ):
+    """Beam-Line Data 
+    """
     def __init__(self, name, type="BldData"):
         BaseData.__init__(self,name,type)
         self.time = None
@@ -193,8 +196,9 @@ class BldData( BaseData ):
             itsme+="\n\t fex_position = array of shape %s"%str(np.shape(self.fex_position))
         print itsme
 
-
 class IpimbData( BaseData ):
+    """Ipimb Data (from Intensity and Position monitoring boards)
+    """
     def __init__( self, name, type="IpimbData" ):
         BaseData.__init__(self,name,type)
         self.fex_sum = None
@@ -218,6 +222,8 @@ class IpimbData( BaseData ):
 
 
 class EncoderData( BaseData ):
+    """Encoder data
+    """
     def __init__( self, name, type="EncoderData" ):
         BaseData.__init__(self,name,type)
         self.values = None
@@ -232,6 +238,8 @@ class EncoderData( BaseData ):
 
 
 class WaveformData( BaseData ):
+    """Waveform data from Acqiris digitizers
+    """
     def __init__( self, name, type="WaveformData" ):
         BaseData.__init__(self,name,type)
         self.wf_voltage = None
@@ -249,6 +257,8 @@ class WaveformData( BaseData ):
 
 
 class EpicsData( BaseData ):
+    """Control and Monitoring PVs from EPICS
+    """
     def __init__( self, name, type="EpicsData" ):
         BaseData.__init__(self,name,type)
         self.values = None
@@ -270,6 +280,8 @@ class EpicsData( BaseData ):
 
 
 class ScanData( BaseData ) :
+    """Scan data
+    """
     def __init__(self, name, type="ScanData"):
         BaseData.__init__(self,name,type)
 
@@ -288,8 +300,9 @@ class ScanData( BaseData ) :
         print itsme
 
 
-
 class ImageData( BaseData ):
+    """Image data
+    """
     def __init__(self, name, type="ImageData"):
         BaseData.__init__(self,name,type)
         self.image = None
@@ -307,6 +320,8 @@ class ImageData( BaseData ):
         print itsme
 
 class CsPadData( BaseData ):
+    """CsPad data
+    """
     def __init__(self, name, type="CsPadData"):
         BaseData.__init__(self,name,type)
         self.image = None
@@ -328,8 +343,11 @@ class CsPadData( BaseData ):
 #-------------------------------------------------------
 # Threshold  
 #-------------------------------------------------------
-
 class Threshold( object ) :
+    """Class Threshold
+
+    To keep track of threshold settings (value and area of interest)
+    """
     def __init__( self,
                   area = None,
                   value = None,
@@ -339,10 +357,10 @@ class Threshold( object ) :
         self.value = value
 
 
+
 #-------------------------------------------------------
 # Plotter
 #-------------------------------------------------------
-
 import time
 import numpy as np
 import matplotlib.pyplot as plt

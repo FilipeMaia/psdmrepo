@@ -101,10 +101,6 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.create_main_frame()
         print "Welcome to Xtc Explorer!"
 
-        print self.filenames
-        # Make a quick scan right away...
-        self.scan_files_quick()
-        
     def create_main_frame(self):
 
         self.main_widget = QtGui.QWidget(self)
