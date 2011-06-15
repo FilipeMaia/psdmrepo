@@ -178,7 +178,6 @@ function elog_create() {
 			var urlbase = window.location.href;
 			var idx = urlbase.indexOf( '&' );
 			if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
-			$('#elog-form-post input[name="onsuccess"]').val(urlbase+'&app=elog:post');
 
 			if( that.context2 == 'run' ) {
 
@@ -208,16 +207,33 @@ function elog_create() {
 				$('#elog-form-post input[name="relevance_time"]').val(relevance_time);
 			}
 
-			$('#elog-form-post').trigger( 'submit' );
+			/* Submit the new message using the JQuery AJAX POST plug-in,
+			 * which also allow uploading files w/o reloading the current page.
+			 *
+			 * NOTE: We aren't refreshing the list of messages because we're relying on
+			 *       the live display.
+			 */
+			$('#elog-form-post').ajaxSubmit({
+				success: function(d) {
+					var data = eval('('+d+')');
+					if( data.Status != 'success' ) {
+						alert('failed because of: '+data.Message);
+						return;
+					}
+					that.post_reset();
+				},
+				dataType: 'JSON'
+			});
 		});
-	
+		$('#elog-form-post').ajaxForm();
+
 		$('#elog-post-reset').button().click(function() { that.post_reset(); });
-	
+
 		this.post_reset();
 	};
 	this.simple_post4experiment = function(text2post) {
 		this.post_reset();
-		$('#elog-form-post textarea[name="message_text"]').text(text2post);
+		$('#elog-form-post textarea[name="message_text"]').val(text2post);
 	};
 
 	/* ------------------------------------------
@@ -226,7 +242,7 @@ function elog_create() {
 	 */
 	this.post_reset = function() {
 
-		$('#elog-form-post textarea[name="message_text"]').text('');
+		$('#elog-form-post textarea[name="message_text"]').val('');
 		$('#elog-form-post input[name="author_account"]').val(this.author);
 		$('.elog-tag-name').val('');
 		if(that.context2 == 'experiment') {
@@ -1662,7 +1678,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		var html =
 '<div id="'+this.base+'-m-rdlg-'+id+'" class="el-l-m-rdlg el-l-m-dlg-hdn">'+
 '  <div style="float:left;">'+
-'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="/apps-dev/logbook/NewFFEntry4portal.php" method="post">'+
+'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="/apps-dev/logbook/NewFFEntry4portalJSON.php" method="post">'+
 '      <input type="hidden" name="id" value="'+this.parent.exp_id+'" />'+
 '      <input type="hidden" name="scope" value="message" />'+
 '      <input type="hidden" name="message_id" value="'+id+'" />'+
@@ -1732,6 +1748,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		}
 
 		dlgs.html(html);
+		$('#elog-form-post-'+id).ajaxForm();
 
 		$('#'+this.base+'-m-re-s-'+id).button();
 		$('#'+this.base+'-m-re-c-'+id).button();
@@ -1786,16 +1803,61 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		var urlbase = window.location.href;
 		var idx = urlbase.indexOf( '&' );
 		if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
-		$('#elog-form-post-'+id+' input[name="onsuccess"]').val(urlbase+'&page1=elog');
 
-		$('#elog-form-post-'+id).trigger( 'submit' );
+		// Use JQuery AJAX Form plug-in to post the reply w/o reloading
+		// the current page.
+		
+		//
+		$('#elog-form-post-'+id).ajaxSubmit({
+			success: function(d) {
+				$('#elog-form-post-'+id+' textarea[name="message_text"]').val('');
+				$('#elog-form-post-'+id+' input[name="author_account"]').val(that.parent.author);
+				$('#'+that.base+'-reply-as-'+id).html(
+'<div>'+
+'  <input type="file" name="file2attach_0" onchange="'+that.address+'.live_reply_add_attachment('+id+')" />'+
+'  <input type="hidden" name="file2attach_0" value=""/ >'+
+'</div>'
+				);
+				var data = eval('('+d+')');
+				if( data.Status != 'success' ) {
+					alert('failed because of: '+data.Message);
+					return;
+				}
+				var entry = data.Entry;
+
+				// Find the parent message and add a new child to it.
+				//
+				// TODO: Should we find a way to serialize the JSON object into a string?
+				//       A problem is that the children array updated below is also used
+				//       from other locations of the code. And in those other locations
+				//       elements of the children array are treated as strings, hence they're
+				//       converted into valid JavaScript objects before passing them into
+				//       the live_child2html() function
+				//
+				that.messages[id].children.push( d );
+
+				// Then display the new child on the page and make it visible
+				//
+				var html = that.live_child2html(entry);
+				$('#'+that.base+'-m-c-'+id).prepend(html);
+
+				$('.el-l-m-re').button();
+				$('.el-l-m-ed').button();
+				$('.el-l-m-mv').button();
+
+				that.toggle_child(entry.id);
+
+				that.live_message_reply_cancel(id);
+			},
+			dataType: 'JSON'
+		});
 
 	};
 	this.live_message_edit_submit = function(id) {
 		var urlbase = window.location.href;
 		var idx = urlbase.indexOf( '&' );
 		if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
-		$('#elog-form-edit-'+id+' input[name="onsuccess"]').val(urlbase+'&page1=elog');
+		$('#elog-form-edit-'+id+' input[name="onsuccess"]').val(urlbase+'&app=elog');
 
 		$('#elog-form-edit-'+id).trigger( 'submit' );
 	};
@@ -1881,8 +1943,11 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '    <div class="el-l-m-tags">'+
 '      <b><i>keywords: </i></b>'+tags_html+
 '    </div>';
+			html +=
+'    <div id="'+this.base+'-m-c-'+entry.id+'">';
 			for(var k in entry.children) html += that.live_child2html(eval("("+entry.children[k]+")"));
-				html +=
+			html +=
+'    </div>'+
 '  </div>';
 		} else {
         	that.runs.push(thread_idx);
@@ -1945,11 +2010,14 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '  <div class="el-l-m-as">'+attachments_html+
 '    <div style="clear:both;"></div>'+
 '  </div>';
+		html +=
+'  <div id="'+this.base+'-m-c-'+entry.id+'">';
 
 		var children = entry.children;
 		for(var i in children) html += that.live_child2html(eval("("+children[i]+")"));
 
 		html +=
+'  </div>'+
 '</div>';
 		return html;
 	};

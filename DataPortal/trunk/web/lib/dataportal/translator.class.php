@@ -84,7 +84,7 @@ class Translator {
 	        $hdf5_files_found = !is_null( $run_irodsws ) && !is_null( $run_irodsws['hdf5'] ) && count( $run_irodsws['hdf5'] );
 
 	        if( $xtc_files_found && !$hdf5_files_found &&
-    	        !in_array( $status, array('FINISHED', 'FAILED', 'TRANSLATING', 'QUEUED' ))) {
+    	        !in_array( $status, array('FINISHED', 'TRANSLATING', 'QUEUED' ))) {
 	        	$actions = '<button class="translate not4print" value="'.$run_logbook->num().'">Translate</button>';
     	    	$ready4translation = true;
         	}

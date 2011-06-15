@@ -3,6 +3,7 @@
 require_once( 'authdb/authdb.inc.php' );
 require_once( 'dataportal/dataportal.inc.php' );
 require_once( 'regdb/regdb.inc.php' );
+require_once( 'logbook/logbook.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
 
 use AuthDB\AuthDB;
@@ -12,6 +13,9 @@ use DataPortal\DataPortal;
 
 use RegDB\RegDB;
 use RegDB\RegDBException;
+
+use LogBook\LogBook;
+use LogBook\LogBookException;
 
 use LusiTime\LusiTime;
 
@@ -31,6 +35,9 @@ try {
 	$authdb = new AuthDB();
 	$authdb->begin();
 
+	$logbook = new LogBook();
+	$logbook->begin();
+	
 	if( isset( $instr_name )) {
 		$instrument = $regdb->find_instrument_by_name( $instr_name );
 		if( is_null( $instrument )) die( 'unknown instrument name provided to the script' );
@@ -219,15 +226,17 @@ function on_experiment_select( elem, instrument ) {
 		if( !is_null( $last_experiment_switch )) {
 
 			$exper_id = $last_experiment_switch['exper_id'];
-			$experiment = $regdb->find_experiment_by_id( $exper_id );
+			$experiment = $logbook->find_experiment_by_id( $exper_id );
 
 			if( is_null( $experiment ))
 				die( "fatal internal error when resolving experiment id={$exper_id} in the database" );
 
-			$last_experiment_name             = $experiment->name();
+			$last_experiment_name             = '<a href="index.php?exper_id='.$experiment->id().'" class="link" title="go to the Web Portal of the experiment">'.$experiment->name();
 			$last_experiment_id               = $experiment->id();
-			$last_experiment_begin_time       = $experiment->begin_time()->toStringShort();
-			$last_experiment_end_time         = $experiment->end_time()->toStringShort();
+			$first_run = $experiment->find_first_run();
+			$last_run  = $experiment->find_last_run();
+			$last_experiment_begin_time       = is_null( $first_run ) ? '' : $first_run->begin_time()->toStringShort().' (<b>run: '.$first_run->num().'</b>)';
+			$last_experiment_end_time         = is_null( $last_run  ) ? '' : $last_run->begin_time ()->toStringShort().' (<b>run: '.$last_run->num().'</b>)';
 			$last_experiment_description      = $experiment->description();
 			$last_experiment_contact          = DataPortal::decorated_experiment_contact_info( $experiment );
 			$last_experiment_leader           = $experiment->leader_account();
@@ -238,8 +247,9 @@ function on_experiment_select( elem, instrument ) {
 
 		$html =<<<HERE
 <div id="current-experiment-{$instrument->name()}" class="module-is-visible">
-  <button id="button-switch-experiment-{$instrument->name()}">Change</button>
-  <br>
+  <div style="font-size:80%;">
+    <button id="button-switch-experiment-{$instrument->name()}" title="select and configure another experiment">Activate another experiment</button>
+  </div>
   <br>
   <table>
     <tbody>
@@ -252,11 +262,11 @@ function on_experiment_select( elem, instrument ) {
         <td class="table_cell_right">{$last_experiment_id}</td>
       </tr>
       <tr>
-        <td class="table_cell_left">Begin</td>
+        <td class="table_cell_left">First run</td>
         <td class="table_cell_right">{$last_experiment_begin_time}</td>
       </tr>
       <tr>
-        <td class="table_cell_left">End</td>
+        <td class="table_cell_left">Last run</td>
         <td class="table_cell_right">{$last_experiment_end_time}</td>
       </tr>
       <tr>
@@ -312,7 +322,7 @@ HERE;
 
 		$opr_account_prev_auth_html = '';
 		foreach( $authdb->roles_by( $opr_account, 'LogBook', $instrument->name()) as $r ) {
-			if( $opr_account_prev_auth_html == '' ) $opr_account_prev_auth_html .= '<div style="float:left; padding:10px;">';
+			if( $opr_account_prev_auth_html == '' ) $opr_account_prev_auth_html .= '<div style="float:left; padding:5px;">';
 			$instr    = $r['instr'];
 			$exper    = $r['exper'];
 			$exper_id = $r['exper_id'];
@@ -324,7 +334,7 @@ HERE;
 		if( $opr_account_prev_auth_html != '' ) {
 			$opr_account_prev_auth_html .=<<<HERE
 </div>
-<div style="float:left; padding:10px; width:180px;">
+<div style="float:left; padding:5px; width:180px;">
   <span style="color:red;">Uncheck those authorizations which may compromise new experiment's
   data privacy/security after accomplishing the switch.</span>
 </div>
@@ -332,10 +342,10 @@ HERE;
 HERE;
 		}
 		$opr_account_auth_html =<<<HERE
-<div style="margin:10px;">
-  <div style="float:left; padding-right:40px;">
-    <b>For selected experiment:</b><br>
-    <div style="padding:10px;">
+<div>
+  <div style="float:left; padding-right:10px;">
+    <b>For new experiment:</b><br>
+    <div style="padding:5px;">
       <input type="radio" name="oprelogauth" value="" />No Aurhorization<br>
       <input type="radio" name="oprelogauth" value="Reader" />Reader<br>
       <input type="radio" name="oprelogauth" value="Writer" checked="checked" />Writer<br>
@@ -350,7 +360,7 @@ HERE;
 </div>
 HERE;
 
-    	$checked_readonly = 'checked="checked" title="ATTENTION: this option can not be unchecked" onclick="this.checked=true"';
+    	$checked_readonly = 'checked="checked"'; //'checked="checked" title="ATTENTION: this option can not be unchecked" onclick="this.checked=true"';
 
     	$admins = array( 'perazzo', 'gapon', 'mcmesser' );
     	$admins_html = '';
@@ -378,64 +388,66 @@ HERE;
     	$pi_gecos = $pi_account['gecos'];
     	$pi_email = $pi_account['email'];
 		$notify_html =<<<HERE
-<div style="margin:10px;">
+<div>
   <div style="float:left;">
     <div style="float:left;">
-      <b>{$instrument->name()} instrument scientists (POSIX group '{$instrument_scientists_group}'):</b><br>
-      <div style="padding:10px;">
+      <b>{$instrument->name()} instrument group '{$instrument_scientists_group}':</b><br>
+      <div style="padding:5px;">
         {$instrument_scientists_html}
       </div>
     </div>
     <div style="float:left; margin-left:40px;">
       <b>PI of the experiment:</b><br>
-      <div style="padding:10px;" id="input-notify-pi-{$instrument->name()}">
+      <div style="padding:5px;" id="input-notify-pi-{$instrument->name()}">
         <input type="checkbox" name="notify_pi_{$pi_uid}" {$checked_readonly} /> {$pi_gecos}<br>
+      </div>
+      <b>Others:</b><br>
+      <div style="padding:5px;" id="registered-{$instrument->name()}">
+        {$admins_html}
       </div>
     </div>
     <div style="clear:both;"></div>
-    <b>Others:</b><br>
-    <div style="padding:10px;" id="registered-{$instrument->name()}">
-      {$admins_html}
-    </div>
-    <div style="margin-top:10px;">
-      <b>Add more recipients to be notified (search LDAP):</b> <input type="text" value="" id="search2notify-{$instrument->name()}" />
+    <div>
+      <b>Search for more recipients:</b> <input type="text" value="" id="search2notify-{$instrument->name()}" />
     </div>
   </div>
   <div style="clear:both;"></div>
-  <div style="margin-top:20px;">
+  <div style="margin-top:5px;">
     <b>Additional instructions to be sent by e-mail:</b><br>
-    <textarea rows="10" cols="64" name="instructions"></textarea>
+    <textarea rows="5" cols="64" name="instructions"></textarea>
   </div>
 </div>
 HERE;
 
 		$html .=<<<HERE
 <div id="select-experiment-{$instrument->name()}" class="module-is-hidden">
-  <b>HOW TO USE THIS FORM:</b> Press 'Submit' to proceed with the switch and all relevant changes in the system.
-  Persons mentioned in the list below will be notified by e-mail. Additional instructions
-  (if provided in a text area below) will be also sent to each recipient. Proper adjustments
-  to the special 'opr' account will be made as requested. The parameters
-  of the switch will be recorded in a database.
+  <div style="width:640px;">
+    <b>HOW TO USE THIS FORM:</b> Press <b>'Submit'</b> to proceed with the switch and all relevant changes in the system.
+    Persons mentioned in the list below will be notified by e-mail. Additional instructions
+    (if provided in a text area below) will be also sent to each recipient. Proper adjustments
+    to the special 'opr' account will be made as requested. The parameters
+    of the switch will be recorded in a database.
+  </div>
   <br>
+  <div style="font-size:80%;">
+    <button id="button-submit-experiment-{$instrument->name()}" title="make changes into effect">Submit</button>
+    <button id="button-cancel-experiment-{$instrument->name()}" title="discard changes and go back to the current experiment status page">Cancel</button>
+  </div>
   <br>
-  <button id="button-submit-experiment-{$instrument->name()}">Submit</button>
-  <button id="button-cancel-experiment-{$instrument->name()}">Cancel</button>
-  <br>
-  <br>
-  <div style="padding:20px; background-color:#f3f3f3; ">
+  <div style="padding-left:10px;">
   <form name="form-{$instrument->name()}" action="ProcessExperimentSwitch.php" method="post">
     <table>
       <tbody>
         <tr>
-          <td class="table_cell_left"  valign="top"><div style="margin:10px;">Select experiment</div></td>
+          <td class="table_cell_left"  valign="top">New experiment</td>
           <td class="table_cell_right" valign="top">{$experiments_html}</td>
         </tr>
         <tr>
-          <td class="table_cell_left"  valign="top"><div style="margin:10px;">E-log authorizations for '{$opr_account}'</div></td>
+          <td class="table_cell_left"  valign="top">E-log authorizations<br>for '{$opr_account}'</td>
           <td class="table_cell_right" valign="top">{$opr_account_auth_html}</td>
         </tr>
         <tr>
-          <td class="table_cell_left  table_cell_bottom" valign="top"><div style="margin:10px;">Notify by e-mail</div></td>
+          <td class="table_cell_left  table_cell_bottom" valign="top">Notify by e-mail</td>
           <td class="table_cell_right table_cell_bottom" valign="top">{$notify_html}</td>
         </tr>
       </tbody>
@@ -483,14 +495,16 @@ HERE;
 			$instrument_tabs,
 			array('name' => 'Current Experiment',
 				  'id'   => 'instrument-'.$instrument->name().'-current',
-				  'html' => $html
+				  'html' => $html,
+				  'class' => 'tab-inline-content'
 			)
 		);
 		array_push(
 			$instrument_tabs,
 			array('name' => 'History',
 				  'id'   => 'instrument-'.$instrument->name().'-history',
-				  'html' => $html_history
+				  'html' => $html_history,
+				  'class' => 'tab-inline-content'
 			)
 		);
 
@@ -500,7 +514,8 @@ HERE;
    			$tabs,
    			array('name' => $instrument->name(),
    				  'id'   => 'instrument-'.$instrument->name(),
-	   			  'html' => DataPortal::tabs_html( "instrument-{$instrument->name()}-contents", $instrument_tabs  )
+	   			  'html' => DataPortal::tabs_html( "instrument-{$instrument->name()}-contents", $instrument_tabs ),
+				  'class' => 'tab-inline-content'
    			)
    		);
 	}
@@ -525,8 +540,9 @@ HERE;
 
 <?php
 
-} catch( AuthDBException $e ) { print $e->toHtml();
-} catch( RegDBException  $e ) { print $e->toHtml();
+} catch( AuthDBException  $e ) { print $e->toHtml();
+} catch( RegDBException   $e ) { print $e->toHtml();
+} catch( LogBookException $e ) { print $e->toHtml();
 }
 
 ?>

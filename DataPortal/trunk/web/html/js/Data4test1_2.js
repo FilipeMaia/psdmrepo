@@ -233,6 +233,11 @@ function datafiles_create() {
 		$('#datafiles-files-refresh').button().click(function() { that.files_update(); });
 		$('#datafiles-files-ctrl').find('input').keyup(function(e) { if(e.keyCode == 13) that.files_update(); });
 		$('#datafiles-files-ctrl').find('select').change(function() { that.files_update(); });
+		$('#datafiles-files-reverse').button().click(function() {
+			that.files_last_request_files.reverse();
+			that.files_last_request.runs.reverse();
+			that.files_display();
+		});
 		$('#datafiles-files-wa' ).find('input[name="type"]').attr('checked','checked');
 		$('#datafiles-files-wa' ).find('input[name="size"]').attr('checked','checked');
 		$('#datafiles-files-wa' ).find('input[name="created"]').attr('checked','checked');

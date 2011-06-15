@@ -16,6 +16,7 @@ use LogBook\LogBookException;
 
 use LusiTime\LusiTimeException;
 
+use RegDB\RegDB;
 use RegDB\RegDBException;
 
 /* Descending sort experiments by their identifiers
@@ -36,6 +37,9 @@ try {
 
 	$logbook = new LogBook();
 	$logbook->begin();
+
+	$regdb = new RegDB();
+	$regdb->begin();
 
 	foreach( $logbook->regdb()->instruments() as $instrument )
 		if( !$instrument->is_location())
@@ -82,9 +86,8 @@ function page_specific_init() {
     $('#experiments').tabs();
     $('#experiments-by-year').tabs();
 
-    $('#experiment-search button').button();
-    $('#experiment-search button').click( search_experiment );
-    $('#experiment-search input').keydown(
+    $('#experiment-search-button').button().click( search_experiment );
+    $('#experiment-search-input').keydown(
     	function( event ) {
         	// Only process RETURN key
         	if( event.which == 13 ) search_experiment();
@@ -181,6 +184,28 @@ function show_email( user, addr ) {
     	)
     );
 
+	/* "Active" experiments. These are the most recent experimentch which have been
+	 * activated with the 'Experiment Switch'.
+     */
+	$html = table_header();
+	foreach( $regdb->instruments() as $instrument ) {
+		if( $instrument->is_location()) continue;
+
+		$last_experiment_switch = $regdb->last_experiment_switch( $instrument->name());
+		if( !is_null( $last_experiment_switch ))
+			$html .= table_row( $logbook->find_experiment_by_id( $last_experiment_switch['exper_id'] ));
+	}	
+    $html .= DataPortal::table_end_html();
+	array_push(
+		$experiment_tabs,
+    	array(
+    		'name' => 'Active',
+    		'id'   => 'experiment-active',
+    		'html' => $html,
+    		'class' => 'tab-inline-content'
+    	)
+    );
+    
 	/* All experiments in one tab. The tab has a subtab for each year of operation.
      */
     $experiment_by_year = array();
@@ -210,7 +235,7 @@ function show_email( user, addr ) {
    	array_push(
 		$experiment_tabs,
     	array(
-    		'name' => 'all experiments',
+    		'name' => 'All Experiments',
     		'id'   => 'experiments-by-year',
     		'html' => DataPortal::tabs_html( "experiments-by-year-contents", $experiment_tabs_by_year ),
 	    	'class' => 'tab-inline-content'
@@ -253,10 +278,9 @@ function show_email( user, addr ) {
      */
 	$html = <<<HERE
 <div id="experiment-search" stype="display:none;">
-  <div>
-    <input type="text" title="enter experiment name or its numeric identifier"/>
-    <button>Search</button>
-  </div>
+  <div style="float:left;"><input id="experiment-search-input" type="text" title="enter experiment name or its numeric identifier"/></div>
+  <div style="float:left; margin-left:10px; font-size:80%;"><button id="experiment-search-button">Search</button></div>
+  <div style="clear:both;"></div>
   <div id="experiment-search-result"></div>
 </div>
 

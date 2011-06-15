@@ -11,6 +11,17 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2011-06-14 Igor Gaponenko
+- added a tab for 'Active' experiments into Experiment Switch
+- allowed to deselect anyone (in the e-mail notification section) in
+the Experiment Switch
+- tightened Experiment Switch GUI
+- allowed to retranslate 'FAILED' runs in teh HDF5 translaton interface
+- improved e-log 'Post' and 'Reply' dialogs to submit messages (w/ attachments)
+w/o refreshing the page. This required to bring in an additional
+JQuery plug-in (AJAX Form)
+
 Tag: V00-00-04
 2011-06-10 Igor Gaponenko
 - committing and tagging the first production version of the Protal

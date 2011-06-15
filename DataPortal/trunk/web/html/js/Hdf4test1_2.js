@@ -175,6 +175,7 @@ function hdf_create() {
 	this.manage_display = function() {
 		var result = this.manage_last_request;
 		var html =
+'<button class="reverse not4print" style="margin-right:20px;">Show in Reverse Order</button>'+
 '<button class="translate_all not4print" value="" title="request translation for all selected runs which have not been translated">Translate selected runs</button>'+
 '<button class="stop_all not4print" style="margin-left:5px;" value="" title="remove translation requests from the translation queue for selected runs">Stop translation of selected runs</button>'+
 '<br><br>'+
@@ -263,6 +264,10 @@ function hdf_create() {
 '</tbody></table>';
 
 		$('#hdf-manage-list').html(html);
+		$('#hdf-manage-list').find('.reverse').button().click(function() {
+			that.manage_last_request.requests.reverse();
+			that.manage_display();
+		});
 		$('#hdf-manage-list').find('.translate').button().click(function() {
 			$(this).button('disable');
 			that.translate_run($(this).val());

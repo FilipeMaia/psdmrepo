@@ -36,7 +36,7 @@ class DataPortal {
 	static function begin( $page_name ) {
 		echo <<<HERE
 
-<!DOCTYPE html"> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html> 
 <head> 
 <title>{$page_name}</title> 

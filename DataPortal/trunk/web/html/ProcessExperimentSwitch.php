@@ -61,7 +61,9 @@ try {
    	 * the switch for this or all experiments.
      */
    	if( !( $authdb->hasRole( $requestor_uid, $experiment->id(), 'ExperimentSwitch', 'Manage' ) ||
-       	   $authdb->hasRole( $requestor_uid, null,              'ExperimentSwitch', 'Manage' ))) {
+       	   $authdb->hasRole( $requestor_uid, null,              'ExperimentSwitch', 'Manage' ) ||
+       	   $authdb->hasRole( $requestor_uid, $experiment->id(), 'ExperimentSwitch', 'Manage_'.$instrument_name ) ||
+       	   $authdb->hasRole( $requestor_uid, null,              'ExperimentSwitch', 'Manage_'.$instrument_name ))) {
     	print( RegDBAuth::reporErrorHtml(
    	    	'You are not authorized to manage the experiment switch'));
    		exit;
@@ -79,7 +81,7 @@ try {
 			die( "fatal internal error when resolving experiment id={$previous_exper_id} in the database" );
 		$previous_experiment_name = $previous_experiment->name();	
 	}
-	if( $previous_experiment_name != '' && $previous_experiment_name != $experiment_name ) {
+	if( $previous_experiment_name != $experiment_name ) {
 
     	/* Find persons to be notified.
 	 	*/

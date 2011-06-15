@@ -44,7 +44,7 @@ $known_apps = array(
 	'experiment' => True,
 	'elog'       => True,
 	'datafiles'  => True,
-	'hdf5'       => True );
+	'hdf'        => True );
 
 $select_app = 'experiment';
 $select_app_context1 = '';
@@ -338,7 +338,7 @@ HERE;
           <div style="clear:both;"></div>
         </div>
       </div>
-      <form id="elog-form-post" enctype="multipart/form-data" action="/apps-dev/logbook/NewFFEntry4portal.php" method="post">
+      <form id="elog-form-post" enctype="multipart/form-data" action="/apps-dev/logbook/NewFFEntry4portalJSON.php" method="post">
         <input type="hidden" name="id" value="{$experiment->id()}" />
         <input type="hidden" name="scope" value="" />
         <input type="hidden" name="run_id" value="" />
@@ -833,23 +833,31 @@ HERE;
             <option>disk</option>
           </select>
         </td>
-        <td style="font-size:120%; padding-left: 40px;"><b>Columns:</b></td>
+        <td><div style="font-size:120%; padding-left:10px;"><button id="datafiles-files-reverse">Show in Reverse Order</button></div></td>
+        <td style="font-size:120%; padding-left: 20px;"><b>Columns:</b></td>
         <td><input type="checkbox" name="type" /></td><td>Type</td>
         <td><input type="checkbox" name="size" /></td><td>Size</td>
         <td><input type="checkbox" name="created" /></td><td>Created</td>
-        <td><input type="checkbox" name="checksum" /></td><td>Checksum</td>
       </tr><tr>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
         <td><input type="checkbox" name="archived" /></td><td>Archived</td>
         <td><input type="checkbox" name="local" /></td><td>On disk</td>
-        <td><input type="checkbox" name="archived_path" /></td><td>Archived path</td>
-        <td><input type="checkbox" name="local_path" /></td><td>Disk path</td>
+        <td><input type="checkbox" name="checksum" /></td><td>Checksum</td>
+      </tr><tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><input type="checkbox" name="archived_path" /></td><td>HPSS</td>
+        <td><input type="checkbox" name="local_path" /></td><td>iRODS</td>
+        <td></td>
       </tr>
     </tbody></table>
   </div>
-  <div id="datafiles-files-list" style="margin-top:15px;"></div>
+  <div id="datafiles-files-list" style="margin-top:5px;"></div>
 </div>
 HERE;
 
@@ -922,11 +930,11 @@ HERE;
 
 <!------------------- Document Begins Here ------------------------->
 
-<!DOCTYPE html"> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
 
-<title>Test</title>
+<title>Web Portal of Experiment: <?php echo $instrument->name()?> / <?php echo $experiment->name()?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
 
 <link type="text/css" href="/jquery/css/custom-theme/jquery-ui-1.8.7.custom.css" rel="Stylesheet" />
@@ -938,6 +946,7 @@ HERE;
 
 <script type="text/javascript" src="/jquery/js/jquery-1.5.1.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui-1.8.7.custom.min.js"></script>
+<script type="text/javascript" src="js/jquery.form.js"></script> 
 <script type="text/javascript" src="js/Utilities.js"></script>
 <script type="text/javascript" src="js/ELog4test1_2.js"></script>
 <script type="text/javascript" src="js/Exper4test1_2.js"></script>
@@ -1457,7 +1466,7 @@ var applications = {
 	'p-appl-experiment' : exper,
 	'p-appl-elog'       : elog,
 	'p-appl-datafiles'  : datafiles,
-	'p-appl-hdf5'       : hdf,
+	'p-appl-hdf'        : hdf,
 	'p-appl-help'       : new p_appl_help()			// TODO: implement it the same wa as for e-Log
 };
 
@@ -1700,7 +1709,7 @@ function p_appl_help() {
     <div class="m-item m-item-first m-select" id="p-appl-experiment">Experment</div>
     <div class="m-item m-item-next" id="p-appl-elog">e-Log</div>
     <div class="m-item m-item-next" id="p-appl-datafiles">File Manager</div>
-    <div class="m-item m-item-next" id="p-appl-hdf5">HDF5 Translation</div>
+    <div class="m-item m-item-next" id="p-appl-hdf">HDF5 Translation</div>
     <div class="m-item m-item-last" id="p-appl-help">Help</div>
     <div class="m-item-end"></div>
   </div>
