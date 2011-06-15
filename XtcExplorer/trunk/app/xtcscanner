@@ -24,7 +24,7 @@ __version__ = "$Revision: 0 $"
 import sys
 from optparse import OptionParser
 
-from XtcEventBrowser.XtcScanner import XtcScanner
+from XtcExplorer.XtcScanner import XtcScanner
 
 if __name__ == "__main__" :
 

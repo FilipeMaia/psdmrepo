@@ -498,8 +498,8 @@ class Plotter(object):
             nrow = int( nplots/ncol )
             if (nplots%ncol) > 0 : nrow+=1
         
-        print "Figuresize: ", self.w*ncol,self.h*nrow
-        print "Figure conf: %d rows x %d cols" % ( nrow, ncol)
+        #print "Figuresize: ", self.w*ncol,self.h*nrow
+        #print "Figure conf: %d rows x %d cols" % ( nrow, ncol)
         
         # --- sanity check ---
         max =  ncol * nrow
@@ -530,7 +530,7 @@ class Plotter(object):
                 aframe.axes = ax
                 self.frames.append(aframe)
 
-            print "Subplot ", i, " created ", nrow, ncol, i, self.frames[i-1].name
+            #print "Subplot ", i, " created ", nrow, ncol, i, self.frames[i-1].name
                     
         self.connect()
 

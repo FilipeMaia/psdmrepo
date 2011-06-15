@@ -80,7 +80,6 @@ class  pyana_image ( object ) :
         self.mpl_num = opt.getOptInteger(fignum)
 
         self.sources = opt.getOptStrings(sources)
-        print sources, self.sources
         nsources = len(self.sources)
         print "pyana_image, %d sources: " % nsources
         for sources in self.sources :

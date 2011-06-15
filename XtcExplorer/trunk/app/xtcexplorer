@@ -59,7 +59,7 @@ def main(argv) :
     explorer = XtcExplorerMain()
 
     for file in files :
-	explorer.add_file_from_cmd(file)
+	explorer.add_file(file)
 
     explorer.show()
     sys.exit(app.exec_())

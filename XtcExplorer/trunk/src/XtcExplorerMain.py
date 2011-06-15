@@ -101,6 +101,9 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.create_main_frame()
         print "Welcome to Xtc Explorer!"
 
+        print self.filenames
+        # Make a quick scan right away...
+        self.scan_files_quick()
         
     def create_main_frame(self):
 
@@ -183,8 +186,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.quit_button = QtGui.QPushButton("&Quit")
         #self.connect(self.quit_button, QtCore.SIGNAL('clicked()'), QtGui.qApp, QtCore.SLOT('quit()') )
         self.connect(self.quit_button, QtCore.SIGNAL('clicked()'), self.quit )
-        
-        
+                
 
         # holds checkboxes, pyana configuration and pyana run-button
         #self.det_selector = QtGui.QVBoxLayout()
@@ -277,7 +279,6 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.setCentralWidget(self.main_widget)
 
 
-
     #-------------------
     #  Public methods --
     #-------------------
@@ -292,6 +293,21 @@ class XtcExplorerMain (QtGui.QMainWindow) :
     #  Private methods --
     #--------------------
     
+    def add_file(self, filename):
+        """Add file by name
+        """
+        if self.filenames.count(filename)==0:
+            if os.path.isfile(filename) :
+                self.filenames.append(filename)
+
+                # add the last file opened to the line dialog
+                self.lineedit.setText( str(filename) )
+                self.update_currentfiles()
+            else :
+                print "Non-existent file: ", filename
+        else:
+            print "Was already in the list: ", filename
+
     def file_browser(self):
         """Opens a Qt File Dialog
 
@@ -303,38 +319,20 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             self, "Select File","/reg/d/psdm/","xtc files (*.xtc)")
         
         # convert QStringList to python list of strings
-        file = ''
+        filename = ""
         for file in selectedfiles :
-            if self.filenames.count( str(file) )==0 :
-                self.filenames.append( str(file) )
+            self.add_file( str(file) )
 
-        # add the last file opened to the line dialog
-        self.lineedit.setText( str(file) )
-        self.update_currentfiles()
-        
-
-    def add_file_from_cmd(self, filename):
-        """Add file
-        """
-        if self.filenames.count(filename)==0:
-            if os.path.isfile(filename) :
-                self.filenames.append(filename)
-                # add the last file opened to the line dialog
-                self.lineedit.setText( str(filename) )
-                self.update_currentfiles()
-            
 
     def add_file_from_lineedit(self):
-        """Add a file to list of files
+        """Add a file from lineedit
         
         Add a file to list of files. Input from lineedit
         """
-        filestring = str(self.lineedit.text())
-        if self.filenames.count(filestring)==0:
-            if os.path.isfile(filestring):
-                self.filenames.append(filestring)
-                self.update_currentfiles()
-            
+        filename = str(self.lineedit.text())
+        self.add_file(filename)
+
+        
     def clear_file_list(self):
         """Empty the file list
         
