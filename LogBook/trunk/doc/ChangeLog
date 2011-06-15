@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: 00-01-22
+2011-06-14 Igor Gaponenko
+- added a new service for posting messages from JQUery AJAX Form
+plug-in w/o refreshing the page. The new service will return a JSON
+object representing a mewely posted entry.
+
 Tag: 00-01-21
 2011-06-10 Igor Gaponenko
 - committing changes required by the first production version of Portal
