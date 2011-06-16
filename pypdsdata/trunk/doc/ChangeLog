@@ -1,4 +1,8 @@
 
+2011-06-16 - V00-00-32
+======================
+- add wrapper src/lusi.py module
+
 2011-06-16 - V00-00-31
 ======================
 - add new types from pdsdata V02-11-05

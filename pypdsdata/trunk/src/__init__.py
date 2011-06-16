@@ -7,7 +7,7 @@
 # import stuff from extension module
 from _pdsdata import Error
 
-__all__ = ['Error', 'xtc', 'bld', 'camera', 'control', 'encoder',
-           'epics', 'evr', 'fccd', 'ipimb', 'opal1k', 'pnccd', 'pulnix',
-           'princeton', 'acqiris', 'io']
+__all__ = ['Error', 'acqiris', 'bld', 'camera', 'control',  'encoder', 
+           'epics', 'evr', 'fccd', 'io', 'ipimb', 'lusi', 'opal1k', 
+           'pnccd', 'pulnix', 'princeton', 'xtc']
 
