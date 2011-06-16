@@ -1,4 +1,8 @@
 
+2011-06-16 - V00-00-31
+======================
+- add new types from pdsdata V02-11-05
+
 2011-06-15 - V00-00-30
 ======================
 - small fixes to make it compile with pdsdata V02-11-05, but new

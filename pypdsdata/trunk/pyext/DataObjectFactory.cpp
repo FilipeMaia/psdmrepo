@@ -32,7 +32,9 @@
 #include "types/bld/BldDataFEEGasDetEnergy.h"
 #include "types/bld/BldDataEBeamV0.h"
 #include "types/bld/BldDataEBeamV1.h"
+#include "types/bld/BldDataEBeamV2.h"
 #include "types/bld/BldDataIpimbV0.h"
+#include "types/bld/BldDataIpimbV1.h"
 #include "types/bld/BldDataPhaseCavity.h"
 
 #include "types/camera/FrameFexConfigV1.h"
@@ -43,6 +45,7 @@
 
 #include "types/cspad/ConfigV1.h"
 #include "types/cspad/ConfigV2.h"
+#include "types/cspad/ConfigV3.h"
 #include "types/cspad/ElementV1.h"
 #include "types/cspad/ElementV2.h"
 
@@ -64,11 +67,15 @@
 #include "types/fccd/FccdConfigV2.h"
 
 #include "types/ipimb/ConfigV1.h"
+#include "types/ipimb/ConfigV2.h"
 #include "types/ipimb/DataV1.h"
+#include "types/ipimb/DataV2.h"
 
 #include "types/lusi/DiodeFexConfigV1.h"
+#include "types/lusi/DiodeFexConfigV2.h"
 #include "types/lusi/DiodeFexV1.h"
 #include "types/lusi/IpmFexConfigV1.h"
+#include "types/lusi/IpmFexConfigV2.h"
 #include "types/lusi/IpmFexV1.h"
 #include "types/lusi/PimImageConfigV1.h"
 
@@ -208,6 +215,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
   case Pds::TypeId::Id_EBeam :
     if ( not obj ) obj = xtc2obj<BldDataEBeamV0, 0>(xtc, parent);
     if ( not obj ) obj = xtc2obj<BldDataEBeamV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<BldDataEBeamV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_PhaseCavity :
@@ -238,10 +246,12 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_IpimbData :
     if ( not obj ) obj = xtc2obj<Ipimb::DataV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Ipimb::DataV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_IpimbConfig :
     if ( not obj ) obj = xtc2obj<Ipimb::ConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Ipimb::ConfigV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_EncoderData :
@@ -269,10 +279,12 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
   case Pds::TypeId::Id_CspadConfig :
     if ( not obj ) obj = xtc2obj<CsPad::ConfigV1, 1>(xtc, parent);
     if ( not obj ) obj = xtc2obj<CsPad::ConfigV2, 2>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<CsPad::ConfigV3, 3>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_IpmFexConfig :
     if ( not obj ) obj = xtc2obj<Lusi::IpmFexConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Lusi::IpmFexConfigV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_IpmFex :
@@ -281,6 +293,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_DiodeFexConfig :
     if ( not obj ) obj = xtc2obj<Lusi::DiodeFexConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Lusi::DiodeFexConfigV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_DiodeFex :
@@ -293,6 +306,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_SharedIpimb :
     if ( not obj ) obj = xtc2obj<BldDataIpimbV0, 0>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<BldDataIpimbV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_AcqTdcConfig :

@@ -55,8 +55,10 @@
 
 #include "types/bld/BldDataEBeamV0.h"
 #include "types/bld/BldDataEBeamV1.h"
+#include "types/bld/BldDataEBeamV2.h"
 #include "types/bld/BldDataFEEGasDetEnergy.h"
 #include "types/bld/BldDataIpimbV0.h"
+#include "types/bld/BldDataIpimbV1.h"
 #include "types/bld/BldDataPhaseCavity.h"
 
 #include "types/camera/FrameCoord.h"
@@ -71,8 +73,10 @@
 #include "types/cspad/ConfigV1.h"
 #include "types/cspad/ConfigV1QuadReg.h"
 #include "types/cspad/ConfigV2.h"
+#include "types/cspad/ConfigV3.h"
 #include "types/cspad/CsPadDigitalPotsCfg.h"
 #include "types/cspad/CsPadGainMapCfg.h"
+#include "types/cspad/CsPadProtectionSystemThreshold.h"
 #include "types/cspad/CsPadReadOnlyCfg.h"
 #include "types/cspad/ElementV1.h"
 #include "types/cspad/ElementV2.h"
@@ -105,11 +109,15 @@
 #include "types/fccd/FccdConfigV2.h"
 
 #include "types/ipimb/ConfigV1.h"
+#include "types/ipimb/ConfigV2.h"
 #include "types/ipimb/DataV1.h"
+#include "types/ipimb/DataV2.h"
 
 #include "types/lusi/DiodeFexConfigV1.h"
+#include "types/lusi/DiodeFexConfigV2.h"
 #include "types/lusi/DiodeFexV1.h"
 #include "types/lusi/IpmFexConfigV1.h"
+#include "types/lusi/IpmFexConfigV2.h"
 #include "types/lusi/IpmFexV1.h"
 #include "types/lusi/PimImageConfigV1.h"
 
@@ -202,8 +210,10 @@ PyMODINIT_FUNC init_pdsdata()
   module = Py_InitModule3( "_pdsdata.bld", 0, "The Python module for pdsdata/bld" );
   pypdsdata::BldDataEBeamV0::initType( module );
   pypdsdata::BldDataEBeamV1::initType( module );
+  pypdsdata::BldDataEBeamV2::initType( module );
   pypdsdata::BldDataFEEGasDetEnergy::initType( module );
   pypdsdata::BldDataIpimbV0::initType( module );
+  pypdsdata::BldDataIpimbV1::initType( module );
   pypdsdata::BldDataPhaseCavity::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "bld", module );
@@ -227,8 +237,10 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::CsPad::ConfigV1::initType( module );
   pypdsdata::CsPad::ConfigV1QuadReg::initType( module );
   pypdsdata::CsPad::ConfigV2::initType( module );
+  pypdsdata::CsPad::ConfigV3::initType( module );
   pypdsdata::CsPad::CsPadDigitalPotsCfg::initType( module );
   pypdsdata::CsPad::CsPadGainMapCfg::initType( module );
+  pypdsdata::CsPad::CsPadProtectionSystemThreshold::initType( module );
   pypdsdata::CsPad::CsPadReadOnlyCfg::initType( module );
   pypdsdata::CsPad::ElementV1::initType( module );
   pypdsdata::CsPad::ElementV2::initType( module );
@@ -276,14 +288,18 @@ PyMODINIT_FUNC init_pdsdata()
 
   module = Py_InitModule3( "_pdsdata.ipimb", 0, "The Python module for pdsdata/ipimb" );
   pypdsdata::Ipimb::ConfigV1::initType( module );
+  pypdsdata::Ipimb::ConfigV2::initType( module );
   pypdsdata::Ipimb::DataV1::initType( module );
+  pypdsdata::Ipimb::DataV2::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "ipimb", module );
 
   module = Py_InitModule3( "_pdsdata.lusi", 0, "The Python module for pdsdata/lusi" );
   pypdsdata::Lusi::DiodeFexConfigV1::initType( module );
+  pypdsdata::Lusi::DiodeFexConfigV2::initType( module );
   pypdsdata::Lusi::DiodeFexV1::initType( module );
   pypdsdata::Lusi::IpmFexConfigV1::initType( module );
+  pypdsdata::Lusi::IpmFexConfigV2::initType( module );
   pypdsdata::Lusi::IpmFexV1::initType( module );
   pypdsdata::Lusi::PimImageConfigV1::initType( module );
   Py_INCREF( module );

@@ -23,6 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "ConfigV2.h"
+#include "ConfigV3.h"
 #include "../../Exception.h"
 #include "../TypeLib.h"
 #include "../../pdsdata_numpy.h"
@@ -138,8 +139,11 @@ next( PyObject* self, PyObject* args )
   if ( pypdsdata::CsPad::ConfigV2::Object_TypeCheck( configObj ) ) {
     const Pds::CsPad::ConfigV2* config = pypdsdata::CsPad::ConfigV2::pdsObject( configObj );
     sMask = config->roiMask(obj->quad());
+  } else if ( pypdsdata::CsPad::ConfigV3::Object_TypeCheck( configObj ) ) {
+    const Pds::CsPad::ConfigV3* config = pypdsdata::CsPad::ConfigV3::pdsObject( configObj );
+    sMask = config->roiMask(obj->quad());
   } else {
-    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a cspad.ConfigV2 object");
+    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a cspad.ConfigV{2,3} object");
     return 0;
   }
 
@@ -173,8 +177,11 @@ data( PyObject* self, PyObject* args )
   if ( pypdsdata::CsPad::ConfigV2::Object_TypeCheck( configObj ) ) {
     const Pds::CsPad::ConfigV2* config = pypdsdata::CsPad::ConfigV2::pdsObject( configObj );
     sMask = config->roiMask(obj->quad());
+  } else if ( pypdsdata::CsPad::ConfigV3::Object_TypeCheck( configObj ) ) {
+    const Pds::CsPad::ConfigV3* config = pypdsdata::CsPad::ConfigV3::pdsObject( configObj );
+    sMask = config->roiMask(obj->quad());
   } else {
-    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a cspad.ConfigV2 object");
+    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a cspad.ConfigV{2,3} object");
     return 0;
   }
   
