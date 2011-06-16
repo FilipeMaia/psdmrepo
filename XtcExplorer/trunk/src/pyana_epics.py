@@ -174,6 +174,10 @@ class pyana_epics (object) :
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
             header = "EpicsPV plots shots %d-%d" % (self.accu_start, self.n_shots)
             self.make_plots(header)
+
+            # flag for pyana_plotter
+            evt.put(True, 'show_event')
+            
             data_epics = []
             for pv_name in self.pv_names :
                 data_epics.append( self.epics_data[pv_name] )

@@ -11,6 +11,12 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Jun-16 ofte                   rev 1995
+	- pyana_ipimb: variable list to select what to plot
+	- pyana_plotter: avoid drawing every event (slows things down). 
+	   Relies on event 'show_event'. Added flag putting to all modules. 
+	- pyana_cspad displays average so far, if no darks. To do: accumulate/reset
+	
 2011-Jun-15 ofte                   rev 1986
         - more tidying up
 

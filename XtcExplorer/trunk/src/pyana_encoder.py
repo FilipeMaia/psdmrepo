@@ -94,6 +94,9 @@ class  pyana_encoder ( object ) :
             header = "Encoder data shots %d-%d" % (self.accu_start, self.n_shots)
             self.make_plots(title=header)
 
+            # flag for pyana_plotter
+            evt.put(True, 'show_event')
+            
             # convert dict to a list:
             data_encoder = []
             for source in self.sources :

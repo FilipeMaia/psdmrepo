@@ -278,6 +278,7 @@ class pyana_scan (object) :
         self.make_plots(fignum=self.mpl_num, suptitle="Scan (%d calib cycles, %d shots each)" \
                         %(self.n_ccls,self.n_shots))
         
+        
         self.data = []
         for pv,data in self.data_scan.iteritems():
             self.data.append( data )

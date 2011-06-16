@@ -207,8 +207,11 @@ class  pyana_bld ( object ) :
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
 
             header = "shots %d-%d" % (self.accu_start, self.n_shots)
-                
             self.make_plots(self.mpl_num, suptitle=header)
+
+            # flag for pyana_plotter
+            evt.put(True, 'show_event')
+
             data_bld = []
             for name,data in self.data.iteritems() :
                 data_bld.append( data )
@@ -228,6 +231,10 @@ class  pyana_bld ( object ) :
         # ----------------- Plotting ---------------------
         header = "shots %d-%d" % (self.accu_start, self.n_shots)
         self.make_plots(self.mpl_num, suptitle=header)
+
+        # flag for pyana_plotter
+        evt.put(True, 'show_event')
+
         data_bld = []
         for name,data in self.data.iteritems() :
             data_bld.append( data )
@@ -238,6 +245,9 @@ class  pyana_bld ( object ) :
 
 
     def make_plots(self, fignum = 1, suptitle = ""):
+
+        if self.accu_start == self.n_shots :
+            print "Can't do ", suptitle
         
         if self.do_EBeam :
             if len(self.EB_charge) > 0 :

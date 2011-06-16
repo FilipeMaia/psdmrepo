@@ -355,6 +355,9 @@ class  pyana_image ( object ) :
         # Draw images from this event
         # -----------------------------------
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
+            # flag for pyana_plotter
+            evt.put(True, 'show_event')
+            
             newmode = self.plotter.draw_figurelist(self.mpl_num,
                                                    event_display_images,
                                                    title="Cameras shot#%d"%self.n_shots,

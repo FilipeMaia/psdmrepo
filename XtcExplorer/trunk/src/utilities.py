@@ -170,6 +170,7 @@ class BldData( BaseData ):
         self.fex_sum = None
         self.fex_channels = None
         self.raw_channels = None
+        self.raw_channels_volt = None
         self.fex_position = None
 
     def show( self ):
@@ -192,6 +193,8 @@ class BldData( BaseData ):
             itsme+="\n\t fex_channels = array of shape %s"%str(np.shape(self.fex_channels))
         if self.raw_channels is not None :
             itsme+="\n\t raw_channels = array of shape %s"%str(np.shape(self.raw_channels))
+        if self.raw_channels_volt is not None :
+            itsme+="\n\t raw_channels_volt = array of shape %s"%str(np.shape(self.raw_channels_volt))
         if self.fex_position is not None :
             itsme+="\n\t fex_position = array of shape %s"%str(np.shape(self.fex_position))
         print itsme
@@ -205,6 +208,7 @@ class IpimbData( BaseData ):
         self.fex_channels = None
         self.fex_position = None
         self.raw_channels = None
+        self.raw_channels_volt = None
 
     def show( self ):
         """Printable description 
@@ -218,6 +222,8 @@ class IpimbData( BaseData ):
             itsme+="\n\t fex_position = array of shape %s"%str(np.shape(self.fex_position))
         if self.raw_channels is not None :
             itsme+="\n\t raw_channels = array of shape %s"%str(np.shape(self.raw_channels))
+        if self.raw_channels_volt is not None :
+            itsme+="\n\t raw_channels_volt = array of shape %s"%str(np.shape(self.raw_channels_volt))
         print itsme
 
 

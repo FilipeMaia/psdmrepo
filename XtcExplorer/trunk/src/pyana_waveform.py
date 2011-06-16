@@ -210,6 +210,9 @@ class pyana_waveform (object) :
 
                             
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
+            # flag for pyana_plotter
+            evt.put(True, 'show_event')
+            
             self.make_plots()
 
             data_waveform = []

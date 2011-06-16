@@ -168,9 +168,6 @@ class pyana_plotter (object) :
         if evt.get('skip_event'):
             return
         
-        # print a progress report
-        if (self.n_shots%1000)==0 :
-            print "Shot#", self.n_shots
 
 
         # if any module changed the display mode, pick it up (we're last)
@@ -194,16 +191,25 @@ class pyana_plotter (object) :
 
             #print "pyana_plotter current display mode: ", self.display_mode
 
+        # only call the plt.draw / plt.show is there's actually
+        # something new to show, since it's slow. 
+        show_event = evt.get('show_event')
+        if show_event:
+            print "pyana_plotter: Shot#%d, Displaymode: %d" % (self.n_shots,self.display_mode)
 
-        if self.display_mode == 1:
-            # Interactive
-            plt.ioff()
-            plt.show()
+            if self.ipython :
+                plt.draw()
+                self.launch_ipython(evt)
 
-        elif self.display_mode == 2:
-            # SlideShow
-            plt.ion()
-            plt.draw()            
+            if self.display_mode == 1:
+                # Interactive
+                plt.ioff()
+                plt.show()
+
+            elif self.display_mode == 2:
+                # SlideShow
+                plt.ion()
+                plt.draw()            
 
     def endcalibcycle( self, env ) :
         """This optional method is called if present at the end of the 
@@ -232,55 +238,14 @@ class pyana_plotter (object) :
         logging.info( "pyana_plotter.endjob() called" )
 
         plt.draw()
-
-        if self.ipython : 
-
-            # get pointer to the data from each of the modules
-            data_ipimb = evt.get('data_ipimb')
-            if data_ipimb :  print "data_ipimb: ", data_ipimb
-            else :           del data_ipimb
-
-            data_bld = evt.get('data_bld')
-            if data_bld :   print "data_bld: ", data_bld
-            else :          del data_bld
-
-            data_epics = evt.get('data_epics')
-            if data_epics :   print "data_epics: ", data_epics
-            else :          del data_epics
-
-            data_scan = evt.get('data_scan')
-            if data_scan :  print "data_scan: ", data_scan
-            else :          del data_scan
-
-            data_encoder = evt.get('data_encoder')
-            if data_encoder :  print "data_encoder: ", data_encoder
-            else :          del data_encoder
-
-            data_waveform = evt.get('data_waveform')
-            if data_waveform :  print "data_waveform: ", data_waveform
-            else :          del data_waveform
-
-            data_image = evt.get('data_image')
-            if data_image:  print "data_image: ", data_image
-            else:           del data_image
-
-            data_cspad = evt.get('data_cspad')
-            if data_cspad:  print "data_cspad: ", data_cspad
-            else:           del data_cspad
-
-            self.ipshell = IPShellEmbed(argv=['-pi1','In \\# >> ','-po','Out \\#: '], 
-                                        banner='--------- Dropping into iPython ---------',
-                                        exit_msg='--------- Leaving iPython -------------')
-            
-            self.ipshell("Called from endjob. \nTry 'whos' to see the workspace. " \
-                         "\nHit Ctrl-D to exit iPython and continue program.")
-            
+        
+        if self.ipython :
+            self.launch_ipython(evt)
             
         print "Pyana will exit once you close all the MatPlotLib windows"            
         if self.display_mode > 0 :
             plt.ioff()
             plt.show()
-
 
         print "-------------------"
         print "Done running pyana."
@@ -289,3 +254,48 @@ class pyana_plotter (object) :
         print "Thank you!"
         print "-------------------"
 
+
+    def launch_ipython(self, evt):
+        """Launch an ipython session with access to data stored in the evt object
+        """
+        # get pointer to the data from each of the modules
+        data_ipimb = evt.get('data_ipimb')
+        if data_ipimb :  print "data_ipimb: ", data_ipimb
+        else :           del data_ipimb
+        
+        data_bld = evt.get('data_bld')
+        if data_bld :   print "data_bld: ", data_bld
+        else :          del data_bld
+        
+        data_epics = evt.get('data_epics')
+        if data_epics :   print "data_epics: ", data_epics
+        else :          del data_epics
+        
+        data_scan = evt.get('data_scan')
+        if data_scan :  print "data_scan: ", data_scan
+        else :          del data_scan
+        
+        data_encoder = evt.get('data_encoder')
+        if data_encoder :  print "data_encoder: ", data_encoder
+        else :          del data_encoder
+        
+        data_waveform = evt.get('data_waveform')
+        if data_waveform :  print "data_waveform: ", data_waveform
+        else :          del data_waveform
+        
+        data_image = evt.get('data_image')
+        if data_image:  print "data_image: ", data_image
+        else:           del data_image
+        
+        data_cspad = evt.get('data_cspad')
+        if data_cspad:  print "data_cspad: ", data_cspad
+        else:           del data_cspad
+        
+        ipshell = IPShellEmbed(argv=['-pi1','In \\# >> ','-po','Out \\#: '], 
+                               banner='--------- Dropping into iPython ---------',
+                               exit_msg='--------- Leaving iPython -------------')
+        
+        ipshell("Called from endjob. \nTry 'whos' to see the workspace. " \
+                "\nHit Ctrl-D to exit iPython and continue program.")
+        
+        

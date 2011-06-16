@@ -201,10 +201,6 @@ class  pyana_cspad ( object ) :
         self.images = []
         self.ititle = []
 
-        # print a progress report
-        if (self.n_shots%1000)==0 :
-            print "Event ", self.n_shots
-        
         quads = evt.getCsPadQuads(self.img_source, env)
         if not quads :
             print '*** cspad information is missing ***'
@@ -302,6 +298,9 @@ class  pyana_cspad ( object ) :
         # -----
         if self.plot_every_n > 0 and (self.n_shots%self.plot_every_n)==0 :
 
+            # flag for pyana_plotter
+            evt.put(True, 'show_event')
+            
             title = "CsPad shot#%d"%self.n_shots
 
             # keep a list of images 
@@ -319,7 +318,9 @@ class  pyana_cspad ( object ) :
                 dark = self.sum_dark_images/self.n_dark
                 event_display_images.append( ("%s (bkg. subtr.)"%self.img_source, cspad_image-dark ) )
                 event_display_images.append( ("Dark (average of %d shots)"%self.n_dark, dark ) )
-            
+            else :
+                event_display_images.append( ("%s average of %d shots"%(self.img_source,self.n_good), \
+                                              self.sum_good_images/self.n_good) )
 
             ## Just one plot
             # newmode = self.plotter.draw_figure(cspad_image,title, fignum=self.mpl_num, showProj=True)
@@ -329,7 +330,7 @@ class  pyana_cspad ( object ) :
                                                    event_display_images,
                                                    title=title,
                                                    showProj=True)
-            
+
             if newmode is not None:
                 # propagate new display mode to the evt object 
                 evt.put(newmode,'display_mode')
