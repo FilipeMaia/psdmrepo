@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_BLDDATAEBEAM_H
-#define H5DATATYPES_BLDDATAEBEAM_H
+#ifndef H5DATATYPES_BLDDATAIPIMBV1_H
+#define H5DATATYPES_BLDDATAIPIMBV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class BldDataEBeam.
+//	Class BldDataIpimbV1.
 //
 //------------------------------------------------------------------------
 
@@ -23,6 +23,9 @@
 //-------------------------------
 #include "hdf5pp/Type.h"
 #include "pdsdata/bld/bldData.hh"
+#include "H5DataTypes/IpimbConfigV2.h"
+#include "H5DataTypes/IpimbDataV2.h"
+#include "H5DataTypes/LusiIpmFexV1.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -34,26 +37,33 @@
 
 namespace H5DataTypes {
 
-struct BldDataEBeam_Data  {
-  uint32_t    uDamageMask;
-  double      fEbeamCharge;    /* in nC */
-  double      fEbeamL3Energy;  /* in MeV */
-  double      fEbeamLTUPosX;   /* in mm */
-  double      fEbeamLTUPosY;   /* in mm */
-  double      fEbeamLTUAngX;   /* in mrad */
-  double      fEbeamLTUAngY;   /* in mrad */
-  double      fEbeamPkCurrBC2; /* in Amps */
+struct BldDataIpimbV1_Data {
+  IpimbDataV2_Data    ipimbData;
+  IpimbConfigV2_Data  ipimbConfig;
+  LusiIpmFexV1_Data   ipmFexData;
 };
 
-class BldDataEBeam  {
+/**
+ *
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see AdditionalClass
+ *
+ *  @version $Id$
+ *
+ *  @author Andrei Salnikov
+ */
+
+class BldDataIpimbV1  {
 public:
 
-  typedef Pds::BldDataEBeam XtcType ;
+  typedef Pds::BldDataIpimbV1 XtcType ;
 
-  BldDataEBeam () {}
-  BldDataEBeam ( const XtcType& xtc ) ;
+  BldDataIpimbV1 () {}
+  BldDataIpimbV1 ( const XtcType& xtc ) ;
 
-  ~BldDataEBeam () ;
+  ~BldDataIpimbV1 () ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
@@ -61,9 +71,10 @@ public:
   static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
 
 private:
-  BldDataEBeam_Data m_data ;
+  BldDataIpimbV1_Data m_data ;
+
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_BLDDATAEBEAM_H
+#endif // H5DATATYPES_BLDDATAIPIMBV1_H

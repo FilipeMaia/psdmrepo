@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_BLDDATAIPIMB_H
-#define H5DATATYPES_BLDDATAIPIMB_H
+#ifndef H5DATATYPES_BLDDATAIPIMBV0_H
+#define H5DATATYPES_BLDDATAIPIMBV0_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class BldDataIpimb.
+//	Class BldDataIpimbV0.
 //
 //------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@
 
 namespace H5DataTypes {
 
-struct BldDataIpimb_Data {
+struct BldDataIpimbV0_Data {
   IpimbDataV1_Data    ipimbData;
   IpimbConfigV1_Data  ipimbConfig;
   LusiIpmFexV1_Data   ipmFexData;
@@ -55,15 +55,15 @@ struct BldDataIpimb_Data {
  *  @author Andrei Salnikov
  */
 
-class BldDataIpimb  {
+class BldDataIpimbV0  {
 public:
 
-  typedef Pds::BldDataIpimb XtcType ;
+  typedef Pds::BldDataIpimbV0 XtcType ;
 
-  BldDataIpimb () {}
-  BldDataIpimb ( const XtcType& xtc ) ;
+  BldDataIpimbV0 () {}
+  BldDataIpimbV0 ( const XtcType& xtc ) ;
 
-  ~BldDataIpimb () ;
+  ~BldDataIpimbV0 () ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
@@ -71,10 +71,10 @@ public:
   static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
 
 private:
-  BldDataIpimb_Data m_data ;
+  BldDataIpimbV0_Data m_data ;
 
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_BLDDATAIPIMB_H
+#endif // H5DATATYPES_BLDDATAIPIMBV0_H

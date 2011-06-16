@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-38
+2011-06-15 Andy Salnikov
+- upgrading to pdsdata V02-11-05
+
 Tag: V00-00-37
 2011-05-23 Andy Salnikov
 - removed SITConfig include, not useful any more

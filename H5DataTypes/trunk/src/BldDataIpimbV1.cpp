@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class BldDataIpimb...
+//	Class BldDataIpimbV1...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "H5DataTypes/BldDataIpimb.h"
+#include "H5DataTypes/BldDataIpimbV1.h"
 
 //-----------------
 // C/C++ Headers --
@@ -35,7 +35,7 @@
 
 namespace H5DataTypes {
 
-BldDataIpimb::BldDataIpimb ( const XtcType& data )
+BldDataIpimbV1::BldDataIpimbV1 ( const XtcType& data )
 {
   m_data.ipimbData.triggerCounter = data.ipimbData.triggerCounter();
   m_data.ipimbData.config0 = data.ipimbData.config0();
@@ -45,11 +45,19 @@ BldDataIpimb::BldDataIpimb ( const XtcType& data )
   m_data.ipimbData.channel1 = data.ipimbData.channel1();
   m_data.ipimbData.channel2 = data.ipimbData.channel2();
   m_data.ipimbData.channel3 = data.ipimbData.channel3();
+  m_data.ipimbData.channel0ps = data.ipimbData.channel0ps();
+  m_data.ipimbData.channel1ps = data.ipimbData.channel1ps();
+  m_data.ipimbData.channel2ps = data.ipimbData.channel2ps();
+  m_data.ipimbData.channel3ps = data.ipimbData.channel3ps();
   m_data.ipimbData.checksum = data.ipimbData.checksum();
   m_data.ipimbData.channel0Volts = data.ipimbData.channel0Volts();
   m_data.ipimbData.channel1Volts = data.ipimbData.channel1Volts();
   m_data.ipimbData.channel2Volts = data.ipimbData.channel2Volts();
   m_data.ipimbData.channel3Volts = data.ipimbData.channel3Volts();
+  m_data.ipimbData.channel0psVolts = data.ipimbData.channel0psVolts();
+  m_data.ipimbData.channel1psVolts = data.ipimbData.channel1psVolts();
+  m_data.ipimbData.channel2psVolts = data.ipimbData.channel2psVolts();
+  m_data.ipimbData.channel3psVolts = data.ipimbData.channel3psVolts();
 
   m_data.ipimbConfig.triggerCounter = data.ipimbConfig.triggerCounter();
   m_data.ipimbConfig.serialID = data.ipimbConfig.serialID();
@@ -64,6 +72,8 @@ BldDataIpimb::BldDataIpimb ( const XtcType& data )
   m_data.ipimbConfig.errors = data.ipimbConfig.errors();
   m_data.ipimbConfig.calStrobeLength = data.ipimbConfig.calStrobeLength();
   m_data.ipimbConfig.trigDelay = data.ipimbConfig.trigDelay();
+  m_data.ipimbConfig.trigPsDelay = data.ipimbConfig.trigPsDelay();
+  m_data.ipimbConfig.adcDelay = data.ipimbConfig.adcDelay();
 
   std::copy( data.ipmFexData.channel, data.ipmFexData.channel+LusiIpmFexV1_Data::CHSIZE, 
       m_data.ipmFexData.channel);
@@ -72,24 +82,24 @@ BldDataIpimb::BldDataIpimb ( const XtcType& data )
   m_data.ipmFexData.ypos = data.ipmFexData.ypos;
 }
 
-BldDataIpimb::~BldDataIpimb ()
+BldDataIpimbV1::~BldDataIpimbV1 ()
 {
 }
 
 hdf5pp::Type
-BldDataIpimb::stored_type()
+BldDataIpimbV1::stored_type()
 {
   return native_type() ;
 }
 
 hdf5pp::Type
-BldDataIpimb::native_type()
+BldDataIpimbV1::native_type()
 {
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<BldDataIpimb_Data>() ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<BldDataIpimbV1_Data>() ;
 
-  type.insert( "ipimbData", offsetof(BldDataIpimb_Data,ipimbData), IpimbDataV1::native_type() );
-  type.insert( "ipimbConfig", offsetof(BldDataIpimb_Data,ipimbConfig), IpimbConfigV1::native_type() );
-  type.insert( "ipmFexData", offsetof(BldDataIpimb_Data,ipmFexData), LusiIpmFexV1::native_type() );
+  type.insert( "ipimbData", offsetof(BldDataIpimbV1_Data,ipimbData), IpimbDataV2::native_type() );
+  type.insert( "ipimbConfig", offsetof(BldDataIpimbV1_Data,ipimbConfig), IpimbConfigV2::native_type() );
+  type.insert( "ipmFexData", offsetof(BldDataIpimbV1_Data,ipmFexData), LusiIpmFexV1::native_type() );
 
   return type ;
 }
