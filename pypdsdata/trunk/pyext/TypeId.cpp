@@ -72,6 +72,9 @@ namespace {
       { "Id_SharedIpimb",     Pds::TypeId::Id_SharedIpimb },
       { "Id_AcqTdcConfig",    Pds::TypeId::Id_AcqTdcConfig },
       { "Id_AcqTdcData",      Pds::TypeId::Id_AcqTdcData },
+      { "Id_Index",           Pds::TypeId::Id_Index },
+      { "Id_XampsConfig",     Pds::TypeId::Id_XampsConfig },
+      { "Id_XampsElement",    Pds::TypeId::Id_XampsElement },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

@@ -317,6 +317,15 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     if ( not obj ) obj = xtc2obj<Acqiris::TdcDataV1, 1>(xtc, parent);
     break ;
 
+  case Pds::TypeId::Id_Index :
+    break;
+
+  case Pds::TypeId::Id_XampsConfig :
+    break;
+
+  case Pds::TypeId::Id_XampsElement :
+    break;
+
   case Pds::TypeId::NumberOf :
     // just to make compiler shut up about this special unhandled enum
     break;

@@ -84,6 +84,7 @@ namespace {
       { "CxiDs2",      Pds::DetInfo::CxiDs2 },
       { "CxiDsu",      Pds::DetInfo::CxiDsu },
       { "CxiSc1",      Pds::DetInfo::CxiSc1 },
+      { "CxiDsd",      Pds::DetInfo::CxiDsd },
       { "NumDetector", Pds::DetInfo::NumDetector },
       { 0, 0 }
   };
@@ -118,6 +119,7 @@ namespace {
       { "Encoder",   Pds::DetInfo::Encoder },
       { "Cspad",     Pds::DetInfo::Cspad },
       { "AcqTDC",    Pds::DetInfo::AcqTDC },
+      { "Xamps",     Pds::DetInfo::Xamps },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };

@@ -1,4 +1,9 @@
 
+2011-06-16 - V00-00-33
+======================
+- updated TypeId and DetInfo enums
+- updated unit test
+
 2011-06-16 - V00-00-32
 ======================
 - add wrapper src/lusi.py module
