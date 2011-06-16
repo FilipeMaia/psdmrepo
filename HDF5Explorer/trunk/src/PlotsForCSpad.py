@@ -167,7 +167,7 @@ class PlotsForCSpad ( object ) :
         asic2x1 = arr1ev[self.pair,...]
        #print 'asic2x1=',asic2x1    
         asics   = hsplit(asic2x1,2)
-        arrgap=zeros( (185,4), dtype=np.int16 ) # make additional 2D-array of 0-s for the gap between two 1x1 pads
+        arrgap=zeros( (185,3), dtype=np.int16 ) # make additional 2D-array of 0-s for the gap between two 1x1 pads
         arr2d = hstack((asics[0],arrgap,asics[1]))
         return arr2d
 
@@ -191,42 +191,56 @@ class PlotsForCSpad ( object ) :
 
             asic2x1 = self.getImageArrayForPair( arr1ev, pair )
             rotarr2d_0 = np.rot90(asic2x1,cs.confcspad.pairInQaudOriInd[self.quad][ind])
-            #print 'rotarr2d.shape=',rotarr2d.shape
+            #print 'rotarr2d_0.shape=',rotarr2d_0.shape
             #print 'rotarr2d.base is asic2x1 ? ',rotarr2d.base is asic2x1 
 
             rotarr2d = rotarr2d_0
 
             offset = cs.confcspad.preventiveRotationOffset
-            ixOff  = offset + cs.confcspad.pairXInQaud[self.quad][ind]
-            iyOff  = offset + cs.confcspad.pairYInQaud[self.quad][ind]
+            ixOff  = offset + cs.confcspad.pairXInQaud[self.quad][ind] + cs.confcspad.dXInQaud[self.quad][ind] 
+            iyOff  = offset + cs.confcspad.pairYInQaud[self.quad][ind] + cs.confcspad.dYInQaud[self.quad][ind]
+            #print 'ixOff, iyOff :', ixOff, iyOff
 
-            # 0:185, 0:388
+            # 0:185, 0:388 -> 185x391
             rot_index = cs.confcspad.pairInQaudOriInd[self.quad][ind] 
 
-            offS = 92 # 185/2
-            offL = 195 #(388+2)/2
+            offS = 0.5*185
+            offL = 0.5*(388+3)
+            #print 'offS, offL :', offS, offL
 
             if rot_index == 0 or rot_index == 2 :
-                ixOff -= offS  
-                iyOff -= offL  
-
+                self.lx0 = offS  
+                self.ly0 = offL  
             else :
-                ixOff -= offL  
-                iyOff -= offS  
+                self.lx0 = offL  
+                self.ly0 = offS  
 
+            ixOff -= self.lx0  
+            iyOff -= self.ly0  
 
             #-------- Apply tilt angle of 2x1 sensors
             if cp.confpars.cspadApplyTiltAngle :
+
+                r0      = math.sqrt( self.lx0*self.lx0 + self.ly0*self.ly0 )
+                sinPhi  = self.ly0 / r0
+                cosPhi  = self.lx0 / r0
 
                 angle  = cs.confcspad.dPhi[self.quad][ind]
                 rotarr2d = spi.rotate(rotarr2d_0, angle, reshape=True, output=np.float32 )
                 dimX0,dimY0 = rotarr2d_0.shape
 
-                if angle > 0:
-                    ixOff -= int(dimY0 * math.sin(math.radians(angle)))
-                else:
-                    iyOff += int(dimX0 * math.sin(math.radians(angle))) #or subtract modulus
+                rdphi = r0 * abs(math.radians(angle))
+                #print 'rdphi :',rdphi
+
+                ixOff -= rdphi * sinPhi
+                iyOff -= rdphi * cosPhi
+
+                #print 'Tilt offset dx, dy=', rdphi * sinPhi, rdphi * cosPhi
+
             #-------- 
+
+            ixOff = int( ixOff )
+            iyOff = int( iyOff )
 
             dimX, dimY = rotarr2d.shape
             #print 'ixOff, iyOff =', ixOff, iyOff,           

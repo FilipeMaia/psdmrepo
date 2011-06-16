@@ -415,6 +415,10 @@ class DrawEvent ( object ) :
             gm.saveNumpyArrayInFile(arr2d,  fname='cspad-ave.txt' , format='%i') # , format='%f')
            #gm.saveNumpyArrayInFile(arr1ev, fname='cspad-arr.txt' , format='%i') # , format='%f')
 
+            quad = cp.confpars.cspadQuad
+            arrQuad = self.plotsCSpad.getImageArrayForQuad( arr1ev, quadNum=quad )
+            gm.saveNumpyArrayInFile(arrQuad, fname='cspad-ave-quad-' + str(quad) + '.txt' , format='%i') # , format='%f')
+
 
     def drawArrayForDSName(self, dsname, arr1ev) :
 

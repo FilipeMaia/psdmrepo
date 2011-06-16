@@ -52,8 +52,6 @@ class ConfigCSpad ( object ) :
 
         print 'setCSpadParameters'
 
-        self.preventiveRotationOffset = 15 # (pixel) increase effective canva for rotation
-        off = self.preventiveRotationOffset
 
         # Old orientation
         #self.quadInDetOrient = [   90,    0,   270,  180]
@@ -68,14 +66,17 @@ class ConfigCSpad ( object ) :
         self.quadInDetOrient = [ 180,   90,    0,  270]
         self.quadInDetOriInd = [   2,    1,    0,    3]
 
-        gapX = 3
-        gapY = 3
+        self.preventiveRotationOffset = 15 # (pixel) increase effective canva for rotation
+        off = 30
+
+        gapX = 0
+        gapY = 0
 
         shiftX = 18
         shiftY = 18
 
-        self.quadXOffset = [  22-gapX+shiftX+off,   22-gapX-shiftX+off,  855+gapX-shiftX+off,  856+gapX+shiftX+off]
-        self.quadYOffset = [  12-gapY-shiftY+off,  846+gapY-shiftY+off,  844+gapY+shiftY+off,   12-gapY+shiftY+off]
+        self.quadXOffset = [ off+0-gapX+shiftX,  off+  0+1-gapX-shiftX,  off+834+0+gapX-shiftX,  off+834+0+gapX+shiftX]
+        self.quadYOffset = [ off+0-gapY-shiftY,  off+834-3+gapY-shiftY,  off+834-0+gapY+shiftY,  off+  0+2-gapY+shiftY]
 
         self.firstPairInQuad = [0, 0,  8, 16]
         self.lastPairInQuad  = [0, 8, 16, 20]
@@ -161,16 +162,43 @@ class ConfigCSpad ( object ) :
         # Optical alignment 2011-03-29 post run3:
         # New version: 1) no rotation w.r.t. optical measurements
         #              2) center coordanates are calculated as an average of 4 corner coordinates.
-        self.pairXInQaud = [[198,  198,  310,   98,  629,  630,  712,  499],
-                            [198,  198,  310,   97,  626,  626,  710,  498],
-                            [200,  199,  314,  103,  631,  633,  714,  501],
-                            [198,  198,  310,   98,  630,  629,  710,  499]] # 4,6 (630,710) were not measured
+        #self.pairXInQaud = [[198,  198,  310,   98,  629,  630,  712,  499],
+        #                    [198,  198,  310,   97,  626,  626,  710,  498],
+        #                    [200,  199,  314,  103,  631,  633,  714,  501],
+        #                    [198,  198,  310,   98,  630,  629,  710,  499]] # 4,6 (630,710) were not measured
                                                                           
-        self.pairYInQaud = [[307,   95,  626,  627,  517,  730,  200,  200],
-                            [308,   95,  626,  626,  513,  725,  200,  200],
-                            [309,   97,  622,  625,  513,  725,  199,  199],
-                            [307,   95,  628,  628,  515,  730,  200,  202]] # 4,6 (515,200) were not measured
+        #self.pairYInQaud = [[307,   95,  626,  627,  517,  730,  200,  200],
+        #                    [308,   95,  626,  626,  513,  725,  200,  200],
+        #                    [309,   97,  622,  625,  513,  725,  199,  199],
+        #                    [307,   95,  628,  628,  515,  730,  200,  202]] # 4,6 (515,200) were not measured
 
+
+        self.pairXInQaud = [[ 198.59,  198.04,  310.42,   98.22,  629.25,  630.01,  712.11,  499.91],  
+                            [ 198.40,  198.13,  310.55,   97.68,  626.40,  626.59,  710.49,  498.15],  
+                            [ 200.58,  199.79,  314.91,  103.43,  631.36,  633.34,  714.25,  501.44],  
+                            [ 198.89,  198.18,  310.75,   98.13,  630.00,  629.41,  710.00,  499.99]] # 4,6 (630,710) were not measured  
+                                                                                                    
+        self.pairYInQaud = [[ 308.00,   95.24,  626.85,  627.63,  517.84,  730.54,  200.79,  200.22],  
+                            [ 308.35,   95.09,  626.15,  626.58,  513.07,  725.86,  200.67,  200.57],  
+                            [ 309.62,   97.24,  622.35,  625.76,  513.46,  725.96,  199.78,  199.76],  
+                            [ 307.80,   95.08,  628.38,  628.43,  515.00,  730.70,  200.00,  202.96]] # 4,6 (515,200) were not measured  
+
+        self.pairZInQaud = [[   0.37,    0.15,    0.52,    0.62,    0.39,    0.55,    0.24,    0.18],  
+                            [   2.16,    1.08,    4.14,    3.51,    4.61,    5.68,    3.35,    2.63],  
+                            [   0.28,    0.20,    0.50,    0.65,    0.39,    0.56,    0.30,    0.27],  
+                            [   0.37,    0.30,    0.47,    0.25,    0.00,    1.06,    0.00,    0.85]]
+
+
+                            #   0    1    2    3    4    5    6    7
+        self.dXInQaud    = [[   0,   0,   0,   0,   0,   0,   0,   0], #*** DO NOT TOCH !
+                            [   0,   0,   0,   0,  -1,   0,   0,   0], #*** DO NOT TOCH !
+                            [   0,   0,  -1,  -1,   0,   0,   0,   0], #*** DO NOT TOCH !
+                            [   0,   0,   0,   0,   0,   0,   0,   0]] #*** DO NOT TOCH ! 4,6 (630,710) were not measured
+                                                                   
+        self.dYInQaud    = [[   0,   0,   0,   0,   0,   0,-0.5,   0], #*** DO NOT TOCH !
+                            [   0,   0,   0, 0.5,  -1,   0,   0,   1], #*** DO NOT TOCH !
+                            [   1,   0,   1,  -2,   0,   0,  -5,  -4], #*** DO NOT TOCH !
+                            [   0,   0,   0,   0,   0,  -1,   0,  -2]] #*** DO NOT TOCH ! 4,6 (515,200) were not measured
 
         #for ix in range(8) : self.pairXInQaud.append(random.randint(0,600))
         #for iy in range(8) : self.pairYInQaud.append(random.randint(0,600))
