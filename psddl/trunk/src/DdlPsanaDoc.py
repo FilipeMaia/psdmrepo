@@ -48,8 +48,69 @@ from psddl.Type import Type
 # Local non-exported definitions --
 #----------------------------------
 
-    
-    
+_css_file = "psana.css"
+
+_css = """
+BODY,H1,H2,H3,H4,H5,H6,P,CENTER,TD,TH,UL,DL,DIV {
+    font-family: Geneva, Arial, Helvetica, sans-serif;
+}
+
+BODY,TD {
+       font-size: 90%;
+}
+H1 {
+    text-align: center;
+       font-size: 160%;
+}
+H2 {
+       font-size: 120%;
+}
+H3 {
+       font-size: 100%;
+}
+
+
+A {
+       text-decoration: none;
+       font-weight: bold;
+       color: #000080;
+}
+A:visited {
+       text-decoration: none;
+       font-weight: bold;
+       color: #000080
+}
+A:hover {
+    text-decoration: none;
+    background-color: #E0E0E0;
+}
+
+dt { 
+margin: 2px;
+padding: 2px;
+}
+
+.const {font-family:monospace;}
+.code {font-family:monospace;}
+
+.methrettype {text-align:right;}
+
+div.def {
+background-color: #E0E0E0;
+margin: 0px;
+padding: 2px;
+line-height: 140%;
+border: 1px solid #000000;
+}
+
+div.descr {
+margin: 10px;
+padding: 2px;
+line-height: 140%;
+border: 1px solid #000000;
+}
+
+"""
 
 #------------------------
 # Exported definitions --
@@ -177,6 +238,11 @@ class DdlPsanaDoc ( object ) :
             self._parsePackage(pkg)
 
         self._htmlFooter(out)
+        out.close()
+        
+        # write CSS
+        out = file(os.path.join(self.dir, _css_file), "w")
+        out.write(_css)
         out.close()
 
     def _parsePackage(self, pkg):
@@ -340,7 +406,7 @@ class DdlPsanaDoc ( object ) :
         print >>f, '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
         print >>f, '<html><head><meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1">'
         print >>f, '<title>%s</title>' % title
-        print >>f, '<link href="psana.css" rel="stylesheet" type="text/css">'
+        print >>f, '<link href="%s" rel="stylesheet" type="text/css">' % _css_file
         print >>f, '</head><body>'
 
     def _htmlFooter(self, f):
