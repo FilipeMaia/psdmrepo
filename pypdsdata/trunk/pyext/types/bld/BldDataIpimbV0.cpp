@@ -1,9 +1,9 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: BldDataIpimb.cpp 811 2010-03-26 17:40:08Z salnikov $
+// 	$Id: BldDataIpimbV0.cpp 811 2010-03-26 17:40:08Z salnikov $
 //
 // Description:
-//	Class BldDataIpimb...
+//	Class BldDataIpimbV0...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "BldDataIpimb.h"
+#include "BldDataIpimbV0.h"
 
 //-----------------
 // C/C++ Headers --
@@ -47,7 +47,7 @@ namespace {
     {0, 0, 0, 0, 0}
   };
 
-  char typedoc[] = "Python class wrapping C++ Pds::BldDataIpimb class.";
+  char typedoc[] = "Python class wrapping C++ Pds::BldDataIpimbV0 class.";
 }
 
 //              ----------------------------------------
@@ -55,7 +55,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::BldDataIpimb::initType( PyObject* module )
+pypdsdata::BldDataIpimbV0::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -63,7 +63,7 @@ pypdsdata::BldDataIpimb::initType( PyObject* module )
   type->tp_str = _repr;
   type->tp_repr = _repr;
 
-  BaseType::initType( "BldDataIpimb", module );
+  BaseType::initType( "BldDataIpimbV0", module );
 }
 
 namespace {
@@ -71,7 +71,7 @@ namespace {
 PyObject* 
 ipimbData( PyObject* self, void* )
 {
-  Pds::BldDataIpimb* pdsObj = pypdsdata::BldDataIpimb::pdsObject(self);
+  Pds::BldDataIpimbV0* pdsObj = pypdsdata::BldDataIpimbV0::pdsObject(self);
   if(not pdsObj) return 0;
 
   return pypdsdata::Ipimb::DataV1::PyObject_FromPds(&pdsObj->ipimbData, 
@@ -81,7 +81,7 @@ ipimbData( PyObject* self, void* )
 PyObject* 
 ipimbConfig( PyObject* self, void* )
 {
-  Pds::BldDataIpimb* pdsObj = pypdsdata::BldDataIpimb::pdsObject(self);
+  Pds::BldDataIpimbV0* pdsObj = pypdsdata::BldDataIpimbV0::pdsObject(self);
   if(not pdsObj) return 0;
 
   return pypdsdata::Ipimb::ConfigV1::PyObject_FromPds(&pdsObj->ipimbConfig, 
@@ -91,7 +91,7 @@ ipimbConfig( PyObject* self, void* )
 PyObject* 
 ipmFexData( PyObject* self, void* )
 {
-  Pds::BldDataIpimb* pdsObj = pypdsdata::BldDataIpimb::pdsObject(self);
+  Pds::BldDataIpimbV0* pdsObj = pypdsdata::BldDataIpimbV0::pdsObject(self);
   if(not pdsObj) return 0;
 
   return pypdsdata::Lusi::IpmFexV1::PyObject_FromPds(&pdsObj->ipmFexData, 
@@ -101,11 +101,11 @@ ipmFexData( PyObject* self, void* )
 PyObject*
 _repr( PyObject *self )
 {
-  Pds::BldDataIpimb* pdsObj = pypdsdata::BldDataIpimb::pdsObject(self);
+  Pds::BldDataIpimbV0* pdsObj = pypdsdata::BldDataIpimbV0::pdsObject(self);
   if(not pdsObj) return 0;
 
   char buf[96];
-  snprintf( buf, sizeof buf, "BldDataIpimb(@%p)", pdsObj );
+  snprintf( buf, sizeof buf, "BldDataIpimbV0(@%p)", pdsObj );
   return PyString_FromString( buf );
 }
 

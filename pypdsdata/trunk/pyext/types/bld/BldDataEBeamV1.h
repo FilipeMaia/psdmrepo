@@ -1,12 +1,12 @@
-#ifndef PYPDSDATA_BLD_BLDDATAIPIMB_H
-#define PYPDSDATA_BLD_BLDDATAIPIMB_H
+#ifndef PYPDSDATA_BLD_BLDDATAEBEAMV1_H
+#define PYPDSDATA_BLD_BLDDATAEBEAMV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: BldDataIpimb.h 811 2010-03-26 17:40:08Z salnikov $
+// 	$Id$
 //
 // Description:
-//	Class BldDataIpimb.
+//	Class BldDataEBeamV1.
 //
 //------------------------------------------------------------------------
 
@@ -40,15 +40,15 @@ namespace pypdsdata {
  *
  *  @see AdditionalClass
  *
- *  @version $Id: BldDataIpimb.h 811 2010-03-26 17:40:08Z salnikov $
+ *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
 
-class BldDataIpimb : public PdsDataType<BldDataIpimb,Pds::BldDataIpimb> {
+class BldDataEBeamV1 : public PdsDataType<BldDataEBeamV1,Pds::BldDataEBeamV1> {
 public:
 
-  typedef PdsDataType<BldDataIpimb,Pds::BldDataIpimb> BaseType;
+  typedef PdsDataType<BldDataEBeamV1,Pds::BldDataEBeamV1> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
@@ -57,4 +57,4 @@ public:
 
 } // namespace pypdsdata
 
-#endif // PYPDSDATA_BLD_BLDDATAIPIMB_H
+#endif // PYPDSDATA_BLD_BLDDATAEBEAMV1_H

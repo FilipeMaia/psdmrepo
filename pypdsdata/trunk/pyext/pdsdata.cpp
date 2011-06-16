@@ -53,10 +53,10 @@
 #include "types/acqiris/TrigV1.h"
 #include "types/acqiris/VertV1.h"
 
-#include "types/bld/BldDataEBeam.h"
 #include "types/bld/BldDataEBeamV0.h"
+#include "types/bld/BldDataEBeamV1.h"
 #include "types/bld/BldDataFEEGasDetEnergy.h"
-#include "types/bld/BldDataIpimb.h"
+#include "types/bld/BldDataIpimbV0.h"
 #include "types/bld/BldDataPhaseCavity.h"
 
 #include "types/camera/FrameCoord.h"
@@ -200,10 +200,10 @@ PyMODINIT_FUNC init_pdsdata()
   PyModule_AddObject( this_module, "acqiris", module );
 
   module = Py_InitModule3( "_pdsdata.bld", 0, "The Python module for pdsdata/bld" );
-  pypdsdata::BldDataEBeam::initType( module );
   pypdsdata::BldDataEBeamV0::initType( module );
+  pypdsdata::BldDataEBeamV1::initType( module );
   pypdsdata::BldDataFEEGasDetEnergy::initType( module );
-  pypdsdata::BldDataIpimb::initType( module );
+  pypdsdata::BldDataIpimbV0::initType( module );
   pypdsdata::BldDataPhaseCavity::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "bld", module );

@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class BldDataEBeam...
+//	Class BldDataEBeamV1...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "BldDataEBeam.h"
+#include "BldDataEBeamV1.h"
 
 //-----------------
 // C/C++ Headers --
@@ -32,14 +32,14 @@
 namespace {
 
   // methods
-  MEMBER_WRAPPER(pypdsdata::BldDataEBeam, uDamageMask)
-  MEMBER_WRAPPER(pypdsdata::BldDataEBeam, fEbeamCharge)
-  MEMBER_WRAPPER(pypdsdata::BldDataEBeam, fEbeamL3Energy)
-  MEMBER_WRAPPER(pypdsdata::BldDataEBeam, fEbeamLTUPosX)
-  MEMBER_WRAPPER(pypdsdata::BldDataEBeam, fEbeamLTUPosY)
-  MEMBER_WRAPPER(pypdsdata::BldDataEBeam, fEbeamLTUAngX)
-  MEMBER_WRAPPER(pypdsdata::BldDataEBeam, fEbeamLTUAngY)
-  MEMBER_WRAPPER(pypdsdata::BldDataEBeam, fEbeamPkCurrBC2)
+  MEMBER_WRAPPER(pypdsdata::BldDataEBeamV1, uDamageMask)
+  MEMBER_WRAPPER(pypdsdata::BldDataEBeamV1, fEbeamCharge)
+  MEMBER_WRAPPER(pypdsdata::BldDataEBeamV1, fEbeamL3Energy)
+  MEMBER_WRAPPER(pypdsdata::BldDataEBeamV1, fEbeamLTUPosX)
+  MEMBER_WRAPPER(pypdsdata::BldDataEBeamV1, fEbeamLTUPosY)
+  MEMBER_WRAPPER(pypdsdata::BldDataEBeamV1, fEbeamLTUAngX)
+  MEMBER_WRAPPER(pypdsdata::BldDataEBeamV1, fEbeamLTUAngY)
+  MEMBER_WRAPPER(pypdsdata::BldDataEBeamV1, fEbeamPkCurrBC2)
   PyObject* _repr( PyObject *self );
 
   PyGetSetDef getset[] = {
@@ -54,7 +54,7 @@ namespace {
     {0, 0, 0, 0, 0}
   };
 
-  char typedoc[] = "Python class wrapping C++ Pds::BldDataEBeam class.";
+  char typedoc[] = "Python class wrapping C++ Pds::BldDataEBeamV1 class.";
 }
 
 //              ----------------------------------------
@@ -62,7 +62,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::BldDataEBeam::initType( PyObject* module )
+pypdsdata::BldDataEBeamV1::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -70,7 +70,7 @@ pypdsdata::BldDataEBeam::initType( PyObject* module )
   type->tp_str = _repr;
   type->tp_repr = _repr;
 
-  BaseType::initType( "BldDataEBeam", module );
+  BaseType::initType( "BldDataEBeamV1", module );
 }
 
 namespace {
@@ -78,11 +78,11 @@ namespace {
 PyObject*
 _repr( PyObject *self )
 {
-  Pds::BldDataEBeam* pdsObj = pypdsdata::BldDataEBeam::pdsObject(self);
+  Pds::BldDataEBeamV1* pdsObj = pypdsdata::BldDataEBeamV1::pdsObject(self);
   if(not pdsObj) return 0;
 
   char buf[64];
-  snprintf( buf, sizeof buf, "BldDataEBeam(Charge=%f, L3Energy=%f, ...)",
+  snprintf( buf, sizeof buf, "BldDataEBeamV1(Charge=%f, L3Energy=%f, ...)",
             pdsObj->fEbeamCharge, pdsObj->fEbeamL3Energy );
   return PyString_FromString( buf );
 }
