@@ -28,9 +28,11 @@
 #include "H5DataTypes/AcqirisConfigV1.h"
 #include "H5DataTypes/AcqirisTdcConfigV1.h"
 #include "H5DataTypes/BldDataEBeamV0.h"
-#include "H5DataTypes/BldDataEBeam.h"
+#include "H5DataTypes/BldDataEBeamV1.h"
+#include "H5DataTypes/BldDataEBeamV2.h"
 #include "H5DataTypes/BldDataFEEGasDetEnergy.h"
-#include "H5DataTypes/BldDataIpimb.h"
+#include "H5DataTypes/BldDataIpimbV0.h"
+#include "H5DataTypes/BldDataIpimbV1.h"
 #include "H5DataTypes/BldDataPhaseCavity.h"
 #include "H5DataTypes/CameraFrameFexConfigV1.h"
 #include "H5DataTypes/CameraFrameV1.h"
@@ -38,6 +40,7 @@
 #include "H5DataTypes/ControlDataConfigV1.h"
 #include "H5DataTypes/CsPadConfigV1.h"
 #include "H5DataTypes/CsPadConfigV2.h"
+#include "H5DataTypes/CsPadConfigV3.h"
 #include "H5DataTypes/EncoderConfigV1.h"
 #include "H5DataTypes/EncoderDataV1.h"
 #include "H5DataTypes/EncoderDataV2.h"
@@ -51,10 +54,14 @@
 #include "H5DataTypes/FccdConfigV1.h"
 #include "H5DataTypes/FccdConfigV2.h"
 #include "H5DataTypes/IpimbConfigV1.h"
+#include "H5DataTypes/IpimbConfigV2.h"
 #include "H5DataTypes/IpimbDataV1.h"
+#include "H5DataTypes/IpimbDataV2.h"
 #include "H5DataTypes/LusiDiodeFexConfigV1.h"
+#include "H5DataTypes/LusiDiodeFexConfigV2.h"
 #include "H5DataTypes/LusiDiodeFexV1.h"
 #include "H5DataTypes/LusiIpmFexConfigV1.h"
+#include "H5DataTypes/LusiIpmFexConfigV2.h"
 #include "H5DataTypes/LusiIpmFexV1.h"
 #include "H5DataTypes/LusiPimImageConfigV1.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
@@ -296,6 +303,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_IpimbConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::IpimbConfigV2> ( "Ipimb::ConfigV2" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_IpimbConfig,2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::EncoderConfigV1> ( "Encoder::ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_EncoderConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
@@ -304,8 +315,16 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_DiodeFexConfig, 1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::LusiDiodeFexConfigV2> ( "Lusi::DiodeFexConfigV2" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_DiodeFexConfig, 2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::LusiIpmFexConfigV1> ( "Lusi::IpmFexConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_IpmFexConfig, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::LusiIpmFexConfigV2> ( "Lusi::IpmFexConfigV2" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_IpmFexConfig, 2).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::LusiPimImageConfigV1> ( "Lusi::PimImageConfigV1" ) ) ;
@@ -318,6 +337,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::CsPadConfigV2> ( "CsPad::ConfigV2" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::CsPadConfigV3> ( "CsPad::ConfigV3" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 3).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // special converter object for CsPad calibration data
@@ -348,15 +371,27 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // version for this type is 1
-  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataEBeam> (
-      "Bld::BldDataEBeam", chunk_size, m_compression ) ) ;
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataEBeamV1> (
+      "Bld::BldDataEBeamV1", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_EBeam,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  // version for this type is 2
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataEBeamV2> (
+      "Bld::BldDataEBeamV2", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EBeam,2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   // version for this type is 0
-  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataIpimb> (
-      "Bld::BldDataIpimb", chunk_size, m_compression ) ) ;
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataIpimbV0> (
+      "Bld::BldDataIpimbV0", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_SharedIpimb,0).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // version for this type is 1
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataIpimbV1> (
+      "Bld::BldDataIpimbV1", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_SharedIpimb,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // version for this type is 0
@@ -381,6 +416,12 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   converter.reset( new EvtDataTypeCvtDef<H5DataTypes::IpimbDataV1> (
       "Ipimb::DataV1", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_IpimbData,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // version for this type is 1
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::IpimbDataV2> (
+      "Ipimb::DataV2", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_IpimbData,2).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // special converter for CameraFrame type
@@ -699,7 +740,12 @@ O2OHdf5Writer::dataObject ( const void* data, size_t size,
     do {
 
       DataTypeCvtPtr converter = it->second ;
-      converter->convert( data, size, typeId, src, m_eventTime ) ;
+      try {
+        converter->convert( data, size, typeId, src, m_eventTime ) ;
+      } catch (const O2OXTCSizeException& ex) {
+        // on size mismatch print an error message but continue
+        MsgLog(logger, error, ex.what());
+      }
 
       ++ it ;
 

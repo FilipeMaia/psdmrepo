@@ -30,8 +30,8 @@
 #include "pdscalibdata/CsPadFilterV1.h"
 #include "pdscalibdata/CsPadPedestalsV1.h"
 #include "pdscalibdata/CsPadPixelStatusV1.h"
-#include "pdsdata/cspad/ConfigV1.hh"
 #include "pdsdata/cspad/ConfigV2.hh"
+#include "pdsdata/cspad/ConfigV3.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -102,9 +102,16 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   uint32_t sMask[Pds::CsPad::MaxQuadsPerSensor];
   unsigned sections = 0;
   
-  // find corresponding configuration object, it could be ConfigV1 or ConfigV2
+  // find corresponding configuration object, it could be ConfigV2 or ConfigV3
   Pds::TypeId cfgTypeId2(Pds::TypeId::Id_CspadConfig, 2);
+  Pds::TypeId cfgTypeId3(Pds::TypeId::Id_CspadConfig, 3);
   if ( const Pds::CsPad::ConfigV2* config = m_configStore.find<Pds::CsPad::ConfigV2>(cfgTypeId2, src.top()) ) {
+    qMask = config->quadMask();
+    for (int q = 0 ; q != Pds::CsPad::MaxQuadsPerSensor; ++ q) {
+      sMask[q] = config->roiMask(q);
+      sections += ::bitCount(sMask[q], Pds::CsPad::ASICsPerQuad/2);
+    }
+  } else if ( const Pds::CsPad::ConfigV3* config = m_configStore.find<Pds::CsPad::ConfigV3>(cfgTypeId3, src.top()) ) {
     qMask = config->quadMask();
     for (int q = 0 ; q != Pds::CsPad::MaxQuadsPerSensor; ++ q) {
       sMask[q] = config->roiMask(q);
