@@ -14,6 +14,9 @@ CsPadDigitalPotsCfg::~CsPadDigitalPotsCfg() {}
 CsPadReadOnlyCfg::~CsPadReadOnlyCfg() {}
 
 
+ProtectionSystemThreshold::~ProtectionSystemThreshold() {}
+
+
 CsPadGainMapCfg::~CsPadGainMapCfg() {}
 
 
@@ -24,6 +27,9 @@ ConfigV1::~ConfigV1() {}
 
 
 ConfigV2::~ConfigV2() {}
+
+
+ConfigV3::~ConfigV3() {}
 
 
 ElementV1::~ElementV1() {}

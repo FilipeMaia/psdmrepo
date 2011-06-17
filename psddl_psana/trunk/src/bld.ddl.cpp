@@ -8,7 +8,10 @@
 namespace Psana {
 namespace Bld {
 
-BldDataIpimb::~BldDataIpimb() {}
+BldDataIpimbV0::~BldDataIpimbV0() {}
+
+
+BldDataIpimbV1::~BldDataIpimbV1() {}
 
 } // namespace Bld
 } // namespace Psana

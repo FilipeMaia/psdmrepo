@@ -49,6 +49,45 @@ private:
 };
 #pragma pack(pop)
 
+/** @class DiodeFexConfigV2
+
+  
+*/
+
+#pragma pack(push,4)
+
+class DiodeFexConfigV2 {
+public:
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_DiodeFexConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    NRANGES = 16 /**<  */
+  };
+  DiodeFexConfigV2()
+  {
+  }
+  DiodeFexConfigV2(const float* arg__base, const float* arg__scale)
+  {
+    std::copy(arg__base, arg__base+(16), _base);
+    std::copy(arg__scale, arg__scale+(16), _scale);
+  }
+  const float* base() const {return &_base[0];}
+  const float* scale() const {return &_scale[0];}
+  static uint32_t _sizeof()  {return (0+(4*(NRANGES)))+(4*(NRANGES));}
+  /** Method which returns the shape (dimensions) of the data returned by base() method. */
+  std::vector<int> base_shape() const;
+  /** Method which returns the shape (dimensions) of the data returned by scale() method. */
+  std::vector<int> scale_shape() const;
+private:
+  float	_base[NRANGES];
+  float	_scale[NRANGES];
+};
+#pragma pack(pop)
+
 /** @class DiodeFexV1
 
   
@@ -94,6 +133,31 @@ public:
   };
   virtual ~IpmFexConfigV1();
   virtual const Lusi::DiodeFexConfigV1& diode(uint32_t i0) const = 0;
+  virtual float xscale() const = 0;
+  virtual float yscale() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by diode() method. */
+  virtual std::vector<int> diode_shape() const = 0;
+};
+
+/** @class IpmFexConfigV2
+
+  
+*/
+
+
+class IpmFexConfigV2 {
+public:
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_IpmFexConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    NCHANNELS = 4 /**<  */
+  };
+  virtual ~IpmFexConfigV2();
+  virtual const Lusi::DiodeFexConfigV2& diode(uint32_t i0) const = 0;
   virtual float xscale() const = 0;
   virtual float yscale() const = 0;
   /** Method which returns the shape (dimensions) of the data returned by diode() method. */

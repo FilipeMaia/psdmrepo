@@ -11,7 +11,13 @@ namespace Ipimb {
 ConfigV1::~ConfigV1() {}
 
 
+ConfigV2::~ConfigV2() {}
+
+
 DataV1::~DataV1() {}
+
+
+DataV2::~DataV2() {}
 
 } // namespace Ipimb
 } // namespace Psana
