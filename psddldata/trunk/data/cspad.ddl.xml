@@ -97,6 +97,19 @@
 		<!-- ========================================================================= -->
 		
 
+		<pstype name="ProtectionSystemThreshold">
+		
+            <attribute name="_adcThreshold" type="uint32_t" accessor="adcThreshold">
+            </attribute>
+
+            <attribute name="_pixelCountThreshold" type="uint32_t" accessor="pixelCountThreshold">
+            </attribute>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+
 		<pstype name="CsPadGainMapCfg">
 
             Class defining ASIC gain map.
@@ -294,6 +307,86 @@
         
 		<!-- ========================================================================= -->
 		
+		<pstype name="ConfigV3" version="3" type_id="Id_CspadConfig">
+		
+            Configuration data for complete CsPad device.
+        
+            <attribute name="_concentratorVersion" type="uint32_t" accessor="concentratorVersion">
+            </attribute>
+
+            <attribute name="_runDelay" type="uint32_t" accessor="runDelay">
+            </attribute>
+
+            <attribute name="_eventCode" type="uint32_t" accessor="eventCode">
+            </attribute>
+
+            <attribute name="_protectionThresholds" type="ProtectionSystemThreshold" 
+                    shape="MaxQuadsPerSensor" accessor="protectionThresholds">
+            </attribute>
+
+            <attribute name="_protectionEnable" type="uint32_t" accessor="protectionEnable">
+            </attribute>
+
+            <attribute name="_inactiveRunMode" type="uint32_t" accessor="inactiveRunMode">
+            </attribute>
+
+            <attribute name="_activeRunMode" type="uint32_t" accessor="activeRunMode">
+            </attribute>
+
+            <attribute name="_testDataIndex" type="uint32_t" accessor="tdi">
+            </attribute>
+
+            <attribute name="_payloadPerQuad" type="uint32_t" accessor="payloadSize">
+            </attribute>
+
+            <attribute name="_badAsicMask0" type="uint32_t" accessor="badAsicMask0">
+            </attribute>
+
+            <attribute name="_badAsicMask1" type="uint32_t" accessor="badAsicMask1">
+            </attribute>
+
+            <attribute name="_AsicMask" type="uint32_t" accessor="asicMask">
+            </attribute>
+
+            <attribute name="_quadMask" type="uint32_t" accessor="quadMask">
+            </attribute>
+
+            <attribute name="_roiMask" type="uint32_t">
+            </attribute>
+
+            <attribute name="_quads" type="ConfigV1QuadReg" shape="MaxQuadsPerSensor" accessor="quads">
+            </attribute>
+
+            <method name="numAsicsRead" type="uint32_t">
+                <expr lang="C++" value="({self}._AsicMask &amp; 0xf)==1 ? 4 : 16"/>
+            </method>
+            
+            <method name="roiMask" type="uint32_t">
+                ROI mask for given quadrant
+                <arg name="iq" type="uint32_t"/>
+                <expr lang="C++" value="({self}._roiMask &gt;&gt; (8*iq)) &amp; 0xff"/>
+            </method>
+            
+            <method name="numAsicsStored" type="uint32_t">
+                Number of ASICs in given quadrant
+                <arg name="iq" type="uint32_t"/>
+                <expr lang="C++" value="__builtin_popcount({self}.roiMask(iq))*2"/>
+            </method>
+            
+            <method name="numQuads" type="uint32_t">
+                Total number of quadrants in setup
+                <expr lang="C++" value="__builtin_popcount({self}._quadMask)"/>
+            </method>
+
+            <method name="numSect" type="uint32_t">
+                Total number of sections (2x1) in all quadrants
+                <expr lang="C++" value="__builtin_popcount({self}._roiMask)"/>
+            </method>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
 		<pstype name="ElementV1">
 
             CsPad data from single CsPad quadrant.
@@ -394,6 +487,7 @@
 		    </const>
 		
 		    <xtc-config name="ConfigV2" />
+		    <xtc-config name="ConfigV3" />
 		    
             <attribute name="_word0" type="uint32_t" accessor="">
             
@@ -460,6 +554,7 @@
             CsPad data from whole detector.
 
             <xtc-config name="ConfigV2" />
+            <xtc-config name="ConfigV3" />
 
             <attribute name="_quads" type="ElementV2" shape="{xtc-config}.numQuads()" 
                         accessor="quads">

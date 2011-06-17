@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2011-06-16 Andrei Salnikov
+- upgrade to pdsdata V02-11-05
+
 Tag: V00-00-08
 2011-04-26 Andrei Salnikov
 - modified acqiris.DataDescV1Elem so that waveform() method returns 

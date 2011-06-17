@@ -89,7 +89,7 @@
 		
 		<!-- ========================================================================= -->
 		
-		<pstype name="BldDataEBeam" type_id="Id_EBeam" version="1" pack="4">
+		<pstype name="BldDataEBeamV1" type_id="Id_EBeam" version="1" pack="4">
 		
             <tag name="value-type"/>
         
@@ -123,6 +123,56 @@
 
             <attribute name="_fEbeamPkCurrBC2" type="double" accessor="ebeamPkCurrBC2">
             Beam current in Amps.
+            </attribute>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+		<pstype name="BldDataEBeamV2" type_id="Id_EBeam" version="2" pack="4">
+		
+            <tag name="value-type"/>
+        
+            <attribute name="_uDamageMask" type="uint32_t" accessor="damageMask">
+            Damage mask.
+            </attribute>
+
+            <attribute name="_fEbeamCharge" type="double" accessor="ebeamCharge">
+            Beam charge in nC.
+            </attribute>
+
+            <attribute name="_fEbeamL3Energy" type="double" accessor="ebeamL3Energy">
+            Beam energy in MeV.
+            </attribute>
+
+            <attribute name="_fEbeamLTUPosX" type="double" accessor="ebeamLTUPosX">
+            LTU beam position in mm.
+            </attribute>
+
+            <attribute name="_fEbeamLTUPosY" type="double" accessor="ebeamLTUPosY">
+            LTU beam position in mm.
+            </attribute>
+
+            <attribute name="_fEbeamLTUAngX" type="double" accessor="ebeamLTUAngX">
+            LTU beam angle in mrad.
+            </attribute>
+
+            <attribute name="_fEbeamLTUAngY" type="double" accessor="ebeamLTUAngY">
+            LTU beam angle in mrad.
+            </attribute>
+
+            <attribute name="_fEbeamPkCurrBC2" type="double" accessor="ebeamPkCurrBC2">
+            Beam current in Amps.
+            </attribute>
+
+            <attribute name="_fEbeamEnergyBC2" type="double" accessor="ebeamEnergyBC2">
+            Beam energy in MeV.
             </attribute>
 
             <ctor>
@@ -171,7 +221,7 @@
 		<!-- ========================================================================= -->
 		
 
-		<pstype name="BldDataIpimb" type_id="Id_SharedIpimb" version="0" pack="4">
+		<pstype name="BldDataIpimbV0" type_id="Id_SharedIpimb" version="0" pack="4">
 
             Combined structure which includes Ipimb.DataV1, Ipimb.ConfigV1, and 
             Lusi.IpmFexV1 objects.
@@ -180,6 +230,25 @@
             </attribute>
 
             <attribute name="_ipimbConfig" type="Ipimb.ConfigV1" accessor="ipimbConfig">
+            </attribute>
+
+            <attribute name="_ipmFexData" type="Lusi.IpmFexV1" accessor="ipmFexData">
+            </attribute>
+
+		</pstype>
+		
+		<!-- ========================================================================= -->
+		
+
+		<pstype name="BldDataIpimbV1" type_id="Id_SharedIpimb" version="1" pack="4">
+
+            Combined structure which includes Ipimb.DataV2, Ipimb.ConfigV2, and 
+            Lusi.IpmFexV1 objects.
+
+            <attribute name="_ipimbData" type="Ipimb.DataV2" accessor="ipimbData">
+            </attribute>
+
+            <attribute name="_ipimbConfig" type="Ipimb.ConfigV2" accessor="ipimbConfig">
             </attribute>
 
             <attribute name="_ipmFexData" type="Lusi.IpmFexV1" accessor="ipmFexData">

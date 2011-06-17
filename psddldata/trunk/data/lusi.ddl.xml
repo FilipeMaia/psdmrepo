@@ -36,6 +36,33 @@
         
 		<!-- ========================================================================= -->
 		
+		<pstype name="DiodeFexConfigV2" version="2" type_id="Id_DiodeFexConfig" pack="4">
+		
+            <tag name="value-type"/>
+
+		    <const name="NRANGES" value="16" />
+		
+            <attribute name="_base" type="float" shape="NRANGES" accessor="base">
+            </attribute>
+
+            <attribute name="_scale" type="float" shape="NRANGES" accessor="scale">
+            </attribute>
+
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
 		<pstype name="DiodeFexV1" version="1" type_id="Id_DiodeFex" pack="4">
 		
             <tag name="value-type"/>
@@ -60,6 +87,25 @@
             <const name="NCHANNELS" value="4" />
         
             <attribute name="_diode" type="DiodeFexConfigV1" shape="NCHANNELS" accessor="diode">
+            </attribute>
+
+            <attribute name="_xscale" type="float" accessor="xscale">
+            </attribute>
+
+            <attribute name="_yscale" type="float" accessor="yscale">
+            </attribute>
+
+        </pstype>
+        
+        
+		<!-- ========================================================================= -->
+		
+
+        <pstype name="IpmFexConfigV2" version="2" type_id="Id_IpmFexConfig" pack="4">
+        
+            <const name="NCHANNELS" value="4" />
+        
+            <attribute name="_diode" type="DiodeFexConfigV2" shape="NCHANNELS" accessor="diode">
             </attribute>
 
             <attribute name="_xscale" type="float" accessor="xscale">

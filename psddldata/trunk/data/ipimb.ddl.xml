@@ -67,6 +67,61 @@
 
         </pstype>
         
+        <!-- ========================================================================= -->
+	
+		
+		<pstype name="ConfigV2" version="2" type_id="Id_IpimbConfig" pack="4">
+		
+            <attribute name="_triggerCounter" type="uint64_t" accessor="triggerCounter">
+            </attribute>
+
+            <attribute name="_serialID" type="uint64_t" accessor="serialID">
+            </attribute>
+
+            <attribute name="_chargeAmpRange" type="uint16_t" accessor="chargeAmpRange">
+            </attribute>
+
+            <attribute name="_calibrationRange" type="uint16_t" accessor="calibrationRange">
+            </attribute>
+
+            <attribute name="_resetLength" type="uint32_t" accessor="resetLength">
+            </attribute>
+
+            <attribute name="_resetDelay" type="uint32_t" accessor="resetDelay">
+            </attribute>
+
+            <attribute name="_chargeAmpRefVoltage" type="float" accessor="chargeAmpRefVoltage">
+            </attribute>
+
+            <attribute name="_calibrationVoltage" type="float" accessor="calibrationVoltage">
+            </attribute>
+
+            <attribute name="_diodeBias" type="float" accessor="diodeBias">
+            </attribute>
+
+            <attribute name="_status" type="uint16_t" accessor="status">
+            </attribute>
+
+            <attribute name="_errors" type="uint16_t" accessor="errors">
+            </attribute>
+
+            <attribute name="_calStrobeLength" type="uint16_t" accessor="calStrobeLength">
+            </attribute>
+
+            <attribute name="_pad0" type="uint16_t">
+            </attribute>
+
+            <attribute name="_trigDelay" type="uint32_t" accessor="trigDelay">
+            </attribute>
+
+            <attribute name="_trigPsDelay" type="uint32_t" accessor="trigPsDelay">
+            </attribute>
+
+            <attribute name="_adcDelay" type="uint32_t" accessor="adcDelay">
+            </attribute>
+
+        </pstype>
+        
 		<!-- ========================================================================= -->
 
         
@@ -121,6 +176,103 @@
             <method name="channel3Volts" type="float">
             Value of of channel3() converted to Volts.
                 <expr lang="C++" value="float({self}._channel3)*3.3/65535"/>
+            </method>
+            
+        </pstype>
+        
+		<!-- ========================================================================= -->
+
+        
+        <pstype name="DataV2" version="2" type_id="Id_IpimbData" pack="4">
+        
+            <const name="ipimbAdcRange" value="5"/>
+            <const name="ipimbAdcSteps" value="65536"/>
+        
+            <attribute name="_triggerCounter" type="uint64_t" accessor="triggerCounter">
+            </attribute>
+
+            <attribute name="_config0" type="uint16_t" accessor="config0">
+            </attribute>
+
+            <attribute name="_config1" type="uint16_t" accessor="config1">
+            </attribute>
+
+            <attribute name="_config2" type="uint16_t" accessor="config2">
+            </attribute>
+
+            <attribute name="_channel0" type="uint16_t" accessor="channel0">
+            Raw counts value returned from channel 0.
+            </attribute>
+
+            <attribute name="_channel1" type="uint16_t" accessor="channel1">
+            Raw counts value returned from channel 1.
+            </attribute>
+
+            <attribute name="_channel2" type="uint16_t" accessor="channel2">
+            Raw counts value returned from channel 2.
+            </attribute>
+
+            <attribute name="_channel3" type="uint16_t" accessor="channel3">
+            Raw counts value returned from channel 3.
+            </attribute>
+
+            <attribute name="_channel0ps" type="uint16_t" accessor="channel0ps">
+            Raw counts value returned from channel 0.
+            </attribute>
+
+            <attribute name="_channel1ps" type="uint16_t" accessor="channel1ps">
+            Raw counts value returned from channel 1.
+            </attribute>
+
+            <attribute name="_channel2ps" type="uint16_t" accessor="channel2ps">
+            Raw counts value returned from channel 2.
+            </attribute>
+
+            <attribute name="_channel3ps" type="uint16_t" accessor="channel3ps">
+            Raw counts value returned from channel 3.
+            </attribute>
+
+            <attribute name="_checksum" type="uint16_t" accessor="checksum">
+            </attribute>
+
+            <method name="channel0Volts" type="float">
+            Value of of channel0() converted to Volts.
+                <expr lang="C++" value="float({self}._channel0)*ipimbAdcRange/(ipimbAdcSteps - 1)"/>
+            </method>
+            
+            <method name="channel1Volts" type="float">
+            Value of of channel1() converted to Volts.
+                <expr lang="C++" value="float({self}._channel1)*ipimbAdcRange/(ipimbAdcSteps - 1)"/>
+            </method>
+            
+            <method name="channel2Volts" type="float">
+            Value of of channel2() converted to Volts.
+                <expr lang="C++" value="float({self}._channel2)*ipimbAdcRange/(ipimbAdcSteps - 1)"/>
+            </method>
+            
+            <method name="channel3Volts" type="float">
+            Value of of channel3() converted to Volts.
+                <expr lang="C++" value="float({self}._channel3)*ipimbAdcRange/(ipimbAdcSteps - 1)"/>
+            </method>
+            
+            <method name="channel0psVolts" type="float">
+            Value of of channel0ps() converted to Volts.
+                <expr lang="C++" value="float({self}._channel0ps)*ipimbAdcRange/(ipimbAdcSteps - 1)"/>
+            </method>
+            
+            <method name="channel1psVolts" type="float">
+            Value of of channel1ps() converted to Volts.
+                <expr lang="C++" value="float({self}._channel1ps)*ipimbAdcRange/(ipimbAdcSteps - 1)"/>
+            </method>
+            
+            <method name="channel2psVolts" type="float">
+            Value of of channel2ps() converted to Volts.
+                <expr lang="C++" value="float({self}._channel2ps)*ipimbAdcRange/(ipimbAdcSteps - 1)"/>
+            </method>
+            
+            <method name="channel3psVolts" type="float">
+            Value of of channel3ps() converted to Volts.
+                <expr lang="C++" value="float({self}._channel3ps)*ipimbAdcRange/(ipimbAdcSteps - 1)"/>
             </method>
             
         </pstype>
