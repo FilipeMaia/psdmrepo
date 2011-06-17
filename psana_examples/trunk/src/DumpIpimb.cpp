@@ -82,6 +82,30 @@ DumpIpimb::beginCalibCycle(Event& evt, Env& env)
     
   }
 
+  shared_ptr<Psana::Ipimb::ConfigV2> config2 = env.configStore().get(m_src);
+  if (config2.get()) {
+    
+    WithMsgLog(name(), info, str) {
+      str << "Ipimb::ConfigV2:";
+      str << "\n  triggerCounter = " << config2->triggerCounter();
+      str << "\n  serialID = " << config2->serialID();
+      str << "\n  chargeAmpRange = " << config2->chargeAmpRange();
+      str << "\n  calibrationRange = " << config2->calibrationRange();
+      str << "\n  resetLength = " << config2->resetLength();
+      str << "\n  resetDelay = " << config2->resetDelay();
+      str << "\n  chargeAmpRefVoltage = " << config2->chargeAmpRefVoltage();
+      str << "\n  calibrationVoltage = " << config2->calibrationVoltage();
+      str << "\n  diodeBias = " << config2->diodeBias();
+      str << "\n  status = " << config2->status();
+      str << "\n  errors = " << config2->errors();
+      str << "\n  calStrobeLength = " << config2->calStrobeLength();
+      str << "\n  trigDelay = " << config2->trigDelay();
+      str << "\n  trigPsDelay = " << config2->trigPsDelay();
+      str << "\n  adcDelay = " << config2->adcDelay();
+    }
+    
+  }
+
 }
 
 // Method which is called with event data
@@ -106,6 +130,35 @@ DumpIpimb::event(Event& evt, Env& env)
           << "," << data1->channel2Volts()
           << "," << data1->channel3Volts()
           << "\n  checksum = " << data1->checksum();
+    }
+  }
+
+  shared_ptr<Psana::Ipimb::DataV2> data2 = evt.get(m_src);
+  if (data2.get()) {
+    
+    WithMsgLog(name(), info, str) {
+      str << "Ipimb::DataV2:"
+          << "\n  triggerCounter = " << data2->triggerCounter()
+          << "\n  config = " << data2->config0()
+          << "," << data2->config1()
+          << "," << data2->config2()
+          << "\n  channel = " << data2->channel0()
+          << "," << data2->channel1()
+          << "," << data2->channel2()
+          << "," << data2->channel3()
+          << "\n  volts = " << data2->channel0Volts()
+          << "," << data2->channel1Volts()
+          << "," << data2->channel2Volts()
+          << "," << data2->channel3Volts()
+          << "\n  channel-ps = " << data2->channel0ps()
+          << "," << data2->channel1ps()
+          << "," << data2->channel2ps()
+          << "," << data2->channel3ps()
+          << "\n  volts-ps = " << data2->channel0psVolts()
+          << "," << data2->channel1psVolts()
+          << "," << data2->channel2psVolts()
+          << "," << data2->channel3psVolts()
+          << "\n  checksum = " << data2->checksum();
     }
   }
 }

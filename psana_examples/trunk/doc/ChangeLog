@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2011-06-16 Andy Salnikov
+- upgrade to pdsdata V02-11-05
+
 Tag: V00-01-00
 2011-05-21 Andy Salnikov
 - Module interface changed, all subclasses need update; 

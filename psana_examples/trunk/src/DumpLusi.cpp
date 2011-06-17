@@ -61,13 +61,13 @@ DumpLusi::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), info, "in beginCalibCycle()");
 
-  shared_ptr<Psana::Lusi::DiodeFexConfigV1> dconfig = env.configStore().get(m_ipimbSrc);
-  if (dconfig.get()) {
+  shared_ptr<Psana::Lusi::DiodeFexConfigV1> dconfig1 = env.configStore().get(m_ipimbSrc);
+  if (dconfig1.get()) {
     
     WithMsgLog(name(), info, str) {
       str << "Lusi::DiodeFexConfigV1:";
-      const float* base = dconfig->base();
-      const float* scale = dconfig->scale();
+      const float* base = dconfig1->base();
+      const float* scale = dconfig1->scale();
       str << "\n  base =";
       for (int i = 0; i < Psana::Lusi::DiodeFexConfigV1::NRANGES; ++ i) {
         str << " " << base[i];
@@ -80,17 +80,36 @@ DumpLusi::beginCalibCycle(Event& evt, Env& env)
     
   }
 
-  shared_ptr<Psana::Lusi::IpmFexConfigV1> iconfig = env.configStore().get(m_ipimbSrc);
-  if (iconfig.get()) {
+  shared_ptr<Psana::Lusi::DiodeFexConfigV2> dconfig2 = env.configStore().get(m_ipimbSrc);
+  if (dconfig2.get()) {
+    
+    WithMsgLog(name(), info, str) {
+      str << "Lusi::DiodeFexConfigV2:";
+      const float* base = dconfig2->base();
+      const float* scale = dconfig2->scale();
+      str << "\n  base =";
+      for (int i = 0; i < Psana::Lusi::DiodeFexConfigV2::NRANGES; ++ i) {
+        str << " " << base[i];
+      }
+      str << "\n  scale =";
+      for (int i = 0; i < Psana::Lusi::DiodeFexConfigV2::NRANGES; ++ i) {
+        str << " " << scale[i];
+      }
+    }
+    
+  }
+
+  shared_ptr<Psana::Lusi::IpmFexConfigV1> iconfig1 = env.configStore().get(m_ipimbSrc);
+  if (iconfig1.get()) {
     
     WithMsgLog(name(), info, str) {
       str << "Psana::Lusi::IpmFexConfigV1:";
-      str << "\n  xscale = " << iconfig->xscale();
-      str << "\n  yscale = " << iconfig->yscale();
+      str << "\n  xscale = " << iconfig1->xscale();
+      str << "\n  yscale = " << iconfig1->yscale();
       for (int ch = 0; ch < Psana::Lusi::IpmFexConfigV1::NCHANNELS; ++ ch) {
         str << "\n  channel #" << ch << ":";
         
-        const Psana::Lusi::DiodeFexConfigV1& dconfig = iconfig->diode(ch);
+        const Psana::Lusi::DiodeFexConfigV1& dconfig = iconfig1->diode(ch);
         const float* base = dconfig.base();
         const float* scale = dconfig.scale();
         str << "\n    base =";
@@ -106,13 +125,39 @@ DumpLusi::beginCalibCycle(Event& evt, Env& env)
     
   }
 
+  shared_ptr<Psana::Lusi::IpmFexConfigV2> iconfig2 = env.configStore().get(m_ipimbSrc);
+  if (iconfig2.get()) {
+    
+    WithMsgLog(name(), info, str) {
+      str << "Psana::Lusi::IpmFexConfigV2:";
+      str << "\n  xscale = " << iconfig2->xscale();
+      str << "\n  yscale = " << iconfig2->yscale();
+      for (int ch = 0; ch < Psana::Lusi::IpmFexConfigV2::NCHANNELS; ++ ch) {
+        str << "\n  channel #" << ch << ":";
+        
+        const Psana::Lusi::DiodeFexConfigV2& dconfig = iconfig2->diode(ch);
+        const float* base = dconfig.base();
+        const float* scale = dconfig.scale();
+        str << "\n    base =";
+        for (int i = 0; i < Psana::Lusi::DiodeFexConfigV2::NRANGES; ++ i) {
+          str << " " << base[i];
+        }
+        str << "\n    scale =";
+        for (int i = 0; i < Psana::Lusi::DiodeFexConfigV2::NRANGES; ++ i) {
+          str << " " << scale[i];
+        }
+      }
+    }
+    
+  }
+
   shared_ptr<Psana::Lusi::PimImageConfigV1> pconfig = env.configStore().get(m_tmSrc);
   if (pconfig.get()) {
     
     WithMsgLog(name(), info, str) {
       str << "Psana::Lusi::PimImageConfigV1:";
-      str << "\n  xscale = " << iconfig->xscale();
-      str << "\n  yscale = " << iconfig->yscale();
+      str << "\n  xscale = " << pconfig->xscale();
+      str << "\n  yscale = " << pconfig->yscale();
     }
     
   }

@@ -75,18 +75,34 @@ DumpBld::event(Event& evt, Env& env)
     }
   }
 
-  shared_ptr<Psana::Bld::BldDataEBeam> ebeam = evt.get(m_ebeamSrc);
-  if (ebeam.get()) {
+  shared_ptr<Psana::Bld::BldDataEBeamV1> ebeam1 = evt.get(m_ebeamSrc);
+  if (ebeam1.get()) {
     WithMsgLog(name(), info, str) {
-      str << "Bld::BldDataEBeam:"
-          << "\n  damageMask=" << ebeam->damageMask()
-          << "\n  ebeamCharge=" << ebeam->ebeamCharge()
-          << "\n  ebeamL3Energy=" << ebeam->ebeamL3Energy()
-          << "\n  ebeamLTUPosX=" << ebeam->ebeamLTUPosX()
-          << "\n  ebeamLTUPosY=" << ebeam->ebeamLTUPosY()
-          << "\n  ebeamLTUAngX=" << ebeam->ebeamLTUAngX()
-          << "\n  ebeamLTUAngY=" << ebeam->ebeamLTUAngY()
-          << "\n  ebeamPkCurrBC2=" << ebeam->ebeamPkCurrBC2();
+      str << "Bld::BldDataEBeamV1:"
+          << "\n  damageMask=" << ebeam1->damageMask()
+          << "\n  ebeamCharge=" << ebeam1->ebeamCharge()
+          << "\n  ebeamL3Energy=" << ebeam1->ebeamL3Energy()
+          << "\n  ebeamLTUPosX=" << ebeam1->ebeamLTUPosX()
+          << "\n  ebeamLTUPosY=" << ebeam1->ebeamLTUPosY()
+          << "\n  ebeamLTUAngX=" << ebeam1->ebeamLTUAngX()
+          << "\n  ebeamLTUAngY=" << ebeam1->ebeamLTUAngY()
+          << "\n  ebeamPkCurrBC2=" << ebeam1->ebeamPkCurrBC2();
+    }
+  }
+
+  shared_ptr<Psana::Bld::BldDataEBeamV2> ebeam2 = evt.get(m_ebeamSrc);
+  if (ebeam2.get()) {
+    WithMsgLog(name(), info, str) {
+      str << "Bld::BldDataEBeamV2:"
+          << "\n  damageMask=" << ebeam2->damageMask()
+          << "\n  ebeamCharge=" << ebeam2->ebeamCharge()
+          << "\n  ebeamL3Energy=" << ebeam2->ebeamL3Energy()
+          << "\n  ebeamLTUPosX=" << ebeam2->ebeamLTUPosX()
+          << "\n  ebeamLTUPosY=" << ebeam2->ebeamLTUPosY()
+          << "\n  ebeamLTUAngX=" << ebeam2->ebeamLTUAngX()
+          << "\n  ebeamLTUAngY=" << ebeam2->ebeamLTUAngY()
+          << "\n  ebeamPkCurrBC2=" << ebeam2->ebeamPkCurrBC2()
+          << "\n  ebeamEnergyBC2=" << ebeam2->ebeamEnergyBC2();
     }
   }
 
@@ -112,11 +128,11 @@ DumpBld::event(Event& evt, Env& env)
     }
   }
 
-  shared_ptr<Psana::Bld::BldDataIpimb> ipimb = evt.get(m_ipimbSrc);
-  if (ipimb.get()) {
+  shared_ptr<Psana::Bld::BldDataIpimbV0> ipimb0 = evt.get(m_ipimbSrc);
+  if (ipimb0.get()) {
     WithMsgLog(name(), info, str) {
-      str << "Bld::BldDataIpimb:";
-      const Psana::Ipimb::DataV1& ipimbData = ipimb->ipimbData();
+      str << "Bld::BldDataIpimbV0:";
+      const Psana::Ipimb::DataV1& ipimbData = ipimb0->ipimbData();
       str << "\n  Ipimb::DataV1:"
           << "\n    triggerCounter = " << ipimbData.triggerCounter()
           << "\n    config = " << ipimbData.config0()
@@ -132,7 +148,7 @@ DumpBld::event(Event& evt, Env& env)
           << "," << ipimbData.channel3Volts()
           << "\n    checksum = " << ipimbData.checksum();
       
-      const Psana::Ipimb::ConfigV1& ipimbConfig = ipimb->ipimbConfig();
+      const Psana::Ipimb::ConfigV1& ipimbConfig = ipimb0->ipimbConfig();
       str << "\n  Ipimb::ConfigV1:";
       str << "\n    triggerCounter = " << ipimbConfig.triggerCounter();
       str << "\n    serialID = " << ipimbConfig.serialID();
@@ -148,7 +164,66 @@ DumpBld::event(Event& evt, Env& env)
       str << "\n    calStrobeLength = " << ipimbConfig.calStrobeLength();
       str << "\n    trigDelay = " << ipimbConfig.trigDelay();
       
-      const Psana::Lusi::IpmFexV1& ipmFexData = ipimb->ipmFexData();
+      const Psana::Lusi::IpmFexV1& ipmFexData = ipimb0->ipmFexData();
+      str << "\n  Psana::Lusi::IpmFexV1:";
+      str << "\n    sum = " << ipmFexData.sum();
+      str << "\n    xpos = " << ipmFexData.xpos();
+      str << "\n    ypos = " << ipmFexData.ypos();
+      const float* channel = ipmFexData.channel();
+      str << "\n    channel =";
+      for (int i = 0; i < Psana::Lusi::IpmFexV1::NCHANNELS; ++ i) {
+        str << " " << channel[i];
+      }
+    }
+  }
+
+  shared_ptr<Psana::Bld::BldDataIpimbV1> ipimb1 = evt.get(m_ipimbSrc);
+  if (ipimb1.get()) {
+    WithMsgLog(name(), info, str) {
+      str << "Bld::BldDataIpimbV1:";
+      const Psana::Ipimb::DataV2& ipimbData = ipimb1->ipimbData();
+      str << "\n  Ipimb::DataV1:"
+          << "\n    triggerCounter = " << ipimbData.triggerCounter()
+          << "\n    config = " << ipimbData.config0()
+          << "," << ipimbData.config1()
+          << "," << ipimbData.config2()
+          << "\n    channel = " << ipimbData.channel0()
+          << "," << ipimbData.channel1()
+          << "," << ipimbData.channel2()
+          << "," << ipimbData.channel3()
+          << "\n    volts = " << ipimbData.channel0Volts()
+          << "," << ipimbData.channel1Volts()
+          << "," << ipimbData.channel2Volts()
+          << "," << ipimbData.channel3Volts()
+          << "\n    channel-ps = " << ipimbData.channel0ps()
+          << "," << ipimbData.channel1ps()
+          << "," << ipimbData.channel2ps()
+          << "," << ipimbData.channel3ps()
+          << "\n    volts-ps = " << ipimbData.channel0psVolts()
+          << "," << ipimbData.channel1psVolts()
+          << "," << ipimbData.channel2psVolts()
+          << "," << ipimbData.channel3psVolts()
+          << "\n    checksum = " << ipimbData.checksum();
+      
+      const Psana::Ipimb::ConfigV2& ipimbConfig = ipimb1->ipimbConfig();
+      str << "\n  Ipimb::ConfigV1:";
+      str << "\n    triggerCounter = " << ipimbConfig.triggerCounter();
+      str << "\n    serialID = " << ipimbConfig.serialID();
+      str << "\n    chargeAmpRange = " << ipimbConfig.chargeAmpRange();
+      str << "\n    calibrationRange = " << ipimbConfig.calibrationRange();
+      str << "\n    resetLength = " << ipimbConfig.resetLength();
+      str << "\n    resetDelay = " << ipimbConfig.resetDelay();
+      str << "\n    chargeAmpRefVoltage = " << ipimbConfig.chargeAmpRefVoltage();
+      str << "\n    calibrationVoltage = " << ipimbConfig.calibrationVoltage();
+      str << "\n    diodeBias = " << ipimbConfig.diodeBias();
+      str << "\n    status = " << ipimbConfig.status();
+      str << "\n    errors = " << ipimbConfig.errors();
+      str << "\n    calStrobeLength = " << ipimbConfig.calStrobeLength();
+      str << "\n    trigDelay = " << ipimbConfig.trigDelay();
+      str << "\n    trigPsDelay = " << ipimbConfig.trigPsDelay();
+      str << "\n    adcDelay = " << ipimbConfig.adcDelay();
+      
+      const Psana::Lusi::IpmFexV1& ipmFexData = ipimb1->ipmFexData();
       str << "\n  Psana::Lusi::IpmFexV1:";
       str << "\n    sum = " << ipmFexData.sum();
       str << "\n    xpos = " << ipmFexData.xpos();
