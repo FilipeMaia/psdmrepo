@@ -21,7 +21,31 @@ std::vector<int> DiodeFexConfigV1::scale_shape() const
   return shape;
 }
 
+std::vector<int> DiodeFexConfigV2::base_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(NRANGES);
+  return shape;
+}
+
+std::vector<int> DiodeFexConfigV2::scale_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(NRANGES);
+  return shape;
+}
+
 std::vector<int> IpmFexConfigV1::diode_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(NCHANNELS);
+  return shape;
+}
+
+std::vector<int> IpmFexConfigV2::diode_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

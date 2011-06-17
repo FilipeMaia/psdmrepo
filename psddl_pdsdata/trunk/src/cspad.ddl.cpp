@@ -86,6 +86,42 @@ std::vector<int> ConfigV2::quads_shape() const
   return shape;
 }
 
+uint32_t
+ConfigV3::numAsicsRead() const {
+  return (this->_AsicMask & 0xf)==1 ? 4 : 16;
+}
+uint32_t
+ConfigV3::roiMask(uint32_t iq) const {
+  return (this->_roiMask >> (8*iq)) & 0xff;
+}
+uint32_t
+ConfigV3::numAsicsStored(uint32_t iq) const {
+  return __builtin_popcount(this->roiMask(iq))*2;
+}
+uint32_t
+ConfigV3::numQuads() const {
+  return __builtin_popcount(this->_quadMask);
+}
+uint32_t
+ConfigV3::numSect() const {
+  return __builtin_popcount(this->_roiMask);
+}
+std::vector<int> ConfigV3::protectionThresholds_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(MaxQuadsPerSensor);
+  return shape;
+}
+
+std::vector<int> ConfigV3::quads_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(MaxQuadsPerSensor);
+  return shape;
+}
+
 std::vector<int> ElementV1::sb_temp_shape() const
 {
   std::vector<int> shape;
@@ -156,6 +192,16 @@ std::vector<int> ElementV2::data_shape(const CsPad::ConfigV2& cfg) const
   return shape;
 }
 
+std::vector<int> ElementV2::data_shape(const CsPad::ConfigV3& cfg) const
+{
+  std::vector<int> shape;
+  shape.reserve(3);
+  shape.push_back(cfg.numAsicsStored(this->quad())/2);
+  shape.push_back( ColumnsPerASIC);
+  shape.push_back( MaxRowsPerASIC*2);
+  return shape;
+}
+
 std::vector<int> ElementV2::_extra_shape() const
 {
   std::vector<int> shape;
@@ -165,6 +211,14 @@ std::vector<int> ElementV2::_extra_shape() const
 }
 
 std::vector<int> DataV2::quads_shape(const CsPad::ConfigV2& cfg) const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(cfg.numQuads());
+  return shape;
+}
+
+std::vector<int> DataV2::quads_shape(const CsPad::ConfigV3& cfg) const
 {
   std::vector<int> shape;
   shape.reserve(1);

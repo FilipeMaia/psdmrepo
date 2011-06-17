@@ -93,6 +93,22 @@ private:
   uint32_t	_version;
 };
 
+/** @class ProtectionSystemThreshold
+
+  
+*/
+
+
+class ProtectionSystemThreshold {
+public:
+  uint32_t adcThreshold() const {return _adcThreshold;}
+  uint32_t pixelCountThreshold() const {return _pixelCountThreshold;}
+  static uint32_t _sizeof()  {return 8;}
+private:
+  uint32_t	_adcThreshold;
+  uint32_t	_pixelCountThreshold;
+};
+
 /** @class CsPadGainMapCfg
 
   Class defining ASIC gain map.
@@ -259,6 +275,66 @@ private:
   CsPad::ConfigV1QuadReg	_quads[MaxQuadsPerSensor];
 };
 
+/** @class ConfigV3
+
+  Configuration data for complete CsPad device.
+*/
+
+
+class ConfigV3 {
+public:
+  enum {
+    Version = 3 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_CspadConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  uint32_t concentratorVersion() const {return _concentratorVersion;}
+  uint32_t runDelay() const {return _runDelay;}
+  uint32_t eventCode() const {return _eventCode;}
+  const CsPad::ProtectionSystemThreshold& protectionThresholds(uint32_t i0) const {return _protectionThresholds[i0];}
+  uint32_t protectionEnable() const {return _protectionEnable;}
+  uint32_t inactiveRunMode() const {return _inactiveRunMode;}
+  uint32_t activeRunMode() const {return _activeRunMode;}
+  uint32_t tdi() const {return _testDataIndex;}
+  uint32_t payloadSize() const {return _payloadPerQuad;}
+  uint32_t badAsicMask0() const {return _badAsicMask0;}
+  uint32_t badAsicMask1() const {return _badAsicMask1;}
+  uint32_t asicMask() const {return _AsicMask;}
+  uint32_t quadMask() const {return _quadMask;}
+  const CsPad::ConfigV1QuadReg& quads(uint32_t i0) const {return _quads[i0];}
+  uint32_t numAsicsRead() const;
+  /** ROI mask for given quadrant */
+  uint32_t roiMask(uint32_t iq) const;
+  /** Number of ASICs in given quadrant */
+  uint32_t numAsicsStored(uint32_t iq) const;
+  /** Total number of quadrants in setup */
+  uint32_t numQuads() const;
+  /** Total number of sections (2x1) in all quadrants */
+  uint32_t numSect() const;
+  static uint32_t _sizeof()  {return (((((((((((12+(CsPad::ProtectionSystemThreshold::_sizeof()*(MaxQuadsPerSensor)))+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad::ConfigV1QuadReg::_sizeof()*(MaxQuadsPerSensor));}
+  /** Method which returns the shape (dimensions) of the data returned by protectionThresholds() method. */
+  std::vector<int> protectionThresholds_shape() const;
+  /** Method which returns the shape (dimensions) of the data returned by quads() method. */
+  std::vector<int> quads_shape() const;
+private:
+  uint32_t	_concentratorVersion;
+  uint32_t	_runDelay;
+  uint32_t	_eventCode;
+  CsPad::ProtectionSystemThreshold	_protectionThresholds[MaxQuadsPerSensor];
+  uint32_t	_protectionEnable;
+  uint32_t	_inactiveRunMode;
+  uint32_t	_activeRunMode;
+  uint32_t	_testDataIndex;
+  uint32_t	_payloadPerQuad;
+  uint32_t	_badAsicMask0;
+  uint32_t	_badAsicMask1;
+  uint32_t	_AsicMask;
+  uint32_t	_quadMask;
+  uint32_t	_roiMask;
+  CsPad::ConfigV1QuadReg	_quads[MaxQuadsPerSensor];
+};
+
 /** @class ElementV1
 
   CsPad data from single CsPad quadrant.
@@ -361,6 +437,7 @@ private:
 */
 
 class ConfigV2;
+class ConfigV3;
 
 class ElementV2 {
 public:
@@ -386,10 +463,13 @@ public:
     return (const uint16_t*)(((const char*)this)+offset);
   }
   uint32_t _sizeof(const CsPad::ConfigV2& cfg) const {return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsStored(this->quad())/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2));}
+  uint32_t _sizeof(const CsPad::ConfigV3& cfg) const {return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsStored(this->quad())/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2));}
   /** Method which returns the shape (dimensions) of the data returned by sb_temp() method. */
   std::vector<int> sb_temp_shape() const;
   /** Method which returns the shape (dimensions) of the data returned by data() method. */
   std::vector<int> data_shape(const CsPad::ConfigV2& cfg) const;
+  /** Method which returns the shape (dimensions) of the data returned by data() method. */
+  std::vector<int> data_shape(const CsPad::ConfigV3& cfg) const;
   /** Method which returns the shape (dimensions) of the data member _extra. */
   std::vector<int> _extra_shape() const;
 private:
@@ -410,6 +490,7 @@ private:
 */
 
 class ConfigV2;
+class ConfigV3;
 
 class DataV2 {
 public:
@@ -428,8 +509,19 @@ public:
     }
     return *(const CsPad::ElementV2*)(memptr);
   }
+  /** Data objects, one element per quadrant. The size of the array is determined by 
+            the numQuads() method of the configuration object. */
+  const CsPad::ElementV2& quads(const CsPad::ConfigV3& cfg, uint32_t i0) const {
+    const char* memptr = ((const char*)this)+0;
+    for (uint32_t i=0; i != i0; ++ i) {
+      memptr += ((const CsPad::ElementV2*)memptr)->_sizeof(cfg);
+    }
+    return *(const CsPad::ElementV2*)(memptr);
+  }
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   std::vector<int> quads_shape(const CsPad::ConfigV2& cfg) const;
+  /** Method which returns the shape (dimensions) of the data returned by quads() method. */
+  std::vector<int> quads_shape(const CsPad::ConfigV3& cfg) const;
 private:
   //CsPad::ElementV2	_quads[cfg.numQuads()];
 };

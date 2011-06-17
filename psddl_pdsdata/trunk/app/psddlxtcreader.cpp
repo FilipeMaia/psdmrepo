@@ -36,46 +36,52 @@ public:
   myLevelIter(Xtc* xtc, unsigned depth, long long int lliOffset) : XtcIterator(xtc), _depth(depth), _lliOffset(lliOffset) {}
 
   void process(const DetInfo& d, const Camera::FrameV1& f) {
-    printf("*** Processing frame object\n");
+    printf("*** Processing Camera::FrameV1 object\n");
   }
   void process(const DetInfo&, const Acqiris::DataDescV1&) {
-    printf("*** Processing acqiris data object\n");
+    printf("*** Processing Acqiris::DataDescV1 object\n");
   }
   void process(const DetInfo&, const Acqiris::ConfigV1&) {
-    printf("*** Processing Acqiris config object\n");
+    printf("*** Processing Acqiris::ConfigV1 object\n");
   }
   void process(const DetInfo&, const Ipimb::DataV1&) {
-    printf("*** Processing ipimb data object\n");
+    printf("*** Processing Ipimb::DataV1 object\n");
+  }
+  void process(const DetInfo&, const Ipimb::DataV2&) {
+    printf("*** Processing Ipimb::DataV2 object\n");
   }
   void process(const DetInfo&, const Ipimb::ConfigV1&) {
-    printf("*** Processing Ipimb config object\n");
+    printf("*** Processing Ipimb::ConfigV1 object\n");
+  }
+  void process(const DetInfo&, const Ipimb::ConfigV2&) {
+    printf("*** Processing Ipimb::ConfigV2 object\n");
   }
   void process(const DetInfo&, const Encoder::DataV1&) {
-    printf("*** Processing encoder DataV1 object\n");
+    printf("*** Processing Encoder::DataV1 object\n");
   }
   void process(const DetInfo&, const Encoder::DataV2&) {
-    printf("*** Processing encoder DataV2 object\n");
+    printf("*** Processing Encoder::DataV2 object\n");
   }
   void process(const DetInfo&, const Encoder::ConfigV1&) {
-    printf("*** Processing Encoder config object\n");
+    printf("*** Processing Encoder::ConfigV1 object\n");
   }
   void process(const DetInfo&, const Opal1k::ConfigV1&) {
-    printf("*** Processing Opal1000 config object\n");
+    printf("*** Processing Opal1k::ConfigV1 object\n");
   }
   void process(const DetInfo&, const Pulnix::TM6740ConfigV1&) {
-    printf("*** Processing TM6740 config object\n");
+    printf("*** Processing Pulnix::TM6740ConfigV1 object\n");
   }
   void process(const DetInfo&, const Camera::FrameFexConfigV1&) {
-    printf("*** Processing frame feature extraction config object\n");
+    printf("*** Processing Camera::FrameFexConfigV1 object\n");
   }
   void process(const DetInfo&, const FCCD::FccdConfigV1&) {
-    printf("*** Processing FCCD ConfigV1 object\n");
+    printf("*** Processing FCCD::FccdConfigV1 object\n");
   }
   void process(const DetInfo&, const FCCD::FccdConfigV2&) {
-    printf("*** Processing FCCD ConfigV2 object\n");
+    printf("*** Processing FCCD::FccdConfigV2 object\n");
   }
   void process(const DetInfo&, const Camera::TwoDGaussianV1& o) {
-    printf("*** Processing 2DGauss object\n");
+    printf("*** Processing Camera::TwoDGaussianV1 object\n");
   }
   void process(const DetInfo& det, const PNCCD::ConfigV1& config) {
     if ( det.detId() != 0 )
@@ -173,8 +179,8 @@ public:
     printf( "ebeamLTUAngY  ( in mrad ): %lf\n", bldData.ebeamLTUAngY() );
     printf( "\n" );    
   }  
-  void process(const DetInfo&, const Bld::BldDataEBeam& bldData) {
-    printf("*** Processing EBeam object\n");
+  void process(const DetInfo&, const Bld::BldDataEBeamV1& bldData) {
+    printf("*** Processing EBeamV1 object\n");
     printf( "ebeamCharge   ( in nC )  : %lf\n", bldData.ebeamCharge()  ); 
     printf( "ebeamL3Energy ( in MeV ) : %lf\n", bldData.ebeamL3Energy()); 
     printf( "ebeamLTUPosX  ( in mm )  : %lf\n", bldData.ebeamLTUPosX() ); 
@@ -182,6 +188,18 @@ public:
     printf( "ebeamLTUAngX  ( in mrad ): %lf\n", bldData.ebeamLTUAngX() ); 
     printf( "ebeamLTUAngY  ( in mrad ): %lf\n", bldData.ebeamLTUAngY() );
     printf( "ebeamPkCurrBC2( in mA )  : %lf\n", bldData.ebeamPkCurrBC2() );
+    printf( "\n" );    
+  }  
+  void process(const DetInfo&, const Bld::BldDataEBeamV2& bldData) {
+    printf("*** Processing EBeamV2 object\n");
+    printf( "ebeamCharge   ( in nC )  : %lf\n", bldData.ebeamCharge()  ); 
+    printf( "ebeamL3Energy ( in MeV ) : %lf\n", bldData.ebeamL3Energy()); 
+    printf( "ebeamLTUPosX  ( in mm )  : %lf\n", bldData.ebeamLTUPosX() ); 
+    printf( "ebeamLTUPosY  ( in mm )  : %lf\n", bldData.ebeamLTUPosY() ); 
+    printf( "ebeamLTUAngX  ( in mrad ): %lf\n", bldData.ebeamLTUAngX() ); 
+    printf( "ebeamLTUAngY  ( in mrad ): %lf\n", bldData.ebeamLTUAngY() );
+    printf( "ebeamPkCurrBC2( in mA )  : %lf\n", bldData.ebeamPkCurrBC2() );
+    printf( "ebeamEnergyBC2( in mA )  : %lf\n", bldData.ebeamEnergyBC2() );
     printf( "\n" );    
   }  
   void process(const DetInfo&, const Bld::BldDataPhaseCavity& bldData) {
@@ -192,7 +210,7 @@ public:
     printf("Charge2  ( in pico-columbs ): %lf\n", bldData.charge2() );
     printf( "\n" );    
   } 
-  void process(const DetInfo&, const Bld::BldDataIpimb& bldData) {
+  void process(const DetInfo&, const Bld::BldDataIpimbV0& bldData) {
     printf("*** Processing Bld-Ipimb object\n");
     printf("BLD Shared IPIMB Data:\n");
     unsigned long long int counter = bldData.ipimbData().triggerCounter();
@@ -201,6 +219,29 @@ public:
     printf("  IpimbDataCh-1   : %f   \n",bldData.ipimbData().channel1Volts());            
     printf("  IpimbDataCh-2   : %f   \n",bldData.ipimbData().channel2Volts());    
     printf("  IpimbDataCh-3   : %f   \n",bldData.ipimbData().channel3Volts());
+
+    printf("  IpmFexDataCh-0  : %f   \n",bldData.ipmFexData().channel()[0]);        
+    printf("  IpmFexDataCh-1  : %f   \n",bldData.ipmFexData().channel()[1]);
+    printf("  IpmFexDataCh-2  : %f   \n",bldData.ipmFexData().channel()[2]);
+    printf("  IpmFexDataCh-3  : %f   \n",bldData.ipmFexData().channel()[3]);
+    printf("  IpmFexDataSum   : %f   \n",bldData.ipmFexData().sum());
+    printf("  IpmFexDataXpos  : %f   \n",bldData.ipmFexData().xpos());
+    printf("  IpmFexDataYpos  : %f   \n",bldData.ipmFexData().ypos());
+    printf( "\n" );    
+  }   
+  void process(const DetInfo&, const Bld::BldDataIpimbV1& bldData) {
+    printf("*** Processing Bld-Ipimb object\n");
+    printf("BLD Shared IPIMB Data:\n");
+    unsigned long long int counter = bldData.ipimbData().triggerCounter();
+    printf("  Trig Count      : %llu \n",counter);
+    printf("  IpimbDataCh-0   : %f   \n",bldData.ipimbData().channel0Volts());
+    printf("  IpimbDataCh-1   : %f   \n",bldData.ipimbData().channel1Volts());            
+    printf("  IpimbDataCh-2   : %f   \n",bldData.ipimbData().channel2Volts());    
+    printf("  IpimbDataCh-3   : %f   \n",bldData.ipimbData().channel3Volts());
+    printf("  IpimbDataCh-0ps : %f   \n",bldData.ipimbData().channel0psVolts());
+    printf("  IpimbDataCh-1ps : %f   \n",bldData.ipimbData().channel1psVolts());            
+    printf("  IpimbDataCh-2ps : %f   \n",bldData.ipimbData().channel2psVolts());    
+    printf("  IpimbDataCh-3ps : %f   \n",bldData.ipimbData().channel3psVolts());
 
     printf("  IpmFexDataCh-0  : %f   \n",bldData.ipmFexData().channel()[0]);        
     printf("  IpmFexDataCh-1  : %f   \n",bldData.ipmFexData().channel()[1]);
@@ -252,17 +293,32 @@ public:
   void process(const DetInfo&, const CsPad::ElementV1&) {
     printf("*** Processing CsPad ElementV1 object\n");
   }
+  void process(const DetInfo&, const CsPad::ElementV2&) {
+    printf("*** Processing CsPad ElementV2 object\n");
+  }
   void process(const DetInfo&, const CsPad::ConfigV1&) {
-    printf("*** Processing CsPad ElementV1 object\n");
+    printf("*** Processing CsPad ConfigV1 object\n");
+  }
+  void process(const DetInfo&, const CsPad::ConfigV2&) {
+    printf("*** Processing CsPad ConfigV2 object\n");
+  }
+  void process(const DetInfo&, const CsPad::ConfigV3&) {
+    printf("*** Processing CsPad ConfigV3 object\n");
   }
   void process(const DetInfo&, const Lusi::IpmFexConfigV1&) {
     printf("*** Processing LUSI IpmFexConfigV1 object\n");
+  }
+  void process(const DetInfo&, const Lusi::IpmFexConfigV2&) {
+    printf("*** Processing LUSI IpmFexConfigV2 object\n");
   }
   void process(const DetInfo&, const Lusi::IpmFexV1&) {
     printf("*** Processing LUSI IpmFexV1 object\n");
   }
   void process(const DetInfo&, const Lusi::DiodeFexConfigV1&) {
     printf("*** Processing LUSI DiodeFexConfigV1 object\n");
+  }
+  void process(const DetInfo&, const Lusi::DiodeFexConfigV2&) {
+    printf("*** Processing LUSI DiodeFexConfigV2 object\n");
   }
   void process(const DetInfo&, const Lusi::DiodeFexV1&) {
     printf("*** Processing LUSI DiodeFexV1 object\n");
@@ -315,17 +371,32 @@ public:
       break;      
     }
     case (TypeId::Id_IpimbData) :
-      process(info, *(const Ipimb::DataV1*)(xtc->payload()));
+    {
+      switch (xtc->contains.version()) {
+      case 1:
+        process(info, *(const Ipimb::DataV1*)(xtc->payload()));
+        break;
+      case 2:
+        process(info, *(const Ipimb::DataV2*)(xtc->payload()));
+        break;
+      default:
+        printf("Unsupported ipimb data version %d\n",xtc->contains.version());
+        break;
+      }
+      break;      
       break;
+    }
     case (TypeId::Id_IpimbConfig) :
     {      
-      unsigned version = xtc->contains.version();
-      switch (version) {
+      switch (xtc->contains.version()) {
       case 1:
         process(info,*(const Ipimb::ConfigV1*)(xtc->payload()));
         break;
+      case 2:
+        process(info,*(const Ipimb::ConfigV2*)(xtc->payload()));
+        break;
       default:
-        printf("Unsupported ipimb configuration version %d\n",version);
+        printf("Unsupported ipimb configuration version %d\n",xtc->contains.version());
         break;
       }
       break;      
@@ -449,7 +520,10 @@ public:
         process(info, *(const Bld::BldDataEBeamV0*) xtc->payload() );
         break; 
       case 1:
-        process(info, *(const Bld::BldDataEBeam*) xtc->payload() );
+        process(info, *(const Bld::BldDataEBeamV1*) xtc->payload() );
+        break; 
+      case 2:
+        process(info, *(const Bld::BldDataEBeamV2*) xtc->payload() );
         break; 
       default:
         break;
@@ -462,7 +536,16 @@ public:
     }
     case (TypeId::Id_SharedIpimb) :
     {
-      process(info, *(const Bld::BldDataIpimb*) xtc->payload() );
+      switch(xtc->contains.version()) {
+      case 0:
+        process(info, *(const Bld::BldDataIpimbV0*) xtc->payload() );
+        break; 
+      case 1:
+        process(info, *(const Bld::BldDataIpimbV1*) xtc->payload() );
+        break; 
+      default:
+        break;
+      }       
       break;        
     }	
     case (TypeId::Id_PrincetonConfig) :
@@ -482,17 +565,47 @@ public:
     }    
     case (TypeId::Id_CspadElement) :
     {
-      process(info, *(const CsPad::ElementV1*)(xtc->payload()));
+      switch(xtc->contains.version()) {
+      case 1:
+        process(info, *(const CsPad::ElementV1*)(xtc->payload()));
+        break; 
+      case 2:
+        process(info, *(const CsPad::ElementV2*)(xtc->payload()));
+        break; 
+      default:
+        break;
+      }       
       break;
     }    
     case (TypeId::Id_CspadConfig) :
     {
-      process(info, *(const CsPad::ConfigV1*)(xtc->payload()));
+      switch(xtc->contains.version()) {
+      case 1:
+        process(info, *(const CsPad::ConfigV1*)(xtc->payload()));
+        break; 
+      case 2:
+        process(info, *(const CsPad::ConfigV2*)(xtc->payload()));
+        break; 
+      case 3:
+        process(info, *(const CsPad::ConfigV3*)(xtc->payload()));
+        break; 
+      default:
+        break;
+      }       
       break;
     }    
     case (TypeId::Id_IpmFexConfig) :
     {
-      process(info, *(const Lusi::IpmFexConfigV1*)(xtc->payload()));
+      switch(xtc->contains.version()) {
+      case 1:
+        process(info, *(const Lusi::IpmFexConfigV1*)(xtc->payload()));
+        break; 
+      case 2:
+        process(info, *(const Lusi::IpmFexConfigV2*)(xtc->payload()));
+        break; 
+      default:
+        break;
+      }       
       break;
     }    
     case (TypeId::Id_IpmFex) :
@@ -502,7 +615,16 @@ public:
     }    
     case (TypeId::Id_DiodeFexConfig) :
     {
-      process(info, *(const Lusi::DiodeFexConfigV1*)(xtc->payload()));
+      switch(xtc->contains.version()) {
+      case 1:
+        process(info, *(const Lusi::DiodeFexConfigV1*)(xtc->payload()));
+        break; 
+      case 2:
+        process(info, *(const Lusi::DiodeFexConfigV2*)(xtc->payload()));
+        break; 
+      default:
+        break;
+      }       
       break;
     }    
     case (TypeId::Id_DiodeFex) :
