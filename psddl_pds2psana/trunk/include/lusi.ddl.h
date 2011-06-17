@@ -11,6 +11,8 @@ namespace psddl_pds2psana {
 namespace Lusi {
 Psana::Lusi::DiodeFexConfigV1 pds_to_psana(PsddlPds::Lusi::DiodeFexConfigV1 pds);
 
+Psana::Lusi::DiodeFexConfigV2 pds_to_psana(PsddlPds::Lusi::DiodeFexConfigV2 pds);
+
 Psana::Lusi::DiodeFexV1 pds_to_psana(PsddlPds::Lusi::DiodeFexV1 pds);
 
 
@@ -28,6 +30,23 @@ public:
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   std::vector< Psana::Lusi::DiodeFexConfigV1 > _diode;
+};
+
+
+class IpmFexConfigV2 : public Psana::Lusi::IpmFexConfigV2 {
+public:
+  typedef PsddlPds::Lusi::IpmFexConfigV2 XtcType;
+  typedef Psana::Lusi::IpmFexConfigV2 PsanaType;
+  IpmFexConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~IpmFexConfigV2();
+  virtual const Psana::Lusi::DiodeFexConfigV2& diode(uint32_t i0) const;
+  virtual float xscale() const;
+  virtual float yscale() const;
+  virtual std::vector<int> diode_shape() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  std::vector< Psana::Lusi::DiodeFexConfigV2 > _diode;
 };
 
 Psana::Lusi::IpmFexV1 pds_to_psana(PsddlPds::Lusi::IpmFexV1 pds);

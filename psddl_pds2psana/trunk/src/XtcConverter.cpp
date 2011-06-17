@@ -274,7 +274,8 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     break;
   case Pds::TypeId::Id_EBeam:
     if (version == 0) ::storeValueType<Psana::Bld::BldDataEBeamV0, PsddlPds::Bld::BldDataEBeamV0>(xtc, evt);
-    if (version == 1) ::storeValueType<Psana::Bld::BldDataEBeam, PsddlPds::Bld::BldDataEBeam>(xtc, evt);
+    if (version == 1) ::storeValueType<Psana::Bld::BldDataEBeamV1, PsddlPds::Bld::BldDataEBeamV1>(xtc, evt);
+    if (version == 2) ::storeValueType<Psana::Bld::BldDataEBeamV2, PsddlPds::Bld::BldDataEBeamV2>(xtc, evt);
     break;
   case Pds::TypeId::Id_PhaseCavity:
     if (version == 0) ::storeValueType<Psana::Bld::BldDataPhaseCavity, PsddlPds::Bld::BldDataPhaseCavity>(xtc, evt);
@@ -293,6 +294,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     break;
   case Pds::TypeId::Id_IpimbData:
     if (version == 1) ::storeDataProxy<Ipimb::DataV1>(xtc, evt);
+    if (version == 2) ::storeDataProxy<Ipimb::DataV2>(xtc, evt);
     break;
   case Pds::TypeId::Id_IpimbConfig:
     break;
@@ -309,7 +311,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     break;
   case Pds::TypeId::Id_CspadElement:
     if (version == 1) ::storeDataProxyCfg2<CsPad::DataV1, PsddlPds::CsPad::ConfigV1, PsddlPds::CsPad::ConfigV2>(xtc, evt, cfgStore);
-    if (version == 2) ::storeDataProxyCfg<CsPad::DataV2, PsddlPds::CsPad::ConfigV2>(xtc, evt, cfgStore);
+    if (version == 2) ::storeDataProxyCfg2<CsPad::DataV2, PsddlPds::CsPad::ConfigV2, PsddlPds::CsPad::ConfigV3>(xtc, evt, cfgStore);
     break;
   case Pds::TypeId::Id_CspadConfig:
     break;
@@ -326,12 +328,19 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
   case Pds::TypeId::Id_PimImageConfig:
     break;
   case Pds::TypeId::Id_SharedIpimb:
-    if (version == 0) ::storeDataProxy<Bld::BldDataIpimb>(xtc, evt);
+    if (version == 0) ::storeDataProxy<Bld::BldDataIpimbV0>(xtc, evt);
+    if (version == 1) ::storeDataProxy<Bld::BldDataIpimbV1>(xtc, evt);
     break;
   case Pds::TypeId::Id_AcqTdcConfig:
     break;
   case Pds::TypeId::Id_AcqTdcData:
     if (version == 1) ::storeDataProxyWithSize<Acqiris::TdcDataV1>(xtc, evt);
+    break;
+  case Pds::TypeId::Id_Index:
+    break;
+  case Pds::TypeId::Id_XampsConfig:
+    break;
+  case Pds::TypeId::Id_XampsElement:
     break;
   case Pds::TypeId::NumberOf:
     break;
@@ -414,6 +423,7 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::Confi
     break;
   case Pds::TypeId::Id_IpimbConfig:
     if (version == 1) ::storeCfgObject<Ipimb::ConfigV1>(xtc, cfgStore);
+    if (version == 2) ::storeCfgObject<Ipimb::ConfigV2>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_EncoderData:
     break;
@@ -430,14 +440,17 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::Confi
   case Pds::TypeId::Id_CspadConfig:
     if (version == 1) ::storeCfgObject<CsPad::ConfigV1>(xtc, cfgStore);
     if (version == 2) ::storeCfgObject<CsPad::ConfigV2>(xtc, cfgStore);
+    if (version == 3) ::storeCfgObject<CsPad::ConfigV3>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_IpmFexConfig:
     if (version == 1) ::storeCfgObject<Lusi::IpmFexConfigV1>(xtc, cfgStore);
+    if (version == 2) ::storeCfgObject<Lusi::IpmFexConfigV2>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_IpmFex:
     break;
   case Pds::TypeId::Id_DiodeFexConfig:
     if (version == 1) ::storeCfgValueType<Psana::Lusi::DiodeFexConfigV1, PsddlPds::Lusi::DiodeFexConfigV1>(xtc, cfgStore);
+    if (version == 2) ::storeCfgValueType<Psana::Lusi::DiodeFexConfigV2, PsddlPds::Lusi::DiodeFexConfigV2>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_DiodeFex:
     break;
@@ -450,6 +463,12 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::Confi
     if (version == 1) ::storeCfgObject<Acqiris::TdcConfigV1>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_AcqTdcData:
+    break;
+  case Pds::TypeId::Id_Index:
+    break;
+  case Pds::TypeId::Id_XampsConfig:
+    break;
+  case Pds::TypeId::Id_XampsElement:
     break;
   case Pds::TypeId::NumberOf:
     break;

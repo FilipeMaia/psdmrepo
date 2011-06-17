@@ -15,17 +15,19 @@ Psana::Bld::BldDataFEEGasDetEnergy pds_to_psana(PsddlPds::Bld::BldDataFEEGasDetE
 
 Psana::Bld::BldDataEBeamV0 pds_to_psana(PsddlPds::Bld::BldDataEBeamV0 pds);
 
-Psana::Bld::BldDataEBeam pds_to_psana(PsddlPds::Bld::BldDataEBeam pds);
+Psana::Bld::BldDataEBeamV1 pds_to_psana(PsddlPds::Bld::BldDataEBeamV1 pds);
+
+Psana::Bld::BldDataEBeamV2 pds_to_psana(PsddlPds::Bld::BldDataEBeamV2 pds);
 
 Psana::Bld::BldDataPhaseCavity pds_to_psana(PsddlPds::Bld::BldDataPhaseCavity pds);
 
 
-class BldDataIpimb : public Psana::Bld::BldDataIpimb {
+class BldDataIpimbV0 : public Psana::Bld::BldDataIpimbV0 {
 public:
-  typedef PsddlPds::Bld::BldDataIpimb XtcType;
-  typedef Psana::Bld::BldDataIpimb PsanaType;
-  BldDataIpimb(const boost::shared_ptr<const XtcType>& xtcPtr);
-  virtual ~BldDataIpimb();
+  typedef PsddlPds::Bld::BldDataIpimbV0 XtcType;
+  typedef Psana::Bld::BldDataIpimbV0 PsanaType;
+  BldDataIpimbV0(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~BldDataIpimbV0();
   virtual const Psana::Ipimb::DataV1& ipimbData() const;
   virtual const Psana::Ipimb::ConfigV1& ipimbConfig() const;
   virtual const Psana::Lusi::IpmFexV1& ipmFexData() const;
@@ -34,6 +36,24 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   psddl_pds2psana::Ipimb::DataV1 _ipimbData;
   psddl_pds2psana::Ipimb::ConfigV1 _ipimbConfig;
+  Psana::Lusi::IpmFexV1 _ipmFexData;
+};
+
+
+class BldDataIpimbV1 : public Psana::Bld::BldDataIpimbV1 {
+public:
+  typedef PsddlPds::Bld::BldDataIpimbV1 XtcType;
+  typedef Psana::Bld::BldDataIpimbV1 PsanaType;
+  BldDataIpimbV1(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~BldDataIpimbV1();
+  virtual const Psana::Ipimb::DataV2& ipimbData() const;
+  virtual const Psana::Ipimb::ConfigV2& ipimbConfig() const;
+  virtual const Psana::Lusi::IpmFexV1& ipmFexData() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  psddl_pds2psana::Ipimb::DataV2 _ipimbData;
+  psddl_pds2psana::Ipimb::ConfigV2 _ipimbConfig;
   Psana::Lusi::IpmFexV1 _ipmFexData;
 };
 

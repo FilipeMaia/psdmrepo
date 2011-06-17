@@ -35,6 +35,33 @@ private:
 };
 
 
+class ConfigV2 : public Psana::Ipimb::ConfigV2 {
+public:
+  typedef PsddlPds::Ipimb::ConfigV2 XtcType;
+  typedef Psana::Ipimb::ConfigV2 PsanaType;
+  ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~ConfigV2();
+  virtual uint64_t triggerCounter() const;
+  virtual uint64_t serialID() const;
+  virtual uint16_t chargeAmpRange() const;
+  virtual uint16_t calibrationRange() const;
+  virtual uint32_t resetLength() const;
+  virtual uint32_t resetDelay() const;
+  virtual float chargeAmpRefVoltage() const;
+  virtual float calibrationVoltage() const;
+  virtual float diodeBias() const;
+  virtual uint16_t status() const;
+  virtual uint16_t errors() const;
+  virtual uint16_t calStrobeLength() const;
+  virtual uint32_t trigDelay() const;
+  virtual uint32_t trigPsDelay() const;
+  virtual uint32_t adcDelay() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
+
 class DataV1 : public Psana::Ipimb::DataV1 {
 public:
   typedef PsddlPds::Ipimb::DataV1 XtcType;
@@ -54,6 +81,39 @@ public:
   virtual float channel1Volts() const;
   virtual float channel2Volts() const;
   virtual float channel3Volts() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
+
+class DataV2 : public Psana::Ipimb::DataV2 {
+public:
+  typedef PsddlPds::Ipimb::DataV2 XtcType;
+  typedef Psana::Ipimb::DataV2 PsanaType;
+  DataV2(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~DataV2();
+  virtual uint64_t triggerCounter() const;
+  virtual uint16_t config0() const;
+  virtual uint16_t config1() const;
+  virtual uint16_t config2() const;
+  virtual uint16_t channel0() const;
+  virtual uint16_t channel1() const;
+  virtual uint16_t channel2() const;
+  virtual uint16_t channel3() const;
+  virtual uint16_t channel0ps() const;
+  virtual uint16_t channel1ps() const;
+  virtual uint16_t channel2ps() const;
+  virtual uint16_t channel3ps() const;
+  virtual uint16_t checksum() const;
+  virtual float channel0Volts() const;
+  virtual float channel1Volts() const;
+  virtual float channel2Volts() const;
+  virtual float channel3Volts() const;
+  virtual float channel0psVolts() const;
+  virtual float channel1psVolts() const;
+  virtual float channel2psVolts() const;
+  virtual float channel3psVolts() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

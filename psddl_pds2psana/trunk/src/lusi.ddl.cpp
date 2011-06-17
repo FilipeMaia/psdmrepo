@@ -14,6 +14,11 @@ Psana::Lusi::DiodeFexConfigV1 pds_to_psana(PsddlPds::Lusi::DiodeFexConfigV1 pds)
   return Psana::Lusi::DiodeFexConfigV1(pds.base(), pds.scale());
 }
 
+Psana::Lusi::DiodeFexConfigV2 pds_to_psana(PsddlPds::Lusi::DiodeFexConfigV2 pds)
+{
+  return Psana::Lusi::DiodeFexConfigV2(pds.base(), pds.scale());
+}
+
 Psana::Lusi::DiodeFexV1 pds_to_psana(PsddlPds::Lusi::DiodeFexV1 pds)
 {
   return Psana::Lusi::DiodeFexV1(pds.value());
@@ -42,6 +47,36 @@ float IpmFexConfigV1::xscale() const { return m_xtcObj->xscale(); }
 
 float IpmFexConfigV1::yscale() const { return m_xtcObj->yscale(); }
 std::vector<int> IpmFexConfigV1::diode_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(_diode.size());
+  return shape;
+}
+
+IpmFexConfigV2::IpmFexConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Lusi::IpmFexConfigV2()
+  , m_xtcObj(xtcPtr)
+{
+  {
+    const std::vector<int>& dims = xtcPtr->diode_shape();
+    _diode.reserve(dims[0]);
+    for (int i0=0; i0 != dims[0]; ++i0) {
+      _diode.push_back(psddl_pds2psana::Lusi::pds_to_psana(xtcPtr->diode(i0)));
+    }
+  }
+}
+IpmFexConfigV2::~IpmFexConfigV2()
+{
+}
+
+
+const Psana::Lusi::DiodeFexConfigV2& IpmFexConfigV2::diode(uint32_t i0) const { return _diode[i0]; }
+
+float IpmFexConfigV2::xscale() const { return m_xtcObj->xscale(); }
+
+float IpmFexConfigV2::yscale() const { return m_xtcObj->yscale(); }
+std::vector<int> IpmFexConfigV2::diode_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);

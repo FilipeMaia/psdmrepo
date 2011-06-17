@@ -44,6 +44,45 @@ uint16_t ConfigV1::errors() const { return m_xtcObj->errors(); }
 uint16_t ConfigV1::calStrobeLength() const { return m_xtcObj->calStrobeLength(); }
 
 uint32_t ConfigV1::trigDelay() const { return m_xtcObj->trigDelay(); }
+ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Ipimb::ConfigV2()
+  , m_xtcObj(xtcPtr)
+{
+}
+ConfigV2::~ConfigV2()
+{
+}
+
+
+uint64_t ConfigV2::triggerCounter() const { return m_xtcObj->triggerCounter(); }
+
+uint64_t ConfigV2::serialID() const { return m_xtcObj->serialID(); }
+
+uint16_t ConfigV2::chargeAmpRange() const { return m_xtcObj->chargeAmpRange(); }
+
+uint16_t ConfigV2::calibrationRange() const { return m_xtcObj->calibrationRange(); }
+
+uint32_t ConfigV2::resetLength() const { return m_xtcObj->resetLength(); }
+
+uint32_t ConfigV2::resetDelay() const { return m_xtcObj->resetDelay(); }
+
+float ConfigV2::chargeAmpRefVoltage() const { return m_xtcObj->chargeAmpRefVoltage(); }
+
+float ConfigV2::calibrationVoltage() const { return m_xtcObj->calibrationVoltage(); }
+
+float ConfigV2::diodeBias() const { return m_xtcObj->diodeBias(); }
+
+uint16_t ConfigV2::status() const { return m_xtcObj->status(); }
+
+uint16_t ConfigV2::errors() const { return m_xtcObj->errors(); }
+
+uint16_t ConfigV2::calStrobeLength() const { return m_xtcObj->calStrobeLength(); }
+
+uint32_t ConfigV2::trigDelay() const { return m_xtcObj->trigDelay(); }
+
+uint32_t ConfigV2::trigPsDelay() const { return m_xtcObj->trigPsDelay(); }
+
+uint32_t ConfigV2::adcDelay() const { return m_xtcObj->adcDelay(); }
 DataV1::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Ipimb::DataV1()
   , m_xtcObj(xtcPtr)
@@ -79,5 +118,56 @@ float DataV1::channel1Volts() const { return m_xtcObj->channel1Volts(); }
 float DataV1::channel2Volts() const { return m_xtcObj->channel2Volts(); }
 
 float DataV1::channel3Volts() const { return m_xtcObj->channel3Volts(); }
+DataV2::DataV2(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Ipimb::DataV2()
+  , m_xtcObj(xtcPtr)
+{
+}
+DataV2::~DataV2()
+{
+}
+
+
+uint64_t DataV2::triggerCounter() const { return m_xtcObj->triggerCounter(); }
+
+uint16_t DataV2::config0() const { return m_xtcObj->config0(); }
+
+uint16_t DataV2::config1() const { return m_xtcObj->config1(); }
+
+uint16_t DataV2::config2() const { return m_xtcObj->config2(); }
+
+uint16_t DataV2::channel0() const { return m_xtcObj->channel0(); }
+
+uint16_t DataV2::channel1() const { return m_xtcObj->channel1(); }
+
+uint16_t DataV2::channel2() const { return m_xtcObj->channel2(); }
+
+uint16_t DataV2::channel3() const { return m_xtcObj->channel3(); }
+
+uint16_t DataV2::channel0ps() const { return m_xtcObj->channel0ps(); }
+
+uint16_t DataV2::channel1ps() const { return m_xtcObj->channel1ps(); }
+
+uint16_t DataV2::channel2ps() const { return m_xtcObj->channel2ps(); }
+
+uint16_t DataV2::channel3ps() const { return m_xtcObj->channel3ps(); }
+
+uint16_t DataV2::checksum() const { return m_xtcObj->checksum(); }
+
+float DataV2::channel0Volts() const { return m_xtcObj->channel0Volts(); }
+
+float DataV2::channel1Volts() const { return m_xtcObj->channel1Volts(); }
+
+float DataV2::channel2Volts() const { return m_xtcObj->channel2Volts(); }
+
+float DataV2::channel3Volts() const { return m_xtcObj->channel3Volts(); }
+
+float DataV2::channel0psVolts() const { return m_xtcObj->channel0psVolts(); }
+
+float DataV2::channel1psVolts() const { return m_xtcObj->channel1psVolts(); }
+
+float DataV2::channel2psVolts() const { return m_xtcObj->channel2psVolts(); }
+
+float DataV2::channel3psVolts() const { return m_xtcObj->channel3psVolts(); }
 } // namespace Ipimb
 } // namespace psddl_pds2psana

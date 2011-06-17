@@ -38,6 +38,20 @@ private:
 };
 
 
+class ProtectionSystemThreshold : public Psana::CsPad::ProtectionSystemThreshold {
+public:
+  typedef PsddlPds::CsPad::ProtectionSystemThreshold XtcType;
+  typedef Psana::CsPad::ProtectionSystemThreshold PsanaType;
+  ProtectionSystemThreshold(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~ProtectionSystemThreshold();
+  virtual uint32_t adcThreshold() const;
+  virtual uint32_t pixelCountThreshold() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
+
 class CsPadGainMapCfg : public Psana::CsPad::CsPadGainMapCfg {
 public:
   typedef PsddlPds::CsPad::CsPadGainMapCfg XtcType;
@@ -144,6 +158,41 @@ private:
 };
 
 
+class ConfigV3 : public Psana::CsPad::ConfigV3 {
+public:
+  typedef PsddlPds::CsPad::ConfigV3 XtcType;
+  typedef Psana::CsPad::ConfigV3 PsanaType;
+  ConfigV3(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~ConfigV3();
+  virtual uint32_t concentratorVersion() const;
+  virtual uint32_t runDelay() const;
+  virtual uint32_t eventCode() const;
+  virtual const Psana::CsPad::ProtectionSystemThreshold& protectionThresholds(uint32_t i0) const;
+  virtual uint32_t protectionEnable() const;
+  virtual uint32_t inactiveRunMode() const;
+  virtual uint32_t activeRunMode() const;
+  virtual uint32_t tdi() const;
+  virtual uint32_t payloadSize() const;
+  virtual uint32_t badAsicMask0() const;
+  virtual uint32_t badAsicMask1() const;
+  virtual uint32_t asicMask() const;
+  virtual uint32_t quadMask() const;
+  virtual const Psana::CsPad::ConfigV1QuadReg& quads(uint32_t i0) const;
+  virtual uint32_t numAsicsRead() const;
+  virtual uint32_t roiMask(uint32_t iq) const;
+  virtual uint32_t numAsicsStored(uint32_t iq) const;
+  virtual uint32_t numQuads() const;
+  virtual uint32_t numSect() const;
+  virtual std::vector<int> protectionThresholds_shape() const;
+  virtual std::vector<int> quads_shape() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  std::vector< psddl_pds2psana::CsPad::ProtectionSystemThreshold > _protectionThresholds;
+  std::vector< psddl_pds2psana::CsPad::ConfigV1QuadReg > _quads;
+};
+
+
 class ElementV1 : public Psana::CsPad::ElementV1 {
 public:
   typedef PsddlPds::CsPad::ElementV1 XtcType;
@@ -197,6 +246,7 @@ public:
   typedef PsddlPds::CsPad::ElementV2 XtcType;
   typedef Psana::CsPad::ElementV2 PsanaType;
   ElementV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV2>& cfgPtr);
+  ElementV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV3>& cfgPtr);
   virtual ~ElementV2();
   virtual uint32_t virtual_channel() const;
   virtual uint32_t lane() const;
@@ -217,6 +267,7 @@ public:
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   boost::shared_ptr<const PsddlPds::CsPad::ConfigV2> m_cfgPtr0;
+  boost::shared_ptr<const PsddlPds::CsPad::ConfigV3> m_cfgPtr1;
 };
 
 
@@ -225,6 +276,7 @@ public:
   typedef PsddlPds::CsPad::DataV2 XtcType;
   typedef Psana::CsPad::DataV2 PsanaType;
   DataV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV2>& cfgPtr);
+  DataV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV3>& cfgPtr);
   virtual ~DataV2();
   virtual const Psana::CsPad::ElementV2& quads(uint32_t i0) const;
   virtual std::vector<int> quads_shape() const;
@@ -232,6 +284,7 @@ public:
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   boost::shared_ptr<const PsddlPds::CsPad::ConfigV2> m_cfgPtr0;
+  boost::shared_ptr<const PsddlPds::CsPad::ConfigV3> m_cfgPtr1;
   std::vector< psddl_pds2psana::CsPad::ElementV2 > _quads;
 };
 

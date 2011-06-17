@@ -19,9 +19,14 @@ Psana::Bld::BldDataEBeamV0 pds_to_psana(PsddlPds::Bld::BldDataEBeamV0 pds)
   return Psana::Bld::BldDataEBeamV0(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY());
 }
 
-Psana::Bld::BldDataEBeam pds_to_psana(PsddlPds::Bld::BldDataEBeam pds)
+Psana::Bld::BldDataEBeamV1 pds_to_psana(PsddlPds::Bld::BldDataEBeamV1 pds)
 {
-  return Psana::Bld::BldDataEBeam(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY(), pds.ebeamPkCurrBC2());
+  return Psana::Bld::BldDataEBeamV1(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY(), pds.ebeamPkCurrBC2());
+}
+
+Psana::Bld::BldDataEBeamV2 pds_to_psana(PsddlPds::Bld::BldDataEBeamV2 pds)
+{
+  return Psana::Bld::BldDataEBeamV2(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY(), pds.ebeamPkCurrBC2(), pds.ebeamEnergyBC2());
 }
 
 Psana::Bld::BldDataPhaseCavity pds_to_psana(PsddlPds::Bld::BldDataPhaseCavity pds)
@@ -29,23 +34,41 @@ Psana::Bld::BldDataPhaseCavity pds_to_psana(PsddlPds::Bld::BldDataPhaseCavity pd
   return Psana::Bld::BldDataPhaseCavity(pds.fitTime1(), pds.fitTime2(), pds.charge1(), pds.charge2());
 }
 
-BldDataIpimb::BldDataIpimb(const boost::shared_ptr<const XtcType>& xtcPtr)
-  : Psana::Bld::BldDataIpimb()
+BldDataIpimbV0::BldDataIpimbV0(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Bld::BldDataIpimbV0()
   , m_xtcObj(xtcPtr)
   , _ipimbData(boost::shared_ptr<const PsddlPds::Ipimb::DataV1>(xtcPtr, &xtcPtr->ipimbData()))
   , _ipimbConfig(boost::shared_ptr<const PsddlPds::Ipimb::ConfigV1>(xtcPtr, &xtcPtr->ipimbConfig()))
   , _ipmFexData(psddl_pds2psana::Lusi::pds_to_psana(xtcPtr->ipmFexData()))
 {
 }
-BldDataIpimb::~BldDataIpimb()
+BldDataIpimbV0::~BldDataIpimbV0()
 {
 }
 
 
-const Psana::Ipimb::DataV1& BldDataIpimb::ipimbData() const { return _ipimbData; }
+const Psana::Ipimb::DataV1& BldDataIpimbV0::ipimbData() const { return _ipimbData; }
 
-const Psana::Ipimb::ConfigV1& BldDataIpimb::ipimbConfig() const { return _ipimbConfig; }
+const Psana::Ipimb::ConfigV1& BldDataIpimbV0::ipimbConfig() const { return _ipimbConfig; }
 
-const Psana::Lusi::IpmFexV1& BldDataIpimb::ipmFexData() const { return _ipmFexData; }
+const Psana::Lusi::IpmFexV1& BldDataIpimbV0::ipmFexData() const { return _ipmFexData; }
+BldDataIpimbV1::BldDataIpimbV1(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Bld::BldDataIpimbV1()
+  , m_xtcObj(xtcPtr)
+  , _ipimbData(boost::shared_ptr<const PsddlPds::Ipimb::DataV2>(xtcPtr, &xtcPtr->ipimbData()))
+  , _ipimbConfig(boost::shared_ptr<const PsddlPds::Ipimb::ConfigV2>(xtcPtr, &xtcPtr->ipimbConfig()))
+  , _ipmFexData(psddl_pds2psana::Lusi::pds_to_psana(xtcPtr->ipmFexData()))
+{
+}
+BldDataIpimbV1::~BldDataIpimbV1()
+{
+}
+
+
+const Psana::Ipimb::DataV2& BldDataIpimbV1::ipimbData() const { return _ipimbData; }
+
+const Psana::Ipimb::ConfigV2& BldDataIpimbV1::ipimbConfig() const { return _ipimbConfig; }
+
+const Psana::Lusi::IpmFexV1& BldDataIpimbV1::ipmFexData() const { return _ipmFexData; }
 } // namespace Bld
 } // namespace psddl_pds2psana
