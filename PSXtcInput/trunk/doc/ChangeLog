@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2011-06-17 Andy Salnikov
+- changed default datagram size to 32MB
+
 Tag: V00-00-11
 2011-05-06 Andy Salnikov
 - improve doxygenated comments
