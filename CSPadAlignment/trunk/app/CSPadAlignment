@@ -1,0 +1,103 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Module CSPadAlignment...
+#
+#------------------------------------------------------------------------
+
+"""Module CSPadAlignment for CSPadAlignment package
+
+CSPadAlignment package is intended to check quality of the CSPad alignment
+using image of wires illuminated by flat field.
+Shadow of wires are compared with a set of straight lines, which can be
+interactively adjusted.
+
+This software was developed for the SIT project.  If you use all or 
+part of it, please give an appropriate acknowledgment.
+
+@see RelatedModule
+
+@version $Id$
+
+@author Mikhail S. Dubrovin
+"""
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 4 $"
+# $Source$
+#------------------------------
+#!/usr/bin/env python
+#----------------------------------
+import sys
+#import os
+from PyQt4 import QtGui, QtCore
+
+from   matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from   matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import numpy             as np
+
+import CSPadAlignment.ImageParameters   as imp
+import CSPadAlignment.GlobalMethods     as gm
+import CSPadAlignment.GUIMainWindow     as guimw
+
+##-----------------------------------------------------
+    
+
+#----------------------------------
+
+def main():
+    print 'Start CSPadAlignment'
+
+    # Test array
+    #arr = np.arange(30000,10000,-1).reshape((100, 200))
+
+    # Get image parameters and load image from file:
+    #imp.impars.loadImageArrayFromFile ( 'cspad-ave100-cxi80410-r0628-v02.txt' )
+    imp.impars.loadImageArrayFromFile ( imp.impars.imgDirName + '/' + imp.impars.imgFileName )
+    imp.impars.printLineCoordinates()
+
+
+    #print imp.impars.arr
+
+    # Draw spectrum of image
+    nbins=120
+    Amin =1000
+    Amax =4000
+    ARange = (Amin,Amax)
+    #drawSpectrum(imp.impars.arr,nbins,ARange)
+
+    # Draw 1D histograms
+    #draw1DHist(imp.impars.arr)
+
+    # Draw exerything for image
+    #draw2DArray(imp.impars.arr)
+    #plt.clim(Amin,Amax)
+    #gm.addRectangle()
+
+
+    app = QtGui.QApplication(sys.argv)
+
+    #fig = gm.openFigure(1,12,12,'CSpad image')
+    fig        = Figure((8.0, 10.0), dpi=100, facecolor='w',edgecolor='w',frameon=True)
+    fig.canvas = FigureCanvas(fig)   # Graphic window specific stuff
+
+    gmw = guimw.GUIMainWindow(None, fig, imp.impars.arr)
+    gmw.show()
+
+    app.exec_()
+ 
+
+    # Show everything
+    #gm.drawOrShow('show')
+
+#----------------------------------
+if __name__ == '__main__':
+    main()
+#----------------------------------
+
+

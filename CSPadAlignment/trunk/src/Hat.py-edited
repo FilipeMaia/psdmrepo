@@ -1,0 +1,31 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Module Hat...
+#
+#------------------------------------------------------------------------
+
+"""Module for CSPadAlignment package
+
+CSPadAlignment package is intended to check quality of the CSPad alignment
+using image of wires illuminated by flat field.
+Shadow of wires are compared with a set of straight lines, which can be
+interactively adjusted.
+
+This software was developed for the SIT project.  If you use all or 
+part of it, please give an appropriate acknowledgment.
+
+@see RelatedModule
+
+@version $Id$
+
+@author Mikhail S. Dubrovin
+"""
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 4 $"
+# $Source$
+#------------------------------
