@@ -34,6 +34,7 @@ import h5py
 from pypdsdata import xtc
 
 from utilities import Plotter
+from utilities import Threshold
 from utilities import PyanaOptions
 from utilities import ImageData
 
@@ -45,8 +46,7 @@ class  pyana_image ( object ) :
     # initialize
     def __init__ ( self,
                    sources = None,
-                   good_range = "0,999999",
-                   dark_range = "-999999,0",
+                   threshold = None,
                    image_rotations = None,
                    image_shifts = None,
                    image_scales = None,
@@ -65,8 +65,7 @@ class  pyana_image ( object ) :
         @param plot_every_n     Frequency for plotting. If n=0, no plots till the end
         @param accumulate_n     Not implemented yet
         @param fignum           Matplotlib figure number
-        @param good_range       threshold values selecting images of interest
-        @param dark_range       threshold values selecting dark images
+        @param threshold
         @param image_rotations  (list) rotation, in degrees, to be applied to image(s)
         @param image_shifts     (list) shift, in (npixX,npixY), to be applied to image(s)
         @param image_scales     (list) scale factor to be applied to images
@@ -147,21 +146,27 @@ class  pyana_image ( object ) :
             self.output_file = None
         print "Using output_file: ", self.output_file
 
+        threshold_string = opt.getOptStrings(threshold)
+        # format: 'value (xlow:xhigh,ylow:yhigh)', only value is required
+        
+        self.threshold = None
+        if len(threshold_string)>0:
+            self.threshold = Threshold()
+            self.threshold.value = opt.getOptFloat(threshold_string[0])
+            print "Using threshold value ", self.threshold.value
+        if len(threshold_string)>1:
+            self.threshold.area = np.array([0.,0.,0.,0.])
                 
-        # ranges
-        tli = str(good_range).split(",")[0]
-        thi = str(good_range).split(",")[1]
-        tld = str(dark_range).split(",")[0]
-        thd = str(dark_range).split(",")[1]
-
-        self.thr_low_image = float( tli )
-        self.thr_high_image = float( thi )
-        self.thr_low_dark = float( tld )
-        self.thr_high_dark = float( thd )
-        print "Using good_range = %s " % good_range
-        print "  (thresholds =  %d (low) and %d (high) " % (self.thr_low_image, self.thr_high_image)
-        print "Using dark_range = %s " % dark_range
-        print "  (thresholds =  %d (low) and %d (high) " % (self.thr_low_dark, self.thr_high_dark)
+            intervals = threshold_string[1].strip('()').split(',')
+            xrange = intervals[0].split(":")
+            yrange = intervals[1].split(":")
+            self.threshold.area[0] = float(xrange[0])
+            self.threshold.area[1] = float(xrange[1])
+            self.threshold.area[2] = float(yrange[0])
+            self.threshold.area[3] = float(yrange[1])
+            
+            print "Using threshold area ", self.threshold.area
+            
 
         self.n_hdf5 = None
         if n_hdf5 is not None :
@@ -174,22 +179,14 @@ class  pyana_image ( object ) :
         self.n_shots = None
 
         # averages
-        self.image_data = {}
-        self.dark_data = {}
-        self.minmax = {}
-        self.fignum = {}
-        self.n_img = {}
+        self.sum_good_images = {}
+        self.sum_dark_images = {}
+        self.n_good = {}
         self.n_dark = {}
         for addr in self.sources :
-            self.image_data[addr] = None
-            self.dark_data[addr] = None
-
-            # these will be plotted too
-            self.minmax[addr] = []
-
-            self.fignum[addr] = self.mpl_num*10 + 100*self.sources.index(addr)
-
-            self.n_img[addr] = 0
+            self.sum_good_images[addr] = None
+            self.sum_dark_images[addr] = None
+            self.n_good[addr] = 0
             self.n_dark[addr] = 0
 
         # output file
@@ -199,7 +196,8 @@ class  pyana_image ( object ) :
                 print "opening %s for writing" % self.output_file
                 self.hdf5file = h5py.File(self.output_file, 'w')
 
-        self.plotter = Plotter()
+        self.plotter = Plotter()        
+        self.plotter.settings(7,7) # set default frame size
 
 
     def beginjob ( self, evt, env ) : 
@@ -240,13 +238,14 @@ class  pyana_image ( object ) :
             frame = None
             if addr.find("Princeton")>0 :
                 frame = evt.getPrincetonValue(addr, env)
-            if addr.find("pnCCD")>0 :
+                print addr, frame
+            elif addr.find("pnCCD")>0 :
                 frame = evt.getPnCcdValue(addr, env)
             else :
                 frame = evt.getFrameValue(addr)
 
             if not frame :
-                print "No frame from ", addr
+                print "No frame from ", addr, " in shot#", self.n_shots
                 continue
 
             # image is a numpy array (pixels)
@@ -257,25 +256,8 @@ class  pyana_image ( object ) :
             if len( dim )!= 2 :
                 print "Unexpected dimensions of image array from %s: %s" % (addr,dim)
 
-            # collect min and max intensities of images from this detector
-            self.minmax[addr].append( [image.min(), image.max()] )
 
-            # ---------------------------------------------------------------------------------------
-            # select good (signal) images
-            isGood = False
-            if ( image.max() > self.thr_low_image) and (image.max() < self.thr_high_image) :
-                isGood = True
-                
-            # select dark images
-            isDark = False
-            if ( image.max() > self.thr_low_dark ) and ( image.max() < self.thr_high_dark ) :
-                isDark = True
-
-            # sanity check
-            if isGood and isDark :
-                print "WARNING! This image has been selected both as signal AND dark! "
-
-
+                                
             # ---------------------------------------------------------------------------------------
             # Apply shift, rotation, scaling of this image if needed:
             if self.image_rotations is not None:
@@ -294,67 +276,81 @@ class  pyana_image ( object ) :
                 pass
 
 
+            isDark = False
+            title = addr
+
             # ---------------------------------------------------------------------------------------
-            # add this image to the sum (for average)
-            if isGood :
-                self.n_img[addr]+=1
-                if self.image_data[addr] is None :
-                    self.image_data[addr] = np.float_(image)
-                else :
-                    self.image_data[addr] += image
+            # threshold filter
+            roi = None
+            if self.threshold is not None:
+                # first, assume we're considering the whole image
+                roi = image
+                if self.threshold.area is not None:
+                    # or set it to the selected threshold area
+                    roi = image[self.threshold.area[2]:self.threshold.area[3],   # rows (y-range)
+                                self.threshold.area[0]:self.threshold.area[1]]   # columns (x-range)
+                dims = np.shape(roi)
+                maxbin = roi.argmax()
+                maxvalue = roi.ravel()[maxbin]
+                maxbin_coord = np.unravel_index(maxbin,dims)
+                
+                if maxvalue < self.threshold.value :
+                    isDark = True
+                    title += " (dark)"
 
-            elif isDark :                
+
+            # -------------DARK----------------
+            if isDark:
                 self.n_dark[addr]+=1
-                if self.dark_data[addr] is None :
-                    self.dark_data[addr] = np.float_(image)
+                if self.sum_dark_images[addr] is None :
+                    self.sum_dark_images[addr] = np.float_(image)
                 else :
-                    self.dark_data[addr] += image
-
-
-            # images for plotting
-            #if isGood :
-            #    if self.subtract_bkg and self.n_dark[addr] > 0 :
-            #        # subtract average of darks so far collected
-            #        image_bkgsub = image - self.dark_data[addr]/self.n_dark[addr]
-            #        event_display_images.append( (addr, image_bkgsub) )
-            #    else :
-
-
+                    self.sum_dark_images[addr] += image
+            else :
+            # -------------BRIGHT----------------
+                self.n_good[addr]+=1
+                if self.sum_good_images[addr] is None :
+                    self.sum_good_images[addr] = np.float_(image)
+                else :
+                    self.sum_good_images[addr] += image
+                        
+            
             # ---------------------------------------------------------------------------------------
             # Here's where we add the raw (or subtracted) image to the list for plotting
-            event_display_images.append( (addr, image) )
+            event_display_images.append( (title, image) )
 
             # This is for use by ipython
             self.data[addr].image   = image
-            if self.n_img[addr] > 0 :
-                self.data[addr].average = self.image_data[addr]/self.n_img[addr]
+            if self.n_good[addr] > 0 :
+                self.data[addr].average = self.sum_good_images[addr]/self.n_good[addr]
             if self.n_dark[addr] > 0 :
-                self.data[addr].dark    = self.dark_data[addr]/self.n_dark[addr]
-            
-            
+                self.data[addr].dark    = self.sum_dark_images[addr]/self.n_dark[addr]
+
         if len(event_display_images)==0 :
             return
-        
+            
         if self.image_manipulations is not None: 
             for i in range ( 0, len(event_display_images) ):
-
+                            
                 if "Diff" in self.image_manipulations :
                     ad1,im1 = event_display_images[i]
                     ad2,im2 = event_display_images[i-1]
                     lb1 = self.image_nicknames[i]
                     lb2 = self.image_nicknames[i-1]
                     event_display_images.append( ("Diff %s-%s"%(lb1,lb2), im1-im2) )
-
+                                
                 if "FFT" in self.image_manipulations :
                     F = np.fft.fftn(im1-im2)
                     event_display_images.append( \
                         ("FFT %s-%s"%(lb1,lb2), np.log(np.abs(np.fft.fftshift(F))**2) ) )
-
-
+                                    
+            
+                    
         # -----------------------------------
         # Draw images from this event
         # -----------------------------------
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
+
             # flag for pyana_plotter
             evt.put(True, 'show_event')
             
@@ -375,7 +371,7 @@ class  pyana_image ( object ) :
                 # give the list to the event object
                 evt.put( data_image, 'data_image' )
                                                             
-            
+
         # -----------------------------------
         # Saving to file
         # -----------------------------------
@@ -420,26 +416,43 @@ class  pyana_image ( object ) :
             self.hdf5file.close()
 
         print "Done processing       ", self.n_shots, " events"
-        print "Range defining images: %f (lower) - %f (upper)" % (self.thr_low_image, self.thr_high_image)
-        print "Range defining darks: %f (lower) - %f (upper)" %  (self.thr_low_dark, self.thr_high_dark)
-        
+
+        # keep a list of images 
+        event_display_images = []
+
         for addr in self.sources:
-            print "# Signal images from %s = %d "% (addr, self.n_img[addr])
+
+            print "# Signal images from %s = %d "% (addr, self.n_good[addr])
             print "# Dark images from %s = %d" % (addr, self.n_dark[addr])
 
-            # plot the average image
-            av_good_img = self.image_data[addr]/self.n_img[addr]
-            self.plotter.draw_figure( av_good_img, "%s: Average of images above threshold"%addr,
-                                    fignum=self.fignum[addr])
+            average_image = None
+            if self.n_good[addr] > 0 :
+                label = "Average of %d bright/accepted shots"%self.n_good[addr]
 
-            if self.n_dark[addr]>0 :
-                av_dark_img = self.dark_data[addr]/self.n_dark[addr]
-                av_bkgsubtracted = av_good_img - av_dark_img 
-                self.plotter.draw_figure( av_dark_img, "%s: Average of images below threshold"%addr,
-                                        fignum=self.fignum[addr]+1 )
-                self.self.draw_figure( av_bkgsubtracted, "%s: Average background subtracted"%addr,
-                                     fignum=self.fignum[addr]+2)
+                average_image = self.sum_good_images[addr]/self.n_good[addr]
+                event_display_images.append( (label, average_image ) )
 
+            rejected_image = None
+            if self.n_dark[addr] > 0 :
+                label = "Average of %d dark/rejected shots"%self.n_dark[addr]
+
+                rejected_image = self.sum_dark_images[addr]/self.n_dark[addr]
+                event_display_images.append( (label, rejected_image ) )
+            
+            #if self.dark_image is not None :
+            #    label = "Dark image from input file"
+            #    event_display_images.append( ("Dark image from file", self.dark_image ) )
+            
+        if len(event_display_images) == 0:
+            print "That shouldn't be possible"
+            return
+                
+        
+        self.plotter.draw_figurelist(self.mpl_num+1,
+                                     event_display_images,
+                                     title="Endjob",
+                                     showProj=True)
+        
         plt.draw()
         
 

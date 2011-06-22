@@ -531,10 +531,11 @@ class Plotter(object):
             print "utitilities.py: Something wrong with the subplot configuration"
             print "                Not enough space for %d plots in %d x %d"%(nplots,ncol,nrow)
 
-        
+
         self.fig = plt.figure(fignum,(self.w*ncol,self.h*nrow))
         self.fignum = fignum
         self.fig.clf()
+        self.fig.set_size_inches(self.w*ncol,self.h*nrow)
 
         self.fig.subplots_adjust(left=0.05,   right=0.95,
                                  bottom=0.05, top=0.90,
@@ -729,12 +730,12 @@ class Plotter(object):
 
         pos = 0
         for tuple in event_display_images :
+            pos += 1
             ad = tuple[0]
             im = tuple[1]
             xt = None
             if len(tuple)==3 : xt = tuple[2]
-
-            pos += 1
+            
             self.drawframe(im,title=ad,fignum=fignum,position=pos,showProj=showProj,extent=xt)
             
         plt.draw()

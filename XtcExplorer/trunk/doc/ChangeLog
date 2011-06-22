@@ -11,6 +11,14 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Jun-22 ofte                   rev 2026
+        - fixed a bug in pyana_image (for Princeton)
+	- fixed a bug in pyana_encoder (now -1 entries for unvalid entries, needed for time line plot)
+	- pyana_image now uses Threshold class instead of the home-made double threshold. 
+	- FIXME! pyana_image: There's still a problem when number of plots change from 
+	  event to event (e.g. one image passes threshold while the other doesnt). For now, solved
+	  by plotting each time anyway, changing title (bright or dark) depending on over/under threshold.
+	
 2011-Jun-16 ofte                   rev 1995
 	- pyana_ipimb: variable list to select what to plot
 	- pyana_plotter: avoid drawing every event (slows things down). 

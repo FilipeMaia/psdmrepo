@@ -87,6 +87,9 @@ class  pyana_encoder ( object ) :
                 self.timestmps[source].append( encoder._33mhz_timestamp )
             else :
                 print "pyana_encoder: No EncoderData from %s found" % source
+                self.values[source].append( -1 )
+                self.counts[source].append( -1 )
+                self.timestmps[source].append( -1 )
 
         # ----------------- Plotting ---------------------
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :

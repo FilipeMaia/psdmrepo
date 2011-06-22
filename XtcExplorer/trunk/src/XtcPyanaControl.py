@@ -826,12 +826,11 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             #print "XtcExplorer.pyana_image at ", index
             address = str(box.text()).split(": ")[1].strip()
             options_for_mod[index].append("\nsources = %s" % address)
+            options_for_mod[index].append("\nthreshold = ")
             options_for_mod[index].append("\nimage_rotations = " )
             options_for_mod[index].append("\nimage_shifts = " )
             options_for_mod[index].append("\nimage_scales = " )
             options_for_mod[index].append("\nimage_manipulations = ")
-            options_for_mod[index].append("\ngood_range = %d,%d" % (0,99999999.9) )
-            options_for_mod[index].append("\ndark_range = %d,%d" % (0,0) )
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
