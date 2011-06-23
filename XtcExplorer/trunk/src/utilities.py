@@ -35,12 +35,15 @@ class PyanaOptions( object ):
         if options_string is None:
             return None
 
+        # strip off any leading or trailing whitespaces
+        options_string = options_string.strip()
+
         # make sure there are no newline characters here
         options_string = options_string.split("\n")
         options_string = " ".join(options_string)
 
         # make a list
-        options = options_string.split(" ")
+        options = options_string.split()
 
         if len(options)==0 :
             return []
@@ -823,12 +826,15 @@ class Plotter(object):
             aplot.vmin, aplot.vmax = aplot.orglims
                     
         # show the active region for thresholding
+        print "threshold = ", aplot.threshold
+        print "area     =  ", aplot.threshold.area
         if aplot.threshold and aplot.threshold.area is not None:
             xy = [aplot.threshold.area[0],aplot.threshold.area[2]]
             w = aplot.threshold.area[1] - aplot.threshold.area[0]
             h = aplot.threshold.area[3] - aplot.threshold.area[2]
             aplot.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=10)
             aplot.axes.add_patch(aplot.thr_rect)
+            print "Plotting the red rectangle in area ", aplot.threshold.area
 
         aplot.axes.set_title(title)
         

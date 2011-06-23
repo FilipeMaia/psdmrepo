@@ -199,6 +199,12 @@ class  pyana_image ( object ) :
         self.plotter = Plotter()        
         self.plotter.settings(7,7) # set default frame size
 
+        # Set up the plotter's frame by hand, since
+        # we need to also tell it about thresholds
+        for source in self.sources :
+            self.plotter.add_frame(source)
+            self.plotter.frame[source].threshold = self.threshold
+
 
     def beginjob ( self, evt, env ) : 
 
@@ -417,10 +423,13 @@ class  pyana_image ( object ) :
 
         print "Done processing       ", self.n_shots, " events"
 
-        # keep a list of images 
-        event_display_images = []
-
+        nsrc = 0
         for addr in self.sources:
+            
+            nsrc += 1
+
+            # keep a list of images 
+            event_display_images = []
 
             print "# Signal images from %s = %d "% (addr, self.n_good[addr])
             print "# Dark images from %s = %d" % (addr, self.n_dark[addr])
@@ -443,17 +452,22 @@ class  pyana_image ( object ) :
             #    label = "Dark image from input file"
             #    event_display_images.append( ("Dark image from file", self.dark_image ) )
             
-        if len(event_display_images) == 0:
-            print "That shouldn't be possible"
-            return
-                
+            if len(event_display_images) == 0:
+                print "That shouldn't be possible"
+                return
+            
+            
+            # plot to a new figure ... thus we must define new frames (if we want them to know about threshold)
+            for title, image in event_display_images:
+                self.plotter.add_frame(title)
+                self.plotter.frame[title].threshold = self.threshold
+
+            self.plotter.draw_figurelist(self.mpl_num+nsrc,
+                                         event_display_images,
+                                         title="Endjob:  %s"%addr,
+                                         showProj=True)
         
-        self.plotter.draw_figurelist(self.mpl_num+1,
-                                     event_display_images,
-                                     title="Endjob",
-                                     showProj=True)
-        
-        plt.draw()
+            plt.draw()
         
 
         # convert dict to a list:
