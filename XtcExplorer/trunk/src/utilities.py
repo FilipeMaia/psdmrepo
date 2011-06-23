@@ -826,8 +826,6 @@ class Plotter(object):
             aplot.vmin, aplot.vmax = aplot.orglims
                     
         # show the active region for thresholding
-        print "threshold = ", aplot.threshold
-        print "area     =  ", aplot.threshold.area
         if aplot.threshold and aplot.threshold.area is not None:
             xy = [aplot.threshold.area[0],aplot.threshold.area[2]]
             w = aplot.threshold.area[1] - aplot.threshold.area[0]
