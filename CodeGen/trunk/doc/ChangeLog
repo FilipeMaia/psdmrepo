@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-21
+2011-06-22 Andy Salnikov
+- update template for psana module
+
 Tag: V00-00-20
 2011-05-24 Andy Salnikov
 - user author name from ~/.codegen-user if present
