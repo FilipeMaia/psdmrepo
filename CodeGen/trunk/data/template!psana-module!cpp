@@ -26,6 +26,7 @@
 // to work with detector data include corresponding 
 // header from psddl_psana package
 #include "psddl_psana/acqiris.ddl.h"
+#include "PSEvt/EventId.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -49,6 +50,7 @@ $class::$class (const std::string& name)
   , m_src()
   , m_maxEvents()
   , m_filter()
+  , m_count(0)
 {
   // get the values from configuration or use defaults
   m_src = configStr("source", "DetInfo(:Acqiris)");
@@ -65,19 +67,19 @@ $class::~$class ()
 
 /// Method which is called once at the beginning of the job
 void 
-$class::beginJob(Env& env)
+$class::beginJob(Event& evt, Env& env)
 {
 }
 
 /// Method which is called at the beginning of the run
 void 
-$class::beginRun(Env& env)
+$class::beginRun(Event& evt, Env& env)
 {
 }
 
 /// Method which is called at the beginning of the calibration cycle
 void 
-$class::beginCalibCycle(Env& env)
+$class::beginCalibCycle(Event& evt, Env& env)
 {
 }
 
@@ -87,7 +89,7 @@ void
 $class::event(Event& evt, Env& env)
 {
   // example of getting non-detector data from event
-  boost::shared_ptr<PSEvt::EventId> eventId = evt.get<PSEvt::EventId>();
+  shared_ptr<PSEvt::EventId> eventId = evt.get();
   if (eventId.get()) {
     // example of producing messages using MgsLog facility
     MsgLog(name(), info, "event ID: " << *eventId);
@@ -107,23 +109,26 @@ $class::event(Event& evt, Env& env)
       log << "found Acqiris::DataDescV1 object";
     }
   }
+  
+  // increment event counter
+  ++ m_count;
 }
   
 /// Method which is called at the end of the calibration cycle
 void 
-$class::endCalibCycle(Env& env)
+$class::endCalibCycle(Event& evt, Env& env)
 {
 }
 
 /// Method which is called at the end of the run
 void 
-$class::endRun(Env& env)
+$class::endRun(Event& evt, Env& env)
 {
 }
 
 /// Method which is called once at the end of the job
 void 
-$class::endJob(Env& env)
+$class::endJob(Event& evt, Env& env)
 {
 }
 
