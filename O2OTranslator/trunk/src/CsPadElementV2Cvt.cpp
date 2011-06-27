@@ -166,13 +166,33 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   int16_t pixelData[nSect][Pds::CsPad::ColumnsPerASIC][Pds::CsPad::MaxRowsPerASIC*2];
   float commonMode[nSect];
 
-  // move the data
+  // quadrants may come unordered in XTC container, while clients
+  // prefer them to be ordered, do ordering here
   const XtcType* pdselem = &data ;
+  typedef std::map<unsigned, const XtcType*> ElementMap;
+  ElementMap elements;
+  for ( unsigned iq = 0 ; iq != nQuad ; ++ iq ) {
+
+    unsigned q = pdselem->quad();
+    
+    // add to map ordered on quad number
+    elements.insert(ElementMap::value_type(q, pdselem));
+
+    // move to next frame
+    const uint16_t* sdata = (const uint16_t*)(pdselem+1);
+    unsigned nSectPerQuad = ::bitCount(sMask[q], Pds::CsPad::ASICsPerQuad/2);
+    sdata += nSectPerQuad*ssize;
+    pdselem = (const XtcType*)(sdata+2) ;
+  }
+  
+  
+  // move the data
   unsigned quad = 0;
   unsigned sect = 0;
-  for ( unsigned iq = 0 ; iq != Pds::CsPad::MaxQuadsPerSensor ; ++ iq ) {
+  for ( ElementMap::const_iterator ie = elements.begin() ; ie != elements.end() ; ++ ie, ++ quad ) {
         
-    if ( not (qMask & (1 << iq))) continue;
+    unsigned q = ie->first;
+    pdselem = ie->second;
 
     // copy frame info
     elems[quad] = H5DataTypes::CsPadElementV2(*pdselem) ;
@@ -182,7 +202,7 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
 
     for ( unsigned is = 0 ; is != Pds::CsPad::ASICsPerQuad/2 ; ++ is ) {
     
-      if ( not (sMask[iq] & (1 << is))) continue; 
+      if ( not (sMask[q] & (1 << is))) continue; 
   
       // output pixel data
       int16_t* output = &pixelData[sect][0][0];
@@ -194,19 +214,19 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
       // status codes for pixels
       const uint16_t* pixStatus = 0;
       if (pixStatusCalib.get()) {
-        pixStatus = &pixStatusCalib->status()[iq][is][0][0];
+        pixStatus = &pixStatusCalib->status()[q][is][0][0];
       }
 
       // this sector's pedestal data
       const float* peddata = 0;
       if (pedestals.get()) {
-        peddata = &pedestals->pedestals()[iq][is][0][0];
+        peddata = &pedestals->pedestals()[q][is][0][0];
       }
       
       // calculate common mode if requested
       float cmode = 0;
       if (cModeCalib.get()) {
-        MsgLog(logger, debug, "calculating common mode for q=" << iq << " s=" << is);
+        MsgLog(logger, debug, "calculating common mode for q=" << q << " s=" << is);
         cmode = cModeCalib->findCommonMode(sdata, peddata, pixStatus, ssize);
         if (cmode == pdscalibdata::CsPadCommonModeSubV1::UnknownCM) {
           // reset subtracted value
@@ -233,9 +253,6 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
       ++ sect;
     }
 
-    // move to next frame
-    pdselem = (const XtcType*)(sdata+2) ;
-    ++ quad;
   }
 
   // may not need it

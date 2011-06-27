@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-09
+2011-06-27 Andy Salnikov
+- implemented ordering of CsPad elements
+
 Tag: V00-10-08
 2011-06-15 Andy Salnikov
 - upgrading to pdsdata V02-11-05
