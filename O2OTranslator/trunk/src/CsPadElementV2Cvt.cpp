@@ -174,13 +174,13 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   for ( unsigned iq = 0 ; iq != nQuad ; ++ iq ) {
 
     unsigned q = pdselem->quad();
+    unsigned nSectPerQuad = ::bitCount(sMask[q], Pds::CsPad::ASICsPerQuad/2);
     
     // add to map ordered on quad number
     elements.insert(ElementMap::value_type(q, pdselem));
 
     // move to next frame
     const uint16_t* sdata = (const uint16_t*)(pdselem+1);
-    unsigned nSectPerQuad = ::bitCount(sMask[q], Pds::CsPad::ASICsPerQuad/2);
     sdata += nSectPerQuad*ssize;
     pdselem = (const XtcType*)(sdata+2) ;
   }
