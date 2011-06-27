@@ -1,0 +1,162 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package pyana
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-28
+2011-06-27 Andy Salnikov
+- implemented ordering of cspad quadrants
+
+Tag: V00-00-27
+2011-05-21 - Andy Salnikov
+- modules' methods endjob, endtrun, endcalibcycle now can
+  be declared with three arguments (self, evt, env) instead of
+  two arguments (self, env). 
+- Number of arguments is discovered at run time, so this change 
+  should be backward compatible
+- With three arguments the methods receive standard event object 
+  which can be used to exchange data between modules. 
+
+Tag: V00-00-26
+2011-03-31 - Andy Salnikov
+- fix for zero-sized Epics XTC objects
+
+Tag: V00-00-25
+2011-03-28 - Andy Salnikov
+- changed method dispatch so that beginjob/endjob is called only
+  once per job, not per configure/unconfigure.
+- if there are multiple configure transition in the same job the 
+  warning will be printed.
+
+Tag: V00-00-24
+2011-02-24 - Andy Salnikov
+- previous tag accidentally "overloaded" event.get() method, doing
+  proper overload now
+
+Tag: V00-00-23
+2011-02-23 - Andy Salnikov
+- added support for user data stored in event
+
+Tag: V00-00-22
+2011-02-22 - Andy Salnikov
+- move pyana code to a separate module pyanamod 
+- can be imported into other apps and called by passing parameters 
+  through keyword arguments.
+
+Tag: V00-00-21
+2010-11-09 - Andy Salnikov
+- event.py: change how DroppedContribution are handled at the container 
+  level while scanning XTC containers 
+
+Tag: V00-00-20
+2010-10-14 - Andy Salnikov
+- some changes in cspad module need update for event class 
+
+Tag: V00-00-19
+2010-09-21 - Andy Salnikov
+- store config objects from Control level (ControlConfig) in environment
+  in addition to standard Source level objects
+
+Tag: V00-00-18
+2010-09-03 - Andy Salnikov
+- upgrade to pdsdata V02-07-00, Event class has new method getCsPadQuads()
+
+Tag: V00-00-17
+2010-08-23 - Andy Salnikov
+- bug fix, user module endrun() was not called if -n N option was given
+  to pyana (https://pswww.slac.stanford.edu/trac/psdm/ticket/30) 
+
+Tag: V00-00-16
+2010-07-07 - Andy Salnikov
+- in pyana update environment even if we skip the events, EPICS data 
+  come at random and need to  be remembered
+
+Tag: V00-00-15
+2010-07-07 - Andy Salnikov
+- added skip option to pyanato not process fist N events
+- user midules may have optional begincalibcycle and endcalibcycle
+  methods which will be called for appropriate transitions
+- beginrun and endrun methods were made optional too
+- avoid creating ROOT files when not needed
+
+Tag: V00-00-14
+2010-06-23 - Andy Salnikov
+- relax a bit filtering of damaged events
+
+Tag: V00-00-13
+2010-06-22 - Andy Salnikov
+- event.py: filter out all bad XTC except those having ContainsIncomplete
+
+Tag: V00-00-12
+2010-06-22 - Andy Salnikov
+- histo.py fix, ROOT now is not in module scope
+
+Tag: V00-00-11
+2010-06-22 - Andy Salnikov
+- process damaged events too, do not look inside damaged XTCs ad detector 
+  data level
+- do not import ROOT unless really necessary, it interferes badly with 
+  matplotlib
+- add protection when loading config objects of unknown type
+
+Tag: V00-00-10
+2010-06-17 - Andy Salnikov
+- HistoMgr is instantiated on demand only
+- event object now has run() method, run number is guessed from
+  the file name
+- disappearing sub-process should be handled better now, the main
+  process detects socket errors and stops
+
+Tag: V00-00-09
+2010-06-08 - Andy Salnikov
+- changed Env.updateConfig to store all types of config objects 
+  instead of selected subset
+
+Tag: V00-00-08
+2010-05-13 - Andy Salnikov
+- updated event.Evt and event.Env for new types
+- removed getConfig* methods from Event interface, use Env
+
+Tag: V00-00-06
+2010-04-14 - Andy Salnikov
+- moved examples to a new package pyana_examples/
+- bug fix in src/config, readfp(0 instead of read()
+
+Tag: V00-00-05
+2010-04-13 - Andy Salnikov
+- subprocess ID is know available in environment, can be used to construct
+  unique names
+- updated example myana.py to use simple scipy algorithm 
+
+Tag: V00-00-04
+2010-04-12 - Andy Salnikov
+- src/event.py: changed keyword params from detInfo to address
+- src/config.py: all configuration stuff including command line options
+  was moved here. Small refactoring oof pyana main().
+
+Tag: V00-00-03
+2010-04-09 - Andy Salnikov
+- src/histo.py: added h1i() and h2i() methods
+- src/merger.py: delete temporary files after merging them
+- src/event.py: more uniform handling of address strings
+- src/userana.py: allow multiple instances of the same analysis class
+- examples/myana.py: updated to support many instances
+
+Tag: V00-00-02
+2010-04-02 - Andy Salnikov
+- adding support for merging results from subprocesses 
+- options can now be specified in config file, the same config file
+  can contain options for user modules, see examples/myana.cfg
+
+Tag: V00-00-01
+2010-03-28 - Andy Salnikov
+- first import into repository
+- first half-working version of pyana
