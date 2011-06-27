@@ -390,14 +390,19 @@ class DdlPsanaDoc ( object ) :
 
     def _methArgs(self, meth):
 
-        type = meth.type
         args = []
         
         if meth.attribute:
+
             if meth.attribute.shape and not meth.type.basic:
                 for i in range(len(meth.attribute.shape.dims)):
                     args.append('uint32_t i%d' % i)
 
+        elif meth.args:
+            
+            logging.debug("_methArgs: meth=%s args=%s", meth.name, meth.args)
+            for arg in meth.args:
+                args.append('%s %s' % (arg[1].name, arg[0]))
             
         return ', '.join(args)
 
