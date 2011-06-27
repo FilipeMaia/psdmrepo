@@ -255,6 +255,8 @@ class Event(object):
             if len(quads) >= numQuads : break
             quad = quad.next(cfg)
         
+        # quads may be unordered in XTC, clients prefer them ordered
+        quads.sort(cmp = lambda x, y: cmp(x.quad(), y.quad()))
         return quads
 
     def put(self, data, key):

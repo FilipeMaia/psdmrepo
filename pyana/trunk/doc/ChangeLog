@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-28
+2011-06-27 Andy Salnikov
+- implemented ordering of cspad quadrants
+
 Tag: V00-00-27
 2011-05-21 - Andy Salnikov
 - modules' methods endjob, endtrun, endcalibcycle now can
