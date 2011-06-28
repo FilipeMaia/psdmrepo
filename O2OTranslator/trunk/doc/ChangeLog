@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-11
+2011-06-28 Andy Salnikov
+- needed to add CsPad calibration converter to a new CsPad config 
+  version number
+
 Tag: V00-10-10
 2011-06-27 Andy Salnikov
 - tiny change for readability

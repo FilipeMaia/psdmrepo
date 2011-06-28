@@ -349,6 +349,8 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 2).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 3).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   hsize_t chunk_size = 16*1024 ;
 
