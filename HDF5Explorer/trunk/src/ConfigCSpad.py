@@ -44,25 +44,111 @@ class ConfigCSpad ( object ) :
     #----------------
     def __init__ ( self ) :
         """Constructor"""
-        self.setCSpadParametersV0001()
+        #self.setCSpadParametersV0001()
+        self.setCSpadParametersV0002()
         #self.Print()
 
-    def setCSpadParametersV0001 ( self ) :
-        """Set default configuration parameters hardwired in this module"""
+
+#==========================================
+#==========================================
+
+    def setCSpadParametersV0002 ( self ) :
+        """Configuration parameters based on 2011-06-20 before-run4 optical measurement"""
 
         print 'setCSpadParameters'
 
+        # Quad orientation
+        self.quadInDetOrient = [ 180,   90,    0,  270]
+        self.quadInDetOriInd = [   2,    1,    0,    3]
 
-        # Old orientation
-        #self.quadInDetOrient = [   90,    0,   270,  180]
-        #self.quadInDetOriInd = [    1,    0,     3,    2]
-        #gapX = 30
-        #gapY = 40
-        #self.quadXOffset     = [   3+off2,    0,      800+gapX, 806+gapX+off2]
-        #self.quadYOffset     = [   0,  792+gapY, 803+gapY+off2,       10+off2]
+        self.preventiveRotationOffset = 15 # (pixel) increase effective canva for rotation
+        off = 40
+
+        gapX = 0
+        gapY = 0
+
+        shiftX = 38
+        shiftY = 38
+
+        #self.quadXOffset = [ off+0-gapX+shiftX,  off+  0+1-gapX-shiftX,  off+834+0+gapX-shiftX,  off+834+0+gapX+shiftX]
+        #self.quadYOffset = [ off+0-gapY-shiftY,  off+834-3+gapY-shiftY,  off+834-0+gapY+shiftY,  off+  0+2-gapY+shiftY]
+
+        self.quadXOffset = [ off+0-gapX+shiftX,  off+  0+0-gapX-shiftX,  off+834-2+gapX-shiftX,  off+834+0+gapX+shiftX]
+        self.quadYOffset = [ off+3-gapY-shiftY,  off+834-1+gapY-shiftY,  off+834-5+gapY+shiftY,  off+  0+2-gapY+shiftY]
 
 
-        # New orientation
+        # We get this array dynamically from /Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV*/CxiDs1.0:Cspad.0/element
+        self.quad_nums_in_event = [0, 1, 2, 3] # <- default values
+
+        # We get this array dynamically from /Configure:0000/CsPad::ConfigV2/CxiDs1.0:Cspad.0/config
+        self.indPairsInQuads = [[ 0,   1,   2,   3,   4,   5,   6,   7],
+                                [ 8,   9,  10,  11,  12,  13,  14,  15],
+                                [16,  17,  18,  19,  20,  21,  22,  23],
+                                [24,  25,  26,  27,  28,  29,  30,  31]]
+
+        # Section orientation
+        self.pairInQaudOrient = [ [ 270, 270, 180, 180,  90,  90, 180, 180],
+                                  [ 270, 270, 180, 180,  90,  90, 180, 180],
+                                  [ 270, 270, 180, 180,  90,  90, 180, 180],
+                                  [ 270, 270, 180, 180,  90,  90, 180, 180] ]
+
+        self.pairInQaudOriInd = [ [   3,   3,   2,   2,   1,   1,   2,   2],
+                                  [   3,   3,   2,   2,   1,   1,   2,   2],
+                                  [   3,   3,   2,   2,   1,   1,   2,   2],
+                                  [   3,   3,   2,   2,   1,   1,   2,   2] ]
+
+        self.dPhi = [ [-0.33819,  0.00132,  0.31452, -0.03487,  0.14738,  0.07896, -0.21778, -0.10396],  
+                      [-0.27238, -0.00526,  0.02545,  0.03066, -0.03619,  0.02434,  0.08027,  0.15067],  
+                      [-0.04803, -0.00592,  0.11318, -0.07896, -0.36125, -0.31846, -0.16527,  0.09200],  
+                      [ 0.12436,  0.00263,  0.44809,  0.25794, -0.18029, -0.00117,  0.32701,  0.32439] ]
+
+        # "0" version of coordinates:
+
+        self.pairXInQaud = [ [400,600,  0,  0,200,  0,400,400],
+                             [400,600,  0,  0,200,  0,400,400],
+                             [400,600,  0,  0,200,  0,400,400],
+                             [400,600,  0,  0,200,  0,400,400] ]
+
+        self.pairYInQaud = [ [  0,  0,200,  0,400,400,600,400],
+                             [  0,  0,200,  0,400,400,600,400],
+                             [  0,  0,200,  0,400,400,600,400],
+                             [  0,  0,200,  0,400,400,600,400] ]
+
+        self.pairXInQaud = [[199.14,  198.05,  310.67,   98.22,  629.71,  629.68,  711.87,  499.32],
+                            [198.52,  198.08,  311.50,   98.69,  627.27,  627.27,  712.35,  499.77],
+                            [198.32,  198.04,  310.53,   97.43,  626.68,  628.45,  710.86,  498.01],
+                            [198.26,  198.04,  308.70,   96.42,  627.66,  628.04,  711.12,  498.25]]
+        
+        self.pairYInQaud = [[308.25,   95.11,  625.60,  625.70,  515.02,  727.37,  198.53,  199.30],
+                            [307.18,   95.08,  622.98,  623.51,  514.99,  727.35,  199.27,  198.94],
+                            [307.68,   95.09,  623.95,  625.29,  512.32,  724.63,  198.04,  200.35],
+                            [307.39,   95.12,  627.57,  626.65,  518.03,  730.95,  200.02,  199.70]]
+        
+        self.pairZInQaud = [[  0.31,    0.12,    0.05,    0.12,    0.28,    0.24,    0.40,    0.27],
+                            [  0.45,    0.36,    0.62,    0.33,    1.02,    0.92,    1.30,    1.07],
+                            [  0.23,    0.22,    0.11,    0.15,    0.24,    0.20,    0.60,    0.42],
+                            [  0.25,    0.21,    0.12,    0.10,    0.35,    0.28,    0.66,    0.40]]
+
+                            #   0    1    2    3    4    5    6    7
+        self.dXInQaud    = [[   0,   0,   0,   1,   1,   0,   1,   0], #DONE
+                            [   0,   0,   0,   0,   0,   0,  -1,   0], #DONE
+                            [   0,   0,   0,   0,   0,   0,   0,   0], #DONE
+                            [   0,   0,   0,  -1,   0,   0,   0,   1]] #DONE
+                                                                   
+        self.dYInQaud    = [[   0,   0,   0,   0,  -1,   0,  -1,   0], #DONE
+                            [   0,   0,   0,   0,   0,   1,   0,   0], #DONE
+                            [   0,   0,   0,   0,   0,   0,  -1,  -2], #DONE
+                            [   0,   0,   0,   0,   0,   0,   0,   0]] #DONE
+
+#==========================================
+#==========================================
+
+    def setCSpadParametersV0001 ( self ) :
+        """Configuration parameters based on 2011-03-29 post-run3 optical measurement"""
+
+        print 'setCSpadParameters'
+
+        # Quad orientation
         self.quadInDetOrient = [ 180,   90,    0,  270]
         self.quadInDetOriInd = [   2,    1,    0,    3]
 
@@ -78,27 +164,17 @@ class ConfigCSpad ( object ) :
         self.quadXOffset = [ off+0-gapX+shiftX,  off+  0+1-gapX-shiftX,  off+834+0+gapX-shiftX,  off+834+0+gapX+shiftX]
         self.quadYOffset = [ off+0-gapY-shiftY,  off+834-3+gapY-shiftY,  off+834-0+gapY+shiftY,  off+  0+2-gapY+shiftY]
 
-        self.firstPairInQuad = [0, 0,  8, 16]
-        self.lastPairInQuad  = [0, 8, 16, 20]
+
+        # We get this array dynamically from /Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV*/CxiDs1.0:Cspad.0/element
+        self.quad_nums_in_event = [0, 1, 2, 3] # <- default values
 
         # We get this array dynamically from /Configure:0000/CsPad::ConfigV2/CxiDs1.0:Cspad.0/config
-        self.indPairsInQuads = [[-1,  -1,  -1,  -1,  -1,  -1,  -1,  -1],
-                                [ 0,   1,   2,   3,   4,   5,   6,   7],
+        self.indPairsInQuads = [[ 0,   1,   2,   3,   4,   5,   6,   7],
                                 [ 8,   9,  10,  11,  12,  13,  14,  15],
-                                [16,  17,  -1,  -1,  -1,  -1,  18,  19]]
+                                [16,  17,  18,  19,  20,  21,  22,  23],
+                                [24,  25,  26,  27,  28,  29,  30,  31]]
 
-        # Old orientation
-        #self.pairInQaudOrient = [ [   0,   0, 270, 270, 180, 180, 270, 270],
-        #                          [   0,   0, 270, 270, 180, 180, 270, 270],
-        #                          [   0,   0, 270, 270, 180, 180, 270, 270],
-        #                          [   0,   0, 270, 270, 180, 180, 270, 270] ]
-
-        #self.pairInQaudOriInd = [ [   0,   0,   3,   3,   2,   2,   3,   3],
-        #                          [   0,   0,   3,   3,   2,   2,   3,   3],
-        #                          [   0,   0,   3,   3,   2,   2,   3,   3],
-        #                          [   0,   0,   3,   3,   2,   2,   3,   3] ]
-
-        # New orientation
+        # Section orientation
         self.pairInQaudOrient = [ [ 270, 270, 180, 180,  90,  90, 180, 180],
                                   [ 270, 270, 180, 180,  90,  90, 180, 180],
                                   [ 270, 270, 180, 180,  90,  90, 180, 180],
@@ -108,13 +184,6 @@ class ConfigCSpad ( object ) :
                                   [   3,   3,   2,   2,   1,   1,   2,   2],
                                   [   3,   3,   2,   2,   1,   1,   2,   2],
                                   [   3,   3,   2,   2,   1,   1,   2,   2] ]
-
-
-        # 2011-02-10 before run3:
-        #self.dPhi = [ [0,0,0,0,0,0,0,0],
-        #              [0.144, 0.466, -0.049, -0.186, -0.291, -0.338, 0.119, 0.135],
-        #              [0,0,0,0,0,0,0,0],
-        #              [0,0,0,0,0,0,0,0] ]
 
         # 2011-03-29 post run3: Signs of angles for a half of sensors are corrected on 2011-05-23
         self.dPhi = [ [-0.27305, 0.01711,-0.34736,-0.08158,-0.15462,-0.12369, 0.09212, 0.39342],
@@ -134,45 +203,6 @@ class ConfigCSpad ( object ) :
                              [  0,  0,200,  0,400,400,600,400],
                              [  0,  0,200,  0,400,400,600,400] ]
 
-
-        # Optical alignment 2011-02-10 before run3:
-
-        #self.pairXInQaud = [[ 419,  631,    0,    0,  208,    1,  423,  424],  # 2:5 were not measured
-        #                    [ 421,  634,    0,    0,  213,    1,  424,  425],
-        #                    [ 417,  630,    0,    1,  212,    0,  425,  426],
-        #                    [ 421,  635,    0,    0,  213,    1,  425,  426]] # 2:5 were not measured 
-                                                                      
-        #self.pairYInQaud = [[   0,    0,  214,    1,  430,  430,  615,  402],  # 2:5 were not measured
-        #                    [   0,    0,  214,    1,  425,  425,  615,  402],
-        #                    [   0,    0,  215,    3,  431,  431,  616,  403],
-        #                    [   0,    0,  214,    1,  425,  425,  615,  403]] # 2:5 were not measured
-
-        # Optical alignment 2011-03-29 post run3:
-
-        #self.pairXInQaud = [[422,  635,    0,    0,  212,    0,  427,  428],
-        #                    [421,  634,    0,    0,  214,    1,  425,  425],
-        #                    [418,  631,    2,    0,  216,    3,  431,  430],
-        #                    [422,  636,    0,    0,  215,    1,  430,  425]] # 4,6 (215,430) were not measured
-                                                                      
-        #self.pairYInQaud = [[  1,    0,  216,    3,  431,  432,  616,  403],
-        #                    [  0,    0,  214,    2,  426,  426,  615,  402],
-        #                    [  1,    0,  219,    8,  433,  435,  617,  404],
-        #                    [  1,    0,  215,    2,  430,  430,  615,  404]] # 4,6 (430,615) were not measured
-
-        # Optical alignment 2011-03-29 post run3:
-        # New version: 1) no rotation w.r.t. optical measurements
-        #              2) center coordanates are calculated as an average of 4 corner coordinates.
-        #self.pairXInQaud = [[198,  198,  310,   98,  629,  630,  712,  499],
-        #                    [198,  198,  310,   97,  626,  626,  710,  498],
-        #                    [200,  199,  314,  103,  631,  633,  714,  501],
-        #                    [198,  198,  310,   98,  630,  629,  710,  499]] # 4,6 (630,710) were not measured
-                                                                          
-        #self.pairYInQaud = [[307,   95,  626,  627,  517,  730,  200,  200],
-        #                    [308,   95,  626,  626,  513,  725,  200,  200],
-        #                    [309,   97,  622,  625,  513,  725,  199,  199],
-        #                    [307,   95,  628,  628,  515,  730,  200,  202]] # 4,6 (515,200) were not measured
-
-
         self.pairXInQaud = [[ 198.59,  198.04,  310.42,   98.22,  629.25,  630.01,  712.11,  499.91],  
                             [ 198.40,  198.13,  310.55,   97.68,  626.40,  626.59,  710.49,  498.15],  
                             [ 200.58,  199.79,  314.91,  103.43,  631.36,  633.34,  714.25,  501.44],  
@@ -188,7 +218,6 @@ class ConfigCSpad ( object ) :
                             [   0.28,    0.20,    0.50,    0.65,    0.39,    0.56,    0.30,    0.27],  
                             [   0.37,    0.30,    0.47,    0.25,    0.00,    1.06,    0.00,    0.85]]
 
-
                             #   0    1    2    3    4    5    6    7
         self.dXInQaud    = [[   0,   0,   0,   0,   0,   0,   0,   0], #*** DO NOT TOCH !
                             [   0,   0,   0,   0,  -1,   0,   0,   0], #*** DO NOT TOCH !
@@ -200,8 +229,8 @@ class ConfigCSpad ( object ) :
                             [   1,   0,   1,  -2,   0,   0,  -5,  -4], #*** DO NOT TOCH !
                             [   0,   0,   0,   0,   0,  -1,   0,  -2]] #*** DO NOT TOCH ! 4,6 (515,200) were not measured
 
-        #for ix in range(8) : self.pairXInQaud.append(random.randint(0,600))
-        #for iy in range(8) : self.pairYInQaud.append(random.randint(0,600))
+#==========================================
+#==========================================
 
     def Print( self ) :
         """Print CSpad configuration parameters"""

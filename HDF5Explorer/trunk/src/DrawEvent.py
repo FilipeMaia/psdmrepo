@@ -93,7 +93,9 @@ class DrawEvent ( object ) :
        # CSpad V2 for runs ~900
        #self.dsnameCSpadV2    = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data"
        #self.dsnameCSpadV2CXI = "/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data"
-        self.dsnameCSpadV2Conf= "/Configure:0000/CsPad::ConfigV2/"                        #CxiDs1.0:Cspad.0/config - is added auto
+       #self.dsnameCSpadV2Conf= "/Configure:0000/CsPad::ConfigV2/"                        #CxiDs1.0:Cspad.0/config - is added auto
+       #self.dsnameCSpadV3Conf= "/Configure:0000/CsPad::ConfigV3/"                        #CxiDs1.0:Cspad.0/config - is added auto
+        self.dsnameCSpadVXConf= "/Configure:0000/CsPad::ConfigV"
 
     #-------------------
     #  Public methods --
@@ -101,7 +103,7 @@ class DrawEvent ( object ) :
 
     def dimIsFixed(self, dsname) :
         #print 'Check if the item "_dim_fix_flag_201103" is in the group', dsname
-        path  = printh5.get_item_path_to_last_name(dsname)
+        path  = gm.get_item_path_to_last_name(dsname)
         group = self.h5file[path]
         if '_dim_fix_flag_201103' in group.keys() : return True
         else :                                      return False 
@@ -175,6 +177,7 @@ class DrawEvent ( object ) :
 
         t_start = time.clock()
         self.openHDF5File() # t=0us
+        if not cp.confpars.h5_file_is_open : return
         
         self.eventStart = cp.confpars.eventCurrent
         self.eventEnd   = cp.confpars.eventCurrent + 1000 # This is have changed at 1st call loopOverDataSets
@@ -288,6 +291,7 @@ class DrawEvent ( object ) :
         """Draws the next (selected) event"""
 
         self.openHDF5File() # t=0us
+        if not cp.confpars.h5_file_is_open : return
 
         self.numEventsSelected = 0
         while True :
@@ -304,6 +308,7 @@ class DrawEvent ( object ) :
         """Draws the previous (selected) event"""
 
         self.openHDF5File() # t=0us
+        if not cp.confpars.h5_file_is_open : return
 
         self.numEventsSelected = 0
         while True :
@@ -325,6 +330,7 @@ class DrawEvent ( object ) :
         """Start show (selected) events in permanent mode"""
 
         self.openHDF5File() # t=0us
+        if not cp.confpars.h5_file_is_open : return
 
         eventStart = cp.confpars.eventCurrent
         eventEnd   = cp.confpars.eventCurrent + 1000*cp.confpars.span
@@ -356,6 +362,7 @@ class DrawEvent ( object ) :
         """Draws current event"""
 
         self.openHDF5File() # t=0us
+        if not cp.confpars.h5_file_is_open : return
         self.drawEventFromOpenFile (mode)
         self.closeHDF5File()
 
@@ -594,6 +601,13 @@ class DrawEvent ( object ) :
 
     def getCSpadConfiguration( self, dsname ):
 
+        #print 'Get quad numbers for each event from the dataset:' 
+        el_dsname = gm.get_item_path_to_last_name(dsname) + '/element'
+        #print el_dsname
+        self.ds_element = self.h5file[el_dsname]
+        cs.confcspad.quad_nums_in_event = self.ds_element[cp.confpars.eventCurrent]['quad']
+        print 'quad_nums_in_event = ', cs.confcspad.quad_nums_in_event
+
         if cp.confpars.fileName == self.fileNameWithAlreadySetCSpadConfiguration : return
 
         if cp.confpars.cspadImageDetIsOn    \
@@ -608,15 +622,33 @@ class DrawEvent ( object ) :
         or cp.confpars.cspadSpectrum08IsOn  : 
 
             item_second_to_last_name = printh5.get_item_second_to_last_name(dsname)
-            cspad_config_ds_name = self.dsnameCSpadV2Conf + item_second_to_last_name + '/config' 
-            
-            #print '   CSpad configuration dataset name:', cspad_config_ds_name
+            #cspad_config_ds_name = self.dsnameCSpadV2Conf + item_second_to_last_name + '/config' 
+            #cspad_config_ds_name = self.dsnameCSpadV3Conf + item_second_to_last_name + '/config' 
 
-            dsConf = self.h5file[cspad_config_ds_name]      # t=0.01us
-            cs.confcspad.indPairsInQuads = dsConf.value[13] #
-            #print "Indexes of pairs in quads =\n",cs.confcspad.indPairsInQuads 
+            #Find the configuration dataset name for CSPad
+            self.dsConf = None
+            for vers in range(100) :
+                self.cspad_config_ds_name = self.dsnameCSpadVXConf + str(vers) + '/' + item_second_to_last_name + '/config' 
+                try:
+                    self.dsConf = self.h5file[self.cspad_config_ds_name]      # t=0.01us
+                    break
+                except KeyError:
+                    #print 'Try another configuration dataset name'
+                    continue
 
+            if self.dsConf == None :
+                print 80*'!'
+                print 'WARNING: The CSPad configuration dataset is not found. Default versin will be used'
+                print 80*'!'
+                return
+
+            print 'Configuration dataset name:', self.cspad_config_ds_name
+
+            cs.confcspad.indPairsInQuads = self.dsConf['sections'] # For V2 it is dsConf.value[13], for V3 it is 15th  ...
+            print "Indexes of pairs in quads =\n",cs.confcspad.indPairsInQuads 
             self.fileNameWithAlreadySetCSpadConfiguration = cp.confpars.fileName
+
+
 
 
     def showEvent ( self, mode=1 ) :
@@ -645,7 +677,14 @@ class DrawEvent ( object ) :
         if not cp.confpars.h5_file_is_open :
             fname = cp.confpars.dirName+'/'+cp.confpars.fileName
             #print 'openHDF5File() : %s' % (fname)
-            self.h5file=  h5py.File(fname, 'r') # open read-only       
+
+            try: 
+                self.h5file=  h5py.File(fname, 'r') # open read-only       
+            except IOError:
+                print 'IOError: No such file:', fname
+                cp.confpars.h5_file_is_open = False
+                return
+
             cp.confpars.h5_file_is_open = True
             #printh5.print_file_info(self.h5file)
 
@@ -769,6 +808,7 @@ class DrawEvent ( object ) :
             return
         
         self.openHDF5File()
+        if not cp.confpars.h5_file_is_open : return
         self.drawCorrelationPlotsFromOpenFile()
         self.closeHDF5File()
 
@@ -801,6 +841,7 @@ class DrawEvent ( object ) :
             return
         
         self.openHDF5File()
+        if not cp.confpars.h5_file_is_open : return
         self.drawCalibCyclePlotsFromOpenFile()
         self.closeHDF5File()
 

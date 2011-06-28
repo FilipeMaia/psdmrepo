@@ -256,6 +256,19 @@ class PlotsForCSpad ( object ) :
         self.eventWithAlreadyGeneratedCSpadDetImage = None
 
 
+    def getQuadNumberForIndex( self, index ):
+        quad = int( cs.confcspad.quad_nums_in_event[ind] )
+        print 'index -> quad :', index, quad
+        return quad
+
+
+    def getIndexForQuadNumber( self, quad ):
+        for index in range(len(cs.confcspad.quad_nums_in_event)) :
+            quad_i = int(cs.confcspad.quad_nums_in_event[index])
+            if quad_i == quad :
+                print 'quad -> index :', quad, index               
+                return index
+
 
     def getImageArrayForDet( self, arr1ev ):
         """Returns the image array for entire CSpad detector"""       
@@ -265,9 +278,12 @@ class PlotsForCSpad ( object ) :
             return self.arr2dCSpad
 
         #self.arr2dCSpad = np.zeros( (1710,1710), dtype=np.int16 )
-        self.arr2dCSpad = np.zeros( (1750,1750), dtype=np.int16 )
+        #self.arr2dCSpad = np.zeros( (1750,1750), dtype=np.int16 )
+        self.arr2dCSpad = np.zeros( (1765,1765), dtype=np.int16 )
 
-        for quad in range(0,4) :
+        #for quad in range(0,4) :
+        for quad in range(len(cs.confcspad.quad_nums_in_event)) :
+            #self.quad_index = self.getIndexForQuadNumber( quad )
             arr2dquad = self.getImageArrayForQuad(arr1ev, quad)
             rotarr2d = np.rot90(arr2dquad,cs.confcspad.quadInDetOriInd[quad])
             #print 'rotarr2d.shape=',rotarr2d.shape
