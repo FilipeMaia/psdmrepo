@@ -32,6 +32,7 @@
 #include "psddl_pds2psana/camera.ddl.h"
 #include "psddl_pds2psana/control.ddl.h"
 #include "psddl_pds2psana/cspad.ddl.h"
+#include "psddl_pds2psana/CsPadDataOrdered.h"
 #include "psddl_pds2psana/encoder.ddl.h"
 #include "psddl_pds2psana/epics.ddl.h"
 #include "psddl_pds2psana/evr.ddl.h"
@@ -310,8 +311,8 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     if (version == 1) ::storeValueType<Psana::Princeton::InfoV1, PsddlPds::Princeton::InfoV1>(xtc, evt);
     break;
   case Pds::TypeId::Id_CspadElement:
-    if (version == 1) ::storeDataProxyCfg2<CsPad::DataV1, PsddlPds::CsPad::ConfigV1, PsddlPds::CsPad::ConfigV2>(xtc, evt, cfgStore);
-    if (version == 2) ::storeDataProxyCfg2<CsPad::DataV2, PsddlPds::CsPad::ConfigV2, PsddlPds::CsPad::ConfigV3>(xtc, evt, cfgStore);
+    if (version == 1) ::storeDataProxyCfg2<CsPadDataOrdered<CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::ConfigV1, PsddlPds::CsPad::ConfigV2>(xtc, evt, cfgStore);
+    if (version == 2) ::storeDataProxyCfg2<CsPadDataOrdered<CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::ConfigV2, PsddlPds::CsPad::ConfigV3>(xtc, evt, cfgStore);
     break;
   case Pds::TypeId::Id_CspadConfig:
     break;
