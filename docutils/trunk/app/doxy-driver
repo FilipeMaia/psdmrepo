@@ -51,7 +51,10 @@ else
   esac
 fi
 
+# try to make directory
+mkdir -p "$output" 2>/dev/null
 
+# run doxygen
 doxygen - << EOD 
 PROJECT_NAME           = $mode
 OUTPUT_DIRECTORY       = $output
