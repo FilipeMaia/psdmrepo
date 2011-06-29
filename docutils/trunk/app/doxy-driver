@@ -2,7 +2,7 @@
 #
 # $Id$
 
-pack_psana="PSEnv PSEvt PSTime PSXtcInput RootHistoManager psana psana/doc/mainpage.dox"
+pack_psana="PSEnv PSEvt PSTime PSXtcInput PSHist RootHistoManager psana psana/doc/mainpage.dox"
 
 usage() {
   echo "Usage: $(basename $0) [options] output-dir [package ...]"

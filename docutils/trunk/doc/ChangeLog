@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2011-06-29 Andrei Salnikov
+- added PSHist to psana package list
+
 Tag: V00-00-02
 2011-05-24 Andrei Salnikov
 - fixing argument parsing in doxy-driver
