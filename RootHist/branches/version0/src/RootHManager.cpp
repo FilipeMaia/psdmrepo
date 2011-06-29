@@ -28,7 +28,6 @@
 #include "RootHist/RootH1.h"
 #include "RootHist/RootH2.h"
 #include "RootHist/RootProfile.h"
-#include "RootHist/RootTuple.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -65,7 +64,6 @@ RootHManager::RootHManager ( const std::string& filename, const std::string&  fi
   , m_h1s()
   , m_h2s()
   , m_profs()
-  , m_tuples()
 {
   // try to open file
   m_file = TFile::Open(filename.c_str(), filemode.c_str(), "Created by the RootHManager");
@@ -88,7 +86,6 @@ RootHManager::~RootHManager ()
   ::deleteValues(m_h1s);
   ::deleteValues(m_h2s);
   ::deleteValues(m_profs);
-  ::deleteValues(m_tuples);
 }
 
 
@@ -345,21 +342,6 @@ RootHManager::prof1(const std::string& name, const std::string& title,
 }
 
 
-//--------------
-// Tuple
-//--------------
-
-PSHist::Tuple* 
-RootHManager::tuple(const std::string& name, const std::string& title) 
-{
-  checkName(name);
-  
-  PSHist::Tuple* tuple = new RootTuple (name, title);
-  m_tuples.insert(std::make_pair(name, tuple));
-
-  return tuple;
-}
-
 void
 RootHManager::write() 
 {
@@ -377,8 +359,7 @@ RootHManager::checkName(const std::string& name)
   // check name
   if (m_h1s.find(name) != m_h1s.end() or
       m_h2s.find(name) != m_h2s.end() or
-      m_profs.find(name) != m_profs.end() or
-      m_tuples.find(name) != m_tuples.end()) {
+      m_profs.find(name) != m_profs.end()) {
     throw PSHist::ExceptionDuplicateName(ERR_LOC, name);
   }
 }

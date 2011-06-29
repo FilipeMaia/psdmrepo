@@ -25,7 +25,6 @@
 #include "PSHist/H1.h"
 #include "PSHist/H2.h"
 #include "PSHist/Profile.h"
-#include "PSHist/Tuple.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -179,11 +178,6 @@ public:
   virtual PSHist::Profile* prof1(const std::string& name, const std::string& title, 
       const PSHist::Axis& axis, double ylow, double yhigh, const std::string& option="");
 
-  // Tuple
-
-  /// Implementation of the corresponding method from PSHist::HManager interface.
-  virtual PSHist::Tuple* tuple(const std::string& name, const std::string& title);
-
 
   /// Implementation of the corresponding method from PSHist::HManager interface.
   virtual void write();
@@ -206,7 +200,6 @@ private:
   std::map<std::string, PSHist::H1*> m_h1s;  ///< 1-dimensional histograms
   std::map<std::string, PSHist::H2*> m_h2s;  ///< 2-dimensional histograms
   std::map<std::string, PSHist::Profile*> m_profs;  ///< 1-dim profile histograms
-  std::map<std::string, PSHist::Tuple*> m_tuples;  ///< tuples
 };
 
 } // namespace RootHist
