@@ -13,20 +13,17 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-
 #include <vector>
 #include <string>
+#include <boost/utility.hpp>
 
 //----------------------
 // Base Class Headers --
 //----------------------
 
-#include <iostream>
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-
 #include "PSHist/Axis.h"
 #include "PSHist/H1.h"
 #include "PSHist/H2.h"
@@ -45,17 +42,27 @@
 namespace PSHist {
 
 /**
- *  This software was developed for the LCLS project.  If you use all or 
- *  part of it, please give an appropriate acknowledgment.
- *
+ *  @defgroup PSHist PSHist package
+ *  
+ *  @brief Package defining interfaces for histogramming services.
+ *  
+ *  This package contains interfaces (abstract classes) for 
+ *  histogramming services used by psana framework. 
+ */
+  
+  
+/**
+ *  @ingroup PSHist
+ *  
+ *  @brief Interface for histogram/tuple manager class.
  *
  *  HManager is an empty base class which holds information about ntuples/histograms. 
  *  The main reason is to be able to create and hold new histograms or/and ntuples
  *  without knowing without knowing what the underlying system is. For example,
  *  it might be root, hbook, hyppo etc.
  *  
- *  Usage
- *  =====
+ *  Usage:
+ *  @code
  *  #include "RootHist/RootHManager.h"
  *  #include "PSHist/HManager.h"
  *  #include "PSHist/Axis.h"
@@ -63,134 +70,560 @@ namespace PSHist {
  *  #include "PSHist/H2.h"
  *  #include "PSHist/Profile.h"  
  *  #include "PSHist/Tuple.h"
- *  
+ *  @endcode
  *  
  *  1. Create a HManager with specific constructor (root for example):
  *
- *            PSHist::HManager *hMan = new RootHist::RootHManager("my-output-file.root", "RECREATE");
+ *  @code
+ *       PSHist::HManager *hMan = new RootHist::RootHManager("my-output-file.root", "RECREATE");
+ *  @endcode
  *
  *  2. Create histograms
  *
- *            PSHist::H1 *pHis1f = hMan->hist1f("His1 float  title",100,0.,1.);
- *            PSHist::H2 *pHis2d = hMan->hist2d("His2 double title",100,0.,1.,100,0.,1.);
+ *  @code
+ *       PSHist::H1 *pHis1f = hMan->hist1f("His1 float  title",100,0.,1.);
+ *       PSHist::H2 *pHis2d = hMan->hist2d("His2 double title",100,0.,1.,100,0.,1.);
+ *  @endcode
  *
  *     Create ntuples
  *
- *            PSHist::Tuple *nt = hMan->ntuple("EXP Data");
+ *  @code
+ *       PSHist::Tuple *nt = hMan->ntuple("EXP Data");
+ *  @endcode
  *
  *     and define the ntuple parameters by names:
  *
- *                                            nt->parameter("beamEnergy");
- *                                            nt->parameter("beamCurrent");
+ *  @code
+ *       nt->parameter("beamEnergy");
+ *       nt->parameter("beamCurrent");
+ *  @endcode
+ *  
  *     or by pointers:
  *
- *            PSHist::TupleParameter *p_beamEnergy  = nt->parameter("beamEnergy");
- *            PSHist::TupleParameter *p_beamCurrent = nt->parameter("beamCurrent");
+ *  @code
+ *       PSHist::TupleParameter *p_beamEnergy  = nt->parameter("beamEnergy");
+ *       PSHist::TupleParameter *p_beamCurrent = nt->parameter("beamCurrent");
+ *  @endcode
  *
  *  3. Fill histograms
  *
- *            pHis1f -> fill(x,[weight]);        // once per event
- *            pHis2d -> fill(x,y,[weight]);
+ *  @code
+ *       pHis1f->fill(x,[weight]);        // once per event
+ *       pHis2d->fill(x,y,[weight]);
+ *  @endcode
  *
  *     Fill ntuple by name:
  *  
- *            nt     -> fill("beamEnergy",  E);  // once per event
- *            nt     -> fill("beamCurrent", I);
+ *  @code
+ *       nt->fill("beamEnergy",  E);  // once per event
+ *       nt->fill("beamCurrent", I);
+ *  @endcode
  *
  *     or by pointers:
- *            p_beamEnergy  -> fill(E);          // once per event
- *            p_beamCurrent -> fill(I);
+ *     
+ *  @code
+ *       p_beamEnergy->fill(E);          // once per event
+ *       p_beamCurrent->fill(I);
+ *       
+ *       nt->addRow();                  // once per event
+ *  @endcode
  *
- *            nt   -> addRow();                  // once per event
  *
  *  4. Write the data into a file:
  *
- *            hMan -> write();                   // at the end of job
- *            delete hMan;
+ *  @code
+ *       hMan->write();                   // at the end of job
+ *       delete hMan;
+ *  @endcode
  *
- *  @see AdditionalClass
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see H1
+ *  @see H2
+ *  @see Profile
+ *  @see Tuple
  *
  *  @version $Id$
  *
  *  @author Mikhail S. Dubrovin
  */
 
-class HManager  {
+class HManager : boost::noncopyable {
 public:
-
-  // Default constructor
-  HManager (){
-    std::cout << "HManager::HManager () - empty, abstract class object constructor." << std::endl;
-  }
 
   // Destructor
-  virtual ~HManager (){
-    std::cout << "HManager::~HManager () - empty abstract class object distructor." << std::endl;
-  }
-
-private:
-
-  // Data members
-  
-  //std::string m_nt_name;
-
-  // Copy constructor and assignment are disabled by default
-  HManager ( const HManager& ) ;
-  HManager& operator = ( const HManager& ) ;
-
-//------------------
-// Static Members --
-//------------------
-
-public:
+  virtual ~HManager () {}
 
   // 1-d histograms
 
-  virtual H1 *hist1i(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh) = 0;
-  virtual H1 *hist1f(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh) = 0;
-  virtual H1 *hist1d(const std::string &name, const std::string &title, int nbins, double xlow, double xhigh) = 0;
+  /**
+   *  @brief Create new 1-dimensional histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional histogram with same-width bins. 
+   *  Internal storage of the created histogram will consists of 32-bit 
+   *  integer per histogram bin. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] nbins  Number of bins.
+   *  @param[in] xlow   Low edge of the first bin.
+   *  @param[in] xhigh  High edge of the last bin.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual H1* hist1i(const std::string& name, const std::string& title, 
+      int nbins, double xlow, double xhigh) = 0;
 
-  virtual H1 *hist1i(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
-  virtual H1 *hist1f(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
-  virtual H1 *hist1d(const std::string &name, const std::string &title, int nbins, double *xbinedges) = 0;
+  /**
+   *  @brief Create new 1-dimensional histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional histogram with same-width bins. 
+   *  Internal storage of the created histogram will consists of 32-bit 
+   *  floating number per histogram bin. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] nbins  Number of bins.
+   *  @param[in] xlow   Low edge of the first bin.
+   *  @param[in] xhigh  High edge of the last bin.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual H1* hist1f(const std::string& name, const std::string& title, 
+      int nbins, double xlow, double xhigh) = 0;
 
-  virtual H1 *hist1i(const std::string &name, const std::string &title, PSHist::Axis &axis) = 0;
-  virtual H1 *hist1f(const std::string &name, const std::string &title, PSHist::Axis &axis) = 0;
-  virtual H1 *hist1d(const std::string &name, const std::string &title, PSHist::Axis &axis) = 0;
+  /**
+   *  @brief Create new 1-dimensional histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional histogram with same-width bins. 
+   *  Internal storage of the created histogram will consists of 64-bit 
+   *  floating number per histogram bin. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] nbins  Number of bins.
+   *  @param[in] xlow   Low edge of the first bin.
+   *  @param[in] xhigh  High edge of the last bin.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual H1* hist1d(const std::string& name, const std::string& title, 
+      int nbins, double xlow, double xhigh) = 0;
+
+  /**
+   *  @brief Create new 1-dimensional histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional histogram with variable-width bins. 
+   *  Internal storage of the created histogram will consists of 32-bit 
+   *  integer per histogram bin. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] nbins  Number of bins.
+   *  @param[in] xbinedges Array of the histogram edges, size of the array 
+   *                    is @c nbins+1, it should contain ordered values for
+   *                    low edges of all bins plus high edge of last bin. 
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual H1* hist1i(const std::string& name, const std::string& title, 
+      int nbins, const double *xbinedges) = 0;
+  
+  /**
+   *  @brief Create new 1-dimensional histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional histogram with variable-width bins. 
+   *  Internal storage of the created histogram will consists of 32-bit 
+   *  floating number per histogram bin. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] nbins  Number of bins.
+   *  @param[in] xbinedges Array of the histogram edges, size of the array 
+   *                    is @c nbins+1, it should contain ordered values for
+   *                    low edges of all bins plus high edge of last bin. 
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual H1* hist1f(const std::string& name, const std::string& title, 
+      int nbins, const double *xbinedges) = 0;
+  
+  /**
+   *  @brief Create new 1-dimensional histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional histogram with variable-width bins. 
+   *  Internal storage of the created histogram will consists of 64-bit 
+   *  floating number per histogram bin. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] nbins  Number of bins.
+   *  @param[in] xbinedges Array of the histogram edges, size of the array 
+   *                    is @c nbins+1, it should contain ordered values for
+   *                    low edges of all bins plus high edge of last bin. 
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual H1* hist1d(const std::string& name, const std::string& title, 
+      int nbins, const double *xbinedges) = 0;
+
+  /**
+   *  @brief Create new 1-dimensional histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional histogram, number of bins and 
+   *  their edges are determined by separate object (Axis class). 
+   *  Internal storage of the created histogram will consists of 32-bit 
+   *  integer per histogram bin. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] axis   Axis definition.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual H1* hist1i(const std::string& name, const std::string& title, 
+      const PSHist::Axis& axis) = 0;
+  
+  /**
+   *  @brief Create new 1-dimensional histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional histogram, number of bins and 
+   *  their edges are determined by separate object (Axis class). 
+   *  Internal storage of the created histogram will consists of 32-bit 
+   *  floating number per histogram bin. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] axis   Axis definition.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual H1* hist1f(const std::string& name, const std::string& title, 
+      const PSHist::Axis& axis) = 0;
+  
+  /**
+   *  @brief Create new 1-dimensional histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional histogram, number of bins and 
+   *  their edges are determined by separate object (Axis class). 
+   *  Internal storage of the created histogram will consists of 64-bit 
+   *  floating number per histogram bin. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] axis   Axis definition.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual H1* hist1d(const std::string& name, const std::string& title, 
+      const PSHist::Axis& axis) = 0;
 
   // 2-d histograms
 
-  virtual H2 *hist2i(const std::string &name, const std::string &title, PSHist::Axis &xaxis, PSHist::Axis &yaxis ) = 0;
-  virtual H2 *hist2f(const std::string &name, const std::string &title, PSHist::Axis &xaxis, PSHist::Axis &yaxis ) = 0;
-  virtual H2 *hist2d(const std::string &name, const std::string &title, PSHist::Axis &xaxis, PSHist::Axis &yaxis ) = 0;
+  /**
+   *  @brief Create new 2-dimensional histogram and return pointer to it.
+   *  
+   *  This method creates new 2-dimensional histogram, number of bins and 
+   *  their edges are determined by separate objects (Axis class). 
+   *  Internal storage of the created histogram will consists of 32-bit 
+   *  integer per histogram bin. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] xaxis  X axis definition.
+   *  @param[in] yaxis  Y axis definition.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual H2* hist2i(const std::string& name, const std::string& title, 
+      const PSHist::Axis& xaxis, const PSHist::Axis& yaxis ) = 0;
+
+  /**
+   *  @brief Create new 2-dimensional histogram and return pointer to it.
+   *  
+   *  This method creates new 2-dimensional histogram, number of bins and 
+   *  their edges are determined by separate objects (Axis class). 
+   *  Internal storage of the created histogram will consists of 32-bit 
+   *  floating number per histogram bin. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] xaxis  X axis definition.
+   *  @param[in] yaxis  Y axis definition.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual H2* hist2f(const std::string& name, const std::string& title, 
+      const PSHist::Axis& xaxis, const PSHist::Axis& yaxis ) = 0;
+
+  /**
+   *  @brief Create new 2-dimensional histogram and return pointer to it.
+   *  
+   *  This method creates new 2-dimensional histogram, number of bins and 
+   *  their edges are determined by separate objects (Axis class). 
+   *  Internal storage of the created histogram will consists of 64-bit 
+   *  floating number per histogram bin. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] xaxis  X axis definition.
+   *  @param[in] yaxis  Y axis definition.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual H2* hist2d(const std::string& name, const std::string& title, 
+      const PSHist::Axis& xaxis, const PSHist::Axis& yaxis ) = 0;
 
   // 1-d profile histograms
 
-  virtual Profile *prof1(const std::string &name, const std::string &title, int nbinsx, double xlow, double xhigh, 
-                                                  double ylow, double yhigh, const std::string &option="") = 0;
-  virtual Profile *prof1(const std::string &name, const std::string &title, int nbins, double *xbinedges, 
-                                                  double ylow, double yhigh, const std::string &option="") = 0;
-  virtual Profile *prof1(const std::string &name, const std::string &title, PSHist::Axis &axis, 
-                                                  double ylow, double yhigh, const std::string &option="") = 0;
+  /**
+   *  @brief Create new 1-dimensional profile histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional profile histogram with same-width bins. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  Option string determines what value is returned for the bin error,  
+   *  possible values are "" (default) for error-of-mean and "s" 
+   *  for standard deviation.
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] nbinsx Number of bins.
+   *  @param[in] xlow   Low edge of the first bin.
+   *  @param[in] xhigh  High edge of the last bin.
+   *  @param[in] option Option string.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual Profile* prof1(const std::string& name, const std::string& title, 
+      int nbinsx, double xlow, double xhigh, const std::string& option="") = 0;
+  
+  /**
+   *  @brief Create new 1-dimensional profile histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional profile histogram with variable-width bins. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  Option string determines what value is returned for the bin error,  
+   *  possible values are "" (default) for error-of-mean and "s" 
+   *  for standard deviation.
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] nbins  Number of bins.
+   *  @param[in] xbinedges Array of the histogram edges, size of the array 
+   *                    is @c nbins+1, it should contain ordered values for
+   *                    low edges of all bins plus high edge of last bin. 
+   *  @param[in] option Option string.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual Profile* prof1(const std::string& name, const std::string& title, 
+      int nbins, const double *xbinedges, const std::string& option="") = 0;
+  
+  /**
+   *  @brief Create new 1-dimensional profile histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional profile histogram, number of bins and 
+   *  their edges are determined by separate object (Axis class). 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  Option string determines what value is returned for the bin error,  
+   *  possible values are "" (default) for error-of-mean and "s" 
+   *  for standard deviation.
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] axis   X axis definition.
+   *  @param[in] option Option string.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual Profile* prof1(const std::string& name, const std::string& title, 
+      const PSHist::Axis& axis, const std::string& option="") = 0;
 
-  // Tuple
+  /**
+   *  @brief Create new 1-dimensional profile histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional profile histogram with same-width bins. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  Option string determines what value is returned for the bin error,  
+   *  possible values are "" (default) for error-of-mean and "s" 
+   *  for standard deviation. 
+   *  Values of y ouside of range (ylow-yhigh) will be ignored.
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] nbinsx Number of bins.
+   *  @param[in] xlow   Low edge of the first bin.
+   *  @param[in] xhigh  High edge of the last bin.
+   *  @param[in] ylow   Lowest possible value for Y values.
+   *  @param[in] yhigh  Highest possible value for Y values.
+   *  @param[in] option Option string.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual Profile* prof1(const std::string& name, const std::string& title, 
+      int nbinsx, double xlow, double xhigh, double ylow, double yhigh, 
+      const std::string& option="") = 0;
+  
+  /**
+   *  @brief Create new 1-dimensional profile histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional profile histogram with variable-width bins. 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  Option string determines what value is returned for the bin error,  
+   *  possible values are "" (default) for error-of-mean and "s" 
+   *  for standard deviation.
+   *  Values of y ouside of range (ylow-yhigh) will be ignored.
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] nbins  Number of bins.
+   *  @param[in] xbinedges Array of the histogram edges, size of the array 
+   *                    is @c nbins+1, it should contain ordered values for
+   *                    low edges of all bins plus high edge of last bin. 
+   *  @param[in] ylow   Lowest possible value for Y values.
+   *  @param[in] yhigh  Highest possible value for Y values.
+   *  @param[in] option Option string.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual Profile* prof1(const std::string& name, const std::string& title, 
+      int nbins, const double *xbinedges, double ylow, double yhigh, 
+      const std::string& option="") = 0;
+  
+  /**
+   *  @brief Create new 1-dimensional profile histogram and return pointer to it.
+   *  
+   *  This method creates new 1-dimensional profile histogram, number of bins and 
+   *  their edges are determined by separate object (Axis class). 
+   *  The name of the histogram must be unique, otherwise exception is thrown. 
+   *  Option string determines what value is returned for the bin error,  
+   *  possible values are "" (default) for error-of-mean and "s" 
+   *  for standard deviation.
+   *  Values of y ouside of range (ylow-yhigh) will be ignored.
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] axis   X axis definition.
+   *  @param[in] ylow   Lowest possible value for Y values.
+   *  @param[in] yhigh  Highest possible value for Y values.
+   *  @param[in] option Option string.
+   *  @return Pointer to a newly created histogram, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual Profile* prof1(const std::string& name, const std::string& title, 
+      const PSHist::Axis& axis, double ylow, double yhigh, 
+      const std::string& option="") = 0;
 
-  virtual Tuple *tuple(const std::string &name, const std::string &title) = 0;
+  /**
+   *  @brief Create new tuple and return pointer to it.
+   *  
+   *  The name of the tuple must be unique, otherwise exception is thrown.
+   *  
+   *  <b>Returned pointer should never be deleted by client code.</b>
+   *  
+   *  @param[in] name   Tuple name, unique string.
+   *  @param[in] title  Title of the tuple, arbitrary string.
+   *  @return Pointer to a newly created tuple, do not delete.
+   *  
+   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
+   *                                identical name exists already
+   */
+  virtual Tuple* tuple(const std::string& name, const std::string& title) = 0;
 
+  /**
+   *  @brief Store all booked histograms and tuples to a permanent storage.
+   *  
+   *  This method should be called once before deleting manager object.
+   *  
+   *  @throw ExceptionStore thrown if write operation fails.
+   */
+  virtual void write() = 0;
 
-   // This function returns a pointer to the ntuple with the given title. 
-   // If the ntuple is known (ie. there is an ntuple with that title), the
-   // existing ntuple is returned. If it is not known, a new one is created. 
-
-   virtual int write() = 0;
-
-   // write the ntuples/histograms into the file. 
-   // Return 0 if successful,
-   // non-0 otherwise.
-   
-   // Selectors (const)
-
-   // Modifiers
 };
 
 } // namespace PSHist

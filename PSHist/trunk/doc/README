@@ -11,11 +11,4 @@ Package author: Mikhail S. Dubrovin
 Brief description:
 ==================
 
-Add here a brief description of the package main purpose, one or two
-sentences is probably enough.
-
-Detailed description:
-=====================
-
-More detailed info goes here. Describe main classes/applications built in
-this package. Give few examples of their use.
+Package which defines interfaces for histogramming services in psana.

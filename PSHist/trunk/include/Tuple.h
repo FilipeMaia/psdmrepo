@@ -13,19 +13,17 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-
 #include <string>
-#include <iostream>
+#include <iosfwd>
+#include <boost/utility.hpp>
 
 //----------------------
 // Base Class Headers --
 //----------------------
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-
 #include "PSHist/Column.h"
 
 //------------------------------------
@@ -39,10 +37,11 @@
 namespace PSHist {
 
 /**
- *  PSHist is a fully abstract package for histogramming in PSANA
- *  Tuple is an abstract class which provides the final-package-implementation-independent
- *  interface to the N-tuple-like object. All methods of this class are virtual and should
- *  be implemented in derived package/class, i.e. RootHist/RootTuple.
+ *  @ingroup PSHist
+ *  
+ *  @brief Interface for n-tuple class.
+ * 
+ *  Currently this interface defines only very simple filling operations.
  *   
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -54,39 +53,30 @@ namespace PSHist {
  *  @author Mikhail S. Dubrovin
  */
 
-class Tuple  {
+class Tuple : boost::noncopyable {
 public:
-
-  // Default constructor
-  Tuple () {}
 
   // Destructor
   virtual ~Tuple () {}
 
-  // Selectors (const)
+  /**
+   *  @brief Add column to tuple.
+   *  
+   *  @throw ExceptionDuplicateColumn thrown if column name already defined
+   */
+  virtual Column* column( const std::string& name, void* address, const std::string& columnlist ) = 0;
 
-  // Modifiers
-
-  virtual Column* column( const std::string &name, void* address, const std::string &columnlist ) = 0;
-
-  virtual Column* column( void* address, const std::string &columnlist ) = 0; // for auto-generated name
+  /**
+   *  @brief Add column to tuple.
+   */
+  virtual Column* column( void* address, const std::string& columnlist ) = 0; // for auto-generated name
 
   virtual void fill() = 0;
 
   virtual void reset() = 0;
 
-  virtual void print(std::ostream &o) const = 0;
+  virtual void print(std::ostream& o) const = 0;
 
-
-private:
-
-  // Copy constructor and assignment are disabled by default
-  Tuple ( const Tuple& ) ;
-  Tuple& operator = ( const Tuple& ) ;
-
-  // Data members
-  
-  // Static Members
 };
 
 } // namespace PSHist
