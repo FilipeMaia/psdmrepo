@@ -28,7 +28,6 @@
 #include "PSHist/H1.h"
 #include "PSHist/H2.h"
 #include "PSHist/Profile.h"
-#include "PSHist/Tuple.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -68,8 +67,7 @@ namespace PSHist {
  *  #include "PSHist/Axis.h"
  *  #include "PSHist/H1.h"
  *  #include "PSHist/H2.h"
- *  #include "PSHist/Profile.h"  
- *  #include "PSHist/Tuple.h"
+ *  #include "PSHist/Profile.h"
  *  @endcode
  *  
  *  1. Create a HManager with specific constructor (root for example):
@@ -85,47 +83,12 @@ namespace PSHist {
  *       PSHist::H2 *pHis2d = hMan->hist2d("His2 double title",100,0.,1.,100,0.,1.);
  *  @endcode
  *
- *     Create ntuples
- *
- *  @code
- *       PSHist::Tuple *nt = hMan->ntuple("EXP Data");
- *  @endcode
- *
- *     and define the ntuple parameters by names:
- *
- *  @code
- *       nt->parameter("beamEnergy");
- *       nt->parameter("beamCurrent");
- *  @endcode
- *  
- *     or by pointers:
- *
- *  @code
- *       PSHist::TupleParameter *p_beamEnergy  = nt->parameter("beamEnergy");
- *       PSHist::TupleParameter *p_beamCurrent = nt->parameter("beamCurrent");
- *  @endcode
  *
  *  3. Fill histograms
  *
  *  @code
  *       pHis1f->fill(x,[weight]);        // once per event
  *       pHis2d->fill(x,y,[weight]);
- *  @endcode
- *
- *     Fill ntuple by name:
- *  
- *  @code
- *       nt->fill("beamEnergy",  E);  // once per event
- *       nt->fill("beamCurrent", I);
- *  @endcode
- *
- *     or by pointers:
- *     
- *  @code
- *       p_beamEnergy->fill(E);          // once per event
- *       p_beamCurrent->fill(I);
- *       
- *       nt->addRow();                  // once per event
  *  @endcode
  *
  *
@@ -142,7 +105,6 @@ namespace PSHist {
  *  @see H1
  *  @see H2
  *  @see Profile
- *  @see Tuple
  *
  *  @version $Id$
  *
@@ -598,22 +560,6 @@ public:
   virtual Profile* prof1(const std::string& name, const std::string& title, 
       const PSHist::Axis& axis, double ylow, double yhigh, 
       const std::string& option="") = 0;
-
-  /**
-   *  @brief Create new tuple and return pointer to it.
-   *  
-   *  The name of the tuple must be unique, otherwise exception is thrown.
-   *  
-   *  <b>Returned pointer should never be deleted by client code.</b>
-   *  
-   *  @param[in] name   Tuple name, unique string.
-   *  @param[in] title  Title of the tuple, arbitrary string.
-   *  @return Pointer to a newly created tuple, do not delete.
-   *  
-   *  @throw ExceptionDuplicateName thrown if histogram or tuple with 
-   *                                identical name exists already
-   */
-  virtual Tuple* tuple(const std::string& name, const std::string& title) = 0;
 
   /**
    *  @brief Store all booked histograms and tuples to a permanent storage.
