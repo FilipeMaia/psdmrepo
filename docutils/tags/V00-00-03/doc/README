@@ -1,0 +1,14 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package docutils
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Brief description:
+==================
+
+Utilities and scripts for documentation of the software.
