@@ -180,7 +180,8 @@ class PlotsForCSpad ( object ) :
             self.quad = quadNum            
         #print 'getImageArrayForQuad(), quad=', self.quad
 
-        arr2dquad = np.zeros( (850,850), dtype=np.int16 )
+        #arr2dquad = np.zeros( (850,850), dtype=np.int16 )
+        arr2dquad = np.zeros( (cs.confcspad.quadDimX,cs.confcspad.quadDimY), dtype=np.int16 )
         #print 'arr2dquad.shape=',arr2dquad.shape
 
         for ind in xrange(8): # loop over ind = 0,1,2,...,7
@@ -279,7 +280,8 @@ class PlotsForCSpad ( object ) :
 
         #self.arr2dCSpad = np.zeros( (1710,1710), dtype=np.int16 )
         #self.arr2dCSpad = np.zeros( (1750,1750), dtype=np.int16 )
-        self.arr2dCSpad = np.zeros( (1765,1765), dtype=np.int16 )
+        #self.arr2dCSpad = np.zeros( (1765,1765), dtype=np.int16 )
+        self.arr2dCSpad = np.zeros( (cs.confcspad.detDimX,cs.confcspad.detDimY), dtype=np.int16 )
 
         #for quad in range(0,4) :
         for quad in range(len(cs.confcspad.quad_nums_in_event)) :

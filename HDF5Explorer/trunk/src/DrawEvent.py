@@ -403,14 +403,10 @@ class DrawEvent ( object ) :
 
     def saveArrayForDSNameInFile(self, dsname, arr1ev) :
 
-        cspadIsInTheName = printh5.CSpadIsInTheName(dsname)
-        #item_last_name = printh5.get_item_last_name(dsname)
+        cspadIsInTheName = gm.CSpadIsInTheName(dsname)
+        item_last_name   = gm.get_item_last_name(dsname)
         #cp.confpars.current_item_name_for_title = printh5.get_item_name_for_title(dsname)
 
-        itemIsForSaving = cspadIsInTheName        # or    \
-        #                  item_last_name=='image'   or    \
-        #                  item_last_name=='waveforms'
-        if not itemIsForSaving : return
         if cspadIsInTheName :
 
             print 'saveArrayForDSNameInFile'
@@ -425,6 +421,13 @@ class DrawEvent ( object ) :
             quad = cp.confpars.cspadQuad
             arrQuad = self.plotsCSpad.getImageArrayForQuad( arr1ev, quadNum=quad )
             gm.saveNumpyArrayInFile(arrQuad, fname='cspad-ave-quad-' + str(quad) + '.txt' , format='%i') # , format='%f')
+
+
+        if item_last_name == 'image' :
+
+            cameraName = gm.get_item_second_to_last_name(dsname)
+            gm.saveNumpyArrayInFile(arr1ev, fname='camera-ave-' + str(cameraName) + '.txt' , format='%i') # , format='%f')
+            
 
 
     def drawArrayForDSName(self, dsname, arr1ev) :
@@ -687,6 +690,20 @@ class DrawEvent ( object ) :
 
             cp.confpars.h5_file_is_open = True
             #printh5.print_file_info(self.h5file)
+
+            self.getTimeHDF5File()
+            cs.confcspad.setCSpadParameters()
+
+
+
+    def getTimeHDF5File( self ) :     
+        conf_group = self.h5file['/Configure:0000']
+        cs.confcspad.run_start_seconds = conf_group.attrs['start.seconds']
+
+        print 'Run start (seconds) =', cs.confcspad.run_start_seconds
+        tloc = time.localtime(cs.confcspad.run_start_seconds) # converts sec to the tuple struct_time in local
+        print 'Run start local time :', time.strftime('%Y-%m-%d %H:%M:%S',tloc)
+        #t1_sec = int( time.mktime((2011, 6, 23, 23, 22, 18, 0, 0, 0)) ) # converts date-tile to seconds
 
 
     def closeHDF5File( self ) :       

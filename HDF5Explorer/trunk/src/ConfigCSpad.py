@@ -31,6 +31,7 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 import sys
 #import os
+import time
 
 #---------------------
 #  Class definition --
@@ -44,9 +45,41 @@ class ConfigCSpad ( object ) :
     #----------------
     def __init__ ( self ) :
         """Constructor"""
+
+        self.setTimeOfRunStart()
+
         #self.setCSpadParametersV0001()
         self.setCSpadParametersV0002()
         #self.Print()
+        self.run_start_seconds = 0
+
+
+    def setTimeOfRunStart( self ) :
+        self.t_sec_r0003 = int( time.mktime((2010, 11, 19, 16, 25, 00, 0, 0, 0)) ) # converts date-time to seconds
+        self.t_sec_r0004 = int( time.mktime((2011,  6, 23,  8, 00, 00, 0, 0, 0)) ) # converts date-time to seconds
+        self.t_sec_Infty = int( time.mktime((2100,  0,  0,  0, 00, 00, 0, 0, 0)) ) # converts date-time to seconds
+
+        print 'Start time for runs for CSPad configuration'
+        print 'self.t_sec_r0003 =', self.t_sec_r0003, time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(self.t_sec_r0003))
+        print 'self.t_sec_r0004 =', self.t_sec_r0004, time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(self.t_sec_r0004))
+        print 'self.t_sec_Infty =', self.t_sec_Infty, time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(self.t_sec_Infty))
+
+       #tloc = time.localtime(start_seconds) # converts sec to the tuple struct_time in local
+       #print 'Local start time :', time.strftime('%Y-%m-%d %H:%M:%S',tloc)
+
+
+#==========================================
+#==========================================
+
+    def setCSpadParameters( self ) :
+
+        print 'setCSpadParameters():',
+        if self.run_start_seconds < self.t_sec_r0004 :
+            self.setCSpadParametersV0001()
+            print 'set parameters for V0001'
+        elif self.t_sec_r0004 < self.run_start_seconds and self.run_start_seconds < self.t_sec_Infty:
+            self.setCSpadParametersV0002()        
+            print 'set parameters for V0002'
 
 
 #==========================================
@@ -55,7 +88,14 @@ class ConfigCSpad ( object ) :
     def setCSpadParametersV0002 ( self ) :
         """Configuration parameters based on 2011-06-20 before-run4 optical measurement"""
 
-        print 'setCSpadParameters'
+        #print 'setCSpadParametersV0002'
+
+        # Detector and quar array dimennsions
+        self.detDimX = 1765
+        self.detDimY = 1765
+
+        self.quadDimX = 850
+        self.quadDimY = 850
 
         # Quad orientation
         self.quadInDetOrient = [ 180,   90,    0,  270]
@@ -146,7 +186,15 @@ class ConfigCSpad ( object ) :
     def setCSpadParametersV0001 ( self ) :
         """Configuration parameters based on 2011-03-29 post-run3 optical measurement"""
 
-        print 'setCSpadParameters'
+        #print 'setCSpadParametersV0001'
+
+        # Detector and quar array dimennsions
+        self.detDimX = 1750
+        self.detDimY = 1750
+
+        self.quadDimX = 850
+        self.quadDimY = 850
+
 
         # Quad orientation
         self.quadInDetOrient = [ 180,   90,    0,  270]
