@@ -11,11 +11,5 @@ Package author: Mikhail S. Dubrovin
 Brief description:
 ==================
 
-Add here a brief description of the package main purpose, one or two
-sentences is probably enough.
-
-Detailed description:
-=====================
-
-More detailed info goes here. Describe main classes/applications built in
-this package. Give few examples of their use.
+ROOT-based implementation of the histogramming interfaces defines in
+PSHist package.

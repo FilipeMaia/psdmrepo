@@ -19,9 +19,24 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <iostream>
+#include <sstream>
 
-using std::cout;
-using std::endl;
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+#include "MsgLogger/MsgLogger.h"
+#include "RootHist/RootTuple.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+
+namespace {
+  
+  const char* logger = "RootHist";
+  
+}
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -29,25 +44,19 @@ using std::endl;
 
 namespace RootHist {
 
-
-RootColumn::RootColumn (RootTuple* tuple, const std::string &name, void* address, const std::string &columnlist)
+RootColumn::RootColumn (RootTuple* tuple, const std::string& name, void* address, const std::string& columnlist)
  : PSHist::Column()
 {
   m_column = tuple -> getTuplePointer() -> Branch(name.c_str(), address, columnlist.c_str()); 
 
-  cout << "RootColumn::RootColumn(...) - Created the column '" << name 
-       << "' with the list of parameters: " << columnlist.c_str() << endl;
+  MsgLog(logger, debug, "Created tuple column '" << name 
+       << "' with the list of parameters: " << columnlist.c_str());
 }
 
 
-void RootColumn::print( std::ostream &o ) const { 
-  o << "RootColumn::print(...) " << endl;
+void RootColumn::print( std::ostream& o ) const 
+{ 
+  o << "RootColumn(" << m_column->GetName() << ")";
 }
-
-
-  //void RootColumn::fill() {
-  //  m_column->Fill();
-  //} 
-
 
 } // namespace RootHist

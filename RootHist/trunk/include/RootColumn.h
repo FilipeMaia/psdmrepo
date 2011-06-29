@@ -23,27 +23,32 @@
 
 //#include "PSHist/Tuple.h"
 #include "PSHist/Column.h"
-#include "RootHist/RootTuple.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-
 #include "root/TBranch.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-
-class TBranch;
+namespace RootHist {  
+  class RootTuple;
+}
 
 //		---------------------
 // 		-- Class Interface --
 //		---------------------
 
 namespace RootHist {
+  
+  class RootTuple;
 
 /**
+ *  @ingroup RootHist
+ *  
+ *  @brief Implementation of PSHist::Column interface.
+ *  
  *  This class implements the tuple parameter (Column) which is defined in ROOT as TBranch.
  *  
  *  Essentially, constructor of this class creates the type-independent pointer TBranch *m_column.
@@ -62,26 +67,17 @@ class RootColumn : public PSHist::Column {
 public:
 
   // Constructors
-  RootColumn () {}
-  RootColumn ( RootTuple* tuple, const std::string &name, void* address, const std::string &columnlist );
+  RootColumn ( RootTuple* tuple, const std::string& name, void* address, const std::string& columnlist );
 
   // Destructor
   virtual ~RootColumn(){}
 
-  // Methods
-
-  virtual void print(std::ostream &o) const;
+  /// Implementation of the corresponding method from PSHist::H1 interface.
+  virtual void print(std::ostream& o) const;
 
 private:
 
-  // Data members
-  TBranch *m_column;
-
-  // Static members
-
-  // Copy constructor and assignment are disabled by default
-  RootColumn              ( const RootColumn& );
-  RootColumn & operator = ( const RootColumn& );
+  TBranch* m_column;  ///< Corresponding ROOT tuple branch
 
 };
 

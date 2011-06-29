@@ -30,13 +30,13 @@ int main ()
   cout << "sizeof(edges) =" << sizeof(edges) << endl;     
 
   PSHist::Axis *axis1 = new PSHist::Axis((int)10,0,100);  
-  axis1->print();
+  axis1->print(std::cout);
 
   PSHist::Axis *axis2 = new PSHist::Axis(10,edges);  
-  axis2->print();
+  axis2->print(std::cout);
 
   PSHist::Axis axis3(5,edges);  
-  axis3.print();
+  axis3.print(std::cout);
 
   return 0;
 }

@@ -13,21 +13,18 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-
-#include <iostream>
 #include <string>
+#include <iosfwd>
 
 //----------------------
 // Base Class Headers --
 //----------------------
-
 #include "PSHist/H2.h"
-#include "PSHist/Axis.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-
+#include "PSHist/Axis.h"
 #include "root/TH2.h"
 
 //------------------------------------
@@ -41,6 +38,10 @@
 namespace RootHist {
 
 /**
+ *  @ingroup RootHist
+ *  
+ *  @brief Implementation of PSHist::H2 interface.
+ *  
  *  This class implements 2D histograms with equal or variable bin size,
  *  which are defined in ROOT as TH2I, TH2F, and TH2D.
  *  
@@ -51,8 +52,6 @@ namespace RootHist {
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
- *
  *  @version $Id$
  *
  *  @author Mikhail S. Dubrovin
@@ -62,44 +61,37 @@ template <typename HTYPE>
 class RootH2 : public PSHist::H2 {
 public:
 
-  // Constructors
-  RootH2<HTYPE> () {}
-
-
-  RootH2<HTYPE> ( const std::string &name, const std::string &title, PSHist::Axis &xaxis, PSHist::Axis &yaxis );
-
-
-  RootH2<HTYPE> ( const std::string &name, const std::string &title, int nbinsx, double xlow, double xhigh, 
-	                                                             int nbinsy, double ylow, double yhigh );
-
-  RootH2<HTYPE> ( const std::string &name, const std::string &title, int nbinsx, double xlow, double xhigh, 
-	                                                             int nbinsy, double *ybinedges );
-
-  RootH2<HTYPE> ( const std::string &name, const std::string &title, int nbinsx, double *xbinedges,
-	                                                             int nbinsy, double ylow, double yhigh );
-
-  RootH2<HTYPE> ( const std::string &name, const std::string &title, int nbinsx, double *xbinedges,
-	                                                             int nbinsy, double *ybinedges );
+  /**
+   *  @brief Instantiate new histogram.
+   *  
+   *  @param[in] name   Histogram name, unique string.
+   *  @param[in] title  Title of the histogram, arbitrary string.
+   *  @param[in] xaxis  X axis definition.
+   *  @param[in] yaxis  Y axis definition.
+   */
+  RootH2<HTYPE> ( const std::string& name, const std::string& title,
+                  const PSHist::Axis& xaxis, const PSHist::Axis& yaxis );
 
   // Destructor
-  virtual ~RootH2<HTYPE> () {}
+  virtual ~RootH2<HTYPE> ();
 
-  // Methods
-  virtual void fill(double x, double y, double weight=1.0);
+  /// Implementation of the corresponding method from PSHist::H2 interface.
+  virtual void fill(double x, double y, double weight);
+  
+  /// Implementation of the corresponding method from PSHist::H2 interface.
+  virtual void fillN(unsigned n, const double* x, const double* y, const double* weight);
+
+  /// Implementation of the corresponding method from PSHist::H2 interface.
   virtual void reset();
-  virtual void print(std::ostream &o) const;
+
+  /// Implementation of the corresponding method from PSHist::H2 interface.
+  virtual void print(std::ostream& o) const;
 
 private:
 
   // Data members
   TH2 *m_histp;
 
-  // Static members
-  //static int s_number_of_booked_histograms;
-
-  // Copy constructor and assignment are disabled by default
-  RootH2<HTYPE> ( const RootH2<HTYPE>& );
-  RootH2<HTYPE>& operator = ( const RootH2<HTYPE>& );
 };
 
 } // namespace RootHist

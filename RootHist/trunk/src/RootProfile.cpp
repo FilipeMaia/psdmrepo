@@ -19,9 +19,22 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <iostream>
 
-using std::cout;
-using std::endl;
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+#include "MsgLogger/MsgLogger.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+
+namespace {
+  
+  const char* logger = "RootHist";
+  
+}
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -30,45 +43,67 @@ using std::endl;
 namespace RootHist {
 
 
-RootProfile::RootProfile ( const std::string &name, const std::string &title, int nbins, double xlow, double xhigh, double ylow, double yhigh, const std::string &option )
+RootProfile::RootProfile ( const std::string& name, const std::string& title, 
+    const PSHist::Axis& axis, const std::string& option )
  : PSHist::Profile()
-{
-  m_histp = new TProfile( name.c_str(), title.c_str(), nbins, xlow, xhigh, ylow, yhigh, option.c_str() ); 
-  std::cout << "RootProfile::RootProfile(...) - Created the 1d profile histogram " << name << " with title=" << title << " and equal bin size" << std::endl;
-}
-
-
-RootProfile::RootProfile ( const std::string &name, const std::string &title, int nbins, double *xbinedges, double ylow, double yhigh, const std::string &option )
- : PSHist::Profile()
-{
-  m_histp = new TProfile( name.c_str(), title.c_str(), nbins, xbinedges, ylow, yhigh, option.c_str() ); 
-  std::cout << "RootProfile::RootProfile(...) - Created the 1d profile histogram " << name << " with title=" << title << " and variable bin size" <<  std::endl;
-}
-
-
-RootProfile::RootProfile ( const std::string &name, const std::string &title, PSHist::Axis &axis, double ylow, double yhigh, const std::string &option )
- : PSHist::Profile()
+  , m_histp(0)
 { 
-  if(axis.edges()) m_histp = new TProfile( name.c_str(), title.c_str(), axis.nbins(), axis.edges(), ylow, yhigh, option.c_str() ); 
-  else             m_histp = new TProfile( name.c_str(), title.c_str(), axis.nbins(), axis.amin(), axis.amax(), ylow, yhigh, option.c_str() );
-  std::cout << "RootProfile::RootProfile(...) - Created the 1d profile histogram " << name << " with title=" << title << std::endl;
+  if(axis.edges()) {
+    m_histp = new TProfile( name.c_str(), title.c_str(), 
+                            axis.nbins(), axis.edges(), option.c_str() ); 
+  } else {
+    m_histp = new TProfile( name.c_str(), title.c_str(), 
+                            axis.nbins(), axis.amin(), axis.amax(), option.c_str() );
+  }
+  MsgLog(logger, debug, "Created 1d profile histogram " << name << " with title=" << title);
 }
 
-
-void RootProfile::print( std::ostream &o ) const
+RootProfile::RootProfile ( const std::string& name, const std::string& title, 
+    const PSHist::Axis& axis, double ylow, double yhigh, const std::string& option )
+ : PSHist::Profile()
+ , m_histp(0)
 { 
-  o << "RootProfile" << endl;
+  if(axis.edges()) {
+    m_histp = new TProfile(name.c_str(), title.c_str(), 
+                           axis.nbins(), axis.edges(), 
+                           ylow, yhigh, option.c_str() ); 
+  } else {
+    m_histp = new TProfile( name.c_str(), title.c_str(), 
+                            axis.nbins(), axis.amin(), axis.amax(), 
+                            ylow, yhigh, option.c_str() );
+  }
+  MsgLog(logger, debug, "Created 1d profile histogram " << name << " with title=" << title);
+}
+
+RootProfile::~RootProfile()
+{
 }
 
 
-void RootProfile::fill( double x, double y, double weight ) {
+void 
+RootProfile::print( std::ostream& o ) const
+{ 
+  o << "RootProfile(" << m_histp->GetName() << ")";
+}
 
-  m_histp->Fill( x, y, weight );
+
+void 
+RootProfile::fill( double x, double y, double weight ) 
+{
+  m_histp->Fill(x, y, weight);
 } 
 
 
-void RootProfile::reset() {
+void 
+RootProfile::fillN(unsigned n, const double* x, const double* y, const double* weight) 
+{
+  m_histp->FillN(n, x, y, weight);
+} 
 
+
+void 
+RootProfile::reset() 
+{
   m_histp->Reset();
 }
 
