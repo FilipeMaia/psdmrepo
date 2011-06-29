@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2011-06-29 Andy Salnikov
+- new method Env::hmgr which returns instance of PSHist::Hmanager
+- rhmgr() is marked as deprecated
+
 Tag: V00-02-00
 2011-05-06 Andy Salnikov
 - few methods in proxy dict classes now take EventKey instead of triplet

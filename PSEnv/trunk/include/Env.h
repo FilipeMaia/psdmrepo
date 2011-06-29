@@ -26,6 +26,7 @@
 #include "PSEnv/ConfigStore.h"
 #include "PSEnv/EpicsStore.h"
 #include "RootHistoManager/RootHMgr.h"
+#include "PSHist/HManager.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -85,8 +86,15 @@ public:
   /// Access to EPICS Store object.
   EpicsStore& epicsStore() { return *m_epicsStore; }
 
-  /// Access to ROOT histogram manager.
+  /**
+   *  @brief DEPRECATED: Access to ROOT histogram manager.
+   *  
+   *  @deprecated Use hmgr() instead.
+   */
   RootHistoManager::RootHMgr& rhmgr() { return *m_rhmgr; }
+
+  /// Access to histogram manager.
+  PSHist::HManager& hmgr();
 
 protected:
 
@@ -97,6 +105,7 @@ private:
   boost::scoped_ptr<ConfigStore> m_cfgStore;   ///< Pointer to Configuration Store
   boost::scoped_ptr<EpicsStore> m_epicsStore;  ///< Pointer to EPICS Store
   boost::scoped_ptr<RootHistoManager::RootHMgr> m_rhmgr;  ///< Pointer to ROOT histogram manager
+  boost::scoped_ptr<PSHist::HManager> m_hmgr;  ///< Pointer to ROOT histogram manager
   
 };
 
