@@ -45,7 +45,7 @@ namespace psana_examples {
 EBeamHist::EBeamHist (const std::string& name)
   : Module(name)
   , m_ebeamHisto(0)
-  , m_chargeHisto()
+  , m_chargeHisto(0)
 {
   m_ebeamSrc = configStr("eBeamSource", "BldInfo(EBeam)");
 }
@@ -61,8 +61,8 @@ EBeamHist::~EBeamHist ()
 void 
 EBeamHist::beginJob(Event& evt, Env& env)
 {
-  m_ebeamHisto = env.rhmgr().h1i("ebeamHisto", "ebeamL3Energy value", AxisDef(0, 50000, 1000));
-  m_chargeHisto = env.rhmgr().h1i("echargeHisto", "ebeamCharge value", AxisDef(0, 0.25, 250));
+  m_ebeamHisto = env.hmgr().hist1i("ebeamHisto", "ebeamL3Energy value", Axis(1000, 13000, 16000));
+  m_chargeHisto = env.hmgr().hist1i("echargeHisto", "ebeamCharge value", Axis(250, 0, 0.25));
 }
 
 // Method which is called with event data
@@ -71,8 +71,8 @@ EBeamHist::event(Event& evt, Env& env)
 {
   shared_ptr<Psana::Bld::BldDataEBeamV1> ebeam = evt.get(m_ebeamSrc);
   if (ebeam.get()) {
-    m_ebeamHisto->Fill(ebeam->ebeamL3Energy());
-    m_chargeHisto->Fill(ebeam->ebeamCharge());
+    m_ebeamHisto->fill(ebeam->ebeamL3Energy());
+    m_chargeHisto->fill(ebeam->ebeamCharge());
   }
 }
 

@@ -68,8 +68,8 @@ private:
   // Data members
   
   Source m_ebeamSrc;
-  TH1* m_ebeamHisto;
-  TH1* m_chargeHisto;
+  PSHist::H1* m_ebeamHisto;
+  PSHist::H1* m_chargeHisto;
 
 };
 

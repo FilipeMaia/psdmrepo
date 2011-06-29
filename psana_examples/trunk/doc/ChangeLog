@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-02
+2011-06-29 Andy Salnikov
+- update EBeamHist module to use new PSHist histogramming
+
 Tag: V00-01-01
 2011-06-16 Andy Salnikov
 - upgrade to pdsdata V02-11-05
