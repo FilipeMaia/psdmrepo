@@ -142,6 +142,11 @@ class LusiTime {
     public function year() {
         return (int)date("Y", $this->sec); }
 
+    /* Return 2-digit month number of the timestamp.
+     */
+    public function month() {
+        return (int)date("m", $this->sec); }
+
     /* Convert the tuple into a packed representation of a 64-bit
      * number. These numbers are meant to be stored in a database.
      *
