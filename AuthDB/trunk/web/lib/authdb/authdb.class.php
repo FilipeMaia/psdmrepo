@@ -37,6 +37,10 @@ class AuthDB {
         return $_SERVER['AUTH_TYPE'];
     }
 
+    public function authRemoteAddr() {
+        return $_SERVER['REMOTE_ADDR'];
+    }
+    
     public function isAuthenticated() {
         return AuthDB::instance()->authName() != '';
     }

@@ -118,7 +118,15 @@ td.table_cell_within_group {
       <li>check if there is such POSIX group as 'ps-xyz'</li>
       <li>check if the group is registered as e-log 'Writer' for all experiments of instrument 'XYZ'</li>
       <li>(optionally) if not then the group will be authorized for those experiments</li>
-      <li>(optionally) report which changes which had to be made at step #3</li></ol>
+      <li>(optionally) report which changes which had to be made at step #3</li>
+      <li>report the number of shifts for each experiment:
+        <ul>
+          <li>If the number is 0 then the number will be show in the red color because the older
+              implementations of e-log won't be able to show runs reported by the DAQ system.</li>
+          <li>The problem can be fixed by following a link to the Web Portal of such experiment
+              (see a table column called 'Experiment') and starting the shift.</li>
+        </ul>
+    </ol>
     <p>The script has two optional parameters:</p>
     <ul>
       <li><b>instr_name='INSTRUMENT'</b> - limit a scope of the operation to the specified instrument</li>
@@ -141,7 +149,8 @@ td.table_cell_within_group {
 		'<td class="table_hdr">Instrument Group</td>'.
 		'<td class="table_hdr">E-Log Role</td>'.
 		'<td class="table_hdr">Is Authorized</td>'.
-		($fix ? '<td class="table_hdr">Action</td>' : '').
+		'<td class="table_hdr"># shifts</td>'.
+	($fix ? '<td class="table_hdr">Action</td>' : '').
 	'</tr>';
 	print '<table><tbody>';
 	foreach( $instrument_names as $instr_name ) {
@@ -153,6 +162,7 @@ td.table_cell_within_group {
 		$experiments = $logbook->experiments_for_instrument( $instr_name );
 		foreach( $experiments as $experiment ) {
 			$has_role = $authdb->hasRole( $group4auth, $experiment->id(), $application, $role );
+			$num_shifts = $experiment->num_shifts();
 			print
 				'<tr>'.
 				'<td class="table_cell table_cell_left">'.$instr_name.'</td>'.
@@ -166,15 +176,18 @@ td.table_cell_within_group {
 					$authdb->createRolePlayer( $application, $role, $experiment->id(), $group4auth );
 					print
 						'<td class="table_cell"><span style="color:green;">Yes</span></td>'.
+						'<td class="table_cell"'.( $num_shifts == 0 ? ' style="font-color:red;"' : '' ).'>'.$num_shifts.'</td>'.
 						'<td class="table_cell table_cell_right"><span style="color:green; font-weight:bold;">just fixed</span></td>';
 				} else {
 					print
 						'<td class="table_cell">Yes</td>'.
+						'<td class="table_cell"'.( $num_shifts == 0 ? ' style="font-color:red;"' : '' ).'>'.$num_shifts.'</td>'.
 						'<td class="table_cell table_cell_right"></td>';
 				}
 			} else {
 				print
-					'<td class="table_cell table_cell_right">'.($has_role ? 'Yes' : '<span style="color:red;">No</span>').'</td>';
+					'<td class="table_cell">'.($has_role ? 'Yes' : '<span style="color:red;">No</span>').'</td>'.
+					'<td class="table_cell table_cell_right"'.( $num_shifts == 0 ? ' style="color:red;"' : '' ).'>'.$num_shifts.'</td>';
 			}
 			print
 				'</tr>';

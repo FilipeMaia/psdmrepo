@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-19
+2011-06-30 Igor Gaponenko
+- added a new method AuthDB::authRemoteAddr() to report the remote address of a caller
+- extended the experiment authorization readyness script to report the number of shifts
+- added a new script to report group management operations in LDAP (only when performed via these Web services)
+
 Tag: V00-00-18
 2011-06-10 Igor Gaponenko
 - fixed a bug in a method fetching privilges from a database
