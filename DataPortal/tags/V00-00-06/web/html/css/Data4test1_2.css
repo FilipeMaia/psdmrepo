@@ -1,0 +1,22 @@
+@CHARSET "ISO-8859-1";
+
+#datafiles-summary-ctrl,
+#datafiles-files-ctrl {
+  width: inherit;
+  padding: 10px 10px 10px 10px;
+  background-color:#f0f0f0;
+}
+#datafiles-summary-wa,
+#datafiles-files-wa {
+  width: inherit;
+  padding: 10px 20px 10px 20px;
+  border-top: solid 1px #c0c0c0;
+}
+.datafiles-info {
+  margin-bottom:10px;
+  color:maroon;
+}
+
+.datafiles-files-highlight {
+  background: #DFEFFC url(/jquery/css/custom-theme/images/ui-bg_glass_85_dfeffc_1x400.png) 50% 50% repeat-x;
+}
