@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: 00-01-23
+2011-06-30 Igor Gaponenko
+- improvements needed for the new version of Portal
+
 Tag: 00-01-22
 2011-06-14 Igor Gaponenko
 - added a new service for posting messages from JQUery AJAX Form

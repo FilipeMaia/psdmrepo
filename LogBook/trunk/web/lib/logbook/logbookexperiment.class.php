@@ -540,7 +540,13 @@ HERE;
      * @return array(LogBookFFEntry)
      */
     public function entries_of_run ( $id ) {
-        return $this->entries_by_( $this->sql_4_entries_by_( " AND h.run_id = ".$id."\n" ));
+        return $this->entries_by_(
+        	$this->sql_4_entries_by_(
+        		" AND h.run_id = ".$id."\n",
+        		null,  /* $limit= */
+        		false  /* $use_tags= */
+        	)
+        );
     }
 
 
@@ -727,7 +733,7 @@ HERE;
                   $this->connection->database.'.entry e'.
                   ($use_tags ? ', '.$this->connection->database.'.tag t ' : ' ');
         return
-            "SELECT DISTINCT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.*\n".
+            "SELECT h.exper_id, h.shift_id, h.run_id, h.relevance_time, e.*\n".
             "FROM $tables\n".
             "WHERE h.exper_id = ".$this->attr['id']."\n".
             " AND h.id = e.hdr_id\n".
@@ -828,15 +834,17 @@ fclose( $debug_file );
         $run_id=null,
         $relevance_time=null ) {
 
+        $insert_time = is_null( $relevance_time ) ? LusiTime::now() : $relevance_time;
+
         $this->connection->query (
             "INSERT INTO {$this->connection->database}.header VALUES(NULL,".$this->id().
             ",".( is_null( $shift_id       ) ? 'NULL' : $shift_id ).
             ",".( is_null( $run_id         ) ? 'NULL' : $run_id ).
-            ",".( is_null( $relevance_time ) ? 'NULL' : LusiTime::to64from( $relevance_time )).")" );
+            ",".LusiTime::to64from( $insert_time ).")" );
 
         $this->connection->query (
             "INSERT INTO {$this->connection->database}.entry VALUES(NULL,(SELECT LAST_INSERT_ID()),NULL".
-            ",".LusiTime::now()->to64().
+            ",".$insert_time->to64().
             ",'".$author.
             "','".$this->connection->escape_string( $content ).
             "','".$content_type."')" );

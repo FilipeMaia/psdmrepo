@@ -14,10 +14,14 @@ use LusiTime\LusiTimeException;
  * This script will process a request for creating new free-form entry
  * in the specified scope.
  */
+/*
+ * NOTE: Can not return JSON MIME type because of the following issue:
+ *       http://jquery.malsup.com/form/#file-upload
+ *
 header( "Content-type: application/json" );
 header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
 header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
-
+*/
 /* Package the error message into a JSON object and return the one
  * back to a caller. The script's execution will end at this point.
  */
@@ -25,10 +29,12 @@ function report_error_and_exit( $msg ) {
     $status_encoded = json_encode( "error" );
     $msg_encoded = json_encode( '<b><em style="color:red;" >Error:</em></b>&nbsp;'.$msg );
     print <<< HERE
+<textarea>
 {
   "Status": {$status_encoded},
   "Message": {$msg_encoded}
 }
+</textarea>
 HERE;
     exit;
 }
@@ -97,13 +103,18 @@ if( isset( $_POST['scope'] )) {
     report_error_and_exit( "no valid scope" );
 }
 
-$relevance_time = LusiTime::now();
+$relevance_time_enforced = false;
+$relevance_time          = LusiTime::now();
 if( isset( $_POST['relevance_time'] )) {
 	$str = trim( $_POST['relevance_time'] );
 	if( $str != '' ) {
-		$relevance_time = LusiTime::parse( $str );
-		if( is_null( $relevance_time ))
-			report_error_and_exit( "incorrect format of the relevance time" );
+		$relevance_time_enforced = true;
+		if( $str == 'now' ) {
+			;
+		} else {
+			$relevance_time = LusiTime::parse( $str );
+			if( is_null( $relevance_time )) report_error_and_exit( "incorrect format of the relevance time" );
+		}
 	}
 }
 
@@ -213,60 +224,47 @@ function child2json( $entry, $posted_at_instrument ) {
 
     $timestamp = $entry->insert_time();
 
-    $relevance_time_str = is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort();
-    $attachments = $entry->attachments();
-    $children = $entry->children();
-
-    $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".$entry->shift()->begin_time()->toStringShort().'</a>';
-    $run_number_str = '';
-    if( !is_null( $entry->run_id())) {
-        $run = $entry->run();
-        $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
-    }
     $tag_ids = array();
+
     $attachment_ids = array();
-    if( count( $attachments ) != 0 ) {
-        foreach( $attachments as $attachment ) {
-            //$attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
-            $attachment_url = '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
-            array_push(
-                $attachment_ids,
-                array(
-                    "id" => $attachment->id(),
-                    "type" => $attachment->document_type(),
-                    "size" => $attachment->document_size(),
-                    "description" => $attachment->description(),
-                    "url" => $attachment_url
-                )
-            );
-        }
-    }
+    foreach( $entry->attachments() as $attachment )
+        array_push(
+            $attachment_ids,
+            array(
+                "id"          => $attachment->id(),
+                "type"        => $attachment->document_type(),
+                "size"        => $attachment->document_size(),
+                "description" => $attachment->description(),
+                "url"         => '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>'
+            )
+        );
+
     $children_ids = array();
-    foreach( $children as $child )
+    foreach( $entry->children() as $child )
         array_push( $children_ids, child2json( $child, $posted_at_instrument ));
 
     $content = wordwrap( $entry->content(), 128 );
     return json_encode(
         array (
             "event_timestamp" => $timestamp->to64(),
-            "event_time" => $entry->insert_time()->toStringShort(),
-            "relevance_time" => $relevance_time_str,
-            "run" => $run_number_str,
-            "shift" => $shift_begin_time_str,
-            "author" => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
-            "id" => $entry->id(),
-            "subject" => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
-            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
-            "html1" => "<pre>".htmlspecialchars($content)."</pre>",
-        	"content" => htmlspecialchars( $entry->content()),
-            "attachments" => $attachment_ids,
-            "tags" => $tag_ids,
-            "children" => $children_ids,
-            "is_run" => 0,
-            "run_id" => 0,
-            "run_num" => 0,
-        	"ymd" => $timestamp->toStringDay(),
-        	"hms" => $timestamp->toStringHMS()
+            "event_time"      => $entry->insert_time()->toStringShort(),
+            "relevance_time"  => is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort(),
+            "run"             => '',
+            "shift"           => '',
+            "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
+            "id"              => $entry->id(),
+            "subject"         => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
+            "html"            => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
+            "html1"           => "<pre>".htmlspecialchars($content)."</pre>",
+        	"content"         => htmlspecialchars( $entry->content()),
+            "attachments"     => $attachment_ids,
+            "tags"            => $tag_ids,
+            "children"        => $children_ids,
+            "is_run"          => 0,
+            "run_id"          => 0,
+            "run_num"         => 0,
+        	"ymd"             => $timestamp->toStringDay(),
+        	"hms"             => $timestamp->toStringHMS()
         )
     );
 }
@@ -274,74 +272,58 @@ function child2json( $entry, $posted_at_instrument ) {
 function entry2json( $entry, $posted_at_instrument ) {
 
     $timestamp = $entry->insert_time();
-    //$event_time_url =  "<a href=\"javascript:display_message({$entry->id()})\" class=\"lb_link\">{$timestamp->toStringShort()}</a>";
-    $event_time_url =  "<a href=\"index.php?action=select_message&id={$entry->id()}\"  target=\"_blank\" class=\"lb_link\">{$timestamp->toStringShort()}</a>";
-    $relevance_time_str = is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort();
-    $tags = $entry->tags();
-    $attachments = $entry->attachments();
-    $children = $entry->children();
+    $shift     = is_null( $entry->shift_id()) ? null : $entry->shift();
+    $run       = is_null( $entry->run_id())   ? null : $entry->run();
 
-    $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".$entry->shift()->begin_time()->toStringShort().'</a>';
-    $run_number_str = '';
-    if( !is_null( $entry->run_id())) {
-        $run = $entry->run();
-        $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
-    }
     $tag_ids = array();
-    if( count( $tags ) != 0 ) {
-        foreach( $tags as $tag ) {
-            array_push(
-                $tag_ids,
-                array(
-                    "tag" => $tag->tag(),
-                    "value" => $tag->value()
-                )
-            );
-        }
-    }
+    foreach( $entry->tags() as $tag )
+        array_push(
+            $tag_ids,
+            array(
+                "tag"   => $tag->tag(),
+                "value" => $tag->value()
+            )
+        );
+
     $attachment_ids = array();
-    if( count( $attachments ) != 0 ) {
-        foreach( $attachments as $attachment ) {
-            //$attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
-            $attachment_url = '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
-            array_push(
-                $attachment_ids,
-                array(
-                    "id" => $attachment->id(),
-                    "type" => $attachment->document_type(),
-                    "size" => $attachment->document_size(),
-                    "description" => $attachment->description(),
-                    "url" => $attachment_url
-                )
-            );
-        }
-    }
+    foreach( $entry->attachments() as $attachment )
+        array_push(
+            $attachment_ids,
+            array(
+                "id"          => $attachment->id(),
+                "type"        => $attachment->document_type(),
+                "size"        => $attachment->document_size(),
+                "description" => $attachment->description(),
+                "url"         => '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>'
+            )
+        );
+
     $children_ids = array();
-    foreach( $children as $child )
+    foreach( $entry->children() as $child )
         array_push( $children_ids, child2json( $child, $posted_at_instrument ));
 
     $content = wordwrap( $entry->content(), 128 );
     return json_encode(
         array (
             "event_timestamp" => $timestamp->to64(),
-            "event_time" => $event_time_url,
-            "relevance_time" => $relevance_time_str,
-            "run" => $run_number_str,
-            "shift" => $shift_begin_time_str,
-            "author" => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
-            "id" => $entry->id(),
-            "subject" => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
-            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
-            "html1" => "<pre>".htmlspecialchars($content)."</pre>",
-        	"content" => htmlspecialchars( $entry->content()),
-            "attachments" => $attachment_ids,
-            "tags" => $tag_ids,
-            "children" => $children_ids,
-            "is_run" => 0,
-            "run_id" => 0,
-            "run_num" => 0,
-        	"ymd" => $timestamp->toStringDay(),
-        	"hms" => $timestamp->toStringHMS()
+            "event_time"      => "<a href=\"index.php?action=select_message&id={$entry->id()}\"  target=\"_blank\" class=\"lb_link\">{$timestamp->toStringShort()}</a>",
+            "relevance_time"  => is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort(),
+            "run"             => is_null( $run   ) ? '' : "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>",
+            "shift"           => is_null( $shift ) ? '' : "<a href=\"javascript:select_shift(".$shift->id().")\" class=\"lb_link\">".$shift->begin_time()->toStringShort().'</a>',
+            "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
+            "id"              => $entry->id(),
+            "subject"         => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
+            "html"            => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
+            "html1"           => "<pre>".htmlspecialchars($content)."</pre>",
+        	"content"         => htmlspecialchars( $entry->content()),
+            "attachments"     => $attachment_ids,
+            "tags"            => $tag_ids,
+            "children"        => $children_ids,
+            "is_run"          => 0,
+            "run_id"          => is_null( $run ) ? 0 : $run->id(),
+            "run_num"         => is_null( $run ) ? 0 : $run->num(),
+        	"ymd"             => $timestamp->toStringDay(),
+        	"hms"             => $timestamp->toStringHMS()
         )
     );
 }
@@ -351,14 +333,30 @@ try {
     $logbook = new LogBook();
     $logbook->begin();
 
-    $experiment = $logbook->find_experiment_by_id( $id ) or
-    	report_error_and_exit( "no such experiment" );
+    $experiment = $logbook->find_experiment_by_id( $id ) or	report_error_and_exit( "no such experiment" );
 
     $instrument = $experiment->instrument();
 
-
     LogBookAuth::instance()->canPostNewMessages( $experiment->id()) or
         report_error_and_exit( 'You are not authorized to post messages for the experiment' );
+
+    /* For messages to be posted for runs we may also make an optional (if
+     * no relevance time is requested explicitly) adjustment to the relevance time
+     * by incrementing the timestamp by one nanosecond from the run end time
+     * if the run is closed. Otherwise do the same for the begin time of the run.
+     */
+    if( !is_null( $run_id ) && !$relevance_time_enforced ) {
+    	$run  = $experiment->find_run_by_id( $run_id ) or report_error_and_exit( "no such run" );
+    	$time = $run->end_time();
+    	if( is_null( $time )) $time = $run->begin_time();
+    	$sec  = $time->sec;
+    	$nsec = $time->nsec + 1;
+    	if( $nsec >= 1000*1000*1000 ) {
+    		$sec += 1;
+    		$nsec = 0;
+    	}
+    	$relevance_time = new LusiTime( $sec, $nsec );
+    }
 
     $content_type = "TEXT";
 
@@ -387,10 +385,12 @@ try {
     $entry_encoded  = $scope == 'message' ? child2json( $entry, false ) : entry2json( $entry, false );
 
 	print <<< HERE
+<textarea>
 {
   "Status": {$status_encoded},
   "Entry": {$entry_encoded}
 }
+</textarea>
 HERE;
 
 	$logbook->commit();

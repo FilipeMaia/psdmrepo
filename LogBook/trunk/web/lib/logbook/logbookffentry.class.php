@@ -63,9 +63,9 @@ class LogBookFFEntry {
         return $this->attr['run_id']; }
 
     public function relevance_time () {
-        return is_null( $this->attr['relevance_time'] ) ?
-            null :
-            LusiTime::from64( $this->attr['relevance_time'] ); }
+    	/* ATTENTION: Always return the insert time of the message. No exceptions!!!
+    	 */
+        return $this->insert_time(); }
 
     public function id() {
         return $this->attr['id']; }

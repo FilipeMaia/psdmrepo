@@ -119,14 +119,8 @@ $inject_runs = false;
 if( isset( $_GET['inject_runs'] ))
     $inject_runs = '0' != trim( $_GET['inject_runs'] );
 
-if( '' != $range_of_runs ) {
-	$inject_runs = true;	// Force it because a request was made to search around
-							// a specific run or a range of those.
-
-	$posted_at_instrument = false;	// the range of runs isn't compatible with
-									// the broader search accross instruments
-}
-
+if( '' != $range_of_runs ) $inject_runs = true;		// Force it because a request was made to search around
+													// a specific run or a range of those.
 
 /* This is a special modifier which (if present) is used to return an updated list
  * of messages since (strictly newer than) the specified time.
@@ -202,47 +196,60 @@ function child2json( $entry, $posted_at_instrument ) {
 
     $timestamp = $entry->insert_time();
 
+    $relevance_time_str = is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort();
+    $attachments = $entry->attachments();
+    $children = $entry->children();
+
+    $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".$entry->shift()->begin_time()->toStringShort().'</a>';
+    $run_number_str = '';
+    if( !is_null( $entry->run_id())) {
+        $run = $entry->run();
+        $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
+    }
     $tag_ids = array();
-
     $attachment_ids = array();
-    foreach( $entry->attachments() as $attachment )
-        array_push(
-            $attachment_ids,
-            array(
-                "id"          => $attachment->id(),
-                "type"        => $attachment->document_type(),
-                "size"        => $attachment->document_size(),
-                "description" => $attachment->description(),
-                "url"         => '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>'
-            )
-        );
-
+    if( count( $attachments ) != 0 ) {
+        foreach( $attachments as $attachment ) {
+            //$attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            $attachment_url = '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            array_push(
+                $attachment_ids,
+                array(
+                    "id" => $attachment->id(),
+                    "type" => $attachment->document_type(),
+                    "size" => $attachment->document_size(),
+                    "description" => $attachment->description(),
+                    "url" => $attachment_url
+                )
+            );
+        }
+    }
     $children_ids = array();
-    foreach( $entry->children() as $child )
+    foreach( $children as $child )
         array_push( $children_ids, child2json( $child, $posted_at_instrument ));
 
     $content = wordwrap( $entry->content(), 128 );
     return json_encode(
         array (
             "event_timestamp" => $timestamp->to64(),
-            "event_time"      => $entry->insert_time()->toStringShort(),
-            "relevance_time"  => is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort(),
-            "run"             => '',
-            "shift"           => '',
-            "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
-            "id"              => $entry->id(),
-            "subject"         => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
-            "html"            => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
-            "html1"           => "<pre>".htmlspecialchars($content)."</pre>",
-        	"content"         => htmlspecialchars( $entry->content()),
-            "attachments"     => $attachment_ids,
-            "tags"            => $tag_ids,
-            "children"        => $children_ids,
-            "is_run"          => 0,
-            "run_id"          => 0,
-            "run_num"         => 0,
-        	"ymd"             => $timestamp->toStringDay(),
-        	"hms"             => $timestamp->toStringHMS()
+            "event_time" => $entry->insert_time()->toStringShort(),
+            "relevance_time" => $relevance_time_str,
+            "run" => $run_number_str,
+            "shift" => $shift_begin_time_str,
+            "author" => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
+            "id" => $entry->id(),
+            "subject" => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
+            "html1" => "<pre>".htmlspecialchars($content)."</pre>",
+        	"content" => htmlspecialchars( $entry->content()),
+            "attachments" => $attachment_ids,
+            "tags" => $tag_ids,
+            "children" => $children_ids,
+            "is_run" => 0,
+            "run_id" => 0,
+            "run_num" => 0,
+        	"ymd" => $timestamp->toStringDay(),
+        	"hms" => $timestamp->toStringHMS()
         )
     );
 }
@@ -250,58 +257,74 @@ function child2json( $entry, $posted_at_instrument ) {
 function entry2json( $entry, $posted_at_instrument ) {
 
     $timestamp = $entry->insert_time();
-    $shift     = is_null( $entry->shift_id()) ? null : $entry->shift();
-    $run       = is_null( $entry->run_id())   ? null : $entry->run();
+    //$event_time_url =  "<a href=\"javascript:display_message({$entry->id()})\" class=\"lb_link\">{$timestamp->toStringShort()}</a>";
+    $event_time_url =  "<a href=\"index.php?action=select_message&id={$entry->id()}\"  target=\"_blank\" class=\"lb_link\">{$timestamp->toStringShort()}</a>";
+    $relevance_time_str = is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort();
+    $tags = $entry->tags();
+    $attachments = $entry->attachments();
+    $children = $entry->children();
 
+    $shift_begin_time_str = is_null( $entry->shift_id()) ? '' : "<a href=\"javascript:select_shift(".$entry->shift()->id().")\" class=\"lb_link\">".$entry->shift()->begin_time()->toStringShort().'</a>';
+    $run_number_str = '';
+    if( !is_null( $entry->run_id())) {
+        $run = $entry->run();
+        $run_number_str = "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>";
+    }
     $tag_ids = array();
-    foreach( $entry->tags() as $tag )
-        array_push(
-            $tag_ids,
-            array(
-                "tag" => $tag->tag(),
-                "value" => $tag->value()
-            )
-        );
-
+    if( count( $tags ) != 0 ) {
+        foreach( $tags as $tag ) {
+            array_push(
+                $tag_ids,
+                array(
+                    "tag" => $tag->tag(),
+                    "value" => $tag->value()
+                )
+            );
+        }
+    }
     $attachment_ids = array();
-    foreach( $entry->attachments() as $attachment )
-        array_push(
-            $attachment_ids,
-            array(
-                "id"          => $attachment->id(),
-                "type"        => $attachment->document_type(),
-                "size"        => $attachment->document_size(),
-                "description" => $attachment->description(),
-                "url"         => '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>'
-            )
-        );
-
+    if( count( $attachments ) != 0 ) {
+        foreach( $attachments as $attachment ) {
+            //$attachment_url = '<a href="ShowAttachment.php?id='.$attachment->id().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            $attachment_url = '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>';
+            array_push(
+                $attachment_ids,
+                array(
+                    "id" => $attachment->id(),
+                    "type" => $attachment->document_type(),
+                    "size" => $attachment->document_size(),
+                    "description" => $attachment->description(),
+                    "url" => $attachment_url
+                )
+            );
+        }
+    }
     $children_ids = array();
-    foreach( $entry->children() as $child )
+    foreach( $children as $child )
         array_push( $children_ids, child2json( $child, $posted_at_instrument ));
 
     $content = wordwrap( $entry->content(), 128 );
     return json_encode(
         array (
             "event_timestamp" => $timestamp->to64(),
-            "event_time"      => "<a href=\"index.php?action=select_message&id={$entry->id()}\"  target=\"_blank\" class=\"lb_link\">{$timestamp->toStringShort()}</a>",
-            "relevance_time"  => is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort(),
-            "run"             => is_null( $run   ) ? '' : "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>",
-            "shift"           => is_null( $shift ) ? '' : "<a href=\"javascript:select_shift(".$shift->id().")\" class=\"lb_link\">".$shift->begin_time()->toStringShort().'</a>',
-            "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
-            "id"              => $entry->id(),
-            "subject"         => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
-            "html"            => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
-            "html1"           => "<pre>".htmlspecialchars($content)."</pre>",
-        	"content"         => htmlspecialchars( $entry->content()),
-            "attachments"     => $attachment_ids,
-            "tags"            => $tag_ids,
-            "children"        => $children_ids,
-            "is_run"          => 0,
-            "run_id"          => is_null( $run ) ? 0 : $run->id(),
-            "run_num"         => is_null( $run ) ? 0 : $run->num(),
-        	"ymd"             => $timestamp->toStringDay(),
-        	"hms"             => $timestamp->toStringHMS()
+            "event_time" => $event_time_url,
+            "relevance_time" => $relevance_time_str,
+            "run" => $run_number_str,
+            "shift" => $shift_begin_time_str,
+            "author" => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
+            "id" => $entry->id(),
+            "subject" => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
+            "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
+            "html1" => "<pre>".htmlspecialchars($content)."</pre>",
+        	"content" => htmlspecialchars( $entry->content()),
+            "attachments" => $attachment_ids,
+            "tags" => $tag_ids,
+            "children" => $children_ids,
+            "is_run" => 0,
+            "run_id" => 0,
+            "run_num" => 0,
+        	"ymd" => $timestamp->toStringDay(),
+        	"hms" => $timestamp->toStringHMS()
         )
     );
 }
@@ -335,6 +358,7 @@ function run2json( $run, $type, $posted_at_instrument ) {
 	case 'run':
 		$timestamp = $run->end_time();
 		$msg       = '<b>run '.$run->num().'</b> ( '.format_seconds( $run->end_time()->sec - $run->begin_time()->sec ).' )';
+		//$msg       = '<b>run ( duration: '.( $run->end_time().$sec - $run->begin_time().$sec ).' seconds )</b>';
 		$id        = 3*512*1024*1024 + $run->id();
 		break;
 	}
@@ -399,37 +423,26 @@ function sort_and_truncate_from_head( &$entries_by_timestamps, $limit ) {
     $timestamps = array();
     $prev_begin_run = null;
     foreach( $all_timestamps as $t ) {
-    	foreach( $entries_by_timestamps[$t] as $pair ) {
-		   	$entry = $pair['object'];
-    		switch( $pair['type'] ) {
-    		case 'entry':
+    	$entry = $entries_by_timestamps[$t]['object'];
+    	switch( $entries_by_timestamps[$t]['type'] ) {
+    	case 'entry':
+    		$prev_begin_run = null;
+    		array_push( $timestamps, $t );
+    		break;
+    	case 'begin_run':
+    		$prev_begin_run = $t;
+    		array_push( $timestamps, $t );
+    		break;
+    	case 'end_run':
+    		if( is_null( $prev_begin_run )) {
+    			array_push( $timestamps, $t );
+    		} else {
+    			$entries_by_timestamps[$prev_begin_run]['type'] = 'run';
     			$prev_begin_run = null;
-    			array_push( $timestamps, $t );
-    			break;
-    		case 'begin_run':
-    			$prev_begin_run = $t;
-    			array_push( $timestamps, $t );
-    			break;
-    		case 'end_run':
-    			if( is_null( $prev_begin_run )) {
-    				array_push( $timestamps, $t );
-    			} else {
-    				foreach( array_keys( $entries_by_timestamps[$prev_begin_run] ) as $k ) {
-    					if( $entries_by_timestamps[$prev_begin_run][$k]['type'] == 'begin_run' ) {
-    						$entries_by_timestamps[$prev_begin_run][$k]['type'] = 'run';
-		    				$prev_begin_run = null;
-		    				break;
-    					}
-    				}
-    			}
-    			break;
     		}
+    		break;
     	}
     }
-    // Remove duplicates (if any). They may show up if an element of
-    // $entries_by_timestamps will have more than one entry.
-    //
-    $timestamps = array_unique( $timestamps );
 
     /* Do need to truncate. Apply different limiting techniques depending
      * on a value of the parameter.
@@ -440,7 +453,7 @@ function sort_and_truncate_from_head( &$entries_by_timestamps, $limit ) {
 
     $limit_num = null;
     $unit = null;
-    if( 2 == sscanf( $limit, "%d%s", $limit_num, &$unit )) {
+    if( 2 == sscanf( $limit, "%d%s", &$limit_num, &$unit )) {
 
     	$nsec_ago = 1000000000 * $limit_num;
     	switch( $unit ) {
@@ -500,7 +513,6 @@ try {
    	 *   - before the beginning of the next to the last run. Of no such next run
    	 *   is found then all messages till the end of the logbook will be selected.
    	 */
-   	$run_specific_entries = array();
    	if( '' != $range_of_runs ) {
    		if(( '' != $begin_str ) or ( '' != $end_str ))
 	   		report_error( "begin/end time limits can't be used together with the run limi" );
@@ -524,10 +536,8 @@ try {
 
 		if( $last_run_num < $first_run_num ) report_error( "last run in the range can't be less than the first one" );
 
-		$first_run = $experiment->find_run_by_num( $first_run_num );
-		if( is_null( $first_run )) report_error( "run {$first_run_num} can't be found" );
-		$last_run = $experiment->find_run_by_num( $last_run_num );
-		if( is_null( $last_run )) report_error( "run {$last_run_num} can't be found" );
+		if( is_null( $experiment->find_run_by_num( $first_run_num ))) report_error( "run {$first_run_num} can't be found" );
+		if( is_null( $experiment->find_run_by_num( $last_run_num  ))) report_error( "run {$last_run_num} can't be found" );
 
 		$previous_run = $experiment->find_run_by_num( $first_run_num - 1 );
 		if( !is_null( $previous_run )) {
@@ -540,70 +550,9 @@ try {
 				$previous_run->begin_time()->toStringShort() :
 				$previous_run->end_time()->toStringShort();
 		}
-		$begin_str = $first_run->begin_time()->toStringShort();
 		$next_run = $experiment->find_run_by_num( $last_run_num + 1 );
-		if( is_null( $next_run )) {
-
-			// ATTENTION: If no next run exists then, depending on the current status
-			//            of the requested last run in the range we assume:
-			//
-			//            o  +1 hr after the end of that run if the run is still open
-			//               and the run's duration doesn't exceed 24 hours (so called "run-away"
-			//               run).
-			//
-			//            o  no end time otherwise (and assumption is that the experiment
-			//               is still taking data)
-			//
-			//            These measures will protect us from seein the whole tail of e-log messages
-			//            posted after the end of the last run.
-			//
-			$last_run_end_time = $last_run->end_time();
-			if( !is_null( $last_run_end_time ) && ( LusiTime::now()->sec - $last_run_end_time->sec > 24*3600 )) {
-				$end_str = new LusiTime( $last_run_end_time->sec + 3600, 0 );
-			}
-		} else {
+		if( !is_null( $next_run )) {
 			$end_str = $next_run->begin_time()->toStringShort();
-		}
-
-		/* Find messages which are explicitly or implicitly associated with runs, no matter
-		 * when those messages were posted. The messages (if any) will be automatically
-		 * mixed into the output result.
-		 * 
-		 * Note the meaning of the associations:
-		 * 
-		 * 'explicit' - these messages were posted (replied) for the specified run,
-		 *              so that there will be a database association
-		 *
-		 * 'implicit' - these messages have (case insensitive) 'run NNN' in the message
-		 *              body. So we have to use full text search to find them.
-		 */
-		for( $num = $first_run_num; $num <= $last_run_num; ++$num ) {
-			$run = $experiment->find_run_by_num( $num);
-			if( is_null( $run )) continue;
-
-			// Explicit
-			//
-			foreach( $experiment->entries_of_run( $run->id()) as $e ) array_push( $run_specific_entries, $e );
-
-			// Implicit
-			//
-    		foreach( $experiment->search(
-        		null,			// $shift_id
-        		null,			// $run_id
-        		"run {$num} ",	// $text2search
-        		true, 			// $search_in_messages,
-        		false,			// $search_in_tags,
-        		false, 			// $search_in_values,
-        		true,			// $posted_at_experiment,
-        		false,			// $posted_at_shifts,
-        		false, 			// $posted_at_runs,
-        		null,			// $begin,
-        		null, 			// $end,
-        		null,			// $tag,
-        		null,			// $author,
-        		null			// $since
-        						// $limit
-        		) as $e ) array_push( $run_specific_entries, $e	);
 		}
    	}
 
@@ -715,15 +664,7 @@ try {
 		/* Merge both results into the dictionary for further processing.
 		 */
     	foreach( $entries as $e ) {
-    		$t = $e->insert_time()->to64();
-    		if( !array_key_exists( $t, $entries_by_timestamps )) $entries_by_timestamps[$t] = array();
-    		array_push(
-    			$entries_by_timestamps[$t],
-    			array(
-    				'type'   => 'entry',
-    				'object' => $e
-    			)
-    		);
+        	$entries_by_timestamps[$e->insert_time()->to64()] = array( 'type' => 'entry', 'object' => $e );
     	}
     	foreach( $runs as $r ) {
 
@@ -733,90 +674,50 @@ try {
 	         *   [begin4runs,end4runs)
     	     */
         	if( is_null( $begin4runs ) || $begin4runs->less( $r->begin_time())) {
-        		$t = $r->begin_time()->to64();
-        		if( !array_key_exists( $t, $entries_by_timestamps )) $entries_by_timestamps[$t] = array();
-        		array_push(
-    				$entries_by_timestamps[$t],
-    				array(
-    					'type'   => 'begin_run',
-    					'object' => $r
-    				)
-    			);
+            	$entries_by_timestamps[$r->begin_time()->to64()] = array( 'type' => 'begin_run', 'object' => $r );
 	        }
 
+    	    /* This check would prevent start of run entry to be replaced by
+        	 * the end of the previous run wich was automatically closed
+	         * when starting the next run.
+    	     */
         	if( !is_null( $r->end_time())) {
-        		$t = $r->end_time()->to64();
-        		if( !array_key_exists( $t, $entries_by_timestamps )) $entries_by_timestamps[$t] = array();
-        		array_push(
-    				$entries_by_timestamps[$t],
-    				array(
-    					'type'   => 'end_run',
-    					'object' => $r
-    				)
-    			);
+            	if( !array_key_exists( $r->end_time()->to64(), $entries_by_timestamps )) {
+                	$entries_by_timestamps[$r->end_time()->to64()] = array( 'type' => 'end_run', 'object' => $r );
+	            }
     	    }
 	    }
-    }
-    /* Merge in the run-specific entries. Make sure there won't be any duplicates.
-     * The duplicates can be easily identified becouase they would be within
-     * teh same timestamps.
-     */
-    foreach( $run_specific_entries as $e ) {
-    	$skip = false;
-    	$t = $e->insert_time()->to64();
-    	if( array_key_exists( $t, $entries_by_timestamps )) {
-    		foreach( $entries_by_timestamps[$t] as $pair )
-    			if(( $pair['type'] == 'entry' ) && ( $pair['object']->id() == $e->id())) {
-    				$skip = true;
-    				break;
-    			}
-    	} else {
-    		$entries_by_timestamps[$t] = array();
-    	}
-    	if( $skip ) continue;
-    	array_push(
-   			$entries_by_timestamps[$t],
-   			array(
-   				'type'   => 'entry',
-   				'object' => $e
-    		)
-   		);
     }
 
     /* Now produce the desired output.
      */
     $timestamps = sort_and_truncate_from_head( $entries_by_timestamps, $limit );
 
-    $status_encoded  = json_encode( "success" );
-   	$updated_encoded = json_encode( LusiTime::now()->toStringShort());
-
-   	$result =<<< HERE
+    $status_encoded = json_encode( "success" );
+    $result =<<< HERE
 {
   "ResultSet": {
     "Status": {$status_encoded},
-    "Updated": {$updated_encoded},
     "Result": [
 HERE;
     $first = true;
     foreach( $timestamps as $t ) {
-    	foreach( $entries_by_timestamps[$t] as $pair ) {
-    		$type  = $pair['type'];
-    		$entry = $pair['object'];
-    		if( $type == 'entry' ) {
-    			if( $first ) {
-                	$first = false;
-                	$result .= "\n".entry2json( $entry, $posted_at_instrument );
-            	} else {
-                	$result .= ",\n".entry2json( $entry, $posted_at_instrument );
-	            }
-    		} else {
-    			if( $first ) {
-            	    $first = false;
-                	$result .= "\n".run2json( $entry, $type, $posted_at_instrument );
-            	} else {
-                	$result .= ",\n".run2json( $entry, $type, $posted_at_instrument );
-	            }
-    		}
+    	$type  = $entries_by_timestamps[$t]['type'];
+    	$entry = $entries_by_timestamps[$t]['object'];
+    	if( $type == 'entry' ) {
+    		if( $first ) {
+                $first = false;
+                $result .= "\n".entry2json( $entry, $posted_at_instrument );
+            } else {
+                $result .= ",\n".entry2json( $entry, $posted_at_instrument );
+            }
+    	} else {
+    		if( $first ) {
+                $first = false;
+                $result .= "\n".run2json( $entry, $type, $posted_at_instrument );
+            } else {
+                $result .= ",\n".run2json( $entry, $type, $posted_at_instrument );
+            }
     	}
     }
     $result .=<<< HERE
