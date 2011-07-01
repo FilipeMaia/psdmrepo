@@ -1,0 +1,88 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package AuthDB
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-19
+2011-06-30 Igor Gaponenko
+- added a new method AuthDB::authRemoteAddr() to report the remote address of a caller
+- extended the experiment authorization readyness script to report the number of shifts
+- added a new script to report group management operations in LDAP (only when performed via these Web services)
+
+Tag: V00-00-18
+2011-06-10 Igor Gaponenko
+- fixed a bug in a method fetching privilges from a database
+
+Tag: V00-00-16
+2011-05-13 Igor Gaponenko
+- added two scripts for reporting and fixing group authorizations
+
+Tag:  V00-00-15
+2011-02-25 Igor Gaponenko
+- extended API to support experiment switch
+
+Tag:  V00-00-14
+2010-10-20 Igor Gaponenko
+- finished implementing manage my POSIX groups editor
+- other improvements in UI and services
+
+Tag: V00-00-13
+2010-07-28 Igor Gaponenko
+- incomplete implementation of the "manage my POSIX groups" editor
+- more efficient implementation of AuthDB::hasPrivilege()
+
+Tag: V00-00-11
+2010-07-16 Igor Gaponenko
+- implemented LDAP group editor
+
+Tag: V00-00-10
+2010-05-28 Igor Gaponenko
+- fixed minor bugs in PHP constant definitions to avoid flooding Apache's log
+files with meaningless warnings
+- added user viewer page
+
+Tag: V00-00-09
+2010-05-03 Andrei Salnikov
+- changes in SConscript
+
+Tag: V00-00-08
+2010-03-22 Igor Gaponenko
+- fixed a bug affecting non-privileged users of some layered apps
+
+Tag: V00-00-07
+2009-11-09 Igor Gaponenko
+- enhanced unit test for the PHP API
+- added two version of the welcome/login pages for WebKDC
+
+Tag: V00-00-06
+2009-10-28 Igor Gaponenko
+- more efficient implementation of the user authorization method 'hasPriv'
+
+Tag: V00-00-04
+2009-10-27 Igor Gaponenko
+- reimplemented the PHP connection class to use persistent MySQL connections
+
+Tag: V00-00-03
+2009-10-12 Igor Gaponenko
+- bug fix in the PHP API
+- added 'logout' to the Web app interface. It works only for WebAuth.
+
+Tag: V00-00-02
+2009-09-30 Igor Gaponenko
+- IDE migration from NetBeans to Eclipse
+- not showing RoleDB role players in a scope of a particular experiment
+- extended API of the AuthDB interface for the AuthDB Web app
+- improved view of POSIX groups  at the AuthDB Web app
+- other improvements at the AuthDB Web app
+
+Tag: V00-00-01
+2009-09-28 Igor Gaponenko
+- the first implementation of the Authorization Database Web application
