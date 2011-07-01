@@ -25,17 +25,19 @@ class RegDB {
         $database    = null,
         $ldap_host   = null,
         $ldap_user   = null,
-        $ldap_passwd = null  ) {
+        $ldap_passwd = null,
+        $ldap_log    = null ) {
 
         $this->connection =
             new RegDBConnection (
-                is_null($host)        ? REGDB_DEFAULT_HOST       : $host,
+                is_null($host)        ? REGDB_DEFAULT_HOST        : $host,
                 is_null($user)        ? REGDB_DEFAULT_USER        : $user,
                 is_null($password)    ? REGDB_DEFAULT_PASSWORD    : $password,
                 is_null($database)    ? REGDB_DEFAULT_DATABASE    : $database,
                 is_null($ldap_host)   ? REGDB_DEFAULT_LDAP_HOST   : $ldap_host,
                 is_null($ldap_user)   ? REGDB_DEFAULT_LDAP_USER   : $ldap_user,
-                is_null($ldap_passwd) ? REGDB_DEFAULT_LDAP_PASSWD : $ldap_passwd );
+                is_null($ldap_passwd) ? REGDB_DEFAULT_LDAP_PASSWD : $ldap_passwd,
+                is_null($ldap_log)    ? REGDB_DEFAULT_LDAP_LOG    : $ldap_log );
         }
 
     /*

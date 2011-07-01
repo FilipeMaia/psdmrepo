@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-30
+2011-06-30 Igor Gaponenko
+- implemented logging of group management operations for LDAP
+
 Tag: V00-00-29
 2011-06-10 Igor Gaponenko
 - fixed a logic flaw in the authorization test method
