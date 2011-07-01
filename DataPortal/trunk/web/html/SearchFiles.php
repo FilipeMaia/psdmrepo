@@ -182,32 +182,24 @@ try {
      * known file types.
      */
     if( is_null( $range_of_runs )) {
-        $range = FileMgrIrodsWs::max_run_range( $instrument->name(), $experiment->name(), array('xtc','hdf5'));
-        $range_of_runs = $range['min'].'-'.$range['max'];
+        $first_run = $experiment->find_first_run();
+        $last_run  = $experiment->find_last_run();
+        $range_of_runs = ( is_null($first_run) || is_null( $last_run )) ? '0-0' : $first_run->num().'-'.$last_run->num();
     }
 
-    /* Build a mapping from file names to the corresponding run numbers.
-     * This information will be shown in the GUI.
+    /* Build two structures:
+     * - a mapping from file names to the corresponding run numbers. This information will be shown in the GUI.
+     * - a list fop all known files.
      */
     $file2run = array();
+    $files    = array();
     foreach( $types as $type ) {
         $runs = null;
         FileMgrIrodsWs::runs( $runs, $instrument->name(), $experiment->name(), $type, $range_of_runs );
         foreach( $runs as $run ) {
-            $files = $run->files;
-            foreach( $files as $file ) {
-                $file2run[$file->name] = $run->run;
-            }
+            foreach( $run->files as $file ) $file2run[$file->name] = $run->run;
+            add_files( $files, $run->files, $type, $file2run, $checksum, $archived, $local );
         }
-    }
-
-    /* Build a list fop all known files.
-     */
-    $files = array();
-    foreach( $types as $type ) {
-        $this_type_files = null;
-        FileMgrIrodsWs::files( $this_type_files, '/psdm-zone/psdm/'.$instrument->name().'/'.$experiment->name().'/'.$type );
-        add_files( $files, $this_type_files, $type, $file2run, $checksum, $archived, $local );
     }
 
     /* Build a map in which run numbers will be keys and lists of the corresponding
@@ -240,6 +232,9 @@ HERE;
 		$first_run = true;
     	foreach( array_keys( $files_by_runs ) as $runnum ) {
     
+    		/* TODO: Speed this up by prefetching runs and then indexing
+    		 *       in a dictionary.
+    		 */
             $run = $experiment->find_run_by_num( $runnum );
    	        $run_url = is_null( $run ) ?
        	        $runnum :

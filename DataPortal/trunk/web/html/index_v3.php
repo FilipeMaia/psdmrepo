@@ -275,7 +275,6 @@ HERE;
     <button id="el-l-collapse"   title="each click will collapse the tree to the previous level of detail">Collapse--</button>
     <button id="el-l-viewattach" title="view attachments of expanded messages">View Attachments</button>
     <button id="el-l-hideattach" title="hide attachments of expanded messages">Hide Attachments</button>
-    <button id="el-l-reverse"    title="show days and messages within each day in reverse order">Show in Reverse Order</button>
   </div>  
   <div class="el-ms" id="el-l-ms"></div>
 </div>
@@ -338,8 +337,7 @@ HERE;
         <input type="hidden" name="num_tags" value="{$num_tags}" />
         <input type="hidden" name="onsuccess" value="" />
         <input type="hidden" name="relevance_time" value="" />
-        <textarea name="message_text" rows="12" cols="64" style="padding:4px; margin-top:5px;"
-                  title="TIPS:\nThe first line of the message body will be used as its subject.\nUse 'run NNN' to post for the run"></textarea>
+        <textarea name="message_text" rows="12" cols="64" style="padding:4px; margin-top:5px;" title="the first line of the message body will be used as its subject" ></textarea>
         <div style="margin-top: 10px;">
           <div style="float:left;">
             <div style="font-weight:bold;">Author:</div>
@@ -476,7 +474,6 @@ Make sure the Begin and End time limits are not used!"/>
     <button id="el-s-collapse"   title="each click will collapse the tree to the previous level of detail">Collapse--</button>
     <button id="el-s-viewattach" title="view attachments of expanded messages">View Attachments</button>
     <button id="el-s-hideattach" title="hide attachments of expanded messages">Hide Attachments</button>
-    <button id="el-s-reverse"    title="show days and messages within each day in reverse order">Show in Reverse Order</button>
   </div>  
   <div class="el-ms" id="el-s-ms"></div>
 </div>
@@ -841,6 +838,14 @@ HERE;
         <td><input type="checkbox" name="archived" /></td><td>Archived</td>
         <td><input type="checkbox" name="local" /></td><td>On disk</td>
         <td><input type="checkbox" name="checksum" /></td><td>Checksum</td>
+      </tr><tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><input type="checkbox" name="archived_path" /></td><td>HPSS</td>
+        <td><input type="checkbox" name="local_path" /></td><td>iRODS</td>
+        <td></td>
       </tr>
     </tbody></table>
   </div>
@@ -935,7 +940,7 @@ HERE;
 <script type="text/javascript" src="/jquery/js/jquery-ui-1.8.7.custom.min.js"></script>
 <script type="text/javascript" src="js/jquery.form.js"></script> 
 <script type="text/javascript" src="js/Utilities.js"></script>
-<script type="text/javascript" src="js/ELog2.js"></script>
+<script type="text/javascript" src="js/ELog4test1_2.js"></script>
 <script type="text/javascript" src="js/Exper4test1_2.js"></script>
 <script type="text/javascript" src="js/Data4test1_2.js"></script>
 <script type="text/javascript" src="js/Hdf4test1_2.js"></script>

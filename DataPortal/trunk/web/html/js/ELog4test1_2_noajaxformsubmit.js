@@ -30,7 +30,6 @@ function elog_create() {
 	this.shifts  = new Array();
 	this.runs    = new Array();
 	this.editor  = false;
-	this.post_onsuccess = null;
 
 	/* The context for v-menu items
 	 */
@@ -180,6 +179,8 @@ function elog_create() {
 			var idx = urlbase.indexOf( '&' );
 			if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
 
+			$('#elog-form-post input[name="onsuccess"]').val(urlbase+'&app=elog');
+
 			if( that.context2 == 'run' ) {
 
 				if( that.min_run == null ) {
@@ -198,41 +199,16 @@ function elog_create() {
 				var shift = $('#el-p-shift').val();
 				$('#elog-form-post input[name="shift_id"]').val(that.shifts[shift]);
 			}
-			switch( post_selected_relevance()) {
+			if( post_selected_relevance() == 'past' ) {
 
-			case 'now':
-				$('#elog-form-post input[name="relevance_time"]').val('now');
-				break;
-
-			case 'past':
-				/* TODO: Check the syntax of the timestamp using regular expression before submitting
-				 * the request. The server side script will also check its validity/applicability.
+				/* TODO: Check the syntax of the timestamp using regular expression
+				 *       before submitting the request. The server side script will also
+				 *       check its validity (applicability).
 				 */
-				$('#elog-form-post input[name="relevance_time"]').val($('#el-p-datepicker').val()+' '+$('#el-p-time').val());
-				break;
+				var relevance_time = $('#el-p-datepicker').val()+' '+$('#el-p-time').val();
+				$('#elog-form-post input[name="relevance_time"]').val(relevance_time);
 			}
-
-			/* Submit the new message using the JQuery AJAX POST plug-in,
-			 * which also allow uploading files w/o reloading the current page.
-			 *
-			 * NOTE: We aren't refreshing the list of messages because we're relying on
-			 *       the live display.
-			 */
-			$('#elog-form-post').ajaxSubmit({
-				success: function(data) {
-					if( data.Status != 'success' ) {
-						alert('failed because of: '+data.Message);
-						return;
-					}
-					that.post_reset();
-
-					// If the parent provided a call back then tell the parent
-					// that we have a new message.
-					//
-					if( that.post_onsuccess != null ) that.post_onsuccess();
-				},
-				dataType: 'json'
-			});
+			$('#elog-form-post').trigger( 'submit' );
 		});
 
 		$('#elog-post-reset').button().click(function() { that.post_reset(); });
@@ -344,14 +320,8 @@ function elog_create() {
 			}
 		});
 		$('#el-l-refresh').button().click(function() {
-			/*
 			that.live_dim_all_highlights();
 			that.live_message_viewer.refresh(live_selected_runs(), that.live_highlight);
-			*/
-			//that.live_stop_refresh();
-			that.live_message_viewer.reload(live_selected_runs(), that.live_selected_range());
-			//that.live_schedule_refresh();
-			//that.live_start_highlight_timer();
 		});
 		$('#el-l-refresh-interval').change(function(ev) {
 			that.live_stop_refresh();
@@ -1211,7 +1181,6 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 	this.parent = parent_object;
 	this.base = element_base;
 
-	this.last_updated = '';
 	this.expand_collapse = 0;
 	this.days2threads = null;
 	this.current_day = null;
@@ -1288,66 +1257,6 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		var entry = that.threads[idx];
 		var toggler='#'+that.base+'-m-tgl-'+entry.id;
 		var container='#'+that.base+'-m-con-'+entry.id;
-
-		/* Initialize the thread container if this is the first call
-		 * to the function for for the message.
-		 */
-		if( $(container).html() == '' ) {
-			var html =
-'    <div class="el-l-m-body">';
-			if(this.parent.editor)
-				html +=
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+entry.id+',false);">move</button></div>'+
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
-			html +=
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',false);">reply</button></div>'+
-'      <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>'+
-'      <div style="clear:both;"></div>'+
-'      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
-'    </div>';
-			that.attachments[entry.id] = entry.attachments;
-			var attachments_html = '';
-			for(var k in entry.attachments) {
-				that.total_attachments++;
-				var a = entry.attachments[k];
-				that.attachments_loader[a.id] = {loaded: false, descr: a};
-				attachments_html +=
-'      <div style="float:left;" class="el-l-a">'+
-'        <div style="float:left;">'+
-'          <span class="toggler ui-icon ui-icon-triangle-1-e el-l-a-tgl" id="'+this.base+'-a-tgl-'+a.id+'" onclick="'+this.address+'.toggle_attachment('+a.id+');"></span>'+
-'        </div>'+
-'        <div style="float:left;" class="el-l-a-dsc"><a class="link" href="../logbook/attachments/'+a.id+'/'+a.description+'"  target="_blank">'+a.description+'</a></div>'+
-'        <div style="float:left; margin-left:10px;" class="el-l-a-info">( type: <b>'+a.type+'</b> size: <b>'+a.size+'</b> )</div>'+
-'        <div style="clear:both;"></div>'+
-'        <div class="el-l-a-con el-l-a-hdn" id="'+this.base+'-a-con-'+a.id+'">'+
-'        </div>'+
-'      </div>';
-			}
-			if(attachments_html) html +=
-'    <div class="el-l-m-as">'+attachments_html+
-'      <div style="clear:both;"></div>'+
-'    </div>';
-			var tags_html = '';
-			for(var k in entry.tags) {
-				if(tags_html) tags_html += ', ';
-				tags_html += entry.tags[k].tag;
-			}
-			if(tags_html) html +=
-'    <div class="el-l-m-tags">'+
-'      <b><i>keywords: </i></b>'+tags_html+
-'    </div>';
-			html +=
-'    <div id="'+this.base+'-m-c-'+entry.id+'">';
-			for(var k in entry.children) html += that.live_child2html(eval("("+entry.children[k]+")"));
-			html +=
-'    </div>'+
-'  </div>';
-			$(container).html(html);
-
-			$(container).find('.el-l-m-re').button();
-			$(container).find('.el-l-m-ed').button();
-			$(container).find('.el-l-m-mv').button();
-		}
 		if(on) {
 			$(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
 			$(container).removeClass('el-l-m-hdn').addClass('el-l-m-vis');
@@ -1433,13 +1342,9 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			if(entry.loaded) return;
 			$('#'+this.base+'-r-con-'+entry.id).html('Loading...');
 			$.get('../logbook/DisplayRunParams.php',{id:entry.run_id},function(data) {
-				var html =
-'<div style="float:right;" class="s-b-con"><button class="el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');">reply</button></div>'+
-'<div style="clear:both;"></div>'+
-'<div id="'+that.base+'-r-dlgs-'+entry.id+'"></div>'+
-'<div style="width:800px; height:300px; overflow:auto; background-color:#ffffff; ">'+data+'</div>';
-				$('#'+that.base+'-r-con-'+entry.id).html(html);
-				$('#'+that.base+'-r-re-'+entry.id).button();
+				$('#'+that.base+'-r-con-'+entry.id).html(
+					'<div style="width:100%; height:300px; overflow:auto; padding:10px; background-color:#ffffff; ">'+data+'</div>'
+				);
 				entry.loaded = true;
 			});
 		} else {
@@ -1447,6 +1352,22 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			$(container).removeClass('el-l-r-vis').addClass('el-l-r-hdn');
 		}
 	};
+
+	this.expand_run = function(idx) {
+    	var entry=this.threads[idx];
+		var toggler='#'+this.base+'-r-tgl-'+entry.id;
+		var container='#'+this.base+'-r-con-'+entry.id;
+		if( $(container).hasClass('el-l-r-hdn')) {
+			$(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+			$(container).removeClass('el-l-r-hdn').addClass('el-l-r-vis');
+			$('#'+this.base+'-r-con-'+entry.id).html('Loading...');
+			$.get('../logbook/DisplayRunParams.php',{id:entry.run_id},function(data) {
+				var html = '<div style="width:820px; height:300px; overflow:auto; padding:10px; background-color:#ffffff; ">'+data+'</div>';
+				$('#'+that.base+'-r-con-'+entry.id).html(html);
+			});
+		}
+	};
+
 	this.collapse_run = function(idx) {
 	   	var entry=this.threads[idx];
 		var toggler='#'+this.base+'-r-tgl-'+entry.id;
@@ -1466,7 +1387,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 
 	/**
 	 * Check if new messages/rusn are available, and if so - refresh the view.
-	 * Highlight the new content if the 'highlighter' function is passed as
+	 * Highlight the new content if teh 'highlighter' function is passed as
 	 * a parameter.
 	 * 
 	 * @param inject_runs - check for new run events (begin/end run)
@@ -1577,6 +1498,10 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 						}
 					}
 					that.live_update_info();
+
+					$('.el-l-m-re').button();
+					$('.el-l-m-ed').button();
+					$('.el-l-m-mv').button();
 				}
 
 			},'json');
@@ -1641,17 +1566,16 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 
 		that.dim_day();
 
-		$('#'+this.base+'-ms-updated').html('Searching...');
+		$('#'+this.base+'-ms-info').html('Searching...');
 		$.get('../logbook/Search.php',params,function(data) {
 
 			var status = data.ResultSet.Status;
 			if(status!='success') {
-				$('#'+that.base+'-ms-updated').html(data.ResultSet.Message);
+				$('#'+that.base+'-ms-info').html(data.ResultSet.Message);
 				return;
 			}
-			$('#'+this.base+'-ms-updated').html('Rendering...');
+			$('#'+this.base+'-ms-info').html('Rendering...');
 
-			that.last_updated = data.ResultSet.Updated;
 			that.expand_collapse = 0;
 			that.threads = data.ResultSet.Result;
 			that.messages = new Array();
@@ -1692,17 +1616,20 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			if(that.days2threads.length) that.expand_group_day(that.days2threads.length-1, true);
 			that.live_update_info();
 
+			$('.el-l-m-re').button();
+			$('.el-l-m-ed').button();
+			$('.el-l-m-mv').button();
+
 		},'json');
 	};
 
 	this.live_update_info = function() {
 		$('#'+this.base+'-ms-info').html(
-			'<center><b>'+that.total_messages+'</b> messages'+
+			'<center>Found: <b>'+that.total_messages+'</b> messages'+
 			', <b>'+that.total_attachments+'</b> attachments'+
 			(that.min_run ? ', runs: <b>'+that.min_run+'</b> .. <b>'+that.max_run+'</b>' : '')+
 			'</center>'
 		);
-		$('#'+this.base+'-ms-updated').html('[ Last update on: <b>'+that.last_updated+'</b> ]');
 	};
 	this.live_day2html = function(day_idx) {
 		var html = '';
@@ -1735,7 +1662,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		var html =
 '<div id="'+this.base+'-m-rdlg-'+id+'" class="el-l-m-rdlg el-l-m-dlg-hdn">'+
 '  <div style="float:left;">'+
-'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="/apps-dev/logbook/NewFFEntry4portalJSON.php" method="post">'+
+'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="/apps-dev/logbook/NewFFEntry4portal.php" method="post">'+
 '      <input type="hidden" name="id" value="'+this.parent.exp_id+'" />'+
 '      <input type="hidden" name="scope" value="message" />'+
 '      <input type="hidden" name="message_id" value="'+id+'" />'+
@@ -1822,7 +1749,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		$('#'+this.base+'-m-re-'+id).button(state);
 		$('#'+this.base+'-m-ed-'+id).button(state);
 		$('#'+this.base+'-m-mv-'+id).button(state);
-	};
+	}
 
 	this.live_message_reply = function(id, is_child) {
 	    that.create_live_message_dialogs(id, is_child);
@@ -1859,59 +1786,8 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		var urlbase = window.location.href;
 		var idx = urlbase.indexOf( '&' );
 		if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
-
-		// Use JQuery AJAX Form plug-in to post the reply w/o reloading
-		// the current page.
-		
-		//
-		$('#elog-form-post-'+id).ajaxSubmit({
-			success: function(data) {
-				$('#elog-form-post-'+id+' textarea[name="message_text"]').val('');
-				$('#elog-form-post-'+id+' input[name="author_account"]').val(that.parent.author);
-				$('#'+that.base+'-reply-as-'+id).html(
-'<div>'+
-'  <input type="file" name="file2attach_0" onchange="'+that.address+'.live_reply_add_attachment('+id+')" />'+
-'  <input type="hidden" name="file2attach_0" value=""/ >'+
-'</div>'
-				);
-				if( data.Status != 'success' ) {
-					alert('failed because of: '+data.Message);
-					return;
-				}
-				var entry = data.Entry;
-
-				// Find the parent message and add a new child to it.
-				//
-				// TODO: Should we find a way to serialize the JSON object into a string?
-				//       A problem is that the children array updated below is also used
-				//       from other locations of the code. And in those other locations
-				//       elements of the children array are treated as strings, hence they're
-				//       converted into valid JavaScript objects before passing them into
-				//       the live_child2html() function
-				//
-				//       Another possibility would be to use typeof inside the code
-				//       which uses the array of children to see if this is the string
-				//       and retranslate it into JSON automatically, or do it immediatellty
-				//       after loading.
-				//
-				that.messages[id].children.push( data );
-
-				// Then display the new child on the page and make it visible
-				//
-				var html = that.live_child2html(entry);
-				$('#'+that.base+'-m-c-'+id).prepend(html);
-
-				$('.el-l-m-re').button();
-				$('.el-l-m-ed').button();
-				$('.el-l-m-mv').button();
-
-				that.toggle_child(entry.id);
-
-				that.live_message_reply_cancel(id);
-			},
-			dataType: 'json'
-		});
-
+		$('#elog-form-post-'+id+' input[name="onsuccess"]').val(urlbase+'&app=elog');
+		$('#elog-form-post-'+id).trigger( 'submit' );
 	};
 	this.live_message_edit_submit = function(id) {
 		var urlbase = window.location.href;
@@ -1945,124 +1821,67 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		);
 	};
 
-
-	this.live_run_reply_cancel = function(id) {
-		$('#'+this.base+'-r-rdlg-'+id).removeClass('el-l-r-dlg-vis').addClass('el-l-r-dlg-hdn');
-		that.live_enable_run_buttons(id, true);
-	};
-	this.live_run_reply_submit = function(id) {
-		var urlbase = window.location.href;
-		var idx = urlbase.indexOf( '&' );
-		if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
-
-		// Use JQuery AJAX Form plug-in to post the reply w/o reloading
-		// the current page.
-		
-		//
-		$('#elog-form-post-'+id).ajaxSubmit({
-			success: function(data) {
-				$('#elog-form-post-'+id+' textarea[name="message_text"]').val('');
-				$('#elog-form-post-'+id+' input[name="author_account"]').val(that.parent.author);
-				$('#'+that.base+'-reply-as-'+id).html(
-'<div>'+
-'  <input type="file" name="file2attach_0" onchange="'+that.address+'.live_reply_add_attachment('+id+')" />'+
-'  <input type="hidden" name="file2attach_0" value=""/ >'+
-'</div>'
-				);
-				if( data.Status != 'success' ) {
-					alert('failed because of: '+data.Message);
-					return;
-				}
-				that.live_run_reply_cancel(id);
-			},
-			dataType: 'json'
-		});
-
-	};
-	this.create_live_run_dialogs = function(idx) {
-		var entry = this.threads[idx];
-		var id    = entry.id;
-		var dlgs  = $('#'+this.base+'-r-dlgs-'+id);
-		if(dlgs.html() != '') return;
-		var html =
-'<div id="'+this.base+'-r-rdlg-'+id+'" class="el-l-r-rdlg el-l-r-dlg-hdn">'+
-'  <div style="float:left;">'+
-'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="/apps-dev/logbook/NewFFEntry4portalJSON.php" method="post">'+
-'      <input type="hidden" name="id" value="'+this.parent.exp_id+'" />'+
-'      <input type="hidden" name="scope" value="run" />'+
-'      <input type="hidden" name="message_id" value="" />'+
-'      <input type="hidden" name="run_id" value="'+entry.run_id+'" />'+
-'      <input type="hidden" name="shift_id" value="" />'+
-'      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />'+
-'      <input type="hidden" name="num_tags" value="0" />'+
-'      <input type="hidden" name="onsuccess" value="" />'+
-'      <input type="hidden" name="relevance_time" value="" />'+
-'      <div style="font-weight:bold; margin-bottom:4px;">Comment for the run:</div>'+
-'      <textarea name="message_text" rows="12" cols="64" style="padding:4px;" title="the first line of the message body will be used as its subject" ></textarea>'+
-'      <div style="margin-top: 10px;">'+
-'        <div style="float:left;">'+ 
-'          <div style="font-weight:bold;">Author:</div>'+
-'          <input type="text" name="author_account" value="'+this.parent.author+'" size=32 style="padding:2px; margin-top:5px;" />'+
-'        </div>'+
-'        <div style="float:left; margin-left:20px;">'+ 
-'          <div style="font-weight:bold;">Attachments:</div>'+
-'          <div id="'+this.base+'-reply-as-'+id+'" style="margin-top:5px;">'+
-'            <div>'+
-'              <input type="file" name="file2attach_0" onchange="'+this.address+'.live_reply_add_attachment('+id+')" />'+
-'              <input type="hidden" name="file2attach_0" value=""/ >'+
-'            </div>'+
-'          </div>'+
-'        </div>'+
-'        <div style="clear:both;"></div>'+
-'      </div>'+
-'    </form>'+
-'  </div>'+
-'  <div style="float:right;" class="s-b-con"><button id="'+this.base+'-r-re-c-'+id+'" onclick="'+this.address+'.live_run_reply_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right;" class="s-b-con"><button id="'+this.base+'-r-re-s-'+id+'" onclick="'+this.address+'.live_run_reply_submit('+id+');">submit</button></div>'+
-'  <div style="clear:both;"></div>'+
-'</div>';
-
-		dlgs.html(html);
-
-		$('#'+this.base+'-r-re-s-'+id).button();
-		$('#'+this.base+'-r-re-c-'+id).button();
-
-	};
-	this.live_enable_run_buttons = function(id, on) {
-		var state = on ? 'enable' : 'disable';
-		$('#'+this.base+'-r-re-'+id).button(state);
-	};
-	this.live_run_reply = function(idx) {
-	    that.create_live_run_dialogs(idx);
-		var entry = this.threads[idx];
-		var id    = entry.id;
-		$('#'+this.base+'-r-rdlg-'+id).removeClass('el-l-r-dlg-hdn').addClass('el-l-r-dlg-vis');
-		that.live_enable_run_buttons(id, false);
-		$('#'+this.base+'-r-rdlg-'+id+' textarea').focus();
-	};
-
 	this.live_thread2html = function(thread_idx) {
 		var html = '';
 		var entry = that.threads[thread_idx];
 		if(!entry.is_run) {
 			that.messages[entry.id] = entry;
 			that.total_messages++;
-			var run_info = ''; //entry.run_num ? '<b>run '+entry.run_num+'</b> ' : '';
 			html +=
 '  <div class="el-l-m-hdr" id="'+this.base+'-m-hdr-'+thread_idx+'" onclick="'+this.address+'.toggle_message('+thread_idx+');">'+
 '    <div style="float:left;"><span class="toggler ui-icon ui-icon-triangle-1-e el-l-m-tgl" id="'+this.base+'-m-tgl-'+entry.id+'"></span></div>'+
 '    <div style="float:left;" class="el-l-m-time">'+entry.hms+'</div>'+
 '    <div style="float:left;" class="el-l-m-author">'+entry.author+'</div>'+
-'    <div style="float:left; margin-left:10px;" class="el-l-m-subj">'+run_info+entry.subject+'</div>'+run_sign(entry.run_num)+message_signs(entry)+
+'    <div style="float:left; margin-left:10px;" class="el-l-m-subj">'+entry.subject+'</div>'+message_signs(entry)+
 '    <div style="clear:both;"></div>'+
 '  </div>'+
-'  <div class="el-l-m-con el-l-m-hdn" id="'+this.base+'-m-con-'+entry.id+'"></div>';
-
-			// The message contents container will be dynamically initialized at its
-			// first use (call to the toggle_message() function.
-			//
-			;
-
+'  <div class="el-l-m-con el-l-m-hdn" id="'+this.base+'-m-con-'+entry.id+'">'+
+'    <div class="el-l-m-body">';
+			if(this.parent.editor)
+				html +=
+'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+entry.id+',false);">move</button></div>'+
+'      <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
+			html +=
+'      <div style="float:right;" class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',false);">reply</button></div>'+
+'      <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>'+
+'      <div style="clear:both;"></div>'+
+'      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
+'    </div>';
+			that.attachments[entry.id] = entry.attachments;
+			var attachments_html = '';
+			for(var k in entry.attachments) {
+				that.total_attachments++;
+				var a = entry.attachments[k];
+				that.attachments_loader[a.id] = {loaded: false, descr: a};
+				attachments_html +=
+'      <div style="float:left;" class="el-l-a">'+
+'        <div style="float:left;">'+
+'          <span class="toggler ui-icon ui-icon-triangle-1-e el-l-a-tgl" id="'+this.base+'-a-tgl-'+a.id+'" onclick="'+this.address+'.toggle_attachment('+a.id+');"></span>'+
+'        </div>'+
+'        <div style="float:left;" class="el-l-a-dsc"><a class="link" href="../logbook/attachments/'+a.id+'/'+a.description+'"  target="_blank">'+a.description+'</a></div>'+
+'        <div style="float:left; margin-left:10px;" class="el-l-a-info">( type: <b>'+a.type+'</b> size: <b>'+a.size+'</b> )</div>'+
+'        <div style="clear:both;"></div>'+
+'        <div class="el-l-a-con el-l-a-hdn" id="'+this.base+'-a-con-'+a.id+'">'+
+'        </div>'+
+'      </div>';
+//'          <a href="../logbook/attachments/'+a.id+'/'+a.description+'" target="_blank"><img src="../logbook/attachments/preview/'+a.id+'" /></a>'+
+			}
+			if(attachments_html) html +=
+'    <div class="el-l-m-as">'+attachments_html+
+'      <div style="clear:both;"></div>'+
+'    </div>';
+			var tags_html = '';
+			for(var k in entry.tags) {
+				if(tags_html) tags_html += ', ';
+				tags_html += entry.tags[k].tag;
+			}
+			if(tags_html) html +=
+'    <div class="el-l-m-tags">'+
+'      <b><i>keywords: </i></b>'+tags_html+
+'    </div>';
+			for(var k in entry.children) html += that.live_child2html(eval("("+entry.children[k]+")"));
+			html +=
+'  </div>';
 		} else {
         	that.runs.push(thread_idx);
 			if((that.min_run == 0) || (entry.run_num < that.min_run)) that.min_run = entry.run_num;
@@ -2076,11 +1895,6 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '    <div style="clear:both;"></div>'+
 '  </div>'+
 '  <div class="el-l-r-con el-l-r-hdn" id="'+this.base+'-r-con-'+entry.id+'"></div>';
-
-			// The run contents container will be dynamically initialized at its
-			// first use (call to the toggle_run() function.
-			//
-			;
 		}
 		return html;
 	};
@@ -2129,14 +1943,11 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '  <div class="el-l-m-as">'+attachments_html+
 '    <div style="clear:both;"></div>'+
 '  </div>';
-		html +=
-'  <div id="'+this.base+'-m-c-'+entry.id+'">';
 
 		var children = entry.children;
 		for(var i in children) html += that.live_child2html(eval("("+children[i]+")"));
 
 		html +=
-'  </div>'+
 '</div>';
 		return html;
 	};
@@ -2148,14 +1959,6 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		if(entry.children.length) html +=  '&nbsp;<sup><b>&crarr;</b></sup>';
 		html += '</div>';
 		return html;
-	}
-
-	function run_sign(num) {
-		if( num ) {
-			var html = '<div style="float:right; margin-right:10px;"><sup><b>run: '+num+'</b></sup></div>';
-			return html;
-		}
-		return '';
 	}
 
 	/* ATTENTION: Watch for dependencies! These functiona will call a function from

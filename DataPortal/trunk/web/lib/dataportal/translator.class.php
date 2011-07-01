@@ -88,6 +88,13 @@ class Translator {
 	        	$actions = '<button class="translate not4print" value="'.$run_logbook->num().'">Translate</button>';
     	    	$ready4translation = true;
         	}
+        	/*
+	        if( $xtc_files_found && $hdf5_files_found &&
+    	        !in_array( $status, array('TRANSLATING', 'QUEUED' ))) {
+	        	$actions = '<button class="translate not4print" value="'.$run_logbook->num().'">Retranslate</button>';
+    	    	$ready4translation = true;
+        	}
+        	*/
 
 	        /* Make sure disk-resident replicas for all XTC files are available (as reported
     	     * by IRODS) before allowing translation. This step relies on optional "open file"
@@ -125,16 +132,14 @@ class Translator {
 
 	        /* Note that the translation completion status for those runs for which
 	         * we do not have any data from the translation service is pre-determined
-	         * by a presence of HDF5 fiules. Moreover, of those files are present then
+	         * by a presence of HDF5 files. Moreover, of those files are present then
 	         * we _always_ assume that the translation succeeded regardeless of what
 	         * the translation service says (we're still going to show that info if available).
 	         * In case of a possible conflict when HDF5 are present but the translation service
 	         * record (if present) says something else, we just do not all any actions
 	         * on that file.
 	         */
-	        if( $hdf5_files_found && !is_null( $run_icws )) {
-    	       	$actions = '';
-	           	$ready4translation = false;
+	        if( $hdf5_files_found && !is_null( $run_icws ) && ( $status == 'FAILED' )) {
     	       	$status = 'FINISHED';
         	}
 	        if( !$hdf5_files_found && ( $status == 'FINISHED' )) {

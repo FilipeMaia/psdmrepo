@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2011-06-30 Igor Gaponenko
+- added statistics.php to report data management statistics accross all experiments
+- the improved version of Web Portal; numerious improvements and bug fixes
+
 Tag: V00-00-05
 2011-06-14 Igor Gaponenko
 - added a tab for 'Active' experiments into Experiment Switch

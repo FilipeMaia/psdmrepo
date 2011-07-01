@@ -119,7 +119,7 @@ function show_email( user, addr ) {
 
 
 <?php
-    DataPortal::body( "Data Portal: Select Experiment" );
+    DataPortal::body( "Web Portal: Select Experiment" );
 ?>
 
 

@@ -63,11 +63,12 @@
 }
 
 .el-wa {
-  padding: 20px 20px 10px 20px;
+  padding: 10px 20px 10px 20px;
   border-top: solid 1px #c0c0c0;
 }
 .el-ms-mctrl {
-  margin-bottom: 10px;
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 .el-ms-info {
   margin-bottom:10px;
@@ -96,6 +97,11 @@
 .el-l-m-time {
   margin-left:10px;
   width: 60px;
+}
+
+.el-r-m-time {
+  margin-left:10px;
+  width: 140px;
 }
 
 .el-l-c-time {
@@ -193,8 +199,7 @@ div.el-l-c-hdr:hover {
   background-color:#d0d0d0;
 }
 
-.el-l-r-hdr,
-.el-r-hdr {
+.el-l-r-hdr {
   margin-bottom:1px;
   padding:3px;
   background-color:#DEF0CD;
@@ -213,9 +218,31 @@ div.el-l-c-hdr:hover {
   cursor:pointer;
 }
 
-div.el-l-r-hdr:hover,
-div.el-r-hdr:hover {
+div.el-l-r-hdr:hover {
   background-color:#B9DD97;
+}
+
+.el-r-hdr {
+  margin-bottom:1px;
+  padding:3px;
+  background-color:#E6E680;
+
+  border:1px solid #CFCF73;
+  border-bottom:1px solid #080808;
+
+  border-radius:5px;
+  border-bottom-left-radius:0px;
+  border-bottom-right-radius:0px;
+
+  -moz-border-radius: 5px;
+  -moz-border-radius-bottomleft: 0;
+  -moz-border-radius-bottomright: 0;
+
+  cursor:pointer;
+}
+
+div.el-r-hdr:hover {
+  background-color:#CFCF73;
 }
 
 .el-sh-hdr {
@@ -263,6 +290,7 @@ div.el-sh-hdr:hover {
 .el-l-r-con,
 .el-r-con {
   padding:20px;
+  padding-top:15px;
 
   border:1px solid #B9DD97;
   border-top:0px;
@@ -325,6 +353,7 @@ div.el-sh-hdr:hover {
 }
 
 .el-l-m-rdlg,
+.el-l-r-rdlg,
 .el-l-m-edlg,
 .el-l-m-mdlg {
   margin-top: 10px;
@@ -349,6 +378,7 @@ div.el-sh-hdr:hover {
 .el-l-a-hdn,
 .el-l-ctx-hdn,
 .el-l-m-dlg-hdn,
+.el-l-r-dlg-hdn,
 .el-r-hdn,
 .el-sh-hdn,
 .el-sh-new-hdn {
@@ -361,6 +391,7 @@ div.el-sh-hdr:hover {
 .el-l-r-vis,
 .el-l-a-vis,
 .el-l-m-dlg-vis,
+.el-l-r-dlg-vis,
 .el-r-vis,
 .el-sh-vis,
 .el-sh-new-vis {
@@ -422,7 +453,7 @@ div.el-sh-hdr:hover {
 
 .el-r-num {
   margin-left:20px;
-  width: 70px;
+  width: 50px;
   font-weight:bold;
 }
 
@@ -439,7 +470,7 @@ div.el-sh-hdr:hover {
 }
 
 .el-r-bar {
-  background-color: green;
+  background-color: #5C5C33;
 }
 
 

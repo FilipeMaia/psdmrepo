@@ -267,16 +267,13 @@ HERE;
   <div style="clear:both;"></div>
 </div>
 <div class="el-wa">
-  <div class="el-ms-info" id="el-l-ms-info" style="float:left;">&nbsp;</div>
-  <div class="el-ms-info" id="el-l-ms-updated" style="float:right;">&nbsp;</div>
-  <div style="clear:both;"></div>
   <div class="el-ms-mctrl">
     <button id="el-l-expand"     title="click a few times to expand the whole tree">Expand++</button>
     <button id="el-l-collapse"   title="each click will collapse the tree to the previous level of detail">Collapse--</button>
     <button id="el-l-viewattach" title="view attachments of expanded messages">View Attachments</button>
     <button id="el-l-hideattach" title="hide attachments of expanded messages">Hide Attachments</button>
-    <button id="el-l-reverse"    title="show days and messages within each day in reverse order">Show in Reverse Order</button>
   </div>  
+  <div class="el-ms-info" id="el-l-ms-info" style="float:right;"></div><div style="clear:both;"></div>
   <div class="el-ms" id="el-l-ms"></div>
 </div>
 
@@ -329,7 +326,7 @@ HERE;
           <div style="clear:both;"></div>
         </div>
       </div>
-      <form id="elog-form-post" enctype="multipart/form-data" action="../logbook/NewFFEntry4portalJSON.php" method="post">
+      <form id="elog-form-post" enctype="multipart/form-data" action="/apps-dev/logbook/NewFFEntry4portal.php" method="post">
         <input type="hidden" name="id" value="{$experiment->id()}" />
         <input type="hidden" name="scope" value="" />
         <input type="hidden" name="run_id" value="" />
@@ -338,8 +335,7 @@ HERE;
         <input type="hidden" name="num_tags" value="{$num_tags}" />
         <input type="hidden" name="onsuccess" value="" />
         <input type="hidden" name="relevance_time" value="" />
-        <textarea name="message_text" rows="12" cols="64" style="padding:4px; margin-top:5px;"
-                  title="TIPS:\nThe first line of the message body will be used as its subject.\nUse 'run NNN' to post for the run"></textarea>
+        <textarea name="message_text" rows="12" cols="64" style="padding:4px; margin-top:5px;" title="the first line of the message body will be used as its subject" ></textarea>
         <div style="margin-top: 10px;">
           <div style="float:left;">
             <div style="font-weight:bold;">Author:</div>
@@ -468,16 +464,13 @@ Make sure the Begin and End time limits are not used!"/>
   <div style="clear:both;"></div>
 </div>
 <div class="el-wa">
-  <div class="el-ms-info" id="el-s-ms-info" style="float:left;">&nbsp;</div>
-  <div class="el-ms-info" id="el-s-ms-updated" style="float:right;">&nbsp;</div>
-  <div style="clear:both;"></div>
   <div class="el-ms-mctrl">
     <button id="el-s-expand"     title="click a few times to expand the whole tree">Expand++</button>
     <button id="el-s-collapse"   title="each click will collapse the tree to the previous level of detail">Collapse--</button>
     <button id="el-s-viewattach" title="view attachments of expanded messages">View Attachments</button>
     <button id="el-s-hideattach" title="hide attachments of expanded messages">Hide Attachments</button>
-    <button id="el-s-reverse"    title="show days and messages within each day in reverse order">Show in Reverse Order</button>
   </div>  
+  <div class="el-ms-info" id="el-s-ms-info" style="float:right;"></div><div style="clear:both;"></div>
   <div class="el-ms" id="el-s-ms"></div>
 </div>
 HERE;
@@ -841,6 +834,14 @@ HERE;
         <td><input type="checkbox" name="archived" /></td><td>Archived</td>
         <td><input type="checkbox" name="local" /></td><td>On disk</td>
         <td><input type="checkbox" name="checksum" /></td><td>Checksum</td>
+      </tr><tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><input type="checkbox" name="archived_path" /></td><td>HPSS</td>
+        <td><input type="checkbox" name="local_path" /></td><td>iRODS</td>
+        <td></td>
       </tr>
     </tbody></table>
   </div>
@@ -933,9 +934,8 @@ HERE;
 
 <script type="text/javascript" src="/jquery/js/jquery-1.5.1.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui-1.8.7.custom.min.js"></script>
-<script type="text/javascript" src="js/jquery.form.js"></script> 
 <script type="text/javascript" src="js/Utilities.js"></script>
-<script type="text/javascript" src="js/ELog2.js"></script>
+<script type="text/javascript" src="js/ELog4test1_2.js"></script>
 <script type="text/javascript" src="js/Exper4test1_2.js"></script>
 <script type="text/javascript" src="js/Data4test1_2.js"></script>
 <script type="text/javascript" src="js/Hdf4test1_2.js"></script>
@@ -1349,27 +1349,6 @@ elog.max_run = <?=(is_null($max_run)?'null':$max_run->num())?>;
 ?>
 elog.editor = <?=(LogBookAuth::instance()->canEditMessages( $experiment->id())?'true':'false')?>;
 
-// Calback function for e-log to be used after successfully posting
-// a new message.
-//
-// TODO: Consider a more general mechanism allowing applications to invoke
-//       callbacks in a context of this thread. That would probably require
-//       the current thread to be re-implemented as an object, which would
-//       open a possibility to pass that objkect's 'this' into applications
-//       as 'parent' (a provider of sertain services).
-//
-elog.post_onsuccess = function() {
-	for(var id in applications) {
-		var a = applications[id];
-		if(a.name == 'elog') {
-			$('#p-menu').children('#'+id).each(function() {	m_item_selected(this); });
-			v_item_selected($('#v-menu > #elog > .v-item#recent'));
-			a.select('recent');
-			break;
-		}
-	}
-};
-
 exper.posix_group = '<?=$experiment->POSIX_gid()?>';
 
 datafiles.exp_id = '<?=$exper_id?>';
@@ -1714,7 +1693,7 @@ function p_appl_help() {
     <div style="clear:both;"></div>
   </div>
   <div id="p-menu">
-    <div class="m-item m-item-first m-select" id="p-appl-experiment">Experiment</div>
+    <div class="m-item m-item-first m-select" id="p-appl-experiment">Experment</div>
     <div class="m-item m-item-next" id="p-appl-elog">e-Log</div>
     <div class="m-item m-item-next" id="p-appl-datafiles">File Manager</div>
     <div class="m-item m-item-next" id="p-appl-hdf">HDF5 Translation</div>
