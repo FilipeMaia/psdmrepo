@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-20
+2011-07-01 Igor Gaponenko
+- added the MySQL-based logging service. The initial implementation
+will only report LDAP group management operations. This will be extended
+to cover any operations with AuthDB. 
+
 Tag: V00-00-19
 2011-06-30 Igor Gaponenko
 - added a new method AuthDB::authRemoteAddr() to report the remote address of a caller

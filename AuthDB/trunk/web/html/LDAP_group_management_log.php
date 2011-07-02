@@ -4,6 +4,7 @@ require_once( 'regdb/regdb.inc.php' );
 
 use AuthDB\AuthDB;
 use AuthDB\AuthDBException;
+use AuthDB\Logger;
 
 use RegDB\RegDB;
 use RegDB\RegDBException;
@@ -42,27 +43,22 @@ HERE
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
 <?php
 
-	$fh = fopen( REGDB_DEFAULT_LDAP_LOG, 'r' ) or
-		die (
-<<<HERE
-<br><br>
-<center>
-  <span style="color: red; font-size: 150%; font-weight: bold; font-family: Times, sans-serif;">
-    T e m p o r a r i l y &nbsp; N o t &nbsp; A v a i l a b l e
-  </span>
-</center>
-<div style="margin: 10px 10% 10px 10%; padding: 10px; font-size: 125%; font-family: Times, sans-serif; border-top: 1px solid #b0b0b0;">
-  We're sorry! No reports are available at this time. Please come back later. If you think this service
-  is not functioning then please contact us by sending an e-mail request to <b>pcds-help</b> (at SLAC).
-</div>
-HERE
-		);
+	$logger = Logger::instance();
+	$logger->begin();
+	$entries = $logger->get_group_management();
 
 	if( $as_text ) {
 
 		print "<pre>\n";
 		$line = '';
-		while( $line = fgets( $fh )) print $line;
+		foreach( $entries as $entry ) {
+			print
+				$entry['event_time']->toStringShort()."  ".
+				$entry['requestor']."@".$entry['requestor_host']."  ".
+				$entry['class'].": ".$entry['operation']." '".
+				$entry['user_account']."' ".$entry['group_type']." '".$entry['group_name']."'".
+				"\n";
+		}
 		print "</pre>\n";
 
 	} else {
@@ -111,7 +107,7 @@ td.table_cell_within_group {
   <h2>About</h2>
   <div style="padding-left:20px;">
     <p>The information found on this page represents a report for recorded
-       group management operations performed on POSIX groups in the PCDS LDAP
+       group management operations performed on user groups (POSIX or NETGROUPS) in the PCDS LDAP
        server. Note that a scope of the report is limited to operations
        requested via PCDS Web tools.</p>
     <p>The report can be also downloaded in the plain text format from <a href="?as_text" target="_blank">here</a>.</p>
@@ -130,34 +126,32 @@ td.table_cell_within_group {
         <td class="table_hdr">Class</td>
         <td class="table_hdr">Operation</td>
         <td class="table_hdr">Account</td>
-        <td class="table_hdr">POSIX Group</td>
+        <td class="table_hdr">Group Type</td>
+        <td class="table_hdr">Group Name</td>
       </tr>
 HERE;
 
-	$line = '';
-	while( $line = fgets( $fh )) {
-
-		$common            = explode( '  ', $line );
-		$time              = $common[0];
-		$requestor         = explode( '@', $common[1] );
-		$requestor_account = $requestor[0];
-		$requestor_host    = $requestor[1];
-		$specific          = explode( ' ', $common[2] );		
-		$class             = $specific[0];
-		$operation         = $specific[1];
-		$user              = substr( $specific[2], 1, -1 );
-		$direction         = $specific[3];
-		$group             = substr( $specific[4], 1, -2 );
+	foreach( $entries as $entry ) {
+	
+		$time           = $entry['event_time']->toStringShort();
+		$requestor      = $entry['requestor'];
+		$requestor_host = $entry['requestor_host'];
+		$class          = $entry['class'];
+		$operation      = $entry['operation'];
+		$user           = $entry['user_account'];
+		$group          = $entry['group_name'];
+		$group_type     = $entry['group_type'];
 
 		print <<<HERE
       <tr>
         <td class="table_cell table_cell_left">{$time}</td>
-	    <td class="table_cell"><a href="../authdb/?action=view_account&uid={$requestor_account}">{$requestor_account}</a></td>
+	    <td class="table_cell"><a href="../authdb/?action=view_account&uid={$requestor}">{$requestor}</a></td>
         <td class="table_cell">{$requestor_host}</td>
         <td class="table_cell">{$class}</td>
         <td class="table_cell">{$operation}</td>
         <td class="table_cell"><a href="../authdb/?action=view_account&uid={$user}">{$user}</a></td>
-	    <td class="table_cell table_cell_right"><a href="../authdb/?action=view_group&gid={$group}">{$group}</a></td>
+        <td class="table_cell">{$group_type}</td>
+        <td class="table_cell table_cell_right"><a href="../authdb/?action=view_group&gid={$group}">{$group}</a></td>
       </tr>
 HERE;
 	}
@@ -167,7 +161,6 @@ HERE;
 </div>
 HERE;
 	}
-	fclose( $fh );
 	$authdb->commit();
 	
 } catch( AuthDBException  $e ) { print $e->toHtml(); }
