@@ -8,6 +8,8 @@ require_once( 'authdb/authdb.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );
 
 use AuthDB\AuthDB;
+use AuthDB\Logger;
+
 use LusiTime\LusiTime;
 
 /**
@@ -24,7 +26,6 @@ class RegDBConnection {
     private $ldap_host;
     private $ldap_user;
     private $ldap_passwd;
-    private $ldap_log;
 
     /* Current state of the object
      */
@@ -50,8 +51,7 @@ class RegDBConnection {
         $database,
         $ldap_host,
         $ldap_user,
-        $ldap_passwd,
-        $ldap_log ) {
+        $ldap_passwd ) {
 
     	$this->host     = $host;
         $this->user     = $user;
@@ -61,7 +61,6 @@ class RegDBConnection {
         $this->ldap_host   = $ldap_host;
         $this->ldap_user   = $ldap_user;
         $this->ldap_passwd = $ldap_passwd;
-        $this->ldap_log    = $ldap_log;
     }
 
     /**
@@ -595,7 +594,7 @@ class RegDBConnection {
     }
 
     public function remove_user_from_posix_group ( $user_name, $group_name ) {
-		$this->posix_group_op( 'del', $user_name, $group_name );
+		$this->posix_group_op( 'delete', $user_name, $group_name );
     }
     private function protected_connect2ldap () {
 
@@ -624,7 +623,7 @@ class RegDBConnection {
     }
     private function posix_group_op ( $opname, $user_name, $group_name ) {
 
-        if(( $opname != 'add' ) && ( $opname != 'del' ))
+        if(( $opname != 'add' ) && ( $opname != 'delete' ))
             throw new RegDBException (
                 __METHOD__,
                "internal error: unknown operation name: ".$opname );
@@ -642,11 +641,11 @@ class RegDBConnection {
                "group name can't be empty" );
 
         $memberuid['memberUid'] = $trim_user_name;
-        $op = 'ldap_mod_'.$opname;
+        $op = 'ldap_mod_'.substr ( $opname, 0, 3 );
 
         $ldap_ds = $this->protected_connect2ldap();
-        if(      $opname == 'add' ) $sr = $op( $ldap_ds, "cn={$trim_group_name},ou=Group,dc=reg,o=slac", $memberuid );
-        else if( $opname == 'del' ) $sr = $op( $ldap_ds, "cn={$trim_group_name},ou=Group,dc=reg,o=slac", $memberuid );
+        if(      $opname == 'add'    ) $sr = $op( $ldap_ds, "cn={$trim_group_name},ou=Group,dc=reg,o=slac", $memberuid );
+        else if( $opname == 'delete' ) $sr = $op( $ldap_ds, "cn={$trim_group_name},ou=Group,dc=reg,o=slac", $memberuid );
         else {
             ldap_close( $ldap_ds );
             throw new RegDBException (
@@ -662,25 +661,12 @@ class RegDBConnection {
         }
         ldap_close( $ldap_ds );
         
-        /* Report the operation into a log file (if the one was provided
-         * to this object)
-         *
-         * TODO: Refactor this code into a separate logger class. That would
-         *       allow logging records both into a database and a file.
-         *       Consider reporting a problem to open the file into 
+        /* Report the operation to the logging facility
          */
-        if( !is_null( $this->ldap_log )) {
-        	$fh = fopen( $this->ldap_log, 'a' );
-        	if( !$fh ) return;
-        	$requestor_name = AuthDB::instance()->authName();
-        	$requestor_address = AuthDB::instance()->authRemoteAddr();
-        	$requested_operation = 'unknown';
-        	if(      $opname == 'add' ) $requested_operation = "add '{$trim_user_name}' to '{$trim_group_name}'";
-        	else if( $opname == 'del' ) $requested_operation = "delete '{$trim_user_name}' from '{$trim_group_name}'";
-        	$record = LusiTime::now()->toStringShort()."  {$requestor_name}@{$requestor_address}  group_management: {$requested_operation}\n";
-        	fwrite( $fh, $record );
-        	fclose( $fh );
-        }
+        $logger = Logger::instance();
+        $logger->begin();
+        $logger->group_management( $opname, $user_name, $group_name );
+        $logger->commit();
     }
 }
 
@@ -698,8 +684,7 @@ $conn = new RegDBConnection (
     REGDB_DEFAULT_DATABASE,
     REGDB_DEFAULT_LDAP_HOST,
     REGDB_DEFAULT_LDAP_USER,
-    REGDB_DEFAULT_LDAP_PASSWD,
-    REGDB_DEFAULT_LDAP_LOG );
+    REGDB_DEFAULT_LDAP_PASSWD );
 
 try {
 	print "<br>";
