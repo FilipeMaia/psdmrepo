@@ -198,8 +198,7 @@ void CSPadTest::event(Event& evt, Env& env)
 	//iterateOverData(data2d);
 	//delete [] data2d;
 
-
-        CSPadImage::Image2D<uint16_t>* quad_image = new CSPadImage::Image2D<uint16_t>(data,m_Nrows,m_Ncols);
+        Image2D<uint16_t>* quad_image = new Image2D<uint16_t>(data,m_Nrows,m_Ncols);
         quad_image -> printImage();
 
     }

@@ -53,6 +53,7 @@ Image2D<T>::Image2D (const T* data, size_t nrows, size_t ncols) :
 
 }
 
+//----------------
  
 template <typename T>
 inline
@@ -61,6 +62,7 @@ void Image2D<T>::getValue (int row, int col, T &v)
   v = m_data[row*m_ncols + col];
 }
 
+//----------------
 
 template <typename T>
 inline
@@ -69,6 +71,7 @@ T Image2D<T>::getValue (int row, int col)
   return m_data[row*m_ncols + col];
 }
 
+//----------------
 
 template <typename T>
 void Image2D<T>::printImage ()
@@ -76,9 +79,8 @@ void Image2D<T>::printImage ()
 	for (size_t row = 0; row < m_nrows; row+=20) {
 	  for (size_t col = 0; col < m_ncols; col+=20) {
 
-	    //cout << m_data[row*m_ncols + col] << "  ";
 	    cout << this->getValue(row,col) << "  ";
-
+	    //cout << m_data[row*m_ncols + col] << "  ";
 	  }
 	    cout << endl;
 	}
@@ -93,7 +95,7 @@ void Image2D<T>::printImage ()
 template <typename T>
 Image2D<T>::~Image2D ()
 {
-  //delete [] m_data; 
+  delete [] m_data; 
 }
 
 
