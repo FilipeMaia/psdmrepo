@@ -99,9 +99,10 @@ class  pyana_cspad ( object ) :
         if plot_vrange is not None and plot_vrange is not "" : 
             self.plot_vmin = float(plot_vrange.strip("()").split(":")[0])
             self.plot_vmax = float(plot_vrange.strip("()").split(":")[1])
-            print "Using plot_vrange = %f,%f"%(self.plot_vmin,self.plot_vmax)
+            print "Using plot_vrange = %.2f,%.2f"%(self.plot_vmin,self.plot_vmax)
 
         self.plotter = Plotter()
+        self.plotter.settings(7,7)
         #if self.plot_every_n > 0 : self.plotter.display_mode = 1 # interactive 
 
         threshold_string = opt.getOptStrings(threshold)
@@ -127,9 +128,11 @@ class  pyana_cspad ( object ) :
             
 
         # Set up the plotter's frame by hand, since
-        # we need to also tell it about thresholds
+        # we need to also tell it about thresholds, and vlimits
         self.plotter.add_frame(self.img_source)
         self.plotter.frame[self.img_source].threshold = self.threshold
+        self.plotter.frame[self.img_source].vmin = self.plot_vmin
+        self.plotter.frame[self.img_source].vmax = self.plot_vmax
 
         # ----
         # initializations of other class variables
@@ -160,7 +163,7 @@ class  pyana_cspad ( object ) :
     # this method is called at an xtc Configure transition
     def beginjob ( self, evt, env ) : 
 
-        config = env.getConfig(xtc.TypeId.Type.Id_CspadConfig, self.img_source )
+        config = env.getConfig(xtc.TypeId.Type.Id_CspadConfig, self.img_source)
         if not config:
             print '*** cspad config object is missing ***'
             return
@@ -262,10 +265,15 @@ class  pyana_cspad ( object ) :
 
             
             dims = np.shape(roi)
+
             maxbin = roi.argmax()
             maxvalue = roi.ravel()[maxbin] 
             maxbin_coord = np.unravel_index(maxbin,dims)
             #print "CsPad: Max value of ROI %s is %d, in bin %d == %s"%(dims,maxvalue,maxbin,maxbin_coord)
+
+            #minbin = roi.argmin()
+            #minvalue = roi.ravel()[minbin] 
+            #minbin_coord = np.unravel_index(minbin,dims)
             
 
             print "pyana_cspad: shot#%d "%self.n_shots ,
@@ -324,8 +332,13 @@ class  pyana_cspad ( object ) :
 
             ## Just one plot
             # newmode = self.plotter.draw_figure(cspad_image,title, fignum=self.mpl_num, showProj=True)
+
+            for title,image in event_display_images: 
+                self.plotter.add_frame(title)
+                self.plotter.frame[title].threshold = self.threshold
+                self.plotter.frame[title].vmin = self.plot_vmin
+                self.plotter.frame[title].vmax = self.plot_vmax
                 
-            self.plotter.settings(6,6)
             newmode = self.plotter.draw_figurelist(self.mpl_num,
                                                    event_display_images,
                                                    title=title,
@@ -419,8 +432,12 @@ class  pyana_cspad ( object ) :
                 np.save(filename2, rejected_image)
 
 
+        for title,image in event_display_images: 
+            self.plotter.add_frame(title)
+            self.plotter.frame[title].threshold = self.threshold
+            self.plotter.frame[title].vmin = self.plot_vmin
+            self.plotter.frame[title].vmax = self.plot_vmax
 
-        self.plotter.settings(7,7)
         self.plotter.draw_figurelist(self.mpl_num+1,
                                      event_display_images,
                                      title=title,

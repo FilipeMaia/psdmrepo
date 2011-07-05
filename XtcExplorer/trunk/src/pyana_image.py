@@ -244,7 +244,6 @@ class  pyana_image ( object ) :
             frame = None
             if addr.find("Princeton")>0 :
                 frame = evt.getPrincetonValue(addr, env)
-                print addr, frame
             elif addr.find("pnCCD")>0 :
                 frame = evt.getPnCcdValue(addr, env)
             else :
@@ -254,8 +253,13 @@ class  pyana_image ( object ) :
                 print "No frame from ", addr, " in shot#", self.n_shots
                 continue
 
+            image = frame.data()
+
             # image is a numpy array (pixels)
-            image = np.float_(frame.data())
+            if addr.find("Fccd")>0:
+                # convert to 16-bit integer
+                image.dtype = np.uint16
+                
 
             # check that it has dimensions as expected from a camera image
             dim = np.shape( image )

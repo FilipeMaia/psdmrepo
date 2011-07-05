@@ -814,6 +814,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # --- --- --- TM6740 --- --- ---
         if ( str(box.text()).find("TM6740")>=0 
              or str(box.text()).find("Opal1000")>=0 
+             or str(box.text()).find("Fccd")>=0 
              or str(box.text()).find("Princeton")>=0
              or str(box.text()).find("pnCCD")>=0 ) :
             try :

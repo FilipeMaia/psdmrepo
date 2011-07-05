@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Jul-05 ofte                   rev 2086
+        - added fccd. 
+
 2011-Jun-23 ofte                   rev 2032
         - fixed a bug introduced in previous commit
 	
