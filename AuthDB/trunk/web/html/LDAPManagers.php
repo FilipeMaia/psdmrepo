@@ -44,6 +44,15 @@ try {
 			array_push( $instrument_names, $name  );
 		}
 	}
+	$all_instrument_names_subpattern = '';
+	foreach( $logbook->regdb()->instrument_names() as $name ) {
+		$instrument = $logbook->regdb()->find_instrument_by_name($name);
+		if( $instrument->is_location()) continue;
+		if( $all_instrument_names_subpattern != '') $all_instrument_names_subpattern .= '|';
+		$all_instrument_names_subpattern .= strtolower( $name );
+	}
+	
+	$all_accounts = $logbook->regdb()->user_accounts();
 
 	$extra_operations = <<<HERE
   <h2>Extra Operations</h2>
@@ -143,7 +152,8 @@ td.table_cell_within_group {
 		'<td class="table_hdr">Id</td>'.
 		'<td class="table_hdr">Experiment</td>'.
 		'<td class="table_hdr">Group</td>'.
-		'<td class="table_hdr">PI</td>'.
+		'<td class="table_hdr">PI (regdb)</td>'.
+		'<td class="table_hdr">PI (matched)</td>'.
 		'<td class="table_hdr">LDAP Role</td>'.
 		'<td class="table_hdr">Is Authorized</td>'.
 		'<td class="table_hdr">Current authorizations</td>'.
@@ -167,35 +177,66 @@ td.table_cell_within_group {
 			// asssume the second one as the real account.
 			// 
 			$real_pi_uid = $experiment->leader_account();
+			$alledged_pi_uids_found = array();
 			if( $real_pi_uid == $experiment->name()) {
 				$account = $logbook->regdb()->find_user_account( $real_pi_uid );
-				$accounts = $logbook->regdb()->find_user_accounts( $account['gecos'], array('uis' => False, 'gecos' => True ));
 
-				// Eliminate all accounts matching the names of experiment. We'll succeed only
-				// if we'll end up with one and only one account.
+				// Extract first and last names
 				//
-				$nonshared_accounts = array();
-				foreach( $accounts as $account )
-					if( !array_key_exists( $account['uid'], $experiments_by_names ))
-						array_push( $nonshared_accounts, $account );
+				if( preg_match('/^([^\s]+)\s+([^\s]+)$/',          $account['gecos'], $result) ||
+				    preg_match('/^([^\s]+)\s+[^\s]*\s+([^\s]+)$/', $account['gecos'], $result)) {
 
-				if( count( $nonshared_accounts ) == 1 )
-					foreach( $nonshared_accounts as $account )
-						if( $account['uid'] != $real_pi_uid ) {
-							$real_pi_uid = $account['uid'];
-							break;
+				    $first_name = $result[1];
+					$last_name  = $result[2];
+
+					//print $account['gecos'].' : '.$first_name.' '.$last_name.' [<span style="color:green;">OK</span>]<br>';
+					foreach( $all_accounts as $a ) {
+
+						if( preg_match( '/^('.$all_instrument_names_subpattern.')\d{5}$/', $a['uid'] )) continue;
+
+						// Look for a combination of the first and last names (both must be
+						// present accross all known accounts. (Obviously) ignore the shared
+						// account (the one we're starting with).
+						//
+						if( preg_match('/^'.$first_name.'\s+'.$last_name.'$/',           $a['gecos']) ||
+						    preg_match('/^'.$first_name.'\s+[^\s]*\s+'.$last_name.'$/',  $a['gecos']) ||
+						    preg_match('/^'.$last_name.',\s+'.$first_name.'$/',          $a['gecos']) ||
+						    preg_match('/^'.$last_name.',\s+'.$first_name.'\s+[^\s]*$/', $a['gecos'])) {
+						    //print '&nbsp;&nbsp;&nbsp;&nbsp;'.$a['uid'].'<br>';
+						    array_push( $alledged_pi_uids_found, $a['uid'] );
 						}
-
+					}
+				} else {
+					//print $account['gecos'].' : [<span style="color:red;">FAILED</span>]<br>';
+				}
 			}
-			$has_role = $authdb->hasRole( $real_pi_uid, $experiment->id(), $application, $role ) || $authdb->hasRole( $real_pi_uid, null, $application, $role );
+			$alledged_pi_uid = '';
+			if( count( $alledged_pi_uids_found ) == 1 ) $alledged_pi_uid = $alledged_pi_uids_found[0];
+
+			$has_role =
+				$alledged_pi_uid == '' ?
+				$authdb->hasRole( $real_pi_uid,     $experiment->id(), $application, $role ) || $authdb->hasRole( $real_pi_uid,     null, $application, $role ) :
+				$authdb->hasRole( $alledged_pi_uid, $experiment->id(), $application, $role ) || $authdb->hasRole( $alledged_pi_uid, null, $application, $role );
+
 			print
 				'<tr>'.
 				'<td class="table_cell table_cell_left">'.$instr_name.'</td>'.
 				'<td class="table_cell">'.$experiment->id().'</td>'.
 			    '<td class="table_cell"><a href="../portal/?exper_id='.$experiment->id().'">'.$experiment->name().'</a></td>'.
 				'<td class="table_cell"><a href="../authdb/?action=view_group&gid='.$experiment->POSIX_gid().'">'.$experiment->POSIX_gid().'</a></td>'.
-				'<td class="table_cell"><a href="../authdb/?action=view_account&uid='.$real_pi_uid.'">'.$real_pi_uid.'</a></td>'.
+				'<td class="table_cell"><a href="../authdb/?action=view_account&uid='.$real_pi_uid.'">'.$real_pi_uid.'</a></td>';
+			if( $alledged_pi_uid == '' )
+				print
+				'<td class="table_cell"></td>';
+			else
+				print
+				'<td class="table_cell"><a href="../authdb/?action=view_account&uid='.$alledged_pi_uid.'">'.$alledged_pi_uid.'</a></td>';
+			print
 				'<td class="table_cell">'.$role.'</td>';
+
+			// TODO: Make sure the above found (if any) 'aledged' PI is authorized
+			//       to manage their group.
+			//
 			if( $fix ) {
 				if( !$has_role  ) {
 					if( $real_pi_uid != $experiment->name()) {

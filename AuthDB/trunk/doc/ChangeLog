@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-21
+2011-07-07 Igor Gaponenko
+- removed unnecessary comments from web/html/LDAP_group_management_log.php
+- improved PI search algorithm in web/html/LDAPManagers.php
+
 Tag: V00-00-20
 2011-07-01 Igor Gaponenko
 - added the MySQL-based logging service. The initial implementation

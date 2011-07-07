@@ -104,15 +104,7 @@ td.table_cell_within_group {
 
 <div style="padding-left:20px; padding-right:20px;">
 
-  <h2>About</h2>
-  <div style="padding-left:20px;">
-    <p>The information found on this page represents a report for recorded
-       group management operations performed on user groups (POSIX or NETGROUPS) in the PCDS LDAP
-       server. Note that a scope of the report is limited to operations
-       requested via PCDS Web tools.</p>
-    <p>The report can be also downloaded in the plain text format from <a href="?as_text" target="_blank">here</a>.</p>
-  </div>
-  <h2>Group Management Operations</h2>
+  <h2>Group Management Operations in PCDS LDAP</h2>
   <div style="padding-left:20px;">
 
 <?php
