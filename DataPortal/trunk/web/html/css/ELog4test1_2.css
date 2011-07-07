@@ -353,6 +353,8 @@ div.el-sh-hdr:hover {
 }
 
 .el-l-m-rdlg,
+.el-l-m-xtdlg,
+.el-l-m-xadlg,
 .el-l-r-rdlg,
 .el-l-m-edlg,
 .el-l-m-mdlg {
@@ -360,7 +362,7 @@ div.el-sh-hdr:hover {
   margin-bottom: 10px;
   padding: 20px;
   padding-bottom: 10px;
-  background-color: #e0e0e0;
+  background-color: #ffffff;
   border:1px solid #c0c0c0;
   border-radius: 5px;
   -moz-border-radius: 5px;

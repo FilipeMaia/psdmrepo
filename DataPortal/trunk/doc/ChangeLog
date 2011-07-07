@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2011-07-07 Igor Gaponenko
+- adding attachments and tags to existing messages
+- improved (more dynamic) interactions when posting/modifying e-log contents
+- final implementation of the message viewer in the list of runs
+- changed appearance of the message reply dialogs
+
 Tag: V00-00-06
 2011-06-30 Igor Gaponenko
 - added statistics.php to report data management statistics accross all experiments

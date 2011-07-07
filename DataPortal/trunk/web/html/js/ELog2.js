@@ -31,6 +31,7 @@ function elog_create() {
 	this.runs    = new Array();
 	this.editor  = false;
 	this.post_onsuccess = null;
+	this.used_tags = new Array();
 
 	/* The context for v-menu items
 	 */
@@ -1304,10 +1305,20 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		var toggler='#'+that.base+'-m-tgl-'+entry.id;
 		var container='#'+that.base+'-m-con-'+entry.id;
 
-		/* Initialize the thread container if this is the first call
-		 * to the function for for the message.
-		 */
-		if( $(container).html() == '' ) {
+		// REIMPLEMENTED THIS:
+		//   Initialize the thread container if this is the first call
+		//   to the function for for the message.
+		//
+		//   if( $(container).html() == '' ) {
+		//
+		// TO THIS:
+		//    Always recreate the thread when opening it to make sure the new contents
+		//    gets properly displayed.
+		//
+		// TODO: Do the same for the message viewer in runs.
+		//
+		if(on) {
+			entry.thread_idx = idx;
 			var html =
 '    <div class="el-l-m-body">';
 			if(this.parent.editor)
@@ -1315,7 +1326,9 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+entry.id+',false);">move</button></div>'+
 '      <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
 			html +=
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',false);">reply</button></div>'+
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xt" id="'+this.base+'-m-xt-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, true);" title="add more tags to the message">+ tags</button></div>'+
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xa" id="'+this.base+'-m-xa-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, false);" title="add more attachments to the message">+ attachments</button></div>'+
+'      <div style="float:right;"                  class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',false);" title="reply to the message">reply</button></div>'+
 '      <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>'+
 '      <div style="clear:both;"></div>'+
 '      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
@@ -1354,19 +1367,20 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '    <div id="'+this.base+'-m-c-'+entry.id+'">';
 			for(var k in entry.children) {
 				var child = entry.children[k];
-				if( typeof child == 'string' ) html += that.live_child2html(eval("("+child+")"));
-				else                           html += that.live_child2html(child);
+				if( typeof child == 'string' ) html += that.live_child2html(eval("("+child+")"), idx);
+				else                           html += that.live_child2html(child, idx);
 			}
 			html +=
 '    </div>'+
 '  </div>';
 			$(container).html(html);
 
+			$(container).find('.el-l-m-xt').button();
+			$(container).find('.el-l-m-xa').button();
 			$(container).find('.el-l-m-re').button();
 			$(container).find('.el-l-m-ed').button();
 			$(container).find('.el-l-m-mv').button();
-		}
-		if(on) {
+
 			$(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
 			$(container).removeClass('el-l-m-hdn').addClass('el-l-m-vis');
 			for(var i = 0; i < entry.attachments.length; i++) {
@@ -1377,7 +1391,9 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 				var child_entry = ( typeof child == 'string' ) ? eval( "("+child+")" ) : child;
 				this.expand_child(child_entry.id, true);
 			}
+
 		} else {
+			$(container).html('');
 			$(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
 			$(container).removeClass('el-l-m-vis').addClass('el-l-m-hdn');
 		}
@@ -1789,9 +1805,24 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 	this.create_live_message_dialogs = function(id, is_child) {
 		var dlgs = $('#'+this.base+'-m-dlgs-'+id);
 		if(dlgs.html() != '') return;
+	    var select_tag_html = "<option> select tag </option>\n";
+	    for( var i= 0; i < this.parent.used_tags.length; ++i )
+	    	select_tag_html += '<option>'+this.parent.used_tags[i]+'</option>\n';
+
+		var tags_html = '';
+		var num_tags = 3;
+	    for( var i = 0; i < num_tags; ++i )
+	    	tags_html +=
+'<div style="width: 100%;">'+
+'  <select id="'+this.base+'-m-tags-library-'+i+'-'+id+'">'+select_tag_html+'</select>'+
+'  <input type="text" class="elog-tag-name" id="'+this.base+'-m-tag-name-'+i+'-'+id+'" name="tag_name_'+i+'" value="" size=16 title="type new tag here or select a known one from the left" />'+
+'  <input type="hidden" id="'+this.base+'-m-tag-value-'+i+'-'+id+'" name="tag_value_'+i+'" value="" />'+
+'</div>';
+
 		var entry = this.messages[id];
 		var html =
 '<div id="'+this.base+'-m-rdlg-'+id+'" class="el-l-m-rdlg el-l-m-dlg-hdn">'+
+'  <div id="'+this.base+'-m-rdlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Compose reply. Note the total limit of <b>25 MB</b> for attachments.</div>'+
 '  <div style="float:left;">'+
 '    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/NewFFEntry4portalJSON.php" method="post">'+
 '      <input type="hidden" name="id" value="'+this.parent.exp_id+'" />'+
@@ -1803,7 +1834,6 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      <input type="hidden" name="num_tags" value="0" />'+
 '      <input type="hidden" name="onsuccess" value="" />'+
 '      <input type="hidden" name="relevance_time" value="" />'+
-'      <div style="font-weight:bold; margin-bottom:4px;">Reply:</div>'+
 '      <textarea name="message_text" rows="12" cols="64" style="padding:4px;" title="the first line of the message body will be used as its subject" ></textarea>'+
 '      <div style="margin-top: 10px;">'+
 '        <div style="float:left;">'+ 
@@ -1823,19 +1853,58 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right;" class="s-b-con"><button class="el-l-m-re-c" id="'+this.base+'-m-re-c-'+id+'" onclick="'+this.address+'.live_message_reply_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right;" class="s-b-con"><button class="el-l-m-re-s" id="'+this.base+'-m-re-s-'+id+'" onclick="'+this.address+'.live_message_reply_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-re-c-'+id+'" onclick="'+this.address+'.live_message_reply_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-re-s-'+id+'" onclick="'+this.address+'.live_message_reply_submit('+id+');">submit</button></div>'+
+'  <div style="clear:both;"></div>'+
+'</div>'+
+'<div id="'+this.base+'-m-xtdlg-'+id+'" class="el-l-m-xtdlg el-l-m-dlg-hdn">'+
+'  <div id="'+this.base+'-m-xtdlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Select existing tags or define new tags to be added.</div>'+
+'  <div style="float:left;">'+
+'    <form id="elog-form-extend-tags-'+id+'" enctype="multipart/form-data" action="../logbook/ExtendFFEntry4portalJSON.php" method="post">'+
+'      <input type="hidden" name="message_id" value="'+id+'" />'+
+'      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />'+
+'      <input type="hidden" name="num_tags" value="'+num_tags+'" />'+
+'      <input type="hidden" name="onsuccess" value="" />'+
+'      <div>'+
+'        <div>'+tags_html+'</div>'+
+'      </div>'+
+'    </form>'+
+'  </div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xt-c-'+id+'" onclick="'+this.address+'.live_message_extend_cancel('+id+', true);">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xt-s-'+id+'" onclick="'+this.address+'.live_message_extend_submit('+id+', true);">submit</button></div>'+
+'  <div style="clear:both;"></div>'+
+'</div>'+
+'<div id="'+this.base+'-m-xadlg-'+id+'" class="el-l-m-xadlg el-l-m-dlg-hdn">'+
+'  <div id="'+this.base+'-m-xadlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Select attachments to upload. Note the total limit of <b>25 MB</b>.</div>'+
+'  <div style="float:left;">'+
+'    <form id="elog-form-extend-attachments-'+id+'" enctype="multipart/form-data" action="../logbook/ExtendFFEntry4portalJSON.php" method="post">'+
+'      <input type="hidden" name="message_id" value="'+id+'" />'+
+'      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />'+
+'      <input type="hidden" name="num_tags" value="0" />'+
+'      <input type="hidden" name="onsuccess" value="" />'+
+'      <div>'+
+'        <div id="'+this.base+'-extend-as-'+id+'">'+
+'          <div>'+
+'            <input type="file" name="file2attach_0" onchange="'+this.address+'.live_extend_add_attachment('+id+')" />'+
+'            <input type="hidden" name="file2attach_0" value=""/ >'+
+'          </div>'+
+'        </div>'+
+'      </div>'+
+'    </form>'+
+'  </div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xa-c-'+id+'" onclick="'+this.address+'.live_message_extend_cancel('+id+', false);">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xa-s-'+id+'" onclick="'+this.address+'.live_message_extend_submit('+id+', false);">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>';
 		if(this.parent.editor) {
 			html +=
 '<div id="'+this.base+'-m-edlg-'+id+'" class="el-l-m-edlg el-l-m-dlg-hdn">'+
+'  <div style="font-size:90%; text-decoration:underline; position:relative; left:-10px; top:-15px;">E d i t &nbsp; m e s s a g e</div>'+
 '  <div style="float:left;">'+
 '    <form id="elog-form-edit-'+id+'" enctype="multipart/form-data" action="../logbook/UpdateFFEntry4portal.php" method="post">'+
 '      <input type="hidden" name="id" value="'+id+'" />'+
 '      <input type="hidden" name="content_type" value="TEXT" />'+
 '      <input type="hidden" name="onsuccess" value="" />'+
-'      <div style="font-weight:bold; margin-bottom:4px;">Edit:</div>'+
 '      <textarea name="content" rows="12" cols="64" style="padding:4px;" title="the first line of the message body will be used as its subject" >'+entry.content+'</textarea>'+
 '      <div style="font-weight:bold; margin-top: 10px;">Extra attachments:</div>'+
 '      <div id="'+this.base+'-edit-as-'+id+'" style="margin-top:5px;">'+
@@ -1846,13 +1915,13 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right;" class="s-b-con"><button class="el-l-m-ed-c" id="'+this.base+'-m-ed-c-'+id+'" onclick="'+this.address+'.live_message_edit_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right;" class="s-b-con"><button class="el-l-m-ed-s" id="'+this.base+'-m-ed-s-'+id+'" onclick="'+this.address+'.live_message_edit_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ed-c" id="'+this.base+'-m-ed-c-'+id+'" onclick="'+this.address+'.live_message_edit_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ed-s" id="'+this.base+'-m-ed-s-'+id+'" onclick="'+this.address+'.live_message_edit_submit('+id+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div id="'+this.base+'-m-mdlg-'+id+'" class="el-l-m-mdlg el-l-m-dlg-hdn">'+
-'  <div style="float:right;" class="s-b-con"><button class="el-l-m-mv-c" id="'+this.base+'-m-mv-c-'+id+'" onclick="'+this.address+'.live_message_move_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right;" class="s-b-con"><button class="el-l-m-mv-s" id="'+this.base+'-m-mv-s-'+id+'" onclick="'+this.address+'.live_message_move_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-mv-c" id="'+this.base+'-m-mv-c-'+id+'" onclick="'+this.address+'.live_message_move_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-mv-s" id="'+this.base+'-m-mv-s-'+id+'" onclick="'+this.address+'.live_message_move_submit('+id+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 ''+
 '  Here be the dialog allowing to move the message into some other context and/or time.'+
@@ -1864,6 +1933,11 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 
 		dlgs.html(html);
 
+		$('#'+this.base+'-m-xt-s-'+id).button();
+		$('#'+this.base+'-m-xt-c-'+id).button();
+		$('#'+this.base+'-m-xa-s-'+id).button();
+		$('#'+this.base+'-m-xa-c-'+id).button();
+
 		$('#'+this.base+'-m-re-s-'+id).button();
 		$('#'+this.base+'-m-re-c-'+id).button();
 
@@ -1873,15 +1947,41 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			$('#'+this.base+'-m-mv-e-'+id).button();
 			$('#'+this.base+'-m-mv-c-'+id).button();
 		}
-	}
+		$('#'+this.base+'-m-tags-library-0-'+id).change(function(ev) {
+			var selectedIndex = $('#'+that.base+'-m-tags-library-0-'+id).attr('selectedIndex');
+			if( selectedIndex == 0 ) return;
+			$('#'+that.base+'-m-tag-name-0-'+id    ).val($('#'+that.base+'-m-tags-library-0-'+id).val());
+			$('#'+that.base+'-m-tags-library-0-'+id).attr('selectedIndex', 0);
+		});
+		$('#'+this.base+'-m-tags-library-1-'+id).change(function(ev) {
+			var selectedIndex = $('#'+that.base+'-m-tags-library-1-'+id).attr('selectedIndex');
+			if( selectedIndex == 0 ) return;
+			$('#'+that.base+'-m-tag-name-1-'+id    ).val($('#'+that.base+'-m-tags-library-1-'+id).val());
+			$('#'+that.base+'-m-tags-library-1-'+id).attr('selectedIndex', 0);
+		});
+		$('#'+this.base+'-m-tags-library-2-'+id).change(function(ev) {
+			var selectedIndex = $('#'+that.base+'-m-tags-library-2-'+id).attr('selectedIndex');
+			if( selectedIndex == 0 ) return;
+			$('#'+that.base+'-m-tag-name-2-'+id    ).val($('#'+that.base+'-m-tags-library-2-'+id).val());
+			$('#'+that.base+'-m-tags-library-2-'+id).attr('selectedIndex', 0);
+		});
+	};
 
 	this.live_enable_message_buttons = function(id, on) {
 		var state = on ? 'enable' : 'disable';
+		$('#'+this.base+'-m-xt-'+id).button(state);
+		$('#'+this.base+'-m-xa-'+id).button(state);
 		$('#'+this.base+'-m-re-'+id).button(state);
 		$('#'+this.base+'-m-ed-'+id).button(state);
 		$('#'+this.base+'-m-mv-'+id).button(state);
 	};
 
+	this.live_message_extend = function(id, is_child, add_tags_vs_attachments) {
+	    that.create_live_message_dialogs(id, is_child);
+	    if( add_tags_vs_attachments ) $('#'+this.base+'-m-xtdlg-'+id).removeClass('el-l-m-dlg-hdn').addClass('el-l-m-dlg-vis');
+	    else                          $('#'+this.base+'-m-xadlg-'+id).removeClass('el-l-m-dlg-hdn').addClass('el-l-m-dlg-vis');
+		that.live_enable_message_buttons(id, false);
+	};
 	this.live_message_reply = function(id, is_child) {
 	    that.create_live_message_dialogs(id, is_child);
 		$('#'+this.base+'-m-rdlg-'+id).removeClass('el-l-m-dlg-hdn').addClass('el-l-m-dlg-vis');
@@ -1914,13 +2014,18 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 	};
 
 	this.live_message_reply_submit = function(id) {
+
 		var urlbase = window.location.href;
 		var idx = urlbase.indexOf( '&' );
 		if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
 
+		var old_info = $('#'+this.base+'-m-rdlg-'+id+'-info').html();
+		$('#'+this.base+'-m-rdlg-'+id+'-info').html('Posting. Please wait...');
+		$('#'+this.base+'-m-re-c-'+id).button('disable');
+		$('#'+this.base+'-m-re-s-'+id).button('disable');
+
 		// Use JQuery AJAX Form plug-in to post the reply w/o reloading
 		// the current page.
-		
 		//
 		$('#elog-form-post-'+id).ajaxSubmit({
 			success: function(data) {
@@ -1956,7 +2061,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 
 				// Then display the new child on the page and make it visible
 				//
-				var html = that.live_child2html(entry);
+				var html = that.live_child2html(entry, that.messages[id].thread_idx);
 				$('#'+that.base+'-m-c-'+id).prepend(html);
 
 				$('.el-l-m-re').button();
@@ -1966,6 +2071,11 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 				that.toggle_child(entry.id);
 
 				that.live_message_reply_cancel(id);
+			},
+			complete: function() {
+				$('#'+that.base+'-m-rdlg-'+id+'-info').html( old_info );
+				$('#'+that.base+'-m-re-c-'+id).button('enable');
+				$('#'+that.base+'-m-re-s-'+id).button('enable');
 			},
 			dataType: 'json'
 		});
@@ -2009,14 +2119,19 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		that.live_enable_run_buttons(id, true);
 	};
 	this.live_run_reply_submit = function(id) {
+
 		var urlbase = window.location.href;
 		var idx = urlbase.indexOf( '&' );
 		if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
 
 		// Use JQuery AJAX Form plug-in to post the reply w/o reloading
 		// the current page.
-		
 		//
+		var old_info = $('#'+this.base+'-m-rdlg-'+id+'-info').html();
+		$('#'+this.base+'-r-rdlg-'+id+'-info').html('Posting. Please wait...');
+		$('#'+this.base+'-r-re-c-'+id).button('disable');
+		$('#'+this.base+'-r-re-s-'+id).button('disable');
+
 		$('#elog-form-post-'+id).ajaxSubmit({
 			success: function(data) {
 				$('#elog-form-post-'+id+' textarea[name="message_text"]').val('');
@@ -2033,10 +2148,113 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 				}
 				that.live_run_reply_cancel(id);
 			},
+			complete: function() {
+				$('#'+that.base+'-r-rdlg-'+id+'-info').html( old_info );
+				$('#'+that.base+'-r-re-c-'+id).button('enable');
+				$('#'+that.base+'-r-re-s-'+id).button('enable');
+			},
 			dataType: 'json'
 		});
 
 	};
+
+	this.live_extend_add_attachment = function(id) {
+		var num = $('#'+this.base+'-extend-as-'+id+' > div').size();
+		$('#'+this.base+'-extend-as-'+id).append(
+'  <div>'+
+'    <input type="file" name="file2attach_'+num+'" onchange="'+this.address+'.live_extend_add_attachment('+id+')" />'+
+'    <input type="hidden" name="file2attach_'+num+'" value=""/ >'+
+'  </div>'
+		);
+	};
+	this.live_message_extend_cancel = function(id, add_tags_vs_attachments ) {
+		if( add_tags_vs_attachments ) $('#'+this.base+'-m-xtdlg-'+id).removeClass('el-l-m-dlg-vis').addClass('el-l-m-dlg-hdn');
+		else                          $('#'+this.base+'-m-xadlg-'+id).removeClass('el-l-m-dlg-vis').addClass('el-l-m-dlg-hdn');
+		that.live_enable_message_buttons(id, true);
+	};
+	this.live_message_extend_submit = function(id, add_tags_vs_attachments) {
+
+		var urlbase = window.location.href;
+		var idx = urlbase.indexOf( '&' );
+		if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
+
+		// Use JQuery AJAX Form plug-in to post the reply w/o reloading
+		// the current page.
+		//
+		if( add_tags_vs_attachments ) {
+
+			var old_info = $('#'+this.base+'-m-xtdlg-'+id+'-info').html();
+			$('#'+this.base+'-m-xtdlg-'+id+'-info').html('Submitting. Please wait...');
+			$('#'+this.base+'-m-xt-c-'+id).button('disable');
+			$('#'+this.base+'-m-xt-s-'+id).button('disable');
+
+			$('#elog-form-extend-tags-'+id).ajaxSubmit({
+				success: function(data) {
+					if( data.Status != 'success' ) {
+						alert('failed because of: '+data.Message);
+						return;
+					}
+					var tags = data.Extended.tags;
+					for( var i = 0; i < tags.length; i++ )
+						that.messages[id].tags.unshift(tags[i]);
+
+					that.expand_message(that.messages[id].thread_idx, true);
+				},
+				complete: function() {
+					$('#'+that.base+'-m-xtdlg-'+id+'-info').html( old_info );
+					$('#'+that.base+'-m-xt-c-'+id).button('enable');
+					$('#'+that.base+'-m-xt-s-'+id).button('enable');
+				},
+				dataType: 'json'
+			});
+		} else {
+
+			var old_info = $('#'+this.base+'-m-xadlg-'+id+'-info').html();
+			$('#'+this.base+'-m-xadlg-'+id+'-info').html('Uploading. Please wait...');
+			$('#'+this.base+'-m-xa-c-'+id).button('disable');
+			$('#'+this.base+'-m-xa-s-'+id).button('disable');
+
+			$('#elog-form-extend-attachments-'+id).ajaxSubmit({
+				success: function(data) {
+					$('#'+that.base+'-extend-as-'+id).html(
+'<div>'+
+'  <input type="file" name="file2attach_0" onchange="'+that.address+'.live_extend_add_attachment('+id+')" />'+
+'  <input type="hidden" name="file2attach_0" value=""/ >'+
+'</div>'
+					);
+					if( data.Status != 'success' ) {
+						alert('failed because of: '+data.Message);
+						return;
+					}
+					var attachments = data.Extended.attachments;
+					for( var i = 0; i < attachments.length; i++ )
+						that.messages[id].attachments.unshift(attachments[i]);
+
+					that.expand_message(that.messages[id].thread_idx, true);
+				},
+				complete: function() {
+					$('#'+that.base+'-m-xadlg-'+id+'-info').html( old_info );
+					$('#'+that.base+'-m-xa-c-'+id).button('enable');
+					$('#'+that.base+'-m-xa-s-'+id).button('enable');
+				},
+				dataType: 'json'
+			});
+		}
+	};
+
+
+
+
+	this.live_edit_add_attachment = function(id) {
+		var num = $('#'+this.base+'-edit-as-'+id+' > div').size();
+		$('#'+this.base+'-edit-as-'+id).append(
+'  <div>'+
+'    <input type="file" name="file2attach_'+num+'" onchange="'+this.address+'.live_edit_add_attachment('+id+')" />'+
+'    <input type="hidden" name="file2attach_'+num+'" value=""/ >'+
+'  </div>'
+		);
+	};
+
 	this.create_live_run_dialogs = function(idx) {
 		var entry = this.threads[idx];
 		var id    = entry.id;
@@ -2044,6 +2262,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		if(dlgs.html() != '') return;
 		var html =
 '<div id="'+this.base+'-r-rdlg-'+id+'" class="el-l-r-rdlg el-l-r-dlg-hdn">'+
+'  <div id="'+this.base+'-r-rdlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Compose message. Note the total limit of <b>25 MB</b> for attachments.</div>'+
 '  <div style="float:left;">'+
 '    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/NewFFEntry4portalJSON.php" method="post">'+
 '      <input type="hidden" name="id" value="'+this.parent.exp_id+'" />'+
@@ -2055,7 +2274,6 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      <input type="hidden" name="num_tags" value="0" />'+
 '      <input type="hidden" name="onsuccess" value="" />'+
 '      <input type="hidden" name="relevance_time" value="" />'+
-'      <div style="font-weight:bold; margin-bottom:4px;">Comment for the run:</div>'+
 '      <textarea name="message_text" rows="12" cols="64" style="padding:4px;" title="the first line of the message body will be used as its subject" ></textarea>'+
 '      <div style="margin-top: 10px;">'+
 '        <div style="float:left;">'+ 
@@ -2075,8 +2293,8 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right;" class="s-b-con"><button id="'+this.base+'-r-re-c-'+id+'" onclick="'+this.address+'.live_run_reply_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right;" class="s-b-con"><button id="'+this.base+'-r-re-s-'+id+'" onclick="'+this.address+'.live_run_reply_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-r-re-c-'+id+'" onclick="'+this.address+'.live_run_reply_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-r-re-s-'+id+'" onclick="'+this.address+'.live_run_reply_submit('+id+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>';
 
@@ -2142,7 +2360,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		return html;
 	};
 
-	this.live_child2html = function(entry) {
+	this.live_child2html = function(entry, thread_idx) {
 		that.messages[entry.id] = entry;
 		var html =
 '<div class="el-l-c-hdr" onclick="'+this.address+'.toggle_child('+entry.id+');">'+
@@ -2189,7 +2407,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '  <div id="'+this.base+'-m-c-'+entry.id+'">';
 
 		var children = entry.children;
-		for(var i in children) html += that.live_child2html(eval("("+children[i]+")"));
+		for(var i in children) html += that.live_child2html(eval("("+children[i]+")"), thread_idx);
 
 		html +=
 '  </div>'+
@@ -2261,15 +2479,15 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 	this.attachments_loader = null;
 
 	var that = this;
-
+/*
 	this.expand_message = function(idx, on) {
 		var entry = that.threads[idx];
 		var toggler='#'+that.base+'-m-tgl-'+entry.id;
 		var container='#'+that.base+'-m-con-'+entry.id;
 
-		/* Initialize the thread container if this is the first call
-		 * to the function for for the message.
-		 */
+		// Initialize the thread container if this is the first call
+		// to the function for for the message.
+		//
 		if( $(container).html() == '' ) {
 			var html =
 '    <div class="el-l-m-body">';
@@ -2336,6 +2554,105 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 				this.expand_child(child.id, true);
 			}
 		} else {
+			$(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+			$(container).removeClass('el-l-m-vis').addClass('el-l-m-hdn');
+		}
+	};
+*/
+	this.expand_message = function(idx, on) {
+		var entry = that.threads[idx];
+		var toggler='#'+that.base+'-m-tgl-'+entry.id;
+		var container='#'+that.base+'-m-con-'+entry.id;
+
+		// REIMPLEMENTED THIS:
+		//   Initialize the thread container if this is the first call
+		//   to the function for for the message.
+		//
+		//   if( $(container).html() == '' ) {
+		//
+		// TO THIS:
+		//    Always recreate the thread when opening it to make sure the new contents
+		//    gets properly displayed.
+		//
+		// TODO: Do the same for the message viewer in runs.
+		//
+		if(on) {
+			entry.thread_idx = idx;
+			var html =
+'    <div class="el-l-m-body">';
+			if(this.parent.editor)
+				html +=
+'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+entry.id+',false);">move</button></div>'+
+'      <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
+			html +=
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xt" id="'+this.base+'-m-xt-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, true);" title="add more tags to the message">+ tags</button></div>'+
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xa" id="'+this.base+'-m-xa-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, false);" title="add more attachments to the message">+ attachments</button></div>'+
+'      <div style="float:right;"                  class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',false);" title="reply to the message">reply</button></div>'+
+'      <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>'+
+'      <div style="clear:both;"></div>'+
+'      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
+'    </div>';
+			that.attachments[entry.id] = entry.attachments;
+			var attachments_html = '';
+			for(var k in entry.attachments) {
+				var a = entry.attachments[k];
+				that.attachments_loader[a.id] = {loaded: false, descr: a};
+				attachments_html +=
+'      <div style="float:left;" class="el-l-a">'+
+'        <div style="float:left;">'+
+'          <span class="toggler ui-icon ui-icon-triangle-1-e el-l-a-tgl" id="'+this.base+'-a-tgl-'+a.id+'" onclick="'+this.address+'.toggle_attachment('+a.id+');"></span>'+
+'        </div>'+
+'        <div style="float:left;" class="el-l-a-dsc"><a class="link" href="../logbook/attachments/'+a.id+'/'+a.description+'"  target="_blank">'+a.description+'</a></div>'+
+'        <div style="float:left; margin-left:10px;" class="el-l-a-info">( type: <b>'+a.type+'</b> size: <b>'+a.size+'</b> )</div>'+
+'        <div style="clear:both;"></div>'+
+'        <div class="el-l-a-con el-l-a-hdn" id="'+this.base+'-a-con-'+a.id+'">'+
+'        </div>'+
+'      </div>';
+			}
+			if(attachments_html) html +=
+'    <div class="el-l-m-as">'+attachments_html+
+'      <div style="clear:both;"></div>'+
+'    </div>';
+			var tags_html = '';
+			for(var k in entry.tags) {
+				if(tags_html) tags_html += ', ';
+				tags_html += entry.tags[k].tag;
+			}
+			if(tags_html) html +=
+'    <div class="el-l-m-tags">'+
+'      <b><i>keywords: </i></b>'+tags_html+
+'    </div>';
+			html +=
+'    <div id="'+this.base+'-m-c-'+entry.id+'">';
+			for(var k in entry.children) {
+				var child = entry.children[k];
+				if( typeof child == 'string' ) html += that.live_child2html(eval("("+child+")"), idx);
+				else                           html += that.live_child2html(child, idx);
+			}
+			html +=
+'    </div>'+
+'  </div>';
+			$(container).html(html);
+
+			$(container).find('.el-l-m-xt').button();
+			$(container).find('.el-l-m-xa').button();
+			$(container).find('.el-l-m-re').button();
+			$(container).find('.el-l-m-ed').button();
+			$(container).find('.el-l-m-mv').button();
+
+			$(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+			$(container).removeClass('el-l-m-hdn').addClass('el-l-m-vis');
+			for(var i = 0; i < entry.attachments.length; i++) {
+				this.expand_attachment(entry.attachments[i].id, true);
+			}
+			for(var i = 0; i < entry.children.length; i++) {
+				var child = entry.children[i];
+				var child_entry = ( typeof child == 'string' ) ? eval( "("+child+")" ) : child;
+				this.expand_child(child_entry.id, true);
+			}
+
+		} else {
+			$(container).html('');
 			$(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
 			$(container).removeClass('el-l-m-vis').addClass('el-l-m-hdn');
 		}
@@ -2469,12 +2786,15 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 
 		},'json');
 	};
+
+/*
 	this.create_live_message_dialogs = function(id, is_child) {
 		var dlgs = $('#'+this.base+'-m-dlgs-'+id);
 		if(dlgs.html() != '') return;
 		var entry = this.messages[id];
 		var html =
 '<div id="'+this.base+'-m-rdlg-'+id+'" class="el-l-m-rdlg el-l-m-dlg-hdn">'+
+'  <div style="font-size:90%; text-decoration:underline; position:relative; left:-10px; top:-15px;">C o m p o s e &nbsp; r e p l y</div>'+
 '  <div style="float:left;">'+
 '    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/NewFFEntry4portalJSON.php" method="post">'+
 '      <input type="hidden" name="id" value="'+this.parent.exp_id+'" />'+
@@ -2486,7 +2806,6 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '      <input type="hidden" name="num_tags" value="0" />'+
 '      <input type="hidden" name="onsuccess" value="" />'+
 '      <input type="hidden" name="relevance_time" value="" />'+
-'      <div style="font-weight:bold; margin-bottom:4px;">Reply:</div>'+
 '      <textarea name="message_text" rows="12" cols="64" style="padding:4px;" title="the first line of the message body will be used as its subject" ></textarea>'+
 '      <div style="margin-top: 10px;">'+
 '        <div style="float:left;">'+ 
@@ -2506,19 +2825,19 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right;" class="s-b-con"><button class="el-l-m-re-c" id="'+this.base+'-m-re-c-'+id+'" onclick="'+this.address+'.live_message_reply_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right;" class="s-b-con"><button class="el-l-m-re-s" id="'+this.base+'-m-re-s-'+id+'" onclick="'+this.address+'.live_message_reply_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-re-c-'+id+'" onclick="'+this.address+'.live_message_reply_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-re-s-'+id+'" onclick="'+this.address+'.live_message_reply_submit('+id+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>';
 		if(this.parent.editor) {
 			html +=
 '<div id="'+this.base+'-m-edlg-'+id+'" class="el-l-m-edlg el-l-m-dlg-hdn">'+
+'  <div style="font-size:90%; text-decoration:underline; position:relative; left:-10px; top:-15px;">E d i t &nbsp; m e s s a g e</div>'+
 '  <div style="float:left;">'+
 '    <form id="elog-form-edit-'+id+'" enctype="multipart/form-data" action="../logbook/UpdateFFEntry4portal.php" method="post">'+
 '      <input type="hidden" name="id" value="'+id+'" />'+
 '      <input type="hidden" name="content_type" value="TEXT" />'+
 '      <input type="hidden" name="onsuccess" value="" />'+
-'      <div style="font-weight:bold; margin-bottom:4px;">Edit:</div>'+
 '      <textarea name="content" rows="12" cols="64" style="padding:4px;" title="the first line of the message body will be used as its subject" >'+entry.content+'</textarea>'+
 '      <div style="font-weight:bold; margin-top: 10px;">Extra attachments:</div>'+
 '      <div id="'+this.base+'-edit-as-'+id+'" style="margin-top:5px;">'+
@@ -2529,13 +2848,13 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right;" class="s-b-con"><button class="el-l-m-ed-c" id="'+this.base+'-m-ed-c-'+id+'" onclick="'+this.address+'.live_message_edit_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right;" class="s-b-con"><button class="el-l-m-ed-s" id="'+this.base+'-m-ed-s-'+id+'" onclick="'+this.address+'.live_message_edit_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ed-c" id="'+this.base+'-m-ed-c-'+id+'" onclick="'+this.address+'.live_message_edit_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ed-s" id="'+this.base+'-m-ed-s-'+id+'" onclick="'+this.address+'.live_message_edit_submit('+id+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div id="'+this.base+'-m-mdlg-'+id+'" class="el-l-m-mdlg el-l-m-dlg-hdn">'+
-'  <div style="float:right;" class="s-b-con"><button class="el-l-m-mv-c" id="'+this.base+'-m-mv-c-'+id+'" onclick="'+this.address+'.live_message_move_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right;" class="s-b-con"><button class="el-l-m-mv-s" id="'+this.base+'-m-mv-s-'+id+'" onclick="'+this.address+'.live_message_move_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-mv-c" id="'+this.base+'-m-mv-c-'+id+'" onclick="'+this.address+'.live_message_move_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-mv-s" id="'+this.base+'-m-mv-s-'+id+'" onclick="'+this.address+'.live_message_move_submit('+id+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 ''+
 '  Here be the dialog allowing to move the message into some other context and/or time.'+
@@ -2564,7 +2883,186 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 		$('#'+this.base+'-m-ed-'+id).button(state);
 		$('#'+this.base+'-m-mv-'+id).button(state);
 	};
+*/
+	this.create_live_message_dialogs = function(id, is_child) {
+		var dlgs = $('#'+this.base+'-m-dlgs-'+id);
+		if(dlgs.html() != '') return;
+	    var select_tag_html = "<option> select tag </option>\n";
+	    for( var i= 0; i < this.parent.used_tags.length; ++i )
+	    	select_tag_html += '<option>'+this.parent.used_tags[i]+'</option>\n';
 
+		var tags_html = '';
+		var num_tags = 3;
+	    for( var i = 0; i < num_tags; ++i )
+	    	tags_html +=
+'<div style="width: 100%;">'+
+'  <select id="'+this.base+'-m-tags-library-'+i+'-'+id+'">'+select_tag_html+'</select>'+
+'  <input type="text" class="elog-tag-name" id="'+this.base+'-m-tag-name-'+i+'-'+id+'" name="tag_name_'+i+'" value="" size=16 title="type new tag here or select a known one from the left" />'+
+'  <input type="hidden" id="'+this.base+'-m-tag-value-'+i+'-'+id+'" name="tag_value_'+i+'" value="" />'+
+'</div>';
+
+		var entry = this.messages[id];
+		var html =
+'<div id="'+this.base+'-m-rdlg-'+id+'" class="el-l-m-rdlg el-l-m-dlg-hdn">'+
+'  <div id="'+this.base+'-m-rdlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Compose reply. Note the total limit of <b>25 MB</b> for attachments.</div>'+
+'  <div style="float:left;">'+
+'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/NewFFEntry4portalJSON.php" method="post">'+
+'      <input type="hidden" name="id" value="'+this.parent.exp_id+'" />'+
+'      <input type="hidden" name="scope" value="message" />'+
+'      <input type="hidden" name="message_id" value="'+id+'" />'+
+'      <input type="hidden" name="run_id" value="" />'+
+'      <input type="hidden" name="shift_id" value="" />'+
+'      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />'+
+'      <input type="hidden" name="num_tags" value="0" />'+
+'      <input type="hidden" name="onsuccess" value="" />'+
+'      <input type="hidden" name="relevance_time" value="" />'+
+'      <textarea name="message_text" rows="12" cols="64" style="padding:4px;" title="the first line of the message body will be used as its subject" ></textarea>'+
+'      <div style="margin-top: 10px;">'+
+'        <div style="float:left;">'+ 
+'          <div style="font-weight:bold;">Author:</div>'+
+'          <input type="text" name="author_account" value="'+this.parent.author+'" size=32 style="padding:2px; margin-top:5px;" />'+
+'        </div>'+
+'        <div style="float:left; margin-left:20px;">'+ 
+'          <div style="font-weight:bold;">Attachments:</div>'+
+'          <div id="'+this.base+'-reply-as-'+id+'" style="margin-top:5px;">'+
+'            <div>'+
+'              <input type="file" name="file2attach_0" onchange="'+this.address+'.live_reply_add_attachment('+id+')" />'+
+'              <input type="hidden" name="file2attach_0" value=""/ >'+
+'            </div>'+
+'          </div>'+
+'        </div>'+
+'        <div style="clear:both;"></div>'+
+'      </div>'+
+'    </form>'+
+'  </div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-re-c-'+id+'" onclick="'+this.address+'.live_message_reply_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-re-s-'+id+'" onclick="'+this.address+'.live_message_reply_submit('+id+');">submit</button></div>'+
+'  <div style="clear:both;"></div>'+
+'</div>'+
+'<div id="'+this.base+'-m-xtdlg-'+id+'" class="el-l-m-xtdlg el-l-m-dlg-hdn">'+
+'  <div id="'+this.base+'-m-xtdlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Select existing tags or define new tags to be added.</div>'+
+'  <div style="float:left;">'+
+'    <form id="elog-form-extend-tags-'+id+'" enctype="multipart/form-data" action="../logbook/ExtendFFEntry4portalJSON.php" method="post">'+
+'      <input type="hidden" name="message_id" value="'+id+'" />'+
+'      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />'+
+'      <input type="hidden" name="num_tags" value="'+num_tags+'" />'+
+'      <input type="hidden" name="onsuccess" value="" />'+
+'      <div>'+
+'        <div>'+tags_html+'</div>'+
+'      </div>'+
+'    </form>'+
+'  </div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xt-c-'+id+'" onclick="'+this.address+'.live_message_extend_cancel('+id+', true);">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xt-s-'+id+'" onclick="'+this.address+'.live_message_extend_submit('+id+', true);">submit</button></div>'+
+'  <div style="clear:both;"></div>'+
+'</div>'+
+'<div id="'+this.base+'-m-xadlg-'+id+'" class="el-l-m-xadlg el-l-m-dlg-hdn">'+
+'  <div id="'+this.base+'-m-xadlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Select attachments to upload. Note the total limit of <b>25 MB</b>.</div>'+
+'  <div style="float:left;">'+
+'    <form id="elog-form-extend-attachments-'+id+'" enctype="multipart/form-data" action="../logbook/ExtendFFEntry4portalJSON.php" method="post">'+
+'      <input type="hidden" name="message_id" value="'+id+'" />'+
+'      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />'+
+'      <input type="hidden" name="num_tags" value="0" />'+
+'      <input type="hidden" name="onsuccess" value="" />'+
+'      <div>'+
+'        <div id="'+this.base+'-extend-as-'+id+'">'+
+'          <div>'+
+'            <input type="file" name="file2attach_0" onchange="'+this.address+'.live_extend_add_attachment('+id+')" />'+
+'            <input type="hidden" name="file2attach_0" value=""/ >'+
+'          </div>'+
+'        </div>'+
+'      </div>'+
+'    </form>'+
+'  </div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xa-c-'+id+'" onclick="'+this.address+'.live_message_extend_cancel('+id+', false);">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xa-s-'+id+'" onclick="'+this.address+'.live_message_extend_submit('+id+', false);">submit</button></div>'+
+'  <div style="clear:both;"></div>'+
+'</div>';
+		if(this.parent.editor) {
+			html +=
+'<div id="'+this.base+'-m-edlg-'+id+'" class="el-l-m-edlg el-l-m-dlg-hdn">'+
+'  <div style="font-size:90%; text-decoration:underline; position:relative; left:-10px; top:-15px;">E d i t &nbsp; m e s s a g e</div>'+
+'  <div style="float:left;">'+
+'    <form id="elog-form-edit-'+id+'" enctype="multipart/form-data" action="../logbook/UpdateFFEntry4portal.php" method="post">'+
+'      <input type="hidden" name="id" value="'+id+'" />'+
+'      <input type="hidden" name="content_type" value="TEXT" />'+
+'      <input type="hidden" name="onsuccess" value="" />'+
+'      <textarea name="content" rows="12" cols="64" style="padding:4px;" title="the first line of the message body will be used as its subject" >'+entry.content+'</textarea>'+
+'      <div style="font-weight:bold; margin-top: 10px;">Extra attachments:</div>'+
+'      <div id="'+this.base+'-edit-as-'+id+'" style="margin-top:5px;">'+
+'        <div>'+
+'          <input type="file" name="file2attach_0" onchange="'+this.address+'.live_edit_add_attachment('+id+')" />'+
+'          <input type="hidden" name="file2attach_0" value=""/ >'+
+'        </div>'+
+'      </div>'+
+'    </form>'+
+'  </div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ed-c" id="'+this.base+'-m-ed-c-'+id+'" onclick="'+this.address+'.live_message_edit_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ed-s" id="'+this.base+'-m-ed-s-'+id+'" onclick="'+this.address+'.live_message_edit_submit('+id+');">submit</button></div>'+
+'  <div style="clear:both;"></div>'+
+'</div>'+
+'<div id="'+this.base+'-m-mdlg-'+id+'" class="el-l-m-mdlg el-l-m-dlg-hdn">'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-mv-c" id="'+this.base+'-m-mv-c-'+id+'" onclick="'+this.address+'.live_message_move_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-mv-s" id="'+this.base+'-m-mv-s-'+id+'" onclick="'+this.address+'.live_message_move_submit('+id+');">submit</button></div>'+
+'  <div style="clear:both;"></div>'+
+''+
+'  Here be the dialog allowing to move the message into some other context and/or time.'+
+'  Right now we create it automatically for each message after loading it.'+
+'  We should probably optimize things by creating it at first use.'+
+'  That way we will reduce the size of DOM'+
+'</div>';
+		}
+
+		dlgs.html(html);
+
+		$('#'+this.base+'-m-xt-s-'+id).button();
+		$('#'+this.base+'-m-xt-c-'+id).button();
+		$('#'+this.base+'-m-xa-s-'+id).button();
+		$('#'+this.base+'-m-xa-c-'+id).button();
+
+		$('#'+this.base+'-m-re-s-'+id).button();
+		$('#'+this.base+'-m-re-c-'+id).button();
+
+		if(this.parent.editor) {
+			$('#'+this.base+'-m-ed-s-'+id).button();
+			$('#'+this.base+'-m-ed-c-'+id).button();
+			$('#'+this.base+'-m-mv-e-'+id).button();
+			$('#'+this.base+'-m-mv-c-'+id).button();
+		}
+		$('#'+this.base+'-m-tags-library-0-'+id).change(function(ev) {
+			var selectedIndex = $('#'+that.base+'-m-tags-library-0-'+id).attr('selectedIndex');
+			if( selectedIndex == 0 ) return;
+			$('#'+that.base+'-m-tag-name-0-'+id    ).val($('#'+that.base+'-m-tags-library-0-'+id).val());
+			$('#'+that.base+'-m-tags-library-0-'+id).attr('selectedIndex', 0);
+		});
+		$('#'+this.base+'-m-tags-library-1-'+id).change(function(ev) {
+			var selectedIndex = $('#'+that.base+'-m-tags-library-1-'+id).attr('selectedIndex');
+			if( selectedIndex == 0 ) return;
+			$('#'+that.base+'-m-tag-name-1-'+id    ).val($('#'+that.base+'-m-tags-library-1-'+id).val());
+			$('#'+that.base+'-m-tags-library-1-'+id).attr('selectedIndex', 0);
+		});
+		$('#'+this.base+'-m-tags-library-2-'+id).change(function(ev) {
+			var selectedIndex = $('#'+that.base+'-m-tags-library-2-'+id).attr('selectedIndex');
+			if( selectedIndex == 0 ) return;
+			$('#'+that.base+'-m-tag-name-2-'+id    ).val($('#'+that.base+'-m-tags-library-2-'+id).val());
+			$('#'+that.base+'-m-tags-library-2-'+id).attr('selectedIndex', 0);
+		});
+	};
+
+	this.live_enable_message_buttons = function(id, on) {
+		var state = on ? 'enable' : 'disable';
+		$('#'+this.base+'-m-xt-'+id).button(state);
+		$('#'+this.base+'-m-xa-'+id).button(state);
+		$('#'+this.base+'-m-re-'+id).button(state);
+		$('#'+this.base+'-m-ed-'+id).button(state);
+		$('#'+this.base+'-m-mv-'+id).button(state);
+	};
+	this.live_message_extend = function(id, is_child, add_tags_vs_attachments) {
+	    that.create_live_message_dialogs(id, is_child);
+	    if( add_tags_vs_attachments ) $('#'+this.base+'-m-xtdlg-'+id).removeClass('el-l-m-dlg-hdn').addClass('el-l-m-dlg-vis');
+	    else                          $('#'+this.base+'-m-xadlg-'+id).removeClass('el-l-m-dlg-hdn').addClass('el-l-m-dlg-vis');
+		that.live_enable_message_buttons(id, false);
+	};
 	this.live_message_reply = function(id, is_child) {
 	    that.create_live_message_dialogs(id, is_child);
 		$('#'+this.base+'-m-rdlg-'+id).removeClass('el-l-m-dlg-hdn').addClass('el-l-m-dlg-vis');
@@ -2601,9 +3099,13 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 		var idx = urlbase.indexOf( '&' );
 		if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
 
+		var old_info = $('#'+this.base+'-m-rdlg-'+id+'-info').html();
+		$('#'+this.base+'-m-rdlg-'+id+'-info').html('Posting. Please wait...');
+		$('#'+this.base+'-m-re-c-'+id).button('disable');
+		$('#'+this.base+'-m-re-s-'+id).button('disable');
+
 		// Use JQuery AJAX Form plug-in to post the reply w/o reloading
 		// the current page.
-		
 		//
 		$('#elog-form-post-'+id).ajaxSubmit({
 			success: function(data) {
@@ -2639,7 +3141,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 
 				// Then display the new child on the page and make it visible
 				//
-				var html = that.live_child2html(entry);
+				var html = that.live_child2html(entry, that.messages[id].thread_idx);
 				$('#'+that.base+'-m-c-'+id).prepend(html);
 
 				$('.el-l-m-re').button();
@@ -2650,10 +3152,101 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 
 				that.live_message_reply_cancel(id);
 			},
+			complete: function() {
+				$('#'+that.base+'-m-rdlg-'+id+'-info').html( old_info );
+				$('#'+that.base+'-m-re-c-'+id).button('enable');
+				$('#'+that.base+'-m-re-s-'+id).button('enable');
+			},
 			dataType: 'json'
 		});
-
 	};
+
+	this.live_extend_add_attachment = function(id) {
+		var num = $('#'+this.base+'-extend-as-'+id+' > div').size();
+		$('#'+this.base+'-extend-as-'+id).append(
+'  <div>'+
+'    <input type="file" name="file2attach_'+num+'" onchange="'+this.address+'.live_extend_add_attachment('+id+')" />'+
+'    <input type="hidden" name="file2attach_'+num+'" value=""/ >'+
+'  </div>'
+		);
+	};
+	this.live_message_extend_cancel = function(id, add_tags_vs_attachments ) {
+		if( add_tags_vs_attachments ) $('#'+this.base+'-m-xtdlg-'+id).removeClass('el-l-m-dlg-vis').addClass('el-l-m-dlg-hdn');
+		else                          $('#'+this.base+'-m-xadlg-'+id).removeClass('el-l-m-dlg-vis').addClass('el-l-m-dlg-hdn');
+		that.live_enable_message_buttons(id, true);
+	};
+	this.live_message_extend_submit = function(id, add_tags_vs_attachments) {
+
+		var urlbase = window.location.href;
+		var idx = urlbase.indexOf( '&' );
+		if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
+
+		// Use JQuery AJAX Form plug-in to post the reply w/o reloading
+		// the current page.
+		//
+		if( add_tags_vs_attachments ) {
+
+			var old_info = $('#'+this.base+'-m-xtdlg-'+id+'-info').html();
+			$('#'+this.base+'-m-xtdlg-'+id+'-info').html('Submitting. Please wait...');
+			$('#'+this.base+'-m-xt-c-'+id).button('disable');
+			$('#'+this.base+'-m-xt-s-'+id).button('disable');
+
+			$('#elog-form-extend-tags-'+id).ajaxSubmit({
+				success: function(data) {
+					if( data.Status != 'success' ) {
+						alert('failed because of: '+data.Message);
+						return;
+					}
+					var tags = data.Extended.tags;
+					for( var i = 0; i < tags.length; i++ )
+						that.messages[id].tags.unshift(tags[i]);
+
+					that.expand_message(that.messages[id].thread_idx, true);
+				},
+				complete: function() {
+					$('#'+that.base+'-m-xtdlg-'+id+'-info').html( old_info );
+					$('#'+that.base+'-m-xt-c-'+id).button('enable');
+					$('#'+that.base+'-m-xt-s-'+id).button('enable');
+				},
+				dataType: 'json'
+			});
+		} else {
+
+			var old_info = $('#'+this.base+'-m-xadlg-'+id+'-info').html();
+			$('#'+this.base+'-m-xadlg-'+id+'-info').html('Uploading. Please wait...');
+			$('#'+this.base+'-m-xa-c-'+id).button('disable');
+			$('#'+this.base+'-m-xa-s-'+id).button('disable');
+
+			$('#elog-form-extend-attachments-'+id).ajaxSubmit({
+				success: function(data) {
+					$('#'+that.base+'-extend-as-'+id).html(
+'<div>'+
+'  <input type="file" name="file2attach_0" onchange="'+that.address+'.live_extend_add_attachment('+id+')" />'+
+'  <input type="hidden" name="file2attach_0" value=""/ >'+
+'</div>'
+					);
+					if( data.Status != 'success' ) {
+						alert('failed because of: '+data.Message);
+						return;
+					}
+					var attachments = data.Extended.attachments;
+					for( var i = 0; i < attachments.length; i++ )
+						that.messages[id].attachments.unshift(attachments[i]);
+
+					that.expand_message(that.messages[id].thread_idx, true);
+				},
+				complete: function() {
+					$('#'+that.base+'-m-xadlg-'+id+'-info').html( old_info );
+					$('#'+that.base+'-m-xa-c-'+id).button('enable');
+					$('#'+that.base+'-m-xa-s-'+id).button('enable');
+				},
+				dataType: 'json'
+			});
+		}
+	};
+
+
+
 	this.live_message_edit_submit = function(id) {
 		var urlbase = window.location.href;
 		var idx = urlbase.indexOf( '&' );
@@ -2700,8 +3293,12 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 
 		// Use JQuery AJAX Form plug-in to post the reply w/o reloading
 		// the current page.
-		
 		//
+		var old_info = $('#'+this.base+'-m-rdlg-'+id+'-info').html();
+		$('#'+this.base+'-r-rdlg-'+id+'-info').html('Posting. Please wait...');
+		$('#'+this.base+'-r-re-c-'+id).button('disable');
+		$('#'+this.base+'-r-re-s-'+id).button('disable');
+
 		$('#elog-form-post-'+id).ajaxSubmit({
 			success: function(data) {
 				$('#elog-form-post-'+id+' textarea[name="message_text"]').val('');
@@ -2724,10 +3321,15 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 				that.expand_message( idx, false );
 				that.expand_message( idx, true );
 			},
+			complete: function() {
+				$('#'+that.base+'-r-rdlg-'+id+'-info').html( old_info );
+				$('#'+that.base+'-r-re-c-'+id).button('enable');
+				$('#'+that.base+'-r-re-s-'+id).button('enable');
+			},
 			dataType: 'json'
 		});
-
 	};
+
 	this.create_live_run_dialogs = function(idx) {
 		var entry = this.threads[idx];
 		var id    = entry.id;
@@ -2735,6 +3337,8 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 		if(dlgs.html() != '') return;
 		var html =
 '<div id="'+this.base+'-r-rdlg-'+id+'" class="el-l-r-rdlg el-l-r-dlg-hdn">'+
+//'  <div style="font-size:90%; text-decoration:underline; position:relative; left:-10px; top:-15px;">C o m p o s e &nbsp; m e s s a g e</div>'+
+'  <div id="'+this.base+'-r-rdlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Compose message. Note the total limit of <b>25 MB</b> for attachments.</div>'+
 '  <div style="float:left;">'+
 '    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/NewFFEntry4portalJSON.php" method="post">'+
 '      <input type="hidden" name="id" value="'+this.parent.exp_id+'" />'+
@@ -2746,7 +3350,6 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '      <input type="hidden" name="num_tags" value="0" />'+
 '      <input type="hidden" name="onsuccess" value="" />'+
 '      <input type="hidden" name="relevance_time" value="" />'+
-'      <div style="font-weight:bold; margin-bottom:4px;">Comment for the run:</div>'+
 '      <textarea name="message_text" rows="12" cols="64" style="padding:4px;" title="the first line of the message body will be used as its subject" ></textarea>'+
 '      <div style="margin-top: 10px;">'+
 '        <div style="float:left;">'+ 
@@ -2766,8 +3369,8 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right;" class="s-b-con"><button id="'+this.base+'-r-re-c-'+id+'" onclick="'+this.address+'.live_run_reply_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right;" class="s-b-con"><button id="'+this.base+'-r-re-s-'+id+'" onclick="'+this.address+'.live_run_reply_submit('+idx+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-r-re-c-'+id+'" onclick="'+this.address+'.live_run_reply_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-r-re-s-'+id+'" onclick="'+this.address+'.live_run_reply_submit('+idx+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>';
 
@@ -2829,7 +3432,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 		}
 		return html;
 	};
-
+/*
 	this.live_child2html = function(entry) {
 		that.messages[entry.id] = entry;
 		var html =
@@ -2884,7 +3487,61 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '</div>';
 		return html;
 	};
+*/
+	this.live_child2html = function(entry, thread_idx) {
+		that.messages[entry.id] = entry;
+		var html =
+'<div class="el-l-c-hdr" onclick="'+this.address+'.toggle_child('+entry.id+');">'+
+'  <div style="float:left;"><span class="toggler ui-icon ui-icon-triangle-1-e el-l-c-tgl" id="'+this.base+'-c-tgl-'+entry.id+'"></span></div>'+
+'  <div style="float:left;" class="el-l-c-time">'+entry.relevance_time+'</div>'+
+'  <div style="float:left;" class="el-l-c-author">'+entry.author+'</div>'+
+'  <div style="float:left; margin-left:10px;" class="el-l-c-subj">'+entry.subject+'</div>'+message_signs(entry)+
+'  <div style="clear:both;"></div>'+
+'</div>'+
+'<div class="el-l-c-con el-l-c-hdn" id="'+this.base+'-c-con-'+entry.id+'">'+
+'  <div class="el-l-c-body">'+
+'    <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>';
+		if(this.parent.editor)
+			html +=
+'    <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',true);">edit</button></div>';
+		html +=
+'    <div style="float:right;" class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',true);">reply</button></div>'+
+'    <div style="clear:both;"></div>'+
+'      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
+'  </div>';
+		that.attachments[entry.id] = entry.attachments;
 
+		var attachments_html = '';
+		for( var i in entry.attachments) {
+			var a = entry.attachments[i];
+			that.attachments_loader[a.id] = {loaded: false, descr: a};
+			attachments_html +=
+'    <div style="float:left;" class="el-l-a">'+
+'      <div style="float:left;">'+
+'        <span class="toggler ui-icon ui-icon-triangle-1-e el-l-a-tgl" id="'+this.base+'-a-tgl-'+a.id+'" onclick="'+this.address+'.toggle_attachment('+a.id+');"></span>'+
+'      </div>'+
+'      <div style="float:left;" class="el-l-a-dsc"><a class="link" href="../logbook/attachments/'+a.id+'/preview"  target="_blank">'+a.description+'</a></div>'+
+'      <div style="float:left; margin-left:10px;" class="el-l-a-info">( type: <b>'+a.type+'</b> size: <b>'+a.size+'</b> )</div>'+
+'      <div style="clear:both;"></div>'+
+'      <div class="el-l-a-con el-l-a-hdn" id="'+this.base+'-a-con-'+a.id+'">'+
+'      </div>'+
+'    </div>';
+		}
+		if(attachments_html) html +=
+'  <div class="el-l-m-as">'+attachments_html+
+'    <div style="clear:both;"></div>'+
+'  </div>';
+		html +=
+'  <div id="'+this.base+'-m-c-'+entry.id+'">';
+
+		var children = entry.children;
+		for(var i in children) html += that.live_child2html(eval("("+children[i]+")"), thread_idx);
+
+		html +=
+'  </div>'+
+'</div>';
+		return html;
+	};
 	function message_signs(entry) {
 		var html = '<div style="float:right; margin-right:10px;">';
 		for(var i=0; i < entry.attachments.length; i++) html += '<img src="../logbook/images/attachment.png" height="18" />';

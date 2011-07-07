@@ -282,13 +282,14 @@ HERE;
 
 HERE;
 
-    $num_tags = 3;
+    $used_tags = $logbook_experiment->used_tags();
+    $select_tag_html = "<option> select tag </option>\n";
+    foreach( $used_tags as $tag )
+    	$select_tag_html .= "<option>{$tag}</option>\n";
+
     $tags_html = '';
-    for( $i = 0; $i < $num_tags; $i++) {
-    	$select_tag_html = "<option> select tag </option>\n";
-    	foreach( $logbook_experiment->used_tags() as $tag ) {
-    		$select_tag_html .= "<option>{$tag}</option>\n";
-    	}
+    $num_tags  = 3;
+    for( $i = 0; $i < $num_tags; $i++)
     	$tags_html .=<<<HERE
 <div style="width: 100%;">
   <select id="elog-tags-library-{$i}">{$select_tag_html}</select>
@@ -297,8 +298,7 @@ HERE;
 </div>
 
 HERE;
-    }
-
+    
     $today = date("Y-m-d");
     $now   = "00:00:00";
     $shifts_html = '';
@@ -1348,6 +1348,9 @@ elog.max_run = <?=(is_null($max_run)?'null':$max_run->num())?>;
 	foreach( $logbook_shifts as $shift ) echo "elog.shifts['{$shift->begin_time()->toStringShort()}']={$shift->id()};\n";
 ?>
 elog.editor = <?=(LogBookAuth::instance()->canEditMessages( $experiment->id())?'true':'false')?>;
+<?php
+	foreach( $used_tags as $tag ) echo "elog.used_tags.push('{$tag}');\n";
+?>
 
 // Calback function for e-log to be used after successfully posting
 // a new message.
