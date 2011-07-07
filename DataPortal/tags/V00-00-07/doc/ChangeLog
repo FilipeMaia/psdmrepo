@@ -1,0 +1,59 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package DataPortal
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-07
+2011-07-07 Igor Gaponenko
+- adding attachments and tags to existing messages
+- improved (more dynamic) interactions when posting/modifying e-log contents
+- final implementation of the message viewer in the list of runs
+- changed appearance of the message reply dialogs
+
+Tag: V00-00-06
+2011-06-30 Igor Gaponenko
+- added statistics.php to report data management statistics accross all experiments
+- the improved version of Web Portal; numerious improvements and bug fixes
+
+Tag: V00-00-05
+2011-06-14 Igor Gaponenko
+- added a tab for 'Active' experiments into Experiment Switch
+- allowed to deselect anyone (in the e-mail notification section) in
+the Experiment Switch
+- tightened Experiment Switch GUI
+- allowed to retranslate 'FAILED' runs in teh HDF5 translaton interface
+- improved e-log 'Post' and 'Reply' dialogs to submit messages (w/ attachments)
+w/o refreshing the page. This required to bring in an additional
+JQuery plug-in (AJAX Form)
+
+Tag: V00-00-04
+2011-06-10 Igor Gaponenko
+- committing and tagging the first production version of the Protal
+
+Tag: V00-00-03
+2011-05-15 Igor Gaponenko
+- protected Portal pages from being accessed by non-authorized users
+- tagging as the first production version
+
+2011-05-13 Igor Gaponenko
+- save results of the on-going development
+
+2011-04-08 Igor Gaponenko
+- save results of the on-going development
+
+Tag: V00-00-02
+2011-02-25 Igor Gaponenko
+- the first usable version of e-log Live & Post pages
+
+Tag: V00-00-01
+2010-10-20 Igor Gaponenko
+- this is an initial commit of the Protal implementation with the main goal to save the
+code to SVN.
