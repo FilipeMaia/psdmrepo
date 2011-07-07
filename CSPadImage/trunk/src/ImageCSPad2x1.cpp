@@ -3,18 +3,22 @@
 // 	$Id$
 //
 // Description:
-//	Class Image2D...
+//	Class ImageCSPad2x1...
 //
 // Author List:
 //      Mikhail S. Dubrovin
 //
+// Image of the 2x1 have a gap comparing to the original array.
+// This gap is accounted in getValue.
+// This is the only principal difference with class Image2D.
+// Member data are also extended to account for this difference.
+// In this class we assume that the image has fixed size 388x185 with gap=3
 //------------------------------------------------------------------------
 
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "CSPadImage/Image2D.h"
-//#include "CSPadImage/ImageCSPad2x1.h"
+#include "CSPadImage/ImageCSPad2x1.h"
 
 //-----------------
 // C/C++ Headers --
@@ -42,74 +46,45 @@ namespace CSPadImage {
 // Constructors --
 //----------------
 
-// Default constructor
 template <typename T>
-Image2D<T>::Image2D (const T* data, size_t nrows, size_t ncols) :
-    m_data(data),
-    m_nrows(nrows),
-    m_ncols(ncols)
+ImageCSPad2x1<T>::ImageCSPad2x1 (const T* data, size_t gap_ncols, size_t nrows, size_t ncols) :
+  m_data(data)
 {
-  cout << "Here in Image2D<T>::Image2D" << endl;
-    m_nrows_transposed = ncols;
-    m_ncols_transposed = nrows;
-}
+  m_gap_ncols  = gap_ncols;
+  m_nrows_arr  = nrows;
+  m_ncols_arr  = ncols; 
+  m_nrows      = m_nrows_arr;
+  m_ncols      = m_ncols_arr+gap_ncols;
+  m_ncols_arr_half          = m_ncols_arr/2;
+  m_ncols_arr_half_plus_gap = m_ncols_arr_half + gap_ncols;
 
-//----------------
- 
-template <typename T>
-inline
-T Image2D<T>::getValue (int row, int col)
-{
-  return m_data[row*m_ncols + col];
-  //return m_data->getValue (row, col);
+  cout << "Here in ImageCSPad2x1<T>::ImageCSPad2x1" << endl;
 }
 
 //----------------
 
 template <typename T>
 inline
-T Image2D<T>::flipud (int row, int col)
+T ImageCSPad2x1<T>::getValue (size_t row, size_t col) 
 {
-  return getValue(m_nrows-row-1, col);
+  if (row<m_nrows) {
+
+    if       (col<m_ncols_arr_half)          { return m_data[row*m_ncols_arr + col]; }
+    else if  (col<m_ncols_arr_half_plus_gap) { return 0; }
+    else if  (col<m_ncols)                   { return m_data[row*m_ncols_arr + col - m_gap_ncols]; }
+    else { cout << "ImageCSPad2x1<T>: COLUMN INDEX " << col 
+                << " EXCEEDS MAXIMAL EXPECTED NUMBER " << m_ncols_arr 
+                << "+" << m_gap_ncols << endl; return 0; }
+  }
+  else { cout   << "ImageCSPad2x1<T>: ROW INDEX " << row 
+                << " EXCEEDS MAXIMAL EXPECTED NUMBER "<< m_nrows << endl; return 0; }
 }
 
 //----------------
 
 template <typename T>
 inline
-T Image2D<T>::fliplr (int row, int col)
-{
-  return getValue(row, m_ncols-col-1);
-}
-
-//----------------
-
-template <typename T>
-inline
-T Image2D<T>::transpose (int row, int col)
-{
-  int col_transposed = row;
-  int row_transposed = col;
-
-  if (col < (int)m_ncols_transposed and row < (int)m_nrows_transposed ) 
-    return getValue(row_transposed, col_transposed);
-  else
-    {
-      cout << "Image2D<T>::transpose: "   
-	   <<  "  row="   << row_transposed 
-           <<  "  col="   << col_transposed
-           <<  "  nrows=" << m_nrows_transposed
-           <<  "  ncols=" << m_ncols_transposed
-           << cout;
-      return 0;
-    }
-}
-
-//----------------
-
-template <typename T>
-inline
-T Image2D<T>::rot000 (int row, int col) // fliplr (transpose)
+T ImageCSPad2x1<T>::rot000 (int row, int col) // fliplr (transpose)
 {
   return getValue(row,col);
 }
@@ -118,7 +93,7 @@ T Image2D<T>::rot000 (int row, int col) // fliplr (transpose)
 
 template <typename T>
 inline
-T Image2D<T>::rot090 (int row, int col) // fliplr (transpose)
+T ImageCSPad2x1<T>::rot090 (int row, int col) // fliplr (transpose)
 {
   int col_transposed = row;
   int row_transposed = col;
@@ -129,7 +104,7 @@ T Image2D<T>::rot090 (int row, int col) // fliplr (transpose)
 
 template <typename T>
 inline
-T Image2D<T>::rot270 (int row, int col) // flipud (transpose)
+T ImageCSPad2x1<T>::rot270 (int row, int col) // flipud (transpose)
 {
   int col_transposed = row;
   int row_transposed = col;
@@ -140,7 +115,7 @@ T Image2D<T>::rot270 (int row, int col) // flipud (transpose)
 
 template <typename T>
 inline
-T Image2D<T>::rot180 (int row, int col) // flipud and fliplr
+T ImageCSPad2x1<T>::rot180 (int row, int col) // flipud and fliplr
 {
   return getValue(m_nrows-row-1, m_ncols-col-1);
 }
@@ -149,20 +124,20 @@ T Image2D<T>::rot180 (int row, int col) // flipud and fliplr
 
 template <typename T>
 inline
-T Image2D<T>::rotN90 (int row, int col, int N) // Generalazed rotation by N*90 degree
+T ImageCSPad2x1<T>::rotN90 (int row, int col, int Nx90) // Generalazed rotation by N*90 degree
 {
-       if (N==0) return rot000(row,col);
-  else if (N==1) return rot090(row,col);
-  else if (N==2) return rot180(row,col);
-  else if (N==3) return rot270(row,col);
-  else           return rot000(row,col);
+       if (Nx90==0) return rot000(row,col);
+  else if (Nx90==1) return rot090(row,col);
+  else if (Nx90==2) return rot180(row,col);
+  else if (Nx90==3) return rot270(row,col);
+  else              return rot000(row,col);
 }
 
 //----------------
 
 template <typename T>
 inline
-size_t Image2D<T>::getNCols(int Nx90)
+size_t ImageCSPad2x1<T>::getNCols(int Nx90)
 {
   if ( (Nx90+2)%2 == 0 ) return m_ncols;
   else                   return m_nrows;
@@ -172,19 +147,18 @@ size_t Image2D<T>::getNCols(int Nx90)
 
 template <typename T>
 inline
-size_t Image2D<T>::getNRows(int Nx90)
+size_t ImageCSPad2x1<T>::getNRows(int Nx90)
 {
   if ( (Nx90+2)%2 == 0 ) return m_nrows;
   else                   return m_ncols;
 }
 
 //----------------
-//----------------
 
 template <typename T>
-void Image2D<T>::printImage (int Nx90)
+void ImageCSPad2x1<T>::printImage (int Nx90)
 {
-        cout << "Image2D<T>: Rotation by 90*" << Nx90 << "=" << Nx90*90 << " degree" << endl;
+        cout << "ImageCSPad2x1<T>: Rotation by 90*" << Nx90 << "=" << Nx90*90 << " degree" << endl;
 
 	cout << "   ncols=" << this->getNCols(Nx90)
 	     << "   nrows=" << this->getNRows(Nx90)
@@ -202,15 +176,15 @@ void Image2D<T>::printImage (int Nx90)
 //----------------
 
 template <typename T>
-void Image2D<T>::printEntireImage (int Nx90)
+void ImageCSPad2x1<T>::printEntireImage (int Nx90)
 {
-        cout << "Image2D<T>: Rotation by 90*" << Nx90 << "=" << Nx90*90 << " degree" << endl;
+        cout << "ImageCSPad2x1<T>: Rotation by 90*" << Nx90 << "=" << Nx90*90 << " degree" << endl;
 
 	cout << "   ncols=" << this->getNCols(Nx90)
 	     << "   nrows=" << this->getNRows(Nx90)
              << endl;
 
-	for (size_t row = 0; row < getNRows(Nx90); row++) {
+        for (size_t row = 0; row < getNRows(Nx90); row++) {
 	  for (size_t col = 0; col < getNCols(Nx90); col++) {
 
 	    cout << this->rotN90 (row,col,Nx90) << "  ";
@@ -219,24 +193,19 @@ void Image2D<T>::printEntireImage (int Nx90)
 	}
 }
 
-
-
-
 //--------------
 // Destructor --
 //--------------
 template <typename T>
-Image2D<T>::~Image2D ()
+ImageCSPad2x1<T>::~ImageCSPad2x1 ()
 {
   delete [] m_data; 
 }
-
 
 //-----------------------------------
 // Instatiation of templated classes
 //-----------------------------------
 
-template class CSPadImage::Image2D<uint16_t>;
-  //template class CSPadImage::Image2D<ImageCSPad2x1<uint16_t>>;
+template class CSPadImage::ImageCSPad2x1<uint16_t>;
 
 } // namespace CSPadImage

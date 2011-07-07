@@ -75,7 +75,7 @@ public:
   //virtual void endRun(Event& evt, Env& env);
 
   /// Method which is called once at the end of the job
-  //virtual void endJob(Event& evt, Env& env);
+  virtual void endJob(Event& evt, Env& env);
 
   //void iterateOverData(const uint16_t* data);
   void iterateOverData(const uint16_t data[][388]);

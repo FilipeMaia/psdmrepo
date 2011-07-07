@@ -30,6 +30,7 @@
 #include "psddl_psana/cspad.ddl.h"
 
 #include "CSPadImage/Image2D.h"
+#include "CSPadImage/ImageCSPad2x1.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -198,13 +199,16 @@ void CSPadTest::event(Event& evt, Env& env)
 	//iterateOverData(data2d);
 	//delete [] data2d;
 
-        Image2D<uint16_t>* quad_image = new Image2D<uint16_t>(data,m_Nrows,m_Ncols);
-        quad_image -> printImage();
+        Image2D<uint16_t>* pair_arr_image = new Image2D<uint16_t>(data,m_Nrows,m_Ncols);
+        pair_arr_image -> printImage();
+
+        //uint16_t data2d[185][388];
 
     }
 
 
   } // if (data2.get())
+
 
 
   // this is how to skip event (all downstream modules will not be called)
@@ -251,11 +255,32 @@ void CSPadTest::iterateOverData(const uint16_t data[][388]) // [185][388] for on
 
 
 /// Method which is called once at the end of the job
-//void CSPadTest::endJob(Event& evt, Env& env) {}
+void CSPadTest::endJob(Event& evt, Env& env) {
+
+  uint16_t arr2d[3][4] = { { 0, 1, 2, 3 },
+                           { 4, 5, 6, 7 },
+                           { 8, 9, 10,11} 
+                         };
+  
+		     int nrows=3;
+		     int ncols=4;
+
+  Image2D<uint16_t>* test_image = new Image2D<uint16_t>(&arr2d[0][0],nrows,ncols);  
+                     test_image -> printEntireImage();
+                     test_image -> printEntireImage(1);
+                     test_image -> printEntireImage(2);
+                     test_image -> printEntireImage(3);
 
 
+		     int gap_ncols = 2;
 
+  ImageCSPad2x1<uint16_t>* image_2x1 = new ImageCSPad2x1<uint16_t>(&arr2d[0][0], gap_ncols, nrows, ncols);  
+	                   image_2x1 -> printEntireImage(0);
+	                   image_2x1 -> printEntireImage(1);
+	                   image_2x1 -> printEntireImage(2);
+	                   image_2x1 -> printEntireImage(3);
 
+}
 
 
 } // namespace CSPadImage

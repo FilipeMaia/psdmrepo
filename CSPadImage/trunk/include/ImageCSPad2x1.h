@@ -1,12 +1,12 @@
-#ifndef CSPADIMAGE_IMAGE2D_H
-#define CSPADIMAGE_IMAGE2D_H
+#ifndef CSPADIMAGE_IMAGECSPAD2X1_H
+#define CSPADIMAGE_IMAGECSPAD2X1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class Image2D.
+//	Class ImageCSPad2x1.
 //
 //------------------------------------------------------------------------
 
@@ -46,30 +46,19 @@ namespace CSPadImage {
  */
 
 template <typename T>
-class Image2D  {
+class ImageCSPad2x1  {
 public:
 
   // Default constructor
-  Image2D () ;
+  ImageCSPad2x1 () ;
 
   // Regular constructor
-  Image2D (const T* data, size_t nrows, size_t ncols) ;
-
-  // Regular constructor
-  //Image2D (T* data, size_t nrows, size_t ncols) :
-  //  m_data(data),
-  //  m_nrows(nrows),
-  //  m_ncols(ncols)
-  //{}
+  ImageCSPad2x1 (const T* data, size_t gap_ncols=3, size_t nrows=185, size_t ncols=388) ;
 
   // Destructor
-  virtual ~Image2D () ;
+  virtual ~ImageCSPad2x1 () ;
 
-  //void getValue (int row, int col, T &v);
-  T    getValue  (int row, int col);
-  T    flipud    (int row, int col);
-  T    fliplr    (int row, int col);
-  T    transpose (int row, int col);
+  T    getValue  (size_t  row, size_t  col);
   T    rot000    (int row, int col);
   T    rot090    (int row, int col);
   T    rot180    (int row, int col);
@@ -78,15 +67,16 @@ public:
 
   size_t getNCols(int Nx90);
   size_t getNRows(int Nx90);
-
+  //T& operator[](size_t &index);
   void printImage       (int Nx90=0);
   void printEntireImage (int Nx90=0);
+
 
 private:
 
   // Copy constructor and assignment are disabled by default
-  Image2D ( const Image2D& ) ;
-  Image2D operator = ( const Image2D& ) ;
+  ImageCSPad2x1 ( const ImageCSPad2x1& ) ;
+  ImageCSPad2x1 operator = ( const ImageCSPad2x1& ) ;
 
 //------------------
 // Static Members --
@@ -96,10 +86,13 @@ private:
   const T* m_data;
   size_t   m_nrows;
   size_t   m_ncols;
-  size_t   m_nrows_transposed;
-  size_t   m_ncols_transposed;
+  size_t   m_nrows_arr;
+  size_t   m_ncols_arr;
+  size_t   m_gap_ncols;
+  size_t   m_ncols_arr_half;
+  size_t   m_ncols_arr_half_plus_gap;
 };
 
 } // namespace CSPadImage
 
-#endif // CSPADIMAGE_IMAGE2D_H
+#endif // CSPADIMAGE_IMAGECSPAD2X1_H
