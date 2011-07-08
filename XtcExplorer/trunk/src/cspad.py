@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 class CsPad( object ):
 
@@ -22,6 +23,84 @@ class CsPad( object ):
         quads = range(4)
         self.sections = map(config.sections, quads)
         pass
+
+    def CsPadElementCommonModeCorr( self, data3d, qn ):
+        # Construct one image for each quadrant, each with 8 sections
+        # from a data3d = 3 x 2*194 x 185 data array
+        #   +---+---+-------+
+        #   |   |   |   6   |
+        #   + 5 | 4 +-------+
+        #   |   |   |   7   |
+        #   +---+---+---+---+
+        #   |   2   |   |   |
+        #   +-------+ 0 | 1 |
+        #   |   3   |   |   |
+        #   +-------+---+---+
+
+        # min and max
+        #print "CsPad (min,max) for quad %d: (%d,%d)" % (qn,np.min(data3d),np.max(data3d))
+
+
+        # if any sections are missing, insert zeros
+        if len( data3d ) < 8 :
+            zsec = np.zeros( (185,388), dtype=data3d.dtype)
+            #zsec = zsec * -99
+            for i in range (8) :
+                if i not in self.sections[qn] :
+                    data3d = np.insert( data3d, i, zsec, axis=0 )
+
+        pairs = []
+        for i in range (8) :
+
+            # histogram of all pixel values (intensities) in this section
+            nbins = 1000
+            mean = np.mean( data3d[i] )
+            std = np.std( data3d[i] )
+            #low_high = ( np.min(data3d[i]), np.max(data3d[i]) )
+            low_high = mean - 5*std, mean + 5*std
+            #(hist, bin_edges) = np.histogram( data3d[i], nbins, low_high )
+            #print hist
+            #plt.plot(bin_edges[:-1],hist)
+            plt.hist(np.ravel(data3d[i]),bins=nbins,range=low_high)
+            plt.show()
+        
+            # insert gap between asics in the 2x1
+            asics = np.hsplit( data3d[i], 2)
+            gap = np.zeros( (185,4), dtype=data3d.dtype )
+            #gap = gap * -99
+            pair = np.hstack( (asics[0], gap, asics[1]) )
+
+                
+            # sections 2,3 and 6,7 are as is. The others need some rotation:
+            if i==0 or i==1 :
+                pair = pair[:,::-1].T
+            if i==4 or i==5 :
+                pair = pair[::-1,:].T
+
+            pairs.append( pair )
+
+
+        # make the array for this quadrant
+        quadrant = np.zeros( (self.npix_quad, self.npix_quad), dtype=data3d.dtype )
+        #quadrant = quadrant * -99
+
+        # insert the 2x1 sections according to
+        for sec in range (8):
+            nrows, ncols = pairs[sec].shape
+
+            # x,y  in quadrant coordinate system
+            xpos = self.xpos_sec2x1[qn][sec]
+            ypos = self.ypos_sec2x1[qn][sec]
+            colp = xpos
+            rowp = self.npix_quad-ypos
+
+            quadrant[rowp-nrows:rowp, colp:colp+ncols] = pairs[sec][0:nrows,0:ncols]
+
+
+        # Finally, rotate the quadrant as needed
+        if qn>0 : quadrant = np.rot90( quadrant, 4-qn)
+        return quadrant
+
 
     def CsPadElement( self, data3d, qn ):
         # Construct one image for each quadrant, each with 8 sections

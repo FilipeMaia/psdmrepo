@@ -53,6 +53,7 @@ class  pyana_cspad ( object ) :
     def __init__ ( self,
                    img_sources = None,
                    dark_img_file = None,
+                   pedestal_file = None,
                    out_avg_file = None,
                    out_shot_file = None,
                    plot_vrange = None,
@@ -66,6 +67,7 @@ class  pyana_cspad ( object ) :
 
         @param img_sources      string, Address of Detector-Id|Device-ID
         @param dark_img_file    name (base) of dark image file (numpy array) to be loaded, if any
+        @param pedestal_file    full path/name of pedestal file (same as translator is using). Alternative! to dark image file. 
         @param out_avg_file     name (base) of output file for average image (numpy array)
         @param out_shot_file    name (base) of numpy array file for selected single-shot events
         @param plot_vrange      range (format vmin:vmax) of values for plotting (pixel intensity)
@@ -87,6 +89,13 @@ class  pyana_cspad ( object ) :
 
         self.darkfile = opt.getOptString(dark_img_file)
         if self.darkfile is not None: print "Input dark image file: ", self.darkfile
+
+        self.pedestalfile = opt.getOptString(pedestal_file)
+        if self.pedestalfile is not None: print "Using pedestals file: ", self.pedestalfile
+
+        if self.darkfile is not None and self.pedestalfile is not None:
+            print "... cannot use both! user-supplied dark image will be used. Pedestals will be ignored"
+            self.pedestalfile = None
                 
         self.out_avg_file = opt.getOptString(out_avg_file)
         if self.out_avg_file is not None: print "Output average image file: ", self.out_avg_file
@@ -150,16 +159,25 @@ class  pyana_cspad ( object ) :
 
         # load dark image from file
         self.dark_image = None
-        if self.darkfile is None :
-            print "No dark-image file provided. The images will not be background subtracted."
-        else :
-            print "Loading dark image from ", self.darkfile
-            try: 
-                self.dark_image = np.load(self.darkfile)
-            except IOError:
-                print "No dark file found, will compute darks on the fly"
-                print "(will only work if a reasonable threshold is used)"
+        try: 
+            self.dark_image = np.load(self.darkfile)
+            print "Dark Image %s loaded from %s" %(str(self.dark.image.shape), self.darkfile)
+            print "Darks will be subtracted from displayed images"
+        except:
+            print "No dark image loaded"
+            pass
+
+        # load dark from pedestal file:
+        try:
+            array = np.loadtxt(self.pedestalfile)
+            self.pedestals = np.reshape(array, (4,8,185,388) )
+            print "Pedestals has been loaded from %s"%self.pedestalfile
+            print "Pedestals will be subtracted from displayed images"
+        except:
+            print "No pedestals loaded"
+            pass
         
+                
     # this method is called at an xtc Configure transition
     def beginjob ( self, evt, env ) : 
 
@@ -195,6 +213,14 @@ class  pyana_cspad ( object ) :
     # process event/shot data
     def event ( self, evt, env ) :
 
+        if  ( self.accumulate_n != 0 and (self.n_good%self.accumulate_n)==0 ):
+            self.sum_good_images = None
+            self.n_good = 0
+
+        if  ( self.accumulate_n != 0 and (self.n_dark%self.accumulate_n)==0 ):
+            self.sum_dark_images = None
+            self.n_dark = 0
+            
         # this one counts every event
         self.n_shots+=1
 
@@ -230,8 +256,14 @@ class  pyana_cspad ( object ) :
             # image data as 3-dimentional array
             data = q.data()
             #print "min and max of original array for quad#%d: %d, %d" %(q.quad(),np.min(data),np.max(data))
-            
-            qimage = self.cspad.CsPadElement(data, q.quad())
+
+            ### Do dark (pedestal) subtraction and common mode correction here!! ###
+            try: 
+                qimage = self.cspad.CsPadElement( data-self.pedestals[q.quad()], q.quad() )
+            except:
+                qimage = self.cspad.CsPadElement( data, q.quad() )
+                
+            #qimage = self.cspad.CsPadElement(data, q.quad())
             qimages[q.quad()] = qimage
 
 
@@ -309,11 +341,11 @@ class  pyana_cspad ( object ) :
             # flag for pyana_plotter
             evt.put(True, 'show_event')
             
-            title = "CsPad shot#%d"%self.n_shots
+            title = "%s shot#%d"%(self.img_source,self.n_shots)
 
             # keep a list of images 
             event_display_images = []
-            event_display_images.append( (self.img_source, cspad_image ) )
+            event_display_images.append( ("%s shot#%d"%(self.img_source,self.n_shots), cspad_image ) )
 
             if roi is not None:
                 extent=self.threshold.area                
@@ -341,7 +373,7 @@ class  pyana_cspad ( object ) :
                 
             newmode = self.plotter.draw_figurelist(self.mpl_num,
                                                    event_display_images,
-                                                   title=title,
+                                                   title="",
                                                    showProj=True)
 
             if newmode is not None:
@@ -354,7 +386,7 @@ class  pyana_cspad ( object ) :
             
             # data for iPython
             self.data.image = cspad_image
-            self.data.average = self.sum_good_images/self.n_shots
+            self.data.average = self.sum_good_images/self.n_good
             self.data.dark = self.dark_image
 
             # save this shot image (numpy array)
