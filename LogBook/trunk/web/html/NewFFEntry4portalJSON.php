@@ -41,17 +41,11 @@ HERE;
 
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
-    if( $id == '' ) {
-        report_error_and_exit( "experiment identifier can't be empty" );
-    }
-} else {
-    report_error_and_exit( "no valid experiment identifier" );
-}
-if( isset( $_POST['message_text'] )) {
-    $message = trim( $_POST['message_text'] );
-} else {
-    report_error_and_exit( "no valid message text" );
-}
+    if( $id == '' ) report_error_and_exit( "experiment identifier can't be empty" );
+} else report_error_and_exit( "no valid experiment identifier" );
+
+if( isset( $_POST['message_text'] )) $message = trim( $_POST['message_text'] );
+else report_error_and_exit( "no valid message text" );
 
 /* The author's name (if provided) would take a precedence
  * over the author's account which is mandatory.
@@ -62,46 +56,40 @@ if( isset( $_POST['author_account'] )) {
         $str = trim( $_POST['author_name'] );
         if( $str != '' ) $author = $str;
     }
-} else {
-    report_error_and_exit( "no valid author text" );
-}
+} else report_error_and_exit( "no valid author text" );
 
 $shift_id = null;
-$run_id = null;
+$run_id   = null;
+$run_num  = null;
 
 if( isset( $_POST['scope'] )) {
-    $scope = trim( $_POST['scope'] );
-    if( $scope == '' ) {
-        report_error_and_exit( "scope can't be empty" );
-    } else if( $scope == 'shift' ) {
+
+	$scope = trim( $_POST['scope'] );
+    if( $scope == '' ) report_error_and_exit( "scope can't be empty" );
+
+    else if( $scope == 'shift' ) {
         if( isset( $_POST['shift_id'] )) {
             $shift_id = trim( $_POST['shift_id'] );
-            if( $shift_id == '' ) {
-                report_error_and_exit( "shift id can't be empty" );
-            }
-        } else {
-            report_error_and_exit( "no valid shift id" );
-        }
+            if( $shift_id == '' ) report_error_and_exit( "shift id can't be empty" );
+        } else report_error_and_exit( "no valid shift id" );
+
     } else if( $scope == 'run' ) {
         if( isset( $_POST['run_id'] )) {
             $run_id = trim( $_POST['run_id'] );
-            if( $run_id == '' )
-                report_error_and_exit( "run id can't be empty" );
-        } else {
-            report_error_and_exit( "no valid run id" );
-        }
+            if( $run_id == '' ) report_error_and_exit( "run id can't be empty" );
+        } else if( isset( $_POST['run_num'] )) {
+            $run_num = trim( $_POST['run_num'] );
+            if( $run_num == '' ) report_error_and_exit( "run number can't be empty" );
+        } else report_error_and_exit( "no valid run id or number" );
+
     } else if( $scope == 'message' ) {
         if( isset( $_POST['message_id'] )) {
             $message_id = trim( $_POST['message_id'] );
-            if( $message_id == '' )
-                report_error_and_exit( "parent message id can't be empty" );
-        } else {
-            report_error_and_exit( "no valid parent message id" );
-        }
+            if( $message_id == '' ) report_error_and_exit( "parent message id can't be empty" );
+        } else report_error_and_exit( "no valid parent message id" );
     }
-} else {
-    report_error_and_exit( "no valid scope" );
-}
+
+} else report_error_and_exit( "no valid scope" );
 
 $relevance_time_enforced = false;
 $relevance_time          = LusiTime::now();
@@ -334,8 +322,12 @@ try {
     $logbook->begin();
 
     $experiment = $logbook->find_experiment_by_id( $id ) or	report_error_and_exit( "no such experiment" );
-
     $instrument = $experiment->instrument();
+
+    if(( $scope == 'run' ) && is_null( $run_id )) {
+    	$run = $experiment->find_run_by_num( $run_num ) or die( "no such run" );
+    	$run_id = $run->id();
+    }
 
     LogBookAuth::instance()->canPostNewMessages( $experiment->id()) or
         report_error_and_exit( 'You are not authorized to post messages for the experiment' );

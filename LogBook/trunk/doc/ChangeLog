@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: 00-01-24
+2011-07-07 Igor Gaponenko
+- updated version of e-log "Grabber" to allow posting messages for runs
+- improved version of the message creation services to allow posting for a run number (not just of run id)
+- added a service to extend existing messages by adding more tags and/or attachments
+
 Tag: 00-01-23
 2011-06-30 Igor Gaponenko
 - improvements needed for the new version of Portal

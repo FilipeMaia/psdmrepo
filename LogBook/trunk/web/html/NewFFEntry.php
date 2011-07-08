@@ -16,17 +16,12 @@ use LusiTime\LusiTimeException;
  */
 if( isset( $_POST['id'] )) {
     $id = trim( $_POST['id'] );
-    if( $id == '' ) {
-        die( "experiment identifier can't be empty" );
-    }
-} else {
-    die( "no valid experiment identifier" );
-}
-if( isset( $_POST['message_text'] )) {
-    $message = trim( $_POST['message_text'] );
-} else {
-    die( "no valid message text" );
-}
+    if( $id == '' ) die( "experiment identifier can't be empty" );
+} else die( "no valid experiment identifier" );
+
+if( isset( $_POST['message_text'] )) $message = trim( $_POST['message_text'] );
+else die( "no valid message text" );
+
 // The author's name (if provided) would take a precedence
 // over the author's account which is mandatory.
 //
@@ -36,47 +31,43 @@ if( isset( $_POST['author_account'] )) {
         $str = trim( $_POST['author_name'] );
         if( $str != '' ) $author = $str;
     }
-} else {
-    die( "no valid author text" );
-}
+} else die( "no valid author text" );
 
 $shift_id = null;
-$run_id = null;
-$relevance_time = LusiTime::now();
+$run_id   = null;
+$run_num  = null;
 
 if( isset( $_POST['scope'] )) {
-    $scope = trim( $_POST['scope'] );
-    if( $scope == '' ) {
-        die( "scope can't be empty" );
-    } else if( $scope == 'shift' ) {
+
+	$scope = trim( $_POST['scope'] );
+    if( $scope == '' ) die( "scope can't be empty" );
+
+	else if( $scope == 'shift' ) {
         if( isset( $_POST['shift_id'] )) {
             $shift_id = trim( $_POST['shift_id'] );
-            if( $shift_id == '' ) {
-                die( "shift id can't be empty" );
-            }
-        } else {
-            die( "no valid shift id" );
-        }
+            if( $shift_id == '' ) die( "shift id can't be empty" );
+        } else die( "no valid shift id" );
+
     } else if( $scope == 'run' ) {
         if( isset( $_POST['run_id'] )) {
             $run_id = trim( $_POST['run_id'] );
-            if( $run_id == '' )
-                die( "run id can't be empty" );
-        } else {
-            die( "no valid run id" );
-        }
+            if( $run_id == '' ) die( "run id can't be empty" );
+        } else if( isset( $_POST['run_num'] )) {
+        	$run_num = trim( $_POST['run_num'] );
+            if( $run_num == '' ) die( "run number can't be empty" );
+        } else die( "no valid run id or number provided" );
+
     } else if( $scope == 'message' ) {
         if( isset( $_POST['message_id'] )) {
             $message_id = trim( $_POST['message_id'] );
-            if( $message_id == '' )
-                die( "parent message id can't be empty" );
-        } else {
-            die( "no valid parent message id" );
-        }
+            if( $message_id == '' ) die( "parent message id can't be empty" );
+        } else die( "no valid parent message id" );
     }
-} else {
-    die( "no valid scope" );
-}
+
+} else die( "no valid scope" );
+
+$relevance_time = LusiTime::now();
+
 
 // Read optional tags submitted with the entry
 //
@@ -160,10 +151,13 @@ try {
     $logbook = new LogBook();
     $logbook->begin();
 
-    $experiment = $logbook->find_experiment_by_id( $id )
-        or die( "no such experiment" );
-
+    $experiment = $logbook->find_experiment_by_id( $id ) or die( "no such experiment" );
     $instrument = $experiment->instrument();
+
+    if(( $scope == 'run' ) && is_null( $run_id )) {
+    	$run = $experiment->find_run_by_num( $run_num ) or die( "no such run" );
+    	$run_id = $run->id();
+    }
 
     // Check for the authorization
     //
