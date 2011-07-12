@@ -101,21 +101,9 @@ try {
 
 	$has_elog_access = LogBookAuth::instance()->canRead( $logbook_experiment->id());
 
-	$num_runs = 0;
-    $min_run = null;
-    $max_run = null;
-    $logbook_runs = $logbook_experiment->runs();
-    foreach( $logbook_runs as $run ) {
-    	$num_runs++;
-  		if( is_null( $min_run )) {
-  			$min_run = $run;
-  			$max_run = $run;
-  		} else {
-    		if( $run->num() < $min_run->num()) $min_run = $run;
-  			if( $run->num() > $max_run->num()) $max_run = $run;
-  		}
-    }
-    $range_of_runs = ( is_null($min_run) || is_null($max_run)) ? 'no runs taken yet' : $min_run->num().' .. '.$max_run->num();
+	$num_runs = $logbook_experiment->num_runs();
+    $min_run  = $logbook_experiment->find_first_run();
+    $max_run  = $logbook_experiment->find_last_run();
 
     $logbook_shifts = $logbook_experiment->shifts();
 
@@ -126,8 +114,6 @@ try {
     $last_experiment_switch = $regdb->last_experiment_switch( $instrument->name());
     if( !is_null( $last_experiment_switch ) && ( $exper_id == $last_experiment_switch['exper_id'] )) $decorated_experiment_status = '<span style="color:#ff0000; font-weight:bold;">ACTIVE</span>';
 	$decorated_experiment_contact = DataPortal::decorated_experiment_contact_info( $experiment );
-	$min_run_num = is_null($min_run) ? '' : $min_run->num();
-	$max_run_num = is_null($max_run) ? '' : $max_run->num();
 	$decorated_min_run = is_null($min_run) ? 'n/a' : $min_run->begin_time()->toStringShort().' (<b>run '.$min_run->num().'</b>)';
 	$decorated_max_run = is_null($max_run) ? 'n/a' : $max_run->begin_time()->toStringShort().' (<b>run '.$max_run->num().'</b>)';
 	$experiment_group_members     = "<table><tbody>\n";
@@ -323,8 +309,7 @@ HERE;
         <div id="el-p-message4run" class="hidden">
           <div style="float:left; font-weight:bold; padding-top:5px;">Message for run</div>
           <div style="float:left; margin-left:5px;">
-            <input type="text" id="el-p-runnum" value="{$max_run_num}" size=2 />
-            <span id="el-p-runnum-error" style="color:red;"></span>
+            <input type="text" id="el-p-runnum" value="" size=4 />
           </div>
           <div style="clear:both;"></div>
         </div>
@@ -332,7 +317,7 @@ HERE;
       <form id="elog-form-post" enctype="multipart/form-data" action="../logbook/NewFFEntry4portalJSON.php" method="post">
         <input type="hidden" name="id" value="{$experiment->id()}" />
         <input type="hidden" name="scope" value="" />
-        <input type="hidden" name="run_id" value="" />
+        <input type="hidden" name="run_num" value="" />
         <input type="hidden" name="shift_id" value="" />
         <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />
         <input type="hidden" name="num_tags" value="{$num_tags}" />
@@ -1340,11 +1325,7 @@ elog.author = '<?=$auth_svc->authName()?>';
 elog.exp_id = '<?=$exper_id?>';
 elog.exp = '<?=$experiment->name()?>';
 elog.instr = '<?=$experiment->instrument()->name()?>';
-elog.rrange = '<?=$range_of_runs?>';
-elog.min_run = <?=(is_null($min_run)?'null':$min_run->num())?>;
-elog.max_run = <?=(is_null($max_run)?'null':$max_run->num())?>;
 <?php
-	foreach( $logbook_runs as $run ) echo "elog.runs[{$run->num()}]={$run->id()};\n";
 	foreach( $logbook_shifts as $shift ) echo "elog.shifts['{$shift->begin_time()->toStringShort()}']={$shift->id()};\n";
 ?>
 elog.editor = <?=(LogBookAuth::instance()->canEditMessages( $experiment->id())?'true':'false')?>;

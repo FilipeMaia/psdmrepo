@@ -11,6 +11,18 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2011-07-12 Igor Gaponenko
+- optimized implementation of the Portal to reduce the startup time
+by not loading run information
+- show IDs for threads and replies (this feature is needed by the new verison of
+the Grabber to post messages as replies)
+- allow posting for any run
+- improving the diagnostics by displaying a pop-up modal dialog in case
+of errors in e-log
+- do not allow posting messages/replies w/a any message
+
+
 Tag: V00-00-07
 2011-07-07 Igor Gaponenko
 - adding attachments and tags to existing messages

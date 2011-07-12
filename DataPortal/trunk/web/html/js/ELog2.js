@@ -24,11 +24,7 @@ function elog_create() {
 	this.exp_id  = null;
 	this.exp     = null;
 	this.instr   = null;
-	this.rrange  = null;
-	this.min_run = null;
-	this.max_run = null;
 	this.shifts  = new Array();
-	this.runs    = new Array();
 	this.editor  = false;
 	this.post_onsuccess = null;
 	this.used_tags = new Array();
@@ -94,6 +90,17 @@ function elog_create() {
 			this.post_reset();
 		}
 	};
+    this.report_error = function(msg) {
+        $('#popupdialogs').html( '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>' );
+        $('#popupdialogs').dialog({
+        	resizable: false,
+        	modal: true,
+        	buttons: {
+        		'Ok': function() { $(this).dialog('close'); }
+        	},
+        	title: 'Error'
+        });
+    };
 
 	/* ----------------------------------------------
 	 *  Initialize the form for posting new messages
@@ -175,29 +182,22 @@ function elog_create() {
 	
 		$('#elog-post-submit').button().click(function() {
 	
-			/* Validate the form and initialize hidden fields */
-
 			var urlbase = window.location.href;
 			var idx = urlbase.indexOf( '&' );
 			if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
 
+			// Make sure there is anything to submit. Do not allow submitting
+			// an empty message.
+			//
+			if( $('#elog-form-post textarea[name="message_text"]').val() == '' ) {
+				that.report_error('Can not post the empty message. Please put some text into the message box.');
+				return;
+			}
+
 			if( that.context2 == 'run' ) {
-
-				if( that.min_run == null ) {
-					$('#el-p-runnum-error').text('the experiment has not taken any runs yet');
-					return;
-				}
-				var run = $('#el-p-runnum').val();
-				if(( run < that.min_run ) || ( run > that.max_run )) {
-					$('#el-p-runnum-error').text('the run number is out of allowed range: '+that.min_run+'-'+that.max_run);
-					return;
-				}
-				$('#elog-form-post input[name="run_id"]').val(that.runs[run]);
-
+				$('#elog-form-post input[name="run_num"]').val($('#el-p-runnum').val());
 			} else if( that.context2 == 'shift' ) {
-
-				var shift = $('#el-p-shift').val();
-				$('#elog-form-post input[name="shift_id"]').val(that.shifts[shift]);
+				$('#elog-form-post input[name="shift_id"]').val(that.shifts[$('#el-p-shift').val()]);
 			}
 			switch( post_selected_relevance()) {
 
@@ -221,10 +221,7 @@ function elog_create() {
 			 */
 			$('#elog-form-post').ajaxSubmit({
 				success: function(data) {
-					if( data.Status != 'success' ) {
-						alert('failed because of: '+data.Message);
-						return;
-					}
+					if( data.Status != 'success' ) { that.report_error(data.Message); return; }
 					that.post_reset();
 
 					// If the parent provided a call back then tell the parent
@@ -232,6 +229,7 @@ function elog_create() {
 					//
 					if( that.post_onsuccess != null ) that.post_onsuccess();
 				},
+				error: function() {	that.report_error('The request can not go through due a failure to contact the server.'); },
 				dataType: 'json'
 			});
 		});
@@ -483,9 +481,7 @@ function elog_create() {
 				for(var i=0; i < authors.length; i++) authors_html += '<option>'+authors[i]+'</option>';
 				$('#elog-form-search select[name="author"]').html(authors_html);
 			},
-			'JSON').error(function () {
-				alert('failed because of: '+jqXHR.statusText);
-			});
+			'JSON').error(function () {	that.report_error( 'failed because of: '+jqXHR.statusText ); });
 		});
 		$('#elog-form-search').find('input[name="runs"]').keyup(function(e) { if( e.keyCode == 13 ) that.search(); });
 	};
@@ -663,9 +659,7 @@ function elog_create() {
 			$('#el-sh-info').html('<b>'+that.shifts_last_request.length+'</b> shifts');
 			$('#el-sh-updated').html('[ Last update on: <b>'+result.Updated+'</b> ]');
 		},
-		'JSON').error(function () {
-			alert('failed because of: '+jqXHR.statusText);
-		});
+		'JSON').error(function () { that.report_error( 'failed because of: '+jqXHR.statusText ); });
 	};
 	this.shifts_init = function() {
 		$('#el-sh-refresh').button().click(function() { that.update_shifts(); });
@@ -781,9 +775,7 @@ function elog_create() {
 			$('#el-r-info').html('<b>'+that.runs_last_request.length+'</b> runs');
 			$('#el-r-updated').html('[ Last update on: <b>'+result.Updated+'</b> ]');
 		},
-		'JSON').error(function () {
-			alert('failed because of: '+jqXHR.statusText);
-		});
+		'JSON').error(function () { that.report_error( 'failed because of: '+jqXHR.statusText ); });
 	};
 	this.runs_init = function() {
 		$('#el-r-refresh').button().click(function() { that.update_runs(); });
@@ -1102,9 +1094,7 @@ function elog_create() {
 			$('#el-at-info').html('<b>'+num_attachments+'</b> attachments');
 			$('#el-at-updated').html('[ Last update on: <b>'+result.Updated+'</b> ]');
 		},
-		'JSON').error(function () {
-			alert('failed because of: '+jqXHR.statusText);
-		});
+		'JSON').error(function () { that.report_error( 'failed because of: '+jqXHR.statusText ); });
 	};
 	this.attachments_init = function() {
 		$('#el-at-refresh').button().click(function() { that.update_attachments(); });
@@ -1134,10 +1124,7 @@ function elog_create() {
 		if( id != null ) params.id = id;
 		var jqXHR = $.get('../logbook/CheckSubscription.php',params,function(data) {
 			var result = eval(data);
-			if(result.Status != 'success') {
-				alert( 'failed because of: '+result.Message );
-				return;
-			}
+			if(result.Status != 'success') { that.report_error( result.Message ); return; }
 			$('#el-subscribed'  ).css('display', result.Subscribed ? 'block' : 'none' );
 			$('#el-unsubscribed').css('display', result.Subscribed ? 'none'  : 'block');
 			var html = '';
@@ -1170,9 +1157,7 @@ html+
 				that.subscription('UNSUBSCRIBE', $(this).val());
 			});
 		},
-		'JSON').error(function () {
-			alert('failed because of: '+jqXHR.statusText);
-		});
+		'JSON').error(function () { that.report_error( 'failed because of: '+jqXHR.statusText ); });
 	};
 	this.subscribe_init = function() {
 		$('#el-subscribe'  ).button().click(function() { that.subscription('SUBSCRIBE',   null); });
@@ -2019,6 +2004,14 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		var idx = urlbase.indexOf( '&' );
 		if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
 
+		// Make sure there is anything to submit. Do not allow submitting
+		// an empty message.
+		//
+		if( $('#elog-form-post-'+id+' textarea[name="message_text"]').val() == '' ) {
+			this.parent.report_error('Can not post the empty message. Please put some text into the message box.');
+			return;
+		}
+
 		var old_info = $('#'+this.base+'-m-rdlg-'+id+'-info').html();
 		$('#'+this.base+'-m-rdlg-'+id+'-info').html('Posting. Please wait...');
 		$('#'+this.base+'-m-re-c-'+id).button('disable');
@@ -2037,10 +2030,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '  <input type="hidden" name="file2attach_0" value=""/ >'+
 '</div>'
 				);
-				if( data.Status != 'success' ) {
-					alert('failed because of: '+data.Message);
-					return;
-				}
+				if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
 				var entry = data.Entry;
 
 				// Find the parent message and add a new child to it.
@@ -2124,6 +2114,14 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		var idx = urlbase.indexOf( '&' );
 		if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
 
+		// Make sure there is anything to submit. Do not allow submitting
+		// an empty message.
+		//
+		if( $('#elog-form-post-'+id+' textarea[name="message_text"]').val() == '' ) {
+			this.parent.report_error('Can not post the empty message. Please put some text into the message box.');
+			return;
+		}
+
 		// Use JQuery AJAX Form plug-in to post the reply w/o reloading
 		// the current page.
 		//
@@ -2142,10 +2140,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '  <input type="hidden" name="file2attach_0" value=""/ >'+
 '</div>'
 				);
-				if( data.Status != 'success' ) {
-					alert('failed because of: '+data.Message);
-					return;
-				}
+				if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
 				that.live_run_reply_cancel(id);
 			},
 			complete: function() {
@@ -2190,10 +2185,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 
 			$('#elog-form-extend-tags-'+id).ajaxSubmit({
 				success: function(data) {
-					if( data.Status != 'success' ) {
-						alert('failed because of: '+data.Message);
-						return;
-					}
+					if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
 					var tags = data.Extended.tags;
 					for( var i = 0; i < tags.length; i++ )
 						that.messages[id].tags.unshift(tags[i]);
@@ -2222,13 +2214,10 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '  <input type="hidden" name="file2attach_0" value=""/ >'+
 '</div>'
 					);
-					if( data.Status != 'success' ) {
-						alert('failed because of: '+data.Message);
-						return;
-					}
+					if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
 					var attachments = data.Extended.attachments;
 					for( var i = 0; i < attachments.length; i++ )
-						that.messages[id].attachments.unshift(attachments[i]);
+						that.messages[id].attachments.push(attachments[i]);
 
 					that.expand_message(that.messages[id].thread_idx, true);
 				},
@@ -2328,7 +2317,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '    <div style="float:left;"><span class="toggler ui-icon ui-icon-triangle-1-e el-l-m-tgl" id="'+this.base+'-m-tgl-'+entry.id+'"></span></div>'+
 '    <div style="float:left;" class="el-l-m-time">'+entry.hms+'</div>'+
 '    <div style="float:left;" class="el-l-m-author">'+entry.author+'</div>'+
-'    <div style="float:left; margin-left:10px;" class="el-l-m-subj">'+entry.subject+'</div>'+run_sign(entry.run_num)+message_signs(entry)+
+'    <div style="float:left; margin-left:10px;" class="el-l-m-subj">'+entry.subject+'</div>'+id_sign(entry)+run_sign(entry.run_num)+message_signs(entry)+
 '    <div style="clear:both;"></div>'+
 '  </div>'+
 '  <div class="el-l-m-con el-l-m-hdn" id="'+this.base+'-m-con-'+entry.id+'"></div>';
@@ -2367,7 +2356,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '  <div style="float:left;"><span class="toggler ui-icon ui-icon-triangle-1-e el-l-c-tgl" id="'+this.base+'-c-tgl-'+entry.id+'"></span></div>'+
 '  <div style="float:left;" class="el-l-c-time">'+entry.relevance_time+'</div>'+
 '  <div style="float:left;" class="el-l-c-author">'+entry.author+'</div>'+
-'  <div style="float:left; margin-left:10px;" class="el-l-c-subj">'+entry.subject+'</div>'+message_signs(entry)+
+'  <div style="float:left; margin-left:10px;" class="el-l-c-subj">'+entry.subject+'</div>'+id_sign(entry)+message_signs(entry)+
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div class="el-l-c-con el-l-c-hdn" id="'+this.base+'-c-con-'+entry.id+'">'+
@@ -2421,6 +2410,10 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		for(var i=0; i < entry.tags.length; i++) html += '&nbsp;<sup><b>T</b></sup>';
 		if(entry.children.length) html +=  '&nbsp;<sup><b>&crarr;</b></sup>';
 		html += '</div>';
+		return html;
+	}
+	function id_sign(entry) {
+		var html = '<div style="float:right; margin-left:10px; margin-top:2px; padding-left:2px; padding-right:2px; background-color:#ffffff;">'+entry.id+'</div>';
 		return html;
 	}
 
@@ -2767,11 +2760,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 		};
 		$.get('../logbook/Search.php',params,function(data) {
 
-			var status = data.ResultSet.Status;
-			if(status!='success') {
-				alert(data.ResultSet.Message);
-				return;
-			}
+			if(data.ResultSet.Status != 'success') { that.parent.report_error( data.ResultSet.Message ); return; }
 
 			that.threads = data.ResultSet.Result;
 			that.messages = new Array();
@@ -2786,104 +2775,6 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 
 		},'json');
 	};
-
-/*
-	this.create_live_message_dialogs = function(id, is_child) {
-		var dlgs = $('#'+this.base+'-m-dlgs-'+id);
-		if(dlgs.html() != '') return;
-		var entry = this.messages[id];
-		var html =
-'<div id="'+this.base+'-m-rdlg-'+id+'" class="el-l-m-rdlg el-l-m-dlg-hdn">'+
-'  <div style="font-size:90%; text-decoration:underline; position:relative; left:-10px; top:-15px;">C o m p o s e &nbsp; r e p l y</div>'+
-'  <div style="float:left;">'+
-'    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/NewFFEntry4portalJSON.php" method="post">'+
-'      <input type="hidden" name="id" value="'+this.parent.exp_id+'" />'+
-'      <input type="hidden" name="scope" value="message" />'+
-'      <input type="hidden" name="message_id" value="'+id+'" />'+
-'      <input type="hidden" name="run_id" value="" />'+
-'      <input type="hidden" name="shift_id" value="" />'+
-'      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />'+
-'      <input type="hidden" name="num_tags" value="0" />'+
-'      <input type="hidden" name="onsuccess" value="" />'+
-'      <input type="hidden" name="relevance_time" value="" />'+
-'      <textarea name="message_text" rows="12" cols="64" style="padding:4px;" title="the first line of the message body will be used as its subject" ></textarea>'+
-'      <div style="margin-top: 10px;">'+
-'        <div style="float:left;">'+ 
-'          <div style="font-weight:bold;">Author:</div>'+
-'          <input type="text" name="author_account" value="'+this.parent.author+'" size=32 style="padding:2px; margin-top:5px;" />'+
-'        </div>'+
-'        <div style="float:left; margin-left:20px;">'+ 
-'          <div style="font-weight:bold;">Attachments:</div>'+
-'          <div id="'+this.base+'-reply-as-'+id+'" style="margin-top:5px;">'+
-'            <div>'+
-'              <input type="file" name="file2attach_0" onchange="'+this.address+'.live_reply_add_attachment('+id+')" />'+
-'              <input type="hidden" name="file2attach_0" value=""/ >'+
-'            </div>'+
-'          </div>'+
-'        </div>'+
-'        <div style="clear:both;"></div>'+
-'      </div>'+
-'    </form>'+
-'  </div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-re-c-'+id+'" onclick="'+this.address+'.live_message_reply_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-re-s-'+id+'" onclick="'+this.address+'.live_message_reply_submit('+id+');">submit</button></div>'+
-'  <div style="clear:both;"></div>'+
-'</div>';
-		if(this.parent.editor) {
-			html +=
-'<div id="'+this.base+'-m-edlg-'+id+'" class="el-l-m-edlg el-l-m-dlg-hdn">'+
-'  <div style="font-size:90%; text-decoration:underline; position:relative; left:-10px; top:-15px;">E d i t &nbsp; m e s s a g e</div>'+
-'  <div style="float:left;">'+
-'    <form id="elog-form-edit-'+id+'" enctype="multipart/form-data" action="../logbook/UpdateFFEntry4portal.php" method="post">'+
-'      <input type="hidden" name="id" value="'+id+'" />'+
-'      <input type="hidden" name="content_type" value="TEXT" />'+
-'      <input type="hidden" name="onsuccess" value="" />'+
-'      <textarea name="content" rows="12" cols="64" style="padding:4px;" title="the first line of the message body will be used as its subject" >'+entry.content+'</textarea>'+
-'      <div style="font-weight:bold; margin-top: 10px;">Extra attachments:</div>'+
-'      <div id="'+this.base+'-edit-as-'+id+'" style="margin-top:5px;">'+
-'        <div>'+
-'          <input type="file" name="file2attach_0" onchange="'+this.address+'.live_edit_add_attachment('+id+')" />'+
-'          <input type="hidden" name="file2attach_0" value=""/ >'+
-'        </div>'+
-'      </div>'+
-'    </form>'+
-'  </div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ed-c" id="'+this.base+'-m-ed-c-'+id+'" onclick="'+this.address+'.live_message_edit_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ed-s" id="'+this.base+'-m-ed-s-'+id+'" onclick="'+this.address+'.live_message_edit_submit('+id+');">submit</button></div>'+
-'  <div style="clear:both;"></div>'+
-'</div>'+
-'<div id="'+this.base+'-m-mdlg-'+id+'" class="el-l-m-mdlg el-l-m-dlg-hdn">'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-mv-c" id="'+this.base+'-m-mv-c-'+id+'" onclick="'+this.address+'.live_message_move_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-mv-s" id="'+this.base+'-m-mv-s-'+id+'" onclick="'+this.address+'.live_message_move_submit('+id+');">submit</button></div>'+
-'  <div style="clear:both;"></div>'+
-''+
-'  Here be the dialog allowing to move the message into some other context and/or time.'+
-'  Right now we create it automatically for each message after loading it.'+
-'  We should probably optimize things by creating it at first use.'+
-'  That way we will reduce the size of DOM'+
-'</div>';
-		}
-
-		dlgs.html(html);
-
-		$('#'+this.base+'-m-re-s-'+id).button();
-		$('#'+this.base+'-m-re-c-'+id).button();
-
-		if(this.parent.editor) {
-			$('#'+this.base+'-m-ed-s-'+id).button();
-			$('#'+this.base+'-m-ed-c-'+id).button();
-			$('#'+this.base+'-m-mv-e-'+id).button();
-			$('#'+this.base+'-m-mv-c-'+id).button();
-		}
-	}
-
-	this.live_enable_message_buttons = function(id, on) {
-		var state = on ? 'enable' : 'disable';
-		$('#'+this.base+'-m-re-'+id).button(state);
-		$('#'+this.base+'-m-ed-'+id).button(state);
-		$('#'+this.base+'-m-mv-'+id).button(state);
-	};
-*/
 	this.create_live_message_dialogs = function(id, is_child) {
 		var dlgs = $('#'+this.base+'-m-dlgs-'+id);
 		if(dlgs.html() != '') return;
@@ -3095,9 +2986,18 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 	};
 
 	this.live_message_reply_submit = function(id) {
+
 		var urlbase = window.location.href;
 		var idx = urlbase.indexOf( '&' );
 		if( idx > 0 ) urlbase = urlbase.substring( 0, idx );
+
+		// Make sure there is anything to submit. Do not allow submitting
+		// an empty message.
+		//
+		if( $('#elog-form-post-'+id+' textarea[name="message_text"]').val() == '' ) {
+			this.parent.report_error('Can not post the empty message. Please put some text into the message box.' );
+			return;
+		}
 
 		var old_info = $('#'+this.base+'-m-rdlg-'+id+'-info').html();
 		$('#'+this.base+'-m-rdlg-'+id+'-info').html('Posting. Please wait...');
@@ -3117,10 +3017,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '  <input type="hidden" name="file2attach_0" value=""/ >'+
 '</div>'
 				);
-				if( data.Status != 'success' ) {
-					alert('failed because of: '+data.Message);
-					return;
-				}
+				if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
 				var entry = data.Entry;
 
 				// Find the parent message and add a new child to it.
@@ -3193,10 +3090,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 
 			$('#elog-form-extend-tags-'+id).ajaxSubmit({
 				success: function(data) {
-					if( data.Status != 'success' ) {
-						alert('failed because of: '+data.Message);
-						return;
-					}
+					if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
 					var tags = data.Extended.tags;
 					for( var i = 0; i < tags.length; i++ )
 						that.messages[id].tags.unshift(tags[i]);
@@ -3225,10 +3119,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '  <input type="hidden" name="file2attach_0" value=""/ >'+
 '</div>'
 					);
-					if( data.Status != 'success' ) {
-						alert('failed because of: '+data.Message);
-						return;
-					}
+					if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
 					var attachments = data.Extended.attachments;
 					for( var i = 0; i < attachments.length; i++ )
 						that.messages[id].attachments.unshift(attachments[i]);
@@ -3285,11 +3176,21 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 		that.live_enable_run_buttons(id, true);
 	};
 	this.live_run_reply_submit = function(idx) {
+
 		var entry = this.threads[idx];
 		var id    = entry.id;
+
 		var urlbase = window.location.href;
 		var urlbase_idx = urlbase.indexOf( '&' );
 		if( urlbase_idx > 0 ) urlbase = urlbase.substring( 0, urlbase_idx );
+
+		// Make sure there is anything to submit. Do not allow submitting
+		// an empty message.
+		//
+		if( $('#elog-form-post-'+id+' textarea[name="message_text"]').val() == '' ) {
+			this.parent.report_error('Can not post the empty message. Please put some text into the message box.');
+			return;
+		}
 
 		// Use JQuery AJAX Form plug-in to post the reply w/o reloading
 		// the current page.
@@ -3309,10 +3210,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '  <input type="hidden" name="file2attach_0" value=""/ >'+
 '</div>'
 				);
-				if( data.Status != 'success' ) {
-					alert('failed because of: '+data.Message);
-					return;
-				}
+				if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
 				that.live_run_reply_cancel(id);
 
 				// Close and reopen the panel for the run to refresh its contents, so that
@@ -3403,7 +3301,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '    <div style="float:left;"><span class="toggler ui-icon ui-icon-triangle-1-e el-l-m-tgl" id="'+this.base+'-m-tgl-'+entry.id+'"></span></div>'+
 '    <div style="float:left;" class="el-r-m-time">'+entry.relevance_time+'</div>'+
 '    <div style="float:left;" class="el-l-m-author">'+entry.author+'</div>'+
-'    <div style="float:left; margin-left:10px;" class="el-l-m-subj">'+entry.subject+'</div>'+run_sign(entry.run_num)+message_signs(entry)+
+'    <div style="float:left; margin-left:10px;" class="el-l-m-subj">'+entry.subject+'</div>'+id_sign(entry)+run_sign(entry.run_num)+message_signs(entry)+
 '    <div style="clear:both;"></div>'+
 '  </div>'+
 '  <div class="el-l-m-con el-l-m-hdn" id="'+this.base+'-m-con-'+entry.id+'"></div>';
@@ -3440,7 +3338,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '  <div style="float:left;"><span class="toggler ui-icon ui-icon-triangle-1-e el-l-c-tgl" id="'+this.base+'-c-tgl-'+entry.id+'"></span></div>'+
 '  <div style="float:left;" class="el-l-c-time">'+entry.relevance_time+'</div>'+
 '  <div style="float:left;" class="el-l-c-author">'+entry.author+'</div>'+
-'  <div style="float:left; margin-left:10px;" class="el-l-c-subj">'+entry.subject+'</div>'+message_signs(entry)+
+'  <div style="float:left; margin-left:10px;" class="el-l-c-subj">'+entry.subject+'</div>'+id_sign(entry)+message_signs(entry)+
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div class="el-l-c-con el-l-c-hdn" id="'+this.base+'-c-con-'+entry.id+'">'+
@@ -3495,7 +3393,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '  <div style="float:left;"><span class="toggler ui-icon ui-icon-triangle-1-e el-l-c-tgl" id="'+this.base+'-c-tgl-'+entry.id+'"></span></div>'+
 '  <div style="float:left;" class="el-l-c-time">'+entry.relevance_time+'</div>'+
 '  <div style="float:left;" class="el-l-c-author">'+entry.author+'</div>'+
-'  <div style="float:left; margin-left:10px;" class="el-l-c-subj">'+entry.subject+'</div>'+message_signs(entry)+
+'  <div style="float:left; margin-left:10px;" class="el-l-c-subj">'+entry.subject+'</div>'+id_sign(entry)+message_signs(entry)+
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div class="el-l-c-con el-l-c-hdn" id="'+this.base+'-c-con-'+entry.id+'">'+
@@ -3548,6 +3446,10 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 		for(var i=0; i < entry.tags.length; i++) html += '&nbsp;<sup><b>T</b></sup>';
 		if(entry.children.length) html +=  '&nbsp;<sup><b>&crarr;</b></sup>';
 		html += '</div>';
+		return html;
+	}
+	function id_sign(entry) {
+		var html = '<div style="float:right; margin-left:10px; margin-top:2px; padding-left:2px; padding-right:2px; background-color:#ffffff;">'+entry.id+'</div>';
 		return html;
 	}
 
