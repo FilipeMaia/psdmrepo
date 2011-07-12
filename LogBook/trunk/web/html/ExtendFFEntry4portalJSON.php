@@ -5,6 +5,7 @@ require_once( 'lusitime/lusitime.inc.php' );
 
 use LogBook\LogBook;
 use LogBook\LogBookAuth;
+use LogBook\LogBookUtils;
 use LogBook\LogBookException;
 
 use LusiTime\LusiTime;
@@ -26,7 +27,7 @@ header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
  */
 function report_error_and_exit( $msg ) {
     $status_encoded = json_encode( "error" );
-    $msg_encoded = json_encode( '<b><em style="color:red;" >Error:</em></b>&nbsp;'.$msg );
+    $msg_encoded = json_encode( $msg );
     print <<< HERE
 <textarea>
 {
@@ -74,29 +75,6 @@ if( isset( $_POST['num_tags'] )) {
 
 /* Process optional attachments
  */
-function upload_err2string( $errcode ) {
-
-	switch( $errcode ) {
-		case UPLOAD_ERR_OK:
-			return "There is no error, the file uploaded with success.";
-		case UPLOAD_ERR_INI_SIZE:
-			return "The uploaded file exceeds the maximum of ".get_ini("upload_max_filesize")." in this Web server configuration.";
-		case UPLOAD_ERR_FORM_SIZE:
-			return "The uploaded file exceeds the maximum of ".$_POST["MAX_FILE_SIZE"]." that was specified in the sender's HTML form.";
-		case UPLOAD_ERR_PARTIAL:
-			return "The uploaded file was only partially uploaded.";
-		case UPLOAD_ERR_NO_FILE:
-			return "No file was uploaded.";
-		case UPLOAD_ERR_NO_TMP_DIR:
-			return "Missing a temporary folder in this Web server installation.";
-		case UPLOAD_ERR_CANT_WRITE:
-			return "Failed to write file to disk at this Web server installation.";
-		case UPLOAD_ERR_EXTENSION:
-			return "A PHP extension stopped the file upload.";
-	}
-	return "Unknown error code: ".$errorcode;
-}
-
 $files = array();
 foreach( array_keys( $_FILES ) as $file_key ) {
 
@@ -107,7 +85,7 @@ foreach( array_keys( $_FILES ) as $file_key ) {
     	if( $error == UPLOAD_ERR_NO_FILE ) continue;
    		report_error_and_exit(
    			"Attachment '{$name}' couldn't be uploaded because of the following problem: '".
-   			upload_err2string( $error )."'."
+   			LogBookUtils::upload_err2string( $error )."'."
    		);
     }
     if( $name ) {

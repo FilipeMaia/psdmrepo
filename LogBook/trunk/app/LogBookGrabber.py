@@ -328,25 +328,31 @@ class LogBookGrabberUI:
         self.author = Label(parent, text=logbook_author)
         self.author.grid(row=6, column=1,padx=5,pady=0,sticky=W+N)
 
-        Label(parent, text="Run #: ").grid(row=7,column=0,padx=5,pady=5,sticky=W+N)
+        Label(parent, text="Run number: ").grid(row=7,column=0,padx=5,pady=5,sticky=W+N)
         self.run = Entry(parent)
         self.run.insert(0, "")
         self.run.grid(row=7, column=1,columnspan=1,padx=5,pady=5,sticky=W+N)
-        Label(parent, text="(put in a number if posting for a specific run)").grid(row=7,column=2,columnspan=4,padx=5,pady=5,sticky=W+N)
+        Label(parent, text="<- use if posting for a specific run").grid(row=7,column=2,columnspan=4,padx=5,pady=5,sticky=W+N)
 
-        Label(parent, text="Description: ").grid(row=8,column=0,padx=5,pady=5,sticky=W+N)
+        Label(parent, text="Message ID: ").grid(row=8,column=0,padx=5,pady=5,sticky=W+N)
+        self.message_id = Entry(parent)
+        self.message_id.insert(0, "")
+        self.message_id.grid(row=8, column=1,columnspan=1,padx=5,pady=5,sticky=W+N)
+        Label(parent, text="<- use if replying to an existing message").grid(row=8,column=2,columnspan=4,padx=5,pady=5,sticky=W+N)
+
+        Label(parent, text="Description: ").grid(row=9,column=0,padx=5,pady=5,sticky=W+N)
         self.descr = Entry(parent)
         self.descr.insert(0, "Image #1")
-        self.descr.grid(row=8, column=1,columnspan=2,padx=5,pady=5,sticky=W+N)
+        self.descr.grid(row=9, column=1,columnspan=2,padx=5,pady=5,sticky=W+N)
 
 
         self.canvas = Canvas(background='black',width=0,height=0)
-        self.canvas.grid(row=9,column=0,padx=5,pady=0,columnspan=6,sticky=W+N+E+S)
+        self.canvas.grid(row=10,column=0,padx=5,pady=0,columnspan=6,sticky=W+N+E+S)
 
         self.submit.configure(state=DISABLED)
         self.cancel.configure(state=DISABLED)
-        self.message.configure(state=DISABLED)
         self.run.configure(state=DISABLED)
+        self.message_id.configure(state=DISABLED)
         self.descr.configure(state=DISABLED)
 
     def on_grab(self):
@@ -383,8 +389,8 @@ class LogBookGrabberUI:
             self.grab.configure(state=DISABLED)
             self.submit.configure(state=NORMAL)
             self.cancel.configure(state=NORMAL)
-            self.message.configure(state=NORMAL)
             self.run.configure(state=NORMAL)
+            self.message_id.configure(state=NORMAL)
             self.descr.configure(state=NORMAL)
             image.draw()
 
@@ -392,15 +398,17 @@ class LogBookGrabberUI:
 
         self.message.delete("0.0",END)
         self.run.delete(0,last=END)
+        self.message_id.delete(0,last=END)
 
         self.grab.configure(state=NORMAL)
         self.submit.configure(state=DISABLED)
         self.cancel.configure(state=DISABLED)
-        self.message.configure(state=DISABLED)
         self.run.configure(state=DISABLED)
+        self.message_id.configure(state=DISABLED)
         self.descr.configure(state=DISABLED)
         self.canvas.configure(width=0)
         self.canvas.configure(height=0)
+        self.canvas.delete(ALL)
 
     def on_submit(self):
 
@@ -422,21 +430,16 @@ class LogBookGrabberUI:
 
         exper_id = logbook_experiments[exper_name]['id']
 
-        url = ws_url+'/LogBook/NewFFEntry.php'
+        url = ws_url+'/LogBook/NewFFEntry4grabber.php'
         run = self.run.get()
-        print "run: ", run
-        if( run == '' ):
-            data = (
-                ('author_account', logbook_author),
-                ('id', exper_id),
-                ('message_text', self.message.get("0.0",END)),
-                ('scope', 'experiment'),
-                ('num_tags', '1'),
-                ('tag_name_0','SCREENSHOT'),
-                ('tag_value_0',''),
-                ("file1", open( self.f_jpeg.name, 'r' )),
-                ("file1", self.descr.get()) )
-        else:
+        message_id = self.message_id.get()
+
+        if(( run != '' ) and ( message_id != '' )):
+            tkMessageBox.showerror (
+                "Inconsistent Input",
+                "Run number can't be used togher with the parent message ID. Choose the right context to post the screenshot and try again." )
+            return
+        if( run != '' ):
             data = (
                 ('author_account', logbook_author),
                 ('id', exper_id),
@@ -448,11 +451,36 @@ class LogBookGrabberUI:
                 ('tag_value_0',''),
                 ("file1", open( self.f_jpeg.name, 'r' )),
                 ("file1", self.descr.get()) )
+        elif( message_id != '' ): 
+            data = (
+                ('author_account', logbook_author),
+                ('id', exper_id),
+                ('message_text', self.message.get("0.0",END)),
+                ('scope', 'message'),
+                ('message_id', message_id),
+                ('num_tags', '1'),
+                ('tag_name_0','SCREENSHOT'),
+                ('tag_value_0',''),
+                ("file1", open( self.f_jpeg.name, 'r' )),
+                ("file1", self.descr.get()) )
+        else:
+            data = (
+                ('author_account', logbook_author),
+                ('id', exper_id),
+                ('message_text', self.message.get("0.0",END)),
+                ('scope', 'experiment'),
+                ('num_tags', '1'),
+                ('tag_name_0','SCREENSHOT'),
+                ('tag_value_0',''),
+                ("file1", open( self.f_jpeg.name, 'r' )),
+                ("file1", self.descr.get()) )
 
         try:
             req = urllib2.Request(url, data, {})
             response = urllib2.urlopen(req)
             the_page = response.read()
+            if the_page != '':
+                tkMessageBox.showerror ( "Error", the_page )
 
         except urllib2.URLError, reason:
             tkMessageBox.showerror (
@@ -465,15 +493,16 @@ class LogBookGrabberUI:
 
         self.message.delete("0.0",END)
         self.run.delete(0,last=END)
-
+        self.message_id.delete(0,last=END)
         self.grab.configure(state=NORMAL)
         self.submit.configure(state=DISABLED)
         self.cancel.configure(state=DISABLED)
-        self.message.configure(state=DISABLED)
         self.run.configure(state=DISABLED)
+        self.message_id.configure(state=DISABLED)
         self.descr.configure(state=DISABLED)
         self.canvas.configure(width=0)
         self.canvas.configure(height=0)
+        self.canvas.delete(ALL)
 
     def on_refresh (self):
 

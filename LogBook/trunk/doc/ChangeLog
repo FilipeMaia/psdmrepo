@@ -11,6 +11,15 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: 00-01-25
+2011-07-12 Igor Gaponenko
+- code refactoring in services to use logbookutil for common operations
+- added Web service for the Grabber to post new messages/replies
+- new version of the Grabber with the following improvements: proper error handling
+for errors reported by services, replyiing to messages, memory clean up after
+displaying an image preview and enabling the message text input before grabbing
+an image
+
 Tag: 00-01-24
 2011-07-07 Igor Gaponenko
 - updated version of e-log "Grabber" to allow posting messages for runs

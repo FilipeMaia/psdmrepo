@@ -12,31 +12,13 @@ use LusiTime\LusiTime;
 use LusiTime\LusiTimeException;
 
 /*
- * This script will process a request for creating new free-form entry
- * in the specified scope.
- */
-/*
- * NOTE: Can not return JSON MIME type because of the following issue:
- *       http://jquery.malsup.com/form/#file-upload
+ * This script will process a request from e-log Grabber for creating new free-form
+ * entry in the specified scope.
  *
-header( "Content-type: application/json" );
-header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
-header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
-*/
-/* Package the error message into a JSON object and return the one
- * back to a caller. The script's execution will end at this point.
+ * RETURN: an empty string in case of success, or an explanation of an error otherwise.
  */
 function report_error_and_exit( $msg ) {
-    $status_encoded = json_encode( "error" );
-    $msg_encoded = json_encode( $msg );
-    print <<< HERE
-<textarea>
-{
-  "Status": {$status_encoded},
-  "Message": {$msg_encoded}
-}
-</textarea>
-HERE;
+    print $msg;
     exit;
 }
 
@@ -201,7 +183,6 @@ try {
     LogBookAuth::instance()->canPostNewMessages( $experiment->id()) or
         report_error_and_exit( 'You are not authorized to post messages for the experiment' );
 
-
     $content_type = "TEXT";
 
     /* If the request has been made in a scope of some parent entry then
@@ -222,20 +203,6 @@ try {
         $attachment = $entry->attach_document( $f['contents'], $f['type'], $f['description'] );
 
     $experiment->notify_subscribers( $entry );
-
-    /* Return a JSON object describing the newly created entry back to the caller.
-     */
-    $status_encoded = json_encode( "success" );
-    $entry_encoded  = $scope == 'message' ? LogBookUtils::child2json( $entry, false ) : LogBookUtils::entry2json( $entry, false );
-
-	print <<< HERE
-<textarea>
-{
-  "Status": {$status_encoded},
-  "Entry": {$entry_encoded}
-}
-</textarea>
-HERE;
 
 	$logbook->commit();
 

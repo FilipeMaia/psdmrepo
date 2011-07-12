@@ -155,7 +155,7 @@ try {
     $instrument = $experiment->instrument();
 
     if(( $scope == 'run' ) && is_null( $run_id )) {
-    	$run = $experiment->find_run_by_num( $run_num ) or die( "no such run" );
+    	$run = $experiment->find_run_by_num( $run_num ) or exit(1);//die( "no such run" );
     	$run_id = $run->id();
     }
 
