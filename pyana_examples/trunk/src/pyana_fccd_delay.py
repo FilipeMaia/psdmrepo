@@ -130,7 +130,7 @@ class pyana_fccd_delay (object) :
 
         self.FoundStartTime = 1e12;
         self.FoundEndTime   = 0;
-  	self.DeltaTime      = (self.fEndTime - self.fStartTime)/self.iNumBins;
+        self.DeltaTime      = (self.fEndTime - self.fStartTime)/self.iNumBins;
 
         # histograms
         self.hTime = []
@@ -210,7 +210,7 @@ class pyana_fccd_delay (object) :
             i0value = ipmRaw.channel1Volts()
             if i0value < self.IpimbThrL:
                 print "Failed ipimb threshold", i0value, self.IpimbThrL 
-            	self.badEvents.append(self.nev)
+                self.badEvents.append(self.nev)
                 return            
         except:
             print "No %s found in shot#%d" %( self.ipimb_source, self.nev)
@@ -426,10 +426,10 @@ class pyana_fccd_delay (object) :
         plt.ioff()
         plt.show()
 
-	print "Bad events: ", self.badEvents
-	print "Total number of events: ", self.nev
-	print "Bad events: ", len(self.badEvents)
-	print "Good events: ", self.nev - len(self.badEvents)
+        print "Bad events: ", self.badEvents
+        print "Total number of events: ", self.nev
+        print "Bad events: ", len(self.badEvents)
+        print "Good events: ", self.nev - len(self.badEvents)
         
 
     def trim_image(self, image):
