@@ -405,7 +405,7 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.NumDevice, 13 )
 
         
-        o1 = DetInfo(0,0,0,0,0)
+        o1 = DetInfo(0,0,0,0)
         
         # check that we can call methods
         o1.level()
@@ -446,10 +446,9 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertRaises( TypeError, lambda : DetInfo(1) )
         self.assertRaises( TypeError, lambda : DetInfo(1,1) )
         self.assertRaises( TypeError, lambda : DetInfo(1,1,1) )
-        self.assertRaises( TypeError, lambda : DetInfo(1,1,1,1) )
         self.assertRaises( TypeError, lambda : DetInfo(1,1,1,1,1,1) )
-        self.assertRaises( TypeError, lambda : DetInfo(1,DetInfo.Detector.NumDetector,1,1,1) )
-        self.assertRaises( TypeError, lambda : DetInfo(1,1,1,DetInfo.Device.NumDevice,1) )
+        self.assertRaises( ValueError, lambda : DetInfo(1,DetInfo.Detector.NumDetector,1,1,1) )
+        self.assertRaises( ValueError, lambda : DetInfo(1,1,1,DetInfo.Device.NumDevice,1) )
 
         # can use for keys
         d = {}
@@ -510,7 +509,15 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( BldInfo.Type.PhaseCavity, 1 )
         self.assertEqual ( BldInfo.Type.FEEGasDetEnergy, 2 )
         self.assertEqual ( BldInfo.Type.Nh2Sb1Ipm01, 3 )
-        self.assertEqual ( BldInfo.Type.NumberOf, 4 )
+        self.assertEqual ( BldInfo.Type.HxxUm6Imb01, 4 )
+        self.assertEqual ( BldInfo.Type.HxxUm6Imb02, 5 )
+        self.assertEqual ( BldInfo.Type.HfxDg2Imb01, 6 )
+        self.assertEqual ( BldInfo.Type.HfxDg2Imb02, 7 )
+        self.assertEqual ( BldInfo.Type.XcsDg3Imb03, 8 )
+        self.assertEqual ( BldInfo.Type.XcsDg3Imb04, 9 )
+        self.assertEqual ( BldInfo.Type.HfxDg3Imb01, 10 )
+        self.assertEqual ( BldInfo.Type.HfxDg3Imb02, 11 )
+        self.assertEqual ( BldInfo.Type.NumberOf, 12 )
 
         o1 = BldInfo(0,0)
         
@@ -530,6 +537,11 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual( o2.processId(), 1 )
         self.assertEqual( o2.type(), 1 )
 
+        o3 = BldInfo("FEEGasDetEnergy")
+        self.assertEqual( o3.level(), Level.Reporter )
+        self.assertEqual( o3.processId(), 0 )
+        self.assertEqual( o3.type(), BldInfo.Type.FEEGasDetEnergy )
+
         # compare
         self.assert_ ( o2 > o1 ) 
         self.assert_ ( o2 >= o1 ) 
@@ -540,9 +552,9 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( o1, o1 ) 
         
         # out of range, parameters
-        self.assertRaises( TypeError, lambda : BldInfo(1) )
+        self.assertRaises( TypeError, lambda : BldInfo() )
         self.assertRaises( TypeError, lambda : BldInfo(1,1,1) )
-        self.assertRaises( TypeError, lambda : BldInfo(1,BldInfo.Type.NumberOf) )
+        self.assertRaises( ValueError, lambda : BldInfo(1,BldInfo.Type.NumberOf) )
 
         # can use for keys
         d = {}

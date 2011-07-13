@@ -201,17 +201,23 @@ DetInfo_init(PyObject* self, PyObject* args, PyObject* kwds)
   }
 
   // parse arguments
-  unsigned processId, det, detId, dev, devId;
-  if ( not PyArg_ParseTuple( args, "IIIII:DetInfo", &processId, &det, &detId, &dev, &devId ) ) {
-    return -1;
+  unsigned processId=0, det, detId, dev, devId;
+  if (PyTuple_GET_SIZE(args) == 4) {
+    if ( not PyArg_ParseTuple( args, "IIII:DetInfo", &det, &detId, &dev, &devId ) ) {
+      return -1;
+    }
+  } else {
+    if ( not PyArg_ParseTuple( args, "IIIII:DetInfo", &processId, &det, &detId, &dev, &devId ) ) {
+      return -1;
+    }
   }
 
   if ( det >= Pds::DetInfo::NumDetector ) {
-    PyErr_SetString(PyExc_TypeError, "Error: detector type out of range");
+    PyErr_SetString(PyExc_ValueError, "Error: detector type out of range");
     return -1;
   }
   if ( dev >= Pds::DetInfo::NumDevice ) {
-    PyErr_SetString(PyExc_TypeError, "Error: device type out of range");
+    PyErr_SetString(PyExc_ValueError, "Error: device type out of range");
     return -1;
   }
 
@@ -236,8 +242,9 @@ DetInfo_compare( PyObject* self, PyObject* other )
 {
   pypdsdata::DetInfo* py_this = (pypdsdata::DetInfo*) self;
   pypdsdata::DetInfo* py_other = (pypdsdata::DetInfo*) other;
-  if ( py_this->m_obj.log() > py_other->m_obj.log() ) return 1 ;
-  if ( py_this->m_obj.log() < py_other->m_obj.log() ) return -1 ;
+  // only compare Level and detector/device, skip process IDs
+  if ( py_this->m_obj.level() > py_other->m_obj.level() ) return 1 ;
+  if ( py_this->m_obj.level() < py_other->m_obj.level() ) return -1 ;
   if ( py_this->m_obj.phy() > py_other->m_obj.phy() ) return 1 ;
   if ( py_this->m_obj.phy() < py_other->m_obj.phy() ) return -1 ;
   return 0 ;

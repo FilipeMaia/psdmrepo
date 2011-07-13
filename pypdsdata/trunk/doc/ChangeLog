@@ -1,4 +1,14 @@
 
+2011-07-13 - V00-00-34
+======================
+- upgrade to pdsdata V02-11-19
+- BldInfo class added few source constants
+- extended BldInfo constructor to accepts single integer or 
+  single string which give value or name of the Type
+- extended DetInfo constructor to take 4 parameters, skipping
+  process id.
+- updated unit test
+
 2011-06-16 - V00-00-33
 ======================
 - updated TypeId and DetInfo enums

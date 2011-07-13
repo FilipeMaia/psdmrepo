@@ -38,6 +38,14 @@ namespace {
         { "PhaseCavity",     Pds::BldInfo::PhaseCavity },
         { "FEEGasDetEnergy", Pds::BldInfo::FEEGasDetEnergy },
         { "Nh2Sb1Ipm01",     Pds::BldInfo::Nh2Sb1Ipm01 },
+        { "HxxUm6Imb01",     Pds::BldInfo::HxxUm6Imb01 },
+        { "HxxUm6Imb02",     Pds::BldInfo::HxxUm6Imb02 },
+        { "HfxDg2Imb01",     Pds::BldInfo::HfxDg2Imb01 },
+        { "HfxDg2Imb02",     Pds::BldInfo::HfxDg2Imb02 },
+        { "XcsDg3Imb03",     Pds::BldInfo::XcsDg3Imb03 },
+        { "XcsDg3Imb04",     Pds::BldInfo::XcsDg3Imb04 },
+        { "HfxDg3Imb01",     Pds::BldInfo::HfxDg3Imb01 },
+        { "HfxDg3Imb02",     Pds::BldInfo::HfxDg3Imb02 },
         { "NumberOf",        Pds::BldInfo::NumberOf },
         { 0, 0 }
     };
@@ -110,11 +118,42 @@ BldInfo_init(PyObject* self, PyObject* args, PyObject* kwds)
   }
 
   // parse arguments
-  unsigned processId, type;
-  if ( not PyArg_ParseTuple( args, "II:BldInfo", &processId, &type ) ) return -1;
+  int processId=0, type=-1;
+  if (PyTuple_GET_SIZE(args) == 1) {
 
-  if ( type >= Pds::BldInfo::NumberOf ) {
-    PyErr_SetString(PyExc_TypeError, "Error: type out of range");
+    // argument can be an integer (long) or string
+    PyObject* obj;
+    if (not PyArg_ParseTuple(args, "O:BldInfo", &obj)) return -1;
+    if (PyInt_Check(obj)) {
+      type = PyInt_AsLong(obj);
+    } else if (PyLong_Check(obj)) {
+      type = PyLong_AsLong(obj);
+    } else if (PyString_Check(obj)) {
+
+      // string may be one of the strings returned from name()
+      char* str = PyString_AsString(obj);
+      for (int i = 0; i < Pds::BldInfo::NumberOf; ++ i) {
+        Pds::BldInfo info(0, Pds::BldInfo::Type(i));
+        if (strcmp(str, Pds::BldInfo::name(info)) == 0) {
+          type = i;
+          break;
+        }
+      }
+      if (type < 0) {
+        PyErr_Format(PyExc_ValueError, "Error: unknown BLD type string: %s", str);
+        return -1;
+      }
+    }
+
+  } else {
+
+    // expect two integer arguments
+    if (not PyArg_ParseTuple(args, "II:BldInfo", &processId, &type)) return -1;
+
+  }
+
+  if ( type < 0 or type >= Pds::BldInfo::NumberOf ) {
+    PyErr_SetString(PyExc_ValueError, "Error: BLD type out of range");
     return -1;
   }
 
@@ -138,10 +177,11 @@ BldInfo_compare( PyObject* self, PyObject* other )
 {
   pypdsdata::BldInfo* py_this = (pypdsdata::BldInfo*) self;
   pypdsdata::BldInfo* py_other = (pypdsdata::BldInfo*) other;
-  if ( py_this->m_obj.log() > py_other->m_obj.log() ) return 1 ;
-  if ( py_this->m_obj.log() < py_other->m_obj.log() ) return -1 ;
-  if ( py_this->m_obj.phy() > py_other->m_obj.phy() ) return 1 ;
-  if ( py_this->m_obj.phy() < py_other->m_obj.phy() ) return -1 ;
+  // only compare Level and Type, skip process IDs
+  if ( py_this->m_obj.level() > py_other->m_obj.level() ) return 1 ;
+  if ( py_this->m_obj.level() < py_other->m_obj.level() ) return -1 ;
+  if ( py_this->m_obj.type() > py_other->m_obj.type() ) return 1 ;
+  if ( py_this->m_obj.type() < py_other->m_obj.type() ) return -1 ;
   return 0 ;
 }
 
@@ -149,18 +189,20 @@ PyObject*
 BldInfo_str( PyObject *self )
 {
   pypdsdata::BldInfo* py_this = (pypdsdata::BldInfo*) self;
-  return PyString_FromString( Pds::BldInfo::name(py_this->m_obj) );
+  if (py_this->m_obj.type() < Pds::BldInfo::NumberOf) {
+    return PyString_FromFormat( "BldInfo(%s)", Pds::BldInfo::name(py_this->m_obj) );
+  } else {
+    return PyString_FromFormat( "BldInfo(%d)", int(py_this->m_obj.type()) );
+  }
 }
 
 PyObject*
 BldInfo_repr( PyObject *self )
 {
   pypdsdata::BldInfo* py_this = (pypdsdata::BldInfo*) self;
-  char buf[32];
-  snprintf( buf, sizeof buf, "<BldInfo(%d, %s)>",
-      py_this->m_obj.processId(),
+  return PyString_FromFormat( "<BldInfo(%d, %s)>",
+      int(py_this->m_obj.processId()),
       Pds::BldInfo::name(py_this->m_obj) );
-  return PyString_FromString( buf );
 }
 
 PyObject*
