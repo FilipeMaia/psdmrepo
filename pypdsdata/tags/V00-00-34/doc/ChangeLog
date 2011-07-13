@@ -1,0 +1,246 @@
+
+2011-07-13 - V00-00-34
+======================
+- upgrade to pdsdata V02-11-19
+- BldInfo class added few source constants
+- extended BldInfo constructor to accepts single integer or 
+  single string which give value or name of the Type
+- extended DetInfo constructor to take 4 parameters, skipping
+  process id.
+- updated unit test
+
+2011-06-16 - V00-00-33
+======================
+- updated TypeId and DetInfo enums
+- updated unit test
+
+2011-06-16 - V00-00-32
+======================
+- add wrapper src/lusi.py module
+
+2011-06-16 - V00-00-31
+======================
+- add new types from pdsdata V02-11-05
+
+2011-06-15 - V00-00-30
+======================
+- small fixes to make it compile with pdsdata V02-11-05, but new
+  types are not implemented yet
+
+2011-05-23 - V00-00-29
+======================
+- removed SITConfig include, not useful any more
+
+2011-05-23 - V00-00-28
+======================
+- suppress compilation warning about missing enum value in switch
+  in DataObjectFactory.cpp
+
+2011-03-31 - V00-00-27
+======================
+- fix for zero-sized Epics XTC objects
+
+2011-03-11 - V00-00-26
+======================
+- fixing copy and paste error in cspad.py
+
+2011-01-26 - V00-00-25
+======================
+- fixing image gluing for PNCCD
+
+2011-01-18 - V00-00-24
+======================
+- upgrading to pdsdata V02-10-03
+- enum constant name changed in Acqiris::TdcDataV1::Source
+- DetInfo::Detector enum extended with CxiSc1 value
+
+2011-01-05 - V00-00-23
+======================
+- upgrading to pdsdata V02-10-02
+- new classes acqiris/Tdc*
+- more uniform aspproach to repr() and str() functions, data classes 
+  can now define (non-virtual) method |void print(std::ostream&) const|
+  which will be used by default implementation of repr() and str().
+
+2010-12-15 - V00-00-22
+======================
+- adding pyevrcodes script to dump just evr codes
+
+2010-12-01 - V00-00-21
+======================
+- upgrading to pdsdata V02-10-00
+- new classes evr/ConfigV5, evr/EventCodeV5, evr/SequencerConfigV1, 
+  evr/SequencerEntry
+
+2010-11-23 - V00-00-20
+======================
+- improved printing of epics data types
+
+2010-11-23 - V00-00-19
+======================
+- upgrading to pdsdata V02-09-02
+- new class bld/BldDataIpimb
+- new typeId Id_SharedIpimb
+- new enum in xtc/BldInfo class BldInfo::Nh2Sb1Ipm01
+- many classes now have useful __repr__ and __str__ methods
+- pyxtcreader catches Broken pipe exceptions, avoids printing 
+  stack trace when pipe is closed
+
+2010-10-14 - V00-00-18
+======================
+- upgrading to pdsdata V02-08-00 and V02-09-00
+- new cspad/ConfigV2 and cspad/ElementV2 classes
+- new class encoder/DataV2
+
+2010-09-03 - V00-00-17
+======================
+- upgrading to pdsdata V02-07-00, new cspad module
+
+2010-08-13 - V00-00-16
+======================
+- added method xtc.Dgram.setClock() to change datagram time
+- io.XtcStreamMerger now changes datagram time
+- pyxtcreader has --l1-offset option
+
+2010-08-12 - V00-00-15
+======================
+- upgrading to pdsdata V02-06-00
+
+2010-06-29 - V00-00-14
+======================
+- fixing problem with stream synchronization, Disable transition
+  can appear timestamp sooner that the last event processed but their
+  order in XTC will be reversed. In the stream merge algorith ignore 
+  all Disable transitions
+
+2010-06-17 - V00-00-13
+======================
+- XtcMergeIterator can now accept files from multiple runs
+- pyxtcreader has -v option to control verbosity
+
+2010-06-10 - V00-00-12
+======================
+- upgrading to pdsdata V02-04-00
+
+2010-06-09 - V00-00-11
+======================
+- in DetInfo implement our own printing of detector and device names 
+  to make printed output consistent with the definition of enums
+- EnumType: suppress c++ warning about strict aliasing rules
+
+2010-06-08 - V00-00-10
+======================
+- forgot to add PNCCD::ConfigV2 to pyext/DataObjectFactory
+
+2010-06-08 - V00-00-09
+======================
+- new pdsdata V02-02-00, applying all changes here
+- new classes evr/IOChannel, evr/IOConfigV1, evr/ConfigV4, evr/EventCodeV4
+
+2010-05-20 - V00-00-08
+======================
+- added new types to DataObjectFactory
+
+2010-05-13 - V00-00-07
+======================
+- forgot couple of new classes in evr package
+- some evr classes had incorrect args count in methods
+
+2010-05-12 - V00-00-06
+======================
+- removed include SITConfig, not needed for this package
+
+2010-05-12 - V00-00-05
+======================
+- adding new types from pdsdata V02-00-01
+- fixing return code from unittest
+
+2010-05-03 - V00-00-04
+======================
+- fixed imports in unit test
+
+2010-04-09 - V00-00-02
+======================
+- fix few typos here and there
+- FrameFexConfigV1 - forgot to declare enums
+- evr/ConfigV2 - returned integer instead of enum
+
+2010-03-26 - V00-00-01
+======================
+- adopting whole thing to SConsTools building
+
+2010-03-24 - version 0.9
+========================
+- moved pdsdata/event.py to pyana
+- make all data classes inheriting from PdsDataType usable as read-only 
+  buffers
+- epics module has new method from_buffer()
+
+2010-03-16 - version 0.8
+========================
+- moved pyana stuff to a separate package
+
+2010-03-14 - version 0.7
+========================
+- preparing to add multiprocessing support
+- implmented pickling of Dgram and Epics classes
+
+2010-02-26 - version 0.6
+========================
+- few bugs fixed in data classes, needed to INCREF self before setting
+  base object in numpy arrays
+- epics xtcs are now cloned to avoid pinning of the whole datagram in memory
+- package organization reworked, now C code is in its own package _pdsdata
+  and pdsdata is pure Python package which imports stuff from _pdsdata.
+  Every _pdsdata submodule is mirrored in pdsdata package to allow
+  different kinds of imports and extend/override the classes from _pdsdata
+- started implementation of pyana
+- pnCCD/FrameV1.cpp returns 512x512 array instead of 1-dim buffer
+
+2010-02-19 - version 0.5
+========================
+- changed module organization:
+  - C extension module is now called _pdsdata
+  - pdsdata package introduced which incorporates _pdsdata and 
+    pure Python modules
+- new pure module 'io' with few file-reading primitives, chunk iterator 
+  and stream merging iterator
+
+2010-02-17 - version 0.4.1
+==========================
+- added bunch of constants and couple of methods to epics module 
+
+2010-02-16 - version 0.4
+========================
+- few remaining modules added - control, epics, pulnix
+- all existing data types to date now have Python classes   
+
+2010-02-14 - version 0.3
+========================
+- major refactoring:
+  - split the whole thing into a number of modules, pdsdata becomes a 
+    package, module names follow the directory names in pdsdata C++ package
+    so that Xtc class is now in pdsdata.xtc.Xtc
+  - most of the classes now inherit from either PdsDataType or 
+    PdsDataTypeEmbedded
+  - Datagram class renamed to Dgram
+- bunch of new data types added
+
+2010-02-04 - version 0.2
+========================
+- added NumPy header location search to setup script
+- started implementation of data classes
+  - common base class to be used for them is in src/types/PdsDataType
+  - src/types/TypeLib hase few useful macros and functions to simplify
+    writing of wrappers for member functions
+- src/types/camera has implementation of the data types from 
+  corresponding pdsdata package
+- new script scripts/pyxtcscanner whcih does the same as o2o-scanner
+- few methods in Xtc and Datagram classes became attributes (following
+  their C++ counterparts as closely as possible).
+
+2010-02-03 - version 0.1
+========================
+- first import into repository
+- just a bunch of XTC-related classes, no specific data types defined yet
+
