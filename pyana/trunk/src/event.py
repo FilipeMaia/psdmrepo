@@ -28,8 +28,14 @@ def _addr( address ):
     If address type is DetInfo then returns dictionary with single key
     address."""
     
-    if type(address) == xtc.DetInfo :
+    if isinstance(address, (xtc.DetInfo, xtc.BldInfo)):
         return dict(address=address)
+
+    # if it is a string matching BLD type then return Bld source
+    try:
+        return dict(address=xtc.BldInfo(address))
+    except:
+        pass
     
     det = None
     detId = None
@@ -316,7 +322,7 @@ class Event(object):
             # check DetInfo
             if address is not None :
                 
-                if not isinstance(src, xtc.DetInfo) : continue
+                if not isinstance(src, (xtc.DetInfo, xtc.BldInfo)) : continue
                 if src != address : continue
 
             else :
