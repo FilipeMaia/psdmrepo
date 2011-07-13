@@ -21,6 +21,7 @@
 #include "AppUtils/AppCmdOptBool.h"
 #include "AppUtils/AppCmdOptNamedValue.h"
 #include "MsgLogger/MsgLogger.h"
+#include "pdsdata/xtc/BldInfo.hh"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/ProcInfo.hh"
 #include "pdsdata/xtc/XtcIterator.hh"
@@ -36,20 +37,36 @@ public:
   enum {Stop, Continue};
   myLevelIter(Xtc* xtc) : XtcIterator(xtc), _depth(1) {}
   int process(Xtc* xtc) {
+
     for ( unsigned i=0 ; i < _depth ; ++ i ) printf("  ");
+
     Level::Type level = xtc->src.level();
-    printf("%s level: ",Level::name(level));
-    printf("payloadSize %d ", xtc->sizeofPayload() );
-    printf("damage %x ", xtc->damage.value() );
-    if (level==Level::Source or level==Pds::Level::Reporter or level==Pds::Level::Control) {
-      DetInfo& info = *(DetInfo*)(&xtc->src);
-      printf("%s.%d %s.%d",
+
+    printf("%s level: ", Level::name(level));
+    printf("payloadSize=%d ", xtc->sizeofPayload() );
+    printf("damage=%x ", xtc->damage.value() );
+
+    if (level == Pds::Level::Source) {
+
+      const DetInfo& info = static_cast<const DetInfo&>(xtc->src);
+      printf("src=DetInfo(%s.%d:%s.%d)",
              DetInfo::name(info.detector()),info.detId(),
              DetInfo::name(info.device()),info.devId());
+
+    } else if (level == Pds::Level::Reporter) {
+
+      const BldInfo& info = static_cast<const BldInfo&>(xtc->src);
+      printf("src=BldInfo(%s)", BldInfo::name(info));
+
     } else {
-      ProcInfo& info = *(ProcInfo*)(&xtc->src);
-      printf("IpAddress %#x ProcessId %#x",info.ipAddr(),info.processId());
+
+      const ProcInfo& info = static_cast<const ProcInfo&>(xtc->src);
+      unsigned ip = info.ipAddr();
+      printf("src=ProcInfo(%d.%d.%d.%d, pid=%d)", ((ip>>24)&0xff), ((ip>>16)&0xff),
+          ((ip>>8)&0xff), (ip&0xff), info.processId());
+
     }
+
     if (xtc->contains.id() == TypeId::Id_Xtc ) {
       printf("\n");
       ++_depth;

@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-11-00
+2011-07-13 Andy Salnikov
+- incompatible change: group names for BldData types now
+  use their corresponding source names.
+- for ControlData (Control level) the group name changed to "Control"
+- updated o2o-scanner to print correct source names
+
 Tag: V00-10-11
 2011-06-28 Andy Salnikov
 - needed to add CsPad calibration converter to a new CsPad config 

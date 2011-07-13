@@ -23,6 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/xtc/BldInfo.hh"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/ProcInfo.hh"
 
@@ -42,6 +43,12 @@ namespace {
     return str.str() ;
   }
 
+  // convert BldInfo to name
+  std::string toName( const Pds::BldInfo& info )
+  {
+    return Pds::BldInfo::name(info) ;
+  }
+
   // convert DetInfo to name
   std::string toName( const Pds::DetInfo& info )
   {
@@ -54,11 +61,17 @@ namespace {
   // convert Src to name
   std::string toName( const Pds::Src& src )
   {
-    if ( src.level() == Pds::Level::Segment ) {
-      const Pds::ProcInfo& info = static_cast<const Pds::ProcInfo&>( src ) ;
-      return toName( info ) ;
-    } else {
+    if ( src.level() == Pds::Level::Source ) {
       const Pds::DetInfo& info = static_cast<const Pds::DetInfo&>( src ) ;
+      return toName( info ) ;
+    } else if ( src.level() == Pds::Level::Reporter ) {
+      const Pds::BldInfo& info = static_cast<const Pds::BldInfo&>( src ) ;
+      return toName( info ) ;
+    } else if ( src.level() == Pds::Level::Control ) {
+      // special case for control data
+      return "Control";
+    } else {
+      const Pds::ProcInfo& info = static_cast<const Pds::ProcInfo&>( src ) ;
       return toName( info ) ;
     }
   }
@@ -80,18 +93,7 @@ O2OXtcSrc::name() const
   if ( m_src.empty() ) return std::string() ;
 
   const Pds::Src& top = m_src.back() ;
-  if ( top.level() == Pds::Level::Control ) {
-
-    // if segment was not found then use control as source
-    return ::toName(top) ;
-
-  } else {
-
-    // in all other cases format topmost
-    return ::toName(top) ;
-
-  }
-
+  return ::toName(top) ;
 }
 
 } // namespace O2OTranslator
