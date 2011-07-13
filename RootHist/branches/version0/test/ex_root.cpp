@@ -96,9 +96,8 @@ int main ()
 
   cout << "Create  a couple of branches" << endl;
   float new_v;
-  TBranch *pbranch = ptree->Branch("new_v", &new_v, "new_v/F");
-
-                     ptree->Branch("point",&point,"x:y:z");
+  ptree->Branch("new_v", &new_v, "new_v/F");
+  ptree->Branch("point",&point,"x:y:z");
 
 
   cout << "Fill branch" << endl;
