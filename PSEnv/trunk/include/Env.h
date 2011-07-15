@@ -23,7 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "PSEnv/ConfigStore.h"
+#include "PSEnv/EnvObjectStore.h"
 #include "PSEnv/EpicsStore.h"
 #include "RootHistoManager/RootHMgr.h"
 #include "PSHist/HManager.h"
@@ -81,7 +81,10 @@ public:
   const std::string& jobName() const { return m_jobName; }
   
   /// Access to Configuration Store object.
-  ConfigStore& configStore() { return *m_cfgStore; }
+  EnvObjectStore& configStore() { return *m_cfgStore; }
+
+  /// Access to Calibration Store object.
+  EnvObjectStore& calibStore() { return *m_calibStore; }
 
   /// Access to EPICS Store object.
   EpicsStore& epicsStore() { return *m_epicsStore; }
@@ -102,7 +105,8 @@ private:
 
   // Data members
   std::string m_jobName;   ///< Job name
-  boost::scoped_ptr<ConfigStore> m_cfgStore;   ///< Pointer to Configuration Store
+  boost::scoped_ptr<EnvObjectStore> m_cfgStore;   ///< Pointer to Configuration Store
+  boost::scoped_ptr<EnvObjectStore> m_calibStore;   ///< Pointer to Calibration Store
   boost::scoped_ptr<EpicsStore> m_epicsStore;  ///< Pointer to EPICS Store
   boost::scoped_ptr<RootHistoManager::RootHMgr> m_rhmgr;  ///< Pointer to ROOT histogram manager
   boost::scoped_ptr<PSHist::HManager> m_hmgr;  ///< Pointer to ROOT histogram manager

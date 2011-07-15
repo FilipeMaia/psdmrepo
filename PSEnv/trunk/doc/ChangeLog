@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2011-07-15 Andy Salnikov
+- renamed ConfigStore class to EnvObjectStore
+- Env now contains config store and calib store which are both
+  of the same type EnvObjectStore
+
 Tag: V00-02-01
 2011-06-29 Andy Salnikov
 - new method Env::hmgr which returns instance of PSHist::Hmanager

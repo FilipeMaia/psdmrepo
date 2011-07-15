@@ -41,13 +41,18 @@ namespace PSEnv {
 Env::Env (const std::string& jobName)
   : m_jobName(jobName)
   , m_cfgStore()
+  , m_calibStore()
   , m_epicsStore(new EpicsStore())
   , m_rhmgr()
   , m_hmgr()
 {
   // instantiate dictionary for config store and store itself
   boost::shared_ptr<PSEvt::ProxyDict> cfgDict(new PSEvt::ProxyDict());
-  m_cfgStore.reset(new ConfigStore(cfgDict));
+  m_cfgStore.reset(new EnvObjectStore(cfgDict));
+
+  // instantiate dictionary for calib store and store itself
+  boost::shared_ptr<PSEvt::ProxyDict> calibDict(new PSEvt::ProxyDict());
+  m_calibStore.reset(new EnvObjectStore(calibDict));
   
   // make root file name
   std::string rfname = jobName + "-rhmgr.root";
