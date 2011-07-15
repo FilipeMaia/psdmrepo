@@ -60,7 +60,7 @@ namespace {
 
   template<typename FinalType>
   void 
-  storeCfgObject(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::ConfigStore& cfgStore)
+  storeCfgObject(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvObjectStore& cfgStore)
   {
     typedef typename FinalType::XtcType XtcType;
     typedef typename FinalType::PsanaType PsanaType;
@@ -120,7 +120,7 @@ namespace {
   
   template<typename FinalType, typename XtcConfigType>
   bool 
-  storeDataProxyCfg(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt, PSEnv::ConfigStore& cfgStore)
+  storeDataProxyCfg(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore)
   {
     typedef typename FinalType::XtcType XtcType;
     typedef typename FinalType::PsanaType PsanaType;
@@ -147,7 +147,7 @@ namespace {
   
   template<typename FinalType, typename XtcConfigType1, typename XtcConfigType2>
   bool 
-  storeDataProxyCfg2(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt, PSEnv::ConfigStore& cfgStore)
+  storeDataProxyCfg2(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore)
   {
     if (storeDataProxyCfg<FinalType, XtcConfigType1>(xtc, evt, cfgStore)) return true;
     if (storeDataProxyCfg<FinalType, XtcConfigType2>(xtc, evt, cfgStore)) return true;
@@ -174,7 +174,7 @@ namespace {
   
   template<typename PsanaType, typename XtcType>
   void 
-  storeCfgValueType(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::ConfigStore& cfgStore)
+  storeCfgValueType(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvObjectStore& cfgStore)
   {
     // XTC data object
     XtcType* xdata = (XtcType*)(xtc->payload());
@@ -232,7 +232,7 @@ XtcConverter::~XtcConverter ()
  *  @brief Convert one object and store it in the event.
  */
 void 
-XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt, PSEnv::ConfigStore& cfgStore)
+XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore)
 {
   const Pds::TypeId& typeId = xtc->contains;
   //uint32_t size = xtc->sizeofPayload();
@@ -354,7 +354,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
  *  @brief Convert one object and store it in the config store.
  */
 void 
-XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::ConfigStore& cfgStore)
+XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvObjectStore& cfgStore)
 {
   const Pds::TypeId& typeId = xtc->contains;
 

@@ -24,7 +24,7 @@
 //-------------------------------
 #include "pdsdata/xtc/Xtc.hh"
 #include "PSEvt/Event.h"
-#include "PSEnv/ConfigStore.h"
+#include "PSEnv/EnvObjectStore.h"
 #include "PSEnv/EpicsStore.h"
 
 //------------------------------------
@@ -63,12 +63,12 @@ public:
   /**
    *  @brief Convert one object and store it in the event.
    */
-  void convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt, PSEnv::ConfigStore& cfgStore);
+  void convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore);
   
   /**
    *  @brief Convert one object and store it in the config store.
    */
-  void convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::ConfigStore& cfgStore);
+  void convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvObjectStore& cfgStore);
 
   /**
    *  @brief Convert one object and store it in the epics store.

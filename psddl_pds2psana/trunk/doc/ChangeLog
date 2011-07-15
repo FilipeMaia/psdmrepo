@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2011-07-15 Andy Salnikov
+- PSEnv::ConfigStore renamed to PSEnv::EnvObjectStore, need to change 
+  few methods here
+
 Tag: V00-00-12
 2011-06-27 Andy Salnikov
 - implemented ordering of quadrants in CsPad
