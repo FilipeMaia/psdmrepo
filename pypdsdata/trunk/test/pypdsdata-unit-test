@@ -517,7 +517,12 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( BldInfo.Type.XcsDg3Imb04, 9 )
         self.assertEqual ( BldInfo.Type.HfxDg3Imb01, 10 )
         self.assertEqual ( BldInfo.Type.HfxDg3Imb02, 11 )
-        self.assertEqual ( BldInfo.Type.NumberOf, 12 )
+        self.assertEqual ( BldInfo.Type.HxxDg1Cam, 12 )
+        self.assertEqual ( BldInfo.Type.HfxDg2Cam, 13 )
+        self.assertEqual ( BldInfo.Type.HfxDg3Cam, 14 )
+        self.assertEqual ( BldInfo.Type.XcsDg3Cam, 15 )
+        self.assertEqual ( BldInfo.Type.HfxMonCam, 16 )
+        self.assertEqual ( BldInfo.Type.NumberOf, 17 )
 
         o1 = BldInfo(0,0)
         

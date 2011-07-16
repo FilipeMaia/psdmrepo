@@ -46,6 +46,11 @@ namespace {
         { "XcsDg3Imb04",     Pds::BldInfo::XcsDg3Imb04 },
         { "HfxDg3Imb01",     Pds::BldInfo::HfxDg3Imb01 },
         { "HfxDg3Imb02",     Pds::BldInfo::HfxDg3Imb02 },
+        { "HxxDg1Cam",       Pds::BldInfo::HxxDg1Cam },
+        { "HfxDg2Cam",       Pds::BldInfo::HfxDg2Cam },
+        { "HfxDg3Cam",       Pds::BldInfo::HfxDg3Cam },
+        { "XcsDg3Cam",       Pds::BldInfo::XcsDg3Cam },
+        { "HfxMonCam",       Pds::BldInfo::HfxMonCam },
         { "NumberOf",        Pds::BldInfo::NumberOf },
         { 0, 0 }
     };
