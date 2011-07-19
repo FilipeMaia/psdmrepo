@@ -21,6 +21,7 @@
 //-----------------
 
 #include <iostream> // for cout
+#include <fstream>
 
 using namespace std;
 
@@ -219,6 +220,32 @@ void Image2D<T>::printEntireImage (int Nx90)
 	}
 }
 
+//----------------
+
+template <typename T>
+void Image2D<T>::saveImageInFile (const std::string &fname, int Nx90)
+{
+    cout << "Image2D<T>::saveImageInFile" << endl;
+
+    ofstream file; 
+    file.open(fname.c_str(),ios_base::out);
+
+        for (size_t row = 0; row < getNRows(Nx90); row++) {
+          for (size_t col = 0; col < getNCols(Nx90); col++) {
+
+            file << this->rotN90 (row,col,Nx90) << "  ";
+          }
+            file << endl;
+        }
+
+    file.close();
+    cout << "The 2x1 image (ncols,nrows="
+         << this->getNCols(Nx90) << ","
+         << this->getNRows(Nx90)
+         << " with rotation by 90*" << Nx90 << "=" << Nx90*90 << " degree)" 
+         << " is saved in file " << fname << endl; 
+}
+
 
 
 
@@ -237,6 +264,9 @@ Image2D<T>::~Image2D ()
 //-----------------------------------
 
 template class CSPadImage::Image2D<uint16_t>;
+template class CSPadImage::Image2D<float>;
   //template class CSPadImage::Image2D<ImageCSPad2x1<uint16_t>>;
 
 } // namespace CSPadImage
+
+//----------------

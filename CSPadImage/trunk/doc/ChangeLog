@@ -1,0 +1,32 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package CSPadImage
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-01
+2011-06-22 Mikhail S. Dubrovin
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
+
+2011-07-19 Mikhail S. Dubrovin
+  Add new modules:
+	  CSPadImage/include/CSPadCalibPars.h
+	  CSPadImage/include/ImageCSPad.h
+	  CSPadImage/include/ImageCSPadQuad.h
+	  CSPadImage/include/QuadParameters.h
+
+	  CSPadImage/src/CSPadCalibPars.cpp
+	  CSPadImage/src/ImageCSPad.cpp
+	  CSPadImage/src/ImageCSPadQuad.cpp
+	  CSPadImage/src/QuadParameters.cpp	

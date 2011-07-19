@@ -81,6 +81,8 @@ public:
 
   void printImage       (int Nx90=0);
   void printEntireImage (int Nx90=0);
+  void saveImageInFile  (const std::string &fname, int Nx90=0);
+
 
 private:
 

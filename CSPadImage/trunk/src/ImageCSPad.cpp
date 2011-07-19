@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class CSPadTest...
+//	Class ImageCSPad...
 //
 // Author List:
 //      Mikhail S. Dubrovin
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "CSPadImage/CSPadTest.h"
+#include "CSPadImage/ImageCSPad.h"
 
 //-----------------
 // C/C++ Headers --
@@ -31,6 +31,8 @@
 
 #include "CSPadImage/Image2D.h"
 #include "CSPadImage/ImageCSPad2x1.h"
+#include "CSPadImage/QuadParameters.h"
+#include "CSPadImage/ImageCSPadQuad.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -41,7 +43,7 @@
 //#include <stdio.h>
 //#include <stdlib.h>
 
-#include <boost/lexical_cast.hpp>
+//#include <boost/lexical_cast.hpp>
 //#include <sstream> // for int to string conversion using std::stringstream
 //#include <iomanip> // for formatted conversion std::setw(3) , std::setfill
 
@@ -51,7 +53,7 @@
 
 // This declares this class as psana module
 using namespace CSPadImage;
-PSANA_MODULE_FACTORY(CSPadTest)
+PSANA_MODULE_FACTORY(ImageCSPad)
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -62,7 +64,7 @@ namespace CSPadImage {
 //----------------
 // Constructors --
 //----------------
-CSPadTest::CSPadTest (const std::string& name)
+ImageCSPad::ImageCSPad (const std::string& name)
   : Module(name)
   , m_src()
   , m_maxEvents()
@@ -78,47 +80,48 @@ CSPadTest::CSPadTest (const std::string& name)
 //--------------
 // Destructor --
 //--------------
-CSPadTest::~CSPadTest () {}
+ImageCSPad::~ImageCSPad () {}
 
+//----------------------------------------------------------
 
 /// Method which is called once at the beginning of the job
-//void CSPadTest::beginJob(Event& evt, Env& env) {}
+//void ImageCSPad::beginJob(Event& evt, Env& env) {}
 
-
+//----------------------------------------------------------
 /// Method which is called at the beginning of the run
-void CSPadTest::beginRun(Event& evt, Env& env) 
+void ImageCSPad::beginRun(Event& evt, Env& env) 
 {
+  shared_ptr<Psana::CsPad::ConfigV3> config = env.configStore().get(m_src);
 
-  shared_ptr<Psana::CsPad::ConfigV3> config2 = env.configStore().get(m_src);
+  cout << "ImageCSPad::beginRun " << endl;
 
-  cout << "CSPadTest::beginRun " << endl;
+  if (config.get()) {
 
-  if (config2.get()) {
-    
+    /*    
     WithMsgLog(name(), info, str) {
-      str << "CsPad::ConfigV2:";
-      str << "\n  concentratorVersion = " << config2->concentratorVersion();
-      str << "\n  runDelay            = " << config2->runDelay();
-      str << "\n  eventCode           = " << config2->eventCode();
-      str << "\n  inactiveRunMode     = " << config2->inactiveRunMode();
-      str << "\n  activeRunMode       = " << config2->activeRunMode();
-      str << "\n  tdi                 = " << config2->tdi();
-      str << "\n  payloadSize         = " << config2->payloadSize();
-      str << "\n  badAsicMask0        = " << config2->badAsicMask0();
-      str << "\n  badAsicMask1        = " << config2->badAsicMask1();
-      str << "\n  asicMask            = " << config2->asicMask();
-      str << "\n  quadMask            = " << config2->quadMask();
-      str << "\n  numAsicsRead        = " << config2->numAsicsRead();
-      str << "\n  numSect             = " << config2->numSect();
-      str << "\n  numQuads            = " << config2->numQuads();
+      str << "CsPad::ConfigV3:";
+      str << "\n  concentratorVersion = " << config->concentratorVersion();
+      str << "\n  runDelay            = " << config->runDelay();
+      str << "\n  eventCode           = " << config->eventCode();
+      str << "\n  inactiveRunMode     = " << config->inactiveRunMode();
+      str << "\n  activeRunMode       = " << config->activeRunMode();
+      str << "\n  tdi                 = " << config->tdi();
+      str << "\n  payloadSize         = " << config->payloadSize();
+      str << "\n  badAsicMask0        = " << config->badAsicMask0();
+      str << "\n  badAsicMask1        = " << config->badAsicMask1();
+      str << "\n  asicMask            = " << config->asicMask();
+      str << "\n  quadMask            = " << config->quadMask();
+      str << "\n  numAsicsRead        = " << config->numAsicsRead();
+      str << "\n  numSect             = " << config->numSect();
+      str << "\n  numQuads            = " << config->numQuads();
 
-      std::vector<int> v_quads_shape = config2->quads_shape();
+      std::vector<int> v_quads_shape = config->quads_shape();
       str << "\n  v_quads_shape.size()= " << v_quads_shape.size();
       str << "\n  v_quads_shape[0]    = " << v_quads_shape[0];
 
-      for (uint32_t q = 0; q < config2->numQuads(); ++ q) {
-        str << "\n  roiMask       (" << q << ") = " << config2->roiMask(q);
-        str << "\n  numAsicsStored(" << q << ") = " << config2->numAsicsStored(q);
+      for (uint32_t q = 0; q < config->numQuads(); ++ q) {
+        str << "\n  roiMask       (" << q << ") = " << config->roiMask(q);
+        str << "\n  numAsicsStored(" << q << ") = " << config->numAsicsStored(q);
       }
 
       str << "\n  MaxQuadsPerSensor = " << Psana::CsPad::MaxQuadsPerSensor;
@@ -131,20 +134,30 @@ void CSPadTest::beginRun(Event& evt, Env& env)
       str << "\n  PotsPerQuad       = " << Psana::CsPad::PotsPerQuad;
       str << "\n  TwoByTwosPerQuad  = " << Psana::CsPad::TwoByTwosPerQuad;
       str << "\n  SectorsPerQuad    = " << Psana::CsPad::SectorsPerQuad;
+    }  // WithMsgLog(...)
+    */
 
-    }
-  } 
+      for (uint32_t q = 0; q < config->numQuads(); ++ q) {
+        m_roiMask[q]         = config->roiMask(q);
+        m_numAsicsStored[q]  = config->numAsicsStored(q);
+      }
+  }  // if (config.get())
 
+  m_cspad_calibpar = new CSPadCalibPars("calibname");
+
+  this -> fillQuadXYmin();
 }
 
+//----------------------------------------------------------
 
 /// Method which is called at the beginning of the calibration cycle
-//void CSPadTest::beginCalibCycle(Event& evt, Env& env) {}
+//void ImageCSPad::beginCalibCycle(Event& evt, Env& env) {}
 
+//----------------------------------------------------------
 
 /// Method which is called with event data, this is the only required 
 /// method, all other methods are optional
-void CSPadTest::event(Event& evt, Env& env)
+void ImageCSPad::event(Event& evt, Env& env)
 {
   // get event ID
 
@@ -160,11 +173,14 @@ void CSPadTest::event(Event& evt, Env& env)
 
   shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src);
   if (data2.get()) {
+
+    /*
     WithMsgLog(name(), info, str) {
       str << "CsPad::DataV2:";
       int nQuads = data2->quads_shape()[0];
         str << "\n    nQuads = " << nQuads ;
       for (int q = 0; q < nQuads; ++ q) {
+
         const Psana::CsPad::ElementV2& el = data2->quads(q);
         str << "\n  Element #" << q ;
         str << "\n    virtual_channel = " << el.virtual_channel() ;
@@ -188,13 +204,9 @@ void CSPadTest::event(Event& evt, Env& env)
         str << "\n    v_image_shape = "   << v_image_shape[0]
                                   << "  " << v_image_shape[1]
                                   << "  " << v_image_shape[2];
-
-	m_Nquads = v_image_shape[0];
-        m_Nrows  = v_image_shape[1];
-        m_Ncols  = v_image_shape[2];
       }
     } //WithMsgLog(
-
+    */
 
     int nQuads = data2->quads_shape()[0];
     cout << "\n    nQuads = " << nQuads << endl;
@@ -205,35 +217,22 @@ void CSPadTest::event(Event& evt, Env& env)
 	const uint16_t* data = el.data();
         int   quad           = el.quad() ;
 
-        //uint16_t data2d[185][388];
-        //uint16_t* data2d = new uint16_t[m_Nrows*m_Ncols];
-	//memcpy (data2d, data, m_Nrows*m_Ncols*sizeof(uint16_t));
-	//iterateOverData(data2d);
-	//delete [] data2d;
+        std::vector<int> v_image_shape = el.data_shape();
 
-        //Image2D<uint16_t>* pair_arr_image = new Image2D<uint16_t>(data,m_Nrows,m_Ncols);
-        //pair_arr_image -> printImage();
+	QuadParameters *quadpars = new QuadParameters(quad, v_image_shape, 850, 850, m_numAsicsStored[q], m_roiMask[q]);
+	//quadpars -> print();
 
-	int sizeOf2x1Img = 185*388;
-        int nOf2x1       = 2;
-        ImageCSPad2x1<uint16_t>* image_2x1 = new ImageCSPad2x1<uint16_t>(&data[nOf2x1 * sizeOf2x1Img]);  
-        image_2x1 -> printImage();
+        ImageCSPadQuad<uint16_t>* image_quad = new ImageCSPadQuad<uint16_t> (data, quadpars, m_cspad_calibpar);
 
-	//char c_quad[2];
-        //sprintf(c_quad,"%02d",quad); 
-        //string s_quad = boost::lexical_cast<string>( quad );
+	this -> addQuadToCSPadImage(image_quad, quadpars, m_cspad_calibpar);
 
-	string fname = "image_q";
-	       fname += boost::lexical_cast<string>( quad );
-	       fname += ".txt";
-        image_2x1 -> saveImageInFile(fname,0);
-
-    }
-
-
+    } //   for (int q ...
   } // if (data2.get())
 
 
+  m_cspad_image_2d = new Image2D<float>(&m_cspad_image[0][0],NRowsDet,NColsDet); 
+
+  this -> saveCSPadImageInFile();
 
   // this is how to skip event (all downstream modules will not be called)
   if (m_filter && m_count % 10 == 0) skip();
@@ -247,39 +246,98 @@ void CSPadTest::event(Event& evt, Env& env)
 
 }
 
+//----------------------------------------------------------
 
-void CSPadTest::iterateOverData(const uint16_t data[][388]) // [185][388] for one quad
-//void CSPadTest::iterateOverData(const uint16_t* data)
+void ImageCSPad::addQuadToCSPadImage(ImageCSPadQuad<uint16_t> *image_quad, QuadParameters *quadpars, CSPadCalibPars *cspad_calibpar)
 {
-  cout << "\n  sizeof(data)       = "  << sizeof(data) << endl;
-  //str << "\n  sizeof(data[0])    = "  << sizeof(data[0]);
-  //str << "\n  sizeof(data[0][0]) = "  << sizeof(data[0][0]);
+   cout << "ImageCSPad::addQuadToCSPadImage()" << endl;
 
-	for (int row = 0; row < m_Nrows; row+=20) {
-	  for (int col = 0; col < m_Ncols; col+=20) {
+            Image2D<uint16_t> *quad_image2d = image_quad -> getQuadImage2D();
 
-	    //cout << data[row*m_Ncols + col] << "  ";
-	    cout << data[row][col] << "  ";
+            uint32_t quad = quadpars -> getQuadNumber();
+	    uint32_t rot_index = (int)(cspad_calibpar -> getQuadRotation(quad)/90);
 
-	  }
-	    cout << endl;
-	}
+            size_t ncols = quad_image2d -> getNCols(rot_index);
+            size_t nrows = quad_image2d -> getNRows(rot_index);
+
+	    uint32_t ixmin = (uint32_t)m_xmin_quad[quad];
+	    uint32_t iymin = (uint32_t)m_ymin_quad[quad];
+
+	    for (uint32_t row=0; row<nrows; row++) {
+	    for (uint32_t col=0; col<ncols; col++) {
+
+               m_cspad_image[ixmin+row][iymin+col] = quad_image2d -> rotN90(row, col, rot_index);
+
+	    }
+	    }
 }
 
+//----------------------------------------------------------
+// Define m_xmin_quad [q], m_ymin_quad [q] from a bunch of calibration parameters 
 
+void ImageCSPad::fillQuadXYmin()
+{
+   cout << "ImageCSPad::fillQuadXYmin()" << endl;
 
+	    float margX  = m_cspad_calibpar -> getMargX  ();
+	    float margY  = m_cspad_calibpar -> getMargY  ();
+	    float gapX   = m_cspad_calibpar -> getGapX   ();
+	    float gapY   = m_cspad_calibpar -> getGapY   ();
+	    float shiftX = m_cspad_calibpar -> getShiftX ();
+	    float shiftY = m_cspad_calibpar -> getShiftY ();
 
-  
+	    // self.quadXOffset = [ margX+0-gapX+shiftX,  margX+  0+0-gapX-shiftX,  margX+834-2+gapX-shiftX,  margX+834+0+gapX+shiftX]
+	    // self.quadYOffset = [ margY+3-gapY-shiftY,  margY+834-1+gapY-shiftY,  margY+834-5+gapY+shiftY,  margY+  0+2-gapY+shiftY]
+
+	    float dx[] = {margX-gapX+shiftX,  margX-gapX-shiftX,  margX+gapX-shiftX,  margX+gapX+shiftX};
+	    float dy[] = {margY-gapY-shiftY,  margY+gapY-shiftY,  margY+gapY+shiftY,  margY-gapY+shiftY};
+
+            for (int q=0; q<4; q++) {
+
+                m_xmin_quad [q] = m_cspad_calibpar -> getOffsetX    (q) 
+                                + m_cspad_calibpar -> getOffsetCorrX(q)  
+                                + dx[q];
+
+                m_ymin_quad [q] = m_cspad_calibpar -> getOffsetY    (q) 
+                                + m_cspad_calibpar -> getOffsetCorrY(q) 
+                                + dy[q];	    
+	    }
+}
+
+//----------------------------------------------------------
+
 /// Method which is called at the end of the calibration cycle
-//void CSPadTest::endCalibCycle(Event& evt, Env& env) {}
+//void ImageCSPad::endCalibCycle(Event& evt, Env& env) {}
 
+//----------------------------------------------------------
 
 /// Method which is called at the end of the run
-//void CSPadTest::endRun(Event& evt, Env& env) {}
+//void ImageCSPad::endRun(Event& evt, Env& env) {}
 
+//----------------------------------------------------------
 
 /// Method which is called once at the end of the job
-void CSPadTest::endJob(Event& evt, Env& env) {
+void ImageCSPad::endJob(Event& evt, Env& env) {
+
+  WithMsgLog(name(), info, str) { str << "\nImageCSPad::endJob\n"; }
+
+  // testOfImageClasses();
+}
+
+//----------------
+
+void ImageCSPad::saveCSPadImageInFile()
+{
+    string fname = "image_cspad.txt";
+    m_cspad_image_2d -> saveImageInFile(fname,0);
+}
+
+//----------------
+
+//----------------------------------------------------------
+
+/// Method which is called once at the end of the job
+void ImageCSPad::testOfImageClasses() {
 
   uint16_t arr2d[3][4] = { { 0, 1, 2, 3 },
                            { 4, 5, 6, 7 },
@@ -305,8 +363,9 @@ void CSPadTest::endJob(Event& evt, Env& env) {
 	                   image_2x1 -> printEntireImage(3);
 
 	                   image_2x1 -> saveImageInFile("image.txt",1);
-
 }
 
+
+//----------------------------------------------------------
 
 } // namespace CSPadImage

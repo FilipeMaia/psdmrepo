@@ -1,12 +1,12 @@
-#ifndef CSPADIMAGE_IMAGECSPAD2X1_H
-#define CSPADIMAGE_IMAGECSPAD2X1_H
+#ifndef CSPADIMAGE_IMAGECSPADQUAD_H
+#define CSPADIMAGE_IMAGECSPADQUAD_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class ImageCSPad2x1.
+//	Class ImageCSPadQuad.
 //
 //------------------------------------------------------------------------
 
@@ -18,6 +18,9 @@
 // Base Class Headers --
 //----------------------
 
+#include "CSPadImage/QuadParameters.h"
+#include "CSPadImage/CSPadCalibPars.h"
+#include "CSPadImage/Image2D.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -46,54 +49,58 @@ namespace CSPadImage {
  */
 
 template <typename T>
-class ImageCSPad2x1  {
+class ImageCSPadQuad  {
 public:
 
+  enum { NRows = 850 };
+  enum { NCols = 850 };
+  // enum { NRows = 1000 };
+  // enum { NCols = 1000 };
+
   // Default constructor
-  ImageCSPad2x1 () ;
+  ImageCSPadQuad () ;
 
   // Regular constructor
-  ImageCSPad2x1 (const T* data, size_t gap_ncols=3, size_t nrows=185, size_t ncols=388) ;
+  ImageCSPadQuad (const T* data, QuadParameters* quadpars, CSPadCalibPars *cspad_calibpar) ;
 
   // Destructor
-  virtual ~ImageCSPad2x1 () ;
+  virtual ~ImageCSPadQuad () ;
 
-  T    getValue  (size_t  row, size_t  col);
-  T    rot000    (int row, int col);
-  T    rot090    (int row, int col);
-  T    rot180    (int row, int col);
-  T    rot270    (int row, int col);
-  T    rotN90    (int row, int col, int Nx90);
 
-  size_t getNCols(int Nx90);
-  size_t getNRows(int Nx90);
-  //T& operator[](size_t &index);
-  void printImage       (int Nx90=0);
-  void printEntireImage (int Nx90=0);
-  void saveImageInFile  (const std::string &fname, int Nx90=0);
+  // Methods
+  void fillQuadImage() ;
+  void addSectionToQuadImage(uint32_t sect, float xcenter, float ycenter, float zcenter, float rotation) ;
+  void saveQuadImageInFile() ;
 
+  Image2D<T>* getQuadImage2D(){ return m_quad_image_2d; } ;
 
 private:
 
   // Copy constructor and assignment are disabled by default
-  ImageCSPad2x1 ( const ImageCSPad2x1& ) ;
-  ImageCSPad2x1 operator = ( const ImageCSPad2x1& ) ;
+  ImageCSPadQuad ( const ImageCSPadQuad& ) ;
+  ImageCSPadQuad operator = ( const ImageCSPadQuad& ) ;
 
 //------------------
 // Static Members --
 //------------------
 
   // Data members
-  const T* m_data;
-  size_t   m_nrows;
-  size_t   m_ncols;
-  size_t   m_nrows_arr;
-  size_t   m_ncols_arr;
-  size_t   m_gap_ncols;
-  size_t   m_ncols_arr_half;
-  size_t   m_ncols_arr_half_plus_gap;
+  const T        *m_data;
+  QuadParameters *m_quadpars;
+  CSPadCalibPars *m_cspad_calibpar;
+  T               m_quad_image[NRows][NCols];
+  Image2D<T>     *m_quad_image_2d;
+
+  std::vector<int> v_image_shape;
+
+  uint32_t m_n2x1;
+  uint32_t m_nrows2x1;
+  uint32_t m_ncols2x1;
+  uint32_t m_sizeOf2x1Img;
+
+  uint32_t m_roiMask;
 };
 
 } // namespace CSPadImage
 
-#endif // CSPADIMAGE_IMAGECSPAD2X1_H
+#endif // CSPADIMAGE_IMAGECSPADQUAD_H
