@@ -10,7 +10,19 @@ Package author: Andrei Salnikov
 
 Please describe any modifications that you made to the package in the
 reverse time order.
-
+Tag: V00-00-09
+2011-07-19 Mikhail Dubrovin
+- add new classes for CSPad image calibration parameters:
+	CalibParsCenterV1
+        CalibParsCenterCorrV1
+	CalibParsMargGapShiftV1
+	CalibParsOffsetV1
+	CalibParsOffsetCorrV1
+	CalibParsRotationV1
+	CalibParsTiltV1
+	CalibParsQuadRotationV1
+	CalibParsQuadTiltV1	
+	
 Tag: V00-00-08
 2011-05-23 Andy Salnikov
 - removed SITConfig include, not useful any more
