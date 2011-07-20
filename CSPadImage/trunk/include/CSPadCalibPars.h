@@ -26,6 +26,17 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "psddl_psana/cspad.ddl.h"
+
+#include "pdscalibdata/CalibParsCenterV1.h"      
+#include "pdscalibdata/CalibParsCenterCorrV1.h"  
+#include "pdscalibdata/CalibParsMargGapShiftV1.h"
+#include "pdscalibdata/CalibParsOffsetV1.h"      
+#include "pdscalibdata/CalibParsOffsetCorrV1.h"  
+#include "pdscalibdata/CalibParsRotationV1.h"    
+#include "pdscalibdata/CalibParsTiltV1.h"        
+#include "pdscalibdata/CalibParsQuadRotationV1.h"
+#include "pdscalibdata/CalibParsQuadTiltV1.h"    
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -49,169 +60,8 @@ namespace CSPadImage {
  *  @author Mikhail S. Dubrovin
  */
 
-enum { NQuad = 4}; //  = Pds::CsPad::MaxQuadsPerSensor
-enum { NSect = 8}; //  = Pds::CsPad::ASICsPerQuad/2 
-
-//----------------
-
-class CalibParsCenterV1 {
-public:
-  enum { NUMBER_OF_PARAMETERS = 96 };
-  CalibParsCenterV1( const std::vector<float> v_parameters );
-  float getCenterX(size_t quad, size_t sect){ return m_center_x[quad][sect]; };
-  float getCenterY(size_t quad, size_t sect){ return m_center_y[quad][sect]; };
-  float getCenterZ(size_t quad, size_t sect){ return m_center_z[quad][sect]; };
-  void  print();
-private:
-  // Segment (2x1) center coordinates from optical measurements
-  float m_center_x[NQuad][NSect];
-  float m_center_y[NQuad][NSect];
-  float m_center_z[NQuad][NSect];
-};
-
-//----------------
-
-class CalibParsCenterCorrV1 {
-public:
-  enum { NUMBER_OF_PARAMETERS = 96 };
-  CalibParsCenterCorrV1( const std::vector<float> v_parameters );
-  float getCenterCorrX(size_t quad, size_t sect){ return m_center_corr_x[quad][sect]; };
-  float getCenterCorrY(size_t quad, size_t sect){ return m_center_corr_y[quad][sect]; };
-  float getCenterCorrZ(size_t quad, size_t sect){ return m_center_corr_z[quad][sect]; };
-  void  print();
-private:
-  // Segment (2x1) center coordinate corrections from my semi-manual alignment
-  float m_center_corr_x[NQuad][NSect];
-  float m_center_corr_y[NQuad][NSect];
-  float m_center_corr_z[NQuad][NSect];
-};
-
-//----------------
-
-class CalibParsMargGapShiftV1 {
-public:
-  enum { NUMBER_OF_PARAMETERS = 12 };
-  CalibParsMargGapShiftV1( const std::vector<float> v_parameters );
-  float getQuadMargX () { return m_quad_marg_x; };
-  float getQuadMargY () { return m_quad_marg_y; };
-  float getQuadMargZ () { return m_quad_marg_z; };
-
-  float getMargX () { return m_marg_x; };
-  float getMargY () { return m_marg_y; };
-  float getMargZ () { return m_marg_z; };
-
-  float getGapX  () { return m_gap_x; };
-  float getGapY  () { return m_gap_y; };
-  float getGapZ  () { return m_gap_z; };
-
-  float getShiftX() { return m_shift_x; };
-  float getShiftY() { return m_shift_y; };
-  float getShiftZ() { return m_shift_z; };
-  void  print();
-private:
-  // Quad margine, CSPad margine, gap, and shift of/between four quads in the detector
-  float m_quad_marg_x;
-  float m_quad_marg_y;
-  float m_quad_marg_z;
-
-  float m_marg_x;
-  float m_marg_y;
-  float m_marg_z;
-
-  float m_gap_x;
-  float m_gap_y;
-  float m_gap_z;
-
-  float m_shift_x;
-  float m_shift_y;
-  float m_shift_z;
-};
-
-//----------------
-
-class CalibParsOffsetV1 {
-public:
-  enum { NUMBER_OF_PARAMETERS = 12 };
-  CalibParsOffsetV1( const std::vector<float> v_parameters );
-  float getOffsetX(size_t quad){ return m_offset_x[quad]; };
-  float getOffsetY(size_t quad){ return m_offset_y[quad]; };
-  float getOffsetZ(size_t quad){ return m_offset_z[quad]; };
-  void  print();
-private:
-  // Offsets of four quads in the detector
-  float m_offset_x[NQuad];
-  float m_offset_y[NQuad];
-  float m_offset_z[NQuad];
-};
-
-//----------------
-
-class CalibParsOffsetCorrV1 {
-public:
-  enum { NUMBER_OF_PARAMETERS = 12 };
-  CalibParsOffsetCorrV1( const std::vector<float> v_parameters );
-  float getOffsetCorrX(size_t quad){ return m_offset_corr_x[quad]; };
-  float getOffsetCorrY(size_t quad){ return m_offset_corr_y[quad]; };
-  float getOffsetCorrZ(size_t quad){ return m_offset_corr_z[quad]; };
-  void  print();
-private:
-  // Offsets of four quad corrections in the detector
-  float m_offset_corr_x[NQuad];
-  float m_offset_corr_y[NQuad];
-  float m_offset_corr_z[NQuad];
-};
-
-//----------------
-
-class CalibParsRotationV1 {
-public:
-  enum { NUMBER_OF_PARAMETERS = 32 };
-  CalibParsRotationV1( const std::vector<float> v_parameters );
-  float getRotation(size_t quad, size_t sect){ return m_rotation[quad][sect]; };
-  void  print();
-private:
-  // Segment (2x1) nominal rotation angles (0,90,180,270)
-  float m_rotation[NQuad][NSect];
-};
-
-//----------------
-
-class CalibParsTiltV1 {
-public:
-  enum { NUMBER_OF_PARAMETERS = 32 };
-  CalibParsTiltV1( const std::vector<float> v_parameters );
-  float getTilt(size_t quad, size_t sect){ return m_tilt[quad][sect]; };
-  void  print();
-private:
-  // Segment (2x1) tilt angles from optical measurements
-  float m_tilt[NQuad][NSect];
-};
-
-//----------------
-
-class CalibParsQuadRotationV1 {
-public:
-  enum { NUMBER_OF_PARAMETERS = 4 };
-  CalibParsQuadRotationV1( const std::vector<float> v_parameters );
-  float getQuadRotation(size_t quad){ return m_quad_rotation[quad]; };
-  void  print();
-private:
-  // Segment (2x1) nominal rotation angles (0,90,180,270)
-  float m_quad_rotation[NQuad];
-};
-
-//----------------
-
-class CalibParsQuadTiltV1 {
-public:
-  enum { NUMBER_OF_PARAMETERS = 4 };
-  CalibParsQuadTiltV1( const std::vector<float> v_parameters );
-  float getQuadTilt(size_t quad){ return m_quad_tilt[quad]; };
-  void  print();
-private:
-  // Segment (2x1) tilt angles from optical measurements
-  float m_quad_tilt[NQuad];
-};
+//enum { NQuad = Psana::CsPad::MaxQuadsPerSensor};
+//enum { NSect = Psana::CsPad::SectorsPerQuad};
 
 //----------------
 
@@ -303,19 +153,16 @@ private:
 
   std::ifstream m_file;
 
-  CalibParsCenterV1       *m_center;
-  CalibParsCenterCorrV1   *m_center_corr;
-  CalibParsMargGapShiftV1 *m_marg_gap_shift;
-  CalibParsOffsetV1       *m_offset;
-  CalibParsOffsetCorrV1   *m_offset_corr;
-  CalibParsRotationV1     *m_rotation;    
-  CalibParsTiltV1         *m_tilt;   
-  CalibParsQuadRotationV1 *m_quad_rotation;    
-  CalibParsQuadTiltV1     *m_quad_tilt;   
+  pdscalibdata::CalibParsCenterV1       *m_center;
+  pdscalibdata::CalibParsCenterCorrV1   *m_center_corr;
+  pdscalibdata::CalibParsMargGapShiftV1 *m_marg_gap_shift;
+  pdscalibdata::CalibParsOffsetV1       *m_offset;
+  pdscalibdata::CalibParsOffsetCorrV1   *m_offset_corr;
+  pdscalibdata::CalibParsRotationV1     *m_rotation;    
+  pdscalibdata::CalibParsTiltV1         *m_tilt;   
+  pdscalibdata::CalibParsQuadRotationV1 *m_quad_rotation;    
+  pdscalibdata::CalibParsQuadTiltV1     *m_quad_tilt;   
 };
-
-
-
 
 } // namespace CSPadImage
 
