@@ -18,10 +18,12 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+using namespace std;
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "MsgLogger/MsgLogger.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -37,9 +39,37 @@ namespace pdscalibdata {
 // Constructors --
 //----------------
 CalibParsOffsetCorrV1::CalibParsOffsetCorrV1 ()
-
 {
 }
+//----------------
+
+CalibParsOffsetCorrV1::CalibParsOffsetCorrV1( const std::vector<float> v_parameters )
+{
+    if (v_parameters.size() != NUMBER_OF_PARAMETERS) {
+        WithMsgLog("CalibParsOffsetCorrV1", error, str) {
+        str << "Expected number of parameters is " << NUMBER_OF_PARAMETERS ;
+        str << ", read from file " << v_parameters.size() ;
+        str << ": check the file.\n" ;
+        }       
+        abort();
+    }
+    size_t NPars    = NQuad;
+    size_t arr_size = sizeof( float ) * v_parameters.size()/3;
+    memcpy( &m_offset_corr_x, &v_parameters[0],       arr_size );
+    memcpy( &m_offset_corr_y, &v_parameters[NPars],   arr_size );
+    memcpy( &m_offset_corr_z, &v_parameters[NPars*2], arr_size );
+    //this->print();
+}
+
+void CalibParsOffsetCorrV1::print()
+{
+  cout << endl;
+  cout << "Quad offset correction X:"; for( int q=0; q<NQuad; ++q ) {cout << "  " << m_offset_corr_x[q];} cout << endl;
+  cout << "Quad offset correction Y:"; for( int q=0; q<NQuad; ++q ) {cout << "  " << m_offset_corr_y[q];} cout << endl;
+  cout << "Quad offset correction Z:"; for( int q=0; q<NQuad; ++q ) {cout << "  " << m_offset_corr_z[q];} cout << endl;
+}
+
+//----------------
 
 //--------------
 // Destructor --
