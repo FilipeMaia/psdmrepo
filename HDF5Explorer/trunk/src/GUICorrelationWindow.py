@@ -147,11 +147,15 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.butCorrYDataSet = QtGui.QPushButton(cp.confpars.correlationWindowParameters[self.window][0])
         self.butCorrXParName = QtGui.QPushButton(cp.confpars.correlationWindowParameters[self.window][8])
         self.butCorrYParName = QtGui.QPushButton(cp.confpars.correlationWindowParameters[self.window][7])
+        self.butCorrXParIndex= QtGui.QPushButton(cp.confpars.correlationWindowParameters[self.window][15])
+        self.butCorrYParIndex= QtGui.QPushButton(cp.confpars.correlationWindowParameters[self.window][14])
 
         self.butCorrXDataSet  .setMaximumHeight(height)
         self.butCorrYDataSet  .setMaximumHeight(height)
         self.butCorrXParName  .setMaximumHeight(height)
         self.butCorrYParName  .setMaximumHeight(height)
+        self.butCorrXParIndex .setMaximumHeight(height)
+        self.butCorrYParIndex .setMaximumHeight(height)
 
         self.butCorrXDataSet.setMaximumWidth(295)
         self.butCorrYDataSet.setMaximumWidth(295)
@@ -169,11 +173,18 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.popupMenuForYParName = QtGui.QMenu()
         self.fillPopupMenuForYParName()
 
+        self.popupMenuForXParIndex = QtGui.QMenu()
+        self.fillPopupMenuForXParIndex()
+
+        self.popupMenuForYParIndex = QtGui.QMenu()
+        self.fillPopupMenuForYParIndex()
+
         grid = QtGui.QGridLayout()
 
         grid.addWidget(self.titCorrYDataSet,      0, 0)
         grid.addWidget(self.butCorrYDataSet,      0, 1, 1, 4)
         grid.addWidget(self.butCorrYParName,      0, 5)
+        grid.addWidget(self.butCorrYParIndex,     0, 6)
 
         grid.addWidget(self.titVs,                1, 0)
         grid.addWidget(self.radioVsIndex,         1, 1)
@@ -184,6 +195,7 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         grid.addWidget(self.titCorrXDataSet,      2, 0)
         grid.addWidget(self.butCorrXDataSet,      2, 1, 1, 4)
         grid.addWidget(self.butCorrXParName,      2, 5)
+        grid.addWidget(self.butCorrXParIndex,     2, 6)
         
         grid.addWidget(self.cboxYlimits,          3, 0)
         grid.addWidget(self.editCorrelationYmin,  3, 1)
@@ -219,6 +231,8 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.connect(self.butCorrYDataSet,       QtCore.SIGNAL('clicked()'),          self.processMenuForYDataSet )
         self.connect(self.butCorrXParName,       QtCore.SIGNAL('clicked()'),          self.processMenuForXParName )
         self.connect(self.butCorrYParName,       QtCore.SIGNAL('clicked()'),          self.processMenuForYParName )
+        self.connect(self.butCorrXParIndex,      QtCore.SIGNAL('clicked()'),          self.processMenuForXParIndex )
+        self.connect(self.butCorrYParIndex,      QtCore.SIGNAL('clicked()'),          self.processMenuForYParIndex )
 
         self.connect(self.editCorrelationYmin,   QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationYmin )
         self.connect(self.editCorrelationYmax,   QtCore.SIGNAL('editingFinished ()'), self.processEditCorrelationYmax )
@@ -480,7 +494,9 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
             self.butCorrYDataSet.setStyleSheet('Text-align:center')
             self.butCorrYDataSet.setStyleSheet(self.styleSheetRed)
             self.butCorrYParName.setText('None')
+            self.butCorrYParIndex.setText('None')
             cp.confpars.correlationWindowParameters[self.window][7] = 'None'
+            cp.confpars.correlationWindowParameters[self.window][14] = 'None'
         else :
             self.butCorrYDataSet.setStyleSheet('Text-align:right;' + self.styleSheetWhite)
 
@@ -494,13 +510,16 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
             self.butCorrXDataSet.setStyleSheet('Text-align:center;' + self.styleSheetWhite)
             self.butCorrXParName.setStyleSheet(self.styleSheetWhite)
             self.butCorrXParName.setText('None')
+            self.butCorrXParIndex.setText('None')
 
         elif   self.butCorrXDataSet.text() == 'None' \
             or self.butCorrXDataSet.text() == 'Select-X-parameter' :
             self.butCorrXDataSet.setStyleSheet('Text-align:center;' + self.styleSheetRed)
             self.butCorrXParName.setStyleSheet(self.styleSheetRed)
             self.butCorrXParName.setText('None')
+            self.butCorrXParIndex.setText('None')
             cp.confpars.correlationWindowParameters[self.window][8] = 'None'
+            cp.confpars.correlationWindowParameters[self.window][15] = 'None'
         else :
             self.butCorrXDataSet.setStyleSheet('Text-align:right;' + self.styleSheetWhite)
 
@@ -541,7 +560,9 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.butCorrYDataSet.setText( selected_dsname )
         cp.confpars.correlationWindowParameters[self.window][0] = str(selected_dsname)
         self.butCorrYParName.setText('None')
+        self.butCorrYParIndex.setText('None')
         cp.confpars.correlationWindowParameters[self.window][7] = 'None'
+        cp.confpars.correlationWindowParameters[self.window][14] = 'None'
         self.setButCorrYDataSetTextAlignment()
 
 
@@ -592,6 +613,8 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         print 'selected_dsname = ', selected_dsname
         self.butCorrYParName.setText( selected_dsname )
         cp.confpars.correlationWindowParameters[self.window][7] = str(selected_dsname)
+        self.butCorrYParIndex.setText('None')
+        cp.confpars.correlationWindowParameters[self.window][14] = 'None'
 
         self.setButCorrYParNameTextAlignment()
         self.cboxYlimits.setCheckState(0)
@@ -610,9 +633,65 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         print 'selected_dsname = ', selected_dsname
         self.butCorrXParName.setText( selected_dsname )
         cp.confpars.correlationWindowParameters[self.window][8]  = str(selected_dsname)
+        self.butCorrXParIndex.setText('None')
+        cp.confpars.correlationWindowParameters[self.window][15] = 'None'
 
         self.setButCorrXParNameTextAlignment()
         self.cboxXlimits.setCheckState(0)
+
+
+
+
+
+
+
+
+
+
+
+    def fillPopupMenuForXParIndex(self):
+        print 'fillPopupMenuForXParIndex'
+        dsname  = cp.confpars.correlationWindowParameters[self.window][1]
+        parname = cp.confpars.correlationWindowParameters[self.window][8]
+        print 'dsname=', dsname, '   parname=', parname
+        self.listOfDatasetParIndexes = printh5.getListOfDatasetParIndexes(dsname,parname)
+        del self.popupMenuForXParIndex
+        self.popupMenuForXParIndex=QtGui.QMenu()
+        for parIndex in self.listOfDatasetParIndexes :
+            self.popupMenuForXParIndex.addAction(parIndex)
+
+    def fillPopupMenuForYParIndex(self):
+        print 'fillPopupMenuForYParIndex'
+        dsname  = cp.confpars.correlationWindowParameters[self.window][0]
+        parname = cp.confpars.correlationWindowParameters[self.window][7]
+        print 'dsname=', dsname, '   parname=', parname
+        self.listOfDatasetParIndexes = printh5.getListOfDatasetParIndexes(dsname,parname)
+        del self.popupMenuForYParIndex
+        self.popupMenuForYParIndex=QtGui.QMenu()
+        for parIndex in self.listOfDatasetParIndexes :
+            self.popupMenuForYParIndex.addAction(parIndex)
+
+    def processMenuForYParIndex(self):
+        print 'MenuForYParIndex'
+        self.fillPopupMenuForYParIndex()
+        actionSelected = self.popupMenuForYParIndex.exec_(QtGui.QCursor.pos())
+        if actionSelected==None : return
+        selected         = actionSelected.text()
+        selected_ind     = self.listOfDatasetParIndexes.index(selected)
+        print 'selected = ', selected
+        self.butCorrYParIndex.setText( selected )
+        cp.confpars.correlationWindowParameters[self.window][14] = str(selected)
+
+    def processMenuForXParIndex(self):
+        print 'MenuForXParIndex'
+        self.fillPopupMenuForXParIndex()
+        actionSelected = self.popupMenuForXParIndex.exec_(QtGui.QCursor.pos())
+        if actionSelected==None : return
+        selected         = actionSelected.text()
+        selected_ind     = self.listOfDatasetParIndexes.index(selected)
+        print 'selected = ', selected
+        self.butCorrXParIndex.setText( selected )
+        cp.confpars.correlationWindowParameters[self.window][15] = str(selected)
 
 #-----------------------------
 #  In case someone decides to run this module

@@ -143,11 +143,15 @@ class GUICalibCycleWindow ( QtGui.QWidget ) :
         self.butCalibCYDataSet = QtGui.QPushButton(cp.confpars.calibcycleWindowParameters[self.window][0])
         self.butCalibCXParName = QtGui.QPushButton(cp.confpars.calibcycleWindowParameters[self.window][8])
         self.butCalibCYParName = QtGui.QPushButton(cp.confpars.calibcycleWindowParameters[self.window][7])
+        self.butCalibCXParIndex= QtGui.QPushButton(cp.confpars.calibcycleWindowParameters[self.window][15])
+        self.butCalibCYParIndex= QtGui.QPushButton(cp.confpars.calibcycleWindowParameters[self.window][14])
 
         self.butCalibCXDataSet  .setMaximumHeight(height)
         self.butCalibCYDataSet  .setMaximumHeight(height)
         self.butCalibCXParName  .setMaximumHeight(height)
         self.butCalibCYParName  .setMaximumHeight(height)
+        self.butCalibCXParIndex .setMaximumHeight(height)
+        self.butCalibCYParIndex .setMaximumHeight(height)
 
         self.butCalibCXDataSet.setMaximumWidth(295)
         self.butCalibCYDataSet.setMaximumWidth(295)
@@ -165,11 +169,19 @@ class GUICalibCycleWindow ( QtGui.QWidget ) :
         self.popupMenuForYParName = QtGui.QMenu()
         self.fillPopupMenuForYParName()
 
+        self.popupMenuForXParIndex = QtGui.QMenu()
+        self.fillPopupMenuForXParIndex()
+
+        self.popupMenuForYParIndex = QtGui.QMenu()
+        self.fillPopupMenuForYParIndex()
+
+
         grid = QtGui.QGridLayout()
 
         grid.addWidget(self.titCalibCYDataSet,      0, 0)
         grid.addWidget(self.butCalibCYDataSet,      0, 1, 1, 4)
         grid.addWidget(self.butCalibCYParName,      0, 5)
+        grid.addWidget(self.butCalibCYParIndex,     0, 6)
 
         grid.addWidget(self.titVs,                  1, 0)
         grid.addWidget(self.radioVsIndex,           1, 1)
@@ -180,6 +192,7 @@ class GUICalibCycleWindow ( QtGui.QWidget ) :
         grid.addWidget(self.titCalibCXDataSet,      2, 0)
         grid.addWidget(self.butCalibCXDataSet,      2, 1, 1, 4)
         grid.addWidget(self.butCalibCXParName,      2, 5)
+        grid.addWidget(self.butCalibCXParIndex,     2, 6)
         
         grid.addWidget(self.cboxYlimits,            3, 0)
         grid.addWidget(self.editCalibCycleYmin,     3, 1)
@@ -215,6 +228,8 @@ class GUICalibCycleWindow ( QtGui.QWidget ) :
         self.connect(self.butCalibCYDataSet,     QtCore.SIGNAL('clicked()'),          self.processMenuForYDataSet )
         self.connect(self.butCalibCXParName,     QtCore.SIGNAL('clicked()'),          self.processMenuForXParName )
         self.connect(self.butCalibCYParName,     QtCore.SIGNAL('clicked()'),          self.processMenuForYParName )
+        self.connect(self.butCalibCXParIndex,    QtCore.SIGNAL('clicked()'),          self.processMenuForXParIndex )
+        self.connect(self.butCalibCYParIndex,    QtCore.SIGNAL('clicked()'),          self.processMenuForYParIndex )
 
         self.connect(self.editCalibCycleYmin,    QtCore.SIGNAL('editingFinished ()'), self.processEditCalibCycleYmin )
         self.connect(self.editCalibCycleYmax,    QtCore.SIGNAL('editingFinished ()'), self.processEditCalibCycleYmax )
@@ -476,7 +491,9 @@ class GUICalibCycleWindow ( QtGui.QWidget ) :
             self.butCalibCYDataSet.setStyleSheet('Text-align:center')
             self.butCalibCYDataSet.setStyleSheet(self.styleSheetRed)
             self.butCalibCYParName.setText('None')
+            self.butCalibCYParIndex.setText('None')
             cp.confpars.calibcycleWindowParameters[self.window][7] = 'None'
+            cp.confpars.calibcycleWindowParameters[self.window][14] = 'None'
         else :
             self.butCalibCYDataSet.setStyleSheet('Text-align:right;' + self.styleSheetWhite)
 
@@ -490,13 +507,16 @@ class GUICalibCycleWindow ( QtGui.QWidget ) :
             self.butCalibCXDataSet.setStyleSheet('Text-align:center;' + self.styleSheetWhite)
             self.butCalibCXParName.setStyleSheet(self.styleSheetWhite)
             self.butCalibCXParName.setText('None')
+            self.butCalibCXParIndex.setText('None')
 
         elif   self.butCalibCXDataSet.text() == 'None' \
             or self.butCalibCXDataSet.text() == 'Select-X-parameter' :
             self.butCalibCXDataSet.setStyleSheet('Text-align:center;' + self.styleSheetRed)
             self.butCalibCXParName.setStyleSheet(self.styleSheetRed)
             self.butCalibCXParName.setText('None')
+            self.butCalibCXParIndex.setText('None')
             cp.confpars.calibcycleWindowParameters[self.window][8] = 'None'
+            cp.confpars.calibcycleWindowParameters[self.window][15] = 'None'
         else :
             self.butCalibCXDataSet.setStyleSheet('Text-align:right;' + self.styleSheetWhite)
 
@@ -538,7 +558,9 @@ class GUICalibCycleWindow ( QtGui.QWidget ) :
         self.butCalibCYDataSet.setText( selected_dsname )
         cp.confpars.calibcycleWindowParameters[self.window][0] = str(selected_dsname)
         self.butCalibCYParName.setText('None')
+        self.butCalibCYParIndex.setText('None')
         cp.confpars.calibcycleWindowParameters[self.window][7] = 'None'
+        cp.confpars.calibcycleWindowParameters[self.window][14] = 'None'
         self.setButCalibCYDataSetTextAlignment()
 
 
@@ -589,6 +611,8 @@ class GUICalibCycleWindow ( QtGui.QWidget ) :
         print 'selected_dsname = ', selected_dsname
         self.butCalibCYParName.setText( selected_dsname )
         cp.confpars.calibcycleWindowParameters[self.window][7] = str(selected_dsname)
+        self.butCalibCYParIndex.setText('None')
+        cp.confpars.calibcycleWindowParameters[self.window][14] = 'None'
 
         self.setButCalibCYParNameTextAlignment()
         self.cboxYlimits.setCheckState(0)
@@ -607,9 +631,61 @@ class GUICalibCycleWindow ( QtGui.QWidget ) :
         print 'selected_dsname = ', selected_dsname
         self.butCalibCXParName.setText( selected_dsname )
         cp.confpars.calibcycleWindowParameters[self.window][8]  = str(selected_dsname)
+        self.butCalibCXParIndex.setText('None')
+        cp.confpars.calibcycleWindowParameters[self.window][15] = 'None'
 
         self.setButCalibCXParNameTextAlignment()
         self.cboxXlimits.setCheckState(0)
+
+
+
+
+
+
+
+    def fillPopupMenuForXParIndex(self):
+        print 'fillPopupMenuForXParIndex'
+        dsname  = cp.confpars.calibcycleWindowParameters[self.window][1]
+        parname = cp.confpars.calibcycleWindowParameters[self.window][8]
+        print 'dsname=', dsname, '   parname=', parname
+        self.listOfDatasetParIndexes = printh5.getListOfDatasetParIndexes(dsname,parname)
+        del self.popupMenuForXParIndex
+        self.popupMenuForXParIndex=QtGui.QMenu()
+        for parIndex in self.listOfDatasetParIndexes :
+            self.popupMenuForXParIndex.addAction(parIndex)
+
+    def fillPopupMenuForYParIndex(self):
+        print 'fillPopupMenuForYParIndex'
+        dsname  = cp.confpars.calibcycleWindowParameters[self.window][0]
+        parname = cp.confpars.calibcycleWindowParameters[self.window][7]
+        print 'dsname=', dsname, '   parname=', parname
+        self.listOfDatasetParIndexes = printh5.getListOfDatasetParIndexes(dsname,parname)
+        del self.popupMenuForYParIndex
+        self.popupMenuForYParIndex=QtGui.QMenu()
+        for parIndex in self.listOfDatasetParIndexes :
+            self.popupMenuForYParIndex.addAction(parIndex)
+
+    def processMenuForYParIndex(self):
+        print 'MenuForYParIndex'
+        self.fillPopupMenuForYParIndex()
+        actionSelected = self.popupMenuForYParIndex.exec_(QtGui.QCursor.pos())
+        if actionSelected==None : return
+        selected         = actionSelected.text()
+        selected_ind     = self.listOfDatasetParIndexes.index(selected)
+        print 'selected = ', selected
+        self.butCalibCYParIndex.setText( selected )
+        cp.confpars.calibcycleWindowParameters[self.window][14] = str(selected)
+
+    def processMenuForXParIndex(self):
+        print 'MenuForXParIndex'
+        self.fillPopupMenuForXParIndex()
+        actionSelected = self.popupMenuForXParIndex.exec_(QtGui.QCursor.pos())
+        if actionSelected==None : return
+        selected         = actionSelected.text()
+        selected_ind     = self.listOfDatasetParIndexes.index(selected)
+        print 'selected = ', selected
+        self.butCalibCXParIndex.setText( selected )
+        cp.confpars.calibcycleWindowParameters[self.window][15] = str(selected)
 
 #-----------------------------
 #  In case someone decides to run this module

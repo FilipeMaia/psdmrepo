@@ -83,6 +83,8 @@ class PlotsForCorrelations ( object ) :
         self.LogIsOn   = cp.confpars.correlationWindowParameters[win][11]
         self.YNBins    = cp.confpars.correlationWindowParameters[win][12]
         self.XNBins    = cp.confpars.correlationWindowParameters[win][13]
+        self.YParIndex = cp.confpars.correlationWindowParameters[win][14] 
+        self.XParIndex = cp.confpars.correlationWindowParameters[win][15] 
         
         if self.Ydsname == 'None' :
             print 'THE Ydsname=', self.Ydsname, ' IS SET INCORRECTLY. THE CORRELATION PLOT', win,' IS IGNORED'
@@ -96,17 +98,22 @@ class PlotsForCorrelations ( object ) :
         self.dsY = h5file[self.Ydsname]
         print 'dsY.shape=',self.dsY.shape
 
-        nYpoints = self.dsY.shape[0]
-        print '\nNew Win:', win, ' Correlation plot for nYpoints =', nYpoints 
+        if self.YParIndex == 'None' :
+            self.Yarr = self.dsY[self.YParName]
+        else :
+            self.Yarr = self.dsY[self.YParName][self.YParIndex]  # Next level index for ipimb...       
 
-        self.Yarr = self.dsY[self.YParName]
         print 'Y-Parameter array :\n', self.Yarr
+        self.nYpoints = self.dsY.shape[0]
+        #self.nYpoints = self.Yarr.shape[0] # also works
+        print '\nNew Win:', win, ' Correlation plot for nYpoints =', self.nYpoints 
+
 
         self.markerStyle = 'bs-'
 
         if   self.radioXPar == 0 : # for Index
-            self.Xarr = range(nYpoints)
-            print 'Index array from 0 to', nYpoints
+            self.Xarr = range(self.nYpoints)
+            print 'Index array from 0 to', self.nYpoints
             self.XTitle = 'Index'
             self.PlotTitle = 'Plot ' + str(win+1) + ': Parameter vs Index'
             self.plotWaveform()
@@ -135,7 +142,11 @@ class PlotsForCorrelations ( object ) :
 
             self.dsX = h5file[self.Xdsname]
 
-            self.Xarr = self.dsX[self.XParName]
+            if self.XParIndex == 'None' :
+                self.Xarr = self.dsX[self.XParName]
+            else :
+                self.Xarr = self.dsX[self.XParName][self.XParIndex] # Next level index for ipimb...
+
 
             if self.dsX.shape[0] != self.dsY.shape[0] :
                 print 'Arrays of different length, X, Y shape=', self.dsX.shape[0], self.dsY.shape[0]
@@ -159,6 +170,21 @@ class PlotsForCorrelations ( object ) :
         plt.show()
 
 
+
+
+
+    def setLabelX( self, parname, parindex='None' ) :
+        if parindex == 'None' : xtitle = parname
+        else                  : xtitle = parname + ' : ' + parindex
+        plt.xlabel(xtitle)
+
+
+    def setLabelY( self, parname, parindex='None' ) :
+        if parindex == 'None' : ytitle = parname
+        else                  : ytitle = parname + ' : ' + parindex
+        plt.ylabel(ytitle)
+
+
     def plotWaveform( self ) :
         plt.clf()
 
@@ -170,7 +196,7 @@ class PlotsForCorrelations ( object ) :
         if self.XLimsIsOn : plt.xlim(self.Xmin,self.Xmax)
         if self.YLimsIsOn : plt.ylim(self.Ymin,self.Ymax)
 
-        plt.ylabel(self.YParName)
+        self.setLabelY(self.YParName, self.YParIndex)
         plt.xlabel(self.XTitle)
         plt.title(self.PlotTitle,color='r',fontsize=20) # pars like in class Text
         self.fig.canvas.set_window_title(self.Ydsname)
@@ -182,7 +208,7 @@ class PlotsForCorrelations ( object ) :
         plt.xlim(auto=True)
         axes = plt.hist(self.Yarr, bins=self.YNBins, color='b')
         if self.YLimsIsOn : plt.xlim(self.Ymin,self.Ymax)
-        plt.xlabel(self.YParName)
+        self.setLabelX(self.YParName, self.YParIndex)
         plt.title(self.PlotTitle,color='r',fontsize=20) # pars like in class Text
         self.fig.canvas.set_window_title(self.Ydsname)        
 
@@ -213,8 +239,10 @@ class PlotsForCorrelations ( object ) :
 
         colb = plt.colorbar(axes, pad=0.005, fraction=0.10, aspect=12, shrink=1) # pad=0.10, orientation=2, aspect = 8, ticks=coltickslocs
 
-        plt.xlabel(self.XParName)
-        plt.ylabel(self.YParName)
+        #plt.xlabel(self.XParName)
+        #plt.ylabel(self.YParName)
+        self.setLabelX(self.XParName, self.XParIndex)
+        self.setLabelY(self.YParName, self.YParIndex)
         plt.title(self.PlotTitle,color='r',fontsize=20) # pars like in class Text
         self.fig.canvas.set_window_title(self.Ydsname)        
 

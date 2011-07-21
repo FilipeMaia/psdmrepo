@@ -145,8 +145,13 @@ class PlotsForCalibCycles ( object ) :
             print self.Ydsname_for_calibcycle,
 
             ds  = h5file[self.Ydsname_for_calibcycle]
-            arr = ds[self.YParName] 
-            val = np.mean(arr)      # We use the averaged over events value of the parameter 
+
+            if self.YParIndex == 'None' :
+                self.arry = ds[self.YParName] 
+            else :
+                self.arry = ds[self.YParName][self.YParIndex]  # Next level index for ipimb...  
+
+            val = np.mean(self.arry)   # We use the averaged over events value of the parameter 
             print '  <Ypar>=',val,
             self.Yarr.append(val)
 
@@ -167,8 +172,14 @@ class PlotsForCalibCycles ( object ) :
             elif self.radioXPar == 2 : # for X-Parameter
 
                 dsx  = h5file[self.Xdsname_for_calibcycle]
-                arrx = ds[self.XParName] 
-                meanx = np.mean(arrx)      # We use the averaged over events value of the parameter 
+                self.arrx = ds[self.XParName] 
+
+                if self.XParIndex == 'None' :
+                    self.arrx = ds[self.XParName] 
+                else :
+                    self.arrx = ds[self.XParName][self.XParIndex]  # Next level index for ipimb...  
+
+                meanx = np.mean(self.arrx) # We use the averaged over events value of the parameter 
                 print '  <Xpar>=', meanx
                 self.Xarr.append(meanx)
 
@@ -217,7 +228,16 @@ class PlotsForCalibCycles ( object ) :
         ##-------------
 
 
+    def setLabelX( self, parname, parindex='None' ) :
+        if parindex == 'None' : xtitle = parname
+        else                  : xtitle = parname + ' : ' + parindex
+        plt.xlabel(xtitle)
 
+
+    def setLabelY( self, parname, parindex='None' ) :
+        if parindex == 'None' : ytitle = parname
+        else                  : ytitle = parname + ' : ' + parindex
+        plt.ylabel(ytitle)
 
 
     def plotWaveform( self ) :
@@ -231,21 +251,32 @@ class PlotsForCalibCycles ( object ) :
         if self.XLimsIsOn : plt.xlim(self.Xmin,self.Xmax)
         if self.YLimsIsOn : plt.ylim(self.Ymin,self.Ymax)
 
-        plt.ylabel(self.YParName)
+        self.setLabelY(self.YParName,self.YParIndex)
         plt.xlabel(self.XTitle)
         plt.title(self.PlotTitle,color='r',fontsize=20) # pars like in class Text
         self.fig.canvas.set_window_title(self.Ydsname)
 
 
-
     def plot1DHistogram( self ) :
         plt.clf()
         plt.xlim(auto=True)
-        axes = plt.hist(self.Yarr, bins=self.YNBins, color='b')
+        arrh = self.excludeNanFromArray(self.Yarr)       
+        axes = plt.hist(arrh, bins=self.YNBins, color='b')
         if self.YLimsIsOn : plt.xlim(self.Ymin,self.Ymax)
-        plt.xlabel(self.YParName)
+        self.setLabelX(self.YParName, self.YParIndex)
         plt.title(self.PlotTitle,color='r',fontsize=20) # pars like in class Text
         self.fig.canvas.set_window_title(self.Ydsname)        
+
+
+    def excludeNanFromArray(self, arr) :
+        print arr
+        print arr.shape[0]
+        newarr = []
+        for val in arr :
+            if np.isnan(val) : continue
+            newarr.append(val)
+        print 'WARNING: All NaN parameters are excluded...'
+        return np.array(newarr)
 
 
 
@@ -274,8 +305,8 @@ class PlotsForCalibCycles ( object ) :
 
         colb = plt.colorbar(axes, pad=0.005, fraction=0.10, aspect=12, shrink=1) # pad=0.10, orientation=2, aspect = 8, ticks=coltickslocs
 
-        plt.xlabel(self.XParName)
-        plt.ylabel(self.YParName)
+        self.setLabelX(self.XParName, self.XParIndex)
+        self.setLabelY(self.YParName, self.YParIndex)
         plt.title(self.PlotTitle,color='r',fontsize=20) # pars like in class Text
         self.fig.canvas.set_window_title(self.Ydsname)        
 

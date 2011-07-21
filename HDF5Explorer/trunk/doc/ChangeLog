@@ -11,6 +11,56 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+------------------------------
+
+	
+2011-06-29 Mikhail S. Dubrovin
+- Add time dependent alignment parameters for CSPad in modules:
+
+	       HDF5Explorer/src/ConfigCSpad.py
+	       HDF5Explorer/src/DrawEvent.py
+	       HDF5Explorer/src/PlotsForCSpad.py
+
+  New versions of alignment parameters should be included in the HDF5Explorer/src/ConfigCSpad.py
+    def setCSpadParameters( self ) : 
+    def setTimeOfRunStart( self ) :
+    def setCSpadParametersV00## ( self ) :	
+
+	
+2011-06-28 Mikhail S. Dubrovin	
+- Add alignment parameters V0002 for run 4. 
+- CSPad image size is increased from 1750 to 1765 in order to inscribe larger shift of quads
+  in the detector for cxi35711 experiment.
+
+- Automatically save text files for numpy arrays of the camera image right after Averege algorithm in
+  HDF5Explorer/src/DrawEvent.py
+    def saveArrayForDSNameInFile(self, dsname, arr1ev) :
+    file name: camera-ave-CAMERA-NAME.txt
+
+- Simple example of how to read/plot this file is in 
+
+	../test_matplotlib/PlotCameraImageFromFile.py	
+
+	import numpy as np
+	import matplotlib.pyplot as plt
+	fname = '/reg/neh/home/dubrovin/LCLS/HDF5Explorer-v01/camera-ave-CxiDg1.0:Tm6740.0.txt'
+	arr   = np.loadtxt(fname, dtype=np.float32)
+	plt.imshow(arr, origin='upper', interpolation='nearest', aspect='auto') #,extent=Range)
+	plt.show()	
+
+	
+  Earlier we had automatic file saving for CSPad detector and quad:
+	cspad-ave.txt
+	cspad-ave-quad-#.txt
+  These files are used in alignment package: CSPadAlignment
+	
+
+	
+2011-06-27 Mikhail S. Dubrovin	
+- Fix the configuration file name definition for CSPad in HDF5Explorer/src/DrawEvent.py
+    def getCSpadConfiguration( self, dsname ):	
+
+	
 Tag: V00-00-01
 2011-05-10 Mikhail S. Dubrovin
 - just created this template file, this entry is an example of the change log

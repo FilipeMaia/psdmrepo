@@ -329,6 +329,44 @@ def getListOfDatasetParNames(dsname=None):
     listOfDatasetParNames.append('None')
     return listOfDatasetParNames
 
+#----------------------------------
+
+def getListOfDatasetParIndexes(dsname=None, parname=None):
+    """Makes a list of the dataset parameter indexes"""
+
+    listOfDatasetParIndexes = []
+    if dsname=='None'  or \
+       dsname=='Index' or \
+       dsname=='Time'  or \
+       dsname=='Is-not-used' or \
+       dsname=='Select-X-parameter' :
+
+        listOfDatasetParIndexes.append('None')
+        return listOfDatasetParIndexes
+
+
+    if not (parname=='ipimbData'   or \
+            parname=='ipimbConfig' or \
+            parname=='ipmFexData') :
+
+        listOfDatasetParIndexes.append('None')
+        return listOfDatasetParIndexes
+ 
+    fname = cp.confpars.dirName+'/'+cp.confpars.fileName
+    f = h5py.File(fname, 'r') # open read-only
+    ds = f[dsname]
+
+    dspar = ds[parname]
+
+    for parIndex in dspar.dtype.names :
+        print parIndex
+        listOfDatasetParIndexes.append(parIndex)
+
+    f.close()
+
+    listOfDatasetParIndexes.append('None')
+    return listOfDatasetParIndexes
+
                             
 #----------------------------------
 #

@@ -218,9 +218,9 @@ class ConfigParameters ( object ) :
 
         self.correlationWindowParameters = []
         for win in range(self.correlationNWindowsMax) :
-            self.correlationWindowParameters.append(['None','None',    0,    0, 1000,    0, 1000,'None','None', False,     False,     False,     40,     40])
-                                                   #[ Ydsn,  Xdsn, Radio, Ymin, Ymax, Xmin, Xmax, Ypar,  Xpar,  YLimsIsOn, XLimsIsOn, LogZIsOn, YNBins, XNBins]
-                                                   #[    0,     1,     2,    3,    4,    5,    6,    7,     8,     9,      10,        11,       12,     13    ]
+            self.correlationWindowParameters.append(['None','None',    0,    0, 1000,    0, 1000,'None','None', False,     False,     False,     40,     40,    'None', 'None'])
+                                                   #[ Ydsn,  Xdsn, Radio, Ymin, Ymax, Xmin, Xmax, Ypar,  Xpar,  YLimsIsOn, XLimsIsOn, LogZIsOn, YNBins, XNBins, YparInd, XparInd]
+                                                   #[    0,     1,     2,    3,    4,    5,    6,    7,     8,     9,      10,        11,       12,     13      14,      15]
 
 
 
@@ -232,9 +232,9 @@ class ConfigParameters ( object ) :
 
         self.calibcycleWindowParameters = []
         for win in range(self.calibcycleNWindowsMax) :
-            self.calibcycleWindowParameters.append(['None','None',    0,    0, 1000,    0, 1000,'None','None', False,     False,     False,     40,     40,    0,       0])
+            self.calibcycleWindowParameters.append(['None','None',    0,    0, 1000,    0, 1000,'None','None', False,     False,     False,     40,     40,    'None', 'None'])
                                                   #[ Ydsn,  Xdsn, Radio, Ymin, Ymax, Xmin, Xmax, Ypar,  Xpar,  YLimsIsOn, XLimsIsOn, LogZIsOn, YNBins, XNBins, YparInd, XparInd]
-                                                  #[    0,     1,     2,    3,    4,    5,    6,    7,     8,     9,      10,        11,       12,     13      14       15]
+                                                  #[    0,     1,     2,    3,    4,    5,    6,    7,     8,     9,      10,        11,       12,     13,     14,      15]
 
         self.projCenterX         = 850
         self.projCenterY         = 850
@@ -411,6 +411,8 @@ class ConfigParameters ( object ) :
             print 'CORR_LOGZ_IS_ON',       self.correlationWindowParameters[win][11] 
             print 'CORR_YNBINS',           self.correlationWindowParameters[win][12]
             print 'CORR_XNBINS',           self.correlationWindowParameters[win][13]
+            print 'CORR_YPARINDEX',        self.correlationWindowParameters[win][14] 
+            print 'CORR_XPARINDEX',        self.correlationWindowParameters[win][15] 
             
         print 'CALIBC_N_WINDOWS_MAX',       self.calibcycleNWindowsMax 
         print 'CALIBC_N_WINDOWS',           self.calibcycleNWindows 
@@ -620,6 +622,8 @@ class ConfigParameters ( object ) :
                 elif key == 'CORR_LOGZ_IS_ON'          : self.correlationWindowParameters[win][11]= dicBool[val.lower()] 
                 elif key == 'CORR_YNBINS'              : self.correlationWindowParameters[win][12]= self.getValIntOrNone(val)
                 elif key == 'CORR_XNBINS'              : self.correlationWindowParameters[win][13]= self.getValIntOrNone(val)
+                elif key == 'CORR_YPARINDEX'           : self.correlationWindowParameters[win][14]= val
+                elif key == 'CORR_XPARINDEX'           : self.correlationWindowParameters[win][15]= val
 
 
                 elif key == 'CALIBC_N_WINDOWS_MAX'     : self.calibcycleNWindowsMax   = int(val)
@@ -640,8 +644,8 @@ class ConfigParameters ( object ) :
                 elif key == 'CALIBC_LOGZ_IS_ON'        : self.calibcycleWindowParameters[win][11]= dicBool[val.lower()] 
                 elif key == 'CALIBC_YNBINS'            : self.calibcycleWindowParameters[win][12]= self.getValIntOrNone(val)
                 elif key == 'CALIBC_XNBINS'            : self.calibcycleWindowParameters[win][13]= self.getValIntOrNone(val)
-                elif key == 'CALIBC_YPARINDEX'         : self.calibcycleWindowParameters[win][14]= self.getValIntOrNone(val)
-                elif key == 'CALIBC_XPARINDEX'         : self.calibcycleWindowParameters[win][15]= self.getValIntOrNone(val)
+                elif key == 'CALIBC_YPARINDEX'         : self.calibcycleWindowParameters[win][14]= val
+                elif key == 'CALIBC_XPARINDEX'         : self.calibcycleWindowParameters[win][15]= val
                 
                 elif key == 'PROJ_CENTER_X'            : self.projCenterX           = float(val)
                 elif key == 'PROJ_CENTER_Y'            : self.projCenterY           = float(val)
@@ -833,6 +837,8 @@ class ConfigParameters ( object ) :
             f.write('CORR_LOGZ_IS_ON'       + space + str(self.correlationWindowParameters[win][11]) + '\n') 
             f.write('CORR_YNBINS'           + space + str(self.correlationWindowParameters[win][12]) + '\n') 
             f.write('CORR_XNBINS'           + space + str(self.correlationWindowParameters[win][13]) + '\n') 
+            f.write('CORR_YPARINDEX'        + space + str(self.correlationWindowParameters[win][14]) + '\n') 
+            f.write('CORR_XPARINDEX'        + space + str(self.correlationWindowParameters[win][15]) + '\n') 
 
 
         f.write('CALIBC_N_WINDOWS_MAX'        + space + str(self.calibcycleNWindowsMax)   + '\n')
