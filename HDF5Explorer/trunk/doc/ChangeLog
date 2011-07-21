@@ -13,6 +13,17 @@ reverse time order.
 
 ------------------------------
 
+Tag: V00-00-02
+2011-07-21 Mikhail S. Dubrovin
+- Add one more index for ipimb data set 
+  Changed modules: 	
+	       HDF5Explorer/src/ConfigParameters.py
+	       HDF5Explorer/src/GUICalibCycleWindow.py
+	       HDF5Explorer/src/GUICorrelationWindow.py
+	       HDF5Explorer/src/PlotsForCalibCycles.py
+	       HDF5Explorer/src/PlotsForCorrelations.py
+	       HDF5Explorer/src/PrintHDF5.py
+	
 	
 2011-06-29 Mikhail S. Dubrovin
 - Add time dependent alignment parameters for CSPad in modules:
