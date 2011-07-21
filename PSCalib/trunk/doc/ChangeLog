@@ -1,0 +1,65 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PSCalib
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-01
+2011-07-11 Mikhail S. Dubrovin
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
+
+
+Description of calibration subdirectories:
+------------------------------------------
+https://confluence.slac.stanford.edu/display/PCDS/CsPad+calibration+in+translator
+
+
+Package created on on psdev:
+----------------------------
+cd LCLS/
+newrel ana-current PSCalib-V00
+cd PSCalib-V00/
+sit_setup
+newpkg PSCalib
+mkdir PSCalib/src
+mkdir PSCalib/app
+mkdir PSCalib/include
+psvn newpkg PSCalib
+addpkg PSCalib
+	
+cp $SIT_RELDIR/ana-current/O2OTranslator/src/CsPadCalibV1Cvt.cpp    PSCalib/src/
+cp $SIT_RELDIR/ana-current/O2OTranslator/include/CsPadCalibV1Cvt.h  PSCalib/include/
+
+Change names, edit these files, add applications for test etc.
+
+
+	
+svn add PSCalib/include/
+svn add PSCalib/src/
+svn add PSCalib/app/
+
+svn update
+svn status PSCalib
+svn commit -m "Work in progress." PSCalib
+
+List tags:
+----------
+psvn tags PSCalib
+
+Create new tag:
+---------------
+cd PSCalib
+svn update
+psvn tag V00-00-01
+==================
