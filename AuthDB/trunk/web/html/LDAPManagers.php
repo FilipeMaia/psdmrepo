@@ -120,7 +120,7 @@ td.table_cell_within_group {
 
   <h2>About</h2>
   <div style="padding-left:20px;">
-    <p>This script will check if experiment PIs are authorized as 'Admin's of POSIX groups
+    <p>This script will check if experiment PIs are authorized as 'Admin's to manage POSIX groups
        of their experiments, and if the optional parameter <b>fix</b> is present then assign
        the role to the PIs. Specifically, for each experiment, the tool will:</p>
     <ol>
@@ -146,6 +146,7 @@ td.table_cell_within_group {
 
 	$application = 'LDAP';
 	$role = 'Admin';
+	$priv = 'manage_groups';
 	$header =
 		'<tr>'.
 		'<td class="table_hdr">Instrument</td>'.
@@ -154,9 +155,8 @@ td.table_cell_within_group {
 		'<td class="table_hdr">Group</td>'.
 		'<td class="table_hdr">PI (regdb)</td>'.
 		'<td class="table_hdr">PI (matched)</td>'.
-		'<td class="table_hdr">LDAP Role</td>'.
-		'<td class="table_hdr">Is Authorized</td>'.
-		'<td class="table_hdr">Current authorizations</td>'.
+		'<td class="table_hdr">PI has authorization</td>'.
+		'<td class="table_hdr">Who else can manage the group</td>'.
 	($fix ? '<td class="table_hdr">Action</td>' : '').
 	'</tr>';
 	print '<table><tbody>';
@@ -189,7 +189,6 @@ td.table_cell_within_group {
 				    $first_name = $result[1];
 					$last_name  = $result[2];
 
-					//print $account['gecos'].' : '.$first_name.' '.$last_name.' [<span style="color:green;">OK</span>]<br>';
 					foreach( $all_accounts as $a ) {
 
 						if( preg_match( '/^('.$all_instrument_names_subpattern.')\d{5}$/', $a['uid'] )) continue;
@@ -202,7 +201,6 @@ td.table_cell_within_group {
 						    preg_match('/^'.$first_name.'\s+[^\s]*\s+'.$last_name.'$/',  $a['gecos']) ||
 						    preg_match('/^'.$last_name.',\s+'.$first_name.'$/',          $a['gecos']) ||
 						    preg_match('/^'.$last_name.',\s+'.$first_name.'\s+[^\s]*$/', $a['gecos'])) {
-						    //print '&nbsp;&nbsp;&nbsp;&nbsp;'.$a['uid'].'<br>';
 						    array_push( $alledged_pi_uids_found, $a['uid'] );
 						}
 					}
@@ -218,6 +216,17 @@ td.table_cell_within_group {
 				$authdb->hasRole( $real_pi_uid,     $experiment->id(), $application, $role ) || $authdb->hasRole( $real_pi_uid,     null, $application, $role ) :
 				$authdb->hasRole( $alledged_pi_uid, $experiment->id(), $application, $role ) || $authdb->hasRole( $alledged_pi_uid, null, $application, $role );
 
+			$current_authorizations_str = '';
+			$current_authorizations = $authdb->whoHasPrivilege( $experiment->id(), $application, $priv );
+			sort( $current_authorizations_str );
+			foreach( $current_authorizations as $user ) {
+				if( $has_role ) {
+					if( $user == $alledged_pi_uid ) continue;
+					if( $user == $real_pi_uid ) continue;
+				}
+				if( $current_authorizations_str != '' ) $current_authorizations_str .= ', ';
+				$current_authorizations_str .= '<a href="../authdb/?action=view_account&uid='.$user.'">'.$user.'</a>';
+			}
 			print
 				'<tr>'.
 				'<td class="table_cell table_cell_left">'.$instr_name.'</td>'.
@@ -231,8 +240,6 @@ td.table_cell_within_group {
 			else
 				print
 				'<td class="table_cell"><a href="../authdb/?action=view_account&uid='.$alledged_pi_uid.'">'.$alledged_pi_uid.'</a></td>';
-			print
-				'<td class="table_cell">'.$role.'</td>';
 
 			// TODO: Make sure the above found (if any) 'aledged' PI is authorized
 			//       to manage their group.
@@ -260,7 +267,7 @@ td.table_cell_within_group {
 			} else {
 				print
 					'<td class="table_cell">'.($has_role ? 'Yes' : '<span style="color:red; font-weight:bold;">No</span>').'</td>'.
-					'<td class="table_cell table_cell_right"></td>';
+					'<td class="table_cell table_cell_right">'.$current_authorizations_str.'</td>';
 			}
 			print
 				'</tr>';
