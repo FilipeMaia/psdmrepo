@@ -36,6 +36,9 @@
 namespace pdscalibdata {
 
 /**
+ *  Gets, holds, and provides an access to the x,y,z of 4 quads 
+ *  offsets (in pixel size) of the CSPad
+ *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
@@ -51,6 +54,7 @@ public:
 
   enum { NQuad = Psana::CsPad::MaxQuadsPerSensor};
   enum { NUMBER_OF_PARAMETERS = 12 };
+
   CalibParsOffsetV1( const std::vector<float> v_parameters );
   float getOffsetX(size_t quad){ return m_offset_x[quad]; };
   float getOffsetY(size_t quad){ return m_offset_y[quad]; };

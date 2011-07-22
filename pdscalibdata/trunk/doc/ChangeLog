@@ -10,6 +10,12 @@ Package author: Andrei Salnikov
 
 Please describe any modifications that you made to the package in the
 reverse time order.
+
+Tag: V00-00-10
+2011-07-22 Mikhail Dubrovin
+- fix problem with CalibParsOffsetCorrV1.cpp (it was empty).
+- add description to all CalibPars*V1.h modules
+
 Tag: V00-00-09
 2011-07-19 Mikhail Dubrovin
 - add new classes for CSPad image calibration parameters:

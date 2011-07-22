@@ -36,6 +36,9 @@
 namespace pdscalibdata {
 
 /**
+ *  Gets, holds, and provides an access to the 2x1 center (in pixel size):
+ *  (x,y,z) * (4 quads) * (8 2x1-sectors) of the CSpad
+ *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
@@ -52,6 +55,7 @@ public:
   enum { NQuad = Psana::CsPad::MaxQuadsPerSensor};
   enum { NSect = Psana::CsPad::SectorsPerQuad};
   enum { NUMBER_OF_PARAMETERS = 96 };
+
   CalibParsCenterV1( const std::vector<float> v_parameters );
   float getCenterX(size_t quad, size_t sect){ return m_center_x[quad][sect]; };
   float getCenterY(size_t quad, size_t sect){ return m_center_y[quad][sect]; };

@@ -35,6 +35,12 @@
 namespace pdscalibdata {
 
 /**
+ *  Gets, holds, and provides an access to the x,y,z of
+ *  1) the common margin of 2x1 in quad, 
+ *  2) the margin of the quad in CSPad,
+ *  3) gap between quads in CSPad, 
+ *  4) relative shift of quads in CSPad.
+ *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
@@ -49,6 +55,7 @@ class CalibParsMargGapShiftV1  {
 public:
 
   enum { NUMBER_OF_PARAMETERS = 12 };
+
   CalibParsMargGapShiftV1( const std::vector<float> v_parameters );
   float getQuadMargX () { return m_quad_marg_x; };
   float getQuadMargY () { return m_quad_marg_y; };

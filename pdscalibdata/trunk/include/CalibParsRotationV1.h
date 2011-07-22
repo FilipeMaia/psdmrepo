@@ -35,6 +35,9 @@
 namespace pdscalibdata {
 
 /**
+ *  Gets, holds, and provides an access to the 32 (4 quad x 8 2x1-sectors) 
+ *  rotation angles (degree) of the CSPad
+ *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
@@ -51,6 +54,7 @@ public:
   enum { NQuad = Psana::CsPad::MaxQuadsPerSensor};
   enum { NSect = Psana::CsPad::SectorsPerQuad};
   enum { NUMBER_OF_PARAMETERS = 32 };
+
   CalibParsRotationV1( const std::vector<float> v_parameters );
   float getRotation(size_t quad, size_t sect){ return m_rotation[quad][sect]; };
   void  print();
