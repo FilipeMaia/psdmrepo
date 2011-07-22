@@ -12,13 +12,17 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-01
-2011-07-11 Mikhail S. Dubrovin
-- just created this template file, this entry is an example of the change log
-  entry
-- keep it brief and easy to read
-- always include author name and date of the change, provide CVS tag when 
-  appropriate
+2011-07-21 Mikhail S. Dubrovin
 
+- Class PSCalib/CalibFileFinder is created with central method 
+  CalibFileFinder::findCalibFile(...) which similar to the 
+  CsPadCalibV1Cvt::findCalibFile(...) from O2OTranslator/CsPadCalibV1Cvt
+  All necessary parameters should be specified at constructor initialization.
+	
+- add example PSCalib/app/ex_calib_file_finder.cpp
+
+	
+2011-07-11 Mikhail S. Dubrovin	
 
 Description of calibration subdirectories:
 ------------------------------------------
@@ -43,12 +47,11 @@ cp $SIT_RELDIR/ana-current/O2OTranslator/include/CsPadCalibV1Cvt.h  PSCalib/incl
 
 Change names, edit these files, add applications for test etc.
 
-
-	
 svn add PSCalib/include/
 svn add PSCalib/src/
 svn add PSCalib/app/
-
+...
+	
 svn update
 svn status PSCalib
 svn commit -m "Work in progress." PSCalib
