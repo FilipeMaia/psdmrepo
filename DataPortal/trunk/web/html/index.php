@@ -939,7 +939,6 @@ HERE;
     left: 0;
     width: 100%;
     height: 129px;
-    border-bottom: 1px solid #0b0b0b;
     background-color: #e0e0e0;
   }
   #p-top-header {
@@ -949,7 +948,16 @@ HERE;
     width: 100%;
     height: 92px;
     background-color: #ffffff;
-    z-index: 9999;
+  }
+  #p-top-title {
+    width: 100%;
+    height: 61px;
+  }
+  #p-context-header {
+    width: 100%;
+    height: 36px;
+    background-color: #E0E0E0;
+    border-bottom: 1px solid #0b0b0b;
   }
   #p-left {
     position: absolute;
@@ -1090,11 +1098,13 @@ span.toggler {
 #p-menu {
   font-family: Arial, sans-serif;
   font-size: 14px;
-  height: 31px;
+  height: 32px;
   width: 100%;
   border: 0;
   padding: 0;
+  /*
   border-bottom: 1px solid #c0c0c0;
+  */
 }
 
 #p-context {
@@ -1125,7 +1135,7 @@ div.m-item {
   color: #0071BC;
 
   border-top: 2px solid #c0c0c0;
-  border-bottom: 1px solid #c0c0c0;
+  /*border-bottom: 1px solid #c0c0c0;*/
   border-right: 2px solid #c0c0c0;
 
   border-radius: 5px;
@@ -1168,7 +1178,9 @@ div.m-item-first {
 div.m-select {
   font-weight: bold;
   background: #e0e0e0;
+  /*
   border-bottom: 1px solid #e0e0e0;
+  */
 }
 
 #v-menu {
@@ -1666,7 +1678,7 @@ function p_appl_help() {
 
 <div id="p-top">
 <div id="p-top-header">
-  <div id="header">
+  <div id="p-top-title">
     <div style="float:left;  padding-left:15px; padding-top:10px;">
       <span id="p-title"><?php echo $document_title?></span>
       <span id="p-subtitle"><?php echo $document_subtitle?></span>
@@ -1705,7 +1717,7 @@ function p_appl_help() {
     <div class="m-item m-item-last" id="p-appl-help">Help</div>
     <div class="m-item-end"></div>
   </div>
-  <div>
+  <div id="p-context-header">
     <div id="p-context" style="float:left"></div>
     <div id="p-search" style="float:right">
       search e-log: <input type="text" id="p-search-elog-text" value="" size=16 title="enter text to search in e-Log, then press RETURN to proceed"  style="font-size:80%; padding:1px; margin-top:6px;" />
