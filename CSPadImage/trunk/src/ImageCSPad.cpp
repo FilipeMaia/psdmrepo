@@ -66,15 +66,24 @@ namespace CSPadImage {
 //----------------
 ImageCSPad::ImageCSPad (const std::string& name)
   : Module(name)
+  , m_calibDir()
+  , m_typeGroupName()
+  , m_source()
   , m_src()
   , m_maxEvents()
   , m_filter()
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_src       = configStr("source", "DetInfo(:Acqiris)");
-  m_maxEvents = config   ("events", 32U);
-  m_filter    = config   ("filter", false);
+  m_calibDir      = configStr("calibDir",      "/reg/d/psdm/CXI/cxi35711/calib");
+  m_typeGroupName = configStr("typeGroupName", "CsPad::CalibV1");
+  m_source        = configStr("source",        "CxiDs1.0:Cspad.0");
+  m_runNumber     = config   ("runNumber",     32U);
+  m_maxEvents     = config   ("events",        32U);
+  m_filter        = config   ("filter",        false);
+  m_src           = m_source;
+
+  this -> printInputPars();
 }
 
 //--------------
@@ -322,6 +331,21 @@ void ImageCSPad::endJob(Event& evt, Env& env) {
   WithMsgLog(name(), info, str) { str << "\nImageCSPad::endJob\n"; }
 
   // testOfImageClasses();
+}
+
+//----------------------------------------------------------
+
+void ImageCSPad::printInputPars()
+{
+  WithMsgLog(name(), info, str) { 
+  str << "\nInput parameters:";
+  str << "\ncalibDir      :" << m_calibDir;
+  str << "\ntypeGroupName :" << m_typeGroupName;
+  str << "\nsource        :" << m_source;
+  str << "\nrunNumber     :" << m_runNumber;
+  str << "\nmaxEvents     :" << m_maxEvents;
+  str << "\nfilter        :" << m_filter;
+  }
 }
 
 //----------------

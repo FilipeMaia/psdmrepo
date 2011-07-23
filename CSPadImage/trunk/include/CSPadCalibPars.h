@@ -71,8 +71,14 @@ public:
   // Default constructor
   CSPadCalibPars () {}
 
-  // Regular constructor
+  // Test constructor
   CSPadCalibPars ( const std::string &xtc_file_name ) ;
+
+  // Regular constructor
+  CSPadCalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/cxi/cxi35711/calib
+                   const std::string&   typeGroupName,      //  CsPad::CalibV1
+                   const std::string&   source,             //  CxiDs1.0:Cspad.0
+                   const unsigned long& runNumber ) ;       //  10
 
   // Destructor
   virtual ~CSPadCalibPars () ;
@@ -80,11 +86,13 @@ public:
   size_t   getNRows             (){ return m_nrows;   };
   size_t   getNCols             (){ return m_ncols;   };
 
-  void loadCalibPars ();
-  void openCalibFile ();
-  void closeCalibFile();
-  void readCalibPars ();
-  void printCalibPars();
+  void fillCalibNameVector();
+  void getCalibFileName   ();
+  void loadCalibPars      ();
+  void openCalibFile      ();
+  void closeCalibFile     ();
+  void readCalibPars      ();
+  void printCalibPars     ();
 
   void fillCalibParsV1();
 
@@ -137,16 +145,28 @@ private:
 // Static Members --
 //------------------
 
-  // Data members        // /reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/pedestals/1-20.data
-  std::string m_expdir;       // /reg/d/psdm/CXI/cxi35711 
-  std::string m_calibdir;     // calib
-  std::string m_calibtype;    // CsPad::CalibV1 
-  std::string m_calibsrc;     // CxiDs1.0:Cspad.0 
-  std::string m_filename;     // 1-20.data
-  std::vector<std::string> v_calibname; // center, center_corr, off_gap_shift, offset, offset_corr, rotation, tilt
+  // Data members for TEST constructor       
+  //std::string m_expdir;       // /reg/d/psdm/CXI/cxi35711 
+  //std::string m_calibtype;    // CsPad::CalibV1 
+  //std::string m_calibsrc;     // CxiDs1.0:Cspad.0 
+  std::string m_calibdir;       // /reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi35711-r0009-det
+  std::string m_calibfilename;  // 1-20.data
+
+
+  // Data members for regular constructor // /reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/pedestals/1-20.data
+  std::string   m_calibDir;
+  std::string   m_typeGroupName;
+  std::string   m_source;
+  std::string   m_dataType;
+  unsigned long m_runNumber;
+
+  std::vector<std::string> v_calibname; // center, center_corr, off_gap_shift, offset, offset_corr, rotation, tilt, ...
   std::vector<float>       v_parameters;
 
   std::string m_cur_calibname;  
+  std::string m_fname;
+
+  bool m_isTestMode;
 
   size_t m_nrows; 
   size_t m_ncols; 

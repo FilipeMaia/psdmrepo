@@ -89,6 +89,7 @@ public:
   Image2D<float>* getCSPadImage2D(){ return m_cspad_image_2d; } ;
   void saveCSPadImageInFile();
   void testOfImageClasses();
+  void printInputPars();
 
 protected:
 
@@ -96,7 +97,11 @@ private:
 
   // Data members, this is for example purposes only
   
-  Source m_src;         // Data source set from config file
+  std::string m_calibDir;       // i.e. /reg/d/psdm/CXI/cxi35711/calib
+  std::string m_typeGroupName;  // i.e. CsPad::CalibV1
+  std::string m_source;         // i.e. CxiDs1.0:Cspad.0
+  Source m_src;                 // i.e. CxiDs1.0:Cspad.0
+  unsigned m_runNumber;
   unsigned m_maxEvents;
   bool m_filter;
   long m_count;

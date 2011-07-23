@@ -14,6 +14,7 @@
 // This Class's Header --
 //-----------------------
 #include "CSPadImage/CSPadCalibPars.h"
+#include "PSCalib/CalibFileFinder.h"
 
 //-----------------
 // C/C++ Headers --
@@ -48,15 +49,40 @@ CSPadCalibPars::CSPadCalibPars ( const std::string &xtc_file_name )
   cout << "CSPadCalibPars::CSPadCalibPars" 
        << "\nHere we have to find from the xtc_file_name the run number and find the calib directory..." << endl;
 
-    m_expdir    = "/reg/d/psdm/CXI/cxi35711"; 
-    m_calibdir  = "calib";
-    m_calibtype = "CsPad::CalibV1"; 
-    m_calibsrc  = "CxiDs1.0:Cspad.0"; 
-    m_filename  = "1-end.data";
+    // Temporary staff:
 
-    // Temporary staff in:
-    m_calibdir  = "/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi35711-r0009-det";
+    m_isTestMode = true;
 
+    m_calibdir      = "/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi35711-r0009-det";
+    m_calibfilename = "0-end.data";
+
+    fillCalibNameVector ();
+    loadCalibPars ();
+    printCalibPars();
+}
+
+//----------------
+
+CSPadCalibPars::CSPadCalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/cxi/cxi35711/calib
+                                 const std::string&   typeGroupName,      //  CsPad::CalibV1
+                                 const std::string&   source,             //  CxiDs1.0:Cspad.0
+                                 const unsigned long& runNumber )         //  10
+  : m_calibDir(calibDir)
+  , m_typeGroupName(typeGroupName)
+  , m_source(source)
+  , m_runNumber(runNumber)
+{
+    m_isTestMode = false;
+
+    fillCalibNameVector ();
+    loadCalibPars ();
+    printCalibPars();
+}
+
+//----------------
+
+void CSPadCalibPars::fillCalibNameVector ()
+{
     v_calibname.push_back("center");
     v_calibname.push_back("center_corr");
     v_calibname.push_back("marg_gap_shift");
@@ -66,9 +92,6 @@ CSPadCalibPars::CSPadCalibPars ( const std::string &xtc_file_name )
     v_calibname.push_back("tilt");
     v_calibname.push_back("quad_rotation");
     v_calibname.push_back("quad_tilt");
-
-
-    loadCalibPars ();
 }
 
 //----------------
@@ -80,26 +103,39 @@ void CSPadCalibPars::loadCalibPars ()
       {
         m_cur_calibname = *iterCalibName;
 
-	openCalibFile();
-	readCalibPars();
-	closeCalibFile();
+	getCalibFileName();
+	openCalibFile   ();
+	readCalibPars   ();
+	closeCalibFile  ();
+	fillCalibParsV1 ();
+      }
+}
 
-	fillCalibParsV1();
-       }
-     printCalibPars();
+//----------------
+
+void CSPadCalibPars::getCalibFileName ()
+{
+  if ( m_isTestMode ) 
+    {
+      m_fname  = m_calibdir; 
+      m_fname += "/"; 
+      m_fname += m_cur_calibname; 
+      m_fname += "/"; 
+      m_fname += m_calibfilename; // "/0-end.data"; // !!! THIS IS A SIMPLIFIED CASE OF THE FILE NAME!!!
+    }
+  else
+    {
+      PSCalib::CalibFileFinder *calibfinder = new PSCalib::CalibFileFinder(m_calibDir, m_typeGroupName, m_source);
+      m_fname = calibfinder -> findCalibFile(m_cur_calibname, m_runNumber);
+    }
+    cout << "\nCSPadCalibPars::openCalibFile\n" << m_fname << endl;
 }
 
 //----------------
 
 void CSPadCalibPars::openCalibFile ()
 {
-   string fname (m_calibdir);
-   fname += "/"; 
-   fname += m_cur_calibname; 
-   fname += "/0-end.data"; // !!! THIS IS A SIMPLIFIED CASE OF THE FILE NAME!!!
-   cout << "\nCSPadCalibPars::openCalibFile\n" << fname << endl;
-
-   m_file.open(fname.c_str());
+   m_file.open(m_fname.c_str());
 }
 
 //----------------
