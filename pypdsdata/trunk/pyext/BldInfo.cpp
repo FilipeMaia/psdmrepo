@@ -51,6 +51,8 @@ namespace {
         { "HfxDg3Cam",       Pds::BldInfo::HfxDg3Cam },
         { "XcsDg3Cam",       Pds::BldInfo::XcsDg3Cam },
         { "HfxMonCam",       Pds::BldInfo::HfxMonCam },
+        { "HfxMonImb01",     Pds::BldInfo::HfxMonImb01 },
+        { "HfxMonImb02",     Pds::BldInfo::HfxMonImb02 },
         { "NumberOf",        Pds::BldInfo::NumberOf },
         { 0, 0 }
     };
