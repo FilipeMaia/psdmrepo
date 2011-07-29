@@ -85,6 +85,7 @@ namespace {
       { "CxiDsu",      Pds::DetInfo::CxiDsu },
       { "CxiSc1",      Pds::DetInfo::CxiSc1 },
       { "CxiDsd",      Pds::DetInfo::CxiDsd },
+      { "XcsBeamline", Pds::DetInfo::XcsBeamline },
       { "NumDetector", Pds::DetInfo::NumDetector },
       { 0, 0 }
   };
