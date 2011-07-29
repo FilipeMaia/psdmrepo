@@ -79,9 +79,7 @@ public:
 
   // Default constructor
 
-  PixCoords2x1 (float row_size_um     = 109.92,  // pixel size of the row in um
-                float col_size_um     = 109.92,  // pixel size of the column in um
-                float gap_row_size_um = 274.8) ; // pixel size of the gap column in um (two columns like this in the gap)
+  PixCoords2x1 () ;
 
   // Destructor
   virtual ~PixCoords2x1 () ;
@@ -103,6 +101,12 @@ public:
   float getPixCoorRotN90_pix (ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col) ;
   float getPixCoorRotN90     (UNITS units, ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col) ;
 
+  static ORIENTATION getOrientation(float angle) ;
+  static size_t getNCols(ORIENTATION n90);
+  static size_t getNRows(ORIENTATION n90);
+  float  getXCenterOffset_um(ORIENTATION n90); 
+  float  getYCenterOffset_um(ORIENTATION n90); 
+
   void print_member_data () ;
   void print_selected_coords_2x1 (ARRAXIS arraxis) ;
 
@@ -114,7 +118,6 @@ private:
 
   float  m_row_size_um;
   float  m_col_size_um;
-  float  m_gap_row_size_um;
   float  m_gap_size_um;
   float  m_coor_row_max;
   float  m_coor_col_max;

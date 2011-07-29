@@ -29,6 +29,7 @@ using namespace std;
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "PSCalib/CSPadCalibPars.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -44,18 +45,17 @@ namespace CSPadPixCoords {
 // Constructors --
 //----------------
 
-PixCoords2x1::PixCoords2x1 (float row_size_um, float col_size_um, float gap_row_size_um)
-    : m_row_size_um(row_size_um)
-    , m_col_size_um(col_size_um)
-    , m_gap_row_size_um(gap_row_size_um)
+PixCoords2x1::PixCoords2x1 ()
 {
-  m_gap_size_um = 2 * m_gap_row_size_um - m_row_size_um; 
+  m_row_size_um   = PSCalib::CSPadCalibPars::getRowSize_um();
+  m_col_size_um   = PSCalib::CSPadCalibPars::getColSize_um();
+  m_gap_size_um   = PSCalib::CSPadCalibPars::getGapSize_um();
+
+  k_row_um_to_pix = PSCalib::CSPadCalibPars::getRowUmToPix();
+  k_col_um_to_pix = PSCalib::CSPadCalibPars::getColUmToPix();
+  k_ort_um_to_pix = PSCalib::CSPadCalibPars::getOrtUmToPix();
 
   fill_pix_coords_2x1();
-
-  k_row_um_to_pix = 1./ m_row_size_um;
-  k_col_um_to_pix = 1./ m_col_size_um;
-  k_ort_um_to_pix = 1.;
 }
 
 //--------------
@@ -92,7 +92,6 @@ void PixCoords2x1::print_member_data()
        << "m_coor_col_max    " << m_coor_col_max    << endl
        << "m_row_size_um     " << m_row_size_um     << endl
        << "m_col_size_um     " << m_col_size_um     << endl
-       << "m_gap_row_size_um " << m_gap_row_size_um << endl
        << "m_gap_size_um     " << m_gap_size_um     << endl;
 }
 
@@ -269,6 +268,75 @@ float PixCoords2x1::getPixCoorRotN90 ( UNITS units, ORIENTATION n90, COORDINATE 
     default   : return 0;
     }
 }
+
+//--------------
+
+PixCoords2x1::ORIENTATION PixCoords2x1::getOrientation(float angle)
+{
+           if(angle ==   0.) return R000;
+      else if(angle ==  90.) return R090; 
+      else if(angle == 180.) return R180; 
+      else if(angle == 270.) return R270; 
+      else                   return R000; 
+}
+
+//--------------
+
+size_t PixCoords2x1::getNCols(ORIENTATION n90) 
+{
+  switch (n90)
+    {
+    case R000 : return NCols2x1;
+    case R180 : return NCols2x1;
+    case R090 : return NRows2x1;
+    case R270 : return NRows2x1;
+    default   : return NCols2x1;
+    }
+}
+
+//--------------
+
+size_t PixCoords2x1::getNRows(ORIENTATION n90) 
+{
+  switch (n90)
+    {
+    case R000 : return NRows2x1;
+    case R180 : return NRows2x1;
+    case R090 : return NCols2x1;
+    case R270 : return NCols2x1;
+    default   : return NRows2x1;
+    }
+}
+
+//--------------
+
+float PixCoords2x1::getXCenterOffset_um(ORIENTATION n90) 
+{
+  switch (n90)
+    {
+    case R000 : return 0.5 * (float)NRows2x1 * m_row_size_um;
+    case R180 : return 0.5 * (float)NRows2x1 * m_row_size_um;
+    case R090 : return 0.5 * (float)NCols2x1 * m_col_size_um;
+    case R270 : return 0.5 * (float)NCols2x1 * m_col_size_um;
+    default   : return 0.5 * (float)NRows2x1 * m_row_size_um;
+    }
+}
+
+//--------------
+
+float PixCoords2x1::getYCenterOffset_um(ORIENTATION n90) 
+{
+  switch (n90)
+    {
+    case R000 : return 0.5 * (float)NCols2x1 * m_col_size_um;
+    case R180 : return 0.5 * (float)NCols2x1 * m_col_size_um;
+    case R090 : return 0.5 * (float)NRows2x1 * m_row_size_um;
+    case R270 : return 0.5 * (float)NRows2x1 * m_row_size_um;
+    default   : return 0.5 * (float)NCols2x1 * m_col_size_um;
+    }
+}
+
+//--------------
 
 //--------------
 

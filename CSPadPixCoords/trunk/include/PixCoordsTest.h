@@ -26,6 +26,8 @@
 
 #include "CSPadImage/QuadParameters.h"
 #include "CSPadPixCoords/PixCoords2x1.h"
+#include "CSPadPixCoords/PixCoordsQuad.h"
+#include "CSPadPixCoords/PixCoordsCSPad.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -81,7 +83,8 @@ public:
   /// Method which is called once at the end of the job
   virtual void endJob(Event& evt, Env& env);
 
-  void test_quad_2x1(const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void test_2x1  (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void test_quad (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
 
 protected:
 
@@ -102,9 +105,13 @@ private:
   uint32_t m_roiMask        [4];
   uint32_t m_numAsicsStored [4];
 
-  PSCalib::CSPadCalibPars      *m_cspad_calibpar;
+  //  uint32_t m_n2x1;
 
-  CSPadPixCoords::PixCoords2x1 *m_pix_coords_2x1;
+  PSCalib::CSPadCalibPars        *m_cspad_calibpar;
+
+  CSPadPixCoords::PixCoords2x1   *m_pix_coords_2x1;
+  CSPadPixCoords::PixCoordsQuad  *m_pix_coords_quad;
+  CSPadPixCoords::PixCoordsCSPad *m_pix_coords_cspad;
 
 };
 

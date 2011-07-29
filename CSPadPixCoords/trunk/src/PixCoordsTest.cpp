@@ -33,6 +33,7 @@
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
+#include <boost/lexical_cast.hpp>
 
 // This declares this class as psana module
 using namespace CSPadPixCoords;
@@ -97,13 +98,11 @@ PixCoordsTest::beginRun(Event& evt, Env& env)
 
   m_cspad_calibpar = new PSCalib::CSPadCalibPars(m_calibDir, m_typeGroupName, m_source, m_runNumber);
 
-  m_pix_coords_2x1  = new CSPadPixCoords::PixCoords2x1();
-  //m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad ( m_pix_coords_2x1,  m_cspad_calibpar );
-  //m_pix_coords_cspad = new CSPadPixCoords::PixCoordsTest( m_pix_coords_quad, m_cspad_calibpar );
-
+  m_pix_coords_2x1   = new CSPadPixCoords::PixCoords2x1   ();
+  m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar );
+  m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar );
 
   m_pix_coords_2x1 -> print_member_data();
-
 
   //this -> fillQuadXYmin();
 }
@@ -149,7 +148,8 @@ PixCoordsTest::event(Event& evt, Env& env)
         //cout << " quadNumber=" << quad << endl;
 
 
-	this -> test_quad_2x1(data, quadpars, m_cspad_calibpar);
+	this -> test_2x1  (data, quadpars, m_cspad_calibpar);
+	this -> test_quad (data, quadpars, m_cspad_calibpar);
     }
 
 
@@ -184,29 +184,32 @@ PixCoordsTest::endJob(Event& evt, Env& env)
 //--------------------
 
 void
-PixCoordsTest::test_quad_2x1(const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+PixCoordsTest::test_2x1(const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
   int quad = quadpars -> getQuadNumber();
 
-        cout  << "PixCoordsTest::test_quad_2x1"
+  // SELECT QUADRANT NUMBER FOR TEST HERE !!!
+  if(quad != 2) return;
+
+        cout  << "PixCoordsTest::test_2x1"
 	      << " quadNumber="       << quad
               << endl;
-
-
-  if(quad != 2) return;
 
         uint32_t roiMask = quadpars -> getRoiMask();
 
 	std::vector<int> v_image_shape  = quadpars -> getImageShapeVector();
  
-      //uint32_t m_n2x1         = v_image_shape[0];        // 8
-        uint32_t m_ncols2x1     = v_image_shape[1];        // 185
-        uint32_t m_nrows2x1     = v_image_shape[2];        // 388
-        uint32_t m_sizeOf2x1Img = m_nrows2x1 * m_ncols2x1; // 185*388;
+      //uint32_t m_n2x1         = v_image_shape[0];                 // 8
+        uint32_t m_ncols2x1     = Psana::CsPad::ColumnsPerASIC;     // v_image_shape[1];        // 185
+        uint32_t m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2; // v_image_shape[2];        // 388
+        uint32_t m_sizeOf2x1Img = m_nrows2x1 * m_ncols2x1;                                      // 185*388;
 
-	uint32_t sect=1;
+        unsigned mrgx=20;
+        unsigned mrgy=20;
 
-        const uint16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
+        CSPadPixCoords::PixCoords2x1::ORIENTATION rot=CSPadPixCoords::PixCoords2x1::R270;
+        CSPadPixCoords::PixCoords2x1::COORDINATE  X  =CSPadPixCoords::PixCoords2x1::X;
+        CSPadPixCoords::PixCoords2x1::COORDINATE  Y  =CSPadPixCoords::PixCoords2x1::Y;
 
         // Initialization
         enum{ NX=500, NY=500 };
@@ -217,15 +220,14 @@ PixCoordsTest::test_quad_2x1(const uint16_t* data, CSPadImage::QuadParameters* q
         }
         }
 
+
+// SELECT 2x1 SECTION NUMBER FOR TEST HERE !!!
+	uint32_t sect=1;
+
             bool bitIsOn = roiMask & (1<<sect);
             if( !bitIsOn ) return;
  
-            unsigned mrgx=20;
-            unsigned mrgy=20;
-            CSPadPixCoords::PixCoords2x1::ORIENTATION rot=CSPadPixCoords::PixCoords2x1::R270;
-            CSPadPixCoords::PixCoords2x1::COORDINATE  X  =CSPadPixCoords::PixCoords2x1::X;
-            CSPadPixCoords::PixCoords2x1::COORDINATE  Y  =CSPadPixCoords::PixCoords2x1::Y;
-
+            const uint16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
  
             for (uint32_t c=0; c<m_ncols2x1; c++) {
             for (uint32_t r=0; r<m_nrows2x1; r++) {
@@ -239,11 +241,81 @@ PixCoordsTest::test_quad_2x1(const uint16_t* data, CSPadImage::QuadParameters* q
             }
 
   CSPadImage::Image2D<float> *img2d = new CSPadImage::Image2D<float>(&arr_image[0][0],NY,NX);
-  img2d -> saveImageInFile("test.txt",0);
+  img2d -> saveImageInFile("test_2x1.txt",0);
 
 }
 
 
+//--------------------
+
+void
+PixCoordsTest::test_quad(const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+{
+  int quad = quadpars -> getQuadNumber();
+
+  // SELECT QUADRANT NUMBER FOR TEST HERE !!!
+
+        cout  << "PixCoordsTest::test_quad"
+	      << " quadNumber="       << quad
+              << endl;
+
+        uint32_t roiMask = quadpars -> getRoiMask();
+
+	std::vector<int> v_image_shape  = quadpars -> getImageShapeVector();
+ 
+        uint32_t m_n2x1         = v_image_shape[0];                 // 8
+        uint32_t m_ncols2x1     = Psana::CsPad::ColumnsPerASIC;     // v_image_shape[1];        // 185
+        uint32_t m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2; // v_image_shape[2];        // 388
+        uint32_t m_sizeOf2x1Img = m_nrows2x1 * m_ncols2x1;                                      // 185*388;
+
+        unsigned mrgx=200;
+        unsigned mrgy=200;
+
+        CSPadPixCoords::PixCoords2x1::ORIENTATION rot=CSPadPixCoords::PixCoords2x1::R270;
+        CSPadPixCoords::PixCoords2x1::COORDINATE  X  =CSPadPixCoords::PixCoords2x1::X;
+        CSPadPixCoords::PixCoords2x1::COORDINATE  Y  =CSPadPixCoords::PixCoords2x1::Y;
+
+        // Initialization
+        enum{ NX=1500, NY=1500 };
+        float arr_image[NY][NX];
+        for (unsigned iy=0; iy<NY; iy++){
+        for (unsigned ix=0; ix<NX; ix++){
+          arr_image[iy][ix] = 0;
+        }
+        }
+
+
+// SELECT 2x1 SECTION NUMBER FOR TEST HERE !!!
+	for(uint32_t sect=0; sect < m_n2x1; sect++)
+	{
+             bool bitIsOn = roiMask & (1<<sect);
+             if( !bitIsOn ) return;
+ 
+             const uint16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
+
+
+             cout  << "  add section " << sect << endl;	     
+ 
+             for (uint32_t c=0; c<m_ncols2x1; c++) {
+             for (uint32_t r=0; r<m_nrows2x1; r++) {
+
+               int iy = mrgy + (int) m_pix_coords_quad -> getPixCoorRot000_pix (Y, quad, sect, r, c);
+               int ix = mrgx + (int) m_pix_coords_quad -> getPixCoorRot000_pix (X, quad, sect, r, c);
+
+               arr_image[iy][ix] = (float)data2x1[c*m_nrows2x1+r];
+
+             }
+             }
+	}
+
+        string fname = "rest_q";
+               fname += boost::lexical_cast<string>( quad );
+               fname += ".txt";
+ 
+  CSPadImage::Image2D<float> *img2d = new CSPadImage::Image2D<float>(&arr_image[0][0],NY,NX);
+  img2d -> saveImageInFile(fname,0);
+
+}
 
 //--------------------
 
