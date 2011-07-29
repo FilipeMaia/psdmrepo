@@ -60,6 +60,9 @@ namespace PSCalib {
  *  @author Mikhail S. Dubrovin
  */
 
+
+//----------------
+
 //enum { NQuad = Psana::CsPad::MaxQuadsPerSensor};
 //enum { NSect = Psana::CsPad::SectorsPerQuad};
 
@@ -134,6 +137,15 @@ public:
   float getQuadRotation(size_t quad) { return m_quad_rotation -> getQuadRotation(quad); };
   float getQuadTilt    (size_t quad) { return m_quad_tilt     -> getQuadTilt    (quad); };
 
+  static float getRowSize_um()   { return 109.92; }  // pixel size of the row in um                                           
+  static float getColSize_um()   { return 109.92; }  // pixel size of the column in um                                        
+  static float getGapRowSize_um(){ return 274.80; }  // pixel size of the gap column in um
+  static float getGapSize_um()   { return 2*getGapRowSize_um() - getRowSize_um(); }  // pixel size of the total gap in um 
+  static float getOrtSize_um()   { return 500.00; }  // pixel size of the ortogonal dimension in um                                        
+
+  static float getRowUmToPix()   { return 1./getRowSize_um(); } // conversion factor of um to pixels for rows
+  static float getColUmToPix()   { return 1./getColSize_um(); } // conversion factor of um to pixels for columns 
+  static float getOrtUmToPix()   { return 1.; }                 // conversion factor of um to pixels for ort
 
 private:
 
@@ -182,6 +194,7 @@ private:
   pdscalibdata::CalibParsTiltV1         *m_tilt;   
   pdscalibdata::CalibParsQuadRotationV1 *m_quad_rotation;    
   pdscalibdata::CalibParsQuadTiltV1     *m_quad_tilt;   
+
 };
 
 } // namespace PSCalib

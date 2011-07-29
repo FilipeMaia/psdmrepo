@@ -83,6 +83,7 @@ CSPadCalibPars::CSPadCalibPars ( const std::string&   calibDir,           //  /r
 
 void CSPadCalibPars::fillCalibNameVector ()
 {
+    v_calibname.clear();
     v_calibname.push_back("center");
     v_calibname.push_back("center_corr");
     v_calibname.push_back("marg_gap_shift");
@@ -128,7 +129,7 @@ void CSPadCalibPars::getCalibFileName ()
       PSCalib::CalibFileFinder *calibfinder = new PSCalib::CalibFileFinder(m_calibDir, m_typeGroupName, m_source);
       m_fname = calibfinder -> findCalibFile(m_cur_calibname, m_runNumber);
     }
-    cout << "\nCSPadCalibPars::openCalibFile\n" << m_fname << endl;
+    cout << "CSPadCalibPars::openCalibFile: " << m_fname << endl;
 }
 
 //----------------
@@ -180,6 +181,9 @@ void CSPadCalibPars::printCalibPars()
 {
     WithMsgLog("CSPadCalibPars", info, str) {
       str << "CSPadCalibPars::printCSPadCalibPars()" ;
+      str << "\n getColSize_um()    = " << getColSize_um() ;
+      str << "\n getRowSize_um()    = " << getRowSize_um() ;
+      str << "\n getGapRowSize_um() = " << getGapRowSize_um() ;
     }        
 
      m_center         -> print();
