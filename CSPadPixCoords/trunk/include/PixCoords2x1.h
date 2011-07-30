@@ -65,6 +65,7 @@ public:
                      Y, 
                      Z };
 
+
   enum ORIENTATION { R000 = 0, 
                      R090, 
                      R180, 
@@ -115,7 +116,6 @@ protected:
 private:
 
   // Data members
-
   float  m_row_size_um;
   float  m_col_size_um;
   float  m_gap_size_um;
@@ -126,6 +126,11 @@ private:
   float  m_coor_row[NRows2x1];  
   float  m_coor_col[NCols2x1];  
   float  m_coor_ort[NCols2x1][NRows2x1];  
+
+  float  k_center_of_rows_um; 
+  float  k_center_of_cols_um; 
+  float  k_center_of_rows_pix; 
+  float  k_center_of_cols_pix; 
 
   float  k_row_um_to_pix;
   float  k_col_um_to_pix;

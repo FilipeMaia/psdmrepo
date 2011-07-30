@@ -75,7 +75,14 @@ public:
   void fillOneSectionInQuad(uint32_t quad, uint32_t sect, float xcenter, float ycenter, float zcenter, float rotation, float tilt);
 
   float getPixCoorRot000_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
+  float getPixCoorRot090_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
+  float getPixCoorRot180_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
+  float getPixCoorRot270_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
+
   float getPixCoorRot000_pix(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
+  float getPixCoorRot090_pix(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
+  float getPixCoorRot180_pix(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
+  float getPixCoorRot270_pix(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
 
 protected:
 
@@ -88,7 +95,10 @@ private:
   float m_coor_x[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
   float m_coor_y[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
 
-  int m_memberVariable;  // private members start with m_
+  float m_coor_x_min[NQuadsInCSPad];
+  float m_coor_x_max[NQuadsInCSPad];
+  float m_coor_y_min[NQuadsInCSPad];
+  float m_coor_y_max[NQuadsInCSPad];
 
   // Copy constructor and assignment are disabled by default
   PixCoordsQuad ( const PixCoordsQuad& ) ;

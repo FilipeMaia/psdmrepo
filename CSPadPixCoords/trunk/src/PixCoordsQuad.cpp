@@ -56,6 +56,12 @@ void PixCoordsQuad::fillAllQuads()
         for (uint32_t quad=0; quad < NQuadsInCSPad; ++quad)
           {
 	    cout << "\n quad=" << quad << ":\n" ;
+
+            m_coor_x_min[quad] = 1e5;
+            m_coor_x_max[quad] = 0;
+            m_coor_y_min[quad] = 1e5;
+            m_coor_y_max[quad] = 0;
+
             fillOneQuad(quad);
 	  }
 }
@@ -96,27 +102,15 @@ void PixCoordsQuad::fillOneQuad(uint32_t quad)
 
 void PixCoordsQuad::fillOneSectionInQuad(uint32_t quad, uint32_t sect, float xcenter, float ycenter, float zcenter, float rotation, float tilt)
 {
-  //cout << "PixCoordsQuad::fillOneSectionInQuad" << endl;
-  cout << " sect=" << sect;
-
-  //if (sect != 0) return;
+  // cout << "PixCoordsQuad::fillOneSectionInQuad" << endl;
+  // cout << " sect=" << sect;
+  // if (sect != 0) return;
 
             PixCoords2x1::ORIENTATION orient = PixCoords2x1::getOrientation(rotation);
             float pixSize_um = PSCalib::CSPadCalibPars::getRowSize_um();
 
-            float ymin = xcenter*pixSize_um - m_pix_coords_2x1->getYCenterOffset_um(orient);
-            float xmin = ycenter*pixSize_um - m_pix_coords_2x1->getXCenterOffset_um(orient);
-
-            cout << " rotat="    << rotation;
-            cout << " NRows2x1=" << NRows2x1;
-            cout << " NCols2x1=" << NCols2x1;
-            cout << " xcenter="  << xcenter;
-            cout << " ycenter="  << ycenter;
-            cout << " Xoffset="  << m_pix_coords_2x1->getXCenterOffset_um(orient);
-            cout << " Yoffset="  << m_pix_coords_2x1->getYCenterOffset_um(orient);
-            cout << " xmin="     << xmin;
-            cout << " ymin="     << ymin;
-            cout << endl;
+            float xmin = xcenter*pixSize_um - m_pix_coords_2x1->getXCenterOffset_um(orient);
+            float ymin = ycenter*pixSize_um - m_pix_coords_2x1->getYCenterOffset_um(orient);
 
             CSPadPixCoords::PixCoords2x1::COORDINATE X = CSPadPixCoords::PixCoords2x1::X;
             CSPadPixCoords::PixCoords2x1::COORDINATE Y = CSPadPixCoords::PixCoords2x1::Y;
@@ -124,9 +118,15 @@ void PixCoordsQuad::fillOneSectionInQuad(uint32_t quad, uint32_t sect, float xce
             for (uint32_t col=0; col<NCols2x1; col++) {
             for (uint32_t row=0; row<NRows2x1; row++) {
 
-               m_coor_x[quad][sect][col][row] = xmin + m_pix_coords_2x1->getPixCoorRotN90_um (orient, X, row, col);
-               m_coor_y[quad][sect][col][row] = ymin + m_pix_coords_2x1->getPixCoorRotN90_um (orient, Y, row, col);
+	       float coor_x = xmin + m_pix_coords_2x1->getPixCoorRotN90_um (orient, X, row, col);
+	       float coor_y = ymin + m_pix_coords_2x1->getPixCoorRotN90_um (orient, Y, row, col);
+	       m_coor_x[quad][sect][col][row] = coor_x;
+	       m_coor_y[quad][sect][col][row] = coor_y;
 
+               if ( coor_x < m_coor_x_min[quad] ) m_coor_x_min[quad] = coor_x;
+               if ( coor_x > m_coor_x_max[quad] ) m_coor_x_max[quad] = coor_x;
+               if ( coor_y < m_coor_y_min[quad] ) m_coor_y_min[quad] = coor_y;
+               if ( coor_y > m_coor_y_max[quad] ) m_coor_y_max[quad] = coor_y;
             }
             }
 }
@@ -150,8 +150,8 @@ float PixCoordsQuad::getPixCoorRot000_pix (CSPadPixCoords::PixCoords2x1::COORDIN
 {
   switch (icoor)
     {
-    case CSPadPixCoords::PixCoords2x1::X : return m_coor_x[quad][sect][col][row] * PSCalib::CSPadCalibPars::getRowUmToPix();
-    case CSPadPixCoords::PixCoords2x1::Y : return m_coor_y[quad][sect][col][row] * PSCalib::CSPadCalibPars::getColUmToPix();
+    case CSPadPixCoords::PixCoords2x1::X : return getPixCoorRot000_um (icoor, quad, sect, row, col) * PSCalib::CSPadCalibPars::getRowUmToPix();
+    case CSPadPixCoords::PixCoords2x1::Y : return getPixCoorRot000_um (icoor, quad, sect, row, col) * PSCalib::CSPadCalibPars::getColUmToPix();
     case CSPadPixCoords::PixCoords2x1::Z : return 0;
     default: return 0;
     }

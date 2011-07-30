@@ -96,7 +96,8 @@ PixCoordsTest::beginRun(Event& evt, Env& env)
       }
   }
 
-  m_cspad_calibpar = new PSCalib::CSPadCalibPars(m_calibDir, m_typeGroupName, m_source, m_runNumber);
+  m_cspad_calibpar   = new PSCalib::CSPadCalibPars();
+  //m_cspad_calibpar = new PSCalib::CSPadCalibPars(m_calibDir, m_typeGroupName, m_source, m_runNumber);
 
   m_pix_coords_2x1   = new CSPadPixCoords::PixCoords2x1   ();
   m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar );
@@ -207,16 +208,16 @@ PixCoordsTest::test_2x1(const uint16_t* data, CSPadImage::QuadParameters* quadpa
         unsigned mrgx=20;
         unsigned mrgy=20;
 
-        CSPadPixCoords::PixCoords2x1::ORIENTATION rot=CSPadPixCoords::PixCoords2x1::R270;
+        CSPadPixCoords::PixCoords2x1::ORIENTATION rot=CSPadPixCoords::PixCoords2x1::R000;
         CSPadPixCoords::PixCoords2x1::COORDINATE  X  =CSPadPixCoords::PixCoords2x1::X;
         CSPadPixCoords::PixCoords2x1::COORDINATE  Y  =CSPadPixCoords::PixCoords2x1::Y;
 
         // Initialization
         enum{ NX=500, NY=500 };
         float arr_image[NY][NX];
-        for (unsigned iy=0; iy<NY; iy++){
         for (unsigned ix=0; ix<NX; ix++){
-          arr_image[iy][ix] = 0;
+        for (unsigned iy=0; iy<NY; iy++){
+          arr_image[ix][iy] = 0;
         }
         }
 
@@ -232,10 +233,10 @@ PixCoordsTest::test_2x1(const uint16_t* data, CSPadImage::QuadParameters* quadpa
             for (uint32_t c=0; c<m_ncols2x1; c++) {
             for (uint32_t r=0; r<m_nrows2x1; r++) {
 
-               int iy = mrgy + (int) m_pix_coords_2x1 -> getPixCoorRotN90_pix (rot, Y, r, c);
                int ix = mrgx + (int) m_pix_coords_2x1 -> getPixCoorRotN90_pix (rot, X, r, c);
+               int iy = mrgy + (int) m_pix_coords_2x1 -> getPixCoorRotN90_pix (rot, Y, r, c);
 
-               arr_image[iy][ix] = (float)data2x1[c*m_nrows2x1+r];
+               arr_image[ix][iy] = (float)data2x1[c*m_nrows2x1+r];
 
             }
             }
@@ -253,8 +254,6 @@ PixCoordsTest::test_quad(const uint16_t* data, CSPadImage::QuadParameters* quadp
 {
   int quad = quadpars -> getQuadNumber();
 
-  // SELECT QUADRANT NUMBER FOR TEST HERE !!!
-
         cout  << "PixCoordsTest::test_quad"
 	      << " quadNumber="       << quad
               << endl;
@@ -268,24 +267,22 @@ PixCoordsTest::test_quad(const uint16_t* data, CSPadImage::QuadParameters* quadp
         uint32_t m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2; // v_image_shape[2];        // 388
         uint32_t m_sizeOf2x1Img = m_nrows2x1 * m_ncols2x1;                                      // 185*388;
 
-        unsigned mrgx=200;
-        unsigned mrgy=200;
+        unsigned mrgx=20;
+        unsigned mrgy=20;
 
-        CSPadPixCoords::PixCoords2x1::ORIENTATION rot=CSPadPixCoords::PixCoords2x1::R270;
-        CSPadPixCoords::PixCoords2x1::COORDINATE  X  =CSPadPixCoords::PixCoords2x1::X;
-        CSPadPixCoords::PixCoords2x1::COORDINATE  Y  =CSPadPixCoords::PixCoords2x1::Y;
+        //CSPadPixCoords::PixCoords2x1::ORIENTATION rot=CSPadPixCoords::PixCoords2x1::R180;
+        CSPadPixCoords::PixCoords2x1::COORDINATE X = CSPadPixCoords::PixCoords2x1::X;
+        CSPadPixCoords::PixCoords2x1::COORDINATE Y = CSPadPixCoords::PixCoords2x1::Y;
 
         // Initialization
-        enum{ NX=1500, NY=1500 };
+        enum{ NX=900, NY=900 };
         float arr_image[NY][NX];
-        for (unsigned iy=0; iy<NY; iy++){
         for (unsigned ix=0; ix<NX; ix++){
-          arr_image[iy][ix] = 0;
+        for (unsigned iy=0; iy<NY; iy++){
+          arr_image[ix][iy] = 0;
         }
         }
 
-
-// SELECT 2x1 SECTION NUMBER FOR TEST HERE !!!
 	for(uint32_t sect=0; sect < m_n2x1; sect++)
 	{
              bool bitIsOn = roiMask & (1<<sect);
@@ -293,16 +290,15 @@ PixCoordsTest::test_quad(const uint16_t* data, CSPadImage::QuadParameters* quadp
  
              const uint16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
 
-
              cout  << "  add section " << sect << endl;	     
  
              for (uint32_t c=0; c<m_ncols2x1; c++) {
              for (uint32_t r=0; r<m_nrows2x1; r++) {
 
-               int iy = mrgy + (int) m_pix_coords_quad -> getPixCoorRot000_pix (Y, quad, sect, r, c);
                int ix = mrgx + (int) m_pix_coords_quad -> getPixCoorRot000_pix (X, quad, sect, r, c);
+               int iy = mrgy + (int) m_pix_coords_quad -> getPixCoorRot000_pix (Y, quad, sect, r, c);
 
-               arr_image[iy][ix] = (float)data2x1[c*m_nrows2x1+r];
+               arr_image[ix][iy] = (float)data2x1[c*m_nrows2x1+r];
 
              }
              }
