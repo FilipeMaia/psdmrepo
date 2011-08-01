@@ -49,7 +49,7 @@ namespace CSPadImage {
 //----------------
 
 template <typename T>
-ImageCSPadQuad<T>::ImageCSPadQuad (const T* data, QuadParameters* quadpars, CSPadCalibPars *cspad_calibpar) :
+ImageCSPadQuad<T>::ImageCSPadQuad (const T* data, QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar) :
   m_data(data),
   m_quadpars(quadpars),
   m_cspad_calibpar(cspad_calibpar)

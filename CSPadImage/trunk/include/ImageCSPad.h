@@ -23,7 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 
-#include "CSPadImage/CSPadCalibPars.h"
+#include "PSCalib/CSPadCalibPars.h"
 #include "CSPadImage/QuadParameters.h"
 #include "CSPadImage/ImageCSPadQuad.h"
 #include "CSPadImage/Image2D.h"
@@ -84,7 +84,7 @@ public:
   /// Method which is called once at the end of the job
   virtual void endJob(Event& evt, Env& env);
 
-  void addQuadToCSPadImage(ImageCSPadQuad<uint16_t> *image_quad, QuadParameters *quadpars, CSPadCalibPars *cspad_calibpar);
+  void addQuadToCSPadImage(ImageCSPadQuad<uint16_t> *image_quad, QuadParameters *quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void fillQuadXYmin();
   Image2D<float>* getCSPadImage2D(){ return m_cspad_image_2d; } ;
   void saveCSPadImageInFile();
@@ -116,7 +116,7 @@ private:
   float    m_xmin_quad [4];
   float    m_ymin_quad [4];
 
-  CSPadCalibPars *m_cspad_calibpar;
+  PSCalib::CSPadCalibPars *m_cspad_calibpar;
 
   float m_cspad_image[NRowsDet][NColsDet];
 

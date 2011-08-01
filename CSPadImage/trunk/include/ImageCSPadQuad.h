@@ -18,8 +18,8 @@
 // Base Class Headers --
 //----------------------
 
+#include "PSCalib/CSPadCalibPars.h"
 #include "CSPadImage/QuadParameters.h"
-#include "CSPadImage/CSPadCalibPars.h"
 #include "CSPadImage/Image2D.h"
 
 //-------------------------------
@@ -61,7 +61,7 @@ public:
   ImageCSPadQuad () ;
 
   // Regular constructor
-  ImageCSPadQuad (const T* data, QuadParameters* quadpars, CSPadCalibPars *cspad_calibpar) ;
+  ImageCSPadQuad (const T* data, QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar) ;
 
   // Destructor
   virtual ~ImageCSPadQuad () ;
@@ -87,9 +87,9 @@ private:
   // Data members
   const T        *m_data;
   QuadParameters *m_quadpars;
-  CSPadCalibPars *m_cspad_calibpar;
   T               m_quad_image[NRows][NCols];
   Image2D<T>     *m_quad_image_2d;
+  PSCalib::CSPadCalibPars *m_cspad_calibpar;
 
   std::vector<int> v_image_shape;
 

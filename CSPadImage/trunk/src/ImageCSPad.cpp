@@ -152,7 +152,8 @@ void ImageCSPad::beginRun(Event& evt, Env& env)
       }
   }  // if (config.get())
 
-  m_cspad_calibpar = new CSPadCalibPars("calibname");
+  // m_cspad_calibpar = new PSCalib::CSPadCalibPars("calibname"); // for test only - take files from local dir.
+  m_cspad_calibpar = new PSCalib::CSPadCalibPars(m_calibDir, m_typeGroupName, m_source, m_runNumber);
 
   this -> fillQuadXYmin();
 }
@@ -217,6 +218,14 @@ void ImageCSPad::event(Event& evt, Env& env)
     } //WithMsgLog(
     */
 
+
+  // this is how to gracefully stop analysis job
+  m_count++;
+  if (m_count > m_maxEvents) stop();
+  // increment event counter
+  cout << "m_count=" << m_count << endl;
+
+
     int nQuads = data2->quads_shape()[0];
     cout << "\n    nQuads = " << nQuads << endl;
     for (int q = 0; q < nQuads; ++ q) {
@@ -247,17 +256,11 @@ void ImageCSPad::event(Event& evt, Env& env)
   if (m_filter && m_count % 10 == 0) skip();
  
 
-  // this is how to gracefully stop analysis job
-  if (m_count >= m_maxEvents) stop();
-  // increment event counter
-  m_count++;
-  cout << "m_count=" << m_count << endl;
-
 }
 
 //----------------------------------------------------------
 
-void ImageCSPad::addQuadToCSPadImage(ImageCSPadQuad<uint16_t> *image_quad, QuadParameters *quadpars, CSPadCalibPars *cspad_calibpar)
+void ImageCSPad::addQuadToCSPadImage(ImageCSPadQuad<uint16_t> *image_quad, QuadParameters *quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
    cout << "ImageCSPad::addQuadToCSPadImage()" << endl;
 
