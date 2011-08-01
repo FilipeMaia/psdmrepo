@@ -84,6 +84,14 @@ public:
   float getPixCoorRot180_pix(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
   float getPixCoorRot270_pix(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
 
+  float getPixCoorRotN90_um (CSPadPixCoords::PixCoords2x1::ORIENTATION orient, 
+                             CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
+  float getPixCoorRotN90_pix(CSPadPixCoords::PixCoords2x1::ORIENTATION orient, 
+                             CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
+  float getPixCoorRotN90    (CSPadPixCoords::PixCoords2x1::UNITS units,
+                             CSPadPixCoords::PixCoords2x1::ORIENTATION orient, 
+                             CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
+
 protected:
 
 private:

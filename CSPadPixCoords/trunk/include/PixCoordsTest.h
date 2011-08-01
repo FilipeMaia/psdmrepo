@@ -83,8 +83,12 @@ public:
   /// Method which is called once at the end of the job
   virtual void endJob(Event& evt, Env& env);
 
-  void test_2x1  (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
-  void test_quad (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void test_2x1   (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void test_quad  (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void test_cspad (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void test_cspad_init();
+  void test_cspad_save();
+
 
 protected:
 
@@ -112,6 +116,10 @@ private:
   CSPadPixCoords::PixCoords2x1   *m_pix_coords_2x1;
   CSPadPixCoords::PixCoordsQuad  *m_pix_coords_quad;
   CSPadPixCoords::PixCoordsCSPad *m_pix_coords_cspad;
+
+  enum{ NX_CSPAD=1750, 
+        NY_CSPAD=1750 };
+  float m_arr_cspad_image[NY_CSPAD][NX_CSPAD];
 
 };
 
