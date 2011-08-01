@@ -72,10 +72,8 @@ class CSPadCalibPars  {
 public:
 
   // Default constructor
-  CSPadCalibPars () {}
-
   // Test constructor
-  CSPadCalibPars ( const std::string &xtc_file_name ) ;
+  CSPadCalibPars () ;
 
   // Regular constructor
   CSPadCalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/cxi/cxi35711/calib

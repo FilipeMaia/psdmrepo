@@ -44,7 +44,7 @@ namespace PSCalib {
 // Constructors --
 //----------------
 
-CSPadCalibPars::CSPadCalibPars ( const std::string &xtc_file_name )
+CSPadCalibPars::CSPadCalibPars ()
 {
   cout << "CSPadCalibPars::CSPadCalibPars" 
        << "\nHere we have to find from the xtc_file_name the run number and find the calib directory..." << endl;
