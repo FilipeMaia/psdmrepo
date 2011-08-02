@@ -56,7 +56,7 @@ void PixCoordsQuad::fillAllQuads()
 {
         for (uint32_t quad=0; quad < NQuadsInCSPad; ++quad)
           {
-	    cout << "\n quad=" << quad << ":\n" ;
+	    //cout << "\n quad=" << quad << ":\n" ;
 
             m_coor_x_min[quad] = 1e5;
             m_coor_x_max[quad] = 0;

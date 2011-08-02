@@ -47,7 +47,7 @@ PixCoordsCSPad::PixCoordsCSPad ( PixCoordsQuad *pix_coords_quad,  PSCalib::CSPad
   //m_cspad_calibpar  -> printCalibPars();
 
   fillAllQuadCoordsInCSPad();
-
+  //setConstXYMinMax();
 }
 
 //--------------
@@ -73,7 +73,7 @@ void PixCoordsCSPad::fillAllQuadCoordsInCSPad()
 
         for (uint32_t q=0; q < NQuadsInCSPad; ++q)
           {
-	    cout << "\n quad=" << q << ":\n" ;
+	    //cout << "quad=" << q << ":" ;
 
             m_xmin_quad [q] = m_cspad_calibpar -> getOffsetX    (q) 
                             + m_cspad_calibpar -> getOffsetCorrX(q)  
@@ -86,10 +86,8 @@ void PixCoordsCSPad::fillAllQuadCoordsInCSPad()
             m_xmin_quad [q] *= pixSize_um;
             m_ymin_quad [q] *= pixSize_um;
 	    
-
-	    cout << "  m_xmin_quad = " << m_xmin_quad [q]
-	         << "  m_ymin_quad = " << m_ymin_quad [q];
-
+	    //cout << "  m_xmin_quad = " << m_xmin_quad [q]
+	    //     << "  m_ymin_quad = " << m_ymin_quad [q];
 
             fillOneQuadCoordsInCSPad(q);
 	  }
@@ -103,7 +101,7 @@ void PixCoordsCSPad::fillOneQuadCoordsInCSPad(uint32_t quad)
         CSPadPixCoords::PixCoords2x1::COORDINATE Y = CSPadPixCoords::PixCoords2x1::Y;
 
         float rotation = m_cspad_calibpar -> getQuadRotation(quad);
-	cout << "  Quad rotation = " <<  rotation << endl;
+	// cout << "  Quad rotation = " <<  rotation << endl;
 
         CSPadPixCoords::PixCoords2x1::ORIENTATION orient = PixCoords2x1::getOrientation(rotation);
 
@@ -129,12 +127,22 @@ void PixCoordsCSPad::fillOneQuadCoordsInCSPad(uint32_t quad)
 
 //--------------
 
+void PixCoordsCSPad::setConstXYMinMax()
+{
+	      m_coor_x_min = 0;
+	      m_coor_y_min = 0;
+	      m_coor_x_max = 1750 * PSCalib::CSPadCalibPars::getRowSize_um();
+	      m_coor_y_max = 1750 * PSCalib::CSPadCalibPars::getRowSize_um();
+}
+
+//--------------
+
 float PixCoordsCSPad::getPixCoor_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col)
 {
   switch (icoor)
     {
-    case CSPadPixCoords::PixCoords2x1::X : return m_coor_x[quad][sect][col][row];// - m_coor_x_min;
-    case CSPadPixCoords::PixCoords2x1::Y : return m_coor_y[quad][sect][col][row];// - m_coor_y_min;
+    case CSPadPixCoords::PixCoords2x1::X : return m_coor_x[quad][sect][col][row] - m_coor_x_min;
+    case CSPadPixCoords::PixCoords2x1::Y : return m_coor_y[quad][sect][col][row] - m_coor_y_min;
     case CSPadPixCoords::PixCoords2x1::Z : return 0;
     default: return 0;
     }

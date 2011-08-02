@@ -83,6 +83,8 @@ public:
   /// Method which is called once at the end of the job
   virtual void endJob(Event& evt, Env& env);
 
+  void getQuadConfigPars(Env& env);
+
   void test_2x1   (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void test_quad  (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void test_cspad (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
@@ -109,7 +111,10 @@ private:
   uint32_t m_roiMask        [4];
   uint32_t m_numAsicsStored [4];
 
-  //  uint32_t m_n2x1;
+  uint32_t m_n2x1;         // 8
+  uint32_t m_ncols2x1;     // 185
+  uint32_t m_nrows2x1;     // 388
+  uint32_t m_sizeOf2x1Img; // 185*388;
 
   PSCalib::CSPadCalibPars        *m_cspad_calibpar;
 
@@ -117,9 +122,21 @@ private:
   CSPadPixCoords::PixCoordsQuad  *m_pix_coords_quad;
   CSPadPixCoords::PixCoordsCSPad *m_pix_coords_cspad;
 
+  CSPadPixCoords::PixCoords2x1::COORDINATE XCOOR;
+  CSPadPixCoords::PixCoords2x1::COORDINATE YCOOR;
+  CSPadPixCoords::PixCoords2x1::COORDINATE ZCOOR;
+
+  enum{ NX_2x1=500, 
+        NY_2x1=500 };
+  float m_arr_2x1_image[NX_2x1][NY_2x1];
+
+  enum{ NX_QUAD=850, 
+        NY_QUAD=850 };
+  float m_arr_quad_image[NX_QUAD][NY_QUAD];
+
   enum{ NX_CSPAD=1750, 
         NY_CSPAD=1750 };
-  float m_arr_cspad_image[NY_CSPAD][NX_CSPAD];
+  float m_arr_cspad_image[NX_CSPAD][NY_CSPAD];
 
 };
 

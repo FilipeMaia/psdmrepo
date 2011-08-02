@@ -72,6 +72,7 @@ public:
 
   void fillAllQuadCoordsInCSPad() ;
   void fillOneQuadCoordsInCSPad(uint32_t quad) ;
+  void setConstXYMinMax() ;
 
   float getPixCoor_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
   float getPixCoor_pix(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
