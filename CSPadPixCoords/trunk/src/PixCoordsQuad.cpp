@@ -47,6 +47,7 @@ PixCoordsQuad::PixCoordsQuad ( PixCoords2x1 *pix_coords_2x1,  PSCalib::CSPadCali
   m_cspad_calibpar -> printCalibPars();
   
   fillAllQuads();
+  setConstXYMinMax();
 }
 
 //--------------
@@ -102,6 +103,7 @@ void PixCoordsQuad::fillOneQuad(uint32_t quad)
 	    //cout << " sect=" << sect;
           }
 	//cout << endl;
+
 }
 
 //--------------
@@ -134,6 +136,21 @@ void PixCoordsQuad::fillOneSectionInQuad(uint32_t quad, uint32_t sect, float xce
                if ( coor_y > m_coor_y_max[quad] ) m_coor_y_max[quad] = coor_y;
             }
             }
+
+}
+
+//--------------
+
+void PixCoordsQuad::setConstXYMinMax()
+{
+        float pixSize_um = PSCalib::CSPadCalibPars::getRowSize_um();
+
+	    for (uint32_t q=0; q<NQuadsInCSPad; q++) {
+	      m_coor_x_min[q] = 0;
+	      m_coor_y_min[q] = 0;
+	      m_coor_x_max[q] = 850*pixSize_um;
+	      m_coor_y_max[q] = 850*pixSize_um;
+	    }
 }
 
 //--------------
