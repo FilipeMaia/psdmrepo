@@ -136,7 +136,6 @@ void PixCoordsQuad::fillOneSectionInQuad(uint32_t quad, uint32_t sect, float xce
                if ( coor_y > m_coor_y_max[quad] ) m_coor_y_max[quad] = coor_y;
             }
             }
-
 }
 
 //--------------
@@ -290,7 +289,6 @@ float PixCoordsQuad::getPixCoorRotN90_pix(CSPadPixCoords::PixCoords2x1::ORIENTAT
     }
 }
 
-
 //--------------
 
 float PixCoordsQuad::getPixCoorRotN90 ( CSPadPixCoords::PixCoords2x1::UNITS units, 
@@ -305,11 +303,10 @@ float PixCoordsQuad::getPixCoorRotN90 ( CSPadPixCoords::PixCoords2x1::UNITS unit
     }
 }
 
-
-
 //--------------
 // Destructor --
 //--------------
+
 PixCoordsQuad::~PixCoordsQuad ()
 {
 }

@@ -59,7 +59,7 @@ class PixCoordsQuad  {
 public:
 
   enum { NQuadsInCSPad = 4 };
-  enum { N2x1InQuad    = 8 };
+  enum { N2x1InQuad    = Psana::CsPad::SectorsPerQuad     }; // 8
   enum { NCols2x1      = Psana::CsPad::ColumnsPerASIC     }; // 185
   enum { NRows2x1      = Psana::CsPad::MaxRowsPerASIC * 2 }; // 194*2 = 388
 

@@ -48,6 +48,7 @@ PixCoordsCSPad::PixCoordsCSPad ( PixCoordsQuad *pix_coords_quad,  PSCalib::CSPad
 
   fillAllQuadCoordsInCSPad();
   //setConstXYMinMax();
+  fillArrsOfCSPadPixCoords();
 }
 
 //--------------
@@ -137,12 +138,39 @@ void PixCoordsCSPad::setConstXYMinMax()
 
 //--------------
 
+void PixCoordsCSPad::fillArrsOfCSPadPixCoords()
+{
+  for (uint32_t quad=0; quad<NQuadsInCSPad; quad++) {
+    for (uint32_t sect=0; sect<N2x1InQuad;  sect++) {
+      for (uint32_t row=0; row<NRows2x1;     row++) {
+        for (uint32_t col=0; col<NCols2x1;   col++) {
+
+	  float coor_x_um = m_coor_x[quad][sect][col][row] - m_coor_x_min;
+	  float coor_y_um = m_coor_y[quad][sect][col][row] - m_coor_y_min;
+
+          m_coor_x     [quad][sect][col][row] = coor_x_um;
+          m_coor_y     [quad][sect][col][row] = coor_y_um;
+
+          m_coor_x_pix [quad][sect][col][row] = coor_x_um * PSCalib::CSPadCalibPars::getRowUmToPix();
+          m_coor_y_pix [quad][sect][col][row] = coor_y_um * PSCalib::CSPadCalibPars::getColUmToPix();
+
+          m_coor_x_int [quad][sect][col][row] = (int) m_coor_x_pix [quad][sect][col][row];
+          m_coor_y_int [quad][sect][col][row] = (int) m_coor_y_pix [quad][sect][col][row];
+
+	}
+      }
+    }
+  }
+}
+
+//--------------
+
 float PixCoordsCSPad::getPixCoor_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col)
 {
   switch (icoor)
     {
-    case CSPadPixCoords::PixCoords2x1::X : return m_coor_x[quad][sect][col][row] - m_coor_x_min;
-    case CSPadPixCoords::PixCoords2x1::Y : return m_coor_y[quad][sect][col][row] - m_coor_y_min;
+    case CSPadPixCoords::PixCoords2x1::X : return m_coor_x [quad][sect][col][row];
+    case CSPadPixCoords::PixCoords2x1::Y : return m_coor_y [quad][sect][col][row];
     case CSPadPixCoords::PixCoords2x1::Z : return 0;
     default: return 0;
     }
@@ -154,8 +182,8 @@ float PixCoordsCSPad::getPixCoor_pix(CSPadPixCoords::PixCoords2x1::COORDINATE ic
 {
   switch (icoor)
     {
-    case CSPadPixCoords::PixCoords2x1::X : return getPixCoor_um (icoor, quad, sect, row, col) * PSCalib::CSPadCalibPars::getRowUmToPix();
-    case CSPadPixCoords::PixCoords2x1::Y : return getPixCoor_um (icoor, quad, sect, row, col) * PSCalib::CSPadCalibPars::getColUmToPix();
+    case CSPadPixCoords::PixCoords2x1::X : return m_coor_x_pix [quad][sect][col][row];
+    case CSPadPixCoords::PixCoords2x1::Y : return m_coor_y_pix [quad][sect][col][row]; 
     case CSPadPixCoords::PixCoords2x1::Z : return 0;
     default: return 0;
     }

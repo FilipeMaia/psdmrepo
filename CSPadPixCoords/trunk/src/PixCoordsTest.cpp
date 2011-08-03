@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <time.h>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -98,6 +99,9 @@ PixCoordsTest::beginRun(Event& evt, Env& env)
   m_cspad_calibpar   = new PSCalib::CSPadCalibPars(m_calibDir, m_typeGroupName, m_source, m_runNumber);
   m_pix_coords_2x1   = new CSPadPixCoords::PixCoords2x1   ();
   m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar );
+
+
+
   m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar );
 
   m_pix_coords_2x1 -> print_member_data();
@@ -167,7 +171,15 @@ PixCoordsTest::event(Event& evt, Env& env)
 
 	this -> test_2x1   (data, quadpars, m_cspad_calibpar);
 	this -> test_quad  (data, quadpars, m_cspad_calibpar);
+
+             struct timespec start, stop;
+             int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
 	this -> test_cspad (data, quadpars, m_cspad_calibpar);
+                 status = clock_gettime( CLOCK_REALTIME, &stop ); // Get LOCAL time
+
+        cout << "Time to fill quad is " 
+             << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
+             << " sec" << endl;
     }
 
         this -> test_cspad_save ();
@@ -315,6 +327,11 @@ PixCoordsTest::test_cspad_init()
     m_arr_cspad_image[ix][iy] = 0;
   }
   }
+  m_cspad_ind = 0;
+  m_coor_x_pix = m_pix_coords_cspad -> getPixCoorArrX_pix();
+  m_coor_y_pix = m_pix_coords_cspad -> getPixCoorArrY_pix();
+  m_coor_x_int = m_pix_coords_cspad -> getPixCoorArrX_int();
+  m_coor_y_int = m_pix_coords_cspad -> getPixCoorArrY_int();
 }
 
 //--------------------
@@ -325,11 +342,11 @@ PixCoordsTest::test_cspad(const uint16_t* data, CSPadImage::QuadParameters* quad
         int              quad           = quadpars -> getQuadNumber();
         uint32_t         roiMask        = quadpars -> getRoiMask();
 	std::vector<int> v_image_shape  = quadpars -> getImageShapeVector();
- 
+
 	for(uint32_t sect=0; sect < m_n2x1; sect++)
 	{
 	     bool bitIsOn = roiMask & (1<<sect);
-	     if( !bitIsOn ) continue;
+	     if( !bitIsOn ) { m_cspad_ind += m_sizeOf2x1Img; continue; }
  
              const uint16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
 
@@ -338,8 +355,14 @@ PixCoordsTest::test_cspad(const uint16_t* data, CSPadImage::QuadParameters* quad
              for (uint32_t c=0; c<m_ncols2x1; c++) {
              for (uint32_t r=0; r<m_nrows2x1; r++) {
 
-               int ix = (int) m_pix_coords_cspad -> getPixCoor_pix (XCOOR, quad, sect, r, c);
-               int iy = (int) m_pix_coords_cspad -> getPixCoor_pix (YCOOR, quad, sect, r, c);
+               //int ix = (int) m_pix_coords_cspad -> getPixCoor_pix (XCOOR, quad, sect, r, c);
+               //int iy = (int) m_pix_coords_cspad -> getPixCoor_pix (YCOOR, quad, sect, r, c);
+
+               //int ix = (int) m_coor_x_pix [m_cspad_ind];
+               //int iy = (int) m_coor_y_pix [m_cspad_ind];
+               int ix = m_coor_x_int [m_cspad_ind];
+               int iy = m_coor_y_int [m_cspad_ind];
+	       m_cspad_ind++;
 
 	       if(ix <  0)        continue;
 	       if(iy <  0)        continue;

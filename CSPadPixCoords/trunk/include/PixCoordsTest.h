@@ -125,6 +125,12 @@ private:
   CSPadPixCoords::PixCoords2x1::COORDINATE XCOOR;
   CSPadPixCoords::PixCoords2x1::COORDINATE YCOOR;
   CSPadPixCoords::PixCoords2x1::COORDINATE ZCOOR;
+	
+  uint32_t  m_cspad_ind;
+  float    *m_coor_x_pix;
+  float    *m_coor_y_pix;
+  uint32_t *m_coor_x_int;
+  uint32_t *m_coor_y_int;
 
   enum{ NX_2x1=500, 
         NY_2x1=500 };
