@@ -58,7 +58,7 @@ CSPadCalibPars::CSPadCalibPars ()
 
     fillCalibNameVector ();
     loadCalibPars ();
-    printCalibPars();
+    //printCalibPars();
 }
 
 //----------------
