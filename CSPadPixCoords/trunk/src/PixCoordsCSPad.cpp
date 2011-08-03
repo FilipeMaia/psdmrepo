@@ -122,7 +122,7 @@ void PixCoordsCSPad::fillOneQuadCoordsInCSPad(uint32_t quad)
 
             } // col
             } // row
-          }   // sect
+        }   // sect
 	//cout << endl;
 }
 
@@ -132,8 +132,8 @@ void PixCoordsCSPad::setConstXYMinMax()
 {
 	      m_coor_x_min = 0;
 	      m_coor_y_min = 0;
-	      m_coor_x_max = 1750 * PSCalib::CSPadCalibPars::getRowSize_um();
-	      m_coor_y_max = 1750 * PSCalib::CSPadCalibPars::getRowSize_um();
+	      m_coor_x_max = NX_CSPAD * PSCalib::CSPadCalibPars::getRowSize_um();
+	      m_coor_y_max = NY_CSPAD * PSCalib::CSPadCalibPars::getColSize_um();
 }
 
 //--------------
@@ -156,7 +156,6 @@ void PixCoordsCSPad::fillArrsOfCSPadPixCoords()
 
           m_coor_x_int [quad][sect][col][row] = (int) m_coor_x_pix [quad][sect][col][row];
           m_coor_y_int [quad][sect][col][row] = (int) m_coor_y_pix [quad][sect][col][row];
-
 	}
       }
     }
@@ -184,6 +183,19 @@ float PixCoordsCSPad::getPixCoor_pix(CSPadPixCoords::PixCoords2x1::COORDINATE ic
     {
     case CSPadPixCoords::PixCoords2x1::X : return m_coor_x_pix [quad][sect][col][row];
     case CSPadPixCoords::PixCoords2x1::Y : return m_coor_y_pix [quad][sect][col][row]; 
+    case CSPadPixCoords::PixCoords2x1::Z : return 0;
+    default: return 0;
+    }
+}
+
+//--------------
+
+float PixCoordsCSPad::getPixCoor_int(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col)
+{
+  switch (icoor)
+    {
+    case CSPadPixCoords::PixCoords2x1::X : return m_coor_x_int [quad][sect][col][row];
+    case CSPadPixCoords::PixCoords2x1::Y : return m_coor_y_int [quad][sect][col][row]; 
     case CSPadPixCoords::PixCoords2x1::Z : return 0;
     default: return 0;
     }

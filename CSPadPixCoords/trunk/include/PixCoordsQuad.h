@@ -72,7 +72,8 @@ public:
 
   void fillAllQuads();
   void fillOneQuad(uint32_t quad);
-  void fillOneSectionInQuad(uint32_t quad, uint32_t sect, float xcenter, float ycenter, float zcenter, float rotation, float tilt);
+  void fillOneSectionInQuad      (uint32_t quad, uint32_t sect, float xcenter, float ycenter, float zcenter, float rotation);
+  void fillOneSectionTiltedInQuad(uint32_t quad, uint32_t sect, float xcenter, float ycenter, float zcenter, float rotation, float tilt);
   void setConstXYMinMax();
 
   float getPixCoorRot000_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
@@ -98,6 +99,12 @@ protected:
 private:
 
   // Data members
+  CSPadPixCoords::PixCoords2x1::COORDINATE XCOOR;
+  CSPadPixCoords::PixCoords2x1::COORDINATE YCOOR;
+  CSPadPixCoords::PixCoords2x1::COORDINATE ZCOOR;
+
+  float m_degToRad; 
+
   PixCoords2x1            *m_pix_coords_2x1;  
   PSCalib::CSPadCalibPars *m_cspad_calibpar;  
 

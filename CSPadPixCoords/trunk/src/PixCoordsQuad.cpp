@@ -18,10 +18,13 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <math.h>
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include <boost/math/constants/constants.hpp>
+
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -45,7 +48,11 @@ PixCoordsQuad::PixCoordsQuad ( PixCoords2x1 *pix_coords_2x1,  PSCalib::CSPadCali
   cout << "PixCoordsQuad::PixCoordsQuad:" << endl;
   m_pix_coords_2x1 -> print_member_data(); 
   m_cspad_calibpar -> printCalibPars();
-  
+
+  XCOOR = CSPadPixCoords::PixCoords2x1::X;
+  YCOOR = CSPadPixCoords::PixCoords2x1::Y;
+  ZCOOR = CSPadPixCoords::PixCoords2x1::Z;
+
   fillAllQuads();
   setConstXYMinMax();
 }
@@ -62,6 +69,8 @@ void PixCoordsQuad::fillAllQuads()
             m_coor_x_max[quad] = 0;
             m_coor_y_min[quad] = 1e5;
             m_coor_y_max[quad] = 0;
+
+            m_degToRad = 3.14159265359 / 180.; 
 
             fillOneQuad(quad);
 	  }
@@ -98,7 +107,8 @@ void PixCoordsQuad::fillOneQuad(uint32_t quad)
             xcenter *= pixSize_um;
             ycenter *= pixSize_um;
 
-            fillOneSectionInQuad(quad, sect, xcenter, ycenter, zcenter, rotation, tilt);
+            //fillOneSectionInQuad(quad, sect, xcenter, ycenter, zcenter, rotation);
+            fillOneSectionTiltedInQuad(quad, sect, xcenter, ycenter, zcenter, rotation, tilt);
 
 	    //cout << " sect=" << sect;
           }
@@ -108,7 +118,7 @@ void PixCoordsQuad::fillOneQuad(uint32_t quad)
 
 //--------------
 
-void PixCoordsQuad::fillOneSectionInQuad(uint32_t quad, uint32_t sect, float xcenter, float ycenter, float zcenter, float rotation, float tilt)
+void PixCoordsQuad::fillOneSectionInQuad(uint32_t quad, uint32_t sect, float xcenter, float ycenter, float zcenter, float rotation)
 {
   // cout << "PixCoordsQuad::fillOneSectionInQuad" << endl;
   // cout << " sect=" << sect;
@@ -119,14 +129,11 @@ void PixCoordsQuad::fillOneSectionInQuad(uint32_t quad, uint32_t sect, float xce
             float xmin = xcenter - m_pix_coords_2x1->getXCenterOffset_um(orient);
             float ymin = ycenter - m_pix_coords_2x1->getYCenterOffset_um(orient);
 
-            CSPadPixCoords::PixCoords2x1::COORDINATE X = CSPadPixCoords::PixCoords2x1::X;
-            CSPadPixCoords::PixCoords2x1::COORDINATE Y = CSPadPixCoords::PixCoords2x1::Y;
-
             for (uint32_t col=0; col<NCols2x1; col++) {
             for (uint32_t row=0; row<NRows2x1; row++) {
 
-	       float coor_x = xmin + m_pix_coords_2x1->getPixCoorRotN90_um (orient, X, row, col);
-	       float coor_y = ymin + m_pix_coords_2x1->getPixCoorRotN90_um (orient, Y, row, col);
+	       float coor_x = xmin + m_pix_coords_2x1->getPixCoorRotN90_um (orient, XCOOR, row, col);
+	       float coor_y = ymin + m_pix_coords_2x1->getPixCoorRotN90_um (orient, YCOOR, row, col);
 	       m_coor_x[quad][sect][col][row] = coor_x;
 	       m_coor_y[quad][sect][col][row] = coor_y;
 
@@ -136,6 +143,67 @@ void PixCoordsQuad::fillOneSectionInQuad(uint32_t quad, uint32_t sect, float xce
                if ( coor_y > m_coor_y_max[quad] ) m_coor_y_max[quad] = coor_y;
             }
             }
+}
+
+//--------------
+
+void PixCoordsQuad::fillOneSectionTiltedInQuad(uint32_t quad, uint32_t sect, float xcenter, float ycenter, float zcenter, float rotation, float tilt)
+{
+    cout << "PixCoordsQuad::fillOneSectionInQuad: ";
+
+    PixCoords2x1::ORIENTATION orient = PixCoords2x1::getOrientation(rotation);
+  
+    float xhalf  = m_pix_coords_2x1->getXCenterOffset_um(orient);
+    float yhalf  = m_pix_coords_2x1->getYCenterOffset_um(orient);
+
+    float tiltrad = tilt*m_degToRad;
+
+    float sintilt = sin(tiltrad);
+    float costilt = cos(tiltrad);
+
+    // Calculate the corner-center offset due to the tilt
+
+    float radius = sqrt(xhalf*xhalf + yhalf*yhalf);
+    float sinPhi = yhalf / radius;
+    float cosPhi = xhalf / radius;
+
+    float rdPhi  = radius * tiltrad; // fabs(tiltrad) ?
+    float dxOff  =  rdPhi * sinPhi;
+    float dyOff  = -rdPhi * cosPhi;
+
+    float xmin   = xcenter - xhalf + dxOff;
+    float ymin   = ycenter - yhalf + dyOff;
+
+    /*
+    cout << " sect="      << sect 
+         << " rotation="  << rotation
+         << " tilt="      << tilt
+         << " sin(tilt)=" << sintilt
+         << " cos(tilt)=" << costilt
+         << endl;
+    */
+
+    for (uint32_t col=0; col<NCols2x1; col++) {
+    for (uint32_t row=0; row<NRows2x1; row++) {
+
+       float x_in_sec = m_pix_coords_2x1->getPixCoorRotN90_um (orient, XCOOR, row, col);
+       float y_in_sec = m_pix_coords_2x1->getPixCoorRotN90_um (orient, YCOOR, row, col);
+
+       float x_tilted =  x_in_sec * costilt - y_in_sec * sintilt;
+       float y_tilted =  x_in_sec * sintilt + y_in_sec * costilt; 
+
+       float coor_x = xmin + x_tilted;
+       float coor_y = ymin + y_tilted;
+
+       m_coor_x[quad][sect][col][row] = coor_x;
+       m_coor_y[quad][sect][col][row] = coor_y;
+
+       if ( coor_x < m_coor_x_min[quad] ) m_coor_x_min[quad] = coor_x;
+       if ( coor_x > m_coor_x_max[quad] ) m_coor_x_max[quad] = coor_x;
+       if ( coor_y < m_coor_y_min[quad] ) m_coor_y_min[quad] = coor_y;
+       if ( coor_y > m_coor_y_max[quad] ) m_coor_y_max[quad] = coor_y;
+    }
+    }
 }
 
 //--------------

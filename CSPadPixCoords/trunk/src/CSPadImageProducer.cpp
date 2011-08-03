@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class PixCoordsTest...
+//	Class CSPadImageProducer...
 //
 // Author List:
 //      Mikhail S. Dubrovin
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "CSPadPixCoords/PixCoordsTest.h"
+#include "CSPadPixCoords/CSPadImageProducer.h"
 
 //-----------------
 // C/C++ Headers --
@@ -38,7 +38,7 @@
 
 // This declares this class as psana module
 using namespace CSPadPixCoords;
-PSANA_MODULE_FACTORY(PixCoordsTest)
+PSANA_MODULE_FACTORY(CSPadImageProducer)
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -50,7 +50,7 @@ namespace CSPadPixCoords {
 // Constructors --
 //----------------
 
-PixCoordsTest::PixCoordsTest (const std::string& name)
+CSPadImageProducer::CSPadImageProducer (const std::string& name)
   : Module(name)
   , m_calibDir()
   , m_typeGroupName()
@@ -75,7 +75,7 @@ PixCoordsTest::PixCoordsTest (const std::string& name)
 // Destructor --
 //--------------
 
-PixCoordsTest::~PixCoordsTest ()
+CSPadImageProducer::~CSPadImageProducer ()
 {
 }
 
@@ -83,7 +83,7 @@ PixCoordsTest::~PixCoordsTest ()
 
 /// Method which is called once at the beginning of the job
 void 
-PixCoordsTest::beginJob(Event& evt, Env& env)
+CSPadImageProducer::beginJob(Event& evt, Env& env)
 {
 }
 
@@ -91,7 +91,7 @@ PixCoordsTest::beginJob(Event& evt, Env& env)
 
 /// Method which is called at the beginning of the run
 void 
-PixCoordsTest::beginRun(Event& evt, Env& env)
+CSPadImageProducer::beginRun(Event& evt, Env& env)
 {
   cout << "ImageCSPad::beginRun " << endl;
 
@@ -110,7 +110,7 @@ PixCoordsTest::beginRun(Event& evt, Env& env)
 //--------------------
 
 void 
-PixCoordsTest::getQuadConfigPars(Env& env)
+CSPadImageProducer::getQuadConfigPars(Env& env)
 {
   shared_ptr<Psana::CsPad::ConfigV3> config = env.configStore().get(m_src);
   if (config.get()) {
@@ -134,7 +134,7 @@ PixCoordsTest::getQuadConfigPars(Env& env)
 
 /// Method which is called at the beginning of the calibration cycle
 void 
-PixCoordsTest::beginCalibCycle(Event& evt, Env& env)
+CSPadImageProducer::beginCalibCycle(Event& evt, Env& env)
 {
 }
 
@@ -143,17 +143,20 @@ PixCoordsTest::beginCalibCycle(Event& evt, Env& env)
 /// Method which is called with event data, this is the only required 
 /// method, all other methods are optional
 void 
-PixCoordsTest::event(Event& evt, Env& env)
+CSPadImageProducer::event(Event& evt, Env& env)
 {
   // this is how to gracefully stop analysis job
   ++m_count;
   if (m_count >= m_maxEvents) stop();
   cout << "m_count=" << m_count << endl;
 
+  struct timespec start, stop;
+  int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
+
   shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src);
   if (data2.get()) {
 
-        this -> test_cspad_init ();
+    this -> cspad_image_init ();
 
     int nQuads = data2->quads_shape()[0];
     cout << "nQuads = " << nQuads << endl;
@@ -164,23 +167,18 @@ PixCoordsTest::event(Event& evt, Env& env)
         int             quad = el.quad() ;
 
         std::vector<int> v_image_shape = el.data_shape();
-
         CSPadImage::QuadParameters *quadpars = new CSPadImage::QuadParameters(quad, v_image_shape, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
 
-	this -> test_2x1  (data, quadpars, m_cspad_calibpar);
-	this -> test_quad (data, quadpars, m_cspad_calibpar);
-
-             struct timespec start, stop;
-             int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
-	this -> test_cspad (data, quadpars, m_cspad_calibpar);
-                 status = clock_gettime( CLOCK_REALTIME, &stop ); // Get LOCAL time
-        cout << "Time to fill quad is " 
-             << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
-             << " sec" << endl;
+	this -> cspad_image_fill (data, quadpars, m_cspad_calibpar);
     }
 
-        this -> test_cspad_save ();
+    status = clock_gettime( CLOCK_REALTIME, &stop ); // Get LOCAL time
+    cout << "Time to fill cspad is " 
+         << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
+         << " sec" << endl;
 
+      this -> cspad_image_save_in_file ();
+    //this -> cspad_image_add_in_event(evt,"CSPad:Image");
   } // if (data2.get())
 }
 
@@ -188,7 +186,7 @@ PixCoordsTest::event(Event& evt, Env& env)
   
 /// Method which is called at the end of the calibration cycle
 void 
-PixCoordsTest::endCalibCycle(Event& evt, Env& env)
+CSPadImageProducer::endCalibCycle(Event& evt, Env& env)
 {
 }
 
@@ -196,7 +194,7 @@ PixCoordsTest::endCalibCycle(Event& evt, Env& env)
 
 /// Method which is called at the end of the run
 void 
-PixCoordsTest::endRun(Event& evt, Env& env)
+CSPadImageProducer::endRun(Event& evt, Env& env)
 {
 }
 
@@ -204,119 +202,14 @@ PixCoordsTest::endRun(Event& evt, Env& env)
 
 /// Method which is called once at the end of the job
 void 
-PixCoordsTest::endJob(Event& evt, Env& env)
+CSPadImageProducer::endJob(Event& evt, Env& env)
 {
 }
 
 //--------------------
 
 void
-PixCoordsTest::test_2x1(const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
-{
-        int              quad           = quadpars -> getQuadNumber();
-        uint32_t         roiMask        = quadpars -> getRoiMask();
-	std::vector<int> v_image_shape  = quadpars -> getImageShapeVector();
-
-        //cout  << "PixCoordsTest::test_2x1:  quadNumber=" << quad << endl;
-
-  // SELECT QUADRANT NUMBER FOR TEST HERE !!!
-  if(quad != 2) return;
- 
-  // SELECT 2x1 ORIENTATION FOR TEST HERE !!!
-  CSPadPixCoords::PixCoords2x1::ORIENTATION rot=CSPadPixCoords::PixCoords2x1::R000;
-
-  // SELECT 2x1 SECTION NUMBER FOR TEST HERE !!!
-  uint32_t sect=1;
-
-        bool bitIsOn = roiMask & (1<<sect);
-        if( !bitIsOn ) return;
- 
-        // Initialization
-        for (unsigned ix=0; ix<NX_2x1; ix++){
-        for (unsigned iy=0; iy<NY_2x1; iy++){
-          m_arr_2x1_image[ix][iy] = 0;
-        }
-        }
-
-        unsigned mrgx=20;
-        unsigned mrgy=20;
-
-        const uint16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
- 
-        for (uint32_t c=0; c<m_ncols2x1; c++) {
-        for (uint32_t r=0; r<m_nrows2x1; r++) {
-
-           int ix = mrgx + (int) m_pix_coords_2x1 -> getPixCoorRotN90_pix (rot, XCOOR, r, c);
-           int iy = mrgy + (int) m_pix_coords_2x1 -> getPixCoorRotN90_pix (rot, YCOOR, r, c);
-
-	   if(ix <  0)      continue;
-	   if(iy <  0)      continue;
-	   if(ix >= NX_2x1) continue;
-	   if(iy >= NY_2x1) continue;
-
-           m_arr_2x1_image[ix][iy] = (float)data2x1[c*m_nrows2x1+r];
-
-        }
-        }
-
-    CSPadImage::Image2D<float> *img2d = new CSPadImage::Image2D<float>(&m_arr_2x1_image[0][0],NY_2x1,NX_2x1);
-    img2d -> saveImageInFile("test_2x1.txt",0);
-}
-
-//--------------------
-
-void
-PixCoordsTest::test_quad(const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
-{
-        int              quad           = quadpars -> getQuadNumber();
-        uint32_t         roiMask        = quadpars -> getRoiMask();
-	std::vector<int> v_image_shape  = quadpars -> getImageShapeVector();
- 
-        cout  << "PixCoordsTest::test_quad:  quadNumber=" << quad << endl;
-
-        // Initialization
-        for (unsigned ix=0; ix<NX_QUAD; ix++){
-        for (unsigned iy=0; iy<NY_QUAD; iy++){
-          m_arr_quad_image[ix][iy] = 0;
-        }
-        }
-
-	for(uint32_t sect=0; sect < m_n2x1; sect++)
-	{
-             bool bitIsOn = roiMask & (1<<sect);
-             if( !bitIsOn ) continue;
- 
-             const uint16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
-
-             for (uint32_t c=0; c<m_ncols2x1; c++) {
-             for (uint32_t r=0; r<m_nrows2x1; r++) {
-
-               int ix = (int) m_pix_coords_quad -> getPixCoorRot000_pix (XCOOR, quad, sect, r, c);
-               int iy = (int) m_pix_coords_quad -> getPixCoorRot000_pix (YCOOR, quad, sect, r, c);
-
-	       if(ix <  0)       continue;
-	       if(iy <  0)       continue;
-	       if(ix >= NX_QUAD) continue;
-	       if(iy >= NY_QUAD) continue;
-
-               m_arr_quad_image[ix][iy] = (float)data2x1[c*m_nrows2x1+r];
-
-             }
-             }
-	}
-
-        string fname = "test_q";
-               fname += boost::lexical_cast<string>( quad );
-               fname += ".txt";
- 
-  CSPadImage::Image2D<float> *img2d = new CSPadImage::Image2D<float>(&m_arr_quad_image[0][0],NY_QUAD,NX_QUAD);
-  img2d -> saveImageInFile(fname,0);
-}
-
-//--------------------
-
-void
-PixCoordsTest::test_cspad_init()
+CSPadImageProducer::cspad_image_init()
 {
   // Initialization
   for (unsigned ix=0; ix<NX_CSPAD; ix++){
@@ -334,7 +227,7 @@ PixCoordsTest::test_cspad_init()
 //--------------------
 
 void
-PixCoordsTest::test_cspad(const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+CSPadImageProducer::cspad_image_fill(const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
       //int              quad           = quadpars -> getQuadNumber();
         uint32_t         roiMask        = quadpars -> getRoiMask();
@@ -352,15 +245,11 @@ PixCoordsTest::test_cspad(const uint16_t* data, CSPadImage::QuadParameters* quad
              for (uint32_t c=0; c<m_ncols2x1; c++) {
              for (uint32_t r=0; r<m_nrows2x1; r++) {
 
-               // This access takes 14ms/quad
+               // This access takes 72ms/cspad
                //int ix = (int) m_pix_coords_cspad -> getPixCoor_pix (XCOOR, quad, sect, r, c);
                //int iy = (int) m_pix_coords_cspad -> getPixCoor_pix (YCOOR, quad, sect, r, c);
 
-               // This access takes 8ms/quad
-               //int ix = (int) m_coor_x_pix [m_cspad_ind];
-               //int iy = (int) m_coor_y_pix [m_cspad_ind];
-
-               // This access takes 6ms/quad
+               // This access takes 40ms/cspad
                int ix = m_coor_x_int [m_cspad_ind];
                int iy = m_coor_y_int [m_cspad_ind];
 	       m_cspad_ind++;
@@ -379,10 +268,20 @@ PixCoordsTest::test_cspad(const uint16_t* data, CSPadImage::QuadParameters* quad
 //--------------------
 
 void
-PixCoordsTest::test_cspad_save()
+CSPadImageProducer::cspad_image_save_in_file(const std::string &filename)
 {
   CSPadImage::Image2D<float> *img2d = new CSPadImage::Image2D<float>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD);
-  img2d -> saveImageInFile("test_cspad.txt",0);
+  img2d -> saveImageInFile(filename,0);
+}
+
+//--------------------
+
+void
+CSPadImageProducer::cspad_image_add_in_event(Event& evt, const std::string &keyname)
+{
+  shared_ptr< CSPadImage::Image2D<float> > img2d( new CSPadImage::Image2D<float>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD) );
+  //evt.put(img2d, m_pdssrc, keyname);
+  evt.put(img2d, keyname);
 }
 
 //--------------------
