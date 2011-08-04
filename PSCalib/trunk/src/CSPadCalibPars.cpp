@@ -76,7 +76,7 @@ CSPadCalibPars::CSPadCalibPars ( const std::string&   calibDir,           //  /r
 
     fillCalibNameVector ();
     loadCalibPars ();
-    printCalibPars();
+    //printCalibPars();
 }
 
 //----------------
