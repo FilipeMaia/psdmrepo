@@ -260,14 +260,15 @@ class XtcScanner ( object ) :
                 self._scan( x )
         else :
 
-            source = str(xtc.src)
+            source = str(xtc.src).split('(')[1].strip(')')
             contents = str(xtc.contains)
             worthknowing = None
 
             dtype = type(xtc.src).__name__
             dname = ''
             if ( dtype=='BldInfo' ):
-                dname = str(xtc.src.type()).split('.')[1]
+                #dname = str(xtc.src.type()).split('.')[1]
+                dname = source
             if ( dtype=='DetInfo' ):
                 dtn = str(xtc.src.detector()).split('.')[1]
                 dti = str(xtc.src.detId())

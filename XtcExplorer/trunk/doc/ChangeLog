@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Aug-04 ofte                  rev 2163
+	- Support for the new BldInfo IPMs added
+	
 2011-Jul-08 ofte                  rev 2096
 	 - added to cspad option of using (translator) pedestal file. 
 	- added to cspad a config file for running standalone pyana

@@ -98,41 +98,61 @@ class  pyana_ipimb ( object ) :
         # IPM diagnostics, for saturation and low count filtering
         for source in self.sources :
 
-            # raw data
-            ipmRaw = evt.get(xtc.TypeId.Type.Id_IpimbData, source )
-            if ipmRaw :
-                ch = [ipmRaw.channel0(),
-                      ipmRaw.channel1(),
-                      ipmRaw.channel2(),
-                      ipmRaw.channel3() ]
+            # -------- TEST
+            # BldDataIpimb / SharedIpimb
+            ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb, source )
+            #ipm = evt.getSharedIpimbValue("HFX-DG3-IMB-02")
+            if ipm :
+                self.raw_ch[source].append( [ipm.ipimbData.channel0(),
+                                             ipm.ipimbData.channel1(),
+                                             ipm.ipimbData.channel2(),
+                                             ipm.ipimbData.channel3()] )
+
+                self.raw_ch_volt[source].append( [ipm.ipimbData.channel0Volts(),
+                                             ipm.ipimbData.channel1Volts(),
+                                             ipm.ipimbData.channel2Volts(),
+                                             ipm.ipimbData.channel3Volts()] )
+
+                self.fex_sum[source].append( ipm.ipmFexData.sum )
+                self.fex_channels[source].append( ipm.ipmFexData.channel )
+                self.fex_position[source].append( [ipm.ipmFexData.xpos, ipm.ipmFexData.ypos] )
+            else :
+
+                # raw data
+                ipmRaw = evt.get(xtc.TypeId.Type.Id_IpimbData, source )
+                if ipmRaw :
+                    ch = [ipmRaw.channel0(),
+                          ipmRaw.channel1(),
+                          ipmRaw.channel2(),
+                          ipmRaw.channel3() ]
                 
-                self.raw_ch[source].append(ch)
+                    self.raw_ch[source].append(ch)
                 
-                ch_volt = [ipmRaw.channel0Volts(),
-                           ipmRaw.channel1Volts(),
-                           ipmRaw.channel2Volts(),
-                           ipmRaw.channel3Volts() ]
-                
-                self.raw_ch_volt[source].append( ch_volt )
+                    ch_volt = [ipmRaw.channel0Volts(),
+                               ipmRaw.channel1Volts(),
+                               ipmRaw.channel2Volts(),
+                               ipmRaw.channel3Volts() ]
+                    
+                    self.raw_ch_volt[source].append( ch_volt )
             
                 
-            else :
-                print "pyana_ipimb: No IpimbData from %s found in event %d" % (source,self.n_shots)
-                self.raw_ch[source].append( [-99,-99,-99,-99] )
-                self.raw_ch_volt[source].append( [-99,-99,-99,-99] ) 
+                else :
+                    print "pyana_ipimb: No IpimbData from %s found in event %d" % (source,self.n_shots)
+                    self.raw_ch[source].append( [-1,-1,-1,-1] )
+                    self.raw_ch_volt[source].append( [-1,-1,-1,-1] ) 
 
-            # feature-extracted data
-            ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, source )
+                # feature-extracted data
+                ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, source )
 
-            if ipmFex :
-                self.fex_sum[source].append( ipmFex.sum )
-                self.fex_channels[source].append( ipmFex.channel )
-                self.fex_position[source].append( [ipmFex.xpos, ipmFex.ypos] )
-            else :
-                print "pyana_ipimb: No IpmFex from %s found in event %d" % (source, self.n_shots)
-                self.fex_sum[source].append( -99 )
-                self.fex_channels[source].append( [-99,-99,-99,-99] ) 
-                self.fex_position[source].append( [-99,-99] ) 
+                if ipmFex :
+                    self.fex_sum[source].append( ipmFex.sum )
+                    self.fex_channels[source].append( ipmFex.channel )
+                    self.fex_position[source].append( [ipmFex.xpos, ipmFex.ypos] )
+                else :
+                    print "pyana_ipimb: No IpmFex from %s found in event %d" % (source, self.n_shots)
+                    self.fex_sum[source].append( -1 )
+                    self.fex_channels[source].append( [-1,-1,-1,-1] ) 
+                    self.fex_position[source].append( [-1,-1] ) 
 
 
         # ----------------- Plotting ---------------------

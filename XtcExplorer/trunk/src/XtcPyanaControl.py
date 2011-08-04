@@ -730,6 +730,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         #      1) scan
         #      2) all-in-one analysis 
 
+
         # --- --- --- Scan --- --- ---
         if str(box.text()).find("ControlPV:")>=0 :
             try :
@@ -748,6 +749,24 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
 
+        # --- --- --- BLD Ipimb --- --- --- 
+        if ( str(box.text()).find("BldInfo")>=0 and ( str(box.text()).find("IPM")>=0 or str(box.text()).find("DIO")>=0 ) ):
+            try :
+                index = modules_to_run.index("XtcExplorer.pyana_ipimb")
+            except ValueError :
+                index = len(modules_to_run)
+                modules_to_run.append("XtcExplorer.pyana_ipimb")
+                options_for_mod.append([])
+
+            #print "XtcExplorer.pyana_ipimb at ", index
+            address = str(box.text()).split(": ")[1].strip()
+            options_for_mod[index].append("\nsources = %s" % address)
+            options_for_mod[index].append("\nvariables = fex:pos fex:sum fex:channels")
+            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
+            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
+            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
+            return
+                    
         # --- --- --- BLD --- --- ---
         if str(box.text()).find("BldInfo")>=0 :
             try :
@@ -767,10 +786,11 @@ class XtcPyanaControl ( QtGui.QWidget ) :
                 options_for_mod[index].append("\ndo_gasdetector = True")
             if str(box.text()).find("PhaseCavity")>=0 :
                 options_for_mod[index].append("\ndo_phasecavity = True")
-            if str(box.text()).find("Nh2Sb1Ipm")>=0 :
+            if (str(box.text()).find("IPM")>=0 or
+                str(box.text()).find("DIO")>=0 ):
                 options_for_mod[index].append("\ndo_ipimb = True")
             return
-        
+            
         # --- --- --- Waveform --- --- ---
         if ( str(box.text()).find("Acq")>=0  
              or str(box.text()).find("ETof")>=0
