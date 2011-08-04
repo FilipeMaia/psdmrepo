@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Aug-04 ofte                   rev 2166
+        - support for BldInfo YAG type address. 
+	
 2011-Aug-04 ofte  Tag: V00-01-07   rev 2164 - 2165
         - tag
 	- support for BldInfo IPMs also added to pyana_scan)

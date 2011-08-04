@@ -749,8 +749,9 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
 
-        # --- --- --- BLD Ipimb --- --- --- 
-        if ( str(box.text()).find("BldInfo")>=0 and ( str(box.text()).find("IPM")>=0 or str(box.text()).find("DIO")>=0 ) ):
+        # --- --- --- BLD IPM & DIO (Ipimb) --- --- --- 
+        if ( str(box.text()).find("BldInfo")>=0 
+             and ( str(box.text()).find("IPM")>=0 or str(box.text()).find("DIO")>=0 ) ):
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_ipimb")
             except ValueError :
@@ -767,6 +768,32 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             return
                     
+
+        # --- --- --- BLD YAG (PIM) --- --- --- 
+        if ( str(box.text()).find("BldInfo")>=0 and str(box.text()).find("YAG")>=0 ):
+            try :
+                index = modules_to_run.index("XtcExplorer.pyana_image")
+            except ValueError :
+                index = len(modules_to_run)
+                modules_to_run.append("XtcExplorer.pyana_image")
+                options_for_mod.append([])
+
+            #print "XtcExplorer.pyana_image at ", index
+            address = str(box.text()).split(": ")[1].strip()
+            options_for_mod[index].append("\nsources = %s" % address)
+            options_for_mod[index].append("\nthreshold = ")
+            options_for_mod[index].append("\nimage_rotations = " )
+            options_for_mod[index].append("\nimage_shifts = " )
+            options_for_mod[index].append("\nimage_scales = " )
+            options_for_mod[index].append("\nimage_manipulations = ")
+            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
+            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
+            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
+            options_for_mod[index].append("\noutput_file = ")
+            options_for_mod[index].append("\nn_hdf5 = ")        
+            return
+
+
         # --- --- --- BLD --- --- ---
         if str(box.text()).find("BldInfo")>=0 :
             try :
