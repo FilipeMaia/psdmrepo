@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <math.h>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -38,13 +39,18 @@ namespace CSPadPixCoords {
 //----------------
 // Constructors --
 //----------------
-PixCoordsCSPad::PixCoordsCSPad ( PixCoordsQuad *pix_coords_quad,  PSCalib::CSPadCalibPars *cspad_calibpar )
+PixCoordsCSPad::PixCoordsCSPad ( PixCoordsQuad *pix_coords_quad,  PSCalib::CSPadCalibPars *cspad_calibpar, bool tiltIsApplied )
   : m_pix_coords_quad(pix_coords_quad)
   , m_cspad_calibpar (cspad_calibpar)
+  , m_tiltIsApplied  (tiltIsApplied)
 {
-  cout << "PixCoordsQuad::PixCoordsCSPad:" << endl;
+  cout << "PixCoordsQuad::PixCoordsCSPad" << endl;
   //m_pix_coords_quad -> print_member_data(); 
   //m_cspad_calibpar  -> printCalibPars();
+
+  XCOOR = CSPadPixCoords::PixCoords2x1::X;
+  YCOOR = CSPadPixCoords::PixCoords2x1::Y;
+  ZCOOR = CSPadPixCoords::PixCoords2x1::Z;
 
   fillAllQuadCoordsInCSPad();
   //setConstXYMinMax();
@@ -55,6 +61,8 @@ PixCoordsCSPad::PixCoordsCSPad ( PixCoordsQuad *pix_coords_quad,  PSCalib::CSPad
 
 void PixCoordsCSPad::fillAllQuadCoordsInCSPad()
 {
+        m_degToRad = 3.14159265359 / 180.; 
+
         m_coor_x_min = 1e5;
         m_coor_x_max = 0;
         m_coor_y_min = 1e5;
@@ -90,7 +98,9 @@ void PixCoordsCSPad::fillAllQuadCoordsInCSPad()
 	    //cout << "  m_xmin_quad = " << m_xmin_quad [q]
 	    //     << "  m_ymin_quad = " << m_ymin_quad [q];
 
-            fillOneQuadCoordsInCSPad(q);
+
+            if (m_tiltIsApplied) fillOneQuadTiltedCoordsInCSPad(q);
+            else                 fillOneQuadCoordsInCSPad(q);
 	  }
 }
 
@@ -98,9 +108,6 @@ void PixCoordsCSPad::fillAllQuadCoordsInCSPad()
 
 void PixCoordsCSPad::fillOneQuadCoordsInCSPad(uint32_t quad)
 {
-        CSPadPixCoords::PixCoords2x1::COORDINATE X = CSPadPixCoords::PixCoords2x1::X;
-        CSPadPixCoords::PixCoords2x1::COORDINATE Y = CSPadPixCoords::PixCoords2x1::Y;
-
         float rotation = m_cspad_calibpar -> getQuadRotation(quad);
 	// cout << "  Quad rotation = " <<  rotation << endl;
 
@@ -110,8 +117,53 @@ void PixCoordsCSPad::fillOneQuadCoordsInCSPad(uint32_t quad)
             for (uint32_t row=0; row<NRows2x1; row++) {
             for (uint32_t col=0; col<NCols2x1; col++) {
 
-	       float coor_x = m_xmin_quad[quad] + m_pix_coords_quad->getPixCoorRotN90_um (orient, X, quad, sect, row, col);
-	       float coor_y = m_ymin_quad[quad] + m_pix_coords_quad->getPixCoorRotN90_um (orient, Y, quad, sect, row, col);
+	       float coor_x = m_xmin_quad[quad] + m_pix_coords_quad->getPixCoorRotN90_um (orient, XCOOR, quad, sect, row, col);
+	       float coor_y = m_ymin_quad[quad] + m_pix_coords_quad->getPixCoorRotN90_um (orient, YCOOR, quad, sect, row, col);
+
+	       m_coor_x[quad][sect][col][row] = coor_x;
+	       m_coor_y[quad][sect][col][row] = coor_y;
+
+               if ( coor_x < m_coor_x_min ) m_coor_x_min = coor_x;
+               if ( coor_x > m_coor_x_max ) m_coor_x_max = coor_x;
+               if ( coor_y < m_coor_y_min ) m_coor_y_min = coor_y;
+               if ( coor_y > m_coor_y_max ) m_coor_y_max = coor_y;
+
+            } // col
+            } // row
+        }   // sect
+	//cout << endl;
+}
+
+//--------------
+
+void PixCoordsCSPad::fillOneQuadTiltedCoordsInCSPad(uint32_t quad)
+{
+        float rotation = m_cspad_calibpar -> getQuadRotation(quad);
+        float tilt     = m_cspad_calibpar -> getQuadTilt(quad);
+        CSPadPixCoords::PixCoords2x1::ORIENTATION orient = PixCoords2x1::getOrientation(rotation);
+
+	cout << "Quad:"       << quad
+	     << "  rotation:" << rotation
+	     << "  tilt:"     << tilt
+	     << endl;
+
+        float tiltrad = tilt * m_degToRad;
+        float sintilt = sin(tiltrad);
+        float costilt = cos(tiltrad);
+
+        for (uint32_t sect=0; sect<N2x1InQuad; ++sect) {
+            for (uint32_t row=0; row<NRows2x1; row++) {
+            for (uint32_t col=0; col<NCols2x1; col++) {
+
+	       float x_in_quad = m_pix_coords_quad->getPixCoorRotN90_um (orient, XCOOR, quad, sect, row, col);
+	       float y_in_quad = m_pix_coords_quad->getPixCoorRotN90_um (orient, YCOOR, quad, sect, row, col);
+
+               float x_tilted =  x_in_quad * costilt - y_in_quad * sintilt;
+               float y_tilted =  x_in_quad * sintilt + y_in_quad * costilt; 
+
+	       float coor_x = m_xmin_quad[quad] + x_tilted;
+	       float coor_y = m_ymin_quad[quad] + y_tilted;
+
 	       m_coor_x[quad][sect][col][row] = coor_x;
 	       m_coor_y[quad][sect][col][row] = coor_y;
 

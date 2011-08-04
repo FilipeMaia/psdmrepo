@@ -104,9 +104,11 @@ private:
   std::string m_source;         // i.e. CxiDs1.0:Cspad.0
    
   Source   m_src;         // Data source set from config file
+  Pds::Src m_actualSrc;
   unsigned m_runNumber;
   unsigned m_maxEvents;
   bool     m_filter;
+  bool     m_tiltIsApplied;
   long     m_count;
 
   uint32_t m_roiMask        [4];

@@ -41,13 +41,14 @@ namespace CSPadPixCoords {
 //----------------
 // Constructors --
 //----------------
-PixCoordsQuad::PixCoordsQuad ( PixCoords2x1 *pix_coords_2x1,  PSCalib::CSPadCalibPars *cspad_calibpar )
+PixCoordsQuad::PixCoordsQuad ( PixCoords2x1 *pix_coords_2x1,  PSCalib::CSPadCalibPars *cspad_calibpar, bool tiltIsApplied )
   : m_pix_coords_2x1(pix_coords_2x1)
   , m_cspad_calibpar(cspad_calibpar)
+  , m_tiltIsApplied (tiltIsApplied)
 {
-  cout << "PixCoordsQuad::PixCoordsQuad:" << endl;
-  m_pix_coords_2x1 -> print_member_data(); 
-  m_cspad_calibpar -> printCalibPars();
+  cout << "PixCoordsQuad::PixCoordsQuad" << endl;
+  //m_pix_coords_2x1 -> print_member_data(); 
+  //m_cspad_calibpar -> printCalibPars();
 
   XCOOR = CSPadPixCoords::PixCoords2x1::X;
   YCOOR = CSPadPixCoords::PixCoords2x1::Y;
@@ -107,8 +108,8 @@ void PixCoordsQuad::fillOneQuad(uint32_t quad)
             xcenter *= pixSize_um;
             ycenter *= pixSize_um;
 
-            //fillOneSectionInQuad(quad, sect, xcenter, ycenter, zcenter, rotation);
-            fillOneSectionTiltedInQuad(quad, sect, xcenter, ycenter, zcenter, rotation, tilt);
+            if (m_tiltIsApplied) fillOneSectionTiltedInQuad(quad, sect, xcenter, ycenter, zcenter, rotation, tilt);
+            else                 fillOneSectionInQuad(quad, sect, xcenter, ycenter, zcenter, rotation);
 
 	    //cout << " sect=" << sect;
           }
@@ -149,7 +150,7 @@ void PixCoordsQuad::fillOneSectionInQuad(uint32_t quad, uint32_t sect, float xce
 
 void PixCoordsQuad::fillOneSectionTiltedInQuad(uint32_t quad, uint32_t sect, float xcenter, float ycenter, float zcenter, float rotation, float tilt)
 {
-    cout << "PixCoordsQuad::fillOneSectionInQuad: ";
+  //cout << "PixCoordsQuad::fillOneSectionInQuad: " << endl;
 
     PixCoords2x1::ORIENTATION orient = PixCoords2x1::getOrientation(rotation);
   

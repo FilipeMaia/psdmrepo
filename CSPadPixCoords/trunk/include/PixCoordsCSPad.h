@@ -62,13 +62,14 @@ public:
   enum { NRows2x1      = Psana::CsPad::MaxRowsPerASIC * 2 }; // 194*2 = 388
 
   // Default constructor
-  PixCoordsCSPad ( PixCoordsQuad *pix_coords_quad,  PSCalib::CSPadCalibPars *cspad_calibpar ) ;
+  PixCoordsCSPad ( PixCoordsQuad *pix_coords_quad,  PSCalib::CSPadCalibPars *cspad_calibpar, bool tiltIsApplied = true ) ;
 
   // Destructor
   virtual ~PixCoordsCSPad () ;
 
   void fillAllQuadCoordsInCSPad() ;
   void fillOneQuadCoordsInCSPad(uint32_t quad) ;
+  void fillOneQuadTiltedCoordsInCSPad(uint32_t quad) ;
   void setConstXYMinMax() ;
   void fillArrsOfCSPadPixCoords() ;
 
@@ -86,8 +87,15 @@ public:
 private:
 
   // Data members
+  CSPadPixCoords::PixCoords2x1::COORDINATE XCOOR;
+  CSPadPixCoords::PixCoords2x1::COORDINATE YCOOR;
+  CSPadPixCoords::PixCoords2x1::COORDINATE ZCOOR;
+
+  float m_degToRad; 
+
   PixCoordsQuad           *m_pix_coords_quad;  
   PSCalib::CSPadCalibPars *m_cspad_calibpar;  
+  bool                     m_tiltIsApplied;
 
   float    m_coor_x    [NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
   float    m_coor_y    [NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];

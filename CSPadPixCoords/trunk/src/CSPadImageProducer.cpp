@@ -58,6 +58,7 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   , m_src()
   , m_maxEvents()
   , m_filter()
+  , m_tiltIsApplied()
   , m_count(0)
 {
   // get the values from configuration or use defaults
@@ -67,6 +68,7 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   m_runNumber     = config   ("runNumber",     32U);
   m_maxEvents     = config   ("events",        32U);
   m_filter        = config   ("filter",        false);
+  m_tiltIsApplied = config   ("tiltIsApplied", true);
   m_src           = m_source;
 }
 
@@ -94,15 +96,16 @@ void
 CSPadImageProducer::beginRun(Event& evt, Env& env)
 {
   cout << "ImageCSPad::beginRun " << endl;
-
-  //m_cspad_calibpar = new PSCalib::CSPadCalibPars(); // get default calib pars from my local directory.
+  //m_cspad_calibpar = new PSCalib::CSPadCalibPars(); // get default calib pars from my local directory
+                                                      // ~dubrovin/LCLS/CSPadAlignment-v01/calib-cxi35711-r0009-det/
   m_cspad_calibpar   = new PSCalib::CSPadCalibPars(m_calibDir, m_typeGroupName, m_source, m_runNumber);
   m_pix_coords_2x1   = new CSPadPixCoords::PixCoords2x1   ();
-  m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar );
-  m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar );
+  m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar, m_tiltIsApplied );
+  m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar, m_tiltIsApplied );
 
-  m_cspad_calibpar -> printCalibPars();
-  m_pix_coords_2x1 -> print_member_data();
+  m_cspad_calibpar  -> printCalibPars();
+  //m_pix_coords_2x1  -> print_member_data();
+  //m_pix_coords_quad -> print_member_data(); 
 
   this -> getQuadConfigPars(env);
 }
@@ -148,18 +151,19 @@ CSPadImageProducer::event(Event& evt, Env& env)
   // this is how to gracefully stop analysis job
   ++m_count;
   if (m_count >= m_maxEvents) stop();
-  cout << "m_count=" << m_count << endl;
+  //cout << "Event: " << m_count;
 
-  struct timespec start, stop;
-  int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
+  //struct timespec start, stop;
+  //int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
 
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src);
+  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src, "", &m_actualSrc); // get m_actualSrc here
+
   if (data2.get()) {
 
     this -> cspad_image_init ();
 
     int nQuads = data2->quads_shape()[0];
-    cout << "nQuads = " << nQuads << endl;
+    //cout << "nQuads = " << nQuads << endl;
     for (int q = 0; q < nQuads; ++ q) {
         const Psana::CsPad::ElementV2& el = data2->quads(q);
 
@@ -172,13 +176,12 @@ CSPadImageProducer::event(Event& evt, Env& env)
 	this -> cspad_image_fill (data, quadpars, m_cspad_calibpar);
     }
 
-    status = clock_gettime( CLOCK_REALTIME, &stop ); // Get LOCAL time
-    cout << "Time to fill cspad is " 
-         << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
-         << " sec" << endl;
+    //status = clock_gettime( CLOCK_REALTIME, &stop ); // Get LOCAL time
+    //cout << "  Time to fill cspad is " 
+    //     << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
+    //     << " sec" << endl;
 
-      this -> cspad_image_save_in_file ();
-    //this -> cspad_image_add_in_event(evt,"CSPad:Image");
+    this -> cspad_image_add_in_event(evt,"CSPad:Image");
   } // if (data2.get())
 }
 
@@ -259,7 +262,7 @@ CSPadImageProducer::cspad_image_fill(const uint16_t* data, CSPadImage::QuadParam
 	       if(ix >= NX_CSPAD) continue;
 	       if(iy >= NY_CSPAD) continue;
 
-               m_arr_cspad_image[ix][iy] = (float)data2x1[c*m_nrows2x1+r];
+               m_arr_cspad_image[ix][iy] += (float)data2x1[c*m_nrows2x1+r];
              }
              }
 	}
@@ -280,8 +283,7 @@ void
 CSPadImageProducer::cspad_image_add_in_event(Event& evt, const std::string &keyname)
 {
   shared_ptr< CSPadImage::Image2D<float> > img2d( new CSPadImage::Image2D<float>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD) );
-  //evt.put(img2d, m_pdssrc, keyname);
-  evt.put(img2d, keyname);
+  evt.put(img2d, m_actualSrc, keyname);
 }
 
 //--------------------

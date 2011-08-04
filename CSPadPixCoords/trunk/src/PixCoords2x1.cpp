@@ -47,6 +47,8 @@ namespace CSPadPixCoords {
 
 PixCoords2x1::PixCoords2x1 ()
 {
+  cout << "PixCoordsQuad::PixCoords2x1" << endl;
+
   m_row_size_um   = PSCalib::CSPadCalibPars::getRowSize_um();
   m_col_size_um   = PSCalib::CSPadCalibPars::getColSize_um();
   m_gap_size_um   = PSCalib::CSPadCalibPars::getGapSize_um();
