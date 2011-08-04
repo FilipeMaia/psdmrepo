@@ -58,7 +58,7 @@ namespace CSPadImage {
   m_numAsicsStored(numAsicsStored),
   m_roiMask(roiMask)
 {
-  cout << "Here in QuadParameters::QuadParameters" << endl;
+  //cout << "Here in QuadParameters::QuadParameters" << endl;
 }
 
 //----------------

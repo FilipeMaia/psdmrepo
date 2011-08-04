@@ -50,7 +50,7 @@ Image2D<T>::Image2D (const T* data, size_t nrows, size_t ncols) :
     m_nrows(nrows),
     m_ncols(ncols)
 {
-  cout << "Here in Image2D<T>::Image2D" << endl;
+  //cout << "Here in Image2D<T>::Image2D" << endl;
     m_nrows_transposed = ncols;
     m_ncols_transposed = nrows;
 }
@@ -225,7 +225,7 @@ void Image2D<T>::printEntireImage (int Nx90)
 template <typename T>
 void Image2D<T>::saveImageInFile (const std::string &fname, int Nx90)
 {
-    cout << "Image2D<T>::saveImageInFile" << endl;
+    cout << "Image2D<T>::saveImageInFile: ";
 
     ofstream file; 
     file.open(fname.c_str(),ios_base::out);
@@ -255,7 +255,7 @@ void Image2D<T>::saveImageInFile (const std::string &fname, int Nx90)
 template <typename T>
 Image2D<T>::~Image2D ()
 {
-  delete [] m_data; 
+  //  delete [] m_data; 
 }
 
 
