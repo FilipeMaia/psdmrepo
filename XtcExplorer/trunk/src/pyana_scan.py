@@ -225,8 +225,8 @@ class pyana_scan (object) :
                 #else :
                 #    self.evts_scalars[scalar].append(-99.0)
 
-            elif scalar.find("Nh2Sb1Ipm01")>= 0 :
-                ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb )
+            elif ( scalar.find("IPM")>= 0 or scalar.find("DIO")>= 0 ):
+                ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb, scalar )
                 if ipm:
                     self.evts_scalars[scalar].append( ipm.ipmFexData.sum )
                 #else :
