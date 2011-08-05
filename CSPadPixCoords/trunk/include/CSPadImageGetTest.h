@@ -37,12 +37,20 @@
 namespace CSPadPixCoords {
 
 /**
- *  @brief Example module class for psana
+ *  @ingroup CSPadPixCoords
+ *
+ *  @brief Test/example module for psana framework.
+ *
+ *  CSPadImageGetTest psana module class works after CSPadImageProducer.
+ *  It gets the Image2D object from the event.
+ *  This image object may be used in data processing.
+ *  For the test purpose, the image of particular event is saved in the text file.
+ *  This event number is defined in the psana.cfg configuration file. 
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see CSPadImageProducer
  *
  *  @version \$Id$
  *

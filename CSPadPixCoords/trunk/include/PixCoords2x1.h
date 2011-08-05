@@ -27,7 +27,6 @@
 //------------------------------------
 #include "psddl_psana/cspad.ddl.h"
 
-
 //		---------------------
 // 		-- Class Interface --
 //		---------------------
@@ -35,7 +34,13 @@
 namespace CSPadPixCoords {
 
 /**
- *  Defines the X,Y,Z pixel coordinates for a single 2x1 in its natural (ONLINE) frame.
+ *  @ingroup CSPadPixCoords
+ *
+ *  @brief PixCoords2x1 class defines the 2x1 section pixel coordinates in its local frame.
+ *
+ *  Defines the X,Y,Z pixel coordinates for single 2x1 in its own (ONLINE) frame:
+ *  X coordinate is directed along rows from 0 to 388 (from top to botton for 0 rotation angle).
+ *  Y coordinate is directed opposite columns from 184 to 0 (from left to right for 0 rotation angle).
  *  getPixCoorRot...(...) methods return these coordinates for rotated by N*90 degree 2x1
  *  in um(micrometer) or pixels.
  *  
@@ -43,12 +48,10 @@ namespace CSPadPixCoords {
  *  /reg/g/psdm/sw/external/lusi-xtc/2.12.0a/x86_64-rhel5-gcc41-opt/pdsdata/cspad/ElementIterator.hh,
  *  Detector.hh
  *  
- *  
- *  
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see CSPadImageProducer, PixCoordsTest
  *
  *  @version $Id$
  *
@@ -65,7 +68,6 @@ public:
                      Y, 
                      Z };
 
-
   enum ORIENTATION { R000 = 0, 
                      R090, 
                      R180, 
@@ -79,7 +81,11 @@ public:
   enum { NRowsASIC = Psana::CsPad::MaxRowsPerASIC     }; // 194
 
   // Default constructor
-
+  /**
+   *  @brief No parameters needed; everything is defined through the fixed 2x1 chip geometry.
+   *  
+   *  Fills/holds/provides access to the arrays of row, column, and ortogonal coordinate of 2x1 pixels
+   */
   PixCoords2x1 () ;
 
   // Destructor
@@ -88,6 +94,11 @@ public:
   // Methods
   void fill_pix_coords_2x1 () ;
 
+  /**
+   *  Access methods return the coordinate for indicated axis, 2x1 row and column
+   *  indexes after the 2x1 rotation by n*90 degree.
+   *  The pixel coordinates can be returned in um(micrometer) and pix(pixel).
+   */
   float getPixCoorRot000_um  (COORDINATE icoor, unsigned row, unsigned col) ;
   float getPixCoorRot090_um  (COORDINATE icoor, unsigned row, unsigned col) ;
   float getPixCoorRot180_um  (COORDINATE icoor, unsigned row, unsigned col) ;
@@ -103,10 +114,10 @@ public:
   float getPixCoorRotN90     (UNITS units, ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col) ;
 
   static ORIENTATION getOrientation(float angle) ;
-  static size_t getNCols(ORIENTATION n90);
-  static size_t getNRows(ORIENTATION n90);
-  float  getXCenterOffset_um(ORIENTATION n90); 
-  float  getYCenterOffset_um(ORIENTATION n90); 
+  static size_t getNCols     (ORIENTATION n90) ;
+  static size_t getNRows     (ORIENTATION n90) ;
+  float  getXCenterOffset_um (ORIENTATION n90) ; 
+  float  getYCenterOffset_um (ORIENTATION n90) ; 
 
   void print_member_data () ;
   void print_selected_coords_2x1 (ARRAXIS arraxis) ;

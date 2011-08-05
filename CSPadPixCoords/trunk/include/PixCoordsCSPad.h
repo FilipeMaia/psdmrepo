@@ -35,17 +35,17 @@
 namespace CSPadPixCoords {
 
 /**
+ *  @ingroup CSPadPixCoords
  *
- *
- *
- *
- *
- *
+ *  @brief PixCoordsCSPad class fills and provides access to the CSPad pixel coordinates.
+ *  
+ *  Fills/holds/provides access to the arrays of the CSPad pixel coordinates, 
+ *  using the quad, section, row, and column indexes.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see CSPadImageProducer, PixCoordsTest
  *
  *  @version $Id$
  *
@@ -62,6 +62,14 @@ public:
   enum { NRows2x1      = Psana::CsPad::MaxRowsPerASIC * 2 }; // 194*2 = 388
 
   // Default constructor
+  /**
+   *  @brief PixCoordsCSPad class fills and provides access to the CSPad pixel coordinates.
+   *  
+   *  Fills/holds/provides access to the array of the quad coordinates, indexed by the quad, section, row, and column.
+   *  @param[in] pix_coords_quad  Pointer to the object with quad pixel coordinates.
+   *  @param[in] cspad_calibpar   Pointer to the object with geometry calibration parameters.
+   *  @param[in] tiltIsApplied    Boolean key indicating if the tilt angle correction for 2x1 and Quads is applied
+   */
   PixCoordsCSPad ( PixCoordsQuad *pix_coords_quad,  PSCalib::CSPadCalibPars *cspad_calibpar, bool tiltIsApplied = true ) ;
 
   // Destructor
@@ -73,10 +81,17 @@ public:
   void setConstXYMinMax() ;
   void fillArrsOfCSPadPixCoords() ;
 
+  /**
+   *  Access methods return the CSPad pixel coordinate for indicated axis, quad, section, row, and column indexes.
+   *  The pixel coordinates can be returned in um(micrometers), pix(pixels), or int(integer pixel index).
+   */
   float getPixCoor_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
   float getPixCoor_pix(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
   float getPixCoor_int(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
 
+  /**
+   *  The group of methods which provide the direct access to coordinate arrays.
+   */
   float*    getPixCoorArrX_um (){return &m_coor_x    [0][0][0][0];}
   float*    getPixCoorArrY_um (){return &m_coor_y    [0][0][0][0];}
   float*    getPixCoorArrX_pix(){return &m_coor_x_pix[0][0][0][0];}

@@ -43,12 +43,27 @@
 namespace CSPadPixCoords {
 
 /**
- *  @brief Example module class for psana
+ *  @ingroup CSPadPixCoords
+ *
+ *  @brief Produces the CSPad image for each event and add it to the event in psana framework.
+ *
+ *  CSPadImageProducer works in psana framework. It does a few operation as follows:
+ *  1) get the pixel coordinates from PixCoords2x1, PixCoordsQuad, and PixCoordsCSPad classes,
+ *  2) get data from the event,
+ *  3) produce the Image2D object with CSPad image for each event,
+ *  4) add the Image2D object in the event for further modules.
+ *
+ *  Time consumed to fill the CSPad image array (currently [1750][1750]) 
+ *  is measured to be about 40 msec/event on psana0105. 
+ *
+ *  This class should not be used directly in the code of users modules. 
+ *  Instead, it should be added as a module in the psana.cfg file with appropriate parameters.
+ *  Then, the produced Image2D object can be extracted from event and used in other modules.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see PixCoords2x1, PixCoordsQuad, PixCoordsCSPad, CSPadImageGetTest
  *
  *  @version \$Id$
  *
@@ -86,14 +101,14 @@ public:
   /// Method which is called once at the end of the job
   virtual void endJob(Event& evt, Env& env);
 
-  void getQuadConfigPars(Env& env);
 
+protected:
+
+  void getQuadConfigPars(Env& env);
   void cspad_image_init();
   void cspad_image_fill (const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void cspad_image_save_in_file(const std::string &filename = "cspad_image.txt");
   void cspad_image_add_in_event(Event& evt, const std::string &keyname = "CSPad:Image");
-
-protected:
 
 private:
 

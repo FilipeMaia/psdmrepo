@@ -40,12 +40,20 @@
 namespace CSPadPixCoords {
 
 /**
- *  @brief Example module class for psana
+ *  @ingroup CSPadPixCoords
+ *
+ *  @brief Test/example module class for psana.
+ *
+ *  PixCoordsTest class is a test of PixCoords2x1, PixCoordsQuad, and PixCoordsCSPad
+ *  classes in psana framework.
+ *  In this test the data image from the event is combined with pixel coordinates
+ *  for 2x1, quad, and CSPad. Relevant images are saved in the files,
+ *  which can be viewed with rendering script.  
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see PixCoords2x1, PixCoordsQuad, and PixCoordsCSPad
  *
  *  @version \$Id$
  *
@@ -85,6 +93,9 @@ public:
 
   void getQuadConfigPars(Env& env);
 
+/**
+ *  @brief Group of methods which do actual tests. 
+ */
   void test_2x1   (const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void test_quad  (const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void test_cspad (const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);

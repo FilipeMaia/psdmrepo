@@ -19,7 +19,6 @@
 // Base Class Headers --
 //----------------------
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
@@ -35,11 +34,16 @@
 namespace CSPadPixCoords {
 
 /**
+ *  @ingroup CSPadPixCoords
+ *
+ *  @brief QuadParameters class holds current parameters for the CSPad quads.
+ *  
+ *  Object of this class is used for passing of the list of current quad parameters. 
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see PixCoords2x1, PixCoordsQuad, PixCoordsCSPad
  *
  *  @version $Id$
  *
@@ -53,6 +57,16 @@ public:
   QuadParameters () ;
 
   // Regular constructor
+  /**
+   *  @brief Creates an object which holds the current quad parameters.
+   *  
+   *  @param[in] quadNumber      Current quad number.
+   *  @param[in] image_shape     Vector of the section parameters: Nsections, Ncolumns, Nrows.
+   *  @param[in] nrows           Number of rows reserved for the quad image.
+   *  @param[in] ncols           Number of columns reserved for the quad image.
+   *  @param[in] numAsicsStored  Number of ASICs stored for this quad in the event. 
+   *  @param[in] roiMask         8-bit mask showing the sections presented in data.
+   */ 
   QuadParameters (uint32_t         quadNumber, 
                   std::vector<int> image_shape, 
                   size_t           nrows=850, 
