@@ -29,7 +29,7 @@
 #include "psddl_psana/acqiris.ddl.h"
 #include "PSEvt/EventId.h"
 
-#include "CSPadImage/Image2D.h"
+#include "CSPadPixCoords/Image2D.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -171,7 +171,7 @@ CSPadImageProducer::event(Event& evt, Env& env)
         int             quad = el.quad() ;
 
         std::vector<int> v_image_shape = el.data_shape();
-        CSPadImage::QuadParameters *quadpars = new CSPadImage::QuadParameters(quad, v_image_shape, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
+        CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(quad, v_image_shape, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
 
 	this -> cspad_image_fill (data, quadpars, m_cspad_calibpar);
     }
@@ -230,7 +230,7 @@ CSPadImageProducer::cspad_image_init()
 //--------------------
 
 void
-CSPadImageProducer::cspad_image_fill(const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+CSPadImageProducer::cspad_image_fill(const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
       //int              quad           = quadpars -> getQuadNumber();
         uint32_t         roiMask        = quadpars -> getRoiMask();
@@ -273,7 +273,7 @@ CSPadImageProducer::cspad_image_fill(const uint16_t* data, CSPadImage::QuadParam
 void
 CSPadImageProducer::cspad_image_save_in_file(const std::string &filename)
 {
-  CSPadImage::Image2D<float> *img2d = new CSPadImage::Image2D<float>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD);
+  CSPadPixCoords::Image2D<float> *img2d = new CSPadPixCoords::Image2D<float>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD);
   img2d -> saveImageInFile(filename,0);
 }
 
@@ -282,7 +282,7 @@ CSPadImageProducer::cspad_image_save_in_file(const std::string &filename)
 void
 CSPadImageProducer::cspad_image_add_in_event(Event& evt, const std::string &keyname)
 {
-  shared_ptr< CSPadImage::Image2D<float> > img2d( new CSPadImage::Image2D<float>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD) );
+  shared_ptr< CSPadPixCoords::Image2D<float> > img2d( new CSPadPixCoords::Image2D<float>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD) );
   evt.put(img2d, m_actualSrc, keyname);
 }
 

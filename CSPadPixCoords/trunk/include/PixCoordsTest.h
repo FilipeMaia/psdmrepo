@@ -24,7 +24,7 @@
 //-------------------------------
 #include "PSCalib/CSPadCalibPars.h"
 
-#include "CSPadImage/QuadParameters.h"
+#include "CSPadPixCoords/QuadParameters.h"
 #include "CSPadPixCoords/PixCoords2x1.h"
 #include "CSPadPixCoords/PixCoordsQuad.h"
 #include "CSPadPixCoords/PixCoordsCSPad.h"
@@ -85,9 +85,9 @@ public:
 
   void getQuadConfigPars(Env& env);
 
-  void test_2x1   (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
-  void test_quad  (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
-  void test_cspad (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void test_2x1   (const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void test_quad  (const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void test_cspad (const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void test_cspad_init();
   void test_cspad_save();
 

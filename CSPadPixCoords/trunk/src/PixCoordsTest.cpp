@@ -29,7 +29,7 @@
 #include "psddl_psana/acqiris.ddl.h"
 #include "PSEvt/EventId.h"
 
-#include "CSPadImage/Image2D.h"
+#include "CSPadPixCoords/Image2D.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -165,7 +165,7 @@ PixCoordsTest::event(Event& evt, Env& env)
 
         std::vector<int> v_image_shape = el.data_shape();
 
-        CSPadImage::QuadParameters *quadpars = new CSPadImage::QuadParameters(quad, v_image_shape, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
+        CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(quad, v_image_shape, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
 
 	this -> test_2x1  (data, quadpars, m_cspad_calibpar);
 	this -> test_quad (data, quadpars, m_cspad_calibpar);
@@ -211,7 +211,7 @@ PixCoordsTest::endJob(Event& evt, Env& env)
 //--------------------
 
 void
-PixCoordsTest::test_2x1(const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+PixCoordsTest::test_2x1(const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
         int              quad           = quadpars -> getQuadNumber();
         uint32_t         roiMask        = quadpars -> getRoiMask();
@@ -259,14 +259,14 @@ PixCoordsTest::test_2x1(const uint16_t* data, CSPadImage::QuadParameters* quadpa
         }
         }
 
-    CSPadImage::Image2D<float> *img2d = new CSPadImage::Image2D<float>(&m_arr_2x1_image[0][0],NY_2x1,NX_2x1);
+    CSPadPixCoords::Image2D<float> *img2d = new CSPadPixCoords::Image2D<float>(&m_arr_2x1_image[0][0],NY_2x1,NX_2x1);
     img2d -> saveImageInFile("test_2x1.txt",0);
 }
 
 //--------------------
 
 void
-PixCoordsTest::test_quad(const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+PixCoordsTest::test_quad(const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
         int              quad           = quadpars -> getQuadNumber();
         uint32_t         roiMask        = quadpars -> getRoiMask();
@@ -309,7 +309,7 @@ PixCoordsTest::test_quad(const uint16_t* data, CSPadImage::QuadParameters* quadp
                fname += boost::lexical_cast<string>( quad );
                fname += ".txt";
  
-  CSPadImage::Image2D<float> *img2d = new CSPadImage::Image2D<float>(&m_arr_quad_image[0][0],NY_QUAD,NX_QUAD);
+  CSPadPixCoords::Image2D<float> *img2d = new CSPadPixCoords::Image2D<float>(&m_arr_quad_image[0][0],NY_QUAD,NX_QUAD);
   img2d -> saveImageInFile(fname,0);
 }
 
@@ -334,7 +334,7 @@ PixCoordsTest::test_cspad_init()
 //--------------------
 
 void
-PixCoordsTest::test_cspad(const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+PixCoordsTest::test_cspad(const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
       //int              quad           = quadpars -> getQuadNumber();
         uint32_t         roiMask        = quadpars -> getRoiMask();
@@ -381,7 +381,7 @@ PixCoordsTest::test_cspad(const uint16_t* data, CSPadImage::QuadParameters* quad
 void
 PixCoordsTest::test_cspad_save()
 {
-  CSPadImage::Image2D<float> *img2d = new CSPadImage::Image2D<float>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD);
+  CSPadPixCoords::Image2D<float> *img2d = new CSPadPixCoords::Image2D<float>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD);
   img2d -> saveImageInFile("test_cspad.txt",0);
 }
 

@@ -25,7 +25,7 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "PSEvt/EventId.h"
-#include "CSPadImage/Image2D.h"
+#include "CSPadPixCoords/Image2D.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -142,7 +142,7 @@ CSPadImageGetTest::endJob(Event& evt, Env& env)
 void 
 CSPadImageGetTest::saveImageInFile(Event& evt)
 {
-  shared_ptr< CSPadImage::Image2D<float> > img2d = evt.get(m_src, "CSPad:Image", &m_actualSrc);
+  shared_ptr< CSPadPixCoords::Image2D<float> > img2d = evt.get(m_src, "CSPad:Image", &m_actualSrc);
 
   if (img2d.get()) {
 

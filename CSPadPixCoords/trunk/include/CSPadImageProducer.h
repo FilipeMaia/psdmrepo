@@ -24,7 +24,7 @@
 //-------------------------------
 #include "PSCalib/CSPadCalibPars.h"
 
-#include "CSPadImage/QuadParameters.h"
+#include "CSPadPixCoords/QuadParameters.h"
 #include "CSPadPixCoords/PixCoords2x1.h"
 #include "CSPadPixCoords/PixCoordsQuad.h"
 #include "CSPadPixCoords/PixCoordsCSPad.h"
@@ -89,7 +89,7 @@ public:
   void getQuadConfigPars(Env& env);
 
   void cspad_image_init();
-  void cspad_image_fill (const uint16_t* data, CSPadImage::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void cspad_image_fill (const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void cspad_image_save_in_file(const std::string &filename = "cspad_image.txt");
   void cspad_image_add_in_event(Event& evt, const std::string &keyname = "CSPad:Image");
 
