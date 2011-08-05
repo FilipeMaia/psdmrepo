@@ -45,7 +45,7 @@ namespace CSPadPixCoords {
 /**
  *  @ingroup CSPadPixCoords
  *
- *  @brief Produces the CSPad image for each event and add it to the event in psana framework.
+ *  @brief CSPadImageProducer produces the CSPad image for each event and add it to the event in psana framework.
  *
  *  CSPadImageProducer works in psana framework. It does a few operation as follows:
  *  1) get the pixel coordinates from PixCoords2x1, PixCoordsQuad, and PixCoordsCSPad classes,

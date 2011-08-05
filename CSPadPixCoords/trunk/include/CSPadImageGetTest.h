@@ -39,7 +39,7 @@ namespace CSPadPixCoords {
 /**
  *  @ingroup CSPadPixCoords
  *
- *  @brief Test/example module for psana framework.
+ *  @brief CSPadImageGetTest is a test/example module for psana framework.
  *
  *  CSPadImageGetTest psana module class works after CSPadImageProducer.
  *  It gets the Image2D object from the event.

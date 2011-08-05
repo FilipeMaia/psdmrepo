@@ -42,7 +42,7 @@ namespace CSPadPixCoords {
 /**
  *  @ingroup CSPadPixCoords
  *
- *  @brief Test/example module class for psana.
+ *  @brief PixCoordsTest class is a test/example module for psana.
  *
  *  PixCoordsTest class is a test of PixCoords2x1, PixCoordsQuad, and PixCoordsCSPad
  *  classes in psana framework.

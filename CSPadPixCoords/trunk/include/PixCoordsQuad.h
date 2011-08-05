@@ -37,7 +37,7 @@ namespace CSPadPixCoords {
 /**
  *  @ingroup CSPadPixCoords
  *
- *  @brief PixCoordsQuads class defines the quad pixel coordinates in its local frame.
+ *  @brief PixCoordsQuad class defines the quad pixel coordinates in its local frame.
  *
  *  Use the same frame like in optical measurement, but in "matrix style" geometry:
  *  X axis goes along rows (from top to bottom)
