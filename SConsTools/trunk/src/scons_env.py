@@ -29,7 +29,7 @@ def buildEnv () :
     vars.Add('TRACE', "Set to positive value to trace processing", 0)
     
     # make environment, also make it default
-    env = DefaultEnvironment( variables = vars )
+    env = DefaultEnvironment(ENV = os.environ, variables = vars)
 
     # set trace level based on the command line value
     tracev = int(env['TRACE'])

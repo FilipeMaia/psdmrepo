@@ -152,6 +152,17 @@ tests = env.Alias ( 'test', env['ALL_TARGETS']['TESTS'] )
 env.Requires ( env['ALL_TARGETS']['TESTS'], all )
 env.Default ( all )
 
+#
+# Additional targets for documentation generation
+#
+docTargets = []
+if 'psddl' in packages:
+    docTargets.append(env.Command('doc/psddl_psana/index.html', env.Dir('psddl'), "ddl_psanadoc doc/psddl_psana/"))
+if 'psana' in packages:
+    docTargets.append(env.Command('doc/psana-doxy/html/index.html', env.Dir('psana'), "doxy-driver -m psana doc/psana-doxy/"))
+if docTargets: 
+    env.Alias ( 'doc', docTargets )
+
 #trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
 trace ( "BUILD_TARGETS is " + pformat( map(str, BUILD_TARGETS) ), "<top>", 1 )
 trace ( "DEFAULT_TARGETS is " + pformat( map(str, DEFAULT_TARGETS) ), "<top>", 1 )

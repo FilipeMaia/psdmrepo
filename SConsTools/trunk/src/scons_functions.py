@@ -31,7 +31,7 @@ def mkdirOrFail ( d ) :
     try :
         if not os.path.isdir( d ) :
             os.makedirs ( d )
-            trace ( "Creating directory `%s'" % d, "mkdirOrFail", 1 )
+            trace ( "Creating directory (1) `%s'" % d, "mkdirOrFail", 1 )
     except :
         fail ( "Failed to create `%s' directory" % ( d, ) )
 
@@ -43,8 +43,11 @@ def mkdirOrFail ( d ) :
 def makePackageLinks ( dirname, packagelist ) :
     
     packageset = set(packagelist)
-    mkdirOrFail ( dirname )
-    existing = set ( os.listdir ( dirname ) )
+    try:
+        existing = set(os.listdir(dirname))
+    except OSError:
+        # likely does not exist
+        existing = set()
     
     # links to delete
     extra = existing - packageset
@@ -60,6 +63,7 @@ def makePackageLinks ( dirname, packagelist ) :
     missing = packageset - existing
     for f in missing :
         if os.path.isdir ( pjoin( f, dirname ) ) :
+            mkdirOrFail ( dirname )
             src = pjoin( "..", f, dirname )
             dst = pjoin( dirname, f )
             try :
