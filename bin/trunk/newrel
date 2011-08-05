@@ -70,6 +70,3 @@ echo "$release" > "$directory/.sit_release" || exit 3
 if [ -r "$reldir/$release/SConstruct" ] ; then
   cp "$reldir/$release/SConstruct" "$directory"
 fi
-
-# create few empty dirs
-mkdir "$directory/arch" "$directory/build" "$directory/data" "$directory/include"
