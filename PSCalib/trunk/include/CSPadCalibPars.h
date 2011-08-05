@@ -49,17 +49,20 @@
 namespace PSCalib {
 
 /**
+ *  @ingroup PSCalib  
  *
- *  This software was developed for the LCLS project.  If you use all or 
+ *  @brief CSPadCalibPars class loads/holds/provides access to the CSPad
+ *  geometry calibration parameters.
+ *
+ *  This software was developed for the LCLS project. If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
+ *  @see CalibFileFinder
  *
  *  @version $Id$
  *
  *  @author Mikhail S. Dubrovin
  */
-
 
 //----------------
 
@@ -76,6 +79,17 @@ public:
   CSPadCalibPars () ;
 
   // Regular constructor
+  /**
+   *  @brief Creates object which holds the calibration parameters.
+   *  
+   *  Loads, holds, and provides access to all calibration types 
+   *  which are necessary for CSPad pixel coordinate geometry.
+   *  
+   *  @param[in] calibDir       Calibration directory for current experiment.
+   *  @param[in] typeGroupName  Data type and group names.
+   *  @param[in] source         The name of the data source.
+   *  @param[in] runNumber      Run number to search the valid file name.
+   */ 
   CSPadCalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/cxi/cxi35711/calib
                    const std::string&   typeGroupName,      //  CsPad::CalibV1
                    const std::string&   source,             //  CxiDs1.0:Cspad.0
