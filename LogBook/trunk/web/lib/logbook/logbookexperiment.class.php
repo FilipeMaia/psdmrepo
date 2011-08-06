@@ -280,7 +280,7 @@ HERE;
         $extra_condition = $condition == '' ? '' : ' AND '.$condition;
         $result = $this->connection->query(
             "SELECT * FROM {$this->connection->database}.run WHERE exper_id=".$this->attr['id'].$extra_condition.
-            ' ORDER BY begin_time DESC'.$limit );
+            ' ORDER BY num, begin_time DESC'.$limit );
 
         $nrows = mysql_numrows( $result );
         for( $i=0; $i<$nrows; $i++ ) {

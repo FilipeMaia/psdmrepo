@@ -4,6 +4,8 @@ namespace LogBook;
 
 require_once( 'logbook.inc.php' );
 
+use LogBook\LogBookException;
+
 /* 
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -185,7 +187,7 @@ class LogBookUtils {
 		$timestamp = '';
 		$msg       = '';
 		$id        = '';
-	
+
 		switch( $type ) {
 		case 'begin_run':
 			$timestamp = $run->begin_time();

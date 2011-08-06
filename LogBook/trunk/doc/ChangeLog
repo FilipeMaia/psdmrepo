@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: 00-01-26
+2011-08-05 Igor Gaponenko
+- added new service for Grabber: RequestExperimentsNew.php
+- fixed an ordering bug in an SQL query for entries
+- fixed a bug in the e-log utilities class
+
 Tag: 00-01-25
 2011-07-12 Igor Gaponenko
 - code refactoring in services to use logbookutil for common operations
