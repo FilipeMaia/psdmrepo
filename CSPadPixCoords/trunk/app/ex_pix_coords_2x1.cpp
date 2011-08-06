@@ -15,7 +15,7 @@
 //-----------------
 
 #include "CSPadPixCoords/PixCoords2x1.h"
-#include "CSPadImage/Image2D.h"
+#include "CSPadPixCoords/Image2D.h"
 
 #include <string>
 #include <iostream>
@@ -52,7 +52,7 @@ void test02()
   }
   }
 
-  CSPadImage::Image2D<float> *img2d = new CSPadImage::Image2D<float>(&arr[0][0],NY,NX);
+  CSPadPixCoords::Image2D<float> *img2d = new CSPadPixCoords::Image2D<float>(&arr[0][0],NY,NX);
   img2d -> saveImageInFile("test.txt",0);
 }
 
@@ -114,7 +114,7 @@ void test03()
   }
   }
 
-  CSPadImage::Image2D<float> *img2d = new CSPadImage::Image2D<float>(&arr[0][0],NY,NX);
+  CSPadPixCoords::Image2D<float> *img2d = new CSPadPixCoords::Image2D<float>(&arr[0][0],NY,NX);
   img2d -> saveImageInFile("test.txt",0);
 }
 
