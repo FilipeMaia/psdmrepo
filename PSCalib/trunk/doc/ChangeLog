@@ -11,9 +11,16 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2011-08-05 Mikhail S. Dubrovin
+- Class CSPadCalibPars provides access to the calibration parameters 
+  for CSPad geometry.
+
 Tag: V00-00-01
 2011-07-21 Mikhail S. Dubrovin
 
+-----------------------------------------------------------------------
+	
 - Class PSCalib/CalibFileFinder is created with central method 
   CalibFileFinder::findCalibFile(...) which similar to the 
   CsPadCalibV1Cvt::findCalibFile(...) from O2OTranslator/CsPadCalibV1Cvt
