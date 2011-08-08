@@ -35,7 +35,8 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 import ConfigParameters as cp
-import PrintHDF5        as printh5
+import GlobalMethods    as gm
+
 #---------------------
 #  Class definition --
 #---------------------
@@ -248,9 +249,9 @@ class GUISelectionWindow ( QtGui.QWidget ) :
         #print 'fillPopupMenuForDataSet'
         self.popupMenuForDataSet.addAction('None')
         for dsname in cp.confpars.list_of_checked_item_names :
-            item_last_name   = printh5.get_item_last_name(dsname)           
-            cspadIsInTheName = printh5.CSpadIsInTheName(dsname)
-            if item_last_name == 'image' or cspadIsInTheName:
+            imageIsInTheName = gm.ImageIsInTheName(dsname)
+            cspadIsInTheName = gm.CSpadIsInTheName(dsname)
+            if imageIsInTheName or cspadIsInTheName:
 
                 self.popupMenuForDataSet.addAction(dsname)
 

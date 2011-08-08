@@ -123,14 +123,14 @@ class DrawEvent ( object ) :
             ds     = self.h5file[dsname]
             self.arr1ev = ds[cp.confpars.eventCurrent]
 
-            if printh5.get_item_last_name(dsname) == 'image' : # Check for IMAGE
+            if gm.ImageIsInTheName(dsname) : # Check for IMAGE
 
                 if not self.dimIsFixed(dsname) :
                     self.arr1ev.shape = (self.arr1ev.shape[1],self.arr1ev.shape[0])
                 self.arr2d = self.arr1ev
 
 
-            elif printh5.CSpadIsInTheName(dsname) :            # Check for CSpad 
+            elif gm.CSpadIsInTheName(dsname) :            # Check for CSpad 
 
                 self.getCSpadConfiguration(dsname)
                 self.arr2d = self.plotsCSpad.getImageArrayForDet( self.arr1ev )
@@ -238,10 +238,10 @@ class DrawEvent ( object ) :
         ind=-1
         for dsname in cp.confpars.list_of_checked_item_names :
 
-            item_last_name = printh5.get_item_last_name(dsname)
-            itemIsForAverage = item_last_name=='image' or    \
+            item_last_name   = gm.get_item_last_name(dsname)
+            itemIsForAverage = gm.ImageIsInTheName(dsname) or \
                                item_last_name=='waveforms' or \
-                               printh5.CSpadIsInTheName(dsname)
+                               gm.CSpadIsInTheName(dsname)
 
             if not itemIsForAverage : continue
 
@@ -391,7 +391,7 @@ class DrawEvent ( object ) :
 
             self.arr1ev = ds[cp.confpars.eventCurrent]
 
-            if printh5.get_item_last_name(dsname) == 'image' : 
+            if gm.get_item_last_name(dsname) == 'image' : 
                 if not self.dimIsFixed(dsname) :
                     self.arr1ev.shape = (self.arr1ev.shape[1],self.arr1ev.shape[0])
 
@@ -423,7 +423,7 @@ class DrawEvent ( object ) :
             gm.saveNumpyArrayInFile(arrQuad, fname='cspad-ave-quad-' + str(quad) + '.txt' , format='%i') # , format='%f')
 
 
-        if item_last_name == 'image' :
+        if gm.ImageIsInTheName(dsname) :
 
             cameraName = gm.get_item_second_to_last_name(dsname)
             gm.saveNumpyArrayInFile(arr1ev, fname='camera-ave-' + str(cameraName) + '.txt' , format='%i') # , format='%f')
@@ -432,12 +432,13 @@ class DrawEvent ( object ) :
 
     def drawArrayForDSName(self, dsname, arr1ev) :
 
-        cspadIsInTheName = printh5.CSpadIsInTheName(dsname)
-        item_last_name = printh5.get_item_last_name(dsname)
+        cspadIsInTheName = gm.CSpadIsInTheName(dsname)
+        imageIsInTheName = gm.ImageIsInTheName(dsname)
+        item_last_name   = gm.get_item_last_name(dsname)
         cp.confpars.current_item_name_for_title = printh5.get_item_name_for_title(dsname)
 
         
-        itemIsForDrawing = item_last_name=='image' or    \
+        itemIsForDrawing = imageIsInTheName            or \
                            item_last_name=='waveforms' or \
                            cspadIsInTheName
         if not itemIsForDrawing : return
@@ -542,7 +543,7 @@ class DrawEvent ( object ) :
                     self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot='Det')
                 else : self.close_fig(self.figNum)
 
-        if item_last_name == 'image' :
+        if imageIsInTheName :
 
             for self.nwin in range(cp.confpars.imageNWindows) :
 

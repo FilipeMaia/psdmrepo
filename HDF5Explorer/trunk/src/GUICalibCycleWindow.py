@@ -542,9 +542,9 @@ class GUICalibCycleWindow ( QtGui.QWidget ) :
 
             item_last_name   = gm.get_item_last_name(dsname)           
             if item_last_name == 'waveforms'        : continue
-            if item_last_name == 'image'            : continue
             if item_last_name == 'timestamps'       : continue
             if not gm.CalibCycleIsInThePath(dsname) : continue
+            if gm.ImageIsInTheName(dsname)          : continue
             if gm.CSpadIsInTheName(dsname)          : continue
  
             self.popupMenuForDataSet.addAction(dsname)

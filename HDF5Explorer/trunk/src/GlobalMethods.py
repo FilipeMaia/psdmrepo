@@ -96,6 +96,26 @@ def get_item_name_for_title(dsname):
 
 #----------------------------------
 
+def ImageIsInTheName(dsname):
+    path1,name1 = os.path.split(str(dsname))
+    path2,name2 = os.path.split(str(path1))
+    path3,name3 = os.path.split(str(path2))
+
+    imageIsInTheName = False
+    if   name1 == 'image' : imageIsInTheName = True
+    elif name1 == 'data' and name3[0:16] == 'Princeton::Frame' : imageIsInTheName = True
+
+    print 'imageIsInTheName :',
+    print '       last name:', name1
+    print '2nd to last name:', name2
+    print '3rd to last name:', name3
+    print 'name3[0:16]', name3[0:16]
+    print 'imageIsInTheName returns:', imageIsInTheName
+
+    return imageIsInTheName
+
+#----------------------------------
+
 def CSpadIsInTheName(dsname):
     path1,name1 = os.path.split(str(dsname))
     path2,name2 = os.path.split(str(path1))
@@ -123,7 +143,7 @@ def CSpadDatasetIsChecked():
 
 def ImageDatasetIsChecked():
     for dsname in cp.confpars.list_of_checked_item_names :
-        if get_item_last_name(dsname) == 'image' : return True
+        if ImageIsInTheName(dsname) : return True
     return False
 
 #----------------------------------

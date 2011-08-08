@@ -36,6 +36,8 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 import ConfigParameters as cp
 import PrintHDF5        as printh5
+import GlobalMethods    as gm
+
 #---------------------
 #  Class definition --
 #---------------------
@@ -543,11 +545,11 @@ class GUICorrelationWindow ( QtGui.QWidget ) :
         self.popupMenuForDataSet.addAction('None')
         for dsname in cp.confpars.list_of_checked_item_names :
 
-            item_last_name   = printh5.get_item_last_name(dsname)           
+            item_last_name   = gm.get_item_last_name(dsname)           
             if item_last_name == 'waveforms'    : continue
-            if item_last_name == 'image'        : continue
             if item_last_name == 'timestamps'   : continue
-            if printh5.CSpadIsInTheName(dsname) : continue
+            if gm.ImageIsInTheName(dsname)      : continue
+            if gm.CSpadIsInTheName(dsname)      : continue
  
             self.popupMenuForDataSet.addAction(dsname)
 
