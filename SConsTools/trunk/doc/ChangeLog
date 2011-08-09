@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-03
+2011-08-08 Andy Salnikov
+- added 'doxy-driver -m psana-modules' to doc target
+
 Tag: V00-01-02
 2011-08-05 Andy Salnikov
 - added 'doc' target which generates doc/ directory with some contents

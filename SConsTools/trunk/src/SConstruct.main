@@ -160,6 +160,8 @@ if 'psddl' in packages:
     docTargets.append(env.Command('doc/psddl_psana/index.html', env.Dir('psddl'), "ddl_psanadoc doc/psddl_psana/"))
 if 'psana' in packages:
     docTargets.append(env.Command('doc/psana-doxy/html/index.html', env.Dir('psana'), "doxy-driver -m psana doc/psana-doxy/"))
+if 'psana' in packages:
+    docTargets.append(env.Command('doc/psana-modules-doxy/html/index.html', env.Dir('psana'), "doxy-driver -m psana-modules doc/psana-modules-doxy/"))
 if docTargets: 
     env.Alias ( 'doc', docTargets )
 
