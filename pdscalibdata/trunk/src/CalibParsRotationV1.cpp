@@ -44,7 +44,7 @@ CalibParsRotationV1::CalibParsRotationV1 ()
 
 //----------------
 
-CalibParsRotationV1::CalibParsRotationV1( const std::vector<float> v_parameters )
+CalibParsRotationV1::CalibParsRotationV1( const std::vector<double> v_parameters )
 {
     if (v_parameters.size() != NUMBER_OF_PARAMETERS) {
         WithMsgLog("CalibParsRotationV1", error, str) {
@@ -54,7 +54,7 @@ CalibParsRotationV1::CalibParsRotationV1( const std::vector<float> v_parameters 
         }       
         abort();
     }
-    size_t arr_size = sizeof( float ) * v_parameters.size();
+    size_t arr_size = sizeof( double ) * v_parameters.size();
     memcpy( &m_rotation, &v_parameters[0], arr_size );
     //this->print();
 }

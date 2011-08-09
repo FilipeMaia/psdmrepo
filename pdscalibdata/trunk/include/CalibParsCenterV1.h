@@ -56,10 +56,10 @@ public:
   enum { NSect = Psana::CsPad::SectorsPerQuad};
   enum { NUMBER_OF_PARAMETERS = 96 };
 
-  CalibParsCenterV1( const std::vector<float> v_parameters );
-  float getCenterX(size_t quad, size_t sect){ return m_center_x[quad][sect]; };
-  float getCenterY(size_t quad, size_t sect){ return m_center_y[quad][sect]; };
-  float getCenterZ(size_t quad, size_t sect){ return m_center_z[quad][sect]; };
+  CalibParsCenterV1( const std::vector<double> v_parameters );
+  double getCenterX(size_t quad, size_t sect){ return m_center_x[quad][sect]; };
+  double getCenterY(size_t quad, size_t sect){ return m_center_y[quad][sect]; };
+  double getCenterZ(size_t quad, size_t sect){ return m_center_z[quad][sect]; };
   void  print();
 
   // Default constructor
@@ -74,9 +74,9 @@ private:
 
   // Data members
   // Segment (2x1) center coordinates from optical measurements
-  float m_center_x[NQuad][NSect];
-  float m_center_y[NQuad][NSect];
-  float m_center_z[NQuad][NSect];  
+  double m_center_x[NQuad][NSect];
+  double m_center_y[NQuad][NSect];
+  double m_center_z[NQuad][NSect];  
 
   // Copy constructor and assignment are disabled by default
   CalibParsCenterV1 ( const CalibParsCenterV1& ) ;

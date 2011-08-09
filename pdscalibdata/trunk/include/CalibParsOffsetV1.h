@@ -55,10 +55,10 @@ public:
   enum { NQuad = Psana::CsPad::MaxQuadsPerSensor};
   enum { NUMBER_OF_PARAMETERS = 12 };
 
-  CalibParsOffsetV1( const std::vector<float> v_parameters );
-  float getOffsetX(size_t quad){ return m_offset_x[quad]; };
-  float getOffsetY(size_t quad){ return m_offset_y[quad]; };
-  float getOffsetZ(size_t quad){ return m_offset_z[quad]; };
+  CalibParsOffsetV1( const std::vector<double> v_parameters );
+  double getOffsetX(size_t quad){ return m_offset_x[quad]; };
+  double getOffsetY(size_t quad){ return m_offset_y[quad]; };
+  double getOffsetZ(size_t quad){ return m_offset_z[quad]; };
   void  print();
 
   // Default constructor
@@ -73,9 +73,9 @@ private:
 
   // Data members
   // Offsets of four quads in the detector
-  float m_offset_x[NQuad];
-  float m_offset_y[NQuad];
-  float m_offset_z[NQuad];  
+  double m_offset_x[NQuad];
+  double m_offset_y[NQuad];
+  double m_offset_z[NQuad];  
 
   // Copy constructor and assignment are disabled by default
   CalibParsOffsetV1 ( const CalibParsOffsetV1& ) ;

@@ -45,7 +45,7 @@ CalibParsQuadTiltV1::CalibParsQuadTiltV1 ()
 
 //----------------
 
-CalibParsQuadTiltV1::CalibParsQuadTiltV1( const std::vector<float> v_parameters )
+CalibParsQuadTiltV1::CalibParsQuadTiltV1( const std::vector<double> v_parameters )
 {
     if (v_parameters.size() != NUMBER_OF_PARAMETERS) {
         WithMsgLog("CalibParsQuadTiltV1", error, str) {
@@ -55,7 +55,7 @@ CalibParsQuadTiltV1::CalibParsQuadTiltV1( const std::vector<float> v_parameters 
         }       
         abort();
     }
-    size_t arr_size = sizeof( float ) * v_parameters.size();
+    size_t arr_size = sizeof( double ) * v_parameters.size();
     memcpy( &m_quad_tilt, &v_parameters[0], arr_size );
     //this->print();
 }

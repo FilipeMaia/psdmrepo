@@ -55,10 +55,10 @@ public:
   enum { NSect = Psana::CsPad::SectorsPerQuad};
   enum { NUMBER_OF_PARAMETERS = 96 };
 
-  CalibParsCenterCorrV1( const std::vector<float> v_parameters );
-  float getCenterCorrX(size_t quad, size_t sect){ return m_center_corr_x[quad][sect]; };
-  float getCenterCorrY(size_t quad, size_t sect){ return m_center_corr_y[quad][sect]; };
-  float getCenterCorrZ(size_t quad, size_t sect){ return m_center_corr_z[quad][sect]; };
+  CalibParsCenterCorrV1( const std::vector<double> v_parameters );
+  double getCenterCorrX(size_t quad, size_t sect){ return m_center_corr_x[quad][sect]; };
+  double getCenterCorrY(size_t quad, size_t sect){ return m_center_corr_y[quad][sect]; };
+  double getCenterCorrZ(size_t quad, size_t sect){ return m_center_corr_z[quad][sect]; };
   void  print();
 
   // Default constructor
@@ -73,9 +73,9 @@ private:
 
   // Data members
   // Segment (2x1) center coordinate corrections from my semi-manual alignment
-  float m_center_corr_x[NQuad][NSect];
-  float m_center_corr_y[NQuad][NSect];
-  float m_center_corr_z[NQuad][NSect];
+  double m_center_corr_x[NQuad][NSect];
+  double m_center_corr_y[NQuad][NSect];
+  double m_center_corr_z[NQuad][NSect];
 
   // Copy constructor and assignment are disabled by default
   CalibParsCenterCorrV1 ( const CalibParsCenterCorrV1& ) ;

@@ -45,7 +45,7 @@ CalibParsTiltV1::CalibParsTiltV1 ()
 
 //----------------
 
-CalibParsTiltV1::CalibParsTiltV1( const std::vector<float> v_parameters )
+CalibParsTiltV1::CalibParsTiltV1( const std::vector<double> v_parameters )
 {
     if (v_parameters.size() != NUMBER_OF_PARAMETERS) {
         WithMsgLog("CalibParsTiltV1", error, str) {
@@ -55,7 +55,7 @@ CalibParsTiltV1::CalibParsTiltV1( const std::vector<float> v_parameters )
         }       
         abort();
     }
-    size_t arr_size = sizeof( float ) * v_parameters.size();
+    size_t arr_size = sizeof( double ) * v_parameters.size();
     memcpy( &m_tilt, &v_parameters[0], arr_size );
     //this->print();
 }

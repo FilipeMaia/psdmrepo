@@ -54,8 +54,8 @@ public:
   enum { NQuad = Psana::CsPad::MaxQuadsPerSensor};
   enum { NUMBER_OF_PARAMETERS = 4 };
 
-  CalibParsQuadTiltV1( const std::vector<float> v_parameters );
-  float getQuadTilt(size_t quad){ return m_quad_tilt[quad]; };
+  CalibParsQuadTiltV1( const std::vector<double> v_parameters );
+  double getQuadTilt(size_t quad){ return m_quad_tilt[quad]; };
   void  print();
 
   // Default constructor
@@ -70,7 +70,7 @@ private:
 
   // Data members
   // Segment (2x1) tilt angles from optical measurements
-  float m_quad_tilt[NQuad];  
+  double m_quad_tilt[NQuad];  
 
   // Copy constructor and assignment are disabled by default
   CalibParsQuadTiltV1 ( const CalibParsQuadTiltV1& ) ;

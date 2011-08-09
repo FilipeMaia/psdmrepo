@@ -55,8 +55,8 @@ public:
   enum { NSect = Psana::CsPad::SectorsPerQuad};
   enum { NUMBER_OF_PARAMETERS = 32 };
 
-  CalibParsTiltV1( const std::vector<float> v_parameters );
-  float getTilt(size_t quad, size_t sect){ return m_tilt[quad][sect]; };
+  CalibParsTiltV1( const std::vector<double> v_parameters );
+  double getTilt(size_t quad, size_t sect){ return m_tilt[quad][sect]; };
   void  print();
 
   // Default constructor
@@ -71,7 +71,7 @@ private:
 
   // Data members
   // Segment (2x1) tilt angles from optical measurements
-  float m_tilt[NQuad][NSect];  
+  double m_tilt[NQuad][NSect];  
 
   // Copy constructor and assignment are disabled by default
   CalibParsTiltV1 ( const CalibParsTiltV1& ) ;

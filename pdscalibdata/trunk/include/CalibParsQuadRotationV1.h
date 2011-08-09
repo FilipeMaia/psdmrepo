@@ -54,8 +54,8 @@ public:
   enum { NQuad = Psana::CsPad::MaxQuadsPerSensor};
   enum { NUMBER_OF_PARAMETERS = 4 };
 
-  CalibParsQuadRotationV1( const std::vector<float> v_parameters );
-  float getQuadRotation(size_t quad){ return m_quad_rotation[quad]; };
+  CalibParsQuadRotationV1( const std::vector<double> v_parameters );
+  double getQuadRotation(size_t quad){ return m_quad_rotation[quad]; };
   void  print();
 
   // Default constructor
@@ -70,7 +70,7 @@ private:
 
   // Data members
   // Segment (2x1) nominal rotation angles (0,90,180,270)
-  float m_quad_rotation[NQuad];
+  double m_quad_rotation[NQuad];
   
   // Copy constructor and assignment are disabled by default
   CalibParsQuadRotationV1 ( const CalibParsQuadRotationV1& ) ;

@@ -44,7 +44,7 @@ CalibParsMargGapShiftV1::CalibParsMargGapShiftV1 ()
 
 //----------------
 
-CalibParsMargGapShiftV1::CalibParsMargGapShiftV1( const std::vector<float> v_parameters )
+CalibParsMargGapShiftV1::CalibParsMargGapShiftV1( const std::vector<double> v_parameters )
 {
     if (v_parameters.size() != NUMBER_OF_PARAMETERS) {
         WithMsgLog("CalibParsMargGapShiftV1", error, str) {

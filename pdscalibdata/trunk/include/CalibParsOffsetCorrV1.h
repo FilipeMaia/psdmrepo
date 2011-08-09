@@ -55,10 +55,10 @@ public:
   enum { NQuad = Psana::CsPad::MaxQuadsPerSensor};
   enum { NUMBER_OF_PARAMETERS = 12 };
 
-  CalibParsOffsetCorrV1( const std::vector<float> v_parameters );
-  float getOffsetCorrX(size_t quad){ return m_offset_corr_x[quad]; };
-  float getOffsetCorrY(size_t quad){ return m_offset_corr_y[quad]; };
-  float getOffsetCorrZ(size_t quad){ return m_offset_corr_z[quad]; };
+  CalibParsOffsetCorrV1( const std::vector<double> v_parameters );
+  double getOffsetCorrX(size_t quad){ return m_offset_corr_x[quad]; };
+  double getOffsetCorrY(size_t quad){ return m_offset_corr_y[quad]; };
+  double getOffsetCorrZ(size_t quad){ return m_offset_corr_z[quad]; };
   void  print();
 
   // Default constructor
@@ -73,9 +73,9 @@ private:
 
   // Data members
   // Offsets of four quad corrections in the detector
-  float m_offset_corr_x[NQuad];
-  float m_offset_corr_y[NQuad];
-  float m_offset_corr_z[NQuad];
+  double m_offset_corr_x[NQuad];
+  double m_offset_corr_y[NQuad];
+  double m_offset_corr_z[NQuad];
 
   // Copy constructor and assignment are disabled by default
   CalibParsOffsetCorrV1 ( const CalibParsOffsetCorrV1& ) ;

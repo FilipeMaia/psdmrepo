@@ -56,22 +56,22 @@ public:
 
   enum { NUMBER_OF_PARAMETERS = 12 };
 
-  CalibParsMargGapShiftV1( const std::vector<float> v_parameters );
-  float getQuadMargX () { return m_quad_marg_x; };
-  float getQuadMargY () { return m_quad_marg_y; };
-  float getQuadMargZ () { return m_quad_marg_z; };
+  CalibParsMargGapShiftV1( const std::vector<double> v_parameters );
+  double getQuadMargX () { return m_quad_marg_x; };
+  double getQuadMargY () { return m_quad_marg_y; };
+  double getQuadMargZ () { return m_quad_marg_z; };
 
-  float getMargX () { return m_marg_x; };
-  float getMargY () { return m_marg_y; };
-  float getMargZ () { return m_marg_z; };
+  double getMargX () { return m_marg_x; };
+  double getMargY () { return m_marg_y; };
+  double getMargZ () { return m_marg_z; };
 
-  float getGapX  () { return m_gap_x; };
-  float getGapY  () { return m_gap_y; };
-  float getGapZ  () { return m_gap_z; };
+  double getGapX  () { return m_gap_x; };
+  double getGapY  () { return m_gap_y; };
+  double getGapZ  () { return m_gap_z; };
 
-  float getShiftX() { return m_shift_x; };
-  float getShiftY() { return m_shift_y; };
-  float getShiftZ() { return m_shift_z; };
+  double getShiftX() { return m_shift_x; };
+  double getShiftY() { return m_shift_y; };
+  double getShiftZ() { return m_shift_z; };
   void  print();
 
   // Default constructor
@@ -86,21 +86,21 @@ private:
 
   // Data members
   // Quad margine, CSPad margine, gap, and shift of/between four quads in the detector
-  float m_quad_marg_x;
-  float m_quad_marg_y;
-  float m_quad_marg_z;
+  double m_quad_marg_x;
+  double m_quad_marg_y;
+  double m_quad_marg_z;
 
-  float m_marg_x;
-  float m_marg_y;
-  float m_marg_z;
+  double m_marg_x;
+  double m_marg_y;
+  double m_marg_z;
 
-  float m_gap_x;
-  float m_gap_y;
-  float m_gap_z;
+  double m_gap_x;
+  double m_gap_y;
+  double m_gap_z;
 
-  float m_shift_x;
-  float m_shift_y;
-  float m_shift_z;  
+  double m_shift_x;
+  double m_shift_y;
+  double m_shift_z;  
 
 
   // Copy constructor and assignment are disabled by default

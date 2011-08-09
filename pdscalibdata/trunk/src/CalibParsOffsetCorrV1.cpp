@@ -43,7 +43,7 @@ CalibParsOffsetCorrV1::CalibParsOffsetCorrV1 ()
 }
 //----------------
 
-CalibParsOffsetCorrV1::CalibParsOffsetCorrV1( const std::vector<float> v_parameters )
+CalibParsOffsetCorrV1::CalibParsOffsetCorrV1( const std::vector<double> v_parameters )
 {
     if (v_parameters.size() != NUMBER_OF_PARAMETERS) {
         WithMsgLog("CalibParsOffsetCorrV1", error, str) {
@@ -54,7 +54,7 @@ CalibParsOffsetCorrV1::CalibParsOffsetCorrV1( const std::vector<float> v_paramet
         abort();
     }
     size_t NPars    = NQuad;
-    size_t arr_size = sizeof( float ) * v_parameters.size()/3;
+    size_t arr_size = sizeof( double ) * v_parameters.size()/3;
     memcpy( &m_offset_corr_x, &v_parameters[0],       arr_size );
     memcpy( &m_offset_corr_y, &v_parameters[NPars],   arr_size );
     memcpy( &m_offset_corr_z, &v_parameters[NPars*2], arr_size );

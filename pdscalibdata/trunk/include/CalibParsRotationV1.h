@@ -55,8 +55,8 @@ public:
   enum { NSect = Psana::CsPad::SectorsPerQuad};
   enum { NUMBER_OF_PARAMETERS = 32 };
 
-  CalibParsRotationV1( const std::vector<float> v_parameters );
-  float getRotation(size_t quad, size_t sect){ return m_rotation[quad][sect]; };
+  CalibParsRotationV1( const std::vector<double> v_parameters );
+  double getRotation(size_t quad, size_t sect){ return m_rotation[quad][sect]; };
   void  print();
 
   // Default constructor
@@ -71,7 +71,7 @@ private:
 
   // Data members
   // Segment (2x1) nominal rotation angles (0,90,180,270)
-  float m_rotation[NQuad][NSect];  
+  double m_rotation[NQuad][NSect];  
 
   // Copy constructor and assignment are disabled by default
   CalibParsRotationV1 ( const CalibParsRotationV1& ) ;
