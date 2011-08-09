@@ -1,0 +1,37 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package CSPadPixCoords
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-03
+2011-08-08 Andy Salnikov
+- moved test app from app/ to test/, disable unit tests running
+- added @addtogroup to all headers to generate separate module for this 
+  package in doxygen documentation
+
+Tag: V00-00-02
+2011-08-05 Mikhail S. Dubrovin
+- The same as previous, but add missing modules...
+
+
+Tag: V00-00-01
+2011-08-05 Mikhail S. Dubrovin
+- The 1st version which provides the 2x1-section, quad, and CSPad
+  pixel coordinates as well as the Image2D object in the event.
+
+
+2011-07-25 Mikhail S. Dubrovin
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
+
