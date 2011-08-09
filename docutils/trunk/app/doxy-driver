@@ -3,6 +3,7 @@
 # $Id$
 
 pack_psana="PSEnv PSEvt PSTime PSXtcInput PSHist RootHistoManager psana psana/doc/mainpage.dox"
+pack_psana_mod="CSPadPixCoords  PSCalib"
 
 usage() {
   echo "Usage: $(basename $0) [options] output-dir [package ...]"
@@ -14,6 +15,7 @@ usage() {
   echo
   echo "Predefined modes:"
   echo "   psana (default)"
+  echo "   psana-modules"
   echo
   echo "If the list of packages is provided then mode is ignored"
 }
@@ -47,6 +49,7 @@ if [ $# -ne 0 ] ; then
 else
   case $mode in
     psana) packages="$pack_psana" ;;
+    psana-modules) packages="$pack_psana_mod" ;;
     \?) usage ; exit 2 ;;
   esac
 fi
