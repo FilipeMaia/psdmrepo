@@ -113,53 +113,53 @@ public:
 
   void fillCalibParsV1();
 
-  float getCenterX(size_t quad, size_t sect){ return m_center -> getCenterX(quad,sect); };
-  float getCenterY(size_t quad, size_t sect){ return m_center -> getCenterY(quad,sect); };
-  float getCenterZ(size_t quad, size_t sect){ return m_center -> getCenterZ(quad,sect); };
+  double getCenterX(size_t quad, size_t sect){ return m_center -> getCenterX(quad,sect); };
+  double getCenterY(size_t quad, size_t sect){ return m_center -> getCenterY(quad,sect); };
+  double getCenterZ(size_t quad, size_t sect){ return m_center -> getCenterZ(quad,sect); };
 
-  float getCenterCorrX(size_t quad, size_t sect){ return m_center_corr -> getCenterCorrX(quad,sect); };
-  float getCenterCorrY(size_t quad, size_t sect){ return m_center_corr -> getCenterCorrY(quad,sect); };
-  float getCenterCorrZ(size_t quad, size_t sect){ return m_center_corr -> getCenterCorrZ(quad,sect); };
+  double getCenterCorrX(size_t quad, size_t sect){ return m_center_corr -> getCenterCorrX(quad,sect); };
+  double getCenterCorrY(size_t quad, size_t sect){ return m_center_corr -> getCenterCorrY(quad,sect); };
+  double getCenterCorrZ(size_t quad, size_t sect){ return m_center_corr -> getCenterCorrZ(quad,sect); };
 
-  float getQuadMargX () { return m_marg_gap_shift -> getQuadMargX ();};
-  float getQuadMargY () { return m_marg_gap_shift -> getQuadMargY ();};
-  float getQuadMargZ () { return m_marg_gap_shift -> getQuadMargZ ();};
+  double getQuadMargX () { return m_marg_gap_shift -> getQuadMargX ();};
+  double getQuadMargY () { return m_marg_gap_shift -> getQuadMargY ();};
+  double getQuadMargZ () { return m_marg_gap_shift -> getQuadMargZ ();};
 
-  float getMargX () { return m_marg_gap_shift -> getMargX ();};
-  float getMargY () { return m_marg_gap_shift -> getMargY ();};
-  float getMargZ () { return m_marg_gap_shift -> getMargZ ();};
+  double getMargX () { return m_marg_gap_shift -> getMargX ();};
+  double getMargY () { return m_marg_gap_shift -> getMargY ();};
+  double getMargZ () { return m_marg_gap_shift -> getMargZ ();};
 					                 
-  float getGapX  () { return m_marg_gap_shift -> getGapX  ();};
-  float getGapY  () { return m_marg_gap_shift -> getGapY  ();};
-  float getGapZ  () { return m_marg_gap_shift -> getGapZ  ();};
+  double getGapX  () { return m_marg_gap_shift -> getGapX  ();};
+  double getGapY  () { return m_marg_gap_shift -> getGapY  ();};
+  double getGapZ  () { return m_marg_gap_shift -> getGapZ  ();};
 					                 
-  float getShiftX() { return m_marg_gap_shift -> getShiftX(); };
-  float getShiftY() { return m_marg_gap_shift -> getShiftY(); };
-  float getShiftZ() { return m_marg_gap_shift -> getShiftZ(); };
+  double getShiftX() { return m_marg_gap_shift -> getShiftX(); };
+  double getShiftY() { return m_marg_gap_shift -> getShiftY(); };
+  double getShiftZ() { return m_marg_gap_shift -> getShiftZ(); };
 
-  float getOffsetX(size_t quad) { return m_offset -> getOffsetX(quad); };
-  float getOffsetY(size_t quad) { return m_offset -> getOffsetY(quad); };
-  float getOffsetZ(size_t quad) { return m_offset -> getOffsetZ(quad); };
+  double getOffsetX(size_t quad) { return m_offset -> getOffsetX(quad); };
+  double getOffsetY(size_t quad) { return m_offset -> getOffsetY(quad); };
+  double getOffsetZ(size_t quad) { return m_offset -> getOffsetZ(quad); };
 
-  float getOffsetCorrX(size_t quad) { return m_offset_corr -> getOffsetCorrX(quad); };
-  float getOffsetCorrY(size_t quad) { return m_offset_corr -> getOffsetCorrY(quad); };
-  float getOffsetCorrZ(size_t quad) { return m_offset_corr -> getOffsetCorrZ(quad); };
+  double getOffsetCorrX(size_t quad) { return m_offset_corr -> getOffsetCorrX(quad); };
+  double getOffsetCorrY(size_t quad) { return m_offset_corr -> getOffsetCorrY(quad); };
+  double getOffsetCorrZ(size_t quad) { return m_offset_corr -> getOffsetCorrZ(quad); };
 
-  float getRotation(size_t quad, size_t sect) { return m_rotation -> getRotation(quad,sect); };
-  float getTilt    (size_t quad, size_t sect) { return m_tilt     -> getTilt    (quad,sect); };
+  double getRotation(size_t quad, size_t sect) { return m_rotation -> getRotation(quad,sect); };
+  double getTilt    (size_t quad, size_t sect) { return m_tilt     -> getTilt    (quad,sect); };
 
-  float getQuadRotation(size_t quad) { return m_quad_rotation -> getQuadRotation(quad); };
-  float getQuadTilt    (size_t quad) { return m_quad_tilt     -> getQuadTilt    (quad); };
+  double getQuadRotation(size_t quad) { return m_quad_rotation -> getQuadRotation(quad); };
+  double getQuadTilt    (size_t quad) { return m_quad_tilt     -> getQuadTilt    (quad); };
 
-  static float getRowSize_um()   { return 109.92; }  // pixel size of the row in um                                           
-  static float getColSize_um()   { return 109.92; }  // pixel size of the column in um                                        
-  static float getGapRowSize_um(){ return 274.80; }  // pixel size of the gap column in um
-  static float getGapSize_um()   { return 2*getGapRowSize_um() - getRowSize_um(); }  // pixel size of the total gap in um 
-  static float getOrtSize_um()   { return 500.00; }  // pixel size of the ortogonal dimension in um                                        
+  static double getRowSize_um()   { return 109.92; }  // pixel size of the row in um                                           
+  static double getColSize_um()   { return 109.92; }  // pixel size of the column in um                                        
+  static double getGapRowSize_um(){ return 274.80; }  // pixel size of the gap column in um
+  static double getGapSize_um()   { return 2*getGapRowSize_um() - getRowSize_um(); }  // pixel size of the total gap in um 
+  static double getOrtSize_um()   { return 500.00; }  // pixel size of the ortogonal dimension in um                                        
 
-  static float getRowUmToPix()   { return 1./getRowSize_um(); } // conversion factor of um to pixels for rows
-  static float getColUmToPix()   { return 1./getColSize_um(); } // conversion factor of um to pixels for columns 
-  static float getOrtUmToPix()   { return 1.; }                 // conversion factor of um to pixels for ort
+  static double getRowUmToPix()   { return 1./getRowSize_um(); } // conversion factor of um to pixels for rows
+  static double getColUmToPix()   { return 1./getColSize_um(); } // conversion factor of um to pixels for columns 
+  static double getOrtUmToPix()   { return 1.; }                 // conversion factor of um to pixels for ort
 
 private:
 
@@ -187,7 +187,7 @@ private:
   unsigned long m_runNumber;
 
   std::vector<std::string> v_calibname; // center, center_corr, off_gap_shift, offset, offset_corr, rotation, tilt, ...
-  std::vector<float>       v_parameters;
+  std::vector<double>      v_parameters;
 
   std::string m_cur_calibname;  
   std::string m_fname;
