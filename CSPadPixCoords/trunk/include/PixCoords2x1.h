@@ -101,25 +101,25 @@ public:
    *  indexes after the 2x1 rotation by n*90 degree.
    *  The pixel coordinates can be returned in um(micrometer) and pix(pixel).
    */
-  float getPixCoorRot000_um  (COORDINATE icoor, unsigned row, unsigned col) ;
-  float getPixCoorRot090_um  (COORDINATE icoor, unsigned row, unsigned col) ;
-  float getPixCoorRot180_um  (COORDINATE icoor, unsigned row, unsigned col) ;
-  float getPixCoorRot270_um  (COORDINATE icoor, unsigned row, unsigned col) ;
+  double getPixCoorRot000_um  (COORDINATE icoor, unsigned row, unsigned col) ;
+  double getPixCoorRot090_um  (COORDINATE icoor, unsigned row, unsigned col) ;
+  double getPixCoorRot180_um  (COORDINATE icoor, unsigned row, unsigned col) ;
+  double getPixCoorRot270_um  (COORDINATE icoor, unsigned row, unsigned col) ;
  
-  float getPixCoorRot000_pix (COORDINATE icoor, unsigned row, unsigned col) ;
-  float getPixCoorRot090_pix (COORDINATE icoor, unsigned row, unsigned col) ;
-  float getPixCoorRot180_pix (COORDINATE icoor, unsigned row, unsigned col) ;
-  float getPixCoorRot270_pix (COORDINATE icoor, unsigned row, unsigned col) ;
+  double getPixCoorRot000_pix (COORDINATE icoor, unsigned row, unsigned col) ;
+  double getPixCoorRot090_pix (COORDINATE icoor, unsigned row, unsigned col) ;
+  double getPixCoorRot180_pix (COORDINATE icoor, unsigned row, unsigned col) ;
+  double getPixCoorRot270_pix (COORDINATE icoor, unsigned row, unsigned col) ;
 
-  float getPixCoorRotN90_um  (ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col) ;
-  float getPixCoorRotN90_pix (ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col) ;
-  float getPixCoorRotN90     (UNITS units, ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col) ;
+  double getPixCoorRotN90_um  (ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col) ;
+  double getPixCoorRotN90_pix (ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col) ;
+  double getPixCoorRotN90     (UNITS units, ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col) ;
 
-  static ORIENTATION getOrientation(float angle) ;
+  static ORIENTATION getOrientation(double angle) ;
   static size_t getNCols     (ORIENTATION n90) ;
   static size_t getNRows     (ORIENTATION n90) ;
-  float  getXCenterOffset_um (ORIENTATION n90) ; 
-  float  getYCenterOffset_um (ORIENTATION n90) ; 
+  double  getXCenterOffset_um (ORIENTATION n90) ; 
+  double  getYCenterOffset_um (ORIENTATION n90) ; 
 
   void print_member_data () ;
   void print_selected_coords_2x1 (ARRAXIS arraxis) ;
@@ -129,25 +129,25 @@ protected:
 private:
 
   // Data members
-  float  m_row_size_um;
-  float  m_col_size_um;
-  float  m_gap_size_um;
-  float  m_coor_row_max;
-  float  m_coor_col_max;
+  double  m_row_size_um;
+  double  m_col_size_um;
+  double  m_gap_size_um;
+  double  m_coor_row_max;
+  double  m_coor_col_max;
 
   // Cols and rows are interchanged in order to have an order of arrays like in ONLINE.
-  float  m_coor_row[NRows2x1];  
-  float  m_coor_col[NCols2x1];  
-  float  m_coor_ort[NCols2x1][NRows2x1];  
+  double  m_coor_row[NRows2x1];  
+  double  m_coor_col[NCols2x1];  
+  double  m_coor_ort[NCols2x1][NRows2x1];  
 
-  float  k_center_of_rows_um; 
-  float  k_center_of_cols_um; 
-  float  k_center_of_rows_pix; 
-  float  k_center_of_cols_pix; 
+  double  k_center_of_rows_um; 
+  double  k_center_of_cols_um; 
+  double  k_center_of_rows_pix; 
+  double  k_center_of_cols_pix; 
 
-  float  k_row_um_to_pix;
-  float  k_col_um_to_pix;
-  float  k_ort_um_to_pix;
+  double  k_row_um_to_pix;
+  double  k_col_um_to_pix;
+  double  k_ort_um_to_pix;
 
   // Copy constructor and assignment are disabled by default
   PixCoords2x1 ( const PixCoords2x1& ) ;

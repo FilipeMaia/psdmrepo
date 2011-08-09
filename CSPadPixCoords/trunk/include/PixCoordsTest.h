@@ -140,22 +140,22 @@ private:
   CSPadPixCoords::PixCoords2x1::COORDINATE ZCOOR;
 	
   uint32_t  m_cspad_ind;
-  float    *m_coor_x_pix;
-  float    *m_coor_y_pix;
+  double    *m_coor_x_pix;
+  double    *m_coor_y_pix;
   uint32_t *m_coor_x_int;
   uint32_t *m_coor_y_int;
 
   enum{ NX_2x1=500, 
         NY_2x1=500 };
-  float m_arr_2x1_image[NX_2x1][NY_2x1];
+  double m_arr_2x1_image[NX_2x1][NY_2x1];
 
   enum{ NX_QUAD=850, 
         NY_QUAD=850 };
-  float m_arr_quad_image[NX_QUAD][NY_QUAD];
+  double m_arr_quad_image[NX_QUAD][NY_QUAD];
 
   enum{ NX_CSPAD=1750, 
         NY_CSPAD=1750 };
-  float m_arr_cspad_image[NX_CSPAD][NY_CSPAD];
+  double m_arr_cspad_image[NX_CSPAD][NY_CSPAD];
 
 };
 

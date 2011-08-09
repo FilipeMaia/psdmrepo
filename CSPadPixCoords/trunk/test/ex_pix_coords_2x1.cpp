@@ -44,7 +44,7 @@ void test01()
 void test02()
 {
   enum{ NX=600, NY=300 };
-  float arr[NY][NX];
+  double arr[NY][NX];
 
   for (unsigned iy=0; iy<NY; iy++){
   for (unsigned ix=0; ix<NX; ix++){
@@ -52,7 +52,7 @@ void test02()
   }
   }
 
-  CSPadPixCoords::Image2D<float> *img2d = new CSPadPixCoords::Image2D<float>(&arr[0][0],NY,NX);
+  CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(&arr[0][0],NY,NX);
   img2d -> saveImageInFile("test.txt",0);
 }
 
@@ -63,7 +63,7 @@ void test03()
 
   // Initialization
   enum{ NX=500, NY=500 };
-  float arr[NY][NX];
+  double arr[NY][NX];
   for (unsigned iy=0; iy<NY; iy++){
   for (unsigned ix=0; ix<NX; ix++){
     arr[iy][ix] = 0;
@@ -87,7 +87,7 @@ void test03()
 
 
 
-  //float um_to_pixels = 1./109.92;
+  //double um_to_pixels = 1./109.92;
   //unsigned c=100;
 
   unsigned mrgx=20;
@@ -96,8 +96,8 @@ void test03()
   for (unsigned r=0; r<NROWS; r++){
   for (unsigned c=0; c<NCOLS; c++){
 
-    float x = pix_coords_2x1 -> getPixCoorRotN90_pix (rot, X, r, c);
-    float y = pix_coords_2x1 -> getPixCoorRotN90_pix (rot, Y, r, c);
+    double x = pix_coords_2x1 -> getPixCoorRotN90_pix (rot, X, r, c);
+    double y = pix_coords_2x1 -> getPixCoorRotN90_pix (rot, Y, r, c);
 
     //int iy = mrgy + (int)(y*um_to_pixels);
     //int ix = mrgx + (int)(x*um_to_pixels);
@@ -114,7 +114,7 @@ void test03()
   }
   }
 
-  CSPadPixCoords::Image2D<float> *img2d = new CSPadPixCoords::Image2D<float>(&arr[0][0],NY,NX);
+  CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(&arr[0][0],NY,NX);
   img2d -> saveImageInFile("test.txt",0);
 }
 

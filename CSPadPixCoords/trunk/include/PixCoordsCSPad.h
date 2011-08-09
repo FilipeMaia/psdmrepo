@@ -87,17 +87,17 @@ public:
    *  Access methods return the CSPad pixel coordinate for indicated axis, quad, section, row, and column indexes.
    *  The pixel coordinates can be returned in um(micrometers), pix(pixels), or int(integer pixel index).
    */
-  float getPixCoor_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
-  float getPixCoor_pix(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
-  float getPixCoor_int(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
+  double getPixCoor_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
+  double getPixCoor_pix(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
+  double getPixCoor_int(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
 
   /**
    *  The group of methods which provide the direct access to coordinate arrays.
    */
-  float*    getPixCoorArrX_um (){return &m_coor_x    [0][0][0][0];}
-  float*    getPixCoorArrY_um (){return &m_coor_y    [0][0][0][0];}
-  float*    getPixCoorArrX_pix(){return &m_coor_x_pix[0][0][0][0];}
-  float*    getPixCoorArrY_pix(){return &m_coor_y_pix[0][0][0][0];}
+  double*    getPixCoorArrX_um (){return &m_coor_x    [0][0][0][0];}
+  double*    getPixCoorArrY_um (){return &m_coor_y    [0][0][0][0];}
+  double*    getPixCoorArrX_pix(){return &m_coor_x_pix[0][0][0][0];}
+  double*    getPixCoorArrY_pix(){return &m_coor_y_pix[0][0][0][0];}
   uint32_t* getPixCoorArrX_int(){return &m_coor_x_int[0][0][0][0];}
   uint32_t* getPixCoorArrY_int(){return &m_coor_y_int[0][0][0][0];}
 
@@ -108,26 +108,26 @@ private:
   CSPadPixCoords::PixCoords2x1::COORDINATE YCOOR;
   CSPadPixCoords::PixCoords2x1::COORDINATE ZCOOR;
 
-  float m_degToRad; 
+  double m_degToRad; 
 
   PixCoordsQuad           *m_pix_coords_quad;  
   PSCalib::CSPadCalibPars *m_cspad_calibpar;  
   bool                     m_tiltIsApplied;
 
-  float    m_coor_x    [NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
-  float    m_coor_y    [NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
-  float    m_coor_x_pix[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
-  float    m_coor_y_pix[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
+  double    m_coor_x    [NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
+  double    m_coor_y    [NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
+  double    m_coor_x_pix[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
+  double    m_coor_y_pix[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
   uint32_t m_coor_x_int[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
   uint32_t m_coor_y_int[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
 
-  float    m_xmin_quad [NQuadsInCSPad]; 
-  float    m_ymin_quad [NQuadsInCSPad]; 
+  double    m_xmin_quad [NQuadsInCSPad]; 
+  double    m_ymin_quad [NQuadsInCSPad]; 
 
-  float m_coor_x_min;
-  float m_coor_y_min;
-  float m_coor_x_max;
-  float m_coor_y_max;
+  double m_coor_x_min;
+  double m_coor_y_min;
+  double m_coor_x_max;
+  double m_coor_y_max;
 
   // Copy constructor and assignment are disabled by default
   PixCoordsCSPad ( const PixCoordsCSPad& ) ;

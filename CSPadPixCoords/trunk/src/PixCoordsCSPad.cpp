@@ -68,17 +68,17 @@ void PixCoordsCSPad::fillAllQuadCoordsInCSPad()
         m_coor_y_min = 1e5;
         m_coor_y_max = 0;
 
-        float pixSize_um = PSCalib::CSPadCalibPars::getRowSize_um();
+        double pixSize_um = PSCalib::CSPadCalibPars::getRowSize_um();
 
-        float margX  = m_cspad_calibpar -> getMargX  ();
-        float margY  = m_cspad_calibpar -> getMargY  ();
-        float gapX   = m_cspad_calibpar -> getGapX   ();
-        float gapY   = m_cspad_calibpar -> getGapY   ();
-        float shiftX = m_cspad_calibpar -> getShiftX ();
-        float shiftY = m_cspad_calibpar -> getShiftY ();
+        double margX  = m_cspad_calibpar -> getMargX  ();
+        double margY  = m_cspad_calibpar -> getMargY  ();
+        double gapX   = m_cspad_calibpar -> getGapX   ();
+        double gapY   = m_cspad_calibpar -> getGapY   ();
+        double shiftX = m_cspad_calibpar -> getShiftX ();
+        double shiftY = m_cspad_calibpar -> getShiftY ();
 
-        float dx[] = {margX-gapX+shiftX,  margX-gapX-shiftX,  margX+gapX-shiftX,  margX+gapX+shiftX};
-        float dy[] = {margY-gapY-shiftY,  margY+gapY-shiftY,  margY+gapY+shiftY,  margY-gapY+shiftY};
+        double dx[] = {margX-gapX+shiftX,  margX-gapX-shiftX,  margX+gapX-shiftX,  margX+gapX+shiftX};
+        double dy[] = {margY-gapY-shiftY,  margY+gapY-shiftY,  margY+gapY+shiftY,  margY-gapY+shiftY};
 
         for (uint32_t q=0; q < NQuadsInCSPad; ++q)
           {
@@ -108,7 +108,7 @@ void PixCoordsCSPad::fillAllQuadCoordsInCSPad()
 
 void PixCoordsCSPad::fillOneQuadCoordsInCSPad(uint32_t quad)
 {
-        float rotation = m_cspad_calibpar -> getQuadRotation(quad);
+        double rotation = m_cspad_calibpar -> getQuadRotation(quad);
 	// cout << "  Quad rotation = " <<  rotation << endl;
 
         CSPadPixCoords::PixCoords2x1::ORIENTATION orient = PixCoords2x1::getOrientation(rotation);
@@ -117,8 +117,8 @@ void PixCoordsCSPad::fillOneQuadCoordsInCSPad(uint32_t quad)
             for (uint32_t row=0; row<NRows2x1; row++) {
             for (uint32_t col=0; col<NCols2x1; col++) {
 
-	       float coor_x = m_xmin_quad[quad] + m_pix_coords_quad->getPixCoorRotN90_um (orient, XCOOR, quad, sect, row, col);
-	       float coor_y = m_ymin_quad[quad] + m_pix_coords_quad->getPixCoorRotN90_um (orient, YCOOR, quad, sect, row, col);
+	       double coor_x = m_xmin_quad[quad] + m_pix_coords_quad->getPixCoorRotN90_um (orient, XCOOR, quad, sect, row, col);
+	       double coor_y = m_ymin_quad[quad] + m_pix_coords_quad->getPixCoorRotN90_um (orient, YCOOR, quad, sect, row, col);
 
 	       m_coor_x[quad][sect][col][row] = coor_x;
 	       m_coor_y[quad][sect][col][row] = coor_y;
@@ -138,8 +138,8 @@ void PixCoordsCSPad::fillOneQuadCoordsInCSPad(uint32_t quad)
 
 void PixCoordsCSPad::fillOneQuadTiltedCoordsInCSPad(uint32_t quad)
 {
-        float rotation = m_cspad_calibpar -> getQuadRotation(quad);
-        float tilt     = m_cspad_calibpar -> getQuadTilt(quad);
+        double rotation = m_cspad_calibpar -> getQuadRotation(quad);
+        double tilt     = m_cspad_calibpar -> getQuadTilt(quad);
         CSPadPixCoords::PixCoords2x1::ORIENTATION orient = PixCoords2x1::getOrientation(rotation);
 
 	cout << "Quad:"       << quad
@@ -147,22 +147,22 @@ void PixCoordsCSPad::fillOneQuadTiltedCoordsInCSPad(uint32_t quad)
 	     << "  tilt:"     << tilt
 	     << endl;
 
-        float tiltrad = tilt * m_degToRad;
-        float sintilt = sin(tiltrad);
-        float costilt = cos(tiltrad);
+        double tiltrad = tilt * m_degToRad;
+        double sintilt = sin(tiltrad);
+        double costilt = cos(tiltrad);
 
         for (uint32_t sect=0; sect<N2x1InQuad; ++sect) {
             for (uint32_t row=0; row<NRows2x1; row++) {
             for (uint32_t col=0; col<NCols2x1; col++) {
 
-	       float x_in_quad = m_pix_coords_quad->getPixCoorRotN90_um (orient, XCOOR, quad, sect, row, col);
-	       float y_in_quad = m_pix_coords_quad->getPixCoorRotN90_um (orient, YCOOR, quad, sect, row, col);
+	       double x_in_quad = m_pix_coords_quad->getPixCoorRotN90_um (orient, XCOOR, quad, sect, row, col);
+	       double y_in_quad = m_pix_coords_quad->getPixCoorRotN90_um (orient, YCOOR, quad, sect, row, col);
 
-               float x_tilted =  x_in_quad * costilt - y_in_quad * sintilt;
-               float y_tilted =  x_in_quad * sintilt + y_in_quad * costilt; 
+               double x_tilted =  x_in_quad * costilt - y_in_quad * sintilt;
+               double y_tilted =  x_in_quad * sintilt + y_in_quad * costilt; 
 
-	       float coor_x = m_xmin_quad[quad] + x_tilted;
-	       float coor_y = m_ymin_quad[quad] + y_tilted;
+	       double coor_x = m_xmin_quad[quad] + x_tilted;
+	       double coor_y = m_ymin_quad[quad] + y_tilted;
 
 	       m_coor_x[quad][sect][col][row] = coor_x;
 	       m_coor_y[quad][sect][col][row] = coor_y;
@@ -197,8 +197,8 @@ void PixCoordsCSPad::fillArrsOfCSPadPixCoords()
       for (uint32_t row=0; row<NRows2x1;     row++) {
         for (uint32_t col=0; col<NCols2x1;   col++) {
 
-	  float coor_x_um = m_coor_x[quad][sect][col][row] - m_coor_x_min;
-	  float coor_y_um = m_coor_y[quad][sect][col][row] - m_coor_y_min;
+	  double coor_x_um = m_coor_x[quad][sect][col][row] - m_coor_x_min;
+	  double coor_y_um = m_coor_y[quad][sect][col][row] - m_coor_y_min;
 
           m_coor_x     [quad][sect][col][row] = coor_x_um;
           m_coor_y     [quad][sect][col][row] = coor_y_um;
@@ -216,7 +216,7 @@ void PixCoordsCSPad::fillArrsOfCSPadPixCoords()
 
 //--------------
 
-float PixCoordsCSPad::getPixCoor_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col)
+double PixCoordsCSPad::getPixCoor_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col)
 {
   switch (icoor)
     {
@@ -229,7 +229,7 @@ float PixCoordsCSPad::getPixCoor_um (CSPadPixCoords::PixCoords2x1::COORDINATE ic
 
 //--------------
 
-float PixCoordsCSPad::getPixCoor_pix(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col)
+double PixCoordsCSPad::getPixCoor_pix(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col)
 {
   switch (icoor)
     {
@@ -242,7 +242,7 @@ float PixCoordsCSPad::getPixCoor_pix(CSPadPixCoords::PixCoords2x1::COORDINATE ic
 
 //--------------
 
-float PixCoordsCSPad::getPixCoor_int(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col)
+double PixCoordsCSPad::getPixCoor_int(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col)
 {
   switch (icoor)
     {

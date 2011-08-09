@@ -57,8 +57,8 @@ PixCoords2x1::PixCoords2x1 ()
   k_col_um_to_pix = PSCalib::CSPadCalibPars::getColUmToPix();
   k_ort_um_to_pix = PSCalib::CSPadCalibPars::getOrtUmToPix();
 
-  k_center_of_rows_um = 0.5 * (m_row_size_um * ((float)NRows2x1-3.0) + 2 * PSCalib::CSPadCalibPars::getGapRowSize_um());
-  k_center_of_cols_um = 0.5 *  m_col_size_um * ((float)NCols2x1-1.0);
+  k_center_of_rows_um = 0.5 * (m_row_size_um * ((double)NRows2x1-3.0) + 2 * PSCalib::CSPadCalibPars::getGapRowSize_um());
+  k_center_of_cols_um = 0.5 *  m_col_size_um * ((double)NCols2x1-1.0);
 
   k_center_of_rows_pix = k_center_of_rows_um * k_row_um_to_pix;
   k_center_of_cols_pix = k_center_of_cols_um * k_col_um_to_pix;
@@ -134,7 +134,7 @@ void PixCoords2x1::print_selected_coords_2x1(ARRAXIS arraxis)
 
 //--------------
 
-float PixCoords2x1::getPixCoorRot000_um (COORDINATE icoor, unsigned row, unsigned col)
+double PixCoords2x1::getPixCoorRot000_um (COORDINATE icoor, unsigned row, unsigned col)
 {
   switch (icoor)
     {
@@ -147,7 +147,7 @@ float PixCoords2x1::getPixCoorRot000_um (COORDINATE icoor, unsigned row, unsigne
 
 //--------------
 
-float PixCoords2x1::getPixCoorRot090_um (COORDINATE icoor, unsigned row, unsigned col)
+double PixCoords2x1::getPixCoorRot090_um (COORDINATE icoor, unsigned row, unsigned col)
 {
   switch (icoor)
     {
@@ -160,7 +160,7 @@ float PixCoords2x1::getPixCoorRot090_um (COORDINATE icoor, unsigned row, unsigne
 
 //--------------
 
-float PixCoords2x1::getPixCoorRot180_um (COORDINATE icoor, unsigned row, unsigned col)
+double PixCoords2x1::getPixCoorRot180_um (COORDINATE icoor, unsigned row, unsigned col)
 {
   switch (icoor)
     {
@@ -173,7 +173,7 @@ float PixCoords2x1::getPixCoorRot180_um (COORDINATE icoor, unsigned row, unsigne
 
 //--------------
 
-float PixCoords2x1::getPixCoorRot270_um (COORDINATE icoor, unsigned row, unsigned col)
+double PixCoords2x1::getPixCoorRot270_um (COORDINATE icoor, unsigned row, unsigned col)
 {
   switch (icoor)
     {
@@ -186,7 +186,7 @@ float PixCoords2x1::getPixCoorRot270_um (COORDINATE icoor, unsigned row, unsigne
 
 //--------------
 
-float PixCoords2x1::getPixCoorRotN90_um (ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col)
+double PixCoords2x1::getPixCoorRotN90_um (ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col)
 {
   switch (n90)
     {
@@ -201,7 +201,7 @@ float PixCoords2x1::getPixCoorRotN90_um (ORIENTATION n90, COORDINATE icoor, unsi
 //--------------
 //--------------
 
-float PixCoords2x1::getPixCoorRot000_pix (COORDINATE icoor, unsigned row, unsigned col)
+double PixCoords2x1::getPixCoorRot000_pix (COORDINATE icoor, unsigned row, unsigned col)
 {
   switch (icoor)
     {
@@ -214,7 +214,7 @@ float PixCoords2x1::getPixCoorRot000_pix (COORDINATE icoor, unsigned row, unsign
 
 //--------------
 
-float PixCoords2x1::getPixCoorRot090_pix (COORDINATE icoor, unsigned row, unsigned col)
+double PixCoords2x1::getPixCoorRot090_pix (COORDINATE icoor, unsigned row, unsigned col)
 {
   switch (icoor)
     {
@@ -227,7 +227,7 @@ float PixCoords2x1::getPixCoorRot090_pix (COORDINATE icoor, unsigned row, unsign
 
 //--------------
 
-float PixCoords2x1::getPixCoorRot180_pix (COORDINATE icoor, unsigned row, unsigned col)
+double PixCoords2x1::getPixCoorRot180_pix (COORDINATE icoor, unsigned row, unsigned col)
 {
   switch (icoor)
     {
@@ -240,7 +240,7 @@ float PixCoords2x1::getPixCoorRot180_pix (COORDINATE icoor, unsigned row, unsign
 
 //--------------
 
-float PixCoords2x1::getPixCoorRot270_pix (COORDINATE icoor, unsigned row, unsigned col)
+double PixCoords2x1::getPixCoorRot270_pix (COORDINATE icoor, unsigned row, unsigned col)
 {
   switch (icoor)
     {
@@ -253,7 +253,7 @@ float PixCoords2x1::getPixCoorRot270_pix (COORDINATE icoor, unsigned row, unsign
 
 //--------------
 
-float PixCoords2x1::getPixCoorRotN90_pix (ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col)
+double PixCoords2x1::getPixCoorRotN90_pix (ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col)
 {
   switch (n90)
     {
@@ -267,7 +267,7 @@ float PixCoords2x1::getPixCoorRotN90_pix (ORIENTATION n90, COORDINATE icoor, uns
 
 //--------------
 
-float PixCoords2x1::getPixCoorRotN90 ( UNITS units, ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col)
+double PixCoords2x1::getPixCoorRotN90 ( UNITS units, ORIENTATION n90, COORDINATE icoor, unsigned row, unsigned col)
 {
   switch (units)
     {
@@ -279,7 +279,7 @@ float PixCoords2x1::getPixCoorRotN90 ( UNITS units, ORIENTATION n90, COORDINATE 
 
 //--------------
 
-PixCoords2x1::ORIENTATION PixCoords2x1::getOrientation(float angle)
+PixCoords2x1::ORIENTATION PixCoords2x1::getOrientation(double angle)
 {
            if(angle ==   0.) return R000;
       else if(angle ==  90.) return R090; 
@@ -318,7 +318,7 @@ size_t PixCoords2x1::getNRows(ORIENTATION n90)
 
 //--------------
 
-float PixCoords2x1::getXCenterOffset_um(ORIENTATION n90) 
+double PixCoords2x1::getXCenterOffset_um(ORIENTATION n90) 
 {
   switch (n90)
     {
@@ -332,7 +332,7 @@ float PixCoords2x1::getXCenterOffset_um(ORIENTATION n90)
 
 //--------------
 
-float PixCoords2x1::getYCenterOffset_um(ORIENTATION n90) 
+double PixCoords2x1::getYCenterOffset_um(ORIENTATION n90) 
 {
   switch (n90)
     {

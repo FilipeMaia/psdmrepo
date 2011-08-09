@@ -142,7 +142,7 @@ CSPadImageGetTest::endJob(Event& evt, Env& env)
 void 
 CSPadImageGetTest::saveImageInFile(Event& evt)
 {
-  shared_ptr< CSPadPixCoords::Image2D<float> > img2d = evt.get(m_src, "CSPad:Image", &m_actualSrc);
+  shared_ptr< CSPadPixCoords::Image2D<double> > img2d = evt.get(m_src, "CSPad:Image", &m_actualSrc);
 
   if (img2d.get()) {
 

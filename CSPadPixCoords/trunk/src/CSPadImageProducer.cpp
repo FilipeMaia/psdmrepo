@@ -262,7 +262,7 @@ CSPadImageProducer::cspad_image_fill(const uint16_t* data, CSPadPixCoords::QuadP
 	       if(ix >= NX_CSPAD) continue;
 	       if(iy >= NY_CSPAD) continue;
 
-               m_arr_cspad_image[ix][iy] += (float)data2x1[c*m_nrows2x1+r];
+               m_arr_cspad_image[ix][iy] += (double)data2x1[c*m_nrows2x1+r];
              }
              }
 	}
@@ -273,7 +273,7 @@ CSPadImageProducer::cspad_image_fill(const uint16_t* data, CSPadPixCoords::QuadP
 void
 CSPadImageProducer::cspad_image_save_in_file(const std::string &filename)
 {
-  CSPadPixCoords::Image2D<float> *img2d = new CSPadPixCoords::Image2D<float>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD);
+  CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD);
   img2d -> saveImageInFile(filename,0);
 }
 
@@ -282,7 +282,7 @@ CSPadImageProducer::cspad_image_save_in_file(const std::string &filename)
 void
 CSPadImageProducer::cspad_image_add_in_event(Event& evt, const std::string &keyname)
 {
-  shared_ptr< CSPadPixCoords::Image2D<float> > img2d( new CSPadPixCoords::Image2D<float>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD) );
+  shared_ptr< CSPadPixCoords::Image2D<double> > img2d( new CSPadPixCoords::Image2D<double>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD) );
   evt.put(img2d, m_actualSrc, keyname);
 }
 
