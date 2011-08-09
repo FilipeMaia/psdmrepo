@@ -139,14 +139,14 @@ private:
   CSPadPixCoords::PixCoords2x1::COORDINATE YCOOR;
   CSPadPixCoords::PixCoords2x1::COORDINATE ZCOOR;
 	
-  uint32_t  m_cspad_ind;
+  uint32_t   m_cspad_ind;
   double    *m_coor_x_pix;
   double    *m_coor_y_pix;
-  uint32_t *m_coor_x_int;
-  uint32_t *m_coor_y_int;
+  uint32_t  *m_coor_x_int;
+  uint32_t  *m_coor_y_int;
 
-  enum{ NX_2x1=500, 
-        NY_2x1=500 };
+  enum{ NX_2x1=450, 
+        NY_2x1=250 };
   double m_arr_2x1_image[NX_2x1][NY_2x1];
 
   enum{ NX_QUAD=850, 

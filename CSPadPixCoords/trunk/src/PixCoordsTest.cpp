@@ -238,16 +238,19 @@ PixCoordsTest::test_2x1(const uint16_t* data, CSPadPixCoords::QuadParameters* qu
         }
         }
 
-        unsigned mrgx=20;
-        unsigned mrgy=20;
+        double  mrgx=20.1;
+        double  mrgy=20.1;
 
         const uint16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
  
         for (uint32_t c=0; c<m_ncols2x1; c++) {
         for (uint32_t r=0; r<m_nrows2x1; r++) {
 
-           int ix = mrgx + (int) m_pix_coords_2x1 -> getPixCoorRotN90_pix (rot, XCOOR, r, c);
-           int iy = mrgy + (int) m_pix_coords_2x1 -> getPixCoorRotN90_pix (rot, YCOOR, r, c);
+           double xcoor = m_pix_coords_2x1 -> getPixCoorRotN90_pix (rot, XCOOR, r, c);
+           double ycoor = m_pix_coords_2x1 -> getPixCoorRotN90_pix (rot, YCOOR, r, c);
+
+           int ix = (int) (mrgx + xcoor);
+           int iy = (int) (mrgy + ycoor);
 
 	   if(ix <  0)      continue;
 	   if(iy <  0)      continue;
@@ -259,7 +262,7 @@ PixCoordsTest::test_2x1(const uint16_t* data, CSPadPixCoords::QuadParameters* qu
         }
         }
 
-    CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(&m_arr_2x1_image[0][0],NY_2x1,NX_2x1);
+    CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(&m_arr_2x1_image[0][0],NX_2x1,NY_2x1);
     img2d -> saveImageInFile("test_2x1.txt",0);
 }
 
@@ -309,7 +312,7 @@ PixCoordsTest::test_quad(const uint16_t* data, CSPadPixCoords::QuadParameters* q
                fname += boost::lexical_cast<string>( quad );
                fname += ".txt";
  
-  CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(&m_arr_quad_image[0][0],NY_QUAD,NX_QUAD);
+  CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(&m_arr_quad_image[0][0],NX_QUAD,NY_QUAD);
   img2d -> saveImageInFile(fname,0);
 }
 
@@ -381,7 +384,7 @@ PixCoordsTest::test_cspad(const uint16_t* data, CSPadPixCoords::QuadParameters* 
 void
 PixCoordsTest::test_cspad_save()
 {
-  CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(&m_arr_cspad_image[0][0],NY_CSPAD,NX_CSPAD);
+  CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(&m_arr_cspad_image[0][0],NX_CSPAD,NY_CSPAD);
   img2d -> saveImageInFile("test_cspad.txt",0);
 }
 
