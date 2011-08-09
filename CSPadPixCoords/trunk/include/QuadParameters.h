@@ -33,6 +33,8 @@
 
 namespace CSPadPixCoords {
 
+/// @addtogroup CSPadPixCoords
+
 /**
  *  @ingroup CSPadPixCoords
  *
