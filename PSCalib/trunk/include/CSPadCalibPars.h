@@ -48,8 +48,10 @@
 
 namespace PSCalib {
 
+/// @addtogroup PSCalib PSCalib
+
 /**
- *  @ingroup PSCalib  
+ *  @ingroup PSCalib
  *
  *  @brief CSPadCalibPars class loads/holds/provides access to the CSPad
  *  geometry calibration parameters.

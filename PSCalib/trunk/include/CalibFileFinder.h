@@ -33,8 +33,10 @@
 
 namespace PSCalib {
 
+/// @addtogroup PSCalib PSCalib
+
 /**
- *  @ingroup PSCalib  
+ *  @ingroup PSCalib
  *
  *  @brief CalibFileFinder class finds the pass to calibration file.
  *

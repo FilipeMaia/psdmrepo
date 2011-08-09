@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2011-08-08 Andy Salnikov
+- moved test app from app/ to test/, disable unit tests running
+- added @addtogroup to all headers to generate separate module for this 
+  package in doxygen documentation
+
 Tag: V00-00-02
 2011-08-05 Mikhail S. Dubrovin
 - Class CSPadCalibPars provides access to the calibration parameters 
