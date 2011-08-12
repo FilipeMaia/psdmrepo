@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: 00-01-27
+2011-08-11 Igor Gaponenko
+- fixed the Grabber to allow run, message id and snappshot description
+fields at all times, not just after a snapshot has been taken.
+
 Tag: 00-01-26
 2011-08-05 Igor Gaponenko
 - added new service for Grabber: RequestExperimentsNew.php

@@ -351,9 +351,6 @@ class LogBookGrabberUI:
 
         self.submit.configure(state=DISABLED)
         self.cancel.configure(state=DISABLED)
-        self.run.configure(state=DISABLED)
-        self.message_id.configure(state=DISABLED)
-        self.descr.configure(state=DISABLED)
 
     def on_grab(self):
 
@@ -389,9 +386,6 @@ class LogBookGrabberUI:
             self.grab.configure(state=DISABLED)
             self.submit.configure(state=NORMAL)
             self.cancel.configure(state=NORMAL)
-            self.run.configure(state=NORMAL)
-            self.message_id.configure(state=NORMAL)
-            self.descr.configure(state=NORMAL)
             image.draw()
 
     def on_cancel(self):
@@ -403,9 +397,6 @@ class LogBookGrabberUI:
         self.grab.configure(state=NORMAL)
         self.submit.configure(state=DISABLED)
         self.cancel.configure(state=DISABLED)
-        self.run.configure(state=DISABLED)
-        self.message_id.configure(state=DISABLED)
-        self.descr.configure(state=DISABLED)
         self.canvas.configure(width=0)
         self.canvas.configure(height=0)
         self.canvas.delete(ALL)
@@ -497,9 +488,6 @@ class LogBookGrabberUI:
         self.grab.configure(state=NORMAL)
         self.submit.configure(state=DISABLED)
         self.cancel.configure(state=DISABLED)
-        self.run.configure(state=DISABLED)
-        self.message_id.configure(state=DISABLED)
-        self.descr.configure(state=DISABLED)
         self.canvas.configure(width=0)
         self.canvas.configure(height=0)
         self.canvas.delete(ALL)
