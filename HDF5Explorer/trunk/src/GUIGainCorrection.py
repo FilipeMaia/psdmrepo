@@ -69,8 +69,7 @@ class GUIGainCorrection ( QtGui.QWidget ) :
 
         self.cboxApply   = QtGui.QCheckBox('Apply gain correction',self)
 
-        if cp.confpars.gainCorrectionIsOn : self.cboxApply.setCheckState(2)
-        else :                              self.cboxApply.setCheckState(0)
+        self.setCBState()
 
         #cp.confpars.confParsDirName  = os.getenv('HOME')
         path          = cp.confpars.gainDirName + '/' + cp.confpars.gainFileName
@@ -132,10 +131,14 @@ class GUIGainCorrection ( QtGui.QWidget ) :
     def processCBoxApply(self, value):
         print 'CBoxApply'
         if self.cboxApply.isChecked():
-            cp.confpars.gainCorrectionIsOn = True
-            self.loadGainCorrectionArrayFromFile()
+            cp.confpars.gainCorrectionIsOn = self.loadGainCorrectionArrayFromFile()
         else:
             cp.confpars.gainCorrectionIsOn = False
+        self.setCBState()
+
+    def setCBState(self):
+        if cp.confpars.gainCorrectionIsOn : self.cboxApply.setCheckState(2)
+        else :                              self.cboxApply.setCheckState(0)
 
     def processMake(self):
         src = cp.confpars. aveDirName + '/' + cp.confpars. aveFileName
@@ -165,14 +168,41 @@ class GUIGainCorrection ( QtGui.QWidget ) :
         print 'Set dirName  : %s' % (cp.confpars.gainDirName)
         print 'Set fileName : %s' % (cp.confpars.gainFileName)
 
+
     def makeGainCorrectionFile(self, src, dst):
-        arr_ave       = gm.getNumpyArrayFromFile(fname=src, datatype=np.float32)
+        try:
+            arr_ave       = gm.getNumpyArrayFromFile(fname=src, datatype=np.float32)
+        except IOError :
+            print '\n',60*'=',\
+                  '\nERROR: Failed to load the file', cp.confpars.aveFileName,\
+                  '\nCheck if the file',cp.confpars.aveFileName,'exists.',\
+                  '\nIf it does not exist, it needs to be created.',\
+                  '\nUse procedure "Average" for the dataset representing',\
+                  '\nthe flat field illumination to create the file', cp.confpars.aveFileName,\
+                  '\nThen, click on "Make" button again.',\
+                  '\n',60*'='
+            return False
+
         arr_gain_corr = fat.getGainCorrectionArrayFromAverage(arr_ave)
         gm.saveNumpyArrayInFile(arr_gain_corr,  fname=dst , format='%f') # , format='%i')
+        return True
+
 
     def loadGainCorrectionArrayFromFile(self):
         gcfname = cp.confpars.gainDirName + '/' + cp.confpars.gainFileName
-        cp.confpars.arr_gain = gm.getNumpyArrayFromFile(fname=gcfname, datatype=np.float32)
+        try :
+            cp.confpars.arr_gain = gm.getNumpyArrayFromFile(fname=gcfname, datatype=np.float32)
+            return True
+        except IOError :
+            print '\n',60*'=',\
+                  '\nERROR: Failed to load the gain correction array...',\
+                  '\nCheck if the file',gcfname,'exists.',\
+                  '\nIf it does not exist, it needs to be created.',\
+                  '\nUse procedure "Average" for the dataset representing',\
+                  '\nthe flat field illumination to create the file', cp.confpars.aveFileName,\
+                  '\nThen, click on "Make" button to create the file for gain correction.',\
+                  '\n',60*'='
+            return False
  
 #-----------------------------
 #  In case someone decides to run this module

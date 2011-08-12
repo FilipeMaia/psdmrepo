@@ -68,8 +68,7 @@ class GUIBackground ( QtGui.QWidget ) :
 
         self.cboxApply   = QtGui.QCheckBox('Apply background subtraction',self)
 
-        if cp.confpars.bkgdSubtractionIsOn : self.cboxApply.setCheckState(2)
-        else :                               self.cboxApply.setCheckState(0)
+        self.setCBState()
 
         #cp.confpars.confParsDirName  = os.getenv('HOME')
         path          = cp.confpars.bkgdDirName + '/' + cp.confpars.bkgdFileName
@@ -130,16 +129,31 @@ class GUIBackground ( QtGui.QWidget ) :
     def processCBoxApply(self, value):
         print 'CBoxApply'
         if self.cboxApply.isChecked():
-            cp.confpars.bkgdSubtractionIsOn = True
-            self.loadBackgroundArrayFromFile()
+            cp.confpars.bkgdSubtractionIsOn = self.loadBackgroundArrayFromFile() 
         else:
             cp.confpars.bkgdSubtractionIsOn = False
+        self.setCBState()
+
+    def setCBState(self):
+        if cp.confpars.bkgdSubtractionIsOn : self.cboxApply.setCheckState(2)
+        else :                               self.cboxApply.setCheckState(0)
 
     def processCopy(self):
         src = cp.confpars. aveDirName + '/' + cp.confpars. aveFileName
         dst = cp.confpars.bkgdDirName + '/' + cp.confpars.bkgdFileName
         print 'Copy the file', src, 'to', dst       
-        copy(src,dst);
+        try:
+            copy(src,dst);
+            return True
+        except IOError :
+            print '\n',60*'=',\
+                  '\nERROR: Failed to copy file...',\
+                  '\nCheck if the file', src, 'exists.',\
+                  '\nIf it does not exist, it needs to be created.',\
+                  '\nUse procedure "Average" for the dataset representing background.',\
+                  '\nThen, click on "Copy" button again.',\
+                  '\n',60*'='
+            return False
 
     def processBrowse(self):
         print 'Browse'
@@ -165,8 +179,19 @@ class GUIBackground ( QtGui.QWidget ) :
 
     def loadBackgroundArrayFromFile(self):
         bkgdfname = cp.confpars.bkgdDirName + '/' + cp.confpars.bkgdFileName
-        cp.confpars.arr_bkgd = gm.getNumpyArrayFromFile(fname=bkgdfname, datatype=np.float32)
- 
+        try :
+            cp.confpars.arr_bkgd = gm.getNumpyArrayFromFile(fname=bkgdfname, datatype=np.float32)
+            return True
+        except IOError :
+            print '\n',60*'=',\
+                  '\nERROR: Failed to load the background array...',\
+                  '\nCheck if the file',bkgdfname,'exists.',\
+                  '\nIf it does not exist, it needs to be created.',\
+                  '\nUse procedure "Average" for the dataset representing background.',\
+                  '\nThen, click on "Copy" button to create the file for background.',\
+                  '\n',60*'='
+            return False
+
 #-----------------------------
 #  In case someone decides to run this module
 #
