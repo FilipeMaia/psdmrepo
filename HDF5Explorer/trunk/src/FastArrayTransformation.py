@@ -231,6 +231,41 @@ def getCartesianArray1Ring() :
 
     return A
 
+#----------------------------------
+#----------------------------------
+
+def getGainCorrectionArrayFromAverage(arr_ave) :
+
+    print 'gainCorrectionArrayFromAverage'
+    arr_weights = np.select([arr_ave==0], [0], default=1) # set 0/1 weights for <1/positive array elements
+    average_over_nonzero = np.average(arr_ave, weights=arr_weights) # get average for non-zero elements
+    print 'average_over_nonzero =', average_over_nonzero 
+    arr_gain_corr = np.select([arr_ave>0], [average_over_nonzero/arr_ave], default=0) # get gain factors
+    arr_gain_corr = np.select([arr_gain_corr < 10], [arr_gain_corr], default=0) # select gain factors < 10
+
+    #printArrForTest(arr_gain_corr)
+    printMeanAndStandardDeviation(arr_gain_corr)
+    return arr_gain_corr
+
+def printMeanAndStandardDeviation(arr) :
+    arr_weights = np.select([arr==0], [0], default=1)
+    print 'Mean of elements for the gain correction array (ixcluding 0s) =',np.average(arr, weights=arr_weights)
+    print 'Mean of elements for the gain correction array (including 0s) =',np.mean(arr)
+    print 'Standard deviation of elements for the gain correction array  =',np.std(arr)
+
+
+def printArrForTest(arr) :
+    print 'arr_gain_corr.shape =',arr_gain_corr.shape
+
+    number_non_zero = 0
+    for row in range(arr.shape[0]) :
+        for col in range(arr.shape[1]) :
+
+            val = arr[row][col]
+            if val != 0 :
+                number_non_zero += 1
+                if number_non_zero > 1000 : break
+                print 'row,col,val:',row,col,val
 
 #----------------------------------
 #----------------------------------

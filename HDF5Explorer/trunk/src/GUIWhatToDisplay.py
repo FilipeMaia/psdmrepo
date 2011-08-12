@@ -52,6 +52,8 @@ import GUICorrelation                  as wtdCO
 import GUICalibCycle                   as wtdCC
 import GUIConfiguration                as guiconfig
 import GUISelection                    as guisel
+import GUIBackground                   as guiBG
+import GUIGainCorrection               as guiGC
 
 #---------------------
 #  Class definition --
@@ -114,12 +116,14 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.tabBar.setTabTextColor(self.indTabCC,QtGui.QColor('red'))
        #self.tabBar.setTabTextColor(self.indTabED,QtGui.QColor('white'))
 
-        self.tabBarBot       = QtGui.QTabBar()
+        self.tabBarBot           = QtGui.QTabBar()
         self.tabBarBot.setShape(QtGui.QTabBar.RoundedSouth)
         #self.tabBarBot.setShape(QtGui.QTabBar.TriangularSouth)
-        self.indTabBotConfig = self.tabBarBot.addTab('Configuration')
-        self.indTabBotSelect = self.tabBarBot.addTab('Selection')
-        self.indTabBotEmpty  = self.tabBarBot.addTab(64*' ')
+        self.indTabBotConfig     = self.tabBarBot.addTab('Configuration')
+        self.indTabBotSelect     = self.tabBarBot.addTab('Selection')
+        self.indTabBotBackground = self.tabBarBot.addTab('Bkgd Subtr.')
+        self.indTabBotGainCorr   = self.tabBarBot.addTab('Gain Corr.')
+        self.indTabBotEmpty      = self.tabBarBot.addTab(18*' ')
         self.tabBarBot.setTabEnabled(self.indTabBotEmpty,False)
         
         self.hboxT = QtGui.QHBoxLayout()
@@ -261,6 +265,20 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.guiTab.setMinimumHeight(240)
         self.hboxD.addWidget(self.guiTab)
 
+    def processBackground(self):
+        #print 'Background'
+        self.guiTab.close()
+        self.guiTab = cp.confpars.guiBG = guiBG.GUIBackground() 
+        self.guiTab.setMinimumHeight(240)
+        self.hboxD.addWidget(self.guiTab)
+
+
+    def processGainCorrection(self):
+        #print 'GainCorrection'
+        self.guiTab.close()
+        self.guiTab = cp.confpars.guiGC = guiGC.GUIGainCorrection() 
+        self.guiTab.setMinimumHeight(240)
+        self.hboxD.addWidget(self.guiTab)
 
     def processSave(self):
         print 'Save'
@@ -275,9 +293,11 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
     def processTabBarBot(self):
         indTab = self.tabBarBot.currentIndex()
         #print 'TabBarBot index=',indTab
-        if indTab == self.indTabBotEmpty  : return
-        if indTab == self.indTabBotSelect : self.processSelection()
-        if indTab == self.indTabBotConfig : self.processConfiguration()
+        if indTab == self.indTabBotEmpty      : return
+        if indTab == self.indTabBotSelect     : self.processSelection()
+        if indTab == self.indTabBotConfig     : self.processConfiguration()
+        if indTab == self.indTabBotBackground : self.processBackground()
+        if indTab == self.indTabBotGainCorr   : self.processGainCorrection()
 
         self.tabBar.setCurrentIndex(self.indTabEmpty)
 

@@ -297,6 +297,10 @@ class PlotsForCSpad ( object ) :
             self.arr2dCSpad[ixOff:dimX+ixOff, iyOff:dimY+iyOff] += rotarr2d[0:dimX, 0:dimY]
 
         self.eventWithAlreadyGeneratedCSpadDetImage = cp.confpars.eventCurrent
+
+        if cp.confpars.bkgdSubtractionIsOn : self.arr2dCSpad -= cp.confpars.arr_bkgd
+        if cp.confpars.gainCorrectionIsOn  : self.arr2dCSpad *= cp.confpars.arr_gain
+
         return self.arr2dCSpad
 
 

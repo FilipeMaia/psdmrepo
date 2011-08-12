@@ -82,6 +82,8 @@ class ConfigParameters ( object ) :
         self.correlationGUIIsOpen    = False
         self.calibcycleGUIIsOpen     = False
         self.playerGUIIsOpen         = False
+        self.bkgdGUIIsOpen           = False
+        self.gainGUIIsOpen           = False
 
         self.step01IsDone            = False
         self.step02IsDone            = False
@@ -283,6 +285,21 @@ class ConfigParameters ( object ) :
         self.projY_Xmax          = 400
         self.projY_Ymin          = 0   
         self.projY_Ymax          = 400
+
+        # Default parameters for the background subtraction
+        self.arr_bkgd             = 0
+        self.bkgdSubtractionIsOn  = False
+        self.bkgdDirName          = '.'
+        self.bkgdFileName         = 'cspad-bkgd.txt'
+
+        # Default parameters for the gain correction
+        self.arr_gain             = 0
+        self.gainCorrectionIsOn   = False
+        self.gainDirName          = '.'
+        self.gainFileName         = 'cspad-gain.txt'
+
+        self.aveDirName           = '.'
+        self.aveFileName          = 'cspad-ave.txt'
 
     #-------------------
     #  Public methods --
@@ -491,6 +508,17 @@ class ConfigParameters ( object ) :
         print 'PROJ_Y_YMIN'              , self.projY_Ymin          
         print 'PROJ_Y_YMAX'              , self.projY_Ymax          
 
+        print 'BKGD_SUBTRACTION_IS_ON'   , self.bkgdSubtractionIsOn 
+        print 'BKGD_DIR_NAME'            , self.bkgdDirName         
+        print 'BKGD_FILE_NAME'           , self.bkgdFileName        
+
+        print 'GAIN_CORRECTION_IS_ON'    , self.gainCorrectionIsOn  
+        print 'GAIN_DIR_NAME'            , self.gainDirName         
+        print 'GAIN_FILE_NAME'           , self.gainFileName        
+
+        print 'AVERAGE_DIR_NAME'         , self.aveDirName          
+        print 'AVERAGE_FILE_NAME'        , self.aveFileName         
+
         print 70*'='
 
 
@@ -693,6 +721,17 @@ class ConfigParameters ( object ) :
                 elif key == 'PROJ_Y_XMAX'              : self.projY_Xmax            = int(val)
                 elif key == 'PROJ_Y_YMIN'              : self.projY_Ymin            = int(val)
                 elif key == 'PROJ_Y_YMAX'              : self.projY_Ymax            = int(val)
+
+               #elif key == 'BKGD_SUBTRACTION_IS_ON'   : self.bkgdSubtractionIsOn   = dicBool[val.lower()]
+                elif key == 'BKGD_DIR_NAME'            : self.bkgdDirName           = val
+                elif key == 'BKGD_FILE_NAME'           : self.bkgdFileName          = val
+                                                                                  
+               #elif key == 'GAIN_CORRECTION_IS_ON'    : self.gainCorrectionIsOn    = dicBool[val.lower()]
+                elif key == 'GAIN_DIR_NAME'            : self.gainDirName           = val
+                elif key == 'GAIN_FILE_NAME'           : self.gainFileName          = val
+                                                                                  
+                elif key == 'AVERAGE_DIR_NAME'         : self.aveDirName            = val
+                elif key == 'AVERAGE_FILE_NAME'        : self.aveFileName           = val
 
                 else : print 'The record : %s %s \n is UNKNOWN in readParameters()' % (key, val) 
             f.close()
@@ -910,6 +949,19 @@ class ConfigParameters ( object ) :
         f.write('PROJ_Y_XMAX'                       + space + str(self.projY_Xmax          )       + '\n')
         f.write('PROJ_Y_YMIN'                       + space + str(self.projY_Ymin          )       + '\n')
         f.write('PROJ_Y_YMAX'                       + space + str(self.projY_Ymax          )       + '\n')
+
+
+        f.write('BKGD_SUBTRACTION_IS_ON'            + space + str(self.bkgdSubtractionIsOn )       + '\n')
+        f.write('BKGD_DIR_NAME'                     + space + str(self.bkgdDirName         )       + '\n')
+        f.write('BKGD_FILE_NAME'                    + space + str(self.bkgdFileName        )       + '\n')
+                                                                                           
+        f.write('GAIN_CORRECTION_IS_ON'             + space + str(self.gainCorrectionIsOn  )       + '\n')
+        f.write('GAIN_DIR_NAME'                     + space + str(self.gainDirName         )       + '\n')
+        f.write('GAIN_FILE_NAME'                    + space + str(self.gainFileName        )       + '\n')
+                                                                                           
+        f.write('AVERAGE_DIR_NAME'                  + space + str(self.aveDirName          )       + '\n')
+        f.write('AVERAGE_FILE_NAME'                 + space + str(self.aveFileName         )       + '\n')
+
         f.close()
 
 
