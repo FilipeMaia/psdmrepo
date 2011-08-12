@@ -13,6 +13,19 @@ reverse time order.
 
 ------------------------------
 
+2011-08-11 Mikhail S. Dubrovin
+- Add features of the background subtraction and gain correction for CSPad 
+
+New modules:	
+	       HDF5Explorer/src/GUIBackground.py
+	       HDF5Explorer/src/GUIGainCorrection.py
+
+Changed modules: 	
+	       HDF5Explorer/src/ConfigParameters.py
+	       HDF5Explorer/src/FastArrayTransformation.py
+	       HDF5Explorer/src/GUIWhatToDisplay.py
+	       HDF5Explorer/src/PlotsForCSpad.py
+	
 Tag: V00-00-02
 2011-07-21 Mikhail S. Dubrovin
 - Add one more index for ipimb data set 
