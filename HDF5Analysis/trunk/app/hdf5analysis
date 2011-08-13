@@ -1,0 +1,85 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script hdf5analysis...
+#
+#------------------------------------------------------------------------
+
+"""This script start the hdf5analysis application for HDF5 files.
+
+This application takes the HDF5 file with LCLS events and  
+provides an access to the dataset ind its data substructure.
+This script is started without any additional parameters.
+All dialog with user is maintained through the system of GUI 
+right after the start.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Mikhail S. Dubrovin
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 8 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from PyQt4 import QtGui
+from HDF5Analysis.GUIMain import GUIMain
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class HDF5Analysis :
+
+    def __init__ ( self ) :
+        """Constructor : This is a regular stuff for PyQt4"""
+
+        self.input_parameters()
+
+	print "Start the event display main GUI"
+        app = QtGui.QApplication(sys.argv)
+        gui = GUIMain(None,app)
+        gui.show()
+        sys.exit(app.exec_())
+
+    def input_parameters(self):	
+        msg = """HDF5Analysis:
+         To run this program use command "hdf5analysis" without parameters. 
+         All necessary parameters will be set through the GUIs of this program. 
+         By default all configuration parameters are taken from the file "configana". 
+         If this file is missing, the default values of parameters will be used at start, 
+         untill the "configana" is not created.
+        """
+	if len(sys.argv) > 1 : 
+            print 90*'-','\n',msg,'\n',90*'-'
+            sys.exit()
+	
+
+#
+#  run application when imported as a main module
+#
+
+if __name__ == "__main__" :
+
+    app = HDF5Analysis()
+    sys.exit(app.exec_())
+
