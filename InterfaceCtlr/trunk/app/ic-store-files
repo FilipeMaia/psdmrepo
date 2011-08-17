@@ -110,10 +110,10 @@ class ICStoreFiles ( LusiPyApp ) :
         config = db.read_config( self._options.config, False )
 
         # instantiate fiel manager
-        if not config.get('filemanager-irods-command', None) :
+        if not config.get('filemanager-irods-command') :
             self.error("filemanager-irods-command is not defined, use -c option to define" )
             return 2            
-        file_mgr = FileMgrIrods( config['filemanager-irods-command'], config, self._log )
+        file_mgr = FileMgrIrods( config.get('filemanager-irods-command'), config, self._log )
 
         # get the list of experiments from regdb
         q = "select i.name, e.name from instrument i, experiment e where i.id = e.instr_id"
@@ -121,34 +121,33 @@ class ICStoreFiles ( LusiPyApp ) :
         cursor.execute( q )
         experiments = [ tuple(row) for row in cursor.fetchall() ]
 
-        # check all experiments
-        for instr, exp in experiments :
-            
-            self.info( "Processing experiment %s:%s", instr, exp )
-            
-            parm = dict ( instrument=instr, instrument_lower=instr.lower(), experiment=exp )
-            
-            # XTC files first
-            if 'experiment-xtc-dir' in config and 'filemanager-xtc-dir' in config :
-                src_dir = config['experiment-xtc-dir'] % parm
-                pattern = config.get('xtc-name-pattern','%(experiment)s-*.xtc') % parm
-                dst_coll = config['filemanager-xtc-dir'] % parm
+        try:
+            # check all experiments
+            for instr, exp in experiments :
                 
-                try:
-                    self.process_dir (src_dir, pattern, dst_coll, file_mgr)
-                except StandardError, exc:
-                    self.error( "Processing failed: %s", exc )
-
-            # HDF files
-            if 'experiment-hdf5-dir' in config and 'filemanager-hdf5-dir' in config :
-                src_dir = config['experiment-hdf5-dir'] % parm
-                pattern = config.get('hdf5-name-pattern','%(experiment)s-*.h5') % parm
-                dst_coll = config['filemanager-hdf5-dir'] % parm
+                self.info( "Processing experiment %s:%s", instr, exp )
                 
-                try:
+                parm = dict ( instrument=instr, instrument_lower=instr.lower(), experiment=exp )
+                
+                # XTC files first
+                if config.get('experiment-xtc-dir') and config.get('filemanager-xtc-dir'):
+                    src_dir = config.get('experiment-xtc-dir') % parm
+                    pattern = (config.get('xtc-name-pattern') or '%(experiment)s-*.xtc') % parm
+                    dst_coll = config.get('filemanager-xtc-dir') % parm
+                    
                     self.process_dir (src_dir, pattern, dst_coll, file_mgr)
-                except StandardError, exc:
-                    self.error( "Processing failed: %s", exc )
+    
+                # HDF files
+                if config.get('experiment-hdf5-dir') and config.get('filemanager-hdf5-dir'):
+                    src_dir = config.get('experiment-hdf5-dir') % parm
+                    pattern = (config.get('hdf5-name-pattern') or '%(experiment)s-*.h5') % parm
+                    dst_coll = config.get('filemanager-hdf5-dir') % parm
+                    
+                    self.process_dir (src_dir, pattern, dst_coll, file_mgr)
+                    
+        except StandardError, exc:
+            self.error( "Processing failed: %s", exc )
+            return 1
 
 
     def process_dir (self, src_dir, pattern, dst_coll, file_mgr):
@@ -174,7 +173,6 @@ class ICStoreFiles ( LusiPyApp ) :
                     # first time around get the list of files already in iRODS
                     if dst_filelist is None :
                         dst_filelist = file_mgr.listdir( dst_coll )
-                        if dst_filelist is None : dst_filelist = []
                         dst_filelist = set(dst_filelist)
                         self.debug("Files in iRODS already: %s", dst_filelist)
 

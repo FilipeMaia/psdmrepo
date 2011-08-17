@@ -70,7 +70,7 @@ class FileMgrIrods ( object ) :
         for env in ['irodsHost','irodsDefResource','irodsPort','irodsZone','irodsUserName','irodsAuthFileName'] :
             val = config.get(env)
             if val:
-                os.putenv( env, val )
+                os.putenv( env, str(val) )
 
     #-------------------
     #  Public methods --
@@ -125,9 +125,20 @@ class FileMgrIrods ( object ) :
         
         stat = child.wait()
         if stat :
-            # error happened
-            self._log.error( "FileMgrIrods.listdir: error returned from ils: %s", str(stat) )
-            return None
+            # error happened, could mean either that iRODS server is not accessible 
+            # (or other server troubles) in which case we want to stop, or that collection
+            # does not exist, then we return empty list.
+
+            # to check that server is running we run 'ips' command to ping it
+            cmd = ['ips']
+            child = popen2.Popen3(cmd)
+            child.tochild.close()
+            list = child.fromchild.read()
+            if child.wait():
+                # connection failed
+                raise IOError("Failed to connect to iRODS SERVER")
+            
+            return []
 
         return list.split()
 

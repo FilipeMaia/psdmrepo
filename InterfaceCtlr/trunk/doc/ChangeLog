@@ -11,9 +11,15 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-10
+2011-08-17 Andy Salnikov
+- finally convert ic-store-files script to use new style config object
+
 Tag: V00-07-09
 2010-11-16 Andy Salnikov
 - added support for --calib-dir translator option
+- improve logic for situation when 'ils' returns error code, if the server
+  is not reachable then just terminate
 
 Tag: V00-07-08
 2010-11-04 Andy Salnikov
