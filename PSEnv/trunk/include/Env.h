@@ -25,6 +25,7 @@
 //-------------------------------
 #include "PSEnv/EnvObjectStore.h"
 #include "PSEnv/EpicsStore.h"
+#include "PSEnv/IExpNameProvider.h"
 #include "RootHistoManager/RootHMgr.h"
 #include "PSHist/HManager.h"
 
@@ -72,7 +73,7 @@ public:
   /**
    *  @brief Constructor takes tha name of the psana job as a parameter.
    */
-  Env (const std::string& jobName) ;
+  Env (const std::string& jobName, const boost::shared_ptr<IExpNameProvider>& expNameProvider) ;
 
   // Destructor
   ~Env () ;
@@ -80,6 +81,12 @@ public:
   /// Returns job name.
   const std::string& jobName() const { return m_jobName; }
   
+  /// Returns instrument name
+  const std::string& instrument() const { return m_expNameProvider->instrument(); }
+
+  /// Returns experiment name
+  const std::string& experiment() const { return m_expNameProvider->experiment(); }
+
   /// Access to Configuration Store object.
   EnvObjectStore& configStore() { return *m_cfgStore; }
 
@@ -110,6 +117,7 @@ private:
   boost::scoped_ptr<EpicsStore> m_epicsStore;  ///< Pointer to EPICS Store
   boost::scoped_ptr<RootHistoManager::RootHMgr> m_rhmgr;  ///< Pointer to ROOT histogram manager
   boost::scoped_ptr<PSHist::HManager> m_hmgr;  ///< Pointer to ROOT histogram manager
+  boost::shared_ptr<IExpNameProvider> m_expNameProvider; ///< Object which provides experiment and instrument names
   
 };
 

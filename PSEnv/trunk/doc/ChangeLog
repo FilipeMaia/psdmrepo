@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-00
+2011-08-17 Andy Salnikov
+- added new methods PSEnv::instrument() and PSEnv::experiment()
+- new abstract class IExpNameProvider, above two methods forward to 
+  this class
+- instance of IExpNameProvider must be provided on PSEnv construction
+
 Tag: V00-03-00
 2011-07-15 Andy Salnikov
 - renamed ConfigStore class to EnvObjectStore

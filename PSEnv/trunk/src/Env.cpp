@@ -38,13 +38,14 @@ namespace PSEnv {
 //----------------
 // Constructors --
 //----------------
-Env::Env (const std::string& jobName)
+Env::Env (const std::string& jobName, const boost::shared_ptr<IExpNameProvider>& expNameProvider)
   : m_jobName(jobName)
   , m_cfgStore()
   , m_calibStore()
   , m_epicsStore(new EpicsStore())
   , m_rhmgr()
   , m_hmgr()
+  , m_expNameProvider(expNameProvider)
 {
   // instantiate dictionary for config store and store itself
   boost::shared_ptr<PSEvt::ProxyDict> cfgDict(new PSEvt::ProxyDict());
