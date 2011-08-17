@@ -33,11 +33,16 @@ $BASEINCL
 
 namespace $package {
 
+/// @addtogroup $package
+
 /**
- *  C++ source file code template. The first sentence is a brief summary of 
- *  what the class is for. It is followed by more detailed information
- *  about how to use the class. This doc comment must immediately preceed the 
- *  class definition.
+ *  @ingroup $package
+ *
+ *  @brief C++ source file code template.
+ *
+ *  The first sentence is a brief summary of what the class is for. It is 
+ *  followed by more detailed information about how to use the class. 
+ *  This doc comment must immediately precede the class definition.
  *
  *  Additional paragraphs with more details may follow; separate paragraphs
  *  with a blank line. The last paragraph before the tags (preceded by @) 

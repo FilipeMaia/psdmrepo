@@ -33,7 +33,11 @@
 
 namespace $package {
 
+/// @addtogroup $package
+
 /**
+ *  @ingroup $package
+ *
  *  @brief Example module class for psana
  *
  *  This software was developed for the LCLS project.  If you use all or 
