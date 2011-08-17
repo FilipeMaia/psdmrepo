@@ -162,8 +162,7 @@ if 'psana' in packages:
     docTargets.append(env.Command('doc/psana-doxy/html/index.html', env.Dir('psana'), "doxy-driver -m psana doc/psana-doxy/"))
 if 'psana' in packages:
     docTargets.append(env.Command('doc/psana-modules-doxy/html/index.html', env.Dir('psana'), "doxy-driver -m psana-modules doc/psana-modules-doxy/"))
-if docTargets: 
-    env.Alias ( 'doc', docTargets )
+env.Alias ( 'doc', docTargets )
 
 #trace ( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
 trace ( "BUILD_TARGETS is " + pformat( map(str, BUILD_TARGETS) ), "<top>", 1 )
