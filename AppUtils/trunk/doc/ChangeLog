@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-07
+2011-08-17 Andy Salnikov
+- new class AppDataPath which finds a file in $SIT_DATA path
+- new unit test for AppDataPath class
+- new data file data/file-for-AppDataPath-unit-test needed for unit test
+
 Tag: V00-01-05
 2009-12-04 Andy Salnikov
 - bug fix in AppCmdLine, empty long and short options were matched
