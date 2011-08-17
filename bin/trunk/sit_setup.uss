@@ -272,7 +272,10 @@ test "$SIT_RELEASE" = "nobase" || prepend_path PYTHONPATH "$SIT_RELDIR/$SIT_RELE
 prepend_path PYTHONPATH "./arch/$SIT_ARCH/python"
 
 # extend SIT_DATA
-test "$SIT_RELEASE" = "nobase" || set_env SIT_DATA "$SIT_RELDIR/$SIT_RELEASE/data"
+set_env SIT_DATA "$SIT_ROOT/data"
+test "$SIT_RELEASE" = "nobase" || prepend_path SIT_DATA "$SIT_RELDIR/$SIT_RELEASE/data"
+test -d "$SIT_ROOT/data/_override" && prepend_path SIT_DATA "$SIT_ROOT/data/_override"
+test -d "$SIT_ROOT/data/_override/_releases/$SIT_RELEASE" && prepend_path SIT_DATA "$SIT_ROOT/data/_override/_releases/$SIT_RELEASE"
 prepend_path SIT_DATA "./data"
 
 test "$SIT_RELEASE" = "nobase" && unset_env SIT_RELEASE
