@@ -7,7 +7,7 @@
 
 # release directory
 release=/reg/g/psdm/sw/releases/current
-#release=/reg/neh/home/salnikov/releases/test-0.2.2
+release=/reg/neh/home/salnikov/releases/test-0.2.2
 
 # database options
 icdb_file=/reg/g/psdm/psdatmgr/ic/.icdb-conn

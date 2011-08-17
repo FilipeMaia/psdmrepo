@@ -15,7 +15,7 @@ logdir=/reg/g/psdm/psdatmgr/ic/log
 resource=lustre-resc
 
 # mail
-expert=salnikov
+expert=salnikov@slac.stanford.edu
 
 # ===================================================================
 
