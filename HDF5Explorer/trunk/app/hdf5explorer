@@ -61,7 +61,6 @@ class HDF5Explorer :
         gui.show()
         #app.setActiveWindow(gui)
         sys.exit(app.exec_())
-        L3 = '\nIf this file is missing, the default values of parameters will be used at start, untill the "evtdispconfig" is not created.'
 
     def input_parameters(self):	
         msg = """HDF5Explorer:

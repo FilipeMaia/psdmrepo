@@ -32,6 +32,7 @@ import sys
 import h5py    # access to hdf5 file structure
 from numpy import *  # for use like       array(...)
 import numpy as np
+import scipy.misc as scimisc
 import time
 
 import matplotlib
@@ -427,7 +428,10 @@ class DrawEvent ( object ) :
 
             cameraName = gm.get_item_second_to_last_name(dsname)
             gm.saveNumpyArrayInFile(arr1ev, fname='camera-ave-' + str(cameraName) + '.txt' , format='%i') # , format='%f')
-            
+
+            tiff_fname = 'camera-ave-' + str(cameraName) + '.tiff'
+            print 'Save image in TIFF file  ', tiff_fname
+            scimisc.imsave(tiff_fname, arr1ev)
 
 
     def drawArrayForDSName(self, dsname, arr1ev) :
