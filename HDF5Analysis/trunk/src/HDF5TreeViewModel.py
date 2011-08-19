@@ -37,7 +37,8 @@ import h5py
 # Imports for other modules --
 #-----------------------------
 
-import ConfigParameters as cp
+import ConfigParameters     as cp
+import AppUtils.AppDataPath as apputils
 
 #---------------------
 #  Class definition --
@@ -51,9 +52,14 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
 
     def __init__(self, parent=None):
 
-        self.icon_folder_open   = QtGui.QIcon("HDF5Explorer/src/icons/folder_open.gif")
-        self.icon_folder_closed = QtGui.QIcon("HDF5Explorer/src/icons/folder_closed.gif")
-        self.icon_data          = QtGui.QIcon("HDF5Explorer/src/icons/table.gif")
+        # !!!!! THE /data/ SUBDIRECTORY SHOULD BE OMITTED IN PATH !!!!!
+        self.apppath_icon_folder_open   = apputils.AppDataPath('HDF5Analysis/icons/folder_open.gif')
+        self.apppath_icon_folder_closed = apputils.AppDataPath('HDF5Analysis/icons/folder_closed.gif')
+        self.apppath_icon_data          = apputils.AppDataPath('HDF5Analysis/icons/table.gif')
+
+        self.icon_folder_open   = QtGui.QIcon(self.apppath_icon_folder_open  .path())
+        self.icon_folder_closed = QtGui.QIcon(self.apppath_icon_folder_closed.path())
+        self.icon_data          = QtGui.QIcon(self.apppath_icon_data         .path())
 
         QtGui.QStandardItemModel.__init__(self, parent)
 

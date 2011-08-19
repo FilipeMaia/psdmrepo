@@ -180,6 +180,7 @@ def isDataset(ds):
     """Check if the input dataset is a h5py.Dataset (exists as expected in HDF5)"""
     return isinstance(ds,h5py.Dataset)
 
+#----------------------------------
 
 def print_dataset_info(ds):
     """Prints attributes and all other available info for group or data"""
@@ -209,6 +210,8 @@ def print_dataset_info(ds):
 
             print_time(ds,cp.confpars.eventCurrent)
 
+        print_data_structure(ds)   
+
     if isinstance(ds,h5py.Group):
         print "Group:",
         print "ds.name = ", ds.name
@@ -225,6 +228,53 @@ def print_dataset_info(ds):
     print "ds.file           = ", ds.file
 
     #print_attributes(ds)
+
+#----------------------------------
+
+def print_data_structure(ds):
+    """Prints data structure of the dataset"""
+    print 50*'I'
+    print 'UNROLL AND PRINT DATASET SUBSTRUCTURE'
+    iterate_over_data_structure(ds)
+    print 50*'I'
+
+#----------------------------------
+
+def iterate_over_data_structure(ds,offset0=''):
+    """Prints data structure of the dataset"""
+
+    offset=offset0+'    '
+
+    print offset, 'ds.shape =', ds.shape, '  len(ds.shape) =', len(ds.shape), '  shape dimension(s) =',
+    if len(ds.shape) == 0 :
+        print offset, 'ZERO-CONTENT DATA! : ds.dtype=',  ds.dtype
+        return
+
+    for shapeDim in ds.shape:
+        print shapeDim,
+    print ' '
+
+    if len(ds.shape) > 0 :
+        print offset,'Sample of data ds[0]=', ds[0]
+
+    if len(ds.dtype) == 0 or ds.dtype.names == None :
+        print offset, 'NO MORE DAUGHTERS AVAILABLE because',\
+              ' len(ds.dtype) =', len(ds.dtype),\
+              ' ds.dtype.names =', ds.dtype.names
+        return
+
+    #print offset, 'ds.dtype.fields =', ds.dtype.fields
+    print offset, 'ds.dtype        =', ds.dtype
+    print offset, 'ds.dtype.names  =', ds.dtype.names
+
+    if ds.dtype.names==None :
+        print offset, 'ZERO-DTYPE.NAMES!'
+        return
+
+    for indname in ds.dtype.names :
+        print offset,'Index Name =', indname         
+        iterate_over_data_structure(ds[indname],offset)
+
 
 #----------------------------------
 

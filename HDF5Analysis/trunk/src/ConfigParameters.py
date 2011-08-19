@@ -70,7 +70,7 @@ class ConfigParameters ( object ) :
     def setRunTimeParametersInit ( self ) :
 
         self.h5_file_is_open         = False
-        self.wtdWindowIsOpen         = False
+        self.dsetsGUIIsOpen          = False
         self.wtdIMWindowIsOpen       = False
         self.wtdCSWindowIsOpen       = False
         self.wtdWFWindowIsOpen       = False
@@ -118,7 +118,7 @@ class ConfigParameters ( object ) :
 
         # Status parameters which do not need to be saved
         self.confParsDirName         = '.'
-        self.confParsFileName        = 'configana'
+        self.confParsFileName        = 'confpars'
 
         self.posGUIMain              = (370,10)
 

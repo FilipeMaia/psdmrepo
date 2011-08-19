@@ -40,14 +40,14 @@ import time   # for sleep(sec)
 # Imports for other modules --
 #-----------------------------
 import ConfigParameters   as cp
-import GUIHDF5Tree     as guiselitems
+import GUIHDF5Tree        as guiselitems
+import GUIDataSets        as guidatasets
+import GUIConfiguration   as guiconfig
 
 #import PrintHDF5          as printh5 # for my print_group(g,offset)
 #import GUIPlayer          as guiplr
 #import GUIComplexCommands as guicomplex
 #import GUIWhatToDisplay   as guiwtd
-#import GUIConfiguration   as guiconfig
-#import GUISelection       as guisel
 
 #---------------------
 #  Class definition --
@@ -68,6 +68,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.setWindowTitle('HDF5Analysis')
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False
+        self.setFrame()
 
         cp.confpars.guimain = self
 
@@ -79,25 +80,20 @@ class GUIMain ( QtGui.QWidget ) :
 
 	#print 'sys.argv=',sys.argv # list of input parameters
 
-        # see http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/qframe.html
-        self.frame = QtGui.QFrame(self)
-        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken )
-        self.frame.setLineWidth(0)
-        self.frame.setMidLineWidth(1)
-        self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(True)
+
 
         self.editFile  = QtGui.QLineEdit(cp.confpars.dirName+'/'+cp.confpars.fileName)
 
         self.butBrowse    = QtGui.QPushButton("1. Select file:")    
         self.butHDF5GUI   = QtGui.QPushButton("2. Check datasets in HDF5 tree")
-        self.butWTD       = QtGui.QPushButton("3. Set what and how to display")
-        self.butPlayer    = QtGui.QPushButton("4. Plot data in several modes")
+        self.butDataSets  = QtGui.QPushButton("3. Select parameters in datasets")
+        self.butPlayer    = QtGui.QPushButton("4. Reserved")
+        self.butConfig    = QtGui.QPushButton("Configuration")
         self.butSave      = QtGui.QPushButton("Save")
         self.butExit      = QtGui.QPushButton("Exit")
 
-        #self.butWTD.setMinimumHeight(30)
-        #self.butWTD.setMinimumWidth(210)
+        #self.butDataSets.setMinimumHeight(30)
+        #self.butDataSets.setMinimumWidth(210)
 
         self.setButtonColors()
 
@@ -110,7 +106,7 @@ class GUIMain ( QtGui.QWidget ) :
         hboxC.addStretch(1)
         
         hboxE = QtGui.QHBoxLayout()
-        hboxE.addWidget(self.butWTD)
+        hboxE.addWidget(self.butDataSets)
         hboxE.addStretch(1)
 
         self.hboxT = QtGui.QHBoxLayout() 
@@ -119,9 +115,13 @@ class GUIMain ( QtGui.QWidget ) :
         if cp.confpars.playerGUIIsOpen : # At initialization it means that "should be open..."
             self.setPlayerWidgets()
 
+        hboxG = QtGui.QHBoxLayout()
+        hboxG.addWidget(self.butPlayer)
+        hboxG.addStretch(1)
+
         hbox = QtGui.QHBoxLayout()
-        hbox.addWidget(self.butPlayer)
         hbox.addStretch(1)
+        hbox.addWidget(self.butConfig)
         hbox.addWidget(self.butSave)
         hbox.addWidget(self.butExit)
 
@@ -132,6 +132,8 @@ class GUIMain ( QtGui.QWidget ) :
         vbox.addStretch(1)     
         vbox.addLayout(hboxE)
         vbox.addStretch(1)     
+        vbox.addLayout(hboxG)
+        vbox.addStretch(1)     
         vbox.addLayout(hbox)
         vbox.addStretch(1)
         vbox.addLayout(self.hboxT)
@@ -141,8 +143,9 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.connect(self.butBrowse,    QtCore.SIGNAL('clicked()'),          self.processBrowse )
         self.connect(self.butHDF5GUI,   QtCore.SIGNAL('clicked()'),          self.processHDF5 )
-        self.connect(self.butWTD,       QtCore.SIGNAL('clicked()'),          self.processWhatToDisplay )
+        self.connect(self.butDataSets,  QtCore.SIGNAL('clicked()'),          self.processDataSets )
         self.connect(self.butPlayer,    QtCore.SIGNAL('clicked()'),          self.processPlayer )
+        self.connect(self.butConfig,    QtCore.SIGNAL('clicked()'),          self.processConfig )
         self.connect(self.butSave,      QtCore.SIGNAL('clicked()'),          self.processSave )
         self.connect(self.butExit,      QtCore.SIGNAL('clicked()'),          self.processQuit )
         self.connect(self.editFile,     QtCore.SIGNAL('editingFinished ()'), self.processEditFile )
@@ -158,7 +161,6 @@ class GUIMain ( QtGui.QWidget ) :
     # Private methods --
     #-------------------
 
-
     def showToolTips(self):
         self.butSave.setToolTip('Save all current settings in the \nfile with configuration parameters.') 
         self.butExit.setToolTip('Close all windows and \nexit this program') 
@@ -170,27 +172,36 @@ class GUIMain ( QtGui.QWidget ) :
         self.styleGreen  = "background-color: rgb(220, 255, 220); color: rgb(0, 0, 0)" # Greenish
         self.styleGray   = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0)" # Pinkish
 
-        if cp.confpars.step01IsDone : self.butBrowse .setStyleSheet(self.styleGray)
-        else                        : self.butBrowse .setStyleSheet(self.styleGreen)
+        if cp.confpars.step01IsDone : self.butBrowse  .setStyleSheet(self.styleGray)
+        else                        : self.butBrowse  .setStyleSheet(self.styleGreen)
 
-        if cp.confpars.step02IsDone : self.butHDF5GUI.setStyleSheet(self.styleGray)
-        else                        : self.butHDF5GUI.setStyleSheet(self.styleGreen)
+        if cp.confpars.step02IsDone : self.butHDF5GUI .setStyleSheet(self.styleGray)
+        else                        : self.butHDF5GUI .setStyleSheet(self.styleGreen)
 
-        if cp.confpars.step03IsDone : self.butWTD    .setStyleSheet(self.styleGray)
-        else                        : self.butWTD    .setStyleSheet(self.styleGreen)
+        if cp.confpars.step03IsDone : self.butDataSets.setStyleSheet(self.styleGray)
+        else                        : self.butDataSets.setStyleSheet(self.styleGreen)
 
-        if cp.confpars.step04IsDone : self.butPlayer .setStyleSheet(self.styleGray)
-        else                        : self.butPlayer .setStyleSheet(self.styleGreen)
+        if cp.confpars.step04IsDone : self.butPlayer  .setStyleSheet(self.styleGray)
+        else                        : self.butPlayer  .setStyleSheet(self.styleGreen)
 
 
-    def moveEvent(self, e):
-        #print 'moveEvent' 
-        cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
+    def setFrame(self):
+        self.frame = QtGui.QFrame(self)
+        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
+        self.frame.setLineWidth(0)
+        self.frame.setMidLineWidth(1)
+        self.frame.setGeometry(self.rect())
+        #self.frame.setVisible(False)
 
 
     def resizeEvent(self, e):
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
+
+
+    def moveEvent(self, e):
+        #print 'moveEvent' 
+        cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
 
 
     #def processPrint(self):
@@ -207,14 +218,14 @@ class GUIMain ( QtGui.QWidget ) :
             self.wplayer.processQuit()
             self.wcomplex.processQuit()
         self.SHowIsOn = False
-        if cp.confpars.wtdWindowIsOpen :
-            cp.confpars.guiwhat.close()
+        if cp.confpars.dsetsGUIIsOpen :
+            cp.confpars.guidsets.close()
         if cp.confpars.treeWindowIsOpen :
             cp.confpars.guitree.close()
         if cp.confpars.configGUIIsOpen :
             cp.confpars.guiconfig.close()
-        if cp.confpars.selectionGUIIsOpen :
-            cp.confpars.guiselection.close()
+        #if cp.confpars.selectionGUIIsOpen :
+        #    cp.confpars.guiselection.close()
         #print 'Segmentation fault may happen at exit, when the dialog is closed. \nThis is a known problem of python-qt4 version.'
         print 'Exit HDF5Explorer'
 
@@ -260,20 +271,20 @@ class GUIMain ( QtGui.QWidget ) :
     #    else :                           # Open wtd window
     #        print 'Selection GUI: Open'
     #        #self.selection.setText('Close Selection')
-    #        cp.confpars.guiselection = guisel.GUISelection()
+    #        cp.confpars.guiselection = guisel.GUIDataSets()
     #        cp.confpars.guiselection.move(self.pos().__add__(QtCore.QPoint(500,330))) # open window with offset w.r.t. parent
     #        cp.confpars.guiselection.show()
 
         
-    #def processConfig(self):
-    #    print 'Configuration'
-    #    if  cp.confpars.configGUIIsOpen :
-    #        cp.confpars.guiconfig.close()
-    #    else :    
-    #        cp.confpars.guiconfig = guiconfig.GUIConfiguration()
-    #        cp.confpars.guiconfig.setParent(self)
-    #        cp.confpars.guiconfig.move(self.pos().__add__(QtCore.QPoint(100,330))) # open window with offset w.r.t. parent
-    #        cp.confpars.guiconfig.show()
+    def processConfig(self):
+        print 'Configuration'
+        if  cp.confpars.configGUIIsOpen :
+            cp.confpars.guiconfig.close()
+        else :    
+            cp.confpars.guiconfig = guiconfig.GUIConfiguration()
+            cp.confpars.guiconfig.setParent(self)
+            cp.confpars.guiconfig.move(self.pos().__add__(QtCore.QPoint(100,330))) # open window with offset w.r.t. parent
+            cp.confpars.guiconfig.show()
 
 
     def processSave(self):
@@ -281,17 +292,15 @@ class GUIMain ( QtGui.QWidget ) :
         cp.confpars.writeParameters()
 
 
-    def processWhatToDisplay(self):
-        if cp.confpars.wtdWindowIsOpen : # close wtd window
-            print 'Close What to display GUI'
-            #self.butWTD.setText('Open')
-            cp.confpars.guiwhat.close()
+    def processDataSets(self):
+        if cp.confpars.dsetsGUIIsOpen : # close wtd window
+            print 'Close GUIDataSets'
+            cp.confpars.guidsets.close()
         else :                           # Open wtd window
-            print 'Open What to display GUI'
-            #self.butWTD.setText('Close')
-            cp.confpars.guiwhat = guiwtd.GUIWhatToDisplay()
-            cp.confpars.guiwhat.move(self.pos().__add__(QtCore.QPoint(0,380))) # open window with offset w.r.t. parent
-            cp.confpars.guiwhat.show()
+            print 'Open GUIDataSets'
+            cp.confpars.guidsets = guidatasets.GUIDataSets()
+            cp.confpars.guidsets.move(self.pos().__add__(QtCore.QPoint(0,380))) # open window with offset w.r.t. parent
+            cp.confpars.guidsets.show()
 
         cp.confpars.step03IsDone = True
         self.setButtonColors()
@@ -314,18 +323,17 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def processPlayer(self):
-        #print 'Player GUI'
-        if  cp.confpars.playerGUIIsOpen :
-            print 'Close Player sub-GUI'
-            self.wplayer.close()
-            self.wcomplex.close()
-            self.setFixedSize(500,150)
-        else :    
-            print 'Open Player sub-GUI'
-            self.setPlayerWidgets()
-            #self.show()
-        cp.confpars.step04IsDone = True
-        self.setButtonColors()
+        print 'GUI Reserved ...'
+        #if  cp.confpars.playerGUIIsOpen :
+        #    print 'Close Player sub-GUI'
+        #    self.wplayer.close()
+        #    self.wcomplex.close()
+        #    self.setFixedSize(500,150)
+        #else :    
+        #    print 'Open Player sub-GUI'
+        #    self.setPlayerWidgets()
+        #cp.confpars.step04IsDone = True
+        #self.setButtonColors()
 
 
     def setPlayerWidgets(self):
