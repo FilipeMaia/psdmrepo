@@ -65,25 +65,30 @@ class GUISelectItems ( QtGui.QMainWindow ) :
         self.setGeometry(10, 10, 350, 1000)
         self.setWindowTitle('HDF5 tree, select items')
 
-        #layout = QHBoxLayout()
+        # !!!!! THE /data/ SUBDIRECTORY SHOULD BE OMITTED IN PATH !!!!!
+        self.apppath_icon_folder_open   = apputils.AppDataPath('HDF5Explorer/icons/folder_open.gif')
+        self.apppath_icon_folder_closed = apputils.AppDataPath('HDF5Explorer/icons/folder_closed.gif')
+        self.apppath_icon_data          = apputils.AppDataPath('HDF5Explorer/icons/table.gif')
+        self.apppath_icon_apply         = apputils.AppDataPath('HDF5Explorer/icons/button_ok.png')
+        self.apppath_icon_reset         = apputils.AppDataPath('HDF5Explorer/icons/undo.png')
+        self.apppath_icon_retreve       = apputils.AppDataPath('HDF5Explorer/icons/redo.png')
+        self.apppath_icon_exit          = apputils.AppDataPath('HDF5Explorer/icons/exit.png')
+        self.apppath_icon_expand        = apputils.AppDataPath('HDF5Explorer/icons/folder_open.gif')
+        self.apppath_icon_collapse      = apputils.AppDataPath('HDF5Explorer/icons/folder_closed.gif')
+        self.apppath_icon_expcheck      = apputils.AppDataPath('HDF5Explorer/icons/folder_open_checked.png')
+        self.apppath_icon_print         = apputils.AppDataPath('HDF5Explorer/icons/contents.png')
 
-        appdatapath = apputils.AppDataPath('HDF5Explorer')
-        data_dir    = appdatapath.path()
-        #data_dir = 'HDF5Explorer/src'
-        #data_dir = 'HDF5Explorer/data'
-        print 'CHECK PATH TO ICONS:data_dir:', data_dir 
-
-        self.icon_folder_open   = QtGui.QIcon(data_dir + "/icons/folder_open.gif")
-        self.icon_folder_closed = QtGui.QIcon(data_dir + "/icons/folder_closed.gif")
-        self.icon_data          = QtGui.QIcon(data_dir + "/icons/table.gif")
-        self.icon_apply         = QtGui.QIcon(data_dir + "/icons/button_ok.png")
-        self.icon_reset         = QtGui.QIcon(data_dir + "/icons/undo.png")
-        self.icon_retreve       = QtGui.QIcon(data_dir + "/icons/redo.png")
-        self.icon_exit          = QtGui.QIcon(data_dir + "/icons/exit.png")
-        self.icon_expand        = QtGui.QIcon(data_dir + "/icons/folder_open.gif")
-        self.icon_collapse      = QtGui.QIcon(data_dir + "/icons/folder_closed.gif")
-        self.icon_expcheck      = QtGui.QIcon(data_dir + "/icons/folder_open_checked.png")
-        self.icon_print         = QtGui.QIcon(data_dir + "/icons/contents.png")
+        self.icon_folder_open   = QtGui.QIcon(self.apppath_icon_folder_open  .path())
+        self.icon_folder_closed = QtGui.QIcon(self.apppath_icon_folder_closed.path())
+        self.icon_data          = QtGui.QIcon(self.apppath_icon_data         .path())
+        self.icon_apply         = QtGui.QIcon(self.apppath_icon_apply        .path())
+        self.icon_reset         = QtGui.QIcon(self.apppath_icon_reset        .path())
+        self.icon_retreve       = QtGui.QIcon(self.apppath_icon_retreve      .path())
+        self.icon_exit          = QtGui.QIcon(self.apppath_icon_exit         .path())
+        self.icon_expand        = QtGui.QIcon(self.apppath_icon_expand       .path())
+        self.icon_collapse      = QtGui.QIcon(self.apppath_icon_collapse     .path())
+        self.icon_expcheck      = QtGui.QIcon(self.apppath_icon_expcheck     .path())
+        self.icon_print         = QtGui.QIcon(self.apppath_icon_print        .path())         
         self.icon_expcoll       = self.icon_expand
 
         actExit         = QtGui.QAction(self.icon_exit,     'Exit',           self)

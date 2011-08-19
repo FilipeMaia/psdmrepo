@@ -13,7 +13,7 @@ reverse time order.
 
 ------------------------------
 Tag: V00-00-04
-2011-08-18 Mikhail S. Dubrovin
+2011-08-19 Mikhail S. Dubrovin
 - Move icons from src/icons/* to data/icons/*
 - Get data directory using AppUtils.AppDataPath in
 	       HDF5Explorer/src/GUISelectItems.py

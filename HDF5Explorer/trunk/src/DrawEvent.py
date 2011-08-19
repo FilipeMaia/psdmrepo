@@ -427,9 +427,14 @@ class DrawEvent ( object ) :
         if gm.ImageIsInTheName(dsname) :
 
             cameraName = gm.get_item_second_to_last_name(dsname)
-            gm.saveNumpyArrayInFile(arr1ev, fname='camera-ave-' + str(cameraName) + '.txt' , format='%i') # , format='%f')
 
-            tiff_fname = 'camera-ave-' + str(cameraName) + '.tiff'
+            str_evt = '-ev%06d' % (self.eventStart) # cp.confpars.eventCurrent
+            str_ave = '-av%d'   % (cp.confpars.numEventsAverage)
+            fname_common = 'camera-' + str(cameraName) + str_ave + str_evt
+
+            gm.saveNumpyArrayInFile(arr1ev, fname=fname_common + '.txt' , format='%i') # , format='%f')
+
+            tiff_fname = fname_common + '.tiff'
             print 'Save image in TIFF file  ', tiff_fname
             scimisc.imsave(tiff_fname, arr1ev)
 

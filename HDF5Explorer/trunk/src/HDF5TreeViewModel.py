@@ -52,14 +52,14 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
 
     def __init__(self, parent=None):
 
-        appdatapath = apputils.AppDataPath('HDF5Explorer')
-        data_dir    = appdatapath.path()
-        #data_dir = 'HDF5Explorer/src'
-        #data_dir = 'HDF5Explorer/data'
+        # !!!!! THE /data/ SUBDIRECTORY SHOULD BE OMITTED IN PATH !!!!!
+        self.apppath_icon_folder_open   = apputils.AppDataPath('HDF5Explorer/icons/folder_open.gif')
+        self.apppath_icon_folder_closed = apputils.AppDataPath('HDF5Explorer/icons/folder_closed.gif')
+        self.apppath_icon_data          = apputils.AppDataPath('HDF5Explorer/icons/table.gif')
 
-        self.icon_folder_open   = QtGui.QIcon(data_dir + "/icons/folder_open.gif")
-        self.icon_folder_closed = QtGui.QIcon(data_dir + "/icons/folder_closed.gif")
-        self.icon_data          = QtGui.QIcon(data_dir + "/icons/table.gif")
+        self.icon_folder_open   = QtGui.QIcon(self.apppath_icon_folder_open  .path())
+        self.icon_folder_closed = QtGui.QIcon(self.apppath_icon_folder_closed.path())
+        self.icon_data          = QtGui.QIcon(self.apppath_icon_data         .path())
 
         QtGui.QStandardItemModel.__init__(self, parent)
 
