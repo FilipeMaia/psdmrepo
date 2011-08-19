@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-08
+2011-08-18 Andy Salnikov
+- implemented Python version of AppDataPath class
+
 Tag: V00-01-07
 2011-08-17 Andy Salnikov
 - new class AppDataPath which finds a file in $SIT_DATA path

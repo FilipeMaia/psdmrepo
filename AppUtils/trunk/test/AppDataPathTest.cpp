@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Test suite case for the AppDataPathTest.
+//	Test suite case for the AppDataPath.
 //
 //------------------------------------------------------------------------
 
