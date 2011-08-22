@@ -81,6 +81,29 @@ DumpPrinceton::beginCalibCycle(Event& evt, Env& env)
     }
     
   }
+
+  shared_ptr<Psana::Princeton::ConfigV2> config2 = env.configStore().get(m_src);
+  if (config2.get()) {
+    
+    WithMsgLog(name(), info, str) {
+      str << "Princeton::ConfigV2:";
+      str << "\n  width = " << config2->width();
+      str << "\n  height = " << config2->height();
+      str << "\n  orgX = " << config2->orgX();
+      str << "\n  orgY = " << config2->orgY();
+      str << "\n  binX = " << config2->binX();
+      str << "\n  binY = " << config2->binY();
+      str << "\n  exposureTime = " << config2->exposureTime();
+      str << "\n  coolingTemp = " << config2->coolingTemp();
+      str << "\n  gainIndex = " << config2->gainIndex();
+      str << "\n  readoutSpeedIndex = " << config2->readoutSpeedIndex();
+      str << "\n  readoutEventCode = " << config2->readoutEventCode();
+      str << "\n  delayMode = " << config2->delayMode();
+      str << "\n  frameSize = " << config2->frameSize();
+      str << "\n  numPixels = " << config2->numPixels();
+    }
+    
+  }
 }
 
 // Method which is called with event data
@@ -91,6 +114,7 @@ DumpPrinceton::event(Event& evt, Env& env)
   if (frame.get()) {
     WithMsgLog(name(), info, str) {
       str << "Princeton::FrameV1:";
+      str << "\n  shotIdStart = " << frame->shotIdStart();
       str << "\n  readoutTime = " << frame->readoutTime();
 
       const uint16_t* data = frame->data();
