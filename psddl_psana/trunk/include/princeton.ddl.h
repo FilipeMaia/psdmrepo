@@ -42,12 +42,46 @@ public:
   virtual uint32_t numPixels() const = 0;
 };
 
+/** @class ConfigV2
+
+  
+*/
+
+
+class ConfigV2 {
+public:
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  virtual ~ConfigV2();
+  virtual uint32_t width() const = 0;
+  virtual uint32_t height() const = 0;
+  virtual uint32_t orgX() const = 0;
+  virtual uint32_t orgY() const = 0;
+  virtual uint32_t binX() const = 0;
+  virtual uint32_t binY() const = 0;
+  virtual float exposureTime() const = 0;
+  virtual float coolingTemp() const = 0;
+  virtual uint16_t gainIndex() const = 0;
+  virtual uint16_t readoutSpeedIndex() const = 0;
+  virtual uint16_t readoutEventCode() const = 0;
+  virtual uint16_t delayMode() const = 0;
+  /** Total size in bytes of the Frame object */
+  virtual uint32_t frameSize() const = 0;
+  /** calculate the frame size in pixels based on the current ROI and binning settings */
+  virtual uint32_t numPixels() const = 0;
+};
+
 /** @class FrameV1
 
   
 */
 
 class ConfigV1;
+class ConfigV2;
 
 class FrameV1 {
 public:
