@@ -44,10 +44,53 @@ uint16_t ConfigV1::delayMode() const { return m_xtcObj->delayMode(); }
 uint32_t ConfigV1::frameSize() const { return m_xtcObj->frameSize(); }
 
 uint32_t ConfigV1::numPixels() const { return m_xtcObj->numPixels(); }
+ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Princeton::ConfigV2()
+  , m_xtcObj(xtcPtr)
+{
+}
+ConfigV2::~ConfigV2()
+{
+}
+
+
+uint32_t ConfigV2::width() const { return m_xtcObj->width(); }
+
+uint32_t ConfigV2::height() const { return m_xtcObj->height(); }
+
+uint32_t ConfigV2::orgX() const { return m_xtcObj->orgX(); }
+
+uint32_t ConfigV2::orgY() const { return m_xtcObj->orgY(); }
+
+uint32_t ConfigV2::binX() const { return m_xtcObj->binX(); }
+
+uint32_t ConfigV2::binY() const { return m_xtcObj->binY(); }
+
+float ConfigV2::exposureTime() const { return m_xtcObj->exposureTime(); }
+
+float ConfigV2::coolingTemp() const { return m_xtcObj->coolingTemp(); }
+
+uint16_t ConfigV2::gainIndex() const { return m_xtcObj->gainIndex(); }
+
+uint16_t ConfigV2::readoutSpeedIndex() const { return m_xtcObj->readoutSpeedIndex(); }
+
+uint16_t ConfigV2::readoutEventCode() const { return m_xtcObj->readoutEventCode(); }
+
+uint16_t ConfigV2::delayMode() const { return m_xtcObj->delayMode(); }
+
+uint32_t ConfigV2::frameSize() const { return m_xtcObj->frameSize(); }
+
+uint32_t ConfigV2::numPixels() const { return m_xtcObj->numPixels(); }
 FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV1>& cfgPtr)
   : Psana::Princeton::FrameV1()
   , m_xtcObj(xtcPtr)
   , m_cfgPtr0(cfgPtr)
+{
+}
+FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV2>& cfgPtr)
+  : Psana::Princeton::FrameV1()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr1(cfgPtr)
 {
 }
 FrameV1::~FrameV1()
@@ -63,6 +106,7 @@ const uint16_t* FrameV1::data() const { return m_xtcObj->data(); }
 
 std::vector<int> FrameV1::data_shape() const {
   if (m_cfgPtr0.get()) return m_xtcObj->data_shape(*m_cfgPtr0);
+  if (m_cfgPtr1.get()) return m_xtcObj->data_shape(*m_cfgPtr1);
   throw std::runtime_error("FrameV1::data_shape: config object pointer is zero");
 }
 
