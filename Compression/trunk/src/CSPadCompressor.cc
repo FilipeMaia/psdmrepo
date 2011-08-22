@@ -682,7 +682,6 @@ CSPadCompressor::dump(std::ostream& str,
     uint8_t*     data_ptr           = hdr_ptr;
     uint8_t*     bitmap_size_ptr    = data_ptr + data_size_bytes;
     const size_t bitmap_size_shorts = *(uint32_t*)bitmap_size_ptr; bitmap_size_ptr += sizeof(uint32_t);
-    uint16_t*    bitmap_ptr         = (uint16_t*)bitmap_size_ptr;
 
     if( hdr_compressed_size_bytes !=
         sizeof(uint16_t) +                      // base
