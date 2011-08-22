@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10
+2011-08-22 Andrei Salnikov
+- added Princeton::ConfigV2 class (part of pdsdata V02-13-03)
+
 Tag: V00-00-09
 2011-06-16 Andrei Salnikov
 - upgrade to pdsdata V02-11-05
