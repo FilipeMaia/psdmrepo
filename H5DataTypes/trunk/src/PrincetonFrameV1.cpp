@@ -62,11 +62,11 @@ PrincetonFrameV1::native_type()
 }
 
 hdf5pp::Type
-PrincetonFrameV1::stored_data_type( const ConfigXtcType& config )
+PrincetonFrameV1::stored_data_type(uint32_t height, uint32_t width)
 {
   hdf5pp::Type baseType = hdf5pp::TypeTraits<uint16_t>::native_type() ;
 
-  hsize_t dims[] = { config.height(), config.width() } ;
+  hsize_t dims[] = { height, width } ;
   return hdf5pp::ArrayType::arrayType ( baseType, 2, dims );
 }
 

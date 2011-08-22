@@ -48,7 +48,6 @@ class PrincetonFrameV1  {
 public:
 
   typedef Pds::Princeton::FrameV1 XtcType ;
-  typedef Pds::Princeton::ConfigV1 ConfigXtcType ;
 
   PrincetonFrameV1 () {}
   PrincetonFrameV1 ( const XtcType& data ) ;
@@ -56,7 +55,7 @@ public:
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  static hdf5pp::Type stored_data_type( const ConfigXtcType& config ) ;
+  static hdf5pp::Type stored_data_type(uint32_t height, uint32_t width) ;
 
 private:
 
