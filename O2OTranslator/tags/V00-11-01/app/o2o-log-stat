@@ -1,0 +1,197 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script O2OLogStat...
+#
+#------------------------------------------------------------------------
+
+"""Collects statistics from translator log files and prints it.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import h5py
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+#from PkgPackage.PkgModule import PkgClass
+
+#---------------------
+# Local definitions --
+#---------------------
+
+def _t(str) :
+    """ Converts string in format Ssec.subsec(...) to time"""
+    str = str.split('(')[0]
+    try :
+        return float(str[1:])
+    except :
+        return 0.0
+
+def _xtcsize(files):
+
+    def _filesize(f):
+        try :
+            return os.stat(f).st_size
+        except :
+            return 0
+    return sum([_filesize(f) for f in files])
+            
+def _hdfsize(instr, exper, run):
+
+    f = '/reg/d/psdm/%s/%s/hdf5/%s-r%04d.h5' % (instr, exper, exper, run)
+    try :
+        return os.stat(f).st_size
+    except :
+        return 0
+            
+def _calibcycles(instr, exper, run):
+
+    fname = '/reg/d/psdm/%s/%s/hdf5/%s-r%04d.h5' % (instr, exper, exper, run)
+    try :
+        f = h5py.File(fname, 'r')
+        g = f['Configure:0000/Run:0000']
+        return list(g)
+    except :
+        return []
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class O2OLogStat ( LusiPyApp ) :
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] log-file ..." )
+
+        # add application options, see optparse module for details
+        
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # check the arguments
+        if not self._args :
+            self._parser.error("one or more arguments required")
+            return 2
+
+        fmt = "%3s  %7s  %5s  %7s  %5s  %5s  %6s  %6s"
+        print "Run Calib XTCsize RunTime HDFsize TrnTime    CPU  Size   Time  XTCspeed"
+        print "num Cycles   MB     sec      MB     sec     util% Ratio  Ratio  MB/sec"
+        print "------------------------------------------------------------------------"
+
+        # process all arguments
+        for arg in self._args :
+            self.process ( arg )
+
+
+    #
+    #  Does real processing job
+    #
+    def process ( self, arg ) :
+        """Processes one argument"""
+
+        self.trace( "Processing "+arg+"..." )
+
+        input = []
+        runNumber = 0
+        instr = ""
+        exper = ""
+        runTime = 0
+        tranRealTime = 0
+        tranCpuTime = 0
+
+        state = 0
+        for line in file(arg):
+            
+            line = line.rstrip('\n')
+            if line.startswith("[INF]") :
+                if line == "[INF] input files:" :
+                    state = 1
+                elif line == "[INF] run statistics:" :
+                    state = 2
+                elif line == "[INF] Resource usage summary:" :
+                    state = 3
+                else :
+                    state = 0
+            elif line.startswith(' ') or line.startswith('\t'):
+                line = line.strip()
+                if state == 1 :
+                    input.append(line)
+                elif state == 2 :
+                    words = line.split(' ')
+                    if words[0] == 'm_runNumber:' :
+                        runNumber = int(words[1])
+                    elif words[0] == 'm_instrument:' :
+                        instr = words[1]
+                    elif words[0] == 'm_experiment:' :
+                        exper = words[1]
+                    elif words[0] == 'm_runBeginTime:' :
+                        t0 = _t(words[1])
+                    elif words[0] == 'm_runEndTime:' :
+                        t1 = _t(words[1])
+                        if t1 > 0 and t0 > 0 : runTime = t1 - t0
+                elif state == 3 :
+                    words = line.split(' ')
+                    if words[0:2] == ['real', 'time:'] :
+                        tranRealTime = float(words[2])
+                    elif words[0:2] == ['user', 'time:'] :
+                        tranCpuTime += float(words[2])
+                    elif words[0:3] == ['sys', 'time', ':'] :
+                        tranCpuTime += float(words[3])
+
+        xtcsize = _xtcsize(input) / 1048576.
+        hdfsize = _hdfsize(instr, exper, runNumber) / 1048576.
+        sfrac = 0
+        if xtcsize : sfrac = hdfsize / xtcsize
+        tfrac = 0
+        if runTime : tfrac = tranRealTime / runTime
+        speed = 0
+        if tranRealTime : speed = xtcsize / tranRealTime
+        cpu = 0
+        if tranRealTime : cpu = tranCpuTime / tranRealTime *100
+
+        cycles = _calibcycles(instr, exper, runNumber)
+        ncycles = len(cycles)
+
+        fmt = "%3d  %3d  %7.1f  %5.0f  %7.1f  %5.0f  %3.0f  %6.3f  %6.3f  %7.3f"
+        print fmt % (runNumber, ncycles, xtcsize, runTime, hdfsize, tranRealTime, cpu, sfrac, tfrac, speed)
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = O2OLogStat()
+    rc = app.run()
+    sys.exit(rc)
