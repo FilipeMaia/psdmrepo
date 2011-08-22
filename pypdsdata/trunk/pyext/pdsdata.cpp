@@ -128,6 +128,7 @@
 #include "types/pnCCD/FrameV1.h"
 
 #include "types/princeton/ConfigV1.h"
+#include "types/princeton/ConfigV2.h"
 #include "types/princeton/FrameV1.h"
 #include "types/princeton/InfoV1.h"
 
@@ -319,6 +320,7 @@ PyMODINIT_FUNC init_pdsdata()
 
   module = Py_InitModule3( "_pdsdata.princeton", 0, "The Python module for pdsdata/princeton" );
   pypdsdata::Princeton::ConfigV1::initType( module );
+  pypdsdata::Princeton::ConfigV2::initType( module );
   pypdsdata::Princeton::FrameV1::initType( module );
   pypdsdata::Princeton::InfoV1::initType( module );
   Py_INCREF( module );

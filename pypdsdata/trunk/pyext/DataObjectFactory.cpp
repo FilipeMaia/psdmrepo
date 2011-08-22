@@ -86,6 +86,7 @@
 #include "types/pnCCD/FrameV1.h"
 
 #include "types/princeton/ConfigV1.h"
+#include "types/princeton/ConfigV2.h"
 #include "types/princeton/FrameV1.h"
 #include "types/princeton/InfoV1.h"
 
@@ -229,6 +230,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_PrincetonConfig :
     if ( not obj ) obj = xtc2obj<Princeton::ConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Princeton::ConfigV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_EvrData :

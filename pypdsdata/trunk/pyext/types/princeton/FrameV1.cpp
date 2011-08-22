@@ -24,6 +24,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "ConfigV1.h"
+#include "ConfigV2.h"
 #include "../../Exception.h"
 #include "../TypeLib.h"
 #include "../../pdsdata_numpy.h"
@@ -78,19 +79,26 @@ data( PyObject* self, PyObject* args )
   PyObject* configObj ;
   if ( not PyArg_ParseTuple( args, "O:Princeton.FrameV1.data", &configObj ) ) return 0;
 
-  // get config object
-  if ( not pypdsdata::Princeton::ConfigV1::Object_TypeCheck( configObj ) ) {
-    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a PNCCD.ConfigV1 object");
+  // dimensions
+  npy_intp dims[2] = { 0, 0 };
+
+  // get dimensions from config object
+  if ( pypdsdata::Princeton::ConfigV1::Object_TypeCheck( configObj ) ) {
+    Pds::Princeton::ConfigV1* config = pypdsdata::Princeton::ConfigV1::pdsObject( configObj );
+    dims[0] = config->height();
+    dims[1] = config->width();
+  } else if ( pypdsdata::Princeton::ConfigV2::Object_TypeCheck( configObj ) ) {
+    Pds::Princeton::ConfigV2* config = pypdsdata::Princeton::ConfigV2::pdsObject( configObj );
+    dims[0] = config->height();
+    dims[1] = config->width();
+  } else {
+    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a PNCCD.ConfigV* object");
     return 0;
   }
-  Pds::Princeton::ConfigV1* config = pypdsdata::Princeton::ConfigV1::pdsObject( configObj );
 
   // NumPy type number
   int typenum = NPY_USHORT ;
   int flags = NPY_C_CONTIGUOUS ;
-
-  // dimensions
-  npy_intp dims[2] = { config->height(), config->width() };
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 2, dims, typenum, 0,
