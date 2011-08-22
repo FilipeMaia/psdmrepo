@@ -22,6 +22,7 @@
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
 #include "pdsdata/princeton/ConfigV1.hh"
+#include "pdsdata/princeton/ConfigV2.hh"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -78,9 +79,17 @@ PrincetonFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                         const H5DataTypes::XtcClockTime& time )
 {
   // find corresponding configuration object
-  Pds::TypeId cfgTypeId(Pds::TypeId::Id_PrincetonConfig, 1);
-  const Pds::Princeton::ConfigV1* config = m_configStore.find<Pds::Princeton::ConfigV1>(cfgTypeId, src.top());
-  if ( not config ) {
+  uint32_t height = 0;
+  uint32_t width = 0;
+  Pds::TypeId cfgTypeId1(Pds::TypeId::Id_PrincetonConfig, 1);
+  Pds::TypeId cfgTypeId2(Pds::TypeId::Id_PrincetonConfig, 2);
+  if (const Pds::Princeton::ConfigV1* config = m_configStore.find<Pds::Princeton::ConfigV1>(cfgTypeId1, src.top())) {
+    height = config->height();
+    width = config->width();
+  } else if (const Pds::Princeton::ConfigV2* config = m_configStore.find<Pds::Princeton::ConfigV2>(cfgTypeId2, src.top())) {
+    height = config->height();
+    width = config->width();
+  } else {
     MsgLog ( logger, error, "PrincetonFrameV1Cvt - no configuration object was defined" );
     return ;
   }
@@ -105,7 +114,7 @@ PrincetonFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   // store the data
   H5DataTypes::PrincetonFrameV1 frame(data);
   m_frameCont->container(group)->append ( frame ) ;
-  hdf5pp::Type type = H5DataTypes::PrincetonFrameV1::stored_data_type ( *config ) ;
+  hdf5pp::Type type = H5DataTypes::PrincetonFrameV1::stored_data_type(height, width) ;
   m_frameDataCont->container(group,type)->append ( *data.data(), type ) ;
   m_timeCont->container(group)->append ( time ) ;
 }

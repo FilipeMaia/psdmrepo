@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-11-01
+2011-08-22 Andy Salnikov
+- upgrading to pdsdata V02-13-03
+
 Tag: V00-11-00
 2011-07-13 Andy Salnikov
 - incompatible change: group names for BldData types now

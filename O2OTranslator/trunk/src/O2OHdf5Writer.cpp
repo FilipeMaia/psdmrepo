@@ -68,6 +68,7 @@
 #include "H5DataTypes/PnCCDConfigV1.h"
 #include "H5DataTypes/PnCCDConfigV2.h"
 #include "H5DataTypes/PrincetonConfigV1.h"
+#include "H5DataTypes/PrincetonConfigV2.h"
 #include "H5DataTypes/PrincetonInfoV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV2.h"
@@ -289,6 +290,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::PrincetonConfigV1> ( "Princeton::ConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_PrincetonConfig,1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::PrincetonConfigV2> ( "Princeton::ConfigV2" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_PrincetonConfig,2).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::FccdConfigV1> ( "FCCD::FccdConfigV1" ) ) ;
