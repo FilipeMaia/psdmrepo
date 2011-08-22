@@ -58,12 +58,61 @@ private:
 };
 #pragma pack(pop)
 
+/** @class ConfigV2
+
+  
+*/
+
+#pragma pack(push,4)
+
+class ConfigV2 {
+public:
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  uint32_t width() const {return _uWidth;}
+  uint32_t height() const {return _uHeight;}
+  uint32_t orgX() const {return _uOrgX;}
+  uint32_t orgY() const {return _uOrgY;}
+  uint32_t binX() const {return _uBinX;}
+  uint32_t binY() const {return _uBinY;}
+  float exposureTime() const {return _f32ExposureTime;}
+  float coolingTemp() const {return _f32CoolingTemp;}
+  uint16_t gainIndex() const {return _u16GainIndex;}
+  uint16_t readoutSpeedIndex() const {return _u16ReadoutSpeedIndex;}
+  uint16_t readoutEventCode() const {return _u16ReadoutEventCode;}
+  uint16_t delayMode() const {return _u16DelayMode;}
+  /** Total size in bytes of the Frame object */
+  uint32_t frameSize() const;
+  /** calculate the frame size in pixels based on the current ROI and binning settings */
+  uint32_t numPixels() const;
+  static uint32_t _sizeof()  {return 40;}
+private:
+  uint32_t	_uWidth;
+  uint32_t	_uHeight;
+  uint32_t	_uOrgX;
+  uint32_t	_uOrgY;
+  uint32_t	_uBinX;
+  uint32_t	_uBinY;
+  float	_f32ExposureTime;
+  float	_f32CoolingTemp;
+  uint16_t	_u16GainIndex;
+  uint16_t	_u16ReadoutSpeedIndex;
+  uint16_t	_u16ReadoutEventCode;
+  uint16_t	_u16DelayMode;
+};
+#pragma pack(pop)
+
 /** @class FrameV1
 
   
 */
 
 class ConfigV1;
+class ConfigV2;
 #pragma pack(push,4)
 
 class FrameV1 {
@@ -81,8 +130,11 @@ public:
     return (const uint16_t*)(((const char*)this)+offset);
   }
   static uint32_t _sizeof(const Princeton::ConfigV1& cfg)  {return 8+(2*(cfg.numPixels()));}
+  static uint32_t _sizeof(const Princeton::ConfigV2& cfg)  {return 8+(2*(cfg.numPixels()));}
   /** Method which returns the shape (dimensions) of the data returned by data() method. */
   std::vector<int> data_shape(const Princeton::ConfigV1& cfg) const;
+  /** Method which returns the shape (dimensions) of the data returned by data() method. */
+  std::vector<int> data_shape(const Princeton::ConfigV2& cfg) const;
 private:
   uint32_t	_iShotIdStart;
   float	_fReadoutTime;
