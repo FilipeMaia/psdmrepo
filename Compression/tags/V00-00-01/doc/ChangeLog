@@ -1,0 +1,18 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id:$
+#
+# Description:
+#  ChangeLog file for package Compression
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-01
+2011-08-19 Igor Gaponenko
+- initial version of the package
+- CSPad compression/decompression algorithms, multithreaded wrapper and three tests
+
