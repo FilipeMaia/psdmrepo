@@ -12,6 +12,13 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ------------------------------
+Tag: V00-00-05
+2011-08-23 Mikhail S. Dubrovin
+- add protection in 'Average' and drawing when the event index exceeds the dataset shape.
+- add more detailed printout for dataset structure; the dataset tree is printed.  
+	       HDF5Explorer/src/DrawEvent.py
+	       HDF5Explorer/src/PrintHDF5.py	
+
 Tag: V00-00-04
 2011-08-19 Mikhail S. Dubrovin
 - Move icons from src/icons/* to data/icons/*
