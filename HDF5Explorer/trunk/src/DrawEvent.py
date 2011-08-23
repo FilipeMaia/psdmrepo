@@ -191,14 +191,18 @@ class DrawEvent ( object ) :
         # Loop over events
         while self.loopIsContinued :
 
+            print 'TEST:self.loopIsContinued     = ', self.loopIsContinued
+
             selectionIsPassed = self.selectionIsPassed() 
             self.printEventSelectionStatistics()
+
             self.loopOverDataSets() # Initialization & Accumulation
 
             cp.confpars.eventCurrent += 1
             if selectionIsPassed : self.numEventsSelected   += 1
             self.loopIsContinued = self.numEventsSelected < cp.confpars.numEventsAverage and cp.confpars.eventCurrent < self.eventEnd 
 
+            cp.confpars.eventCurrent -= 1
 
         self.loopOverDataSets(option=1) # Normalization per 1 event
 
@@ -236,7 +240,7 @@ class DrawEvent ( object ) :
                 self.ave1ev    = []                         
                 self.avedsname = []
 
-        ind=-1
+        indds=-1
         for dsname in cp.confpars.list_of_checked_item_names :
 
             item_last_name   = gm.get_item_last_name(dsname)
@@ -248,44 +252,45 @@ class DrawEvent ( object ) :
 
             ds          = self.h5file[dsname]
 
-            if cp.confpars.eventCurrent > ds.shape[0] :
+            if cp.confpars.eventCurrent >= ds.shape[0] :
                 print 80*'=', \
                       '\nWARNING! CURRENT EVENT NUMBER', cp.confpars.eventCurrent, \
-                      ' EXCEEDS THE ARRAY INDEX', ds.shape[0], \
+                      ' EXCEEDS THE ARRAY SHAPE INDEX', ds.shape[0], \
                       '\nfor dataset:', dsname, \
                       '\nTHIS EVENT IS NOT INCLUDED IN AVERAGE!'
                 continue
 
-            self.arr1ev = ds[cp.confpars.eventCurrent]
-
-            if item_last_name == 'image' : 
-                if not self.dimIsFixed(dsname) :
-                    self.arr1ev.shape = (self.arr1ev.shape[1],self.arr1ev.shape[0])
-
-            ind += 1 
+            indds += 1 
             if  option == None :
+
+                self.arr1ev = ds[cp.confpars.eventCurrent]
+
+                if item_last_name == 'image' : 
+                    if not self.dimIsFixed(dsname) :
+                        self.arr1ev.shape = (self.arr1ev.shape[1],self.arr1ev.shape[0])
+
                 if cp.confpars.eventCurrent != self.eventStart :
 
-                    self.ave1ev[ind] += self.arr1ev              # Accumulation
+                    self.ave1ev[indds] += self.arr1ev              # Accumulation
                 else :                                           # Initialization
-                    self.ave          = np.zeros(self.arr1ev.shape, dtype=np.float32)
-                    self.ave1ev       .append(self.ave)
-                    self.ave1ev[ind] += self.arr1ev   
-                    self.avedsname    .append(dsname)
-                    self.eventEnd     = ds.shape[0]
-                    print 'Total numbr of events in averaged sample [', ind, '] =', self.eventEnd
+                    self.ave           = np.zeros(self.arr1ev.shape, dtype=np.float32)
+                    self.ave1ev        .append(self.ave)
+                    self.ave1ev[indds] += self.arr1ev   
+                    self.avedsname     .append(dsname)
+                    self.eventEnd      = ds.shape[0]
+                    print 'Total numbr of events in averaged sample [', indds, '] =', self.eventEnd
 
             elif option == 1 :                                   # Normalization per 1 event
                 if self.numEventsSelected > 0 :
-                    self.ave1ev[ind] /= self.numEventsSelected
+                    self.ave1ev[indds] /= self.numEventsSelected
 
             elif option == 5 :                                   # Draw averaged dataset
 
                 #print 'Plot the dataset', dsname, '\naveraged over .numEventsSelected=', self.numEventsSelected
 
                 self.plotsCSpad.resetEventWithAlreadyGeneratedCSpadDetImage()
-                self.drawArrayForDSName(self.avedsname[ind], self.ave1ev[ind])
-                self.saveArrayForDSNameInFile(self.avedsname[ind], self.ave1ev[ind]) 
+                self.drawArrayForDSName(self.avedsname[indds], self.ave1ev[indds])
+                self.saveArrayForDSNameInFile(self.avedsname[indds], self.ave1ev[indds]) 
 
 
     def drawNextEvent ( self, mode=1 ) :
@@ -383,9 +388,9 @@ class DrawEvent ( object ) :
         for dsname in cp.confpars.list_of_checked_item_names :
 
             ds     = self.h5file[dsname]
-            if cp.confpars.eventCurrent > ds.shape[0] :
+            if cp.confpars.eventCurrent >= ds.shape[0] :
                 print 'WARNING! CURRENT EVENT NUMBER ', cp.confpars.eventCurrent, \
-                      ' EXCEEDS THE ARRAY INDEX ', ds.shape[0], \
+                      ' EXCEEDS THE ARRAY SHAPE INDEX ', ds.shape[0], \
                       '\nfor dataset: ', dsname, \
                       '\nPLOTS ARE IGNORED!'
                 return
@@ -429,7 +434,7 @@ class DrawEvent ( object ) :
             cameraName = gm.get_item_second_to_last_name(dsname)
 
             str_evt = '-ev%06d' % (self.eventStart) # cp.confpars.eventCurrent
-            str_ave = '-av%d'   % (cp.confpars.numEventsAverage)
+            str_ave = '-av%d'   % (self.numEventsSelected) # cp.confpars.numEventsAverage
             fname_common = 'camera-' + str(cameraName) + str_ave + str_evt
 
             gm.saveNumpyArrayInFile(arr1ev, fname=fname_common + '.txt' , format='%i') # , format='%f')
