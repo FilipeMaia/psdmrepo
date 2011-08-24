@@ -200,15 +200,15 @@ def print_dataset_info(ds):
         elif len(ds.shape)==0 or ds.shape[0] == 0  or ds.shape[0] == 1 : #check if the ds.shape scalar or array with dimension 0 or 1
             print "ds.value    = ", ds.value
 
-        elif ds.shape[0] < cp.confpars.eventCurrent: #check if the ds.shape array size less than current event number
+        else : # ds.shape[0] < cp.confpars.eventCurrent: #check if the ds.shape array size less than current event number
             print " data for ds[0]:"
             print ds[0]
+            print_time(ds,0)
 
-        else :
-            print " Assume that the array 1st index is an event number ", cp.confpars.eventCurrent
-            print ds[cp.confpars.eventCurrent]
-
-            print_time(ds,cp.confpars.eventCurrent)
+        #else :
+        #    print " Assume that the array 1st index is an event number ", cp.confpars.eventCurrent
+        #    print ds[cp.confpars.eventCurrent]
+        #    print_time(ds,cp.confpars.eventCurrent)
 
         print_data_structure(ds)   
 

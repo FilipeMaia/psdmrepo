@@ -76,11 +76,8 @@ class GUIMain ( QtGui.QWidget ) :
         if not cp.confpars.readParsFromFileAtStart :
             cp.confpars.setDefaultParameters()
         cp.confpars.Print()
-        print 'Current event number : %d ' % (cp.confpars.eventCurrent)
 
 	#print 'sys.argv=',sys.argv # list of input parameters
-
-
 
         self.editFile  = QtGui.QLineEdit(cp.confpars.dirName+'/'+cp.confpars.fileName)
 
@@ -112,8 +109,8 @@ class GUIMain ( QtGui.QWidget ) :
         self.hboxT = QtGui.QHBoxLayout() 
         self.hboxA = QtGui.QHBoxLayout() 
 
-        if cp.confpars.playerGUIIsOpen : # At initialization it means that "should be open..."
-            self.setPlayerWidgets()
+        #if cp.confpars.playerGUIIsOpen : # At initialization it means that "should be open..."
+        #    self.setPlayerWidgets()
 
         hboxG = QtGui.QHBoxLayout()
         hboxG.addWidget(self.butPlayer)
@@ -214,9 +211,9 @@ class GUIMain ( QtGui.QWidget ) :
         #print 'closeEvent'
         #print 'Quit GUIMain'
         #self.drawev.quitDrawEvent()
-        if cp.confpars.playerGUIIsOpen :
-            self.wplayer.processQuit()
-            self.wcomplex.processQuit()
+        #if cp.confpars.playerGUIIsOpen :
+        #    self.wplayer.processQuit()
+        #    self.wcomplex.processQuit()
         self.SHowIsOn = False
         if cp.confpars.dsetsGUIIsOpen :
             cp.confpars.guidsets.close()
@@ -227,7 +224,7 @@ class GUIMain ( QtGui.QWidget ) :
         #if cp.confpars.selectionGUIIsOpen :
         #    cp.confpars.guiselection.close()
         #print 'Segmentation fault may happen at exit, when the dialog is closed. \nThis is a known problem of python-qt4 version.'
-        print 'Exit HDF5Explorer'
+        print 'Exit application'
 
         
     def processQuit(self):

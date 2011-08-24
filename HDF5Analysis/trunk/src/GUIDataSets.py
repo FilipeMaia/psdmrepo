@@ -94,9 +94,7 @@ class GUIDataSets ( QtGui.QWidget ) :
         self.showToolTips()
 
         cp.confpars.dsetsGUIIsOpen = True
-
-
-
+        cp.confpars.guidatasets = self
 
     #-------------------
     # Private methods --

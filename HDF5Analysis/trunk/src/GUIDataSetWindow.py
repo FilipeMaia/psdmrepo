@@ -1,3 +1,4 @@
+
 #--------------------------------------------------------------------------
 # File and Version Information:
 #  $Id$
@@ -54,6 +55,7 @@ class GUIDataSetWindow ( QtGui.QWidget ) :
         print 'GUIDataSetWindow for region', window
 
         self.window = window
+        self.dsname = cp.confpars.dsWindowParameters[self.window][6]
 
         self.setGeometry(370, 350, 500, 500)
         self.setWindowTitle('Data set parameters')
@@ -70,11 +72,11 @@ class GUIDataSetWindow ( QtGui.QWidget ) :
         height = 20
         width  = 50
 
-        #self.editSelectionThr   = QtGui.QLineEdit(str(cp.confpars.selectionWindowParameters[self.window][0]))
-        #self.editSelectionXmin  = QtGui.QLineEdit(str(cp.confpars.selectionWindowParameters[self.window][2]))
-        #self.editSelectionXmax  = QtGui.QLineEdit(str(cp.confpars.selectionWindowParameters[self.window][3]))
-        #self.editSelectionYmin  = QtGui.QLineEdit(str(cp.confpars.selectionWindowParameters[self.window][4]))
-        #self.editSelectionYmax  = QtGui.QLineEdit(str(cp.confpars.selectionWindowParameters[self.window][5]))
+        #self.editSelectionThr   = QtGui.QLineEdit(str(cp.confpars.dsWindowParameters[self.window][0]))
+        #self.editSelectionXmin  = QtGui.QLineEdit(str(cp.confpars.dsWindowParameters[self.window][2]))
+        #self.editSelectionXmax  = QtGui.QLineEdit(str(cp.confpars.dsWindowParameters[self.window][3]))
+        #self.editSelectionYmin  = QtGui.QLineEdit(str(cp.confpars.dsWindowParameters[self.window][4]))
+        #self.editSelectionYmax  = QtGui.QLineEdit(str(cp.confpars.dsWindowParameters[self.window][5]))
 
         #self.editSelectionThr   .setMaximumWidth(width)
         #self.editSelectionXmin  .setMaximumWidth(width)
@@ -101,19 +103,18 @@ class GUIDataSetWindow ( QtGui.QWidget ) :
         #self.radioGroup.addButton(self.radioInWin)
         #self.radioGroup.addButton(self.radioInBin)
 
-        #if cp.confpars.selectionWindowParameters[self.window][1] : self.radioInBin.setChecked(True)
+        #if cp.confpars.dsWindowParameters[self.window][1] : self.radioInBin.setChecked(True)
         #else :                                                     self.radioInWin.setChecked(True)
 
         self.titSelDataSet        = QtGui.QLabel('2. Dataset:')
-        self.butSelDataSet = QtGui.QPushButton(cp.confpars.selectionWindowParameters[self.window][6])
+        self.butSelDataSet = QtGui.QPushButton(self.dsname)
         self.butSelDataSet.setMaximumWidth(350)
         self.setButSelDataSetTextAlignment()
 
         self.popupMenuForDataSet = QtGui.QMenu()
         self.fillPopupMenuForDataSet()
 
-        self.guitree = guidstree.GUIDataSetTree()
-        self.guitree.setDSName(cp.confpars.selectionWindowParameters[self.window][6])
+        self.guitree = guidstree.GUIDataSetTree(None,self.window)
 
         grid = QtGui.QGridLayout()
         grid.addWidget(self.titSelDataSet,       0, 0)
@@ -216,31 +217,31 @@ class GUIDataSetWindow ( QtGui.QWidget ) :
 
 
     def processRadioInBin(self):
-        cp.confpars.selectionWindowParameters[self.window][1] = True
+        cp.confpars.dsWindowParameters[self.window][1] = True
 
 
     def processRadioInWin(self):
-        cp.confpars.selectionWindowParameters[self.window][1] = False
+        cp.confpars.dsWindowParameters[self.window][1] = False
 
 
     def processEditSelectionThr(self):
-        cp.confpars.selectionWindowParameters[self.window][0] = int(self.editSelectionThr.displayText())        
+        cp.confpars.dsWindowParameters[self.window][0] = int(self.editSelectionThr.displayText())        
 
 
     def processEditSelectionXmin(self):
-        cp.confpars.selectionWindowParameters[self.window][2] = int(self.editSelectionXmin.displayText())        
+        cp.confpars.dsWindowParameters[self.window][2] = int(self.editSelectionXmin.displayText())        
 
 
     def processEditSelectionXmax(self):
-        cp.confpars.selectionWindowParameters[self.window][3] = int(self.editSelectionXmax.displayText())        
+        cp.confpars.dsWindowParameters[self.window][3] = int(self.editSelectionXmax.displayText())        
 
 
     def processEditSelectionYmin(self):
-        cp.confpars.selectionWindowParameters[self.window][4] = int(self.editSelectionYmin.displayText())        
+        cp.confpars.dsWindowParameters[self.window][4] = int(self.editSelectionYmin.displayText())        
 
 
     def processEditSelectionYmax(self):
-        cp.confpars.selectionWindowParameters[self.window][5] = int(self.editSelectionYmax.displayText())        
+        cp.confpars.dsWindowParameters[self.window][5] = int(self.editSelectionYmax.displayText())        
 
 
     def setButSelDataSetTextAlignment(self):
@@ -267,9 +268,10 @@ class GUIDataSetWindow ( QtGui.QWidget ) :
         selected_ds = actionSelected.text()
         self.butSelDataSet.setText( selected_ds )
         self.setButSelDataSetTextAlignment()
-        cp.confpars.selectionWindowParameters[self.window][6] = str(selected_ds)
+        self.dsname = cp.confpars.dsWindowParameters[self.window][6] = str(selected_ds)
 
-        self.guitree.setDSName(cp.confpars.selectionWindowParameters[self.window][6])
+        cp.confpars.guidatasets.processTabBar() # Refresh the tree through the tabbar
+
         print 'Selected data set:', selected_ds
 
 #-----------------------------

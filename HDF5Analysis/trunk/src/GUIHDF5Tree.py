@@ -201,8 +201,8 @@ class GUIHDF5Tree ( QtGui.QMainWindow ) :
     def processApply(self):
         print 'Apply button is clicked, use all checked items in the tree model for display'
         cp.confpars.list_of_checked_item_names = self.model.get_list_of_checked_item_names_for_model()
-        if cp.confpars.wtdWindowIsOpen :
-            cp.confpars.guiwhat.processRefresh()
+        #if cp.confpars.wtdWindowIsOpen :
+        #    cp.confpars.guiwhat.processRefresh()
 
 
     def processReset(self):
