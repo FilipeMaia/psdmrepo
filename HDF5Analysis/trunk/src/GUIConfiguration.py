@@ -160,8 +160,8 @@ class GUIConfiguration ( QtGui.QWidget ) :
     def processRead(self):
         print 'Read'
         cp.confpars.readParameters(self.confParsFileName())
-        self.parent.fileEdit.setText(cp.confpars.dirName + '/' + cp.confpars.fileName)
-        self.refreshGUIWhatToDisplay()
+        self.parent.editFile.setText(cp.confpars.dirName + '/' + cp.confpars.fileName)
+        #self.refreshGUIWhatToDisplay()
 
     def processWrite(self):
         print 'Write'
@@ -170,8 +170,8 @@ class GUIConfiguration ( QtGui.QWidget ) :
     def processDefault(self):
         print 'Set default values of configuration parameters'
         cp.confpars.setDefaultParameters()
-        self.parent.fileEdit.setText(cp.confpars.dirName + '/' + cp.confpars.fileName)
-        self.refreshGUIWhatToDisplay()
+        self.parent.editFile.setText(cp.confpars.dirName + '/' + cp.confpars.fileName)
+        #self.refreshGUIWhatToDisplay()
 
     def processPrint(self):
         print 'Print'

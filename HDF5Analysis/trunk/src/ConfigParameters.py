@@ -120,8 +120,6 @@ class ConfigParameters ( object ) :
             self.dsWindowParameters.append(['None', 0, None])
                                           #[DS_NAME_IN_HDF5, DS_N_CHECKED_DS_IN_WIN, DS_INDEX_LIST]
 
-
-
     #-------------------
     #  Public methods --
     #-------------------
@@ -157,6 +155,9 @@ class ConfigParameters ( object ) :
                     for index in list_of_indexes_of_checked_ds :
                         print 'DS_INDEX_IN_LIST', index
 
+
+        print 70*'='
+        self.print_all_checked_dataset_indexes()
         print 70*'='
 
 
@@ -257,6 +258,28 @@ class ConfigParameters ( object ) :
             self._fname = self.confParsDirName + '/' + self.confParsFileName
         else :
             self._fname = fname
+
+
+    def get_list_of_indexes_of_all_checked_datasets(self) :
+        
+        list_of_indexes_of_all_checked_ds = []
+
+        for win in range(self.dsNWindows) :
+            for list_of_indexes_1d in self.dsWindowParameters[win][2] :
+                list_of_idexes_of_one_ds = []
+                list_of_idexes_of_one_ds.append( self.dsWindowParameters[win][0] ) # add the base index in hdf5
+                for index in list_of_indexes_1d : 
+                    list_of_idexes_of_one_ds.append(index)
+                list_of_indexes_of_all_checked_ds.append(list_of_idexes_of_one_ds)
+
+        return list_of_indexes_of_all_checked_ds
+
+
+    def print_all_checked_dataset_indexes(self) :
+        print """Print all checked dataset indexes"""
+        list_of_indexes_2d = self.get_list_of_indexes_of_all_checked_datasets()
+        for list_of_indexes_1d in list_of_indexes_2d :
+            print list_of_indexes_1d
 
 #---------------------------------------
 # Makes a single object of this class --
