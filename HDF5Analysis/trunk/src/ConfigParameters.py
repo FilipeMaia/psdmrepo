@@ -117,8 +117,8 @@ class ConfigParameters ( object ) :
 
         self.dsWindowParameters = []
         for win in range(self.selectionNWindowsMax) :
-            self.dsWindowParameters.append([0, True, 0, 1000, 0, 1000, 'None'])
-                                                 #[Theshold, InBin, Xmin, Xmax, Ymin, Ymax]
+            self.dsWindowParameters.append([0, True, 0, 1000, 0, 1000, 'None', None])
+                                                 #[Theshold, InBin, Xmin, Xmax, Ymin, Ymax, dslist]
 
 
 

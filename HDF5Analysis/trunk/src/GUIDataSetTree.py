@@ -177,11 +177,11 @@ class GUIDataSetTree(QtGui.QWidget):
 
     def processApplyChecked(self):
         print 'ApplyChecked is clicked'
-        list = self.model.get_list_of_checked_items()
+        list = cp.confpars.dsWindowParameters[self.window][7] = self.model.get_list_of_checked_items()
         print 'List of checked dataset indexes:'
         for dsindexes in list : print dsindexes           
 
-
+ 
     def cellSelected(self, ind_sel, ind_desel):
         item     = self.model.itemFromIndex(ind_sel)
         print "Item with text '%s' is selected" % ( item.text() ),
