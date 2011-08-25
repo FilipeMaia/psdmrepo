@@ -112,13 +112,13 @@ class ConfigParameters ( object ) :
 
  
         # Default parameters for Selection algorithms
-        self.selectionNWindows      = 1
-        self.selectionNWindowsMax   = 10 # Maximal number of windows for selection algorithms
+        self.dsNWindows      = 1
+        self.dsNWindowsMax   = 10 # Maximal number of windows for selection algorithms
 
         self.dsWindowParameters = []
-        for win in range(self.selectionNWindowsMax) :
-            self.dsWindowParameters.append([0, True, 0, 1000, 0, 1000, 'None', None])
-                                                 #[Theshold, InBin, Xmin, Xmax, Ymin, Ymax, dslist]
+        for win in range(self.dsNWindowsMax) :
+            self.dsWindowParameters.append(['None', 0, None])
+                                          #[DS_NAME_IN_HDF5, DS_N_CHECKED_DS_IN_WIN, DS_INDEX_LIST]
 
 
 
@@ -141,19 +141,21 @@ class ConfigParameters ( object ) :
         print 'STEP_03_IS_DONE',           self.step03IsDone
         print 'STEP_04_IS_DONE',           self.step04IsDone
         
-        print 'DATASET_N_WINDOWS_MAX',       self.selectionNWindowsMax 
-        print 'DATASET_N_WINDOWS',           self.selectionNWindows 
+        print 'DS_N_WINDOWS_MAX',          self.dsNWindowsMax 
+        print 'DS_N_WINDOWS',              self.dsNWindows 
 
-        for win in range(self.selectionNWindows) :
+        for win in range(self.dsNWindows) :
 
-            print 'DATASET_WINDOW_NUMBER',   win 
-            print 'DATASET_THRESHOLD',       self.dsWindowParameters[win][0] 
-            print 'DATASET_IN_BIN',          self.dsWindowParameters[win][1] 
-            print 'DATASET_XMIN',            self.dsWindowParameters[win][2] 
-            print 'DATASET_XMAX',            self.dsWindowParameters[win][3] 
-            print 'DATASET_YMIN',            self.dsWindowParameters[win][4] 
-            print 'DATASET_YMAX',            self.dsWindowParameters[win][5] 
-            print 'DATASET_NAME',            self.dsWindowParameters[win][6] 
+            print 'DS_WINDOW_NUMBER',       win 
+            print 'DS_NAME_IN_HDF5',        self.dsWindowParameters[win][0] 
+            print 'DS_N_CHECKED_DS_IN_WIN', self.dsWindowParameters[win][1] 
+
+            if self.dsWindowParameters[win][1] != 0 :
+                list_of_indexes_2d =        self.dsWindowParameters[win][2]
+                for list_of_indexes_of_checked_ds in list_of_indexes_2d :
+                    print 'DS_N_INDEXES_IN_DS', len(list_of_indexes_of_checked_ds) 
+                    for index in list_of_indexes_of_checked_ds :
+                        print 'DS_INDEX_IN_LIST', index
 
         print 70*'='
 
@@ -181,19 +183,27 @@ class ConfigParameters ( object ) :
                 elif key == 'STEP_03_IS_DONE'          : self.step03IsDone            = dicBool[val.lower()]
                 elif key == 'STEP_04_IS_DONE'          : self.step04IsDone            = dicBool[val.lower()]
 
-                elif key == 'DATASET_N_WINDOWS_MAX'      : self.selectionNWindowsMax     = int(val)
-                elif key == 'DATASET_N_WINDOWS'          : self.selectionNWindows        = int(val)
+                elif key == 'DS_N_WINDOWS_MAX'      : self.dsNWindowsMax     = int(val)
+                elif key == 'DS_N_WINDOWS'          : self.dsNWindows        = int(val)
 
-                elif key == 'DATASET_WINDOW_NUMBER'      : win                           = int(val)
-                elif key == 'DATASET_THRESHOLD'          : self.dsWindowParameters[win][0] = int(val)
-                elif key == 'DATASET_IN_BIN'             : self.dsWindowParameters[win][1] = dicBool[val.lower()]
-                elif key == 'DATASET_XMIN'               : self.dsWindowParameters[win][2] = int(val)
-                elif key == 'DATASET_XMAX'               : self.dsWindowParameters[win][3] = int(val)
-                elif key == 'DATASET_YMIN'               : self.dsWindowParameters[win][4] = int(val)
-                elif key == 'DATASET_YMAX'               : self.dsWindowParameters[win][5] = int(val)
-                elif key == 'DATASET_NAME'               : self.dsWindowParameters[win][6] = val
+                elif key == 'DS_WINDOW_NUMBER'      :
+                    win = int(val)
+                    self.list_of_indexes_2d = []
+                elif key == 'DS_NAME_IN_HDF5'       : self.dsWindowParameters[win][0] = val
+                elif key == 'DS_N_CHECKED_DS_IN_WIN': self.dsWindowParameters[win][1] = int(val)
+                elif key == 'DS_N_INDEXES_IN_DS'    :
+                    self.num_of_indexes = int(val)
+                    self.list_of_indexes_of_checked_ds = []
 
-                else : print 'The record : %s %s \n is UNKNOWN in readParameters()' % (key, val) 
+                elif key == 'DS_INDEX_IN_LIST' :
+                    self.list_of_indexes_of_checked_ds.append(val)
+                    if len(self.list_of_indexes_of_checked_ds) == self.num_of_indexes :
+                        self.list_of_indexes_2d.append(self.list_of_indexes_of_checked_ds)
+                        if len(self.list_of_indexes_2d) == self.dsWindowParameters[win][1] :
+                            self.dsWindowParameters[win][2] = self.list_of_indexes_2d
+
+                else :
+                    print 'The record : %s %s \n is UNKNOWN in readParameters()' % (key, val) 
             f.close()
         else :
             print 'The file %s does not exist' % (fname)
@@ -211,8 +221,8 @@ class ConfigParameters ( object ) :
         space = '    '
         f=open(self._fname,'w')
 
-        f.write('READ_PARS_AT_START'        + space + str(self.readParsFromFileAtStart) + '\n')
-        f.write('HDF5_FILE_NAME'            + space + self.dirName + '/' + self.fileName + '\n')
+        f.write('READ_PARS_AT_START'        + space + str(self.readParsFromFileAtStart)         + '\n')
+        f.write('HDF5_FILE_NAME'            + space + self.dirName + '/' + self.fileName        + '\n')
         f.write('N_CHECKED_ITEMS'           + space + str(len(self.list_of_checked_item_names)) + '\n')
         for name in self.list_of_checked_item_names :
             f.write('ITEM_NAME'             + space + str(name)                         + '\n')
@@ -223,19 +233,21 @@ class ConfigParameters ( object ) :
         f.write('STEP_04_IS_DONE'           + space + str(self.step04IsDone)            + '\n')
 
         f.write('\n')
-        f.write('DATASET_N_WINDOWS_MAX'       + space + str(self.selectionNWindowsMax)     + '\n')
-        f.write('DATASET_N_WINDOWS'           + space + str(self.selectionNWindows)        + '\n')
+        f.write('DS_N_WINDOWS_MAX'       + space + str(self.dsNWindowsMax)     + '\n')
+        f.write('DS_N_WINDOWS'           + space + str(self.dsNWindows)        + '\n')
 
-        for win in range(self.selectionNWindows) :
+        for win in range(self.dsNWindows) :
             f.write('\n')
-            f.write('DATASET_WINDOW_NUMBER'   + space + str(win)                                       + '\n')
-            f.write('DATASET_THRESHOLD'       + space + str(self.dsWindowParameters[win][0] )   + '\n')
-            f.write('DATASET_IN_BIN'          + space + str(self.dsWindowParameters[win][1] )   + '\n')
-            f.write('DATASET_XMIN'            + space + str(self.dsWindowParameters[win][2] )   + '\n')
-            f.write('DATASET_XMAX'            + space + str(self.dsWindowParameters[win][3] )   + '\n')
-            f.write('DATASET_YMIN'            + space + str(self.dsWindowParameters[win][4] )   + '\n')
-            f.write('DATASET_YMAX'            + space + str(self.dsWindowParameters[win][5] )   + '\n')
-            f.write('DATASET_NAME'            + space + str(self.dsWindowParameters[win][6] )   + '\n')
+            f.write('DS_WINDOW_NUMBER'       + space + str(win)                                + '\n')
+            f.write('DS_NAME_IN_HDF5'        + space + str(self.dsWindowParameters[win][0] )   + '\n')
+            f.write('DS_N_CHECKED_DS_IN_WIN' + space + str(self.dsWindowParameters[win][1] )   + '\n')
+
+            if self.dsWindowParameters[win][1] != 0 :
+                list_of_indexes_2d =        self.dsWindowParameters[win][2]
+                for list_of_indexes_of_checked_ds in list_of_indexes_2d :
+                    f.write('DS_N_INDEXES_IN_DS' + space + str(len(list_of_indexes_of_checked_ds)) + '\n') 
+                    for index in list_of_indexes_of_checked_ds :
+                        f.write('DS_INDEX_IN_LIST' + space + str(index ) + '\n')
 
         f.close()
 

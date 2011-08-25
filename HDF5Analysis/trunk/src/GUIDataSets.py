@@ -60,12 +60,12 @@ class GUIDataSets ( QtGui.QWidget ) :
 
         self.char_expand = u'\u25BE' # down-head triangle
 
-        self.titNWin  = QtGui.QLabel('1. Number of tabs for data sets:')
-        self.butMenuNWin = QtGui.QPushButton(str(cp.confpars.selectionNWindows) + self.char_expand)
+        self.titNWin  = QtGui.QLabel('1. Number of tabs/windows for data sets:')
+        self.butMenuNWin = QtGui.QPushButton(str(cp.confpars.dsNWindows) + self.char_expand)
         self.butMenuNWin.setMaximumWidth(30)
 
         self.popupMenuNWin = QtGui.QMenu()
-        for nwin in range(1,cp.confpars.selectionNWindowsMax+1) :
+        for nwin in range(1,cp.confpars.dsNWindowsMax+1) :
             self.popupMenuNWin.addAction(str(nwin))
 
         self.hboxN = QtGui.QHBoxLayout() 
@@ -147,8 +147,8 @@ class GUIDataSets ( QtGui.QWidget ) :
         #print 'MenuNWin'
         actionSelected = self.popupMenuNWin.exec_(QtGui.QCursor.pos())
         if actionSelected==None : return
-        cp.confpars.selectionNWindows = int(actionSelected.text())
-        self.butMenuNWin.setText( str(cp.confpars.selectionNWindows) + self.char_expand )
+        cp.confpars.dsNWindows = int(actionSelected.text())
+        self.butMenuNWin.setText( str(cp.confpars.dsNWindows) + self.char_expand )
         self.makeTabBarLayout(mode=1)
 
 
@@ -157,7 +157,7 @@ class GUIDataSets ( QtGui.QWidget ) :
         if mode != None : self.tabBar.close()
         self.tabBar = QtGui.QTabBar()
         #self.tabBar.setMovable(True) 
-        for window in range(cp.confpars.selectionNWindows) :
+        for window in range(cp.confpars.dsNWindows) :
 
             indTab = self.tabBar.addTab( 'DS:' + str(window+1) )
             self.tabBar.setTabTextColor(indTab,QtGui.QColor('blue'))
@@ -173,7 +173,7 @@ class GUIDataSets ( QtGui.QWidget ) :
         #print 'TabBar index=',indTab
 
         self.guiWin.close()
-        for window in range(cp.confpars.selectionNWindows) :
+        for window in range(cp.confpars.dsNWindows) :
             if indTab == window :
                 self.guiWin = guidswin.GUIDataSetWindow(None, window)
 

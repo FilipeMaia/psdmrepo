@@ -55,7 +55,7 @@ class GUIDataSetWindow ( QtGui.QWidget ) :
         print 'GUIDataSetWindow for region', window
 
         self.window = window
-        self.dsname = cp.confpars.dsWindowParameters[self.window][6]
+        self.dsname = cp.confpars.dsWindowParameters[self.window][0]
 
         self.setGeometry(370, 350, 500, 500)
         self.setWindowTitle('Data set parameters')
@@ -216,32 +216,32 @@ class GUIDataSetWindow ( QtGui.QWidget ) :
         self.close()
 
 
-    def processRadioInBin(self):
-        cp.confpars.dsWindowParameters[self.window][1] = True
+    #def processRadioInBin(self):
+    #    cp.confpars.dsWindowParameters[self.window][1] = True
 
 
-    def processRadioInWin(self):
-        cp.confpars.dsWindowParameters[self.window][1] = False
+    #def processRadioInWin(self):
+    #    cp.confpars.dsWindowParameters[self.window][1] = False
 
 
-    def processEditSelectionThr(self):
-        cp.confpars.dsWindowParameters[self.window][0] = int(self.editSelectionThr.displayText())        
+    #def processEditSelectionThr(self):
+    #    cp.confpars.dsWindowParameters[self.window][0] = int(self.editSelectionThr.displayText())        
 
 
-    def processEditSelectionXmin(self):
-        cp.confpars.dsWindowParameters[self.window][2] = int(self.editSelectionXmin.displayText())        
+    #def processEditSelectionXmin(self):
+    #    cp.confpars.dsWindowParameters[self.window][2] = int(self.editSelectionXmin.displayText())        
 
 
-    def processEditSelectionXmax(self):
-        cp.confpars.dsWindowParameters[self.window][3] = int(self.editSelectionXmax.displayText())        
+    #def processEditSelectionXmax(self):
+    #    cp.confpars.dsWindowParameters[self.window][3] = int(self.editSelectionXmax.displayText())        
 
 
-    def processEditSelectionYmin(self):
-        cp.confpars.dsWindowParameters[self.window][4] = int(self.editSelectionYmin.displayText())        
+    #def processEditSelectionYmin(self):
+    #    cp.confpars.dsWindowParameters[self.window][4] = int(self.editSelectionYmin.displayText())        
 
 
-    def processEditSelectionYmax(self):
-        cp.confpars.dsWindowParameters[self.window][5] = int(self.editSelectionYmax.displayText())        
+    #def processEditSelectionYmax(self):
+    #    cp.confpars.dsWindowParameters[self.window][5] = int(self.editSelectionYmax.displayText())        
 
 
     def setButSelDataSetTextAlignment(self):
@@ -268,7 +268,7 @@ class GUIDataSetWindow ( QtGui.QWidget ) :
         selected_ds = actionSelected.text()
         self.butSelDataSet.setText( selected_ds )
         self.setButSelDataSetTextAlignment()
-        self.dsname = cp.confpars.dsWindowParameters[self.window][6] = str(selected_ds)
+        self.dsname = cp.confpars.dsWindowParameters[self.window][0] = str(selected_ds)
 
         cp.confpars.guidatasets.processTabBar() # Refresh the tree through the tabbar
 

@@ -53,11 +53,13 @@ class GUIDataSetTree(QtGui.QWidget):
         self.setFrame()
 
         self.window = window
-        self.dsname = cp.confpars.dsWindowParameters[self.window][6]
+        self.dsname = cp.confpars.dsWindowParameters[self.window][0]
 
         self.butExpColl    = QtGui.QPushButton('Expand')
-        self.butExpCheck   = QtGui.QPushButton('Expand Checked')
-        self.butApplyCheck = QtGui.QPushButton('Apply Checked')
+        self.butExpCheck   = QtGui.QPushButton('Exp.Checked')
+        self.butApplyCheck = QtGui.QPushButton('Apply')
+        self.butReset      = QtGui.QPushButton('Reset')
+        self.butRetreve    = QtGui.QPushButton('Retreve')
         #self.butExit      = QtGui.QPushButton('Exit')
 
         self.model = dstvmodel.DataSetTreeViewModel(None,self.window)
@@ -71,6 +73,8 @@ class GUIDataSetTree(QtGui.QWidget):
         self.hboxButs = QtGui.QHBoxLayout()
         self.hboxButs.addWidget(self.butExpColl)
         self.hboxButs.addWidget(self.butExpCheck)
+        self.hboxButs.addWidget(self.butReset)
+        self.hboxButs.addWidget(self.butRetreve)
         self.hboxButs.addWidget(self.butApplyCheck)
         #self.hboxButs.addWidget(self.butExit)
 
@@ -79,15 +83,18 @@ class GUIDataSetTree(QtGui.QWidget):
         self.vboxTree.addLayout(self.hboxButs)
         self.setLayout(self.vboxTree)
 
-        self.connect(self.tree.selectionModel(), QtCore.SIGNAL('currentChanged(QModelIndex, QModelIndex)'), self.cellSelected)
+        self.connect(self.tree.selectionModel(), QtCore.SIGNAL('currentChanged(QModelIndex, QModelIndex)'), self.on_itemClick)
         self.model.itemChanged.connect(self.on_itemChanged)
         self.tree.expanded.connect(self.itemExpanded)
         self.tree.collapsed.connect(self.itemCollapsed)
         self.connect(self.butExpColl,    QtCore.SIGNAL('clicked()'), self.processExpColl )
         self.connect(self.butExpCheck,   QtCore.SIGNAL('clicked()'), self.processExpChecked )
         self.connect(self.butApplyCheck, QtCore.SIGNAL('clicked()'), self.processApplyChecked )
+        self.connect(self.butReset,      QtCore.SIGNAL('clicked()'), self.processReset )
+        self.connect(self.butRetreve,    QtCore.SIGNAL('clicked()'), self.processRetreve )
         #self.connect(self.butExit,     QtCore.SIGNAL('clicked()'), self.processExit )
 
+        self.processRetreve()
         self.showToolTips()
 
 
@@ -95,10 +102,11 @@ class GUIDataSetTree(QtGui.QWidget):
         # Tips for buttons and fields:
         #self.butExit.setToolTip('Click on mouse left button\n' +\
         #                        'in order to exit.')
-        self.butExpColl.setToolTip('Click on mouse left button\n' +\
-                                   'in order to expand/collapse all groups in the dataset tree.')
-        self.butExpCheck.setToolTip('Click on mouse left button\n' +\
-                                    'in order to expand groups with checked items only.')
+        self.butExpColl.   setToolTip('Expand/Collapse all groups in the dataset tree.')
+        self.butExpCheck.  setToolTip('Expand groups with checked items only.')
+        self.butReset.     setToolTip('Reset all checked items to unchecked state in the dataset tree.')
+        self.butRetreve.   setToolTip('Retreve checked items in the dataset tree from configuration parameters.')
+        self.butApplyCheck.setToolTip('Apply checked items in the dataset tree to configuration parameters.')
 
     #def setDSName(self, dsname):
     #    if dsname=='None' : title = 'Dataset substructure'
@@ -153,6 +161,15 @@ class GUIDataSetTree(QtGui.QWidget):
         self.butExpColl.setText('Collapse')
         cp.confpars.dsTreeIsExpanded = True       # Change status for expand/collapse button
 
+    def processReset(self):
+        print 'Reset button is clicked, reset all checked items in unchecked state.'
+        self.model.reset_checked_items()
+
+    def processRetreve(self):
+        print 'Retreve button is clicked, retreve all checked items from the config. par. list.'
+        self.model.retreve_checked_items()
+        self.processExpChecked()
+
     #def processApply(self):
     #    print 'Apply button is clicked'
 
@@ -177,18 +194,23 @@ class GUIDataSetTree(QtGui.QWidget):
 
     def processApplyChecked(self):
         print 'ApplyChecked is clicked'
-        list = cp.confpars.dsWindowParameters[self.window][7] = self.model.get_list_of_checked_items()
+        cp.confpars.dsWindowParameters[self.window][2] = list = self.model.get_list_of_checked_items()
+        cp.confpars.dsWindowParameters[self.window][1] = len(list)
         print 'List of checked dataset indexes:'
         for dsindexes in list : print dsindexes           
 
  
-    def cellSelected(self, ind_sel, ind_desel):
+    def on_itemClick(self, ind_sel, ind_desel):
         item     = self.model.itemFromIndex(ind_sel)
         print "Item with text '%s' is selected" % ( item.text() ),
         print ' checkState=',item.checkState(), 
         print ' isExpanded=',self.tree.isExpanded(ind_sel)
         print 'The dataset indexes:', self.model.get_full_path_to_item(item)
         print 'The dataset shape dims:', self.model.get_dataset_dims(item)
+        ds = self.model.get_dataset(item)
+        prod_of_dims = self.model.get_dataset_prod_of_dims(item)
+        if prod_of_dims < 10000 : print 'ds:\n',    ds
+        else                    : print 'ds[0]:\n', ds[0]
 
         #print "ind   selected : ", ind_sel.row(),  ind_sel.column()
         #print "ind deselected : ", ind_desel.row(),ind_desel.column() 
