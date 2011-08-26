@@ -95,7 +95,8 @@ class GUIDataSetTree(QtGui.QWidget):
         #self.connect(self.butExit,     QtCore.SIGNAL('clicked()'), self.processExit )
 
         self.showToolTips()
-        self.processExpChecked()
+        if not cp.confpars.isSetWarningModel :
+            self.processExpChecked() # SHOULD NOT DO THAT FOR WARNING MODEL...
 
 
     def showToolTips(self):
@@ -201,16 +202,20 @@ class GUIDataSetTree(QtGui.QWidget):
 
  
     def on_itemClick(self, ind_sel, ind_desel):
-        item     = self.model.itemFromIndex(ind_sel)
-        print "Item with text '%s' is selected" % ( item.text() ),
-        print ' checkState=',item.checkState(), 
-        print ' isExpanded=',self.tree.isExpanded(ind_sel)
+        item = self.model.itemFromIndex(ind_sel)
+        print '\n\n====> Clicked on item with'
+        print 'text : %s' % (item.text()),
+        print ', checkState=',item.checkState(), 
+        print ', isExpanded=',self.tree.isExpanded(ind_sel)
         print 'The dataset indexes:', self.model.get_full_path_to_item(item)
         print 'The dataset shape dims:', self.model.get_dataset_dims(item)
-        ds = self.model.get_dataset(item)
         prod_of_dims = self.model.get_dataset_prod_of_dims(item)
-        if prod_of_dims < 10000 : print 'ds:\n',    ds
-        else                    : print 'ds[0]:\n', ds[0]
+        if prod_of_dims < 10000 :
+            ds = self.model.get_dataset(item)
+            print 'ds:\n',    ds
+        else :
+            ds_0 = self.model.get_dataset_0(item) 
+            print 'ds[0]:\n', ds_0
 
         #print "ind   selected : ", ind_sel.row(),  ind_sel.column()
         #print "ind deselected : ", ind_desel.row(),ind_desel.column() 

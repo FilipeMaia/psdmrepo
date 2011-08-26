@@ -73,6 +73,7 @@ class ConfigParameters ( object ) :
         self.treeViewIsExpanded      = False
         self.configGUIIsOpen         = False
 
+       #self.isSetWarningModel       = False
         self.dsTreeIsExpanded        = False
 
         self.step01IsDone            = False
@@ -267,10 +268,10 @@ class ConfigParameters ( object ) :
         list_of_indexes_of_all_checked_ds = []
 
         for win in range(self.dsNWindows) :
-            if self.dsWindowParameters[win][2] == None : return
+            if self.dsWindowParameters[win][2] == None : continue
             for list_of_indexes_1d in self.dsWindowParameters[win][2] :
                 list_of_idexes_of_one_ds = []
-                list_of_idexes_of_one_ds.append( self.dsWindowParameters[win][0] ) # add the base index in hdf5
+                # list_of_idexes_of_one_ds.append( self.dsWindowParameters[win][0] ) # is already in list...
                 for index in list_of_indexes_1d : 
                     list_of_idexes_of_one_ds.append(index)
                 list_of_indexes_of_all_checked_ds.append(list_of_idexes_of_one_ds)
@@ -282,7 +283,9 @@ class ConfigParameters ( object ) :
         print """Print all checked dataset indexes"""
 
         list_of_indexes_2d = self.get_list_of_indexes_of_all_checked_datasets()
-        if list_of_indexes_2d == None : return
+        if list_of_indexes_2d == None :
+            print 'There is no checked item in the list...'
+            return
         for list_of_indexes_1d in list_of_indexes_2d :
             print list_of_indexes_1d
 
