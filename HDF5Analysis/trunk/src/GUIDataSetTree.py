@@ -94,7 +94,7 @@ class GUIDataSetTree(QtGui.QWidget):
         self.connect(self.butRetreve,    QtCore.SIGNAL('clicked()'), self.processRetreve )
         #self.connect(self.butExit,     QtCore.SIGNAL('clicked()'), self.processExit )
 
-        self.processRetreve()
+        #self.processRetreve()
         self.showToolTips()
 
 

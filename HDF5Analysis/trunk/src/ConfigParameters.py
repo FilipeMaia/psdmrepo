@@ -150,6 +150,7 @@ class ConfigParameters ( object ) :
 
             if self.dsWindowParameters[win][1] != 0 :
                 list_of_indexes_2d =        self.dsWindowParameters[win][2]
+                if list_of_indexes_2d == None : continue
                 for list_of_indexes_of_checked_ds in list_of_indexes_2d :
                     print 'DS_N_INDEXES_IN_DS', len(list_of_indexes_of_checked_ds) 
                     for index in list_of_indexes_of_checked_ds :
@@ -245,6 +246,7 @@ class ConfigParameters ( object ) :
 
             if self.dsWindowParameters[win][1] != 0 :
                 list_of_indexes_2d =        self.dsWindowParameters[win][2]
+                if list_of_indexes_2d == None : continue
                 for list_of_indexes_of_checked_ds in list_of_indexes_2d :
                     f.write('DS_N_INDEXES_IN_DS' + space + str(len(list_of_indexes_of_checked_ds)) + '\n') 
                     for index in list_of_indexes_of_checked_ds :
@@ -265,6 +267,7 @@ class ConfigParameters ( object ) :
         list_of_indexes_of_all_checked_ds = []
 
         for win in range(self.dsNWindows) :
+            if self.dsWindowParameters[win][2] == None : return
             for list_of_indexes_1d in self.dsWindowParameters[win][2] :
                 list_of_idexes_of_one_ds = []
                 list_of_idexes_of_one_ds.append( self.dsWindowParameters[win][0] ) # add the base index in hdf5
@@ -277,7 +280,9 @@ class ConfigParameters ( object ) :
 
     def print_all_checked_dataset_indexes(self) :
         print """Print all checked dataset indexes"""
+
         list_of_indexes_2d = self.get_list_of_indexes_of_all_checked_datasets()
+        if list_of_indexes_2d == None : return
         for list_of_indexes_1d in list_of_indexes_2d :
             print list_of_indexes_1d
 
