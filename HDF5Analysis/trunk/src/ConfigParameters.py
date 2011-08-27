@@ -47,9 +47,6 @@ import os
 #---------------------
 class ConfigParameters ( object ) :
     """This class contains all configuration parameters
-
-    @see BaseClass
-    @see OtherClass
     """
 
     #--------------------
@@ -126,8 +123,8 @@ class ConfigParameters ( object ) :
     #-------------------
 
     def Print ( self ) :
-        """Prints current values of configuration parameters
-        """
+        """Prints current values of configuration parameters"""
+
         print '\nConfigParameters'
         print 'READ_PARS_AT_START',        self.readParsFromFileAtStart
         print 'HDF5 file : %s' % ( self.dirName + '/' + self.fileName )
@@ -164,6 +161,8 @@ class ConfigParameters ( object ) :
 
 
     def readParameters(self, fname=None) :
+        """Read the configuration parameters form the file"""
+
         self.__setConfigParsFileName(fname)        
         print 'Read parameters from file:', self._fname
         dicBool = {'false':False, 'true':True}
@@ -219,6 +218,8 @@ class ConfigParameters ( object ) :
 
 
     def writeParameters(self, fname=None) :
+        """Write the configuration parameters in the file"""
+
         self.__setConfigParsFileName(fname)        
         print 'Write parameters in file:', self._fname
         space = '    '
@@ -264,9 +265,9 @@ class ConfigParameters ( object ) :
 
 
     def get_list_of_indexes_of_all_checked_datasets(self) :
+        """Join lists of the checked ds indexes from different windows in a single list"""
         
         list_of_indexes_of_all_checked_ds = []
-
         for win in range(self.dsNWindows) :
             if self.dsWindowParameters[win][2] == None : continue
             for list_of_indexes_1d in self.dsWindowParameters[win][2] :

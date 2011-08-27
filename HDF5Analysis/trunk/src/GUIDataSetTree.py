@@ -232,7 +232,8 @@ class GUIDataSetTree(QtGui.QWidget):
 
     def on_itemChanged(self,  item):
         state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][item.checkState()]
-        print "Item with text '%s', is at state %s\n" % ( item.text(),  state)
+        print '\n\n====> Checked item with'
+        print "text : '%s', is at state %s" % ( item.text(),  state)
         print 'The dataset indexes:', self.model.get_full_path_to_item(item)
         print 'The dataset shape dims:', self.model.get_dataset_dims(item)
 
