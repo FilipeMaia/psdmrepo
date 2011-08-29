@@ -1,0 +1,79 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psddl_pds2psana
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-02
+2011-08-29 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-11
+- added Bld::BldDataPimV1 to converter
+
+Tag: V00-01-01
+2011-08-22 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-10
+- added Princeton::ConfigV2 to converter
+
+Tag: V00-01-00
+2011-07-15 Andy Salnikov
+- PSEnv::ConfigStore renamed to PSEnv::EnvObjectStore, need to change 
+  few methods here
+
+Tag: V00-00-12
+2011-06-27 Andy Salnikov
+- implemented ordering of quadrants in CsPad
+
+Tag: V00-00-11
+2011-06-16 Andy Salnikov
+- upgrade to pdsdata V02-11-05
+
+Tag: V00-00-10
+2011-05-23 Andy Salnikov
+- catch DuplicateKey exceptions when adding stuff to event, print warning
+
+Tag: V00-00-09
+2011-04-26 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-08
+
+Tag: V00-00-08
+2011-04-07 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-07
+
+Tag: V00-00-07
+2011-04-01 Andy Salnikov
+- fix for PNCCD::FrameV1 proxy instantiation
+
+Tag: V00-00-06
+2011-03-31 Andy Salnikov
+- regenerated whole thing after changes in psddl
+
+Tag: V00-00-05
+2011-03-30 Andy Salnikov
+- adding support for AcqTdcData type (unknown size data)
+- constructor definition is added manually (in acqiris.cpp)
+- EvtProxy changed to pass additional size parameter to constructor
+
+Tag: V00-00-04
+2011-03-28 Andy Salnikov
+- few changes in epics classes, regenerated epics.ddh.*
+- XtcConverter now adds epics data to environment
+
+Tag: V00-00-03
+2011-03-21 Andy Salnikov
+- ConfigStore::get() does not need template parameter
+
+Tag: V00-00-02
+2011-03-21 Andy Salnikov
+- changes in the array member access code
+
+Tag: V00-00-01
+2011-03-21 Andy Salnikov
+- first import into svn
+- mostly working, but there will be updates no doubt
