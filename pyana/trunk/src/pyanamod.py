@@ -92,6 +92,9 @@ def _proc(jobname, id, pipes, userObjects, dg_ref):
             
             # update configuration objects
             env.updateConfig(evt)
+            
+            # on configure build list of EPICS objects
+            if evt.seq().service() == xtc.TransitionId.Configure: env.updateEpics(evt)
     
             # update epics data
             env.m_epics.m_id2epics = epics_data

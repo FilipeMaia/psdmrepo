@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-30
+2011-08-29 Andy Salnikov
+- fix for EPICS bug in multi-process mode
+
 Tag: V00-00-29
 2011-06-27 Andy Salnikov
 - added support for specifying BldInfo addresses in evt.get()
