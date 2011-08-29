@@ -13,5 +13,8 @@ BldDataIpimbV0::~BldDataIpimbV0() {}
 
 BldDataIpimbV1::~BldDataIpimbV1() {}
 
+
+BldDataPimV1::~BldDataPimV1() {}
+
 } // namespace Bld
 } // namespace Psana

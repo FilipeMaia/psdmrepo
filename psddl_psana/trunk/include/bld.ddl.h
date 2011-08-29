@@ -7,8 +7,10 @@
 
 #include <vector>
 
+#include "psddl_psana/camera.ddl.h"
 #include "psddl_psana/ipimb.ddl.h"
 #include "psddl_psana/lusi.ddl.h"
+#include "psddl_psana/pulnix.ddl.h"
 namespace Psana {
 namespace Bld {
 
@@ -270,6 +272,27 @@ public:
   virtual const Ipimb::DataV2& ipimbData() const = 0;
   virtual const Ipimb::ConfigV2& ipimbConfig() const = 0;
   virtual const Lusi::IpmFexV1& ipmFexData() const = 0;
+};
+
+/** @class BldDataPimV1
+
+  Combined structure which includes Pulnix.TM6740ConfigV2, Lusi.PimImageConfigV1, and 
+            Camera.FrameV1 objects.
+*/
+
+
+class BldDataPimV1 {
+public:
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_SharedPim /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  virtual ~BldDataPimV1();
+  virtual const Pulnix::TM6740ConfigV2& camConfig() const = 0;
+  virtual const Lusi::PimImageConfigV1& pimConfig() const = 0;
+  virtual const Camera::FrameV1& frame() const = 0;
 };
 } // namespace Bld
 } // namespace Psana
