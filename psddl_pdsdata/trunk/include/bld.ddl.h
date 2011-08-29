@@ -9,8 +9,10 @@
 
 #include <cstddef>
 
+#include "psddl_pdsdata/camera.ddl.h"
 #include "psddl_pdsdata/ipimb.ddl.h"
 #include "psddl_pdsdata/lusi.ddl.h"
+#include "psddl_pdsdata/pulnix.ddl.h"
 namespace PsddlPds {
 namespace Bld {
 
@@ -283,6 +285,32 @@ private:
   Ipimb::DataV2	_ipimbData;
   Ipimb::ConfigV2	_ipimbConfig;
   Lusi::IpmFexV1	_ipmFexData;
+};
+#pragma pack(pop)
+
+/** @class BldDataPimV1
+
+  Combined structure which includes Pulnix.TM6740ConfigV2, Lusi.PimImageConfigV1, and 
+            Camera.FrameV1 objects.
+*/
+
+#pragma pack(push,4)
+
+class BldDataPimV1 {
+public:
+  enum {
+    Version = 1 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_SharedPim /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  const Pulnix::TM6740ConfigV2& camConfig() const {return _camConfig;}
+  const Lusi::PimImageConfigV1& pimConfig() const {return _pimConfig;}
+  const Camera::FrameV1& frame() const {return _frame;}
+private:
+  Pulnix::TM6740ConfigV2	_camConfig;
+  Lusi::PimImageConfigV1	_pimConfig;
+  Camera::FrameV1	_frame;
 };
 #pragma pack(pop)
 } // namespace Bld
