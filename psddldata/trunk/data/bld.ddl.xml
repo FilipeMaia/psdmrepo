@@ -3,8 +3,10 @@
 
 <psddl>
 
+    <use file="psddldata/camera.ddl.xml"/>
     <use file="psddldata/ipimb.ddl.xml"/>
     <use file="psddldata/lusi.ddl.xml"/>
+    <use file="psddldata/pulnix.ddl.xml"/>
 
 	<package name="Bld">
 	
@@ -252,6 +254,26 @@
             </attribute>
 
             <attribute name="_ipmFexData" type="Lusi.IpmFexV1" accessor="ipmFexData">
+            </attribute>
+
+		</pstype>
+		
+
+		<!-- ========================================================================= -->
+		
+
+		<pstype name="BldDataPimV1" type_id="Id_SharedPim" version="1" pack="4">
+
+            Combined structure which includes Pulnix.TM6740ConfigV2, Lusi.PimImageConfigV1, and 
+            Camera.FrameV1 objects.
+
+            <attribute name="_camConfig" type="Pulnix.TM6740ConfigV2" accessor="camConfig">
+            </attribute>
+
+            <attribute name="_pimConfig" type="Lusi.PimImageConfigV1" accessor="pimConfig">
+            </attribute>
+
+            <attribute name="_frame" type="Camera.FrameV1" accessor="frame">
             </attribute>
 
 		</pstype>
