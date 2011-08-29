@@ -60,6 +60,7 @@
 #include "types/bld/BldDataIpimbV0.h"
 #include "types/bld/BldDataIpimbV1.h"
 #include "types/bld/BldDataPhaseCavity.h"
+#include "types/bld/BldDataPimV1.h"
 
 #include "types/camera/FrameCoord.h"
 #include "types/camera/FrameFexConfigV1.h"
@@ -216,6 +217,7 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::BldDataIpimbV0::initType( module );
   pypdsdata::BldDataIpimbV1::initType( module );
   pypdsdata::BldDataPhaseCavity::initType( module );
+  pypdsdata::BldDataPimV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "bld", module );
 

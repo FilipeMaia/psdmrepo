@@ -36,6 +36,7 @@
 #include "types/bld/BldDataIpimbV0.h"
 #include "types/bld/BldDataIpimbV1.h"
 #include "types/bld/BldDataPhaseCavity.h"
+#include "types/bld/BldDataPimV1.h"
 
 #include "types/camera/FrameFexConfigV1.h"
 #include "types/camera/FrameV1.h"
@@ -327,6 +328,13 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_XampsElement :
     break;
+
+  case Pds::TypeId::Id_Cspad2x2Element :
+    break;
+
+  case Pds::TypeId::Id_SharedPim :
+    if ( not obj ) obj = xtc2obj<BldDataPimV1, 1>(xtc, parent);
+    break ;
 
   case Pds::TypeId::NumberOf :
     // just to make compiler shut up about this special unhandled enum
