@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-11-02
+2011-08-29 Andy Salnikov
+- added support for BldDataPimV1 class
+
 Tag: V00-11-01
 2011-08-22 Andy Salnikov
 - upgrading to pdsdata V02-13-03

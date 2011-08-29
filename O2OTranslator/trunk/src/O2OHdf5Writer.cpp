@@ -34,6 +34,7 @@
 #include "H5DataTypes/BldDataIpimbV0.h"
 #include "H5DataTypes/BldDataIpimbV1.h"
 #include "H5DataTypes/BldDataPhaseCavity.h"
+#include "H5DataTypes/BldDataPimV1.h"
 #include "H5DataTypes/CameraFrameFexConfigV1.h"
 #include "H5DataTypes/CameraFrameV1.h"
 #include "H5DataTypes/CameraTwoDGaussianV1.h"
@@ -405,6 +406,12 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataPhaseCavity> (
       "Bld::BldDataPhaseCavity", chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_PhaseCavity,0).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // version for this type is 1
+  converter.reset( new EvtDataTypeCvtDef<H5DataTypes::BldDataPimV1> (
+      "Bld::BldDataPimV1", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_SharedPim,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // version for this type is 1
