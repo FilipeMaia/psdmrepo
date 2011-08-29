@@ -70,5 +70,23 @@ const Psana::Ipimb::DataV2& BldDataIpimbV1::ipimbData() const { return _ipimbDat
 const Psana::Ipimb::ConfigV2& BldDataIpimbV1::ipimbConfig() const { return _ipimbConfig; }
 
 const Psana::Lusi::IpmFexV1& BldDataIpimbV1::ipmFexData() const { return _ipmFexData; }
+BldDataPimV1::BldDataPimV1(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Bld::BldDataPimV1()
+  , m_xtcObj(xtcPtr)
+  , _camConfig(boost::shared_ptr<const PsddlPds::Pulnix::TM6740ConfigV2>(xtcPtr, &xtcPtr->camConfig()))
+  , _pimConfig(psddl_pds2psana::Lusi::pds_to_psana(xtcPtr->pimConfig()))
+  , _frame(boost::shared_ptr<const PsddlPds::Camera::FrameV1>(xtcPtr, &xtcPtr->frame()))
+{
+}
+BldDataPimV1::~BldDataPimV1()
+{
+}
+
+
+const Psana::Pulnix::TM6740ConfigV2& BldDataPimV1::camConfig() const { return _camConfig; }
+
+const Psana::Lusi::PimImageConfigV1& BldDataPimV1::pimConfig() const { return _pimConfig; }
+
+const Psana::Camera::FrameV1& BldDataPimV1::frame() const { return _frame; }
 } // namespace Bld
 } // namespace psddl_pds2psana

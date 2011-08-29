@@ -343,6 +343,11 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
     break;
   case Pds::TypeId::Id_XampsElement:
     break;
+  case Pds::TypeId::Id_Cspad2x2Element:
+    break;
+  case Pds::TypeId::Id_SharedPim:
+    if (version == 1) ::storeDataProxy<Bld::BldDataPimV1>(xtc, evt);
+    break;
   case Pds::TypeId::NumberOf:
     break;
 
@@ -471,6 +476,10 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
   case Pds::TypeId::Id_XampsConfig:
     break;
   case Pds::TypeId::Id_XampsElement:
+    break;
+  case Pds::TypeId::Id_Cspad2x2Element:
+    break;
+  case Pds::TypeId::Id_SharedPim:
     break;
   case Pds::TypeId::NumberOf:
     break;

@@ -7,8 +7,10 @@
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/bld.ddl.h"
 #include "psddl_pdsdata/bld.ddl.h"
+#include "psddl_pds2psana/camera.ddl.h"
 #include "psddl_pds2psana/ipimb.ddl.h"
 #include "psddl_pds2psana/lusi.ddl.h"
+#include "psddl_pds2psana/pulnix.ddl.h"
 namespace psddl_pds2psana {
 namespace Bld {
 Psana::Bld::BldDataFEEGasDetEnergy pds_to_psana(PsddlPds::Bld::BldDataFEEGasDetEnergy pds);
@@ -55,6 +57,24 @@ private:
   psddl_pds2psana::Ipimb::DataV2 _ipimbData;
   psddl_pds2psana::Ipimb::ConfigV2 _ipimbConfig;
   Psana::Lusi::IpmFexV1 _ipmFexData;
+};
+
+
+class BldDataPimV1 : public Psana::Bld::BldDataPimV1 {
+public:
+  typedef PsddlPds::Bld::BldDataPimV1 XtcType;
+  typedef Psana::Bld::BldDataPimV1 PsanaType;
+  BldDataPimV1(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~BldDataPimV1();
+  virtual const Psana::Pulnix::TM6740ConfigV2& camConfig() const;
+  virtual const Psana::Lusi::PimImageConfigV1& pimConfig() const;
+  virtual const Psana::Camera::FrameV1& frame() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  psddl_pds2psana::Pulnix::TM6740ConfigV2 _camConfig;
+  Psana::Lusi::PimImageConfigV1 _pimConfig;
+  psddl_pds2psana::Camera::FrameV1 _frame;
 };
 
 } // namespace Bld
