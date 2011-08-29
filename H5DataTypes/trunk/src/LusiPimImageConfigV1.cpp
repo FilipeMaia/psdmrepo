@@ -36,10 +36,15 @@
 
 namespace H5DataTypes {
 
-LusiPimImageConfigV1::LusiPimImageConfigV1 ( const XtcType& data )
+LusiPimImageConfigV1_Data::LusiPimImageConfigV1_Data(const Pds::Lusi::PimImageConfigV1& data)
+  : xscale(data.xscale)
+  , yscale(data.yscale)
 {
-  m_data.xscale = data.xscale;
-  m_data.yscale = data.yscale;
+}
+
+LusiPimImageConfigV1::LusiPimImageConfigV1 ( const XtcType& data )
+  : m_data(data)
+{
 }
 
 hdf5pp::Type

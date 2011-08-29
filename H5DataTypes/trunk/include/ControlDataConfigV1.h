@@ -40,12 +40,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::ControlData::PVControl
 //
-struct ControlDataPVControlV1_Data {
-  char     name[Pds::ControlData::PVControl::NameSize];
-  uint32_t index;
-  double   value;
-} ;
-
 class ControlDataPVControlV1 {
 public:
 
@@ -57,20 +51,15 @@ public:
 
 private:
 
-  ControlDataPVControlV1_Data m_data ;
+  char     name[Pds::ControlData::PVControl::NameSize];
+  uint32_t index;
+  double   value;
 };
 
 
 //
 // Helper type for Pds::ControlData::PVMonitor
 //
-struct ControlDataPVMonitorV1_Data {
-  char     name[Pds::ControlData::PVMonitor::NameSize];
-  uint32_t index;
-  double   loValue;
-  double   hiValue;
-} ;
-
 class ControlDataPVMonitorV1 {
 public:
 
@@ -82,21 +71,16 @@ public:
 
 private:
 
-  ControlDataPVMonitorV1_Data m_data ;
+  char     name[Pds::ControlData::PVMonitor::NameSize];
+  uint32_t index;
+  double   loValue;
+  double   hiValue;
+
 };
 
 //
 // Helper type for Pds::ControlData::ConfigV1
 //
-struct ControlDataConfigV1_Data {
-  uint8_t   uses_duration;
-  uint8_t   uses_events;
-  XtcClockTime_Data duration;
-  uint32_t  events;
-  uint32_t  npvControls;
-  uint32_t  npvMonitors;
-};
-
 class ControlDataConfigV1  {
 public:
 
@@ -115,7 +99,12 @@ public:
 
 private:
 
-  ControlDataConfigV1_Data m_data ;
+  uint8_t   uses_duration;
+  uint8_t   uses_events;
+  XtcClockTime duration;
+  uint32_t  events;
+  uint32_t  npvControls;
+  uint32_t  npvMonitors;
 
 };
 

@@ -35,9 +35,9 @@
 namespace H5DataTypes {
 
 XtcClockTime::XtcClockTime ( const Pds::ClockTime& time )
+  : seconds(time.seconds())
+  , nanoseconds(time.nanoseconds())
 {
-  m_data.seconds = time.seconds() ;
-  m_data.nanoseconds = time.nanoseconds() ;
 }
 
 hdf5pp::Type
@@ -50,8 +50,8 @@ hdf5pp::Type
 XtcClockTime::native_type()
 {
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<XtcClockTime>() ;
-  type.insert_native<uint32_t>( "seconds", offsetof(XtcClockTime_Data,seconds) ) ;
-  type.insert_native<uint32_t>( "nanoseconds", offsetof(XtcClockTime_Data,nanoseconds) ) ;
+  type.insert_native<uint32_t>( "seconds", offsetof(XtcClockTime,seconds) ) ;
+  type.insert_native<uint32_t>( "nanoseconds", offsetof(XtcClockTime,nanoseconds) ) ;
 
   return type ;
 }

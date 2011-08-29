@@ -37,12 +37,6 @@
 
 namespace H5DataTypes {
 
-struct BldDataIpimbV0_Data {
-  IpimbDataV1_Data    ipimbData;
-  IpimbConfigV1_Data  ipimbConfig;
-  LusiIpmFexV1_Data   ipmFexData;
-};
-
 /**
  *
  *  This software was developed for the LCLS project.  If you use all or 
@@ -71,7 +65,10 @@ public:
   static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
 
 private:
-  BldDataIpimbV0_Data m_data ;
+
+  IpimbDataV1    ipimbData;
+  IpimbConfigV1  ipimbConfig;
+  LusiIpmFexV1   ipmFexData;
 
 };
 

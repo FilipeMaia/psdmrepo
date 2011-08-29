@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-40
+2011-08-29 Andy Salnikov
+- adding implementation for BldDataPimV1 class
+- fixed old bug in PulnixTM6740ConfigV1 and PulnixTM6740ConfigV2
+  classes which contained uninitialized data
+- get rid of some *_Data classes, moved data members into the
+  main class
+
 Tag: V00-00-39
 2011-08-22 Andy Salnikov
 - upgrading to pdsdata V02-13-03

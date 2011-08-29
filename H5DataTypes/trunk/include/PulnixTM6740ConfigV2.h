@@ -37,19 +37,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::Pulnix::TM6740ConfigV2
 //
-struct PulnixTM6740ConfigV2_Data {
-  uint16_t vref_a;
-  uint16_t vref_b;
-  uint16_t gain_a;
-  uint16_t gain_b;
-  uint8_t gain_balance;
-  uint8_t output_resolution;
-  uint8_t output_resolution_bits;
-  uint8_t horizontal_binning;
-  uint8_t vertical_binning;
-  uint8_t lookuptable_mode;
-};
-
 class PulnixTM6740ConfigV2  {
 public:
 
@@ -66,7 +53,18 @@ public:
   static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
 
 private:
-  PulnixTM6740ConfigV2_Data m_data ;
+
+  uint16_t vref_a;
+  uint16_t vref_b;
+  uint16_t gain_a;
+  uint16_t gain_b;
+  uint8_t gain_balance;
+  uint8_t output_resolution;
+  uint8_t output_resolution_bits;
+  uint8_t horizontal_binning;
+  uint8_t vertical_binning;
+  uint8_t lookuptable_mode;
+
 };
 
 } // namespace H5DataTypes

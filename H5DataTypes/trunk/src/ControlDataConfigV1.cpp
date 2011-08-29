@@ -64,10 +64,10 @@ namespace H5DataTypes {
 // Constructors --
 //----------------
 ControlDataPVControlV1::ControlDataPVControlV1 ( const Pds::ControlData::PVControl& pconfig )
+  : index(pconfig.index())
+  , value(pconfig.value())
 {
-  strcpy( m_data.name, pconfig.name() ) ;
-  m_data.index = pconfig.index() ;
-  m_data.value = pconfig.value() ;
+  strcpy( name, pconfig.name() ) ;
 }
 
 hdf5pp::Type
@@ -79,20 +79,20 @@ ControlDataPVControlV1::stored_type()
 hdf5pp::Type
 ControlDataPVControlV1::native_type()
 {
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< ControlDataPVControlV1_Data >() ;
-  type.insert( "name", offsetof(ControlDataPVControlV1_Data,name), _pvCtrlNameType() ) ;
-  type.insert_native<int32_t>( "index", offsetof(ControlDataPVControlV1_Data,index) ) ;
-  type.insert_native<double>( "value", offsetof(ControlDataPVControlV1_Data,value) ) ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<ControlDataPVControlV1>() ;
+  type.insert( "name", offsetof(ControlDataPVControlV1,name), _pvCtrlNameType() ) ;
+  type.insert_native<int32_t>( "index", offsetof(ControlDataPVControlV1, index) ) ;
+  type.insert_native<double>( "value", offsetof(ControlDataPVControlV1, value) ) ;
 
   return type ;
 }
 
 ControlDataPVMonitorV1::ControlDataPVMonitorV1 ( const Pds::ControlData::PVMonitor& pconfig )
+  : index(pconfig.index())
+  , loValue(pconfig.loValue())
+  , hiValue(pconfig.hiValue())
 {
-  strcpy( m_data.name, pconfig.name() ) ;
-  m_data.index = pconfig.index() ;
-  m_data.loValue = pconfig.loValue() ;
-  m_data.hiValue = pconfig.hiValue() ;
+  strcpy( name, pconfig.name() ) ;
 }
 
 hdf5pp::Type
@@ -104,25 +104,24 @@ ControlDataPVMonitorV1::stored_type()
 hdf5pp::Type
 ControlDataPVMonitorV1::native_type()
 {
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType< ControlDataPVMonitorV1_Data >() ;
-  type.insert( "name", offsetof(ControlDataPVMonitorV1_Data,name), _pvMonNameType() ) ;
-  type.insert_native<int32_t>( "index", offsetof(ControlDataPVMonitorV1_Data,index) ) ;
-  type.insert_native<double>( "loValue", offsetof(ControlDataPVMonitorV1_Data,loValue) ) ;
-  type.insert_native<double>( "hiValue", offsetof(ControlDataPVMonitorV1_Data,hiValue) ) ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<ControlDataPVMonitorV1>() ;
+  type.insert( "name", offsetof(ControlDataPVMonitorV1, name), _pvMonNameType() ) ;
+  type.insert_native<int32_t>( "index", offsetof(ControlDataPVMonitorV1, index) ) ;
+  type.insert_native<double>( "loValue", offsetof(ControlDataPVMonitorV1, loValue) ) ;
+  type.insert_native<double>( "hiValue", offsetof(ControlDataPVMonitorV1, hiValue) ) ;
 
   return type ;
 }
 
 
 ControlDataConfigV1::ControlDataConfigV1 ( const XtcType& data )
+  : uses_duration(data.uses_duration())
+  , uses_events(data.uses_events())
+  , duration(data.duration())
+  , events(data.events())
+  , npvControls(data.npvControls())
+  , npvMonitors(data.npvMonitors())
 {
-  m_data.uses_duration = data.uses_duration() ;
-  m_data.uses_events = data.uses_events() ;
-  m_data.duration.seconds = data.duration().seconds() ;
-  m_data.duration.nanoseconds = data.duration().nanoseconds() ;
-  m_data.events = data.events() ;
-  m_data.npvControls = data.npvControls() ;
-  m_data.npvMonitors = data.npvMonitors() ;
 }
 
 hdf5pp::Type
@@ -134,13 +133,13 @@ ControlDataConfigV1::stored_type()
 hdf5pp::Type
 ControlDataConfigV1::native_type()
 {
-  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<ControlDataConfigV1_Data>() ;
-  confType.insert_native<uint8_t>( "uses_duration", offsetof(ControlDataConfigV1_Data,uses_duration) ) ;
-  confType.insert_native<uint8_t>( "uses_events", offsetof(ControlDataConfigV1_Data,uses_events) ) ;
-  confType.insert_native<XtcClockTime>( "duration", offsetof(ControlDataConfigV1_Data,duration) ) ;
-  confType.insert_native<uint32_t>( "events", offsetof(ControlDataConfigV1_Data,events) ) ;
-  confType.insert_native<uint32_t>( "npvControls", offsetof(ControlDataConfigV1_Data,npvControls) ) ;
-  confType.insert_native<uint32_t>( "npvMonitors", offsetof(ControlDataConfigV1_Data,npvMonitors) ) ;
+  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<ControlDataConfigV1>() ;
+  confType.insert_native<uint8_t>( "uses_duration", offsetof(ControlDataConfigV1,uses_duration) ) ;
+  confType.insert_native<uint8_t>( "uses_events", offsetof(ControlDataConfigV1,uses_events) ) ;
+  confType.insert_native<XtcClockTime>( "duration", offsetof(ControlDataConfigV1,duration) ) ;
+  confType.insert_native<uint32_t>( "events", offsetof(ControlDataConfigV1,events) ) ;
+  confType.insert_native<uint32_t>( "npvControls", offsetof(ControlDataConfigV1,npvControls) ) ;
+  confType.insert_native<uint32_t>( "npvMonitors", offsetof(ControlDataConfigV1,npvMonitors) ) ;
 
   return confType ;
 }

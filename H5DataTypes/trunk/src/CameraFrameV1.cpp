@@ -39,12 +39,12 @@ namespace H5DataTypes {
 //----------------
 // Constructors --
 //----------------
-CameraFrameV1::CameraFrameV1 ( const Pds::Camera::FrameV1& frame )
+CameraFrameV1::CameraFrameV1 ( const Pds::Camera::FrameV1& data )
+  : width(data.width())
+  , height(data.height())
+  , depth(data.depth())
+  , offset(data.offset())
 {
-  m_data.width = frame.width() ;
-  m_data.height = frame.height() ;
-  m_data.depth = frame.depth() ;
-  m_data.offset = frame.offset() ;
 }
 
 CameraFrameV1::~CameraFrameV1 ()
@@ -61,10 +61,10 @@ hdf5pp::Type
 CameraFrameV1::native_type()
 {
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<CameraFrameV1>() ;
-  type.insert_native<uint32_t>( "width", offsetof(CameraFrameV1_Data,width) ) ;
-  type.insert_native<uint32_t>( "height", offsetof(CameraFrameV1_Data,height) ) ;
-  type.insert_native<uint32_t>( "depth", offsetof(CameraFrameV1_Data,depth) ) ;
-  type.insert_native<uint32_t>( "offset", offsetof(CameraFrameV1_Data,offset) ) ;
+  type.insert_native<uint32_t>( "width", offsetof(CameraFrameV1,width) ) ;
+  type.insert_native<uint32_t>( "height", offsetof(CameraFrameV1,height) ) ;
+  type.insert_native<uint32_t>( "depth", offsetof(CameraFrameV1,depth) ) ;
+  type.insert_native<uint32_t>( "offset", offsetof(CameraFrameV1,offset) ) ;
 
   return type ;
 }

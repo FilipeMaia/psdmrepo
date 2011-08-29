@@ -46,12 +46,6 @@
 
 namespace H5DataTypes {
 
-struct XtcClockTime_Data  {
-  uint32_t seconds;
-  uint32_t nanoseconds;
-};
-
-
 class XtcClockTime  {
 public:
 
@@ -63,7 +57,10 @@ public:
   static hdf5pp::Type native_type() ;
 
 private:
-  XtcClockTime_Data m_data ;
+
+  uint32_t seconds;
+  uint32_t nanoseconds;
+
 };
 
 } // namespace H5DataTypes

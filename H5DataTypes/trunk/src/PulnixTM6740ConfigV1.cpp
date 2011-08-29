@@ -39,7 +39,17 @@ namespace H5DataTypes {
 //----------------
 // Constructors --
 //----------------
-PulnixTM6740ConfigV1::PulnixTM6740ConfigV1 ( const Pds::Pulnix::TM6740ConfigV1& config )
+PulnixTM6740ConfigV1::PulnixTM6740ConfigV1 ( const Pds::Pulnix::TM6740ConfigV1& data )
+  : vref(data.vref())
+  , gain_a(data.gain_a())
+  , gain_b(data.gain_b())
+  , gain_balance(data.gain_balance())
+  , shutter_width(data.shutter_width())
+  , output_resolution(data.output_resolution())
+  , output_resolution_bits(data.output_resolution_bits())
+  , horizontal_binning(data.horizontal_binning())
+  , vertical_binning(data.vertical_binning())
+  , lookuptable_mode(data.lookuptable_mode())
 {
 }
 
@@ -66,16 +76,16 @@ PulnixTM6740ConfigV1::native_type()
   lookupTableEnum.insert ( "Linear", Pds::Pulnix::TM6740ConfigV1::Linear ) ;
 
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<PulnixTM6740ConfigV1>() ;
-  confType.insert_native<uint16_t>( "vref", offsetof(PulnixTM6740ConfigV1_Data,vref) ) ;
-  confType.insert_native<uint16_t>( "gain_a", offsetof(PulnixTM6740ConfigV1_Data,gain_a) ) ;
-  confType.insert_native<uint16_t>( "gain_b", offsetof(PulnixTM6740ConfigV1_Data,gain_b) ) ;
-  confType.insert_native<uint8_t>( "gain_balance", offsetof(PulnixTM6740ConfigV1_Data,gain_balance) ) ;
-  confType.insert_native<uint16_t>( "shutter_width", offsetof(PulnixTM6740ConfigV1_Data,shutter_width) ) ;
-  confType.insert( "output_resolution", offsetof(PulnixTM6740ConfigV1_Data,output_resolution), depthEnum ) ;
-  confType.insert_native<uint8_t>( "output_resolution_bits", offsetof(PulnixTM6740ConfigV1_Data,output_resolution_bits) ) ;
-  confType.insert( "horizontal_binning", offsetof(PulnixTM6740ConfigV1_Data,horizontal_binning), binningEnum ) ;
-  confType.insert( "vertical_binning", offsetof(PulnixTM6740ConfigV1_Data,vertical_binning), binningEnum ) ;
-  confType.insert( "lookuptable_mode", offsetof(PulnixTM6740ConfigV1_Data,lookuptable_mode), lookupTableEnum ) ;
+  confType.insert_native<uint16_t>( "vref", offsetof(PulnixTM6740ConfigV1,vref) ) ;
+  confType.insert_native<uint16_t>( "gain_a", offsetof(PulnixTM6740ConfigV1,gain_a) ) ;
+  confType.insert_native<uint16_t>( "gain_b", offsetof(PulnixTM6740ConfigV1,gain_b) ) ;
+  confType.insert_native<uint8_t>( "gain_balance", offsetof(PulnixTM6740ConfigV1,gain_balance) ) ;
+  confType.insert_native<uint16_t>( "shutter_width", offsetof(PulnixTM6740ConfigV1,shutter_width) ) ;
+  confType.insert( "output_resolution", offsetof(PulnixTM6740ConfigV1,output_resolution), depthEnum ) ;
+  confType.insert_native<uint8_t>( "output_resolution_bits", offsetof(PulnixTM6740ConfigV1,output_resolution_bits) ) ;
+  confType.insert( "horizontal_binning", offsetof(PulnixTM6740ConfigV1,horizontal_binning), binningEnum ) ;
+  confType.insert( "vertical_binning", offsetof(PulnixTM6740ConfigV1,vertical_binning), binningEnum ) ;
+  confType.insert( "lookuptable_mode", offsetof(PulnixTM6740ConfigV1,lookuptable_mode), lookupTableEnum ) ;
 
   return confType ;
 }

@@ -35,14 +35,14 @@
 namespace H5DataTypes {
 
 BldDataEBeamV0::BldDataEBeamV0 ( const XtcType& xtc )
+  : uDamageMask(xtc.uDamageMask)
+  , fEbeamCharge(xtc.fEbeamCharge)
+  , fEbeamL3Energy(xtc.fEbeamL3Energy)
+  , fEbeamLTUPosX(xtc.fEbeamLTUPosX)
+  , fEbeamLTUPosY(xtc.fEbeamLTUPosY)
+  , fEbeamLTUAngX(xtc.fEbeamLTUAngX)
+  , fEbeamLTUAngY(xtc.fEbeamLTUAngY)
 {
-  m_data.uDamageMask = xtc.uDamageMask ;
-  m_data.fEbeamCharge = xtc.fEbeamCharge ;
-  m_data.fEbeamL3Energy = xtc.fEbeamL3Energy ;
-  m_data.fEbeamLTUPosX = xtc.fEbeamLTUPosX ;
-  m_data.fEbeamLTUPosY = xtc.fEbeamLTUPosY ;
-  m_data.fEbeamLTUAngX = xtc.fEbeamLTUAngX ;
-  m_data.fEbeamLTUAngY = xtc.fEbeamLTUAngY ;
 }
 
 BldDataEBeamV0::~BldDataEBeamV0 ()
@@ -58,14 +58,14 @@ BldDataEBeamV0::stored_type()
 hdf5pp::Type
 BldDataEBeamV0::native_type()
 {
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<BldDataEBeamV0_Data>() ;
-  type.insert_native<uint32_t>( "uDamageMask", offsetof(BldDataEBeamV0_Data,uDamageMask) ) ;
-  type.insert_native<double>( "fEbeamCharge", offsetof(BldDataEBeamV0_Data,fEbeamCharge) ) ;
-  type.insert_native<double>( "fEbeamL3Energy", offsetof(BldDataEBeamV0_Data,fEbeamL3Energy) ) ;
-  type.insert_native<double>( "fEbeamLTUPosX", offsetof(BldDataEBeamV0_Data,fEbeamLTUPosX) ) ;
-  type.insert_native<double>( "fEbeamLTUPosY", offsetof(BldDataEBeamV0_Data,fEbeamLTUPosY) ) ;
-  type.insert_native<double>( "fEbeamLTUAngX", offsetof(BldDataEBeamV0_Data,fEbeamLTUAngX) ) ;
-  type.insert_native<double>( "fEbeamLTUAngY", offsetof(BldDataEBeamV0_Data,fEbeamLTUAngY) ) ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<BldDataEBeamV0>() ;
+  type.insert_native<uint32_t>( "uDamageMask", offsetof(BldDataEBeamV0, uDamageMask) ) ;
+  type.insert_native<double>( "fEbeamCharge", offsetof(BldDataEBeamV0, fEbeamCharge) ) ;
+  type.insert_native<double>( "fEbeamL3Energy", offsetof(BldDataEBeamV0, fEbeamL3Energy) ) ;
+  type.insert_native<double>( "fEbeamLTUPosX", offsetof(BldDataEBeamV0, fEbeamLTUPosX) ) ;
+  type.insert_native<double>( "fEbeamLTUPosY", offsetof(BldDataEBeamV0, fEbeamLTUPosY) ) ;
+  type.insert_native<double>( "fEbeamLTUAngX", offsetof(BldDataEBeamV0, fEbeamLTUAngX) ) ;
+  type.insert_native<double>( "fEbeamLTUAngY", offsetof(BldDataEBeamV0, fEbeamLTUAngY) ) ;
 
   return type ;
 }

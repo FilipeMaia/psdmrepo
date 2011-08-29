@@ -34,16 +34,6 @@
 
 namespace H5DataTypes {
 
-struct BldDataEBeamV0_Data  {
-  uint32_t    uDamageMask;
-  double      fEbeamCharge;    /* in nC */
-  double      fEbeamL3Energy;  /* in MeV */
-  double      fEbeamLTUPosX;   /* in mm */
-  double      fEbeamLTUPosY;   /* in mm */
-  double      fEbeamLTUAngX;   /* in mrad */
-  double      fEbeamLTUAngY;   /* in mrad */
-};
-
 class BldDataEBeamV0  {
 public:
 
@@ -60,7 +50,13 @@ public:
   static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
 
 private:
-  BldDataEBeamV0_Data m_data ;
+  uint32_t    uDamageMask;
+  double      fEbeamCharge;    /* in nC */
+  double      fEbeamL3Energy;  /* in MeV */
+  double      fEbeamLTUPosX;   /* in mm */
+  double      fEbeamLTUPosY;   /* in mm */
+  double      fEbeamLTUAngX;   /* in mrad */
+  double      fEbeamLTUAngY;   /* in mrad */
 };
 
 } // namespace H5DataTypes

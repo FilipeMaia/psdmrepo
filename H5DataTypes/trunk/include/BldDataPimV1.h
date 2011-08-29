@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_PULNIXTM6740CONFIGV1_H
-#define H5DATATYPES_PULNIXTM6740CONFIGV1_H
+#ifndef H5DATATYPES_BLDDATAPIMV1_H
+#define H5DATATYPES_BLDDATAPIMV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class PulnixTM6740ConfigV1.
+//	Class BldDataPimV1.
 //
 //------------------------------------------------------------------------
 
@@ -18,55 +18,65 @@
 // Base Class Headers --
 //----------------------
 
+
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "hdf5pp/Group.h"
-#include "pdsdata/pulnix/TM6740ConfigV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+#include "hdf5pp/Type.h"
+#include "pdsdata/bld/bldData.hh"
+#include "H5DataTypes/PulnixTM6740ConfigV2.h"
+#include "H5DataTypes/LusiPimImageConfigV1.h"
+#include "H5DataTypes/CameraFrameV1.h"
 
 //		---------------------
 // 		-- Class Interface --
 //		---------------------
 
+/**
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see AdditionalClass
+ *
+ *  @version $Id$
+ *
+ *  @author Andy Salnikov
+ */
+
 namespace H5DataTypes {
 
 //
-// Helper type for Pds::Pulnix::TM6740ConfigV1
+//  Helper class for Pds::BldDataPimV1 class
 //
-class PulnixTM6740ConfigV1  {
+class BldDataPimV1  {
 public:
 
-  typedef Pds::Pulnix::TM6740ConfigV1 XtcType ;
+  typedef Pds::BldDataPimV1 XtcType ;
 
-  PulnixTM6740ConfigV1 () {}
-  PulnixTM6740ConfigV1 ( const XtcType& config ) ;
+  BldDataPimV1 () {}
+  BldDataPimV1 ( const XtcType& xtc ) ;
+
+  ~BldDataPimV1 () ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  static void store ( const XtcType& config, hdf5pp::Group location ) ;
-
   static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
+
+protected:
 
 private:
 
-  uint16_t vref;
-  uint16_t gain_a;
-  uint16_t gain_b;
-  uint8_t gain_balance;
-  uint16_t shutter_width;
-  uint8_t output_resolution;
-  uint8_t output_resolution_bits;
-  uint8_t horizontal_binning;
-  uint8_t vertical_binning;
-  uint8_t lookuptable_mode;
+  PulnixTM6740ConfigV2  camConfig;
+  LusiPimImageConfigV1  pimConfig;
+  CameraFrameV1         frame;
 
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_PULNIXTM6740CONFIGV1_H
+#endif // H5DATATYPES_BLDDATAPIMV1_H
