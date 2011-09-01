@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class CsPadCalibV1Cvt...
+//	Class CsPadMiniCalibV1Cvt...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "O2OTranslator/CsPadCalibV1Cvt.h"
+#include "O2OTranslator/CsPadMiniCalibV1Cvt.h"
 
 //-----------------
 // C/C++ Headers --
@@ -24,15 +24,15 @@
 //-------------------------------
 #include "H5DataTypes/CsPadCommonModeSubV1.h"
 #include "H5DataTypes/CsPadFilterV1.h"
-#include "H5DataTypes/CsPadPedestalsV1.h"
-#include "H5DataTypes/CsPadPixelStatusV1.h"
+#include "H5DataTypes/CsPadMiniPedestalsV1.h"
+#include "H5DataTypes/CsPadMiniPixelStatusV1.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/CalibObjectStore.h"
 #include "O2OTranslator/O2OMetaData.h"
 #include "pdscalibdata/CsPadCommonModeSubV1.h"
 #include "pdscalibdata/CsPadFilterV1.h"
-#include "pdscalibdata/CsPadPedestalsV1.h"
-#include "pdscalibdata/CsPadPixelStatusV1.h"
+#include "pdscalibdata/CsPadMiniPedestalsV1.h"
+#include "pdscalibdata/CsPadMiniPixelStatusV1.h"
 #include "PSCalib/CalibFileFinder.h"
 
 //-----------------------------------------------------------------------
@@ -41,7 +41,7 @@
 
 namespace {
 
-  const char logger[] = "CsPadCalibV1Cvt";
+  const char logger[] = "CsPadMiniCalibV1Cvt";
   
 }
 
@@ -54,7 +54,7 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-CsPadCalibV1Cvt::CsPadCalibV1Cvt (const std::string& typeGroupName,
+CsPadMiniCalibV1Cvt::CsPadMiniCalibV1Cvt (const std::string& typeGroupName,
                                   const O2OMetaData& metadata,
                                   CalibObjectStore& calibStore)
   : DataTypeCvtI()
@@ -68,17 +68,17 @@ CsPadCalibV1Cvt::CsPadCalibV1Cvt (const std::string& typeGroupName,
 //--------------
 // Destructor --
 //--------------
-CsPadCalibV1Cvt::~CsPadCalibV1Cvt ()
+CsPadMiniCalibV1Cvt::~CsPadMiniCalibV1Cvt ()
 {
 }
 
 /// main method of this class
 void 
-CsPadCalibV1Cvt::convert ( const void* data, 
-                             size_t size,
-                             const Pds::TypeId& typeId,
-                             const O2OXtcSrc& src,
-                             const H5DataTypes::XtcClockTime& time ) 
+CsPadMiniCalibV1Cvt::convert ( const void* data,
+                               size_t size,
+                               const Pds::TypeId& typeId,
+                               const O2OXtcSrc& src,
+                               const H5DataTypes::XtcClockTime& time )
 {
   // this should not happen
   assert ( not m_groups.empty() ) ;
@@ -100,25 +100,25 @@ CsPadCalibV1Cvt::convert ( const void* data,
   if ( pedFileName.empty() and pixFileName.empty() and cmodeFileName.empty()) return;
 
   // read everything
-  boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> peds;
-  boost::shared_ptr<pdscalibdata::CsPadPixelStatusV1> pixStat;
+  boost::shared_ptr<pdscalibdata::CsPadMiniPedestalsV1> peds;
+  boost::shared_ptr<pdscalibdata::CsPadMiniPixelStatusV1> pixStat;
   boost::shared_ptr<pdscalibdata::CsPadCommonModeSubV1> cmode;
   boost::shared_ptr<pdscalibdata::CsPadFilterV1> filter;
   if (not pedFileName.empty()) {
-    peds.reset(new pdscalibdata::CsPadPedestalsV1(pedFileName));
-    MsgLogRoot(info, "Read CsPad pedestals from " << pedFileName);
+    peds.reset(new pdscalibdata::CsPadMiniPedestalsV1(pedFileName));
+    MsgLog(logger, info, "Read CsPad pedestals from " << pedFileName);
   }
   if (not pixFileName.empty()) {
-    pixStat.reset(new pdscalibdata::CsPadPixelStatusV1(pixFileName));
-    MsgLogRoot(info, "Read CsPad pixel status from " << pixFileName);
+    pixStat.reset(new pdscalibdata::CsPadMiniPixelStatusV1(pixFileName));
+    MsgLog(logger, info, "Read CsPad pixel status from " << pixFileName);
   }
   if (not cmodeFileName.empty()) {
     cmode.reset(new pdscalibdata::CsPadCommonModeSubV1(cmodeFileName));
-    MsgLogRoot(info, "Read CsPad common mode data from " << cmodeFileName);
+    MsgLog(logger, info, "Read CsPad common mode data from " << cmodeFileName);
   }
   if (not filterFileName.empty()) {
     filter.reset(new pdscalibdata::CsPadFilterV1(filterFileName));
-    MsgLogRoot(info, "Read CsPad filter data from " << filterFileName);
+    MsgLog(logger, info, "Read CsPad filter data from " << filterFileName);
   }
 
   // get the name of the group for this object
@@ -127,7 +127,7 @@ CsPadCalibV1Cvt::convert ( const void* data,
   if ( m_groups.top().hasChild(m_typeGroupName) ) {
     hdf5pp::Group typeGroup = m_groups.top().openGroup(m_typeGroupName);
     if ( typeGroup.hasChild(src.name()) ) {
-      MsgLog("ConfigDataTypeCvt", trace, "group " << grpName << " already exists") ;
+      MsgLog(logger, trace, "group " << grpName << " already exists") ;
       return;
     }
   }
@@ -137,10 +137,10 @@ CsPadCalibV1Cvt::convert ( const void* data,
 
   // store it in a file
   if (peds.get()) {
-    H5DataTypes::CsPadPedestalsV1::store(*peds, grp, pedFileName);
+    H5DataTypes::CsPadMiniPedestalsV1::store(*peds, grp, pedFileName);
   }
   if (pixStat.get()) {
-    H5DataTypes::CsPadPixelStatusV1::store(*pixStat, grp, pixFileName);
+    H5DataTypes::CsPadMiniPixelStatusV1::store(*pixStat, grp, pixFileName);
   }
   if (cmode.get()) {
     H5DataTypes::CsPadCommonModeSubV1::store(*cmode, grp, cmodeFileName);
@@ -159,14 +159,14 @@ CsPadCalibV1Cvt::convert ( const void* data,
 
 /// method called when the driver makes a new group in the file
 void 
-CsPadCalibV1Cvt::openGroup( hdf5pp::Group group ) 
+CsPadMiniCalibV1Cvt::openGroup( hdf5pp::Group group )
 {
   m_groups.push ( group ) ;
 }
 
 /// method called when the driver closes a group in the file
 void 
-CsPadCalibV1Cvt::closeGroup( hdf5pp::Group group ) 
+CsPadMiniCalibV1Cvt::closeGroup( hdf5pp::Group group )
 {
   if ( m_groups.empty() ) return ;
   while ( m_groups.top() != group ) m_groups.pop() ;

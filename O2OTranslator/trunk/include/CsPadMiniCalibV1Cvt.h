@@ -1,12 +1,12 @@
-#ifndef O2OTRANSLATOR_CSPADCALIBV1CVT_H
-#define O2OTRANSLATOR_CSPADCALIBV1CVT_H
+#ifndef O2OTRANSLATOR_CSPADMINICALIBV1CVT_H
+#define O2OTRANSLATOR_CSPADMINICALIBV1CVT_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CsPadCalibV1Cvt.
+//	Class CsPadMiniCalibV1Cvt.
 //
 //------------------------------------------------------------------------
 
@@ -54,16 +54,16 @@ namespace O2OTranslator {
  *  @author Andrei Salnikov
  */
 
-class CsPadCalibV1Cvt : public DataTypeCvtI {
+class CsPadMiniCalibV1Cvt : public DataTypeCvtI {
 public:
 
   // Default constructor
-  CsPadCalibV1Cvt ( const std::string& typeGroupName,
+  CsPadMiniCalibV1Cvt ( const std::string& typeGroupName,
           const O2OMetaData& metadata,
           CalibObjectStore& calibStore);
 
   // Destructor
-  virtual ~CsPadCalibV1Cvt () ;
+  virtual ~CsPadMiniCalibV1Cvt () ;
 
   /// main method of this class
   virtual void convert ( const void* data, 
@@ -92,4 +92,4 @@ private:
 
 } // namespace O2OTranslator
 
-#endif // O2OTRANSLATOR_CSPADCALIBV1CVT_H
+#endif // O2OTRANSLATOR_CSPADMINICALIBV1CVT_H

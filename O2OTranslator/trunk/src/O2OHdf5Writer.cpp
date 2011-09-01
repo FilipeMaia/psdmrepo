@@ -82,6 +82,8 @@
 #include "O2OTranslator/CsPadElementV1Cvt.h"
 #include "O2OTranslator/CsPadElementV2Cvt.h"
 #include "O2OTranslator/CsPadCalibV1Cvt.h"
+#include "O2OTranslator/CsPadMiniCalibV1Cvt.h"
+#include "O2OTranslator/CsPadMiniElementV1Cvt.h"
 #include "O2OTranslator/EvrDataV3Cvt.h"
 #include "O2OTranslator/EvtDataTypeCvtDef.h"
 #include "O2OTranslator/EpicsDataTypeCvt.h"
@@ -358,6 +360,15 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 3).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  // special converter object for CsPad calibration data
+  converter.reset( new CsPadMiniCalibV1Cvt ( "CsPad::MiniCalibV1", m_metadata, m_calibStore ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 3).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   hsize_t chunk_size = 16*1024 ;
 
   // instantiate all factories for event converters
@@ -507,6 +518,12 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   converter.reset( new CsPadElementV2Cvt ( "CsPad::ElementV2", m_configStore, 
                                            m_calibStore, chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadElement,2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // very special converter for CsPad::MiniElementV1, it needs calibrations
+  converter.reset( new CsPadMiniElementV1Cvt (
+      "CsPad::MiniElementV1", m_calibStore, chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_Cspad2x2Element, 1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
 }
