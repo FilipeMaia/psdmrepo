@@ -97,7 +97,8 @@ float
 CsPadCommonModeSubV1::findCommonMode(const uint16_t* sdata, 
                                      const float* peddata, 
                                      const  uint16_t *pixStatus, 
-                                     unsigned ssize) const
+                                     unsigned ssize,
+                                     int stride) const
 {
   // do we even need it
   if (m_mode == None) return float(UnknownCM);
@@ -115,7 +116,7 @@ CsPadCommonModeSubV1::findCommonMode(const uint16_t* sdata,
   unsigned long count = 0;
   
   // fill histogram
-  for (unsigned p = 0; p != ssize; ++ p) {
+  for (unsigned count = 0, p = 0; count != ssize; ++ count, p += stride) {
     
     // ignore channels that re too noisy
     if (pixStatus and (pixStatus[p] & CsPadPixelStatusV1::VeryHot)) continue;

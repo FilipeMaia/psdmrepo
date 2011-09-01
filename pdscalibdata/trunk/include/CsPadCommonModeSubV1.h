@@ -92,7 +92,8 @@ public:
   float findCommonMode(const uint16_t* sdata, 
                        const float* peddata, 
                        const  uint16_t *pixStatus, 
-                       unsigned ssize) const;
+                       unsigned ssize,
+                       int stride = 1) const;
   
 protected:
 

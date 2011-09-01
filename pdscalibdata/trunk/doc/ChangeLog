@@ -11,6 +11,16 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2011-09-01 Andy Salnikov
+- add classes for CsPad::MiniElementV1 calibration: CsPadMiniPedestalsV1
+  and CsPadMiniPixelStatusV1
+- CsPad::MiniElementV1 data is organized differently (sections are 
+  interleaved) so to be able to use common mode calculator with that data 
+  type I added "stride" argument to CsPadCommonModeSubV1::findCommonMode
+  method which is 1 (default) for standard CsPad elements and should be set 
+  to 2 for MiniElement.
+
 Tag: V00-00-11
 2011-08-09 Mikhail Dubrovin
 - Replace float -> double for all CSPad stuff.
