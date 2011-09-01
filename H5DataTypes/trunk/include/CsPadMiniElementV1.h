@@ -1,19 +1,18 @@
-#ifndef H5DATATYPES_CSPADPIXELSTATUSV1_H
-#define H5DATATYPES_CSPADPIXELSTATUSV1_H
+#ifndef H5DATATYPES_CSPADMINIELEMENTV1_H
+#define H5DATATYPES_CSPADMINIELEMENTV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CsPadPixelStatusV1.
+//	Class CsPadMiniElementV1.
 //
 //------------------------------------------------------------------------
 
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <string>
 
 //----------------------
 // Base Class Headers --
@@ -22,9 +21,9 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "hdf5pp/Group.h"
+#include "H5DataTypes/CsPadElementHeader.h"
 #include "hdf5pp/Type.h"
-#include "pdscalibdata/CsPadPixelStatusV1.h"
+#include "pdsdata/cspad/MiniElementV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -37,38 +36,28 @@
 namespace H5DataTypes {
 
 //
-// Helper type for pdscalibdata::CsPadPixelStatusV1
+// Helper type for Pds::CsPad::MiniElementV1
 //
-class CsPadPixelStatusV1  {
+class CsPadMiniElementV1  {
 public:
 
-  typedef pdscalibdata::CsPadPixelStatusV1 DataType ;
-  
-  // Default constructor
-  CsPadPixelStatusV1 () ;
-  
-  // Construct from transient object
-  CsPadPixelStatusV1 (const DataType& data) ;
+  typedef Pds::CsPad::MiniElementV1 XtcType ;
 
-  // Destructor
-  ~CsPadPixelStatusV1 () ;
+  CsPadMiniElementV1 () {}
+  CsPadMiniElementV1 ( const XtcType& data ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  // store single object at specified location
-  static void store( const DataType& data, 
-                     hdf5pp::Group location,
-                     const std::string& fileName = std::string()) ;
-  
-protected:
+  static hdf5pp::Type stored_data_type() ;
+  static hdf5pp::Type cmode_data_type() ;
 
 private:
 
-  DataType::StatusCodes status;
+  CsPadElementHeader m_data ;
 
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_CSPADPIXELSTATUSV1_H
+#endif // H5DATATYPES_CSPADMINIELEMENTV1_H

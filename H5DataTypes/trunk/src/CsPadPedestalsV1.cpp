@@ -19,7 +19,6 @@
 // C/C++ Headers --
 //-----------------
 #include <algorithm>
-#include <fstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -46,15 +45,15 @@ namespace H5DataTypes {
 CsPadPedestalsV1::CsPadPedestalsV1 ()
 {
   // fill all pedestals with zeros
-  std::fill_n(&m_data.pedestals[0][0][0][0], int(CsPadPedestalsV1_Data::Size), 0.0f);
+  std::fill_n(&pedestals[0][0][0][0], int(DataType::Size), 0.0f);
 }
 
 CsPadPedestalsV1::CsPadPedestalsV1 (const DataType& data) 
 { 
   const DataType::Pedestals& pdata = data.pedestals();
   const DataType::pedestal_t* src = &pdata[0][0][0][0];
-  DataType::pedestal_t* dst = &m_data.pedestals[0][0][0][0];
-  std::copy(src, src+int(CsPadPedestalsV1_Data::Size), dst );
+  DataType::pedestal_t* dst = &pedestals[0][0][0][0];
+  std::copy(src, src+int(DataType::Size), dst );
 }
 
 //--------------
@@ -74,10 +73,10 @@ CsPadPedestalsV1::stored_type()
 hdf5pp::Type
 CsPadPedestalsV1::native_type()
 {
-  hsize_t dims[4] = { CsPadPedestalsV1_Data::Quads,
-                      CsPadPedestalsV1_Data::Sections,
-                      CsPadPedestalsV1_Data::Columns,
-                      CsPadPedestalsV1_Data::Rows}; 
+  hsize_t dims[4] = { DataType::Quads,
+                      DataType::Sections,
+                      DataType::Columns,
+                      DataType::Rows};
   hdf5pp::ArrayType arrType = 
     hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<DataType::pedestal_t>::native_type(), 4, dims) ;
   return arrType;

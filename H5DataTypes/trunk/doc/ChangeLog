@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-41
+2011-09-01 Andy Salnikov
+- refactored CsPadElement stuff, header data now live in separate file
+  CsPadElementHeader
+- added bunch of classes for CsPad::MiniElementV1, both regular data and
+  calibration classes.
+
 Tag: V00-00-40
 2011-08-29 Andy Salnikov
 - adding implementation for BldDataPimV1 class

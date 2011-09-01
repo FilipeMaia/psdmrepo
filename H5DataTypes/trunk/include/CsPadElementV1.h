@@ -22,9 +22,9 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "hdf5pp/Group.h"
+#include "H5DataTypes/CsPadElementHeader.h"
+#include "hdf5pp/Type.h"
 #include "pdsdata/cspad/ElementV1.hh"
-#include "pdsdata/cspad/ConfigV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -39,26 +39,10 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::CsPad::ElementV1
 //
-struct CsPadElementHeader_Data  {
-  enum { SbTempSize = 4 };
-  uint32_t tid;
-  uint32_t seq_count;
-  uint32_t ticks;
-  uint32_t fiducials;
-  uint16_t acq_count;
-  uint16_t sb_temp[SbTempSize];
-  uint8_t virtual_channel;
-  uint8_t lane;
-  uint8_t op_code;
-  uint8_t quad;
-  uint8_t frame_type;
-};
-
 class CsPadElementV1  {
 public:
 
   typedef Pds::CsPad::ElementV1 XtcType ;
-  typedef Pds::CsPad::ConfigV1 ConfigXtcType ;
 
   CsPadElementV1 () {}
   CsPadElementV1 ( const XtcType& data ) ;
@@ -71,7 +55,7 @@ public:
 
 private:
 
-  CsPadElementHeader_Data m_data ;
+  CsPadElementHeader m_data ;
 
 };
 

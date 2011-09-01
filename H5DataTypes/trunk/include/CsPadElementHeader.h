@@ -1,19 +1,18 @@
-#ifndef H5DATATYPES_CSPADPIXELSTATUSV1_H
-#define H5DATATYPES_CSPADPIXELSTATUSV1_H
+#ifndef H5DATATYPES_CSPADELEMENTHEADER_H
+#define H5DATATYPES_CSPADELEMENTHEADER_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CsPadPixelStatusV1.
+//	Class CsPadElementHeader.
 //
 //------------------------------------------------------------------------
 
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <string>
 
 //----------------------
 // Base Class Headers --
@@ -24,7 +23,7 @@
 //-------------------------------
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
-#include "pdscalibdata/CsPadPixelStatusV1.h"
+#include "pdsdata/cspad/ElementHeader.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -37,38 +36,42 @@
 namespace H5DataTypes {
 
 //
-// Helper type for pdscalibdata::CsPadPixelStatusV1
+// Helper type for Pds::CsPad::ElementHeader
 //
-class CsPadPixelStatusV1  {
+
+class CsPadElementHeader  {
 public:
 
-  typedef pdscalibdata::CsPadPixelStatusV1 DataType ;
-  
-  // Default constructor
-  CsPadPixelStatusV1 () ;
-  
-  // Construct from transient object
-  CsPadPixelStatusV1 (const DataType& data) ;
+  typedef Pds::CsPad::ElementHeader XtcType ;
+
+  CsPadElementHeader () {}
+  CsPadElementHeader ( const XtcType& data ) ;
 
   // Destructor
-  ~CsPadPixelStatusV1 () ;
+  ~CsPadElementHeader () ;
 
-  static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  // store single object at specified location
-  static void store( const DataType& data, 
-                     hdf5pp::Group location,
-                     const std::string& fileName = std::string()) ;
-  
 protected:
 
 private:
 
-  DataType::StatusCodes status;
+  enum { SbTempSize = 4 };
+
+  uint32_t tid;
+  uint32_t seq_count;
+  uint32_t ticks;
+  uint32_t fiducials;
+  uint16_t acq_count;
+  uint16_t sb_temp[SbTempSize];
+  uint8_t virtual_channel;
+  uint8_t lane;
+  uint8_t op_code;
+  uint8_t quad;
+  uint8_t frame_type;
 
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_CSPADPIXELSTATUSV1_H
+#endif // H5DATATYPES_CSPADELEMENTHEADER_H

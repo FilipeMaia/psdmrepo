@@ -3,17 +3,17 @@
 // 	$Id$
 //
 // Description:
-//	Class CsPadElementV1...
+//	Class CsPadMiniElementV1...
 //
 // Author List:
-//      Andrei Salnikov
+//      Andy Salnikov
 //
 //------------------------------------------------------------------------
 
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "H5DataTypes/CsPadElementV1.h"
+#include "H5DataTypes/CsPadMiniElementV1.h"
 
 //-----------------
 // C/C++ Headers --
@@ -38,40 +38,36 @@
 
 namespace H5DataTypes {
 
-
-CsPadElementV1::CsPadElementV1 ( const XtcType& data )
+CsPadMiniElementV1::CsPadMiniElementV1 ( const XtcType& data )
   : m_data(data)
 {
 }
 
 hdf5pp::Type
-CsPadElementV1::stored_type(unsigned nQuad)
+CsPadMiniElementV1::stored_type()
 {
-  return native_type(nQuad) ;
+  return native_type() ;
 }
 
 hdf5pp::Type
-CsPadElementV1::native_type(unsigned nQuad)
+CsPadMiniElementV1::native_type()
 {
-  return hdf5pp::ArrayType::arrayType ( CsPadElementHeader::native_type(), nQuad );
+  return CsPadElementHeader::native_type();
 }
 
 hdf5pp::Type
-CsPadElementV1::stored_data_type(unsigned nQuad, unsigned nSect)
+CsPadMiniElementV1::stored_data_type()
 {
   hdf5pp::Type baseType = hdf5pp::TypeTraits<int16_t>::native_type() ;
 
-  hsize_t dims[] = { nQuad, nSect, Pds::CsPad::ColumnsPerASIC, Pds::CsPad::MaxRowsPerASIC*2 } ;
-  return hdf5pp::ArrayType::arrayType ( baseType, 4, dims );
+  hsize_t dims[] = { Pds::CsPad::ColumnsPerASIC, Pds::CsPad::MaxRowsPerASIC*2, 2 } ;
+  return hdf5pp::ArrayType::arrayType ( baseType, 3, dims );
 }
 
 hdf5pp::Type
-CsPadElementV1::cmode_data_type(unsigned nQuad, unsigned nSect)
+CsPadMiniElementV1::cmode_data_type()
 {
-  hdf5pp::Type baseType = hdf5pp::TypeTraits<float>::native_type() ;
-
-  hsize_t dims[] = { nQuad, nSect } ;
-  return hdf5pp::ArrayType::arrayType ( baseType, 2, dims );
+  return hdf5pp::ArrayType::arrayType<float>(2);
 }
 
 } // namespace H5DataTypes

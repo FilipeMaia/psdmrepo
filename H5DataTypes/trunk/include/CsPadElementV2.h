@@ -22,10 +22,9 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "H5DataTypes/CsPadElementV1.h"
-#include "hdf5pp/Group.h"
+#include "H5DataTypes/CsPadElementHeader.h"
+#include "hdf5pp/Type.h"
 #include "pdsdata/cspad/ElementV2.hh"
-#include "pdsdata/cspad/ConfigV2.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -37,11 +36,13 @@
 
 namespace H5DataTypes {
   
+//
+// Helper type for Pds::CsPad::ElementV2
+//
 class CsPadElementV2  {
 public:
 
   typedef Pds::CsPad::ElementV2 XtcType ;
-  typedef Pds::CsPad::ConfigV2 ConfigXtcType ;
 
   CsPadElementV2 () {}
   CsPadElementV2 ( const XtcType& data ) ;
@@ -54,7 +55,7 @@ public:
 
 private:
 
-  CsPadElementHeader_Data m_data ;
+  CsPadElementHeader m_data ;
 
 };
 

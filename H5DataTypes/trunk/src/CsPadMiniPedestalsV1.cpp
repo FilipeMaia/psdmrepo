@@ -3,17 +3,17 @@
 // 	$Id$
 //
 // Description:
-//	Class CsPadPixelStatusV1...
+//	Class CsPadMiniPedestalsV1...
 //
 // Author List:
-//      Andrei Salnikov
+//      Andy Salnikov
 //
 //------------------------------------------------------------------------
 
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "H5DataTypes/CsPadPixelStatusV1.h"
+#include "H5DataTypes/CsPadMiniPedestalsV1.h"
 
 //-----------------
 // C/C++ Headers --
@@ -24,6 +24,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/ArrayType.h"
+#include "hdf5pp/CompoundType.h"
 #include "hdf5pp/TypeTraits.h"
 #include "H5DataTypes/H5DataUtils.h"
 #include "MsgLogger/MsgLogger.h"
@@ -41,53 +42,51 @@ namespace H5DataTypes {
 //----------------
 // Constructors --
 //----------------
-CsPadPixelStatusV1::CsPadPixelStatusV1 ()
+CsPadMiniPedestalsV1::CsPadMiniPedestalsV1 ()
 {
-  // fill all codes with zeros
-  pdscalibdata::CsPadPixelStatusV1::status_t zero=0;
-  std::fill_n(&status[0][0][0][0], int(DataType::Size), zero);
+  // fill all pedestals with zeros
+  std::fill_n(&pedestals[0][0][0], int(DataType::Size), 0.0f);
 }
 
-CsPadPixelStatusV1::CsPadPixelStatusV1 (const DataType& data) 
-{ 
-  const DataType::StatusCodes& pdata = data.status();
-  const DataType::status_t* src = &pdata[0][0][0][0];
-  DataType::status_t* dst = &status[0][0][0][0];
+CsPadMiniPedestalsV1::CsPadMiniPedestalsV1 (const DataType& data)
+{
+  const DataType::Pedestals& pdata = data.pedestals();
+  const DataType::pedestal_t* src = &pdata[0][0][0];
+  DataType::pedestal_t* dst = &pedestals[0][0][0];
   std::copy(src, src+int(DataType::Size), dst );
 }
 
 //--------------
 // Destructor --
 //--------------
-CsPadPixelStatusV1::~CsPadPixelStatusV1 ()
+CsPadMiniPedestalsV1::~CsPadMiniPedestalsV1 ()
 {
 }
 
 
 hdf5pp::Type
-CsPadPixelStatusV1::stored_type()
+CsPadMiniPedestalsV1::stored_type()
 {
   return native_type() ;
 }
 
 hdf5pp::Type
-CsPadPixelStatusV1::native_type()
+CsPadMiniPedestalsV1::native_type()
 {
-  hsize_t dims[4] = { DataType::Quads,
-                      DataType::Sections,
-                      DataType::Columns,
-                      DataType::Rows};
-  hdf5pp::ArrayType arrType = 
-    hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<DataType::status_t>::native_type(), 4, dims) ;
+  hsize_t dims[4] = { DataType::Columns,
+                      DataType::Rows,
+                      DataType::Sections};
+  hdf5pp::ArrayType arrType =
+    hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<DataType::pedestal_t>::native_type(), 3, dims) ;
   return arrType;
 }
 
 void
-CsPadPixelStatusV1::store( const DataType& data, hdf5pp::Group grp, const std::string& fileName )
+CsPadMiniPedestalsV1::store( const DataType& data, hdf5pp::Group grp, const std::string& fileName )
 {
-  CsPadPixelStatusV1 obj(data);
-  hdf5pp::DataSet<CsPadPixelStatusV1> ds = storeDataObject ( obj, "pixel_status", grp ) ;
-  
+  CsPadMiniPedestalsV1 obj(data);
+  hdf5pp::DataSet<CsPadMiniPedestalsV1> ds = storeDataObject ( obj, "pedestals", grp ) ;
+
   // add attributes
   ds.createAttr<const char*>("source").store(fileName.c_str());
 }

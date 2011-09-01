@@ -37,31 +37,8 @@
 namespace H5DataTypes {
 
 //
-// Helper type for CsPadPedestalsV1
+// Helper type for pdscalibdata::CsPadPedestalsV1
 //
-struct CsPadPedestalsV1_Data  {
-
-  enum { Quads = pdscalibdata::CsPadPedestalsV1::Quads };
-  enum { Sections = pdscalibdata::CsPadPedestalsV1::Sections };
-  enum { Columns = pdscalibdata::CsPadPedestalsV1::Columns };
-  enum { Rows = pdscalibdata::CsPadPedestalsV1::Rows };
-  enum { Size = Quads*Sections*Columns*Rows };
-  
-  pdscalibdata::CsPadPedestalsV1::Pedestals pedestals;
-};
-
-/**
- *
- *  This software was developed for the LCLS project.  If you use all or 
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
- *
- *  @version $Id$
- *
- *  @author Andrei Salnikov
- */
-
 class CsPadPedestalsV1  {
 public:
 
@@ -88,12 +65,7 @@ protected:
 
 private:
 
-  // Data members
-  CsPadPedestalsV1_Data m_data;
-
-  // Copy constructor and assignment are disabled by default
-  CsPadPedestalsV1 ( const CsPadPedestalsV1& ) ;
-  CsPadPedestalsV1& operator = ( const CsPadPedestalsV1& ) ;
+  DataType::Pedestals pedestals;
 
 };
 
