@@ -84,7 +84,7 @@ public:
    *  @param[in] datatype   Type of the calibration parameters (i.e. "rotation").
    *  @param[in] runNumber  Run number to search the valid file name.
    */ 
-  std::string findCalibFile(const std::string& datatype, unsigned long& runNumber) const;
+  std::string findCalibFile(const std::string& datatype, unsigned long runNumber) const;
  
 protected:
 

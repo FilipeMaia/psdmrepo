@@ -110,7 +110,7 @@ CalibFileFinder::CalibFileFinder (const std::string& calibDir,           //  /re
 
 // find calibration file
 std::string 
-CalibFileFinder::findCalibFile(const std::string& dataType, unsigned long& runNumber) const        //  pedestals
+CalibFileFinder::findCalibFile(const std::string& dataType, unsigned long runNumber) const        //  pedestals
 try {
   // if no directory given then don't do anything
   if ( m_calibDir == "" ) return std::string();
