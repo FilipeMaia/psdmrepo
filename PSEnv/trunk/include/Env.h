@@ -71,9 +71,17 @@ class Env : boost::noncopyable {
 public:
 
   /**
-   *  @brief Constructor takes tha name of the psana job as a parameter.
+   *  @brief Constructor
+   *
+   *  @param[in] jobName    Name of the psana job.
+   *  @param[in] expNameProvider  Object which provides experiment/instrument names.
+   *  @param[in] calibDir  Name of the calibration directory, can include "{exp}"
+   *                       and "{instr}" strings which will be replaced with experiment
+   *                       and instrument names.
    */
-  Env (const std::string& jobName, const boost::shared_ptr<IExpNameProvider>& expNameProvider) ;
+  Env (const std::string& jobName,
+      const boost::shared_ptr<IExpNameProvider>& expNameProvider,
+      const std::string& calibDir) ;
 
   // Destructor
   ~Env () ;
@@ -86,6 +94,10 @@ public:
 
   /// Returns experiment name
   const std::string& experiment() const { return m_expNameProvider->experiment(); }
+
+  /// Returns that name of the calibration directory for current
+  /// instrument/experiment.
+  const std::string& calibDir() const;
 
   /// Access to Configuration Store object.
   EnvObjectStore& configStore() { return *m_cfgStore; }
@@ -118,6 +130,8 @@ private:
   boost::scoped_ptr<RootHistoManager::RootHMgr> m_rhmgr;  ///< Pointer to ROOT histogram manager
   boost::scoped_ptr<PSHist::HManager> m_hmgr;  ///< Pointer to ROOT histogram manager
   boost::shared_ptr<IExpNameProvider> m_expNameProvider; ///< Object which provides experiment and instrument names
+  mutable std::string m_calibDir;              ///< Name of the calibration directory
+  mutable bool m_calibDirSetup;                ///< Flag set to true after calibration directory name is fixed
   
 };
 
