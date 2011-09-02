@@ -50,6 +50,7 @@ def standardSConscript( **kw ) :
 
     """ Understands following keywords, all optional:
         LIBS - list of additional libraries needed by this package
+        LIBPATH - list of directories for additional libraries
         BINS - dictionary of executables and their corresponding source files
         TESTS - dictionary of test applications and their corresponding source files
         SCRIPTS - list of scripts in app/ directory
@@ -86,7 +87,10 @@ def standardLib( **kw ) :
         env = DefaultEnvironment()
         libdir = env['LIBDIR']
 
-        lib = env.SharedLibrary ( pkg, source=libsrcs, LIBS=[] )
+        binkw = {}
+        binkw['LIBS'] = _getkwlist ( kw, 'LIBS' )
+        binkw['LIBPATH'] = _getkwlist ( kw, 'LIBPATH' )  + env['LIBPATH']
+        lib = env.SharedLibrary ( pkg, source=libsrcs, **binkw )
         ilib = env.Install ( libdir, source=lib )
         env['ALL_TARGETS']['LIBS'].extend ( ilib )
         
@@ -237,7 +241,7 @@ def _standardBins( appdir, binenv, install, **kw ) :
         binkw = {}
         binkw['LIBS'] = _getkwlist ( kw, 'LIBS' )
         #binkw['LIBS'].insert ( 0, _getpkg( kw ) )
-        binkw['LIBPATH'] = _getkwlist ( kw, 'LIBPATH' )
+        binkw['LIBPATH'] = _getkwlist ( kw, 'LIBPATH' )  + env['LIBPATH']
     
         for bin, srcs in bins.iteritems() :
             

@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2011-09-01 Andy Salnikov
+- in standardSConscript $LIBS also needs to be added to shared library
+- fixing LIBPATH override
+
 Tag: V00-01-04
 2011-08-17 Andy Salnikov
 - fix doc target if there is nothing to build
