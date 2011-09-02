@@ -1,4 +1,8 @@
 
+2011-09-01 - V00-00-40
+======================
+- added support for CsPad::MiniElementV1 class
+
 2011-08-29 - V00-00-39
 ======================
 - added support for BldDataPimV1 class

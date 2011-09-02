@@ -49,6 +49,7 @@
 #include "types/cspad/ConfigV3.h"
 #include "types/cspad/ElementV1.h"
 #include "types/cspad/ElementV2.h"
+#include "types/cspad/MiniElementV1.h"
 
 #include "types/encoder/ConfigV1.h"
 #include "types/encoder/DataV1.h"
@@ -330,6 +331,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     break;
 
   case Pds::TypeId::Id_Cspad2x2Element :
+    if ( not obj ) obj = xtc2obj<CsPad::MiniElementV1, 1>(xtc, parent);
     break;
 
   case Pds::TypeId::Id_SharedPim :

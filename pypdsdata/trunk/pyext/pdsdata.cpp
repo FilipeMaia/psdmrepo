@@ -81,6 +81,7 @@
 #include "types/cspad/CsPadReadOnlyCfg.h"
 #include "types/cspad/ElementV1.h"
 #include "types/cspad/ElementV2.h"
+#include "types/cspad/MiniElementV1.h"
 
 #include "types/encoder/ConfigV1.h"
 #include "types/encoder/DataV1.h"
@@ -247,6 +248,7 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::CsPad::CsPadReadOnlyCfg::initType( module );
   pypdsdata::CsPad::ElementV1::initType( module );
   pypdsdata::CsPad::ElementV2::initType( module );
+  pypdsdata::CsPad::MiniElementV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "cspad", module );
 
