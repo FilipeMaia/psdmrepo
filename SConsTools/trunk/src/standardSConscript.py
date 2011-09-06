@@ -56,6 +56,7 @@ def standardSConscript( **kw ) :
         SCRIPTS - list of scripts in app/ directory
         UTESTS - names of the unit tests to run, if not given then all tests are unit tests
         PYEXTMOD - name of the Python extension module, package name used by default
+        CCFLAGS - additional flags passed to C/C++ compilers
     """
 
     pkg = _getpkg ( kw )
@@ -90,6 +91,8 @@ def standardLib( **kw ) :
         binkw = {}
         binkw['LIBS'] = _getkwlist ( kw, 'LIBS' )
         binkw['LIBPATH'] = _getkwlist ( kw, 'LIBPATH' )  + env['LIBPATH']
+        if 'CCFLAGS' in kw:
+            binkw['CCFLAGS'] = env['CCFLAGS'] + ' ' + kw['CCFLAGS']
         lib = env.SharedLibrary ( pkg, source=libsrcs, **binkw )
         ilib = env.Install ( libdir, source=lib )
         env['ALL_TARGETS']['LIBS'].extend ( ilib )
@@ -242,6 +245,8 @@ def _standardBins( appdir, binenv, install, **kw ) :
         binkw['LIBS'] = _getkwlist ( kw, 'LIBS' )
         #binkw['LIBS'].insert ( 0, _getpkg( kw ) )
         binkw['LIBPATH'] = _getkwlist ( kw, 'LIBPATH' )  + env['LIBPATH']
+        if 'CCFLAGS' in kw:
+            binkw['CCFLAGS'] = env['CCFLAGS'] + ' ' + kw['CCFLAGS']
     
         for bin, srcs in bins.iteritems() :
             
