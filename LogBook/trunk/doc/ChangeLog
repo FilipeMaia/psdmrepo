@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: 00-01-28
+2011-09-06 Igor Gaponenko
+- added static function LogBook::instance()
+
 Tag: 00-01-27
 2011-08-11 Igor Gaponenko
 - fixed the Grabber to allow run, message id and snappshot description
