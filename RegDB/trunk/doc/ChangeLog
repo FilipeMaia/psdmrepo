@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-32
+2011-09-07 Igor Gaponenko
+- implemented the 'Data Path' Web interface and the corresponding Web service
+to allow a single point of view onto physical locations where experimental
+data are stored by the ONLIN-to-OFFLINE migration script.
+
 Tag: V00-00-31
 2011-07-01 Igor Gaponenko
 - reimplemented the GROPUP management service to report operations to

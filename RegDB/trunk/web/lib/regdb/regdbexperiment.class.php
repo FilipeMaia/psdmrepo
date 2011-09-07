@@ -213,7 +213,7 @@ class RegDBExperiment {
 
     public function add_param ( $name, $value, $description ) {
 
-        /* Verify the leader's name
+        /* erify values of parameters
          */
         if( is_null( $name ) || is_null( $value ) || is_null( $description ))
             throw new RegDBException (
@@ -241,6 +241,39 @@ class RegDBExperiment {
         return $new_param;
     }
 
+    public function set_param ( $name, $value ) {
+
+        /* Verify values of parameters
+    	 */
+        if( is_null( $name ) || is_null( $value ))
+            throw new RegDBException (
+                __METHOD__, "method parameters can't be null objects" );
+
+        /* Make sure the parameter already exists. If it doesn't then create it with
+         * some default description.
+         */
+        $param = $this->find_param_by_name( $name );
+        if( is_null( $param )) return $this->add_param( $name, $value, "" );
+
+        /* Otherwise proceed and set its new value.
+         */
+        $trimmed_name = trim( $name );
+        if( strlen( $trimmed_name ) == 0 )
+            throw new RegDBException(
+                __METHOD__, "parameter name can't be empty" );
+
+        $trimmed_value = trim( $value );
+               
+        /* Proceed with the operation.
+         */
+        $this->connection->query (
+            "UPDATE {$this->connection->database}.experiment_param SET val='".$this->connection->escape_string( $trimmed_value )."'".
+            " WHERE exper_id=".$this->id().
+            " AND param='".$this->connection->escape_string( $trimmed_name )."'" );
+
+        return $this->find_param_by_name( $name );
+    }
+    
     public function remove_param ( $name ) {
 
         /* Verify values of parameters

@@ -9,7 +9,18 @@ use LusiTime\LusiTime;
 
 class RegDB {
 
-    /* Data members
+	private static $default_instance = null;
+
+	/**
+	 * Return an instance of the object initialzied with default version
+	 * of parameters.
+	 */
+	public static function instance() {
+		if( is_null($default_instance)) $default_instance = new RegDB();
+		return $default_instance;
+	}
+
+	/* Data members
      */
     private $connection;
 
