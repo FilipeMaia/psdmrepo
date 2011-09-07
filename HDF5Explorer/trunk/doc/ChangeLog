@@ -12,6 +12,15 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ------------------------------
+Tag: V00-00-06
+2011-09-06 Mikhail S. Dubrovin
+- add CSPad detector spectrum plot, which represents the latest windoe or manual zoom-in region.	
+- modified modules:
+               HDF5Explorer/src/DrawEvent.py
+               HDF5Explorer/src/PlotsForCSpad.py
+               HDF5Explorer/src/GUIWhatToDisplayCBoxCSpad.py
+               HDF5Explorer/src/ConfigParameters.py	
+
 Tag: V00-00-05
 2011-08-23 Mikhail S. Dubrovin
 - add protection in 'Average' and drawing when the event index exceeds the dataset shape.
