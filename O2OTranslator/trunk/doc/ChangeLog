@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-00
+2011-09-07 Andy Salnikov
+- enabling shuffle compression for many datasets, this should 
+  improve zlib compression slightly without much CPU time increase
+
 Tag: V00-11-03
 2011-09-01 Andy Salnikov
 - added support for CsPad::MiniElementV1 translation via special 

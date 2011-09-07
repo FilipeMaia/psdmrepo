@@ -92,11 +92,11 @@ EpicsDataTypeCvt::typedConvertSubgroup ( hdf5pp::Group group,
     // new thing, create all groups/containers
 
     // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
     XtcClockTimeCont* timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
     // make container for data objects
-    CvtDataContFactoryEpics dataContFactory( "data", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryEpics dataContFactory( "data", m_chunk_size, m_deflate, false ) ;
     DataCont* dataCont = new DataCont ( dataContFactory ) ;
 
     // store it all for later use

@@ -107,15 +107,15 @@ PnCCDFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( not m_frameCont ) {
 
     // create container for frames
-    CvtDataContFactoryTyped<H5DataTypes::PnCCDFrameV1> frContFactory( "frame", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryTyped<H5DataTypes::PnCCDFrameV1> frContFactory( "frame", m_chunk_size, m_deflate, true ) ;
     m_frameCont = new FrameCont ( frContFactory ) ;
 
     // create container for frame data
-    CvtDataContFactoryTyped<uint16_t> dataContFactory( "data", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryTyped<uint16_t> dataContFactory( "data", m_chunk_size, m_deflate, true ) ;
     m_frameDataCont = new FrameDataCont ( dataContFactory ) ;
 
     // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
   }

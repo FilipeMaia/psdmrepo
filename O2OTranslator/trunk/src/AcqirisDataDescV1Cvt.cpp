@@ -93,15 +93,15 @@ AcqirisDataDescV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( not m_waveformCont ) {
 
     // create container for timestamps
-    CvtDataContFactoryTyped<uint64_t> tsContFactory( "timestamps", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryTyped<uint64_t> tsContFactory( "timestamps", m_chunk_size, m_deflate, true ) ;
     m_timestampCont = new TimestampCont ( tsContFactory ) ;
 
     // create container for waveforms
-    CvtDataContFactoryTyped<int16_t> wfContFactory( "waveforms", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryTyped<int16_t> wfContFactory( "waveforms", m_chunk_size, m_deflate, true ) ;
     m_waveformCont = new WaveformCont ( wfContFactory ) ;
 
     // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
   }

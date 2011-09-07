@@ -80,11 +80,11 @@ AcqirisTdcDataV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( not m_dataCont ) {
 
     // make container for data objects
-    CvtDataContFactoryDef<H5Type> dataContFactory ( "data", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryDef<H5Type> dataContFactory ( "data", m_chunk_size, m_deflate, true ) ;
     m_dataCont = new DataCont ( dataContFactory ) ;
 
     // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
   }

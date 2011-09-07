@@ -79,11 +79,11 @@ EvrDataV3Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( not m_evrDataCont ) {
 
     // create container for frames
-    CvtDataContFactoryDef<H5DataTypes::EvrDataV3> evrDataContFactory( "evrData", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryDef<H5DataTypes::EvrDataV3> evrDataContFactory( "evrData", m_chunk_size, m_deflate, true ) ;
     m_evrDataCont = new EvrDataCont ( evrDataContFactory ) ;
 
     // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
   }

@@ -57,10 +57,11 @@ public:
   typedef H5DataTypes::ObjectContainer<Pds::EpicsPvHeader> container_type ;
 
   // constructor
-  CvtDataContFactoryEpics (const std::string& name,  hsize_t chunkSize, int deflate)
+  CvtDataContFactoryEpics (const std::string& name,  hsize_t chunkSize, int deflate, bool shuffle = false)
     : m_name(name)
     , m_chunkSize(chunkSize)
     , m_deflate(deflate)
+    , m_shuffle(shuffle)
   {
   }
 
@@ -84,6 +85,7 @@ private:
   std::string m_name ;
   hsize_t m_chunkSize ;
   int m_deflate ;
+  bool m_shuffle ;
 };
 
 } // namespace O2OTranslator

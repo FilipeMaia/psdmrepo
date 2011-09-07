@@ -64,11 +64,11 @@ public:
     , m_timeCont(0)
   {
     // make container for data objects
-    CvtDataContFactoryDef<H5Type> dataContFactory( "data", chunk_size, deflate ) ;
+    CvtDataContFactoryDef<H5Type> dataContFactory( "data", chunk_size, deflate, true ) ;
     m_dataCont = new DataCont ( dataContFactory ) ;
 
     // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", chunk_size, deflate ) ;
+    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", chunk_size, deflate, true ) ;
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
   }
 

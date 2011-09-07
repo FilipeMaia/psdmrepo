@@ -127,21 +127,21 @@ CsPadElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( not m_elementCont ) {
 
     // create container for frames
-    CvtDataContFactoryTyped<H5DataTypes::CsPadElementV1> elContFactory( "element", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryTyped<H5DataTypes::CsPadElementV1> elContFactory( "element", m_chunk_size, m_deflate, true ) ;
     m_elementCont = new ElementCont ( elContFactory ) ;
 
     // create container for frame data
-    CvtDataContFactoryTyped<int16_t> dataContFactory( "data", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryTyped<int16_t> dataContFactory( "data", m_chunk_size, m_deflate, true ) ;
     m_pixelDataCont = new PixelDataCont ( dataContFactory ) ;
 
     if (cModeCalib.get()) {
       // create container for common mode data
-      CvtDataContFactoryTyped<float> cmodeContFactory( "common_mode", m_chunk_size, m_deflate ) ;
+      CvtDataContFactoryTyped<float> cmodeContFactory( "common_mode", m_chunk_size, m_deflate, true ) ;
       m_cmodeDataCont = new CommonModeDataCont ( cmodeContFactory ) ;
     }
 
     // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
   }

@@ -82,15 +82,15 @@ CameraFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( not m_dataCont ) {
 
     // make container for data objects
-    CvtDataContFactoryDef<H5DataTypes::CameraFrameV1> dataContFactory ( "data", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryDef<H5DataTypes::CameraFrameV1> dataContFactory ( "data", m_chunk_size, m_deflate, true ) ;
     m_dataCont = new DataCont ( dataContFactory ) ;
 
     // get the type for the image
-    CvtDataContFactoryTyped<const unsigned char> imgContFactory( "image", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryTyped<const unsigned char> imgContFactory( "image", m_chunk_size, m_deflate, true ) ;
     m_imageCont = new ImageCont ( imgContFactory ) ;
 
     // make container for time
-    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate ) ;
+    CvtDataContFactoryDef<H5DataTypes::XtcClockTime> timeContFactory ( "time", m_chunk_size, m_deflate, true ) ;
     m_timeCont = new XtcClockTimeCont ( timeContFactory ) ;
 
     // separate dataset which indicates that image dimensions are correct

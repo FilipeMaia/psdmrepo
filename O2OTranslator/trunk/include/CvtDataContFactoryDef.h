@@ -59,10 +59,12 @@ public:
   CvtDataContFactoryDef ( const std::string& name,
                           hsize_t chunkSize,
                           int deflate,
+                          bool shuffle = false,
                           hdf5pp::Type type = H5Type::stored_type() )
     : m_name(name)
     , m_chunkSize()
     , m_deflate(deflate)
+    , m_shuffle(shuffle)
     , m_type(type)
   {
     m_chunkSize = std::max ( chunkSize / sizeof(H5Type), hsize_t(1) ) ;
@@ -75,7 +77,7 @@ public:
   container_type* container( hdf5pp::Group group ) const
   {
     MsgLog( "CvtDataContFactoryDef", debug, "create container " << m_name << " with chunk size " << m_chunkSize ) ;
-    return new container_type ( m_name, group, m_type, m_chunkSize, m_deflate ) ;
+    return new container_type ( m_name, group, m_type, m_chunkSize, m_deflate, m_shuffle ) ;
   }
 
 protected:
@@ -86,6 +88,7 @@ private:
   std::string m_name ;
   hsize_t m_chunkSize ;
   int m_deflate ;
+  bool m_shuffle;
   hdf5pp::Type m_type ;
 
 };
