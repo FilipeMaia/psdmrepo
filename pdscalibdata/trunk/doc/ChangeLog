@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2011-09-06 Andy Salnikov
+- last change in CsPadCommonModeSubV1::findCommonMode introduced a bug,
+  variable in for loop masked other variable. Making a quick fix.
+
 Tag: V00-00-12
 2011-09-01 Andy Salnikov
 - add classes for CsPad::MiniElementV1 calibration: CsPadMiniPedestalsV1

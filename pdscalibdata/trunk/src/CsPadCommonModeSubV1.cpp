@@ -116,7 +116,7 @@ CsPadCommonModeSubV1::findCommonMode(const uint16_t* sdata,
   unsigned long count = 0;
   
   // fill histogram
-  for (unsigned count = 0, p = 0; count != ssize; ++ count, p += stride) {
+  for (unsigned c = 0, p = 0; c != ssize; ++ c, p += stride) {
     
     // ignore channels that re too noisy
     if (pixStatus and (pixStatus[p] & CsPadPixelStatusV1::VeryHot)) continue;
