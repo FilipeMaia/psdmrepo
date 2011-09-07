@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-22
+2011-09-06 Igor Gaponenko
+- added two LDAP tests to cross-check POSIX groups
+
 Tag: V00-00-21
 2011-07-07 Igor Gaponenko
 - removed unnecessary comments from web/html/LDAP_group_management_log.php
