@@ -75,6 +75,9 @@ public:
   // set deflate compression method
   void set_szip ( unsigned mask, unsigned block_size ) ;
 
+  // set shuffle "compression"
+  void set_shuffle () ;
+
   // set n-bit compression method
   void set_nbit () ;
 

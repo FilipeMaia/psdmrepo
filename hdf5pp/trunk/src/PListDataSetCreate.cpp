@@ -90,6 +90,16 @@ PListDataSetCreate::set_szip( unsigned mask, unsigned block_size )
   }
 }
 
+// set shuffle "compression"
+void
+PListDataSetCreate::set_shuffle ()
+{
+  herr_t stat = H5Pset_shuffle( m_impl.id() ) ;
+  if ( stat < 0 ) {
+    throw Hdf5CallException ( "PListDataSetCreate::set_shuffle", "H5Pset_shuffle" ) ;
+  }
+}
+
 // set n-bit compression method
 void
 PListDataSetCreate::set_nbit ()
