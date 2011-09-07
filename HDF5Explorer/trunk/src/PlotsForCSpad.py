@@ -115,8 +115,9 @@ class PlotsForCSpad ( object ) :
         #arr1quad = np.zeros( (8,185,388) ) # In order to have array for all 8 pairs!!!!!
         #arr1quad[0:pairN-pair1, 0:185, 0:388] += arr1ev[pair1:pairN,0:185, 0:388]
 
-        if plot ==  8 : self.plotCSpadQuad08SpectraOf2x1( arr1ev, fig )
-        if plot == 16 : self.plotCSpadQuad16Spectra     ( arr1ev, fig )
+        if plot ==  8        : self.plotCSpadQuad08SpectraOf2x1( arr1ev, fig )
+        if plot == 16        : self.plotCSpadQuad16Spectra     ( arr1ev, fig )
+        if plot == 'DetSpec' : self.plotCSpadDetSpectrum       ( arr1ev, fig )
 
 
     def plotCSpad08PairsImage( self, arr1ev, fig ):
@@ -362,10 +363,11 @@ class PlotsForCSpad ( object ) :
         #self.figDet.span = RectangleSelector(self.axesDet, self.onRectangleSelect, drawtype='box',rectprops=rect_props)
 
         self.figDet.canvas.mpl_connect('button_release_event', self.processMouseButtonReleaseForImage)
+        #self.drawCSpadDetSpectrum(self.arrwin)
 
 
     def processMouseButtonReleaseForImage(self, event) :
-
+        #print 'processMouseButtonReleaseForImage'
         fig = self.figDet = event.canvas.figure # or plt.gcf()
         figNum = fig.number 
         
@@ -386,6 +388,9 @@ class PlotsForCSpad ( object ) :
             self.drawCSpadDetImage()
             #plt.draw() # redraw the current figure
             fig.myZoomIsOn = False
+
+        arrwin = plt.gci().get_array() # this returns the full size imaje...
+        self.drawCSpadDetSpectrum(arrwin)
 
             
     def onRectangleSelect(self, eclick, erelease) :
@@ -443,6 +448,42 @@ class PlotsForCSpad ( object ) :
                     plt.gca().add_patch(rec)
 
 
+    def plotCSpadDetSpectrum( self, arr1ev, fig ):
+        """Plot 2d spectrum of the detector from input array."""
+        if not cp.confpars.cspadSpectrumDetIsOn : return
+        print 'plotCSpadDetSpectrum()'       
+        self.arr2d = self.getImageArrayForDet( arr1ev )
+        self.figDetSpec = fig
+        #plt.clf()
+        self.drawCSpadDetSpectrum(self.arr2d)
+
+
+    def drawCSpadDetSpectrum( self, arr2d ):
+        if not cp.confpars.cspadSpectrumDetIsOn : return
+
+        try :
+            fig = self.figDet
+        except AttributeError :
+            fig = self.figDetSpec
+
+        if fig.myXmin == None :
+            self.arrwin = arr2d
+        else :
+            self.arrwin = arr2d[fig.myYmin:fig.myYmax,fig.myXmin:fig.myXmax]
+
+        self.str_event = 'Event ' + str(cp.confpars.eventCurrent)
+        fig = plt.figure(num=self.figDetSpec.number)
+        fig.canvas.set_window_title('CSpad spectrum ' + self.str_event)
+        fig.subplots_adjust(left=0.12, bottom=0.03, right=0.98, top=0.97, wspace=0, hspace=0)
+        plt.clf()
+
+        plt.hist(self.arrwin.flatten(),
+                 bins = cp.confpars.cspadSpectrumNbins,
+                 range=(cp.confpars.cspadSpectrumAmin,
+                        cp.confpars.cspadSpectrumAmax))
+
+        #print 'drawCSpadDetSpectrum for event ' + str(self.str_event)
+        plt.draw() # redraw the current figure
 
 
     def plotCSpadQuad08SpectraOf2x1( self, arr1ev, fig ):
@@ -542,8 +583,6 @@ class PlotsForCSpad ( object ) :
                     plt.text(0.8,1.08,title,color='b',fontsize=24,transform = plt.gca().transAxes)
 
         print 'Time to generate all histograms (sec) = %f' % (time.clock() - t_start)
-
-
 
 
     def plotCSpadPairImage( self, arr1ev, fig ):

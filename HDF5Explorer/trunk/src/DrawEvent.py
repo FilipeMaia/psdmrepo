@@ -495,6 +495,7 @@ class DrawEvent ( object ) :
             if cp.confpars.cspadSpectrum08IsOn : 
                 self.plotsCSpad.plotCSpadV1Spectrum(arr1ev,self.set_fig(4),plot=8)
             else : self.close_fig(self.figNum)
+
             
         #if dsname == self.dsnameCSpadV2 or dsname == self.dsnameCSpadV2CXI :
             #print 'Draw plots for CSpad V2'
@@ -529,6 +530,11 @@ class DrawEvent ( object ) :
             self.figNum += 1 
             if cp.confpars.cspadSpectrum08IsOn : 
                 self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=8)
+            else : self.close_fig(self.figNum)
+
+            self.figNum += 1 
+            if cp.confpars.cspadSpectrumDetIsOn : 
+                self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig('1x1'),plot='DetSpec')
             else : self.close_fig(self.figNum)
 
             self.figNum += 1 
@@ -637,6 +643,7 @@ class DrawEvent ( object ) :
         or cp.confpars.cspadProjRIsOn       \
         or cp.confpars.cspadProjPhiIsOn     \
         or cp.confpars.cspadSpectrumIsOn    \
+        or cp.confpars.cspadSpectrumDetIsOn \
         or cp.confpars.cspadSpectrum08IsOn  : 
 
             item_second_to_last_name = printh5.get_item_second_to_last_name(dsname)
@@ -786,6 +793,7 @@ class DrawEvent ( object ) :
         self.fig.myCmax = None
         self.fig.myarr  = None
         self.fig.mydsname = dsname
+        #self.fig.myFigNum = self.number
 
         self.fig.myZoomIsOn = False
         self.fig.nwin   = self.nwin

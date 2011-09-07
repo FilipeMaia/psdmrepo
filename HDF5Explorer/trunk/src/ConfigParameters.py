@@ -137,6 +137,7 @@ class ConfigParameters ( object ) :
         self.cspadImageQuadIsOn   = False
         self.cspadImageDetIsOn    = False
         self.cspadSpectrumIsOn    = False
+        self.cspadSpectrumDetIsOn = False
         self.cspadSpectrum08IsOn  = False
         self.cspadProjXIsOn       = False
         self.cspadProjYIsOn       = False
@@ -329,6 +330,7 @@ class ConfigParameters ( object ) :
         print 'CSPAD_IMAGE_QUAD_IS_ON',    self.cspadImageQuadIsOn
         print 'CSPAD_IMAGE_DET_IS_ON',     self.cspadImageDetIsOn
         print 'CSPAD_SPECT_IS_ON',         self.cspadSpectrumIsOn    
+        print 'CSPAD_SPECT_DET_IS_ON',     self.cspadSpectrumDetIsOn    
         print 'CSPAD_SPE08_IS_ON',         self.cspadSpectrum08IsOn    
         print 'CSPAD_PROJ_X_IS_ON',        self.cspadProjXIsOn    
         print 'CSPAD_PROJ_Y_IS_ON',        self.cspadProjYIsOn    
@@ -552,6 +554,7 @@ class ConfigParameters ( object ) :
                 elif key == 'CSPAD_IMAGE_QUAD_IS_ON'   : self.cspadImageQuadIsOn      = dicBool[val.lower()]
                 elif key == 'CSPAD_IMAGE_DET_IS_ON'    : self.cspadImageDetIsOn       = dicBool[val.lower()]
                 elif key == 'CSPAD_SPECT_IS_ON'        : self.cspadSpectrumIsOn       = dicBool[val.lower()]
+                elif key == 'CSPAD_SPECT_DET_IS_ON'    : self.cspadSpectrumDetIsOn    = dicBool[val.lower()]
                 elif key == 'CSPAD_SPE08_IS_ON'        : self.cspadSpectrum08IsOn     = dicBool[val.lower()]
                 elif key == 'CSPAD_PROJ_X_IS_ON'       : self.cspadProjXIsOn          = dicBool[val.lower()]
                 elif key == 'CSPAD_PROJ_Y_IS_ON'       : self.cspadProjYIsOn          = dicBool[val.lower()]
@@ -767,6 +770,7 @@ class ConfigParameters ( object ) :
         f.write('CSPAD_IMAGE_QUAD_IS_ON'    + space + str(self.cspadImageQuadIsOn)      + '\n')
         f.write('CSPAD_IMAGE_DET_IS_ON'     + space + str(self.cspadImageDetIsOn)       + '\n')
         f.write('CSPAD_SPECT_IS_ON'         + space + str(self.cspadSpectrumIsOn)       + '\n')
+        f.write('CSPAD_SPECT_DET_IS_ON'     + space + str(self.cspadSpectrumDetIsOn)    + '\n')
         f.write('CSPAD_SPE08_IS_ON'         + space + str(self.cspadSpectrum08IsOn)     + '\n')
         f.write('CSPAD_PROJ_X_IS_ON'        + space + str(self.cspadProjXIsOn)          + '\n')
         f.write('CSPAD_PROJ_Y_IS_ON'        + space + str(self.cspadProjYIsOn)          + '\n')

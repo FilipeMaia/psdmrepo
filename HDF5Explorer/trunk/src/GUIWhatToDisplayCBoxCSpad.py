@@ -86,6 +86,7 @@ class GUIWhatToDisplayCBoxCSpad ( QtGui.QWidget ) :
         self.cboxCSImage          = QtGui.QCheckBox('8 of 2x1',           self)
         self.cboxCSImageOfPair    = QtGui.QCheckBox('1 of 2x1',           self)
         self.cboxCSSpectrum       = QtGui.QCheckBox('16 ASICs',           self)
+        self.cboxCSSpectrumDet    = QtGui.QCheckBox('Detecror',           self)
         self.cboxCSSpectrum08     = QtGui.QCheckBox('8 of 2x1',           self)
         self.cboxCSProjX          = QtGui.QCheckBox('X',                  self)
         self.cboxCSProjY          = QtGui.QCheckBox('Y',                  self)
@@ -97,6 +98,7 @@ class GUIWhatToDisplayCBoxCSpad ( QtGui.QWidget ) :
         if cp.confpars.cspadImageQuadIsOn   : self.cboxCSImageQuad     .setCheckState(2)
         if cp.confpars.cspadImageDetIsOn    : self.cboxCSImageDet      .setCheckState(2)
         if cp.confpars.cspadSpectrumIsOn    : self.cboxCSSpectrum      .setCheckState(2)
+        if cp.confpars.cspadSpectrumDetIsOn : self.cboxCSSpectrumDet   .setCheckState(2)
         if cp.confpars.cspadSpectrum08IsOn  : self.cboxCSSpectrum08    .setCheckState(2)
         if cp.confpars.cspadProjXIsOn       : self.cboxCSProjX         .setCheckState(2)
         if cp.confpars.cspadProjYIsOn       : self.cboxCSProjY         .setCheckState(2)
@@ -118,6 +120,7 @@ class GUIWhatToDisplayCBoxCSpad ( QtGui.QWidget ) :
         gridCS.addWidget(self. titCSSpectra,        2, 0)
         gridCS.addWidget(self.cboxCSSpectrum08,     2, 1)
         gridCS.addWidget(self.cboxCSSpectrum,       2, 2)
+        gridCS.addWidget(self.cboxCSSpectrumDet,    2, 3)
 
         gridCS.addWidget(self. titCSImageSpec,      3, 0)
         gridCS.addWidget(self.cboxCSImageOfPair,    3, 1)
@@ -139,6 +142,7 @@ class GUIWhatToDisplayCBoxCSpad ( QtGui.QWidget ) :
         self.connect(self.cboxCSImageOfPair,   QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSImageOfPair)
         self.connect(self.cboxCSSpectrum,      QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSSpectrum)
         self.connect(self.cboxCSSpectrum08,    QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSSpectrum08)
+        self.connect(self.cboxCSSpectrumDet,   QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSSpectrumDet)
         self.connect(self.cboxCSProjX,         QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSProjX)
         self.connect(self.cboxCSProjY,         QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSProjY)
         self.connect(self.cboxCSProjR,         QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCSProjR)
@@ -261,6 +265,14 @@ class GUIWhatToDisplayCBoxCSpad ( QtGui.QWidget ) :
             cp.confpars.cspadSpectrum08IsOn = True
         else:
             cp.confpars.cspadSpectrum08IsOn = False
+
+
+    def processCBoxCSSpectrumDet(self, value):
+        if self.cboxCSSpectrumDet.isChecked():
+            self.setActiveTabBarForIndex(self.parent.indTabCS)
+            cp.confpars.cspadSpectrumDetIsOn = True
+        else:
+            cp.confpars.cspadSpectrumDetIsOn = False
 
 
 #-----------------------------
