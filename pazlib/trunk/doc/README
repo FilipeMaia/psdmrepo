@@ -1,0 +1,19 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package pazlib
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Brief description:
+==================
+
+Package which provides parallel implementation for the zlib method
+compress2(). This package builds a library which exposes that single
+method. To use this library one needs to pre-load using the 
+standard LD_PRELOAD variable, something like:
+
+LD_PRELOAD=libpazlib.so myapp ... 
