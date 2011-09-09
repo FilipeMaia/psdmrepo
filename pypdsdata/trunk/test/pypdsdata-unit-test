@@ -262,7 +262,9 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_Index, 38 )
         self.assertEqual ( TypeId.Type.Id_XampsConfig, 39 )
         self.assertEqual ( TypeId.Type.Id_XampsElement, 40 )
-        self.assertEqual ( TypeId.Type.NumberOf, 41 )
+        self.assertEqual ( TypeId.Type.Id_Cspad2x2Element, 41 )
+        self.assertEqual ( TypeId.Type.Id_SharedPim, 42 )
+        self.assertEqual ( TypeId.Type.NumberOf, 43 )
 
         # instantiation
         TypeId ()
@@ -403,7 +405,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.Cspad, 10 )
         self.assertEqual ( DetInfo.Device.AcqTDC, 11 )
         self.assertEqual ( DetInfo.Device.Xamps, 12 )
-        self.assertEqual ( DetInfo.Device.NumDevice, 13 )
+        self.assertEqual ( DetInfo.Device.Cspad2x2, 13 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 14 )
 
         
         o1 = DetInfo(0,0,0,0)

@@ -75,6 +75,8 @@ namespace {
       { "Id_Index",           Pds::TypeId::Id_Index },
       { "Id_XampsConfig",     Pds::TypeId::Id_XampsConfig },
       { "Id_XampsElement",    Pds::TypeId::Id_XampsElement },
+      { "Id_Cspad2x2Element", Pds::TypeId::Id_Cspad2x2Element },
+      { "Id_SharedPim",       Pds::TypeId::Id_SharedPim },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

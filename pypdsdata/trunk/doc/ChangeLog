@@ -1,4 +1,8 @@
 
+2011-09-09 - V00-00-41
+======================
+- forgot to add TypeId and DetInfo enums for new things 
+
 2011-09-01 - V00-00-40
 ======================
 - added support for CsPad::MiniElementV1 class

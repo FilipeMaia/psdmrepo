@@ -121,6 +121,7 @@ namespace {
       { "Cspad",     Pds::DetInfo::Cspad },
       { "AcqTDC",    Pds::DetInfo::AcqTDC },
       { "Xamps",     Pds::DetInfo::Xamps },
+      { "Cspad2x2",  Pds::DetInfo::Cspad2x2 },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };
