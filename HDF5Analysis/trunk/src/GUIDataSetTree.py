@@ -200,15 +200,41 @@ class GUIDataSetTree(QtGui.QWidget):
         print 'List of checked dataset indexes:'
         for dsindexes in list : print dsindexes           
 
- 
     def on_itemClick(self, ind_sel, ind_desel):
         item = self.model.itemFromIndex(ind_sel)
         print '\n\n====> Clicked on item with'
-        print 'text : %s' % (item.text()),
-        print ', checkState=',item.checkState(), 
-        print ', isExpanded=',self.tree.isExpanded(ind_sel)
+        self.print_item_info(item)
+        self.print_item_data(item)
+        #self.print_index_info(ind_sel, ind_desel)
+
+    def on_itemChanged(self, item):
+        print '\n\n====> Checked item with'
+        self.print_item_info(item)
+
+
+    def print_index_info(self, ind_sel, ind_desel):
+        print 'isExpanded=',self.tree.isExpanded(ind_sel)
+        #print "ind   selected : ", ind_sel.row(),  ind_sel.column()
+        #print "ind deselected : ", ind_desel.row(),ind_desel.column() 
+        #ind_par  = self.model.parent(ind_sel)
+        #if(ind_par.column() != -1):
+        #    item_par = self.model.itemFromIndex(ind_par)
+        #    print " has parent '%s' \n" % ( item_par.text() )
+
+
+    def print_item_info(self, item):
+        state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][item.checkState()]
+        print "text : '%s', is at state %s" % ( item.text(),  state)
         print 'The dataset indexes:', self.model.get_full_path_to_item(item)
         print 'The dataset shape dims:', self.model.get_dataset_dims(item)
+        #print ' isSelectable=',item.isSelectable(), 
+        #print ' isTristate=',item.isTristate(), 
+        #print ' isEditable=',item.isEditable(), 
+        #print ' isEnabled=',item.isEnabled(), 
+        #print ' isCheckable=',item.isCheckable(), 
+
+
+    def print_item_data(self, item):
         prod_of_dims = self.model.get_dataset_prod_of_dims(item)
         if prod_of_dims < 10000 :
             ds = self.model.get_dataset(item)
@@ -217,25 +243,6 @@ class GUIDataSetTree(QtGui.QWidget):
             ds_0 = self.model.get_dataset_0(item) 
             print 'ds[0]:\n', ds_0
 
-        #print "ind   selected : ", ind_sel.row(),  ind_sel.column()
-        #print "ind deselected : ", ind_desel.row(),ind_desel.column() 
-        #print ' isSelectable=',item.isSelectable(), 
-        #print ' isTristate=',item.isTristate(), 
-        #print ' isEditable=',item.isEditable(), 
-        #print ' isEnabled=',item.isEnabled(), 
-        #print ' isCheckable=',item.isCheckable(), 
-
-        #ind_par  = self.model.parent(ind_sel)
-        #if(ind_par.column() != -1):
-        #    item_par = self.model.itemFromIndex(ind_par)
-        #    print " has parent '%s' \n" % ( item_par.text() )
-
-    def on_itemChanged(self,  item):
-        state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][item.checkState()]
-        print '\n\n====> Checked item with'
-        print "text : '%s', is at state %s" % ( item.text(),  state)
-        print 'The dataset indexes:', self.model.get_full_path_to_item(item)
-        print 'The dataset shape dims:', self.model.get_dataset_dims(item)
 
 #---------------------------------- 
 
