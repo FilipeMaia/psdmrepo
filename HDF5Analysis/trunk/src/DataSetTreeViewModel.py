@@ -197,8 +197,8 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
                 title = indtitle # + '  DATA ARRAY  ' + str_dims 
                 item = self.add_item_to_tree(parentItem,                             # parent
                                              title,                                  # title
-                                             self.icon_data,                         # icon
-                                             'data',                                 # description
+                                             self.icon_folder_closed,                # icon
+                                             'group',                                # description
                                              str_dims,                               # text
                                              True)                                   # isCheckable
                 #isAddedToMenu = True
