@@ -226,5 +226,23 @@ std::vector<int> DataV2::quads_shape(const CsPad::ConfigV3& cfg) const
   return shape;
 }
 
+std::vector<int> MiniElementV1::sb_temp_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(Nsbtemp);
+  return shape;
+}
+
+std::vector<int> MiniElementV1::data_shape() const
+{
+  std::vector<int> shape;
+  shape.reserve(3);
+  shape.push_back(ColumnsPerASIC);
+  shape.push_back( MaxRowsPerASIC*2);
+  shape.push_back( 2);
+  return shape;
+}
+
 } // namespace CsPad
 } // namespace PsddlPds
