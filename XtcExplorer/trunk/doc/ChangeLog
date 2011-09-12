@@ -11,6 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Sep-12 ofte  Tag: V00-01-08   rev 2353 & 2354
+	- Support for Cspad2x2, within pyana_cspad.py. 
+	- minimal other changes. 
+	- tag before changing the GUI interface. 
+	
 2011-Aug-04 ofte                   rev 2166
         - support for BldInfo YAG type address. 
 	

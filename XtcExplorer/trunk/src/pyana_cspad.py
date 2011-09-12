@@ -185,8 +185,11 @@ class  pyana_cspad ( object ) :
         if not config:
             print '*** cspad config object is missing ***'
             return
-        
+                
         quads = range(4)
+        sections = str(map(config.sections, quads))
+        self.cspad = CsPad(sections)
+        self.data = CsPadData(self.img_source)
 
         print 
         print "Cspad configuration"
@@ -203,12 +206,9 @@ class  pyana_cspad ( object ) :
             print "  numAsicsStored: %s" % str(map(config.numAsicsStored, quads))
         except:
             pass
-        print "  sections      : %s" % str(map(config.sections, quads))
+        print "  sections      : %s" % str(sections)
         print
-        
-        self.cspad = CsPad(config)
 
-        self.data = CsPadData(self.img_source)
 
     # process event/shot data
     def event ( self, evt, env ) :
@@ -227,51 +227,26 @@ class  pyana_cspad ( object ) :
         if evt.get('skip_event'):
             return
 
+
         self.images = []
         self.ititle = []
 
+        # full Cspad
+        cspad_image = None
+
         quads = evt.getCsPadQuads(self.img_source, env)
-        if not quads :
+        if quads is not None:         
+            cspad_image = self.cspad.CsPadImage(quads)
+        else :
+            # mini Cspad (only 2x2)
+            quads = evt.get(xtc.TypeId.Type.Id_Cspad2x2Element, self.img_source)
+            cspad_image = self.cspad.CsPad2x2Image(quads)
+            
+        if not quads:
             print '*** cspad information is missing ***'
             return
+
         
-        # dump information about quadrants
-        #print "Number of quadrants: %d" % len(quads)
-        qimages = np.zeros((4, self.cspad.npix_quad, self.cspad.npix_quad ), dtype="uint16")
-
-        for q in quads:
-            
-            #print "  Quadrant %d" % q.quad()
-            #print "    virtual_channel: %s" % q.virtual_channel()
-            #print "    lane: %s" % q.lane()
-            #print "    tid: %s" % q.tid()
-            #print "    acq_count: %s" % q.acq_count()
-            #print "    op_code: %s" % q.op_code()
-            #print "    seq_count: %s" % q.seq_count()
-            #print "    ticks: %s" % q.ticks()
-            #print "    fiducials: %s" % q.fiducials()
-            #print "    frame_type: %s" % q.frame_type()
-            #print "    sb_temp: %s" % map(q.sb_temp, range(4))
-            
-            # image data as 3-dimentional array
-            data = q.data()
-            #print "min and max of original array for quad#%d: %d, %d" %(q.quad(),np.min(data),np.max(data))
-
-            ### Do dark (pedestal) subtraction and common mode correction here!! ###
-            try: 
-                qimage = self.cspad.CsPadElement( data-self.pedestals[q.quad()], q.quad() )
-            except:
-                qimage = self.cspad.CsPadElement( data, q.quad() )
-                
-            #qimage = self.cspad.CsPadElement(data, q.quad())
-            qimages[q.quad()] = qimage
-
-
-        # need to do this a better way:
-        h1 = np.hstack( (qimages[0], qimages[1]) )
-        h2 = np.hstack( (qimages[3], qimages[2]) )
-        cspad_image = np.vstack( (h1, h2) )
-
         # mask out hot pixels (16383)
         cspad_image_masked = np.ma.masked_greater_equal( cspad_image,16383 )
         cspad_image = np.ma.filled(cspad_image_masked, 0)

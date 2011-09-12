@@ -167,7 +167,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # assume all events        
         self.run_n = None 
         self.skip_n = None 
-        self.plot_n = 100
+        self.plot_n = 1
         self.accum_n = 0
 
         self.bool_string = { False: "No" , True: "Yes" }
@@ -303,7 +303,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
 
         # Global Display mode
         self.dmode_layout = QtGui.QHBoxLayout()
-        self.displaymode = "SlideShow"
+        self.displaymode = "Interactive"
         self.dmode_status = QtGui.QLabel("Display mode is %s"% self.displaymode)
 
         self.dmode_menu = QtGui.QComboBox()
@@ -311,7 +311,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.dmode_menu.addItem("NoDisplay")
         self.dmode_menu.addItem("SlideShow")
         self.dmode_menu.addItem("Interactive")
-        self.dmode_menu.setCurrentIndex(1) # SlideShow
+        self.dmode_menu.setCurrentIndex(2)
         self.connect(self.dmode_menu,  QtCore.SIGNAL('currentIndexChanged(int)'), self.process_dmode )
         self.dmode_layout.addWidget(self.dmode_status)
         self.dmode_layout.addWidget(self.dmode_menu)
@@ -887,7 +887,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             return
 
         # --- --- --- CsPad --- --- ---
-        if str(box.text()).find("Cspad")>=0 :
+        if (str(box.text()).find("Cspad")>=0 ):
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_cspad")
             except ValueError :

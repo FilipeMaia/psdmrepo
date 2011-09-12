@@ -34,8 +34,9 @@ __version__ = "$Revision: 0 $"
 #-----------------------------
 import sys, os, random
 
-from    PyQt4 import QtGui, QtCore
-from  XtcScanner import XtcScanner
+from PyQt4 import QtGui, QtCore
+from XtcScanner import XtcScanner
+
 from XtcPyanaControl import XtcPyanaControl
 
 import matplotlib
@@ -132,7 +133,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.qscan_button.setDisabled(True)
         self.connect(self.qscan_button, QtCore.SIGNAL('clicked()'), self.scan_files_quick )
         self.qscan_label = QtGui.QLabel(self.qscan_button)
-        self.nev_qscan = 200
+        self.nev_qscan = 20
         self.qscan_label.setText("Scan the first %d events   " % self.nev_qscan)
 
         self.qscan_edit = QtGui.QLineEdit(str(self.nev_qscan))
@@ -423,15 +424,15 @@ class XtcExplorerMain (QtGui.QMainWindow) :
 
         # (re)make the pyana control object
         if self.pyanactrl: del self.pyanactrl
+
         self.pyanactrl = XtcPyanaControl()
-                    
         self.pyanactrl.update(devices=self.scanner.devices.keys(),
                               epicsPVs=self.scanner.epicsPVs,
                               controls=self.scanner.controls,
                               moreinfo=self.scanner.moreinfo.values(),
                               nevents=self.scanner.nevents,
                               filenames=self.filenames )
-
+        
         if self.scan_button.isEnabled():
             self.scan_enable()
             
