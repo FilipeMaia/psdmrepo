@@ -128,8 +128,8 @@ class CsPad( object ):
             pairs.append( pair )
 
             # if tilt... 
-            pair = interpol.rotate(pair,self.tilt_array[qn][i])
-            print "shape of pair after rotation", pair.shape
+#            pair = interpol.rotate(pair,self.tilt_array[qn][i])
+#            print "shape of pair after rotation", pair.shape
 
         # make the array for this quadrant
         quadrant = np.zeros( (self.npix_quad, self.npix_quad), dtype=data3d.dtype )
@@ -141,10 +141,10 @@ class CsPad( object ):
             # colp,rowp are where the corner of a section should be placed
             colp = self.npix_quad - (self.center_array[1][qn][sec] + ncols/2)
             rowp = self.npix_quad - (self.center_array[0][qn][sec] - nrows/2)
-            print "Quad#%d Section %d in  col=%d, row=%d" %(qn,sec,colp,rowp)
+            #print "Quad#%d Section %d in  col=%d, row=%d" %(qn,sec,colp,rowp)
 
-            if sec < 2 :
-                quadrant[rowp-nrows:rowp, colp:colp+ncols] = pairs[sec][0:nrows,0:ncols]
+            #if sec < 2 :
+            quadrant[rowp-nrows:rowp, colp:colp+ncols] = pairs[sec][0:nrows,0:ncols]
 
 
         # Finally, reorient the quadrant as needed
@@ -188,20 +188,25 @@ class CsPad( object ):
 
             quad_images[quad] = self.CsPadElement( data, quad)
             
-
         self.pixels = pixel_array.reshape(5920,388)
 
-        cspad_image = np.zeros((2*self.npix_quad, 2*self.npix_quad ), dtype="uint16")
-        
-        for qn in xrange (0,4):
-            offset_x = self.offset[0][qn]
-            offset_y = self.offset[1][qn]
-            print offset_x
-            print offset_y
-            #cspad_image[offset_x:offset_x+self.npix_quad,
-            #            offset_y, offset_y+self.npix_quad ] = quad_images[qn]
-        
+        # need to do this a better way:
+        h1 = np.hstack( (quad_images[0], quad_images[1]) )
+        h2 = np.hstack( (quad_images[3], quad_images[2]) )
+        cspad_image = np.vstack( (h1, h2) )
         return cspad_image
+    
+#        cspad_image = np.zeros((2*self.npix_quad, 2*self.npix_quad ), dtype="uint16")
+        
+#        for qn in xrange (0,4):
+#            offset_x = self.offset[0][qn]
+#            offset_y = self.offset[1][qn]
+#            print offset_x
+#            print offset_y
+#            cspad_image[offset_x:offset_x+self.npix_quad,
+#                        offset_y, offset_y+self.npix_quad ] = quad_images[qn]
+#        
+#        return cspad_image
 
 
 

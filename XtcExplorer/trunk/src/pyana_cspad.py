@@ -246,7 +246,7 @@ class  pyana_cspad ( object ) :
             print '*** cspad information is missing ***'
             return
 
-        
+
         # mask out hot pixels (16383)
         cspad_image_masked = np.ma.masked_greater_equal( cspad_image,16383 )
         cspad_image = np.ma.filled(cspad_image_masked, 0)

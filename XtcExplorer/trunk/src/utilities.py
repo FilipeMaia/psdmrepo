@@ -420,10 +420,14 @@ class Frame(object):
         print itsme
 
     def update_axes(self):
-        # max along each axis
-        proj_vert = self.image.max(axis=1) # for each row, maximum bin value
-        proj_horiz = self.image.max(axis=0) # for each column, maximum bin value
-        
+#        # max along each axis
+#        proj_vert = self.image.max(axis=1) # for each row, maximum bin value
+#        proj_horiz = self.image.max(axis=0) # for each column, maximum bin value
+
+        #projections
+        maskedimage = np.ma.masked_array( self.image, mask=(self.image==0) )
+        proj_vert = np.ma.average(maskedimage,1) # for each row, average of elements
+        proj_horiz = np.ma.average(maskedimage,0) # for each column, average of elements
         # ---------------------------------------------------------
         # these are the limits I want my histogram to use
         vmin = np.min(proj_vert) - 0.1 * np.min(proj_vert)
@@ -714,7 +718,7 @@ class Plotter(object):
                 
                     
                     aplot.axesim.set_clim(aplot.vmin,aplot.vmax)
-                    aplot.update_axes()
+                    #aplot.update_axes()
                     plt.draw()
 
 
@@ -795,24 +799,23 @@ class Plotter(object):
             hbins = np.arange(start_x, start_x+hdim, 1)
             vbins = np.arange(start_y, start_y+vdim, 1)
 
-            # sum or average along each axis, 
-            #proj_vert = np.sum(frameimage,1)/hdim # for each row, sum of elements
-            #proj_horiz = np.sum(frameimage,0)/vdim # for each column, sum of elements
+            # --- sum or average along each axis, 
+            maskedimage = np.ma.masked_array( frameimage, mask=(frameimage==0) )
+            proj_vert = np.ma.average(maskedimage,1) # for each row, average of elements
+            proj_horiz = np.ma.average(maskedimage,0) # for each column, average of elements
 
-            # max along each axis
-            proj_vert = frameimage.max(axis=1) # for each row, maximum bin value
-            proj_horiz = frameimage.max(axis=0) # for each column, maximum bin value
+#            # max along each axis
+#            proj_vert = frameimage.max(axis=1) # for each row, maximum bin value
+#            proj_horiz = frameimage.max(axis=0) # for each column, maximum bin value
 
             aplot.projx.plot(hbins,proj_horiz)
-            aplot.projy.plot(proj_vert[::-1], vbins[::-1])
-            #aplot.projx.hist(hbins, bins=hdim, histtype='step', weights=proj_horiz)
-            #aplot.projy.hist(vbins, bins=vdim, histtype='step', weights=proj_vert,orientation='horizontal')
+            aplot.projy.plot(proj_vert, vbins)
             aplot.projx.get_xaxis().set_visible(False)
 
             aplot.projx.set_xlim( start_x, start_x+hdim)
-            aplot.projy.set_ylim( start_y, start_y+vdim)
+            aplot.projy.set_ylim( start_y+vdim, start_y)
 
-            aplot.update_axes()
+            #aplot.update_axes()
             
 
         cax = divider.append_axes("right",size="5%", pad=0.05)
