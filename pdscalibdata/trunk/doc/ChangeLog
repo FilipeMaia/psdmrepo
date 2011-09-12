@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-14
+2011-09-11 Andy Salnikov
+- in CsPadCommonModeSubV1 inlined rounding to improve performance
+
 Tag: V00-00-13
 2011-09-06 Andy Salnikov
 - last change in CsPadCommonModeSubV1::findCommonMode introduced a bug,

@@ -121,9 +121,10 @@ CsPadCommonModeSubV1::findCommonMode(const uint16_t* sdata,
     // ignore channels that re too noisy
     if (pixStatus and (pixStatus[p] & CsPadPixelStatusV1::VeryHot)) continue;
     
-    // pixel value with pedestal subtracted
-    int val = int(std::floor(sdata[p] - peddata[p] + 0.5));
-
+    // pixel value with pedestal subtracted, rounded to integer
+    double dval = sdata[p] - peddata[p];
+    int val = dval < 0 ? int(dval - 0.5) : int(dval + 0.5);
+    
     // histogram bin
     unsigned bin = unsigned(val - low);
     
