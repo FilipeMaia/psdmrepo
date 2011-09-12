@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-04
+2011-09-12 Andy Salnikov
+- DumpCsPad can now dump MiniElementV1 objects
+- DumpBld can now dump Bld::BldDataPimV1 objects
+
 Tag: V00-01-03
 2011-08-22 Andy Salnikov
 - modified DumpPrinceton to recognize ConfigV2 objects

@@ -48,6 +48,7 @@ DumpCsPad::DumpCsPad (const std::string& name)
   : Module(name)
 {
   m_src = configStr("source", "DetInfo(:Cspad)");
+  m_src2x2 = configStr("source2x2", "DetInfo(:Cspad2x2)");
 }
 
 //--------------
@@ -186,6 +187,10 @@ DumpCsPad::event(Event& evt, Env& env)
         std::copy(sb_temp, sb_temp+Psana::CsPad::ElementV1::Nsbtemp, 
             std::ostream_iterator<uint16_t>(str, " "));
         str << "]";
+        str << "\n    data_shape = [ ";
+        const std::vector<int> dshape = el.data_shape();
+        std::copy(dshape.begin(), dshape.end(), std::ostream_iterator<int>(str, " "));
+        str << "]";
       }
 
     }
@@ -216,8 +221,39 @@ DumpCsPad::event(Event& evt, Env& env)
         std::copy(sb_temp, sb_temp+Psana::CsPad::ElementV2::Nsbtemp, 
             std::ostream_iterator<uint16_t>(str, " "));
         str << "]";
+        str << "\n    data_shape = [ ";
+        const std::vector<int> dshape = el.data_shape();
+        std::copy(dshape.begin(), dshape.end(), std::ostream_iterator<int>(str, " "));
+        str << "]";
       }
 
+    }
+  }
+
+  shared_ptr<Psana::CsPad::MiniElementV1> mini1 = evt.get(m_src2x2);
+  if (mini1.get()) {
+
+    WithMsgLog(name(), info, str) {
+      str << "CsPad::MiniElementV1:";
+      str << "\n  virtual_channel = " << mini1->virtual_channel() ;
+      str << "\n  lane = " << mini1->lane() ;
+      str << "\n  tid = " << mini1->tid() ;
+      str << "\n  acq_count = " << mini1->acq_count() ;
+      str << "\n  op_code = " << mini1->op_code() ;
+      str << "\n  quad = " << mini1->quad() ;
+      str << "\n  seq_count = " << mini1->seq_count() ;
+      str << "\n  ticks = " << mini1->ticks() ;
+      str << "\n  fiducials = " << mini1->fiducials() ;
+      str << "\n  frame_type = " << mini1->frame_type() ;
+      str << "\n  sb_temp = [ ";
+      const uint16_t* sb_temp = mini1->sb_temp();
+      std::copy(sb_temp, sb_temp+Psana::CsPad::ElementV2::Nsbtemp,
+          std::ostream_iterator<uint16_t>(str, " "));
+      str << "]";
+      str << "\n  data_shape = [ ";
+      const std::vector<int> dshape = mini1->data_shape();
+      std::copy(dshape.begin(), dshape.end(), std::ostream_iterator<int>(str, " "));
+      str << "]";
     }
   }
 

@@ -48,6 +48,7 @@ DumpBld::DumpBld (const std::string& name)
   m_cavSrc = configStr("phaseCavSource", "BldInfo(PhaseCavity)");
   m_feeSrc = configStr("feeSource", "BldInfo(FEEGasDetEnergy)");
   m_ipimbSrc = configStr("ipimbSource", "BldInfo(NH2-SB1-IPM-01)");
+  m_pimSrc = configStr("pimSource", "BldInfo(XCS-DIO-01)");
 }
 
 //--------------
@@ -233,6 +234,41 @@ DumpBld::event(Event& evt, Env& env)
       for (int i = 0; i < Psana::Lusi::IpmFexV1::NCHANNELS; ++ i) {
         str << " " << channel[i];
       }
+    }
+  }
+
+  shared_ptr<Psana::Bld::BldDataPimV1> pim1 = evt.get(m_pimSrc);
+  if (pim1.get()) {
+    WithMsgLog(name(), info, str) {
+      str << "Bld::BldDataPimV1:";
+      const Psana::Pulnix::TM6740ConfigV2& camCfg = pim1->camConfig();
+      str << "\n  Pulnix::TM6740ConfigV2:"
+          << "\n    vref_a = " << camCfg.vref_a()
+          << "\n    vref_b = " << camCfg.vref_b()
+          << "\n    gain_a = " << camCfg.gain_a()
+          << "\n    gain_b = " << camCfg.gain_b()
+          << "\n    gain_balance = " << (camCfg.gain_balance() ? "yes" : "no")
+          << "\n    output_resolution = " << camCfg.output_resolution()
+          << "\n    output_resolution_bits = " << camCfg.output_resolution_bits()
+          << "\n    horizontal_binning = " << camCfg.horizontal_binning()
+          << "\n    vertical_binning = " << camCfg.vertical_binning()
+          << "\n    lookuptable_mode = " << camCfg.lookuptable_mode();
+
+      const Psana::Lusi::PimImageConfigV1& pimCfg = pim1->pimConfig();
+      str << "\n  Lusi::PimImageConfigV1:"
+          << "\n    xscale = " << pimCfg.xscale()
+          << "\n    yscale = " << pimCfg.yscale();
+
+      const Psana::Camera::FrameV1& frame = pim1->frame();
+      const uint8_t* frame_data = frame.data();
+      str << "\n  Camera::FrameV1:"
+          << "\n    width=" << frame.width()
+          << "\n    height=" << frame.height()
+          << "\n    depth=" << frame.depth()
+          << "\n    offset=" << frame.offset()
+          << "\n    data=[" << int(frame_data[0])
+          << ", " << int(frame_data[1])
+          << ", " << int(frame_data[2]) << ", ...]";
     }
   }
 }
