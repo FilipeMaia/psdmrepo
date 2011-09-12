@@ -240,11 +240,13 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
       // subtract pedestals and common mode, plus round to nearest int
       if (peddata) {
         for (unsigned i = 0; i != ssize; ++ i) {
-          output[i] = int(std::floor(sdata[i] - peddata[i] - cmode + 0.5));
+          double val = sdata[i] - peddata[i] - cmode;
+          output[i] = val < 0 ? int(val - 0.5) : int(val + 0.5);
         }
       } else {
         for (unsigned i = 0; i != ssize; ++ i) {
-          output[i] = int(std::floor(sdata[i] - cmode + 0.5));
+          double val = sdata[i] - cmode;
+          output[i] = val < 0 ? int(val - 0.5) : int(val + 0.5);
         }
       }
       
