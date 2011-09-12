@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-03
+2011-09-12 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-12
+- added CsPad::MiniElementV1 to converter
+
 Tag: V00-01-02
 2011-08-29 Andy Salnikov
 - regenerated whole thing from psddldata V00-00-11

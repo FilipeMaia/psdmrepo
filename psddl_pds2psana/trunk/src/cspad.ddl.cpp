@@ -504,5 +504,42 @@ std::vector<int> DataV2::quads_shape() const
   return shape;
 }
 
+MiniElementV1::MiniElementV1(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::CsPad::MiniElementV1()
+  , m_xtcObj(xtcPtr)
+{
+}
+MiniElementV1::~MiniElementV1()
+{
+}
+
+
+uint32_t MiniElementV1::virtual_channel() const { return m_xtcObj->virtual_channel(); }
+
+uint32_t MiniElementV1::lane() const { return m_xtcObj->lane(); }
+
+uint32_t MiniElementV1::tid() const { return m_xtcObj->tid(); }
+
+uint32_t MiniElementV1::acq_count() const { return m_xtcObj->acq_count(); }
+
+uint32_t MiniElementV1::op_code() const { return m_xtcObj->op_code(); }
+
+uint32_t MiniElementV1::quad() const { return m_xtcObj->quad(); }
+
+uint32_t MiniElementV1::seq_count() const { return m_xtcObj->seq_count(); }
+
+uint32_t MiniElementV1::ticks() const { return m_xtcObj->ticks(); }
+
+uint32_t MiniElementV1::fiducials() const { return m_xtcObj->fiducials(); }
+
+const uint16_t* MiniElementV1::sb_temp() const { return m_xtcObj->sb_temp(); }
+
+uint32_t MiniElementV1::frame_type() const { return m_xtcObj->frame_type(); }
+
+const uint16_t* MiniElementV1::data() const { return m_xtcObj->data(); }
+
+std::vector<int> MiniElementV1::sb_temp_shape() const { return m_xtcObj->sb_temp_shape(); }
+
+std::vector<int> MiniElementV1::data_shape() const { return m_xtcObj->data_shape(); }
 } // namespace CsPad
 } // namespace psddl_pds2psana
