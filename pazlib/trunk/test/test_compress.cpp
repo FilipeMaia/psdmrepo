@@ -135,8 +135,8 @@ test_compress::runApp ()
 
 
   // guess the size of output data
-  m_outputSize = m_inputSize + m_inputSize/100 + 12;
-  m_output = new Bytef[m_outputSize];
+  uLong outBufSize = m_inputSize + m_inputSize/100 + 12;
+  m_output = new Bytef[outBufSize];
 
   struct rusage ru0;
   stat = getrusage(RUSAGE_SELF, &ru0);
@@ -144,6 +144,7 @@ test_compress::runApp ()
   for (int count = m_repeatOpt.value(); count != 0 ; -- count) {
 
     // call compression
+    m_outputSize = outBufSize;
     stat = compress2 (m_output, &m_outputSize, m_input, m_inputSize, m_levelOpt.value());
     if (stat == Z_BUF_ERROR) {
       std::cerr << "output buffer size is too small" << std::endl;
