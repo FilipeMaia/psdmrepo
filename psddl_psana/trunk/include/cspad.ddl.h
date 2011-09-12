@@ -386,6 +386,45 @@ public:
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   virtual std::vector<int> quads_shape() const = 0;
 };
+
+/** @class MiniElementV1
+
+  CsPad data from single 2x2 element.
+*/
+
+
+class MiniElementV1 {
+public:
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_Cspad2x2Element /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum {
+    Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */
+  };
+  virtual ~MiniElementV1();
+  /** Virtual channel number. */
+  virtual uint32_t virtual_channel() const = 0;
+  /** Lane number. */
+  virtual uint32_t lane() const = 0;
+  virtual uint32_t tid() const = 0;
+  virtual uint32_t acq_count() const = 0;
+  virtual uint32_t op_code() const = 0;
+  /** Quadrant number. */
+  virtual uint32_t quad() const = 0;
+  virtual uint32_t seq_count() const = 0;
+  virtual uint32_t ticks() const = 0;
+  virtual uint32_t fiducials() const = 0;
+  virtual const uint16_t* sb_temp() const = 0;
+  virtual uint32_t frame_type() const = 0;
+  virtual const uint16_t* data() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by sb_temp() method. */
+  virtual std::vector<int> sb_temp_shape() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by data() method. */
+  virtual std::vector<int> data_shape() const = 0;
+};
 } // namespace CsPad
 } // namespace Psana
 #endif // PSANA_CSPAD_DDL_H
