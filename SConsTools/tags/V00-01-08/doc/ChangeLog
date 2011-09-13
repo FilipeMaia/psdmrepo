@@ -1,0 +1,195 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package SConsTools
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-08
+2011-09-12 Andy Salnikov
+- unit test builder generates a build error if unit test fails
+
+Tag: V00-01-07
+2011-09-08 Andy Salnikov
+- only add -Wno-invalid-offsetof to CXXFLAGS, not CCFLAGS
+
+Tag: V00-01-06
+2011-09-06 Andy Salnikov
+- add support for CCFLAGS kw to standardSConscript
+
+Tag: V00-01-05
+2011-09-01 Andy Salnikov
+- in standardSConscript $LIBS also needs to be added to shared library
+- fixing LIBPATH override
+
+Tag: V00-01-04
+2011-08-17 Andy Salnikov
+- fix doc target if there is nothing to build
+
+Tag: V00-01-03
+2011-08-08 Andy Salnikov
+- added 'doxy-driver -m psana-modules' to doc target
+
+Tag: V00-01-02
+2011-08-05 Andy Salnikov
+- added 'doc' target which generates doc/ directory with some contents
+- do not created include/, data/, web/ directories if they are empty
+
+Tag: V00-01-01
+2011-05-22 Andy Salnikov
+- there was a tag V00-01-00 already which prevented latest tags to
+  appear in the nightly builds
+
+Tag: V00-00-31
+2011-05-21 Andy Salnikov
+- suppress invalid offsetof warnings
+
+Tag: V00-00-30
+2011-05-05 Andy Salnikov
+- added check for conflicts between .sit_release and $SIT_RELEASE
+
+Tag: V00-00-29
+2010-03-30 Andy Salnikov
+- standardExternalPackage: update to allow BINDIR, LIBDIR, etc to
+  be empty (but not None)
+
+Tag: V00-00-28
+2010-03-27 Andy Salnikov
+- in standardExternalPackage: allow symlinking of the directories
+  when doing Python modules
+- also allow explicit specification of which files to link via LINKPY
+  argument to standardExternalPackage
+
+Tag: V00-00-24
+2010-03-26 Andy Salnikov
+- add support for building Python extension modules, everything that 
+  appears in pyext/ directory will be built as Python extension
+
+Tag: V00-00-23
+2010-03-24 Andy Salnikov
+- adding library list when building shared libraries
+
+Tag: V00-00-22
+2009-06-18 Andy Salnikov
+- create web/ directory at the release top level with the links 
+  to the packages web/ directories
+
+Tag: V00-00-21
+2009-05-19 Andy Salnikov
+- added support for test scripts to the standardSConscript.py
+
+Tag: V00-00-20
+2009-05-08 Andy Salnikov
+- standardSConscript.py: fix standardScripts() function which sometimes
+  misses scripts in app/ directory
+
+Tag: V00-00-19
+2009-04-10 Andy Salnikov
+- can use 'dbg' instead of 'deb'
+- for external packages added a logic to locate package directory
+  using different $LUSI_ARCH combinations or LUSI_ARCH_BASE
+
+Tag: V00-00-18
+2009-02-05 Andy Salnikov
+- compilers.py: add support for gcc41
+- we'll use /usr/bin/python2.4 instead of /usr/bin/env python, latter
+  find python2.5 from TWW which we can't use
+
+Tag: V00-00-17
+2009-01-31 Andy Salnikov
+- compilers.py: adding support for RHEL5
+- standardExternalPackage.py: new keyword for standardExternalPackage -
+  INCLUDES, to link only the specified includes, and not the whole 
+  directory. Useful when the external package is installed in /usr. 
+
+Tag: V00-00-16
+2008-12-17 Andy Salnikov
+- compilers.py: added -Wall for c++ compilation
+- fixed properties on few files 
+
+Tag: V00-00-15
+2008-12-15 Andy Salnikov
+- dependencies.py: add workaround for unnecessary rebuilding of the 
+  binaries on the second run
+
+Tag: V00-00-14
+2008-12-09 Andy Salnikov
+- do dependency calculations only after reading all SConscript files
+
+Tag: V00-00-13
+2008-12-08 Andy Salnikov
+- switch to Python2.6
+
+Tag: V00-00-12
+2008-12-02 Andy Salnikov
+- dependencies.py - modified dependency search when the include file is 
+  more than one level deep in geninc/ directory.
+
+Tag: V00-00-11
+2008-11-03 Andy Salnikov
+- fix in standardSConscript.py: UTESTS list did not work
+
+Tag: V00-00-10
+2008-10-31 Andy Salnikov
+- dependencies.py: fix in in findAllDependencies, was skipping non-existing files
+- SConstruct.main: added dependecy of all tests on 'all' target
+
+Tag: V00-00-09
+2008-10-31 Andy Salnikov
+- symlinks in geninc/ directory are made without using scons rules, but
+  directly by standardExternalPackage script itself. Resolves problem 
+  with some weird dependencies.
+
+Tag: V00-00-08
+2008-10-29 Andy Salnikov
+- adding unit test target to the builds
+- standardSConscript: few additional keywords: TESTS, UTESTS, SCRIPTS; 
+  split standardSConscript() into bunch of functions
+- builders.py: make all builders clesses instead of functions, adding
+  strfunction() method to the classes, nicer printing of progress
+- scons_env.py: adding ALL_TARGETS variable to environment, which is a
+  dictionary of the targets for BINS, LIBS, and TEST aliases
+- standardExternalPackage: fills in ALL_TARGETS
+- standardSConscript: fills in ALL_TARGETS
+- SConstruct.main: defines target aliases 'lib', 'bin', 'test'
+- lot's of other improvements
+
+Tag: V00-00-07
+2008-10-29 Andy Salnikov
+- standardSConscript: adding support for building tests in test/, 
+  plus minor refactoring
+
+Tag: V00-00-06
+2008-10-28 Andy Salnikov
+- standardSConscript: added more C/C++ extensions for building libraries and
+  binaries: cc,cpp,cxx,C,c
+- standardExternalPackage: added globbing for LINKLIBS and LINKBINS
+- dependencies: 
+  - tries to guess boost package names
+  - improved topological sort, detect cycles
+
+Tag: V00-00-05
+2008-10-17 Andy Salnikov
+- standardExternalPackage: adding PYDIRSEP option
+
+Tag: V00-00-04
+2008-10-15 Andy Salnikov
+- adding release dependencies module 
+
+Tag: V00-00-01
+2008-10-08 Andy Salnikov
+- added ScriptInstall builder to handle substitution of @XYZ@ placeholders
+  in the scripts
+
+Tag: V00-00-00
+2008-10-08 Andy Salnikov
+- initial import of SConsTools into CVS
+- few python module are in the package at this time, used by SConstruct.main
+- SConstruct.main should be moved into the top release directory as a part
+  of the release preparation (or it can also be linked to SConstruct.main)
