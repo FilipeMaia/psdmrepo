@@ -77,7 +77,7 @@ namespace {
             unsigned long long total_bytes_decompressed = 0ULL;
 
             void**  image       = new void* [m_num_images_per_batch];
-            size_t* outDataSize = new size_t[m_num_images_per_batch];
+            //size_t* outDataSize = new size_t[m_num_images_per_batch];
             int*    stat4all    = new int   [m_num_images_per_batch];
 
             CSPadCompressor::ImageParams* params = new CSPadCompressor::ImageParams[m_num_images_per_batch];
@@ -104,11 +104,11 @@ namespace {
 
                     if( hdr_size != fread( ptr, sizeof(uint8_t), hdr_size, infile )) break;  // either EOF or not enough data for a full header
 
-                    const uint32_t compression_flags = *(uint32_t*)ptr; ptr += sizeof(uint32_t);
-                    const uint32_t cs                = *(uint32_t*)ptr; ptr += sizeof(uint32_t);
-                    const uint32_t width             = *(uint32_t*)ptr; ptr += sizeof(uint32_t);
-                    const uint32_t height            = *(uint32_t*)ptr; ptr += sizeof(uint32_t);
-                    const uint32_t depth             = *(uint32_t*)ptr; ptr += sizeof(uint32_t);
+                    /*const uint32_t compression_flags = *(uint32_t*)ptr;*/ ptr += sizeof(uint32_t);
+                    /*const uint32_t cs                = *(uint32_t*)ptr;*/ ptr += sizeof(uint32_t);
+                    /*const uint32_t width             = *(uint32_t*)ptr;*/ ptr += sizeof(uint32_t);
+                    /*const uint32_t height            = *(uint32_t*)ptr;*/ ptr += sizeof(uint32_t);
+                    /*const uint32_t depth             = *(uint32_t*)ptr;*/ ptr += sizeof(uint32_t);
                     const uint32_t body_size         = *(uint32_t*)ptr; ptr += sizeof(uint32_t);
 
                     if( 0 == body_size ) {
@@ -285,7 +285,7 @@ main( int argc, char* argv[] )
         if( !strcmp( opt, "-b" )) {
             if( !numArgs )                                       { ::usage( "missing value for option <num_images_per_batch>" );        return 1; }
             const char* val = *(argsPtr++); --numArgs;
-            if( 1 != sscanf( val, "%u", &num_images_per_batch )) { ::usage( "failed to translate a value of <num_images_per_batch>" );  return 1; }
+            if( 1 != sscanf( val, "%lu", &num_images_per_batch )) { ::usage( "failed to translate a value of <num_images_per_batch>" );  return 1; }
             if( num_images_per_batch == 0 )                      { ::usage( "<num_images_per_batch> can't have a value of 0" );         return 1; }
 
         } else if( !strcmp( opt, "-i" )) {
@@ -297,13 +297,13 @@ main( int argc, char* argv[] )
         } else if( !strcmp( opt, "-m" )) {
             if( !numArgs )                                       { ::usage( "missing value for option <max_images_per_thread>" );       return 1; }
             const char* val = *(argsPtr++); --numArgs;
-            if( 1 != sscanf( val, "%u", &maxImagesPerThread ))   { ::usage( "failed to translate a value of <max_images_per_thread>" ); return 1; }
+            if( 1 != sscanf( val, "%lu", &maxImagesPerThread ))   { ::usage( "failed to translate a value of <max_images_per_thread>" ); return 1; }
             if( maxImagesPerThread == 0 )                        { ::usage( "<max_images_per_thread> can't have a value of 0" );        return 1; }
 
         } else if( !strcmp( opt, "-p" )) {
             if( !numArgs )                                       { ::usage( "missing value for option <max_threads>" );                 return 1; }
             const char* val = *(argsPtr++); --numArgs;
-            if( 1 != sscanf( val, "%u", &numThreads ))           { ::usage( "failed to translate a value of <max_threads>" );           return 1; }
+            if( 1 != sscanf( val, "%lu", &numThreads ))           { ::usage( "failed to translate a value of <max_threads>" );           return 1; }
             if( numThreads == 0 )                                { ::usage( "<max_threads> can't have a value of 0" );                  return 1; }
 
         } else if( !strcmp( opt, "-o" )) {
@@ -326,11 +326,11 @@ main( int argc, char* argv[] )
     }
     if( numArgs )                                              { ::usage( "illegal number of parameters" );                    return 1; }
 
-    printf( "maximum compressed image size (bytes): %u\n", MAX_IMAGE_SIZE );
-    printf( "images per batch:                      %u\n", num_images_per_batch );
+    printf( "maximum compressed image size (bytes): %lu\n", MAX_IMAGE_SIZE );
+    printf( "images per batch:                      %lu\n", num_images_per_batch );
     printf( "iterations per batch:                  %u\n", num_iter_per_batch );
-    printf( "maximum number of images per thread:   %u\n", maxImagesPerThread );
-    printf( "maximum number of threads:             %u\n", numThreads );
+    printf( "maximum number of images per thread:   %lu\n", maxImagesPerThread );
+    printf( "maximum number of threads:             %lu\n", numThreads );
 
     ::DecompressionTestMT dct( num_images_per_batch, num_iter_per_batch, maxImagesPerThread, numThreads );
 

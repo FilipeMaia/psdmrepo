@@ -276,7 +276,7 @@ main( int argc, char* argv[] )
         if( !strcmp( opt, "-r" )) {
             if( !numArgs )                                     { ::usage( "record value isn't following the option" );        return 1; }
             const char* val = *(argsPtr++); --numArgs;
-            if( 1 != sscanf( val, "%u", &reclen ))             { ::usage( "failed to translate a value of <reclen_shorts>" ); return 1; }
+            if( 1 != sscanf( val, "%lu", &reclen ))             { ::usage( "failed to translate a value of <reclen_shorts>" ); return 1; }
             if( reclen == 0 )                                  { ::usage( "<reclen_shorts> parameter can't be 0" );           return 1; }
 
         } else if( !strcmp( opt, "-i" )) {
@@ -302,7 +302,7 @@ main( int argc, char* argv[] )
     }
     if( numArgs )                                              { ::usage( "illegal number of parameters" );                    return 1; }
 
-    printf( "reading records of %u short numbers\n", reclen );
+    printf( "reading records of %lu short numbers\n", reclen );
 
     ::CompressionTest ct( reclen, num_iter_per_image );
 

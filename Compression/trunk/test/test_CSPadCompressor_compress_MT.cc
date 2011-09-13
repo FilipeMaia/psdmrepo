@@ -402,13 +402,13 @@ main( int argc, char* argv[] )
         if( !strcmp( opt, "-r" )) {
             if( !numArgs )                                       { ::usage( "missing value for option <reclen_shorts>" );               return 1; }
             const char* val = *(argsPtr++); --numArgs;
-            if( 1 != sscanf( val, "%u", &reclen ))               { ::usage( "failed to translate a value of <reclen_shorts>" );         return 1; }
+            if( 1 != sscanf( val, "%lu", &reclen ))              { ::usage( "failed to translate a value of <reclen_shorts>" );         return 1; }
             if( reclen == 0 )                                    { ::usage( "<reclen_shorts> can't have a value of 0" );                return 1; }
 
         } else if( !strcmp( opt, "-b" )) {
             if( !numArgs )                                       { ::usage( "missing value for option <num_images_per_batch>" );        return 1; }
             const char* val = *(argsPtr++); --numArgs;
-            if( 1 != sscanf( val, "%u", &num_images_per_batch )) { ::usage( "failed to translate a value of <num_images_per_batch>" );  return 1; }
+            if( 1 != sscanf( val, "%lu", &num_images_per_batch )) { ::usage( "failed to translate a value of <num_images_per_batch>" );  return 1; }
             if( num_images_per_batch == 0 )                      { ::usage( "<num_images_per_batch> can't have a value of 0" );         return 1; }
 
         } else if( !strcmp( opt, "-i" )) {
@@ -420,13 +420,13 @@ main( int argc, char* argv[] )
         } else if( !strcmp( opt, "-m" )) {
             if( !numArgs )                                       { ::usage( "missing value for option <max_images_per_thread>" );       return 1; }
             const char* val = *(argsPtr++); --numArgs;
-            if( 1 != sscanf( val, "%u", &maxImagesPerThread ))   { ::usage( "failed to translate a value of <max_images_per_thread>" ); return 1; }
+            if( 1 != sscanf( val, "%lu", &maxImagesPerThread ))  { ::usage( "failed to translate a value of <max_images_per_thread>" ); return 1; }
             if( maxImagesPerThread == 0 )                        { ::usage( "<max_images_per_thread> can't have a value of 0" );        return 1; }
 
         } else if( !strcmp( opt, "-p" )) {
             if( !numArgs )                                       { ::usage( "missing value for option <max_threads>" );                 return 1; }
             const char* val = *(argsPtr++); --numArgs;
-            if( 1 != sscanf( val, "%u", &numThreads ))           { ::usage( "failed to translate a value of <max_threads>" );           return 1; }
+            if( 1 != sscanf( val, "%lu", &numThreads ))          { ::usage( "failed to translate a value of <max_threads>" );           return 1; }
             if( numThreads == 0 )                                { ::usage( "<max_threads> can't have a value of 0" );                  return 1; }
 
         } else if( !strcmp( opt, "-o" )) {
@@ -452,11 +452,11 @@ main( int argc, char* argv[] )
     }
     if( numArgs )                                              { ::usage( "illegal number of parameters" );                    return 1; }
 
-    printf( "image size (16-bit numbers):         %u\n", reclen );
-    printf( "images per batch:                    %u\n", num_images_per_batch );
+    printf( "image size (16-bit numbers):         %lu\n", reclen );
+    printf( "images per batch:                    %lu\n", num_images_per_batch );
     printf( "iterations per batch:                %u\n", num_iter_per_batch );
-    printf( "maximum number of images per thread: %u\n", maxImagesPerThread );
-    printf( "maximum number of threads:           %u\n", numThreads );
+    printf( "maximum number of images per thread: %lu\n", maxImagesPerThread );
+    printf( "maximum number of threads:           %lu\n", numThreads );
 
     ::CompressionTestMT ct( reclen, num_images_per_batch, num_iter_per_batch, maxImagesPerThread, numThreads );
 
