@@ -76,7 +76,8 @@ typedef struct thread_data {
 
 } thread_data;
 
-pthread_mutex_t pazlib_sync;     /* global mutex to serialize all calls to pazlib */
+static pthread_mutex_t pazlib_sync;     /* global mutex to serialize all calls to pazlib */
+static pthread_attr_t thread_attr;
 static int threads_running = 0;  /* number of threads created so far */
 static pthread_t threads[PAZLIB_MAX_THREADS];    /* array for threads */
 static thread_data th_data[PAZLIB_MAX_THREADS];  /* array with thread data */
@@ -87,10 +88,27 @@ static void* comp_thread(void*);  /* function wich runs in thread */
 void pazlib_init(void) __attribute__((constructor));
 void pazlib_init(void)
 {
+  int s;
+  
+  /* initialize global lock */
   DBGMSG((stderr, "pazlib_init: starting initialization\n"))
-  int s = pthread_mutex_init(&pazlib_sync, NULL);
+  s = pthread_mutex_init(&pazlib_sync, NULL);
   if (s != 0) {
     fprintf(stderr, "pazlib_init: pthread_mutex_init failed: %s\n", strerror(s));
+    abort();
+  }
+  
+  /* init instance of thread attributes */
+  s = pthread_attr_init(&thread_attr);
+  if (s != 0) {
+    fprintf(stderr, "pazlib_init: pthread_attr_init failed: %s\n", strerror(s));
+    abort();
+  }
+  
+  /* set stack size for all new threads */
+  s = pthread_attr_setstacksize(&thread_attr, 32*1024);
+  if (s != 0) {
+    fprintf(stderr, "pazlib_init: pthread_attr_setstacksize failed: %s\n", strerror(s));
     abort();
   }
 }
@@ -116,7 +134,7 @@ static int start_new_thread(int index)
   th_data[index].index = index;
 
   /* start thread */
-  s = pthread_create(&threads[index], NULL, comp_thread, &th_data[index]);
+  s = pthread_create(&threads[index], &thread_attr, comp_thread, &th_data[index]);
   DBGMSG((stderr, "pazlib: thread %d started, code: %d\n", index, s))
   return s;
 }
