@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Sep-12 ofte  Tag: V00-01-10  rev 2372 & 2373
+         - added calib directory
+	
 2011-Sep-12 ofte  Tag: V00-01-09   rev 2356 
         - bugfix (cspad.py)
 	- replaced max-value "projections" with average projections (images)
