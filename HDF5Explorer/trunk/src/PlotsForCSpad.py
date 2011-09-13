@@ -47,6 +47,7 @@ import math # cos(x), sin(x), radians(x), degrees()
 import ConfigParameters as cp
 import ConfigCSpad      as cs
 import PrintHDF5        as printh5
+import GlobalMethods    as gm
 
 #---------------------
 #  Class definition --
@@ -123,6 +124,10 @@ class PlotsForCSpad ( object ) :
     def plotCSpad08PairsImage( self, arr1ev, fig ):
         """Plot 2d image of 8 2x1 pairs of ASICs' from input array."""
 
+        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+            print 'WARNING: plotCSpad08PairsImage(...) - these images are not available for CSPad2x2 ...'
+            return
+
         #print 'plot_CSpadQuad()'       
 
         str_event = 'Event ' + str(cp.confpars.eventCurrent) + '  Quad ' + str(self.quad)
@@ -163,10 +168,14 @@ class PlotsForCSpad ( object ) :
             self.pair = cp.confpars.cspadPair
         else :
             self.pair = pairNum
+
+        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+            return self.getImageArrayForMiniElementPair(arr1ev,self.pair)
+
         #print 'getImageArrayForPair(), pair=', self.pair
 
         asic2x1 = arr1ev[self.pair,...]
-       #print 'asic2x1=',asic2x1    
+        #print 'asic2x1=',asic2x1    
         asics   = hsplit(asic2x1,2)
         arrgap=zeros( (185,3), dtype=np.int16 ) # make additional 2D-array of 0-s for the gap between two 1x1 pads
         arr2d = hstack((asics[0],arrgap,asics[1]))
@@ -175,6 +184,10 @@ class PlotsForCSpad ( object ) :
 
     def getImageArrayForQuad( self, arr1ev, quadNum=None ):
         """Returns the image array for one quad"""
+
+        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+            return self.getImageArrayForCSPadMiniElement( arr1ev )
+
         if quadNum == None :
             self.quad = cp.confpars.cspadQuad
         else :
@@ -279,6 +292,23 @@ class PlotsForCSpad ( object ) :
             #print 'Use already generated image for CSpad and save time'
             return self.arr2dCSpad
 
+        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+            self.arr2dCSpad = self.getImageArrayForCSPadMiniElement( arr1ev )
+
+        else : # For regular CSPad detector
+            self.arr2dCSpad = self.getImageArrayForCSPadElement( arr1ev )
+
+        self.eventWithAlreadyGeneratedCSpadDetImage = cp.confpars.eventCurrent
+
+        if cp.confpars.bkgdSubtractionIsOn : self.arr2dCSpad -= cp.confpars.arr_bkgd
+        if cp.confpars.gainCorrectionIsOn  : self.arr2dCSpad *= cp.confpars.arr_gain
+
+        return self.arr2dCSpad
+
+
+    def getImageArrayForCSPadElement( self, arr1ev ):
+        """Returns the image array for the CSPad detector for dataset CSPadElement"""
+
         #self.arr2dCSpad = np.zeros( (1710,1710), dtype=np.int16 )
         #self.arr2dCSpad = np.zeros( (1750,1750), dtype=np.int16 )
         #self.arr2dCSpad = np.zeros( (1765,1765), dtype=np.int16 )
@@ -297,12 +327,51 @@ class PlotsForCSpad ( object ) :
 
             self.arr2dCSpad[ixOff:dimX+ixOff, iyOff:dimY+iyOff] += rotarr2d[0:dimX, 0:dimY]
 
-        self.eventWithAlreadyGeneratedCSpadDetImage = cp.confpars.eventCurrent
-
-        if cp.confpars.bkgdSubtractionIsOn : self.arr2dCSpad -= cp.confpars.arr_bkgd
-        if cp.confpars.gainCorrectionIsOn  : self.arr2dCSpad *= cp.confpars.arr_gain
-
         return self.arr2dCSpad
+
+
+    def getImageArrayForMiniElementPair( self, arr1ev, pairNum=None ):
+        """Returns the image array for pair of ASICs"""
+        if pairNum == None :
+            self.pair = cp.confpars.cspadPair
+        else :
+            self.pair = pairNum
+
+        #arr2x1 = arr1ev[0:185,0:388,self.pair]
+        arr2x1 = arr1ev[:,:,self.pair]
+        #print 'arr2x1=',arr2x1 
+
+        asics = hsplit(arr2x1,2)
+        arrgap=zeros( (185,3), dtype=np.int16 ) # make additional 2D-array of 0-s for the gap between two 1x1 pads
+
+        #print 'asics[0].shape=',asics[0].shape
+        #print 'asics[1].shape=',asics[1].shape
+        #print 'arrgap.shape=',arrgap.shape
+
+        arr2d = hstack((asics[0],arrgap,asics[1]))
+        return arr2d
+
+
+    def getImageArrayForCSPadMiniElement( self, arr1ev ):
+        """Returns the image array for the CSpadMiniElement or CSpad2x2"""       
+
+        arr2x1Pair0 = self.getImageArrayForMiniElementPair(arr1ev,0)
+        arr2x1Pair1 = self.getImageArrayForMiniElementPair(arr1ev,1)
+        wid2x1      = arr2x1Pair0.shape[0]
+        len2x1      = arr2x1Pair0.shape[1]
+
+        arrgapV = zeros( (20,len2x1), dtype=np.int16 ) 
+        arr2d   = vstack((arr2x1Pair0, arrgapV, arr2x1Pair1))
+
+        #print 'arr2d.shape=', arr2d.shape
+        #print 'arr2d=',       arr2d
+        return arr2d
+
+
+
+
+
+
 
 
     def plotCSpadQuadImage( self, arr1ev, fig ):
@@ -438,7 +507,7 @@ class PlotsForCSpad ( object ) :
             for win in range(cp.confpars.selectionNWindows) :
 
                 #print 'Selection for dataset:', cp.confpars.selectionWindowParameters[win][6]
-                if printh5.CSpadIsInTheName(cp.confpars.selectionWindowParameters[win][6]) :
+                if gm.CSpadIsInTheName(cp.confpars.selectionWindowParameters[win][6]) :
 
                     xy = cp.confpars.selectionWindowParameters[win][2],  cp.confpars.selectionWindowParameters[win][4]
                     w  = cp.confpars.selectionWindowParameters[win][3] - cp.confpars.selectionWindowParameters[win][2]
@@ -489,6 +558,10 @@ class PlotsForCSpad ( object ) :
     def plotCSpadQuad08SpectraOf2x1( self, arr1ev, fig ):
         """Amplitude specra from 2d array."""
 
+        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+            print 'WARNING: plotCSpadQuad08SpectraOf2x1(...) - Spectra are not available for CSPad2x2 ...'
+            return
+
         fig.canvas.set_window_title('CSpad Quad Specra of 2x1')
         plt.clf() # clear plot
         #plt.title('Spectra',color='r',fontsize=20)
@@ -533,6 +606,10 @@ class PlotsForCSpad ( object ) :
 
     def plotCSpadQuad16Spectra( self, arr1ev, fig ):
         """Amplitude specra from 2d array."""
+
+        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+            print 'WARNING: plotCSpadQuad16Spectra(...) - Spectra are not available for CSPad2x2 ...'
+            return
 
         fig.canvas.set_window_title('CSpad Quad Specra of 16 ASICs')
         plt.clf() # clear plot
@@ -606,15 +683,21 @@ class PlotsForCSpad ( object ) :
             return
         
         #For Image 
-
-        asic1x2  = arr1ev[self.pair,...]
-        asics    = hsplit(asic1x2,2)
-        self.arr = hstack((asics[0],arrgap,asics[1]))
+        if cs.confcspad.isCSPad2x2 : # For 2x2 Mini
+            if cp.confpars.cspadPair > 0 : self.pair = 1
+            else                         : self.pair = 0            
+            self.arr = self.getImageArrayForMiniElementPair(arr1ev,self.pair)
+        else : 
+            asic1x2  = arr1ev[self.pair,...]
+            asics    = hsplit(asic1x2,2)
+            self.arr = hstack((asics[0],arrgap,asics[1]))
 
         #For spectrum
-        arrdimX,arrdimY = asic1x2.shape
-        self.asic1d = asic1x2
-        self.asic1d.resize(arrdimX*arrdimY)            
+        #arrdimX,arrdimY = asic1x2.shape
+        #self.asic1d = asic1x2
+        #self.asic1d.resize(arrdimX*arrdimY)            
+
+        self.asic1d = self.arr.flatten()
 
 
         self.pantit =    'Event '   + str(cp.confpars.eventCurrent) 

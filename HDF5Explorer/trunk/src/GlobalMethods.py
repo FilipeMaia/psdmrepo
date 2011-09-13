@@ -126,17 +126,45 @@ def CSpadIsInTheName(dsname):
     #print '3rd to last name:', name3
     #print 'name3[0:5]', name3[0:5]
 
-    cspadIsInTheName = False
-    if name3[0:5] == 'CsPad' and name1 == 'data' : cspadIsInTheName = True
-    #print 'cspadIsInTheName :', cspadIsInTheName
+    if name3[0:5] == 'CsPad' and name1 == 'data' : return True
+    else                                         : return False
 
-    return cspadIsInTheName
+#----------------------------------
+
+def CSpadElementIsInTheName(dsname):
+    path1,name1 = os.path.split(str(dsname))
+    path2,name2 = os.path.split(str(path1))
+    path3,name3 = os.path.split(str(path2))
+    if name3[0:14] == 'CsPad::Element' and name1 == 'data' : return True
+    else                                                   : return False
+
+#----------------------------------
+
+def CSpadMiniElementIsInTheName(dsname):
+    path1,name1 = os.path.split(str(dsname))
+    path2,name2 = os.path.split(str(path1))
+    path3,name3 = os.path.split(str(path2))
+    if name3[0:18] == 'CsPad::MiniElement' and name1 == 'data' : return True
+    else                                                       : return False
 
 #----------------------------------
 
 def CSpadDatasetIsChecked():
     for dsname in cp.confpars.list_of_checked_item_names :
         if CSpadIsInTheName(dsname) : return True
+    return False
+#----------------------------------
+
+def CSpadElementDatasetIsChecked():
+    for dsname in cp.confpars.list_of_checked_item_names :
+        if CSpadElementIsInTheName(dsname) : return True
+    return False
+
+#----------------------------------
+
+def CSpadMiniElementDatasetIsChecked():
+    for dsname in cp.confpars.list_of_checked_item_names :
+        if CSpadMiniElementIsInTheName(dsname) : return True
     return False
 
 #----------------------------------

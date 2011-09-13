@@ -12,6 +12,16 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ------------------------------
+Tag: V00-00-07
+2011-09-13 Mikhail S. Dubrovin
+- add CSPad2x2 in the frame of CSPad plots, depending on 
+  CSPadMiniElement, or CSPadElement in the dataset name.
+- modified modules:
+	       HDF5Explorer/src/DrawEvent.py
+	       HDF5Explorer/src/ConfigCSpad.py
+	       HDF5Explorer/src/PlotsForCSpad.py
+	       HDF5Explorer/src/GlobalMethods.py
+
 Tag: V00-00-06
 2011-09-06 Mikhail S. Dubrovin
 - add CSPad detector spectrum plot, which represents the latest windoe or manual zoom-in region.	

@@ -124,14 +124,14 @@ class DrawEvent ( object ) :
             ds     = self.h5file[dsname]
             self.arr1ev = ds[cp.confpars.eventCurrent]
 
-            if gm.ImageIsInTheName(dsname) : # Check for IMAGE
+            if gm.ImageIsInTheName(dsname) :      # Check for IMAGE
 
                 if not self.dimIsFixed(dsname) :
                     self.arr1ev.shape = (self.arr1ev.shape[1],self.arr1ev.shape[0])
                 self.arr2d = self.arr1ev
 
 
-            elif gm.CSpadIsInTheName(dsname) :            # Check for CSpad 
+            elif gm.CSpadIsInTheName(dsname) :    # Check for CSpad 
 
                 self.getCSpadConfiguration(dsname)
                 self.arr2d = self.plotsCSpad.getImageArrayForDet( self.arr1ev )
@@ -625,11 +625,18 @@ class DrawEvent ( object ) :
 
     def getCSpadConfiguration( self, dsname ):
 
+        if gm.CSpadMiniElementIsInTheName(dsname) :
+            print 'getCSpadConfiguration(...): This is a CSpadMiniElement. Special configuration is not required'
+            cs.confcspad.isCSPad2x2 = True
+            return
+
         #print 'Get quad numbers for each event from the dataset:' 
         el_dsname = gm.get_item_path_to_last_name(dsname) + '/element'
         #print el_dsname
         self.ds_element = self.h5file[el_dsname]
+
         cs.confcspad.quad_nums_in_event = self.ds_element[cp.confpars.eventCurrent]['quad']
+
         print 'quad_nums_in_event = ', cs.confcspad.quad_nums_in_event
 
         if cp.confpars.fileName == self.fileNameWithAlreadySetCSpadConfiguration : return
@@ -714,7 +721,9 @@ class DrawEvent ( object ) :
             #printh5.print_file_info(self.h5file)
 
             self.getTimeHDF5File()
-            cs.confcspad.setCSpadParameters()
+
+            if cp.confpars.fileName == self.fileNameWithAlreadySetCSpadConfiguration : return
+            else : cs.confcspad.setCSpadParameters()
 
 
 

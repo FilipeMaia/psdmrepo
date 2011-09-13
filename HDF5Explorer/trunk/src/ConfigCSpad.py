@@ -90,6 +90,8 @@ class ConfigCSpad ( object ) :
 
         #print 'setCSpadParametersV0002'
 
+        self.isCSPad2x2 = False
+
         # Detector and quar array dimennsions
         self.detDimX = 1765
         self.detDimY = 1765
@@ -187,6 +189,8 @@ class ConfigCSpad ( object ) :
         """Configuration parameters based on 2011-03-29 post-run3 optical measurement"""
 
         #print 'setCSpadParametersV0001'
+
+        self.isCSPad2x2 = False
 
         # Detector and quar array dimennsions
         self.detDimX = 1750
