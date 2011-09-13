@@ -1,0 +1,23 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package Compression
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Brief description:
+==================
+
+Various data compression algorithms and relevant tests
+
+Detailed description:
+=====================
+
+The package contains the following algorithms:
+
+- CSPad compression and decompression algorithms for 2x1 structures
+- a multithreaded wrapper class for varios implementations of the CSPad compression algorithms
+- relevant tests applications
