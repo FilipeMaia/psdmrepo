@@ -340,7 +340,14 @@ class  pyana_cspad ( object ) :
             ## Just one plot
             # newmode = self.plotter.draw_figure(cspad_image,title, fignum=self.mpl_num, showProj=True)
 
-            for title,image in event_display_images: 
+            for tuple in event_display_images: 
+                title = tuple[0]
+                image = tuple[1]
+                extent = None
+                try:
+                    extent = tuple[2]
+                except:
+                    pass
                 self.plotter.add_frame(title)
                 self.plotter.frame[title].threshold = self.threshold
                 self.plotter.frame[title].vmin = self.plot_vmin
@@ -349,7 +356,8 @@ class  pyana_cspad ( object ) :
             newmode = self.plotter.draw_figurelist(self.mpl_num,
                                                    event_display_images,
                                                    title="",
-                                                   showProj=True)
+                                                   showProj=True,
+                                                   extent = extent)
 
             if newmode is not None:
                 # propagate new display mode to the evt object 
@@ -439,7 +447,14 @@ class  pyana_cspad ( object ) :
                 np.save(filename2, rejected_image)
 
 
-        for title,image in event_display_images: 
+        for tuple in event_display_images: 
+            title = tuple[0]
+            image = tuple[1]
+            extent = None
+            try:
+                extent = tuple[2]
+            except:
+                pass
             self.plotter.add_frame(title)
             self.plotter.frame[title].threshold = self.threshold
             self.plotter.frame[title].vmin = self.plot_vmin
@@ -448,5 +463,6 @@ class  pyana_cspad ( object ) :
         self.plotter.draw_figurelist(self.mpl_num+1,
                                      event_display_images,
                                      title=title,
-                                     showProj=True)
+                                     showProj=True,
+                                     extent=extent)
             
