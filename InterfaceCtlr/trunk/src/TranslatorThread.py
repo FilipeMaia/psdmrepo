@@ -403,8 +403,13 @@ class TranslatorThread ( threading.Thread ) :
             os.dup2 ( fd, 1 )
             os.dup2 ( fd, 2 )
             
+            # set LD_PRELOAD if needed
+            env = os.environ.copy()
+            ld_preload = self._get_config('ld-preload')
+            if ld_preload: env['LD_PRELOAD'] = ld_preload
+            
             # execute subprocess, should throw in case of errors
-            os.execvp(cmd[0], cmd)
+            os.execvpe(cmd[0], cmd, env)
             
         else :
 

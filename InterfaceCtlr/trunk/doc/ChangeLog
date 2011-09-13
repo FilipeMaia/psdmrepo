@@ -11,6 +11,10 @@ Package author: Robert C. Sass
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-11
+2011-09-13 Andy Salnikov
+- add option to set LD_PRELOAD envvar for translator from configuration
+
 Tag: V00-07-10
 2011-08-17 Andy Salnikov
 - finally convert ic-store-files script to use new style config object
