@@ -138,6 +138,7 @@ class _unitTest :
                 print s
                 print l
                 print s
+                return ret
             else :
                 print "UnitTest successful: "+bin
             
