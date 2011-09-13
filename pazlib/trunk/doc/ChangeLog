@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2011-09-12 Andy Salnikov
+- threads are created in detached state
+
 Tag: V00-00-02
 2011-09-12 Andy Salnikov
 - limit threads' stack size to 32kB

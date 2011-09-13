@@ -106,11 +106,8 @@ void pazlib_init(void)
   }
   
   /* set stack size for all new threads */
-  s = pthread_attr_setstacksize(&thread_attr, 32*1024);
-  if (s != 0) {
-    fprintf(stderr, "pazlib_init: pthread_attr_setstacksize failed: %s\n", strerror(s));
-    abort();
-  }
+  pthread_attr_setstacksize(&thread_attr, 32*1024);
+  pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_DETACHED);
 }
 
 /* start one thread */
