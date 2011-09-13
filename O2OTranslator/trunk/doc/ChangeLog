@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-02
+2011-09-13 Andy Salnikov
+- bug fix in CsPadMiniElementV1Cvt, only half of the image was copied
+
 Tag: V00-12-01
 2011-09-11 Andy Salnikov
 - in CsPad converters inlined rounding of doubles to improve performance
