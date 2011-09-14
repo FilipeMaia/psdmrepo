@@ -130,7 +130,7 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
         self.parentItem = self.invisibleRootItem()
         self.parentItem.setAccessibleDescription('root')
         self.parentItem.setAccessibleText(self.fname) # self.dsname
-        header_item = QtGui.QStandardItem(self.fname)
+        header_item = QtGui.QStandardItem('File: ' + self.fname)
         header_item.setTextAlignment(QtCore.Qt.AlignRight)
         self.setHorizontalHeaderItem(0,header_item) # Set title for root-item
 
@@ -288,7 +288,7 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
                                              title,                                  # title
                                              self.icon_data,                         # icon
                                              'data',                                 # description
-                                             '',                                     # text
+                                             'Data w/o shape',                       # text
                                              True)                                   # isCheckable
                 #isAddedToMenu = True
 
@@ -351,7 +351,8 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
                                          title,                                  # title
                                          self.icon_data,                         # icon
                                          'data',                                 # description
-                                         ds_dtype.shape)                         # text
+                                         ds_dtype.shape,                         # text
+                                         True)                                   # isCheckable
         else :
             print offset + 'THIS IS A COMPOSIT OBJECT <--------------------'
 
@@ -363,7 +364,8 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
                                          title,                                  # title
                                          self.icon_folder_closed,                # icon
                                          'group',                                # description
-                                         ds_dtype.shape)                         # text
+                                         ds_dtype.shape,                         # text
+                                         True)                                   # isCheckable
 
             for dtype_descr in ds_dtype.descr :        
 
@@ -587,7 +589,7 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
         """Recursive iteration over item children in the frame of the QtGui.QStandardItemModel"""
         state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][item.checkState()]
         if state == 'CHECKED' or state == 'TRISTATE' :
-            list_of_indexes_for_one_item = self.get_full_path_to_item(item) # self.get_indexs_to_item(item)
+            list_of_indexes_for_one_item = self.get_index_titles_to_item(item)
             print '  Found checked item.text():', item.text()
             #print '  list of indexes:', list_of_indexes_for_one_item
             self.list_of_checked_dataset_indexes.append(list_of_indexes_for_one_item)
@@ -640,7 +642,7 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
         """Recursive iteration over item children in the frame of the QtGui.QStandardItemModel"""
 
         if item.isCheckable(): 
-            list_of_indexes_for_item = self.get_full_path_to_item(item) # self.get_indexs_to_item(item)
+            list_of_indexes_for_item = self.get_index_titles_to_item(item)
             if list_of_indexes_for_item in self.list_of_indexes_2d :
                 print ' Check the item with indexes:', list_of_indexes_for_item
                 item.setCheckState(2) # 2 means CHECKED; 1-TRISTATE
@@ -682,19 +684,45 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
 #---------------------
 #---------------------
 
-    def get_full_path_to_item(self,item):
-        """Returns the ORDERED !!! list of all symbolic indexes to te indicated item starting from hdf5 dsname."""
+    def get_dims_from_item_title(self,item_title):
 
-        self.list_of_named_indexes = []
-        self._iterate_over_parent_items(item)
-        self.list_of_named_indexes.append(str(self.dsname))
-        self.list_of_named_indexes.reverse()
-        return self.list_of_named_indexes
+        if item_title[0] == '(' : # THIS SHOULD BE THE SHAPE
+            str_dims = item_title[1:len(item_title)-1]
+            #print 'get_dims_from_item_title : str_dims =', str_dims
+            dims = np.fromstring(str_dims, dtype = np.int, sep=',')            
+            #print 'get_dims_from_item_title : dims =', dims,
+            #print ' len(dims) =', len(dims)
+            return dims
+
+        else : return None
 
 #---------------------
 
-    def get_indexs_to_item(self,item):
-        """Returns the ORDERED !!! list of all symbolic indexes to te indicated item. The hdf5 dsname is not included."""
+    def get_indexes_to_item(self,item):
+        """Returns the list of symbolic AND NUMERICAL indexes to the indicated item. The hdf5 dsname is not included."""
+
+        list_of_index_titles_to_item = self.get_index_titles_to_item(item)
+
+        self.list_of_indexes = []
+        for title in list_of_index_titles_to_item :
+
+            if title[0] == '(' : # THIS SHOULD BE THE SHAPE
+                list_of_dims = self.get_dims_from_item_title(title)
+                for dim in list_of_dims:
+                    numerical_index = 0 # dim-1
+                    self.list_of_indexes.append(numerical_index)
+            else :
+                self.list_of_indexes.append(title)
+
+        return self.list_of_indexes
+
+
+
+
+#---------------------
+
+    def get_index_titles_to_item(self,item):
+        """Returns the ORDERED !!! list of SYMBOLIC indexes to the indicated item. The hdf5 dsname is not included."""
 
         self.list_of_named_indexes = []
         self._iterate_over_parent_items(item)
@@ -705,10 +733,11 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
 
     def _iterate_over_parent_items(self,item):
         """Add the item symbolic index to the list and iterate over parents"""
-        #print '    ' + item.accessibleDescription() + ' : ' + item.text() + ' : ' + item.accessibleText()
 
-        if item.accessibleDescription() == 'group' :
-            self.list_of_named_indexes.append(str(item.text()))
+        #self.print_item_attributes(item)
+
+        #if item.accessibleDescription() == 'group' :
+        self.list_of_named_indexes.append(str(item.text()))
 
         item_parent = item.parent()
         ind_parent  = self.indexFromItem(item_parent)
@@ -718,24 +747,37 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
             self._iterate_over_parent_items(item_parent)
 
 #---------------------
+
+    def print_item_attributes(self,item):
+
+        print 'print_item_attributes ---------------------------------------' 
+        print 'print_item_attributes : item.text()                  =', item.text()
+        print 'print_item_attributes : item.accessibleText()        =', item.accessibleText()
+        print 'print_item_attributes : item.accessibleDescription() =', item.accessibleDescription()
+
+#---------------------
 #---------------------
 #---------------------
 #---------------------
 
     def get_dataset(self, item, num_index=None) :
 
-        if item.accessibleDescription() != 'data' :
-            print 'THIS IS NOT A DATA ITEM...'
-            return None
+        #if item.accessibleDescription() != 'data' :
+        #    print 'THIS IS NOT A DATA ITEM...'
+        #    return None
 
-        list_of_named_indexes = self.get_indexs_to_item(item) # self.get_full_path_to_item(item)
+        list_of_named_indexes = self.get_indexes_to_item(item)
+        #print 'list_of_named_indexes = ', list_of_named_indexes
 
         self.open_hdf5_file()
-        ds = self.get_dataset_from_hdf5_file(self.dsname) 
 
         for index in list_of_named_indexes : 
-            print 'Apply index :', index
-            ds = ds[index]
+
+            if index == self.dsname :
+                ds = self.get_dataset_from_hdf5_file(self.dsname) 
+            else :
+                print 'Apply index :', index
+                ds = ds[index]
 
         if num_index != None : ds = ds[num_index]
 
