@@ -5,11 +5,11 @@
 # $Id$
 #
 
-# Number of translator instances to run, 0 = number of cores
+# Number of translator instances to run, 0 = number of cores divided by 1.5
 translators=0
 
 # release directory
-release=/reg/g/psdm/sw/releases/0.2.27
+release=/reg/g/psdm/sw/releases/0.2.52
 #release=/reg/neh/home/salnikov/releases/ic-0.2.20
 
 # database options
@@ -17,7 +17,7 @@ conn_file=/reg/g/psdm/psdatmgr/ic/.icdb-conn
 
 # config section names to read from database
 #config="meta-db group-time compress no-split xtc-lustre"
-config="group-time compress no-split xtc-lustre l1-offset calib-data"
+config="group-time compress no-split xtc-lustre l1-offset calib-data datagram-32M pazlib"
 
 # log directory
 logdir=/reg/g/psdm/psdatmgr/ic/log
@@ -45,7 +45,7 @@ done
 shift `expr $OPTIND - 1`
 
 # count cores if translators=0
-test $translators -eq 0 && translators=`gawk '/^processor[ \t]*:/{n=n+1} END {print n}' /proc/cpuinfo`
+test $translators -eq 0 && translators=`gawk '/^processor[ \t]*:/{n=n+1} END {print int(n/1.5)}' /proc/cpuinfo`
 
 # allow world access
 umask 022

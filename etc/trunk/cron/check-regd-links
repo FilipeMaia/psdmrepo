@@ -51,7 +51,7 @@ import socket
 
 # directories to skip
 _dirs_skip = ['lost+found', 'logs', 'dgs', 'test', 'gapon', 'mcmesser', 'cosmo',
-              'cxi/data', 'rci/scratch', 'amo/amotst', 'caa/LCLS']
+              'cxi/data', 'rci/scratch', 'amo/amotst', 'caa/LCLS', 'sxr/scratch']
 
 _pjoin = os.path.join
 
