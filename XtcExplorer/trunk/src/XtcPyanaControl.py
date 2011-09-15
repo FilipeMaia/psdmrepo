@@ -852,7 +852,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             #print "XtcExplorer.pyana_ipimb at ", index
             address = str(box.text()).split(": ")[1].strip()
             options_for_mod[index].append("\nsources = %s" % address)
-            options_for_mod[index].append("\nvariables = fex:pos fex:sum fex:channels")
+            options_for_mod[index].append("\nquantities = fex:pos fex:sum fex:channels")
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))

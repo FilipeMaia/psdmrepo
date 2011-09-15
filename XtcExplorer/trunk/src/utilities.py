@@ -150,15 +150,34 @@ class BaseData( object ):
         self.name = name
         self.type = type
         
-    def __str__( self ):
-        itsme = "<%s object with name %s>" % (self.type, self.name)
-        return itsme
-
-    def __repr__( self ):
-        itsme = "<%s object with name %s>" % (self.type, self.name)
-        return itsme
-
-
+    def show( self ):
+        itsme = "\n%s \n\t name = %s" % (self.type, self.name)
+        for item in dir(self):
+            if item.find('__')>=0 : continue
+            attr = getattr(self,item)
+            if attr is not None:
+                if type(attr)==str:
+                    print item, "(str) = ", attr
+                elif type(attr)==np.ndarray:
+                    print item, ": ndarray of dimension(s) ", attr.shape
+                else:
+                    print item, " = ", type(attr)
+                    
+    def get_plottables_base(self):
+        plottables = {}
+        for item in dir(self):
+            if item.find('__')>=0 : continue
+            attr = getattr(self,item)
+            if attr is not None:
+                if type(attr)==np.ndarray:
+                    plottables[item] = attr
+        return plottables
+                                
+    def get_plottables(self):
+        return self.get_plottables_base()
+                                
+                                
+                                
 class BldData( BaseData ):
     """Beam-Line Data 
     """
@@ -176,31 +195,6 @@ class BldData( BaseData ):
         self.raw_channels_volt = None
         self.fex_position = None
 
-    def show( self ):
-        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
-        if self.time is not None :
-            itsme+="\n\t time = array of shape %s"%str(np.shape(self.time))
-        if self.damage is not None :
-            itsme+="\n\t damage = array of shape %s"%str(np.shape(self.damage))
-        if self.energy is not None :
-            itsme+="\n\t energy = array of shape %s"%str(np.shape(self.energy))
-        if self.position is not None :
-            itsme+="\n\t position = array of shape %s"%str(np.shape(self.position))
-        if self.angle is not None :
-            itsme+="\n\t angle = array of shape %s"%str(np.shape(self.angle))
-        if self.charge is not None :
-            itsme+="\n\t charge = array of shape %s"%str(np.shape(self.charge))
-        if self.fex_sum is not None :
-            itsme+="\n\t fex_sum = array of shape %s"%str(np.shape(self.fex_sum))
-        if self.fex_channels is not None :
-            itsme+="\n\t fex_channels = array of shape %s"%str(np.shape(self.fex_channels))
-        if self.raw_channels is not None :
-            itsme+="\n\t raw_channels = array of shape %s"%str(np.shape(self.raw_channels))
-        if self.raw_channels_volt is not None :
-            itsme+="\n\t raw_channels_volt = array of shape %s"%str(np.shape(self.raw_channels_volt))
-        if self.fex_position is not None :
-            itsme+="\n\t fex_position = array of shape %s"%str(np.shape(self.fex_position))
-        print itsme
 
 class IpimbData( BaseData ):
     """Ipimb Data (from Intensity and Position monitoring boards)
@@ -211,23 +205,8 @@ class IpimbData( BaseData ):
         self.fex_channels = None
         self.fex_position = None
         self.raw_channels = None
-        self.raw_channels_volt = None
+        self.raw_voltages = None
 
-    def show( self ):
-        """Printable description 
-        """
-        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
-        if self.fex_sum is not None :
-            itsme+="\n\t fex_sum = array of shape %s"%str(np.shape(self.fex_sum))
-        if self.fex_channels is not None :
-            itsme+="\n\t fex_channels = array of shape %s"%str(np.shape(self.fex_channels))
-        if self.fex_position is not None :
-            itsme+="\n\t fex_position = array of shape %s"%str(np.shape(self.fex_position))
-        if self.raw_channels is not None :
-            itsme+="\n\t raw_channels = array of shape %s"%str(np.shape(self.raw_channels))
-        if self.raw_channels_volt is not None :
-            itsme+="\n\t raw_channels_volt = array of shape %s"%str(np.shape(self.raw_channels_volt))
-        print itsme
 
 
 class EncoderData( BaseData ):
@@ -237,13 +216,6 @@ class EncoderData( BaseData ):
         BaseData.__init__(self,name,type)
         self.values = None
 
-    def show( self ):
-        """Printable description 
-        """
-        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
-        if self.values is not None :
-            itsme+="\n\t values = array of shape %s"%str(np.shape(self.values))
-        print itsme
 
 
 class WaveformData( BaseData ):
@@ -253,16 +225,6 @@ class WaveformData( BaseData ):
         BaseData.__init__(self,name,type)
         self.wf_voltage = None
         self.wf_time = None
-
-    def show( self ):
-        """Printable description 
-        """
-        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
-        if self.wf_voltage is not None :
-            itsme+="\n\t wf_voltage = array of shape %s"%str(np.shape(self.wf_voltage))
-        if self.wf_time is not None :
-            itsme+="\n\t wf_time = array of shape %s"%str(np.shape(self.wf_time))
-        print itsme
 
 
 class EpicsData( BaseData ):
@@ -275,17 +237,6 @@ class EpicsData( BaseData ):
         self.status = None
         self.severity = None
 
-    def show( self ):
-        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
-        if self.values is not None :
-            itsme+="\n\t values = array of shape %s"%str(np.shape(self.values))
-        if self.shotnr is not None :
-            itsme+="\n\t shotnr = array of shape %s"%str(np.shape(self.shotnr))
-        if self.status is not None :
-            itsme+="\n\t status = array of shape %s"%str(np.shape(self.status))
-        if self.severity is not None :
-            itsme+="\n\t severity = array of shape %s"%str(np.shape(self.severity))
-        print itsme
 
 
 class ScanData( BaseData ) :
@@ -298,15 +249,6 @@ class ScanData( BaseData ) :
         self.arheader = None
         self.scandata = None
 
-    def show(self):
-        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
-        if self.scanvec is not None :
-            itsme+="\n\t scanvec = array of shape %s"%str(np.shape(self.scanvec))
-        if self.arheader is not None :
-            itsme+="\n\t arheader = list of scan data %s"% self.arheader 
-        if self.scandata is not None :
-            itsme+="\n\t scandata = array of shape %s"%str(np.shape(self.scandata))
-        print itsme
 
 
 class ImageData( BaseData ):
@@ -314,20 +256,32 @@ class ImageData( BaseData ):
     """
     def __init__(self, name, type="ImageData"):
         BaseData.__init__(self,name,type)
-        self.image = None
-        self.average = None
-        self.dark = None
-
-    def show( self ):
-        itsme = "\n%s \n\t name = %s" % (self.type, self.name)
-        if self.image is not None :
-            itsme+="\n\t image = array of shape %s"%str(np.shape(self.image))
-        if self.average is not None :
-            itsme+="\n\t average = array of shape %s"%str(np.shape(self.average))
-        if self.dark is not None :
-            itsme+="\n\t dark = array of shape %s"%str(np.shape(self.dark))
-        print itsme
-
+        self.image = None      # the image
+        self.average = None    # the average collected so far
+        self.dark = None       # the dark that was subtracted
+        self.roi = None        # list of coordinates defining ROI
+        
+        # The following are 1D array if unbinned, 2D if binned (bin array being the first dim)
+        self.spectrum = None   # Array of image intensities (1D, or 2D if binned)
+        self.projX = None      # Average image intensity projected onto horizontal axis
+        self.projY = None      # Average image intensity projected onto vertical axis
+        
+        # The following are always 2D arrays, binned. bins vs. values
+        self.projR = None      # Average image intensity projected onto radial axis (2D)
+        self.projTheta = None  # Average image intensity projected onto polar angle axis (2D_
+        
+    def get_plottables(self):
+        plottables = self.get_plottables_base()
+        if self.roi is not None:
+            try:
+                c = self.roi
+                print "image? ", self.image
+                print "roi? ", self.image[c[0]:c[1],c[2]:c[3]]
+                plottables["roi"] = self.image[c[0]:c[1],c[2]:c[3]]
+            except:
+                print "setting ROI failed, did you define the image? "
+                
+                
 class CsPadData( BaseData ):
     """CsPad data
     """
@@ -336,16 +290,6 @@ class CsPadData( BaseData ):
         self.image = None
         self.average = None
         self.dark = None
-
-    def show( self ):
-        itsme = "\n%s: \n\t name = %s" % (self.type, self.name)
-        if self.image is not None :
-            itsme+="\n\t image = array of shape %s"%str(np.shape(self.image))
-        if self.average is not None :
-            itsme+="\n\t average = array of shape %s"%str(np.shape(self.average))
-        if self.dark is not None :
-            itsme+="\n\t dark = array of shape %s"%str(np.shape(self.dark))
-        print itsme
 
 
 
@@ -420,9 +364,12 @@ class Frame(object):
         print itsme
 
     def update_axes(self):
-#        # max along each axis
-#        proj_vert = self.image.max(axis=1) # for each row, maximum bin value
-#        proj_horiz = self.image.max(axis=0) # for each column, maximum bin value
+        if self.projx is None: return
+        if self.projy is None: return
+        
+#       # max along each axis
+#       proj_vert = self.image.max(axis=1) # for each row, maximum bin value
+#       proj_horiz = self.image.max(axis=0) # for each column, maximum bin value
 
         #projections
         maskedimage = np.ma.masked_array( self.image, mask=(self.image==0) )

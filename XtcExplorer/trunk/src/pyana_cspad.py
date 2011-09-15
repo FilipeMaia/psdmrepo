@@ -240,7 +240,8 @@ class  pyana_cspad ( object ) :
         else :
             # mini Cspad (only 2x2)
             quads = evt.get(xtc.TypeId.Type.Id_Cspad2x2Element, self.img_source)
-            cspad_image = self.cspad.CsPad2x2Image(quads)
+            if quads is not None:         
+                cspad_image = self.cspad.CsPad2x2Image(quads)
             
         if not quads:
             print '*** cspad information is missing ***'
@@ -297,8 +298,9 @@ class  pyana_cspad ( object ) :
                 evt.put(True,'skip_event') # tell downstream modules to skip this event
                 return
             else :
-                print "accepted (%.2f > %.2f) " % (maxvalue, float(self.threshold.value))
-
+                print "%d accepting event #%d, vmax = %.0f > %.0f ,hitrate: %.4f" % \
+                      (env.subprocess(), self.n_shots, maxvalue,
+                       float(self.threshold.value),float(self.n_good)/float(self.n_shots))
         # -----
         # Passed the threshold filter. Add this to the sum
         # -----

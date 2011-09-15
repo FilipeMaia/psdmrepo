@@ -11,6 +11,26 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Sep-15 ofte                 rev 2400
+	- pyana_cspad.py: small improvements / crash fixes. 
+	- utilities.py: Simplification of Data containers
+	- pyana_ipimb.py and XtcPyanaControl.py: 'variables' -> 'quantities'
+	- additionally, I've added the following modules that allow to run 
+	  the new version of the GUI. Not ready yet, but I'd like to get it 
+	  into svn anyhow. It can be run with xtcexplorernew and should be 
+	  independent of the old one (new classes and new modules) and its 
+	  development *should not* break the old xtcexplorer... 
+          A       XtcExplorer/app/xtcexplorernew
+	  A       XtcExplorer/src/config_pyana.py
+	  A       XtcExplorer/src/gui_explorer_main.py
+	  A       XtcExplorer/src/gui_config_panels.py
+	  A       XtcExplorer/src/gui_pyana_control.py
+	  A       XtcExplorer/src/pyana_ipimb_beta.py
+	
+
+2011-Sep-13 ofte                   rev 2384
+	- bugfix in pyana_cspad.py
+	
 2011-Sep-12 ofte  Tag: V00-01-10  rev 2372 & 2373
          - added calib directory
 	

@@ -12,86 +12,67 @@ from utilities import IpimbData
 
 
 # analysis class declaration
-class  pyana_ipimb ( object ) :
+class  pyana_ipimb_beta ( object ) :
     
     def __init__ ( self,
                    source = None,
-                   sources = None,
                    quantities = "fex:pos fex:sum fex:channels",
-                   # "raw:channels raw:voltages"
-                   # "fex:ch0 fex:ch1 fex:ch2 fex:ch3"
-                   # "raw:ch0 raw:ch1 raw:ch2 raw:ch3"
-                   # "raw:ch0volt raw:ch1volt raw:ch2volt raw:ch2volt"
-                   plot_every_n = "0",
-                   accumulate_n    = "0",
-                   fignum = "1" ) :
+                   ):
         """
-        @param sources           list of IPIMB addresses
+        @param source             addresse of Ipimb
         @param quantities         list of quantities to plot
-        @param plot_every_n      Zero (don't plot until the end), or N (int, plot every N event)
-        @param accumulate_n      Accumulate all (0) or reset the array every n shots
-        @param fignum            matplotlib figure number
+                                  fex:pos fex:sum fex:channels
+                                  raw:channels raw:voltages
+                                  fex:ch0 fex:ch1 fex:ch2 fex:ch3
+                                  raw:ch0 raw:ch1 raw:ch2 raw:ch3
+                                  raw:ch0volt raw:ch1volt raw:ch2volt raw:ch2volt
         """
 
         # initialize data
         opt = PyanaOptions()
-        if sources is not None:
-            self.sources = opt.getOptStrings(sources)
-        elif source is not None:
-            self.sources = opt.getOptStrings(source)
+        self.source = opt.getOptString(source)
             
-        print "pyana_ipimb, %d sources: " % len(self.sources)
-        for source in self.sources :
-            print "  ", source
-
         self.quantities = opt.getOptStrings(quantities)
-        print "pyana_ipimb quantities to plot:"
+        print "pyana_ipimb_beta quantities to plot:"
         for var in self.quantities:
             print "  ", var
             
-        self.plot_every_n = opt.getOptInteger(plot_every_n)
-        self.accumulate_n = opt.getOptInteger(accumulate_n)
-        self.mpl_num = opt.getOptInteger(fignum)
-
         # other
         self.n_shots = None
         self.accu_start = None
+
+        self.mydata = IpimbData(source)
         
         # lists to fill numpy arrays
         self.initlists()
-
+        
 
     def initlists(self):
-        self.fex_sum = {}
-        self.fex_channels = {}
-        self.fex_position = {}
-        self.raw_ch = {}
-        self.raw_ch_volt = {}
-        for source in self.sources :
-            self.fex_sum[source] = list()
-            self.fex_channels[source] = list()
-            self.fex_position[source] = list()
-            self.raw_ch[source] = list()
-            self.raw_ch_volt[source] = list()
+        if "fex:sum" in self.quantities:
+            self.mydata.fex_sum = list()
+        if "fex:channels" in self.quantities:
+            self.mydata.fex_channels = list()
+        if "fex:pos" in self.quantities:
+            self.mydata.fex_position = list()
+        if "raw:channels" in self.quantities:
+            self.raw_channels = list()
+        if "raw:voltages" in self.quantities:
+            self.raw_voltages = list()
+
 
     def resetlists(self):
         self.accu_start = self.n_shots
-        for source in self.sources :
-            del self.fex_sum[source][:]
-            del self.fex_channels[source][:]
-            del self.fex_position[source][:]
-            del self.raw_ch[source][:]
-            del self.raw_ch_volt[source][:]
-
+        for item in dir(self.mydata):
+            if item.find('__')>=0 : continue
+            attr = getattr(self,item)
+            if attr is not None:
+                if type(attr)==np.ndarray:
+                    del attr[:]
 
     def beginjob ( self, evt, env ) : 
         self.n_shots = 0
         self.accu_start = 0
         
-        self.data = {}
-        for source in self.sources :
-            self.data[source] = IpimbData( source ) 
-            
     def event ( self, evt, env ) :
 
         self.n_shots+=1
@@ -100,86 +81,58 @@ class  pyana_ipimb ( object ) :
             return
 
         # IPM diagnostics, for saturation and low count filtering
-        for source in self.sources :
+        source = self.source
 
-            # -------- TEST
-            # BldDataIpimb / SharedIpimb
-            ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb, source )
-            #ipm = evt.getSharedIpimbValue("HFX-DG3-IMB-02")
-            if ipm :
-                self.raw_ch[source].append( [ipm.ipimbData.channel0(),
-                                             ipm.ipimbData.channel1(),
-                                             ipm.ipimbData.channel2(),
-                                             ipm.ipimbData.channel3()] )
+        ipmShr = evt.get(xtc.TypeId.Type.Id_SharedIpimb, source )
+        ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, source )
+        ipmRaw = evt.get(xtc.TypeId.Type.Id_IpimbData, source )
 
-                self.raw_ch_volt[source].append( [ipm.ipimbData.channel0Volts(),
-                                             ipm.ipimbData.channel1Volts(),
-                                             ipm.ipimbData.channel2Volts(),
-                                             ipm.ipimbData.channel3Volts()] )
+        if ipmShr:
+            # SharedIpimb's contain both raw and fex data
+            if self.mydata.fex_sum is not None:
+                self.mydata.fex_sum.append( ipmShr.ipmFexData.sum )
+            if self.mydata.fex_position is not None:
+                self.mydata.fex_position.append( [ipmShr.ipmFexData.xpos, ipmShr.ipmFexData.ypos] )
+            if self.mydata.fex_channels is not None: 
+                self.mydata.fex_channels.append( ipmShr.ipmFexData.channel )
 
-                self.fex_sum[source].append( ipm.ipmFexData.sum )
-                self.fex_channels[source].append( ipm.ipmFexData.channel )
-                self.fex_position[source].append( [ipm.ipmFexData.xpos, ipm.ipmFexData.ypos] )
+            if self.mydata.raw_channels is not None:
+                self.mydata.raw_channels.append( [ipmShr.ipimbData.channel0(),
+                                                  ipmShr.ipimbData.channel1(),
+                                                  ipmShr.ipimbData.channel2(),
+                                                  ipmShr.ipimbData.channel3()] )
+            if self.mydata.raw_voltages is not None:
+                self.mydata.raw_voltages.append( [ipmShr.ipimbData.channel0Volts(),
+                                                  ipmShr.ipimbData.channel1Volts(),
+                                                  ipmShr.ipimbData.channel2Volts(),
+                                                  ipmShr.ipimbData.channel3Volts()] )
+        else :
+            # feature-extracted data
+            if ipmFex: 
+                if self.mydata.fex_sum is not None:
+                    self.mydata.fex_sum.append( ipmFex.sum )
+                if self.mydata.fex_channels is not None:
+                    self.mydata.fex_channels.append( ipmFex.channel )
+                if self.mydata.fex_position is not None:
+                    self.mydata.fex_position.append( [ipmFex.xpos, ipmFex.ypos] )
             else :
+                print "No Ipimb fex data"
 
-                # raw data
-                ipmRaw = evt.get(xtc.TypeId.Type.Id_IpimbData, source )
-                if ipmRaw :
-                    ch = [ipmRaw.channel0(),
-                          ipmRaw.channel1(),
-                          ipmRaw.channel2(),
-                          ipmRaw.channel3() ]
-                
-                    self.raw_ch[source].append(ch)
-                
-                    ch_volt = [ipmRaw.channel0Volts(),
-                               ipmRaw.channel1Volts(),
-                               ipmRaw.channel2Volts(),
-                               ipmRaw.channel3Volts() ]
-                    
-                    self.raw_ch_volt[source].append( ch_volt )
-            
-                
-                else :
-                    print "pyana_ipimb: No IpimbData from %s found in event %d" % (source,self.n_shots)
-                    self.raw_ch[source].append( [-1,-1,-1,-1] )
-                    self.raw_ch_volt[source].append( [-1,-1,-1,-1] ) 
+            # raw data
+            if ipmRaw: 
+                if self.mydata.raw_channels is not None:
+                    self.mydata.raw_channels.append( [ipmRaw.channel0(),
+                                                      ipmRaw.channel1(),
+                                                      ipmRaw.channel2(),
+                                                      ipmRaw.channel3() ] )            
+                if self.mydata.raw_voltages is not None:
+                    self.mydata.raw_voltages.append( [ipmRaw.channel0Volts(),
+                                                      ipmRaw.channel1Volts(),
+                                                      ipmRaw.channel2Volts(),
+                                                      ipmRaw.channel3Volts() ] )
+            else:
+                print "No Ipimb raw data"
 
-                # feature-extracted data
-                ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, source )
-
-                if ipmFex :
-                    self.fex_sum[source].append( ipmFex.sum )
-                    self.fex_channels[source].append( ipmFex.channel )
-                    self.fex_position[source].append( [ipmFex.xpos, ipmFex.ypos] )
-                else :
-                    print "pyana_ipimb: No IpmFex from %s found in event %d" % (source, self.n_shots)
-                    self.fex_sum[source].append( -1 )
-                    self.fex_channels[source].append( [-1,-1,-1,-1] ) 
-                    self.fex_position[source].append( [-1,-1] ) 
-
-            
-
-        # ----------------- Plotting ---------------------
-        if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
-
-            header = "DetInfo:IPIMB data shots %d-%d" % (self.accu_start, self.n_shots)
-            self.make_plots(title=header)
-
-            # flag for pyana_plotter
-            evt.put(True, 'show_event')
-
-            # convert dict to a list:
-            data_ipimb = []
-            for source in self.sources :
-                data_ipimb.append( self.data[source] )
-            # give the list to the event object
-            evt.put( data_ipimb, 'data_ipimb' )
-
-                        
-        # --------- Reset -------------
-        if self.accumulate_n!=0 and (self.n_shots%self.accumulate_n)==0 :
-            self.resetlists()
 
 
     def endjob( self, evt, env ) :
