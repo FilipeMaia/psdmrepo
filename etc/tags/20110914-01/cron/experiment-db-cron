@@ -1,0 +1,14 @@
+#!/bin/sh
+
+db=/reg/g/psdm/data/psana/experiment-db.dat
+tmpdb=$db.tmp
+
+q="select e.id, i.name, e.name from experiment e, instrument i where e.instr_id = i.id and INSTR(e.name, ' ') = 0 order by e.id;"
+
+echo "$q" | mysql -N -hpsdb -uregdb_reader regdb > $tmpdb
+if diff -q $tmpdb $db > /dev/null ; then
+  rm $tmpdb
+else
+  mv $tmpdb $db
+  echo "$db has been updated"
+fi
