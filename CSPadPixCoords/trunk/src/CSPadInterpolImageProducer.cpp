@@ -160,45 +160,50 @@ CSPadInterpolImageProducer::event(Event& evt, Env& env)
   // this is how to gracefully stop analysis job
   ++m_count;
   if (m_count >= m_maxEvents) stop();
-  cout << "Event: " << m_count << endl;
 
-  /* // !!!!!!!!!!!!!!!!! 
-
-
-  //struct timespec start, stop;
-  //int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
+    //-------------------- Time
+    struct timespec start, stop;
+    int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
+    //-------------------- Time
 
   shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src, "", &m_actualSrc); // get m_actualSrc here
 
   if (data2.get()) {
 
-    this -> cspad_image_init (); // !!!!!!!!!!!!!!!!! 
-
+    bool  quadIsAvailable[] = {false, false, false, false};
+    const uint16_t* data[4];
+    CSPadPixCoords::QuadParameters *quadpars[4];
+   
     int nQuads = data2->quads_shape()[0];
-    //cout << "nQuads = " << nQuads << endl;
+
     for (int q = 0; q < nQuads; ++ q) {
         const Psana::CsPad::ElementV2& el = data2->quads(q);
+        int  quad  = el.quad();
 
-        const uint16_t* data = el.data();
-        int             quad = el.quad() ;
-
+        data[quad] = el.data();
         std::vector<int> v_image_shape = el.data_shape();
-        CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(quad, v_image_shape, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
+        quadpars[quad] = new CSPadPixCoords::QuadParameters(quad, v_image_shape, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
+        quadIsAvailable[quad] = true;
 
-	this -> cspad_image_fill (data, quadpars, m_cspad_calibpar); // !!!!!!!!!!!!!!!!! 
+	//cout << " q = "                     << q 
+	//     << " quad = "                  << quad 
+	//     << " quadIsAvailable[quad] = " << quadIsAvailable[quad]
+        //     << endl;
     }
 
-    //status = clock_gettime( CLOCK_REALTIME, &stop ); // Get LOCAL time
-    //cout << "  Time to fill cspad is " 
-    //     << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
-    //     << " sec" << endl;
+    this -> cspad_image_init ();
+    this -> cspad_image_interpolated_fill (data, quadpars, quadIsAvailable);
+    this -> cspad_image_add_in_event(evt,"CSPad:Image");
 
-    this -> cspad_image_add_in_event(evt,"CSPad:Image"); // !!!!!!!!!!!!!!!!! 
+    //-------------------- Time
+    status = clock_gettime( CLOCK_REALTIME, &stop ); // Get LOCAL time
+    cout << "  Event: " << m_count 
+         << "  Time to fill cspad is " 
+         << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
+         << " sec" << endl;
+    //-------------------- Time
+
   } // if (data2.get())
-
-
-  */ // !!!!!!!!!!!!!!!!! 
-
 }
 
 //--------------------
@@ -482,16 +487,12 @@ CSPadInterpolImageProducer::get_weight_of_4_neighbors(unsigned ix, unsigned iy)
 }
 
 //--------------------
-
-
-
-
-
-
-
-
 //--------------------
-
+//--------------------
+//--------------------
+/**
+  * Initialization of the CSPad array
+  */ 
 void
 CSPadInterpolImageProducer::cspad_image_init()
 {
@@ -509,48 +510,49 @@ CSPadInterpolImageProducer::cspad_image_init()
 }
 
 //--------------------
-
+/**
+  * Fill the CSPad array with interpolation.
+  */ 
 void
-CSPadInterpolImageProducer::cspad_image_fill(const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+CSPadInterpolImageProducer::cspad_image_interpolated_fill (const uint16_t* data[], CSPadPixCoords::QuadParameters* quadpars[], bool quadIsAvailable[])
 {
-      //int              quad           = quadpars -> getQuadNumber();
-        uint32_t         roiMask        = quadpars -> getRoiMask();
-	std::vector<int> v_image_shape  = quadpars -> getImageShapeVector();
+    for (unsigned ix=0; ix<NX_CSPAD; ix++){
+    for (unsigned iy=0; iy<NY_CSPAD; iy++){
 
-	for(uint32_t sect=0; sect < m_n2x1; sect++)
-	{
-	     bool bitIsOn = roiMask & (1<<sect);
-	     if( !bitIsOn ) { m_cspad_ind += m_sizeOf2x1Img; continue; }
- 
-             const uint16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
+      double sum_wf = 0;
+      double sum_w  = 0;
+      for (unsigned ip=0; ip<4; ip++){ // loop over 4 neighbour pixels
 
-             //cout  << "  add section " << sect << endl;	     
- 
-             for (uint32_t c=0; c<m_ncols2x1; c++) {
-             for (uint32_t r=0; r<m_nrows2x1; r++) {
+          ArrAddr &addr = m_address[ix][iy][ip];
 
-               // This access takes 72ms/cspad
-               //int ix = (int) m_pix_coords_cspad -> getPixCoor_pix (XCOOR, quad, sect, r, c);
-               //int iy = (int) m_pix_coords_cspad -> getPixCoor_pix (YCOOR, quad, sect, r, c);
+          // Skip empty bins of the CSPad detector image
+          if ( addr.quad == -1 ) continue;
 
-               // This access takes 40ms/cspad
-               int ix = m_coor_x_int [m_cspad_ind];
-               int iy = m_coor_y_int [m_cspad_ind];
-	       m_cspad_ind++;
+          // Skip missing quads
+          if ( !quadIsAvailable[addr.quad] ) continue;
 
-	       if(ix <  0)        continue;
-	       if(iy <  0)        continue;
-	       if(ix >= NX_CSPAD) continue;
-	       if(iy >= NY_CSPAD) continue;
+          // Skip missing 2x1 data
+	  bool  bitIsOn = (quadpars[addr.quad]->getRoiMask()) & (1<<addr.sect);
+          if ( !bitIsOn ) continue; 
 
-               m_arr_cspad_image[ix][iy] += (double)data2x1[c*m_nrows2x1+r];
-             }
-             }
-	}
+          const uint16_t *data2x1 = &data[addr.quad][addr.sect * m_sizeOf2x1Img];
+          const double f = (double)data2x1[addr.col*m_nrows2x1+addr.row];
+	  const double w = (double)m_weight [ix][iy][ip];
+
+          sum_wf += (w * f);
+          sum_w  +=  w;
+
+       } // ip
+       m_arr_cspad_image[ix][iy] = (sum_w != 0) ? sum_wf / sum_w : 0;
+
+    } // iy
+    } // ix
 }
 
 //--------------------
-
+/**
+  * Save the CSPad image array in the text file.
+  */ 
 void
 CSPadInterpolImageProducer::cspad_image_save_in_file(const std::string &filename)
 {
@@ -559,7 +561,9 @@ CSPadInterpolImageProducer::cspad_image_save_in_file(const std::string &filename
 }
 
 //--------------------
-
+/**
+  * Add the CSPad image array in the event.
+  */ 
 void
 CSPadInterpolImageProducer::cspad_image_add_in_event(Event& evt, const std::string &keyname)
 {

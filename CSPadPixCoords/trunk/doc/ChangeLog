@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2011-09-15 Mikhail S. Dubrovin
+- add psana module CSPadInterpolImageProducer
+  which produces the CSPad interpolated image. 
+  This algorithm takes ~0.2s on regular CPU (psana0106) and needs in GPU acceleration.
+	
 Tag: V00-00-04
 2011-08-05 Mikhail S. Dubrovin
 - change float -> double
