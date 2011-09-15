@@ -142,7 +142,13 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
 
 #----------------------------------
 
-
+    def get_string_wo_spaces(self, str_with_spaces) :
+        str_wo_spaces = ''
+        for c in str_with_spaces :
+            if c != ' ' : str_wo_spaces += c
+        #print 'str_with_spaces =',str_with_spaces
+        #print 'str_wo_spaces =',str_wo_spaces
+        return str_wo_spaces
 
 
 #----------------------------------
@@ -165,20 +171,20 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
             DTYPE_IS_AVAILABLE = False
             
         try:
-            self.ds_shape = ds.shape
+            self.str_ds_shape = self.get_string_wo_spaces(str(ds.shape))
             if ds.shape : SHAPE_IS_AVAILABLE = True
             else        : SHAPE_IS_AVAILABLE = False
         except AttributeError:
             print offset + 'AttributeError: current object has no attribute shape'
-            self.ds_shape = None
+            self.str_ds_shape = None
             SHAPE_IS_AVAILABLE = False
 
         if SHAPE_IS_AVAILABLE :
             try :
-                str_dims = self.get_str_ds_shape_dims(ds)
+                #str_dims = self.get_str_ds_shape_dims(ds)
                 DIMS_ARE_AVAILABLE = True
             except AttributeError:
-                str_dims = None               
+                #str_dims = None               
                 DIMS_ARE_AVAILABLE = False
 
 
@@ -193,31 +199,31 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
 
                 print offset + 'THIS IS A COMPOSIT OBJECT WITH SHAPE  <--------------------'
 
-                #title = indtitle + '  DATA ARRAY  ' + str_dims + ' ' + str(self.ds_shape)
+                #title = indtitle + '  DATA ARRAY  ' + str_dims + ' ' + self.str_ds_shape
                 title = indtitle # + '  DATA ARRAY  ' + str_dims 
                 item = self.add_item_to_tree(parentItem,                             # parent
                                              title,                                  # title
                                              self.icon_folder_closed,                # icon
-                                             'group',                                # description
-                                             str_dims,                               # text
+                                             'group',                                # accessibleDescription
+                                             'Composit object with shape',           # accessibleText
                                              True)                                   # isCheckable
                 #isAddedToMenu = True
 
                 print offset + 'SHAPE IS NOT EMPTY !!! =', ds.shape, ' CONTINUE ITERATIONS'
                 ds0 = self.get_ds0_shaped(ds)
-                self.add_item_iterate_ds(ds0, item, str(self.ds_shape), offset) # str(self.ds_shape), str_dims
+                self.add_item_iterate_ds(ds0, item, self.str_ds_shape, offset) # self.str_ds_shape, str_dims
 
 
             elif ds.dtype.num == 20 :
 
                 print offset + 'THIS IS A COMPOSIT OBJECT WITH NUM=20 <--------------------'
 
-                title = indtitle # + ' INDEXED ARR ' + str(self.ds_shape)
+                title = indtitle # + ' INDEXED ARR ' + self.str_ds_shape
                 item = self.add_item_to_tree(parentItem,                             # parent
                                              title,                                  # title
                                              self.icon_folder_closed,                # icon
-                                             'group',                                # description
-                                             indtitle,                               # text
+                                             'group',                                # accessibleDescription
+                                             'Composit object with dtype.num=20',    # accessibleText
                                              True)                                   # isCheckable
                 #isAddedToMenu = True
 
@@ -241,21 +247,21 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
                         if SHAPE_IS_AVAILABLE :
                              print offset + 'THIS IS A COMPOSIT OBJECT WITH SHAPE  <--------------------'
                              print offset + 'SHAPE IS NOT EMPTY !!! =', ds.shape, ' CONTINUE ITERATIONS'
+                             #str_dims = self.get_str_ds_shape_dims(ds)
                              ds0 = self.get_ds0_shaped(ds)
-                             str_dims = self.get_str_ds_shape_dims(ds)
-                             self.add_item_iterate_ds(ds0, item, str(self.ds_shape), offset) # str(self.ds_shape), str_dims
+                             self.add_item_iterate_ds(ds0, item, self.str_ds_shape, offset) # self.str_ds_shape, str_dims
 
 
 
             else : # NON COMPOSIT DATA OBJECT
 
                 print offset + 'THIS IS A SINGLE DATA OBJECT      <--------------------'
-                title = indtitle # + ' SINGLE DATA OBJECT ' + ds.dtype.name # + ' ' + str (self.ds_shape) + '  DATA: ' + str(ds)
+                title = indtitle # + ' SINGLE DATA OBJECT ' + ds.dtype.name # + ' ' + self.str_ds_shape + '  DATA: ' + str(ds)
                 item = self.add_item_to_tree(parentItem,                             # parent
                                              title,                                  # title
                                              self.icon_data,                         # icon
-                                             'data',                                 # description
-                                             '',                                     # text
+                                             'data',                                 # accessibleDescription
+                                             'Single data object',                   # accessibleText
                                              True)                                   # isCheckable
                 #isAddedToMenu = True
 
@@ -266,14 +272,14 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
             if SHAPE_IS_AVAILABLE :
                 print offset + 'SHAPE IS NOT EMPTY !!! =', ds.shape, ' ADD AS AN ARRAY, CONTINUE ITERATIONS'
 
-                str_dims = self.get_str_ds_shape_dims(ds)
-                title = indtitle # + '  NO DTYPE COMP ' + str_dims + str(self.ds_shape) + ' ' + str(ds)
+                #str_dims = self.get_str_ds_shape_dims(ds)
+                title = indtitle # + '  NO DTYPE COMP ' + str_dims + self.str_ds_shape + ' ' + str(ds)
 
                 item = self.add_item_to_tree(parentItem,                             # parent
                                              title,                                  # title
                                              self.icon_data,                         # icon
-                                             'data',                                 # description
-                                             str_dims,                               # text
+                                             'data',                                 # accessibleDescription
+                                             'Data array',                           # accessibleText
                                              True)                                   # isCheckable
                 #isAddedToMenu = True
 
@@ -287,8 +293,8 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
                 item = self.add_item_to_tree(parentItem,                             # parent
                                              title,                                  # title
                                              self.icon_data,                         # icon
-                                             'data',                                 # description
-                                             'Data w/o shape',                       # text
+                                             'data',                                 # accessibleDescription
+                                             'Data w/o shape',                       # accessibleText
                                              True)                                   # isCheckable
                 #isAddedToMenu = True
 
@@ -350,8 +356,8 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
             item = self.add_item_to_tree(parentItem,                             # parent
                                          title,                                  # title
                                          self.icon_data,                         # icon
-                                         'data',                                 # description
-                                         ds_dtype.shape,                         # text
+                                         'data',                                 # accessibleDescription
+                                         ds_dtype.shape,                         # accessibleText
                                          True)                                   # isCheckable
         else :
             print offset + 'THIS IS A COMPOSIT OBJECT <--------------------'
@@ -363,8 +369,8 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
             item = self.add_item_to_tree(parentItem,                             # parent
                                          title,                                  # title
                                          self.icon_folder_closed,                # icon
-                                         'group',                                # description
-                                         ds_dtype.shape,                         # text
+                                         'group',                                # accessibleDescription
+                                         ds_dtype.shape,                         # accessibleText
                                          True)                                   # isCheckable
 
             for dtype_descr in ds_dtype.descr :        
@@ -428,6 +434,7 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
 #----------------------------------
 
     def get_str_ds_shape_dims(self,ds) :
+        """DEPRICATED - IS NOT USED"""
         str_ds_shape_dims = ''
         for shapeDim in ds.shape :
             if str_ds_shape_dims != '' : str_ds_shape_dims += ' '
@@ -443,22 +450,8 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
 
 #----------------------------------
 
-    def get_ds0_shaped(self,ds) :
-        if   len(ds.shape) == 0 : ds0 = None
-        elif len(ds.shape) == 1 : ds0 = ds[0]
-        elif len(ds.shape) == 2 : ds0 = ds[0][0]
-        elif len(ds.shape) == 3 : ds0 = ds[0][0][0]
-        elif len(ds.shape) == 4 : ds0 = ds[0][0][0][0]
-        elif len(ds.shape) == 5 : ds0 = ds[0][0][0][0][0]
-        elif len(ds.shape) == 6 : ds0 = ds[0][0][0][0][0][0]
-        elif len(ds.shape) == 7 : ds0 = ds[0][0][0][0][0][0][0]
-        elif len(ds.shape) == 8 : ds0 = ds[0][0][0][0][0][0][0][0]
-        elif len(ds.shape) == 9 : ds0 = ds[0][0][0][0][0][0][0][0][0]
-        return ds0
-
-#----------------------------------
-
     def get_ds0_shape(self,ds) :
+        """DEPRICATED - IS NOT USED"""
         if   len(ds.shape) == 0 : ds0_shape = None
         elif len(ds.shape) == 1 : ds0_shape = ds[0].shape
         elif len(ds.shape) == 2 : ds0_shape = ds[0][0].shape
@@ -470,6 +463,22 @@ class DataSetTreeViewModel (QtGui.QStandardItemModel) :
         elif len(ds.shape) == 8 : ds0_shape = ds[0][0][0][0][0][0][0][0].shape
         elif len(ds.shape) == 9 : ds0_shape = ds[0][0][0][0][0][0][0][0][0].shape
         return ds0_shape    
+
+#----------------------------------
+
+    def get_ds0_shaped(self,ds) :
+        """Returns the multidimensional array element with zero-indexes for sample print."""
+        if   len(ds.shape) == 0 : ds0 = None
+        elif len(ds.shape) == 1 : ds0 = ds[0]
+        elif len(ds.shape) == 2 : ds0 = ds[0][0]
+        elif len(ds.shape) == 3 : ds0 = ds[0][0][0]
+        elif len(ds.shape) == 4 : ds0 = ds[0][0][0][0]
+        elif len(ds.shape) == 5 : ds0 = ds[0][0][0][0][0]
+        elif len(ds.shape) == 6 : ds0 = ds[0][0][0][0][0][0]
+        elif len(ds.shape) == 7 : ds0 = ds[0][0][0][0][0][0][0]
+        elif len(ds.shape) == 8 : ds0 = ds[0][0][0][0][0][0][0][0]
+        elif len(ds.shape) == 9 : ds0 = ds[0][0][0][0][0][0][0][0][0]
+        return ds0
 
 #----------------------------------
 

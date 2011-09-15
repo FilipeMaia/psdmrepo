@@ -224,9 +224,11 @@ class GUIDataSetTree(QtGui.QWidget):
 
     def print_item_info(self, item):
         state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][item.checkState()]
-        print "text : '%s', is at state %s" % ( item.text(),  state)
-        print 'The dataset index titles:', self.model.get_index_titles_to_item(item)
-        print 'The dataset indexes     :', self.model.get_indexes_to_item(item)
+        print "'%s' item is at state %s" % ( item.text(),  state)
+        print '     accessibleText         :', item.accessibleText()
+        print '     accessibleDescription  :', item.accessibleDescription()
+        print '     index titles           :', self.model.get_index_titles_to_item(item)
+        print '     indexes subst. by zeros:', self.model.get_indexes_to_item(item)
 
         #print 'The dataset shape dims:', self.model.get_dataset_dims(item)
         #print ' isSelectable=',item.isSelectable(), 
