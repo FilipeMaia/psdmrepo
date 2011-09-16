@@ -181,9 +181,9 @@ try {
     /* If no specific run range is provided find out the one by probing all
      * known file types.
      */
+    $first_run = $experiment->find_first_run();
+    $last_run  = $experiment->find_last_run();
     if( is_null( $range_of_runs )) {
-        $first_run = $experiment->find_first_run();
-        $last_run  = $experiment->find_last_run();
         $range_of_runs = ( is_null($first_run) || is_null( $last_run )) ? '0-0' : $first_run->num().'-'.$last_run->num();
     }
 
@@ -191,15 +191,20 @@ try {
      * - a mapping from file names to the corresponding run numbers. This information will be shown in the GUI.
      * - a list fop all known files.
      */
+    $files_reported_by_iRODS = array();
     $file2run = array();
     $files    = array();
     foreach( $types as $type ) {
         $runs = null;
         FileMgrIrodsWs::runs( $runs, $instrument->name(), $experiment->name(), $type, $range_of_runs );
-        foreach( $runs as $run ) {
-            foreach( $run->files as $file ) $file2run[$file->name] = $run->run;
-            add_files( $files, $run->files, $type, $file2run, $checksum, $archived, $local );
-        }
+        if( !is_null( $runs ))
+	        foreach( $runs as $run ) {
+    	        foreach( $run->files as $file ) {
+    	        	$file2run[$file->name] = $run->run;
+    	        	$files_reported_by_iRODS[$file->name] = True;
+    	        }
+        	    add_files( $files, $run->files, $type, $file2run, $checksum, $archived, $local );
+        	}
     }
 
     /* Build a map in which run numbers will be keys and lists of the corresponding
@@ -214,6 +219,17 @@ try {
         array_push( $files_by_runs[$runnum], $file );
     }
 
+    /* Postprocess the above created array to missing gaps for runs
+     * with empty collections of files.
+     */
+    if( !( is_null( $first_run ) || is_null( $last_run ))) {
+	    for( $runnum = $first_run->num(); $runnum <= $last_run->num(); $runnum++ ) {
+    		if( !array_key_exists( $runnum, $files_by_runs )) {
+    			$files_by_runs[$runnum] = array();
+	    	}
+	    }
+    }
+    
     if( $json ) {
 
     	$success_encoded = json_encode("success");
@@ -230,8 +246,10 @@ try {
 HERE;
 		$total_size_gb = 0;
 		$first_run = true;
-    	foreach( array_keys( $files_by_runs ) as $runnum ) {
-    
+		$run_numbers = array_keys( $files_by_runs );
+		sort( $run_numbers, SORT_NUMERIC );
+    	foreach( $run_numbers as $runnum ) {
+
     		/* TODO: Speed this up by prefetching runs and then indexing
     		 *       in a dictionary.
     		 */
@@ -246,7 +264,7 @@ HERE;
 
 			$first_file = true;
             foreach( $files_by_runs[$runnum] as $file ) {
-       
+
             	$total_size_gb += $file['size'] / (1024.0 * 1024.0 * 1024.0);
 				if($first_file) $first_file = false;
 				else print ',';
@@ -266,6 +284,37 @@ HERE;
                	   	'checksum' => $file['checksum']
   				));
    	        }
+
+   	        /* Add XTC files which haven't been reported to iRODS because they have either
+   	         * never migrated from ONLINE or because theye have been permanently deleted.
+   	         */
+   	        if( in_array( 'xtc', $types )) {
+	    		foreach( $experiment->regdb_experiment()->files( $runnum ) as $file ) {
+
+	    			$name = sprintf("e%d-r%04d-s%02d-c%02d.xtc",
+									$experiment->id(),
+									$file->run(),
+									$file->stream(),
+									$file->chunk());
+
+					if( !array_key_exists( $name, $files_reported_by_iRODS )) {
+						if($first_file) $first_file = false;
+						else print ',';
+						print json_encode( array(
+							'runnum'          => $runnum,
+   							'name'            => '<span style="color:red;">'.$name.'</span>',
+   							'type'            => 'XTC',
+							'size_bytes'      => '0',
+    						'size'            => '<span style="color:red;">n/a</span>',
+   							'created'         => date( "Y-m-d H:i:s", $file->open_time()->sec ),
+							'created_seconds' => $file->open_time()->sec,
+	   						'archived'        => '<span style="color:red;">n/a</span>',
+		   					'local'           => '<span style="color:red;">never migrated from DAQ or deleted</span>',
+        	    	   	   	'checksum'        => ''
+  						));
+					}
+				}
+    		}
    	        print ' ] }';
         }
         $total_size_gb_str = json_encode( sprintf( "%.0f", $total_size_gb ));

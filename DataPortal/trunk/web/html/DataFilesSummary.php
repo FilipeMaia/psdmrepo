@@ -49,7 +49,12 @@ try {
 
     /* Get the stats for data files
      */
-    $num_runs = 0;
+    $first_run = $experiment->find_first_run();
+    $last_run  = $experiment->find_last_run();
+    $num_runs  = $experiment->num_runs();
+    $min_run   = is_null( $first_run ) ? 0 : $first_run->num();
+    $max_run   = is_null( $last_run ) ? 0 : $last_run->num();
+
     $xtc_size       = 0.0;
     $xtc_num_files  = 0;
     $xtc_archived   = 0;
@@ -61,11 +66,7 @@ try {
     $hdf5_local_copy = 0;
 
     $range = FileMgrIrodsWs::max_run_range( $experiment->instrument()->name(), $experiment->name(), array('xtc','hdf5'));
-
-    $num_runs = $range['total'];
-    $min_run  = $range['min'];
-    $max_run  = $range['max'];
-    $range_of_runs = $min_run.'-'.$max_run;
+    $range_of_runs = $range['min'].'-'.$range['max'];
 
     $runs2files = array();
 
@@ -86,7 +87,9 @@ try {
             if( $file->resource == 'lustre-resc' ) $xtc_local_copy++;
         }
     }
-    
+    $xtc_num_files_DAQ = ( is_null( $first_run ) || is_null( $last_run )) ? 0 : count( $experiment->regdb_experiment()->files());    
+    if( $xtc_num_files_DAQ > $xtc_num_files ) $xtc_num_files = $xtc_num_files_DAQ;
+
     $hdf5_runs = null;
     FileMgrIrodsWs::runs( $hdf5_runs, $experiment->instrument()->name(), $experiment->name(), 'hdf5', $range_of_runs );
     foreach( $hdf5_runs as $run ) {
@@ -120,7 +123,7 @@ try {
     	$xtc_num_files == 0 ?
     	'n/a' : (	$xtc_num_files == $xtc_local_copy ?
 			    	'100%' :
-    				'<span style="color:red;">'.sprintf("%2.0f",100.0*$xtc_local_copy/$xtc_num_files).'%</span> ( '.$xtc_local_copy.' / '.$xtc_num_files.' )' )
+    				'<span style="color:red;">'.sprintf("%2.0f", floor( 100.0*$xtc_local_copy/$xtc_num_files )).'%</span> ( '.$xtc_local_copy.' / '.$xtc_num_files.' )' )
    	);
     $hdf5_archived_html = json_encode(
     	$hdf5_num_files == 0 ?
@@ -132,7 +135,7 @@ try {
     	$hdf5_num_files == 0 ?
    		'n/a' : (	$hdf5_num_files == $hdf5_local_copy ?
    					'100%' :
-   					'<span style="color:red;">'.sprintf("%2.0f",100.0*$hdf5_local_copy/$hdf5_num_files).'%</span> ( '.$hdf5_local_copy.' / '.$hdf5_num_files.' )' )
+   					'<span style="color:red;">'.sprintf("%2.0f", floor( 100.0*$hdf5_local_copy/$hdf5_num_files )).'%</span> ( '.$hdf5_local_copy.' / '.$hdf5_num_files.' )' )
     );
 
     header( 'Content-type: application/json' );

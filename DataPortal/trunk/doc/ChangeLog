@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2011-09-16 Igor Gaponenko
+- implemented Data Migration Monitor
+
 Tag: V00-00-08
 2011-07-12 Igor Gaponenko
 - optimized implementation of the Portal to reduce the startup time
