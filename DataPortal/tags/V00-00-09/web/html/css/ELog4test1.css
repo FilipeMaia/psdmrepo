@@ -1,0 +1,271 @@
+@CHARSET "ISO-8859-1";
+
+/* -----------------------------------
+ * - Naming convention for shortcuts -
+ * -----------------------------------
+ *
+ *   el          elog
+ *   el-l        .....live
+ *   el-l-ms     ..........messages
+ *   el-l-m      ..........message
+ *   el-l-m-d    ....................messages groupped into a day
+ *   el-l-m-re   ....................message reply
+ *   el-l-m-re-s ....................submit message reply
+ *   el-l-m-re-c ....................cancel message reply
+ *   el-l-m-ed   ....................message editing
+ *   el-l-m-ed-s ....................submit message editing
+ *   el-l-m-ed-c ....................cancel message editing
+ *   el-l-m-mv   ....................message move
+ *   el-l-m-mv-s ....................submit message move
+ *   el-l-m-mv-c ....................cancel message move
+ *   el-l-c      ..........child of a message
+ *   el-l-rs     ..........runs
+ *   el-l-r      ..........run
+ *   el-p        .....post 
+ *
+ * Suffixes:
+ *
+ *   -auto    autorefresh
+ *   -con     container
+ *   -hdr     header
+ *   -dsc     description
+ *   -dlg     dialog
+ *   -dlgs    dialogs
+ *   -rdlg    'reply' dialog
+ *   -edlg    'edit' dialog
+ *   -mdlg    'move' dialog
+ *   -tgl     toggler
+ *   -hdn     hidden
+ *   -vis     visible
+ *   -info    information
+ *   -subj    subject
+ */
+
+#el-l-mctrl {
+  margin-bottom:20px;
+  width: inherit;
+}
+
+#el-l-auto {
+  border-bottom: 1px solid #c0c0c0;
+}
+
+#el-l-ms {
+	height: inherit;
+    width: inherit;
+}
+
+#el-l-ms-action {
+  color:maroon;
+}
+
+#el-l-ms-info {
+  margin-right:15px;
+  margin-bottom:10px;
+  color:maroon;
+}
+
+.el-l-m-d-tgl,
+.el-l-m-tgl,
+.el-l-c-tgl,
+.el-l-r-tgl,
+.el-l-a-tgl {
+  background-color:#ffffff;
+  border:1px solid #c0c0c0;
+}
+
+.el-l-m-d {
+  font-size:100%;
+  margin-left:10px;
+}
+
+.el-l-a-dsc {
+  font-weight:bold;
+  margin-left:10px;
+}
+
+.el-l-m-time {
+  margin-left:10px;
+  width: 60px;
+}
+
+.el-l-c-time {
+  margin-left:10px;
+  width: 140px;
+}
+
+.el-l-m-author,
+.el-l-c-author {
+  font-weight:bold;
+  margin-left:10px;
+  width:80px;
+}
+
+.el-l-m-subj,
+.el-l-c-subj {
+  margin-left:10px;
+}
+
+.el-l-a {
+  margin-right:10px;
+  margin-bottom:10px;
+  padding:5px;
+}
+
+div.el-l-a:hover {
+  background-color:#d0d0d0;
+  border-radius:5px;
+}
+
+.el-l-m-d-hdr {
+  padding:3px;
+  background-color:#b9dcf5;
+  border:1px solid #A6C9E2;
+  border-bottom:0px;
+  border-radius:5px;
+  border-bottom-left-radius:0px;
+  border-bottom-right-radius:0px;
+  cursor:pointer;
+}
+
+div.el-l-m-d-hdr:hover {
+  background-color:#A6C9E2;
+}
+
+.el-l-m-d-con {
+  padding:25px;
+  border:1px solid #A6C9E2;
+  border-top:0px;
+  border-bottom:0px;
+  border-radius:5px;
+  border-top-left-radius:0px;
+  border-top-right-radius:0px;
+}
+
+.el-l-m-hdr,
+.el-l-c-hdr {
+  padding:3px;
+  background-color:#e0e0e0;
+  border:1px solid #d0d0d0;
+  border-bottom:0px;
+  border-radius:5px;
+  border-bottom-left-radius:0px;
+  border-bottom-right-radius:0px;
+  cursor:pointer;
+}
+
+div.el-l-m-hdr:hover,
+div.el-l-c-hdr:hover {
+  background-color:#d0d0d0;
+}
+
+.el-l-r-hdr {
+  padding:3px;
+  background-color:#DEF0CD;
+  border:1px solid #B9DD97;
+  border-bottom:0px;
+  border-radius:5px;
+  border-bottom-left-radius:0px;
+  border-bottom-right-radius:0px;
+  cursor:pointer;
+}
+
+div.el-l-r-hdr:hover {
+  background-color:#B9DD97;
+}
+
+.el-l-m-con,
+.el-l-c-con {
+  padding:25px;
+  padding-top:5px;
+  border:1px solid #d0d0d0;
+  border-top:0px;
+  border-radius:5px;
+  border-top-left-radius:0px;
+  border-top-right-radius:0px;
+}
+
+.el-l-r-con {
+  padding:20px;
+  border:1px solid #B9DD97;
+  border-top:0px;
+  border-radius:5px;
+  border-top-left-radius:0px;
+  border-top-right-radius:0px;
+}
+
+.el-l-a-con {
+  margin-left:10px;
+  padding-top:5px;
+  padding-left:20px;
+}
+
+.el-l-m-body,
+.el-l-c-body {
+  padding-top:10px;
+  padding-bottom:10px;
+}
+
+.el-l-m-body pre {
+  margin: 0px;
+  padding-top: 5px;
+  padding-bottom: 10px;
+  overflow: auto;
+}
+
+.el-l-m-as {
+  padding:10px;
+  border-top:1px solid #c8c8c8;
+}
+
+.el-l-a-info {
+  margin-left:5px;
+}
+
+.el-l-m-tags {
+  padding:10px;
+  border-top:1px solid #c8c8c8;
+}
+
+.el-l-m-rdlg,
+.el-l-m-edlg,
+.el-l-m-mdlg {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 20px;
+  padding-bottom: 10px;
+  background-color: #e0e0e0;
+  border:1px solid #c0c0c0;
+  border-radius: 5px;
+}
+
+.el-l-m-highlight {
+  background-color:#ff6666;
+  color: #ffffff;
+}
+
+.el-l-m-d-hdn,
+.el-l-m-hdn,
+.el-l-c-hdn,
+.el-l-r-hdn,
+.el-l-a-hdn,
+.el-l-ctx-hdn,
+.el-l-m-dlg-hdn {
+  display: none;
+}
+
+.el-l-m-d-vis,
+.el-l-m-vis,
+.el-l-c-vis,
+.el-l-r-vis,
+.el-l-a-vis,
+.el-l-ctx-vis,
+.el-l-m-dlg-vis {
+  display: block;
+}
+
+<!--[if lte IE 10]>
+.el-l-ctx-vis {
+  display: none;
+}
+<![endif]--> 
