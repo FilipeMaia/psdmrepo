@@ -41,7 +41,7 @@ try {
 
 <script type="text/javascript" src="/jquery/js/jquery-1.5.1.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui-1.8.7.custom.min.js"></script>
-<script type="text/javascript" src="js/jquery.form.js"></script> 
+<script type="text/javascript" src="/jquery/js/jquery.form.js"></script> 
 
 <style type="text/css">
 

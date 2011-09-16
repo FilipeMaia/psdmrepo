@@ -15,43 +15,120 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 40px;
-    background-color: #a0a0a0;
+    height: 129px;
+    background-color: #e0e0e0;
+  }
+  #p-top-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 92px;
+    background-color: #ffffff;
+  }
+  #p-top-title {
+    width: 100%;
+    height: 61px;
+  }
+  #p-context-header {
+    width: 100%;
+    height: 36px;
+    background-color: #E0E0E0;
+    border-bottom: 1px solid #0b0b0b;
   }
   #p-left {
     position: absolute;
     left: 0;
-    top: 40px;
+    top: 130px;
     width: 200px;
-    background-color: #c0c0c0;
+    overflow: auto;
+  }
+  #p-splitter {
+    position: absolute;
+    left: 200px;
+    top: 130px;
+    width: 1px;
+    overflow: none;
+    cursor: e-resize;
+    border-left: 1px solid #a0a0a0;
+    border-right: 1px solid #a0a0a0;
   }
   #p-bottom {
+    z-index: 100;
     position: absolute;
     left: 0;
     bottom: 0;
     height: 20px;
     width: 100%;
-    background-color: #c0c0c0;
+    background-color: #a0a0a0;
+    border-top: 1px solid #c0c0c0;
+  }
+  #p-status {
+    padding: 2px;
+    font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+    font-size: 75%;
   }
   #p-center {
     position: relative;
-    top:40px;
-    margin: 0px 0px 20px 200px;
-    background-color: #f0f0f0;
+    top:130px;
+    margin: 0px 0px 20px 203px;
     overflow: auto;
+    background-color: #ffffff;
+    border-left: 1px solid #a0a0a0;
   }
-
 </style>
 
 <script type="text/javascript" src="/jquery/js/jquery-1.4.4.min.js"></script>
 <script type="text/javascript">
 
+
 function resize() {
-	$('#p-center').height($(window).height()-40-20);
+	$('#p-left').height($(window).height()-125-20);
+	$('#p-splitter').height($(window).height()-125-20);
+	$('#p-center').height($(window).height()-125-20);
+}
+
+/* Get mouse position relative to the document.
+ */
+function getMousePosition(e) {
+
+	var posx = 0;
+	var posy = 0;
+	if (!e) var e = window.event;
+	if (e.pageX || e.pageY) 	{
+		posx = e.pageX;
+		posy = e.pageY;
+	}
+	else if (e.clientX || e.clientY) 	{
+		posx = e.clientX + document.body.scrollLeft
+			+ document.documentElement.scrollLeft;
+		posy = e.clientY + document.body.scrollTop
+			+ document.documentElement.scrollTop;
+	}
+	return {'x': posx, 'y': posy };
+}
+
+function move_split(e) {
+	var pos = getMousePosition(e);
+	$('#p-left').css('width', pos['x']);
+	$('#p-splitter').css('left', pos['x']);
+	$('#p-center').css('margin-left', pos['x']+3);
 }
 
 $(function() {
+
 	resize();
+
+	var mouse_down = false;
+
+	$('#p-splitter').mousedown (function(e) { mouse_down = true; return false; });
+
+	$('#p-left'    ).mousemove(function(e) { if(mouse_down) move_split(e); });
+	$('#p-center'  ).mousemove(function(e) { if(mouse_down) move_split(e); });
+
+	$('#p-left'    ).mouseup   (function(e) { mouse_down = false; });
+	$('#p-splitter').mouseup   (function(e) { mouse_down = false; });
+	$('#p-center'  ).mouseup   (function(e) { mouse_down = false; });
 });
 
 </script>
@@ -59,10 +136,20 @@ $(function() {
 </head>
 <body onresize="resize()">
 
-  <div id="p-top">top</div>
-  <div id="p-left">left</div>
-  <div id="p-bottom">bottom</div>
-  <div id="p-center">
+<div id="p-top">top</div>
+
+<div id="p-left">left</div>
+
+<div id="p-splitter"></div>
+
+<div id="p-bottom">
+  <div id="p-status">
+    <center>- status bar to be here at some point -</center>
+  </div>
+</div>
+
+<div id="p-center">
+  <div id="application-workarea">
     <h2>On the Origin of The Origin</h2>
     <p>Darwin's father was dead set on his son becoming a cleric but even though the young rapscallion started to study theology he found worms much more interesting.</p>
     <p>When a lonely man with a moustache asked Darwin to ride with him on his boat named after a dog, Darwin agreed and set off around the world fiddling with wildlife.</p>
@@ -76,6 +163,8 @@ $(function() {
     <p>Darwin lived out his final days as a celebrity wrestler with a traveling circus.</p>
     <p>His body can now be found encased in granite in the food hall of London's Natural History Museum. Near the toilets.</p>
   </div>
+  <div id="popupdialogs" style="display:none;"></div>
+</div>
 
 </body>
 </html>

@@ -910,20 +910,22 @@ HERE;
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
 
 <link type="text/css" href="/jquery/css/custom-theme/jquery-ui-1.8.7.custom.css" rel="Stylesheet" />
+
 <link type="text/css" href="css/common.css" rel="Stylesheet" />
-<link type="text/css" href="css/ELog4test1_2.css" rel="Stylesheet" />
-<link type="text/css" href="css/Exper4test1_2.css" rel="Stylesheet" />
-<link type="text/css" href="css/Data4test1_2.css" rel="Stylesheet" />
-<link type="text/css" href="css/Hdf4test1_2.css" rel="Stylesheet" />
+<link type="text/css" href="css/ELog.css" rel="Stylesheet" />
+<link type="text/css" href="css/Exper.css" rel="Stylesheet" />
+<link type="text/css" href="css/Data.css" rel="Stylesheet" />
+<link type="text/css" href="css/Hdf.css" rel="Stylesheet" />
 
 <script type="text/javascript" src="/jquery/js/jquery-1.5.1.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui-1.8.7.custom.min.js"></script>
-<script type="text/javascript" src="js/jquery.form.js"></script> 
+<script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
+
 <script type="text/javascript" src="js/Utilities.js"></script>
-<script type="text/javascript" src="js/ELog2.js"></script>
-<script type="text/javascript" src="js/Exper4test1_2.js"></script>
-<script type="text/javascript" src="js/Data4test1_2.js"></script>
-<script type="text/javascript" src="js/Hdf4test1_2.js"></script>
+<script type="text/javascript" src="js/ELog.js"></script>
+<script type="text/javascript" src="js/Exper.js"></script>
+<script type="text/javascript" src="js/Data.js"></script>
+<script type="text/javascript" src="js/Hdf.js"></script>
 
 <!----------- Window layout styles and supppot actions ----------->
 
