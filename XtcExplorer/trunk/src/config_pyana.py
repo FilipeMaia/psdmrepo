@@ -92,10 +92,10 @@ class ImageModConfig( ModuleConfig ):
 class ScanModConfig( ModuleConfig ):
     """Class ScanModConfig
 
-    Place to store configuration information for a pyana_scan module
+    Place to store configuration information for a pyana_scan_beta module
     """
     def __init__(self, address = None):
-        ModuleConfig.__init__(self, "pyana_scan", address)
+        ModuleConfig.__init__(self, "pyana_scan_beta", address)
         self.options["controlpv"] = self.address
         self.options["input_epics"] = None
         self.options["input_scalars"] = None
@@ -184,30 +184,30 @@ class WaveformModConfig( ModuleConfig ):
     Place to store configuration information for a pyana_waveform module
     """
     def __init__(self, address = None):
-        ModuleConfig.__init__(self, "pyana_waveform", address)
+        ModuleConfig.__init__(self, "pyana_waveform_beta", address)
 
 class EncoderModConfig( ModuleConfig ):
     """Class EncoderModConfig
     """
     def __init__(self, address = None):
-        ModuleConfig.__init__(self,"pyana_encoder", address)
+        ModuleConfig.__init__(self,"pyana_encoder_beta", address)
 
 class EpicsModConfig( ModuleConfig ):
     """Class EpicsModConfig
     """
     def __init__(self, address = None):
-        ModuleConfig.__init__(self,"pyana_epics", address )
+        ModuleConfig.__init__(self,"pyana_epics_beta", address )
 
 
 class BldModConfig( ModuleConfig ):
     """Class BldModConfig
-    (singleton?)
     """
-    def __call__(self):
-        return self
+    # singleton? 
+    #def __call__(self):
+    #    return self
     
     def __init__(self, address = None):
-        ModuleConfig.__init__(self,"pyana_bld", address )
+        ModuleConfig.__init__(self,"pyana_bld_beta", address )
         self.label = self.name
 
         self.options["do_ebeam"] = "False"
@@ -294,7 +294,46 @@ class Configuration( object ):
                               'PhaseCavity':     BldModConfig,
                               
                               'NotImplementedYet' : ModuleConfig }
+
+        self.mod_name_lookup = { 'ControlPV'  : 'pyana_scan_beta',
+                                 'Epics'      : 'pyana_epics_beta',
+                                 
+                                 'Cspad'      : 'pyana_image_beta',
+                                 'Cspad2x2'   : 'pyana_image_beta',
+                                 'TM6740'     : 'pyana_image_beta', 
+                                 'Opal1000'   : 'pyana_image_beta', 
+                                 'Fccd'       : 'pyana_image_beta', 
+                                 'Princeton'  : 'pyana_image_beta',
+                                 'pnCCD'      : 'pyana_image_beta',
+                                 'YAG'        : 'pyana_image_beta', 
+                                 
+                                 'Acqiris'    : 'pyana_waveform_beta',
+                                 'ETof'       : 'pyana_waveform_beta',
+                                 'ITof'       : 'pyana_waveform_beta',
+                                 'Mbes'       : 'pyana_waveform_beta',
+                                 #'Camp'      : 'pyana_waveform_beta',
+                                 
+                                 'Ipimb'      : 'pyana_ipimb_beta',
+                                 'IPM'        : 'pyana_ipimb_beta',
+                                 'DIO'        : 'pyana_ipimb_beta',
+                                 
+                                 'Encoder'    : 'pyana_encoder_beta',
+                                 
+                                 'EBeam'      :     'pyana_bld_beta',
+                                 'FEEGasDetEnergy': 'pyana_bld_beta',
+                                 'PhaseCavity':     'pyana_bld_beta'
+                                 }
+
         
+        self.make_confmodule = { 'pyana_scan_beta'     : ScanModConfig,
+                                 'pyana_epics_beta'    : EpicsModConfig,
+                                 'pyana_image_beta'    : ImageModConfig,
+                                 'pyana_waveform_beta' : WaveformModConfig,
+                                 'pyana_ipimb_beta'    : IpimbModConfig,
+                                 'pyana_encoder_beta'  : EncoderModConfig,
+                                 'pyana_bld_beta'      : BldModConfig
+                                 }
+
         
     def add_to_scan(self,checkbox_label):
         if not self.scan:
@@ -313,39 +352,49 @@ class Configuration( object ):
         elif 'IPM' in checkbox_label: key = 'IPM'
         elif 'DIO' in checkbox_label: key = 'DIO'        
         return key
-        
+    
+    def get_mlabel(self, checkbox_label):
+        key = self.get_key(checkbox_label)
+        mname = self.mod_name_lookup[key]
+
+        mlabel = mname
+        if mname != 'pyana_bld_beta': # singleton
+            mlabel = "%s:%s"%(mname,checkbox_label)
+        return mlabel
 
     def add_module(self, checkbox_label):
         """Schedule a module to be run by pyana
         (add it to a dictionary with checkbox label as the key)
         """
-        key = self.get_key(checkbox_label)
-        print "key to module lookup" , key
+        mlabel = self.get_mlabel(checkbox_label)
+        mname = mlabel.split(':')[0]
 
-        module = self.make_modconf[key](checkbox_label)
-        print "module label ", module.label
-        self.modules[module.label] = module
+        module = None
+        if mlabel not in self.modules:
+            module = self.make_confmodule[mname](checkbox_label)
+            self.modules[mlabel] = module
+        else :
+            module = self.modules[mlabel]
+            
+        for m in self.modules:
+            print "   module: ", m, self.modules[m].label
         self.update_text()
 
         return module
         
     
     def remove_module(self, checkbox_label ) :
-        """Remove a module from the list of pyana modules
+        """Remove a module from the scheduled pyana modules
         """
-        key = self.get_key(checkbox_label)
-
-        print "Beore remove: \n"
-        print self.modules
-
-        if key in self.modules:
-            del self.modules[checkbox_label]
-
-        print "\nAfter remove\n"
-        print self.modules
-        print        
+        mlabel = self.get_mlabel(checkbox_label)
+        deleted = None
+        if mlabel in self.modules:
+            deleted = self.modules[mlabel]
+            del self.modules[mlabel]
         self.update_text()
-        
+        return deleted # this shouldn't work, should it??
+
+
     def update_text(self):
         """configuration text for pyana.cfg file
         """

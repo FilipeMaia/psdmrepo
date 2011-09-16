@@ -256,10 +256,10 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # configuration object for pyana job
         self.pyana_cfg = cfg.Configuration()
 
-        self.config_tab = { 'pyana_image_beta' : self.image_tab,
-                            'pyana_scan'       : self.scan_tab,
-                            'pyana_ipimb_beta' : self.ipimb_tab,
-                            'pyana_bld'        : self.bld_tab
+        self.config_tab = { 'pyana_image_beta'  : self.image_tab,
+                            'pyana_scan_beta'   : self.scan_tab,
+                            'pyana_ipimb_beta'  : self.ipimb_tab,
+                            'pyana_bld_beta'    : self.bld_tab
                             }
         # ------- SELECTION / CONFIGURATION ------
         self.checklabels = None
@@ -329,6 +329,7 @@ Start with selecting data of interest to you from list on the left and general r
         # to the right:
         self.cfg_tabs_tally = {}
         self.cfg_tabs = QtGui.QTabWidget()
+        self.cfg_tabs.tabsClosable()
         self.cfg_tabs.setMinimumWidth(600)
 
         self.general_tab()
@@ -339,33 +340,6 @@ Start with selecting data of interest to you from list on the left and general r
         self.layout.addLayout(h0)
         self.layout.addLayout(h1)
 
-    def general_tab(self):
-
-        general_widget = panels.JobConfigGui( self.pyana_cfg )
-        self.connect( general_widget.apply_button,
-                      QtCore.SIGNAL('clicked()'), self.update_pyana_tab )
-        
-        num = self.cfg_tabs.addTab(general_widget,"General Settings")
-        self.cfg_tabs_tally["General Settings"] = num
-        #print "general tab tally: ",self.cfg_tabs_tally
-
-    def bld_tab(self, mod):
-
-        if "BldInfo" in self.cfg_tabs_tally:
-            index = self.cfg_tabs_tally["BldInfo"]
-            self.cfg_tabs.setCurrentIndex(index)
-            return
-
-        bld_widget = panels.BldConfigGui()
-        self.connect( bld_widget.apply_button,
-                      QtCore.SIGNAL('clicked()'), self.update_pyana_tab )
-
-        num = self.cfg_tabs.addTab(bld_widget,"BldInfo")
-        self.cfg_tabs_tally["BldInfo"] = num
-        #print "general tab tally: ",self.cfg_tabs_tally
-        self.cfg_tabs.setCurrentWidget(bld_widget)
-
-                
     def setup_gui_checkboxes(self) :
         """Draw a group of checkboxes to the GUI
 
@@ -415,8 +389,52 @@ Start with selecting data of interest to you from list on the left and general r
         for checkbox in self.checkboxes :
             self.detector_box_layout.addWidget(checkbox)
             
+    def general_tab(self):
+        tabname = "General Settings"
+        if tabname in self.cfg_tabs_tally:
+            index = self.cfg_tabs_tally[ tabname ]
+            self.cfg_tabs.setCurrentIndex(index)
+            return
+
+        general_widget = panels.JobConfigGui( self.pyana_cfg )
+        self.connect( general_widget.apply_button,
+                      QtCore.SIGNAL('clicked()'), self.update_pyana_tab )
+        
+        num = self.cfg_tabs.addTab(general_widget,tabname)
+        self.cfg_tabs_tally[tabname] = num
+        #print "general tab tally: ",self.cfg_tabs_tally
+
+    def bld_tab(self, mod, remove=False):
+        tabname = "BldInfo"
+        if tabname in self.cfg_tabs_tally:
+            index = self.cfg_tabs_tally[ tabname ]
+            self.cfg_tabs.setCurrentIndex(index)
+            if remove:
+                self.cfg_tabs.removeTab(index)
+                del self.cfg_tabs_tally[tabname]
+            return
+
+        bld_widget = panels.BldConfigGui()
+        self.connect( bld_widget.apply_button,
+                      QtCore.SIGNAL('clicked()'), self.update_pyana_tab )
+
+        num = self.cfg_tabs.addTab(bld_widget,tabname)
+        self.cfg_tabs_tally[tabname] = num
+        #print "general tab tally: ",self.cfg_tabs_tally
+        self.cfg_tabs.setCurrentWidget(bld_widget)
+
+                
     
-    def image_tab(self, mod):
+    def image_tab(self, mod, remove=False):
+        tabname = "%s"%mod.address
+        if tabname in self.cfg_tabs_tally:
+            index = self.cfg_tabs_tally[ tabname ]
+            self.cfg_tabs.setCurrentIndex(index)
+            if remove:
+                self.cfg_tabs.removeTab(index)
+                del self.cfg_tabs_tally[tabname]
+            return
+
         image_widget = QtGui.QWidget()
         page_layout = QtGui.QVBoxLayout(image_widget)
 
@@ -502,7 +520,16 @@ Start with selecting data of interest to you from list on the left and general r
         self.cfg_tabs.setCurrentWidget(image_widget)
         return 
             
-    def ipimb_tab(self, mod):
+    def ipimb_tab(self, mod, remove=False):
+        tabname = "%s"%mod.address
+        if tabname in self.cfg_tabs_tally:
+            index = self.cfg_tabs_tally[ tabname ]
+            self.cfg_tabs.setCurrentIndex(index)
+            if remove:
+                self.cfg_tabs.removeTab(index)
+                del self.cfg_tabs_tally[tabname]
+            return
+
         ipimb_widget = QtGui.QWidget()
         page_layout = QtGui.QVBoxLayout(ipimb_widget)
 
@@ -596,9 +623,8 @@ Start with selecting data of interest to you from list on the left and general r
         # -------------------------------------------
 
 
-        
-        num = self.cfg_tabs.addTab(ipimb_widget,"%s"%mod.address)
-        self.cfg_tabs_tally["%s"%mod.address] = num
+        num = self.cfg_tabs.addTab(ipimb_widget,tabname)
+        self.cfg_tabs_tally[tabname] = num
         #print "tabs tally: ", self.cfg_tabs_tally
         self.cfg_tabs.setCurrentWidget(ipimb_widget)
         return 
@@ -608,9 +634,18 @@ Start with selecting data of interest to you from list on the left and general r
         
 
 
-    def scan_tab(self, who):
+    def scan_tab(self, who, remove=False):
         """ Second tab: Scan
         """
+        tabname = "Scan"
+        if tabname in self.cfg_tabs_tally:
+            index = self.cfg_tabs_tally[ tabname ]
+            self.cfg_tabs.setCurrentIndex(index)
+            if remove:
+                self.cfg_tabs.removeTab(index)
+                del self.cfg_tabs_tally[tabname]
+            return
+
         if self.scan_widget is None :
             self.scan_widget = QtGui.QWidget()
             self.scan_layout = QtGui.QVBoxLayout(self.scan_widget)
@@ -620,8 +655,9 @@ Start with selecting data of interest to you from list on the left and general r
 
             self.scan_layout.addWidget(message)
 
-            num = self.cfg_tabs.addTab(self.scan_widget,"Scan Configuration")
-            self.cfg_tabs_tally["Scan Configuration"] = num
+            
+            num = self.cfg_tabs.addTab(self.scan_widget,tabname)
+            self.cfg_tabs_tally[tabname] = num
             #print "tabs tally: ", self.cfg_tabs_tally
 
 
@@ -632,6 +668,7 @@ Start with selecting data of interest to you from list on the left and general r
     def pyana_tab(self):
         """Pyana configuration text
         """
+        tabname = "Pyana Configuration"
         pyana_widget = QtGui.QWidget()
         pyana_layout = QtGui.QVBoxLayout(pyana_widget)
         pyana_widget.setLayout(pyana_layout)
@@ -657,8 +694,8 @@ Start with selecting data of interest to you from list on the left and general r
         self.econfig_button.hide()
         pyana_layout.addLayout(pyana_button_layout)
 
-        num = self.cfg_tabs.addTab(pyana_widget,"Pyana Configuration")
-        self.cfg_tabs_tally["Pyana Configuration"] = num
+        num = self.cfg_tabs.addTab(pyana_widget,tabname)
+        self.cfg_tabs_tally[tabname] = num
         #print "tabs tally: ", self.cfg_tabs_tally
 
         self.cfg_tabs.tabBar().show()
@@ -789,16 +826,15 @@ Start with selecting data of interest to you from list on the left and general r
             self.update_pyana_tab()
         
             # 2) Open tab to configure plots
-            self.config_tab[module.name](module)
-            
+            self.config_tab[module.name](module)            
         else :
             # 1) Remove module from module list
-            self.pyana_cfg.remove_module( checkbox_label )
-            # 2) Close tab for configuring plots
-            #self.cfg_tabs.removeTab( self.cfg_tabs_tally[checkbox_label] )
-            self.cfg_tabs.removeTab( self.cfg_tabs_tally[checkbox_label] )
+            module = self.pyana_cfg.remove_module( checkbox_label )
             self.update_pyana_tab()
 
+            # 2) Close tab for configuring plots
+            self.config_tab[module.name](module,remove=True)
+            
 
     def add_to_scan(self,box,modules_to_run,options_for_mod) :
   
