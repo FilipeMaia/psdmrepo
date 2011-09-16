@@ -1,17 +1,17 @@
-class ConfigModule( object ):
+class ModuleConfig( object ):
     """Place to store configuration of a given pyana module.
     """
-    def __init__(self, name, address = None, jobconf = None):
+    def __init__(self, name, address = None):
         self.name = name
         self.address = address
 
         self.label = "%s" % (name)
         if address is not None: 
             self.label = "%s:%s" % (name,address)
-
+            
         self.options = {}
         self.options["source"] = self.address
-
+            
     def dump(self, indent = ""):
         print "%sName:    %s"%(indent, self.name)
         print "%sAddress: %s"%(indent, self.address)
@@ -34,13 +34,13 @@ class ConfigModule( object ):
             
         return text
 
-class ConfigImageMod( ConfigModule ):
-    """Class ConfigImageMod
+class ImageModConfig( ModuleConfig ):
+    """Class ImageModConfig
 
     Place to store configuration information for a pyana_image module
     """ 
-    def __init__(self, address = None, jobconf = None):
-        ConfigModule.__init__(self, "pyana_image_beta", address, jobconf )
+    def __init__(self, address = None):
+        ModuleConfig.__init__(self, "pyana_image_beta", address )
         # list of quantities to plot:
         self.quantities = []
         
@@ -89,25 +89,25 @@ class ConfigImageMod( ConfigModule ):
         self.set_opt_quantities("projR",value)
 
 
-class ConfigScanMod( ConfigModule ):
-    """Class ConfigScanMod
+class ScanModConfig( ModuleConfig ):
+    """Class ScanModConfig
 
     Place to store configuration information for a pyana_scan module
     """
-    def __init__(self, address = None, jobconf = None ):
-        ConfigModule.__init__(self, "pyana_scan", address, jobconf )
+    def __init__(self, address = None):
+        ModuleConfig.__init__(self, "pyana_scan", address)
         self.options["controlpv"] = self.address
         self.options["input_epics"] = None
         self.options["input_scalars"] = None
 
 
-class ConfigIpimbMod( ConfigModule ):
-    """Class ConfigIpimbMod
+class IpimbModConfig( ModuleConfig ):
+    """Class IpimbModConfig
 
     Place to store configuration information for a pyana_ipimb module
     """
-    def __init__(self, address = None, jobconf = None):
-        ConfigModule.__init__(self, "pyana_ipimb_beta", address, jobconf )
+    def __init__(self, address = None):
+        ModuleConfig.__init__(self, "pyana_ipimb_beta", address )
         self.options["quantities"] = "fex:pos fex:sum fex:channels"
         self.quantities = []
 
@@ -178,57 +178,61 @@ class ConfigIpimbMod( ConfigModule ):
         self.set_opt_quantities("fex:posy",value)
 
 
-class ConfigWaveformMod( ConfigModule ):
-    """Class ConfigWaveformMod
+class WaveformModConfig( ModuleConfig ):
+    """Class WaveformModConfig
 
     Place to store configuration information for a pyana_waveform module
     """
-    def __init__(self, address = None, jobconf = None):
-        ConfigModule.__init__(self, "pyana_waveform", address, jobconf )
+    def __init__(self, address = None):
+        ModuleConfig.__init__(self, "pyana_waveform", address)
 
-class ConfigEncoderMod( ConfigModule ):
-    """Class ConfigEncoderMod
+class EncoderModConfig( ModuleConfig ):
+    """Class EncoderModConfig
     """
-    def __init__(self, address = None, jobconf = None):
-        ConfigModule.__init__(self,"pyana_encoder", address, jobconf )
+    def __init__(self, address = None):
+        ModuleConfig.__init__(self,"pyana_encoder", address)
 
-class ConfigEpicsMod( ConfigModule ):
-    """Class ConfigEpicsMod
+class EpicsModConfig( ModuleConfig ):
+    """Class EpicsModConfig
     """
-    def __init__(self, address = None, jobconf = None ):
-        ConfigModule.__init__(self,"pyana_epics", address, jobconf )
+    def __init__(self, address = None):
+        ModuleConfig.__init__(self,"pyana_epics", address )
 
 
-class ConfigBldMod( ConfigModule ):
-    """Class ConfigBldMod
+class BldModConfig( ModuleConfig ):
+    """Class BldModConfig
     (singleton?)
     """
     def __call__(self):
         return self
     
-    def __init__(self, address = None, jobconf = None):
-        ConfigModule.__init__(self,"pyana_bld", address, jobconf )
+    def __init__(self, address = None):
+        ModuleConfig.__init__(self,"pyana_bld", address )
         self.label = self.name
 
         self.options["do_ebeam"] = "False"
         self.options["do_gasdetector"] = "False"
         self.options["do_phasecavity"] = "False"
 
-class ConfigPlotterMod( ConfigModule ):
-    def __init__(self, address = None, jobconf = None ):
-        ConfigModule.__init__(self,"pyana_plotter", address, jobconf)
-
+class PlotterModConfig( ModuleConfig ):
+    def __init__(self, address = None):
+        ModuleConfig.__init__(self,"pyana_plotter_beta", address)
         del self.options["source"]
-        if jobconf: 
-            self.options["display_mode"] = jobconf.displaymode
-            self.options["ipython"] = jobconf.ipython
-            if jobconf.plot_n is not None : 
-                self.options["plot_every_n"] = jobconf.plot_n
-            if jobconf.accum_n is not None :
-                self.options["accumulate_n"] = jobconf.accum_n
+
+        self.plot_n = "100"
+        self.accum_n = None
+        self.displaymode = None
+        self.ipython = None
+
+        self.options["display_mode"] = self.displaymode
+        self.options["ipython"] = self.ipython
+        if self.plot_n is not None : 
+            self.options["plot_every_n"] = self.plot_n
+        if self.accum_n is not None :
+            self.options["accumulate_n"] = self.accum_n
 
         
-class ConfigJob( object ):
+class JobConfig( object ):
     """Place to store pyana configuration
     """
     def __init__(self) :
@@ -236,12 +240,7 @@ class ConfigJob( object ):
         # assume all events        
         self.run_n = None
         self.skip_n = None
-        self.plot_n = "100"
-        self.accum_n = None
         self.num_cpu = None
-
-        self.displaymode = None
-        self.ipython = None
         
 
 class Configuration( object ):
@@ -253,7 +252,8 @@ class Configuration( object ):
         @param file   name of pyana.cfg configuration file
         """
         
-        self.jobconfig = ConfigJob()
+        self.jobconfig = JobConfig()
+        self.plotconfig = PlotterModConfig()
         self.file = file
         self.config_text = None
 
@@ -261,36 +261,39 @@ class Configuration( object ):
         self.modules = {}
         self.scan = False
 
-
-        self.confmod_lookup = { 'DeviceName' : ConfigModule,
-                                'ControlPV'  : ConfigScanMod,
-                                'EpicsPV'    : ConfigEpicsMod,
-                                
-                                'Cspad'      : ConfigImageMod,
-                                'TM6740'     : ConfigImageMod, 
-                                'Opal1000'   : ConfigImageMod, 
-                                'Fccd'       : ConfigImageMod, 
-                                'Princeton'  : ConfigImageMod,
-                                'pnCCD'      : ConfigImageMod,
-                                'YAG'        : ConfigImageMod, 
-                                
-                                'Acq'        : ConfigWaveformMod,
-                                'ETof'       : ConfigWaveformMod,
-                                'ITof'       : ConfigWaveformMod,
-                                'Mbes'       : ConfigWaveformMod,
-                                #'Camp'      : ConfigWaveformMod,
-                                
-                                'Ipimb'      : ConfigIpimbMod,
-                                'IPM'        : ConfigIpimbMod,
-                                'DIO'        : ConfigIpimbMod,
-
-                                'Encoder'    : ConfigEncoderMod,
-                                
-                                'EBeam'      :     ConfigBldMod,
-                                'FEEGasDetEnergy': ConfigBldMod,
-                                'PhaseCavity':     ConfigBldMod,
-                                
-                                'NotImplementedYet' : ConfigModule }
+        # make a module configuration object, based on key
+        # returns a module configuratio object with a unique label
+        # (except if singleton, like BldInfo data, return the existing instance)
+        self.make_modconf = { 'DeviceName' : ModuleConfig,
+                              'ControlPV'  : ScanModConfig,
+                              'EpicsPV'    : EpicsModConfig,
+                              
+                              'Cspad'      : ImageModConfig,
+                              'Cspad2x2'   : ImageModConfig,
+                              'TM6740'     : ImageModConfig, 
+                              'Opal1000'   : ImageModConfig, 
+                              'Fccd'       : ImageModConfig, 
+                              'Princeton'  : ImageModConfig,
+                              'pnCCD'      : ImageModConfig,
+                              'YAG'        : ImageModConfig, 
+                              
+                              'Acq'        : WaveformModConfig,
+                              'ETof'       : WaveformModConfig,
+                              'ITof'       : WaveformModConfig,
+                              'Mbes'       : WaveformModConfig,
+                              #'Camp'      : WaveformModConfig,
+                              
+                              'Ipimb'      : IpimbModConfig,
+                              'IPM'        : IpimbModConfig,
+                              'DIO'        : IpimbModConfig,
+                              
+                              'Encoder'    : EncoderModConfig,
+                              
+                              'EBeam'      :     BldModConfig,
+                              'FEEGasDetEnergy': BldModConfig,
+                              'PhaseCavity':     BldModConfig,
+                              
+                              'NotImplementedYet' : ModuleConfig }
         
         
     def add_to_scan(self,checkbox_label):
@@ -299,11 +302,7 @@ class Configuration( object ):
         
         self.update_text()
 
-
-    def add_module(self, checkbox_label):
-        """Add a module to list of pyana modules to run
-        based on the checkbox label
-        """
+    def get_key(self, checkbox_label):
         key = checkbox_label
         if '|' in checkbox_label :
             keys = checkbox_label.split('|')
@@ -313,9 +312,18 @@ class Configuration( object ):
 
         elif 'IPM' in checkbox_label: key = 'IPM'
         elif 'DIO' in checkbox_label: key = 'DIO'        
+        return key
+        
 
-        module = self.confmod_lookup[key](checkbox_label,self.jobconfig)
+    def add_module(self, checkbox_label):
+        """Schedule a module to be run by pyana
+        (add it to a dictionary with checkbox label as the key)
+        """
+        key = self.get_key(checkbox_label)
+        print "key to module lookup" , key
 
+        module = self.make_modconf[key](checkbox_label)
+        print "module label ", module.label
         self.modules[module.label] = module
         self.update_text()
 
@@ -325,9 +333,17 @@ class Configuration( object ):
     def remove_module(self, checkbox_label ) :
         """Remove a module from the list of pyana modules
         """
-        if checkbox_label in self.modules:
+        key = self.get_key(checkbox_label)
+
+        print "Beore remove: \n"
+        print self.modules
+
+        if key in self.modules:
             del self.modules[checkbox_label]
 
+        print "\nAfter remove\n"
+        print self.modules
+        print        
         self.update_text()
         
     def update_text(self):
@@ -344,7 +360,7 @@ class Configuration( object ):
             self.config_text += " "
             self.config_text += "XtcExplorer.%s "%(label)
             config_module_list.append( module.config_snippet() )
-        self.config_text += "XtcExplorer.pyana_plotter "
+        self.config_text += "XtcExplorer.pyana_plotter_beta "
 
         if self.jobconfig.run_n is not None: 
             self.config_text += "\nnum-events = %s"%self.jobconfig.run_n
@@ -361,7 +377,7 @@ class Configuration( object ):
         for snippet in config_module_list:
             self.config_text += "\n"
             self.config_text += snippet
-        self.config_text += "\n%s"%(ConfigPlotterMod(jobconf=self.jobconfig).config_snippet())
+        self.config_text += "\n%s"%(self.plotconfig.config_snippet())
         
 
         # add linebreaks if needed

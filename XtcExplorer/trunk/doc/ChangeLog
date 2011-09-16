@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Sep-16 ofte                rev 2401
+	- pyana_image_beta and pyana_plotter_beta added
+	- minor changes to new GUI
+	
 2011-Sep-15 ofte                 rev 2400
 	- pyana_cspad.py: small improvements / crash fixes. 
 	- utilities.py: Simplification of Data containers
@@ -25,8 +29,7 @@ reverse time order.
 	  A       XtcExplorer/src/gui_explorer_main.py
 	  A       XtcExplorer/src/gui_config_panels.py
 	  A       XtcExplorer/src/gui_pyana_control.py
-	  A       XtcExplorer/src/pyana_ipimb_beta.py
-	
+	  A       XtcExplorer/src/pyana_ipimb_beta.py	
 
 2011-Sep-13 ofte                   rev 2384
 	- bugfix in pyana_cspad.py

@@ -194,6 +194,11 @@ class CsPad( object ):
         h1 = np.hstack( (quad_images[0], quad_images[1]) )
         h2 = np.hstack( (quad_images[3], quad_images[2]) )
         cspad_image = np.vstack( (h1, h2) )
+
+        # mask out hot/saturated pixels (16383)
+        im_hot_masked = np.ma.masked_greater_equal( cspad_image,16383 )
+        cspad_image = np.ma.filled( im_hot_masked, 0)
+
         return cspad_image
     
 #        cspad_image = np.zeros((2*self.npix_quad, 2*self.npix_quad ), dtype="uint16")

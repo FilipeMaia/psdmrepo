@@ -57,7 +57,23 @@ class PyanaOptions( object ):
         # all other cases:
         return options
 
-
+    def getOptStringsDict(self, options_string) :
+        """Return a dictionary of strings
+        """
+        if options_string is None:
+            return {}
+        
+        mylist = self.getOptStrings(options_string)
+        mydict = {}
+        for entry in mylist:
+            items = entry.split(":")
+            if len(items) > 1 :
+                mydict[items[0]] = items[1].strip('([])').split(',')
+            else:
+                mydict[items[0]] = None
+                
+        return mydict
+           
     def getOptIntegers(self, options_string):
         """Return a list of integers
         """
