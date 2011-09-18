@@ -550,6 +550,11 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
   m_transition = dgram.seq.service();
   Pds::ClockTime clock = dgram.seq.clock();
   LusiTime::Time t(clock.seconds(), clock.nanoseconds());
+  
+  // store current event time
+  m_eventTime = H5DataTypes::XtcClockTime(clock) ;
+  
+
   bool skip = false;
   switch ( m_transition ) {
 
@@ -637,9 +642,6 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
 
     case Pds::TransitionId::L1Accept :
 
-      // store current event time
-      m_eventTime = H5DataTypes::XtcClockTime(clock) ;
-      
       // check the time, should not be sooner than begin of calib cycle
       if ( t < m_transClock[Pds::TransitionId::BeginCalibCycle] ) {
         MsgLog( logger, warning, "O2OHdf5Writer::eventStart: L1Accept time out of sync: "
