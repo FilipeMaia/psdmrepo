@@ -60,6 +60,7 @@ class  pyana_cspad ( object ) :
                    threshold = None,
                    plot_every_n = None,
                    accumulate_n = "0",
+                   max_save = "100",
                    fignum = "1" ):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
@@ -74,6 +75,7 @@ class  pyana_cspad ( object ) :
         @param threshold        threshold intensity and threshold area (xlow:xhigh,ylow:yhigh)
         @param plot_every_n     int, Draw plot for every N event? (if None or 0, don't plot till end) 
         @param accumulate_n     Accumulate all (0) or reset the array every n shots
+        @param max_save         Maximum single-shot images to save
         @param fignum           int, Matplotlib figure number
         """
 
@@ -85,6 +87,8 @@ class  pyana_cspad ( object ) :
 
         self.plot_every_n = opt.getOptInteger(plot_every_n)
         self.accumulate_n = opt.getOptInteger(accumulate_n)
+
+        self.max_save = opt.getOptInteger(max_save)
         self.mpl_num = opt.getOptInteger(fignum)
 
         self.darkfile = opt.getOptString(dark_img_file)
@@ -152,6 +156,7 @@ class  pyana_cspad ( object ) :
         self.accu_start = 0
         self.n_good = 0
         self.n_dark = 0
+        self.n_saved = 0
 
         # accumulate image data 
         self.sum_good_images = None
@@ -376,7 +381,7 @@ class  pyana_cspad ( object ) :
 
             # save this shot image (numpy array)
             # binary file .npy format
-            if self.out_shot_file is not None :
+            if (self.out_shot_file is not None) and (self.n_saved < self.max_save):
                 filename = self.out_shot_file
                 if ".npy" not in filename :
                     filename += ".npy"
@@ -386,7 +391,8 @@ class  pyana_cspad ( object ) :
 
                 print "Saving this shot to file ", filename
                 np.save(filename, cspad_image)
-
+                self.n_saved += 1
+                
 
             
     # after last event has been processed. 

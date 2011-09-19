@@ -56,6 +56,7 @@ class  pyana_image ( object ) :
                    n_hdf5 = None ,
                    plot_every_n = None,
                    accumulate_n = None,
+                   max_save = "100",
                    fignum = "1" ):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
@@ -72,10 +73,12 @@ class  pyana_image ( object ) :
         @param image_nicknames  (list) nicknames for plot titles
         @param output_file      filename (If collecting: write to this file)
         @param n_hdf5           if output file is hdf5, combine n events in each output file. 
+        @param max_save         Maximum single-shot images to save
         """
 
         opt = PyanaOptions() # convert option string to appropriate type
         self.plot_every_n  =  opt.getOptInteger(plot_every_n)
+        self.max_save = opt.getOptInteger(max_save)
         self.mpl_num = opt.getOptInteger(fignum)
 
         self.sources = opt.getOptStrings(sources)
@@ -177,6 +180,7 @@ class  pyana_image ( object ) :
 
         # to keep track
         self.n_shots = None
+        self.n_saved = 0
 
         # averages
         self.sum_good_images = {}
@@ -391,8 +395,8 @@ class  pyana_image ( object ) :
         
         # save the average data image (numpy array)
         # binary file .npy format
-        if self.output_file is not None :
-
+        if (self.output_file is not None) and (self.n_saved < self.max_save) : 
+            self.n_saved += 1
             for ad, im in event_display_images :
 
                 fname = self.output_file.split('.')
@@ -417,7 +421,7 @@ class  pyana_image ( object ) :
                     print "Output file does not have the expected file extension: ", fname[-1]
                     print "Expected hdf5, txt or npy. Please correct."
                     print "I'm not saving this event... "
-        
+    
 
     # after last event has been processed. 
     def endjob( self, evt, env ) :
