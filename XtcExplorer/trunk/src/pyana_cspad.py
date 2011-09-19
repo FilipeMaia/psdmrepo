@@ -192,7 +192,7 @@ class  pyana_cspad ( object ) :
             return
                 
         quads = range(4)
-        sections = str(map(config.sections, quads))
+        sections = map(config.sections, quads)
         self.cspad = CsPad(sections)
         self.data = CsPadData(self.img_source)
 

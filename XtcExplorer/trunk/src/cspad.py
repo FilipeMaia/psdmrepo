@@ -178,17 +178,14 @@ class CsPad( object ):
         """
         quad_images = np.zeros((4, self.npix_quad, self.npix_quad ), dtype="uint16")
 
-        pixel_array = np.zeros( (4,8,185,388), dtype="uint16")
-
         for e in elements: 
             data = e.data()
             quad = e.quad()
-
-            pixel_array[quad] = e.data()
-
-            quad_images[quad] = self.CsPadElement( data, quad)
             
-        self.pixels = pixel_array.reshape(5920,388)
+            quad_images[quad] = self.CsPadElement( data, quad )
+
+        #pixel_array = np.zeros( (4,8,185,388), dtype="uint16)")
+        #self.pixels = pixel_array.reshape(5920,388)
 
         # need to do this a better way:
         h1 = np.hstack( (quad_images[0], quad_images[1]) )
