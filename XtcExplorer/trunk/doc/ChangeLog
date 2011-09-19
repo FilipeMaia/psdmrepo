@@ -11,8 +11,12 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Sep-19 ofte                rev 2411
+        - included gaps and margins for full Cspad detector view. Now uses 
+	  all the same calibration files as psana uses (potentially at least)
+
 2011-Sep-19 ofte                rev 2410
-        - removed pixel save from cspad to "solve" a problem
+        - removed pixel save from cspad to "solve" a problem	
 
 2011-Sep-19 ofte                rev 2409
 	- save max 100 (parameter) single-shot events (cspad and image (old))

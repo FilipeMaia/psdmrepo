@@ -97,7 +97,24 @@ for psana.
    - offset_corr . Mikhail's fine tuning
    
    - marg_gap_shift (margin gaps and shifts. Movements due to motors)
-     4x3 array, quads and x,y,z coordinates
+     4x3 array:
+     The 3 rows signify x, y and z 
+     The 4 columns signify: 
+	1) section padding (in pixels) in the quad, 
+ 	2) quad padding (in pixels) in the full detector, 
+	3) global gap between the quads, 
+	4) shift of each quad w.r.t. "nominal" position in the detector. 
+
+	Quad coordinates in the detector:
+	off    = 40
+	gapX   = 0
+	gapY   = 0
+	shiftX = 38
+	shiftY = 38
+	offsetX = [ off+0-gapX+shiftX,  off+  0+0-gapX-shiftX,  off+834-2+gapX-shiftX,  off+834+0+gapX+shiftX]
+	offsetY = [ off+3-gapY-shiftY,  off+834-1+gapY-shiftY,  off+834-5+gapY+shiftY,  off+  0+2-gapY+shiftY]
+	# the four numbers represent the four quads, 0,1,2,3. 
+	
 
    - quad_rotation (of each quad)
      4x1 array:

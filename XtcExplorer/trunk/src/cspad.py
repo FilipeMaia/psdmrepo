@@ -45,9 +45,6 @@ class CsPad( object ):
 
     def read_geometry(self):
 
-        print self.xpos_sec2x1
-        print self.ypos_sec2x1
-
 #        # read in rotation array:
 #        # 90-degree angle orientation of each section in each quadrant. 
 #        self.rotation_array =  np.loadtxt('XtcExplorer/calib/CSPad/rotation.par')
@@ -55,7 +52,8 @@ class CsPad( object ):
 
         # read in tilt array
         self.tilt_array =  np.loadtxt('XtcExplorer/calib/CSPad/tilt.par')
-        print "Tilt array: ", self.tilt_array
+#        print "Tilt array: sections (columns), quadrants (rows)"
+#        print self.tilt_array
 
         # read in center position of sections in each quadrant
         ctr_array = np.loadtxt('XtcExplorer/calib/CSPad/center.par')
@@ -63,15 +61,44 @@ class CsPad( object ):
         # KIS (Keep It Simple)
         self.center_array = np.reshape( ctr_array + ctr_corr_array, (3,4,8) )
 
-        print "Center array: ", self.center_array[0:2]
-        #print "X = ", self.center_array[0]
-        #print "Y = ", self.center_array[1]
-        #print "Z = ", self.center_array[2]
+#        print "Section center x-coordinates:"
+#        print self.center_array[0]
 
-        det_offset = np.loadtxt('XtcExplorer/calib/CSPad/offset.par')
-        det_offset_corr = np.loadtxt('XtcExplorer/calib/CSPad/offset_corr.par')
-        self.offset = det_offset + det_offset_corr
-        print self.offset.shape
+#        print "Section center y-coordinates:"
+#        print self.center_array[1]
+
+        quad_pos = np.loadtxt('XtcExplorer/calib/CSPad/offset.par')
+        quad_pos_corr = np.loadtxt('XtcExplorer/calib/CSPad/offset_corr.par')
+        quad_position = quad_pos[0:2,:] + quad_pos_corr[0:2,:]
+#        print "Quad position (approximate):"
+#        print quad_position
+        
+        # read in margins file:
+        marg_gap_shift = np.loadtxt('XtcExplorer/calib/CSPad/marg_gap_shift.par')
+
+        # break it down
+        self.sec_offset = marg_gap_shift[0:2,0]
+
+        quad_offset_xy = marg_gap_shift[0:2,1]
+        quad_gap_xy = marg_gap_shift[0:2,2]
+        quad_shift_xy = marg_gap_shift[0:2,3]
+        
+        quad_offset_XY = np.array( [quad_offset_xy,
+                                    quad_offset_xy,
+                                    quad_offset_xy,
+                                    quad_offset_xy] ).T
+        quad_gap_XY = np.array( [quad_gap_xy*[-1,-1],
+                                 quad_gap_xy*[-1,1],
+                                 quad_gap_xy*[1,1],
+                                 quad_gap_xy*[1,-1]] ).T
+        quad_shift_XY = np.array( [quad_shift_xy*[1,-1],
+                                   quad_shift_xy*[-1,-1],
+                                   quad_shift_xy*[-1,1],
+                                   quad_shift_xy*[1,1]] ).T
+
+        self.quad_offset = quad_position + quad_offset_XY + quad_gap_XY + quad_shift_XY
+#        print self.quad_offset
+        
 
     def CsPadElement( self, data3d, qn ):
 
@@ -139,13 +166,14 @@ class CsPad( object ):
             nrows, ncols = pairs[sec].shape
 
             # colp,rowp are where the corner of a section should be placed
-            colp = self.npix_quad - (self.center_array[1][qn][sec] + ncols/2)
-            rowp = self.npix_quad - (self.center_array[0][qn][sec] - nrows/2)
-            #print "Quad#%d Section %d in  col=%d, row=%d" %(qn,sec,colp,rowp)
+            rowp = self.npix_quad - (self.sec_offset[0] + self.center_array[0][qn][sec] - nrows/2)
+            colp = self.npix_quad - (self.sec_offset[1] + self.center_array[1][qn][sec] + ncols/2)
 
             #if sec < 2 :
             quadrant[rowp-nrows:rowp, colp:colp+ncols] = pairs[sec][0:nrows,0:ncols]
-
+            if (rowp > self.npix_quad) or (colp+ncols > self.npix_quad) :
+                print "ERROR"
+                print rowp-nrows, ":", rowp, ", ", colp, ":",colp+ncols
 
         # Finally, reorient the quadrant as needed
         if qn>0 : quadrant = np.rot90( quadrant, 4-qn)
@@ -187,29 +215,26 @@ class CsPad( object ):
         #pixel_array = np.zeros( (4,8,185,388), dtype="uint16)")
         #self.pixels = pixel_array.reshape(5920,388)
 
-        # need to do this a better way:
-        h1 = np.hstack( (quad_images[0], quad_images[1]) )
-        h2 = np.hstack( (quad_images[3], quad_images[2]) )
-        cspad_image = np.vstack( (h1, h2) )
+#        # need to do this a better way:
+#        h1 = np.hstack( (quad_images[0], quad_images[1]) )
+#        h2 = np.hstack( (quad_images[3], quad_images[2]) )
+#        cspad_image = np.vstack( (h1, h2) )
+#        print cspad_image.shape
+    
+        cspad_image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype="uint16")
+        print cspad_image.shape
+        
+        for qn in xrange (0,4):
+            qoff_x = self.quad_offset[0,qn]
+            qoff_y = self.quad_offset[1,qn]
+            cspad_image[qoff_x : qoff_x+self.npix_quad,
+                        qoff_y : qoff_y+self.npix_quad ] = quad_images[qn]
 
         # mask out hot/saturated pixels (16383)
         im_hot_masked = np.ma.masked_greater_equal( cspad_image,16383 )
         cspad_image = np.ma.filled( im_hot_masked, 0)
 
         return cspad_image
-    
-#        cspad_image = np.zeros((2*self.npix_quad, 2*self.npix_quad ), dtype="uint16")
-        
-#        for qn in xrange (0,4):
-#            offset_x = self.offset[0][qn]
-#            offset_y = self.offset[1][qn]
-#            print offset_x
-#            print offset_y
-#            cspad_image[offset_x:offset_x+self.npix_quad,
-#                        offset_y, offset_y+self.npix_quad ] = quad_images[qn]
-#        
-#        return cspad_image
-
 
 
 

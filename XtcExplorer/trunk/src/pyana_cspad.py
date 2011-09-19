@@ -129,7 +129,7 @@ class  pyana_cspad ( object ) :
         if len(threshold_string)>1:
             self.threshold.area = np.array([0.,0.,0.,0.])            
 
-            intervals = threshold_string[1].strip('()').split(',')
+            intervals = threshold_string[1].strip('[()]').split(',')
             xrange = intervals[0].split(":")
             yrange = intervals[1].split(":")
             self.threshold.area[0] = float(xrange[0])

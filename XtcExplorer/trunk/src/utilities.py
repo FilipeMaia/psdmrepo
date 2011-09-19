@@ -387,19 +387,26 @@ class Frame(object):
 #       proj_vert = self.image.max(axis=1) # for each row, maximum bin value
 #       proj_horiz = self.image.max(axis=0) # for each column, maximum bin value
 
-        #projections
-        maskedimage = np.ma.masked_array( self.image, mask=(self.image==0) )
-        proj_vert = np.ma.average(maskedimage,1) # for each row, average of elements
-        proj_horiz = np.ma.average(maskedimage,0) # for each column, average of elements
-        # ---------------------------------------------------------
-        # these are the limits I want my histogram to use
-        vmin = np.min(proj_vert) - 0.1 * np.min(proj_vert)
-        #vmin = 0
-        vmax = np.max(proj_vert) + 0.1 * np.max(proj_vert)
-        hmin = np.min(proj_horiz) - 0.2 * np.min(proj_horiz)
-        #hmin = 0.0
-        hmax = np.max(proj_horiz) + 0.2 * np.max(proj_horiz) 
+#        # these are the limits I want my histogram to use
+#        vmin = np.min(proj_vert) - 0.1 * np.min(proj_vert)
+#        #vmin = 0
+#        vmax = np.max(proj_vert) + 0.1 * np.max(proj_vert)
+#        hmin = np.min(proj_horiz) - 0.2 * np.min(proj_horiz)
+#        #hmin = 0.0
+#        hmax = np.max(proj_horiz) + 0.2 * np.max(proj_horiz) 
         
+#        # unless vmin and vmax has been set for the image
+#        if self.vmax is not None: 
+#            vmax = self.vmax + 0.1 * self.vmax
+#            hmax = self.vmax + 0.1 * self.vmax
+#        if self.vmin is not None: 
+#            vmin = self.vmin - 0.1 * self.vmin
+#            hmin = self.vmin - 0.1 * self.vmin
+            
+
+        vmin, vmax = self.projy.get_xlim()
+        hmin, hmax = self.projx.get_ylim()
+        print self.projy.get_xlim(), self.projx.get_ylim()
         # unless vmin and vmax has been set for the image
         if self.vmax is not None: 
             vmax = self.vmax + 0.1 * self.vmax
@@ -742,7 +749,6 @@ class Plotter(object):
                                           extent=extent,
                                           vmin=aplot.vmin,
                                           vmax=aplot.vmax )
-        
 
         divider = make_axes_locatable(aplot.axes)
 
