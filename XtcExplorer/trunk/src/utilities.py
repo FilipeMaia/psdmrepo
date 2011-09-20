@@ -153,6 +153,7 @@ class PyanaOptions( object ):
         return float(options_string)
 
 
+
 #-----------------------------------------
 # Data Storage Classes
 #-----------------------------------------
@@ -382,63 +383,52 @@ class Frame(object):
     def update_axes(self):
         if self.projx is None: return
         if self.projy is None: return
-        
-#       # max along each axis
-#       proj_vert = self.image.max(axis=1) # for each row, maximum bin value
-#       proj_horiz = self.image.max(axis=0) # for each column, maximum bin value
+        # does nothing right now...
+        # but if needed, this is where to update axes of projection plots
+        # if these need to change when image colorscale changes
 
-#        # these are the limits I want my histogram to use
-#        vmin = np.min(proj_vert) - 0.1 * np.min(proj_vert)
-#        #vmin = 0
-#        vmax = np.max(proj_vert) + 0.1 * np.max(proj_vert)
-#        hmin = np.min(proj_horiz) - 0.2 * np.min(proj_horiz)
-#        #hmin = 0.0
-#        hmax = np.max(proj_horiz) + 0.2 * np.max(proj_horiz) 
+    def set_ticks(self, limits = None ):
         
-#        # unless vmin and vmax has been set for the image
-#        if self.vmax is not None: 
-#            vmax = self.vmax + 0.1 * self.vmax
-#            hmax = self.vmax + 0.1 * self.vmax
-#        if self.vmin is not None: 
-#            vmin = self.vmin - 0.1 * self.vmin
-#            hmin = self.vmin - 0.1 * self.vmin
-            
+        if limits is None: 
+            vmin, vmax = self.projy.get_xlim()
+            hmin, hmax = self.projx.get_ylim()
+            limits = (vmin,vmax,hmin,hmax)
+        vmin,vmax,hmin,hmax = limits
 
-        vmin, vmax = self.projy.get_xlim()
-        hmin, hmax = self.projx.get_ylim()
-        print self.projy.get_xlim(), self.projx.get_ylim()
-        # unless vmin and vmax has been set for the image
-        if self.vmax is not None: 
-            vmax = self.vmax + 0.1 * self.vmax
-            hmax = self.vmax + 0.1 * self.vmax
-        if self.vmin is not None: 
-            vmin = self.vmin - 0.1 * self.vmin
-            hmin = self.vmin - 0.1 * self.vmin
-            
         # -------------horizontal-------------------
         roundto = 1
         if hmax > 100 : roundto = 10
         if hmax > 1000 : roundto = 100
         if hmax > 10000 : roundto = 1000
-        ticks = [ roundto * np.around(hmin/roundto) ,
-                  roundto * np.around((hmax-hmin)/(2*roundto)),
-                  roundto * np.around(hmax/roundto) ]
+
+        nticks = 3
+        firsttick = roundto * np.around(hmin/roundto)
+        lasttick = roundto * np.around(hmax/roundto)
+        interval = roundto * np.around((hmax-hmin)/((nticks-1)*roundto))
+        ticks = []
+        for tck in range (nticks):
+            ticks.append( firsttick + tck * interval )
+                  
         self.projx.set_yticks( ticks )
-        
         self.projx.set_ylim( np.min(ticks[0],hmin), np.max(ticks[-1],hmax) )
-        
         
         # -------------vertical---------------
         roundto = 1
         if vmax > 100 : roundto = 10
         if vmax > 1000 : roundto = 100
         if vmax > 10000 : roundto = 1000
-        ticks = [ roundto * np.around( vmin/roundto) ,
-                  roundto * np.around((vmax-vmin)/(2*roundto)),
-                  roundto * np.around(vmax/roundto) ]
+
+        nticks = 3
+        firsttick = roundto * np.around(vmin/roundto)
+        lasttick = roundto * np.around(vmax/roundto)
+        interval = roundto * np.around((vmax-vmin)/((nticks-1)*roundto))
+        ticks = []
+        for tck in range (nticks):
+            ticks.append( firsttick + tck * interval )
+
         self.projy.set_xticks( ticks )
-        
         self.projy.set_xlim( np.max(ticks[-1],vmax), np.min(ticks[0],vmin) )
+
 
     
 class Plotter(object):
@@ -658,18 +648,18 @@ class Plotter(object):
             for aplot in self.frames :
                 if aplot.colb and aplot.colb.ax == event.inaxes: 
                     
-                    print "You clicked on colorbar of plot ", aplot.name
+                    #print "You clicked on colorbar of plot ", aplot.name
+                    #print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y
+                    #print ' xdata=',event.xdata,' ydata=', event.ydata
 
-                    print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y
-                    print ' xdata=',event.xdata,' ydata=', event.ydata
-        
-                    lims = aplot.axesim.get_clim()
-        
-                    aplot.vmin = lims[0]
-                    aplot.vmax = lims[1]
+                    # color/value limits
+                    clims = aplot.axesim.get_clim()        
+                    aplot.vmin = clims[0]
+                    aplot.vmax = clims[1]
+
                     range = aplot.vmax - aplot.vmin
                     value = aplot.vmin + event.ydata * range
-                    print "min,max,range,value = ",aplot.vmin,aplot.vmax,range,value
+                    #print "min,max,range,value = ",aplot.vmin,aplot.vmax,range,value
             
                     # left button
                     if event.button == 1 :
@@ -679,14 +669,13 @@ class Plotter(object):
                     # middle button
                     elif event.button == 2 :
                         aplot.vmin, aplot.vmax = aplot.orglims
-                        print "reset"
+                        print "reset to original: ( %.2f , %.2f ) " % (aplot.vmin, aplot.vmax )
                         
                     # right button
                     elif event.button == 3 :
                         aplot.vmax = value
                         print "maximum changed:   ( %.2f , %.2f ) " % (aplot.vmin, aplot.vmax )
                 
-                    
                     aplot.axesim.set_clim(aplot.vmin,aplot.vmax)
                     #aplot.update_axes()
                     plt.draw()
@@ -757,33 +746,28 @@ class Plotter(object):
             aplot.projy = divider.append_axes("left", size="20%", pad=0.03,sharey=aplot.axes)
             aplot.projx.set_title( aplot.axes.get_title() )
 
-            start_x = 0
-            start_y = 0
-            if extent is not None:
-                start_x = extent[0]
-                start_y = extent[2]
-
-            # vertical and horizontal dimensions, axes, projections
-            vdim,hdim = np.shape(frameimage)
-            hbins = np.arange(start_x, start_x+hdim, 1)
-            vbins = np.arange(start_y, start_y+vdim, 1)
-
             # --- sum or average along each axis, 
-            maskedimage = np.ma.masked_array( frameimage, mask=(frameimage==0) )
+            maskedimage = np.ma.masked_array(frameimage, mask=(frameimage==0) )
             proj_vert = np.ma.average(maskedimage,1) # for each row, average of elements
             proj_horiz = np.ma.average(maskedimage,0) # for each column, average of elements
+            
+            x1,x2,y1,y2 = aplot.axesim.get_extent()
+            start_x = x1
+            start_y = y1
 
-#            # max along each axis
-#            proj_vert = frameimage.max(axis=1) # for each row, maximum bin value
-#            proj_horiz = frameimage.max(axis=0) # for each column, maximum bin value
+            # vertical and horizontal dimensions, axes, projections
+            vdim,hdim = aplot.axesim.get_size()        
+            hbins = np.arange(start_x, start_x+hdim, 1)
+            vbins = np.arange(start_y, start_y+vdim, 1)
 
             aplot.projx.plot(hbins,proj_horiz)
             aplot.projy.plot(proj_vert, vbins)
             aplot.projx.get_xaxis().set_visible(False)
-
+        
             aplot.projx.set_xlim( start_x, start_x+hdim)
             aplot.projy.set_ylim( start_y+vdim, start_y)
 
+            aplot.set_ticks()
             #aplot.update_axes()
             
 
@@ -794,7 +778,7 @@ class Plotter(object):
         if aplot.vmin is None: 
             aplot.orglims = aplot.axesim.get_clim()
             # min and max values in the axes are
-            print "%s original value limits: %s" % (aplot.name,aplot.orglims)
+            #print "%s original value limits: %s" % (aplot.name,aplot.orglims)
             aplot.vmin, aplot.vmax = aplot.orglims
                     
         # show the active region for thresholding

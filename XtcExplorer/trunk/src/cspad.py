@@ -26,7 +26,8 @@ class CsPad( object ):
         self.sections = sections
         self.pedestals = None
 
-        self.pixels = np.zeros((4*8*185,388), dtype="uint16")
+        self.quad_arrays = [None, None, None, None]  #np.zeros((4*8*185,388), dtype="uint16")
+        self.pixel_array = None
         self.read_geometry()
 
     def set_pedestals(self, pedestalfile ):
@@ -125,6 +126,8 @@ class CsPad( object ):
                 if i not in self.sections[qn] :
                     data3d = np.insert( data3d, i, zsec, axis=0 )
 
+        # now the sections have been "filled out", fill the pixels attribute
+        self.quad_arrays[qn] = data3d.reshape(1480,388)
                 
         # subtract pedestals, if supplied --- !!UNTESTED!!
         if self.pedestals :
@@ -189,6 +192,8 @@ class CsPad( object ):
         """
         data = element.data()
         quad = element.quad()
+        self.pixel_array = np.concatenate( (data[:,:,0],data[:,:,1]) )
+        # pixels should now be (370, 388)
 
         pairs = []
         for i in xrange(2):
@@ -212,17 +217,10 @@ class CsPad( object ):
             
             quad_images[quad] = self.CsPadElement( data, quad )
 
-        #pixel_array = np.zeros( (4,8,185,388), dtype="uint16)")
-        #self.pixels = pixel_array.reshape(5920,388)
+        # now all elements have been filled out, fill and reshape self.pixels
+        self.pixel_array = np.array( self.quad_arrays ).reshape(5920, 388)
 
-#        # need to do this a better way:
-#        h1 = np.hstack( (quad_images[0], quad_images[1]) )
-#        h2 = np.hstack( (quad_images[3], quad_images[2]) )
-#        cspad_image = np.vstack( (h1, h2) )
-#        print cspad_image.shape
-    
         cspad_image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype="uint16")
-        print cspad_image.shape
         
         for qn in xrange (0,4):
             qoff_x = self.quad_offset[0,qn]
