@@ -21,6 +21,7 @@ Usage: `basename $0` [options] [release ...]
     -d          debug (turn on -x shell option)
     -n          do not print header
     -r          do not decorate tags
+    -s          skip packages with all identical tags
     -p package  print info for specified package(s)
     -f file     read list of packages from a file
     -a          list all packages from all releases
@@ -97,6 +98,15 @@ listPackages() {
 }
 
 #
+# return true if all tags are the same
+#
+same_tags() {
+  tag=$1
+  for t in "$@" ; do test $tag = $t || return 1 ; done
+  return 0
+}
+
+#
 # Decorate list of tags for a given package
 #  - if a tag is newer that any other tag decorate it with (+)
 #  - otherwise if a tag is older that any other tag decorate it with (-)
@@ -109,7 +119,7 @@ decorate() {
   	  if( $i!="HEAD" && $i!="-" ) { if(min=="" || $i<min) min=$i; if(max=="" || $i>max) max=$i; } \
   	} ; \
     for(i=1;i<=NF;i++) { \
-      if( $i!="HEAD" && $i!="-" ) { if($i>min) { $i=$i"(+)" } else { if($i<max) $i=$i"(-)"; } } \
+      if( $i!="HEAD" && $i!="-" ) { if($i>min) { if($i<max) { $i=$i"(*)" } else { $i=$i"(+)" } } else { if($i<max) $i=$i"(-)"; } } \
     } ; print ;\
   }'
 
@@ -169,9 +179,10 @@ header="yes"
 delim=""
 decorate="yes"
 allpkgs="no"
+skip="no"
 
 # get the options
-while getopts hdnt:rap:f: c ; do
+while getopts hdnt:rsap:f: c ; do
   case $c in
     h) usage ; exit 0 ;;
     d) set -x ;;
@@ -180,6 +191,7 @@ while getopts hdnt:rap:f: c ; do
     p) packages="$packages $OPTARG" ;;
     f) packages="$packages $(cat $OPTARG)" ;;
     r) decorate="no" ;;
+    s) skip="yes" ;;
     a) allpkgs="yes" ;;
     \?) usage ; exit 2 ;;
   esac
@@ -219,16 +231,22 @@ fi
 
 # scan all package names
 for p in $packages ; do
+  
   tsep=''
   l=''
+  
   for r in $relnums ; do
     tag=`getPkgTag $r $p` || exit 2
     l="$l$tsep$tag"
     tsep=' '
   done
+
+  test x$skip = xyes && same_tags $l && continue
+
   test x$decorate = xyes && l=`decorate $l`
   lines="$lines$sep$p $l"
   sep=':'
+  
 done
 
 if [ -n "$delim" ] ; then
