@@ -85,6 +85,15 @@ class LogBookFFEntry {
     public function content_type() {
         return $this->attr['content_type']; }
 
+    public function deleted() {
+        return $this->attr['deleted_time'] != ''; }
+
+    public function deleted_time () {
+        return LusiTime::from64( $this->attr['deleted_time'] ); }
+
+    public function deleted_by() {
+        return $this->attr['deleted_by']; }
+
     /* Operations
      */
     public function shift() {
@@ -132,7 +141,7 @@ class LogBookFFEntry {
             ",".LusiTime::now()->to64().
             ",'".$author.
             "','".$this->connection->escape_string( $content ).
-            "','".$content_type."')" );
+            "','".$content_type."',NULL,NULL)" );
 
         return $this->experiment->find_entry_by_ (
             'e.id = (SELECT LAST_INSERT_ID())' );

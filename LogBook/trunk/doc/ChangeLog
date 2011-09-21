@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: 00-02-00
+2011-09-20 Igor Gaponenko
+- added support for deleting messages. Note, that MySQL schema had to be extended.
+See details in the new schema file. The previous implementations of e-log won't work
+with the new schema.
+
+
 Tag: 00-01-28
 2011-09-06 Igor Gaponenko
 - added static function LogBook::instance()

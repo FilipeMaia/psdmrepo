@@ -484,12 +484,13 @@ HERE;
      *
      * @return array(LogBookFFEntry)
      */
-    public function entries () {
+    public function entries ( $inject_deleted_messages=false ) {
         return $this->entries_by_(
         	$this->sql_4_entries_by_(
         		/* $extra_condition=*/ "",
         		/* $limit=          */ null,
-        	    /* $use_tags=       */ false));
+        	    /* $use_tags=       */ false,
+        		                       $inject_deleted_messages ));
     }
 
     /**
@@ -503,7 +504,7 @@ HERE;
      *
      * @return array(LogBookFFEntry)
      */
-    public function entries_of_experiment ( $begin=null, $end=null ) {
+    public function entries_of_experiment ( $begin=null, $end=null, $inject_deleted_messages=false ) {
         if( !is_null( $begin ) && !is_null( $end ) && !$begin->less( $end ))
             throw new LogBookException(
                 __METHOD__,
@@ -514,7 +515,10 @@ HERE;
                 " AND h.shift_id IS NULL\n".
                 " AND h.run_id IS NULL\n".
                 ( is_null( $begin ) ? "" : " AND e.insert_time >= ".$begin->to64()."\n" ).
-                ( is_null( $end )   ? "" : " AND e.insert_time < ".$end->to64()."\n" )
+                ( is_null( $end )   ? "" : " AND e.insert_time < ".$end->to64()."\n" ),
+        		null,  /* $limit= */
+        		false, /* $use_tags= */
+                $inject_deleted_messages
             )
         );
     }
@@ -527,8 +531,13 @@ HERE;
      *
      * @return array(LogBookFFEntry)
      */
-    public function entries_of_shift ( $id ) {
-        return $this->entries_by_( $this->sql_4_entries_by_( " AND h.shift_id = ".$id."\n" ));
+    public function entries_of_shift ( $id, $inject_deleted_messages=false ) {
+        return $this->entries_by_(
+        	$this->sql_4_entries_by_(
+        		" AND h.shift_id = ".$id."\n",
+        		null,  /* $limit= */
+        		false, /* $use_tags= */
+        		$inject_deleted_messages ));
     }
 
     /**
@@ -539,12 +548,13 @@ HERE;
      *
      * @return array(LogBookFFEntry)
      */
-    public function entries_of_run ( $id ) {
+    public function entries_of_run ( $id, $inject_deleted_messages=false ) {
         return $this->entries_by_(
         	$this->sql_4_entries_by_(
         		" AND h.run_id = ".$id."\n",
         		null,  /* $limit= */
-        		false  /* $use_tags= */
+        		false, /* $use_tags= */
+        		$inject_deleted_messages
         	)
         );
     }
@@ -573,7 +583,8 @@ HERE;
         $tag='',
         $author='',
         $since=null,
-        $limit=null ) {
+        $limit=null,
+        $inject_deleted_messages=false ) {
 
         /* Verify parameters
          */
@@ -716,12 +727,17 @@ HERE;
             $this->sql_4_entries_by_(
                 $condition,
                 $limit,
-                $use_tags
+                $use_tags,
+                $inject_deleted_messages
             )
         );
     }
 
-    private function sql_4_entries_by_ ( $extra_condition="", $limit=null, $use_tags=true ) {
+    private function sql_4_entries_by_ ( $extra_condition="", $limit=null, $use_tags=true, $inject_deleted_messages=false ) {
+
+    	//throw new LogBookException(
+        //	__METHOD__,
+        //    $inject_deleted_messages ? "" : " AND e.deleted_time is NULL\n" );
 
         /* Apply the limit if specified
          *
@@ -738,6 +754,7 @@ HERE;
             "WHERE h.exper_id = ".$this->attr['id']."\n".
             " AND h.id = e.hdr_id\n".
             " AND e.parent_entry_id is NULL\n".
+        	( $inject_deleted_messages ? "" : " AND e.deleted_time is NULL\n" ).
             $extra_condition.
             "ORDER BY e.insert_time DESC\n".
             ( is_null( $limit ) ? "" : "LIMIT $limit\n" );
@@ -847,11 +864,23 @@ fclose( $debug_file );
             ",".$insert_time->to64().
             ",'".$author.
             "','".$this->connection->escape_string( $content ).
-            "','".$content_type."')" );
+            "','".$content_type."',NULL,NULL)" );
 
         return $this->find_entry_by_ (
             "hdr_id = (SELECT h.id FROM {$this->connection->database}.header h, {$this->connection->database}.entry e".
             ' WHERE h.id = e.hdr_id AND e.id = (SELECT LAST_INSERT_ID()))' );
+    }
+
+    public function delete_entry ( $id, $deleted_time, $deleted_by ) {
+        $this->connection->query (
+            "UPDATE {$this->connection->database}.entry SET deleted_time=".$deleted_time->to64().
+            ", deleted_by='".$this->connection->escape_string( trim( $deleted_by )).
+            "' WHERE id=".$id );
+    }
+
+    public function undelete_entry ( $id ) {
+        $this->connection->query (
+            "UPDATE {$this->connection->database}.entry SET deleted_time=NULL, deleted_by=NULL WHERE id=".$id );
     }
 
     /* ====================

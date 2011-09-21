@@ -128,6 +128,7 @@ if( '' != $range_of_runs ) {
 									// the broader search accross instruments
 }
 
+$inject_deleted_messages = isset( $_GET['inject_deleted_messages'] );
 
 /* This is a special modifier which (if present) is used to return an updated list
  * of messages since (strictly newer than) the specified time.
@@ -297,7 +298,6 @@ function sort_and_truncate_from_head( &$entries_by_timestamps, $limit ) {
     return $result;
 }
 
-
 /* Proceed with the operation
  */
 try {
@@ -408,7 +408,7 @@ try {
 
 			// Explicit
 			//
-			foreach( $experiment->entries_of_run( $run->id()) as $e ) array_push( $run_specific_entries, $e );
+			foreach( $experiment->entries_of_run( $run->id(), $inject_deleted_messages ) as $e ) array_push( $run_specific_entries, $e );
 
 			// Implicit
 			//
@@ -426,8 +426,9 @@ try {
         		null, 			// $end,
         		null,			// $tag,
         		null,			// $author,
-        		null			// $since
-        						// $limit
+        		null,			// $since
+        		null,			// $limit
+        		$inject_deleted_messages
         		) as $e ) array_push( $run_specific_entries, $e	);
 		}
    	}
@@ -532,8 +533,9 @@ try {
         	$end,
         	$tag,
         	$author,
-        	$since/*,
-        	$limit*/ );
+        	$since,
+        	null, /* $limit */
+        	$inject_deleted_messages );
 
 		$runs = !$inject_runs ? array() : $e->runs_in_interval( $begin4runs, $end4runs/*, $limit*/ );
 
@@ -630,9 +632,9 @@ HERE;
     		if( $type == 'entry' ) {
     			if( $first ) {
                 	$first = false;
-                	$result .= "\n".LogBookUtils::entry2json( $entry, $posted_at_instrument );
+                	$result .= "\n".LogBookUtils::entry2json( $entry, $posted_at_instrument, $inject_deleted_messages );
             	} else {
-                	$result .= ",\n".LogBookUtils::entry2json( $entry, $posted_at_instrument );
+                	$result .= ",\n".LogBookUtils::entry2json( $entry, $posted_at_instrument, $inject_deleted_messages );
 	            }
     		} else {
     			if( $first ) {

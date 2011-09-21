@@ -3127,6 +3127,7 @@ function display_messages_table(
         '&tag='+encodeURIComponent(tag)+
         '&author='+encodeURIComponent(author)+
         (inject_runs ? '&inject_runs' : '')+
+        '&inject_deleted_messages'+
         (limit_per_view == null ? '' : '&limit='+limit_per_view);
 
     var html=

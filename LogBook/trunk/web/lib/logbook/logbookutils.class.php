@@ -55,7 +55,7 @@ class LogBookUtils {
 	 * @param boolean $posted_at_instrument
 	 * @return string
 	 */
-	public static function child2json( $entry, $posted_at_instrument ) {
+	public static function child2json( $entry, $posted_at_instrument, $inject_deleted_messages=false ) {
 	
 	    $timestamp = $entry->insert_time();
 	
@@ -75,9 +75,10 @@ class LogBookUtils {
 	        );
 	
 	    $children_ids = array();
-	    foreach( $entry->children() as $child )
-	        array_push( $children_ids, LogBookUtils::child2json( $child, $posted_at_instrument ));
-	
+	    foreach( $entry->children() as $child ) {
+			if( $child->deleted() && !$inject_deleted_messages ) continue;
+	        array_push( $children_ids, LogBookUtils::child2json( $child, $posted_at_instrument, $inject_deleted_messages ));
+	    }
 	    $content = wordwrap( $entry->content(), 128 );
 	    return json_encode(
 	        array (
@@ -99,7 +100,10 @@ class LogBookUtils {
 	            "run_id"          => 0,
 	            "run_num"         => 0,
 	        	"ymd"             => $timestamp->toStringDay(),
-	        	"hms"             => $timestamp->toStringHMS()
+	        	"hms"             => $timestamp->toStringHMS(),
+	        	"deleted"		  => $entry->deleted() ? 1 : 0,
+	        	"deleted_by"	  => $entry->deleted() ? $entry->deleted_by() : '',
+	        	"deleted_time"	  => $entry->deleted() ? $entry->deleted_time()->toStringShort() : ''
 	        )
 	    );
 	}
@@ -111,7 +115,7 @@ class LogBookUtils {
 	 * @param boolean $posted_at_instrument
 	 * @return unknown_type
 	 */
-	public static function entry2json( $entry, $posted_at_instrument ) {
+	public static function entry2json( $entry, $posted_at_instrument, $inject_deleted_messages=false ) {
 	
 	    $timestamp = $entry->insert_time();
 	    $shift     = is_null( $entry->shift_id()) ? null : $entry->shift();
@@ -141,8 +145,10 @@ class LogBookUtils {
 	        );
 	
 	    $children_ids = array();
-	    foreach( $entry->children() as $child )
-	        array_push( $children_ids, LogBookUtils::child2json( $child, $posted_at_instrument ));
+	    foreach( $entry->children() as $child ) {
+	    	if( $child->deleted() && !$inject_deleted_messages ) continue;
+	        array_push( $children_ids, LogBookUtils::child2json( $child, $posted_at_instrument, $inject_deleted_messages ));
+	    }
 	
 	    $content = wordwrap( $entry->content(), 128 );
 	    return json_encode(
@@ -165,7 +171,10 @@ class LogBookUtils {
 	            "run_id"          => is_null( $run ) ? 0 : $run->id(),
 	            "run_num"         => is_null( $run ) ? 0 : $run->num(),
 	        	"ymd"             => $timestamp->toStringDay(),
-	        	"hms"             => $timestamp->toStringHMS()
+	        	"hms"             => $timestamp->toStringHMS(),
+	        	"deleted"		  => $entry->deleted() ? 1 : 0,
+	        	"deleted_by"	  => $entry->deleted() ? $entry->deleted_by() : '',
+	        	"deleted_time"	  => $entry->deleted() ? $entry->deleted_time()->toStringShort() : ''
 	        )
 	    );
 	}
