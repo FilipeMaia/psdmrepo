@@ -212,13 +212,6 @@ HERE;
 
 <div id="el-l-mctrl">
   <div style="float:left;">
-    <div style="font-weight:bold; margin-bottom:4px;">Show runs:</div>
-    <div id="el-l-rs-selector">
-      <input type="radio" id="el-l-rs-on"  name="show_runs" value="on" checked="checked"/><label for="el-l-rs-on" >Yes</label>
-      <input type="radio" id="el-l-rs-off" name="show_runs" value="off"/><label for="el-l-rs-off">No</label>
-    </div>
-  </div>
-  <div style="float:left; margin-left:20px;">
     <div style="font-weight:bold; margin-bottom:2px;">Messages:</div>
     <select name="messages" style="font-size:90%; padding:1px;" title="Select non-blank option to select how many events to load">
       <option selected="selected">100</option>
@@ -227,6 +220,20 @@ HERE;
       <option>7 days</option>
       <option>everything</option>
     </select>
+  </div>
+  <div style="float:left; margin-left:20px;">
+    <div style="font-weight:bold; margin-bottom:4px;">Include runs:</div>
+    <div id="el-l-rs-selector">
+      <input type="radio" id="el-l-rs-on"  name="show_runs" value="on" checked="checked"/><label for="el-l-rs-on" >Yes</label>
+      <input type="radio" id="el-l-rs-off" name="show_runs" value="off"/><label for="el-l-rs-off">No</label>
+    </div>
+  </div>
+  <div style="float:left; margin-left:20px;">
+    <div style="font-weight:bold; margin-bottom:4px;">Include deleted:</div>
+    <div id="el-l-dm-selector">
+      <input type="radio" id="el-l-dm-on"  name="show_deleted" value="on" checked="checked"/><label for="el-l-dm-on" >Yes</label>
+      <input type="radio" id="el-l-dm-off" name="show_deleted" value="off" /><label for="el-l-dm-off">No</label>
+    </div>
   </div>
   <div style="float:right;" class="el-l-auto">
     <div style="float:left;">
@@ -417,6 +424,7 @@ HERE;
         <div><input type="checkbox" name="search_in_messages" value="Message" checked="checked" /> message body</div>
         <div><input type="checkbox" name="search_in_tags" value="Tag" /> tags</div>
         <div><input type="checkbox" name="search_in_values" value="Value" /> tag values</div>
+        <div><input type="checkbox" name="search_in_deleted" value="Deleted" checked="checked" /> deleted messages</div>
       </div>
       <div style="float:left; margin-left:20px;">
         <div style="font-weight:bold; margin-bottom:5px;">Posted at:</div>

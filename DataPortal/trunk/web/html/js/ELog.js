@@ -64,7 +64,7 @@ function elog_create() {
 			//
 			if( just_initialized || (prev_context1 != this.context1 )) {
 				this.live_dim_all_highlights();
-				this.live_message_viewer.reload(live_selected_runs(), this.live_selected_range());
+				this.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), this.live_selected_range());
 			}
 		} else if(this.context1 == 'post') {
 
@@ -323,15 +323,20 @@ function elog_create() {
 
 		this.live_message_viewer = new elog_message_viewer_create('elog.live_message_viewer', this, 'el-l');
 
-		$('#el-l-rs-selector').buttonset().change(function() {
-			that.live_message_viewer.dim_day();
-			that.live_dim_all_highlights();
-			that.live_message_viewer.reload(live_selected_runs(), that.live_selected_range());
-		});
 		$('#el-l-mctrl').find('select[name="messages"]').change(function() {
 			that.live_message_viewer.dim_day();
 			that.live_dim_all_highlights();
-			that.live_message_viewer.reload(live_selected_runs(), that.live_selected_range());
+			that.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), that.live_selected_range());
+		});
+		$('#el-l-dm-selector').buttonset().change(function() {
+			that.live_message_viewer.dim_day();
+			that.live_dim_all_highlights();
+			that.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), that.live_selected_range());
+		});
+		$('#el-l-rs-selector').buttonset().change(function() {
+			that.live_message_viewer.dim_day();
+			that.live_dim_all_highlights();
+			that.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), that.live_selected_range());
 		});
 		$('#el-l-refresh-selector').buttonset().change(function() {
 			if(live_selected_refresh()) {
@@ -348,7 +353,7 @@ function elog_create() {
 			that.live_message_viewer.refresh(live_selected_runs(), that.live_highlight);
 			*/
 			//that.live_stop_refresh();
-			that.live_message_viewer.reload(live_selected_runs(), that.live_selected_range());
+			that.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), that.live_selected_range());
 			//that.live_schedule_refresh();
 			//that.live_start_highlight_timer();
 		});
@@ -357,7 +362,7 @@ function elog_create() {
 			that.live_schedule_refresh();
 		});
 
-		this.live_message_viewer.reload(live_selected_runs(), this.live_selected_range());
+		this.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), this.live_selected_range());
 		this.live_schedule_refresh();
 		this.live_start_highlight_timer();
 	};
@@ -417,7 +422,7 @@ function elog_create() {
 	    }
 	};
 	this.live_refresh_actions = function() {
-		this.live_message_viewer.refresh(live_selected_runs(), this.live_highlight);
+		this.live_message_viewer.refresh(live_selected_deleted(), live_selected_runs(), this.live_highlight);
 		this.live_schedule_refresh();
 	};
 
@@ -425,6 +430,13 @@ function elog_create() {
 	 *  Live display: selectors
 	 * -------------------------
 	 */
+	var live_id2deleted = new Array();
+	live_id2deleted['el-l-dm-on']=1;
+	live_id2deleted['el-l-dm-off']=0;
+	function live_selected_deleted() {
+		return live_id2deleted[$('#el-l-dm-selector input:checked').attr('id')];
+	}
+
 	var live_id2runs = new Array();
 	live_id2runs['el-l-rs-on']=1;
 	live_id2runs['el-l-rs-off']=0;
@@ -491,6 +503,7 @@ function elog_create() {
 		var search_in_messages   = 1,
 		    search_in_tags       = 0,
 		    search_in_values     = 0,
+		    search_in_deleted    = 1,
 		    posted_at_instrument = 0,
 		    posted_at_experiment = 1,
 		    posted_at_shifts     = 1,
@@ -505,6 +518,7 @@ function elog_create() {
 			search_in_messages,
 			search_in_tags,
 			search_in_values,
+			search_in_deleted,
 			posted_at_instrument,
 			posted_at_experiment,
 			posted_at_shifts,
@@ -525,6 +539,7 @@ function elog_create() {
 			is_checked('search_in_messages'),
 			is_checked('search_in_tags'),
 			is_checked('search_in_values'),
+			is_checked('search_in_deleted'),
 			is_checked('posted_at_instrument'),
 			is_checked('posted_at_experiment'),
 			is_checked('posted_at_shifts'),
@@ -550,6 +565,7 @@ function elog_create() {
 		set_checked('search_in_messages',   1);
 		set_checked('search_in_tags',       0);
 		set_checked('search_in_values',     0);
+		set_checked('search_in_deleted',    1);
 		set_checked('posted_at_instrument', 0);
 		set_checked('posted_at_experiment', 1);
 		set_checked('posted_at_shifts',     1);
@@ -1212,6 +1228,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 	this.threads = null;
 	this.messages = null;
 	this.total_messages = 0;
+	this.total_messages_deleted = 0;
 	this.runs = null;
 	this.min_run = 0;
 	this.max_run = 0;
@@ -1306,11 +1323,20 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			entry.thread_idx = idx;
 			var html =
 '    <div class="el-l-m-body">';
-			if(this.parent.editor)
+			if(entry.deleted) {
 				html +=
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ud" id="'+this.base+'-m-ud-'+entry.id+'" onclick="'+this.address+'.live_message_undelete('+idx+');" title="undelete this message">undelete</button></div>'+
+'      <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>'+
+'      <div style="clear:both;"></div>'+
+'      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
+'    </div>';
+			} else {
+				if(this.parent.editor)
+					html +=
 '      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+entry.id+',false);">move</button></div>'+
 '      <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
-			html +=
+				html +=
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-de" id="'+this.base+'-m-de-'+entry.id+'" onclick="'+this.address+'.live_message_delete('+idx+');" title="delete this message and all its children if any">delete</button></div>'+
 '      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xt" id="'+this.base+'-m-xt-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, true);" title="add more tags to the message">+ tags</button></div>'+
 '      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xa" id="'+this.base+'-m-xa-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, false);" title="add more attachments to the message">+ attachments</button></div>'+
 '      <div style="float:right;"                  class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',false);" title="reply to the message">reply</button></div>'+
@@ -1318,6 +1344,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      <div style="clear:both;"></div>'+
 '      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
 '    </div>';
+			}
 			that.attachments[entry.id] = entry.attachments;
 			var attachments_html = '';
 			for(var k in entry.attachments) {
@@ -1352,14 +1379,20 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '    <div id="'+this.base+'-m-c-'+entry.id+'">';
 			for(var k in entry.children) {
 				var child = entry.children[k];
-				if( typeof child == 'string' ) html += that.live_child2html(eval("("+child+")"), idx);
-				else                           html += that.live_child2html(child, idx);
+				if( typeof child == 'string' ) {
+					child = eval("("+child+")");
+					entry.children[k] = child;
+				}
+				html += '<div id="'+this.base+'-c-'+child.id+'">'+
+						that.live_child2html(child, idx, entry.deleted)+
+						'</div>';
 			}
 			html +=
 '    </div>'+
 '  </div>';
 			$(container).html(html);
-
+			$(container).find('.el-l-m-ud').button();
+			$(container).find('.el-l-m-de').button();
 			$(container).find('.el-l-m-xt').button();
 			$(container).find('.el-l-m-xa').button();
 			$(container).find('.el-l-m-re').button();
@@ -1371,10 +1404,13 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			for(var i = 0; i < entry.attachments.length; i++) {
 				this.expand_attachment(entry.attachments[i].id, true);
 			}
-			for(var i = 0; i < entry.children.length; i++) {
-				var child = entry.children[i];
-				var child_entry = ( typeof child == 'string' ) ? eval( "("+child+")" ) : child;
-				this.expand_child(child_entry.id, true);
+			for(var k in entry.children) {
+				var child = entry.children[k];
+				if( typeof child == 'string' ) {
+					child = eval("("+child+")");
+					entry.children[k] = child;
+				}
+				this.expand_child(child.id, true);
 			}
 
 		} else {
@@ -1405,13 +1441,47 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			for(var i = 0; i < entry.attachments.length; i++) {
 				this.expand_attachment(entry.attachments[i].id, true);
 			}
-			for(var i = 0; i < entry.children.length; i++) {
-				var child = eval( "("+entry.children[i]+")" );
+			for(var i in entry.children ) {
+				var child = entry.children[i];
+				if( typeof child == 'string' ) {
+					child = eval( "("+child+")" );
+					entry.children[i] = child;
+				}
 				this.expand_child(child.id, true);
 			}
 		} else {
 			$(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
 			$(container).removeClass('el-l-c-vis').addClass('el-l-c-hdn');
+		}
+	};
+	this.recreate_child = function(id) {
+		var entry = that.messages[id];
+		var toggler='#'+this.base+'-c-tgl-'+id;
+		var container='#'+this.base+'-c-con-'+id;
+
+		$('#'+this.base+'-c-'+id).html(this.live_child2html(entry, entry.thread_idx, false));
+
+		$(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+		$(container).removeClass('el-l-c-hdn').addClass('el-l-c-vis');
+
+		$(container).find('.el-l-m-ud').button();
+		$(container).find('.el-l-m-de').button();
+		$(container).find('.el-l-m-xt').button();
+		$(container).find('.el-l-m-xa').button();
+		$(container).find('.el-l-m-re').button();
+		$(container).find('.el-l-m-ed').button();
+		$(container).find('.el-l-m-mv').button();
+
+		for(var i = 0; i < entry.attachments.length; i++) {
+			this.expand_attachment(entry.attachments[i].id, true);
+		}
+		for(var i in entry.children ) {
+			var child = entry.children[i];
+			if( typeof child == 'string' ) {
+				child = eval( "("+child+")" );
+				entry.children[i] = child;
+			}
+			this.expand_child(child.id, true);
 		}
 	};
 
@@ -1485,7 +1555,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 
 
 	/**
-	 * Check if new messages/rusn are available, and if so - refresh the view.
+	 * Check if new messages/runs are available, and if so - refresh the view.
 	 * Highlight the new content if the 'highlighter' function is passed as
 	 * a parameter.
 	 * 
@@ -1493,7 +1563,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 	 * @param highlighter - an optional highlighter function to be called for new messages
 	 * @return
 	 */
-	this.refresh = function(inject_runs, highlighter) {
+	this.refresh = function(inject_deleted_messages, inject_runs, highlighter) {
 		if(that.threads.length) {
 
 			var params = {
@@ -1509,6 +1579,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 				since: that.threads[that.threads.length-1].event_timestamp
 			};
 			if(inject_runs) params.inject_runs = '';
+			if(inject_deleted_messages) params.inject_deleted_messages = '';
 
 			$.get('../logbook/Search.php',params,function(data) {
 
@@ -1617,10 +1688,10 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			},'json');
 
 		} else {
-			that.reload(inject_runs, 0);
+			that.reload(inject_deleted_messages, inject_runs, 0);
 		}
 	};
-	this.reload = function(inject_runs, limit) {
+	this.reload = function(inject_deleted_messages, inject_runs, limit) {
 
 		var params = {
 			id: this.parent.exp_id,
@@ -1634,6 +1705,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			format: 'detailed'
 		};
 		if(inject_runs) params.inject_runs = '';
+		if(inject_deleted_messages) params.inject_deleted_messages = '';
 		if(limit) params.limit = limit;
 		
 		this.do_reload(params);
@@ -1643,6 +1715,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		search_in_messages,
 		search_in_tags,
 		search_in_values,
+		search_in_deleted,
 		posted_at_instrument,
 		posted_at_experiment,
 		posted_at_shifts,
@@ -1670,6 +1743,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			author              : author,
 			range_of_runs       : range_of_runs
 		};
+		if( search_in_deleted ) params.inject_deleted_messages = '';
 		this.do_reload(params);
 	};
 	this.do_reload = function(params) {
@@ -1691,6 +1765,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 			that.threads = data.ResultSet.Result;
 			that.messages = new Array();
 			that.total_messages = 0;
+			that.total_messages_deleted = 0;
 			that.runs = new Array();
 			that.min_run = 0;
 			that.max_run = 0;
@@ -1742,6 +1817,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		// DOM in the below called functions.
 		//
 		that.total_messages = 0;
+		that.total_messages_deleted = 0;
 		that.runs = new Array();
 		that.min_run = 0;
 		that.max_run = 0;
@@ -1758,6 +1834,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 	this.live_update_info = function() {
 		$('#'+this.base+'-ms-info').html(
 			'<center><b>'+that.total_messages+'</b> messages'+
+			( that.total_messages_deleted ? ' (<b>'+that.total_messages_deleted+'</b> deleted)' : '')+
 			(that.min_run ? ', runs: <b>'+that.min_run+'</b> .. <b>'+that.max_run+'</b>' : '')+
 			'</center>'
 		);
@@ -1954,6 +2031,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 
 	this.live_enable_message_buttons = function(id, on) {
 		var state = on ? 'enable' : 'disable';
+		$('#'+this.base+'-m-de-'+id).button(state);
 		$('#'+this.base+'-m-xt-'+id).button(state);
 		$('#'+this.base+'-m-xa-'+id).button(state);
 		$('#'+this.base+'-m-re-'+id).button(state);
@@ -1967,6 +2045,158 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 	    else                          $('#'+this.base+'-m-xadlg-'+id).removeClass('el-l-m-dlg-hdn').addClass('el-l-m-dlg-vis');
 		that.live_enable_message_buttons(id, false);
 	};
+	this.live_message_delete = function(idx) {
+		var entry = that.threads[idx];
+		$('#popupdialogs').html(
+			'<p style="color:red;"><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
+	    	'You have requested to delete the selected message. Are you sure?</p>'
+		 );
+		$('#popupdialogs').dialog({
+			resizable: false,
+			modal: true,
+			buttons: {
+				'Yes': function() {
+
+					$( this ).dialog('close');
+
+					var jqXHR = $.get(
+						'../logbook/DeleteFFEntry4portalJSON.php', {id: entry.id},
+						function(data) {
+
+							if( data.Status != 'success' ) {
+								that.parent.report_error( data.Message );
+								return;
+							}
+							$('#'+that.base+'-m-subj-'+idx).addClass( 'el-l-m-subj-deleted' );
+							$('#'+that.base+'-m-subj-notes-'+idx).html( '<i>deleted by <b>'+data.deleted_by+'</b> [ '+data.deleted_time+' ]</i>' );
+
+							entry.deleted      = 1;
+							entry.deleted_by   = data.deleted_by;
+							entry.deleted_time = data.deleted_time;
+
+							/* Closing and reopening the message tree will update buttons within th emessage
+							 * and its children (if any) to a new state.
+							 */
+							that.expand_message(idx, false);
+							that.expand_message(idx, true);
+						},
+						'JSON'
+					).error( function () {
+						that.parent.report_error('failed because of: '+jqXHR.statusText); }
+					).complete( function() {
+						;
+					});
+				},
+				Cancel: function() {
+					$(this).dialog('close');
+				}
+			},
+			title: 'Information Deletion Warning'
+		});
+	};
+	this.live_message_undelete = function(idx) {
+		var entry = that.threads[idx];
+
+		var jqXHR = $.get(
+			'../logbook/UndeleteFFEntry4portalJSON.php', {id: entry.id},
+			function(data) {
+
+				if( data.Status != 'success' ) {
+					that.parent.report_error( data.Message );
+					return;
+				}
+				$('#'+that.base+'-m-subj-'+idx).removeClass( 'el-l-m-subj-deleted' );
+				$('#'+that.base+'-m-subj-notes-'+idx).html( '' );
+
+				entry.deleted = 0;
+				entry.deleted_by = '';
+				entry.deleted_time = '';
+
+				/* Closing and reopening the message tree will update buttons within th emessage
+				 * and its children (if any) to a new state.
+				 */
+				that.expand_message(idx, false);
+				that.expand_message(idx, true);
+			},
+			'JSON'
+		).error( function () {
+			that.parent.report_error('failed because of: '+jqXHR.statusText); }
+		).complete( function() {
+			;
+		});
+	}
+	this.live_child_delete = function(id) {
+		var entry = that.messages[id];
+		$('#popupdialogs').html(
+			'<p style="color:red;"><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
+	    	'You have requested to delete the selected message. Are you sure?</p>'
+		 );
+		$('#popupdialogs').dialog({
+			resizable: false,
+			modal: true,
+			buttons: {
+				'Yes': function() {
+
+					$( this ).dialog('close');
+
+					var jqXHR = $.get(
+						'../logbook/DeleteFFEntry4portalJSON.php', {id: entry.id},
+						function(data) {
+
+							if( data.Status != 'success' ) {
+								that.parent.report_error( data.Message );
+								return;
+							}
+							$('#'+that.base+'-c-subj-'+entry.id).addClass( 'el-l-c-subj-deleted' );
+							$('#'+that.base+'-c-subj-notes-'+entry.id).html( '<i>deleted by <b>'+data.deleted_by+'</b> [ '+data.deleted_time+' ]</i>' );
+
+							entry.deleted      = 1;
+							entry.deleted_by   = data.deleted_by;
+							entry.deleted_time = data.deleted_time;
+
+							that.recreate_child(entry.id);
+						},
+						'JSON'
+					).error( function () {
+						that.parent.report_error('failed because of: '+jqXHR.statusText); }
+					).complete( function() {
+						;
+					});
+				},
+				Cancel: function() {
+					$(this).dialog('close');
+				}
+			},
+			title: 'Information Deletion Warning'
+		});
+	};
+	this.live_child_undelete = function(id) {
+		var entry = that.messages[id];
+
+		var jqXHR = $.get(
+			'../logbook/UndeleteFFEntry4portalJSON.php', {id: entry.id},
+			function(data) {
+
+				if( data.Status != 'success' ) {
+					that.parent.report_error( data.Message );
+					return;
+				}
+				$('#'+that.base+'-c-subj-'+entry.id).removeClass( 'el-l-c-subj-deleted' );
+				$('#'+that.base+'-c-subj-notes-'+entry.id).html( '' );
+
+				entry.deleted = 0;
+				entry.deleted_by = '';
+				entry.deleted_time = '';
+
+				that.recreate_child(entry.id);
+			},
+			'JSON'
+		).error( function () {
+			that.parent.report_error('failed because of: '+jqXHR.statusText); }
+		).complete( function() {
+			;
+		});
+	}
 	this.live_message_reply = function(id, is_child) {
 	    that.create_live_message_dialogs(id, is_child);
 		$('#'+this.base+'-m-rdlg-'+id).removeClass('el-l-m-dlg-hdn').addClass('el-l-m-dlg-vis');
@@ -2051,9 +2281,14 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 
 				// Then display the new child on the page and make it visible
 				//
-				var html = that.live_child2html(entry, that.messages[id].thread_idx);
+				var html = '<div id="'+that.base+'-c-'+entry.id+'">'+
+						   that.live_child2html(entry, that.messages[id].thread_idx, false)+
+						   '</div>';
 				$('#'+that.base+'-m-c-'+id).prepend(html);
 
+				$('.el-l-m-ud').button();
+				$('.el-l-m-de').button();
+				$('.el-l-m-xa').button();
 				$('.el-l-m-re').button();
 				$('.el-l-m-ed').button();
 				$('.el-l-m-mv').button();
@@ -2312,12 +2547,20 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		if(!entry.is_run) {
 			that.messages[entry.id] = entry;
 			that.total_messages++;
+			if( entry.deleted ) that.total_messages_deleted++;
+			var notes = '';
+			var extra_subj_class = '';
+			if( entry.deleted ) {
+				extra_subj_class = 'el-l-m-subj-deleted';
+				notes = '<i>deleted by <b>'+entry.deleted_by+'</b> [ '+entry.deleted_time+' ]</i>';
+			}
 			html +=
 '  <div class="el-l-m-hdr" id="'+this.base+'-m-hdr-'+thread_idx+'" onclick="'+this.address+'.toggle_message('+thread_idx+');">'+
 '    <div style="float:left;"><span class="toggler ui-icon ui-icon-triangle-1-e el-l-m-tgl" id="'+this.base+'-m-tgl-'+entry.id+'"></span></div>'+
 '    <div style="float:left;" class="el-l-m-time">'+entry.hms+'</div>'+
 '    <div style="float:left;" class="el-l-m-author">'+entry.author+'</div>'+
-'    <div style="float:left; margin-left:10px;" class="el-l-m-subj">'+entry.subject+'</div>'+id_sign(entry)+run_sign(entry.run_num)+message_signs(entry)+
+'    <div style="float:left; margin-left:10px;" class="el-l-m-subj '+extra_subj_class+'" id='+this.base+'-m-subj-'+thread_idx+'>'+entry.subject+'</div>'+
+'    <div style="float:left; margin-left:10px;" class="el-l-m-subj-notes" id='+this.base+'-m-subj-notes-'+thread_idx+'>'+notes+'</div>'+id_sign(entry)+run_sign(entry.run_num)+message_signs(entry)+
 '    <div style="clear:both;"></div>'+
 '  </div>'+
 '  <div class="el-l-m-con el-l-m-hdn" id="'+this.base+'-m-con-'+entry.id+'"></div>';
@@ -2349,26 +2592,52 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		return html;
 	};
 
-	this.live_child2html = function(entry, thread_idx) {
-		that.messages[entry.id] = entry;
+	this.live_child2html = function(entry_in, thread_idx, parent_is_deleted) {
+
+		/* IMPORTANT: An existing message entry in the centrally managed array would
+		 * always prevail over anything send in as a parameter. Otherwise it would
+		 * be difficult to maintain the consistent state of message entries.
+		 */
+		var entry = entry_in;
+		if( entry.id in that.messages ) entry = that.messages[entry.id];
+		else that.messages[entry.id] = entry;
+
+		if( entry.deleted ) that.total_messages_deleted++;
+		var notes = '';
+		var extra_subj_class = '';
+		if( entry.deleted ) {
+			extra_subj_class = 'el-l-c-subj-deleted';
+			notes = '<i>deleted by <b>'+entry.deleted_by+'</b> [ '+entry.deleted_time+' ]</i>';
+		}
 		var html =
-'<div class="el-l-c-hdr" onclick="'+this.address+'.toggle_child('+entry.id+');">'+
+'<div class="el-l-c-hdr" id="'+this.base+'-c-hdr-'+entry.id+'" onclick="'+this.address+'.toggle_child('+entry.id+');">'+
 '  <div style="float:left;"><span class="toggler ui-icon ui-icon-triangle-1-e el-l-c-tgl" id="'+this.base+'-c-tgl-'+entry.id+'"></span></div>'+
 '  <div style="float:left;" class="el-l-c-time">'+entry.relevance_time+'</div>'+
 '  <div style="float:left;" class="el-l-c-author">'+entry.author+'</div>'+
-'  <div style="float:left; margin-left:10px;" class="el-l-c-subj">'+entry.subject+'</div>'+id_sign(entry)+message_signs(entry)+
+'  <div style="float:left; margin-left:10px;" class="el-l-c-subj '+extra_subj_class+'" id='+this.base+'-c-subj-'+entry.id+'>'+entry.subject+'</div>'+
+'  <div style="float:left; margin-left:10px;" class="el-l-c-subj-notes" id='+this.base+'-c-subj-notes-'+entry.id+'>'+notes+'</div>'+id_sign(entry)+message_signs(entry)+
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div class="el-l-c-con el-l-c-hdn" id="'+this.base+'-c-con-'+entry.id+'">'+
-'  <div class="el-l-c-body">'+
-'    <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>';
-		if(this.parent.editor)
-			html +=
-'    <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',true);">edit</button></div>';
+'  <div class="el-l-c-body">';
+		if( !parent_is_deleted ) {
+			if( entry.deleted ) {
+				html +=
+'    <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ud" id="'+this.base+'-m-ud-'+entry.id+'" onclick="'+this.address+'.live_child_undelete('+entry.id+');" title="undelete this message">undelete</button></div>';
+			} else {
+				if( this.parent.editor ) {
+					html +=
+'    <div style="float:right;" class="s-b-con"><button class="el-l-m-ed" id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',true);">edit</button></div>';
+				}
+				html +=
+'    <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-de" id="'+this.base+'-m-de-'+entry.id+'" onclick="'+this.address+'.live_child_delete('+entry.id+');" title="delete this message and all its children if any">delete</button></div>'+
+'    <div style="float:right;" class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',true);">reply</button></div>';
+			}
+		}
 		html +=
-'    <div style="float:right;" class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',true);">reply</button></div>'+
+'    <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>'+
 '    <div style="clear:both;"></div>'+
-'      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
+'    <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
 '  </div>';
 		that.attachments[entry.id] = entry.attachments;
 
@@ -2395,9 +2664,16 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		html +=
 '  <div id="'+this.base+'-m-c-'+entry.id+'">';
 
-		var children = entry.children;
-		for(var i in children) html += that.live_child2html(eval("("+children[i]+")"), thread_idx);
-
+		for(var i in entry.children ) {
+			var child = entry.children[i];
+			if( typeof child == 'string' ) {
+				child = eval("("+child+")");
+				entry.children[i] = child;
+			}
+			html += '<div id="'+that.base+'-c-'+child.id+'">'+
+					that.live_child2html(child, thread_idx, parent_is_deleted || entry.deleted )+
+					'</div>';
+		}
 		html +=
 '  </div>'+
 '</div>';
@@ -2472,86 +2748,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 	this.attachments_loader = null;
 
 	var that = this;
-/*
-	this.expand_message = function(idx, on) {
-		var entry = that.threads[idx];
-		var toggler='#'+that.base+'-m-tgl-'+entry.id;
-		var container='#'+that.base+'-m-con-'+entry.id;
 
-		// Initialize the thread container if this is the first call
-		// to the function for for the message.
-		//
-		if( $(container).html() == '' ) {
-			var html =
-'    <div class="el-l-m-body">';
-			if(this.parent.editor)
-				html +=
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+entry.id+',false);">move</button></div>'+
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
-			html +=
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',false);">reply</button></div>'+
-'      <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>'+
-'      <div style="clear:both;"></div>'+
-'      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
-'    </div>';
-			that.attachments[entry.id] = entry.attachments;
-			var attachments_html = '';
-			for(var k in entry.attachments) {
-				var a = entry.attachments[k];
-				that.attachments_loader[a.id] = {loaded: false, descr: a};
-				attachments_html +=
-'      <div style="float:left;" class="el-l-a">'+
-'        <div style="float:left;">'+
-'          <span class="toggler ui-icon ui-icon-triangle-1-e el-l-a-tgl" id="'+this.base+'-a-tgl-'+a.id+'" onclick="'+this.address+'.toggle_attachment('+a.id+');"></span>'+
-'        </div>'+
-'        <div style="float:left;" class="el-l-a-dsc"><a class="link" href="../logbook/attachments/'+a.id+'/'+a.description+'"  target="_blank">'+a.description+'</a></div>'+
-'        <div style="float:left; margin-left:10px;" class="el-l-a-info">( type: <b>'+a.type+'</b> size: <b>'+a.size+'</b> )</div>'+
-'        <div style="clear:both;"></div>'+
-'        <div class="el-l-a-con el-l-a-hdn" id="'+this.base+'-a-con-'+a.id+'">'+
-'        </div>'+
-'      </div>';
-			}
-			if(attachments_html) html +=
-'    <div class="el-l-m-as">'+attachments_html+
-'      <div style="clear:both;"></div>'+
-'    </div>';
-			var tags_html = '';
-			for(var k in entry.tags) {
-				if(tags_html) tags_html += ', ';
-				tags_html += entry.tags[k].tag;
-			}
-			if(tags_html) html +=
-'    <div class="el-l-m-tags">'+
-'      <b><i>keywords: </i></b>'+tags_html+
-'    </div>';
-			html +=
-'    <div id="'+this.base+'-m-c-'+entry.id+'">';
-			for(var k in entry.children) html += that.live_child2html(eval("("+entry.children[k]+")"));
-			html +=
-'    </div>'+
-'  </div>';
-			$(container).html(html);
-
-			$(container).find('.el-l-m-re').button();
-			$(container).find('.el-l-m-ed').button();
-			$(container).find('.el-l-m-mv').button();
-		}
-		if(on) {
-			$(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
-			$(container).removeClass('el-l-m-hdn').addClass('el-l-m-vis');
-			for(var i = 0; i < entry.attachments.length; i++) {
-				this.expand_attachment(entry.attachments[i].id, true);
-			}
-			for(var i = 0; i < entry.children.length; i++) {
-				var child = eval( "("+entry.children[i]+")" );
-				this.expand_child(child.id, true);
-			}
-		} else {
-			$(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
-			$(container).removeClass('el-l-m-vis').addClass('el-l-m-hdn');
-		}
-	};
-*/
 	this.expand_message = function(idx, on) {
 		var entry = that.threads[idx];
 		var toggler='#'+that.base+'-m-tgl-'+entry.id;

@@ -120,6 +120,14 @@
 .el-l-c-subj {
   margin-left:10px;
 }
+.el-l-m-subj-deleted,
+.el-l-c-subj-deleted {
+  text-decoration: line-through;
+}
+.el-l-m-subj-notes,
+.el-l-c-subj-notes {
+  color: red;
+}
 
 .el-l-a {
   margin-right:10px;
@@ -198,7 +206,7 @@ div.el-l-m-hdr:hover,
 div.el-l-c-hdr:hover {
   background-color:#d0d0d0;
 }
-
+	
 .el-l-r-hdr {
   margin-bottom:1px;
   padding:3px;
