@@ -162,6 +162,9 @@ class  pyana_cspad ( object ) :
         self.sum_good_images = None
         self.sum_dark_images = None
 
+        # test
+        self.sum_array = None
+
         # load dark image from file
         self.dark_image = None
         try: 
@@ -196,6 +199,9 @@ class  pyana_cspad ( object ) :
         self.cspad = CsPad(sections)
         self.data = CsPadData(self.img_source)
 
+        if self.pedestals is not None:
+            self.cspad.pedestals = self.pedestals
+
         print 
         print "Cspad configuration"
         print "  N quadrants   : %d" % config.numQuads()
@@ -220,6 +226,7 @@ class  pyana_cspad ( object ) :
 
         if  ( self.accumulate_n != 0 and (self.n_good%self.accumulate_n)==0 ):
             self.sum_good_images = None
+            self.sum_array = None
             self.n_good = 0
 
         if  ( self.accumulate_n != 0 and (self.n_dark%self.accumulate_n)==0 ):
@@ -241,17 +248,16 @@ class  pyana_cspad ( object ) :
 
         quads = evt.getCsPadQuads(self.img_source, env)
         if quads is not None:         
-            cspad_image = self.cspad.CsPadImage(quads)
+            cspad_image = self.cspad.get_detector_image(quads)
         else :
             # mini Cspad (only 2x2)
             quads = evt.get(xtc.TypeId.Type.Id_Cspad2x2Element, self.img_source)
             if quads is not None:         
-                cspad_image = self.cspad.CsPad2x2Image(quads)
+                cspad_image = self.cspad.get_mini_image(quads)
             
         if not quads:
             print '*** cspad information is missing ***'
             return
-
 
         # mask out hot pixels (16383)
         cspad_image_masked = np.ma.masked_greater_equal( cspad_image,16383 )
@@ -312,8 +318,12 @@ class  pyana_cspad ( object ) :
         self.n_good+=1
         if self.sum_good_images is None :
             self.sum_good_images = np.float_(cspad_image)
+            self.sum_array = np.float_( self.cspad.pixel_array )
         else :
             self.sum_good_images += cspad_image
+            self.sum_array += self.cspad.pixel_array
+            
+        # test
 
         # -----
         # Draw this event.
@@ -411,6 +421,10 @@ class  pyana_cspad ( object ) :
 
             average_image = self.sum_good_images/self.n_good 
             event_display_images.append( (label, average_image ) )
+
+            average_array = self.sum_array / self.n_good
+            np.savetxt("testfile.txt", average_array.reshape((4*8*185),388))
+            np.save("testfile.npy", average_array.reshape((4*8*185),388))
 
         rejected_image = None
         if self.n_dark > 0 :

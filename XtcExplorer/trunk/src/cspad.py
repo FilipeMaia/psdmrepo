@@ -22,21 +22,36 @@ class CsPad( object ):
          [434, 220, 850, 850, 637, 849, 430, 429]]
         )
 
-    def __init__(self, sections):
+    def __init__(self, sections, path = None):
+        """ Initialize CsPad object
+        @param sections    list of active sections from the cfg object
+        @param path        optional, path to calibration directory
+        """
         self.sections = sections
-        self.pedestals = None
 
-        self.quad_arrays = [None, None, None, None]  #np.zeros((4*8*185,388), dtype="uint16")
+        self.pedestals = None
+        # one array 4 x 8 x 185 x 388
+        # (flattens to 5920 x 388)
+
+        self.quad_arrays = [None, None, None, None]
+        # 4 arrays, each (8 x 185 x 388)
+
         self.pixel_array = None
-        self.read_geometry()
+        # one array 4 x 8 x 185 x 388
+        # (flattens to 5920 x 388)
+
+        self.image = None 
+        # one 1800x1800 image ready for display
+
+        self.read_geometry(path)
 
     def set_pedestals(self, pedestalfile ):
 
         # load dark from pedestal file:
         # pedestals txt file is (4*8*185)=5920 (lines) x 388 (columns)
         try: 
-            array = np.loadtxt(pedestalfile)
-            self.pedestals = np.reshape(array, (4,8,185,388) )
+            self.pedestals = np.loadtxt(pedestalfile)
+            self.pedestals = np.reshape(4,8,185,388)
             print "Pedestals has been loaded from %s"% pedestalfile
             print "Pedestals will be subtracted from displayed images"
         except:
@@ -44,40 +59,41 @@ class CsPad( object ):
             pass
          
 
-    def read_geometry(self):
+    def read_geometry(self, path = None):
+        """
+        Geometry calibrations are defined the same as for psana.
+        Read in these standard parameter files.
+        """
+        if path is None: 
+            path = 'XtcExplorer/calib/CsPad/'
 
-#        # read in rotation array:
-#        # 90-degree angle orientation of each section in each quadrant. 
-#        self.rotation_array =  np.loadtxt('XtcExplorer/calib/CSPad/rotation.par')
-#        print "Rotation array: ", self.rotation_array
+        # read in rotation array:
+        # 90-degree angle orientation of each section in each quadrant. 
+        # ... (4 rows (quads) x 8 columns (sections))
+        self.rotation_array =  np.loadtxt('XtcExplorer/calib/CSPad/rotation.par')
 
         # read in tilt array
+        # ... (4 rows (quads) x 8 columns (sections))
         self.tilt_array =  np.loadtxt('XtcExplorer/calib/CSPad/tilt.par')
-#        print "Tilt array: sections (columns), quadrants (rows)"
-#        print self.tilt_array
 
         # read in center position of sections in each quadrant
+        # ... (3*4 rows (4 quads, 3 xyz coordinates) x 8 columns (sections))
         ctr_array = np.loadtxt('XtcExplorer/calib/CSPad/center.par')
         ctr_corr_array = np.loadtxt('XtcExplorer/calib/CSPad/center_corr.par')
-        # KIS (Keep It Simple)
         self.center_array = np.reshape( ctr_array + ctr_corr_array, (3,4,8) )
 
-#        print "Section center x-coordinates:"
-#        print self.center_array[0]
-
-#        print "Section center y-coordinates:"
-#        print self.center_array[1]
-
+        # read in the quadrant offset parameters (w.r.t. image 0,0 in upper left coner)
+        # ... (3 rows (xyz) x 4 columns (quads) )
         quad_pos = np.loadtxt('XtcExplorer/calib/CSPad/offset.par')
         quad_pos_corr = np.loadtxt('XtcExplorer/calib/CSPad/offset_corr.par')
         quad_position = quad_pos[0:2,:] + quad_pos_corr[0:2,:]
-#        print "Quad position (approximate):"
-#        print quad_position
+
         
         # read in margins file:
+        # ... (3 rows (x,y,z) x 4 columns (section offset, quad offset, quad gap, quad shift)
         marg_gap_shift = np.loadtxt('XtcExplorer/calib/CSPad/marg_gap_shift.par')
 
-        # break it down
+        # break it down (extract each column, make full arrays to be added to the above ones)
         self.sec_offset = marg_gap_shift[0:2,0]
 
         quad_offset_xy = marg_gap_shift[0:2,1]
@@ -96,12 +112,35 @@ class CsPad( object ):
                                    quad_shift_xy*[-1,-1],
                                    quad_shift_xy*[-1,1],
                                    quad_shift_xy*[1,1]] ).T
-
         self.quad_offset = quad_position + quad_offset_XY + quad_gap_XY + quad_shift_XY
-#        print self.quad_offset
+
         
 
-    def CsPadElement( self, data3d, qn ):
+    def complete( self, data3d, qn ):
+        # if any sections are missing, insert zeros
+        if len( data3d ) < 8 :
+            zsec = np.zeros( (185,388), dtype=data3d.dtype)
+            #zsec = zsec * -99
+            for i in range (8) :
+                if i not in self.sections[qn] :
+                    data3d = np.insert( data3d, i, zsec, axis=0 )
+
+        # now the sections have been "filled out", fill the pixels attribute
+        self.quad_arrays[qn] = data3d.reshape(1480,388)
+        return data3d
+
+    def make_pixel_array( self, elements ):
+
+        self.pixel_array = np.zeros((4,8,185,388), dtype="uint16")
+        for e in elements: 
+            data = e.data()
+            quad = e.quad()
+            
+            data = self.complete(data, quad)
+            self.pixel_array[quad] = data
+
+
+    def get_quad_image( self, data3d, qn ):
 
         # Construct one image for each quadrant, each with 8 sections
         # from a data3d = 3 x 2*194 x 185 data array
@@ -114,30 +153,6 @@ class CsPad( object ):
         #   +-------+ 0 | 1 |
         #   |   3   |   |   |
         #   +-------+---+---+
-
-        # min and max
-        #print "CsPad (min,max) for quad %d: (%d,%d)" % (qn,np.min(data3d),np.max(data3d))
-
-        # if any sections are missing, insert zeros
-        if len( data3d ) < 8 :
-            zsec = np.zeros( (185,388), dtype=data3d.dtype)
-            #zsec = zsec * -99
-            for i in range (8) :
-                if i not in self.sections[qn] :
-                    data3d = np.insert( data3d, i, zsec, axis=0 )
-
-        # now the sections have been "filled out", fill the pixels attribute
-        self.quad_arrays[qn] = data3d.reshape(1480,388)
-                
-        # subtract pedestals, if supplied --- !!UNTESTED!!
-        if self.pedestals :
-            print "Subtracting pedestals:"
-            print "data3d has shape ", data3d.shape
-            print "pedestals has shape ", self.pedestals
-            print data3d
-            print self.pedestals
-            data3d -= self.pedestals
-
 
         pairs = []
         for i in range (8) :
@@ -186,14 +201,14 @@ class CsPad( object ):
         return quadrant
 
 
-    def CsPad2x2Image(self, element ):
-        """CsPad2x2Image
+    def get_mini_image(self, element ):
+        """get_2x2_image
         @param element      a single CsPad.MiniElementV1
         """
         data = element.data()
         quad = element.quad()
-        self.pixel_array = np.concatenate( (data[:,:,0],data[:,:,1]) )
-        # pixels should now be (370, 388)
+        self.pixel_array = np.array( (data[:,:,0],data[:,:,1]) )
+        # pixels should now be (2 x 185 x 388)
 
         pairs = []
         for i in xrange(2):
@@ -205,28 +220,25 @@ class CsPad( object ):
         image = np.vstack( (pairs[0],pairs[1]) )
         return image
 
-    def CsPadImage(self, elements ):
-        """CsPadImage
+    def get_detector_image(self, elements ):
+        """get_detector_image
         @param elements     list of CsPad.ElementV1 from pyana evt.getCsPadQuads()
         """
-        quad_images = np.zeros((4, self.npix_quad, self.npix_quad ), dtype="uint16")
+        self.make_pixel_array( elements )
 
-        for e in elements: 
-            data = e.data()
-            quad = e.quad()
-            
-            quad_images[quad] = self.CsPadElement( data, quad )
-
-        # now all elements have been filled out, fill and reshape self.pixels
-        self.pixel_array = np.array( self.quad_arrays ).reshape(5920, 388)
+        # pedestal subtraction here
+        if self.pedestals is not None:
+            self.pixel_array = self.pixel_array - self.pedestals
 
         cspad_image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype="uint16")
-        
-        for qn in xrange (0,4):
-            qoff_x = self.quad_offset[0,qn]
-            qoff_y = self.quad_offset[1,qn]
-            cspad_image[qoff_x : qoff_x+self.npix_quad,
-                        qoff_y : qoff_y+self.npix_quad ] = quad_images[qn]
+        for quad in xrange (4):
+
+            quad_image = self.get_quad_image( self.pixel_array[quad], quad )
+
+            qoff_x = self.quad_offset[0,quad]
+            qoff_y = self.quad_offset[1,quad]
+            cspad_image[qoff_x:qoff_x+self.npix_quad, qoff_y:qoff_y+self.npix_quad]=quad_image
+
 
         # mask out hot/saturated pixels (16383)
         im_hot_masked = np.ma.masked_greater_equal( cspad_image,16383 )
@@ -236,7 +248,7 @@ class CsPad( object ):
 
 
 
-    def CsPadElementCommonModeCorr( self, data3d, qn ):
+    def quad_imageCommonModeCorr( self, data3d, qn ):
         # Construct one image for each quadrant, each with 8 sections
         # from a data3d = 3 x 2*194 x 185 data array
         #   +---+---+-------+

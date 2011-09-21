@@ -11,6 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Sep-21 ofte                rev 2419
+        - pyana_cspad.py now has the option of saving and background subtract 
+	  using a pixel array file of same dimensions as the pedestals file used
+	  in psana
+	
 2011-Sep-20 ofte                rev 2412
         - solved the cspad pixel array problem, still lacks the ability to save it. 
 	- improved the axes labeling (ticks) for projection plots of cspad. 
