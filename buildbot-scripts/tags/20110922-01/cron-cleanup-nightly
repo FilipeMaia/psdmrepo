@@ -1,0 +1,53 @@
+#!/bin/sh
+
+reldir=${1:?Required parameter missing (release directory)}
+
+nkeep=10
+logdir="$reldir/logs/"
+
+#
+# redirect output to logfile
+#
+exec >> "$logdir/cleanup-nightly" 2>&1
+
+echo "+++ Starting at" `date`
+
+#
+# make full list of releases, sorted in reverse order
+#
+cd "$reldir"
+releases=`/bin/ls -1 | grep '^nightly-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$' | sort -r`
+
+#
+# Filter out releases we want to save
+#
+r1=
+for r in $releases ; do
+    test -f $r/.keep || r1="$r1 $r"
+done
+releases="$r1"
+echo "--- All non-keep releases: $releases"
+
+#
+# save top $nkeep releases
+#
+r1=
+for r in $releases ; do
+    if [ $nkeep -gt 0 ] ; then
+        nkeep=`expr $nkeep - 1`
+    else
+        r1="$r $r1"
+    fi
+done
+releases="$r1"
+echo "--- Releases to remove: $releases"
+
+#
+# Start removing them
+#
+for r in $releases ; do
+    echo "--- Removing release: $r"
+    rm -rf $r
+done
+
+echo "+++ Finishing at" `date`

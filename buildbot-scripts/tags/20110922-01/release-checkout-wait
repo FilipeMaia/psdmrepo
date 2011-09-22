@@ -1,0 +1,34 @@
+#!/bin/sh
+
+reldir=${1:?Required parameter missing (build directory)}
+shift 1
+rel=${1:?Required parameter missing (release name)}
+shift 1
+
+# max wait time in minutes
+wait_time=60
+
+#
+# file name to watch
+#
+watch="$reldir/$rel/.co-done"
+
+#
+# 
+#
+while [ $wait_time -ge 0 ] ; do
+    echo "Waiting for release to be checked out..."
+    if [ -f "$watch" ] ; then
+        cat "$watch"
+        if [ -f "$watch.err" ] ; then
+            cat "$watch.err" 1>&2
+            exit 2
+        fi
+        exit 0
+    fi
+    wait_time=`expr $wait_time - 1`
+    sleep 60
+done
+
+echo "Could not find release to build: $reldir/$rel" 1>&2
+exit 1
