@@ -775,12 +775,17 @@ class Plotter(object):
         aplot.colb = plt.colorbar(aplot.axesim,cax=cax)
         # colb is the colorbar object
 
-        if aplot.vmin is None: 
-            aplot.orglims = aplot.axesim.get_clim()
-            # min and max values in the axes are
-            #print "%s original value limits: %s" % (aplot.name,aplot.orglims)
-            aplot.vmin, aplot.vmax = aplot.orglims
-                    
+        aplot.orglims = aplot.axesim.get_clim()
+        print aplot.orglims
+        if aplot.vmin is not None:
+            aplot.orglims = ( aplot.vmin, aplot.orglims[1] )
+        if aplot.vmax is not None:
+            aplot.orglims = ( aplot.orglims[0], aplot.vmax )
+
+        aplot.vmin, aplot.vmax = aplot.orglims
+
+
+        
         # show the active region for thresholding
         if aplot.threshold and aplot.threshold.area is not None:
             xy = [aplot.threshold.area[0],aplot.threshold.area[2]]
