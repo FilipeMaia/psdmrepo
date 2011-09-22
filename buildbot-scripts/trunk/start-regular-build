@@ -7,7 +7,7 @@
 bbot=psdev:9989
 
 usage() {
-  echo Usage: `basename $0` '<release-name> <tags-file>' 1>&2
+  echo Usage: `basename $0` '<release-name> <tags-file> [<description-file>]' 1>&2
 }
 
 tmp=${SIT_ROOT:?Missing SIT_ROOT}
@@ -21,6 +21,7 @@ fi
 
 rel=$1
 tags=$2
+desc=$3
 
 #
 # directory for the new release
@@ -52,9 +53,10 @@ if [ ! -f "$tags" ] ; then
 fi
 
 #
-# Make absolute name for tags file
+# Make absolute name for files
 #
 tags=$(cd $(dirname $tags); pwd)/$(basename $tags)
+test -n "$desc" && desc=$(cd $(dirname $desc); pwd)/$(basename $desc) 
 
 #
 # Checkout the release
@@ -67,6 +69,8 @@ cd "$rel" && \
 cp "$tags" ./tags && \
 addpkg -x -f ./tags >"$log.out" 2>"$log.err"
 status=$?
+
+test -n "$desc" -a -f "$desc" && cp "$desc" ./release-notes
 
 test -s "$log.err" || rm "$log.err"
 mv "$log.out" "$rels/$rel/.co-done"
