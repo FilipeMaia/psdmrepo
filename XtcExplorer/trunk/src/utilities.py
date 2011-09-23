@@ -347,8 +347,9 @@ class Frame(object):
     Yet, I find no way to have access to everything, like colorbar.
     # So I make my own container... let me know if you know a better way
     """
-    def __init__(self, name=""):
+    def __init__(self, name="", title=""):
         self.name = name
+        self.title = title
 
         self.axes = None       # the patch containing the image
         self.axesim = None     # the image AxesImage
@@ -370,6 +371,7 @@ class Frame(object):
     def show(self):
         itsme = "%s"%self
         itsme +="\n name = %s " % self.name        
+        itsme +="\n title = %s " % self.title
         itsme +="\n axes = %s " % self.axes
         itsme +="\n axesim = %s " % self.axesim
         itsme +="\n threshold = %s " % self.threshold
@@ -438,11 +440,15 @@ class Plotter(object):
         self.fig = None
         self.fignum = None
         # a figure has one or more plots/frames
-        self.frames = None # list of class Frame in this figure
-        self.frame = {} # dictionary / hash table to access the Frames (only if named)
+        
+        self.frames = {} # dictionary / hash table to access the Frames
 
         self.display_mode = None
         # flag if interactively changed
+
+        self.threshold = None
+        self.vmin = None
+        self.vmax = None
 
         self.first = True
 
@@ -452,14 +458,21 @@ class Plotter(object):
         # a bug in raw_input ("QCoreApplication::exec: The event loop is already running")
         QtCore.pyqtRemoveInputHook()
 
-    def add_frame(self, frame_name=""):
-        if self.frames is None:
-            self.frames = []
-        aframe = Frame(frame_name)
-        self.frames.append(aframe)
+    def add_frame(self, name="", title=""):
+        aframe = None
+
+        if name == "":
+            name = "frame%d",len(self.frames)+1
         
-        if frame_name != "" :
-            self.frame[frame_name] = aframe
+        if name in self.frames:
+            aframe = self.frames[name]
+        else :
+            self.frames[name] = Frame(name)
+            aframe = self.frames[name]
+
+        aframe.title = title
+        return aframe
+
         
     def settings(self
                  , width = 5 # width of a single plot
@@ -509,22 +522,19 @@ class Plotter(object):
                                  wspace=0.2,  hspace=0.2 )
         
         # add subplots and frames
-        if self.frames is None:
-            self.frames = []
-
         for i in range (1,nplots+1):
             ax = self.fig.add_subplot(nrow,ncol,i)
 
-            if len(self.frames) >=  i:
-                self.frames[i-1].axes = ax
+            key = "fig%d_frame%d"%(fignum,i)
+            if key in self.frames :
+                self.frames[key].axes = ax
             else :
-                aframe = Frame()
+                aframe = self.add_frame(key)
                 aframe.axes = ax
-                self.frames.append(aframe)
+                #self.frames[key] = aframe 
 
-            #print "Subplot ", i, " created ", nrow, ncol, i, self.frames[i-1].name
-                    
         self.connect()
+
 
     def close_figure(self):
         #print plt.get_fignums()
@@ -545,7 +555,7 @@ class Plotter(object):
         #print "The following artist object was picked: ", event.artist
 
         # in which Frame?
-        for aplot in self.frames :
+        for aplot in self.frames.itemsvalues() :
             if aplot.axes == event.artist.axes : 
 
                 print "Current   threshold = ", aplot.threshold.value
@@ -645,9 +655,9 @@ class Plotter(object):
             # find out which axes was clicked...
 
             # ... colorbar?
-            for aplot in self.frames :
+            for key,aplot in self.frames.iteritems() :
                 if aplot.colb and aplot.colb.ax == event.inaxes: 
-                    
+
                     #print "You clicked on colorbar of plot ", aplot.name
                     #print 'mouse click: button=', event.button,' x=',event.x, ' y=',event.y
                     #print ' xdata=',event.xdata,' ydata=', event.ydata
@@ -664,17 +674,17 @@ class Plotter(object):
                     # left button
                     if event.button == 1 :
                         aplot.vmin = value
-                        print "mininum changed:   ( %.2f , %.2f ) " % (aplot.vmin, aplot.vmax )
+                        print "mininum of %s changed:   ( %.2f , %.2f ) " % (key, aplot.vmin, aplot.vmax )
                 
                     # middle button
                     elif event.button == 2 :
                         aplot.vmin, aplot.vmax = aplot.orglims
-                        print "reset to original: ( %.2f , %.2f ) " % (aplot.vmin, aplot.vmax )
+                        print "reset %s to original: ( %.2f , %.2f ) " % (key, aplot.vmin, aplot.vmax )
                         
                     # right button
                     elif event.button == 3 :
                         aplot.vmax = value
-                        print "maximum changed:   ( %.2f , %.2f ) " % (aplot.vmin, aplot.vmax )
+                        print "maximum of %s changed:   ( %.2f , %.2f ) " % (key, aplot.vmin, aplot.vmax )
                 
                     aplot.axesim.set_clim(aplot.vmin,aplot.vmax)
                     #aplot.update_axes()
@@ -690,10 +700,10 @@ class Plotter(object):
         @event_display_images    a list of tuples (title,image)
         @return                  new display_mode if any (else return None)
         """
-
+        #if self.fig is None: 
         self.create_figure(fignum, nplots=len(event_display_images))
         self.fig.suptitle(title)
-
+            
         pos = 0
         for tuple in event_display_images :
             pos += 1
@@ -721,12 +731,17 @@ class Plotter(object):
     def drawframe( self, frameimage, title="", fignum=1,position=1, showProj = False,extent=None):
         """ Draw a single frame
         """
-        index= position-1
-        aplot = self.frames[index]
+        key = "fig%d_frame%d"%(fignum,position)
+        aplot = self.frames[key]
         aplot.image = frameimage
+
+        if ( aplot.vmin is None) and (self.vmin is not None ):
+            aplot.vmin = self.vmin
+        if ( aplot.vmax is None) and (self.vmax is not None ):
+            aplot.vmax = self.vmax
         
         # get axes
-        aplot.axes = self.fig.axes[index]
+        aplot.axes = self.fig.axes[position-1]
         aplot.axes.set_title( title )
 
         if aplot.name == "" and title != "" :
@@ -776,7 +791,6 @@ class Plotter(object):
         # colb is the colorbar object
 
         aplot.orglims = aplot.axesim.get_clim()
-        print aplot.orglims
         if aplot.vmin is not None:
             aplot.orglims = ( aplot.vmin, aplot.orglims[1] )
         if aplot.vmax is not None:

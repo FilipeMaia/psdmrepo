@@ -68,7 +68,8 @@ class  pyana_cspad ( object ) :
 
         @param img_sources      string, Address of Detector-Id|Device-ID
         @param dark_img_file    name (base) of dark image file (numpy array) to be loaded, if any
-        @param pedestal_file    full path/name of pedestal file (same as translator is using). Alternative! to dark image file. 
+        @param pedestal_file    full path/name of pedestal file (same as translator is using).
+                                Alternative! to dark image file. 
         @param out_avg_file     name (base) of output file for average image (numpy array)
         @param out_shot_file    name (base) of numpy array file for selected single-shot events
         @param plot_vrange      range (format vmin:vmax) of values for plotting (pixel intensity)
@@ -95,7 +96,7 @@ class  pyana_cspad ( object ) :
         if self.darkfile is not None: print "Input dark image file: ", self.darkfile
 
         self.pedestalfile = opt.getOptString(pedestal_file)
-        if self.pedestalfile is not None: print "Using pedestals file: ", self.pedestalfile
+        if self.pedestalfile is not None: print "Using pedestal file: ", self.pedestalfile
 
         if self.darkfile is not None and self.pedestalfile is not None:
             print "... cannot use both! user-supplied dark image will be used. Pedestals will be ignored"
@@ -114,8 +115,6 @@ class  pyana_cspad ( object ) :
             self.plot_vmax = float(plot_vrange.strip("()").split(":")[1])
             print "Using plot_vrange = %.2f,%.2f"%(self.plot_vmin,self.plot_vmax)
 
-        self.plotter = Plotter()
-        self.plotter.settings(7,7)
         #if self.plot_every_n > 0 : self.plotter.display_mode = 1 # interactive 
 
         threshold_string = opt.getOptStrings(threshold)
@@ -140,12 +139,12 @@ class  pyana_cspad ( object ) :
             print "Using threshold area ", self.threshold.area
             
 
-        # Set up the plotter's frame by hand, since
-        # we need to also tell it about thresholds, and vlimits
-        self.plotter.add_frame(self.img_source)
-        self.plotter.frame[self.img_source].threshold = self.threshold
-        self.plotter.frame[self.img_source].vmin = self.plot_vmin
-        self.plotter.frame[self.img_source].vmax = self.plot_vmax
+        self.plotter = Plotter()
+        self.plotter.settings(7,7)
+        self.plotter.threshold = None
+        if self.threshold is not None:
+            self.plotter.threshold = self.threshold.value            
+        self.plotter.vmin, self.plotter.vmax = self.plot_vmin, self.plot_vmax
 
         # ----
         # initializations of other class variables
@@ -165,26 +164,8 @@ class  pyana_cspad ( object ) :
         # test
         self.sum_array = None
 
-        # load dark image from file
         self.dark_image = None
-        try: 
-            self.dark_image = np.load(self.darkfile)
-            print "Dark Image %s loaded from %s" %(str(self.dark.image.shape), self.darkfile)
-            print "Darks will be subtracted from displayed images"
-        except:
-            print "No dark image loaded"
-            pass
 
-        # load dark from pedestal file:
-        try:
-            array = np.loadtxt(self.pedestalfile)
-            self.pedestals = np.reshape(array, (4,8,185,388) )
-            print "Pedestals has been loaded from %s"%self.pedestalfile
-            print "Pedestals will be subtracted from displayed images"
-        except:
-            print "No pedestals loaded"
-            pass
-        
                 
     # this method is called at an xtc Configure transition
     def beginjob ( self, evt, env ) : 
@@ -196,11 +177,23 @@ class  pyana_cspad ( object ) :
                 
         quads = range(4)
         sections = map(config.sections, quads)
+
         self.cspad = CsPad(sections)
         self.data = CsPadData(self.img_source)
 
-        if self.pedestals is not None:
-            self.cspad.pedestals = self.pedestals
+        if self.pedestalfile is not None: 
+            self.cspad.set_pedestals( self.pedestalfile )
+            print "cspad images will be pedestal subtracted. Using pedestals file ", self.pedestalfile
+        else :
+            # load dark image from file
+            try: 
+                self.dark_image = np.load(self.darkfile)
+                print "Dark Image %s loaded from %s" %(str(self.dark.image.shape), self.darkfile)
+                print "Darks will be subtracted from displayed images"
+            except:
+                print "No dark image loaded"
+                pass
+
 
         print 
         print "Cspad configuration"
@@ -263,9 +256,6 @@ class  pyana_cspad ( object ) :
         cspad_image_masked = np.ma.masked_greater_equal( cspad_image,16383 )
         cspad_image = np.ma.filled(cspad_image_masked, 0)
         
-        self.vmax = np.max(cspad_image)
-        self.vmin = np.min(cspad_image)
-
         # subtract background if provided from a file
         if self.dark_image is not None: 
             cspad_image = cspad_image - self.dark_image 
@@ -356,26 +346,11 @@ class  pyana_cspad ( object ) :
 
             ## Just one plot
             # newmode = self.plotter.draw_figure(cspad_image,title, fignum=self.mpl_num, showProj=True)
-
-            for tuple in event_display_images: 
-                title = tuple[0]
-                image = tuple[1]
-                extent = None
-                try:
-                    extent = tuple[2]
-                except:
-                    pass
-                self.plotter.add_frame(title)
-                self.plotter.frame[title].threshold = self.threshold
-                self.plotter.frame[title].vmin = self.plot_vmin
-                self.plotter.frame[title].vmax = self.plot_vmax
-                
             newmode = self.plotter.draw_figurelist(self.mpl_num,
                                                    event_display_images,
                                                    title="",
-                                                   showProj=True,
-                                                   extent = extent)
-
+                                                   showProj=True)
+            
             if newmode is not None:
                 # propagate new display mode to the evt object 
                 evt.put(newmode,'display_mode')
@@ -469,22 +444,8 @@ class  pyana_cspad ( object ) :
                 np.save(filename2, rejected_image)
 
 
-        for tuple in event_display_images: 
-            title = tuple[0]
-            image = tuple[1]
-            extent = None
-            try:
-                extent = tuple[2]
-            except:
-                pass
-            self.plotter.add_frame(title)
-            self.plotter.frame[title].threshold = self.threshold
-            self.plotter.frame[title].vmin = self.plot_vmin
-            self.plotter.frame[title].vmax = self.plot_vmax
-
         self.plotter.draw_figurelist(self.mpl_num+1,
                                      event_display_images,
                                      title=title,
-                                     showProj=True,
-                                     extent=extent)
+                                     showProj=True)
             

@@ -926,13 +926,13 @@ Start with selecting data of interest to you from list on the left and general r
         lpoptions.append("pyana")
         if self.pyana_cfg.jobconfig.run_n is not None:
             lpoptions.append("-n")
-            lpoptions.append(self.pyana_cfg.jobconfig.run_n)
+            lpoptions.append("%s"%str(self.pyana_cfg.jobconfig.run_n))
         if self.pyana_cfg.jobconfig.skip_n is not None:
             lpoptions.append("-s")
-            lpoptions.append(self.pyana_cfg.jobconfig.skip_n)
+            lpoptions.append("%s"%str(self.pyana_cfg.jobconfig.skip_n))
         if self.pyana_cfg.jobconfig.num_cpu is not None:
             lpoptions.append("-p")
-            lpoptions.append(self.pyana_cfg.jobconfig.num_cpu)
+            lpoptions.append("%s"%str(self.pyana_cfg.jobconfig.num_cpu))
         lpoptions.append("-c")
         lpoptions.append("%s" % self.pyana_cfg.file)
         for file in self.filenames :
@@ -952,16 +952,20 @@ Start with selecting data of interest to you from list on the left and general r
             runstring = str(text)
             lpoptions = runstring.split(' ')
 
-            # and update run_n and skip_n in the Gui:
-            if "-n" in lpoptions:
-                self.pyana_cfg.jobconfig.run_n = int(lpoptions[ lpoptions.index("-n")+1 ])
-                self.run_n_status.setText("Process %s events"% self.pyana_cfg.jobconfig.run_n)
-            if "-s" in lpoptions:
-                self.pyana_cfg.jobconfig.skip_n = int(lpoptions[ lpoptions.index("-s")+1 ])
-                self.skip_n_status.setText("Skip the fist %s events of xtc file"% self.pyana_cfg.jobconfig.skip_n)
-            if "-p" in lpoptions:
-                self.pyana_cfg.jobconfig.num_cpu = int(lpoptions[ lpoptions.index("-p")+1 ])
-                self.mproc_status.setText("Multiprocessing with %s CPUs"% self.pyana_cfg.jobconfig.num_cpu)
+# DISABLE run-dialogue feedback for now
+#            # and update run_n and skip_n in the Gui:
+#            if "-n" in lpoptions:
+#                self.pyana_cfg.jobconfig.run_n = int(lpoptions[ lpoptions.index("-n")+1 ])
+#                general_widget.run_n_status.setText("Process %s events"%\
+#                                                    self.pyana_cfg.jobconfig.run_n)
+#            if "-s" in lpoptions:
+#                self.pyana_cfg.jobconfig.skip_n = int(lpoptions[ lpoptions.index("-s")+1 ])
+#                general_widget.skip_n_status.setText("Skip the fist %s events of xtc file"%\
+#                                                     self.pyana_cfg.jobconfig.skip_n)
+#            if "-p" in lpoptions:
+#                self.pyana_cfg.jobconfig.num_cpu = int(lpoptions[ lpoptions.index("-p")+1 ])
+#                general_widget.mproc_status.setText("Multiprocessing with %s CPUs"%\
+#                                                    self.pyana_cfg.jobconfig.num_cpu)
         else :
             return
 

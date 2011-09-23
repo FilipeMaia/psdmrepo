@@ -202,12 +202,16 @@ class  pyana_image ( object ) :
 
         self.plotter = Plotter()        
         self.plotter.settings(7,7) # set default frame size
+        self.plotter.threshold = None
+        if self.threshold is not None:
+            self.plotter.threshold = self.threshold.value
+            self.plotter.vmin, self.plotter.vmax = self.plot_vmin, self.plot_vmax
 
-        # Set up the plotter's frame by hand, since
-        # we need to also tell it about thresholds
-        for source in self.sources :
-            self.plotter.add_frame(source)
-            self.plotter.frame[source].threshold = self.threshold
+#        # Set up the plotter's frame by hand, since
+#        # we need to also tell it about thresholds
+#        for source in self.sources :
+#            self.plotter.add_frame(source)
+#            self.plotter.frame[source].threshold = self.threshold
 
 
     def beginjob ( self, evt, env ) : 
@@ -466,10 +470,6 @@ class  pyana_image ( object ) :
             
             
             # plot to a new figure ... thus we must define new frames (if we want them to know about threshold)
-            for title, image in event_display_images:
-                self.plotter.add_frame(title)
-                self.plotter.frame[title].threshold = self.threshold
-
             self.plotter.draw_figurelist(self.mpl_num+nsrc,
                                          event_display_images,
                                          title="Endjob:  %s"%addr,

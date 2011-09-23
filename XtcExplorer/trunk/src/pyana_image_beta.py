@@ -517,7 +517,7 @@ class  pyana_image_beta ( object ) :
         image = None
         quads = evt.get(xtc.TypeId.Type.Id_Cspad2x2Element, self.source)
         if quads is not None: 
-            image = self.cspad.CsPad2x2Image(quads)
+            image = self.cspad.get_mini_image(quads)
         else: 
             print '*** cspad information is missing ***'
             return
@@ -538,7 +538,7 @@ class  pyana_image_beta ( object ) :
         quads = evt.getCsPadQuads(self.source, env)
         image = None
         if quads is not None:         
-            image = self.cspad.CsPadImage(quads)
+            image = self.cspad.get_detector_image(quads)
         else :
             print '*** cspad information is missing ***'
             print self.source

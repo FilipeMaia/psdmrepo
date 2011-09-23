@@ -50,13 +50,13 @@ class CsPad( object ):
         # load dark from pedestal file:
         # pedestals txt file is (4*8*185)=5920 (lines) x 388 (columns)
         try: 
-            self.pedestals = np.loadtxt(pedestalfile)
-            self.pedestals = np.reshape(4,8,185,388)
+            self.pedestals = np.loadtxt(pedestalfile).reshape((4,8,185,388))
             print "Pedestals has been loaded from %s"% pedestalfile
             print "Pedestals will be subtracted from displayed images"
         except:
             print "No pedestals loaded"
             pass
+
          
 
     def read_geometry(self, path = None):
@@ -139,6 +139,26 @@ class CsPad( object ):
             data = self.complete(data, quad)
             self.pixel_array[quad] = data
 
+    def make_image(self, data2d ):
+        """make image
+        
+        Takes 'flattened' data array, applies the Cspad geometry 
+        and returns the 1800x1800 image with all sections in the right place (or approximately)
+        @param data2d  input 2d data array file (4*8*185 x 388 = 5920 x 388)
+        """
+        self.image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype="uint16")
+        for quad in xrange (4):
+
+            quad_image = self.get_quad_image( self.pixel_array[quad], quad )
+
+            qoff_x = self.quad_offset[0,quad]
+            qoff_y = self.quad_offset[1,quad]
+            self.image[qoff_x:qoff_x+self.npix_quad, qoff_y:qoff_y+self.npix_quad]=quad_image
+
+
+        # mask out hot/saturated pixels (16383)
+        im_hot_masked = np.ma.masked_greater_equal( self.image, 16383 )
+        self.image = np.ma.filled( im_hot_masked, 0)
 
     def get_quad_image( self, data3d, qn ):
 
@@ -166,6 +186,7 @@ class CsPad( object ):
 
             # all sections are originally 185 (rows) x 388 (columns) 
             # Re-orient each section in the quad
+
             if i==0 or i==1 :
                 pair = pair[:,::-1].T   # reverse columns, switch columns to rows. 
             if i==4 or i==5 :
@@ -228,24 +249,12 @@ class CsPad( object ):
 
         # pedestal subtraction here
         if self.pedestals is not None:
+            print self.pixel_array.shape, self.pedestals.shape
             self.pixel_array = self.pixel_array - self.pedestals
 
-        cspad_image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype="uint16")
-        for quad in xrange (4):
+        self.make_image( self.pixel_array )
 
-            quad_image = self.get_quad_image( self.pixel_array[quad], quad )
-
-            qoff_x = self.quad_offset[0,quad]
-            qoff_y = self.quad_offset[1,quad]
-            cspad_image[qoff_x:qoff_x+self.npix_quad, qoff_y:qoff_y+self.npix_quad]=quad_image
-
-
-        # mask out hot/saturated pixels (16383)
-        im_hot_masked = np.ma.masked_greater_equal( cspad_image,16383 )
-        cspad_image = np.ma.filled( im_hot_masked, 0)
-
-        return cspad_image
-
+        return self.image
 
 
     def quad_imageCommonModeCorr( self, data3d, qn ):

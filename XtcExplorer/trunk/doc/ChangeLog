@@ -11,6 +11,19 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Sep-23 ofte                rev 2425
+        - Change the way Plotter and Frames are handled to fix a problem 
+	  with colorbar being disconnected when endjob plot appars. In fact 
+	  this should handle another problem with memory leak too (too many 
+	  "frames" stored)
+	- pyana_cspad.py and pyana_image.py changed accordingly. 
+	- cspad.py: added functionality to draw a picture from array file 
+	  independent of pyana / xtcexplorer. That part isn't properly working 
+	  yet, but shouldn't break anything either. More next week... 
+	
+2011-Sep-22 ofte                rev 2424
+        - fixed middle-button reset for cspad&images (utilities.py)
+
 2011-Sep-21 ofte                rev 2419
         - pyana_cspad.py now has the option of saving and background subtract 
 	  using a pixel array file of same dimensions as the pedestals file used
