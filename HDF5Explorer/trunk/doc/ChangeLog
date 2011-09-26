@@ -12,6 +12,10 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ------------------------------
+2011-09-26 Mikhail S. Dubrovin
+- CSPad image was calculated in int16 -> now in float
+- CSPad and camera images were saved in int -> now in float
+
 Tag: V00-00-08
 2011-09-26 Mikhail S. Dubrovin
 - Fix problem with incriment of the number of averaged events.

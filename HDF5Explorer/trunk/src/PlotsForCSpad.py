@@ -177,8 +177,10 @@ class PlotsForCSpad ( object ) :
         asic2x1 = arr1ev[self.pair,...]
         #print 'asic2x1=',asic2x1    
         asics   = hsplit(asic2x1,2)
+        #arrgap=zeros( (185,3), dtype=np.float ) # make additional 2D-array of 0-s for the gap between two 1x1 pads
         arrgap=zeros( (185,3), dtype=np.int16 ) # make additional 2D-array of 0-s for the gap between two 1x1 pads
         arr2d = hstack((asics[0],arrgap,asics[1]))
+        #print 'arr2d=\n', arr2d    
         return arr2d
 
 
@@ -195,7 +197,7 @@ class PlotsForCSpad ( object ) :
         #print 'getImageArrayForQuad(), quad=', self.quad
 
         #arr2dquad = np.zeros( (850,850), dtype=np.int16 )
-        arr2dquad = np.zeros( (cs.confcspad.quadDimX,cs.confcspad.quadDimY), dtype=np.int16 )
+        arr2dquad = np.zeros( (cs.confcspad.quadDimX,cs.confcspad.quadDimY), dtype=np.float ) # dtype=np.int16 
         #print 'arr2dquad.shape=',arr2dquad.shape
 
         for ind in xrange(8): # loop over ind = 0,1,2,...,7
@@ -263,6 +265,7 @@ class PlotsForCSpad ( object ) :
             
             arr2dquad[ixOff:dimX+ixOff, iyOff:dimY+iyOff] += rotarr2d[0:dimX, 0:dimY]
 
+        #print 'arr2dquad=\n', arr2dquad
         return arr2dquad
 
 
@@ -312,7 +315,7 @@ class PlotsForCSpad ( object ) :
         #self.arr2dCSpad = np.zeros( (1710,1710), dtype=np.int16 )
         #self.arr2dCSpad = np.zeros( (1750,1750), dtype=np.int16 )
         #self.arr2dCSpad = np.zeros( (1765,1765), dtype=np.int16 )
-        self.arr2dCSpad = np.zeros( (cs.confcspad.detDimX,cs.confcspad.detDimY), dtype=np.int16 )
+        self.arr2dCSpad = np.zeros( (cs.confcspad.detDimX,cs.confcspad.detDimY), dtype=np.float ) # dtype=np.int16
 
         #for quad in range(0,4) :
         for quad in range(len(cs.confcspad.quad_nums_in_event)) :
@@ -342,7 +345,7 @@ class PlotsForCSpad ( object ) :
         #print 'arr2x1=',arr2x1 
 
         asics = hsplit(arr2x1,2)
-        arrgap=zeros( (185,3), dtype=np.int16 ) # make additional 2D-array of 0-s for the gap between two 1x1 pads
+        arrgap=zeros( (185,3), dtype=np.float ) #dtype=np.int16 # make additional 2D-array of 0-s for the gap between two 1x1 pads
 
         #print 'asics[0].shape=',asics[0].shape
         #print 'asics[1].shape=',asics[1].shape
@@ -360,7 +363,7 @@ class PlotsForCSpad ( object ) :
         wid2x1      = arr2x1Pair0.shape[0]
         len2x1      = arr2x1Pair0.shape[1]
 
-        arrgapV = zeros( (20,len2x1), dtype=np.int16 ) 
+        arrgapV = zeros( (20,len2x1), dtype=np.float ) # dtype=np.int16 
         arr2d   = vstack((arr2x1Pair0, arrgapV, arr2x1Pair1))
 
         #print 'arr2d.shape=', arr2d.shape

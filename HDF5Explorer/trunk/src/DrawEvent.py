@@ -424,12 +424,14 @@ class DrawEvent ( object ) :
             self.getCSpadConfiguration(dsname)
             arr2d = self.plotsCSpad.getImageArrayForDet( arr1ev )
             #print 'arr2d.shape=', arr2d.shape
-            gm.saveNumpyArrayInFile(arr2d,  fname='cspad-ave.txt' , format='%i') # , format='%f')
+            #print 'arr1ev=/n', arr1ev
+            #print 'arr2d[100:200,100:200]=\n', arr2d[100:200,100:200]
+            gm.saveNumpyArrayInFile(arr2d,  fname='cspad-ave.txt' , format='%f') # , format='%i')
            #gm.saveNumpyArrayInFile(arr1ev, fname='cspad-arr.txt' , format='%i') # , format='%f')
 
             quad = cp.confpars.cspadQuad
             arrQuad = self.plotsCSpad.getImageArrayForQuad( arr1ev, quadNum=quad )
-            gm.saveNumpyArrayInFile(arrQuad, fname='cspad-ave-quad-' + str(quad) + '.txt' , format='%i') # , format='%f')
+            gm.saveNumpyArrayInFile(arrQuad, fname='cspad-ave-quad-' + str(quad) + '.txt' , format='%f') # , format='%i')
 
 
         if gm.ImageIsInTheName(dsname) :
@@ -440,7 +442,7 @@ class DrawEvent ( object ) :
             str_ave = '-av%d'   % (self.numEventsSelected) # cp.confpars.numEventsAverage
             fname_common = 'camera-' + str(cameraName) + str_ave + str_evt
 
-            gm.saveNumpyArrayInFile(arr1ev, fname=fname_common + '.txt' , format='%i') # , format='%f')
+            gm.saveNumpyArrayInFile(arr1ev, fname=fname_common + '.txt' , format='%f') # , format='%i')
 
             tiff_fname = fname_common + '.tiff'
             print 'Save image in TIFF file  ', tiff_fname
