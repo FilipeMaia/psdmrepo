@@ -289,10 +289,11 @@ Start with selecting data of interest to you from list on the left and general r
                 mproc_status.setText("Multiprocessing with %s CPUs"%text)
                 self.num_cpu = int(text)                
         self.connect(mproc_menu, QtCore.SIGNAL('currentIndexChanged(int)'), mproc_changed )
-                                                                                                                                                                                
+        
         # divider
-        self.help_layout.addWidget(QtGui.QLabel(" "))
-
+        divider = ". . . "*30
+        self.help_layout.addWidget(QtGui.QLabel(divider))
+        
         # Global Display mode
         self.dmode_layout = QtGui.QHBoxLayout()
         self.displaymode = "Interactive"

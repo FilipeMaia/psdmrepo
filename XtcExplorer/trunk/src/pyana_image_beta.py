@@ -152,7 +152,8 @@ class  pyana_image_beta ( object ) :
                                    'Princeton' : self.get_princeton_image,
                                    'pnCCD' :     self.get_pnccd_image,
                                    'Fccd' :      self.get_fccd_image, 
-                                   'TM6740' :    self.get_other_image }
+                                   'TM6740' :    self.get_other_image,
+                                   'AnyOther' :  self.get_other_image }
         
         
         # accumulate image data 
@@ -216,6 +217,12 @@ class  pyana_image_beta ( object ) :
             self.cspad.set_pedestals( self.pedestalfile )
             
 
+        self.image_type = None
+        try:
+            self.image_type = self.source.split('|')[1].split('-')[0]
+        except:
+            self.image_type = "AnyOther"
+
 
     # process event/shot data
     def event ( self, evt, env ) :
@@ -233,9 +240,7 @@ class  pyana_image_beta ( object ) :
         #################################
 
         # call the relevant function to get the image (faster than if-else clauses)
-        label = self.source.split('|')[1].split('-')[0]
-
-        the_image = self.funcdict_getimage[label]([evt, env])
+        the_image = self.funcdict_getimage[self.image_type]([evt, env])
         if the_image is None:
             print "No image from ", label
             return

@@ -159,6 +159,10 @@ class  pyana_ipimb ( object ) :
                     self.fex_position[source].append( [-1,-1] ) 
 
             
+        # only call plotter if this is the main thread
+        if (env.subprocess()>0):
+            return
+
 
         # ----------------- Plotting ---------------------
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
@@ -183,6 +187,10 @@ class  pyana_ipimb ( object ) :
 
 
     def endjob( self, evt, env ) :
+
+        # only call plotter if this is the main thread
+        if (env.subprocess()>0):
+            return
 
         # ----------------- Plotting ---------------------
         header = "DetInfo:IPIMB data shots %d-%d" % (self.accu_start, self.n_shots)
@@ -247,7 +255,7 @@ class  pyana_ipimb ( object ) :
                 plt.xlabel('Sum of channels',horizontalalignment='left') # the other right
                 i+=1
             self.data[source].fex_sum = array
- 
+            print "Checking the length of array: ", len(array)
 
             array = np.float_(self.fex_channels[source])
             if "fex:channels" in self.quantities:

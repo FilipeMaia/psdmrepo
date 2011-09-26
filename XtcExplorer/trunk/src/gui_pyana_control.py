@@ -254,7 +254,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.ncalib = len(data.nevents)
 
         # configuration object for pyana job
-        self.pyana_cfg = cfg.Configuration()
+        self.settings = cfg.Configuration()
 
         self.config_tab = { 'pyana_image_beta'  : self.image_tab,
                             'pyana_scan_beta'   : self.scan_tab,
@@ -396,7 +396,7 @@ Start with selecting data of interest to you from list on the left and general r
             self.cfg_tabs.setCurrentIndex(index)
             return
 
-        general_widget = panels.JobConfigGui( self.pyana_cfg )
+        general_widget = panels.JobConfigGui( self.settings )
         self.connect( general_widget.apply_button,
                       QtCore.SIGNAL('clicked()'), self.update_pyana_tab )
         
@@ -702,8 +702,8 @@ Start with selecting data of interest to you from list on the left and general r
         self.pyana_widget = pyana_widget
         
     def update_pyana_tab(self):
-        self.pyana_cfg.update_text()
-        self.pyana_config_text.setText(self.pyana_cfg.config_text)
+        self.settings.update_text()
+        self.pyana_config_text.setText(self.settings.config_text)
 
         #self.cfg_tabs.setCurrentWidget(self.pyana_widget)
         # clear title 
@@ -822,14 +822,14 @@ Start with selecting data of interest to you from list on the left and general r
 
         if checkbox.isChecked():
             # 1) Add module to module list 
-            module = self.pyana_cfg.add_module( checkbox_label )
+            module = self.settings.add_module( checkbox_label )
             self.update_pyana_tab()
         
             # 2) Open tab to configure plots
             self.config_tab[module.name](module)            
         else :
             # 1) Remove module from module list
-            module = self.pyana_cfg.remove_module( checkbox_label )
+            module = self.settings.remove_module( checkbox_label )
             self.update_pyana_tab()
 
             # 2) Close tab for configuring plots
@@ -860,9 +860,9 @@ Start with selecting data of interest to you from list on the left and general r
 
     def print_configuration(self):
         print "----------------------------------------"
-        print "Configuration file (%s): " % self.pyana_cfg.file
+        print "Configuration file (%s): " % self.settings.file
         print "----------------------------------------"
-        print self.pyana_cfg.config_text
+        print self.settings.config_text
         print "----------------------------------------"
         return
 
@@ -870,12 +870,12 @@ Start with selecting data of interest to you from list on the left and general r
         """Write the configuration text to a file. Filename is generated randomly
         """
 
-        self.pyana_cfg.file = "xb_pyana_%d.cfg" % random.randint(1000,9999)
+        self.settings.file = "xb_pyana_%d.cfg" % random.randint(1000,9999)
 
-        self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.pyana_cfg.file)
+        self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.settings.file)
 
-        f = open(self.pyana_cfg.file,'w')
-        f.write(self.pyana_cfg.config_text)
+        f = open(self.settings.file,'w')
+        f.write(self.settings.config_text)
         f.close()
 
         self.print_configuration()
@@ -894,19 +894,19 @@ Start with selecting data of interest to you from list on the left and general r
     def edit_configfile(self):
 
         # pop up emacs window to edit the config file as needed:
-        #proc_emacs = myPopen("emacs %s" % self.pyana_cfg.file, shell=True)
-        #proc_emacs = myPopen("nano %s" % self.pyana_cfg.file, shell=True)
-        proc_emacs = myPopen("$EDITOR %s" % self.pyana_cfg.file, shell=True) 
+        #proc_emacs = myPopen("emacs %s" % self.settings.file, shell=True)
+        #proc_emacs = myPopen("nano %s" % self.settings.file, shell=True)
+        proc_emacs = myPopen("$EDITOR %s" % self.settings.file, shell=True) 
         stdout_value = proc_emacs.communicate()[0]
         print stdout_value
-        #proc_emacs = MyThread("emacs %s" % self.pyana_cfg.file) 
+        #proc_emacs = MyThread("emacs %s" % self.settings.file) 
         #proc_emacs.start()
         
-        f = open(self.pyana_cfg.file,'r')
+        f = open(self.settings.file,'r')
         configtext = f.read()
         f.close()
 
-        self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.pyana_cfg.file)
+        self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.settings.file)
         self.pyana_config_text.setText(configtext)
 
         # should add:
@@ -924,17 +924,17 @@ Start with selecting data of interest to you from list on the left and general r
         # Make a command sequence 
         lpoptions = []
         lpoptions.append("pyana")
-        if self.pyana_cfg.jobconfig.run_n is not None:
+        if self.settings.jobconfig.run_n is not None:
             lpoptions.append("-n")
-            lpoptions.append("%s"%str(self.pyana_cfg.jobconfig.run_n))
-        if self.pyana_cfg.jobconfig.skip_n is not None:
+            lpoptions.append("%s"%str(self.settings.jobconfig.run_n))
+        if self.settings.jobconfig.skip_n is not None:
             lpoptions.append("-s")
-            lpoptions.append("%s"%str(self.pyana_cfg.jobconfig.skip_n))
-        if self.pyana_cfg.jobconfig.num_cpu is not None:
+            lpoptions.append("%s"%str(self.settings.jobconfig.skip_n))
+        if self.settings.jobconfig.num_cpu is not None:
             lpoptions.append("-p")
-            lpoptions.append("%s"%str(self.pyana_cfg.jobconfig.num_cpu))
+            lpoptions.append("%s"%str(self.settings.jobconfig.num_cpu))
         lpoptions.append("-c")
-        lpoptions.append("%s" % self.pyana_cfg.file)
+        lpoptions.append("%s" % self.settings.file)
         for file in self.filenames :
             lpoptions.append(file)
 
@@ -955,17 +955,17 @@ Start with selecting data of interest to you from list on the left and general r
 # DISABLE run-dialogue feedback for now
 #            # and update run_n and skip_n in the Gui:
 #            if "-n" in lpoptions:
-#                self.pyana_cfg.jobconfig.run_n = int(lpoptions[ lpoptions.index("-n")+1 ])
+#                self.settings.jobconfig.run_n = int(lpoptions[ lpoptions.index("-n")+1 ])
 #                general_widget.run_n_status.setText("Process %s events"%\
-#                                                    self.pyana_cfg.jobconfig.run_n)
+#                                                    self.settings.jobconfig.run_n)
 #            if "-s" in lpoptions:
-#                self.pyana_cfg.jobconfig.skip_n = int(lpoptions[ lpoptions.index("-s")+1 ])
+#                self.settings.jobconfig.skip_n = int(lpoptions[ lpoptions.index("-s")+1 ])
 #                general_widget.skip_n_status.setText("Skip the fist %s events of xtc file"%\
-#                                                     self.pyana_cfg.jobconfig.skip_n)
+#                                                     self.settings.jobconfig.skip_n)
 #            if "-p" in lpoptions:
-#                self.pyana_cfg.jobconfig.num_cpu = int(lpoptions[ lpoptions.index("-p")+1 ])
+#                self.settings.jobconfig.num_cpu = int(lpoptions[ lpoptions.index("-p")+1 ])
 #                general_widget.mproc_status.setText("Multiprocessing with %s CPUs"%\
-#                                                    self.pyana_cfg.jobconfig.num_cpu)
+#                                                    self.settings.jobconfig.num_cpu)
         else :
             return
 

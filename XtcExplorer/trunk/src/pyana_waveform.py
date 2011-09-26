@@ -259,18 +259,11 @@ class pyana_waveform (object) :
 
         nplots = len(self.src_ch)
         ncols = 1
-        nrows = 1
-        if nplots == 2: ncols = 2
-        if nplots == 3: ncols = 3
-        if nplots == 4: ncols = 2; nrows = 2
-        if nplots > 4:
-            ncols = 3
-            nrows = nplots / 3
-            if nplots%3 > 0 : nrows += 1
+        nrows = len(self.src_ch)
             
-        height=4.2
+        height=4.0
         if (nrows * height) > 14 : height = 14/nrows
-        width=height*1.3
+        width=height*4.3
         
         fig = plt.figure(num=self.mpl_num, figsize=(width*ncols,height*nrows) )
         fig.clf()
@@ -281,19 +274,22 @@ class pyana_waveform (object) :
 
         pos = 1
         for source in self.src_ch :
-            print "plotting %d events from source %s" % (self.ctr[source],source)
-            
-            self.wf_avg = self.wf[source] / self.ctr[source]
-            self.wf2_avg = self.wf2[source] / self.ctr[source]
-            self.wf_rms = np.sqrt( self.wf2_avg - self.wf_avg*self.wf_avg ) / np.sqrt(self.ctr[source])
+            nev = self.ctr[source]
+            ts_axis = self.ts[source]
+
+            print "plotting %d events from source %s" % (nev,source)
+            self.wf_avg = self.wf[source] / nev
+
+#            # ... plotting with error bars is terribly slow.... enable at your own "risk"
+#            self.wf2_avg = self.wf2[source] / nev
+#            self.wf_rms = np.sqrt( self.wf2_avg - self.wf_avg*self.wf_avg ) / np.sqrt(nev)
 
             dim1 = np.shape(self.wf_avg)
-            dim2 = np.shape(self.wf_rms)
-            dim3 = np.shape(self.ts[source])
+#            dim2 = np.shape(self.wf_rms)
+            dim3 = np.shape(ts_axis)
 
-            ts_axis = self.ts[source]
             if dim3 != dim1 :
-                ts_axis = self.ts[source][0:dim1[0]]
+                ts_axis = ts_axis[0:dim1[0]]
 
             ax = fig.add_subplot(nrows,ncols,pos)
             pos+=1 
@@ -304,14 +300,16 @@ class pyana_waveform (object) :
             unit = ts_axis[1]-ts_axis[0]
             plt.xlim(ts_axis[0]-unit,ts_axis[-1]+unit)
                 
-            plt.errorbar(ts_axis, self.wf_avg,yerr=self.wf_rms, mew=0.0)
+#           # ... plotting with error bars is terribly slow.... enable at your own "risk"
+#           plt.errorbar(ts_axis, self.wf_avg,yerr=self.wf_rms, mew=0.0)
+            plt.errorbar(ts_axis, self.wf_avg)
             plt.title(source)
             plt.xlabel("time   [s]")
             plt.ylabel("voltage   [V]")
 
             self.data[source].wf_voltage = self.wf_avg
-            self.data[source].wf_time = self.ts[source]
-            
+            self.data[source].wf_time = ts_axis
+
 
         plt.draw()
 

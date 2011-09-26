@@ -367,6 +367,11 @@ class  pyana_image ( object ) :
         # -----------------------------------
         # Draw images from this event
         # -----------------------------------
+
+        # only call plotter if this is the main thread
+        if (env.subprocess()>0):
+            return
+
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
 
             # flag for pyana_plotter

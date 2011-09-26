@@ -217,13 +217,13 @@ class pyana_plotter_beta (object) :
                 for data in plot_data:
 
                     list_for_plotting = []
-                    
+
                     for name,array in data.get_plottables().iteritems():
                         print data.name, name, array.shape
                         list_for_plotting.append( (name,array,data.name) )
                         
-                        
-                    self.plotter.plot_several(111, list_for_plotting, data.name)
+                    self.plotter.plot_several(111, list_for_plotting,
+                                              title="%s event#%d" % (data.name,self.n_shots))
                     #self.plotter.draw_func_lookup[name](array,title=data.name)
                     
                 plt.show()

@@ -297,7 +297,7 @@ class ImageData( BaseData ):
                 plottables["roi"] = self.image[c[0]:c[1],c[2]:c[3]]
             except:
                 print "setting ROI failed, did you define the image? "
-                
+        return plottables
                 
 class CsPadData( BaseData ):
     """CsPad data
@@ -692,6 +692,32 @@ class Plotter(object):
 
 
 
+
+    def plot_several(self, fignum, list_of_arrays, title="" ):
+        """ Draw several frames in one canvas
+        
+        @fignum                  figure number, i.e. fig = plt.figure(num=fignum)
+        @list_of_arrays    a list of tuples (title, array)
+        @return                  new display_mode if any (else return None)
+        """
+        print list_of_arrays
+
+        #if self.fig is None: 
+        self.create_figure(fignum, nplots=len(list_of_arrays))
+        self.fig.suptitle(title)
+            
+        pos = 0
+        for tuple in list_of_arrays :
+            pos += 1
+            ad = tuple[0]
+            im = tuple[1]
+            xt = None
+            if len(tuple)==3 : xt = tuple[2]
+            
+            self.drawframe(im,title=ad,fignum=fignum,position=pos)
+            
+        plt.draw()
+        return self.display_mode
 
     def draw_figurelist(self, fignum, event_display_images, title="",showProj=False,extent=None ) :
         """ Draw several frames in one canvas
