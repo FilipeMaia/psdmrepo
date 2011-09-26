@@ -343,7 +343,6 @@ class PlotsForImage ( object ) :
         self.drawImageAndSpectrum(Amin, Amax)
 
 
-
     def drawImageAndSpectrum(self, Amin=None, Amax=None):
         """Plot 2d image from input array for a single pair"""
 
@@ -363,6 +362,10 @@ class PlotsForImage ( object ) :
         plt.clim(colmin,colmax)
 
         self.fig.canvas.mpl_connect('button_press_event', self.processMouseButtonClick)
+
+        #arrwin = plt.gci().get_array() # this returns the full size image array
+        #print 50*'=' + '\ndrawImageAndSpectrum: arrwin\n', arrwin
+
 
 
     def processMouseButtonClick(self, event) :

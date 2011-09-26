@@ -49,7 +49,8 @@ class ConfigCSpad ( object ) :
         self.setTimeOfRunStart()
 
         #self.setCSpadParametersV0001()
-        self.setCSpadParametersV0002()
+        #self.setCSpadParametersV0002()
+        self.setCSpadParametersV0003()
         #self.Print()
         self.run_start_seconds = 0
 
@@ -57,11 +58,13 @@ class ConfigCSpad ( object ) :
     def setTimeOfRunStart( self ) :
         self.t_sec_r0003 = int( time.mktime((2010, 11, 19, 16, 25, 00, 0, 0, 0)) ) # converts date-time to seconds
         self.t_sec_r0004 = int( time.mktime((2011,  6, 23,  8, 00, 00, 0, 0, 0)) ) # converts date-time to seconds
+        self.t_sec_r0005 = int( time.mktime((2011,  9,  1,  0, 00, 00, 0, 0, 0)) ) # converts date-time to seconds
         self.t_sec_Infty = int( time.mktime((2100,  0,  0,  0, 00, 00, 0, 0, 0)) ) # converts date-time to seconds
 
         print 'Start time for runs for CSPad configuration'
         print 'self.t_sec_r0003 =', self.t_sec_r0003, time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(self.t_sec_r0003))
         print 'self.t_sec_r0004 =', self.t_sec_r0004, time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(self.t_sec_r0004))
+        print 'self.t_sec_r0005 =', self.t_sec_r0005, time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(self.t_sec_r0005))
         print 'self.t_sec_Infty =', self.t_sec_Infty, time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(self.t_sec_Infty))
 
        #tloc = time.localtime(start_seconds) # converts sec to the tuple struct_time in local
@@ -77,10 +80,110 @@ class ConfigCSpad ( object ) :
         if self.run_start_seconds < self.t_sec_r0004 :
             self.setCSpadParametersV0001()
             print 'set parameters for V0001'
-        elif self.t_sec_r0004 < self.run_start_seconds and self.run_start_seconds < self.t_sec_Infty:
+        elif self.t_sec_r0004 < self.run_start_seconds and self.run_start_seconds < self.t_sec_r0005:
             self.setCSpadParametersV0002()        
             print 'set parameters for V0002'
+        elif self.t_sec_r0005 < self.run_start_seconds and self.run_start_seconds < self.t_sec_Infty:
+            self.setCSpadParametersV0003()        
+            print 'set parameters for V0003'
 
+
+#==========================================
+#==========================================
+
+    def setCSpadParametersV0003 ( self ) :
+        """Configuration parameters based on 2011-08-10-Metrology optical measurement"""
+
+        #print 'setCSpadParametersV0002'
+
+        self.isCSPad2x2 = False
+
+        # Detector and quar array dimennsions
+        self.detDimX = 1765
+        self.detDimY = 1765
+
+        self.quadDimX = 850
+        self.quadDimY = 850
+
+        # Quad rotation angles
+        self.quadInDetOrient = [ 180,   90,    0,  270]
+        self.quadInDetOriInd = [   2,    1,    0,    3]
+
+        self.preventiveRotationOffset = 15 # (pixel) increase effective canva for rotation
+        off = 40
+
+        gapX = 0
+        gapY = 0
+
+        shiftX = 18
+        shiftY = 18
+
+        d0     = 834
+
+        #self.quadXOffset = [ off+0-gapX+shiftX,  off+  0+1-gapX-shiftX,  off+834+0+gapX-shiftX,  off+834+0+gapX+shiftX]
+        #self.quadYOffset = [ off+0-gapY-shiftY,  off+834-3+gapY-shiftY,  off+834-0+gapY+shiftY,  off+  0+2-gapY+shiftY]
+
+        #self.quadXOffset = [ off+0-gapX+shiftX,  off+  0+0-gapX-shiftX,  off+834-2+gapX-shiftX,  off+834+0+gapX+shiftX]
+        #self.quadYOffset = [ off+3-gapY-shiftY,  off+834-1+gapY-shiftY,  off+834-5+gapY+shiftY,  off+  0+2-gapY+shiftY]
+
+        self.quadXOffset = [ off+ 0-gapX+shiftX,  off+ 0+0-gapX-shiftX,  off+d0-0+gapX-shiftX,  off+d0+0+gapX+shiftX]
+        self.quadYOffset = [ off+ 0-gapY-shiftY,  off+d0-0+gapY-shiftY,  off+d0-0+gapY+shiftY,  off+ 0+0-gapY+shiftY]
+
+
+        # We get this array dynamically from /Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV*/CxiDs1.0:Cspad.0/element
+        self.quad_nums_in_event = [0, 1, 2, 3] # <- default values
+
+        # We get this array dynamically from /Configure:0000/CsPad::ConfigV2/CxiDs1.0:Cspad.0/config
+        self.indPairsInQuads = [[ 0,   1,   2,   3,   4,   5,   6,   7],
+                                [ 8,   9,  10,  11,  12,  13,  14,  15],
+                                [16,  17,  18,  19,  20,  21,  22,  23],
+                                [24,  25,  26,  27,  28,  29,  30,  31]]
+
+        # 2x1 section rotation angles
+        self.pairInQaudOrient = [ [ 270, 270, 180, 180,  90,  90, 180, 180],
+                                  [ 270, 270, 180, 180,  90,  90, 180, 180],
+                                  [ 270, 270, 180, 180,  90,  90, 180, 180],
+                                  [ 270, 270, 180, 180,  90,  90, 180, 180] ]
+
+        # 2x1 section rotation index
+        self.pairInQaudOriInd = [ [   3,   3,   2,   2,   1,   1,   2,   2],
+                                  [   3,   3,   2,   2,   1,   1,   2,   2],
+                                  [   3,   3,   2,   2,   1,   1,   2,   2],
+                                  [   3,   3,   2,   2,   1,   1,   2,   2] ]
+
+        # 2x1 section tilt angles
+        self.dPhi = [ [-0.06186, -0.00526,  0.17107,  0.16384, -0.02763,  0.38428,  0.04672,  0.11581],  
+                      [-0.06251, -0.00066, -0.06843,  0.01382, -0.15199, -0.09540,  0.05330, -0.07172],  
+                      [-0.26781, -0.00263, -0.28227, -0.12172, -0.24212,  0.00000, -0.11382, -0.13160],  
+                      [-0.21897,  0.00132,  0.00526, -0.08423, -0.31617,  0.00395, -0.06251,  0.02106] ]
+
+        # 2x1 section center coordinates
+        self.pairXInQaud = [[ 198.48,  198.05,  307.91,   95.69,  625.60,  624.69,  709.79,  497.97],
+                            [ 198.36,  198.05,  310.89,   98.49,  627.36,  627.76,  712.15,  498.90],
+                            [ 198.78,  198.04,  310.98,   97.86,  627.09,  627.61,  713.33,  500.94],
+                            [ 198.90,  198.05,  309.48,   96.66,  626.23,  626.67,  712.47,  499.68]]
+        
+        self.pairYInQaud = [[ 306.92,   95.08,  625.56,  625.52,  516.16,  729.09,  200.58,  201.70],
+                            [ 307.40,   95.09,  624.41,  624.85,  519.48,  731.87,  204.71,  205.30],
+                            [ 307.61,   95.10,  625.99,  626.70,  514.76,  727.56,  200.39,  201.28],
+                            [ 308.23,   95.08,  624.73,  625.09,  513.34,  726.52,  196.72,  196.82]]
+        
+        self.pairZInQaud = [[   0.33,    0.28,    0.21,    0.08,    0.43,    0.43,    0.54,    0.48],
+                            [  -0.68,   -0.42,   -1.15,   -0.87,   -1.63,   -1.86,   -1.53,   -1.07],
+                            [  -0.37,   -0.01,   -0.50,   -0.33,   -0.89,   -0.95,   -1.01,   -0.77],
+                            [  -0.46,   -0.37,   -0.68,   -0.41,   -1.16,   -1.25,   -1.11,   -1.79]]
+
+        # 2x1 section center coordinate corrections
+                            #   0    1    2    3    4    5    6    7
+        self.dXInQaud    = [[   0,   0,   0,   0,   0,   0,   0,   0], 
+                            [   0,   0,   0,   0,   0,   0,   0,   0], 
+                            [   0,   0,   0,   0,   0,   0,   0,   0], 
+                            [   0,   0,   0,   0,   0,   0,   0,   0]] 
+                                                                   
+        self.dYInQaud    = [[   0,   0,   0,   0,   0,   0,   0,   0], 
+                            [   0,   0,   0,   0,  -7,  -7, -10, -10], 
+                            [   0,   0,   0,   0,   0,   0,   0,   0], 
+                            [   0,   0,   0,   0,   0,   0,   0,   2]] 
 
 #==========================================
 #==========================================
@@ -115,8 +218,11 @@ class ConfigCSpad ( object ) :
         #self.quadXOffset = [ off+0-gapX+shiftX,  off+  0+1-gapX-shiftX,  off+834+0+gapX-shiftX,  off+834+0+gapX+shiftX]
         #self.quadYOffset = [ off+0-gapY-shiftY,  off+834-3+gapY-shiftY,  off+834-0+gapY+shiftY,  off+  0+2-gapY+shiftY]
 
-        self.quadXOffset = [ off+0-gapX+shiftX,  off+  0+0-gapX-shiftX,  off+834-2+gapX-shiftX,  off+834+0+gapX+shiftX]
-        self.quadYOffset = [ off+3-gapY-shiftY,  off+834-1+gapY-shiftY,  off+834-5+gapY+shiftY,  off+  0+2-gapY+shiftY]
+        #self.quadXOffset = [ off+0-gapX+shiftX,  off+  0+0-gapX-shiftX,  off+834-2+gapX-shiftX,  off+834+0+gapX+shiftX]
+        #self.quadYOffset = [ off+3-gapY-shiftY,  off+834-1+gapY-shiftY,  off+834-5+gapY+shiftY,  off+  0+2-gapY+shiftY]
+
+        self.quadXOffset = [ off+0-gapX+shiftX,  off+  0+0-gapX-shiftX,  off+834-6+gapX-shiftX,  off+834-4+gapX+shiftX]
+        self.quadYOffset = [ off+3-gapY-shiftY,  off+834-1+gapY-shiftY,  off+834+0+gapY+shiftY,  off+  0+8-gapY+shiftY]
 
 
         # We get this array dynamically from /Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV*/CxiDs1.0:Cspad.0/element

@@ -105,12 +105,12 @@ def ImageIsInTheName(dsname):
     if   name1 == 'image' : imageIsInTheName = True
     elif name1 == 'data' and name3[0:16] == 'Princeton::Frame' : imageIsInTheName = True
 
-    print 'imageIsInTheName :',
-    print '       last name:', name1
-    print '2nd to last name:', name2
-    print '3rd to last name:', name3
-    print 'name3[0:16]', name3[0:16]
-    print 'imageIsInTheName returns:', imageIsInTheName
+    #print 'imageIsInTheName :',
+    #print '       last name:', name1
+    #print '2nd to last name:', name2
+    #print '3rd to last name:', name3
+    #print 'name3[0:16]', name3[0:16]
+    #print 'imageIsInTheName returns:', imageIsInTheName
 
     return imageIsInTheName
 

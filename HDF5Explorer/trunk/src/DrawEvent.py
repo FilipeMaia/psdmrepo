@@ -191,7 +191,7 @@ class DrawEvent ( object ) :
         # Loop over events
         while self.loopIsContinued :
 
-            print 'TEST:self.loopIsContinued     = ', self.loopIsContinued
+            #print 'TEST:self.loopIsContinued     = ', self.loopIsContinued
 
             selectionIsPassed = self.selectionIsPassed() 
             self.printEventSelectionStatistics()
@@ -202,7 +202,7 @@ class DrawEvent ( object ) :
             if selectionIsPassed : self.numEventsSelected   += 1
             self.loopIsContinued = self.numEventsSelected < cp.confpars.numEventsAverage and cp.confpars.eventCurrent < self.eventEnd 
 
-            cp.confpars.eventCurrent -= 1
+            #cp.confpars.eventCurrent -= 1
 
         self.loopOverDataSets(option=1) # Normalization per 1 event
 
@@ -250,7 +250,7 @@ class DrawEvent ( object ) :
 
             if not itemIsForAverage : continue
 
-            ds          = self.h5file[dsname]
+            ds = self.h5file[dsname]
 
             if cp.confpars.eventCurrent >= ds.shape[0] :
                 print 80*'=', \
@@ -272,6 +272,8 @@ class DrawEvent ( object ) :
                 if cp.confpars.eventCurrent != self.eventStart :
 
                     self.ave1ev[indds] += self.arr1ev              # Accumulation
+                    #print 'self.ave1ev[indds]\n', self.ave1ev[indds]
+
                 else :                                           # Initialization
                     self.ave           = np.zeros(self.arr1ev.shape, dtype=np.float32)
                     self.ave1ev        .append(self.ave)
@@ -283,6 +285,7 @@ class DrawEvent ( object ) :
             elif option == 1 :                                   # Normalization per 1 event
                 if self.numEventsSelected > 0 :
                     self.ave1ev[indds] /= self.numEventsSelected
+                    #print 50*'=' + '\nself.ave1ev[indds]\n', self.ave1ev[indds]
 
             elif option == 5 :                                   # Draw averaged dataset
 
