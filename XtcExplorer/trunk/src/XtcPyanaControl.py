@@ -41,7 +41,7 @@ from PyQt4 import QtCore, QtGui
 #-----------------------------
 
 import threading
-from multiprocessing import Process
+import multiprocessing as mp
 import  subprocess 
 from pyana import pyanamod
 
@@ -114,30 +114,33 @@ class XtcPyanaControl ( QtGui.QWidget ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ (self, parent=None) :
+    def __init__ (self,
+                  data,
+                  parent = None) :
         """Constructor.
         
+        @param data    object that holds information about the data
+        @param parent  parent widget, if any
         """
         QtGui.QWidget.__init__(self, parent)
-
+        
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
-
+            
         self.setWindowTitle('Pyana Control Center')
         self.setWindowIcon(QtGui.QIcon('XtcExplorer/src/lclsLogo.gif'))
 
-        # --------------- INPUT --------------
-        # these must be initialized before use (by calling module)
-        self.filenames = []
-        self.devices = []
-        self.epicsPVs = []
-        self.controls = []
-        self.moreinfo = []
-        self.nevents = []
-        self.ncalib = None
-        # -------------------------------------
+        print data
+            
+        # container for information about the data
+        self.filenames = data.files
+        self.devices = data.devices.keys()
+        self.epicsPVs = data.epicsPVs
+        self.controls = data.controls
+        self.moreinfo = data.moreinfo.values()
+        self.nevents = data.nevents
+        self.ncalib = len(data.nevents)
         
-
         # ------- SELECTION / CONFIGURATION ------
         self.configuration = None
         self.checklabels = []
@@ -167,6 +170,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # assume all events        
         self.run_n = None 
         self.skip_n = None 
+        self.num_cpu = 1
         self.plot_n = 1
         self.accum_n = 0
 
@@ -175,6 +179,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.define_layout()
 
         self.show()
+        self.update()
         
 
 
@@ -189,6 +194,16 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         pic.setPixmap( QtGui.QPixmap('XtcExplorer/src/lclsLogo.gif'))
         h0.addWidget( pic )
         h0.setAlignment( pic, QtCore.Qt.AlignLeft )
+
+        label = QtGui.QLabel(self)
+        label_text = """
+Configure your analysis here...
+Start with selecting data of interest to you from list on the left and general run / display options from the tab(s) on the right.
+"""
+        label.setText(label_text)
+        h0.addWidget( label )
+        h0.setAlignment( label, QtCore.Qt.AlignRight )
+                                        
 
         # mid layer: almost everything
         h1 = QtGui.QHBoxLayout()
@@ -214,22 +229,6 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # First tab: help/info
         self.help_widget = QtGui.QWidget()
         self.help_layout = QtGui.QVBoxLayout(self.help_widget)
-        self.help_subwg1 = QtGui.QLabel(self.help_widget)
-        self.help_subwg1_text = """
- * Configure what data to display and analyze:
-
-    Select the information / detectors of interest to you from list
-    to the left. Pyana modules will be configured for you to analyze
-    the information.
-
-    You can edit the configuration or pyana modules afterwards, 
-    if you want to further customize your analysis.
-
- * The following are general settings for pyana and
-   defaults for plotting:
-    """
-        self.help_subwg1.setText(self.help_subwg1_text)
-        self.help_layout.addWidget(self.help_subwg1)
 
         # run pyana with the first Nr events. Skip Ns events. 
         self.run_n_status = QtGui.QLabel("Process all shots (or enter how many to process)")
@@ -267,6 +266,49 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.skip_n_layout.addWidget(self.skip_n_change_btn)
         self.help_layout.addLayout(self.skip_n_layout, QtCore.Qt.AlignRight )
 
+        # Multiprocessing?
+        mproc_status = QtGui.QLabel("Multiprocessing? No, single CPU")
+        mproc_menu = QtGui.QComboBox()
+        mproc_menu.setMaximumWidth(90)
+        for i in range (0,mp.cpu_count()):
+            mproc_menu.addItem(str(i+1))
+        mproc_menu.setCurrentIndex(0) # Single-CPU
+
+        mproc_layout = QtGui.QHBoxLayout()
+        mproc_layout.addWidget(mproc_status)
+        mproc_layout.addStretch()
+        mproc_layout.addWidget(mproc_menu)
+        self.help_layout.addLayout(mproc_layout, QtCore.Qt.AlignRight)        
+
+        def mproc_changed():
+            text = str(mproc_menu.currentText())
+            if ( text is None ) or ( text == "1" ):
+                mproc_status.setText("Multiprocessing? No, single CPU")
+                self.num_cpu = 1
+            else:
+                mproc_status.setText("Multiprocessing with %s CPUs"%text)
+                self.num_cpu = int(text)                
+        self.connect(mproc_menu, QtCore.SIGNAL('currentIndexChanged(int)'), mproc_changed )
+                                                                                                                                                                                
+        # divider
+        self.help_layout.addWidget(QtGui.QLabel(" "))
+
+        # Global Display mode
+        self.dmode_layout = QtGui.QHBoxLayout()
+        self.displaymode = "Interactive"
+        self.dmode_status = QtGui.QLabel("Display mode is %s"% self.displaymode)
+
+        self.dmode_menu = QtGui.QComboBox()
+        self.dmode_menu.setMaximumWidth(90)
+        self.dmode_menu.addItem("NoDisplay")
+        self.dmode_menu.addItem("SlideShow")
+        self.dmode_menu.addItem("Interactive")
+        self.dmode_menu.setCurrentIndex(2)
+        self.connect(self.dmode_menu,  QtCore.SIGNAL('currentIndexChanged(int)'), self.process_dmode )
+        self.dmode_layout.addWidget(self.dmode_status)
+        self.dmode_layout.addWidget(self.dmode_menu)
+        self.help_layout.addLayout(self.dmode_layout, QtCore.Qt.AlignRight)
+
         # plot every N events
         self.plot_n_layout = QtGui.QHBoxLayout()
         if self.plot_n == 0:
@@ -300,22 +342,6 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.accum_n_layout.addWidget(self.accumn_enter)
         self.accum_n_layout.addWidget(self.accumn_change_btn)
         self.help_layout.addLayout(self.accum_n_layout, QtCore.Qt.AlignRight )
-
-        # Global Display mode
-        self.dmode_layout = QtGui.QHBoxLayout()
-        self.displaymode = "Interactive"
-        self.dmode_status = QtGui.QLabel("Display mode is %s"% self.displaymode)
-
-        self.dmode_menu = QtGui.QComboBox()
-        self.dmode_menu.setMaximumWidth(90)
-        self.dmode_menu.addItem("NoDisplay")
-        self.dmode_menu.addItem("SlideShow")
-        self.dmode_menu.addItem("Interactive")
-        self.dmode_menu.setCurrentIndex(2)
-        self.connect(self.dmode_menu,  QtCore.SIGNAL('currentIndexChanged(int)'), self.process_dmode )
-        self.dmode_layout.addWidget(self.dmode_status)
-        self.dmode_layout.addWidget(self.dmode_menu)
-        self.help_layout.addLayout(self.dmode_layout, QtCore.Qt.AlignRight)
 
         # Drop into iPython session at the end of the job?
         self.ipython = False
@@ -467,19 +493,10 @@ class XtcPyanaControl ( QtGui.QWidget ) :
     #  Public methods --
     #-------------------
                 
-    def update(self, filenames=[],devices=[],epicsPVs=[],controls=[],moreinfo=[],nevents=[]):
+    def update(self):
         """Update lists of filenames, devices and epics channels
            Make sure GUI gets updated too
         """
-        self.filenames = filenames
-        self.devices = devices
-        self.moreinfo = moreinfo
-        self.epicsPVs = epicsPVs
-        self.controls = controls
-        self.nevents = nevents
-        self.ncalib = len(nevents)
-        #print self.nevents
-
         # show all of this in the Gui
         self.setup_gui_checkboxes()
         #for ch in self.checkboxes:
@@ -492,8 +509,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             self.plotn_enter.setText( str(self.nevents[0]) )
             self.plotn_change()
             self.plotn_enter.setText("")
-
-
+            
         print "Configure pyana by selecting from the detector list"
 
     def setup_gui_checkboxes(self) :
@@ -762,7 +778,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
             #print "XtcExplorer.pyana_ipimb at ", index
             address = str(box.text()).split(": ")[1].strip()
             options_for_mod[index].append("\nsources = %s" % address)
-            options_for_mod[index].append("\nvariables = fex:pos fex:sum fex:channels")
+            options_for_mod[index].append("\nquantities = fex:pos fex:sum fex:channels")
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
@@ -1055,6 +1071,9 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # Make a command sequence 
         lpoptions = []
         lpoptions.append("pyana")
+        if self.num_cpu > 1 :
+            lpoptions.append("-p")
+            lpoptions.append(str(self.num_cpu))
         if self.run_n is not None:
             lpoptions.append("-n")
             lpoptions.append(str(self.run_n))
@@ -1110,7 +1129,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         if 0 :
             # calling as module... using multiprocessing
             #kwargs = {'argv':lpoptions}
-            #p = Process(target=pyanamod.pyana,kwargs=kwargs)
+            #p = mp.Process(target=pyanamod.pyana,kwargs=kwargs)
             #p.start()
             #p.join()
             # this option is nothing but trouble

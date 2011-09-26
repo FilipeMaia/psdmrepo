@@ -4,7 +4,7 @@
 #  $Id$
 #
 # Description:
-#  Module XtcExplorerMain...
+#  Module XtcExplorerMain
 #
 #------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ part of it, please give an appropriate acknowledgment.
 
 @see RelatedModule
 
-@version $Id: XtcExplorerMain 2011-01-27 14:15:00 ofte $
+@version $Id: gui_explorer_main 2011-01-27 14:15:00 ofte $
 
 @author Ingrid Ofte
 """
@@ -32,7 +32,7 @@ __version__ = "$Revision: 0 $"
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-import sys, os, random
+import sys, os, random, fnmatch
 
 from PyQt4 import QtGui, QtCore
 from XtcScanner import XtcScanner
@@ -76,11 +76,12 @@ class XtcExplorerMain (QtGui.QMainWindow) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self ) :
+    def __init__ ( self, instrument=None ) :
         """Constructor.
 
         Description
         """
+        print "gui_explorer_main"
         QtGui.QMainWindow.__init__(self)
 
         QtCore.pyqtRemoveInputHook()
@@ -92,6 +93,8 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.setWindowTitle("LCLS Xtc Explorer")
         self.setWindowIcon(QtGui.QIcon('XtcExplorer/src/lclsLogo.gif'))
 
+        self.directory = "/reg/d/psdm/"
+        self.instrument = instrument
         self.filenames = []
         # list of current files
 
@@ -172,6 +175,49 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.addfile_button = QtGui.QPushButton("&Add")
         self.connect(self.addfile_button, QtCore.SIGNAL('clicked()'), self.add_file_from_lineedit )
              
+        # ---- Select section -------
+        self.comboBoxIns = QtGui.QComboBox()
+        self.comboBoxIns.setMinimumWidth(80)
+        #self.comboBoxIns.setGeometry(QtGui.QRect(30,211,70,30))
+        
+        self.comboBoxExp = QtGui.QComboBox()
+        self.comboBoxExp.setMinimumWidth(80)
+        #self.comboBoxExp.setGeometry(QtGui.QRect(110,210,170,30))
+
+        # Line edit: enter run number
+        self.labelRun = QtGui.QLabel("Enter run number: ")
+
+        self.lineEditRun = QtGui.QLineEdit("")
+        self.lineEditRun.setMaximumWidth(80)
+        self.connect(self.lineEditRun, QtCore.SIGNAL('returnPressed()'), self.set_runnumber )
+
+        self.okButtonRun = QtGui.QPushButton("&OK")
+        self.connect(self.okButtonRun, QtCore.SIGNAL('clicked()'), self.set_runnumber )
+
+        self.labelOr = QtGui.QLabel(" ---- OR ---- ")
+                
+        self.comboBoxIns.clear() 
+        self.comboBoxIns.addItem("Select instrument")
+        self.comboBoxIns.addItem("AMO")
+        self.comboBoxIns.addItem("SXR")
+        self.comboBoxIns.addItem("XPP")
+        self.comboBoxIns.addItem("CXI")
+        self.comboBoxIns.addItem("XCS")
+        self.comboBoxIns.addItem("MEC")
+
+        if self.instrument:
+            index = self.comboBoxIns.findText( self.instrument )
+            self.comboBoxIns.setCurrentIndex(index)
+            print "index for instrument ", self.instrument, index
+
+        self.comboBoxExp.clear()
+        self.comboBoxExp.addItem("Select experiment")
+                                                                        
+        self.connect(self.comboBoxIns, QtCore.SIGNAL('currentIndexChanged(int)'), self.set_instrument )
+        self.connect(self.comboBoxExp, QtCore.SIGNAL('currentIndexChanged(int)'), self.set_experiment )
+
+        #self.dmode_menu.addItem("Interactive")
+        #self.dmode_menu.setCurrentIndex(1) # SlideShow
 
         # ---- Test section -------
         
@@ -216,11 +262,22 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         h2.addWidget( self.lineedit )
         h2.addWidget( self.addfile_button )
 
+        h3 = QtGui.QHBoxLayout()
+        h3.addWidget( self.comboBoxIns )
+        h3.addStretch()
+        h3.addWidget( self.comboBoxExp )
+        h3.addStretch()
+        h3.addWidget( self.labelRun )
+        h3.addWidget( self.lineEditRun )
+        h3.addWidget( self.okButtonRun )
+
         H1 = QtGui.QVBoxLayout()
+        H1.addLayout(h3)
+        H1.addWidget( self.labelOr )
         H1.addLayout(h1)
         H1.addLayout(h2)
-        fgroup.setLayout(H1)
-        
+        fgroup.setLayout(H1)                
+
         # Scan
         sgroup = QtGui.QGroupBox("Scan section")
 
@@ -290,6 +347,50 @@ class XtcExplorerMain (QtGui.QMainWindow) :
     #  Private methods --
     #--------------------
     
+    def set_instrument(self):
+        self.comboBoxExp.clear()
+        self.comboBoxExp.addItem("Select experiment")
+
+        self.instrument = self.comboBoxIns.currentText() 
+        #print "Changing directory from ", self.directory, " to ", 
+        
+        self.directory = "/reg/d/psdm/"
+        self.directory += (self.instrument + "/")
+        #print self.directory
+        
+        # add subdirectories to experiment selector
+        dirList=os.listdir(self.directory)
+        for fname in dirList:
+            self.comboBoxExp.addItem(fname)
+
+    def set_experiment(self):
+        self.experiment = self.comboBoxExp.currentText()
+        try:
+            self.directory = "/reg/d/psdm/" + self.instrument + "/" + self.experiment + "/xtc/"
+        except:
+            pass
+
+    def set_runnumber(self):
+
+        self.runnumber = int(self.lineEditRun.text())
+        fileNamePattern = "e*-r%04d-*.xtc"%(self.runnumber)
+
+        files = []
+        try: 
+            dirList=os.listdir(self.directory)
+            for fname in fnmatch.filter(dirList, fileNamePattern):
+                fullpath = self.directory + fname
+                if os.path.isfile(fullpath):                
+                    files.append( fullpath )
+        except:
+            print "No such file. Please select instrument and experiment"
+            return
+
+        if len(files) > 0 :
+            self.clear_file_list()
+            for file in files:
+                self.add_file( str(file) )
+        
     def add_file(self, filename):
         """Add file by name
         """
@@ -313,7 +414,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         are added to a list holding current files.
         """
         selectedfiles = QtGui.QFileDialog.getOpenFileNames( \
-            self, "Select File","/reg/d/psdm/","xtc files (*.xtc)")
+            self, "Select File",self.directory,"xtc files (*.xtc)")
         
         # convert QStringList to python list of strings
         filename = ""
@@ -425,14 +526,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         # (re)make the pyana control object
         if self.pyanactrl: del self.pyanactrl
 
-        self.pyanactrl = XtcPyanaControl()
-        self.pyanactrl.update(devices=self.scanner.devices.keys(),
-                              epicsPVs=self.scanner.epicsPVs,
-                              controls=self.scanner.controls,
-                              moreinfo=self.scanner.moreinfo.values(),
-                              nevents=self.scanner.nevents,
-                              filenames=self.filenames )
-        
+        self.pyanactrl = XtcPyanaControl(self.scanner)
         if self.scan_button.isEnabled():
             self.scan_enable()
             
@@ -445,7 +539,6 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             fileinfo_text = self.pyanactrl.add_linebreaks(fileinfo_text,width=70)
         
         self.fileinfo.setText(fileinfo_text)
-
 
     def scan_files_quick(self):
         """Quick scan of xtc files

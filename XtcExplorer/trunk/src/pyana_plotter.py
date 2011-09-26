@@ -113,6 +113,7 @@ class pyana_plotter (object) :
         opt = PyanaOptions() # convert option string to appropriate type        
         self.ipython      = opt.getOptBoolean(ipython)
 
+
     #-------------------
     #  Public methods --
     #-------------------
@@ -125,6 +126,7 @@ class pyana_plotter (object) :
         @param evt    event data object
         @param env    environment object
         """
+        self.starttime = time.time()
 
         # Preferred way to log information is via logging package
         logging.info( "pyana_plotter.beginjob() called with displaymode %d"%self.display_mode )
@@ -236,6 +238,10 @@ class pyana_plotter (object) :
         """
         
         logging.info( "pyana_plotter.endjob() called" )
+        endtime = time.time()
+        duration = endtime - self.starttime
+        #print "Start: %.3f, Stop: %.3f, Duration: %.4f" %(self.starttime,endtime,duration)
+        print "\nTiming as measured by pyana_plotter endjob: %.4f s\n" %(duration)
 
         plt.draw()
         

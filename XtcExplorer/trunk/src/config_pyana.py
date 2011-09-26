@@ -351,6 +351,7 @@ class Configuration( object ):
 
         elif 'IPM' in checkbox_label: key = 'IPM'
         elif 'DIO' in checkbox_label: key = 'DIO'        
+        elif 'YAG' in checkbox_label: key = 'YAG'
         return key
     
     def get_mlabel(self, checkbox_label):

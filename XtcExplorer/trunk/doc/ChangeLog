@@ -11,6 +11,12 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Sep-26 ofte                rev 2428
+        - Added some of the GUI look and feel from xtcexplorernew to the old, 
+	 since the new explorer seems might need some more work to finish... if 
+	 at all worthwile... ? 
+	- Old now has the new file selector, and multiprocessing. 
+	
 2011-Sep-23 ofte                rev 2425
         - Change the way Plotter and Frames are handled to fix a problem 
 	  with colorbar being disconnected when endjob plot appars. In fact 
