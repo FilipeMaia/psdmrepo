@@ -8,7 +8,7 @@ class ModuleConfig( object ):
         self.label = "%s" % (name)
         if address is not None: 
             self.label = "%s:%s" % (name,address)
-            
+
         self.options = {}
         self.options["source"] = self.address
             
@@ -19,6 +19,8 @@ class ModuleConfig( object ):
             print "%s  %s = %s"%(indent, okey,oval)
 
     def config_snippet(self):
+        self.update_options()
+
         text = "[XtcExplorer.%s]\n" % self.name
 
         if self.address :
@@ -43,8 +45,9 @@ class ImageModConfig( ModuleConfig ):
         ModuleConfig.__init__(self, "pyana_image_beta", address )
         # list of quantities to plot:
         self.quantities = []
+        self.update_options()
         
-        # set defaults:
+    def update_options(self):
         self.options["dark_img_file"] = None
         self.options["out_avg_file"] = None
         self.options["out_shot_file"] = None
@@ -96,6 +99,9 @@ class ScanModConfig( ModuleConfig ):
     """
     def __init__(self, address = None):
         ModuleConfig.__init__(self, "pyana_scan_beta", address)
+        self.update_options()
+        
+    def update_options(self):
         self.options["controlpv"] = self.address
         self.options["input_epics"] = None
         self.options["input_scalars"] = None
@@ -185,19 +191,30 @@ class WaveformModConfig( ModuleConfig ):
     """
     def __init__(self, address = None):
         ModuleConfig.__init__(self, "pyana_waveform_beta", address)
-
+        self.update_options()
+        
+    def update_options(self):
+        pass
+    
 class EncoderModConfig( ModuleConfig ):
     """Class EncoderModConfig
     """
     def __init__(self, address = None):
         ModuleConfig.__init__(self,"pyana_encoder_beta", address)
+        self.update_options()
+        
+    def update_options(self):
+        pass
 
 class EpicsModConfig( ModuleConfig ):
     """Class EpicsModConfig
     """
     def __init__(self, address = None):
         ModuleConfig.__init__(self,"pyana_epics_beta", address )
-
+        self.update_options()
+        
+    def update_options(self):
+        pass
 
 class BldModConfig( ModuleConfig ):
     """Class BldModConfig
@@ -210,11 +227,15 @@ class BldModConfig( ModuleConfig ):
         ModuleConfig.__init__(self,"pyana_bld_beta", address )
         self.label = self.name
 
+        self.update_options()
+        
+    def update_options(self):
         self.options["do_ebeam"] = "False"
         self.options["do_gasdetector"] = "False"
         self.options["do_phasecavity"] = "False"
 
 class PlotterModConfig( ModuleConfig ):
+
     def __init__(self, address = None):
         ModuleConfig.__init__(self,"pyana_plotter_beta", address)
         del self.options["source"]
@@ -224,25 +245,19 @@ class PlotterModConfig( ModuleConfig ):
         self.displaymode = None
         self.ipython = None
 
-        self.options["display_mode"] = self.displaymode
-        self.options["ipython"] = self.ipython
+        self.update_options()
+
+    def update_options(self):
+        if self.displaymode is not None:
+            self.options["display_mode"] = self.displaymode
+        if self.ipython is not None: 
+            self.options["ipython"] = self.ipython
         if self.plot_n is not None : 
             self.options["plot_every_n"] = self.plot_n
         if self.accum_n is not None :
             self.options["accumulate_n"] = self.accum_n
 
         
-class JobConfig( object ):
-    """Place to store pyana configuration
-    """
-    def __init__(self) :
-        
-        # assume all events        
-        self.run_n = None
-        self.skip_n = None
-        self.num_cpu = None
-        
-
 class Configuration( object ):
     """Class Configuration
     Place to store pyana configuration
@@ -252,8 +267,17 @@ class Configuration( object ):
         @param file   name of pyana.cfg configuration file
         """
         
-        self.jobconfig = JobConfig()
-        self.plotconfig = PlotterModConfig()
+        # assume all events        
+        self.run_n = None
+        self.skip_n = None
+        self.num_cpu = None
+        self.plot_n = "100"
+        self.accum_n = None
+        self.displaymode = None
+        self.ipython = None
+        
+        self.plotter = PlotterModConfig()
+
         self.file = file
         self.config_text = None
 
@@ -412,14 +436,20 @@ class Configuration( object ):
             config_module_list.append( module.config_snippet() )
         self.config_text += "XtcExplorer.pyana_plotter_beta "
 
-        if self.jobconfig.run_n is not None: 
-            self.config_text += "\nnum-events = %s"%self.jobconfig.run_n
+        if self.run_n is not None: 
+            self.config_text += "\nnum-events = %s"%self.run_n
 
-        if self.jobconfig.skip_n is not None:
-            self.config_text += "\nskip-events  = %s"%self.jobconfig.skip_n
+        if self.skip_n is not None:
+            self.config_text += "\nskip-events  = %s"%self.skip_n
 
-        if self.jobconfig.num_cpu is not None: 
-            self.config_text += "\nnum-cpu = %s"%self.jobconfig.num_cpu
+        if self.num_cpu is not None: 
+            self.config_text += "\nnum-cpu = %s"%self.num_cpu
+
+        # copy these to plotter
+        self.plotter.plot_n = self.plot_n
+        self.plotter.accum_n = self.accum_n
+        self.plotter.displaymode = self.displaymode
+        self.plotter.ipython = self.ipython
 
         self.config_text += "\n"
 
@@ -427,7 +457,7 @@ class Configuration( object ):
         for snippet in config_module_list:
             self.config_text += "\n"
             self.config_text += snippet
-        self.config_text += "\n%s"%(self.plotconfig.config_snippet())
+        self.config_text += "\n%s"%(self.plotter.config_snippet())
         
 
         # add linebreaks if needed

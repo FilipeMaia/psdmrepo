@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Sep-26 ofte                rev 2433
+        - improvements to xtcexplorernew: acqiris 1/2way implemented, not connected. 
+	- improved connections between guis
+
 2011-Sep-26 ofte                rev 2429
         - Several small changes
 	- To speed up waveforms, I have opted not to display errorbars. Huge difference!!

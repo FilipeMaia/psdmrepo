@@ -249,17 +249,18 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.devices = data.devices.keys()
         self.epicsPVs = data.epicsPVs
         self.controls = data.controls
-        self.moreinfo = data.moreinfo.values()
+        self.moreinfo = data.moreinfo
         self.nevents = data.nevents
         self.ncalib = len(data.nevents)
 
         # configuration object for pyana job
         self.settings = cfg.Configuration()
 
-        self.config_tab = { 'pyana_image_beta'  : self.image_tab,
-                            'pyana_scan_beta'   : self.scan_tab,
-                            'pyana_ipimb_beta'  : self.ipimb_tab,
-                            'pyana_bld_beta'    : self.bld_tab
+        self.config_tab = { 'pyana_image_beta'    : self.image_tab,
+                            'pyana_scan_beta'     : self.scan_tab,
+                            'pyana_ipimb_beta'    : self.ipimb_tab,
+                            'pyana_bld_beta'      : self.bld_tab,
+                            'pyana_waveform_beta' : self.waveform_tab
                             }
         # ------- SELECTION / CONFIGURATION ------
         self.checklabels = None
@@ -422,6 +423,27 @@ Start with selecting data of interest to you from list on the left and general r
         self.cfg_tabs_tally[tabname] = num
         #print "general tab tally: ",self.cfg_tabs_tally
         self.cfg_tabs.setCurrentWidget(bld_widget)
+
+                
+    def waveform_tab(self, mod, remove=False):
+        tabname = "%s"%mod.address
+
+        if tabname in self.cfg_tabs_tally:
+            index = self.cfg_tabs_tally[ tabname ]
+            self.cfg_tabs.setCurrentIndex(index)
+            if remove:
+                self.cfg_tabs.removeTab(index)
+                del self.cfg_tabs_tally[tabname]
+            return
+
+        wf_widget = panels.WaveformConfigGui(self,title=tabname)
+        self.connect( wf_widget.apply_button,
+                      QtCore.SIGNAL('clicked()'), self.update_pyana_tab )
+
+        num = self.cfg_tabs.addTab(wf_widget,tabname)
+        self.cfg_tabs_tally[tabname] = num
+        #print "general tab tally: ",self.cfg_tabs_tally
+        self.cfg_tabs.setCurrentWidget(wf_widget)
 
                 
     
@@ -702,7 +724,9 @@ Start with selecting data of interest to you from list on the left and general r
         self.pyana_widget = pyana_widget
         
     def update_pyana_tab(self):
+        
         self.settings.update_text()
+        print self.settings.config_text
         self.pyana_config_text.setText(self.settings.config_text)
 
         #self.cfg_tabs.setCurrentWidget(self.pyana_widget)
@@ -720,32 +744,6 @@ Start with selecting data of interest to you from list on the left and general r
     #-------------------
     #  Public methods --
     #-------------------
-                
-    def update(self, filenames=[],devices=[],epicsPVs=[],controls=[],moreinfo=[],nevents=[]):
-        """Update lists of filenames, devices and epics channels
-           Make sure GUI gets updated too
-        """
-        self.filenames = filenames
-        self.devices = devices
-        self.moreinfo = moreinfo
-        self.epicsPVs = epicsPVs
-        self.controls = controls
-        self.nevents = nevents
-        self.ncalib = len(nevents)
-
-        # show all of this in the Gui
-        self.setup_gui_checkboxes()
-
-        # if scan, plot every calib cycle 
-        if self.ncalib > 1 :
-            print "Have %d scan steps a %d events each. Set up to plot after every %d events" %\
-                  (self.ncalib, self.nevents[0], self.nevents[0] )
-            self.plotn_enter.setText( str(self.nevents[0]) )
-            self.plotn_change()
-            self.plotn_enter.setText("")
-
-        print "Configure pyana by selecting from the detector list"
-
 
     def setup_gui_epics(self):
         """Open a new window if epics_checkbox is checked.
@@ -924,15 +922,15 @@ Start with selecting data of interest to you from list on the left and general r
         # Make a command sequence 
         lpoptions = []
         lpoptions.append("pyana")
-        if self.settings.jobconfig.run_n is not None:
+        if self.settings.run_n is not None:
             lpoptions.append("-n")
-            lpoptions.append("%s"%str(self.settings.jobconfig.run_n))
-        if self.settings.jobconfig.skip_n is not None:
+            lpoptions.append("%s"%str(self.settings.run_n))
+        if self.settings.skip_n is not None:
             lpoptions.append("-s")
-            lpoptions.append("%s"%str(self.settings.jobconfig.skip_n))
-        if self.settings.jobconfig.num_cpu is not None:
+            lpoptions.append("%s"%str(self.settings.skip_n))
+        if self.settings.num_cpu is not None:
             lpoptions.append("-p")
-            lpoptions.append("%s"%str(self.settings.jobconfig.num_cpu))
+            lpoptions.append("%s"%str(self.settings.num_cpu))
         lpoptions.append("-c")
         lpoptions.append("%s" % self.settings.file)
         for file in self.filenames :
@@ -955,17 +953,17 @@ Start with selecting data of interest to you from list on the left and general r
 # DISABLE run-dialogue feedback for now
 #            # and update run_n and skip_n in the Gui:
 #            if "-n" in lpoptions:
-#                self.settings.jobconfig.run_n = int(lpoptions[ lpoptions.index("-n")+1 ])
+#                self.settings.run_n = int(lpoptions[ lpoptions.index("-n")+1 ])
 #                general_widget.run_n_status.setText("Process %s events"%\
-#                                                    self.settings.jobconfig.run_n)
+#                                                    self.settings.run_n)
 #            if "-s" in lpoptions:
-#                self.settings.jobconfig.skip_n = int(lpoptions[ lpoptions.index("-s")+1 ])
+#                self.settings.skip_n = int(lpoptions[ lpoptions.index("-s")+1 ])
 #                general_widget.skip_n_status.setText("Skip the fist %s events of xtc file"%\
-#                                                     self.settings.jobconfig.skip_n)
+#                                                     self.settings.skip_n)
 #            if "-p" in lpoptions:
-#                self.settings.jobconfig.num_cpu = int(lpoptions[ lpoptions.index("-p")+1 ])
+#                self.settings.num_cpu = int(lpoptions[ lpoptions.index("-p")+1 ])
 #                general_widget.mproc_status.setText("Multiprocessing with %s CPUs"%\
-#                                                    self.settings.jobconfig.num_cpu)
+#                                                    self.settings.num_cpu)
         else :
             return
 
