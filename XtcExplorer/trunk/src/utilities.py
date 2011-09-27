@@ -700,8 +700,6 @@ class Plotter(object):
         @list_of_arrays    a list of tuples (title, array)
         @return                  new display_mode if any (else return None)
         """
-        print list_of_arrays
-
         #if self.fig is None: 
         self.create_figure(fignum, nplots=len(list_of_arrays))
         self.fig.suptitle(title)
@@ -713,9 +711,11 @@ class Plotter(object):
             im = tuple[1]
             xt = None
             if len(tuple)==3 : xt = tuple[2]
-            
-            self.drawframe(im,title=ad,fignum=fignum,position=pos)
-            
+
+            if len( im.shape ) > 1:
+                self.drawframe(im,title=ad,fignum=fignum,position=pos)
+            else :
+                plt.plot(im)
         plt.draw()
         return self.display_mode
 

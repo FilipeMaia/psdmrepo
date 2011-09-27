@@ -285,7 +285,8 @@ class XtcScanner ( object ) :
                         pv_control = data.pvControl(i).name()
                         if pv_control not in self.controls :
                             self.controls.append( pv_control )
-                if xtc.contains.id() == TypeId.Type.Id_Epics :
+
+                elif xtc.contains.id() == TypeId.Type.Id_Epics :
                     try:
                         data = xtc.payload()
                         self.epicsPVs.append(data.sPvName)
@@ -293,23 +294,37 @@ class XtcScanner ( object ) :
                         #print "An epics object with no payload (size %d)" % xtc.sizeofPayload()
                         pass
                     
-                if xtc.contains.id() == TypeId.Type.Id_AcqConfig :
+                elif xtc.contains.id() == TypeId.Type.Id_AcqConfig :
                     data = xtc.payload()
                     worthknowing = "%s ch" % data.nbrChannels()
-                    #self.nchannels.append(data.nbrChannels())
+
+                elif xtc.contains.id() == TypeId.Type.Id_TM6740Config :
+                    data = xtc.payload()
+                    worthknowing = "%dx%d" % (data.Row_Pixels,data.Column_Pixels)
+
+                elif xtc.contains.id() == TypeId.Type.Id_Opal1kConfig :
+                    data = xtc.payload()
+                    worthknowing = "%dx%d" % (data.row,data.column)
+
+                elif xtc.contains.id() == TypeId.Type.Id_FccdConfig :
+                    data = xtc.payload()
+                    worthknowing = "%dx%d" % (data.trimmedHeight(),data.trimmedWidth())
+                    
 
             if dkey not in self.devices :
                 # first occurence of this detector/device
                 self.devices[dkey] = []
                 self.devices[dkey].append( contents )
                 self.moreinfo[dkey] = []
-                self.moreinfo[dkey].append( worthknowing )
+                self.moreinfo[dkey].append(worthknowing) 
                 self.counters[dkey] = []
                 self.counters[dkey].append( 1 )
             else :
                 # new type of data contents
                 if self.devices[dkey].count( contents )==0 :
                     self.devices[dkey].append( contents )
+                    if worthknowing is not None:
+                        self.moreinfo[dkey].append(worthknowing) 
                     self.counters[dkey].append( 1 )
                 else :
                     indx = self.devices[dkey].index( contents )

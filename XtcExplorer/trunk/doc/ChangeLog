@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Sep-26 ofte                rev 2434
+         - more improvements to new approach. Also more info gathered by XtcScanner. 
+
 2011-Sep-26 ofte                rev 2433
         - improvements to xtcexplorernew: acqiris 1/2way implemented, not connected. 
 	- improved connections between guis

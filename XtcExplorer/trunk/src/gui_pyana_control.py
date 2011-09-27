@@ -46,130 +46,6 @@ import gui_config_panels as panels
 #---------------------
 #  Class definition --
 #---------------------
-class RegionInput(QtGui.QWidget):
-    def __init__(self, name, module, layout):
-        """Region input (x1, x2, y1, y2)
-        @param name     is the name of the quantity we're modifying
-        @param module   is the relevant module-configuration container
-        @param layout   is a QtGui.QBoxLayout widget that this widget belongs to
-        """
-        QtGui.QWidget.__init__(self)
-        self.name=name
-
-        self.label = QtGui.QLabel("Pixels [x1-x2:y1-y2]: ")
-        self.xmin = QtGui.QLineEdit("")
-        self.xmin.setMaximumWidth(30)
-        self.xmax = QtGui.QLineEdit("")
-        self.xmax.setMaximumWidth(30)
-        self.ymin = QtGui.QLineEdit("")
-        self.ymin.setMaximumWidth(30)
-        self.ymax = QtGui.QLineEdit("")
-        self.ymax.setMaximumWidth(30)
-        self.button = QtGui.QPushButton("OK") 
-
-        self.layout = layout
-        self.module = module
-
-    def add_to_layout(self):
-        self.layout.addWidget(self.label)
-        self.layout.addWidget(self.xmin)
-        self.layout.addWidget(self.xmax)
-        self.layout.addWidget(self.ymin)
-        self.layout.addWidget(self.ymax)
-        self.layout.addWidget(self.button)
-        self.label.show()
-        self.xmin.show()
-        self.xmax.show()
-        self.ymin.show()
-        self.ymax.show()
-        self.button.show()
-
-    def hide(self):
-        self.label.hide()
-        self.xmin.hide()
-        self.xmax.hide()
-        self.ymin.hide()
-        self.ymax.hide()
-        self.button.hide()
-
-    def update_label(self):
-        x1 = str(self.xmin.text())
-        x2 = str(self.xmax.text())
-        y1 = str(self.ymin.text())
-        y2 = str(self.ymax.text())
-        pixels = "[%s,%s,%s,%s]"%(x1,x2,y1,y2)
-        self.label.setText("Pixels %s: " % pixels)
-        self.add_to_layout()
-        self.module.add_modifier(quantity=self.name,modifier=pixels)
-
-    def connect_button(self):
-        #print "Connected"
-        self.connect(self.button, QtCore.SIGNAL('clicked()'), self.update_label )
-
-
-class AxisInput(QtGui.QWidget):
-    def __init__(self, name, module, layout ):
-        """Widget taking 3 inputs: low, high, nbins
-        @param name     is the name of the quantity we're modifying        
-        @param module   is the relevant module-configuration container
-        @param layout   is a QtGui.QBoxLayout widget that this widget belongs to
-        """
-        QtGui.QWidget.__init__(self)
-        self.name = name
-
-        self.range_label = QtGui.QLabel("Range: ")
-        self.min = QtGui.QLineEdit("")
-        self.min.setMaximumWidth(50)
-        self.max = QtGui.QLineEdit("")
-        self.max.setMaximumWidth(50)
-
-        self.nbins_label = QtGui.QLabel("NBins: ")
-        self.nbins = QtGui.QLineEdit("")
-        self.nbins.setMaximumWidth(40)
-
-        self.button = QtGui.QPushButton("OK") 
-        self.button.setMaximumWidth(40)
-
-        self.layout = layout
-        self.module = module
-
-    def add_to_layout(self):
-        self.layout.addWidget(self.range_label)
-        self.layout.addWidget(self.min)
-        self.layout.addWidget(self.max)
-        self.layout.addWidget(self.nbins_label)
-        self.layout.addWidget(self.nbins)
-        self.layout.addWidget(self.button)
-        self.range_label.show()
-        self.min.show()
-        self.max.show()
-        self.nbins_label.show()
-        self.nbins.show()
-        self.button.show()
-
-    def hide(self):
-        self.range_label.hide()
-        self.min.hide()
-        self.max.hide()
-        self.nbins_label.hide()
-        self.nbins.hide()
-        self.button.hide()
-
-    def update_label(self):
-        fro = str(self.min.text())
-        to = str(self.max.text())
-        n = str(self.nbins.text())
-        axis = "[%s,%s,%s]" % (fro,to,n)
-        self.range_label.setText("Range = (%s, %s)"%(fro, to))
-        self.nbins_label.setText("NBins =%s"%(n))
-        self.module.add_modifier( quantity=self.name, modifier=axis )
-        
-    def connect_button(self):
-        #print "Connected"
-        self.connect(self.button, QtCore.SIGNAL('clicked()'), self.update_label )
-
-
-
 class myPopen(subprocess.Popen):
     def kill(self, signal = signal.SIGTERM):
         os.kill(self.pid, signal)
@@ -437,6 +313,7 @@ Start with selecting data of interest to you from list on the left and general r
             return
 
         wf_widget = panels.WaveformConfigGui(self,title=tabname)
+        print wf_widget
         self.connect( wf_widget.apply_button,
                       QtCore.SIGNAL('clicked()'), self.update_pyana_tab )
 
@@ -449,6 +326,7 @@ Start with selecting data of interest to you from list on the left and general r
     
     def image_tab(self, mod, remove=False):
         tabname = "%s"%mod.address
+
         if tabname in self.cfg_tabs_tally:
             index = self.cfg_tabs_tally[ tabname ]
             self.cfg_tabs.setCurrentIndex(index)
@@ -457,84 +335,10 @@ Start with selecting data of interest to you from list on the left and general r
                 del self.cfg_tabs_tally[tabname]
             return
 
-        image_widget = QtGui.QWidget()
-        page_layout = QtGui.QVBoxLayout(image_widget)
-
-        # has two widgets: checkboxes for plotting, alterations
-        selection_box = QtGui.QGroupBox("Select what to plot:")
-        selection_layout = QtGui.QVBoxLayout()
-        selection_box.setLayout( selection_layout )
-        
-        alterations_box = QtGui.QGroupBox("Background subtraction etc:")
-        alterations_layout = QtGui.QVBoxLayout()
-        alterations_box.setLayout( alterations_layout )
-
-        button_update_layout = QtGui.QHBoxLayout()
-        button_update = QtGui.QPushButton("Apply")
-        button_update.setMaximumWidth(90)
-        #button_update.setDisabled(True)
-        self.connect(button_update, QtCore.SIGNAL('clicked()'), self.update_pyana_tab )
-        button_update_layout.addStretch()
-        button_update_layout.addWidget(button_update)
-        
-        page_layout.addWidget( selection_box )
-        page_layout.addWidget( alterations_box )
-        page_layout.addLayout( button_update_layout )
-        
-        # checkbox 'image'
-        layout_image_conf = QtGui.QHBoxLayout()
-        checkbox_image = QtGui.QCheckBox("Main image (x vs y)", self)
-        layout_image_conf.addWidget(checkbox_image)
-        selection_layout.addLayout(layout_image_conf)
-
-        self.connect(checkbox_image, QtCore.SIGNAL('stateChanged(int)'), mod.set_opt_imXY )
-        checkbox_image.setChecked(True)
-
-        # checkbox 'roi'
-        roi_layout = QtGui.QHBoxLayout()
-        checkbox_roi = QtGui.QCheckBox("Region of interest", self) 
-        roi_layout.addWidget(checkbox_roi)
-        roi_layout.addStretch()
-        selection_layout.addLayout(roi_layout)
-
-        roi_input = RegionInput("roi",mod,roi_layout)
-        roi_input.connect_button()
-        def ask_about_roi(value):
-            mod.set_opt_roi(value)
-            if value == 2 :
-                roi_input.add_to_layout()
-            else:
-                roi_input.hide()
-        self.connect(checkbox_roi, QtCore.SIGNAL('stateChanged(int)'), ask_about_roi )
-
-
-        spectrum_layout = QtGui.QHBoxLayout()
-        checkbox_spectrum = QtGui.QCheckBox("Intensity spectrum", self)
-        spectrum_layout.addWidget(checkbox_spectrum)
-        spectrum_layout.addStretch()
-        selection_layout.addLayout(spectrum_layout)
-
-        spectrum_input = AxisInput("spectrum",mod,spectrum_layout)
-        spectrum_input.connect_button()
-        def ask_about_spectrum(value):
-            mod.set_opt_spectr(value)
-            if value == 2:
-                spectrum_input.add_to_layout()
-            else:
-                spectrum_input.hide()                
-        self.connect(checkbox_spectrum, QtCore.SIGNAL('stateChanged(int)'), ask_about_spectrum )
-
-        checkbox_projX = QtGui.QCheckBox("ProjX", self)
-        self.connect(checkbox_projX, QtCore.SIGNAL('stateChanged(int)'), mod.set_opt_projX )
-        selection_layout.addWidget(checkbox_projX)
-
-        checkbox_projY = QtGui.QCheckBox("ProjY", self)
-        self.connect(checkbox_projY, QtCore.SIGNAL('stateChanged(int)'), mod.set_opt_projY )
-        selection_layout.addWidget(checkbox_projY)
-        
-        checkbox_projR = QtGui.QCheckBox("ProjR", self)
-        self.connect(checkbox_projR, QtCore.SIGNAL('stateChanged(int)'), mod.set_opt_projR )
-        selection_layout.addWidget(checkbox_projR)
+        image_widget = panels.ImageConfigGui(mod,self)
+        print image_widget
+        self.connect(image_widget.apply_button,
+                     QtCore.SIGNAL('clicked()'), self.update_pyana_tab )        
 
         num = self.cfg_tabs.addTab(image_widget,"%s"%mod.address)
         self.cfg_tabs_tally["%s"%mod.address] = num
@@ -726,7 +530,6 @@ Start with selecting data of interest to you from list on the left and general r
     def update_pyana_tab(self):
         
         self.settings.update_text()
-        print self.settings.config_text
         self.pyana_config_text.setText(self.settings.config_text)
 
         #self.cfg_tabs.setCurrentWidget(self.pyana_widget)
