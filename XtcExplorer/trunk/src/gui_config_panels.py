@@ -375,8 +375,12 @@ class ImageConfigGui(QtGui.QWidget):
         page_layout = QtGui.QVBoxLayout(self)
 
         nametag = self.module.address
-        picsize = map( int, self.parent.moreinfo['DetInfo:%s'%nametag][0].split('x') )
-
+        picsize = [1800,1800]
+        try:
+            picsize = map( int, self.parent.moreinfo['DetInfo:%s'%nametag][0].split('x') )
+        except:
+            pass
+        
         selection_box = QtGui.QGroupBox("Select what to plot:")
         selection_layout = QtGui.QVBoxLayout( selection_box )
         

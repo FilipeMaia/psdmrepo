@@ -117,6 +117,9 @@ class IpimbModConfig( ModuleConfig ):
         self.options["quantities"] = "fex:pos fex:sum fex:channels"
         self.quantities = []
 
+    def update_options(self):
+        pass
+
     def set_opt_quantities(self, quantity, value):
         """Set plot quantities by name
         """
@@ -248,14 +251,10 @@ class PlotterModConfig( ModuleConfig ):
         self.update_options()
 
     def update_options(self):
-        if self.displaymode is not None:
-            self.options["display_mode"] = self.displaymode
-        if self.ipython is not None: 
-            self.options["ipython"] = self.ipython
-        if self.plot_n is not None : 
-            self.options["plot_every_n"] = self.plot_n
-        if self.accum_n is not None :
-            self.options["accumulate_n"] = self.accum_n
+        self.options["display_mode"] = self.displaymode
+        self.options["ipython"] = self.ipython
+        self.options["plot_every_n"] = self.plot_n
+        self.options["accumulate_n"] = self.accum_n
 
         
 class Configuration( object ):

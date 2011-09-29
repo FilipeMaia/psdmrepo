@@ -135,7 +135,8 @@ class pyana_plotter_beta (object) :
         @param evt    event data object
         @param env    environment object
         """
-
+        self.starttime = time.time()
+        
         # Preferred way to log information is via logging package
         logging.info( "pyana_plotter_beta.beginjob() called with displaymode %d"%self.display_mode )
 
@@ -226,8 +227,6 @@ class pyana_plotter_beta (object) :
                                               title="%s event#%d" % (data.name,self.n_shots))
                     #self.plotter.draw_func_lookup[name](array,title=data.name)
                     
-                plt.show()
-
 
                 
             #----------------------------------------------------------
@@ -244,20 +243,22 @@ class pyana_plotter_beta (object) :
                     self.display_mode = newmode
                     
 
-                if self.ipython :
-                    plt.draw()
-                    self.launch_ipython(evt)
 
-                if self.display_mode == 1:
-                    # Interactive
-                    plt.ioff()
-                    plt.show()
-
-                elif self.display_mode == 2:
-                    # SlideShow
-                    plt.ion()
-                    plt.draw()            
-
+            # in all cases: 
+            if self.ipython :
+                plt.draw()
+                self.launch_ipython(evt)
+                
+            if self.display_mode == 1:
+                # Interactive
+                plt.ioff()
+                plt.show()
+                
+            elif self.display_mode == 2:
+                # SlideShow
+                plt.ion()
+                plt.draw()            
+                
                 # wait for 'enter' before proceeding
                 # raw_input('Please hit \'enter\' to proceed to the next event') 
 
@@ -286,7 +287,11 @@ class pyana_plotter_beta (object) :
         """
         
         logging.info( "pyana_plotter_beta.endjob() called" )
-
+        endtime = time.time()
+        duration = endtime - self.starttime
+        #print "Start: %.3f, Stop: %.3f, Duration: %.4f" %(self.starttime,endtime,duration)
+        print "\nTiming as measured by pyana_plotter_beta endjob: %.4f s\n" %(duration)
+                                
         if (env.subprocess()<1):        
             event_display_images = evt.get( 'event_display_images')
             if event_display_images: 

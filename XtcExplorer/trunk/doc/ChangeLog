@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Sep-26 ofte                rev 2435
+         - small changes, plus ability to use cspad.py to load a numpy array in ipython
+	   and display it with matplotlib. Todo: use utilitiles to make the plot. 
+	
 2011-Sep-26 ofte                rev 2434
          - more improvements to new approach. Also more info gathered by XtcScanner. 
 

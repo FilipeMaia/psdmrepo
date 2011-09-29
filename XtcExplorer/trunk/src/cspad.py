@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import scipy.ndimage.interpolation as interpol
 
 class CsPad( object ):
-
+    """CsPad class for creating CsPad image for an event within pyana
+    """
     npix_quad = 2 * (388 + 3) + 68 # = 850 (68 is arbitrary padding)
     
     # Old numbers translated into New coordinate system: 
@@ -22,7 +23,7 @@ class CsPad( object ):
          [434, 220, 850, 850, 637, 849, 430, 429]]
         )
 
-    def __init__(self, sections, path = None):
+    def __init__(self, sections = [[],[],[],[]], path = None):
         """ Initialize CsPad object
         @param sections    list of active sections from the cfg object
         @param path        optional, path to calibration directory
@@ -146,7 +147,10 @@ class CsPad( object ):
         and returns the 1800x1800 image with all sections in the right place (or approximately)
         @param data2d  input 2d data array file (4*8*185 x 388 = 5920 x 388)
         """
+        self.pixel_array = data2d.reshape(4,8,185,388)
+        
         self.image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype="uint16")
+
         for quad in xrange (4):
 
             quad_image = self.get_quad_image( self.pixel_array[quad], quad )
@@ -160,8 +164,17 @@ class CsPad( object ):
         im_hot_masked = np.ma.masked_greater_equal( self.image, 16383 )
         self.image = np.ma.filled( im_hot_masked, 0)
 
-    def get_quad_image( self, data3d, qn ):
+    def get_quad_image( self, data3d, qn, small_angle_tilt=False ):
+        """get_quad_image
+        Get an image for this quad (qn)
 
+        @param data3d           3d data array (row vs. col vs. section)
+        @param qn               quad number
+        @param small_angle_tilt apply additional small-angle tilt (in addition to
+                                the 90-degree rotation of the sections). This improves
+                                the image visually, but requires interpolation, 
+                                and makes the display rather slow... 
+        """
         # Construct one image for each quadrant, each with 8 sections
         # from a data3d = 3 x 2*194 x 185 data array
         #   +---+---+-------+
@@ -194,8 +207,9 @@ class CsPad( object ):
             pairs.append( pair )
 
             # if tilt... 
-#            pair = interpol.rotate(pair,self.tilt_array[qn][i])
-#            print "shape of pair after rotation", pair.shape
+            if small_angle_tilt :
+                pair = interpol.rotate(pair,self.tilt_array[qn][i])
+                #print "shape of pair after rotation", pair.shape
 
         # make the array for this quadrant
         quadrant = np.zeros( (self.npix_quad, self.npix_quad), dtype=data3d.dtype )
