@@ -60,39 +60,42 @@ class CsPad( object ):
 
          
 
-    def read_geometry(self, path = None):
+    def read_geometry(self, path = None, file=None):
         """
         Geometry calibrations are defined the same as for psana.
         Read in these standard parameter files.
         """
         if path is None: 
-            path = 'XtcExplorer/calib/CsPad/'
+            path = 'XtcExplorer/calib/CSPad'
 
+        if file is None:
+            file = '0-end.data'
+            
         # read in rotation array:
         # 90-degree angle orientation of each section in each quadrant. 
         # ... (4 rows (quads) x 8 columns (sections))
-        self.rotation_array =  np.loadtxt('XtcExplorer/calib/CSPad/rotation.par')
+        self.rotation_array =  np.loadtxt('%s/rotation/%s'%(path,file))
 
         # read in tilt array
         # ... (4 rows (quads) x 8 columns (sections))
-        self.tilt_array =  np.loadtxt('XtcExplorer/calib/CSPad/tilt.par')
+        self.tilt_array =  np.loadtxt('%s/tilt/%s'%(path,file))
 
         # read in center position of sections in each quadrant
         # ... (3*4 rows (4 quads, 3 xyz coordinates) x 8 columns (sections))
-        ctr_array = np.loadtxt('XtcExplorer/calib/CSPad/center.par')
-        ctr_corr_array = np.loadtxt('XtcExplorer/calib/CSPad/center_corr.par')
+        ctr_array = np.loadtxt('%s/center/%s'%(path,file))
+        ctr_corr_array = np.loadtxt('%s/center_corr/%s'%(path,file))
         self.center_array = np.reshape( ctr_array + ctr_corr_array, (3,4,8) )
 
         # read in the quadrant offset parameters (w.r.t. image 0,0 in upper left coner)
         # ... (3 rows (xyz) x 4 columns (quads) )
-        quad_pos = np.loadtxt('XtcExplorer/calib/CSPad/offset.par')
-        quad_pos_corr = np.loadtxt('XtcExplorer/calib/CSPad/offset_corr.par')
+        quad_pos = np.loadtxt('%s/offset/%s'%(path,file))
+        quad_pos_corr = np.loadtxt('%s/offset_corr/%s'%(path,file))
         quad_position = quad_pos[0:2,:] + quad_pos_corr[0:2,:]
 
         
         # read in margins file:
         # ... (3 rows (x,y,z) x 4 columns (section offset, quad offset, quad gap, quad shift)
-        marg_gap_shift = np.loadtxt('XtcExplorer/calib/CSPad/marg_gap_shift.par')
+        marg_gap_shift = np.loadtxt('%s/marg_gap_shift/%s'%(path,file))
 
         # break it down (extract each column, make full arrays to be added to the above ones)
         self.sec_offset = marg_gap_shift[0:2,0]
@@ -115,7 +118,6 @@ class CsPad( object ):
                                    quad_shift_xy*[1,1]] ).T
         self.quad_offset = quad_position + quad_offset_XY + quad_gap_XY + quad_shift_XY
 
-        
 
     def complete( self, data3d, qn ):
         # if any sections are missing, insert zeros
@@ -133,6 +135,7 @@ class CsPad( object ):
     def make_pixel_array( self, elements ):
 
         self.pixel_array = np.zeros((4,8,185,388), dtype="uint16")
+
         for e in elements: 
             data = e.data()
             quad = e.quad()
@@ -148,9 +151,8 @@ class CsPad( object ):
         @param data2d  input 2d data array file (4*8*185 x 388 = 5920 x 388)
         """
         self.pixel_array = data2d.reshape(4,8,185,388)
-        
-        self.image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype="uint16")
 
+        self.image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype="uint16")
         for quad in xrange (4):
 
             quad_image = self.get_quad_image( self.pixel_array[quad], quad )

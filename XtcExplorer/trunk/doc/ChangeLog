@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Sep-30 ofte                rev 2439
+        - changed the naming scheme for the cspad calibration data files. Now 
+	it is ready to implement some parameter to point to experiment's own calibration files. 
+
 2011-Sep-30 ofte                rev 2436
 	- added a function to utilities for making the interactive plot in e.g. ipython
 	  (plot_image())
