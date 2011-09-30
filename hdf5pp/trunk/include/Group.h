@@ -109,6 +109,13 @@ public:
     return DataSet<T>::createDataSet ( *m_id, name, type, dspc, plistDScreate ) ;
   }
 
+  // open existing dataset
+  template <typename T>
+  DataSet<T> openDataSet ( const std::string& name)
+  {
+    return DataSet<T>::openDataSet (*m_id, name) ;
+  }
+
   // close the group
   void close() ;
 

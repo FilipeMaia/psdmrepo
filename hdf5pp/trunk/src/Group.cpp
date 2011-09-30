@@ -24,6 +24,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Exceptions.h"
+#include "MsgLogger/MsgLogger.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -54,6 +55,7 @@ Group::~Group ()
 Group
 Group::createGroup ( hid_t parent, const std::string& name )
 {
+  MsgLog("hdf5pp::Group", debug, "Group::createGroup: parent=" << parent << " name=" << name ) ;
   // allow creation of intermediate directories
   hid_t lcpl_id = H5Pcreate( H5P_LINK_CREATE ) ;
   H5Pset_create_intermediate_group( lcpl_id, 1 ) ;
@@ -78,12 +80,24 @@ Group::openGroup ( hid_t parent, const std::string& name )
 bool
 Group::hasChild ( const std::string& name ) const
 {
+  std::string child = name;
+  std::string::size_type p = name.find('/');
+  if (p != std::string::npos) child.erase(p);
+    
   // check that the group exists
   hid_t lapl_id = H5Pcreate( H5P_LINK_ACCESS ) ;
-  htri_t stat = H5Lexists ( *m_id, name.c_str(), lapl_id ) ;
+  htri_t stat = H5Lexists ( *m_id, child.c_str(), lapl_id ) ;
   H5Pclose( lapl_id ) ;
+  if (p == std::string::npos) return stat>0 ;
 
-  return stat>0 ;
+  if (stat <= 0) return false;
+  
+  // open child group
+  hid_t f_id = H5Gopen2 ( *m_id, child.c_str(), H5P_DEFAULT ) ;
+  if ( f_id < 0 ) {
+    throw Hdf5CallException( "Group::openGroup", "H5Gopen2") ;
+  }
+  return Group(f_id).hasChild(std::string(name, p+1));
 }
 
 // close the group
