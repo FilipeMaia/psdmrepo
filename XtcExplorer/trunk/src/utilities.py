@@ -475,8 +475,8 @@ class Plotter(object):
 
         
     def settings(self
-                 , width = 5 # width of a single plot
-                 , height = 4 # height of a single plot
+                 , width = 8 # width of a single plot
+                 , height = 7 # height of a single plot
                  , nplots=1  # total number of plots in the figure
                  , maxcol=3  # maximum number of columns
                  ):
@@ -692,6 +692,17 @@ class Plotter(object):
 
 
 
+
+    def plot_image(self, image, fignum=1, title="", showProj = False, extent=None):
+        """ plot_image
+        utility function for when plotting a single image outside of pyana
+        """
+        self.create_figure(fignum,1)
+        self.fig.suptitle(title)
+        self.drawframe(image, showProj=showProj, extent=extent)
+
+        plt.draw()
+        plt.show()
 
     def plot_several(self, fignum, list_of_arrays, title="" ):
         """ Draw several frames in one canvas
