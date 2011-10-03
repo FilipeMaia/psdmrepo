@@ -66,7 +66,12 @@ for psana.
    - center:
 	(location of each section center in the quad array, from optical measurements)	
 	8x12 array: The first 4 rows are x-position, the second 4 rows are y-positions, 
-	the third 4 rows are z-positions:
+	the third 4 rows are z-positions. 
+
+	!!! NOTE !!!
+	! The "problem" is that these are not array coordinates, but given in a 
+	coordinate system where 0,0 is at the beam position, i.e. in the lower 
+	right corner, and y points to the right and x points up. 
 
 		   S0       S1	      S2       S3      S4       S5        S6      S7
 		---------------------------------------------------------------------

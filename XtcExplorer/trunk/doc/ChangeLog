@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Oct-03 ofte                rev 2440
+	- only updated the geometry description this time. More & corrected info. 
+	
 2011-Sep-30 ofte                rev 2439
         - changed the naming scheme for the cspad calibration data files. Now 
 	it is ready to implement some parameter to point to experiment's own calibration files. 
