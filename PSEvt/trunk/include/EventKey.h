@@ -25,6 +25,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "pdsdata/xtc/Src.hh"
+#include "pdsdata/xtc/ProcInfo.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -70,6 +71,13 @@ public:
 
   // Destructor
   ~EventKey () {}
+
+  /// Returns special source address which is used for no-source data
+  static Pds::Src noSource() { return Pds::Src(); }
+
+  /// Returns special source address which is used for proxies that can serve
+  /// any source address
+  static Pds::Src anySource() { return Pds::ProcInfo(Pds::Level::NumberOfLevels, 0, 0); }
 
   /// Compare two keys
   bool operator<(const EventKey& other) const;

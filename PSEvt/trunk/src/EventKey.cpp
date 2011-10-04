@@ -117,7 +117,9 @@ EventKey::print(std::ostream& str) const
 {
   str << "EventKey(type=";
   ::print(str, m_typeinfo);
-  if (validSrc()) {
+  if (m_src == anySource()) {
+    str << ", src=AnySource";
+  } else if (validSrc()) {
     str << ", src=";
     ::print(str, m_src);
   }

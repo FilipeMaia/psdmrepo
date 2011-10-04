@@ -78,8 +78,16 @@ ProxyDict::getImpl( const std::type_info* typeinfo,
       if (foundSrc) *foundSrc = it->first.src();
       return it->second->get(this, it->first.src(), key);
     }
-    return proxy_ptr();
-    
+
+    // try special any-source proxy
+    EventKey proxyKeyAny(typeinfo, EventKey::anySource(), key);
+    it = m_dict.find(proxyKeyAny);
+    if ( it != m_dict.end() ) {
+      // call proxy to get the value
+      if (foundSrc) *foundSrc = source.src();
+      return it->second->get(this, source.src(), key);
+    }
+
   } else {
 
     // When source is a match then no-source objects have priority. Try to
@@ -105,9 +113,10 @@ ProxyDict::getImpl( const std::type_info* typeinfo,
       }
     }
     
-    return proxy_ptr();
-    
   }
+
+  return proxy_ptr();
+
 }
 
 bool 

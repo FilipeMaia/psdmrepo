@@ -80,7 +80,8 @@ public:
   /**
    *  @brief Exact match for source.
    *  
-   *  This object will match fully-specified source.
+   *  This object will match fully-specified source. Note that Source(Pds::Src())
+   *  is equivalent to Source(null).
    */
   explicit Source (const Pds::Src& src);
   
@@ -133,7 +134,7 @@ public:
   /// Returns true if matches no-source only
   bool isNoSource() const { return m_src == Pds::Src(); }
   
-  /// Returns true if it is exact match
+  /// Returns true if it is exact match, no-source is also exact.
   bool isExact() const;
   
   /// Returns the source

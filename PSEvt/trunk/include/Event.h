@@ -117,7 +117,7 @@ public:
   template <typename T>
   void putProxy(const boost::shared_ptr<Proxy<T> >& proxy, const std::string& key=std::string()) 
   {
-    EventKey evKey(&typeid(const T), Pds::Src(), key);
+    EventKey evKey(&typeid(const T), EventKey::noSource(), key);
     m_dict->put(boost::static_pointer_cast<ProxyI>(proxy), evKey);
   }
   
@@ -147,7 +147,7 @@ public:
   void put(const boost::shared_ptr<T>& data, const std::string& key=std::string()) 
   {
     boost::shared_ptr<ProxyI> proxyPtr( new DataProxy<T>(data) );
-    EventKey evKey(&typeid(const T), Pds::Src(), key);
+    EventKey evKey(&typeid(const T), EventKey::noSource(), key);
     m_dict->put(proxyPtr, evKey);
   }
   

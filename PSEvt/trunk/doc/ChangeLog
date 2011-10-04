@@ -11,6 +11,16 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2011-10-04 Andy Salnikov
+- add support for "AnySource" proxies. These proxies are stored in 
+  proxy dictionary with special source address which does not correspond 
+  to real source. When get() is called on dictionary with exact source
+  address and there is no proxy registered for that address another
+  try is done to find "AnySource" proxy and ask it for data.   
+- This is added primarily to support calibration-type proxies that 
+  can serve calibration data for multiple sources. Not for casual users.
+
 Tag: V00-02-00
 2011-05-06 Andy Salnikov
 - few methods in proxy dict classes now take EventKey instead of triplet
