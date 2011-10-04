@@ -102,7 +102,7 @@ CsPadFilterV1::~CsPadFilterV1 ()
 }
 
 bool
-CsPadFilterV1::filter(int16_t* pixelData, unsigned nPixel) const
+CsPadFilterV1::filter(const int16_t* pixelData, unsigned nPixel) const
 {
   if (m_mode == None) return true;
   

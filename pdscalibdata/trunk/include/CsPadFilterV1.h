@@ -79,7 +79,7 @@ public:
    *                      optionally common mode) subtraction
    *  @param nPixel       Number of pixels in the data
    */
-  bool filter(int16_t* pixelData, unsigned nPixel) const;
+  bool filter(const int16_t* pixelData, unsigned nPixel) const;
   
 protected:
 

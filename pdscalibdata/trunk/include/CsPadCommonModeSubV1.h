@@ -89,7 +89,7 @@ public:
    *  @param pixStatus  pixel status data, can be zero pointer
    *  @param ssize  size of all above arrays
    */ 
-  float findCommonMode(const uint16_t* sdata, 
+  float findCommonMode(const int16_t* sdata,
                        const float* peddata, 
                        const  uint16_t *pixStatus, 
                        unsigned ssize,

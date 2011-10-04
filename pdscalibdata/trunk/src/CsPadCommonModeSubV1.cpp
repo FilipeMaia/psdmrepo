@@ -94,7 +94,7 @@ CsPadCommonModeSubV1::~CsPadCommonModeSubV1 ()
 }
 
 float 
-CsPadCommonModeSubV1::findCommonMode(const uint16_t* sdata, 
+CsPadCommonModeSubV1::findCommonMode(const int16_t* sdata,
                                      const float* peddata, 
                                      const  uint16_t *pixStatus, 
                                      unsigned ssize,
