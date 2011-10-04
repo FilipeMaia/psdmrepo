@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2011-10-04 Andrei Salnikov
+- CsPad.Element image data type changed from uint16_t to int16_t,
+  calibration output which is essentially signed can reuse the same
+  definitions
+- methods common_mode(int) and sectionMask() added to CsPad.Element
+  classes, this is to simplify data handling and unify with 
+  calibrated data interface
+
 Tag: V00-00-12
 2011-09-12 Andrei Salnikov
 - adding CsPad.MiniElementV1 class

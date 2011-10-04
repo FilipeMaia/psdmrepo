@@ -446,7 +446,7 @@
             <attribute name="_frame_type" type="uint32_t" accessor="frame_type">
             </attribute>
 
-            <attribute name="_data" type="uint16_t" 
+            <attribute name="_data" type="int16_t" 
                     shape="{xtc-config}.numAsicsRead()/2, ColumnsPerASIC, MaxRowsPerASIC*2" 
                     accessor="data">
             </attribute>
@@ -454,6 +454,19 @@
             <attribute name="_extra" type="uint16_t" shape="2">
             Unused.
             </attribute>
+
+            <method name="sectionMask" type="uint32_t">
+				Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
+				total bit count gives the number of sections active.  
+                <expr lang="C++" value="({xtc-config}.asicMask() &amp; 0xf)==1 ? 0x3 : 0xff"/>
+            </method>
+
+            <method name="common_mode" type="float">
+                Common mode value for a given section, section number can be 0 to config.numAsicsRead()/2.
+                Will return 0 for data read from XTC, may be non-zero after calibration.
+                <arg name="section" type="uint32_t"/>
+                <expr lang="C++" value="0"/>
+            </method>
 
         </pstype>
         
@@ -536,7 +549,7 @@
             <attribute name="_frame_type" type="uint32_t" accessor="frame_type">
             </attribute>
 
-            <attribute name="_data" type="uint16_t" 
+            <attribute name="_data" type="int16_t" 
                     shape="{xtc-config}.numAsicsStored({self}.quad())/2, ColumnsPerASIC, MaxRowsPerASIC*2" 
                     accessor="data">
             </attribute>
@@ -544,6 +557,19 @@
             <attribute name="_extra" type="uint16_t" shape="2">
             Unused.
             </attribute>
+
+            <method name="sectionMask" type="uint32_t">
+				Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
+				total bit count gives the number of sections active.  
+                <expr lang="C++" value="{xtc-config}.roiMask({self}.quad())"/>
+            </method>
+
+            <method name="common_mode" type="float">
+                Common mode value for a given section, section number can be 0 to config.numSect().
+                Will return 0 for data read from XTC, may be non-zero after calibration.
+                <arg name="section" type="uint32_t"/>
+                <expr lang="C++" value="0"/>
+            </method>
 
         </pstype>
         
@@ -566,7 +592,7 @@
         
 		<!-- ========================================================================= -->
 		
-		<pstype name="MiniElementV1" version="2" type_id="Id_Cspad2x2Element">
+		<pstype name="MiniElementV1" version="1" type_id="Id_Cspad2x2Element">
 		
 		    CsPad data from single 2x2 element.
 		
@@ -621,9 +647,16 @@
             <attribute name="_frame_type" type="uint32_t" accessor="frame_type">
             </attribute>
 
-            <attribute name="_data" type="uint16_t" shape="ColumnsPerASIC, MaxRowsPerASIC*2, 2" accessor="data">
+            <attribute name="_data" type="int16_t" shape="ColumnsPerASIC, MaxRowsPerASIC*2, 2" accessor="data">
             </attribute>
 
+
+            <method name="common_mode" type="float">
+                Common mode value for a given section, section number can be 0 or 1.
+                Will return 0 for data read from XTC, may be non-zero after calibration.
+                <arg name="section" type="uint32_t"/>
+                <expr lang="C++" value="0"/>
+            </method>
 
         </pstype>
         
