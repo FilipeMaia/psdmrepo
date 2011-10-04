@@ -122,6 +122,18 @@ std::vector<int> ConfigV3::quads_shape() const
   return shape;
 }
 
+uint32_t
+ElementV1::sectionMask(const CsPad::ConfigV1& cfg) const {
+  return (cfg.asicMask() & 0xf)==1 ? 0x3 : 0xff;
+}
+uint32_t
+ElementV1::sectionMask(const CsPad::ConfigV2& cfg) const {
+  return (cfg.asicMask() & 0xf)==1 ? 0x3 : 0xff;
+}
+float
+ElementV1::common_mode(uint32_t section) const {
+  return 0;
+}
 std::vector<int> ElementV1::sb_temp_shape() const
 {
   std::vector<int> shape;
@@ -174,6 +186,18 @@ std::vector<int> DataV1::quads_shape(const CsPad::ConfigV2& cfg) const
   return shape;
 }
 
+uint32_t
+ElementV2::sectionMask(const CsPad::ConfigV2& cfg) const {
+  return cfg.roiMask(this->quad());
+}
+uint32_t
+ElementV2::sectionMask(const CsPad::ConfigV3& cfg) const {
+  return cfg.roiMask(this->quad());
+}
+float
+ElementV2::common_mode(uint32_t section) const {
+  return 0;
+}
 std::vector<int> ElementV2::sb_temp_shape() const
 {
   std::vector<int> shape;
@@ -226,6 +250,10 @@ std::vector<int> DataV2::quads_shape(const CsPad::ConfigV3& cfg) const
   return shape;
 }
 
+float
+MiniElementV1::common_mode(uint32_t section) const {
+  return 0;
+}
 std::vector<int> MiniElementV1::sb_temp_shape() const
 {
   std::vector<int> shape;

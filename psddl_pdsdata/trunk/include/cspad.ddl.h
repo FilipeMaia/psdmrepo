@@ -363,10 +363,19 @@ public:
   uint32_t fiducials() const {return _fiducials;}
   const uint16_t* sb_temp() const {return &_sbtemp[0];}
   uint32_t frame_type() const {return _frame_type;}
-  const uint16_t* data() const {
+  const int16_t* data() const {
     ptrdiff_t offset=32;
-    return (const uint16_t*)(((const char*)this)+offset);
+    return (const int16_t*)(((const char*)this)+offset);
   }
+  /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
+				total bit count gives the number of sections active. */
+  uint32_t sectionMask(const CsPad::ConfigV1& cfg) const;
+  /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
+				total bit count gives the number of sections active. */
+  uint32_t sectionMask(const CsPad::ConfigV2& cfg) const;
+  /** Common mode value for a given section, section number can be 0 to config.numAsicsRead()/2.
+                Will return 0 for data read from XTC, may be non-zero after calibration. */
+  float common_mode(uint32_t section) const;
   static uint32_t _sizeof(const CsPad::ConfigV1& cfg)  {return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2));}
   static uint32_t _sizeof(const CsPad::ConfigV2& cfg)  {return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsRead()/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2));}
   /** Method which returns the shape (dimensions) of the data returned by sb_temp() method. */
@@ -385,7 +394,7 @@ private:
   uint32_t	_fiducials;
   uint16_t	_sbtemp[Nsbtemp];
   uint32_t	_frame_type;
-  //uint16_t	_data[cfg.numAsicsRead()/2][ ColumnsPerASIC][ MaxRowsPerASIC*2];
+  //int16_t	_data[cfg.numAsicsRead()/2][ ColumnsPerASIC][ MaxRowsPerASIC*2];
   //uint16_t	_extra[2];
 };
 
@@ -458,10 +467,19 @@ public:
   uint32_t fiducials() const {return _fiducials;}
   const uint16_t* sb_temp() const {return &_sbtemp[0];}
   uint32_t frame_type() const {return _frame_type;}
-  const uint16_t* data() const {
+  const int16_t* data() const {
     ptrdiff_t offset=32;
-    return (const uint16_t*)(((const char*)this)+offset);
+    return (const int16_t*)(((const char*)this)+offset);
   }
+  /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
+				total bit count gives the number of sections active. */
+  uint32_t sectionMask(const CsPad::ConfigV2& cfg) const;
+  /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
+				total bit count gives the number of sections active. */
+  uint32_t sectionMask(const CsPad::ConfigV3& cfg) const;
+  /** Common mode value for a given section, section number can be 0 to config.numSect().
+                Will return 0 for data read from XTC, may be non-zero after calibration. */
+  float common_mode(uint32_t section) const;
   uint32_t _sizeof(const CsPad::ConfigV2& cfg) const {return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsStored(this->quad())/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2));}
   uint32_t _sizeof(const CsPad::ConfigV3& cfg) const {return (((20+(2*(Nsbtemp)))+4)+(2*(cfg.numAsicsStored(this->quad())/2)*( ColumnsPerASIC)*( MaxRowsPerASIC*2)))+(2*(2));}
   /** Method which returns the shape (dimensions) of the data returned by sb_temp() method. */
@@ -480,7 +498,7 @@ private:
   uint32_t	_fiducials;
   uint16_t	_sbtemp[Nsbtemp];
   uint32_t	_frame_type;
-  //uint16_t	_data[cfg.numAsicsStored(this->quad())/2][ ColumnsPerASIC][ MaxRowsPerASIC*2];
+  //int16_t	_data[cfg.numAsicsStored(this->quad())/2][ ColumnsPerASIC][ MaxRowsPerASIC*2];
   //uint16_t	_extra[2];
 };
 
@@ -535,7 +553,7 @@ private:
 class MiniElementV1 {
 public:
   enum {
-    Version = 2 /**< XTC type version number */
+    Version = 1 /**< XTC type version number */
   };
   enum {
     TypeId = Pds::TypeId::Id_Cspad2x2Element /**< XTC type ID value (from Pds::TypeId class) */
@@ -557,10 +575,13 @@ public:
   uint32_t fiducials() const {return _fiducials;}
   const uint16_t* sb_temp() const {return &_sbtemp[0];}
   uint32_t frame_type() const {return _frame_type;}
-  const uint16_t* data() const {
+  const int16_t* data() const {
     ptrdiff_t offset=32;
-    return (const uint16_t*)(((const char*)this)+offset);
+    return (const int16_t*)(((const char*)this)+offset);
   }
+  /** Common mode value for a given section, section number can be 0 or 1.
+                Will return 0 for data read from XTC, may be non-zero after calibration. */
+  float common_mode(uint32_t section) const;
   static uint32_t _sizeof()  {return ((20+(2*(Nsbtemp)))+4)+(2*(ColumnsPerASIC)*( MaxRowsPerASIC*2)*( 2));}
   /** Method which returns the shape (dimensions) of the data returned by sb_temp() method. */
   std::vector<int> sb_temp_shape() const;
@@ -574,7 +595,7 @@ private:
   uint32_t	_fiducials;
   uint16_t	_sbtemp[Nsbtemp];
   uint32_t	_frame_type;
-  //uint16_t	_data[ColumnsPerASIC][ MaxRowsPerASIC*2][ 2];
+  //int16_t	_data[ColumnsPerASIC][ MaxRowsPerASIC*2][ 2];
 };
 } // namespace CsPad
 } // namespace PsddlPds
