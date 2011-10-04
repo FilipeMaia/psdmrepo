@@ -66,6 +66,7 @@ protected:
 private:
 
   // Data members, this is for example purposes only
+  std::string m_key;
   Source m_src;
   Source m_src2x2;
 

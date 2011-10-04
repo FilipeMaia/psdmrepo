@@ -21,6 +21,8 @@
 #include <algorithm>
 #include <iomanip>
 #include <iterator>
+#include <numeric>
+#include <functional>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -47,6 +49,7 @@ namespace psana_examples {
 DumpCsPad::DumpCsPad (const std::string& name)
   : Module(name)
 {
+  m_key = configStr("inputKey", "");
   m_src = configStr("source", "DetInfo(:Cspad)");
   m_src2x2 = configStr("source2x2", "DetInfo(:Cspad2x2)");
 }
@@ -163,7 +166,7 @@ void
 DumpCsPad::event(Event& evt, Env& env)
 {
 
-  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_src);
+  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_src, m_key);
   if (data1.get()) {
     
     WithMsgLog(name(), info, str) {
@@ -191,13 +194,27 @@ DumpCsPad::event(Event& evt, Env& env)
         const std::vector<int> dshape = el.data_shape();
         std::copy(dshape.begin(), dshape.end(), std::ostream_iterator<int>(str, " "));
         str << "]";
+        str << "\n    common_mode = [ ";
+        for (int i = 0; i != dshape[0]; ++ i) {
+            str << el.common_mode(i) << ' ';
+        }
+        str << "]";
+        str << "\n    data = [";
+        const int16_t* data = el.data();
+        int ssize = std::accumulate(dshape.begin()+1, dshape.end(), 1, std::multiplies<int>());
+        for (int i = 0; i != dshape[0]; ++ i) {
+          str << "\n        [ ";
+          std::copy(data+ssize*i, data+ssize*i+10, std::ostream_iterator<int>(str, " "));
+          str << " ... ]";
+        }
+        str << "\n    ]";
       }
 
     }
   }
 
 
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src);
+  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src, m_key);
   if (data2.get()) {
     
     WithMsgLog(name(), info, str) {
@@ -225,12 +242,26 @@ DumpCsPad::event(Event& evt, Env& env)
         const std::vector<int> dshape = el.data_shape();
         std::copy(dshape.begin(), dshape.end(), std::ostream_iterator<int>(str, " "));
         str << "]";
+        str << "\n    common_mode = [ ";
+        for (int i = 0; i != dshape[0]; ++ i) {
+            str << el.common_mode(i) << ' ';
+        }
+        str << "]";
+        str << "\n    data = [";
+        const int16_t* data = el.data();
+        int ssize = std::accumulate(dshape.begin()+1, dshape.end(), 1, std::multiplies<int>());
+        for (int i = 0; i != dshape[0]; ++ i) {
+          str << "\n        [ ";
+          std::copy(data+ssize*i, data+ssize*i+10, std::ostream_iterator<int>(str, " "));
+          str << " ... ]";
+        }
+        str << "\n    ]";
       }
 
     }
   }
 
-  shared_ptr<Psana::CsPad::MiniElementV1> mini1 = evt.get(m_src2x2);
+  shared_ptr<Psana::CsPad::MiniElementV1> mini1 = evt.get(m_src2x2, m_key);
   if (mini1.get()) {
 
     WithMsgLog(name(), info, str) {
@@ -254,6 +285,20 @@ DumpCsPad::event(Event& evt, Env& env)
       const std::vector<int> dshape = mini1->data_shape();
       std::copy(dshape.begin(), dshape.end(), std::ostream_iterator<int>(str, " "));
       str << "]";
+      str << "\n    common_mode = [ ";
+      for (int i = 0; i != dshape[0]; ++ i) {
+          str << mini1->common_mode(i) << ' ';
+      }
+      str << "]";
+      str << "\n    data = [";
+      const int16_t* data = mini1->data();
+      int ssize = std::accumulate(dshape.begin()+1, dshape.end(), 1, std::multiplies<int>());
+      for (int i = 0; i != dshape[0]; ++ i) {
+        str << "\n        [ ";
+        std::copy(data+ssize*i, data+ssize*i+10, std::ostream_iterator<int>(str, " "));
+        str << " ... ]";
+      }
+      str << "\n    ]";
     }
   }
 

@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2011-10-04 Andy Salnikov
+- DumpCsPad now prints common_mode from new schema and some data from images
+
 Tag: V00-01-04
 2011-09-12 Andy Salnikov
 - DumpCsPad can now dump MiniElementV1 objects
