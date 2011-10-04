@@ -1,0 +1,19 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package H5DataTypes
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Brief description:
+==================
+
+This package defines C++ data types for HDF5 storage. Usually these
+types are "mirrors" of the corresponding XTC types, but in some cases 
+the mapping can be quite complex.
+
+Detailed description:
+=====================
