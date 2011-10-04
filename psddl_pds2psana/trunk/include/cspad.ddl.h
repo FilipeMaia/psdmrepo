@@ -211,7 +211,9 @@ public:
   virtual uint32_t fiducials() const;
   virtual const uint16_t* sb_temp() const;
   virtual uint32_t frame_type() const;
-  virtual const uint16_t* data() const;
+  virtual const int16_t* data() const;
+  virtual uint32_t sectionMask() const;
+  virtual float common_mode(uint32_t section) const;
   virtual std::vector<int> sb_temp_shape() const;
   virtual std::vector<int> data_shape() const;
   virtual std::vector<int> _extra_shape() const;
@@ -259,7 +261,9 @@ public:
   virtual uint32_t fiducials() const;
   virtual const uint16_t* sb_temp() const;
   virtual uint32_t frame_type() const;
-  virtual const uint16_t* data() const;
+  virtual const int16_t* data() const;
+  virtual uint32_t sectionMask() const;
+  virtual float common_mode(uint32_t section) const;
   virtual std::vector<int> sb_temp_shape() const;
   virtual std::vector<int> data_shape() const;
   virtual std::vector<int> _extra_shape() const;
@@ -306,7 +310,8 @@ public:
   virtual uint32_t fiducials() const;
   virtual const uint16_t* sb_temp() const;
   virtual uint32_t frame_type() const;
-  virtual const uint16_t* data() const;
+  virtual const int16_t* data() const;
+  virtual float common_mode(uint32_t section) const;
   virtual std::vector<int> sb_temp_shape() const;
   virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }

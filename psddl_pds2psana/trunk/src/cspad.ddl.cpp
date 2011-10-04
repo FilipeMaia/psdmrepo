@@ -353,7 +353,16 @@ const uint16_t* ElementV1::sb_temp() const { return m_xtcObj->sb_temp(); }
 
 uint32_t ElementV1::frame_type() const { return m_xtcObj->frame_type(); }
 
-const uint16_t* ElementV1::data() const { return m_xtcObj->data(); }
+const int16_t* ElementV1::data() const { return m_xtcObj->data(); }
+
+uint32_t ElementV1::sectionMask() const {
+  if (m_cfgPtr0.get()) return m_xtcObj->sectionMask(*m_cfgPtr0);
+  if (m_cfgPtr1.get()) return m_xtcObj->sectionMask(*m_cfgPtr1);
+  throw std::runtime_error("ElementV1::sectionMask: config object pointer is zero");
+}
+
+
+float ElementV1::common_mode(uint32_t section) const { return m_xtcObj->common_mode(section); }
 
 std::vector<int> ElementV1::sb_temp_shape() const { return m_xtcObj->sb_temp_shape(); }
 
@@ -448,7 +457,16 @@ const uint16_t* ElementV2::sb_temp() const { return m_xtcObj->sb_temp(); }
 
 uint32_t ElementV2::frame_type() const { return m_xtcObj->frame_type(); }
 
-const uint16_t* ElementV2::data() const { return m_xtcObj->data(); }
+const int16_t* ElementV2::data() const { return m_xtcObj->data(); }
+
+uint32_t ElementV2::sectionMask() const {
+  if (m_cfgPtr0.get()) return m_xtcObj->sectionMask(*m_cfgPtr0);
+  if (m_cfgPtr1.get()) return m_xtcObj->sectionMask(*m_cfgPtr1);
+  throw std::runtime_error("ElementV2::sectionMask: config object pointer is zero");
+}
+
+
+float ElementV2::common_mode(uint32_t section) const { return m_xtcObj->common_mode(section); }
 
 std::vector<int> ElementV2::sb_temp_shape() const { return m_xtcObj->sb_temp_shape(); }
 
@@ -536,7 +554,9 @@ const uint16_t* MiniElementV1::sb_temp() const { return m_xtcObj->sb_temp(); }
 
 uint32_t MiniElementV1::frame_type() const { return m_xtcObj->frame_type(); }
 
-const uint16_t* MiniElementV1::data() const { return m_xtcObj->data(); }
+const int16_t* MiniElementV1::data() const { return m_xtcObj->data(); }
+
+float MiniElementV1::common_mode(uint32_t section) const { return m_xtcObj->common_mode(section); }
 
 std::vector<int> MiniElementV1::sb_temp_shape() const { return m_xtcObj->sb_temp_shape(); }
 
