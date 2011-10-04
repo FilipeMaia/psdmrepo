@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-04
+2011-10-03 Andy Salnikov
+- fix for wrong sign of common mode in CsPadMiniElementV1Cvt
+
 Tag: V00-12-03
 2011-09-17 Andy Salnikov
 - event time was only recorded correctly for L1Accept, objects 

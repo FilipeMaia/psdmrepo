@@ -187,7 +187,7 @@ CsPadMiniElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     } else {
       unsigned last = ssize*nSect;
       for (unsigned i = 0; i != last; i += nSect) {
-        double val = sdata[i] - - cmode;
+        double val = sdata[i] - cmode;
         output[i] = val < 0 ? int(val - 0.5) : int(val + 0.5);
       }
     }
