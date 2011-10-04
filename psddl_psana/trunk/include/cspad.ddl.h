@@ -293,7 +293,13 @@ public:
   virtual uint32_t fiducials() const = 0;
   virtual const uint16_t* sb_temp() const = 0;
   virtual uint32_t frame_type() const = 0;
-  virtual const uint16_t* data() const = 0;
+  virtual const int16_t* data() const = 0;
+  /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
+				total bit count gives the number of sections active. */
+  virtual uint32_t sectionMask() const = 0;
+  /** Common mode value for a given section, section number can be 0 to config.numAsicsRead()/2.
+                Will return 0 for data read from XTC, may be non-zero after calibration. */
+  virtual float common_mode(uint32_t section) const = 0;
   /** Method which returns the shape (dimensions) of the data returned by sb_temp() method. */
   virtual std::vector<int> sb_temp_shape() const = 0;
   /** Method which returns the shape (dimensions) of the data returned by data() method. */
@@ -354,7 +360,13 @@ public:
   virtual uint32_t fiducials() const = 0;
   virtual const uint16_t* sb_temp() const = 0;
   virtual uint32_t frame_type() const = 0;
-  virtual const uint16_t* data() const = 0;
+  virtual const int16_t* data() const = 0;
+  /** Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, 
+				total bit count gives the number of sections active. */
+  virtual uint32_t sectionMask() const = 0;
+  /** Common mode value for a given section, section number can be 0 to config.numSect().
+                Will return 0 for data read from XTC, may be non-zero after calibration. */
+  virtual float common_mode(uint32_t section) const = 0;
   /** Method which returns the shape (dimensions) of the data returned by sb_temp() method. */
   virtual std::vector<int> sb_temp_shape() const = 0;
   /** Method which returns the shape (dimensions) of the data returned by data() method. */
@@ -396,7 +408,7 @@ public:
 class MiniElementV1 {
 public:
   enum {
-    Version = 2 /**< XTC type version number */
+    Version = 1 /**< XTC type version number */
   };
   enum {
     TypeId = Pds::TypeId::Id_Cspad2x2Element /**< XTC type ID value (from Pds::TypeId class) */
@@ -419,7 +431,10 @@ public:
   virtual uint32_t fiducials() const = 0;
   virtual const uint16_t* sb_temp() const = 0;
   virtual uint32_t frame_type() const = 0;
-  virtual const uint16_t* data() const = 0;
+  virtual const int16_t* data() const = 0;
+  /** Common mode value for a given section, section number can be 0 or 1.
+                Will return 0 for data read from XTC, may be non-zero after calibration. */
+  virtual float common_mode(uint32_t section) const = 0;
   /** Method which returns the shape (dimensions) of the data returned by sb_temp() method. */
   virtual std::vector<int> sb_temp_shape() const = 0;
   /** Method which returns the shape (dimensions) of the data returned by data() method. */
