@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2011-10-04 Andy Salnikov
+- XtcInputModule now adds EventId and datagram objects to the event in
+  beginRun and beginCalibCyle, run number can be extracted in beginRun()
+
 Tag: V00-00-12
 2011-06-17 Andy Salnikov
 - changed default datagram size to 32MB

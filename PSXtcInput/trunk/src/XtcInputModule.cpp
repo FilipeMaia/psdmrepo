@@ -43,12 +43,6 @@ using namespace XtcInput;
 using namespace PSXtcInput;
 PSANA_INPUT_MODULE_FACTORY(XtcInputModule)
 
-namespace {
-  
-  const char logger[] = "XtcInputModule";
-
-}
-
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -75,10 +69,10 @@ XtcInputModule::~XtcInputModule ()
   if (m_readerThread) {
     // ask the thread to stop
     m_readerThread->interrupt();
-    MsgLog(logger, debug, "wait for reader thread to finish");
+    MsgLog(name(), debug, "wait for reader thread to finish");
     // wait until it does
     m_readerThread->join();
-    MsgLog(logger, debug, "reader thread has finished");
+    MsgLog(name(), debug, "reader thread has finished");
   }
 }
 
@@ -86,7 +80,7 @@ XtcInputModule::~XtcInputModule ()
 void 
 XtcInputModule::beginJob(Env& env)
 {
-  MsgLog(logger, debug, "XtcInputModule: in beginJob()");
+  MsgLog(name(), debug, name() << ": in beginJob()");
 
   // will throw if no files were defined in config
   std::list<std::string> fileNames = configList("files");
@@ -98,7 +92,7 @@ XtcInputModule::beginJob(Env& env)
   for (std::list<std::string>::const_iterator i = fileNames.begin(); i != fileNames.end(); ++i) {
     files.push_back( XtcInput::XtcFileName(*i) ) ;
   }
-  WithMsgLog(logger, debug, str) {
+  WithMsgLog(name(), debug, str) {
     str << "Input files: ";
     std::copy(files.begin(), files.end(), std::ostream_iterator<XtcInput::XtcFileName>(str, " "));
   }
@@ -119,12 +113,12 @@ XtcInputModule::beginJob(Env& env)
   
   Dgram::ptr dgptr = dg.dg();
 
-  MsgLog(logger, debug, "XtcInputModule: read first datagram, transition = " 
+  MsgLog(name(), debug, name() << ": read first datagram, transition = "
         << Pds::TransitionId::name(dgptr->seq.service()));
 
   if ( dgptr->seq.service() != Pds::TransitionId::Configure ) {
     // Something else than Configure, store if for event()
-    MsgLog(logger, warning, "Expected Configure transition for first datagram, received " 
+    MsgLog(name(), warning, "Expected Configure transition for first datagram, received "
            << Pds::TransitionId::name(dgptr->seq.service()) );
     m_putBack = dg;
     return;
@@ -140,7 +134,7 @@ XtcInputModule::beginJob(Env& env)
 InputModule::Status 
 XtcInputModule::event(Event& evt, Env& env)
 {
-  MsgLog(logger, debug, "XtcInputModule: in event()");
+  MsgLog(name(), debug, name() << ": in event()");
 
   Status status = Skip;
   bool found = false;
@@ -157,7 +151,7 @@ XtcInputModule::event(Event& evt, Env& env)
   
     if (dg.empty()) {
       // finita
-      MsgLog(logger, debug, "EOF seen");
+      MsgLog(name(), debug, "EOF seen");
       return Stop;
     }
 
@@ -166,14 +160,14 @@ XtcInputModule::event(Event& evt, Env& env)
     const Pds::ClockTime& clock = seq.clock() ;
     Pds::TransitionId::Value trans = seq.service();
 
-    MsgLog(logger, debug, "XtcInputModule: found new datagram, transition = " 
+    MsgLog(name(), debug, name() << ": found new datagram, transition = "
           << Pds::TransitionId::name(trans));
 
     switch( seq.service()) {
     
     case Pds::TransitionId::Configure:
       if (not (clock == m_transitions[trans])) {
-        MsgLog(logger, warning, "Multiple Configure transitions encountered");
+        MsgLog(name(), warning, name() << ": Multiple Configure transitions encountered");
         m_transitions[trans] = clock;
         fillEnv(dg, env);
       }
@@ -185,6 +179,8 @@ XtcInputModule::event(Event& evt, Env& env)
     case Pds::TransitionId::BeginRun:
       // signal new run, content is not relevant
       if (not (clock == m_transitions[trans])) {
+        fillEventId(dg, evt);
+        fillEventDg(dg, evt);
         status = BeginRun;
         found = true;
         m_transitions[trans] = clock;
@@ -204,6 +200,8 @@ XtcInputModule::event(Event& evt, Env& env)
       // copy config data and signal new calib cycle
       if (not (clock == m_transitions[trans])) {
         fillEnv(dg, env);
+        fillEventId(dg, evt);
+        fillEventDg(dg, evt);
         status = BeginCalibCycle;
         found = true;
         m_transitions[trans] = clock;
@@ -223,6 +221,8 @@ XtcInputModule::event(Event& evt, Env& env)
       // regular event
       fillEnv(dg, env);
       fillEvent(dg, evt, env);
+      fillEventId(dg, evt);
+      fillEventDg(dg, evt);
       found = true;
       status = DoEvent;
       break;
@@ -252,22 +252,10 @@ XtcInputModule::endJob(Env& env)
 void 
 XtcInputModule::fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env)
 {
-  MsgLog(logger, debug, "XtcInputModule: in fillEvent()");
+  MsgLog(name(), debug, name() << ": in fillEvent()");
 
   Dgram::ptr dgptr = dg.dg();
-    
-  // Store datagram itself in the event
-  evt.put(dgptr);
   
-  const Pds::Sequence& seq = dgptr->seq ;
-  const Pds::ClockTime& clock = seq.clock() ;
-
-  // Store event ID
-  PSTime::Time evtTime(clock.seconds(), clock.nanoseconds());
-  unsigned run = dg.file().run();
-  boost::shared_ptr<PSEvt::EventId> eventId( new XtcEventId(run, evtTime) );
-  evt.put(eventId);
-
   // Loop over all XTC contained in the datagram
   XtcInput::XtcIterator iter(&dgptr->xtc);
   while (Pds::Xtc* xtc = iter.next()) {
@@ -279,11 +267,41 @@ XtcInputModule::fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env)
   }
 }
 
+// Fill event with datagram contents
+void
+XtcInputModule::fillEventId(const XtcInput::Dgram& dg, Event& evt)
+{
+  MsgLog(name(), debug, name() << ": in fillEventId()");
+
+  Dgram::ptr dgptr = dg.dg();
+
+  const Pds::Sequence& seq = dgptr->seq ;
+  const Pds::ClockTime& clock = seq.clock() ;
+
+  // Store event ID
+  PSTime::Time evtTime(clock.seconds(), clock.nanoseconds());
+  unsigned run = dg.file().run();
+  boost::shared_ptr<PSEvt::EventId> eventId( new XtcEventId(run, evtTime) );
+  evt.put(eventId);
+}
+
+// Fill event with datagram contents
+void
+XtcInputModule::fillEventDg(const XtcInput::Dgram& dg, Event& evt)
+{
+  MsgLog(name(), debug, name() << ": in fillEventDg()");
+
+  Dgram::ptr dgptr = dg.dg();
+
+  // Store datagram itself in the event
+  evt.put(dgptr);
+}
+
 // Fill environment with datagram contents
 void 
 XtcInputModule::fillEnv(const XtcInput::Dgram& dg, Env& env)
 {
-  MsgLog(logger, debug, "XtcInputModule: in fillEnv()");
+  MsgLog(name(), debug, name() << ": in fillEnv()");
 
   // All objects in datagram in Configuration and BeginCalibCycle transitions
   // (except for EPICS data) are considered configuration data. Just store them
