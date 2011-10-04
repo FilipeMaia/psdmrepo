@@ -27,6 +27,7 @@
 #include "hdf5pp/Group.h"
 #include "hdf5pp/TypeTraits.h"
 #include "hdf5pp/Type.h"
+#include "MsgLogger/MsgLogger.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -74,7 +75,12 @@ public:
     if ( deflate >= 0 ) plDScreate.set_deflate(deflate) ;
 
     // make a data set
-    m_dataset = location.createDataSet<T> ( name, stored_type, dsp, plDScreate ) ;
+    MsgLog("ObjectContainer", trace, "ObjectContainer -- creating dataset " << name ) ;
+    if (location.hasChild(name)) {
+      m_dataset = location.openDataSet<T> ( name ) ;
+    } else {
+      m_dataset = location.createDataSet<T> ( name, stored_type, dsp, plDScreate ) ;
+    }
   }
 
   /**
