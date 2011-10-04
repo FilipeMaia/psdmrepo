@@ -109,7 +109,11 @@ EpicsDataTypeCvt::typedConvertSubgroup ( hdf5pp::Group group,
   if ( not subgroup.valid() ) {
     const std::string& subname = _subname( data ) ;
     MsgLog(logger,trace, "EpicsDataTypeCvt -- creating subgroup " << subname ) ;
-    subgroup = group.createGroup( subname ) ;
+    if (group.hasChild(subname)) {
+      subgroup = group.openGroup( subname ) ;
+    } else {
+      subgroup = group.createGroup( subname ) ;
+    }
     m_subgroups[group][data.iPvId] = subgroup ;
   }
 

@@ -27,6 +27,7 @@
 //-------------------------------
 #include "hdf5pp/Group.h"
 #include "O2OTranslator/CvtGroupMap.h"
+#include "MsgLogger/MsgLogger.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -82,7 +83,12 @@ public:
       const std::string& grpName = m_typeGroupName + "/" + src.name() ;
 
       // create separate group
-      subgroup = group.createGroup( grpName );
+      MsgLog("EvtDataTypeCvt", trace, "EvtDataTypeCvt -- creating group " << grpName ) ;
+      if (group.hasChild(grpName)) {
+        subgroup = group.openGroup( grpName );
+      } else {
+        subgroup = group.createGroup( grpName );
+      }
 
       m_group2group.insert ( group, src.top(), subgroup ) ;
     }

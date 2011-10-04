@@ -701,7 +701,12 @@ O2OHdf5Writer::openGroup ( const Pds::Dgram& dgram, State state )
   // create group
   const std::string& name = groupName ( state, counter ) ;
   MsgLog( logger, debug, "HDF5Writer -- creating group " << name ) ;
-  hdf5pp::Group group = m_groups.top().createGroup( name ) ;
+  hdf5pp::Group group;
+  if (m_groups.top().hasChild(name)) {
+    group = m_groups.top().openGroup(name) ;
+  } else {
+    group = m_groups.top().createGroup(name) ;
+  }
 
   // store transition time as couple of attributes to this new group
   ::storeClock ( group, dgram.seq.clock(), "start" ) ;
