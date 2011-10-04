@@ -52,7 +52,6 @@ namespace CSPadPixCoords {
 
 CSPadImageProducer::CSPadImageProducer (const std::string& name)
   : Module(name)
-  , m_calibDir()
   , m_typeGroupName()
   , m_source()
   , m_src()
@@ -62,10 +61,8 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_calibDir      = configStr("calibDir",      "/reg/d/psdm/CXI/cxi35711/calib");
   m_typeGroupName = configStr("typeGroupName", "CsPad::CalibV1");
   m_source        = configStr("source",        "CxiDs1.0:Cspad.0");
-  m_runNumber     = config   ("runNumber",     32U);
   m_maxEvents     = config   ("events",        32U);
   m_filter        = config   ("filter",        false);
   m_tiltIsApplied = config   ("tiltIsApplied", true);
@@ -96,9 +93,19 @@ void
 CSPadImageProducer::beginRun(Event& evt, Env& env)
 {
   cout << "ImageCSPad::beginRun " << endl;
+
+  // get run number
+  shared_ptr<EventId> eventId = evt.get();
+  int run = 0;
+  if (eventId.get()) {
+    run = eventId->run();
+  } else {
+    MsgLog(name(), warning, "Cannot determine run number, will use 0.");
+  }
+
   //m_cspad_calibpar = new PSCalib::CSPadCalibPars(); // get default calib pars from my local directory
                                                       // ~dubrovin/LCLS/CSPadAlignment-v01/calib-cxi35711-r0009-det/
-  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(m_calibDir, m_typeGroupName, m_source, m_runNumber);
+  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(env.calibDir(), m_typeGroupName, m_source, run);
   m_pix_coords_2x1   = new CSPadPixCoords::PixCoords2x1   ();
   m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar, m_tiltIsApplied );
   m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar, m_tiltIsApplied );
@@ -167,8 +174,8 @@ CSPadImageProducer::event(Event& evt, Env& env)
     for (int q = 0; q < nQuads; ++ q) {
         const Psana::CsPad::ElementV2& el = data2->quads(q);
 
-        const uint16_t* data = el.data();
-        int             quad = el.quad() ;
+        const int16_t* data = el.data();
+        int            quad = el.quad() ;
 
         std::vector<int> v_image_shape = el.data_shape();
         CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(quad, v_image_shape, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
@@ -230,7 +237,7 @@ CSPadImageProducer::cspad_image_init()
 //--------------------
 
 void
-CSPadImageProducer::cspad_image_fill(const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+CSPadImageProducer::cspad_image_fill(const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
       //int              quad           = quadpars -> getQuadNumber();
         uint32_t         roiMask        = quadpars -> getRoiMask();
@@ -241,7 +248,7 @@ CSPadImageProducer::cspad_image_fill(const uint16_t* data, CSPadPixCoords::QuadP
 	     bool bitIsOn = roiMask & (1<<sect);
 	     if( !bitIsOn ) { m_cspad_ind += m_sizeOf2x1Img; continue; }
  
-             const uint16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
+             const int16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
 
              //cout  << "  add section " << sect << endl;	     
  

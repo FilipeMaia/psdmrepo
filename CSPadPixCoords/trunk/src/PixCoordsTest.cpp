@@ -160,8 +160,8 @@ PixCoordsTest::event(Event& evt, Env& env)
     for (int q = 0; q < nQuads; ++ q) {
         const Psana::CsPad::ElementV2& el = data2->quads(q);
 
-        const uint16_t* data = el.data();
-        int             quad = el.quad() ;
+        const int16_t* data = el.data();
+        int            quad = el.quad() ;
 
         std::vector<int> v_image_shape = el.data_shape();
 
@@ -211,7 +211,7 @@ PixCoordsTest::endJob(Event& evt, Env& env)
 //--------------------
 
 void
-PixCoordsTest::test_2x1(const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+PixCoordsTest::test_2x1(const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
         int              quad           = quadpars -> getQuadNumber();
         uint32_t         roiMask        = quadpars -> getRoiMask();
@@ -241,7 +241,7 @@ PixCoordsTest::test_2x1(const uint16_t* data, CSPadPixCoords::QuadParameters* qu
         double  mrgx=20.1;
         double  mrgy=20.1;
 
-        const uint16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
+        const int16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
  
         for (uint32_t c=0; c<m_ncols2x1; c++) {
         for (uint32_t r=0; r<m_nrows2x1; r++) {
@@ -269,7 +269,7 @@ PixCoordsTest::test_2x1(const uint16_t* data, CSPadPixCoords::QuadParameters* qu
 //--------------------
 
 void
-PixCoordsTest::test_quad(const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+PixCoordsTest::test_quad(const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
         int              quad           = quadpars -> getQuadNumber();
         uint32_t         roiMask        = quadpars -> getRoiMask();
@@ -289,7 +289,7 @@ PixCoordsTest::test_quad(const uint16_t* data, CSPadPixCoords::QuadParameters* q
              bool bitIsOn = roiMask & (1<<sect);
              if( !bitIsOn ) continue;
  
-             const uint16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
+             const int16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
 
              for (uint32_t c=0; c<m_ncols2x1; c++) {
              for (uint32_t r=0; r<m_nrows2x1; r++) {
@@ -337,7 +337,7 @@ PixCoordsTest::test_cspad_init()
 //--------------------
 
 void
-PixCoordsTest::test_cspad(const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+PixCoordsTest::test_cspad(const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
       //int              quad           = quadpars -> getQuadNumber();
         uint32_t         roiMask        = quadpars -> getRoiMask();
@@ -348,7 +348,7 @@ PixCoordsTest::test_cspad(const uint16_t* data, CSPadPixCoords::QuadParameters* 
 	     bool bitIsOn = roiMask & (1<<sect);
 	     if( !bitIsOn ) { m_cspad_ind += m_sizeOf2x1Img; continue; }
  
-             const uint16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
+             const int16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
 
              //cout  << "  add section " << sect << endl;	     
  

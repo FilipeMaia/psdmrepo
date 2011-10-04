@@ -52,7 +52,6 @@ namespace CSPadPixCoords {
 
 CSPadInterpolImageProducer::CSPadInterpolImageProducer (const std::string& name)
   : Module(name)
-  , m_calibDir()
   , m_typeGroupName()
   , m_source()
   , m_src()
@@ -62,10 +61,8 @@ CSPadInterpolImageProducer::CSPadInterpolImageProducer (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_calibDir      = configStr("calibDir",      "/reg/d/psdm/CXI/cxi35711/calib");
   m_typeGroupName = configStr("typeGroupName", "CsPad::CalibV1");
   m_source        = configStr("source",        "CxiDs1.0:Cspad.0");
-  m_runNumber     = config   ("runNumber",     32U);
   m_maxEvents     = config   ("events",        32U);
   m_filter        = config   ("filter",        false);
   m_tiltIsApplied = config   ("tiltIsApplied", true);
@@ -96,9 +93,19 @@ void
 CSPadInterpolImageProducer::beginRun(Event& evt, Env& env)
 {
   cout << "ImageCSPad::beginRun " << endl;
+
+  // get run number
+  shared_ptr<EventId> eventId = evt.get();
+  int run = 0;
+  if (eventId.get()) {
+    run = eventId->run();
+  } else {
+    MsgLog(name(), warning, "Cannot determine run number, will use 0.");
+  }
+
   //m_cspad_calibpar = new PSCalib::CSPadCalibPars(); // get default calib pars from my local directory
                                                       // ~dubrovin/LCLS/CSPadAlignment-v01/calib-cxi35711-r0009-det/
-  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(m_calibDir, m_typeGroupName, m_source, m_runNumber);
+  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(env.calibDir(), m_typeGroupName, m_source, run);
   m_pix_coords_2x1   = new CSPadPixCoords::PixCoords2x1   ();
   m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar, m_tiltIsApplied );
   m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar, m_tiltIsApplied );
@@ -171,7 +178,7 @@ CSPadInterpolImageProducer::event(Event& evt, Env& env)
   if (data2.get()) {
 
     bool  quadIsAvailable[] = {false, false, false, false};
-    const uint16_t* data[4];
+    const int16_t* data[4];
     CSPadPixCoords::QuadParameters *quadpars[4];
    
     int nQuads = data2->quads_shape()[0];
@@ -514,7 +521,7 @@ CSPadInterpolImageProducer::cspad_image_init()
   * Fill the CSPad array with interpolation.
   */ 
 void
-CSPadInterpolImageProducer::cspad_image_interpolated_fill (const uint16_t* data[], CSPadPixCoords::QuadParameters* quadpars[], bool quadIsAvailable[])
+CSPadInterpolImageProducer::cspad_image_interpolated_fill (const int16_t* data[], CSPadPixCoords::QuadParameters* quadpars[], bool quadIsAvailable[])
 {
     for (unsigned ix=0; ix<NX_CSPAD; ix++){
     for (unsigned iy=0; iy<NY_CSPAD; iy++){
@@ -535,7 +542,7 @@ CSPadInterpolImageProducer::cspad_image_interpolated_fill (const uint16_t* data[
 	  bool  bitIsOn = (quadpars[addr.quad]->getRoiMask()) & (1<<addr.sect);
           if ( !bitIsOn ) continue; 
 
-          const uint16_t *data2x1 = &data[addr.quad][addr.sect * m_sizeOf2x1Img];
+          const int16_t *data2x1 = &data[addr.quad][addr.sect * m_sizeOf2x1Img];
           const double f = (double)data2x1[addr.col*m_nrows2x1+addr.row];
 	  const double w = (double)m_weight [ix][iy][ip];
 

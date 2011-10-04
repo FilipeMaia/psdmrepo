@@ -108,7 +108,7 @@ protected:
 
   void getQuadConfigPars(Env& env);
   void cspad_image_init();
-  void cspad_image_fill (const uint16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void cspad_image_fill (const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void cspad_image_save_in_file(const std::string &filename = "cspad_image.txt");
   void cspad_image_add_in_event(Event& evt, const std::string &keyname = "CSPad:Image");
 
@@ -116,13 +116,11 @@ private:
 
   // Data members, this is for example purposes only
 
-  std::string m_calibDir;       // i.e. /reg/d/psdm/CXI/cxi35711/calib
   std::string m_typeGroupName;  // i.e. CsPad::CalibV1
   std::string m_source;         // i.e. CxiDs1.0:Cspad.0
    
   Source   m_src;         // Data source set from config file
   Pds::Src m_actualSrc;
-  unsigned m_runNumber;
   unsigned m_maxEvents;
   bool     m_filter;
   bool     m_tiltIsApplied;

@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2011-10-04 Andy Salnikov
+- cspad image data type has changed from uint16_t to int16_t, updating code here
+- calibration directory name is now accessible from environment, individual
+  modules should not need their own parameters, removing it from here
+- likewise for the run number, it's accessible from EventId object
+
 Tag: V00-00-05
 2011-09-15 Mikhail S. Dubrovin
 - add psana module CSPadInterpolImageProducer
