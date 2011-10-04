@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2011-10-04 Andy Salnikov
+- in CalibFileFinder class moved source argument to findCalibFile()
+  method instead of constructor, more convenient for use.
+- added exceptions classes, exception is thrown when somebody passes
+  source address which is not DetInfo
+
 Tag: V00-00-05
 2011-09-01 Andy Salnikov
 - pass run number to CalibFileFinder::findCalibFile() method by

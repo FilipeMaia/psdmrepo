@@ -14,25 +14,22 @@
 // This Class's Header --
 //-----------------------
 #include "PSCalib/CSPadCalibPars.h"
-#include "PSCalib/CalibFileFinder.h"
 
 //-----------------
 // C/C++ Headers --
 //-----------------
-
-#include <iostream> // for cout
-//#include <fstream>
-
-using namespace std;
+#include <iostream>
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+#include "PSCalib/CalibFileFinder.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
+using namespace std;
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -126,8 +123,8 @@ void CSPadCalibPars::getCalibFileName ()
     }
   else
     {
-      PSCalib::CalibFileFinder *calibfinder = new PSCalib::CalibFileFinder(m_calibDir, m_typeGroupName, m_source);
-      m_fname = calibfinder -> findCalibFile(m_cur_calibname, m_runNumber);
+      PSCalib::CalibFileFinder *calibfinder = new PSCalib::CalibFileFinder(m_calibDir, m_typeGroupName);
+      m_fname = calibfinder -> findCalibFile(m_source, m_cur_calibname, m_runNumber);
     }
     cout << "CSPadCalibPars::openCalibFile: " << m_fname << endl;
 }

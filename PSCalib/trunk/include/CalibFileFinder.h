@@ -22,6 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/xtc/Src.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -65,41 +66,42 @@ public:
   /**
    *  @brief Creates object with elements of the path to the calibration file.
    *  
-   *  @param[in] calibDir       Calibration directory for current experiment.
-   *  @param[in] typeGroupName  Data type and group names.
-   *  @param[in] src            The name of the data source.
-   */ 
-
-  CalibFileFinder (const std::string& calibDir,          //  /reg/d/psdm/cxi/cxi35711/calib
-                   const std::string& typeGroupName,     //  CsPad::CalibV1
-                   const std::string& src);              //  CxiDs1.0:Cspad.0) ;
+   *  Calibration directory typically comes from environment for psana jobs.
+   *
+   *  @param[in] calibDir   Calibration directory for current experiment.
+   *  @param[in] className  Calibration class name, e.g. CsPad::CalibV1
+   */
+  CalibFileFinder (const std::string& calibDir,
+                   const std::string& className);
 
   // Destructor
-  virtual ~CalibFileFinder () ;
+  ~CalibFileFinder () ;
 
-  // find calibration file 
   /**
    *  @brief Returns complete path/name of the calibration file.
-   *  
+   *
+   *  @param[in] src        The name of the data source, e.g. CxiDs1.0:Cspad.0
    *  @param[in] datatype   Type of the calibration parameters (i.e. "rotation").
    *  @param[in] runNumber  Run number to search the valid file name.
-   */ 
-  std::string findCalibFile(const std::string& datatype, unsigned long runNumber) const;
+   */
+  std::string findCalibFile(const std::string& src, const std::string& datatype, unsigned long runNumber) const;
+
+  /**
+   *  @brief Returns complete path/name of the calibration file.
+   *
+   *  @param[in] src        Address of the data source, only DetInfo addresses are accepted.
+   *  @param[in] datatype   Type of the calibration parameters (i.e. "rotation").
+   *  @param[in] runNumber  Run number to search the valid file name.
+   */
+  std::string findCalibFile(const Pds::Src& src, const std::string& datatype, unsigned long runNumber) const;
  
 protected:
 
 private:
 
   // Data members
-  
   const std::string m_calibDir;
   const std::string m_typeGroupName;
-  const std::string m_src;
-  const std::string m_dataType;
-
-  // Copy constructor and assignment are disabled by default
-  CalibFileFinder ( const CalibFileFinder& ) ;
-  CalibFileFinder& operator = ( const CalibFileFinder& ) ;
 
 };
 

@@ -25,11 +25,12 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+#include "pdsdata/xtc/DetInfo.hh"
+#include "PSCalib/Exceptions.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -84,6 +85,21 @@ namespace {
     return out << "CalibFile(\"" << cf.path() << "\", " << cf.begin() << ", " << cf.end() << ")" ;
   }
   
+
+  // convert source address to string
+  std::string toString( const Pds::Src& src )
+  {
+    if ( src.level() != Pds::Level::Source ) {
+      throw PSCalib::NotDetInfoError(ERR_LOC);
+    }
+
+    const Pds::DetInfo& info = static_cast<const Pds::DetInfo&>( src ) ;
+    std::ostringstream str ;
+    str << Pds::DetInfo::name(info.detector()) << '.' << info.detId()
+        << ':' << Pds::DetInfo::name(info.device()) << '.' << info.devId() ;
+    return str.str() ;
+  }
+
 }
 
 
@@ -97,20 +113,23 @@ namespace PSCalib {
 // Constructors --
 //----------------
 
-CalibFileFinder::CalibFileFinder (const std::string& calibDir,           //  /reg/d/psdm/cxi/cxi35711/calib
-                                  const std::string& typeGroupName,      //  CsPad::CalibV1
-                                  const std::string& src)                //  CxiDs1.0:Cspad.0
+CalibFileFinder::CalibFileFinder (const std::string& calibDir,
+                                  const std::string& typeGroupName)
   : m_calibDir(calibDir)
   , m_typeGroupName(typeGroupName)
-  , m_src(src)
 {
 }
 
-//----------------
+//--------------
+// Destructor --
+//--------------
+CalibFileFinder::~CalibFileFinder ()
+{
+}
 
 // find calibration file
-std::string 
-CalibFileFinder::findCalibFile(const std::string& dataType, unsigned long runNumber) const        //  pedestals
+std::string
+CalibFileFinder::findCalibFile(const std::string& src, const std::string& dataType, unsigned long runNumber) const
 try {
   // if no directory given then don't do anything
   if ( m_calibDir == "" ) return std::string();
@@ -118,7 +137,7 @@ try {
   // construct full path name
   fs::path dir = m_calibDir;
   dir /= m_typeGroupName;
-  dir /= m_src;
+  dir /= src;
   dir /= dataType;
 
   // scan directory
@@ -159,12 +178,11 @@ try {
   return std::string();  
 }
 
-
-//--------------
-// Destructor --
-//--------------
-CalibFileFinder::~CalibFileFinder ()
+// find calibration file
+std::string
+CalibFileFinder::findCalibFile(const Pds::Src& src, const std::string& dataType, unsigned long runNumber) const
 {
+  return findCalibFile(::toString(src), dataType, runNumber);
 }
 
 } // namespace PSCalib

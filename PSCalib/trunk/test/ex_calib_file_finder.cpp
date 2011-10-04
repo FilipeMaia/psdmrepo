@@ -36,11 +36,11 @@ int main ()
   cout << "Test of PSCalib::CalibFileFinder" << endl;     
 
 
-  PSCalib::CalibFileFinder *calib1 = new PSCalib::CalibFileFinder(calibDir, typeGroupName, src);  
+  PSCalib::CalibFileFinder *calib1 = new PSCalib::CalibFileFinder(calibDir, typeGroupName);
 
-  cout << "Calibration file name for existing run range: " << calib1->findCalibFile(dataType,runNumber) << endl;     
+  cout << "Calibration file name for existing run range: " << calib1->findCalibFile(src,dataType,runNumber) << endl;
 
-  cout << "Calibration file name for non-existing run range: " << calib1->findCalibFile(dataType,runNumber2) << endl;     
+  cout << "Calibration file name for non-existing run range: " << calib1->findCalibFile(src,dataType,runNumber2) << endl;
 
   return 0;
 }
