@@ -83,10 +83,11 @@ public:
       const std::string& grpName = m_typeGroupName + "/" + src.name() ;
 
       // create separate group
-      MsgLog("EvtDataTypeCvt", trace, "EvtDataTypeCvt -- creating group " << grpName ) ;
       if (group.hasChild(grpName)) {
+        MsgLog("EvtDataTypeCvt", trace, "EvtDataTypeCvt -- existing group " << grpName ) ;
         subgroup = group.openGroup( grpName );
       } else {
+        MsgLog("EvtDataTypeCvt", trace, "EvtDataTypeCvt -- creating group " << grpName ) ;
         subgroup = group.createGroup( grpName );
       }
 

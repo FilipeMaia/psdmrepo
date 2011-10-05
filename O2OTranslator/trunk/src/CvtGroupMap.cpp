@@ -37,8 +37,8 @@ namespace O2OTranslator {
 bool
 CvtGroupMap::_SrcCmp::operator()( const Pds::Src& lhs, const Pds::Src& rhs ) const
 {
-  if ( lhs.log() < rhs.log() ) return true ;
-  if ( lhs.log() > rhs.log() ) return false ;
+  if ( lhs.level() < rhs.level() ) return true ;
+  if ( lhs.level() > rhs.level() ) return false ;
   if ( lhs.phy() < rhs.phy() ) return true ;
   return false ;
 }

@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-07
+2011-10-05 Andy Salnikov
+- continuing EPICS saga, improved handling of the multi-source
+  data. Data with the same address which appeared to come from
+  different sources were not handled correctly. Changing 
+  CvtGroupMap::_SrcCmp::operator() to ignore host IP in Pds::Src,
+  so that source address compares correctly even though the
+  host IP is different.
+
 Tag: V00-12-06
 2011-10-04 Andy Salnikov
 - PSCalib::CalibFileFinder interface changed, updating code here

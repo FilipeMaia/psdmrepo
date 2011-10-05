@@ -94,18 +94,18 @@ private:
     DataCont* dataCont ;
   };
 
-  typedef std::map<int16_t,hdf5pp::Group> PV2Group ;
-  typedef std::map<int16_t,hdf5pp::Type> PV2Type ;
-  typedef std::map<hdf5pp::Group,PV2Group> Subgroups ;
-  typedef std::map<hdf5pp::Group,PV2Type> Types ;
-  typedef std::map<int16_t,_pvdata> PVDataMap ;
-  typedef std::map<int16_t,std::string> PVNameMap ;
-  typedef std::map<std::string,int16_t> PVName2Id ;
+  typedef std::map<int16_t,hdf5pp::Group> PV2Group ;   // maps PV id to group
+  typedef std::map<int16_t,hdf5pp::Type> PV2Type ;     // maps PV id to its HDF5 type
+  typedef std::map<hdf5pp::Group,PV2Group> Subgroups ; // maps Src group to (PV id -> Group) mapping
+  typedef std::map<hdf5pp::Group,PV2Type> Types ;      // maps Src group to (PV id -> Type) mapping
+  typedef std::map<int16_t,_pvdata> PVDataMap ;        // maps PV id to containers
+  typedef std::map<int16_t,std::string> PVNameMap ;    // maps PV id to it EPICS name
+  typedef std::map<std::string,int16_t> PVName2Id ;    // maps EPICS name to PV id
 
   // Data members
   hsize_t m_chunk_size ;
   int m_deflate ;
-  Subgroups m_subgroups ;
+  Subgroups m_subgroups ;  // maps top EPICS group (.../Epics::EpicsPv/EpicsArch.0:NoDevice.0) to PV2Group mapping
   Types m_types ;
   PVDataMap m_pvdatamap ;
   PVNameMap m_pvnames ;
