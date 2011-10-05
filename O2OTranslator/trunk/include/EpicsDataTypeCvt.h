@@ -15,6 +15,7 @@
 //-----------------
 #include <string>
 #include <map>
+#include <tr1/tuple>
 
 //----------------------
 // Base Class Headers --
@@ -79,13 +80,16 @@ protected:
   /// method called when the driver closes a group in the file
   virtual void closeSubgroup( hdf5pp::Group group ) ;
 
-  // generate the name for the subgroup
-  std::string _subname ( const XtcType& data ) ;
+  // get the name of the channel
+  std::string pvName (const XtcType& data, const Pds::Src& src) ;
 
 private:
 
   typedef CvtDataContainer<CvtDataContFactoryDef<H5DataTypes::XtcClockTime> > XtcClockTimeCont ;
   typedef CvtDataContainer<CvtDataContFactoryEpics> DataCont ;
+
+  // PV id is: src.log(), src.phy(), epics.pvId
+  typedef std::tr1::tuple<uint32_t, uint32_t, int> PvId;
 
   struct _pvdata {
     _pvdata() : timeCont(0), dataCont(0) {}
@@ -94,13 +98,12 @@ private:
     DataCont* dataCont ;
   };
 
-  typedef std::map<int16_t,hdf5pp::Group> PV2Group ;   // maps PV id to group
-  typedef std::map<int16_t,hdf5pp::Type> PV2Type ;     // maps PV id to its HDF5 type
-  typedef std::map<hdf5pp::Group,PV2Group> Subgroups ; // maps Src group to (PV id -> Group) mapping
-  typedef std::map<hdf5pp::Group,PV2Type> Types ;      // maps Src group to (PV id -> Type) mapping
-  typedef std::map<int16_t,_pvdata> PVDataMap ;        // maps PV id to containers
-  typedef std::map<int16_t,std::string> PVNameMap ;    // maps PV id to it EPICS name
-  typedef std::map<std::string,int16_t> PVName2Id ;    // maps EPICS name to PV id
+  typedef std::map<std::string, hdf5pp::Group> PV2Group ; // maps PV name to group
+  typedef std::map<std::string, hdf5pp::Type> PV2Type ;   // maps PV name to its HDF5 type
+  typedef std::map<hdf5pp::Group, PV2Group> Subgroups ;   // maps Src group to (PV id -> Group) mapping
+  typedef std::map<hdf5pp::Group, PV2Type> Types ;        // maps Src group to (PV id -> Type) mapping
+  typedef std::map<std::string, _pvdata> PVDataMap ;      // maps PV name to containers
+  typedef std::map<PvId, std::string> PVNameMap ;         // maps PV id to its name
 
   // Data members
   hsize_t m_chunk_size ;
@@ -109,7 +112,6 @@ private:
   Types m_types ;
   PVDataMap m_pvdatamap ;
   PVNameMap m_pvnames ;
-  PVName2Id m_name2id ;
 
   // Copy constructor and assignment are disabled by default
   EpicsDataTypeCvt ( const EpicsDataTypeCvt& ) ;

@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-00
+2011-10-05 Andy Salnikov
+- committing proper fix for multi-source EPICS, now identification
+  is based on the PV names instead of IDs. Multiple instances 
+  with the same name will all end up in the same container.
+- Not clear how this fix will work with the proposed fix to
+  XTC data when there are multiple devices, I suspect that it
+  should work OK but this needs checking.
+
 Tag: V00-12-07
 2011-10-05 Andy Salnikov
 - continuing EPICS saga, improved handling of the multi-source

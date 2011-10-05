@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/lexical_cast.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -53,7 +54,6 @@ EpicsDataTypeCvt::EpicsDataTypeCvt ( const std::string& topGroupName,
   , m_types()
   , m_pvdatamap()
   , m_pvnames()
-  , m_name2id()
 {
 }
 
@@ -85,9 +85,15 @@ EpicsDataTypeCvt::typedConvertSubgroup ( hdf5pp::Group group,
     MsgLog("ConfigDataTypeCvt", warning, "Zero XTC payload in " << typeGroupName()) ;
     return;
   }
-  
+
+  const Pds::Src& pvSrc = src.top();
+  PvId pvid(pvSrc.log(), pvSrc.phy(), data.iPvId);
+
+  // get the name
+  const std::string pvname = pvName(data, pvSrc);
+
   // see if there is a structure setup already for this PV
-  PVDataMap::iterator pv_it = m_pvdatamap.find(data.iPvId) ;
+  PVDataMap::iterator pv_it = m_pvdatamap.find(pvname) ;
   if ( pv_it == m_pvdatamap.end() ) {
     // new thing, create all groups/containers
 
@@ -101,27 +107,26 @@ EpicsDataTypeCvt::typedConvertSubgroup ( hdf5pp::Group group,
 
     // store it all for later use
     _pvdata pv( timeCont, dataCont ) ;
-    pv_it = m_pvdatamap.insert( PVDataMap::value_type(data.iPvId, pv) ).first ;
+    pv_it = m_pvdatamap.insert( std::make_pair(pvname, pv) ).first ;
   }
 
   // is there a subgroup for this PV?
-  hdf5pp::Group subgroup = m_subgroups[group][data.iPvId] ;
+  hdf5pp::Group subgroup = m_subgroups[group][pvname] ;
   if ( not subgroup.valid() ) {
-    const std::string& subname = _subname( data ) ;
-    MsgLog(logger,trace, "EpicsDataTypeCvt -- creating subgroup " << subname ) ;
-    if (group.hasChild(subname)) {
-      subgroup = group.openGroup( subname ) ;
+    MsgLog(logger,trace, "EpicsDataTypeCvt -- creating subgroup " << pvname ) ;
+    if (group.hasChild(pvname)) {
+      subgroup = group.openGroup( pvname ) ;
     } else {
-      subgroup = group.createGroup( subname ) ;
+      subgroup = group.createGroup( pvname ) ;
     }
-    m_subgroups[group][data.iPvId] = subgroup ;
+    m_subgroups[group][pvname] = subgroup ;
   }
 
   // is there a type for this PV?
-  hdf5pp::Type type = m_types[group][data.iPvId] ;
+  hdf5pp::Type type = m_types[group][pvname] ;
   if ( not type.valid() ) {
     type = CvtDataContFactoryEpics::stored_type( data ) ;
-    m_types[group][data.iPvId] = type ;
+    m_types[group][pvname] = type ;
   }
 
   _pvdata& pv = pv_it->second ;
@@ -148,38 +153,28 @@ EpicsDataTypeCvt::closeSubgroup( hdf5pp::Group group )
   m_types.erase( group ) ;
 }
 
-// generate the name for the subgroup
+// get the name of the channel
 std::string
-EpicsDataTypeCvt::_subname ( const XtcType& data )
+EpicsDataTypeCvt::pvName (const XtcType& data, const Pds::Src& src)
 {
-  // generate new name, if the data is CTRL data then it already contains
-  // EPICS name of PV, otherwise generate some unique name
-  std::string name = m_pvnames[data.iPvId] ;
+  PvId pvid(src.log(), src.phy(), data.iPvId);
+
+  std::string name = m_pvnames[pvid] ;
   if ( name.empty() ) {
+
     if ( dbr_type_is_CTRL(data.iDbrType) ) {
 
       name = static_cast<const Pds::EpicsPvCtrlHeader&>(data).sPvName ;
 
-      // some channels may appear twice
-      if ( m_name2id.count(name) > 0 ) {
-        MsgLog(logger,warning,"EpicsDataTypeCvt -- duplicate PV name: " << name << " for IDs " << m_name2id[name] << " and " << data.iPvId ) ;
-
-        // augment it with channel ID
-        char buf[64] ;
-        snprintf( buf, sizeof buf, "%s#%d", static_cast<const Pds::EpicsPvCtrlHeader&>(data).sPvName, int(data.iPvId) ) ;
-        name = buf ;
-      }
-
-      m_pvnames[data.iPvId] = name ;
-      m_name2id[name] = data.iPvId ;
-
     } else {
 
-      char buf[32] ;
-      snprintf( buf, sizeof buf, "pvId=%d", int(data.iPvId) ) ;
-      name = buf ;
+      name = "PV:pvId=" + boost::lexical_cast<std::string>(data.iPvId) +
+          ":src_log=" + boost::lexical_cast<std::string>(src.log()) +
+          ":src_phy=" + boost::lexical_cast<std::string>(src.phy());
 
     }
+
+    m_pvnames[pvid] = name ;
   }
 
   return name ;
