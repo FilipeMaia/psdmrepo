@@ -52,10 +52,14 @@ CsPadFilter::CsPadFilter (const std::string& name)
   , m_src()
   , m_key()
   , m_skipIfNoData()
+  , m_mode()
+  , m_param()
 {
   m_src = configStr("source", "DetInfo(:Cspad)");
   m_key = configStr("inputKey", "");
   m_skipIfNoData = config("skipIfNoData", true);
+  m_mode = config("mode", -1);
+  m_param = configList("parameters", std::list<double>());
 }
 
 //--------------
@@ -75,22 +79,47 @@ CsPadFilter::beginJob(Event& evt, Env& env)
 void 
 CsPadFilter::beginRun(Event& evt, Env& env)
 {
-  // get run number
-  shared_ptr<EventId> eventId = evt.get();
-  int run = 0;
-  if (eventId.get()) {
-    run = eventId->run();
-    MsgLog(name(), trace, name() << ": Using run number " << run);
+  if (m_mode<= 0) {
+    
+    // use calibration file
+    
+    // get run number
+    shared_ptr<EventId> eventId = evt.get();
+    int run = 0;
+    if (eventId.get()) {
+      run = eventId->run();
+      MsgLog(name(), trace, name() << ": Using run number " << run);
+    } else {
+      MsgLog(name(), warning, name() << ": Cannot determine run number, will use 0.");
+    }
+  
+    // add proxy to calib store
+    boost::shared_ptr< PSEvt::Proxy<pdscalibdata::CsPadFilterV1> > proxy(
+        new CalibDataProxy<pdscalibdata::CsPadFilterV1>(env.calibDir(), "CsPad::CalibV1", "filter", run));
+    env.calibStore().putProxy(proxy, PSEvt::EventKey::anySource());
+
   } else {
-    MsgLog(name(), warning, name() << ": Cannot determine run number, will use 0.");
+    
+    // copy parameters to array
+    const int paramSize = pdscalibdata::CsPadFilterV1::DataSize;
+    double param[paramSize];    
+    std::fill_n(param, paramSize, 0.0);
+    
+    std::list<double>::const_iterator it = m_param.begin();
+    for (int i = 0; i != paramSize and it != m_param.end(); ++ i, ++ it) {
+      param[i] = *it;
+    }
+    if (it != m_param.end()) {
+      MsgLog(name(), warning, "Too many values specified in parameters, ignoring extra values.");
+    }
+
+    // make filter object
+    pdscalibdata::CsPadFilterV1::FilterMode mode = pdscalibdata::CsPadFilterV1::FilterMode(m_mode);
+    boost::shared_ptr<pdscalibdata::CsPadFilterV1> filter(new pdscalibdata::CsPadFilterV1(mode, param));
+    
+    // store it
+    env.calibStore().put(filter, PSEvt::EventKey::anySource());
   }
-
-  // add proxy to calib store
-  PSEnv::EnvObjectStore& calibStore = env.calibStore();
-  boost::shared_ptr< PSEvt::Proxy<pdscalibdata::CsPadFilterV1> > proxy(
-      new CalibDataProxy<pdscalibdata::CsPadFilterV1>(env.calibDir(), "CsPad::CalibV1", "filter", run));
-  calibStore.putProxy(proxy, PSEvt::EventKey::anySource());
-
 }
 
 /// Method which is called at the beginning of the calibration cycle

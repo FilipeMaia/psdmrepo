@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <list>
 
 //----------------------
 // Base Class Headers --
@@ -93,6 +94,8 @@ private:
   Source m_src; ///< Data source address
   std::string m_key; ///< event key for input data, default is empty
   bool m_skipIfNoData; ///< If true then even is filtered out if there is no CsPad data
+  int m_mode;   ///< Filter mode, see pdscalibdata::CsPadFilterV1, if negative use calib file
+  std::list<double> m_param;  ///< Filter parameters, only if m_mode is non-negative
 
 };
 
