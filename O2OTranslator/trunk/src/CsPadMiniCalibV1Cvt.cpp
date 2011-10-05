@@ -83,19 +83,19 @@ CsPadMiniCalibV1Cvt::convert ( const void* data,
   // this should not happen
   assert ( not m_groups.empty() ) ;
 
-  PSCalib::CalibFileFinder calibFileFinder(m_metadata.calibDir(), m_typeGroupName, src.name());
+  PSCalib::CalibFileFinder calibFileFinder(m_metadata.calibDir(), m_typeGroupName);
 
   // find file with pedestals
-  std::string pedFileName = calibFileFinder.findCalibFile("pedestals", m_metadata.runNumber());
+  std::string pedFileName = calibFileFinder.findCalibFile(src.name(), "pedestals", m_metadata.runNumber());
 
   // find file with pixel status
-  std::string pixFileName = calibFileFinder.findCalibFile("pixel_status", m_metadata.runNumber());
+  std::string pixFileName = calibFileFinder.findCalibFile(src.name(), "pixel_status", m_metadata.runNumber());
   
   // find file with common mode data
-  std::string cmodeFileName = calibFileFinder.findCalibFile("common_mode", m_metadata.runNumber());
+  std::string cmodeFileName = calibFileFinder.findCalibFile(src.name(), "common_mode", m_metadata.runNumber());
   
   // find file with filter data
-  std::string filterFileName = calibFileFinder.findCalibFile("filter", m_metadata.runNumber());
+  std::string filterFileName = calibFileFinder.findCalibFile(src.name(), "filter", m_metadata.runNumber());
   
   if ( pedFileName.empty() and pixFileName.empty() and cmodeFileName.empty()) return;
 

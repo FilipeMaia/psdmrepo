@@ -198,7 +198,7 @@ CsPadElementV2Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     elems[quad] = H5DataTypes::CsPadElementV2(*pdselem) ;
 
     // start of pixel data
-    const uint16_t* sdata = (const uint16_t*)(pdselem+1);
+    const int16_t* sdata = (const int16_t*)(pdselem+1);
 
     for ( unsigned is = 0 ; is != Pds::CsPad::ASICsPerQuad/2 ; ++ is ) {
     

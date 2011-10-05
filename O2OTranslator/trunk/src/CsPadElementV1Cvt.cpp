@@ -164,7 +164,7 @@ CsPadElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     // copy frame info
     elems[iq] = H5DataTypes::CsPadElementV1(*pdselem) ;
 
-    const uint16_t* qdata = pdselem->data();
+    const int16_t* qdata = (const int16_t*)pdselem->data();
 
     int sect = 0;
     for ( int is = 0 ; is < Pds::CsPad::ASICsPerQuad/2 ; ++ is ) {
@@ -172,7 +172,7 @@ CsPadElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
       if ( not (sMask & (1<<is)) ) continue;
       
       // start of the section data
-      const uint16_t* sdata = qdata + sect*ssize;
+      const int16_t* sdata = qdata + sect*ssize;
 
       // status codes for pixels
       const uint16_t* pixStatus = 0;

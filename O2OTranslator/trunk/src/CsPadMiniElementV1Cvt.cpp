@@ -142,7 +142,7 @@ CsPadMiniElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   for ( unsigned sect = 0; sect < nSect ; ++ sect ) {
 
     // start of pixel data
-    const uint16_t* sdata = (const uint16_t*)(&data.pair[0][0]) + sect;
+    const int16_t* sdata = (const int16_t*)(&data.pair[0][0]) + sect;
 
     // output pixel data
     int16_t* output = &pixelData[0][0][sect];

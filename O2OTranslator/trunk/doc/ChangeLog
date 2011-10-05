@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-06
+2011-10-04 Andy Salnikov
+- PSCalib::CalibFileFinder interface changed, updating code here
+- type of cspad image changed to signed and lots of code expects 
+  int16_t now, so we change types in few places here
+
 Tag: V00-12-05
 2011-10-03 Andy Salnikov
 - add protection for creation of new groups when group exists already,
