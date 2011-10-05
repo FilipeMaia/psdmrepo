@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
+#include <vector>
 
 //----------------------
 // Base Class Headers --
@@ -62,6 +63,9 @@ public:
 
   /// Read constants from file
   CsPadFilterV1 (const std::string& fname) ;
+
+  /// Initialize constants from parameters
+  CsPadFilterV1 (FilterMode mode, const double data[DataSize]) ;
 
   // Destructor
   ~CsPadFilterV1 () ;

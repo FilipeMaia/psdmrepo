@@ -69,6 +69,11 @@ public:
    */
   CsPadCommonModeSubV1 (const std::string& fname) ;
 
+  /**
+   *  Initialize constants from parameters.
+   */
+  CsPadCommonModeSubV1 (CommonMode mode, const double data[DataSize]) ;
+
   // Destructor
   ~CsPadCommonModeSubV1 () ;
 

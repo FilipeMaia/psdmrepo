@@ -84,7 +84,16 @@ CsPadCommonModeSubV1::CsPadCommonModeSubV1 (const std::string& fname)
     ++ count;
   }
 
+  MsgLog(logger, trace, "CsPadCommonModeSubV1: mode=" << m_mode << " data=" << m_data[0] << "," << m_data[1] << "," << m_data[2]);
 }
+
+CsPadCommonModeSubV1::CsPadCommonModeSubV1 (CommonMode mode, const double data[DataSize])
+  : m_mode(uint32_t(mode))
+{
+  std::copy(data, data+DataSize, m_data);
+  MsgLog(logger, trace, "CsPadCommonModeSubV1: mode=" << m_mode << " data=" << m_data[0] << "," << m_data[1] << "," << m_data[2]);
+}
+
 
 //--------------
 // Destructor --

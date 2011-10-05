@@ -90,8 +90,15 @@ CsPadFilterV1::CsPadFilterV1 (const std::string& fname)
     ++ count;
   }
 
-  MsgLog(logger, debug, "CsPadFilterV1: mode=" << m_mode << " data=" << m_data[0] << "," << m_data[1]);
+  MsgLog(logger, trace, "CsPadFilterV1: mode=" << m_mode << " data=" << m_data[0] << "," << m_data[1]);
   
+}
+
+CsPadFilterV1::CsPadFilterV1 (FilterMode mode, const double data[DataSize]) 
+  : m_mode(uint32_t(mode))
+{
+  std::copy(data, data+DataSize, m_data);
+  MsgLog(logger, trace, "CsPadFilterV1: mode=" << m_mode << " data=" << m_data[0] << "," << m_data[1]);
 }
 
 //--------------
