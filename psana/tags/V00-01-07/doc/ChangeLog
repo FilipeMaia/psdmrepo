@@ -1,0 +1,104 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psana
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-07
+2011-10-05 Andy Salnikov
+- bug fix in Configurable::configList
+
+Tag: V00-01-06
+2011-10-04 Andy Salnikov
+- EventKeys module now prints calibStore keys too
+
+Tag: V00-01-05
+2011-09-14 Andy Salnikov
+- psana did not recognize skip() method called in modules
+
+Tag: V00-01-04
+2011-09-01 Andy Salnikov
+- add an option to specify calibration directory name on the command line 
+  (with -b or --calib-dir) or in config file (psana.calib-dir)
+- default value for calib dir is "/reg/d/psdm/{instr}/{exp}/calib"
+- pass this name to the environment's constructor
+
+Tag: V00-01-03
+2011-07-17 Andy Salnikov
+- adding support for obtaining instrument and experiment names in psana
+- two new classes ExpNameFromXtc and ExpNameFromConfig which implement
+  PSEnv::IExpNameProvider interface
+- psana instantiates one of these two depending on the input parameters 
+  and file names and passes the instance to PSEnv constructor
+
+Tag: V00-01-02
+2011-06-29 Andy Salnikov
+- add 'using PSHist::Axis' to Module.h
+
+Tag: V00-01-01
+2011-06-17 Andrei Salnikov
+- fix for reading input files from config fles
+
+Tag: V00-01-00
+2011-05-21 Andrei Salnikov
+- changed Module interface, now all methods take Event parameter
+  so that modules can exchange information at any stage, not just event()
+
+Tag: V00-00-11
+2011-05-06 Andrei Salnikov
+- generate doxygen docs, fix/extend comments
+
+Tag: V00-00-10
+2011-04-14 Andrei Salnikov
+- add -j option to psana to change job name
+- add using RootHistoManager::AxisDef to Mofule.h
+
+Tag: V00-00-09
+2011-04-01 Andrei Salnikov
+- new module PrintSeparator
+- changed formatting for message logger
+
+Tag: V00-00-08
+2011-03-21 Andrei Salnikov
+- Event::get() method does not need template parameter any more
+
+Tag: V00-00-07
+2011-03-21 Andrei Salnikov
+- added PrintEventId module
+
+Tag: V00-00-06
+2011-03-21 Andrei Salnikov
+- added EventKeys module which dumps the keys in event and config store
+- modules from psana package do not need psana. prefix
+
+Tag: V00-00-05
+2011-03-20 Andrei Salnikov
+- added -m option to specify module list on command line
+
+Tag: V00-00-04
+2011-01-31 Andrei Salnikov
+- some packages were renamed, fixing their names here
+- use ErrSvc::Issue as base class for exceptions
+
+Tag: V00-00-03
+2011-01-27 Andrei Salnikov
+- main loop is now driven by the codes from input module
+- module interface got few new methods
+
+Tag: V00-00-02
+2011-01-26 Andrei Salnikov
+- added base class for input modules, loading of the input modules
+
+Tag: V00-00-01
+2010-09-28 Andrei Salnikov
+- first commit to repository
+- functionality currently here: dynamic loader, base class for module
+  (not finished)
+ 
