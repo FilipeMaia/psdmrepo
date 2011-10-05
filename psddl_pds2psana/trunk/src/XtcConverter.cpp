@@ -202,7 +202,7 @@ namespace {
     
     // create and store psana object in epics store
     boost::shared_ptr<Psana::Epics::EpicsPvHeader> obj(new FinalType(xptr));
-    eStore.store(obj);
+    eStore.store(obj, xtc->src);
   }
 
 }
