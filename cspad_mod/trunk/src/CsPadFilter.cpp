@@ -209,6 +209,37 @@ CsPadFilter::event(Event& evt, Env& env)
     }
   }
 
+
+  shared_ptr<Psana::CsPad::MiniElementV1> mini1 = evt.get(m_src, m_key, &actualSrc);
+  if (mini1.get()) {
+
+    // get calibration object
+    boost::shared_ptr<pdscalibdata::CsPadFilterV1> filter = env.calibStore().get(actualSrc);
+    if (filter.get()) {
+
+      const Psana::CsPad::MiniElementV1& el = *mini1;
+
+      // get data and its size
+      const int16_t* data = el.data();
+      const std::vector<int>& dshape = el.data_shape();
+      int dsize = std::accumulate(dshape.begin(), dshape.end(), 1, std::multiplies<int>());
+
+      // call filter
+      bool stat = filter->filter(data, dsize);
+      if (stat) {
+        // at least some data is good, do not skip and stop here
+        MsgLog(name(), debug, name() << ": Good data found in CsPad::MiniElementV1 quadrant=" << el.quad());
+        return;
+      }
+
+      // no good data found, skip it
+      MsgLog(name(), debug, name() << ": No good data were found in CsPad::MiniElementV1");
+      skip();
+      return;
+
+    }
+  }
+
   // no data found
   MsgLog(name(), debug, name() << ": No cspad data was found in event");
   if (m_skipIfNoData) {

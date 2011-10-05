@@ -11,8 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2011-10-05 Andy Salnikov
+- CsPadFilter module now looks for MiniElement too
+
 Tag: V00-01-00
-2011-10-04 Andy Salnikov
+2011-10-05 Andy Salnikov
 - CsPadFilter module now has parameters that can be used in place
   of reading calibration files
 
