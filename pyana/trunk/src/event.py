@@ -365,24 +365,30 @@ class EpicsStore(object):
     
     def __init__ (self):
         
-        self.m_name2id = {}
-        self.m_id2epics = []
+        self.m_id2name = {}
+        self.m_name2epics = {}
         
     def update(self, evt):
         
-        epicsData = evt.find(typeId=xtc.TypeId.Type.Id_Epics)
-        for e in epicsData :
+        epicsData = evt.findXtc(typeId=xtc.TypeId.Type.Id_Epics)
+        for extc in epicsData :
+            
+            src = extc.src
+            e = extc.payload()
+            
+            id = (src.log(), src.phy(), e.iPvId)
+            
             if epics.dbr_type_is_CTRL(e.iDbrType) :
                 # store mapping from name to ID
-                self.m_name2id[e.sPvName] = e.iPvId
-            if e.iPvId >= len(self.m_id2epics) :
-                self.m_id2epics.extend( [None]*(e.iPvId+1-len(self.m_id2epics)))
-            self.m_id2epics[e.iPvId] = e
+                name = e.sPvName
+                self.m_id2name[id] = name
+            else:
+                name = self.m_id2name.get(id, None)
+                
+            self.m_name2epics[name] = e
 
     def value(self, name):
-        id = self.m_name2id.get(name, None)
-        if id is None : return None
-        return self.m_id2epics[id]
+        return self.m_name2epics.get(name, None)
 
 #
 # Environment

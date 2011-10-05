@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-31
+2011-10-05 Andy Salnikov
+- add fix to EPICS "multi-source" data
+
 Tag: V00-00-30
 2011-08-29 Andy Salnikov
 - fix for EPICS bug in multi-process mode
