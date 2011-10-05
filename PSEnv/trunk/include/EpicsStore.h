@@ -27,6 +27,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "PSEnv/EpicsStoreImpl.h"
+#include "pdsdata/xtc/Src.hh"
 #include "psddl_psana/epics.ddl.h"
 
 //------------------------------------
@@ -163,8 +164,8 @@ public:
   ~EpicsStore () ;
 
   /// Store EPICS PV, will add new PV or update existing PV.
-  void store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv) {
-    m_impl->store(pv);
+  void store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv, const Pds::Src& src) {
+    m_impl->store(pv, src);
   }
 
   /// Get the list of PV names, all known names are returned.

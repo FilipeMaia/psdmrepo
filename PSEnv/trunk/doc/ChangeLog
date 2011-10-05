@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-00
+2011-10-05 Andy Salnikov
+- update EpicsStore classes to support multi-source EPICS data
+
 Tag: V00-05-00
 2011-09-01 Andy Salnikov
 - new method PSEnv::calibDir() which returns the name of the calibration

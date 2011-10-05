@@ -18,6 +18,7 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
+#include <tr1/tuple>
 
 //----------------------
 // Base Class Headers --
@@ -26,6 +27,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/xtc/Src.hh"
 #include "psddl_psana/epics.ddl.h"
 #include "psddl_psana/EpicsLib.h"
 #include "PSEnv/Exceptions.h"
@@ -68,7 +70,7 @@ public:
   ~EpicsStoreImpl () ;
 
   /// Store EPICS PV
-  void store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv);
+  void store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv, const Pds::Src& src);
   
   /// Get the list of PV names
   void pvNames(std::vector<std::string>& pvNames) const ;
@@ -91,7 +93,7 @@ public:
   boost::shared_ptr<Psana::Epics::EpicsPvHeader> getAny(const std::string& name) const ;
 
   /**
-   *   @brief Get status info for the EPIVS PV.
+   *   @brief Get status info for the EPICS PV.
    *   
    *   @param[in] name      PV name
    *   @param[out] status   EPICS status value
@@ -126,9 +128,6 @@ public:
 
 protected:
 
-  /// Get the index of the PV
-  int findIndex(const std::string& name) const;
-
   /// Implementation of the getCtrl which returns generic pointer
   boost::shared_ptr<Psana::Epics::EpicsPvCtrlHeader> getCtrlImpl(const std::string& name) const;
 
@@ -137,17 +136,20 @@ protected:
   
 private:
 
-  /// Type for mapping from PV name to PV id
-  typedef std::map<std::string, int> Name2ID;
-  
-  /// Type for mapping from PV ID to EpicsPvCtrl* objects
-  typedef std::map<int, boost::shared_ptr<Psana::Epics::EpicsPvCtrlHeader> > CrtlMap;
+  // PV id is: src.log(), src.phy(), epics.pvId
+  typedef std::tr1::tuple<uint32_t, uint32_t, int> PvId;
 
-  /// Type for mapping from PV ID to EpicsPvTime* objects
-  typedef std::map<int, boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> > TimeMap;
+  /// Type for mapping from PV id to PV name
+  typedef std::map<PvId, std::string> ID2Name;
+  
+  /// Type for mapping from PV name to EpicsPvCtrl* objects
+  typedef std::map<std::string, boost::shared_ptr<Psana::Epics::EpicsPvCtrlHeader> > CrtlMap;
+
+  /// Type for mapping from PV name to EpicsPvTime* objects
+  typedef std::map<std::string, boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> > TimeMap;
   
   // Data members
-  Name2ID m_name2id;  ///< Mapping from PV name to its ID.
+  ID2Name m_id2name;  ///< Mapping from PV name to its ID.
   CrtlMap m_ctrlMap;  ///< Mapping from ID to EPICS object for CTRL objects
   TimeMap m_timeMap;  ///< Mapping from ID to EPICS object for TIME objects
 
