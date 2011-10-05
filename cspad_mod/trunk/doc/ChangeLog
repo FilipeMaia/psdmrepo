@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2011-10-04 Andy Salnikov
+- adding modules for cspad calibration and filtering
+- all supporting stuff (proxies, etc) is also added here
+
 Tag: V00-00-01
 2011-06-27 Andy Salnikov
 - one (and only) new module CsPadPedestals which calculates average

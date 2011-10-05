@@ -200,7 +200,7 @@ CsPadPedestals::endJob(Event& evt, Env& env)
 
 /// collect statistics
 void 
-CsPadPedestals::collectStat(unsigned qNum, const uint16_t* data)
+CsPadPedestals::collectStat(unsigned qNum, const int16_t* data)
 {
 
   // loop over segments
@@ -212,7 +212,7 @@ CsPadPedestals::collectStat(unsigned qNum, const uint16_t* data)
       double* sum = &m_sum[qNum][is][0][0];
       double* sum2 = &m_sum2[qNum][is][0][0];
 
-      const uint16_t* segData = data + seg*NumColumns*NumRows;
+      const int16_t* segData = data + seg*NumColumns*NumRows;
 
       // sum
       for (int i = 0; i < NumColumns*NumRows ; ++ i) {            

@@ -74,7 +74,7 @@ public:
 protected:
 
   /// collect statistics
-  void collectStat(unsigned qNum, const uint16_t* data);
+  void collectStat(unsigned qNum, const int16_t* data);
   
 private:
 
