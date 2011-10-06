@@ -814,6 +814,7 @@ Start with selecting data of interest to you from list on the left and general r
         """Kill the pyana process
         """
         if self.proc_pyana :
+            print "Killing pyana process"
             self.proc_pyana.kill()
             return
 

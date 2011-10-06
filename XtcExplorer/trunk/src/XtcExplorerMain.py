@@ -442,7 +442,8 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.checkboxes = []
         
         if self.pyanactrl is not None :
-            del self.pyanactrl
+            self.pyanactrl.quit_pyana()
+            self.pyanactrl.close()
             self.pyanactrl = None
             
     def update_currentfiles(self):
@@ -523,9 +524,12 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             self.scanner.setOption({'ndatagrams':-1}) # all
         self.scanner.scan()
 
-        # (re)make the pyana control object
-        if self.pyanactrl: del self.pyanactrl
-
+        # (re)make the pyana control object 
+        if self.pyanactrl is not None :
+            self.pyanactrl.quit_pyana()
+            self.pyanactrl.close()
+            self.pyanactrl = None
+            
         self.pyanactrl = XtcPyanaControl(self.scanner)
         if self.scan_button.isEnabled():
             self.scan_enable()

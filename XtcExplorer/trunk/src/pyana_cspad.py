@@ -182,7 +182,7 @@ class  pyana_cspad ( object ) :
         self.data = CsPadData(self.img_source)
 
         if self.pedestalfile is not None: 
-            self.cspad.set_pedestals( self.pedestalfile )
+            self.cspad.load_pedestals( self.pedestalfile )
             print "cspad images will be pedestal subtracted. Using pedestals file ", self.pedestalfile
         else :
             # load dark image from file
@@ -308,10 +308,10 @@ class  pyana_cspad ( object ) :
         self.n_good+=1
         if self.sum_good_images is None :
             self.sum_good_images = np.float_(cspad_image)
-            self.sum_array = np.float_( self.cspad.pixel_array )
+            self.sum_array = np.float_( self.cspad.pixels )
         else :
             self.sum_good_images += cspad_image
-            self.sum_array += self.cspad.pixel_array
+            self.sum_array += self.cspad.pixels
             
         # test
 

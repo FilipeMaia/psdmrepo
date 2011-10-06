@@ -130,7 +130,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.setWindowTitle('Pyana Control Center')
         self.setWindowIcon(QtGui.QIcon('XtcExplorer/src/lclsLogo.gif'))
 
-        print data
+        print "XtcPyanaControl printing data ", data
             
         # container for information about the data
         self.filenames = data.files

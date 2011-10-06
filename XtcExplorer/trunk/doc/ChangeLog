@@ -11,6 +11,12 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Oct-06 ofte                rev 2492
+        - cleaned up cspad.py some, mainly for pixelmap development to come
+	- fixed a bug with XtcPyanaControl panel, not killing widget and pyan
+	  if another instance was made. If anyone considered this a positive 
+	  feature, let me know.
+
 2011-Oct-03 ofte                rev 2440
 	- only updated the geometry description this time. More & corrected info. 
 	
