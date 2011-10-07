@@ -304,12 +304,20 @@ class XtcScanner ( object ) :
 
                 elif xtc.contains.id() == TypeId.Type.Id_Opal1kConfig :
                     data = xtc.payload()
-                    worthknowing = "%dx%d" % (data.row,data.column)
+                    worthknowing = "%dx%d" % (data.Row_Pixels,data.Column_Pixels)
+                    #no? worthknowing = "%dx%d" % (data.row,data.column)
 
                 elif xtc.contains.id() == TypeId.Type.Id_FccdConfig :
                     data = xtc.payload()
                     worthknowing = "%dx%d" % (data.trimmedHeight(),data.trimmedWidth())
                     
+                elif xtc.contains.id() == TypeId.Type.Id_PrincetonConfig :
+                    data = xtc.payload()
+                    worthknowing = "%dx%d" % (data.height(),data.width())
+
+                elif xtc.contains.id() == TypeId.Type.Id_pnCCDconfig :
+                    data = xtc.payload()
+                    worthknowing = "%dx%d" % (data.numRows(),data.numChannels())
 
             if dkey not in self.devices :
                 # first occurence of this detector/device

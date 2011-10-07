@@ -240,9 +240,16 @@ class WaveformData( BaseData ):
     """
     def __init__( self, name, type="WaveformData" ):
         BaseData.__init__(self,name,type)
-        self.wf_voltage = None
+        self.wf_voltages = None
+        self.wf2_voltages = None
         self.wf_time = None
+        self.channels = None
 
+    def get_plottables(self):
+        plottables = self.get_plottables_base()
+        for ch in self.channels: 
+            plottables["volt_vs_time_ch%d"%ch] = (self.wf_time[ch],self.wf_voltages[ch])
+        return plottables
 
 class EpicsData( BaseData ):
     """Control and Monitoring PVs from EPICS
@@ -708,7 +715,7 @@ class Plotter(object):
         """ Draw several frames in one canvas
         
         @fignum                  figure number, i.e. fig = plt.figure(num=fignum)
-        @list_of_arrays    a list of tuples (title, array)
+        @list_of_arrays          a list of tuples (title, array)
         @return                  new display_mode if any (else return None)
         """
         #if self.fig is None: 
@@ -723,10 +730,15 @@ class Plotter(object):
             xt = None
             if len(tuple)==3 : xt = tuple[2]
 
-            if len( im.shape ) > 1:
-                self.drawframe(im,title=ad,fignum=fignum,position=pos)
-            else :
-                plt.plot(im)
+            if type(im)==np.ndarray:
+                if len( im.shape ) > 1:
+                    self.drawframe(im,title=ad,fignum=fignum,position=pos)
+                else :
+                    plt.plot(im)
+            elif type(im)==tuple:
+                print "tuple"
+                pass
+                
         plt.draw()
         return self.display_mode
 

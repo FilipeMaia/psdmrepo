@@ -153,6 +153,7 @@ class  pyana_image_beta ( object ) :
                                    'pnCCD' :     self.get_pnccd_image,
                                    'Fccd' :      self.get_fccd_image, 
                                    'TM6740' :    self.get_other_image,
+                                   'Opal1000' :  self.get_other_image,
                                    'AnyOther' :  self.get_other_image }
         
         

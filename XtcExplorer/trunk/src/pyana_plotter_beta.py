@@ -213,18 +213,23 @@ class pyana_plotter_beta (object) :
             # for xtcexplorernew: 
             #----------------------------------------------------------
             plot_data = evt.get( 'plot_data')
+            print "pyana_plotter_beta: \nplot_data"
+            print plot_data
+
+            fignum = 100
             if plot_data is not None: 
-
+                
                 for data in plot_data:
-
+                    
                     list_for_plotting = []
-
                     for name,array in data.get_plottables().iteritems():
                         print data.name, name, array.shape
                         list_for_plotting.append( (name,array,data.name) )
                         
-                    self.plotter.plot_several(111, list_for_plotting,
+                    fignum += 1
+                    self.plotter.plot_several(fignum, list_for_plotting,
                                               title="%s event#%d" % (data.name,self.n_shots))
+                    plt.draw()
                     #self.plotter.draw_func_lookup[name](array,title=data.name)
                     
 
