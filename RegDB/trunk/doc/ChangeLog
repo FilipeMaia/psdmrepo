@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-34
+2011-10-10 Andy Salnikov
+- added method RegDb.last_experiment_switch() which returns latest active 
+  experiment
+
 Tag: V00-00-33
 2011-09-22 Igor Gaponenko
 - added MySQL schema for table 'data_migration' which is meant to be used

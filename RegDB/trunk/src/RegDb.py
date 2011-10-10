@@ -119,3 +119,24 @@ class RegDb ( object ) :
 
         return row
 
+
+    def last_experiment_switch(self, instr):
+        """Get the latest experiment for the given instrument name,
+        returns tuple (expName, time, user), time is LusiTime.Time object,
+        user is user name who requested switch. Returns None if cannot find
+        information for given instrument name."""
+
+        cursor = self._conn.cursor()
+        q = """SELECT e.name, sw.switch_time, sw.requestor_uid 
+            FROM expswitch sw, experiment e, instrument i
+            WHERE sw.exper_id = e.id AND e.instr_id = i.id AND i.name=%s
+            ORDER BY sw.switch_time DESC LIMIT 1"""
+        cursor.execute(q, (instr,))
+        
+        rows = cursor.fetchall()
+        if not rows: return None
+
+        name, time, user = rows[0]
+        time = Time.from64(time);
+            
+        return (name, time, user)
