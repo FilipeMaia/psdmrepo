@@ -1,0 +1,433 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package XtcEventBrowser
+#------------------------------------------------------------------------
+
+Package author: Ingrid Ofte
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+2011-Oct-11 ofte  Tag: V00-01-11  rev 2498 & 2499
+         - minor changes in this particular revision. Main purpose is to make 
+	   a new tag to make the most recent changes available in the release. 
+	
+2011-Oct-07 ofte                rev 2493
+         - a few bugfixes   
+
+2011-Oct-06 ofte                rev 2492
+        - cleaned up cspad.py some, mainly for pixelmap development to come
+	- fixed a bug with XtcPyanaControl panel, not killing widget and pyan
+	  if another instance was made. If anyone considered this a positive 
+	  feature, let me know.
+
+2011-Oct-03 ofte                rev 2440
+	- only updated the geometry description this time. More & corrected info. 
+	
+2011-Sep-30 ofte                rev 2439
+        - changed the naming scheme for the cspad calibration data files. Now 
+	it is ready to implement some parameter to point to experiment's own calibration files. 
+
+2011-Sep-30 ofte                rev 2436
+	- added a function to utilities for making the interactive plot in e.g. ipython
+	  (plot_image())
+2011-Sep-29 ofte                rev 2435
+         - small changes, plus ability to use cspad.py to load a numpy array in ipython
+	   and display it with matplotlib. Todo: use utilitiles to make the plot. 
+	
+2011-Sep-26 ofte                rev 2434
+         - more improvements to new approach. Also more info gathered by XtcScanner. 
+
+2011-Sep-26 ofte                rev 2433
+        - improvements to xtcexplorernew: acqiris 1/2way implemented, not connected. 
+	- improved connections between guis
+
+2011-Sep-26 ofte                rev 2429
+        - Several small changes
+	- To speed up waveforms, I have opted not to display errorbars. Huge difference!!
+
+2011-Sep-26 ofte                rev 2428
+        - Added some of the GUI look and feel from xtcexplorernew to the old, 
+	 since the new explorer seems might need some more work to finish... if 
+	 at all worthwile... ? 
+	- Old now has the new file selector, and multiprocessing. 
+	
+2011-Sep-23 ofte                rev 2425
+        - Change the way Plotter and Frames are handled to fix a problem 
+	  with colorbar being disconnected when endjob plot appars. In fact 
+	  this should handle another problem with memory leak too (too many 
+	  "frames" stored)
+	- pyana_cspad.py and pyana_image.py changed accordingly. 
+	- cspad.py: added functionality to draw a picture from array file 
+	  independent of pyana / xtcexplorer. That part isn't properly working 
+	  yet, but shouldn't break anything either. More next week... 
+	
+2011-Sep-22 ofte                rev 2424
+        - fixed middle-button reset for cspad&images (utilities.py)
+
+2011-Sep-21 ofte                rev 2419
+        - pyana_cspad.py now has the option of saving and background subtract 
+	  using a pixel array file of same dimensions as the pedestals file used
+	  in psana
+	
+2011-Sep-20 ofte                rev 2412
+        - solved the cspad pixel array problem, still lacks the ability to save it. 
+	- improved the axes labeling (ticks) for projection plots of cspad. 
+
+2011-Sep-19 ofte                rev 2411
+        - included gaps and margins for full Cspad detector view. Now uses 
+	  all the same calibration files as psana uses (potentially at least)
+
+2011-Sep-19 ofte                rev 2410
+        - removed pixel save from cspad to "solve" a problem	
+
+2011-Sep-19 ofte                rev 2409
+	- save max 100 (parameter) single-shot events (cspad and image (old))
+	
+2011-Sep-16 ofte                rev 2404
+        - minor modifications
+	
+2011-Sep-16 ofte                rev 2401
+	- pyana_image_beta and pyana_plotter_beta added
+	- minor changes to new GUI
+	
+2011-Sep-15 ofte                 rev 2400
+	- pyana_cspad.py: small improvements / crash fixes. 
+	- utilities.py: Simplification of Data containers
+	- pyana_ipimb.py and XtcPyanaControl.py: 'variables' -> 'quantities'
+	- additionally, I've added the following modules that allow to run 
+	  the new version of the GUI. Not ready yet, but I'd like to get it 
+	  into svn anyhow. It can be run with xtcexplorernew and should be 
+	  independent of the old one (new classes and new modules) and its 
+	  development *should not* break the old xtcexplorer... 
+          A       XtcExplorer/app/xtcexplorernew
+	  A       XtcExplorer/src/config_pyana.py
+	  A       XtcExplorer/src/gui_explorer_main.py
+	  A       XtcExplorer/src/gui_config_panels.py
+	  A       XtcExplorer/src/gui_pyana_control.py
+	  A       XtcExplorer/src/pyana_ipimb_beta.py	
+
+2011-Sep-13 ofte                   rev 2384
+	- bugfix in pyana_cspad.py
+	
+2011-Sep-12 ofte  Tag: V00-01-10  rev 2372 & 2373
+         - added calib directory
+	
+2011-Sep-12 ofte  Tag: V00-01-09   rev 2356 
+        - bugfix (cspad.py)
+	- replaced max-value "projections" with average projections (images)
+	- new tag
+	
+2011-Sep-12 ofte  Tag: V00-01-08   rev 2353 & 2353
+        - Support for Cspad2x2, within pyana_cspad.py. 
+	- minimal other changes. 
+	- tag before changing the GUI interface. 
+	
+2011-Aug-04 ofte                   rev 2166
+        - support for BldInfo YAG type address. 
+	
+2011-Aug-04 ofte  Tag: V00-01-07   rev 2164 - 2165
+        - tag
+	- support for BldInfo IPMs also added to pyana_scan)
+	
+2011-Aug-04 ofte                  rev 2163
+	- Support for the new BldInfo IPMs added
+	
+2011-Jul-08 ofte                  rev 2096
+	 - added to cspad option of using (translator) pedestal file. 
+	- added to cspad a config file for running standalone pyana
+	- cspad working on common mode correction... 
+	
+2011-Jul-05 ofte                   rev 2086
+        - added fccd. 
+
+2011-Jun-23 ofte                   rev 2032
+        - fixed a bug introduced in previous commit
+	
+2011-Jun-23 ofte                   rev 2031
+	- Some tuning of pyana_image. 
+	- "Solve" FIXME from yesterday by plotting each event 
+	whether or not the event is accepted. 
+
+2011-Jun-22 ofte     V00-01-06     rev 2027
+          Tag
+	
+2011-Jun-22 ofte                   rev 2026
+        - fixed a bug in pyana_image (for Princeton)
+	- fixed a bug in pyana_encoder (now -1 entries for unvalid entries, needed for time line plot)
+	- pyana_image now uses Threshold class instead of the home-made double threshold. 
+	- FIXME! pyana_image: There's still a problem when number of plots change from 
+	  event to event (e.g. one image passes threshold while the other doesnt). For now, solved
+	  by plotting each time anyway, changing title (bright or dark) depending on over/under threshold.
+	
+2011-Jun-16 ofte                   rev 1995
+	- pyana_ipimb: variable list to select what to plot
+	- pyana_plotter: avoid drawing every event (slows things down). 
+	   Relies on event 'show_event'. Added flag putting to all modules. 
+	- pyana_cspad displays average so far, if no darks. To do: accumulate/reset
+	
+2011-Jun-15 ofte                   rev 1986
+        - more tidying up
+
+2011-Jun-15 ofte                   rev 1985
+        - small bugfix and some tidying up
+	
+2011-Jun-09 ofte  Tag: V00-01-05   rev 1970
+	- for tag (for release!)
+
+2011-Jun-09 ofte                  rev 1969
+	- small fix
+2011-Jun-09 ofte                  rev 1965
+	- Much improved pyana_cspad
+	- Supports background subtraction, both from dark file and on-the-fly dark average
+	- Supports saving good average and dark average as numpy file. 
+	- Supports saving good single-events to file (numpy)
+	
+2011-Jun-09 ofte                  rev 1964
+        - Cleaned up utilities, cspad and image modules somewhat more. 
+	- The projections now reflect the (interactive) change of vmin/vmax
+	- Allow filtering / skipping events / not running modules downstream 
+	  if this shot is not passing threshold (using evt.put(True,'skip_event'))	
+	
+2011-Jun-08 ofte                  rev 1961
+	- Several structural changes to utilities.py and some to 
+	  pyana_image and pyana_cspad. Attempt at better organization 
+	  and similarity of the two modules. Some additional features 
+	  and probably bugs too. Will clean this up further in the coming
+	  days. Frame object to hold threshold and other information from 
+	  each plot, instead of the Plotter object which contains all plots 
+	  (Frames) in one figure canvas. 
+
+2011-May-27 ofte                  rev 1959
+	- minor changes
+
+2011-May-27 ofte                  rev 1958
+	- added pyana_encoder
+	- cleaned up waveform a little, added WaveformData (for ipython)
+
+2011-May-26 ofte  Tag: V00-01-04  rev 1956-7
+	- minor tweak, and tagging
+
+2011-May-26 ofte                  rev 1955
+       - Some more useful stuff in pyana_epics. New plots and data for ipython.
+       - Moved definition of datastructures to utilities.py
+       - ipython support (basic) can be considered done / ready
+	
+2011-May-25 ofte                  rev 1954
+       - removed pyana_xppscan (was just a test)
+       - simplified pyana_scan. 
+       - Added more accumulation/reset control
+       - all modules now have Datastructures for ipython
+	
+2011-May-25 ofte                  rev 1953
+       - Accumulate/Reset option added to ipimb, bld, waveform. Will add to the rest ASAP
+       - Some bugfixes in XtcPyanaControl
+	
+2011-May-24 ofte                  rev 1952
+       - Added XxxData structure to pyana_bld, pyana_ipimb and pyana_scan
+	 to hold information to pass to the ipython session launched in pyana_plotter.
+	 Requires pyana V00-00-27 or later. 
+	
+2011-May-19 ofte   Tag: V00-01-03 rev 1912
+       - a leftover reference to xbplotter removed
+       - bugfix: full scan button threshold
+	
+2011-May-19 ofte   Tag: V00-01-02 rev 1910
+
+2011-May-18 ofte                  rev 1905
+       - Some more tweaking. 
+       - Added option (parameter) to accumulate_n events in pyana_waveform. 
+       - TODO: Need to speed up waveform plotting. 
+       - TODO: Still need to compute on-the-fly background in images/cspad
+2011-May-18 ofte                  rev 1904
+       - Fixed some bugs, alignment
+	
+2011-May-10 ofte                  rev 1880
+       - improved cspad, still not able to subtract on-the-fly background. 
+
+2011-May-10 ofte                  rev 1877 and 1878
+       - some cosmetic and some functional improvements
+       - removed xbplotter, moved Threshold and Plotter classes into the utilities library
+       - consistent parameter style, use comma for ranges. 
+       - consistent event/shot counter (self.n_shots)
+	
+2011-May-10 ofte  tag V00-01-01   rev 1866
+       - No other changes. Just to have a reference for confluence. 
+	
+2011-May-10 ofte               rev 1865
+        - removed XtcEventDisplay.py. Not used
+	
+2011-May-10 ofte               rev 1864
+	- Got pyana_waveform.py in a decent working condition
+	- Got rid of some remaining name issues in XtcPyanaControl.py
+
+2011-May-9 ofte               rev 1859
+        D       XtcExplorer/app/xtcbrowser
+        A  +    XtcExplorer/app/xtcexplorer
+
+2011-May-9 ofte               rev 1858
+        Deleting       XtcExplorer/src/XtcBrowserMain.py
+	Adding         XtcExplorer/src/XtcExplorerMain.py
+
+2011-May-9 ofte               rev 1857
+        Changed the name of the package to XtcExplorer (was XtcEventBrowser)
+
+	
+2011-May-6 ofte               rev 1835
+        XtcPyanaControl.py
+	- Experimented with threading / subprocesses, but all is restored back I hope. 
+	- More GUI control for general settings (display mode, plotting frequency etc, ipython)
+	XtcBrowserMain.py
+	- added nevents to the transferred info from xtcscanner
+	pyana_ipimb.py
+	- Changed the plot layout a bit
+	pyana_bld.py
+	- Added support for the SharedIpimb
+	pyana_image.py
+	- cleaned up endjob some
+	pyana_scan.py
+	- experimented with ipython, but restored. 
+	- support for shared ipimb included
+	pyana_waveform.py
+	- More sensible tracking of average waveform
+	- removed the non-functioning const threshold routine
+	pyana_plotter.py
+	- ipython functionality is moved here, although here it doesn't actually work. 
+	  Will add a way to get to the "stored" interactive data from this module which 
+	  is run last. 
+	pyana_cspad.py
+	- vrange now separated by comma. 
+	- Don't automatically start in interactive mode. Respect the GUI settings. 
+	xbplotter.py
+	- For drawframe (used by cspad and image), add projection plots	
+	
+2011-Apr-8 ofte V00-00-18     rev 1792
+        - Some tuning. This goes with another version of the confluence documentation. 
+	- waveforms still not working. 
+	- ipimb filtering / scan should be improved. 
+
+2011-Apr-8 ofte               rev 1786
+        - XtcEventBrowser/src/pyana_xppscan.py: fixed some mistake.
+	  IPMdiagnostics and IPMfilt utilities done, still some more plotting needed
+
+2011-Apr-7 ofte               rev 1784
+        - Almost done implementing the xpp IPMdiagnostics functionality. 
+	
+2011-Apr-6 ofte               rev 1770
+	- added XtcEventBrowser/src/pyana_xppscan.py as a testing module 
+	  for adding XPP matlab functionality. Will add to pyana_scan whatever 
+	  works well / seems general enough. 
+	- XtcPyanaControl now has the (hardcoded, default False) option of 
+	  running pyana in a separate *thread*. Need to launch mpl figures from 
+	  the GUI, not fully implemented yet, but might be in the future. Could allow
+	  for more interactive data manipulation with ipython. For now, 
+	  running as separate process is more convenient (currently default). 
+
+2011-Apr-4 ofte               rev 1764
+	- Some more plotting for pyana_scan (motor scan)
+
+2011-Apr-1 ofte               rev 1763
+	- Remember pyana command line from one run to the next
+	- scan wrt control variables by pyana_scan.py. If ControlPV is selected, 
+	  a scan will be configured (i.e. no other pyana modules). Else, as before. 
+	- pyana_scan still needs some work to be fully functional
+	
+2011-Mar-31 ofte               rev 1723
+	- Fix to XtcScanner to deal with (skip) empty epics records
+
+2011-Mar-29 ofte               rev 1711
+	- added file size checking, cleaned up the GUIs
+	- XtcScanner: improved print layout, more config information
+
+2011-Mar-25 ofte               rev 1682
+	- added waveform data support
+	- added scan processing
+	
+2011-Mar-18 ofte V00-00-17     rev 1611
+        - Some tweaking. And a tag
+
+2011-Mar-18 ofte                rev 1609
+        - Epics PV controls variable now in xtcscanner, pyana GUI and pyana_epics.py
+	- pyana_misc.py and pyana_pnccd.py removed. 
+	
+2011-Mar-16 ofte                rev 1607
+        - Some tuning of figure numbers etc. 
+	- pyana_epics improved
+	- made SlideShow default (only CSPad has Interactive functionality so far anyway)
+
+2011-Mar-16 ofte                rev 1606
+        - Improved parameters and defaults for all moduls. SlideShow now should work for all.
+
+2011-Mar-16 ofte                rev 1605
+        - Cleaned up XtcPyanaControl some. pyana_epics still rudimentary
+
+2011-Mar-15 ofte                rev 1603
+        - Added pyana_epics, and a new GUI to select epics channels 
+
+2011-Mar-10 ofte                rev 1601
+        - Tuned pyana_bld (added plot_every_n option)
+	- Added utilities.py with PyanaOptions, to convert option strings
+
+2011-Mar-10 ofte                rev 1597
+        - Display mode: Interactive (plt.show()) or SlideShow(plt.draw()) or None
+	- This version needs pyana V00-00-24 or later (use evt.put and evt.get)
+	- pyana_ipimb updated to also plot every N events
+	
+2011-Mar-09  ofte                rev 1593
+	- xbplotter now takes care of pyana_image plotting too
+	- fixed a clash btw raw_input and Qt
+	
+2011-Mar-09  ofte                rev 1591
+	- xbplotter now handles all plotting for pyana_cspad
+	- xbplotter Threshold class handles threshold value and region
+	
+2011-Mar-08  ofte  V00-00-16     rev 1589
+         - pyana_image.py works OK now
+	 - option to save as hdf5 file
+	 - more options to control what to plot / save
+
+2011-Mar-07  ofte  no tag        rev 1582
+         - pyana_image.py tuned and tested some more. 
+	 - translation of images included (using numpy.roll)
+	 - option to save as numpy array (txt or npy)
+
+2011-Mar-06  ofte  no tag        rev 1581
+         - pyana_image.py tuned and tested some more. 
+	 - still need to implement translation and scaling of images	
+
+2011-Mar-05  ofte  no tag        rev 1580
+        - parameters for pyana_image to rotate, shift and scale images. 
+	- only rotate implemented so far
+	- not extensively tested...
+
+2011-Mar-04  ofte  Tag V00-00-15 rev 1578
+	- added pyana_plotter to issue plt.show() command. more tasks later
+	- added stuff to xbplotter. try to outsource plotting functions to xbplotter.Plotter 
+	- pyana_image plots any number of images. Start adding some functionality / analysis algorithms. 
+	- minor modifications to pyana_cspad
+	
+2011-Mar-01  ofte  Tag V00-00-14  rev 1576  doc/ChangeLog replaces History. Cosmetic changes to GUIs
+2011-Feb-28  ofte                 rev 1574  commented out pyanamod dependence
+2011-Feb-28  ofte  Tag V00-00-12  rev 1571  Thresholding *after* background subtraction
+2011-Feb-28  ofte                 rev 1570  Improved the config file editing
+2011-Feb-28  ofte                 rev 1569  Added changable rectangle to show active threshold area.
+2011-Feb-25  ofte                 rev 1567  removed threshold subplot. Improved dialog w/colorbar.
+2011-Feb-25  ofte                 rev 1566  fixed a silly dependency problem
+2011-Feb-25  ofte  Tag V00-00-11  rev 1550  CsPad outsourced, dependence on "test" module fixed. parameter names
+                                            for cspad improved. Save avg images. Threshold filter (to be improved)
+2011-Feb-18  ofte  Tag V00-00-10  rev 1536  Added spectrum and plot limits via config parameters
+2011-Feb-18  ofte  Tag V00-00-09  rev 1534  A few GUI improvements
+2011-Feb-15  ofte  Tag V00-00-08  rev 1517  Alignment of CsPad added (Mikhail Dubrovin's method)
+2011-Feb-14  ofte                 rev 1516  Fix a typo and add a print_configuration function
+2011-Feb-14  ofte                 rev 1514  Allow edit (emacs popup) configuration file
+2011-Feb-14  ofte  Tag V00-00-07  rev 1513  Bkg-subtr with dark images for CsPad
+2011-Feb-11  ofte  Tag V00-00-06            bugfixed. version for testing with CsPad. 
+2011-Feb-11  ofte  Tag V00-00-05            latest version for testing in control room
+2011-Feb-10  ofte  Tag V00-00-04            pyana control outsourced to different class. Support for CsPad (limited)
+2011-Feb-4   ofte  Tag V00-00-03            More pyana options added, support for (some) images.
+2011-Feb-3   ofte  Tag V00-00-02            Almost same as previous tag, but this version does work :)
+2011-Feb-2   ofte  Tag V00-00-01.           Initial working version (actually not working due to a bug!)
+
