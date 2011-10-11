@@ -50,9 +50,21 @@ from XtcExplorer.gui_explorer_main import XtcExplorerMain
 #  Application class definition --
 #---------------------------------
 
+def printwarning():
+    warning = """
+******************************************************************************************
+This is xtcexplorernew! It's really just a testing ground yet, and while I invite you to 
+try it out and give me feedback and ideas, don't expect it to work yet! If you want to get 
+any work done, I encourage you to use the old xtcexplorer instead. 
+******************************************************************************************
+"""
+    print warning
+    return
 
 def main( argv ) :
 
+    printwarning()
+	
     # pull out expected options: 
     #
     # Instrument: 
@@ -74,6 +86,7 @@ def main( argv ) :
 
     explorer.show()
     sys.exit(app.exec_())
+
 
 
 #

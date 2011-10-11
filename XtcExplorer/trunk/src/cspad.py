@@ -1,6 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
-
+import math
 import scipy.ndimage.interpolation as interpol
 
 class CsPad( object ):
@@ -31,7 +30,10 @@ class CsPad( object ):
         # the 90-degree rotation of the sections). This improves
         # the image visually, but requires interpolation, 
         # and makes the display rather slow... 
+        
+        
         self.read_alignment(path)
+
 
 
     def read_alignment(self, path = None, file=None):
@@ -61,33 +63,35 @@ class CsPad( object ):
         # ... (3 rows (xyz) x 4 columns (quads) )
         quad_pos = np.loadtxt('%s/offset/%s'%(path,file))
         quad_pos_corr = np.loadtxt('%s/offset_corr/%s'%(path,file))
-        quad_position = quad_pos[0:2,:] + quad_pos_corr[0:2,:]
+        quad_position = quad_pos + quad_pos_corr
 
-        
+
         # read in margins file:
         # ... (3 rows (x,y,z) x 4 columns (section offset, quad offset, quad gap, quad shift)
         marg_gap_shift = np.loadtxt('%s/marg_gap_shift/%s'%(path,file))
 
         # break it down (extract each column, make full arrays to be added to the above ones)
-        self.sec_offset = marg_gap_shift[0:2,0]
+        self.sec_offset = marg_gap_shift[:,0]
 
-        quad_offset_xy = marg_gap_shift[0:2,1]
-        quad_gap_xy = marg_gap_shift[0:2,2]
-        quad_shift_xy = marg_gap_shift[0:2,3]
-        
-        quad_offset_XY = np.array( [quad_offset_xy,
-                                    quad_offset_xy,
-                                    quad_offset_xy,
-                                    quad_offset_xy] ).T
-        quad_gap_XY = np.array( [quad_gap_xy*[-1,-1],
-                                 quad_gap_xy*[-1,1],
-                                 quad_gap_xy*[1,1],
-                                 quad_gap_xy*[1,-1]] ).T
-        quad_shift_XY = np.array( [quad_shift_xy*[1,-1],
-                                   quad_shift_xy*[-1,-1],
-                                   quad_shift_xy*[-1,1],
-                                   quad_shift_xy*[1,1]] ).T
-        self.quad_offset = quad_position + quad_offset_XY + quad_gap_XY + quad_shift_XY
+        quad_offset = marg_gap_shift[:,1]
+        quad_gap = marg_gap_shift[:,2]
+        quad_shift = marg_gap_shift[:,3]
+
+        # turn them into 2D arrays
+        quad_offset = np.array( [quad_offset,
+                                 quad_offset,
+                                 quad_offset,
+                                 quad_offset] ).T
+        quad_gap = np.array( [quad_gap*[-1,-1,1],     # numpy element-wise multiplication
+                              quad_gap*[-1,1,1],
+                              quad_gap*[1,1,1],
+                              quad_gap*[1,-1,1]] ).T
+        quad_shift = np.array( [quad_shift*[1,-1,1],
+                                quad_shift*[-1,-1,1],
+                                quad_shift*[-1,1,1],
+                                quad_shift*[1,1,1]] ).T
+        self.quad_offset = quad_position + quad_offset + quad_gap + quad_shift
+
 
 
     def get_mini_image(self, element ):

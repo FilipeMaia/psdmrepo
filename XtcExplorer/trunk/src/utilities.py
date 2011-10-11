@@ -334,14 +334,18 @@ class Threshold( object ) :
         self.value = value
 
 
-
 #-------------------------------------------------------
 # Plotter
 #-------------------------------------------------------
-import time
 import numpy as np
-import matplotlib.pyplot as plt
+
 from PyQt4 import QtCore
+
+# uncomment these two if you want to run the pyana job in batch mode
+# import matplotlib
+# matplotlib.use('PDF')
+
+import matplotlib.pyplot as plt
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1 import AxesGrid
@@ -440,7 +444,9 @@ class Frame(object):
 
 
     
+
 class Plotter(object):
+    
     """Figure (canvas) manager
     """
     def __init__(self):

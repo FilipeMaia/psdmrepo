@@ -11,6 +11,13 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Oct-11 ofte  Tag: V00-01-11  rev 2498 & 2499
+         - minor changes in this particular revision. Main purpose is to make 
+	   a new tag to make the most recent changes available in the release. 
+	
+2011-Oct-07 ofte                rev 2493
+         - a few bugfixes   
+
 2011-Oct-06 ofte                rev 2492
         - cleaned up cspad.py some, mainly for pixelmap development to come
 	- fixed a bug with XtcPyanaControl panel, not killing widget and pyan

@@ -42,7 +42,7 @@ from PyQt4 import QtCore, QtGui
 
 import threading
 import multiprocessing as mp
-import  subprocess 
+import subprocess 
 from pyana import pyanamod
 
 #----------------------------------
@@ -1034,11 +1034,19 @@ Start with selecting data of interest to you from list on the left and general r
             self.pyana_button.show()
 
     def edit_configfile(self):
-
         # pop up emacs window to edit the config file as needed:
-        #proc_emacs = myPopen("emacs %s" % self.configfile, shell=True)
-        #proc_emacs = myPopen("nano %s" % self.configfile, shell=True)
-        proc_emacs = myPopen("$EDITOR %s" % self.configfile, shell=True) 
+
+        proc_emacs = None
+        try: 
+            myeditor = os.environ['EDITOR']
+            print "Launching your favorite editor %s to edit config file" % myeditor
+            proc_emacs = myPopen("$EDITOR %s" % self.configfile, shell=True) 
+        except :
+            print "Launching emacs to edit the config file."
+            print "To launch another editor of your choice, make sure to",
+            print "set the EDITOR variable in your shell environment."
+            proc_emacs = myPopen("emacs %s" % self.configfile, shell=True)
+
         stdout_value = proc_emacs.communicate()[0]
         print stdout_value
         #proc_emacs = MyThread("emacs %s" % self.configfile) 

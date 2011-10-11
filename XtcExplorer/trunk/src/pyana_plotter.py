@@ -169,8 +169,6 @@ class pyana_plotter (object) :
 
         if evt.get('skip_event'):
             return
-        
-
 
         # if any module changed the display mode, pick it up (we're last)
         evmode = evt.get('display_mode')
