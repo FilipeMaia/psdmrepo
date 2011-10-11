@@ -97,7 +97,7 @@ def _proc(jobname, id, pipes, userObjects, dg_ref):
             if evt.seq().service() == xtc.TransitionId.Configure: env.updateEpics(evt)
     
             # update epics data
-            env.m_epics.m_id2epics = epics_data
+            env.m_epics.m_name2epics = epics_data
     
             # process all data
             dispatch.dispatch(evt, env)

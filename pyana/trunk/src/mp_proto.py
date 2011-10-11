@@ -101,7 +101,7 @@ class mp_proto ( object ) :
         
         self.sendCode(OP_EVENT)
         
-        mp_proto._sendEpicsList(self._conn, env.m_epics.m_id2epics)
+        mp_proto._sendEpicsList(self._conn, env.m_epics.m_name2epics)
         
         if self._dg_ref :
             self._conn.send(fileName)
@@ -132,7 +132,7 @@ class mp_proto ( object ) :
                 try :
                     
                     # read epics list from pipe
-                    epics_data = [ e for e in mp_proto._getEpics(self._conn) ]
+                    epics_data = dict([e for e in mp_proto._getEpics(self._conn)])
                     
                     # read next object from pipe, this would be a datagram sent as a string or 
                     # a file name plus file position
@@ -184,13 +184,10 @@ class mp_proto ( object ) :
     @staticmethod
     def _sendEpicsList(pipe, epicsList):
         
-        for epics in epicsList :
-            if epics :
-                # send as buffer
-                pipe.send_bytes(epics)
-            else :
-                # send special string 
-                pipe.send_bytes('')
+        for name, epics in epicsList.iteritems() :
+            # send as buffer
+            pipe.send_bytes(name)
+            pipe.send_bytes(epics)
         # EOD
         pipe.send_bytes('$')
     
@@ -201,10 +198,7 @@ class mp_proto ( object ) :
         while True :
             buf = pipe.recv_bytes()
             if buf == '$' : break
-            if buf == '' :
-                yield None
-            else :
-                yield epics.from_buffer(buf)
+            yield (buf, epics.from_buffer(pipe.recv_bytes()))
 
 
     #--------------------

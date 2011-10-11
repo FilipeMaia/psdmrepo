@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-32
+2011-10-11 Andy Salnikov
+- bug fix in passing epics data to subprocesses
+
 Tag: V00-00-31
 2011-10-05 Andy Salnikov
 - add fix to EPICS "multi-source" data
