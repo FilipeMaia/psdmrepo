@@ -15,9 +15,9 @@ AppUtils package contains a bunch of classes which should simplify writing
 of the command-line applications. Much of this stuff was ported from BaBar 
 (and somewhat improved).
 
-There are two categories of classes in this package: AppBase (single class 
-in its own category) and AppCmd* classes. AppCmd* classes are for the 
-command-line parsing, they are almost unchanged from BaBar.
+There are two categories of classes in this package: AppBase (one C++ class 
+and one Python module/class) and AppCmd* C++ classes. AppCmd* classes are 
+for the command-line parsing, they are almost unchanged from BaBar.
 
 Command line parser
 ===================
@@ -607,3 +607,195 @@ Usage: EchoApp [options] [strings ...]
   Positional parameters:
     strings  the list of strings to print
 
+
+
+AppBase Python module
+=====================
+
+AppBase module provides an application class (called AppBase too) 
+which simplifies building of the standard command-line applications. 
+It solves two standard problems which appear in almost every 
+command-line application - command line parsing and logging/debugging.
+
+The real applications built from this class needs to be customized, 
+customization is performed through the inheritance and override of few 
+methods of the base class. Most of the time only the single method 
+called _run() needs to be implemented, in addition to the setup code 
+in the subclass' constructor. Additionally the code which runs the 
+whole application needs to be added to the script, so in general,
+the script will look like this:
+
+#
+#  Example code for AppBase
+#
+import sys
+from AppUtils.AppBase import AppBase
+
+class ExampleApp ( AppBase ) :
+    def __init__ ( self ) :
+        # super init
+        AppBase.__init__ ( self, ... )
+        # more init code
+        # ....
+
+    def _run ( self ) :
+        # app code
+        # ...
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = ExampleApp()
+    rc = app.run()
+    sys.exit(rc)
+
+
+The "main" code above calls the application's run() method which does 
+few standard tasks - command line parsing, logging initialization - 
+and calls the _run() method which is implemented in the user's code.
+
+For the command line parsing the base classes uses Python's optparse 
+module (http://www.python.org/doc/lib/module-optparse.html) which 
+supports variety of option types. Base class instantiates the 
+OptionParser object which is accessible to the subclass via the 
+self._parser member. Additionally base class adds one option to the 
+parser, '-v' or "--verbose" of type "count" and default value 0, so 
+all applications will receive this option and can change their 
+"verbosity" based on this option. Additional options are added to the 
+parser in the subclass constructor using the standard methods of the 
+OptionParser class:
+
+    def __init__ ( self ) :
+        # super init
+        AppBase.__init__ ( self, usage = "usage: %prog [options] package tag" )
+        # add more options
+        self._parser.add_option ( '-b', "--bug-fix", default=False, action="store_true", 
+                                  help="publish bug fix, def: new feature" )
+        self._parser.add_option ( '-f', "--input-file", default=None, 
+                                  help="name of the file with the tags" )
+
+All applications will also have option -h or --help (which is standard 
+to OptionParser itself) which prints usage summary and help for all 
+defined options. The usage summary can be also changed by user using 
+the 'usage' parameter of the AppBase's constructor as in the example 
+above. Other constructor keyword arguments which are passed to 
+OptionParser constructor include: version, description, and prog;
+check OptionParser documentation for their meaning.
+
+The run() method calls parser's parse_args() methods and stores its 
+result in two members:
+
+  self._options - object with the parsed options
+  self._args    - rest of the command line as sequence of strings
+
+Second task performed by the run() method is instantiation of the 
+logger. If you do not plan to use logging at all, or do your own 
+logging you can turn the instantiation off by providing 'installLogger 
+= False' parameter to the constructor of the base class. If you do not 
+do this then the default logger will be installed for use in your 
+application. For more information about what is logger and what it can 
+do check the docs (http://www.python.org/doc/lib/module-logging.html).
+
+The class installs the logger object accessible to the user code 
+through the self._log member. The name of the logger will be the same 
+as the name of the application, and the name of the application is 
+determined by the appName() method of the class. Default 
+implementation of the method in the base class uses the "basename" of 
+the script, but subclasses can override the metod to return something 
+else. If you choose not to install logger at all then self._log will 
+point to a "root" logger. The base class also defines one additional 
+logging level called 'TRACE' which is between standard DEBUG and INFO 
+levels. 
+
+The format of the messages printed by the logger is controlled by the 
+format string with the default value '%(asctime)s %(levelname)-8s 
+%(message)s'. Clients can change the format string by either providing 
+the 'logfmt' kwargument to the constructor of the base class, or 
+changing the value of the self._logfmt member before the run() method 
+is called (e.g. in constructor)
+
+There are several convenience methods defined in the base class to use 
+for logging instead of directly calling self._log methods. These are:
+
+    debug(...)
+    trace(...)
+    info(...)
+    warning(...)
+    error(...)
+    critical(...)
+
+They all call corresponding methods of the self._log object. 
+
+The default logging level for the self._log logger depends on the 
+verbosity level of the application specified with the -v (--verbose) 
+option on the command line. Here is the correspondence between 
+verbosity level and logging level:
+
+        Verbosity       Logging level
+        ---------------------------
+        0 (default)     WARNING
+        1 (-v)          INFO
+        2 (-vv)         TRACE
+        3+ (-vvv...)    DEBUG
+
+
+Here is the brief reference of the members and methods:
+
+self._parser      - OptionParser object for command-line parsing, user 
+                    is supposed to add more options to it
+self._options     - result of the command line parsing, object with 
+                    all options
+self._args        - rest of the command line, positional arguments
+self._log         - logger object
+self._logfmt      - logger format string, initialized by 'logfmt' 
+                    argument to constructor, can be changed before run()
+self.run(argv)    - method called from "main", usually should not be 
+                    overridden
+self.appName()    - returns application name, used for the name of the 
+                    logger, can be overridden
+self._run()       - the method to be implemented by user, contains all
+                    application's logic, can access all other members
+                    and methods from this method
+self.debug(...)   - convenience method for message logging
+self.trace(...)   - convenience method for message logging
+self.info(...)    - convenience method for message logging
+self.warning(...) - convenience method for message logging
+self.error(...)   - convenience method for message logging
+self.critical(...)- convenience method for message logging
+
+
+And last working (but not exceptionally useful:) example:
+
+#!@PYTHON@
+#
+#  Example 'echo' application
+#
+import sys
+from AppUtils.AppBase import AppBase
+
+class Echo ( AppBase ) :
+    def __init__ ( self ) :
+        # super init
+        AppBase.__init__ ( self, usage="usage: %prog [options] ...", 
+                            logfmt = '%(levelname)s: %(message)s' )
+        # add more command options
+        self._parser.add_option ( '-n', "--no-newline", default=False, action="store_true",
+                                  help="do not output the trailing newline" )
+
+    def _run ( self ) :
+        self.trace("starting this super-echo app")
+        self.debug("arguments: %s", (self._args,) )
+
+        sys.stdout.write ( ' '.join(self._args) )
+        if not self._options.no_echo :
+            self.debug("will terminate with newline")
+            sys.stdout.write('\n')
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = Echo()
+    rc = app.run()
+    sys.exit(rc)

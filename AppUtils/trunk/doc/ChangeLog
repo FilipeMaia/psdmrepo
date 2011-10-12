@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-09
+2011-10-12 Andy Salnikov
+- clone LusiPython/LusiPyApp as AppBase claass in this package, LusiPyApp
+  becomes deprecated
+
 Tag: V00-01-08
 2011-08-18 Andy Salnikov
 - implemented Python version of AppDataPath class
