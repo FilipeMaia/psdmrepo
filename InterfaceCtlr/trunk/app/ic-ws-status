@@ -40,7 +40,7 @@ import time
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-from LusiPython.LusiPyApp import LusiPyApp
+from AppUtils.AppBase import AppBase
 
 #-----------------------------
 # Imports for other modules --
@@ -56,11 +56,11 @@ from WSClient.WSResource import WSResource
 #  Application class definition --
 #---------------------------------
 
-class IcWsStatus ( LusiPyApp ) :
+class IcWsStatus ( AppBase ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] instrument experiment" )
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options] instrument experiment" )
 
         # add application options, see optparse module for details
         self._parser.add_option ( '-u', "--user", 

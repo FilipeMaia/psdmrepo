@@ -12,8 +12,6 @@
 This software was developed for the LUSI project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
 
-@see RelatedModule
-
 @version $Id$
 
 @author Andrei Salnikov
@@ -31,10 +29,13 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import os
+import errno
 import logging
 import resource
 import threading
+import types
 from pprint import *
+import MySQLdb
 
 #---------------------------------
 #  Imports of base class module --
@@ -50,7 +51,18 @@ from InterfaceCtlr.Config import Config
 # Local non-exported definitions --
 #----------------------------------
 
-class _DatabaseOperatonFailed(Exception):
+class DBConnectionError(StandardError):
+    """This exception is thrown when there is a problem with database connection.
+    Caller may retry operation at later time"""
+    def __init__ (self, ex):
+        msg = "Database connection failed: " + str(ex)
+        Exception.__init__(self, msg)
+
+class _DatabaseOperatonFailed(StandardError):
+    def __init__ (self, message):
+        Exception.__init__( self, message )
+
+class ControllerInstanceError(StandardError):
     def __init__ (self, message):
         Exception.__init__( self, message )
 
@@ -70,27 +82,95 @@ def _synchronized(fun):
 
 # decorator for transaction
 def _transaction(fun):
+    """This decorator will start a transaction before calling the method and 
+    will commit it after successful return. If method throws an exception 
+    the transaction will be aborted.
+    This wrapper will throw an exception DBConnectionError if it fails to connect
+    to database, start transaction; or if the method throws MySQLdb.InternalError or
+    MySQLdb.OperationalError. For other MySQLdb exception it will throw 
+    _DatabaseOperatonFailed. All other exceptions will be passed upstream.
+    """
     
     def wrp( *args, **kwargs ) :
         
         _self = args[0]
-        cursor = _self._conn.cursor()
-        commit_or_abort = "ROLLBACK"
-        try :
-            cursor.execute("START TRANSACTION")
-            newkw = kwargs.copy()
-            newkw['cursor'] = cursor
-            res = fun( *args, **newkw )
-            commit_or_abort = "COMMIT"
-            return res                
-        finally :
-            cursor.execute(commit_or_abort)
         
+        # connect to database, this may fail
+        try:
+            cursor = _self._conn.cursor()
+            cursor.execute("START TRANSACTION")
+        except StandardError, ex:
+            raise DBConnectionError(ex)
+        
+        try:
+            try :
+                newkw = kwargs.copy()
+                newkw['cursor'] = cursor
+                res = fun( *args, **newkw )
+                cursor.execute("COMMIT")
+                return res                
+            except MySQLdb.OperationalError, ex:
+                raise DBConnectionError(ex)
+            except MySQLdb.InternalError, ex:
+                raise DBConnectionError(ex)
+            except MySQLdb.Error, ex:
+                raise _DatabaseOperatonFailed(str(ex))
+        except:
+            # statement may fail if exception was already generated, catch and ignore
+            try:
+                cursor.execute("ROLLBACK")
+            except:
+                pass
+            raise
+
     return wrp
+
+def _checkProcess(pid):
+    """Returns true if process with given PID still running"""
+    try:
+        os.kill(pid, 0)
+    except OSError, ex:
+        if ex.errno == errno.ESRCH:
+            return False
+    return True
 
 #------------------------
 # Exported definitions --
 #------------------------
+
+class Controller(object):
+    def __init__(self, id, host, instruments):
+        self.id = id
+        self.host = host
+        self.instruments = instruments[:]
+    def __str__(self):
+        return "Controller(id=%s, host=%s, instr=%s)" % (self.id, self.host, self.instruments)
+
+
+class Translator(object):
+    def __init__(self, id, jobid, outputDir):
+        self.id = id
+        self.jobid = jobid
+        self.outputDir = outputDir
+    def __str__(self):
+        return "Translator(id=%s, jobid=%s)" % (self.id, self.jobid)
+
+class Fileset(object):
+    def __init__(self, id, experiment, instrument, run_type, run_number, status, xtc_files, translator):
+        self.id = id
+        self.experiment = experiment
+        self.instrument = instrument
+        self.instrument_lower = instrument.lower()
+        self.run_type = run_type
+        self.run_number = run_number
+        self.status = status
+        self.xtc_files = xtc_files[:]
+        self.translator = translator
+    def __str__(self):
+        jobid = None
+        if self.translator: jobid = self.translator.jobid
+        return "FileSet(id=%s, instr=%s, exp=%s, run=%s, status=%s, jobid=%s, files=%s)" % \
+            (self.id, self.instrument, self.experiment, self.run_number, self.status, jobid, self.xtc_files)
 
 #---------------------
 #  Class definition --
@@ -123,30 +203,59 @@ class InterfaceDb ( object ) :
     def new_controller(self, host, log, cursor=None):
         """
         Define new controller in the database, return new controller object
-        which is a dictionary with these keys:
-            - id
-            - translate_uri
-            - log_uri
+        which is an instance of Controller class.
+            
+        @param host   Controller host name
+        @param log    Log file name
+            
+        If there is already a controller running exception ControllerInstanceError
+        will be raised.
         """
 
+        # check if there is already an instance running
+        cursor.execute("SELECT controller_id FROM active_controller FOR UPDATE")
+        rows = cursor.fetchall()
+        if not rows :
+            raise _DatabaseOperatonFailed("Failed to fetch rows from active_controller table.")
+        if len(rows) > 1:
+            raise _DatabaseOperatonFailed("Too many rows in active_controller table: %d" % len(rows))
+        
+        active_id = rows[0][0]
+        if active_id is not None:
+            # if there is a running controller, if it runs on the same host then check if 
+            # the process is still alive
+            
+            q = """SELECT n.node_uri, ic.process_id FROM translator_node n, interface_controller ic
+                WHERE ic.fk_translator_node = n.id AND ic.id = %s"""
+            cursor.execute(q, active_id)
+            rows = cursor.fetchall()
+            if not rows :
+                raise _DatabaseOperatonFailed("Failed to fetch rows for active_controller instance.")
+            if len(rows) > 1:
+                raise _DatabaseOperatonFailed("Too many rows for active_controller instance: %d" % len(rows))
+
+            active_host, active_pid = rows[0]
+            if active_host != host or _checkProcess(active_pid):
+                # stop here
+                raise ControllerInstanceError("There is a controller instance running already with id=%s (host=%s, pid=%s)" % \
+                                              (active_id, active_host, active_pid))
+            else:
+                self._log.trace("Previous active controller instance is not running any more: host=%s, pid=%s", active_host, active_pid)
+
         # find node ID
-        cursor.execute( """SELECT id, translate_uri,log_uri FROM translator_node WHERE 
-                        (node_uri = %s AND active = 1)""", (host,) )
+        cursor.execute( """SELECT id FROM translator_node WHERE (node_uri = %s AND active = 1)""", (host,) )
         rows = cursor.fetchall()
         if not rows :
             raise _DatabaseOperatonFailed("Failed to find node %s in translator_node table." % host)
         if len(rows) > 1:
             raise _DatabaseOperatonFailed("Too many rows in translator_node table for node %s" % host)
 
-        row = rows[0]
-        xlatenode_id = row[0]
-        translate_uri = row[1]
-        log_uri = row[2]
+        xlatenode_id = rows[0][0]
         proc_id = os.getpid()
         start  = Time.now()
 
         # get allowed instruments
-        cursor.execute( """SELECT instrument FROM node2instr WHERE translator_node_id = %s""", (xlatenode_id,) )
+        cursor.execute( "SELECT instrument FROM node2instr WHERE translator_node_id = %s", (xlatenode_id,) )
         instruments = [row[0] for row in cursor.fetchall()]
 
         # define new controller instance
@@ -158,34 +267,57 @@ class InterfaceDb ( object ) :
         rows = cursor.fetchall()
         controller_id = rows[0][0]
         
-        return dict ( id=controller_id, 
-                      instruments=instruments,
-                      translate_uri=translate_uri, 
-                      log_uri=log_uri)
+        # update active table
+        cursor.execute("UPDATE active_controller SET controller_id = %s", (controller_id, ))
+        
+        return Controller(controller_id, host, instruments)
+
+    @_synchronized
+    @_transaction
+    def deactivate_controller(self, controller_id, cursor=None):
+        """Unlocks database by removing controller from active table so that
+        another controller can start.
+        
+        @param[in]  controller_id  If non-None then it is checked against active ID in database.
+        
+        Exception is raised if controller_id does not match current active ID.
+        """
+
+        # if controller ID is provider then active ID must be the same
+        if controller_id is not None:
+            cursor.execute("SELECT controller_id FROM active_controller FOR UPDATE")
+            rows = cursor.fetchall()
+            if not rows :
+                raise _DatabaseOperatonFailed("Failed to fetch rows from active_controller table.")
+            if len(rows) > 1:
+                raise _DatabaseOperatonFailed("Too many rows in active_controller table: %d" % len(rows))
+            active_id = rows[0][0]
+            if controller_id != active_id:
+                raise _DatabaseOperatonFailed("stop_controller: controller IDs do not match, active ID = %s, requested ID = " % (active_id, controller_id))
+
+        # update active table
+        cursor.execute("UPDATE active_controller SET controller_id = NULL")
+        
 
     @_synchronized
     @_transaction
     def controller_status(self, id=None, cursor=None):
         """
         Returns list describing controller status. Every list item describes separate host
-        which is in active state.
+        which is in active state. If id is None the only the currently active controller
+        is returned.
         """
 
         if id is None :
-            # get the latest controller for every active node
-            q = """SELECT c.id, n.node_uri, c.started, c.stopped, c.process_id, c.log, n.id
-                FROM interface_controller c, translator_node n, 
-                    (SELECT fk_translator_node nid, max(started) started 
-                     FROM interface_controller 
-                     GROUP BY nid) cmax 
-                WHERE n.id = c.fk_translator_node AND c.fk_translator_node = cmax.nid 
-                     AND c.started = cmax.started AND n.active"""
-            vars = ()
-        else :
-            q = """SELECT c.id, n.node_uri, c.started, c.stopped, c.process_id, c.log, n.id
-                FROM interface_controller c, translator_node n
-                WHERE n.id = c.fk_translator_node AND c.id = %s"""
-            vars = (id,)
+            # get active controller for every active node
+            cursor.execute("SELECT controller_id FROM active_controller FOR UPDATE")
+            rows = cursor.fetchall()
+            if rows: id = rows[0][0]
+
+        q = """SELECT c.id, n.node_uri, c.started, c.stopped, c.process_id, c.log, n.id
+            FROM interface_controller c, translator_node n
+            WHERE n.id = c.fk_translator_node AND c.id = %s"""
+        vars = (id,)
         
         cursor.execute(q, vars)
         
@@ -202,8 +334,7 @@ class InterfaceDb ( object ) :
         for ctrl in res :
             
             # get the list of instruments
-            q = """SELECT instrument FROM node2instr WHERE translator_node_id = %s"""
-            cursor.execute(q, (ctrl['nodeid'],))
+            cursor.execute("SELECT instrument FROM node2instr WHERE translator_node_id = %s", (ctrl['nodeid'],))
             instruments = [row[0] for row in cursor.fetchall()]
 
             # update controller info
@@ -246,18 +377,16 @@ class InterfaceDb ( object ) :
     @_synchronized
     @_transaction
     def read_config (self, sections, verbose=0, cursor=None):
-        """ read all configuration sections from database """
+        """ read configuration sections from database """
 
-        # throw away all we got
         fullconfig = Config()
 
-        # get configuration from database
-        for section in sections :
+        # get configuration from database, include empty section
+        for section in [""] + sections:
             
             # read section from database
             config = self.__get_config(section,cursor)
-            if verbose :
-                self._log.info ( 'config[%s] = %s', section, config )
+            if verbose : self._log.info ( 'config[%s] = %s', section, config )
 
             # merge configurations
             fullconfig.merge(config)
@@ -270,47 +399,55 @@ class InterfaceDb ( object ) :
 
     @_synchronized
     @_transaction
-    def get_fileset ( self, status, instruments=None, cursor=None ) :
-
-        """return a fileset id with the specified status or None if
-        no fileset exists with that status"""
+    def get_filesets ( self, status, instruments=None, cursor=None ) :
+        """Finds and returns a list of filesets with a given status. 
+        Filesets will be ordered by their priority."""
         
-        fs = None
+        if type(status) in [types.TupleType, types.ListType]:
+            statfmt = ",".join(['%s']*len(status))
+            vars = tuple(status)
+        else:
+            statfmt = "%s"
+            vars = (status,)
         
         # find a matching fileset and lock it for update
-        q = """SELECT fs.id AS id, fs.experiment, fs.instrument, run_type, run_number, stat.name as status
-                    FROM fileset AS fs, fileset_status_def AS stat, active_exp AS act
-                    WHERE stat.name = %s AND fs.fk_fileset_status = stat.id AND fs.locked = FALSE
-                    AND fs.instrument = act.instrument AND fs.experiment = act.experiment"""
-        vars = (status,)
+        q = """SELECT fs.id id, fs.experiment, fs.instrument, run_type, run_number, 
+                      stat.name status, tr.id tr_id, tr.jobid, tr.output_dir
+                    FROM fileset fs LEFT OUTER JOIN translator_process tr ON tr.id = fs.translator_id, 
+                    fileset_status_def stat, active_exp act
+                    WHERE stat.name IN (%s) AND fs.fk_fileset_status = stat.id 
+                    AND fs.instrument = act.instrument AND fs.experiment = act.experiment""" % statfmt
         if instruments :
             fmt = ','.join(['%s']*len(instruments))
-            q += " AND fs.instrument IN (" + fmt + ')'
+            q += ' AND fs.instrument IN (%s)' % fmt
             vars += tuple(instruments)
-        q += " ORDER BY fs.priority DESC, fs.created ASC LIMIT 1 FOR UPDATE"
+        q += " ORDER BY fs.priority DESC, fs.created ASC FOR UPDATE"
 
+        res = []
         cursor.execute(q, vars)
-        rows = cursor.fetchall()
-        
-        if rows :
+        for row in cursor.fetchall():
+            
+            id, experiment, instrument, run_type, run_number, fstatus, tr_id, jobid, output_dir = row
+
             # set lock flag 
-            fs = rows[0]
-            fs = dict( id=fs[0], experiment=fs[1], instrument=fs[2], 
-                       run_type=fs[3], run_number=fs[4], status=fs[5] )
             try :
-                cursor.execute("""UPDATE fileset SET locked = TRUE
-                     WHERE fileset.id = %s""", ( fs['id'], ) )
+                cursor.execute("""UPDATE fileset SET locked = TRUE WHERE fileset.id = %s""", ( id, ) )
             except Exception, ex :
-                self._log.warning( "Failed to lock fileset record, retry later, set #%d" % fs['id'] )
-                fs = None
+                self._log.warning( "Failed to lock fileset record, retry later, set #%d" % id )
+                return None
 
-            if fs :
-                # get the list of files in fileset
-                rows = cursor.execute("SELECT name FROM files WHERE fk_fileset_id = %s and type='XTC'", (fs['id'],) )
-                rows = cursor.fetchall()
-                fs['xtc_files'] = [ r[0] for r in rows ]
+            # get the list of files in fileset
+            cursor.execute("SELECT name FROM files WHERE fk_fileset_id = %s and type='XTC'", (id,) )
+            rows = cursor.fetchall()
+            xtc_files = [ r[0] for r in rows ]
 
-        return fs
+            translator = None
+            if tr_id: translator = Translator(tr_id, jobid, output_dir)
+            res.append(Fileset(id, experiment, instrument, run_type, run_number, fstatus, xtc_files, translator))
+        
+        self._log.debug('get_filesets: found %d filesets with status %s', len(res), status)        
+        
+        return res
 
     # ======================
     # Add files to a fileset
@@ -403,20 +540,25 @@ class InterfaceDb ( object ) :
 
     @_synchronized
     @_transaction
-    def new_translator ( self, ctlr_id,  fs_id, log, cursor=None ) :
+    def new_translator ( self, fs_id, log, jobId, output_dir, cursor=None ) :
 
         """Add a row for this translator process. Update statistics after run is complete.
         Return the id of the new row for later update"""
 
         cursor.execute("""INSERT INTO translator_process 
-                (id, fk_interface_controller, fk_fileset, kill_tp, started, log)
-                VALUES(NULL, %s, %s, False, %s, %s)""", 
-                ( ctlr_id, fs_id, Time.now().toString("%F %T"), log ) )
+                (id, fk_fileset, kill_tp, started, log, jobid, output_dir)
+                VALUES(NULL, %s, False, %s, %s, %s, %s)""",
+                ( fs_id, Time.now().toString("%F %T"), log, jobId, output_dir ) )
         cursor.execute("SELECT LAST_INSERT_ID()")
         rows = cursor.fetchall()
         if not rows:
             raise _DatabaseOperatonFailed( "Failed to retrieve LAST_INSERT_ID in new_translator" )
-        return rows[0][0]
+        translator_id = rows[0][0]
+
+        # remember working translator ID for this fileset
+        cursor.execute("UPDATE fileset SET translator_id = %s WHERE id = %s", (translator_id, fs_id))
+        
+        return translator_id
 
 
     # ======================================
@@ -425,24 +567,16 @@ class InterfaceDb ( object ) :
 
     @_synchronized
     @_transaction
-    def update_translator( self, translator_id, proc_code, perf_prev, ofilesize, cursor=None) :
+    def update_translator( self, translator_id, proc_code, ofilesize, cursor=None) :
 
         """Update the row for this translator process. Update run statistics and process return
         code. We store all of the resource usage even though some are 0 for a given OS.
         Take usage - perf_prev to get usage for the last child process. """
 
-        usage = resource.getrusage(resource.RUSAGE_CHILDREN)
-        diff = tuple([ usage[x]-perf_prev[x] for x in range(0, 16) ])
-        
         cursor.execute("""UPDATE translator_process SET 
-           stopped = %s, filesize_bytes = %s, tstatus_code = %s, 
-           tru_utime = %s,  tru_stime = %s,    tru_maxrss = %s,   tru_ixrss = %s,
-           tru_idrss = %s,  tru_isrss = %s,    tru_minflt = %s,   tru_majflt = %s,
-           tru_nswap = %s,  tru_inblock = %s,  tru_outblock = %s, tru_msgsnd = %s,
-           tru_msgrcv = %s, tru_nsignals = %s, tru_nvcsw = %s,    tru_nivcsw = %s
+           stopped = %s, filesize_bytes = %s, tstatus_code = %s
            WHERE id = %s """,
-           ( Time.now().toString("%F %T"), ofilesize, proc_code, ) + diff + 
-           (translator_id,) )
+           (Time.now().toString("%F %T"), ofilesize, proc_code, translator_id,) )
             
 
     # ======================================
@@ -534,7 +668,7 @@ class InterfaceDb ( object ) :
 
     @_synchronized
     @_transaction
-    def new_fileset (self, instr, exper, runnum, runtype, xtcfiles, duplicate=False, status = 'Waiting_Translation', priority=0, cursor=None ) :
+    def new_fileset (self, instr, exper, runnum, runtype, xtcfiles, duplicate=False, status = 'WAIT', priority=0, cursor=None ) :
         """ Register new fileset.         
             @param instr        instrument name
             @param exper        experiment name
@@ -557,7 +691,7 @@ class InterfaceDb ( object ) :
                 # there is something there already
                 raise _DatabaseOperatonFailed( "fileset already exists: instr=%s exper=%s run=%d" % (instr, exper, runnum) )
            
-        cursor.execute("SELECT id FROM fileset_status_def WHERE name = %s", ('Initial_Entry',) )
+        cursor.execute("SELECT id FROM fileset_status_def WHERE name = %s", ('WAIT_FILES',) )
         row = cursor.fetchone()
         if not row :
             raise _DatabaseOperatonFailed( "No rows found in fileset_status_def with Initial_Entry" )

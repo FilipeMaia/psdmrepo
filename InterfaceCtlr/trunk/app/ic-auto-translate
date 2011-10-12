@@ -36,7 +36,7 @@ import time
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-from LusiPython.LusiPyApp import LusiPyApp
+from AppUtils.AppBase import AppBase
 
 #-----------------------------
 # Imports for other modules --
@@ -56,11 +56,11 @@ _logbook_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.logbook-conn"
 #  Application class definition --
 #---------------------------------
 
-class IcAutoTranslate ( LusiPyApp ) :
+class IcAutoTranslate ( AppBase ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] input-file ..." )
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options] input-file ..." )
 
         # add application options, see optparse module for details
         self._parser.add_option ( '-c', "--config", 

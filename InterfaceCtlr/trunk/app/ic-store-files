@@ -38,7 +38,7 @@ import fnmatch
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-from LusiPython.LusiPyApp import LusiPyApp
+from AppUtils.AppBase import AppBase
 
 #-----------------------------
 # Imports for other modules --
@@ -58,20 +58,16 @@ _regdb_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.regdb-conn"
 #  Application class definition --
 #---------------------------------
 
-class ICStoreFiles ( LusiPyApp ) :
+class ICStoreFiles ( AppBase ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
 
         self._parser.add_option ( '-d', "--conn-string",
                                   action="store", dest="conn_string", default=_conn_str,
                                   help="interface database connection string", metavar="CONN_STRING" )
 
-        self._parser.add_option ( '-r', "--regdb",
-                                  action="store", dest="regdb", default=_regdb_conn_str,
-                                    help="RegDB connection string", metavar="CONN_STRING" )
-        
         self._parser.add_option ( '-u', "--user",
                                   action="store", dest="user", default=None,
                                   help="override default user name" )
@@ -101,15 +97,15 @@ class ICStoreFiles ( LusiPyApp ) :
                              user=self._options.user,
                              passwd=self._options.password )
         db = InterfaceDb( conn, self ) 
-        
-        regdb_conn = DbConnection( conn_string=self._options.regdb, 
-                                   user=self._options.user,
-                                   passwd=self._options.password )
-        
+
         # get the options from database
         config = db.read_config( self._options.config, False )
 
-        # instantiate fiel manager
+        # get regdb 
+        regdb_conn_str = config.get('regdb-conn')
+        regdb_conn = DbConnection( conn_string=regdb_conn_str )
+        
+        # instantiate file manager
         if not config.get('filemanager-irods-command') :
             self.error("filemanager-irods-command is not defined, use -c option to define" )
             return 2            
@@ -131,17 +127,17 @@ class ICStoreFiles ( LusiPyApp ) :
                 
                 # XTC files first
                 if config.get('experiment-xtc-dir') and config.get('filemanager-xtc-dir'):
-                    src_dir = config.get('experiment-xtc-dir') % parm
-                    pattern = (config.get('xtc-name-pattern') or '%(experiment)s-*.xtc') % parm
-                    dst_coll = config.get('filemanager-xtc-dir') % parm
+                    src_dir = config.get('experiment-xtc-dir', subs=parm)
+                    pattern = config.get('xtc-name-pattern', default='%(experiment)s-*.xtc', subs=parm)
+                    dst_coll = config.get('filemanager-xtc-dir', subs=parm)
                     
                     self.process_dir (src_dir, pattern, dst_coll, file_mgr)
     
                 # HDF files
                 if config.get('experiment-hdf5-dir') and config.get('filemanager-hdf5-dir'):
-                    src_dir = config.get('experiment-hdf5-dir') % parm
-                    pattern = (config.get('hdf5-name-pattern') or '%(experiment)s-*.h5') % parm
-                    dst_coll = config.get('filemanager-hdf5-dir') % parm
+                    src_dir = config.get('experiment-hdf5-dir', subs=parm)
+                    pattern = config.get('hdf5-name-pattern', default='%(experiment)s-*.h5', subs=parm)
+                    dst_coll = config.get('filemanager-hdf5-dir', subs=parm)
                     
                     self.process_dir (src_dir, pattern, dst_coll, file_mgr)
                     

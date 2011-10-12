@@ -30,6 +30,7 @@ __version__ = "$Revision$"
 #  Imports of standard modules --
 #--------------------------------
 import sys
+import types
 
 #---------------------------------
 #  Imports of base class module --
@@ -46,6 +47,19 @@ import sys
 # make an object which cannot exist in configuration
 _Missing = [None]
 _Missing[0] = _Missing
+
+def _subs(value, subs):
+    "Do keyword substitution"
+    
+    if not subs: return value
+
+    if type(value) in types.StringTypes:
+        value = value % subs
+
+    if type(value) == types.ListType:
+        return [_subs(item) for item in value]
+
+    return value
 
 #------------------------
 # Exported definitions --
@@ -98,27 +112,41 @@ class Config ( object ) :
             else :
                 self._dict[key] = value
             
-    def get(self, option, instrument=None, experiment=None ) :
+    def get(self, option, instrument=None, experiment=None, default=None, subs=None ) :
         """get the option value
 
-        @param option   configuration option name
+        @param option     configuration option name
         @param instrument instrument name
         @param experiment experiment name
+        @param default    default value to be returned
+        @param subs       dictionary for keyword substitutions
         """
 
-        key = (option, instrument, experiment)
-        val = self._dict.get(key, _Missing)
-        if val is not _Missing: return val
+        if instrument and experiment:
+            
+            key = (option, instrument, experiment)
+            val = self._dict.get(key, _Missing)
+            if val is not _Missing: 
+                return _subs(val, subs)
+            
+        if experiment:
+            key = (option, None, experiment)
+            val = self._dict.get(key, _Missing)
+            if val is not _Missing: 
+                return _subs(val, subs)
 
-        key = (option, instrument, None)
-        val = self._dict.get(key, _Missing)
-        if val is not _Missing: return val
+        if instrument:
+            key = (option, instrument, None)
+            val = self._dict.get(key, _Missing)
+            if val is not _Missing: 
+                return _subs(val, subs)
 
         key = (option, None, None)
         val = self._dict.get(key, _Missing)
-        if val is not _Missing: return val
+        if val is not _Missing: 
+            return _subs(val, subs)
 
-        return None
+        return _subs(default, subs)
 
 
     def __str__(self):

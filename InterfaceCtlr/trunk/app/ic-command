@@ -32,11 +32,12 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import os
+from optparse import OptionParser
 
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-from LusiPython.LusiPyApp import LusiPyApp
+from AppUtils.AppBase import AppBase
 
 #-----------------------------
 # Imports for other modules --
@@ -54,7 +55,7 @@ _conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
 # Application class definition --
 #--------------------------------
 
-class ICCommand ( LusiPyApp ) :
+class ICCommand ( AppBase ) :
 
     # ===========
     # constructor
@@ -62,13 +63,16 @@ class ICCommand ( LusiPyApp ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ (
-            self,
-            installLogger = True,
-            usage = "usage: %prog [<command>] [<parameters>] [<options>]" )
+        usage = "usage: %prog [options] command [options] [arguments]"
+        descr = "Type '%prog help' to see the list of availble commands."
+        parser = OptionParser(usage=usage, description=descr)
+        AppBase.__init__ (self, installLogger = True,
+                            usage = usage, description=descr)
 
         # Add application options, see optparse module for details -------------
         #
+        self._parser.disable_interspersed_args()
+        
         self._parser.add_option ( '-d', "--conn-string",
                                   action="store", dest="conn_string", default=_conn_str,
                                   help="database connection string", metavar="CONN_STRING" )
@@ -89,46 +93,12 @@ class ICCommand ( LusiPyApp ) :
 
         # Register command handlers for known command --------------------------
         #
-        self.__add_handler(
-            'help',
-            '[<command> [<command> [...]]]',
-            """
-    If no specific command (or commands) will be presented
-    then general information about the tool will be printed.
-    Otherwise detailed description of each command will be
-    printed.
-    """,
-            self.cmd_help)
-
-        self.__add_handler(
-            'translate',
-            '<instrument> <experiment> <run_type> <run_number> <xtc_files>',
-            "Translate a set of files to Offline Data Management",
-             self.cmd_translate )
-
-        self.__add_handler(
-            'remove',
-            '<instrument> <experiment> [<run_number>]',
-            "Remove fileset(s) from the database",
-             self.cmd_remove )
-
-        self.__add_handler(
-            'active',
-            '',
-            "Display active experiments",
-             self.cmd_active )
-
-        self.__add_handler(
-            'activate',
-            '<instrument> <experiment> ',
-            "Activate experiment",
-             self.cmd_activate )
-
-        self.__add_handler(
-            'deactivate',
-            '<instrument> <experiment> ',
-            "Deactivate experiment",
-             self.cmd_deactivate )
+        self.__add_handler('help', "Print usage information", self.cmd_help)
+        self.__add_handler('translate',"Make new translation request", self.cmd_translate )
+        self.__add_handler('remove', "Remove fileset(s) from the database", self.cmd_remove )
+        self.__add_handler('active', "Display active experiments", self.cmd_active)
+        self.__add_handler( 'activate', "Activate experiment", self.cmd_activate)
+        self.__add_handler('deactivate', "Deactivate experiment", self.cmd_deactivate)
 
 
     # =========================================================================
@@ -137,9 +107,8 @@ class ICCommand ( LusiPyApp ) :
     # the tool.
     # =========================================================================
     
-    def __add_handler(self, command, syntax, description, handler):
+    def __add_handler(self, command, description, handler):
         self.__cmd_handlers[command] = {
-            'SYNTAX':syntax,
             'DESCRIPTION':description,
             'HANDLER':handler
         }
@@ -152,7 +121,7 @@ class ICCommand ( LusiPyApp ) :
 
     def _run ( self ) :
 
-        # Print the list of supported commands of none is given ----------------
+        # Print the list of supported commands if none is given ----------------
         #
         if not self._args :
             self.cmd_help('help', self._args)
@@ -177,63 +146,16 @@ class ICCommand ( LusiPyApp ) :
 
     def cmd_help ( self, command, args ) :
 
-        names = args
-        if names is not None and len(names) > 0:
-            verbose = True
-        else:
-            names = self.__cmd_order
-            verbose = False
+        self._parser.print_usage()
 
-        if verbose:
+        print "List of available commands:"
+        max_len = max([len(n) for n in self.__cmd_order])
+        for name in self.__cmd_order:
+            print "    %-*s  %s" % (max_len, name, self.__cmd_handlers[name]['DESCRIPTION'])
 
-            # Print full description of each command
-            #
-            for name in names:
-                print """COMMAND:
-
-    %s
-
-PARAMETERS:
-
-    %s
-
-DESCRIPTION:
-%s
-""" % (name,
-         self.__cmd_handlers[name]['SYNTAX'],
-         self.__cmd_handlers[name]['DESCRIPTION'] )
-
-        else:
-
-            print """APPLICATION:
-
-    %s
-
-        This is the Online script that writes to the Interface Controller
-        Database to notify the Interface Controller that Online files are
-        ready for translation. The application has been developed in the 
-        context of the OFFLINE Data Management Project for LCLS/LUSI 
-        experiments.
-
-USAGE:
-
-    command [options] [parameters]
-
-    help
-    help [command [command ...]]   (for detailed explanation)
-
-    -h | --help                    (for a full list of available options)
-
-SUPPORTED COMMANDS:
-""" %  os.path.basename(sys.argv[0])
-
-            # Reserve enough space for the command names based on
-            # the longest name.
-            max_len = max([len(n) for n in names])
-            for name in names:
-                print "    %-*s  %s" % (max_len, name, self.__cmd_handlers[name]['SYNTAX'])
-
-            print
+        print self._parser.expand_prog_name("\nType '%prog -h' to see the list of global options.")
+        print self._parser.expand_prog_name("\nType '%prog <command> -h' to see the list of command options and arguments.")
+        print
 
         return 0
 
@@ -241,19 +163,33 @@ SUPPORTED COMMANDS:
     # Translate a fileset
     # ===================
 
-    def cmd_translate ( self, command, args ) :
+    def cmd_translate ( self, command, cmdargs ) :
 
-        if len(args) < 5:
-            self._parser.error(
-                "Enter: instrument experiment run_type run_num xtc_files - %s" % command)
+        usage = "usage: %%prog %s [options] instrument experiment run_num [files ...]" % command
+        descr = "Adds translation request to the queue"
+        parser = OptionParser(usage=usage, description=descr)
+        parser.add_option('-r', "--re-translate", action='store_true', default=False, 
+                          help="allows re-submission of requests for the same run")
+        parser.add_option('-w', "--priority", type='int', default=0, 
+                          help="sets the priority of the request")
+        parser.add_option('-t', "--data-type", default="DATA", 
+                          help="sets run data type, default: DATA")
+        (options, args) = parser.parse_args(cmdargs)
+
+        if len(args) < 3:
+            parser.error("Three or more positional arguments required")
 
         instr      = args[0]
         exper      = args[1]
-        runtype    = args[2]
-        runnum     = args[3]
-        xtcfiles   = args[4:]
+        runnum     = int(args[2])
+        xtcfiles   = args[3:]
 
-        self.icdb().new_fileset ( instr, exper, runnum, runtype, xtcfiles, duplicate=True )
+        if xtcfiles:
+            status = 'WAIT'
+        else:
+            status = 'WAIT_FILES'
+        self.icdb().new_fileset ( instr, exper, runnum, options.data_type, xtcfiles, 
+                                  priority=options.priority, duplicate=options.re_translate, status=status )
         
         return 0
 
@@ -261,18 +197,31 @@ SUPPORTED COMMANDS:
     # Remove filesets
     # ===============
 
-    def cmd_remove ( self, command, args ) :
+    def cmd_remove ( self, command, cmdargs ) :
 
-        if len(args) not in [2,3]:
-            self._parser.error(
-                "Enter: instrument experiment [run_num] - %s" % command)
+        usage = "usage: %%prog %s [options] [instrument experiment [run_num]]" % command
+        descr = "Deletes translation request from queue"
+        parser = OptionParser(usage=usage, description=descr)
+        parser.add_option('-i', "--id", type='int', default=None, help="Delete request with given ID")
+        (options, args) = parser.parse_args(cmdargs)
 
-        instr = args[0]
-        exper = args[1]
-        runnum = None
-        if len(args) > 2 : runnum = args[2]
-
-        self.icdb().remove_fileset ( instr, exper, runnum )
+        if options.id is not None:
+            if args: parser.error("No arguments expected with -i option")
+            self.icdb().remove_fileset_id(options.id)
+        else:
+            if len(args) not in [2,3]:
+                parser.error("Two or three positional argument required without -i option")
+    
+            instr = args[0]
+            exper = args[1]
+            runnum = None
+            if len(args) > 2 :
+                try:
+                    runnum = int(args[2])
+                except ValueError, ex:
+                    parser.error("Run number must be integer: "+args[2])
+    
+            self.icdb().remove_fileset ( instr, exper, runnum )
         
         return 0
 
@@ -280,10 +229,15 @@ SUPPORTED COMMANDS:
     # Show active experiments
     # =======================
 
-    def cmd_active ( self, command, args ) :
+    def cmd_active ( self, command, cmdargs ) :
+
+        usage = "usage: %%prog %s [options]" % command
+        descr = "Prints the list of currently active experiments"
+        parser = OptionParser(usage=usage, description=descr)
+        (options, args) = parser.parse_args(cmdargs)
 
         if args:
-            self._parser.error("No arguments expected - %s" % command)
+            parser.error("No arguments expected")
 
         for instr, exp, since in self.icdb().active_experiments() :
             print "%-6s %s" %(instr, exp)
@@ -294,10 +248,15 @@ SUPPORTED COMMANDS:
     # Activate experiment
     # ===================
 
-    def cmd_activate ( self, command, args ) :
+    def cmd_activate ( self, command, cmdargs ) :
+
+        usage = "usage: %%prog %s [options] instrument experiment" % command
+        descr = "Adds one experiment to the list of active experiments"
+        parser = OptionParser(usage=usage, description=descr)
+        (options, args) = parser.parse_args(cmdargs)
 
         if len(args) != 2:
-            self._parser.error("Enter: instrument experiment - %s" % command)
+            parser.error("Two positional arguments are required")
 
         self.icdb().activate_experiment(*args)
         
@@ -307,10 +266,15 @@ SUPPORTED COMMANDS:
     # Deactivate experiment
     # =====================
 
-    def cmd_deactivate ( self, command, args ) :
+    def cmd_deactivate ( self, command, cmdargs ) :
+
+        usage = "usage: %%prog %s [options] instrument experiment" % command
+        descr = "Removes experiment from the list of active experiments"
+        parser = OptionParser(usage=usage, description=descr)
+        (options, args) = parser.parse_args(cmdargs)
 
         if len(args) != 2:
-            self._parser.error("Enter: instrument experiment - %s" % command)
+            parser.error("Two positional arguments are required")
 
         self.icdb().deactivate_experiment(*args)
         

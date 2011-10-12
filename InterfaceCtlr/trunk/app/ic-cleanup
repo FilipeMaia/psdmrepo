@@ -38,11 +38,12 @@ import socket
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-from LusiPython.LusiPyApp import LusiPyApp
+from AppUtils.AppBase import AppBase
 
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+from InterfaceCtlr.InterfaceDb import InterfaceDb
 from LusiPython.DbConnection import DbConnection
 from LusiTime.Time import Time
 
@@ -52,15 +53,24 @@ from LusiTime.Time import Time
 
 _conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
 
+def _checkProcess(pid):
+    """Returns true if process with given PID still running"""
+    try:
+        os.kill(pid, 0)
+    except OSError, ex:
+        if ex.errno == errno.ESRCH:
+            return False
+    return True
+
 #---------------------------------
 #  Application class definition --
 #---------------------------------
 
-class ICStatus ( LusiPyApp ) :
+class ICStatus ( AppBase ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
 
         self._parser.add_option ( '-d', "--conn-string",
                                   action="store", dest="conn_string", default=_conn_str,
@@ -92,43 +102,30 @@ class ICStatus ( LusiPyApp ) :
         host = socket.getfqdn(socket.gethostname())
         self.trace('host name: %s', host)
 
-        q = """SELECT c.started, c.stopped, c.process_id, c.id
-            FROM interface_controller c, translator_node n 
-            WHERE n.id=c.fk_translator_node AND n.node_uri=%s 
-            ORDER BY started DESC LIMIT 1"""
+        db = InterfaceDb(conn)
+        controllers = db.controller_status()
 
-        # execute query
-        cursor = conn.cursor()
-        cursor.execute( q, (host,) )
+        if not controllers:
+            self.info("No active controller instance found.")
+            return 0
 
-        # dump it
-        rows = cursor.fetchall()
-        if not rows :
-            self.info("No information about this node in the database, stop.")
-        else :
-            info = rows[0]
-            stopped = info[1]
-            pid = info[2]
-            cid = info[3]
-            if stopped :
-                self.info("Last controller instance already stopped.")
-            else :
-                # check that process is running
-                try:
-                    os.kill(pid, 0)
-                    self.info("Process %s is still running.", pid)
-                except OSError, exc:
-                    if exc.errno == errno.ESRCH :
-                        # no such process
-                        self.info("Process %s is not running, updating database.", pid)
-                        
-                        endtime = Time.now().toString("%F %T")
-                        cursor.execute("""UPDATE interface_controller SET stopped = %s WHERE id = %s """, 
-                                            ( endtime, cid ) )
-                        cursor.execute("COMMIT")
-                    else :
-                        self.error("Unexpected error killing process %s: %s", pid, str(exc))
-                        return exc.errno
+        if len(controllers) > 1:
+            self.error("More than one active controller instance found.")
+            return 2
+            
+        info = controllers[0]
+        if info['host'] == host:
+
+            pid = info['pid']
+
+            # check that process is running
+            if _checkProcess(pid):
+                self.info("Process %s is still running.", pid)
+            else:
+                self.info("Process %s is not running, updating database.", pid)
+                db.deactivate_controller(info['id'])
+                db.exit_controller(info['id'])
+
 
 #
 #  run application when imported as a main module

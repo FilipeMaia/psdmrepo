@@ -6,11 +6,17 @@
 #  ChangeLog file for package InterfaceCtlr
 #------------------------------------------------------------------------
 
-Package author: Robert C. Sass
-
+Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-00
+2011-10-12 Andy Salnikov
+- new implementation of the controller based on LSF batch system
+- many changes, can't document all here, some background info is here:
+  https://pswww.slac.stanford.edu/trac/psdm/ticket/105
+  https://pswww.slac.stanford.edu/trac/psdm/ticket/106
+  
 Tag: V00-07-11
 2011-09-13 Andy Salnikov
 - add option to set LD_PRELOAD envvar for translator from configuration
