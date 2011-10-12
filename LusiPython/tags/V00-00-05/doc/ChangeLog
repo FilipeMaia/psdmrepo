@@ -1,0 +1,36 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package LusiPython
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-05
+2011-10-12 Andy Salnikov
+- updated comments in DbConnection module
+
+Tag: V00-00-03
+2009-11-13 Andy Salnikov
+- DbConnection: merge two parameters into one, now only one parameter 
+  is used to specify either connection string or file name with the
+  connection string (if starts with 'file:')
+
+Tag: V00-00-02
+2009-11-13 Andy Salnikov
+- small change in DbConnection, allow kw arguments with None value,
+  simply ignore them 
+
+Tag: V00-00-01
+2009-11-13 Andy Salnikov
+- add DbConnection class
+
+Tag: V00-00-00
+2008-10-08 Andy Salnikov
+- first import of the package into LUSI CVS
+- at this time only LusiPyApp module is there
