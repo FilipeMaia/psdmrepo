@@ -51,6 +51,10 @@ import time
 # Internal method which parses connection string
 #
 def _parse_conn_string( conn_string ) :
+    """
+    This method parses ODBC-like connection string and returns
+    a dictionary of parameters.
+    """ 
 
     kwords = {
         'server'   : ('host',   lambda x : x),
@@ -88,7 +92,7 @@ def _parse_conn_string( conn_string ) :
         except KeyError:
             raise ValueError ( "invalid key in connection string (%s): %s" % ( key, conn_string ) )
 
-        # conver the value
+        # convert the value
         try :
             val = fun(val)
         except :
@@ -112,18 +116,28 @@ class DbConnection ( object ) :
     #  Constructor --
     #----------------
     def __init__ ( self, **kwargs ) :
-        """Constructor.
+        """Constructor accepts a number of keyword parameters.
 
-        @param conn_string      connection string, if present the parameters
-                                will be initialized from it
-        @param conn_string_file  file with connection string, 
-        @param timeout       default connection timeout in seconds
+        @param conn_string  connection string
+        @param host         server host name
+        @param db           database name
+        @param port         port number
+        @param user         user name
+        @param passwd       password
+        @param timeout      connection timeout in seconds
         
-        format of the connection string is :
-        Server=myServerAddress;Port=1234;Database=myDataBase;Uid=myUsername;Pwd=myPassword;Connection Timeout=5;
+        Format of the connection string is :
+        file:path, or
+        Server=hostname;Port=1234;Database=myDataBase;Uid=myUsername;Pwd=myPassword;Connection Timeout=5;
         (all parts are optional, default timeout value is 15 sec)
         
-        One of the conn_string or conn_string_file must be given
+        Connection parameters are initialized from connection string (if present),
+        all remaining keyword arguments can be used to override values in connection string.
+        If connection string is not given then only keyword arguments are used.
+        If connection string starts with 'file:' string then connection string is read from 
+        a file name which follows this prefix.
+        
+        Constructor may throw ValueError exception if connection string has unrecognized format.
         """
 
         # check keyword arguments
@@ -170,7 +184,12 @@ class DbConnection ( object ) :
     # ===========================================================
 
     def connection(self):
-        """ Method that returns connection to a database """
+        """ Method that returns connection to a database. If connection
+        cannot be established immediately it retries for a number of 
+        seconds given in timeout parameter to constructor. If connection
+        cannot be established after timeout expires an exception of a type
+        MySQLdb.Error (subclass of StandardError).
+        """
         
         if self._conn :
             try :
@@ -207,6 +226,15 @@ class DbConnection ( object ) :
     # Make a cursor object
     #
     def cursor (self, dictcursor=False):
+        """Returns cursor object. It tries to establish connection to
+        database first using connection() method and then returns 
+        cursor for that connection. If dictcursor argument is true then 
+        a 'dictionary cursor' is returned, otherwise standard cursor.
+        This method will generate exception if connection to database cannot 
+        be established within specified timeout.
+        """
+        
+        
         if dictcursor: 
             return self.connection().cursor(db.cursors.SSDictCursor)
         else:
