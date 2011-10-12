@@ -29,7 +29,6 @@
 #include "O2OTranslator/O2OMetaData.h"
 #include "pdsdata/xtc/Dgram.hh"
 #include "pdsdata/xtc/Src.hh"
-#include "SciMD/Connection.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -50,13 +49,9 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-MetaDataScanner::MetaDataScanner (const O2OMetaData& metadata,
-                                  const std::string& odbcConnStr,
-                                  const std::string& regdbConnStr)
+MetaDataScanner::MetaDataScanner (const O2OMetaData& metadata)
   : O2OXtcScannerI()
   , m_metadata(metadata)
-  , m_odbcConnStr(odbcConnStr)
-  , m_regdbConnStr(regdbConnStr)
   , m_nevents(0)
   , m_eventSize(0)
   , m_runBeginTime()
@@ -201,110 +196,6 @@ MetaDataScanner::storeRunInfo()
       << "\n\tm_eventSize: " << ( m_nevents ? m_eventSize/m_nevents : 0 )
       << "\n\tm_runBeginTime: " << m_runBeginTime.toString("S%s%f") << "(" << m_runBeginTime << ")"
       << "\n\tm_runEndTime: " << m_runEndTime.toString("S%s%f") << "(" << m_runEndTime << ")" ) ;
-
-  // can we store it?
-  if ( m_odbcConnStr.empty() ) {
-    MsgLog( logger, warning, "metadata ODBC connection string is empty, no data will be stored" ) ;
-    return ;
-  }
-  if ( run == 0 ) {
-    MsgLog( logger, warning, "run number is zero, no data will be stored" ) ;
-    return ;
-  }
-  if ( instr.empty() ) {
-    MsgLog( logger, warning, "instrument name is empty, no data will be stored" ) ;
-    return ;
-  }
-  if ( exper.empty() ) {
-    MsgLog( logger, warning, "experiment name is empty, no data will be stored" ) ;
-    return ;
-  }
-
-  // create connection to the SciMD
-  SciMD::Connection* conn = 0 ;
-  try {
-    MsgLog( logger, trace, "ODBC connection string: '" << m_odbcConnStr << "'" ) ;
-    conn = SciMD::Connection::open( m_odbcConnStr, m_regdbConnStr ) ;
-  } catch ( SciMD::DatabaseError& e ) {
-    MsgLog( logger, error, "failed to open SciMD connection, metadata will not be stored" ) ;
-    throw ;
-  }
-
-  // start saving data
-  conn->beginTransaction() ;
-
-  // create info for this run
-  try {
-    conn->createRun ( instr, exper, run, m_metadata.runType(), m_runBeginTime, m_runEndTime ) ;
-  } catch ( SciMD::DatabaseError& e ) {
-    MsgLog( logger, error, "failed to create new run, run number may already exist" ) ;
-    conn->abortTransaction() ;
-    delete conn ;
-    throw ;
-  }
-
-  try {
-
-    // store event count
-    conn->setRunParam ( instr, exper, run, "events", (int)m_nevents, "translator" ) ;
-
-  } catch ( std::exception& e ) {
-
-    // this should not happen, have to abort here
-    MsgLog( logger, error, "failed to store event count: " << e.what() ) ;
-    conn->abortTransaction() ;
-    delete conn ;
-    throw ;
-
-  }
-
-  try {
-
-    // store average event size
-    conn->setRunParam ( instr, exper, run,
-                        "eventSize", (int)( m_nevents ? m_eventSize/m_nevents : 0 ), "translator" ) ;
-
-  } catch ( std::exception& e ) {
-
-    // this should not happen, have to abort here
-    MsgLog( logger, error, "failed to store event size: " << e.what() ) ;
-    conn->abortTransaction() ;
-    delete conn ;
-    throw ;
-
-  }
-
-  try {
-
-    // store average event size
-    conn->setRunParam ( instr, exper, run, "dgramSize", (int64_t)m_eventSize, "translator" ) ;
-
-  } catch ( std::exception& e ) {
-
-    // this should not happen, have to abort here
-    MsgLog( logger, error, "failed to store datagrams size: " << e.what() ) ;
-    conn->abortTransaction() ;
-    delete conn ;
-    throw ;
-
-  }
-
-  // store all metadata that we received from online
-  typedef O2OMetaData::const_iterator MDIter ;
-  for ( MDIter it = m_metadata.extra_begin() ; it != m_metadata.extra_end() ; ++ it ) {
-    try {
-      conn->setRunParam ( instr, exper, run, it->first, it->second, "translator" ) ;
-    } catch ( std::exception& e ) {
-      // this is not fatal, just print error message and continue
-      MsgLog( logger, error, "failed to store metadata: " << e.what()
-          << "\n\tkey='" << it->first << "', value='" << it->second << "'" ) ;
-    }
-  }
-
-  // finished storing metadata
-  conn->commitTransaction() ;
-  delete conn ;
-  conn = 0 ;
 }
 
 } // namespace O2OTranslator

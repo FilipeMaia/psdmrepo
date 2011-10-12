@@ -55,9 +55,7 @@ class MetaDataScanner : public O2OXtcScannerI {
 public:
 
   // Default constructor
-  MetaDataScanner ( const O2OMetaData& metadata,
-                    const std::string& odbcConnStr,
-                    const std::string& regdbConnStr ) ;
+  MetaDataScanner ( const O2OMetaData& metadata ) ;
 
   // Destructor
   virtual ~MetaDataScanner () ;
@@ -88,8 +86,6 @@ private:
 
   // Data members
   const O2OMetaData& m_metadata ;
-  const std::string m_odbcConnStr ;
-  const std::string m_regdbConnStr ;
   unsigned long m_nevents ;
   uint64_t m_eventSize ;
   LusiTime::Time m_runBeginTime ;

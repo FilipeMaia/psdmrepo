@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-14-00
+2011-10-12 Andy Salnikov
+- removed all SciMD-related code, it was never used and only  
+  introduced dependency on odbc
+
 Tag: V00-13-00
 2011-10-05 Andy Salnikov
 - committing proper fix for multi-source EPICS, now identification

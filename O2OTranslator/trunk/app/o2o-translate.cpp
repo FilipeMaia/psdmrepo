@@ -93,13 +93,11 @@ private:
   AppCmdOptBool               m_extGroups ;
   AppCmdOpt<std::string>      m_instrument ;
   AppCmdOpt<double>           m_l1offset ;
-  AppCmdOpt<std::string>      m_mdConnStr ;
   AppCmdOptNamedValue<XtcInput::XtcStreamMerger::MergeMode> m_mergeMode ;
   AppCmdOptList<std::string>  m_metadata ;
   AppCmdOpt<std::string>      m_outputDir ;
   AppCmdOpt<std::string>      m_outputName ;
   AppCmdOptBool               m_overwrite ;
-  AppCmdOpt<std::string>      m_regConnStr ;
   AppCmdOpt<unsigned long>    m_runNumber ;
   AppCmdOpt<std::string>      m_runType ;
   AppCmdOptNamedValue<O2OHdf5Writer::SplitMode> m_splitMode ;
@@ -121,14 +119,12 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   , m_extGroups  ( 'G', "group-time",               "use extended group names with timestamps", false )
   , m_instrument ( 'i', "instrument",   "string",   "instrument name", "" )
   , m_l1offset   (      "l1-offset",    "number",   "L1Accept time offset seconds, def: 0", 0 )
-  , m_mdConnStr  ( 'M', "md-conn",      "string",   "metadata ODBC connection string", "" )
   , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", 
                   XtcInput::XtcStreamMerger::FileName )
   , m_metadata   ( 'm', "metadata",     "name:value", "science metadata values", '\0' )
   , m_outputDir  ( 'd', "output-dir",   "path",     "directory to store output files, def: .", "." )
   , m_outputName ( 'n', "output-name",  "template", "template string for output file names, def: {seq4}.h5", "{seq4}.h5" )
   , m_overwrite  (      "overwrite",                "overwrite output file", false )
-  , m_regConnStr ( 'R', "regdb-conn",   "string",   "RegDB ODBC connection string", "" )
   , m_runNumber  ( 'r', "run-number",   "number",   "run number, non-negative number; def: 0", 0 )
   , m_runType    ( 't', "run-type",     "string",   "run type, DATA or CALIB, def: DATA", "DATA" )
   , m_splitMode  ( 's', "split-mode",   "mode-name","one of none, or family; def: none", O2OHdf5Writer::NoSplit )
@@ -144,7 +140,6 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_extGroups ) ;
   addOption( m_instrument ) ;
   addOption( m_l1offset ) ;
-  addOption( m_mdConnStr ) ;
   addOption( m_mergeMode ) ;
   m_mergeMode.add ( "one-stream", XtcInput::XtcStreamMerger::OneStream ) ;
   m_mergeMode.add ( "no-chunking", XtcInput::XtcStreamMerger::NoChunking ) ;
@@ -153,7 +148,6 @@ O2O_Translate::O2O_Translate ( const std::string& appName )
   addOption( m_outputDir ) ;
   addOption( m_outputName ) ;
   addOption( m_overwrite ) ;
-  addOption( m_regConnStr ) ;
   addOption( m_runNumber ) ;
   addOption( m_runType ) ;
   m_splitMode.add ( "none", O2OHdf5Writer::NoSplit ) ;
@@ -216,7 +210,7 @@ O2O_Translate::runApp ()
                                   metadata ) ) ;
 
   // instantiate metadata scanner
-  scanners.push_back ( new MetaDataScanner( metadata, m_mdConnStr.value(), m_regConnStr.value() ) ) ;
+  scanners.push_back ( new MetaDataScanner( metadata ) ) ;
 
   // make datagram queue
   XtcInput::DgramQueue dgqueue( m_dgramQSize.value() ) ;
