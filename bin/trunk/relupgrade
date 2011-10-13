@@ -56,6 +56,11 @@ if [ ! -d $SIT_RELDIR/$release ] ; then
   exit 2
 fi
 
+# if release is linked to another one get its real name
+if [ -f "$SIT_RELDIR/$release/.sit_release" ] ; then
+  release=`cat "$SIT_RELDIR/$release/.sit_release"`
+fi
+
 # update release names
 echo "$release" > .sit_release
 
