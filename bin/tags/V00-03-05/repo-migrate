@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Migration script for repository location
+#
+
+usage() {
+  cat << EOD
+
+Usage: `basename $0` [package ...]
+
+  Available options:
+    -h          this message
+    
+Upgrade package to use new subversion repository location.
+Accepts one or more directory names with packages.
+EOD
+}
+
+# get the options
+while getopts h c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+if [ $# -eq 0 ] ; then
+  usage
+  exit 2
+fi
+
+old_svn=svn+ssh://yakut/afs/slac.stanford.edu/g/lusi/svnrepo
+new_svn=https://pswww.slac.stanford.edu/svn/psdmrepo
+for pkg in "$@" ; do
+  (cd "$pkg"; svn switch --relocate "$old_svn" "$new_svn")
+done
