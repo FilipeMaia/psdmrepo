@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Oct-13 ofte                  rev 2520
+          - improvements to the run pyana / quit pyana interface. 
+	  - bugfix in pyana_image_beta (cspad)
+	
 2011-Oct-11 ofte  Tag: V00-01-11  rev 2498 & 2499
          - minor changes in this particular revision. Main purpose is to make 
 	   a new tag to make the most recent changes available in the release. 

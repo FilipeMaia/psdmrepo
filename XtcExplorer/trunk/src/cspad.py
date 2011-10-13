@@ -168,7 +168,7 @@ class CsPad( object ):
         self.image = np.ma.filled( im_hot_masked, 0)
         return self.image
          
-    def load_pedestals(self, pedestalfile ):
+    def load_pedestals(self, pedestalsfile ):
         """ load dark from pedestal file:
         pedestals txt file is (4*8*185)=5920 (lines) x 388 (columns)
         accepted file formats: ascii and npy (binary)

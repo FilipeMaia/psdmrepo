@@ -48,10 +48,19 @@ import gui_config_panels as panels
 #---------------------
 class myPopen(subprocess.Popen):
     def kill(self, signal = signal.SIGTERM):
-        os.kill(self.pid, signal)
-        print "pyana process %d has been killed "% self.pid
-
-
+        code = self.poll()
+        if code is None: 
+            os.kill(self.pid, signal)
+            print "pyana process %d has been killed "% self.pid
+            return 1
+        else :
+            print "No pyana process to kill... "
+            if code==0 : 
+                print "Finished successfully"
+            else :
+                print "Exited with code ", code
+                code = 1
+            return code
 
 #class MyThread( threading.Thread ):
 class MyThread( QtCore.QThread ):
@@ -84,6 +93,9 @@ class MyThread( QtCore.QThread ):
         print " !   python threads cannot be interupted..."
         print " !   you'll have to wait..."
         print " !   or ^Z and kill the whole xtcbrowser process."
+        # SOLUTION: Run the Plot gui in a subprocess, this subprocess then calls the thread.
+        # That should keep the other GUIs active, while the Plot GUI waits (or not) for pyana.
+        # Killing pyana thread then requires killing the Plot GUI subprocess.
         #self.terminate()  ... hangs indefinitely & freezes up the GUI
         #self.exit(0) ..... does nothing
         #self.quit() .... does nothing
@@ -143,6 +155,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.checkboxes = None
 
         self.proc_pyana = None
+        self.proc_status = None
 
         self.pvWindow = None
         self.pvGroupLayout = None
@@ -686,9 +699,16 @@ Start with selecting data of interest to you from list on the left and general r
 
         if self.pyana_button is None: 
             self.pyana_button = QtGui.QPushButton("&Run pyana")
+            self.pyana_button.setMaximumWidth(120)
+            self.proc_status = QtGui.QLabel("")
+            
             self.connect(self.pyana_button, QtCore.SIGNAL('clicked()'), self.run_pyana)
-            self.layout.addWidget( self.pyana_button )
-            self.layout.setAlignment( self.pyana_button, QtCore.Qt.AlignRight )
+
+            pyana_button_line = QtGui.QHBoxLayout()
+            pyana_button_line.addWidget( self.proc_status )
+            pyana_button_line.addWidget( self.pyana_button )
+            self.layout.addLayout( pyana_button_line  )
+            self.layout.setAlignment( pyana_button_line, QtCore.Qt.AlignRight )
         else :
             self.pyana_button.show()
 
@@ -782,6 +802,7 @@ Start with selecting data of interest to you from list on the left and general r
         if 1 :
             # calling a new process
             self.proc_pyana = myPopen(lpoptions) # this runs in separate thread.
+            self.proc_status.setText("pyana process %d is running "%self.proc_pyana.pid)
             #stdout_value = proc_pyana.communicate()[0]
             #print stdout_value
             # the benefit of this option is that the GUI remains unlocked
@@ -808,8 +829,11 @@ Start with selecting data of interest to you from list on the left and general r
             print "I'm back"
             
             
+        self.pyana_button.setDisabled(True)
+            
         if self.quit_pyana_button is None :
             self.quit_pyana_button = QtGui.QPushButton("&Quit pyana")
+            self.quit_pyana_button.setMaximumWidth(120)
             self.connect(self.quit_pyana_button, QtCore.SIGNAL('clicked()'), self.quit_pyana )
             self.layout.addWidget( self.quit_pyana_button )
             self.layout.setAlignment( self.quit_pyana_button, QtCore.Qt.AlignRight )
@@ -820,8 +844,14 @@ Start with selecting data of interest to you from list on the left and general r
         """Kill the pyana process
         """
         if self.proc_pyana :
-            print "Killing pyana process"
-            self.proc_pyana.kill()
+
+            statustext = {1 : "process %d killed"%self.proc_pyana.pid,
+                          0 : "process %d finished successfully"%self.proc_pyana.pid }
+            status = self.proc_pyana.kill()
+
+            self.pyana_button.setDisabled(False)        
+            self.proc_status.setText(statustext[status])
+            self.quit_pyana_button.hide()
             return
 
         print "No pyana process to stop"

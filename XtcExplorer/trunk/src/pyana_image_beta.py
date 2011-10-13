@@ -214,8 +214,9 @@ class  pyana_image_beta ( object ) :
             print "  sections      : %s" % str(map(config.sections, quads))
             print
         
-            self.cspad = CsPad(config)
-            self.cspad.set_pedestals( self.pedestalfile )
+            sections = map(config.sections, quads)
+            self.cspad = CsPad(sections)
+            self.cspad.load_pedestals( self.pedestalfile )
             
 
         self.image_type = None

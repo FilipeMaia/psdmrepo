@@ -4,6 +4,7 @@
 # 
 
 import numpy as np
+import logging
 import matplotlib.pyplot as plt
 from utilities import PyanaOptions 
 from utilities import BldData
@@ -41,6 +42,11 @@ class  pyana_bld ( object ) :
         self.plot_every_n = opt.getOptInteger(plot_every_n)
         self.accumulate_n = opt.getOptInteger(accumulate_n)
         self.mpl_num      = opt.getOptInteger(fignum)
+
+        # output file:
+        # ... when multiprocessing is on, each subprocess accumulate separately.
+        #     The only automatic way to merge the results is to use env.mkfile
+        self.outputfile = None
 
         # other
         self.n_shots = None
@@ -101,8 +107,12 @@ class  pyana_bld ( object ) :
 
 
     def beginjob ( self, evt, env ) : 
+        logging.info("pyana_bld.beginjob() called, process %d"%env.subprocess())
+
         self.n_shots = 0
         self.accu_start = 0
+
+        self.outputfile = env.mkfile("bld_%s.dat"%env.jobName(),mode='w',bufsize=-1)
 
         self.data = {}
         if self.do_EBeam:  self.data["EBeam"]       = BldData("EBeam") 
@@ -110,11 +120,16 @@ class  pyana_bld ( object ) :
         if self.do_PC :    self.data["PhaseCavity"] = BldData("PhaseCavity") 
         if self.do_ipimb : self.data["SharedIpimb"] = BldData("SharedIpimb") 
 
+        self.doPlot = (env.subprocess()<1) and (self.plot_every_n != 0)
 
     def event ( self, evt, env ) :
-
         self.n_shots += 1
+        self.doPlot = self.doPlot and (self.n_shots%self.plot_every_n)==0 
 
+        self.outputfile.write("from process %d, event # %d\n"%(env.subprocess(),self.n_shots))
+        return
+
+        # if a prior module has failed a filter...
         if evt.get('skip_event'):
             return
 
@@ -204,8 +219,7 @@ class  pyana_bld ( object ) :
                     self.IPM_fex_position.append( [0.0,0.0] )
                     
         # ----------------- Plotting --------------------- 
-        if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
-
+        if self.doPlot :
             header = "shots %d-%d" % (self.accu_start, self.n_shots)
             self.make_plots(self.mpl_num, suptitle=header)
 
@@ -227,21 +241,22 @@ class  pyana_bld ( object ) :
     def endjob( self, evt, env ) :
         
         print "EndJob has been reached"
+        self.outputfile.close()
 
         # ----------------- Plotting ---------------------
-        header = "shots %d-%d" % (self.accu_start, self.n_shots)
-        self.make_plots(self.mpl_num, suptitle=header)
+        if (env.subprocess()<1):
+            header = "shots %d-%d" % (self.accu_start, self.n_shots)
+            self.make_plots(self.mpl_num, suptitle=header)
 
-        # flag for pyana_plotter
-        evt.put(True, 'show_event')
+            # flag for pyana_plotter
+            evt.put(True, 'show_event')
 
-        data_bld = []
-        for name,data in self.data.iteritems() :
-            data_bld.append( data )
-                    
-        # give the list to the event object
-        evt.put( data_bld, 'data_bld' )
-
+            data_bld = []
+            for name,data in self.data.iteritems() :
+                data_bld.append( data )
+                
+            # give the list to the event object
+            evt.put( data_bld, 'data_bld' )
 
 
     def make_plots(self, fignum = 1, suptitle = ""):
@@ -251,6 +266,8 @@ class  pyana_bld ( object ) :
         
         if self.do_EBeam :
             if len(self.EB_charge) > 0 :
+
+                print "Making plot of array of length %d"%len(self.EB_charge)
 
                 # numpy arrays
                 xaxis = np.arange( self.accu_start, self.n_shots ) 
