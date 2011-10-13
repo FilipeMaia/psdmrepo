@@ -104,6 +104,10 @@ private:
   boost::scoped_ptr<boost::thread> m_readerThread;    ///< Thread which does datagram reading
   psddl_pds2psana::XtcConverter m_cvt;                ///< Data converter object
   Pds::ClockTime m_transitions[Pds::TransitionId::NumberOf];  ///< Timestamps of the observed transitions
+  unsigned long m_skipEvents;                         ///< Number of events (L1Accept transitions) to skip
+  unsigned long m_maxEvents;                          ///< Number of events (L1Accept transitions) to process
+  unsigned long m_l1Count;                            ///< Number of events (L1Accept transitions) seen so far
+  int m_simulateEOR;                                  ///< if non-zero then simulate endRun/stop
 };
 
 } // namespace PSXtcInput

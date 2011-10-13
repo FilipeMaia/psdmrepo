@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2011-10-04 Andy Salnikov
+- implemented event skipping and max event number
+
 Tag: V00-00-13
 2011-10-04 Andy Salnikov
 - XtcInputModule now adds EventId and datagram objects to the event in

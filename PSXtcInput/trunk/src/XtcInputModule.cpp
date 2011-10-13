@@ -58,7 +58,15 @@ XtcInputModule::XtcInputModule (const std::string& name)
   , m_putBack()
   , m_readerThread()
   , m_cvt()
+  , m_skipEvents(0)
+  , m_maxEvents(0)
+  , m_l1Count(0)
+  , m_simulateEOR(0)
 {
+  // get number of events to process/skip from psana configuration
+  ConfigSvc::ConfigSvc cfg;
+  m_skipEvents = cfg.get("psana", "skip-events", 0UL);
+  m_maxEvents = cfg.get("psana", "events", 0UL);
 }
 
 //--------------
@@ -136,6 +144,21 @@ XtcInputModule::event(Event& evt, Env& env)
 {
   MsgLog(name(), debug, name() << ": in event()");
 
+  // are we in the simulated EOR/EOF
+  if (m_simulateEOR > 0) {
+    // fake EndRun, prepare to stop on next call
+    MsgLog(name(), debug, name() << ": simulated EOR");
+    fillEventId(m_putBack, evt);
+    fillEventDg(m_putBack, evt);
+    // negative means stop at next call
+    m_simulateEOR = -1;
+    return EndRun;
+  } else if (m_simulateEOR < 0) {
+    // fake EOF
+    MsgLog(name(), debug, name() << ": simulated EOF");
+    return Stop;
+  }
+
   Status status = Skip;
   bool found = false;
   while (not found) {
@@ -190,6 +213,8 @@ XtcInputModule::event(Event& evt, Env& env)
     case Pds::TransitionId::EndRun:
       // signal end of run, content is not relevant
       if (not (clock == m_transitions[trans])) {
+        fillEventId(dg, evt);
+        fillEventDg(dg, evt);
         status = EndRun;
         found = true;
         m_transitions[trans] = clock;
@@ -211,6 +236,8 @@ XtcInputModule::event(Event& evt, Env& env)
     case Pds::TransitionId::EndCalibCycle:
       // stop calib cycle
       if (not (clock == m_transitions[trans])) {
+        fillEventId(dg, evt);
+        fillEventDg(dg, evt);
         status = EndCalibCycle;
         found = true;
         m_transitions[trans] = clock;
@@ -219,12 +246,39 @@ XtcInputModule::event(Event& evt, Env& env)
     
     case Pds::TransitionId::L1Accept:
       // regular event
-      fillEnv(dg, env);
-      fillEvent(dg, evt, env);
-      fillEventId(dg, evt);
-      fillEventDg(dg, evt);
-      found = true;
-      status = DoEvent;
+
+      if (m_maxEvents and m_l1Count >= m_skipEvents+m_maxEvents) {
+
+        // reached event limit, will go in simulated end-of-run
+        MsgLog(name(), debug, name() << ": event limit reached, simulated EndCalibCycle");
+        fillEventId(dg, evt);
+        fillEventDg(dg, evt);
+        found = true;
+        status = EndCalibCycle;
+        m_simulateEOR = 1;
+        // remember datagram to be used in simulated EndRun
+        m_putBack = dg;
+
+      } else if (m_l1Count < m_skipEvents) {
+
+        // skipping the events, note that things like environment and EPICS need to be updated
+        MsgLog(name(), debug, name() << ": skipping event");
+        fillEnv(dg, env);
+        found = true;
+        status = Skip;
+
+      } else {
+
+        fillEnv(dg, env);
+        fillEvent(dg, evt, env);
+        fillEventId(dg, evt);
+        fillEventDg(dg, evt);
+        found = true;
+        status = DoEvent;
+
+      }
+      ++m_l1Count;
+
       break;
     
     case Pds::TransitionId::Unknown:
