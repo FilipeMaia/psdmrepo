@@ -15,6 +15,7 @@
 //-----------------
 #include <string>
 #include <iostream>
+#include <iomanip>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -133,6 +134,18 @@ test_compress::runApp ()
     m_inputSize = m_sizeOpt.value();
   }
 
+  uLong adler = adler32(0L, Z_NULL, 0);
+  adler = adler32(adler, m_input, m_inputSize);
+  std::cout << "adler32: " << std::hex << adler << std::dec << std::endl;
+
+  uLong adler1 = adler32(0L, Z_NULL, 0);
+  uLong adler2 = adler32(0L, Z_NULL, 0);
+  adler1 = adler32(adler1, m_input, m_inputSize/2);
+  adler2 = adler32(adler2, m_input+m_inputSize/2, m_inputSize-m_inputSize/2);
+  adler = adler32(0L, NULL, 0);
+  adler = adler32_combine(adler, adler1, m_inputSize/2);
+  adler = adler32_combine(adler, adler2, m_inputSize-m_inputSize/2);
+  std::cout << "adler32 combined: " << std::hex << adler << std::dec << std::endl;
 
   // guess the size of output data
   uLong outBufSize = m_inputSize + m_inputSize/100 + 12;

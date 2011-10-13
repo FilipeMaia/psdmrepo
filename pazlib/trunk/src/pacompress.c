@@ -326,7 +326,7 @@ int ZEXPORT compress2(Bytef *dest, uLongf *destLen,
   }
 
   /* we are not thread-safe, so lock global mutex to serialize everything after here */
-  DBGMSG((stderr, "pazlib: lock global mutex\n", thread))
+  DBGMSG((stderr, "pazlib: lock global mutex\n"))
   rc = pthread_mutex_lock(&pazlib_sync);
   if (rc) {
     fprintf(stderr, "pazlib: pthread_mutex_lock failed: %s\n", strerror(rc));
@@ -343,6 +343,7 @@ int ZEXPORT compress2(Bytef *dest, uLongf *destLen,
   /* number of bytes per thread in input and outbut buffers */
   bytesPerThread = sourceLen / numThreads;
   outBytesPerThread = *destLen / numThreads;
+  DBGMSG((stderr, "pazlib: sourceLen=%lu destLen=%lu\n", sourceLen, *destLen))
   DBGMSG((stderr, "pazlib: bytes per thread src = %lu dst = %lu\n", bytesPerThread, outBytesPerThread))
 
   /* pass the data to all threads */
@@ -462,7 +463,7 @@ int ZEXPORT compress2(Bytef *dest, uLongf *destLen,
   adler = adler32(0L, NULL, 0);
   for (thread = 0; thread < numThreads; ++ thread) {
     adler = adler32_combine(adler, th_data[thread].adler, th_data[thread].sourceLen);
-    DBGMSG((stderr, "pazlib: th_data[%d]: adler=%lu sum_adler=%lu\n", thread, th_data[thread].adler, adler))
+    DBGMSG((stderr, "pazlib: th_data[%d]: adler=%#lx sum_adler=%#lx\n", thread, th_data[thread].adler, adler))
   }
 
   /* add adler checksum */

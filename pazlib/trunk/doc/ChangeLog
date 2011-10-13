@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2011-10-12 Andy Salnikov
+- there is a bug in adler32_combine() in zlib 1.2.3-3 which is currently
+  istalled on our machines: https://bugzilla.redhat.com/show_bug.cgi?id=622779
+- copy correct version of adler32.c into package, will build it into libpazlib
+
 Tag: V00-00-03
 2011-09-12 Andy Salnikov
 - threads are created in detached state
