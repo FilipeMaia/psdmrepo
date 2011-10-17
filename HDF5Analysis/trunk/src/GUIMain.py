@@ -43,6 +43,7 @@ import ConfigParameters   as cp
 import GUIHDF5Tree        as guiselitems
 import GUIDataSets        as guidatasets
 import GUIConfiguration   as guiconfig
+import GUIHelp            as guihelp
 
 #import PrintHDF5          as printh5 # for my print_group(g,offset)
 #import GUIPlayer          as guiplr
@@ -86,6 +87,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.butDataSets  = QtGui.QPushButton("3. Select parameters in datasets")
         self.butPlayer    = QtGui.QPushButton("4. Reserved")
         self.butConfig    = QtGui.QPushButton("Configuration")
+        self.butHelp      = QtGui.QPushButton("Help")
         self.butSave      = QtGui.QPushButton("Save")
         self.butExit      = QtGui.QPushButton("Exit")
 
@@ -101,6 +103,7 @@ class GUIMain ( QtGui.QWidget ) :
         hboxC = QtGui.QHBoxLayout()
         hboxC.addWidget(self.butHDF5GUI)
         hboxC.addStretch(1)
+        hboxC.addWidget(self.butHelp)
         
         hboxE = QtGui.QHBoxLayout()
         hboxE.addWidget(self.butDataSets)
@@ -143,6 +146,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.connect(self.butDataSets,  QtCore.SIGNAL('clicked()'),          self.processDataSets )
         self.connect(self.butPlayer,    QtCore.SIGNAL('clicked()'),          self.processPlayer )
         self.connect(self.butConfig,    QtCore.SIGNAL('clicked()'),          self.processConfig )
+        self.connect(self.butHelp,      QtCore.SIGNAL('clicked()'),          self.processHelp )
         self.connect(self.butSave,      QtCore.SIGNAL('clicked()'),          self.processSave )
         self.connect(self.butExit,      QtCore.SIGNAL('clicked()'),          self.processQuit )
         self.connect(self.editFile,     QtCore.SIGNAL('editingFinished ()'), self.processEditFile )
@@ -165,7 +169,7 @@ class GUIMain ( QtGui.QWidget ) :
 
     def setButtonColors(self):
         #self.styleYellow = "background-color: rgb(255, 255, 230); color: rgb(0, 0, 0)" # Yellowish
-        #self.stylePink   = "background-color: rgb(255, 240, 245); color: rgb(0, 0, 0)" # Pinkish
+        self.stylePink   = "background-color: rgb(255, 230, 230); color: rgb(0, 0, 0)" # Pinkish
         self.styleGreen  = "background-color: rgb(220, 255, 220); color: rgb(0, 0, 0)" # Greenish
         self.styleGray   = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0)" # Pinkish
 
@@ -180,6 +184,8 @@ class GUIMain ( QtGui.QWidget ) :
 
         if cp.confpars.step04IsDone : self.butPlayer  .setStyleSheet(self.styleGray)
         else                        : self.butPlayer  .setStyleSheet(self.styleGreen)
+
+        self.butHelp.setStyleSheet(self.stylePink)
 
 
     def setFrame(self):
@@ -199,7 +205,6 @@ class GUIMain ( QtGui.QWidget ) :
     def moveEvent(self, e):
         #print 'moveEvent' 
         cp.confpars.posGUIMain = (self.pos().x(),self.pos().y())
-
 
     #def processPrint(self):
     #    fname = cp.confpars.dirName+'/'+cp.confpars.fileName
@@ -231,7 +236,11 @@ class GUIMain ( QtGui.QWidget ) :
         print 'Exit button is clicked'
         self.close()
 
-
+    def processHelp(self):
+        print 'Help button is clicked'
+        cp.confpars.guihelp = guihelp.GUIHelp()
+        cp.confpars.guihelp.show()
+    
     def processBrowse(self):
         print 'Browse'
         cp.confpars.step01IsDone = True

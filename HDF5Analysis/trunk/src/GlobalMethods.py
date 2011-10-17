@@ -134,6 +134,24 @@ def CSpadIsInTheName(dsname):
 
 #----------------------------------
 
+def CSpadElementIsInTheName(dsname):
+    path1,name1 = os.path.split(str(dsname))
+    path2,name2 = os.path.split(str(path1))
+    path3,name3 = os.path.split(str(path2))
+    if name3[0:14] == 'CsPad::Element' and name1 == 'data' : return True
+    else                                                   : return False
+
+#----------------------------------
+
+def CSpadMiniElementIsInTheName(dsname):
+    path1,name1 = os.path.split(str(dsname))
+    path2,name2 = os.path.split(str(path1))
+    path3,name3 = os.path.split(str(path2))
+    if name3[0:18] == 'CsPad::MiniElement' and name1 == 'data' : return True
+    else                                                       : return False
+
+#----------------------------------
+
 def CSpadDatasetIsChecked():
     for dsname in cp.confpars.list_of_checked_item_names :
         if CSpadIsInTheName(dsname) : return True
