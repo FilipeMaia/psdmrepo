@@ -12,6 +12,22 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-01
+
+2011-10-18 Mikhail S. Dubrovin
+
+- Add in example access to cxi37411 constants
+- The HDF5Methods.getOneCSPadEventForTest() now retreave 
+  configuration for each event:
+	cspadconfig.setCSPadConfiguration( fname, dsname, event )
+  We need it if the set of sensors is not complete, 
+  like in Dsd now (3 2x1 are missing).
+	
+- Changed modules:
+	       src/CSPadConfigPars.py
+	       src/CSPadImageProducer.py
+	       src/CalibPars.py
+	       src/HDF5Methods.py
+
 2011-10-17 Mikhail S. Dubrovin
 	
   CSPadImageProducer.py <- see the test example in main
