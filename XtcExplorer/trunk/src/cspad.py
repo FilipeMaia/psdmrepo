@@ -1,6 +1,9 @@
 import numpy as np
 import math
 import scipy.ndimage.interpolation as interpol
+from utilities import Plotter
+
+np.set_printoptions(precision=3,suppress=True)
 
 class CsPad( object ):
     """CsPad class for creating CsPad image for an event within pyana
@@ -31,9 +34,12 @@ class CsPad( object ):
         # the image visually, but requires interpolation, 
         # and makes the display rather slow... 
         
-        
         self.read_alignment(path)
-
+        
+        self.x_coordinates = None
+        self.y_coordinates = None
+        self.z_coordinates = None
+        self.make_coordinate_map()
 
 
     def read_alignment(self, path = None, file=None):
@@ -92,6 +98,53 @@ class CsPad( object ):
                                 quad_shift*[1,1,1]] ).T
         self.quad_offset = quad_position + quad_offset + quad_gap + quad_shift
 
+    def make_coordinate_map(self):
+        """Make coordinate maps from meterology file
+        """
+        print "Making coordinate map of the CSPAD detector."
+        self.x_coordinates = np.zeros((4,8,185,388), dtype="float")
+        self.y_coordinates = np.zeros((4,8,185,388), dtype="float")
+        self.z_coordinates = np.zeros((4,8,185,388), dtype="float")
+
+        def get_asics(bigsection):
+            """Utility function"""
+            asic0 = bigsection[:,0:194]
+            asic1 = bigsection[:,(391-194):]
+            asics = np.concatenate( (asic0,asic1), axis=1 )
+            return asics
+        
+        # section pixel array / grid
+        rr,cc = np.mgrid[0:185:185j, 0:391:391j]
+        
+        # now compute the "fractional pixels"
+        rrfrac = rr / 185.0
+        ccfrac = cc / 391.0
+        
+        # remove the 3-pixel gap
+        rrfrac = get_asics(rrfrac)
+        ccfrac = get_asics(ccfrac)
+        
+        sec_coords = np.array([rrfrac,ccfrac])
+        
+        # load data from metrology file (ignore first column)
+        quads = np.loadtxt("XtcExplorer/calib/CSPad/cspad_2011-08-10-Metrology.txt")[:,1:]
+        quads = quads.reshape(4,8,4,3)
+        
+        for quad in range(4):
+            
+            for sec in range(8):
+                
+                # corner values
+                input_x = quads[quad,sec,(1,2,0,3),0].reshape(2,2)
+                input_y = quads[quad,sec,(1,2,0,3),1].reshape(2,2)
+                input_z = quads[quad,sec,(1,2,0,3),2].reshape(2,2)
+        
+                # interpolate coordinates over to the pixel map
+                self.x_coordinates[quad,sec] = interpol.map_coordinates(input_x, sec_coords)
+                self.y_coordinates[quad,sec] = interpol.map_coordinates(input_y, sec_coords)
+                self.z_coordinates[quad,sec] = interpol.map_coordinates(input_z, sec_coords)
+
+        print "Done making coordinate map of the CSPAD detector."
 
 
     def get_mini_image(self, element ):
@@ -218,7 +271,19 @@ class CsPad( object ):
         #   +-------+ 0 | 1 |
         #   |   3   |   |   |
         #   +-------+---+---+
-
+        #
+        # each section read from the event has "landscape" orientation
+        # with 185 rows (first index) and 2*194 columns (2nd index)
+        #   - Sections 0,1: "portrait" orientation / tilted 90 degrees counter clockwise:
+        #                    first index increases from left to right, 2nd index increases from bottom to top, 
+        #   - Sections 2,3: "landscape" orientation / as is:
+        #                    first index increases from top to bottom, 2nd index increases from left to right
+        #   - Sections 4,5: "portrait" orientation / tilted 90 degrees clockwise:
+        #                    first index increases from right to left, 2nd index increases from top to bottom, 
+        #   - Sections 6,7: "landscape" orientation / as is:
+        #                    first index increases from top to bottom, 2nd index increases from left to right
+        #   Again, the orientations of the Sections for quadrant 1 are rotated 90 degrees clockwise
+    
         pairs = []
         for i in range (8) :
         

@@ -42,16 +42,17 @@ axis "y", pointing to the left (column number), is as follows:
  #   |   3   |   |   |
  #X  +-------+---+---+  <-- this corner is near beamline, for all quadrants. 
 
-Here's the description from pdsdata (where the arrays are in "portrait" orientation
-for some reason): 
-//  Each "Section" is composed of 2*194 rows by 185 columns with the following 
-//  orientations (for quadrant 0):
-//    Sections 0,1: row index increases from bottom to top, column index increases from left to right
-//    Sections 2,3: row index increases from left to right, column index increases from top to bottom
-//    Sections 4,5: row index increases from top to bottom, column index increases from right to left
-//    Sections 6,7: row index increases from left to right, column index increases from top to bottom
-//  Again, the orientations of the Sections for quadrant 1 are rotated 90 degrees clockwise 
-//  and so on for each successive quadrant.
+ # each section read from the event has "landscape" orientation
+ # with 185 rows (first index) and 2*194 columns (2nd index)
+ #   - Sections 0,1: "portrait" orientation / tilted 90 degrees counter clockwise:
+ #                    first index increases from left to right, 2nd index increases from bottom to top, 
+ #   - Sections 2,3: "landscape" orientation / as is:
+ #                    first index increases from top to bottom, 2nd index increases from left to right
+ #   - Sections 4,5: "portrait" orientation / tilted 90 degrees clockwise:
+ #                    first index increases from right to left, 2nd index increases from top to bottom, 
+ #   - Sections 6,7: "landscape" orientation / as is:
+ #                    first index increases from top to bottom, 2nd index increases from left to right
+ #   Again, the orientations of the Sections for quadrant 1 are rotated 90 degrees clockwise
 
 --------------------------------------------------------------------------------
 3) The center position of each section in the quadrant is determined from optical 

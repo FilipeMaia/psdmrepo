@@ -10,7 +10,7 @@ from   pypdsdata import xtc
 from utilities import PyanaOptions
 from utilities import EncoderData
 
-
+import logging
 
 # analysis class declaration
 class  pyana_encoder ( object ) :
@@ -69,6 +69,16 @@ class  pyana_encoder ( object ) :
         self.data = {}
         for source in self.sources :
             self.data[source] = EncoderData( source ) 
+
+            config = env.getConfig(xtc.TypeId.Type.Id_EncoderConfig, source)
+            message = "%s configuration: \n"%source
+            message += "  Channel number = %s \n"%config._chan_num
+            message += "  Counter mode = %s \n"%config._count_mode
+            message += "  Quadrature mode = %s \n"%config._quadrature_mode
+            message += "  Trigger input number = %s \n"%config._input_num
+            message += "  Trigger on Rising Edge? = %s \n"%config._input_rising 
+            message += "  Timestamp tics per sec = %s"%config._ticks_per_sec           
+            logging.info(message)
             
     def event ( self, evt, env ) :
 
@@ -81,9 +91,25 @@ class  pyana_encoder ( object ) :
         for source in self.sources :
 
             encoder = evt.get(xtc.TypeId.Type.Id_EncoderData, source )
-            if encoder :
-                self.values[source].append( encoder.value() )
-                self.counts[source].append( encoder._encoder_count )
+            if encoder:
+                print "Found encoder data in event", type(encoder).__name__
+                if type(encoder).__name__ =='DataV1':
+                    self.values[source].append( encoder.value() )
+                    self.counts[source].append( encoder._encoder_count )
+                if type(encoder).__name__ == 'DataV2':
+                    print encoder._encoder_count
+                    print encoder._33mhz_timestamp
+                    i = 0
+                    for val in encoder._encoder_count:
+                        print "encoder count ", val
+                        print "encoder value ", encoder.value(i)
+                        i+=1
+                        
+                    self.values[source].append( encoder.value(1) )
+                    self.counts[source].append( encoder._encoder_count[1] )
+                else:
+                    print "Unknown type"
+
                 self.timestmps[source].append( encoder._33mhz_timestamp )
             else :
                 print "pyana_encoder: No EncoderData from %s found" % source

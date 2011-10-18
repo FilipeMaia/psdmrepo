@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Oct-18 ofte                  rev 2528
+          - Added cspad coordinate maps, based directly on meterology measurements. 
+
 2011-Oct-13 ofte                  rev 2520
           - improvements to the run pyana / quit pyana interface. 
 	  - bugfix in pyana_image_beta (cspad)

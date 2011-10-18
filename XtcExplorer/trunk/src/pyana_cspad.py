@@ -177,7 +177,6 @@ class  pyana_cspad ( object ) :
                 
         quads = range(4)
         sections = map(config.sections, quads)
-        print "beginjob: ", sections
 
         self.cspad = CsPad(sections)
         self.data = CsPadData(self.img_source)

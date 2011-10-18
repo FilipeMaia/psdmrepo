@@ -356,19 +356,22 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         
         self.directory = "/reg/d/psdm/"
         self.directory += (self.instrument + "/")
-        #print self.directory
         
         # add subdirectories to experiment selector
         dirList=os.listdir(self.directory)
         for fname in dirList:
             self.comboBoxExp.addItem(fname)
 
+        print "Current directory: %s (%s)"%(self.directory,os.path.exists(self.directory))
+
     def set_experiment(self):
         self.experiment = self.comboBoxExp.currentText()
         try:
             self.directory = "/reg/d/psdm/" + self.instrument + "/" + self.experiment + "/xtc/"
+            print "Current directory: %s (%s)"%(self.directory,os.path.exists(self.directory))
         except:
             pass
+        
 
     def set_runnumber(self):
 

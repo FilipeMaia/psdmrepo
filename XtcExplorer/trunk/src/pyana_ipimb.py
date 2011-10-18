@@ -91,6 +91,28 @@ class  pyana_ipimb ( object ) :
         self.data = {}
         for source in self.sources :
             self.data[source] = IpimbData( source ) 
+
+            # just for information:
+            config = env.getConfig( xtc.TypeId.Type.Id_IpimbConfig , source )
+            print "IPIMB %s configuration info: "%source
+            print "   Acquisition window (ns) ", config.resetLength()
+            print "   Reset delay (ns) ", config.resetDelay()
+            print "   Reference voltage ", config.chargeAmpRefVoltage()
+            print "   Diode bias voltage ", config.diodeBias()
+            print "   Sampling delay (ns) ", config.trigDelay()
+            #print "   trigger counter ", config.triggerCounter()
+            #print "   serial ID ", config.serialID()
+            #print "   charge amp range ", config.chargeAmpRange()
+            #print "   calibration range ", config.calibrationRange()
+            #print "   calibration voltage ", config.calibrationVoltage()
+            #print "   status ", config.status()
+            #print "   errors ", config.errors()
+            #print "   calStrobeLength ", config.calStrobeLength()
+            #try: # These are only for ConfigV2
+            #    print "   trigger ps delay ", config.trigPsDelay()
+            #    print "   adc delay ", config.adcDelay()
+            #except:
+            #    pass
             
     def event ( self, evt, env ) :
 
