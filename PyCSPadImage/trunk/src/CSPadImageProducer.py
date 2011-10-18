@@ -93,6 +93,7 @@ class CSPadImageProducer (object) :
 
 #       for ind in xrange(1): # loop over ind = 0,1,2,...,7
         for ind in xrange(8): # loop over ind = 0,1,2,...,7
+
             pair = indPairsInQuads[self.quad][ind]
             #print 'quad,ind,pair=', self.quad, ind, pair
             if pair == -1 : continue
@@ -262,42 +263,96 @@ class CSPadImageProducer (object) :
 
 #----------------------------------------------
 
-def main() :
+def main_calib() :
 
-    print 'Start test'
-    calp.calibpars.setCalibPars( run      = 9,
-                                 calibdir = '/reg/d/psdm/CXI/cxi35711/calib',
-                                 group    = 'CsPad::CalibV1',
-                                 source   = 'CxiDs1.0:Cspad.0' )
+    print 'Start test in main_calib()'
+    #calp.calibpars.setCalibPars( run      = 9,
+    #                             calibdir = '/reg/d/psdm/CXI/cxi35711/calib',
+    #                             group    = 'CsPad::CalibV1',
+    #                             source   = 'CxiDs1.0:Cspad.0' )
 
+    calp.calibpars.setCalibParsForPath ( run  = 1,
+                                         path = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0' )
+    #                                    path = '/reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0' )
+    #                                    path = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDsd.0:Cspad.0' )
+    #                                    path = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi37411-r0038-Dsd/' )
+    #                                    path = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi37411-r0080-Ds1' )
+    #                                    path = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi35711-r0009-det' )
+    
     print 'CSPadImageProducer() object initialization'
     cspadimg = CSPadImageProducer()
 
     print 'Get one raw CSPad event: ',   
-    ds1ev = hm.getOneCSPadEventForTest( fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5',
-                                        dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data',
-                                        event  = 1 )
+    event = 0
+
+    fname  = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0080.h5'
+    #fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5'
+    #fname  = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0039.h5'
+
+    #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
+    dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDsd.0:Cspad.0/data'
+
+    ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
     print 'ds1ev.shape = ',ds1ev.shape
 
-    print 'Make the CSPad image from raw event array'
+    print 'Make the CSPad image from raw array for event', event
     #arr = cspadimg.getImageArrayForPair( ds1ev, pairNum=3 )
     #arr = cspadimg.getImageArrayForQuad( ds1ev, quadNum=2 )
     arr = cspadimg.getImageArrayForCSPadElement( ds1ev )
     #print 'arr = \n',arr
 
     print 'Plot CSPad image'
-    gg.plotImage(arr,range=(0,2000),figsize=(11.6,10))
+    gg.plotImage(arr,range=(-10,50),figsize=(11.6,10))
     gg.move(200,100)
     #gg.plotImageAndSpectrum(arr,range=(1,2001))
-    gg.plotSpectrum(arr,range=(10,2000))
+    gg.plotSpectrum(arr,range=(-10,50))
     gg.move(50,50)
     gg.show()
 
-#---------------------
+#----------------------------------------------
+
+def main_example() :
+
+    print 'Start test in main_example()'
+
+    calp.calibpars.setCalibParsForPath ( run  = 1,
+                                         path = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0' )
+    #                                    path = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDsd.0:Cspad.0' )
+    #                                    path = '/reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0' )
+
+    print 'CSPadImageProducer() object initialization'
+    cspadimg = CSPadImageProducer()
+
+    print 'Get one raw CSPad event: ',   
+
+    #fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5'
+    #fname  = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0080.h5'
+    fname  = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0039.h5'
+
+    #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDsd.0:Cspad.0/data'
+    dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
+    event  = 0
+
+    ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
+    print 'ds1ev.shape = ',ds1ev.shape
+
+    print 'Make the CSPad image from raw array for event', event
+    arr = cspadimg.getImageArrayForCSPadElement( ds1ev )
+
+    print 'Plot CSPad image'
+    gg.plotImage(arr,range=(-10,90),figsize=(11.6,10))
+    gg.move(200,100)
+    gg.plotSpectrum(arr,range=(-10,90))
+    gg.move(50,50)
+    #gg.plotImageAndSpectrum(arr,range=(1,2001))
+    gg.show()
+
+#----------------------------------------------
 
 if __name__ == "__main__" :
 
-    main()
+    #main_calib()
+    main_example()
     sys.exit ( 'End of test.' )
 
 #----------------------------------------------

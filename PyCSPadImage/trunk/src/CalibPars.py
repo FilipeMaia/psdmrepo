@@ -100,6 +100,22 @@ class CalibPars (object) :
 
         self.run = run
         self.path_to_calib_types = calibdir + '/' + group + '/' + source + '/'
+        self.loadAllCalibPars ()
+
+#---------------------
+
+    def setCalibParsForPath (self,
+                      run      = None, # 1
+                      path     = '/reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0' ) :
+        """ Set calibration parameters for specified input pars"""
+
+        self.run = run
+        self.path_to_calib_types = path + '/'
+        self.loadAllCalibPars ()
+
+#---------------------
+
+    def loadAllCalibPars (self) :
 
         self.cpars = {}
 
@@ -119,7 +135,7 @@ class CalibPars (object) :
     def loadCalibParsFromFileOrDefault (self, fname, type) :
 
         if fname == None :
-            return self.loadCalibParsDefault (fname, type)
+            return self.getCalibParsDefault (type)
 
         try :
             return np.loadtxt (fname)

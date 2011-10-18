@@ -99,7 +99,7 @@ class CSPadConfigPars(object) :
         """For each event"""
         el_dsname  = gm.get_item_path_to_last_name(dsname) + '/element'
         ds_element = self.h5file[el_dsname]
-        return self.ds_element[event]['quad']
+        return ds_element[event]['quad']
 
 #---------------------
 
@@ -110,6 +110,9 @@ class CSPadConfigPars(object) :
         self.dsConf = None
         for vers in range(100) :
             self.cspad_config_ds_name = self.dsnameCSpadVXConf + str(vers) + '/' + item_second_to_last_name + '/config' 
+
+            #print 'Try to get CSPad configuration from the dataset:\n',self.cspad_config_ds_name 
+
             try:
                 self.dsConf = self.h5file[self.cspad_config_ds_name]      # t=0.01us
                 break
@@ -143,7 +146,7 @@ class CSPadConfigPars(object) :
         # Once per file:
             self.fileNameWithAlreadySetCSPadConfiguration = fname            
             self.indPairsInQuads = self.getIndPairsInQuads( dsname )
-            print "Indexes of pairs in quads =\n", self.indPairsInQuads 
+            #print "Indexes of pairs in quads =\n", self.indPairsInQuads 
 
         hm.hdf5mets.close_hdf5_file()
 
@@ -164,8 +167,12 @@ cspadconfig = CSPadConfigPars()
 
 def main() :
     """This is an example of how to use this class"""
-    fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5'
-    dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
+    #fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5'
+    #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
+    #event  = 1
+
+    fname  = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0039.h5'
+    dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDsd.0:Cspad.0/data'
     event  = 1
 
     print 'Default CSPad configuration pars:'

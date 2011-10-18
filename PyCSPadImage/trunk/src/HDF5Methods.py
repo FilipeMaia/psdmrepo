@@ -34,6 +34,7 @@ import h5py
 #import numpy as np
 
 #import ConfigParameters as cp
+import CSPadConfigPars as ccp
 
 #---------------------
 #  Class definition --
@@ -93,6 +94,10 @@ class HDF5Methods(object) :
 def getOneCSPadEventForTest( fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5',
                              dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data',
                              event  = 1 ) :
+
+    ccp.cspadconfig.setCSPadConfiguration( fname, dsname, event )
+    #ccp.cspadconfig.printCSPadConfigPars()
+
     file    = h5py.File(fname, 'r')
     dataset = file[dsname]
     return dataset[event]
