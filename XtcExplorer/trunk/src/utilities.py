@@ -717,11 +717,11 @@ class Plotter(object):
         plt.draw()
         plt.show()
 
-    def plot_several(self, fignum, list_of_arrays, title="" ):
+    def plot_several(self, list_of_arrays, fignum=1, title="" ):
         """ Draw several frames in one canvas
         
-        @fignum                  figure number, i.e. fig = plt.figure(num=fignum)
         @list_of_arrays          a list of tuples (title, array)
+        @fignum                  figure number, i.e. fig = plt.figure(num=fignum)
         @return                  new display_mode if any (else return None)
         """
         #if self.fig is None: 

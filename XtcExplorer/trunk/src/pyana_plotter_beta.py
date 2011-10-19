@@ -227,7 +227,7 @@ class pyana_plotter_beta (object) :
                         list_for_plotting.append( (name,array,data.name) )
                         
                     fignum += 1
-                    self.plotter.plot_several(fignum, list_for_plotting,
+                    self.plotter.plot_several(list_for_plotting, fignum=fignum,
                                               title="%s event#%d" % (data.name,self.n_shots))
                     plt.draw()
                     #self.plotter.draw_func_lookup[name](array,title=data.name)

@@ -128,32 +128,75 @@ class CsPad( object ):
         sec_coord_order = [(1,2,0,3),(1,2,0,3),(2,3,1,0),(2,3,1,0),(3,0,2,1),(3,0,2,1),(2,3,1,0),(2,3,1,0)]
         
         # load data from metrology file (ignore first column)
-        quads = np.loadtxt("XtcExplorer/calib/CSPad/cspad_2011-08-10-Metrology.txt")[:,1:]
-        quads = quads.reshape(4,8,4,3)
-        
+        metrology = np.loadtxt("XtcExplorer/calib/CSPad/cspad_2011-08-10-Metrology.txt")[:,1:]
+        metrology = metrology.reshape(4,8,4,3)
+
+        # also, we need to resort the 2x1 sections, they are
+        # listed in the file in the order 1,0,3,2,4,5,7,6
+        metrology = metrology[:,(1,0,3,2,4,5,7,6),:,:]
+
+        # orientation (row, col)
+        orientation = ["L","L","P","P","L","L","P","P"]
+
+        dLong = np.zeros((4,8,2), dtype="float64")
+        dShort = np.zeros((4,8,2), dtype="float64")
         for quad in range(4):
-            
+
             for sec in range(8):
-                
+
                 # corner values
-                input_x = quads[quad,sec,sec_coord_order[sec],0].reshape(2,2)
-                input_y = quads[quad,sec,sec_coord_order[sec],1].reshape(2,2)
-                input_z = quads[quad,sec,sec_coord_order[sec],2].reshape(2,2)
+                input_x = metrology[quad,sec,sec_coord_order[sec],0].reshape(2,2)
+                input_y = metrology[quad,sec,sec_coord_order[sec],1].reshape(2,2)
+                input_z = metrology[quad,sec,sec_coord_order[sec],2].reshape(2,2)
+                #print "X ", input_x
+                #print "Y ", input_y
+                #print "Z ", input_z
         
                 # interpolate coordinates over to the pixel map
                 self.x_coordinates[quad,sec] = interpol.map_coordinates(input_x, sec_coords)
                 self.y_coordinates[quad,sec] = interpol.map_coordinates(input_y, sec_coords)
                 self.z_coordinates[quad,sec] = interpol.map_coordinates(input_z, sec_coords)
+                #print "z ", self.z_coordinates[quad,sec]
                 
                 # ! in micrometers! Need to convert to pixel units
+                dL = np.array([ abs(input_x[0,1]-input_x[0,0])/391, 
+                                abs(input_x[1,1]-input_x[1,0])/391,
+                                abs(input_y[0,0]-input_y[0,1])/391,
+                                abs(input_y[1,0]-input_y[1,1])/391 ])
+                dLong[quad,sec] = dL[dL>100] # filter out the nonsense ones
+                
+                dS = np.array([ abs(input_y[0,0]-input_y[1,0])/185,
+                                abs(input_y[0,1]-input_y[1,1])/185, 
+                                abs(input_x[0,0]-input_x[1,0])/185,
+                                abs(input_x[0,1]-input_x[1,1])/185 ])
+                dShort[quad,sec] = dS[dS>100] # filter out the nonsense ones
+
+
+        dTotal = np.concatenate( (dLong.ravel(), dShort.ravel() ))
+        print "Pixel-size:"
+        print "     long side average:    %.2f +- %.2f "%( dLong.mean(), dLong.std())
+        print "     short side average:   %.2f +- %.2f "%( dShort.mean(), dShort.std())
+        print "     all sides average:    %.2f +- %.2f "%( dTotal.mean(), dTotal.std())
+
+        # use the total to convert it all to pixel units
+        self.x_coordinates = self.x_coordinates / dTotal.mean()
+        self.y_coordinates = self.y_coordinates / dTotal.mean()
+        self.z_coordinates = self.z_coordinates / dTotal.mean()
+        
 
         print "Done making coordinate map of the CSPAD detector."
-        # test
         #np.savetxt("xcoord.txt",self.x_coordinates.reshape((4*8*185,388)),fmt='%.1f')
-        #self.make_image(self.x_coordinates)
-        #plotter = Plotter()
-        #plotter.plot_image(self.image)
-        #plt.show()
+
+        # test
+        #list_of_images = []
+        #list_of_images.append( ("X-coordinates",self.make_image(self.x_coordinates)) )
+        #list_of_images.append( ("Y-coordinates",self.make_image(self.y_coordinates)) )
+        #list_of_images.append( ("Z-coordinates",self.make_image(self.z_coordinates)) )
+        # 
+        # plotter = Plotter()
+        # #plotter.plot_image(self.image, title="Z-coordinates")
+        # plotter.plot_several(list_of_images, title="CS-Pad (2011-08-10-Metrology)")
+        # plt.show()
 
     def get_mini_image(self, element ):
         """get_2x2_image
@@ -211,7 +254,7 @@ class CsPad( object ):
         """
         self.pixels = data2d.reshape(4,8,185,388)
 
-        self.image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype="uint16")
+        self.image = np.zeros((2*self.npix_quad+100, 2*self.npix_quad+100 ), dtype="float64")
         for quad in xrange (4):
 
             quad_image = self.get_quad_image( self.pixels[quad], quad )
@@ -225,8 +268,8 @@ class CsPad( object ):
             self.image[qoff_x:qoff_x+self.npix_quad, qoff_y:qoff_y+self.npix_quad]=quad_image
 
         # mask out hot/saturated pixels (16383)
-        im_hot_masked = np.ma.masked_greater_equal( self.image, 16383 )
-        self.image = np.ma.filled( im_hot_masked, 0)
+        #im_hot_masked = np.ma.masked_greater_equal( self.image, 16383 )
+        #self.image = np.ma.filled( im_hot_masked, 0)
         return self.image
          
     def load_pedestals(self, pedestalsfile ):

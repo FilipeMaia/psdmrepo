@@ -11,7 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-2011-Oct-19 ofte                  rev 2528
+2011-Oct-19 ofte                  rev 2532
+	- Fixed another bug. The coordinate maps are now correct. They have been 
+	  converted to pixel units. 
+	
+2011-Oct-19 ofte                  rev 2530
           - a fix to the coordinate map, to get the section alignment in. Still missing: 
 	    1) convert to pixel units, 2) make use of coordinate map for plotting.
 	
