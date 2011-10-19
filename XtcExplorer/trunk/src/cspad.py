@@ -2,7 +2,7 @@ import numpy as np
 import math
 import scipy.ndimage.interpolation as interpol
 from utilities import Plotter
-
+import matplotlib.pyplot as plt
 np.set_printoptions(precision=3,suppress=True)
 
 class CsPad( object ):
@@ -125,6 +125,7 @@ class CsPad( object ):
         ccfrac = get_asics(ccfrac)
         
         sec_coords = np.array([rrfrac,ccfrac])
+        sec_coord_order = [(1,2,0,3),(1,2,0,3),(2,3,1,0),(2,3,1,0),(3,0,2,1),(3,0,2,1),(2,3,1,0),(2,3,1,0)]
         
         # load data from metrology file (ignore first column)
         quads = np.loadtxt("XtcExplorer/calib/CSPad/cspad_2011-08-10-Metrology.txt")[:,1:]
@@ -135,17 +136,24 @@ class CsPad( object ):
             for sec in range(8):
                 
                 # corner values
-                input_x = quads[quad,sec,(1,2,0,3),0].reshape(2,2)
-                input_y = quads[quad,sec,(1,2,0,3),1].reshape(2,2)
-                input_z = quads[quad,sec,(1,2,0,3),2].reshape(2,2)
+                input_x = quads[quad,sec,sec_coord_order[sec],0].reshape(2,2)
+                input_y = quads[quad,sec,sec_coord_order[sec],1].reshape(2,2)
+                input_z = quads[quad,sec,sec_coord_order[sec],2].reshape(2,2)
         
                 # interpolate coordinates over to the pixel map
                 self.x_coordinates[quad,sec] = interpol.map_coordinates(input_x, sec_coords)
                 self.y_coordinates[quad,sec] = interpol.map_coordinates(input_y, sec_coords)
                 self.z_coordinates[quad,sec] = interpol.map_coordinates(input_z, sec_coords)
+                
+                # ! in micrometers! Need to convert to pixel units
 
         print "Done making coordinate map of the CSPAD detector."
-
+        # test
+        #np.savetxt("xcoord.txt",self.x_coordinates.reshape((4*8*185,388)),fmt='%.1f')
+        #self.make_image(self.x_coordinates)
+        #plotter = Plotter()
+        #plotter.plot_image(self.image)
+        #plt.show()
 
     def get_mini_image(self, element ):
         """get_2x2_image
