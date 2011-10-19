@@ -272,10 +272,10 @@ def main_calib() :
     #                             source   = 'CxiDs1.0:Cspad.0' )
 
     calp.calibpars.setCalibParsForPath ( run  = 1,
-                                         path = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0' )
+    #                                    path = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0' )
     #                                    path = '/reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0' )
-    #                                    path = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDsd.0:Cspad.0' )
-    #                                    path = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi37411-r0038-Dsd/' )
+                                         path = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDsd.0:Cspad.0' )
+    #                                    path = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi37411-r0039-Dsd/' )
     #                                    path = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi37411-r0080-Ds1' )
     #                                    path = '/reg/neh/home/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi35711-r0009-det' )
     
@@ -285,9 +285,9 @@ def main_calib() :
     print 'Get one raw CSPad event: ',   
     event = 0
 
-    fname  = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0080.h5'
     #fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5'
-    #fname  = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0039.h5'
+    #fname  = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0080.h5'
+    fname  = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0039.h5'
 
     #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
     dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDsd.0:Cspad.0/data'

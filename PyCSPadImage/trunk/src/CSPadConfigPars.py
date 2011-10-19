@@ -91,15 +91,28 @@ class CSPadConfigPars(object) :
        #self.dsnameCSpadV3Conf= "/Configure:0000/CsPad::ConfigV3/"                        #CxiDs1.0:Cspad.0/config - is added auto
         self.dsnameCSpadVXConf= "/Configure:0000/CsPad::ConfigV"
 
-        self.fileNameWithAlreadySetCSPadConfiguration = 'File name for CSPad configuration is not set yet...'
+       #self.fileNameWithAlreadySetCSPadConfiguration = 'File name for CSPad configuration is not set yet...'
 
 #---------------------
 
     def getQuadNumsInEvent( self, dsname, event=0 ):
         """For each event"""
         el_dsname  = gm.get_item_path_to_last_name(dsname) + '/element'
-        ds_element = self.h5file[el_dsname]
-        return ds_element[event]['quad']
+        try:
+            ds_element = self.h5file[el_dsname]
+        except KeyError: 
+            print 80*'!'
+            print 'WARNING: The CSPad configuration for "element" dataset is not found. Default will be used'
+            print 80*'!'
+            return self.quadNumsInEvent
+
+        try:
+            return ds_element[event]['quad']
+        except KeyError: 
+            print 80*'!'
+            print 'WARNING: The CSPad configuration for ds_element[event][quad] is not found. Default will be used'
+            print 80*'!'
+            return self.quadNumsInEvent
 
 #---------------------
 
@@ -122,7 +135,7 @@ class CSPadConfigPars(object) :
 
         if self.dsConf == None :
             print 80*'!'
-            print 'WARNING: The CSPad configuration dataset is not found. Default versin will be used'
+            print 'WARNING: The CSPad configuration for "config" dataset is not found. Default will be used'
             print 80*'!'
             return self.indPairsInQuads
         else :
@@ -141,14 +154,29 @@ class CSPadConfigPars(object) :
         self.h5file = hm.hdf5mets.open_hdf5_file(fname) 
 
         self.quadNumsInEvent = self.getQuadNumsInEvent( dsname, event )
+        self.indPairsInQuads = self.getIndPairsInQuads( dsname )
 
-        if fname != self.fileNameWithAlreadySetCSPadConfiguration :
+        #if fname != self.fileNameWithAlreadySetCSPadConfiguration :
         # Once per file:
-            self.fileNameWithAlreadySetCSPadConfiguration = fname            
-            self.indPairsInQuads = self.getIndPairsInQuads( dsname )
+            #self.fileNameWithAlreadySetCSPadConfiguration = fname            
             #print "Indexes of pairs in quads =\n", self.indPairsInQuads 
 
         hm.hdf5mets.close_hdf5_file()
+        #self.printCSPadConfigPars()
+
+#---------------------
+
+    def setCSPadConfigurationFromOpenFile( self, h5file, dsname, event=0 ):
+        """Takes the CSPad configuration parameters from open hdf5 file."""
+        if gm.CSpadMiniElementIsInTheName(dsname) :
+            print 'getCSpadConfiguration(...): This is a CSpadMiniElement. Special configuration is not required'
+            self.isCSPad2x2 = True
+            return
+
+        self.h5file = h5file
+        self.quadNumsInEvent = self.getQuadNumsInEvent( dsname, event )
+        self.indPairsInQuads = self.getIndPairsInQuads( dsname )
+        #self.printCSPadConfigPars()
 
 #---------------------
 
