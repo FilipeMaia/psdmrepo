@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Oct-19 ofte                  rev 2534
+	- mostly improvemetns to the pyana run control. Added suspend/resume button.
+	
 2011-Oct-19 ofte                  rev 2532
 	- Fixed another bug. The coordinate maps are now correct. They have been 
 	  converted to pixel units. 

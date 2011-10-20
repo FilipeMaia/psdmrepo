@@ -135,9 +135,6 @@ class CsPad( object ):
         # listed in the file in the order 1,0,3,2,4,5,7,6
         metrology = metrology[:,(1,0,3,2,4,5,7,6),:,:]
 
-        # orientation (row, col)
-        orientation = ["L","L","P","P","L","L","P","P"]
-
         dLong = np.zeros((4,8,2), dtype="float64")
         dShort = np.zeros((4,8,2), dtype="float64")
         for quad in range(4):
@@ -187,16 +184,16 @@ class CsPad( object ):
         print "Done making coordinate map of the CSPAD detector."
         #np.savetxt("xcoord.txt",self.x_coordinates.reshape((4*8*185,388)),fmt='%.1f')
 
-        # test
+        ## test
         #list_of_images = []
         #list_of_images.append( ("X-coordinates",self.make_image(self.x_coordinates)) )
         #list_of_images.append( ("Y-coordinates",self.make_image(self.y_coordinates)) )
         #list_of_images.append( ("Z-coordinates",self.make_image(self.z_coordinates)) )
         # 
-        # plotter = Plotter()
-        # #plotter.plot_image(self.image, title="Z-coordinates")
-        # plotter.plot_several(list_of_images, title="CS-Pad (2011-08-10-Metrology)")
-        # plt.show()
+        #plotter = Plotter()
+        ##plotter.plot_image(self.image, title="Z-coordinates")
+        #plotter.plot_several(list_of_images, title="CS-Pad (2011-08-10-Metrology)")
+        #plt.show()
 
     def get_mini_image(self, element ):
         """get_2x2_image

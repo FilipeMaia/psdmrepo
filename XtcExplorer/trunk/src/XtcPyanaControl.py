@@ -60,21 +60,23 @@ from pyana import pyanamod
 #  Class definition --
 #---------------------
 class myPopen(subprocess.Popen):
-    def kill(self, signal = signal.SIGTERM):
-        code = self.poll()
-        if code is None: 
-            os.kill(self.pid, signal)
-            print "pyana process %d has been killed "% self.pid
-            return 1
-        else :
-            print "No pyana process to kill... "
-            if code==0 : 
-                print "Finished successfully"
-            else :
-                print "Exited with code ", code
-                code = 1
-            return code
+    status = 1 # running
 
+    def kill(self, signal = signal.SIGTERM):
+        os.kill(self.pid, signal)
+        print  "pyana process %d has been killed "% self.pid
+        status = 0 # not running
+
+    def suspend(self):
+        os.kill(self.pid, signal.SIGSTOP)
+        print "pyana process %d has been suspended "% self.pid
+        status = 2 # suspended
+
+    def resume(self):
+        os.kill(self.pid, signal.SIGCONT)
+        print "pyana process %d has been resumed "%self.pid
+        status = 1
+        
 #class MyThread( threading.Thread ):
 class MyThread( QtCore.QThread ):
     """Run pyana module in a separate thread. This allows the GUI windows
@@ -86,6 +88,11 @@ class MyThread( QtCore.QThread ):
     Still some issues to look into:
     - matplotlib figure must be created before pyana runs
     - This begs embedded mpl in a tool GUI. 
+    Issues: 
+    - Pyana threads are unkillable. Will keep going while GUI hangs. 
+    # SOLUTION: Run the Plot gui in a subprocess, this subprocess then spawns the thread.
+    # That should keep the other GUIs active, while the Plot GUI waits (or not) for pyana.
+    # Killing pyana thread then requires killing the Plot GUI subprocess.
     """
     def __init__(self,pyanastring = ""):
         self.lpoptions = pyanastring
@@ -102,15 +109,12 @@ class MyThread( QtCore.QThread ):
         return self._stop.isSet()
 
     def kill(self):
-        print " !   python threads cannot be interupted..."
-        print " !   you'll have to wait..."
-        print " !   or ^Z and kill the whole xtcbrowser process."
-        # SOLUTION: Run the Plot gui in a subprocess, this subprocess then calls the thread.
-        # That should keep the other GUIs active, while the Plot GUI waits (or not) for pyana.
-        # Killing pyana thread then requires killing the Plot GUI subprocess.
         #self.terminate()  ... hangs indefinitely & freezes up the GUI
         #self.exit(0) ..... does nothing
         #self.quit() .... does nothing
+        print " !   python threads cannot be interupted..."
+        print " !   you'll have to wait..."
+        print " !   or ^Z and kill the whole xtcbrowser process."
         print "done killing"
     
 
@@ -163,6 +167,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.proc_pyana = None
         self.proc_status = None
         self.configfile = None
+        self.runstring = None
 
         self.pvWindow = None
         self.scrollArea = None
@@ -176,7 +181,8 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.config_button = None
         self.econfig_button = None
         self.pyana_button = None
-        self.quit_pyana_button = None
+        self.quit_button = None
+        self.susp_button = None
 
         self.scan_widget = None
         self.pyana_widget = None
@@ -235,9 +241,59 @@ Start with selecting data of interest to you from list on the left and general r
         self.intro_tab()
         h1.addWidget(self.config_tabs)
 
-        # header
+        # bottom layer: pyana run control
+        h2 = self.layout_runcontrol()
+
+        # 
         self.layout.addLayout(h0)
         self.layout.addLayout(h1)
+        self.layout.addLayout(h2)
+
+    def layout_runcontrol(self):
+
+        # Run pyana button
+        self.pyana_button = QtGui.QPushButton("&Run pyana")
+        self.pyana_button.setMaximumWidth(120)
+        self.connect(self.pyana_button, QtCore.SIGNAL('clicked()'), self.run_pyana)
+
+        # Suspend pyana button
+        self.susp_button = QtGui.QPushButton("&Suspend pyana")
+        self.susp_button.setCheckable(True) # Toggle two states: suspend / resume
+        self.susp_button.setMaximumWidth(120)
+        self.connect(self.susp_button, QtCore.SIGNAL('clicked()'), self.suspend_pyana )
+
+        # Quit pyana button
+        self.quit_button = QtGui.QPushButton("&Quit pyana")
+        self.quit_button.setMaximumWidth(120)
+        self.connect(self.quit_button, QtCore.SIGNAL('clicked()'), self.quit_pyana )
+
+        # pyana runstring
+        self.runstring_label = QtGui.QLabel("")
+
+        # process status
+        self.proc_status = QtGui.QLabel("")
+
+        pyana_button_line = QtGui.QHBoxLayout()
+        pyana_button_line.addWidget( self.runstring_label )
+        pyana_button_line.addWidget( self.pyana_button )
+
+        pyana_qsusp_line = QtGui.QHBoxLayout()
+        pyana_qsusp_line.addWidget( self.proc_status )
+        pyana_qsusp_line.addWidget( self.susp_button )
+        pyana_qsusp_line.addWidget( self.quit_button )
+        
+        self.runcontrol = QtGui.QVBoxLayout()
+        self.runcontrol.addLayout( pyana_button_line  )
+        self.runcontrol.addLayout( pyana_qsusp_line  )
+        self.runcontrol.setAlignment( pyana_button_line, QtCore.Qt.AlignRight )
+        self.runcontrol.setAlignment( pyana_qsusp_line, QtCore.Qt.AlignRight )
+
+        # hide all first
+        self.pyana_button.hide()
+        self.susp_button.hide()
+        self.quit_button.hide()
+
+        return self.runcontrol
 
                 
     def intro_tab(self):
@@ -657,7 +713,8 @@ Start with selecting data of interest to you from list on the left and general r
         self.configfile = None
         if self.econfig_button is not None : self.econfig_button.hide()
         if self.pyana_button is not None: self.pyana_button.hide()
-        if self.quit_pyana_button is not None: self.quit_pyana_button.hide()
+        if self.quit_button is not None: self.quit_button.hide()
+        if self.susp_button is not None: self.susp_button.hide()
 
         self.pyana_txtbox.setTitle("Current pyana configuration:")
 
@@ -1040,20 +1097,9 @@ Start with selecting data of interest to you from list on the left and general r
         self.config_button.setDisabled(True)
         self.econfig_button.setEnabled(True)
 
-        if self.pyana_button is None: 
-            self.pyana_button = QtGui.QPushButton("&Run pyana")
-            self.pyana_button.setMaximumWidth(120)
-            self.proc_status = QtGui.QLabel("")
-            
-            self.connect(self.pyana_button, QtCore.SIGNAL('clicked()'), self.run_pyana)
+        self.pyana_runstring()
+        self.pyana_button.show()
 
-            pyana_button_line = QtGui.QHBoxLayout()
-            pyana_button_line.addWidget( self.proc_status )
-            pyana_button_line.addWidget( self.pyana_button )
-            self.layout.addLayout( pyana_button_line  )
-            self.layout.setAlignment( pyana_button_line, QtCore.Qt.AlignRight )
-        else :
-            self.pyana_button.show()
 
     def edit_configfile(self):
         # pop up emacs window to edit the config file as needed:
@@ -1088,15 +1134,8 @@ Start with selecting data of interest to you from list on the left and general r
         self.print_configuration
         print "Done"
 
-
-    def run_pyana(self):
-        """Run pyana
-
-        Open a dialog to allow chaging options to pyana. Wait for OK, then
-        run pyana with the needed modules and configurations as requested
-        based on the the checkboxes
-        """
-
+ 
+    def pyana_runstring(self):
         # Make a command sequence 
         lpoptions = []
         lpoptions.append("pyana")
@@ -1114,19 +1153,30 @@ Start with selecting data of interest to you from list on the left and general r
         for file in self.filenames :
             lpoptions.append(file)
 
-        # turn sequence into a string, allow user to modify it
-        runstring = ' '.join(lpoptions)
+        self.runstring = ' '.join(lpoptions)
+
+    def run_pyana(self):
+        """Run pyana
+
+        Open a dialog to allow chaging options to pyana. Wait for OK, then
+        run pyana with the needed modules and configurations as requested
+        based on the the checkboxes
+        """
+        lpoptions = self.runstring.split(' ')
+
         dialog =  QtGui.QInputDialog()
         dialog.resize(400,400)
         #dialog.setMinimumWidth(1500)
+
         text, ok = dialog.getText(self,
                                   'Pyana options',
                                   'Run pyana with the following command (edit as needed and click OK):',
                                   QtGui.QLineEdit.Normal,
-                                  text=runstring )
+                                  text=self.runstring)
+
         if ok:
-            runstring = str(text)
-            lpoptions = runstring.split(' ')
+            self.runstring = str(text)
+            lpoptions = self.runstring.split(' ')
 
             # and update run_n and skip_n in the Gui:
             if "-n" in lpoptions:
@@ -1171,33 +1221,69 @@ Start with selecting data of interest to you from list on the left and general r
             self.proc_pyana.start()
             print "I'm back"
 
-
         self.pyana_button.setDisabled(True)
+        self.susp_button.show()
+        self.quit_button.show()
+        self.susp_button.setDisabled(False)
+        self.quit_button.setDisabled(False)
             
-        if self.quit_pyana_button is None :
-            self.quit_pyana_button = QtGui.QPushButton("&Quit pyana")
-            self.quit_pyana_button.setMaximumWidth(120)
-            self.connect(self.quit_pyana_button, QtCore.SIGNAL('clicked()'), self.quit_pyana )
-            self.layout.addWidget( self.quit_pyana_button )
-            self.layout.setAlignment( self.quit_pyana_button, QtCore.Qt.AlignRight )
-        else :
-            self.quit_pyana_button.show()
 
     def quit_pyana(self) :
         """Kill the pyana process
         """
+        statustext = ""
+
         if self.proc_pyana :
+            # is it running? 
+            status = self.proc_pyana.poll()
+            pid = self.proc_pyana.pid
+            if status is None: 
+                self.proc_pyana.kill()
+                statustext = "pyana process %d has been killed"%pid
+            else :
+                statustext = "pyana process %d has finished (returncode %d)"%(pid,status)
+        else :
+            print "No pyana process to stop"
 
-            statustext = {1 : "process %d killed"%self.proc_pyana.pid,
-                          0 : "process %d finished successfully"%self.proc_pyana.pid }
-            status = self.proc_pyana.kill()
+        self.proc_status.setText(statustext)
 
-            self.pyana_button.setDisabled(False)        
-            self.proc_status.setText(statustext[status])
-            self.quit_pyana_button.hide()
-            return
+        # double check
+        status = self.proc_pyana.poll()
+        if status is not None: 
+            self.quit_button.setDisabled(True)
+            self.susp_button.setDisabled(True)
+        else:
+            print "finishing... ?"
+            print os.system("ps -u ofte")
 
-        print "No pyana process to stop"
+
+    def suspend_pyana(self):
+        """suspend or resume the pyana process
+        """
+        checked = self.susp_button.isChecked()
+
+        statustext = "" 
+        buttontext = ""
+        if self.proc_pyana :
+            # is it running? 
+            status = self.proc_pyana.poll()
+            pid = self.proc_pyana.pid
+            if status is None: 
+                if checked :
+                    self.proc_pyana.suspend()
+                    statustext = "pyana process %d has been suspended"%pid
+                    buttontext = "Resume"
+                else :
+                    self.proc_pyana.resume()
+                    statustext = "pyana process %d has been resumed"%pid 
+                    buttontext = "Suspend"                   
+            else :
+                statustext = "pyana process %d has finished (returncode %d)"%(pid,status)
+        else :
+            print "No pyana process to suspend or resume"
+
+        self.proc_status.setText(statustext)
+        self.susp_button.setText(buttontext)
 
 
     #--------------------------------

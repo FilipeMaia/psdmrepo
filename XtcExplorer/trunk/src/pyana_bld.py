@@ -43,11 +43,6 @@ class  pyana_bld ( object ) :
         self.accumulate_n = opt.getOptInteger(accumulate_n)
         self.mpl_num      = opt.getOptInteger(fignum)
 
-        # output file:
-        # ... when multiprocessing is on, each subprocess accumulate separately.
-        #     The only automatic way to merge the results is to use env.mkfile
-        self.outputfile = None
-
         # other
         self.n_shots = None
         self.accu_start = None
@@ -112,8 +107,6 @@ class  pyana_bld ( object ) :
         self.n_shots = 0
         self.accu_start = 0
 
-        self.outputfile = env.mkfile("bld_%s.dat"%env.jobName(),mode='w',bufsize=-1)
-
         self.data = {}
         if self.do_EBeam:  self.data["EBeam"]       = BldData("EBeam") 
         if self.do_GasDet: self.data["GasDetector"] = BldData("GasDetector")
@@ -125,9 +118,6 @@ class  pyana_bld ( object ) :
     def event ( self, evt, env ) :
         self.n_shots += 1
         self.doPlot = self.doPlot and (self.n_shots%self.plot_every_n)==0 
-
-        self.outputfile.write("from process %d, event # %d\n"%(env.subprocess(),self.n_shots))
-        return
 
         # if a prior module has failed a filter...
         if evt.get('skip_event'):
@@ -232,7 +222,12 @@ class  pyana_bld ( object ) :
                     
             # give the list to the event object
             evt.put( data_bld, 'data_bld' )
-
+        else:
+            print "bld doPlot is False ",
+            print "subprocess < 1 ? ", (env.subprocess()<1)
+            print "plot_every_n ? ", self.plot_every_n 
+            print "modulus? ", (self.n_shots%self.plot_every_n)
+            
         # --------- Reset -------------
         if self.accumulate_n!=0 and (self.n_shots%self.accumulate_n)==0 :
             self.resetlists()
@@ -241,7 +236,6 @@ class  pyana_bld ( object ) :
     def endjob( self, evt, env ) :
         
         print "EndJob has been reached"
-        self.outputfile.close()
 
         # ----------------- Plotting ---------------------
         if (env.subprocess()<1):
