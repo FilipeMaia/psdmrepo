@@ -36,8 +36,9 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 import ConfigParameters as cp
-import GlobalMethods    as gm
 import GUIDataSetTree   as guidstree
+
+#import GlobalMethods    as gm
 
 #---------------------
 #  Class definition --
