@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-09
+2011-10-24 Andy Salnikov
+- standardExternalPackage() has new kw argument COPYLIBS  which specifies 
+  the list of libraries to copy (instead of symlink)
+
 Tag: V00-01-08
 2011-09-12 Andy Salnikov
 - unit test builder generates a build error if unit test fails

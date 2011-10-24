@@ -94,9 +94,10 @@ def standardExternalPackage ( package, **kw ) :
         PYDIRSEP - if present and evaluates to True installs python code to a 
                    separate directory arch/$SIT_ARCH/python/<package>
         LIBDIR   - libraries directory, absolute or relative to PREFIX
-        LINKLIBS - library names to link, or all libs if not present
+        COPYLIBS - library names to copy
+        LINKLIBS - library names to link, or all libs if LINKLIBS and COPYLIBS are empty
         BINDIR   - binaries directory, absolute or relative to PREFIX
-        LINKBINS - binary names to link, or all libs if not present
+        LINKBINS - binary names to link, or all binaries if not present
         PKGLIBS  - names of libraries that have to be linked for this package
         DEPS     - names of other packages that we depend upon
     """
@@ -168,11 +169,30 @@ def standardExternalPackage ( package, **kw ) :
     lib_dir = _absdir ( prefix, kw.get('LIBDIR') )
     if lib_dir is not None :
         trace ( "lib_dir: %s" % lib_dir, "standardExternalPackage", 5 )
+
+        # list of libraries to copy
+        copylibs = kw.get('COPYLIBS')
+        trace ( "copylibs: %s" % copylibs, "standardExternalPackage", 5 )
+        if copylibs:
+            copylibs = _glob ( lib_dir, copylibs )
+            trace ( "copylibs: %s" % copylibs, "standardExternalPackage", 5 )
+            for f in copylibs :
+                loc = pjoin(lib_dir,f)
+                if os.path.isfile(loc) :
+                    #targ = env.Install( "$LIBDIR", loc )
+                    targ = env.Install ( env.subst("$LIBDIR"), loc )
+                    trace ( "copylib: %s -> %s" % (loc, str(targ[0])), "standardExternalPackage", 5 )
+                    env['ALL_TARGETS']['LIBS'].extend ( targ )
         
         # make a list of libs to link
         libraries = kw.get('LINKLIBS')
         trace ( "libraries: %s" % libraries, "standardExternalPackage", 5 )
-        libraries = _glob ( lib_dir, libraries )
+        if not libraries and copylibs:
+            # if COPYLIBS is there but not LINKLIBS do not lin anything
+            libraries = []
+        else:
+            # even if LINKLIBS is empty link all libraries
+            libraries = _glob ( lib_dir, libraries )
             
         trace ( "libraries: %s" % libraries, "standardExternalPackage", 5 )
         for f in libraries :
