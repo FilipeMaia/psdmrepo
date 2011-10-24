@@ -28,6 +28,6 @@ if env['SIT_ARCH_PROC'] == 'x86_64' : PYDIR = "lib64"
 PYDIR += "/python"+env['PYTHON_VERSION']+"/site-packages"
 
 LIBDIR = "/afs/slac/package/lsf/curr/lib"
-LINKLIBS = "liblsf.so libbat.so"
+COPYLIBS = "liblsf.so libbat.so"
 
 standardExternalPackage ( pkg, **locals() )
