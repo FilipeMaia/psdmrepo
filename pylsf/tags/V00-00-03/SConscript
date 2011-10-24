@@ -1,0 +1,33 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package pylsf
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+pkg = "pylsf"
+pkg_ver = "20110926"
+PREFIX  = pjoin(env['SIT_ROOT'], "sw/external", pkg, pkg_ver)
+
+PYDIR = "lib"
+if env['SIT_ARCH_PROC'] == 'x86_64' : PYDIR = "lib64"
+PYDIR += "/python"+env['PYTHON_VERSION']+"/site-packages"
+
+LIBDIR = "/afs/slac/package/lsf/curr/lib"
+COPYLIBS = "liblsf.so libbat.so"
+
+standardExternalPackage ( pkg, **locals() )
