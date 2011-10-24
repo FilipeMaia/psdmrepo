@@ -11,7 +11,7 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: 00-02-01
+Tag: V00-02-01
 2011-10-24 Andy Salnikov
 - removed include Lusi/Lusi.h, no use for it any more
 
