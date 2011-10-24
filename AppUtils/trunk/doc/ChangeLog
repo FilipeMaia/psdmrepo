@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-10
+2011-10-24 Andy Salnikov
+- removed include Lusi.h
+
 Tag: V00-01-09
 2011-10-12 Andy Salnikov
 - clone LusiPython/LusiPyApp as AppBase claass in this package, LusiPyApp
