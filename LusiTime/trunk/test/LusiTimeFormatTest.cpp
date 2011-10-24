@@ -6,7 +6,6 @@
 //	Test suite case for the LusiTimeTest.
 //
 //------------------------------------------------------------------------
-#include "Lusi/Lusi.h"
 
 //---------------
 // C++ Headers --
