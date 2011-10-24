@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2011-10-24 Andy Salnikov
+- removed include Lusi.h
+
 Tag: V00-01-00
 2009-09-29 Andy Salnikov
 - MsgLogStream.h: changed the name of the temporary stream in macros to
