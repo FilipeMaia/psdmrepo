@@ -482,10 +482,13 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             if self.scan_button and self.scan_label :
                 # automatically enable full scan if smaller than 1.2G
                 if self.filesize < 1.2*1024**3 :
-                    self.scan_enable()
                     scantext = "Scan all events (%s)"%filesizetxt
+                    self.scan_button.setEnabled(True)
+                    self.scan_enable_button.setText("Disable full scan")
                 else :
                     scantext = "Scan all events (%s!)"%filesizetxt
+                    self.scan_button.setDisabled(True)
+                    self.scan_enable_button.setText("Enable full scan")
 
         status+="\t %s \n" % filesizetxt
         for filename in self.filenames :
@@ -509,7 +512,6 @@ class XtcExplorerMain (QtGui.QMainWindow) :
             else :
                 self.scan_button.setEnabled(True)
                 self.scan_enable_button.setText("Disable full scan")
-
 
     def scan_files(self, quick=False):
         """Scan xtc files

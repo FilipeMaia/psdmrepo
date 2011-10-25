@@ -11,6 +11,14 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Oct-25 ofte                  rev 2555
+	- fixed a bug with the "full scan" button and file size checking
+	- added a "mode" to pyana_waveform that can be 'average' (default) 
+	  or 'stack'. The latter stacks waveforms in a 2D array and plots it 
+	  like an image plot. Works fine for small arrays, but will run out of 
+	  memory if the "image" gets too big. 
+	  
+
 2011-Oct-19 ofte                  rev 2534
 	- mostly improvemetns to the pyana run control. Added suspend/resume button.
 	

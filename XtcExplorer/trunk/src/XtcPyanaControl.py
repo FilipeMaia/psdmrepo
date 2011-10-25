@@ -927,6 +927,7 @@ Start with selecting data of interest to you from list on the left and general r
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
+            options_for_mod[index].append("\nmode = average")
             return
                     
         # --- --- --- Ipimb --- --- ---
@@ -1246,15 +1247,18 @@ Start with selecting data of interest to you from list on the left and general r
             print "No pyana process to stop"
 
         self.proc_status.setText(statustext)
+        self.quit_button.setDisabled(True)
+        self.susp_button.setDisabled(True)
+        self.pyana_button.setDisabled(False)
 
-        # double check
-        status = self.proc_pyana.poll()
-        if status is not None: 
-            self.quit_button.setDisabled(True)
-            self.susp_button.setDisabled(True)
-        else:
-            print "finishing... ?"
-            print os.system("ps -u ofte")
+#        # double check
+#        status = self.proc_pyana.poll()
+#        if status is not None: 
+#            self.quit_button.setDisabled(True)
+#            self.susp_button.setDisabled(True)
+#        else:
+#            print "finishing... ?"
+#            print os.system("ps")
 
 
     def suspend_pyana(self):
