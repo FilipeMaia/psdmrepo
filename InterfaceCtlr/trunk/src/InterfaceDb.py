@@ -156,7 +156,7 @@ class Translator(object):
         return "Translator(id=%s, jobid=%s)" % (self.id, self.jobid)
 
 class Fileset(object):
-    def __init__(self, id, experiment, instrument, run_type, run_number, status, xtc_files, translator):
+    def __init__(self, id, experiment, instrument, run_type, run_number, status, xtc_files, translator, priority):
         self.id = id
         self.experiment = experiment
         self.instrument = instrument
@@ -166,6 +166,7 @@ class Fileset(object):
         self.status = status
         self.xtc_files = xtc_files[:]
         self.translator = translator
+        self.priority = priority
     def __str__(self):
         jobid = None
         if self.translator: jobid = self.translator.jobid
@@ -412,7 +413,7 @@ class InterfaceDb ( object ) :
         
         # find a matching fileset and lock it for update
         q = """SELECT fs.id id, fs.experiment, fs.instrument, run_type, run_number, 
-                      stat.name status, tr.id tr_id, tr.jobid, tr.output_dir
+                      stat.name status, tr.id tr_id, tr.jobid, tr.output_dir, fs.priority
                     FROM fileset fs LEFT OUTER JOIN translator_process tr ON tr.id = fs.translator_id, 
                     fileset_status_def stat, active_exp act
                     WHERE stat.name IN (%s) AND fs.fk_fileset_status = stat.id 
@@ -427,7 +428,7 @@ class InterfaceDb ( object ) :
         cursor.execute(q, vars)
         for row in cursor.fetchall():
             
-            id, experiment, instrument, run_type, run_number, fstatus, tr_id, jobid, output_dir = row
+            id, experiment, instrument, run_type, run_number, fstatus, tr_id, jobid, output_dir, priority = row
 
             # set lock flag 
             try :
@@ -443,7 +444,7 @@ class InterfaceDb ( object ) :
 
             translator = None
             if tr_id: translator = Translator(tr_id, jobid, output_dir)
-            res.append(Fileset(id, experiment, instrument, run_type, run_number, fstatus, xtc_files, translator))
+            res.append(Fileset(id, experiment, instrument, run_type, run_number, fstatus, xtc_files, translator, priority))
         
         self._log.debug('get_filesets: found %d filesets with status %s', len(res), status)        
         
@@ -515,7 +516,6 @@ class InterfaceDb ( object ) :
     @_synchronized
     @_transaction
     def change_fileset_status ( self, fileset_id, status, cursor=None ) :
-
         """ change the fileset to the requested status"""
 
         cursor.execute("""UPDATE fileset SET fk_fileset_status = (SELECT id FROM fileset_status_def WHERE name=%s), locked = FALSE 
@@ -528,8 +528,7 @@ class InterfaceDb ( object ) :
     @_synchronized
     @_transaction
     def change_fileset_priority ( self, fileset_id, priority, cursor=None ) :
-
-        """ change the fileset to the requested status"""
+        """ change the priority value for fileset"""
 
         cursor.execute("""UPDATE fileset SET priority = %s WHERE fileset.id = %s""", (priority, fileset_id) )
 

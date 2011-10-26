@@ -30,6 +30,7 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import os
+import time
 
 #---------------------------------
 #  Imports of base class module --
@@ -159,7 +160,6 @@ class TranslatorJob(object) :
 
         # update job status from LSF
         self._job.update()
-        self._name = self._job.name()
         
         lsf_status = self._job.status()
         exitCode = self._job.exitStatus()
@@ -169,12 +169,22 @@ class TranslatorJob(object) :
             
             # say that we are still running though, next iteration could fix it
             return self._status
+
+        # update name from LSF
+        self._name = self._job.name()
             
-        self.debug("[%s] Job %s status=%#x exitCode=%s", self._name, self._job, lsf_status, exitCode)
+        self.debug("[%s] %s status=%#x exitCode=%s", self._name, self._job, lsf_status, exitCode)
         if lsf_status & LSF.JOB_STAT_PEND:
             
             # still pending
             if self._fs.status != 'PENDING': self._update_fs_status('PENDING')
+            
+            # may decide to change priority still
+            self._checkDbPriority()
+            if self._fs.priority != self._job.priority():
+                self.trace("[%s] Job %s priority change %s to %s", self._name, self._job, self._job.priority(), self._fs.priority)
+                self._job.setPriority(self._fs.priority)
+            
             return self._status
         
         elif lsf_status & LSF.JOB_STAT_RUN:
@@ -229,7 +239,7 @@ class TranslatorJob(object) :
             
         else:
             
-            # store result in file manager
+            # copy resulting files to final destination
             h5dirname = self._get_config('output-dir', _defOutputDir, True)
             returncode = self.__store_hdf5(self._fs, self._outputDir, h5dirname)
             self._db.update_irods_status (self._id, returncode)
@@ -326,8 +336,13 @@ class TranslatorJob(object) :
                 else :
                     yield ( subdir, e )
 
-        # build a list of files to store
-        files = [ x for x in _all_files( tmpdirname ) ]
+        try:
+            # build a list of files to store
+            files = [ x for x in _all_files( tmpdirname ) ]
+        except Exception, e:
+            self.error("store_hdf5: failed to find output files in directory %s", tmpdirname)
+            self.error("store_hdf5: exception raised: %s", str(e) )
+            return 2
 
         # check that final destination does not have these files
         for f in files :
@@ -429,7 +444,9 @@ class TranslatorJob(object) :
         # submit a job
         self.info('submitting new job, command: %s\n  queue=%s, jobName=%s, log=%s, numProc=%s, resource=%s', \
                   cmd, queue, self._name, logname, numproc, resource)
-        job = LSF.submit(cmd, queue=queue, jobName=self._name, log=logname, numProc=numproc, resource=resource)
+        self._checkDbPriority()
+        job = LSF.submit(cmd, queue=queue, jobName=self._name, log=logname, numProc=numproc, 
+                         priority=self._fs.priority, resource=resource)
         self.trace('new job: %s', job)
         
         return job
@@ -499,6 +516,26 @@ class TranslatorJob(object) :
     
     def _update_fs_status(self, status):
         if self._fs.status != status: self._db.change_fileset_status (self._fs.id, status)
+
+    def _checkDbPriority(self):
+        """Check the value of dataset priority, update it if it's out of range"""
+
+        maxPriority = LSF.maxUserPriority()
+        if self._fs.priority is None or self._fs.priority < 1 :
+            
+            self.debug("Change database priority from %s to %s", self._fs.priority,  maxPriority / 2)
+            # 0 or negative means use default priority, LSF defines default as MAX/2
+            self._fs.priority = maxPriority / 2
+            # update priority in database
+            self._db.change_fileset_priority(self._fs.id, self._fs.priority)
+            
+        elif self._fs.priority > maxPriority:
+            
+            self.debug("Change database priority from %s to %s", self._fs.priority,  maxPriority)
+            # limit the priority value
+            self._fs.priority = maxPriority
+            # update priority in database
+            self._db.change_fileset_priority(self._fs.id, self._fs.priority)
     
     #                                                                                                                                                 
     #  Logging methods                                                                                                                                

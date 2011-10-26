@@ -84,6 +84,8 @@ class LSBError(Exception):
 # Local non-exported definitions --
 #----------------------------------
 
+_parameterinfo = None # result of lsb_parameterinfo()
+
 def _statStr(status):
     if status is None: return "NONE"
     res = []
@@ -146,16 +148,60 @@ class Job ( object ) :
     def exitStatus(self):
         return self._exitStatus
 
+    def priority(self):
+        return self._priority
+
     def __str__(self):
         return "Job(id=%s,status=%s)" % (lsf.lsb_jobid2str(self._jobid), _statStr(self._status))
     
     def update(self):
+        """ Retrieves job status information from LSF and updates internal state."""
+
+        data = self.__update()
+        if data:
+            # update status
+            self.__set(data)
+
+    def setPriority(self, priority):
+        """Change priority of the existing job"""
+        
+        data = self.__update()
+        if data is None:
+            logging.warning('Job.setPriority() failed to get current status for %s', self)
+            return
+
+        req = lsf.submit()
+        options, options2 = 0, 0
+        req.command = str(self._jobid)
+        if priority is not None:
+            options2 = options2 | lsf.SUB2_JOB_PRIORITY
+            req.userPriority = priority
+            
+        req.options = options
+        req.options2 = options2
+    
+        req.rLimits = data.submit.rLimits
+    
+        req.beginTime = data.submit.beginTime
+        req.termTime = 0
+        req.numProcessors = data.submit.numProcessors
+        req.maxNumProcessors = data.submit.maxNumProcessors
+        
+        reply = lsf.submitReply()
+    
+        job_id = lsf.lsb_modify(req, reply, self._jobid)
+        if job_id < 0:
+            raise LSBError()
+
+        self._priority = priority
+        
+    def __update(self):
         """ Retrieves job statrus information from LSF and updates internal state."""
 
         count = lsf.lsb_openjobinfo(self._jobid, None, "all", None, None, lsf.ALL_JOB)
         if count < 1:
             # job is not there any more
-            logging.warning('lsb_openjobinfo() failed for %s (job may be finished long ago)', self)
+            logging.warning('lsb_openjobinfo() failed for %s (job may be finished long ago or has not started)', self)
             self.__reset()
             return None
         if count > 1:
@@ -168,8 +214,7 @@ class Job ( object ) :
 
         lsf.lsb_closejobinfo()
 
-        # update status
-        self.__set(data)
+        return data
 
     def __reset(self):
         self._status = None
@@ -191,14 +236,14 @@ class Job ( object ) :
 
 def submit(command, queue = None, jobName = None, 
            log = None, priority = None, 
-           numProc = 1, resource = None):
+           numProc = 1, resource = None, beginTime = 0):
     """Submit a job to LSF.
     
     @param[in] command    Command to execute
     @param[in] queue      Queue name
     @param[in] jobName    Name of the job
     @param[in] log        Log file path
-    @param[in] priority   User priority, number between 0 and 100
+    @param[in] priority   User priority, number between 1 and LSF.maxUserPriority()
     @param[in] resource   Resource requirements string
     """
     
@@ -227,7 +272,7 @@ def submit(command, queue = None, jobName = None,
 
     req.rLimits = [lsf.DEFAULT_RLIMIT] * lsf.LSF_RLIM_NLIMITS
 
-    req.beginTime = 0
+    req.beginTime = beginTime
     req.termTime = 0
     req.numProcessors = numProc
     req.maxNumProcessors = numProc
@@ -257,6 +302,13 @@ def bjobs(queue = None, user = "all", options = CUR_JOB):
     lsf.lsb_closejobinfo()
     
     return result
+
+def maxUserPriority():
+    """Return max user priority value"""
+    
+    global _parameterinfo
+    if not _parameterinfo: _parameterinfo = lsf.lsb_parameterinfo([], None, 0)
+    return _parameterinfo.maxUserPriority
 
 #
 # One-time initialization needed for LSB

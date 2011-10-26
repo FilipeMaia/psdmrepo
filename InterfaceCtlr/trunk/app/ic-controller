@@ -173,7 +173,7 @@ class Controller ( AppBase ) :
 
                     # TranslatorJob needs to have non-Null jobid, otherwise it will try to start new job
                     if fs.translator is None:
-                        self.warning("Missing translator job for Being_Translated fileset")
+                        self.warning("Missing translator job for PENDING/RUN/SUSPENDED fileset")
                         continue
                     
                     logger = self
@@ -184,10 +184,9 @@ class Controller ( AppBase ) :
                     if stat is not None: self.trace('Job %d finished with status %s', fs.jobid, stat )
                     
 
-                # try to find new fileset, currently we expect filesets
-                # with status Waiting_Translation which should have all
-                # corresponding files or filesets with status  Initial_Entry
-                # for which we need to find the files on disk
+                # try to find new fileset, currently we expect filesets with status WAIT which 
+                # should have all corresponding files or filesets with status  WAIT_FILES for 
+                # which we need to find the files on disk
                 
                 # check if there are filesets with Initial_Entry and find files for it
                 filesets = self._db.get_filesets('WAIT_FILES', self._controller.instruments)
@@ -207,9 +206,17 @@ class Controller ( AppBase ) :
 
                 # now try to see if there is a fileset with files
                 filesets = self._db.get_filesets('WAIT', self._controller.instruments)
-                for fs in filesets:
+                
+                # We want to limit job submission rate to 1Hz, so if there are jobs to 
+                # submit then submit the first one (with the highest priority) and
+                # sleep for 1 second, otherwise sleep for 20 seconds and retry.
+                # also do not submit more than 20 jobs at once
+                timeout = 20
+                for fs in filesets[:20]:
+                    
                     # must have some files associated
                     if not fs.xtc_files :
+                        
                         self.error ('expecting non-empty fileset: %s', fs)
                         self._db.change_fileset_status (fs.id, 'FAIL_NOFILES')
                         
@@ -222,8 +229,11 @@ class Controller ( AppBase ) :
                         logger = self
                         job = TranslatorJob(fs, self._db, self._config, logger)
     
+                        time.sleep(1)
+                        timeout -= 1
+                
                 # Nothing to do, sleep, look for work again
-                time.sleep(60)
+                if timeout > 0: time.sleep(timeout)
 
             except KeyboardInterrupt:
                 
