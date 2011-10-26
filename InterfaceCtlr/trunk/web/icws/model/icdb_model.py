@@ -170,7 +170,7 @@ class IcdbModel ( InterfaceDb ) :
         """Create new translation request, returns request object."""
         
         icdb = InterfaceDb(self._conn.connection())
-        stat = 'Initial_Entry'
+        stat = 'WAIT_FILES'
         id = icdb.new_fileset(instrument, experiment, run, 'DATA', [], force, stat, priority)
 
         res = self.requests(id)

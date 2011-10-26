@@ -10,6 +10,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-02
+2011-10-26 Andy Salnikov
+- code in icws web service was still using old status names
+
 Tag: V01-00-01
 2011-10-26 Andy Salnikov
 - implementation of the priorities in the new batch system
