@@ -204,8 +204,6 @@ class CsPad( object ):
         
         self.pixels = np.array( (data[:,:,0],data[:,:,1]) )
         # pixels should now be (2 x 185 x 388)
-        print "2x2 array : ", self.pixels[0].shape
-        print "2x2 array : ", self.pixels[1].shape
 
         pairs = []
         for i in xrange(2):
