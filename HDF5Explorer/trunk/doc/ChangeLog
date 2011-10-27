@@ -22,6 +22,21 @@ Tag: V00-00-
 	add checkbox for "WF vs Event" with functionality
 - GUIComplexCommands.py
 	add button "WF vs Ev" with functionality
+- modified modules:
+	       doc/ChangeLog
+	       src/ConfigParameters.py
+	       src/DrawEvent.py
+	       src/GUIComplexCommands.py
+	       src/GUISelectQuadAndPair.py
+	       src/GUISettingsForWaveformWindow.py
+	       src/GUIWhatToDisplay.py
+	       src/GUIWhatToDisplayCBoxOther.py
+	       src/GUIWhatToDisplayForCSpad.py
+	       src/GUIWhatToDisplayForCSpadWindow.py
+	       src/GUIWhatToDisplayForImage.py
+	       src/HDF5TreeViewModel.py
+	       src/PlotsForCSpad.py
+	       src/PlotsForWaveform.py
 
 2011-10-24 Mikhail S. Dubrovin
 - CSPad GUI is chsnged: 
@@ -30,6 +45,7 @@ Tag: V00-00-
 	each window has a dataset - image is associated with dataset for each window.
 	!!! Geometry correction is taken for the 1st CSPad dataset !!!
 
+	
 Tag: V00-00-09
 2011-09-26 Mikhail S. Dubrovin
 - CSPad image was calculated in int16 -> now in float
