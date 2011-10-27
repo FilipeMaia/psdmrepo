@@ -81,10 +81,12 @@ class GUIWhatToDisplayCBoxOther ( QtGui.QWidget ) :
         self.titWaveform.setFont (titFont) 
         
         self.cboxWFWaveform    = QtGui.QCheckBox('Waveform',     self)
+        self.cboxWFWaveVsEv    = QtGui.QCheckBox('WF vs Event',  self)
         self.cboxCO            = QtGui.QCheckBox('Correlations', self)
         self.cboxCC            = QtGui.QCheckBox('CalibCycles',  self)
 
         if cp.confpars.waveformWaveformIsOn : self.cboxWFWaveform.setCheckState(2)
+        if cp.confpars.waveformWaveVsEvIsOn : self.cboxWFWaveVsEv.setCheckState(2)
         if cp.confpars.correlationsIsOn     : self.cboxCO        .setCheckState(2)
         if cp.confpars.calibcycleIsOn       : self.cboxCC        .setCheckState(2)
 
@@ -93,6 +95,7 @@ class GUIWhatToDisplayCBoxOther ( QtGui.QWidget ) :
         gridWF = QtGui.QGridLayout()
         gridWF.addWidget(self.titWaveform,      0, 0)
         gridWF.addWidget(self.cboxWFWaveform,   1, 0)
+        gridWF.addWidget(self.cboxWFWaveVsEv,   2, 0)
         gridWF.addWidget(self.cboxCO,           1, 1)
         gridWF.addWidget(self.cboxCC,           1, 2)
        #gridWF.addWidget(self.cboxED,           1, 3)
@@ -104,6 +107,7 @@ class GUIWhatToDisplayCBoxOther ( QtGui.QWidget ) :
         self.setLayout(self.vbox)
   
         self.connect(self.cboxWFWaveform,      QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxWFWaveform)
+        self.connect(self.cboxWFWaveVsEv,      QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxWFWaveVsEv)
         self.connect(self.cboxCO,              QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCO)
         self.connect(self.cboxCC,              QtCore.SIGNAL('stateChanged(int)'),   self.processCBoxCC)
 
@@ -157,6 +161,14 @@ class GUIWhatToDisplayCBoxOther ( QtGui.QWidget ) :
             cp.confpars.waveformWaveformIsOn = True
         else:
             cp.confpars.waveformWaveformIsOn = False
+
+
+    def processCBoxWFWaveVsEv(self, value):
+        if self.cboxWFWaveVsEv.isChecked():
+            self.setActiveTabBarForIndex(self.parent.indTabWF)
+            cp.confpars.waveformWaveVsEvIsOn = True
+        else:
+            cp.confpars.waveformWaveVsEvIsOn = False
 
 
 #-----------------------------

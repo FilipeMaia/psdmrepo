@@ -126,11 +126,15 @@ class ConfigParameters ( object ) :
         self.current_item_name_for_title = 'Current extended item name for title'
 
         # Default parameters for CSpad plots
-        self.cspadQuad            = 1
-        self.cspadPair            = 1
 
-        self.cspadImageNWindows   = 1
-        self.cspadImageNWindowsMax= 8 # Maximal number of windows for CSpad image which can be opened
+        self.cspadNWindows   = 1
+        self.cspadNWindowsMax= 8 # Maximal number of windows for CSpad which can be opened
+
+        self.cspadWindowParameters = []
+        for win in range(self.cspadNWindowsMax) :
+            self.cspadWindowParameters.append(['All', 0, 100, 0, 100, 100, 1, True, True, False, 1, 1])
+            #[dataset, ImAmin, ImAmax, SpAmin, SpAmax, SpNBins, SpBinWidth, ImALimsIsOn, SpALimsIsOn, SpBinWidthIsOn, quad, pair]
+            #[0,       1,      2,      3,      4,      5,       6,          7,           8,           9,              10,   11]
 
         self.cspadImageOfPairIsOn = False
         self.cspadImageIsOn       = False
@@ -145,6 +149,7 @@ class ConfigParameters ( object ) :
         self.cspadProjPhiIsOn     = False
         self.cspadApplyTiltAngle  = False # Is used in PlotsForCSpad.py
 
+        self.cspadCurrentDSName   = 'None'
         self.cspadAmplitudeRaMin  = 0
         self.cspadAmplitudeRange  = 2000
         self.cspadImageAmin       = 0   
@@ -153,8 +158,11 @@ class ConfigParameters ( object ) :
         self.cspadSpectrumAmax    = 2000
         self.cspadSpectrumNbins   = 50
         self.cspadSpectrumBinWidth= 1
+        self.cspadImageLimsIsOn   = True
+        self.cspadSpectLimsIsOn   = True
         self.cspadBinWidthIsOn    = True
-       #self.cspadSpectrumRange   = None
+        self.cspadQuad            = 1
+        self.cspadPair            = 1
 
         # Default parameters for Image plots
         self.imageImageIsOn       = False
@@ -192,6 +200,7 @@ class ConfigParameters ( object ) :
 
         # Default parameters for Waveform plots
         self.waveformWaveformIsOn  = False
+        self.waveformWaveVsEvIsOn  = False
 
         self.waveformNWindows      = 1
         self.waveformNWindowsMax   = 10 # Maximal number of windows for waveforms which can be opened
@@ -323,8 +332,6 @@ class ConfigParameters ( object ) :
         print 'STEP_03_IS_DONE',           self.step03IsDone
         print 'STEP_04_IS_DONE',           self.step04IsDone
         
-        print 'CSPAD_QUAD_NUMBER',         self.cspadQuad
-        print 'CSPAD_PAIR_NUMBER',         self.cspadPair
         print 'CSPAD_IMAGE_IS_ON',         self.cspadImageIsOn       
         print 'CSPAD_IMAGE_OF_PAIR_IS_ON', self.cspadImageOfPairIsOn
         print 'CSPAD_IMAGE_QUAD_IS_ON',    self.cspadImageQuadIsOn
@@ -346,7 +353,31 @@ class ConfigParameters ( object ) :
         print 'CSPAD_SPECT_AMAX',          self.cspadSpectrumAmax
         print 'CSPAD_SPECT_NBINS',         self.cspadSpectrumNbins    
         print 'CSPAD_SPECT_BIN_WIDTH',     self.cspadSpectrumBinWidth 
+        print 'CSPAD_IM_LIMITS_IS_ON',     self.cspadImageLimsIsOn
+        print 'CSPAD_SP_LIMITS_IS_ON',     self.cspadSpectLimsIsOn
         print 'CSPAD_BIN_WIDTH_IS_ON',     self.cspadBinWidthIsOn     
+        print 'CSPAD_QUAD_NUMBER',         self.cspadQuad
+        print 'CSPAD_PAIR_NUMBER',         self.cspadPair
+
+        print 'CSPAD_N_WINDOWS_MAX',       self.cspadNWindowsMax 
+        print 'CSPAD_N_WINDOWS',           self.cspadNWindows 
+
+        for win in range(self.cspadNWindows) :
+
+            print 'CSPAD_WINDOW_NUMBER',   win 
+            print 'CSPAD_DATASET',         self.cspadWindowParameters[win][0] 
+            print 'CSPAD_IMAGE_AMIN',      self.cspadWindowParameters[win][1] 
+            print 'CSPAD_IMAGE_AMAX',      self.cspadWindowParameters[win][2] 
+            print 'CSPAD_SPECT_AMIN',      self.cspadWindowParameters[win][3] 
+            print 'CSPAD_SPECT_AMAX',      self.cspadWindowParameters[win][4]         
+            print 'CSPAD_SPECT_NBINS',     self.cspadWindowParameters[win][5] 
+            print 'CSPAD_SPECT_BIN_WIDTH', self.cspadWindowParameters[win][6] 
+            print 'CSPAD_IM_LIMITS_IS_ON', self.cspadWindowParameters[win][7] 
+            print 'CSPAD_SP_LIMITS_IS_ON', self.cspadWindowParameters[win][8] 
+            print 'CSPAD_BIN_WIDTH_IS_ON', self.cspadWindowParameters[win][9] 
+            print 'CSPAD_QUAD_NUMBER',     self.cspadWindowParameters[win][10]
+            print 'CSPAD_PAIR_NUMBER',     self.cspadWindowParameters[win][11]
+
 
         print 'IMAGE_IMAGE_IS_ON',         self.imageImageIsOn       
         print 'IMAGE_IMAGE_SPEC_IS_ON',    self.imageImageSpecIsOn       
@@ -377,6 +408,7 @@ class ConfigParameters ( object ) :
         print 'READ_PARS_AT_START',        self.readParsFromFileAtStart
 
         print 'WAVEF_WAVEF_IS_ON',         self.waveformWaveformIsOn    
+        print 'WAVEF_WFVSEV_IS_ON',        self.waveformWaveVsEvIsOn    
 
         print 'WAVEF_N_WINDOWS_MAX',       self.waveformNWindowsMax 
         print 'WAVEF_N_WINDOWS',           self.waveformNWindows 
@@ -571,19 +603,38 @@ class ConfigParameters ( object ) :
                 elif key == 'IMAGE_PROJ_PHI_IS_ON'     : self.imageProjPhiIsOn        = dicBool[val.lower()]
 
                 elif key == 'WAVEF_WAVEF_IS_ON'        : self.waveformWaveformIsOn    = dicBool[val.lower()]
+                elif key == 'WAVEF_WFVSEV_IS_ON'       : self.waveformWaveVsEvIsOn    = dicBool[val.lower()]
                 elif key == 'READ_PARS_AT_START'       : self.readParsFromFileAtStart = dicBool[val.lower()]
-                elif key == 'CSPAD_QUAD_NUMBER'        : self.cspadQuad               = int(val)
-                elif key == 'CSPAD_PAIR_NUMBER'        : self.cspadPair               = int(val)
 
-                elif key == 'CSPAD_RANGE_AMIN'         : self.cspadAmplitudeRaMin     = int(val)
-                elif key == 'CSPAD_RANGE_AMAX'         : self.cspadAmplitudeRange     = int(val)
-                elif key == 'CSPAD_IMAGE_AMIN'         : self.cspadImageAmin          = int(val)
-                elif key == 'CSPAD_IMAGE_AMAX'         : self.cspadImageAmax          = int(val)
-                elif key == 'CSPAD_SPECT_AMIN'         : self.cspadSpectrumAmin       = int(val)
-                elif key == 'CSPAD_SPECT_AMAX'         : self.cspadSpectrumAmax       = int(val)
-                elif key == 'CSPAD_SPECT_NBINS'        : self.cspadSpectrumNbins      = int(val)
-                elif key == 'CSPAD_SPECT_BIN_WIDTH'    : self.cspadSpectrumBinWidth   = int(val)
-                elif key == 'CSPAD_BIN_WIDTH_IS_ON'    : self.cspadBinWidthIsOn       = dicBool[val.lower()]
+                #elif key == 'CSPAD_QUAD_NUMBER'        : self.cspadQuad               = int(val)
+                #elif key == 'CSPAD_PAIR_NUMBER'        : self.cspadPair               = int(val)
+
+                #elif key == 'CSPAD_RANGE_AMIN'         : self.cspadAmplitudeRaMin     = int(val)
+                #elif key == 'CSPAD_RANGE_AMAX'         : self.cspadAmplitudeRange     = int(val)
+                #elif key == 'CSPAD_IMAGE_AMIN'         : self.cspadImageAmin          = int(val)
+                #elif key == 'CSPAD_IMAGE_AMAX'         : self.cspadImageAmax          = int(val)
+                #elif key == 'CSPAD_SPECT_AMIN'         : self.cspadSpectrumAmin       = int(val)
+                #elif key == 'CSPAD_SPECT_AMAX'         : self.cspadSpectrumAmax       = int(val)
+                #elif key == 'CSPAD_SPECT_NBINS'        : self.cspadSpectrumNbins      = int(val)
+                #elif key == 'CSPAD_SPECT_BIN_WIDTH'    : self.cspadSpectrumBinWidth   = int(val)
+                #elif key == 'CSPAD_BIN_WIDTH_IS_ON'    : self.cspadBinWidthIsOn       = dicBool[val.lower()]
+
+                elif key == 'CSPAD_N_WINDOWS_MAX'      : self.cspadNWindowsMax        = int(val)
+                elif key == 'CSPAD_N_WINDOWS'          : self.cspadNWindows           = int(val)
+
+                elif key == 'CSPAD_WINDOW_NUMBER'      : win                          = int(val)
+                elif key == 'CSPAD_DATASET'            : self.cspadWindowParameters[win][0] = val
+                elif key == 'CSPAD_IMAGE_AMIN'         : self.cspadWindowParameters[win][1] = int(val)
+                elif key == 'CSPAD_IMAGE_AMAX'         : self.cspadWindowParameters[win][2] = int(val)
+                elif key == 'CSPAD_SPECT_AMIN'         : self.cspadWindowParameters[win][3] = int(val)
+                elif key == 'CSPAD_SPECT_AMAX'         : self.cspadWindowParameters[win][4] = int(val)
+                elif key == 'CSPAD_SPECT_NBINS'        : self.cspadWindowParameters[win][5] = int(val)
+                elif key == 'CSPAD_SPECT_BIN_WIDTH'    : self.cspadWindowParameters[win][6] = int(val)
+                elif key == 'CSPAD_IM_LIMITS_IS_ON'    : self.cspadWindowParameters[win][7] = dicBool[val.lower()]
+                elif key == 'CSPAD_SP_LIMITS_IS_ON'    : self.cspadWindowParameters[win][8] = dicBool[val.lower()]
+                elif key == 'CSPAD_BIN_WIDTH_IS_ON'    : self.cspadWindowParameters[win][9] = dicBool[val.lower()]
+                elif key == 'CSPAD_QUAD_NUMBER'        : self.cspadWindowParameters[win][10]= int(val)
+                elif key == 'CSPAD_PAIR_NUMBER'        : self.cspadWindowParameters[win][11]= int(val)
 
                 elif key == 'IMAGE_N_WINDOWS_MAX'      : self.imageNWindowsMax        = int(val)
                 elif key == 'IMAGE_N_WINDOWS'          : self.imageNWindows           = int(val)
@@ -786,20 +837,42 @@ class ConfigParameters ( object ) :
         f.write('IMAGE_PROJ_R_IS_ON'        + space + str(self.imageProjRIsOn)          + '\n')
         f.write('IMAGE_PROJ_PHI_IS_ON'      + space + str(self.imageProjPhiIsOn)        + '\n')
         f.write('WAVEF_WAVEF_IS_ON'         + space + str(self.waveformWaveformIsOn)    + '\n')
+        f.write('WAVEF_WFVSEV_IS_ON'        + space + str(self.waveformWaveVsEvIsOn)    + '\n')
         f.write('READ_PARS_AT_START'        + space + str(self.readParsFromFileAtStart) + '\n')
 
-        f.write('CSPAD_QUAD_NUMBER'         + space + str(self.cspadQuad)               + '\n')
-        f.write('CSPAD_PAIR_NUMBER'         + space + str(self.cspadPair)               + '\n')
-        f.write('CSPAD_RANGE_AMIN'          + space + str(self.cspadAmplitudeRaMin)     + '\n')
-        f.write('CSPAD_RANGE_AMAX'          + space + str(self.cspadAmplitudeRange)     + '\n')
-        f.write('CSPAD_IMAGE_AMIN'          + space + str(self.cspadImageAmin)          + '\n')
-        f.write('CSPAD_IMAGE_AMAX'          + space + str(self.cspadImageAmax)          + '\n')
-        f.write('CSPAD_SPECT_AMIN'          + space + str(self.cspadSpectrumAmin)       + '\n')
-        f.write('CSPAD_SPECT_AMAX'          + space + str(self.cspadSpectrumAmax)       + '\n')
-        f.write('CSPAD_SPECT_NBINS'         + space + str(self.cspadSpectrumNbins)      + '\n')
-        f.write('CSPAD_SPECT_BIN_WIDTH'     + space + str(self.cspadSpectrumBinWidth)   + '\n')
-        f.write('CSPAD_BIN_WIDTH_IS_ON'     + space + str(self.cspadBinWidthIsOn)       + '\n')
-                                                                                
+        #f.write('CSPAD_QUAD_NUMBER'         + space + str(self.cspadQuad)               + '\n')
+        #f.write('CSPAD_PAIR_NUMBER'         + space + str(self.cspadPair)               + '\n')
+        #f.write('CSPAD_RANGE_AMIN'          + space + str(self.cspadAmplitudeRaMin)     + '\n')
+        #f.write('CSPAD_RANGE_AMAX'          + space + str(self.cspadAmplitudeRange)     + '\n')
+        #f.write('CSPAD_IMAGE_AMIN'          + space + str(self.cspadImageAmin)          + '\n')
+        #f.write('CSPAD_IMAGE_AMAX'          + space + str(self.cspadImageAmax)          + '\n')
+        #f.write('CSPAD_SPECT_AMIN'          + space + str(self.cspadSpectrumAmin)       + '\n')
+        #f.write('CSPAD_SPECT_AMAX'          + space + str(self.cspadSpectrumAmax)       + '\n')
+        #f.write('CSPAD_SPECT_NBINS'         + space + str(self.cspadSpectrumNbins)      + '\n')
+        #f.write('CSPAD_SPECT_BIN_WIDTH'     + space + str(self.cspadSpectrumBinWidth)   + '\n')
+        #f.write('CSPAD_BIN_WIDTH_IS_ON'     + space + str(self.cspadBinWidthIsOn)       + '\n')
+
+
+        f.write('\n')
+        f.write('CSPAD_N_WINDOWS_MAX'       + space + str(self.cspadNWindowsMax)     + '\n')
+        f.write('CSPAD_N_WINDOWS'           + space + str(self.cspadNWindows)        + '\n')
+
+        for win in range(self.cspadNWindows) :
+            f.write('\n')
+            f.write('CSPAD_WINDOW_NUMBER'  + space + str(win)                                    + '\n')
+            f.write('CSPAD_DATASET'        + space + str(self.cspadWindowParameters[win][0] )    + '\n')
+            f.write('CSPAD_IMAGE_AMIN'     + space + str(self.cspadWindowParameters[win][1] )    + '\n')
+            f.write('CSPAD_IMAGE_AMAX'     + space + str(self.cspadWindowParameters[win][2] )    + '\n')
+            f.write('CSPAD_SPECT_AMIN'     + space + str(self.cspadWindowParameters[win][3] )    + '\n')
+            f.write('CSPAD_SPECT_AMAX'     + space + str(self.cspadWindowParameters[win][4] )    + '\n')
+            f.write('CSPAD_SPECT_NBINS'    + space + str(self.cspadWindowParameters[win][5] )    + '\n')
+            f.write('CSPAD_SPECT_BIN_WIDTH'+ space + str(self.cspadWindowParameters[win][6] )    + '\n')
+            f.write('CSPAD_IM_LIMITS_IS_ON'+ space + str(self.cspadWindowParameters[win][7] )    + '\n')
+            f.write('CSPAD_SP_LIMITS_IS_ON'+ space + str(self.cspadWindowParameters[win][8] )    + '\n')
+            f.write('CSPAD_BIN_WIDTH_IS_ON'+ space + str(self.cspadWindowParameters[win][9] )    + '\n')
+            f.write('CSPAD_QUAD_NUMBER'    + space + str(self.cspadWindowParameters[win][10])    + '\n')
+            f.write('CSPAD_PAIR_NUMBER'    + space + str(self.cspadWindowParameters[win][11])    + '\n')
+
 
         f.write('\n')
         f.write('IMAGE_N_WINDOWS_MAX'       + space + str(self.imageNWindowsMax)     + '\n')
@@ -974,6 +1047,37 @@ class ConfigParameters ( object ) :
             self._fname = self.confParsDirName + '/' + self.confParsFileName
         else :
             self._fname = fname
+
+
+    def fillCSPadConfigParsNamedFromWin(self, window):
+        self.cspadCurrentDSName    = self.cspadWindowParameters[window][0]
+        self.cspadImageAmin        = self.cspadWindowParameters[window][1]
+        self.cspadImageAmax        = self.cspadWindowParameters[window][2]
+        self.cspadSpectrumAmin     = self.cspadWindowParameters[window][3]
+        self.cspadSpectrumAmax     = self.cspadWindowParameters[window][4]
+        self.cspadSpectrumNbins    = self.cspadWindowParameters[window][5]
+        self.cspadSpectrumBinWidth = self.cspadWindowParameters[window][6]       
+        self.cspadImageLimsIsOn    = self.cspadWindowParameters[window][7]
+        self.cspadSpectLimsIsOn    = self.cspadWindowParameters[window][8]
+        self.cspadBinWidthIsOn     = self.cspadWindowParameters[window][9]
+        self.cspadQuad             = self.cspadWindowParameters[window][10]
+        self.cspadPair             = self.cspadWindowParameters[window][11]
+
+
+    def fillCSPadConfigParsWinFromNamed(self, window):
+        self.cspadWindowParameters[window][0] = self.cspadCurrentDSName
+        self.cspadWindowParameters[window][1] = self.cspadImageAmin       
+        self.cspadWindowParameters[window][2] = self.cspadImageAmax       
+        self.cspadWindowParameters[window][3] = self.cspadSpectrumAmin    
+        self.cspadWindowParameters[window][4] = self.cspadSpectrumAmax    
+        self.cspadWindowParameters[window][5] = self.cspadSpectrumNbins   
+        self.cspadWindowParameters[window][6] = self.cspadSpectrumBinWidth       
+        self.cspadWindowParameters[window][7] = self.cspadImageLimsIsOn
+        self.cspadWindowParameters[window][8] = self.cspadSpectLimsIsOn
+        self.cspadWindowParameters[window][9] = self.cspadBinWidthIsOn    
+        self.cspadWindowParameters[window][10]= self.cspadQuad
+        self.cspadWindowParameters[window][11]= self.cspadPair
+
 
 #---------------------------------------
 # Makes a single object of this class --

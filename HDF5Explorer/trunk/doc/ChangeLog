@@ -12,6 +12,24 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ------------------------------
+Tag: V00-00-
+2011-10-26 Mikhail S. Dubrovin
+- In src/HDF5TreeViewModel.py    _add_group_to_tree(...) 
+	add try-except protection against hdf5 corruption
+- PlotsForWaveform.py 
+	add plot for waveform vs event
+- GUIWhatToDisplayCBoxOther.py
+	add checkbox for "WF vs Event" with functionality
+- GUIComplexCommands.py
+	add button "WF vs Ev" with functionality
+
+2011-10-24 Mikhail S. Dubrovin
+- CSPad GUI is chsnged: 
+	sliders are removed, 
+	multi-window GUI is added,
+	each window has a dataset - image is associated with dataset for each window.
+	!!! Geometry correction is taken for the 1st CSPad dataset !!!
+
 Tag: V00-00-09
 2011-09-26 Mikhail S. Dubrovin
 - CSPad image was calculated in int16 -> now in float

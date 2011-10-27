@@ -65,7 +65,8 @@ class PlotsForCSpad ( object ) :
         #print 'using MPL version: ', matplotlib.__version__
         #self.fig1_window_is_open = False
 
-        self.eventWithAlreadyGeneratedCSpadDetImage  = None
+        self.eventWithAlreadyGeneratedCSpadDetImage   = None
+        self.dsnameWithAlreadyGeneratedCSpadDetImage  = None
 
     #-------------------
     #  Public methods --
@@ -271,7 +272,8 @@ class PlotsForCSpad ( object ) :
 
     def resetEventWithAlreadyGeneratedCSpadDetImage( self ):
         """This method is used in order to update image for averaging"""
-        self.eventWithAlreadyGeneratedCSpadDetImage = None
+        self.eventWithAlreadyGeneratedCSpadDetImage   = None
+        self.dsnameWithAlreadyGeneratedCSpadDetImage  = None
 
 
     def getQuadNumberForIndex( self, index ):
@@ -291,7 +293,7 @@ class PlotsForCSpad ( object ) :
     def getImageArrayForDet( self, arr1ev ):
         """Returns the image array for entire CSpad detector"""       
 
-        if cp.confpars.eventCurrent == self.eventWithAlreadyGeneratedCSpadDetImage :
+        if  cp.confpars.eventCurrent == self.eventWithAlreadyGeneratedCSpadDetImage and cp.confpars.cspadCurrentDSName == self.dsnameWithAlreadyGeneratedCSpadDetImage :
             #print 'Use already generated image for CSpad and save time'
             return self.arr2dCSpad
 
@@ -301,7 +303,8 @@ class PlotsForCSpad ( object ) :
         else : # For regular CSPad detector
             self.arr2dCSpad = self.getImageArrayForCSPadElement( arr1ev )
 
-        self.eventWithAlreadyGeneratedCSpadDetImage = cp.confpars.eventCurrent
+        self.eventWithAlreadyGeneratedCSpadDetImage  = cp.confpars.eventCurrent
+        self.dsnameWithAlreadyGeneratedCSpadDetImage = cp.confpars.cspadCurrentDSName
 
         if cp.confpars.bkgdSubtractionIsOn : self.arr2dCSpad -= cp.confpars.arr_bkgd
         if cp.confpars.gainCorrectionIsOn  : self.arr2dCSpad *= cp.confpars.arr_gain

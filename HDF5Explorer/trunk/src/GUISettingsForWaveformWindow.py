@@ -88,7 +88,7 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
 
         self.char_expand = u'\u25BE' # down-head triangle
         height = 22
-        width  = 50
+        width  = 60
 
         self.butWFDataSet = QtGui.QPushButton(cp.confpars.waveformWindowParameters[self.window][0])
         self.butWFDataSet.setMaximumWidth(350)
@@ -157,15 +157,15 @@ class GUISettingsForWaveformWindow ( QtGui.QWidget ) :
         gridWF.addWidget(self.butWFDataSet,        0, 1, 1, 7)
         gridWF.addWidget(self.titWFIndexes,        1, 0)
 
-        gridWF.addWidget(self.cboxAUnits,          2, 0, 1, 3)
-        gridWF.addWidget(self.cboxALimits,         2, 3, 1, 2)
-        gridWF.addWidget(self.editWFWaveformAmin,  2, 5)
-        gridWF.addWidget(self.editWFWaveformAmax,  2, 6)
+        gridWF.addWidget(self.cboxAUnits,          2, 0, 1, 2)
+        gridWF.addWidget(self.cboxALimits,         2, 2, 1, 2)
+        gridWF.addWidget(self.editWFWaveformAmin,  2, 4, 1, 2)
+        gridWF.addWidget(self.editWFWaveformAmax,  2, 6, 1, 2)
 
-        gridWF.addWidget(self.cboxTUnits,          3, 0, 1, 3)
-        gridWF.addWidget(self.cboxTLimits,         3, 3, 1, 2)
-        gridWF.addWidget(self.editWFWaveformTmin,  3, 5)
-        gridWF.addWidget(self.editWFWaveformTmax,  3, 6)
+        gridWF.addWidget(self.cboxTUnits,          3, 0, 1, 2)
+        gridWF.addWidget(self.cboxTLimits,         3, 2, 1, 2)
+        gridWF.addWidget(self.editWFWaveformTmin,  3, 4, 1, 2)
+        gridWF.addWidget(self.editWFWaveformTmax,  3, 6, 1, 2)
 
         gridWF.addWidget(self.butWFInd1,           1, 1)
         gridWF.addWidget(self.titWFInd2,           1, 2)

@@ -99,8 +99,7 @@ class GUIWhatToDisplayForImage ( QtGui.QWidget ) :
         self.connect(self.butMenuNWin,  QtCore.SIGNAL('clicked()'), self.processMenuNWin )
 
         self.showToolTips()
-
-
+        cp.confpars.wtdIMWindowIsOpen = True
 
     #-------------------
     # Private methods --

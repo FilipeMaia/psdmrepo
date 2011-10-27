@@ -83,7 +83,7 @@ class DrawEvent ( object ) :
         
         self.list_of_open_figs      = []
         self.parent                 = parent
-        self.fileNameWithAlreadySetCSpadConfiguration = None
+        #self.fileNameWithAlreadySetCSpadConfiguration = None
 
         #self.arrInWindowMax         = 0 
         #self.arrInWindowSum         = 0
@@ -508,39 +508,52 @@ class DrawEvent ( object ) :
         if cspadIsInTheName :
 
             #arr1ev # (32, 185, 388) <- format of this record
-
             self.getCSpadConfiguration(dsname)
 
+            for self.nwin in range(cp.confpars.cspadNWindows) :
 
-            self.figNum += 1 
-            if cp.confpars.cspadImageIsOn : 
-                self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot=8)
-            else : self.close_fig(self.figNum)
+                cp.confpars.fillCSPadConfigParsNamedFromWin(self.nwin)
 
-            self.figNum += 1 
-            if cp.confpars.cspadImageOfPairIsOn : 
-                self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(1),plot=1)
-            else : self.close_fig(self.figNum)
+                if       cp.confpars.cspadWindowParameters[self.nwin][0] == dsname \
+                      or cp.confpars.cspadWindowParameters[self.nwin][0] == 'All'  :
 
-            self.figNum += 1 
-            if cp.confpars.cspadImageQuadIsOn : 
-                self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot='Quad')
-            else : self.close_fig(self.figNum)
+                    self.figNum += 1 
+                    if cp.confpars.cspadImageIsOn : 
+                        self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot=8)
+                    else : self.close_fig(self.figNum)
 
-            self.figNum += 1 
-            if cp.confpars.cspadSpectrumIsOn : 
-                self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=16)
-            else : self.close_fig(self.figNum)
+                    self.figNum += 1 
+                    if cp.confpars.cspadImageOfPairIsOn : 
+                        self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(1),plot=1)
+                    else : self.close_fig(self.figNum)
 
-            self.figNum += 1 
-            if cp.confpars.cspadSpectrum08IsOn : 
-                self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=8)
-            else : self.close_fig(self.figNum)
+                    self.figNum += 1 
+                    if cp.confpars.cspadImageQuadIsOn : 
+                        self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot='Quad')
+                    else : self.close_fig(self.figNum)
 
-            self.figNum += 1 
-            if cp.confpars.cspadSpectrumDetIsOn : 
-                self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig('1x1'),plot='DetSpec')
-            else : self.close_fig(self.figNum)
+                    self.figNum += 1 
+                    if cp.confpars.cspadSpectrumIsOn : 
+                        self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=16)
+                    else : self.close_fig(self.figNum)
+
+                    self.figNum += 1 
+                    if cp.confpars.cspadSpectrum08IsOn : 
+                        self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig(4),plot=8)
+                    else : self.close_fig(self.figNum)
+
+                    self.figNum += 1 
+                    if cp.confpars.cspadSpectrumDetIsOn : 
+                        self.plotsCSpad.plotCSpadV2Spectrum(arr1ev,self.set_fig('1x1'),plot='DetSpec')
+                    else : self.close_fig(self.figNum)
+
+                    self.figNum += 1 
+                    if cp.confpars.cspadImageDetIsOn : 
+                        self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot='Det')
+                    else : self.close_fig(self.figNum)
+
+
+            self.figNum = 10*cp.confpars.cspadNWindowsMax
 
             self.figNum += 1 
             if cp.confpars.cspadProjXIsOn : 
@@ -562,11 +575,6 @@ class DrawEvent ( object ) :
                 self.plotsCSpadProj.plotProjPhi(arr1ev,self.set_fig('1x1'))
             else : self.close_fig(self.figNum)
             
-            for nwin in range(cp.confpars.cspadImageNWindowsMax) :
-                self.figNum += 1 
-                if cp.confpars.cspadImageDetIsOn and nwin < cp.confpars.cspadImageNWindows : 
-                    self.plotsCSpad.plotCSpadV2Image(arr1ev,self.set_fig(4),plot='Det')
-                else : self.close_fig(self.figNum)
 
         if imageIsInTheName :
 
@@ -644,7 +652,7 @@ class DrawEvent ( object ) :
 
         print 'quad_nums_in_event = ', cs.confcspad.quad_nums_in_event
 
-        if cp.confpars.fileName == self.fileNameWithAlreadySetCSpadConfiguration : return
+        #if cp.confpars.fileName == self.fileNameWithAlreadySetCSpadConfiguration : return
 
         if cp.confpars.cspadImageDetIsOn    \
         or cp.confpars.cspadImageQuadIsOn   \
@@ -683,7 +691,7 @@ class DrawEvent ( object ) :
 
             cs.confcspad.indPairsInQuads = self.dsConf['sections'] # For V2 it is dsConf.value[13], for V3 it is 15th  ...
             print "Indexes of pairs in quads =\n",cs.confcspad.indPairsInQuads 
-            self.fileNameWithAlreadySetCSpadConfiguration = cp.confpars.fileName
+            #self.fileNameWithAlreadySetCSpadConfiguration = cp.confpars.fileName
 
 
 
@@ -727,9 +735,9 @@ class DrawEvent ( object ) :
 
             self.getTimeHDF5File()
 
-            if cp.confpars.fileName == self.fileNameWithAlreadySetCSpadConfiguration : return
-            else : cs.confcspad.setCSpadParameters()
-
+            #if cp.confpars.fileName == self.fileNameWithAlreadySetCSpadConfiguration : return
+            #else : cs.confcspad.setCSpadParameters()
+            cs.confcspad.setCSpadParameters()
 
 
     def getTimeHDF5File( self ) :     
@@ -868,16 +876,9 @@ class DrawEvent ( object ) :
 
     def drawCorrelationPlotsFromOpenFile ( self ) :
 
-        #cp.confpars.correlationNWindowsMax 
-        #cp.confpars.correlationNWindows 
- 
         self.figNum = 100
 
         for self.nwin in range(cp.confpars.correlationNWindows) :
-
-            #Ydsname   = cp.confpars.correlationWindowParameters[self.nwin][0]
-            #Xdsname   = cp.confpars.correlationWindowParameters[self.nwin][1]
-            #radioXPar = cp.confpars.correlationWindowParameters[self.nwin][2] 
 
             self.figNum += 1 
             if cp.confpars.correlationsIsOn : 
@@ -901,23 +902,47 @@ class DrawEvent ( object ) :
 
     def drawCalibCyclePlotsFromOpenFile ( self ) :
 
-        #cp.confpars.calibcycleNWindowsMax 
-        #cp.confpars.calibcycleNWindows 
- 
         self.figNum = 200
 
         print 'drawCalibCyclePlotsFromOpenFile for nwin=', cp.confpars.calibcycleNWindows
 
         for self.nwin in range(cp.confpars.calibcycleNWindows) :
 
-            #Ydsname   = cp.confpars.calibcycleWindowParameters[self.nwin][0]
-            #Xdsname   = cp.confpars.calibcycleWindowParameters[self.nwin][1]
-            #radioXPar = cp.confpars.calibcycleWindowParameters[self.nwin][2] 
-
             self.figNum += 1 
             if cp.confpars.calibcycleIsOn : 
                 self.plotsCalibCycles.plotCalibCycles(self.set_fig('2x1'), self.h5file)
             else : self.close_fig(self.figNum)
+
+#-----------------------------------------
+#-----------------------------------------
+#-----------------------------------------
+
+    def drawWaveVsEventPlots ( self ) :
+        """Draw waveform vs event plots"""
+
+        if not cp.confpars.waveformWaveVsEvIsOn :
+            print 'Check the "WF vs Event" checkbox in the "What to display?" GUI\n' +\
+                  'and set the waveform plot parameters.'
+            return
+        
+        self.openHDF5File()
+        if not cp.confpars.h5_file_is_open : return
+        self.drawWaveVsEventPlotsFromOpenFile()
+        self.closeHDF5File()
+
+    def drawWaveVsEventPlotsFromOpenFile ( self ) :
+
+        self.figNum = 300
+
+        print 'drawWaveVsEvPlotsFromOpenFile for nwin=', cp.confpars.waveformNWindows
+
+        for self.nwin in range(cp.confpars.waveformNWindows) :
+
+            self.figNum += 1 
+            if cp.confpars.waveformWaveVsEvIsOn : 
+                self.plotsWaveform.plotWaveVsEvent(self.set_fig('2x1'), self.h5file)
+            else : self.close_fig(self.figNum)
+
 
 #-----------------------------------------
 #

@@ -90,10 +90,8 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
         
-        #self.butRefresh       = QtGui.QPushButton('Refresh')
         self.butClose         = QtGui.QPushButton('Quit')
         self.butSave          = QtGui.QPushButton('Save')
-        #self.butSave.setMaximumWidth(40)   
 
         self.tabBar      = QtGui.QTabBar()
         self.tabBar.setShape(QtGui.QTabBar.RoundedNorth)
@@ -114,7 +112,6 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         self.tabBar.setTabTextColor(self.indTabPR,QtGui.QColor('magenta'))
         self.tabBar.setTabTextColor(self.indTabCO,QtGui.QColor('black'))
         self.tabBar.setTabTextColor(self.indTabCC,QtGui.QColor('red'))
-       #self.tabBar.setTabTextColor(self.indTabED,QtGui.QColor('white'))
 
         self.tabBarBot           = QtGui.QTabBar()
         self.tabBarBot.setShape(QtGui.QTabBar.RoundedSouth)
@@ -134,7 +131,8 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
         self.hboxD = QtGui.QHBoxLayout()
         self.hboxD.addWidget(self.guiTab)
-        
+        self.guiTab.close()
+
         self.hboxC = QtGui.QHBoxLayout()
         #self.hboxC.addWidget(self.butRefresh)
         self.hboxC.addWidget(self.butSave)
@@ -207,8 +205,8 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
         if wavefDatasetIsChecked or correDatasetIsChecked :
             self.cboxguiOT = cboxOT.GUIWhatToDisplayCBoxOther(self)
-            self.cboxguiOT.setFixedHeight(50)
-            self.vertSize += 50
+            self.cboxguiOT.setFixedHeight(70)
+            self.vertSize += 70
             self.vboxB.addWidget(self.cboxguiOT)
             if wavefDatasetIsChecked : self.indTabOpen = self.indTabWF 
             if correDatasetIsChecked : self.indTabOpen = self.indTabCO 
@@ -242,6 +240,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
         if self.isOpenOT: self.cboxguiOT.close()
         self.guiTab.close()
         self.tabBar.close()
+        self.tabBarBot.close()
         cp.confpars.wtdWindowIsOpen = False
 
 
@@ -252,6 +251,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
     def processSelection(self):
         #print 'Selection'
+        self.hboxD.removeWidget(self.guiTab)
         self.guiTab.close()
         self.guiTab = cp.confpars.guiselection = guisel.GUISelection() 
         self.guiTab.setMinimumHeight(240)
@@ -260,6 +260,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
     def processConfiguration(self):
         #print 'Configuration'
+        self.hboxD.removeWidget(self.guiTab)
         self.guiTab.close()
         self.guiTab = cp.confpars.guiconfig = guiconfig.GUIConfiguration() 
         self.guiTab.setMinimumHeight(240)
@@ -267,6 +268,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
     def processBackground(self):
         #print 'Background'
+        self.hboxD.removeWidget(self.guiTab)
         self.guiTab.close()
         self.guiTab = cp.confpars.guiBG = guiBG.GUIBackground() 
         self.guiTab.setMinimumHeight(240)
@@ -275,6 +277,7 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
     def processGainCorrection(self):
         #print 'GainCorrection'
+        self.hboxD.removeWidget(self.guiTab)
         self.guiTab.close()
         self.guiTab = cp.confpars.guiGC = guiGC.GUIGainCorrection() 
         self.guiTab.setMinimumHeight(240)
@@ -309,13 +312,14 @@ class GUIWhatToDisplay ( QtGui.QWidget ) :
 
         if indTab == self.indTabEmpty: return
 
-        self.guiTab.close()
-
         cspadDatasetIsChecked = gm.CSpadDatasetIsChecked()
         imageDatasetIsChecked = gm.ImageDatasetIsChecked()
         wavefDatasetIsChecked = gm.WaveformDatasetIsChecked()
         correDatasetIsChecked = gm.CorrelationDatasetIsChecked()
         calibDatasetIsChecked = gm.CalibCycleDatasetIsChecked()
+
+        self.hboxD.removeWidget(self.guiTab)
+        self.guiTab.close()
 
         if indTab == self.indTabCS:
             if cspadDatasetIsChecked: self.guiTab = wtdCS.GUIWhatToDisplayForCSpad()

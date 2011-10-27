@@ -47,10 +47,14 @@ class GUISelectQuadAndPair ( QtGui.QWidget ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ (self, parent=None, app=None) :
+    def __init__ (self, parent=None, window = 0) :
         """Constructor"""
 
-        self.myapp = app
+        #self.myapp = app
+        self.window = window
+        cp.confpars.cspadQuad = cp.confpars.cspadWindowParameters[self.window][10]
+        cp.confpars.cspadPair = cp.confpars.cspadWindowParameters[self.window][11]
+        
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(200, 500, 80, 25)
@@ -160,20 +164,12 @@ class GUISelectQuadAndPair ( QtGui.QWidget ) :
         self.close()
 
         
-    def mousePressEvent(self, event):
-        print 'Click on Quad or Pair number using mouse left button\n'
-        #print 'event.button() = %s at position' % (event.button()),        
-        #print (event.pos()),
-        #print ' x=%d, y=%d' % (event.x(),event.y()),        
-        #print ' global x=%d, y=%d' % (event.globalX(),event.globalY())
-
-
     def processMenuQuad(self):
         #print 'MenuQuad'
         actionSelected = self.popupMenuQuad.exec_(QtGui.QCursor.pos())
         if actionSelected==None : return
         for action in self.listActMenuQuad :
-            cp.confpars.cspadQuad = int(actionSelected.text())
+            cp.confpars.cspadQuad = cp.confpars.cspadWindowParameters[self.window][10] = int(actionSelected.text())
             if actionSelected == action : self.butMenuQuad.setText( str(cp.confpars.cspadQuad) + self.char_expand )
 
         self.setMenuForPairs()
@@ -190,19 +186,19 @@ class GUISelectQuadAndPair ( QtGui.QWidget ) :
                 self.butMenuPair.setStyleSheet("background-color: rgb(255, 0, 0); color: rgb(255, 255, 255)")
                 self.butMenuPair.setMaximumWidth(45)
             else :
-                cp.confpars.cspadPair = int(actionSelected.text())
+                cp.confpars.cspadPair = cp.confpars.cspadWindowParameters[self.window][11] = int(actionSelected.text())
                 self.butMenuPair.setText( str(cp.confpars.cspadPair) + self.char_expand )
                 self.butMenuPair.setStyleSheet("background-color: rgb(255, 255, 255); color: rgb(0, 0, 0)")
                 self.butMenuPair.setMaximumWidth(25)
 
 
-#    def processEditQuad(self):    
-#        cp.confpars.cspadQuad = int(self.editQuad.displayText())
-#        print 'Set quad: ', cp.confpars.cspadQuad
+    def mousePressEvent(self, event):
+        print 'Click on Quad or Pair number using mouse left button\n'
+        #print 'event.button() = %s at position' % (event.button()),        
+        #print (event.pos()),
+        #print ' x=%d, y=%d' % (event.x(),event.y()),        
+        #print ' global x=%d, y=%d' % (event.globalX(),event.globalY())
 
-#    def processEditPair(self):    
-#        cp.confpars.cspadPair = int(self.editPair.displayText())
-#        print 'Set pair: ', cp.confpars.cspadPair
 
 #http://doc.qt.nokia.com/4.6/qt.html#Key-enum
     def keyPressEvent(self, event):

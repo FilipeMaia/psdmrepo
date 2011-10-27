@@ -120,7 +120,18 @@ class HDF5TreeViewModel (QtGui.QStandardItemModel) :
     def _add_group_to_tree(self, g, parentItem):
         """Adds content of the file/group/dataset iteratively, starting from the sub-groups of g"""
 
-        d = dict(g)
+        try :
+            d = dict(g)
+        except h5py.h5e.BtreeError: 
+            print 70*'!'
+            print 'ERROR: CORRUPTED HDF5 STRUCTURE !!!' + \
+                  '\nCAN NOT MAKE A DICTIONARY FROM THE GROUP d = dict(g):\n', g 
+            print 'THIS GROUP IS MARKED AS UNRECOGNIZED IN THE TREE...'
+            print 70*'!'
+            item = QtGui.QStandardItem(QtCore.QString('UNRECOGNIZED GROUP'))
+            parentItem.appendRow(item)
+            return
+            
         list_keys = sorted(d.keys())
         list_vals = d.values()
         #print 'list_keys =', list_keys 
