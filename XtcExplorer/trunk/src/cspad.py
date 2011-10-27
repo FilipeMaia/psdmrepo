@@ -201,17 +201,26 @@ class CsPad( object ):
         """
         data = element.data()
         quad = element.quad()
+        
         self.pixels = np.array( (data[:,:,0],data[:,:,1]) )
         # pixels should now be (2 x 185 x 388)
+        print "2x2 array : ", self.pixels[0].shape
+        print "2x2 array : ", self.pixels[1].shape
 
         pairs = []
         for i in xrange(2):
             asics = np.split( data[:,:,i],2,axis=1)
-            gap = np.zeros( (185,3), dtype=data.dtype )
+
             # gap should be 3 pixels wide
+            gap = np.zeros( (185,3), dtype=data.dtype )
             pair = np.concatenate( (asics[0], gap, asics[1]), axis=1 )
+
+            pair = pair[:,::-1].T
             pairs.append(pair)
-        image = np.vstack( (pairs[0],pairs[1]) )
+
+        # wedge some pixels between the two 2x1s
+        wedge = np.zeros( (391,10), data.dtype )
+        image = np.hstack( (pairs[0],wedge,pairs[1]) )
         return image
 
 
