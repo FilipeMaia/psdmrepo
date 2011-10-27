@@ -398,8 +398,6 @@ class  pyana_cspad ( object ) :
             event_display_images.append( (label, average_image ) )
 
             average_array = self.sum_array / self.n_good
-            np.savetxt("testfile.txt", average_array.reshape((4*8*185),388))
-            np.save("testfile.npy", average_array.reshape((4*8*185),388))
 
         rejected_image = None
         if self.n_dark > 0 :
