@@ -17,7 +17,7 @@ CREATE  TABLE IF NOT EXISTS `REGDB`.`FILE` (
   `chunk` INT NOT NULL,
   `open` BIGINT UNSIGNED NOT NULL ,
   `host` VARCHAR(255) NOT NULL ,
-  `dirpath` VARCHAR(65535) NOT NULL ,
+  `dirpath` VARCHAR(255) NOT NULL ,
   PRIMARY KEY (`exper_id`,`run`,`stream`,`chunk`) ,
   KEY `FILE_FK_1` (`exper_id`) ,
   CONSTRAINT `FILE_FK_1`
