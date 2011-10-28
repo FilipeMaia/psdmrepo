@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-14-01
+2011-10-12 Andy Salnikov
+- make cspad 2x2 calibration to use the same calibration directory
+  as regular cspad
+
 Tag: V00-14-00
 2011-10-12 Andy Salnikov
 - removed all SciMD-related code, it was never used and only  

@@ -83,6 +83,17 @@ CsPadMiniCalibV1Cvt::convert ( const void* data,
   // this should not happen
   assert ( not m_groups.empty() ) ;
 
+  {
+    // We only accept data from Cspad2x2 devices here
+    const Pds::Src& pdssrc = src.top();
+    if (pdssrc.level() != Pds::Level::Source) {
+      MsgLog(logger, warning, "CsPadMiniCalibV1Cvt::convert called with non-Source level: " << Pds::Level::name(pdssrc.level()));
+      return;
+    }
+    const Pds::DetInfo& dinfo = static_cast<const Pds::DetInfo&>(pdssrc);
+    if (dinfo.device() != Pds::DetInfo::Cspad2x2) return;
+  }
+  
   PSCalib::CalibFileFinder calibFileFinder(m_metadata.calibDir(), m_typeGroupName);
 
   // find file with pedestals
