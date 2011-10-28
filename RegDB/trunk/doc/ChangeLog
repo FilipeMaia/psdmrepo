@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-35
+2011-10-28 Igor Gaponenko
+- fixed a bug in PHP class method RegDB::instance()
+- added and extended schema for database table regdb.file which now has two additional
+columns storing a host name where a file is open and directory path to the file
+on that host.
+
 Tag: V00-00-34
 2011-10-10 Andy Salnikov
 - added method RegDb.last_experiment_switch() which returns latest active 

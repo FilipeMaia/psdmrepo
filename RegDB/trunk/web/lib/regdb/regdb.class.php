@@ -16,8 +16,8 @@ class RegDB {
 	 * of parameters.
 	 */
 	public static function instance() {
-		if( is_null($default_instance)) $default_instance = new RegDB();
-		return $default_instance;
+		if( is_null(RegDB::$default_instance)) RegDB::$default_instance = new RegDB();
+		return RegDB::$default_instance;
 	}
 
 	/* Data members
