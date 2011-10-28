@@ -46,14 +46,19 @@ class CalibCycles :
     """
 
     def __init__ ( self, h5fname=None, dsname=None ) :
-        """Constructor"""
+        """Initialization
+
+        if the h5fname is missing, than the self.numberOfCalibCycles
+        should be defined from open file by extractNumberOfCalibCyclesFromOpenFile(...)
+        """
 
         #self.h5fname = h5fname
         #self.dsname  = dsname
         if h5fname != None :
             self.numberOfCalibCycles = self.extractNumberOfCalibCycles(h5fname, dsname)
-        else :
-            print 'WARNING: THE CalibCycles INITIALIZATION IS OMITTED... LORD CARES OF YOU...'
+        #else :
+        #    print 'WARNING: THE CalibCycles INITIALIZATION IS OMITTED...'
+            
 
 #-----------------------------
 

@@ -120,7 +120,7 @@ class PlotsForImage ( object ) :
         cp.confpars.imageSpALimsIsOn     = cp.confpars.imageWindowParameters[self.fig.nwin][8]
         cp.confpars.imageBinWidthIsOn    = cp.confpars.imageWindowParameters[self.fig.nwin][9]
 
-  
+
     def plotImage( self, arr2d1ev, fig ):
         """Plot 2d image from input array."""
 

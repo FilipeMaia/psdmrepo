@@ -129,8 +129,8 @@ class DrawEvent ( object ) :
 
                 if not self.dimIsFixed(dsname) :
                     self.arr1ev.shape = (self.arr1ev.shape[1],self.arr1ev.shape[0])
-                self.arr2d = self.arr1ev
-
+                #self.arr2d = self.arr1ev
+                self.arr2d = self.applyImageCorrections( self.arr1ev, dsname )
 
             elif gm.CSpadIsInTheName(dsname) :    # Check for CSpad 
 
@@ -165,6 +165,10 @@ class DrawEvent ( object ) :
 
         self.arrInWindowMax = arrInWindow.max()
         self.arrInWindowSum = arrInWindow.sum()
+
+        #print ' arrInWindow =',arrInWindow
+        #print ' arrInWindowMax =',self.arrInWindowMax
+        #print ' arrInWindowSum =',self.arrInWindowSum
 
         if inBin :
             if self.arrInWindowMax > Thr : return True
@@ -579,6 +583,8 @@ class DrawEvent ( object ) :
 
         if imageIsInTheName :
 
+            arr2d = self.applyImageCorrections( arr1ev, dsname )
+
             for self.nwin in range(cp.confpars.imageNWindows) :
 
                 if       cp.confpars.imageWindowParameters[self.nwin][0] == dsname \
@@ -586,44 +592,40 @@ class DrawEvent ( object ) :
 
                     self.figNum += 1 
                     if cp.confpars.imageImageIsOn : 
-                        self.plotsImage.plotImage(arr1ev,self.set_fig('1x1',dsname))
+                        self.plotsImage.plotImage(arr2d,self.set_fig('1x1',dsname))
                     else : self.close_fig(self.figNum)
 
                     self.figNum += 1 
                     if cp.confpars.imageSpectrumIsOn : 
-                        self.plotsImage.plotImageSpectrum(arr1ev,self.set_fig('1x1'))
+                        self.plotsImage.plotImageSpectrum(arr2d,self.set_fig('1x1',dsname))
                     else : self.close_fig(self.figNum)
 
                     self.figNum += 1 
                     if cp.confpars.imageImageSpecIsOn : 
-                        self.plotsImage.plotImageAndSpectrum(arr1ev,self.set_fig('2x3'))
+                        self.plotsImage.plotImageAndSpectrum(arr2d,self.set_fig('2x3',dsname))
                     else : self.close_fig(self.figNum)
-
-
 
 
             self.figNum += 1 
             if cp.confpars.imageProjXIsOn : 
-                self.plotsImageProj.plotProjX(arr1ev,self.set_fig('1x1'))
+                self.plotsImageProj.plotProjX(arr2d,self.set_fig('1x1'))
             else : self.close_fig(self.figNum)
 
             self.figNum += 1 
             if cp.confpars.imageProjYIsOn : 
-                self.plotsImageProj.plotProjY(arr1ev,self.set_fig('1x1'))
+                self.plotsImageProj.plotProjY(arr2d,self.set_fig('1x1'))
             else : self.close_fig(self.figNum)
 
             self.figNum += 1 
             if cp.confpars.imageProjRIsOn : 
-                self.plotsImageProj.plotProjR(arr1ev,self.set_fig('1x1'))
+                self.plotsImageProj.plotProjR(arr2d,self.set_fig('1x1'))
             else : self.close_fig(self.figNum)
 
             self.figNum += 1 
             if cp.confpars.imageProjPhiIsOn : 
-                self.plotsImageProj.plotProjPhi(arr1ev,self.set_fig('1x1'))
+                self.plotsImageProj.plotProjPhi(arr2d,self.set_fig('1x1'))
             else : self.close_fig(self.figNum)
 
-
-            
 
         if item_last_name == 'waveforms' :
 
@@ -635,6 +637,17 @@ class DrawEvent ( object ) :
                     if cp.confpars.waveformWaveformIsOn : 
                         self.plotsWaveform.plotWFWaveform(arr1ev,self.set_fig('2x1'),self.h5file)
                     else : self.close_fig(self.figNum)
+
+
+    def applyImageCorrections( self, arr2d1ev, dsname ):
+        """Apply corrections to the image array:
+        1) uint -> float32;
+        2) subtract offset from data
+        """
+        offset_dsname = gm.get_item_path_to_last_name(dsname) + '/data'
+        ds = self.h5file[offset_dsname]
+        offset = ds['offset'][cp.confpars.eventCurrent] # !!! Indexes are reversed in order to use 'offset' as index
+        return np.array(arr2d1ev, dtype=float32) - offset
 
 
     def getCSpadConfiguration( self, dsname ):

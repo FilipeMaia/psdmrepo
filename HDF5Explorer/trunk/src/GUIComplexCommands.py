@@ -97,6 +97,9 @@ class GUIComplexCommands ( QtGui.QWidget ) :
         self.butWaveVsEvIncCC = QtGui.QPushButton("+1 CC")
         self.butWaveVsEvDecCC = QtGui.QPushButton("-1 CC")
 
+        self.butWaveVsEvIncCC.setMaximumWidth(45)
+        self.butWaveVsEvDecCC.setMaximumWidth(45)
+
         #self.butAverage      .setStyleSheet("background-color: rgb(0, 255, 0); color: rgb(0, 0, 0)")
         #self.butCorr         .setStyleSheet("background-color: magenta; color: rgb(0, 0, 0)")
         self.butAverage      .setStyleSheet("background-color: rgb(230, 255, 230); color: rgb(0, 0, 0)")

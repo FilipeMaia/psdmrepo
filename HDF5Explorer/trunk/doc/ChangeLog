@@ -13,6 +13,23 @@ reverse time order.
 
 ------------------------------
 Tag: V00-00-
+2011-10-28 Mikhail S. Dubrovin
+- DrawEvent.py 
+  add method applyImageCorrections( arr1ev, dsname ), which 
+	1) converts image from uint -> float32
+	2) subtract the 'offset' from data record
+	
+2011-10-27 Mikhail S. Dubrovin
+- add module CalibCycles.py
+- in GUIComplexCommands.py
+	add +1CC and -1CC buttons with complete functionality
+- modified modules:	
+	       src/GUIComplexCommands.py
+	       src/GUIMain.py
+	       src/DrawEvent.py
+	       src/PlotsForWaveform.py
+	       src/PrintHDF5.py
+
 2011-10-26 Mikhail S. Dubrovin
 - In src/HDF5TreeViewModel.py    _add_group_to_tree(...) 
 	add try-except protection against hdf5 corruption
@@ -45,7 +62,6 @@ Tag: V00-00-
 	each window has a dataset - image is associated with dataset for each window.
 	!!! Geometry correction is taken for the 1st CSPad dataset !!!
 
-	
 Tag: V00-00-09
 2011-09-26 Mikhail S. Dubrovin
 - CSPad image was calculated in int16 -> now in float
