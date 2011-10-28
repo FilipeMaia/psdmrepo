@@ -68,7 +68,7 @@ class GUIComplexCommands ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(370, 10, 500, 50)
+        self.setGeometry(370, 10, 500, 30)
         self.setWindowTitle('Average and Correlation')
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False
@@ -90,17 +90,21 @@ class GUIComplexCommands ( QtGui.QWidget ) :
         self.avevEdit.setMaximumWidth(45)
         self.avevEdit.setValidator(QtGui.QIntValidator(1,1000000,self))
 
-        self.butAverage   = QtGui.QPushButton("Average")
-        self.butCorr      = QtGui.QPushButton("Correlations")
-        self.butCalibC    = QtGui.QPushButton("CalibCycles")
-        self.butWaveVsEv  = QtGui.QPushButton("WF vs Ev")
+        self.butAverage       = QtGui.QPushButton("Average")
+        self.butCorr          = QtGui.QPushButton("Correlations")
+        self.butCalibC        = QtGui.QPushButton("CalibCycles")
+        self.butWaveVsEv      = QtGui.QPushButton("WF vs Ev")
+        self.butWaveVsEvIncCC = QtGui.QPushButton("+1 CC")
+        self.butWaveVsEvDecCC = QtGui.QPushButton("-1 CC")
 
-        #self.butAverage   .setStyleSheet("background-color: rgb(0, 255, 0); color: rgb(0, 0, 0)")
-        #self.butCorr      .setStyleSheet("background-color: magenta; color: rgb(0, 0, 0)")
-        self.butAverage   .setStyleSheet("background-color: rgb(230, 255, 230); color: rgb(0, 0, 0)")
-        self.butCorr      .setStyleSheet("background-color: rgb(255, 230, 255); color: rgb(0, 0, 0)")
-        self.butCalibC    .setStyleSheet("background-color: rgb(255, 255, 220); color: rgb(0, 0, 0)")
-        self.butWaveVsEv  .setStyleSheet("background-color: rgb(220, 255, 255); color: rgb(0, 0, 0)")
+        #self.butAverage      .setStyleSheet("background-color: rgb(0, 255, 0); color: rgb(0, 0, 0)")
+        #self.butCorr         .setStyleSheet("background-color: magenta; color: rgb(0, 0, 0)")
+        self.butAverage      .setStyleSheet("background-color: rgb(230, 255, 230); color: rgb(0, 0, 0)")
+        self.butCorr         .setStyleSheet("background-color: rgb(255, 230, 255); color: rgb(0, 0, 0)")
+        self.butCalibC       .setStyleSheet("background-color: rgb(255, 255, 220); color: rgb(0, 0, 0)")
+        self.butWaveVsEv     .setStyleSheet("background-color: rgb(220, 255, 255); color: rgb(0, 0, 0)")
+        self.butWaveVsEvIncCC.setStyleSheet("background-color: rgb(220, 255, 255); color: rgb(0, 0, 0)")
+        self.butWaveVsEvDecCC.setStyleSheet("background-color: rgb(220, 255, 255); color: rgb(0, 0, 0)")
         
         #self.closeplts= QtGui.QPushButton("Close plots")
         #self.exit     = QtGui.QPushButton("Exit")
@@ -114,15 +118,26 @@ class GUIComplexCommands ( QtGui.QWidget ) :
         hboxA.addStretch(2)
         hboxA.addWidget(self.butCorr)
         hboxA.addWidget(self.butCalibC)
-        hboxA.addWidget(self.butWaveVsEv)
 
-        self.setLayout(hboxA)
+        hboxB = QtGui.QHBoxLayout()
+        hboxB.addWidget(self.butWaveVsEvDecCC)
+        hboxB.addWidget(self.butWaveVsEv)
+        hboxB.addWidget(self.butWaveVsEvIncCC)
+        hboxB.addStretch()
 
-        self.connect(self.butAverage,  QtCore.SIGNAL('clicked()'),          self.processAverage )
-        self.connect(self.butCorr,     QtCore.SIGNAL('clicked()'),          self.processCorrelations )
-        self.connect(self.butCalibC,   QtCore.SIGNAL('clicked()'),          self.processCalibCycles )
-        self.connect(self.butWaveVsEv, QtCore.SIGNAL('clicked()'),          self.processWaveVsEv )
-        self.connect(self.avevEdit,    QtCore.SIGNAL('editingFinished ()'), self.processAverageEventsEdit )
+        vbox  = QtGui.QVBoxLayout()
+        vbox.addLayout(hboxA)
+        vbox.addLayout(hboxB)
+
+        self.setLayout(vbox)
+
+        self.connect(self.butAverage,      QtCore.SIGNAL('clicked()'),          self.processAverage )
+        self.connect(self.butCorr,         QtCore.SIGNAL('clicked()'),          self.processCorrelations )
+        self.connect(self.butCalibC,       QtCore.SIGNAL('clicked()'),          self.processCalibCycles )
+        self.connect(self.butWaveVsEv,     QtCore.SIGNAL('clicked()'),          self.processWaveVsEv )
+        self.connect(self.butWaveVsEvIncCC,QtCore.SIGNAL('clicked()'),          self.processWaveVsEvIncCC )
+        self.connect(self.butWaveVsEvDecCC,QtCore.SIGNAL('clicked()'),          self.processWaveVsEvDecCC )
+        self.connect(self.avevEdit,        QtCore.SIGNAL('editingFinished ()'), self.processAverageEventsEdit )
 
         #self.setFocus()
         #self.resize(500, 300)
@@ -161,6 +176,16 @@ class GUIComplexCommands ( QtGui.QWidget ) :
     def processWaveVsEv(self):
         print 'WaveVsEv'
         self.drawev.drawWaveVsEventPlots()
+
+
+    def processWaveVsEvIncCC(self):
+        print 'WaveVsEvIncCC'
+        self.drawev.drawWaveVsEventPlots(1)
+
+
+    def processWaveVsEvDecCC(self):
+        print 'WaveVsEvDecCC'
+        self.drawev.drawWaveVsEventPlots(-1)
 
 
     def processAverage(self):

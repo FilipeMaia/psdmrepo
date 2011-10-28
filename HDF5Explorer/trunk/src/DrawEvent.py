@@ -55,6 +55,7 @@ import PlotsForCSpadProjections  as cspadproj
 import PlotsForImageProjections  as imageproj
 import PrintHDF5                 as printh5
 import GlobalMethods             as gm
+import CalibCycles               as cc
 
 #---------------------
 #  Class definition --
@@ -917,7 +918,7 @@ class DrawEvent ( object ) :
 #-----------------------------------------
 #-----------------------------------------
 
-    def drawWaveVsEventPlots ( self ) :
+    def drawWaveVsEventPlots ( self, dNcc=0 ) :
         """Draw waveform vs event plots"""
 
         if not cp.confpars.waveformWaveVsEvIsOn :
@@ -927,21 +928,37 @@ class DrawEvent ( object ) :
         
         self.openHDF5File()
         if not cp.confpars.h5_file_is_open : return
-        self.drawWaveVsEventPlotsFromOpenFile()
+
+        dsname = cp.confpars.waveformWindowParameters[0][0]
+        #Create the CalibCycles object and initialize it from open file
+        self.CalibCOps = cc.CalibCycles()
+        NccTotal = self.CalibCOps.extractNumberOfCalibCyclesFromOpenFile(self.h5file, dsname)
+        print 'Total number of CalibCycles =', NccTotal
+        self.drawWaveVsEventPlotsFromOpenFile(dNcc)        
         self.closeHDF5File()
 
-    def drawWaveVsEventPlotsFromOpenFile ( self ) :
+    def drawWaveVsEventPlotsFromOpenFile ( self, dNcc=0 ) :
 
         self.figNum = 300
 
-        print 'drawWaveVsEvPlotsFromOpenFile for nwin=', cp.confpars.waveformNWindows
+        print 'drawWaveVsEvPlotsFromOpenFile for nwin=', cp.confpars.waveformNWindows, ' dNcc=', dNcc
 
         for self.nwin in range(cp.confpars.waveformNWindows) :
+
+            self.setDSNameForCalibCycle ( self.nwin, dNcc )
 
             self.figNum += 1 
             if cp.confpars.waveformWaveVsEvIsOn : 
                 self.plotsWaveform.plotWaveVsEvent(self.set_fig('2x1'), self.h5file)
             else : self.close_fig(self.figNum)
+
+
+    def setDSNameForCalibCycle ( self, nwin, dNcc=0 ) :
+        if dNcc != 0 :
+            dsname = cp.confpars.waveformWindowParameters[nwin][0]
+            cp.confpars.waveformWindowParameters[nwin][0] = self.CalibCOps.getDSNameForCalibCycleDN(dsname, dNcc)
+            print 'Plot for other CalibCycle:', cp.confpars.waveformWindowParameters[nwin][0]
+
 
 
 #-----------------------------------------

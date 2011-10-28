@@ -141,6 +141,19 @@ def get_item_name_for_title(dsname):
 
     return name3 + '/' + name2 + '/' + name1
 
+
+#----------------------------------
+
+def get_item_name_for_title_4(dsname):
+    """Returns the last 4 parts of the full item name (after last slashes)"""
+
+    path1,name1 = os.path.split(str(dsname))
+    path2,name2 = os.path.split(str(path1))
+    path3,name3 = os.path.split(str(path2))
+    path4,name4 = os.path.split(str(path3))
+
+    return name4 + '/' + name3 + '/' + name2 + '/' + name1
+
 #----------------------------------
 
 def CSpadIsInTheName(dsname):

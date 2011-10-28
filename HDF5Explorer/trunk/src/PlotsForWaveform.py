@@ -235,8 +235,8 @@ class PlotsForWaveform ( object ) :
         self.nwin   = nwin = fig.nwin
         self.h5file = h5file
         dsname = cp.confpars.waveformWindowParameters[self.nwin][0]
-        #cp.confpars.current_item_name_for_title = printh5.get_item_name_for_title(dsname)
-        cp.confpars.current_item_name_for_title = str(dsname)
+        cp.confpars.current_item_name_for_title = printh5.get_item_name_for_title_4(dsname)
+        #cp.confpars.current_item_name_for_title = str(dsname)
 
         ds     = self.h5file[dsname]
         Nevents = ds.shape[0]     

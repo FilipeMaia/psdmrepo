@@ -319,7 +319,7 @@ class GUIMain ( QtGui.QWidget ) :
             print 'Open What to display GUI'
             #self.wtd.setText('Close')
             cp.confpars.guiwhat = guiwtd.GUIWhatToDisplay()
-            cp.confpars.guiwhat.move(self.pos().__add__(QtCore.QPoint(0,380))) # open window with offset w.r.t. parent
+            cp.confpars.guiwhat.move(self.pos().__add__(QtCore.QPoint(0,420))) # open window with offset w.r.t. parent
             cp.confpars.guiwhat.show()
 
         cp.confpars.step03IsDone = True
@@ -363,7 +363,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.wcomplex = guicomplex.GUIComplexCommands(None, self.wplayer)
         self.hboxT.addWidget(self.wplayer)
         self.hboxA.addWidget(self.wcomplex)
-        self.setFixedSize(500,350)
+        self.setFixedSize(500,390)
 
 
     def mousePressEvent(self, event):
