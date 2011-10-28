@@ -16,8 +16,8 @@ class LogBook {
 	 * of parameters.
 	 */
 	public static function instance() {
-		if( is_null($default_instance)) $default_instance = new LogBook();
-		return $default_instance;
+		if( is_null(LogBook::$default_instance)) LogBook::$default_instance = new LogBook();
+		return LogBook::$default_instance;
 	}
 	
     /* Data members

@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-03
+2011-10-28 
+- fixed a bug in PHP class method LogBook::instance()
+
 Tag: V00-02-02
 2011-10-24 Andy Salnikov
 - removed include Lusi/Lusi.h from test app too
