@@ -75,20 +75,28 @@ CsPadPedestals::~CsPadPedestals ()
 void 
 CsPadPedestals::beginRun(Event& evt, Env& env)
 {
-  std::string src = configStr("source", "DetInfo(:Cspad)");
-
+  // Find all configuration objects matching the source address
+  // provided in configuration. If there is more than one configuration 
+  // object is found then complain and stop.
+  
+  std::string src = configStr("source", "DetInfo()");
+  int count = 0;
+  
   // need to know segment mask which is availabale in configuration only
   shared_ptr<Psana::CsPad::ConfigV1> config1 = env.configStore().get(src, &m_src);
   if (config1.get()) {
     for (int i = 0; i < MaxQuads; ++i) {
       m_segMask[i] = config1->asicMask()==1 ? 0x3 : 0xff;
     }
+    ++ count;
   }
+  
   shared_ptr<Psana::CsPad::ConfigV2> config2 = env.configStore().get(src, &m_src);
   if (config2.get()) {
     for (int i = 0; i < MaxQuads; ++i) {
       m_segMask[i] = config2->roiMask(i);
     }
+    ++ count;
   }
 
   shared_ptr<Psana::CsPad::ConfigV3> config3 = env.configStore().get(src, &m_src);
@@ -96,8 +104,30 @@ CsPadPedestals::beginRun(Event& evt, Env& env)
     for (int i = 0; i < MaxQuads; ++i) {
       m_segMask[i] = config3->roiMask(i);
     }
+    ++ count;
+  }
+
+  if (not count) {
+    MsgLog(name(), error, "No CsPad configuration objects found, terminating.");
+    terminate();
+    return;
   }
   
+  if (count > 1) {
+    MsgLog(name(), error, "Multiple CsPad configuration objects found, use more specific source address. Terminating.");
+    terminate();
+    return;
+  }
+
+  MsgLog(name(), info, "Found CsPad object with address " << m_src);
+  if (m_src.level() == Pds::Level::Source) {
+    const Pds::DetInfo& dinfo =static_cast<const Pds::DetInfo&>(m_src);
+    // see what data we should get
+    m_2x2 = dinfo.device() == Pds::DetInfo::Cspad2x2; 
+  } else {
+    MsgLog(name(), error, "Found object with address not at Source level. Terminating.");
+    terminate();
+  }
 }
 
 /// Method which is called with event data, this is the only required 
@@ -105,41 +135,60 @@ CsPadPedestals::beginRun(Event& evt, Env& env)
 void 
 CsPadPedestals::event(Event& evt, Env& env)
 {
-  
-  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_src);
-  if (data1.get()) {
 
-    ++ m_count;
+  if (m_2x2) {
     
-    int nQuads = data1->quads_shape()[0];
-    for (int iq = 0; iq != nQuads; ++ iq) {
+    // we should expect 2x2 data 
+    
+    shared_ptr<Psana::CsPad::MiniElementV1> data1 = evt.get(m_src);
+    if (data1.get()) {
+  
+      ++ m_count;
       
-      // get quad object
-      const CsPad::ElementV1& quad = data1->quads(iq);
-
-      // process statistics for this quad
-      collectStat(quad.quad(), quad.data());
+      // process statistics for 2x2
+      collectStat2x2(data1->data());
+      
     }
     
-  }
+  } else {
   
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src);
-  if (data2.get()) {
-
-    ++ m_count;
+    // we should get only regular cspad data
     
-    int nQuads = data2->quads_shape()[0];
-    for (int iq = 0; iq != nQuads; ++ iq) {
+    shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_src);
+    if (data1.get()) {
+  
+      ++ m_count;
       
-      // get quad object
-      const CsPad::ElementV2& quad = data2->quads(iq);
-
-      // process statistics for this quad
-      collectStat(quad.quad(), quad.data());
+      int nQuads = data1->quads_shape()[0];
+      for (int iq = 0; iq != nQuads; ++ iq) {
+        
+        // get quad object
+        const CsPad::ElementV1& quad = data1->quads(iq);
+  
+        // process statistics for this quad
+        collectStat(quad.quad(), quad.data());
+      }
+      
     }
     
-  }
+    shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src);
+    if (data2.get()) {
   
+      ++ m_count;
+      
+      int nQuads = data2->quads_shape()[0];
+      for (int iq = 0; iq != nQuads; ++ iq) {
+        
+        // get quad object
+        const CsPad::ElementV2& quad = data2->quads(iq);
+  
+        // process statistics for this quad
+        collectStat(quad.quad(), quad.data());
+      }
+      
+    }
+
+  }
 }
 
 
@@ -151,50 +200,90 @@ CsPadPedestals::endJob(Event& evt, Env& env)
 
   MsgLog(name(), info, "collected total " << m_count << " events");
   
-  if (not m_pedFile.empty()) {
-    
-    // save pedestals as average
-    std::ofstream out(m_pedFile.c_str());
-    for (int iq = 0; iq != MaxQuads; ++ iq) {
-      for (int is = 0; is != MaxSectors; ++ is) {
-        for (int ic = 0; ic != NumColumns; ++ ic) {
-          for (int ir = 0; ir != NumRows; ++ ir) {
-            double avg = m_count ? m_sum[iq][is][ic][ir] / m_count : 0;
-            out << avg << ' ';
-          }
-          out << '\n';
-        }
-      }
-    }
-    
-    out.close();
-    
-  }
+  if (m_2x2) {
 
-  if (not m_noiseFile.empty()) {
+    const double* sum = &m_sum[0][0][0][0];
+    const double* sum2 = &m_sum2[0][0][0][0];
+    const int size = NumColumns*NumRows*2;
+
+    if (not m_pedFile.empty()) {
+      
+      // save pedestals as average
+      std::ofstream out(m_pedFile.c_str());
+      for (int i = 0; i < size; ++ i) {
+        double avg = m_count ? sum[i] / m_count : 0;
+        out << avg << '\n';
+      }
+      
+      out.close();
+      
+    }
+  
+    if (not m_noiseFile.empty()) {
+      
+      // save pedestals as average
+      std::ofstream out(m_noiseFile.c_str());
+      for (int i = 0; i < size; ++ i) {
+        double stdev = 0;
+        if (m_count > 1) {
+          double avg = sum[i] / m_count;
+          stdev = std::sqrt(sum2[i] / m_count - avg*avg);              
+        }
+        out << stdev << '\n';
+      }
+      
+      out.close();
+      
+    }
+
+
+  } else {
     
-    // save pedestals as average
-    std::ofstream out(m_noiseFile.c_str());
-    for (int iq = 0; iq != MaxQuads; ++ iq) {
-      for (int is = 0; is != MaxSectors; ++ is) {
-        for (int ic = 0; ic != NumColumns; ++ ic) {
-          for (int ir = 0; ir != NumRows; ++ ir) {
-            double stdev = 0;
-            if (m_count > 1) {
-              double avg = m_sum[iq][is][ic][ir] / m_count;
-              stdev = std::sqrt(m_sum2[iq][is][ic][ir] / m_count - avg*avg);              
+    if (not m_pedFile.empty()) {
+      
+      // save pedestals as average
+      std::ofstream out(m_pedFile.c_str());
+      for (int iq = 0; iq != MaxQuads; ++ iq) {
+        for (int is = 0; is != MaxSectors; ++ is) {
+          for (int ic = 0; ic != NumColumns; ++ ic) {
+            for (int ir = 0; ir != NumRows; ++ ir) {
+              double avg = m_count ? m_sum[iq][is][ic][ir] / m_count : 0;
+              out << avg << ' ';
             }
-            out << stdev << ' ';
+            out << '\n';
           }
-          out << '\n';
         }
       }
+      
+      out.close();
+      
     }
-    
-    out.close();
-    
-  }
+  
+    if (not m_noiseFile.empty()) {
+      
+      // save pedestals as average
+      std::ofstream out(m_noiseFile.c_str());
+      for (int iq = 0; iq != MaxQuads; ++ iq) {
+        for (int is = 0; is != MaxSectors; ++ is) {
+          for (int ic = 0; ic != NumColumns; ++ ic) {
+            for (int ir = 0; ir != NumRows; ++ ir) {
+              double stdev = 0;
+              if (m_count > 1) {
+                double avg = m_sum[iq][is][ic][ir] / m_count;
+                stdev = std::sqrt(m_sum2[iq][is][ic][ir] / m_count - avg*avg);              
+              }
+              out << stdev << ' ';
+            }
+            out << '\n';
+          }
+        }
+      }
+      
+      out.close();
+      
+    }
 
+  }
 }
 
 
@@ -223,6 +312,22 @@ CsPadPedestals::collectStat(unsigned qNum, const int16_t* data)
       ++seg;
     }
   }
+
+}
+
+/// collect statistics for 2x2
+void 
+CsPadPedestals::collectStat2x2(const int16_t* data)
+{
+  double* sum = &m_sum[0][0][0][0];
+  double* sum2 = &m_sum2[0][0][0][0];
+  const int size = NumColumns*NumRows*2;
+  
+  for (int i = 0; i < size; ++ i) {
+    double val = data[i];
+    sum[i] += val;
+    sum2[i] += val*val;
+  }          
 
 }
 

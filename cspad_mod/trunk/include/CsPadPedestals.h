@@ -76,6 +76,9 @@ protected:
   /// collect statistics
   void collectStat(unsigned qNum, const int16_t* data);
   
+  /// collect statistics for 2x2
+  void collectStat2x2(const int16_t* data);
+  
 private:
 
   std::string m_pedFile;
@@ -89,6 +92,7 @@ private:
   double m_sum[MaxQuads][MaxSectors][NumColumns][NumRows];   // sum per pixel
   double m_sum2[MaxQuads][MaxSectors][NumColumns][NumRows];  // sum of squares per pixel
   
+  bool m_2x2;      // if true then data come from 2x2
 };
 
 } // namespace cspad_mod

@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-02
+2011-10-28 Andy Salnikov
+- CsPadPedestals module now understand 2x2 data and makes pedestals for 
+  those data as well
+- make it work better in presence of multiple cspad detectors
+
 Tag: V00-01-01
 2011-10-05 Andy Salnikov
 - CsPadFilter module now looks for MiniElement too
