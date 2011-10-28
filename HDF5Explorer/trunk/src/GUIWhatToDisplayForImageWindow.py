@@ -75,6 +75,7 @@ class GUIWhatToDisplayForImageWindow ( QtGui.QWidget ) :
 
         self.titIMImage          = QtGui.QLabel('Image plot')
         self.titIMSpectrum       = QtGui.QLabel('Spectrum')
+        self.titIMOffset         = QtGui.QLabel('Const. offset')
 
         self.titIMImage    .setFont (titFont10)   
         self.titIMSpectrum .setFont (titFont10)
@@ -97,6 +98,7 @@ class GUIWhatToDisplayForImageWindow ( QtGui.QWidget ) :
         self.editIMSpectrumAmax     = QtGui.QLineEdit(str(cp.confpars.imageWindowParameters[self.window][4]))
         self.editIMSpectrumNBins    = QtGui.QLineEdit(str(cp.confpars.imageWindowParameters[self.window][5]))
         self.editIMSpectrumBinWidth = QtGui.QLineEdit(str(cp.confpars.imageWindowParameters[self.window][6]))
+        self.editIMOffset           = QtGui.QLineEdit(str(cp.confpars.imageWindowParameters[self.window][10]))
 
         self.editIMImageAmin        .setValidator(QtGui.QIntValidator(-100000, 100000, self))
         self.editIMImageAmax        .setValidator(QtGui.QIntValidator(-100000, 100000, self))
@@ -111,7 +113,8 @@ class GUIWhatToDisplayForImageWindow ( QtGui.QWidget ) :
         self.editIMSpectrumAmax     .setMaximumWidth(45)
         self.editIMSpectrumNBins    .setMaximumWidth(45)
         self.editIMSpectrumBinWidth .setMaximumWidth(45)
-
+        self.editIMOffset           .setMaximumWidth(65)
+        
         self.titIMDataset  = QtGui.QLabel('Dataset:')
         self.butSelDataSet = QtGui.QPushButton(cp.confpars.imageWindowParameters[self.window][0])
         self.butSelDataSet.setMaximumWidth(350)
@@ -139,6 +142,10 @@ class GUIWhatToDisplayForImageWindow ( QtGui.QWidget ) :
         gridIM.addWidget(self.radioBinWidth,          3, 5)
         gridIM.addWidget(self.editIMSpectrumNBins,    2, 6)
         gridIM.addWidget(self.editIMSpectrumBinWidth, 3, 6)
+
+        gridIM.addWidget(self.titIMOffset,            3, 0)
+        gridIM.addWidget(self.editIMOffset,           3, 1)
+
         
         #hboxC = QtGui.QHBoxLayout()
         #hboxC.addStretch(1)
@@ -159,6 +166,7 @@ class GUIWhatToDisplayForImageWindow ( QtGui.QWidget ) :
         self.connect(self.editIMSpectrumAmax,     QtCore.SIGNAL('editingFinished ()'), self.processEditIMSpectrumAmax )
         self.connect(self.editIMSpectrumNBins,    QtCore.SIGNAL('editingFinished ()'), self.processEditIMSpectrumNBins )
         self.connect(self.editIMSpectrumBinWidth, QtCore.SIGNAL('editingFinished ()'), self.processEditIMSpectrumBinWidth )
+        self.connect(self.editIMOffset,           QtCore.SIGNAL('editingFinished ()'), self.processEditIMOffset )
 
         self.connect(self.cboxImALimits,          QtCore.SIGNAL('stateChanged(int)'),  self.processCboxImALimits)
         self.connect(self.cboxSpALimits,          QtCore.SIGNAL('stateChanged(int)'),  self.processCboxSpALimits)
@@ -337,6 +345,10 @@ class GUIWhatToDisplayForImageWindow ( QtGui.QWidget ) :
         #print 'EditIMSpectrumAmax'
         cp.confpars.imageWindowParameters[self.window][4] = int(self.editIMSpectrumAmax.displayText())        
         self.setBinning()
+
+    def processEditIMOffset(self):
+        #print 'EditIMOffset'
+        cp.confpars.imageWindowParameters[self.window][10] = int(self.editIMOffset.displayText())        
 
 #-----------------------------
 #  In case someone decides to run this module

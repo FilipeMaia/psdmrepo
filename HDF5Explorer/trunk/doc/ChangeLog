@@ -12,13 +12,16 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ------------------------------
-Tag: V00-00-
+Tag: V00-00-10
 2011-10-28 Mikhail S. Dubrovin
 - DrawEvent.py 
   add method applyImageCorrections( arr1ev, dsname ), which 
 	1) converts image from uint -> float32
 	2) subtract the 'offset' from data record
-	
+        3) subtract the 'const. offset' from the menu:
+- GUIWhatToDisplayForCSpadWindow.py	
+        Add "Const. offset" parameter with full functionality
+
 2011-10-27 Mikhail S. Dubrovin
 - add module CalibCycles.py
 - in GUIComplexCommands.py

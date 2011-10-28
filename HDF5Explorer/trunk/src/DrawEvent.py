@@ -114,6 +114,8 @@ class DrawEvent ( object ) :
 
         if not cp.confpars.selectionIsOn : return True           # Is passed if selection is OFF
 
+        self.nwin = None
+
         for win in range(cp.confpars.selectionNWindows) :        # Loop over all windows
 
             dsname = cp.confpars.selectionWindowParameters[win][6]
@@ -647,7 +649,10 @@ class DrawEvent ( object ) :
         offset_dsname = gm.get_item_path_to_last_name(dsname) + '/data'
         ds = self.h5file[offset_dsname]
         offset = ds['offset'][cp.confpars.eventCurrent] # !!! Indexes are reversed in order to use 'offset' as index
-        return np.array(arr2d1ev, dtype=float32) - offset
+        if self.nwin == None :
+            return np.array(arr2d1ev, dtype=float32) - offset
+        else :
+            return np.array(arr2d1ev, dtype=float32) - offset - cp.confpars.imageWindowParameters[self.nwin][10]
 
 
     def getCSpadConfiguration( self, dsname ):

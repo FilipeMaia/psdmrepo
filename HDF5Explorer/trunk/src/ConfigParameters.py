@@ -193,9 +193,9 @@ class ConfigParameters ( object ) :
 
         self.imageWindowParameters = []
         for win in range(self.imageNWindowsMax) :
-            self.imageWindowParameters.append(['All', 0, 100, 0, 100, 100, 1, False, False, False])
-            #[dataset, ImAmin, ImAmax, SpAmin, SpAmax, SpNBins, SpBinWidth, ImALimsIsOn, SpALimsIsOn, SpBinWidthIsOn]
-            #[0,       1,      2,      3,      4,      5,       6,          7,           8,           9]
+            self.imageWindowParameters.append(['All', 0, 100, 0, 100, 100, 1, False, False, False, 0])
+            #[dataset, ImAmin, ImAmax, SpAmin, SpAmax, SpNBins, SpBinWidth, ImALimsIsOn, SpALimsIsOn, SpBinWidthIsOn, ImOffset]
+            #[0,       1,      2,      3,      4,      5,       6,          7,           8,           9,              10]
 
 
         # Default parameters for Waveform plots
@@ -403,6 +403,7 @@ class ConfigParameters ( object ) :
             print 'IMAGE_IM_LIMITS_IS_ON', self.imageWindowParameters[win][7] 
             print 'IMAGE_SP_LIMITS_IS_ON', self.imageWindowParameters[win][8] 
             print 'IMAGE_BIN_WIDTH_IS_ON', self.imageWindowParameters[win][9] 
+            print 'IMAGE_OFFSET',          self.imageWindowParameters[win][10] 
 
 
         print 'READ_PARS_AT_START',        self.readParsFromFileAtStart
@@ -650,6 +651,7 @@ class ConfigParameters ( object ) :
                 elif key == 'IMAGE_IM_LIMITS_IS_ON'    : self.imageWindowParameters[win][7] = dicBool[val.lower()]
                 elif key == 'IMAGE_SP_LIMITS_IS_ON'    : self.imageWindowParameters[win][8] = dicBool[val.lower()]
                 elif key == 'IMAGE_BIN_WIDTH_IS_ON'    : self.imageWindowParameters[win][9] = dicBool[val.lower()]
+                elif key == 'IMAGE_OFFSET'             : self.imageWindowParameters[win][10]= int(val)
 
 
                #elif key == 'PER_EVENT_DIST_IS_ON'     : self.perEventDistIsOn        = dicBool[val.lower()]
@@ -891,6 +893,7 @@ class ConfigParameters ( object ) :
             f.write('IMAGE_IM_LIMITS_IS_ON'+ space + str(self.imageWindowParameters[win][7] )    + '\n')
             f.write('IMAGE_SP_LIMITS_IS_ON'+ space + str(self.imageWindowParameters[win][8] )    + '\n')
             f.write('IMAGE_BIN_WIDTH_IS_ON'+ space + str(self.imageWindowParameters[win][9] )    + '\n')
+            f.write('IMAGE_OFFSET'         + space + str(self.imageWindowParameters[win][10])    + '\n')
 
 
        #f.write('PER_EVENT_DIST_IS_ON'      + space + str(self.perEventDistIsOn)        + '\n')
