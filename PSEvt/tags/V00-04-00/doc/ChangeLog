@@ -1,0 +1,75 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PSEvt
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-04-00
+2011-10-28 Andy Salnikov
+- method Event::keys() now takes options source argument to limit 
+  returned keys only to matching sources
+- added unit test for that
+- fix for EventKEy class to allow assignment operator
+- added global operator<<() for Pds::Src class
+
+Tag: V00-03-00
+2011-10-04 Andy Salnikov
+- add support for "AnySource" proxies. These proxies are stored in 
+  proxy dictionary with special source address which does not correspond 
+  to real source. When get() is called on dictionary with exact source
+  address and there is no proxy registered for that address another
+  try is done to find "AnySource" proxy and ask it for data.   
+- This is added primarily to support calibration-type proxies that 
+  can serve calibration data for multiple sources. Not for casual users.
+
+Tag: V00-02-00
+2011-05-06 Andy Salnikov
+- few methods in proxy dict classes now take EventKey instead of triplet
+  of parameters
+- doxygenating headers
+
+Tag: V00-01-00
+2011-04-26 Andy Salnikov
+- added optional argument to Event::get and matching ProxyDict methods 
+  to return the exact source (Pds::Src) of the object.
+
+Tag: V00-00-07
+2011-03-28 Andy Salnikov
+- missing return value in ProxyDict::getImpl
+
+Tag: V00-00-06
+2011-03-23 Andy Salnikov
+- extended psevt-source-unit-test.cpp slightly
+- add Event::get method which takes Source in addition to Pds::Src 
+- modified ProxyDict to work with Source instead of Pds::Src and 
+  do matching if source is not exact
+
+Tag: V00-00-05
+2011-03-23 Andy Salnikov
+- added Source class and unit test for it
+
+Tag: V00-00-04
+2011-03-21 Andy Salnikov
+- Event::get() function does not need template parameter
+
+Tag: V00-00-03
+2011-03-20 Andy Salnikov
+- added EventId class which is an interface for the Event ID objects
+- added EventKey class which is the key for objects in the event structure
+
+Tag: V00-00-02
+2011-01-31 Andy Salnikov
+- renamed the package to PSEvt
+- use ErrSvc::Issue for exceptions' base class
+
+Tag: V00-00-01
+2011-01-26 Andy Salnikov
+- fist commit to repository
+- event class is basically finished, ready for tests
