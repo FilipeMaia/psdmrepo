@@ -157,10 +157,10 @@ public:
    *  
    *  @return list of the EventKey objects
    */
-  std::list<PSEvt::EventKey> keys() const
+  std::list<PSEvt::EventKey> keys(const PSEvt::Source& source = PSEvt::Source()) const
   {
     std::list<PSEvt::EventKey> result;
-    m_dict->keys(result);
+    m_dict->keys(result, source);
     return result;
   }
 

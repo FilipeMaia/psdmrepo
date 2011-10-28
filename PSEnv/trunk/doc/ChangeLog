@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-00
+2011-10-28 Andy Salnikov
+- proxy dict keys() method now takes source argument, updating 
+  interface of EnvObjectStore to match
+
 Tag: V00-06-00
 2011-10-05 Andy Salnikov
 - update EpicsStore classes to support multi-source EPICS data
