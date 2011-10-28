@@ -815,8 +815,10 @@ void
 ConnectionImpl::reportOpenFile (int exper_id,
                                 int run,
                                 int stream,
-                                int chunk) throw (WrongParams,
-                                                  DatabaseError)
+                                int chunk,
+                                const std::string& host,
+                                const std::string& dirpath) throw (WrongParams,
+                                                                   DatabaseError)
 {
     if (!m_is_started)
         throw DatabaseError ("no transaction") ;
@@ -836,6 +838,12 @@ ConnectionImpl::reportOpenFile (int exper_id,
     //
     const LusiTime::Time now = LusiTime::Time::now () ;
 
+    // Host name and directory path shouldn't exceed the limit. Neither they should
+    // be empty.
+    //
+    if(host.empty() || (host.size() > 255) || dirpath.empty() || (dirpath.size() > 255))
+        throw WrongParams ("host name or directory path are either empty or exceed the limit of 255 characters") ;
+
     // Now proceed with the new file registration
     //
 
@@ -847,6 +855,8 @@ ConnectionImpl::reportOpenFile (int exper_id,
          `stream`   int(11) NOT NULL,
          `chunk`    int(11) NOT NULL,
          `open`     bigint(20) unsigned NOT NULL,
+         `host`     varchar(255) NOT NULL,
+         `dirpath`  varchar(255) NOT NULL,
           PRIMARY KEY  (`exper_id`, `run`, `stream`, `chunk`),
           KEY `FILE_FK_1` (`exper_id`),
           CONSTRAINT `FILE_FK_1` FOREIGN KEY (`exper_id`) REFERENCES `experiment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -860,7 +870,9 @@ ConnectionImpl::reportOpenFile (int exper_id,
         << run      << ","
         << stream   << ","
         << chunk    << ","
-        << LusiTime::Time::to64 (now) << ")";
+        << LusiTime::Time::to64 (now) << ",'"
+        << this->escape_string (m_regdb_mysql, host)    << "','"
+        << this->escape_string (m_regdb_mysql, dirpath) << "')";
 
     this->simpleQuery (m_regdb_mysql, sql.str());
 }

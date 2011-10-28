@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-04
+2011-10-28
+- extended C++ API method LogBook::Connection::reportOpenFile() to report
+the host name and the local directory path name for files created by DAQ.
+- made proper adjustments to teh test application LogBookTestApp
+
 Tag: V00-02-03
 2011-10-28 
 - fixed a bug in PHP class method LogBook::instance()

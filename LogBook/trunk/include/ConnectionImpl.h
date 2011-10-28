@@ -361,8 +361,10 @@ public:
     virtual void reportOpenFile (int exper_id,
                                  int run,
                                  int stream,
-                                 int chunk) throw (WrongParams,
-                                                   DatabaseError) ;
+                                 int chunk,
+                                 const std::string& host,
+                                 const std::string& dirpath) throw (WrongParams,
+                                                                    DatabaseError) ;
 
 private:
 

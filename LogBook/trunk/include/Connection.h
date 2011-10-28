@@ -504,6 +504,12 @@ public:
       * The method would store the information about the new file in the Experiment
       * Registry database in a scope of the specified experiment and run.
       *
+      * PARAMETERS:
+      *
+      *   host:    host name where the file is available
+      *   dirpath: full directory path to where the file can be accessed from
+      *            the above specified host
+      *
       * EXCEPTIONS:
       *
       *   "WrongParams"        : to report wrong parameters (non-existing experiment, run, etc.)
@@ -515,8 +521,10 @@ public:
     virtual void reportOpenFile (int exper_id,
                                  int run,
                                  int stream,
-                                 int chunk) throw (WrongParams,
-                                                   DatabaseError) = 0 ;
+                                 int chunk,
+                                 const std::string& host,
+                                 const std::string& dirpath) throw (WrongParams,
+                                                                    DatabaseError) = 0 ;
 
 protected:
 

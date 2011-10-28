@@ -351,7 +351,7 @@ LogBookTestApp::cmd_help ()
          << "  save_files       <instrument> <experiment> <run> {DATA|CALIB}\n"
          << "  save_files_m     <instrument> <experiment> <run> {DATA|CALIB} [ <file1> {XTC|EPICS} ] [ <file>2 {XTC|EPICS} ] ...\n"
          << "\n"
-         << "  open_file     <exper_id> <run> <stream> <chunk>\n"
+         << "  open_file     <exper_id> <run> <stream> <chunk> <host> <dirpath>\n"
          << "\n"
          << "NOTES ON PARAMETERS:\n"
          << "\n"
@@ -969,7 +969,7 @@ LogBookTestApp::cmd_open_file () throw (std::exception)
 {
     // Parse and verify the arguments
     //
-    if (m_args.empty() || m_args.size() != 4) {
+    if (m_args.empty() || m_args.size() != 6) {
         MsgLogRoot (error, "wrong number of arguments to the command") ;
         return 2 ;
     }
@@ -978,13 +978,17 @@ LogBookTestApp::cmd_open_file () throw (std::exception)
     const int run      = LogBook::str2int (*(itr++)) ;
     const int stream   = LogBook::str2int (*(itr++)) ;
     const int chunk    = LogBook::str2int (*(itr++)) ;
+    const std::string host    = *(itr++) ;
+    const std::string dirpath = *(itr++) ;
 
     m_connection->beginTransaction () ;
     m_connection->reportOpenFile(
         exper_id,
         run,
         stream,
-        chunk) ;
+        chunk,
+        host,
+        dirpath) ;
     m_connection->commitTransaction () ;
 
     return 0 ;
