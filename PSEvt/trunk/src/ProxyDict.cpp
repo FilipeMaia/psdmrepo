@@ -132,11 +132,11 @@ ProxyDict::removeImpl(const EventKey& key)
 }
 
 void 
-ProxyDict::keysImpl(std::list<EventKey>& keys) const
+ProxyDict::keysImpl(std::list<EventKey>& keys, const Source& source) const
 {
   keys.clear();
   for (Dict::const_iterator it = m_dict.begin(); it != m_dict.end(); ++ it) {
-    keys.push_back(it->first);
+    if (source.match(it->first.src())) keys.push_back(it->first);
   }
 }
 

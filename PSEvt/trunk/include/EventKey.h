@@ -103,8 +103,8 @@ private:
 
   // Data members
   const std::type_info* m_typeinfo; ///< Pointer to typeinfo object
-  const Pds::Src m_src;             ///< Data source address
-  const std::string m_key;          ///< String key
+  Pds::Src m_src;             ///< Data source address
+  std::string m_key;          ///< String key
 
 };
 
@@ -116,5 +116,9 @@ operator<<(std::ostream& out, const EventKey& key) {
 }
 
 } // namespace PSEvt
+
+/// Helper operator to format Pds::Src to a standard stream
+std::ostream&
+operator<<(std::ostream& out, const Pds::Src& src);
 
 #endif // PSEVT_EVENTKEY_H

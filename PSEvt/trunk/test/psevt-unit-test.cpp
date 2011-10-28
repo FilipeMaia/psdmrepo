@@ -146,4 +146,34 @@ BOOST_AUTO_TEST_CASE( test )
 
 // ==============================================================
 
+BOOST_AUTO_TEST_CASE( test_keys )
+{
+  boost::shared_ptr<int> p0(new int(0));
+  BOOST_CHECK_NO_THROW( evt.put(p0) );
+
+  boost::shared_ptr<int> p1(new int(1));
+  BOOST_CHECK_NO_THROW( evt.put(p1, di1) );
+
+  boost::shared_ptr<int> p2(new int(2));
+  BOOST_CHECK_NO_THROW( evt.put(p2, di2) );
+
+  boost::shared_ptr<int> p3(new int(3));
+  BOOST_CHECK_NO_THROW( evt.put(p3, di2, "p3") );
+
+  std::list<EventKey> keys = evt.keys();
+  BOOST_CHECK_EQUAL( keys.size(), 4U );
+
+  keys = evt.keys(Source("*.0:*.0"));
+  BOOST_CHECK_EQUAL( keys.size(), 0U );
+
+  keys = evt.keys(Source("*.1:*.1"));
+  BOOST_CHECK_EQUAL( keys.size(), 1U );
+
+  keys = evt.keys(Source("*.2:*.2"));
+  BOOST_CHECK_EQUAL( keys.size(), 2U );
+
+}
+
+// ==============================================================
+
 BOOST_AUTO_TEST_SUITE_END()

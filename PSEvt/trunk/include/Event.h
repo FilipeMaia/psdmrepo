@@ -276,14 +276,15 @@ public:
   }
   
   /**
-   *  @brief Get the list of event keys defined in event
+   *  @brief Get the list of event keys defined in event matching given source
    *  
+   *  @param[in]  source matching source address
    *  @return list of the EventKey objects
    */
-  std::list<EventKey> keys() const
+  std::list<EventKey> keys(const Source& source = Source()) const
   {
     std::list<EventKey> result;
-    m_dict->keys(result);
+    m_dict->keys(result, source);
     return result;
   }
   

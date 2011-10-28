@@ -108,9 +108,10 @@ protected:
   /**
    *  @brief Get the list of event keys defined in event
    *  
+   *  @param[in]  source matching source address
    *  @param[out] keys list of the EventKey objects
    */
-  virtual void keysImpl(std::list<EventKey>& keys) const;
+  virtual void keysImpl(std::list<EventKey>& keys, const Source& source) const;
 
 private:
 

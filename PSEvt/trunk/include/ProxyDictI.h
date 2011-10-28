@@ -133,11 +133,12 @@ public:
   /**
    *  @brief Get the list of event keys defined in event
    *  
-   *  @param[out] keys list of the EventKey objects
+   *  @param[in]  source matching source address
+   *  @param[out] keys   list of the EventKey objects
    */
-  void keys(std::list<EventKey>& keys) const
+  void keys(std::list<EventKey>& keys, const Source& source) const
   {
-    this->keysImpl(keys);
+    this->keysImpl(keys, source);
   }
 
 protected:
@@ -188,9 +189,10 @@ protected:
   /**
    *  @brief Get the list of event keys defined in event
    *  
+   *  @param[in]  source matching source address
    *  @param[out] keys list of the EventKey objects
    */
-  virtual void keysImpl(std::list<EventKey>& keys) const = 0;
+  virtual void keysImpl(std::list<EventKey>& keys, const Source& source) const = 0;
 
 private:
 
