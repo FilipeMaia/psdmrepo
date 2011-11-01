@@ -110,6 +110,14 @@ public:
                                                              DatabaseError) ;
 
     /**
+      * Extract a value from the currently selected row (long).
+      */
+    void get (long&              val,
+              const std::string& col_name,
+              const bool         nullIsAllowed=false) throw (WrongParams,
+                                                             DatabaseError) ;
+
+    /**
       * Extract a value from the currently selected row (double).
       */
     void get (double&            val,

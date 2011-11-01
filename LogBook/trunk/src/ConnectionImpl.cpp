@@ -48,14 +48,15 @@ namespace LogBook {
 
 inline
 void
-string2upper(std::string& out)
+string2upper (std::string& out)
 {
     for (size_t i = 0; i < out.length(); i++)
         out[i] = toupper (out[i]) ;
 }
 
+inline
 bool
-isValidRunType(const std::string& type)
+isValidRunType (const std::string& type)
 {
     static const char* const validTypes[] = {"DATA", "CALIB"} ;
     static const size_t numTypes = 2 ;
@@ -65,8 +66,9 @@ isValidRunType(const std::string& type)
     return false ;
 }
 
+inline
 bool
-isValidFileType(const std::string& type)
+isValidFileType (const std::string& type)
 {
     static const char* const validTypes[] = {"XTC", "EPICS"} ;
     static const size_t numTypes = 2 ;
@@ -76,8 +78,9 @@ isValidFileType(const std::string& type)
     return false ;
 }
 
+inline
 bool
-isValidRunParamType(const std::string& type)
+isValidValueType (const std::string& type)
 {
     static const char* const validTypes[] = {"INT", "DOUBLE", "TEXT"} ;
     static const size_t numTypes = 3 ;
@@ -85,6 +88,22 @@ isValidRunParamType(const std::string& type)
         if (0 == strcasecmp(validTypes[i], type.c_str()))
             return true ;
     return false ;
+}
+
+inline
+void
+row2attr (AttrInfo& info,
+          QueryProcessor& query,
+          const std::string& instrument, const std::string& experiment, int run)
+{
+    info.instrument = instrument ;
+    info.experiment = experiment ;
+    info.run        = run ;
+
+    query.get (info.attr_class, "class") ;
+    query.get (info.attr_name,  "name") ;
+    query.get (info.attr_type,  "type") ;
+    query.get (info.attr_descr, "descr", true) ;
 }
 
 //-------------
@@ -657,7 +676,7 @@ ConnectionImpl::createRunParam (const std::string& instrument,
 
     std::string type = parameter_type ;
     string2upper (type) ;
-    if (!isValidRunParamType (type))
+    if (!isValidValueType(type))
         throw WrongParams ("unsupported run parameter type: "+parameter_type) ;
 
     ExperDescr exper_descr ;
@@ -875,6 +894,408 @@ ConnectionImpl::reportOpenFile (int exper_id,
         << this->escape_string (m_regdb_mysql, dirpath) << "')";
 
     this->simpleQuery (m_regdb_mysql, sql.str());
+}
+
+bool
+ConnectionImpl::getAttrInfo (AttrInfo&          info,
+                             const std::string& instrument,
+                             const std::string& experiment,
+                             int                run,
+                             const std::string& attr_class,
+                             const std::string& attr_name) throw (WrongParams,
+                                                                  DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, instrument, experiment))
+        throw WrongParams ("unknown experiment") ;
+
+    RunDescr run_descr ;
+    if (!findRun (run_descr,
+                  exper_descr.id,
+                  run))
+        throw WrongParams ("unknown run") ;
+
+    std::ostringstream sql;
+    sql << "SELECT * FROM run_attr WHERE run_id=" << run_descr.id
+        << " AND class='" << attr_class << "' AND name='" << attr_name << "'";
+
+    QueryProcessor query (m_logbook_mysql) ;
+    query.execute (sql.str()) ;
+
+    if (query.num_rows() > 1)
+        throw DatabaseError ("inconsistent result returned by query - database may be corrupt") ;
+
+    while (query.next_row()) {
+        LogBook::row2attr(info, query, instrument, experiment, run);
+        return true ;
+    }
+    return false ;
+}
+
+void
+ConnectionImpl::getAttrInfo (std::vector<AttrInfo >& info,
+                             const std::string&      instrument,
+                             const std::string&      experiment,
+                             int                     run,
+                             const std::string&      attr_class) throw (WrongParams,
+                                                                        DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, instrument, experiment))
+        throw WrongParams ("unknown experiment") ;
+
+    RunDescr run_descr ;
+    if (!findRun (run_descr,
+                  exper_descr.id,
+                  run))
+        throw WrongParams ("unknown run") ;
+
+    std::ostringstream sql;
+    sql << "SELECT * FROM run_attr WHERE run_id=" << run_descr.id
+        << " AND class='" << attr_class << "' ORDER BY name";
+
+    QueryProcessor query (m_logbook_mysql) ;
+    query.execute (sql.str()) ;
+
+    info.reserve (query.num_rows ()) ;
+
+    while (query.next_row()) {
+
+        AttrInfo param ;
+
+        LogBook::row2attr(param, query, instrument, experiment, run);
+
+        info.push_back (param) ;
+    }
+}
+
+void
+ConnectionImpl::getAttrInfo (std::vector<AttrInfo >& info,
+                             const std::string&      instrument,
+                             const std::string&      experiment,
+                             int                     run) throw (WrongParams,
+                                                                 DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, instrument, experiment))
+        throw WrongParams ("unknown experiment") ;
+
+    RunDescr run_descr ;
+    if (!findRun (run_descr,
+                  exper_descr.id,
+                  run))
+        throw WrongParams ("unknown run") ;
+
+    std::ostringstream sql;
+    sql << "SELECT * FROM run_attr WHERE run_id=" << run_descr.id << " ORDER BY class, name";
+
+    QueryProcessor query (m_logbook_mysql) ;
+    query.execute (sql.str()) ;
+
+    info.reserve (query.num_rows ()) ;
+
+    while (query.next_row()) {
+
+        AttrInfo param ;
+
+        LogBook::row2attr(param, query, instrument, experiment, run);
+
+        info.push_back (param) ;
+    }
+}
+
+void
+ConnectionImpl::getAttrClasses (std::vector<std::string >& attr_classes,
+                                const std::string&         instrument,
+                                const std::string&         experiment,
+                                int                        run) throw (WrongParams,
+                                                                       DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, instrument, experiment))
+        throw WrongParams ("unknown experiment") ;
+
+    RunDescr run_descr ;
+    if (!findRun (run_descr,
+                  exper_descr.id,
+                  run))
+        throw WrongParams ("unknown run") ;
+
+    std::ostringstream sql;
+    sql << "SELECT DISTINCT class FROM run_attr WHERE run_id=" << run_descr.id << " ORDER BY class";
+
+    QueryProcessor query (m_logbook_mysql) ;
+    query.execute (sql.str()) ;
+
+    attr_classes.reserve (query.num_rows ()) ;
+
+    while (query.next_row()) {
+
+        std::string attr_class ;
+        query.get (attr_class, "class") ;
+        attr_classes.push_back (attr_class) ;
+    }
+}
+
+bool
+ConnectionImpl::getAttrVal (long&              attr_value,
+                            const std::string& instrument,
+                            const std::string& experiment,
+                            int                run,
+                            const std::string& attr_class,
+                            const std::string& attr_name) throw (ValueTypeMismatch,
+                                                                 WrongParams,
+                                                                 DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, instrument, experiment))
+        throw WrongParams ("unknown experiment") ;
+
+    RunDescr run_descr ;
+    if (!findRun (run_descr,
+                  exper_descr.id,
+                  run))
+        throw WrongParams ("unknown run") ;
+
+    std::ostringstream sql;
+    sql << "SELECT run_attr_int.val AS `val` FROM run_attr, run_attr_int WHERE run_attr.run_id=" << run_descr.id
+        << " AND run_attr.class='" << attr_class << "'"
+        << " AND run_attr.id=run_attr_int.attr_id";
+
+    QueryProcessor query (m_logbook_mysql) ;
+    query.execute (sql.str()) ;
+
+    if (query.num_rows () > 1)
+        throw DatabaseError ("inconsistent result returned by query - database may be corrupt") ;
+
+    while (query.next_row()) {
+        query.get (attr_value, "val") ;
+        return true ;
+    }
+    return false ;
+}
+
+bool
+ConnectionImpl::getAttrVal (double&            attr_value,
+                            const std::string& instrument,
+                            const std::string& experiment,
+                            int                run,
+                            const std::string& attr_class,
+                            const std::string& attr_name) throw (ValueTypeMismatch,
+                                                                 WrongParams,
+                                                                 DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, instrument, experiment))
+        throw WrongParams ("unknown experiment") ;
+
+    RunDescr run_descr ;
+    if (!findRun (run_descr,
+                  exper_descr.id,
+                  run))
+        throw WrongParams ("unknown run") ;
+
+    std::ostringstream sql;
+    sql << "SELECT run_attr_double.val AS `val` FROM run_attr, run_attr_double WHERE run_attr.run_id=" << run_descr.id
+        << " AND run_attr.class='" << attr_class << "'"
+        << " AND run_attr.id=run_attr_double.attr_id";
+
+    QueryProcessor query (m_logbook_mysql) ;
+    query.execute (sql.str()) ;
+
+    if (query.num_rows () > 1)
+        throw DatabaseError ("inconsistent result returned by query - database may be corrupt") ;
+
+    while (query.next_row()) {
+        query.get (attr_value, "val") ;
+        return true ;
+    }
+    return false ;
+}
+
+bool
+ConnectionImpl::getAttrVal (std::string&       attr_value,
+                            const std::string& instrument,
+                            const std::string& experiment,
+                            int                run,
+                            const std::string& attr_class,
+                            const std::string& attr_name) throw (ValueTypeMismatch,
+                                                                 WrongParams,
+                                                                 DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, instrument, experiment))
+        throw WrongParams ("unknown experiment") ;
+
+    RunDescr run_descr ;
+    if (!findRun (run_descr,
+                  exper_descr.id,
+                  run))
+        throw WrongParams ("unknown run") ;
+
+    std::ostringstream sql;
+    sql << "SELECT run_attr_text.val AS `val` FROM run_attr, run_attr_text WHERE run_attr.run_id=" << run_descr.id
+        << " AND run_attr.class='" << attr_class << "'"
+        << " AND run_attr.id=run_attr_text.attr_id";
+
+    QueryProcessor query (m_logbook_mysql) ;
+    query.execute (sql.str()) ;
+
+    if (query.num_rows () > 1)
+        throw DatabaseError ("inconsistent result returned by query - database may be corrupt") ;
+
+    while (query.next_row()) {
+        query.get (attr_value, "val") ;
+        return true ;
+    }
+    return false ;
+}
+
+void
+ConnectionImpl::createRunAttr (const std::string& instrument,
+                               const std::string& experiment,
+                               int                run,
+                               const std::string& attr_class,
+                               const std::string& attr_name,
+                               const std::string& attr_description,
+                               long               attr_value) throw (WrongParams,
+                                                                     DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    std::string attr_type = "INT" ;
+
+    if( attr_name.empty())
+        throw WrongParams ("attribute name can't be empty") ;
+
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, instrument, experiment))
+        throw WrongParams ("unknown experiment") ;
+
+    RunDescr run_descr ;
+    if (!findRun (run_descr,
+                  exper_descr.id,
+                  run))
+        throw WrongParams ("unknown run") ;
+
+    std::ostringstream s_1, s_2;
+    s_1 << "INSERT INTO run_attr VALUES(NULL,"
+        << run_descr.id << ",'"
+        << this->escape_string (m_logbook_mysql, attr_class) << "','"
+        << this->escape_string (m_logbook_mysql, attr_name) << "','"
+        << attr_type << "','"
+        << this->escape_string (m_logbook_mysql, attr_description) << "')";
+    s_2 << "INSERT INTO run_attr_int VALUES(LAST_INSERT_ID(),"
+        << attr_value << ");";
+
+    this->simpleQuery (m_logbook_mysql, s_1.str());
+    this->simpleQuery (m_logbook_mysql, s_2.str());
+}
+
+void
+ConnectionImpl::createRunAttr (const std::string& instrument,
+                               const std::string& experiment,
+                               int                run,
+                               const std::string& attr_class,
+                               const std::string& attr_name,
+                               const std::string& attr_description,
+                               double             attr_value) throw (WrongParams,
+                                                                     DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    std::string attr_type = "DOUBLE" ;
+
+    if( attr_name.empty())
+        throw WrongParams ("attribute name can't be empty") ;
+
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, instrument, experiment))
+        throw WrongParams ("unknown experiment") ;
+
+    RunDescr run_descr ;
+    if (!findRun (run_descr,
+                  exper_descr.id,
+                  run))
+        throw WrongParams ("unknown run") ;
+
+    std::ostringstream s_1, s_2;
+    s_1 << "INSERT INTO run_attr VALUES(NULL,"
+        << run_descr.id << ",'"
+        << this->escape_string (m_logbook_mysql, attr_class) << "','"
+        << this->escape_string (m_logbook_mysql, attr_name) << "','"
+        << attr_type << "','"
+        << this->escape_string (m_logbook_mysql, attr_description) << "');";
+    s_2 << "INSERT INTO run_attr_double VALUES(LAST_INSERT_ID(),"
+        << attr_value << ");";
+
+    this->simpleQuery (m_logbook_mysql, s_1.str());
+    this->simpleQuery (m_logbook_mysql, s_2.str());
+}
+
+void
+ConnectionImpl::createRunAttr (const std::string& instrument,
+                               const std::string& experiment,
+                               int                run,
+                               const std::string& attr_class,
+                               const std::string& attr_name,
+                               const std::string& attr_description,
+                               const std::string& attr_value) throw (WrongParams,
+                                                                     DatabaseError)
+{
+    if (!m_is_started)
+        throw DatabaseError ("no transaction") ;
+
+    std::string attr_type = "TEXT" ;
+
+    if( attr_name.empty())
+        throw WrongParams ("attribute name can't be empty") ;
+
+    ExperDescr exper_descr ;
+    if (!this->findExper (exper_descr, instrument, experiment))
+        throw WrongParams ("unknown experiment") ;
+
+    RunDescr run_descr ;
+    if (!findRun (run_descr,
+                  exper_descr.id,
+                  run))
+        throw WrongParams ("unknown run") ;
+
+    std::ostringstream s_1, s_2;
+    s_1 << "INSERT INTO run_attr VALUES(NULL,"
+        << run_descr.id << ",'"
+        << this->escape_string (m_logbook_mysql, attr_class) << "','"
+        << this->escape_string (m_logbook_mysql, attr_name) << "','"
+        << attr_type << "','"
+        << this->escape_string (m_logbook_mysql, attr_description) << "');";
+    s_2 << "INSERT INTO run_attr_text VALUES(LAST_INSERT_ID(),'"
+        <<  this->escape_string (m_logbook_mysql, attr_value) << "');";
+
+    this->simpleQuery (m_logbook_mysql, s_1.str());
+    this->simpleQuery (m_logbook_mysql, s_2.str());
 }
 
 bool
@@ -1097,7 +1518,7 @@ ConnectionImpl::getRunParamImpl (QueryProcessor&    query,
 
     std::string type = parameter_type ;
     string2upper (type) ;
-    if (!isValidRunParamType (type))
+    if (!isValidValueType(type))
         throw WrongParams ("unsupported run parameter type: "+parameter_type) ;
 
     ExperDescr exper_descr ;

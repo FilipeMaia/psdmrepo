@@ -93,6 +93,25 @@ struct ParamInfo {
 std::ostream& operator<< (std::ostream& s, const ParamInfo& p) ;
 
 /**
+  * Run attribute information structure.
+  *
+  * Data members of the class represent properties of the attribute
+  * in the database.
+  */
+struct AttrInfo {
+    std::string instrument ;    // its instrument name
+    std::string experiment ;    // its experiment name
+    int         run ;           // its run number
+    std::string attr_class ;    // its class (group)
+    std::string attr_name ;     // its (attribute's) name within a class
+    std::string attr_type ;     // its type
+    std::string attr_descr ;    // its description (can be very long!)
+} ;
+
+std::ostream& operator<< (std::ostream& s, const AttrInfo& p) ;
+
+
+/**
   * The top-level class of the "LogBook Database" API.
   *
   * Note, that this class is made abstract to prevent clients code
@@ -275,6 +294,137 @@ public:
                               LusiTime::Time&    updated) throw (ValueTypeMismatch,
                                                                  WrongParams,
                                                                  DatabaseError) = 0 ;
+
+    /**
+      * Find an information on a specific run attribute.
+      *
+      * The method would check if the attribute is known in the database
+      * for the specified run. If so then the method will return 'true'
+      * and set up a contents of the structure. Otherwise it will return
+      * 'false'.
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"   : to report wrong parameters (non-existing instrument, experiment, etc.)
+      *   "DatabaseError" : to report database related problems
+      *
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+     virtual bool getAttrInfo (AttrInfo&          info,
+                               const std::string& instrument,
+                               const std::string& experiment,
+                               int                run,
+                               const std::string& attr_class,
+                               const std::string& attr_name) throw (WrongParams,
+                                                                    DatabaseError) = 0 ;
+    /**
+      * Find an information on all run attributes of a given class.
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"   : to report wrong parameters (non-existing instrument, experiment, etc.)
+      *   "DatabaseError" : to report database related problems
+      *
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+     virtual void getAttrInfo (std::vector<AttrInfo >& info,
+                               const std::string&      instrument,
+                               const std::string&      experiment,
+                               int                     run,
+                               const std::string&      attr_class) throw (WrongParams,
+                                                                          DatabaseError) = 0 ;
+
+
+    /**
+      * Find an information on all known run attributes.
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"   : to report wrong parameters (non-existing instrument, experiment, etc.)
+      *   "DatabaseError" : to report database related problems
+      *
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+     virtual void getAttrInfo (std::vector<AttrInfo >& info,
+                               const std::string&      instrument,
+                               const std::string&      experiment,
+                               int                     run) throw (WrongParams,
+                                                                   DatabaseError) = 0 ;
+
+    /**
+      * Find names of all known classes of run attributes.
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"   : to report wrong parameters (non-existing instrument, experiment, etc.)
+      *   "DatabaseError" : to report database related problems
+      *
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+     virtual void getAttrClasses (std::vector<std::string >& attr_classes,
+                                  const std::string&         instrument,
+                                  const std::string&         experiment,
+                                  int                        run) throw (WrongParams,
+                                                                         DatabaseError) = 0 ;
+
+    /**
+      * Obtain a value of a specific run attribute (32-bit integer).
+      *
+      * The method would check if the attribute is known in the database
+      * for the specified run. If so then the method will return 'true'
+      * and assign a value to the 'attr_value' parameter. Otherwise it will return
+      * 'false'.
+      *
+      * Note, that this method can be also used to check if the attribute is known
+      * for the specified context instrument/experiment/run/class.
+      *
+      * EXCEPTIONS:
+      *
+      *   "ValueTypeMismatch" : to report a wrong type of an attribute's value
+      *   "WrongParams"       : to report wrong parameters (non-existing instrument, experiment, etc.)
+      *   "DatabaseError"     : to report database related problems
+      *
+      * @see ValueTypeMismatch
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+     virtual bool getAttrVal (long&              attr_value,
+                              const std::string& instrument,
+                              const std::string& experiment,
+                              int                run,
+                              const std::string& attr_class,
+                              const std::string& attr_name) throw (ValueTypeMismatch,
+                                                                   WrongParams,
+                                                                   DatabaseError) = 0 ;
+
+    /**
+      * Obtain a value of a specific run attribute (double).
+      */
+     virtual bool getAttrVal (double&            attr_value,
+                              const std::string& instrument,
+                              const std::string& experiment,
+                              int                run,
+                              const std::string& attr_class,
+                              const std::string& attr_name) throw (ValueTypeMismatch,
+                                                                   WrongParams,
+                                                                   DatabaseError) = 0 ;
+
+    /**
+      * Obtain a value of a specific run attribute (string).
+      */
+     virtual bool getAttrVal (std::string&       attr_value,
+                              const std::string& instrument,
+                              const std::string& experiment,
+                              int                run,
+                              const std::string& attr_class,
+                              const std::string& attr_name) throw (ValueTypeMismatch,
+                                                                   WrongParams,
+                                                                   DatabaseError) = 0 ;
+
 
     // --------------------------------------------------------------------
     // ------------- Database contents modification methods ---------------
@@ -526,6 +676,107 @@ public:
                                  const std::string& dirpath) throw (WrongParams,
                                                                     DatabaseError) = 0 ;
 
+    /**
+      * Create a new attribute of a run (integer value)
+      *
+      * The method would store a new attribute for the specified run of an experiment.
+      * The attribute will be a member of the specific class (group of attributes).
+      * Attribute names within each class (of a run) have to be unique.
+      *
+      * PARAMETERS:
+      *
+      *   instrument - an instrument name
+      *   experiment - an experiment name
+      *   run        - a run number
+      *   attr_class - a class (group) the attribute belongs to
+      *   attr_name  - a unique name of the parameter in a scope of its run and its class (and experiment)
+      *   attr_description - an arbitrary description of the attribute
+      *   attr_value - a value associated with the attribute
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"        : to report wrong parameters (non-existing experiment, etc.)
+      *   "DatabaseError"      : to report database related problems
+      *
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+    virtual void createRunAttr (const std::string& instrument,
+                                const std::string& experiment,
+                                int                run,
+                                const std::string& attr_class,
+                                const std::string& attr_name,
+                                const std::string& attr_description,
+                                long               attr_value) throw (WrongParams,
+                                                                      DatabaseError) = 0 ;
+
+    /**
+      * Create a new attribute of a run (double precision floating point value)
+      *
+      * The method would store a new attribute for the specified run of an experiment.
+      * The attribute will be a member of the specific class (group of attributes).
+      * Attribute names within each class (of a run) have to be unique.
+      *
+      * PARAMETERS:
+      *
+      *   instrument - an instrument name
+      *   experiment - an experiment name
+      *   run        - a run number
+      *   attr_class - a class (group) the attribute belongs to
+      *   attr_name  - a unique name of the parameter in a scope of its run and its class (and experiment)
+      *   attr_description - an arbitrary description of the attribute
+      *   attr_value - a value associated with the attribute
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"        : to report wrong parameters (non-existing experiment, etc.)
+      *   "DatabaseError"      : to report database related problems
+      *
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+    virtual void createRunAttr (const std::string& instrument,
+                                const std::string& experiment,
+                                int                run,
+                                const std::string& attr_class,
+                                const std::string& attr_name,
+                                const std::string& attr_description,
+                                double             attr_value) throw (WrongParams,
+                                                                      DatabaseError) = 0 ;
+
+    /**
+      * Create a new attribute of a run (text value)
+      *
+      * The method would store a new attribute for the specified run of an experiment.
+      * The attribute will be a member of the specific class (group of attributes).
+      * Attribute names within each class (of a run) have to be unique.
+      *
+      * PARAMETERS:
+      *
+      *   instrument - an instrument name
+      *   experiment - an experiment name
+      *   run        - a run number
+      *   attr_class - a class (group) the attribute belongs to
+      *   attr_name  - a unique name of the parameter in a scope of its run and its class (and experiment)
+      *   attr_description - an arbitrary description of the attribute
+      *   attr_value - a value associated with the attribute
+      *
+      * EXCEPTIONS:
+      *
+      *   "WrongParams"        : to report wrong parameters (non-existing experiment, etc.)
+      *   "DatabaseError"      : to report database related problems
+      *
+      * @see class WrongParams
+      * @see class DatabaseError
+      */
+    virtual void createRunAttr (const std::string& instrument,
+                                const std::string& experiment,
+                                int                run,
+                                const std::string& attr_class,
+                                const std::string& attr_name,
+                                const std::string& attr_description,
+                                const std::string& attr_value) throw (WrongParams,
+                                                                      DatabaseError) = 0 ;
 protected:
 
     /**

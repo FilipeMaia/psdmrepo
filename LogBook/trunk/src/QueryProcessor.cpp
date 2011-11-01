@@ -143,6 +143,26 @@ QueryProcessor::get (int&               val,
 }
 
 void
+QueryProcessor::get (long&              val,
+                     const std::string& col_name,
+                     const bool         nullIsAllowed) throw (WrongParams,
+                                                              DatabaseError)
+{
+    const Cell c = this->cell (col_name) ;
+    if (!c.ptr) {
+        if (nullIsAllowed) {
+            val = 0 ;
+            return ;
+        } else
+            throw DatabaseError ("NULL value in collumn: "+col_name) ;
+    }
+    char* end_ptr = 0;
+    val = strtol (c.ptr, &end_ptr, 10) ;
+    if (!end_ptr)
+        throw DatabaseError ("failed to interpret a value in collumn: "+col_name) ;
+}
+
+void
 QueryProcessor::get (double&            val,
                      const std::string& col_name,
                      const bool         nullIsAllowed) throw (WrongParams,

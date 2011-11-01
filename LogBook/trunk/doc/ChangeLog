@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-05
+2011-11-01
+- extended MySQL schema to support run attributes
+- extended C++ API to support run attributes
+
 Tag: V00-02-04
 2011-10-28
 - extended C++ API method LogBook::Connection::reportOpenFile() to report

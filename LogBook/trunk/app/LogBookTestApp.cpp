@@ -124,6 +124,54 @@ str2int (const std::string& str) throw (LogBook::ParseException)
 }
 
 /**
+  * Translate a string into a long number.
+  *
+  * The method will throw an exception if the input string can't be
+  * translated.
+  *
+  * @return a value
+  */
+long
+str2long (const std::string& str) throw (LogBook::ParseException)
+{
+    if (str.empty())
+        throw LogBook::ParseException ("empty string passed as an argument") ;
+
+    long result = 0 ;
+    if (1 != sscanf (str.c_str(), "%ld", &result))
+        throw LogBook::ParseException ("the argument can't be translated") ;
+
+    if (result < 0)
+        throw LogBook::ParseException ("negative value of the argument isn't allowed") ;
+
+    return result ;
+}
+
+/**
+  * Translate a string into a double precision number.
+  *
+  * The method will throw an exception if the input string can't be
+  * translated.
+  *
+  * @return a value
+  */
+double
+str2double (const std::string& str) throw (LogBook::ParseException)
+{
+    if (str.empty())
+        throw LogBook::ParseException ("empty string passed as an argument") ;
+
+    double result = 0 ;
+    if (1 != sscanf (str.c_str(), "%lf", &result))
+        throw LogBook::ParseException ("the argument can't be translated") ;
+
+    if (result < 0)
+        throw LogBook::ParseException ("negative value of the argument isn't allowed") ;
+
+    return result ;
+}
+
+/**
   * Application class.
   */
 class LogBookTestApp : public AppUtils::AppBase {
@@ -167,6 +215,13 @@ private:
 
     int cmd_set_run_param     () throw (std::exception) ;
     int cmd_display_run_param () throw (std::exception) ;
+
+    int cmd_create_run_attr   () throw (std::exception) ;
+    int cmd_display_run_attr  () throw (std::exception) ;
+
+    int cmd_attr_info         () throw (std::exception) ;
+    int cmd_run_attributes    () throw (std::exception) ;
+    int cmd_attr_classes      () throw (std::exception) ;
 
     int cmd_save_files        () throw (std::exception) ;
     int cmd_save_files_m      () throw (std::exception) ;
@@ -294,20 +349,29 @@ LogBookTestApp::runApp ()
 
         // Proceed to commands which require the database
         //
-        if      (command == "current_experiment") return cmd_current_experiment ();
-        else if (command == "experiments")        return cmd_experiments ();
-        else if (command == "allocate_run")       return cmd_allocate_run ();
-        else if (command == "add_run")            return cmd_add_run ();
-        else if (command == "begin_run")          return cmd_begin_run ();
-        else if (command == "end_run")            return cmd_end_run ();
-        else if (command == "create_run_param")   return cmd_create_run_param ();
-        else if (command == "param_info")         return cmd_param_info ();
-        else if (command == "run_parameters")     return cmd_run_parameters ();
-        else if (command == "set_run_param")      return cmd_set_run_param ();
-        else if (command == "display_run_param")  return cmd_display_run_param ();
-        else if (command == "save_files")         return cmd_save_files ();
-        else if (command == "save_files_m")       return cmd_save_files_m ();
-        else if (command == "open_file")          return cmd_open_file ();
+        if      (command == "current_experiment") return cmd_current_experiment () ;
+        else if (command == "experiments")        return cmd_experiments () ;
+
+        else if (command == "allocate_run")       return cmd_allocate_run () ;
+        else if (command == "add_run")            return cmd_add_run () ;
+        else if (command == "begin_run")          return cmd_begin_run () ;
+        else if (command == "end_run")            return cmd_end_run () ;
+
+        else if (command == "create_run_param")   return cmd_create_run_param () ;
+        else if (command == "param_info")         return cmd_param_info () ;
+        else if (command == "run_parameters")     return cmd_run_parameters () ;
+        else if (command == "set_run_param")      return cmd_set_run_param () ;
+        else if (command == "display_run_param")  return cmd_display_run_param () ;
+
+        else if (command == "create_run_attr")    return cmd_create_run_attr () ;
+        else if (command == "display_run_attr")   return cmd_display_run_attr () ;
+        else if (command == "attr_info")          return cmd_attr_info () ;
+        else if (command == "run_attributes")     return cmd_run_attributes () ;
+        else if (command == "attr_classes")       return cmd_attr_classes () ;
+
+        else if (command == "save_files")         return cmd_save_files () ;
+        else if (command == "save_files_m")       return cmd_save_files_m () ;
+        else if (command == "open_file")          return cmd_open_file () ;
         else {
             MsgLogRoot( error, "unknown command") ;
             return 2 ;
@@ -347,6 +411,13 @@ LogBookTestApp::cmd_help ()
          << "\n"
          << "  set_run_param     <instrument> <experiment> <run> <param> <value> {INT|DOUBLE|TEXT}\n"
          << "  display_run_param <instrument> <experiment> <run> <param>\n"
+         << "\n"
+         << "  create_run_attr  <instrument> <experiment> <run>  <attr_class> <attr_name> {INT|DOUBLE|TEXT} <attr_description> <attr_value>\n"
+         << "  display_run_attr <instrument> <experiment> <run>  <attr_class> <attr_name>\n"
+         << "\n"
+         << "  attr_info        <instrument> <experiment> <run>  <attr_class> <attr_name>\n"
+         << "  run_attributes   <instrument> <experiment> <run> [<attr_class>] \n"
+         << "  attr_classes     <instrument> <experiment> <run> \n"
          << "\n"
          << "  save_files       <instrument> <experiment> <run> {DATA|CALIB}\n"
          << "  save_files_m     <instrument> <experiment> <run> {DATA|CALIB} [ <file1> {XTC|EPICS} ] [ <file>2 {XTC|EPICS} ] ...\n"
@@ -898,6 +969,194 @@ LogBookTestApp::cmd_display_run_param () throw (std::exception)
     cout << "SOURCE:  " << source << "\n";
     cout << "UPDATED: " << updated << "\n";
 
+    return 0 ;
+}
+
+int
+LogBookTestApp::cmd_create_run_attr () throw (std::exception)
+{
+    if (m_args.empty() || m_args.size() != 8) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument       = *(itr++) ;
+    const std::string  experiment       = *(itr++) ;
+    const int          run              = LogBook::str2int (*(itr++)) ;
+    const std::string  attr_class       = *(itr++) ;
+    const std::string  attr_name        = *(itr++) ;
+    const std::string  attr_type        = *(itr++) ;
+    const std::string  attr_description = *(itr++) ;
+    const std::string  attr_value       = *(itr++) ;
+
+    int status = 0 ;
+
+    m_connection->beginTransaction () ;
+
+    LogBook::AttrInfo attr ;
+    if (m_connection->getAttrInfo (attr,
+                                   instrument, experiment, run,
+                                   attr_class, attr_name)) {
+        cout << "error: the attribute already exists in the database." << endl ;
+        status = 1 ;
+    } else {
+        if (attr_type == "INT")
+            m_connection->createRunAttr (instrument, experiment, run,
+                                         attr_class, attr_name, attr_description,
+                                         LogBook::str2long (attr_value)) ;
+        else if (attr_type == "DOUBLE")
+            m_connection->createRunAttr (instrument, experiment, run,
+                                         attr_class, attr_name, attr_description,
+                                         LogBook::str2double (attr_value)) ;
+        else if (attr_type == "TEXT")
+            m_connection->createRunAttr (instrument, experiment, run,
+                                         attr_class, attr_name, attr_description,
+                                         attr_value) ;
+        else {
+            cout << "error: no support for attribute type: " << attr_type << endl ;
+            status = 1 ;
+        }
+    }
+    m_connection->commitTransaction () ;
+
+    return status ;
+}
+
+int
+LogBookTestApp::cmd_display_run_attr () throw (std::exception)
+{
+    if (m_args.empty() || (m_args.size() != 5)) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string instrument = *(itr++) ;
+    const std::string experiment = *(itr++) ;
+    const int         run        = LogBook::str2int (*(itr++)) ;
+    const std::string attr_class = *(itr++) ;
+    const std::string attr_name  = *(itr++) ;
+
+    m_connection->beginTransaction () ;
+
+    LogBook::AttrInfo attr ;
+    if (!m_connection->getAttrInfo (attr,
+                                    instrument, experiment, run,
+                                    attr_class, attr_name)) {
+        cout << "error: no such attribute found in the database." << endl ;
+        return 1 ;
+    }
+    if (attr.attr_type == "INT") {
+
+        long attr_value ;
+        m_connection->getAttrVal(attr_value,
+                                 instrument, experiment, run,
+                                 attr_class, attr_name) ;
+        cout << attr_value << endl ;
+
+    } else if (attr.attr_type == "DOUBLE") {
+
+        double attr_value ;
+        m_connection->getAttrVal(attr_value,
+                                 instrument, experiment, run,
+                                 attr_class, attr_name) ;
+        cout << attr_value << endl ;
+
+    } else if (attr.attr_type == "TEXT") {
+
+        std::string attr_value ;
+        m_connection->getAttrVal(attr_value,
+                                 instrument, experiment, run,
+                                 attr_class, attr_name) ;
+        cout << '"' << attr_value << '"' << endl ;
+
+     } else {
+        cout << "error: no support for attribute type: " << attr.attr_type << endl ;
+        return 1 ;
+    }
+    m_connection->commitTransaction () ;
+
+    return 0 ;
+}
+
+int
+LogBookTestApp::cmd_attr_info () throw (std::exception)
+{
+    if (m_args.empty() || (m_args.size() != 5)) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument = *(itr++) ;
+    const std::string  experiment = *(itr++) ;
+    const int          run        = LogBook::str2int (*(itr++)) ;
+    const std::string  attr_class = *(itr++) ;
+    const std::string  attr_name  = *(itr++) ;
+
+    m_connection->beginTransaction () ;
+
+    LogBook::AttrInfo attr ;
+    if (m_connection->getAttrInfo (attr,
+                                   instrument, experiment, run,
+                                   attr_class, attr_name)) {
+        cout << "\n" << attr ;
+        return 0 ;
+    }
+    cout << "error: no such attribute found" << endl ;
+    return 0 ;
+}
+
+int
+LogBookTestApp::cmd_run_attributes () throw (std::exception)
+{
+    if (m_args.empty() || (m_args.size() < 3) || (m_args.size() > 4)) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument       = *(itr++) ;
+    const std::string  experiment       = *(itr++) ;
+    const int          run              = LogBook::str2int (*(itr++)) ;
+    const bool         using_attr_class = m_args.size() == 4 ;
+    const std::string  attr_class       = using_attr_class ? *(itr++) : "" ;
+
+    m_connection->beginTransaction () ;
+
+    std::vector<LogBook::AttrInfo > attr ;
+    if (using_attr_class)
+        m_connection->getAttrInfo (attr,
+                                   instrument, experiment, run,
+                                   attr_class);
+    else
+        m_connection->getAttrInfo (attr,
+                                   instrument, experiment, run);
+
+    for (std::vector<LogBook::AttrInfo >::const_iterator itr = attr.begin() ; itr != attr.end() ; ++itr) {
+      cout << "\n" << *itr;
+    }
+    return 0 ;
+}
+
+int
+LogBookTestApp::cmd_attr_classes () throw (std::exception)
+{
+    if (m_args.empty() || (m_args.size() != 3)) {
+        MsgLogRoot (error, "wrong number of arguments to the command") ;
+        return 2 ;
+    }
+    AppUtils::AppCmdArgList<std::string >::const_iterator itr = m_args.begin() ;
+    const std::string  instrument       = *(itr++) ;
+    const std::string  experiment       = *(itr++) ;
+    const int          run              = LogBook::str2int (*(itr++)) ;
+
+    m_connection->beginTransaction () ;
+
+    std::vector<std::string > attr_classes ;
+    m_connection->getAttrClasses (attr_classes,
+                                  instrument, experiment, run) ;
+
+    for (std::vector<std::string >::const_iterator itr = attr_classes.begin() ; itr != attr_classes.end() ; ++itr) {
+      cout << *itr << "\n";
+    }
     return 0 ;
 }
 

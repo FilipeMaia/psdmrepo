@@ -138,21 +138,21 @@ operator<< (std::ostream& s, const ExperDescr& d)
 {
     s << "LogBook::ExperDescr {\n"
 
-      << "         instr_id: " << d.instr_id << "\n"
-      << "       instr_name: " << d.instr_name << "\n"
-      << "      instr_descr: " << d.instr_descr << "\n"
+      << "           instr_id: " << d.instr_id << "\n"
+      << "         instr_name: " << d.instr_name << "\n"
+      << "        instr_descr: " << d.instr_descr << "\n"
 
-      << "               id: " << d.id << "\n"
-      << "             name: " << d.name << "\n"
-      << "            descr: " << d.descr << "\n"
+      << "                 id: " << d.id << "\n"
+      << "               name: " << d.name << "\n"
+      << "              descr: " << d.descr << "\n"
 
-      << "registration_time: " << d.registration_time << "\n"
-      << "       begin_time: " << d.begin_time << "\n"
-      << "         end_time: " << d.end_time << "\n"
+      << "    registration_time: " << d.registration_time << "\n"
+      << "         begin_time: " << d.begin_time << "\n"
+      << "           end_time: " << d.end_time << "\n"
 
-      << "   leader_account: " << d.leader_account << "\n"
-      << "     contact_info: " << d.contact_info << "\n"
-      << "        posix_gid: " << d.posix_gid << "\n"
+      << "     leader_account: " << d.leader_account << "\n"
+      << "       contact_info: " << d.contact_info << "\n"
+      << "          posix_gid: " << d.posix_gid << "\n"
       << "}\n" ;
     return s ;
 }
@@ -161,15 +161,32 @@ std::ostream&
 operator<< (std::ostream& s, const ParamInfo& p)
 {
     s << "LogBook::ParamInfo {\n"
-      << "instrument: " << p.instrument << "\n"
-      << "experiment: " << p.experiment << "\n"
-      << "      name: " << p.name << "\n"
-      << "      type: " << p.type << "\n"
-      << "     descr: " << p.descr << "\n"
+      << "  instrument: " << p.instrument << "\n"
+      << "  experiment: " << p.experiment << "\n"
+      << "        name: " << p.name << "\n"
+      << "        type: " << p.type << "\n"
+      << "       descr: " << p.descr << "\n"
       << "}\n" ;
 
     return s ;
 }
+
+std::ostream&
+operator<< (std::ostream& s, const AttrInfo& a)
+{
+    s << "LogBook::AttrInfo {\n"
+      << "  instrument: " << a.instrument << "\n"
+      << "  experiment: " << a.experiment << "\n"
+      << "         run: " << a.run << "\n"
+      << "  attr_class: " << a.attr_class << "\n"
+      << "   attr_name: " << a.attr_name << "\n"
+      << "   attr_type: " << a.attr_type << "\n"
+      << "  attr_descr: " << a.attr_descr << "\n"
+      << "}\n" ;
+
+    return s ;
+}
+
 
 //------------------
 // Static methods --

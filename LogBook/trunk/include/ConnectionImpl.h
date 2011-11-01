@@ -231,6 +231,96 @@ public:
                                                                  DatabaseError) ;
 
     /**
+      * Find an information on a specific run attribute.
+      *
+      * @see method Connection::getAttrInfo()
+      */
+     virtual bool getAttrInfo (AttrInfo&          info,
+                               const std::string& instrument,
+                               const std::string& experiment,
+                               int                run,
+                               const std::string& attr_class,
+                               const std::string& attr_name) throw (WrongParams,
+                                                                    DatabaseError) ;
+    /**
+      * Find an information on all run attributes of a given class.
+      *
+      * @see method Connection::getAttrInfo()
+      */
+     virtual void getAttrInfo (std::vector<AttrInfo >& info,
+                               const std::string&      instrument,
+                               const std::string&      experiment,
+                               int                     run,
+                               const std::string&      attr_class) throw (WrongParams,
+                                                                          DatabaseError) ;
+
+
+    /**
+      * Find an information on all known run attributes.
+      *
+      * @see method Connection::getAttrInfo()
+      */
+     virtual void getAttrInfo (std::vector<AttrInfo >& info,
+                               const std::string&      instrument,
+                               const std::string&      experiment,
+                               int                     run) throw (WrongParams,
+                                                                   DatabaseError) ;
+
+    /**
+      * Find names of all known classes of run attributes.
+      *
+      * @see method Connection::getAttrClasses()
+      */
+     virtual void getAttrClasses (std::vector<std::string >& attr_classes,
+                                  const std::string&         instrument,
+                                  const std::string&         experiment,
+                                  int                        run) throw (WrongParams,
+                                                                         DatabaseError) ;
+
+    /**
+      * Obtain a value of a specific run attribute (32-bit integer).
+      *
+      * @see method Connection::getAttrVal()
+      */
+     virtual bool getAttrVal (long&              attr_value,
+                              const std::string& instrument,
+                              const std::string& experiment,
+                              int                run,
+                              const std::string& attr_class,
+                              const std::string& attr_name) throw (ValueTypeMismatch,
+                                                                   WrongParams,
+                                                                   DatabaseError) ;
+
+    /**
+      * Obtain a value of a specific run attribute (double).
+      *
+      * @see method Connection::getAttrVal()
+      */
+     virtual bool getAttrVal (double&            attr_value,
+                              const std::string& instrument,
+                              const std::string& experiment,
+                              int                run,
+                              const std::string& attr_class,
+                              const std::string& attr_name) throw (ValueTypeMismatch,
+                                                                   WrongParams,
+                                                                   DatabaseError) ;
+
+    /**
+      * Obtain a value of a specific run attribute (string).
+      *
+      * @see method Connection::getAttrVal()
+      */
+     virtual bool getAttrVal (std::string&       attr_value,
+                              const std::string& instrument,
+                              const std::string& experiment,
+                              int                run,
+                              const std::string& attr_class,
+                              const std::string& attr_name) throw (ValueTypeMismatch,
+                                                                   WrongParams,
+                                                                   DatabaseError) ;
+
+
+    /**
       * Allocate next run number
       *
       * @see method Connection::allocateRunNumber()
@@ -365,6 +455,48 @@ public:
                                  const std::string& host,
                                  const std::string& dirpath) throw (WrongParams,
                                                                     DatabaseError) ;
+
+   /**
+      * Create a new attribute of a run (integer value)
+      *
+      * @see method Connection::createRunAttr()
+      */
+    virtual void createRunAttr (const std::string& instrument,
+                                const std::string& experiment,
+                                int                run,
+                                const std::string& attr_class,
+                                const std::string& attr_name,
+                                const std::string& attr_description,
+                                long               attr_value) throw (WrongParams,
+                                                                      DatabaseError) ;
+
+    /**
+      * Create a new attribute of a run (double precision floating point value)
+      *
+      * @see method Connection::createRunAttr()
+      */
+    virtual void createRunAttr (const std::string& instrument,
+                                const std::string& experiment,
+                                int                run,
+                                const std::string& attr_class,
+                                const std::string& attr_name,
+                                const std::string& attr_description,
+                                double             attr_value) throw (WrongParams,
+                                                                      DatabaseError) ;
+
+    /**
+      * Create a new attribute of a run (text value)
+      *
+      * @see method Connection::createRunAttr()
+      */
+    virtual void createRunAttr (const std::string& instrument,
+                                const std::string& experiment,
+                                int                run,
+                                const std::string& attr_class,
+                                const std::string& attr_name,
+                                const std::string& attr_description,
+                                const std::string& attr_value) throw (WrongParams,
+                                                                      DatabaseError) ;
 
 private:
 
