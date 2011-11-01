@@ -1,0 +1,161 @@
+@CHARSET "ISO-8859-1";
+<style type="text/css">
+
+    /* margin and padding on body element can introduce errors in determining
+       element position and are not recommended;
+       we turn them off as a foundation for YUI CSS treatments.
+     */
+    body {
+        margin: 0;
+        padding: 0;
+        /*
+         background-color:#e0e0e0;
+         background:url('images/paperbg.gif');
+         */
+    }
+
+    div.yui-b p {
+        margin: 0 0 .5em 0;
+        color: #999;
+    }
+
+    div.yui-b p strong {
+        font-weight: bold;
+        color: #000;
+    }
+    
+    div.yui-b p em {
+        color: #000;
+    }
+    
+    .lb_label {
+        text-align: left;
+        /*color:#0071bc;*/
+        font-weight: bold;
+    }
+    
+    a,.lb_link {
+        text-decoration: none;
+        font-weight: bold;
+        color: #0071bc;
+    }
+    
+    a:hover,a.lb_link:hover {
+        color: red;
+    }
+    
+    .lb_msg_subject {
+        color: maroon;
+        /*font-style:italic;*/
+    }
+    
+    input.lb_sparse {
+        padding: 2px;
+        color: blue;
+    }
+    
+    div.help_area {
+        width: 800px;
+    }
+    
+    p.help {
+        font-family: Times, serif;
+        font-size: 18px;
+        padding-bottom: 1em;
+    }
+    
+    #application_header {
+        background-color: #d0d0d0;
+        padding: 8px;
+        padding-bottom: 12px;
+        margin: 0px;
+    }
+    
+    #application_title {
+        margin-left: 5px;
+        font-family: "Times", serif;
+        font-size: 32px;
+    }
+    
+    #application_subtitle {
+        color: #0071bc;
+        font-size: 24px;
+    }
+    
+    #menubar {
+        margin: 0 0 10px 0;
+    }
+    
+    #context {
+        margin: 20px;
+        margin-bottom: 0px;
+        font-size: 16px;
+        text-align: left;
+    }
+    
+    #nav-and-work-areas {
+        margin-left: 20px;
+    }
+    
+    #navarea {
+        overflow: auto;
+        padding: 20px;
+        padding-top: 10px;
+        border-right: solid 4px #f0f0f0;
+        display: none;
+    }
+    
+    #workarea {
+        overflow: auto;
+        padding: 20px;
+        padding-top: 10px;
+        /*background-color:#E3F6CE;*/ /*background-color:#f0f0f0;*/
+    }
+    
+    #experiment_info_container,
+    #run_parameters {
+        padding: 10px;
+        margin-left: 10px;
+    }
+    
+    #workarea_table_container table {
+        
+    }
+    
+    #workarea_table_paginator,
+    #params_table_page,
+    #runs_table_paginator,
+    #shifts_table_paginator,
+    #tags_table_paginator,
+    #files_table_paginator
+    {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    #workarea_table_container,
+    #workarea_table_container .yui-dt-loading {
+        text-align: center;
+        background-color: transparent;
+    }
+    
+    #actions_container,
+    #params_actions_container,
+    #runs_actions_container,
+    #shifts_actions_container {
+        margin-top: 18px;
+        margin-left: 0px;
+        text-align: left;
+    }
+
+    .section_header {
+        padding:2px;
+        /*font-family: Arial;*/
+        font-size:18px;
+        font-weight:bold;
+        background-color:#e0e0e0;
+        /*background-color:#dcefff;*/
+        border-top:solid 3px #000000;
+        /*border-top:solid 1px #c0c0c0;*/
+    }
+</style>
