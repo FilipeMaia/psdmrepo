@@ -464,7 +464,12 @@ class Plotter(object):
         self.vmax = None
 
         self.first = True
+        self.cid1 = None
+        self.cid2 = None
 
+        self.aspect = 'equal'
+        #self.aspect = 'auto'
+        
         self.settings() # defaults
 
         # matplotlib backend is set to QtAgg, and this is needed to avoid
@@ -525,7 +530,7 @@ class Plotter(object):
             print "                Not enough space for %d plots in %d x %d"%(nplots,ncol,nrow)
 
 
-        self.fig = plt.figure(fignum,(self.w*ncol,self.h*nrow))
+        self.fig = plt.figure(fignum)#,(self.w*ncol,self.h*nrow))
         self.fignum = fignum
         self.fig.clf()
         self.fig.set_size_inches(self.w*ncol,self.h*nrow)
@@ -555,17 +560,15 @@ class Plotter(object):
         
     def connect(self,plot=None):
         if plot is None: 
-            self.fig.canvas.mpl_connect('button_press_event', self.onclick)
-            self.fig.canvas.mpl_connect('pick_event', self.onpick)
-
+            self.cid1 = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+            self.cid2 = self.fig.canvas.mpl_connect('pick_event', self.onpick)
         else :
-            self.fig.canvas.mpl_connect('button_press_event', plot.onclick)
-            self.fig.canvas.mpl_connect('pick_event', plot.onpick)
-            
+            self.cid1 = self.fig.canvas.mpl_connect('button_press_event', plot.onclick)
+            self.cid2 = self.fig.canvas.mpl_connect('pick_event', plot.onpick)
+        #print "Now connected? ", self.cid1, self.cid2
 
     def onpick(self, event):
-
-        #print "The following artist object was picked: ", event.artist
+        print "The following clickable artist object was picked: ", event.artist
 
         # in which Frame?
         for aplot in self.frames.itemsvalues() :
@@ -623,6 +626,8 @@ class Plotter(object):
         # can we open a dialogue box here?
         if not event.inaxes and event.button == 3 :
             print "can we open a menu here?"
+            #print "Close all mpl windows"
+            #plt.close('all')
             
         # change display mode
         if not event.inaxes and event.button == 2 :
@@ -700,7 +705,7 @@ class Plotter(object):
                         print "maximum of %s changed:   ( %.2f , %.2f ) " % (key, aplot.vmin, aplot.vmax )
                 
                     aplot.axesim.set_clim(aplot.vmin,aplot.vmax)
-                    #aplot.update_axes()
+                    aplot.update_axes()
                     plt.draw()
 
 
@@ -784,8 +789,9 @@ class Plotter(object):
 
 
     def drawframe( self, frameimage, title="", fignum=1,position=1, showProj = False,extent=None):
-        """ Draw a single frame
+        """ Draw a single interactive frame with optional projections and threshold
         """
+
         key = "fig%d_frame%d"%(fignum,position)
         aplot = self.frames[key]
         aplot.image = frameimage
@@ -803,9 +809,13 @@ class Plotter(object):
             aplot.name = title
 
         # AxesImage
+        myorigin = 'upper'
+        if showProj: myorigin = 'lower'
         aplot.axesim = aplot.axes.imshow( frameimage,
-                                          origin='lower',
+                                          origin=myorigin,
                                           extent=extent,
+                                          aspect=self.aspect,
+                                          interpolation='bilinear',
                                           vmin=aplot.vmin,
                                           vmax=aplot.vmax )
 
@@ -815,6 +825,7 @@ class Plotter(object):
             aplot.projx = divider.append_axes("top", size="20%", pad=0.03,sharex=aplot.axes)
             aplot.projy = divider.append_axes("left", size="20%", pad=0.03,sharey=aplot.axes)
             aplot.projx.set_title( aplot.axes.get_title() )
+            aplot.axes.set_title("") # clear the axis title
 
             # --- sum or average along each axis, 
             maskedimage = np.ma.masked_array(frameimage, mask=(frameimage==0) )
@@ -838,7 +849,7 @@ class Plotter(object):
             aplot.projy.set_ylim( start_y+vdim, start_y)
 
             aplot.set_ticks()
-            #aplot.update_axes()
+            aplot.update_axes()
             
 
         cax = divider.append_axes("right",size="5%", pad=0.05)

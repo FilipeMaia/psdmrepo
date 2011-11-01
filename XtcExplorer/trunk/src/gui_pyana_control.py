@@ -47,20 +47,23 @@ import gui_config_panels as panels
 #  Class definition --
 #---------------------
 class myPopen(subprocess.Popen):
+    status = 1 # running
+
     def kill(self, signal = signal.SIGTERM):
-        code = self.poll()
-        if code is None: 
-            os.kill(self.pid, signal)
-            print "pyana process %d has been killed "% self.pid
-            return 1
-        else :
-            print "No pyana process to kill... "
-            if code==0 : 
-                print "Finished successfully"
-            else :
-                print "Exited with code ", code
-                code = 1
-            return code
+        os.kill(self.pid, signal)
+        print  "pyana process %d has been killed "% self.pid
+        status = 0 # not running
+
+    def suspend(self):
+        os.kill(self.pid, signal.SIGSTOP)
+        print "pyana process %d has been suspended "% self.pid
+        status = 2 # suspended
+
+    def resume(self):
+        os.kill(self.pid, signal.SIGCONT)
+        print "pyana process %d has been resumed "%self.pid
+        status = 1
+        
 
 #class MyThread( threading.Thread ):
 class MyThread( QtCore.QThread ):
@@ -166,7 +169,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.config_button = None
         self.econfig_button = None
         self.pyana_button = None
-        self.quit_pyana_button = None
+        self.quit_button = None
 
         self.scan_widget = None
         self.pyana_widget = None 
@@ -226,9 +229,59 @@ Start with selecting data of interest to you from list on the left and general r
         self.pyana_tab()
         h1.addWidget(self.cfg_tabs)
 
+        # bottom layer: pyana run control
+        h2 = self.layout_runcontrol()
+
         # header
         self.layout.addLayout(h0)
         self.layout.addLayout(h1)
+        self.layout.addLayout(h2)
+
+    def layout_runcontrol(self):
+
+        # Run pyana button
+        self.pyana_button = QtGui.QPushButton("&Run pyana")
+        self.pyana_button.setMaximumWidth(120)
+        self.connect(self.pyana_button, QtCore.SIGNAL('clicked()'), self.run_pyana)
+
+        # Suspend pyana button
+        self.susp_button = QtGui.QPushButton("&Suspend pyana")
+        self.susp_button.setCheckable(True) # Toggle two states: suspend / resume
+        self.susp_button.setMaximumWidth(120)
+        self.connect(self.susp_button, QtCore.SIGNAL('clicked()'), self.suspend_pyana )
+
+        # Quit pyana button
+        self.quit_button = QtGui.QPushButton("&Quit pyana")
+        self.quit_button.setMaximumWidth(120)
+        self.connect(self.quit_button, QtCore.SIGNAL('clicked()'), self.quit_pyana )
+
+        # pyana runstring
+        self.runstring_label = QtGui.QLabel("")
+
+        # process status
+        self.proc_status = QtGui.QLabel("")
+
+        pyana_button_line = QtGui.QHBoxLayout()
+        pyana_button_line.addWidget( self.runstring_label )
+        pyana_button_line.addWidget( self.pyana_button )
+
+        pyana_qsusp_line = QtGui.QHBoxLayout()
+        pyana_qsusp_line.addWidget( self.proc_status )
+        pyana_qsusp_line.addWidget( self.susp_button )
+        pyana_qsusp_line.addWidget( self.quit_button )
+        
+        self.runcontrol = QtGui.QVBoxLayout()
+        self.runcontrol.addLayout( pyana_button_line  )
+        self.runcontrol.addLayout( pyana_qsusp_line  )
+        self.runcontrol.setAlignment( pyana_button_line, QtCore.Qt.AlignRight )
+        self.runcontrol.setAlignment( pyana_qsusp_line, QtCore.Qt.AlignRight )
+
+        # hide all first
+        self.pyana_button.setDisabled(True)
+        self.susp_button.setDisabled(True)
+        self.quit_button.setDisabled(True)
+
+        return self.runcontrol
 
     def setup_gui_checkboxes(self) :
         """Draw a group of checkboxes to the GUI
@@ -510,6 +563,7 @@ Start with selecting data of interest to you from list on the left and general r
         tabname = "Pyana Configuration"
         pyana_widget = QtGui.QWidget()
         pyana_layout = QtGui.QVBoxLayout(pyana_widget)
+
         pyana_widget.setLayout(pyana_layout)
         self.pyana_config_label = QtGui.QLabel("Current pyana configuration:")
         
@@ -529,8 +583,8 @@ Start with selecting data of interest to you from list on the left and general r
         self.econfig_button = QtGui.QPushButton("&Edit configuration file")
         self.connect(self.econfig_button, QtCore.SIGNAL('clicked()'), self.edit_configfile )
         pyana_button_layout.addWidget( self.econfig_button )
-        self.config_button.hide()
-        self.econfig_button.hide()
+        self.config_button.setDisabled(True)
+        self.econfig_button.setDisabled(True)
         pyana_layout.addLayout(pyana_button_layout)
 
         num = self.cfg_tabs.addTab(pyana_widget,tabname)
@@ -545,13 +599,6 @@ Start with selecting data of interest to you from list on the left and general r
         self.settings.update_text()
         self.pyana_config_text.setText(self.settings.config_text)
 
-        #self.cfg_tabs.setCurrentWidget(self.pyana_widget)
-        # clear title 
-        #if self.econfig_button is not None : self.econfig_button.hide()
-        #if self.pyana_button is not None: self.pyana_button.hide()
-        #if self.quit_pyana_button is not None: self.quit_pyana_button.hide()
-        self.config_button.show()
-        self.econfig_button.show()
         self.config_button.setEnabled(True)
         self.econfig_button.setDisabled(True)
 
@@ -697,20 +744,7 @@ Start with selecting data of interest to you from list on the left and general r
         self.config_button.setDisabled(True)
         self.econfig_button.setEnabled(True)
 
-        if self.pyana_button is None: 
-            self.pyana_button = QtGui.QPushButton("&Run pyana")
-            self.pyana_button.setMaximumWidth(120)
-            self.proc_status = QtGui.QLabel("")
-            
-            self.connect(self.pyana_button, QtCore.SIGNAL('clicked()'), self.run_pyana)
-
-            pyana_button_line = QtGui.QHBoxLayout()
-            pyana_button_line.addWidget( self.proc_status )
-            pyana_button_line.addWidget( self.pyana_button )
-            self.layout.addLayout( pyana_button_line  )
-            self.layout.setAlignment( pyana_button_line, QtCore.Qt.AlignRight )
-        else :
-            self.pyana_button.show()
+        self.pyana_button.setEnabled(True)
 
     def edit_configfile(self):
         proc_emacs = None
@@ -733,11 +767,11 @@ Start with selecting data of interest to you from list on the left and general r
         configtext = f.read()
         f.close()
 
-        self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.settings.file)
-        self.pyana_config_text.setText(configtext)
-
         # should add:
         # PARSE FILE & UPDATE ANY GUI FIELDS OR BUTTONS
+
+        self.update_pyana_tab()
+        
 
 
     def run_pyana(self):
@@ -828,33 +862,69 @@ Start with selecting data of interest to you from list on the left and general r
             self.proc_pyana.start()
             print "I'm back"
             
-            
         self.pyana_button.setDisabled(True)
-            
-        if self.quit_pyana_button is None :
-            self.quit_pyana_button = QtGui.QPushButton("&Quit pyana")
-            self.quit_pyana_button.setMaximumWidth(120)
-            self.connect(self.quit_pyana_button, QtCore.SIGNAL('clicked()'), self.quit_pyana )
-            self.layout.addWidget( self.quit_pyana_button )
-            self.layout.setAlignment( self.quit_pyana_button, QtCore.Qt.AlignRight )
-        else :
-            self.quit_pyana_button.show()
+        self.quit_button.setEnabled(True)
+        self.susp_button.setEnabled(True)
 
     def quit_pyana(self) :
         """Kill the pyana process
         """
+        statustext = ""
+
         if self.proc_pyana :
+            # is it running? 
+            status = self.proc_pyana.poll()
+            pid = self.proc_pyana.pid
+            if status is None: 
+                self.proc_pyana.kill()
+                statustext = "pyana process %d has been killed"%pid
+            else :
+                statustext = "pyana process %d has finished (returncode %d)"%(pid,status)
+        else :
+            print "No pyana process to stop"
 
-            statustext = {1 : "process %d killed"%self.proc_pyana.pid,
-                          0 : "process %d finished successfully"%self.proc_pyana.pid }
-            status = self.proc_pyana.kill()
+        self.proc_status.setText(statustext)
+        self.quit_button.setDisabled(True)
+        self.susp_button.setDisabled(True)
+        self.pyana_button.setDisabled(False)
 
-            self.pyana_button.setDisabled(False)        
-            self.proc_status.setText(statustext[status])
-            self.quit_pyana_button.hide()
-            return
+#        # double check
+#        status = self.proc_pyana.poll()
+#        if status is not None: 
+#            self.quit_button.setDisabled(True)
+#            self.susp_button.setDisabled(True)
+#        else:
+#            print "finishing... ?"
+#            print os.system("ps")
 
-        print "No pyana process to stop"
+
+    def suspend_pyana(self):
+        """suspend or resume the pyana process
+        """
+        checked = self.susp_button.isChecked()
+
+        statustext = "" 
+        buttontext = ""
+        if self.proc_pyana :
+            # is it running? 
+            status = self.proc_pyana.poll()
+            pid = self.proc_pyana.pid
+            if status is None: 
+                if checked :
+                    self.proc_pyana.suspend()
+                    statustext = "pyana process %d has been suspended"%pid
+                    buttontext = "Resume"
+                else :
+                    self.proc_pyana.resume()
+                    statustext = "pyana process %d has been resumed"%pid 
+                    buttontext = "Suspend"                   
+            else :
+                statustext = "pyana process %d has finished (returncode %d)"%(pid,status)
+        else :
+            print "No pyana process to suspend or resume"
+
+        self.proc_status.setText(statustext)
+        self.susp_button.setText(buttontext)
 
 
     #--------------------------------

@@ -11,6 +11,12 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Nov-01 ofte  	          rev 2587
+	- Mainly fixed the suspend-button for xtcexplorernew and unified / improved 
+	the behaviour a bit. 
+	- cspad save pixels
+	- wf... some unfinished improvements. may break. 
+	
 2011-Oct-25 ofte                  rev 2555
 	- fixed a bug with the "full scan" button and file size checking
 	- added a "mode" to pyana_waveform that can be 'average' (default) 

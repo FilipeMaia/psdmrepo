@@ -177,7 +177,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.pvGroupLayout = None
 
         # buttons
-        self.pyana_config = QtGui.QLabel(self);
+        self.pyana_config_text = QtGui.QLabel(self);
         self.config_button = None
         self.econfig_button = None
         self.pyana_button = None
@@ -228,8 +228,10 @@ Start with selecting data of interest to you from list on the left and general r
 
         # mid layer: almost everything
         h1 = QtGui.QHBoxLayout()
+
         # to the left:
         detector_gbox = QtGui.QGroupBox("In the file(s):")
+
         # layout of the group must be global, checkboxes added later
         self.lgroup = QtGui.QVBoxLayout()
         detector_gbox.setLayout(self.lgroup)
@@ -239,6 +241,7 @@ Start with selecting data of interest to you from list on the left and general r
         self.config_tabs = QtGui.QTabWidget()
         self.config_tabs.setMinimumWidth(600)
         self.intro_tab()
+        self.pyana_tab()
         h1.addWidget(self.config_tabs)
 
         # bottom layer: pyana run control
@@ -288,10 +291,10 @@ Start with selecting data of interest to you from list on the left and general r
         self.runcontrol.setAlignment( pyana_button_line, QtCore.Qt.AlignRight )
         self.runcontrol.setAlignment( pyana_qsusp_line, QtCore.Qt.AlignRight )
 
-        # hide all first
-        self.pyana_button.hide()
-        self.susp_button.hide()
-        self.quit_button.hide()
+        ## hide all first
+        self.pyana_button.setDisabled(True)
+        self.susp_button.setDisabled(True)
+        self.quit_button.setDisabled(True)
 
         return self.runcontrol
 
@@ -532,32 +535,47 @@ Start with selecting data of interest to you from list on the left and general r
     def pyana_tab(self):
         """Pyana configuration text
         """
-        if self.pyana_widget is None :
-            pyana_widget = QtGui.QWidget()
-            pyana_layout = QtGui.QVBoxLayout(pyana_widget)
-
-            pyana_txtbox = QtGui.QGroupBox("Current pyana configuration:")
-            pyana_txtbox_layout = QtGui.QVBoxLayout()
-            pyana_txtbox_layout.addWidget(self.pyana_config)
-            pyana_txtbox.setLayout(pyana_txtbox_layout)
-            pyana_layout.addWidget(pyana_txtbox)
-            self.pyana_txtbox = pyana_txtbox
+        pyana_widget = QtGui.QWidget()
+        pyana_layout = QtGui.QVBoxLayout(pyana_widget)
         
-            pyana_button_layout = QtGui.QHBoxLayout()
-            self.config_button = QtGui.QPushButton("&Write configuration to file") 
-            self.connect(self.config_button, QtCore.SIGNAL('clicked()'), self.write_configfile )
-            pyana_button_layout.addWidget( self.config_button )
-            self.econfig_button = QtGui.QPushButton("&Edit configuration file")
-            self.connect(self.econfig_button, QtCore.SIGNAL('clicked()'), self.edit_configfile )
-            pyana_button_layout.addWidget( self.econfig_button )
-            self.config_button.hide()
-            self.econfig_button.hide()
-            pyana_layout.addLayout(pyana_button_layout)
-            
-            self.config_tabs.addTab(pyana_widget,"Pyana Configuration")
+        pyana_widget.setLayout(pyana_layout)
+        self.pyana_config_label = QtGui.QLabel("Current pyana configuration:")
+        
+        # scroll area for the configuration file text
+        scrollArea = QtGui.QScrollArea()
+        scrollArea.setWidgetResizable(True)
+        scrollArea.setWidget( self.pyana_config_text )
+        
+        pyana_layout.addWidget(self.pyana_config_label)
+        pyana_layout.addWidget(scrollArea)
+        
+        # add some buttons for this tab: Write / Edit
+        pyana_button_layout = QtGui.QHBoxLayout()
+        self.config_button = QtGui.QPushButton("&Write configuration to file") 
+        self.connect(self.config_button, QtCore.SIGNAL('clicked()'), self.write_configfile )
+        pyana_button_layout.addWidget( self.config_button )
+        self.econfig_button = QtGui.QPushButton("&Edit configuration file")
+        self.connect(self.econfig_button, QtCore.SIGNAL('clicked()'), self.edit_configfile )
+        pyana_button_layout.addWidget( self.econfig_button )
 
-            self.config_tabs.tabBar().show()
-            self.pyana_widget = pyana_widget
+        self.config_button.setDisabled(True)
+        self.econfig_button.setDisabled(True)
+        pyana_layout.addLayout(pyana_button_layout)
+        
+        self.config_tabs.addTab(pyana_widget,"Pyana Configuration")
+        
+        self.config_tabs.tabBar().show()
+        self.pyana_widget = pyana_widget
+        
+
+    def update_pyana_tab(self):
+        if self.pyana_widget is None :
+            self.pyana_tab()
+        
+        self.pyana_config_text.setText(self.configuration)
+
+        self.config_button.setEnabled(True)
+        self.econfig_button.setDisabled(True)
 
         self.config_tabs.setCurrentWidget(self.pyana_widget)
 
@@ -706,17 +724,15 @@ Start with selecting data of interest to you from list on the left and general r
         """Process the list of checkboxes and
         call the appropriate function based on the
         checkbox name/label
-        """
-        self.pyana_tab()
-        
+        """        
         # clear title 
         self.configfile = None
-        if self.econfig_button is not None : self.econfig_button.hide()
-        if self.pyana_button is not None: self.pyana_button.hide()
-        if self.quit_button is not None: self.quit_button.hide()
-        if self.susp_button is not None: self.susp_button.hide()
+        if self.econfig_button is not None : self.econfig_button.setDisabled(True)
+        if self.pyana_button is not None: self.pyana_button.setDisabled(True)
+        if self.quit_button is not None: self.quit_button.setDisabled(True)
+        if self.susp_button is not None: self.susp_button.setDisabled(True)
 
-        self.pyana_txtbox.setTitle("Current pyana configuration:")
+        self.pyana_config_label.setText("Current pyana configuration:")
 
         modules_to_run = []
         options_for_mod = []
@@ -781,12 +797,8 @@ Start with selecting data of interest to you from list on the left and general r
         self.configuration = self.add_linebreaks(self.configuration, width=70)
         #print self.configuration
 
-        self.pyana_config.setText(self.configuration)
+        self.update_pyana_tab()
 
-        self.config_button.show()
-        self.econfig_button.show()
-        self.config_button.setEnabled(True)
-        self.econfig_button.setDisabled(True)
 
 
     def add_to_scan(self,box,modules_to_run,options_for_mod) :
@@ -986,13 +998,17 @@ Start with selecting data of interest to you from list on the left and general r
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_cspad at ", index
+            fname = self.filenames[0]
+            exp = fname.split('/')[5]
+            rnr = fname.split('/')[7].split('-')[1]
+            dfile = "cspad_%s_%s.npy"%(exp,rnr)
             address = str(box.text()).split(":")[1].strip()
             options_for_mod[index].append("\nimg_sources = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             options_for_mod[index].append("\ndark_img_file = ")
-            options_for_mod[index].append("\nout_avg_file = ")
+            options_for_mod[index].append("\nout_avg_file = %s"%dfile)
             options_for_mod[index].append("\nout_shot_file = ")
             options_for_mod[index].append("\nplot_vrange = ")
             options_for_mod[index].append("\nthreshold = ")
@@ -1081,7 +1097,7 @@ Start with selecting data of interest to you from list on the left and general r
 
         self.configfile = "xb_pyana_%d.cfg" % random.randint(1000,9999)
 
-        self.pyana_txtbox.setTitle("Current pyana configuration: (%s)" % self.configfile)
+        self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.configfile)
 
         f = open(self.configfile,'w')
         f.write(self.configuration)
@@ -1099,7 +1115,7 @@ Start with selecting data of interest to you from list on the left and general r
         self.econfig_button.setEnabled(True)
 
         self.pyana_runstring()
-        self.pyana_button.show()
+        self.pyana_button.setEnabled(True)
 
 
     def edit_configfile(self):
@@ -1123,8 +1139,8 @@ Start with selecting data of interest to you from list on the left and general r
         self.configuration = f.read()
         f.close()
 
-        self.pyana_txtbox.setTitle("Current pyana configuration: (%s)" % self.configfile)
-        self.pyana_config.setText(self.configuration)
+        self.pyana_config_label.setText("Current pyana configuration: (%s)" % self.configfile)
+        self.pyana_config_text.setText(self.configuration)
 
         print "----------------------------------------"
         print "Configuration file (%s): " % self.configfile
@@ -1223,8 +1239,8 @@ Start with selecting data of interest to you from list on the left and general r
             print "I'm back"
 
         self.pyana_button.setDisabled(True)
-        self.susp_button.show()
-        self.quit_button.show()
+        self.susp_button.setEnabled(True)
+        self.quit_button.setEnabled(True)
         self.susp_button.setDisabled(False)
         self.quit_button.setDisabled(False)
             

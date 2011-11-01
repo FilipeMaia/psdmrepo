@@ -92,6 +92,7 @@ class pyana_waveform (object) :
         self.accu_start = None
 
         self.do_plots = self.plot_every_n != 0
+        self.plotter = None
 
     def initlists(self):
         # containers to store data from this job
@@ -158,6 +159,14 @@ class pyana_waveform (object) :
         # lists to fill numpy arrays
         self.initlists()
 
+        self.plotter = Plotter()
+        self.plotter.settings(7,7) # set default frame size
+        self.plotter.threshold = None
+        #if self.threshold is not None:
+        #    self.plotter.threshold = self.threshold.value
+        #    self.plotter.vmin, self.plotter.vmax = self.plot_vmin, self.plot_vmax
+
+
 
 
     def beginrun( self, evt, env ) :
@@ -215,7 +224,6 @@ class pyana_waveform (object) :
                         self.wf[label] = []
                         self.wf[label].append(awf)
                     else :
-                        #self.wf[label] = np.vstack( (self.wf[label], awf))
                         self.wf[label].append(awf)
 
                 else : 
@@ -286,23 +294,30 @@ class pyana_waveform (object) :
     def make_stackplots(self):
         #self.make_plots(stack=True)
 
-        plotter = Plotter()
         plots = []
         suptitle = "Stack of waveforms for events %d-%d" % (self.accu_start,self.n_shots)
         
         for source in self.src_ch :
             
-            if type(self.wf[source]).__name__=='list':
-                self.wf[source] = np.float_(self.wf[source])
+            wf_array = np.float_(self.wf[source])
                 
-            print "preparing to plot array of size ", self.wf[source].size
-            plots.append( ("Voltage waveform from %s"%source, self.wf[source] ) )
+            print "preparing to plot array of size ", wf_array.size
+            plots.append( ("Voltage waveform from %s"%source, wf_array ) )
                 
-                
+            ## scientific notation for time axis
+            #plt.ticklabel_format(style='sci',axis='x',scilimits=(0,0))
+            
+            #ts_axis = self.ts[source]
+            #unit = ts_axis[1]-ts_axis[0]
+            #plt.xlim(ts_axis[0]-unit,ts_axis[-1]+unit)
+            
+            #plt.xlabel("time   [s]")
+            #plt.ylabel("Event number")
+            
         if len(plots) > 1 :
             fig.subplots_adjust(wspace=0.45, hspace=0.45)
-
-        plotter.plot_several(plots,fignum=1000,title=suptitle)
+                
+        self.plotter.plot_several(plots,fignum=1000,title=suptitle)
 
         print "shot#%d: wf avg histogram plotted for %d sources" % (self.n_shots,len(plots))
         

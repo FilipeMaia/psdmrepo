@@ -283,13 +283,29 @@ class CsPad( object ):
         """
         try: 
             if pedestalsfile.find(".npy") >= 0:
-                self.pedestals = np.load(pedestalfile).reshape((4,8,185,388))
+                self.pedestals = np.load(pedestalsfile).reshape((4,8,185,388))
             else :
-                self.pedestals = np.loadtxt(pedestalfile).reshape((4,8,185,388))
-            print "Pedestals has been loaded from %s"% pedestalfile
+                self.pedestals = np.loadtxt(pedestalsfile).reshape((4,8,185,388))
+            print "Pedestals has been loaded from %s"% pedestalsfile
             print "Pedestals will be subtracted from displayed images"
         except:
             print "No pedestals loaded. File name requested was ", pedestalsfile
+            pass
+
+
+    def save_pixels(self, pixelsfile ):
+        """ save image as a pixel array with the same 
+        format as the pedestals txt file: 5920 (lines) x 388 (columns)
+        accepted file formats: ascii and npy (binary)
+        """
+        try: 
+            if pixelsfile.find(".npy") >= 0:
+                np.save(pixelsfile, self.pixels.reshape((5920,388)))
+            else :
+                np.savetxt(pixelsfile, self.pixels.reshape((5920,388)))
+            print "Pixels have been saved to %s"% pixelsfile
+        except:
+            print "Could not save to file ", pixelsfile
             pass
 
 
