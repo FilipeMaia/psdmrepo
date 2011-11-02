@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module ImageWidget...
+#  Module ImgWidget...
 #
 #------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ import numpy as np
 
 import matplotlib
 #matplotlib.use('GTKAgg') # forse Agg rendering to a GTK canvas (backend)
-matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+#matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 
 #from   matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -48,7 +48,7 @@ from PyQt4 import QtGui, QtCore
 #  Class definition --
 #---------------------
 
-class ImageWidget (QtGui.QWidget) :
+class ImgWidget (QtGui.QWidget) :
     """Plots for any 'image' record in the EventeDisplay project."""
 
     def __init__(self, parent=None, fig=None, arr=None):
@@ -59,8 +59,8 @@ class ImageWidget (QtGui.QWidget) :
         #-----------------------------------
         #self.canvas = FigureCanvas(self.fig)
         self.canvas = self.fig.canvas
-        vbox = QtGui.QVBoxLayout()         # <=== Begin to combine layout 
-        vbox.addWidget(self.canvas)        # <=== Add figure 
+        vbox = QtGui.QVBoxLayout()
+        vbox.addWidget(self.canvas)        # Wrap figure canvas in widget 
         self.setLayout(vbox)
         #-----------------------------------
         self.initParameters()
@@ -68,19 +68,20 @@ class ImageWidget (QtGui.QWidget) :
 
     def initParameters(self):
         self.setFrame()
+
         self.fig.myXmin = None
         self.fig.myXmax = None
         self.fig.myYmin = None
         self.fig.myYmax = None
         self.fig.myZmin = None
         self.fig.myZmax = None
-        self.fig.myNBins = 100
         self.fig.myZoomIsOn = False
 
         self.xpress = 0
         self.ypress = 0
         self.xpressabs = 0
         self.ypressabs = 0
+
 
 
     def setFrame(self):
@@ -125,51 +126,28 @@ class ImageWidget (QtGui.QWidget) :
 
         self.arr2d = self.arrwin
 
-        #if self.cbox_log.isChecked() : self.arr2d = np.log(self.arrwin)
-        #else :                         self.arr2d =        self.arrwin
+        zmin = self.intOrNone(zmin)
+        zmax = self.intOrNone(zmax)
+        #h1Range = (zmin,zmax)
+        #if zmin==None or zmax==None :  h1Range = None
+        #print 'h1Range = ', h1Range
+
 
         self.fig.clear()        
 
         gs = gridspec.GridSpec(20, 20)
-        zmin = self.intOrNone(zmin)
-        zmax = self.intOrNone(zmax)
-
-        h1Range = (zmin,zmax)
-        if zmin==None and zmax==None : h1Range = None
-
-        print 'h1Range = ', h1Range
-
         #self.fig.myaxesH = self.fig.add_subplot(212)
-        self.fig.myaxesH = self.fig.add_subplot(gs[15:19,:])
         
-        self.fig.myaxesH.hist(self.arrwin.flatten(), bins=self.fig.myNBins, range=h1Range)#, range=(Amin, Amax)) 
-        Nmin, Nmax = self.fig.myaxesH.get_ylim() 
-        yticks = np.arange(Nmin, Nmax, int((Nmax-Nmin)/4))
-        if len(yticks)<2 : yticks = [Nmin,Nmax]
-        self.fig.myaxesH.set_yticks( yticks )
-
-        zmin,zmax      = self.fig.myaxesH.get_xlim() 
-        coltickslocs   = self.fig.myaxesH.get_xticks()
-        self.fig.myaxesH.set_xticklabels('')
-        #coltickslabels = self.fig.myaxesH.get_xticklabels()
-        print 'colticks =', coltickslocs#, coltickslabels
- 
         self.fig.myZmin, self.fig.myZmax = zmin, zmax
-        #self.setEditFieldValues()
 
-        self.fig.myaxesI = self.fig.add_subplot(gs[0:14,:])
+        self.fig.myaxesSIm = self.fig.add_subplot(gs[0:18,:])
         #self.fig.myaxesI.grid(self.cbox_grid.isChecked())
-        self.fig.myaxesImage = self.fig.myaxesI.imshow(self.arr2d, origin='upper', interpolation='nearest', extent=self.range, aspect='auto')
-        self.fig.myaxesImage.set_clim(zmin,zmax)
-        #self.fig.mycolbar = self.fig.colorbar(self.fig.myaxesImage, fraction=0.15, pad=0.1, shrink=1.0, aspect=15, orientation=1, ticks=coltickslocs) #orientation=1,
-        self.fig.myaxesC = self.fig.add_subplot(gs[19,:])
-        self.fig.mycolbar = self.fig.colorbar(self.fig.myaxesImage, cax=self.fig.myaxesC, orientation=1, ticks=coltickslocs) #orientation=1,
+        self.fig.myaxesImg = self.fig.myaxesSIm.imshow(self.arr2d, origin='upper', interpolation='nearest', extent=self.range, aspect='auto')
+        self.fig.myaxesImg.set_clim(zmin,zmax)
+
+        self.fig.myaxesSCB = self.fig.add_subplot(gs[19,:])
+        self.fig.mycolbar  = self.fig.colorbar(self.fig.myaxesImg, cax=self.fig.myaxesSCB, orientation=1)#, ticks=coltickslocs) #orientation=1,
         #self.fig.mycolbar.set_clim(zmin,zmax)
-
-        #self.fig.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
-        #self.fig.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
-        #self.fig.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
-
 
         self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
         self.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
@@ -182,25 +160,21 @@ class ImageWidget (QtGui.QWidget) :
 
     def processMouseMotion(self, event) :
         fig = self.fig
-        if event.inaxes == fig.myaxesI :
+        if event.inaxes == fig.myaxesSIm :
             print 'processMouseMotion',
             #print 'event.xdata, event.ydata =', event.xdata, event.ydata
             print 'event.x, event.y =', event.x, event.y
-            height = self.canvas.figure.bbox.height
-            self.xmotion    = event.xdata
-            self.ymotion    = event.ydata
-            x0 = self.xpressabs
-            x1 = event.x
-            y0 = height - self.ypressabs
-            y1 = height - event.y
-            w  = x1 - x0
-            h  = y1 - y0
-            rect = [x0, y0, w, h]
-            self.fig.canvas.drawRectangle( rect )
-
-            
-
-              
+            #height = self.canvas.figure.bbox.height
+            #self.xmotion    = event.xdata
+            #self.ymotion    = event.ydata
+            #x0 = self.xpressabs
+            #x1 = event.x
+            #y0 = height - self.ypressabs
+            #y1 = height - event.y
+            #w  = x1 - x0
+            #h  = y1 - y0
+            #rect = [x0, y0, w, h]
+            #self.fig.canvas.drawRectangle( rect )              
             
 
     def processDraw(self) :
@@ -214,13 +188,15 @@ class ImageWidget (QtGui.QWidget) :
         self.fig = event.canvas.figure
 
         if event.inaxes == self.fig.mycolbar.ax : self.mousePressOnColorBar (event)
-        if event.inaxes == self.fig.myaxesI     : self.mousePressOnImage    (event)
-        if event.inaxes == self.fig.myaxesH     : self.mousePressOnHistogram(event)
+        if event.inaxes == self.fig.myaxesSIm   : self.mousePressOnImage    (event)
+
+
+
 
 
     def mousePressOnImage(self, event) :
         fig = self.fig
-        if event.inaxes == fig.myaxesI :
+        if event.inaxes == fig.myaxesSIm :
             print 'PressOnImage'
            #print 'event.xdata, event.ydata =', event.xdata, event.ydata
             self.xpress    = event.xdata
@@ -229,15 +205,10 @@ class ImageWidget (QtGui.QWidget) :
             self.ypressabs = event.y
 
 
-    def mousePressOnHistogram(self, event) :
-        print 'PressOnHistogram'
-        lims = self.fig.myaxesH.get_xlim()
-        self.setColorLimits(event, lims[0], lims[1], event.xdata)
-
 
     def mousePressOnColorBar(self, event) :
         print 'PressOnColorBar'
-        lims = self.fig.myaxesImage.get_clim()
+        lims = self.fig.myaxesImg.get_clim()
         colmin = lims[0]
         colmax = lims[1]
         range = colmax - colmin
@@ -282,7 +253,7 @@ class ImageWidget (QtGui.QWidget) :
         self.fig    = fig
         axes        = event.inaxes # fig.gca() 
                 
-        if event.inaxes == fig.myaxesI and event.button == 1 : # Left button
+        if event.inaxes == fig.myaxesSIm and event.button == 1 : # Left button
             #bounds = axes.viewLim.bounds
             #fig.myXmin = bounds[0] 
             #fig.myXmax = bounds[0] + bounds[2]  
@@ -353,8 +324,8 @@ def main():
     #fig = Figure(          figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
     fig = plt.figure(num=1, figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
 
-    #w = ImageWidget(None, fig, arr)
-    w = ImageWidget(None, fig)
+    #w = ImgWidget(None, fig, arr)
+    w = ImgWidget(None, fig)
     w.move(QtCore.QPoint(50,50))
     w.set_image_array( get_array2d_for_test() )
     w.show()    
@@ -362,7 +333,7 @@ def main():
     app.exec_()
         
 #-----------------------------
-#  In case someone decides to run this module
+#  For test
 #
 if __name__ == "__main__" :
     main()

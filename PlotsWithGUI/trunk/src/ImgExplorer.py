@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module ImageWithGUI...
+#  Module ImgExplorer...
 #
 #------------------------------------------------------------------------
 
@@ -45,16 +45,17 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
+import ImgFigureManager     as imgfm
 import MyNavigationToolbar  as mytb
-import ImageWidget          as imgwidg
-import ImageButtons         as imgbuts
+import ImgWidget            as imgwidg
+import ImgGUI               as imggui
 
 #---------------------
 #  Class definition --
 #---------------------
 
-#class ImageWithGUI (QtGui.QMainWindow) :
-class ImageWithGUI (QtGui.QWidget) :
+#class ImgExplorer (QtGui.QMainWindow) :
+class ImgExplorer (QtGui.QWidget) :
     """Plots for any 'image' record in the EventeDisplay project."""
 
 
@@ -64,10 +65,11 @@ class ImageWithGUI (QtGui.QWidget) :
         self.setWindowTitle('GUI with plot')
         self.setFrame()
 
-        self.fig = plt.figure(num=1, figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
         #self.fig = Figure((5.0, 10.0), dpi=100, facecolor='w',edgecolor='w',frameon=True)
-        self.widgimage = imgwidg.ImageWidget(parent, self.fig, arr)
-        self.widgbuts  = imgbuts.ImageButtons(None)
+        #self.fig = plt.figure(num=None, figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
+        self.fig       = imgfm.ifm.get_figure(figsize=(5,10), type='type1')
+        self.widgimage = imgwidg.ImgWidget(parent, self.fig, arr)
+        self.widimggui = imggui.ImgGUI(None)
 
         # Create the navigation toolbar, tied to the canvas
         self.mpl_toolbar = mytb.MyNavigationToolbar(self.widgimage.getCanvas(), self)
@@ -76,9 +78,9 @@ class ImageWithGUI (QtGui.QWidget) :
 
         vbox = QtGui.QVBoxLayout()                      # <=== Begin to combine layout 
         #vbox.addWidget(self.widgimage)                 # <=== Add figure as QWidget
-        vbox.addWidget(self.widgimage.getCanvas())      # <=== Add figure as FigureCanvas 
         vbox.addWidget(self.mpl_toolbar)                # <=== Add toolbar
-        vbox.addWidget(self.widgbuts)                   # <=== Add buttons         
+        vbox.addWidget(self.widgimage.getCanvas())      # <=== Add figure as FigureCanvas (saves useful space)
+        vbox.addWidget(self.widimggui)                  # <=== Add gui         
         self.setLayout(vbox)
 
         #---------------------
@@ -109,7 +111,7 @@ class ImageWithGUI (QtGui.QWidget) :
 
     def closeEvent(self, event): # is called for self.close() or when click on "x"
         print 'Close application'
-
+        #self.widgimage  .close()
 
 #-----------------------------
 # Test
@@ -127,8 +129,8 @@ def main():
 
     app = QtGui.QApplication(sys.argv)
 
-    #w  = ImageWithGUI(None, arr)
-    w  = ImageWithGUI(None)
+    #w  = ImgExplorer(None, arr)
+    w  = ImgExplorer(None)
     w.move(QtCore.QPoint(50,50))
     w.set_image_array( get_array2d_for_test() )
     w.show()
