@@ -10,6 +10,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-03
+2011-11-04 Andy Salnikov
+- ic-status and ic-ws-status now display JobID column
+- icws service returns jobid data for requests
+- ic-command has 'cstop' command to stop controller
+
 Tag: V01-00-02
 2011-10-26 Andy Salnikov
 - code in icws web service was still using old status names

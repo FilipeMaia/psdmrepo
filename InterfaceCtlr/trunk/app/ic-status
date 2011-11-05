@@ -167,8 +167,9 @@ class ICStatus ( AppBase ) :
             subq += " GROUP BY run_number, instrument, experiment"
  
             q = """SELECT fs.instrument, fs.experiment, fs.run_number, 
-                          stat.name as status, fs.id, fs.priority, fs.created
-                FROM fileset fs, fileset_status_def stat, (""" +subq+ """) flast
+                          stat.name as status, fs.id, IFNULL(tr.jobid,0), fs.priority, fs.created
+                FROM fileset fs LEFT OUTER JOIN translator_process tr ON tr.id = fs.translator_id, 
+                    fileset_status_def stat, (""" +subq+ """) flast
                 WHERE fs.instrument=flast.instrument AND fs.experiment=flast.experiment 
                 AND fs.run_number=flast.run_number AND fs.created=flast.last
                 AND stat.id=fs.fk_fileset_status  
@@ -177,8 +178,8 @@ class ICStatus ( AppBase ) :
         else :
             
             q = """SELECT fs.instrument, fs.experiment, fs.run_number, 
-                          stat.name as status, fs.id, fs.priority, fs.created
-                FROM fileset fs, fileset_status_def stat
+                          stat.name as status, fs.id, IFNULL(tr.jobid,0), fs.priority, fs.created
+                FROM fileset fs LEFT OUTER JOIN translator_process tr ON tr.id = fs.translator_id, fileset_status_def stat
                 WHERE stat.id=fs.fk_fileset_status 
             """
         
@@ -219,10 +220,10 @@ class ICStatus ( AppBase ) :
         while rows :
             for row in rows :
                 if self._options.print_header and count % 30 == 0 :
-                    print "---------------------------------------------------------------------------"
-                    print "Instr. Experiment   Run  Status      RequestId Priority Create Time"
-                    print "---------------------------------------------------------------------------"
-                print "%-6s %-12s %4d %-12s %8d %8d %-16s" % tuple( row )
+                    print "------------------------------------------------------------------------------------"
+                    print "Instr. Experiment    Run Status      RequestId    JobID Priority Create Time"
+                    print "------------------------------------------------------------------------------------"
+                print "%-6s %-12s %4d %-12s %8d %8d %8d %-16s" % tuple( row )
                 count += 1
             rows = cursor.fetchmany()
 

@@ -344,6 +344,14 @@ class InterfaceDb ( object ) :
             
         return res
 
+    @_synchronized
+    @_transaction
+    def controller_stop(self, id, cursor=None):
+        """Stop given controller instance"""
+        
+        # stop controller process
+        q = """UPDATE interface_controller SET kill_ic=1 WHERE id = %s"""
+        cursor.execute(q, (id,))
 
     # ===========================================
     # get configuration information from database

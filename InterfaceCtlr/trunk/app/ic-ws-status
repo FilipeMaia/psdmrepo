@@ -138,12 +138,12 @@ class IcWsStatus ( AppBase ) :
             res_name = '/exp/%s/%s' % (self._args[0], self._args[1])
             res = WSResource( app, res_name )
             data = res.request( 'GET' )
-            fmt = '%6s  %-20s  %6s  %4s  %-19s  %s'
+            fmt = '%6s  %-20s  %6s  %8s  %4s  %-19s  %s'
             if data:
                 if not self._options.no_header :
-                    print fmt % ('Run', 'Status', 'ReqID', 'Prio', 'Req Time', 'Files')
-                    print '  ----------------------------------------------------------------------------'
-                data = [ (d['run'], d['id'], d['created'], d['status'], d.get('priority', 0), d.get('xtc_files')) for d in data ]
+                    print fmt % ('Run', 'Status', 'ReqID', 'JobID', 'Prio', 'Req Time', 'Files')
+                    print '  --------------------------------------------------------------------------------------'
+                data = [ (d['run'], d['id'], d['created'], d['status'], d.get('priority', 0), d.get('xtc_files'), d.get('jobid', 0)) for d in data ]
                 data.sort()
 
                 for d in data :
@@ -153,14 +153,16 @@ class IcWsStatus ( AppBase ) :
                     stat = d[3]
                     prio = d[4]
                     files = d[5]
+                    jobid = d[6]
                     if not files : files = ['']
                     for f in files :
-                        print fmt % (run, stat, reqid, prio, time, f)
+                        print fmt % (run, stat, reqid, jobid, prio, time, f)
                         run = ''
                         reqid = ''
                         time = ''
                         stat = ''
                         prio = ''
+                        jobid = ''
                         
             else :
                 print 'No requests were found'

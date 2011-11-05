@@ -80,25 +80,9 @@ class IcdbModel ( InterfaceDb ) :
 
     def controller_stop(self, id):
         """Stop given controller instance"""
-        
-        cursor = self._conn.cursor()
-
-        # this is a subject to race condition, translator threads 
-        # and main controller thread need to synchronize but now they run
-        # independently
-        
-        # stop all translator processes
-        q = """UPDATE translator_process SET kill_tp=1 
-            WHERE fk_interface_controller = %s AND stopped IS NULL"""
-        cursor.execute(q, (id,))
-
-        # stop controller process
-        q = """UPDATE interface_controller SET kill_ic=1 WHERE id = %s"""
-        cursor.execute(q, (id,))
-        
-        cursor.execute("COMMIT")
-        
+                
         icdb = InterfaceDb(self._conn.connection())
+        icdb.controller_stop(id)
         res = icdb.controller_status(id)
         if res : return res[0]
         return {}
@@ -148,7 +132,7 @@ class IcdbModel ( InterfaceDb ) :
 
         # select translator info
         q = """SELECT fs.id, DATE_FORMAT(tr.started, GET_FORMAT(DATETIME,'ISO')) started, 
-            DATE_FORMAT(tr.stopped, GET_FORMAT(DATETIME,'ISO')) stopped, tr.log 
+            DATE_FORMAT(tr.stopped, GET_FORMAT(DATETIME,'ISO')) stopped, tr.log, IFNULL(tr.jobid,0) jobid
             FROM fileset fs, translator_process tr 
             WHERE fs.id=tr.fk_fileset"""
         if rid is not None:
@@ -163,6 +147,7 @@ class IcdbModel ( InterfaceDb ) :
                 d['log'] = row['log']
                 d['started'] = row['started']
                 d['stopped'] = row['stopped']
+                d['jobid'] = row['jobid']
 
         return res.values()
     

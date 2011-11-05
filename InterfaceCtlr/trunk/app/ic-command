@@ -99,6 +99,7 @@ class ICCommand ( AppBase ) :
         self.__add_handler('active', "Display active experiments", self.cmd_active)
         self.__add_handler( 'activate', "Activate experiment", self.cmd_activate)
         self.__add_handler('deactivate', "Deactivate experiment", self.cmd_deactivate)
+        self.__add_handler('cstop', "Send stop signal to controller", self.cmd_cstop)
 
 
     # =========================================================================
@@ -277,6 +278,25 @@ class ICCommand ( AppBase ) :
             parser.error("Two positional arguments are required")
 
         self.icdb().deactivate_experiment(*args)
+        
+        return 0
+
+
+    # ===============
+    # Stop controller
+    # ===============
+
+    def cmd_cstop( self, command, cmdargs ) :
+
+        usage = "usage: %%prog %s controller-id" % command
+        descr = "Signals that controller with specified ID should stop gracefully"
+        parser = OptionParser(usage=usage, description=descr)
+        (options, args) = parser.parse_args(cmdargs)
+
+        if len(args) != 1:
+            parser.error("One positional arguments are required")
+
+        self.icdb().controller_stop(*args)
         
         return 0
 
