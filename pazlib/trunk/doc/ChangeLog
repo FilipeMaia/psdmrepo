@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2011-11-07 Andy Salnikov
+- add libpthread to the link list
+- small changes to test case
+
 Tag: V00-00-04
 2011-10-12 Andy Salnikov
 - there is a bug in adler32_combine() in zlib 1.2.3-3 which is currently

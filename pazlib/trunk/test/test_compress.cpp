@@ -29,6 +29,7 @@
 // Base Class Headers --
 //----------------------
 #include "AppUtils/AppBase.h"
+#include "PSTime/Time.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -153,6 +154,7 @@ test_compress::runApp ()
 
   struct rusage ru0;
   stat = getrusage(RUSAGE_SELF, &ru0);
+  PSTime::Time t0 = PSTime::Time::now();
 
   for (int count = m_repeatOpt.value(); count != 0 ; -- count) {
 
@@ -171,10 +173,12 @@ test_compress::runApp ()
 
   struct rusage ru1;
   stat = getrusage(RUSAGE_SELF, &ru1);
+  PSTime::Time t1 = PSTime::Time::now();
   std::cout << "user sec: " << (ru1.ru_utime.tv_sec - ru0.ru_utime.tv_sec) +
       (ru1.ru_utime.tv_usec - ru0.ru_utime.tv_usec)/1e6 << '\n';
   std::cout << "sys  sec: " << (ru1.ru_stime.tv_sec - ru0.ru_stime.tv_sec) +
       (ru1.ru_stime.tv_usec - ru0.ru_stime.tv_usec)/1e6 << '\n';
+  std::cout << "real sec: " << (t1-t0) << '\n';
 
   stat = write();
   if (stat != 0) return stat;
