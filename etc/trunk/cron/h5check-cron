@@ -59,6 +59,8 @@ fi
 # create log dir if not there
 test -d "$logdir" || mkdir -p "$logdir" || exit 2
 
+touch $lockfile
+
 # redirect output
 log="$logdir/h5check-scan.log"
 exec >> "$log" 2>&1
@@ -89,7 +91,7 @@ for job in $jobs; do
 	fname=`printf "/reg/d/psdm/%s/%s/hdf5/%s-r%04d.h5" $instr $exp $exp $run`
     if [ -f "$fname" ] ; then
     	time=`date +'%Y-%m-%d %H:%M:%S'`
-    	echo "==> Time: $time Checking file $fname"
+    	echo "... Time: $time Checking file $fname"
     	h5check $fname || status=$?
     	echo $reqid > "$reqIDfile"
     fi
@@ -104,5 +106,7 @@ fi
 
 time=`date +'%Y-%m-%d %H:%M:%S'`
 echo "--- Time: $time"
+
+rm $lockfile
 
 exit $status
