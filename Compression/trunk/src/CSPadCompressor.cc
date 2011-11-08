@@ -100,18 +100,26 @@ CSPadCompressor::compress (
     const size_t prev_outbufsize = m_outbufsize;
 
     m_outbufsize =
-        sizeof(uint32_t)     +             // - storage for compression flag(s): data, bitmap, etc.
-        sizeof(uint32_t)     +             // - storage for the data checksum (either compressed or not)
-        sizeof(uint32_t) * 3 +             // - storage for image params (width, height, depth)
-        sizeof(uint32_t)     +             // - storage for a size of uncompressed data (shorts)
-        sizeof(uint32_t)     +             // - storage for the data buffer length (bytes)
-        sizeof(uint16_t)     * inbufsize;  // - storage for the data buffer:
-                                           //
-                                           //   - in the worst case scenario when nothing gets compressed
-                                           //     it will be just original data
-                                           //
-                                           //   - for the compressed data we expect the compressed data
-                                           //     plus overheads  not to exceed the uncompressed data size.
+        sizeof(uint32_t)     +                 // - storage for compression flag(s): data, bitmap, etc.
+        sizeof(uint32_t)     +                 // - storage for the data checksum (either compressed or not)
+        sizeof(uint32_t) * 3 +                 // - storage for image params (width, height, depth)
+        sizeof(uint32_t)     +                 // - storage for a size of uncompressed data (shorts)
+        sizeof(uint32_t)     +                 // - storage for the data buffer length (bytes)
+        sizeof(uint16_t)     * inbufsize * 2;  // - (double) storage for the data buffer:
+                                               //
+                                               //   - when nothing gets compressed it will be just original data
+                                               //
+                                               //   - for the compressed data we expect the compressed data
+                                               //     plus overheads not to exceed the uncompressed data size
+                                               //
+                                               //   - however, the buffer size is doubled to cover a border-line
+                                               //     scenario when only a small fraction of the input buffer gets
+                                               //     compressed and the resulting bitmap remains totally uncompressed.
+                                               //     In that case the total size of the output buffer may slightly grow
+                                               //     beyond its original size. Doubling the output buffer will allow
+                                               //     the algorithm to produce the full output image before deciding
+                                               //     wether to return it to a caller or throw it away and return
+                                               //     uncompressed data.
 
     bool reallocate_buffers = false;
     if( 0 == prev_outbufsize )
@@ -164,7 +172,7 @@ CSPadCompressor::compress (
     // of the bit-map index.
     //
     // This step (once we establish a case for the compression) may also
-    // seegnificantly speedup the next step of locating a cluster of elements
+    // significantly speedup the next step of locating a cluster of elements
     // to be compressed.
     //
     const unsigned int half = inbufsize / 2;
@@ -363,7 +371,19 @@ CSPadCompressor::compress (
          */
         ptr = outptr;
         *(uint32_t*)ptr = bitmapsize; ptr += sizeof(uint32_t);
-
+#if 0
+        /* TODO: Improve the algorithm to evaluate the final storage requirements
+         *       for the output data structure and decide if it has to be thrown away
+         *       and an original uncompressed image returned instead.
+         */
+        cout << "DEBUG: CSPadCompressor::compress(): \n"
+             << "  m_outbufsize:                     " << m_outbufsize << " (the total size of the output buffer)\n"
+             << "    ptr - m_outbuf:                 " << ptr - m_outbuf << " (the number of bytes just befor the bitmap)\n"
+             << "    bitmapsize * sizeof(uint16_t):  " << bitmapsize * sizeof(uint16_t) << " (the number of bytes in bitmap)\n"
+             << "    ------------------------------  \n"
+             << "    total number of bytes required: " << ptr - m_outbuf + bitmapsize * sizeof(uint16_t) << "\n"
+             << endl;
+#endif
         memcpy((void*)ptr, bitmapptr, bitmapsize * sizeof(uint16_t));
         ptr +=  bitmapsize * sizeof(uint16_t);
 
