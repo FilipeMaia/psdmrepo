@@ -62,12 +62,13 @@ class ImgExplorer (QtGui.QWidget) :
     def __init__(self, parent=None, arr=None):
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
+        self.setGeometry(10, 10, 880, 1000) 
         self.setWindowTitle('GUI with plot')
         self.setFrame()
 
-        #self.fig = Figure((5.0, 10.0), dpi=100, facecolor='w',edgecolor='w',frameon=True)
+        #self.fig = Figure((5, 10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
         #self.fig = plt.figure(num=None, figsize=(5,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
-        self.fig       = imgfm.ifm.get_figure(figsize=(5,10), type='type1')
+        self.fig       = imgfm.ifm.get_figure(figsize=(10,10), type='maxspace')
         self.widgimage = imgwidg.ImgWidget(parent, self.fig, arr)
         self.widimggui = imggui.ImgGUI(None)
 
@@ -119,9 +120,11 @@ class ImgExplorer (QtGui.QWidget) :
 
 def get_array2d_for_test() :
     mu, sigma = 200, 25
-    arr = mu + sigma*np.random.standard_normal(size=2400)
     #arr = np.arange(2400)
-    arr.shape = (40,60)
+    arr = mu + sigma*np.random.standard_normal(size=250000)
+    arr.shape = (500,500)
+    #arr = mu + sigma*np.random.standard_normal(size=25)
+    #arr.shape = (5,5)
     return arr
 
 
@@ -131,7 +134,7 @@ def main():
 
     #w  = ImgExplorer(None, arr)
     w  = ImgExplorer(None)
-    w.move(QtCore.QPoint(50,50))
+    w.move(QtCore.QPoint(10,10))
     w.set_image_array( get_array2d_for_test() )
     w.show()
 

@@ -61,8 +61,9 @@ class ImgFigureManager :
         if type == 'type1' :
             fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
 
-        elif type == 'type2' :
-            fig.subplots_adjust(left=0.08, bottom=0.02, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
+        elif type == 'maxspace' :
+            fig.subplots_adjust(left=0.06, bottom=0.03, right=0.99, top=0.99, wspace=0, hspace=0)
+
         return fig
 
 

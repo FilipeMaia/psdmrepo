@@ -43,7 +43,7 @@ import matplotlib.gridspec as gridspec
 from   matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 from PyQt4 import QtGui, QtCore
-
+import ImgConfigParameters as icp
 #---------------------
 #  Class definition --
 #---------------------
@@ -65,6 +65,8 @@ class ImgWidget (QtGui.QWidget) :
         #-----------------------------------
         self.initParameters()
 
+        icp.imgconfpars.widg_img = self
+
 
     def initParameters(self):
         self.setFrame()
@@ -76,6 +78,11 @@ class ImgWidget (QtGui.QWidget) :
         self.fig.myZmin = None
         self.fig.myZmax = None
         self.fig.myZoomIsOn = False
+
+        self.selectRectIsOn = False
+        self.mouse1BottonIsPrresed = False
+        self.mouse2BottonIsPrresed = False
+        self.mouse3BottonIsPrresed = False
 
         self.xpress = 0
         self.ypress = 0
@@ -132,49 +139,72 @@ class ImgWidget (QtGui.QWidget) :
         #if zmin==None or zmax==None :  h1Range = None
         #print 'h1Range = ', h1Range
 
+        self.fig.myZmin, self.fig.myZmax = zmin, zmax
 
         self.fig.clear()        
 
-        gs = gridspec.GridSpec(20, 20)
-        #self.fig.myaxesH = self.fig.add_subplot(212)
-        
-        self.fig.myZmin, self.fig.myZmax = zmin, zmax
-
-        self.fig.myaxesSIm = self.fig.add_subplot(gs[0:18,:])
+        #gs = gridspec.GridSpec(20, 20)
+        #self.fig.myaxesSIm = self.fig.add_subplot(gs[0:18,:])
+        #self.fig.myaxesSIm = self.fig.add_subplot(gs[:,:])
+        self.fig.myaxesSIm = self.fig.add_subplot(111)
         #self.fig.myaxesI.grid(self.cbox_grid.isChecked())
         self.fig.myaxesImg = self.fig.myaxesSIm.imshow(self.arr2d, origin='upper', interpolation='nearest', extent=self.range, aspect='auto')
         self.fig.myaxesImg.set_clim(zmin,zmax)
 
-        self.fig.myaxesSCB = self.fig.add_subplot(gs[19,:])
-        self.fig.mycolbar  = self.fig.colorbar(self.fig.myaxesImg, cax=self.fig.myaxesSCB, orientation=1)#, ticks=coltickslocs) #orientation=1,
+        # pad=0.005, fraction=0.10, aspect=12, shrink=1, orientation=2, aspect = 8, ticks=coltickslocs
+        self.fig.mycolbar  = self.fig.colorbar(self.fig.myaxesImg, pad=0.004, fraction=0.1, aspect=40)
+
+        #self.fig.myaxesSCB = self.fig.add_subplot(gs[19,:])
+        #self.fig.mycolbar  = self.fig.colorbar(self.fig.myaxesImg, cax=self.fig.myaxesSCB, orientation=1)#, ticks=coltickslocs) 
         #self.fig.mycolbar.set_clim(zmin,zmax)
 
         self.canvas.mpl_connect('button_press_event',   self.processMouseButtonPress) 
         self.canvas.mpl_connect('button_release_event', self.processMouseButtonRelease) 
         self.canvas.mpl_connect('motion_notify_event',  self.processMouseMotion)
 
-        #self.canvas.draw()
-        print 'End of on_draw'
+        #plt.draw()
+        self.canvas.draw()
+        #self.img_bkgd = self.canvas.copy_from_bbox(self.fig.myaxesSIm.bbox)
+        #self.img_bbox = self.fig.myaxesSIm.bbox
+        #l, b, r, t = self.fig.myaxesSIm.bbox.extents        
+        print 'self.fig.myaxesSIm.bbox.extents (l, b, r, t) =', self.fig.myaxesSIm.bbox.extents    
+        #print 'End of on_draw'
+
+
+    def resetImage( self ) :
+        self.selectRectIsOn = False
+
+        img_bbox = self.fig.myaxesSIm.bbox
+        self.canvas.restore_region(self.img_bkgd)#, bbox=img_bbox)
+        self.canvas.blit(img_bbox)
+        print 'img_bbox.extents (l, b, r, t) =', img_bbox.extents    
+        #print 'bbox.width, bbox.height =', img_bbox.width, img_bbox.height
+        #self.on_draw()
+
+
+    def selectRectangularRegion(self) :
+        self.selectRectIsOn = True
+        self.img_bkgd = self.canvas.copy_from_bbox(self.fig.myaxesSIm.bbox)
 
 
 
     def processMouseMotion(self, event) :
         fig = self.fig
         if event.inaxes == fig.myaxesSIm :
-            print 'processMouseMotion',
+            #print 'processMouseMotion',
             #print 'event.xdata, event.ydata =', event.xdata, event.ydata
-            print 'event.x, event.y =', event.x, event.y
-            #height = self.canvas.figure.bbox.height
-            #self.xmotion    = event.xdata
-            #self.ymotion    = event.ydata
-            #x0 = self.xpressabs
-            #x1 = event.x
-            #y0 = height - self.ypressabs
-            #y1 = height - event.y
-            #w  = x1 - x0
-            #h  = y1 - y0
-            #rect = [x0, y0, w, h]
-            #self.fig.canvas.drawRectangle( rect )              
+            #print 'event.x, event.y =', event.x, event.y
+
+            if self.selectRectIsOn and self.mouse1BottonIsPrresed :            
+                height = self.canvas.figure.bbox.height
+                x0 = self.xpressabs
+                x1 = event.x
+                y0 = height - self.ypressabs
+                y1 = height - event.y
+                w  = x1 - x0
+                h  = y1 - y0
+                rect = [x0, y0, w, h]
+                self.fig.canvas.drawRectangle( rect )              
             
 
     def processDraw(self) :
@@ -192,10 +222,12 @@ class ImgWidget (QtGui.QWidget) :
 
 
 
-
-
     def mousePressOnImage(self, event) :
         fig = self.fig
+        if event.button is 1 : self.mouse1BottonIsPrresed = True
+        if event.button is 2 : self.mouse2BottonIsPrresed = True
+        if event.button is 3 : self.mouse3BottonIsPrresed = True
+
         if event.inaxes == fig.myaxesSIm :
             print 'PressOnImage'
            #print 'event.xdata, event.ydata =', event.xdata, event.ydata
@@ -252,27 +284,26 @@ class ImgWidget (QtGui.QWidget) :
         #figNum      = fig.number 
         self.fig    = fig
         axes        = event.inaxes # fig.gca() 
+
+        self.mouse1BottonIsPrresed = False
+        self.mouse2BottonIsPrresed = False
+        self.mouse3BottonIsPrresed = False
                 
         if event.inaxes == fig.myaxesSIm and event.button == 1 : # Left button
-            #bounds = axes.viewLim.bounds
-            #fig.myXmin = bounds[0] 
-            #fig.myXmax = bounds[0] + bounds[2]  
-            #fig.myYmin = bounds[1] + bounds[3] 
-            #fig.myYmax = bounds[1] 
 
-            #xlims = self.fig.myaxesI.get_xlim()
-            #print ' xlims=', xlims
-            #self.on_draw()
+            self.xrelease = event.xdata
+            self.yrelease = event.ydata
 
-            if fig.myZoomIsOn :
-                self.xrelease = event.xdata
-                self.yrelease = event.ydata
+            if self.selectRectIsOn == True :
+
                 fig.myXmin = int(min(self.xpress, self.xrelease))
                 fig.myXmax = int(max(self.xpress, self.xrelease))  
                 fig.myYmin = int(min(self.ypress, self.yrelease))
                 fig.myYmax = int(max(self.ypress, self.yrelease))
-
                 print ' Xmin, Xmax, Ymin, Ymax =', fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax
+                self.drawRectangle( fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax )
+
+            if fig.myZoomIsOn :
                 self.on_draw(fig.myXmin, fig.myXmax, fig.myYmin, fig.myYmax, fig.myZmin, fig.myZmax)
 
         if event.button == 2 : #or event.button == 3 : # middle or right button
@@ -288,6 +319,16 @@ class ImgWidget (QtGui.QWidget) :
             #fig.myZoomIsOn = False
 
         #self.setEditFieldValues()
+
+
+    def drawRectangle( self, Xmin, Xmax, Ymin, Ymax):
+        xy = Xmin, Ymin
+        w  = Xmax - Xmin
+        h  = Ymax - Ymin
+
+        rec = plt.Rectangle(xy, width=w, height=h, edgecolor='r', linewidth=2, fill=False)
+        plt.gca().add_patch(rec)
+        plt.draw()
 
 
     def closeEvent(self, event): # is called for self.close() or when click on "x"

@@ -11,6 +11,15 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-11-08 Mikhail S. Dubrovin
+- add modules:
+	  DragLine.py
+	  Drag.py
+	  ImgGUISpectrum.py
+	  DragRectangle.py
+	  DragCircle.py
+	  ImgGUIXYZRanges.py
+	
 Tag: V00-00-01
 2011-10-21 Mikhail S. Dubrovin
 - just created this template file, this entry is an example of the change log

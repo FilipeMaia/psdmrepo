@@ -53,7 +53,7 @@ class MyNavigationToolbar ( NavigationToolbar ) :
     """Get full control on navigation toolbar buttons"""
 
     def __init__(self, canvas, parent=None):
-        print 'MyNavigationToolbar.__init__'
+        #print 'MyNavigationToolbar.__init__'
         NavigationToolbar.__init__( self, canvas, parent )
 
         self.parentWidget = parent

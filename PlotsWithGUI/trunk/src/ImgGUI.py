@@ -28,15 +28,16 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 import sys
 import os
+import time   # for sleep(sec)
 
 from PyQt4 import QtGui, QtCore
-import time   # for sleep(sec)
 #import ImgGUIWindow as guiwin
 
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
 import ImgConfigParameters as icp
+import ImgGUISpectrum as igspec
 
 #---------------------
 #  Class definition --
@@ -63,8 +64,12 @@ class ImgGUI ( QtGui.QWidget ) :
         self.makeTabBarTop()
         self.makeTabBarBot()
 
-        self.guiWin = QtGui.QTextEdit('First') # guiwin.ImgGUIWindow() # for 0th window
-        self.guiWin.setMinimumHeight(150)
+        self.minHeight = 100
+        self.maxHeight = 250
+
+        self.guiWin = igspec.ImgGUISpectrum() # QtGui.QTextEdit('First')
+        self.guiWin.setMinimumHeight(self.minHeight)
+        self.guiWin.setMaximumHeight(self.maxHeight)
 
         self.tabBarTop.setCurrentIndex(self.indTabSpec)
         self.tabBarBot.setCurrentIndex(self.indTabEmpB)
@@ -138,12 +143,12 @@ class ImgGUI ( QtGui.QWidget ) :
         self.tabBarTop = QtGui.QTabBar()
         #self.tabBar.setMovable(True) 
 
-        self.indTabSpec = self.tabBarTop.addTab( 'Spect.' )
+        self.indTabSpec = self.tabBarTop.addTab( 'Spectrum' )
         self.indTabProX = self.tabBarTop.addTab( 'Proj.X' )
         self.indTabProY = self.tabBarTop.addTab( 'Proj.Y' )
         self.indTabProR = self.tabBarTop.addTab( 'Proj.R' )
         self.indTabProP = self.tabBarTop.addTab( 'Proj.P' )
-        self.indTabEmpt = self.tabBarTop.addTab( 10*' ' )
+        self.indTabEmpt = self.tabBarTop.addTab( 5*' ' )
         self.tabBarTop.setTabEnabled(self.indTabEmpt,False)
 
         self.tabBarTop.setTabTextColor(self.indTabSpec,QtGui.QColor('red'))
@@ -166,17 +171,20 @@ class ImgGUI ( QtGui.QWidget ) :
         #print 'TabBar index=',indTab
 
         #self.hboxD.removeWidget(self.guiWin) 
-        self.guiWin.close()
+        try :
+            self.guiWin.close()
+        except AttributeError :
+            pass
 
         if indTab == self.indTabEmpt : return
-        if indTab == self.indTabSpec : self.guiWin = QtGui.QTextEdit('Spectrum') # guiwin.ImgGUIWindow(None, window)
+        if indTab == self.indTabSpec : self.guiWin = igspec.ImgGUISpectrum() #QtGui.QTextEdit('Spectrum')
         if indTab == self.indTabProX : self.guiWin = QtGui.QTextEdit('Projection X')
         if indTab == self.indTabProY : self.guiWin = QtGui.QTextEdit('Projection Y')
         if indTab == self.indTabProR : self.guiWin = QtGui.QTextEdit('Projection R')
         if indTab == self.indTabProP : self.guiWin = QtGui.QTextEdit('Projection P')
 
-        self.guiWin.setMinimumHeight(150)
-        self.guiWin.setMaximumHeight(200)
+        self.guiWin.setMinimumHeight(self.minHeight)
+        self.guiWin.setMaximumHeight(self.maxHeight)
         self.hboxD.addWidget(self.guiWin)
 
         self.tabBarBot.setCurrentIndex(self.indTabEmpB)
@@ -188,13 +196,15 @@ class ImgGUI ( QtGui.QWidget ) :
         self.tabBarBot = QtGui.QTabBar()
         #self.tabBarBot.setMovable(True) 
 
+        self.indTabZmCp = self.tabBarBot.addTab( 'Zoom-copy' )
         self.indTabCent = self.tabBarBot.addTab( 'Center' )
         self.indTabLine = self.tabBarBot.addTab( 'Line' )
         self.indTabCirc = self.tabBarBot.addTab( 'Circ' )
-        self.indTabEmpB = self.tabBarBot.addTab( 10*' ' )
+        self.indTabEmpB = self.tabBarBot.addTab( 5*' ' )
         self.tabBarBot.setTabEnabled(self.indTabEmpB,False)
 
-        self.tabBarBot.setTabTextColor(self.indTabCent,QtGui.QColor('magenta'))
+        self.tabBarBot.setTabTextColor(self.indTabZmCp,QtGui.QColor('magenta'))
+        self.tabBarBot.setTabTextColor(self.indTabCent,QtGui.QColor('green'))
         self.tabBarBot.setTabTextColor(self.indTabLine,QtGui.QColor('red'))
         self.tabBarBot.setTabTextColor(self.indTabCirc,QtGui.QColor('blue'))
         self.tabBarBot.setShape(QtGui.QTabBar.RoundedSouth)
@@ -210,15 +220,18 @@ class ImgGUI ( QtGui.QWidget ) :
         #print 'TabBar index=',indTab
 
         #self.hboxD.removeWidget(self.guiWin) 
-        self.guiWin.close()
-
+        try :
+            self.guiWin.close()
+        except AttributeError :
+            pass
         if indTab == self.indTabEmpB : return
+        if indTab == self.indTabZmCp : self.guiWin = QtGui.QTextEdit('Zoomed copy of image')
         if indTab == self.indTabCent : self.guiWin = QtGui.QTextEdit('Set center')
         if indTab == self.indTabLine : self.guiWin = QtGui.QTextEdit('Profile along Line')
         if indTab == self.indTabCirc : self.guiWin = QtGui.QTextEdit('Profile along Circ')
 
-        self.guiWin.setMinimumHeight(150)
-        self.guiWin.setMaximumHeight(200)
+        self.guiWin.setMinimumHeight(self.minHeight)
+        self.guiWin.setMaximumHeight(self.maxHeight)
         self.hboxD.addWidget(self.guiWin)
 
         self.tabBarTop.setCurrentIndex(self.indTabEmpt)

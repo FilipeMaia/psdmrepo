@@ -35,28 +35,30 @@ import os
 #---------------------
 #  Class definition --
 #---------------------
-class ConfigParameters :
+class ImgConfigParameters :
     """This class contains all configuration parameters
     """
 
     def __init__ ( self ) :
-        """Constructor"""
         self.setRunTimeParametersInit()
         self.setDefaultParameters()
+        print 'ImgConfigParameters initialization'
 
 
     def setRunTimeParametersInit ( self ) :
         self.ImgGUIIsOpen         = False
-        self.nWindows             = 3
+        #self.nWindows            = 3
+        self.widg_img             = None # widget of the image for access
 
     def setDefaultParameters ( self ) :
         """Set default configuration parameters hardwired in this module"""
-        print 'setDefaultParameters'
+        #print 'setDefaultParameters'
+        pass
 
 #---------------------------------------
 # Makes a single object of this class --
 #---------------------------------------
 
-imgconfpars = ConfigParameters ()
+imgconfpars = ImgConfigParameters ()
 
 #---------------------------------------
