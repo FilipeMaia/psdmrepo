@@ -11,7 +11,6 @@ release=/reg/g/psdm/sw/releases/current
 
 # database options
 icdb_file=/reg/g/psdm/psdatmgr/ic/.icdb-conn
-regdb_file=/reg/g/psdm/psdatmgr/ic/.regdb-conn
 
 # config section names to read from database
 config="ic-store-files fm-irods"
@@ -74,7 +73,7 @@ if [ -z "$oldpid" ] ; then
 	done
 	
 	# run it
-    ic-store-files -r "file:${regdb_file}" -d "file:${icdb_file}" $config_opt -v
+    ic-store-files -d "file:${icdb_file}" $config_opt -v
     status=$?
 
 fi
