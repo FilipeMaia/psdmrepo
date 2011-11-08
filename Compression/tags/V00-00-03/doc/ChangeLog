@@ -1,0 +1,29 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id:$
+#
+# Description:
+#  ChangeLog file for package Compression
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-03
+2011-11-07 Igor Gaponenko
+- fixed a bug (buffer overflow) in the CSPad compression algorithm which may result
+in memory corruption if an image size would be on the border-line of compression.
+
+Tag: V00-00-02
+2011-09-12 Andy
+- SConscript: defined empty UTESTS so that build does not try to run test
+  apps as unit tests
+- fixed compilation warnings in tests
+
+Tag: V00-00-01
+2011-08-19 Igor Gaponenko
+- initial version of the package
+- CSPad compression/decompression algorithms, multithreaded wrapper and three tests
+
