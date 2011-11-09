@@ -11,6 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Nov-08 ofte                  rev 2605
+        - improved utilities.py plotting, for pyana_waveforms mainly, and the way pyana_waveforms 
+	does the plotting. 
+
+	
 2011-Nov-01 ofte  	          rev 2587
 	- Mainly fixed the suspend-button for xtcexplorernew and unified / improved 
 	the behaviour a bit. 

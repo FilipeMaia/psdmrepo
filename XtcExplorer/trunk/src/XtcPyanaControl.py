@@ -1132,6 +1132,10 @@ Start with selecting data of interest to you from list on the left and general r
             print "set the EDITOR variable in your shell environment."
             proc_emacs = myPopen("emacs %s" % self.configfile, shell=True)
 
+            # communicate with the process, makes everything wait for editor to finish
+            stdout_value = proc_emacs.communicate()[0]
+
+
         #proc_emacs = MyThread("emacs %s" % self.configfile) 
         #proc_emacs.start()
         

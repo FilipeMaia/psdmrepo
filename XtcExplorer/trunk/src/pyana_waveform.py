@@ -66,7 +66,7 @@ class pyana_waveform (object) :
                    plot_every_n = None,
                    accumulate_n = "0",
                    fignum = "1",
-                   mode = "average" ) :
+                   mode = "average"):
         """Class constructor. The parameters to the constructor are passed
         from pyana configuration file. If parameters do not have default 
         values  here then the must be defined in pyana.cfg. All parameters 
@@ -82,10 +82,11 @@ class pyana_waveform (object) :
         # initialize data
         opt = PyanaOptions()
         self.sources = opt.getOptStrings( sources )
+        self.mode = opt.getOptString( mode )
+
         self.plot_every_n = opt.getOptInteger( plot_every_n )
         self.accumulate_n = opt.getOptInteger( accumulate_n )
         self.mpl_num = opt.getOptInteger( fignum )
-        self.mode = opt.getOptString( mode )
 
         # other
         self.n_shots = None
@@ -94,17 +95,13 @@ class pyana_waveform (object) :
         self.do_plots = self.plot_every_n != 0
         self.plotter = None
 
-    def initlists(self):
         # containers to store data from this job
         self.ctr = {} # source-specific event counter 
         self.ts = {} # time waveform
         self.wf = {} # voltage waveform
         self.wf2 = {} # waveform squared (for computation of RMS)
-        for label in self.src_ch :
-            self.ctr[label] = 0
-            self.ts[label] = None
-            self.wf[label] = None
-            self.wf2[label] = None
+        self.wf_stack = {}
+
                 
     def resetlists(self):
         self.accu_start = self.n_shots
@@ -135,33 +132,40 @@ class pyana_waveform (object) :
         self.accu_start = 0
 
         # list of channels and source (names)
-        self.cfg = {} # configuration object
         self.src_ch = []
 
         self.data = {}
         for source in self.sources:
-            print source
-
             cfg = env.getAcqConfig(source)
-            self.cfg[source] = { 'nCh' : cfg.nbrChannels(),
-                                 'nSamp' : cfg.horiz().nbrSamples(),
-                                 'smpInt' : cfg.horiz().sampInterval() }
-            
-            print self.cfg[source]
-            
+
             nch = cfg.nbrChannels()
+            nsmp = cfg.horiz().nbrSamples()
+            unit = cfg.horiz().sampInterval() * 1.0e9 # nano-seconds
+            span = nsmp * unit
+            print "%s has %d channels, wf window %.5f ns, %d samples"%(source,nch,span,nsmp)
+            
             for i in range (0, nch ):
                 label =  "%s Ch%s" % (source,i) 
                 self.src_ch.append(label)                    
 
                 self.data[label] = WaveformData( label )
                 
-        # lists to fill numpy arrays
-        self.initlists()
+                self.ctr[label] = 0
+                self.ts[label] = None
+                self.wf[label] = np.empty( nsmp, dtype='float64')
+                self.wf2[label] = np.empty( nsmp, dtype='float64')
 
+                self.wf_stack[label] = None
+                if self.accumulate_n > 0 :
+                    self.wf_stack[label] = np.empty( (self.accumulate_n, nsmp), dtype='float64')
+                else :
+                    self.wf_stack[label] = []
+                    
+                
         self.plotter = Plotter()
         self.plotter.settings(7,7) # set default frame size
         self.plotter.threshold = None
+
         #if self.threshold is not None:
         #    self.plotter.threshold = self.threshold.value
         #    self.plotter.vmin, self.plotter.vmax = self.plot_vmin, self.plot_vmax
@@ -201,6 +205,7 @@ class pyana_waveform (object) :
         if evt.get('skip_event') :
             return
 
+        row = self.n_shots - self.accu_start -1
 
         for label in self.src_ch :
 
@@ -212,23 +217,29 @@ class pyana_waveform (object) :
             if acqData :
 
                 if self.ts[label] is None:
-                    self.ts[label] = acqData.timestamps()
+                    self.ts[label] = acqData.timestamps() * 1.0e9 # nano-seconds
 
                 # a waveform
                 awf = acqData.waveform() 
-
+                
                 self.ctr[label]+=1
 
-                if self.mode == 'stack':
-                    if self.wf[label] is None: # first event
-                        self.wf[label] = []
-                        self.wf[label].append(awf)
-                    else :
-                        self.wf[label].append(awf)
+                
+                if self.mode.find('stack')>=0 :
+                    # fill image
+                    try:
+                        self.wf_stack[label][row] =  awf
+                    except: 
+                        if self.accumulate_n==0:
+                            if self.n_shots < 10:
+                                print "WARNING: Accumulating stack of waveforms ",
+                                print "with accumulate_n set to 0. Faster if you ",
+                                print "set accumulate_n to a number"
+                            self.wf_stack[label].append( awf )
 
-                else : 
-                    # average waveform
 
+                if self.mode.find('average')>=0:
+                    # collect sum for average
                     if self.wf[label] is None : # first event
                         self.wf[label] = awf
                         self.wf2[label] = (awf*awf)
@@ -242,16 +253,7 @@ class pyana_waveform (object) :
             # flag for pyana_plotter
             evt.put(True, 'show_event')
             
-            if self.mode == 'stack':
-                self.make_stackplots()
-                print "event / returned from make stackplots"
-            else :
-                self.make_plots()
-                
-            #data_waveform = []
-            #for label in self.src_ch :
-            #    data_waveform.append( self.data[label] )
-            #evt.put( data_waveform, 'data_waveform' )
+            self.make_plots()
                 
         if  ( self.accumulate_n != 0 and (self.n_shots%self.accumulate_n)==0 ):
             self.resetlists()
@@ -282,109 +284,37 @@ class pyana_waveform (object) :
         
         logging.info( "pyana_waveform.endjob() called" )
 
-        if self.mode == 'stack':
-            self.make_stackplots()
-            print "endjob / returned from make stackplots"
-        else :
-            self.make_plots()
-                
-        print "leaving..."
-
-
-    def make_stackplots(self):
-        #self.make_plots(stack=True)
-
-        plots = []
-        suptitle = "Stack of waveforms for events %d-%d" % (self.accu_start,self.n_shots)
+        self.make_plots()
         
-        for source in self.src_ch :
-            
-            wf_array = np.float_(self.wf[source])
-                
-            print "preparing to plot array of size ", wf_array.size
-            plots.append( ("Voltage waveform from %s"%source, wf_array ) )
-                
-            ## scientific notation for time axis
-            #plt.ticklabel_format(style='sci',axis='x',scilimits=(0,0))
-            
-            #ts_axis = self.ts[source]
-            #unit = ts_axis[1]-ts_axis[0]
-            #plt.xlim(ts_axis[0]-unit,ts_axis[-1]+unit)
-            
-            #plt.xlabel("time   [s]")
-            #plt.ylabel("Event number")
-            
-        if len(plots) > 1 :
-            fig.subplots_adjust(wspace=0.45, hspace=0.45)
-                
-        self.plotter.plot_several(plots,fignum=1000,title=suptitle)
 
-        print "shot#%d: wf avg histogram plotted for %d sources" % (self.n_shots,len(plots))
+    def make_plots(self):
+
+        ## Plotting
+        if self.mode.find('average')>=0:
+            for source in self.src_ch :            
+                name = "wfavg(%s)"%source
+                title = "Average, %s"%source
+                nbins = self.wf[source].size
+                contents = (self.ts[source][0:nbins],self.wf[source]/self.ctr[source])
+                self.plotter.add_frame(name,title,contents, aspect='auto')
+
+        if self.mode.find('stack')>=0:
+            for source in self.src_ch :            
+                name = "wfstack(%s)"%source
+                title = "Stack, %s"%source
+                wf_image = self.wf_stack[source]
+                if type(wf_image).__name__=='list' :
+                    wf_image = np.float_(self.wf_stack[source])
+                contents = (wf_image,) # a tuple
+                self.plotter.add_frame(name,title,contents,aspect='equal')
+                self.plotter.frames[name].axis_values = self.ts[source]
+
+                
+        self.plotter.plot_all_frames(ordered=True)
+
+        suptitle = "Events %d-%d" % (self.accu_start,self.n_shots)
+        plt.suptitle(suptitle)
         
 
 
-    def make_plots(self, stack = False):
-
-        nplots = len(self.src_ch)
-        ncols = 1
-        nrows = len(self.src_ch)
-            
-        height=4.0
-        if (nrows * height) > 14 : height = 14/nrows
-        width=height*4.3
-        
-        fig = plt.figure(num=self.mpl_num, figsize=(width*ncols,height*nrows) )
-        fig.clf()
-        nev = self.n_shots - self.accu_start
-        if nev==1 :
-            fig.suptitle("Waveform of shot %d" % (self.n_shots))
-        else: 
-            fig.suptitle("Average waveform of shots %d-%d" % (self.accu_start,self.n_shots))
-            
-        if nplots > 1 :
-            fig.subplots_adjust(wspace=0.45, hspace=0.45)
-
-        pos = 1
-        for source in self.src_ch :
-            nev = self.ctr[source]
-            ts_axis = self.ts[source]
-
-            print "plotting %d events from source %s" % (nev,source)
-            wf_avg = self.wf[source] / nev
-
-#            # ... plotting with error bars is terribly slow.... enable at your own "risk"
-#            self.wf2_avg = self.wf2[source] / nev
-#            self.wf_rms = np.sqrt( self.wf2_avg - wf_avg*wf_avg ) / np.sqrt(nev)
-
-            dim1 = np.shape(wf_avg)
-#            dim2 = np.shape(self.wf_rms)
-            dim3 = np.shape(ts_axis)
-
-            if dim3 != dim1 :
-                ts_axis = ts_axis[0:dim1[0]]
-
-            ax = fig.add_subplot(nrows,ncols,pos)
-            pos+=1 
-
-            # scientific notation for time axis
-            plt.ticklabel_format(style='sci',axis='x',scilimits=(0,0))
-
-            unit = ts_axis[1]-ts_axis[0]
-            plt.xlim(ts_axis[0]-unit,ts_axis[-1]+unit)
-                
-#           # ... plotting with error bars is terribly slow.... enable at your own "risk"
-#           plt.errorbar(ts_axis, wf_avg,yerr=self.wf_rms, mew=0.0)
-            plt.errorbar(ts_axis, wf_avg)
-            plt.title(source)
-            plt.xlabel("time   [s]")
-            plt.ylabel("voltage   [V]")
-
-            self.data[source].wf_voltage = wf_avg
-            self.data[source].wf_time = ts_axis
-
-
-        plt.draw()
-
-        print "shot#%d: wf avg histogram plotted for %d sources" % (self.n_shots,nplots)
-        
 

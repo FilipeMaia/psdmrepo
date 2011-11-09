@@ -347,6 +347,8 @@ from PyQt4 import QtCore
 
 import matplotlib.pyplot as plt
 
+import matplotlib.ticker as ticker
+
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1 import AxesGrid
 
@@ -361,6 +363,9 @@ class Frame(object):
     def __init__(self, name="", title=""):
         self.name = name
         self.title = title
+
+        self.data = None       # the array to be plotted
+        self.ticks = {}        # tick marks for any axes if needed
 
         self.axes = None       # the patch containing the image
         self.axesim = None     # the image AxesImage
@@ -378,6 +383,22 @@ class Frame(object):
         self.vmin = None
         self.vmax = None
         self.orglims = None
+
+        self.axis_values = None
+        self.aspect = 'auto'
+
+    def myticks(self, x, pos):
+        'The two args are the value and tick position'
+        if self.axis_values is None:
+            return x # change nothing
+
+        try:
+            val = self.axis_values[x]
+            return '%1.0f'%val
+        except:
+            print "axis values out of range, %1.1f not in %s"%( x, str(self.axis_values.shape))
+            return x
+
 
     def show(self):
         itsme = "%s"%self
@@ -399,6 +420,21 @@ class Frame(object):
         # does nothing right now...
         # but if needed, this is where to update axes of projection plots
         # if these need to change when image colorscale changes
+
+    #def set_ticks_new(self, nticks, lotick, hitick, axis="X"):
+    #    """Set ticks of this frame object's x,y or z axis
+    #    """
+    #    interval = (hitick-lotick)/(nticks)        
+
+    #    ticks = []
+    #    for tck in range (nticks+1):
+    #        tick = lotick + tck * interval
+    #        print tick
+    #        tick = np.round( tick )
+    #        ticks.append(tick)
+
+    #    self.ticks[axis] = ticks
+
 
     def set_ticks(self, limits = None ):
         
@@ -467,16 +503,20 @@ class Plotter(object):
         self.cid1 = None
         self.cid2 = None
 
-        self.aspect = 'equal'
-        #self.aspect = 'auto'
-        
         self.settings() # defaults
 
         # matplotlib backend is set to QtAgg, and this is needed to avoid
         # a bug in raw_input ("QCoreApplication::exec: The event loop is already running")
         QtCore.pyqtRemoveInputHook()
 
-    def add_frame(self, name="", title=""):
+
+    def add_frame(self, name="", title="",contents=None, type=None, aspect='auto'):
+        """Add a frame to the plotter. 
+        name = name of frame (must be unique, else returns the existing frame)
+        title = current title, may be different from event to event
+        contents = tuple of arrays to be plotted (in one frame).
+        type = type of plot. Defaults based on contents
+        """
         aframe = None
 
         if name == "":
@@ -489,8 +529,56 @@ class Plotter(object):
             aframe = self.frames[name]
 
         aframe.title = title
+        aframe.data = contents
+        aframe.type = type
+        aframe.aspect = aspect
+
         return aframe
 
+    def plot_all_frames(self, fignum=1, ordered=False):
+        """Draw all frames
+        """
+        nplots = len(self.frames)
+        
+        self.fig = plt.figure(fignum)#,(self.w*ncol,self.h*nrow))
+        self.fignum = fignum
+        self.fig.clf()
+
+        nrow = int(np.ceil( np.sqrt(nplots) ))
+        ncol = int(np.ceil( (1.0*nplots) / nrow ))
+        self.fig.set_size_inches(self.w*ncol,self.h*nrow)
+
+        i = 1
+        framenames = self.frames.iterkeys()
+        if ordered : framenames = sorted(framenames)
+        for name in framenames:
+            frame = self.frames[name]
+            frame.axes = self.fig.add_subplot(nrow,ncol,i)
+            frame.axes.set_aspect(frame.aspect)
+            print "adding subplot for %s with aspect %s"%(name,frame.aspect)
+            i+=1
+
+            # single image (2d array)
+            if len(frame.data)==1 and frame.data[0].ndim==2 :
+                plt.imshow(frame.data[0])
+            else :
+                # one or multiple graphs in the same picture
+                plt.plot(*frame.data)
+                frame.axes.set_xlim(frame.data[0][0],frame.data[0][-1])
+
+            if frame.axis_values is not None:
+                formatter = ticker.FuncFormatter(frame.myticks)
+                frame.axes.xaxis.set_major_formatter(formatter)
+                
+
+            plt.title(frame.title)
+                
+        self.fig.subplots_adjust(left=0.05,   right=0.95,
+                                 bottom=0.05, top=0.90,
+                                 wspace=0.2,  hspace=0.2 )
+        self.connect()
+
+    
         
     def settings(self
                  , width = 8 # width of a single plot
@@ -503,7 +591,6 @@ class Plotter(object):
         self.nplots = nplots
         self.maxcol = maxcol
         
-
     def create_figure(self, fignum, nplots=1):
         """ Make the matplotlib figure.
         This clears and rebuilds the canvas, although
