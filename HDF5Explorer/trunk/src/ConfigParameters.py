@@ -207,9 +207,11 @@ class ConfigParameters ( object ) :
 
         self.waveformWindowParameters = []
         for win in range(self.waveformNWindowsMax) :
-            self.waveformWindowParameters.append(['None', 0, 0, 1000, 0, 1000, 0, None, None, None, None])
-                        #[dataset, rangeUnitsBits, Amin, Amax, Tmin, Tmax, NumberOfWFInDS, WF1, WF2, WF3, WF4]
-        #rangeUnitsBits : 1-ALimits, 2-TLimits, 4-AUnits, 8-TUnits
+            self.waveformWindowParameters.append(['None', 0, 0, 1000, 0, 1000, 0, None, None, None, None, 0, 1000])
+                        #[dataset, rangeUnitsBits, Amin, Amax, Tmin, Tmax, NumberOfWFInDS, WF1, WF2, WF3, WF4, NEvMin, NEvMax]
+                        #[0,       1,              2,    3,    4,    5,    6,              7,   8,   9,   10,  11,     12]
+
+        #rangeUnitsBits : 1-ALimits, 2-TLimits, 4-AUnits, 8-TUnits, 16-EvRange
 
 
         # Default parameters for Selection algorithms
@@ -428,6 +430,8 @@ class ConfigParameters ( object ) :
             print 'WAVEF_IND_WF_IN_RED',   self.waveformWindowParameters[win][8] 
             print 'WAVEF_IND_WF_IN_GREEN', self.waveformWindowParameters[win][9] 
             print 'WAVEF_IND_WF_IN_BLUE',  self.waveformWindowParameters[win][10] 
+            print 'WAVEF_NEV_MIN',         self.waveformWindowParameters[win][11] 
+            print 'WAVEF_NEV_MAX',         self.waveformWindowParameters[win][12] 
 
         print 'SELEC_N_WINDOWS_MAX',       self.selectionNWindowsMax 
         print 'SELEC_N_WINDOWS',           self.selectionNWindows 
@@ -673,6 +677,8 @@ class ConfigParameters ( object ) :
                 elif key == 'WAVEF_IND_WF_IN_RED'      : self.waveformWindowParameters[win][8] = self.getValIntOrNone(val)
                 elif key == 'WAVEF_IND_WF_IN_GREEN'    : self.waveformWindowParameters[win][9] = self.getValIntOrNone(val)
                 elif key == 'WAVEF_IND_WF_IN_BLUE'     : self.waveformWindowParameters[win][10]= self.getValIntOrNone(val)
+                elif key == 'WAVEF_NEV_MIN'            : self.waveformWindowParameters[win][11]= self.getValIntOrNone(val)
+                elif key == 'WAVEF_NEV_MAX'            : self.waveformWindowParameters[win][12]= self.getValIntOrNone(val)
 
 
                 elif key == 'SELEC_N_WINDOWS_MAX'      : self.selectionNWindowsMax     = int(val)
@@ -921,6 +927,8 @@ class ConfigParameters ( object ) :
             f.write('WAVEF_IND_WF_IN_RED'   + space + str(self.waveformWindowParameters[win][8] )    + '\n')
             f.write('WAVEF_IND_WF_IN_GREEN' + space + str(self.waveformWindowParameters[win][9] )    + '\n')
             f.write('WAVEF_IND_WF_IN_BLUE'  + space + str(self.waveformWindowParameters[win][10])    + '\n')
+            f.write('WAVEF_NEV_MIN'         + space + str(self.waveformWindowParameters[win][11])    + '\n')
+            f.write('WAVEF_NEV_MAX'         + space + str(self.waveformWindowParameters[win][12])    + '\n')
 
         f.write('SELEC_N_WINDOWS_MAX'       + space + str(self.selectionNWindowsMax)     + '\n')
         f.write('SELEC_N_WINDOWS'           + space + str(self.selectionNWindows)        + '\n')

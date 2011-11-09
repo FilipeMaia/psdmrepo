@@ -239,11 +239,11 @@ class PlotsForWaveform ( object ) :
         #cp.confpars.current_item_name_for_title = str(dsname)
 
         ds     = self.h5file[dsname]
-        Nevents = ds.shape[0]     
+        self.Nevents = ds.shape[0]     
         event = 0
         self.ds1ev = ds[event]
         numberOfWF, par2, self.dimX = self.ds1ev.shape
-        #print 'Nevents, dimX = ', Nevents, self.dimX      
+        #print 'Nevents, dimX = ', self.Nevents, self.dimX      
 
         # Use the 1st defined index for this wave.
         for par in range(10,6,-1):
@@ -255,14 +255,6 @@ class PlotsForWaveform ( object ) :
 
         self.arrA = self.getAmplitudeArray(self.indwf)
         self.arrT = self.getTimeArray()
-
-        # Make 2D float array of the wave vs event
-        self.arrWaveVsEv = empty([Nevents, self.dimX], dtype=float)
-
-        for event in range(Nevents) :
-            #print 'event =', event
-            self.ds1ev = ds[event]            
-            self.arrWaveVsEv[event,...] = self.getAmplitudeArray(self.indwf)
 
         # Define A range
         ARange = None
@@ -293,9 +285,43 @@ class PlotsForWaveform ( object ) :
             self.TIndMin = self.TMin
             self.TIndMax = self.TMax
 
-        Range  = (self.TMin, self.TMax, 0, Nevents)     
-        arr2d   = self.arrWaveVsEv[...,self.TIndMin:self.TIndMax]
+        if self.getBitStatus( 16 ): # Use N Ev range
+            self.NEvMin = cp.confpars.waveformWindowParameters[nwin][11]
+            self.NEvMax = cp.confpars.waveformWindowParameters[nwin][12]
+            #print 'Nevents, self.NEvMin, self.NEvMax =', self.Nevents, self.NEvMin, self.NEvMax
+            if  self.NEvMax > self.Nevents :
+                self.NEvMax = self.Nevents
+            if  self.NEvMin > self.Nevents :
+                self.NEvMin = self.Nevents-100
+        else:
+            self.NEvMin = 0
+            self.NEvMax = self.Nevents
 
+        print 'Dataset has Nevents  =', self.Nevents,' Plot events  in the range from', self.NEvMin,  ' to', self.NEvMax
+        print 'Number of bins in WF =', self.dimX,   ' Plot WF bins in the range from', self.TIndMin, ' to', self.TIndMax 
+
+
+        try : # First, to delete this array in order to clean up memory
+            self.arrWaveVsEv.delete()
+        except AttributeError :
+            #print 'object has no attribute arrWaveVsEv'
+            pass
+
+        # Make 2D float array of the wave vs event
+        self.arrWaveVsEv = empty([self.NEvMax-self.NEvMin,self.TIndMax-self.TIndMin], dtype=float)
+
+        print 'Fill 2-D array'
+        for event in range(self.NEvMin,self.NEvMax) :
+            #print 'event =', event
+            self.ds1ev = ds[event]            
+            self.arrWaveVsEv[event-self.NEvMin,0:self.TIndMax-self.TIndMin] = self.getAmplitudeArray(self.indwf)[self.TIndMin:self.TIndMax]
+
+        Range  = (self.TMin, self.TMax, self.NEvMin, self.NEvMax)     
+        arr2d   = self.arrWaveVsEv
+        #arr2d   = self.arrWaveVsEv[...,self.TIndMin:self.TIndMax]
+
+
+        print 'Begin to plot 2-D array'
         # Begin plot
         fig.canvas.set_window_title(cp.confpars.current_item_name_for_title) 
         plt.clf() # clear plot
@@ -317,7 +343,6 @@ class PlotsForWaveform ( object ) :
         plt.xlabel(XTitle)
         plt.ylabel(YTitle)
         #plt.zlabel(ZTitle)
-
 
 #--------------------------------
 #  In case someone decides to run this module

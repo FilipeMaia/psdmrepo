@@ -12,6 +12,16 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ------------------------------
+2011-11-08 Mikhail S. Dubrovin
+- In the GUI/plot for WF vs Ev:
+	add the range of events
+	fill 2-D array for indicated T-range only.
+- modified modules:
+	PlotsForWaveform.py
+	ConfigParameters.py
+	GUISettingsForWaveformWindow.py
+
+	
 Tag: V00-00-10
 2011-10-28 Mikhail S. Dubrovin
 - DrawEvent.py 
