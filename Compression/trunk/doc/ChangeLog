@@ -12,6 +12,15 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-03
+2011-11-10 Igor Gaponenko
+- improved the histogram analysis algorithm to locate the base in arbitrary
+(non CSPad only) distributions of values.
+- added diagnostic printouts garded by C++ macro-processor directives. Uncomment
+them if needed.
+- added a test application for "internal" compression of XTC files at a level
+of datagrams.
+
+Tag: V00-00-03
 2011-11-07 Igor Gaponenko
 - fixed a bug (buffer overflow) in the CSPad compression algorithm which may result
 in memory corruption if an image size would be on the border-line of compression.

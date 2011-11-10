@@ -26,6 +26,8 @@ using namespace std;
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+//#define CSPadCompressor_DEBUG
+//#define CSPadCompressor_DEBUG_HISTEVAL
 
 namespace {
     string format_addr( size_t addr )
@@ -185,6 +187,41 @@ CSPadCompressor::compress (
             break;
         }
     }
+#ifdef CSPadCompressor_DEBUG_HISTEVAL
+    cout << "CSPadCompressor::DEBUG <histogram evaluation> {\n"
+         << "         chan      8-bit   16-bit\n"
+         << "  -----------    -------  -------\n";
+    for( size_t ih8 = 0; ih8 < 0x100; ++ih8 ) {
+        unsigned int sum = 0;
+        for( size_t ih16 = ih8 * 0x100; ih16 < (ih8 + 1) * 0x100; ++ih16 ) sum += m_hist_channels[ih16];
+        cout << "  "
+             << setw(3) << setfill(' ') << ih8 << " [" << setw(5) << setfill(' ') << (ih8<<8) << "] : "
+             << setw(8) << setfill(' ') << m_hist_channels_8bits[ih8] << " "
+             << setw(8) << setfill(' ') << sum
+             << (m_hist_channels_8bits[ih8] != sum ? " (!)" : "")
+             << "\n";
+
+    }
+    cout << "}\n";
+#endif
+#ifdef CSPadCompressor_DEBUG
+    cout << "CSPadCompressor::DEBUG <histogram pass #1> {\n"
+         << "  inbufsize: " << inbufsize << "\n"
+         << "  8-bit histogram: (chan#,16-bit base,counts,fraction)\n";
+    unsigned int debug_chan = 0;
+    for( unsigned int* ptr = m_hist_channels_8bits;
+                       ptr < m_hist_channels_8bits + 0x100;
+                     ++ptr, ++debug_chan ) {
+        double fraction = *ptr * 100.0 / inbufsize;
+        if( fraction < 5. ) continue;
+        cout << "    "
+             << setw(3) << setfill(' ') << debug_chan << " [" << setw(5) << setfill(' ') << (debug_chan<<8) << "] : "
+             << setw(8) << setfill(' ') << *ptr << " "
+             << setw(3) << setfill(' ') << setiosflags(ios::fixed) << setprecision(0) << fraction << "%\n";
+    }
+    cout << "  start base: " << start_8bits - m_hist_channels_8bits << "\n"
+         << "}\n";
+#endif
     if( start_8bits == m_hist_channels_8bits + 0x100 ) {
 
         /* NO COMPRESSION: just fill in the header and copy the contents of
@@ -211,21 +248,43 @@ CSPadCompressor::compress (
 
     // The second pass has two stages. At the first one a sweep accross
     // the first 256 elements is made in order to calculate the sum of counters.
-    // At the second stage the alforithm will be sliding the window through
+    // At the second stage the algorithm will be sliding the window through
     // the remaining 256 elements to determine the window (of 256 bins) where
     // the maximum number of counts is found. For optimization purposes, the
     // the second state algorithm will use the sum from each previous iteration.
+    //
+    // TODO: Actually, the first pass can be omitted because we already
+    //       know the starting channel of the 8-bit histogram, and so
+    //       we know its value. This improvement may slightly improve
+    //       the algorithm performance.
     //
     unsigned int count_8bits = 0;
     unsigned int* start = m_hist_channels + ( start_8bits - m_hist_channels_8bits ) * 0x100;
     for( unsigned int* ptr = start;
                        ptr < start + 0x100;
                      ++ptr ) count_8bits += *ptr;
+
+#ifdef CSPadCompressor_DEBUG
+    cout << "CSPadCompressor::DEBUG <histogram pass #2> {\n"
+         << "   chan  count_8bits  new_count_8bits         -         +\n";
+    const unsigned int debug_initial_count_8bits = count_8bits;
+#endif
+
+    unsigned int new_count_8bits = count_8bits;
     unsigned int* start4compression = start;
     for( unsigned int* ptr = start;
                        ptr < start + 0x100;
                      ++ptr ) {
-        unsigned int new_count_8bits = count_8bits - *(ptr) + *(ptr+0x100);
+        new_count_8bits += - *(ptr) + *(ptr+0x100);
+
+#ifdef CSPadCompressor_DEBUG
+            cout << "  " << setw(5)  << setfill(' ') << ( ptr - start )
+                 << "  " << setw(11) << setfill(' ') << count_8bits
+                 << "  " << setw(15) << setfill(' ') << new_count_8bits 
+                 << "  " << setw(8)  << setfill(' ') << *(ptr)
+                 << "  " << setw(8)  << setfill(' ') << *(ptr+0x100)
+                 << "  " << (new_count_8bits > count_8bits ? "*" : "") << "\n";
+#endif
         if( new_count_8bits > count_8bits ) {
             count_8bits = new_count_8bits;
             start4compression = ptr + 1;
@@ -235,8 +294,14 @@ CSPadCompressor::compress (
     /* Base to offset compressed numbers
      */
     const uint16_t base = start4compression - m_hist_channels;
+#ifdef CSPadCompressor_DEBUG
+    cout << "  initial_count_8bits: " << debug_initial_count_8bits << "\n"
+         << "          count_8bits: " << count_8bits << "\n"
+         << "                 base: " << base << "\n"
+         << "}\n";
+#endif
 
-    /* Phase I: compress the elements, build the bit-map to indicate
+    /* Phase I: compress elements, build a bit-map to indicate
      *          which elements have been compressed.
      */
     uint16_t bit  = 0x1;  // current bit in the bitmap
@@ -259,6 +324,9 @@ CSPadCompressor::compress (
 
     /* Prepare a pointer onto the uncompressed bitmap
      */
+#if CSPadCompressor_DEBUG
+    unsigned int debug_num_compressed_elements = 0;
+#endif
     uint16_t* outbmapptr = m_outbmap;
     {
         const uint16_t* end = inbuf + inbufsize;
@@ -269,6 +337,9 @@ CSPadCompressor::compress (
                 if( v_offset < 0x100 ) {
                     *(outptr++) = (uint8_t)v_offset;
                     bmap |= bit;
+#ifdef CSPadCompressor_DEBUG
+                    debug_num_compressed_elements++;
+#endif
                 } else {
                     *(uint16_t*)outptr = *ptr;  // store 'as is' (16-bit word)
                     outptr += sizeof(uint16_t);
@@ -287,6 +358,12 @@ CSPadCompressor::compress (
         if( 0x1 != bit ) *(outbmapptr++) = bmap;    // Make sure the last bit map word is stored
                                                     // if it was't complete within the loop.
     }
+#ifdef CSPadCompressor_DEBUG
+    cout << "CSPadCompressor::DEBUG <compression phase #1> {\n"
+         << "  debug_num_compressed_elements: " << debug_num_compressed_elements << "\n"
+         << "}\n";
+#endif
+
 
     /* Phase II: Try to compress the bitmap using runlength compression
      *           algorithm (counting words with fully populated bits).
@@ -371,19 +448,7 @@ CSPadCompressor::compress (
          */
         ptr = outptr;
         *(uint32_t*)ptr = bitmapsize; ptr += sizeof(uint32_t);
-#if 0
-        /* TODO: Improve the algorithm to evaluate the final storage requirements
-         *       for the output data structure and decide if it has to be thrown away
-         *       and an original uncompressed image returned instead.
-         */
-        cout << "DEBUG: CSPadCompressor::compress(): \n"
-             << "  m_outbufsize:                     " << m_outbufsize << " (the total size of the output buffer)\n"
-             << "    ptr - m_outbuf:                 " << ptr - m_outbuf << " (the number of bytes just befor the bitmap)\n"
-             << "    bitmapsize * sizeof(uint16_t):  " << bitmapsize * sizeof(uint16_t) << " (the number of bytes in bitmap)\n"
-             << "    ------------------------------  \n"
-             << "    total number of bytes required: " << ptr - m_outbuf + bitmapsize * sizeof(uint16_t) << "\n"
-             << endl;
-#endif
+
         memcpy((void*)ptr, bitmapptr, bitmapsize * sizeof(uint16_t));
         ptr +=  bitmapsize * sizeof(uint16_t);
 
