@@ -11,7 +11,7 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-00-03
+Tag: V00-00-04
 2011-11-10 Igor Gaponenko
 - improved the histogram analysis algorithm to locate the base in arbitrary
 (non CSPad only) distributions of values.
