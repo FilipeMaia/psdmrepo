@@ -11,6 +11,16 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2011-11-10 Igor Gaponenko
+- minor reimplementation of the multi-threaded wrapper in order to get rid of
+the confusing parameter 'maxImagesPerThread'. In the new version of the wrapper
+a value of this parameter is calculated automatically per each compression request
+based on the number of images in the request and the maximum number of threads
+specified in the wrapper's constructor.
+- removed the above mentioned parameter from the c-tor of the wrapper
+- made adjustments to the test applications using the wrapper
+
 Tag: V00-00-04
 2011-11-10 Igor Gaponenko
 - improved the histogram analysis algorithm to locate the base in arbitrary

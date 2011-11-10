@@ -61,7 +61,7 @@ namespace Pds {
                 ErrInAlgorithm         // failed to process at least least one of the images in a batch
             };
 
-            CompressorMT(size_t maxImagesPerThread=1, size_t numThreads=1);
+            explicit CompressorMT(size_t numThreads=1);
 
             virtual ~CompressorMT();
 
@@ -78,6 +78,10 @@ namespace Pds {
             static const char* err2str(int code);
 
         private:
+
+            void delete_thread_data();
+
+            void allocate_thread_data();
 
             int implement_request(bool compress_vs_decompress,
                                   void** image, typename COMPRESSOR::ImageParams* params,
@@ -186,12 +190,12 @@ namespace Pds {
 }
 
 template< class COMPRESSOR >
-Pds::Codec::CompressorMT<COMPRESSOR>::CompressorMT(size_t maxImagesPerThread, size_t numThreads) :
+Pds::Codec::CompressorMT<COMPRESSOR>::CompressorMT(size_t numThreads) :
 
     m_numImages  (0),
     m_compressor (0),
 
-    m_maxImagesPerThread(maxImagesPerThread > 0 ? maxImagesPerThread : 1),
+    m_maxImagesPerThread(1),
     m_numThreads        (numThreads > 0 ? numThreads : 1),
     m_numActiveThreads  (0),
     m_threadsStarted    (false),
@@ -202,14 +206,7 @@ Pds::Codec::CompressorMT<COMPRESSOR>::CompressorMT(size_t maxImagesPerThread, si
     pthread_cond_init ( &m_data_ready_cv, NULL);
     pthread_cond_init ( &m_finished_processing_cv, NULL);
 
-    m_thread_data = new ThreadData*[m_numThreads];
-    for( size_t i = 0; i < m_numThreads; ++i ) {
-        m_thread_data[i] = new ThreadData( m_maxImagesPerThread );
-        m_thread_data[i]->numActiveThreads       = &m_numActiveThreads;
-        m_thread_data[i]->guard_mutex            = &m_guard_mutex;
-        m_thread_data[i]->data_ready_cv          = &m_data_ready_cv;
-        m_thread_data[i]->finished_processing_cv = &m_finished_processing_cv;
-    }
+    this->allocate_thread_data();
 }
 
 template< class COMPRESSOR >
@@ -227,9 +224,7 @@ Pds::Codec::CompressorMT<COMPRESSOR>::~CompressorMT()
         delete [] m_compressor;
         m_compressor = 0;
     }
-    for( size_t i = 0; i < m_numThreads; ++i ) delete m_thread_data[i];
-    delete [] m_thread_data;
-    m_thread_data = 0;
+    this->delete_thread_data();
 }
 
 template< class COMPRESSOR >
@@ -264,6 +259,31 @@ Pds::Codec::CompressorMT<COMPRESSOR>::decompress(
         numImages);
 }
 
+
+template< class COMPRESSOR >
+void
+Pds::Codec::CompressorMT<COMPRESSOR>::delete_thread_data()
+{
+    for( size_t i = 0; i < m_numThreads; ++i ) delete m_thread_data[i];
+    delete [] m_thread_data;
+    m_thread_data = 0;
+}
+
+
+template< class COMPRESSOR >
+void
+Pds::Codec::CompressorMT<COMPRESSOR>::allocate_thread_data()
+{
+    m_thread_data = new ThreadData*[m_numThreads];
+    for( size_t i = 0; i < m_numThreads; ++i ) {
+        m_thread_data[i] = new ThreadData( m_maxImagesPerThread );
+        m_thread_data[i]->numActiveThreads       = &m_numActiveThreads;
+        m_thread_data[i]->guard_mutex            = &m_guard_mutex;
+        m_thread_data[i]->data_ready_cv          = &m_data_ready_cv;
+        m_thread_data[i]->finished_processing_cv = &m_finished_processing_cv;
+    }
+}
+
 template< class COMPRESSOR >
 int
 Pds::Codec::CompressorMT<COMPRESSOR>::implement_request(
@@ -274,6 +294,19 @@ Pds::Codec::CompressorMT<COMPRESSOR>::implement_request(
     size_t numImages)
 {
     if( 0 == numImages ) return ErrNoImages;  // not enough images to process
+
+    // Calculate the number of images per thread based on the specified
+    // (in the c-tor) number of threads and the number of images.
+    //
+    // Expand the thread data to accommodate more images per thread if needed.
+    //
+    size_t maxImagesPerThread = numImages < m_numThreads ? m_numThreads : (numImages + 1) / m_numThreads;
+
+    if( maxImagesPerThread > m_maxImagesPerThread ) {
+        this->delete_thread_data();
+        m_maxImagesPerThread = maxImagesPerThread;
+        this->allocate_thread_data();
+    }
 
     // Expand the list of compressors if needed
     //
@@ -306,7 +339,12 @@ Pds::Codec::CompressorMT<COMPRESSOR>::implement_request(
 
             size_t numImagesPerThread = 0;
 
-            for( size_t i = 0; i < m_maxImagesPerThread; ++i ) {
+            // ATTENTION: This loop uses the actual value of the parameter calculate
+            //            for the current request, not the maximum capacity of the thread
+            //            processors, which might be higher in previous requests. Otherwise
+            //            images won't be spread equally between threads.
+            //
+            for( size_t i = 0; i < maxImagesPerThread; ++i ) {
 
                 if( image2process >= numImages ) break;  // no more images are left to process
 
