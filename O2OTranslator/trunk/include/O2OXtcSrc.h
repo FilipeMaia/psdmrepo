@@ -83,4 +83,8 @@ private:
 
 } // namespace O2OTranslator
 
+/// Helper operator to format Pds::Src to a standard stream
+std::ostream&
+operator<<(std::ostream& out, const Pds::Src& src);
+
 #endif // O2OTRANSLATOR_O2OXTCSRC_H

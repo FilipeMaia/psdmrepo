@@ -79,12 +79,11 @@ PnCCDFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
                                         const H5DataTypes::XtcClockTime& time )
 {
   // find corresponding configuration object
-  const Pds::DetInfo& info = static_cast<const Pds::DetInfo&>(src.top());
   Pds::PNCCD::ConfigV1 config;
   Pds::TypeId cfgTypeId(Pds::TypeId::Id_pnCCDconfig, 1);
   const Pds::PNCCD::ConfigV1* config1 = m_configStore.find<Pds::PNCCD::ConfigV1>(cfgTypeId, src.top());
   MsgLog( logger, debug, "PnCCDFrameV1Cvt: looking for config object "
-      << Pds::DetInfo::name(info)
+      << src.top()
       << " name=" <<  Pds::TypeId::name(cfgTypeId.id())
       << " version=" <<  cfgTypeId.version() ) ;
   if ( config1 ) {
@@ -93,7 +92,7 @@ PnCCDFrameV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
     Pds::TypeId cfgTypeId(Pds::TypeId::Id_pnCCDconfig, 2);
     const Pds::PNCCD::ConfigV2* config2 = m_configStore.find<Pds::PNCCD::ConfigV2>(cfgTypeId, src.top());
     MsgLog( logger, debug, "PnCCDFrameV1Cvt: looking for config object "
-        << Pds::DetInfo::name(info)
+        << src.top()
         << " name=" <<  Pds::TypeId::name(cfgTypeId.id())
         << " version=" <<  cfgTypeId.version() ) ;
     if (not config2) {

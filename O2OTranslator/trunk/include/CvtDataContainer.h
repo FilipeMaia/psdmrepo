@@ -53,6 +53,7 @@ class CvtDataContainer {
 public:
 
   // container type
+  typedef Factory factory_type ;
   typedef typename Factory::container_type container_type ;
 
   // Constructor

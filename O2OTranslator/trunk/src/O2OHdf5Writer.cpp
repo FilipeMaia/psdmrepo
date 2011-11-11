@@ -43,6 +43,7 @@
 #include "H5DataTypes/CsPadConfigV2.h"
 #include "H5DataTypes/CsPadConfigV3.h"
 #include "H5DataTypes/EncoderConfigV1.h"
+#include "H5DataTypes/EncoderConfigV2.h"
 #include "H5DataTypes/EncoderDataV1.h"
 #include "H5DataTypes/EncoderDataV2.h"
 #include "H5DataTypes/EpicsPvHeader.h"
@@ -54,6 +55,7 @@
 #include "H5DataTypes/EvrIOConfigV1.h"
 #include "H5DataTypes/FccdConfigV1.h"
 #include "H5DataTypes/FccdConfigV2.h"
+#include "H5DataTypes/Gsc16aiConfigV1.h"
 #include "H5DataTypes/IpimbConfigV1.h"
 #include "H5DataTypes/IpimbConfigV2.h"
 #include "H5DataTypes/IpimbDataV1.h"
@@ -87,6 +89,7 @@
 #include "O2OTranslator/EvrDataV3Cvt.h"
 #include "O2OTranslator/EvtDataTypeCvtDef.h"
 #include "O2OTranslator/EpicsDataTypeCvt.h"
+#include "O2OTranslator/Gsc16aiDataV1Cvt.h"
 #include "O2OTranslator/O2OExceptions.h"
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OMetaData.h"
@@ -319,6 +322,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_EncoderConfig,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::EncoderConfigV2> ( "Encoder::ConfigV2" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_EncoderConfig,2).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::LusiDiodeFexConfigV1> ( "Lusi::DiodeFexConfigV1" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_DiodeFexConfig, 1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
@@ -349,6 +356,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 
   converter.reset( new ConfigDataTypeCvt<H5DataTypes::CsPadConfigV3> ( "CsPad::ConfigV3" ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 3).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::Gsc16aiConfigV1> ( "Gsc16ai::ConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_Gsc16aiConfig, 1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // special converter object for CsPad calibration data
@@ -524,6 +535,11 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   converter.reset( new CsPadMiniElementV1Cvt (
       "CsPad::MiniElementV1", m_calibStore, chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_Cspad2x2Element, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // very special converter for Gsc16ai::DataV1, it needs two types of data
+  converter.reset( new Gsc16aiDataV1Cvt ( "Gsc16ai::DataV1", m_configStore, chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_Gsc16aiData, 1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
 }
@@ -763,9 +779,8 @@ O2OHdf5Writer::dataObject ( const void* data, size_t size,
   // for Configure and BeginCalibCycle transitions store config objects at Source level
   if ( ( m_transition == Pds::TransitionId::Configure
       or m_transition == Pds::TransitionId::BeginCalibCycle )  ) {
-    const Pds::DetInfo& info = static_cast<const Pds::DetInfo&>(src.top());
     MsgLog( logger, debug, "O2OHdf5Writer: store config object "
-        << Pds::DetInfo::name(info)
+        << src.top()
         << " name=" <<  Pds::TypeId::name(typeId.id())
         << " version=" <<  typeId.version() ) ;
     m_configStore.store(typeId, src.top(), data, size);

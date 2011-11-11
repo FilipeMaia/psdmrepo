@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-14-03
+2011-11-11 Andy Salnikov
+- adding support for Encoder::ConfigV2, Gsc16ai::ConfigV1
+  and Gsc16ai::DataV1 classes
+
 Tag: V00-14-02
 2011-11-07 Andy Salnikov
 - added application for filtering XTC files
