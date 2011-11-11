@@ -549,27 +549,60 @@ class BldConfigGui( QtGui.QWidget ):
         widget_layout.setAlignment( self.apply_button, QtCore.Qt.AlignRight )
 
 
-class WaveformConfigGui( QtGui.QWidget ):
+class WaveformConfigSubGui( QtGui.QWidget ):
+    """The checkboxes for each waveform module
     """
+    def __init__(self, parent = None, module = None):
+        QtGui.QWidget.__init__(self,parent)
+        self.parent = parent
+        
+        sub_layout = QtGui.QVBoxLayout(self)
+
+        ## title
+        title = "%s"%module.address
+
+        ## how many channels?
+        nch = int(self.parent.moreinfo["DetInfo:%s"%module.address][0].split(' ')[0])
+
+        ## Group of checkboxes
+        groupbox = QtGui.QGroupBox(title)
+        groupbox.setGeometry(QtCore.QRect(30,30,200,200))
+        #groupbox.setMinimumHeight(60)
+        groupbox.setCheckable(True)
+
+        checkbox_ch = []
+        for ch in xrange (nch):
+            checkbox_ch.append( QtGui.QCheckBox("Ch %d"%(ch), groupbox ) )
+            checkbox_ch[ch].setGeometry(QtCore.QRect(30,60+10*ch,100,21))
+            checkbox_ch[ch].setChecked(True)
+            
+        sub_layout.addWidget(groupbox)
+
+
+class WaveformConfigGui( QtGui.QWidget ):
+    """Tab to configure waveforms
     """
     def __init__(self, parent = None, title="" ):
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(QtCore.QRect(20,20,800,800))
+        self.parent = parent
 
-        widget_layout = QtGui.QVBoxLayout(self)
+        panel_layout = QtGui.QVBoxLayout(self)
 
+        self.modconf_layout = QtGui.QVBoxLayout()
         self.apply_button = QtGui.QPushButton()
         self.apply_button.setGeometry(QtCore.QRect(470,420,96,30))
         self.apply_button.setText("Apply")
         self.apply_button.setMaximumWidth(60)
 
-        # how many channels?
-        nch = int(parent.moreinfo["DetInfo:%s"%title][0].split(' ')[0])
-        checkbox_ch = []
-        for ch in xrange (nch):
-            checkbox_ch.append( QtGui.QCheckBox("%s Ch %d"%(title,ch)) )
-            widget_layout.addWidget( checkbox_ch[ch] )
+        panel_layout.addLayout(self.modconf_layout)
+        panel_layout.addWidget(self.apply_button)
+        panel_layout.setAlignment( self.apply_button, QtCore.Qt.AlignRight )
 
-        widget_layout.addWidget(self.apply_button)
-        widget_layout.setAlignment( self.apply_button, QtCore.Qt.AlignRight )
+    def add_module(self, module):
+
+        sub = WaveformConfigSubGui(parent=self.parent, module=module)
+        self.modconf_layout.addWidget(sub)
+        
+        
 

@@ -182,12 +182,12 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.setup_gui_checkboxes()
 
         # if scan, plot every calib cycle 
-        if self.ncalib > 1 :
-            print "Have %d scan steps a %d events each. Set up to plot after every %d events" %\
-                  (self.ncalib, self.nevents[0], self.nevents[0] )
-            self.plotn_enter.setText( str(self.nevents[0]) )
-            self.plotn_change()
-            self.plotn_enter.setText("")
+        #if self.ncalib > 1 :
+        #    print "Have %d scan steps a %d events each. Set up to plot after every %d events" %\
+        #          (self.ncalib, self.nevents[0], self.nevents[0] )
+        #    self.settings.plotn_enter.setText( str(self.nevents[0]) )
+        #    self.settings.plotn_change()
+        #    self.settings.plotn_enter.setText("")
 
 
     def define_layout(self):
@@ -368,18 +368,23 @@ Start with selecting data of interest to you from list on the left and general r
 
                 
     def waveform_tab(self, mod, remove=False):
-        tabname = "%s"%mod.address
+        """Would be better if this was a subtab
+        """
+        #tabname = "%s"%mod.address
+        tabname = "Waveforms"
 
         if tabname in self.cfg_tabs_tally:
             index = self.cfg_tabs_tally[ tabname ]
             self.cfg_tabs.setCurrentIndex(index)
+            wf_widget = self.cfg_tabs.currentWidget()
+            wf_widget.add_module(mod)
             if remove:
                 self.cfg_tabs.removeTab(index)
                 del self.cfg_tabs_tally[tabname]
             return
 
         wf_widget = panels.WaveformConfigGui(self,title=tabname)
-        print wf_widget
+        wf_widget.add_module(mod)
         self.connect( wf_widget.apply_button,
                       QtCore.SIGNAL('clicked()'), self.update_pyana_tab )
 

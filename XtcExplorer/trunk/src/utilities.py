@@ -512,27 +512,29 @@ class Plotter(object):
 
     def add_frame(self, name="", title="",contents=None, type=None, aspect='auto'):
         """Add a frame to the plotter. 
-        name = name of frame (must be unique, else returns the existing frame)
-        title = current title, may be different from event to event
-        contents = tuple of arrays to be plotted (in one frame).
-        type = type of plot. Defaults based on contents
+        @param  name       name of frame (must be unique, else returns the existing frame)
+        @param  title      current title, may be different from event to event
+        @param  contents   tuple of data arrays to be plotted (in one frame).
+        @param  type       type of plot. Defaults based on contents
+        @param  aspect     set aspect ratio of this frame (doesn't work)
         """
         aframe = None
 
         if name == "":
             name = "frame%d",len(self.frames)+1
-        
+
+        # Add this frame to plotter's list of frames.
+        # If one with this name already exists, fetch it, don't make a new one
         if name in self.frames:
             aframe = self.frames[name]
         else :
             self.frames[name] = Frame(name)
             aframe = self.frames[name]
-
+        
         aframe.title = title
         aframe.data = contents
         aframe.type = type
         aframe.aspect = aspect
-
         return aframe
 
     def plot_all_frames(self, fignum=1, ordered=False):
