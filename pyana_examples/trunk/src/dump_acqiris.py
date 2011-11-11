@@ -43,7 +43,7 @@ from pypdsdata import xtc
 #---------------------
 #  Class definition --
 #---------------------
-class dump_princeton (object) :
+class dump_acqiris (object) :
     """Class whose instance will be used as a user analysis module. """
 
     #----------------
@@ -62,23 +62,32 @@ class dump_princeton (object) :
     #-------------------
     def beginjob( self, evt, env ) :
         
-        config = env.getPrincetonConfig(self.m_src)
+        config = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, self.m_src)
         if config:
         
             print "%s: %s" % (config.__class__.__name__, self.m_src)
             
-            print "  width =", config.width();
-            print "  height =", config.height();
-            print "  orgX =", config.orgX();
-            print "  orgY =", config.orgY();
-            print "  binX =", config.binX();
-            print "  binY =", config.binY();
-            print "  exposureTime =", config.exposureTime();
-            print "  coolingTemp =", config.coolingTemp();
-            print "  readoutSpeedIndex =", config.readoutSpeedIndex();
-            print "  readoutEventCode =", config.readoutEventCode();
-            print "  delayMode =", config.delayMode();
-            print "  frameSize =", config.frameSize();
+            print "  nbrBanks =", config.nbrBanks(),
+            print "channelMask =", config.channelMask(),
+            print "nbrChannels =", config.nbrChannels(),
+            print "nbrConvertersPerChannel =", config.nbrConvertersPerChannel()
+     
+            h = config.horiz()
+            print "  horiz: sampInterval =", h.sampInterval(),
+            print "delayTime =", h.delayTime(),
+            print "nbrSegments =", h.nbrSegments(),
+            print "nbrSamples =", h.nbrSamples()
+
+            nch = config.nbrChannels()
+            for ch in range(nch):
+                v = config.vert(ch)
+                print "  vert(%d):" % ch,
+                print "fullScale =", v.fullScale(),
+                print "slope =", v.slope(),
+                print "offset =", v.offset(),
+                print "coupling =", v.coupling(),
+                print "bandwidth=", v.bandwidth()
+
 
     def event( self, evt, env ) :
         """This method is called for every L1Accept transition.
@@ -87,16 +96,16 @@ class dump_princeton (object) :
         @param env    environment object
         """
 
-        frame = evt.get(xtc.TypeId.Type.Id_PrincetonFrame, self.m_src)
-        if frame:
-            print "%s: %s" % (frame.__class__.__name__, self.m_src)
-            
-            print "  shotIdStart =", frame.shotIdStart()
-            print "  readoutTime =", frame.readoutTime()
-            
-            img = frame.data()
-            print "  data.shape =", img.shape
-            print "  data =", img
+        acqData = evt.get(xtc.TypeId.Type.Id_AcqWaveform, self.m_src)
+
+        for chan, elem in enumerate(acqData):
+
+            print "%s: %s: channel = %d" % (elem.__class__.__name__, self.m_src, chan)
+            print "  nbrSegments =", elem.nbrSegments()
+            print "  nbrSamplesInSeg =", elem.nbrSamplesInSeg()
+            print "  timestamps =", [elem.timestamp(seg) for seg in range(elem.nbrSegments())]
+            wf = elem.waveform()
+            print "  waveform [len=%d] = %s" % (len(wf), wf)
 
 
     def endjob( self, evt, env ) :

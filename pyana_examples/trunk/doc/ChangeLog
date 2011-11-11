@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-14
+2011-11-11 Andy Salnikov
+- added three more dump_* modules, some of them are copies of 
+  myana_* modules
+- all these new methods use generic evt.get() method
+
 Tag: V00-00-13
 2011-09-13 Andy Salnikov
 - added new module dump_cspad_mini

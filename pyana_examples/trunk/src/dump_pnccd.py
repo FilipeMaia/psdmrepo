@@ -52,7 +52,7 @@ from pypdsdata import *
 #---------------------
 #  Class definition --
 #---------------------
-class myana_pnccd ( object ) :
+class dump_pnccd ( object ) :
     """Example analysis module which dumps pnCCD info."""
 
     #--------------------
@@ -62,45 +62,57 @@ class myana_pnccd ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self ) :
-        """Constructor. """
+    def __init__ ( self, source="" ) :
+        """Class constructor takes the name of the data source.
 
-        self.count=0
+        @param source   data source
+        """
+        
+        self.m_src = source
 
     #-------------------
     #  Public methods --
     #-------------------
 
     def beginjob( self, evt, env ) :
-        pass
+
+        config = env.getConfig(xtc.TypeId.Type.Id_pnCCDconfig, self.m_src)
+        if config:
+        
+            print "%s: %s" % (config.__class__.__name__, self.m_src)
+            print "  numLinks =", config.numLinks()
+            print "  payloadSizePerLink =", config.payloadSizePerLink()
+            
+            try:
+                #these methods exist only in V2
+                print "  numChannels = %s" % config.numChannels()
+                print "  numRows =", config.numRows()
+                print "  numSubmoduleChannels =", config.numSubmoduleChannels()
+                print "  numSubmoduleRows =", config.numSubmoduleRows()
+                print "  numSubmodules =", config.numSubmodules()
+                print "  camexMagic =", config.camexMagic()
+                print "  info =", config.info()
+                print "  timingFName =", config.timingFName()
+            except:
+                pass
 
     def beginrun( self, evt, env ) :
         pass
 
     def event( self, evt, env ) :
         
-        for x in evt.findXtc(typeId=xtc.TypeId.Type.Id_pnCCDframe) :
-            
-            cfg = env.getPnCCDConfig(x.src)
-            print "event %d: detInfo=%s numLinks=%d payloadSizePerLink=%d" % \
-                    ( self.count, x.src, cfg.numLinks(), cfg.payloadSizePerLink() )
-            
-            frame = x.payload()
-            for i in range(cfg.numLinks()) :
-                print  "    link %d: shape=%s specialWord=%d frameNumber=%d timeStampHi=%d timeStampLo=%d sizeofData=%d" % \
-                    (i, frame.data(cfg).shape, frame.specialWord(), frame.frameNumber(), 
-                     frame.timeStampHi(), frame.timeStampLo(), frame.sizeofData(cfg) )
-                frame = frame.next(cfg)
+        frame = evt.get(xtc.TypeId.Type.Id_pnCCDframe, self.m_src)
+        if frame:
+            print "%s: %s" % (frame.__class__.__name__, self.m_src)
+            print "  specialWord =", frame.specialWord()
+            print "  frameNumber =", frame.frameNumber()
+            print "  timeStampHi =", frame.timeStampHi()
+            print "  timeStampLo =", frame.timeStampLo()
+            data = frame.data()
+            print "  data.shape =", data.shape
+            print "  data.dtype =", data.dtype
+            print "  data =", data
         
-            
-            # dump also combined object
-            frame = evt.get(xtc.TypeId.Type.Id_pnCCDframe, x.src)
-            print  "    combined: shape=%s specialWord=%d frameNumber=%d timeStampHi=%d timeStampLo=%d sizeofData=%d" % \
-                (frame.data().shape, frame.specialWord(), frame.frameNumber(), 
-                 frame.timeStampHi(), frame.timeStampLo(), frame.sizeofData() )
-        
-        
-        self.count += 1
         
     def endrun( self, env ) :
         pass
