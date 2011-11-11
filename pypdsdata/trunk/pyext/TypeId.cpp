@@ -77,6 +77,11 @@ namespace {
       { "Id_XampsElement",    Pds::TypeId::Id_XampsElement },
       { "Id_Cspad2x2Element", Pds::TypeId::Id_Cspad2x2Element },
       { "Id_SharedPim",       Pds::TypeId::Id_SharedPim },
+      { "Id_Cspad2x2Config",  Pds::TypeId::Id_Cspad2x2Config },
+      { "Id_FexampConfig",    Pds::TypeId::Id_FexampConfig },
+      { "Id_FexampElement",   Pds::TypeId::Id_FexampElement },
+      { "Id_Gsc16aiConfig",   Pds::TypeId::Id_Gsc16aiConfig },
+      { "Id_Gsc16aiData",     Pds::TypeId::Id_Gsc16aiData },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

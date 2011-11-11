@@ -52,6 +52,7 @@
 #include "types/cspad/MiniElementV1.h"
 
 #include "types/encoder/ConfigV1.h"
+#include "types/encoder/ConfigV2.h"
 #include "types/encoder/DataV1.h"
 #include "types/encoder/DataV2.h"
 
@@ -67,6 +68,9 @@
 
 #include "types/fccd/FccdConfigV1.h"
 #include "types/fccd/FccdConfigV2.h"
+
+#include "types/gsc16ai/ConfigV1.h"
+#include "types/gsc16ai/DataV1.h"
 
 #include "types/ipimb/ConfigV1.h"
 #include "types/ipimb/ConfigV2.h"
@@ -265,6 +269,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_EncoderConfig :
     if ( not obj ) obj = xtc2obj<Encoder::ConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Encoder::ConfigV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_EvrIOConfig :
@@ -336,6 +341,14 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_SharedPim :
     if ( not obj ) obj = xtc2obj<BldDataPimV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_Gsc16aiConfig :
+    if ( not obj ) obj = xtc2obj<Gsc16ai::ConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_Gsc16aiData :
+    if ( not obj ) obj = xtc2obj<Gsc16ai::DataV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::NumberOf :

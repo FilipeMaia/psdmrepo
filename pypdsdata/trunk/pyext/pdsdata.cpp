@@ -84,6 +84,7 @@
 #include "types/cspad/MiniElementV1.h"
 
 #include "types/encoder/ConfigV1.h"
+#include "types/encoder/ConfigV2.h"
 #include "types/encoder/DataV1.h"
 #include "types/encoder/DataV2.h"
 
@@ -109,6 +110,9 @@
 
 #include "types/fccd/FccdConfigV1.h"
 #include "types/fccd/FccdConfigV2.h"
+
+#include "types/gsc16ai/ConfigV1.h"
+#include "types/gsc16ai/DataV1.h"
 
 #include "types/ipimb/ConfigV1.h"
 #include "types/ipimb/ConfigV2.h"
@@ -254,6 +258,7 @@ PyMODINIT_FUNC init_pdsdata()
 
   module = Py_InitModule3( "_pdsdata.encoder", 0, "The Python module for pdsdata/encoder" );
   pypdsdata::Encoder::ConfigV1::initType( module );
+  pypdsdata::Encoder::ConfigV2::initType( module );
   pypdsdata::Encoder::DataV1::initType( module );
   pypdsdata::Encoder::DataV2::initType( module );
   Py_INCREF( module );
@@ -290,6 +295,12 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::FCCD::FccdConfigV2::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "fccd", module );
+
+  module = Py_InitModule3( "_pdsdata.gsc16ai", 0, "The Python module for pdsdata/gsc16ai" );
+  pypdsdata::Gsc16ai::ConfigV1::initType( module );
+  pypdsdata::Gsc16ai::DataV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "gsc16ai", module );
 
   module = Py_InitModule3( "_pdsdata.ipimb", 0, "The Python module for pdsdata/ipimb" );
   pypdsdata::Ipimb::ConfigV1::initType( module );

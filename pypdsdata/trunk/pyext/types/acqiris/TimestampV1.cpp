@@ -65,6 +65,6 @@ pypdsdata::Acqiris::TimestampV1::print(std::ostream& out) const
   if(not m_obj) {
     out << "acqiris.TimestampV1(None)";
   } else {  
-    out << "acqiris.TimestampV1(" << m_obj->value() << ")" ;
+    out << "acqiris.TimestampV1(" << m_obj->pos() << ", " << m_obj->value() << ")" ;
   }
 }

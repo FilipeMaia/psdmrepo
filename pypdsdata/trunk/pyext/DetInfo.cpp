@@ -122,6 +122,8 @@ namespace {
       { "AcqTDC",    Pds::DetInfo::AcqTDC },
       { "Xamps",     Pds::DetInfo::Xamps },
       { "Cspad2x2",  Pds::DetInfo::Cspad2x2 },
+      { "Fexamp",    Pds::DetInfo::Fexamp },
+      { "Gsc16ai",   Pds::DetInfo::Gsc16ai },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };
