@@ -88,7 +88,7 @@ def _proc(jobname, id, pipes, userObjects, dg_ref):
             dg = req[2]
             run = req[3]
 
-            evt = event.Event(dg, run)
+            evt = event.Event(dg, run, env)
             
             # update configuration objects
             env.updateConfig(evt)
@@ -107,7 +107,7 @@ def _proc(jobname, id, pipes, userObjects, dg_ref):
         elif req[0] == OP_FINISH :
             
             logging.info("proc-%s: received FIN", id)
-            evt = event.Event(None, run)
+            evt = event.Event(None, run, env)
             dispatch.finish(evt, env)
             
         elif req[0] == OP_RESULT :
@@ -206,7 +206,7 @@ def _pyana ( argv ) :
             damage = dg.xtc.damage.value()
             svc = dg.seq.service()
         
-            evt = event.Event(dg, run)
+            evt = event.Event(dg, run, env)
             
             # update environment
             env.update ( evt )
@@ -245,7 +245,7 @@ def _pyana ( argv ) :
                     
                 
         # finish
-        evt = event.Event(None, run)
+        evt = event.Event(None, run, env)
         dispatch.finish(evt, env)
     
     

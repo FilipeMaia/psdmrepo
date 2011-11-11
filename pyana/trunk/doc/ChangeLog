@@ -11,6 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-33
+2011-11-11 Andy Salnikov
+- few changes to Event class, mostly transparent to users
+  - constructor now takes Evn object, used internally by new 
+    wrapper methods
+  - get() method now returns correctly wrapped data objects
+    similar to all getXxxData()
+
 Tag: V00-00-32
 2011-10-11 Andy Salnikov
 - bug fix in passing epics data to subprocesses

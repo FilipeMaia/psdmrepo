@@ -15,6 +15,7 @@ from pypdsdata import epics
 from pypdsdata import Error
 from pypdsdata import acqiris
 from pypdsdata import cspad
+from pypdsdata import gsc16ai
 from pypdsdata import pnccd
 from pypdsdata import princeton
 
@@ -80,11 +81,21 @@ def _addr( address ):
 class Event(object):
     
     
-    def __init__( self, dg, run = -1 ):
+    def __init__( self, dg, run = -1, env = None ):
         
         self.m_dg = dg
         self.m_run = run
+        self.m_env = env
         self.m_userData = {}
+        
+        # set of wrapper methods
+        self.m_wrappers = {
+            xtc.TypeId.Type.Id_Gsc16aiData: self._wrapGsc16aiData,
+            xtc.TypeId.Type.Id_AcqWaveform: self._wrapAcqirisData,
+            xtc.TypeId.Type.Id_pnCCDframe: self._wrapPnCcdData,
+            xtc.TypeId.Type.Id_PrincetonFrame: self._wrapPrincetonData,
+            xtc.TypeId.Type.Id_CspadElement: self._wrapCsPadQuads,
+            }
 
     def run(self) :
         return self.m_run
@@ -132,12 +143,109 @@ class Event(object):
         return None
 
     def get(self, key, address=None):
-        """Generic get method, retieves detector data or user data"""
+        """Generic get method, retrieves detector data or user data. 
+        If first argument (key) is an integer then it is assumed to be 
+        TypeId value (such as xtc.TypeId.Type.Id_AcqWaveform), second
+        argument in this case is an address string or DetInfo object.
+        Otherwise the first argument is assumed to be a key (usually a 
+        string) for user data added to event with put() method. """
+        
         if isinstance(key,int):
-            return self.findFirst( typeId=key, address=address )
+            # integer key is TypeId value, must be event data
+            for x in Event._filter(self.m_dg.xtc, typeId=key, address=address):
+                obj = self._payload(x)
+                if obj: return obj
         else :
             default = address
             return self.m_userData.get(key, default)
+
+
+    def _payload(self, xtcObj):
+        """ Extract payload from XTC and if necessary wrap an object into some wrapper class. """
+
+        # get payload
+        obj = xtcObj.payload()
+        if not obj: return None
+
+        # find a wrapper method for typeId
+        typeId = xtcObj.contains.id()
+        wrapper = self.m_wrappers.get(typeId)
+        if wrapper:
+            return wrapper(obj, typeId, xtcObj.contains.version(), xtcObj.src)
+        else:
+            # no need to wrap
+            return obj
+
+
+    def _wrapGsc16aiData(self, obj, typeId, typeVersion, src):
+        """ Wrapper method for Gsc16ai data """
+        
+        cfg = self.m_env.getConfig(xtc.TypeId.Type.Id_Gsc16aiConfig, address=src)
+        if not cfg : raise Error("cannot find Gsc16ai config for address %s" % src )    
+        return gsc16ai.DataV1( obj, cfg )
+
+    def _wrapAcqirisData(self, obj, typeId, typeVersion, src):
+        """ Wrapper method for Acqiris data """
+        
+        cfg = self.m_env.getAcqConfig(address=src)
+        if not cfg : raise Error("cannot find Acqiris config for address %s" % src )
+
+        data = []        
+        hcfg = cfg.horiz()
+        channel = 0
+        while True:
+            
+            vcfg = cfg.vert(channel)
+            data.append(acqiris.DataDescV1(obj, hcfg, vcfg))
+            
+            channel += 1
+            if channel >= cfg.nbrChannels(): break
+            
+            obj = obj.nextChannel(hcfg)
+
+        return data
+
+    def _wrapPnCcdData(self, obj, typeId, typeVersion, src):
+        """ Wrapper method for PNCCD data"""
+        
+        cfg = self.m_env.getPnCCDConfig(address=src)
+        if not cfg : raise Error("cannot find PnCCD config for address %s" % src )
+
+        # get all frames
+        frames = []
+        numLinks = cfg.numLinks()
+        while True:
+            frames.append(obj)
+            if len(frames) >= numLinks : break
+            obj = obj.next(cfg)
+        
+        return pnccd.FrameV1( frames, cfg )
+
+    def _wrapPrincetonData(self, obj, typeId, typeVersion, src):
+        """ Wrapper method for Princeton data"""
+
+        cfg = self.m_env.getPrincetonConfig(address=src)
+        if not cfg : raise Error("cannot find Princeton config for address %s" % src )
+
+        return princeton.FrameV1( obj, cfg )
+
+    def _wrapCsPadQuads(self, obj, typeId, typeVersion, src):
+        """ Wrapper method for cspad data"""
+        
+        cfg = self.m_env.getConfig(typeId=xtc.TypeId.Type.Id_CspadConfig, address=src)
+        if not cfg : raise Error("cannot find CsPad config for address %s" % src )
+
+        # get all elements
+        quads = []
+        numQuads = cfg.numQuads()
+        while True:
+            quads.append(cspad.wrapElement(obj, cfg))
+            if len(quads) >= numQuads : break
+            obj = obj.next(cfg)
+        
+        # quads may be unordered in XTC, clients prefer them ordered
+        quads.sort(cmp = lambda x, y: cmp(x.quad(), y.quad()))
+        return quads
 
     def getAcqValue(self, address, channel, env):
         """ returns Acquiris data for specific detector and channel, 
@@ -205,22 +313,8 @@ class Event(object):
 
         xtcObj = self.findFirstXtc( typeId=xtc.TypeId.Type.Id_pnCCDframe, address=address )
         if not xtcObj : return None
-        frame = xtcObj.payload()
 
-        # get config object
-        cfg = env.getPnCCDConfig(address=xtcObj.src)
-        if not cfg : 
-            raise Error("cannot find PnCCD config for address %s" % xtcObj.src )
-
-        # get all frames
-        frames = []
-        numLinks = cfg.numLinks()
-        while True:
-            frames.append(frame)
-            if len(frames) >= numLinks : break
-            frame = frame.next(cfg)
-        
-        return pnccd.FrameV1( frames, cfg )
+        return self._wrapPnCcdData(xtcObj.payload(), xtcObj.contains.id(), xtcObj.contains.version(), xtcObj.src)
 
     def getPrincetonValue(self, address, env):
         """ returns Acquiris data for specific detector and channel, 
@@ -230,15 +324,9 @@ class Event(object):
 
         xtcObj = self.findFirstXtc( typeId=xtc.TypeId.Type.Id_PrincetonFrame, address=address )
         if not xtcObj : return None
-        obj = xtcObj.payload()
 
-        # get config object
-        cfg = env.getPrincetonConfig(address=xtcObj.src)
-        if not cfg : 
-            raise Error("cannot find Princeton config for address %s" % xtcObj.src )
+        return self._wrapPrincetonData(xtcObj.payload(), xtcObj.contains.id(), xtcObj.contains.version(), xtcObj.src)
 
-        return princeton.FrameV1( obj, cfg )
-    
     def getCsPadQuads(self, address, env):
         """ returns CsPadElement for specific address"""
         
@@ -246,27 +334,14 @@ class Event(object):
 
         xtcObj = self.findFirstXtc( typeId=xtc.TypeId.Type.Id_CspadElement, address=address )
         if not xtcObj : return None
-        quad = xtcObj.payload()
 
-        # get config object
-        cfg = env.getConfig(typeId=xtc.TypeId.Type.Id_CspadConfig, address=xtcObj.src)
-        if not cfg : 
-            raise Error("cannot find CsPad config for address %s" % xtcObj.src )
+        return self._wrapCsPadQuads(xtcObj.payload(), xtcObj.contains.id(), xtcObj.contains.version(), xtcObj.src)
 
-        # get all elements
-        quads = []
-        numQuads = cfg.numQuads()
-        while True:
-            quads.append(cspad.wrapElement(quad, cfg))
-            if len(quads) >= numQuads : break
-            quad = quad.next(cfg)
-        
-        # quads may be unordered in XTC, clients prefer them ordered
-        quads.sort(cmp = lambda x, y: cmp(x.quad(), y.quad()))
-        return quads
 
     def put(self, data, key):
-        """ Add user data to the event, key identifies the data """
+        """ Add user data to the event, key identifies the data. 
+        Key is usually a string but can have any type except integer type."""
+        
         self.m_userData[key] = data
 
 
@@ -486,6 +561,10 @@ class Env(object):
     def getAcqConfig(self, address=None):
         _log.debug("Env.getAcqConfig: %s", address)
         return self._getConfig(typeId=xtc.TypeId.Type.Id_AcqConfig, address=address)
+
+    def getGsc16aiConfig(self, address=None):
+        _log.debug("Env.getGsc16aiConfig: %s", address)
+        return self._getConfig(typeId=xtc.TypeId.Type.Id_Gsc16aiConfig, address=address)
 
     def getOpal1kConfig(self, address=None):
         _log.debug("Env.getOpal1kConfig: %s", address)
