@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_ENCODERDATAV1_H
-#define H5DATATYPES_ENCODERDATAV1_H
+#ifndef H5DATATYPES_GSC16AICONFIGV1_H
+#define H5DATATYPES_GSC16AICONFIGV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class EncoderDataV1.
+//	Class Gsc16aiConfigV1.
 //
 //------------------------------------------------------------------------
 
@@ -18,12 +18,11 @@
 // Base Class Headers --
 //----------------------
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/encoder/DataV1.hh"
+#include "pdsdata/gsc16ai/ConfigV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,29 +34,41 @@
 
 namespace H5DataTypes {
 
-class EncoderDataV1  {
+//
+// Helper type for Pds::Gsc16ai::ConfigV1
+//
+class Gsc16aiConfigV1  {
 public:
 
-  typedef Pds::Encoder::DataV1 XtcType ;
+  typedef Pds::Gsc16ai::ConfigV1 XtcType ;
 
-  // Default constructor
-  EncoderDataV1 () {}
-  EncoderDataV1 ( const XtcType& data ) ;
+  Gsc16aiConfigV1 () {}
+  Gsc16aiConfigV1 ( const XtcType& data ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
+  // store single config object at specified location
+  static void store( const XtcType& config, hdf5pp::Group location ) ;
+
+  static size_t xtcSize( const XtcType& xtc ) { return sizeof(xtc) ; }
 
 protected:
 
 private:
 
-  uint32_t _33mhz_timestamp;
-  uint32_t encoder_count;
+  uint16_t    _voltageRange;
+  uint16_t    _firstChan;
+  uint16_t    _lastChan;
+  uint16_t    _inputMode;
+  uint16_t    _triggerMode;
+  uint16_t    _dataFormat;
+  uint16_t    _fps;
+  int8_t      _autocalibEnable;
+  int8_t      _timeTagEnable;
 
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_ENCODERDATAV1_H
+#endif // H5DATATYPES_GSC16AICONFIGV1_H

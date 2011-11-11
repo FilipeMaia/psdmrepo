@@ -38,13 +38,13 @@
 namespace H5DataTypes {
 
 EncoderConfigV1::EncoderConfigV1 ( const Pds::Encoder::ConfigV1& data )
+  : chan_num(data._chan_num)
+  , count_mode(data._count_mode)
+  , quadrature_mode(data._quadrature_mode)
+  , input_num(data._input_num)
+  , input_rising(data._input_rising)
+  , ticks_per_sec(data._ticks_per_sec)
 {
-  m_data.chan_num = data._chan_num;
-  m_data.count_mode = data._count_mode;
-  m_data.quadrature_mode = data._quadrature_mode;
-  m_data.input_num = data._input_num;
-  m_data.input_rising = data._input_rising;
-  m_data.ticks_per_sec = data._ticks_per_sec;
 }
 
 hdf5pp::Type
@@ -71,12 +71,12 @@ EncoderConfigV1::native_type()
   quadModeEnumType.insert ( "END", Pds::Encoder::ConfigV1::quad_mode::END ) ;
 
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<EncoderConfigV1>() ;
-  confType.insert_native<uint32_t>( "chan_num", offsetof(EncoderConfigV1_Data,chan_num) ) ;
-  confType.insert( "count_mode", offsetof(EncoderConfigV1_Data,count_mode), countModeEnumType ) ;
-  confType.insert( "quadrature_mode", offsetof(EncoderConfigV1_Data,quadrature_mode), quadModeEnumType ) ;
-  confType.insert_native<uint32_t>( "input_num", offsetof(EncoderConfigV1_Data,input_num) ) ;
-  confType.insert_native<uint32_t>( "input_rising", offsetof(EncoderConfigV1_Data,input_rising) ) ;
-  confType.insert_native<uint32_t>( "ticks_per_sec", offsetof(EncoderConfigV1_Data,ticks_per_sec) ) ;
+  confType.insert_native<uint32_t>( "chan_num", offsetof(EncoderConfigV1, chan_num) ) ;
+  confType.insert( "count_mode", offsetof(EncoderConfigV1,count_mode), countModeEnumType ) ;
+  confType.insert( "quadrature_mode", offsetof(EncoderConfigV1,quadrature_mode), quadModeEnumType ) ;
+  confType.insert_native<uint32_t>( "input_num", offsetof(EncoderConfigV1, input_num) ) ;
+  confType.insert_native<uint32_t>( "input_rising", offsetof(EncoderConfigV1, input_rising) ) ;
+  confType.insert_native<uint32_t>( "ticks_per_sec", offsetof(EncoderConfigV1, ticks_per_sec) ) ;
 
   return confType ;
 }

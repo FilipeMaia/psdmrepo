@@ -38,15 +38,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::Encoder::ConfigV1
 //
-struct EncoderConfigV1_Data {
-  uint32_t chan_num;
-  uint32_t count_mode;
-  uint32_t quadrature_mode;
-  uint32_t input_num;
-  uint32_t input_rising;
-  uint32_t ticks_per_sec;
-};
-
 class EncoderConfigV1  {
 public:
 
@@ -65,7 +56,12 @@ public:
 
 private:
 
-  EncoderConfigV1_Data m_data ;
+  uint32_t chan_num;
+  uint32_t count_mode;
+  uint32_t quadrature_mode;
+  uint32_t input_num;
+  uint32_t input_rising;
+  uint32_t ticks_per_sec;
 
 };
 

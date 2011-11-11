@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-44
+2011-11-11 Andy Salnikov
+- added EncoderConfigV2 class
+- added Gsc16aiConfigV1 and Gsc16aiDataV1 classes
+- started work on FexampConfigV1 and FexampElementV1 but their
+  Pds classes are broken, so pausing until it gets fixed
+
 Tag: V00-00-43
 2011-10-03 Andy Salnikov
 - add protection for creating new dataset when dataset exists already,

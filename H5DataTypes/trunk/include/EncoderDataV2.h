@@ -35,11 +35,6 @@
 
 namespace H5DataTypes {
 
-struct EncoderDataV2_Data {
-  uint32_t _33mhz_timestamp;
-  uint32_t encoder_count[3];
-};
-
 class EncoderDataV2  {
 public:
 
@@ -58,7 +53,9 @@ protected:
 
 private:
 
-  EncoderDataV2_Data m_data ;
+  uint32_t _33mhz_timestamp;
+  uint32_t encoder_count[3];
+
 };
 
 } // namespace H5DataTypes

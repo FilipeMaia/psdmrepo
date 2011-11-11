@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_ENCODERDATAV1_H
-#define H5DATATYPES_ENCODERDATAV1_H
+#ifndef H5DATATYPES_FEXAMPELEMENTV1_H
+#define H5DATATYPES_FEXAMPELEMENTV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class EncoderDataV1.
+//	Class FexampElementV1.
 //
 //------------------------------------------------------------------------
 
@@ -18,12 +18,11 @@
 // Base Class Headers --
 //----------------------
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "hdf5pp/Group.h"
-#include "pdsdata/encoder/DataV1.hh"
+#include "hdf5pp/Type.h"
+#include "pdsdata/fexamp/ElementV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,29 +34,39 @@
 
 namespace H5DataTypes {
 
-class EncoderDataV1  {
+//
+// Helper class for Pds::Fexamp::ElementV1
+//
+class FexampElementV1  {
 public:
 
-  typedef Pds::Encoder::DataV1 XtcType ;
+  typedef Pds::Fexamp::ElementV1 XtcType ;
+  typedef Pds::Fexamp::ConfigV1 ConfigXtcType ;
 
-  // Default constructor
-  EncoderDataV1 () {}
-  EncoderDataV1 ( const XtcType& data ) ;
+  FexampElementV1 () {}
+  FexampElementV1(const XtcType& data, const ConfigXtcType& config) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
-
-protected:
+  static hdf5pp::Type stored_data_type() ;
+  static hdf5pp::Type cmode_data_type() ;
 
 private:
 
-  uint32_t _33mhz_timestamp;
-  uint32_t encoder_count;
+  uint32_t m_seq_count;
+  uint32_t m_tid;
+  uint16_t m_acq_count;
+  uint8_t m_virtual_channel;
+  uint8_t m_lane;
+  uint8_t m_op_code;
+  uint8_t m_elementId;
+  uint8_t m_frame_type;
+  uint32_t m_penultimateWord;
+  uint32_t m_ultimateWord;
 
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_ENCODERDATAV1_H
+#endif // H5DATATYPES_FEXAMPELEMENTV1_H
