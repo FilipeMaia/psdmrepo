@@ -56,6 +56,50 @@ private:
   uint32_t	_ticks_per_sec;
 };
 
+/** @class ConfigV2
+
+  
+*/
+
+
+class ConfigV2 {
+public:
+  enum {
+    Version = 2 /**< XTC type version number */
+  };
+  enum {
+    TypeId = Pds::TypeId::Id_EncoderConfig /**< XTC type ID value (from Pds::TypeId class) */
+  };
+  enum count_mode_type {
+    WRAP_FULL,
+    LIMIT,
+    HALT,
+    WRAP_PRESET,
+    COUNT_END,
+  };
+  enum quad_mode {
+    CLOCK_DIR,
+    X1,
+    X2,
+    X4,
+    QUAD_END,
+  };
+  uint32_t chan_mask() const {return _chan_mask;}
+  uint32_t count_mode() const {return _count_mode;}
+  uint32_t quadrature_mode() const {return _quadrature_mode;}
+  uint32_t input_num() const {return _input_num;}
+  uint32_t input_rising() const {return _input_rising;}
+  uint32_t ticks_per_sec() const {return _ticks_per_sec;}
+  static uint32_t _sizeof()  {return 24;}
+private:
+  uint32_t	_chan_mask;
+  uint32_t	_count_mode;
+  uint32_t	_quadrature_mode;
+  uint32_t	_input_num;
+  uint32_t	_input_rising;
+  uint32_t	_ticks_per_sec;
+};
+
 /** @class DataV1
 
   
