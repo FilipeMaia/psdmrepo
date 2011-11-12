@@ -370,29 +370,47 @@ Start with selecting data of interest to you from list on the left and general r
     def waveform_tab(self, mod, remove=False):
         """Would be better if this was a subtab
         """
-        #tabname = "%s"%mod.address
+        # We have one tab and several widgets (one for each waveform device)
         tabname = "Waveforms"
+        widgetname = "%s"%mod.address
 
+        # tabs tally only keeps tracks of tabs
         if tabname in self.cfg_tabs_tally:
+            print "A"
             index = self.cfg_tabs_tally[ tabname ]
             self.cfg_tabs.setCurrentIndex(index)
-            wf_widget = self.cfg_tabs.currentWidget()
-            wf_widget.add_module(mod)
+            wf_tab = self.cfg_tabs.currentWidget()
+
             if remove:
-                self.cfg_tabs.removeTab(index)
-                del self.cfg_tabs_tally[tabname]
-            return
+                print "B Remove"
+                if widgetname in wf_tab.modules_connected:
+                    # if it's already there, remove it? 
+                    wf_tab.modules_connected[widgetname].groupbox.setChecked(False)
 
-        wf_widget = panels.WaveformConfigGui(self,title=tabname)
-        wf_widget.add_module(mod)
-        self.connect( wf_widget.apply_button,
-                      QtCore.SIGNAL('clicked()'), self.update_pyana_tab )
+                if len(wf_tab.modules_connected)<1:
+                    self.cfg_tabs.removeTab(index)
+                    del self.cfg_tabs_tally[tabname]
 
-        num = self.cfg_tabs.addTab(wf_widget,tabname)
-        self.cfg_tabs_tally[tabname] = num
-        #print "general tab tally: ",self.cfg_tabs_tally
-        self.cfg_tabs.setCurrentWidget(wf_widget)
+            else :
+                print "B Add"
+                # add it
+                if widgetname not in wf_tab.modules_connected:
+                    wf_tab.add_module(mod)
 
+
+        else:
+            print "C"
+            wf_tab = panels.WaveformConfigGui(self,title=tabname)
+            wf_tab.add_module(mod)
+            self.connect( wf_tab.apply_button,
+                          QtCore.SIGNAL('clicked()'), self.update_pyana_tab )
+
+            num = self.cfg_tabs.addTab(wf_tab,tabname)
+            self.cfg_tabs_tally[tabname] = num
+            #print "general tab tally: ",self.cfg_tabs_tally
+            self.cfg_tabs.setCurrentWidget(wf_tab)
+
+        return
                 
     
     def image_tab(self, mod, remove=False):

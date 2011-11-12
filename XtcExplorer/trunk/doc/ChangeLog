@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Nov-11 ofte V00-01-13       rev 2625
+        - some more tuning, and a tag
+	
 2011-Nov-11 ofte                  rev 2624
         - waveform interface for explorernew is on the way
 	

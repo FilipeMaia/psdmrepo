@@ -559,24 +559,45 @@ class WaveformConfigSubGui( QtGui.QWidget ):
         sub_layout = QtGui.QVBoxLayout(self)
 
         ## title
-        title = "%s"%module.address
+        self.title = "%s"%module.address
 
         ## how many channels?
         nch = int(self.parent.moreinfo["DetInfo:%s"%module.address][0].split(' ')[0])
 
         ## Group of checkboxes
-        groupbox = QtGui.QGroupBox(title)
-        groupbox.setGeometry(QtCore.QRect(30,30,200,200))
-        #groupbox.setMinimumHeight(60)
-        groupbox.setCheckable(True)
+        self.groupbox = QtGui.QGroupBox(self.title)
+        self.groupbox.setGeometry(QtCore.QRect(30,30,200,200))
+        #self.groupbox.setMinimumHeight(60)
+        self.groupbox.setCheckable(True)
+
+        def do_something():
+            print self.sender().text()
+            #print "what would parent do?"
+            #print parent
 
         checkbox_ch = []
         for ch in xrange (nch):
-            checkbox_ch.append( QtGui.QCheckBox("Ch %d"%(ch), groupbox ) )
-            checkbox_ch[ch].setGeometry(QtCore.QRect(30,60+10*ch,100,21))
-            checkbox_ch[ch].setChecked(True)
-            
-        sub_layout.addWidget(groupbox)
+            # Checkbox group for this channel
+            chgr_ch = QtGui.QGroupBox("Ch %d"%(ch), self.groupbox)
+            chgr_ch.setGeometry(QtCore.QRect(30,30,300,80))
+            chgr_ch.setFlat(True)
+
+            chgr_ch_layout = QtGui.QHBoxLayout(chgr_ch)
+            chgr_ch.setCheckable(True)
+            parent.connect(chgr_ch, QtCore.SIGNAL('stateChanged(int)'),do_something )
+
+            checkbox_avg = QtGui.QCheckBox("average")
+            parent.connect(checkbox_avg, QtCore.SIGNAL('stateChanged(int)'),do_something )
+
+            checkbox_stack = QtGui.QCheckBox("stack")
+            parent.connect(checkbox_stack, QtCore.SIGNAL('stateChanged(int)'),do_something )
+
+            chgr_ch_layout.addStretch()
+            chgr_ch_layout.addWidget(checkbox_avg)
+            chgr_ch_layout.addWidget(checkbox_stack)
+
+                        
+        sub_layout.addWidget(self.groupbox)
 
 
 class WaveformConfigGui( QtGui.QWidget ):
@@ -587,8 +608,11 @@ class WaveformConfigGui( QtGui.QWidget ):
         self.setGeometry(QtCore.QRect(20,20,800,800))
         self.parent = parent
 
-        panel_layout = QtGui.QVBoxLayout(self)
+        # to keep track
+        self.modules_connected = {}
 
+        panel_layout = QtGui.QVBoxLayout(self)
+        
         self.modconf_layout = QtGui.QVBoxLayout()
         self.apply_button = QtGui.QPushButton()
         self.apply_button.setGeometry(QtCore.QRect(470,420,96,30))
@@ -603,6 +627,9 @@ class WaveformConfigGui( QtGui.QWidget ):
 
         sub = WaveformConfigSubGui(parent=self.parent, module=module)
         self.modconf_layout.addWidget(sub)
+
+        # add it to our dictionary to keep track
+        self.modules_connected[module.address]=sub
         
         
 
