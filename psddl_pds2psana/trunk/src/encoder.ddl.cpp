@@ -40,6 +40,37 @@ uint32_t ConfigV1::input_num() const { return m_xtcObj->input_num(); }
 uint32_t ConfigV1::input_rising() const { return m_xtcObj->input_rising(); }
 
 uint32_t ConfigV1::ticks_per_sec() const { return m_xtcObj->ticks_per_sec(); }
+Psana::Encoder::ConfigV2::count_mode_type pds_to_psana(PsddlPds::Encoder::ConfigV2::count_mode_type e)
+{
+  return Psana::Encoder::ConfigV2::count_mode_type(e);
+}
+
+Psana::Encoder::ConfigV2::quad_mode pds_to_psana(PsddlPds::Encoder::ConfigV2::quad_mode e)
+{
+  return Psana::Encoder::ConfigV2::quad_mode(e);
+}
+
+ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Encoder::ConfigV2()
+  , m_xtcObj(xtcPtr)
+{
+}
+ConfigV2::~ConfigV2()
+{
+}
+
+
+uint32_t ConfigV2::chan_mask() const { return m_xtcObj->chan_mask(); }
+
+uint32_t ConfigV2::count_mode() const { return m_xtcObj->count_mode(); }
+
+uint32_t ConfigV2::quadrature_mode() const { return m_xtcObj->quadrature_mode(); }
+
+uint32_t ConfigV2::input_num() const { return m_xtcObj->input_num(); }
+
+uint32_t ConfigV2::input_rising() const { return m_xtcObj->input_rising(); }
+
+uint32_t ConfigV2::ticks_per_sec() const { return m_xtcObj->ticks_per_sec(); }
 DataV1::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Encoder::DataV1()
   , m_xtcObj(xtcPtr)

@@ -37,6 +37,7 @@
 #include "psddl_pds2psana/epics.ddl.h"
 #include "psddl_pds2psana/evr.ddl.h"
 #include "psddl_pds2psana/fccd.ddl.h"
+#include "psddl_pds2psana/gsc16ai.ddl.h"
 #include "psddl_pds2psana/ipimb.ddl.h"
 #include "psddl_pds2psana/lusi.ddl.h"
 #include "psddl_pds2psana/opal1k.ddl.h"
@@ -349,6 +350,11 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
   case Pds::TypeId::Id_SharedPim:
     if (version == 1) ::storeDataProxy<Bld::BldDataPimV1>(xtc, evt);
     break;
+  case Pds::TypeId::Id_Gsc16aiConfig:
+    break;
+  case Pds::TypeId::Id_Gsc16aiData:
+    if (version == 1) ::storeDataProxyCfg<Gsc16ai::DataV1, PsddlPds::Gsc16ai::ConfigV1>(xtc, evt, cfgStore);
+    break;
   case Pds::TypeId::NumberOf:
     break;
 
@@ -437,6 +443,7 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     break;
   case Pds::TypeId::Id_EncoderConfig:
     if (version == 1) ::storeCfgObject<Encoder::ConfigV1>(xtc, cfgStore);
+    if (version == 2) ::storeCfgObject<Encoder::ConfigV2>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_EvrIOConfig:
     if (version == 1) ::storeCfgObject<EvrData::IOConfigV1>(xtc, cfgStore);
@@ -481,6 +488,11 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
   case Pds::TypeId::Id_Cspad2x2Element:
     break;
   case Pds::TypeId::Id_SharedPim:
+    break;
+  case Pds::TypeId::Id_Gsc16aiConfig:
+    if (version == 1) ::storeCfgObject<Gsc16ai::ConfigV1>(xtc, cfgStore);
+    break;
+  case Pds::TypeId::Id_Gsc16aiData:
     break;
   case Pds::TypeId::NumberOf:
     break;

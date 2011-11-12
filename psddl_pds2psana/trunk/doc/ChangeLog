@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-06
+2011-11-12 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-14
+- new data types added to XtcConverter
+
 Tag: V00-01-05
 2011-10-05 Andy Salnikov
 - PSEnv::EpicsStore interface has changed to support multi-source

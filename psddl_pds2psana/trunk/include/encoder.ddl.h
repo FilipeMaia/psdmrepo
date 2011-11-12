@@ -28,6 +28,24 @@ private:
 };
 
 
+class ConfigV2 : public Psana::Encoder::ConfigV2 {
+public:
+  typedef PsddlPds::Encoder::ConfigV2 XtcType;
+  typedef Psana::Encoder::ConfigV2 PsanaType;
+  ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~ConfigV2();
+  virtual uint32_t chan_mask() const;
+  virtual uint32_t count_mode() const;
+  virtual uint32_t quadrature_mode() const;
+  virtual uint32_t input_num() const;
+  virtual uint32_t input_rising() const;
+  virtual uint32_t ticks_per_sec() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
+
 class DataV1 : public Psana::Encoder::DataV1 {
 public:
   typedef PsddlPds::Encoder::DataV1 XtcType;
