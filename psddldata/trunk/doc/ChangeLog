@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-14
+2011-11-12 Andrei Salnikov
+- new class encoder.ConfigV2
+- new package gsc16ai with two classes ConfigV1 and DataV1
+
 Tag: V00-00-13
 2011-10-04 Andrei Salnikov
 - CsPad.Element image data type changed from uint16_t to int16_t,
