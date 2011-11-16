@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-37
+2011-11-16 Igor Gaponenko
+- SQL schema changed in the Data Migration table to allow registering files which are
+ready to be migrated but which haven't been tried (to be migrated) yet.
+
 Tag: V00-00-36
 2011-10-28 Igor Gaponenko
 - changed a bug in the newely introduced schema
