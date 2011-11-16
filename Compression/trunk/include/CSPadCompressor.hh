@@ -49,6 +49,11 @@ namespace Pds {
                 size_t width;   // 1..
                 size_t height;  // 1..
                 size_t depth;   // bytes per pixel
+                enum {
+                    MinWidth  = 1, MaxWidth  = 0,  /* 1..unlimited */
+                    MinHeight = 1, MaxHeight = 0,  /* 1..unlimited */
+                    MinDepth  = 2, MaxDepth  = 2   /* exactly 2 bytes */
+                };
             };
 
             enum {

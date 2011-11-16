@@ -3,6 +3,9 @@
  */
 
 #include "Compression/CSPadCompressor.hh"
+#include "Compression/CompressorMT.hh"
+#include "Compression/StreamCompressor.hh"
+
 #include "XtcInput/XtcDgIterator.h"
 
 using namespace Pds::Codec;
@@ -25,11 +28,11 @@ namespace {
     public:
 
         CompressionTest( size_t       reclen,
+                         unsigned int num_threads,
                          unsigned int num_iter_per_image ) :
 
-            m_compressor        (new CSPadCompressor()),
-            m_num_iter_per_image(num_iter_per_image),
-            m_reclen            (reclen)
+            m_compressor        (new StreamCompressor<CSPadCompressor,CompressorMT>( reclen, num_threads )),
+            m_num_iter_per_image(num_iter_per_image)
         {}
 
         virtual ~CompressionTest()
@@ -40,7 +43,6 @@ namespace {
         bool run( const char*  infilename,
                   const char*  outfilename,
                   unsigned int first_dgram_num,
-                  bool         shift_by_byte,
                   bool         stats,
                   bool         test,
                   bool         verbose )
@@ -72,8 +74,8 @@ namespace {
 
                 if( dgram_num++ < first_dgram_num ) continue;
 
-                char* payload = dgram->xtc.payload();
-                int payload_size = dgram->xtc.sizeofPayload();
+                const void* inData     = (const void*)(dgram->xtc.payload());
+                size_t      inDataSize = dgram->xtc.sizeofPayload();
 
                 if( verbose ) {
                     cout << "\n"
@@ -81,69 +83,40 @@ namespace {
                          << "*************************** DATAGRAM: " << setw(6) << setfill(' ') << (dgram_num - 1) << " ***************************\n"
                          << "************************************************************************\n"
                          << "\n"
-                         << "payload_size: " << payload_size << " Bytes\n";
+                         << "inDataSize: " << inDataSize << " Bytes\n";
                 }
+                
+                void*  outData        = 0;
+                size_t outDataSize    = 0;
+                int*   outSegmentStat = 0;
+                size_t outNumSegments = 0;
 
-                size_t num_left = payload_size / sizeof(unsigned short) - ( shift_by_byte ? 1 : 0 );
-                unsigned short* inbuf = (unsigned short*)( shift_by_byte ? payload + 1 : payload );
-
-                unsigned int segment_num = 0;
-
-                while( num_left ) {
-
-
-                    // Use the specified segment size if it's not zero and if there is enough
-                    // data left for at least 2 segment. Otherwise compress what ever is left.
-                    //
-                    size_t num_read = m_reclen && ( num_left / m_reclen >= 2 ) ? m_reclen : num_left;
-
-                    if( verbose ) {
-                        cout << "\n"
-                             << "*************************** SEGMENT:  " << setw(6) << setfill(' ') << (segment_num++) << " ***************************\n"
-                             << "\n"
-                             << "segment_size: " << num_read * sizeof(unsigned short) << " Bytes\n";
+                for( unsigned int i = 0; i < m_num_iter_per_image; ++i ) {
+                    const int status = m_compressor->compress( inData, inDataSize,
+                                                               outData, outDataSize, outSegmentStat, outNumSegments );
+                    if( status ) {
+                        cerr << "compression failed with error status " << status << ": " << m_compressor->err2str( status ) << endl;
+                        return false;
                     }
-
-                    CSPadCompressor::ImageParams params;
-                    params.width  = num_read;
-                    params.height = 1;
-                    params.depth  = 2;
-
-                    void* outData  = 0;
-                    size_t outDataSize = 0;
-
-                    for( unsigned int i = 0; i < m_num_iter_per_image; ++i ) {
-                        const int stat = m_compressor->compress( inbuf, params, outData, outDataSize );
-                        if( stat ) {
-                            cerr << "compression failed with erro status: " << stat << endl;
-                            return false;
-                        }
-                    }
-                    if( outfile ) {
-                        if( outDataSize != fwrite( outData, sizeof(unsigned char), outDataSize, outfile )) {
-                            if( ferror( outfile )) cerr << "failed to write into the output file due to: " << last_error() << endl;
-                            else                   cerr << "unknown error when writing into the output file" << endl;
-                                return false;
-                        }
-                    }
-                    if( verbose ) {
-                        double compression =  1.0 * outDataSize / ( sizeof(unsigned short) * num_read );
-                        cout << setprecision(4) << "image compression: " << compression << "  (" << outDataSize << "/" << ( sizeof(unsigned short) * num_read ) << ")\n";
-                        m_compressor->dump( cout, outData, outDataSize );
-                    }
-                    if( stats ) {
-                        total_bytes_read       += sizeof(unsigned short) * num_read;
-                        total_bytes_compressed += outDataSize;
-                    }
-                    if( test )
-                        if( !this->test( params, outData, outDataSize ))
-                            return false;
-
-                    // Move to the next segment (if any)
-                    //
-                    num_left -= num_read;
-                    inbuf    += num_read;
                 }
+                if( outfile ) {
+                    if( outDataSize != fwrite( outData, sizeof(unsigned char), outDataSize, outfile )) {
+                        if( ferror( outfile )) cerr << "failed to write into the output file due to: " << last_error() << endl;
+                        else                   cerr << "unknown error when writing into the output file" << endl;
+                            return false;
+                    }
+                }
+                if( verbose ) {
+                    double compression =  1.0 * outDataSize / inDataSize;
+                    cout << setprecision(4) << "image compression: " << compression << "  (" << outDataSize << "/" << inDataSize << ")\n";
+                }
+                if( stats ) {
+                    total_bytes_read       += inDataSize;
+                    total_bytes_compressed += outDataSize;
+                }
+                if( test )
+                    if( !this->test( inData, inDataSize, outData, outDataSize, outNumSegments ))
+                        return false;
             }
 
             struct timespec end;
@@ -172,38 +145,47 @@ namespace {
             return "failed to obtain error information";
         }
 
-        bool test( const CSPadCompressor::ImageParams& expected_params, void* outData, size_t outDataSize )
+        bool test( const void*  inDataExpected, size_t  inDataSizeExpected,
+                         void* outData,         size_t outDataSize,         size_t outNumSegments )
         {
-            void* image = 0;
-            CSPadCompressor::ImageParams params;
-            const int status = m_compressor->decompress( outData, outDataSize, image, params );
-            if( 0 != status ) {
-                cerr << "test failed: status=" << status << endl;
+            void*  inData        = 0;
+            size_t inDataSize    = 0;
+            int*   inSegmentStat = 0;
+            size_t inNumSegments = 0;
+
+            const int status = m_compressor->decompress( outData, outDataSize,
+                                                          inData,  inDataSize, inSegmentStat, inNumSegments );
+            if( status ) {
+                cerr << "decompression failed with error status " << status << ": " << m_compressor->err2str( status ) << endl;
                 return false;
             }
-            if(( expected_params.width  != params.width  ) ||
-               ( expected_params.height != params.height ) ||
-               ( expected_params.depth  != params.depth  )) {
-                cerr << "test failed: image parameters missmatch after decompression" << endl;
+            if( inDataSizeExpected != inDataSize ) {
+                cerr << "test failed: data size missmatch after decompression, got " << inDataSize << " instead of " << inDataSizeExpected << endl;
                 return false;
+            }
+            if( outNumSegments != inNumSegments ) {
+                cerr << "test failed: number of segments missmatch after decompression, got " << inNumSegments << " instead of " << outNumSegments << endl;
+                return false;
+            }
+            for( size_t i = 0; i < inDataSizeExpected; ++i ) {
+                if(((char*)inDataExpected)[i] != ((char*)inData)[i] ) {
+                    cerr << "test failed: data missmatch at byte position " << i << " after decompression, got " << ((char*)inData)[i] << " instead of " <<  ((char*)inDataExpected)[i]  << endl;
+                    return false;
+                }
             }
             return true;
         }
 
     private:
 
-        CSPadCompressor* m_compressor;
-        unsigned int     m_num_iter_per_image;
-
-        size_t  m_reclen;  // the preferred segment length (in 16-bit words). If set
-                           // to 0 then the input buffer is compressed as a whole w/o
-                           // splitting it into segments.
+        StreamCompressor<CSPadCompressor,CompressorMT>* m_compressor;
+        unsigned int m_num_iter_per_image;
     };
 
     void usage( const char* msg=0)
     {
         if( msg ) cerr << msg << "\n";
-        cerr << "usage: <infile> [-o <outfile>] [-f <first_dgram_num>] [-b] [-r <reclen_shorts>] [-i <num_iter_per_image>] [-s] [-t] [-v]" << endl;
+        cerr << "usage: <infile> [-o <outfile>] [-f <first_dgram_num>] [-r <reclen_shorts>] [-p <num_threads>] [-i <num_iter_per_image>] [-s] [-t] [-v]" << endl;
     }
 }
 
@@ -218,11 +200,11 @@ main( int argc, char* argv[] )
     const char*  infilename         = *(argsPtr++); --numArgs;
     char*        outfilename        = 0;
     unsigned int first_dgram_num    = 0;
-    bool         shift_by_byte      = false;
     size_t       reclen             = 0;
     bool         stats              = false;
     bool         test               = false;
     bool         verbose            = false;
+    unsigned int num_threads        = 0;
     unsigned int num_iter_per_image = 1;
 
     while( numArgs ) {
@@ -234,14 +216,17 @@ main( int argc, char* argv[] )
             const char* val = *(argsPtr++); --numArgs;
             if( 1 != sscanf( val, "%u", &first_dgram_num ))   { ::usage( "failed to translate a value of <first_dgram_num>" ); return 1; }
 
-        } else if( !strcmp( opt, "-b" )) {
-            shift_by_byte = true;
-
         } else  if( !strcmp( opt, "-r" )) {
             if( !numArgs )                                     { ::usage( "record value isn't following the option" );        return 1; }
             const char* val = *(argsPtr++); --numArgs;
             if( 1 != sscanf( val, "%lu", &reclen ))            { ::usage( "failed to translate a value of <reclen_shorts>" ); return 1; }
             if( reclen == 0 )                                  { ::usage( "<reclen_shorts> parameter can't be 0" );           return 1; }
+            reclen *= sizeof(unsigned short);
+
+        } else if( !strcmp( opt, "-p" )) {
+            if( !numArgs )                                     { ::usage( "number of threads value isn't following the option" );   return 1; }
+            const char* val = *(argsPtr++); --numArgs;
+            if( 1 != sscanf( val, "%u", &num_threads ))        { ::usage( "failed to translate a value of <num_threads>" );         return 1; }
 
         } else if( !strcmp( opt, "-i" )) {
             if( !numArgs )                                     { ::usage( "iteration number value isn't following the option" );   return 1; }
@@ -266,9 +251,7 @@ main( int argc, char* argv[] )
     }
     if( numArgs )                                              { ::usage( "illegal number of parameters" );                    return 1; }
 
-    printf( "reading records of %lu short numbers\n", reclen );
+    ::CompressionTest ct( reclen, num_threads, num_iter_per_image );
 
-    ::CompressionTest ct( reclen, num_iter_per_image );
-
-    return ct.run( infilename, outfilename, first_dgram_num, shift_by_byte, stats, test, verbose ) ? 0 : 1;
+    return ct.run( infilename, outfilename, first_dgram_num, stats, test, verbose ) ? 0 : 1;
 }

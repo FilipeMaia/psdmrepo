@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2011-11-15 Igor Gaponenko
+- fixed bugs in the MT wrapper
+- added StreamCompresor wrapper (which still needs to be optimized for
+the best performance)
+
 Tag: V00-00-05
 2011-11-10 Igor Gaponenko
 - minor reimplementation of the multi-threaded wrapper in order to get rid of

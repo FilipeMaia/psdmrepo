@@ -13,6 +13,11 @@
 //   Igor A. Gaponenko, SLAC National Accelerator Laboratory
 //--------------------------------------------------------------------------
 
+// DEBUG NOTE: Please, uncomment the following line to see the diagnostic
+//             print outs of the alforithm.
+//
+//#define PDS_CODEC_COMPRESSORMT_DEBUG
+
 //-----------------
 // C/C++ Headers --
 //-----------------
@@ -20,6 +25,11 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <assert.h>
+
+#ifdef PDS_CODEC_COMPRESSORMT_DEBUG
+#include <iostream>
+#include <iomanip>
+#endif
 
 //----------------------
 // Base Class Headers --
@@ -57,6 +67,7 @@ namespace Pds {
                 // Status values returned by algorithms
                 //
                 ErrStartThreads,       // failed to start threads
+                ErrStopThreads,        // failed to stop threads
                 ErrWrongThreadStatus,  // threads didn't finish processing the previous request (implementation bug)
                 ErrInAlgorithm         // failed to process at least least one of the images in a batch
             };
@@ -89,6 +100,8 @@ namespace Pds {
                                   int* stat,
                                   size_t numImages);
 
+            bool stop_threads();
+
             bool start_threads();
 
             static void* processor(void* arg);
@@ -118,22 +131,22 @@ namespace Pds {
 
             struct ThreadData {
 
-                explicit ThreadData(size_t max_images2process) :
+                ThreadData() :
 
                     num_images(0),
-                    image_idx (new size_t[max_images2process]),
+                    image_idx (0),
 
                     operation (RESERVED),
 
-                    compressor(new COMPRESSOR*[max_images2process]),
+                    compressor(0),
 
-                    image  (new void*[max_images2process]),
-                    params (new typename COMPRESSOR::ImageParams[max_images2process]),
+                    image  (0),
+                    params (0),
 
-                    outData    (new void* [max_images2process]),
-                    outDataSize(new size_t[max_images2process]),
+                    outData    (0),
+                    outDataSize(0),
 
-                    stat(new int[max_images2process]),
+                    stat(0),
 
                     hasWork2do      (false),
                     numActiveThreads(0),
@@ -146,6 +159,11 @@ namespace Pds {
 
                 ~ThreadData()
                 {
+                    reset();
+                }
+
+                void reset()
+                {
                     delete [] image_idx;   image_idx   = 0;
                     delete [] compressor;  compressor  = 0;
                     delete [] image;       image       = 0;
@@ -153,6 +171,19 @@ namespace Pds {
                     delete [] outData;     outData     = 0;
                     delete [] outDataSize; outDataSize = 0;
                     delete [] stat;        stat        = 0;
+                }
+
+                void resize(size_t max_images2process) {
+
+                    reset();
+
+                    image_idx   = new                           size_t[max_images2process];
+                    compressor  = new                      COMPRESSOR*[max_images2process];
+                    image       = new                            void*[max_images2process];
+                    params      = new typename COMPRESSOR::ImageParams[max_images2process];
+                    outData     = new                           void* [max_images2process];
+                    outDataSize = new                           size_t[max_images2process];
+                    stat        = new                              int[max_images2process];
                 }
 
                 pthread_t id;
@@ -181,7 +212,6 @@ namespace Pds {
                 pthread_cond_t*  finished_processing_cv;
 
             private:
-                ThreadData();
                 ThreadData& operator=(const ThreadData&);
             };
             ThreadData** m_thread_data;
@@ -206,25 +236,37 @@ Pds::Codec::CompressorMT<COMPRESSOR>::CompressorMT(size_t numThreads) :
     pthread_cond_init ( &m_data_ready_cv, NULL);
     pthread_cond_init ( &m_finished_processing_cv, NULL);
 
-    this->allocate_thread_data();
+    m_thread_data = new ThreadData*[m_numThreads];
+    for( size_t i = 0; i < m_numThreads; ++i ) {
+
+        m_thread_data[i] = new ThreadData();
+
+        m_thread_data[i]->numActiveThreads       = &m_numActiveThreads;
+        m_thread_data[i]->guard_mutex            = &m_guard_mutex;
+        m_thread_data[i]->data_ready_cv          = &m_data_ready_cv;
+        m_thread_data[i]->finished_processing_cv = &m_finished_processing_cv;
+
+        m_thread_data[i]->resize( m_maxImagesPerThread );
+    }
 }
 
 template< class COMPRESSOR >
 Pds::Codec::CompressorMT<COMPRESSOR>::~CompressorMT()
 {
-    if(m_threadsStarted) {
-        for( size_t i = 0; i < m_numThreads; ++i )
-            pthread_cancel( m_thread_data[i]->id );
-        pthread_mutex_destroy( &m_guard_mutex );
-        pthread_cond_destroy ( &m_data_ready_cv );
-        pthread_cond_destroy ( &m_finished_processing_cv );
-    }
+    this->stop_threads();
+
+    for( size_t i = 0; i < m_numThreads; ++i ) delete m_thread_data[i];
+    delete [] m_thread_data;
+    m_thread_data = 0;
+
     if( 0 != m_compressor ) {
         for( size_t i = 0; i < m_numImages; ++i ) delete m_compressor[i];
         delete [] m_compressor;
         m_compressor = 0;
     }
-    this->delete_thread_data();
+    pthread_mutex_destroy( &m_guard_mutex );
+    pthread_cond_destroy ( &m_data_ready_cv );
+    pthread_cond_destroy ( &m_finished_processing_cv );
 }
 
 template< class COMPRESSOR >
@@ -259,31 +301,6 @@ Pds::Codec::CompressorMT<COMPRESSOR>::decompress(
         numImages);
 }
 
-
-template< class COMPRESSOR >
-void
-Pds::Codec::CompressorMT<COMPRESSOR>::delete_thread_data()
-{
-    for( size_t i = 0; i < m_numThreads; ++i ) delete m_thread_data[i];
-    delete [] m_thread_data;
-    m_thread_data = 0;
-}
-
-
-template< class COMPRESSOR >
-void
-Pds::Codec::CompressorMT<COMPRESSOR>::allocate_thread_data()
-{
-    m_thread_data = new ThreadData*[m_numThreads];
-    for( size_t i = 0; i < m_numThreads; ++i ) {
-        m_thread_data[i] = new ThreadData( m_maxImagesPerThread );
-        m_thread_data[i]->numActiveThreads       = &m_numActiveThreads;
-        m_thread_data[i]->guard_mutex            = &m_guard_mutex;
-        m_thread_data[i]->data_ready_cv          = &m_data_ready_cv;
-        m_thread_data[i]->finished_processing_cv = &m_finished_processing_cv;
-    }
-}
-
 template< class COMPRESSOR >
 int
 Pds::Codec::CompressorMT<COMPRESSOR>::implement_request(
@@ -303,9 +320,9 @@ Pds::Codec::CompressorMT<COMPRESSOR>::implement_request(
     size_t maxImagesPerThread = numImages < m_numThreads ? m_numThreads : (numImages + 1) / m_numThreads;
 
     if( maxImagesPerThread > m_maxImagesPerThread ) {
-        this->delete_thread_data();
         m_maxImagesPerThread = maxImagesPerThread;
-        this->allocate_thread_data();
+        for( size_t i = 0; i < m_numThreads; ++i )
+            m_thread_data[i]->resize( m_maxImagesPerThread );
     }
 
     // Expand the list of compressors if needed
@@ -418,6 +435,17 @@ Pds::Codec::CompressorMT<COMPRESSOR>::implement_request(
 
 template< class COMPRESSOR >
 bool
+Pds::Codec::CompressorMT<COMPRESSOR>::stop_threads()
+{
+    if( m_threadsStarted ) {
+        m_threadsStarted = false;
+        for( size_t i = 0; i < m_numThreads; ++i ) pthread_cancel( m_thread_data[i]->id );
+    }
+    return true;
+}
+
+template< class COMPRESSOR >
+bool
 Pds::Codec::CompressorMT<COMPRESSOR>::start_threads()
 {
     if( !m_threadsStarted ) {
@@ -501,6 +529,7 @@ Pds::Codec::CompressorMT<COMPRESSOR>::err2str(int code)
     case Success:              return "Success";
     case ErrNoImages:          return "No images to process";
     case ErrStartThreads:      return "Failed to start threads";
+    case ErrStopThreads:       return "Failed to stop threads";
     case ErrWrongThreadStatus: return "Threads didn't finish processing the previous request (implementation bug)";
     case ErrInAlgorithm:       return "Failed to process at least least one of the images in a batch";
     }
