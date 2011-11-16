@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-02-NeoCaptar
+2011-11-16 Igor Gaponenko
+- added new application NeoCaptar; the project is yet to be completed
+- the tag is created to save the status of teh on-going development before migrating from Eclipse
+to NetBeans IDE
+
 Tag: V00-01-01
 2011-09-20 Igor Gaponenko
 - implemented message deletion. Note, that  this operation requires to extend

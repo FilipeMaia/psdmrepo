@@ -183,8 +183,10 @@ try {
      */
     $first_run = $experiment->find_first_run();
     $last_run  = $experiment->find_last_run();
-    if( is_null( $range_of_runs )) {
-        $range_of_runs = ( is_null($first_run) || is_null( $last_run )) ? '0-0' : $first_run->num().'-'.$last_run->num();
+
+    $effective_range_of_runs = $range_of_runs;
+    if( is_null( $effective_range_of_runs )) {
+        $effective_range_of_runs = ( is_null($first_run) || is_null( $last_run )) ? '0-0' : $first_run->num().'-'.$last_run->num();
     }
 
     /* Build two structures:
@@ -196,7 +198,7 @@ try {
     $files    = array();
     foreach( $types as $type ) {
         $runs = null;
-        FileMgrIrodsWs::runs( $runs, $instrument->name(), $experiment->name(), $type, $range_of_runs );
+        FileMgrIrodsWs::runs( $runs, $instrument->name(), $experiment->name(), $type, $effective_range_of_runs );
         if( !is_null( $runs ))
 	        foreach( $runs as $run ) {
     	        foreach( $run->files as $file ) {
@@ -221,12 +223,17 @@ try {
 
     /* Postprocess the above created array to missing gaps for runs
      * with empty collections of files.
+     * 
+     * DO THIS ONLY IF NO SPECIFIC RANGE OF RUNS WAS
+     * PROVIDED TO THE SCRIPT!!!
      */
-    if( !( is_null( $first_run ) || is_null( $last_run ))) {
-	    for( $runnum = $first_run->num(); $runnum <= $last_run->num(); $runnum++ ) {
-    		if( !array_key_exists( $runnum, $files_by_runs )) {
-    			$files_by_runs[$runnum] = array();
-	    	}
+    if( is_null( $range_of_runs )) {
+	    if( !( is_null( $first_run ) || is_null( $last_run ))) {
+		    for( $runnum = $first_run->num(); $runnum <= $last_run->num(); $runnum++ ) {
+    			if( !array_key_exists( $runnum, $files_by_runs )) {
+    				$files_by_runs[$runnum] = array();
+	    		}
+		    }
 	    }
     }
     
@@ -286,7 +293,7 @@ HERE;
    	        }
 
    	        /* Add XTC files which haven't been reported to iRODS because they have either
-   	         * never migrated from ONLINE or because theye have been permanently deleted.
+   	         * never migrated from ONLINE or because they have been permanently deleted.
    	         */
    	        if( in_array( 'xtc', $types )) {
 	    		foreach( $experiment->regdb_experiment()->files( $runnum ) as $file ) {

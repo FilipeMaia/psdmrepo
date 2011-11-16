@@ -928,6 +928,7 @@ HERE;
 <script type="text/javascript" src="/jquery/js/jquery-1.5.1.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui-1.8.7.custom.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
 
 <script type="text/javascript" src="js/Utilities.js"></script>
 <script type="text/javascript" src="js/ELog.js"></script>
@@ -1453,21 +1454,17 @@ function display_path( file ) {
 }
 
 function printer_friendly() {
-	var el = document.getElementById( current_tab );
-	if (el) {
-		var html = document.getElementById(current_tab).innerHTML;
-		var pfcopy = window.open("about:blank");
-		pfcopy.document.write('<html xmlns="http://www.w3.org/1999/xhtml">');
-		pfcopy.document.write('<head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />');
-		pfcopy.document.write('<link rel="stylesheet" type="text/css" href="css/default.css" />');
-		pfcopy.document.write('<link type="text/css" href="css/portal.css" rel="Stylesheet" />');
-		pfcopy.document.write('<link type="text/css" href="css/ELog.css" rel="Stylesheet" />');
-		pfcopy.document.write('<style type="text/css"> .not4print { display:none; }	</style>');
-		pfcopy.document.write('<title>Web Portal of Experiment: '+elog.instr+' / '+elog.exp+'</title></head><body><div class="maintext">');
-		pfcopy.document.write(html);
-		pfcopy.document.write("</div></body></html>");
-		pfcopy.document.close();
-	}
+	if( current_application != null ) {
+		var wa_id = current_application.name;
+		if(current_application.context1 != '') wa_id += '-'+current_application.context1;
+		$('#p-center .application-workarea#'+wa_id).printElement({
+			leaveOpen: true,
+			printMode: 'popup',
+			printBodyOptions: {
+            	styleToAdd:'font-size:12px;'
+            }
+		});
+	}	
 }
 
 

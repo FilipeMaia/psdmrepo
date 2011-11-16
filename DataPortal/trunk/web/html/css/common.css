@@ -10,19 +10,31 @@ td.table_hdr {
   font-weight: bold;
   font-size: 75%;
 }
+td.table_hdr_tight {
+  padding: 0px 0px 0px 0px;
+}
 td.table_cell {
-  border:solid 1px #d0d0d0;
+  border: solid 1px #d0d0d0;
   border-top: none;
   border-left: none;
   padding: 4px 8px 4px 8px;
   font-family: Arial, sans-serif;
   font-size: 75%;
 }
+td.table_cell_strong_bottom {
+  border-bottom: solid 1px #000000;
+}
 td.table_cell_left {
   font-weight: bold;
 }
+td.table_cell_left_closed {
+  border-left: solid 1px #d0d0d0;
+}
 td.table_cell_right {
   border-right: none;
+}
+td.table_cell_top {
+  border-top: solid 1px #d0d0d0;
 }
 td.table_cell_bottom {
   border-bottom: none;
@@ -30,7 +42,11 @@ td.table_cell_bottom {
 td.table_cell_within_group {
   border-bottom: none;
 }
-
+/*
+tr.table_row:hover {
+  background-color:#f8f8f8;
+}
+*/
 /* Compact borderless table */
 
 td.ctable_hdr {
@@ -53,4 +69,7 @@ td.ctable_cell_right {
 td.ctable_cell_bottom {
 }
 td.ctable_cell_within_group {
+}
+td.table_cell_highlight {
+  background: #DFEFFC url(/jquery/css/custom-theme/images/ui-bg_glass_85_dfeffc_1x400.png) 50% 50% repeat-x;
 }

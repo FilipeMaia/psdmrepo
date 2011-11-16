@@ -347,21 +347,24 @@ class Translator {
 	static function simple_request_status( $status ) {
 		switch( $status ) {
 
-			case 'Initial_Entry':
-			case 'Waiting_Translation':
+			case 'WAIT_FILES':
+			case 'WAIT':
+			case 'PENDING':
 				return 'QUEUED';
 
-			case 'Being_Translated':
+			case 'RUN':
+			case 'SUSPENDED':
 				return 'TRANSLATING';
 
-			case 'Empty_Fileset':
-			case 'H5Dir_Error':
-			case 'Translation_Error':
-			case 'Archive_Error':
+			case 'DONE':
+				return 'FINISHED';
+
+			case 'FAIL':
+			case 'FAIL_COPY':
+			case 'FAIL_NOINPUT':
+			case 'FAIL_MKDIR':
 				return 'FAILED';
 
-			case 'Complete':
-				return 'FINISHED';
 		}
    		return 'NOT-TRANSLATED';
 	}

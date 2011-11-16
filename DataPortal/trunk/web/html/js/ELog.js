@@ -1336,6 +1336,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+entry.id+',false);">move</button></div>'+
 '      <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
 				html +=
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-pr" id="'+this.base+'-m-pr-'+entry.id+'" onclick="'+this.address+'.live_message_print('+idx+');" title="print this message and all its children if any">print</button></div>'+
 '      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-de" id="'+this.base+'-m-de-'+entry.id+'" onclick="'+this.address+'.live_message_delete('+idx+');" title="delete this message and all its children if any">delete</button></div>'+
 '      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xt" id="'+this.base+'-m-xt-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, true);" title="add more tags to the message">+ tags</button></div>'+
 '      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xa" id="'+this.base+'-m-xa-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, false);" title="add more attachments to the message">+ attachments</button></div>'+
@@ -1391,6 +1392,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '    </div>'+
 '  </div>';
 			$(container).html(html);
+			$(container).find('.el-l-m-pr').button();
 			$(container).find('.el-l-m-ud').button();
 			$(container).find('.el-l-m-de').button();
 			$(container).find('.el-l-m-xt').button();
@@ -2045,6 +2047,17 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 	    else                          $('#'+this.base+'-m-xadlg-'+id).removeClass('el-l-m-dlg-hdn').addClass('el-l-m-dlg-vis');
 		that.live_enable_message_buttons(id, false);
 	};
+	this.live_message_print = function(idx) {
+		var entry = that.threads[idx];
+		var id = entry.id;
+		$('#'+this.base+'-m-con-'+id).parent().printElement({
+			leaveOpen: true,
+			printMode: 'popup',
+			printBodyOptions: {
+            	styleToAdd:'font-size:12px;'
+            }
+		});
+	};
 	this.live_message_delete = function(idx) {
 		var entry = that.threads[idx];
 		$('#popupdialogs').html(
@@ -2689,7 +2702,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 		return html;
 	}
 	function id_sign(entry) {
-		var html = '<div style="float:right; margin-left:10px; margin-top:2px; padding-left:2px; padding-right:2px; background-color:#ffffff;">'+entry.id+'</div>';
+		var html = '<div style="float:right; margin-left:10px; margin-top:2px; padding-left:2px; padding-right:2px; background-color:#ffffff; font-size:12px;">'+entry.id+'</div>';
 		return html;
 	}
 
@@ -3646,7 +3659,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 		return html;
 	}
 	function id_sign(entry) {
-		var html = '<div style="float:right; margin-left:10px; margin-top:2px; padding-left:2px; padding-right:2px; background-color:#ffffff;">'+entry.id+'</div>';
+		var html = '<div style="float:right; margin-left:10px; margin-top:2px; padding-left:2px; padding-right:2px; background-color:#ffffff; font-size:12px;">'+entry.id+'</div>';
 		return html;
 	}
 
