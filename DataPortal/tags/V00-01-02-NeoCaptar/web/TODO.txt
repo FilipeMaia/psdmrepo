@@ -1,0 +1,119 @@
+
+			====================================
+			The development ideas for Neo-CAPTAR
+			====================================
+
+
+_________________________________________
+October 28, 2011 (tasks to be implemented)
+
+  - implement the dictionary for (routing) and (instructions). Add database & Web services support for that.
+  - migrate transient JavaScript dictionary to use the server backend
+
+  - extend the Web services to return the number of occurances for each dictionary element.
+  - warn a user attempting to delete a dictionary element if there is at least 1 client (reference) of it (to it)
+  - turn the number of references into a URL landing at the search page on which all cables using this element will be reported
+
+  - proceed to Search and make it compatible with the list of cables in Projects
+  - consider restricting the number of cables returned or do not allow editing to speed up the GUI.
+    Alternatevly do not show any tools in there. Insted of that use the link to the project to jump straight to that project
+    where all editing can be done.
+
+  - update counters on (yellow colored) project header lines after adding/deleting cables
+    or changing a status of a cable. Also update the last modification timestamp from
+    the 'updated/modified' field returned by the corresponding Web service.
+
+  - eliminate project status 'submitted' and replace it with the collective status
+    as explained in secton '2. On overall project status' from October 6, 2011.
+
+  - refined model for the group operations on project's cables: replace 'submit project'
+    with operations similar to what is defined for individual cables. The implementation
+    should simply loop over eligible cables and invoke operations one-by-one. Functions
+    for those operations are already implemented.
+
+  - implement sorting cables according to the 'Sort by' & 'reverse' criteria
+
+  - implement collumn reduction according to checkboxes in the 'Display' group
+
+  - revisit font sizes. Specify the base size for <body> at some main index.php, and
+    use relative sizes (% of that base) elswhere in the 'downstream' HTML (static or dynamic).
+
+__________________________________
+October 06, 2011 (palling meeting)
+
+  Here is a summary of a discussion (following my mock-up presentation)
+  with Amedeo's cable people. Some suggestion are about how to improve/change
+  the GUI of the mock-up.
+
+  _______________
+  1. Cable status
+
+    Each cable will be allowed to have a separate status:
+
+      Planned
+      Registered (AKA "submitted")
+      Labeled
+      Fabrication
+      Ready
+      Installed
+      Commissioned
+      Damaged
+      Retired
+
+    Group operations on the whole project (like 'Submit') will stil be allowed.
+
+  ____________________________
+  2. On overall project status
+
+    Derive the project status based on a status of included cables as follows:
+
+    - if all cables are in the same state then use that state as the project status
+    - otherwise put 'in-progress'
+
+    Add multiple columns on the projects table to indicate statistics on cables
+    being in different state:
+
+      Pln Rgs Lbl Fbr Rdy Ins Cms Dmg Rtr
+      --- --- --- --- --- --- --- --- ---
+        0  12   3   0  12   4  23   0   0
+
+  _________________
+  3. Editing cables
+
+    Not allow to do so after printing the label.
+    Just put the cable into 'Retired' state and start a new cable
+
+  ______________________________________________________________________
+  4. Enforced (schema) restrictions for locations & system (device name)
+
+    Apparently there is LCLS naming conventuon guide which requires to limit
+    options when entering the following descriptions:
+
+      location / crate / slot / side => system (formal device) name
+
+    Regular users (customers) injecting projects & cables will be given limited
+    (and proven to exist) options/choices when entering/modifying cables.
+    Administrators will be able to extend the schema in two ways:
+
+    - when editing a cable there will be an option (in the select)
+      to allow adding a new location/crate/slot/side
+
+    - or doing this upfronnt using a separate page on the Cable's tab which
+      would be implemented similar to Cable type/connector/pin list.
+
+  _________________________
+  5. Job numbers generation
+
+    Generate a new number when submitting the project or the first individual cable of
+    the project. On top of that implement an administrative control:
+
+    - for mapping user accounts to TLAs
+    - and what's the last used or next available job number for each
+      registered person
+
+  __________________________
+  6. Reports on each project
+
+    There was a request to consider adding various reports on the database. 
+    Details will be discussed later when it will be known which reports are
+    needed.
