@@ -2741,11 +2741,11 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 /**
  * A simplified object for displaying e-log messages associated with the specified run.
  * 
- * @object_address - the full path name to an instance of the object (used for global references from collback functions
- * @param parent - parent object
- * @param element_base - the base of an element where to grow the DOM
- * @run_num - the run number
- * @return
+ * @param object_address  :the full path name to an instance of the object (used for global references from collback functions
+ * @param parent_object   :parent object
+ * @param element_base    :the base of an element where to grow the DOM
+ * @param run_num         :the run number
+ * @return                :return a new object
  */
 function elog_message_viewer4run_create(object_address, parent_object, element_base, run_num) {
 

@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-03
+2011-11-16 Igor Gaponenko
+- migrated to the NetBeans IDE
+
 Tag: V00-01-02-NeoCaptar
 2011-11-16 Igor Gaponenko
 - added new application NeoCaptar; the project is yet to be completed
