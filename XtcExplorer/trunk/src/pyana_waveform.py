@@ -163,7 +163,7 @@ class pyana_waveform (object) :
                     
                 
         self.plotter = Plotter()
-        self.plotter.settings(7,7) # set default frame size
+        self.plotter.settings(4,4) # set default frame size
         self.plotter.threshold = None
 
         #if self.threshold is not None:

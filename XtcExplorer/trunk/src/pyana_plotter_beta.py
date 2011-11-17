@@ -91,9 +91,6 @@ class pyana_plotter_beta (object) :
     #  Constructor --
     #----------------
     def __init__ ( self,
-                   source = "Dummy",
-                   plot_every_n = "Dummy",
-                   accumulate_n = "Dummy",
                    display_mode = "Interactive",
                    ipython         = "False",
                    printprogress   = "False" ):
@@ -115,13 +112,8 @@ class pyana_plotter_beta (object) :
             print "Unknown display mode %s, using NoDisplay (0)"%display_mode
             self.display_mode = 0
 
-        self.plot_every_n = opt.getOptInteger( plot_every_n )
-        self.accumulate_n = opt.getOptInteger( accumulate_n )
-        self.mpl_num = opt.getOptInteger( fignum )
-
         opt = PyanaOptions() # convert option string to appropriate type        
         self.ipython       = opt.getOptBoolean(ipython)
-
         self.printprogress = opt.getOptBoolean(printprogress)
 
         self.plotter = Plotter()        
@@ -143,9 +135,6 @@ class pyana_plotter_beta (object) :
         
         # Preferred way to log information is via logging package
         logging.info( "pyana_plotter_beta.beginjob() called with displaymode %d"%self.display_mode )
-
-        self.do_plots = self.plot_every_n != 0
-        self.plotter = None
 
         if self.display_mode == 0 :
             plt.ioff()
@@ -183,101 +172,80 @@ class pyana_plotter_beta (object) :
         """
         self.n_shots += 1
 
+        # print progress
+        if self.printprogress : self.progress_report()
+
         if evt.get('skip_event'):
             return
         
-        # print progress
-        if self.printprogress :
-            if self.n_shots <= 10 :
-                print "Event # ", self.n_shots
-            elif self.n_shots < 100 :
-                if (self.n_shots % 10)==0 :
-                    print "Event # ", self.n_shots
-            elif self.n_shots < 1000 :
-                if (self.n_shots % 100)==0 :
-                    print "Event # ", self.n_shots
-            elif self.n_shots < 10000 :
-                if (self.n_shots % 1000)==0 :
-                    print "Event # ", self.n_shots
-            else:
-                if (self.n_shots % 10000)==0 :
-                    print "Event # ", self.n_shots
-
-
         # only call the plt.draw / plt.show is there's actually
         # something new to show, since it's slow. 
+        if not evt.get('show_event'):
+            return
 
-        if self.do_plots :
-
-            if (self.n_shots%self.plot_every_n)!=0: return
-                
-            show_event = evt.get('show_event')
-            if not show_event: return
-
-            # only call plotter if this is the main thread
-            if (env.subprocess()>0): return
+        # only call plotter if this is the main thread
+        if (env.subprocess()>0): return
             
 
-            # OK, go ahead
-            print "pyana_plotter_beta: Shot#%d, Displaymode: %d" % (self.n_shots,self.display_mode)
-
-            #----------------------------------------------------------
-            # for xtcexplorernew: 
-            #----------------------------------------------------------
-            plot_data = evt.get('plot_data')
-            print "pyana_plotter_beta: \nplot_data"
-            print plot_data
-
-            fignum = 100
-            if plot_data is not None: 
+        # OK, go ahead
+        
+        #----------------------------------------------------------
+        # for xtcexplorernew: 
+        #----------------------------------------------------------
+        plot_data = evt.get('plot_data')
+        
+        fignum = 100
+        if plot_data is not None: 
+            for data in plot_data:
                 
-                for data in plot_data:
+                list_for_plotting = []
+                for name,array in data.get_plottables().iteritems():
+                    print "list for plotting: ", data.name, name, len(array)
+                    list_for_plotting.append( (name,array,data.name) )
                     
-                    list_for_plotting = []
-                    for name,array in data.get_plottables().iteritems():
-                        print data.name, name, len(array)
-                        list_for_plotting.append( (name,array,data.name) )
-                        
-                    fignum += 1
-                    self.plotter.plot_several(list_for_plotting, fignum=fignum,
+                if len(list_for_plotting)<1: continue
+
+                fignum += 1
+                self.plotter.plot_several(list_for_plotting, fignum=fignum,
                                               title="%s event#%d" % (data.name,self.n_shots))
-                    plt.draw()
-                    #self.plotter.draw_func_lookup[name](array,title=data.name)
+                plt.draw()
+                plt.draw()
+                #self.plotter.draw_func_lookup[name](array,title=data.name)
                     
 
                 
-            #----------------------------------------------------------
-            # for xtcexplorer (old)
-            #----------------------------------------------------------
-            event_display_images = evt.get( 'event_display_images')
-            if event_display_images is not None: 
-                print "pyana_plotter_beta: Plotting %d plots"%len(event_display_images)
-                newmode = self.plotter.draw_figurelist(200,
+        #----------------------------------------------------------
+        # for xtcexplorer (old)
+        #----------------------------------------------------------
+        event_display_images = evt.get( 'event_display_images')
+        if event_display_images is not None: 
+            print "pyana_plotter_beta: Plotting %d plots"%len(event_display_images)
+            newmode = self.plotter.draw_figurelist(200,
                                                        event_display_images,
                                                        title="Cameras shot#%d"%self.n_shots,
                                                        showProj=False)
-                if newmode is not None:
-                    self.display_mode = newmode
+            if newmode is not None:
+                self.display_mode = newmode
                     
 
 
-            # in all cases: 
-            if self.ipython :
-                plt.draw()
-                self.launch_ipython(evt)
-                
-            if self.display_mode == 1:
-                # Interactive
-                plt.ioff()
-                plt.show()
-                
-            elif self.display_mode == 2:
-                # SlideShow
-                plt.ion()
-                plt.draw()            
-                
-                # wait for 'enter' before proceeding
-                # raw_input('Please hit \'enter\' to proceed to the next event') 
+        # in all cases: 
+        if self.ipython :
+            plt.draw()
+            self.launch_ipython(evt)
+            
+        if self.display_mode == 1:
+            # Interactive
+            plt.ioff()
+            plt.show()
+            
+        elif self.display_mode == 2:
+            # SlideShow
+            plt.ion()
+            plt.draw()            
+            
+            # wait for 'enter' before proceeding
+            # raw_input('Please hit \'enter\' to proceed to the next event') 
 
     def endcalibcycle( self, env ) :
         """This optional method is called if present at the end of the 
@@ -380,3 +348,20 @@ class pyana_plotter_beta (object) :
                 "\nHit Ctrl-D to exit iPython and continue program.")
         
         
+    def progress_report(self):
+
+        if self.n_shots <= 10 :
+            print "Event # ", self.n_shots
+        elif self.n_shots < 100 :
+            if (self.n_shots % 10)==0 :
+                print "Event # ", self.n_shots
+        elif self.n_shots < 1000 :
+            if (self.n_shots % 100)==0 :
+                print "Event # ", self.n_shots
+        elif self.n_shots < 10000 :
+            if (self.n_shots % 1000)==0 :
+                print "Event # ", self.n_shots
+        else:
+            if (self.n_shots % 10000)==0 :
+                print "Event # ", self.n_shots
+

@@ -571,7 +571,7 @@ class WaveformConfigSubGui( QtGui.QWidget ):
         self.groupbox.setCheckable(True)
 
         def do_something():
-            print self.sender().text()
+            print "do something? ", self.sender().text()
             #print "what would parent do?"
             #print parent
 
@@ -587,10 +587,10 @@ class WaveformConfigSubGui( QtGui.QWidget ):
             parent.connect(chgr_ch, QtCore.SIGNAL('stateChanged(int)'),do_something )
 
             checkbox_avg = QtGui.QCheckBox("average")
-            parent.connect(checkbox_avg, QtCore.SIGNAL('stateChanged(int)'),do_something )
+            parent.connect(checkbox_avg, QtCore.SIGNAL('stateChanged(int)'), module.set_opt_average )
 
             checkbox_stack = QtGui.QCheckBox("stack")
-            parent.connect(checkbox_stack, QtCore.SIGNAL('stateChanged(int)'),do_something )
+            parent.connect(checkbox_stack, QtCore.SIGNAL('stateChanged(int)'), module.set_opt_stack )
 
             chgr_ch_layout.addStretch()
             chgr_ch_layout.addWidget(checkbox_avg)

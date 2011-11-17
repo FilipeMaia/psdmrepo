@@ -4,6 +4,7 @@ class ModuleConfig( object ):
     def __init__(self, name, address = None):
         self.name = name
         self.address = address
+        self.quantities = []
 
         self.label = "%s" % (name)
         if address is not None: 
@@ -12,6 +13,15 @@ class ModuleConfig( object ):
         self.options = {}
         self.options["source"] = self.address
             
+    def set_opt_quantities(self, quantity, value):
+        """Set plot quantities by name
+        """
+        if value > 0 : 
+            self.quantities.append(quantity)
+        else :
+            self.quantities.remove(quantity)
+        self.options["quantities"] = " ".join(self.quantities)
+
     def dump(self, indent = ""):
         print "%sName:    %s"%(indent, self.name)
         print "%sAddress: %s"%(indent, self.address)
@@ -44,7 +54,6 @@ class ImageModConfig( ModuleConfig ):
     def __init__(self, address = None):
         ModuleConfig.__init__(self, "pyana_image_beta", address )
         # list of quantities to plot:
-        self.quantities = []
         self.update_options()
         
     def update_options(self):
@@ -64,14 +73,6 @@ class ImageModConfig( ModuleConfig ):
 #                                                           (quantity,''.join(str(modifier,).split())))
         self.options["quantities"] = newconfigline
 
-    def set_opt_quantities(self, quantity, value):
-        """Set plot quantities by name
-        """
-        if value > 0 : 
-            self.quantities.append(quantity)
-        else :
-            self.quantities.remove(quantity)
-        self.options["quantities"] = " ".join(self.quantities)
             
     def set_opt_imXY(self, value):
         self.set_opt_quantities("image",value)
@@ -115,19 +116,9 @@ class IpimbModConfig( ModuleConfig ):
     def __init__(self, address = None):
         ModuleConfig.__init__(self, "pyana_ipimb_beta", address )
         self.options["quantities"] = "fex:pos fex:sum fex:channels"
-        self.quantities = []
 
     def update_options(self):
         pass
-
-    def set_opt_quantities(self, quantity, value):
-        """Set plot quantities by name
-        """
-        if value > 0 : 
-            self.quantities.append(quantity)
-        else :
-            self.quantities.remove(quantity)
-        self.options["quantities"] = " ".join(self.quantities)
 
     def set_opt_chRaw(self, value):
         self.set_opt_quantities("raw:channels",value)
@@ -195,10 +186,17 @@ class WaveformModConfig( ModuleConfig ):
     def __init__(self, address = None):
         ModuleConfig.__init__(self, "pyana_waveform_beta", address)
         self.update_options()
+        #self.quantities = []
         
     def update_options(self):
         pass
-    
+                
+    def set_opt_average(self, value):
+        self.set_opt_quantities("average",value)
+
+    def set_opt_stack(self, value):
+        self.set_opt_quantities("stack",value)
+
 class EncoderModConfig( ModuleConfig ):
     """Class EncoderModConfig
     """
@@ -243,8 +241,6 @@ class PlotterModConfig( ModuleConfig ):
         ModuleConfig.__init__(self,"pyana_plotter_beta", address)
         del self.options["source"]
 
-        self.plot_n = "100"
-        self.accum_n = None
         self.displaymode = None
         self.ipython = None
 
@@ -253,8 +249,6 @@ class PlotterModConfig( ModuleConfig ):
     def update_options(self):
         self.options["display_mode"] = self.displaymode
         self.options["ipython"] = self.ipython
-        self.options["plot_every_n"] = self.plot_n
-        self.options["accumulate_n"] = self.accum_n
 
         
 class Configuration( object ):

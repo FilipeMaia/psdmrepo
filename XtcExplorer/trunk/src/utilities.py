@@ -542,13 +542,13 @@ class Plotter(object):
         """
         nplots = len(self.frames)
         
-        self.fig = plt.figure(fignum)#,(self.w*ncol,self.h*nrow))
         self.fignum = fignum
-        self.fig.clf()
 
         nrow = int(np.ceil( np.sqrt(nplots) ))
         ncol = int(np.ceil( (1.0*nplots) / nrow ))
-        self.fig.set_size_inches(self.w*ncol,self.h*nrow)
+
+        self.fig = plt.figure(fignum,(self.w*ncol,self.h*nrow))
+        self.fig.clf()
 
         i = 1
         framenames = self.frames.iterkeys()
@@ -557,7 +557,7 @@ class Plotter(object):
             frame = self.frames[name]
             frame.axes = self.fig.add_subplot(nrow,ncol,i)
             frame.axes.set_aspect(frame.aspect)
-            print "adding subplot for %s with aspect %s"%(name,frame.aspect)
+            #print "adding subplot for %s with aspect %s"%(name,frame.aspect)
             i+=1
 
             # single image (2d array)
