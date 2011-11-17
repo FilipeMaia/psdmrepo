@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-38
+2011-11-16 Igor Gaponenko
+- migrated to NetBeans IDE
+
 Tag: V00-00-37
 2011-11-16 Igor Gaponenko
 - SQL schema changed in the Data Migration table to allow registering files which are
