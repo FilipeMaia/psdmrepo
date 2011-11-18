@@ -31,6 +31,7 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 #import sys
 import os
+import sys
 import string as st
 import time
 import numpy as np
@@ -217,6 +218,27 @@ def CalibCycleIsInThePath(path_and_name):
 #    return False
 
 #----------------------------------
+#----------------------------------
+
+def getListOfFiles(dirname, extension='h5') :
+    print """Returns the list of files in the specified directory with requested extension"""
+    
+    if not os.path.exists(dirname) :
+        print  'WARNING: THE SPECIFIED DIRECTORY "',dirname,'" DOES NOT EXIST.'
+        return None
+
+    dot_extension = '.' + extension
+    list_of_files = []
+    for fname in os.listdir(dirname) :
+        name, ext = os.path.splitext(fname)
+        #print fname, ext
+        if ext == dot_extension :
+            list_of_files.append( dirname + '/' + fname )
+
+    if len(list_of_files) == 0 : return None
+    else :                       return list_of_files
+
+#----------------------------------
 
 def saveNumpyArrayInFile(arr, fname='nparray.txt', format='%f') : # format='%f'
     print """Save numpy array in file """, fname
@@ -229,12 +251,16 @@ def getNumpyArrayFromFile(fname='nparray.txt', datatype=np.float32) : # np.int16
     return np.loadtxt(fname, dtype=datatype)
 
 #----------------------------------
-#
-#  In case someone decides to run this module
-#
+# Test
+
+def main() :    
+    for fname in getListOfFiles('/reg/d/psdm/cxi/cxii0211/hdf5', 'h5') : print fname
+
+#----------------------------------
+
 if __name__ == "__main__" :
-    # In principle we can try to run test suite for this module,
-    # have to think about it later. Right now just abort.
+
+    main()
     sys.exit ( "Module is not supposed to be run as main module" )
 
 #----------------------------------

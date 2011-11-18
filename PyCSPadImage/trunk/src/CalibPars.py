@@ -58,8 +58,8 @@ class CalibPars (object) :
                                    ,'tilt'
                                    ,'quad_rotation'
                                    ,'quad_tilt'
-                                   ,'common_mode'
-                                   ,'filter'
+                                   #,'common_mode'
+                                   #,'filter'
                                    #,'pedestals'
                                    #,'pixel_status'
                                    ]
@@ -86,7 +86,7 @@ class CalibPars (object) :
     def setRun ( self, run = 0 ) :
         self.run = run
 
-        print 'Load the calibration parameters for run ', self.run
+        #print 'Load the calibration parameters for run ', self.run
         self.setCalibPars()
 
 #---------------------
@@ -119,7 +119,7 @@ class CalibPars (object) :
 
         self.cpars = {}
 
-        print 'Load the calibration parameters for run ', self.run
+        #print 'Load the calibration parameters for run ', self.run
 
         for type in self.list_of_clib_types :
             fname = self.findCalibFile (self.run, type) # self.path_to_calib_types + type + '/0-end.data'

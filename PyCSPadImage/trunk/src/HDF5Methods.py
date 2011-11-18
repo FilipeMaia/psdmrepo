@@ -59,7 +59,7 @@ class HDF5Methods(object) :
         else :
             self.fname = fname_input
 
-        print '=== Open HDF5 file: ' + self.fname
+        #print '=== Open HDF5 file: ' + self.fname
 
         try :
             self.h5file = h5py.File(self.fname,'r') # open read-only
@@ -73,12 +73,12 @@ class HDF5Methods(object) :
 
     def close_hdf5_file(self) :
         self.h5file.close()
-        print '=== Close HDF5 file ==='
+        #print '=== Close HDF5 file ==='
 
 #---------------------
 
     def get_dataset_from_hdf5_file(self,dsname) :
-        print 'From hdf5 file get dataset :', dsname
+        #print 'From hdf5 file get dataset :', dsname
 
         try :
             self.dset =  self.h5file[str(dsname)]

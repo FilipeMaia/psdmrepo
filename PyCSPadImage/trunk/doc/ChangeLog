@@ -11,6 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+2011-11-18 Mikhail S. Dubrovin
+        - add Examples.py
+        - Move examples from CSPadImageProducer.py to new module Examples.py
+	- Make examples more readable
+	- Commented print statements inside the modules CalibPars.py and HDF5Methods.py
+	- Add example for xpp47712
+	
 Tag: V00-00-01
 
 2011-10-19 Mikhail S. Dubrovin
