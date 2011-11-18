@@ -282,6 +282,7 @@ class ImageData( BaseData ):
         BaseData.__init__(self,name,type)
         self.image = None      # the image
         self.average = None    # the average collected so far
+        self.counter = 0       # nEvents in average
         self.dark = None       # the dark that was subtracted
         self.roi = None        # list of coordinates defining ROI
         
@@ -903,7 +904,6 @@ class Plotter(object):
         aplot.axesim = aplot.axes.imshow( frameimage,
                                           origin=myorigin,
                                           extent=extent,
-                                          aspect=self.aspect,
                                           interpolation='bilinear',
                                           vmin=aplot.vmin,
                                           vmax=aplot.vmax )

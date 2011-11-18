@@ -244,9 +244,8 @@ class  pyana_image_beta ( object ) :
         # call the relevant function to get the image (faster than if-else clauses)
         the_image = self.funcdict_getimage[self.image_type]([evt, env])
         if the_image is None:
-            print "No image from ", label
+            #print "No image from ", self.image_type
             return
-
 
         ##################################################
         # subtract background if provided from a file
@@ -298,39 +297,16 @@ class  pyana_image_beta ( object ) :
     def endjob( self, evt, env ) :
 
         print "Done processing       ", self.n_shots, " events"        
+
         
-        title = self.source
+        # add mydata to event's plot_data 
+        plot_data = evt.get('plot_data')
+        if plot_data is None:
+            plot_data = []
+        plot_data.append( self.mydata ) 
+        evt.put( plot_data ,'plot_data' )
+        evt.put( True, 'show_event')
 
-        # keep a list of images 
-        event_display_images = []
-
-        average_image = None
-        if self.n_good > 0 :
-            label = "Average of %d shots"%self.n_good
-
-            average_image = self.sum_good_images/self.n_good 
-            event_display_images.append( (label, average_image ) )
-
-        rejected_image = None
-        if self.n_dark > 0 :
-            label = "Average of %d dark/rejected shots"%self.n_dark
-
-            rejected_image = self.sum_dark_images/self.n_dark
-            event_display_images.append( (label, rejected_image ) )
-            
-        if self.dark_image is not None :
-            label = "Dark image from input file"
-            event_display_images.append( ("Dark image from file", self.dark_image ) )
-
-            
-        ## Just one plot
-        # newmode = self.plotter.draw_figure(the_image,title, fignum=self.mpl_num, showProj=True)
-
-        if len(event_display_images) == 0:
-            print "No images to display from ", self.source
-            return
-                
-        #evt.put( self.data, 'data_cspad')
 
         # save the average data image (numpy array)
         # binary file .npy format
@@ -352,21 +328,6 @@ class  pyana_image_beta ( object ) :
                 print "Saving average of dark shots to file ", filename2
                 np.save(filename2, rejected_image)
 
-
-#        for title,image in event_display_images: 
-#            self.plotter.add_frame(title)
-#            self.plotter.frame[title].threshold = self.threshold
-#            self.plotter.frame[title].vmin = self.plot_vmin
-#            self.plotter.frame[title].vmax = self.plot_vmax
-
-        # try something new: 
-        list_for_plotting = evt.get( 'event_display_images')
-        if list_for_plotting :
-            list_for_plotting.extend( event_display_images )
-        else :
-            evt.put(event_display_images, 'event_display_images')
-            
-            
                     
 
     # -----------------
@@ -446,6 +407,7 @@ class  pyana_image_beta ( object ) :
         self.mydata.roi = None
         if options is not None:
             self.mydata.roi = map(int,options) # a list
+
             
     def book_spectrum_plot(self,image,options=None):
         flat = image.ravel()
@@ -561,7 +523,8 @@ class  pyana_image_beta ( object ) :
             frame = evt.getPrincetonValue(self.source, env)
             return frame.data()
         except: 
-            print "No frame from ", self.source, " in shot#", self.n_shots
+            # Princeton cameras are so slow that these are often lacking from the event
+            #print "No frame from ", self.source, " in shot#", self.n_shots
             return
         
     def get_pnccd_image(self,arg):

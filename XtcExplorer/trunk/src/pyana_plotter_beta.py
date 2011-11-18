@@ -193,25 +193,10 @@ class pyana_plotter_beta (object) :
         # for xtcexplorernew: 
         #----------------------------------------------------------
         plot_data = evt.get('plot_data')
-        
-        fignum = 100
-        if plot_data is not None: 
-            for data in plot_data:
-                
-                list_for_plotting = []
-                for name,array in data.get_plottables().iteritems():
-                    print "list for plotting: ", data.name, name, len(array)
-                    list_for_plotting.append( (name,array,data.name) )
-                    
-                if len(list_for_plotting)<1: continue
 
-                fignum += 1
-                self.plotter.plot_several(list_for_plotting, fignum=fignum,
-                                              title="%s event#%d" % (data.name,self.n_shots))
-                plt.draw()
-                plt.draw()
-                #self.plotter.draw_func_lookup[name](array,title=data.name)
-                    
+        if plot_data is not None: 
+            self.make_plots(fignum=100,datalist=plot_data)
+            plt.suptitle("Event#%d"%self.n_shots)
 
                 
         #----------------------------------------------------------
@@ -278,6 +263,21 @@ class pyana_plotter_beta (object) :
         print "\nTiming as measured by pyana_plotter_beta endjob: %.4f s\n" %(duration)
                                 
         if (env.subprocess()<1):        
+            
+            #----------------------------------------------------------
+            # for xtcexplorernew: 
+            #----------------------------------------------------------
+            plot_data = evt.get('plot_data')
+
+            if plot_data is not None: 
+                self.make_plots(fignum=201,datalist=plot_data)
+                plt.suptitle("End Job : Average of all events")
+            
+
+                
+            #----------------------------------------------------------
+            # for xtcexplorer (old)
+            #----------------------------------------------------------
             event_display_images = evt.get( 'event_display_images')
             if event_display_images: 
                 print "pyana_plotter_beta: Plotting %d plots"%len(event_display_images)
@@ -287,7 +287,7 @@ class pyana_plotter_beta (object) :
                                              showProj=False)
             
             plt.draw()
-        
+            
             if self.ipython :
                 self.launch_ipython(evt)
             
@@ -295,6 +295,7 @@ class pyana_plotter_beta (object) :
             if self.display_mode > 0 :
                 plt.ioff()
                 plt.show()
+
 
         print "-------------------"
         print "Done running pyana."
@@ -365,3 +366,24 @@ class pyana_plotter_beta (object) :
             if (self.n_shots % 10000)==0 :
                 print "Event # ", self.n_shots
 
+
+
+    def make_plots(self,fignum=1,datalist=None):
+
+        if datalist is None:
+            print "Cannot plot nothing"
+            return
+
+        print "pyana_plotter event %d has found %d sources to plot from"%(self.n_shots,len(datalist))
+        
+        for data in datalist:
+            for name,array in data.get_plottables().iteritems():
+
+                title = "%s %s"%(data.name, name)
+                contents = (array,) # a tuple
+
+                self.plotter.add_frame(name,title,contents)
+                
+
+        self.plotter.plot_all_frames(fignum=fignum,ordered=True)
+                    

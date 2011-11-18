@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Nov-11 ofte                 rev 2658
+        - fix to xtcplotternew (image plotting)
+
 2011-Nov-11 ofte                 rev 2657
         - fix a plotting problem. 
 	- some improvements to xtcexplorernew (waveforms gui)

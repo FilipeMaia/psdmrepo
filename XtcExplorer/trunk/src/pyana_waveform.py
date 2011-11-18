@@ -66,7 +66,7 @@ class pyana_waveform (object) :
                    plot_every_n = None,
                    accumulate_n = "0",
                    fignum = "1",
-                   mode = "average"):
+                   quantities = "average"):
         """Class constructor. The parameters to the constructor are passed
         from pyana configuration file. If parameters do not have default 
         values  here then the must be defined in pyana.cfg. All parameters 
@@ -76,13 +76,13 @@ class pyana_waveform (object) :
         @param plot_every_n    Frequency of plot updates
         @param accumulate_n    Accumulate all or reset the array every n shots
         @param fignum          Figure number for matplotlib
-        @param mode            plotting mode: average or stack
+        @param quantities      string containing quantities to plot
         """
 
         # initialize data
         opt = PyanaOptions()
         self.sources = opt.getOptStrings( sources )
-        self.mode = opt.getOptString( mode )
+        self.quantities = opt.getOptString( quantities )
 
         self.plot_every_n = opt.getOptInteger( plot_every_n )
         self.accumulate_n = opt.getOptInteger( accumulate_n )
@@ -225,7 +225,7 @@ class pyana_waveform (object) :
                 self.ctr[label]+=1
 
                 
-                if self.mode.find('stack')>=0 :
+                if self.quantities.find('stack')>=0 :
                     # fill image
                     try:
                         self.wf_stack[label][row] =  awf
@@ -238,7 +238,7 @@ class pyana_waveform (object) :
                             self.wf_stack[label].append( awf )
 
 
-                if self.mode.find('average')>=0:
+                if self.quantities.find('average')>=0:
                     # collect sum for average
                     if self.wf[label] is None : # first event
                         self.wf[label] = awf
@@ -290,7 +290,7 @@ class pyana_waveform (object) :
     def make_plots(self):
 
         ## Plotting
-        if self.mode.find('average')>=0:
+        if self.quantities.find('average')>=0:
             for source in self.src_ch :            
                 name = "wfavg(%s)"%source
                 title = "Average, %s"%source
@@ -298,7 +298,7 @@ class pyana_waveform (object) :
                 contents = (self.ts[source][0:nbins],self.wf[source]/self.ctr[source])
                 self.plotter.add_frame(name,title,contents, aspect='auto')
 
-        if self.mode.find('stack')>=0:
+        if self.quantities.find('stack')>=0:
             for source in self.src_ch :            
                 name = "wfstack(%s)"%source
                 title = "Stack, %s"%source
