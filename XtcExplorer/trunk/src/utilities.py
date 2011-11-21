@@ -345,6 +345,8 @@ from PyQt4 import QtCore
 # uncomment these two if you want to run the pyana job in batch mode
 # import matplotlib
 # matplotlib.use('PDF')
+import matplotlib 
+matplotlib.use('Qt4Agg')
 
 import matplotlib.pyplot as plt
 
@@ -545,8 +547,8 @@ class Plotter(object):
         
         self.fignum = fignum
 
-        nrow = int(np.ceil( np.sqrt(nplots) ))
-        ncol = int(np.ceil( (1.0*nplots) / nrow ))
+        ncol = int(np.ceil( np.sqrt(nplots) ))
+        nrow = int(np.ceil( (1.0*nplots) / ncol ))
 
         self.fig = plt.figure(fignum,(self.w*ncol,self.h*nrow))
         self.fig.clf()
@@ -567,7 +569,9 @@ class Plotter(object):
             else :
                 # one or multiple graphs in the same picture
                 plt.plot(*frame.data)
-                frame.axes.set_xlim(frame.data[0][0],frame.data[0][-1])
+
+                if len(frame.data)>1:
+                    frame.axes.set_xlim(frame.data[0][0],frame.data[0][-1])
 
             if frame.axis_values is not None:
                 formatter = ticker.FuncFormatter(frame.myticks)
@@ -581,6 +585,8 @@ class Plotter(object):
                                  wspace=0.2,  hspace=0.2 )
         self.connect()
 
+        # for backward compatibility
+        return self.display_mode
     
         
     def settings(self
@@ -623,7 +629,7 @@ class Plotter(object):
         self.fig = plt.figure(fignum)#,(self.w*ncol,self.h*nrow))
         self.fignum = fignum
         self.fig.clf()
-        self.fig.set_size_inches(self.w*ncol,self.h*nrow)
+        #self.fig.set_size_inches(self.w*ncol,self.h*nrow)
 
         self.fig.subplots_adjust(left=0.05,   right=0.95,
                                  bottom=0.05, top=0.90,
@@ -812,36 +818,38 @@ class Plotter(object):
         plt.draw()
         plt.show()
 
-    def plot_several(self, list_of_arrays, fignum=1, title="" ):
-        """ Draw several frames in one canvas
-        
-        @list_of_arrays          a list of tuples (title, array)
-        @fignum                  figure number, i.e. fig = plt.figure(num=fignum)
-        @return                  new display_mode if any (else return None)
-        """
-        #if self.fig is None: 
-        self.create_figure(fignum, nplots=len(list_of_arrays))
-        self.fig.suptitle(title)
+############# This won't be missed (I think)
+#
+#    def plot_several(self, list_of_arrays, fignum=1, title="" ):
+#        """ Draw several frames in one canvas
+#        
+#        @list_of_arrays          a list of tuples (title, array)
+#        @fignum                  figure number, i.e. fig = plt.figure(num=fignum)
+#        @return                  new display_mode if any (else return None)
+#        """
+#        #if self.fig is None: 
+#        self.create_figure(fignum, nplots=len(list_of_arrays))
+#        self.fig.suptitle(title)
             
-        pos = 0
-        for tuple in list_of_arrays :
-            pos += 1
-            ad = tuple[0]
-            im = tuple[1]
-            xt = None
-            if len(tuple)==3 : xt = tuple[2]
+#        pos = 0
+#        for tuple in list_of_arrays :
+#            pos += 1
+#            ad = tuple[0]
+#            im = tuple[1]
+#            xt = None
+#            if len(tuple)==3 : xt = tuple[2]
 
-            if type(im)==np.ndarray:
-                if len( im.shape ) > 1:
-                    self.drawframe(im,title=ad,fignum=fignum,position=pos)
-                else :
-                    plt.plot(im)
-            elif type(im)==tuple:
-                print "tuple"
-                pass
+#            if type(im)==np.ndarray:
+#                if len( im.shape ) > 1:
+#                    self.drawframe(im,title=ad,fignum=fignum,position=pos)
+#                else :
+#                    plt.plot(im)
+#            elif type(im)==tuple:
+#                print "tuple"
+#                pass
                 
-        plt.draw()
-        return self.display_mode
+#        plt.draw()
+#        return self.display_mode
 
     def draw_figurelist(self, fignum, event_display_images, title="",showProj=False,extent=None ) :
         """ Draw several frames in one canvas

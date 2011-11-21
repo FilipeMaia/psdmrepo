@@ -258,7 +258,7 @@ class  pyana_image ( object ) :
                 frame = evt.getFrameValue(addr)
 
             if not frame :
-                print "No frame from ", addr, " in shot#", self.n_shots
+                #print "No frame from ", addr, " in shot#", self.n_shots
                 continue
 
             image = frame.data()

@@ -282,7 +282,7 @@ class  pyana_image_beta ( object ) :
 
         for quantity in self.quantities :
             option = self.quantities[quantity]
-            print "pyana_image_beta.py: Plotting ", quantity, option
+            print "pyana_image_beta.py: Plotting %s with option %s"%( quantity, option)
             self.funcdict_bookplot[quantity](the_image,option)
 
         # add mydata to event's plot_data 

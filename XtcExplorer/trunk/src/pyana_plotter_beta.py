@@ -378,10 +378,10 @@ class pyana_plotter_beta (object) :
         
         for data in datalist:
             for name,array in data.get_plottables().iteritems():
-
                 title = "%s %s"%(data.name, name)
                 contents = (array,) # a tuple
 
+                #print title, [item.shape for item in contents]
                 self.plotter.add_frame(name,title,contents)
                 
 
