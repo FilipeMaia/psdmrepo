@@ -630,7 +630,8 @@ Start with selecting data of interest to you from list on the left and general r
             if self.checklabels.count(label)!=0 : continue # avoid duplicates
 
             # make checkbox for this device
-            checkbox = QtGui.QCheckBox(': '.join(label.split(":")), self)
+            #checkbox = QtGui.QCheckBox(': '.join(label.split(":")), self)
+            checkbox = QtGui.QCheckBox( label.split(":")[1], self)
             self.connect(checkbox, QtCore.SIGNAL('stateChanged(int)'), self.process_checkboxes )
             
             # special case: Epics PVs
@@ -861,7 +862,8 @@ Start with selecting data of interest to you from list on the left and general r
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_ipimb at ", index
-            address = str(box.text()).split(": ")[1].strip()
+            #address = str(box.text()).split(": ")[1].strip()
+            address = str(box.text()).strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nquantities = fex:pos fex:sum fex:channels")
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
@@ -880,9 +882,10 @@ Start with selecting data of interest to you from list on the left and general r
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_image at ", index
-            address = str(box.text()).split(": ")[1].strip()
+            #address = str(box.text()).split(": ")[1].strip()
+            address = str(box.text()).strip()
             options_for_mod[index].append("\nsources = %s" % address)
-            options_for_mod[index].append("\nthreshold = ")
+            options_for_mod[index].append("\nthreshold =   ; value (xlow:xhigh,ylow:yhigh) ")
             options_for_mod[index].append("\nimage_rotations = " )
             options_for_mod[index].append("\nimage_shifts = " )
             options_for_mod[index].append("\nimage_scales = " )
@@ -890,8 +893,10 @@ Start with selecting data of interest to you from list on the left and general r
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
-            options_for_mod[index].append("\noutput_file = ")
-            options_for_mod[index].append("\nn_hdf5 = ")        
+            options_for_mod[index].append("\nshow_projections = 0 ; 0: no projection, 1:project average, 2: project max values")
+            options_for_mod[index].append("\noutput_file = out.npy ")
+            options_for_mod[index].append("\nmax_save = 0   ; maximum number of event images to save" )
+            options_for_mod[index].append("\nn_hdf5 = ") 
             return
 
 
@@ -934,7 +939,8 @@ Start with selecting data of interest to you from list on the left and general r
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_waveform at ", index
-            address = str(box.text()).split(":")[1].strip()
+            #address = str(box.text()).split(":")[1].strip()
+            address = str(box.text()).strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
@@ -952,7 +958,8 @@ Start with selecting data of interest to you from list on the left and general r
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_ipimb at ", index
-            address = str(box.text()).split(": ")[1].strip()
+            #address = str(box.text()).split(": ")[1].strip()
+            address = str(box.text()).strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nquantities = fex:pos fex:sum fex:channels")
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
@@ -974,9 +981,10 @@ Start with selecting data of interest to you from list on the left and general r
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_image at ", index
-            address = str(box.text()).split(": ")[1].strip()
+            #address = str(box.text()).split(": ")[1].strip()
+            address = str(box.text()).strip()
             options_for_mod[index].append("\nsources = %s" % address)
-            options_for_mod[index].append("\nthreshold = ")
+            options_for_mod[index].append("\nthreshold =   ; value (xlow:xhigh,ylow:yhigh) ")
             options_for_mod[index].append("\nimage_rotations = " )
             options_for_mod[index].append("\nimage_shifts = " )
             options_for_mod[index].append("\nimage_scales = " )
@@ -984,8 +992,10 @@ Start with selecting data of interest to you from list on the left and general r
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
-            options_for_mod[index].append("\noutput_file = ")
-            options_for_mod[index].append("\nn_hdf5 = ")        
+            options_for_mod[index].append("\nshow_projections = 0 ; 0: no projection, 1:project average, 2: project max values")
+            options_for_mod[index].append("\noutput_file = out.npy ")
+            options_for_mod[index].append("\nmax_save = 0   ; maximum number of event images to save" )
+            options_for_mod[index].append("\nn_hdf5 = ") 
             return
 
         # --- --- --- CsPad --- --- ---
@@ -1001,17 +1011,18 @@ Start with selecting data of interest to you from list on the left and general r
             fname = self.filenames[0]
             exp = fname.split('/')[5]
             rnr = fname.split('/')[7].split('-')[1]
-            dfile = "cspad_%s_%s.npy"%(exp,rnr)
-            address = str(box.text()).split(":")[1].strip()
-            options_for_mod[index].append("\nimg_sources = %s" % address)
+            dfile = "cspad_%s_%s.npy"%(exp,rnr) 
+            #address = str(box.text()).split(":")[1].strip()
+            address = str(box.text()).strip()
+            options_for_mod[index].append("\nsource = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             options_for_mod[index].append("\ndark_img_file = ")
             options_for_mod[index].append("\nout_avg_file = %s"%dfile)
             options_for_mod[index].append("\nout_shot_file = ")
-            options_for_mod[index].append("\nplot_vrange = ")
-            options_for_mod[index].append("\nthreshold = ")
+            options_for_mod[index].append("\nplot_vrange = ") 
+            options_for_mod[index].append("\nthreshold =   ; value (xlow:xhigh,ylow:yhigh) ")
             return
 
         # --- --- --- Encoder --- --- ---
@@ -1024,7 +1035,8 @@ Start with selecting data of interest to you from list on the left and general r
                 options_for_mod.append([])
 
             #print "XtcExplorer.pyana_encoder at ", index 
-            address = str(box.text()).split(": ")[1].strip()
+            #address = str(box.text()).split(": ")[1].strip()
+            address = str(box.text()).strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n )
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n )

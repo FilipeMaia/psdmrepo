@@ -51,7 +51,7 @@ class  pyana_cspad ( object ) :
             
     # initialize
     def __init__ ( self,
-                   img_sources = None,
+                   source = None,
                    dark_img_file = None,
                    pedestal_file = None,
                    out_avg_file = None,
@@ -66,7 +66,7 @@ class  pyana_cspad ( object ) :
         Parameters are passed from pyana.cfg configuration file.
         All parameters are passed as strings
 
-        @param img_sources      string, Address of Detector-Id|Device-ID
+        @param source      string, Address of Detector-Id|Device-ID
         @param dark_img_file    name (base) of dark image file (numpy array) to be loaded, if any
         @param pedestal_file    full path/name of pedestal file (same as translator is using).
                                 Alternative! to dark image file. 
@@ -83,8 +83,8 @@ class  pyana_cspad ( object ) :
         # initializations from argument list
         opt = PyanaOptions()
 
-        self.img_source = opt.getOptString(img_sources)
-        print "Using img_sources = ", self.img_source
+        self.source = opt.getOptString(source)
+        print "Using source = ", self.source
 
         self.plot_every_n = opt.getOptInteger(plot_every_n)
         self.accumulate_n = opt.getOptInteger(accumulate_n)
@@ -143,7 +143,7 @@ class  pyana_cspad ( object ) :
         self.plotter.settings(7,7)
         self.plotter.threshold = None
         if self.threshold is not None:
-            self.plotter.threshold = self.threshold.value            
+            self.plotter.threshold = self.threshold
         self.plotter.vmin, self.plotter.vmax = self.plot_vmin, self.plot_vmax
 
         # ----
@@ -170,7 +170,7 @@ class  pyana_cspad ( object ) :
     # this method is called at an xtc Configure transition
     def beginjob ( self, evt, env ) : 
 
-        config = env.getConfig(xtc.TypeId.Type.Id_CspadConfig, self.img_source)
+        config = env.getConfig(xtc.TypeId.Type.Id_CspadConfig, self.source)
         if not config:
             print '*** cspad config object is missing ***'
             return
@@ -179,7 +179,7 @@ class  pyana_cspad ( object ) :
         sections = map(config.sections, quads)
 
         self.cspad = CsPad(sections)
-        self.data = CsPadData(self.img_source)
+        self.data = CsPadData(self.source)
 
         if self.pedestalfile is not None: 
             self.cspad.load_pedestals( self.pedestalfile )
@@ -239,12 +239,12 @@ class  pyana_cspad ( object ) :
         # full Cspad
         cspad_image = None
 
-        quads = evt.getCsPadQuads(self.img_source, env)
+        quads = evt.getCsPadQuads(self.source, env)
         if quads is not None:         
             cspad_image = self.cspad.get_detector_image(quads)
         else :
             # mini Cspad (only 2x2)
-            quads = evt.get(xtc.TypeId.Type.Id_Cspad2x2Element, self.img_source)
+            quads = evt.get(xtc.TypeId.Type.Id_Cspad2x2Element, self.source)
             if quads is not None:         
                 cspad_image = self.cspad.get_mini_image(quads)
             
@@ -322,26 +322,27 @@ class  pyana_cspad ( object ) :
 
             # flag for pyana_plotter
             evt.put(True, 'show_event')
-            
-            title = "%s shot#%d"%(self.img_source,self.n_shots)
+
+            name = "%s%d"%(self.source,self.n_shots)
+            title = "%s shot#%d"%(self.source,self.n_shots)
 
             # keep a list of images 
             event_display_images = []
-            event_display_images.append( ("%s shot#%d"%(self.img_source,self.n_shots), cspad_image ) )
+            event_display_images.append( (name, title, cspad_image ) )
 
             if roi is not None:
                 extent=self.threshold.area                
-                event_display_images.append( ("Region of Interest", roi, extent ) )
+                event_display_images.append( ("ROI","Region of Interest", roi, extent ) )
                 
             if self.dark_image is not None :
                 title += " (bkg. subtr.)"
-                event_display_images.append( ("Dark image", self.dark_image ) )
+                event_display_images.append( ("dark","Dark image", self.dark_image ) )
             elif self.n_dark > 1 :
                 dark = self.sum_dark_images/self.n_dark
-                event_display_images.append( ("%s (bkg. subtr.)"%self.img_source, cspad_image-dark ) )
-                event_display_images.append( ("Dark (average of %d shots)"%self.n_dark, dark ) )
+                event_display_images.append( ("imagesub","%s (bkg. subtr.)"%self.source, cspad_image-dark ) )
+                event_display_images.append( ("darkavg","Dark (average of %d shots)"%self.n_dark, dark ) )
             else :
-                event_display_images.append( ("%s average of %d shots"%(self.img_source,self.n_good), \
+                event_display_images.append( ("imgavg","%s average of %d shots"%(self.source,self.n_good), \
                                               self.sum_good_images/self.n_good) )
 
             ## Just one plot
@@ -385,37 +386,40 @@ class  pyana_cspad ( object ) :
 
         print "Done processing       ", self.n_shots, " events"        
         
-        title = self.img_source
+        title = self.source
 
         # keep a list of images 
         event_display_images = []
 
         average_image = None
         if self.n_good > 0 :
-            label = "Average of %d shots"%self.n_good
+            name = "avg_bright"
+            title = "Average of %d shots"%self.n_good
 
             average_image = self.sum_good_images/self.n_good 
-            event_display_images.append( (label, average_image ) )
+            event_display_images.append( (name, title, average_image ) )
 
             average_array = self.sum_array / self.n_good
 
         rejected_image = None
         if self.n_dark > 0 :
-            label = "Average of %d dark/rejected shots"%self.n_dark
+            name = "avg_dark"
+            title = "Average of %d dark/rejected shots"%self.n_dark
 
             rejected_image = self.sum_dark_images/self.n_dark
-            event_display_images.append( (label, rejected_image ) )
+            event_display_images.append( (name, title, rejected_image ) )
             
         if self.dark_image is not None :
-            label = "Dark image from input file"
-            event_display_images.append( ("Dark image from file", self.dark_image ) )
+            name = "dark"
+            title = "Dark image from input file"
+            event_display_images.append( (name,title, self.dark_image ) )
 
             
         ## Just one plot
         # newmode = self.plotter.draw_figure(cspad_image,title, fignum=self.mpl_num, showProj=True)
 
         if len(event_display_images) == 0:
-            print "No images to display from ", self.img_source
+            print "No images to display from ", self.source
             return
                 
         

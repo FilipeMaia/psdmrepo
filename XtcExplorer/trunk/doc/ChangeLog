@@ -11,6 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+	
+2011-Nov-23 ofte                 rev 2664
+         - in the process of cleaning up / improving pyana_image and others
+	   There were several problems, from random development over the last months... 
+	
 2011-Nov-21 ofte                 rev 2663
         - minor changes
 	

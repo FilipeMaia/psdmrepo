@@ -213,21 +213,19 @@ class pyana_plotter_beta (object) :
                 self.display_mode = newmode
                     
 
-
-        # in all cases: 
-        if self.ipython :
-            plt.draw()
-            self.launch_ipython(evt)
+            if self.ipython :
+                plt.draw()
+                self.launch_ipython(evt)
             
-        if self.display_mode == 1:
-            # Interactive
-            plt.ioff()
-            plt.show()
+            if self.display_mode == 1:
+                # Interactive
+                plt.ioff()
+                plt.show()
             
-        elif self.display_mode == 2:
-            # SlideShow
-            plt.ion()
-            plt.draw()            
+            elif self.display_mode == 2:
+                # SlideShow
+                plt.ion()
+                plt.draw()            
             
             # wait for 'enter' before proceeding
             # raw_input('Please hit \'enter\' to proceed to the next event') 
@@ -286,15 +284,15 @@ class pyana_plotter_beta (object) :
                                              title="End job",
                                              showProj=False)
             
-            plt.draw()
+                plt.draw()
             
-            if self.ipython :
-                self.launch_ipython(evt)
+                if self.ipython :
+                    self.launch_ipython(evt)
             
-            print "Pyana will exit once you close all the MatPlotLib windows"            
-            if self.display_mode > 0 :
-                plt.ioff()
-                plt.show()
+                print "Pyana will exit once you close all the MatPlotLib windows"            
+                if self.display_mode > 0 :
+                    plt.ioff()
+                    plt.show()
 
 
         print "-------------------"
@@ -387,3 +385,19 @@ class pyana_plotter_beta (object) :
 
         self.plotter.plot_all_frames(fignum=fignum,ordered=True)
                     
+        if self.ipython :
+            plt.draw()
+            self.launch_ipython(evt)
+            
+        if self.display_mode == 1:
+            # Interactive
+            plt.ioff()
+            plt.show()
+                
+        elif self.display_mode == 2:
+            # SlideShow
+            plt.ion()
+            plt.draw()            
+
+        else :
+            print "Displaymode?? ", self.display_mode

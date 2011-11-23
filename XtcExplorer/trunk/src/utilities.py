@@ -93,9 +93,9 @@ class PyanaOptions( object ):
     def getOptInteger(self, options_string):
         """Return a single integer
         """
-        if options_string is None: return None
-
-        if options_string == "" : return None
+        if options_string is None:   return None
+        if options_string == "":     return None
+        if options_string == "None": return None
         return int(options_string)
 
 
@@ -327,13 +327,18 @@ class Threshold( object ) :
     To keep track of threshold settings (value and area of interest)
     """
     def __init__( self,
-                  area = None,
                   value = None,
+                  area = None,
+                  type = "maximum"
                   ) :
-
+        """constructor
+        @param  value     threshold value (float)
+        @param  area      region for evaluating threshold (length 4 array of floats)
+        @param  type      type of evaluation. 'maximum' or 'average'
+        """
         self.area = area        
         self.value = value
-
+        self.type = type
 
 #-------------------------------------------------------
 # Plotter
@@ -345,8 +350,10 @@ from PyQt4 import QtCore
 # uncomment these two if you want to run the pyana job in batch mode
 # import matplotlib
 # matplotlib.use('PDF')
-import matplotlib 
-matplotlib.use('Qt4Agg')
+
+# These don't work with SlideShow, for some reason:
+#import matplotlib 
+#matplotlib.use('Qt4Agg')
 
 import matplotlib.pyplot as plt
 
@@ -482,6 +489,97 @@ class Frame(object):
         self.projy.set_xlim( np.max(ticks[-1],vmax), np.min(ticks[0],vmin) )
 
 
+    def imshow( self, image, title="", fignum=1,position=1, showProj=1, extent=None):
+        """ extension of plt.imshow with
+        - interactive colorbar
+        - optional axis projections
+        - threshold management
+        - display mode management
+        """
+        print "Calling imshow from frame ", self
+        print self.name
+        print self.title
+    
+        if ( self.vmin is None) and (self.vmin is not None ):
+            self.vmin = self.vmin
+        if ( self.vmax is None) and (self.vmax is not None ):
+            self.vmax = self.vmax
+        
+
+        # AxesImage
+        myorigin = 'upper'
+        if showProj: myorigin = 'lower'
+        self.axesim = self.axes.imshow( image,
+                                        origin=myorigin,
+                                        extent=extent,
+                                        interpolation='bilinear',
+                                        vmin=self.vmin,
+                                        vmax=self.vmax )
+
+        divider = make_axes_locatable(self.axes)
+        
+        if showProj>0 :
+            self.projx = divider.append_axes("top", size="20%", pad=0.03,sharex=self.axes)
+            self.projy = divider.append_axes("left", size="20%", pad=0.03,sharey=self.axes)
+            self.projx.set_title( self.axes.get_title() )
+            self.axes.set_title("") # clear the axis title
+
+            # --- sum or average along each axis, 
+            maskedimage = np.ma.masked_array(image, mask=(image==0) )
+
+            proj_vert, proj_horiz = None, None
+            if showProj == 1:
+                proj_vert = np.ma.average(maskedimage,1) # for each row, average of elements
+                proj_horiz = np.ma.average(maskedimage,0) # for each column, average of elements
+            elif showProj == 2: 
+                proj_vert = np.ma.max(maskedimage,1) # for each row, max of elements
+                proj_horiz = np.ma.max(maskedimage,0) # for each column, max of elements
+               
+            x1,x2,y1,y2 = self.axesim.get_extent()
+            start_x = x1
+            start_y = y1
+
+            # vertical and horizontal dimensions, axes, projections
+            vdim,hdim = self.axesim.get_size()        
+            hbins = np.arange(start_x, start_x+hdim, 1)
+            vbins = np.arange(start_y, start_y+vdim, 1)
+
+            self.projx.plot(hbins,proj_horiz)
+            self.projy.plot(proj_vert, vbins)
+            self.projx.get_xaxis().set_visible(False)
+        
+            self.projx.set_xlim( start_x, start_x+hdim)
+            self.projy.set_ylim( start_y+vdim, start_y)
+
+            self.set_ticks()
+            self.update_axes()
+            
+
+        cax = divider.append_axes("right",size="5%", pad=0.05)
+        self.colb = plt.colorbar(self.axesim,cax=cax)
+        # colb is the colorbar object
+
+        self.orglims = self.axesim.get_clim()
+        if self.vmin is not None:
+            self.orglims = ( self.vmin, self.orglims[1] )
+        if self.vmax is not None:
+            self.orglims = ( self.orglims[0], self.vmax )
+
+        self.vmin, self.vmax = self.orglims
+
+
+        
+        # show the active region for thresholding
+        if self.threshold and self.threshold.area is not None:
+            xy = [self.threshold.area[0],self.threshold.area[2]]
+            w = self.threshold.area[1] - self.threshold.area[0]
+            h = self.threshold.area[3] - self.threshold.area[2]
+            self.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=10)
+            self.axes.add_patch(self.thr_rect)
+            print "Plotting the red rectangle in area ", self.threshold.area
+
+        self.axes.set_title(title)
+
     
 
 class Plotter(object):
@@ -533,6 +631,9 @@ class Plotter(object):
         else :
             self.frames[name] = Frame(name)
             aframe = self.frames[name]
+
+        # copy any threshold as default
+        aframe.threshold = self.threshold        
         
         aframe.title = title
         aframe.data = contents
@@ -565,7 +666,9 @@ class Plotter(object):
 
             # single image (2d array)
             if len(frame.data)==1 and frame.data[0].ndim==2 :
-                plt.imshow(frame.data[0])
+                #plt.imshow(frame.data[0])
+                #self.drawframe(frame.data[0])
+                frame.imshow(frame.data[0],title=frame.title,fignum=fignum,showProj=True)
             else :
                 # one or multiple graphs in the same picture
                 plt.plot(*frame.data)
@@ -816,7 +919,8 @@ class Plotter(object):
         self.drawframe(image, showProj=showProj, extent=extent)
 
         plt.draw()
-        plt.show()
+        if self.display_mode == "Interactive" :
+            plt.show()
 
 ############# This won't be missed (I think)
 #
@@ -855,7 +959,7 @@ class Plotter(object):
         """ Draw several frames in one canvas
         
         @fignum                  figure number, i.e. fig = plt.figure(num=fignum)
-        @event_display_images    a list of tuples (title,image)
+        @event_display_images    a list of tuples (name,title,image,extent=None)
         @return                  new display_mode if any (else return None)
         """
         #if self.fig is None: 
@@ -865,12 +969,14 @@ class Plotter(object):
         pos = 0
         for tuple in event_display_images :
             pos += 1
-            ad = tuple[0]
-            im = tuple[1]
+            name  = tuple[0]
+            title = tuple[1]
+            img   = tuple[2]
+
             xt = None
-            if len(tuple)==3 : xt = tuple[2]
+            if len(tuple)==4 : xt = tuple[3]
             
-            self.drawframe(im,title=ad,fignum=fignum,position=pos,showProj=showProj,extent=xt)
+            self.drawframe(img,title=title,fignum=fignum,position=pos,showProj=showProj,extent=xt)
             
         plt.draw()
         return self.display_mode
@@ -886,10 +992,11 @@ class Plotter(object):
         return self.display_mode
 
 
-    def drawframe( self, frameimage, title="", fignum=1,position=1, showProj = False,extent=None):
+        
+        
+    def drawframe( self, frameimage, title="", fignum=1,position=1, showProj=0, extent=None):
         """ Draw a single interactive frame with optional projections and threshold
         """
-
         key = "fig%d_frame%d"%(fignum,position)
         aplot = self.frames[key]
         aplot.image = frameimage
@@ -918,7 +1025,7 @@ class Plotter(object):
 
         divider = make_axes_locatable(aplot.axes)
 
-        if showProj :
+        if showProj>0:
             aplot.projx = divider.append_axes("top", size="20%", pad=0.03,sharex=aplot.axes)
             aplot.projy = divider.append_axes("left", size="20%", pad=0.03,sharey=aplot.axes)
             aplot.projx.set_title( aplot.axes.get_title() )
@@ -926,9 +1033,15 @@ class Plotter(object):
 
             # --- sum or average along each axis, 
             maskedimage = np.ma.masked_array(frameimage, mask=(frameimage==0) )
-            proj_vert = np.ma.average(maskedimage,1) # for each row, average of elements
-            proj_horiz = np.ma.average(maskedimage,0) # for each column, average of elements
-            
+
+            proj_vert, proj_horiz = None, None
+            if showProj == 1:
+                proj_vert = np.ma.average(maskedimage,1) # for each row, average of elements
+                proj_horiz = np.ma.average(maskedimage,0) # for each column, average of elements
+            elif showProj == 2: 
+                proj_vert = np.ma.max(maskedimage,1) # for each row, max of elements
+                proj_horiz = np.ma.max(maskedimage,0) # for each column, max of elements
+                           
             x1,x2,y1,y2 = aplot.axesim.get_extent()
             start_x = x1
             start_y = y1
@@ -961,7 +1074,6 @@ class Plotter(object):
 
         aplot.vmin, aplot.vmax = aplot.orglims
 
-
         
         # show the active region for thresholding
         if aplot.threshold and aplot.threshold.area is not None:
@@ -970,7 +1082,7 @@ class Plotter(object):
             h = aplot.threshold.area[3] - aplot.threshold.area[2]
             aplot.thr_rect = plt.Rectangle(xy,w,h, facecolor='none', edgecolor='red', picker=10)
             aplot.axes.add_patch(aplot.thr_rect)
-            print "Plotting the red rectangle in area ", aplot.threshold.area
+            #print "Plotting the red rectangle in area ", aplot.threshold.area
 
         aplot.axes.set_title(title)
         

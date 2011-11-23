@@ -47,6 +47,7 @@ import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 
+import webbrowser
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
@@ -554,7 +555,10 @@ class XtcExplorerMain (QtGui.QMainWindow) :
 
 
     def documentation(self):        
-        print "Documentation on Confluence"
+        """Open confluence page on default web browser"""
+        url = 'https://confluence.slac.stanford.edu/display/PCDS/XTC+Explorer'
+        print "Documentation on Confluence: %s"%url
+        webbrowser.open(url, new=2)
         
     def about(self):
         progname = os.path.basename(sys.argv[0])

@@ -46,34 +46,39 @@ class  pyana_image ( object ) :
     # initialize
     def __init__ ( self,
                    sources = None,
+                   dark_img_file = None,
                    threshold = None,
+                   plot_vrange = None,                   
                    image_rotations = None,
                    image_shifts = None,
                    image_scales = None,
                    image_nicknames = None,
                    image_manipulations = None, 
                    output_file = None,
+                   show_projections = None,
                    n_hdf5 = None ,
                    plot_every_n = None,
                    accumulate_n = None,
-                   max_save = "100",
+                   max_save = "0",
                    fignum = "1" ):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
         All parameters are passed as strings
 
-        @param sources          (list) address string of Detector-Id|Device-ID
-        @param plot_every_n     Frequency for plotting. If n=0, no plots till the end
-        @param accumulate_n     Not implemented yet
-        @param fignum           Matplotlib figure number
+        @param sources           address string of Detector-Id|Device-ID
+        @param dark_img_file     name (base) of dark image file (numpy array) to be loaded, if any
+        @param plot_every_n      Frequency for plotting. If n=0, no plots till the end
+        @param accumulate_n      Not implemented yet
+        @param fignum            Matplotlib figure number
         @param threshold
-        @param image_rotations  (list) rotation, in degrees, to be applied to image(s)
-        @param image_shifts     (list) shift, in (npixX,npixY), to be applied to image(s)
-        @param image_scales     (list) scale factor to be applied to images
-        @param image_nicknames  (list) nicknames for plot titles
-        @param output_file      filename (If collecting: write to this file)
-        @param n_hdf5           if output file is hdf5, combine n events in each output file. 
-        @param max_save         Maximum single-shot images to save
+        @param image_rotations   (list) rotation, in degrees, to be applied to image(s)
+        @param image_shifts      (list) shift, in (npixX,npixY), to be applied to image(s)
+        @param image_scales      (list) scale factor to be applied to images
+        @param image_nicknames   (list) nicknames for plot titles
+        @param output_file       filename (If collecting: write to this file)
+        @param show_projections  0,1 or 2, for projecting nothing, average or maximum 
+        @param n_hdf5            if output file is hdf5, combine n events in each output file. 
+        @param max_save          Maximum single-shot images to save
         """
 
         opt = PyanaOptions() # convert option string to appropriate type
@@ -87,10 +92,13 @@ class  pyana_image ( object ) :
         for sources in self.sources :
             print "  ", sources
 
+        self.darkfile = opt.getOptString(dark_img_file)
+        if self.darkfile is not None: print "Input dark image file: ", self.darkfile
+
         self.image_nicknames = []
         if image_nicknames is None:
             for i in range (0, len(self.sources) ):
-                self.image_nicknames.append( "Im%d"%(i+1) )
+                self.image_nicknames.append( "Img%d"%(i+1) )
         else :
             self.image_nicknames = image_nicknames.split(" ")
 
@@ -144,11 +152,6 @@ class  pyana_image ( object ) :
                 self.image_manipulations = image_manipulations
 
 
-        self.output_file = output_file
-        if output_file == "" or output_file == "None" :
-            self.output_file = None
-        print "Using output_file: ", self.output_file
-
         threshold_string = opt.getOptStrings(threshold)
         # format: 'value (xlow:xhigh,ylow:yhigh)', only value is required
         
@@ -171,12 +174,17 @@ class  pyana_image ( object ) :
             print "Using threshold area ", self.threshold.area
             
 
-        self.n_hdf5 = None
-        if n_hdf5 is not None :
-            if n_hdf5 == "" or n_hdf5 == "None" :
-                self.n_hdf5 = None
-            else :
-                self.n_hdf5 = int(n_hdf5)
+        self.n_hdf5 = opt.getOptInteger(n_hdf5)
+
+        self.output_file = opt.getOptString(output_file)
+        #print "Output file name base: ", self.output_file
+
+        self.plot_vmin = None
+        self.plot_vmax = None
+        if plot_vrange is not None and plot_vrange is not "" : 
+            self.plot_vmin = float(plot_vrange.strip("()").split(":")[0])
+            self.plot_vmax = float(plot_vrange.strip("()").split(":")[1])
+            print "Using plot_vrange = %.2f,%.2f"%(self.plot_vmin,self.plot_vmax)
 
         # to keep track
         self.n_shots = None
@@ -193,25 +201,29 @@ class  pyana_image ( object ) :
             self.n_good[addr] = 0
             self.n_dark[addr] = 0
 
-        # output file
-        self.hdf5file = None
-        if self.output_file is not None :
-            if ".hdf5" in self.output_file  and self.n_hdf5 is None:
-                print "opening %s for writing" % self.output_file
-                self.hdf5file = h5py.File(self.output_file, 'w')
+
+#        # output file
+#        # can be npy (numpy binary) txt (numpy ascii) or hdf5
+#        # only hdf5 need a file handler
+#        self.hdf5file_all = None
+#        self.hdf5file_events = None
+#        if self.output_file is not None :
+#            if ".hdf5" in self.output_file  and self.n_hdf5 is None:
+#                print "opening HDF5 %s for writing of all events" % self.output_file
+#                self.hdf5file = h5py.File(self.output_file, 'w')
 
         self.plotter = Plotter()        
         self.plotter.settings(7,7) # set default frame size
         self.plotter.threshold = None
         if self.threshold is not None:
-            self.plotter.threshold = self.threshold.value
+            self.plotter.threshold = self.threshold
             self.plotter.vmin, self.plotter.vmax = self.plot_vmin, self.plot_vmax
 
 #        # Set up the plotter's frame by hand, since
 #        # we need to also tell it about thresholds
 #        for source in self.sources :
 #            self.plotter.add_frame(source)
-#            self.plotter.frame[source].threshold = self.threshold
+#            self.plotter.frames[source].threshold = self.threshold
 
 
     def beginjob ( self, evt, env ) : 
@@ -224,6 +236,10 @@ class  pyana_image ( object ) :
             self.data[source] = ImageData(source)
 
 
+        ## load dark image from file
+        #try:
+        #    self.dark_image = 
+
     # process event/shot data
     def event ( self, evt, env ) :
 
@@ -233,15 +249,15 @@ class  pyana_image ( object ) :
         if evt.get('skip_event') :
             return
 
-        # new hdf5-file every N events
-        if self.output_file is not None :
-            if ".hdf5" in self.output_file and self.n_hdf5 is not None:
-                if (self.n_shots%self.n_hdf5)==1 :
-                    start = self.n_shots # this event
-                    stop = self.n_shots+self.n_hdf5-1
-                    self.sub_output_file = self.output_file.replace('.hdf5',"_%d-%d.hdf5"%(start,stop) )
-                    print "opening %s for writing" % self.sub_output_file
-                    self.hdf5file = h5py.File(self.sub_output_file, 'w')
+#        # new hdf5-file every N events
+#        if self.output_file is not None :
+#            if ".hdf5" in self.output_file and self.n_hdf5 is not None:
+#                if (self.n_shots%self.n_hdf5)==1 :
+#                    start = self.n_shots # this event
+#                    stop = self.n_shots+self.n_hdf5-1
+#                    self.sub_output_file = self.output_file.replace('.hdf5',"_%d-%d.hdf5"%(start,stop) )
+#                    print "opening %s for writing" % self.sub_output_file
+#                    self.hdf5file = h5py.File(self.sub_output_file, 'w')
 
         # for each event, collect a list of images to be plotted 
         event_display_images = []
@@ -295,6 +311,7 @@ class  pyana_image ( object ) :
 
 
             isDark = False
+            name = addr
             title = addr
 
             # ---------------------------------------------------------------------------------------
@@ -311,13 +328,18 @@ class  pyana_image ( object ) :
                 maxbin = roi.argmax()
                 maxvalue = roi.ravel()[maxbin]
                 maxbin_coord = np.unravel_index(maxbin,dims)
+
+                if self.threshold.type == 'average':
+                    maxvalue = roi.average()
                 
                 if maxvalue < self.threshold.value :
                     isDark = True
+                    name += "_dark"
                     title += " (dark)"
+                else:
+                    print "Not dark, max = ", maxvalue, maxbin_coord
 
-
-            # -------------DARK----------------
+            # ------------- DARK ----------------
             if isDark:
                 self.n_dark[addr]+=1
                 if self.sum_dark_images[addr] is None :
@@ -325,7 +347,7 @@ class  pyana_image ( object ) :
                 else :
                     self.sum_dark_images[addr] += image
             else :
-            # -------------BRIGHT----------------
+            # ------------- HIT ----------------
                 self.n_good[addr]+=1
                 if self.sum_good_images[addr] is None :
                     self.sum_good_images[addr] = np.float_(image)
@@ -335,7 +357,7 @@ class  pyana_image ( object ) :
             
             # ---------------------------------------------------------------------------------------
             # Here's where we add the raw (or subtracted) image to the list for plotting
-            event_display_images.append( (title, image) )
+            event_display_images.append( (name, title, image) )
 
             # This is for use by ipython
             self.data[addr].image   = image
@@ -351,16 +373,14 @@ class  pyana_image ( object ) :
             for i in range ( 0, len(event_display_images) ):
                             
                 if "Diff" in self.image_manipulations :
-                    ad1,im1 = event_display_images[i]
-                    ad2,im2 = event_display_images[i-1]
-                    lb1 = self.image_nicknames[i]
-                    lb2 = self.image_nicknames[i-1]
-                    event_display_images.append( ("Diff %s-%s"%(lb1,lb2), im1-im2) )
+                    lb1,ad1,im1 = event_display_images[i]
+                    lb2,ad2,im2 = event_display_images[i-1]
+                    event_display_images.append( ("diff","Diff %s-%s"%(lb1,lb2), im1-im2) )
                                 
                 if "FFT" in self.image_manipulations :
                     F = np.fft.fftn(im1-im2)
                     event_display_images.append( \
-                        ("FFT %s-%s"%(lb1,lb2), np.log(np.abs(np.fft.fftshift(F))**2) ) )
+                        ("fft","FFT %s-%s"%(lb1,lb2), np.log(np.abs(np.fft.fftshift(F))**2) ) )
                                     
             
                     
@@ -380,7 +400,7 @@ class  pyana_image ( object ) :
             newmode = self.plotter.draw_figurelist(self.mpl_num,
                                                    event_display_images,
                                                    title="Cameras shot#%d"%self.n_shots,
-                                                   showProj=True)
+                                                   showProj=2   )
             if newmode is not None:
                 # propagate new display mode to the evt object 
                 evt.put(newmode,'display_mode')
@@ -396,47 +416,20 @@ class  pyana_image ( object ) :
                                                             
 
         # -----------------------------------
-        # Saving to file
+        # Saving this event to file(s)
         # -----------------------------------
-        if self.hdf5file is not None :
-            # save this event as a group in hdf5 file:
-            group = self.hdf5file.create_group("Event%d" % self.n_shots)
-        
-        # save the average data image (numpy array)
-        # binary file .npy format
         if (self.output_file is not None) and (self.n_saved < self.max_save) : 
             self.n_saved += 1
-            for ad, im in event_display_images :
 
-                fname = self.output_file.split('.')
-                label = ad.replace("|","_")
-                label = label.replace(" ","")
-                filnamn = ''.join( (fname[0],"%s_ev%d."%(label,self.n_shots),fname[-1]) )
+            self.save_images( self.output_file, event_display_images, self.n_shots )
 
-                # HDF5
-                if self.hdf5file is not None :
-                    # save each image as a dataset in this event group
-                    dset = group.create_dataset("%s"%ad,data=im)
-
-                # Numpy array
-                elif ".npy" in self.output_file :
-                    np.save(filnamn, im)
-                    print "saving to ", filnamn
-                elif ".txt" in self.output_file :
-                    np.savetxt(filnamn, im) 
-                    print "saving to ", filnamn
-                        
-                else :
-                    print "Output file does not have the expected file extension: ", fname[-1]
-                    print "Expected hdf5, txt or npy. Please correct."
-                    print "I'm not saving this event... "
     
 
     # after last event has been processed. 
     def endjob( self, evt, env ) :
 
-        if self.hdf5file is not None :
-            self.hdf5file.close()
+#        if self.hdf5file is not None :
+#            self.hdf5file.close()
 
         print "Done processing       ", self.n_shots, " events"
 
@@ -453,21 +446,24 @@ class  pyana_image ( object ) :
 
             average_image = None
             if self.n_good[addr] > 0 :
-                label = "Average of %d bright/accepted shots"%self.n_good[addr]
+                name = "AvgHit_"+addr
+                title = addr+" Average of %d hits"%self.n_good[addr]
 
                 average_image = self.sum_good_images[addr]/self.n_good[addr]
-                event_display_images.append( (label, average_image ) )
+                event_display_images.append( (name, title, average_image ) )
 
             rejected_image = None
             if self.n_dark[addr] > 0 :
-                label = "Average of %d dark/rejected shots"%self.n_dark[addr]
-
+                name = "AvgDark_"+addr
+                title = addr+" Average of %d darks"%self.n_dark[addr]
+                
                 rejected_image = self.sum_dark_images[addr]/self.n_dark[addr]
-                event_display_images.append( (label, rejected_image ) )
+                event_display_images.append( (name, title, rejected_image ) )
             
             #if self.dark_image is not None :
-            #    label = "Dark image from input file"
-            #    event_display_images.append( ("Dark image from file", self.dark_image ) )
+            #    name = "dark"
+            #    title = "Dark image from input file"
+            #    event_display_images.append( (name, title, self.dark_image ) )
             
             if len(event_display_images) == 0:
                 print "That shouldn't be possible"
@@ -483,6 +479,14 @@ class  pyana_image ( object ) :
             plt.draw()
         
 
+        # -----------------------------------
+        # Saving the final average to file(s)
+        # -----------------------------------
+        if (self.output_file is not None):
+
+            self.save_images( self.output_file, event_display_images )
+
+
         # convert dict to a list:
         data_image = []
         for source in self.sources :
@@ -491,3 +495,46 @@ class  pyana_image ( object ) :
             evt.put( data_image, 'data_image' )
             
 
+
+
+    def save_images(self, filename, image_list, event=None ):
+
+            #if self.hdf5file is not None :
+            #    # save this event as a group in hdf5 file:
+            #    group = self.hdf5file.create_group("Event%d" % self.n_shots)
+
+            for name,title,array in image_list :
+
+                print "save image ", name, title, array.shape
+
+                parts = filename.split('.')
+                label = name #address.replace("|","_").strip()
+                
+                thename = ''
+                for i in range (len(parts)-1):
+                    thename+="%s"%parts[i]
+                    
+                thename+="_%s"%label
+
+                if event is not None:
+                    thename+="_ev%d"%event
+
+                thename+=".%s"%parts[-1]
+
+                print "Writing to file ", thename
+
+#                # HDF5
+#                if self.hdf5file is not None :
+#                    # save each image as a dataset in this event group
+#                    dset = group.create_dataset("%s"%ad,data=array)
+
+                # Numpy array
+                if ".npy" in thename :
+                    np.save(thename, array)
+                elif ".txt" in thename :
+                    np.savetxt(thename, array) 
+                        
+                else :
+                    print "Output file does not have the expected file extension: ", fname[-1]
+                    print "Expected hdf5, txt or npy. Please correct."
+                    print "I'm not saving this event... "

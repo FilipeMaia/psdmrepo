@@ -195,7 +195,7 @@ class pyana_plotter (object) :
         # something new to show, since it's slow. 
         show_event = evt.get('show_event')
         if show_event and env.subprocess()<1 :
-            print "pyana_plotter: Shot#%d, Displaymode: %d" % (self.n_shots,self.display_mode)
+            #print "pyana_plotter: Shot#%d, Displaymode: %d" % (self.n_shots,self.display_mode)
 
             if self.ipython :
                 plt.draw()
