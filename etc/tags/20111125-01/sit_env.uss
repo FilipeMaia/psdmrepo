@@ -1,0 +1,27 @@
+#!/reg/g/psdm/bin/uss.sh
+###########################################################
+#
+# sit_env.uss
+#
+# description: Environment for LUSI users
+#
+# $Id$
+#
+###########################################################
+
+# if not defined define SIT_ENV and SIT_ROOT
+test -n "$SIT_ENV" || set_env SIT_ENV "default"
+test -n "$SIT_ROOT" || set_env SIT_ROOT "/reg/g/psdm"
+
+# place where USS stuff is located, can be changed via SIT_SETUP_DIR
+ussbindir="${SIT_SETUP_DIR:-${SIT_ROOT}/bin}"
+
+# set alias for sit_setup
+test $uss_mode = "csh" && set_alias sit_setup "source $ussbindir/sit_setup.csh"
+test $uss_mode = "sh" && set_alias sit_setup ". $ussbindir/sit_setup.sh"
+
+# source the main script too
+. $ussbindir/sit_setup.uss
+
+# cleanup
+unset ussbindir
