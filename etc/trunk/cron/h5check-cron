@@ -19,6 +19,15 @@ reqIDfile=/reg/g/psdm/psdatmgr/ic/h5check-reqid
 
 # ===================================================================
 
+# test if first agument is in the list (remaining arguments)
+is_in() {
+  val=$1; shift
+  for w; do
+    test $val -eq $w && return
+  done
+  false
+}
+
 usage () {
   echo "Usage: $(basename $0) [options]"
   echo "  Options:"
@@ -47,8 +56,8 @@ EOD
 fi
 
 # get last request ID from file
-lastid=`cat "$reqIDfile" 2>/dev/null`
-if [ -z "$lastid" ] ; then
+lastids=`cat "$reqIDfile" 2>/dev/null`
+if [ -z "$lastids" ] ; then
     mail -s "[h5check-cron] request ID file does not exist" $expert << EOD
 $time
 Request ID file $reqIDfile is not there or empty
@@ -75,11 +84,12 @@ cd "$release"
 . /reg/g/psdm/bin/sit_setup.sh
 
 
-# get the list of IDs to check
-jobs=`ic-status -n -t | gawk -v lastid=$lastid '/ DONE / { if ($5 > lastid) printf "%s:%s:%s:%s\n", $1, $2, $3, $5; }'`
+# get the list of IDs to check, use last 200 successfully finished jobs
+jobs=`ic-status -n -t -S | tail -200 | gawk '{ printf "%s:%s:%s:%s\n", $1, $2, $3, $5; }'`
 
 # loop over the jobs
 status=0
+newlast=""
 for job in $jobs; do
 	
 	set `echo $job | tr : ' '`
@@ -87,7 +97,11 @@ for job in $jobs; do
 	exp=$2
 	run=$3
 	reqid=$4
-	
+
+    newlast="$newlast $reqid"
+
+	is_in $reqid $lastids && continue
+			
 	fname=`printf "/reg/d/psdm/%s/%s/hdf5/%s-r%04d.h5" $instr $exp $exp $run`
     if [ -f "$fname" ] ; then
     	time=`date +'%Y-%m-%d %H:%M:%S'`
@@ -96,6 +110,9 @@ for job in $jobs; do
     	echo $reqid > "$reqIDfile"
     fi
 done    		
+
+# store the list
+test -n "$newlast" && echo "$newlast" > "$reqIDfile"
 
 if [ $status -ne 0 ] ; then
 	mail -s "[irods-scan-cron] Detected corrupted HDF5 files" $expert << EOD
