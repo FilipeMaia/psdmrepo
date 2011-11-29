@@ -134,11 +134,16 @@ class RequestController ( BaseController ) :
         force = form_result['force']
         priority = form_result['priority']
 
+        model = IcdbModel()
+
+        # check that instrument/experiment exists
+        if not model.check_expname(instrument, experiment):
+            abort(400, "Invalid instrument/experiment names: %s:%s" % (instrument, experiment))
+
         # check user's privileges
         h.checkAccess(instrument, experiment, 'create')
 
         # send it all to model
-        model = IcdbModel()
         res = []
         code = 200
         for run in self._runList(runs) :
@@ -222,7 +227,7 @@ class RequestController ( BaseController ) :
         instr = data['instrument']
         exper = data['experiment']
         status = data['status']
-        if status not in ('Initial_Entry', 'Waiting_Translation'):
+        if status not in ('WAIT', 'WAIT_FILES'):
             abort(405, 'Cannot delete processed request: %d' % id)
 
         # check user's privileges

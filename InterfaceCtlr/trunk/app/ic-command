@@ -42,8 +42,9 @@ from AppUtils.AppBase import AppBase
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from LusiPython.DbConnection import DbConnection
 from InterfaceCtlr.InterfaceDb import InterfaceDb
+from LusiPython.DbConnection import DbConnection
+from RegDB.RegDb import RegDb
 
 #---------------------
 # Local definitions --
@@ -87,6 +88,7 @@ class ICCommand ( AppBase ) :
 
         self.__conn = None
         self.__icdb = None
+        self.__regdb = None
 
         self.__cmd_handlers = {}
         self.__cmd_order = []
@@ -184,6 +186,10 @@ class ICCommand ( AppBase ) :
         exper      = args[1]
         runnum     = int(args[2])
         xtcfiles   = args[3:]
+
+        # check instrument/experiment names
+        if not self.regdb().find_experiment_by_name(instr, exper):
+            parser.error("Instrument or experiment does not exist: %s:%s" % (instr, exper))
 
         if xtcfiles:
             status = 'WAIT'
@@ -318,13 +324,26 @@ class ICCommand ( AppBase ) :
                                     passwd=self._options.password,
                                     timeout=0 )
         return self.__conn
-                                    
+
+
     def icdb(self) :
     
         if self.__icdb : return self.__icdb
         
         self.__icdb = InterfaceDb( self.connection() )
         return self.__icdb
+
+
+    def regdb(self) :
+    
+        if self.__regdb : return self.__regdb
+
+        # get regdb connection string from database
+        config = self.icdb().read_config([])
+        regdbConnStr = config.get("regdb-conn")
+        
+        self.__regdb = RegDb(DbConnection(conn_string=regdbConnStr))
+        return self.__regdb
 
 
 # ==============================================

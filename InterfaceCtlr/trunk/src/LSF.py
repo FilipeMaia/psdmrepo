@@ -307,7 +307,10 @@ def maxUserPriority():
     """Return max user priority value"""
     
     global _parameterinfo
-    if not _parameterinfo: _parameterinfo = lsf.lsb_parameterinfo([], None, 0)
+    if not _parameterinfo: 
+        _parameterinfo = lsf.lsb_parameterinfo([], None, 0)
+        if not _parameterinfo:
+            raise LSBError()
     return _parameterinfo.maxUserPriority
 
 #

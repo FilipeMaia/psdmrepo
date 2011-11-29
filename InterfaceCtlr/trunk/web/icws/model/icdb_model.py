@@ -285,6 +285,23 @@ class IcdbModel ( InterfaceDb ) :
 
         return res.values()
 
+    def check_expname(self, instrument, experiment):
+        """Check that instrument/experiment name exist in regdb"""
+        
+        regdb = self._regdb()
+        return regdb.find_experiment_by_name(instr, exper) is not None
+
+    def _regdb(self) :
+
+        icdb = InterfaceDb(self._conn.connection())
+    
+        # get regdb connection string from database
+        config = icdb.read_config([])
+        regdbConnStr = config.get("regdb-conn")
+        
+        return RegDb(DbConnection(conn_string=regdbConnStr))
+
+
 #
 #  In case someone decides to run this module
 #

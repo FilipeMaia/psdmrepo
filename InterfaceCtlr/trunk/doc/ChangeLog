@@ -10,6 +10,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-04
+2011-11-29 Andy Salnikov
+- LSF.py and TranslatorJob.py: added protection when LSF is not 
+  accessible
+- ic-command and web service: added check for instrument/experiment 
+  name in regdb
+
 Tag: V01-00-03
 2011-11-04 Andy Salnikov
 - ic-status and ic-ws-status now display JobID column

@@ -520,7 +520,13 @@ class TranslatorJob(object) :
     def _checkDbPriority(self):
         """Check the value of dataset priority, update it if it's out of range"""
 
-        maxPriority = LSF.maxUserPriority()
+        try:
+            maxPriority = LSF.maxUserPriority()
+        except LSF.LSBError, ex:
+            # LSF may not be available temporarily, no reason to stop here now
+            self.warning("failed to get max priority number, LSF may be unavailable: %s", ex)
+            return
+            
         if self._fs.priority is None or self._fs.priority < 1 :
             
             self.debug("Change database priority from %s to %s", self._fs.priority,  maxPriority / 2)
