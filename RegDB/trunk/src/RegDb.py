@@ -86,8 +86,8 @@ class RegDb ( object ) :
 
     def find_experiment_by_id(self, id):
         """
-        Find experiment by its identifier. Return none or False of no such experiment
-        or a dictionary with parameters of the experiment. The followinng keys will
+        Find experiment by its identifier. Return none or False if no such experiment
+        or a dictionary with parameters of the experiment. The following keys will
         be found in the dictionary:
             - instr_id
             - instr_name
@@ -110,6 +110,32 @@ class RegDb ( object ) :
         if not rows : return None
         if len(rows) > 1:
             raise Exception("Too many rows for experiment id %s" % id)
+
+        row = rows[0]
+
+        row['registration_time'] = Time.from64( row['registration_time'] )
+        row['begin_time']        = Time.from64( row['begin_time'] )
+        row['end_time']          = Time.from64( row['end_time'] )
+
+        return row
+
+
+    def find_experiment_by_name(self, instrName, expName):
+        """
+        Find experiment by its name (plus instrument name). Returns
+        the same result as find_experiment_by_id().
+        """
+
+        # find the experiment
+        cursor = self._conn.cursor( True )
+        q = """SELECT i.name AS instr_name, i.descr AS instr_descr, e.* 
+            FROM experiment e, instrument i 
+            WHERE i.name=%s AND e.name=%s AND e.instr_id=i.id"""
+        cursor.execute(q, (instrName, expName))
+        rows = cursor.fetchall()
+        if not rows : return None
+        if len(rows) > 1:
+            raise Exception("Too many rows for experiment %s:%s" % (instrName, expName))
 
         row = rows[0]
 
