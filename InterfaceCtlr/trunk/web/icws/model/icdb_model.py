@@ -43,6 +43,7 @@ from InterfaceCtlr.InterfaceDb import InterfaceDb
 from pylons import config
 from LusiPython.DbConnection import DbConnection
 from LusiTime.Time import Time
+from RegDB.RegDb import RegDb
 
 #----------------------------------
 # Local non-exported definitions --
@@ -289,7 +290,7 @@ class IcdbModel ( InterfaceDb ) :
         """Check that instrument/experiment name exist in regdb"""
         
         regdb = self._regdb()
-        return regdb.find_experiment_by_name(instr, exper) is not None
+        return regdb.find_experiment_by_name(instrument, experiment) is not None
 
     def _regdb(self) :
 
