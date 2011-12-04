@@ -11,7 +11,7 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V01-00-06
-2011-13-04 Andy Salnikov
+2011-12-04 Andy Salnikov
 - use shutil.move to copy the resulting hdf files instead of os.rename
 
 Tag: V01-00-05
