@@ -31,6 +31,7 @@ __version__ = "$Revision$"
 import sys
 import os
 import time
+import shutil
 
 #---------------------------------
 #  Imports of base class module --
@@ -357,7 +358,7 @@ class TranslatorJob(object) :
             dst = os.path.join( dirname, f[0], f[1] )
             try:
                 self.debug("moving file %s ->%s", src,dst)
-                os.rename(src,dst)
+                shutil.move(src,dst)
             except Exception, e :
                 self.error("store_hdf5: failed to move file: %s -> %s", src, dst)
                 self.error("store_hdf5: exception raised: %s", str(e) )
