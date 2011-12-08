@@ -1,0 +1,70 @@
+#!/bin/bash
+#
+# ic-controller  This shell script takes care of starting and stopping
+#                the ic-controller
+#
+# chkconfig: 345 90 10
+# description:  Interface controller for PSDM/LCLS
+# processname: ic-controller
+# config: 
+# pidfile: /var/run/ic-controller/ic-controller.pid
+
+# Source function library.
+. /etc/init.d/functions
+
+
+prog=ic-controller
+pidfile=/var/run/ic-controller/ic-controller.pid
+CMDPATH=/reg/g/psdm/etc/ic-controller-runner
+
+RETVAL=0
+
+# create run directory if not there
+test -d /var/run/ic-controller || mkdir /var/run/ic-controller && chown psdatmgr /var/run/ic-controller
+
+start() {
+    echo -n "Starting ${prog}: "
+    pid=`cat "${pidfile}" 2>/dev/null`
+    if [ -n "${pid}" -a -d /proc/${pid} ] ; then
+        failure "already running, pid=$pid"
+    else
+        runuser -g ps-data -s /bin/bash psdatmgr -c "${CMDPATH} -p ${pidfile}" && success || failure
+    fi
+    RETVAL=$?
+}
+
+stop() {
+    echo -n "Shutting down ${prog}: "
+    pid=`cat "${pidfile}" 2>/dev/null`
+    if [ -n "${pid}" -a -d /proc/${pid} ] ; then
+        kill "${pid}" && success || failure
+        rm "${pidfile}"
+    else
+        failure "not running"
+    fi
+    RETVAL=$?
+}
+
+# See how we were called.
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart)
+        stop
+        sleep 3
+        start
+        ;;
+  status)
+        status -p "${pidfile}" ic-controller
+        RETVAL=$?
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|status}"
+        exit 1
+esac
+
+exit $RETVAL
