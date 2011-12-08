@@ -247,6 +247,7 @@ class TranslatorJob(object) :
             if returncode != 0:
                 self._update_fs_status('FAIL_COPY')
             else:
+                self.info ("[%s] moved data to final directory")
                 self._update_fs_status('DONE')
 
 
@@ -337,11 +338,26 @@ class TranslatorJob(object) :
                 else :
                     yield ( subdir, e )
 
+        def _basename(path):
+            path = os.path.split(path)
+            if not path[1]: path = os.path.split(path[0])
+            return path[1]
+        
+        # first move tmpdir as a whole to the final directory
+        tmpdirfinal = os.path.join(dirname, _basename(tmpdirname))
+        if not os.path.samefile(tmpdirfinal, tmpdirname):
+            try:
+                shutil.move(tmpdirname, tmpdirfinal)
+            except Exception, e:
+                self.error("store_hdf5: failed to move output files to directory %s", tmpdirfinal)
+                self.error("store_hdf5: exception raised: %s", str(e) )
+                return 2
+
         try:
             # build a list of files to store
-            files = [ x for x in _all_files( tmpdirname ) ]
+            files = [ x for x in _all_files( tmpdirfinal ) ]
         except Exception, e:
-            self.error("store_hdf5: failed to find output files in directory %s", tmpdirname)
+            self.error("store_hdf5: failed to find output files in directory %s", tmpdirfinal)
             self.error("store_hdf5: exception raised: %s", str(e) )
             return 2
 
@@ -354,7 +370,7 @@ class TranslatorJob(object) :
             
         # move all files to final destination
         for f in files :
-            src = os.path.join( tmpdirname, f[0], f[1] )
+            src = os.path.join( tmpdirfinal, f[0], f[1] )
             dst = os.path.join( dirname, f[0], f[1] )
             try:
                 self.debug("moving file %s ->%s", src,dst)
@@ -366,7 +382,7 @@ class TranslatorJob(object) :
         
         # remove temporary directory
         try :
-            self.debug("removing temp dir %s", tmpdirname)
+            self.debug("removing temp dir %s", tmpdirfinal)
             os.rmdir( tmpdirname )
         except Exception, e :
             # non-fatal, means it may have some subdirectories
