@@ -366,12 +366,28 @@ class TranslatorJob(object) :
             self.error("store_hdf5: exception raised: %s", str(e) )
             return 2
 
-        # check that final destination does not have these files
-        for f in files :
-            dst = os.path.join( dirname, f[0], f[1] )
-            if os.path.exists(dst) :
-                self.error("store_hdf5: destination files already exists: %s",dst)
-                return 2
+        backup_suffix = self._get_config("hdf-backup-suffix", None, True)
+        if backup_suffix:
+            # if destination file already there rename it
+            for f in files :
+                dst = os.path.join( dirname, f[0], f[1] )
+                if os.path.exists(dst) :
+                    dstbck = dst + backup_suffix
+                    self.trace("store_hdf5: backup existing file %s -> %s", dst, dstbck)
+                    try:
+                        shutil.move(dst, dstbck)
+                    except Exception, e :
+                        self.error("store_hdf5: failed to backup file %s", dst)
+                        self.error("store_hdf5: exception raised: %s", str(e) )
+                        return 2
+        else:
+            # check that final destination does not have these files
+            for f in files :
+                dst = os.path.join( dirname, f[0], f[1] )
+                if os.path.exists(dst) :
+                    self.error("store_hdf5: destination files already exists: %s",dst)
+                    return 2
+
             
         # move all files to final destination
         for f in files :

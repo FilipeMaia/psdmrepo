@@ -10,6 +10,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-09
+2011-12-08 Andy Salnikov
+- when non-empty option "hdf-backup-suffix" is present in configuration 
+  and the destination HDF5 already exist it will be renamed by adding
+  a suffix (from option) to its name. Good value for suffix is may be
+  "-%(current_time)s.bck". If option does not exist or non-empty then
+  new files are left in subdirectory as before.
+
 Tag: V01-00-08
 2011-12-08 Andy Salnikov
 - few fixes to file move procedure
