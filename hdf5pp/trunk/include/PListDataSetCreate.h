@@ -72,7 +72,7 @@ public:
   // set deflate compression method
   void set_deflate ( unsigned level ) ;
 
-  // set deflate compression method
+  // set szip compression method
   void set_szip ( unsigned mask, unsigned block_size ) ;
 
   // set shuffle "compression"

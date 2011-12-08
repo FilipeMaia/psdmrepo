@@ -9,7 +9,6 @@
 //      Andrei Salnikov
 //
 //------------------------------------------------------------------------
-#include "Lusi/Lusi.h"
 
 //-----------------------
 // This Class's Header --
@@ -46,10 +45,11 @@ DataSetImpl::createDataSet ( hid_t parent,
                              const std::string& name,
                              const Type& type,
                              const DataSpace& dspc,
-                             const PListDataSetCreate& plistDScreate )
+                             const PListDataSetCreate& plistDScreate,
+                             const PListDataSetAccess& plistDSaccess )
 {
   hid_t ds = H5Dcreate2 ( parent, name.c_str(), type.id(), dspc.id(),
-                          H5P_DEFAULT, plistDScreate.plist(), H5P_DEFAULT ) ;
+                          H5P_DEFAULT, plistDScreate.plist(), plistDSaccess.plist() ) ;
   if ( ds < 0 ) throw Hdf5CallException( "DataSet::createDataSet", "H5Dcreate2" ) ;
   return DataSetImpl ( ds ) ;
 }

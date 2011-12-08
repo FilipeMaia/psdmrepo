@@ -24,6 +24,7 @@
 #include "hdf5pp/Attribute.h"
 #include "hdf5pp/DataSetImpl.h"
 #include "hdf5pp/DataSpace.h"
+#include "hdf5pp/PListDataSetAccess.h"
 #include "hdf5pp/PListDataSetCreate.h"
 #include "hdf5pp/Type.h"
 #include "hdf5pp/TypeTraits.h"
@@ -122,9 +123,10 @@ protected:
                                 const std::string& name,
                                 const Type& type,
                                 const DataSpace& dspc,
-                                const PListDataSetCreate& plistDScreate )
+                                const PListDataSetCreate& plistDScreate,
+                                const PListDataSetAccess& plistDSaccess)
   {
-    return DataSet ( DataSetImpl::createDataSet ( parent, name, type, dspc, plistDScreate ) ) ;
+    return DataSet ( DataSetImpl::createDataSet ( parent, name, type, dspc, plistDScreate, plistDSaccess ) ) ;
   }
 
   /// open existing dataset

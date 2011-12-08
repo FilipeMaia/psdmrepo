@@ -24,6 +24,7 @@
 //-------------------------------
 #include "hdf5pp/Attribute.h"
 #include "hdf5pp/DataSpace.h"
+#include "hdf5pp/PListDataSetAccess.h"
 #include "hdf5pp/PListDataSetCreate.h"
 #include "hdf5pp/Type.h"
 
@@ -59,7 +60,8 @@ public:
                                      const std::string& name,
                                      const Type& type,
                                      const DataSpace& dspc,
-                                     const PListDataSetCreate& plistDScreate ) ;
+                                     const PListDataSetCreate& plistDScreate,
+                                     const PListDataSetAccess& plistDSaccess ) ;
 
   /// open existing dataset
   static DataSetImpl openDataSet ( hid_t parent, const std::string& name ) ;

@@ -1,19 +1,19 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: Type.cpp 250 2009-04-08 01:02:05Z salnikov $
+// 	$Id$
 //
 // Description:
-//	Class Type...
+//	Class PListDataSetAccess...
 //
 // Author List:
-//      Andrei Salnikov
+//      Andy Salnikov
 //
 //------------------------------------------------------------------------
 
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "hdf5pp/ArrayType.h"
+#include "hdf5pp/PListDataSetAccess.h"
 
 //-----------------
 // C/C++ Headers --
@@ -22,7 +22,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "hdf5/hdf5.h"
 #include "hdf5pp/Exceptions.h"
 
 //-----------------------------------------------------------------------
@@ -35,13 +34,29 @@
 
 namespace hdf5pp {
 
-// make a an array type of any rank
-ArrayType
-ArrayType::arrayType( const Type& baseType, unsigned rank, hsize_t dims[] )
+//----------------
+// Constructors --
+//----------------
+PListDataSetAccess::PListDataSetAccess ()
+  : m_impl(H5P_DATASET_ACCESS)
 {
-  hid_t tid = H5Tarray_create2( baseType.id(), rank, dims ) ;
-  if ( tid < 0 ) throw Hdf5CallException ( "ArrayType::arrayType", "H5Tarray_create2" ) ;
-  return ArrayType ( tid ) ;
+}
+
+//--------------
+// Destructor --
+//--------------
+PListDataSetAccess::~PListDataSetAccess ()
+{
+}
+
+// define chuk cache properties
+void
+PListDataSetAccess::set_chunk_cache(size_t rdcc_nslots, size_t rdcc_nbytes, double rdcc_w0)
+{
+  herr_t stat = H5Pset_chunk_cache(m_impl.id(), rdcc_nslots, rdcc_nbytes, rdcc_w0);
+  if (stat < 0) {
+    throw Hdf5CallException("PListDataSetCreate::set_chunk", "H5Pset_chunk");
+  }
 }
 
 } // namespace hdf5pp

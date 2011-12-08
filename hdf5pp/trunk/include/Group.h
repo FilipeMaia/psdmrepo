@@ -27,6 +27,7 @@
 #include "hdf5pp/Attribute.h"
 #include "hdf5pp/DataSet.h"
 #include "hdf5pp/DataSpace.h"
+#include "hdf5pp/PListDataSetAccess.h"
 #include "hdf5pp/PListDataSetCreate.h"
 
 //------------------------------------
@@ -94,9 +95,10 @@ public:
   template <typename T>
   DataSet<T> createDataSet ( const std::string& name,
                              const DataSpace& dspc,
-                             const PListDataSetCreate& plistDScreate = PListDataSetCreate() )
+                             const PListDataSetCreate& plistDScreate = PListDataSetCreate(),
+                             const PListDataSetAccess& plistDSaccess = PListDataSetAccess())
   {
-    return DataSet<T>::createDataSet ( *m_id, name, TypeTraits<T>::stored_type(), dspc, plistDScreate ) ;
+    return DataSet<T>::createDataSet ( *m_id, name, TypeTraits<T>::stored_type(), dspc, plistDScreate, plistDSaccess ) ;
   }
 
   // create new data set, type is determined by explicit parameter
@@ -104,9 +106,10 @@ public:
   DataSet<T> createDataSet ( const std::string& name,
                              const Type& type,
                              const DataSpace& dspc,
-                             const PListDataSetCreate& plistDScreate = PListDataSetCreate() )
+                             const PListDataSetCreate& plistDScreate = PListDataSetCreate(),
+                             const PListDataSetAccess& plistDSaccess = PListDataSetAccess())
   {
-    return DataSet<T>::createDataSet ( *m_id, name, type, dspc, plistDScreate ) ;
+    return DataSet<T>::createDataSet ( *m_id, name, type, dspc, plistDScreate, plistDSaccess ) ;
   }
 
   // open existing dataset
