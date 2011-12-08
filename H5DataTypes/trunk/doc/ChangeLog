@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-45
+2011-12-08 Andy Salnikov
+- ObjectContainer class now has smarter algorithm for determining 
+  chunk size for dataset and also changing the chunk cache properties
+
 Tag: V00-00-44
 2011-11-11 Andy Salnikov
 - added EncoderConfigV2 class

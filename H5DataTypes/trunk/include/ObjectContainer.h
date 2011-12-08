@@ -70,16 +70,31 @@ public:
 
     // use chunking
     hdf5pp::PListDataSetCreate plDScreate ;
-    plDScreate.set_chunk(chunk_size) ;
+    hsize_t objectsPerChunk = numObjectsPerChunk(stored_type, chunk_size);
+    plDScreate.set_chunk(objectsPerChunk) ;
     if ( shuffle ) plDScreate.set_shuffle() ;
     if ( deflate >= 0 ) plDScreate.set_deflate(deflate) ;
 
+    // adjust chunk cache size to fit at least one chunk
+    hdf5pp::PListDataSetAccess plDSaccess;
+    const hsize_t def_chunk_cache_size = 1024*1024;
+    const hsize_t max_chunk_cache_size = 10*1024*1024;
+    hsize_t chunk_cache_size = objectsPerChunk * stored_type.size();
+    if (chunk_cache_size < def_chunk_cache_size) {
+      chunk_cache_size = def_chunk_cache_size;
+    } else  if (chunk_cache_size < max_chunk_cache_size) {
+      chunk_cache_size *= 2;
+    }
+    hsize_t nchunks_in_cache = chunk_cache_size / (objectsPerChunk * stored_type.size());
+    MsgLog("ObjectContainer", trace, "ObjectContainer -- set chunk cache size to " << chunk_cache_size) ;
+    plDSaccess.set_chunk_cache(nchunks_in_cache*20, chunk_cache_size);
+
     // make a data set
-    MsgLog("ObjectContainer", trace, "ObjectContainer -- creating dataset " << name ) ;
+    MsgLog("ObjectContainer", trace, "ObjectContainer -- creating dataset " << name << " with chunk size " << objectsPerChunk << " (objects)") ;
     if (location.hasChild(name)) {
       m_dataset = location.openDataSet<T> ( name ) ;
     } else {
-      m_dataset = location.createDataSet<T> ( name, stored_type, dsp, plDScreate ) ;
+      m_dataset = location.createDataSet<T> ( name, stored_type, dsp, plDScreate, plDSaccess ) ;
     }
   }
 
@@ -111,6 +126,26 @@ public:
   hdf5pp::DataSet<T>& dataset() { return m_dataset ; }
 
 private:
+
+  /// Calculate suitable chunk size from input data
+  static hsize_t numObjectsPerChunk (const hdf5pp::Type& stored_type, hsize_t chunk_size)
+  {
+    const hsize_t abs_max_chunk_size = 100*1024*1024;
+    const unsigned max_objects_per_chunk = 2048;
+    const unsigned min_objects_per_chunk = 50;
+
+    // chunk_size is a desirable size, make sure that number of objects is not
+    // too large or too small
+    size_t obj_size = stored_type.size();
+    hsize_t chunk = chunk_size / obj_size;
+    if (chunk > max_objects_per_chunk) {
+      chunk = max_objects_per_chunk;
+    } else if (chunk < min_objects_per_chunk) {
+      chunk = min_objects_per_chunk;
+      if (chunk*obj_size > abs_max_chunk_size) chunk = abs_max_chunk_size / obj_size;
+    }
+    return chunk;
+  }
 
   hdf5pp::DataSet<T> m_dataset ;
   unsigned long m_count ;
