@@ -903,7 +903,7 @@ class Plotter(object):
         aplot.axesim = aplot.axes.imshow( frameimage,
                                           origin=myorigin,
                                           extent=extent,
-                                          aspect=self.aspect,
+                                          aspect=aplot.aspect,
                                           interpolation='bilinear',
                                           vmin=aplot.vmin,
                                           vmax=aplot.vmax )
