@@ -247,7 +247,7 @@ class TranslatorJob(object) :
             if returncode != 0:
                 self._update_fs_status('FAIL_COPY')
             else:
-                self.info ("[%s] moved data to final directory")
+                self.info ("[%s] moved data to final directory", self._name)
                 self._update_fs_status('DONE')
 
 
@@ -343,10 +343,15 @@ class TranslatorJob(object) :
             if not path[1]: path = os.path.split(path[0])
             return path[1]
         
+        if not os.path.exists(tmpdirname):
+            self.error("store_hdf5: temporary directory %s does not exist", tmpdirname)
+            return 2
+        
         # first move tmpdir as a whole to the final directory
         tmpdirfinal = os.path.join(dirname, _basename(tmpdirname))
-        if not os.path.samefile(tmpdirfinal, tmpdirname):
+        if not os.path.exists(tmpdirfinal) or not os.path.samefile(tmpdirfinal, tmpdirname):
             try:
+                self.trace("moving directory %s -> %s", tmpdirname, tmpdirfinal)
                 shutil.move(tmpdirname, tmpdirfinal)
             except Exception, e:
                 self.error("store_hdf5: failed to move output files to directory %s", tmpdirfinal)
@@ -373,7 +378,7 @@ class TranslatorJob(object) :
             src = os.path.join( tmpdirfinal, f[0], f[1] )
             dst = os.path.join( dirname, f[0], f[1] )
             try:
-                self.debug("moving file %s ->%s", src,dst)
+                self.trace("moving file %s -> %s", src,dst)
                 shutil.move(src,dst)
             except Exception, e :
                 self.error("store_hdf5: failed to move file: %s -> %s", src, dst)
@@ -383,10 +388,10 @@ class TranslatorJob(object) :
         # remove temporary directory
         try :
             self.debug("removing temp dir %s", tmpdirfinal)
-            os.rmdir( tmpdirname )
+            os.rmdir( tmpdirfinal )
         except Exception, e :
             # non-fatal, means it may have some subdirectories
-            self.error("store_hdf5: failed to remove directory %s: %s", tmpdirname, str(e) )
+            self.error("store_hdf5: failed to remove directory %s: %s", tmpdirfinal, str(e) )
 
         # add all files to fileset
         self._db.add_files( fs.id, 'HDF5', [os.path.join(dirname,f[0],f[1]) for f in files ] )

@@ -10,6 +10,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-08
+2011-12-08 Andy Salnikov
+- few fixes to file move procedure
+
 Tag: V01-00-07
 2011-12-07 Andy Salnikov
 - copy HDF files to temporary directory first inside final directory
