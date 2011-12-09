@@ -1,0 +1,79 @@
+#!/bin/sh
+#
+# $Id$
+
+pack_psana="PSEnv PSEvt PSTime PSXtcInput PSHist RootHistoManager MsgLogger ndarray psana psddl_psana"
+pack_psana_mod="CSPadPixCoords PSCalib cspad_mod psana_examples"
+
+usage() {
+  echo "Usage: $(basename $0) [options] output-dir [package ...]"
+  echo
+  echo "Availabale options:"
+  echo "    -h        print this message"
+  echo "    -d        debug (turn on -x shell option)"
+  echo "    -m mode   use predefined mode"
+  echo
+  echo "Predefined modes:"
+  echo "   psana (default)"
+  echo "   psana-modules"
+  echo
+  echo "If the list of packages is provided then mode is ignored"
+}
+
+# default values for options
+mode="psana"
+
+# get the options
+while getopts hdm: c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    d) set -x ;;
+    m) mode="$OPTARG" ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# get output directory name
+if [ $# -eq 0 ] ; then
+  usage
+  exit 2
+fi
+output="$1"
+shift
+
+# optional package names
+if [ $# -ne 0 ] ; then
+  packages="$@"
+  mode="unknown"
+else
+  case $mode in
+    psana) packages="$pack_psana" ;;
+    psana-modules) packages="$pack_psana_mod" ;;
+    \?) usage ; exit 2 ;;
+  esac
+fi
+
+# try to make directory
+mkdir -p "$output" 2>/dev/null
+
+# run doxygen
+doxygen - << EOD 
+PROJECT_NAME           = $mode
+OUTPUT_DIRECTORY       = $output
+CREATE_SUBDIRS         = NO
+DETAILS_AT_TOP         = NO
+BUILTIN_STL_SUPPORT    = YES
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+INPUT                  = $packages
+FILE_PATTERNS          = *.h *.py *.cpp *.dox
+RECURSIVE              = YES
+SOURCE_BROWSER         = YES
+STRIP_CODE_COMMENTS    = NO
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+EOD
