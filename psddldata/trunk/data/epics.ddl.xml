@@ -578,7 +578,7 @@
 			
 			<method name="value" type="string">
                 <arg name="i" type="uint32_t"/>
-                <expr lang="C++" value="data()+i*MAX_STRING_SIZE"/>
+                <expr lang="C++" value="data(i)"/>
 			</method>
         </pstype>
         
@@ -666,7 +666,7 @@
             
             <method name="value" type="string">
                 <arg name="i" type="uint32_t"/>
-                <expr lang="C++" value="data()+MAX_STRING_SIZE*i"/>
+                <expr lang="C++" value="data(i)"/>
             </method>
         </pstype>
         

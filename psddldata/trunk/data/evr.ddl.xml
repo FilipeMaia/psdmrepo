@@ -567,6 +567,8 @@
         
         <pstype name="IOChannel">
         
+            <tag name="value-type"/>
+
             <const name="NameLength" value="12"/>
             <const name="MaxInfos" value="8"/>
         
@@ -579,6 +581,16 @@
             <attribute name="_info" type="Pds.DetInfo" shape="MaxInfos" accessor="infos">
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+            
         </pstype>
         
         <!-- ========================================================================= -->

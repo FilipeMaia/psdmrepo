@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2011-12-09 Andrei Salnikov
+- few small changes related to ndarray migration
+- evr.IOChannel is now value-type class
+
 Tag: V00-00-14
 2011-11-12 Andrei Salnikov
 - new class encoder.ConfigV2
