@@ -2,8 +2,8 @@
 #
 # $Id$
 
-pack_psana="PSEnv PSEvt PSTime PSXtcInput PSHist RootHistoManager psana psana/doc/mainpage.dox"
-pack_psana_mod="CSPadPixCoords  PSCalib"
+pack_psana="PSEnv PSEvt PSTime PSXtcInput PSHist RootHistoManager MsgLogger ndarray psana psddl_psana"
+pack_psana_mod="CSPadPixCoords PSCalib cspad_mod psana_examples"
 
 usage() {
   echo "Usage: $(basename $0) [options] output-dir [package ...]"
@@ -69,7 +69,7 @@ EXTRACT_PRIVATE        = NO
 EXTRACT_STATIC         = YES
 EXTRACT_LOCAL_CLASSES  = YES
 INPUT                  = $packages
-FILE_PATTERNS          = *.h *.py
+FILE_PATTERNS          = *.h *.py *.cpp *.dox
 RECURSIVE              = YES
 SOURCE_BROWSER         = YES
 STRIP_CODE_COMMENTS    = NO
