@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-14-04
+2011-12-08 Andy Salnikov
+- increasing chunk size for large dataset, should help with the
+  performance when opening large files
+
 Tag: V00-14-03
 2011-11-11 Andy Salnikov
 - adding support for Encoder::ConfigV2, Gsc16ai::ConfigV1

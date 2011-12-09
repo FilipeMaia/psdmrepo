@@ -196,9 +196,8 @@ CvtDataContFactoryEpics::container( hdf5pp::Group group, const Pds::EpicsPvHeade
 {
   hdf5pp::Type type = native_type(pv) ;
 
-  hsize_t chunk = m_chunkSize / type.size() ;
-  MsgLog( "CvtDataContFactoryEpics", debug, "create container " << m_name << " with chunk size " << chunk ) ;
-  return new container_type ( m_name, group, type, chunk, m_deflate, m_shuffle ) ;
+  MsgLog( "CvtDataContFactoryEpics", debug, "create container " << m_name << " with chunk size " << m_chunkSize ) ;
+  return new container_type ( m_name, group, type, m_chunkSize, m_deflate, m_shuffle ) ;
 }
 
 

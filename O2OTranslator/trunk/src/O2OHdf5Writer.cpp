@@ -380,7 +380,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 3).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
-  hsize_t chunk_size = 16*1024 ;
+  hsize_t chunk_size = 16*1024*1024 ;
 
   // instantiate all factories for event converters
   converter.reset( new EvtDataTypeCvtDef<H5DataTypes::CameraTwoDGaussianV1> (
@@ -503,7 +503,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 //  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
   // Epics converter, non-default chunk size
-  converter.reset( new EpicsDataTypeCvt( "Epics::EpicsPv", 1024, m_compression ) ) ;
+  converter.reset( new EpicsDataTypeCvt( "Epics::EpicsPv", 16*1024, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_Epics,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 

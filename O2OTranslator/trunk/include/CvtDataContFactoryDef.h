@@ -62,12 +62,11 @@ public:
                           bool shuffle = false,
                           hdf5pp::Type type = H5Type::stored_type() )
     : m_name(name)
-    , m_chunkSize()
+    , m_chunkSize(chunkSize)
     , m_deflate(deflate)
     , m_shuffle(shuffle)
     , m_type(type)
   {
-    m_chunkSize = std::max ( chunkSize / sizeof(H5Type), hsize_t(1) ) ;
   }
 
   // Destructor

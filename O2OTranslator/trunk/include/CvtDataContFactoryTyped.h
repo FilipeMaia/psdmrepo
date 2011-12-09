@@ -71,9 +71,8 @@ public:
   // main method
   container_type* container( hdf5pp::Group group, hdf5pp::Type type ) const
   {
-    hsize_t chunkSize = std::max( m_chunkSize/type.size(), hsize_t(1) ) ;
-    MsgLog( "CvtDataContFactoryTyped", debug, "create container " << m_name << " with chunk size " << chunkSize ) ;
-    return new container_type ( m_name, group, type, chunkSize, m_deflate, m_shuffle ) ;
+    MsgLog( "CvtDataContFactoryTyped", debug, "create container " << m_name << " with chunk size " << m_chunkSize ) ;
+    return new container_type ( m_name, group, type, m_chunkSize, m_deflate, m_shuffle ) ;
   }
 
 protected:
