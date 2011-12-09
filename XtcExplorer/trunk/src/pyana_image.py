@@ -182,12 +182,10 @@ class  pyana_image ( object ) :
 
         self.configtypes = { 'Cspad2x2'  : xtc.TypeId.Type.Id_CspadConfig ,
                              'Cspad'     : xtc.TypeId.Type.Id_CspadConfig ,
-                             'Opal'      : xtc.TypeId.Type.Id_Opal1kConfig,
-                             '????'     : xtc.TypeId.Type.Id_FrameFexConfig,
+                             'Opal1000'  : xtc.TypeId.Type.Id_Opal1kConfig,
                              'TM6740'    : xtc.TypeId.Type.Id_TM6740Config,
                              'pnCCD'     : xtc.TypeId.Type.Id_pnCCDconfig,
                              'Princeton' : xtc.TypeId.Type.Id_PrincetonConfig,
-                             'Fccd ?? '  : xtc.TypeId.Type.Id_FrameFccdConfig,
                              'Fccd'      : xtc.TypeId.Type.Id_FccdConfig,
                              'PIM'       : xtc.TypeId.Type.Id_PimImageConfig
                              }
@@ -195,7 +193,7 @@ class  pyana_image ( object ) :
         self.datatypes = {'Cspad2x2'      : xtc.TypeId.Type.Id_Cspad2x2Element, 
                           'Cspad'         : xtc.TypeId.Type.Id_CspadElement,
                           'TM6740'        : xtc.TypeId.Type.Id_Frame,
-                          'Opal'          : xtc.TypeId.Type.Id_Frame,
+                          'Opal1000'      : xtc.TypeId.Type.Id_Frame,
                           'pnCCD'         : xtc.TypeId.Type.Id_pnCCDframe,
                           'Princeton'     : xtc.TypeId.Type.Id_PrincetonFrame
                           }
@@ -371,19 +369,6 @@ class  pyana_image ( object ) :
         if len(event_display_images)==0 :
             return
             
-        #if self.image_manipulations is not None: 
-        #    for i in range ( 0, len(event_display_images) ):
-        #                    
-        #        if "Diff" in self.image_manipulations :
-        #            lb1,ad1,im1 = event_display_images[i]
-        #            lb2,ad2,im2 = event_display_images[i-1]
-        #            event_display_images.append( ("diff","Diff %s-%s"%(lb1,lb2), im1-im2) )
-        #                        
-        #        if "FFT" in self.image_manipulations :
-        #            F = np.fft.fftn(im1-im2)
-        #            event_display_images.append( \
-        #                ("fft","FFT %s-%s"%(lb1,lb2), np.log(np.abs(np.fft.fftshift(F))**2) ) )
-                                    
             
                     
         # -----------------------------------

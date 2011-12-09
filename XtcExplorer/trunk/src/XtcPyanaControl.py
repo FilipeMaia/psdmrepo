@@ -146,7 +146,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
             
         self.setWindowTitle('Pyana Control Center')
-        self.setWindowIcon(QtGui.QIcon('XtcExplorer/src/lclsLogo.gif'))
+        self.setWindowIcon(QtGui.QIcon('data/XtcExplorer/icons/lclsLogo.gif'))
 
         print "XtcPyanaControl printing data ", data
             
@@ -211,7 +211,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # header: icon
         h0 = QtGui.QHBoxLayout()
         pic = QtGui.QLabel(self)
-        pic.setPixmap( QtGui.QPixmap('XtcExplorer/src/lclsLogo.gif'))
+        pic.setPixmap( QtGui.QPixmap('data/XtcExplorer/icons/lclsLogo.gif'))
         h0.addWidget( pic )
         h0.setAlignment( pic, QtCore.Qt.AlignLeft )
 
@@ -694,7 +694,7 @@ Start with selecting data of interest to you from list on the left and general r
         self.pvWindow = QtGui.QWidget()
         self.pvWindow.setStyleSheet("QWidget {background-color: #FFFFFF }")
         self.pvWindow.setWindowTitle('Available Epics PVs')
-        self.pvWindow.setWindowIcon(QtGui.QIcon('XtcExplorer/src/lclsLogo.gif'))
+        self.pvWindow.setWindowIcon(QtGui.QIcon('data/XtcExplorer/icons/lclsLogo.gif'))
         self.pvWindow.setMinimumWidth(300)
         self.pvWindow.setMinimumHeight(700)
 
@@ -900,14 +900,16 @@ Start with selecting data of interest to you from list on the left and general r
 
 
         # --- --- --- BLD --- --- ---
-        if str(box.text()).find("BldInfo")>=0 :
+        if ( str(box.text()).find("EBeam")>=0 or 
+             str(box.text()).find("FEEGasDetEnergy")>=0 or
+             str(box.text()).find("PhaseCavity")>=0 ):
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_bld")
             except ValueError :
                 index = len(modules_to_run)
                 modules_to_run.append("XtcExplorer.pyana_bld")
                 options_for_mod.append([])
-
+                
             #print "XtcExplorer.pyana_bld at ", index
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
@@ -918,9 +920,6 @@ Start with selecting data of interest to you from list on the left and general r
                 options_for_mod[index].append("\ndo_gasdetector = True")
             if str(box.text()).find("PhaseCavity")>=0 :
                 options_for_mod[index].append("\ndo_phasecavity = True")
-            if (str(box.text()).find("IPM")>=0 or
-                str(box.text()).find("DIO")>=0 ):
-                options_for_mod[index].append("\ndo_ipimb = True")
             return
             
         # --- --- --- Waveform --- --- ---
@@ -944,7 +943,7 @@ Start with selecting data of interest to you from list on the left and general r
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
-            options_for_mod[index].append("\nmode = averagestack")
+            options_for_mod[index].append("\nquantities = average")
             return
                     
         # --- --- --- Ipimb --- --- ---

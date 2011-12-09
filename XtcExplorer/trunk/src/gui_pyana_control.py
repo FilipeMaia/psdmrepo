@@ -133,7 +133,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
 
         self.setWindowTitle('Pyana Control Center')
-        self.setWindowIcon(QtGui.QIcon('XtcExplorer/src/lclsLogo.gif'))
+        self.setWindowIcon(QtGui.QIcon('data/XtcExplorer/icons/lclsLogo.gif'))
 
         # container for information about the data
         self.filenames = data.files
@@ -198,7 +198,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         # header: icon
         h0 = QtGui.QHBoxLayout()
         pic = QtGui.QLabel(self)
-        pic.setPixmap( QtGui.QPixmap('XtcExplorer/src/lclsLogo.gif'))
+        pic.setPixmap( QtGui.QPixmap('data/XtcExplorer/icons/lclsLogo.gif'))
         h0.addWidget( pic )
         h0.setAlignment( pic, QtCore.Qt.AlignLeft )
         label = QtGui.QLabel(self)
@@ -673,7 +673,7 @@ Start with selecting data of interest to you from list on the left and general r
         self.pvWindow = QtGui.QWidget()
         self.pvWindow.setStyleSheet("QWidget {background-color: #FFFFFF }")
         self.pvWindow.setWindowTitle('Available Epics PVs')
-        self.pvWindow.setWindowIcon(QtGui.QIcon('XtcExplorer/src/lclsLogo.gif'))
+        self.pvWindow.setWindowIcon(QtGui.QIcon('data/XtcExplorer/icons/lclsLogo.gif'))
         self.pvWindow.setMinimumWidth(300)
         self.pvWindow.setMinimumHeight(700)
 

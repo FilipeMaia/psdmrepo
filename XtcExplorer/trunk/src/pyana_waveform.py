@@ -98,8 +98,9 @@ class pyana_waveform (object) :
         # containers to store data from this job
         self.ctr = {} # source-specific event counter 
         self.ts = {} # time waveform
-        self.wf = {} # voltage waveform
-        self.wf2 = {} # waveform squared (for computation of RMS)
+        self.wf = {} # voltage waveform (single event)
+        self.wf_accum = {} # voltage waveform (accumulated)
+        self.wf2_accum = {} # waveform squared (for computation of RMS) (accumulated)
         self.wf_stack = {}
 
                 
@@ -107,10 +108,11 @@ class pyana_waveform (object) :
         self.accu_start = self.n_shots
         for label in self.src_ch :
             self.ctr[label] = 0
-            del self.wf[label] 
-            del self.wf2[label]
             self.wf[label] = None
-            self.wf2[label] = None
+            del self.wf_accum[label] 
+            del self.wf2_accum[label]
+            self.wf_accum[label] = None
+            self.wf2_accum[label] = None
 
     #-------------------
     #  Public methods --
@@ -153,7 +155,8 @@ class pyana_waveform (object) :
                 self.ctr[label] = 0
                 self.ts[label] = None
                 self.wf[label] = np.empty( nsmp, dtype='float64')
-                self.wf2[label] = np.empty( nsmp, dtype='float64')
+                self.wf_accum[label] = np.empty( nsmp, dtype='float64')
+                self.wf2_accum[label] = np.empty( nsmp, dtype='float64')
 
                 self.wf_stack[label] = None
                 if self.accumulate_n > 0 :
@@ -163,7 +166,7 @@ class pyana_waveform (object) :
                     
                 
         self.plotter = Plotter()
-        self.plotter.settings(4,4) # set default frame size
+        self.plotter.settings(7,7) # set default frame size
         self.plotter.threshold = None
 
         #if self.threshold is not None:
@@ -224,6 +227,18 @@ class pyana_waveform (object) :
                 
                 self.ctr[label]+=1
 
+                if self.quantities.find('single')>=0:
+                    self.wf[label] = awf
+
+                if self.quantities.find('average')>=0:
+                    # collect sum for average
+                    if self.wf_accum[label] is None : # first event
+                        self.wf_accum[label] = awf
+                        self.wf2_accum[label] = (awf*awf)
+                    else :
+                        self.wf_accum[label] += awf
+                        self.wf2_accum[label] += (awf*awf)
+
                 
                 if self.quantities.find('stack')>=0 :
                     # fill image
@@ -238,27 +253,28 @@ class pyana_waveform (object) :
                             self.wf_stack[label].append( awf )
 
 
-                if self.quantities.find('average')>=0:
-                    # collect sum for average
-                    if self.wf[label] is None : # first event
-                        self.wf[label] = awf
-                        self.wf2[label] = (awf*awf)
-                    else :
-                        self.wf[label] += awf
-                        self.wf2[label] += (awf*awf)
-
                             
+        # only call plotter if this is the main thread
+        if (env.subprocess()>0):
+            return
+
         if self.do_plots and (self.n_shots%self.plot_every_n)==0:
 
             # flag for pyana_plotter
             evt.put(True, 'show_event')
             
-            self.make_plots()
+            newmode = self.make_plots()
                 
         if  ( self.accumulate_n != 0 and (self.n_shots%self.accumulate_n)==0 ):
             self.resetlists()
 
+        if newmode is not None:
+            # propagate new display mode to the evt object 
+            evt.put(newmode,'display_mode')
+            # reset
+            self.plotter.display_mode = None
                     
+
     def endcalibcycle( self, env ) :
         """This optional method is called if present at the end of the 
         calibration cycle.
@@ -290,14 +306,31 @@ class pyana_waveform (object) :
     def make_plots(self):
 
         ## Plotting
+        suptitle = "Events %d-%d" % (self.accu_start,self.n_shots)
+
+        if self.quantities.find('single')>=0:
+            for source in self.src_ch :            
+                name = "wf(%s)"%source
+                title = "Single event (#%d), %s"%(self.n_shots,source)
+                nbins = self.wf[source].size
+                contents = (self.ts[source][0:nbins],self.wf[source])
+                self.plotter.add_frame(name,title,contents, aspect='auto')
+
+                # This title is common to all the plots
+                suptitle = "Event %d" % (self.n_shots)
+                # will be overwritten if 'average' or 'stack' is also requested
+
         if self.quantities.find('average')>=0:
             for source in self.src_ch :            
                 name = "wfavg(%s)"%source
                 title = "Average, %s"%source
-                nbins = self.wf[source].size
-                contents = (self.ts[source][0:nbins],self.wf[source]/self.ctr[source])
+                nbins = self.wf_accum[source].size
+                contents = (self.ts[source][0:nbins],self.wf_accum[source]/self.ctr[source])
                 self.plotter.add_frame(name,title,contents, aspect='auto')
-
+ 
+                # This title is common to all the plots
+                suptitle = "Events %d-%d" % (self.accu_start,self.n_shots)
+        
         if self.quantities.find('stack')>=0:
             for source in self.src_ch :            
                 name = "wfstack(%s)"%source
@@ -309,12 +342,16 @@ class pyana_waveform (object) :
                 self.plotter.add_frame(name,title,contents,aspect='equal')
                 self.plotter.frames[name].axis_values = self.ts[source]
 
-                
-        self.plotter.plot_all_frames(ordered=True)
+                # This title is common to all the plots
+                suptitle = "Events %d-%d" % (self.accu_start,self.n_shots)
 
-        suptitle = "Events %d-%d" % (self.accu_start,self.n_shots)
+                
+        newmode = self.plotter.plot_all_frames(ordered=True)
+
         plt.suptitle(suptitle)
         
+        return newmode
+            
 
 
 

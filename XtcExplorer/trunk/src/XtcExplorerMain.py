@@ -92,7 +92,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         self.setStyleSheet("QWidget {background-color: #FFFFFF }")
 
         self.setWindowTitle("LCLS Xtc Explorer")
-        self.setWindowIcon(QtGui.QIcon('XtcExplorer/src/lclsLogo.gif'))
+        self.setWindowIcon(QtGui.QIcon('data/XtcExplorer/icons/lclsLogo.gif'))
 
         self.directory = "/reg/d/psdm/"
         self.instrument = instrument
@@ -114,7 +114,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
 
         # Icon
         self.pic = QtGui.QLabel(self)
-        self.pic.setPixmap( QtGui.QPixmap('XtcExplorer/src/lclsLogo.gif'))
+        self.pic.setPixmap( QtGui.QPixmap('data/XtcExplorer/icons/lclsLogo.gif'))
 
         # menu
         self.help_menu = QtGui.QMenu('&Help', self)

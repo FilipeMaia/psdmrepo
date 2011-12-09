@@ -117,7 +117,8 @@ class  pyana_bld ( object ) :
 
     def event ( self, evt, env ) :
         self.n_shots += 1
-        self.doPlot = self.doPlot and (self.n_shots%self.plot_every_n)==0 
+
+        do_plot = self.doPlot and (self.n_shots%self.plot_every_n)==0 
 
         # if a prior module has failed a filter...
         if evt.get('skip_event'):
@@ -209,7 +210,7 @@ class  pyana_bld ( object ) :
                     self.IPM_fex_position.append( [0.0,0.0] )
                     
         # ----------------- Plotting --------------------- 
-        if self.doPlot :
+        if do_plot :
             header = "shots %d-%d" % (self.accu_start, self.n_shots)
             self.make_plots(self.mpl_num, suptitle=header)
 
@@ -222,11 +223,11 @@ class  pyana_bld ( object ) :
                     
             # give the list to the event object
             evt.put( data_bld, 'data_bld' )
-        else:
-            print "bld doPlot is False ",
-            print "subprocess < 1 ? ", (env.subprocess()<1)
-            print "plot_every_n ? ", self.plot_every_n 
-            print "modulus? ", (self.n_shots%self.plot_every_n)
+        #else:
+        #    print "bld doPlot is False ",
+        #    print "subprocess < 1 ? ", (env.subprocess()<1)
+        #    print "plot_every_n ? ", self.plot_every_n 
+        #    print "modulus? ", (self.n_shots%self.plot_every_n)
             
         # --------- Reset -------------
         if self.accumulate_n!=0 and (self.n_shots%self.accumulate_n)==0 :
@@ -235,7 +236,7 @@ class  pyana_bld ( object ) :
                 
     def endjob( self, evt, env ) :
         
-        print "EndJob has been reached"
+        print "pyana_bld endjob has been reached, after processing %d events"%self.n_shots
 
         # ----------------- Plotting ---------------------
         if (env.subprocess()<1):

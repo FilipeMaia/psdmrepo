@@ -48,7 +48,7 @@ class CsPad( object ):
         path/file can be given by arguments
         """
         if path is None: # use a local copy
-            path = 'XtcExplorer/calib/CSPad'
+            path = 'data/XtcExplorer/calib/CSPad'
 
         if file is None: # assume same file for all runs
             file = '0-end.data'
@@ -128,7 +128,7 @@ class CsPad( object ):
         sec_coord_order = [(1,2,0,3),(1,2,0,3),(2,3,1,0),(2,3,1,0),(3,0,2,1),(3,0,2,1),(2,3,1,0),(2,3,1,0)]
         
         # load data from metrology file (ignore first column)
-        metrology = np.loadtxt("XtcExplorer/calib/CSPad/cspad_2011-08-10-Metrology.txt")[:,1:]
+        metrology = np.loadtxt("data/XtcExplorer/calib/CSPad/cspad_2011-08-10-Metrology.txt")[:,1:]
         metrology = metrology.reshape(4,8,4,3)
 
         # also, we need to resort the 2x1 sections, they are
