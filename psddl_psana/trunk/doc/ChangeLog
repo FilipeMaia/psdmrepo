@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2011-12-09 Andy Salnikov
+- switching to ndarray
+- regenerate whole thing from psddldata V00-01-00 with psddl  V00-01-00
+
 Tag: V00-00-13
 2011-11-12 Andy Salnikov
 - regenerated whole thing from psddldata V00-00-14
