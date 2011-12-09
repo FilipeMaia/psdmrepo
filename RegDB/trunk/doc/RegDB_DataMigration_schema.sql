@@ -13,8 +13,12 @@ DROP TABLE IF EXISTS `REGDB`.`DATA_MIGRATION` ;
 CREATE  TABLE IF NOT EXISTS `REGDB`.`DATA_MIGRATION` (
   `exper_id` INT NOT NULL ,
   `file` VARCHAR(255) NOT NULL ,
+  `file_type` TEXT NOT NULL ,
   `start_time` BIGINT UNSIGNED DEFAULT NULL ,
   `stop_time` BIGINT UNSIGNED DEFAULT NULL ,
+  `error_msg` TEXT ,
+  `host` TEXT NOT NULL ,
+  `dirpath` TEXT NOT NULL ,
   PRIMARY KEY (`exper_id`,`file`) ,
   INDEX `EXPSWITCH_FK_1` (`exper_id` ASC) ,
   CONSTRAINT `DATA_MIGRATION_FK_1`
@@ -23,6 +27,40 @@ CREATE  TABLE IF NOT EXISTS `REGDB`.`DATA_MIGRATION` (
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Trigger `
+
+DROP TRIGGER IF EXISTS `REGDB`.`REGDB_FILE_INSERT`;
+
+DELIMITER |
+CREATE TRIGGER `REGDB`.`REGDB_FILE_INSERT` AFTER INSERT ON `REGDB`.`FILE`
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO `REGDB`.`DATA_MIGRATION`
+    VALUES(
+      NEW.exper_id ,
+      CONCAT('e',NEW.exper_id,'-r',LPAD(NEW.run,4,'0000'),'-s',LPAD(NEW.stream,2,'00'),'-c',LPAD(NEW.chunk,2,'00'),'.xtc') ,
+      'xtc' ,
+      NULL ,
+      NULL ,
+      NULL ,
+      NEW.host ,
+      NEW.dirpath ) ;
+    INSERT INTO `REGDB`.`DATA_MIGRATION`
+    VALUES(
+      NEW.exper_id ,
+      CONCAT('e',NEW.exper_id,'-r',LPAD(NEW.run,4,'0000'),'-s',LPAD(NEW.stream,2,'00'),'-c',LPAD(NEW.chunk,2,'00'),'.xtc.idx') ,
+      'xtc.idx' ,
+      NULL ,
+      NULL ,
+      NULL ,
+      NEW.host ,
+      CONCAT(NEW.dirpath,'/index') ) ;
+  END; |
+DELIMITER ;
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
