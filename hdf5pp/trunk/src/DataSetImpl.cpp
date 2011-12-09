@@ -83,6 +83,17 @@ DataSetImpl::store ( const Type& memType,
   if ( stat < 0 ) throw Hdf5CallException( "DataSet::store", "H5Dwrite" ) ;
 }
 
+// read the data
+void 
+DataSetImpl::read(const Type& memType,
+                  const DataSpace& memDspc,
+                  const DataSpace& fileDspc,
+                  void* data)
+{
+  herr_t stat = H5Dread(*m_id, memType.id(), memDspc.id(), fileDspc.id(), H5P_DEFAULT, data);
+  if ( stat < 0 ) throw Hdf5CallException( "DataSetImpl::read", "H5Dread" ) ;
+}
+
 /// access data space
 DataSpace
 DataSetImpl::dataSpace()

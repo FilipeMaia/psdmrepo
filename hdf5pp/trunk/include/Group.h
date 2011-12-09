@@ -91,6 +91,11 @@ public:
     return Attribute<T>::openAttr ( *m_id, name ) ;
   }
 
+  /// check if attribute exists
+  bool hasAttr ( const std::string& name ) {
+    return H5Aexists(*m_id, name.c_str()) > 0;
+  }
+
   // create new data set, type is determined by the template type
   template <typename T>
   DataSet<T> createDataSet ( const std::string& name,
@@ -112,11 +117,11 @@ public:
     return DataSet<T>::createDataSet ( *m_id, name, type, dspc, plistDScreate, plistDSaccess ) ;
   }
 
-  // open existing dataset
+  // open existing data set
   template <typename T>
-  DataSet<T> openDataSet ( const std::string& name)
+  DataSet<T> openDataSet ( const std::string& name )
   {
-    return DataSet<T>::openDataSet (*m_id, name) ;
+    return DataSet<T>::openDataSet ( *m_id, name ) ;
   }
 
   // close the group
@@ -124,6 +129,12 @@ public:
 
   // returns true if there is a real object behind
   bool valid() const { return m_id.get() ; }
+  
+  // get group name (absolute, may be ambiguous)
+  std::string name() const;
+
+  // get group name (relative to some parent)
+  std::string basename() const;
 
   // groups can be used as keys for associative containers, need compare operators
   bool operator<( const Group& other ) const ;
@@ -132,8 +143,10 @@ public:
 
 protected:
 
-  // allow this guy to call my factory methods
+  // allow these guys to call my factory methods
   friend class File ;
+  friend class GroupIter ;
+  friend class NameIter ;
 
   // factory methods
   static Group createGroup ( hid_t parent, const std::string& name ) ;
@@ -143,14 +156,6 @@ protected:
   Group ( hid_t grp ) ;
 
 private:
-
-  // deleter for  boost smart pointer
-  struct GroupPtrDeleter {
-    void operator()( hid_t* id ) {
-      if ( id ) H5Gclose ( *id );
-      delete id ;
-    }
-  };
 
   // Data members
   boost::shared_ptr<hid_t> m_id ;

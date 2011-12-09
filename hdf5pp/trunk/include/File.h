@@ -117,14 +117,6 @@ protected:
 
 private:
 
-  // deleter for  boost smart pointer
-  struct FilePtrDeleter {
-    void operator()( hid_t* id ) {
-      if ( id ) H5Fclose ( *id );
-      delete id ;
-    }
-  };
-
   // Data members
   boost::shared_ptr<hid_t> m_id ;
 

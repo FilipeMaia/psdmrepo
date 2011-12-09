@@ -97,14 +97,6 @@ protected:
 
 private:
 
-  // deleter for  boost smart pointer
-  struct DataSpacePtrDeleter {
-    void operator()( hid_t* id ) {
-      if ( id and *id != H5S_ALL ) H5Sclose ( *id );
-      delete id ;
-    }
-  };
-
   // Data members
   boost::shared_ptr<hid_t> m_id ;
 

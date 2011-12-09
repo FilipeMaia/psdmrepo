@@ -93,6 +93,12 @@ public:
                const DataSpace& fileDspc,
                const void* data ) ;
 
+  // read the data
+  void read(const Type& memType,
+            const DataSpace& memDspc,
+            const DataSpace& fileDspc,
+            void* data) ;
+
   // close the data set
   void close() { m_id.reset() ; }
 

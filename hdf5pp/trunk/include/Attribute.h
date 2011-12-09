@@ -71,6 +71,9 @@ public:
   /// store attribute value (for arbitrary attributes)
   void store( unsigned size, const T value[] ) ;
 
+  /// read attribute value (for scalar attributes)
+  T read() ;
+
   // returns true if there is a real object behind
   bool valid() const { return m_id.get() ; }
 
@@ -121,7 +124,7 @@ Attribute<T>::openAttr ( hid_t parent, const std::string& name )
   if ( aid < 0 ) throw Hdf5CallException( "Attribute::openAttr", "H5Aopen" ) ;
   hid_t dspc = H5Aget_space( aid ) ;
   if ( dspc < 0 ) throw Hdf5CallException( "Attribute::openAttr", "H5Aget_space" ) ;
-  return Attribute<T>( aid, dspc ) ;
+  return Attribute<T>( aid, DataSpace(dspc) ) ;
 }
 
 /// store attribute value (for scalar attributes)
@@ -144,6 +147,17 @@ Attribute<T>::store( unsigned size, const T value[] )
   if ( stat < 0 ) throw Hdf5CallException( "Attribute::store", "H5Awrite" ) ;
 }
 
+/// read attribute value (for scalar attributes)
+template <typename T>
+T 
+Attribute<T>::read()
+{
+  if ( m_dspc.size() != 1 ) throw Hdf5DataSpaceSizeException ( "Attribute::read" );
+  T value;
+  herr_t stat = H5Aread ( *m_id, TypeTraits<T>::native_type().id(), TypeTraits<T>::address(value) ) ;
+  if ( stat < 0 ) throw Hdf5CallException( "Attribute::read", "H5Aread" ) ;
+  return value;
+}
 
 } // namespace hdf5pp
 

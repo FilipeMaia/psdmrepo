@@ -28,6 +28,18 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+namespace {
+
+  // deleter for  boost smart pointer
+  struct FilePtrDeleter {
+    void operator()( hid_t* id ) {
+      if ( id ) H5Fclose ( *id );
+      delete id ;
+    }
+  };
+
+}
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------

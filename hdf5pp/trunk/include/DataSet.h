@@ -102,6 +102,15 @@ public:
     m_impl.store( native_type, memDspc, fileDspc, TypeTraits<T>::address( *data ) ) ;
   }
 
+  // retrieve the data from dataset
+  void read (const DataSpace& memDspc,
+             const DataSpace& fileDspc,
+             T* data,
+             const hdf5pp::Type& native_type = TypeTraits<T>::native_type())
+  {
+    m_impl.read( native_type, memDspc, fileDspc, TypeTraits<T>::address( *data ) ) ;
+  }
+
   // close the data set
   void close() { m_impl.close() ; }
 

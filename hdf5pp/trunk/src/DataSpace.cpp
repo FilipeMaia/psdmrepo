@@ -28,6 +28,18 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+namespace {
+
+  // deleter for  boost smart pointer
+  struct DataSpacePtrDeleter {
+    void operator()( hid_t* id ) {
+      if ( id and *id != H5S_ALL ) H5Sclose ( *id );
+      delete id ;
+    }
+  };
+
+}
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -38,7 +50,7 @@ namespace hdf5pp {
 // Constructors --
 //----------------
 DataSpace::DataSpace ( hid_t dsid )
-  : m_id( new hid_t(dsid), DataSpacePtrDeleter() )
+  : m_id( new hid_t(dsid), ::DataSpacePtrDeleter() )
 {
 }
 

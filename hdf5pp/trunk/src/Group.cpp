@@ -29,6 +29,18 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+namespace {
+
+  // deleter for  boost smart pointer
+  struct GroupPtrDeleter {
+    void operator()( hid_t* id ) {
+      if ( id ) H5Gclose ( *id );
+      delete id ;
+    }
+  };
+
+}
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -39,7 +51,7 @@ namespace hdf5pp {
 // Constructors --
 //----------------
 Group::Group ( hid_t grp )
-  : m_id( new hid_t(grp), GroupPtrDeleter() )
+  : m_id( new hid_t(grp), ::GroupPtrDeleter() )
 {
 }
 
@@ -104,6 +116,45 @@ void
 Group::close()
 {
   m_id.reset();
+}
+
+// get group name (absolute)
+std::string 
+Group::name() const
+{
+  const int maxsize = 255;
+  char buf[maxsize+1];
+
+  // first try with the fixed buffer size
+  ssize_t size = H5Iget_name(*m_id, buf, maxsize+1);
+  if (size < 0) {
+    throw Hdf5CallException( "Group::name", "H5Iget_name") ;
+  }
+  if (size == 0) {
+    // name is not known
+    return std::string();
+  }
+  if (size <= maxsize) {
+    // name has fit into buffer
+    return buf;
+  }
+
+  // another try with dynamically allocated buffer
+  char* dbuf = new char[size+1];
+  H5Iget_name(*m_id, dbuf, size+1);
+  std::string res(dbuf);
+  delete [] dbuf;
+  return res;
+}
+
+// get group name (relative to some parent)
+std::string 
+Group::basename() const
+{
+  const std::string& path = name();
+  std::string::size_type p = path.rfind('/');
+  if (p == std::string::npos) return path;
+  return std::string(path, p+1);
 }
 
 // groups can be used as keys for associative containers, need compare operators

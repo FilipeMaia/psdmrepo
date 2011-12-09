@@ -56,6 +56,7 @@ struct TypeTraits  {
   static Type stored_type() { return T::stored_type() ; }
   static Type native_type() { return T::native_type() ; }
   static const void* address( const T& value ) { return static_cast<const void*>(&value) ; }
+  static void* address( T& value ) { return static_cast<void*>(&value) ; }
 };
 
 #define TYPE_TRAITS_SIMPLE(CPP_TYPE,H5_TYPE) \
@@ -63,6 +64,7 @@ struct TypeTraits  {
     static Type stored_type() { return Type::LockedType(H5_TYPE); } \
     static Type native_type() { return Type::LockedType(H5_TYPE); } \
     static const void* address( const CPP_TYPE& value ) { return static_cast<const void*>(&value) ; } \
+    static void* address( CPP_TYPE& value ) { return static_cast<void*>(&value) ; } \
   }
 
 TYPE_TRAITS_SIMPLE(float,H5T_NATIVE_FLOAT);
@@ -84,6 +86,7 @@ struct TypeTraits<const char*> {
   static Type stored_type() { return TypeTraitsHelper::string_h5type() ; }
   static Type native_type() { return TypeTraitsHelper::string_h5type() ; }
   static const void* address( const vtype& value ) { return static_cast<const void*>(&value) ; }
+  static void* address( vtype& value ) { return static_cast<void*>(&value) ; }
 };
 
 
