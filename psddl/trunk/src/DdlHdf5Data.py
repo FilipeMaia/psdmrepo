@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module DdlPdsdata...
+#  Module DdlHdf5Data...
 #
 #------------------------------------------------------------------------
 
-"""DDL parser which generates pdsdata C++ code.
+"""DDL parser which generates C++ code for HDF5 data classes.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -16,7 +16,7 @@ part of it, please give an appropriate acknowledgment.
 
 @version $Id$
 
-@author Andrei Salnikov
+@author Andy Salnikov
 """
 
 
@@ -24,7 +24,6 @@ part of it, please give an appropriate acknowledgment.
 #  Module's version from CVS --
 #------------------------------
 __version__ = "$Revision$"
-# $Source$
 
 #--------------------------------
 #  Imports of standard modules --
@@ -32,7 +31,6 @@ __version__ = "$Revision$"
 import sys
 import os
 import logging
-import types
 
 #---------------------------------
 #  Imports of base class module --
@@ -41,7 +39,8 @@ import types
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from psddl.CppTypeCodegen import CppTypeCodegen
+from psddl.Attribute import Attribute
+from psddl.Enum import Enum
 from psddl.Package import Package
 from psddl.Type import Type
 
@@ -56,12 +55,12 @@ from psddl.Type import Type
 #---------------------
 #  Class definition --
 #---------------------
-class DdlPdsdata ( object ) :
+class DdlHdf5Data ( object ) :
 
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, incname, cppname, backend_options ) :
+    def __init__(self, incname, cppname, backend_options):
         """Constructor
         
             @param incname  include file name
@@ -71,7 +70,7 @@ class DdlPdsdata ( object ) :
         self.cppname = cppname
         self.incdirname = backend_options.get('gen-incdir', "")
         self.top_pkg = backend_options.get('top-package')
-        
+
         #include guard
         g = os.path.split(self.incname)[1]
         if self.top_pkg: g = self.top_pkg + '_' + g
@@ -81,7 +80,7 @@ class DdlPdsdata ( object ) :
     #  Public methods --
     #-------------------
 
-    def parseTree ( self, model ) :
+    def parseTree(self, model):
         
         # open output files
         self.inc = file(self.incname, 'w')
@@ -96,10 +95,9 @@ class DdlPdsdata ( object ) :
         print >>self.cpp, msg
 
         # add necessary includes
-        print >>self.inc, "#include <vector>"
-        print >>self.inc, "#include <cstddef>"
         print >>self.inc, "#include \"pdsdata/xtc/TypeId.hh\""
-        print >>self.inc, "#include \"ndarray/ndarray.h\""
+        print >>self.inc, "#include <vector>"
+        print >>self.inc, "#include <cstddef>\n"
 
         inc = os.path.join(self.incdirname, os.path.basename(self.incname))
         print >>self.cpp, "#include \"%s\"\n" % inc
@@ -116,8 +114,9 @@ class DdlPdsdata ( object ) :
                 print >>self.inc, "#include \"%s\"" % header
 
         if self.top_pkg : 
-            print >>self.inc, "namespace %s {" % self.top_pkg
-            print >>self.cpp, "namespace %s {" % self.top_pkg
+            ns = "namespace %s {" % self.top_pkg
+            print >>self.inc, ns
+            print >>self.cpp, ns
 
         # loop over packages in the model
         for pkg in model.packages() :
@@ -125,8 +124,9 @@ class DdlPdsdata ( object ) :
             self._parsePackage(pkg)
 
         if self.top_pkg : 
-            print >>self.inc, "} // namespace %s" % self.top_pkg
-            print >>self.cpp, "} // namespace %s" % self.top_pkg
+            ns = "} // namespace %s" % self.top_pkg
+            print >>self.inc, ns
+            print >>self.cpp, ns
 
         # close include guard
         print >>self.inc, "#endif //", self.guard
@@ -137,7 +137,7 @@ class DdlPdsdata ( object ) :
 
 
     def _parsePackage(self, pkg):
-
+        
         if pkg.included: return
 
         # open namespaces
@@ -169,23 +169,14 @@ class DdlPdsdata ( object ) :
         print >>self.inc, "} // namespace %s" % pkg.name
         print >>self.cpp, "} // namespace %s" % pkg.name
 
-    def _parseType(self, type):
-
-        logging.debug("_parseType: type=%s", repr(type))
-
-        # skip included types
-        if type.included : return
-
-        codegen = CppTypeCodegen(self.inc, self.cpp, type)
-        codegen.codegen()
 
     def _genConst(self, const):
         
-        print >>self.inc, "  enum {\n    %s = %s /**< %s */\n  };" % \
+        print >>self._inc, "  enum {\n    %s = %s /**< %s */\n  };" % \
                 (const.name, const.value, const.comment)
 
     def _genEnum(self, enum):
-
+        
         if enum.comment: print >>self.inc, "\n  /** %s */" % (enum.comment)
         print >>self.inc, "  enum %s {" % (enum.name or "",)
         for const in enum.constants() :
@@ -195,6 +186,82 @@ class DdlPdsdata ( object ) :
             if const.comment: doc = ' /**< %s */' % const.comment
             print >>self.inc, "    %s%s,%s" % (const.name, val, doc)
         print >>self.inc, "  };"
+
+    def _parseType(self, type):
+
+        logging.debug("_parseType: type=%s", repr(type))
+
+        # skip included types
+        if type.included : return
+
+        for schema in type.h5schemas:
+            self._genSchema(type, schema)
+
+
+    def _genSchema(self, type, schema):
+
+        # find schema version
+        schemaVersion = 1
+        if schema: schemaVersion = schema.version
+            
+        className = "%s_s%s" % (type.name, schemaVersion)
+            
+        # class-level comment
+        print >>self.inc, "\n/** @class %s\n\n  %s\n*/\n" % (className, type.comment)
+
+        # declare config classes if needed
+        for cfg in type.xtcConfig:
+            print >>self.inc, "class %s;" % cfg.name
+
+        # base class
+        base = ""
+        if type.base : base = ": public %s" % type.base.name
+
+
+        # start class declaration
+        print >>self.inc, "\nclass %s%s {" % (type.name, base)
+        print >>self.inc, "public:"
+
+        # enums for version and typeId
+        if type.version is not None: 
+            doc = '/**< XTC type version number */'
+            print >>self.inc, "  enum {\n    Version = %s %s\n  };" % (type.version, doc)
+        if type.type_id is not None: 
+            doc = '/**< XTC type ID value (from Pds::TypeId class) */'
+            print >>self.inc, "  enum {\n    TypeId = Pds::TypeId::%s %s\n  };" % (type.type_id, doc)
+
+        # enums for constants
+        for const in type.constants() :
+            self._genConst(const)
+
+        # regular enums
+        for enum in type.enums() :
+            self._genEnum(enum)
+
+        # generate method declaration for public members without accessors
+        for attr in type.attributes() :
+            if attr.access == "public" and attr.accessor is None:
+                self._genPubAttrMethod(attr)
+
+        # generate declaration for public methods only
+        pub_meth = [meth for meth in type.methods() if meth.access == "public"]
+        for meth in pub_meth: 
+            self._genMethDecl(meth)
+
+        # generate _shape() methods for array attributes
+        for attr in type.attributes() :
+            self._genAttrShapeDecl(attr)
+
+        # data members
+        for attr in type.attributes() :
+            self._genAttrDecl(attr)
+
+        # close class declaration
+        print >>self.inc, "};"
+
+    #--------------------
+    #  Private methods --
+    #--------------------
 
 #
 #  In case someone decides to run this module

@@ -32,6 +32,7 @@ __version__ = "$Revision$"
 import sys
 import os
 import logging
+import cgi
 
 #---------------------------------
 #  Imports of base class module --
@@ -112,6 +113,18 @@ border: 1px solid #000000;
 
 """
 
+def _typename(type):
+    
+    return type.fullName('C++')
+
+def _typedecl(type):
+    typename = _typename(type)
+    if not type.basic : typename = "const "+typename+'&'
+    return typename
+
+def _esc(s):
+    return cgi.escape(s)
+
 #------------------------
 # Exported definitions --
 #------------------------
@@ -159,7 +172,7 @@ class DdlPsanaDoc ( object ) :
         if packages:
             print >>out, '<h2>Packages/namespaces</h2><ul>'
             for pkg in packages :
-                print >>out, '<li><a href="%s">%s</a></li>' % (self._pkgFileName(pkg), pkg.fullName('C++',self.top_pkg))
+                print >>out, '<li><a href="%s">%s</a></li>' % (_esc(self._pkgFileName(pkg)), _esc(pkg.fullName('C++',self.top_pkg)))
             print >>out, '</ul>'
 
     def printTypes(self, ns, out):
@@ -189,9 +202,9 @@ class DdlPsanaDoc ( object ) :
             print >>out, '<h2>Constants</h2>'
             for const in constants:
                 print >>out, '<div class="descr"><div class="def">'
-                print >>out, '%s = %s' % (const.name, const.value)
+                print >>out, '%s = %s' % (_esc(const.name), _esc(const.value))
                 print >>out, '</div>'
-                print >>out, '%s' % const.comment
+                print >>out, '%s' % _esc(const.comment)
                 print >>out, '</div>'
 
 
@@ -199,17 +212,17 @@ class DdlPsanaDoc ( object ) :
         
         
         print >>out, '<div class="descr"><div class="def" id="enum_%s">' % enum.name
-        print >>out, 'Enumeration <font class="enumname">%s</font>' % enum.fullName('C++',self.top_pkg)
+        print >>out, 'Enumeration <font class="enumname">%s</font>' % _esc(enum.fullName('C++',self.top_pkg))
         print >>out, '</div>'
-        print >>out, "<p>%s</p>" % enum.comment
+        print >>out, "<p>%s</p>" % _esc(enum.comment)
         print >>out, "<p>Enumerators:<table>"
         for const in enum.constants() :
             print >>out, '<tr>'
             val = ""
             if const.value is not None : val = " = " + const.value
-            print >>out, '<td class="const">%s</td>' % const.name
-            print >>out, '<td class="const">%s</td>' % val
-            print >>out, '<td>%s</td>' % (const.comment)
+            print >>out, '<td class="const">%s</td>' % _esc(const.name)
+            print >>out, '<td class="const">%s</td>' % _esc(val)
+            print >>out, '<td>%s</td>' % _esc(const.comment)
             print >>out, '</tr>'
         print >>out, "</table></p>"
         print >>out, '</div>'
@@ -252,10 +265,10 @@ class DdlPsanaDoc ( object ) :
 
         # open output file
         out = file(os.path.join(self.dir, filename), "w")
-        self._htmlHeader(out, "Package %s Reference" % pkgname)
-        print >>out, '<h1>Package %s Reference</h1>' % pkgname
+        self._htmlHeader(out, "Package %s Reference" % _esc(pkgname))
+        print >>out, '<h1>Package %s Reference</h1>' % _esc(pkgname)
 
-        print >>out, pkg.comment
+        print >>out, _esc(pkg.comment)
 
 
         self.printPackages(pkg, out)
@@ -282,18 +295,19 @@ class DdlPsanaDoc ( object ) :
 
         # open output file
         out = file(os.path.join(self.dir, filename), "w")
-        self._htmlHeader(out, "Class %s Reference" % typename)
-        print >>out, '<h1>Class %s Reference</h1>' % typename
+        self._htmlHeader(out, "Class %s Reference" % _esc(typename))
+        print >>out, '<h1>Class %s Reference</h1>' % _esc(typename)
 
         if type.location:
             include = os.path.basename(type.location)
             include = os.path.splitext(include)[0] + '.h'
-            print >>out, '<p>Include: <span class="code">#include "%s/%s"</span></p>' % (self.psana_inc, include)
+            repourl = "https://pswww.slac.stanford.edu/trac/psdm/browser/psdm/%s/trunk/include/%s" % (self.psana_inc, include)
+            print >>out, '<p>Include: <span class="code">#include "<a href="%s">%s/%s</a>"</span></p>' % (repourl, _esc(self.psana_inc), _esc(include))
 
         if type.base:
             print >>out, "<p>Base class: %s</p>" % self._typeRef(type.base)
 
-        print >>out, type.comment
+        print >>out, _esc(type.comment)
             
 
         self.printConstants(type, out)
@@ -310,8 +324,8 @@ class DdlPsanaDoc ( object ) :
 
         # X_shape methods
         for attr in type.attributes():
-            if attr.shape_method:
-                rettype = "std::vector&lt;int&gt;"
+            if attr.shape_method and attr.accessor and (attr.type.name == 'char' or not attr.type.value_type):
+                rettype = "std::vector<int>"
                 args = ""
                 descr = self._methShapeDescr(attr)
                 mlist.append((attr.shape_method, rettype, args, descr))
@@ -336,7 +350,7 @@ class DdlPsanaDoc ( object ) :
                 print >>out, '<div class="def" id="meth_%s">' % meth[0]
                 print >>out, self._methDecl2(*meth)
                 print >>out, '</div>'
-                print >>out, meth[3]
+                print >>out, _esc(meth[3])
                 print >>out, '</div>'
         
 
@@ -346,45 +360,52 @@ class DdlPsanaDoc ( object ) :
     def _methDecl(self, name, rettype, args, descr):
 
         return '<tr><td class="methrettype">%s</td><td class="methdecl">%s(%s)</td></tr>' % \
-            (rettype, self._methRef(name), args)
+            (_esc(rettype), self._methRef(_esc(name)), _esc(args))
 
     def _methShapeDescr(self, attr):
 
         if attr.accessor:
             return """Method which returns the shape (dimensions) of the data returned by 
-                %s() method.""" % self._methRef(attr.accessor.name)
+                %s() method.""" % self._methRef(_esc(attr.accessor.name))
         else:
             return """Method which returns the shape (dimensions) of the data member %s.""" % \
-                attr.name
+                _esc(attr.name)
 
     def _methDecl2(self, name, rettype, args, descr):
-        return '%s %s(%s)' % (rettype, name, args)
+        return '%s %s(%s)' % (_esc(rettype), _esc(name), _esc(args))
 
     def _methReturnType(self, meth):
 
-        type = meth.type
-        
         if meth.attribute:
-            if meth.attribute.shape:
-                # array, return type is either a pointer or reference
-                typename = type.fullName('C++', self.top_pkg)
-                if not type.basic : 
-                    typename = "const "+self._typeRef(type)+'&'
-                else:                
-                    typename = "const "+typename+'*'
-            else:
-                # non-array
-                typename = type.fullName('C++', self.top_pkg)
-                if not type.basic : typename = "const "+self._typeRef(type)+'&'
+            
+            if not meth.attribute.shape:
+                
+                # attribute is a regular non-array object, 
+                # return value or reference depending on what type it is
+                typename = _typedecl(meth.attribute.type)
 
-        elif type is None:
+            elif meth.attribute.type.name == 'char':
+                
+                # char array is actually a string
+                typename = "const char*"
+                
+            elif meth.attribute.type.value_type :
+                
+                # return ndarray
+                typename = "ndarray<%s, %d>" % (_typename(meth.attribute.type), len(meth.attribute.shape.dims))
+
+            else:
+
+                # array of any other types
+                typename = _typedecl(meth.attribute.type)
+
+        elif meth.type is None:
             
             typename = 'void'
             
         else:
 
-            typename = type.fullName('C++', self.top_pkg)
-            if not type.basic : typename = "const "+self._typeRef(type)+'&'
+            typename = _typedecl(meth.type)
             
         return typename
 
@@ -430,15 +451,15 @@ class DdlPsanaDoc ( object ) :
 
     def _pkgRef(self, pkg):
 
-        return '<a href="%s">%s</a>' % (self._pkgFileName(pkg), pkg.fullName('C++',self.top_pkg))
+        return '<a href="%s">%s</a>' % (self._pkgFileName(pkg), _esc(pkg.fullName('C++',self.top_pkg)))
 
     def _typeRef(self, type):
 
-        return '<a href="%s">%s</a>' % (self._typeFileName(type), type.fullName('C++',self.top_pkg))
+        return '<a href="%s">%s</a>' % (self._typeFileName(type), _esc(type.fullName('C++',self.top_pkg)))
 
     def _methRef(self, methname):
 
-        return '<a href="#meth_%s">%s</a>' % (methname, methname)
+        return '<a href="#meth_%s">%s</a>' % (methname, _esc(methname))
 
 
 

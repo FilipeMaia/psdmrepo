@@ -485,7 +485,7 @@ class XmlReader ( object ) :
     def _initTypes(self, ns):
         """ Define few basic types in global namespace """
         
-        tags = {'basic': 1, 'external': 2}
+        tags = {'basic': 1, 'external': 2, 'value-type': 3}
         Type("char", size=1, align=1, package=ns, tags=tags)
         Type("int8_t", size=1, align=1, package=ns, tags=tags)
         Type("uint8_t", size=1, align=1, package=ns, tags=tags)

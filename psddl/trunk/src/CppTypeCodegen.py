@@ -67,13 +67,15 @@ def _typedecl(type):
 def _argdecl(name, type):    
     return _typedecl(type) + ' ' + name
 
-def _dimargs(shape, type):
-    if not shape : return [] 
-    int_type = type.lookup('uint32_t')
-    return [('i%d'%i, int_type) for i in range(len(shape.dims))]
+def _dims(dims):
+    return ''.join(['[%s]'%d for d in dims])
 
-def _dimexpr(shape):
-    return ''.join(['[i%d]'%i for i in range(len(shape.dims))])
+def _dimargs(dims, type):
+    int_type = type.lookup('uint32_t')
+    return [('i%d'%i, int_type) for i in range(len(dims))]
+
+def _dimexpr(dims):
+    return ''.join(['[i%d]'%i for i in range(len(dims))])
 
 #------------------------
 # Exported definitions --
@@ -125,12 +127,12 @@ class CppTypeCodegen ( object ) :
 
         # enums for version and typeId
         access = self._access("public", access)
-        if self._type.version is not None: 
-            doc = '/**< XTC type version number */'
-            print >>self._inc, "  enum {\n    Version = %s %s\n  };" % (self._type.version, doc)
         if self._type.type_id is not None: 
             doc = '/**< XTC type ID value (from Pds::TypeId class) */'
-            print >>self._inc, "  enum {\n    TypeId = Pds::TypeId::%s %s\n  };" % (self._type.type_id, doc)
+            print >>self._inc, "  enum { TypeId = Pds::TypeId::%s %s };" % (self._type.type_id, doc)
+        if self._type.version is not None: 
+            doc = '/**< XTC type version number */'
+            print >>self._inc, "  enum { Version = %s %s };" % (self._type.version, doc)
 
         # enums for constants
         access = self._access("public", access)
@@ -143,7 +145,7 @@ class CppTypeCodegen ( object ) :
             self._genEnum(enum)
 
         if not self._abs:
-            # constructor
+            # constructor, all should be declared explicitly
             for ctor in self._type.ctors :
                 access = self._access(ctor.access, access)
                 self._genCtor(ctor)
@@ -154,22 +156,10 @@ class CppTypeCodegen ( object ) :
             print >>self._inc, "  virtual ~%s();" % self._type.name
             print >>self._cpp, "\n%s::~%s() {}\n" % (self._type.name, self._type.name)
 
-        if not self._abs:
-            # all methods
-            for meth in self._type.methods(): 
-                access = self._access(meth.access or "public", access)
-                self._genMethDecl(meth)
-        else:
-            # generate method declaration for public members without accessors
-            for attr in self._type.attributes() :
-                if attr.access == "public" and attr.accessor is None:
-                    self._genPubAttrMethod(attr)
-
-            # generate declaration for public methods only
+        # generate methods (for interfaces public methods only)
+        for meth in self._type.methods(): 
             access = self._access("public", access)
-            pub_meth = [meth for meth in self._type.methods() if meth.access == "public"]
-            for meth in pub_meth: 
-                self._genMethDecl(meth)
+            if not self._abs or meth.access == "public": self._genMethod(meth)
 
         # generate _shape() methods for array attributes
         for attr in self._type.attributes() :
@@ -179,7 +169,7 @@ class CppTypeCodegen ( object ) :
         if not self._abs:
             # data members
             for attr in self._type.attributes() :
-                access = self._access(attr.access or "private", access)
+                access = self._access("private", access)
                 self._genAttrDecl(attr)
 
         # close class declaration
@@ -196,8 +186,9 @@ class CppTypeCodegen ( object ) :
         
     def _genConst(self, const):
         
-        print >>self._inc, "  enum {\n    %s = %s /**< %s */\n  };" % \
-                (const.name, const.value, const.comment)
+        doc = ""
+        if const.comment: doc = "/**< %s */ " %  const.comment
+        print >>self._inc, "  enum { %s = %s %s};" % (const.name, const.value, doc)
 
     def _genEnum(self, enum):
         
@@ -216,9 +207,6 @@ class CppTypeCodegen ( object ) :
         
         logging.debug("_genAttrDecl: attr: %s", attr)
         
-        def _dims(shape):
-            return ''.join(['[%s]'%d for d in shape.dims])
-
         doc = ""
         if attr.comment : doc = "\t/**< %s */" % attr.comment.strip()
         
@@ -229,79 +217,66 @@ class CppTypeCodegen ( object ) :
                 decl = "  //%s\t%s;" % (_typename(attr.type), attr.name)
         else:
             if attr.isfixed():
-                dim = _interpolate(_dims(attr.shape), attr.parent)
+                dim = _interpolate(_dims(attr.shape.dims), attr.parent)
                 decl = "  %s\t%s%s;%s" % (_typename(attr.type), attr.name, dim, doc)
             else :
-                dim = _interpolate(_dims(attr.shape), attr.parent)
+                dim = _interpolate(_dims(attr.shape.dims), attr.parent)
                 decl = "  //%s\t%s%s;" % (_typename(attr.type), attr.name, dim)
         print >>self._inc, decl
 
-    def _genPubAttrMethod(self, attr):
-        """Generate virtual method declaration for accessing public attribute"""
 
-        logging.debug("_genPubAttrMethod: attr: %s", attr)
-        
-        if not attr.isfixed():
-
-            # attribute can only be access through calculated offset
-            self._genAccessMethod(attr.name, attr)
-
-        elif not attr.shape:
-            
-            # attribute is a regular non-array object, 
-            # return value or reference depending on what type it is
-            self._genMethodExpr(attr.name, _typedecl(attr.type), attr.name, inline=True, doc=attr.comment)
-                
-        else:
-
-            # attribute is an array object, return pointer for basic types,
-            # or reference to elements for composite types
-            if attr.type.basic:
-                rettype = "const "+_typename(attr.type)+'*'
-                expr = '&' + attr.name + '[0]'*len(attr.shape.dims)
-                self._genMethodExpr(attr.name, rettype, expr, inline=True, doc=attr.comment)
-            else:
-                rettype = _typedecl(attr.type)
-                expr = attr.name + _dimexpr(attr.shape)
-                self._genMethodExpr(attr.name, rettype, expr, 
-                    args=_dimargs(attr.shape, self._type), inline=True, doc=attr.comment)
-
-
-    def _genMethDecl(self, meth):
+    def _genMethod(self, meth):
         """Generate method declaration and definition"""
 
-        logging.debug("_genMethDecl: meth: %s", meth)
+        logging.debug("_genMethod: meth: %s", meth)
         
         if meth.attribute:
             
             # generate access method for a named attribute
             
             attr = meth.attribute
+            args = []
                         
-            if not attr.isfixed():
-
-                # attribute can only be access through calculated offset
-                self._genAccessMethod(meth.name, attr)
-
-            elif not attr.shape:
+            if not attr.shape:
                 
                 # attribute is a regular non-array object, 
                 # return value or reference depending on what type it is
-                self._genMethodExpr(meth.name, _typedecl(attr.type), attr.name, inline=True, doc=meth.comment)
-                    
+                rettype = _typedecl(attr.type)
+                body = self._bodyNonArray(attr)
+
+            elif attr.type.name == 'char':
+                
+                # char array is actually a string
+                rettype = "const char*"
+                args = _dimargs(attr.shape.dims[:-1], self._type)
+                body = self._bodyCharArrray(attr)
+                
+            elif attr.type.value_type :
+                
+                # return ndarray
+                rettype = "ndarray<%s, %d>" % (_typename(attr.type), len(attr.shape.dims))
+                body = self._bodyNDArrray(attr)
+
             else:
 
-                # attribute is an array object, return pointer for basic types,
-                # or reference to elements for composite types
-                if attr.type.basic:
-                    rettype = "const "+_typename(attr.type)+'*'
-                    expr = '&' + attr.name + '[0]'*len(attr.shape.dims)
-                    self._genMethodExpr(meth.name, rettype, expr, inline=True, doc=meth.comment)
-                else:
-                    rettype = _typedecl(attr.type)
-                    expr = attr.name + _dimexpr(attr.shape)
-                    self._genMethodExpr(meth.name, rettype, expr, 
-                        args=_dimargs(attr.shape, self._type), inline=True, doc=meth.comment)
+                # array of any other types
+                rettype = _typedecl(attr.type)
+                args = _dimargs(attr.shape.dims, self._type)
+                body = self._bodyAnyArrray(attr)
+
+
+            # guess if we need to pass cfg object to method
+            cfgNeeded = body.find('{xtc-config}') >= 0
+            body = _interpolate(body, self._type)
+
+            configs = [None]
+            if cfgNeeded and not self._abs: configs = attr.parent.xtcConfig
+            for cfg in configs:
+
+                cargs = []
+                if cfg: cargs = [('cfg', cfg)]
+
+                self._genMethodBody(meth.name, rettype, body, cargs + args, inline=True, doc=attr.comment)
 
         elif meth.bitfield:
 
@@ -312,18 +287,14 @@ class CppTypeCodegen ( object ) :
             cfgNeeded = expr.find('{xtc-config}') >= 0
             expr = _interpolate(expr, meth.parent)
 
-            if cfgNeeded and not self._abs:
+            configs = [None]
+            if cfgNeeded and not self._abs: configs = meth.parent.xtcConfig
+            for cfg in configs:
 
-                if not meth.parent.xtcConfig :
-                    raise ValueError('xtc-config is not defined')
+                args = []
+                if cfg: args = [('cfg', cfg)]
 
-                for cfg in meth.parent.xtcConfig:
-                    args = [('cfg', cfg)]
-                    self._genMethodExpr(meth.name, _typename(meth.type), expr, args, doc=meth.comment)
-
-            else:
-                
-                self._genMethodExpr(meth.name, _typename(meth.type), expr, inline=True, doc=meth.comment)
+                self._genMethodExpr(meth.name, _typename(meth.type), expr, args, inline=True, doc=meth.comment)
 
         else:
 
@@ -348,25 +319,117 @@ class CppTypeCodegen ( object ) :
             # default is not inline, can change with a tag
             inline = 'inline' in meth.tags
             
-            if cfgNeeded and not self._abs:
+            configs = [None]
+            if cfgNeeded and not self._abs: configs = meth.parent.xtcConfig
+            for cfg in configs:
 
-                if not meth.parent.xtcConfig :
-                    raise ValueError('xtc-config is not defined')
+                args = []
+                if cfg: args = [('cfg', cfg)]
+                args += meth.args
 
-                for cfg in meth.parent.xtcConfig:
-                    args = [('cfg', cfg)] + meth.args
-                    self._genMethodExpr(meth.name, type, expr, args, inline, static=meth.static, doc=meth.comment)
+                self._genMethodExpr(meth.name, type, expr, args, inline, static=meth.static, doc=meth.comment)
 
-            else:
+
+    def _bodyNonArray(self, attr):
+        """Makes method body for methods returning non-array attribute values"""
+
+        if attr.isfixed():
+
+            return "return " + attr.name + ";"
+        
+        else:
+            
+            body = "ptrdiff_t offset=%s;" % str(attr.offset)
+            body += "\n  return *(const %s*)(((const char*)this)+offset);" % _typename(attr.type)
+            return body
+
+    def _bodyCharArrray(self, attr):
+        """Makes method body for methods returning char*"""
+
+        if attr.isfixed():
+
+            return "return " + attr.name + _dimexpr(attr.shape.dims[:-1]) + ";"
+        
+        else:
+            
+            dims = _dims(attr.shape.dims[1:])
+            body = "typedef char atype" + dims + ';'
+            body += "\n  ptrdiff_t offset=%s;" % str(attr.offset)
+            body += "\n  const atype* pchar = (const atype*)(((const char*)this)+offset);"
+            body += "\n  return pchar" + _dimexpr(attr.shape.dims[:-1]) + ';'
+            return body
+
+    def _bodyNDArrray(self, attr):
+        """Makes method body for methods returning ndarray"""
+
+        shape = ', '.join([str(s or 0) for s in attr.shape.dims])
+        if attr.isfixed():
+
+            idx0 = "[0]" * len(attr.shape.dims)
+            return "return make_ndarray(&%s%s, %s);" % (attr.name, idx0, shape)
+
+        else:
+            
+            typename = _typename(attr.type)
+            body = "ptrdiff_t offset=%s;" % str(attr.offset)
+            body += "\n  %s* data = (%s*)(((const char*)this)+offset);" % (typename, typename)
+            body += "\n  return make_ndarray(data, %s);" % shape
+            return body
+
+    def _bodyAnyArrray(self, attr):
+        """Makes method body for methods returning ndarray"""
+
+        shape = ', '.join([str(s or 0) for s in attr.shape.dims])
+        if attr.isfixed():
+
+            return "return " + attr.name + _dimexpr(attr.shape.dims) + ";"
+
+        elif attr.type.variable:
+            
+            # _sizeof may need config
+            sizeofCfg = ''
+            if str(attr.type.size).find('{xtc-config}') >= 0: 
+                sizeofCfg = '{xtc-config}'
                 
-                self._genMethodExpr(meth.name, type, expr, meth.args, inline, static=meth.static, doc=meth.comment)
+            typename = _typename(attr.type)
+            body = "const char* memptr = ((const char*)this)+%s;" % str(attr.offset)
+            body += "\n  for (uint32_t i=0; i != i0; ++ i) {"
+            body += "\n    memptr += ((const %s*)memptr)->_sizeof(%s);" % (typename, sizeofCfg)
+            body += "\n  }"
+            body += "\n  return *(const %s*)(memptr);" % (typename)
+            return body
+
+        else:
+            
+            idxexpr = ExprVal('i0', self._type)
+            for i in range(1,len(attr.shape.dims)):
+                idxexpr = idxexpr*attr.shape.dims[i] + ExprVal('i%d'%i, self._type)
+                
+            # _sizeof may need config
+            sizeofCfg = ''
+            if str(attr.type.size).find('{xtc-config}') >= 0: 
+                sizeofCfg = '{xtc-config}'
+
+            typename = _typename(attr.type)
+            body = "ptrdiff_t offset=%s;" % str(attr.offset)
+            body += "\n  const %s* memptr = (const %s*)(((const char*)this)+offset);" % (typename, typename)
+            body += "\n  size_t memsize = memptr->_sizeof(%s);" % (sizeofCfg,)
+            body += "\n  return *(const %s*)((const char*)memptr + (%s)*memsize);" % (typename, idxexpr)
+            return body
 
 
     def _genMethodExpr(self, methname, rettype, expr, args=[], inline=False, static=False, doc=None):
+        """ Generate method, both declaration and definition, given the expression that it returns"""
+
+        body = expr
+        if body and rettype != 'void': body = "return %s;" % (expr,)
+        self._genMethodBody(methname, rettype, body, args=args, inline=inline, static=static, doc=doc)
+        
+    def _genMethodBody(self, methname, rettype, body, args=[], inline=False, static=False, doc=None):
+        """ Generate method, both declaration and definition, given the body of the method"""
         
         # make argument list
-        argsspec = [_argdecl(*arg) for arg in args]
-        argsspec = ', '.join(argsspec)
+        argsspec = ', '.join([_argdecl(*arg) for arg in args])
 
         if static:
             static = "static "
@@ -376,150 +439,30 @@ class CppTypeCodegen ( object ) :
             const = "const"
         
 
+        if doc: print >>self._inc, '  /** %s */' % doc
+
         if self._abs and not static:
-            # abstract method declaration
-            if doc: print >>self._inc, '  /** %s */' % doc
+            
+            # abstract method declaration, body is not needed
             print >>self._inc, "  virtual %s %s(%s) const = 0;" % (rettype, methname, argsspec)
+
+        elif not body:
+
+            # declaration only, implementation provided somewhere else
+            print >>self._inc, "  %s%s %s(%s) %s;" % (static, rettype, methname, argsspec, const)
+
+        elif inline:
+            
+            # inline method
+            print >>self._inc, "  %s%s %s(%s) %s { %s }" % (static, rettype, methname, argsspec, const, body)
+        
         else:
             
-            if not expr:
+            # out-of-line method
+            print >>self._inc, "  %s%s %s(%s) %s;" % (static, rettype, methname, argsspec, const)
+            print >>self._cpp, "%s\n%s::%s(%s) %s {\n  %s\n}" % \
+                    (rettype, self._type.name, methname, argsspec, const, body)
 
-                # declaration only, implementation provided somewhere else
-                if doc: print >>self._inc, '  /** %s */' % doc
-                print >>self._inc, "  %s%s %s(%s) %s;" % (static, rettype, methname, argsspec, const)
-
-            else:
-                
-                if rettype == "void":
-                    
-                    if inline:
-                        if doc: print >>self._inc, '  /** %s */' % doc
-                        print >>self._inc, "  %s%s %s(%s) %s {%s;}" % (static, rettype, methname, argsspec, const, expr)
-                    else:
-                        if doc: print >>self._inc, '  /** %s */' % doc
-                        print >>self._inc, "  %s%s %s(%s) %s;" % (static, rettype, methname, argsspec, const)
-                        print >>self._cpp, "%s\n%s::%s(%s) %s {\n  %s;\n}" % \
-                                (rettype, self._type.name, methname, argsspec, const, expr)
-
-                else:
-                    
-                    if inline:
-                        if doc: print >>self._inc, '  /** %s */' % doc
-                        print >>self._inc, "  %s%s %s(%s) %s {return %s;}" % \
-                                (static, rettype, methname, argsspec, const, expr)
-                    else:
-                        if doc: print >>self._inc, '  /** %s */' % doc
-                        print >>self._inc, "  %s%s %s(%s) %s;" % (static, rettype, methname, argsspec, const)
-                        print >>self._cpp, "%s\n%s::%s(%s) %s {\n  return %s;\n}" % \
-                                (rettype, self._type.name, methname, argsspec, const, expr)
-
-    def _genAccessMethod(self, methname, attr):
-        
-        logging.debug("_genAccessMethod: meth: %s", methname)
-
-        offset = str(attr.offset)
-        cfgNeeded = offset.find('{xtc-config}') >= 0
-        offset = _interpolate(offset, attr.parent)
-        logging.debug("_genAccessMethod: cfgNeeded: %s", cfgNeeded)
-
-        doc = attr.comment
-
-        args = _dimargs(attr.shape, attr.parent)
-        rettype = _typedecl(attr.type)
-        
-        if self._abs:
-
-            logging.debug("_genAccessMethod: self._abs")
-            
-            if attr.shape and attr.type.basic : 
-                rettype = 'const '+rettype+'*'
-                argstr = ""
-            else:
-                argstr = ', '.join([_argdecl(*x) for x in args])
-            if doc: print >>self._inc, '  /** %s */' % doc
-            print >>self._inc, "  virtual %s %s(%s) const = 0;" % (rettype, methname, argstr)
-
-        elif attr.type.basic:
-            
-            logging.debug("_genAccessMethod: attr.type.basic")
-
-            configs = [None]
-            if cfgNeeded : configs = attr.parent.xtcConfig
-            for cfg in configs:
- 
-                args = ''
-                if cfg : args = _argdecl('cfg', cfg)
-            
-                if doc: print >>self._inc, '  /** %s */' % doc
-                print >>self._inc, "  const %s* %s(%s) const {" % (rettype, methname, args)
-                print >>self._inc, "    ptrdiff_t offset=%s;" % (offset,)
-                print >>self._inc, "    return (const %s*)(((const char*)this)+offset);" % (rettype,)  
-                print >>self._inc, "  }"
-
-        elif attr.shape and attr.type.variable:
-
-            if len(attr.shape.dims) != 1:
-                raise ValueError('only one-dimentional arrays are supported now')
-
-            idxexpr = ExprVal(0)
-            sizeofCfg = ''
-                
-            # _sizeof may need config
-            if str(attr.type.size).find('{xtc-config}') >= 0: 
-                cfgNeeded = True
-                sizeofCfg = 'cfg'
-            
-            configs = [None]
-            if cfgNeeded : configs = attr.parent.xtcConfig
-            for cfg in configs:
-
-                if cfg :
-                    argstr = ', '.join([_argdecl(*x) for x in [('cfg', cfg)] + args])
-                else :
-                    argstr = ', '.join([_argdecl(*x) for x in args])
-                typename = _typename(attr.type)
-
-                if doc: print >>self._inc, '  /** %s */' % doc
-                print >>self._inc, "  const %s& %s(%s) const {" % (typename, methname, argstr)
-                print >>self._inc, "    const char* memptr = ((const char*)this)+%s;" % (offset,)
-                print >>self._inc, "    for (uint32_t i=0; i != i0; ++ i) {"
-                print >>self._inc, "      memptr += ((const %s*)memptr)->_sizeof(%s);" % (typename, sizeofCfg)
-                print >>self._inc, "    }"
-                print >>self._inc, "    return *(const %s*)(memptr);" % (typename)
-                print >>self._inc, "  }"
-
-        else:
-            
-            idxexpr = ExprVal(0)
-            sizeofCfg = ''
-            if attr.shape : 
-                
-                idxexpr = ExprVal('i0', self._type)
-                for i in range(1,len(attr.shape.dims)):
-                    idxexpr = idxexpr*attr.shape.dims[i] + ExprVal('i%d'%i, self._type)
-                    
-                # _sizeof may need config
-                if str(attr.type.size).find('{xtc-config}') >= 0: 
-                    cfgNeeded = True
-                    sizeofCfg = 'cfg'
-            
-            configs = [None]
-            if cfgNeeded : configs = attr.parent.xtcConfig
-            for cfg in configs:
-
-                if cfg :
-                    argstr = ', '.join([_argdecl(*x) for x in [('cfg', cfg)] + args])
-                else :
-                    argstr = ', '.join([_argdecl(*x) for x in args])
-                typename = _typename(attr.type)
-
-                if doc: print >>self._inc, '  /** %s */' % doc
-                print >>self._inc, "  const %s& %s(%s) const {" % (typename, methname, argstr)
-                print >>self._inc, "    ptrdiff_t offset=%s;" % (offset,)
-                print >>self._inc, "    const %s* memptr = (const %s*)(((const char*)this)+offset);" % (typename, typename)
-                print >>self._inc, "    size_t memsize = memptr->_sizeof(%s);" % (sizeofCfg,)
-                print >>self._inc, "    return *(const %s*)((const char*)memptr + (%s)*memsize);" % (typename, idxexpr)
-                print >>self._inc, "  }"
 
 
     def _genCtor(self, ctor):
@@ -642,49 +585,35 @@ class CppTypeCodegen ( object ) :
     def _genAttrShapeDecl(self, attr):
 
         if not attr.shape_method: return 
-
-        if attr.accessor:
-            doc = "Method which returns the shape (dimensions) of the data returned by %s() method." % \
-                    attr.accessor.name
-        else:
-            doc = "Method which returns the shape (dimensions) of the data member %s." % attr.name
-
-        if self._abs:
+        if not attr.accessor: return
         
-            print >>self._inc, "  /** %s */" % doc
-            print >>self._inc, "  virtual std::vector<int> %s() const = 0;" % (attr.shape_method)
+        doc = "Method which returns the shape (dimensions) of the data returned by %s() method." % \
+                attr.accessor.name
         
-        else:
+        # value-type arrays return ndarrays which do not need shape method
+        if attr.type.value_type and attr.type.name != 'char': return
 
-            shape = attr.shape.dims
+        shape = [str(s or -1) for s in attr.shape.dims]
 
-            cfgNeeded = False        
-            for s in shape:
-                if '{xtc-config}' in str(s): 
-                    cfgNeeded = True
+        body = "std::vector<int> shape;" 
+        body += "\n  shape.reserve(%d);" % len(shape)
+        for s in shape:
+            body += "\n  shape.push_back(%s);" % s
+        body += "\n  return shape;"
 
-            args = []
-            if cfgNeeded:
-                for cfg in attr.parent.xtcConfig:
-                    args.append(_argdecl('cfg', cfg))
-            else:
-                args = ['']
-                
-            for arg in args:
-                
-                print >>self._inc, "  /** %s */" % doc
-                print >>self._inc, "  std::vector<int> %s(%s) const;" % (attr.shape_method, arg)
-                print >>self._cpp, "std::vector<int> %s::%s(%s) const\n{" % (self._type.name, attr.shape_method, arg)
-                print >>self._cpp, "  std::vector<int> shape;" 
-                print >>self._cpp, "  shape.reserve(%d);" % len(shape)
-                for s in shape:
-                    if s is None:
-                        expr = "-1"
-                    else :
-                        expr = str(s)
-                    print >>self._cpp, "  shape.push_back(%s);" % _interpolate(expr, self._type)
-                print >>self._cpp, "  return shape;"
-                print >>self._cpp, "}\n"
+        # guess if we need to pass cfg object to method
+        cfgNeeded = body.find('{xtc-config}') >= 0
+        body = _interpolate(body, self._type)
+
+        configs = [None]
+        if cfgNeeded and not self._abs: configs = attr.parent.xtcConfig
+        for cfg in configs:
+
+            cargs = []
+            if cfg: cargs = [('cfg', cfg)]
+
+            self._genMethodBody(attr.shape_method, "std::vector<int>", body, cargs, inline=False, doc=doc)
+
 
 
 #

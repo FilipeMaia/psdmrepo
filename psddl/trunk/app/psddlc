@@ -45,6 +45,7 @@ from psddl.DdlPds2Psana import DdlPds2Psana
 from psddl.DdlPsanaDoc import DdlPsanaDoc
 from psddl.DdlPsanaInterfaces import DdlPsanaInterfaces
 from psddl.DdlPdsdata import DdlPdsdata
+from psddl.DdlHdf5Data import DdlHdf5Data
 
 #---------------------
 # Local definitions --
@@ -70,7 +71,8 @@ class psddlc ( LusiPyApp ) :
                                   gen_incdir = "",
                                   include_dir = [],
                                   top_package = None,
-                                  backend_options = [])
+                                  backend_options = [],
+                                  list_backends = False)
         
         self._parser.add_option("-b", "--backend", metavar="NAME", 
                                 help="use specified backend (pdsdata, psana, etc.)")
@@ -90,6 +92,18 @@ class psddlc ( LusiPyApp ) :
                                 help="top-level package/namespace for generated code", metavar="NAME")
         self._parser.add_option("-B", "--backend-options", action="append",
                                 help="options for backend, form key:value or key", metavar="OPTION")
+        self._parser.add_option("-l", "--list-backends", action="store_true",
+                                help="print list of available backends and exit")
+
+
+        self.backends = {
+            "pdsdata": self.pdsdataGen,
+            "psana": self.psanaGen,
+            "psana-doc": self.psanaDocGen,
+            "pds2psana": self.pds2psanaGen,
+            "hdf5": self.hdf5Gen,
+        }
+        
 
 
     #
@@ -98,19 +112,15 @@ class psddlc ( LusiPyApp ) :
     #
     def _run ( self ) :
 
+        if self._options.list_backends:
+            print "Availabale backens: " + " ".join(self.backends.keys())
+            return 0
+
         # check the arguments
         if not self._args:
             self._parser.error("one or more arguments required")
             return 2
-
-        input = self._args
-        base = os.path.basename(input[0])
-
-        header = self._options.header
-        source = self._options.output
         
-        generator = None
-
         # build dict with backend options
         backend_options = dict()
         for opt in self._options.backend_options:
@@ -121,47 +131,74 @@ class psddlc ( LusiPyApp ) :
         backend_options['top-package'] = self._options.top_package
         backend_options['gen-incdir'] = self._options.gen_incdir
         
-
-        if self._options.backend == "pdsdata" :
-            if not header : header = os.path.splitext(base)[0] + '.h'
-            if not source : source = os.path.splitext(base)[0] + '.cpp'
-            if self._options.header_dir: header = os.path.join(self._options.header_dir, header)
-            if self._options.output_dir: source = os.path.join(self._options.output_dir, source)
-            generator = DdlPdsdata(header, source, backend_options)
-        elif self._options.backend == "psana" :
-            if not header : header = os.path.splitext(base)[0] + '.h'
-            if not source : source = os.path.splitext(base)[0] + '.cpp'
-            if self._options.header_dir: header = os.path.join(self._options.header_dir, header)
-            if self._options.output_dir: source = os.path.join(self._options.output_dir, source)
-            generator = DdlPsanaInterfaces(header, source, backend_options)
-        elif self._options.backend == "psana-doc" :
-            generator = DdlPsanaDoc(self._options.output_dir, backend_options)
-        elif self._options.backend == "pds2psana" :
-            if not header : header = os.path.splitext(base)[0] + '.h'
-            if not source : source = os.path.splitext(base)[0] + '.cpp'
-            if self._options.header_dir: header = os.path.join(self._options.header_dir, header)
-            if self._options.output_dir: source = os.path.join(self._options.output_dir, source)
-            generator = DdlPds2Psana(header, source, backend_options)
+        # instantiate generator
+        try:
+            genMethod = self.backends[self._options.backend]
+        except:
+            print >>sys.stderr, "incorrect back-end name:", self._options.backend
+            return 2
+        generator = genMethod(backend_options)
+            
 
         try :
-            reader = XmlReader(input, self._options.include_dir)
+            reader = XmlReader(self._args, self._options.include_dir)
             model = reader.read()
         except Exception, ex:
-            print >>sys.stderr, "parsing failed for file", input
+            print >>sys.stderr, "parsing failed for file", self._args
             print >>sys.stderr, "reason:", ex
             raise
             return 2
 
-        if generator :
-            try :
-                generator.parseTree(model)
-            except Exception, ex:
-                print >>sys.stderr, "generation failed for file", input
-                print >>sys.stderr, "reason:", ex
-                raise
-                return 2
+        try :
+            generator.parseTree(model)
+        except Exception, ex:
+            print >>sys.stderr, "generation failed for file", self._args
+            print >>sys.stderr, "reason:", ex
+            raise
+            return 2
 
         return 0
+
+    def _getHeaderAndSource(self):
+        base = os.path.basename(self._args[0])
+
+        header = self._options.header
+        source = self._options.output
+        
+        if not header : header = os.path.splitext(base)[0] + '.h'
+        if not source : source = os.path.splitext(base)[0] + '.cpp'
+        if self._options.header_dir: header = os.path.join(self._options.header_dir, header)
+        if self._options.output_dir: source = os.path.join(self._options.output_dir, source)
+
+        return (header, source)
+    
+    def pdsdataGen(self, backend_options):
+        
+        header, source = self._getHeaderAndSource()
+        
+        return DdlPdsdata(header, source, backend_options)
+    
+    def psanaGen(self, backend_options):
+
+        header, source = self._getHeaderAndSource()
+        
+        return DdlPsanaInterfaces(header, source, backend_options)
+    
+    def psanaDocGen(self, backend_options):
+        
+        return DdlPsanaDoc(self._options.output_dir, backend_options)
+        
+    def pds2psanaGen(self, backend_options):
+
+        header, source = self._getHeaderAndSource()
+        
+        return DdlPds2Psana(header, source, backend_options)
+
+    def hdf5Gen(self, backend_options):
+
+        header, source = self._getHeaderAndSource()
+        
+        return DdlHdf5Data(header, source, backend_options)
 
 #
 #  run application when imported as a main module

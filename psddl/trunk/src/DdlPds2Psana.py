@@ -271,15 +271,21 @@ class DdlPds2Psana ( object ) :
         for aname, atype, dest in args:
 
             if not atype: atype = dest.type
-            
-            if isinstance(dest,Attribute) and dest.access == 'public':
-                expr = "pds."+dest.name
-            elif dest.accessor:
-                expr = "pds."+dest.accessor.name+"()"
-            else:
+
+            if not dest.accessor:
                 raise ValueError('attribute %s has no access method' % dest.name)
+
+            expr = "pds."+dest.accessor.name+"()"
+            if isinstance(dest, Attribute) and dest.shape:
+                if atype.name == 'char':
+                    # accessor returns char* and takes few indices
+                    idx = ','.join(['0']*(len(dest.shape.dims)-1))
+                    expr = "pds."+dest.accessor.name+"("+idx+")"
+                elif atype.value_type:
+                    # accessor returns ndarray, we need pointer
+                    expr = "pds."+dest.accessor.name+"().data()"
                 
-            if not atype.basic and not isinstance(atype, Enum):
+            if not atype.basic and not atype.external and not isinstance(atype, Enum):
                 expr = "pds_to_psana(%s)" % expr
             ctor_args.append(expr)
 
@@ -324,13 +330,7 @@ class DdlPds2Psana ( object ) :
         # declarations for public methods 
         for t in _types(type):
             for meth in t.methods(): 
-                if meth.access == 'public': self._genMethDecl(meth, type)
-
-        # generate method declaration for public members without accessors
-        for t in _types(type):
-            for attr in t.attributes() :
-                if attr.access == "public" and attr.accessor is None:
-                    self._genPubAttrMethod(attr, type)
+                if meth.access == 'public': self._genMethod(meth, type)
 
         # generate _shape() methods for array attributes
         for t in _types(type):
@@ -357,10 +357,10 @@ class DdlPds2Psana ( object ) :
         print >>self.inc, "};\n"
 
 
-    def _genMethDecl(self, meth, type):
+    def _genMethod(self, meth, type):
         """Generate method declaration and definition"""
 
-        logging.debug("_genMethDecl: meth: %s", meth)
+        logging.debug("_genMethod: meth: %s", meth)
         
         if meth.attribute:
             
@@ -373,10 +373,17 @@ class DdlPds2Psana ( object ) :
                 cfgNeeded = False
                 if '{xtc-config}' in str(attr.offset) : cfgNeeded = True
 
+                args = []
                 rettype = attr.type.fullName('C++')
-                if attr.shape:
-                    rettype = "const "+rettype+'*'
-                self._genFwdMeth(meth.name, rettype, type, cfgNeeded)
+                if attr.shape :
+                    for d in attr.shape.dims:
+                        if '{xtc-config}' in str(d) : cfgNeeded = True
+                    if attr.type.name == 'char':
+                        rettype = "const char*"
+                        args = [('i%d'%i, type.lookup('uint32_t')) for i in range(len(attr.shape.dims)-1)]
+                    else:
+                        rettype = "ndarray<%s, %d>" % (rettype, len(attr.shape.dims))
+                self._genFwdMeth(meth.name, rettype, type, cfgNeeded, args=args)
             
             else:
 
@@ -389,6 +396,14 @@ class DdlPds2Psana ( object ) :
                             (psana_type, meth.name)
                     print >>self.cpp, "\nconst %s& %s::%s() const { return %s; }" % \
                             (psana_type, type.name, meth.name, attr.name)
+                        
+                elif attr.type.value_type:
+                    
+                    # attribute is an array accessed through ndarray
+                    ndarray = "ndarray<%s, %d>" % (psana_type, len(attr.shape.dims))
+                    print >>self.inc, "  virtual %s %s() const;" % (ndarray, meth.name)
+                    expr = "%s(&%s_ndarray_storage_[0], %s_ndarray_shape_)" % (ndarray, attr.name, attr.name)
+                    print >>self.cpp, "\n%s %s::%s() const { return %s; }" % (ndarray, type.name, meth.name, expr)
                         
                 else:
     
@@ -455,28 +470,31 @@ class DdlPds2Psana ( object ) :
 
     def _genAttrDecl(self, attr):
         
+        # basic types do not need conversion
         if attr.type.basic: return
         
         # need corresponding psana type
-        if 'value-type' not in attr.type.tags:
-            psana_type = attr.type.fullName('C++', self.top_pkg)
-        else :
+        if attr.type.value_type:
             psana_type =  attr.type.fullName('C++', self.psana_ns)
+        else :
+            psana_type = attr.type.fullName('C++', self.top_pkg)
 
-        # may need to mangle name
-        name = attr.name
-        if attr.access == 'public' : name += "_pub_member_"
-        
         if not attr.shape:
             
-            print >>self.inc, "  %s %s;" % (psana_type, name)
+            print >>self.inc, "  %s %s;" % (psana_type, attr.name)
+
+        elif attr.type.value_type:
+            
+            # for value types we return ndarray which needs contiguous memory
+            print >>self.inc, "  std::vector<%s> %s_ndarray_storage_;" % (psana_type, attr.name)
+            print >>self.inc, "  unsigned %s_ndarray_shape_[%d];" % (attr.name, len(attr.shape.dims))
 
         else :
 
             atype = psana_type     
             for d in attr.shape.dims:
                 atype = "std::vector< %s >" % atype
-            print >>self.inc, "  %s %s;" % (atype, name)
+            print >>self.inc, "  %s %s;" % (atype, attr.name)
 
 
     def _genCtor(self, type, cfg, cfgnum):
@@ -531,7 +549,6 @@ class DdlPds2Psana ( object ) :
 
         # may need to mangle name
         name = attr.name
-        if attr.access == 'public' : name += "_pub_member_"
 
         if attr.type.external:
             print >>self.cpp, "  , %s(%s)" % (name, expr)
@@ -553,22 +570,25 @@ class DdlPds2Psana ( object ) :
         # all basic types are forwarded to xtc 
         if attr.type.basic: return
         
-        # arrays are initialized inside constructor
         if not attr.shape: return
-        
+
         # may need to mangle name
         name = attr.name
-        if attr.access == 'public' : name += "_pub_member_"
 
         ndims = len(attr.shape.dims)
 
-        print >>self.cpp, "  {"
-        
+        # for value types we do ndarrays in separate method
+        if attr.type.value_type: 
+            return self._genAttrInitNDArray(attr)
+
+        # config objects may be needed
         cfgNeeded = False
         if str(attr.offset).find('{xtc-config}') >= 0:
             cfgNeeded = True
         if str(attr.type.size).find('{xtc-config}') >= 0:
             cfgNeeded = True
+
+        print >>self.cpp, "  {"
         
         cfg = ''
         for d in attr.shape.dims:
@@ -611,11 +631,52 @@ class DdlPds2Psana ( object ) :
 
         print >>self.cpp, "  }" 
 
+    def _genAttrInitNDArray(self, attr):
+
+        pdstypename = attr.type.fullName('C++', self.pdsdata_ns)
+        psanatypename = attr.type.fullName('C++', self.psana_ns)
+
+        # may need to mangle name
+        name = attr.name
+
+        ndims = len(attr.shape.dims)
+
+        cfgNeeded = False
+        if str(attr.offset).find('{xtc-config}') >= 0:
+            cfgNeeded = True
+        for d in attr.shape.dims:
+            if '{xtc-config}' in str(d) : cfgNeeded = True
+            
+        cfg = ""
+        if cfgNeeded: cfg = "*cfgPtr"
+        
+        if attr.type.external:
+            elem_expr = '*it'
+        else:
+            ns = attr.type._parent.fullName('C++', self.top_pkg)
+            elem_expr = '%s::pds_to_psana(*it)' % ns
+            
+        # ndarray initialization
+        print >>self.cpp, "  {"
+        print >>self.cpp, "    typedef ndarray<%s, %d> XtcNDArray;" % (pdstypename, ndims)
+        print >>self.cpp, "    const XtcNDArray& xtc_ndarr = xtcPtr->%s(%s);" % (attr.accessor.name, cfg)
+        print >>self.cpp, "    %s_ndarray_storage_.reserve(xtc_ndarr.size());" % (name,)
+        print >>self.cpp, "    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {"
+        print >>self.cpp, "      %s_ndarray_storage_.push_back(%s);" % (name, elem_expr)
+        print >>self.cpp, "    }"
+        print >>self.cpp, "    const unsigned* shape = xtc_ndarr.shape();"
+        print >>self.cpp, "    std::copy(shape, shape+%d, %s_ndarray_shape_);" % (ndims, name)
+        print >>self.cpp, "  }" 
+
 
     def _genAttrShapeDecl(self, attr, type):
 
         if not attr.shape_method: return 
+        if not attr.accessor: return
         
+        # value-type arrays return ndarrays which do not need shape method
+        if attr.type.value_type and attr.type.name != 'char': return
+
         if attr.type.basic:
 
             cfgNeeded = False
@@ -643,42 +704,6 @@ class DdlPds2Psana ( object ) :
                 v += '[0]'
             print >>self.cpp, "  return shape;\n}\n"
 
-    def _genPubAttrMethod(self, attr, type):
-        """Generate virtual method declaration for accessing public attribute"""
-
-        def subscr(r):
-            return "".join(['[i%d]'%i for i in range(r)])
-        def subscr_comma(r):
-            return ",".join(['int i%d'%i for i in range(r)])
-
-        logging.debug("_genPubAttrMethod: attr: %s", attr)
-        
-        if attr.type.basic:
-            
-            rettype = attr.type.fullName('C++')
-            if attr.shape:
-                rettype = "const "+rettype+'*'
-
-            print >>self.inc, "  virtual %s %s() const;" % (rettype, attr.name)
-            print >>self.cpp, "\n%s %s::%s() const { return m_xtcObj->%s; }" % (rettype, type.name, attr.name, attr.name)
-
-        else:
-
-            rettype = attr.type.fullName('C++', self.psana_ns)
-
-            name = attr.name + "_pub_member_"
-            
-            argexpr = ''
-            subexpr = ''
-            if attr.shape:
-                rank = len(attr.shape.dims)
-                argexpr = subscr_comma(rank)
-                subexpr = subscr(rank)
-            
-            print >>self.inc, "  virtual const %s& %s(%s) const;" % (rettype, attr.name, argexpr)
-            print >>self.cpp, "\nconst %s& %s::%s(%s) const { return %s%s; }" % \
-                    (rettype, type.name, attr.name, argexpr, name, subexpr)
-                
 
 #
 #  In case someone decides to run this module

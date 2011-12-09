@@ -118,7 +118,7 @@ class Attribute ( object ) :
         return "<Attribute(%s)>" % self.__dict__
 
     def __repr__(self):
-        return "<Attribute(%s)>" % self.name
+        return "<Attribute(%s)>" % self.__dict__
 
 #
 #  In case someone decides to run this module

@@ -95,12 +95,13 @@ class DdlPsanaInterfaces ( object ) :
         print >>self.cpp, msg
 
         # add necessary includes
-        print >>self.inc, "#include \"pdsdata/xtc/TypeId.hh\"\n"
-        print >>self.inc, "#include <vector>\n"
+        print >>self.inc, "#include <vector>"
+        print >>self.cpp, "#include <cstddef>"
 
+        print >>self.inc, "#include \"ndarray/ndarray.h\""
+        print >>self.inc, "#include \"pdsdata/xtc/TypeId.hh\""
         inc = os.path.join(self.incdirname, os.path.basename(self.incname))
-        print >>self.cpp, "#include \"%s\"\n" % inc
-        print >>self.cpp, "#include <cstddef>\n"
+        print >>self.cpp, "#include \"%s\"" % inc
 
         # headers for other included packages
         for use in model.use:
@@ -174,7 +175,7 @@ class DdlPsanaInterfaces ( object ) :
         if type.included : return
 
         # type is abstract by default but can be reset with tag "value-type"
-        abstract = "value-type" not in type.tags
+        abstract = not type.value_type
 
         codegen = CppTypeCodegen(self.inc, self.cpp, type, abstract)
         codegen.codegen()
