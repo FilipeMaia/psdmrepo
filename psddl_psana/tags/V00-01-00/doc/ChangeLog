@@ -1,0 +1,74 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psddl_psana
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-00
+2011-12-09 Andy Salnikov
+- switching to ndarray
+- regenerate whole thing from psddldata V00-01-00 with psddl  V00-01-00
+
+Tag: V00-00-13
+2011-11-12 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-14
+
+Tag: V00-00-12
+2011-10-04 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-13
+
+Tag: V00-00-11
+2011-09-12 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-12
+
+Tag: V00-00-10
+2011-08-29 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-11
+
+Tag: V00-00-09
+2011-08-22 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-10
+
+Tag: V00-00-08
+2011-06-16 Andy Salnikov
+- upgrade to pdsdata V02-11-05
+
+Tag: V00-00-07
+2011-05-06 Andy Salnikov
+- removed generated documentation from package
+- added option to ddl_psanadoc to generate files in given location
+
+Tag: V00-00-06
+2011-04-26 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-08
+
+Tag: V00-00-05
+2011-04-07 Andy Salnikov
+- added app/ddl_psanadoc
+
+Tag: V00-00-04
+2011-04-07 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-07
+- generated documentation is in doc/html directory
+
+Tag: V00-00-03
+2011-03-31 Andy Salnikov
+- regenerated whole thing after changes in psddl
+
+Tag: V00-00-02
+2011-03-28 Andy Salnikov
+- added template EpicsLib.h with few helper tempaltes which should
+  simplify access to epics data
+- few changes in epics classes, regenerated epics.ddh.*
+
+Tag: V00-00-01
+2011-03-21 Andy Salnikov
+- first import into svn
+- mostly working, but there will be updates no doubt
