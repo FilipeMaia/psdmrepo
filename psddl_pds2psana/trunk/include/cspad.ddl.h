@@ -16,8 +16,7 @@ public:
   typedef Psana::CsPad::CsPadDigitalPotsCfg PsanaType;
   CsPadDigitalPotsCfg(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~CsPadDigitalPotsCfg();
-  virtual const uint8_t* pots() const;
-  virtual std::vector<int> pots_shape() const;
+  virtual ndarray<uint8_t, 1> pots() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -58,8 +57,7 @@ public:
   typedef Psana::CsPad::CsPadGainMapCfg PsanaType;
   CsPadGainMapCfg(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~CsPadGainMapCfg();
-  virtual const uint16_t* gainMap() const;
-  virtual std::vector<int> gainMap_shape() const;
+  virtual ndarray<uint16_t, 2> gainMap() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -72,8 +70,8 @@ public:
   typedef Psana::CsPad::ConfigV1QuadReg PsanaType;
   ConfigV1QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1QuadReg();
-  virtual const uint32_t* shiftSelect() const;
-  virtual const uint32_t* edgeSelect() const;
+  virtual ndarray<uint32_t, 1> shiftSelect() const;
+  virtual ndarray<uint32_t, 1> edgeSelect() const;
   virtual uint32_t readClkSet() const;
   virtual uint32_t readClkHold() const;
   virtual uint32_t dataMode() const;
@@ -87,8 +85,6 @@ public:
   virtual const Psana::CsPad::CsPadReadOnlyCfg& ro() const;
   virtual const Psana::CsPad::CsPadDigitalPotsCfg& dp() const;
   virtual const Psana::CsPad::CsPadGainMapCfg& gm() const;
-  virtual std::vector<int> shiftSelect_shape() const;
-  virtual std::vector<int> edgeSelect_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -209,14 +205,11 @@ public:
   virtual uint32_t seq_count() const;
   virtual uint32_t ticks() const;
   virtual uint32_t fiducials() const;
-  virtual const uint16_t* sb_temp() const;
+  virtual ndarray<uint16_t, 1> sb_temp() const;
   virtual uint32_t frame_type() const;
-  virtual const int16_t* data() const;
+  virtual ndarray<int16_t, 3> data() const;
   virtual uint32_t sectionMask() const;
   virtual float common_mode(uint32_t section) const;
-  virtual std::vector<int> sb_temp_shape() const;
-  virtual std::vector<int> data_shape() const;
-  virtual std::vector<int> _extra_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -259,14 +252,11 @@ public:
   virtual uint32_t seq_count() const;
   virtual uint32_t ticks() const;
   virtual uint32_t fiducials() const;
-  virtual const uint16_t* sb_temp() const;
+  virtual ndarray<uint16_t, 1> sb_temp() const;
   virtual uint32_t frame_type() const;
-  virtual const int16_t* data() const;
+  virtual ndarray<int16_t, 3> data() const;
   virtual uint32_t sectionMask() const;
   virtual float common_mode(uint32_t section) const;
-  virtual std::vector<int> sb_temp_shape() const;
-  virtual std::vector<int> data_shape() const;
-  virtual std::vector<int> _extra_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -308,12 +298,10 @@ public:
   virtual uint32_t seq_count() const;
   virtual uint32_t ticks() const;
   virtual uint32_t fiducials() const;
-  virtual const uint16_t* sb_temp() const;
+  virtual ndarray<uint16_t, 1> sb_temp() const;
   virtual uint32_t frame_type() const;
-  virtual const int16_t* data() const;
+  virtual ndarray<int16_t, 3> data() const;
   virtual float common_mode(uint32_t section) const;
-  virtual std::vector<int> sb_temp_shape() const;
-  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

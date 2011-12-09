@@ -29,9 +29,7 @@ CsPadDigitalPotsCfg::~CsPadDigitalPotsCfg()
 }
 
 
-const uint8_t* CsPadDigitalPotsCfg::pots() const { return m_xtcObj->pots(); }
-
-std::vector<int> CsPadDigitalPotsCfg::pots_shape() const { return m_xtcObj->pots_shape(); }
+ndarray<uint8_t, 1> CsPadDigitalPotsCfg::pots() const { return m_xtcObj->pots(); }
 CsPadReadOnlyCfg::CsPadReadOnlyCfg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::CsPadReadOnlyCfg()
   , m_xtcObj(xtcPtr)
@@ -68,9 +66,7 @@ CsPadGainMapCfg::~CsPadGainMapCfg()
 }
 
 
-const uint16_t* CsPadGainMapCfg::gainMap() const { return m_xtcObj->gainMap(); }
-
-std::vector<int> CsPadGainMapCfg::gainMap_shape() const { return m_xtcObj->gainMap_shape(); }
+ndarray<uint16_t, 2> CsPadGainMapCfg::gainMap() const { return m_xtcObj->gainMap(); }
 ConfigV1QuadReg::ConfigV1QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::ConfigV1QuadReg()
   , m_xtcObj(xtcPtr)
@@ -84,9 +80,9 @@ ConfigV1QuadReg::~ConfigV1QuadReg()
 }
 
 
-const uint32_t* ConfigV1QuadReg::shiftSelect() const { return m_xtcObj->shiftSelect(); }
+ndarray<uint32_t, 1> ConfigV1QuadReg::shiftSelect() const { return m_xtcObj->shiftSelect(); }
 
-const uint32_t* ConfigV1QuadReg::edgeSelect() const { return m_xtcObj->edgeSelect(); }
+ndarray<uint32_t, 1> ConfigV1QuadReg::edgeSelect() const { return m_xtcObj->edgeSelect(); }
 
 uint32_t ConfigV1QuadReg::readClkSet() const { return m_xtcObj->readClkSet(); }
 
@@ -113,10 +109,6 @@ const Psana::CsPad::CsPadReadOnlyCfg& ConfigV1QuadReg::ro() const { return _read
 const Psana::CsPad::CsPadDigitalPotsCfg& ConfigV1QuadReg::dp() const { return _digitalPots; }
 
 const Psana::CsPad::CsPadGainMapCfg& ConfigV1QuadReg::gm() const { return _gainMap; }
-
-std::vector<int> ConfigV1QuadReg::shiftSelect_shape() const { return m_xtcObj->shiftSelect_shape(); }
-
-std::vector<int> ConfigV1QuadReg::edgeSelect_shape() const { return m_xtcObj->edgeSelect_shape(); }
 ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::ConfigV1()
   , m_xtcObj(xtcPtr)
@@ -349,11 +341,16 @@ uint32_t ElementV1::ticks() const { return m_xtcObj->ticks(); }
 
 uint32_t ElementV1::fiducials() const { return m_xtcObj->fiducials(); }
 
-const uint16_t* ElementV1::sb_temp() const { return m_xtcObj->sb_temp(); }
+ndarray<uint16_t, 1> ElementV1::sb_temp() const { return m_xtcObj->sb_temp(); }
 
 uint32_t ElementV1::frame_type() const { return m_xtcObj->frame_type(); }
 
-const int16_t* ElementV1::data() const { return m_xtcObj->data(); }
+ndarray<int16_t, 3> ElementV1::data() const {
+  if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
+  if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
+  throw std::runtime_error("ElementV1::data: config object pointer is zero");
+}
+
 
 uint32_t ElementV1::sectionMask() const {
   if (m_cfgPtr0.get()) return m_xtcObj->sectionMask(*m_cfgPtr0);
@@ -363,17 +360,6 @@ uint32_t ElementV1::sectionMask() const {
 
 
 float ElementV1::common_mode(uint32_t section) const { return m_xtcObj->common_mode(section); }
-
-std::vector<int> ElementV1::sb_temp_shape() const { return m_xtcObj->sb_temp_shape(); }
-
-std::vector<int> ElementV1::data_shape() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->data_shape(*m_cfgPtr0);
-  if (m_cfgPtr1.get()) return m_xtcObj->data_shape(*m_cfgPtr1);
-  throw std::runtime_error("ElementV1::data_shape: config object pointer is zero");
-}
-
-
-std::vector<int> ElementV1::_extra_shape() const { return m_xtcObj->_extra_shape(); }
 DataV1::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV1>& cfgPtr)
   : Psana::CsPad::DataV1()
   , m_xtcObj(xtcPtr)
@@ -453,11 +439,16 @@ uint32_t ElementV2::ticks() const { return m_xtcObj->ticks(); }
 
 uint32_t ElementV2::fiducials() const { return m_xtcObj->fiducials(); }
 
-const uint16_t* ElementV2::sb_temp() const { return m_xtcObj->sb_temp(); }
+ndarray<uint16_t, 1> ElementV2::sb_temp() const { return m_xtcObj->sb_temp(); }
 
 uint32_t ElementV2::frame_type() const { return m_xtcObj->frame_type(); }
 
-const int16_t* ElementV2::data() const { return m_xtcObj->data(); }
+ndarray<int16_t, 3> ElementV2::data() const {
+  if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
+  if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
+  throw std::runtime_error("ElementV2::data: config object pointer is zero");
+}
+
 
 uint32_t ElementV2::sectionMask() const {
   if (m_cfgPtr0.get()) return m_xtcObj->sectionMask(*m_cfgPtr0);
@@ -467,17 +458,6 @@ uint32_t ElementV2::sectionMask() const {
 
 
 float ElementV2::common_mode(uint32_t section) const { return m_xtcObj->common_mode(section); }
-
-std::vector<int> ElementV2::sb_temp_shape() const { return m_xtcObj->sb_temp_shape(); }
-
-std::vector<int> ElementV2::data_shape() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->data_shape(*m_cfgPtr0);
-  if (m_cfgPtr1.get()) return m_xtcObj->data_shape(*m_cfgPtr1);
-  throw std::runtime_error("ElementV2::data_shape: config object pointer is zero");
-}
-
-
-std::vector<int> ElementV2::_extra_shape() const { return m_xtcObj->_extra_shape(); }
 DataV2::DataV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::CsPad::ConfigV2>& cfgPtr)
   : Psana::CsPad::DataV2()
   , m_xtcObj(xtcPtr)
@@ -550,16 +530,12 @@ uint32_t MiniElementV1::ticks() const { return m_xtcObj->ticks(); }
 
 uint32_t MiniElementV1::fiducials() const { return m_xtcObj->fiducials(); }
 
-const uint16_t* MiniElementV1::sb_temp() const { return m_xtcObj->sb_temp(); }
+ndarray<uint16_t, 1> MiniElementV1::sb_temp() const { return m_xtcObj->sb_temp(); }
 
 uint32_t MiniElementV1::frame_type() const { return m_xtcObj->frame_type(); }
 
-const int16_t* MiniElementV1::data() const { return m_xtcObj->data(); }
+ndarray<int16_t, 3> MiniElementV1::data() const { return m_xtcObj->data(); }
 
 float MiniElementV1::common_mode(uint32_t section) const { return m_xtcObj->common_mode(section); }
-
-std::vector<int> MiniElementV1::sb_temp_shape() const { return m_xtcObj->sb_temp_shape(); }
-
-std::vector<int> MiniElementV1::data_shape() const { return m_xtcObj->data_shape(); }
 } // namespace CsPad
 } // namespace psddl_pds2psana

@@ -31,15 +31,15 @@ public:
   virtual ~ConfigV1();
   virtual uint32_t npulses() const;
   virtual uint32_t noutputs() const;
-  virtual const Psana::EvrData::PulseConfig& pulses(uint32_t i0) const;
-  virtual const Psana::EvrData::OutputMap& output_maps(uint32_t i0) const;
-  virtual std::vector<int> pulses_shape() const;
-  virtual std::vector<int> output_maps_shape() const;
+  virtual ndarray<Psana::EvrData::PulseConfig, 1> pulses() const;
+  virtual ndarray<Psana::EvrData::OutputMap, 1> output_maps() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< Psana::EvrData::PulseConfig > _pulses;
-  std::vector< Psana::EvrData::OutputMap > _output_maps;
+  std::vector<Psana::EvrData::PulseConfig> _pulses_ndarray_storage_;
+  unsigned _pulses_ndarray_shape_[1];
+  std::vector<Psana::EvrData::OutputMap> _output_maps_ndarray_storage_;
+  unsigned _output_maps_ndarray_shape_[1];
 };
 
 
@@ -52,17 +52,17 @@ public:
   virtual uint32_t opcode() const;
   virtual uint32_t npulses() const;
   virtual uint32_t noutputs() const;
-  virtual const Psana::EvrData::PulseConfig& pulses(uint32_t i0) const;
-  virtual const Psana::EvrData::OutputMap& output_maps(uint32_t i0) const;
+  virtual ndarray<Psana::EvrData::PulseConfig, 1> pulses() const;
+  virtual ndarray<Psana::EvrData::OutputMap, 1> output_maps() const;
   virtual Psana::EvrData::ConfigV2::BeamCode beam() const;
   virtual Psana::EvrData::ConfigV2::RateCode rate() const;
-  virtual std::vector<int> pulses_shape() const;
-  virtual std::vector<int> output_maps_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< Psana::EvrData::PulseConfig > _pulses;
-  std::vector< Psana::EvrData::OutputMap > _output_maps;
+  std::vector<Psana::EvrData::PulseConfig> _pulses_ndarray_storage_;
+  unsigned _pulses_ndarray_shape_[1];
+  std::vector<Psana::EvrData::OutputMap> _output_maps_ndarray_storage_;
+  unsigned _output_maps_ndarray_shape_[1];
 };
 
 
@@ -75,18 +75,18 @@ public:
   virtual uint32_t neventcodes() const;
   virtual uint32_t npulses() const;
   virtual uint32_t noutputs() const;
-  virtual const Psana::EvrData::EventCodeV3& eventcodes(uint32_t i0) const;
-  virtual const Psana::EvrData::PulseConfigV3& pulses(uint32_t i0) const;
-  virtual const Psana::EvrData::OutputMap& output_maps(uint32_t i0) const;
-  virtual std::vector<int> eventcodes_shape() const;
-  virtual std::vector<int> pulses_shape() const;
-  virtual std::vector<int> output_maps_shape() const;
+  virtual ndarray<Psana::EvrData::EventCodeV3, 1> eventcodes() const;
+  virtual ndarray<Psana::EvrData::PulseConfigV3, 1> pulses() const;
+  virtual ndarray<Psana::EvrData::OutputMap, 1> output_maps() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< Psana::EvrData::EventCodeV3 > _eventcodes;
-  std::vector< Psana::EvrData::PulseConfigV3 > _pulses;
-  std::vector< Psana::EvrData::OutputMap > _output_maps;
+  std::vector<Psana::EvrData::EventCodeV3> _eventcodes_ndarray_storage_;
+  unsigned _eventcodes_ndarray_shape_[1];
+  std::vector<Psana::EvrData::PulseConfigV3> _pulses_ndarray_storage_;
+  unsigned _pulses_ndarray_shape_[1];
+  std::vector<Psana::EvrData::OutputMap> _output_maps_ndarray_storage_;
+  unsigned _output_maps_ndarray_shape_[1];
 };
 
 
@@ -99,18 +99,18 @@ public:
   virtual uint32_t neventcodes() const;
   virtual uint32_t npulses() const;
   virtual uint32_t noutputs() const;
-  virtual const Psana::EvrData::EventCodeV4& eventcodes(uint32_t i0) const;
-  virtual const Psana::EvrData::PulseConfigV3& pulses(uint32_t i0) const;
-  virtual const Psana::EvrData::OutputMap& output_maps(uint32_t i0) const;
-  virtual std::vector<int> eventcodes_shape() const;
-  virtual std::vector<int> pulses_shape() const;
-  virtual std::vector<int> output_maps_shape() const;
+  virtual ndarray<Psana::EvrData::EventCodeV4, 1> eventcodes() const;
+  virtual ndarray<Psana::EvrData::PulseConfigV3, 1> pulses() const;
+  virtual ndarray<Psana::EvrData::OutputMap, 1> output_maps() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< Psana::EvrData::EventCodeV4 > _eventcodes;
-  std::vector< Psana::EvrData::PulseConfigV3 > _pulses;
-  std::vector< Psana::EvrData::OutputMap > _output_maps;
+  std::vector<Psana::EvrData::EventCodeV4> _eventcodes_ndarray_storage_;
+  unsigned _eventcodes_ndarray_shape_[1];
+  std::vector<Psana::EvrData::PulseConfigV3> _pulses_ndarray_storage_;
+  unsigned _pulses_ndarray_shape_[1];
+  std::vector<Psana::EvrData::OutputMap> _output_maps_ndarray_storage_;
+  unsigned _output_maps_ndarray_shape_[1];
 };
 
 Psana::EvrData::SequencerEntry pds_to_psana(PsddlPds::EvrData::SequencerEntry pds);
@@ -126,12 +126,12 @@ public:
   virtual Psana::EvrData::SequencerConfigV1::Source beam_source() const;
   virtual uint32_t length() const;
   virtual uint32_t cycles() const;
-  virtual const Psana::EvrData::SequencerEntry& entries(uint32_t i0) const;
-  virtual std::vector<int> entries_shape() const;
+  virtual ndarray<Psana::EvrData::SequencerEntry, 1> entries() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< Psana::EvrData::SequencerEntry > _entries;
+  std::vector<Psana::EvrData::SequencerEntry> _entries_ndarray_storage_;
+  unsigned _entries_ndarray_shape_[1];
 };
 
 
@@ -144,19 +144,19 @@ public:
   virtual uint32_t neventcodes() const;
   virtual uint32_t npulses() const;
   virtual uint32_t noutputs() const;
-  virtual const Psana::EvrData::EventCodeV5& eventcodes(uint32_t i0) const;
-  virtual const Psana::EvrData::PulseConfigV3& pulses(uint32_t i0) const;
-  virtual const Psana::EvrData::OutputMap& output_maps(uint32_t i0) const;
+  virtual ndarray<Psana::EvrData::EventCodeV5, 1> eventcodes() const;
+  virtual ndarray<Psana::EvrData::PulseConfigV3, 1> pulses() const;
+  virtual ndarray<Psana::EvrData::OutputMap, 1> output_maps() const;
   virtual const Psana::EvrData::SequencerConfigV1& seq_config() const;
-  virtual std::vector<int> eventcodes_shape() const;
-  virtual std::vector<int> pulses_shape() const;
-  virtual std::vector<int> output_maps_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< Psana::EvrData::EventCodeV5 > _eventcodes;
-  std::vector< Psana::EvrData::PulseConfigV3 > _pulses;
-  std::vector< Psana::EvrData::OutputMap > _output_maps;
+  std::vector<Psana::EvrData::EventCodeV5> _eventcodes_ndarray_storage_;
+  unsigned _eventcodes_ndarray_shape_[1];
+  std::vector<Psana::EvrData::PulseConfigV3> _pulses_ndarray_storage_;
+  unsigned _pulses_ndarray_shape_[1];
+  std::vector<Psana::EvrData::OutputMap> _output_maps_ndarray_storage_;
+  unsigned _output_maps_ndarray_shape_[1];
   psddl_pds2psana::EvrData::SequencerConfigV1 _seq_config;
 };
 
@@ -170,31 +170,15 @@ public:
   DataV3(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~DataV3();
   virtual uint32_t numFifoEvents() const;
-  virtual const Psana::EvrData::FIFOEvent& fifoEvents(uint32_t i0) const;
-  virtual std::vector<int> fifoEvents_shape() const;
+  virtual ndarray<Psana::EvrData::FIFOEvent, 1> fifoEvents() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< Psana::EvrData::FIFOEvent > _fifoEvents;
+  std::vector<Psana::EvrData::FIFOEvent> _fifoEvents_ndarray_storage_;
+  unsigned _fifoEvents_ndarray_shape_[1];
 };
 
-
-class IOChannel : public Psana::EvrData::IOChannel {
-public:
-  typedef PsddlPds::EvrData::IOChannel XtcType;
-  typedef Psana::EvrData::IOChannel PsanaType;
-  IOChannel(const boost::shared_ptr<const XtcType>& xtcPtr);
-  virtual ~IOChannel();
-  virtual const char* name() const;
-  virtual uint32_t ninfo() const;
-  virtual const Pds::DetInfo& infos(uint32_t i0) const;
-  virtual std::vector<int> name_shape() const;
-  virtual std::vector<int> infos_shape() const;
-  const XtcType& _xtcObj() const { return *m_xtcObj; }
-private:
-  boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< Pds::DetInfo > _info;
-};
+Psana::EvrData::IOChannel pds_to_psana(PsddlPds::EvrData::IOChannel pds);
 
 
 class IOConfigV1 : public Psana::EvrData::IOConfigV1 {
@@ -204,13 +188,13 @@ public:
   IOConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~IOConfigV1();
   virtual uint16_t nchannels() const;
-  virtual const Psana::EvrData::IOChannel& channels(uint32_t i0) const;
+  virtual ndarray<Psana::EvrData::IOChannel, 1> channels() const;
   virtual Psana::EvrData::OutputMap::Conn conn() const;
-  virtual std::vector<int> channels_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< psddl_pds2psana::EvrData::IOChannel > _channels;
+  std::vector<Psana::EvrData::IOChannel> _channels_ndarray_storage_;
+  unsigned _channels_ndarray_shape_[1];
 };
 
 } // namespace EvrData

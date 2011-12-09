@@ -25,18 +25,24 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   , _duration(xtcPtr->duration())
 {
   {
-    const std::vector<int>& dims = xtcPtr->pvControls_shape();
-    _pvControls.reserve(dims[0]);
-    for (int i0=0; i0 != dims[0]; ++i0) {
-      _pvControls.push_back(psddl_pds2psana::ControlData::pds_to_psana(xtcPtr->pvControls(i0)));
+    typedef ndarray<PsddlPds::ControlData::PVControl, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->pvControls();
+    _pvControls_ndarray_storage_.reserve(xtc_ndarr.size());
+    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+      _pvControls_ndarray_storage_.push_back(psddl_pds2psana::ControlData::pds_to_psana(*it));
     }
+    const unsigned* shape = xtc_ndarr.shape();
+    std::copy(shape, shape+1, _pvControls_ndarray_shape_);
   }
   {
-    const std::vector<int>& dims = xtcPtr->pvMonitors_shape();
-    _pvMonitors.reserve(dims[0]);
-    for (int i0=0; i0 != dims[0]; ++i0) {
-      _pvMonitors.push_back(psddl_pds2psana::ControlData::pds_to_psana(xtcPtr->pvMonitors(i0)));
+    typedef ndarray<PsddlPds::ControlData::PVMonitor, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->pvMonitors();
+    _pvMonitors_ndarray_storage_.reserve(xtc_ndarr.size());
+    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+      _pvMonitors_ndarray_storage_.push_back(psddl_pds2psana::ControlData::pds_to_psana(*it));
     }
+    const unsigned* shape = xtc_ndarr.shape();
+    std::copy(shape, shape+1, _pvMonitors_ndarray_shape_);
   }
 }
 ConfigV1::~ConfigV1()
@@ -56,24 +62,8 @@ uint32_t ConfigV1::npvControls() const { return m_xtcObj->npvControls(); }
 
 uint32_t ConfigV1::npvMonitors() const { return m_xtcObj->npvMonitors(); }
 
-const Psana::ControlData::PVControl& ConfigV1::pvControls(uint32_t i0) const { return _pvControls[i0]; }
+ndarray<Psana::ControlData::PVControl, 1> ConfigV1::pvControls() const { return ndarray<Psana::ControlData::PVControl, 1>(&_pvControls_ndarray_storage_[0], _pvControls_ndarray_shape_); }
 
-const Psana::ControlData::PVMonitor& ConfigV1::pvMonitors(uint32_t i0) const { return _pvMonitors[i0]; }
-std::vector<int> ConfigV1::pvControls_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(_pvControls.size());
-  return shape;
-}
-
-std::vector<int> ConfigV1::pvMonitors_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(_pvMonitors.size());
-  return shape;
-}
-
+ndarray<Psana::ControlData::PVMonitor, 1> ConfigV1::pvMonitors() const { return ndarray<Psana::ControlData::PVMonitor, 1>(&_pvMonitors_ndarray_storage_[0], _pvMonitors_ndarray_shape_); }
 } // namespace ControlData
 } // namespace psddl_pds2psana

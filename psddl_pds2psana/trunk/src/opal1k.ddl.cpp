@@ -29,11 +29,14 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   , m_xtcObj(xtcPtr)
 {
   {
-    const std::vector<int>& dims = xtcPtr->defect_pixel_coordinates_shape();
-    _defectPixels.reserve(dims[0]);
-    for (int i0=0; i0 != dims[0]; ++i0) {
-      _defectPixels.push_back(psddl_pds2psana::Camera::pds_to_psana(xtcPtr->defect_pixel_coordinates(i0)));
+    typedef ndarray<PsddlPds::Camera::FrameCoord, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->defect_pixel_coordinates();
+    _defectPixels_ndarray_storage_.reserve(xtc_ndarr.size());
+    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+      _defectPixels_ndarray_storage_.push_back(psddl_pds2psana::Camera::pds_to_psana(*it));
     }
+    const unsigned* shape = xtc_ndarr.shape();
+    std::copy(shape, shape+1, _defectPixels_ndarray_shape_);
   }
 }
 ConfigV1::~ConfigV1()
@@ -59,22 +62,12 @@ uint8_t ConfigV1::output_lookup_table_enabled() const { return m_xtcObj->output_
 
 uint32_t ConfigV1::number_of_defect_pixels() const { return m_xtcObj->number_of_defect_pixels(); }
 
-const uint16_t* ConfigV1::output_lookup_table() const { return m_xtcObj->output_lookup_table(); }
+ndarray<uint16_t, 1> ConfigV1::output_lookup_table() const { return m_xtcObj->output_lookup_table(); }
 
-const Psana::Camera::FrameCoord& ConfigV1::defect_pixel_coordinates(uint32_t i0) const { return _defectPixels[i0]; }
+ndarray<Psana::Camera::FrameCoord, 1> ConfigV1::defect_pixel_coordinates() const { return ndarray<Psana::Camera::FrameCoord, 1>(&_defectPixels_ndarray_storage_[0], _defectPixels_ndarray_shape_); }
 
 uint16_t ConfigV1::output_offset() const { return m_xtcObj->output_offset(); }
 
 uint32_t ConfigV1::output_resolution_bits() const { return m_xtcObj->output_resolution_bits(); }
-
-std::vector<int> ConfigV1::output_lookup_table_shape() const { return m_xtcObj->output_lookup_table_shape(); }
-std::vector<int> ConfigV1::defect_pixel_coordinates_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(_defectPixels.size());
-  return shape;
-}
-
 } // namespace Opal1k
 } // namespace psddl_pds2psana

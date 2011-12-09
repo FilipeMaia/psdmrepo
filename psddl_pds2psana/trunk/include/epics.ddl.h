@@ -119,7 +119,7 @@ public:
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_sts_string& dbr() const;
-  virtual const char* data() const;
+  virtual const char* data(uint32_t i0) const;
   virtual const char* value(uint32_t i) const;
   virtual std::vector<int> pvName_shape() const;
   virtual std::vector<int> data_shape() const;
@@ -146,10 +146,9 @@ public:
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_short& dbr() const;
-  virtual const int16_t* data() const;
+  virtual ndarray<int16_t, 1> data() const;
   virtual int16_t value(uint32_t i) const;
   virtual std::vector<int> pvName_shape() const;
-  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -173,10 +172,9 @@ public:
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_float& dbr() const;
-  virtual const float* data() const;
+  virtual ndarray<float, 1> data() const;
   virtual float value(uint32_t i) const;
   virtual std::vector<int> pvName_shape() const;
-  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -200,10 +198,9 @@ public:
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_enum& dbr() const;
-  virtual const uint16_t* data() const;
+  virtual ndarray<uint16_t, 1> data() const;
   virtual uint16_t value(uint32_t i) const;
   virtual std::vector<int> pvName_shape() const;
-  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -227,10 +224,9 @@ public:
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_char& dbr() const;
-  virtual const uint8_t* data() const;
+  virtual ndarray<uint8_t, 1> data() const;
   virtual uint8_t value(uint32_t i) const;
   virtual std::vector<int> pvName_shape() const;
-  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -254,10 +250,9 @@ public:
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_long& dbr() const;
-  virtual const int32_t* data() const;
+  virtual ndarray<int32_t, 1> data() const;
   virtual int32_t value(uint32_t i) const;
   virtual std::vector<int> pvName_shape() const;
-  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -281,10 +276,9 @@ public:
   virtual uint16_t severity() const;
   virtual const char* pvName() const;
   virtual const Psana::Epics::dbr_ctrl_double& dbr() const;
-  virtual const double* data() const;
+  virtual ndarray<double, 1> data() const;
   virtual double value(uint32_t i) const;
   virtual std::vector<int> pvName_shape() const;
-  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -308,7 +302,7 @@ public:
   virtual uint16_t severity() const;
   virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_string& dbr() const;
-  virtual const char* data() const;
+  virtual const char* data(uint32_t i0) const;
   virtual const char* value(uint32_t i) const;
   virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
@@ -334,9 +328,8 @@ public:
   virtual uint16_t severity() const;
   virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_short& dbr() const;
-  virtual const int16_t* data() const;
+  virtual ndarray<int16_t, 1> data() const;
   virtual int16_t value(uint32_t i) const;
-  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -360,9 +353,8 @@ public:
   virtual uint16_t severity() const;
   virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_float& dbr() const;
-  virtual const float* data() const;
+  virtual ndarray<float, 1> data() const;
   virtual float value(uint32_t i) const;
-  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -386,9 +378,8 @@ public:
   virtual uint16_t severity() const;
   virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_enum& dbr() const;
-  virtual const uint16_t* data() const;
+  virtual ndarray<uint16_t, 1> data() const;
   virtual uint16_t value(uint32_t i) const;
-  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -412,9 +403,8 @@ public:
   virtual uint16_t severity() const;
   virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_char& dbr() const;
-  virtual const uint8_t* data() const;
+  virtual ndarray<uint8_t, 1> data() const;
   virtual uint8_t value(uint32_t i) const;
-  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -438,9 +428,8 @@ public:
   virtual uint16_t severity() const;
   virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_long& dbr() const;
-  virtual const int32_t* data() const;
+  virtual ndarray<int32_t, 1> data() const;
   virtual int32_t value(uint32_t i) const;
-  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -464,9 +453,8 @@ public:
   virtual uint16_t severity() const;
   virtual Psana::Epics::epicsTimeStamp stamp() const;
   virtual const Psana::Epics::dbr_time_double& dbr() const;
-  virtual const double* data() const;
+  virtual ndarray<double, 1> data() const;
   virtual double value(uint32_t i) const;
-  virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

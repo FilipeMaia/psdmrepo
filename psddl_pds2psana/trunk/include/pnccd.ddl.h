@@ -59,8 +59,7 @@ public:
   virtual uint32_t frameNumber() const;
   virtual uint32_t timeStampHi() const;
   virtual uint32_t timeStampLo() const;
-  virtual const uint16_t* data() const;
-  virtual std::vector<int> data_shape() const;
+  virtual ndarray<uint16_t, 1> data() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

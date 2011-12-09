@@ -102,12 +102,10 @@ uint32_t FrameV1::shotIdStart() const { return m_xtcObj->shotIdStart(); }
 
 float FrameV1::readoutTime() const { return m_xtcObj->readoutTime(); }
 
-const uint16_t* FrameV1::data() const { return m_xtcObj->data(); }
-
-std::vector<int> FrameV1::data_shape() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->data_shape(*m_cfgPtr0);
-  if (m_cfgPtr1.get()) return m_xtcObj->data_shape(*m_cfgPtr1);
-  throw std::runtime_error("FrameV1::data_shape: config object pointer is zero");
+ndarray<uint16_t, 1> FrameV1::data() const {
+  if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
+  if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
+  throw std::runtime_error("FrameV1::data: config object pointer is zero");
 }
 
 Psana::Princeton::InfoV1 pds_to_psana(PsddlPds::Princeton::InfoV1 pds)

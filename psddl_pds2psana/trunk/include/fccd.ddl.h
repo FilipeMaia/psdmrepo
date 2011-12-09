@@ -37,14 +37,12 @@ public:
   virtual uint8_t ccdEnable() const;
   virtual uint8_t focusMode() const;
   virtual uint32_t exposureTime() const;
-  virtual const float* dacVoltages() const;
-  virtual const uint16_t* waveforms() const;
+  virtual ndarray<float, 1> dacVoltages() const;
+  virtual ndarray<uint16_t, 1> waveforms() const;
   virtual uint32_t width() const;
   virtual uint32_t height() const;
   virtual uint32_t trimmedWidth() const;
   virtual uint32_t trimmedHeight() const;
-  virtual std::vector<int> dacVoltages_shape() const;
-  virtual std::vector<int> waveforms_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

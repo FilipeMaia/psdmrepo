@@ -27,16 +27,16 @@ public:
   virtual const Pds::ClockTime& duration() const;
   virtual uint32_t npvControls() const;
   virtual uint32_t npvMonitors() const;
-  virtual const Psana::ControlData::PVControl& pvControls(uint32_t i0) const;
-  virtual const Psana::ControlData::PVMonitor& pvMonitors(uint32_t i0) const;
-  virtual std::vector<int> pvControls_shape() const;
-  virtual std::vector<int> pvMonitors_shape() const;
+  virtual ndarray<Psana::ControlData::PVControl, 1> pvControls() const;
+  virtual ndarray<Psana::ControlData::PVMonitor, 1> pvMonitors() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   Pds::ClockTime _duration;
-  std::vector< Psana::ControlData::PVControl > _pvControls;
-  std::vector< Psana::ControlData::PVMonitor > _pvMonitors;
+  std::vector<Psana::ControlData::PVControl> _pvControls_ndarray_storage_;
+  unsigned _pvControls_ndarray_shape_[1];
+  std::vector<Psana::ControlData::PVMonitor> _pvMonitors_ndarray_storage_;
+  unsigned _pvMonitors_ndarray_shape_[1];
 };
 
 } // namespace ControlData

@@ -69,15 +69,11 @@ DataV1::~DataV1()
 }
 
 
-const uint16_t* DataV1::timestamp() const { return m_xtcObj->timestamp(); }
+ndarray<uint16_t, 1> DataV1::timestamp() const { return m_xtcObj->timestamp(); }
 
-const uint16_t* DataV1::channelValue() const { return m_xtcObj->channelValue(); }
-
-std::vector<int> DataV1::timestamp_shape() const { return m_xtcObj->timestamp_shape(); }
-
-std::vector<int> DataV1::channelValue_shape() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->channelValue_shape(*m_cfgPtr0);
-  throw std::runtime_error("DataV1::channelValue_shape: config object pointer is zero");
+ndarray<uint16_t, 1> DataV1::channelValue() const {
+  if (m_cfgPtr0.get()) return m_xtcObj->channelValue(*m_cfgPtr0);
+  throw std::runtime_error("DataV1::channelValue: config object pointer is zero");
 }
 
 } // namespace Gsc16ai

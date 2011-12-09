@@ -27,15 +27,15 @@ public:
   virtual uint32_t nbrBanks() const;
   virtual const Psana::Acqiris::TrigV1& trig() const;
   virtual const Psana::Acqiris::HorizV1& horiz() const;
-  virtual const Psana::Acqiris::VertV1& vert(uint32_t i0) const;
+  virtual ndarray<Psana::Acqiris::VertV1, 1> vert() const;
   virtual uint32_t nbrChannels() const;
-  virtual std::vector<int> vert_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   Psana::Acqiris::TrigV1 _trig;
   Psana::Acqiris::HorizV1 _horiz;
-  std::vector< Psana::Acqiris::VertV1 > _vert;
+  std::vector<Psana::Acqiris::VertV1> _vert_ndarray_storage_;
+  unsigned _vert_ndarray_shape_[1];
 };
 
 Psana::Acqiris::TimestampV1 pds_to_psana(PsddlPds::Acqiris::TimestampV1 pds);
@@ -50,17 +50,14 @@ public:
   virtual uint32_t nbrSamplesInSeg() const;
   virtual uint32_t indexFirstPoint() const;
   virtual uint32_t nbrSegments() const;
-  virtual const Psana::Acqiris::TimestampV1& timestamp(uint32_t i0) const;
-  virtual const int16_t* waveforms() const;
-  virtual std::vector<int> timestamps_shape() const;
-  virtual std::vector<int> _skip_shape() const;
-  virtual std::vector<int> waveforms_shape() const;
-  virtual std::vector<int> _extraSpace_shape() const;
+  virtual ndarray<Psana::Acqiris::TimestampV1, 1> timestamp() const;
+  virtual ndarray<int16_t, 2> waveforms() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   boost::shared_ptr<const PsddlPds::Acqiris::ConfigV1> m_cfgPtr0;
-  std::vector< Psana::Acqiris::TimestampV1 > _timestamps;
+  std::vector<Psana::Acqiris::TimestampV1> _timestamps_ndarray_storage_;
+  unsigned _timestamps_ndarray_shape_[1];
 };
 
 
@@ -92,16 +89,16 @@ public:
   typedef Psana::Acqiris::TdcConfigV1 PsanaType;
   TdcConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~TdcConfigV1();
-  virtual const Psana::Acqiris::TdcChannel& channels(uint32_t i0) const;
-  virtual const Psana::Acqiris::TdcAuxIO& auxio(uint32_t i0) const;
+  virtual ndarray<Psana::Acqiris::TdcChannel, 1> channels() const;
+  virtual ndarray<Psana::Acqiris::TdcAuxIO, 1> auxio() const;
   virtual const Psana::Acqiris::TdcVetoIO& veto() const;
-  virtual std::vector<int> channels_shape() const;
-  virtual std::vector<int> auxio_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< Psana::Acqiris::TdcChannel > _channel;
-  std::vector< Psana::Acqiris::TdcAuxIO > _auxIO;
+  std::vector<Psana::Acqiris::TdcChannel> _channel_ndarray_storage_;
+  unsigned _channel_ndarray_shape_[1];
+  std::vector<Psana::Acqiris::TdcAuxIO> _auxIO_ndarray_storage_;
+  unsigned _auxIO_ndarray_shape_[1];
   Psana::Acqiris::TdcVetoIO _veto;
 };
 
@@ -114,12 +111,12 @@ public:
   typedef Psana::Acqiris::TdcDataV1 PsanaType;
   TdcDataV1(const boost::shared_ptr<const XtcType>& xtcPtr, size_t xtcSize);
   virtual ~TdcDataV1();
-  virtual const Psana::Acqiris::TdcDataV1_Item& data(uint32_t i0) const;
-  virtual std::vector<int> data_shape() const;
+  virtual ndarray<Psana::Acqiris::TdcDataV1_Item, 1> data() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< Psana::Acqiris::TdcDataV1_Item > _data;
+  std::vector<Psana::Acqiris::TdcDataV1_Item> _data_ndarray_storage_;
+  unsigned _data_ndarray_shape_[1];
 };
 
 } // namespace Acqiris

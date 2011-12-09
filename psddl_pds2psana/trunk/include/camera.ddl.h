@@ -37,14 +37,14 @@ public:
   virtual const Psana::Camera::FrameCoord& roiEnd() const;
   virtual uint32_t threshold() const;
   virtual uint32_t number_of_masked_pixels() const;
-  virtual const Psana::Camera::FrameCoord& masked_pixel_coordinates(uint32_t i0) const;
-  virtual std::vector<int> masked_pixel_shape() const;
+  virtual ndarray<Psana::Camera::FrameCoord, 1> masked_pixel_coordinates() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   Psana::Camera::FrameCoord _roiBegin;
   Psana::Camera::FrameCoord _roiEnd;
-  std::vector< Psana::Camera::FrameCoord > _masked_pixel_coordinates;
+  std::vector<Psana::Camera::FrameCoord> _masked_pixel_coordinates_ndarray_storage_;
+  unsigned _masked_pixel_coordinates_ndarray_shape_[1];
 };
 
 
@@ -58,8 +58,7 @@ public:
   virtual uint32_t height() const;
   virtual uint32_t depth() const;
   virtual uint32_t offset() const;
-  virtual const uint8_t* data() const;
-  virtual std::vector<int> data_shape() const;
+  virtual ndarray<uint8_t, 1> data() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

@@ -40,12 +40,15 @@ TdcDataV1::TdcDataV1(const boost::shared_ptr<const XtcType>& xtcPtr, size_t xtcS
 {
   // special constructor for TdcDataV1
   // the size of the data array is unknown and needs to be determined from XTC size
-  
-  size_t nItems = xtcSize / Psana::Acqiris::TdcDataV1_Item::_sizeof();
-  _data.reserve(nItems);
-  for (size_t i0=0; i0 != nItems; ++i0) {
-    _data.push_back(pds_to_psana(xtcPtr->data(i0)));
+  size_t nItems = xtcSize / PsddlPds::Acqiris::TdcDataV1_Item::_sizeof();
+
+  typedef ndarray<PsddlPds::Acqiris::TdcDataV1_Item, 1> XtcNDArray;
+  const XtcNDArray& xtc_ndarr = xtcPtr->data();
+  _data_ndarray_storage_.reserve(nItems);
+  for (unsigned i = 0; i != nItems; ++ i) {
+    _data_ndarray_storage_.push_back(pds_to_psana(xtc_ndarr[i]));
   }
+  _data_ndarray_shape_[0] = nItems;
 }
 
 } // namespace Acqiris

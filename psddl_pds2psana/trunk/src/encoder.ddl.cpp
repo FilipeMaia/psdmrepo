@@ -96,8 +96,6 @@ DataV2::~DataV2()
 
 uint32_t DataV2::timestamp() const { return m_xtcObj->timestamp(); }
 
-const uint32_t* DataV2::encoder_count() const { return m_xtcObj->encoder_count(); }
-
-std::vector<int> DataV2::encoder_count_shape() const { return m_xtcObj->encoder_count_shape(); }
+ndarray<uint32_t, 1> DataV2::encoder_count() const { return m_xtcObj->encoder_count(); }
 } // namespace Encoder
 } // namespace psddl_pds2psana

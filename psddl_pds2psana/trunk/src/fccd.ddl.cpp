@@ -66,9 +66,9 @@ uint8_t FccdConfigV2::focusMode() const { return m_xtcObj->focusMode(); }
 
 uint32_t FccdConfigV2::exposureTime() const { return m_xtcObj->exposureTime(); }
 
-const float* FccdConfigV2::dacVoltages() const { return m_xtcObj->dacVoltages(); }
+ndarray<float, 1> FccdConfigV2::dacVoltages() const { return m_xtcObj->dacVoltages(); }
 
-const uint16_t* FccdConfigV2::waveforms() const { return m_xtcObj->waveforms(); }
+ndarray<uint16_t, 1> FccdConfigV2::waveforms() const { return m_xtcObj->waveforms(); }
 
 uint32_t FccdConfigV2::width() const { return m_xtcObj->width(); }
 
@@ -77,9 +77,5 @@ uint32_t FccdConfigV2::height() const { return m_xtcObj->height(); }
 uint32_t FccdConfigV2::trimmedWidth() const { return m_xtcObj->trimmedWidth(); }
 
 uint32_t FccdConfigV2::trimmedHeight() const { return m_xtcObj->trimmedHeight(); }
-
-std::vector<int> FccdConfigV2::dacVoltages_shape() const { return m_xtcObj->dacVoltages_shape(); }
-
-std::vector<int> FccdConfigV2::waveforms_shape() const { return m_xtcObj->waveforms_shape(); }
 } // namespace FCCD
 } // namespace psddl_pds2psana

@@ -40,11 +40,14 @@ FrameFexConfigV1::FrameFexConfigV1(const boost::shared_ptr<const XtcType>& xtcPt
   , _roiEnd(psddl_pds2psana::Camera::pds_to_psana(xtcPtr->roiEnd()))
 {
   {
-    const std::vector<int>& dims = xtcPtr->masked_pixel_shape();
-    _masked_pixel_coordinates.reserve(dims[0]);
-    for (int i0=0; i0 != dims[0]; ++i0) {
-      _masked_pixel_coordinates.push_back(psddl_pds2psana::Camera::pds_to_psana(xtcPtr->masked_pixel_coordinates(i0)));
+    typedef ndarray<PsddlPds::Camera::FrameCoord, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->masked_pixel_coordinates();
+    _masked_pixel_coordinates_ndarray_storage_.reserve(xtc_ndarr.size());
+    for (XtcNDArray::const_iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+      _masked_pixel_coordinates_ndarray_storage_.push_back(psddl_pds2psana::Camera::pds_to_psana(*it));
     }
+    const unsigned* shape = xtc_ndarr.shape();
+    std::copy(shape, shape+1, _masked_pixel_coordinates_ndarray_shape_);
   }
 }
 FrameFexConfigV1::~FrameFexConfigV1()
@@ -66,15 +69,7 @@ uint32_t FrameFexConfigV1::threshold() const { return m_xtcObj->threshold(); }
 
 uint32_t FrameFexConfigV1::number_of_masked_pixels() const { return m_xtcObj->number_of_masked_pixels(); }
 
-const Psana::Camera::FrameCoord& FrameFexConfigV1::masked_pixel_coordinates(uint32_t i0) const { return _masked_pixel_coordinates[i0]; }
-std::vector<int> FrameFexConfigV1::masked_pixel_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(_masked_pixel_coordinates.size());
-  return shape;
-}
-
+ndarray<Psana::Camera::FrameCoord, 1> FrameFexConfigV1::masked_pixel_coordinates() const { return ndarray<Psana::Camera::FrameCoord, 1>(&_masked_pixel_coordinates_ndarray_storage_[0], _masked_pixel_coordinates_ndarray_shape_); }
 FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Camera::FrameV1()
   , m_xtcObj(xtcPtr)
@@ -93,9 +88,7 @@ uint32_t FrameV1::depth() const { return m_xtcObj->depth(); }
 
 uint32_t FrameV1::offset() const { return m_xtcObj->offset(); }
 
-const uint8_t* FrameV1::data() const { return m_xtcObj->data(); }
-
-std::vector<int> FrameV1::data_shape() const { return m_xtcObj->data_shape(); }
+ndarray<uint8_t, 1> FrameV1::data() const { return m_xtcObj->data(); }
 TwoDGaussianV1::TwoDGaussianV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Camera::TwoDGaussianV1()
   , m_xtcObj(xtcPtr)
