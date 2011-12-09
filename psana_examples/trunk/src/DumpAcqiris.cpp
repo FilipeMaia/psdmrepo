@@ -76,8 +76,9 @@ DumpAcqiris::beginCalibCycle(Event& evt, Env& env)
            << " nbrSegments=" << h.nbrSegments()
            << " nbrSamples=" << h.nbrSamples();
       
-      for (unsigned ch = 0; ch < acqConfig->nbrChannels() ; ++ ch) {
-        const Psana::Acqiris::VertV1& v = acqConfig->vert(ch);
+      const ndarray<Psana::Acqiris::VertV1, 1>& vert = acqConfig->vert();
+      for (unsigned ch = 0; ch < vert.shape()[0]; ++ ch) {
+        const Psana::Acqiris::VertV1& v = vert[ch];
         str << "\n  vert(" << ch << "):"
             << " fullScale=" << v.fullScale()
             << " slope=" << v.slope()
@@ -107,7 +108,7 @@ DumpAcqiris::event(Event& evt, Env& env)
       
       const Psana::Acqiris::DataDescV1Elem& elem = acqData->data(chan);
 
-      const Psana::Acqiris::VertV1& v = acqConfig->vert(chan);
+      const Psana::Acqiris::VertV1& v = acqConfig->vert()[chan];
       double slope = v.slope();
       double offset = v.offset();
 
@@ -118,18 +119,19 @@ DumpAcqiris::event(Event& evt, Env& env)
            << "\n  nbrSamplesInSeg=" << elem.nbrSamplesInSeg()
            << "\n  indexFirstPoint=" << elem.indexFirstPoint();
         
+        const ndarray<Psana::Acqiris::TimestampV1, 1>& timestamps = elem.timestamp();
+        const ndarray<int16_t, 2>& waveforms = elem.waveforms();
+
         // loop over segments
         for (unsigned seg = 0; seg < elem.nbrSegments(); ++ seg) {
           
           str << "\n  Segment #" << seg
-              << "\n    timestamp=" << elem.timestamp(seg).pos()
+              << "\n    timestamp=" << timestamps[seg].pos()
               << "\n    data=[";
           
-          const int16_t* wf = elem.waveforms() + seg*elem.nbrSamplesInSeg();
-
           unsigned size = std::min(elem.nbrSamplesInSeg(), 32U);
           for (unsigned i = 0; i < size; ++ i) {
-            str << (wf[i]*slope + offset) << ", ";
+            str << (waveforms[seg][i]*slope + offset) << ", ";
           }
           str << "...]";
         

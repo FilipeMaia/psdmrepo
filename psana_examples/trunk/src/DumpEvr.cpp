@@ -32,6 +32,111 @@
 using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpEvr)
 
+namespace {
+
+  // Bunch of helper methods to print individual data objects
+
+  void print(std::ostream& str, unsigned i, const Psana::EvrData::PulseConfig& pcfg)
+  {
+    str << "\n  pulse config #" << i
+        << ": pulse=" << pcfg.pulse()
+        << " polarity=" << int(pcfg.polarity())
+        << " prescale=" << pcfg.prescale()
+        << " delay=" << pcfg.delay()
+        << " width=" << pcfg.width();
+  }
+
+  void print(std::ostream& str, unsigned i, const Psana::EvrData::OutputMap& ocfg)
+  {
+    str << "\n  output config #" << i
+        << ": source=" << ocfg.source()
+        << " source_id=" << int(ocfg.source_id())
+        << " conn=" << ocfg.conn()
+        << " conn_id=" << int(ocfg.conn_id());
+  }
+
+  void print(std::ostream& str, unsigned i, const Psana::EvrData::PulseConfigV3& pcfg)
+  {
+    str << "\n  pulse config #" << i
+        << ": pulseId=" << pcfg.pulseId()
+        << " polarity=" << int(pcfg.polarity())
+        << " prescale=" << pcfg.prescale()
+        << " delay=" << pcfg.delay()
+        << " width=" << pcfg.width();
+  }
+
+  void print(std::ostream& str, unsigned i, const Psana::EvrData::EventCodeV3& ecfg)
+  {
+    str << "\n  event code #" << i
+        << ": code=" << ecfg.code()
+        << " isReadout=" << int(ecfg.isReadout())
+        << " isTerminator=" << int(ecfg.isTerminator())
+        << " maskTrigger=" << ecfg.maskTrigger()
+        << " maskSet=" << ecfg.maskSet()
+        << " maskClear=" << ecfg.maskClear();
+
+  }
+
+  void print(std::ostream& str, unsigned i, const Psana::EvrData::EventCodeV4& ecfg)
+  {
+    str << "\n  event code #" << i
+        << ": code=" << ecfg.code()
+        << " isReadout=" << int(ecfg.isReadout())
+        << " isTerminator=" << int(ecfg.isTerminator())
+        << " reportDelay=" << ecfg.reportDelay()
+        << " reportWidth=" << ecfg.reportWidth()
+        << " maskTrigger=" << ecfg.maskTrigger()
+        << " maskSet=" << ecfg.maskSet()
+        << " maskClear=" << ecfg.maskClear();
+  }
+
+  void print(std::ostream& str, unsigned i, const Psana::EvrData::EventCodeV5& ecfg)
+  {
+    str << "\n  event code #" << i
+        << ": code=" << ecfg.code()
+        << " isReadout=" << int(ecfg.isReadout())
+        << " isTerminator=" << int(ecfg.isTerminator())
+        << " isLatch=" << int(ecfg.isLatch())
+        << " reportDelay=" << ecfg.reportDelay()
+        << " reportWidth=" << ecfg.reportWidth()
+        << " maskTrigger=" << ecfg.maskTrigger()
+        << " maskSet=" << ecfg.maskSet()
+        << " maskClear=" << ecfg.maskClear();
+  }
+
+  void print(std::ostream& str, unsigned i, const Psana::EvrData::SequencerEntry& e)
+  {
+    str << "\n    entry #" << i <<  " delay=" << e.delay() << " eventcode=" << e.eventcode();
+  }
+
+  void print(std::ostream& str, unsigned i, const Psana::EvrData::IOChannel& ioch)
+  {
+    str << "\n  io channel #" << i
+        << ": name=" << ioch.name()
+        << " infos=[";
+    for (unsigned d = 0; d != ioch.ninfo(); ++ d) {
+      str << " " << Pds::DetInfo::name(ioch.infos()[d]);
+    }
+    str << " ]";
+  }
+
+  void print(std::ostream& str, unsigned i, const Psana::EvrData::FIFOEvent& f)
+  {
+    str << "\n    fifo event #" << i
+        <<  " timestampHigh=" << f.timestampHigh()
+        <<  " timestampLow=" << f.timestampLow()
+        << " eventCode=" << f.eventCode();
+  }
+
+  template <typename T>
+  void print_array(std::ostream& str, const ndarray<T, 1>& array) {
+    for (unsigned i = 0; i < array.size(); ++ i) {
+      ::print(str, i, array[i]);
+    }
+  }
+
+}
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -67,23 +172,10 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
     WithMsgLog(name(), info, str) {
       str << "EvrData::ConfigV1: npulses = " << config1->npulses()
           << " noutputs = " << config1->noutputs();
-      for (unsigned i = 0; i < config1->npulses(); ++ i) {
-        const Psana::EvrData::PulseConfig& pcfg = config1->pulses(i);
-        str << "\n  pulse config #" << i 
-            << ": pulse=" << pcfg.pulse()
-            << " polarity=" << int(pcfg.polarity())
-            << " prescale=" << pcfg.prescale()
-            << " delay=" << pcfg.delay()
-            << " width=" << pcfg.width();
-      }
-      for (unsigned i = 0; i < config1->noutputs(); ++ i) {
-        const Psana::EvrData::OutputMap& ocfg = config1->output_maps(i);
-        str << "\n  output config #" << i 
-            << ": source=" << ocfg.source()
-            << " source_id=" << int(ocfg.source_id())
-            << " conn=" << ocfg.conn()
-            << " conn_id=" << int(ocfg.conn_id());
-      }
+
+      ::print_array(str, config1->pulses());
+      ::print_array(str, config1->output_maps());
+
     }
     
   }
@@ -97,23 +189,10 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
           << " noutputs = " << config2->noutputs()
           << " beam = " << config2->beam()
           << " rate = " << config2->rate() ;
-      for (unsigned i = 0; i < config2->npulses(); ++ i) {
-        const Psana::EvrData::PulseConfig& pcfg = config2->pulses(i);
-        str << "\n  pulse config #" << i 
-            << ": pulse=" << pcfg.pulse()
-            << " polarity=" << int(pcfg.polarity())
-            << " prescale=" << pcfg.prescale()
-            << " delay=" << pcfg.delay()
-            << " width=" << pcfg.width();
-      }
-      for (unsigned i = 0; i < config2->noutputs(); ++ i) {
-        const Psana::EvrData::OutputMap& ocfg = config2->output_maps(i);
-        str << "\n  output config #" << i 
-            << ": source=" << ocfg.source()
-            << " source_id=" << int(ocfg.source_id())
-            << " conn=" << ocfg.conn()
-            << " conn_id=" << int(ocfg.conn_id());
-      }
+
+      ::print_array(str, config2->pulses());
+      ::print_array(str, config2->output_maps());
+
     }
     
   }
@@ -126,33 +205,11 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
       str << "EvrData::ConfigV3: npulses = " << config3->npulses()
           << " noutputs = " << config3->noutputs()
           << " neventcodes = " << config3->neventcodes();
-      for (unsigned i = 0; i < config3->npulses(); ++ i) {
-        const Psana::EvrData::PulseConfigV3& pcfg = config3->pulses(i);
-        str << "\n  pulse config #" << i 
-            << ": pulseId=" << pcfg.pulseId()
-            << " polarity=" << int(pcfg.polarity())
-            << " prescale=" << pcfg.prescale()
-            << " delay=" << pcfg.delay()
-            << " width=" << pcfg.width();
-      }
-      for (unsigned i = 0; i < config3->noutputs(); ++ i) {
-        const Psana::EvrData::OutputMap& ocfg = config3->output_maps(i);
-        str << "\n  output config #" << i 
-            << ": source=" << ocfg.source()
-            << " source_id=" << int(ocfg.source_id())
-            << " conn=" << ocfg.conn()
-            << " conn_id=" << int(ocfg.conn_id());
-      }
-      for (unsigned i = 0; i < config3->neventcodes(); ++ i) {
-        const Psana::EvrData::EventCodeV3& ecfg = config3->eventcodes(i);
-        str << "\n  event code #" << i 
-            << ": code=" << ecfg.code()
-            << " isReadout=" << int(ecfg.isReadout())
-            << " isTerminator=" << int(ecfg.isTerminator())
-            << " maskTrigger=" << ecfg.maskTrigger()
-            << " maskSet=" << ecfg.maskSet()
-            << " maskClear=" << ecfg.maskClear();
-      }
+
+      ::print_array(str, config3->pulses());
+      ::print_array(str, config3->output_maps());
+      ::print_array(str, config3->eventcodes());
+
     }
     
   }
@@ -165,35 +222,11 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
       str << "EvrData::ConfigV4: npulses = " << config4->npulses()
           << " noutputs = " << config4->noutputs()
           << " neventcodes = " << config4->neventcodes();
-      for (unsigned i = 0; i < config4->npulses(); ++ i) {
-        const Psana::EvrData::PulseConfigV3& pcfg = config4->pulses(i);
-        str << "\n  pulse config #" << i 
-            << ": pulseId=" << pcfg.pulseId()
-            << " polarity=" << int(pcfg.polarity())
-            << " prescale=" << pcfg.prescale()
-            << " delay=" << pcfg.delay()
-            << " width=" << pcfg.width();
-      }
-      for (unsigned i = 0; i < config4->noutputs(); ++ i) {
-        const Psana::EvrData::OutputMap& ocfg = config4->output_maps(i);
-        str << "\n  output config #" << i 
-            << ": source=" << ocfg.source()
-            << " source_id=" << int(ocfg.source_id())
-            << " conn=" << ocfg.conn()
-            << " conn_id=" << int(ocfg.conn_id());
-      }
-      for (unsigned i = 0; i < config4->neventcodes(); ++ i) {
-        const Psana::EvrData::EventCodeV4& ecfg = config4->eventcodes(i);
-        str << "\n  event code #" << i 
-            << ": code=" << ecfg.code()
-            << " isReadout=" << int(ecfg.isReadout())
-            << " isTerminator=" << int(ecfg.isTerminator())
-            << " reportDelay=" << ecfg.reportDelay()
-            << " reportWidth=" << ecfg.reportWidth()
-            << " maskTrigger=" << ecfg.maskTrigger()
-            << " maskSet=" << ecfg.maskSet()
-            << " maskClear=" << ecfg.maskClear();
-      }
+
+      ::print_array(str, config4->pulses());
+      ::print_array(str, config4->output_maps());
+      ::print_array(str, config4->eventcodes());
+
     }
     
   }
@@ -206,45 +239,19 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
       str << "EvrData::ConfigV5: npulses = " << config5->npulses()
           << " noutputs = " << config5->noutputs()
           << " neventcodes = " << config5->neventcodes();
-      for (unsigned i = 0; i < config5->npulses(); ++ i) {
-        const Psana::EvrData::PulseConfigV3& pcfg = config5->pulses(i);
-        str << "\n  pulse config #" << i 
-            << ": pulseId=" << pcfg.pulseId()
-            << " polarity=" << int(pcfg.polarity())
-            << " prescale=" << pcfg.prescale()
-            << " delay=" << pcfg.delay()
-            << " width=" << pcfg.width();
-      }
-      for (unsigned i = 0; i < config5->noutputs(); ++ i) {
-        const Psana::EvrData::OutputMap& ocfg = config5->output_maps(i);
-        str << "\n  output config #" << i 
-            << ": source=" << ocfg.source()
-            << " source_id=" << int(ocfg.source_id())
-            << " conn=" << ocfg.conn()
-            << " conn_id=" << int(ocfg.conn_id());
-      }
-      for (unsigned i = 0; i < config5->neventcodes(); ++ i) {
-        const Psana::EvrData::EventCodeV5& ecfg = config5->eventcodes(i);
-        str << "\n  event code #" << i 
-            << ": code=" << ecfg.code()
-            << " isReadout=" << int(ecfg.isReadout())
-            << " isTerminator=" << int(ecfg.isTerminator())
-            << " isLatch=" << int(ecfg.isLatch())
-            << " reportDelay=" << ecfg.reportDelay()
-            << " reportWidth=" << ecfg.reportWidth()
-            << " maskTrigger=" << ecfg.maskTrigger()
-            << " maskSet=" << ecfg.maskSet()
-            << " maskClear=" << ecfg.maskClear();
-      }
+
+      ::print_array(str, config5->pulses());
+      ::print_array(str, config5->output_maps());
+      ::print_array(str, config5->eventcodes());
+
       const Psana::EvrData::SequencerConfigV1& scfg = config5->seq_config();
       str << "\n  seq_config: sync_source=" << scfg.sync_source()
           << " beam_source=" << scfg.beam_source()
           << " length=" << scfg.length()
           << " cycles=" << scfg.cycles();
-      for (unsigned i = 0; i < scfg.length(); ++ i) {
-        const Psana::EvrData::SequencerEntry& e = scfg.entries(i);
-        str << "\n    entry #" << i <<  " delay=" << e.delay() << " eventcode=" << e.eventcode();
-      }
+
+      ::print_array(str, scfg.entries());
+
     }
     
   }
@@ -255,17 +262,9 @@ DumpEvr::beginCalibCycle(Event& evt, Env& env)
     WithMsgLog(name(), info, str) {
       str << "EvrData::IOConfigV1: nchannels = " << iocfg1->nchannels()
           << " conn = " << iocfg1->conn();
-      for (unsigned i = 0; i < iocfg1->nchannels(); ++ i) {
-        const Psana::EvrData::IOChannel& ioch = iocfg1->channels(i);
-        str << "\n  io channel #" << i 
-            << ": name=" << ioch.name()
-            << " infos=[";
-        for (unsigned d = 0; d != ioch.ninfo(); ++ d) {
-          const Pds::DetInfo& dinfo = ioch.infos(d);
-          str << " " << Pds::DetInfo::name(dinfo);
-        }
-        str << " ]";
-      }
+
+      ::print_array(str, iocfg1->channels());
+
     }
   }
   
@@ -280,13 +279,7 @@ DumpEvr::event(Event& evt, Env& env)
     
     WithMsgLog(name(), info, str) {
       str << "Encoder::DataV3: numFifoEvents=" << data3->numFifoEvents();
-      for (unsigned i = 0; i < data3->numFifoEvents(); ++ i) {
-        const Psana::EvrData::FIFOEvent& f = data3->fifoEvents(i);
-        str << "\n    fifo event #" << i 
-            <<  " timestampHigh=" << f.timestampHigh() 
-            <<  " timestampLow=" << f.timestampLow() 
-            << " eventCode=" << f.eventCode();
-      }
+      ::print_array(str, data3->fifoEvents());
     }
   }
 

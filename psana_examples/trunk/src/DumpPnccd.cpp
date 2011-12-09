@@ -105,7 +105,7 @@ DumpPnccd::event(Event& evt, Env& env)
       str << "\n  timeStampHi = " << frame->timeStampHi();
       str << "\n  timeStampLo = " << frame->timeStampLo();
 
-      const uint16_t* data = frame->data();
+      const ndarray<uint16_t, 1> data = frame->data();
       str << "\n  data =";
       for (int i = 0; i < 10; ++ i) {
         str << " " << data[i];

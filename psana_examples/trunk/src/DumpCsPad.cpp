@@ -185,27 +185,28 @@ DumpCsPad::event(Event& evt, Env& env)
         str << "\n    ticks = " << el.ticks() ;
         str << "\n    fiducials = " << el.fiducials() ;
         str << "\n    frame_type = " << el.frame_type() ;
+
         str << "\n    sb_temp = [ ";
-        const uint16_t* sb_temp = el.sb_temp();
-        std::copy(sb_temp, sb_temp+Psana::CsPad::ElementV1::Nsbtemp, 
-            std::ostream_iterator<uint16_t>(str, " "));
+        const ndarray<uint16_t, 1>& sb_temp = el.sb_temp();
+        std::copy(sb_temp.begin(), sb_temp.end(), std::ostream_iterator<uint16_t>(str, " "));
         str << "]";
+
+        const ndarray<int16_t, 3>& data = el.data();
         str << "\n    data_shape = [ ";
-        const std::vector<int> dshape = el.data_shape();
-        std::copy(dshape.begin(), dshape.end(), std::ostream_iterator<int>(str, " "));
+        std::copy(data.shape(), data.shape()+3, std::ostream_iterator<int>(str, " "));
         str << "]";
+
         str << "\n    common_mode = [ ";
-        for (int i = 0; i != dshape[0]; ++ i) {
+        for (unsigned i = 0; i != data.shape()[0]; ++ i) {
             str << el.common_mode(i) << ' ';
         }
         str << "]";
+
         str << "\n    data = [";
-        const int16_t* data = el.data();
-        int ssize = std::accumulate(dshape.begin()+1, dshape.end(), 1, std::multiplies<int>());
-        for (int i = 0; i != dshape[0]; ++ i) {
+        for (unsigned s = 0; s != data.shape()[0]; ++ s) {
           str << "\n        [ ";
-          std::copy(data+ssize*i, data+ssize*i+10, std::ostream_iterator<int>(str, " "));
-          str << " ... ]";
+          for (unsigned i = 0; i < 10; ++ i) str << data[s][0][i] << ' ';
+          str << "... ]";
         }
         str << "\n    ]";
       }
@@ -233,27 +234,28 @@ DumpCsPad::event(Event& evt, Env& env)
         str << "\n    ticks = " << el.ticks() ;
         str << "\n    fiducials = " << el.fiducials() ;
         str << "\n    frame_type = " << el.frame_type() ;
+
         str << "\n    sb_temp = [ ";
-        const uint16_t* sb_temp = el.sb_temp();
-        std::copy(sb_temp, sb_temp+Psana::CsPad::ElementV2::Nsbtemp, 
-            std::ostream_iterator<uint16_t>(str, " "));
+        const ndarray<uint16_t, 1>& sb_temp = el.sb_temp();
+        std::copy(sb_temp.begin(), sb_temp.end(), std::ostream_iterator<uint16_t>(str, " "));
         str << "]";
+
+        const ndarray<int16_t, 3>& data = el.data();
         str << "\n    data_shape = [ ";
-        const std::vector<int> dshape = el.data_shape();
-        std::copy(dshape.begin(), dshape.end(), std::ostream_iterator<int>(str, " "));
+        std::copy(data.shape(), data.shape()+3, std::ostream_iterator<int>(str, " "));
         str << "]";
+
         str << "\n    common_mode = [ ";
-        for (int i = 0; i != dshape[0]; ++ i) {
+        for (unsigned i = 0; i != data.shape()[0]; ++ i) {
             str << el.common_mode(i) << ' ';
         }
         str << "]";
+
         str << "\n    data = [";
-        const int16_t* data = el.data();
-        int ssize = std::accumulate(dshape.begin()+1, dshape.end(), 1, std::multiplies<int>());
-        for (int i = 0; i != dshape[0]; ++ i) {
+        for (unsigned s = 0; s != data.shape()[0]; ++ s) {
           str << "\n        [ ";
-          std::copy(data+ssize*i, data+ssize*i+10, std::ostream_iterator<int>(str, " "));
-          str << " ... ]";
+          for (unsigned i = 0; i < 10; ++ i) str << data[s][0][i] << ' ';
+          str << "... ]";
         }
         str << "\n    ]";
       }
@@ -276,27 +278,28 @@ DumpCsPad::event(Event& evt, Env& env)
       str << "\n  ticks = " << mini1->ticks() ;
       str << "\n  fiducials = " << mini1->fiducials() ;
       str << "\n  frame_type = " << mini1->frame_type() ;
-      str << "\n  sb_temp = [ ";
-      const uint16_t* sb_temp = mini1->sb_temp();
-      std::copy(sb_temp, sb_temp+Psana::CsPad::ElementV2::Nsbtemp,
-          std::ostream_iterator<uint16_t>(str, " "));
+
+      str << "\n    sb_temp = [ ";
+      const ndarray<uint16_t, 1>& sb_temp = mini1->sb_temp();
+      std::copy(sb_temp.begin(), sb_temp.end(), std::ostream_iterator<uint16_t>(str, " "));
       str << "]";
-      str << "\n  data_shape = [ ";
-      const std::vector<int> dshape = mini1->data_shape();
-      std::copy(dshape.begin(), dshape.end(), std::ostream_iterator<int>(str, " "));
+
+      const ndarray<int16_t, 3>& data = mini1->data();
+      str << "\n    data_shape = [ ";
+      std::copy(data.shape(), data.shape()+3, std::ostream_iterator<int>(str, " "));
       str << "]";
+
       str << "\n    common_mode = [ ";
-      for (int i = 0; i != dshape[0]; ++ i) {
+      for (unsigned i = 0; i != data.shape()[2]; ++ i) {
           str << mini1->common_mode(i) << ' ';
       }
       str << "]";
+
       str << "\n    data = [";
-      const int16_t* data = mini1->data();
-      int ssize = std::accumulate(dshape.begin()+1, dshape.end(), 1, std::multiplies<int>());
-      for (int i = 0; i != dshape[0]; ++ i) {
+      for (unsigned s = 0; s != data.shape()[2]; ++ s) {
         str << "\n        [ ";
-        std::copy(data+ssize*i, data+ssize*i+10, std::ostream_iterator<int>(str, " "));
-        str << " ... ]";
+        for (unsigned i = 0; i < 10; ++ i) str << data[0][i][s] << ' ';
+        str << "... ]";
       }
       str << "\n    ]";
     }

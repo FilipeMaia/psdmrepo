@@ -86,9 +86,9 @@ DumpOpal1k::beginCalibCycle(Event& evt, Env& env)
       str << "\n  output_lookup_table_enabled = " << int(config->output_lookup_table_enabled());
       
       if (config->output_lookup_table_enabled()) {        
-        const uint16_t* output_lookup_table = config->output_lookup_table();
+        const ndarray<uint16_t, 1>& output_lookup_table = config->output_lookup_table();
         str << "\n  output_lookup_table =";
-        for (int i = 0; i < Psana::Opal1k::ConfigV1::Output_LUT_Size; ++ i) {
+        for (unsigned i = 0; i < output_lookup_table.size(); ++ i) {
           str << ' ' << output_lookup_table[i];
         }
         
@@ -97,10 +97,10 @@ DumpOpal1k::beginCalibCycle(Event& evt, Env& env)
       
       if (config->number_of_defect_pixels()) {
         str << "\n  defect_pixel_coordinates =";
-        for (unsigned i = 0; i < config->number_of_defect_pixels(); ++ i) {
-          const Psana::Camera::FrameCoord& coord = config->defect_pixel_coordinates(i);
+        const ndarray<Psana::Camera::FrameCoord, 1>& coord = config->defect_pixel_coordinates();
+        for (unsigned i = 0; i < coord.size(); ++ i) {
           str << " ";
-          printFrameCoord(str, coord);
+          printFrameCoord(str, coord[i]);
         }
       }
     }

@@ -170,9 +170,9 @@ DumpBld::event(Event& evt, Env& env)
       str << "\n    sum = " << ipmFexData.sum();
       str << "\n    xpos = " << ipmFexData.xpos();
       str << "\n    ypos = " << ipmFexData.ypos();
-      const float* channel = ipmFexData.channel();
+      const ndarray<float, 1>& channel = ipmFexData.channel();
       str << "\n    channel =";
-      for (int i = 0; i < Psana::Lusi::IpmFexV1::NCHANNELS; ++ i) {
+      for (unsigned i = 0; i < channel.shape()[0]; ++ i) {
         str << " " << channel[i];
       }
     }
@@ -229,9 +229,9 @@ DumpBld::event(Event& evt, Env& env)
       str << "\n    sum = " << ipmFexData.sum();
       str << "\n    xpos = " << ipmFexData.xpos();
       str << "\n    ypos = " << ipmFexData.ypos();
-      const float* channel = ipmFexData.channel();
+      const ndarray<float, 1>& channel = ipmFexData.channel();
       str << "\n    channel =";
-      for (int i = 0; i < Psana::Lusi::IpmFexV1::NCHANNELS; ++ i) {
+      for (unsigned i = 0; i < channel.shape()[0]; ++ i) {
         str << " " << channel[i];
       }
     }
@@ -260,7 +260,7 @@ DumpBld::event(Event& evt, Env& env)
           << "\n    yscale = " << pimCfg.yscale();
 
       const Psana::Camera::FrameV1& frame = pim1->frame();
-      const uint8_t* frame_data = frame.data();
+      const ndarray<uint8_t, 1>& frame_data = frame.data();
       str << "\n  Camera::FrameV1:"
           << "\n    width=" << frame.width()
           << "\n    height=" << frame.height()

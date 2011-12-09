@@ -66,14 +66,14 @@ DumpLusi::beginCalibCycle(Event& evt, Env& env)
     
     WithMsgLog(name(), info, str) {
       str << "Lusi::DiodeFexConfigV1:";
-      const float* base = dconfig1->base();
-      const float* scale = dconfig1->scale();
+      const ndarray<float, 1>& base = dconfig1->base();
+      const ndarray<float, 1>& scale = dconfig1->scale();
       str << "\n  base =";
-      for (int i = 0; i < Psana::Lusi::DiodeFexConfigV1::NRANGES; ++ i) {
+      for (unsigned i = 0; i < base.size(); ++ i) {
         str << " " << base[i];
       }
       str << "\n  scale =";
-      for (int i = 0; i < Psana::Lusi::DiodeFexConfigV1::NRANGES; ++ i) {
+      for (unsigned i = 0; i < scale.size(); ++ i) {
         str << " " << scale[i];
       }
     }
@@ -85,14 +85,14 @@ DumpLusi::beginCalibCycle(Event& evt, Env& env)
     
     WithMsgLog(name(), info, str) {
       str << "Lusi::DiodeFexConfigV2:";
-      const float* base = dconfig2->base();
-      const float* scale = dconfig2->scale();
+      const ndarray<float, 1>& base = dconfig2->base();
+      const ndarray<float, 1>& scale = dconfig2->scale();
       str << "\n  base =";
-      for (int i = 0; i < Psana::Lusi::DiodeFexConfigV2::NRANGES; ++ i) {
+      for (unsigned i = 0; i < base.size(); ++ i) {
         str << " " << base[i];
       }
       str << "\n  scale =";
-      for (int i = 0; i < Psana::Lusi::DiodeFexConfigV2::NRANGES; ++ i) {
+      for (unsigned i = 0; i < scale.size(); ++ i) {
         str << " " << scale[i];
       }
     }
@@ -106,18 +106,20 @@ DumpLusi::beginCalibCycle(Event& evt, Env& env)
       str << "Psana::Lusi::IpmFexConfigV1:";
       str << "\n  xscale = " << iconfig1->xscale();
       str << "\n  yscale = " << iconfig1->yscale();
-      for (int ch = 0; ch < Psana::Lusi::IpmFexConfigV1::NCHANNELS; ++ ch) {
+
+      const ndarray<Psana::Lusi::DiodeFexConfigV1, 1>& diodes = iconfig1->diode();
+      for (unsigned ch = 0; ch < diodes.size(); ++ ch) {
         str << "\n  channel #" << ch << ":";
         
-        const Psana::Lusi::DiodeFexConfigV1& dconfig = iconfig1->diode(ch);
-        const float* base = dconfig.base();
-        const float* scale = dconfig.scale();
+        const Psana::Lusi::DiodeFexConfigV1& dconfig = diodes[ch];
+        const ndarray<float, 1>& base = dconfig.base();
+        const ndarray<float, 1>& scale = dconfig.scale();
         str << "\n    base =";
-        for (int i = 0; i < Psana::Lusi::DiodeFexConfigV1::NRANGES; ++ i) {
+        for (unsigned i = 0; i < base.size(); ++ i) {
           str << " " << base[i];
         }
         str << "\n    scale =";
-        for (int i = 0; i < Psana::Lusi::DiodeFexConfigV1::NRANGES; ++ i) {
+        for (unsigned i = 0; i < scale.size(); ++ i) {
           str << " " << scale[i];
         }
       }
@@ -132,18 +134,20 @@ DumpLusi::beginCalibCycle(Event& evt, Env& env)
       str << "Psana::Lusi::IpmFexConfigV2:";
       str << "\n  xscale = " << iconfig2->xscale();
       str << "\n  yscale = " << iconfig2->yscale();
+
+      const ndarray<Psana::Lusi::DiodeFexConfigV2, 1>& diodes = iconfig2->diode();
       for (int ch = 0; ch < Psana::Lusi::IpmFexConfigV2::NCHANNELS; ++ ch) {
         str << "\n  channel #" << ch << ":";
         
-        const Psana::Lusi::DiodeFexConfigV2& dconfig = iconfig2->diode(ch);
-        const float* base = dconfig.base();
-        const float* scale = dconfig.scale();
+        const Psana::Lusi::DiodeFexConfigV2& dconfig = diodes[ch];
+        const ndarray<float, 1>& base = dconfig.base();
+        const ndarray<float, 1>& scale = dconfig.scale();
         str << "\n    base =";
-        for (int i = 0; i < Psana::Lusi::DiodeFexConfigV2::NRANGES; ++ i) {
+        for (unsigned i = 0; i < base.size(); ++ i) {
           str << " " << base[i];
         }
         str << "\n    scale =";
-        for (int i = 0; i < Psana::Lusi::DiodeFexConfigV2::NRANGES; ++ i) {
+        for (unsigned i = 0; i < scale.size(); ++ i) {
           str << " " << scale[i];
         }
       }
@@ -183,9 +187,9 @@ DumpLusi::event(Event& evt, Env& env)
       str << "\n  xpos = " << fex->xpos();
       str << "\n  ypos = " << fex->ypos();
 
-      const float* channel = fex->channel();
+      const ndarray<float, 1>& channel = fex->channel();
       str << "\n  channel =";
-      for (int i = 0; i < Psana::Lusi::IpmFexV1::NCHANNELS; ++ i) {
+      for (unsigned i = 0; i < channel.size(); ++ i) {
         str << " " << channel[i];
       }
     }

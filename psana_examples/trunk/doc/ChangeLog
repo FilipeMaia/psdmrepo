@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2011-12-09 Andy Salnikov
+- migrating to ndarray for adrray data
+
 Tag: V00-01-05
 2011-10-04 Andy Salnikov
 - DumpCsPad now prints common_mode from new schema and some data from images

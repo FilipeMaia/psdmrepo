@@ -86,17 +86,19 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
       str << "ControlData::ConfigV1:\n  duration = ";
       printClockTime(str, config->duration());
 
-      for (unsigned i = 0; i < config->npvControls(); ++ i) {
+      const ndarray<Psana::ControlData::PVControl, 1>& pvControls = config->pvControls();
+      for (unsigned i = 0; i < pvControls.size(); ++ i) {
         if (i == 0) str << "\n  PV Controls:";
-        const Psana::ControlData::PVControl& ctrl = config->pvControls(i);
+        const Psana::ControlData::PVControl& ctrl = pvControls[i];
         str << "\n    " << ctrl.name() << " index=" << ctrl.index()
             << " value=" << ctrl.value() << " array=" << int(ctrl.array());
         
       }
 
-      for (unsigned i = 0; i < config->npvMonitors(); ++ i) {
+      const ndarray<Psana::ControlData::PVMonitor, 1>& pvMonitors = config->pvMonitors();
+      for (unsigned i = 0; i < pvMonitors.size(); ++ i) {
         if (i == 0) str << "\n  PV Monitors:";
-        const Psana::ControlData::PVMonitor& mon = config->pvMonitors(i);
+        const Psana::ControlData::PVMonitor& mon = pvMonitors[i];
         str << "\n    " << mon.name() << " index=" << mon.index()
             << " low value=" << mon.loValue() 
             << " high value=" << mon.hiValue() 

@@ -97,8 +97,8 @@ DumpEncoder::event(Event& evt, Env& env)
       str << "Encoder::DataV2:"
           << " timestamp = " << data2->timestamp()
           << " encoder_count =";
-      const uint32_t* counts = data2->encoder_count();
-      for (int i = 0; i != Psana::Encoder::DataV2::NEncoders; ++ i) {
+      const ndarray<uint32_t, 1>& counts = data2->encoder_count();
+      for (unsigned i = 0; i != counts.size(); ++ i) {
         str << " " << counts[i];
       }
 

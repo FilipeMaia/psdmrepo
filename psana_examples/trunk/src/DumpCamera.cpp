@@ -86,9 +86,10 @@ DumpCamera::beginCalibCycle(Event& evt, Env& env)
       ::printFrameCoord(str, frmConfig->roiEnd());
       str << "\n  threshold = " << frmConfig->threshold();
       str << "\n  number_of_masked_pixels = " << frmConfig->number_of_masked_pixels();
-      for (unsigned i = 0; i < frmConfig->number_of_masked_pixels(); ++ i) {
+      const ndarray<Psana::Camera::FrameCoord, 1>& masked_pixels = frmConfig->masked_pixel_coordinates();
+      for (unsigned i = 0; i < masked_pixels.shape()[0]; ++ i) {
         str << "\n    ";
-        ::printFrameCoord(str, frmConfig->masked_pixel_coordinates(i));
+        ::printFrameCoord(str, masked_pixels[i]);
       }
     }
     
