@@ -49,7 +49,15 @@ extern "C" {
 // 		-- Class Interface --
 //		---------------------
 
+
+namespace MsgLogger {
+
+class MsgFormatter ;
+class MsgLogRecord ;
+
 /**
+ *  @ingroup MsgLogger
+ *
  *  The base class for handling messages. Handling means dispatching
  *  messages to their final distantion, such as terminal, log file,
  *  external logging service, etc. Handlers like loggers have corresponding
@@ -70,11 +78,6 @@ extern "C" {
  *
  *  @author Andy Salnikov
  */
-
-namespace MsgLogger {
-
-class MsgFormatter ;
-class MsgLogRecord ;
 
 class MsgHandler {
 

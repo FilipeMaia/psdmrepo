@@ -146,7 +146,7 @@ The scope of the log object declared above (which is a regular ostream
 object) is to the end of the closing bracket matching the opening bracket 
 after the With... macro. Note that the code within the scope is only executing
 when the the logging level of the logger is lower than message level, that is
-if the logging level of the "OPR.Temporal" logget is "info" then the code 
+if the logging level of the "OPR.Temporal" logger is "info" then the code 
 above is not executed. Do not rely on any side effect of the code in the 
 scope on surrounding scope. 
 

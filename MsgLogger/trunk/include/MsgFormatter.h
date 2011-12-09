@@ -50,7 +50,14 @@ extern "C" {
 // 		-- Class Interface --
 //		---------------------
 
+namespace MsgLogger {
+
+class MsgLogRecord ;
+
+
 /**
+ *  @ingroup MsgLogger
+ *
  *  The class which does message formating to show the message in  the
  *  human-readable format. In principle you can inherit this class and
  *  override some methods, but this implementation is already sufficiently
@@ -67,11 +74,6 @@ extern "C" {
  *
  *  @author Andy Salnikov
  */
-
-namespace MsgLogger {
-
-class MsgLogRecord ;
-
 
 class MsgFormatter {
 

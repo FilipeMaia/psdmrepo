@@ -50,7 +50,15 @@ extern "C" {
 // 		-- Class Interface --
 //		---------------------
 
+namespace MsgLogger {
+
+class MsgLogLevel ;
+
+/// @addtogroup MsgLogger_detail
+
 /**
+ *  @ingroup MsgLogger_detail
+ *
  *  Implementation of the message handler which logs formatted messages to
  *  the stanfard C++ streams cout and cerr (well I have removed "error"
  *  levels so it's only logs to cout now.)
@@ -66,10 +74,6 @@ extern "C" {
  *
  *  @author Andy Salnikov
  */
-
-namespace MsgLogger {
-
-class MsgLogLevel ;
 
 class MsgHandlerStdStreams : public MsgHandler {
 

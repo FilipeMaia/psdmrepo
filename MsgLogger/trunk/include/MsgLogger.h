@@ -49,7 +49,15 @@ extern "C" {
 // 		-- Class Interface --
 //		---------------------
 
+namespace MsgLogger {
+
+class MsgHandler ;
+class MsgLogRecord ;
+class MsgLoggerImpl ;
+
 /**
+ *  @ingroup MsgLogger
+ *
  *  The class for the first-level processing of the messages. The streams
  *  send messages to this class, and this class forwards them to handlers
  *  (if it decides that message is indeed to be logged.) The loggers are
@@ -71,12 +79,6 @@ extern "C" {
  *
  *  @author Andy Salnikov
  */
-
-namespace MsgLogger {
-
-class MsgHandler ;
-class MsgLogRecord ;
-class MsgLoggerImpl ;
 
 class MsgLogger {
 

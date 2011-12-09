@@ -1,0 +1,254 @@
+/**
+
+@defgroup MsgLogger 
+
+Package MsgLogger defines message logging facilities for off-line software.
+It provides easy-to-use interface to a flexible service 
+for generating and logging various types of messages. 
+
+@section Introduction
+
+Logging in general is a mean of tracking various events happening inside
+software. Software uses logging facilities to indicate that some particular
+event has happened. Event usually contains a descriptive message plus optionally
+additional associated data (such as location of the event origin or time when event 
+happened). Events have associated importance (also known as level or severity). 
+Event notification may need to have different destinations based on event 
+importance and/or event source, e.g. most low-importance events may be suppressed
+altogether, standard events should be redirected to a log file, and critical
+event may need to be forwarded to an e-mail destination.  Logging service
+main responsibility is to make this kind of filtering and forwarding possible
+with as little programming overhead and run-time costs as possible. 
+
+
+@section Concepts Concepts
+
+@subsection Severity Severity level
+
+Every logging message has corresponding severity level. Here is the list of 
+all levels ordered by severity from low to high:
+ - @c debug
+ - @c trace
+ - @c info
+ - @c warning
+ - @c error
+ - @c fatal 
+
+Logging service can dispatch messages based on their severity. Allowing logging for
+one particular lever automatically allows logging for higher severity as well
+(enabling @c info level will enable @c warning, @c error, and @c fatal as well).
+Messages with hight severity such as @c error and @c fatal cannot be disabled at all.
+Difference between @c error and @c fatal is that @c fatal messages automatically 
+terminate application after the message handling is complete (meaning that message 
+is printed or sent to destination).
+
+In usual setup logging service is configured to enable only @c info severity (plus 
+@c warning, @c error, and @c fatal). Default configuration can be changed via 
+application-dependent options, usually via command line or environment variables.
+
+@subsection MsgProp Message properties
+
+In addition to the message (text) each logging event has other associated properties:
+ - logger -- the name of the logger which received message
+ - level -- severity level of the message
+ - file -- name of the file where message was generated
+ - line -- line number in the file where message was generated
+ - time -- time when message was generated
+ - PID -- process ID of the process which generated message
+
+These properties can be displayed as a part of the printed output produced by 
+messaging service. Which properties are displayed and format of their output can
+be changed via configuration.
+
+@subsection Handlers Handlers
+
+Message handler is a logical destination for messages. There may be multiple 
+implementations of handlers, e.g. one implementation for printing messages
+to standard output or error streams, another implementation for sending 
+messages to e-mail addresses or syslog. There may be multiple handlers 
+instantiated at the same time and one message can be dispatched to more than 
+one handler. Each handler has corresponding severity level and only accepts
+messages with the same or higher severity level, by default handlers are
+instantiated with @c debug level and accept all events.
+
+Currently there is only one type of handler implemented which logs messages 
+to standard output or error (for warning, error, and fatal messages) streams.
+
+@subsection Loggers Loggers
+
+Conceptually the logger is an object which receives messages from client code and 
+forwards them to one or more handlers, they act as message source for the logging system.
+Every logger in a system has an associated name which identifies that logger. 
+When client code sends a message to the logging service it specifies the logger name
+for the message. Logger names form hierarchical name space and used dotted notation 
+to specify hierarchy. For example logger with the name "TopLogger" is a parent 
+for the loggers "TopLogger.child1" and "TopLogger.child2". At the top of the 
+logger hierarchy is so-called root logger. It does not have a name, even though
+on output its name may appear as "/root/" for example. 
+
+Loggers like handlers have associated severity levels. Every logger has zero or 
+more associated handlers. If logger's severity is the same or lower than message
+severity then the message is sent to every associated handler. 
+
+By default (if not configured specifically) the logger also sends all messages to 
+the parent logger. Such hierarchical relations are used to simplify control over 
+multiple loggers. Imagine for example that some library or facility uses following 
+loggers for its messages: "Foo.Bar", "Foo.Baz", and "Foo.Qux". By enabling for example
+debugging logging for "Foo" logger all debug messages from every child logger "Foo.*"
+will be enabled as well.
+
+
+@section GenMsg Generating Messages
+
+User code can generate new logging messages using one of the four convenience macros
+provided by the package:
+
+ - @c MsgLog(logger, severity, message)
+ - @c MsgLogRoot(severity, message)
+ - @c WithMsgLog(logger, severity, stream)
+ - @c WithMsgLogRoot(severity, stream)
+
+Two of these macros take the logger name as the first argument, logger name can be 
+either C-style character string (or char*) or C++ @c std::string object. Two other 
+macros do not the logger name and instead send the messages directly to root logger.
+Preferred forms are those which use logger name, providing logger name gives more 
+flexibility in controlling the output. @c Severity parameter to these macros should be
+a constant defined in MsgLogLevel class, one of @c debug, @c trace, @c info,  
+@c warning, @c error, or @c fatal.
+
+Two of the macros take an expression as the last argument which is used to generate 
+message. this expression can be anything that can appera on the right side of the
+standard stream  insertion operator (like cout << ...).
+
+Two other macros (With* form) declare a stream object which can be used inside a 
+compound statement which follows the macro. the stream is a regular C++ @c std::ostream
+object and can be used to compose more complex messages with conditional expressions
+or loops.
+
+Here is a simplified example of using @c MsgLog macro which makes a message out of 
+several variables and sends it to "MyPackage" logger with debug severity:
+@code
+#include "MsgLogger/MsgLogger.h"
+
+...
+
+  MsgLog("MyPackage", debug, "key = " << key << " value = " << value << " count = " << count);
+@endcode
+
+Here is a bit more complex example of using @c WithMsgLog macro which makes similar 
+message:
+@code
+#include "MsgLogger/MsgLogger.h"
+
+...
+
+  WithMsgLog("MyPackage", debug, out) {
+    if (not key.empty()) out << "key = " << key << ' ';
+    out << " value = " << value << " count = " << count;
+  }
+@endcode
+
+
+
+@section ConfigMsgLog Configuration
+
+By default if application or user do not take any actions to configure the logging 
+service all loggers are instantiated with the @c info severity (meaning that they will 
+accept messages with @c info, @c warning, @c error, or @c fatal severities). Non-root 
+loggers do not have any associated handlers, and only the root logger has a single 
+handler that prints message contents to a standard output or standard error depending 
+on message severity. All loggers send their messages to parent loggers and evenually to 
+root logger which results in all messages with @c info and higher severity being 
+printed to terminal or log files.
+
+Many offline applications (including psana) provide simple way to change severity of 
+the root logger via the command line switches (-v and -q):
+ - single -v option changes root logger severity to @c trace
+ - two -v options (or -vv) changes root logger severity to @c debug
+ - single -q option changes root logger severity to @c warning
+ - two -q options (or -qq) changes root logger severity to @c error
+
+
+@subsection LoggerConfig Logger Configuration
+
+There is a lot of flexibility in changing properties of the individual loggers. 
+Following properties of loggers can be changed:
+ - severity level
+ - associated handlers
+ - parent propagation
+
+Currently configuration can be changed by providing simple configuration directives via
+@c MSGLOGCONFIG environment variable. The format of the variable contents is:
+@code
+  format    :: directive[; directive]*
+  directive :: level
+  directive :: logger=level[-]
+@endcode
+which says that variable can contain any number of directives separated by semicolons.
+Each directive consists either of the level name (one of the defined severity levels)
+or logger name and level name separated by equal sign optionally followed by minus.
+
+Directive which contains only the level name changes severity level of the root logger:
+@code
+export MSGLOGCONFIG=debug
+@endcode
+will change root logger severity to debug.
+
+Directive which also includes logger name does two things: 1) instantiate new message
+handler (with debug level) and associate this handler with the specified logger, 
+2) change logger severity level to the specified level. If the directive has a traling
+minus sign then the logger is also set to not propagate its messages to the parent 
+logger. Right now only one type of handler exists which will print messages to standard 
+streams.
+
+Here are few examples:
+@code
+export MSGLOGCONFIG="info; MyPackage=debug"
+@endcode
+This will change severity level of "MyPackage" logger to debug, and severity of the root
+logger to info (also default). Note that this configuration will produce repeating 
+messages for @c info or higher severities because "MyPackage" handler will first send 
+those message to its own handler and then also forward it to the root logger which will
+send it again to the associated handler. To avoid this duplication one can just disable
+propagation from "MyPackage" to root logger:
+@code
+export MSGLOGCONFIG="info; MyPackage=debug-"
+@endcode
+
+
+@subsection HadlerConfig Handler Configuration
+
+Current implementation has only one type of handler which formats and prints the message
+to either standard output or standard error stream. The handler uses so-called formatter
+to format the message content. The output produced by formatter can be configured via
+the @c MSGLOGFMT environment variable which can contain a number of for formatting 
+directives in the form "%(keyword)". Following keywords are defined:
+ - @c logger  - name of the logger
+ - @c level   - logging level of the message (debug/trace/info/warning/error)
+ - @c LVL     - three-letter level code (DBG/TRC/INF/WRN/ERR)
+ - @c L       - one-letter level code (D/T/I/W/E)
+ - @c message - the text of the message
+ - @c path    - full path of the file where message originated
+ - @c file    - base name of the file where message originated
+ - @c line    - line number where message originated
+ - @c time    - timestamp of the message
+ - @c pid     - process ID
+
+Example of the format string could be:
+@code
+export MSGLOGFMT="%(time) [%(LVL)] {%(logger)} %(file):%(line) - %(message)"
+@endcode
+
+Additionally the format of the time string can be controlled via the @c MSGLOGTIMEFMT
+environment variable which provides strftime-format string with one additional format
+code "%f" for the number of milliseconds. Here is an example:
+@code
+export MSGLOGTIMEFMT="%D %T.%f"
+@endcode
+
+@section MoreInfo Additional Information
+
+The package includes original <A HREF="https://pswww.slac.stanford.edu/trac/psdm/browser/psdm/MsgLogger/trunk/doc/README">README</A> 
+file which may contain additional details. 
+
+*/

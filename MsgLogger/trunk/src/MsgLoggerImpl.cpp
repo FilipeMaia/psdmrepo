@@ -212,7 +212,7 @@ MsgLoggerImpl::getLogger( const std::string& name )
 namespace {
 
   // make one logger
-  void makeLogger ( const std::string& name, const std::string level, bool propagate )
+  void makeLogger ( const std::string& name, const std::string& level, bool propagate )
   {
     // check first
     Name2ImplMap::const_iterator it = implementations.map.find ( name ) ;
@@ -256,19 +256,19 @@ namespace {
       // find '='
       iter j1 = std::find ( i, j, '=' ) ;
       if ( j1 == j ) {
-	// no = means it should be a level name for root logger
-	std::string level(i,j) ;
-	::makeLogger ( std::string(), level, false ) ;
+        // no = means it should be a level name for root logger
+        std::string level(i,j) ;
+        ::makeLogger ( std::string(), level, false ) ;
       } else {
-	bool propagate = *(j-1) != '-' ;
-	std::string level( j1+1, *(j-1)=='-' ? j-1 : j ) ;
+        bool propagate = *(j-1) != '-' ;
+        std::string level( j1+1, *(j-1)=='-' ? j-1 : j ) ;
 
-	for ( iter i2 = i, j2 ; i2 != j1 ; i2 = j2 ) {
-	  j2 = std::find( i2, j1, ',') ;
-	  std::string name ( i2, j2 ) ;
-	  if ( j2 != j1 ) ++ j2 ;
-	  ::makeLogger ( name, level, propagate ) ;
-	}
+        for ( iter i2 = i, j2 ; i2 != j1 ; i2 = j2 ) {
+          j2 = std::find( i2, j1, ',') ;
+          std::string name ( i2, j2 ) ;
+          if ( j2 != j1 ) ++ j2 ;
+          ::makeLogger ( name, level, propagate ) ;
+        }
 
       }
 

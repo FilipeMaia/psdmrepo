@@ -47,7 +47,11 @@ extern "C" {
 // 		-- Class Interface --
 //		---------------------
 
+namespace MsgLogger {
+
 /**
+ *  @ingroup MsgLogger
+ *
  *  This class defines message logging levels, their names and ordering.
  *
  *  This software was developed for the BaBar collaboration.  If you
@@ -62,7 +66,6 @@ extern "C" {
  *  @author Andy Salnikov
  */
 
-namespace MsgLogger {
 class MsgLogLevel {
 
 public:

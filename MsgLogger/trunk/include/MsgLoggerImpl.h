@@ -50,7 +50,16 @@ extern "C" {
 // 		-- Class Interface --
 //		---------------------
 
+namespace MsgLogger {
+
+class MsgHandler ;
+class MsgLogRecord ;
+
+/// @addtogroup MsgLogger_detail
+
 /**
+ *  @ingroup MsgLogger_detail
+ *
  *  Implementation of the message logger. This class is actually an implementation
  *  detail used by the MsgLogger class. It should not be visible to clients in any way.
  *
@@ -66,11 +75,6 @@ extern "C" {
  *
  *  @author Andy Salnikov
  */
-
-namespace MsgLogger {
-
-class MsgHandler ;
-class MsgLogRecord ;
 
 class MsgLoggerImpl {
 

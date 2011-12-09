@@ -49,8 +49,14 @@ extern "C" {
 // 		-- Class Interface --
 //		---------------------
 
+namespace MsgLogger {
+
+class MsgLoggerImpl ;
+
 /**
- *  Clkass which defines a single logging message (record.) It has such attributes
+ *  @ingroup MsgLogger
+ *
+ *  Class which defines a single logging message (record.) It has such attributes
  *  as message itself, logging level, corresponding logger name, file/line where
  *  the message originated. For performance optimization purposes the message is
  *  passed as a pointer to the streambuf. This complicates things a bit, you have
@@ -70,10 +76,6 @@ extern "C" {
  *
  *  @author Andy Salnikov
  */
-
-namespace MsgLogger {
-
-class MsgLoggerImpl ;
 
 class MsgLogRecord {
 
