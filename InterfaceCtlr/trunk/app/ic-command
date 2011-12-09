@@ -99,9 +99,10 @@ class ICCommand ( AppBase ) :
         self.__add_handler('translate',"Make new translation request", self.cmd_translate )
         self.__add_handler('remove', "Remove fileset(s) from the database", self.cmd_remove )
         self.__add_handler('active', "Display active experiments", self.cmd_active)
-        self.__add_handler( 'activate', "Activate experiment", self.cmd_activate)
+        self.__add_handler('activate', "Activate experiment", self.cmd_activate)
         self.__add_handler('deactivate', "Deactivate experiment", self.cmd_deactivate)
         self.__add_handler('cstop', "Send stop signal to controller", self.cmd_cstop)
+        self.__add_handler('set_status', "Update request status", self.cmd_set_status)
 
 
     # =========================================================================
@@ -300,9 +301,28 @@ class ICCommand ( AppBase ) :
         (options, args) = parser.parse_args(cmdargs)
 
         if len(args) != 1:
-            parser.error("One positional arguments are required")
+            parser.error("One positional argument is required")
 
-        self.icdb().controller_stop(*args)
+        self.icdb().controller_stop(int(args[0]))
+        
+        return 0
+
+
+    # =====================
+    # Change request status
+    # =====================
+
+    def cmd_set_status( self, command, cmdargs ) :
+
+        usage = "usage: %%prog %s request-id new-status" % command
+        descr = "Change the status of request, use with care, potentially dangerous"
+        parser = OptionParser(usage=usage, description=descr)
+        (options, args) = parser.parse_args(cmdargs)
+
+        if len(args) != 2:
+            parser.error("Two positional arguments are required")
+
+        self.icdb().change_fileset_status(int(args[0]), args[1])
         
         return 0
 

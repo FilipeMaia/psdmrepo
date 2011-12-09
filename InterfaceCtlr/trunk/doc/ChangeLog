@@ -10,6 +10,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-10
+2011-12-09 Andy Salnikov
+- add set_status command to ic-command
+
 Tag: V01-00-09
 2011-12-08 Andy Salnikov
 - when non-empty option "hdf-backup-suffix" is present in configuration 
