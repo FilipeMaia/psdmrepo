@@ -34,10 +34,10 @@
 
 namespace ndarray_details {
 
-/// @addtogroup ndarray
+/// @addtogroup ndarray_details
 
 /**
- *  @ingroup ndarray
+ *  @ingroup ndarray_details
  *
  *  @brief C++ source file code template.
  *
@@ -58,12 +58,8 @@ class nd_elem_access : protected nd_data<ElemType, NDim> {
 
 public:
 
-  nd_elem_access_pxy<ElemType, NDim-1> operator[](int i) {
+  nd_elem_access_pxy<ElemType, NDim-1> operator[](int i) const {
     return nd_elem_access_pxy<ElemType, NDim-1>(Super::m_data + i*Super::m_strides[0], Super::m_shape+1, Super::m_strides+1);
-  }
-  const nd_elem_access_pxy<ElemType, NDim-1> operator[](int i) const {
-    ElemType* data = const_cast<ElemType*>(Super::m_data);
-    return nd_elem_access_pxy<ElemType, NDim-1>(data + i*Super::m_strides[0], Super::m_shape+1, Super::m_strides+1);
   }
 
 protected:
@@ -82,7 +78,6 @@ class nd_elem_access<ElemType, 1> : protected nd_data<ElemType, 1> {
 
 public:
 
-  ElemType& operator[](int i) { return Super::m_data[i*Super::m_strides[0]]; }
   const ElemType& operator[](int i) const { return Super::m_data[i*Super::m_strides[0]]; }
 
 protected:

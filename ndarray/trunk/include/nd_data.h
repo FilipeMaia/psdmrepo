@@ -33,10 +33,10 @@
 
 namespace ndarray_details {
 
-/// @addtogroup ndarray
+/// @addtogroup ndarray_details
 
 /**
- *  @ingroup ndarray
+ *  @ingroup ndarray_details
  *
  *  @brief C++ source file code template.
  *
@@ -56,10 +56,9 @@ struct nd_data  {
   // Destructor
   ~nd_data () {}
 
-  ElemType* m_data;          ///< Pointer to the data array
+  const ElemType* m_data;          ///< Pointer to the data array
   unsigned m_shape[NDim];    ///< Array dimensions
   unsigned m_strides[NDim];  ///< Array strides
-  bool m_own;                ///< If value is true then m_data array will be deleted in destructor
 };
 
 } // namespace ndarray_details

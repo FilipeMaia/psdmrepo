@@ -54,19 +54,6 @@ BOOST_AUTO_TEST_CASE( test_notown )
 
 // ==============================================================
 
-BOOST_AUTO_TEST_CASE( test_own_copy )
-{
-  unsigned dims[3] = {2,3,4};
-  int* data = new int[DataSize];
-  std::copy(gdata, gdata+DataSize, data);
-  ndarray<int,3> arr(data, dims, true);
-
-  BOOST_CHECK_EQUAL ( arr[0][0][0], gdata[0] ) ;
-  BOOST_CHECK_EQUAL ( arr[1][2][3], gdata[23] ) ;
-}
-
-// ==============================================================
-
 BOOST_AUTO_TEST_CASE( test_strides_def )
 {
   unsigned dims[3] = {2,3,4};
@@ -93,4 +80,54 @@ BOOST_AUTO_TEST_CASE( test_strides )
   BOOST_CHECK_EQUAL ( arr[0][1][0], gdata[4] ) ;
   BOOST_CHECK_EQUAL ( arr[1][0][0], gdata[12] ) ;
   BOOST_CHECK_EQUAL ( arr[1][2][3], gdata[23] ) ;
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_swap )
+{
+  ndarray<int,3> arr0;
+  unsigned dims[3] = {2,3,4};
+  ndarray<int,3> arr1(gdata, dims);
+
+  BOOST_CHECK_EQUAL ( arr0.shape()[0], 0U ) ;
+  BOOST_CHECK_EQUAL ( arr0.shape()[1], 0U ) ;
+  BOOST_CHECK_EQUAL ( arr0.shape()[2], 0U ) ;
+
+  BOOST_CHECK_EQUAL ( arr0.strides()[0], 0U ) ;
+  BOOST_CHECK_EQUAL ( arr0.strides()[1], 0U ) ;
+  BOOST_CHECK_EQUAL ( arr0.strides()[2], 0U ) ;
+
+  BOOST_CHECK_EQUAL ( arr1.shape()[0], 2U ) ;
+  BOOST_CHECK_EQUAL ( arr1.shape()[1], 3U ) ;
+  BOOST_CHECK_EQUAL ( arr1.shape()[2], 4U ) ;
+
+  BOOST_CHECK_EQUAL ( arr1.strides()[0], 12U ) ;
+  BOOST_CHECK_EQUAL ( arr1.strides()[1], 4U ) ;
+  BOOST_CHECK_EQUAL ( arr1.strides()[2], 1U ) ;
+
+  BOOST_CHECK_EQUAL ( arr1[0][0][0], gdata[0] ) ;
+  BOOST_CHECK_EQUAL ( arr1[1][2][3], gdata[23] ) ;
+
+  arr0.swap(arr1);
+
+  BOOST_CHECK_EQUAL ( arr1.shape()[0], 0U ) ;
+  BOOST_CHECK_EQUAL ( arr1.shape()[1], 0U ) ;
+  BOOST_CHECK_EQUAL ( arr1.shape()[2], 0U ) ;
+
+  BOOST_CHECK_EQUAL ( arr1.strides()[0], 0U ) ;
+  BOOST_CHECK_EQUAL ( arr1.strides()[1], 0U ) ;
+  BOOST_CHECK_EQUAL ( arr1.strides()[2], 0U ) ;
+
+  BOOST_CHECK_EQUAL ( arr0.shape()[0], 2U ) ;
+  BOOST_CHECK_EQUAL ( arr0.shape()[1], 3U ) ;
+  BOOST_CHECK_EQUAL ( arr0.shape()[2], 4U ) ;
+
+  BOOST_CHECK_EQUAL ( arr0.strides()[0], 12U ) ;
+  BOOST_CHECK_EQUAL ( arr0.strides()[1], 4U ) ;
+  BOOST_CHECK_EQUAL ( arr0.strides()[2], 1U ) ;
+
+  BOOST_CHECK_EQUAL ( arr0[0][0][0], gdata[0] ) ;
+  BOOST_CHECK_EQUAL ( arr0[1][2][3], gdata[23] ) ;
+
 }
