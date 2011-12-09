@@ -6,14 +6,11 @@
 #   Module pyana_image
 #   pyana module with intensity threshold, plotting with matplotlib, allow rescale color plot
 #
-#   Example xtc file: /reg/d/psdm/sxr/sxrcom10/xtc/e29-r0603-s00-c00.xtc 
-#
-#   To run: pyana -m mypkg.pyana_image <filename>
-#
 """User analysis module for pyana framework.
 
 This software was developed for the LCLS project.  If you use all or
 part of it, please give an appropriate acknowledgment.
+
 @author Ingrid Ofte
 """
 
@@ -23,20 +20,24 @@ part of it, please give an appropriate acknowledgment.
 import sys
 import time
 
-import scipy.ndimage.interpolation as interpol
 import numpy as np
 import matplotlib.pyplot as plt
-import h5py
+#import h5py
 
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
 from pypdsdata import xtc
 
+#-----------------------------
+# Imports for local modules --
+#-----------------------------
+from cspad     import CsPad
 from utilities import Plotter
 from utilities import Threshold
 from utilities import PyanaOptions
 from utilities import ImageData
+import algorithms as alg
 
 #---------------------
 #  Class definition --
@@ -45,20 +46,18 @@ class  pyana_image ( object ) :
 
     # initialize
     def __init__ ( self,
-                   sources = None,
-                   dark_img_file = None,
+                   sources = None,       
+                   inputdark = None,
                    threshold = None,
-                   plot_vrange = None,                   
-                   image_rotations = None,
-                   image_shifts = None,
-                   image_scales = None,
-                   image_nicknames = None,
-                   image_manipulations = None, 
-                   output_file = None,
-                   show_projections = None,
-                   n_hdf5 = None ,
+                   algorithms = None,
+                   # plotting options:
                    plot_every_n = None,
                    accumulate_n = None,
+                   plot_vrange = None,                   
+                   show_projections = None,
+                   # output options
+                   outputfile = None,
+                   n_hdf5 = None ,
                    max_save = "0",
                    fignum = "1" ):
         """Class constructor.
@@ -66,17 +65,16 @@ class  pyana_image ( object ) :
         All parameters are passed as strings
 
         @param sources           address string of Detector-Id|Device-ID
-        @param dark_img_file     name (base) of dark image file (numpy array) to be loaded, if any
+        @param inputdark         name (base) of dark image file (numpy array) to be loaded, if any
+        @param algorithms        (list of) algorithms to be applied to the image before plotting
+        @param threshold         value (xmin:xmax,ymin:xmax) type
+
         @param plot_every_n      Frequency for plotting. If n=0, no plots till the end
         @param accumulate_n      Not implemented yet
-        @param fignum            Matplotlib figure number
-        @param threshold
-        @param image_rotations   (list) rotation, in degrees, to be applied to image(s)
-        @param image_shifts      (list) shift, in (npixX,npixY), to be applied to image(s)
-        @param image_scales      (list) scale factor to be applied to images
-        @param image_nicknames   (list) nicknames for plot titles
-        @param output_file       filename (If collecting: write to this file)
+        @param plot_vrange       value-range of interest
         @param show_projections  0,1 or 2, for projecting nothing, average or maximum 
+ 
+        @param outputfile       filename (If collecting: write to this file)
         @param n_hdf5            if output file is hdf5, combine n events in each output file. 
         @param max_save          Maximum single-shot images to save
         """
@@ -92,68 +90,15 @@ class  pyana_image ( object ) :
         for sources in self.sources :
             print "  ", sources
 
-        self.darkfile = opt.getOptString(dark_img_file)
+        self.darkfile = opt.getOptString(inputdark)
         if self.darkfile is not None: print "Input dark image file: ", self.darkfile
 
-        self.image_nicknames = []
-        if image_nicknames is None:
-            for i in range (0, len(self.sources) ):
-                self.image_nicknames.append( "Img%d"%(i+1) )
-        else :
-            self.image_nicknames = image_nicknames.split(" ")
-
-        
-        self.image_rotations = None
-        if image_rotations is not None:
-            if image_rotations == "" or image_rotations == "None" :
-                self.image_rotations = None
-            else :    
-                self.image_rotations = {}
-                list_of_rotations = image_rotations.split(" ")
-                if len(list_of_rotations) != nsources: print "Plz provide rotation angles for *all* images!"
-                i = 0
-                for source in self.sources :
-                    self.image_rotations[source] = float( list_of_rotations[i] )
-                    i+=1
-                
-            
-        self.image_shifts = None
-        if image_shifts is not None:
-            if image_shifts == "" or image_shifts == "None" :
-                self.image_shifts = None
-            else :
-                self.image_shifts = {}
-                list_of_shifts =  image_shifts.split(" ") 
-                if len(list_of_shifts) != nsources: print "Plz provide shift amount for *all* images!"
-                i = 0
-                for source in self.sources :
-                    shift = list_of_shifts[i].lstrip("(").rstrip(")").split(",")
-                    self.image_shifts[source] = (int(shift[0]), int(shift[1]))
-                    i+=1
-
-        self.image_scales = None
-        if image_scales is not None:
-            if image_scales == "" or image_scales == "None" :
-                self.image_scales = None
-            else :
-                self.image_scales = {}
-                list_of_scales = image_scales.split(" ")            
-                if len(list_of_scales) != nsources: print "Plz provide scale factors for *all* images!"
-                i = 0
-                for sources in self.image_adresses :
-                    self.image_scales[source] = float( list_of_scales[i] )
-                    i+=1
-
-        self.image_manipulations = None
-        if image_manipulations is not None:
-            if image_manipulations == "" or image_manipulations == "None" :
-                self.image_manipulations = None
-            else :    
-                self.image_manipulations = image_manipulations
+        self.algorithms = opt.getOptStrings(algorithms)
+        print self.algorithms
 
 
         threshold_string = opt.getOptStrings(threshold)
-        # format: 'value (xlow:xhigh,ylow:yhigh)', only value is required
+        # format: 'value (xlow:xhigh,ylow:yhigh) type',
         
         self.threshold = None
         if len(threshold_string)>0:
@@ -173,10 +118,15 @@ class  pyana_image ( object ) :
             
             print "Using threshold area ", self.threshold.area
             
+            try:
+                type = threshold_string[2]
+                self.threshold.type = type
+            except:
+                pass
 
         self.n_hdf5 = opt.getOptInteger(n_hdf5)
 
-        self.output_file = opt.getOptString(output_file)
+        self.output_file = opt.getOptString(outputfile)
         #print "Output file name base: ", self.output_file
 
         self.plot_vmin = None
@@ -218,13 +168,37 @@ class  pyana_image ( object ) :
         if self.threshold is not None:
             self.plotter.threshold = self.threshold
             self.plotter.vmin, self.plotter.vmax = self.plot_vmin, self.plot_vmax
+            
+        self.apply_dictionary = { 'rotate': alg.rotate,
+                                  'shift' : alg.shift }
+        
+        #        # Set up the plotter's frame by hand, since
+        #        # we need to also tell it about thresholds
+        #        for source in self.sources :
+        #            self.plotter.add_frame(source)
+        #            self.plotter.frames[source].threshold = self.threshold
+        
+        self.cspad = {}
 
-#        # Set up the plotter's frame by hand, since
-#        # we need to also tell it about thresholds
-#        for source in self.sources :
-#            self.plotter.add_frame(source)
-#            self.plotter.frames[source].threshold = self.threshold
+        self.configtypes = { 'Cspad2x2'  : xtc.TypeId.Type.Id_CspadConfig ,
+                             'Cspad'     : xtc.TypeId.Type.Id_CspadConfig ,
+                             'Opal'      : xtc.TypeId.Type.Id_Opal1kConfig,
+                             '????'     : xtc.TypeId.Type.Id_FrameFexConfig,
+                             'TM6740'    : xtc.TypeId.Type.Id_TM6740Config,
+                             'pnCCD'     : xtc.TypeId.Type.Id_pnCCDconfig,
+                             'Princeton' : xtc.TypeId.Type.Id_PrincetonConfig,
+                             'Fccd ?? '  : xtc.TypeId.Type.Id_FrameFccdConfig,
+                             'Fccd'      : xtc.TypeId.Type.Id_FccdConfig,
+                             'PIM'       : xtc.TypeId.Type.Id_PimImageConfig
+                             }
 
+        self.datatypes = {'Cspad2x2'      : xtc.TypeId.Type.Id_Cspad2x2Element, 
+                          'Cspad'         : xtc.TypeId.Type.Id_CspadElement,
+                          'TM6740'        : xtc.TypeId.Type.Id_Frame,
+                          'Opal'          : xtc.TypeId.Type.Id_Frame,
+                          'pnCCD'         : xtc.TypeId.Type.Id_pnCCDframe,
+                          'Princeton'     : xtc.TypeId.Type.Id_PrincetonFrame
+                          }
 
     def beginjob ( self, evt, env ) : 
 
@@ -235,6 +209,20 @@ class  pyana_image ( object ) :
         for source in self.sources:
             self.data[source] = ImageData(source)
 
+        for addr in self.sources :
+
+            # pick out the device name from the address
+            device = addr.split('|')[1].split('-')[0]
+            config = env.getConfig( self.configtypes[device], addr )
+            if not config:
+                print '*** %s config object is missing ***'%addr
+                return
+
+            if addr.find('Cspad')>=0:
+                quads = range(4)
+                sections = map(config.sections, quads)
+                
+                self.cspad[addr] = CsPad(sections)
 
         ## load dark image from file
         #try:
@@ -264,20 +252,30 @@ class  pyana_image ( object ) :
 
         # get the requested images
         for addr in self.sources :
+            image = None
 
-            frame = None
-            if addr.find("Princeton")>0 :
-                frame = evt.getPrincetonValue(addr, env)
-            elif addr.find("pnCCD")>0 :
-                frame = evt.getPnCcdValue(addr, env)
-            else :
-                frame = evt.getFrameValue(addr)
+            # pick out the device name from the address
+            device = addr.split('|')[1].split('-')[0]
+            frame = evt.get( self.datatypes[device], addr )
 
-            if not frame :
-                #print "No frame from ", addr, " in shot#", self.n_shots
+            if addr.find("Cspad2x2")>0 :
+                # in this case 'frame' is the MiniElement
+                # call cspad library to assemble the image
+                image = self.cspad[addr].get_mini_image(frame)
+
+            elif addr.find("Cspad")>0 :
+                # in this case we need the specialized getter: 
+                quads = evt.getCsPadQuads(addr, env)
+                # then call cspad library to assemble the image
+                image = self.cspad[addr].get_detector_image(quads)
+
+            else:
+                # all other cameras have simple arrays. 
+                image = frame.data()
+
+            if image is None:
+                print "No frame image from ", addr, " in shot#", self.n_shots
                 continue
-
-            image = frame.data()
 
             # image is a numpy array (pixels)
             if addr.find("Fccd")>0:
@@ -290,26 +288,29 @@ class  pyana_image ( object ) :
             if len( dim )!= 2 :
                 print "Unexpected dimensions of image array from %s: %s" % (addr,dim)
 
-
                                 
             # ---------------------------------------------------------------------------------------
             # Apply shift, rotation, scaling of this image if needed:
-            if self.image_rotations is not None:
-                rotatedimage = interpol.rotate( image, self.image_rotations[addr], reshape=False )                
-                image = rotatedimage
 
-            if self.image_shifts is not None:
-                #implement this
-                shiftx, shifty = self.image_shifts[addr]
-                shiftedimage = np.roll(image,shiftx,0)
-                shiftedimage = np.roll(image,shifty,1)
-                image = shiftedimage
-                
-            if self.image_scales is not None:
-                #implement this!
-                pass
+            if self.algorithms is not None:
+
+                # apply each algorithm in the list
+                # (algorithms needs to be a list, because dictionary is unordered.)
+                for algos in self.algorithms:
+
+                    # parse the string "algorithm:parameters"
+                    [algo_name, algo_pars] = algos.split(':')
+
+                    # turn algo_pars into a list of floats (to be passed as args)
+                    algo_pars = [float(n) for n in algo_pars.strip('([])').split(',')]
+
+                    #print "algorithm: ", algo_name, "  parameters: ", algo_pars
+
+                    # look up the dictionary and call the function with  this name
+                    image = self.apply_dictionary[algo_name](image,*algo_pars)
 
 
+            # prepare to apply threshold and see if this is a hit or a dark event
             isDark = False
             name = addr
             title = addr
@@ -330,7 +331,7 @@ class  pyana_image ( object ) :
                 maxbin_coord = np.unravel_index(maxbin,dims)
 
                 if self.threshold.type == 'average':
-                    maxvalue = roi.average()
+                    maxvalue = roi.mean()
                 
                 if maxvalue < self.threshold.value :
                     isDark = True
@@ -358,29 +359,30 @@ class  pyana_image ( object ) :
             # ---------------------------------------------------------------------------------------
             # Here's where we add the raw (or subtracted) image to the list for plotting
             event_display_images.append( (name, title, image) )
-
+            
             # This is for use by ipython
             self.data[addr].image   = image
             if self.n_good[addr] > 0 :
                 self.data[addr].average = self.sum_good_images[addr]/self.n_good[addr]
             if self.n_dark[addr] > 0 :
                 self.data[addr].dark    = self.sum_dark_images[addr]/self.n_dark[addr]
+        
 
         if len(event_display_images)==0 :
             return
             
-        if self.image_manipulations is not None: 
-            for i in range ( 0, len(event_display_images) ):
-                            
-                if "Diff" in self.image_manipulations :
-                    lb1,ad1,im1 = event_display_images[i]
-                    lb2,ad2,im2 = event_display_images[i-1]
-                    event_display_images.append( ("diff","Diff %s-%s"%(lb1,lb2), im1-im2) )
-                                
-                if "FFT" in self.image_manipulations :
-                    F = np.fft.fftn(im1-im2)
-                    event_display_images.append( \
-                        ("fft","FFT %s-%s"%(lb1,lb2), np.log(np.abs(np.fft.fftshift(F))**2) ) )
+        #if self.image_manipulations is not None: 
+        #    for i in range ( 0, len(event_display_images) ):
+        #                    
+        #        if "Diff" in self.image_manipulations :
+        #            lb1,ad1,im1 = event_display_images[i]
+        #            lb2,ad2,im2 = event_display_images[i-1]
+        #            event_display_images.append( ("diff","Diff %s-%s"%(lb1,lb2), im1-im2) )
+        #                        
+        #        if "FFT" in self.image_manipulations :
+        #            F = np.fft.fftn(im1-im2)
+        #            event_display_images.append( \
+        #                ("fft","FFT %s-%s"%(lb1,lb2), np.log(np.abs(np.fft.fftshift(F))**2) ) )
                                     
             
                     
@@ -396,11 +398,17 @@ class  pyana_image ( object ) :
 
             # flag for pyana_plotter
             evt.put(True, 'show_event')
-            
+
+            # --- this works, but needs some tweaking to make it prettier
+            #for (name,title,image) in event_display_images:
+            #    self.plotter.add_frame(name,addr,(image,))
+            #newmode = self.plotter.plot_all_frames(fignum=self.mpl_num,ordered=True)
+
             newmode = self.plotter.draw_figurelist(self.mpl_num,
                                                    event_display_images,
                                                    title="Cameras shot#%d"%self.n_shots,
                                                    showProj=2   )
+
             if newmode is not None:
                 # propagate new display mode to the evt object 
                 evt.put(newmode,'display_mode')

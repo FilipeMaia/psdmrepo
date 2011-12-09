@@ -167,7 +167,6 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.proc_pyana = None
         self.proc_status = None
         self.configfile = None
-        self.runstring = None
 
         self.pvWindow = None
         self.scrollArea = None
@@ -972,7 +971,8 @@ Start with selecting data of interest to you from list on the left and general r
              or str(box.text()).find("Opal1000")>=0 
              or str(box.text()).find("Fccd")>=0 
              or str(box.text()).find("Princeton")>=0
-             or str(box.text()).find("pnCCD")>=0 ) :
+             or str(box.text()).find("pnCCD")>=0 
+             or str(box.text()).find("Cspad")>=0 ):
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_image")
             except ValueError :
@@ -985,45 +985,42 @@ Start with selecting data of interest to you from list on the left and general r
             address = str(box.text()).strip()
             options_for_mod[index].append("\nsources = %s" % address)
             options_for_mod[index].append("\nthreshold =   ; value (xlow:xhigh,ylow:yhigh) ")
-            options_for_mod[index].append("\nimage_rotations = " )
-            options_for_mod[index].append("\nimage_shifts = " )
-            options_for_mod[index].append("\nimage_scales = " )
-            options_for_mod[index].append("\nimage_manipulations = ")
             options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
+            options_for_mod[index].append("\ninputdark = ")
             options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
             options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
             options_for_mod[index].append("\nshow_projections = 0 ; 0: no projection, 1:project average, 2: project max values")
-            options_for_mod[index].append("\noutput_file = out.npy ")
+            options_for_mod[index].append("\noutputfile = ")
             options_for_mod[index].append("\nmax_save = 0   ; maximum number of event images to save" )
             options_for_mod[index].append("\nn_hdf5 = ") 
             return
 
-        # --- --- --- CsPad --- --- ---
-        if (str(box.text()).find("Cspad")>=0 ):
-            try :
-                index = modules_to_run.index("XtcExplorer.pyana_cspad")
-            except ValueError :
-                index = len(modules_to_run)
-                modules_to_run.append("XtcExplorer.pyana_cspad")
-                options_for_mod.append([])
+#        # --- --- --- CsPad --- --- ---
+#        if (str(box.text()).find("Cspad")>=0 ):
+#            try :
+#                index = modules_to_run.index("XtcExplorer.pyana_cspad")
+#            except ValueError :
+#                index = len(modules_to_run)
+#                modules_to_run.append("XtcExplorer.pyana_cspad")
+#                options_for_mod.append([])
 
-            #print "XtcExplorer.pyana_cspad at ", index
-            fname = self.filenames[0]
-            exp = fname.split('/')[5]
-            rnr = fname.split('/')[7].split('-')[1]
-            dfile = "cspad_%s_%s.npy"%(exp,rnr) 
-            #address = str(box.text()).split(":")[1].strip()
-            address = str(box.text()).strip()
-            options_for_mod[index].append("\nsource = %s" % address)
-            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
-            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
-            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
-            options_for_mod[index].append("\ndark_img_file = ")
-            options_for_mod[index].append("\nout_avg_file = %s"%dfile)
-            options_for_mod[index].append("\nout_shot_file = ")
-            options_for_mod[index].append("\nplot_vrange = ") 
-            options_for_mod[index].append("\nthreshold =   ; value (xlow:xhigh,ylow:yhigh) ")
-            return
+#            #print "XtcExplorer.pyana_cspad at ", index
+#            fname = self.filenames[0]
+#            exp = fname.split('/')[5]
+#            rnr = fname.split('/')[7].split('-')[1]
+#            dfile = "cspad_%s_%s.npy"%(exp,rnr) 
+#            #address = str(box.text()).split(":")[1].strip()
+#            address = str(box.text()).strip()
+#            options_for_mod[index].append("\nsource = %s" % address)
+#            options_for_mod[index].append("\nplot_every_n = %d" % self.plot_n)
+#            options_for_mod[index].append("\naccumulate_n = %d" % self.accum_n)
+#            options_for_mod[index].append("\nfignum = %d" % (100*(index+1)))
+#            options_for_mod[index].append("\ndark_img_file = ")
+#            options_for_mod[index].append("\nout_avg_file = %s"%dfile)
+#            options_for_mod[index].append("\nout_shot_file = ")
+#            options_for_mod[index].append("\nplot_vrange = ") 
+#            options_for_mod[index].append("\nthreshold =   ; value (xlow:xhigh,ylow:yhigh) ")
+#            return
 
         # --- --- --- Encoder --- --- ---
         if str(box.text()).find("Encoder")>=0 :
@@ -1126,7 +1123,6 @@ Start with selecting data of interest to you from list on the left and general r
         self.config_button.setDisabled(True)
         self.econfig_button.setEnabled(True)
 
-        self.pyana_runstring()
         self.pyana_button.setEnabled(True)
 
 
@@ -1186,7 +1182,8 @@ Start with selecting data of interest to you from list on the left and general r
         for file in self.filenames :
             lpoptions.append(file)
 
-        self.runstring = ' '.join(lpoptions)
+        runstring = ' '.join(lpoptions)
+        return runstring
 
     def run_pyana(self):
         """Run pyana
@@ -1195,7 +1192,9 @@ Start with selecting data of interest to you from list on the left and general r
         run pyana with the needed modules and configurations as requested
         based on the the checkboxes
         """
-        lpoptions = self.runstring.split(' ')
+        runstring = self.pyana_runstring()
+
+        lpoptions = runstring.split(' ')
 
         dialog =  QtGui.QInputDialog()
         dialog.resize(400,400)
@@ -1205,11 +1204,11 @@ Start with selecting data of interest to you from list on the left and general r
                                   'Pyana options',
                                   'Run pyana with the following command (edit as needed and click OK):',
                                   QtGui.QLineEdit.Normal,
-                                  text=self.runstring)
+                                  text=runstring)
 
         if ok:
-            self.runstring = str(text)
-            lpoptions = self.runstring.split(' ')
+            runstring = str(text)
+            lpoptions = runstring.split(' ')
 
             # and update run_n and skip_n in the Gui:
             if "-n" in lpoptions:

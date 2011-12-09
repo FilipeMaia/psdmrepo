@@ -42,7 +42,7 @@ class PyanaOptions( object ):
         options_string = options_string.split("\n")
         options_string = " ".join(options_string)
 
-        # make a list
+        # make a list (split by whitespace)
         options = options_string.split()
 
         if len(options)==0 :
@@ -73,6 +73,7 @@ class PyanaOptions( object ):
                 mydict[items[0]] = None
                 
         return mydict
+
            
     def getOptIntegers(self, options_string):
         """Return a list of integers
@@ -496,10 +497,6 @@ class Frame(object):
         - threshold management
         - display mode management
         """
-        print "Calling imshow from frame ", self
-        print self.name
-        print self.title
-    
         if ( self.vmin is None) and (self.vmin is not None ):
             self.vmin = self.vmin
         if ( self.vmax is None) and (self.vmax is not None ):
@@ -603,6 +600,8 @@ class Plotter(object):
         self.first = True
         self.cid1 = None
         self.cid2 = None
+
+        self.set_ROI = False
 
         self.settings() # defaults
 
@@ -770,11 +769,28 @@ class Plotter(object):
         print "The following clickable artist object was picked: ", event.artist
 
         # in which Frame?
-        for aplot in self.frames.itemsvalues() :
+        for aplot in self.frames.itervalues() :
             if aplot.axes == event.artist.axes : 
 
                 print "Current   threshold = ", aplot.threshold.value
                 print "          active area [xmin xmax ymin ymax] = ", aplot.threshold.area
+                print "To change the Region of Interest, Left-click"
+                if event.mouseevent.button==1:
+                    self.set_ROI = True
+                    print "************************************"
+                    print "You can now select a new ROI        "
+                    print "To cancel, right-click.             "
+                    print "************************************"
+
+                if event.mouseevent.button==3:
+                    self.set_ROI = False
+                    print "*************************************"
+                    print "ROI selction has now been deactivated "
+                    print "To select ROI again, left-click on the rectangle "
+                    print "************************************"
+                    
+
+                """
                 print "To change threshold value, middle-click..." 
                 print "To change active area, right-click..." 
                 
@@ -807,20 +823,22 @@ class Plotter(object):
                         print "Threshold value has been changed to ", aplot.threshold.value
                         plt.draw()
 
-            
+                """            
+
+
+
     # define what to do if we click on the plot
     def onclick(self, event) :
 
         if self.first : 
+            self.first = False
             print """
             To change the color scale, click on the color bar:
             - left-click sets the lower limit
             - right-click sets higher limit
             - middle-click resets to original
             """
-            self.first = False
         
-
         # -------------- clicks outside axes ----------------------
         # can we open a dialogue box here?
         if not event.inaxes and event.button == 3 :
@@ -828,6 +846,7 @@ class Plotter(object):
             #print "Close all mpl windows"
             #plt.close('all')
             
+
         # change display mode
         if not event.inaxes and event.button == 2 :
             new_mode = None
@@ -907,8 +926,12 @@ class Plotter(object):
                     aplot.update_axes()
                     plt.draw()
 
-
-
+                
+                if aplot.axes == event.inaxes: 
+                    if self.set_ROI:
+                        print "New area ", event.xdata, event.ydata
+                        self.ROI_coordinates = plt.ginput(n=0) 
+                        print "New coordinates", self.ROI_coordinates
 
     def plot_image(self, image, fignum=1, title="", showProj = False, extent=None):
         """ plot_image

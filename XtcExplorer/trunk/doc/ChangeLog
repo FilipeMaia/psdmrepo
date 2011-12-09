@@ -11,6 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Dec-08 ofte                 rev 2694
+	- pyana_image is quite a bit reduced / cleaned up, and pyana_cspad.py while 
+	  still there and valid, is becoming obsolete as it is handled as any other image
+	  by pyana_image.py
+	- Some GUI work ongoing. Not fully tested yet. 
 	
 2011-Nov-23 ofte                 rev 2664
          - in the process of cleaning up / improving pyana_image and others

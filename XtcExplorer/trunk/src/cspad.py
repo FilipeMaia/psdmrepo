@@ -199,8 +199,7 @@ class CsPad( object ):
         """get_2x2_image
         @param element      a single CsPad.MiniElementV1
         """
-        data = element.data()
-        quad = element.quad()
+        data = element.data()   # 185x388x2
         
         self.pixels = np.array( (data[:,:,0],data[:,:,1]) )
         # pixels should now be (2 x 185 x 388)
