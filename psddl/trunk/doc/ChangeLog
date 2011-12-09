@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2011-12-09 Andy Salnikov
+- switch to ndarray for accessing array data
+- work-in-progress hdf5 generator added
+
 Tag: V00-00-09
 2011-06-27 Andy Salnikov
 - fix missing method arguments in psanadoc
