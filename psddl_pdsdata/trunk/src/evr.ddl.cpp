@@ -17,14 +17,13 @@ int16_t
 PulseConfig::clear() const {
   return this->bf_clear()-1;
 }
-std::vector<int> EventCodeV5::desc_shape() const
-{
+std::vector<int>
+EventCodeV5::desc_shape() const {
   std::vector<int> shape;
   shape.reserve(1);
   shape.push_back(DescSize);
   return shape;
 }
-
 EvrData::OutputMap::Source
 OutputMap::source() const {
   return Source(_v & 0xff);
@@ -41,22 +40,6 @@ uint8_t
 OutputMap::conn_id() const {
   return _v >> 24;
 }
-std::vector<int> ConfigV1::pulses_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_npulses);
-  return shape;
-}
-
-std::vector<int> ConfigV1::output_maps_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_noutputs);
-  return shape;
-}
-
 EvrData::ConfigV2::BeamCode
 ConfigV2::beam() const {
   return (this->_opcode > beamOn) ? On : Off;
@@ -65,137 +48,16 @@ EvrData::ConfigV2::RateCode
 ConfigV2::rate() const {
   return (this->_opcode < beamOn) ? RateCode(this->_opcode-baseRate) :                  ((this->_opcode < singleShot) ? RateCode(this->_opcode-beamOn-baseRate) : Single);
 }
-std::vector<int> ConfigV2::pulses_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_npulses);
-  return shape;
-}
-
-std::vector<int> ConfigV2::output_maps_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_noutputs);
-  return shape;
-}
-
-std::vector<int> ConfigV3::eventcodes_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_neventcodes);
-  return shape;
-}
-
-std::vector<int> ConfigV3::pulses_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_npulses);
-  return shape;
-}
-
-std::vector<int> ConfigV3::output_maps_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_noutputs);
-  return shape;
-}
-
-std::vector<int> ConfigV4::eventcodes_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_neventcodes);
-  return shape;
-}
-
-std::vector<int> ConfigV4::pulses_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_npulses);
-  return shape;
-}
-
-std::vector<int> ConfigV4::output_maps_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_noutputs);
-  return shape;
-}
-
-std::vector<int> SequencerConfigV1::entries_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_length);
-  return shape;
-}
-
-std::vector<int> ConfigV5::eventcodes_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_neventcodes);
-  return shape;
-}
-
-std::vector<int> ConfigV5::pulses_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_npulses);
-  return shape;
-}
-
-std::vector<int> ConfigV5::output_maps_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_noutputs);
-  return shape;
-}
-
-std::vector<int> DataV3::fifoEvents_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_u32NumFifoEvents);
-  return shape;
-}
-
-std::vector<int> IOChannel::name_shape() const
-{
+std::vector<int>
+IOChannel::name_shape() const {
   std::vector<int> shape;
   shape.reserve(1);
   shape.push_back(NameLength);
   return shape;
 }
-
-std::vector<int> IOChannel::infos_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(MaxInfos);
-  return shape;
-}
-
 EvrData::OutputMap::Conn
 IOConfigV1::conn() const {
   return OutputMap::Conn(this->_conn);
 }
-std::vector<int> IOConfigV1::channels_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_nchannels);
-  return shape;
-}
-
 } // namespace EvrData
 } // namespace PsddlPds

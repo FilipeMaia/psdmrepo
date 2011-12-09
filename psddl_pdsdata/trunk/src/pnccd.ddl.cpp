@@ -5,37 +5,19 @@
 
 namespace PsddlPds {
 namespace PNCCD {
-std::vector<int> ConfigV2::info_shape() const
-{
+std::vector<int>
+ConfigV2::info_shape() const {
   std::vector<int> shape;
   shape.reserve(1);
   shape.push_back(256);
   return shape;
 }
-
-std::vector<int> ConfigV2::timingFName_shape() const
-{
+std::vector<int>
+ConfigV2::timingFName_shape() const {
   std::vector<int> shape;
   shape.reserve(1);
   shape.push_back(256);
   return shape;
 }
-
-std::vector<int> FrameV1::data_shape(const PNCCD::ConfigV1& cfg) const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back((cfg.payloadSizePerLink()-16)/2);
-  return shape;
-}
-
-std::vector<int> FrameV1::data_shape(const PNCCD::ConfigV2& cfg) const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back((cfg.payloadSizePerLink()-16)/2);
-  return shape;
-}
-
 } // namespace PNCCD
 } // namespace PsddlPds

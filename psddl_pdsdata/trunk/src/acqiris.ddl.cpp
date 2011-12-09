@@ -13,75 +13,17 @@ uint32_t
 ConfigV1::nbrChannels() const {
   return __builtin_popcount(this->_channelMask);
 }
-std::vector<int> ConfigV1::vert_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(MaxChan);
-  return shape;
-}
-
 uint64_t
 TimestampV1::value() const {
   return ((uint64_t)this->_timeStampHi)<<32 + this->_timeStampLo;
 }
-std::vector<int> DataDescV1Elem::timestamps_shape(const Acqiris::ConfigV1& cfg) const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(cfg.horiz().nbrSegments());
-  return shape;
-}
-
-std::vector<int> DataDescV1Elem::_skip_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->indexFirstPoint());
-  return shape;
-}
-
-std::vector<int> DataDescV1Elem::waveforms_shape(const Acqiris::ConfigV1& cfg) const
-{
-  std::vector<int> shape;
-  shape.reserve(2);
-  shape.push_back(cfg.horiz().nbrSegments());
-  shape.push_back(cfg.horiz().nbrSamples());
-  return shape;
-}
-
-std::vector<int> DataDescV1Elem::_extraSpace_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(_extraSize-this->indexFirstPoint());
-  return shape;
-}
-
-std::vector<int> DataDescV1::data_shape(const Acqiris::ConfigV1& cfg) const
-{
+std::vector<int>
+DataDescV1::data_shape(const Acqiris::ConfigV1& cfg) const {
   std::vector<int> shape;
   shape.reserve(1);
   shape.push_back(cfg.nbrChannels());
   return shape;
 }
-
-std::vector<int> TdcConfigV1::channels_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(NChannels);
-  return shape;
-}
-
-std::vector<int> TdcConfigV1::auxio_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(NAuxIO);
-  return shape;
-}
-
 uint32_t
 TdcDataV1Common::nhits() const {
   return this->bf_val_();
@@ -106,13 +48,5 @@ Acqiris::TdcDataV1Marker::Type
 TdcDataV1Marker::type() const {
   return Type(this->bf_val_());
 }
-std::vector<int> TdcDataV1::data_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(-1);
-  return shape;
-}
-
 } // namespace Acqiris
 } // namespace PsddlPds

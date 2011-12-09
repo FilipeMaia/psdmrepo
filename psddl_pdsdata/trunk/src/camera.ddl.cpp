@@ -13,22 +13,6 @@ Camera::FrameFexConfigV1::Processing
 FrameFexConfigV1::processing() const {
   return Processing(this->_processing);
 }
-std::vector<int> FrameFexConfigV1::masked_pixel_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_masked_pixel_count);
-  return shape;
-}
-
-std::vector<int> FrameV1::data_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_width*this->_height*((this->_depth+7)/8));
-  return shape;
-}
-
 TwoDGaussianV1::TwoDGaussianV1()
 {
 }

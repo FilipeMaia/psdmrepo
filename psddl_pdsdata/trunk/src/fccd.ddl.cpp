@@ -37,21 +37,5 @@ uint32_t
 FccdConfigV2::trimmedHeight() const {
   return Trimmed_Row_Pixels;
 }
-std::vector<int> FccdConfigV2::dacVoltages_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(NVoltages);
-  return shape;
-}
-
-std::vector<int> FccdConfigV2::waveforms_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(NWaveforms);
-  return shape;
-}
-
 } // namespace FCCD
 } // namespace PsddlPds

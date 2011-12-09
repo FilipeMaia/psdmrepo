@@ -13,21 +13,5 @@ uint8_t
 PVMonitor::array() const {
   return _index != NoArray;
 }
-std::vector<int> ConfigV1::pvControls_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_npvControls);
-  return shape;
-}
-
-std::vector<int> ConfigV1::pvMonitors_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_npvMonitors);
-  return shape;
-}
-
 } // namespace ControlData
 } // namespace PsddlPds

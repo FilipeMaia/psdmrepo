@@ -13,21 +13,5 @@ uint32_t
 ConfigV1::output_resolution_bits() const {
   return this->output_resolution()*2+8;
 }
-std::vector<int> ConfigV1::output_lookup_table_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(Output_LUT_Size*this->output_lookup_table_enabled());
-  return shape;
-}
-
-std::vector<int> ConfigV1::defect_pixel_coordinates_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_defectPixelCount);
-  return shape;
-}
-
 } // namespace Opal1k
 } // namespace PsddlPds
