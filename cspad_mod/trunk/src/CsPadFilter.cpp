@@ -149,13 +149,8 @@ CsPadFilter::event(Event& evt, Env& env)
 
         const Psana::CsPad::ElementV1& el = data1->quads(q);
 
-        // get data and its size
-        const int16_t* data = el.data();
-        const std::vector<int>& dshape = el.data_shape();
-        int dsize = std::accumulate(dshape.begin(), dshape.end(), 1, std::multiplies<int>());
-
         // call filter
-        bool stat = filter->filter(data, dsize);
+        bool stat = filter->filter(el.data());
         if (stat) {
           // at least some data is good, do not skip and stop here
           MsgLog(name(), debug, name() << ": Good data found in CsPad::DataV1 quadrant=" << el.quad());
@@ -186,13 +181,8 @@ CsPadFilter::event(Event& evt, Env& env)
 
         const Psana::CsPad::ElementV2& el = data2->quads(q);
 
-        // get data and its size
-        const int16_t* data = el.data();
-        const std::vector<int>& dshape = el.data_shape();
-        int dsize = std::accumulate(dshape.begin(), dshape.end(), 1, std::multiplies<int>());
-
         // call filter
-        bool stat = filter->filter(data, dsize);
+        bool stat = filter->filter(el.data());
         if (stat) {
           // at least some data is good, do not skip and stop here
           MsgLog(name(), debug, name() << ": Good data found in CsPad::DataV2 quadrant=" << el.quad());
@@ -219,13 +209,8 @@ CsPadFilter::event(Event& evt, Env& env)
 
       const Psana::CsPad::MiniElementV1& el = *mini1;
 
-      // get data and its size
-      const int16_t* data = el.data();
-      const std::vector<int>& dshape = el.data_shape();
-      int dsize = std::accumulate(dshape.begin(), dshape.end(), 1, std::multiplies<int>());
-
       // call filter
-      bool stat = filter->filter(data, dsize);
+      bool stat = filter->filter(el.data());
       if (stat) {
         // at least some data is good, do not skip and stop here
         MsgLog(name(), debug, name() << ": Good data found in CsPad::MiniElementV1 quadrant=" << el.quad());

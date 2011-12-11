@@ -54,10 +54,16 @@ MiniElementV1::MiniElementV1 (const Psana::CsPad::MiniElementV1& elem,
   , m_frame_type(elem.frame_type())
   , m_data(data)
   , m_common_mode()
-  , m_sb_temp_shape(elem.sb_temp_shape())
-  , m_data_shape(elem.data_shape())
 {
-  std::copy(elem.sb_temp(), elem.sb_temp()+Nsbtemp, m_sb_temp);
+  // copy sb_temp array
+  const ndarray<uint16_t, 1>& sb_temp = elem.sb_temp();
+  std::copy(sb_temp.begin(), sb_temp.end(), m_sb_temp);
+
+  // copy data shape
+  const ndarray<int16_t, 3>& edata = elem.data();
+  std::copy(edata.shape(), edata.shape()+3, m_data_shape);
+
+  // copy common_mode array
   std::copy(common_mode, common_mode+2, m_common_mode);
 }
 

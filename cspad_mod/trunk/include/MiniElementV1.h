@@ -82,14 +82,10 @@ public:
   virtual uint32_t seq_count() const { return m_seq_count; }
   virtual uint32_t ticks() const { return m_ticks; }
   virtual uint32_t fiducials() const { return m_fiducials; }
-  virtual const uint16_t* sb_temp() const { return m_sb_temp; }
+  virtual ndarray<uint16_t, 1> sb_temp() const { return make_ndarray(m_sb_temp, Nsbtemp); }
   virtual uint32_t frame_type() const { return m_frame_type; }
-  virtual const int16_t* data() const { return m_data; }
+  virtual ndarray<int16_t, 3> data() const { return ndarray<int16_t, 3>(m_data, m_data_shape); }
   virtual float common_mode(uint32_t section) const { return m_common_mode[section]; }
-  /** Method which returns the shape (dimensions) of the data returned by sb_temp() method. */
-  virtual std::vector<int> sb_temp_shape() const { return m_sb_temp_shape; }
-  /** Method which returns the shape (dimensions) of the data returned by data() method. */
-  virtual std::vector<int> data_shape() const { return m_data_shape; }
 
 protected:
 
@@ -108,8 +104,7 @@ private:
   uint32_t m_frame_type;
   const int16_t* m_data;
   float m_common_mode[2];
-  std::vector<int> m_sb_temp_shape;
-  std::vector<int> m_data_shape;
+  unsigned m_data_shape[3];
 
   // Copy constructor and assignment are disabled by default
   MiniElementV1 ( const MiniElementV1& ) ;

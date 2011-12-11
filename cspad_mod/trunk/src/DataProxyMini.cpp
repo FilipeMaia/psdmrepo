@@ -89,8 +89,10 @@ DataProxyMini::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, con
   // loop over sections
   for ( unsigned sect = 0; sect < nSect ; ++ sect ) {
 
+    const ndarray<int16_t, 3>& data = obj->data();
+
     // start of pixel data
-    const int16_t* sdata = obj->data() + sect;
+    const int16_t* sdata = data.data() + sect;
 
     // output pixel data
     int16_t* output = pixelData + sect;

@@ -146,7 +146,8 @@ CsPadPedestals::event(Event& evt, Env& env)
       ++ m_count;
       
       // process statistics for 2x2
-      collectStat2x2(data1->data());
+      const ndarray<int16_t, 3>& data = data1->data();
+      collectStat2x2(data.data());
       
     }
     
@@ -166,7 +167,8 @@ CsPadPedestals::event(Event& evt, Env& env)
         const CsPad::ElementV1& quad = data1->quads(iq);
   
         // process statistics for this quad
-        collectStat(quad.quad(), quad.data());
+        const ndarray<int16_t, 3>& data = quad.data();
+        collectStat(quad.quad(), data.data());
       }
       
     }
@@ -183,7 +185,8 @@ CsPadPedestals::event(Event& evt, Env& env)
         const CsPad::ElementV2& quad = data2->quads(iq);
   
         // process statistics for this quad
-        collectStat(quad.quad(), quad.data());
+        const ndarray<int16_t, 3>& data = quad.data();
+        collectStat(quad.quad(), data.data());
       }
       
     }

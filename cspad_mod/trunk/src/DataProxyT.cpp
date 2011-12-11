@@ -92,10 +92,13 @@ DataProxyT<DataType, ElemType>::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds:
     // quadrant number
     int iq = elem.quad();
 
+    // data array
+    const ndarray<int16_t, 3>& data = elem.data();
+
     uint32_t sMask = elem.sectionMask();
 
     // get few constants
-    const unsigned nSect = elem.data_shape()[0];
+    const unsigned nSect = data.shape()[0];
     const unsigned ssize = Pds::CsPad::ColumnsPerASIC*Pds::CsPad::MaxRowsPerASIC*2;
 
     // make data arrays
@@ -108,7 +111,7 @@ DataProxyT<DataType, ElemType>::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds:
       if ( not (sMask & (1 << is))) continue;
 
       // start of pixel data
-      const int16_t* sdata = elem.data() + sect*ssize;
+      const int16_t* sdata = &data[sect][0][0];
 
       // output pixel data
       int16_t* output = pixelData + sect*ssize;
