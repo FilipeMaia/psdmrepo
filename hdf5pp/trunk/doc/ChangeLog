@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2011-12-10 Andy Salnikov
+- fix to TypeTraits to allow const types
+
 Tag: V00-02-00
 2011-12-09 Andy Salnikov
 - adding bunch of methods for read access to HDF5 file data

@@ -59,6 +59,11 @@ struct TypeTraits  {
   static void* address( T& value ) { return static_cast<void*>(&value) ; }
 };
 
+// const type traits are the same as non-const
+template <typename T>
+struct TypeTraits<const T> : public TypeTraits<T> {
+};
+
 #define TYPE_TRAITS_SIMPLE(CPP_TYPE,H5_TYPE) \
   template <> struct TypeTraits<CPP_TYPE> { \
     static Type stored_type() { return Type::LockedType(H5_TYPE); } \
