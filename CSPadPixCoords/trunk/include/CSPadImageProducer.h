@@ -108,7 +108,7 @@ protected:
 
   void getQuadConfigPars(Env& env);
   void cspad_image_init();
-  void cspad_image_fill (const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void cspad_image_fill (const ndarray<int16_t, 3>& data, const QuadParameters& quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void cspad_image_save_in_file(const std::string &filename = "cspad_image.txt");
   void cspad_image_add_in_event(Event& evt, const std::string &keyname = "CSPad:Image");
 

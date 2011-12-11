@@ -63,14 +63,12 @@ public:
    *  @brief Creates an object which holds the current quad parameters.
    *  
    *  @param[in] quadNumber      Current quad number.
-   *  @param[in] image_shape     Vector of the section parameters: Nsections, Ncolumns, Nrows.
    *  @param[in] nrows           Number of rows reserved for the quad image.
    *  @param[in] ncols           Number of columns reserved for the quad image.
    *  @param[in] numAsicsStored  Number of ASICs stored for this quad in the event. 
    *  @param[in] roiMask         8-bit mask showing the sections presented in data.
    */ 
   QuadParameters (uint32_t         quadNumber, 
-                  std::vector<int> image_shape, 
                   size_t           nrows=850, 
                   size_t           ncols=850, 
                   uint32_t         numAsicsStored=16, 
@@ -79,12 +77,11 @@ public:
   // Destructor
   virtual ~QuadParameters () ;
 
-  size_t           getNRows             (){ return m_nrows;   };
-  size_t           getNCols             (){ return m_ncols;   };
-  uint32_t         getRoiMask           (){ return m_roiMask; };
-  uint32_t         getQuadNumber        (){ return m_quadNumber; };
-  uint32_t         getNumberAsicsStroed (){ return m_numAsicsStored; };
-  std::vector<int> getImageShapeVector  (){ return v_image_shape; };
+  size_t           getNRows             () const { return m_nrows;   };
+  size_t           getNCols             () const { return m_ncols;   };
+  uint32_t         getRoiMask           () const { return m_roiMask; };
+  uint32_t         getQuadNumber        () const { return m_quadNumber; };
+  uint32_t         getNumberAsicsStroed () const { return m_numAsicsStored; };
 
   void print ();
 
@@ -100,7 +97,6 @@ private:
 
   // Data members
   uint32_t         m_quadNumber;
-  std::vector<int> v_image_shape;
   size_t           m_nrows;
   size_t           m_ncols;
   uint32_t         m_numAsicsStored;

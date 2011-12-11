@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2011-10-04 Andy Salnikov
+- migration to use ndarray for cspad images
+
 Tag: V00-01-00
 2011-10-04 Andy Salnikov
 - cspad image data type has changed from uint16_t to int16_t, updating code here

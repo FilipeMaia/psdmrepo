@@ -178,8 +178,8 @@ CSPadInterpolImageProducer::event(Event& evt, Env& env)
   if (data2.get()) {
 
     bool  quadIsAvailable[] = {false, false, false, false};
-    const int16_t* data[4];
-    CSPadPixCoords::QuadParameters *quadpars[4];
+    ndarray<int16_t, 3> data[4];
+    QuadParameters *quadpars[4];
    
     int nQuads = data2->quads_shape()[0];
 
@@ -188,8 +188,7 @@ CSPadInterpolImageProducer::event(Event& evt, Env& env)
         int  quad  = el.quad();
 
         data[quad] = el.data();
-        std::vector<int> v_image_shape = el.data_shape();
-        quadpars[quad] = new CSPadPixCoords::QuadParameters(quad, v_image_shape, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
+        quadpars[quad] = new QuadParameters(quad, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
         quadIsAvailable[quad] = true;
 
 	//cout << " q = "                     << q 
@@ -521,7 +520,7 @@ CSPadInterpolImageProducer::cspad_image_init()
   * Fill the CSPad array with interpolation.
   */ 
 void
-CSPadInterpolImageProducer::cspad_image_interpolated_fill (const int16_t* data[], CSPadPixCoords::QuadParameters* quadpars[], bool quadIsAvailable[])
+CSPadInterpolImageProducer::cspad_image_interpolated_fill (ndarray<int16_t, 3> data[], QuadParameters* quadpars[], bool quadIsAvailable[])
 {
     for (unsigned ix=0; ix<NX_CSPAD; ix++){
     for (unsigned iy=0; iy<NY_CSPAD; iy++){
@@ -542,8 +541,7 @@ CSPadInterpolImageProducer::cspad_image_interpolated_fill (const int16_t* data[]
 	  bool  bitIsOn = (quadpars[addr.quad]->getRoiMask()) & (1<<addr.sect);
           if ( !bitIsOn ) continue; 
 
-          const int16_t *data2x1 = &data[addr.quad][addr.sect * m_sizeOf2x1Img];
-          const double f = (double)data2x1[addr.col*m_nrows2x1+addr.row];
+          const double f = (double)data[addr.quad][addr.sect][addr.col][addr.row];
 	  const double w = (double)m_weight [ix][iy][ip];
 
           sum_wf += (w * f);

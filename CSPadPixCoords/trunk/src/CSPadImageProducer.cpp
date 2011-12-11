@@ -174,11 +174,10 @@ CSPadImageProducer::event(Event& evt, Env& env)
     for (int q = 0; q < nQuads; ++ q) {
         const Psana::CsPad::ElementV2& el = data2->quads(q);
 
-        const int16_t* data = el.data();
+        const ndarray<int16_t, 3>& data = el.data();
         int            quad = el.quad() ;
 
-        std::vector<int> v_image_shape = el.data_shape();
-        CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(quad, v_image_shape, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
+        CSPadPixCoords::QuadParameters quadpars(quad, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
 
 	this -> cspad_image_fill (data, quadpars, m_cspad_calibpar);
     }
@@ -237,19 +236,16 @@ CSPadImageProducer::cspad_image_init()
 //--------------------
 
 void
-CSPadImageProducer::cspad_image_fill(const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+CSPadImageProducer::cspad_image_fill(const ndarray<int16_t, 3>& data, const QuadParameters& quadpars, PSCalib::CSPadCalibPars* cspad_calibpar)
 {
-      //int              quad           = quadpars -> getQuadNumber();
-        uint32_t         roiMask        = quadpars -> getRoiMask();
-	std::vector<int> v_image_shape  = quadpars -> getImageShapeVector();
+      //int              quad           = quadpars.getQuadNumber();
+        uint32_t         roiMask        = quadpars.getRoiMask();
 
 	for(uint32_t sect=0; sect < m_n2x1; sect++)
 	{
 	     bool bitIsOn = roiMask & (1<<sect);
 	     if( !bitIsOn ) { m_cspad_ind += m_sizeOf2x1Img; continue; }
  
-             const int16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
-
              //cout  << "  add section " << sect << endl;	     
  
              for (uint32_t c=0; c<m_ncols2x1; c++) {
@@ -269,7 +265,7 @@ CSPadImageProducer::cspad_image_fill(const int16_t* data, CSPadPixCoords::QuadPa
 	       if(ix >= NX_CSPAD) continue;
 	       if(iy >= NY_CSPAD) continue;
 
-               m_arr_cspad_image[ix][iy] += (double)data2x1[c*m_nrows2x1+r];
+               m_arr_cspad_image[ix][iy] += (double)data[sect][c][r];
              }
              }
 	}
