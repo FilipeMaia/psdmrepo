@@ -23,6 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "ErrSvc/Issue.h"
 #include "hdf5pp/ArrayType.h"
 #include "hdf5pp/TypeTraits.h"
 #include "H5DataTypes/H5DataUtils.h"
@@ -31,6 +32,15 @@
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
+
+namespace {
+
+  class BadShape: public ErrSvc::Issue {
+  public:
+    BadShape(const ErrSvc::Context& ctx) : ErrSvc::Issue(ctx, "Illegal shape of data array") {}
+  };
+
+}
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -50,8 +60,16 @@ CsPadPixelStatusV1::CsPadPixelStatusV1 ()
 
 CsPadPixelStatusV1::CsPadPixelStatusV1 (const DataType& data) 
 { 
-  const DataType::StatusCodes& pdata = data.status();
-  const DataType::status_t* src = &pdata[0][0][0][0];
+  const ndarray<DataType::status_t, 4>& sdata = data.status();
+
+  // verify that data shape is what we expect
+  const unsigned* shape = sdata.shape();
+  if (shape[0] != DataType::Quads or shape[1] != DataType::Sections or
+      shape[2] != DataType::Columns or shape[3] != DataType::Rows) {
+    throw BadShape(ERR_LOC);
+  }
+
+  const DataType::status_t* src = &sdata[0][0][0][0];
   DataType::status_t* dst = &status[0][0][0][0];
   std::copy(src, src+int(DataType::Size), dst );
 }

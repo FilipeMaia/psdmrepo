@@ -65,7 +65,7 @@ protected:
 
 private:
 
-  DataType::Pedestals pedestals;
+  DataType::pedestal_t pedestals[DataType::Quads][DataType::Sections][DataType::Columns][DataType::Rows];
 
 };
 

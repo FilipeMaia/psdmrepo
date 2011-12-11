@@ -65,7 +65,7 @@ protected:
 
 private:
 
-  DataType::StatusCodes status;
+  DataType::status_t status[DataType::Columns][DataType::Rows][DataType::Sections];
 
 };
 

@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-46
+2011-12-10 Andy Salnikov
+- migration cspad calibration classes to ndarray use
+
 Tag: V00-00-45
 2011-12-08 Andy Salnikov
 - ObjectContainer class now has smarter algorithm for determining 

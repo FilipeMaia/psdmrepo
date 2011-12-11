@@ -23,6 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "ErrSvc/Issue.h"
 #include "hdf5pp/ArrayType.h"
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/TypeTraits.h"
@@ -32,6 +33,15 @@
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
+
+namespace {
+
+  class BadShape: public ErrSvc::Issue {
+  public:
+    BadShape(const ErrSvc::Context& ctx) : ErrSvc::Issue(ctx, "Illegal shape of data array") {}
+  };
+
+}
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -50,7 +60,15 @@ CsPadPedestalsV1::CsPadPedestalsV1 ()
 
 CsPadPedestalsV1::CsPadPedestalsV1 (const DataType& data) 
 { 
-  const DataType::Pedestals& pdata = data.pedestals();
+  const ndarray<DataType::pedestal_t, 4>& pdata = data.pedestals();
+
+  // verify that data shape is what we expect
+  const unsigned* shape = pdata.shape();
+  if (shape[0] != DataType::Quads or shape[1] != DataType::Sections or
+      shape[2] != DataType::Columns or shape[3] != DataType::Rows) {
+    throw BadShape(ERR_LOC);
+  }
+
   const DataType::pedestal_t* src = &pdata[0][0][0][0];
   DataType::pedestal_t* dst = &pedestals[0][0][0][0];
   std::copy(src, src+int(DataType::Size), dst );
