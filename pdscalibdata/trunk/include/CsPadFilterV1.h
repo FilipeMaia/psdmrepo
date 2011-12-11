@@ -20,10 +20,10 @@
 // Base Class Headers --
 //----------------------
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "ndarray/ndarray.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -83,7 +83,7 @@ public:
    *                      optionally common mode) subtraction
    *  @param nPixel       Number of pixels in the data
    */
-  bool filter(const int16_t* pixelData, unsigned nPixel) const;
+  bool filter(const ndarray<int16_t, 3>& pixelData) const;
   
 protected:
 

@@ -43,7 +43,7 @@ namespace pdscalibdata {
 CsPadMiniPixelStatusV1::CsPadMiniPixelStatusV1 ()
 {
   // fill all status codes with zeros
-  std::fill_n(&m_status[0][0][0], int(Size), status_t(0));
+  std::fill_n(m_status, int(Size), status_t(0));
 }
 
 CsPadMiniPixelStatusV1::CsPadMiniPixelStatusV1 (const std::string& fname)
@@ -57,7 +57,7 @@ CsPadMiniPixelStatusV1::CsPadMiniPixelStatusV1 (const std::string& fname)
   }
 
   // read all numbers
-  status_t* it = &m_status[0][0][0];
+  status_t* it = m_status;
   size_t count = 0;
   while(in and count != Size) {
     in >> *it++;

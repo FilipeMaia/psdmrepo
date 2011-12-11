@@ -23,6 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "ndarray/ndarray.h"
 #include "pdsdata/cspad/Detector.hh"
 
 //------------------------------------
@@ -59,9 +60,6 @@ public:
   enum { Size = Sections*Columns*Rows };
 
   typedef float pedestal_t;
-  // organization of data in MiniElement is quite different from
-  // regular CsPad elements
-  typedef pedestal_t Pedestals[Columns][Rows][Sections];
 
   // Default constructor
   CsPadMiniPedestalsV1 () ;
@@ -73,14 +71,16 @@ public:
   ~CsPadMiniPedestalsV1 () ;
 
   // access pedestal data
-  const Pedestals& pedestals() const { return m_pedestals; }
+  ndarray<pedestal_t, 3> pedestals() const {
+    return make_ndarray(m_pedestals, Columns, Rows, Sections);
+  }
 
 protected:
 
 private:
 
   // Data members
-  Pedestals m_pedestals;
+  pedestal_t m_pedestals[Size];
 
 };
 

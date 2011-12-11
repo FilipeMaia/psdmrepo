@@ -22,6 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "ndarray/ndarray.h"
 #include "pdsdata/cspad/Detector.hh"
 
 //------------------------------------
@@ -63,7 +64,6 @@ public:
   };
   
   typedef uint16_t status_t;
-  typedef status_t StatusCodes[Quads][Sections][Columns][Rows];
   
   /// Default constructor, all pixel codes set to 0
   CsPadPixelStatusV1 () ;
@@ -79,14 +79,16 @@ public:
   ~CsPadPixelStatusV1 () ;
 
   // access status data
-  const StatusCodes& status() const { return m_status; }
+  ndarray<status_t, 4> status() const {
+    return make_ndarray(m_status, Quads, Sections, Columns, Rows);
+  }
 
 protected:
 
 private:
 
   // Data members  
-  StatusCodes m_status;
+  status_t m_status[Size];
 
   // Copy constructor and assignment are disabled by default
   CsPadPixelStatusV1 ( const CsPadPixelStatusV1& ) ;

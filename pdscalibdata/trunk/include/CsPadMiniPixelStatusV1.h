@@ -23,6 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "ndarray/ndarray.h"
 #include "pdsdata/cspad/Detector.hh"
 
 //------------------------------------
@@ -66,9 +67,6 @@ public:
   };
 
   typedef uint16_t status_t;
-  // organization of data in MiniElement is quite different from
-  // regular CsPad elements
-  typedef status_t StatusCodes[Columns][Rows][Sections];
 
   /// Default constructor, all pixel codes set to 0
   CsPadMiniPixelStatusV1 () ;
@@ -84,14 +82,16 @@ public:
   ~CsPadMiniPixelStatusV1 () ;
 
   // access status data
-  const StatusCodes& status() const { return m_status; }
+  ndarray<status_t, 3> status() const {
+    return make_ndarray(m_status, Columns, Rows, Sections);
+  }
 
 protected:
 
 private:
 
   // Data members
-  StatusCodes m_status;
+  status_t m_status[Size];
 
 };
 

@@ -109,17 +109,17 @@ CsPadFilterV1::~CsPadFilterV1 ()
 }
 
 bool
-CsPadFilterV1::filter(const int16_t* pixelData, unsigned nPixel) const
+CsPadFilterV1::filter(const ndarray<int16_t, 3>& pixelData) const
 {
   if (m_mode == None) return true;
   
-  unsigned count = std::count_if(pixelData, pixelData+nPixel, ::HigherThan(int(m_data[0])));
+  unsigned count = std::count_if(pixelData.begin(), pixelData.end(), ::HigherThan(int(m_data[0])));
   
   MsgLog(logger, debug, "CsPadFilterV1::filter - " << count << " pixels above " << m_data[0]);
   
   if (m_data[1] < 0) {
     // m_data[0] is a percentage
-    return count > -m_data[1]/100*nPixel;    
+    return count > -m_data[1]/100*pixelData.size();
   } else {
     // m_data[0] is absolute pixel count
     return count > m_data[1];

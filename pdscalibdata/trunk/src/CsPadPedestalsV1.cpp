@@ -43,7 +43,7 @@ namespace pdscalibdata {
 CsPadPedestalsV1::CsPadPedestalsV1 ()
 {
   // fill all pedestals with zeros
-  std::fill_n(&m_pedestals[0][0][0][0], int(Size), pedestal_t(0));
+  std::fill_n(m_pedestals, int(Size), pedestal_t(0));
 }
 
 CsPadPedestalsV1::CsPadPedestalsV1 (const std::string& fname) 
@@ -57,7 +57,7 @@ CsPadPedestalsV1::CsPadPedestalsV1 (const std::string& fname)
   }
 
   // read all numbers
-  pedestal_t* it = &m_pedestals[0][0][0][0];
+  pedestal_t* it = m_pedestals;
   size_t count = 0;
   while(in and count != Size) {
     in >> *it++;

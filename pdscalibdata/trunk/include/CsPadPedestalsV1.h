@@ -22,6 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "ndarray/ndarray.h"
 #include "pdsdata/cspad/Detector.hh"
 
 //------------------------------------
@@ -56,7 +57,6 @@ public:
   enum { Size = Quads*Sections*Columns*Rows };
   
   typedef float pedestal_t;
-  typedef pedestal_t Pedestals[Quads][Sections][Columns][Rows];
   
   // Default constructor
   CsPadPedestalsV1 () ;
@@ -68,14 +68,16 @@ public:
   ~CsPadPedestalsV1 () ;
 
   // access pedestal data
-  const Pedestals& pedestals() const { return m_pedestals; }
+  ndarray<pedestal_t, 4> pedestals() const {
+    return make_ndarray(m_pedestals, Quads, Sections, Columns, Rows);
+  }
 
 protected:
 
 private:
 
   // Data members  
-  Pedestals m_pedestals;
+  pedestal_t m_pedestals[Size];
 
   // Copy constructor and assignment are disabled by default
   CsPadPedestalsV1 ( const CsPadPedestalsV1& ) ;

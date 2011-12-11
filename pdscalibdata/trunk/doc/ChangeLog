@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2011-12-10 Andy Salnikov
+- switch to using ndarray for arrays
+
 Tag: V00-01-01
 2011-10-04 Andy Salnikov
 - CsPadCommonModeSubV1 and CsPadFilterV1 now can be initialized through
