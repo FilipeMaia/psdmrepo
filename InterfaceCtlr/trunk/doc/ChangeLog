@@ -10,6 +10,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-11
+2011-12-11 Andy Salnikov
+- fix formatting of shutil.Error exceptions
+
 Tag: V01-00-10
 2011-12-09 Andy Salnikov
 - add set_status command to ic-command

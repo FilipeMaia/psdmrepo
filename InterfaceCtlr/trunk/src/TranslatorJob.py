@@ -56,6 +56,21 @@ _defOutputDirTmp = "/reg/d/psdm/%(instrument_lower)s/%(experiment)s/hdf5/%(run_n
 _defLogDir = "/reg/g/psdm/psdatmgr/ic/log/o2o-translate-%(experiment)s"
 _defLogName = "o2o-translate-%(experiment)s-r%(run_number)04d-%(current_time)s.log"
 
+
+# shutil.Error has rather weird content that needs special formatting
+def _shutilErrFmt(ex):
+    
+    def _fmt(item):
+        if isinstance(item, tuple):
+            return '(' + ', '.join([_fmt(x) for x in item]) + ')'
+        elif isinstance(item, list):
+            return '[' + ', '.join([_fmt(x) for x in item]) + ']'
+        else:
+            return str(item)
+    
+    return _fmt(ex.args)
+
+
 #-------------------
 # Local functions --
 #-------------------
@@ -355,7 +370,7 @@ class TranslatorJob(object) :
                 shutil.move(tmpdirname, tmpdirfinal)
             except Exception, e:
                 self.error("store_hdf5: failed to move output files to directory %s", tmpdirfinal)
-                self.error("store_hdf5: exception raised: %s", str(e) )
+                self.error("store_hdf5: exception raised: %s", _shutilErrFmt(e) )
                 return 2
 
         try:
@@ -378,7 +393,7 @@ class TranslatorJob(object) :
                         shutil.move(dst, dstbck)
                     except Exception, e :
                         self.error("store_hdf5: failed to backup file %s", dst)
-                        self.error("store_hdf5: exception raised: %s", str(e) )
+                        self.error("store_hdf5: exception raised: %s", _shutilErrFmt(e) )
                         return 2
         else:
             # check that final destination does not have these files
@@ -398,7 +413,7 @@ class TranslatorJob(object) :
                 shutil.move(src,dst)
             except Exception, e :
                 self.error("store_hdf5: failed to move file: %s -> %s", src, dst)
-                self.error("store_hdf5: exception raised: %s", str(e) )
+                self.error("store_hdf5: exception raised: %s", _shutilErrFmt(e) )
                 return 2
         
         # remove temporary directory
