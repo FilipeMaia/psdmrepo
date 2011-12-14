@@ -43,7 +43,7 @@ namespace cspad_mod {
 /**
  *  @ingroup cspad_mod
  *
- *  @briefProxy for DataT/ElementT which performs calibration.
+ *  @brief Proxy for DataT/ElementT which performs calibration.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.

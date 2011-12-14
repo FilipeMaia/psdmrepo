@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-03
+2011-12-14 Andy Salnikov
+- fixing few doxygen issues
+
 Tag: V00-01-02
 2011-10-28 Andy Salnikov
 - CsPadPedestals module now understand 2x2 data and makes pedestals for 
