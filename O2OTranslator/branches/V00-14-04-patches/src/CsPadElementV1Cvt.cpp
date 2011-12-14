@@ -31,6 +31,7 @@
 #include "pdscalibdata/CsPadPixelStatusV1.h"
 #include "pdsdata/cspad/ConfigV1.hh"
 #include "pdsdata/cspad/ConfigV2.hh"
+#include "pdsdata/cspad/ConfigV3.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -103,10 +104,14 @@ CsPadElementV1Cvt::typedConvertSubgroup ( hdf5pp::Group group,
   // find corresponding configuration object, it could be ConfigV1 or ConfigV2 
   Pds::TypeId cfgTypeId1(Pds::TypeId::Id_CspadConfig, 1);
   Pds::TypeId cfgTypeId2(Pds::TypeId::Id_CspadConfig, 2);
+  Pds::TypeId cfgTypeId3(Pds::TypeId::Id_CspadConfig, 3);
   if ( const Pds::CsPad::ConfigV1* config = m_configStore.find<Pds::CsPad::ConfigV1>(cfgTypeId1, src.top()) ) {
     qMask = config->quadMask();
     sMask = config->asicMask()==1 ? 0x3 : 0xff;
   } else if ( const Pds::CsPad::ConfigV2* config = m_configStore.find<Pds::CsPad::ConfigV2>(cfgTypeId2, src.top()) ) {
+    qMask = config->quadMask();
+    sMask = config->asicMask()==1 ? 0x3 : 0xff;
+  } else if ( const Pds::CsPad::ConfigV3* config = m_configStore.find<Pds::CsPad::ConfigV3>(cfgTypeId3, src.top()) ) {
     qMask = config->quadMask();
     sMask = config->asicMask()==1 ? 0x3 : 0xff;
   } else {
