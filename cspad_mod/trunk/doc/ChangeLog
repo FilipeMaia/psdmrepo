@@ -11,6 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2011-12-14 Andy Salnikov
+- applying patch V00-01-03 to the trunk
+
+Tag: V00-01-03
+2011-12-14 Andy Salnikov
+- fixing few doxygen issues (on branch V00-01-02-patches)
+
 Tag: V00-02-00
 2011-12-10 Andy Salnikov
 - migration to ndarray

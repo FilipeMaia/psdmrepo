@@ -85,11 +85,11 @@ public:
 protected:
 
   // add calibration proxies for DataV* classes
-  void addProxyV1(const EventKey& key, Event& evt, Env& env);
-  void addProxyV2(const EventKey& key, Event& evt, Env& env);
+  void addProxyV1(const PSEvt::EventKey& key, Event& evt, Env& env);
+  void addProxyV2(const PSEvt::EventKey& key, Event& evt, Env& env);
 
   // add calibration proxies for MiniElementV* classes
-  void addProxyMini(const EventKey& key, Event& evt, Env& env);
+  void addProxyMini(const PSEvt::EventKey& key, Event& evt, Env& env);
 
 private:
 
