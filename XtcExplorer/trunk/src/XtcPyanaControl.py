@@ -188,6 +188,7 @@ class XtcPyanaControl ( QtGui.QWidget ) :
         self.info_widget = None
 
         # assume all events        
+        #self.verbose = None
         self.run_n = None 
         self.skip_n = None 
         self.num_cpu = 1
@@ -811,14 +812,11 @@ Start with selecting data of interest to you from list on the left and general r
             
         #print "XtcExplorer.pyana_scan at ", index
         source = str(box.text())
-        if source.find("BldInfo")>=0 :
-            options_for_mod[index].append("\ninput_scalars = %s" % source.split(": ")[1] )
-            return
         if source.find("EpicsPV")>=0 :
             options_for_mod[index].append("\ninput_epics = %s" % source.split(": ")[1])
             return
-        if source.find("DetInfo")>=0 :
-            options_for_mod[index].append("\ninput_scalars = %s" % source.split(": ")[1])
+        else:
+            options_for_mod[index].append("\ninput_scalars = %s" % source)
             return
 
 
@@ -851,8 +849,7 @@ Start with selecting data of interest to you from list on the left and general r
             return
 
         # --- --- --- BLD IPM & DIO (Ipimb) --- --- --- 
-        if ( str(box.text()).find("BldInfo")>=0 
-             and ( str(box.text()).find("IPM")>=0 or str(box.text()).find("DIO")>=0 ) ):
+        if ( str(box.text()).find("IPM")>=0 or str(box.text()).find("DIO")>=0 ):
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_ipimb")
             except ValueError :
@@ -872,7 +869,7 @@ Start with selecting data of interest to you from list on the left and general r
                     
 
         # --- --- --- BLD YAG (PIM) --- --- --- 
-        if ( str(box.text()).find("BldInfo")>=0 and str(box.text()).find("YAG")>=0 ):
+        if ( str(box.text()).find("YAG")>=0 ):
             try :
                 index = modules_to_run.index("XtcExplorer.pyana_image")
             except ValueError :
@@ -1167,6 +1164,8 @@ Start with selecting data of interest to you from list on the left and general r
         # Make a command sequence 
         lpoptions = []
         lpoptions.append("pyana")
+        #if self.verbose is not None:
+        #    lpoptions.append("-v")
         if self.num_cpu > 1 :
             lpoptions.append("-p")
             lpoptions.append(str(self.num_cpu))
@@ -1210,6 +1209,11 @@ Start with selecting data of interest to you from list on the left and general r
             lpoptions = runstring.split(' ')
 
             # and update run_n and skip_n in the Gui:
+            #if "-v" in lpoptions:
+            #    self.verbose = True
+            #else :
+            #    self.verbose = False
+                
             if "-n" in lpoptions:
                 self.run_n = int(lpoptions[ lpoptions.index("-n")+1 ])
                 self.run_n_status.setText("Process %d shots"% self.run_n)

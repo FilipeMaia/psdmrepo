@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2011-Dec-13 ofte                 rev 2755
+        - I think all the most obvious bugs have been removed now. This will be V00-01-15
+	- encoder has been updated to use channel mask
+	
 2011-Dec-09 ofte                 rev 2697
         - moved icons to the 'data' directory. 
 	- moved 'calib' to the 'data' directory

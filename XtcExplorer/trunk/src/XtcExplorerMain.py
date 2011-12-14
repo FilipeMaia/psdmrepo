@@ -564,7 +564,7 @@ class XtcExplorerMain (QtGui.QMainWindow) :
         
     def about(self):
         progname = os.path.basename(sys.argv[0])
-        progversion = "pre-0.1.15"
+        progversion = "0.1.15"
         QtGui.QMessageBox.about(self, "About %s" % os.path.basename(sys.argv[0]),
 u"""%(prog)s version %(version)s
 GUI interface to analysis of xtc files.

@@ -380,10 +380,17 @@ class Frame(object):
 
         self.axes = None       # the patch containing the image
         self.axesim = None     # the image AxesImage
-        self.image = None      # the image (numpy array)
+
         self.colb = None       # the colorbar
         self.projx = None      # projection onto the horizontal axis
         self.projy = None      # projection onto the vertical axis
+
+        # options
+        self.plot_type = None 
+        self.showProj = False  # only relevant for 2d plots
+        self.extent = None
+        self.axis_values = None
+        self.aspect = 'auto'
 
         # threshold associated with this plot (image)
         self.threshold = None
@@ -395,8 +402,6 @@ class Frame(object):
         self.vmax = None
         self.orglims = None
 
-        self.axis_values = None
-        self.aspect = 'auto'
 
     def myticks(self, x, pos):
         'The two args are the value and tick position'
@@ -428,6 +433,7 @@ class Frame(object):
     def update_axes(self):
         if self.projx is None: return
         if self.projy is None: return
+            
         # does nothing right now...
         # but if needed, this is where to update axes of projection plots
         # if these need to change when image colorscale changes
@@ -490,7 +496,7 @@ class Frame(object):
         self.projy.set_xlim( np.max(ticks[-1],vmax), np.min(ticks[0],vmin) )
 
 
-    def imshow( self, image, title="", fignum=1,position=1, showProj=1, extent=None):
+    def imshow( self, image, fignum=1, position=1):
         """ extension of plt.imshow with
         - interactive colorbar
         - optional axis projections
@@ -505,30 +511,32 @@ class Frame(object):
 
         # AxesImage
         myorigin = 'upper'
-        if showProj: myorigin = 'lower'
+        if self.showProj>0 : myorigin = 'lower'
         self.axesim = self.axes.imshow( image,
                                         origin=myorigin,
-                                        extent=extent,
+                                        extent=self.extent,
                                         interpolation='bilinear',
                                         vmin=self.vmin,
                                         vmax=self.vmax )
 
         divider = make_axes_locatable(self.axes)
         
-        if showProj>0 :
+        self.axes.set_title(self.title)
+
+        if self.showProj>0 :
             self.projx = divider.append_axes("top", size="20%", pad=0.03,sharex=self.axes)
             self.projy = divider.append_axes("left", size="20%", pad=0.03,sharey=self.axes)
             self.projx.set_title( self.axes.get_title() )
             self.axes.set_title("") # clear the axis title
 
-            # --- sum or average along each axis, 
             maskedimage = np.ma.masked_array(image, mask=(image==0) )
 
+            # --- average along each axis (or optionally maximum for special purposes)
             proj_vert, proj_horiz = None, None
-            if showProj == 1:
+            if self.showProj == 1:
                 proj_vert = np.ma.average(maskedimage,1) # for each row, average of elements
                 proj_horiz = np.ma.average(maskedimage,0) # for each column, average of elements
-            elif showProj == 2: 
+            elif self.showProj == 2: 
                 proj_vert = np.ma.max(maskedimage,1) # for each row, max of elements
                 proj_horiz = np.ma.max(maskedimage,0) # for each column, max of elements
                
@@ -565,7 +573,6 @@ class Frame(object):
         self.vmin, self.vmax = self.orglims
 
 
-        
         # show the active region for thresholding
         if self.threshold and self.threshold.area is not None:
             xy = [self.threshold.area[0],self.threshold.area[2]]
@@ -575,9 +582,6 @@ class Frame(object):
             self.axes.add_patch(self.thr_rect)
             print "Plotting the red rectangle in area ", self.threshold.area
 
-        self.axes.set_title(title)
-
-    
 
 class Plotter(object):
     
@@ -593,6 +597,9 @@ class Plotter(object):
         self.display_mode = None
         # flag if interactively changed
 
+        # global title
+        self.title = ""
+        
         self.threshold = None
         self.vmin = None
         self.vmax = None
@@ -610,7 +617,7 @@ class Plotter(object):
         QtCore.pyqtRemoveInputHook()
 
 
-    def add_frame(self, name="", title="",contents=None, type=None, aspect='auto'):
+    def add_frame(self, name="", title="",contents=None, plot_type=None, aspect='auto'):
         """Add a frame to the plotter. 
         @param  name       name of frame (must be unique, else returns the existing frame)
         @param  title      current title, may be different from event to event
@@ -636,7 +643,7 @@ class Plotter(object):
         
         aframe.title = title
         aframe.data = contents
-        aframe.type = type
+        aframe.plot_type = plot_type
         aframe.aspect = aspect
         return aframe
 
@@ -653,34 +660,74 @@ class Plotter(object):
         self.fig = plt.figure(fignum,(self.w*ncol,self.h*nrow))
         self.fig.clf()
 
+        self.fig.suptitle(self.title)
+
         i = 1
         framenames = self.frames.iterkeys()
         if ordered : framenames = sorted(framenames)
         for name in framenames:
+
             frame = self.frames[name]
             frame.axes = self.fig.add_subplot(nrow,ncol,i)
-            frame.axes.set_aspect(frame.aspect)
-            #print "adding subplot for %s with aspect %s"%(name,frame.aspect)
             i+=1
 
-            # single image (2d array)
-            if len(frame.data)==1 and frame.data[0].ndim==2 :
-                #plt.imshow(frame.data[0])
-                #self.drawframe(frame.data[0])
-                frame.imshow(frame.data[0],title=frame.title,fignum=fignum,showProj=True)
-            else :
-                # one or multiple graphs in the same picture
-                plt.plot(*frame.data)
+            frame.axes.set_aspect(frame.aspect)
 
-                if len(frame.data)>1:
-                    frame.axes.set_xlim(frame.data[0][0],frame.data[0][-1])
+            titles = frame.title.split(';')
+            frame.axes.set_title(titles[0])
+            try:
+                frame.axes.set_xlabel(titles[1])
+                frame.axes.set_ylabel(titles[2])
+            except:
+                pass
+
+
+            if frame.plot_type == "hist":
+                n, bins, patches = plt.hist(frame.data, 60, histtype='stepfilled')
+
+            elif frame.plot_type == 'image':
+                frame.imshow(frame.data, fignum=fignum)
+
+            elif frame.plot_type == 'scatter':
+                points = plt.scatter(frame.data[0],frame.data[1])
+
+            else :
+
+                # single image (2d array)
+                narrs = len(frame.data)
+                ndims = frame.data[0].ndim
+                
+                if ndims == 2 :
+                    if narrs == 1 :
+                        frame.imshow(frame.data[0], fignum=fignum)
+                    else :
+                        print "utilities: Plotter:plot_all_frames: unsure what to do about this"
+                    
+                elif ndims == 1 :
+                    # line plots
+                
+                    if narrs == 1 or narrs == 2:
+                        plt.plot(*frame.data)
+
+                    if narrs > 2 :
+                        xaxis = frame.data[0]
+                        others = frame.data[1:]
+                        myargs = []
+                        for o in others :
+                            myargs.append( xaxis )
+                            myargs.append( o )
+                            myargs.append('-o')
+                        
+                        plt.plot(*myargs)
+
+                    if len(frame.data)>1:
+                        frame.axes.set_xlim(frame.data[0][0],frame.data[0][-1])
 
             if frame.axis_values is not None:
                 formatter = ticker.FuncFormatter(frame.myticks)
                 frame.axes.xaxis.set_major_formatter(formatter)
                 
 
-            plt.title(frame.title)
                 
         self.fig.subplots_adjust(left=0.05,   right=0.95,
                                  bottom=0.05, top=0.90,
@@ -933,7 +980,7 @@ class Plotter(object):
                         self.ROI_coordinates = plt.ginput(n=0) 
                         print "New coordinates", self.ROI_coordinates
 
-    def plot_image(self, image, fignum=1, title="", showProj = False, extent=None):
+    def plot_image(self, image, fignum=1, title="", showProj=0, extent=None):
         """ plot_image
         utility function for when plotting a single image outside of pyana
         """
@@ -978,7 +1025,7 @@ class Plotter(object):
 #        plt.draw()
 #        return self.display_mode
 
-    def draw_figurelist(self, fignum, event_display_images, title="",showProj=False,extent=None ) :
+    def draw_figurelist(self, fignum, event_display_images, title="",showProj=0,extent=None ) :
         """ Draw several frames in one canvas
         
         @fignum                  figure number, i.e. fig = plt.figure(num=fignum)
@@ -1004,7 +1051,7 @@ class Plotter(object):
         plt.draw()
         return self.display_mode
 
-    def draw_figure( self, frameimage, title="", fignum=1,position=1, showProj = False,extent=None):
+    def draw_figure( self, frameimage, title="", fignum=1,position=1, showProj = 0,extent=None):
         """ Draw a single frame in one canvas
         """
         self.create_figure(fignum)
@@ -1038,7 +1085,8 @@ class Plotter(object):
 
         # AxesImage
         myorigin = 'upper'
-        if showProj: myorigin = 'lower'
+        if showProj>0 : myorigin = 'lower'
+
         aplot.axesim = aplot.axes.imshow( frameimage,
                                           origin=myorigin,
                                           extent=extent,

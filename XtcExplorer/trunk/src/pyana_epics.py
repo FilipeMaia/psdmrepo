@@ -38,6 +38,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pypdsdata import xtc
+from pypdsdata import epics
 
 from utilities import PyanaOptions
 from utilities import EpicsData
@@ -131,10 +132,31 @@ class pyana_epics (object) :
             else :
 
                 # The returned value should be of the type epics.EpicsPvCtrl.
-                print "PV %s: id=%d type=%d size=%d status=%s severity=%s values=%s" % \
-                      (pv_name, pv.iPvId, pv.iDbrType, pv.iNumElements,
-                       pv.status, pv.severity, pv.values)
+                #print "PV %s: id=%d type=%d size=%d status=%s severity=%s values=%s" % \
+                #      (pv_name, pv.iPvId, pv.iDbrType, pv.iNumElements,
+                #       pv.status, pv.severity, pv.values)
+                
+                message = "%s (Id=%d, Type=%d, Precision=%d, Unit=%s )\n" \
+                          %(pv_name,pv.iPvId, pv.iDbrType, pv.precision, pv.units)
+
+                message += "   Status = %d , Severity = %d \n"%(pv.status, pv.severity)
+                try:
+                    message += "(%s), (%s)\n" \
+                               %(epics.epicsAlarmConditionStrings[pv.status],
+                                 epics.epicsAlarmSeverityStrings[pv.severity])
+                except:
+                    pass
+                
+                message += "   Limits: " 
+                message += "   Ctrl: [%s - %s]" % (pv.lower_ctrl_limit, pv.upper_ctrl_limit)
+                message += "   Display: [%s - %s]" % (pv.lower_disp_limit, pv.upper_disp_limit) 
+                message += "   Warning: [%s - %s]" % (pv.lower_warning_limit, pv.upper_warning_limit) 
+                message += "   Alarm: [%s - %s]" % (pv.lower_alarm_limit, pv.upper_alarm_limit)
+                
+                
+                print message
                 self.epics_data[pv_name] = EpicsData(pv_name)
+
         
     def event( self, evt, env ) :
         """
@@ -143,6 +165,7 @@ class pyana_epics (object) :
         """
         self.n_shots += 1
         logging.info( "pyana_epics.event() called (%d)"%self.n_shots )
+
 
         if evt.get('skip_event') :
             return
@@ -200,7 +223,7 @@ class pyana_epics (object) :
             data_epics.append( self.epics_data[pv_name] )
         # send it to the evt object
         evt.put(data_epics, 'data_epics')
-
+ 
 
     def make_plots(self, title=""):
         
@@ -234,7 +257,7 @@ class pyana_epics (object) :
         i = 0
         for pv_name in self.pv_names :
             i+=1
-            
+
             fig.add_subplot(nrows, ncols, i) 
 
             # append one more bin to the shots array (bin boundaries)
@@ -266,9 +289,10 @@ class pyana_epics (object) :
                                         bins=shots_array,
                                         histtype='step')
             plt.xlim(shots_array[0],shots_array[-1])
-            plt.ylim(ymin-0.3*span,ymax+0.3*span)
-            plt.plot(shots_array[:nbins], values_array,'bo')
+            if span > 0:
+                plt.ylim(ymin-0.3*span,ymax+0.3*span)
 
+            plt.plot(shots_array[:nbins], values_array,'bo')
 
             plt.title(pv_name)
             plt.xlabel("Shot number",horizontalalignment='left') # the other right

@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from   pypdsdata import xtc
 from utilities import PyanaOptions
 from utilities import IpimbData
-
+from utilities import Plotter
 
 # analysis class declaration
 class  pyana_ipimb ( object ) :
@@ -56,9 +56,13 @@ class  pyana_ipimb ( object ) :
         # other
         self.n_shots = None
         self.accu_start = None
+
+        self.plotter = None
+                
         
         # lists to fill numpy arrays
         self.initlists()
+
 
 
     def initlists(self):
@@ -114,6 +118,11 @@ class  pyana_ipimb ( object ) :
                 #    print "   adc delay ", config.adcDelay()
                 #except:
                 #    pass
+
+
+        self.plotter = Plotter()
+        self.plotter.settings(7,7) # set default frame size
+                
             
     def event ( self, evt, env ) :
 
@@ -125,62 +134,54 @@ class  pyana_ipimb ( object ) :
         # IPM diagnostics, for saturation and low count filtering
         for source in self.sources :
 
-            # -------- TEST
-            # BldDataIpimb / SharedIpimb
+            ipm_raw = None
+            ipm_fex = None
+
+            # -------------------------------------------
+            # fetch the data object from the pyana event 
+            # -------------------------------------------
+
+            # try Shared IPIMB first
             ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb, source )
-            #ipm = evt.getSharedIpimbValue("HFX-DG3-IMB-02")
-            if ipm :
-                self.raw_ch[source].append( [ipm.ipimbData.channel0(),
-                                             ipm.ipimbData.channel1(),
-                                             ipm.ipimbData.channel2(),
-                                             ipm.ipimbData.channel3()] )
+            if ipm is not None:
+                ipm_raw = ipm.ipimbData
+                ipm_fex = ipm.ipmFexData
+            else: 
+                # try to get the other data types for IPIMBs 
+                ipm_raw = evt.get(xtc.TypeId.Type.Id_IpimbData, source )
+                ipm_fex = evt.get(xtc.TypeId.Type.Id_IpmFex, source )
 
-                self.raw_ch_volt[source].append( [ipm.ipimbData.channel0Volts(),
-                                             ipm.ipimbData.channel1Volts(),
-                                             ipm.ipimbData.channel2Volts(),
-                                             ipm.ipimbData.channel3Volts()] )
+            # --------------------------------------------------------------
+            # store arrays of the data that we want
+            # --------------------------------------------------------------
 
-                self.fex_sum[source].append( ipm.ipmFexData.sum )
-                self.fex_channels[source].append( ipm.ipmFexData.channel )
-                self.fex_position[source].append( [ipm.ipmFexData.xpos, ipm.ipmFexData.ypos] )
+            # ----- raw data -------
+            if ipm_raw is not None: 
+                self.raw_ch[source].append( [ipm_raw.channel0(),
+                                             ipm_raw.channel1(),
+                                             ipm_raw.channel2(),
+                                             ipm_raw.channel3()] )
+                self.raw_ch_volt[source].append( [ipm_raw.channel0Volts(),
+                                                  ipm_raw.channel1Volts(),
+                                                  ipm_raw.channel2Volts(),
+                                                  ipm_raw.channel3Volts()] )
             else :
+                #print "pyana_ipimb: no raw data from %s in event %d" % (source,self.n_shots)
+                self.raw_ch[source].append( [-1,-1,-1,-1] )
+                self.raw_ch_volt[source].append( [-1,-1,-1,-1] ) 
 
-                # raw data
-                ipmRaw = evt.get(xtc.TypeId.Type.Id_IpimbData, source )
-                if ipmRaw :
-                    ch = [ipmRaw.channel0(),
-                          ipmRaw.channel1(),
-                          ipmRaw.channel2(),
-                          ipmRaw.channel3() ]
+
+            # ------ fex data -------
+            if ipm_fex is not None: 
+                self.fex_sum[source].append( ipm_fex.sum )
+                self.fex_channels[source].append( ipm_fex.channel )
+                self.fex_position[source].append( [ipm_fex.xpos, ipm_fex.ypos] )
+            else :
+                #print "pyana_ipimb: no fex data from %s in event %d" % (source,self.n_shots)
+                self.fex_sum[source].append( -1 )
+                self.fex_channels[source].append( [-1,-1,-1,-1] ) 
+                self.fex_position[source].append( [-1,-1] ) 
                 
-                    self.raw_ch[source].append(ch)
-                
-                    ch_volt = [ipmRaw.channel0Volts(),
-                               ipmRaw.channel1Volts(),
-                               ipmRaw.channel2Volts(),
-                               ipmRaw.channel3Volts() ]
-                    
-                    self.raw_ch_volt[source].append( ch_volt )
-            
-                
-                else :
-                    print "pyana_ipimb: No IpimbData from %s found in event %d" % (source,self.n_shots)
-                    self.raw_ch[source].append( [-1,-1,-1,-1] )
-                    self.raw_ch_volt[source].append( [-1,-1,-1,-1] ) 
-
-                # feature-extracted data
-                ipmFex = evt.get(xtc.TypeId.Type.Id_IpmFex, source )
-
-                if ipmFex :
-                    self.fex_sum[source].append( ipmFex.sum )
-                    self.fex_channels[source].append( ipmFex.channel )
-                    self.fex_position[source].append( [ipmFex.xpos, ipmFex.ypos] )
-                else :
-                    print "pyana_ipimb: No IpmFex from %s found in event %d" % (source, self.n_shots)
-                    self.fex_sum[source].append( -1 )
-                    self.fex_channels[source].append( [-1,-1,-1,-1] ) 
-                    self.fex_position[source].append( [-1,-1] ) 
-
             
         # only call plotter if this is the main thread
         if (env.subprocess()>0):
@@ -191,7 +192,7 @@ class  pyana_ipimb ( object ) :
         if self.plot_every_n != 0 and (self.n_shots%self.plot_every_n)==0 :
 
             header = "DetInfo:IPIMB data shots %d-%d" % (self.accu_start, self.n_shots)
-            self.make_plots(title=header)
+            self.old_make_plots(title=header)
 
             # flag for pyana_plotter
             evt.put(True, 'show_event')
@@ -217,7 +218,7 @@ class  pyana_ipimb ( object ) :
 
         # ----------------- Plotting ---------------------
         header = "DetInfo:IPIMB data shots %d-%d" % (self.accu_start, self.n_shots)
-        self.make_plots(title=header)
+        self.old_make_plots(title=header)
 
         # flag for pyana_plotter
         evt.put(True, 'show_event')
@@ -229,8 +230,45 @@ class  pyana_ipimb ( object ) :
             # give the list to the event object
             evt.put( data_ipimb, 'data_ipimb' )
 
+    def make_plots(self,title=""):
+
+        for source in self.sources :
+
+            xaxis = np.arange( self.accu_start, self.n_shots )
+
+            # --------------------------------------
+            if "fex:channels" in self.quantities:
+                name = "fex:channel(%s)"%source
+                title = "%s; %s; %s" % (source, "Event number", "Channel Fex")
+                
+                # turn the list into nx4 array
+                array = np.float_(self.fex_channels[source])
+
+                # turn nx4 array into list of channels, each a numpy array
+                channels = [ np.float_(column) for column in array.T.tolist() ]
+
+                # insert x-axis at the beginning of the list
+                channels.insert(0,xaxis)
+
+                # add frame to the canvas
+                self.plotter.add_frame(name,title, tuple(channels) )
+
+
+            # --------------------------------------
+            # fills a histogram with the sum of channels
+            if "fex:sum" in self.quantities:
+                name = "fex:sum(%s)"%source
+                title = "%s; %s; %s" % (source, "Event number", "Channel Sum")
+
+                array = np.float_(self.fex_sum[source])
+
+                # add frame to the canvas
+                self.plotter.add_frame(name, title, (array,), plot_type="hist" )
+
+
+        newmode = self.plotter.plot_all_frames(ordered=True)
         
-    def make_plots(self, title = ""):
+    def old_make_plots(self, title = ""):
 
         if self.n_shots == self.accu_start: 
             print "Cannot do ", title
@@ -419,8 +457,7 @@ class  pyana_ipimb ( object ) :
                 plt.xlabel('Beam position X',horizontalalignment='left')
                 plt.ylabel('Beam position Y',horizontalalignment='left')
                 i+=1
-
-            self.data[source].fex_position = array2
+                self.data[source].fex_position = array2
 
         plt.draw()
 

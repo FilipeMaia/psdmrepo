@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from   pypdsdata import xtc
+from   pypdsdata import encoder
+
 from utilities import PyanaOptions
 from utilities import EncoderData
 
@@ -41,6 +43,7 @@ class  pyana_encoder ( object ) :
         # other
         self.n_shots = None
         self.accu_start = None
+        self.channel = {}
         
         # lists to fill numpy arrays
         self.initlists()
@@ -71,14 +74,34 @@ class  pyana_encoder ( object ) :
             self.data[source] = EncoderData( source ) 
 
             config = env.getConfig(xtc.TypeId.Type.Id_EncoderConfig, source)
-            message = "%s configuration: \n"%source
-            message += "  Channel number = %s \n"%config._chan_num
-            message += "  Counter mode = %s \n"%config._count_mode
-            message += "  Quadrature mode = %s \n"%config._quadrature_mode
-            message += "  Trigger input number = %s \n"%config._input_num
-            message += "  Trigger on Rising Edge? = %s \n"%config._input_rising 
-            message += "  Timestamp tics per sec = %s"%config._ticks_per_sec           
-            logging.info(message)
+
+            message = "%s configuration (%s): \n"%(source, type(config).__name__ )
+
+            try: # only for ConfigV2
+                # look for populated channel in the bitmap
+                self.channel[source] = 0 
+                while ( (config._chan_mask & (1<<self.channel[source]))==0 ):
+                    self.channel[source]+=1
+                message += "  Channel mask = 0x%x \n"          % config._chan_mask
+                message += "  Channel number = %d \n"          % self.channel[source]
+            except:
+                pass
+
+            try: # only for ConfigV1
+                message += "  Channel number = %s (not used)\n"          % config._chan_num
+                # always 0
+            except:
+                pass
+
+            message += "  Counter mode = %s \n"            % config._count_mode
+            message += "  Quadrature mode = %s \n"         % config._quadrature_mode
+            message += "  Trigger input number = %s \n"    % config._input_num
+            message += "  Trigger on Rising Edge? = %s \n" % config._input_rising 
+            message += "  Timestamp tics per sec = %s"     % config._ticks_per_sec           
+            #logging.info(message)
+            print message
+
+
             
     def event ( self, evt, env ) :
 
@@ -92,21 +115,12 @@ class  pyana_encoder ( object ) :
 
             encoder = evt.get(xtc.TypeId.Type.Id_EncoderData, source )
             if encoder:
-                print "Found encoder data in event", type(encoder).__name__
                 if type(encoder).__name__ =='DataV1':
                     self.values[source].append( encoder.value() )
                     self.counts[source].append( encoder._encoder_count )
-                if type(encoder).__name__ == 'DataV2':
-                    print encoder._encoder_count
-                    print encoder._33mhz_timestamp
-                    i = 0
-                    for val in encoder._encoder_count:
-                        print "encoder count ", val
-                        print "encoder value ", encoder.value(i)
-                        i+=1
-                        
-                    self.values[source].append( encoder.value(1) )
-                    self.counts[source].append( encoder._encoder_count[1] )
+                if type(encoder).__name__ == 'DataV2':                    
+                    self.values[source].append( encoder.value(self.channel[source]) )
+                    self.counts[source].append( encoder._encoder_count[self.channel[source]] )
                 else:
                     print "Unknown type"
 

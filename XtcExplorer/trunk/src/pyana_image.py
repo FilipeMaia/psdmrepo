@@ -383,16 +383,14 @@ class  pyana_image ( object ) :
 
             # flag for pyana_plotter
             evt.put(True, 'show_event')
-
+            
             # --- this works, but needs some tweaking to make it prettier
-            #for (name,title,image) in event_display_images:
-            #    self.plotter.add_frame(name,addr,(image,))
-            #newmode = self.plotter.plot_all_frames(fignum=self.mpl_num,ordered=True)
-
-            newmode = self.plotter.draw_figurelist(self.mpl_num,
-                                                   event_display_images,
-                                                   title="Cameras shot#%d"%self.n_shots,
-                                                   showProj=2   )
+            for (name,title,image) in event_display_images:
+                self.plotter.add_frame(name,addr,(image,))
+                self.plotter.frames[name].showProj=1
+                
+            self.plotter.title = "Cameras shot#%d"%self.n_shots
+            newmode = self.plotter.plot_all_frames(fignum=self.mpl_num,ordered=True)
 
             if newmode is not None:
                 # propagate new display mode to the evt object 
@@ -467,7 +465,7 @@ class  pyana_image ( object ) :
             self.plotter.draw_figurelist(self.mpl_num+nsrc,
                                          event_display_images,
                                          title="Endjob:  %s"%addr,
-                                         showProj=True)
+                                         showProj=1)
         
             plt.draw()
         
