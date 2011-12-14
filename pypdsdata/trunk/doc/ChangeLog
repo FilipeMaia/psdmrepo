@@ -1,4 +1,8 @@
 
+2011-12-14 - V00-00-43
+======================
+- add support for cspad.ConfigV3 and cspad.ElementV1 combination
+
 2011-11-11 - V00-00-42
 ======================
 - new pdsdata sub-package gsc16ai added with classes ConfigV1 and Datav1
