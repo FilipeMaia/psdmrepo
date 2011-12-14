@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-34
+2011-12-13 Andy Salnikov
+- call gc.collect() in the event loops to clean up cycles from memory,
+  without this virtual size tends to grow too much
+
 Tag: V00-00-33
 2011-11-11 Andy Salnikov
 - few changes to Event class, mostly transparent to users

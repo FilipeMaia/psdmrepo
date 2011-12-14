@@ -34,6 +34,7 @@ import os
 import logging
 import multiprocessing as mp
 from resource import *
+import gc
 
 #---------------------------------
 #  Imports of base class module --
@@ -120,6 +121,10 @@ def _proc(jobname, id, pipes, userObjects, dg_ref):
             logging.info("proc-%s: received END", id)
             # stop here
             break
+
+        # explicitly run garbage collector once per iteration
+        # to collect cycles.
+        gc.collect()
             
     # done with the environment
     env.finish()
@@ -196,6 +201,10 @@ def _pyana ( argv ) :
     
         # read datagrams one by one
         for dgtup in dgramGen( names ) :
+
+            # explicitly run garbage collector once per iteration
+            # to collect cycles.
+            gc.collect()
     
             if num_events is not None and nevent >= num_events+skip_events :
                 logging.info("event limit reached (%d), terminating", nevent)
