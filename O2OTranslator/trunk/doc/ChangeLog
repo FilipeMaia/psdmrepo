@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-15-01
+2011-12-14 Andy Salnikov
+- add support for cspad.ConfigV3 and cspad.ElementV1 combination
+
 Tag: V00-15-00
 2011-12-10 Andy Salnikov
 - migrating cspad calibration to ndarray use
