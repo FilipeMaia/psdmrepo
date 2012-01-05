@@ -202,8 +202,8 @@ void CSPadTest::event(Event& evt, Env& env)
         const Psana::CsPad::ElementV2& el = data2->quads(q);
         cout  << "\n  Quad / Element #" << q << endl;
 
-	const uint16_t* data = el.data();
-        int   quad           = el.quad() ;
+	const int16_t* data = el.data();
+        int   quad          = el.quad() ;
 
         //uint16_t data2d[185][388];
         //uint16_t* data2d = new uint16_t[m_Nrows*m_Ncols];
@@ -216,7 +216,7 @@ void CSPadTest::event(Event& evt, Env& env)
 
 	int sizeOf2x1Img = 185*388;
         int nOf2x1       = 2;
-        ImageCSPad2x1<uint16_t>* image_2x1 = new ImageCSPad2x1<uint16_t>(&data[nOf2x1 * sizeOf2x1Img]);  
+        ImageCSPad2x1<int16_t>* image_2x1 = new ImageCSPad2x1<int16_t>(&data[nOf2x1 * sizeOf2x1Img]);  
         image_2x1 -> printImage();
 
 	//char c_quad[2];

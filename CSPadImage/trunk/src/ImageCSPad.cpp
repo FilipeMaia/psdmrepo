@@ -232,15 +232,15 @@ void ImageCSPad::event(Event& evt, Env& env)
         const Psana::CsPad::ElementV2& el = data2->quads(q);
         cout  << "\n  Quad / Element #" << q << endl;
 
-	const uint16_t* data = el.data();
-        int   quad           = el.quad() ;
+	const int16_t* data = el.data();
+        int   quad          = el.quad() ;
 
         std::vector<int> v_image_shape = el.data_shape();
 
 	QuadParameters *quadpars = new QuadParameters(quad, v_image_shape, 850, 850, m_numAsicsStored[q], m_roiMask[q]);
 	//quadpars -> print();
 
-        ImageCSPadQuad<uint16_t>* image_quad = new ImageCSPadQuad<uint16_t> (data, quadpars, m_cspad_calibpar);
+        ImageCSPadQuad<int16_t>* image_quad = new ImageCSPadQuad<int16_t> (data, quadpars, m_cspad_calibpar);
 
 	this -> addQuadToCSPadImage(image_quad, quadpars, m_cspad_calibpar);
 
@@ -260,11 +260,11 @@ void ImageCSPad::event(Event& evt, Env& env)
 
 //----------------------------------------------------------
 
-void ImageCSPad::addQuadToCSPadImage(ImageCSPadQuad<uint16_t> *image_quad, QuadParameters *quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+void ImageCSPad::addQuadToCSPadImage(ImageCSPadQuad<int16_t> *image_quad, QuadParameters *quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
    cout << "ImageCSPad::addQuadToCSPadImage()" << endl;
 
-            Image2D<uint16_t> *quad_image2d = image_quad -> getQuadImage2D();
+            Image2D<int16_t> *quad_image2d = image_quad -> getQuadImage2D();
 
             uint32_t quad = quadpars -> getQuadNumber();
 	    uint32_t rot_index = (int)(cspad_calibpar -> getQuadRotation(quad)/90);

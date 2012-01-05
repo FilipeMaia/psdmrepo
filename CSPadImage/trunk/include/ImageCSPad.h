@@ -84,7 +84,7 @@ public:
   /// Method which is called once at the end of the job
   virtual void endJob(Event& evt, Env& env);
 
-  void addQuadToCSPadImage(ImageCSPadQuad<uint16_t> *image_quad, QuadParameters *quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void addQuadToCSPadImage(ImageCSPadQuad<int16_t> *image_quad, QuadParameters *quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void fillQuadXYmin();
   Image2D<float>* getCSPadImage2D(){ return m_cspad_image_2d; } ;
   void saveCSPadImageInFile();
