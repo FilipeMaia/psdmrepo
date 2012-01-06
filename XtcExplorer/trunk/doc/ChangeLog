@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-Jan-06 ofte                 rev 2760
+	- minor edits
+	
 2011-Dec-13 ofte                 rev 2755
         - I think all the most obvious bugs have been removed now. This will be V00-01-15
 	- encoder has been updated to use channel mask

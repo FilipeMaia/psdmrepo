@@ -1,10 +1,6 @@
 #--------------------------------------------------------------------------
-# File and Version Information:
-#  $Id: template!pyana-module!py 1095 2010-07-07 23:01:23Z salnikov $
-#
 # Description:
 #  Pyana user analysis module pyana_plotter...
-#
 #------------------------------------------------------------------------
 
 """User analysis module for pyana framework.

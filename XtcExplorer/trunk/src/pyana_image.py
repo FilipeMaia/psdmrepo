@@ -152,16 +152,6 @@ class  pyana_image ( object ) :
             self.n_dark[addr] = 0
 
 
-#        # output file
-#        # can be npy (numpy binary) txt (numpy ascii) or hdf5
-#        # only hdf5 need a file handler
-#        self.hdf5file_all = None
-#        self.hdf5file_events = None
-#        if self.output_file is not None :
-#            if ".hdf5" in self.output_file  and self.n_hdf5 is None:
-#                print "opening HDF5 %s for writing of all events" % self.output_file
-#                self.hdf5file = h5py.File(self.output_file, 'w')
-
         self.plotter = Plotter()        
         self.plotter.settings(7,7) # set default frame size
         self.plotter.threshold = None
@@ -172,11 +162,6 @@ class  pyana_image ( object ) :
         self.apply_dictionary = { 'rotate': alg.rotate,
                                   'shift' : alg.shift }
         
-        #        # Set up the plotter's frame by hand, since
-        #        # we need to also tell it about thresholds
-        #        for source in self.sources :
-        #            self.plotter.add_frame(source)
-        #            self.plotter.frames[source].threshold = self.threshold
         
         self.cspad = {}
 
@@ -342,14 +327,14 @@ class  pyana_image ( object ) :
             if isDark:
                 self.n_dark[addr]+=1
                 if self.sum_dark_images[addr] is None :
-                    self.sum_dark_images[addr] = np.float_(image)
+                    self.sum_dark_images[addr] = np.array(image,dtype=image.dtype)
                 else :
                     self.sum_dark_images[addr] += image
             else :
             # ------------- HIT ----------------
                 self.n_good[addr]+=1
                 if self.sum_good_images[addr] is None :
-                    self.sum_good_images[addr] = np.float_(image)
+                    self.sum_good_images[addr] = np.array(image,dtype=image.dtype)
                 else :
                     self.sum_good_images[addr] += image
                         
@@ -361,9 +346,9 @@ class  pyana_image ( object ) :
             # This is for use by ipython
             self.data[addr].image   = image
             if self.n_good[addr] > 0 :
-                self.data[addr].average = self.sum_good_images[addr]/self.n_good[addr]
+                self.data[addr].average = np.float_(self.sum_good_images[addr])/self.n_good[addr]
             if self.n_dark[addr] > 0 :
-                self.data[addr].dark    = self.sum_dark_images[addr]/self.n_dark[addr]
+                self.data[addr].dark    = np.float_(self.sum_dark_images[addr])/self.n_dark[addr]
         
 
         if len(event_display_images)==0 :
@@ -384,7 +369,6 @@ class  pyana_image ( object ) :
             # flag for pyana_plotter
             evt.put(True, 'show_event')
             
-            # --- this works, but needs some tweaking to make it prettier
             for (name,title,image) in event_display_images:
                 self.plotter.add_frame(name,addr,(image,))
                 self.plotter.frames[name].showProj=1
@@ -438,17 +422,17 @@ class  pyana_image ( object ) :
             average_image = None
             if self.n_good[addr] > 0 :
                 name = "AvgHit_"+addr
-                title = addr+" Average of %d hits"%self.n_good[addr]
+                title = "Average of %d hits"%self.n_good[addr]
 
-                average_image = self.sum_good_images[addr]/self.n_good[addr]
+                average_image = np.float_(self.sum_good_images[addr])/self.n_good[addr]
                 event_display_images.append( (name, title, average_image ) )
 
             rejected_image = None
             if self.n_dark[addr] > 0 :
                 name = "AvgDark_"+addr
-                title = addr+" Average of %d darks"%self.n_dark[addr]
+                title = "Average of %d darks"%self.n_dark[addr]
                 
-                rejected_image = self.sum_dark_images[addr]/self.n_dark[addr]
+                rejected_image = np.float_(self.sum_dark_images[addr])/self.n_dark[addr]
                 event_display_images.append( (name, title, rejected_image ) )
             
             #if self.dark_image is not None :
@@ -461,7 +445,6 @@ class  pyana_image ( object ) :
                 return
             
             
-            # plot to a new figure ... thus we must define new frames (if we want them to know about threshold)
             self.plotter.draw_figurelist(self.mpl_num+nsrc,
                                          event_display_images,
                                          title="Endjob:  %s"%addr,

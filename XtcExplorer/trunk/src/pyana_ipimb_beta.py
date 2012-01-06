@@ -76,6 +76,7 @@ class  pyana_ipimb_beta ( object ) :
     def event ( self, evt, env ) :
 
         self.n_shots+=1
+        print self.n_shots
 
         if evt.get('skip_event') :
             return
