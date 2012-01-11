@@ -77,11 +77,11 @@ public:
   // Destructor
   virtual ~QuadParameters () ;
 
-  size_t           getNRows             () const { return m_nrows;   };
-  size_t           getNCols             () const { return m_ncols;   };
-  uint32_t         getRoiMask           () const { return m_roiMask; };
-  uint32_t         getQuadNumber        () const { return m_quadNumber; };
-  uint32_t         getNumberAsicsStroed () const { return m_numAsicsStored; };
+  size_t           getNRows             (){ return m_nrows;   };
+  size_t           getNCols             (){ return m_ncols;   };
+  uint32_t         getRoiMask           (){ return m_roiMask; };
+  uint32_t         getQuadNumber        (){ return m_quadNumber; };
+  uint32_t         getNumberAsicsStroed (){ return m_numAsicsStored; };
 
   void print ();
 

@@ -135,10 +135,10 @@ CSPadInterpolImageProducer::getConfigPars(Env& env)
   }
 
   m_nquads       = 4;
-  m_n2x1         = Psana::CsPad::SectorsPerQuad;     // v_image_shape[0]; // 8
-  m_ncols2x1     = Psana::CsPad::ColumnsPerASIC;     // v_image_shape[1]; // 185
-  m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2; // v_image_shape[2]; // 388
-  m_sizeOf2x1Img = m_nrows2x1 * m_ncols2x1;                               // 185*388;
+  m_n2x1         = Psana::CsPad::SectorsPerQuad;     // 8
+  m_ncols2x1     = Psana::CsPad::ColumnsPerASIC;     // 185
+  m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2; // 388
+  m_sizeOf2x1Img = m_nrows2x1 * m_ncols2x1;          // 185*388;
 
   XCOOR = CSPadPixCoords::PixCoords2x1::X;
   YCOOR = CSPadPixCoords::PixCoords2x1::Y;
@@ -185,10 +185,10 @@ CSPadInterpolImageProducer::event(Event& evt, Env& env)
 
     for (int q = 0; q < nQuads; ++ q) {
         const Psana::CsPad::ElementV2& el = data2->quads(q);
-        int  quad  = el.quad();
-
-        data[quad] = el.data();
-        quadpars[quad] = new QuadParameters(quad, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
+        int quad                           = el.quad();
+        const ndarray<int16_t,3>& data_nda = el.data();
+        data[quad] = &data_nda[0][0][0];
+        quadpars[quad] = new CSPadPixCoords::QuadParameters(quad, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
         quadIsAvailable[quad] = true;
 
 	//cout << " q = "                     << q 

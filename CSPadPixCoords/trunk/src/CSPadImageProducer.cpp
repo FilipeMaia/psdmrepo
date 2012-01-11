@@ -55,6 +55,7 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   , m_typeGroupName()
   , m_source()
   , m_src()
+  , m_key()
   , m_maxEvents()
   , m_filter()
   , m_tiltIsApplied()
@@ -63,7 +64,8 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   // get the values from configuration or use defaults
   m_typeGroupName = configStr("typeGroupName", "CsPad::CalibV1");
   m_source        = configStr("source",        "CxiDs1.0:Cspad.0");
-  m_maxEvents     = config   ("events",        32U);
+  m_key           = configStr("key",           "");
+  m_maxEvents     = config   ("events",        1<<31U);
   m_filter        = config   ("filter",        false);
   m_tiltIsApplied = config   ("tiltIsApplied", true);
   m_src           = m_source;
@@ -130,10 +132,10 @@ CSPadImageProducer::getQuadConfigPars(Env& env)
       }
   }
 
-  m_n2x1         = Psana::CsPad::SectorsPerQuad;     // v_image_shape[0]; // 8
-  m_ncols2x1     = Psana::CsPad::ColumnsPerASIC;     // v_image_shape[1]; // 185
-  m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2; // v_image_shape[2]; // 388
-  m_sizeOf2x1Img = m_nrows2x1 * m_ncols2x1;                               // 185*388;
+  m_n2x1         = Psana::CsPad::SectorsPerQuad;     // 8
+  m_ncols2x1     = Psana::CsPad::ColumnsPerASIC;     // 185
+  m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2; // 388
+  m_sizeOf2x1Img = m_nrows2x1 * m_ncols2x1;          // 185*388;
 
   XCOOR = CSPadPixCoords::PixCoords2x1::X;
   YCOOR = CSPadPixCoords::PixCoords2x1::Y;
@@ -163,7 +165,7 @@ CSPadImageProducer::event(Event& evt, Env& env)
   //struct timespec start, stop;
   //int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
 
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src, "", &m_actualSrc); // get m_actualSrc here
+  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src, m_key, &m_actualSrc); // get m_actualSrc here
 
   if (data2.get()) {
 
@@ -174,10 +176,12 @@ CSPadImageProducer::event(Event& evt, Env& env)
     for (int q = 0; q < nQuads; ++ q) {
         const Psana::CsPad::ElementV2& el = data2->quads(q);
 
-        const ndarray<int16_t, 3>& data = el.data();
-        int            quad = el.quad() ;
+        //const int16_t* data = el.data(); // depricated stuff
+        int quad                           = el.quad() ;
+        const ndarray<int16_t,3>& data_nda = el.data();
+        const int16_t* data = &data_nda[0][0][0];
 
-        CSPadPixCoords::QuadParameters quadpars(quad, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
+        CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(quad, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
 
 	this -> cspad_image_fill (data, quadpars, m_cspad_calibpar);
     }
@@ -236,15 +240,19 @@ CSPadImageProducer::cspad_image_init()
 //--------------------
 
 void
-CSPadImageProducer::cspad_image_fill(const ndarray<int16_t, 3>& data, const QuadParameters& quadpars, PSCalib::CSPadCalibPars* cspad_calibpar)
+CSPadImageProducer::cspad_image_fill(const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
+//CSPadImageProducer::cspad_image_fill(const ndarray<int16_t,3>& data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar)
 {
-      //int              quad           = quadpars.getQuadNumber();
-        uint32_t         roiMask        = quadpars.getRoiMask();
+      //int              quad           = quadpars -> getQuadNumber();
+        uint32_t         roiMask        = quadpars -> getRoiMask();
 
 	for(uint32_t sect=0; sect < m_n2x1; sect++)
 	{
 	     bool bitIsOn = roiMask & (1<<sect);
 	     if( !bitIsOn ) { m_cspad_ind += m_sizeOf2x1Img; continue; }
+ 
+             const int16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
+             //const int16_t *data2x1 = &data[sect][0][0];
  
              //cout  << "  add section " << sect << endl;	     
  
@@ -265,7 +273,7 @@ CSPadImageProducer::cspad_image_fill(const ndarray<int16_t, 3>& data, const Quad
 	       if(ix >= NX_CSPAD) continue;
 	       if(iy >= NY_CSPAD) continue;
 
-               m_arr_cspad_image[ix][iy] += (double)data[sect][c][r];
+               m_arr_cspad_image[ix][iy] += (double)data2x1[c*m_nrows2x1+r];
              }
              }
 	}

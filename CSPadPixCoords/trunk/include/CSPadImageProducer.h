@@ -109,6 +109,7 @@ protected:
   void getQuadConfigPars(Env& env);
   void cspad_image_init();
   void cspad_image_fill (const ndarray<int16_t, 3>& data, const QuadParameters& quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  //void cspad_image_fill (const ndarray<int16_t,3>& data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar); 
   void cspad_image_save_in_file(const std::string &filename = "cspad_image.txt");
   void cspad_image_add_in_event(Event& evt, const std::string &keyname = "CSPad:Image");
 
@@ -121,6 +122,7 @@ private:
    
   Source   m_src;         // Data source set from config file
   Pds::Src m_actualSrc;
+  std::string m_key; 
   unsigned m_maxEvents;
   bool     m_filter;
   bool     m_tiltIsApplied;
@@ -143,11 +145,11 @@ private:
   CSPadPixCoords::PixCoords2x1::COORDINATE YCOOR;
   CSPadPixCoords::PixCoords2x1::COORDINATE ZCOOR;
 	
-  uint32_t  m_cspad_ind;
+  uint32_t   m_cspad_ind;
   double    *m_coor_x_pix;
   double    *m_coor_y_pix;
-  uint32_t *m_coor_x_int;
-  uint32_t *m_coor_y_int;
+  uint32_t  *m_coor_x_int;
+  uint32_t  *m_coor_y_int;
 
   enum{ NX_QUAD=850, 
         NY_QUAD=850 };
