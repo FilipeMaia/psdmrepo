@@ -1,12 +1,12 @@
-#ifndef IMGPIXSPECTRA_CSPADPIXSPECTRA_H
-#define IMGPIXSPECTRA_CSPADPIXSPECTRA_H
+#ifndef IMGPIXSPECTRA_CAMERAPIXSPECTRA_H
+#define IMGPIXSPECTRA_CAMERAPIXSPECTRA_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class CSPadPixSpectra.
+//	Class CameraPixSpectra.
 //
 //------------------------------------------------------------------------
 
@@ -22,8 +22,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "psddl_psana/cspad.ddl.h"
-//#include "ndarray/ndarray.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -40,26 +38,31 @@ namespace ImgPixSpectra {
 /**
  *  @ingroup ImgPixSpectra
  *
- *  @brief Creates the spectal array for all pixels in the CSPad detector.
+ *  @brief Creates the spectal array for all pixels in the Mini-CSPad detector.
  *
- *  CSPadPixSpectra class is a psana module which creates and fills 
- *  the spectral array for all pixels in the CSPad array. The spectral
- *  array has two dimensions, the total number of CSPad pixels and
+ *  CameraPixSpectra class is a psana module which creates and fills 
+ *  the spectral array for all pixels in the Mini-CSPad array. The spectral
+ *  array has two dimensions, the total number of Mini-CSPad pixels and
  *  the number of amplitude bins requested in the list of configuration parameters.
  *
  *  An example of the configuration file (psana.cfg) for this module:
  *
  *    @code
- *    [psana]
- *    files         = /reg/d/psdm/CXI/cxi35711/xtc/e86-r0009-s00-c00.xtc
- *    modules       = ImgPixSpectra.CSPadPixSpectra
- *
- *    [ImgPixSpectra.CSPadPixSpectra]
- *    source        = CxiDs1.0:Cspad.0
- *    amin          =    10.
- *    amax          =  2010.
- *    nbins         =   100
- *    arr_fname     = cspad_spectral_array_cfg.txt
+ *    [psana]                                                                   
+ *    files         = /reg/d/psdm/sxr/sxr16410/xtc/e75-r0081-s01-c00.xtc    
+ *    modules       = ImgPixSpectra.CameraPixSpectra                        
+ *                                                                          
+ *    [ImgPixSpectra.CameraPixSpectra]                                      
+ *    source        = SxrBeamline.0:Opal1000.1                              
+ *    amin          =     0.                                                
+ *    amax          =  1000.                                                
+ *    nbins         =   100                                                 
+ *    arr_fname     = sxr16410-r0081-opal-camera-pix-spectra.txt            
+ *    events        =   150                                                  
+ *    
+ *    
+ *    
+ *    
  *    @endcode
  *
  *  The output file "cspad_spectral_array_cfg.txt" contains the spectral array 
@@ -73,25 +76,19 @@ namespace ImgPixSpectra {
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
- *
- *  @version \$Id: CSPadPixSpectra.h$
+ *  @version \$Id: CameraPixSpectra.h$
  *
  *  @author Mikhail S. Dubrovin
  */
 
-  typedef Psana::CsPad::DataV2    CSPadDataType;
-  typedef Psana::CsPad::ElementV2 CSPadElementType;
-  typedef Psana::CsPad::ConfigV3  CSPadConfigType;
-
-class CSPadPixSpectra : public Module {
+class CameraPixSpectra : public Module {
 public:
 
   // Default constructor
-  CSPadPixSpectra (const std::string& name) ;
+  CameraPixSpectra (const std::string& name) ;
 
   // Destructor
-  virtual ~CSPadPixSpectra () ;
+  virtual ~CameraPixSpectra () ;
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
@@ -117,52 +114,38 @@ public:
 
 protected:
 
-  void getQuadConfigPars(Env& env);
-  void printQuadConfigPars();
   void printInputPars();
   void arrayInit();
   void arrayDelete();
-  void loopOverQuads(shared_ptr<CSPadDataType> data);
-  void arrayFill(int quad, const int16_t* data, uint32_t roiMask);
+  void arrayFill(const int16_t* data);
   void saveArrayInFile();
   int  ampToIndex(double amp);
-
+  
 private:
 
   // Data members, this is for example purposes only
+
+  //enum {m_npix_mini1 = 185 * 388 * 2};
+
+  enum {m_npix_mini1 = 1024}; // *1024};
   
-  Source   m_src;         // Data source set from config file
-  Pds::Src m_actualSrc;
-  std::string m_key;
-  unsigned m_maxEvents;
-  double   m_amin;
-  double   m_amax;
-  int      m_nbins;
-  string   m_arr_fname;
-  bool     m_filter;
-  long     m_count;
-  
-  int      m_nbins1;
-  double   m_factor;
+  Source        m_src;         // Data source set from config file
+  Pds::Src      m_actualSrc;
+  std::string   m_key;
+  double        m_amin;
+  double        m_amax;
+  int           m_nbins;
+  std::string   m_arr_fname;
+  unsigned      m_maxEvents;
+  bool          m_filter;
+  long          m_count;
 
-  uint32_t m_roiMask        [4];
-  uint32_t m_numAsicsStored [4];
+  int           m_nbins1;
+  double        m_factor;
 
-  uint32_t m_nquads;         // 4
-  uint32_t m_n2x1;           // 8
-  uint32_t m_ncols2x1;       // 185
-  uint32_t m_nrows2x1;       // 388
-  uint32_t m_sizeOf2x1Arr;   // 185*388;
-  uint32_t m_sizeOfQuadArr;  // 185*388*8;
-  uint32_t m_sizeOfCSPadArr; // 185*388*8*4;
-  uint32_t m_pixel_ind;
-
-  //std::vector<int> m_image_shape;
-
-  int*           m_arr;
-  //ndarray<int,2> m_arr2d;
+  int*          m_arr;
 };
 
 } // namespace ImgPixSpectra
 
-#endif // IMGPIXSPECTRA_CSPADPIXSPECTRA_H
+#endif // IMGPIXSPECTRA_CAMERAPIXSPECTRA_H

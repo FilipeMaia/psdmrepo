@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class MiniCSPadPixSpectra...
+//	Class CameraPixSpectra...
 //
 // Author List:
 //      Mikhail S. Dubrovin
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "ImgPixSpectra/MiniCSPadPixSpectra.h"
+#include "ImgPixSpectra/CameraPixSpectra.h"
 
 //-----------------
 // C/C++ Headers --
@@ -27,10 +27,10 @@
 // header from psddl_psana package
 // #include "psddl_psana/acqiris.ddl.h"
 
-#include "psddl_psana/cspad.ddl.h"
+//#include "psddl_psana/cspad.ddl.h"
 #include "PSEvt/EventId.h"
 #include "CSPadPixCoords/Image2D.h"
-
+#include "psddl_psana/opal1k.ddl.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -38,7 +38,7 @@
 
 // This declares this class as psana module
 using namespace ImgPixSpectra;
-PSANA_MODULE_FACTORY(MiniCSPadPixSpectra)
+PSANA_MODULE_FACTORY(CameraPixSpectra)
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -49,7 +49,7 @@ namespace ImgPixSpectra {
 //----------------
 // Constructors --
 //----------------
-MiniCSPadPixSpectra::MiniCSPadPixSpectra (const std::string& name)
+CameraPixSpectra::CameraPixSpectra (const std::string& name)
   : Module(name)
   , m_src()
   , m_key()
@@ -63,25 +63,25 @@ MiniCSPadPixSpectra::MiniCSPadPixSpectra (const std::string& name)
 {
   // get the values from configuration or use defaults
   m_src           = configStr("source", "DetInfo(:Cspad2x2)");
-  m_key           = configStr("inputKey",  "");
-  m_amin          = config   ("amin",      0.);
-  m_amax          = config   ("amax",   1000.);
-  m_nbins         = config   ("nbins",    100);
+  m_key           = configStr("inputKey",   "");
+  m_amin          = config   ("amin",       0.);
+  m_amax          = config   ("amax",    1000.);
+  m_nbins         = config   ("nbins",     100);
   m_arr_fname     = configStr("arr_fname", "mini_cspad_spectral_array.txt");
   m_maxEvents     = config   ("events", 1<<31U);
-  m_filter        = config   ("filter", false);
+  m_filter        = config   ("filter",  false);
 }
 
 //--------------
 // Destructor --
 //--------------
-MiniCSPadPixSpectra::~MiniCSPadPixSpectra ()
+CameraPixSpectra::~CameraPixSpectra ()
 {
 }
 
 /// Method which is called once at the beginning of the job
 void 
-MiniCSPadPixSpectra::beginJob(Event& evt, Env& env)
+CameraPixSpectra::beginJob(Event& evt, Env& env)
 {
   this -> printInputPars();
   this -> arrayInit();
@@ -89,20 +89,20 @@ MiniCSPadPixSpectra::beginJob(Event& evt, Env& env)
 
 /// Method which is called at the beginning of the run
 void 
-MiniCSPadPixSpectra::beginRun(Event& evt, Env& env)
+CameraPixSpectra::beginRun(Event& evt, Env& env)
 {
 }
 
 /// Method which is called at the beginning of the calibration cycle
 void 
-MiniCSPadPixSpectra::beginCalibCycle(Event& evt, Env& env)
+CameraPixSpectra::beginCalibCycle(Event& evt, Env& env)
 {
 }
 
 /// Method which is called with event data, this is the only required 
 /// method, all other methods are optional
 void 
-MiniCSPadPixSpectra::event(Event& evt, Env& env)
+CameraPixSpectra::event(Event& evt, Env& env)
 {
   //// example of getting non-detector data from event
   //shared_ptr<PSEvt::EventId> eventId = evt.get();
@@ -120,31 +120,38 @@ MiniCSPadPixSpectra::event(Event& evt, Env& env)
   if (   m_count<5 
      or (m_count<500 and m_count%100  == 0) 
      or                  m_count%1000 == 0  ) WithMsgLog(name(), info, log) { log << "event=" << m_count; }
-  
-  shared_ptr<Psana::CsPad::MiniElementV1> mini1 = evt.get(m_src, m_key, &m_actualSrc);
-  if (mini1.get()) {
 
-      const Psana::CsPad::MiniElementV1& el = *mini1;
-      
-      //const int16_t* data = el.data(); // depricated
-      const ndarray<int16_t,3>& data_nda = el.data();
-      const int16_t* data = &data_nda[0][0][0];
+  shared_ptr<Psana::Opal1k::ConfigV1> config = env.configStore().get(m_src); 
+  //shared_ptr<Psana::Opal1k::ConfigV1> config = evt.get(m_src);
+  if (config.get()) {
 
-      const unsigned* dshape = data_nda.shape();
-      int npix_mini1 = dshape[0] * dshape[1] * dshape[2];  
+    WithMsgLog(name(), info, str) {
+      str << "Psana::Opal1k::ConfigV1:";
+      str << "\n  black_level = " << config->black_level();
+      str << "\n  gain_percent = " << config->gain_percent();
+      str << "\n  output_resolution = " << config->output_resolution();
+      str << "\n  vertical_binning = " << config->vertical_binning();
+      str << "\n  output_mirroring = " << config->output_mirroring();
+      str << "\n  vertical_remapping = " << int(config->vertical_remapping());
+      str << "\n  output_offset = " << config->output_offset();
+      str << "\n  output_resolution_bits = " << config->output_resolution_bits();
+      str << "\n  defect_pixel_correction_enabled = " << int(config->defect_pixel_correction_enabled());
+      str << "\n  output_lookup_table_enabled = " << int(config->output_lookup_table_enabled());
+    }
 
-      if (npix_mini1 != m_npix_mini1) {
-          MsgLog(name(), error, "Unexpected data shape: " << npix_mini1 << ", expected MiniElementV1 data size is " << m_npix_mini1);
-          stop();
-      }
 
-      //WithMsgLog(name(), info, log) { 
-      //  log << "CsPad::MiniElementV1  dshape.size() = " << dshape.size() << "  shape = "; 
-      //for(uint i=0; i<dshape.size(); i++) log << dshape[i] << ", "; 
-      //log << "    npix_mini1 = " << npix_mini1 << "\n";
-      //
+    //const ndarray<int16_t,3>& data_nda = el.data();
 
-      this -> arrayFill (data);
+
+      //const unsigned* dshape = data_nda.shape();
+      //int npix_mini1 = dshape[0] * dshape[1] * dshape[2];  
+
+      //if (npix_mini1 != m_npix_mini1) {
+      //    MsgLog(name(), error, "Unexpected data shape: " << npix_mini1 << ", expected MiniElementV1 data size is " << m_npix_mini1);
+      //    stop();
+      //}
+
+      //this -> arrayFill (data);
   }
 
   // increment event counter
@@ -153,21 +160,21 @@ MiniCSPadPixSpectra::event(Event& evt, Env& env)
   
 /// Method which is called at the end of the calibration cycle
 void 
-MiniCSPadPixSpectra::endCalibCycle(Event& evt, Env& env)
+CameraPixSpectra::endCalibCycle(Event& evt, Env& env)
 {
 }
 
 /// Method which is called at the end of the run
 void 
-MiniCSPadPixSpectra::endRun(Event& evt, Env& env)
+CameraPixSpectra::endRun(Event& evt, Env& env)
 {
 }
 
 /// Method which is called once at the end of the job
 void 
-MiniCSPadPixSpectra::endJob(Event& evt, Env& env)
+CameraPixSpectra::endJob(Event& evt, Env& env)
 {
-  MsgLog(name(), info, "MiniCSPadPixSpectra::endJob");
+  MsgLog(name(), info, "CameraPixSpectra::endJob");
   this -> saveArrayInFile();
   this -> arrayDelete();
 }
@@ -178,7 +185,7 @@ MiniCSPadPixSpectra::endJob(Event& evt, Env& env)
 //--------------------
 
 void 
-MiniCSPadPixSpectra::arrayInit()
+CameraPixSpectra::arrayInit()
 {
   m_factor = double(m_nbins) / (m_amax-m_amin);  // scale factor for histogramm index
   m_nbins1 = m_nbins - 1;
@@ -191,7 +198,7 @@ MiniCSPadPixSpectra::arrayInit()
 //--------------------
 
 void 
-MiniCSPadPixSpectra::arrayDelete()
+CameraPixSpectra::arrayDelete()
 {
   delete [] m_arr;
 }
@@ -199,7 +206,7 @@ MiniCSPadPixSpectra::arrayDelete()
 //--------------------
 
 void
-MiniCSPadPixSpectra::arrayFill(const int16_t* data)
+CameraPixSpectra::arrayFill(const int16_t* data)
 {
              for (uint32_t i=0; i<m_npix_mini1; i++) {
                double amp = (double)data[i];
@@ -212,7 +219,7 @@ MiniCSPadPixSpectra::arrayFill(const int16_t* data)
 //--------------------
 
 void 
-MiniCSPadPixSpectra::saveArrayInFile()
+CameraPixSpectra::saveArrayInFile()
 { 
     MsgLog(name(), info, "Save the spectral array in file " << m_arr_fname);
     CSPadPixCoords::Image2D<int>* arr = new CSPadPixCoords::Image2D<int>(&m_arr[0], m_npix_mini1, m_nbins); 
@@ -222,7 +229,7 @@ MiniCSPadPixSpectra::saveArrayInFile()
 //--------------------
 
 int  
-MiniCSPadPixSpectra::ampToIndex(double amp)
+CameraPixSpectra::ampToIndex(double amp)
 {
     int ind = (int) (m_factor*(amp-m_amin));
     if( ind < 0       ) return 0;
@@ -233,7 +240,7 @@ MiniCSPadPixSpectra::ampToIndex(double amp)
 //--------------------
 
 void 
-MiniCSPadPixSpectra::printInputPars()
+CameraPixSpectra::printInputPars()
 {
   WithMsgLog(name(), info, log) { log 
         << "\n    Input parameters:"

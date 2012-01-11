@@ -28,8 +28,7 @@
 // #include "psddl_psana/acqiris.ddl.h"
 // #include "psddl_psana/cspad.ddl.h" // moved to header
 #include "PSEvt/EventId.h"
-//#include "CSPadImage/Image2D.h"
-#include "ImgPixSpectra/Image2D.h"
+#include "CSPadPixCoords/Image2D.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -51,6 +50,7 @@ namespace ImgPixSpectra {
 CSPadPixSpectra::CSPadPixSpectra (const std::string& name)
   : Module(name)
   , m_src()
+  , m_key()
   , m_maxEvents()
   , m_amin()
   , m_amax()
@@ -61,12 +61,13 @@ CSPadPixSpectra::CSPadPixSpectra (const std::string& name)
 {
   // get the values from configuration or use defaults
   m_src           = configStr("source", "CxiDs1.0:Cspad.0");
-  m_maxEvents     = config   ("events",   32U);
-  m_amin          = config   ("amin",      0.);
-  m_amax          = config   ("amax",   1000.);
-  m_nbins         = config   ("nbins",    100);
+  m_key           = configStr("inputKey",   "");
+  m_maxEvents     = config   ("events", 1<<31U);
+  m_amin          = config   ("amin",       0.);
+  m_amax          = config   ("amax",    1000.);
+  m_nbins         = config   ("nbins",     100);
   m_arr_fname     = configStr("arr_fname", "cspad_spectral_array.txt");
-  m_filter        = config   ("filter", false); 
+  m_filter        = config   ("filter",  false); 
 }
 
 //--------------
@@ -81,15 +82,15 @@ void
 CSPadPixSpectra::beginJob(Event& evt, Env& env)
 {
   this -> printInputPars();
+  this -> getQuadConfigPars(env);
+  this -> printQuadConfigPars();
+  this -> arrayInit();
 }
 
 /// Method which is called at the beginning of the run
 void 
 CSPadPixSpectra::beginRun(Event& evt, Env& env)
 {
-  this -> getQuadConfigPars(env);
-  this -> printQuadConfigPars();
-  this -> arrayInit();
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -114,16 +115,17 @@ CSPadPixSpectra::event(Event& evt, Env& env)
   //if (m_filter && m_count % 10 == 0) skip();
   
   // this is how to gracefully stop analysis job
-  //if (m_count >= m_maxEvents) stop();
-  //if (m_count >= m_maxEvents) return;
+  if (m_count >= m_maxEvents) {stop(); return;}
 
   // getting detector data from event
   //shared_ptr<Psana::CsPad::DataV2> data = evt.get(m_src, "", &m_actualSrc); // get m_actualSrc here
-  shared_ptr<CSPadDataType> data = evt.get(m_src, "", &m_actualSrc); // get m_actualSrc here
+  shared_ptr<CSPadDataType> data = evt.get(m_src, m_key, &m_actualSrc); // get m_actualSrc here
+
+  if (   m_count<5 
+     or (m_count<500 and m_count%100  == 0) 
+     or                  m_count%1000 == 0  ) WithMsgLog(name(), info, log) { log << "event=" << m_count; }
 
   if (data.get()) {
-    if( m_count%100 ==0 ) WithMsgLog(name(), info, log) { log << "event=" << m_count; }
-    m_pixel_ind = 0;
     this -> loopOverQuads(data);
   }
   
@@ -141,14 +143,14 @@ CSPadPixSpectra::endCalibCycle(Event& evt, Env& env)
 void 
 CSPadPixSpectra::endRun(Event& evt, Env& env)
 {
-  this -> saveArrayInFile();
-  this -> arrayDelete();
 }
 
 /// Method which is called once at the end of the job
 void 
 CSPadPixSpectra::endJob(Event& evt, Env& env)
 {
+  this -> saveArrayInFile();
+  this -> arrayDelete();
 }
 
 //--------------------
@@ -182,14 +184,17 @@ CSPadPixSpectra::arrayDelete()
 void 
 CSPadPixSpectra::loopOverQuads(shared_ptr<CSPadDataType> data)
 {
+    m_pixel_ind = 0;
     int nQuads = data -> quads_shape()[0];
 
     for (int q = 0; q < nQuads; ++ q) {
         const Psana::CsPad::ElementV2& el = data->quads(q);
 
-        const int16_t* data = el.data(); 
-        int            quad = el.quad() ;
-        //cout << "     q = " << q << " quad =" << quad << endl;
+        int quad                           = el.quad() ;
+        const ndarray<int16_t,3>& data_nda = el.data();
+        const int16_t* data = &data_nda[0][0][0];
+
+          //cout << "     q = " << q << " quad =" << quad << endl;
         this -> arrayFill (quad, data, m_roiMask[q]);
     }
 }
@@ -263,6 +268,7 @@ CSPadPixSpectra::printInputPars()
   WithMsgLog(name(), info, log) { log 
         << "\n    Input parameters:"
       //<< "\n    m_src         " << m_src       
+        << "\n    m_key         " << m_key    
         << "\n    m_maxEvents   " << m_maxEvents 
         << "\n    m_amin        " << m_amin      
         << "\n    m_amax        " << m_amax      
@@ -303,9 +309,7 @@ void
 CSPadPixSpectra::saveArrayInFile()
 { 
     MsgLog(name(), info, "Save the spectral array in file " << m_arr_fname);
-    //string fname = "cspad_spectral_array.txt";
-    //CSPadImage::Image2D<int>* arr = new CSPadImage::Image2D<int>(&m_arr[0], m_sizeOfCSPadArr, m_nbins); 
-    Image2D<int>* arr = new Image2D<int>(&m_arr[0], m_sizeOfCSPadArr, m_nbins); 
+    CSPadPixCoords::Image2D<int>* arr = new CSPadPixCoords::Image2D<int>(&m_arr[0], m_sizeOfCSPadArr, m_nbins); 
     arr -> saveImageInFile(m_arr_fname,0);
 }
 
