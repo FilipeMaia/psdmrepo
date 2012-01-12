@@ -19,12 +19,12 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
-lusi_xtc_ver = "3.0.2"
+lusi_xtc_ver = "3.1.7"
 PREFIX = pjoin(env['SIT_ROOT'],"sw/external/lusi-xtc",lusi_xtc_ver)
 BINDIR = "bin"
 LIBDIR = "lib"
 INCDIR = "pdsdata"
-PKGLIBS = "acqdata bld camdata controldata encoderdata epics evrdata " +\
-    "fccddata ipimbdata opal1kdata pnccddata princetondata pulnixdata " +\
-    "cspaddata lusidata fexampdata gsc16aidata xtcdata"
+PKGLIBS = "acqdata bld camdata controldata cspad2x2data cspaddata encoderdata epics" +\
+    " evrdata fccddata fexampdata gsc16aidata indexdata ipimbdata lusidata opal1kdata" +\
+    " phasicsdata pnccddata princetondata pulnixdata timepixdata xampsdata xtcdata"
 standardExternalPackage ( 'pdsdata', **locals() )
