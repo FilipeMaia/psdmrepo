@@ -10,16 +10,8 @@ ConfigV1::frameSize() const {
   return sizeof(FrameV1) + this->numPixels()*2;
 }
 uint32_t
-ConfigV1::numPixels() const {
-  return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY );
-}
-uint32_t
 ConfigV2::frameSize() const {
   return sizeof(FrameV1) + this->numPixels()*2;
-}
-uint32_t
-ConfigV2::numPixels() const {
-  return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY );
 }
 } // namespace Princeton
 } // namespace PsddlPds

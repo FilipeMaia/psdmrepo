@@ -34,8 +34,12 @@ public:
   uint16_t delayMode() const { return _u16DelayMode; }
   /** Total size in bytes of the Frame object */
   uint32_t frameSize() const;
-  /** calculate the frame size in pixels based on the current ROI and binning settings */
-  uint32_t numPixels() const;
+  /** calculate frame X size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsX() const { return (_uWidth + _uBinX - 1) / _uBinX; }
+  /** calculate frame Y size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsY() const { return (_uHeight+ _uBinY - 1) / _uBinY; }
+  /** calculate total frame size in pixels based on the current ROI and binning settings */
+  uint32_t numPixels() const { return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY ); }
   static uint32_t _sizeof()  { return 40; }
 private:
   uint32_t	_uWidth;
@@ -77,8 +81,12 @@ public:
   uint16_t delayMode() const { return _u16DelayMode; }
   /** Total size in bytes of the Frame object */
   uint32_t frameSize() const;
-  /** calculate the frame size in pixels based on the current ROI and binning settings */
-  uint32_t numPixels() const;
+  /** calculate frame X size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsX() const { return (_uWidth + _uBinX - 1) / _uBinX; }
+  /** calculate frame Y size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsY() const { return (_uHeight+ _uBinY - 1) / _uBinY; }
+  /** calculate total frame size in pixels based on the current ROI and binning settings */
+  uint32_t numPixels() const { return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY ); }
   static uint32_t _sizeof()  { return 40; }
 private:
   uint32_t	_uWidth;
@@ -111,18 +119,18 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   uint32_t shotIdStart() const { return _iShotIdStart; }
   float readoutTime() const { return _fReadoutTime; }
-  ndarray<uint16_t, 1> data(const Princeton::ConfigV1& cfg) const { ptrdiff_t offset=8;
+  ndarray<uint16_t, 2> data(const Princeton::ConfigV1& cfg) const { ptrdiff_t offset=8;
   uint16_t* data = (uint16_t*)(((const char*)this)+offset);
-  return make_ndarray(data, cfg.numPixels()); }
-  ndarray<uint16_t, 1> data(const Princeton::ConfigV2& cfg) const { ptrdiff_t offset=8;
+  return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }
+  ndarray<uint16_t, 2> data(const Princeton::ConfigV2& cfg) const { ptrdiff_t offset=8;
   uint16_t* data = (uint16_t*)(((const char*)this)+offset);
-  return make_ndarray(data, cfg.numPixels()); }
-  static uint32_t _sizeof(const Princeton::ConfigV1& cfg)  { return 8+(2*(cfg.numPixels())); }
-  static uint32_t _sizeof(const Princeton::ConfigV2& cfg)  { return 8+(2*(cfg.numPixels())); }
+  return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }
+  static uint32_t _sizeof(const Princeton::ConfigV1& cfg)  { return 8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())); }
+  static uint32_t _sizeof(const Princeton::ConfigV2& cfg)  { return 8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())); }
 private:
   uint32_t	_iShotIdStart;
   float	_fReadoutTime;
-  //uint16_t	_data[cfg.numPixels()];
+  //uint16_t	_data[cfg.numPixelsY()][cfg.numPixelsX()];
 };
 #pragma pack(pop)
 
