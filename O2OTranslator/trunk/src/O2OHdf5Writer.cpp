@@ -75,6 +75,7 @@
 #include "H5DataTypes/PrincetonInfoV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV2.h"
+#include "H5DataTypes/TimepixConfigV1.h"
 #include "LusiTime/Time.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/AcqirisDataDescV1Cvt.h"
@@ -95,6 +96,7 @@
 #include "O2OTranslator/O2OMetaData.h"
 #include "O2OTranslator/PnCCDFrameV1Cvt.h"
 #include "O2OTranslator/PrincetonFrameV1Cvt.h"
+#include "O2OTranslator/TimepixDataV1Cvt.h"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/Dgram.hh"
 #include "pdsdata/xtc/Level.hh"
@@ -362,6 +364,10 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   typeId =  Pds::TypeId(Pds::TypeId::Id_Gsc16aiConfig, 1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
+  converter.reset( new ConfigDataTypeCvt<H5DataTypes::TimepixConfigV1> ( "Timepix::ConfigV1" ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_TimepixConfig, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
   // special converter object for CsPad calibration data
   converter.reset( new CsPadCalibV1Cvt ( "CsPad::CalibV1", m_metadata, m_calibStore ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_CspadConfig, 1).value() ;
@@ -540,6 +546,11 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
   // very special converter for Gsc16ai::DataV1, it needs two types of data
   converter.reset( new Gsc16aiDataV1Cvt ( "Gsc16ai::DataV1", m_configStore, chunk_size, m_compression ) ) ;
   typeId =  Pds::TypeId(Pds::TypeId::Id_Gsc16aiData, 1).value() ;
+  m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
+
+  // very special converter for Timepix::DataV1
+  converter.reset( new TimepixDataV1Cvt ( "Timepix::DataV1", chunk_size, m_compression ) ) ;
+  typeId =  Pds::TypeId(Pds::TypeId::Id_TimepixData,1).value() ;
   m_cvtMap.insert( CvtMap::value_type( typeId, converter ) ) ;
 
 }
