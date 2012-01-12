@@ -406,6 +406,8 @@ class DdlPsanaDoc ( object ) :
         else:
 
             typename = _typedecl(meth.type)
+            if meth.rank > 0:
+                typename = "ndarray<%s, %d>" % (typename, meth.rank)
             
         return typename
 

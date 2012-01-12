@@ -302,19 +302,30 @@ class CppTypeCodegen ( object ) :
             
             if meth.name == "_sizeof" and self._abs : return
             
-            expr = meth.expr.get("C++")
-            if not expr : expr = meth.expr.get("Any")
-            cfgNeeded = False
-            if expr: 
-                cfgNeeded = expr.find('{xtc-config}') >= 0
-                expr = _interpolate(expr, meth.parent)
-
             # if no type given then it does not return anything
             type = meth.type
             if type is None:
                 type = "void"
             else:
                 type = _typename(type)
+                if meth.rank > 0:
+                    type = "ndarray<%s, %d>" % (type, meth.rank)
+
+            # make method body
+            body = meth.code.get("C++")
+            if not body : body = meth.code.get("Any")
+            if not body :
+                expr = meth.expr.get("C++")
+                if not expr : expr = meth.expr.get("Any")
+                if expr:
+                    body = expr
+                    if type: body = "return %s;" % expr
+                
+            # config objects may be needed 
+            cfgNeeded = False
+            if body: 
+                cfgNeeded = body.find('{xtc-config}') >= 0
+                body = _interpolate(body, meth.parent)
 
             # default is not inline, can change with a tag
             inline = 'inline' in meth.tags
@@ -327,7 +338,7 @@ class CppTypeCodegen ( object ) :
                 if cfg: args = [('cfg', cfg)]
                 args += meth.args
 
-                self._genMethodExpr(meth.name, type, expr, args, inline, static=meth.static, doc=meth.comment)
+                self._genMethodBody(meth.name, type, body, args, inline, static=meth.static, doc=meth.comment)
 
 
     def _bodyNonArray(self, attr):

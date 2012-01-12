@@ -427,6 +427,7 @@ class XmlReader ( object ) :
         if typename:
             mtype = type.lookup(typename, (Type, Enum))
             if not mtype: raise ValueError('method element has unknown type '+typename)
+        rank = int(methel.get('rank', 0))
 
         args = []
         for argel in list(methel) :
@@ -444,11 +445,20 @@ class XmlReader ( object ) :
                 value = exprel.get('value')
                 expr[lang] = value
 
+        code = {}
+        for exprel in list(methel) :
+            if exprel.tag == "code" :
+                lang = exprel.get('lang', "Any")
+                body = exprel.get('body')
+                code[lang] = body
+
         method = Method(name, 
                         parent = type, 
                         type = mtype,
+                        rank = rank,
                         args = args,
                         expr = expr,
+                        code = code,
                         access = methel.get('access', 'public'),
                         tags = self._tags(methel),
                         comment = (methel.text or "").strip())

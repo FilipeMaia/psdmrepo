@@ -421,11 +421,18 @@ class DdlPds2Psana ( object ) :
             
             if meth.name == "_sizeof" : return
             
-            expr = meth.expr.get("C++")
-            if not expr : expr = meth.expr.get("Any")
+            # check if config object is needed
+            body = meth.code.get("C++")
+            if not body : body = meth.code.get("Any")
+            if not body :
+                expr = meth.expr.get("C++")
+                if not expr : expr = meth.expr.get("Any")
+                if expr:
+                    body = expr
+                    if type: body = "return %s;" % expr
             cfgNeeded = False
-            if expr: 
-                cfgNeeded = expr.find('{xtc-config}') >= 0
+            if body:
+                cfgNeeded = body.find('{xtc-config}') >= 0
 
             # if no type given then it does not return anything
             rettype = meth.type
@@ -434,6 +441,8 @@ class DdlPds2Psana ( object ) :
                 rettype = "void"
             elif rettype.basic and not isinstance(rettype, Enum):
                 rettype = rettype.fullName('C++')
+                if meth.rank > 0:
+                    rettype = "ndarray<%s, %d>" % (rettype, meth.rank)
             else:
                 cvt = True
                 rettype = rettype.fullName('C++', self.psana_ns)

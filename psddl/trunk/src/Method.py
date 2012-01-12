@@ -59,11 +59,13 @@ class Method ( object ) :
         
         self.name = name
         self.type = kw.get('type')
+        self.rank = kw.get('rank', 0)
         self.parent = kw.get('parent')
         self.attribute = kw.get('attribute')
         self.bitfield = kw.get('bitfield')
         self.args = kw.get('args', [])
         self.expr = kw.get('expr', {}).copy()
+        self.code = kw.get('code', {}).copy()
         self.comment = kw.get('comment')
         self.access = kw.get('access', "public")
         self.static = kw.get('static', False)

@@ -11,6 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-02
+2012-01-12 Andy Salnikov
+- extending method generation capabilities
+- methods may have "rank" attribute which cases return type to be 
+  ndarray<Type, Rank>
+- methods may have "code" element instead of "expr" which can specify
+  full methods body
+
 Tag: V00-01-00
 2011-12-09 Andy Salnikov
 - switch to ndarray for accessing array data
