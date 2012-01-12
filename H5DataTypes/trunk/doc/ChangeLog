@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-47
+2012-01-12 Andy Salnikov
+- adding TimepixConfigV1 and TimepixDataV1 classes
+
 Tag: V00-00-46
 2011-12-10 Andy Salnikov
 - migration cspad calibration classes to ndarray use
