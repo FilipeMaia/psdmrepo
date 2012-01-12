@@ -33,7 +33,11 @@ public:
   virtual uint16_t delayMode() const = 0;
   /** Total size in bytes of the Frame object */
   virtual uint32_t frameSize() const = 0;
-  /** calculate the frame size in pixels based on the current ROI and binning settings */
+  /** calculate frame X size in pixels based on the current ROI and binning settings */
+  virtual uint32_t numPixelsX() const = 0;
+  /** calculate frame Y size in pixels based on the current ROI and binning settings */
+  virtual uint32_t numPixelsY() const = 0;
+  /** calculate total frame size in pixels based on the current ROI and binning settings */
   virtual uint32_t numPixels() const = 0;
 };
 
@@ -62,7 +66,11 @@ public:
   virtual uint16_t delayMode() const = 0;
   /** Total size in bytes of the Frame object */
   virtual uint32_t frameSize() const = 0;
-  /** calculate the frame size in pixels based on the current ROI and binning settings */
+  /** calculate frame X size in pixels based on the current ROI and binning settings */
+  virtual uint32_t numPixelsX() const = 0;
+  /** calculate frame Y size in pixels based on the current ROI and binning settings */
+  virtual uint32_t numPixelsY() const = 0;
+  /** calculate total frame size in pixels based on the current ROI and binning settings */
   virtual uint32_t numPixels() const = 0;
 };
 
@@ -81,7 +89,7 @@ public:
   virtual ~FrameV1();
   virtual uint32_t shotIdStart() const = 0;
   virtual float readoutTime() const = 0;
-  virtual ndarray<uint16_t, 1> data() const = 0;
+  virtual ndarray<uint16_t, 2> data() const = 0;
 };
 
 /** @class InfoV1
