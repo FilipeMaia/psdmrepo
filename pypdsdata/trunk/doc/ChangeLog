@@ -1,4 +1,10 @@
 
+Tag: V00-00-44
+2012-01-12 Andy Salnikov
+- adding new pdsdata package timepix
+- updated TypeId and DetInfo
+- updated unit test
+
 2011-12-14 - V00-00-43
 ======================
 - add support for cspad.ConfigV3 and cspad.ElementV1 combination

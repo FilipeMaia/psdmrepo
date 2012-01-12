@@ -124,6 +124,8 @@ namespace {
       { "Cspad2x2",  Pds::DetInfo::Cspad2x2 },
       { "Fexamp",    Pds::DetInfo::Fexamp },
       { "Gsc16ai",   Pds::DetInfo::Gsc16ai },
+      { "Phasics",   Pds::DetInfo::Phasics },
+      { "Timepix",   Pds::DetInfo::Timepix },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };

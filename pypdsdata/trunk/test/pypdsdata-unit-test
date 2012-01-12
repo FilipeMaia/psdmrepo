@@ -269,7 +269,10 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_FexampElement, 45 )
         self.assertEqual ( TypeId.Type.Id_Gsc16aiConfig, 46 )
         self.assertEqual ( TypeId.Type.Id_Gsc16aiData, 47 )
-        self.assertEqual ( TypeId.Type.NumberOf, 48 )
+        self.assertEqual ( TypeId.Type.Id_PhasicsConfig, 48 )
+        self.assertEqual ( TypeId.Type.Id_TimepixConfig, 49 )
+        self.assertEqual ( TypeId.Type.Id_TimepixData, 50 )
+        self.assertEqual ( TypeId.Type.NumberOf, 51 )
 
         # instantiation
         TypeId ()
@@ -413,7 +416,9 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.Cspad2x2, 13 )
         self.assertEqual ( DetInfo.Device.Fexamp, 14 )
         self.assertEqual ( DetInfo.Device.Gsc16ai, 15 )
-        self.assertEqual ( DetInfo.Device.NumDevice, 16 )
+        self.assertEqual ( DetInfo.Device.Phasics, 16 )
+        self.assertEqual ( DetInfo.Device.Timepix, 17 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 18 )
 
         
         o1 = DetInfo(0,0,0,0)

@@ -141,6 +141,9 @@
 #include "types/pulnix/TM6740ConfigV1.h"
 #include "types/pulnix/TM6740ConfigV2.h"
 
+#include "types/timepix/ConfigV1.h"
+#include "types/timepix/DataV1.h"
+
 #define PDSDATA_IMPORT_ARRAY
 #import "pdsdata_numpy.h"
 
@@ -346,6 +349,12 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Pulnix::TM6740ConfigV2::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "pulnix", module );
+
+  module = Py_InitModule3( "_pdsdata.timepix", 0, "The Python module for pdsdata/timepix" );
+  pypdsdata::Timepix::ConfigV1::initType( module );
+  pypdsdata::Timepix::DataV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "timepix", module );
 
   // import NumPy
   import_array();

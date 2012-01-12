@@ -82,6 +82,9 @@ namespace {
       { "Id_FexampElement",   Pds::TypeId::Id_FexampElement },
       { "Id_Gsc16aiConfig",   Pds::TypeId::Id_Gsc16aiConfig },
       { "Id_Gsc16aiData",     Pds::TypeId::Id_Gsc16aiData },
+      { "Id_PhasicsConfig",   Pds::TypeId::Id_PhasicsConfig },
+      { "Id_TimepixConfig",   Pds::TypeId::Id_TimepixConfig },
+      { "Id_TimepixData",     Pds::TypeId::Id_TimepixData },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

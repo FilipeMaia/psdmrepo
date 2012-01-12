@@ -99,6 +99,9 @@
 #include "types/pulnix/TM6740ConfigV1.h"
 #include "types/pulnix/TM6740ConfigV2.h"
 
+#include "types/timepix/ConfigV1.h"
+#include "types/timepix/DataV1.h"
+
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
@@ -343,12 +346,32 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     if ( not obj ) obj = xtc2obj<BldDataPimV1, 1>(xtc, parent);
     break ;
 
+  case Pds::TypeId::Id_Cspad2x2Config :
+    break;
+
+  case Pds::TypeId::Id_FexampConfig :
+    break;
+
+  case Pds::TypeId::Id_FexampElement :
+    break;
+
   case Pds::TypeId::Id_Gsc16aiConfig :
     if ( not obj ) obj = xtc2obj<Gsc16ai::ConfigV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_Gsc16aiData :
     if ( not obj ) obj = xtc2obj<Gsc16ai::DataV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_PhasicsConfig :
+    break;
+
+  case Pds::TypeId::Id_TimepixConfig :
+    if ( not obj ) obj = xtc2obj<Timepix::ConfigV1, 1>(xtc, parent);
+    break ;
+
+  case Pds::TypeId::Id_TimepixData :
+    if ( not obj ) obj = xtc2obj<Timepix::DataV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::NumberOf :
