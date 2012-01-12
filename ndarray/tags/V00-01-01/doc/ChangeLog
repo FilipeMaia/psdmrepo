@@ -1,0 +1,29 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package ndarray
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-01
+2012-01-12 Andy Salnikov
+- add ndarray::empty() method
+
+Tag: V00-01-00
+2011-12-09 Andy Salnikov
+- get rid of data ownership in ndarray, now it is strictly a "pointer" 
+  to existing data
+- removed ndarray::copy() method
+- added ndarray::swap() method
+- ndarray now is read-only, cannot change data through ndarray interface
+- doxygenated whole shebang
+
+Tag: V00-00-01
+2011-11-27 Andy Salnikov
+- first version of the ndarray class
