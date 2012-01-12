@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2012-01-12 Andy Salnikov
+- adding DumpTimepix module
+
 Tag: V00-02-00
 2011-12-09 Andy Salnikov
 - migrating to ndarray for adrray data

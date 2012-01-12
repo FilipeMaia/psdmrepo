@@ -117,10 +117,10 @@ DumpPrinceton::event(Event& evt, Env& env)
       str << "\n  shotIdStart = " << frame->shotIdStart();
       str << "\n  readoutTime = " << frame->readoutTime();
 
-      const ndarray<uint16_t, 1>& data = frame->data();
+      const ndarray<uint16_t, 2>& data = frame->data();
       str << "\n  data =";
       for (int i = 0; i < 10; ++ i) {
-        str << " " << data[i];
+        str << " " << data[0][i];
       }
       str << " ...";
     }

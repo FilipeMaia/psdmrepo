@@ -54,7 +54,7 @@ namespace psana_examples {
 DumpCamera::DumpCamera (const std::string& name)
   : Module(name)
 {
-  m_src = configStr("source", "DetInfo(:Opal1000)");
+  m_src = configStr("source", "DetInfo()");
 }
 
 //--------------
@@ -107,10 +107,21 @@ DumpCamera::event(Event& evt, Env& env)
       str << "Camera::FrameV1: width=" << frmData->width()
           << " height=" << frmData->height()
           << " depth=" << frmData->depth()
-          << " offset=" << frmData->offset()
-          << " data=[" << int(frmData->data()[0])
-          << ", " << int(frmData->data()[1])
-          << ", " << int(frmData->data()[2]) << ", ...]";
+          << " offset=" << frmData->offset() ;
+
+      const ndarray<uint8_t, 2>& data8 = frmData->data8();
+      if (not data8.empty()) {
+        str << " data8=[" << int(data8[0][0])
+            << ", " << int(data8[0][1])
+            << ", " << int(data8[0][2]) << ", ...]";
+      }
+
+      const ndarray<uint16_t, 2>& data16 = frmData->data16();
+      if (not data16.empty()) {
+        str << " data16=[" << int(data16[0][0])
+            << ", " << int(data16[0][1])
+            << ", " << int(data16[0][2]) << ", ...]";
+      }
     }
   }
 

@@ -260,15 +260,25 @@ DumpBld::event(Event& evt, Env& env)
           << "\n    yscale = " << pimCfg.yscale();
 
       const Psana::Camera::FrameV1& frame = pim1->frame();
-      const ndarray<uint8_t, 1>& frame_data = frame.data();
       str << "\n  Camera::FrameV1:"
           << "\n    width=" << frame.width()
           << "\n    height=" << frame.height()
           << "\n    depth=" << frame.depth()
-          << "\n    offset=" << frame.offset()
-          << "\n    data=[" << int(frame_data[0])
-          << ", " << int(frame_data[1])
-          << ", " << int(frame_data[2]) << ", ...]";
+          << "\n    offset=" << frame.offset();
+
+      const ndarray<uint8_t, 2>& data8 = frame.data8();
+      if (not data8.empty()) {
+        str << "\n    data8=[" << int(data8[0][0])
+            << ", " << int(data8[0][1])
+            << ", " << int(data8[0][2]) << ", ...]";
+      }
+
+      const ndarray<uint16_t, 2>& data16 = frame.data16();
+      if (not data16.empty()) {
+        str << "\n    data16=[" << int(data16[0][0])
+            << ", " << int(data16[0][1])
+            << ", " << int(data16[0][2]) << ", ...]";
+      }
     }
   }
 }
