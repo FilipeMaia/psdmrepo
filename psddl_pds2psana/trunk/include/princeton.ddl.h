@@ -28,6 +28,8 @@ public:
   virtual uint16_t readoutEventCode() const;
   virtual uint16_t delayMode() const;
   virtual uint32_t frameSize() const;
+  virtual uint32_t numPixelsX() const;
+  virtual uint32_t numPixelsY() const;
   virtual uint32_t numPixels() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -54,6 +56,8 @@ public:
   virtual uint16_t readoutEventCode() const;
   virtual uint16_t delayMode() const;
   virtual uint32_t frameSize() const;
+  virtual uint32_t numPixelsX() const;
+  virtual uint32_t numPixelsY() const;
   virtual uint32_t numPixels() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
@@ -70,7 +74,7 @@ public:
   virtual ~FrameV1();
   virtual uint32_t shotIdStart() const;
   virtual float readoutTime() const;
-  virtual ndarray<uint16_t, 1> data() const;
+  virtual ndarray<uint16_t, 2> data() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

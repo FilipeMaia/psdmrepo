@@ -58,7 +58,9 @@ public:
   virtual uint32_t height() const;
   virtual uint32_t depth() const;
   virtual uint32_t offset() const;
-  virtual ndarray<uint8_t, 1> data() const;
+  virtual ndarray<uint8_t, 1> _int_pixel_data() const;
+  virtual ndarray<uint8_t, 2> data8() const;
+  virtual ndarray<uint16_t, 2> data16() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

@@ -44,6 +44,7 @@
 #include "psddl_pds2psana/pnccd.ddl.h"
 #include "psddl_pds2psana/princeton.ddl.h"
 #include "psddl_pds2psana/pulnix.ddl.h"
+#include "psddl_pds2psana/timepix.ddl.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -350,10 +351,23 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
   case Pds::TypeId::Id_SharedPim:
     if (version == 1) ::storeDataProxy<Bld::BldDataPimV1>(xtc, evt);
     break;
+  case Pds::TypeId::Id_Cspad2x2Config:
+    break;
+  case Pds::TypeId::Id_FexampConfig:
+    break;
+  case Pds::TypeId::Id_FexampElement:
+    break;
   case Pds::TypeId::Id_Gsc16aiConfig:
     break;
   case Pds::TypeId::Id_Gsc16aiData:
     if (version == 1) ::storeDataProxyCfg<Gsc16ai::DataV1, PsddlPds::Gsc16ai::ConfigV1>(xtc, evt, cfgStore);
+    break;
+  case Pds::TypeId::Id_PhasicsConfig:
+    break;
+  case Pds::TypeId::Id_TimepixConfig:
+    break;
+  case Pds::TypeId::Id_TimepixData:
+    if (version == 1) ::storeDataProxy<Timepix::DataV1>(xtc, evt);
     break;
   case Pds::TypeId::NumberOf:
     break;
@@ -489,10 +503,23 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     break;
   case Pds::TypeId::Id_SharedPim:
     break;
+  case Pds::TypeId::Id_Cspad2x2Config:
+    break;
+  case Pds::TypeId::Id_FexampConfig:
+    break;
+  case Pds::TypeId::Id_FexampElement:
+    break;
   case Pds::TypeId::Id_Gsc16aiConfig:
     if (version == 1) ::storeCfgObject<Gsc16ai::ConfigV1>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_Gsc16aiData:
+    break;
+  case Pds::TypeId::Id_PhasicsConfig:
+    break;
+  case Pds::TypeId::Id_TimepixConfig:
+    if (version == 1) ::storeCfgObject<Timepix::ConfigV1>(xtc, cfgStore);
+    break;
+  case Pds::TypeId::Id_TimepixData:
     break;
   case Pds::TypeId::NumberOf:
     break;

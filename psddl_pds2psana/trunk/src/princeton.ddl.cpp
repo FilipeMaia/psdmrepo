@@ -43,6 +43,10 @@ uint16_t ConfigV1::delayMode() const { return m_xtcObj->delayMode(); }
 
 uint32_t ConfigV1::frameSize() const { return m_xtcObj->frameSize(); }
 
+uint32_t ConfigV1::numPixelsX() const { return m_xtcObj->numPixelsX(); }
+
+uint32_t ConfigV1::numPixelsY() const { return m_xtcObj->numPixelsY(); }
+
 uint32_t ConfigV1::numPixels() const { return m_xtcObj->numPixels(); }
 ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Princeton::ConfigV2()
@@ -80,6 +84,10 @@ uint16_t ConfigV2::delayMode() const { return m_xtcObj->delayMode(); }
 
 uint32_t ConfigV2::frameSize() const { return m_xtcObj->frameSize(); }
 
+uint32_t ConfigV2::numPixelsX() const { return m_xtcObj->numPixelsX(); }
+
+uint32_t ConfigV2::numPixelsY() const { return m_xtcObj->numPixelsY(); }
+
 uint32_t ConfigV2::numPixels() const { return m_xtcObj->numPixels(); }
 FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV1>& cfgPtr)
   : Psana::Princeton::FrameV1()
@@ -102,7 +110,7 @@ uint32_t FrameV1::shotIdStart() const { return m_xtcObj->shotIdStart(); }
 
 float FrameV1::readoutTime() const { return m_xtcObj->readoutTime(); }
 
-ndarray<uint16_t, 1> FrameV1::data() const {
+ndarray<uint16_t, 2> FrameV1::data() const {
   if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
   if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
   throw std::runtime_error("FrameV1::data: config object pointer is zero");

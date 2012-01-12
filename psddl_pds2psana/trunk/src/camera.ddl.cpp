@@ -88,7 +88,11 @@ uint32_t FrameV1::depth() const { return m_xtcObj->depth(); }
 
 uint32_t FrameV1::offset() const { return m_xtcObj->offset(); }
 
-ndarray<uint8_t, 1> FrameV1::data() const { return m_xtcObj->data(); }
+ndarray<uint8_t, 1> FrameV1::_int_pixel_data() const { return m_xtcObj->_int_pixel_data(); }
+
+ndarray<uint8_t, 2> FrameV1::data8() const { return m_xtcObj->data8(); }
+
+ndarray<uint16_t, 2> FrameV1::data16() const { return m_xtcObj->data16(); }
 TwoDGaussianV1::TwoDGaussianV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Camera::TwoDGaussianV1()
   , m_xtcObj(xtcPtr)
