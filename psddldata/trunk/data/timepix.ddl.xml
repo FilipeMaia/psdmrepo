@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+	<package name="Timepix">
+	
+	
+	    Package containing definitions for Timepix data types.
+
+		<!-- ========================================================================= -->
+		
+		<pstype name="ConfigV1" version="1" type_id="Id_TimepixConfig" pack="4">
+				
+            <enum name="ReadoutSpeed">
+                <enum-const name="ReadoutSpeed_Slow" value="0" />
+                <enum-const name="ReadoutSpeed_Fast" value="1" />
+            </enum>
+
+            <enum name="TriggerMode">
+                <enum-const name="TriggerMode_ExtPos" value="0" />
+                <enum-const name="TriggerMode_ExtNeg" value="1" />
+                <enum-const name="TriggerMode_Soft" value="2" />
+            </enum>
+
+            <const name="ChipCount" value="4"/>
+
+			<attribute name="_readoutSpeed" type="uint8_t" />
+			
+            <method name="readoutSpeed" type="ReadoutSpeed">
+            	<tag name="inline"/>
+                <expr lang="C++" value="ReadoutSpeed(_readoutSpeed)"/>
+            </method>
+
+			<attribute name="_triggerMode" type="uint8_t" />
+
+            <method name="triggerMode" type="TriggerMode">
+            	<tag name="inline"/>
+                <expr lang="C++" value="TriggerMode(_triggerMode)"/>
+            </method>
+			
+			<attribute name="_pad" type="int16_t" />
+
+			<attribute name="_shutterTimeout" type="int32_t" accessor="shutterTimeout" />
+			
+			<attribute name="_dac0Ikrum" type="int32_t" accessor="dac0Ikrum" />
+			
+			<attribute name="_dac0Disc" type="int32_t" accessor="dac0Disc" />
+			
+			<attribute name="_dac0Preamp" type="int32_t" accessor="dac0Preamp" />
+			
+			<attribute name="_dac0BufAnalogA" type="int32_t" accessor="dac0BufAnalogA" />
+			
+			<attribute name="_dac0BufAnalogB" type="int32_t" accessor="dac0BufAnalogB" />
+			
+			<attribute name="_dac0Hist" type="int32_t" accessor="dac0Hist" />
+			
+			<attribute name="_dac0ThlFine" type="int32_t" accessor="dac0ThlFine" />
+			
+			<attribute name="_dac0ThlCourse" type="int32_t" accessor="dac0ThlCourse" />
+			
+			<attribute name="_dac0Vcas" type="int32_t" accessor="dac0Vcas" />
+			
+			<attribute name="_dac0Fbk" type="int32_t" accessor="dac0Fbk" />
+			
+			<attribute name="_dac0Gnd" type="int32_t" accessor="dac0Gnd" />
+			
+			<attribute name="_dac0Ths" type="int32_t" accessor="dac0Ths" />
+			
+			<attribute name="_dac0BiasLvds" type="int32_t" accessor="dac0BiasLvds" />
+			
+			<attribute name="_dac0RefLvds" type="int32_t" accessor="dac0RefLvds" />
+			
+			<attribute name="_dac1Ikrum" type="int32_t" accessor="dac1Ikrum" />
+			
+			<attribute name="_dac1Disc" type="int32_t" accessor="dac1Disc" />
+			
+			<attribute name="_dac1Preamp" type="int32_t" accessor="dac1Preamp" />
+			
+			<attribute name="_dac1BufAnalogA" type="int32_t" accessor="dac1BufAnalogA" />
+			
+			<attribute name="_dac1BufAnalogB" type="int32_t" accessor="dac1BufAnalogB" />
+			
+			<attribute name="_dac1Hist" type="int32_t" accessor="dac1Hist" />
+			
+			<attribute name="_dac1ThlFine" type="int32_t" accessor="dac1ThlFine" />
+			
+			<attribute name="_dac1ThlCourse" type="int32_t" accessor="dac1ThlCourse" />
+			
+			<attribute name="_dac1Vcas" type="int32_t" accessor="dac1Vcas" />
+			
+			<attribute name="_dac1Fbk" type="int32_t" accessor="dac1Fbk" />
+			
+			<attribute name="_dac1Gnd" type="int32_t" accessor="dac1Gnd" />
+			
+			<attribute name="_dac1Ths" type="int32_t" accessor="dac1Ths" />
+			
+			<attribute name="_dac1BiasLvds" type="int32_t" accessor="dac1BiasLvds" />
+			
+			<attribute name="_dac1RefLvds" type="int32_t" accessor="dac1RefLvds" />
+			
+			<attribute name="_dac2Ikrum" type="int32_t" accessor="dac2Ikrum" />
+			
+			<attribute name="_dac2Disc" type="int32_t" accessor="dac2Disc" />
+			
+			<attribute name="_dac2Preamp" type="int32_t" accessor="dac2Preamp" />
+			
+			<attribute name="_dac2BufAnalogA" type="int32_t" accessor="dac2BufAnalogA" />
+			
+			<attribute name="_dac2BufAnalogB" type="int32_t" accessor="dac2BufAnalogB" />
+			
+			<attribute name="_dac2Hist" type="int32_t" accessor="dac2Hist" />
+			
+			<attribute name="_dac2ThlFine" type="int32_t" accessor="dac2ThlFine" />
+			
+			<attribute name="_dac2ThlCourse" type="int32_t" accessor="dac2ThlCourse" />
+			
+			<attribute name="_dac2Vcas" type="int32_t" accessor="dac2Vcas" />
+			
+			<attribute name="_dac2Fbk" type="int32_t" accessor="dac2Fbk" />
+			
+			<attribute name="_dac2Gnd" type="int32_t" accessor="dac2Gnd" />
+			
+			<attribute name="_dac2Ths" type="int32_t" accessor="dac2Ths" />
+			
+			<attribute name="_dac2BiasLvds" type="int32_t" accessor="dac2BiasLvds" />
+			
+			<attribute name="_dac2RefLvds" type="int32_t" accessor="dac2RefLvds" />
+			
+			<attribute name="_dac3Ikrum" type="int32_t" accessor="dac3Ikrum" />
+			
+			<attribute name="_dac3Disc" type="int32_t" accessor="dac3Disc" />
+			
+			<attribute name="_dac3Preamp" type="int32_t" accessor="dac3Preamp" />
+			
+			<attribute name="_dac3BufAnalogA" type="int32_t" accessor="dac3BufAnalogA" />
+			
+			<attribute name="_dac3BufAnalogB" type="int32_t" accessor="dac3BufAnalogB" />
+			
+			<attribute name="_dac3Hist" type="int32_t" accessor="dac3Hist" />
+			
+			<attribute name="_dac3ThlFine" type="int32_t" accessor="dac3ThlFine" />
+			
+			<attribute name="_dac3ThlCourse" type="int32_t" accessor="dac3ThlCourse" />
+			
+			<attribute name="_dac3Vcas" type="int32_t" accessor="dac3Vcas" />
+			
+			<attribute name="_dac3Fbk" type="int32_t" accessor="dac3Fbk" />
+			
+			<attribute name="_dac3Gnd" type="int32_t" accessor="dac3Gnd" />
+			
+			<attribute name="_dac3Ths" type="int32_t" accessor="dac3Ths" />
+			
+			<attribute name="_dac3BiasLvds" type="int32_t" accessor="dac3BiasLvds" />
+			
+			<attribute name="_dac3RefLvds" type="int32_t" accessor="dac3RefLvds" />
+			
+        </pstype>
+        
+        
+		<!-- ========================================================================= -->
+		
+        <pstype name="DataV1" version="1" type_id="Id_TimepixData">
+
+            <const name="TIMEPIX_HEIGHT" value="512"/>
+            <const name="TIMEPIX_WIDTH" value="512"/>
+            <const name="TIMEPIX_DEPTH" value="14"/>
+            <const name="TIMEPIX_DEPTH_BYTES" value="2"/>
+        
+            <attribute name="_timestamp" type="uint32_t" accessor="timestamp">
+            </attribute>
+
+            <attribute name="_frameCounter" type="uint16_t" accessor="frameCounter">
+            </attribute>
+
+            <attribute name="_lostRows" type="uint16_t" accessor="lostRows">
+            </attribute>
+
+            <attribute name="_data" type="uint16_t" shape="TIMEPIX_HEIGHT,TIMEPIX_WIDTH" accessor="data">
+            </attribute>
+
+        </pstype>
+        
+		<!-- ========================================================================= -->
+		
+	</package>
+</psddl>

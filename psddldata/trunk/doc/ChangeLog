@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2012-01-12 Andy Salnikov
+- adding timepix package
+- Princeton.FrameV1 data() method now return 2-dim array
+- Camera.FrameV1 now has two methods data8() and data16() that return
+  either 8-bit or 16-bit data
+
 Tag: V00-01-00
 2011-12-09 Andrei Salnikov
 - few small changes related to ndarray migration

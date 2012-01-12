@@ -49,8 +49,21 @@
                 <expr lang="C++" value="sizeof(FrameV1) + {self}.numPixels()*2"/>
             </method>
 
+            <method name="numPixelsX" type="uint32_t">
+            calculate frame X size in pixels based on the current ROI and binning settings
+            	<tag name="inline"/>
+                <expr lang="C++" value="(_uWidth + _uBinX - 1) / _uBinX"/>
+            </method>
+
+            <method name="numPixelsY" type="uint32_t">
+            calculate frame Y size in pixels based on the current ROI and binning settings
+            	<tag name="inline"/>
+                <expr lang="C++" value="(_uHeight+ _uBinY - 1) / _uBinY"/>
+            </method>
+
             <method name="numPixels" type="uint32_t">
-            calculate the frame size in pixels based on the current ROI and binning settings
+            calculate total frame size in pixels based on the current ROI and binning settings
+            	<tag name="inline"/>
                 <expr lang="C++" value="((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY )"/>
             </method>
 
@@ -102,8 +115,21 @@
                 <expr lang="C++" value="sizeof(FrameV1) + {self}.numPixels()*2"/>
             </method>
 
+            <method name="numPixelsX" type="uint32_t">
+            calculate frame X size in pixels based on the current ROI and binning settings
+            	<tag name="inline"/>
+                <expr lang="C++" value="(_uWidth + _uBinX - 1) / _uBinX"/>
+            </method>
+
+            <method name="numPixelsY" type="uint32_t">
+            calculate frame Y size in pixels based on the current ROI and binning settings
+            	<tag name="inline"/>
+                <expr lang="C++" value="(_uHeight+ _uBinY - 1) / _uBinY"/>
+            </method>
+
             <method name="numPixels" type="uint32_t">
-            calculate the frame size in pixels based on the current ROI and binning settings
+            calculate total frame size in pixels based on the current ROI and binning settings
+            	<tag name="inline"/>
                 <expr lang="C++" value="((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY )"/>
             </method>
 
@@ -123,7 +149,7 @@
             <attribute name="_fReadoutTime" type="float" accessor="readoutTime">
             </attribute>
 
-            <attribute name="_data" type="uint16_t" shape="{xtc-config}.numPixels()" accessor="data">
+            <attribute name="_data" type="uint16_t" shape="{xtc-config}.numPixelsY(),{xtc-config}.numPixelsX()" accessor="data">
             </attribute>
 
         </pstype>

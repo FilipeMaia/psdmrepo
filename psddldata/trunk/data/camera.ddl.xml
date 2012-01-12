@@ -67,6 +67,7 @@
 
             <method name="forwarding" type="Forwarding">
                 Forwarding policy for frame data.
+                <tag name="inline" />
                 <expr lang="C++" value="Forwarding({self}._forwarding)"/>
             </method>
 
@@ -80,6 +81,7 @@
 
             <method name="processing" type="Processing">
             Algorithm to apply to frames to produce processed output.
+                <tag name="inline" />
                 <expr lang="C++" value="Processing({self}._processing)"/>
             </method>
 
@@ -133,10 +135,22 @@
 
             <attribute name="_pixel_data" type="uint8_t"
                 shape="{self}._width*{self}._height*(({self}._depth+7)/8)" 
-                accessor="data" shape_method="data_shape">
-            Pixel data as array of bytes.
+                accessor="_int_pixel_data">
+            Pixel data as array of bytes, method is for internal use only, use data8() or 
+            data16() for access to the data.
             </attribute>
 
+            <method name="data8" type="uint8_t" rank="2">
+                Returns pixel data array when stored data type is 8-bit (depth() is less than 9).
+                If data type is 16-bit then empty array is returned, use data16() method in this case.
+                <code lang="C++" body="if ({self}._depth &gt; 8) return ndarray&lt;uint8_t, 2&gt;(); return make_ndarray(_int_pixel_data().data(), _height, _width);" />
+            </method>
+
+            <method name="data16" type="uint16_t" rank="2">
+                Returns pixel data array when stored data type is 16-bit (depth() is greater than 8).
+                If data type is 8-bit then empty array is returned, use data8() method in this case.
+                <code lang="C++" body="if ({self}._depth &lt;= 8) return ndarray&lt;uint16_t, 2&gt;(); return make_ndarray((uint16_t*)_int_pixel_data().data(), _height, _width);" />
+            </method>
 
         </pstype>
         
