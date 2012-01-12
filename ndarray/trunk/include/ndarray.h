@@ -260,6 +260,9 @@ public:
     return std::accumulate(Super::m_shape, Super::m_shape+NDim, size_type(1), std::multiplies<size_type>());
   }
 
+  /// Returns true if array has no data
+  bool empty() const { return not Super::m_data; }
+
   /// Returns iterator to the beginning of data, iteration is performed in memory order
   const_iterator begin() const { return Super::m_data; }
 
