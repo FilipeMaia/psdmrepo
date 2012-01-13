@@ -98,9 +98,12 @@ public:
 /**
  *  @brief Group of methods which do actual tests. 
  */
-  void test_2x1   (const ndarray<int16_t, 3>& data, QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
-  void test_quad  (const ndarray<int16_t, 3>& data, QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
-  void test_cspad (const ndarray<int16_t, 3>& data, QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void test_2x1   (const int16_t* data, QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void test_quad  (const int16_t* data, QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  void test_cspad (const int16_t* data, QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  //void test_2x1   (const ndarray<int16_t, 3>& data, QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  //void test_quad  (const ndarray<int16_t, 3>& data, QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
+  //void test_cspad (const ndarray<int16_t, 3>& data, QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void test_cspad_init();
   void test_cspad_save();
 
