@@ -117,7 +117,8 @@ protected:
   void printInputPars();
   void arrayInit();
   void arrayDelete();
-  void arrayFill(const int16_t* data);
+  void arrayFill (const uint16_t* data);
+  void arrayFill8(const uint8_t*  data);
   void saveArrayInFile();
   int  ampToIndex(double amp);
   
@@ -127,7 +128,7 @@ private:
 
   //enum {m_npix_mini1 = 185 * 388 * 2};
 
-  enum {m_npix_mini1 = 1024}; // *1024};
+  //enum {m_npix_mini1 = 1024}; // *1024};
   
   Source        m_src;         // Data source set from config file
   Pds::Src      m_actualSrc;
@@ -140,6 +141,10 @@ private:
   bool          m_filter;
   long          m_count;
 
+  int           m_offset;
+  int           m_width;
+  int           m_height;
+  int           m_numPixels;
   int           m_nbins1;
   double        m_factor;
 
