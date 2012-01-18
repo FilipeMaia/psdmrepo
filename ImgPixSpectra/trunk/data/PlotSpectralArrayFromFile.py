@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 #--------------------
 # Check input parameters
-
+import SpectralArray as sa
+import numpy as np
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 import sys
 
 print ' sys.argv[0]: ', sys.argv[0]
@@ -35,22 +37,19 @@ def plot_image (arr, range=None) :    # range = (left, right, low, high)
 #--------------------
 # Read and plot array
 
-arr_inp = np.loadtxt(fname, dtype=np.float32)
+sp = sa.SpectralArray (fname)
+sp.print_shape_parameters ()
+sp.print_array_subset ()
 
-print arr_inp
+arr_inp = sp.arr
 print arr_inp.shape
 
-#arr = arr_inp
+# Test for any camera
+pixmin = 10000
+pixmax = pixmin + 1000
 
-# MiniCSPad test
-arr = arr_inp[10000:11000][:]
-plot_image (arr, range=(500, 1000, 11000, 10000))
-
-# CSPad test
-#arr = arr_inp[5000:10000][:]
-#plot_image (arr, range=(10, 2010, 10000, 5000))
-
-#plot_histogram (arr)
+arr = arr_inp[pixmin:pixmax][:]
+plot_image (arr, range=(sp.amin, sp.amax, pixmax, pixmin))
 
 plt.show()
 

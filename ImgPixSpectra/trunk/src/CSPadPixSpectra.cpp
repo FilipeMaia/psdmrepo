@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <fstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -150,6 +151,7 @@ void
 CSPadPixSpectra::endJob(Event& evt, Env& env)
 {
   this -> saveArrayInFile();
+  this -> saveShapeInFile();
   this -> arrayDelete();
 }
 
@@ -311,6 +313,24 @@ CSPadPixSpectra::saveArrayInFile()
     MsgLog(name(), info, "Save the spectral array in file " << m_arr_fname);
     CSPadPixCoords::Image2D<int>* arr = new CSPadPixCoords::Image2D<int>(&m_arr[0], m_sizeOfCSPadArr, m_nbins); 
     arr -> saveImageInFile(m_arr_fname,0);
+}
+
+//--------------------
+
+void 
+CSPadPixSpectra::saveShapeInFile()
+{ 
+    m_arr_shape_fname = m_arr_fname + ".sha";
+    MsgLog(name(), info, "Save the spectral array configuration in file " << m_arr_shape_fname);
+    ofstream file; 
+    file.open(m_arr_shape_fname.c_str(),ios_base::out);
+    file << "NPIXELS  " << m_sizeOfCSPadArr  << "\n";
+    file << "NBINS    " << m_nbins           << "\n";
+    file << "AMIN     " << m_amin            << "\n";
+    file << "AMAX     " << m_amax            << "\n";
+    file << "NEVENTS  " << m_count           << "\n";
+    file << "ARRFNAME " << m_arr_fname       << "\n";
+    file.close();
 }
 
 //--------------------

@@ -44,7 +44,7 @@ namespace ImgPixSpectra {
  *
  *  CSPadPixSpectra class is a psana module which creates and fills 
  *  the spectral array for all pixels in the CSPad array. The spectral
- *  array has two dimensions, the total number of CSPad pixels and
+ *  array has two dimensions, the total number of pixels and
  *  the number of amplitude bins requested in the list of configuration parameters.
  *
  *  An example of the configuration file (psana.cfg) for this module:
@@ -59,18 +59,21 @@ namespace ImgPixSpectra {
  *    amin          =    10.
  *    amax          =  2010.
  *    nbins         =   100
- *    arr_fname     = cspad_spectral_array_cfg.txt
+ *    arr_fname     = cspad-pix-spectra.txt
+ *    #events       =   500                                                  
  *    @endcode
  *
- *  The output file "cspad_spectral_array_cfg.txt" contains the spectral array 
- *  for CSPad pixels accumulated in job. This file can be used for further analysis 
+ *  The output file "cspad-pix-spectra.txt" contains the spectral array 
+ *  for CSPad pixels accumulated in job. 
+ *  Axillary file with additional name extension ".sha" contains the shape parameters
+ *  of the spectral array. The file(s) can be used for further analysis 
  *  or presentation, for example, using the python script:
  *
  *    @code
- *    ./Plot2DArrayFromFile.py cspad_spectral_array_cfg.txt
+ *    ImgPixSpectra/data/PlotSpectralArrayFromFile.py cspad-pix-spectra.txt
  *    @endcode
  *
- *  This software was developed for the LCLS project.  If you use all or 
+ *  This software was developed for the LCLS project. If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
  *  @see AdditionalClass
@@ -125,6 +128,7 @@ protected:
   void loopOverQuads(shared_ptr<CSPadDataType> data);
   void arrayFill(int quad, const int16_t* data, uint32_t roiMask);
   void saveArrayInFile();
+  void saveShapeInFile();
   int  ampToIndex(double amp);
 
 private:
@@ -138,7 +142,8 @@ private:
   double   m_amin;
   double   m_amax;
   int      m_nbins;
-  string   m_arr_fname;
+  std::string   m_arr_fname;
+  std::string   m_arr_shape_fname;
   bool     m_filter;
   long     m_count;
   

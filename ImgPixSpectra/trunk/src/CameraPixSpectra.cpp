@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <fstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -64,12 +65,12 @@ CameraPixSpectra::CameraPixSpectra (const std::string& name)
 {
   // get the values from configuration or use defaults
 //m_src = configStr("source", "DetInfo(:Princeton)");
-  m_src           = configStr("source", "DetInfo(:Cspad2x2)");  
+  m_src           = configStr("source", "DetInfo(SxrBeamline.0:Opal1000.1)");  
   m_key           = configStr("inputKey",   "");
   m_amin          = config   ("amin",       0.);
   m_amax          = config   ("amax",    1000.);
   m_nbins         = config   ("nbins",     100);
-  m_arr_fname     = configStr("arr_fname", "mini_cspad_spectral_array.txt");
+  m_arr_fname     = configStr("arr_fname", "camera_spectral_array.txt");
   m_maxEvents     = config   ("events", 1<<31U);
   m_filter        = config   ("filter",  false);
 }
@@ -309,6 +310,7 @@ CameraPixSpectra::endJob(Event& evt, Env& env)
 {
   MsgLog(name(), info, "CameraPixSpectra::endJob");
   this -> saveArrayInFile();
+  this -> saveShapeInFile();
   this -> arrayDelete();
 }
 
@@ -372,6 +374,24 @@ CameraPixSpectra::saveArrayInFile()
     MsgLog(name(), info, "Save the spectral array in file " << m_arr_fname);
     CSPadPixCoords::Image2D<int>* arr = new CSPadPixCoords::Image2D<int>(&m_arr[0], m_numPixels, m_nbins); 
     arr -> saveImageInFile(m_arr_fname,0);
+}
+
+//--------------------
+
+void 
+CameraPixSpectra::saveShapeInFile()
+{ 
+    m_arr_shape_fname = m_arr_fname + ".sha";
+    MsgLog(name(), info, "Save the spectral array configuration in file " << m_arr_shape_fname);
+    ofstream file; 
+    file.open(m_arr_shape_fname.c_str(),ios_base::out);
+    file << "NPIXELS  " << m_numPixels       << "\n";
+    file << "NBINS    " << m_nbins           << "\n";
+    file << "AMIN     " << m_amin            << "\n";
+    file << "AMAX     " << m_amax            << "\n";
+    file << "NEVENTS  " << m_count           << "\n";
+    file << "ARRFNAME " << m_arr_fname       << "\n";
+    file.close();
 }
 
 //--------------------

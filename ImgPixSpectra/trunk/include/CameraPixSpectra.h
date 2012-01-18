@@ -38,11 +38,11 @@ namespace ImgPixSpectra {
 /**
  *  @ingroup ImgPixSpectra
  *
- *  @brief Creates the spectal array for all pixels in the Mini-CSPad detector.
+ *  @brief Creates the spectal array for all pixels in the Opal-1k, Princeton, etc camera-detectors.
  *
  *  CameraPixSpectra class is a psana module which creates and fills 
- *  the spectral array for all pixels in the Mini-CSPad array. The spectral
- *  array has two dimensions, the total number of Mini-CSPad pixels and
+ *  the spectral array for all pixels in the Opal-1k, Princeton, etc array. 
+ *  The spectral array has two dimensions, the total number of pixels and
  *  the number of amplitude bins requested in the list of configuration parameters.
  *
  *  An example of the configuration file (psana.cfg) for this module:
@@ -57,23 +57,21 @@ namespace ImgPixSpectra {
  *    amin          =     0.                                                
  *    amax          =  1000.                                                
  *    nbins         =   100                                                 
- *    arr_fname     = sxr16410-r0081-opal-camera-pix-spectra.txt            
- *    events        =   150                                                  
- *    
- *    
- *    
- *    
+ *    arr_fname     = camera-pix-spectra.txt            
+ *    #events       =   500                                                  
  *    @endcode
  *
- *  The output file "cspad_spectral_array_cfg.txt" contains the spectral array 
- *  for CSPad pixels accumulated in job. This file can be used for further analysis 
+ *  The output file "camera-pix-spectra.txt" contains the spectral array 
+ *  for CSPad pixels accumulated in job. 
+ *  Axillary file with additional name extension ".sha" contains the shape parameters
+ *  of the spectral array. The file(s) can be used for further analysis 
  *  or presentation, for example, using the python script:
  *
  *    @code
- *    ./Plot2DArrayFromFile.py cspad_spectral_array_cfg.txt
+ *    ImgPixSpectra/data/PlotSpectralArrayFromFile.py camera-pix-spectra.txt
  *    @endcode
  *
- *  This software was developed for the LCLS project.  If you use all or 
+ *  This software was developed for the LCLS project. If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
  *  @version \$Id: CameraPixSpectra.h$
@@ -120,6 +118,7 @@ protected:
   void arrayFill (const uint16_t* data);
   void arrayFill8(const uint8_t*  data);
   void saveArrayInFile();
+  void saveShapeInFile();
   int  ampToIndex(double amp);
   
 private:
@@ -137,6 +136,7 @@ private:
   double        m_amax;
   int           m_nbins;
   std::string   m_arr_fname;
+  std::string   m_arr_shape_fname;
   unsigned      m_maxEvents;
   bool          m_filter;
   long          m_count;
