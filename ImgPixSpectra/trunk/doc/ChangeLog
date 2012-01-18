@@ -11,7 +11,27 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-01-18 Mikhail S. Dubrovin
 Tag: V00-00-01
+   The 1st tagged version of this package contains 
+   the psana modules
+	CSPadPixSpectra
+	CameraPixSpectra
+	MiniCSPadPixSpectra
+
+   the *.cfg example files for psana
+       ImgPixSpectra/data/psana-cxi35711-r0009-cspad-pix-spectra.cfg
+       ImgPixSpectra/data/psana-cxi49812-r0203-mini-cspad-pix-spectra.cfg
+       ImgPixSpectra/data/psana-sxr16410-r0081-opal-camera-pix-spectra.cfg
+
+   the auxiliary python scripts in ImgPixSpectra/data/
+	MergeArrays.py
+	SpectralArray.py
+	PlotSpectralArrayFromFile.py
+
+   Documentation is available in doxygen and in 
+	https://confluence.slac.stanford.edu/display/PCDS/Psana+Module+Catalog#PsanaModuleCatalog
+	
 2012-01-03 Mikhail S. Dubrovin
 - just created this template file, this entry is an example of the change log
   entry
