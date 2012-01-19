@@ -11,16 +11,17 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-2012-Jan-18 ofte                 rev 2800
+	
+2012-Jan-18 ofte  Tag V00-01-16        rev 2800
 	- Added path parameter to pyana_images, to set correct CSPad tile
 	alignment path. Currently needs to be edited into pyana config file 
 	by users.
 	
-2012-Jan-06 ofte                 rev 2760
+2012-Jan-06 ofte                   rev 2760
 	- minor edits
 	
-2011-Dec-13 ofte                 rev 2755
-        - I think all the most obvious bugs have been removed now. This will be V00-01-15
+2011-Dec-13 ofte  V00-01-15                 rev 2755
+        - I think all the most obvious bugs have been removed now. 
 	- encoder has been updated to use channel mask
 	
 2011-Dec-09 ofte                 rev 2697
