@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-01-19 Andy Salnikov
+Tag: V00-00-02
+	in CSPadPixSpectra.h moved typedefs inside class declaration,
+	otherwise doxygen documentation is all messed up
+
 2012-01-18 Mikhail S. Dubrovin
 Tag: V00-00-01
    The 1st tagged version of this package contains 

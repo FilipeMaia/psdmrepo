@@ -83,12 +83,12 @@ namespace ImgPixSpectra {
  *  @author Mikhail S. Dubrovin
  */
 
+class CSPadPixSpectra : public Module {
+public:
+
   typedef Psana::CsPad::DataV2    CSPadDataType;
   typedef Psana::CsPad::ElementV2 CSPadElementType;
   typedef Psana::CsPad::ConfigV3  CSPadConfigType;
-
-class CSPadPixSpectra : public Module {
-public:
 
   // Default constructor
   CSPadPixSpectra (const std::string& name) ;
