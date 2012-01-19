@@ -11,6 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2012-01-19 Mikhail S. Dubrovin
+- in all psana modules replace the pointer by ndarray. 
+  //const int16_t* data = el.data(); // depricated stuff
+    const ndarray<int16_t,3>& data_nda = el.data();
+- add in Image2D.cpp
+  template class CSPadPixCoords::Image2D<int>;
+	
 Tag: V00-02-00
 2011-10-04 Andy Salnikov
 - migration to use ndarray for cspad images
