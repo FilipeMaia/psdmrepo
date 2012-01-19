@@ -49,7 +49,10 @@ class CsPad( object ):
         """
         if path is None: # use a local copy
             path = 'data/XtcExplorer/calib/CSPad'
-
+            print "Reading CsPad tile alignment from local calibration directory"
+        else :
+            print "Reading CsPad tile alignment from ", path
+            
         if file is None: # assume same file for all runs
             file = '0-end.data'
             

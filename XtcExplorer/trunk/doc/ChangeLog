@@ -11,6 +11,11 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2012-Jan-18 ofte                 rev 2800
+	- Added path parameter to pyana_images, to set correct CSPad tile
+	alignment path. Currently needs to be edited into pyana config file 
+	by users.
+	
 2012-Jan-06 ofte                 rev 2760
 	- minor edits
 	

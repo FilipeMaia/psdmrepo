@@ -59,7 +59,9 @@ class  pyana_image ( object ) :
                    outputfile = None,
                    n_hdf5 = None ,
                    max_save = "0",
-                   fignum = "1" ):
+                   fignum = "1",
+                   # data/calibration path (needed for CsPad)
+                   calib_path = None ):
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
         All parameters are passed as strings
@@ -74,9 +76,11 @@ class  pyana_image ( object ) :
         @param plot_vrange       value-range of interest
         @param show_projections  0,1 or 2, for projecting nothing, average or maximum 
  
-        @param outputfile       filename (If collecting: write to this file)
+        @param outputfile        filename (If collecting: write to this file)
         @param n_hdf5            if output file is hdf5, combine n events in each output file. 
         @param max_save          Maximum single-shot images to save
+
+        @param calib_path        path to the calibration directory (expNUMBER/calib)
         """
 
         opt = PyanaOptions() # convert option string to appropriate type
@@ -162,9 +166,11 @@ class  pyana_image ( object ) :
         self.apply_dictionary = { 'rotate': alg.rotate,
                                   'shift' : alg.shift }
         
+
+        self.calib_path = calib_path
         
         self.cspad = {}
-
+        
         self.configtypes = { 'Cspad2x2'  : xtc.TypeId.Type.Id_CspadConfig ,
                              'Cspad'     : xtc.TypeId.Type.Id_CspadConfig ,
                              'Opal1000'  : xtc.TypeId.Type.Id_Opal1kConfig,
@@ -205,7 +211,7 @@ class  pyana_image ( object ) :
                 quads = range(4)
                 sections = map(config.sections, quads)
                 
-                self.cspad[addr] = CsPad(sections)
+                self.cspad[addr] = CsPad(sections, path=self.calib_path)
 
         ## load dark image from file
         #try:

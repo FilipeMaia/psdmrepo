@@ -78,7 +78,7 @@ class  pyana_image_beta ( object ) :
         opt = PyanaOptions()
 
         self.source = opt.getOptString(source)
-        self.quantities = opt.getOptStringsDict(quantities)
+        self.quantities = opt.getOptStringsList(quantities)
         self.darkfile = opt.getOptString(dark_img_file)
         self.pedestalfile = opt.getOptString(pedestal_file)
         self.out_avg_file = opt.getOptString(out_avg_file)
@@ -232,6 +232,14 @@ class  pyana_image_beta ( object ) :
         # this one counts every event
         self.n_shots+=1
 
+        # test for marcin
+        #self.stop_event = 4
+        #print(self.n_shots)
+        #print(self.stop_event)
+        #print(self.n_shots > self.stop_event)
+        #print(self.n_shots < self.stop_event)
+                                                                                                                
+
         if evt.get('skip_event'):
             print "Told to skip this event..."
             return
@@ -261,6 +269,10 @@ class  pyana_image_beta ( object ) :
         #if not passed:
         #    return
             
+        # select a region
+        #the_image = the_image[700:1600,1100:1600]
+
+
         # -----
         # Passed the threshold filter. Add this to the sum
         # -----
@@ -280,10 +292,9 @@ class  pyana_image_beta ( object ) :
         if self.radii is None: 
             self.compute_polarcoordinates(the_image.shape)
 
-        for quantity in self.quantities :
-            option = self.quantities[quantity]
-            print "pyana_image_beta.py: Plotting %s with option %s"%( quantity, option)
-            self.funcdict_bookplot[quantity](the_image,option)
+        for quantity,options in self.quantities :
+            print "pyana_image_beta.py: Plotting %s with option %s"%( quantity, options)
+            self.funcdict_bookplot[quantity](the_image,options)
 
         # add mydata to event's plot_data 
         plot_data = evt.get('plot_data')
@@ -408,6 +419,7 @@ class  pyana_image_beta ( object ) :
         if options is not None:
             self.mydata.roi = map(int,options) # a list
 
+        print self.mydata.roi
             
     def book_spectrum_plot(self,image,options=None):
         flat = image.ravel()

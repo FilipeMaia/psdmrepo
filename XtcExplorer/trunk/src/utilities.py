@@ -74,6 +74,32 @@ class PyanaOptions( object ):
                 
         return mydict
 
+    def getOptStringsList(self, options_string) :
+        """Return a list of strings (label) and VALUES
+        Alternative to Dictionary, but it's sorted in whichever order was requested.
+        """
+        if options_string is None:
+            return []
+        
+        mylist = self.getOptStrings(options_string)
+        for entry in mylist:
+            # location of this entry in list
+            loc = mylist.index(entry)
+
+            # split 
+            items = entry.split(":")
+
+            label = items[0]
+            options = None
+
+            if len(items) > 1 :
+                options = items[1].strip('([])').split(',')
+
+            # replace entry with tuple of (label, options)
+            mylist[loc] = (label,options)
+                
+        return mylist
+
            
     def getOptIntegers(self, options_string):
         """Return a list of integers
