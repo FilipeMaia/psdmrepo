@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2012-01-19 Andy Salnikov
+- added ImgPixSpectra for psana-modules mode
+
 Tag: V00-00-06
 2011-12-09 Andy Salnikov
 - add MsgLogger, ndarray, and psddl_psana package to psana mode

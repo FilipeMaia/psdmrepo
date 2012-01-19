@@ -3,7 +3,7 @@
 # $Id$
 
 pack_psana="PSEnv PSEvt PSTime PSXtcInput PSHist RootHistoManager MsgLogger ndarray psana psddl_psana"
-pack_psana_mod="CSPadPixCoords PSCalib cspad_mod psana_examples"
+pack_psana_mod="CSPadPixCoords PSCalib ImgPixSpectra cspad_mod psana_examples"
 
 usage() {
   echo "Usage: $(basename $0) [options] output-dir [package ...]"
