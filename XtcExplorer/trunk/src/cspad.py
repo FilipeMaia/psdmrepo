@@ -39,7 +39,7 @@ class CsPad( object ):
         self.x_coordinates = None
         self.y_coordinates = None
         self.z_coordinates = None
-        self.make_coordinate_map()
+        #self.make_coordinate_map()
 
 
     def read_alignment(self, path = None, file=None):
@@ -143,8 +143,8 @@ class CsPad( object ):
         for quad in range(4):
 
             for sec in range(8):
-
-                # corner values
+                
+                # corner positions (in micrometers)
                 input_x = metrology[quad,sec,sec_coord_order[sec],0].reshape(2,2)
                 input_y = metrology[quad,sec,sec_coord_order[sec],1].reshape(2,2)
                 input_z = metrology[quad,sec,sec_coord_order[sec],2].reshape(2,2)
@@ -156,6 +156,8 @@ class CsPad( object ):
                 self.x_coordinates[quad,sec] = interpol.map_coordinates(input_x, sec_coords)
                 self.y_coordinates[quad,sec] = interpol.map_coordinates(input_y, sec_coords)
                 self.z_coordinates[quad,sec] = interpol.map_coordinates(input_z, sec_coords)
+                #print "x ", self.x_coordinates[quad,sec]
+                #print "y ", self.y_coordinates[quad,sec]
                 #print "z ", self.z_coordinates[quad,sec]
                 
                 # ! in micrometers! Need to convert to pixel units
@@ -171,7 +173,6 @@ class CsPad( object ):
                                 abs(input_x[0,1]-input_x[1,1])/185 ])
                 dShort[quad,sec] = dS[dS>100] # filter out the nonsense ones
 
-
         dTotal = np.concatenate( (dLong.ravel(), dShort.ravel() ))
         print "Pixel-size:"
         print "     long side average:    %.2f +- %.2f "%( dLong.mean(), dLong.std())
@@ -182,20 +183,37 @@ class CsPad( object ):
         self.x_coordinates = self.x_coordinates / dTotal.mean()
         self.y_coordinates = self.y_coordinates / dTotal.mean()
         self.z_coordinates = self.z_coordinates / dTotal.mean()
-        
+
+        origin = [[834,834],[834,834],[834,834],[834,834]]
+        for quad in range(4):
+            # For each quad, rotate and shift into the image coordinate system
+            if quad==0 :
+                savex = np.array( self.x_coordinates[quad] )
+                self.x_coordinates[quad] = origin[quad][0] - self.y_coordinates[quad]
+                self.y_coordinates[quad] = origin[quad][1] - savex
+            if quad==1 :
+                self.x_coordinates[quad] = origin[quad][0] + self.x_coordinates[quad]
+                self.y_coordinates[quad] = origin[quad][1] - self.y_coordinates[quad]
+            if quad==2 :
+                savex = np.array( self.x_coordinates[quad] )                
+                self.x_coordinates[quad] = origin[quad][0] + self.y_coordinates[quad]
+                self.y_coordinates[quad] = origin[quad][1] + savex
+            if quad==3 :
+                self.x_coordinates[quad] = origin[quad][0] - self.x_coordinates[quad]
+                self.y_coordinates[quad] = origin[quad][1] + self.y_coordinates[quad]
+                        
 
         print "Done making coordinate map of the CSPAD detector."
         #np.savetxt("xcoord.txt",self.x_coordinates.reshape((4*8*185,388)),fmt='%.1f')
 
         ## test
-        #list_of_images = []
-        #list_of_images.append( ("X-coordinates",self.make_image(self.x_coordinates)) )
-        #list_of_images.append( ("Y-coordinates",self.make_image(self.y_coordinates)) )
-        #list_of_images.append( ("Z-coordinates",self.make_image(self.z_coordinates)) )
-        # 
         #plotter = Plotter()
+        #plotter.add_image_frame("xcoord","X-coordinates",self.make_image(self.x_coordinates),)
+        #plotter.add_image_frame("ycoord","Y-coordinates",self.make_image(self.y_coordinates),)
+        #plotter.add_image_frame("zcoord","Z-coordinates",self.make_image(self.z_coordinates),)
         ##plotter.plot_image(self.image, title="Z-coordinates")
         #plotter.plot_several(list_of_images, title="CS-Pad (2011-08-10-Metrology)")
+        #plotter.plot_all_frames()
         #plt.show()
 
     def get_mini_image(self, element ):

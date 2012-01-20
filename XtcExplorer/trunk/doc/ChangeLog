@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 	
+2012-Jan-19 ofte  Tag V00-01-17        rev 2809
+         - finished the CsPad map of full image. And commented it out, because 
+	 there isn't really much you can do with it, but it can be used if requested. 
+	 Plan to move this to a separate pyana/cspad utilities library. 
+
 2012-Jan-18 ofte  Tag V00-01-16        rev 2800
 	- Added path parameter to pyana_images, to set correct CSPad tile
 	alignment path. Currently needs to be edited into pyana config file 

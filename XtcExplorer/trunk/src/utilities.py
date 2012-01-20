@@ -643,6 +643,11 @@ class Plotter(object):
         QtCore.pyqtRemoveInputHook()
 
 
+    def add_image_frame(self, name="", title="",contents=None, plot_type="image", aspect='auto'):
+        """Forward to add_frame"""
+        return self.add_frame(name,title,contents,plot_type,aspect)
+
+
     def add_frame(self, name="", title="",contents=None, plot_type=None, aspect='auto'):
         """Add a frame to the plotter. 
         @param  name       name of frame (must be unique, else returns the existing frame)
