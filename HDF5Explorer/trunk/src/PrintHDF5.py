@@ -29,7 +29,7 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
-#import sys
+import sys
 import os
 import time
 import h5py
@@ -45,44 +45,38 @@ import ConfigParameters as cp
 # Exported definitions --
 #------------------------
 
-
-
 #----------------------------------
 
 def print_hdf5_file_structure(fname):
     """Prints the HDF5 file structure"""
 
-    offset = '    '
     f = h5py.File(fname, 'r') # open read-only
-    print_group(f,offset)
+    print_hdf5_item_structure(f)
     f.close()
     print '=== EOF ==='
 
 #----------------------------------
 
-def print_group(g,offset):
+def print_hdf5_item_structure(g, offset='    ') :
     """Prints the input file/group/dataset (g) name and begin iterations on its content"""
-    print "Structure of the",
-    if   isinstance(g,h5py.File):    print "'File'",
-    elif isinstance(g,h5py.Group):   print "'Group' from file",
-    elif isinstance(g,h5py.Dataset): print "'Dataset' from file",
-    print g.file,"\n",g.name
-    if   isinstance(g,h5py.Dataset): print offset, "(Dateset)   len =", g.shape #, subg.dtype
-    else:                            print_group_content(g,offset)
+    if   isinstance(g,h5py.File) :
+        print g.file, '(File)', g.name
 
-#----------------------------------
+    elif isinstance(g,h5py.Dataset) :
+        print '(Dataset)', g.name, '    len =', g.shape #, g.dtype
 
-def print_group_content(g,offset):
-    """Prints content of the file/group/dataset iteratively, starting from the sub-groups of g"""
-    for key,val in dict(g).iteritems():
-        subg = val 
-        print offset, key, #,"   ", subg.name #, val, subg.len(), type(subg), 
-        if   isinstance(subg, h5py.Dataset):
-            print " (Dateset)   len =", subg.shape #, subg.dtype
-        elif isinstance(subg, h5py.Group):
-            print " (Group)   len =",len(subg)
-            offset_subg = offset + '    '
-            print_group_content(subg,offset_subg)
+    elif isinstance(g,h5py.Group) :
+        print '(Group)', g.name
+
+    else :
+        print 'WORNING: UNKNOWN ITEM IN HDF5 FILE', g.name
+        sys.exit ( "EXECUTION IS TERMINATED" )
+
+    if isinstance(g, h5py.File) or isinstance(g, h5py.Group) :
+        for key,val in dict(g).iteritems() :
+            subg = val
+            print offset, key, #,"   ", subg.name #, val, subg.len(), type(subg),
+            print_hdf5_item_structure(subg, offset + '    ')
 
 #----------------------------------
 #----------------------------------
@@ -437,8 +431,7 @@ def getListOfDatasetParIndexes(dsname=None, parname=None):
 #
 if __name__ == "__main__" :
 
-    # In principle we can try to run test suite for this module,
-    # have to think about it later. Right now just abort.
-    sys.exit ( "Module is not supposed to be run as main module" )
+    print_hdf5_file_structure('/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5')
+    sys.exit ( 'End of test' )
 
 #----------------------------------
