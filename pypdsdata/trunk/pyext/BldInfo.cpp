@@ -53,6 +53,7 @@ namespace {
         { "HfxMonCam",       Pds::BldInfo::HfxMonCam },
         { "HfxMonImb01",     Pds::BldInfo::HfxMonImb01 },
         { "HfxMonImb02",     Pds::BldInfo::HfxMonImb02 },
+        { "HfxMonImb03",     Pds::BldInfo::HfxMonImb03 },
         { "NumberOf",        Pds::BldInfo::NumberOf },
         { 0, 0 }
     };

@@ -1,4 +1,9 @@
 
+Tag: V00-00-45
+2012-01-19 Andy Salnikov
+- upgrade to pdsdata V03-02-04
+  - only one extra enum in BldInfo
+
 Tag: V00-00-44
 2012-01-12 Andy Salnikov
 - adding new pdsdata package timepix
