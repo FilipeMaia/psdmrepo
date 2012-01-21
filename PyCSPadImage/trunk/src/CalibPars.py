@@ -196,8 +196,10 @@ class CalibPars (object) :
             print  'WARNING: THE SPECIFIED DIRECTORY "',path,'" DOES NOT EXIST.'
             return self.calibfname
 
-        for fname in os.listdir(path) :
+        flist = os.listdir(path)
+        if len(flist) > 1 : flist.sort()
 
+        for fname in flist :
             basename = fname.split('.') # Assume: basename[0]='0-end', basename[1]='data' 
             basename_beg, basename_end = basename[0].split('-')
 

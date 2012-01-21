@@ -11,7 +11,18 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+#---------------------
+	
+Tag: V00-00-02
+2012-01-20 Mikhail S. Dubrovin
+- PyCSPadImage/src/CalibPars.py
+  order the file list: flist.sort() 
+  in order to have 0-end.data and 1150-end.data in a right order
 
+- Examples.py
+  is modified for calibration purpose.
+
+	
 2011-11-18 Mikhail S. Dubrovin
         - add Examples.py
         - Move examples from CSPadImageProducer.py to new module Examples.py
@@ -20,7 +31,6 @@ reverse time order.
 	- Add example for xpp47712
 	
 Tag: V00-00-01
-
 2011-10-19 Mikhail S. Dubrovin
   In CSPadConfigPars.py 
 	- add setCSPadConfigurationFromOpenFile( hdf5file, dsname, event )
