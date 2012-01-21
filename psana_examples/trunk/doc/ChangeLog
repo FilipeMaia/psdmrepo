@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-02
+2012-01-20 Andy Salnikov
+- more details printed in DumpControl module
+
 Tag: V00-02-01
 2012-01-12 Andy Salnikov
 - adding DumpTimepix module

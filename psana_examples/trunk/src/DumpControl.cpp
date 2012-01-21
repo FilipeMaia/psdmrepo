@@ -83,8 +83,12 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
     
     WithMsgLog(name(), info, str) {
       
-      str << "ControlData::ConfigV1:\n  duration = ";
+      str << "ControlData::ConfigV1:"
+          <<  "\n  uses_duration = " << (config->uses_duration() ? "yes" : "no")
+          <<  "\n  duration = ";
       printClockTime(str, config->duration());
+      str <<  "\n  uses_events = " << (config->uses_events() ? "yes" : "no")
+          << "\n  events = " << config->events();
 
       const ndarray<Psana::ControlData::PVControl, 1>& pvControls = config->pvControls();
       for (unsigned i = 0; i < pvControls.size(); ++ i) {
