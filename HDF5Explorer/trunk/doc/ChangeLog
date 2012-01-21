@@ -12,6 +12,27 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ------------------------------
+Tag: V00-00-11
+2012-01-20 Mikhail S. Dubrovin
+
+- ConfigCSpad.py
+  add methods with new constants:
+  setCSpadParametersV0004() #DS1
+  setCSpadParametersV0005() #DSD
+  and
+  setCSpadParametersFromCalibDir()
+  for automatic access to calibration parameters from the official calibration derectory.
+
+	
+- DrawEvent.py
+  add methods getRunNumberFromHDF5FileName, getCSPadName, getCSPadCalibDir
+  in order to get automatically calibration parameters
+
+	
+- GlobalMethods.py
+  add a few methods to 
+	
+
 2011-11-08 Mikhail S. Dubrovin
 - In the GUI/plot for WF vs Ev:
 	add the range of events

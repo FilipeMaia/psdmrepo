@@ -86,6 +86,16 @@ def get_item_third_to_last_name(dsname):
 
 #----------------------------------
 
+def get_item_last_three_names(dsname):
+    """Returns the 3nd to last part of the full item name"""
+    path1,name1 = os.path.split(str(dsname))
+    path2,name2 = os.path.split(str(path1))
+    path3,name3 = os.path.split(str(path2))
+    #str(name3)
+    return name1, name2, name3 
+
+#----------------------------------
+
 def get_item_name_for_title(dsname):
     """Returns the last 3 parts of the full item name (after last slashes)"""
     path1,name1 = os.path.split(str(dsname))
@@ -237,6 +247,21 @@ def saveNumpyArrayInFile(arr, fname='nparray.txt', format='%f') : # format='%f'
 def getNumpyArrayFromFile(fname='nparray.txt', datatype=np.float32) : # np.int16, np.float16, np.float32
     print """Load numpy array from file """, fname
     return np.loadtxt(fname, dtype=datatype)
+
+
+#----------------------------------
+
+def getListOfFilesInDir(dirname) :
+    return os.listdir(dirname)
+
+#----------------------------------
+
+def printListOfFilesInDir(dirname) :
+    dirList = getListOfFilesInDir(dirname)
+    print 'List of files in the dir.', dirname
+    for name in dirList :
+        print name,
+    print '\n'
 
 #----------------------------------
 #

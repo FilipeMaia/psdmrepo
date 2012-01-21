@@ -753,13 +753,17 @@ class DrawEvent ( object ) :
             #printh5.print_file_info(self.h5file)
 
             self.getTimeHDF5File()
+            self.getRunNumberFromHDF5FileName()
+            self.getCSPadName()
+            self.getCSPadCalibDir()
 
             #if cp.confpars.fileName == self.fileNameWithAlreadySetCSpadConfiguration : return
             #else : cs.confcspad.setCSpadParameters()
             cs.confcspad.setCSpadParameters()
 
 
-    def getTimeHDF5File( self ) :     
+    def getTimeHDF5File( self ) :
+        """Get the time of the run start in seconds and save it in cs.confcspad.run_start_seconds for configuration"""
         conf_group = self.h5file['/Configure:0000']
         cs.confcspad.run_start_seconds = conf_group.attrs['start.seconds']
 
@@ -767,6 +771,53 @@ class DrawEvent ( object ) :
         tloc = time.localtime(cs.confcspad.run_start_seconds) # converts sec to the tuple struct_time in local
         print 'Run start local time :', time.strftime('%Y-%m-%d %H:%M:%S',tloc)
         #t1_sec = int( time.mktime((2011, 6, 23, 23, 22, 18, 0, 0, 0)) ) # converts date-tile to seconds
+
+
+    def getRunNumberFromHDF5FileName( self ) :
+        #print 'File name:', cp.confpars.fileName
+        ind1 = cp.confpars.fileName.find('-r')
+        ind2 = cp.confpars.fileName.find('.h5')
+        cs.confcspad.run_num = int(cp.confpars.fileName[ind1+2:ind2])
+        #print 'Run number:', cs.confcspad.run_num
+
+
+    def getCSPadName( self ) :
+        """Get the CSPad detector name and data type 
+           1. finds the 1st in the list dataset for CSPad.
+           2. get the detector name and data type as a parts of the dataset name
+           3. save them in cs.confcspad.cspad_name and cs.confcspad.cspad_data_type for configuration
+        """
+        cs.confcspad.cspad_name      = ''
+        cs.confcspad.cspad_data_type = ''
+        for dsname in cp.confpars.list_of_checked_item_names :
+            #item_last_name   = gm.get_item_last_name(dsname)
+            if gm.CSpadIsInTheName(dsname) :
+                name1, name2, name3 = gm.get_item_last_three_names(dsname)
+                cs.confcspad.cspad_name      = name2 # something like CxiDs1.0:Cspad.0
+                cs.confcspad.cspad_data_type = name3 # something like CsPad::ElementV2
+                #print 'CSPad is found in dataset', dsname
+                #print 'CSPad name and data type =', cs.confcspad.cspad_name, cs.confcspad.cspad_data_type
+                #return name2
+                return
+
+
+    def getCSPadCalibDir( self ) :
+        """Constructs the calibration directory name from the *.h5 file directory and the detector name.
+           The lates version of calibration is picked up automatically.
+           The calibration directory name is used to load the CSPad geometry configuration parameters.
+        """
+        calib_dir = gm.get_item_path_to_last_name(cp.confpars.dirName) + '/calib/'
+        #print 'getCSPadCalibDir: calib dir name:', calib_dir # something like /reg/d/psdm/CXI/cxi80410/calib/
+
+        dirList=gm.getListOfFilesInDir(calib_dir)
+        self.calib_version = '' 
+        for name in dirList: # loop
+            if name[0:5] == 'CsPad' :
+                self.calib_version = name # something like CsPad::CalibV1
+
+        cs.confcspad.cspad_calib_dir = calib_dir + self.calib_version + '/' + cs.confcspad.cspad_name     
+        #print 'getCSPadCalibDir: calib dir name:', cs.confcspad.cspad_calib_dir
+        #gm.printListOfFilesInDir(cs.confcspad.cspad_calib_dir)
 
 
     def closeHDF5File( self ) :       

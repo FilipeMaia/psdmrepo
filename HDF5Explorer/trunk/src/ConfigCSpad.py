@@ -32,6 +32,7 @@ __version__ = "$Revision: 4 $"
 import sys
 #import os
 import time
+import PyCSPadImage.CalibPars as calp
 
 #---------------------
 #  Class definition --
@@ -62,7 +63,7 @@ class ConfigCSpad ( object ) :
         self.t_sec_r0004 = int( time.mktime((2011,  6, 23,  8, 00, 00, 0, 0, 0)) ) # converts date-time to seconds
         self.t_sec_r0005 = int( time.mktime((2011,  9,  1,  0, 00, 00, 0, 0, 0)) ) # converts date-time to seconds
         self.t_sec_r0006 = int( time.mktime((2012,  1, 14,  0, 00, 00, 0, 0, 0)) ) # runs after winter break
-        self.t_sec_Infty = int( time.mktime((2100,  0,  0,  0, 00, 00, 0, 0, 0)) ) # converts date-time to seconds
+        self.t_sec_Infty = int( time.mktime((2100,  1,  1,  0, 00, 00, 0, 0, 0)) ) # converts date-time to seconds
 
         print 'Start time for runs for CSPad configuration'
         print 'self.t_sec_r0003 =', self.t_sec_r0003, time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(self.t_sec_r0003))
@@ -80,20 +81,159 @@ class ConfigCSpad ( object ) :
     def setCSpadParameters( self ) :
 
         print 'setCSpadParameters():',
+
         if self.run_start_seconds < self.t_sec_r0004 :
             self.setCSpadParametersV0001()
             print 'set parameters for V0001'
+
         elif self.t_sec_r0004 < self.run_start_seconds and self.run_start_seconds < self.t_sec_r0005:
             self.setCSpadParametersV0002()        
             print 'set parameters for V0002'
+
         elif self.t_sec_r0005 < self.run_start_seconds and self.run_start_seconds < self.t_sec_r0006:
             self.setCSpadParametersV0003()        
             print 'set parameters for V0003'
+
         elif self.t_sec_r0006 < self.run_start_seconds and self.run_start_seconds < self.t_sec_Infty:
-            self.setCSpadParametersV0004() # For DS1       
-            print 'set parameters for V0004'
-            #self.setCSpadParametersV0005() # For DSD
-            #print 'set parameters for V0005'
+
+            #if   self.cspad_name == 'CxiDs1.0:Cspad.0' :
+            #    self.setCSpadParametersV0004() # For DS1       
+            #    print 'set parameters for V0004'
+
+            if   self.cspad_name == 'CxiDsd.0:Cspad.0' :
+                 self.setCSpadParametersV0005() # For DSD
+                 print 'set parameters for V0005'
+
+            else : 
+                 self.setCSpadParametersFromCalibDir() 
+                 print 'set parameters for from calib dir'
+
+#==========================================
+#==========================================
+
+    def setCSpadParametersFromCalibDir ( self ) :
+        """Set the calibration parameters from the official location
+           The name of self.cspad_calib_dir should be provided...
+           Use V0004 as a default for fallback...
+        """
+        print 'setCSpadParameters(): calib dir :', self.cspad_calib_dir
+        print 'setCSpadParameters(): CSPad name:', self.cspad_name
+        print 'setCSpadParameters(): Run number:', self.run_num
+
+        calp.calibpars.setCalibParsForPath ( run = self.run_num, path = self.cspad_calib_dir )
+        #calp.calibpars.printCalibPars()
+        #calp.calibpars.printCalibFiles ()
+        #calp.calibpars.printListOfCalibTypes()
+        #print calp.calibpars.cpars['center']
+        #print calp.calibpars.cpars['center_corr']
+        #print calp.calibpars.cpars['offset']
+        #print calp.calibpars.cpars['offset_corr']
+        #print calp.calibpars.cpars['marg_gap_shift']
+        #print calp.calibpars.cpars['tilt']
+
+        self.isCSPad2x2 = False
+
+        # Detector and quar array dimennsions
+        self.detDimX = 1765
+        self.detDimY = 1765
+
+        self.quadDimX = 850
+        self.quadDimY = 850
+
+        self.marg_gap_shift = calp.calibpars.cpars['marg_gap_shift']
+        self.offset         = calp.calibpars.cpars['offset']
+        self.offset_corr    = calp.calibpars.cpars['offset_corr']
+        dq                  = self.offset + self.offset_corr 
+
+        #print 'self.marg_gap_shift =\n', self.marg_gap_shift 
+        #print 'self.offset =\n',      self.offset
+        #print 'self.offset_corr =\n', self.offset_corr 
+        #print 'dq =\n', dq 
+
+        self.preventiveRotationOffset = self.marg_gap_shift[0,0] # 15 # (pixel) increase effective canva for rotation
+
+        offX   = self.marg_gap_shift[0,1] # 40
+        offY   = self.marg_gap_shift[1,1] # 40
+
+        gapX   = self.marg_gap_shift[0,2] # 0
+        gapY   = self.marg_gap_shift[1,2] # 0
+
+        shiftX = self.marg_gap_shift[0,3] # 28
+        shiftY = self.marg_gap_shift[1,3] # 28
+
+        #d0     = 834
+        #self.quadXOffset = [ offX+ 0-gapX+shiftX,  offX+ 0+0-gapX-shiftX,  offX+d0-4+gapX-shiftX,  offX+d0-4+gapX+shiftX]
+        #self.quadYOffset = [ offY+ 3-gapY-shiftY,  offY+d0-1+gapY-shiftY,  offY+d0-0+gapY+shiftY,  offY+ 0+8-gapY+shiftY]
+
+        self.quadXOffset = [ offX-gapX+shiftX,  offX-gapX-shiftX,  offX+gapX-shiftX,  offX+gapX+shiftX]
+        self.quadYOffset = [ offY-gapY-shiftY,  offY+gapY-shiftY,  offY+gapY+shiftY,  offY-gapY+shiftY]
+
+        self.quadXOffset += dq[0] 
+        self.quadYOffset += dq[1] 
+
+        # We get this array dynamically from /Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV*/CxiDs1.0:Cspad.0/element
+        self.quad_nums_in_event = [0, 1, 2, 3] # <- default values
+
+        # Quad rotation angles
+        self.quadInDetOrient = [ 180,   90,    0,  270]
+        self.quadInDetOriInd = [   2,    1,    0,    3]
+
+        # We get this array dynamically from /Configure:0000/CsPad::ConfigV2/CxiDs1.0:Cspad.0/config
+        self.indPairsInQuads = [[ 0,   1,   2,   3,   4,   5,   6,   7],
+                                [ 8,   9,  10,  11,  12,  13,  14,  15],
+                                [16,  17,  18,  19,  20,  21,  22,  23],
+                                [24,  25,  26,  27,  28,  29,  30,  31]]
+
+        # 2x1 section rotation angles
+        self.pairInQaudOrient = [ [ 270, 270, 180, 180,  90,  90, 180, 180],
+                                  [ 270, 270, 180, 180,  90,  90, 180, 180],
+                                  [ 270, 270, 180, 180,  90,  90, 180, 180],
+                                  [ 270, 270, 180, 180,  90,  90, 180, 180] ]
+
+        # 2x1 section rotation index
+        self.pairInQaudOriInd = [ [   3,   3,   2,   2,   1,   1,   2,   2],
+                                  [   3,   3,   2,   2,   1,   1,   2,   2],
+                                  [   3,   3,   2,   2,   1,   1,   2,   2],
+                                  [   3,   3,   2,   2,   1,   1,   2,   2] ]
+
+        #self.dPhi = [ [-0.33819,  0.00132,  0.31452, -0.03487,  0.14738,  0.07896, -0.21778, -0.10396],  
+        #              [-0.27238, -0.00526,  0.02545,  0.03066, -0.03619,  0.02434,  0.08027,  0.15067],  
+        #              [-0.04803, -0.00592,  0.11318, -0.07896, -0.36125, -0.31846, -0.16527,  0.09200],  
+        #              [ 0.12436,  0.00263,  0.44809,  0.25794, -0.18029, -0.00117,  0.32701,  0.32439] ]
+        self.dPhi = calp.calibpars.cpars['tilt']
+
+        #self.pairXInQaud = [[199.14,  198.05,  310.67,   98.22,  629.71,  629.68,  711.87,  499.32],
+        #                    [198.52,  198.08,  311.50,   98.69,  627.27,  627.27,  712.35,  499.77],
+        #                    [198.32,  198.04,  310.53,   97.43,  626.68,  628.45,  710.86,  498.01],
+        #                    [198.26,  198.04,  308.70,   96.42,  627.66,  628.04,  711.12,  498.25]]
+        
+        #self.pairYInQaud = [[308.25,   95.11,  625.60,  625.70,  515.02,  727.37,  198.53,  199.30],
+        #                    [307.18,   95.08,  622.98,  623.51,  514.99,  727.35,  199.27,  198.94],
+        #                    [307.68,   95.09,  623.95,  625.29,  512.32,  724.63,  198.04,  200.35],
+        #                    [307.39,   95.12,  627.57,  626.65,  518.03,  730.95,  200.02,  199.70]]
+        
+        #self.pairZInQaud = [[  0.31,    0.12,    0.05,    0.12,    0.28,    0.24,    0.40,    0.27],
+        #                    [  0.45,    0.36,    0.62,    0.33,    1.02,    0.92,    1.30,    1.07],
+        #                    [  0.23,    0.22,    0.11,    0.15,    0.24,    0.20,    0.60,    0.42],
+        #                    [  0.25,    0.21,    0.12,    0.10,    0.35,    0.28,    0.66,    0.40]]
+
+        self.pairXInQaud = calp.calibpars.cpars['center'][0]
+        self.pairYInQaud = calp.calibpars.cpars['center'][1]
+        self.pairZInQaud = calp.calibpars.cpars['center'][2]
+
+                             #   0    1    2    3    4    5    6    7
+        #self.dXInQaud    = [[   0,   0,   0,   1,   1,   0,   1,   0],
+        #                    [   0,   0,   0,   0,   0,   0,  -1,   0],
+        #                    [   0,   0,   0,   0,   0,   0,   0,   0],
+        #                    [   0,   0,   0,  -1,   0,   0,   0,   1]]
+                                                                   
+        #self.dYInQaud    = [[   0,   0,   0,   0,  -1,   0,  -1,   0],
+        #                    [   0,   0,   0,   0,   0,   1,   0,   0],
+        #                    [   0,   0,   0,   0,   0,   0,  -1,  -2],
+        #                    [   0,   0,   0,   0,   0,   0,   0,   0]]
+        self.dXInQaud    = calp.calibpars.cpars['center_corr'][0]
+        self.dYInQaud    = calp.calibpars.cpars['center_corr'][1]
+
 
 #==========================================
 #==========================================
@@ -245,18 +385,6 @@ class ConfigCSpad ( object ) :
                       [-0.27238, -0.00526,  0.02545,  0.03066, -0.03619,  0.02434,  0.08027,  0.15067],  
                       [-0.04803, -0.00592,  0.11318, -0.07896, -0.36125, -0.31846, -0.16527,  0.09200],  
                       [ 0.12436,  0.00263,  0.44809,  0.25794, -0.18029, -0.00117,  0.32701,  0.32439] ]
-
-        # "0" version of coordinates:
-
-        self.pairXInQaud = [ [400,600,  0,  0,200,  0,400,400],
-                             [400,600,  0,  0,200,  0,400,400],
-                             [400,600,  0,  0,200,  0,400,400],
-                             [400,600,  0,  0,200,  0,400,400] ]
-
-        self.pairYInQaud = [ [  0,  0,200,  0,400,400,600,400],
-                             [  0,  0,200,  0,400,400,600,400],
-                             [  0,  0,200,  0,400,400,600,400],
-                             [  0,  0,200,  0,400,400,600,400] ]
 
         self.pairXInQaud = [[199.14,  198.05,  310.67,   98.22,  629.71,  629.68,  711.87,  499.32],
                             [198.52,  198.08,  311.50,   98.69,  627.27,  627.27,  712.35,  499.77],
@@ -445,18 +573,6 @@ class ConfigCSpad ( object ) :
                       [-0.27238, -0.00526,  0.02545,  0.03066, -0.03619,  0.02434,  0.08027,  0.15067],  
                       [-0.04803, -0.00592,  0.11318, -0.07896, -0.36125, -0.31846, -0.16527,  0.09200],  
                       [ 0.12436,  0.00263,  0.44809,  0.25794, -0.18029, -0.00117,  0.32701,  0.32439] ]
-
-        # "0" version of coordinates:
-
-        self.pairXInQaud = [ [400,600,  0,  0,200,  0,400,400],
-                             [400,600,  0,  0,200,  0,400,400],
-                             [400,600,  0,  0,200,  0,400,400],
-                             [400,600,  0,  0,200,  0,400,400] ]
-
-        self.pairYInQaud = [ [  0,  0,200,  0,400,400,600,400],
-                             [  0,  0,200,  0,400,400,600,400],
-                             [  0,  0,200,  0,400,400,600,400],
-                             [  0,  0,200,  0,400,400,600,400] ]
 
         self.pairXInQaud = [[199.14,  198.05,  310.67,   98.22,  629.71,  629.68,  711.87,  499.32],
                             [198.52,  198.08,  311.50,   98.69,  627.27,  627.27,  712.35,  499.77],
