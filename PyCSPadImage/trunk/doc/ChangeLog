@@ -12,9 +12,22 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2012-01-23 Mikhail S. Dubrovin
+
+- HDF5Methods.py: add methods 
+  get_cspad_name_and_data_type_from_dataset_name( dsname )
+  get_root_calib_dir_from_hdf5_path( path )
+  def get_cspad_calib_dir( path, cspad_name='CxiDs1.0:Cspad.0' )	
+  get_run_number_from_hdf5_file_name( fname )
+
+- GlobalMethods.py add methods
+  get_item_last_three_names(dsname)
+  getListOfFilesInDir(dirname)
+  printListOfFilesInDir(dirname)	
 	
-Tag: V00-00-02
 2012-01-20 Mikhail S. Dubrovin
+Tag: V00-00-02
+
 - PyCSPadImage/src/CalibPars.py
   order the file list: flist.sort() 
   in order to have 0-end.data and 1150-end.data in a right order
@@ -30,9 +43,10 @@ Tag: V00-00-02
 	- Commented print statements inside the modules CalibPars.py and HDF5Methods.py
 	- Add example for xpp47712
 	
-Tag: V00-00-01
 2011-10-19 Mikhail S. Dubrovin
-  In CSPadConfigPars.py 
+Tag: V00-00-01
+
+In CSPadConfigPars.py 
 	- add setCSPadConfigurationFromOpenFile( hdf5file, dsname, event )
 	- remove optimization: #if fname != self.fileNameWithAlreadySetCSPadConfiguration :
           which does not work in case of swap between Ds1 and Dsd
